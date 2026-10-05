@@ -19,7 +19,7 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5383 |
-| servermodules (`server/**/*.js`) | 4071 |
+| servermodules (`server/**/*.js`) | 4072 |
 | routebestanden (`server/routes/**`) | 638 |
 | kernmodules (`server/kern/**`) | 2561 |
 | schermen (`public/**/*.html`) | 326 |
@@ -72,6 +72,7 @@ leverancierpoort
 diensten
 media
 kluis
+meldingenlezen
 rem
 pinslot
 kantoordeur

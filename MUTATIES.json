@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-04T19:06:28.140Z",
-    "commit": "6c19cab6",
+    "op": "2026-10-05T14:26:01.833Z",
+    "commit": "395ddb7c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -8557,6 +8557,13 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "meldingen-isolatie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "memo.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10592,6 +10599,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "payroll-ssrf.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/payroll/dekking-bronnen.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "payroll-uren-controles.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -11085,6 +11100,14 @@
       "module": "server/config/productie-communicatie.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "productie-failclosed.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config.js",
+      "operator": "===->!==#0",
+      "gezakt": 11,
       "geprobeerd": 1
     },
     "productie-installatie.test.js": {
@@ -14072,6 +14095,14 @@
         "testSha256": "3b1f13998a6319183ef804ab43ff7062a3e6d4383463cf096e7f503d378542d7"
       }
     },
+    "sqlite-botsing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/merge.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "sqlite-duurzaam-sync.test.js": {
       "soort": "gericht",
       "staat": "gezakt",
@@ -14378,6 +14409,14 @@
       "module": "scripts/stillezing.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "stopspoeling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/stopspoeling.js",
+      "operator": "&&->||#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "storingen-bezorging.test.js": {
@@ -15155,6 +15194,13 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "token-domeinscheiding.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "training.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -15227,6 +15273,13 @@
       "operator": "!==->===#0",
       "gezakt": 6,
       "geprobeerd": 6
+    },
+    "tweede-rem.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "tweedehandtekening.test.js": {
       "soort": "server",

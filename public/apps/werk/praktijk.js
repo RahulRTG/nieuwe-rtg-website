@@ -8,6 +8,17 @@
   let stand, bezig = false, offset = 0, laadNummer = 0, ruimte = '';
   const concepten = new Map();
   const formulierSleutel = f => [f.dataset.pr,f.dataset.project||'',f.dataset.stap||''].join('|');
+  /* Het paneel wordt na elke bewaring opnieuw opgebouwd. Zonder deze sleutel
+     klapte daarbij elk blok dicht: wie een stap van een werk vastlegde, zag
+     het werk dichtvallen, en wie tijdens het bewaren een ander blok opende,
+     zag dat weer sluiten zodra het antwoord binnenkwam. Een blok draagt
+     daarom een vaste naam (data-pr-blok, binnen een werk data-pr-werk), en
+     wat open stond, staat na het herbouwen weer open. Een blok zonder naam
+     (bijvoorbeeld een teamlid) volgt zijn eigen tekening. */
+  const blokSleutel = d => { const w = d.closest('[data-pr-werk]');
+    const naam = d.dataset.prWerk ? 'werk' : d.dataset.prBlok; return naam ? (w ? w.dataset.prWerk : '') + '|' + naam : null; };
+  const openStand = () => { const m = new Map();
+    paneel.querySelectorAll('details').forEach(d => { const k = blokSleutel(d); if (k) m.set(k, d.open); }); return m; };
   paneel.addEventListener('input', ev => { const f = ev.target.closest('form[data-pr]');
     if (f) concepten.set(formulierSleutel(f), Object.fromEntries(new FormData(f))); });
   addEventListener('beforeunload', ev => { if (concepten.size) { ev.preventDefault(); ev.returnValue = ''; } });
@@ -19,12 +30,15 @@
   async function laad() {
     if (!K.sessie() || bezig) return;
     const gekozen = K.sessie().werkruimte;
-    if (ruimte !== gekozen) { concepten.clear(); ruimte = gekozen; offset = 0; }
+    const andereRuimte = ruimte !== gekozen;
+    if (andereRuimte) { concepten.clear(); ruimte = gekozen; offset = 0; }
     const nummer = ++laadNummer;
     try {
       const data = await api('beeld', {offset});
       if (nummer !== laadNummer || K.sessie()?.werkruimte !== gekozen) return;
+      const wasOpen = andereRuimte ? new Map() : openStand();
       stand = data; paneel.innerHTML = UI.teken(stand);
+      paneel.querySelectorAll('details').forEach(d => { const k = blokSleutel(d); if (k && wasOpen.has(k)) d.open = wasOpen.get(k); });
       paneel.querySelectorAll('form[data-pr]').forEach(f => {
         const waarden = concepten.get(formulierSleutel(f)); if (!waarden) return;
         for (const [naam, waarde] of Object.entries(waarden)) { const el = f.elements.namedItem(naam); if (el) el.value = waarde; }

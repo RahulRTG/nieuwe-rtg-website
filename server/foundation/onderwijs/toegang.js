@@ -10,9 +10,8 @@
      plus een willekeurig leerling-id; een kind is geen profiel (LEVEN.md), dus
      er staat geen naam, leeftijd of gezin in de sleutel.
 
-   Een les is tijdelijk: alle drie vervallen samen na GELDIG_MS. Twaalf uur is
-   een schooldag plus het huiswerk van die avond; de volgende dag begint de
-   begeleider een nieuwe les. Intrekken en roteren doet de leraar zelf.
+   Een les is tijdelijk: alle drie vervallen samen na GELDIG_MS. Twaalf uur: een
+   schooldag plus het huiswerk. Intrekken en roteren doet de leraar zelf.
 
    Deze laag bezit uitsluitend de credentials (collectie foundationLesToegang).
    De inhoud van de les (bord, schriften, namen) blijft in F().lessen, op het
@@ -148,18 +147,19 @@ module.exports = ({ db, crypto, bewerkCollectie, productie = process.env.NODE_EN
   const beheer = require('./toegang-beheer')({ bearer, transactie, dicht, kaal, nu,
     DOEL, SCOPE });
 
-  /* De drager van een verzoek: eerst de Authorization-kop, dan het lijf, als
-     laatste de query (alleen voor EventSource, die geen koppen kan sturen). Het
-     token gaat METEEN door vanSleutel(); de kale sleutel reist alleen mee zodat
-     het beheer hem binnen zijn transactie opnieuw kan toetsen. */
+  // live-stroom: ./stroomticket.js (B25)
+  const stroom = require('./stroomticket')({ bearer, transactie, dicht, kaal, nu, DOEL, SCOPE });
+
+  /* De drager van een verzoek: de Authorization-kop of het lijf, en NOOIT het
+     adres (B25: een URL belandt in logs en geschiedenis; lesVan() weigert een
+     ?token= al). De kale sleutel gaat mee voor het beheer. */
   function vanVerzoek(lesId, req) {
     const h = String((req.get && req.get('authorization')) || '');
-    const sleutel = (h.startsWith('Bearer ') ? h.slice(7) : '') || (req.body && req.body.token) ||
-      (req.query && req.query.token) || '';
+    const sleutel = (h.startsWith('Bearer ') ? h.slice(7) : '') || (req.body && req.body.token) || '';
     return Object.assign(vanSleutel(lesId, sleutel), { sleutel: String(sleutel) });
   }
 
-  return Object.assign({ nieuweLes, claim, vanSleutel, vanVerzoek, publiek: bearer.publiek }, beheer);
+  return Object.assign({ nieuweLes, claim, vanSleutel, vanVerzoek, publiek: bearer.publiek }, beheer, stroom);
 };
 
 module.exports.DOEL = DOEL;

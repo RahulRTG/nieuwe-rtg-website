@@ -42,7 +42,7 @@ async function opzet(naam) {
   const klas = { code: kl.code, leraarToken: p.personeelToken };
   const g = await json(await api('/gezin/maak', { gezinsnaam: 'Fam ' + naam, naam: 'Ouder ' + naam, pin: '1234' }));
   const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind ' + naam, rol: 'kind', groep: 'kind' }));
-  const kindToken = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const kindToken = (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).token;
   await api('/school/koppel', { code: g.code, token: kindToken, klasCode: klas.code });
   return { sch, klas, g, kindToken, profielId: kind.profiel.id };
 }
@@ -92,7 +92,7 @@ test('2. tweetalig overzicht: de eigen taal ernaast, het Nederlands blijft staan
   // een klasgenoot zonder thuistaal krijgt geen vertaallaag (niets dubbels)
   const g2 = await json(await api('/gezin/maak', { gezinsnaam: 'Fam NL', naam: 'Ouder NL', pin: '1234' }));
   const kind2 = await json(await api('/gezin/profiel/maak', { code: g2.code, token: g2.token, naam: 'Kind NL', rol: 'kind', groep: 'kind' }));
-  const kind2Token = (await json(await api('/gezin/profiel/kies', { code: g2.code, profielId: kind2.profiel.id }))).token;
+  const kind2Token = (await json(await api('/gezin/profiel/kies', { gezinscode: g2.gezinscode, profielId: kind2.profiel.id }))).token;
   await api('/school/koppel', { code: g2.code, token: kind2Token, klasCode: klas.code });
   const nl = await json(await api('/school/mijn', { code: g2.code, token: kind2Token }));
   assert.equal(nl.school[0].vertaling, undefined);

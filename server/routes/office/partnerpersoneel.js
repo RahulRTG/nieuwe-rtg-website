@@ -9,9 +9,10 @@
    antwoordcache: lib/eenmalig-geheim-routes.js); het overzicht draagt nooit een
    code of een hash.
 
-   Een oude, zelfgekozen `partner.staff.code` opent niets meer; het overzicht
-   meldt alleen DAT hij nog in de opslag staat, zodat een mens hem kan laten
-   vervangen door codes per medewerker. */
+   Een oude, zelfgekozen `partner.staff.code` opent niets meer en wordt bij de
+   opslagstart gewist (B21, kern/partnerpersoneelscode-migratie.js); het
+   overzicht meldt DAT en wanneer, zodat het kantoor elke medewerker een eigen
+   code geeft. */
 module.exports = (octx) => {
   const { kern } = octx;
   const { app, boardroomAuth, boardroomWie, findPartner } = kern;
@@ -31,7 +32,9 @@ module.exports = (octx) => {
     if (b.partner && !partner) return res.status(404).json({ error: 'Deze partner kennen we niet.' });
     res.json({ codes: codes().lijst(partner ? partner.code : null),
       oudeKaleCode: partner ? !!(partner.staff && partner.staff.code) : null,
-      uitleg: 'Een oude, zelfgekozen personeelscode opent niets meer; geef elke medewerker een eigen code.' });
+      // B21: wanneer de uitrol de oude code wiste (nooit de code zelf)
+      oudeCodeGewistOp: partner && partner.staff ? partner.staff.oude_code_gewist_at || null : null,
+      uitleg: 'Een oude, zelfgekozen personeelscode opent niets meer en is bij de uitrol gewist (B21); geef elke medewerker een eigen code.' });
   });
 
   app.post('/api/office/partnerkanaal/personeelscode', boardroomAuth, async (req, res) => {

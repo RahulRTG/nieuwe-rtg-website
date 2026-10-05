@@ -152,7 +152,8 @@ test('een les van voor de migratie: de oude code en tokens openen niets, en ze g
       json(b) { res.body = b; resolve(res); return res; }, end() { resolve(res); } };
     Promise.resolve(h[sleutel](Object.assign({ body: {}, params: {}, query: {}, get: () => '' }, req), res));
   });
-  const oud = await roep('GET /bord/:code', { params: { code: 'OUDECODE' }, query: { token: 'a'.repeat(48) } });
+  const oud = await roep('GET /bord/:code', { params: { code: 'OUDECODE' },
+    get: k => (k === 'authorization' ? 'Bearer ' + 'a'.repeat(48) : '') });
   assert.equal(oud.statusCode, 404, 'het oude leraarstoken opent het bord niet meer: de les heeft geen credential');
   assert.equal((await roep('POST /les/join', { body: { lescode: 'OUDECODE', naam: 'X' } })).statusCode, 404);
   const nieuw = await roep('POST /les/maak', { body: { vak: 'Nieuw', naam: 'Juf' } });

@@ -98,7 +98,19 @@ module.exports = (ctx) => {
      Het adres komt uit `ipVan()` en niet uit een kop die de aanroeper zelf
      vult -- zie de uitleg in ./rem.js, waar die fout een keer echt is gemaakt. */
   const rolVan = new WeakMap();
+  /* DE SLEUTEL HOORT NIET IN HET ADRES (B25). Een URL belandt in serverlogs,
+     proxylogs en de browsergeschiedenis; een ?token= wordt daarom overal
+     geweigerd -- ook buiten productie, zodat geen scherm er stil op kan blijven
+     leunen -- en wel VOOR de opzoeking, zodat de weigering niets verraadt. */
+  function sleutelInAdres(req, res) {
+    if (!req.query || req.query.token === undefined) return false;
+    res.set('Cache-Control', 'no-store');
+    res.status(400).json({ error: 'De lessleutel hoort niet in het adres.', reden: 'sleutel-in-adres',
+      hoe: 'Stuur hem in de kop Authorization: Bearer of in het lijf; de live-stroom opent met een stroomticket.' });
+    return true;
+  }
   function lesVan(req, res) {
+    if (sleutelInAdres(req, res)) return null;
     const bak = 'lescode:' + ipVan(req);
     if (teVaak(res, bak)) return null;
     const lesId = String((req.body && req.body.code) || req.params.code || '');
@@ -136,7 +148,7 @@ module.exports = (ctx) => {
      blijft hier en gaat als referentie mee. */
   const octx = { router, F, save, nu, rid, schoon, crypto, anthropic, SYSTEM, DEMO, TIPS,
     teVaak, misluktePoging, goedePoging, ipVan, toegang, ruimOudeLessen, rolVanVerzoek,
-    sse, stuur, online, presentie, lesVan, docentCheck, leerlingVan, lesPubliek };
+    sse, stuur, online, presentie, lesVan, sleutelInAdres, docentCheck, leerlingVan, lesPubliek };
   require('./onderwijs/les')(octx);
   require('./onderwijs/lesbeheer')(octx);
   require('./onderwijs/schrift')(octx);

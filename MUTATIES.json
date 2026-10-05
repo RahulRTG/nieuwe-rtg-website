@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-05T07:05:26.772Z",
-    "commit": "e38fb1ae2",
+    "op": "2026-10-05T09:16:47.433Z",
+    "commit": "b100219e",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 9,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
   },
@@ -4217,6 +4217,23 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "foundation-lesstroom.pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "module": "server/redis.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 11
+    },
+    "foundation-lesstroom.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "foundation-markt.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5007,6 +5024,13 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "gezinmeenemen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
     "gezinsagenda-motor.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5014,6 +5038,38 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "gezinscode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foundation/gezinscode.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "gezinsdeur.pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "module": "server/redis.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 11
+    },
+    "gezinsdeur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "gezinseigenaar.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
     },
     "gezinskeuken.test.js": {
       "soort": "server",
@@ -6286,6 +6342,20 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "kantoor-eerste-account.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "kantoor-koppel-passkey.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "kantoor-productiedeur.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6386,6 +6456,13 @@
       "operator": "&&->||#0",
       "gezakt": 2,
       "geprobeerd": 4
+    },
+    "kantoorkoppel-productie.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "kantoormacht.test.js": {
       "soort": "puur",
@@ -7158,6 +7235,28 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "lesdeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/foundation/lesdeel.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
+    "lesdeellink.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "lesstroom.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "letters.test.js": {
@@ -10293,6 +10392,13 @@
         "sourceSha256": "4a0fd28071240fb56281805736980f6e94f8fad81a6c9666696f6b1388706790",
         "testSha256": "73494e3f99f5525a7335e2e8f4f2e7abaae1a510f1d5ae072853b76b90e5d460"
       }
+    },
+    "partnerpersoneelscode-migratie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "partnerpersoneelscode-register.test.js": {
       "soort": "puur",
@@ -14034,6 +14140,13 @@
         "testSha256": "48518910aa94be61aa99ed6ebfab7308ec1c2ea740cdfe7d0578f9ebbb1e58ae"
       }
     },
+    "sso-clientgeheim-b22.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "sso-clientgeheim-routes.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -14071,6 +14184,14 @@
       "operator": "return-weg#0",
       "gezakt": 12,
       "geprobeerd": 3
+    },
+    "ssogeheim-ouderdom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/clientgeheim.js",
+      "operator": "+->-#0",
+      "gezakt": 2,
+      "geprobeerd": 14
     },
     "ssrf.test.js": {
       "soort": "puur",
@@ -14346,6 +14467,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/stripe.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "stroomticket.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stroomticket.js",
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1

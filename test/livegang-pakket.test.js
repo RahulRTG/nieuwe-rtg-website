@@ -134,7 +134,8 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
       RTG_TLS: '1', RTG_ACME: '1',
       RTG_TLS_DOMAIN: 'app.example.test', RTG_PROXY_HOPS: '0'
     })) assert.equal(env[naam], waarde, naam);
-    assert.ok(env.OFFICE_TOTP_SECRET.length >= 16);
+    // B10/B24 (4 okt 2026): geen kantoorcode of -TOTP meer in het pakket
+    for (const n of ['OFFICE_CODE', 'OFFICE_TOTP_SECRET']) assert.equal(env[n], undefined, n);
     assert.doesNotMatch(maak.stdout, new RegExp(env.RTG_ENC_KEY));
 
     const backupDir = path.join(tmp, 'backup');

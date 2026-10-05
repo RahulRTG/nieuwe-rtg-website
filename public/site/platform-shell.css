@@ -128,6 +128,49 @@ body[data-public-platform] :is(button,input,select){font-family:Inter,sans-serif
  .pp-shell .wd-focus{width:100%;border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial)}.pp-shell .wd-focus-head{display:flex;flex-wrap:wrap;gap:1rem;padding:1rem;border-bottom:1px solid var(--wd-line)}.wd-focus-head h2{font-size:1.5rem}.pp-detail-content{padding:1rem}.pp-architecture{grid-template-columns:1fr}
  .pp-detail-content :is(.pass-grid,.pass-cards){grid-template-columns:1fr}.pp-list-view .pp-widget{grid-template-columns:1fr}.pp-footer{display:block}
 }
+
+.pp-section-title{margin:28px 0 0;padding-top:24px;border-top:1px solid var(--wd-line);font:400 1.5rem/1.2 "Bodoni Moda",Georgia,serif!important}
+.pp-section-title+.pp-section-index{margin-top:10px;padding-top:0;border-top:0}
+.pp-section-index .pp-button{min-height:40px;padding:8px 12px;border-color:rgba(216,187,135,.24);border-radius:var(--rtg-radius-system)!important;background:rgba(27,23,18,.78);color:var(--wh-soft)!important;font-size:11px}
+.pp-section-index .pp-button:hover{border-color:rgba(226,195,137,.62);color:var(--wh-ink)!important;filter:none}
+
+/* Social-tech front door: photographic like the app, with a restrained
+   technical layer. The native world shell and its single Edge remain owners
+   of geometry and navigation. */
+body[data-public-platform="app"]{background:
+  linear-gradient(rgba(226,195,137,.025) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(226,195,137,.025) 1px,transparent 1px),#100e0b!important;background-size:48px 48px}
+body[data-public-platform="app"] .pp-header{background:rgba(16,14,11,.9)!important;backdrop-filter:blur(22px) saturate(1.25)}
+body[data-public-platform="app"] .pp-feature{box-shadow:0 34px 90px rgba(0,0,0,.34),inset 0 0 0 1px rgba(255,244,224,.035)}
+body[data-public-platform="app"] .pp-feature::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.22;background:
+  linear-gradient(90deg,transparent 0 24.9%,rgba(232,202,153,.24) 25%,transparent 25.1% 74.9%,rgba(232,202,153,.24) 75%,transparent 75.1%),
+  linear-gradient(transparent 0 32.9%,rgba(232,202,153,.16) 33%,transparent 33.1% 65.9%,rgba(232,202,153,.16) 66%,transparent 66.1%)}
+.pp-technology-signal{position:absolute;z-index:2;inset:18px 18px auto auto;display:grid;grid-template-columns:auto auto;align-items:center;column-gap:8px;margin:0!important;padding:10px 12px;border:1px solid rgba(236,211,170,.34);border-radius:var(--rtg-radius-system);background:rgba(12,11,9,.66);backdrop-filter:blur(16px);box-shadow:0 14px 40px rgba(0,0,0,.22);font:500 9px/1.4 Inter,sans-serif!important;letter-spacing:.08em;text-transform:uppercase;color:#f4eadc!important}
+.pp-technology-signal .pp-signal-pulse{grid-row:1/3;width:7px;height:7px;border-radius:50%;background:#82d6ae;box-shadow:0 0 0 4px rgba(130,214,174,.12),0 0 16px rgba(130,214,174,.5)}
+.pp-technology-signal small{font:500 8px/1.2 Inter,sans-serif;color:#d9bb82;letter-spacing:.14em}
+.pp-technology-signal strong{font:600 10px/1.25 Inter,sans-serif;color:#fff7ea;letter-spacing:.06em}
+.pp-technology-signal>span:last-child{grid-column:2;font-size:8px;color:#d6c8b7;letter-spacing:.04em;text-transform:none}
+.pp-secure-link{display:inline-flex;min-height:44px;align-items:center;margin-top:8px;color:#fff4df;text-decoration:none;border-bottom:1px solid rgba(226,195,137,.58);font-size:13px}
+.pp-secure-link::after{content:'\2197';margin-inline-start:30px;color:#e2c389}
+.pp-world-facts{padding-top:.65rem;border-top:1px solid var(--wd-line);color:var(--wh-gold)!important;font-size:.72rem!important;line-height:1.55!important}
+body[data-public-platform="app"] .pp-widget{position:relative;overflow:hidden;border-color:rgba(216,187,135,.25);background:linear-gradient(145deg,rgba(37,29,21,.9),rgba(17,15,12,.96))}
+body[data-public-platform="app"] .pp-widget-photo{height:160px;filter:saturate(.9) contrast(1.03);transition:transform .45s ease,filter .45s ease}
+body[data-public-platform="app"] .pp-widget:hover .pp-widget-photo{transform:scale(1.025);filter:saturate(1.04) contrast(1.04)}
+body[data-public-platform="app"] [data-public-widget="socialApp"]{grid-column:span 2;background:linear-gradient(145deg,rgba(61,35,29,.88),rgba(17,15,12,.97))}
+body[data-public-platform="app"] [data-public-widget="socialApp"] .pp-widget-photo{height:210px}
+body[data-public-platform="app"] .pp-detail-content .app-truth-detail{background:rgba(14,12,10,.82)}
+
+@media(max-width:999px){
+ body[data-public-platform="app"]{background:linear-gradient(180deg,#221910,#100e0b 300px)!important}
+ .pp-technology-signal{inset:14px 14px auto auto;padding:8px 9px}
+ .pp-technology-signal small{display:block;font-size:7px}
+ .pp-technology-signal strong{grid-column:2}
+ .pp-secure-link{font-size:13px}
+ body[data-public-platform="app"] [data-public-widget="socialApp"]{grid-column:1/-1}
+ body[data-public-platform="app"] [data-public-widget="socialApp"] .pp-widget-photo{height:150px}
+}
+@media(max-width:420px){.pp-technology-signal>span:last-child{display:none}.pp-technology-signal{grid-template-columns:auto auto}.pp-feature-copy{padding-top:64px!important}}
+@media(prefers-reduced-motion:reduce){body[data-public-platform="app"] .pp-widget-photo{transition:none}}
 @media(max-width:370px){.pp-context{font-size:.95rem}.pp-shell .wd-catalog{grid-template-columns:1fr}.pp-feature{min-height:490px}.pp-feature-copy :is(h1,h2){font-size:2rem}.pp-brand{font-size:2.3rem!important}.pp-header{gap:.5rem}.pp-profile{min-width:40px}}
 @media(prefers-reduced-motion:reduce){body[data-public-platform] *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 

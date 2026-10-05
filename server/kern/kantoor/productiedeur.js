@@ -26,6 +26,10 @@
 'use strict';
 
 const ACTIE = 'kantoor-binnen';
+/* B24: het KOPPELEN van de kantoorrol met een uitnodiging (kern/eenaccount/
+   koppelen.js) is een eigen handeling met een eigen naam, zodat een ceremonie
+   voor het koppelen nooit het kantoor opent en omgekeerd. */
+const KOPPEL_ACTIE = 'kantoor-koppel';
 const CODE_DICHT = 'KANTOORCODE_NIET_IN_PRODUCTIE';
 const WEG = 'Log in met uw eigen RTG-account, kies de kantoorrol (/api/account/start met rol "kantoor") ' +
   'en bevestig met uw passkey. Hebt u de kantoorrol nog niet, vraag de eigenaar dan om een uitnodiging op naam.';
@@ -70,7 +74,8 @@ function eigenaarDirect(env) {
    Geeft { ok:true, bewijs } (buiten productie: bewijs null), of een weigering
    in de vorm die /api/account/start doorgeeft. `zwaarVan` is een getter: de
    zware poort wordt later in de montage gemaakt dan de sleutelbos. */
-async function startBewijs({ zwaarVan, accounts, key, req, env }) {
+async function startBewijs({ zwaarVan, accounts, key, req, env, actie, omschrijving }) {
+  const naam = actie || ACTIE;
   const omgeving = env || process.env;
   if (!isProductie(omgeving)) return { ok: true, bewijs: null };
   let zwaar = null;
@@ -83,9 +88,9 @@ async function startBewijs({ zwaarVan, accounts, key, req, env }) {
   try { user = m ? accounts.getUserById(Number(m[1])) : null; } catch (e) { user = null; }
   if (!user) return { status: 403, error: 'Het kantoor opent alleen met een eigen RTG-account.' };
   const sleutel = zwaar.sessieSleutel(req);
-  const r = await zwaar.eis(user, ACTIE, sleutel, req, 'Het openen van het kantoor', { zonderTerugval: true });
+  const r = await zwaar.eis(user, naam, sleutel, req, omschrijving || 'Het openen van het kantoor', { zonderTerugval: true });
   if (r.ok && r.bewezen === true) {
-    return { ok: true, bewijs: { type: 'passkey', methode: 'cryptografisch', graad: 'bewezen', actie: ACTIE,
+    return { ok: true, bewijs: { type: 'passkey', methode: 'cryptografisch', graad: 'bewezen', actie: naam,
       op: new Date().toISOString() } };
   }
   if (r.ok) return { status: 403, watNu: 'passkey-zetten', error: 'Het kantoor opent in productie alleen met een passkey.' };
@@ -93,12 +98,12 @@ async function startBewijs({ zwaarVan, accounts, key, req, env }) {
      deur geen eigen optiesroute nodig, en is de challenge aan precies deze
      lid-sessie en deze handeling gebonden. */
   if (r.bevestigingNodig) {
-    const o = await zwaar.opties(user, ACTIE, sleutel, req);
+    const o = await zwaar.opties(user, naam, sleutel, req);
     if (o && o.error) return { status: o.status || 400, error: o.error };
-    return { status: 401, bevestigingNodig: true, actie: ACTIE, error: r.error,
+    return { status: 401, bevestigingNodig: true, actie: naam, error: r.error,
       bevestiging: { ceremonie: o.ceremonie, opties: o.opties } };
   }
   return r;
 }
 
-module.exports = { ACTIE, CODE_DICHT, WEG, isProductie, codeDicht, bewijsGeldig, sessieMag, eigenaarDirect, startBewijs };
+module.exports = { ACTIE, KOPPEL_ACTIE, CODE_DICHT, WEG, isProductie, codeDicht, bewijsGeldig, sessieMag, eigenaarDirect, startBewijs };

@@ -168,7 +168,8 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-democratie').SLEUTELS,
   require('./idemsleutels-connection-final').SLEUTELS,
   require('./idemsleutels-leerhuis').SLEUTELS,
-  require('./idemsleutels-conciergelus').SLEUTELS);
+  require('./idemsleutels-conciergelus').SLEUTELS,
+  require('./idemsleutels-eigengezin').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

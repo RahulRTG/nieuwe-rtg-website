@@ -111,7 +111,7 @@ test('Foundation Connect: elke deur is gemonteerd, en geen enkele staat open', a
       Object.assign({ naam: 'Gast', rol: 'gast' }, paar))).body;
     if (gast && gast.profiel && gast.profiel.id) {
       const kies = (await post('/api/foundation/gezin/profiel/kies',
-        { code: gezin.code, profielId: gast.profiel.id })).body;
+        { gezinscode: gezin.gezinscode, profielId: gast.profiel.id })).body;
       if (kies && kies.token) {
         const r = await post('/api/rtf/connect/ontdek', { code: gezin.code, token: kies.token });
         assert.equal(r.status, 403, 'een gastprofiel komt de Connect-deur niet door');

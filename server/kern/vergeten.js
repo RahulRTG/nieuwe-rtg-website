@@ -125,6 +125,11 @@ module.exports = function maakVergeten(kern) {
        wel bekend maar de rest niet meer -- en de volgorde kost niets: mislukt de
        verwijdering van het account, dan is een gewiste scan geen verlies maar
        precies wat het lid vroeg. */
+    /* Het gezin aan dit account (foundation/gezinseigenaar.js) en de
+       koppelingen als oppas of familie. Niet in een lege catch: blijft het
+       gezin staan, dan blijven er gegevens van kinderen achter zonder ouder. */
+    if (sessie.account && kern.rtf && typeof kern.rtf.vergeetAccount === 'function')
+      kern.rtf.vergeetAccount(sessie.account.id);
     if (sessie.account) {
       try { identiteitsmap.wisAllesVan(sessie.account.id); } catch (e) {}
       accounts.deleteUser(sessie.account.id);

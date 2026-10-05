@@ -10,6 +10,11 @@
 'use strict';
 const SLEUTELS = {
   'POST /api/foundation/gezin/toestemming/gezondheid': { zelfdeVerzoek: true },
-  'POST /api/rtf/welzijn/toestemming': { zelfdeVerzoek: true }
+  'POST /api/rtf/welzijn/toestemming': { zelfdeVerzoek: true },
+  /* De wisronde van de gezinnen (foundation/gezinbewaren.js) is een RONDE, net als
+     /api/techniek/bewaren/veeg: elke oproep rekent opnieuw na wat rijp is. Een
+     afgespeeld antwoord zou "2 gewist" melden over een ronde die niets deed. */
+  'POST /api/techniek/bewaren/gezinnen': { nietIdempotent: true,
+    waarom: 'een wisronde rekent bij elke oproep opnieuw na; een tweede ronde vindt het gewiste niet meer, en een proef verandert niets' }
 };
 module.exports = { SLEUTELS };

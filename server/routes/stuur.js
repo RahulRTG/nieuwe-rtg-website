@@ -47,7 +47,7 @@ module.exports = (kern) => {
     if (r.bevestigNodig) return res.status(428).json(r);
     if (r.error) return res.status(r.status || 500).json({ error: r.error });
     // de buitenkant is gelukt; de binnenkant vertelt hoe de actie afliep
-    return res.json({ ok: r.status < 400, status: r.status, antwoord: r.antwoord, agent: r.agent || null });
+    return res.json({ ok: r.status < 400, status: r.status, antwoord: r.antwoord, agent: r.agent || null, oorzaak: r.oorzaak || null });
   };
   const alleenPersoneel = (req, res, wereld) => {
     if (wereld === 'staff' && (!req.actor || !req.actor.staffId)) {

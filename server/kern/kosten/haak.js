@@ -58,7 +58,14 @@ const HUIS = 'huis';
    onderzoek van een andere rechtspersoon, en dat is precies wat ECONOMIE.md
    verbiedt -- niet omdat het geld op is, maar omdat een stichting die haar eigen
    kosten niet kent, ze ook niet kan verantwoorden. */
-const SOORTEN_DRAGER = ['lid', 'zaak', 'gezin', 'lab', 'huis'];
+/* DE ZESDE SINDS 5 OKTOBER 2026: `dienst` (besluit B4b). Een achtergronddienst
+   (kern/dienstidentiteit.js) is geen gebruiker, maar zijn verbruik is ook geen
+   verbruik ZONDER eigenaar: het is van een benoemde dienst van RTG zelf. Hij
+   boekt op `dienst:<naam>`, apart per dienst, in de wereld van het huis
+   (kern/economie/werelden.js) en met de stand van het huis
+   (./beleidkaart.js). Zonder deze soort viel elke nachtronde op `huis`, en dan
+   is "wat kost de bewaarveger" niet te beantwoorden. */
+const SOORTEN_DRAGER = ['lid', 'zaak', 'gezin', 'lab', 'dienst', 'huis'];
 
 function drager(soort, id) {
   const s = String(soort || '').trim();

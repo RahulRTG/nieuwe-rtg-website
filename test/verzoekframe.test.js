@@ -147,7 +147,8 @@ test('een lezer: de bus-envelop via zetFrameBron; verder niemand in server/ (PR 
     }
   };
   loop(wortel);
-  assert.deepEqual(gevonden.sort(), ['opzet/envelop.js', 'opzet/verzoekketen.js'],
+  /* kern/dienstidentiteit.js OPENT frames voor achtergronddiensten (PR 7) en leest er niets uit. */
+  assert.deepEqual(gevonden.sort(), ['kern/dienstidentiteit.js', 'opzet/envelop.js', 'opzet/verzoekketen.js'],
     'een nieuwe lezer van het verzoekframe is een besluit (Fase 2, PR 5 en later), geen bijvangst');
   assert.deepEqual(bronnen, ['opzet/verzoekframe.js'],
     'de bus-envelop leest het frame op EEN manier, en het frame hangt zich daar zelf in');

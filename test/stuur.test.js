@@ -160,3 +160,22 @@ test('10. besluit A5: het spoor ziet dat de AI handelde, namens de mens, en dat 
   const kaal = await kop({ 'x-rtg-agent': 'rahul' });
   assert.equal(kaal.headers.get('x-rtg-handelaar'), null);
 });
+
+test('11. I11: de interne aanroep draagt het verzoek waarin Rahul werd gevraagd als oorzaak', async () => {
+  /* Een echte keten: de buitenste /doe krijgt van de server een correlatie
+     (X-Request-Id), en het frame van de BINNENSTE aanroep moet die als oorzaak
+     dragen -- anders breekt de keten bij elke handeling van de AI. */
+  const r = await fetch(base + '/api/member/doe', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lid },
+    body: JSON.stringify({ pad: '/api/kantoorpakket/mijn', body: {} }) });
+  const body = await r.json();
+  assert.equal(body.ok, true, JSON.stringify(body).slice(0, 160));
+  const buiten = r.headers.get('x-request-id');
+  assert.ok(buiten, 'de buitenste aanroep heeft een correlatie');
+  assert.equal(body.oorzaak, buiten, 'de binnenste aanroep noemt de buitenste als oorzaak');
+  /* En een mens kan die kop niet zelf meesturen om zijn klik aan een andere keten te hangen. */
+  const vals = await fetch(base + '/api/kantoorpakket/mijn', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lid, 'x-rtg-oorzaak': buiten }, body: '{}' });
+  assert.equal(vals.status, 200);
+  assert.equal(vals.headers.get('x-rtg-oorzaak'), null, 'een kale kop zet geen oorzaak');
+});

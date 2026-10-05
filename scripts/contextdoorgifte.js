@@ -13,7 +13,7 @@
    Deze meter is die probe als blijvend instrument: het frame dat erna komt
    moet tegen DEZE getallen bewijzen dat het iets oplost.
 
-   WAT HIJ MEET -- elf invarianten, elk apart en met opzet geen totaalcijfer:
+   WAT HIJ MEET -- twaalf invarianten, elk apart en met opzet geen totaalcijfer:
 
      I1  een envelop die binnen een verzoek ontstaat, draagt diens correlatie
      I2  de correlatie maakt de server; een client-id is alleen `extern`, begrensd
@@ -22,6 +22,8 @@
      I5  na sluiten zegt geen context stil "gelukt"
      I8  op de bus staat als actor een codenaam en nooit een datasleutel user-<n>
      I9  geen enterWith in server/
+     I11 Rahuls interne aanroep (/api/member/doe) draagt het buitenste verzoek
+         als oorzaak, en die oorzaak is ondertekend (kern/agentteken.js)
      I12 een bus-abonnee draait niet in de contexten van de publiceerder, op
          beide transporten gelijk (in proces en over Redis)
      I13 elk verzoekframe heeft precies een identiteit (een andere sleutel na
@@ -82,6 +84,7 @@ const RICHTING = {
   i5StilNaSluiten: 'omlaag',
   i8ActorSleutel: 'omlaag',
   i9EnterWith: 'omlaag',
+  i11ZonderOorzaak: 'omlaag',
   i12AbonneeInVerzoek: 'omlaag',
   i10AuthZonderContext: 'omlaag',
   i13TweedeIdentiteit: 'omlaag',
@@ -246,6 +249,23 @@ function ijkI5() {
   return stil === 'stil' && leeg === 'stil' && weigert === 'weigert' && meldt === 'meldt';
 }
 
+/* ---------- I11: de oorzaak van een interne agent-aanroep ----------
+   Een echte /api/member/doe op een leesroute: de buitenste correlatie (de
+   X-Request-Id van het antwoord) moet als `oorzaak` terugkomen uit het frame van
+   de binnenste aanroep. Een proef die niet slaagde is niet vast te stellen. */
+const I11_PAD = '/api/kantoorpakket/mijn';
+function meetI11(p) {
+  if (!p || p.status !== 200 || !p.ok || !p.buiten) return null;
+  return { proeven: 1, buiten: p.buiten, oorzaak: p.oorzaak || null, zonderOorzaak: p.oorzaak === p.buiten ? 0 : 1 };
+}
+function ijkI11() {
+  const zonder = meetI11({ status: 200, ok: true, buiten: 'a1', oorzaak: null });
+  const anders = meetI11({ status: 200, ok: true, buiten: 'a1', oorzaak: 'b2' });
+  const goed = meetI11({ status: 200, ok: true, buiten: 'a1', oorzaak: 'a1' });
+  return zonder.zonderOorzaak === 1 && anders.zonderOorzaak === 1 && goed.zonderOorzaak === 0
+    && meetI11({ status: 403, ok: false }) === null;
+}
+
 /* ---------- I12: de bus-abonnee in de nulcontext ----------
    Een OPEN verzoek met frame, handeling, ai-context en kostendrager publiceert;
    de abonnee zegt welke van die vier hij ziet. Twee transporten: de echte
@@ -404,11 +424,20 @@ async function meetServer(max) {
         i2.push({ kop, status: r.status, antwoordId: r.headers.get('x-request-id') });
       } catch (e) { i2.push({ kop, status: 0, antwoordId: null }); }
     }
+    /* I11: een interne aanroep via het stuur van Rahul. */
+    let i11 = null;
+    try {
+      const r = await fetch(basis + '/api/member/doe', { method: 'POST', signal: AbortSignal.timeout(20000),
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok.member },
+        body: JSON.stringify({ pad: I11_PAD, body: {} }) });
+      const b = await r.json().catch(() => ({}));
+      i11 = { status: r.status, ok: !!b.ok, buiten: r.headers.get('x-request-id'), oorzaak: b.oorzaak || null };
+    } catch (e) { i11 = { status: 0 }; }
     /* De spoeltimers staan op 1 en 5 seconden; daarna nog een schrijfronde van de peiling. */
     await new Promise(r => setTimeout(r, 8000));
     if (!fs.existsSync(uitPad)) throw new Error('de peiling in de server heeft niets weggeschreven (' + uitPad + ')');
     const R = JSON.parse(fs.readFileSync(uitPad, 'utf8'));   // atomair geschreven; onleesbaar is een fout
-    return { R, i2, verzoeken: lijst.length, statussen, rollen, hernieuwd: wacht.hernieuwd(),
+    return { R, i2, i11, verzoeken: lijst.length, statussen, rollen, hernieuwd: wacht.hernieuwd(),
       perMethode: lijst.reduce((m, r) => (m[r.methode] = (m[r.methode] || 0) + 1, m), {}) };
   } finally { klaar(); try { fs.rmSync(uitPad, { force: true }); } catch (e) {} }
 }
@@ -444,6 +473,7 @@ function samenvatting({ i5, i9, i12, server }) {
       aandeelMetCorrelatie: breuk(m.envelop.metVerzoekCorrelatie, m.envelop.binnenVerzoek) };
     g.i2 = meetI2(server.i2, m.i2);
     g.i3 = { authPunten: m.auth.n, eens: m.auth.correlatieEens, oneens: m.auth.correlatieOneens };
+    g.i11 = meetI11(server.i11);
     g.i4 = { gezetInVerzoek: m.timers.gezetInVerzoek, gevuurdNaAfloop: m.timers.gevuurdNaAfloop,
       naAfloopMetDrager: m.timers.naAfloopMetDrager, naAfloopMetAiSessie: m.timers.naAfloopMetAiSessie,
       plekken: m.timers.plekken, lekPlekken: Object.keys(m.timers.plekken).length };
@@ -467,6 +497,7 @@ function samenvatting({ i5, i9, i12, server }) {
 function tandenVan(g) {
   const t = { i5StilNaSluiten: g.i5.stilNaSluiten, i9EnterWith: g.i9.enterWith };
   if (g.i12) t.i12AbonneeInVerzoek = g.i12.lekkend;
+  if (g.i11) t.i11ZonderOorzaak = g.i11.zonderOorzaak;
   if (g.i1 && g.i1.binnenVerzoek) t.i1AandeelMetCorrelatie = g.i1.aandeelMetCorrelatie;
   if (g.i1 && g.i1.binnenVerzoek) t.i8ActorSleutel = g.i1.actorSleutel || 0;
   if (g.i2) t.i2ClientSleutel = g.i2.clientSleutel;
@@ -493,7 +524,7 @@ function vergelijk(ratel, tanden, deel) {
   return fout;
 }
 
-module.exports = { telEnterWith, meetI9, meetI5, ijkI5, meetI12, ijkI12, meetI2, ijkI2, I2_KOPPEN, klasse, vergelijk, samenvatting, tandenVan, ijkServer, RICHTING, DOEL };
+module.exports = { telEnterWith, meetI9, meetI5, ijkI5, meetI11, ijkI11, meetI12, ijkI12, meetI2, ijkI2, I2_KOPPEN, klasse, vergelijk, samenvatting, tandenVan, ijkServer, RICHTING, DOEL };
 
 if (require.main === module) {
   (async () => {
@@ -503,6 +534,7 @@ if (require.main === module) {
     const max = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;
     if (!ijkI5()) { console.error('meterStuk: de indeling van I5 herkent een stille schrijver niet'); process.exit(2); }
     if (!ijkI2()) { console.error('meterStuk: I2 herkent een overgenomen client-id niet'); process.exit(2); }
+    if (!ijkI11()) { console.error('meterStuk: I11 ziet een agent-aanroep zonder oorzaak niet'); process.exit(2); }
     if (!ijkI12()) { console.error('meterStuk: I12 ziet een abonnee in het verzoek niet'); process.exit(2); }
     const i9 = meetI9();
     const i5 = await meetI5();
@@ -532,7 +564,7 @@ if (require.main === module) {
     const { stempel } = require('./lib/stempel');
     const uit = {
       stempel: stempel(),
-      uitleg: 'Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Elf invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.',
+      uitleg: 'Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Twaalf invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.',
       hoe: 'npm run contextdoorgifte',
       grens: 'Alleen statische leden- en zaakroutes die de rolkaart een rol geeft (vandaag allemaal POST, zie noemer.perMethode) met een leeg lijf, geen PostgreSQL- of Redis-stand, alleen timers via de globale timerfuncties. Een lege noemer is niet vast te stellen.',
       richting: RICHTING,

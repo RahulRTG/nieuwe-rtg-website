@@ -25,9 +25,12 @@ test('een deelronde tegen een echte server haalt de ratel, en de peiling is geij
   const uit = (r.stdout || '') + (r.stderr || '');
   assert.notStrictEqual(r.status, 2, 'meterStuk -- de peiling ziet haar eigen ijking niet:\n' + uit);
   assert.strictEqual(r.status, 0, 'de contextdoorgifte valt terug ten opzichte van de ratel:\n' + uit);
-  /* Elke tand van de ratel behalve I1: of er in de eerste routes een envelop
-     ontstaat is toeval, en een deelronde zonder noemer slaat die tand over. */
-  for (const tand of Object.keys(RICHTING).filter(t => !t.startsWith('i1'))) {
+  /* Elke tand van de ratel behalve I1 en I8: of er in de eerste routes een
+     envelop ontstaat is toeval, en een deelronde zonder noemer slaat die tanden
+     over. Hier stond `startsWith('i1')`, en dat sloeg ook I10 tot en met I14
+     over -- een uitzondering voor een tand die er vijf wegliet. */
+  const ZONDER_NOEMER = ['i1AandeelMetCorrelatie', 'i8ActorSleutel'];
+  for (const tand of Object.keys(RICHTING).filter(t => !ZONDER_NOEMER.includes(t))) {
     assert.ok(uit.includes(tand), 'de deelronde mat "' + tand + '" niet; dan bewijst hij niets:\n' + uit);
   }
 });

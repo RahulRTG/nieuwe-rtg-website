@@ -38,6 +38,7 @@ const { AsyncLocalStorage } = require('async_hooks');
 /* De rij-telling staat apart in ./handelingtelling.js, met de kop over WAT er
    gemeten wordt, wat die meting NIET ziet en wat hij kost erbij. */
 const { tel, verschil } = require('./handelingtelling');
+require('../lib/losvanverzoek');   // nulcontext vastleggen VOOR het eerste verzoek
 const context = new AsyncLocalStorage();
 
 /* De grens waarboven een handeling het vermelden waard is. Bewust geen blokkade:

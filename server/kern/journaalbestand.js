@@ -37,6 +37,7 @@ const fs = require('fs');
 const path = require('path');
 const kluis = require('../kluis');
 const rtgKlok = require('../lib/klok');
+const { losVanVerzoek } = require('../lib/losvanverzoek');
 
 const MAX_BYTES = Number(process.env.RTG_JOURNAAL_BYTES || 2 * 1024 * 1024);
 const MAX_BESTANDEN = Number(process.env.RTG_JOURNAAL_BESTANDEN || 5);
@@ -102,7 +103,8 @@ function maakJournaalbestand({ dir, nu, maxBytes, maxBestanden, vensterMs, stape
   }
   function plan() {
     if (spoelt || !stapel.length) return;
-    spoelt = setTimeout(() => { spoelt = null; spoel(); }, SPOEL_MS);
+    /* Een timer voor ALLE verzoeken, dus in de nulcontext (lib/losvanverzoek.js). */
+    spoelt = losVanVerzoek(setTimeout, () => { spoelt = null; spoel(); }, SPOEL_MS);
     if (spoelt.unref) spoelt.unref();
   }
 
@@ -113,7 +115,7 @@ function maakJournaalbestand({ dir, nu, maxBytes, maxBestanden, vensterMs, stape
   function noteerRegel(regel) {
     if (stuk) return false;
     stapel.push(regel);
-    if (stapel.length >= STAPEL) spoel(); else plan();
+    if (stapel.length >= STAPEL) losVanVerzoek(spoel); else plan();
     return true;
   }
 

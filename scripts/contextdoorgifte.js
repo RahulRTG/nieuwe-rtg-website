@@ -13,9 +13,10 @@
    Deze meter is die probe als blijvend instrument: het frame dat erna komt
    moet tegen DEZE getallen bewijzen dat het iets oplost.
 
-   WAT HIJ MEET -- zes invarianten, elk apart en met opzet geen totaalcijfer:
+   WAT HIJ MEET -- zeven invarianten, elk apart en met opzet geen totaalcijfer:
 
      I1  een envelop die binnen een verzoek ontstaat, draagt diens correlatie
+     I2  de correlatie maakt de server; een client-id is alleen `extern`, begrensd
      I3  handeling, ai-context en req.envelop zijn het eens over de correlatie
      I4  achtergrondwerk erft geen verzoekidentiteit (timers na afloop)
      I5  na sluiten zegt geen context stil "gelukt"
@@ -67,6 +68,8 @@ const S = (p) => require(path.join(WORTEL, 'server', p));
    bij, in `gemeten`. */
 const RICHTING = {
   i1AandeelMetCorrelatie: 'omhoog',
+  i2ClientSleutel: 'omlaag',
+  i2ExternFout: 'omlaag',
   i3CorrelatieOneens: 'omlaag',
   i4LekPlekken: 'omlaag',
   i5StilNaSluiten: 'omlaag',
@@ -217,6 +220,40 @@ function ijkI5() {
   return stil === 'stil' && leeg === 'stil' && weigert === 'weigert' && meldt === 'meldt';
 }
 
+/* ---------- I2: wie maakt de correlatie ----------
+   Drie proefverzoeken met een zelfgekozen X-Request-Id: twee keer hetzelfde
+   korte id en een keer 4000 tekens. Een client-id wordt een SLEUTEL als hij als
+   correlatie terugkomt (in het antwoord of in de handeling), en twee verzoeken
+   met hetzelfde id die dezelfde correlatie krijgen zijn een botsing. Daarnaast:
+   draagt `req.externeId` het id begrensd (kort: gelijk; lang: de eerste 64). */
+const I2_KORT = 'I2-zelfgekozen.correlatie';
+const I2_LANG = 'I2-' + 'x'.repeat(3997);
+const I2_KOPPEN = [I2_KORT, I2_KORT, I2_LANG];
+const I2_PAD = '/api/agenda/mijn-lijst';   // een leesroute achter de ledenpoort
+
+function meetI2(proeven, binnen) {
+  const geldig = (proeven || []).filter(p => p.status > 0);
+  if (geldig.length < I2_KOPPEN.length) return null;          // niet vast te stellen
+  const overgenomen = proeven.filter(p => p.antwoordId === p.kop || (p.antwoordId || '').length > 64).length
+    + (binnen || []).filter(b => b.kopIsCorrelatie || b.handelingIsKop).length;
+  const botsing = proeven[0].antwoordId && proeven[0].antwoordId === proeven[1].antwoordId ? 1 : 0;
+  const verwacht = (n) => n === I2_KORT.length ? I2_KORT : I2_LANG.slice(0, 64);
+  const b = binnen || [];
+  const externFout = b.length >= I2_KOPPEN.length ? b.filter(x => x.extern !== verwacht(x.kopLengte)).length : null;
+  return { proeven: proeven.length, serverZag: b.length, overgenomen, botsing, externFout,
+    clientSleutel: overgenomen + botsing, antwoordLengtes: proeven.map(p => (p.antwoordId || '').length) };
+}
+
+/* De ijking van I2: de oude vorm (kop overgenomen) moet uitslaan, de nieuwe niet. */
+function ijkI2() {
+  const oud = meetI2(I2_KOPPEN.map(k => ({ kop: k, status: 200, antwoordId: k })),
+    I2_KOPPEN.map(k => ({ kopLengte: k.length, kopIsCorrelatie: true, handelingIsKop: true, extern: '(ontbreekt)' })));
+  const nieuw = meetI2(I2_KOPPEN.map((k, i) => ({ kop: k, status: 200, antwoordId: 'a1b2c3d4e5f6a7b' + i })),
+    I2_KOPPEN.map(k => ({ kopLengte: k.length, kopIsCorrelatie: false, handelingIsKop: false, extern: k.slice(0, 64) })));
+  return !!oud && oud.clientSleutel === 7 && oud.externFout === 3 && nieuw.clientSleutel === 0 && nieuw.externFout === 0
+    && meetI2([], []) === null;
+}
+
 /* ---------- I1, I3, I4, I10: een echte server ---------- */
 async function meetServer(max) {
   const { start } = require('./lib/wegwerpserver');
@@ -268,11 +305,21 @@ async function meetServer(max) {
         statussen[s] = (statussen[s] || 0) + 1;
       }
     }));
+    /* I2: de drie proefverzoeken, met een verse ledensessie. */
+    const i2 = [];
+    for (const kop of I2_KOPPEN) {
+      try {
+        const r = await fetch(basis + I2_PAD, { method: 'POST', signal: AbortSignal.timeout(10000), body: '{}',
+          headers: { 'Content-Type': 'application/json', 'X-Request-Id': kop, Authorization: 'Bearer ' + tok.member } });
+        await r.arrayBuffer().catch(() => {});
+        i2.push({ kop, status: r.status, antwoordId: r.headers.get('x-request-id') });
+      } catch (e) { i2.push({ kop, status: 0, antwoordId: null }); }
+    }
     /* De spoeltimers staan op 1 en 5 seconden; daarna nog een schrijfronde van de peiling. */
     await new Promise(r => setTimeout(r, 8000));
     if (!fs.existsSync(uitPad)) throw new Error('de peiling in de server heeft niets weggeschreven (' + uitPad + ')');
     const R = JSON.parse(fs.readFileSync(uitPad, 'utf8'));   // atomair geschreven; onleesbaar is een fout
-    return { R, verzoeken: lijst.length, statussen, rollen, hernieuwd: wacht.hernieuwd(),
+    return { R, i2, verzoeken: lijst.length, statussen, rollen, hernieuwd: wacht.hernieuwd(),
       perMethode: lijst.reduce((m, r) => (m[r.methode] = (m[r.methode] || 0) + 1, m), {}) };
   } finally { klaar(); try { fs.rmSync(uitPad, { force: true }); } catch (e) {} }
 }
@@ -301,6 +348,7 @@ function samenvatting({ i5, i9, server }) {
     g.i1 = { binnenVerzoek: m.envelop.binnenVerzoek, metVerzoekCorrelatie: m.envelop.metVerzoekCorrelatie,
       metActor: m.envelop.metActor, metSessie: m.envelop.metSessie, kanalen: m.envelop.kanalen,
       aandeelMetCorrelatie: breuk(m.envelop.metVerzoekCorrelatie, m.envelop.binnenVerzoek) };
+    g.i2 = meetI2(server.i2, m.i2);
     g.i3 = { authPunten: m.auth.n, eens: m.auth.correlatieEens, oneens: m.auth.correlatieOneens };
     g.i4 = { gezetInVerzoek: m.timers.gezetInVerzoek, gevuurdNaAfloop: m.timers.gevuurdNaAfloop,
       naAfloopMetDrager: m.timers.naAfloopMetDrager, naAfloopMetAiSessie: m.timers.naAfloopMetAiSessie,
@@ -319,6 +367,8 @@ function samenvatting({ i5, i9, server }) {
 function tandenVan(g) {
   const t = { i5StilNaSluiten: g.i5.stilNaSluiten, i9EnterWith: g.i9.enterWith };
   if (g.i1 && g.i1.binnenVerzoek) t.i1AandeelMetCorrelatie = g.i1.aandeelMetCorrelatie;
+  if (g.i2) t.i2ClientSleutel = g.i2.clientSleutel;
+  if (g.i2 && g.i2.externFout !== null) t.i2ExternFout = g.i2.externFout;
   if (g.i3 && g.i3.authPunten) t.i3CorrelatieOneens = g.i3.oneens;
   if (g.i10 && g.i10.authPunten) {
     t.i10AuthZonderContext = g.i10.authPunten - Math.min(g.i10.metHandeling, g.i10.metAiContext, g.i10.metEffectteller);
@@ -339,7 +389,7 @@ function vergelijk(ratel, tanden, deel) {
   return fout;
 }
 
-module.exports = { telEnterWith, meetI9, meetI5, ijkI5, klasse, vergelijk, samenvatting, tandenVan, ijkServer, RICHTING, DOEL };
+module.exports = { telEnterWith, meetI9, meetI5, ijkI5, meetI2, ijkI2, I2_KOPPEN, klasse, vergelijk, samenvatting, tandenVan, ijkServer, RICHTING, DOEL };
 
 if (require.main === module) {
   (async () => {
@@ -348,6 +398,7 @@ if (require.main === module) {
     const vast = argv.includes('--vastleggen');
     const max = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;
     if (!ijkI5()) { console.error('meterStuk: de indeling van I5 herkent een stille schrijver niet'); process.exit(2); }
+    if (!ijkI2()) { console.error('meterStuk: I2 herkent een overgenomen client-id niet'); process.exit(2); }
     const i9 = meetI9();
     const i5 = await meetI5();
     let server = null;
@@ -374,7 +425,7 @@ if (require.main === module) {
     const { stempel } = require('./lib/stempel');
     const uit = {
       stempel: stempel(),
-      uitleg: 'Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Zes invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.',
+      uitleg: 'Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Zeven invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.',
       hoe: 'npm run contextdoorgifte',
       grens: 'Alleen statische leden- en zaakroutes die de rolkaart een rol geeft (vandaag allemaal POST, zie noemer.perMethode) met een leeg lijf, geen PostgreSQL- of Redis-stand, alleen timers via de globale timerfuncties. Een lege noemer is niet vast te stellen.',
       richting: RICHTING,

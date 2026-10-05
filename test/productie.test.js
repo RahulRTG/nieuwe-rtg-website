@@ -288,6 +288,16 @@ test('log.middleware: zet een X-Request-Id op het antwoord', () => {
   assert.equal(headers['X-Request-Id'], req.id);
 });
 
+test('log.middleware: een X-Request-Id van de client wordt extern, nooit de correlatie (B1a)', () => {
+  const headers = {};
+  const req = { headers: { 'x-request-id': 'ZELFGEKOZEN-correlatie' }, method: 'GET', path: '/x' };
+  const res = { set: (k, v) => { headers[k] = v; }, on: () => {} };
+  middleware()(req, res, () => {});
+  assert.notEqual(req.id, 'ZELFGEKOZEN-correlatie');
+  assert.equal(headers['X-Request-Id'], req.id);
+  assert.equal(req.externeId, 'ZELFGEKOZEN-correlatie');
+});
+
 test('log.foutMiddleware: geeft nette 500 met id, lekt geen details', () => {
   let code = 0, payload = null;
   const req = { id: 'abc', path: '/kapot' };

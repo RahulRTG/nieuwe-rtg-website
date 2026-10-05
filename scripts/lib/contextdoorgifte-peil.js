@@ -31,6 +31,7 @@ const leeg = () => ({
   envelop: { binnenVerzoek: 0, metVerzoekCorrelatie: 0, metActor: 0, metSessie: 0, kanalen: {} },
   auth: { n: 0, post: 0, metHandeling: 0, metAiContext: 0, metEffectteller: 0, postMetAlleDrie: 0,
     correlatieEens: 0, correlatieOneens: 0 },
+  i2: [],
   timers: { gezetInVerzoek: 0, gevuurdMetVerzoek: 0, gevuurdNaAfloop: 0, naAfloopMetDrager: 0,
     naAfloopMetAiSessie: 0, plekken: {} }
 });
@@ -73,6 +74,13 @@ haak.binnen = function (d, fn, pas) {
       if (c) a.metAiContext++;
       if (t) a.metEffectteller++;
       if (req && req.method === 'POST') { a.post++; if (h && c && t) a.postMetAlleDrie++; }
+      /* I2: de proefverzoeken van de meter dragen een X-Request-Id die met I2-
+         begint; hier staat wat de server ervan maakte (correlatie en extern). */
+      const kop = req && req.headers && req.headers['x-request-id'];
+      if (typeof kop === 'string' && kop.startsWith('I2-') && doel.i2.length < 20) {
+        doel.i2.push({ kopLengte: kop.length, kopIsCorrelatie: req.id === kop,
+          handelingIsKop: !!h && h.correlatie === kop, extern: req.externeId === undefined ? '(ontbreekt)' : req.externeId });
+      }
       if (h && req) {
         const env = req.envelop;
         const eens = req.id === h.correlatie && (!env || env.correlatie === h.correlatie);

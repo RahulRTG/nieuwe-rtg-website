@@ -2,7 +2,7 @@
    DE CONTEXTDOORGIFTE MAG ALLEEN DE GOEDE KANT OP (scripts/contextdoorgifte.js,
    CONTEXTDOORGIFTE.json).
 
-   Zes invarianten uit het Fase 2-onderzoek naar een verzoekframe. Wat vandaag
+   Zeven invarianten uit het Fase 2-onderzoek naar een verzoekframe. Wat vandaag
    rood is staat op zijn huidige stand in `ratel` en mag alleen verbeteren; wat
    groen is mag niet terugvallen. Deze toets houdt drie dingen vast:
 
@@ -36,7 +36,7 @@ test('het register draagt een tand voor elke invariant, en ligt niet onder zijn 
   const fout = m.vergelijk(r.ratel, m.tandenVan(r.gemeten));
   assert.deepStrictEqual(fout, [], 'het register loopt achter op zijn eigen ratel: ' + fout.join('; ') +
     ' -- draai npm run contextdoorgifte en kijk welke invariant terugviel');
-  /* Geen samengesteld cijfer: zes invarianten blijven zes. */
+  /* Geen samengesteld cijfer: zeven invarianten blijven zeven. */
   assert.ok(!('totaal' in r.gemeten) && !('score' in r.gemeten), 'een totaalcijfer verbergt welke invariant bewoog');
 });
 
@@ -60,6 +60,9 @@ test('I5 en I9 vers gemeten: geen context zegt na sluiten stil "gelukt", geen en
 
 test('zelfijking: het instrument slaat uit op bekend-foute invoer', () => {
   assert.ok(m.ijkI5(), 'de I5-indeling herkent een stille schrijver niet');
+  assert.ok(m.ijkI2(), 'I2 herkent een overgenomen client-id of een botsing niet');
+  /* Een proefverzoek dat niet aankwam is geen nul maar niet vast te stellen. */
+  assert.strictEqual(m.meetI2(m.I2_KOPPEN.map(k => ({ kop: k, status: 0, antwoordId: null })), []), null);
   assert.strictEqual(m.klasse({ uitkomst: true, veranderd: true, gemeld: false }), 'stil');
   assert.strictEqual(m.klasse({ uitkomst: undefined, veranderd: true, gemeld: false }), 'stil',
     'niets teruggeven is ook "gelukt" zeggen');

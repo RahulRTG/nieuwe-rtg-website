@@ -105,7 +105,7 @@ let stand = null;
 
 async function laad(){
   try{
-    const d = await fetch('/api/foundation/gezin/'+s.code+'/verjaardagen?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/verjaardagen',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     if (d.error) throw new Error(d.error);
     stand = d;
     if (!d.mensen.length){ $('#mensen').innerHTML = '<div class="kaart blok"><div class="leeg">Nog niemand in het boek. Zet hieronder de eerste verjaardag erbij.</div></div>'; }

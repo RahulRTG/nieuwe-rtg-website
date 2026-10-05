@@ -69,7 +69,7 @@ async function maakGezin(merk) {
 
   const mij = await haal('/gezin/' + g.code + '/mij', g.token);
   const mijnId = (mij.body.profiel || mij.body).id || mij.body.mijnId;
-  return { code: g.code, token: g.token, mijnId, kindId: kind.profiel.id };
+  return { code: g.code, gezinscode: g.gezinscode, token: g.token, mijnId, kindId: kind.profiel.id };
 }
 
 test.before(async () => {
@@ -136,7 +136,7 @@ test('3. het dossier van A is na alle pogingen ongewijzigd', async () => {
   assert.ok(tekst.includes('Paracetamol'), 'wat A zelf vastlegde staat er nog');
   assert.ok(!tekst.includes('Kaping'), 'en wat B probeerde te schrijven staat er niet');
 
-  const profielen = (await post('/gezin/inloggen', { code: A.code })).body.profielen || [];
+  const profielen = (await post('/gezin/inloggen', { gezinscode: A.gezinscode })).body.profielen || [];
   assert.ok(!profielen.some(p => (p.naam || '') === 'Indringer'),
     'B heeft geen profiel in het gezin van A kunnen zetten');
   assert.equal(profielen.length, 2, 'A heeft nog precies zijn eigen twee profielen');

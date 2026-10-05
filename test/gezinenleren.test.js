@@ -55,7 +55,7 @@ async function gezinMetKind(naam) {
     { code: g.code, token: g.token, naam: 'Kind ' + naam, rol: 'kind', groep: 'kind' }))).body;
   assert.ok(kind.profiel && kind.profiel.id, 'het kind heeft een profiel: ' + JSON.stringify(kind).slice(0, 160));
   const kindToken = (await json(await api('/gezin/profiel/kies',
-    { code: g.code, profielId: kind.profiel.id }))).body.token;
+    { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).body.token;
   assert.ok(kindToken, 'en een eigen token');
   return { g, kindId: kind.profiel.id, kindToken };
 }

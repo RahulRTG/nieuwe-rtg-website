@@ -13,7 +13,7 @@ test('a family profile never borrows an existing member identity for desktop wid
       phone: '06' + String(n).slice(-8), password: 'geheim123', geboortedatum: '1980-01-01', tier: 'rtg' });
     const f = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Gescheiden profielen', naam: 'Ouder', pin: '1234', bevoegdGezin: true, privacyAkkoord: true });
     const c = await post('/api/foundation/gezin/profiel/maak', { code: f.code, token: f.token, naam: 'Milan', rol: 'kind', geboortedatum: '2015-04-04', pin: '5678' });
-    const chosen = await post('/api/foundation/gezin/profiel/kies', { code: f.code, profielId: c.profiel.id, pin: '5678' });
+    const chosen = await post('/api/foundation/gezin/profiel/kies', { gezinscode: f.gezinscode, profielId: c.profiel.id, pin: '5678' });
     browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 1050 }, serviceWorkers: 'block' });
     await ctx.addInitScript(({ member, f, chosen }) => {

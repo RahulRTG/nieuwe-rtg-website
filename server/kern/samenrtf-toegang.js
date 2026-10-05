@@ -15,13 +15,16 @@ module.exports = ({ crypto, nu = () => new Date().toISOString() }) => {
   const historie = k => Array.isArray(k && k.toegang_historie)
     ? k.toegang_historie : [];
 
-  function uniekeNieuwe(kamers, k, issuer, rotatie) {
+  /* afgeleid 'geen': wie meedoet is lid van de KAMER en niet van de code;
+     een nieuwe deelcode zet niemand eruit. */
+  const spec = (k, issuer) => ({ prefix: 'RTFSAMEN', issuer, doel: DOEL,
+    scope: SCOPE, onderwerp: { soort: 'rtf-samen-kamer', id: k.id },
+    geldigheid: { duurMs: GELDIG_MS }, gebruik: { max: MAX_GEBRUIK }, afgeleid: 'geen' });
+
+  function uniekeNieuwe(kamers, maak) {
     const rijen = alle(kamers);
     for (let poging = 0; poging < 8; poging++) {
-      const gemaakt = bearer.maak({ prefix: 'RTFSAMEN', issuer, doel: DOEL,
-        scope: SCOPE, onderwerp: { soort: 'rtf-samen-kamer', id: k.id },
-        geldigMs: GELDIG_MS, maxGebruik: MAX_GEBRUIK });
-      gemaakt.toegang.rotatie = rotatie || 1;
+      const gemaakt = maak();
       const dubbel = rijen.some(x => bearer.zelfdeHash(
         x && x.toegang && x.toegang.code_hash, gemaakt.toegang.code_hash) ||
         historie(x).some(h => bearer.zelfdeHash(
@@ -33,7 +36,7 @@ module.exports = ({ crypto, nu = () => new Date().toISOString() }) => {
 
   function nieuw(kamers, k, issuer) {
     k.toegang_historie = [];
-    return uniekeNieuwe(kamers, k, issuer, 1);
+    return uniekeNieuwe(kamers, () => bearer.maak(spec(k, issuer)));
   }
 
   function zoek(kamers, code) {
@@ -52,14 +55,16 @@ module.exports = ({ crypto, nu = () => new Date().toISOString() }) => {
     if (k && k.toegang) bearer.intrekken(k.toegang, actor, waarom);
   }
 
+  /* Het werkwoord is VERNIEUWEN (kern/bearercode-keten.js): de gastheer geeft
+     op naam een verse deelcode uit met een eigen termijn en een verse teller.
+     De oude wordt daarbij ingetrokken; de uitgever blijft. Zelfde vorm als
+     samen-toegang.js, zodat het samenvoegen tot een module er een blijft. */
   function roteer(kamers, k, actor) {
-    intrekken(k, actor, 'geroteerd');
+    const oud = k.toegang;
+    const gemaakt = uniekeNieuwe(kamers, () => bearer.vernieuw(oud, spec(k, oud.issuer), actor));
     k.toegang_historie = historie(k);
-    k.toegang_historie.push({ code_hash: k.toegang.code_hash,
-      ingetrokken_at: k.toegang.ingetrokken_at,
-      rotatie: k.toegang.rotatie || 1 });
-    const gemaakt = uniekeNieuwe(kamers, k, actor,
-      (k.toegang.rotatie || 1) + 1);
+    k.toegang_historie.push({ code_hash: oud.code_hash,
+      ingetrokken_at: oud.ingetrokken_at, rotatie: oud.rotatie || 1 });
     if (gemaakt) k.toegang = gemaakt.toegang;
     return gemaakt;
   }

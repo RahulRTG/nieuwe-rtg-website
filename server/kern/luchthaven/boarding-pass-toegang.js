@@ -60,7 +60,7 @@ module.exports = ({ crypto, nu = () => new Date().toISOString() }) => {
     if (!b.pass_id) b.pass_id = nieuwId('bp');
     const gemaakt = bearer.maak({ prefix: 'BP', issuer: 'travelos.airport',
       doel: DOEL, scope: SCOPE, onderwerp: onderwerp(b, v),
-      geldigMs: geldigheidMs(v), maxGebruik: MAX_GEBRUIK });
+      geldigheid: { duurMs: geldigheidMs(v) }, gebruik: { max: MAX_GEBRUIK }, afgeleid: 'geen' });
     gemaakt.toegang.rotatie = Math.max(1, Number(rotatie) || 1);
     return gemaakt;
   }

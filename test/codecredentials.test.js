@@ -466,7 +466,10 @@ test('contractversie 2 vraagt een v2-uitgifte in de eigen bron, en de twee proef
   const v2 = register.deuren.filter(d => d.contractversie === 2).map(d => d.id).sort();
   assert.deepEqual(v2, ['devices.zaakdoos_sleutel', 'foundation.family_profile_token_buiten_harde_poort',
     'livingos.invisible_arrival_pass', 'pay.giftcard_value_code', 'pay.tegoedbon', 'workos.workspace_access_tokens']);
-  const deur = register.deuren.find(d => d.id === 'travelos.reisuitnodiging');
+  /* Een deur die nog nergens een v2-uitgifte heeft. De reisuitnodiging was het
+     voorbeeld, maar die geeft sinds het vernieuwen zelf v2 uit (al blijft
+     haar programmalink v1, dus het register zegt nog geen 2). */
+  const deur = register.deuren.find(d => d.id === 'workos.project_proposal_guest_link');
   deur.contractversie = 2;
   let uit = poort.controleer(register);
   assert.ok(uit.fouten.some(f => f.includes(deur.id) && f.includes('contractversie 2')), 'een v1-deur die v2 zegt valt op');

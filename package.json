@@ -177,6 +177,8 @@
     "wereld": "node scripts/wereld.js",
     "appcluster": "node scripts/appcluster.js",
     "functielijst": "node scripts/functielijst.js",
+    "loopfabric:coverage": "node scripts/loop-fabric-coverage.js",
+    "loopfabric:coverage:controle": "node scripts/loop-fabric-coverage.js --controle",
     "inlinestijl": "node scripts/inlinestijl-ronde.js",
     "inlinestijl:toon": "node scripts/inlinestijl-ronde.js --toon",
     "deelindex": "node scripts/deelindex.js",

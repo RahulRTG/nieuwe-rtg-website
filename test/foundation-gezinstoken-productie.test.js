@@ -25,7 +25,8 @@ const os = require('node:os');
 const path = require('node:path');
 const poort = require('../server/middleware/foundation-productiepoort');
 const { maakGetekendeVrijgave } = require('./foundation-vrijgave-fixture');
-const { startServer, stop, stopNet } = require('./helper');
+const { startServer, stop, stopNet, keurLidGoed } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const ROOT = path.join(__dirname, '..');
 /* Wat in zo'n bestand staat maar het token NIET leest, met de reden. */
@@ -165,16 +166,27 @@ const SLEUTELS = { RTG_ENC_KEY: 'k'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64), R
 test('echte productieserver: de consumers werken op het nieuwe token, een oud kaal token opent niets', async t => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gezinstoken-prod-'));
   t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
-  const eerst = await startServer({ env: { ...SLEUTELS, RTG_DATA_DIR: tmp, SMTP_URL: '' } });
-  let g, kind;
+  /* Sinds 5 oktober 2026 komt een kind in productie alleen binnen via het
+     account van een ouder met een gecontroleerd paspoort (gezinseigenaar.js,
+     gezinshulp.js profielVan). Het gezin ontstaat daarom langs die weg; het
+     anonieme gezin ernaast bewijst dat code + PIN daar niets meer opent. */
+  const eerst = await startServer({ env: { ...SLEUTELS, RTG_DATA_DIR: tmp, SMTP_URL: '', RTG_DEMO: '1' } });
+  let g, kind, anoniem;
   try {
     const f = (pad, body) => fetch(eerst.base + '/api/foundation' + pad, { method: 'POST',
       headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
-    g = await f('/gezin/maak', { gezinsnaam: 'Gezin Productie', naam: 'Beheerder', pin: '2468' });
-    const k = await f('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Noor', rol: 'kind', geboortedatum: '2016-04-12', pin: '1357' });
-    kind = await f('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: k.profiel.id, pin: '1357' });
+    const lid = (pad, body, tok) => fetch(eerst.base + pad, { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify(body) }).then(r => r.json());
+    const ouder = await registreerGratis(eerst.base);
+    assert.ok(ouder, 'een gratis account');
+    await keurLidGoed(eerst.base, ouder.token, ouder.codenaam);
+    g = await lid('/api/rtf/eigen-gezin/maak', { gezinsnaam: 'Gezin Productie', naam: 'Beheerder', bevoegdGezin: true, privacyAkkoord: true }, ouder.token);
+    const k = await lid('/api/rtf/eigen-gezin/kind', { naam: 'Noor', geboortedatum: '2016-04-12' }, ouder.token);
+    kind = await lid('/api/rtf/eigen-gezin/sessie', { profielId: k.profiel.id }, ouder.token);
+    anoniem = await f('/gezin/maak', { gezinsnaam: 'Gezin Anoniem', naam: 'Beheerder', pin: '2468' });
     assert.match(g.token, /^GZ\.[0-9A-F]{32}$/);
     assert.match(kind.token, /^GZ\.[0-9A-F]{32}$/);
+    assert.match(anoniem.token, /^GZ\.[0-9A-F]{32}$/);
   } finally { await stopNet(eerst.child); }
 
   const { child, base } = await startServer({ env: { ...PROD, ...SLEUTELS, RTG_DATA_DIR: tmp } });
@@ -187,6 +199,8 @@ test('echte productieserver: de consumers werken op het nieuwe token, een oud ka
     const r = await post(pad, { code: g.code, token });
     assert.equal(r.status, 200, pad + ' opent in productie met de gezinssessie: ' + await r.text());
   }
+  assert.equal((await post('/api/rtf/toegang', { code: anoniem.code, token: anoniem.token })).status, 403,
+    'een anoniem gezin (code + PIN, geen eigenaar) opent in productie niets');
   for (const token of ['a'.repeat(48), 'GZ.' + '0'.repeat(32), g.token.slice(3)]) {
     const r = await post('/api/rtf/toegang', { code: g.code, token });
     assert.equal(r.status, 403, 'een kaal token van de oude vorm, een verzonnen of een half token opent niets');

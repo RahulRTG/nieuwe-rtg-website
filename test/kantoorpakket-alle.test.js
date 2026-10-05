@@ -163,7 +163,7 @@ test('9. RTF: elk gezinsprofiel een eigen map en delen binnen het gezin', async 
   const code = g.body.code;
   async function profiel(naam, groep) {
     const p = await api('/api/foundation/gezin/profiel/maak', { code, token: g.body.token, naam, rol: 'kind', groep });
-    const kies = await api('/api/foundation/gezin/profiel/kies', { code, profielId: p.body.profiel.id });
+    const kies = await api('/api/foundation/gezin/profiel/kies', { gezinscode: g.body.gezinscode, profielId: p.body.profiel.id });
     return kies.body.token;
   }
   const mamaTok = g.body.token;

@@ -85,6 +85,7 @@ const BESCHERMDE_ROUTES = Object.freeze([
   '/api/rtf/uitnodiging/accepteer',
   '/api/rtf/overzicht',
   '/api/rtf/kanaal',
+  '/api/rtf/gezin/passkey',
   '/api/rtf/bericht',
   '/api/rtf/solliciteer',
   '/api/rtfos/casussen',

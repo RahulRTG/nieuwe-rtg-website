@@ -45,7 +45,7 @@ let A, B, C, aCn, bCn;
 async function tiener(gezinsnaam, kindnaam) {
   const g = await json(await fnd('/gezin/maak', { gezinsnaam, naam: 'Ouder ' + kindnaam, pin: '1234' }));
   const p = await json(await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam: kindnaam, rol: 'kind', groep: 'tiener' }));
-  const kies = await json(await fnd('/gezin/profiel/kies', { code: g.code, profielId: p.profiel.id }));
+  const kies = await json(await fnd('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: p.profiel.id }));
   return { code: g.code, token: kies.token, ouderToken: g.token, profielId: p.profiel.id, codenaam: kies.profiel.codenaam };
 }
 async function klasMet(naam, leden) {
@@ -179,8 +179,12 @@ test('flitsduel: honderd potjes starten allemaal (geen lege trekking in een som)
    om de levende verbindingenlijst en niet om een tabel. */
 async function opentStream(sess) {
   const ac = new AbortController();
+  // de sessie gaat niet in de URL: eerst een eenmalig stroomticket (B18)
+  const t = await (await fetch(BASE + '/api/foundation/gezin/stroom/ticket', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sess.token },
+    body: JSON.stringify({ code: sess.code, kanaal: 'sociaal' }) })).json();
   const url = BASE + '/api/rtf/social/stream?code=' + encodeURIComponent(sess.code) +
-    '&token=' + encodeURIComponent(sess.token);
+    '&ticket=' + encodeURIComponent(t.ticket);
   const res = await fetch(url, { signal: ac.signal });
   assert.equal(res.status, 200, 'de stream hoort open te gaan');
   const reader = res.body.getReader();

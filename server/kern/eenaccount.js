@@ -38,7 +38,7 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
      verzilverd, want hier komt de kantoorrol aan de sleutelbos. */
   const kantoorUitnodiging = require('./kantoor/uitnodiging').maakUitnodiging({ db, save, crypto, bewerkCollectie });
   const koppelen = require('./eenaccount/koppelen')({ accounts, findSupplier, checkCred, hasCred,
-    DEMO, DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, logInlog, pinSlot, nu, kantoorUitnodiging });
+    DEMO, DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, logInlog, pinSlot, nu, kantoorUitnodiging, zwaarVan });
 
   /* De AFGELEIDE sleutels: niet opgeslagen maar gelezen uit een waarheid die
      ergens anders al staat -- de kantoordeur van de eigenaar en elke

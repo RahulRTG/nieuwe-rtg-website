@@ -32,6 +32,7 @@
     "contextmeting": "node scripts/contextmeting.js",
     "kennisindex": "node scripts/kennisindex.js",
     "kluisbeheer": "node scripts/kluisbeheer.js",
+    "ssogeheim:ouderdom": "node scripts/ssogeheim-ouderdom.js",
     "outbox": "node scripts/outbox.js",
     "eigenpost": "node scripts/eigenpost.js",
     "golive": "node scripts/golive.js",

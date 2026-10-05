@@ -43,7 +43,7 @@ async function tienerSessie() {
   const t = Date.now() + '' + (teller++);
   const g = await json(await fnd('/gezin/maak', { gezinsnaam: 'Tn ' + t, naam: 'Ouder ' + t, pin: '1234' }));
   const p = await json(await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Skater ' + t, rol: 'gezinslid', groep: 'tiener' }));
-  const kies = await json(await fnd('/gezin/profiel/kies', { code: g.code, profielId: p.profiel.id }));
+  const kies = await json(await fnd('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: p.profiel.id }));
   return { sess: { code: g.code, token: kies.token }, g };
 }
 
@@ -104,7 +104,7 @@ test('zakgeld: boeken met saldo-bewaking, spaardoelen met inleg en teruggave', a
 test('gasten blijven uit de tiener-tools', async () => {
   const { g } = await tienerSessie();
   const gast = await json(await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Oppas', rol: 'gast', groep: 'volw' }));
-  const kies = await json(await fnd('/gezin/profiel/kies', { code: g.code, profielId: gast.profiel.id }));
+  const kies = await json(await fnd('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: gast.profiel.id }));
   const r = await tn('potje', {}, { code: g.code, token: kies.token });
   assert.equal(r.status, 403);
 });

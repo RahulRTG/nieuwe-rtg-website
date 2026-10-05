@@ -37,7 +37,7 @@ test.before(async () => {
   // voeg een kind toe (beschermd profiel)
   const kind = await json(await rtf('/gezin/profiel/maak', { code, token: volwToken, naam: 'Tim', groep: 'kind' }));
   kindId = kind.profiel.id;
-  const kindKies = await json(await rtf('/gezin/profiel/kies', { code, profielId: kindId }));
+  const kindKies = await json(await rtf('/gezin/profiel/kies', { gezinscode: g1.gezinscode, profielId: kindId }));
   kindToken = kindKies.token;
   // gezin 2 (koper)
   const g2 = await json(await rtf('/gezin/maak', { gezinsnaam: 'Familie Dijk', naam: 'Omar', pin: '4321', groep: 'volw' }));

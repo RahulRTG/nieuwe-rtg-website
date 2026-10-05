@@ -142,3 +142,35 @@ test('paginaopslag comprimeert werkelijk en decodeert slechts een begrensde lees
   assert.equal(projectie.lijst(projectie.volgende(later, [], null), false).length, 0);
   delete require.cache[pad];
 });
+
+test('een door retentie kort blijvende staart houdt geen verdwenen referentiekeys vast', () => {
+  const p = require('../server/db/audit-projectie')(); let s = null;
+  for (let nr = 1; nr <= 300; nr++) {
+    s = p.volgende(s, [{ nr, tekst: JSON.stringify({ nr }) }], Math.max(1, nr - 2));
+    const lijst = p.lijst(s, false);
+    assert.equal(lijst[lijst.length - 1].nr, nr);
+    assert.deepEqual([...s.staart.refs.keys()], s.staart.nummers,
+      'de actuele staart bewaart geen metadata van verwijderde rijen');
+  }
+  assert.equal(s.lengte, 3); assert.equal(s.staart.refs.size, 3);
+  assert.deepEqual([...p.lijst(s, false)].map(r => r.nr), [298, 299, 300]);
+});
+
+test('staarttrim laat oude snapshots en reeds uitgedeelde rij-identiteit intact', () => {
+  const p = require('../server/db/audit-projectie')();
+  const rij = nr => ({ nr, tekst: JSON.stringify({ nr, nested: { waarde: nr } }) });
+  const oud = p.volgende(null, [rij(1), rij(2), rij(3)], 1);
+  const oudeLijst = p.lijst(oud, false), verdwenen = oudeLijst[0], behouden = oudeLijst[1];
+  let nieuw = p.volgende(oud, [rij(4)], 2);
+  assert.notEqual(nieuw.staart.refs, oud.staart.refs, 'de oude snapshotkaart wordt niet opgeschoond');
+  assert.equal(p.lijst(nieuw, false)[0], behouden);
+  assert.deepEqual([...oud.staart.refs.keys()], [1, 2, 3]);
+  for (let nr = 5; nr < 11; nr++) {
+    nieuw = p.volgende(nieuw, [rij(nr)], nr - 2);
+    assert.equal(p.lijst(nieuw, false).at(-1).nr, nr);
+  }
+  assert.equal(oudeLijst[0], verdwenen, 'cacheverdringing verandert de oude uitgedeelde rij niet');
+  assert.equal(oudeLijst[1], behouden);
+  assert.deepEqual([...oudeLijst].map(r => r.nr), [1, 2, 3]);
+  assert.equal(nieuw.staart.refs.size, 3);
+});

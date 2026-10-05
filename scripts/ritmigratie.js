@@ -75,10 +75,10 @@ const LEZERS = {
     wat: 'bestaande referenties, ook van betaalde ritten, uitsluiten bij de uitgifte van een nieuwe object- en betaalidentiteit',
     naOmzetting: 'pas als de opdrachtwereld ook alle historische referenties bewaart; een gemiste betaalde rit kan anders opnieuw dezelfde identiteit krijgen' },
   'server/kern/lidacties/ritten.js': { soort: 'schrijver',
-    wat: 'maakt de rit (unshift) en zoekt hem terug om te betalen',
-    naOmzetting: 'wordt de plek waar de projectie ontstaat: de opdracht eerst, de rit-rij als afgeleide' },
+    wat: 'maakt de rit (unshift), geeft bestaande referenties door aan de pure botsingscontrole en zoekt hem terug om te betalen',
+    naOmzetting: 'de opdracht eerst, de rit-rij als afgeleide; ook historische betaalde referenties blijven nodig om een dubbele object- en betaalidentiteit uit te sluiten' },
   'server/routes/member/kopen/tickets.js': { soort: 'schrijver',
-    wat: 'maakt een transferrit bij een ticket, en weigert een tweede op dezelfde ticketRef',
+    wat: 'maakt een transferrit bij een ticket, sluit bestaande ritreferenties uit en weigert een tweede op dezelfde ticketRef',
     naOmzetting: 'idem; let op de ticketRef-controle, die kent de opdrachtwereld niet' },
 
   'server/kern/live.js': { soort: 'stand',

@@ -56,8 +56,8 @@
   .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:0;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;max-width:90vw;}
   :focus-visible{outline:2px solid var(--leesgoud);outline-offset:2px;}
 
-/* Componentvormen: dezelfde maten, beheerd bij het scherm. */
-.zaakpay-wacht{color:var(--leesgoud);font-size:.8rem;}
+/* Componentopmaak: behoudt de voormalige attributen en expliciete toestanden. */
+.zaakpay-wacht-ophalen{color:var(--leesgoud);font-size:.8rem;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/rtg-world-desktop.js" defer></script>
@@ -204,7 +204,7 @@ async function verversTegoed(){
       '<small>'+(t.aan ? 'voor '+esc(t.aan) : 'vrij, met code')+'</small></div>'+
     (t.verlopen
       ? '<button class="knop stil" data-terug="'+esc(t.id)+'">Neem terug</button>'
-      : '<span class="zaakpay-wacht">wacht op ophalen</span>'+
+      : '<span class="zaakpay-wacht-ophalen" >wacht op ophalen</span>'+
         '<button class="knop stil" data-roteer="'+esc(t.id)+'">Nieuwe code</button>'+
         '<button class="knop stil" data-intrek="'+esc(t.id)+'">Trek in</button>')+
     '</div>').join('');

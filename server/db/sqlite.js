@@ -6,10 +6,10 @@ const kluis = require('../kluis');
 const state = require('./state');
 const { merge3 } = require('./merge');
 const { DATA_DIR, STORE, besloten, beslotenMap } = require('./opslag');
-// Grote collecties: begrensde voorcheck, nooit voor geld.
+// Begrensde veranderingsdetectie voor grote collecties; nooit voor geld.
 const voorcheck = require('./voorcheck');
-const { sleutelsVoorLezing } = require('../opzet/begroting');
 const externeCollecties = require('./sqlite-poll');
+const { collectieSleutels } = require('../opzet/begroting');
 const db = state.db;
 let auditMotorWaarde;
 function auditMotor() {
@@ -36,7 +36,9 @@ function sqliteInit() {
   stmt = null; // verse verbinding: de voorbereide statements horen bij de oude
   besloten(bestand);
   require('../lib/sqlite-gelijktijdigheid')(kvdb);
-  // Begrens het WAL-bestand na checkpoints.
+  // Houd het WAL-bestand begrensd: na een checkpoint wordt het teruggezet naar
+  // deze grens in plaats van op zijn hoogste stand te blijven staan. Zonder dit
+  // groeide store.db-wal tot een paar MB en werd elke start onnodig traag.
   kvdb.exec('PRAGMA journal_size_limit=' + Number(process.env.RTG_SQLITE_WAL_MAX || 8 * 1024 * 1024));
   kvdb.exec('CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, val TEXT, ver INTEGER NOT NULL DEFAULT 0)');
   kvdb.exec('CREATE INDEX IF NOT EXISTS idx_kv_ver ON kv(ver)');
@@ -54,8 +56,7 @@ function loadSqlite() {
   for (const r of rows) { const j = uitStore(r.val); data[r.key] = JSON.parse(j); laatsteJson.set(r.key, j); toegepast.set(r.key, r.ver); }
   return audits.laad(data, audit);
 }
-// De statements zijn per verbinding altijd dezelfde: één keer voorbereiden
-// in plaats van bij elke save opnieuw (SQLite hoeft dan niet te hercompileren).
+// Bereid de vaste statements eenmaal per verbinding voor.
 let stmt = null;
 function statements() {
   if (stmt) return stmt;
@@ -63,7 +64,6 @@ function statements() {
     bump: kvdb.prepare("UPDATE meta SET v = v + 1 WHERE k = 'ver'"),
     huidig: kvdb.prepare("SELECT v FROM meta WHERE k = 'ver'"),
     lees: kvdb.prepare('SELECT val, ver FROM kv WHERE key = ?'),
-    versie: kvdb.prepare('SELECT ver FROM kv WHERE key = ?'),
     versies: kvdb.prepare('SELECT key, ver FROM kv'),
     up: kvdb.prepare('INSERT INTO kv(key,val,ver) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=excluded.ver')
   };
@@ -82,7 +82,7 @@ function saveSqlite(force, sleutels, extraAudit = [], duurzaam = false) {
   const gewijzigd = [];
   const nu = Date.now();
   let uitgesteld = false;
-  for (const k of sleutels === undefined ? sleutelsVoorLezing(db.data) : [...new Set(sleutels)]) {
+  for (const k of sleutels === undefined ? collectieSleutels(db.data) : [...new Set(sleutels)]) {
     if (auditSleutels.has(k) || audits.bezit(db.data, k)) continue;
     if (voorcheck.magOverslaan(k, db.data[k], force || sleutels !== undefined, nu)) { uitgesteld = true; continue; }
     const j = JSON.stringify(db.data[k]);
@@ -94,7 +94,7 @@ function saveSqlite(force, sleutels, extraAudit = [], duurzaam = false) {
      `undefined`, en de duurzame bundel las dat als verlies -- zie duurzaam.js.
      Alleen zonder uitgesteld werk is elke collectie ook echt nagekeken. */
   if (!gewijzigd.length && !auditOps.length) return { alGelijk: !uitgesteld };
-  const { bump, huidig, lees, versie, up } = statements();
+  const { bump, huidig, lees, up } = statements();
   const vastgelegd = [];
   const auditResultaten = [];
   let auditSnapshots;
@@ -102,11 +102,10 @@ function saveSqlite(force, sleutels, extraAudit = [], duurzaam = false) {
   try {
     for (const [k, jOns] of gewijzigd) {
       let j = jOns;
-      const stand = versie.get(k);
+      const rij = lees.get(k);
       // Schreef een ander proces deze collectie ondertussen? Voeg per item samen
       // in plaats van hun wijzigingen te overschrijven.
-      if (stand && stand.ver > (toegepast.get(k) || 0)) {
-        const rij = lees.get(k);
+      if (rij && rij.ver > (toegepast.get(k) || 0)) {
         const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
         const samen = merge3(base, db.data[k], JSON.parse(uitStore(rij.val)));
         db.data[k] = samen;
@@ -132,7 +131,8 @@ function saveSqlite(force, sleutels, extraAudit = [], duurzaam = false) {
   audits.naCommit(auditResultaten, doos, auditSnapshots);
   return { alGelijk: false, committed: true };
 }
-// Publiceer extern gewijzigde collecties vanuit één snapshot.
+// Haal de collecties op die een ANDER proces sinds onze laatste versie schreef,
+// en zet ze in db.data. Zo blijven losse domeinprocessen bij elkaar in de pas.
 function pollSqlite() {
   if (!kvdb) return;
   try {

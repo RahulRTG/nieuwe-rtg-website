@@ -202,7 +202,7 @@ omlaag.
 
 ## `apps/foundation/sessie.js`
 
-`public/apps/foundation/sessie/` -- 4 delen, 404 regels in de delen
+`public/apps/foundation/sessie/` -- 4 delen, 405 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -810,12 +810,12 @@ omlaag.
 
 ## `shared/rtg-edge-smart-menu.js`
 
-`public/shared/rtg-edge-smart-menu/` -- 2 delen, 250 regels in de delen
+`public/shared/rtg-edge-smart-menu/` -- 2 delen, 295 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `rtg-edge-smart-menu-00.js` | Twee gezichten, één hamburger: lokale context en heel RTG blijven in het bestaande Edge-menu |
-| `rtg-edge-smart-menu-01.js` | De menupanelen, focus en koppeling aan de bestaande Edge-schil |
+| `rtg-edge-smart-menu-01.js` | Dezelfde appcatalogus als de widgets: mobiel mag geen apps verliezen |
 
 ## `shared/rtg-schil.js`
 
@@ -898,9 +898,9 @@ omlaag.
 | deel | onderwerp |
 |---|---|
 | `werkos-01.js` | RTG Werk-OS |
-| `werkos-01b.js` | WerkOS: dock en desktopwerkvlak |
-| `werkos-01bb.js` | WerkOS: mobiele schil en contextbalk |
-| `werkos-01c.js` | WerkOS: beweging en vensters |
+| `werkos-01b.js` | WerkOS-commandobalk, Command Center en tabletindeling |
+| `werkos-01bb.js` | WerkOS op mobiel: compacte rail, context en bereikbare bediening |
+| `werkos-01c.js` | WerkOS-beweging, vaste rail en contextschil |
 | `werkos-02.js` | Command Center |
 | `werkos-03.js` | bouwen en spiegelen |
 | `werkos-04.js` | DE BORDSCHIL: het vlak dat over de app komt met de werkvlakken erin |

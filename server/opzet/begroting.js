@@ -126,9 +126,9 @@ function beoordeel(collectie, oudeLengte, nieuweLengte, opties) {
    en niemand twee wikkels om een ding krijgt. */
 const wikkels = new WeakMap();
 const instellingen = new WeakMap();
-// Enumeratie verandert niets. Alleen onze eigen schrijfproxy mag hiervoor
-// worden uitgepakt; de waarden en alle schrijfhandelingen blijven bewaakt.
-const sleutelsVoorLezing = data => Object.keys(instellingen.get(data)?.bron || data);
+
+// Alleen eigen wikkels: verse sleutels, zonder een schrijfbaar doel uit te geven.
+function collectieSleutels(data) { return Object.keys(instellingen.get(data)?.doel || data); }
 
 // Een opslagcommit toetst zijn latere publicatie vooraf. Geen uitzondering op
 // het budget: dezelfde predicate, vóór SQLite de transactie onomkeerbaar maakt.
@@ -187,7 +187,7 @@ function bewaak(data, deps) {
   });
   wikkels.set(data, wikkel);
   wikkels.set(wikkel, wikkel);   // bewaak(bewaakt) geeft dezelfde wikkel terug
-  instellingen.set(wikkel, { nu, modus, grens, bron: data });
+  instellingen.set(wikkel, { nu, modus, grens, doel: data });
   return wikkel;
 }
 
@@ -197,4 +197,4 @@ function stand() {
     laatste: teller.laatste.slice(0, 10) };
 }
 
-module.exports = { bewaak, beoordeel, toetsOpslag, sleutelsVoorLezing, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };
+module.exports = { bewaak, beoordeel, toetsOpslag, collectieSleutels, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };

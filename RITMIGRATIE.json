@@ -1,5 +1,5 @@
 {
-  "stempel": "2026-10-04",
+  "stempel": "2026-10-03",
   "uitleg": "Per lezer van db.data.rides: wat hij eruit haalt en of de opdrachtwereld dat kan leveren. Geschreven vóór de migratie, zodat die niet wordt geraden. Zie MAATSTAF.md par. 7.5.",
   "blokkade": {
     "stand": "opgeheven",
@@ -12,29 +12,29 @@
     "bijOmzetting": "elke lezer die naar de opdrachtwereld gaat, moet zo'n rit afvangen -- zichtbaar, met de reden erbij, en nooit door hem stil uit de lijst te laten vallen."
   },
   "telling": {
-    "bestanden": 24,
-    "treffers": 39,
+    "bestanden": 23,
+    "treffers": 40,
     "schrijver": 2,
     "stand": 7,
-    "historie": 11,
+    "historie": 10,
     "geenLezer": 4,
     "onbekend": 0,
     "kanNu": 7,
     "wachtOpBesluit": 0,
-    "daarna": 13
+    "daarna": 12
   },
   "perSoort": {
     "schrijver": [
       {
         "bestand": "server/kern/lidacties/ritten.js",
-        "treffers": 2,
-        "wat": "maakt de rit (unshift) en zoekt hem terug om te betalen",
-        "naOmzetting": "wordt de plek waar de projectie ontstaat: de opdracht eerst, de rit-rij als afgeleide"
+        "treffers": 3,
+        "wat": "maakt de rit (unshift), geeft bestaande referenties door aan de pure botsingscontrole en zoekt hem terug om te betalen",
+        "naOmzetting": "de opdracht eerst, de rit-rij als afgeleide; ook historische betaalde referenties blijven nodig om een dubbele object- en betaalidentiteit uit te sluiten"
       },
       {
         "bestand": "server/routes/member/kopen/tickets.js",
-        "treffers": 3,
-        "wat": "maakt een transferrit bij een ticket, en weigert een tweede op dezelfde ticketRef",
+        "treffers": 4,
+        "wat": "maakt een transferrit bij een ticket, sluit bestaande ritreferenties uit en weigert een tweede op dezelfde ticketRef",
         "naOmzetting": "idem; let op de ticketRef-controle, die kent de opdrachtwereld niet"
       }
     ],
@@ -112,12 +112,6 @@
         "treffers": 1,
         "wat": "fooien per dag van een zaak",
         "naOmzetting": "na het besluit. Fooi is geld van een mens: een rit die uit de telling valt, kost een chauffeur zijn deel"
-      },
-      {
-        "bestand": "server/kern/lidacties/ritreferentie.js",
-        "treffers": 1,
-        "wat": "bestaande referenties, ook van betaalde ritten, uitsluiten bij de uitgifte van een nieuwe object- en betaalidentiteit",
-        "naOmzetting": "pas als de opdrachtwereld ook alle historische referenties bewaart; een gemiste betaalde rit kan anders opnieuw dezelfde identiteit krijgen"
       },
       {
         "bestand": "server/opzet/kernlaag4.js",

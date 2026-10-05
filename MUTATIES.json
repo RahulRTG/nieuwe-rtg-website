@@ -1,30 +1,19 @@
 {
   "stempel": {
-    "op": "2026-10-03T20:06:37.758Z",
-    "commit": "823d57a0d",
+    "op": "2026-10-04T04:41:52.144Z",
+    "commit": "eaf9b488",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v22.22.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
   "toetsen": {
     "a11y-hermeet.e2e.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/a11y-hermeet.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T05:31:47.949Z",
-        "commit": "205b1ab30",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 5 mutaties in scripts/a11y-hermeet.js (diep): wachttijden en de playState-wacht, die de uitkomst niet bepalen. 2 handmutaties raak: de tweede meting overslaan (return res) laat \"een grond die er een tel later niet meer is, telt niet\" zakken (1 !== 0), en een tweede meting die het contrast leeg teruggeeft laat \"en de tweede meting ziet hem nog steeds\" zakken (0 !== 1)"
     },
     "a11ykeuring.test.js": {
       "soort": "puur",
@@ -51,19 +40,7 @@
     },
     "aankomst-chauffeur-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/rit-momenten.js",
-      "operator": "===->!==#6",
-      "gezakt": 1,
-      "geprobeerd": 21,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "aanmeldbesluit.test.js": {
       "soort": "server",
@@ -792,15 +769,7 @@
       "module": "scripts/lib/bestemming.js",
       "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "geprobeerd": 1
     },
     "appwerkt-onderschepper.test.js": {
       "soort": "puur",
@@ -967,19 +936,7 @@
     },
     "backupvolledig.test.js": {
       "soort": "puur",
-      "staat": "geen bruikbare mutatie",
-      "modules": [
-        "server/opzet/backup-lijst.js"
-      ],
-      "posities": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "balans.test.js": {
       "soort": "server",
@@ -1166,13 +1123,15 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "bedrijfsmaatgroei.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "bedrijfsmaattoelating.test.js": {
       "soort": "server",
@@ -1204,19 +1163,7 @@
     },
     "beginscherm.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/wereldregister.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "begroting.test.js": {
       "soort": "puur",
@@ -1323,19 +1270,7 @@
     },
     "bereikbaar.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bereik.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "berichten.e2e.js": {
       "soort": "server",
@@ -1384,7 +1319,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "besluit.test.js": {
       "soort": "puur",
@@ -1913,15 +1849,7 @@
       "module": "test/helper.js",
       "operator": "return-weg#14",
       "gezakt": 1,
-      "geprobeerd": 135,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "geprobeerd": 120
     },
     "brugklant.test.js": {
       "soort": "puur",
@@ -2067,7 +1995,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "camerascherm.e2e.js": {
       "soort": "puur",
@@ -2094,19 +2023,7 @@
     },
     "canvas.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/canvas.js",
-      "operator": "===->!==#0",
-      "gezakt": 5,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "capabilities.test.js": {
       "soort": "puur",
@@ -2236,19 +2153,7 @@
     },
     "clipdeler.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/clipdeler.js",
-      "operator": "browser-export-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "clips-studio.e2e.js": {
       "soort": "server",
@@ -2293,6 +2198,11 @@
       "operator": "return-weg#0",
       "gezakt": 5,
       "geprobeerd": 6
+    },
+    "codedeuren-claim.pg.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
     },
     "codegrens.test.js": {
       "soort": "puur",
@@ -2400,19 +2310,7 @@
     },
     "command-router.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/command/catalog.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "command-routes-bestuur.test.js": {
       "soort": "server",
@@ -2871,19 +2769,8 @@
     },
     "csp.e2e.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/middleware/voordeur.js",
-      "operator": "route-doel-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "CSP-kop en browserblokkades; 1 mutatie in voordeur.js overleefd (traag: 210 s tegen een budget van 90 s, dus een schot), het beleid zelf is een tekenreeks; 2 handmutaties raak: unsafe-inline in script-src laat de kopbewering zakken, de stijlstempelaar uit laat 352 blokkades zien"
     },
     "dagcoach.test.js": {
       "soort": "server",
@@ -2930,19 +2817,7 @@
     },
     "decision-room.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/rtgone-voorzijde.js",
-      "operator": "route-doel-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 17,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "deelindex.test.js": {
       "soort": "puur",
@@ -2961,37 +2836,13 @@
     },
     "deelmenuronde.e2e.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "gezakt": 3,
-      "lekt": true,
-      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
-      "module": "public/shared/deelmenu/deelmenu-02.js",
-      "operator": "browser-export-weg#0",
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de toets bundelt public/shared/deelmenu/deelmenu-0{1,2,3}.js; 01 en 03 zijn fragmenten die node --check niet halen (0 pogingen), 02 gaf na 2 pogingen een eindeloze lus (te langzaam). Twee motoroperatoren met de hand op deelmenu-03.js raak: getal+1 op de balkopruimer (for b = 1) laat toets 2, 3 en 4 zakken, return-weg in geenMenu.open (undefined in plaats van null) laat toets 2 zakken"
     },
     "deelmenuwacht.e2e.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/deelmenu.js",
-      "operator": "browser-export-weg#0",
-      "gezakt": 2,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T05:31:47.949Z",
-        "commit": "205b1ab30",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "bewaakt de optie subtree: true van de wacht in public/shared/deelmenu.js, en geen operator raakt een objectliteraal; 3 mutaties geprobeerd: twee returnwaarden van start() overleefden, === -> !== in de id-ontdubbeling liet de pagina eindeloos lussen (te langzaam). Handmutatie subtree: true -> false laat toets 1 zakken, toets 2 blijft groen"
     },
     "defensie.test.js": {
       "soort": "server",
@@ -3462,6 +3313,21 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "edge-communications.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-communication-surface.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-4520ebf/edge-communications.e2e.js.evidence.json",
+        "sha256": "1c9b8b19959a42e2fdeedf2f54932f379680b1f18b411e78a2f41d26010a0ade",
+        "commit": "4520ebf44571a9fae935272fdfa61e22f0530e1a",
+        "sourceSha256": "83cf4c1693e1b6bd630923334daff208afed195bb17d09c7ecfb325ac516aec7",
+        "testSha256": "93ab366e97d3af2ddd183133d03e13daa0a0dc6f28759efbd9efe35abab6d921"
+      }
+    },
     "edge-enige-balk.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3547,6 +3413,21 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "editorial-coverage.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "scripts/editorial-coverage.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-4520ebf/editorial-coverage.test.js.evidence.json",
+        "sha256": "2d502729f63dcffd208db1a064ef66e39223ce8167d8830f48c21d41a2b872e0",
+        "commit": "4520ebf44571a9fae935272fdfa61e22f0530e1a",
+        "sourceSha256": "46eb8707e49caa9085906023aa706347a18afb68e9a8efabd78169aeec6e7606",
+        "testSha256": "69a345460df8800b9193c3f3afb68ea48e4848778c530e5da9a3a4c6269baa35"
+      }
     },
     "eenaccount-werkruimte.test.js": {
       "soort": "server",
@@ -3646,10 +3527,8 @@
     },
     "eigenaarpasskey.e2e.js": {
       "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "eigenaarschap.test.js": {
       "soort": "server",
@@ -3747,6 +3626,11 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "eten-kortingscode.pg.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
+    },
     "eten-kortingscode.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3757,19 +3641,7 @@
     },
     "eten-uitgaan-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/app-main/app-main-56b.js",
-      "operator": "===->!==#4",
-      "gezakt": 1,
-      "geprobeerd": 13,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "eten.test.js": {
       "soort": "puur",
@@ -4256,21 +4128,24 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "foundation-entry-lifecycle.e2e.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "public/apps/foundation/agenda.html",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-4520ebf/foundation-entry-lifecycle.e2e.js.evidence.json",
+        "sha256": "63493b623e2fbedfc0c667b37320121ecf3dc63fa25b00e3344b8bce469bf718",
+        "commit": "4520ebf44571a9fae935272fdfa61e22f0530e1a",
+        "sourceSha256": "f8dfa5e49d98023c5ce4e3568a5c06b4352d687f566d40464b9efcca5d2dc5d2",
+        "testSha256": "f1232e9fe694418c36f7323a02254820fc6d5f3586e72e6653d91ef1815fb20f"
+      }
+    },
     "foundation-geld-later.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/rtfappcatalogus-data.js",
-      "operator": "route-doel-weg#42",
-      "gezakt": 1,
-      "geprobeerd": 96,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "foundation-gezinstoken-productie.test.js": {
       "soort": "server",
@@ -4281,51 +4156,15 @@
     },
     "foundation-gezondheid-welzijn.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/foundation/gezondheid-welzijn.js",
-      "operator": "route-doel-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "foundation-hulp-zorg.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/foundation/zorg-hulp.js",
-      "operator": "route-doel-weg#1",
-      "gezakt": 1,
-      "geprobeerd": 5,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "foundation-leren-groei.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/foundation/leren-groei.js",
-      "operator": "route-doel-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "foundation-lescredential-server.test.js": {
       "soort": "server",
@@ -4333,6 +4172,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "foundation-lescredential.pg.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
     },
     "foundation-lescredential.test.js": {
       "soort": "puur",
@@ -4358,19 +4202,7 @@
     },
     "foundation-meedoen-ontdekken.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/foundation/meedoen-ontdekken.js",
-      "operator": "route-doel-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "foundation-persoonscodes.pg.test.js": {
       "soort": "puur",
@@ -4386,19 +4218,7 @@
     },
     "foundation-premium-ui.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/foundation/sw.js",
-      "operator": "!==->===#0",
-      "gezakt": 1,
-      "geprobeerd": 3,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "foundation-productiepoort.test.js": {
       "soort": "puur",
@@ -4424,51 +4244,30 @@
     },
     "foundation-samen-thuis.test.js": {
       "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "foundation-sw-cache.e2e.js": {
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "server/kern/appgids-data/deel4.js",
-      "operator": "route-doel-weg#4",
+      "module": "public/apps/foundation/sw.js",
+      "operator": "expliciete bronmutatie",
       "gezakt": 1,
-      "geprobeerd": 93,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-4520ebf/foundation-sw-cache.e2e.js.evidence.json",
+        "sha256": "2ca529278bdab2f638b44d51bfa0978ea760f85ae0374f87b6341dea044098f6",
+        "commit": "4520ebf44571a9fae935272fdfa61e22f0530e1a",
+        "sourceSha256": "774caf43786cf7ec6f59ce2df9e70c7c387fec257582c8e7e9c4cf75f490f587",
+        "testSha256": "badba537e0938c6ea0c7ee9e940ccb73542cfe2c23e67957da1300d5c82796e0"
       }
     },
     "foundation-veilig-vertrouwd.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/foundation/veilig-vertrouwd.js",
-      "operator": "route-doel-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "foundation-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/foundation/voorzijde.js",
-      "operator": "route-doel-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 2,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "foundation-vrijgave.test.js": {
       "soort": "puur",
@@ -4685,8 +4484,10 @@
     },
     "gebaar-notities.e2e.js": {
       "soort": "server",
-      "staat": "al rood",
-      "gezakteZonderMutatie": 1
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "gebaar-omweg.test.js": {
       "soort": "puur",
@@ -4712,26 +4513,12 @@
     },
     "gebaar.e2e.js": {
       "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 2,
-      "scherp": "overleefd"
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "gebaar.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/gebaar.js",
-      "operator": ">=->>#0",
-      "gezakt": 1,
-      "geprobeerd": 5,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "gebouw.test.js": {
       "soort": "server",
@@ -4864,19 +4651,7 @@
     },
     "geld-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/geld/schil.js",
-      "operator": ">=->>#0",
-      "gezakt": 1,
-      "geprobeerd": 3,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "geld.e2e.js": {
       "soort": "server",
@@ -5234,7 +5009,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "gezinstoken.test.js": {
       "soort": "puur",
@@ -5250,6 +5026,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "gezinsuitnodiging.pg.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
     },
     "gezinzorg.test.js": {
       "soort": "server",
@@ -5395,19 +5176,7 @@
     },
     "hand.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/hand.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "handelenspoor.test.js": {
       "soort": "server",
@@ -5552,14 +5321,6 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 3
-    },
-    "herhaalbesluit.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/herhaalbesluit.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 1
     },
     "herhaalpakket.test.js": {
       "soort": "puur",
@@ -5882,6 +5643,11 @@
       "gezakt": 20,
       "scherp": "gezakt"
     },
+    "horecabon-credential.pg.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
+    },
     "horecabon-credential.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6156,19 +5922,8 @@
     },
     "identiteitschermen.e2e.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/rtgid.html",
-      "operator": "html-hoofdinhoud-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "legt tekst en afwezigheid vast, geen rekenend gedrag; overleefde 13 mutaties in public/apps/geld/balansb.js (de Balans-stand). 3 handmutaties raak: \"nooit meer gegevens dan gevraagd\" uit rtgid.html laat toets 1 zakken, \"Geen streaks\" uit balansb.js laat toets 2 zakken, en een regel \"3 dagen op rij\" in balansb.js laat toets 2 zakken op de reeksteller"
     },
     "idor.test.js": {
       "soort": "puur",
@@ -6372,8 +6127,10 @@
     "ioslaag.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
-      "operator": "liegpoort /api/",
       "gezakt": 1,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "operator": "liegpoort /api/",
       "scherp": "overleefd"
     },
     "isolatie-cockpit.e2e.js": {
@@ -6488,19 +6245,8 @@
     },
     "juridischeschermen.e2e.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/juridisch/privacy.html",
-      "operator": "html-hoofdinhoud-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "tekstcontract op vier statische HTML-pagina's, geen module maakt die tekst; 2 handmutaties raak: Autoriteit Persoonsgegevens weg uit privacy.html laat de klachtrechteis zakken, Marriott in voorwaarden.html de merkregel"
     },
     "kaart.test.js": {
       "soort": "puur",
@@ -6975,8 +6721,10 @@
     },
     "kosten.e2e.js": {
       "soort": "server",
-      "staat": "al rood",
-      "gezakteZonderMutatie": 2
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "kosten.test.js": {
       "soort": "server",
@@ -7111,19 +6859,8 @@
     },
     "laatstedrie.e2e.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/media.js",
-      "operator": "browser-export-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 34 mutaties in public/shared/media.js (diep); de twee poortbeweringen lezen vaste tekst in oog.html en scherm.html, en inline script haalt node --check niet. 2 handmutaties raak: `if (vooraf)` -> `if (!vooraf)` in vraag() (de stroom wordt nooit gevraagd) en beeld.srcObject = null in camera.html laten allebei de zoekerwacht zakken; de token-grendel omdraaien in oog.html en scherm.html bleef groen (oog valt terug op dezelfde personeelstekst via RTGDeur, scherm leest #poort voordat de 401 hem vervangt)"
     },
     "lab-geheim.test.js": {
       "soort": "puur",
@@ -7262,17 +6999,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/mobielkeuring.js",
-      "operator": "voorwaarde-omkeren#0",
+      "operator": "&&->||#0",
       "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T05:31:47.949Z",
-        "commit": "205b1ab30",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "geprobeerd": 7
     },
     "leerfabric.test.js": {
       "soort": "puur",
@@ -7545,15 +7274,7 @@
       "module": "scripts/lib/schermleugen.js",
       "operator": "&&->||#0",
       "gezakt": 1,
-      "geprobeerd": 3,
-      "herkomst": {
-        "op": "2026-10-04T05:31:47.949Z",
-        "commit": "205b1ab30",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "geprobeerd": 2
     },
     "liegpoort.test.js": {
       "soort": "puur",
@@ -7635,6 +7356,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "linkcap-credential.pg.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
     },
     "linkcap-credential.test.js": {
       "soort": "puur",
@@ -7850,10 +7576,7 @@
     },
     "livinglab.e2e.js": {
       "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 2,
-      "scherp": "gezakt"
+      "staat": "te langzaam"
     },
     "livinglab.test.js": {
       "soort": "server",
@@ -8113,19 +7836,7 @@
     },
     "magnaat-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/magnaat-voorzijde.js",
-      "operator": "===->!==#10",
-      "gezakt": 1,
-      "geprobeerd": 38,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "magnaat-werkroutefabriek.test.js": {
       "soort": "puur",
@@ -8593,49 +8304,21 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/apps/media/studio-pro-engine.js",
-      "operator": "browser-export-weg#0",
+      "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T05:31:47.949Z",
-        "commit": "205b1ab30",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "geprobeerd": 1
     },
     "media-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/media/voorzijde.js",
-      "operator": "route-doel-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 16,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "media.e2e.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/media.js",
-      "operator": "browser-export-weg#0",
+      "operator": "!==->===#0",
       "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T05:31:47.949Z",
-        "commit": "205b1ab30",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "geprobeerd": 3
     },
     "media.test.js": {
       "soort": "server",
@@ -9064,6 +8747,13 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "mobile-single-shell.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "mobiliteit-werkkant-routes.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -9301,6 +8991,38 @@
       "soort": "puur",
       "staat": "muteert zelf",
       "reden": "toetst de opruimwacht van deze motor; die twee om elkaar heen draaien zegt niets"
+    },
+    "mutationproof-aggregate.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/mutationproof-model.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "mutationproof-capture.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/mutationproof-model.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "mutationproof-runtime.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/mutationproof-model.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "mutationproof.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/mutationproof-model.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
     },
     "muziek-bestanden.e2e.js": {
       "soort": "server",
@@ -9579,19 +9301,26 @@
       "geprobeerd": 1
     },
     "normprestatie.test.js": {
-      "soort": "puur",
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "scripts/norm.js",
-      "operator": "return-weg#1",
+      "module": "scripts/performance-debt.js",
+      "operator": "expliciete bronmutatie",
       "gezakt": 1,
-      "geprobeerd": 10
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-bb6d9cdd/normprestatie.test.js.evidence.json",
+        "sha256": "f6072494b0d9b7951d0bd9aea2c624802f8ae4c3a9555437611fb3dec23b42fb",
+        "commit": "bb6d9cdd6d53f90ac9071451809b2d0b8af4a0d4",
+        "sourceSha256": "deb665e79b0db4663b323a7fb843d6a0c36279e423858ae14697a8271f9bf308",
+        "testSha256": "1b86babd736ca904cdb5110c631acb08843fd2fb2df758320dbe87802947fd70"
+      }
     },
     "normverval.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/normverval.js",
       "operator": "===->!==#0",
-      "gezakt": 8,
+      "gezakt": 7,
       "geprobeerd": 1
     },
     "notities.e2e.js": {
@@ -10099,7 +9828,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 7
+      "gezakt": 8,
+      "scherp": "gezakt"
     },
     "onderwijs.test.js": {
       "soort": "server",
@@ -10204,13 +9934,15 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "operationeel-herstel.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "operationeel-meter.test.js": {
       "soort": "puur",
@@ -10224,7 +9956,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "oplaadgat.test.js": {
       "soort": "puur",
@@ -10238,9 +9971,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/db/sqlite.js",
-      "operator": "===->!==#0",
-      "gezakt": 10,
-      "geprobeerd": 3
+      "operator": "!==->===#0",
+      "gezakt": 6,
+      "geprobeerd": 4
     },
     "opslagblokkade.test.js": {
       "soort": "puur",
@@ -10280,6 +10013,21 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "outputartifact.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "scripts/lib/outputartifact.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-e9254cb/outputartifact.test.js.evidence.json",
+        "sha256": "5c04b7b982f82ae4cca7f7c9e64deb3f8af6eebdd76de5ba9d2594d7e380992d",
+        "commit": "e9254cb184dd3b3ce4ef310d072bab9fb9c96210",
+        "sourceSha256": "05411957d3440d09a856a2dc9f3076533b173edbccf88e5145230f517d2d8647",
+        "testSha256": "28ede256591ea3cdf5ef2ed571f38e1e2fc5bdc7248882ff731526b9504f5a82"
+      }
+    },
     "outputaudit.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -10287,6 +10035,51 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "outputbinding.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "scripts/lib/outputbinding.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-4520ebf/outputbinding.test.js.evidence.json",
+        "sha256": "5ae7adf38b942e76e6fdaebb63cdaec453fbe28b1a4090e73334903ac67c8efe",
+        "commit": "4520ebf44571a9fae935272fdfa61e22f0530e1a",
+        "sourceSha256": "63760315f0e9f532a288adebc3faf8a3f9c1b79fda8843cc468b959b148dfa00",
+        "testSha256": "bbcd52e8d687680cd41ac64b4d24fe26640a3d23c724407d3b42d9399337dee5"
+      }
+    },
+    "outputshards.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "scripts/lib/outputshards.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-4520ebf/outputshards.test.js.evidence.json",
+        "sha256": "f9582ad0e124617ae46660a10b0181dee4969bd3f89a682f39eae96671b2e397",
+        "commit": "4520ebf44571a9fae935272fdfa61e22f0530e1a",
+        "sourceSha256": "d256b88e09c9c712cc9b11cbe9cf6caff14870bf1c732cb53b02312ac909b231",
+        "testSha256": "acf8266b5d1b9e5ca9c2e0852a47d7e1c3f9188f30011e4eefa586ee653a3494"
+      }
+    },
+    "outputworker.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "scripts/lib/outputworker.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-4520ebf/outputworker.test.js.evidence.json",
+        "sha256": "2b8d418e727b15bc64c8fecfbd35f618e09db7786d037e628f76d9bce1228da8",
+        "commit": "4520ebf44571a9fae935272fdfa61e22f0530e1a",
+        "sourceSha256": "64aa05f06ecaff915cd18039ced4dd709e139dc09b2c09a4be53095e786b2b9d",
+        "testSha256": "861fdcc25324c270f5f5200ace548b82ce36251c375fb48370905d8473afad55"
+      }
     },
     "ov-operatie.test.js": {
       "soort": "puur",
@@ -10410,13 +10203,9 @@
       "geprobeerd": 2
     },
     "paginas.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "gezakt": 1,
-      "lekt": true,
-      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
-      "operator": "liegpoort /api/",
-      "scherp": "gezakt"
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "census over alle pagina's in public/ zonder eigen module, en de nulmeting past niet in het budget: met public/shared/basis.js als module kwam de nulmeting terug als te langzaam (0 mutaties geprobeerd). Tweemaal met de hand raak op een groene nulmeting: een TypeError in basis.js (setAttribute -> zetAttribuut) laat hem zakken op de onafgevangen fout, een scriptbron in apps/app.html naar een niet-bestaand bestand op de 404"
     },
     "paginascripts.test.js": {
       "soort": "puur",
@@ -10467,11 +10256,19 @@
       "scherp": "gezakt"
     },
     "partnerpas.test.js": {
-      "soort": "server",
+      "soort": "gericht",
       "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 2,
-      "scherp": "gezakt"
+      "module": "server/routes/office/partners.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-bb6d9cdd/partnerpas.test.js.evidence.json",
+        "sha256": "905bf47638b1ceac1e6d4afe2d7897df5a1886eb19469ccef9fc3ef1c9973d50",
+        "commit": "bb6d9cdd6d53f90ac9071451809b2d0b8af4a0d4",
+        "sourceSha256": "4a0fd28071240fb56281805736980f6e94f8fad81a6c9666696f6b1388706790",
+        "testSha256": "73494e3f99f5525a7335e2e8f4f2e7abaae1a510f1d5ae072853b76b90e5d460"
+      }
     },
     "partnerpersoneelscode-register.test.js": {
       "soort": "puur",
@@ -10480,6 +10277,11 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
+    },
+    "partnerpersoneelscode.pg.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
     },
     "partnerpersoneelscode.test.js": {
       "soort": "server",
@@ -10810,6 +10612,11 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "personeelsuitnodiging.pg.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
+    },
     "persoonseis.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -11116,30 +10923,6 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
-    "praktijk-betalen.e2e.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/werk/praktijk-betalen.js",
-      "operator": "browser-export-weg#0",
-      "gezakt": 2,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T05:31:47.949Z",
-        "commit": "205b1ab30",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
-    },
-    "praktijk-betalen.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/betaalwaarheid/index.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 3
-    },
     "praktijk-http.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -11147,27 +10930,10 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
-    "praktijk-leverancier.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/bedrijf/praktijk-vorm.js",
-      "operator": "===->!==#0",
-      "gezakt": 4,
-      "geprobeerd": 1
-    },
-    "praktijk-transacties-http.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
     "praktijk.e2e.js": {
       "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 2,
-      "scherp": "gezakt"
+      "staat": "al rood",
+      "gezakteZonderMutatie": 2
     },
     "praktijk.test.js": {
       "soort": "puur",
@@ -11196,7 +10962,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "presentiemeting.test.js": {
       "soort": "server",
@@ -11294,19 +11061,7 @@
     },
     "project-room.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/project-room.js",
-      "operator": "api-actie-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 2,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "provider-sandbox.test.js": {
       "soort": "puur",
@@ -11589,13 +11344,20 @@
       "gezakt": 1,
       "geprobeerd": 8
     },
-    "registerratel.test.js": {
-      "soort": "puur",
+    "registerratels.test.js": {
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "scripts/registerratel.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
+      "module": "scripts/registerratels.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-4520ebf/registerratels.test.js.evidence.json",
+        "sha256": "7a8088916ee8be0910027decb560c4f79694d69732d1d581e0ba12b402d68545",
+        "commit": "4520ebf44571a9fae935272fdfa61e22f0530e1a",
+        "sourceSha256": "a3ef0b6130983a40089895c2e4eafb6f1dc7a4a05a6a85df745f1f7039eee1ee",
+        "testSha256": "78ca1c807175600cd60b19dc35e5f02ded5b8ecc631869f32b79723025443014"
+      }
     },
     "reisaanbod.test.js": {
       "soort": "server",
@@ -11634,19 +11396,7 @@
     },
     "reisboek-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/reisboek.js",
-      "operator": "===->!==#16",
-      "gezakt": 1,
-      "geprobeerd": 51,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "reisbureau-genre.test.js": {
       "soort": "puur",
@@ -11716,9 +11466,11 @@
     "reisprogramma.e2e.js": {
       "soort": "puur",
       "staat": "gezakt",
+      "gezakt": 2,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
       "module": "public/apps/reisprogramma-editor.js",
       "operator": "===->!==#0",
-      "gezakt": 2,
       "geprobeerd": 1
     },
     "reisprogramma.test.js": {
@@ -11907,6 +11659,11 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "restdeuren.pg.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
+    },
     "resync-licht.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -11975,6 +11732,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "ritreferentie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/pay/boeking.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "rollbackbesluit.test.js": {
       "soort": "puur",
@@ -12092,19 +11857,7 @@
     },
     "rtdocs-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/office/voorzijde.js",
-      "operator": "api-actie-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 3,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "rtf-labfonds-deur.test.js": {
       "soort": "server",
@@ -12233,8 +11986,10 @@
     "rtfkinderschermen.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
-      "operator": "liegpoort /api/",
       "gezakt": 1,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "operator": "liegpoort /api/",
       "scherp": "gezakt"
     },
     "rtfkosten.e2e.js": {
@@ -12379,19 +12134,8 @@
     },
     "rtfrust.e2e.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/foundation/rust.html",
-      "operator": "-->+#0",
-      "gezakt": 1,
-      "geprobeerd": 7,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de logica staat inline in public/apps/foundation/rust.html en de motor muteert geen .html (0 pogingen, node --check weigert hem); 2 handmutaties in dat inline script raak: de fasewissel van 4000 naar 9000 ms laat de toets zakken op het wachten op \"Houd vast\", en tijdens de minuut een tekst in #stilTekst zetten laat de bewering \"het scherm is stil\" zakken"
     },
     "rtfschool.test.js": {
       "soort": "server",
@@ -12451,8 +12195,11 @@
     },
     "rtg-a11y.e2e.js": {
       "soort": "puur",
-      "staat": "al rood",
-      "gezakteZonderMutatie": 1
+      "staat": "gezakt",
+      "module": "scripts/rtg-a11y.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 8
     },
     "rtg-a11y.test.js": {
       "soort": "puur",
@@ -12489,17 +12236,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/rtg-dev.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 2,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T05:31:47.949Z",
-        "commit": "205b1ab30",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "rtg-edge-2-pilots.test.js": {
       "soort": "puur",
@@ -12511,21 +12250,8 @@
     },
     "rtg-edge-2.e2e.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "gezakt": 2,
-      "traag": true,
-      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
-      "module": "public/shared/rtg-edge-2.js",
-      "operator": "voorwaarde-omkeren#0",
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "nulmeting 251 s tegen een motorgrens van 240 s (twee keer te langzaam, 0 pogingen). 2 handmutaties raak, alle 22 toetsen rood: het eerste === -> !== in public/shared/rtg-edge-2.js (de motoroperator zelf) en isEmbedded() in rtg-edge-2-context.js die een topscherm als ingebed leest (self!==top -> self===top) -- dan bouwt geen route zijn rand en zakt de wacht op data-rtg-edge-2-rendered"
     },
     "rtg-edge-2.test.js": {
       "soort": "puur",
@@ -12598,19 +12324,7 @@
     },
     "rtg-heritage-transition.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/rtg-heritage-transition.js",
-      "operator": "!==->===#0",
-      "gezakt": 1,
-      "geprobeerd": 2,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "rtg-heritage.test.js": {
       "soort": "puur",
@@ -12681,7 +12395,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "rtgcode.test.js": {
       "soort": "puur",
@@ -12743,19 +12458,7 @@
     },
     "rtgone-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/rtgone-voorzijde.js",
-      "operator": "route-doel-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 2,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "rtgone.test.js": {
       "soort": "server",
@@ -12836,19 +12539,7 @@
     },
     "rtmail-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/rtmail-voorzijde-werk.js",
-      "operator": "route-doel-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 15,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "rtmail-werk.test.js": {
       "soort": "server",
@@ -13133,8 +12824,19 @@
       "scherp": "gezakt"
     },
     "saveduurzaam.test.js": {
-      "soort": "puur",
-      "staat": "geen module gevonden"
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/duurzaam.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-bb6d9cdd/saveduurzaam.test.js.evidence.json",
+        "sha256": "c91d1daff5bc5b518e0f5dc34257f69c7e897ed36857b07363281f501dca8aa0",
+        "commit": "bb6d9cdd6d53f90ac9071451809b2d0b8af4a0d4",
+        "sourceSha256": "8ecb7fd4f004ec01bce7b6a23857819e4a51dde4b8a01aac7088214ccc527135",
+        "testSha256": "1408f9edd1db7d57773b5f7b2d2498aa2fd263a16e95eefd6a344f0e5294d161"
+      }
     },
     "scan-tafel.e2e.js": {
       "soort": "server",
@@ -13495,19 +13197,7 @@
     },
     "second-screen-personal.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/interface/second-screen-personal.js",
-      "operator": "!==->===#0",
-      "gezakt": 1,
-      "geprobeerd": 2,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "securitylog-keten.test.js": {
       "soort": "server",
@@ -13587,19 +13277,7 @@
     },
     "servicecaps-releasepoort.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/servicecaps.js",
-      "operator": "return-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 5,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "servicecockpit.e2e.js": {
       "soort": "server",
@@ -13708,12 +13386,19 @@
       "scherp": "overleefd"
     },
     "sessies.test.js": {
-      "soort": "puur",
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "server/kern/sessies.js",
-      "operator": "return-weg#2",
+      "module": "server/db/merge.js",
+      "operator": "expliciete bronmutatie",
       "gezakt": 1,
-      "geprobeerd": 4
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-bb6d9cdd/sessies.test.js.evidence.json",
+        "sha256": "b5d8ae24f6ce31edb7aed778ee6da7611caa8ab55f445c94b7465a3351f3b198",
+        "commit": "bb6d9cdd6d53f90ac9071451809b2d0b8af4a0d4",
+        "sourceSha256": "88bbeef6abc0bf20470797034acd3ef36db13d09dbf9e1ecf0b5545b0c501159",
+        "testSha256": "31be36277e1f3c275d78fb8e4bf0babc3c7b855c3a2892e2afee6b85124f37b5"
+      }
     },
     "sessieverfijning.test.js": {
       "soort": "puur",
@@ -14221,36 +13906,109 @@
       "staat": "geen module gevonden"
     },
     "sqlite-audit-herstel.test.js": {
-      "soort": "puur",
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "server/kern/command/journaal.js",
-      "operator": "&&->||#0",
+      "module": "server/db/audit-sqlite.js",
+      "operator": "expliciete bronmutatie",
       "gezakt": 1,
-      "geprobeerd": 3
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-e9254cb/sqlite-audit-herstel.test.js.evidence.json",
+        "sha256": "ef3b18209a8fdc7625128a9ee3742ecb5b87fef9e41a01a2b8ef107d59d0258b",
+        "commit": "e9254cb184dd3b3ce4ef310d072bab9fb9c96210",
+        "sourceSha256": "084276ae99b17eb87d9639273b7cfd5271eca6953e17ebf475c0fb214934d58b",
+        "testSha256": "5adb4f92b6b4b33a0c3152ffcff6104b139b83c51d5d75b44550a2709b10a62d"
+      }
+    },
+    "sqlite-audit-publicatie.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/audit-publicatie.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/sqlite-mutation-proof-7e71-20261003/sqlite-audit-publicatie.test.js.evidence.json",
+        "sha256": "c9d449c326cf7108c82089348f7b26a0e0ee67c395f164456adb1b84ec6f517f",
+        "commit": "7e71dac6590996898d8d388f714bec737a5f7835",
+        "sourceSha256": "7d78a851b93fc7d828c6c9195485dba650ef6283bb6608585eea486ca9bd1ac5",
+        "testSha256": "ad3d245c2ed017e655056f30b796e4b18ac1ed3d4bac6c1112846fe650b4dc78"
+      }
     },
     "sqlite-audit-rijen.test.js": {
-      "soort": "puur",
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "server/lib/keten.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 1
+      "module": "server/db/audit-sqlite.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-e9254cb/sqlite-audit-rijen.test.js.evidence.json",
+        "sha256": "5b8553f1a7a663c0cded5707ebf59043242b69816033fd7dd700427f8b8c63af",
+        "commit": "e9254cb184dd3b3ce4ef310d072bab9fb9c96210",
+        "sourceSha256": "084276ae99b17eb87d9639273b7cfd5271eca6953e17ebf475c0fb214934d58b",
+        "testSha256": "226f495b9f280ca2d3327a4a6628d78e1af81ce261aebad64a79f31a5268e2c3"
+      }
     },
     "sqlite-audit-selectief.test.js": {
-      "soort": "puur",
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "server/db/index.js",
-      "operator": "===->!==#0",
-      "gezakt": 8,
-      "geprobeerd": 1
+      "module": "server/kern/sessies.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-bb6d9cdd/sqlite-audit-selectief.test.js.evidence.json",
+        "sha256": "204c3f0c3baf2ef15b211584f3ee720f4654bfe6aa140c1817014c1f5124a3ae",
+        "commit": "bb6d9cdd6d53f90ac9071451809b2d0b8af4a0d4",
+        "sourceSha256": "888448790dfcdc6a4bee9a65ac7375a032ddd672155fc2008ee5b8f5aac75b0c",
+        "testSha256": "d6ea9238351602e13fc30960a1445cf390c303f367464198251f4773b7a29be7"
+      }
     },
     "sqlite-audit-snapshot.test.js": {
-      "soort": "puur",
+      "soort": "gericht",
       "staat": "gezakt",
-      "module": "server/db/sqlite.js",
-      "operator": "===->!==#0",
-      "gezakt": 4,
-      "geprobeerd": 1
+      "module": "server/db/audit-sqlite.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-e9254cb/sqlite-audit-snapshot.test.js.evidence.json",
+        "sha256": "128a5177f456ebf57f8af359455f7037f9b9d0e3bb57915bd932fc2001acb251",
+        "commit": "e9254cb184dd3b3ce4ef310d072bab9fb9c96210",
+        "sourceSha256": "084276ae99b17eb87d9639273b7cfd5271eca6953e17ebf475c0fb214934d58b",
+        "testSha256": "3b1f13998a6319183ef804ab43ff7062a3e6d4383463cf096e7f503d378542d7"
+      }
+    },
+    "sqlite-duurzaam-sync.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/sqlite-duurzaam.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 8,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/sqlite-mutation-proof-7e71-20261003/sqlite-duurzaam-sync.test.js.evidence.json",
+        "sha256": "610ce4cf123bb0effd89a9ef51080ab8fdc248cffca66b9d847d2a7773b8a704",
+        "commit": "7e71dac6590996898d8d388f714bec737a5f7835",
+        "sourceSha256": "8f2c2d93b3268bf74c30fab88139ee6f13d444254a489da2a441c013fdfe4407",
+        "testSha256": "b334086d44d42bd3eed6ecc39c55f1b47d2d8dbdc033d197b64c205e962e8df5"
+      }
+    },
+    "sqlite-poll-selectief.test.js": {
+      "soort": "gericht",
+      "staat": "gezakt",
+      "module": "server/db/sqlite-poll.js",
+      "operator": "expliciete bronmutatie",
+      "gezakt": 1,
+      "geprobeerd": 1,
+      "bewijs": {
+        "bestand": "/Users/rahultravelgroup/Documents/Codex/2026-09-06/kan-je-main-live-zetten/output/editorial-live-20261001/quality-mutation-proofs-4520ebf/sqlite-poll-selectief.test.js.evidence.json",
+        "sha256": "1842f1dcfb72fef30034359d61093ebef54bdec4e636e68a3eba13f3d1b02ee8",
+        "commit": "4520ebf44571a9fae935272fdfa61e22f0530e1a",
+        "sourceSha256": "98de88afa86a695be86e6343f76010a2ec31794db93e520f03db1ebc53066826",
+        "testSha256": "48518910aa94be61aa99ed6ebfab7308ec1c2ea740cdfe7d0578f9ebbb1e58ae"
+      }
     },
     "sso-clientgeheim-routes.test.js": {
       "soort": "server",
@@ -14533,18 +14291,10 @@
     "storyline-worlds.e2e.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "public/site/storyline-world.js",
-      "operator": "browser-export-weg#0",
+      "module": "public/site/storyline-stage.js",
+      "operator": "&&->||#0",
       "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "geprobeerd": 2
     },
     "streefbeeld.test.js": {
       "soort": "server",
@@ -14906,19 +14656,7 @@
     },
     "team-room-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/personeel.html",
-      "operator": "html-bron-weg#12",
-      "gezakt": 1,
-      "geprobeerd": 21,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "techniek-functies.test.js": {
       "soort": "server",
@@ -15258,18 +14996,12 @@
     "toestel.e2e.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "public/shared/toestel/opslag.js",
-      "operator": "!==->===#0",
       "gezakt": 1,
-      "geprobeerd": 5,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "public/shared/toestel/poorten.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 1
     },
     "toestelbinding.test.js": {
       "soort": "puur",
@@ -15589,19 +15321,7 @@
     },
     "vandaag-surface-pilots.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/werk/command-entry.js",
-      "operator": "&&->||#0",
-      "gezakt": 1,
-      "geprobeerd": 2,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "vastgoed-keyless-productie.test.js": {
       "soort": "puur",
@@ -15635,19 +15355,7 @@
     },
     "veilig-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/veilig/vandaag.js",
-      "operator": "route-doel-weg#1",
-      "gezakt": 1,
-      "geprobeerd": 8,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "veiligadres.test.js": {
       "soort": "puur",
@@ -15727,35 +15435,11 @@
     },
     "verblijven-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/hotels-momenten.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 5,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "verdiepende-appflows.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/rtg-edge-2-loader.js",
-      "operator": "===->!==#10",
-      "gezakt": 1,
-      "geprobeerd": 44,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "verdiepende-schermen.e2e.js": {
       "soort": "puur",
@@ -15778,14 +15462,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
-    },
-    "verhalen-aankomst.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/verhalen.js",
-      "operator": "&&->||#14",
-      "gezakt": 1,
-      "geprobeerd": 67
     },
     "verhuur.test.js": {
       "soort": "server",
@@ -16373,18 +16049,10 @@
     "website-screen-edges.e2e.js": {
       "soort": "puur",
       "staat": "gezakt",
-      "module": "public/site/werelden/livingos.html",
-      "operator": "html-breedte-breken#0",
+      "module": "public/shared/rtg-adaptive-edge-core.js",
+      "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 2,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "geprobeerd": 1
     },
     "website-text-style.test.js": {
       "soort": "puur",
@@ -16438,19 +16106,8 @@
     },
     "wereldbreedte.e2e.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/living-os.html",
-      "operator": "html-hoofdinhoud-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "geometrie (scrollWidth, railpositie, paneelhoogte), geen rekenend gedrag; 23 mutaties in public/apps/living-os.js, en de ene \"gezakt\" (getal+1 in een meervoudsvorm) herhaalde niet met de hand. 2 handmutaties raak: min-width 190px op de railknoppen in shared/living-os.css laat de breedtebewering zakken, en de data-view-binding weghalen in living-os.js laat \"geen zichtbaar paneel\" zakken (intent, decisions, evidence)"
     },
     "wereldcompositor.test.js": {
       "soort": "puur",
@@ -16704,17 +16361,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/werkos.js",
-      "operator": "voorwaarde-omkeren#0",
+      "operator": "return-weg#0",
       "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "geprobeerd": 6
     },
     "werkplaats-uitgifte.test.js": {
       "soort": "server",
@@ -16761,25 +16410,14 @@
     },
     "werkruimte-kantoor.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/cookie.js",
-      "operator": "!==->===#0",
-      "gezakt": 1,
-      "geprobeerd": 21,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "werkruimte-maak-idem.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "werkruimte-objecten.e2e.js": {
       "soort": "server",
@@ -16792,17 +16430,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/rtg-schil.js",
-      "operator": "browser-export-weg#0",
+      "operator": "===->!==#0",
       "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T05:31:47.949Z",
-        "commit": "205b1ab30",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "geprobeerd": 3
     },
     "werkscherm.e2e.js": {
       "soort": "server",
@@ -16852,19 +16482,7 @@
     },
     "werktafelgeheugen.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/shared/command/geheugen.js",
-      "operator": "===->!==#0",
-      "gezakt": 5,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T04:31:06.404Z",
-        "commit": "3c3dcae57",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "werktoen.test.js": {
       "soort": "server",
@@ -16948,19 +16566,7 @@
     },
     "winkel-voorzijde.test.js": {
       "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/mall.html",
-      "operator": "html-bron-weg#13",
-      "gezakt": 1,
-      "geprobeerd": 114,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
+      "staat": "geen module gevonden"
     },
     "wiring-contract.test.js": {
       "soort": "puur",
@@ -17419,70 +17025,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "mutatie-html.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/mutatie-html.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 1,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T11:04:50.235Z",
-        "commit": "5c26105f3",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
-    },
-    "sqlite-audit-publicatie.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/db/audit-publicatie.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 6,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T05:31:47.949Z",
-        "commit": "205b1ab30",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
-    },
-    "sqlite-duurzaam-sync.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/command/journaal.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 4,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T05:31:47.949Z",
-        "commit": "205b1ab30",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
-    },
-    "ritreferentie.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/pay/boeking.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 5,
-      "geprobeerd": 1,
-      "herkomst": {
-        "op": "2026-10-04T05:31:47.949Z",
-        "commit": "205b1ab30",
-        "boomVuil": false,
-        "boomAnders": 1,
-        "instrument": "scripts/mutatie.js",
-        "node": "v24.18.0"
-      }
     }
   }
 }

@@ -49,7 +49,7 @@ const { load, startSqliteSync } = require('./starten')({ save });
 const { flushBijAfsluiten, opslagKlaar } = require('./afsluiten');
 const { planSnapshot } = snapshot;
 
-function save(collecties) { return collecties === undefined ? bewaar() : save.sleutels(collecties); }
+function save() { return bewaar(); }
 // Expliciete schrijvers hoeven niet bij iedere auditregel de hele wereld te scannen.
 save.sleutels = keys => {
   if (!Array.isArray(keys) || !keys.length || keys.some(k => typeof k !== 'string' || !Object.hasOwn(db.data, k)))
@@ -112,7 +112,7 @@ function bewaar(sleutels, auditOp) {
     postgres.planSave();
   } else if (STORE === 'sqlite') {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
-    sqlite.saveSqlite(false, sleutels, auditOp ? [auditOp] : []);
+    sqlite.saveSqlite(Boolean(sleutels), sleutels, auditOp ? [auditOp] : []);
   } else if (STORE === 'geheugen') {
     // GEHEUGEN: versleutelde, incrementele brok-per-collectie-opslag (write-behind).
     geheugen.saveGeheugen();

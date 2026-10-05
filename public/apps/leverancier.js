@@ -2010,16 +2010,16 @@
   function sluitBalk(d){
     const t = d.dekking.totaalCenten || 1;
     const b = (n) => Math.max(0, Math.round((n / t) * 1000) / 10);
-    const bewezen = b(d.dekking.bewezenCenten), uitzondering = b(d.dekking.uitzonderingCenten);
-    return '<div class="afs-balk" role="img" aria-label="'+
+    const delen = [b(d.dekking.bewezenCenten), b(d.dekking.uitzonderingCenten), b(d.dekking.ontbrekendCenten)];
+    const schaal = Math.max(100, delen.reduce((som, n) => som + n, 0));
+    return '<svg class="afs-balk" viewBox="0 0 '+schaal+' 1" preserveAspectRatio="none" role="img" aria-label="'+
         T('fn.afs.bewezen','Bewezen')+' '+d.dekking.bewezenPct+'%, '+
         T('fn.afs.uitz','Uitzondering')+' '+d.dekking.uitzonderingPct+'%, '+
         T('fn.afs.ontbr','Ontbrekend')+' '+d.dekking.ontbrekendPct+'%">'+
-      '<svg viewBox="0 0 100 1" preserveAspectRatio="none" aria-hidden="true">'+
-      '<rect class="afs-b" x="0" y="0" height="1" width="'+bewezen+'"/>'+
-      '<rect class="afs-u" x="'+bewezen+'" y="0" height="1" width="'+uitzondering+'"/>'+
-      '<rect class="afs-o" x="'+(bewezen+uitzondering)+'" y="0" height="1" width="'+b(d.dekking.ontbrekendCenten)+'"/></svg>'+
-      '</div>';
+      '<rect class="afs-b" x="0" width="'+delen[0]+'" height="1"></rect>'+
+      '<rect class="afs-u" x="'+delen[0]+'" width="'+delen[1]+'" height="1"></rect>'+
+      '<rect class="afs-o" x="'+(delen[0]+delen[1])+'" width="'+delen[2]+'" height="1"></rect>'+
+      '</svg>';
   }
 
   function btwAfsluiting(toon){

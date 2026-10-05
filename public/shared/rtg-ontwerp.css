@@ -319,5 +319,6 @@
 .rtg-koppel-knop:focus-visible{outline:2px solid var(--rtg-goud);outline-offset:2px;}
 .rtg-koppel-knop[disabled]{opacity:.5;cursor:progress;}
 
-/* Componentvormen: dezelfde maten, beheerd bij het scherm. */
-.rtg-bedoeling .linkkaart-uitleg{font-weight:400;opacity:.8;}
+
+/* Componentopmaak: behoudt de voormalige attributen en expliciete toestanden. */
+.rtg-bedoeling .knoppen .linkkaart-intentie-uitleg{font-weight:400;opacity:.8;}

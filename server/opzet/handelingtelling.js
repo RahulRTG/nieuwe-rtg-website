@@ -35,14 +35,16 @@
    van p50 -- en dat is hier de leesbaarheid niet waard.
    ========================================================================== */
 'use strict';
-const sleutelsVoorLezing = data => require('./begroting').sleutelsVoorLezing(data);
+
+// Pas bij de meting laden: begroting gebruikt zelf de handelingscontext.
+function collectieSleutels(data) { return require('./begroting').collectieSleutels(data); }
 
 /* Alleen top-level arrays tellen. Een object of een getal in db.data is geen
    collectie met rijen, en meetellen zou het getal betekenisloos maken. */
 function tel(data) {
   const uit = new Map();
   if (!data || typeof data !== 'object') return uit;
-  for (const sleutel of sleutelsVoorLezing(data)) {
+  for (const sleutel of collectieSleutels(data)) {
     const v = data[sleutel];
     if (Array.isArray(v)) uit.set(sleutel, v.length);
   }
@@ -65,4 +67,4 @@ function verschil(voor, na) {
   return wijzigingen;
 }
 
-module.exports = { tel, verschil };
+module.exports = { tel, verschil, collectieSleutels };

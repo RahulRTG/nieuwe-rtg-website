@@ -36,6 +36,7 @@
 const fs = require('fs');
 const path = require('path');
 const { stempel } = require('./lib/stempel');
+const { idemClassificatie } = require('./lib/bewijsschuld-idem');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'BEWIJSSCHULD.json');
@@ -337,16 +338,18 @@ const POSTEN = [
   { id: 'idem-ongeclassificeerd', soort: 'meetwerk',
     wat: 'muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer',
     uit: (r) => {
-      if (!r.idembesluit || !Array.isArray(r.idemproef?.perRoute)) return null;
-      return require('./lib/herhaalbesluit').inventaris(r.idemproef.perRoute,
-        r.contracten || {}, r.idembesluit).ontbreekt.length;
+      const uit = idemClassificatie(r.idemproef && r.idemproef.perRoute,
+        (r.idembesluit || {}).routes, r.mutatiecontracten);
+      return uit ? uit.open.length : null;
     },
     waarom: 'autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege ' +
       'afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles ' +
       'idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.',
-    sluit: 'per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js ' +
-      'plus server/lib/mutatiecontracten.js en de oudere IDEMBESLUIT.json); ' +
-      'een geldig bestaand besluit telt eenmaal, onbekend of ongeldig blijft open.' },
+    sluit: 'per route beslissen en vastleggen in de canonieke server/lib/mutatiecontracten ' +
+      '(gevalideerd met dezelfde contractkeuring), of het oudere IDEMBESLUIT.json. ' +
+      'Een fixtureblokkade, tebeslissen of onbekende semantiek blijft open. Dit telt ' +
+      'uitsluitend het bestaan van een geldig besluit; runtimebewijs blijft afzonderlijk ' +
+      'in IDEMPROEF.json en de bewijsmatrix staan.' },
 
   { id: 'wegwerpserver-kopieen', soort: 'meetwerk',
     wat: 'scripts met een eigen kopie van "start een wegwerpserver"',
@@ -423,8 +426,8 @@ function meet() {
        iets anders dan niets te melden. */
     resolverbereik: lees('RESOLVERBEREIK.json'), idemproef: lees('IDEMPROEF.json'),
     droogloop: lees('DROOGLOOP.json'), herstel: lees('HERSTEL.json'),
-    contracten: require('../server/lib/mutatiecontracten').CONTRACTEN,
-    idembesluit: lees('IDEMBESLUIT.json'), executionmap: lees('EXECUTION_MAP.json')
+    idembesluit: lees('IDEMBESLUIT.json'), executionmap: lees('EXECUTION_MAP.json'),
+    mutatiecontracten: require('../server/lib/mutatiecontracten').CONTRACTEN
   };
   const posten = POSTEN.map(p => {
     let aantal = null;
@@ -435,7 +438,6 @@ function meet() {
   const som = (s) => posten.filter(p => p.soort === s && typeof p.aantal === 'number')
     .reduce((a, p) => a + p.aantal, 0);
   return { stempel: stempel(),
-    herhaalbesluiten: require('./lib/herhaalbesluit').inventaris(r.idemproef?.perRoute || [], r.contracten, r.idembesluit || {}),
     uitleg: 'Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie ' +
       'test/bewijsschuld.test.js. Een post van soort "grens" sluit nooit; die telt niet als ' +
       'achterstand maar als de rand van de methode.',

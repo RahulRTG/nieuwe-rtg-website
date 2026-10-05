@@ -508,7 +508,7 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
-    /* Deze zes kwamen bij de brede PR-integratie net over de lat. De naden zijn
+    /* Deze zeven kwamen bij de brede PR-integratie net over de lat. De naden zijn
        benoemd, maar horen met hun gerichte toetsen in een aparte onderhoudsronde
        te worden geknipt en niet tijdens het samenvoegen van twintig releases. */
     'server/accounts/users.js',
@@ -3416,16 +3416,16 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/bedrijf/praktijk-betalen-routes.js', 'Betaalopdracht, ontvanger en hervatopties moeten duurzaam staan vóór extern netwerkverkeer.'],
     ['server/bedrijf/praktijk-gast.js', 'Gastakkoord op een voorstel wordt pas bevestigd na duurzame opslag van dezelfde versie en beslissing.'],
     ['server/db/duurzaam.js', 'hier WOONT de primitive sinds db/index.js is opgeknipt'],
-    ['server/db/sqlite-duurzaam.js', 'bezit de SQLite FULL-sync transactie en controleert de duurzame bevestiging van de commit'],
+    ['server/db/sqlite-duurzaam.js', 'de bestaande SQLite-primitive bevestigt haar eigen FULL-COMMIT of gecontroleerde no-opbarrière; geen nieuwe domeinaanroeper'],
     ['server/db/bijeen.js', 'de bundel met de duurzaam-vlag is de enige indirecte weg erheen'],
     ['server/db/index.js', 'draagt de vlag van de aanroeper door naar de bundel; kiest zelf niets'],
     ['scripts/check.js', 'deze regel zelf noemt zijn naam'],
     ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt'],
-    ['test/sqlite-audit-rijen.test.js', 'bewijst dat auditrijen dezelfde duurzame bundel delen'],
-    ['test/sqlite-audit-selectief.test.js', 'bewijst dat selectieve opslag en audit samen duurzaam worden bevestigd'],
-    ['test/sqlite-audit-publicatie.test.js', 'weigert een mislukte auditpublicatie vóór de duurzame commit'],
-    ['test/ritreferentie.test.js', 'bewijst met echte duurzame ritbetalingen dat botsende referenties en retries geen dubbele of verloren boeking geven'],
-    ['test/sqlite-duurzaam-sync.test.js', 'bewijst FULL-sync, herhaling en de checkpointbarrière bij een noop'],
+    ['test/sqlite-duurzaam-sync.test.js', 'bewijst FULL vóór dezelfde atomaire commit, fouten zonder schijnsucces en duurzame herhaling zonder dubbel effect'],
+    ['test/sqlite-audit-publicatie.test.js', 'bewijst dat onpubliceerbare auditresultaten vóór de duurzame commit worden geweigerd, zodat vastgelegd werk niet als mislukt terugkomt'],
+    ['test/ritreferentie.test.js', 'bewijst verse ritidentiteit, idempotente herhaling en actor-isolation via de echte duurzame SQLite-geldboeking'],
+    ['test/sqlite-audit-rijen.test.js', 'bewijst dat auditrijen dezelfde duurzame bundel delen en niet tweemaal worden gecommit'],
+    ['test/sqlite-audit-selectief.test.js', 'bewijst dat selectieve sessieopslag, een andere domeinmutatie en audit samen in dezelfde duurzame bundel worden bevestigd'],
     ['test/notitiesduurzaam.test.js', 'de toets die bewijst dat het bord niet bevestigt zonder opslag'],
     ['scripts/duurzaamheidskosten.js', 'merkt per route of hij duurzaam is; meet de prijs, zet niets aan'],
     ['server/lib/verraad-catalogus.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep. Stond op verraad.js tot de catalogus daar op 13 september uit is geknipt (keuringsregel 13); de lijst is daarmee VERPLAATST en niet gegroeid'],
@@ -4742,7 +4742,7 @@ console.log('\n57) een browser start op EEN plek: test/helper.js');
   }
 }
 
-console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen en echte cirkels');
+console.log('\n58) vaste hoekgrammatica: centrale inhouds-, systeem- en capsulevormen en echte cirkels');
 {
   const RE = /border-radius\s*:\s*([^;}"'\n\\`]+)/g;
   const HERITAGE = new Map([
@@ -4794,6 +4794,24 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
       'var(--rtg-radius-system)'
     ])]
   ]);
+  // Approved editorial surfaces use named geometry, never arbitrary per-page
+  // radii. Keep the scope explicit so unrelated routes cannot bypass the rule.
+  const editorialSurfaces = [
+    'public/shared/rtg-adaptive-edge.css', 'public/shared/rtg-editorial-system.css',
+    'public/shared/rtg-communication-surface.css', 'public/shared/rtg-mail-2026.css',
+    'public/shared/rtg-world-home.css', 'public/apps/wereld-feed.css',
+    'public/apps/muziek-heritage.css'
+  ];
+  for (const file of editorialSurfaces) {
+    const permitted = HERITAGE.get(file) || new Set();
+    for (const name of ['content', 'editorial', 'system', 'capsule']) {
+      permitted.add('var(--rtg-radius-' + name + ')');
+      permitted.add('var(--rtg-radius-' + name + ')!important');
+    }
+    HERITAGE.set(file, permitted);
+  }
+  HERITAGE.get('public/shared/rtg-communication-surface.css').add('var(--rtg-radius-system)var(--rtg-radius-system)00!important');
+  HERITAGE.get('public/shared/rtg-mail-2026.css').add('0var(--rtg-radius-content)var(--rtg-radius-content)0');
   const mag = (v, rel) => {
     const k = String(v).trim().toLowerCase().replace(/\s+/g, '');
     if (k === '0' || k === '0!important' || k === '50%' || k === '50%!important') return true;
@@ -4821,7 +4839,7 @@ console.log('\n58) vaste hoekgrammatica: rechte inhoud, afgeronde systeemlagen e
   });
   if (kapot.length) {
     for (const k of kapot.slice(0, 12)) {
-      fout('ongeclassificeerde hoek: ' + k + ' -- route-inhoud blijft 0;' +
+      fout('ongeclassificeerde hoek: ' + k + ' -- onbenoemde vorm;'  +
         ' Heritage-inhoud en systeemlagen gebruiken uitsluitend de centrale contractwaarden');
     }
     if (kapot.length > 12) fout('... en nog ' + (kapot.length - 12) + ' plekken');

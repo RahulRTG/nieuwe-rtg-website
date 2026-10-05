@@ -11,7 +11,7 @@
   'use strict';
   const $ = (s, r) => (r || document).querySelector(s);
 
-  let CSS = `
+  const CSS = `
   body.wos .tabbar{display:none !important;}
   body.wos.wos-aan .content{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 6.5rem) !important;}
   body.wos #shell{background:var(--rtg-grond,var(--rtg-bg));}
@@ -58,9 +58,9 @@
     .wos-app:nth-child(odd){border-right:0;}
     .wos-navkop{margin-top:2rem;}
   }
-`;
-/* WerkOS: dock en desktopwerkvlak. */
-  CSS += `  /* De onderbalk is een onyx commandobalk, geen los merkobject. */
+` +
+/* WerkOS-commandobalk, Command Center en tabletindeling. */
+`  /* De onderbalk is een onyx commandobalk, geen los merkobject. */
   .wos-dock{
     position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + .8rem);
     z-index:60;display:none;align-items:stretch;padding:0;
@@ -149,9 +149,9 @@
     body.wos.wos-aan .wos-dock,body.wos.wos-bord-aan .wos-dock{left:calc(50% + 32px);}
     body.wos .wos-top-huidig{min-width:130px;}
   }
-`;
-/* WerkOS: mobiele schil en contextbalk. */
-  CSS += `  /* Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar.
+` +
+/* WerkOS op mobiel: compacte rail, context en bereikbare bediening. */
+`  /* Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar.
      De contextbalk krijgt een eigen rij, de rail blijft een compacte
      glyfenstrook en de dock houdt altijd Start en Command Center bereikbaar. */
   @media (max-width:620px){
@@ -176,9 +176,9 @@
     .wos-zoek-voet span:nth-child(2){display:none;}
   }
   @media (max-width:360px){.wos-dock button:nth-child(n+5):not(:last-child){display:none;}}
-`;
-/* WerkOS: beweging en vensters. */
-  CSS += `  /* Beweging bevestigt alleen een wissel van werkvlak. */
+` +
+/* WerkOS-beweging, vaste rail en contextschil. */
+`  /* Beweging bevestigt alleen een wissel van werkvlak. */
   @media (prefers-reduced-motion:no-preference){
     body.wos-aan .view.active{animation:wosOpen var(--rtg-tijd-normaal,180ms) var(--rtg-veer,ease);}
     @keyframes wosOpen{from{transform:translateY(4px);opacity:.72;}to{transform:none;opacity:1;}}

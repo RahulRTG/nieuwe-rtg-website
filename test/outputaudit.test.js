@@ -381,7 +381,7 @@ test('6. de basislijn vervangt de controlerun zonder het oordeel te verzwakken',
        hij niet raakt laat hem groen -> blind. */
     const blind = o.meetEen('POST /api/bestaat-niet-in-deze-toets', 'zz-basis-groen.test.js',
       { basisGroen: new Set(['zz-basis-groen.test.js']) });
-    assert.equal(blind.staat, 'blind');
+    assert.equal(blind.staat, 'blind', JSON.stringify(blind));
   } finally {
     fs.unlinkSync(groenBestand);
     fs.unlinkSync(roodBestand);

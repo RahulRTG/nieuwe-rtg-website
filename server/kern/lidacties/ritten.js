@@ -1,7 +1,7 @@
 /* Lidacties (deelmodule): ritten: vraagRitVoor (slimme offerte op afstand
    en tarief, leeftijdsgrens voor jets/helikopters, plannen vooruit, het
-   zorgprofiel voor de chauffeur) en betaalRitVoor. Krijgt de gedeelde
-   context een keer bij het opstarten vanuit kern/lidacties.js. */
+   zorgprofiel voor de chauffeur) en betaalRitVoor.
+   Context komt uit kern/lidacties.js. */
 const subsidie = require('../commercie/subsidie');
 const ritreferentie = require('./ritreferentie');
 
@@ -9,7 +9,7 @@ module.exports = (ctx) => {
   const { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
     leeftijdVan, geborenVan, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
     fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
-    notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgMee, zorgContact, keuken,
+    notifySupplier: meld, sseToSupplier, sseToOffice, zorgVoor, zorgMee, zorgContact, keuken,
     orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor, factuurVoorLid } = ctx;
   const { rekenAf } = require('./afrekenen')(ctx);
 function vraagRitVoor(session, body) {
@@ -87,7 +87,7 @@ function vraagRitVoor(session, body) {
   db.data.rides.unshift(ride);
   save();
   if (ride.status === 'aangevraagd') {
-    notifySupplier(s.code, { icon: 'auto', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') + ' \u00B7 ' + pax + 'p \u00B7 \u20AC ' + quote });
+    (meld.naOpslag || meld)(s.code, { icon: 'auto', title: 'Nieuwe ritaanvraag', body: codename + ': ' + ride.from + ' naar ' + (ride.to || 'bestemming') + ' \u00B7 ' + pax + 'p \u00B7 \u20AC ' + quote });
     sseToSupplier(s.code, 'sync', { scope: 'orders' });
     sseToOffice('sync', { scope: 'orders' });
   }
@@ -139,7 +139,7 @@ async function betaalRitVoor(session, body) {
     codenaam: r.customerCodename, ref: r.ref, methode: 'rtg',
     regels: [{ omschrijving: (r.type === 'jet' ? 'Vlucht ' : 'Rit ') + r.from + ' naar ' + (r.to || 'bestemming'),
       aantal: 1, stuk: r.quote || 0 }] });
-  notifySupplier(r.supplierCode, { icon: r.type === 'jet' ? 'vluchten' : 'auto', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
+  meld(r.supplierCode, { icon: r.type === 'jet' ? 'vluchten' : 'auto', title: 'Nieuwe ritaanvraag (betaald)', body: r.customerCodename + ': ' + r.from + ' naar ' + (r.to || 'bestemming') + ' \u00B7 ' + r.passengers + 'p \u00B7 \u20AC ' + r.quote + (r.plannedFor ? ' \u00B7 ' + r.when : '') });
   sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   pushLive(session.key);

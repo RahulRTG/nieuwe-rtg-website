@@ -1,5 +1,5 @@
-/* WerkOS: dock en desktopwerkvlak. */
-  CSS += `  /* De onderbalk is een onyx commandobalk, geen los merkobject. */
+/* WerkOS-commandobalk, Command Center en tabletindeling. */
+`  /* De onderbalk is een onyx commandobalk, geen los merkobject. */
   .wos-dock{
     position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + .8rem);
     z-index:60;display:none;align-items:stretch;padding:0;
@@ -88,4 +88,4 @@
     body.wos.wos-aan .wos-dock,body.wos.wos-bord-aan .wos-dock{left:calc(50% + 32px);}
     body.wos .wos-top-huidig{min-width:130px;}
   }
-`;
+` +

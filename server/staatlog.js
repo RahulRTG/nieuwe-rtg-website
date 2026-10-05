@@ -73,7 +73,7 @@
 
 const crypto = require('crypto');
 const state = require('./db/state');
-const { sleutelsVoorLezing } = require('./opzet/begroting');
+const { collectieSleutels } = require('./opzet/handelingtelling');
 
 let aan = false, diep = false;
 
@@ -94,7 +94,7 @@ function stand() {
   const data = state.db && state.db.data;
   if (!data || typeof data !== 'object') return '';
   const uit = [];
-  for (const k of sleutelsVoorLezing(data)) {
+  for (const k of collectieSleutels(data)) {
     const v = data[k];
     if (!v || typeof v !== 'object') continue;
     if (!diep) { if (Array.isArray(v) && v.length) uit.push(k + '=' + v.length); continue; }

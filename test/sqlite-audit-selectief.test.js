@@ -476,3 +476,264 @@ test('selectieve sessies en context blijven samen met vreemd domein en audit in 
   assert.equal(p.lees('handelingLog').length, 1);
   assert.equal(h.ketenstand().ok, true);
 });
+
+function meldingPoort(p, publiceer, push) {
+  p.db.data.notifications = {};
+  p.db.data.pushSubs = { lid: [{ endpoint: 'https://push.invalid/proef' }] };
+  p.db.data.meldingVoorkeur = {};
+  p.save();
+  return require('../server/opzet/meldingen')({ db: p.db, save: p.save,
+    crypto: require('node:crypto'), bus: { publish: publiceer },
+    webpush: { sendNotification: (...args) => { if (push) push(...args); return Promise.resolve(); } } });
+}
+
+test('een eigen melding bewaart vóór publicatie uitsluitend notifications; de gewone ingang blijft breed', t => {
+  const p = proef(t), gezien = [], pushes = [];
+  const m = meldingPoort(p, (_soort, bericht) => {
+    assert.equal(p.lees('notifications').lid[0].id, bericht.data.id, 'SQLite bevestigt vóór SSE');
+    gezien.push(bericht);
+  }, (_sub, payload) => pushes.push(JSON.parse(payload)));
+  let scans = 0;
+  Object.defineProperty(p.db.data.ander, 'toJSON', { value() { scans++; return { waarde: this.waarde }; } });
+  p.db.data.ander.waarde = 7;
+  const n = m.notify.alleenMelding('lid', { title: 'Factuur', body: 'Uw factuur staat klaar', scope: 'facturen' });
+  assert.equal(scans, 0);
+  assert.equal(p.lees('ander').waarde, 1, 'de melding schrijft geen vreemd pending domein');
+  assert.deepEqual(p.lees('notifications').lid, [n]);
+  assert.equal(gezien.length, 1); assert.equal(pushes.length, 1);
+  assert.equal(pushes[0].tag, n.id);
+  m.notify('lid', { title: 'Gewone melding' });
+  assert.ok(scans > 0); assert.equal(p.lees('ander').waarde, 7);
+  assert.equal(p.lees('notifications').lid.length, 2);
+});
+
+test('uitgeschakelde meldingsscope schrijft, seint en pusht niets via de eigen ingang', t => {
+  const p = proef(t); let effecten = 0;
+  const m = meldingPoort(p, () => effecten++, () => effecten++);
+  p.db.data.meldingVoorkeur.lid = { facturen: false }; p.save();
+  const voor = p.conn.prepare("SELECT v FROM meta WHERE k='ver'").get().v;
+  const n = m.notify.alleenMelding('lid', { title: 'Niet gewenst', scope: 'facturen' });
+  assert.equal(n.title, 'Niet gewenst');
+  assert.deepEqual(p.lees('notifications'), {});
+  assert.equal(p.conn.prepare("SELECT v FROM meta WHERE k='ver'").get().v, voor);
+  assert.equal(effecten, 0);
+});
+
+test('eigen melding behoudt de echte commitfout; zonder commit geen SSE of push', t => {
+  const p = proef(t); let effecten = 0;
+  const m = meldingPoort(p, () => effecten++, () => effecten++);
+  const exec = DatabaseSync.prototype.exec; let faal = true;
+  t.mock.method(DatabaseSync.prototype, 'exec', function(sql) {
+    if (sql === 'COMMIT' && faal) { faal = false; throw new Error('meldingcommit mislukt'); }
+    return exec.call(this, sql);
+  });
+  assert.throws(() => m.notify.alleenMelding('lid', { title: 'Geen bevestiging' }), /meldingcommit/);
+  assert.deepEqual(p.lees('notifications'), {});
+  assert.equal(effecten, 0);
+  p.db.data.notifications = p.lees('notifications');
+  const n = m.notify.alleenMelding('lid', { title: 'Hersteld' });
+  assert.deepEqual(p.lees('notifications').lid, [n]);
+  assert.equal(effecten, 2);
+});
+
+test('eigen melding veroorzaakt geen deelcommit in een bestaande duurzame bundel', async t => {
+  const p = proef(t), m = meldingPoort(p, () => {}); let id;
+  await p.bijeen(() => {
+    id = m.notify.alleenMelding('lid', { title: 'Samen' }).id;
+    p.db.data.ander.waarde = 9; p.save();
+    assert.deepEqual(p.lees('notifications'), {});
+    assert.equal(p.lees('ander').waarde, 1);
+  }, { duurzaam: true });
+  assert.equal(p.lees('notifications').lid[0].id, id);
+  assert.equal(p.lees('ander').waarde, 9);
+});
+
+test('factuur bewaart alleen haar domein en gebruikt daarna de eigen meldingsschrijver', t => {
+  const p = proef(t), m = meldingPoort(p, () => {});
+  p.db.data.facturen = []; p.db.data.factuurTeller = 0; p.save();
+  let scans = 0;
+  Object.defineProperty(p.db.data.ander, 'toJSON', { value() { scans++; return { waarde: this.waarde }; } });
+  p.db.data.ander.waarde = 2;
+  const motor = require('../server/kern/facturatie/motor')({ db: p.db, save: p.save,
+    crypto: require('node:crypto'), SOORTEN: ['verkoop'], nu: () => '2026-10-03T12:00:00.000Z',
+    scho: (waarde, max) => String(waarde || '').slice(0, max), rond: n => Math.round(n * 100) / 100,
+    findSupplier: () => null, publiek: f => f, notify: m.notify,
+    sseToCustomer: () => {
+      assert.equal(p.lees('facturen').length, 1, 'factuur is vóór haar seintje opgeslagen');
+      assert.equal(p.lees('factuurTeller'), 1);
+      p.db.data.ander.waarde = 3;
+    } });
+  const r = motor.boek({ totaal: 24.20, btw: 21, koper: { key: 'lid' },
+    verkoperNaam: 'De zaak', verkoperCode: 'AAA', methode: 'rtg', ref: 'bon-1' });
+  assert.equal(r.ok, true);
+  assert.equal(scans, 0, 'factuur en melding serialiseren geen vreemd domein');
+  assert.equal(p.lees('ander').waarde, 1, 'vreemde pending wijzigingen worden niet door de factuur of melding geflusht');
+  assert.equal(p.lees('facturen')[0].id, r.factuur.id);
+  assert.equal(p.lees('notifications').lid.length, 1);
+  assert.equal(p.lees('notifications').lid[0].title, 'Nieuwe factuur');
+  assert.equal(motor.factuurBetaald(r.factuur.id, 'AAA', false).ok, true);
+  assert.equal(motor.factuurBetaald(r.factuur.id, 'AAA', true).ok, true);
+  const voor = p.conn.prepare("SELECT v FROM meta WHERE k='ver'").get().v;
+  assert.equal(motor.factuurBetaald(r.factuur.id, 'AAA', true).ongewijzigd, true);
+  assert.equal(p.conn.prepare("SELECT v FROM meta WHERE k='ver'").get().v, voor, 'retry geeft geen tweede write');
+  assert.equal(p.lees('facturen').length, 1);
+  assert.equal(p.lees('notifications').lid.length, 1);
+});
+
+function leveranciersMeldingPoort(p, publiceer, save = p.save) {
+  return require('../server/opzet/leverancierpoort')({ db: p.db, save,
+    crypto: require('node:crypto'), rtgKlok: { datum: () => new Date('2026-10-04T12:00:00Z') },
+    busGeef: () => ({ publish: publiceer }), kernGeef: () => ({}) }).notifySupplier;
+}
+
+test('eigen leveranciersmelding bewaart vóór SSE alleen haar collectie; gewone en oude save blijven breed', t => {
+  const p = proef(t), gezien = [];
+  p.db.data.supplierNotifications = { BBB: [{ id: 'ander', title: 'Andere zaak' }] }; p.save();
+  const publiceer = (_topic, event) => {
+    assert.equal(event.match, 'AAA'); assert.equal(event.event, 'notify');
+    assert.equal(p.lees('supplierNotifications').AAA[0].id, event.data.id, 'tweede verbinding ziet commit vóór SSE');
+    gezien.push(event);
+  };
+  const notify = leveranciersMeldingPoort(p, publiceer);
+  let scans = 0;
+  Object.defineProperty(p.db.data.ander, 'toJSON', { value() { scans++; return { waarde: this.waarde }; } });
+  p.db.data.ander.waarde = 7;
+  const eigen = notify.naOpslag('AAA', { title: 'Nieuwe aanvraag' });
+  assert.equal(scans, 0); assert.equal(p.lees('ander').waarde, 1);
+  assert.deepEqual(p.lees('supplierNotifications').AAA, [eigen]);
+  assert.deepEqual(p.lees('supplierNotifications').BBB, [{ id: 'ander', title: 'Andere zaak' }]);
+  notify('AAA', { title: 'Gewone ingang' });
+  assert.equal(scans, 1); assert.equal(p.lees('ander').waarde, 7);
+  p.db.data.ander.waarde = 8;
+  const oud = leveranciersMeldingPoort(p, publiceer, () => p.save());
+  oud.naOpslag('AAA', { title: 'Opslag zonder selectieve API' });
+  assert.equal(scans, 2); assert.equal(p.lees('ander').waarde, 8);
+  assert.equal(gezien.length, 3); assert.equal(p.lees('supplierNotifications').AAA.length, 3);
+});
+
+test('leveranciersmelding houdt commitfailure gesloten en behoudt de bestaande bundelgrens', async t => {
+  const p = proef(t); p.db.data.supplierNotifications = {}; p.save();
+  let effecten = 0;
+  const notify = leveranciersMeldingPoort(p, () => effecten++);
+  const exec = DatabaseSync.prototype.exec; let faal = true;
+  t.mock.method(DatabaseSync.prototype, 'exec', function(sql) {
+    if (sql === 'COMMIT' && faal) { faal = false; throw new Error('leveranciersmeldingcommit mislukt'); }
+    return exec.call(this, sql);
+  });
+  assert.throws(() => notify.naOpslag('AAA', { title: 'Niet bevestigd' }), /leveranciersmeldingcommit/);
+  assert.deepEqual(p.lees('supplierNotifications'), {}); assert.equal(effecten, 0);
+  p.db.data.supplierNotifications = p.lees('supplierNotifications');
+  const n = notify.naOpslag('AAA', { title: 'Hersteld' });
+  assert.deepEqual(p.lees('supplierNotifications').AAA, [n]); assert.equal(effecten, 1);
+  await p.bijeen(() => {
+    notify.naOpslag('AAA', { title: 'Samen' });
+    p.db.data.ander.waarde = 9; p.save();
+    assert.deepEqual(p.lees('supplierNotifications').AAA, [n], 'geen voortijdige deelcommit');
+    assert.equal(p.lees('ander').waarde, 1);
+  }, { duurzaam: true });
+  assert.equal(p.lees('supplierNotifications').AAA.length, 2);
+  assert.equal(p.lees('ander').waarde, 9);
+});
+
+// Alleen de omringende domeindiensten zijn doubles. De twee echte handlers,
+// leverancierspoort en SQLite bewaren de bestelling/rit en de melding zelf.
+function aanvraagMetMelding(t, soort, oudeMelding = false) {
+  const p = proef(t), signalen = [];
+  const zaak = { code: 'AAA', name: 'De zaak', type: soort === 'rit' ? 'taxi' : 'restaurant',
+    settings: {}, menu: [{ id: 'eten', name: 'Lunch', price: 12, publiekePrijs: 12 }] };
+  Object.assign(p.db.data, { suppliers: [zaak], orders: [], rides: [], live: {}, supplierNotifications: {} });
+  p.save(); p.db.capsVan = () => ['rides'];
+  let scans = 0, breed = 0;
+  Object.defineProperty(p.db.data.ander, 'toJSON', { value() { scans++; return { waarde: this.waarde }; } });
+  const save = () => {
+    p.save(); breed++;
+    // Een onafhankelijk domein kan na de eerste commit nog werk hebben.
+    // Alleen diens eigen brede save mag die wijziging later publiceren.
+    if (breed === 1) p.db.data.ander.waarde = 3;
+  };
+  save.sleutels = p.save.sleutels;
+  const collectie = soort === 'rit' ? 'rides' : 'orders';
+  function sein(naam) {
+    assert.equal(p.lees(collectie).length, 1, naam + ': domein opgeslagen');
+    assert.equal(p.lees('supplierNotifications').AAA.length, 1, naam + ': melding opgeslagen');
+    signalen.push(naam);
+  }
+  const notify = leveranciersMeldingPoort(p, (_topic, event) => {
+    assert.equal(event.match, zaak.code); sein('notify');
+  }, save);
+  const ctx = { db: p.db, save, crypto: require('node:crypto'),
+    schoon: (v, n) => String(v ?? '').slice(0, n), PERSONAS: { rtg: { codename: 'Anna' } },
+    findSupplier: code => code === zaak.code ? zaak : null, ledenPrijs: (_publiek, prijs) => prijs,
+    optieAan: (_s, naam) => naam !== 'betaalVooraf', leeftijdVan: () => 35, geborenVan: () => '1991-01-01',
+    idGeverifieerd: () => true, pickupCode: () => '42', zorgVoor: () => null, zorgMee: () => null,
+    liveCodename: () => 'Anna', haversine: () => null, openLijnVoor() {},
+    ordersVoegToe: order => p.db.data.orders.push(order),
+    notifySupplier: oudeMelding ? (code, note) => notify(code, note) : notify,
+    sseToSupplier: () => sein('supplier'), sseToOffice: () => sein('office'), pushLive: () => sein('push'),
+    fooiUit: () => 0, pasTegoedToe: () => 0, ledenvoordeelVoor: () => 0,
+    herstelTegoed() {}, verdienPunten() {}, factuurVoorLid() {},
+    pay: { betaalZaak: async () => ({ ok: true, betaaldCenten: 1200, bijgelegdCenten: 0 }) } };
+  const actor = { key: 'lid', tier: 'rtg' };
+  const plaats = () => soort === 'rit'
+    ? require('../server/kern/lidacties/ritten')(ctx).vraagRitVoor(actor, { supplierCode: zaak.code })
+    : require('../server/kern/lidacties/bestellen')(ctx).plaatsOrderVoor(actor,
+      { supplierCode: zaak.code, items: [{ id: 'eten', qty: 1 }] });
+  return { ...p, plaats, ctx, actor, zaak, signalen, collectie, scans: () => scans, breed: () => breed };
+}
+
+for (const soort of ['order', 'rit']) {
+  test(soort + ': opgeslagen aanvraag gebruikt eigen melding vóór alle SSE/push', t => {
+    const p = aanvraagMetMelding(t, soort);
+    p.db.data.ander.waarde = 2;
+    const r = p.plaats(); assert.equal(r.ok, true);
+    assert.equal(p.scans(), 1, 'alleen domeinsave leest de andere collectie');
+    assert.equal(p.breed(), 1); assert.equal(p.lees('ander').waarde, 2);
+    assert.equal(p.db.data.ander.waarde, 3, 'de later gewijzigde vreemde collectie blijft pending');
+    assert.equal(p.lees(p.collectie)[0].ref, (r.order || r.ride).ref);
+    assert.deepEqual(p.signalen, soort === 'rit' ? ['notify', 'supplier', 'office', 'push'] : ['notify', 'supplier', 'office']);
+  });
+
+  test(soort + ': oude meldingsfunctie zonder naOpslag blijft bruikbaar en breed', t => {
+    const p = aanvraagMetMelding(t, soort, true);
+    assert.equal(p.plaats().ok, true);
+    assert.equal(p.breed(), 2); assert.equal(p.scans(), 2);
+    assert.equal(p.lees('ander').waarde, 3);
+    assert.equal(p.lees('supplierNotifications').AAA.length, 1);
+    assert.ok(p.signalen.includes('notify'));
+  });
+
+  test(soort + ': mislukte meldingscommit laat aanvraag staan maar publiceert geen succes', t => {
+    const p = aanvraagMetMelding(t, soort), exec = DatabaseSync.prototype.exec; let commits = 0;
+    t.mock.method(DatabaseSync.prototype, 'exec', function(sql) {
+      if (sql === 'COMMIT' && ++commits === 2) throw new Error('melding na aanvraag mislukt');
+      return exec.call(this, sql);
+    });
+    assert.throws(() => p.plaats(), /melding na aanvraag/);
+    assert.equal(commits, 2);
+    assert.equal(p.lees(p.collectie).length, 1, 'reeds bevestigde aanvraag wordt niet teruggedraaid');
+    assert.deepEqual(p.lees('supplierNotifications'), {}, 'mislukte meldingswrite is teruggerold');
+    assert.deepEqual(p.signalen, [], 'geen notify, sync of push na de mislukte commit');
+  });
+}
+
+test('betaalde order behoudt brede leveranciersmelding voor nog onbehouden keukeninitialisatie', async t => {
+  const p = aanvraagMetMelding(t, 'order');
+  const order = { ref: 'BETAAL', customerKey: p.actor.key, supplierCode: p.zaak.code,
+    supplierName: p.zaak.name, customerCodename: 'Anna', total: 12, paid: false, status: 'nieuw',
+    items: [{ id: 'eten', name: 'Lunch', price: 12, qty: 1 }] };
+  p.db.data.orders.push(order); p.save();
+  assert.equal(p.zaak.recepten, undefined);
+  p.ctx.orderMetRef = ref => p.db.data.orders.find(o => o.ref === ref);
+  p.ctx.keuken = require('../server/kern/keuken')({ db: p.db, save: p.ctx.save,
+    crypto: p.ctx.crypto, schoon: p.ctx.schoon, notifySupplier: p.ctx.notifySupplier }).keuken;
+  p.ctx.notifySupplier.naOpslag = () => assert.fail('betaalOrderVoor heeft nog een brede opslaggrens nodig');
+  const betaal = require('../server/kern/lidacties/betalen')(p.ctx).betaalOrderVoor;
+  assert.equal((await betaal(p.actor, { ref: order.ref })).ok, true);
+  assert.equal(p.lees('orders')[0].paid, true);
+  assert.deepEqual(p.lees('suppliers')[0].recepten, {}, 'echte keuken initialiseert zonder geboekte voorraadregel of eigen save');
+  assert.equal(p.breed(), 2); assert.equal(p.scans(), 3, 'fixture, betaaldomein en brede melding');
+  assert.equal(p.lees('ander').waarde, 3);
+  assert.deepEqual(p.signalen, ['notify', 'supplier', 'office']);
+  assert.equal((await betaal(p.actor, { ref: order.ref })).status, 409);
+  assert.equal(p.lees('supplierNotifications').AAA.length, 1, 'retry maakt geen tweede melding');
+});

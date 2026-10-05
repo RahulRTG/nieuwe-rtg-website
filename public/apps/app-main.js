@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '626fc78a';
+var RTG_BOUW = 'e097efc8';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -9156,40 +9156,40 @@ var RTG_BOUW = '626fc78a';
     const kanBetalen = user && user.tier !== 'guest';
     let ov = document.getElementById('etalage-ov');
     if (!ov){ ov = document.createElement('div'); ov.id = 'etalage-ov';
-      ov.style.cssText = 'position:fixed;inset:0;z-index:120;background:rgba(0,0,0,0.55);display:flex;align-items:flex-end;justify-content:center;';
+      ov.className = 'salon-etalage';
       document.body.appendChild(ov);
       ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
     }
     const eur2 = n => '€ ' + Number(n||0).toLocaleString(lang());
     const items = d.items || [];
     const html =
-      '<div class="eta-paneel">' +
-      '<div class="eta-media">' +
-        (p.foto ? '<img src="' + p.foto + '" alt="" class="eta-foto">' : '<div class="eta-fotoleeg"></div>') +
-        '<button id="etaClose" class="eta-sluiten">✕</button>' +
+      '<div class="salon-etalage-blad" >' +
+      '<div class="salon-etalage-beeld" >' +
+        (p.foto ? '<img src="' + p.foto + '" alt="" class="salon-etalage-foto" >' : '<div class="salon-etalage-zonder-foto" ></div>') +
+        '<button id="etaClose" class="salon-etalage-sluit" >✕</button>' +
       '</div>' +
-      '<div class="eta-inhoud">' +
-        '<div class="eta-kop"><b class="eta-naam">' + escT(p.name) + '</b>' +
-          '<button id="etaVolg" class="eta-volgen' + (p.volgIk ? ' is-gevolgd' : '') + '">' + (p.volgIk ? '✓ ' + T('sal.volgt','Volgt') : '+ ' + T('sal.volg','Volg')) + '</button></div>' +
-        '<div class="eta-volgers">' + (p.icon ? p.icon + ' ' : '') + escT(p.typeLabel || '') + ' · ' + escT(p.city || '') + ' · ' + p.volgers + ' ' + T('sal.volgers','volgers') + '</div>' +
-        (p.bio ? '<div class="eta-bio">' + escT(p.bio) + '</div>' : '') +
-        (kanBetalen ? '<button id="etaBetaal" class="mo-pay eta-betalen" >' + FID_MINI + T('dp.betaaldirect','Betaal direct met Face ID') + '</button>' : '') +
+      '<div class="salon-etalage-inhoud" >' +
+        '<div class="salon-etalage-kop" ><b class="salon-etalage-naam" >' + escT(p.name) + '</b>' +
+          '<button id="etaVolg" class="salon-etalage-volg' + (p.volgIk ? ' volgt' : '') + '">' + (p.volgIk ? '✓ ' + T('sal.volgt','Volgt') : '+ ' + T('sal.volg','Volg')) + '</button></div>' +
+        '<div class="salon-etalage-meta" >' + (p.icon ? p.icon + ' ' : '') + escT(p.typeLabel || '') + ' · ' + escT(p.city || '') + ' · ' + p.volgers + ' ' + T('sal.volgers','volgers') + '</div>' +
+        (p.bio ? '<div class="salon-etalage-bio" >' + escT(p.bio) + '</div>' : '') +
+        (kanBetalen ? '<button id="etaBetaal" class="mo-pay salon-etalage-betaal" >' + FID_MINI + T('dp.betaaldirect','Betaal direct met Face ID') + '</button>' : '') +
         (vz.length ? '<div class="h-mt80">' + vz.map(v =>
-          '<div class="eta-verzoek">' +
-          '<div class="eta-soort">' + FID_MINI + T('dp.verzoek','Betaalverzoek') + '</div>' +
-          '<div class="eta-verzoekrij"><span class="eta-omschrijving">' + escT(v.omschrijving || '') + '</span><b class="eta-bedrag">' + eur2((v.bedrag||0)/100) + '</b></div>' +
-          '<button class="mo-pay js-vzpay eta-verzoekbetalen" data-vz="' + v.ref + '" >' + FID_MINI + T('dp.betaalverzoek','Betaal dit verzoek') + '</button></div>').join('') + '</div>' : '') +
+          '<div class="salon-etalage-verzoek" >' +
+          '<div class="salon-etalage-soort" >' + FID_MINI + T('dp.verzoek','Betaalverzoek') + '</div>' +
+          '<div class="salon-etalage-bedragrij" ><span class="salon-etalage-omschrijving" >' + escT(v.omschrijving || '') + '</span><b class="salon-etalage-bedrag" >' + eur2((v.bedrag||0)/100) + '</b></div>' +
+          '<button class="mo-pay js-vzpay salon-etalage-betaalverzoek" data-vz="' + v.ref + '" >' + FID_MINI + T('dp.betaalverzoek','Betaal dit verzoek') + '</button></div>').join('') + '</div>' : '') +
         (items.length
           ? items.map(it =>
-            '<div class="eta-item">' +
-            '<div class="eta-soort">' + (it.soort === 'folder' ? '' + T('sal.folder','Folder') : it.soort === 'deal' ? '' + T('sal.deal','Aanbieding') : it.soort === 'poll' ? 'Poll' : '' + T('sal.bericht','Bericht')) + '</div>' +
-            (it.folder ? '<div class="eta-titel">' + escT(it.folder.titel) + '</div>' +
-              ((it.folder.fotos && it.folder.fotos.length) ? '<div class="eta-fotos">' + it.folder.fotos.map(f => '<img src="' + f + '" alt="" class="eta-folderfoto">').join('') + '</div>' : '') +
-              ((it.folder.items && it.folder.items.length) ? '<div class="eta-folderregels">' + it.folder.items.map(x => '<div class="eta-folderregel"><span>' + escT(x.naam) + '</span>' + (x.prijs != null ? '<span class="h-leesgoud">' + eur2(x.prijs) + '</span>' : '') + '</div>').join('') + '</div>' : '')
-              : (it.deal ? '<div class="eta-titel">' + escT(it.deal.titel) + (it.deal.mijnClaim ? ' · <span class="h-leesgoud">' + escT(it.deal.mijnClaim.status || '') + '</span>' : '') + '</div>'
-              : '<div class="eta-bericht">' + escT(it.text || '') + '</div>')) +
+            '<div class="salon-etalage-item" >' +
+            '<div class="salon-etalage-soort" >' + (it.soort === 'folder' ? '' + T('sal.folder','Folder') : it.soort === 'deal' ? '' + T('sal.deal','Aanbieding') : it.soort === 'poll' ? 'Poll' : '' + T('sal.bericht','Bericht')) + '</div>' +
+            (it.folder ? '<div class="salon-etalage-titel" >' + escT(it.folder.titel) + '</div>' +
+              ((it.folder.fotos && it.folder.fotos.length) ? '<div class="salon-etalage-fotos" >' + it.folder.fotos.map(f => '<img src="' + f + '" alt="" class="salon-etalage-folderfoto" >').join('') + '</div>' : '') +
+              ((it.folder.items && it.folder.items.length) ? '<div class="salon-etalage-producten" >' + it.folder.items.map(x => '<div class="salon-etalage-product" ><span>' + escT(x.naam) + '</span>' + (x.prijs != null ? '<span class="h-leesgoud">' + eur2(x.prijs) + '</span>' : '') + '</div>').join('') + '</div>' : '')
+              : (it.deal ? '<div class="salon-etalage-titel" >' + escT(it.deal.titel) + (it.deal.mijnClaim ? ' · <span class="h-leesgoud">' + escT(it.deal.mijnClaim.status || '') + '</span>' : '') + '</div>'
+              : '<div class="salon-etalage-bericht" >' + escT(it.text || '') + '</div>')) +
             '</div>').join('')
-          : '<div class="eta-leeg">' + T('sal.etaleeg','Nog geen folders of aanbiedingen.') + '</div>') +
+          : '<div class="salon-etalage-leeg" >' + T('sal.etaleeg','Nog geen folders of aanbiedingen.') + '</div>') +
       '</div></div>';
     ov.innerHTML = html;
     ov.querySelector('#etaClose').addEventListener('click', () => ov.remove());

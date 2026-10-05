@@ -34,12 +34,26 @@ on:
   workflow_dispatch:
     inputs:
       scope:
-        description: Volledige ronde of dezelfde standaardbeproeving afzonderlijk
+        description: Volledige ronde, prestatieschuld of kandidaatgebonden output- of mutatieproef
         type: choice
         default: full
         options:
           - full
           - performance
+          - outputproof
+          - mutationproof
+      candidate:
+        description: Volledige kandidaat-SHA; afzonderlijk van de workflow/runner-revisie
+        type: string
+        default: ''
+      ci_run:
+        description: Volledige CI-run voor deze kandidaat met alle 14 routejournals
+        type: string
+        default: ''
+      profile:
+        description: Alleen diagnose; CPU-profielen kunnen prestatieschuld niet sluiten
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -60,14 +74,222 @@ defaults:
   run:
     shell: bash
 
-# Jobs gebruiken geïsoleerde runners. Verschillende branches en proefsoorten
-# blokkeren elkaar niet; dezelfde bron en proef blijven serieel.
+# Iedere job gebruikt een eigen geïsoleerde runner. Onafhankelijke branches
+# en bewijssoorten mogen elkaar niet blokkeren of een pending run vervangen.
+# Dezelfde ref/scope blijft serieel; een lopende meting breken we niet af.
 concurrency:
   group: ronde-${{ github.ref }}-${{ inputs.scope || 'full' }}
   cancel-in-progress: false
 
 jobs:
+  mutationproof:
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'mutationproof'
+    uses: ./.github/workflows/mutationproof.yml
+    with:
+      candidate: ${{ inputs.candidate }}
+
+  output-plan:
+    name: Outputproef — bron en volledige journals verifiëren
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'outputproof'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+    env:
+      CANDIDATE_SHA: ${{ inputs.candidate }}
+      CI_RUN_ID: ${{ inputs.ci_run }}
+    steps:
+      - name: Alleen exacte bronidentiteiten
+        run: |
+          [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$CI_RUN_ID" =~ ^[0-9]+$ ]]
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          path: tooling
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.candidate }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: candidate/.nvmrc
+      - name: Verifieer de veertien GitHub-journals en hun echte checkout
+        working-directory: tooling
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/outputcollect.js ../candidate "$CANDIDATE_SHA" "$CI_RUN_ID" ../output-input
+      - name: Leg volledige routeverdeling en onafhankelijke runner vast
+        working-directory: tooling
+        run: node scripts/outputproof.js plan ../candidate "$CANDIDATE_SHA" ../output-input/routejournaal.log ../output-input
+      - name: Bewaar invoer, inclusief een expliciete verzamelblokkade
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: output-input-${{ github.run_id }}-${{ github.run_attempt }}
+          path: output-input/
+          if-no-files-found: error
+          retention-days: 30
+
+  output-shards:
+    name: Outputproef — scherf ${{ matrix.shard }} (twee geïsoleerde werkers)
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'outputproof'
+    needs: output-plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    env:
+      CANDIDATE_SHA: ${{ inputs.candidate }}
+      SHARD_INDEX: ${{ matrix.shard }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          path: tooling
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.candidate }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: candidate/.nvmrc
+          cache: npm
+          cache-dependency-path: candidate/package-lock.json
+      - run: npm ci
+        working-directory: candidate
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: output-input-${{ github.run_id }}-${{ github.run_attempt }}
+          path: output-input
+      - name: Bestaande mutatie en controlerun, geen bewijs uit oude PASS-tellers
+        working-directory: tooling
+        run: node scripts/outputproof.js shard ../candidate "$CANDIDATE_SHA" ../output-input/PLAN.json "$SHARD_INDEX" ../output-shard
+      - name: Bewaar echte TAP, gewijzigde antwoorden en storingen
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: output-shard-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
+          path: output-shard/
+          if-no-files-found: error
+          retention-days: 30
+
+  output-aggregate:
+    name: Outputproef — volledig bewijs samenvoegen en controleren
+    if: always() && github.event_name == 'workflow_dispatch' && inputs.scope == 'outputproof' && needs.output-plan.result == 'success'
+    needs: [output-plan, output-shards]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CANDIDATE_SHA: ${{ inputs.candidate }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          path: tooling
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.candidate }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: candidate/.nvmrc
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: output-input-${{ github.run_id }}-${{ github.run_attempt }}
+          path: output-input
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: output-shard-${{ github.run_id }}-${{ github.run_attempt }}-*
+          path: output-shards
+      - name: Vereis alle routes, controleer ruwe bytes en herbereken claims
+        working-directory: tooling
+        run: node scripts/outputproof.js aggregate ../candidate "$CANDIDATE_SHA" ../output-input/PLAN.json ../output-shards ../output-proof
+      - name: Bewaar volledig dossier; geen automatische registerwijziging of promotie
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: output-proof-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            output-input/
+            output-shards/
+            output-proof/
+          if-no-files-found: error
+          retention-days: 30
+
+  performance-debt:
+    name: Prestatieschuld (geïsoleerde SQLite-storm)
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'performance'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      DATABASE_URL: ''
+      PG_URL: ''
+      RTG_STORE: sqlite
+      SMTP_URL: ''
+      RTG_AI_UIT: '1'
+      ANTHROPIC_API_KEY: ''
+      STORM_WERKERS: '12'
+      SOAK_MIN: '3'
+      MEGA_SEED: '1234567'
+      LEK_MS: '15000'
+      LEK_RONDES: '2'
+      RTG_PERFORMANCE_COMMIT: ${{ inputs.candidate || github.sha }}
+      RTG_PERFORMANCE_WORKFLOW_COMMIT: ${{ github.sha }}
+      RTG_CPU_PROFILE_DIR: ${{ inputs.profile && format('{0}/artifacts/performance-debt/profiles', github.workspace) || '' }}
+    steps:
+      - name: Alleen exacte bronidentiteiten vóór checkout
+        run: |
+          [[ "$RTG_PERFORMANCE_COMMIT" =~ ^[0-9a-f]{40}$ ]] || exit 1
+          [[ "$RTG_PERFORMANCE_WORKFLOW_COMMIT" =~ ^[0-9a-f]{40}$ ]] || exit 1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ env.RTG_PERFORMANCE_COMMIT }}
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - name: Bewaar de vorige meting; accepteer alleen vers bewijs
+        run: node scripts/performance-debt.js prepare
+      - name: Bewaar workflowherkomst afzonderlijk van de gemeten kandidaat
+        run: |
+          printf '{"candidateCommit":"%s","workflowCommit":"%s"}\n' "$RTG_PERFORMANCE_COMMIT" "$RTG_PERFORMANCE_WORKFLOW_COMMIT" > artifacts/performance-debt/WORKFLOW-IDENTITY.json
+      - name: Bestaande storm, geld, misbruik en herstel
+        run: node scripts/beproeving.js 2>&1 | tee artifacts/performance-debt/beproeving.log
+      - name: Toets de oorspronkelijke doelen zonder de norm te verplaatsen
+        if: always()
+        run: node scripts/performance-debt.js evaluate
+      - name: Bewaar bewijs, ook wanneer een doel niet is gehaald
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: performance-debt-${{ env.RTG_PERFORMANCE_COMMIT }}
+          path: |
+            artifacts/performance-debt/
+            BEPROEVING.json
+            LAATSTE_METING.json
+          retention-days: 30
+
   beproeving:
+    if: github.event_name != 'workflow_dispatch' || inputs.scope == 'full'
     name: De Beproeving (storm, geld, misbruik, herstel)
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -159,7 +381,7 @@ jobs:
           retention-days: 30
 
   tot-crash:
-    if: inputs.scope != 'performance'
+    if: github.event_name != 'workflow_dispatch' || inputs.scope == 'full'
     name: Tot crash (escalerende druk tot iets breekt)
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -198,7 +420,7 @@ jobs:
           retention-days: 30
 
   heapproef:
-    if: inputs.scope != 'performance'
+    if: github.event_name != 'workflow_dispatch' || inputs.scope == 'full'
     name: Heapproef (houdt de server geheugen vast?)
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -238,7 +460,7 @@ jobs:
           retention-days: 30
 
   dekking:
-    if: inputs.scope != 'performance'
+    if: github.event_name != 'workflow_dispatch' || inputs.scope == 'full'
     name: Waargenomen endpoint-dekking en de samenhang
     runs-on: ubuntu-latest
     # 90 was genoeg voor de suite plus de dekking; de meetronde komt er met

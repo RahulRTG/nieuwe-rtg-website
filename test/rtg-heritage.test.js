@@ -1,5 +1,5 @@
 /* DE HERITAGE-DOCTRINE IS CODE, GEEN MOODBOARD.
-   Deze toets borgt de vaste wereldpaletten, twee geometrieën, vier dieptelagen
+   Deze toets borgt de vaste wereldpaletten, centrale geometrieën, vier dieptelagen
    en de componentrollen waarmee routes gefaseerd worden opgebouwd. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -43,32 +43,33 @@ test('vier vaste werelden delen één volledige token- en dieptegrammatica', () 
     assert.match(PALETTE, /--rtg-world-photo:none!important;/, wereld + ' mag geen foto wereldwijd herhalen');
   }
   for (const token of ['--rtg-depth-content:', '--rtg-depth-focus:', '--rtg-depth-system:',
-    '--rtg-radius-content:4px', '--rtg-radius-editorial:4px', '--rtg-radius-system:10px', '--rtg-target:48px']) {
+    '--rtg-radius-content:10px', '--rtg-radius-editorial:16px', '--rtg-radius-system:24px', '--rtg-radius-capsule:999px', '--rtg-target:48px']) {
     assert.ok(TOKENS.includes(token), token + ' ontbreekt');
   }
 });
 
-test('LivingOS blijft champagne; routes hebben geen eigen donker thema meer', () => {
+test('LivingOS deelt warm onyx en champagne; routes verzinnen geen eigen thema', () => {
   assert.doesNotMatch(TOKENS, /data-rtg-eigenvlak/);
   assert.doesNotMatch(SIMPLE, /--rtg-world-bg:/);
   const living = PALETTE.match(/data-rtg-world="living"[^}]+/)[0];
-  /* het warme palet van de desktopstandaard (#413) */
-  assert.match(living, /--rtg-world-bg:#faf8f3!important/);
-  assert.match(living, /--rtg-world-ink:#181918!important/);
-  assert.match(living, /--rtg-world-schema:light!important/);
+  /* De door de gebruiker gekozen fotografische editorial standaard (#444). */
+  assert.match(living, /--rtg-world-bg:#100d0a!important/);
+  assert.match(living, /--rtg-world-ink:#f7f0e5!important/);
+  assert.match(living, /--rtg-world-schema:dark!important/);
   assert.match(PALETTE, /--edge-bar-bg:var\(--rtg-world-card\)!important/);
 });
 
 test('Bodoni blijft redactioneel en Inter blijft operationeel', () => {
   assert.match(MATERIALEN, /data-rtg-type="display"/);
-  assert.match(MATERIALEN, /:where\(h1,h2,h3,h4\)[^}]*--rtg-interface/);
+  assert.match(MATERIALEN, /:where\(h1,h2\)[^}]*--rtg-display/);
+  assert.match(MATERIALEN, /:where\(h3,h4\)[^}]*--rtg-interface/);
   assert.doesNotMatch(MATERIALEN, /body\[data-rtg-skin="heritage"\]\s*\{[^}]*font-family:[^;}]*Bodoni/i,
     'Bodoni mag nooit de lopende bodyletter worden');
   assert.match(COMPONENTEN, /\.rtg-operational-panel[^}]*font-family:Inter/);
   assert.match(COMPONENTEN, /font-variant-numeric:tabular-nums/);
 });
 
-test('rechte inhoud en afgeronde systeemlagen blijven betekenisvol verschillend', () => {
+test('inhoud en systeemlagen houden hun eigen centrale geometrie', () => {
   assert.match(MATERIALEN, /\.rtg-groep,.kaart,.card,.paneel,.panel,.tegel,.box,.blok[^}]*border-radius:var\(--rtg-radius-content\)/);
   assert.match(MATERIALEN, /dialog,.modal,.sheet,\[role="dialog"\][^}]*border-radius:var\(--rtg-radius-system\)/);
   assert.match(MATERIALEN, /focus-visible/);
@@ -118,7 +119,7 @@ test('bestaande echte DOM wordt geadapteerd zonder knoppen of data te kopiëren'
 });
 
 test('Heritage laadt de centrale visuele standaard als laatste laag', () => {
-  assert.equal([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].at(-1)[1], './rtg-world-palette.css',
+  assert.equal([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].at(-1)[1], './rtg-editorial-system.css',
     'last import is shared and project-relative; no query that the CSS bundler would discard');
   assert.equal((TOKENS.match(/rtg-simple\.css/g) || []).length, 1);
   assert.match(WERELDSCHERMEN, /data-rtg-screen-root="content"/);
@@ -128,7 +129,7 @@ test('Heritage laadt de centrale visuele standaard als laatste laag', () => {
 });
 
 test('iedere wereld krijgt een rustig eigen accent zonder globale herhaalfoto', () => {
-  const accents = {living:'#89704b',travel:'#c4a0a6',work:'#91b7a9',foundation:'#cbb681'};
+  const accents = {living:'#b59063',travel:'#b86a7e',work:'#8da99b',foundation:'#9eb69b'};
   for (const [world,accent] of Object.entries(accents)) {
     const block = PALETTE.match(new RegExp('data-rtg-world="'+world+'"[^}]+'))[0];
     assert.ok(block.includes('--rtg-world-signature:'+accent+'!important'));

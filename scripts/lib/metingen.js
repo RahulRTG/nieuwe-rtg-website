@@ -97,50 +97,62 @@ const GEEN_METING = new Set([
 ]);
 
 const REGISTER = {
-  'KRIMP.json': { eigenRatel: 'scripts/registerratel.js' },
-  'BEGROTING.json': { eigenRatel: 'scripts/registerratel.js' },
-  'CODEWERELD.json': { eigenRatel: 'scripts/registerratel.js' },
-  'RAILVERGELIJK.json': { eigenRatel: 'scripts/registerratel.js' },
-  'SCHRIJFANALYSE.json': { eigenRatel: 'scripts/registerratel.js' },
-  'SEMANTIEK.json': { eigenRatel: 'scripts/registerratel.js' },
-  'SLO.json': { eigenRatel: 'scripts/registerratel.js' },
-  'SUITE.json': { eigenRatel: 'scripts/registerratel.js' },
-  'VERTROUWEN.json': { eigenRatel: 'scripts/registerratel.js' },
-  'COMMERCE.json': { eigenRatel: 'scripts/registerratel.js' },
-  /* Deze kwaliteitsvelden hebben een echte regressiepoort tegen het aftakpunt;
-     test/registerratel.test.js draait de poort en saboteert iedere regel. */
-  'AANROEPGRAAF.json': { eigenRatel: 'scripts/registerratel.js' },
-  'AUDITPROEF.json': { eigenRatel: 'scripts/registerratel.js' },
-  'CONTEXTPROEF.json': { eigenRatel: 'scripts/registerratel.js' },
-  'CONTROLS.json': { eigenRatel: 'scripts/registerratel.js' },
-  'DUURZAAMHEIDSKOSTEN.json': { eigenRatel: 'scripts/registerratel.js' },
-  'ENVELOP.json': { eigenRatel: 'scripts/registerratel.js' },
-  'GRAAFAS.json': { eigenRatel: 'scripts/registerratel.js' },
-  'HANDELINGPROEF.json': { eigenRatel: 'scripts/registerratel.js' },
-  'HANDLERWACHT.json': { eigenRatel: 'scripts/registerratel.js' },
-  'IDOR.json': { eigenRatel: 'scripts/registerratel.js' },
-  'INHOUDSKAART.json': { eigenRatel: 'scripts/registerratel.js' },
-  'KERNHERKOMST.json': { eigenRatel: 'scripts/registerratel.js' },
-  'KLOKWACHT.json': { eigenRatel: 'scripts/registerratel.js' },
-  'MAGNAATLAB.json': { eigenRatel: 'scripts/registerratel.js' },
-  'MUTATIEBOEK.json': { eigenRatel: 'scripts/registerratel.js' },
-  'MUTATIESEMANTIEK.json': { eigenRatel: 'scripts/registerratel.js' },
-  'ONBEWEZEN.json': { eigenRatel: 'scripts/registerratel.js' },
-  'ONDERZOEKSKETEN.json': { eigenRatel: 'scripts/registerratel.js' },
-  'OUTPUTPROEF.json': { eigenRatel: 'scripts/registerratel.js' },
-  'ROUTEBRON.json': { eigenRatel: 'scripts/registerratel.js' },
-  'SCHERMGEDRAG.json': { eigenRatel: 'scripts/registerratel.js' },
-  'SCHERMROUTES.json': { eigenRatel: 'scripts/registerratel.js' },
-  'SYMBOLEN.json': { eigenRatel: 'scripts/registerratel.js' },
-  'VERRAAD.json': { eigenRatel: 'scripts/registerratel.js' },
-  'WAAROM.json': { eigenRatel: 'scripts/registerratel.js' },
-  'BELOFTE.json': { eigenRatel: 'scripts/check.js' },
+  /* Bestaande handhavers waren wel actief in CI maar niet met hun register
+     verbonden. Deze koppelingen claimen alleen de genoemde ratel: bijvoorbeeld
+     afdrukconsistentie is geen bewijs dat een gehele capability correct werkt.
+     De integriteitsratels hieronder hebben per register negatieve controles in
+     test/registerratels.test.js; ontbrekende records of tellers worden geweigerd. */
   'BEWIJSSCHULD.json': { meter: ['bewijsAchterstand'] },
   'DEKKING.json': { meter: ['dekkingWaargenomenPct', 'endpointsNooitAangeraakt'] },
-  'GEZAG.json': { eigenRatel: 'scripts/gezag.js' },
+  'AANROEPGRAAF.json': { eigenRatel: 'test/codewereld.test.js' },
+  'CAPABILITEIT.json': { eigenRatel: 'test/capabilities.test.js' },
+  'CODEWERELD.json': { eigenRatel: 'test/codewereld.test.js' },
+  'COMMERCE.json': { eigenRatel: 'scripts/check.js' },
+  'CONTROLS.json': { eigenRatel: 'test/controls.test.js' },
+  'ENVELOP.json': { eigenRatel: 'test/actorvormen.test.js' },
+  'GEZAG.json': { eigenRatel: 'test/gezag.test.js' },
+  'GRAAFAS.json': { eigenRatel: 'test/graafas.test.js' },
+  'HANDLERWACHT.json': { eigenRatel: 'test/handlerwacht.test.js' },
   'IDEMSCHULD.json': { eigenRatel: 'test/idemschuld.test.js' },
+  'IDOR.json': { eigenRatel: 'test/idor.test.js' },
+  'INHOUDSKAART.json': { eigenRatel: 'test/inhoudswacht.test.js' },
+  'KLOKWACHT.json': { eigenRatel: 'test/klokwacht.test.js' },
+  'MAKERS.json': { eigenRatel: 'test/makers.test.js' },
+  'MAGNAATLAB.json': { eigenRatel: 'test/magnaatlab.test.js' },
+  'MUTATIESEMANTIEK.json': { eigenRatel: 'test/mutatiesemantiek.test.js' },
+  'OBJECTMODEL.json': { eigenRatel: 'test/objectmodel.test.js' },
+  'SCHERMGEDRAG.json': { eigenRatel: 'test/codewereld.test.js' },
+  'SCHERMROUTES.json': { eigenRatel: 'test/codewereld.test.js' },
+  'SEMANTIEK.json': { eigenRatel: 'test/semantiek.test.js' },
+  /* Bestaande tegenproeven: collectiegrenzen inclusief vergeetpad-uitzonderingen,
+     werkelijk bestaande beloftedekking en de vaste Rust-migratietrechter.
+     Dit claimt geen weigermodus in productie, volledige beloftecorrectheid of
+     voltooide Rust-migraties. De handhavers toetsen precies die grenzen. */
+  'BEGROTING.json': { eigenRatel: 'test/begrotingsgrenzen.test.js' },
+  'BELOFTE.json': { eigenRatel: 'test/belofte.test.js' },
   'RUST-MIGRATIES.json': { eigenRatel: 'scripts/rust-migraties.js' },
-
+  /* Geen nieuw bewijs over oude rondes: deze ratels verhinderen tegenstrijdige
+     bewijsclaims in de opgeslagen uitkomst. SUITE mag eerlijk rood blijven;
+     onbekende herkomst, ontbrekende schakels en niet-gereden routes blijven
+     onbekend. Versheid en kandidaatbinding worden hiermee niet bewezen. SLO
+     bewaakt de bestaande afspraak dat de gepubliceerde doelen en sonde gelijk
+     zijn aan de machineconfiguratie. Elke regel heeft een negatieve proef. */
+  'SLO.json': { eigenRatel: 'scripts/registerratels.js' },
+  'SUITE.json': { eigenRatel: 'scripts/registerratels.js' },
+  'HANDELINGPROEF.json': { eigenRatel: 'scripts/registerratels.js' },
+  'KERNHERKOMST.json': { eigenRatel: 'scripts/registerratels.js' },
+  'SCHRIJFANALYSE.json': { eigenRatel: 'scripts/registerratels.js' },
+  'WAAROM.json': { eigenRatel: 'scripts/registerratels.js' },
+  'VERTROUWEN.json': { eigenRatel: 'scripts/registerratels.js' },
+  'AUDITPROEF.json': { eigenRatel: 'scripts/registerratels.js' },
+  'MUTATIEBOEK.json': { eigenRatel: 'scripts/registerratels.js' },
+  'ONBEWEZEN.json': { eigenRatel: 'scripts/registerratels.js' },
+  'ONDERZOEKSKETEN.json': { eigenRatel: 'scripts/registerratels.js' },
+  'RAILVERGELIJK.json': { eigenRatel: 'scripts/registerratels.js' },
+  'ROUTEBRON.json': { eigenRatel: 'scripts/registerratels.js' },
+  'SYMBOLEN.json': { eigenRatel: 'scripts/registerratels.js' },
+  'VERRAAD.json': { eigenRatel: 'scripts/registerratels.js' },
+  'WERELDSTIJL.json': { eigenRatel: 'scripts/registerratels.js' },
   /* CONNECTION_CONSTITUTION.json wordt uitsluitend geschreven nadat alle
      genoemde product-, privacy-, state- en routeproeven groen zijn. Het script
      weigert bij een ontbrekend bewijs of exposed implemented:false capability

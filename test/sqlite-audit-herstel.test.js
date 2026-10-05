@@ -109,3 +109,56 @@ test('een gesloten mislukte bundel lekt geen preview of oude wachtrij naar een o
   fout.mock.restore(); assert.ok(later, 'de late context is daadwerkelijk aangemaakt'); hervat(); await later;
   assert.deepEqual(p.lees('apiSpoor').commandJournaal.map(r => r.actor), ['nieuw']);
 });
+
+test('inlogspoor bewaart alleen zijn eigen keten, weigert commitfouten en overleeft herladen', t => {
+  const p = proef(t, { securityLog: [] });
+  const { schoon } = require('../server/kern/util');
+  const { maakInlogspoor } = require('../server/kern/identiteit/inlogherkomst');
+  const spoor = maakInlogspoor({ db: p.db, save: p.save, schoon });
+  let vreemd = 0;
+  Object.defineProperty(p.db.data.ander, 'toJSON', { value() { vreemd++; return { waarde: 1 }; } });
+  spoor.logInlog('account', 1, ' <user-1> ', { ip: '127.0.0.1' });
+  const voor = p.lees('securityLog');
+  assert.equal(vreemd, 0, 'een inlog serialiseert geen ander domein');
+  assert.equal(voor.length, 1);
+  assert.equal(voor[0].wie, 'user-1');
+  assert.equal(voor[0].ok, true);
+  assert.equal(voor[0].ip, '127.0.0.1');
+  assert.equal(spoor.securityLogKeten().ok, true);
+  const proto = DatabaseSync.prototype, exec = proto.exec;
+  const fout = t.mock.method(proto, 'exec', function(sql) {
+    if (sql === 'COMMIT') throw new Error('inlogcommit mislukt');
+    return exec.call(this, sql);
+  });
+  assert.throws(() => spoor.logInlog('account', false, null, {}), /inlogcommit mislukt/);
+  assert.deepEqual(p.lees('securityLog'), voor, 'geen gedeeltelijk gecommitteerde keten');
+  fout.mock.restore();
+  p.db.data = require('../server/db/sqlite').loadSqlite();
+  assert.equal(spoor.securityLogKeten().top, voor[0].hash, 'dezelfde lezer volgt de herladen root');
+  spoor.logInlog('account', false, null, {});
+  const herstart = p.kind(`const p=require('./server/db');
+    p.db.data=require('./server/db/sqlite').loadSqlite();
+    const s=require('./server/kern/identiteit/inlogherkomst').maakInlogspoor({db:p.db,save:p.save,schoon:require('./server/kern/util').schoon});
+    console.log(JSON.stringify({log:p.db.data.securityLog,keten:s.securityLogKeten()}));`);
+  assert.equal(herstart.status, 0, herstart.stderr);
+  const na = JSON.parse(herstart.stdout);
+  assert.deepEqual(na.log, p.lees('securityLog'));
+  assert.equal(na.log.length, 2);
+  assert.equal(na.log[0].ok, false);
+  assert.equal(na.log[0].wie, null);
+  assert.equal(na.keten.ok, true);
+});
+
+test('inlogspoor leest zonder scheppen en weigert beschadigde bestaande auditdata', () => {
+  const db = { data: {} }; let saves = 0;
+  const spoor = require('../server/kern/identiteit/inlogherkomst').maakInlogspoor({
+    db, save: { sleutels() { saves++; } }, schoon: v => v
+  });
+  spoor.securityLogKeten();
+  assert.equal(Object.hasOwn(db.data, 'securityLog'), false);
+  db.data.securityLog = { corrupt: true };
+  assert.throws(() => spoor.securityLogKeten(), /niet de verklaarde vorm/);
+  assert.throws(() => spoor.logInlog('account', false, null, {}), /niet de verklaarde vorm/);
+  assert.deepEqual(db.data.securityLog, { corrupt: true });
+  assert.equal(saves, 0);
+});

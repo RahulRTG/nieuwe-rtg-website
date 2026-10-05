@@ -11,7 +11,7 @@
   'use strict';
   const $ = (s, r) => (r || document).querySelector(s);
 
-  let CSS = `
+  const CSS = `
   body.wos .tabbar{display:none !important;}
   body.wos.wos-aan .content{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 6.5rem) !important;}
   body.wos #shell{background:var(--rtg-grond,var(--rtg-bg));}
@@ -58,4 +58,4 @@
     .wos-app:nth-child(odd){border-right:0;}
     .wos-navkop{margin-top:2rem;}
   }
-`;
+` +

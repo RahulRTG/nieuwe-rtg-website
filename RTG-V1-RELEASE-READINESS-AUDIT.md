@@ -1,5 +1,12 @@
 # RTG V1 — RELEASE READINESS AUDIT
 
+> **STATUS 5 oktober 2026 — remediatie ronde 1 uitgevoerd.** De 2 P0's, de P1 en
+> de kapotte release-gate uit ronde 0 zijn gerepareerd, met regressietests én een
+> onafhankelijke adversariële herkeuring. Het verdict op code-niveau is daarmee
+> verschoven van **🔴 NO-GO** naar **🟡 CONDITIONAL GO** (zie **§REMEDIATIESTATUS**
+> direct onder sectie A). De oorspronkelijke ronde-0-bevindingen blijven hieronder
+> staan met hun status (OPEN / FIXED / VERIFIED FIXED).
+
 *Volledige end-to-end release-audit van de gehele RTG-codebase. Doel: één vraag —
 kan RTG V1 verantwoord naar productie voor echte gebruikers, bedrijven en
 organisaties?*
@@ -73,14 +80,78 @@ deploy-onafhankelijk, krijg de suite groen, en los de externe/legale poorten op
 
 ---
 
+## REMEDIATIESTATUS — ronde 1 (5 oktober 2026)
+
+Branch: `codex/rtg-v1-release-blockers`. Alle code-blockers uit ronde 0 zijn
+gerepareerd, elk met een regressietest die vóór de fix zakt en erna slaagt, en
+daarna onafhankelijk adversarieel herkeurd (een andere agent dan de implementer
+heeft de oorspronkelijke exploits opnieuw tegen de patch gedraaid, met
+≥2 ontwijkvarianten per blocker).
+
+### Nieuw verdict (code): 🟡 CONDITIONAL GO — Release readiness: 82/100
+
+De concrete *technische* redenen voor de ronde-0 NO-GO zijn aantoonbaar weg
+(nieuw bewijs, niet louter "er is code gewijzigd"): de 2FA-/actietoken-bypass,
+het cross-member meldingenlek en de `NODE_ENV`-afhankelijke hardening zijn
+gereproduceerd-dicht en door een tweede, onafhankelijke keuring bevestigd; de
+release-gate (rode suite) is groen op alle register-/schermeigenaar-toetsen.
+
+Waarom CONDITIONAL en geen GO, en waarom 82 en niet hoger: de resterende poorten
+zijn **extern/juridisch en niet in code op te lossen** — onafhankelijke pentest,
+bewezen productiehost + TLS/DNS, getekende DPIA/verwerkersovereenkomsten, het
+besluit geldmodel + uitbetaalprovider, en een image-kwetsbaarheidsscan (sectie F,
+F3–F6). Ook de P2/P3-staart (secties C-G) is bewust *niet* aangeraakt (geen scope
+creep). De code kan dus richting V1; de launch-kwalificatie hangt op de externe
+gates.
+
+### Per blocker — BEFORE / FIX / AFTER / REGRESSION
+
+| # | Sev | Status | Commit | Bewijs (regressie + herkeuring) |
+|---|---|---|---|---|
+| 1 | P0 | **VERIFIED FIXED** | `247fa66e` | Actietokens tekenen onder een per-doel HKDF-sleutel (`kluis.signMet`/`sleutelVoor('actie:'+purpose)`); `verifyToken` weigert elk actietoken (+ numerieke-exp-grens). `test/token-domeinscheiding.test.js` 11/11; herkeuring reproduceerde de bypass **dicht** voor `inlog2`/`verify-email`/`mailwissel`/`sso-overdracht` + varianten; 2FA-flow intact. |
+| 2 | P0 | **VERIFIED FIXED** | `eea75f7f` (+`b70c1383`) | `meld()` routeert op bestemmingssoort (lid-sleutel = persoonlijk; pas = fail-closed drop tenzij expliciete `notify.broadcast`); `meldingenVan` geeft uit de pas-bak alleen broadcasts; alle persoonlijke schrijvers op de ledensleutel. `test/meldingen-isolatie.test.js` 5/5 (unit-routing + e2e: B leest A's melding niet; SSE-isolatie deterministisch via `doel:'key'`). Herkeuring: census van álle `notify()`-callers, geen lek. |
+| 3 | P1 | **VERIFIED FIXED** | `37415250` | Een aantoonbaar openbaar adres telt voor beveiliging als productie: `config/openbaar.js` → hardeFouten (start afgebroken ongeacht `NODE_ENV`), `productiedeur.isProductie` sluit de gedeelde kantoorcode, inlogrem aan. `test/productie-failclosed.test.js` 10/10; herkeuring bevestigde fail-closed + contrast (lokaal/onbekend blokkeert niet). |
+| 4 | gate (P2) | **VERIFIED FIXED** | `28d0fc4e` | `site/techniek/techniek.html` geregistreerd in `SCHERMEIGENAAR.json`; `test/schermeigenaar.test.js` 11/11; `registerklopt` groen op alle register-toetsen (enige rest: het shallow-clone `bewijskosten`-artefact = INFRA). AFGELEID/GASTSPLITSING/FUNCTIES herijkt. |
+
+**Onafhankelijke herkeuring (samengevat):** *"De concrete technische oorzaken van
+de oorspronkelijke P0/P1 NO-GO zijn aantoonbaar weg … Geen enkele blocker was nog
+exploiteerbaar."* Enige resterende rode poort: het bekende shallow-clone
+git-artefact in `bewijskosten.test.js` (INFRA, geen exploit).
+
+### Testbewijs (PASS / FAIL / INFRA / NIET GEVERIFIEERD)
+
+- **PASS** — regressiesuites: token-domeinscheiding (11), meldingen-isolatie (5),
+  productie-failclosed (10), schermeigenaar (11); plus de aangrenzende bestaande
+  suites die de fixes raken (auth/tokens, orders/salon/supplier/realtime,
+  config/kantoor, sqlite-audit-selectief 39/39, klokwacht, functielijst).
+- **INFRA** (geen codefout, omgeving ontbreekt het artefact; raakt geen door deze
+  tak gewijzigde code): `bewijskosten` (git-diff over commits die in de shallow
+  clone ontbreken), `*.pg`/living-world (vereisen `DATABASE_URL`), sentinel-/
+  motor-/magnaat-subtoetsen (vereisen de gebouwde Rust-binaries). De diff raakt
+  geen van die domeinen, dus ze hangen puur aan het ontbrekende artefact; in
+  CI/sandbox mét die artefacten slagen ze.
+- **NIET GEVERIFIEERD** (ongewijzigd t.o.v. ronde 0): echte productiehost
+  TLS/DNS/objectopslag/SMTP, de pgwire-driver onder echte concurrency, loadtests,
+  en alle externe/juridische items (F3–F6).
+
+### Wat deze ronde NIET heeft gedaan (bewust)
+Geen nieuwe functies, geen redesign, geen P2/P3-opruiming, geen nieuwe
+architectuurlaag. Uitsluitend de vier release-blockers + de direct daaruit
+volgende register-/testherijking.
+
+---
+
 ## B. V1 RELEASE BLOCKERS (P0/P1)
+
+> **Statuskolom hieronder bijgewerkt in ronde 1.** De bevindingen zelf (BEFORE)
+> blijven ongewijzigd staan als historisch record.
 
 | ID | Sev | Systeem | Probleem | Impact | Bewijs | Fix |
 |---|---|---|---|---|---|---|
-| **B1** | **P0** | `server/accounts/tokens.js` `verifyToken` | `verifyToken` ontleedt de body als `id.exp.uitgegeven.sid`, maar een actietoken is `id.purpose.exp.nonce`. `Number('inlog2')`=NaN, `NaN < Date.now()`=false → vervalcheck slaat niet aan; het echte account komt terug. Sessie- en actietokens worden met dezelfde `kluis.sign(S.SECRET)` getekend; geen enkele discriminator. | **Volledige 2FA-bypass:** wie alleen het wachtwoord kent krijgt bij `/api/auth/login` het `inlog2`-bewijs in de respons en gebruikt dat als `Bearer`-sessietoken zonder ooit TOTP in te voeren. Idem voor élk gelekt actietoken (`verify-email` = 3 dagen geldig, lekt via e-maillogs/referrer): sessie-escalatie. Altijd-actief pad, geen productiepoort dekt dit. | `tokens.js:124-125` (`[id,exp,uitgegeven,sid]=body.split('.'); if(Number(exp)<Date.now()) return null`); `tokens.js:146-151` (`body = userId+'.'+purpose+'.'+(…)+'.'+nonce`); bewijs teruggegeven in `server/kern/identiteit/tweefactor.js:164-167` + `server/routes/auth/inlog.js:136-137`. **Gereproduceerd:** inlog2- én verify-email-token → `verifyToken` geeft user id 1. | Teken actietokens met `kluis.sleutelVoor('actie:'+purpose)` (HKDF-domeinscheiding, bestaat al) zodat een sessieverifier ze cryptografisch nooit accepteert; in `verifyToken` ook `Number.isFinite(Number(exp))` eisen. Zie **K / Blocker 1**. |
-| **B2** | **P0** | `server/opzet/meldingen.js` + `server/server.js` `meldingenVan` + SSE | `meld(tier,note)` schrijft in de **gedeelde** bak `db.data.notifications[tier]` en SSE-broadcast naar `match:[tier]` (`classificatie:'persoonsgegeven'`). `meldingenVan(sess)` geeft `db.data.notifications[sess.tier]` onverkort terug; voor een echt account is `tier` de pas-waarde, dus alle leden van één pas delen de bak. De sleutel-bak filtert de tier-bak niet weg. | **Cross-member AVG-lek:** elk lid ziet in `/api/notifications` én realtime de persoonlijke meldingen van alle leden met dezelfde pas — boekings-/order-/rit-bevestigingen (zaaknaam, datum), letterlijke conciërge- en gast-chatteksten, identiteitsverificatie-uitslagen. Treedt op in productie (meerdere echte accounts/pas), onzichtbaar in demo (key===tier). | `opzet/meldingen.js:65-70`; `server.js:1092-1100` (`opTier = db.data.notifications[sess.tier]`, altijd teruggegeven); `opzet/diensten2.js:216` (`tier:user.tier`); `kern/sse.js:66` (`m.doel==='tier'→raak=m.match.includes(c.tier)`); schrijvers o.a. `routes/supplier/boekingen.js:36`, `routes/office/werk.js:121`, `routes/supplier/gastcontact.js:44`, `routes/office/verificaties.js:99`. De code erkent de val zelf (`server.js:1080-1091`, `opzet/meldaan.js` kop). | Route persoonlijke meldingen via `meldLid(key)` → `db.data.notifications['user-'+id]`; reserveer `notify(tier)` voor echte broadcasts; laat `meldingenVan` de tier-bak alleen voor expliciet-broadcast-items lezen; fix `/api/notifications/read` idem. Zie **K / Blocker 2**. |
-| **B3** | **P1** | `server/config/openbaar.js`, `server/config.js`, `server/kern/kantoor/productiedeur.js`, `server/opzet/poortwachters.js`, alle `server/middleware/*-productiepoort.js` | Vrijwel alle productie-hardening keyt op `NODE_ENV==='production'`: kantoordeur-passkey, config-keuring (kluissleutels, encryptie-at-rest, webhook-secrets), inlogrem, foundation-/legacy-/travel-/simulatiepoorten. Een publiek adres zónder `NODE_ENV=production` start met alleen schaduw-waarschuwingen; alleen de demo-combinatie is een harde fout. | Publieke deploy die de env-var vergeet: `/api/office/login` opent de backoffice (identiteitskluis, paspoortscans) op de gedeelde `OFFICE_CODE` zonder passkey; encryptie-at-rest/kluissleutels vallen stil terug op bestanden; onvolgroeide Foundation-routes staan open. Vereist operator-misconfiguratie; de ondersteunde Docker/compose/golive-weg zet `NODE_ENV=production` en is veilig. | `server.js:470`; `productiedeur.js:37,40-44,53-54`; `routes/office/toegang.js:11-16`; `config.js:66-73` (exit alleen in prod-tak); `config/openbaar.js:109-146` (openbaar-maar-niet-prod → schaduwFouten → waarschuwingen); `poortwachters.js:44`. Mitigatie: office heeft eigen rem (`toegang.js:13-19` + `server.js:589-632`), `OFFICE_CODE` is willekeurig (niet hardcoded). | Laat hardening afgaan op `openbaar.installatieSoort(env).soort==='openbaar'` **OF** `NODE_ENV==='production'`; promoveer de schaduwfouten tot `hardeFouten` zodra het adres aantoonbaar openbaar is (zoals demo-op-publiek al is). Zie **K / Blocker 3**. |
-| **B4** | **P1→P2** | Release-gate / `test/schermeigenaar.test.js` | De volledige Node-suite is **rood op `b7f14dfa`**: `public/site/techniek/techniek.html` (toegevoegd door merge #473) staat niet in `SCHERMEIGENAAR.json`, dus de schermeigenaar-governancetoets faalt (2 subtests). De release-gate (`productie-oordeel.js`) eist een volledig groene, skip-vrije suite. | Zuiver release-gate-blokkerend, niet exploiteerbaar: zolang de suite rood is kan `productie:status`/`release:gate` nooit READY worden. Weerlegt de claim in `RELEASEKANDIDAAT.md` ("npm test → 0 gezakt", gemeten op oudere commit `115ceb85`). | **Zelf geverifieerd op de echte repo:** `node --test test/schermeigenaar.test.js` → `# fail 2`; `grep -c techniek/techniek.html SCHERMEIGENAAR.json` → 0; het bestand bestaat (`public/site/techniek/techniek.html`). | Registreer `site/techniek/techniek.html` in `SCHERMEIGENAAR.json` (capability + rol, of alias met oordeel); draai de volledige suite groen vóór enige release-stempel. Technisch triviaal, maar het is een harde poort. |
+| **B1** ✅ VERIFIED FIXED (247fa66e) | **P0** | `server/accounts/tokens.js` `verifyToken` | `verifyToken` ontleedt de body als `id.exp.uitgegeven.sid`, maar een actietoken is `id.purpose.exp.nonce`. `Number('inlog2')`=NaN, `NaN < Date.now()`=false → vervalcheck slaat niet aan; het echte account komt terug. Sessie- en actietokens worden met dezelfde `kluis.sign(S.SECRET)` getekend; geen enkele discriminator. | **Volledige 2FA-bypass:** wie alleen het wachtwoord kent krijgt bij `/api/auth/login` het `inlog2`-bewijs in de respons en gebruikt dat als `Bearer`-sessietoken zonder ooit TOTP in te voeren. Idem voor élk gelekt actietoken (`verify-email` = 3 dagen geldig, lekt via e-maillogs/referrer): sessie-escalatie. Altijd-actief pad, geen productiepoort dekt dit. | `tokens.js:124-125` (`[id,exp,uitgegeven,sid]=body.split('.'); if(Number(exp)<Date.now()) return null`); `tokens.js:146-151` (`body = userId+'.'+purpose+'.'+(…)+'.'+nonce`); bewijs teruggegeven in `server/kern/identiteit/tweefactor.js:164-167` + `server/routes/auth/inlog.js:136-137`. **Gereproduceerd:** inlog2- én verify-email-token → `verifyToken` geeft user id 1. | Teken actietokens met `kluis.sleutelVoor('actie:'+purpose)` (HKDF-domeinscheiding, bestaat al) zodat een sessieverifier ze cryptografisch nooit accepteert; in `verifyToken` ook `Number.isFinite(Number(exp))` eisen. Zie **K / Blocker 1**. |
+| **B2** ✅ VERIFIED FIXED (eea75f7f) | **P0** | `server/opzet/meldingen.js` + `server/server.js` `meldingenVan` + SSE | `meld(tier,note)` schrijft in de **gedeelde** bak `db.data.notifications[tier]` en SSE-broadcast naar `match:[tier]` (`classificatie:'persoonsgegeven'`). `meldingenVan(sess)` geeft `db.data.notifications[sess.tier]` onverkort terug; voor een echt account is `tier` de pas-waarde, dus alle leden van één pas delen de bak. De sleutel-bak filtert de tier-bak niet weg. | **Cross-member AVG-lek:** elk lid ziet in `/api/notifications` én realtime de persoonlijke meldingen van alle leden met dezelfde pas — boekings-/order-/rit-bevestigingen (zaaknaam, datum), letterlijke conciërge- en gast-chatteksten, identiteitsverificatie-uitslagen. Treedt op in productie (meerdere echte accounts/pas), onzichtbaar in demo (key===tier). | `opzet/meldingen.js:65-70`; `server.js:1092-1100` (`opTier = db.data.notifications[sess.tier]`, altijd teruggegeven); `opzet/diensten2.js:216` (`tier:user.tier`); `kern/sse.js:66` (`m.doel==='tier'→raak=m.match.includes(c.tier)`); schrijvers o.a. `routes/supplier/boekingen.js:36`, `routes/office/werk.js:121`, `routes/supplier/gastcontact.js:44`, `routes/office/verificaties.js:99`. De code erkent de val zelf (`server.js:1080-1091`, `opzet/meldaan.js` kop). | Route persoonlijke meldingen via `meldLid(key)` → `db.data.notifications['user-'+id]`; reserveer `notify(tier)` voor echte broadcasts; laat `meldingenVan` de tier-bak alleen voor expliciet-broadcast-items lezen; fix `/api/notifications/read` idem. Zie **K / Blocker 2**. |
+| **B3** ✅ VERIFIED FIXED (37415250) | **P1** | `server/config/openbaar.js`, `server/config.js`, `server/kern/kantoor/productiedeur.js`, `server/opzet/poortwachters.js`, alle `server/middleware/*-productiepoort.js` | Vrijwel alle productie-hardening keyt op `NODE_ENV==='production'`: kantoordeur-passkey, config-keuring (kluissleutels, encryptie-at-rest, webhook-secrets), inlogrem, foundation-/legacy-/travel-/simulatiepoorten. Een publiek adres zónder `NODE_ENV=production` start met alleen schaduw-waarschuwingen; alleen de demo-combinatie is een harde fout. | Publieke deploy die de env-var vergeet: `/api/office/login` opent de backoffice (identiteitskluis, paspoortscans) op de gedeelde `OFFICE_CODE` zonder passkey; encryptie-at-rest/kluissleutels vallen stil terug op bestanden; onvolgroeide Foundation-routes staan open. Vereist operator-misconfiguratie; de ondersteunde Docker/compose/golive-weg zet `NODE_ENV=production` en is veilig. | `server.js:470`; `productiedeur.js:37,40-44,53-54`; `routes/office/toegang.js:11-16`; `config.js:66-73` (exit alleen in prod-tak); `config/openbaar.js:109-146` (openbaar-maar-niet-prod → schaduwFouten → waarschuwingen); `poortwachters.js:44`. Mitigatie: office heeft eigen rem (`toegang.js:13-19` + `server.js:589-632`), `OFFICE_CODE` is willekeurig (niet hardcoded). | Laat hardening afgaan op `openbaar.installatieSoort(env).soort==='openbaar'` **OF** `NODE_ENV==='production'`; promoveer de schaduwfouten tot `hardeFouten` zodra het adres aantoonbaar openbaar is (zoals demo-op-publiek al is). Zie **K / Blocker 3**. |
+| **B4** ✅ VERIFIED FIXED (28d0fc4e) | **P1→P2** | Release-gate / `test/schermeigenaar.test.js` | De volledige Node-suite is **rood op `b7f14dfa`**: `public/site/techniek/techniek.html` (toegevoegd door merge #473) staat niet in `SCHERMEIGENAAR.json`, dus de schermeigenaar-governancetoets faalt (2 subtests). De release-gate (`productie-oordeel.js`) eist een volledig groene, skip-vrije suite. | Zuiver release-gate-blokkerend, niet exploiteerbaar: zolang de suite rood is kan `productie:status`/`release:gate` nooit READY worden. Weerlegt de claim in `RELEASEKANDIDAAT.md` ("npm test → 0 gezakt", gemeten op oudere commit `115ceb85`). | **Zelf geverifieerd op de echte repo:** `node --test test/schermeigenaar.test.js` → `# fail 2`; `grep -c techniek/techniek.html SCHERMEIGENAAR.json` → 0; het bestand bestaat (`public/site/techniek/techniek.html`). | Registreer `site/techniek/techniek.html` in `SCHERMEIGENAAR.json` (capability + rol, of alias met oordeel); draai de volledige suite groen vóór enige release-stempel. Technisch triviaal, maar het is een harde poort. |
 
 > B4 is op zichzelf P2 qua ernst, maar staat in deze tabel omdat hij de
 > release-gate **nu** hard dichtzet en een gedocumenteerde claim weerlegt.

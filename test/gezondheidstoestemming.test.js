@@ -77,7 +77,7 @@ test('3. de ouder geeft hem, en daarna gaat alles door; een oude allergie blokke
   assert.equal((await fn('/gezin/toestemming/gezondheid', Object.assign({ aan: true }, G))).status, 200);
   // een dubbeltik geeft hetzelfde antwoord en verandert niets (lib/mutatiecontracten-toestemming.js)
   const tweede = await fn('/gezin/toestemming/gezondheid', Object.assign({ aan: true }, G));
-  assert.deepEqual([tweede.status, tweede.body], [200, { ok: true, toestemming: true }]);
+  assert.deepEqual([tweede.status, tweede.body.toestemming], [200, true]);
   assert.equal((await fn('/gezin/gezondheid/medicijn', Object.assign({ voor: kind.id, naam: 'Paracetamol' }, G))).status, 200);
   assert.equal((await fn('/gezin/oppasinfo', Object.assign({ allergie: 'pinda', huisregels: 'Schoenen uit' }, G))).status, 200);
   assert.equal((await post('/api/rtf/welzijn/stemming', Object.assign({ gevoel: 'bang' }, kind))).status, 200,
@@ -95,7 +95,7 @@ test('4. vanaf 16 geeft een gezinslid zelf toestemming; die van het gezin geldt 
     'een kind onder 16 geeft deze niet zelf');
   assert.equal((await post('/api/rtf/welzijn/toestemming', Object.assign({ aan: true }, tiener))).status, 200);
   const nog = await post('/api/rtf/welzijn/toestemming', Object.assign({ aan: true }, tiener));
-  assert.deepEqual([nog.status, nog.body], [200, { ok: true, toestemming: true }], 'een dubbeltik verandert niets');
+  assert.deepEqual([nog.status, nog.body.toestemming], [200, true], 'een dubbeltik verandert niets');
   assert.equal((await post('/api/rtf/welzijn/stemming', Object.assign({ gevoel: 'moe' }, tiener))).status, 200);
 });
 

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-05T09:16:47.433Z",
-    "commit": "b100219e",
-    "boomVuil": false,
-    "boomAnders": 9,
+    "op": "2026-10-05T14:13:07.185Z",
+    "commit": "6a3f84fb",
+    "boomVuil": true,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
   },
@@ -4979,6 +4979,13 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "gezinbewaren.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "gezinenleren.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5109,6 +5116,11 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "gezondheidstoestemming.test.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 3
     },
     "ghost.test.js": {
       "soort": "server",

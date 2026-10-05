@@ -2614,12 +2614,6 @@
       "doelgroep": "publiek",
       "doel": "Begrijpen dat de opgevraagde pagina niet bestaat en een weg terug naar de site of de leden-app vinden."
     },
-    "site/techniek/techniek.html": {
-      "capability": "site.techniek",
-      "rol": "eigenaar",
-      "doelgroep": "publiek",
-      "doel": "Begrijpen hoe RTG techniek en security aanpakt (de publieke techniek- en security-pagina van de site)."
-    },
     "site/passen/business-lite.html": {
       "capability": "site.passen.business-lite",
       "rol": "eigenaar",
@@ -2673,6 +2667,12 @@
       "rol": "eigenaar",
       "doelgroep": "publiek",
       "doel": "Begrijpen wat WorkOS voor mijn organisatie kan betekenen aan de hand van een uitgewerkt voorbeeldmoment."
+    },
+    "site/techniek/techniek.html": {
+      "capability": "site.techniek",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen hoe RTG onder de motorkap werkt (codenamen, kluis, CSP, lokale modellen, meters), met de bestanden erbij en wat nog niet af is."
     }
   }
 }

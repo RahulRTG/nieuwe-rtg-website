@@ -145,7 +145,6 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-project-room').CONTRACTEN,
   // de zware poort: drie ceremonieloketten, met opzet niet herhaalbaar
   require('./mutatiecontracten-zwaar').CONTRACTEN,
-  // de teruggave na een horecacorrectie, door de manager van de zaak, per wijze
   require('./mutatiecontracten-horecateruggave').CONTRACTEN,
   /* Het eigenaarsherstel: zeven routes, per stuk beantwoord of een herhaling
      een ander antwoord krijgt. Eigen bestand, zie de kop daar. */

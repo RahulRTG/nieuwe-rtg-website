@@ -51,8 +51,32 @@ test('elk resultaat- en mogelijkheidsblok op de vier wereldpagina’s heeft verd
 });
 
 test('alle genoemde code-ankers bestaan in deze repository', () => {
-  const html = [read('index.html'), ...worldPages.map(read)].join('\n');
+  const html = [read('index.html'), read('public/site/techniek/techniek.html'), ...worldPages.map(read)].join('\n');
   for (const source of sources(html)) {
     assert.equal(fs.existsSync(path.join(root, source)), true, 'onbekend code-anker: ' + source);
   }
+});
+
+test('de technieksectie en de techniekpagina noemen bij iedere bewering een bestand', () => {
+  /* Een techniekverhaal zonder bron is marketing. Deze blokken zijn er juist voor
+     wie het wil nalezen, dus elk feit draagt een code-anker (dat de toets
+     hierboven op bestaan controleert). */
+  const html = read('index.html');
+  const sectie = html.match(/<section class="scene tech-section[\s\S]*?<\/section>/);
+  assert.ok(sectie, 'de voordeur heeft een technieksectie');
+  const feiten = [...sectie[0].matchAll(/<article>[\s\S]*?<\/article>/g)];
+  assert.equal(feiten.length, 6);
+  for (const [i, m] of feiten.entries()) {
+    assert.match(m[0], /<span class="proof-source">[^<]+<\/span>/, 'feit ' + (i + 1) + ' mist een code-anker');
+  }
+  assert.match(sectie[0], /href="\.\/public\/site\/techniek\/techniek\.html"/);
+
+  const pagina = read('public/site/techniek/techniek.html');
+  const kaarten = [...pagina.matchAll(/<article class="(?:outcome|capability)">[\s\S]*?<\/article>/g)];
+  assert.equal(kaarten.length, 16, 'privacy (3), stapel (6), bewijs (3) en wat nog niet af is (4)');
+  for (const [i, m] of kaarten.entries()) {
+    assert.match(m[0], /<details class="proof-detail">/, 'kaart ' + (i + 1) + ' mist verdieping');
+    assert.match(m[0], /<span class="proof-source">[^<]+<\/span>/, 'kaart ' + (i + 1) + ' mist code-ankers');
+  }
+  assert.match(pagina, /id="open"[\s\S]*Wat nog niet af is/, 'de pagina zegt ook wat er ontbreekt');
 });

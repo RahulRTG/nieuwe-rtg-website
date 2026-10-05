@@ -47,6 +47,18 @@ function bestaatDbJson(env) {
   } catch (e) { return false; }
 }
 
+/* Welke stand zet een tweede schrijver op dezelfde opslag? null als er een is.
+   De domeinlijst staat hier en niet geimporteerd, omdat ../opzet/routes.js bij
+   het laden routes aanhangt; test/productie-failclosed.test.js houdt de twee
+   lijsten gelijk. */
+const ALLE_DOMEINEN = ['auth', 'member', 'supplier', 'office', 'staff', 'social', 'techniek', 'zakelijk', 'wereld'];
+function meerdereSchrijvers(env) {
+  if (env.RTG_SPREIDING === '1') return 'RTG_SPREIDING=1';
+  if (env.RTG_DOMAINS === undefined) return null;
+  const gekozen = new Set(String(env.RTG_DOMAINS).split(',').map(s => s.trim()).filter(s => s && s !== '-'));
+  return ALLE_DOMEINEN.every(d => gekozen.has(d)) ? null : 'RTG_DOMAINS=' + env.RTG_DOMAINS;
+}
+
 function keurOpslag(env, fouten, waarschuwingen) {
   const store = keuze.kiesStore(env, bestaatDbJson(env));
   const databaseUrl = env.DATABASE_URL || env.PG_URL;
@@ -73,6 +85,17 @@ function keurOpslag(env, fouten, waarschuwingen) {
       'Zet DATABASE_URL (PostgreSQL) of RTG_STORE=sqlite' +
       (env.TX_LEDGER_SQLITE === '0' ? ' en haal TX_LEDGER_SQLITE=0 weg' : '') + '.');
   }
+  /* EEN BAK, MAAR OOK EEN SCHRIJVER (RTG-V1-RELEASE C6). De samenvoeging tussen
+     processen (../db/merge.js) laat bij twee wijzigingen van hetzelfde veld de
+     laatste schrijver winnen: een saldo-update van het ene proces verdwijnt dan
+     stil onder die van het andere. Met een schrijvend proces gebeurt dat niet;
+     met twee wel. Twee standen maken er twee: spreiding (volgers die schrijven,
+     ../trio-spreiding.js) en een opgesplitst RTG_DOMAINS (../poort.js zegt
+     zelf dat er dan precies een proces hoort te schrijven). PostgreSQL heeft
+     voor een verzoek een conflictvaste merge (../pg/verzoekmerge.js). */
+  if (store === 'sqlite' && meerdereSchrijvers(env))
+    fouten.push('Meerdere schrijvende processen op SQLite (' + meerdereSchrijvers(env) + '): de samenvoeging tussen processen laat bij een ' +
+      'gelijktijdige wijziging de laatste schrijver winnen, en dan verdwijnt een update stil. Zet DATABASE_URL (PostgreSQL) of draai een schrijvend proces.');
   /* Sqlite mag, maar deelt niet tussen instances. Dat is een aanbeveling en geen
      blokkade: een enkele bak met sqlite is een geldige productiestand. */
   if (!env.DATABASE_URL && store === 'sqlite')
@@ -80,4 +103,4 @@ function keurOpslag(env, fouten, waarschuwingen) {
   return store;
 }
 
-module.exports = { keurOpslag, bestaatDbJson };
+module.exports = { keurOpslag, bestaatDbJson, meerdereSchrijvers, ALLE_DOMEINEN };

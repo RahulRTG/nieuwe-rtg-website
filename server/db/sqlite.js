@@ -5,6 +5,7 @@ const path = require('path');
 const kluis = require('../kluis');
 const state = require('./state');
 const { merge3 } = require('./merge');
+const { melder } = require('./botsing'); // C6: botsing hoorbaar
 const { DATA_DIR, STORE, besloten, beslotenMap } = require('./opslag');
 // De goedkope veranderingsdetectie op GROTE collecties; daar staat ook waarom
 // hij veilig is en waarom geld er nooit door gaat.
@@ -106,7 +107,7 @@ function saveSqlite(force, sleutels, extraAudit = [], duurzaam = false) {
       // in plaats van hun wijzigingen te overschrijven.
       if (rij && rij.ver > (toegepast.get(k) || 0)) {
         const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
-        const samen = merge3(base, db.data[k], JSON.parse(uitStore(rij.val)));
+        const samen = merge3(base, db.data[k], JSON.parse(uitStore(rij.val)), melder(k));
         db.data[k] = samen;
         j = JSON.stringify(samen);
         // na een merge is de collectie een ANDER object: de maten van de
@@ -146,7 +147,7 @@ function pollSqlite() {
       const baseJson = laatsteJson.get(sleutel);
       const hunJson = uitStore(r.val);
       const lokaalOpenstaand = baseJson !== undefined && JSON.stringify(db.data[sleutel]) !== baseJson;
-      const waarde = lokaalOpenstaand ? merge3(JSON.parse(baseJson), db.data[sleutel], JSON.parse(hunJson)) : JSON.parse(hunJson);
+      const waarde = lokaalOpenstaand ? merge3(JSON.parse(baseJson), db.data[sleutel], JSON.parse(hunJson), melder(sleutel)) : JSON.parse(hunJson);
       voorbereid.push({ sleutel, waarde, hunJson, lokaalOpenstaand, ver: r.ver });
     }
     audits.publiceerSnapshots(audit);

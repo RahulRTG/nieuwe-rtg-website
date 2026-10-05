@@ -135,3 +135,42 @@ test('12. een OPENBAAR adres zonder NODE_ENV + RTG_DEV_LINKS=1 => hardeFouten (C
   assert.ok(r.hardeFouten.some(f => /RTG_DEV_LINKS/.test(f)),
     'op een openbaar adres hoort RTG_DEV_LINKS een harde fout te zijn: ' + JSON.stringify(r.hardeFouten));
 });
+
+/* C6 (SQLite met meerdere schrijvers): de merge tussen processen laat de
+   laatste schrijver winnen, dus een tweede schrijvend proces op SQLite
+   verliest stil updates. Een schrijver op SQLite blijft een geldige stand. */
+const opslagKeuring = require('../server/config/productie-opslag');
+const { DATABASE_URL: _weg, ...SQLITE } = { ...VEILIG, RTG_STORE: 'sqlite' };
+const opslagFout = (r) => [...r.fouten, ...r.hardeFouten].some(f => /Meerdere schrijvende processen op SQLite/.test(f));
+
+test('13. productie + SQLite + RTG_SPREIDING=1 weigert de start (C6)', () => {
+  const r = config.valideer({ ...SQLITE, RTG_SPREIDING: '1' });
+  assert.ok(weigert(r) && opslagFout(r), JSON.stringify([...r.fouten, ...r.hardeFouten]));
+});
+
+test('14. productie + SQLite + een opgesplitst RTG_DOMAINS weigert de start (C6)', () => {
+  assert.ok(opslagFout(config.valideer({ ...SQLITE, RTG_DOMAINS: 'member,social' })));
+  assert.ok(opslagFout(config.valideer({ ...SQLITE, RTG_DOMAINS: '-' })), 'een vlootproces naast het hoofdproces is ook een tweede schrijver');
+});
+
+test('15. CONTRAST: een schrijvend proces op SQLite blijft een geldige productiestand (C6)', () => {
+  assert.equal(opslagFout(config.valideer(SQLITE)), false, 'het bestaande besluit: een bak met sqlite mag');
+  assert.equal(opslagFout(config.valideer({ ...SQLITE, RTG_DOMAINS: opslagKeuring.ALLE_DOMEINEN.join(',') })), false,
+    'alle domeinen in een proces is een schrijver');
+  assert.equal(opslagFout(config.valideer({ ...VEILIG, RTG_SPREIDING: '1' })), false, 'PostgreSQL met spreiding is de bedoelde stand');
+});
+
+test('16. een OPENBAAR adres zonder NODE_ENV + SQLite + spreiding => hardeFouten (C6)', () => {
+  const { NODE_ENV, ...zonderProd } = SQLITE;
+  const r = config.valideer({ ...zonderProd, APP_URL: PUBLIEK, RTG_SPREIDING: '1' });
+  assert.ok(r.hardeFouten.some(f => /Meerdere schrijvende processen op SQLite/.test(f)), JSON.stringify(r.hardeFouten));
+});
+
+test('17. de domeinlijst van de keuring is dezelfde als die van de router (C6)', () => {
+  const bron = require('fs').readFileSync(require('path').join(__dirname, '..', 'server/opzet/routes.js'), 'utf8');
+  const m = /const ALLE_DOMEINEN = \[([^\]]*)\]/.exec(bron);
+  assert.ok(m, 'ALLE_DOMEINEN niet gevonden in server/opzet/routes.js');
+  const router = m[1].split(',').map(s => s.trim().replace(/^'|'$/g, '')).filter(Boolean);
+  assert.deepEqual([...router].sort(), [...opslagKeuring.ALLE_DOMEINEN].sort(),
+    'loopt deze lijst uit elkaar, dan telt de keuring een proces met alle domeinen als tweede schrijver of andersom');
+});

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-05T11:33:53.626Z",
-    "commit": "37415250",
+    "op": "2026-10-05T09:16:19.303Z",
+    "commit": "b100219e",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 5,
     "instrument": "scripts/gastsplitsing.js",
     "node": "v22.22.0"
   },
@@ -11,13 +11,13 @@
   "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
   "uitleg": "Per plek in server/ die op de gast toetst: maakt de code het onderscheid tussen bezoeker en gratis account, en wat zegt de weigering dat er nodig is. account-belofte = de tekst zegt dat een account of profiel volstaat, terwijl de code ook het gratis account weigert.",
   "gemeten": {
-    "bestanden": 124,
-    "plekken": 140,
+    "bestanden": 123,
+    "plekken": 139,
     "perSoort": {
       "vertakt": 23,
-      "onderscheidt": 23,
+      "onderscheidt": 24,
       "pas-eis": 11,
-      "leden": 82,
+      "leden": 80,
       "zonder-tekst": 1
     },
     "tegenspraak": 0
@@ -455,17 +455,12 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/privacy.js:15",
-      "soort": "leden",
-      "zegt": "Alleen voor leden."
+      "plek": "server/routes/member/privacy.js:21",
+      "soort": "onderscheidt",
+      "zegt": null
     },
     {
-      "plek": "server/routes/member/privacy.js:81",
-      "soort": "leden",
-      "zegt": "Alleen voor leden."
-    },
-    {
-      "plek": "server/routes/member/privacy.js:99",
+      "plek": "server/routes/member/privacy.js:93",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
@@ -715,12 +710,12 @@
       "zegt": null
     },
     {
-      "plek": "server/server.js:1272",
+      "plek": "server/server.js:1258",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/server.js:1298",
+      "plek": "server/server.js:1284",
       "soort": "vertakt",
       "zegt": null
     }

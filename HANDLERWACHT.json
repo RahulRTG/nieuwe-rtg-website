@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-05T20:27:33.061Z",
-  "commit": "4c70964c",
+  "op": "2026-10-05T09:56:17.642Z",
+  "commit": "c07eea11",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.0"
  },
@@ -360,7 +360,7 @@
   },
   {
    "sleutel": "POST /api/auth/tweede",
-   "bestand": "server/routes/member/tweefactor.js:129",
+   "bestand": "server/routes/member/tweefactor.js:109",
    "staat": "eigenControle"
   },
   {
@@ -1598,19 +1598,19 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen",
-   "bestand": "server/foundation/zorg.js:106",
+   "bestand": "server/foundation/zorg.js:107",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/bevestig",
-   "bestand": "server/foundation/zorg.js:113",
+   "bestand": "server/foundation/zorg.js:114",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/intrekken",
-   "bestand": "server/foundation/zorg.js:121",
+   "bestand": "server/foundation/zorg.js:122",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -4066,7 +4066,7 @@
   },
   {
    "sleutel": "POST /api/techniek/inloggen",
-   "bestand": "server/routes/techniek/inlog.js:57",
+   "bestand": "server/routes/techniek/inlog.js:29",
    "staat": "eigenControle"
   },
   {
@@ -4200,7 +4200,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1391",
+   "bestand": "server/server.js:1412",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

@@ -59,6 +59,8 @@ const EIGENAAR = {
      staat in de kop van scripts/outputband.js zelf en is hier niet verzonnen. */
   'OUTPUTPROEF.json': { schrijver: 'scripts/outputproef.js',
     waarom: 'outputband.js is "GEEN TWEEDE METING": de selectie (kiesKandidaten) en de meting (meetEen) komen allebei uit outputproef.js; de band bepaalt alleen wie wat wanneer meet en houdt EEN schrijver op het register. De meetronde draait outputproef.js, en die zet zich in de stempel.' },
+  'DPIA-GEZIN.md': { soort: 'BRON',
+    waarom: 'Handmatig opgestelde DPIA voor de gezinslaag van FoundationOS (5 oktober 2026); de weging is een voorstel en de vaststelling is mensenwerk. Het bewijs staat in test/gezinseigenaar.test.js.' },
   'KETENS.md': { soort: 'BRON',
     waarom: 'Handmatig onderhouden norm en bereik van operationele ketens; scripts/operationeel.js verzamelt vers uitvoerbaar bewijs en bewaart onbekende grenzen.' },
   'DESKTOP-STANDAARD.md': { soort: 'BRON',

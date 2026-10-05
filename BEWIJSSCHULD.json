@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-04T19:19:07.528Z",
-  "commit": "b02914cd7",
-  "boomVuil": true,
-  "boomAnders": 35,
+  "op": "2026-10-05T01:18:00.697Z",
+  "commit": "ca0a3a151",
+  "boomVuil": false,
+  "boomAnders": 1,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v24.18.0"
  },
@@ -198,253 +198,253 @@
  "historie": {
   "auth-onbeslist": [
    {
-    "op": "2026-09-29",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-01",
     "aantal": 1
    },
    {
     "op": "2026-10-04",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 1
    }
   ],
   "capability-in-handler": [
    {
-    "op": "2026-09-29",
-    "aantal": 560
-   },
-   {
     "op": "2026-10-01",
     "aantal": 560
    },
    {
     "op": "2026-10-04",
+    "aantal": 560
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 560
    }
   ],
   "objectpoort": [
    {
-    "op": "2026-09-29",
-    "aantal": 52
-   },
-   {
     "op": "2026-10-01",
     "aantal": 52
    },
    {
     "op": "2026-10-04",
+    "aantal": 52
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 52
    }
   ],
   "output-deuren": [
    {
-    "op": "2026-09-29",
-    "aantal": 21
-   },
-   {
     "op": "2026-10-01",
     "aantal": 21
    },
    {
     "op": "2026-10-04",
+    "aantal": 21
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 21
    }
   ],
   "lichaamssleutel": [
    {
-    "op": "2026-09-29",
-    "aantal": 102
-   },
-   {
     "op": "2026-10-01",
     "aantal": 102
    },
    {
     "op": "2026-10-04",
+    "aantal": 102
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 102
    }
   ],
   "output-niet-toerekenbaar": [
    {
-    "op": "2026-09-29",
-    "aantal": 1037
-   },
-   {
     "op": "2026-10-01",
     "aantal": 1037
    },
    {
     "op": "2026-10-04",
+    "aantal": 0
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 0
    }
   ],
   "output-blind": [
    {
-    "op": "2026-09-29",
-    "aantal": 0
-   },
-   {
     "op": "2026-10-01",
     "aantal": 0
    },
    {
     "op": "2026-10-04",
+    "aantal": 0
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
-    "op": "2026-09-29",
-    "aantal": 4
-   },
-   {
     "op": "2026-10-01",
     "aantal": 4
    },
    {
     "op": "2026-10-04",
+    "aantal": 4
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 4
    }
   ],
   "audit-wisselend": [
    {
-    "op": "2026-09-29",
-    "aantal": null
-   },
-   {
     "op": "2026-10-01",
     "aantal": null
    },
    {
     "op": "2026-10-04",
+    "aantal": null
+   },
+   {
+    "op": "2026-10-05",
     "aantal": null
    }
   ],
   "audit-verklaard": [
    {
-    "op": "2026-09-29",
-    "aantal": null
-   },
-   {
     "op": "2026-10-01",
     "aantal": null
    },
    {
     "op": "2026-10-04",
+    "aantal": null
+   },
+   {
+    "op": "2026-10-05",
     "aantal": null
    }
   ],
   "rollback-gezakt": [
    {
-    "op": "2026-09-29",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-01",
     "aantal": 1
    },
    {
     "op": "2026-10-04",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 1
    }
   ],
   "object-vooraf": [
    {
-    "op": "2026-09-29",
-    "aantal": 323
-   },
-   {
     "op": "2026-10-01",
     "aantal": 323
    },
    {
     "op": "2026-10-04",
+    "aantal": 323
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 323
    }
   ],
   "proefruis": [
    {
-    "op": "2026-09-29",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-01",
     "aantal": 1
    },
    {
     "op": "2026-10-04",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 1
    }
   ],
   "gevolg-onbekend": [
    {
-    "op": "2026-09-29",
-    "aantal": 96
-   },
-   {
     "op": "2026-10-01",
     "aantal": 96
    },
    {
     "op": "2026-10-04",
+    "aantal": 96
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 96
    }
   ],
   "droogloop-onbeoordeeld": [
    {
-    "op": "2026-09-29",
-    "aantal": 2
-   },
-   {
     "op": "2026-10-01",
     "aantal": 2
    },
    {
     "op": "2026-10-04",
+    "aantal": 2
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
-    "op": "2026-09-29",
-    "aantal": 49
-   },
-   {
     "op": "2026-10-01",
     "aantal": 49
    },
    {
     "op": "2026-10-04",
+    "aantal": 49
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 49
    }
   ],
   "idem-ongeclassificeerd": [
    {
-    "op": "2026-09-29",
-    "aantal": 1613
-   },
-   {
     "op": "2026-10-01",
     "aantal": 152
    },
    {
     "op": "2026-10-04",
+    "aantal": 152
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 152
    }
   ],
   "wegwerpserver-kopieen": [
    {
-    "op": "2026-09-29",
-    "aantal": 3
-   },
-   {
     "op": "2026-10-01",
     "aantal": 3
    },
    {
     "op": "2026-10-04",
+    "aantal": 3
+   },
+   {
+    "op": "2026-10-05",
     "aantal": 3
    }
   ]
@@ -497,6 +497,12 @@
    "aantal": 49,
    "meetdagen": 3,
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: wat hier nog staat, vraagt een WERELD die de proef niet opzet: een zaak met de werkvorm journalistiek, een ingericht landpakket, een salon, een geplande reisoptie. Elk draagt in HERSTELPROEF.json wat er zou moeten bestaan (`wereldOntbreekt`). Sluiten betekent hier dus die wereld opzetten in scripts/lib/herstelwereld.js -- per stuk, en alleen langs de gewone routes. Wat de afleiding uberhaupt niet ziet blijft daarbuiten: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
+  },
+  {
+   "id": "idem-ongeclassificeerd",
+   "aantal": 152,
+   "meetdagen": 3,
+   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: per route beslissen en vastleggen in de canonieke server/lib/mutatiecontracten (gevalideerd met dezelfde contractkeuring), of het oudere IDEMBESLUIT.json. Een fixtureblokkade, tebeslissen of onbekende semantiek blijft open. Dit telt uitsluitend het bestaan van een geldig besluit; runtimebewijs blijft afzonderlijk in IDEMPROEF.json en de bewijsmatrix staan."
   },
   {
    "id": "wegwerpserver-kopieen",

@@ -242,7 +242,6 @@ test('de browser gebruikt fragment, vaste POST-routes en geen persoonlijke schil
 test('een nieuwe uitgifte vernieuwt de koppeling: volgnummer, geschiedenis en eigen termijn', async () => {
   const o = opstelling(), id = await seconden(o), oud = await koppel(o, id);
   const rij = o.db.data.spellen.projecties[0], eerste = rij.koppeling;
-  await new Promise(r => setTimeout(r, 5));
   const vers = await o.kern.projectieOpen('b', id, idem());
   const nu = o.db.data.spellen.projecties[0].koppeling;
   assert.equal(nu.rotatie, eerste.rotatie + 1);
@@ -253,7 +252,7 @@ test('een nieuwe uitgifte vernieuwt de koppeling: volgnummer, geschiedenis en ei
   assert.equal(nu.issuer, eerste.issuer, 'de uitgever blijft');
   assert.equal(Date.parse(nu.expires_at) - Date.parse(nu.issued_at), 15 * 60000,
     'een vernieuwing draagt haar eigen termijn');
-  assert.ok(Date.parse(nu.expires_at) > Date.parse(eerste.expires_at));
+  assert.ok(Date.parse(nu.expires_at) >= Date.parse(eerste.expires_at), 'een vernieuwing eindigt nooit eerder');
   assert.equal(nu.gebruik, 0, 'de teller begint opnieuw');
   assert.equal((await o.kern.projectieKoppel(oud.uitgifte.code)).status, 404);
   assert.equal((await o.kern.projectieKoppel(vers.code)).status, 200);

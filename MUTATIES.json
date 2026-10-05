@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T11:52:43.522Z",
-    "commit": "6bd72f612",
+    "op": "2026-10-05T12:11:27.842Z",
+    "commit": "2ee5c97ed",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3611,6 +3611,14 @@
       "module": "server/kern/envelop.js",
       "operator": "!==->===#0",
       "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "envelopv2.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/envelop.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "envelopvelden.test.js": {

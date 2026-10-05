@@ -15,28 +15,42 @@ for (const breedte of [390,1440]) test('dagelijks werk vanaf nul en gastakkoord 
     await page.getByRole('button',{name:'Eigen werkruimte maken',exact:true}).click();
     const paneel=page.locator('#praktijk');
     page.setDefaultTimeout(12000);
+    /* Elke bewaring bouwt het paneel opnieuw op, en het scherm houdt daarbij
+       vast welke blokken open stonden. Een klik op een summary KLAPT dus om:
+       wie blind klikt terwijl het vorige antwoord nog onderweg is, sluit een
+       blok dat al open stond. Daarom eerst wachten op de stand die bij de
+       vorige stap hoort (dan is het paneel herbouwd), en alleen openen wat
+       dicht is. */
+    const werk=paneel.locator('[data-pr-werk]');
+    const werkStand=async st=>{await werk.locator('.pr-status').filter({hasText:new RegExp('· '+st+'( ·|$)')}).waitFor({state:'attached'});};
+    const openAls=async summary=>{await summary.waitFor({state:'attached'});
+      if(!await summary.evaluate(el=>el.closest('details').open)) await summary.click();};
+    const openWerk=async st=>{await werkStand(st);await openAls(werk.locator(':scope > summary'));};
+    const openBlok=async tekst=>openAls(paneel.getByText(tekst,{exact:true}));
     await paneel.getByLabel('Hoe werkt u?').selectOption('stichting');
     await paneel.getByRole('button',{name:'Werkplek bewaren',exact:true}).click();
-    await paneel.getByText('Aanbod toevoegen · 0 onderdelen',{exact:true}).click();
+    await openBlok('Aanbod toevoegen · 0 onderdelen');
     await paneel.getByLabel('Wat biedt u aan?').fill('Samen koken');
     await paneel.getByLabel('Soort',{exact:true}).selectOption('activiteit');
     await paneel.getByLabel('Omschrijving',{exact:true}).fill('Een gezellige kookmiddag');
     await paneel.getByLabel('Prijs',{exact:true}).selectOption('kosteloos');
     await paneel.getByLabel('Locatie, vestiging of online').fill('Buurthuis Haarlem');
     await paneel.getByRole('button',{name:'Aanbod bewaren',exact:true}).click();
-    await paneel.getByText('Klantvraag of hulpvraag toevoegen',{exact:true}).click();
+    await openBlok('Klantvraag of hulpvraag toevoegen');
     await paneel.getByLabel('Klant of contactpersoon (een herkenbare naam is genoeg)').fill('Mijn buur');
     await paneel.getByLabel('Wat wil deze persoon?').fill('Met drie mensen komen koken');
     await paneel.getByRole('button',{name:'Vraag bewaren',exact:true}).click();
-    await paneel.getByText('Aanbod toevoegen · 1 onderdelen',{exact:true}).click();
+    await werkStand('vraag');
+    await openBlok('Aanbod toevoegen · 1 onderdelen');
     await paneel.getByLabel('Wat biedt u aan?').fill('Volgende activiteit als concept');
-    await paneel.locator('[data-pr-werk] > summary').click();
+    await openWerk('vraag');
     await paneel.getByLabel('Wat spreekt u af?').fill('Gratis kookmiddag, materialen inbegrepen');
     await paneel.getByRole('button',{name:'Voorstel maken',exact:true}).click();
+    await werkStand('voorstel');
     assert.equal(await paneel.getByLabel('Wat biedt u aan?').inputValue(),'Volgende activiteit als concept','ander formulier blijft bewaard');
     await paneel.getByLabel('Wat biedt u aan?').fill('');
     page.on('dialog', d=>d.accept());
-    await paneel.locator('[data-pr-werk] > summary').click();
+    await openWerk('voorstel');
     await paneel.getByRole('button',{name:'Klantlink maken',exact:true}).click();
     const link=await paneel.locator('.pr-link').getAttribute('href');assert.ok(link.includes('#gast='));
     const gast=await browser.newPage({viewport:{width:breedte,height:900}});letOpFouten(gast,fouten);
@@ -45,12 +59,14 @@ for (const breedte of [390,1440]) test('dagelijks werk vanaf nul en gastakkoord 
     await gast.locator('#praktijkGast').getByText('bevestigd',{exact:true}).waitFor();
     assert.equal(await gast.locator('#praktijkGast').getByText('Mijn buur',{exact:true}).count(),0);
     await page.reload({waitUntil:'domcontentloaded'});
-    await paneel.locator('[data-pr-werk] > summary').click();
+    await openWerk('bevestigd');
     await paneel.getByLabel('Uitvoerdatum',{exact:true}).fill('2026-12-01');
     await paneel.getByLabel('Wie voert het uit?').fill('Sam');
     await paneel.getByRole('button',{name:'Werk plannen',exact:true}).click();
-    await paneel.locator('[data-pr-werk] > summary').click();
-    await paneel.getByText('Externe afspraken en onderdelen · 0',{exact:true}).click();
+    await werkStand('ingepland');
+    assert.equal(await werk.evaluate(d=>d.open),true,'het werk blijft open na een vastgelegde stap');
+    await openWerk('ingepland');
+    await openBlok('Externe afspraken en onderdelen · 0');
     await paneel.getByLabel('Wat wordt geregeld?',{exact:true}).fill('Keukenruimte huren');
     await paneel.getByLabel('Uitvoerende partij',{exact:true}).fill('Buurthuis');
     await paneel.getByLabel('Externe stand',{exact:true}).selectOption('uitgevoerd');
@@ -61,14 +77,14 @@ for (const breedte of [390,1440]) test('dagelijks werk vanaf nul en gastakkoord 
     await paneel.getByText('Externe afspraken en onderdelen · 1',{exact:true}).waitFor({state:'attached'});
     await paneel.locator('b').filter({hasText:/^Keukenruimte huren$/}).waitFor({state:'attached'});
     assert.match(await paneel.textContent(),/Ontvangstbewijs BH-01/);
-    await paneel.locator('[data-pr-werk] > summary').click();
+    await openWerk('ingepland');
     await paneel.getByLabel('Wat is daadwerkelijk uitgevoerd?').fill('Samen gekookt en opgeruimd');
     await paneel.getByRole('button',{name:'Uitvoering vastleggen',exact:true}).click();
-    await paneel.locator('[data-pr-werk] > summary').click();
+    await openWerk('uitgevoerd');
     await paneel.getByLabel('Verwijzing naar uw administratie of uitleg').fill('Kosteloze vrijwilligersactiviteit');
     await paneel.getByRole('button',{name:'Administratief afronden',exact:true}).click();
     await paneel.getByText('Mijn buur · afgerond · 2026-12-01',{exact:true}).waitFor();
-    await paneel.locator('[data-pr-werk] > summary').click();
+    await openWerk('afgerond');
     await paneel.getByRole('button',{name:'Klantlinks intrekken',exact:true}).click();
     await paneel.getByText('Alle klantlinks voor deze afspraak zijn ingetrokken.',{exact:true}).waitFor();
     await gast.reload({waitUntil:'domcontentloaded'});
@@ -82,7 +98,7 @@ for (const breedte of [390,1440]) test('dagelijks werk vanaf nul en gastakkoord 
     await collega.getByRole('button',{name:'Toegang aanvragen',exact:true}).click();
     await collega.getByRole('button',{name:'Controleer mijn toegang',exact:true}).click();
     assert.equal(await collega.locator('#inhoud').isVisible(),false,'wachten geeft nog geen toegang');
-    await paneel.getByText('Team en tijdelijke rechten',{exact:true}).click();
+    await openBlok('Team en tijdelijke rechten');
     await paneel.getByRole('button',{name:'Team laden',exact:true}).click();
     await paneel.getByText('Collega Noor · wacht',{exact:true}).click();
     await paneel.getByRole('button',{name:'Persoon toelaten',exact:true}).click();

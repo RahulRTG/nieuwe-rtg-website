@@ -12,19 +12,19 @@
   const knop = t => '<button class="knop p" type="submit">' + e(t) + '</button>';
   function inrichten(d) {
     const p = d.profiel || {};
-    return '<details' + (!d.profiel ? ' open' : '') + '><summary>Uw werkplek inrichten</summary><p>Begin met wat u vandaag doet. U kunt producten, diensten, verhuur, activiteiten en hulp combineren.</p>' +
+    return '<details data-pr-blok="inrichten"' + (!d.profiel ? ' open' : '') + '><summary>Uw werkplek inrichten</summary><p>Begin met wat u vandaag doet. U kunt producten, diensten, verhuur, activiteiten en hulp combineren.</p>' +
       '<form data-pr="inrichten">' + keuze('profiel','Hoe werkt u?',d.profielen,p.profiel) +
       window.RTGPraktijkRegio.velden(p) + knop('Werkplek bewaren') + '</form></details>';
   }
   function aanbod(d) {
-    return '<details><summary>Aanbod toevoegen · ' + d.aanbod.length + ' onderdelen</summary><p>Dit is uw interne aanbod. Het wordt pas openbaar via de bestaande toelatingsroute.</p><ul>' +
+    return '<details data-pr-blok="aanbod"><summary>Aanbod toevoegen · ' + d.aanbod.length + ' onderdelen</summary><p>Dit is uw interne aanbod. Het wordt pas openbaar via de bestaande toelatingsroute.</p><ul>' +
       d.aanbod.map(a => '<li>' + e(a.naam) + ' · ' + e(labels[a.soort]) + ' · ' + e(a.locatie) + '</li>').join('') + '</ul>' +
       '<form data-pr="aanbod">' + veld('naam','Wat biedt u aan?') + keuze('soort','Soort',d.soorten) + tekst('omschrijving','Omschrijving') +
       keuze('prijswijze','Prijs',['vast','op-aanvraag','kosteloos']) + veld('bedrag','Bedrag in ' + d.profiel.valuta, '0', 'number') +
       veld('locatie','Locatie, vestiging of online') + knop('Aanbod bewaren') + '</form></details>';
   }
   function vraag(d) {
-    return '<details><summary>Klantvraag of hulpvraag toevoegen</summary><form data-pr="vraag"><label>Aanbod<select name="aanbodId">' +
+    return '<details data-pr-blok="vraag"><summary>Klantvraag of hulpvraag toevoegen</summary><form data-pr="vraag"><label>Aanbod<select name="aanbodId">' +
       d.aanbod.map(a => '<option value="' + e(a.id) + '">' + e(a.naam) + '</option>').join('') + '</select></label>' +
       veld('klant','Klant of contactpersoon (een herkenbare naam is genoeg)') + tekst('vraag','Wat wil deze persoon?') +
       '<label>Gewenste datum (optioneel)<input type="date" name="datum"></label>' + knop('Vraag bewaren') + '</form></details>';
@@ -46,7 +46,7 @@
       tekst('toelichting','Al telefonisch of persoonlijk akkoord? Noteer hoe en wanneer.') + knop('Bestaand akkoord vastleggen') + '</form>';
     if (['voorstel','bevestigd','ingepland','uitgevoerd','afgerond'].includes(x.stand)) f += '<div class="pr-rij"><button type="button" class="knop" data-pr-deel="' + e(x.id) + '">Klantlink maken</button>' +
       '<button type="button" class="knop" data-pr-intrek="' + e(x.id) + '">Klantlinks intrekken</button></div>';
-    if (['vraag','voorstel','bevestigd','ingepland','afgewezen'].includes(x.stand)) f += '<details><summary>Werk annuleren</summary><form data-pr="stap" data-project="' + e(x.id) + '" data-stap="annuleren">' + tekst('toelichting','Reden van annulering') + knop('Annulering vastleggen') + '</form></details>';
+    if (['vraag','voorstel','bevestigd','ingepland','afgewezen'].includes(x.stand)) f += '<details data-pr-blok="annuleren"><summary>Werk annuleren</summary><form data-pr="stap" data-project="' + e(x.id) + '" data-stap="annuleren">' + tekst('toelichting','Reden van annulering') + knop('Annulering vastleggen') + '</form></details>';
     if (!['afgerond','geannuleerd'].includes(x.stand)) f += window.RTGPraktijkExtern.formulier(x);
     return '<details data-pr-werk="' + e(x.id) + '"><summary><b>' + e(x.naam) + '</b><br><span class="pr-status">' + e(x.klant) + ' · ' + e(x.stand) + (x.datum ? ' · ' + e(x.datum) : '') + '</span></summary>' +
       '<p>' + e(x.omschrijving) + '</p>' + (x.voorstel ? '<p><b>Afspraak:</b> ' + e(x.voorstel) + '</p>' : '') +
@@ -55,7 +55,7 @@
   }
   window.RTGPraktijkUI = { veld, knop, teken: d => '<h2>Uw dagelijkse werk</h2><p>Van een eerste vraag tot afgerond werk. Alles met de hand te gebruiken, ook zonder andere software.</p>' +
     inrichten(d) + (d.profiel ? aanbod(d) + (d.aanbod.length ? vraag(d) : '<p>Voeg uw eerste product, dienst of activiteit toe.</p>') : '') +
-    '<details><summary>Team en tijdelijke rechten</summary><button class="knop" type="button" data-pr-team>Team laden</button><div id="prTeam"></div></details>' +
+    '<details data-pr-blok="team"><summary>Team en tijdelijke rechten</summary><button class="knop" type="button" data-pr-team>Team laden</button><div id="prTeam"></div></details>' +
     '<h3>Uw werk · ' + d.pagina.totaal + '</h3>' + (d.werk.length ? d.werk.map(werk).join('') : '<p>Nog geen vragen. Uw eigen werk verschijnt hier zodra u begint.</p>') +
     '<div class="pr-rij">' + (d.pagina.offset > 0 ? '<button class="knop" data-pr-pagina="' + Math.max(0,d.pagina.offset-50) + '">Vorige 50</button>' : '') +
     (d.pagina.offset + 50 < d.pagina.totaal ? '<button class="knop" data-pr-pagina="' + (d.pagina.offset+50) + '">Volgende 50</button>' : '') + '</div>' };

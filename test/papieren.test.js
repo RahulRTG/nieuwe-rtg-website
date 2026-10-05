@@ -166,12 +166,12 @@ test('10. EEN MERKTEKEN ZONDER VRAAG IS OOK EEN GAT', () => {
   const heel = papieren.document('verwerkingsregister');
   assert.equal(heel.gaten, 0, 'alles beantwoord: geen gaten');
 
-  const bestand = path.join(__dirname, '..', 'VERWERKINGSREGISTER.md');
-  const origineel = fs.readFileSync(bestand, 'utf8');
-  try {
-    fs.writeFileSync(bestand, origineel + '\n\nVerantwoordelijke: {{eenveldzonder_vraag}}\n');
-    const met = papieren.document('verwerkingsregister');
-    assert.equal(met.gaten, 1, 'een merkteken zonder vraag telt als gat');
-    assert.match(met.tekst, /\{\{eenveldzonder_vraag\}\}/, 'en blijft zichtbaar in de tekst staan');
-  } finally { fs.writeFileSync(bestand, origineel); }
+  /* Op een tekst in het geheugen en NIET door het echte VERWERKINGSREGISTER.md te
+     herschrijven: papieren-boardroom.test.js leest dat bestand in dezelfde
+     CI-scherf, en writeFileSync maakt het eerst leeg -- de lezer kreeg dan een
+     leeg document (gaten 0, tekst ''). Dezelfde telling als document() gebruikt. */
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'VERWERKINGSREGISTER.md'), 'utf8');
+  const met = papieren.vulIn(bron + '\n\nVerantwoordelijke: {{eenveldzonder_vraag}}\n');
+  assert.equal(papieren.telGaten(met), 1, 'een merkteken zonder vraag telt als gat');
+  assert.match(met, /\{\{eenveldzonder_vraag\}\}/, 'en blijft zichtbaar in de tekst staan');
 });

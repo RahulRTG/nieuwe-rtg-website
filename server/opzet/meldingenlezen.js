@@ -15,11 +15,14 @@
    met dezelfde pas op gelezen.
 
    In DEMO valt de sleutel samen met de pas; dan is er een bak, van de persona
-   zelf, en wordt er niets dubbel getoond. */
+   zelf, en wordt er niets dubbel getoond.
+
+   Deze module krijgt een BAKLEZER mee en niet de database: de toegang tot
+   de database blijft in ../server.js, zodat er geen nieuwe db-deur bij komt. */
 'use strict';
 
-function maakMeldingenLezer(db) {
-  const bak = (naam) => (db.data.notifications[naam] || []);
+function maakMeldingenLezer(bakVan) {
+  const bak = (naam) => bakVan(naam) || [];
   function meldingenVan(sess) {
     const eigen = bak(sess.key);
     if (!sess.tier || sess.key === sess.tier) return eigen.slice(0, 40);

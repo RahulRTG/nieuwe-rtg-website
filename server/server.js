@@ -1071,7 +1071,7 @@ app.get('/api/stream', (req, res) => {
 });
 
 /* Welke bakken een lid ziet en afvinkt: ./opzet/meldingenlezen.js. */
-const { meldingenVan, markeerGelezen } = require('./opzet/meldingenlezen').maakMeldingenLezer(db);
+const { meldingenVan, markeerGelezen } = require('./opzet/meldingenlezen').maakMeldingenLezer((naam) => db.data.notifications[naam]);
 
 app.post('/api/notifications', auth, (req, res) => {
   res.json({ notifications: meldingenVan(req.session) });

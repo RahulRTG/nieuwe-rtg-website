@@ -1,21 +1,33 @@
-/* Credentiallevensloop van een LivingOS Samen-kamer. */
+/* Credentiallevensloop van een Samen-kamer, in twee profielen: LivingOS
+   (`samen`) en FoundationOS (`rtf`). Ze verschilden alleen in deze constanten;
+   de FoundationOS-kopie (samenrtf-toegang.js) is daarom opgeheven. De gezins- en
+   vriendschapscontrole van FoundationOS blijft een tweede poort in samenrtf.js;
+   deze laag bezit uitsluitend het eenmalige deelgeheim en zijn levensloop. */
 'use strict';
 
-const DOEL = 'livingos-samen-kamer';
-const SCOPE = ['samen.join'];
-const GELDIG_MS = 12 * 3600000;
+const klok = require('../lib/klok');
+
+const PROFIELEN = Object.freeze({
+  samen: Object.freeze({ doel: 'livingos-samen-kamer', scope: Object.freeze(['samen.join']),
+    geldigMs: 12 * 3600000, soort: 'samen-kamer', idVoor: 'sk', prefix: 'SAMEN' }),
+  rtf: Object.freeze({ doel: 'foundationos-samen-kamer', scope: Object.freeze(['rtf.samen.join']),
+    geldigMs: 6 * 3600000, soort: 'rtf-samen-kamer', idVoor: 'rsk', prefix: 'RTFSAMEN' })
+});
 const MAX_GEBRUIK = 11;
 
-module.exports = ({ crypto, nu = () => new Date().toISOString() }) => {
-  const bearer = require('./bearercode')({ crypto, namespace: 'livingos-samen-kamer', nu });
+module.exports = ({ crypto, nu = () => klok.datum().toISOString(), profiel = 'samen' }) => {
+  const P = PROFIELEN[profiel];
+  if (!P) throw new Error('samen-toegang kent geen profiel ' + profiel);
+  const DOEL = P.doel, SCOPE = P.scope, GELDIG_MS = P.geldigMs;
+  const bearer = require('./bearercode')({ crypto, namespace: DOEL, nu });
   const alle = kamers => Object.values(kamers || {}).filter(Boolean);
   const historie = k => Array.isArray(k && k.toegang_historie) ? k.toegang_historie : [];
 
   function uniekeNieuwe(kamers, k, issuer, rotatie) {
     const rijen = alle(kamers);
     for (let poging = 0; poging < 8; poging++) {
-      const gemaakt = bearer.maak({ prefix: 'SAMEN', issuer, doel: DOEL, scope: SCOPE,
-        onderwerp: { soort: 'samen-kamer', id: k.id }, geldigMs: GELDIG_MS,
+      const gemaakt = bearer.maak({ prefix: P.prefix, issuer, doel: DOEL, scope: SCOPE,
+        onderwerp: { soort: P.soort, id: k.id }, geldigMs: GELDIG_MS,
         maxGebruik: MAX_GEBRUIK });
       gemaakt.toegang.rotatie = rotatie || 1;
       const dubbel = rijen.some(x => bearer.zelfdeHash(x && x.toegang && x.toegang.code_hash,
@@ -68,12 +80,12 @@ module.exports = ({ crypto, nu = () => new Date().toISOString() }) => {
       const raw = String(k.code || sleutel || '');
       const issued = Number.isFinite(Number(k.at))
         ? new Date(Number(k.at)).toISOString() : nu();
-      const id = /^sk[a-f0-9]{32}$/i.test(String(k.id || ''))
-        ? k.id : 'sk' + crypto.randomBytes(16).toString('hex');
+      const id = new RegExp('^' + P.idVoor + '[a-f0-9]{32}$', 'i').test(String(k.id || ''))
+        ? k.id : P.idVoor + crypto.randomBytes(16).toString('hex');
       k.id = id;
       k.toegang = {
         code_hash: bearer.hash(raw), issuer: k.gastheer || 'legacy', doel: DOEL,
-        scope: [...SCOPE], onderwerp: { soort: 'samen-kamer', id }, issued_at: issued,
+        scope: [...SCOPE], onderwerp: { soort: P.soort, id }, issued_at: issued,
         expires_at: new Date(Date.parse(issued) + GELDIG_MS).toISOString(),
         max_gebruik: MAX_GEBRUIK, gebruik: Math.max(0, (k.leden || []).length - 1),
         laatst_gebruikt_at: null, ingetrokken_at: issued,
@@ -90,7 +102,5 @@ module.exports = ({ crypto, nu = () => new Date().toISOString() }) => {
   return { nieuw, zoek, reden, gebruik, intrekken, roteer, publiek, migreerLegacy };
 };
 
-module.exports.DOEL = DOEL;
-module.exports.SCOPE = SCOPE;
-module.exports.GELDIG_MS = GELDIG_MS;
+module.exports.PROFIELEN = PROFIELEN;
 module.exports.MAX_GEBRUIK = MAX_GEBRUIK;

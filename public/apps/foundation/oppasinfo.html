@@ -131,7 +131,7 @@ if (window.RTGUitvoer) RTGUitvoer.bron(function () {
 
 async function laad(){
   try{
-    const d = await fetch('/api/foundation/gezin/'+s.code+'/oppasinfo?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/oppasinfo',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     huidig = d.oppasinfo; magBewerken = d.magBewerken;
     render();
   }catch(e){ $('#intro').textContent = 'Kon de info niet laden.'; }

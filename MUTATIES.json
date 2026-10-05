@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-05T11:10:19.626Z",
-    "commit": "de8ffe6f8",
+    "op": "2026-10-04T19:06:28.140Z",
+    "commit": "6c19cab6",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -4193,6 +4193,23 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "foundation-lesstroom.pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "module": "server/redis.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 11
+    },
+    "foundation-lesstroom.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "foundation-markt.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4991,6 +5008,31 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "gezinscode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foundation/gezinscode.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "gezinsdeur.pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "module": "server/redis.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 11
+    },
+    "gezinsdeur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "gezinskeuken.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5321,14 +5363,6 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 3
-    },
-    "herhaalbesluit.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/herhaalbesluit.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 2,
-      "geprobeerd": 1
     },
     "herhaalpakket.test.js": {
       "soort": "puur",
@@ -6270,6 +6304,20 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "kantoor-eerste-account.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "kantoor-koppel-passkey.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "kantoor-productiedeur.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6370,6 +6418,13 @@
       "operator": "&&->||#0",
       "gezakt": 2,
       "geprobeerd": 4
+    },
+    "kantoorkoppel-productie.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "kantoormacht.test.js": {
       "soort": "puur",
@@ -7142,6 +7197,28 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "lesdeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/foundation/lesdeel.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
+    "lesdeellink.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "lesstroom.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "letters.test.js": {
@@ -8950,14 +9027,6 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
-    "mutatie-html.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/mutatie-html.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
     "mutatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -10286,6 +10355,13 @@
         "testSha256": "73494e3f99f5525a7335e2e8f4f2e7abaae1a510f1d5ae072853b76b90e5d460"
       }
     },
+    "partnerpersoneelscode-migratie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "partnerpersoneelscode-register.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -10939,42 +11015,11 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
-    "praktijk-betalen.e2e.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/werk/praktijk-betalen.js",
-      "operator": "browser-export-weg#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "praktijk-betalen.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/betaalwaarheid/index.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 3,
-      "geprobeerd": 1
-    },
     "praktijk-http.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
-      "scherp": "gezakt"
-    },
-    "praktijk-leverancier.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/bedrijf/praktijk-vorm.js",
-      "operator": "===->!==#0",
-      "gezakt": 4,
-      "geprobeerd": 3
-    },
-    "praktijk-transacties-http.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
       "scherp": "gezakt"
     },
     "praktijk.e2e.js": {
@@ -11390,14 +11435,6 @@
       "operator": "getal+1#1",
       "gezakt": 1,
       "geprobeerd": 8
-    },
-    "registerratel.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/registerratel.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 2,
-      "geprobeerd": 1
     },
     "registerratels.test.js": {
       "soort": "gericht",
@@ -14065,6 +14102,13 @@
         "testSha256": "48518910aa94be61aa99ed6ebfab7308ec1c2ea740cdfe7d0578f9ebbb1e58ae"
       }
     },
+    "sso-clientgeheim-b22.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "sso-clientgeheim-routes.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -14102,6 +14146,14 @@
       "operator": "return-weg#0",
       "gezakt": 12,
       "geprobeerd": 3
+    },
+    "ssogeheim-ouderdom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/sso/clientgeheim.js",
+      "operator": "+->-#0",
+      "gezakt": 2,
+      "geprobeerd": 14
     },
     "ssrf.test.js": {
       "soort": "puur",
@@ -14377,6 +14429,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/stripe.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "stroomticket.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stroomticket.js",
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
@@ -15517,14 +15577,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
-    },
-    "verhalen-aankomst.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/verhalen.js",
-      "operator": "&&->||#14",
-      "gezakt": 1,
-      "geprobeerd": 86
     },
     "verhuur.test.js": {
       "soort": "server",

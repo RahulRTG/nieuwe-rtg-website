@@ -78,7 +78,7 @@ async function opzet(naam) {
   const kind = (await json(await api('/gezin/profiel/maak',
     { code: g.code, token: g.token, naam: 'Kind ' + naam, rol: 'kind', groep: 'kind' }))).body;
   const kindToken = (await json(await api('/gezin/profiel/kies',
-    { code: g.code, profielId: kind.profiel.id }))).body.token;
+    { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).body.token;
   const kop = (await json(await api('/school/koppel',
     { code: g.code, token: g.token, klasCode: klas.code, profielId: kind.profiel.id }))).body;
   assert.ok(kop.uitgenodigd, 'de ouder nodigt uit: ' + JSON.stringify(kop).slice(0, 160));

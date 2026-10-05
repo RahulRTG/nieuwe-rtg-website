@@ -1,0 +1,18 @@
+/* ONDER DE MOTORKAP: de technieksectie van de voordeur. Een compacte rij feiten,
+   elk met het bestand waar het in de code staat; de diepte woont op
+   public/site/techniek/techniek.html. Op zwart: wit en goud, nooit bordeaux als
+   tekst (CLAUDE.md, merkregels). Geen afronding: dit is een inhoudsvlak. */
+.tech-section .scene-heading>p:last-child{color:rgba(244,240,233,.72)}
+.tech-section h2 em{color:#ded1b9;font-style:normal}
+.tech-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin:0;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.14)}
+.tech-facts article{min-width:0;padding:30px 28px 28px;background:#11120f}
+.tech-facts article>span:first-child{color:#c9ad6a;font-size:10px;font-weight:700;letter-spacing:.24em}
+.tech-facts h3{margin:22px 0 12px;color:#f4f0e9;font-family:var(--serif);font-size:24px;font-weight:450;line-height:1.15}
+.tech-facts p{margin:0;color:rgba(244,240,233,.72);font-size:14px;line-height:1.75}
+.tech-facts .proof-source{display:block;margin-top:18px;color:rgba(244,240,233,.62);font:500 11px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}
+.tech-more{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 18px;margin:40px 0 0}
+.tech-more a{display:inline-flex;align-items:center;min-height:48px;padding:0 20px;border:1px solid #c9ad6a;color:#f4f0e9;font-size:12px;font-weight:700;letter-spacing:.12em;text-decoration:none;text-transform:uppercase}
+.tech-more a:hover,.tech-more a:focus-visible{background:#c9ad6a;color:#0d0e0c}
+.tech-more small{color:rgba(244,240,233,.62);font-size:13px}
+@media (max-width:900px){.tech-facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.tech-facts{grid-template-columns:1fr}.tech-facts article{padding:24px 20px}}

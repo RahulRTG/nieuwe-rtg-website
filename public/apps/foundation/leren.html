@@ -1,8 +1,15 @@
 <!doctype html>
 <html lang="nl" data-rtg-thema="foundation">
 <head>
-<script src="/shared/id.js"></script>
 <meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
+<!-- B20: een deellink draagt de lescode in het fragment (#les=LES.<32 hex>).
+     Lees hem in geheugen en wis het fragment voor het eerste verzoek van deze
+     pagina; leren-groei.js zet hem daarna in "Meedoen". -->
+<script>
+(function(){try{var h=location.hash,m=/^#les=(LES\.[A-F0-9]{32})$/i.exec(h);if(m)window.__RTG_LESCODE=m[1].toUpperCase();if(/^#les=/.test(h))history.replaceState(null,'',location.pathname+location.search)}catch(e){}})();
+</script>
+<script src="/shared/id.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#123c3a">
 <meta name="robots" content="noindex,nofollow">

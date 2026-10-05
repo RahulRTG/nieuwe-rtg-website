@@ -7,6 +7,8 @@
    zetten. De kale code verlaat alleen de uitgifte; op schijf staat zijn hash. */
 'use strict';
 
+const { keten } = require('./bearercode-keten');
+
 const DEFAULT_DAGEN = 90;
 const DEFAULT_MAX_GEBRUIK = 500;
 const MAX_DAGEN = 366;
@@ -115,23 +117,25 @@ module.exports = ({ opslag, staat, nu, rid, crypto, save, bewerkCollectie }) => 
       return { ok: true, toegang: publiek(r) };
     }
 
+    /* VERNIEUWEN en niet roteren: een medewerker kiest de termijn en het gebruik
+       opnieuw (geldig_dagen, max_gebruik). Deze codes hebben een eigen hash en
+       vorm, dus geen bearer.vernieuw(); wel dezelfde keten (volgnummer,
+       geschiedenis, intrekking van de oude), met de reden van de mens erbij. */
     function roteer(id, invoer) {
       const oud = rijen.find(x => x.id === String(id || ''));
       if (!oud) return { status: 404, error: 'Deze toegangscode bestaat niet.' };
       if (oud.geroteerd_naar) return { status: 409, error: 'Deze toegangscode is al geroteerd.' };
-      const at = nu();
-      const gemaakt = maak({
-        prefix: invoer && invoer.prefix, issuer: invoer && invoer.issuer,
-        doel: oud.doel, scope: oud.scope, onderwerp: oud.onderwerp,
-        geldig_dagen: invoer && invoer.geldig_dagen,
-        max_gebruik: invoer && invoer.max_gebruik, vervangt_id: oud.id
-      }, at, oud.rotatie + 1, rijen);
+      const at = nu(), i = invoer || {};
+      const gemaakt = maak({ prefix: i.prefix, issuer: i.issuer, doel: oud.doel, scope: oud.scope,
+        onderwerp: oud.onderwerp, geldig_dagen: i.geldig_dagen, max_gebruik: i.max_gebruik,
+        vervangt_id: oud.id }, at, 1, rijen);
       if (!gemaakt.r) return gemaakt;
-      if (!oud.ingetrokken_at) {
-        oud.ingetrokken_at = at;
-        oud.ingetrokken_door = schoon(invoer && invoer.issuer).slice(0, 80) || 'onbekend';
-        oud.intrekreden = schoon(invoer && invoer.reden).slice(0, 200) || 'geroteerd';
-      }
+      keten({ oud, nieuw: { toegang: gemaakt.r }, actor: schoon(i.issuer).slice(0, 80) || 'onbekend',
+        soort: 'vernieuwd', nu: at, intrekken: (o, door) => {
+          if (o.ingetrokken_at) return;
+          Object.assign(o, { ingetrokken_at: at, ingetrokken_door: door,
+            intrekreden: schoon(i.reden).slice(0, 200) || 'vernieuwd' });
+        } });
       oud.geroteerd_naar = gemaakt.r.id;
       rijen.push(gemaakt.r);
       return { ok: true, code: gemaakt.code, toegang: publiek(gemaakt.r), vorige: publiek(oud) };

@@ -176,3 +176,24 @@ test('17. een uitgeschreven volledige domeinlijst telt ook als splitsing, met de
   assert.ok(opslagFout(r), 'de keuring houdt geen kopie van de domeinlijst bij, dus een gezette RTG_DOMAINS is een splitsing');
   assert.ok([...r.fouten, ...r.hardeFouten].some(f => /DATABASE_URL/.test(f)), 'en de melding noemt de uitweg');
 });
+
+/* C4 (herkeuring): dezelfde klasse als RTG_DEV_LINKS. */
+test('18. productie + RTG_LIEG of RTG_STAATLOG weigert de start (C4)', () => {
+  for (const [vlag, waarde] of [['RTG_LIEG', '/api/'], ['RTG_STAATLOG', '1'], ['RTG_STAATLOG', '2']]) {
+    const r = config.valideer({ ...VEILIG, [vlag]: waarde });
+    assert.ok(weigert(r) && [...r.fouten, ...r.hardeFouten].some(f => f.includes(vlag)), vlag + '=' + waarde + ' hoort te blokkeren');
+  }
+  assert.equal([...config.valideer({ ...VEILIG, RTG_STAATLOG: '0' }).fouten].some(f => f.includes('RTG_STAATLOG')), false,
+    'RTG_STAATLOG=0 is uit');
+});
+
+test('19. RTG_DEV_LINKS op een ONBEKEND adres zonder NODE_ENV: geen blokkade, wel een waarschuwing (C4)', () => {
+  const { NODE_ENV, ...zonderProd } = VEILIG;
+  for (const APP_URL of [undefined, 'https://rtg-intern', 'https://rtg.example.com']) {
+    const env = { ...zonderProd, RTG_DEV_LINKS: '1' };
+    if (APP_URL) env.APP_URL = APP_URL; else delete env.APP_URL;
+    const r = config.valideer(env);
+    assert.equal(r.hardeFouten.some(f => /RTG_DEV_LINKS/.test(f)), false, 'onbekend is geen openbaar: geen harde fout');
+    assert.ok(r.waarschuwingen.some(f => /RTG_DEV_LINKS/.test(f)), 'maar het staat er wel (' + (APP_URL || 'geen APP_URL') + ')');
+  }
+});

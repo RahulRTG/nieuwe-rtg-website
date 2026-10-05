@@ -129,6 +129,11 @@ function keurOpenbareBouwstand(env, bakken) {
       + 'een pincode uit de broncode en een betaalprovider die zichzelf bevestigt.');
   }
 
+  // RTG_DEV_LINKS op een niet-openbaar adres: geen blokkade, wel hardop (C4)
+  if (stand.soort !== 'openbaar' && env.RTG_DEV_LINKS === '1' && !productie)
+    waarschuwingen.push('RTG_DEV_LINKS=1: herstellinks staan in het antwoord; openbaar of niet is niet vast te stellen ('
+      + (stand.reden || stand.host) + '). Staat het open, zet de vlag uit.');
+
   /* FAIL-CLOSED OP EEN OPENBAAR ADRES (RTG-V1-RELEASE blocker 3). Hier stond
      een schaduwronde die de productiekeuring alleen als MELDING liet lopen: wie
      NODE_ENV vergat, startte publiek zonder kluissleutel en met de gedeelde

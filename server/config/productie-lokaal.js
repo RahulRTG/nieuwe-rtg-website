@@ -24,6 +24,14 @@ function keurLokaleBouwstanden(env, fouten, waarschuwingen) {
   if (env.RTG_DEV_LINKS === '1')
     fouten.push('RTG_DEV_LINKS=1 in productie: herstel- en verificatielinks en sms-codes zouden in het HTTP-antwoord staan, en daarmee is elk account over te nemen. Zet hem uit.');
 
+  /* Twee meet- en proefstanden die ELK antwoord raken, dezelfde klasse als
+     RTG_DEV_LINKS (de herkeuring van C4). RTG_VERRAAD en RTG_KLOK gooien zelf al
+     in productie (lib/verraad.js, lib/klok.js); deze twee deden dat niet. */
+  if (env.RTG_LIEG)
+    fouten.push('RTG_LIEG staat aan in productie: de gekozen paden geven met opzet een leeg antwoord. Zet hem uit.');
+  if (env.RTG_STAATLOG && env.RTG_STAATLOG !== '0')
+    fouten.push('RTG_STAATLOG staat aan in productie: elk antwoord draagt de omvang van de opslag. Zet hem uit.');
+
   for (const naam of ['SMTP_SANDBOX', 'SMS_SANDBOX', 'STRIPE_CONNECT_SANDBOX', 'SEPA_SANDBOX']) {
     if (env[naam] === '1')
       fouten.push(naam + '=1 is uitsluitend lokaal: een contract-sandbox mag productie nooit als een echte integratie laten starten.');

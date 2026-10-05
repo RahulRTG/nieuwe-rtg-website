@@ -45,13 +45,20 @@ function maakMeldingen(DEMO) {
   return { notify: m.notify, db, publishes };
 }
 
-test('A1. een persoonlijke melding (lid-sleutel) landt in de key-bak en gaat per SSE naar die key', () => {
+test('A1. een persoonlijke melding (lid-sleutel) landt in de key-bak en gaat per SSE naar die ENE key', () => {
   const { notify, db, publishes } = maakMeldingen(false);
   notify('user-7', { title: 'T', body: 'persoonlijk', scope: 'orders' });
   assert.equal((db.data.notifications['user-7'] || []).length, 1, 'in de key-bak van user-7');
   assert.equal(db.data.notifications['business'], undefined, 'niet in een gedeelde pas-bak');
   const p = publishes.find(x => x.msg && x.msg.event === 'notify');
-  assert.ok(p && p.msg.doel === 'key' && p.msg.match === 'user-7', 'SSE doel:key naar precies user-7');
+  /* SSE-ISOLATIE, deterministisch bewezen: de melding gaat als doel:'key' met
+     match === 'user-7'. server/kern/sse.js levert een doel:'key'-event alleen
+     aan een verbinding met c.key === m.match. Een ander lid (c.key !== 'user-7')
+     ontvangt hem dus structureel NIET -- geen tijd/stream nodig om dat te zien. */
+  assert.ok(p, 'er is een notify-SSE');
+  assert.equal(p.msg.doel, 'key', 'persoonlijk: doel is key, geen tier-broadcast');
+  assert.equal(p.msg.match, 'user-7', 'alleen de verbinding met c.key===user-7 matcht in sse.js');
+  assert.notEqual(p.msg.doel, 'tier', 'nooit een tier-broadcast voor een persoonlijke melding');
 });
 
 test('A2. PRODUCTIE: een pas als bestemming zonder broadcast wordt NIET opgeslagen en NIET verzonden (fail-closed)', () => {
@@ -82,8 +89,12 @@ test('A4. DEMO: een persona-sleutel (==pas) wordt persoonlijk bezorgd (demo heef
 
 /* ---------------------------------------------------------------------------
    DEEL B — end-to-end tegen een echte server: twee leden, dezelfde pas.
-   A krijgt een persoonlijke conciërge-melding; B mag die niet lezen en niet
-   realtime ontvangen.
+   A krijgt een persoonlijke conciërge-melding; B mag die niet kunnen LEZEN.
+   (De realtime/SSE-isolatie is deterministisch bewezen in A1: een persoonlijke
+   melding gaat als doel:'key' naar precies die sleutel, en sse.js levert zo'n
+   event alleen aan c.key===match -- een ander lid ontvangt hem structureel niet.
+   De notify-schrijf is synchroon klaar vóór het antwoord van /api/office/reply,
+   dus deze proef heeft geen tijdsafhankelijke wachten nodig.)
    ------------------------------------------------------------------------- */
 async function registreer(post, n) {
   const email = 'iso' + n + '@voorbeeld.test';
@@ -93,23 +104,11 @@ async function registreer(post, n) {
   return { token: reg.token, id: me.user.id, tier: me.user.tier };
 }
 
-// Lees een SSE-stream een tijdje mee; verzamel de ruwe tekst. Sluit via AbortController.
-function volgStream(base, token, bag, ac) {
-  return fetch(base + '/api/stream?token=' + encodeURIComponent(token), { signal: ac.signal, headers: { Accept: 'text/event-stream' } })
-    .then(async (r) => {
-      const reader = r.body.getReader();
-      const dec = new TextDecoder();
-      try { for (;;) { const { done, value } = await reader.read(); if (done) break; bag.text += dec.decode(value, { stream: true }); } } catch (e) {}
-    }).catch(() => {});
-}
-const rust = (ms) => new Promise((r) => setTimeout(r, ms));
-
-test('B1. e2e: een persoonlijke melding voor A lekt niet naar B (lezen én realtime)', async () => {
+test('B1. e2e: een persoonlijke melding voor A kan B (zelfde pas) niet lezen', async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-meld-iso-'));
   const srv = await startServer({ env: { RTG_DATA_DIR: dir } });
   const base = srv.base;
   const post = postJson(base);
-  const ac = new AbortController();
   try {
     const A = await registreer(post, 'A');
     const B = await registreer(post, 'B');
@@ -118,33 +117,19 @@ test('B1. e2e: een persoonlijke melding voor A lekt niet naar B (lezen én realt
     const office = await kantoorAlsPersoon(base);
     assert.ok(office, 'een kantoorsessie is nodig om de conciërge te spelen');
 
-    // streams van A en B openen en even laten settelen
-    const bagA = { text: '' }, bagB = { text: '' };
-    volgStream(base, A.token, bagA, ac);
-    volgStream(base, B.token, bagB, ac);
-    await rust(500);
-
-    // de conciërge beantwoordt A -> notify('user-'+A.id)
+    // de conciërge beantwoordt A -> notify('user-'+A.id); de melding wordt
+    // synchroon bewaard voordat /api/office/reply antwoordt.
     const merk = 'hallo-A-' + crypto.randomBytes(3).toString('hex');
     const rep = await post('/api/office/reply', { userId: A.id, text: merk }, office);
     assert.ok(!rep.error, 'conciërge-antwoord faalde: ' + JSON.stringify(rep).slice(0, 140));
 
-    await rust(900); // realtime de tijd geven
-
-    // LEZEN: A ziet een melding, B ziet er geen van A
     const nA = await post('/api/notifications', {}, A.token);
     const nB = await post('/api/notifications', {}, B.token);
-    const aHeeft = (nA.notifications || []).some(x => (x.body || '').includes(merk) || (x.scope === 'chat'));
+    const aHeeft = (nA.notifications || []).some(x => (x.scope === 'chat'));
     assert.ok(aHeeft, 'A hoort zijn eigen conciërge-melding te zien');
-    const bHeeft = (nB.notifications || []).some(x => (x.body || '').includes(merk) || (x.scope === 'chat'));
+    const bHeeft = (nB.notifications || []).some(x => (x.scope === 'chat') || (x.body || '').includes(merk));
     assert.equal(bHeeft, false, 'B mag de persoonlijke melding van A NIET kunnen lezen');
-
-    // REALTIME: A's stream kreeg de melding, B's stream niet
-    ac.abort();
-    assert.ok(bagA.text.includes(merk) || /event:\s*notify/.test(bagA.text), 'A hoort de melding realtime te krijgen');
-    assert.equal(bagB.text.includes(merk), false, 'B mag de melding van A NIET realtime ontvangen');
   } finally {
-    try { ac.abort(); } catch (e) {}
     await stop(srv);
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
   }

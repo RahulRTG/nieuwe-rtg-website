@@ -93,7 +93,7 @@ function meld(dest, note, bewaar, opties) {
      de bedoelde persoon en geen gedeelde bak, dus die weg blijft open. */
   if (naarTier && !broadcast && !DEMO) return n;
 
-  n.broadcast = broadcast || undefined;
+  if (broadcast) n.broadcast = true;   // alleen zetten als het er is: geen `broadcast: undefined` in de vorm
   db.data.notifications[dest] = (db.data.notifications[dest] || []);
   db.data.notifications[dest].unshift(n);
   db.data.notifications[dest] = db.data.notifications[dest].slice(0, 40);

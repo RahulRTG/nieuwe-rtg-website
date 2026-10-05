@@ -82,6 +82,7 @@
         "PROHIBITED": 5,
         "NO_LEARNING_VALUE": 8
       },
+      "decisionDossiers": [],
       "blastRadius": {
         "sourceOwners": 14,
         "kernelModules": 2472,
@@ -128,6 +129,9 @@
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
       },
+      "decisionDossiers": [
+        "D10_RESEARCH_PARTICIPATION"
+      ],
       "blastRadius": {
         "sourceOwners": 5,
         "kernelModules": 117,
@@ -183,6 +187,9 @@
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
       },
+      "decisionDossiers": [
+        "D06_WORKFORCE_DEVELOPMENT"
+      ],
       "blastRadius": {
         "sourceOwners": 13,
         "kernelModules": 121,
@@ -238,6 +245,7 @@
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
       },
+      "decisionDossiers": [],
       "blastRadius": {
         "sourceOwners": 7,
         "kernelModules": 40,
@@ -290,6 +298,7 @@
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
       },
+      "decisionDossiers": [],
       "blastRadius": {
         "sourceOwners": 8,
         "kernelModules": 13,
@@ -350,6 +359,11 @@
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
       },
+      "decisionDossiers": [
+        "D05_DOCUMENT_CONTENT",
+        "D14_AI_ASSISTANCE",
+        "D15_SERVICE_IMPROVEMENT"
+      ],
       "blastRadius": {
         "sourceOwners": 14,
         "kernelModules": 31,
@@ -431,6 +445,7 @@
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
       },
+      "decisionDossiers": [],
       "blastRadius": {
         "sourceOwners": 32,
         "kernelModules": 48,
@@ -487,6 +502,10 @@
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
       },
+      "decisionDossiers": [
+        "D13_DISCOVERY_COMMONS",
+        "D14_AI_ASSISTANCE"
+      ],
       "blastRadius": {
         "sourceOwners": 11,
         "kernelModules": 30,
@@ -571,6 +590,15 @@
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
       },
+      "decisionDossiers": [
+        "D06_WORKFORCE_DEVELOPMENT",
+        "D07_TRAVEL_EXPERIENCE",
+        "D08_FOUNDATION_ASSISTANCE",
+        "D09_CHILD_EDUCATION",
+        "D10_RESEARCH_PARTICIPATION",
+        "D11_COMMUNITY_EVENTS",
+        "D12_DATING"
+      ],
       "blastRadius": {
         "sourceOwners": 38,
         "kernelModules": 117,
@@ -706,6 +734,19 @@
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
       },
+      "decisionDossiers": [
+        "D01_PERSONAL_MEMORY",
+        "D02_LOCATION_CONTEXT",
+        "D03_HEALTH_CONTEXT",
+        "D04_COMMUNICATION_CONTENT",
+        "D16_ACCOUNT_ORGANIZATION",
+        "D17_SECURITY_CREDENTIALS",
+        "D18_IDENTITY_VERIFICATION",
+        "D19_GOVERNANCE",
+        "D20_PAYMENT_OPERATIONS",
+        "D21_FINANCIAL_PROFILING",
+        "D22_COMMERCIAL_CLAIMS"
+      ],
       "blastRadius": {
         "sourceOwners": 86,
         "kernelModules": 2495,

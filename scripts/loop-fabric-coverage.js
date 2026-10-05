@@ -5,6 +5,7 @@ const ROOT=path.join(__dirname,'..'),OUT=path.join(ROOT,'LOOP-FABRIC-COVERAGE.js
 const {FUNCTIES}=require('../server/functies/register');
 const policy=require('../server/kern/loop-fabric/coverage-policy');
 const executionPolicy=require('./lib/loop-fabric-execution-policy');
+const decisionPolicy=require('./lib/loop-fabric-decision-policy');
 
 const read=name=>JSON.parse(fs.readFileSync(path.join(ROOT,name),'utf8'));
 const routeSource=read('ROUTEBRON.json').perRoute;
@@ -100,7 +101,10 @@ function build() {
       loop:loopShape(evidence.signals,decision.status),participation:participation(decision),
       crossDomainHandoffs:decision.status==='LOOP_CAPABLE'?['SOURCE_REF_TO_AUTHORIZED_CONSUMER']:
         decision.status==='PARTIALLY_LOOP_CAPABLE'?['LIMITED_PROVEN_FLOW_ONLY']:[],missing:missing(decision.status)};
-    row.execution=executionPolicy.classify(row);return row;
+    row.execution=executionPolicy.classify(row);
+    const dossier=decisionPolicy.dossierForCapability(row.id);
+    if(dossier)row.execution.decisionDossierId=dossier.id;
+    return row;
   });
   const domains={};
   for(const row of capabilities){const d=domains[row.domain]||(domains[row.domain]={domain:row.domain,capabilities:0,eligibleFlows:0,

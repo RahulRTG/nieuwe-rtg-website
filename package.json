@@ -183,6 +183,8 @@
     "loopfabric:execution:controle": "node scripts/loop-fabric-execution.js --controle",
     "loopfabric:flows": "node scripts/loop-fabric-source-flows.js",
     "loopfabric:flows:controle": "node scripts/loop-fabric-source-flows.js --controle",
+    "loopfabric:decisions": "node scripts/loop-fabric-decisions.js",
+    "loopfabric:decisions:controle": "node scripts/loop-fabric-decisions.js --controle",
     "inlinestijl": "node scripts/inlinestijl-ronde.js",
     "inlinestijl:toon": "node scripts/inlinestijl-ronde.js --toon",
     "deelindex": "node scripts/deelindex.js",

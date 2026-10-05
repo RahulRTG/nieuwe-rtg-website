@@ -1,0 +1,2306 @@
+{
+  "schemaVersion": 1,
+  "kind": "RTG_LOOP_FABRIC_DECISION_DOSSIERS",
+  "sourceOfTruth": false,
+  "warning": "Technisch/productadvies, geen juridisch advies. LEGAL_VALIDATION_REQUIRED blijft geblokkeerd tot bevoegde validatie.",
+  "summary": {
+    "blockedCapabilities": 144,
+    "decisionFamilies": 22,
+    "reduction": 122,
+    "classifications": {
+      "ETHICAL/SAFETY": 3,
+      "GOVERNANCE": 1,
+      "LEGAL_VALIDATION_REQUIRED": 6,
+      "MIXED": 6,
+      "PRIVACY_POLICY": 5,
+      "PRODUCT_POLICY": 1
+    }
+  },
+  "coverage": {
+    "expected": [
+      "arrival",
+      "avondos",
+      "betalen",
+      "bk-reiswijzer",
+      "bk-reizen",
+      "bk-tickets",
+      "bk-verblijf",
+      "carriereledger",
+      "connect",
+      "connectionos",
+      "contracten",
+      "dagmetingen",
+      "democratie",
+      "democratie-partijen",
+      "doelen",
+      "dom-agenda",
+      "dom-bank-advies",
+      "dom-bank-incasso",
+      "dom-bank-inzicht",
+      "dom-bank-krediet",
+      "dom-bank-passen",
+      "dom-bank-rekening-open",
+      "dom-bank-sepa",
+      "dom-bank-spaardoel",
+      "dom-bank-storten",
+      "dom-bank-vastelasten",
+      "dom-bank-zakelijk",
+      "dom-beschermdeur",
+      "dom-bestanden",
+      "dom-care",
+      "dom-gemeente",
+      "dom-genootschap",
+      "dom-kmar",
+      "dom-kosten",
+      "dom-lab",
+      "dom-labfonds",
+      "dom-livinglab",
+      "dom-livinglab-bewoner",
+      "dom-meet",
+      "dom-metier",
+      "dom-onboarding",
+      "dom-overheid",
+      "dom-partner-uitbetaling",
+      "dom-pay-tegoed",
+      "dom-pay-tegoed-zaak",
+      "dom-pay-terug",
+      "dom-pay-vooraf",
+      "dom-pay-wallet",
+      "dom-reisbureau",
+      "dom-rekening",
+      "dom-rtfkantoor",
+      "dom-rtfos",
+      "dom-rtgid",
+      "dom-samen",
+      "dom-vak",
+      "dom-veiligheid",
+      "dom-wallet",
+      "dom-werkvloer",
+      "eigenaarherstel",
+      "foundation",
+      "foundation-school",
+      "fs-gast",
+      "fs-terrein",
+      "fs-werk",
+      "geldwereld",
+      "gemoed",
+      "gewoonten",
+      "ghost",
+      "gld-aitegoed",
+      "gld-cadeau",
+      "gld-claims",
+      "gld-munt",
+      "gld-prijsgarantie",
+      "gld-prijzen",
+      "gld-punten",
+      "gld-rekening",
+      "gld-splitsen",
+      "instantreality",
+      "kern-berichten",
+      "kern-comm",
+      "kern-locatie",
+      "kern-meldingen",
+      "kern-memo",
+      "kern-rahul",
+      "kern-waardering",
+      "knelpunt",
+      "levenos",
+      "life",
+      "medicijnen",
+      "member",
+      "member-connect",
+      "member-snaps",
+      "member-werk",
+      "neiging",
+      "office-school",
+      "ondertiteling",
+      "ontmoetingen",
+      "oog",
+      "opvangwijzer",
+      "ov-aandacht",
+      "ov-kantoorgesprek",
+      "ov-mail-binnen",
+      "ov-spar",
+      "ov-werkmail",
+      "ov-zorgprofiel",
+      "paspoort",
+      "privekantoor",
+      "rechterhand",
+      "rtf-contacten",
+      "rtgone",
+      "rugdekking",
+      "rust",
+      "salon",
+      "service",
+      "service-bel",
+      "social",
+      "socialewereld",
+      "staff",
+      "stuur",
+      "supplier",
+      "supplier-apply",
+      "supplier-events",
+      "tenant",
+      "tg-aanmeld",
+      "tg-account",
+      "tg-gegevens",
+      "tg-inlog",
+      "tg-link",
+      "tg-pin",
+      "tg-sso",
+      "tg-zegel",
+      "tickets",
+      "tijdlijn",
+      "training",
+      "vakbewijs",
+      "verificatie",
+      "vertegenwoordiging",
+      "voeding",
+      "vonk",
+      "wbw",
+      "webauthn",
+      "werk-rtf",
+      "werving",
+      "zakelijk"
+    ],
+    "assigned": [
+      "arrival",
+      "avondos",
+      "betalen",
+      "bk-reiswijzer",
+      "bk-reizen",
+      "bk-tickets",
+      "bk-verblijf",
+      "carriereledger",
+      "connect",
+      "connectionos",
+      "contracten",
+      "dagmetingen",
+      "democratie",
+      "democratie-partijen",
+      "doelen",
+      "dom-agenda",
+      "dom-bank-advies",
+      "dom-bank-incasso",
+      "dom-bank-inzicht",
+      "dom-bank-krediet",
+      "dom-bank-passen",
+      "dom-bank-rekening-open",
+      "dom-bank-sepa",
+      "dom-bank-spaardoel",
+      "dom-bank-storten",
+      "dom-bank-vastelasten",
+      "dom-bank-zakelijk",
+      "dom-beschermdeur",
+      "dom-bestanden",
+      "dom-care",
+      "dom-gemeente",
+      "dom-genootschap",
+      "dom-kmar",
+      "dom-kosten",
+      "dom-lab",
+      "dom-labfonds",
+      "dom-livinglab",
+      "dom-livinglab-bewoner",
+      "dom-meet",
+      "dom-metier",
+      "dom-onboarding",
+      "dom-overheid",
+      "dom-partner-uitbetaling",
+      "dom-pay-tegoed",
+      "dom-pay-tegoed-zaak",
+      "dom-pay-terug",
+      "dom-pay-vooraf",
+      "dom-pay-wallet",
+      "dom-reisbureau",
+      "dom-rekening",
+      "dom-rtfkantoor",
+      "dom-rtfos",
+      "dom-rtgid",
+      "dom-samen",
+      "dom-vak",
+      "dom-veiligheid",
+      "dom-wallet",
+      "dom-werkvloer",
+      "eigenaarherstel",
+      "foundation",
+      "foundation-school",
+      "fs-gast",
+      "fs-terrein",
+      "fs-werk",
+      "geldwereld",
+      "gemoed",
+      "gewoonten",
+      "ghost",
+      "gld-aitegoed",
+      "gld-cadeau",
+      "gld-claims",
+      "gld-munt",
+      "gld-prijsgarantie",
+      "gld-prijzen",
+      "gld-punten",
+      "gld-rekening",
+      "gld-splitsen",
+      "instantreality",
+      "kern-berichten",
+      "kern-comm",
+      "kern-locatie",
+      "kern-meldingen",
+      "kern-memo",
+      "kern-rahul",
+      "kern-waardering",
+      "knelpunt",
+      "levenos",
+      "life",
+      "medicijnen",
+      "member",
+      "member-connect",
+      "member-snaps",
+      "member-werk",
+      "neiging",
+      "office-school",
+      "ondertiteling",
+      "ontmoetingen",
+      "oog",
+      "opvangwijzer",
+      "ov-aandacht",
+      "ov-kantoorgesprek",
+      "ov-mail-binnen",
+      "ov-spar",
+      "ov-werkmail",
+      "ov-zorgprofiel",
+      "paspoort",
+      "privekantoor",
+      "rechterhand",
+      "rtf-contacten",
+      "rtgone",
+      "rugdekking",
+      "rust",
+      "salon",
+      "service",
+      "service-bel",
+      "social",
+      "socialewereld",
+      "staff",
+      "stuur",
+      "supplier",
+      "supplier-apply",
+      "supplier-events",
+      "tenant",
+      "tg-aanmeld",
+      "tg-account",
+      "tg-gegevens",
+      "tg-inlog",
+      "tg-link",
+      "tg-pin",
+      "tg-sso",
+      "tg-zegel",
+      "tickets",
+      "tijdlijn",
+      "training",
+      "vakbewijs",
+      "verificatie",
+      "vertegenwoordiging",
+      "voeding",
+      "vonk",
+      "wbw",
+      "webauthn",
+      "werk-rtf",
+      "werving",
+      "zakelijk"
+    ],
+    "complete": true
+  },
+  "dossiers": [
+    {
+      "id": "D20_PAYMENT_OPERATIONS",
+      "title": "Betaaluitvoering en financieel bronspoor",
+      "classification": "LEGAL_VALIDATION_REQUIRED",
+      "capabilityIds": [
+        "wbw",
+        "betalen",
+        "dom-rekening",
+        "dom-bank-rekening-open",
+        "dom-bank-storten",
+        "dom-bank-sepa",
+        "dom-bank-incasso",
+        "dom-bank-passen",
+        "dom-bank-zakelijk",
+        "dom-wallet",
+        "dom-pay-wallet",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-partner-uitbetaling",
+        "gld-munt",
+        "gld-rekening",
+        "gld-splitsen",
+        "gld-cadeau",
+        "gld-punten"
+      ],
+      "domains": [
+        "pay"
+      ],
+      "question": "Welke betaaloccurrences mogen na operationele afhandeling fraudepreventie of procesverbetering voeden?",
+      "why": "Pay blijft financiële bronwaarheid; learningretentie, fraudedoel en cross-domain gebruik vragen aparte validatie.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Betaling, rekening, saldo, kaart, uitbetaling en settlement blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Betaling, rekening, saldo, kaart, uitbetaling en settlement blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Betaling, rekening, saldo, kaart, uitbetaling en settlement kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Betaling, rekening, saldo, kaart, uitbetaling en settlement kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Betaling, rekening, saldo, kaart, uitbetaling en settlement levert uitsluitend geminimaliseerde failure/recovery zonder koop- of personenprofiel; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Betaling, rekening, saldo, kaart, uitbetaling en settlement levert uitsluitend geminimaliseerde failure/recovery zonder koop- of personenprofiel; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies C voor beoordeelde technische/operationele failures; transactie-inhoud en koopgedrag blijven buiten optionele learning.",
+      "unlockImpact": {
+        "capabilities": 21,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D01_PERSONAL_MEMORY",
+      "title": "Persoonlijke levenscontext",
+      "classification": "PRIVACY_POLICY",
+      "capabilityIds": [
+        "rechterhand",
+        "neiging",
+        "privekantoor",
+        "life",
+        "doelen",
+        "dagmetingen",
+        "gemoed",
+        "gewoonten",
+        "training",
+        "tijdlijn",
+        "voeding",
+        "rust",
+        "ov-spar"
+      ],
+      "domains": [
+        "personal-life"
+      ],
+      "question": "Mag persoonlijke levenscontext later proactief terugkomen of structurele verbetering voeden?",
+      "why": "De code bezit persoonlijke functies, maar geen gedeeld besluit over geheugen, profilering of post-service-retentie.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Persoonlijke doelen, routines, reflecties en welzijnscontext blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Persoonlijke doelen, routines, reflecties en welzijnscontext blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Persoonlijke doelen, routines, reflecties en welzijnscontext kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Persoonlijke doelen, routines, reflecties en welzijnscontext kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Persoonlijke doelen, routines, reflecties en welzijnscontext levert uitsluitend een expliciet gekozen, niet-identificeerbare structurele les; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Persoonlijke doelen, routines, reflecties en welzijnscontext levert uitsluitend een expliciet gekozen, niet-identificeerbare structurele les; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies B voor expliciete persoonlijke recall; organizational learning alleen via een aparte unlinking-release.",
+      "unlockImpact": {
+        "capabilities": 13,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D06_WORKFORCE_DEVELOPMENT",
+      "title": "Werknemers-, talent- en loopbaancontext",
+      "classification": "MIXED",
+      "capabilityIds": [
+        "staff",
+        "dom-werkvloer",
+        "ov-kantoorgesprek",
+        "ov-werkmail",
+        "member-werk",
+        "carriereledger",
+        "supplier-apply",
+        "werving",
+        "vakbewijs",
+        "dom-metier",
+        "dom-vak"
+      ],
+      "domains": [
+        "workos",
+        "talent"
+      ],
+      "question": "Welke werk- en ontwikkelingsinformatie mag institutional memory of opportunitymatching worden?",
+      "why": "De code onderscheidt operationele werkstate, performance, loopbaanclaims en privécommunicatie nog niet als beleid.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Werknemersgedrag, gesprekken, sollicitaties, vakbewijs en loopbaan blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Werknemersgedrag, gesprekken, sollicitaties, vakbewijs en loopbaan blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Werknemersgedrag, gesprekken, sollicitaties, vakbewijs en loopbaan kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Werknemersgedrag, gesprekken, sollicitaties, vakbewijs en loopbaan kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Werknemersgedrag, gesprekken, sollicitaties, vakbewijs en loopbaan levert uitsluitend procesles zonder individuele productiviteits- of gedragsprofielen; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Werknemersgedrag, gesprekken, sollicitaties, vakbewijs en loopbaan levert uitsluitend procesles zonder individuele productiviteits- of gedragsprofielen; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Laat objectieve processtate losstaan van mensbeoordeling; kies B alleen voor door de persoon gekozen portfolio- of ontwikkelingsdoelen.",
+      "unlockImpact": {
+        "capabilities": 11,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D11_COMMUNITY_EVENTS",
+      "title": "Community-, event- en groepsdeelname",
+      "classification": "PRIVACY_POLICY",
+      "capabilityIds": [
+        "ontmoetingen",
+        "social",
+        "rtf-contacten",
+        "tickets",
+        "supplier-events",
+        "dom-agenda",
+        "dom-meet",
+        "bk-tickets",
+        "fs-terrein",
+        "fs-werk",
+        "fs-gast"
+      ],
+      "domains": [
+        "community-events"
+      ],
+      "question": "Mag deelname-, groeps- of eventervaring community- of organizational memory worden?",
+      "why": "Aanmelden of deelnemen bepaalt geen zichtbaarheid, herinnering, groepsprofilering of toekomstig hergebruik.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Deelname, programma, groep en eventervaring blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Deelname, programma, groep en eventervaring blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Deelname, programma, groep en eventervaring kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Deelname, programma, groep en eventervaring kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Deelname, programma, groep en eventervaring levert uitsluitend capaciteit-, toegankelijkheids- of procesles zonder deelnemershistorie; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Deelname, programma, groep en eventervaring levert uitsluitend capaciteit-, toegankelijkheids- of procesles zonder deelnemershistorie; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies B voor vrijwillige bijdrage; C voor operationele eventlessen zonder deelnemerslijst.",
+      "unlockImpact": {
+        "capabilities": 11,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D17_SECURITY_CREDENTIALS",
+      "title": "Credentials, toegang en veiligheidscontext",
+      "classification": "LEGAL_VALIDATION_REQUIRED",
+      "capabilityIds": [
+        "webauthn",
+        "eigenaarherstel",
+        "dom-beschermdeur",
+        "dom-rtgid",
+        "dom-veiligheid",
+        "dom-kmar",
+        "tg-inlog",
+        "tg-sso",
+        "tg-pin",
+        "tg-zegel",
+        "tg-link"
+      ],
+      "domains": [
+        "identity-organizations"
+      ],
+      "question": "Welke securitysignalen mogen voor fraudepreventie of incidentverbetering worden bewaard en gedeeld?",
+      "why": "Credentials en veiligheidsgegevens vereisen purpose limitation, toegangsbeperking en juridisch gevalideerde retentie.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Authenticatie, herstel, capabilities, grens- en veiligheidsstate blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Authenticatie, herstel, capabilities, grens- en veiligheidsstate blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Authenticatie, herstel, capabilities, grens- en veiligheidsstate kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Authenticatie, herstel, capabilities, grens- en veiligheidsstate kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Authenticatie, herstel, capabilities, grens- en veiligheidsstate levert uitsluitend geminimaliseerd beoordeeld security-incident zonder secret; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Authenticatie, herstel, capabilities, grens- en veiligheidsstate levert uitsluitend geminimaliseerd beoordeeld security-incident zonder secret; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Sta alleen beoordeelde technische occurrences toe; nooit secrets of ruwe credentialinhoud in learning artifacts.",
+      "unlockImpact": {
+        "capabilities": 11,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D04_COMMUNICATION_CONTENT",
+      "title": "Communicatie en gesprekken",
+      "classification": "MIXED",
+      "capabilityIds": [
+        "member-snaps",
+        "member-connect",
+        "service-bel",
+        "ondertiteling",
+        "connectionos",
+        "kern-meldingen",
+        "kern-berichten",
+        "kern-comm",
+        "ov-mail-binnen"
+      ],
+      "domains": [
+        "communication"
+      ],
+      "question": "Mag bericht-, bel-, mail- of transcriptinhoud verbeteringsmateriaal worden?",
+      "why": "Verzenden of ontvangen is geen toestemming voor analyse, geheugen, training of organizational reuse.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Berichten, gesprekken, ondertiteling en mail blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Berichten, gesprekken, ondertiteling en mail blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Berichten, gesprekken, ondertiteling en mail kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Berichten, gesprekken, ondertiteling en mail kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Berichten, gesprekken, ondertiteling en mail levert uitsluitend geaggregeerde delivery- of bereikbaarheidsfouten zonder inhoud; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Berichten, gesprekken, ondertiteling en mail levert uitsluitend geaggregeerde delivery- of bereikbaarheidsfouten zonder inhoud; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies A voor inhoud; sta B alleen toe voor expliciet geselecteerde fragmenten. Technische deliverymetadata krijgt een apart doel.",
+      "unlockImpact": {
+        "capabilities": 9,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D19_GOVERNANCE",
+      "title": "Governance, democratie en vertegenwoordiging",
+      "classification": "GOVERNANCE",
+      "capabilityIds": [
+        "democratie",
+        "democratie-partijen",
+        "contracten",
+        "rtgone",
+        "vertegenwoordiging",
+        "dom-overheid",
+        "dom-gemeente",
+        "dom-samen"
+      ],
+      "domains": [
+        "governance"
+      ],
+      "question": "Welke besluiten, beraadslagingen en uitkomsten mogen toekomstige governance informeren?",
+      "why": "Stem, mandaat, contract, publieke rol en ambtelijke procedure hebben verschillende openbaarheid en authority.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Voorstel, stem, mandaat, contract en bestuurlijk besluit blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Voorstel, stem, mandaat, contract en bestuurlijk besluit blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Voorstel, stem, mandaat, contract en bestuurlijk besluit kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Voorstel, stem, mandaat, contract en bestuurlijk besluit kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Voorstel, stem, mandaat, contract en bestuurlijk besluit levert uitsluitend formeel gepubliceerd besluit en procesles met versie/provenance; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Voorstel, stem, mandaat, contract en bestuurlijk besluit levert uitsluitend formeel gepubliceerd besluit en procesles met versie/provenance; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies B/C per formeel proces met immutable besluitcontext; private beraadslaging blijft buiten recall.",
+      "unlockImpact": {
+        "capabilities": 8,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D21_FINANCIAL_PROFILING",
+      "title": "Financiële inzichten, krediet en AI",
+      "classification": "LEGAL_VALIDATION_REQUIRED",
+      "capabilityIds": [
+        "geldwereld",
+        "dom-bank-inzicht",
+        "dom-bank-vastelasten",
+        "dom-bank-spaardoel",
+        "dom-bank-krediet",
+        "dom-bank-advies",
+        "dom-kosten",
+        "gld-aitegoed"
+      ],
+      "domains": [
+        "pay"
+      ],
+      "question": "Welke financiële patronen mogen worden afgeleid, onthouden of voor advies/krediet gebruikt?",
+      "why": "Dit raakt profiling, mogelijke rechtsgevolgen, AI-uitlegbaarheid en sterk doelgebonden financiële gegevens.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Financieel gedrag, doelen, krediet, kosten en AI-advies blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Financieel gedrag, doelen, krediet, kosten en AI-advies blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Financieel gedrag, doelen, krediet, kosten en AI-advies kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Financieel gedrag, doelen, krediet, kosten en AI-advies kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Financieel gedrag, doelen, krediet, kosten en AI-advies levert uitsluitend uitsluitend door gebruiker bevestigde persoonlijke analyse voor één doel; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Financieel gedrag, doelen, krediet, kosten en AI-advies levert uitsluitend uitsluitend door gebruiker bevestigde persoonlijke analyse voor één doel; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Houd A totdat productbeleid en juridische validatie per advies- of kredietdoel bestaan.",
+      "unlockImpact": {
+        "capabilities": 8,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D07_TRAVEL_EXPERIENCE",
+      "title": "Reiservaring en toekomstige reisrecall",
+      "classification": "MIXED",
+      "capabilityIds": [
+        "avondos",
+        "arrival",
+        "instantreality",
+        "dom-reisbureau",
+        "bk-reizen",
+        "bk-verblijf",
+        "bk-reiswijzer"
+      ],
+      "domains": [
+        "travelos"
+      ],
+      "question": "Welke reiservaring mag persoonlijk worden onthouden of losgekoppeld operationele verbetering voeden?",
+      "why": "Een boeking of reis maakt geen keuze over experience sharing, profiling, locatie of toekomstige aanbevelingen.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Reisintentie, verblijf, verplaatsing en ervaring blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Reisintentie, verblijf, verplaatsing en ervaring blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Reisintentie, verblijf, verplaatsing en ervaring kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Reisintentie, verblijf, verplaatsing en ervaring kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Reisintentie, verblijf, verplaatsing en ervaring levert uitsluitend route-, service- of verstoringskennis zonder reizigershistorie; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Reisintentie, verblijf, verplaatsing en ervaring levert uitsluitend route-, service- of verstoringskennis zonder reizigershistorie; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies B voor persoonlijke triprecall en C voor losgekoppelde verstorings-/toegankelijkheidslessen.",
+      "unlockImpact": {
+        "capabilities": 7,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D13_DISCOVERY_COMMONS",
+      "title": "Saloon, sociaal/professioneel netwerk en Commons",
+      "classification": "PRODUCT_POLICY",
+      "capabilityIds": [
+        "zakelijk",
+        "socialewereld",
+        "connect",
+        "dom-genootschap",
+        "salon",
+        "kern-waardering"
+      ],
+      "domains": [
+        "world-network",
+        "saloon"
+      ],
+      "question": "Welke bijdragen mogen publiek/commons worden en welke signalen mogen discovery verbeteren?",
+      "why": "Volgen, waarderen, netwerken en publiceren hebben verschillende betekenis; populariteit is geen kwaliteit.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Netwerkbijdragen, waarderingen en discoverygedrag blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Netwerkbijdragen, waarderingen en discoverygedrag blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Netwerkbijdragen, waarderingen en discoverygedrag kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Netwerkbijdragen, waarderingen en discoverygedrag kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Netwerkbijdragen, waarderingen en discoverygedrag levert uitsluitend versiegebonden Commons-inhoud met provenance, zonder globaal reputatiecijfer; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Netwerkbijdragen, waarderingen en discoverygedrag levert uitsluitend versiegebonden Commons-inhoud met provenance, zonder globaal reputatiecijfer; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies B voor expliciete public release en C alleen voor inhoudsrelevantie zonder mensscore of pay-to-rank.",
+      "unlockImpact": {
+        "capabilities": 6,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D14_AI_ASSISTANCE",
+      "title": "AI-assistentie, inference en voorspellen",
+      "classification": "ETHICAL/SAFETY",
+      "capabilityIds": [
+        "oog",
+        "ghost",
+        "knelpunt",
+        "kern-rahul",
+        "ov-aandacht",
+        "stuur"
+      ],
+      "domains": [
+        "edge-ai",
+        "service-support"
+      ],
+      "question": "Welke AI-output mag worden bewaard, geleerd, uitgevoerd of later teruggebracht?",
+      "why": "INFERRED, PROPOSED en GENERATED zijn geen menselijke uitspraak, toestemming of authority decision.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "AI-input, output, voorspelling en aandachtssignaal blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "AI-input, output, voorspelling en aandachtssignaal blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "AI-input, output, voorspelling en aandachtssignaal kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "AI-input, output, voorspelling en aandachtssignaal kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "AI-input, output, voorspelling en aandachtssignaal levert uitsluitend door een bevoegde mens geaccepteerde voorstelreferentie met AI-provenance; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "AI-input, output, voorspelling en aandachtssignaal levert uitsluitend door een bevoegde mens geaccepteerde voorstelreferentie met AI-provenance; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies B voor door de gebruiker bevestigde assistentiecontext; AI-training blijft een afzonderlijk doel en source truth blijft onaangeraakt.",
+      "unlockImpact": {
+        "capabilities": 6,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D16_ACCOUNT_ORGANIZATION",
+      "title": "Account-, profiel- en organisatiecontext",
+      "classification": "PRIVACY_POLICY",
+      "capabilityIds": [
+        "member",
+        "supplier",
+        "tenant",
+        "dom-onboarding",
+        "tg-account",
+        "tg-aanmeld"
+      ],
+      "domains": [
+        "identity-organizations"
+      ],
+      "question": "Welke account- of organisatiestate mag onboarding en service verbeteren?",
+      "why": "Accountgebruik is noodzakelijk voor de dienst maar geen toestemming voor gedragsprofilering of cross-domain learning.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Account, profiel, tenant en onboarding blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Account, profiel, tenant en onboarding blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Account, profiel, tenant en onboarding kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Account, profiel, tenant en onboarding kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Account, profiel, tenant en onboarding levert uitsluitend geaggregeerde procesfout zonder identiteit of profielinhoud; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Account, profiel, tenant en onboarding levert uitsluitend geaggregeerde procesfout zonder identiteit of profielinhoud; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies C voor geaggregeerde procesfrictie; persoonlijke profielinhoud blijft A tenzij expliciet gekozen.",
+      "unlockImpact": {
+        "capabilities": 6,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D08_FOUNDATION_ASSISTANCE",
+      "title": "Foundation-hulp en programma-ervaring",
+      "classification": "ETHICAL/SAFETY",
+      "capabilityIds": [
+        "levenos",
+        "rugdekking",
+        "werk-rtf",
+        "dom-rtfkantoor",
+        "dom-rtfos"
+      ],
+      "domains": [
+        "foundationos"
+      ],
+      "question": "Mag vrijwillige ervaring uit hulp of Foundation-programma’s bijdragen aan verbetering?",
+      "why": "De machtsverhouding maakt een technisch vinkje onvoldoende; weigering mag behandeling of kans nooit verslechteren.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Ervaring met hulp, mentoring, kansen en Foundation-projecten blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Ervaring met hulp, mentoring, kansen en Foundation-projecten blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Ervaring met hulp, mentoring, kansen en Foundation-projecten kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Ervaring met hulp, mentoring, kansen en Foundation-projecten kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Ervaring met hulp, mentoring, kansen en Foundation-projecten levert uitsluitend een vrijwillig vrijgegeven les zonder hulpdossier; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Ervaring met hulp, mentoring, kansen en Foundation-projecten levert uitsluitend een vrijwillig vrijgegeven les zonder hulpdossier; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies B met aantoonbare no-disadvantage en scheid zorg-/hulpdossier van de vrijwillige bijdrage.",
+      "unlockImpact": {
+        "capabilities": 5,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D09_CHILD_EDUCATION",
+      "title": "Kinderen, school en oudercontext",
+      "classification": "LEGAL_VALIDATION_REQUIRED",
+      "capabilityIds": [
+        "opvangwijzer",
+        "office-school",
+        "foundation",
+        "foundation-school"
+      ],
+      "domains": [
+        "foundationos"
+      ],
+      "question": "Welke leer- of ervaringscontext rond minderjarigen mag worden bewaard, gedeeld of hergebruikt?",
+      "why": "Leeftijd, vertegenwoordiging, kindstem, schoolauthority en bewaartermijn vragen een expliciete beleids- en juridische keuze.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Kinderopvang-, leerling-, ouder- en schoolcontext blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Kinderopvang-, leerling-, ouder- en schoolcontext blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Kinderopvang-, leerling-, ouder- en schoolcontext kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Kinderopvang-, leerling-, ouder- en schoolcontext kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Kinderopvang-, leerling-, ouder- en schoolcontext levert uitsluitend onderwijsprocesverbetering zonder leerlingprofiel; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Kinderopvang-, leerling-, ouder- en schoolcontext levert uitsluitend onderwijsprocesverbetering zonder leerlingprofiel; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Houd A totdat leeftijdsgebonden assent/consent, schoolrollen en verwijdering zijn gevalideerd.",
+      "unlockImpact": {
+        "capabilities": 4,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D10_RESEARCH_PARTICIPATION",
+      "title": "Living Lab en onderzoeksdeelname",
+      "classification": "MIXED",
+      "capabilityIds": [
+        "dom-lab",
+        "dom-livinglab",
+        "dom-livinglab-bewoner",
+        "dom-labfonds"
+      ],
+      "domains": [
+        "living-lab"
+      ],
+      "question": "Onder welke voorwaarden mogen studiegegevens, reflecties en resultaten later opnieuw worden gebruikt?",
+      "why": "Studiedoel, ethische review, withdrawal, dataset-onomkeerbaarheid en secondary use zijn studiegebonden.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Onderzoeksobservaties, metingen, reflecties en conclusies blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Onderzoeksobservaties, metingen, reflecties en conclusies blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Onderzoeksobservaties, metingen, reflecties en conclusies kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Onderzoeksobservaties, metingen, reflecties en conclusies kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Onderzoeksobservaties, metingen, reflecties en conclusies levert uitsluitend een versiegebonden gepubliceerd resultaat met provenance; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Onderzoeksobservaties, metingen, reflecties en conclusies levert uitsluitend een versiegebonden gepubliceerd resultaat met provenance; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies B per studie; Commons-publicatie en secondary use krijgen aparte releases.",
+      "unlockImpact": {
+        "capabilities": 4,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D03_HEALTH_CONTEXT",
+      "title": "Zorg- en gezondheidscontext",
+      "classification": "LEGAL_VALIDATION_REQUIRED",
+      "capabilityIds": [
+        "medicijnen",
+        "dom-care",
+        "ov-zorgprofiel"
+      ],
+      "domains": [
+        "health-care"
+      ],
+      "question": "Welke zorgcontext mag voor welk verbeterdoel worden hergebruikt en wie mag haar terugzien?",
+      "why": "De code kan medische gevoeligheid, beroepsgeheim, grondslag en bewaartermijn niet zelf vaststellen.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Medicatie, zorgvraag en zorgprofiel blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Medicatie, zorgvraag en zorgprofiel blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Medicatie, zorgvraag en zorgprofiel kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Medicatie, zorgvraag en zorgprofiel kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Medicatie, zorgvraag en zorgprofiel levert uitsluitend uitsluitend expliciet gevalideerde veiligheidskennis zonder patiëntkoppeling; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Medicatie, zorgvraag en zorgprofiel levert uitsluitend uitsluitend expliciet gevalideerde veiligheidskennis zonder patiëntkoppeling; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Houd A totdat productbeleid én juridische validatie per doel bestaan.",
+      "unlockImpact": {
+        "capabilities": 3,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D18_IDENTITY_VERIFICATION",
+      "title": "Identiteitsverificatie en gegevensdeling",
+      "classification": "LEGAL_VALIDATION_REQUIRED",
+      "capabilityIds": [
+        "verificatie",
+        "paspoort",
+        "tg-gegevens"
+      ],
+      "domains": [
+        "identity-organizations"
+      ],
+      "question": "Mag verificatie- of documentcontext buiten de concrete verificatie of gegevensoverdracht worden gebruikt?",
+      "why": "De code kan rechtsgrond, documentretentie, ontvangers en verboden secondary use niet zelf beslissen.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "KYC-, paspoort- en gegevenspoortinhoud blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "KYC-, paspoort- en gegevenspoortinhoud blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "KYC-, paspoort- en gegevenspoortinhoud kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "KYC-, paspoort- en gegevenspoortinhoud kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "KYC-, paspoort- en gegevenspoortinhoud levert uitsluitend een niet-herleidbaar technisch overdrachtsincident; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "KYC-, paspoort- en gegevenspoortinhoud levert uitsluitend een niet-herleidbaar technisch overdrachtsincident; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies A voor inhoud; alleen technische kwaliteitsincidenten kunnen na review als C.",
+      "unlockImpact": {
+        "capabilities": 3,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D22_COMMERCIAL_CLAIMS",
+      "title": "Prijzen, garanties en commerciële claims",
+      "classification": "MIXED",
+      "capabilityIds": [
+        "gld-prijzen",
+        "gld-claims",
+        "gld-prijsgarantie"
+      ],
+      "domains": [
+        "pay"
+      ],
+      "question": "Mag een prijs- of garantieclaim worden hergebruikt voor beleid, ranking of toekomstige beslissingen?",
+      "why": "Een commerciële claim is betwistbaar en wordt niet waar door herhaling of betaling.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Prijs-, tarief- en garantieclaims blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Prijs-, tarief- en garantieclaims blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Prijs-, tarief- en garantieclaims kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Prijs-, tarief- en garantieclaims kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Prijs-, tarief- en garantieclaims levert uitsluitend geverifieerde procesuitkomst zonder mens- of zaakscore; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Prijs-, tarief- en garantieclaims levert uitsluitend geverifieerde procesuitkomst zonder mens- of zaakscore; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies B voor zaakgebonden behandeling; pas na source verification kan een geminimaliseerde procesles ontstaan.",
+      "unlockImpact": {
+        "capabilities": 3,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D05_DOCUMENT_CONTENT",
+      "title": "Bestanden, memo en samenvattingen",
+      "classification": "PRIVACY_POLICY",
+      "capabilityIds": [
+        "dom-bestanden",
+        "kern-memo"
+      ],
+      "domains": [
+        "files-documents"
+      ],
+      "question": "Mag documentinhoud of een afgeleide samenvatting voor learning of recall worden gebruikt?",
+      "why": "Toegang tot een bestand zegt niets over hergebruik van inhoud, afgeleiden, AI of retentie.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Bestandsinhoud, memo en samenvatting blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Bestandsinhoud, memo en samenvatting blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Bestandsinhoud, memo en samenvatting kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Bestandsinhoud, memo en samenvatting kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Bestandsinhoud, memo en samenvatting levert uitsluitend documenttype- en procesmetadata zonder inhoud; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Bestandsinhoud, memo en samenvatting levert uitsluitend documenttype- en procesmetadata zonder inhoud; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies B per document en doel; metadata alleen is geen inhoudsrelease.",
+      "unlockImpact": {
+        "capabilities": 2,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D02_LOCATION_CONTEXT",
+      "title": "Locatie en aanwezigheid",
+      "classification": "PRIVACY_POLICY",
+      "capabilityIds": [
+        "kern-locatie"
+      ],
+      "domains": [
+        "personal-life"
+      ],
+      "question": "Mag locatiegeschiedenis worden gebruikt voor recall of verbetering buiten de actuele handeling?",
+      "why": "Actuele locatie delen bepaalt niet of een historische bewegings- of aanwezigheidslijn mag ontstaan.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Locatie en aanwezigheid blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Locatie en aanwezigheid blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Locatie en aanwezigheid kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Locatie en aanwezigheid kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Locatie en aanwezigheid levert uitsluitend een plaatsgebonden signaal zonder persoon of routehistorie; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Locatie en aanwezigheid levert uitsluitend een plaatsgebonden signaal zonder persoon of routehistorie; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Bewaar standaard geen geschiedenis; B alleen per concreet doel en korte expiry.",
+      "unlockImpact": {
+        "capabilities": 1,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D12_DATING",
+      "title": "Dating en intieme voorkeuren",
+      "classification": "ETHICAL/SAFETY",
+      "capabilityIds": [
+        "vonk"
+      ],
+      "domains": [
+        "community-events"
+      ],
+      "question": "Mag datinginteractie ooit learning, ranking of cross-domain recall voeden?",
+      "why": "Dit raakt intieme voorkeuren en veiligheidsrisico’s; productgebruik is geen profilingtoestemming.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Datinginteractie en intieme voorkeuren blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Datinginteractie en intieme voorkeuren blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Datinginteractie en intieme voorkeuren kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Datinginteractie en intieme voorkeuren kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Datinginteractie en intieme voorkeuren levert uitsluitend uitsluitend beoordeeld safety-incident zonder matchingprofiel; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Datinginteractie en intieme voorkeuren levert uitsluitend uitsluitend beoordeeld safety-incident zonder matchingprofiel; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies A als platformregel; eventuele safety-signalen blijven doelgebonden en strikt afgescheiden.",
+      "unlockImpact": {
+        "capabilities": 1,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    },
+    {
+      "id": "D15_SERVICE_IMPROVEMENT",
+      "title": "Service- en supportverbetering",
+      "classification": "MIXED",
+      "capabilityIds": [
+        "service"
+      ],
+      "domains": [
+        "service-support"
+      ],
+      "question": "Mag supportfeedback of ticketinhoud organizational improvement voeden?",
+      "why": "Een hulpvraag kan gevoelige context bevatten; oplossen is geen automatische release voor analyse of training.",
+      "options": [
+        {
+          "id": "A",
+          "title": "Geen optionele learning",
+          "description": "Supportticket, klacht en oplossingsgesprek blijft uitsluitend primaire operationele state.",
+          "consequences": {
+            "product": "Supportticket, klacht en oplossingsgesprek blijft uitsluitend primaire operationele state.",
+            "privacy": "Geen optionele learningkopie.",
+            "learning": "Alleen operationele bronstate.",
+            "ai": "Geen AI-gebruik buiten de primaire dienst.",
+            "crossDomain": "Uit.",
+            "retention": "Bronretentie; geen extra memory.",
+            "userControl": "Geen optionele deelname.",
+            "implementation": "Deny-gate; geen learning artifact of recallprojectie."
+          }
+        },
+        {
+          "id": "B",
+          "title": "Vrijwillig en doelgebonden",
+          "description": "Supportticket, klacht en oplossingsgesprek kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+          "consequences": {
+            "product": "Supportticket, klacht en oplossingsgesprek kan alleen na een afzonderlijke, begrijpelijke keuze aan één genoemd verbeterdoel bijdragen.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Source-issued eligibility met audience, fields, expiry en withdrawal."
+          }
+        },
+        {
+          "id": "C",
+          "title": "Alleen structureel geminimaliseerd",
+          "description": "Supportticket, klacht en oplossingsgesprek levert uitsluitend door behandelaar geminimaliseerde procesles zonder klantinhoud; de persoonlijke koppeling gaat niet mee.",
+          "consequences": {
+            "product": "Supportticket, klacht en oplossingsgesprek levert uitsluitend door behandelaar geminimaliseerde procesles zonder klantinhoud; de persoonlijke koppeling gaat niet mee.",
+            "privacy": "Doelgebonden minimale gegevens.",
+            "learning": "Alleen vrijgegeven of structureel geminimaliseerde artifacts.",
+            "ai": "AI blijft een afzonderlijke use-scope.",
+            "crossDomain": "Alleen met afzonderlijke source-issued eligibility.",
+            "retention": "Purpose-bound expiry, unlinking en revocation.",
+            "userControl": "Inzien, corrigeren, intrekken waar toepasselijk.",
+            "implementation": "Reviewpoort, allowlist en aantoonbare unlinking vóór organizational memory."
+          }
+        }
+      ],
+      "safeDefault": "Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken.",
+      "recommendation": "Kies C voor procesmetadata en B voor expliciet geselecteerde inhoud.",
+      "unlockImpact": {
+        "capabilities": 1,
+        "to": "NEEDS_TECHNICAL_PREREQUISITE",
+        "directReady": 0
+      }
+    }
+  ],
+  "educationDossier": {
+    "id": "D23_LIBRARY_EDUCATION_RELEASE",
+    "title": "Library Edition naar Academy",
+    "classification": "MIXED",
+    "capabilityIds": [
+      "dom-library",
+      "leerhuis",
+      "dom-les",
+      "dom-leerstof",
+      "dom-onderwijs",
+      "ov-bijles",
+      "rtf-leerpaspoort"
+    ],
+    "domains": [
+      "libraryos",
+      "academy"
+    ],
+    "question": "Onder welke edition-bound voorwaarden mag Academy Library-inhoud gebruiken?",
+    "why": "RightsGrant kent education als actie, maar applicability, ontvangerauthority, withdrawal en cursusversioning vormen nog geen bewezen contract.",
+    "decisions": {
+      "editionScope": [
+        "alleen Edition X",
+        "Edition X plus expliciet toekomstige Editions"
+      ],
+      "contentScope": [
+        "hele Edition",
+        "geselecteerde ContentNodes"
+      ],
+      "economics": [
+        "gratis",
+        "betaald/licentiecontract"
+      ],
+      "academyAudience": [
+        "interne Academy-context Z",
+        "publieke cursusrelease"
+      ],
+      "language": [
+        "exacte taalrepresentatie",
+        "afzonderlijk vertaalrecht"
+      ],
+      "derivatives": [
+        "citeren",
+        "lesmateriaal afleiden",
+        "geen afleiding"
+      ],
+      "ai": [
+        "geen AI",
+        "assistentie",
+        "afzonderlijke trainingstoestemming"
+      ],
+      "attribution": [
+        "vereiste citation en contributorcredit"
+      ],
+      "change": [
+        "nieuwe Edition vereist nieuwe release tenzij expliciet future-edition grant"
+      ],
+      "withdrawal": [
+        "nieuwe consumptie stopt",
+        "bestaande cursusversie blijft historisch maar niet opnieuw uitgeven"
+      ],
+      "learners": [
+        "bestaande legitiem uitgegeven cursus blijft aantoonbaar beschikbaar volgens releasevoorwaarden"
+      ],
+      "retention": [
+        "releasebewijs en lineage duurzaam; broninhoud niet dupliceren"
+      ],
+      "lineage": [
+        "Edition/ContentNode -> Academy curriculum version, zonder truth promotion"
+      ]
+    },
+    "safeDefault": "Geen Library-naar-Academy overdracht.",
+    "recommendation": "Begin met één gratis, interne Academy-context, exact Edition X, geselecteerde ContentNodes, citation verplicht, geen derivatives of AI-training, en withdrawal voor toekomstige cursusversies.",
+    "unlockImpact": {
+      "capabilities": 7,
+      "to": "NEEDS_TECHNICAL_PREREQUISITE",
+      "directReady": 0
+    }
+  },
+  "constitutionCandidates": [
+    {
+      "id": "C01_SERVICE_IS_NOT_LEARNING_CONSENT",
+      "rule": "Gebruik van een RTG-dienst is geen toestemming voor optionele learning.",
+      "resolves": [
+        "D01",
+        "D04",
+        "D07",
+        "D11",
+        "D13",
+        "D15",
+        "D16"
+      ],
+      "domains": [
+        "personal-life",
+        "communication",
+        "travelos",
+        "community-events",
+        "saloon",
+        "service-support",
+        "identity-organizations"
+      ],
+      "counterexample": "Noodzakelijke technische verwerking voor levering van de dienst is geen optionele learning.",
+      "exceptions": "Een andere aantoonbare grond kan gelden voor strikt noodzakelijke security of wettelijke verplichting.",
+      "runtime": "Iedere promotion vraagt source-issued eligibility met purpose en basis; afwezig betekent DENY.",
+      "tests": [
+        "implicit use cannot issue eligibility",
+        "no-consent does not degrade primary service"
+      ]
+    },
+    {
+      "id": "C02_NO_SILENT_MEMORY_PROMOTION",
+      "rule": "Personal en Relationship Memory promoveren nooit stil naar Organizational, Domain/Asset of Commons Memory.",
+      "resolves": [
+        "D01",
+        "D04",
+        "D05",
+        "D06",
+        "D07",
+        "D11"
+      ],
+      "domains": [
+        "personal-life",
+        "communication",
+        "files-documents",
+        "workos",
+        "talent",
+        "travelos",
+        "community-events"
+      ],
+      "counterexample": "Een bronobject dat vanaf creatie aantoonbaar Domain/Asset-state is, hoeft niet eerst Personal te zijn.",
+      "exceptions": "Een nieuwe afzonderlijke release kan een geminimaliseerd nieuw artifact uitgeven.",
+      "runtime": "memoryClass is immutable in eligibility; promotion vereist nieuw artifact, nieuwe eligibility en lineage.",
+      "tests": [
+        "personal-to-organizational denied",
+        "personal-to-commons denied",
+        "new released artifact keeps provenance"
+      ]
+    },
+    {
+      "id": "C03_COMMONS_RELEASE",
+      "rule": "Commons-publicatie vereist een afzonderlijke expliciete, versiegebonden release.",
+      "resolves": [
+        "D10",
+        "D13",
+        "D19",
+        "D23"
+      ],
+      "domains": [
+        "living-lab",
+        "saloon",
+        "world-network",
+        "governance",
+        "libraryos",
+        "academy"
+      ],
+      "counterexample": "Reeds publiek bronmateriaal kan als publieke bronreferentie worden gebruikt binnen zijn bestaande licentie.",
+      "exceptions": "Wettelijke publicatieplicht kan een andere aantoonbare basis hebben.",
+      "runtime": "publish=true alleen bij source-issued release met scope, version, audience en withdrawalbeleid.",
+      "tests": [
+        "private artifact cannot become commons",
+        "new version does not inherit release silently"
+      ]
+    },
+    {
+      "id": "C04_AI_PURPOSE_SEPARATION",
+      "rule": "AI-assistentie, AI-inference en AI-training zijn afzonderlijke doelen.",
+      "resolves": [
+        "D03",
+        "D04",
+        "D05",
+        "D14",
+        "D18",
+        "D21",
+        "D23"
+      ],
+      "domains": [
+        "health-care",
+        "communication",
+        "files-documents",
+        "edge-ai",
+        "identity-organizations",
+        "pay",
+        "libraryos",
+        "academy"
+      ],
+      "counterexample": "Deterministische lokale tekstzoekfunctie is geen modeltraining of inference.",
+      "exceptions": "Geen.",
+      "runtime": "uses.ai krijgt benoemde modes; ontbrekende mode is denied; AI-herkomst blijft INFERRED/PROPOSED/GENERATED.",
+      "tests": [
+        "assistant consent does not allow training",
+        "AI output cannot become SOURCE_VERIFIED"
+      ]
+    },
+    {
+      "id": "C05_STRUCTURAL_LESSON_UNLINKING",
+      "rule": "Een persoonlijke Observation kan alleen organizational improvement voeden via een apart, minimaal artifact waarvan onnodige persoonskoppeling aantoonbaar is verwijderd.",
+      "resolves": [
+        "D06",
+        "D07",
+        "D08",
+        "D11",
+        "D15",
+        "D16",
+        "D20"
+      ],
+      "domains": [
+        "workos",
+        "talent",
+        "travelos",
+        "foundationos",
+        "community-events",
+        "service-support",
+        "identity-organizations",
+        "pay"
+      ],
+      "counterexample": "Een individuele klachtbehandeling moet de relatie tijdelijk behouden om terug te koppelen.",
+      "exceptions": "Legal hold of betwisting kan beperkte koppeling langer vereisen; dat geeft geen bredere recall.",
+      "runtime": "minimization allowlist, unlink receipt en aparte retention voor bron en lesson.",
+      "tests": [
+        "lesson survives permitted unlink",
+        "identity cannot be resolved after unlink",
+        "contest return path remains scoped"
+      ]
+    },
+    {
+      "id": "C06_FOUNDATION_NO_DISADVANTAGE",
+      "rule": "Foundation-hulp, onderwijsdeelname of kansen worden niet afhankelijk gemaakt van toestemming voor optionele learning.",
+      "resolves": [
+        "D08",
+        "D09"
+      ],
+      "domains": [
+        "foundationos"
+      ],
+      "counterexample": "Informatie die noodzakelijk is om de aangevraagde dienst veilig te leveren mag vereist zijn.",
+      "exceptions": "Noodzakelijke dienstdata blijft strikt bij dat doel.",
+      "runtime": "service decision mag geen optional eligibility-status lezen; architecture gate bewaakt de verboden dependency.",
+      "tests": [
+        "denied learning consent keeps service eligibility equal",
+        "withdrawal cannot reduce support"
+      ]
+    },
+    {
+      "id": "C07_EMPLOYEE_SURVEILLANCE_BOUNDARY",
+      "rule": "Persoonlijke productiviteit, communicatie en gedrag worden niet automatisch organizational memory.",
+      "resolves": [
+        "D04",
+        "D06",
+        "D15"
+      ],
+      "domains": [
+        "communication",
+        "workos",
+        "talent",
+        "service-support"
+      ],
+      "counterexample": "Objectieve status van een toegewezen taak of geautoriseerde proceschange is organizationele processtate.",
+      "exceptions": "Beoordeelde safety/security-incidenten volgen een afzonderlijk doel en authority.",
+      "runtime": "employee-linked fields ontbreken uit organizational artifact allowlists; recall weigert person-scoped refs.",
+      "tests": [
+        "employee note not institutional memory",
+        "process receipt may remain without worker profile"
+      ]
+    },
+    {
+      "id": "C08_ASSET_NOT_OCCUPANT",
+      "rule": "Een volgende gebruiker of bewoner erft asset history, niet automatisch de persoonsgeschiedenis van de vorige gebruiker.",
+      "resolves": [
+        "D01",
+        "D02",
+        "D07",
+        "D11"
+      ],
+      "domains": [
+        "personal-life",
+        "travelos",
+        "community-events",
+        "livingos"
+      ],
+      "counterexample": "Een gedeelde contractuele verplichting kan bewust aan de assetrelatie zijn gekoppeld.",
+      "exceptions": "Overdracht met expliciete bevoegdheid en dataminimalisatie.",
+      "runtime": "assetRef en actorRef hebben gescheiden retention; relatiebeëindiging unlinkt actor voor toekomstige recall.",
+      "tests": [
+        "next occupant sees asset intervention",
+        "next occupant cannot resolve former actor"
+      ]
+    },
+    {
+      "id": "C09_EPISTEMIC_PROVENANCE",
+      "rule": "Cross-domain overdracht verandert claim, inference of observatie niet vanzelf in geverifieerde waarheid.",
+      "resolves": [
+        "D10",
+        "D13",
+        "D14",
+        "D19",
+        "D22",
+        "D23"
+      ],
+      "domains": [
+        "living-lab",
+        "saloon",
+        "world-network",
+        "edge-ai",
+        "governance",
+        "pay",
+        "libraryos",
+        "academy"
+      ],
+      "counterexample": "Een bevoegde bron kan na eigen verificatie een nieuw SOURCE_VERIFIED artifact uitgeven.",
+      "exceptions": "Het nieuwe artifact behoudt lineage naar het oorspronkelijke epistemische type.",
+      "runtime": "epistemicType is verplicht en immutable per artifact; consumer kan alleen nieuw bronartifact uitgeven.",
+      "tests": [
+        "claim remains claim across three domains",
+        "verified artifact requires source authority"
+      ]
+    },
+    {
+      "id": "C10_CURRENT_AUTHORITY_AT_RECALL",
+      "rule": "Historische toegang geeft geen permanent recht op Recall.",
+      "resolves": [
+        "D03",
+        "D04",
+        "D05",
+        "D06",
+        "D09",
+        "D10",
+        "D17",
+        "D18",
+        "D19",
+        "D20"
+      ],
+      "domains": [
+        "health-care",
+        "communication",
+        "files-documents",
+        "workos",
+        "foundationos",
+        "living-lab",
+        "identity-organizations",
+        "governance",
+        "pay"
+      ],
+      "counterexample": "Een publiek released Commons-object kan zonder historische relatie leesbaar blijven.",
+      "exceptions": "Audit/verantwoording kan beperkte, afzonderlijk geautoriseerde toegang vereisen.",
+      "runtime": "Recall resolveert actuele authority, purpose, retention en source visibility bij iedere presentatie.",
+      "tests": [
+        "revoked role denies recall",
+        "public release follows current distribution status"
+      ]
+    },
+    {
+      "id": "C11_MINOR_CONTEXT_FAILS_CLOSED",
+      "rule": "Optionele learning rond minderjarigen blijft dicht zonder leeftijdsadequate toestemming, vertegenwoordiging en doel.",
+      "resolves": [
+        "D09"
+      ],
+      "domains": [
+        "foundationos"
+      ],
+      "counterexample": "Noodzakelijke schooladministratie is operationele state en geen optionele learning.",
+      "exceptions": "Alleen na gevalideerd beleid per leeftijd, rol en doel.",
+      "runtime": "minor sensitivity forceert HUMAN_REVIEW_REQUIRED totdat policyref en authority bestaan.",
+      "tests": [
+        "guardian relation alone does not publish",
+        "expired representation denies recall"
+      ]
+    },
+    {
+      "id": "C12_HIGH_IMPACT_SEPARATION",
+      "rule": "Zorg, financiële profilering, credentials en intieme context krijgen geen generiek cross-domain learningpad.",
+      "resolves": [
+        "D03",
+        "D12",
+        "D17",
+        "D18",
+        "D21"
+      ],
+      "domains": [
+        "health-care",
+        "community-events",
+        "identity-organizations",
+        "pay"
+      ],
+      "counterexample": "Een geminimaliseerd technisch incident kan na menselijke review een operationele procesles worden.",
+      "exceptions": "Doelgebonden gevalideerde adapters per domein, nooit een catch-all.",
+      "runtime": "sensitivity policy blokkeert cross-domain en AI standaard; expliciete domeinadapter vereist.",
+      "tests": [
+        "high-impact artifact rejected by generic adapter",
+        "technical incident excludes source payload"
+      ]
+    }
+  ]
+}

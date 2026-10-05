@@ -7460,7 +7460,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D16_ACCOUNT_ORGANIZATION"
       }
     },
     {
@@ -7636,7 +7637,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D04_COMMUNICATION_CONTENT"
       }
     },
     {
@@ -7747,7 +7749,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D04_COMMUNICATION_CONTENT"
       }
     },
     {
@@ -7844,7 +7847,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
       }
     },
     {
@@ -7962,7 +7966,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -8061,7 +8066,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D13_DISCOVERY_COMMONS"
       }
     },
     {
@@ -8278,7 +8284,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D15_SERVICE_IMPROVEMENT"
       }
     },
     {
@@ -8376,7 +8383,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D04_COMMUNICATION_CONTENT"
       }
     },
     {
@@ -8469,7 +8477,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D04_COMMUNICATION_CONTENT"
       }
     },
     {
@@ -8569,7 +8578,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -8673,7 +8683,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -8789,7 +8800,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D13_DISCOVERY_COMMONS"
       }
     },
     {
@@ -8871,7 +8883,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D11_COMMUNITY_EVENTS"
       }
     },
     {
@@ -8975,7 +8988,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D11_COMMUNITY_EVENTS"
       }
     },
     {
@@ -9132,7 +9146,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D11_COMMUNITY_EVENTS"
       }
     },
     {
@@ -9231,7 +9246,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D19_GOVERNANCE"
       }
     },
     {
@@ -9323,7 +9339,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D19_GOVERNANCE"
       }
     },
     {
@@ -9519,7 +9536,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D11_COMMUNITY_EVENTS"
       }
     },
     {
@@ -10110,7 +10128,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D19_GOVERNANCE"
       }
     },
     {
@@ -11015,7 +11034,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -11130,7 +11150,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D21_FINANCIAL_PROFILING"
       }
     },
     {
@@ -11242,7 +11263,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE"
       }
     },
     {
@@ -11352,7 +11374,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D13_DISCOVERY_COMMONS"
       }
     },
     {
@@ -11670,7 +11693,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D12_DATING"
       }
     },
     {
@@ -11773,7 +11797,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D04_COMMUNICATION_CONTENT"
       }
     },
     {
@@ -12059,7 +12084,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D14_AI_ASSISTANCE"
       }
     },
     {
@@ -12151,7 +12177,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D14_AI_ASSISTANCE"
       }
     },
     {
@@ -12405,7 +12432,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
       }
     },
     {
@@ -12505,7 +12533,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
       }
     },
     {
@@ -12598,7 +12627,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
       }
     },
     {
@@ -12700,7 +12730,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D19_GOVERNANCE"
       }
     },
     {
@@ -12892,7 +12923,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -12983,7 +13015,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -13074,7 +13107,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -13160,7 +13194,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -13251,7 +13286,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -13400,7 +13436,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D03_HEALTH_CONTEXT"
       }
     },
     {
@@ -13494,7 +13531,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -13585,7 +13623,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -13676,7 +13715,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -13910,7 +13950,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D09_CHILD_EDUCATION"
       }
     },
     {
@@ -14021,7 +14062,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D14_AI_ASSISTANCE"
       }
     },
     {
@@ -14119,7 +14161,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D19_GOVERNANCE"
       }
     },
     {
@@ -14196,7 +14239,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE"
       }
     },
     {
@@ -14297,7 +14341,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
       }
     },
     {
@@ -14390,7 +14435,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -14489,7 +14535,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D13_DISCOVERY_COMMONS"
       }
     },
     {
@@ -14780,7 +14827,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D16_ACCOUNT_ORGANIZATION"
       }
     },
     {
@@ -15186,7 +15234,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D11_COMMUNITY_EVENTS"
       }
     },
     {
@@ -15592,7 +15641,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
       }
     },
     {
@@ -15850,7 +15900,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D09_CHILD_EDUCATION"
       }
     },
     {
@@ -15995,7 +16046,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D09_CHILD_EDUCATION"
       }
     },
     {
@@ -16127,7 +16179,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D09_CHILD_EDUCATION"
       }
     },
     {
@@ -16226,7 +16279,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE"
       }
     },
     {
@@ -16484,7 +16538,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -16581,7 +16636,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D17_SECURITY_CREDENTIALS"
       }
     },
     {
@@ -16683,7 +16739,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D17_SECURITY_CREDENTIALS"
       }
     },
     {
@@ -16769,7 +16826,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D18_IDENTITY_VERIFICATION"
       }
     },
     {
@@ -16859,7 +16917,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D18_IDENTITY_VERIFICATION"
       }
     },
     {
@@ -16993,7 +17052,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
       }
     },
     {
@@ -17093,7 +17153,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
       }
     },
     {
@@ -17206,7 +17267,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D14_AI_ASSISTANCE"
       }
     },
     {
@@ -17791,7 +17853,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D16_ACCOUNT_ORGANIZATION"
       }
     },
     {
@@ -17891,7 +17954,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
       }
     },
     {
@@ -18218,7 +18282,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D19_GOVERNANCE"
       }
     },
     {
@@ -18322,7 +18387,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D19_GOVERNANCE"
       }
     },
     {
@@ -18724,7 +18790,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
       }
     },
     {
@@ -18815,7 +18882,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D03_HEALTH_CONTEXT"
       }
     },
     {
@@ -18922,7 +18990,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D11_COMMUNITY_EVENTS"
       }
     },
     {
@@ -19016,7 +19085,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D11_COMMUNITY_EVENTS"
       }
     },
     {
@@ -19499,7 +19569,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D13_DISCOVERY_COMMONS"
       }
     },
     {
@@ -20112,7 +20183,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
       }
     },
     {
@@ -20318,7 +20390,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
       }
     },
     {
@@ -20414,7 +20487,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
       }
     },
     {
@@ -20813,7 +20887,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE"
       }
     },
     {
@@ -20931,7 +21006,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE"
       }
     },
     {
@@ -21016,7 +21092,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D17_SECURITY_CREDENTIALS"
       }
     },
     {
@@ -21115,7 +21192,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D10_RESEARCH_PARTICIPATION"
       }
     },
     {
@@ -21231,7 +21309,8 @@
         "blockers": [
           "human-decision",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D10_RESEARCH_PARTICIPATION"
       }
     },
     {
@@ -21333,7 +21412,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D10_RESEARCH_PARTICIPATION"
       }
     },
     {
@@ -22082,7 +22162,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D05_DOCUMENT_CONTENT"
       }
     },
     {
@@ -22690,7 +22771,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D17_SECURITY_CREDENTIALS"
       }
     },
     {
@@ -22776,7 +22858,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D17_SECURITY_CREDENTIALS"
       }
     },
     {
@@ -22864,7 +22947,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D17_SECURITY_CREDENTIALS"
       }
     },
     {
@@ -22956,7 +23040,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D16_ACCOUNT_ORGANIZATION"
       }
     },
     {
@@ -23047,7 +23132,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -23131,7 +23217,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D21_FINANCIAL_PROFILING"
       }
     },
     {
@@ -23214,7 +23301,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D21_FINANCIAL_PROFILING"
       }
     },
     {
@@ -23304,7 +23392,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D21_FINANCIAL_PROFILING"
       }
     },
     {
@@ -23391,7 +23480,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -23478,7 +23568,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -23565,7 +23656,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -23650,7 +23742,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -23738,7 +23831,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -23823,7 +23917,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D21_FINANCIAL_PROFILING"
       }
     },
     {
@@ -23909,7 +24004,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -24008,7 +24104,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D21_FINANCIAL_PROFILING"
       }
     },
     {
@@ -24089,7 +24186,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -24191,7 +24289,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -24275,7 +24374,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -24359,7 +24459,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -24446,7 +24547,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -24529,7 +24631,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -24610,7 +24713,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -24704,7 +24808,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D21_FINANCIAL_PROFILING"
       }
     },
     {
@@ -24815,7 +24920,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D17_SECURITY_CREDENTIALS"
       }
     },
     {
@@ -24918,7 +25024,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D16_ACCOUNT_ORGANIZATION"
       }
     },
     {
@@ -25019,7 +25126,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D17_SECURITY_CREDENTIALS"
       }
     },
     {
@@ -25101,7 +25209,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D17_SECURITY_CREDENTIALS"
       }
     },
     {
@@ -25236,7 +25345,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D17_SECURITY_CREDENTIALS"
       }
     },
     {
@@ -25334,7 +25444,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D17_SECURITY_CREDENTIALS"
       }
     },
     {
@@ -25433,7 +25544,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D18_IDENTITY_VERIFICATION"
       }
     },
     {
@@ -25531,7 +25643,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D16_ACCOUNT_ORGANIZATION"
       }
     },
     {
@@ -25884,7 +25997,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D04_COMMUNICATION_CONTENT"
       }
     },
     {
@@ -25999,7 +26113,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D04_COMMUNICATION_CONTENT"
       }
     },
     {
@@ -26096,7 +26211,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D04_COMMUNICATION_CONTENT"
       }
     },
     {
@@ -26325,7 +26441,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D02_LOCATION_CONTEXT"
       }
     },
     {
@@ -26492,7 +26609,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D05_DOCUMENT_CONTENT"
       }
     },
     {
@@ -26612,7 +26730,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D14_AI_ASSISTANCE"
       }
     },
     {
@@ -26787,7 +26906,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D13_DISCOVERY_COMMONS"
       }
     },
     {
@@ -26908,7 +27028,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
       }
     },
     {
@@ -27012,7 +27133,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
       }
     },
     {
@@ -27109,7 +27231,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
       }
     },
     {
@@ -27326,7 +27449,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D11_COMMUNITY_EVENTS"
       }
     },
     {
@@ -27636,7 +27760,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -27722,7 +27847,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -27807,7 +27933,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -27901,7 +28028,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -27997,7 +28125,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D20_PAYMENT_OPERATIONS"
       }
     },
     {
@@ -28124,7 +28253,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D22_COMMERCIAL_CLAIMS"
       }
     },
     {
@@ -28249,7 +28379,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D22_COMMERCIAL_CLAIMS"
       }
     },
     {
@@ -28355,7 +28486,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D22_COMMERCIAL_CLAIMS"
       }
     },
     {
@@ -28450,7 +28582,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D21_FINANCIAL_PROFILING"
       }
     },
     {
@@ -28998,7 +29131,8 @@
           "human-decision",
           "lawful-basis",
           "retention"
-        ]
+        ],
+        "decisionDossierId": "D03_HEALTH_CONTEXT"
       }
     },
     {
@@ -29093,7 +29227,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D14_AI_ASSISTANCE"
       }
     },
     {
@@ -29184,7 +29319,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D01_PERSONAL_MEMORY"
       }
     },
     {
@@ -29373,7 +29509,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
       }
     },
     {
@@ -29465,7 +29602,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
       }
     },
     {
@@ -29565,7 +29703,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D04_COMMUNICATION_CONTENT"
       }
     },
     {
@@ -29800,7 +29939,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D10_RESEARCH_PARTICIPATION"
       }
     },
     {
@@ -29894,7 +30034,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D19_GOVERNANCE"
       }
     },
     {
@@ -30082,7 +30223,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D11_COMMUNITY_EVENTS"
       }
     },
     {
@@ -30192,7 +30334,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D11_COMMUNITY_EVENTS"
       }
     },
     {
@@ -30292,7 +30435,8 @@
           "human-decision",
           "memory-class",
           "purpose-scope"
-        ]
+        ],
+        "decisionDossierId": "D11_COMMUNITY_EVENTS"
       }
     }
   ]

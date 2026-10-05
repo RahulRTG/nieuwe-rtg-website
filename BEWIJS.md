@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2311 bestanden en 15815 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2312 bestanden en 15818 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2311 |
-| losse beweringen (`test(...)`) | 15815 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 242 |
+| toetsbestanden | 2312 |
+| losse beweringen (`test(...)`) | 15818 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 243 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1953 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 162 |
 | alleen in de kop *genoemd*, nog niet gemeten | 33 |
-| niets van beide | 163 |
+| niets van beide | 164 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2014 bestanden, 15305 beweringen.
+2015 bestanden, 15308 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -956,6 +956,7 @@ toets omvalt.
 | `loop-fabric-academy-slice.test.js` | 2 | gezakt op `===->!==#0` | Derde bewijsslice: Leerhuis gebruikt een eigen append-only bronspoor, governance en kennisversies. De Fabric vervoert alleen refs en receipts. |
 | `loop-fabric-architecture-gate.test.js` | 3 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-coverage.test.js` | 4 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `loop-fabric-decisions.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-delivery.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-execution.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-http.test.js` | 1 | gezakt op `liegpoort /api/` | Werkelijke HTTP-deurproef. De protocol- en end-to-endproeven gaan dieper in op betekenis; deze proef bewijst op een echte server dat alle Loop-ingangen ingangen gemount zijn en zonder server-derived... |

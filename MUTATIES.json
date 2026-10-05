@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T09:39:31.560Z",
-    "commit": "127e15677",
+    "op": "2026-10-05T11:42:41.962Z",
+    "commit": "dfa3dc677",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2736,6 +2736,14 @@
       "operator": "return-weg#0",
       "gezakt": 7,
       "geprobeerd": 4
+    },
+    "correlatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/correlatie.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 6
     },
     "crashas.test.js": {
       "soort": "puur",

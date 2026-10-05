@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2328 bestanden en 15976 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2329 bestanden en 15981 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2328 |
-| losse beweringen (`test(...)`) | 15976 |
+| toetsbestanden | 2329 |
+| losse beweringen (`test(...)`) | 15981 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2153 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2154 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2025 bestanden, 15448 beweringen.
+2026 bestanden, 15453 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -635,6 +635,7 @@ toets omvalt.
 | `gezinenleren.test.js` | 3 | gezakt op `liegpoort /api/` | HET GEZIN EN HET LEREN -- zakgeld, sterren, en de eerlijke vergeetcurve. WAAROM DEZE TWEE SAMEN Ze zijn allebei van de RTFoundation-kant en ze raken allebei kinderen, maar op een verschillende manier gevoelig: HET... |
 | `gezinhuishouden.test.js` | 3 | gezakt op `liegpoort /api/` | HET HUISHOUDEN: DE KEUKEN, HET SPAARPOT EN HET DROMENBORD. WAT DEZE DRIE BINDT: ze zijn allemaal GEDEELD. |
 | `gezinleven.test.js` | 4 | gezakt op `liegpoort /api/` | HET GEZINSLEVEN: DE OCHTEND EN HET FEEST. WAT DEZE TWEE MODULES GEMEEN HEBBEN Ze coderen allebei een OPVOEDKUNDIGE keuze, en in allebei is die keuze met een half regeltje om te draaien zonder dat er iets kapot lijkt... |
+| `gezinmeenemen.test.js` | 5 | gezakt op `liegpoort /api/` | EEN BESTAAND GEZIN MEENEMEN NAAR EEN ACCOUNT (foundation/gezinmeenemen.js, DPIA-GEZIN.md R-G8), op een ECHTE server. Het gezin ontstaat zoals vroeger, op een server ZONDER accountplicht (code + PIN, een kind erin). |
 | `gezinsagenda-motor.test.js` | 6 | gezakt op `===->!==#0` | De gezinsagenda is geen tweede agenda meer (SCHERMEIGENAAR.json, consolidatieronde van 23 september 2026): hij schrijft en leest via dezelfde motor als de ledenagenda, onder de sleutel gezin:<code>. Deze toets draait... |
 | `gezinscode.test.js` | 7 | gezakt op `true->false#0` | De gezinscode en het stroomticket (B18, CODECREDENTIALS.json foundation.family_profile_access), control voor control: 128 bits en eenmaal kaal, hash-only in een EIGEN collectie, issuer/doel/scope/onderwerp zonder... |
 | `gezinsdeur.pg.test.js` | 1 | gezakt op `===->!==#0` | Echte productie-topologieproef voor de gezinsdeur (B18, foundation.family_profile_access): twee onafhankelijke instances delen dezelfde PostgreSQL. 1. |

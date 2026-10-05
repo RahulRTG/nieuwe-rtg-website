@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T08:52:31.437Z",
-    "commit": "aa865932",
+    "op": "2026-10-05T09:16:47.433Z",
+    "commit": "b100219e",
     "boomVuil": false,
     "boomAnders": 9,
     "instrument": "scripts/mutatie.js",
@@ -4998,6 +4998,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "gezinmeenemen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "gezinsagenda-motor.test.js": {

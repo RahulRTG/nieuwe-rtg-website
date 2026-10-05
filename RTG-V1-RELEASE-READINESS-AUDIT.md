@@ -1,11 +1,20 @@
 # RTG V1 — RELEASE READINESS AUDIT
 
-> **STATUS 5 oktober 2026 — remediatie ronde 1 uitgevoerd.** De 2 P0's, de P1 en
-> de kapotte release-gate uit ronde 0 zijn gerepareerd, met regressietests én een
-> onafhankelijke adversariële herkeuring. Het verdict op code-niveau is daarmee
-> verschoven van **🔴 NO-GO** naar **🟡 CONDITIONAL GO** (zie **§REMEDIATIESTATUS**
-> direct onder sectie A). De oorspronkelijke ronde-0-bevindingen blijven hieronder
-> staan met hun status (OPEN / FIXED / VERIFIED FIXED).
+> **STATUS 5 oktober 2026 — remediatie ronde 1 en 2 uitgevoerd.**
+>
+> - **Ronde 1:** de 2 P0's, de P1 en de kapotte release-gate uit ronde 0 zijn
+>   gerepareerd, met regressietests én een onafhankelijke adversariële
+>   herkeuring. Het verdict ging van **🔴 NO-GO** naar **🟡 CONDITIONAL GO**.
+> - **Ronde 2:** de P2-staart (C3, C4, C5, C6, D1) is VERIFIED FIXED, na vier
+>   herkeuringsrondes.
+> - **Nieuw:** de herkeuringen vonden een P1 die er al was (N1: de
+>   techniek-inlog zonder tweede factor) plus negen kleinere punten.
+> - **Verdict nu:** 🟡 CONDITIONAL GO, **80/100**, met N1 als nieuwe
+>   code-voorwaarde.
+>
+> Zie **§REMEDIATIESTATUS** (ronde 1 en ronde 2) direct onder sectie A. De
+> oorspronkelijke ronde-0-bevindingen blijven hieronder staan met hun status
+> (OPEN / FIXED / VERIFIED FIXED).
 
 *Volledige end-to-end release-audit van de gehele RTG-codebase. Doel: één vraag —
 kan RTG V1 verantwoord naar productie voor echte gebruikers, bedrijven en
@@ -141,6 +150,193 @@ volgende register-/testherijking.
 
 ---
 
+## REMEDIATIESTATUS — ronde 2: de P2-staart (5 oktober 2026)
+
+Branch: `codex/rtg-v1-release-blockers` (PR #487). Na ronde 1 koos de eigenaar
+voor **de hele P2-staart**: C3, C4, C5, C6 en D1. Voor C6 koos hij **alleen de
+gevaarlijke combinatie**:
+
+- SQLite met meer dan een schrijvend proces wordt in productie en op een
+  openbaar adres geweigerd;
+- een enkel SQLite-proces blijft een geldige productiestand;
+- een samenvoegbotsing die er dan nog is, moet hoorbaar zijn en niet stil.
+
+Werkwijze per bevinding:
+
+1. reproduceren;
+2. de oorzaak vinden;
+3. repareren;
+4. een regressietoets die vóór de reparatie zakt en erna slaagt;
+5. een onafhankelijke adversariële herkeuring: een andere agent dan de
+   implementer draait de exploit opnieuw, met varianten en mutaties;
+6. breder zoeken in dezelfde foutklasse.
+
+Er zijn **vier herkeuringsrondes** geweest. Elke ronde vond iets wat de vorige
+reparatie miste, en dat is hieronder niet weggepoetst.
+
+### Nieuw verdict (code): 🟡 CONDITIONAL GO — Release readiness: 80/100
+
+**Waarom lager dan 82, terwijl de P2-staart dicht is.** Dat ligt niet aan iets
+dat slechter werd. De herkeuringen vonden **een P1 die er in ronde 1 al was en
+niet was meegeteld**: de inlog op de techniekpagina geeft op alleen het
+wachtwoord een volwaardig accounttoken (N1 hieronder), ook voor het
+eigenaarsaccount. Dat weegt zwaarder dan vijf gesloten P2's.
+
+**Wat het nieuwe bewijs wel oplevert:**
+
+- C3, C4, C5 en D1 zijn VERIFIED FIXED. Hun regressietoetsen zakken op de oude
+  code en slagen op de nieuwe, en de herkeuring van ronde 3 draaide de exploits
+  opnieuw dicht.
+- Ook de kern van C6 is VERIFIED FIXED. In ronde 4 ontstonden in geen enkel
+  scenario nog twee leiders of twee schrijvers, ook niet met echte processen en
+  niet in 140 fuzzrondes.
+- Dertien mutanten die de herkeuringen zagen overleven, worden nu door een
+  toets gevangen.
+
+**De code-voorwaarden voor GO**, bovenop de externe poorten van ronde 1 (sectie
+F, F3–F6):
+
+- **N1 dicht** (techniek-inlog zonder tweede factor);
+- **een besluit over N2** (nieuwe herstelcodes met alleen het wachtwoord);
+- **voor een uitrol met het failover-trio: N6 dicht** (een stand-by bevestigt
+  schrijfacties met 200 zonder ze te bewaren).
+
+### Per bevinding — BEFORE / FIX / AFTER / REGRESSIE
+
+| # | Sev | Status | Commits | BEFORE → AFTER | Regressie (zakt vóór, slaagt na) |
+|---|---|---|---|---|---|
+| C3 | P2 | **VERIFIED FIXED** | `ce494056`, `d4391f3d`, `d8d6154c`, `dd8a3a49` | **Vóór:** de TOTP-code op `/api/auth/tweede` was onbeperkt te raden; een verkeerde code trekt het bewijs met opzet niet in. **Na:** een emmer per ACCOUNT (10) en een per BRON (50), via `tooManyTries`/`noteFailedTry`. Een vol slot houdt ook de juiste code tegen. `/api/mijn/tweefactor/uit` deelt dezelfde accountemmer. | `test/tweede-rem.test.js` 1-4. Toets 3 gokt over tien adressen en twee bewijzen. Toets 4 gokt op `/uit` vanaf wisselende adressen en kijkt daarna of de inlog ook dicht zit. |
+| C4 | P2 | **VERIFIED FIXED** | `abe4a2f1`, `7de740f4`, `d8d6154c`, `dd8a3a49` | **Vóór:** `RTG_DEV_LINKS=1` zette herstellinks en sms-codes in het HTTP-antwoord en kwam door de productiekeuring. **Na:** deze vlaggen zijn een harde fout in productie én op een openbaar adres zonder `NODE_ENV`: `RTG_DEV_LINKS`, `RTG_LIEG`, `RTG_STAATLOG` (1/2), `RTG_VERRAAD`, `RTG_KLOK` en `RTG_DUURZAAM=uit`. Op een onbekend adres geeft `RTG_DEV_LINKS` een waarschuwing. | `test/productie-failclosed.test.js` 18-20. Toets 20 toetst per vlag meer dan één waarde (hoofdletters, een absoluut moment, elke bekende verraadnaam). |
+| C5 | P2 | **VERIFIED FIXED** | `5ce141b7`, `6453dcc3`, `d8d6154c`, `dd8a3a49` | **Vóór:** de payroll-bronlaag haalde een opgegeven URL op zonder filter op interne adressen en volgde omleidingen. **Na:** `kern/payroll/bronophalen.js`, bij het registreren én bij het ophalen. Het pakket: alleen https, een naam met domein en een publiek ogend topdomein (`redis.rtg_data` en `.internal`/`.lan`/`.local` tellen niet), `veiligeExternalUrl`, `redirect: 'error'`, 10 s tijdslimiet (ook op het lezen), 2 MB grens, en een BOM vooraan breekt de bron niet. | `test/payroll-ssrf.test.js` 1-10. Toets 9 loopt over het productiepad `urlBron`. Plus `test/office-payroll-dekking.test.js`. |
+| C6 | P2 | **VERIFIED FIXED** (kern, herkeuring ronde 4). Het restvenster uit ronde 4 (een herstarte stand-by kreeg 95-803 ms verkeer) is FIXED in `b6c423e2`, maar niet meer onafhankelijk herkeurd | `5e8ed2f9`, `dad44086`, `d8d6154c`, `4c68adee`, `b6c423e2` | **Vóór:** de samenvoeging tussen processen liet stil de laatste schrijver winnen. **Na:** (a) productie en een openbaar adres weigeren SQLite met `RTG_SPREIDING=1`+`REDIS_URL` of een opgesplitst `RTG_DOMAINS`. (b) Elke SQLite-merge meldt een botsing (`db/botsing.js`), ook "de ene kant verwijderde wat de andere wijzigde". (c) In het failover-trio wordt een oude leider of een niet-bevestigde kandidaat aantoonbaar afgezet (of gestopt) voordat een ander leider wordt. De failback loopt onder het slot van `kiesActieve`. Een actieve die zelf `leider: false` meldt, wordt opnieuw gepromoveerd en krijgt tot dan geen verkeer. | `test/productie-failclosed.test.js` 13-17, `test/sqlite-botsing.test.js` 1-9, `test/trio-afzetten.test.js` 1-14 (4-9 en 14 zakken op de vorige reparatie, 10-13 vangen mutanten), en de `/api/health`-contracttoets in `test/api-contract.test.js`. |
+| D1 | P2 | **VERIFIED FIXED** | `9b35baa5`, `6ba08c8f`, `d8d6154c`, `dd8a3a49` | **Vóór:** een crash (`uncaughtException`) spoelde minder dan SIGTERM. **Na:** één lijst (`opzet/stopspoeling.js`) voor beide wegen. Een crash midden in een `bijeen()`-bundel spoelt de opslag NIET, zodat een halve geldmutatie niet op schijf belandt; zonder bundelvraag valt dat dicht. De genadetermijn is begrensd, de exitcode is altijd 1, en de bedrading in `server.js` wordt op de echte bundelvraag getoetst. | `test/stopspoeling.test.js` 1-5. Toets 4g crasht een echte SQLite-opslag midden in een bundel en vindt `{X:100,Y:0}` terug. |
+
+### Herkeuringsverloop
+
+- **Ronde 1 (op `3b2400d8`).** **D1 werd erger.** De crashweg flushte nu ook
+  de write-behind, dus een crash midden in een bundel legde een halve mutatie
+  vast (`{X:50,Y:0}`). Gerepareerd in `6ba08c8f`. **C6 was niet gefixt:** het
+  trio kon promoveren terwijl de oude leider nog leefde. **C3, C4 en C5 waren
+  deels dicht**, met restpunten (emmer per bewijs, namen zonder domein,
+  `RTG_LIEG`/`RTG_STAATLOG`).
+- **Ronde 2 (op `2b7c4e41`).** **C6 nog steeds niet gefixt (P1, blokkerend).**
+  Een promote die bij de poortwachter een time-out gaf maar door de server wel
+  was uitgevoerd, leverde twee leiders op. D1, C3, C4 en C5 waren dicht met
+  kanttekeningen. Gerepareerd in `d8d6154c`, met de restpunten van C3, C4, C5 en
+  D1.
+- **Ronde 3 (op `f55a4a68`).** **C3, C4, C5 en D1: VERIFIED FIXED**, maar met
+  zeven overlevende mutanten. Die worden sinds `dd8a3a49` gevangen.
+  **C6: FIXED_MET_KANTTEKENING.** De blokkerende fout uit ronde 2 was dicht,
+  maar de reparatie opende **een nieuwe weg naar twee leiders**: een
+  `kiesActieve` tijdens de failback-wissel. Daarnaast bleek een bestaande fout:
+  een actieve die als stand-by herstartte, werd zonder promote teruggenomen.
+  Beide gerepareerd in `4c68adee`.
+- **Ronde 4 (op `93dabce2`, C6): de kern is VERIFIED FIXED.** Nergens nog twee
+  leiders of twee schrijvers:
+  - de reproducties van ronde 3 zakken op de oude code en slagen op de nieuwe;
+  - echte processen, achttien keer gestopt met SIGKILL: altijd hooguit één
+    leider, en na 30 s schreef de actieve elke keer;
+  - 140 fuzzrondes zonder fout, terwijl de fuzzer op de oude code wel uitsloeg.
+
+  Drie restpunten, alle drie dicht in `b6c423e2` en met een mutant
+  nagetrokken, maar niet meer onafhankelijk herkeurd:
+  - geen toets ving het weghalen van `!switching` (nu toets 13);
+  - tussen gezondheidscontrole en herpromotie kon een herstarte stand-by 95-803
+    ms verkeer krijgen (nu weigert `wachtOpActieve` dat, toets 14);
+  - geen toets legde vast dat `/api/health` `leider` meldt (nu de
+    contracttoets).
+
+### Nieuwe bevindingen uit de herkeuringen (OPEN)
+
+Deze punten kwamen tijdens de herkeuringen boven. Ze vallen buiten de opdracht
+van ronde 2 of vragen een besluit, en zijn in deze ronde niet gerepareerd. Ze
+staan hier zodat ze niet verdwijnen.
+
+| ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
+|---|---|---|---|---|---|---|
+| **N1** | **P1** | OPEN | `server/routes/techniek/inlog.js:56` | `/api/techniek/inloggen` geeft na wachtwoord en toegangslijst `accounts.issueToken(user.id, 1)` zonder `tweefactor`-poort. Voor de eigenaar en elk account op de techniektoegangslijst is de tweede factor daar geen drempel. | Code gelezen door twee herkeurders en de implementer. Niet uitgevoerd. | Dezelfde tweede stap als `/api/auth/login` (bewijs, daarna `/api/auth/tweede`), of een `code` in hetzelfde verzoek. Vraagt een kleine aanpassing in de techniekpagina. |
+| **N2** | P2 | OPEN, besluit | `server/routes/member/tweefactor.js` `/codes` | Nieuwe herstelcodes vragen alleen sessie + wachtwoord. Met zo'n code zet `/uit` de tweede factor uit, dus de rem op `/uit` houdt wie sessie én wachtwoord heeft niet tegen. `test/mijnrtg-routes.test.js` 9 legt "vraagt het wachtwoord" vast als contract. | Uitgevoerd door de herkeuring van ronde 3: 10 nieuwe codes, daarna `/uit` 200. | Een geldige code (TOTP of herstelcode) eisen voor `/codes`, zoals `/uit`. Geen scherm gebruikt de route, dus het raakt alleen het API-contract. |
+| **N3** | P2 | OPEN | `server/routes/aanmeldgesprek.js:73-77` | Het aanmeldgesprek met sleutelwoorden geeft een sessietoken zonder `inlogPoort` en zonder tweede factor, ook als de tweede stap op slot zit. | Uitgevoerd door de herkeuring van ronde 3: token terwijl `/api/auth/tweede` 429 gaf. | Langs dezelfde inlogpoort laten lopen. |
+| **N4** | P2 | OPEN, besluit | `server/server.js` `noteFailedTry` | Tien foute codes melden brute force, en dat zet het adres van de laatste poging een uur in quarantaine. Wie het wachtwoord kent, kan negen gokken vooraf laden; de eerste typefout van het lid zet dan zijn eigen adres in quarantaine. De emmer wordt bij succes niet geleegd. | Quarantaine uitgevoerd door de herkeuring van ronde 3. | Zie besluitpunt 2. |
+| **N5** | P3 | OPEN | `server/server.js:584` | De pogingenemmers zijn een `Map` per proces. Met meerdere processen krijgt elk proces opnieuw tien gokken. | Code gelezen. | Emmers via Redis delen als `REDIS_URL` gezet is. |
+| **N6** | P1 (alleen met het trio) | OPEN, deels verkleind | `server/db/index.js:61` `bewaar`, `server/trio-schaduw.js` | Een stand-by antwoordt 200 op een schrijfverzoek en bewaart niets. Sinds `d8d6154c`, `4c68adee` en `b6c423e2` krijgt een stand-by tijdens de failback geen verkeer, en een actieve die geen leider is, wordt opnieuw gepromoveerd en krijgt tot dan niets. Het venster blijft bestaan voor: een verzoek dat al onderweg was, en de werkers van `RTG_POORTWACHTERS` (die sturen bij actief -1 naar de eerste gezonde server). | Herkeuring ronde 2 en 3, deels met echte processen. | Op de server zelf: een muterend verzoek krijgt 503 als `!db.writable`, in plaats van 200 zonder bewaren. Raakt elke route, dus een eigen ronde. |
+| **N7** | P3 | OPEN | `server/kern/ssrf.js:72-87` | De gedeelde SSRF-poort: `startsWith('fc'/'fd')` weigert ook domeinnamen (`fd.nl`, `fcbarcelona.com`), en enkele IPv6-vormen (`::7f00:1`, NAT64 `64:ff9b::/96`) komen erdoor. De school-webhooks laten `redis`, `localhost.` en `metadata.google.internal.` nog door; de reparatie van C5 zit alleen in de payrollmodule. | Herkeuring ronde 2 en 3. IPv6 niet te meten in de sandbox. | De regels van `bronophalen.js` naar `ssrf.js` tillen, met een IP-literal-tak die alleen op IP's kijkt. |
+| **N8** | P3 | OPEN | `server/config/openbaar.js:66-87`, diverse `RTG_*` | Een publiek IPv6-literal en `RTG_ACME`/`RTG_TLS_DOMAIN` worden niet als openbaar ingedeeld, dus `RTG_DEV_LINKS` krijgt daar alleen een waarschuwing. Ongekeurd zijn ook `RTG_GRENS_MELD`, `RTG_SCHOOL_WEBHOOK_INTERN`, `RTG_SCRYPT_*`, `RTG_ANKERPOST_ONVEILIG`, `RTG_DOOS_SLEUTEL`, `RTG_CSP_NONCE=0`, `RTG_BEZITSBEWIJS=uit`, `RTG_DOELBINDING=uit` en `RTG_SCHORSPOORT_UIT`. Daarnaast verraadt `/api/auth/forgot` via `tweestaps` of een account bestaat. | Herkeuring ronde 2 en 3. | De keuring per vlag afleiden uit de `lees()` van de module zelf, in plaats van kopieën. |
+| **N9** | P3 | OPEN | `server/opzet/stopspoeling.js`, `server/db/bijeen.js` | Een crash uit een andere context terwijl een bundel half staat (op een niet-geldcollectie boven 512 KB, of na een `save()` van een ander verzoek binnen de genadetermijn) kan de halve stand alsnog wegschrijven. SIGTERM met een open achtergrondbundel eindigt met 0 op een halve stand. De PostgreSQL-modus is niet live beproefd. | Herkeuring ronde 2, deels zelf gemeten. | Een procesbrede teller van open bundels, of de schrijfpoort bevriezen bij een crash. |
+| **N10** | P3 | OPEN | `server/db/pg/*.js` | De merges op Postgres (`pg/inlezen.js`, `pg/schrijflanen.js`, `pg/collectietransactie.js`) geven geen melder mee. | Herkeuring ronde 2 en 3. | Dezelfde melder als op SQLite. |
+
+### Besluitpunten voor de eigenaar
+
+1. **N1 (techniek-inlog zonder tweede factor).**
+   - **(a) Aanbevolen:** dezelfde tweede stap als de gewone inlog; de
+     techniekpagina vraagt dan de code.
+   - (b) Een `code` in hetzelfde verzoek.
+   - (c) Bewust laten zoals het is, met de reden in het document.
+2. **Quarantaine bij tien foute codes (N4).**
+   - **(a) Aanbevolen:** de emmer bij succes legen, en de tweede stap NIET aan de
+     noodrem koppelen. Het slot van vijf minuten blijft, maar een gok van een
+     ander kan het adres van het lid niet meer in quarantaine zetten.
+   - (b) Zo laten: huisbeleid, gelijk aan het wachtwoord.
+3. **`/codes` zonder code (N2).**
+   - **(a) Aanbevolen:** een geldige code eisen. Dat verandert het contract in
+     toets 9 van `test/mijnrtg-routes.test.js`.
+   - (b) Zo laten, en de rem op `/uit` daarmee als symbolisch erkennen.
+4. **N6 (stand-by antwoordt 200).** Alleen nodig als het trio in productie
+   draait: een eigen ronde voor een 503 op muterende verzoeken bij
+   `!db.writable`.
+
+### Testbewijs (PASS / FAIL / INFRA / NIET GEVERIFIEERD)
+
+- **PASS: de regressiesuites op de huidige head.**
+
+  | Suite | Uitslag |
+  |---|---|
+  | `tweede-rem` | 4/4 |
+  | `productie-failclosed` | 21/21 |
+  | `payroll-ssrf` + `office-payroll-dekking` | 21/21 |
+  | `stopspoeling` | 11/11 |
+  | `trio-afzetten` | 14/14 |
+  | `sqlite-botsing` | 9/9 |
+
+- **PASS: de suites eromheen.**
+
+  | Suites | Uitslag |
+  |---|---|
+  | trio en contract (`trio-kleef`, `trio-wees`, `trio-werkers`, `spreidingsoordeel`, `wacht`, `wachter`, `api-contract`) | 64/64 |
+  | merge en opslag, inclusief de eigenschapstoets van `merge3` | 100/100 |
+  | `mijnrtg-routes`, `tweefactor`, `config`, `openbare-bouwstand` | 63/63 |
+  | registertoetsen | 132/132 |
+
+- **PASS: de statische poorten.** `npm run check` (Alles in orde), `npm run
+  norm` (gehaald) en de deltapoort tegen main (gehaald).
+- **PASS: CI.** Op `7212a375` en `f55a4a68` was de volledige matrix groen,
+  behalve `github-advanced-security`. Die stopt op het Copilot-maandquotum
+  (402) voordat hij één bestand bekijkt.
+- **INFRA:**
+  - `bewijskosten` toets 9. De ondiepe kloon mist historische commits; in CI
+    slaagt hij.
+  - `*.pg`-toetsen buiten `scripts/pgtoetsen.js` (die vragen `DATABASE_URL`).
+- **FLAKY, niet van deze tak:** de WebKit-toets *Pass inhoud, tabblad en
+  hervatten* in `test/mobile-content.e2e.js`.
+  - Rood op main `2cb57c61` en op `209f0298`/`dd8a3a49` van deze tak.
+  - Groen op `f55a4a68`.
+  - Deze tak raakt geen schermcode. Gemeld op PR #487.
+- **NIET GEVERIFIEERD:**
+  - `ci:lokaal` als geheel op de laatste head. Op `2b7c4e41` stond elke poort
+    vóór e2e op *staat*; de e2e-stap is na twee uur afgebroken, en in CI is e2e
+    op `7212a375` en `f55a4a68` groen.
+  - De crashspoeling en de merges in PostgreSQL-modus, live.
+  - De IPv6-bereikbaarheid van N7.
+
+### Wat deze ronde NIET heeft gedaan (bewust)
+
+Geen nieuwe functies en geen herontwerp. De nieuwe bevindingen N1–N10 zijn
+vastgelegd en niet gerepareerd, ook waar de reparatie klein lijkt. Ze raken
+een contract (N2), een inlogweg buiten C3 (N1, N3), huisbeleid (N4) of elke
+route (N6), en horen eerst een besluit te krijgen.
+
+---
+
 ## B. V1 RELEASE BLOCKERS (P0/P1)
 
 > **Statuskolom hieronder bijgewerkt in ronde 1.** De bevindingen zelf (BEFORE)
@@ -164,10 +360,10 @@ volgende register-/testherijking.
 |---|---|---|---|---|---|---|
 | **C1** | **P0** | authenticatie | = **B1** (2FA-bypass via actietoken). | Accountovername met alleen wachtwoord; sessie uit gelekte e-maillink. | zie B1 (gereproduceerd). | zie K/Blocker 1. |
 | **C2** | **P1** | deploy-hardening | = **B3** (`NODE_ENV`-afhankelijke poorten). | Backoffice/kluis open bij één vergeten env-var. | zie B3. | zie K/Blocker 3. |
-| **C3** | **P2** | `server/routes/member/tweefactor.js` | `/api/auth/tweede` (TOTP-controle) kent geen eigen pogingenrem binnen het 5-min bewijsvenster. | TOTP brute-forcebaar binnen het venster (verzwakt door de korte TTL). | `routes/member/tweefactor.js:109-114` (geen `tooManyTries`/`noteFailedTry`). | `tooManyTries`/`noteFailedTry` op deze route, zoals bij `/api/auth/login`. |
-| **C4** | **P2** | `server/routes/auth.js`, `herstel.js`, `account.js` | `RTG_DEV_LINKS=1` lekt herstel-/verify-URL's en SMS-code in de HTTP-respons; niet gedekt door de release-poort. | Bij een gezette dev-vlag in een verkeerde omgeving lekken herstelgeheimen. | `routes/auth.js:65`; `routes/auth/herstel.js:122`. | `RTG_DEV_LINKS` als harde fout in `config/productie-lokaal.js` / openbaar-adres. |
-| **C5** | **P2** | `server/kern/payroll/bijwerken.js`, `dekking-bronnen.js` | SSRF: payroll-bronlaag haalt een kantoor-opgegeven URL op zonder intern-adresfilter en volgt redirects (anders dan de voorbeeldige SSO-fetch). | Kantoorhouder kan interne adressen laten aanroepen. | `payroll/bijwerken.js:160-163`; `dekking-bronnen.js:31-34`. | Hergebruik de SSRF-hardening van `server/sso/haal.js` (intern-adres/redirect-filter) + liefst IP-pin tegen DNS-rebinding. |
-| **C6** | **P2** | `server/db/merge.js` + `server/db/sqlite.js` | SQLite-productiestand: de kruisproces-merge lost een scalar-conflict stil op ten gunste van de laatste schrijver → verloren saldo-update. | Stille lost-update op geld/stand bij gelijktijdigheid in SQLite-modus. | `merge.js:29` (`return ours; // laatste schrijver`); `sqlite.js:109`. Contrast: `pg/verzoekmerge.js` geeft 409. | **Verbied SQLite als productiestand** (eis PostgreSQL in prod) óf til de 409-conflictdetectie van de PG-merge naar de SQLite-merge. Scope: DISABLE_V1. |
+| **C3** ✅ VERIFIED FIXED (ronde 2) | **P2** | `server/routes/member/tweefactor.js` | `/api/auth/tweede` (TOTP-controle) kent geen eigen pogingenrem binnen het 5-min bewijsvenster. | TOTP brute-forcebaar binnen het venster (verzwakt door de korte TTL). | `routes/member/tweefactor.js:109-114` (geen `tooManyTries`/`noteFailedTry`). | `tooManyTries`/`noteFailedTry` op deze route, zoals bij `/api/auth/login`. |
+| **C4** ✅ VERIFIED FIXED (ronde 2) | **P2** | `server/routes/auth.js`, `herstel.js`, `account.js` | `RTG_DEV_LINKS=1` lekt herstel-/verify-URL's en SMS-code in de HTTP-respons; niet gedekt door de release-poort. | Bij een gezette dev-vlag in een verkeerde omgeving lekken herstelgeheimen. | `routes/auth.js:65`; `routes/auth/herstel.js:122`. | `RTG_DEV_LINKS` als harde fout in `config/productie-lokaal.js` / openbaar-adres. |
+| **C5** ✅ VERIFIED FIXED (ronde 2) | **P2** | `server/kern/payroll/bijwerken.js`, `dekking-bronnen.js` | SSRF: payroll-bronlaag haalt een kantoor-opgegeven URL op zonder intern-adresfilter en volgt redirects (anders dan de voorbeeldige SSO-fetch). | Kantoorhouder kan interne adressen laten aanroepen. | `payroll/bijwerken.js:160-163`; `dekking-bronnen.js:31-34`. | Hergebruik de SSRF-hardening van `server/sso/haal.js` (intern-adres/redirect-filter) + liefst IP-pin tegen DNS-rebinding. |
+| **C6** ✅ VERIFIED FIXED (ronde 2; keuze eigenaar: alleen de gevaarlijke combinatie geweigerd) | **P2** | `server/db/merge.js` + `server/db/sqlite.js` | SQLite-productiestand: de kruisproces-merge lost een scalar-conflict stil op ten gunste van de laatste schrijver → verloren saldo-update. | Stille lost-update op geld/stand bij gelijktijdigheid in SQLite-modus. | `merge.js:29` (`return ours; // laatste schrijver`); `sqlite.js:109`. Contrast: `pg/verzoekmerge.js` geeft 409. | **Verbied SQLite als productiestand** (eis PostgreSQL in prod) óf til de 409-conflictdetectie van de PG-merge naar de SQLite-merge. Scope: DISABLE_V1. |
 
 > Opt-in `RTG_EIGEN_HTTP=1`-motoren (`server/lib/http1.js`, `http1-res.js`)
 > missen request-smuggling- en CRLF-verdediging (P2, DISABLE_V1). Niet in
@@ -186,7 +382,7 @@ gevreesde "`save()` zet alleen een vlag" blijkt in PG-modus gedekt.
 
 | ID | Sev | Systeem | Probleem | Impact | Bewijs | Fix |
 |---|---|---|---|---|---|---|
-| **D1** | **P2** | `server/server.js` crash-handler | `uncaughtException` flusht minder dan SIGTERM: geen synchrone journaal-/vertaal-/snapshotflush. | Bij een crash verdwijnt een write-behind-venster + gebufferde auditregels — precies waar incidentreconstructie op leunt. | `server.js:143-154` (alleen `save()`); vgl. SIGTERM `opzet/luister.js:135-139`. | Laat de `uncaughtException`-handler dezelfde flush draaien als SIGTERM vóór `exit(1)`. |
+| **D1** ✅ VERIFIED FIXED (ronde 2) | **P2** | `server/server.js` crash-handler | `uncaughtException` flusht minder dan SIGTERM: geen synchrone journaal-/vertaal-/snapshotflush. | Bij een crash verdwijnt een write-behind-venster + gebufferde auditregels — precies waar incidentreconstructie op leunt. | `server.js:143-154` (alleen `save()`); vgl. SIGTERM `opzet/luister.js:135-139`. | Laat de `uncaughtException`-handler dezelfde flush draaien als SIGTERM vóór `exit(1)`. |
 | **D2** | **P2** | audit/opslag (`STILSPOOR.json`) | 41 spoor-/opslagschrijvers met gesmoorde fout, 0 met een vastgelegd besluit (LAT.md regel 21-schuld). | Een mislukte audit-/opslagschrijf kan stil verdwijnen. | `STILSPOOR.json` (`spoorGesmoord:17, opslagGesmoord:24, …MetBesluit:0`); `server/db/postgres.js:176`. | Per gesmoorde schrijver een expliciet besluit (bewust of repareren); de kritieke audit-schrijvers fail-closed. |
 | **D3** | **P2** | `server/middleware/idempotentie.js` | Generieke idempotentielaag is per-proces (`new Map()`); dekt in een cluster niet. | Dubbele niet-geld-mutaties als een retry op een andere werker landt. (Geld-idempotentie is wél cluster-breed via PG.) | `idempotentie.js:92` + docstring 59-61. | Deel de idempotentiekas via PG/Redis voor muterende routes in clustermodus. |
 | **D4** | **P2** | `IDEMPROEF.json` / `MUTATIECONTRACT.json` | Idempotentie/mutatiecontract is voor 1739 van ~5148 routes beproefd (3409 ongemeten); registers stale t.o.v. `b7f14dfa`. | Onbekende herhaalbaarheid op een groot deel van de muterende routes. | `IDEMPROEF.json` (`beoordeeld 1739, ongemeten 3409`), stempel `387b942c5` ≠ HEAD. | Meet door op de kritieke muterende routes; herijk de registers op de release-commit. |

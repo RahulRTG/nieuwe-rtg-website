@@ -140,7 +140,7 @@ De bijbehorende code:
 |---|---|---|---|
 | R-G1, R-G3 | Een kind toevoegen of openen kan alleen met `volwassen()` (account + A3 + 18) | `gezinseigenaar.js` | `test/gezinseigenaar.test.js` 2, 3 |
 | R-G1 | Onder de accountplicht opent een anoniem gezin niets | `gezinshulp.js` `profielVan` | `test/gezinseigenaar.test.js` 4; `test/foundation-gezinstoken-productie.test.js` op een echte productieserver |
-| R-G1 | De oude beheerdersroute voegt onder de plicht geen kind toe | `gezin.js` `/gezin/profiel/maak` | `test/gezinseigenaar.test.js` 5 |
+| R-G1 | De oude ingangen maken onder de plicht geen anoniem gezin en geen kind | `accountplicht.js` `bewaak()` | `test/gezinseigenaar.test.js` 4, 5 |
 | R-G2 | Een gezin maken kan pas vanaf een opgegeven leeftijd van 18 | `gezinseigenaar.js` `maak` | `test/gezinseigenaar.test.js` 8 (een account van 16) |
 | R-G4 | Verwijderen van het account wist het gezin; export toont het | `kern/vergeten.js`, `routes/member/privacy.js` | `test/gezinseigenaar.test.js` 7 |
 | R-G4 | Een gratis account heeft recht op inzage en vergetelheid (dat weigerde eerder: `tier === 'guest'`) | `routes/member/privacy.js` | `test/gezinseigenaar.test.js` 7 |
@@ -152,14 +152,13 @@ De bijbehorende code:
 
 ## 6. Wat nog moet vóór vrijgave
 
-1. **Het register met deuren.** `/api/foundation/gezin` staat als geheel in
-   `foundation-nog-gesloten.js`. Dat betekent: dicht, ook met een dossier. Voor
-   een gezin aan een account moeten de routes die een token **lezen** (`/mij`,
-   berichten, oppasinfo en dergelijke) daaruit, terwijl de routes met code en
-   PIN (`/maak`, `/inloggen`, `/profiel/kies`, `/uitnodiging/bekijk|accepteer`)
-   dicht blijven. Dat is een wijziging in `CODECREDENTIALS.json` en haar toetsen.
-   **Zonder deze stap opent het gezinsscherm in productie niet, ook niet met dit
-   dossier.**
+1. **Het register met deuren: gedaan op `main` (B18, 4 oktober 2026).** De
+   gezinsdeur staat niet meer in `foundation-nog-gesloten.js`: de gezinscode is
+   een 128-bit bearer geworden en een sessie verloopt na zeven dagen, met
+   verlengen via een passkey (B19). Met een ondertekend dossier opent het
+   gezinsscherm dus ook in productie. Onder de accountplicht maakt de oude deur
+   `/gezin/maak` geen anoniem gezin meer, en voegt `/gezin/profiel/maak` geen
+   kind toe; beide wijzen naar Mijn gezin (`accountplicht.js` `bewaak()`).
 2. **De open plekken in deze tekst.** Alle `[TE BEOORDELEN]`, `[TE BESLISSEN]`
    en `[TE MAKEN]` hierboven.
 3. **Advies van een FG of privacyjurist** (art. 35 lid 2).

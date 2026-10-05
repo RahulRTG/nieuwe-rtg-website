@@ -182,7 +182,7 @@ omlaag.
 
 ## `apps/foundation/gezin-rt.js`
 
-`public/apps/foundation/gezin-rt/` -- 3 delen, 195 regels in de delen
+`public/apps/foundation/gezin-rt/` -- 3 delen, 208 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -202,7 +202,7 @@ omlaag.
 
 ## `apps/foundation/sessie.js`
 
-`public/apps/foundation/sessie/` -- 4 delen, 405 regels in de delen
+`public/apps/foundation/sessie/` -- 4 delen, 422 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -380,7 +380,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 32 delen, 3246 regels in de delen
+`public/apps/personeel/` -- 32 delen, 3252 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -517,7 +517,7 @@ omlaag.
 
 ## `apps/techniek.js`
 
-`public/apps/techniek/` -- 10 delen, 944 regels in de delen
+`public/apps/techniek/` -- 10 delen, 943 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -529,7 +529,7 @@ omlaag.
 | `techniek-03.js` | een functie globaal aan- of uitzetten |
 | `techniek-03a.js` | het doelgroepfilter met chips, en het zoeken erin |
 | `techniek-03c.js` | de automatische noodrem aan- of uitzetten |
-| `techniek-03d-sso.js` | SSO-CLIENTGEHEIMEN (besluit B16) |
+| `techniek-03d-sso.js` | SSO-CLIENTGEHEIMEN (B16, B22): alleen de STAND, nooit het geheim; roteren vraagt een verse passkey (RTGZwaar) |
 | `techniek-04.js` | De laatste stand van het statusbord, zodat "meenemen" uit het EIGEN model leest en niet uit de kaartjes op het scherm |
 
 ## `apps/werkplek-bureaus.js`

@@ -79,6 +79,33 @@ module.exports = (kern) => {
     res.json({ ok: true });
   });
 
+  /* B19: de EIGEN passkey aan het EIGEN gezinsprofiel hangen, zodat die sessie
+     daarna met een vinger te verlengen is (foundation/gezinsdeur.js). Het vraagt
+     drie dingen tegelijk: dit RTG-account, een lopende gezinssessie van het
+     profiel (in het lijf), en een verse passkey van dit account, gebonden aan
+     deze lid-sessie (zware poort, zonder terugval). Een gast niet: zijn kanaal
+     blijft 12 uur. */
+  app.post('/api/rtf/gezin/passkey', auth, async (req, res) => {
+    if (!eisAccount(req, res)) return;
+    const s = rtf.verifieerProfiel(req.body.code, req.body.token);
+    if (!s) return res.status(403).json({ error: 'Log eerst in bij je gezin.' });
+    if (s.gast) return res.status(403).json({ error: 'Een oppas of familielid verlengt niet; het kanaal blijft 12 uur.' });
+    const zwaar = kern.zwaarbewijs;
+    const user = zwaar && accounts.getUserById(req.session.account.id);
+    if (!user) return res.status(503).json({ error: 'De passkeycontrole is op deze server niet ingericht.' });
+    const sleutel = zwaar.sessieSleutel(req);
+    const r = await zwaar.eis(user, 'gezin-passkey-koppel', sleutel, req, 'Je passkey aan je gezinsprofiel koppelen', { zonderTerugval: true });
+    if (r.ok && r.bewezen === true)
+      return rtf.koppelPasskey(s, user.id) ? res.json({ ok: true }) : res.status(404).json({ error: 'Dit profiel bestaat niet meer.' });
+    if (r.bevestigingNodig) {
+      const o = await zwaar.opties(user, 'gezin-passkey-koppel', sleutel, req);
+      if (!o || o.error) return res.status((o && o.status) || 400).json({ error: (o && o.error) || 'De passkey kon niet worden gevraagd.' });
+      return res.status(401).json({ bevestigingNodig: true, actie: 'gezin-passkey-koppel', error: r.error,
+        bevestiging: { ceremonie: o.ceremonie, opties: o.opties } });
+    }
+    return r.ok ? res.status(403).json({ watNu: 'passkey-zetten', error: 'Koppelen kan alleen met een passkey.' }) : zwaar.stuur(res, r);
+  });
+
   app.post('/api/rtf/meldingen/gelezen', auth, (req, res) => {
     if (!eisAccount(req, res)) return;
     const md = accounts.getMemberState(req.session.account.id) || {};

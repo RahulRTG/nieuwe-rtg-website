@@ -3,12 +3,12 @@ module.exports = (gctx) => {
     nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
     schoonGroep, isBeschermd, isGast, KLEUREN,
     hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle,
-    socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, tokenUit, gezinstoken, plicht } = gctx;
+    socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, tokenUit, gezinstoken } = gctx;
   const bezorgAanGasten = (g, b) => gctx.bezorgAanGasten(g, b);
 router.post('/gezin/maak', async (req, res) => {
   const bucket = 'maak:' + ipVan(req);
   if (teVaak(res, bucket)) return;
-  misluktePoging(bucket, 8, 30); // hooguit 8 nieuwe gezinnen per adres per half uur
+  misluktePoging(bucket, 8, 30);
   const naam = schoon(req.body.gezinsnaam, 40);
   const beheerder = schoon(req.body.naam, 40);
   if (!naam) return res.status(400).json({ error: 'Geef je gezin een naam.' });
@@ -30,7 +30,8 @@ router.post('/gezin/maak', async (req, res) => {
     registratie: { door:pid, bevoegdVerklaard:req.body.bevoegdGezin === true, privacyAkkoord:req.body.privacyAkkoord === true, at:nu() } };
   G()[code] = g; const token = gezinstoken.geef(g, profiel); save();
   try { gctx.welkomRtf(profiel.codenaam); } catch (e) {}
-  res.json({ code, token, profiel: pubProfiel(profiel, true), gezin: pubGezin(g) });
+  const gezinscode = await gctx.gezinscode.geef(g, pid).catch(() => null); // B18: alleen hier kaal
+  res.json({ code, gezinscode, token, profiel: pubProfiel(profiel, true), gezin: pubGezin(g) });
 });
 
 router.get('/gezin/:code/mij', (req, res) => {
@@ -52,7 +53,6 @@ router.post('/gezin/profiel/maak', async (req, res) => {
   if (!naam) return res.status(400).json({ error: 'Vul een naam in voor het nieuwe profiel.' });
   if (Object.keys(g.profielen).length >= 12) return res.status(400).json({ error: 'Een gezin kan tot 12 profielen hebben.' });
   const rol = ROLLEN.includes(req.body.rol) ? req.body.rol : 'kind';
-  if (plicht.weigerKind(res, rol)) return;
   if (process.env.NODE_ENV !== 'test' && rol !== 'kind')
     return res.status(409).json({ error:'Volwassenen en gasten worden met een persoonlijke uitnodiging gekoppeld.' });
   if (process.env.NODE_ENV !== 'test' && !req.body.geboortedatum)
@@ -136,7 +136,7 @@ router.post('/gezin/bericht', (req, res) => {
   const b = { id: rid(3), van: p.id, vanNaam: p.naam, vanAvatar: p.avatar, naar, soort, tekst: encS(tekst), at: nu(), gelezenDoor: [p.id] };
   if (!g.berichten) g.berichten = [];
   g.berichten.unshift(b); g.berichten = g.berichten.slice(0, 200); save();
-  bezorgAanGasten(g, b); // gekoppelde oppas/familie krijgt dit ook in de RTG-app
+  bezorgAanGasten(g, b); // ook naar de gekoppelde oppas
   res.json({ ok: true, bericht: Object.assign({}, b, { tekst }) });
 });
 

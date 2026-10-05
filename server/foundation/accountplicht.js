@@ -19,10 +19,11 @@
    Dit vervangt de vrijgavepoort NIET: zonder extern dossier blijven de
    beschermde routes in productie 503 (middleware/foundation-productiepoort.js).
 
-   Daarnaast weigerKind() voor de oude beheerdersroute /gezin/profiel/maak:
-   onder de plicht voegt die geen kind toe, anders was hij de omweg om de
-   paspoorttrede heen. */
+   Daarnaast bewaak(): twee wachters voor de oude ingangen met code en PIN
+   (zie hieronder). */
 'use strict';
+
+const VOLWASSEN_ROLLEN = ['beheerder', 'ouder', 'gezinslid', 'gast'];
 
 function maak({ ctx, isBeschermd }) {
   function accountplicht() {
@@ -37,14 +38,24 @@ function maak({ ctx, isBeschermd }) {
     if (!g || !g.eigenaar || g.eigenaar.userId == null) return false;
     return isBeschermd(p) ? volwassenAccount(g.eigenaar.userId) : true;
   }
-  /* Voor gezin.js /gezin/profiel/maak, NA het bepalen van de rol (die van
-     elke onbekende rol een kind maakt): weigert onder de plicht met 409. */
-  function weigerKind(res, rol) {
-    if (!accountplicht() || rol !== 'kind') return false;
-    res.status(409).json({ error: 'Voeg je kind toe via Mijn gezin in je RTG-account.' });
-    return true;
+  /* De twee oude ingangen die onder de plicht doodlopen, als wachters VÓÓR de
+     routes in gezin.js (router.use, dus geen tweede route op hetzelfde pad):
+     - /gezin/maak: een anoniem gezin opent onder de plicht niets, dus wie hem
+       maakt zou daarna bij elke stap "log opnieuw in" lezen. Hij hoort de weg.
+     - /gezin/profiel/maak: geen kind via de beheerderspincode, anders was dit
+       de omweg om de paspoorttrede heen. gezin.js maakt van elke onbekende rol
+       een kind, dus dit weigert alles wat geen volwassen rol is. */
+  function bewaak(router) {
+    router.use('/gezin/maak', (req, res, next) => {
+      if (!accountplicht()) return next();
+      res.status(409).json({ error: 'Maak je gezin via Mijn gezin in je RTG-account. Een gratis account is genoeg.' });
+    });
+    router.use('/gezin/profiel/maak', (req, res, next) => {
+      if (!accountplicht() || VOLWASSEN_ROLLEN.includes(req.body && req.body.rol)) return next();
+      res.status(409).json({ error: 'Voeg je kind toe via Mijn gezin in je RTG-account.' });
+    });
   }
-  return { accountplicht, volwassenAccount, magDoor, weigerKind };
+  return { accountplicht, volwassenAccount, magDoor, bewaak };
 }
 
 module.exports = { maak };

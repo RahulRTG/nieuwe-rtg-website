@@ -26,10 +26,10 @@ test.after(() => {
 });
 
 test('code plus eigen PIN opent direct één profiel en een foute PIN toont geen namen', async () => {
-  const fout = await f('/gezin/inloggen', { code:gezin.code, pin:'0000' });
+  const fout = await f('/gezin/inloggen', { gezinscode:gezin.gezinscode, pin:'0000' });
   assert.equal(fout.status, 403);
   assert.equal((await fout.text()).includes('Beheerder'), false);
-  const goed = await json(await f('/gezin/inloggen', { code:gezin.code, pin:'2468' }));
+  const goed = await json(await f('/gezin/inloggen', { gezinscode:gezin.gezinscode, pin:'2468' }));
   assert.equal(goed.profiel.naam, 'Beheerder');
   assert.ok(goed.token);
   assert.equal(goed.profielen, undefined);
@@ -105,7 +105,7 @@ test('de beheerder trekt een openstaande uitnodiging in en de sleutel is daarna 
     'zonder beheerderstoken trekt niemand een uitnodiging in');
   assert.equal((await f('/gezin/uitnodiging/intrek', { code:gezin.code, token:gezin.token, id:'bestaatniet' })).status, 404);
 
-  const voor = await json(await f('/gezin/uitnodigingen', { code:gezin.code, token:gezin.token }));
+  const voor = await json(await post('/api/foundation/gezin/uitnodigingen', { code:gezin.code, token:gezin.token }));
   assert.equal(voor.uitnodigingen.find(u => u.id === gemaakt.id).status, 'open');
 
   const ingetrokken = await f('/gezin/uitnodiging/intrek', { code:gezin.code, token:gezin.token, id:gemaakt.id });
@@ -113,7 +113,7 @@ test('de beheerder trekt een openstaande uitnodiging in en de sleutel is daarna 
   assert.equal(ingetrokken.status, 200, antwoord);
   assert.deepEqual(JSON.parse(antwoord), { ok:true });
 
-  const na = await json(await f('/gezin/uitnodigingen', { code:gezin.code, token:gezin.token }));
+  const na = await json(await post('/api/foundation/gezin/uitnodigingen', { code:gezin.code, token:gezin.token }));
   assert.equal(na.uitnodigingen.find(u => u.id === gemaakt.id).status, 'ingetrokken');
 
   assert.equal((await f('/gezin/uitnodiging/bekijk', { uitnodiging:gemaakt.uitnodiging })).status, 404,

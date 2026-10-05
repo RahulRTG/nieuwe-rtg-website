@@ -102,8 +102,8 @@ test('2. de lesagenda is ook van de begeleider', async () => {
 test('3. een profiel wijzigt de beheerder, en er blijft er altijd een', async () => {
   const g = (await api('/gezin/maak', { gezinsnaam: 'De Vries', naam: 'Ouder Een', pin: '2468' })).body;
   const kind = (await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Noor', rol: 'kind' })).body.profiel;
-  const kt = (await api('/gezin/profiel/kies', { code: g.code, profielId: kind.id })).body.token;
-  const mij = await get('/gezin/' + g.code + '/mij?token=' + g.token);
+  const kt = (await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.id })).body.token;
+  const mij = await get('/gezin/' + g.code + '/mij', g.token);
   const mijnId = (mij.profiel || mij).id;
 
   assert.equal((await api('/gezin/profiel/wijzig', { code: g.code, token: kt, profielId: kind.id, naam: 'Baas' })).status, 403,
@@ -135,14 +135,14 @@ test('4. gelezen is persoonlijk', async () => {
   const g = (await api('/gezin/maak', { gezinsnaam: 'De Boer', naam: 'Ouder', pin: '1357' })).body;
   const mk = async naam => {
     const p = (await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam, rol: 'ouder' })).body.profiel;
-    return { id: p.id, token: (await api('/gezin/profiel/kies', { code: g.code, profielId: p.id })).body.token };
+    return { id: p.id, token: (await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: p.id })).body.token };
   };
   const een = await mk('Ouder Twee');
   const twee = await mk('Ouder Drie');
 
   assert.equal((await api('/gezin/bericht', { code: g.code, token: g.token, naar: 'allen', tekst: 'Vanavond eten we vroeg.' })).status, 200);
 
-  const lees = (t) => get('/gezin/' + g.code + '/berichten?token=' + t).then(d => d.berichten || []);
+  const lees = (t) => get('/gezin/' + g.code + '/berichten', t).then(d => d.berichten || []);
   const voorEen = await lees(een.token);
   assert.ok(voorEen.some(b => /vroeg/.test(b.tekst) && !b.gelezen), 'het bericht staat ongelezen bij de eerste');
   assert.ok((await lees(twee.token)).some(b => /vroeg/.test(b.tekst) && !b.gelezen), 'en ook bij de tweede');

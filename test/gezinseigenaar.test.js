@@ -95,11 +95,14 @@ test('3. na de keuring van de ouder: kind toevoegen, kind binnen', async () => {
   assert.equal(volw.status, 409, 'een volwassene is geen kinderprofiel');
 });
 
-test('4. een anoniem gezin met code en pincode opent onder de plicht niets', async () => {
+test('4. onder de plicht maakt de oude deur geen anoniem gezin, en wijst de weg', async () => {
+  /* Een anoniem gezin opent onder de plicht niets (zie test/foundation-gezinstoken-productie.test.js,
+     op een echte productieserver). Hem dan nog laten maken is een doodlopende weg. */
   const g = await post('/api/foundation/gezin/maak',
     { gezinsnaam: 'Anoniem', naam: 'Iemand', pin: '2468', bevoegdGezin: true, privacyAkkoord: true });
-  assert.equal(g.status, 200, g.tekst);
-  assert.equal(await mij(g.body.code, g.body.token), 403, 'zonder eigenaar geen toegang');
+  assert.equal(g.status, 409, g.tekst);
+  assert.match(g.body.error, /Mijn gezin/);
+  assert.equal(g.body.token, undefined, 'geen sessie bij een weigering');
 });
 
 test('6. een account, een gezin', async () => {

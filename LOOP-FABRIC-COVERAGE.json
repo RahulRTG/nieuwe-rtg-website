@@ -8185,7 +8185,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P03_ASSET_INTERVENTION_LIFECYCLE"
       }
     },
     {
@@ -9443,7 +9444,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Change Router",
+          "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+          "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+          "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+        }
       }
     },
     {
@@ -9634,7 +9641,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Change Router, checkpoints en Recall projection",
+          "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+          "decision": "partition ownership, event ordering, clock semantics en region failover",
+          "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+        }
       }
     },
     {
@@ -9730,7 +9743,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Change Router, checkpoints en Recall projection",
+          "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+          "decision": "partition ownership, event ordering, clock semantics en region failover",
+          "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+        }
       }
     },
     {
@@ -9827,7 +9846,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P03_ASSET_INTERVENTION_LIFECYCLE"
       }
     },
     {
@@ -9929,7 +9949,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Change Router",
+          "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+          "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+          "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+        }
       }
     },
     {
@@ -10035,7 +10061,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Change Router, checkpoints en Recall projection",
+          "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+          "decision": "partition ownership, event ordering, clock semantics en region failover",
+          "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+        }
       }
     },
     {
@@ -10226,7 +10258,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Change Router",
+          "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+          "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+          "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+        }
       }
     },
     {
@@ -10325,7 +10363,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Change Router",
+          "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+          "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+          "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+        }
       }
     },
     {
@@ -10437,7 +10481,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Recall ranking",
+          "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+          "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+          "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+        }
       }
     },
     {
@@ -10537,7 +10587,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Recall ranking",
+          "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+          "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+          "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+        }
       }
     },
     {
@@ -10635,7 +10691,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Recall ranking",
+          "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+          "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+          "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+        }
       }
     },
     {
@@ -10728,7 +10790,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Change Router, checkpoints en Recall projection",
+          "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+          "decision": "partition ownership, event ordering, clock semantics en region failover",
+          "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+        }
       }
     },
     {
@@ -10827,7 +10895,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Change Router, checkpoints en Recall projection",
+          "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+          "decision": "partition ownership, event ordering, clock semantics en region failover",
+          "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+        }
       }
     },
     {
@@ -10941,7 +11015,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Change Router, checkpoints en Recall projection",
+          "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+          "decision": "partition ownership, event ordering, clock semantics en region failover",
+          "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+        }
       }
     },
     {
@@ -11482,7 +11562,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P02_VERSIONED_WORK_PROCESS_TARGET"
       }
     },
     {
@@ -11601,7 +11682,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P02_VERSIONED_WORK_PROCESS_TARGET"
       }
     },
     {
@@ -11898,7 +11980,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Recall ranking",
+          "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+          "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+          "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+        }
       }
     },
     {
@@ -11990,7 +12078,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Recall ranking",
+          "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+          "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+          "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+        }
       }
     },
     {
@@ -12313,7 +12407,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P04_VERSIONED_SERVICE_PROCEDURE"
       }
     },
     {
@@ -12830,7 +12925,8 @@
         "blockers": [
           "flow-granularity",
           "source-contract-per-flow"
-        ]
+        ],
+        "technicalPrerequisiteId": "P03_ASSET_INTERVENTION_LIFECYCLE"
       }
     },
     {
@@ -13873,7 +13969,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P03_ASSET_INTERVENTION_LIFECYCLE"
       }
     },
     {
@@ -14669,7 +14766,8 @@
         "blockers": [
           "flow-granularity",
           "source-contract-per-flow"
-        ]
+        ],
+        "technicalPrerequisiteId": "P01_VERSIONED_SOURCE_RELEASE"
       }
     },
     {
@@ -14924,7 +15022,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P04_VERSIONED_SERVICE_PROCEDURE"
       }
     },
     {
@@ -15037,7 +15136,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P04_VERSIONED_SERVICE_PROCEDURE"
       }
     },
     {
@@ -15131,7 +15231,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P04_VERSIONED_SERVICE_PROCEDURE"
       }
     },
     {
@@ -15344,7 +15445,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Change Router",
+          "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+          "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+          "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+        }
       }
     },
     {
@@ -15439,7 +15546,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P04_VERSIONED_SERVICE_PROCEDURE"
       }
     },
     {
@@ -15537,7 +15645,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Change Router, checkpoints en Recall projection",
+          "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+          "decision": "partition ownership, event ordering, clock semantics en region failover",
+          "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+        }
       }
     },
     {
@@ -15800,7 +15914,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P02_VERSIONED_WORK_PROCESS_TARGET"
       }
     },
     {
@@ -16428,7 +16543,8 @@
         "blockers": [
           "flow-granularity",
           "source-contract-per-flow"
-        ]
+        ],
+        "technicalPrerequisiteId": "P02_VERSIONED_WORK_PROCESS_TARGET"
       }
     },
     {
@@ -17480,7 +17596,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P02_VERSIONED_WORK_PROCESS_TARGET"
       }
     },
     {
@@ -17599,7 +17716,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P02_VERSIONED_WORK_PROCESS_TARGET"
       }
     },
     {
@@ -17727,7 +17845,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P02_VERSIONED_WORK_PROCESS_TARGET"
       }
     },
     {
@@ -18064,7 +18183,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P02_VERSIONED_WORK_PROCESS_TARGET"
       }
     },
     {
@@ -18172,7 +18292,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P02_VERSIONED_WORK_PROCESS_TARGET"
       }
     },
     {
@@ -18486,7 +18607,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P03_ASSET_INTERVENTION_LIFECYCLE"
       }
     },
     {
@@ -18580,7 +18702,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P03_ASSET_INTERVENTION_LIFECYCLE"
       }
     },
     {
@@ -18689,7 +18812,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Change Router, checkpoints en Recall projection",
+          "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+          "decision": "partition ownership, event ordering, clock semantics en region failover",
+          "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+        }
       }
     },
     {
@@ -19185,7 +19314,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Change Router, checkpoints en Recall projection",
+          "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+          "decision": "partition ownership, event ordering, clock semantics en region failover",
+          "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+        }
       }
     },
     {
@@ -19281,7 +19416,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Change Router, checkpoints en Recall projection",
+          "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+          "decision": "partition ownership, event ordering, clock semantics en region failover",
+          "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+        }
       }
     },
     {
@@ -19374,7 +19515,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P03_ASSET_INTERVENTION_LIFECYCLE"
       }
     },
     {
@@ -19476,7 +19618,8 @@
         "blockers": [
           "flow-granularity",
           "source-contract-per-flow"
-        ]
+        ],
+        "technicalPrerequisiteId": "P01_VERSIONED_SOURCE_RELEASE"
       }
     },
     {
@@ -19665,7 +19808,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Recall ranking",
+          "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+          "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+          "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+        }
       }
     },
     {
@@ -19776,7 +19925,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Recall ranking",
+          "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+          "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+          "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+        }
       }
     },
     {
@@ -19866,7 +20021,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Recall ranking",
+          "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+          "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+          "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+        }
       }
     },
     {
@@ -19960,7 +20121,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P01_VERSIONED_SOURCE_RELEASE"
       }
     },
     {
@@ -20091,7 +20253,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Recall ranking",
+          "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+          "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+          "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+        }
       }
     },
     {
@@ -20295,7 +20463,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P02_VERSIONED_WORK_PROCESS_TARGET"
       }
     },
     {
@@ -20580,7 +20749,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Change Router",
+          "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+          "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+          "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+        }
       }
     },
     {
@@ -20690,7 +20865,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P06_VERSIONED_PHYSICAL_HANDOFF"
       }
     },
     {
@@ -20787,7 +20963,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Change Router",
+          "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+          "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+          "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+        }
       }
     },
     {
@@ -21508,7 +21690,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P01_VERSIONED_SOURCE_RELEASE"
       }
     },
     {
@@ -21603,7 +21786,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P01_VERSIONED_SOURCE_RELEASE"
       }
     },
     {
@@ -21698,7 +21882,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P01_VERSIONED_SOURCE_RELEASE"
       }
     },
     {
@@ -21796,7 +21981,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Change Router",
+          "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+          "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+          "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+        }
       }
     },
     {
@@ -21932,7 +22123,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Change Router",
+          "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+          "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+          "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+        }
       }
     },
     {
@@ -22053,7 +22250,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Change Router",
+          "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+          "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+          "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+        }
       }
     },
     {
@@ -22329,7 +22532,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P01_VERSIONED_SOURCE_RELEASE"
       }
     },
     {
@@ -22420,7 +22624,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P01_VERSIONED_SOURCE_RELEASE"
       }
     },
     {
@@ -22585,7 +22790,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P03_ASSET_INTERVENTION_LIFECYCLE"
       }
     },
     {
@@ -22688,7 +22894,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P05_REVIEWED_FAILURE_ARTIFACT"
       }
     },
     {
@@ -27339,7 +27546,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Change Router, checkpoints en Recall projection",
+          "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+          "decision": "partition ownership, event ordering, clock semantics en region failover",
+          "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+        }
       }
     },
     {
@@ -27564,7 +27777,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Change Router, checkpoints en Recall projection",
+          "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+          "decision": "partition ownership, event ordering, clock semantics en region failover",
+          "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+        }
       }
     },
     {
@@ -27659,7 +27878,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P04_VERSIONED_SERVICE_PROCEDURE"
       }
     },
     {
@@ -28692,7 +28912,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P03_ASSET_INTERVENTION_LIFECYCLE"
       }
     },
     {
@@ -28786,7 +29007,13 @@
           "query-model",
           "mass-revocation",
           "cross-region-recovery"
-        ]
+        ],
+        "scaleBlocker": {
+          "component": "Lineage Index en Change Router",
+          "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+          "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+          "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+        }
       }
     },
     {
@@ -28949,7 +29176,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P01_VERSIONED_SOURCE_RELEASE"
       }
     },
     {
@@ -29415,7 +29643,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P01_VERSIONED_SOURCE_RELEASE"
       }
     },
     {
@@ -29832,7 +30061,8 @@
           "versioned-change-target",
           "durable-event",
           "recovery-proof"
-        ]
+        ],
+        "technicalPrerequisiteId": "P01_VERSIONED_SOURCE_RELEASE"
       }
     },
     {

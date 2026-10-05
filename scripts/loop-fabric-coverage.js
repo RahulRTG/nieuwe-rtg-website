@@ -6,6 +6,7 @@ const {FUNCTIES}=require('../server/functies/register');
 const policy=require('../server/kern/loop-fabric/coverage-policy');
 const executionPolicy=require('./lib/loop-fabric-execution-policy');
 const decisionPolicy=require('./lib/loop-fabric-decision-policy');
+const prerequisitePolicy=require('./lib/loop-fabric-prerequisite-policy');
 
 const read=name=>JSON.parse(fs.readFileSync(path.join(ROOT,name),'utf8'));
 const routeSource=read('ROUTEBRON.json').perRoute;
@@ -104,6 +105,10 @@ function build() {
     row.execution=executionPolicy.classify(row);
     const dossier=decisionPolicy.dossierForCapability(row.id);
     if(dossier)row.execution.decisionDossierId=dossier.id;
+    const prerequisite=prerequisitePolicy.prerequisiteForCapability(row.id);
+    if(prerequisite)row.execution.technicalPrerequisiteId=prerequisite.id;
+    if(row.execution.readiness==='BLOCKED_BY_SCALE_ARCHITECTURE')
+      row.execution.scaleBlocker=prerequisitePolicy.SCALE_DECISIONS[row.domain];
     return row;
   });
   const domains={};

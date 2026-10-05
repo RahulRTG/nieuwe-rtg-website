@@ -29,6 +29,7 @@ function build() {
     batches.push({id,name:meta.name,status:meta.status,domains:[...new Set(capabilities.map(row=>row.domain))].sort(),
       capabilities:capabilities.map(row=>row.id),readiness,
       decisionDossiers:[...new Set(capabilities.map(row=>row.execution.decisionDossierId).filter(Boolean))].sort(),
+      technicalPrerequisites:[...new Set(capabilities.map(row=>row.execution.technicalPrerequisiteId).filter(Boolean))].sort(),
       blastRadius:{sourceOwners:capabilities.length,kernelModules:kernels.length,mutationContracts:mutationRows.length,
         routes:routeRows.length,screens:screenRows.length,dataSchema:meta.dataSchema,newSharedPrimitive:meta.sharedPrimitive,
         crossDomainDependencies:meta.crossDomain,privacyImpact:meta.privacy,authorityImpact:meta.authority,

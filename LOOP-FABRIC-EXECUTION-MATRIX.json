@@ -83,6 +83,7 @@
         "NO_LEARNING_VALUE": 8
       },
       "decisionDossiers": [],
+      "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 14,
         "kernelModules": 2472,
@@ -131,6 +132,11 @@
       },
       "decisionDossiers": [
         "D10_RESEARCH_PARTICIPATION"
+      ],
+      "technicalPrerequisites": [
+        "P01_VERSIONED_SOURCE_RELEASE",
+        "P02_VERSIONED_WORK_PROCESS_TARGET",
+        "P03_ASSET_INTERVENTION_LIFECYCLE"
       ],
       "blastRadius": {
         "sourceOwners": 5,
@@ -190,6 +196,9 @@
       "decisionDossiers": [
         "D06_WORKFORCE_DEVELOPMENT"
       ],
+      "technicalPrerequisites": [
+        "P02_VERSIONED_WORK_PROCESS_TARGET"
+      ],
       "blastRadius": {
         "sourceOwners": 13,
         "kernelModules": 121,
@@ -246,6 +255,9 @@
         "NO_LEARNING_VALUE": 0
       },
       "decisionDossiers": [],
+      "technicalPrerequisites": [
+        "P01_VERSIONED_SOURCE_RELEASE"
+      ],
       "blastRadius": {
         "sourceOwners": 7,
         "kernelModules": 40,
@@ -299,6 +311,9 @@
         "NO_LEARNING_VALUE": 0
       },
       "decisionDossiers": [],
+      "technicalPrerequisites": [
+        "P03_ASSET_INTERVENTION_LIFECYCLE"
+      ],
       "blastRadius": {
         "sourceOwners": 8,
         "kernelModules": 13,
@@ -363,6 +378,12 @@
         "D05_DOCUMENT_CONTENT",
         "D14_AI_ASSISTANCE",
         "D15_SERVICE_IMPROVEMENT"
+      ],
+      "technicalPrerequisites": [
+        "P01_VERSIONED_SOURCE_RELEASE",
+        "P04_VERSIONED_SERVICE_PROCEDURE",
+        "P05_REVIEWED_FAILURE_ARTIFACT",
+        "P06_VERSIONED_PHYSICAL_HANDOFF"
       ],
       "blastRadius": {
         "sourceOwners": 14,
@@ -446,6 +467,7 @@
         "NO_LEARNING_VALUE": 0
       },
       "decisionDossiers": [],
+      "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 32,
         "kernelModules": 48,
@@ -506,6 +528,7 @@
         "D13_DISCOVERY_COMMONS",
         "D14_AI_ASSISTANCE"
       ],
+      "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 11,
         "kernelModules": 30,
@@ -599,6 +622,7 @@
         "D11_COMMUNITY_EVENTS",
         "D12_DATING"
       ],
+      "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 38,
         "kernelModules": 117,
@@ -747,6 +771,7 @@
         "D21_FINANCIAL_PROFILING",
         "D22_COMMERCIAL_CLAIMS"
       ],
+      "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 86,
         "kernelModules": 2495,

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2312 bestanden en 15818 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2313 bestanden en 15821 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2312 |
-| losse beweringen (`test(...)`) | 15818 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 243 |
+| toetsbestanden | 2313 |
+| losse beweringen (`test(...)`) | 15821 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 244 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1953 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 162 |
 | alleen in de kop *genoemd*, nog niet gemeten | 33 |
-| niets van beide | 164 |
+| niets van beide | 165 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2015 bestanden, 15308 beweringen.
+2016 bestanden, 15311 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -967,6 +967,7 @@ toets omvalt.
 | `loop-fabric-routes.test.js` | 4 | gezakt op `===->!==#0` | De Loop Fabric-routeproef bewijst dat de HTTP-deuren de actor uit de sessie en het persoonlijke WorkOS-lid afleiden, en ontbrekende bevoegdheid vóór de bronmutatie afwijzen. |
 | `loop-fabric-service-proof.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-source-flows.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `loop-fabric-unlock.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-workos-slice.test.js` | 2 | gezakt op `===->!==#0` | Tweede bewijsslice: dezelfde federatieve contracten dragen een interne WorkOS near-miss en een versioned runbook, zonder Living World-semantiek. |
 | `loop-fabric.pg.test.js` | 1 | al rood | De PostgreSQL-proef bewijst multi-instance serialisatie, payloadgebonden replay, herstel na verloren commitantwoord en duurzame Loop Fabric-projectie over een herstart. |
 | `loop-fabric.test.js` | 11 | gezakt op `===->!==#0` | De federatieve Loop Fabric-slice bewijst observation, bevoegd WorkOS-besluit, source-issued change receipt, doelgebonden recall en niet-causale verificatie. De adversarial paden dekken intrekking, correctie, contest,... |

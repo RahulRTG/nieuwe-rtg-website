@@ -31,6 +31,9 @@ module.exports = (tctx) => {
     catch (e) { return null; }
   };
 
+  // het geheim zetten, roteren met overlap en de overlap sluiten (B16, B22)
+  const geheimDeel = require('./sso-geheim')(tctx, wie);
+
   /* Het overzicht. Per koppeling ook hoeveel mensen er via binnen zijn gekomen
      -- een aantal, geen namen. */
   app.get('/api/techniek/sso', techAuth, eigenaarAlleen, (req, res) => {
@@ -46,8 +49,10 @@ module.exports = (tctx) => {
 
   /* Aanmaken of wijzigen. Laat je clientSecret weg bij een wijziging, dan blijft
      het bestaande geheim staan (zie sso/koppelingen.js). */
-  app.post('/api/techniek/sso', techAuth, eigenaarAlleen, (req, res) => {
+  app.post('/api/techniek/sso', techAuth, eigenaarAlleen, async (req, res) => {
     const b = req.body || {};
+    // een clientSecret zetten vraagt een verse passkey (B22, ./sso-geheim.js)
+    if (b.clientSecret && await geheimDeel.eisGeheimPasskey(req, res)) return;
     try {
       const k = koppelingen.zet({
         org: b.org, naam: b.naam, issuer: b.issuer, clientId: b.clientId,
@@ -66,8 +71,6 @@ module.exports = (tctx) => {
     }
   });
 
-  // het geheim zetten, roteren met overlap en de overlap sluiten (besluit B16)
-  require('./sso-geheim')(tctx, wie);
 
   /* Uitzetten zonder weggooien: de koppeling blijft staan (en daarmee de
      verwijzingen naar de accounts), maar er komt niemand meer mee binnen. Dit

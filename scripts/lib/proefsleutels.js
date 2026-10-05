@@ -235,7 +235,7 @@ const MUNTERS = [
       const org = 'proefkoppeling';
       const gezet = await post('/api/techniek/sso', {
         org, naam: 'Proefkoppeling', issuer: 'https://idp.proef.invalid',
-        clientId: 'proef', clientSecret: 'proef-geheim', domeinen: ['proef.invalid'], actief: true
+        clientId: 'proef', domeinen: ['proef.invalid'], actief: true
       }, bos.techniek);
       if (!gezet || gezet.status !== 200) return null;
       const s = await post('/api/techniek/sso/scimsleutel', { org }, bos.techniek);

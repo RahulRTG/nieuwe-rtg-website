@@ -72,7 +72,7 @@ async function opzet(naam) {
   const klas = { code: kl.code, leraarToken: p.personeelToken };
   const g = await json(await api('/gezin/maak', { gezinsnaam: 'Fam ' + naam, naam: 'Ouder ' + naam, pin: '1234' }));
   const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind ' + naam, rol: 'kind', groep: 'kind' }));
-  const kindToken = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const kindToken = (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).token;
   // de ouder nodigt uit; het kind accepteert zelf (dat is de afspraak)
   const kop = await json(await api('/school/koppel', { code: g.code, token: g.token, klasCode: klas.code, profielId: kind.profiel.id }));
   assert.ok(kop.ok && kop.uitgenodigd, 'de ouder verstuurt een uitnodiging');
@@ -108,7 +108,7 @@ test('uitnodigen: het kind beslist zelf, en aansluiten zonder ouder kan ook', as
   const kl = await json(await api('/school/leraar/klas/maak', { schoolCode: sch.schoolCode, personeelToken: p.personeelToken, naam: 'Groep 6' }));
   const g = await json(await api('/gezin/maak', { gezinsnaam: 'Fam Keuze', naam: 'Ouder Keuze', pin: '1234' }));
   const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind Keuze', rol: 'kind', groep: 'kind' }));
-  const kindToken = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const kindToken = (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).token;
 
   // 1. de ouder nodigt uit: nog GEEN leerling, wel een uitnodiging voor het kind
   const kop = await json(await api('/school/koppel', { code: g.code, token: g.token, klasCode: kl.code, profielId: kind.profiel.id }));
@@ -134,7 +134,7 @@ test('uitnodigen: het kind beslist zelf, en aansluiten zonder ouder kan ook', as
 
   // 3. een tweede kind sluit ZICHZELF aan, zonder ouder: eigen keuze telt meteen
   const kind2 = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind Solo', rol: 'kind', groep: 'tiener' }));
-  const kind2Token = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind2.profiel.id }))).token;
+  const kind2Token = (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind2.profiel.id }))).token;
   const zelf = await json(await api('/school/koppel', { code: g.code, token: kind2Token, klasCode: kl.code }));
   assert.ok(zelf.ok && !zelf.uitgenodigd, 'zelf aansluiten werkt direct');
   kd = await json(await api('/school/klas', { klasCode: kl.code, leraarToken: p.personeelToken }));
@@ -174,7 +174,7 @@ test('cijfers: het gezin ziet alleen de cijfers van het eigen kind', async () =>
   const kind2 = await json(await api('/gezin/profiel/maak', { code: g2.code, token: g2.token, naam: 'Kind Cc2', rol: 'kind', groep: 'kind' }));
   await api('/school/koppel', { code: g2.code, token: g2.token, klasCode: A.klas.code, profielId: kind2.profiel.id });
   // het kind accepteert de uitnodiging zelf
-  const kind2Token = (await json(await api('/gezin/profiel/kies', { code: g2.code, profielId: kind2.profiel.id }))).token;
+  const kind2Token = (await json(await api('/gezin/profiel/kies', { gezinscode: g2.gezinscode, profielId: kind2.profiel.id }))).token;
   await api('/school/uitnodiging/antwoord', { code: g2.code, token: kind2Token, klasCode: A.klas.code, akkoord: true });
 
   await lr(A.klas, '/school/cijfer/geef', { leerling: A.sleutel, vak: 'Rekenen', cijfer: 8.5, omschrijving: 'Toets H4' });

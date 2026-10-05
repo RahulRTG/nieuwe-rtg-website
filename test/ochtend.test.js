@@ -22,7 +22,7 @@ function api(pad, body) {
   });
 }
 const json = r => r.json();
-const overzicht = (code, token) => fetch(BASE + '/api/foundation/gezin/' + code + '/ochtend?token=' + token).then(json);
+const overzicht = (code, token) => fetch(BASE + '/api/foundation/gezin/' + code + '/ochtend', { headers: { Authorization: 'Bearer ' + token } }).then(json);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' }, wachtPad: '/api/foundation/health' }));
@@ -35,10 +35,10 @@ test.after(() => {
 async function gezin() {
   const g = await json(await api('/gezin/maak', { gezinsnaam: 'Vroeg Op', naam: 'Ouder', pin: '2468' }));
   const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Noor', rol: 'kind' }));
-  const kt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const kt = (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).token;
   const gast = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Oma', rol: 'gast' }));
-  const gt = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: gast.profiel.id }))).token;
-  return { code: g.code, token: g.token, kindId: kind.profiel.id, kt, gt };
+  const gt = (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: gast.profiel.id }))).token;
+  return { code: g.code, gezinscode: g.gezinscode, token: g.token, kindId: kind.profiel.id, kt, gt };
 }
 
 test('mijn ritme: stappen erbij, afvinken, en alles-af telt zacht mee voor de week', async () => {
@@ -118,6 +118,6 @@ test('het ochtendritme is dicht voor een gast en voor een verkeerd token', async
   const G = await gezin();
   assert.equal((await api('/gezin/ochtend/stap', { code: G.code, token: G.gt, tekst: 'stiekem' })).status, 403);
   assert.equal((await api('/gezin/ochtend/vink', { code: G.code, token: G.gt, stapId: 'x', aan: true })).status, 403);
-  assert.equal((await fetch(BASE + '/api/foundation/gezin/' + G.code + '/ochtend?token=' + G.gt)).status, 403);
-  assert.equal((await fetch(BASE + '/api/foundation/gezin/' + G.code + '/ochtend?token=nep')).status, 403);
+  assert.equal((await fetch(BASE + '/api/foundation/gezin/' + G.code + '/ochtend', { headers: { Authorization: 'Bearer ' + G.gt } })).status, 403);
+  assert.equal((await fetch(BASE + '/api/foundation/gezin/' + G.code + '/ochtend', { headers: { Authorization: 'Bearer nep' } })).status, 403);
 });

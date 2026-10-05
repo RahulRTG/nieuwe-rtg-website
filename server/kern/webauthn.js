@@ -27,11 +27,13 @@ function maakWebauthn({ db, save, accounts, schoon }) {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/webauthn', bezit: { webauthn: 'kaart', webauthnSpoor: 'kaart' } });
 
   const lijsten = () => eigen.bak('webauthn');   // userId -> [credentials]
-  const credsVan = userId => lijsten()[userId] || [];
+  // lezen schept niets: bak() gaf een 500 op de 1e passkey onder PG
+  const kijkLijsten = () => eigen.kijk('webauthn');
+  const credsVan = userId => kijkLijsten()[userId] || [];
   function index() {
     if (credentialIndex) return credentialIndex;
     credentialIndex = new Map();
-    for (const [userId, rij] of Object.entries(lijsten()))
+    for (const [userId, rij] of Object.entries(kijkLijsten()))
       for (const cred of (rij || [])) if (cred && cred.id) credentialIndex.set(cred.id, userId);
     return credentialIndex;
   }

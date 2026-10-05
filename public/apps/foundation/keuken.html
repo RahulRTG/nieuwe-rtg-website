@@ -117,7 +117,7 @@ function kokOpties(gekozen){
 
 async function laad(){
   try{
-    const d = await fetch('/api/foundation/gezin/'+s.code+'/keuken?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/keuken',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     if (d.error) throw new Error(d.error);
     koks = d.koks || [];
     stand = d;

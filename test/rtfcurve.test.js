@@ -29,9 +29,9 @@ test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' }, wachtPad: '/api/foundation/health' }));
   g = await json(await api('/gezin/maak', { gezinsnaam: 'Fam Curve', naam: 'Mam', pin: '1234' }));
   const k = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Isa', rol: 'kind', groep: 'tiener' }));
-  kind = { code: g.code, token: (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: k.profiel.id }))).token };
+  kind = { code: g.code, token: (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: k.profiel.id }))).token };
   const b = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Tom', rol: 'kind', groep: 'tiener' }));
-  broer = { code: g.code, token: (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: b.profiel.id }))).token };
+  broer = { code: g.code, token: (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: b.profiel.id }))).token };
   const l = await leren('lijst-maak', Object.assign({}, kind, { naam: 'Frans H3',
     paren: [{ v: 'de hond', a: 'le chien' }, { v: 'de kat', a: 'le chat' }, { v: 'het brood', a: 'le pain' }] }));
   lijstId = l.body.id;

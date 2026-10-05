@@ -8,6 +8,9 @@ module.exports = Object.freeze([
   'POST /api/foundation/gezin/uitnodiging/intrek',
   // gezinssessies afmelden of overal sluiten (foundation/gezinssessie.js)
   'POST /api/foundation/gezin/sessie/intrek',
+  // de gezinscode intrekken en een passkey van het eigen profiel halen (foundation/gezinsdeur.js)
+  'POST /api/foundation/gezin/code/intrek',
+  'POST /api/foundation/gezin/passkey/weg',
   'POST /api/foundation/gezin/locatie/stop',
   'POST /api/foundation/gezin/wissen',
   'POST /api/foundation/gezin/wissen/bevestig',

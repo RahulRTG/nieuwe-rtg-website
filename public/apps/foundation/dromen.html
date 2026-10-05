@@ -121,7 +121,7 @@ if (window.RTGUitvoer) RTGUitvoer.bron(function () {
 
 async function laad(){
   try{
-    const d = await fetch('/api/foundation/gezin/'+s.code+'/dromen?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/dromen',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     DROMEN = d.dromen || [];
     const dromen = DROMEN;
     const open = dromen.filter(x=>!x.behaald), klaar = dromen.filter(x=>x.behaald);

@@ -29,9 +29,9 @@ test.before(async () => {
   g = gz.body;
   ouder = { code: g.code, token: g.token };
   const k = await api('/gezin/profiel/maak', Object.assign({}, ouder, { naam: 'Juno', rol: 'kind', groep: 'kind' }));
-  kind = { code: g.code, token: (await api('/gezin/profiel/kies', { code: g.code, profielId: k.body.profiel.id })).body.token };
+  kind = { code: g.code, token: (await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: k.body.profiel.id })).body.token };
   const ga = await api('/gezin/profiel/maak', Object.assign({}, ouder, { naam: 'Oppas Bo', rol: 'gast' }));
-  gast = { code: g.code, token: (await api('/gezin/profiel/kies', { code: g.code, profielId: ga.body.profiel.id })).body.token };
+  gast = { code: g.code, token: (await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: ga.body.profiel.id })).body.token };
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}

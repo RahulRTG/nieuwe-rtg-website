@@ -174,7 +174,7 @@ async function wereld(basis) {
     const id = p.data && p.data.profiel && p.data.profiel.id;
     if (!id) throw new Error('geen profiel "' + naam + '" (status ' + p.status + ': ' +
       ((p.data && p.data.error) || '') + ')');
-    const kies = await P('/gezin/profiel/kies', { code, profielId: id });
+    const kies = await P('/gezin/profiel/kies', { code, token: ouderToken, profielId: id });
     return { id, token: kies.data && kies.data.token, groep: p.data.profiel.groep,
       codenaam: kies.data && kies.data.profiel && kies.data.profiel.codenaam };
   };

@@ -2,7 +2,7 @@
  'use strict';
  w.RTGPublicController=function(v){
   var P=w.RTGPublicPlatform,D=w.RTGPublicContent,copy=P.copy,photo=P.photo;
-  var {o,data,company,root,detail,focus,focusTitle,home,favorites,library,title,body,picture,stories,stepper,overline,summary,language,search,filter,catalog,empty,gridButton,listButton,menuPanel,worldPanel}=v;
+  var {o,data,company,root,detail,focus,focusTitle,home,favorites,library,title,body,picture,stories,stepper,overline,summary,signalWorld,signalCount,language,search,filter,catalog,empty,gridButton,listButton,menuPanel,worldPanel}=v;
   var selected=data.stories[0],lastFocus=null,savedScroll=0,current=null,moved=null;
   function select(id,notify){
    var story=data.stories.find(function(s){return s.id===id;});if(!story)return;selected=story;
@@ -13,13 +13,15 @@
    stepper.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.publicStep===id));});
    d.body.dataset.rtgWorld=story.world;d.body.dataset.rtgDesktop=story.world;
    if(notify&&o.select)o.select(story);
-   if(company){overline.dataset.i18n='public.'+story.label;overline.dataset.i18nSource=D.words[story.label][0];overline.textContent=copy(story.label);}
+   overline.dataset.i18n='public.'+story.label;overline.dataset.i18nSource=D.words[story.label][0];overline.textContent=copy(story.label);
+   if(signalWorld)signalWorld.textContent={living:'LivingOS',travel:'TravelOS',work:'WorkOS',foundation:'FoundationOS'}[story.world];
+   if(signalCount){var truth=w.RTGWebsiteTruth&&w.RTGWebsiteTruth.worlds&&w.RTGWebsiteTruth.worlds[story.world];signalCount.textContent=truth?truth.featureCount+' '+copy('applications'):copy('currentMap');}
    refresh();if(notify)saveHash();
   }
   function saveHash(){var h=new URLSearchParams();h.set('story',selected.id);if(current)h.set('detail',current);w.history.replaceState(null,'','#rtg?'+h.toString());}
   function filterCards(){
    var q=search.value.trim().toLocaleLowerCase();var count=0;
-   catalog.querySelectorAll('[data-public-widget]').forEach(function(el){var card=data.cards.find(function(c){return c.id===el.dataset.publicWidget;}),matches=filter.value==='all'||(filter.value==='favorites'?!!el.querySelector('[data-company-pin][aria-pressed="true"]'):card.world===filter.value);el.hidden=!!(!matches||(q&&!(copy(card.title)+' '+copy(card.body)).toLocaleLowerCase().includes(q)));if(!el.hidden)count++;});empty.hidden=count>0;
+   catalog.querySelectorAll('[data-public-widget]').forEach(function(el){var card=data.cards.find(function(c){return c.id===el.dataset.publicWidget;}),matches=filter.value==='all'||(filter.value==='favorites'?!!el.querySelector('[data-company-pin][aria-pressed="true"]'):card.world===filter.value),haystack=(copy(card.title)+' '+copy(card.body)+' '+(el.dataset.search||'')).toLocaleLowerCase();el.hidden=!!(!matches||(q&&!haystack.includes(q)));if(!el.hidden)count++;});empty.hidden=count>0;
   }
   function setView(list){catalog.classList.toggle('pp-list-view',list);gridButton.setAttribute('aria-pressed',String(!list));listButton.setAttribute('aria-pressed',String(list));}
   function collapse(){

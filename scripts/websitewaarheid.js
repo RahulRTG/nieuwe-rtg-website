@@ -8,11 +8,14 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const vm = require('vm');
+const wereldregister = require('./lib/wereldregister');
+const appgids = require('../server/kern/appgids');
 
 const ROOT = path.join(__dirname, '..');
 const WERELDBRON = path.join(ROOT, 'public/shared/rtg-edge-worlds.js');
 const DOEL = path.join(ROOT, 'public/site/website-truth.json');
 const VOLGORDE = ['living', 'travel', 'work', 'foundation'];
+const WERELDMAP = { living: 'map-rtg', travel: 'map-reizen', work: 'map-werk', foundation: 'map-rtf' };
 const PLATFORM = [
   { id: 'organisatie', audience: 'Organisatie', name: 'RTG Werk OS', route: '/apps/werk.html',
     image: 'images/start/app-schermen/organisatie.png', action: 'Open RTG Werk OS' },
@@ -65,6 +68,26 @@ function euro(centen) {
   return '€ ' + new Intl.NumberFormat('nl-NL', { maximumFractionDigits: 2 }).format(centen / 100);
 }
 
+function appUitleg(app, route) {
+  if (app.soort === 'link') {
+    const gids = appgids.gidsVan(route);
+    if (!gids || gids.algemeen) throw new Error(app.naam + ' mist een eigen app-uitleg: ' + route);
+    return { summary: gids.wat, actions: gids.doe, note: gids.tip };
+  }
+  if (app.soort === 'tab') {
+    return {
+      summary: app.naam + ' is een vaste stand binnen de RTG ledenapp. U blijft in dezelfde omgeving terwijl deze stand opent.',
+      actions: ['Open uw RTG ledenapp', 'Kies de stand ' + app.naam, 'Ga daar verder met uw eigen gegevens'],
+      note: 'Een stand is geen losse openbare app. De ledenapp bewaakt welke persoonlijke inhoud u kunt zien.'
+    };
+  }
+  return {
+    summary: app.naam + ' is een kiezer binnen de RTG ledenapp. Vanuit deze ingang kiest u de omgeving die bij uw situatie past.',
+    actions: ['Open uw RTG ledenapp', 'Kies ' + app.naam, 'Selecteer daarna een beschikbare omgeving'],
+    note: 'Een kiezer heeft geen los openbaar adres. Welke omgeving beschikbaar is, wordt in de ledenapp bepaald.'
+  };
+}
+
 function maak() {
   const { code, werelden } = wereldenUitBron();
   if (!werelden) throw new Error('rtg-edge-worlds.js leverde geen werelden op');
@@ -73,26 +96,41 @@ function maak() {
   for (const id of VOLGORDE) {
     const wereld = werelden[id];
     if (!wereld) throw new Error('wereld ontbreekt in appbron: ' + id);
-    const routes = [wereld.huis, wereld.home, wereld.workspace]
-      .concat(wereld.all.map((functie) => functie[3]));
+    const volledigeWereld = wereldregister.WERELDEN.find((item) => item.sleutel === WERELDMAP[id]);
+    if (!volledigeWereld) throw new Error('MAPPEN mist de wereld: ' + id);
+    const apps = volledigeWereld.items.map((item) => {
+      const app = wereldregister.los(item);
+      if (!app.bestaat) throw new Error(id + ' bevat een onbereikbaar onderdeel: ' + item);
+      const route = app.soort === 'link' && String(app.url).startsWith('/') ? app.url : '/apps/app.html';
+      return Object.assign({ id: item, name: app.naam, kind: app.soort, route }, appUitleg(app, route));
+    });
+    const groepen = [
+      { kind: 'link', name: 'Appschermen' },
+      { kind: 'tab', name: 'Standen in de ledenapp' },
+      { kind: 'os', name: 'Kiezers in de ledenapp' }
+    ].map((groep) => {
+      const items = apps.filter((app) => app.kind === groep.kind);
+      return { name: groep.name, count: items.length, apps: items };
+    }).filter((groep) => groep.count);
+    const routes = [volledigeWereld.wereld, wereld.home, wereld.workspace]
+      .concat(apps.map((app) => app.route));
     const ontbreekt = [...new Set(routes)].filter((route) => !routeBestaat(route));
     if (ontbreekt.length) throw new Error(id + ' verwijst naar ontbrekende app-route(s): ' + ontbreekt.join(', '));
     wereldUit[id] = {
-      name: wereld.kaart,
+      name: volledigeWereld.naam,
       appName: wereld.naam,
-      publicRoute: wereld.huis,
+      publicRoute: volledigeWereld.wereld,
       homeRoute: wereld.home,
       workspaceRoute: wereld.workspace,
       action: wereld.actie,
-      groupCount: wereld.groups.length,
-      featureCount: wereld.all.length,
-      groups: wereld.groups.map((groep) => ({ name: groep[0], count: groep[1].length })),
+      groupCount: groepen.length,
+      featureCount: apps.length,
+      groups: groepen,
       tools: wereld.tools.map((functie) => ({ id: functie[0], name: functie[1], route: functie[3] }))
     };
   }
 
   const ladder = require('../server/kern/pasladder').treden();
-  const appgids = require('../server/kern/appgids');
   const passen = {};
   for (const pas of ladder) {
     const id = pas.id === 'gratis' ? 'community' : pas.id;
@@ -130,10 +168,11 @@ function maak() {
     return Object.assign({}, scherm, { summary: gids.wat, actions, note: gids.tip, sourceHash });
   });
 
-  const hashBron = code + '\n' + JSON.stringify(ladder) + '\n' + JSON.stringify(platform);
+  const hashBron = code + '\n' + wereldregister.BRON + '\n' + JSON.stringify(ladder) + '\n' +
+    JSON.stringify(wereldUit) + '\n' + JSON.stringify(platform);
   const uit = {
-    schema: 2,
-    source: ['public/shared/rtg-edge-worlds.js', 'server/kern/pasladder.js', 'server/kern/appgids.js',
+    schema: 4,
+    source: ['public/apps/app-main.js', 'public/shared/rtg-edge-worlds.js', 'server/kern/pasladder.js', 'server/kern/appgids.js',
       'public/apps/werk.html', 'public/apps/leverancier.html', 'public/apps/app.html'],
     sourceHash: crypto.createHash('sha256').update(hashBron).digest('hex'),
     platform,

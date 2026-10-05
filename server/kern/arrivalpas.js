@@ -65,9 +65,8 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
     }
     const g = bearer.maak({ prefix: 'AR', issuer: 'rtg.gast.arrival', doel: DOEL, scope: SCOPE,
       onderwerp: { soort: 'arrival', id: rij.id, supplierCode: rij.supplierCode, reserveringId: rij.reserveringId },
-      geldigMs: Date.parse(rij.tot) - ms(), maxGebruik: MAX_PULSEN });
+      geldigheid: { verlooptOp: rij.tot }, gebruik: { max: MAX_PULSEN }, afgeleid: 'geen' });
     g.toegang.rotatie = rotatie;
-    g.toegang.expires_at = rij.tot;
     rij.toegang = g.toegang;
     rij.bijgewerkt_at = nu();
     return g.code;
@@ -100,6 +99,8 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
   function aanvraag({ requestToken, supplierCode, reserveringId, datum, tijd }) {
     const ah = aanvraagHash(requestToken);
     const tot = aankomst(datum, tijd) + NA_AANKOMST_MS;
+    // een pass die bij uitgifte al verlopen is, is geen pass; v1 gaf hem met 200
+    if (!(tot > ms() + 60000)) return { status: 400, error: 'Deze aankomst ligt al voorbij; daar hoort geen Arrival Pass meer bij.' };
     return transactie(bron => {
       let bestaand = null;
       for (const r of Object.values(bron)) if (bearer.zelfdeHash(r && r.aanvraag_hash, ah)) bestaand = r;

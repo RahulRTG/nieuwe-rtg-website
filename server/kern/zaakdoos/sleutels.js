@@ -72,8 +72,7 @@ function maakDoosSleutels({ db, save, crypto, bewerkCollectie, nu }) {
       if (binnen >= MAX_DOZEN_PER_ZAAK)
         return { status: 409, error: 'Deze zaak heeft al ' + MAX_DOZEN_PER_ZAAK + ' dozen met een geldige sleutel. Trek er eerst een in.' };
       const g = bearer.maak({ prefix: 'ZD', issuer: ISSUER, doel: DOEL, scope: scopes.map(s => 'zaakdoos.' + s),
-        onderwerp: { doos: n, zaak: z }, geldigMs: d * DAG, maxGebruik: 1 });
-      g.toegang.max_gebruik = 0; // niet geteld: zie de kop
+        onderwerp: { doos: n, zaak: z }, geldigheid: { duurMs: d * DAG }, gebruik: 'sessie', afgeleid: 'perAanroep' });
       const historie = oud && Array.isArray(oud.historie) ? oud.historie.slice(-2) : [];
       if (oud && oud.toegang && oud.zaak === z) {
         if (!oud.toegang.ingetrokken_at) bearer.intrekken(oud.toegang, wie, 'geroteerd');

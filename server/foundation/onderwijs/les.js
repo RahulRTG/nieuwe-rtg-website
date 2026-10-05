@@ -4,7 +4,7 @@
    foundation/onderwijs.js. */
 module.exports = (octx) => {
   const { router, F, save, nu, rid, schoon, teVaak, misluktePoging, goedePoging, ipVan,
-    toegang, ruimOudeLessen, rolVanVerzoek, sse, stuur, presentie, lesVan, docentCheck, lesPubliek } = octx;
+    toegang, ruimOudeLessen, rolVanVerzoek, sse, stuur, presentie, lesVan, sleutelInAdres, docentCheck, lesPubliek } = octx;
 
   /* ---------- les maken / meedoen ---------- */
   /* EEN REM OP HET MAKEN, en niet alleen op het raden. `lesVan()` begrenst wie
@@ -79,17 +79,34 @@ module.exports = (octx) => {
     res.json({ les: lesPubliek(les) });
   });
 
-  /* ---------- live meekijken ---------- */
-  /* Ook de stream loopt langs de rem. Hij antwoordde bij een onbekende code met
-     een kaal `404.end()`; `lesVan()` stuurt daar een JSON-lijf bij. Dat is voor
-     een EventSource geen verschil -- die kijkt naar de statuscode en opent geen
-     stroom bij een 404 -- en het scheelt een tweede 404-vorm in dit bestand. */
-  router.get('/les/:code/stream', (req, res) => {
+  /* ---------- live meekijken (B25) ----------
+     EventSource kan geen koppen sturen, en de sleutel mag niet in het adres.
+     Dus eerst een stroomticket: POST met de sleutel in de kop, en het ticket
+     (128 bits, dertig seconden, eenmalig, aan deze les en rol gebonden; zie
+     ./stroomticket.js) is het enige dat in het adres van de stroom staat. Het
+     ticket draagt de rol, dus `?role=` beslist niets meer; een afwijkende rol
+     weigert alleen. Het kale ticket staat precies een keer in een antwoord
+     (lib/eenmalig-geheim-routes.js). */
+  router.post('/les/stroomticket', async (req, res) => {
     const les = lesVan(req, res); if (!les) return;
-    const w = rolVanVerzoek(req);
-    const role = req.query.role === 'docent' ? 'docent' : 'leerling';
-    if ((role === 'docent') !== (w.rol === 'leraar')) return res.status(403).end();
-    const studentId = w.rol === 'leerling' ? w.studentId : null;
+    const uit = await toegang.stroomticket(les.id, rolVanVerzoek(req).sleutel);
+    res.set('Cache-Control', 'no-store');
+    if (!uit.ok) return res.status(uit.status).json({ error: uit.error });
+    res.json({ ticket: uit.ticket, rol: uit.rol, verloopt: uit.verloopt });
+  });
+  /* Ook de stroom loopt langs de rem op het raden (dezelfde bak als lesVan). */
+  router.get('/les/:code/stream', async (req, res) => {
+    if (sleutelInAdres(req, res)) return;
+    const bak = 'lescode:' + ipVan(req);
+    if (teVaak(res, bak)) return;
+    const w = Object.prototype.hasOwnProperty.call(F().lessen, String(req.params.code || ''))
+      ? await toegang.claimStroom(req.params.code, req.query.ticket) : { status: 404, error: 'Deze les kennen we niet.' };
+    if (!w.ok) { misluktePoging(bak, 20, 10); return res.status(w.status).json({ error: w.error }); }
+    goedePoging(bak);
+    const les = F().lessen[w.lesId]; if (!les) return res.status(404).end();
+    const role = w.rol === 'leraar' ? 'docent' : 'leerling';
+    if (req.query.role && req.query.role !== role) return res.status(403).end();
+    const studentId = w.studentId;
     res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
     res.write('retry: 3000\n\n');
     const client = { res, role, studentId };

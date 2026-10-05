@@ -716,6 +716,10 @@ body[data-public-platform="company"] .pp-footer{
  body[data-public-platform="company"] .rtg-adaptive-edge{
   width:calc(100% - var(--rtg-safe-left) - var(--rtg-safe-right) - 32px);
  }
+ body[data-public-platform="company"][data-rtg-desktop] .rtg-adaptive-edge:not([data-rtg-adaptive-state="peek"]){
+  bottom:max(10px,calc(env(safe-area-inset-bottom,0px) + 4px))!important;
+  height:60px!important;
+ }
 }
 
 @media(max-width:370px){

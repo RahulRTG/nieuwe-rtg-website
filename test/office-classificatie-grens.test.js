@@ -27,9 +27,10 @@ test('strikte gezinsdocumenten blijven privé via API, lijst, opslag en herstart
     const gezin = await api('/api/foundation/gezin/maak', { gezinsnaam: 'Classificatieproef', naam: 'Eigenaar', pin: '1234' });
     assert.equal(gezin.status, 200);
     const owner = { code: gezin.body.code, token: gezin.body.token };
+    const gezinscode = gezin.body.gezinscode;
     const profiel = await api('/api/foundation/gezin/profiel/maak', { ...owner, naam: 'Tweede', rol: 'kind', groep: 'kind' });
     assert.equal(profiel.status, 200);
-    const kies = await api('/api/foundation/gezin/profiel/kies', { code: owner.code, profielId: profiel.body.profiel.id });
+    const kies = await api('/api/foundation/gezin/profiel/kies', { gezinscode, profielId: profiel.body.profiel.id });
     assert.equal(kies.status, 200);
     const reader = { code: owner.code, token: kies.body.token };
     const rtf = (actie, data = {}, actor = owner) => api('/api/rtf/kantoorpakket/' + actie, { ...actor, ...data });

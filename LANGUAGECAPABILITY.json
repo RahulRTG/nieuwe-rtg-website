@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-04T04:48:40.086Z",
-  "completedAt": "2026-10-04T04:49:16.611Z",
-  "node": "v24.19.0",
+  "startedAt": "2026-10-05T09:10:22.129Z",
+  "completedAt": "2026-10-05T09:10:47.311Z",
+  "node": "v24.18.0",
   "command": "npm run language:proof",
   "testExitCode": 0,
-  "testOutputSha256": "50a35de0004969f24cb91f27eeaef9cbc8ca402d2692303d894d7dccfd46a93f",
+  "testOutputSha256": "573b58ee7262767f71eb500e2f1910d57c5228dafebb4797fbd5698a303cbfec",
   "sources": {
     "public/apps/access/meaning.js": "268dc805c892ee0e351c14fd2f8d955aa292b556a20af8109bece178559c8bf4",
     "public/apps/access/portal.css": "2b180093703178a7d1d5de93802b7e35e46aa061694cff0788e0fe7c1f7d3f45",
@@ -31,7 +31,7 @@
     "server/translate/cache.js": "51fb8ae3cfe124f8da256f9ef20378990f290a85f24c32c49e59a01fb8a1f32a",
     "server/translate/uitslag.js": "98446b05189312cdda8e60a56685d2f2affad1d226fcc6a3bafad6845c7346dd",
     "server/kern/taalkeuring.js": "0110a0f1fa1e5a23a1676210778a148c3589fe38361197cbe29b73c518c7b271",
-    "server/server.js": "db7adc06b782c7e3830467a58dabddcf8de84ded6258fe39d6e9d745ebf1e6a9",
+    "server/server.js": "3be1e916b5a6576e65490093eb4da7049702d174ae59a8a691e96e2e0931547e",
     "server/lib/ui-vertaling.js": "f0b120a51a1dce2b573bea44b0f59d3879a985d6cbfec243ce4c3a2d76c5b8c7",
     "server/local-ai.js": "05e2de3bf8be5b432cf1af6d7a077471770757c44b519eab126be51d8a485213",
     "server/ai.js": "ba5c8c6e951f8585e33f95b6c17ae4b515e0dd21ab0dd066e5b6d065093a2b4a",
@@ -43,7 +43,7 @@
   },
   "productionReady114Languages": false,
   "scope": "RTG member account portal and shared language loader; mobile Chromium, synthetic input.",
-  "browser": "151.0.7922.34",
+  "browser": "153.0.8010.12",
   "viewport": {
     "width": 390,
     "height": 844

@@ -1,30 +1,30 @@
 {
  "stempel": {
-  "op": "2026-10-04T12:24:28.133Z",
-  "commit": "0055a1b2d",
-  "boomVuil": true,
-  "boomAnders": 4,
+  "op": "2026-10-05T09:10:50.435Z",
+  "commit": "fe012431d",
+  "boomVuil": false,
+  "boomAnders": 9,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5290,
-  "geclassificeerd": 5265,
+  "totaal": 5293,
+  "geclassificeerd": 5268,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3168,
    "NOT_APPLICABLE": 1274,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 650,
+   "PROTECTED": 653,
    "INTENTIONALLY_NON_IDEMPOTENT": 173
   },
-  "vastgesteldDoorMens": 2149,
+  "vastgesteldDoorMens": 2152,
   "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4366,
    "PUBLIC": 134,
-   "OBJECT_SCOPED": 761,
+   "OBJECT_SCOPED": 764,
    "(niet af te leiden -- vraagt een verklaring)": 13,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4882,
-   "niet gemeten": 142
+   "niet gemeten": 145
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -6192,12 +6192,69 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "bedrijf.loop.incident.lifecycle",
+   "route": "POST /api/bedrijf/loop/incident/lifecycle",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: werkruimte",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bedrijf.loop.incident.observe",
+   "route": "POST /api/bedrijf/loop/incident/observe",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: werkruimte",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "bedrijf.loop.procedure.change",
    "route": "POST /api/bedrijf/loop/procedure/change",
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: werkruimte",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bedrijf.loop.runbook.change",
+   "route": "POST /api/bedrijf/loop/runbook/change",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
@@ -39668,7 +39725,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -39689,7 +39746,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -39710,7 +39767,7 @@
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -39731,7 +39788,7 @@
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,

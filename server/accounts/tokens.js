@@ -121,8 +121,8 @@ function maakTokens(getUserById) {
          uitgerekend deze deur, waar elk verzoek langskomt, stond nog op de
          kale vergelijking. */
       if (!veiligGelijk(kluis.sign(body), sig)) return null;
-      const [id, exp, uitgegeven, sid] = body.split('.');
-      if (Number(exp) < Date.now()) return null;
+      const [id, exp, uitgegeven, sid] = require('./tokenvorm').sessieDelen(body) || [];
+      if (!id || Number(exp) < Date.now()) return null;
       if (isIngetrokken(token)) return null; // uitgelogd: de handtekening klopt, wij niet meer
       /* En de sessie zelf. Dit is de tweede deur, en hij bestaat omdat de eerste
          het token nodig heeft -- dat heeft alleen de houder. Zonder deze regel

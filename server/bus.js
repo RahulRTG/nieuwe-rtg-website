@@ -8,7 +8,7 @@
    kern kiest welke bus hij gebruikt.
 
    Elk bericht wordt precies een keer per proces afgeleverd: publish stuurt naar
-   het transport (EventEmitter of Redis) en het transport levert aan de abonnee.
+   het transport (EventEmitter of Redis), dat aan de abonnee levert.
    Bij Redis ontvangt ook het publicerende proces zijn eigen bericht terug, dus
    we leveren nooit apart lokaal af.
 
@@ -135,7 +135,7 @@ function maakBus() {
       sub.on('error', e => { zetKlaar(false); console.warn('[bus] redis sub:', e.message); });
       pub.connect().catch(e => console.warn('[bus] redis pub verbinden mislukt:', e.message));
       sub.connect().catch(e => console.warn('[bus] redis sub verbinden mislukt:', e.message));
-      console.log('[bus] realtime via Redis:', url);
+      console.log('[bus] realtime via Redis:', require('./log-redactie').urlZonderGeheim(url));
       const publiceer = (kanaal, bericht) => {
         const b = stempel(kanaal, bericht);
         return klaar ? stuur(kanaal, b) : wacht([kanaal, b]);

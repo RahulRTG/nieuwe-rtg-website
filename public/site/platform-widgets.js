@@ -8,7 +8,8 @@
    var article=node('article',null,'wd-widget pp-widget');article.dataset.publicWidget=card.id;article.dataset.world=card.world;
    var head=button(null,function(){o.open(card.target);},'pp-widget-head');head.append(icon(card.icon),node('span',card.title),icon('next'));
    var inside=node('div',null,'pp-widget-body');
-   if(card.type==='photo')inside.append(photo(card.photo,'pp-widget-photo'));
+   if(card.photo)inside.append(photo(card.photo,'pp-widget-photo'));
+   if(card.target.indexOf('world:')===0){var facts=node('p',null,'pp-world-facts');facts.dataset.publicWorldFacts=card.world;facts.textContent='Actuele productkaart wordt geladen.';inside.append(facts);}
    if(card.type==='worlds'){var row=node('div',null,'pp-world-mini');['living','travel','work','foundation'].forEach(function(world){var b=button(null,function(){o.open(company?'worlds':'world:'+world);},'pp-mini-world');b.dataset.world=world;b.append(icon({living:'home',travel:'plane',work:'brief',foundation:'heart'}[world]));var label=node('span');label.textContent={living:'LivingOS',travel:'TravelOS',work:'WorkOS',foundation:'FoundationOS'}[world];b.append(label);row.append(b);});inside.append(row);}
    if(card.type==='chain'){var chain=node('div',null,'pp-chain');['wish','proposal','decision'].forEach(function(k,i){var el=node('span');el.append(icon(['people','list','shield'][i]),node('span',k));chain.append(el);});inside.append(chain);}
    if(card.type==='rahul'){inside.append(lips(),node('p',company?'controlBody':'whyBody','pp-widget-note'));}

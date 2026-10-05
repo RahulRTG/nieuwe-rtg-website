@@ -37,6 +37,29 @@ test('alle vier wereldkaarten krijgen actuele namen, onderdelen en app-routes', 
   assert.doesNotMatch(runtime, /innerHTML/);
 });
 
+test('iedere wereld publiceert alle actuele apps uit dezelfde bron', () => {
+  const data = waarheid.maak();
+  for (const wereld of WERELDEN) {
+    const groepen = data.worlds[wereld].groups;
+    assert.equal(groepen.reduce((som, groep) => som + groep.apps.length, 0), data.worlds[wereld].featureCount,
+      wereld + ' schrijft iedere app precies één keer uit');
+    for (const groep of groepen) {
+      assert.equal(groep.apps.length, groep.count, groep.name + ' heeft het actuele aantal');
+      for (const app of groep.apps) {
+        assert.ok(app.id && app.name && app.kind && app.route, wereld + ' bevat een volledige openbare appverwijzing');
+        assert.ok(app.summary && app.actions.length && app.note,
+          wereld + ' geeft ' + app.name + ' een uitleg, handelingen en een grens of tip');
+      }
+    }
+  }
+  const runtime = lees('public/site/website-truth.js');
+  assert.match(runtime, /maakAppgroepen/);
+  assert.match(runtime, /dataset\.appPath = app\.route/);
+  assert.match(runtime, /app-truth-app-summary/);
+  assert.match(runtime, /app-truth-actions/);
+  assert.match(runtime, /app-truth-note/);
+});
+
 test('de B2B2C-schermen komen uit bestaande app-routes en een gecontroleerd echt beeld', () => {
   const data = waarheid.maak();
   const html = lees('index.html');

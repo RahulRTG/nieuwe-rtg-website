@@ -62,10 +62,19 @@ const { CONTRACTEN } = require(path.join(WORTEL, 'server/lib/mutatiecontracten')
    met opzet nog geen menselijk contract (server/lib/mutatiecontracten-lesfamilie.js
    zegt waarom: hij staat als afgeleid contract in MUTATIECONTRACT-AFGELEID.json,
    en een route mag niet in beide lijsten staan). Zodra dat contract er is, met
-   `objectVeld: 'lescode'`, valt hij hier vanzelf af (toets 3). */
+   `objectVeld: 'lescode'`, valt hij hier vanzelf af (toets 3).
+
+   GEGROEID OP 4 OKTOBER 2026 (#448, besluit B18): /api/foundation/gezin/inloggen
+   en /profiel/kies. Dezelfde vorm als les/join: sinds de gezinscode een 128-bit
+   credential is, wijst niet meer het veld `code` het gezin aan maar een CLAIM op
+   de `gezinscode` in het lijf (foundation/gezinstoegang.js, dragerVan). Beide staan
+   als afgeleid contract in MUTATIECONTRACT-AFGELEID.json; met een menselijk
+   contract (`objectVeld: 'gezinscode'`) vallen ze hier vanzelf af. */
 const NOG_ZONDER = [
   'POST /api/aanmeld/zeg',
   'POST /api/auth/reset',
+  'POST /api/foundation/gezin/inloggen',
+  'POST /api/foundation/gezin/profiel/kies',
   'POST /api/foundation/gezin/uitnodiging/accepteer',
   'POST /api/foundation/gezin/uitnodiging/bekijk',
   'POST /api/foundation/gezin/uitnodiging/intrek',

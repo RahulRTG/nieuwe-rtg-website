@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0908">
+  <meta name="description" content="Hoe RTG onder de motorkap werkt: codenamen en een gescheiden kluis, een strikte CSP, modellen eerst lokaal, een Rust-motor zonder externe crates, en meters die kunnen zakken. Met de bestanden erbij, en met wat nog niet af is.">
+  <meta name="rtg-asset-base" content="../..">
+  <title>Techniek | Rahul Travel Group</title>
+  <link rel="icon" href="../../icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../start/start-base.css">
+  <link rel="stylesheet" href="../../shared/rtg-heritage.css">
+  <link rel="stylesheet" href="../werelden/world.css?v=20260920-text3">
+  <link rel="stylesheet" href="./techniek.css?v=20261005">
+</head>
+<body class="world-story tech-story" data-world="tech" data-rtg-skin="heritage">
+  <a class="skip-link" href="#verhaal">Ga naar de inhoud</a>
+  <div class="world-shell">
+    <section class="world-hero" aria-labelledby="techtitel">
+      <header class="world-header">
+        <a class="brand" href="../../../" aria-label="Rahul Travel Group, naar de startpagina"><span class="brand-name">Rahul Travel Group</span><span class="brand-slogan">EXPERIENCE THE ELITE CLASS</span></a>
+        <div class="world-header-actions"><a class="world-back" href="../../../#techniek">Terug naar de start</a><button type="button" class="login-link language-link" data-language-picker aria-label="Taal kiezen">Taal</button><a class="login-link" href="https://app.rahultravelgroup.com/apps/app.html">Inloggen</a></div>
+      </header>
+      <div class="world-hero-inner">
+        <div class="world-hero-copy">
+          <p class="world-label">Onder de motorkap</p>
+          <h1 id="techtitel">Liever nagelezen dan geloofd.</h1>
+          <p class="world-lead">RTG draait op een eigen platform: een Node-server, een Rust-motor voor de gevoelige paden en een browserlaag zonder externe afhankelijkheden. Op deze pagina staat hoe dat in elkaar zit. Bij iedere bewering staat het bestand waar u haar in de code terugvindt, en onderaan staat wat nog niet af is.</p>
+          <div class="world-actions"><a class="button button-primary" href="#privacy">Begin bij privacy</a><a class="button button-ghost" href="#open">Wat nog niet af is</a></div>
+        </div>
+      </div>
+    </section>
+
+    <main id="verhaal">
+      <section class="story-section" id="privacy">
+        <div class="story-inner">
+          <div class="story-intro">
+            <div><p class="story-kicker">Privacy als architectuur</p><h2>Wie u bent, staat ergens anders dan wat u doet.</h2></div>
+            <div class="story-intro-text">
+              <p>Privacy is bij ons geen instelling die u aanzet. Het zit in hoe de gegevens zijn opgeslagen.</p>
+              <p>Alles wat RTG met u doet, van een reis tot een rooster, draait op een codenaam. Uw echte naam en contactgegevens staan in een aparte identiteitskluis. Wie een codenaam aan een naam wil koppelen, moet langs een poort die een reden vraagt en een spoor achterlaat.</p>
+            </div>
+          </div>
+          <div class="outcomes">
+            <article class="outcome"><span class="outcome-number">01</span><h3>Een kluis met binding</h3><p>Velden in de kluis zijn versleuteld met AES-256-GCM, en ieder blob is gebonden aan zijn eigen rij.</p><details class="proof-detail"><summary>Waarom die binding ertoe doet</summary><p>Een AEAD controleert of de inhoud ongeschonden is, maar niet waar die inhoud hoort. Wie de database kan bewerken, kan de versleutelde naam van lid A dus naar de rij van lid B verplaatsen. Daarom gaat de identiteit van de rij mee als geauthenticeerde data. Een verplaatst blob valt dan niet meer te ontsleutelen.</p><span class="proof-source">server/kluis.js; server/accounts/gebonden.js</span></details></article>
+            <article class="outcome"><span class="outcome-number">02</span><h3>Geen spoor, geen inzage</h3><p>Opent een medewerker een dossier, dan wordt dat eerst vastgelegd in een journaal met een hashketen.</p><details class="proof-detail"><summary>Hoe de poort faalt</summary><p>Lukt het niet om de journaalregel vast te leggen, dan krijgt de medewerker geen dossier te zien. De poort is beproefd met een opslag die doet alsof hij schrijft maar niets bewaart. De regel zegt bewust "toegestaan" en niet "ingezien", want hij wordt geschreven voordat het dossier is samengesteld. Het journaal wordt op tijd bewaard, 730 dagen. Er is een noodrem, en die telt het als er regels afvallen in plaats van dat stil te laten gebeuren.</p><span class="proof-source">server/kern/ledenbalie-inzage.js; server/inzagelog.js; server/lib/keten.js; server/inzagelog-bewaring.js</span></details></article>
+            <article class="outcome"><span class="outcome-number">03</span><h3>Passkeys, eigen parser</h3><p>U kunt inloggen met een passkey. De WebAuthn-afhandeling en de CBOR-decoder zijn in eigen code geschreven.</p><details class="proof-detail"><summary>Wat er wel en niet bij hoort</summary><p>Een passkey registreren en beheren kan alleen achter de gewone inlog van een echt account. Bij elke inlog wordt vastgelegd langs welke weg u binnenkwam. Een wachtwoord heet dan gemeten en een passkey cryptografisch. Die twee worden nooit op een hoop gegooid.</p><span class="proof-source">server/webauthn/index.js; server/webauthn/cbor.js; server/routes/auth/webauthn.js; server/kern/identiteit/inlogherkomst.js</span></details></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="capability-section" id="stapel" aria-labelledby="stapeltitel">
+        <div class="story-inner">
+          <div class="capability-heading">
+            <div><p class="story-kicker">De stapel</p><h2 id="stapeltitel">Weinig afhankelijkheden, met opzet.</h2></div>
+            <p>Elke bibliotheek van een ander is code die u niet zelf hebt gelezen. Waar het om geld, identiteit of het netwerk gaat, schrijven we het daarom liever zelf. Waar dat echt niet kan, beperken we zo ver mogelijk wat de vreemde code mag.</p>
+          </div>
+          <div class="capability-grid">
+            <article class="capability"><h3>Een strikte CSP</h3><p>Iedere pagina krijgt een eigen nonce. Scripts, stijlen, lettertypes en verbindingen komen nergens anders vandaan dan van ons eigen domein.</p><details class="proof-detail"><summary>Bekijk de kop</summary><p>De basis is default-src 'self' en object-src 'none'. Een script of stijlblok in de pagina zelf draait alleen met de nonce van dat ene verzoek. Inline stijl-attributen kunnen geen nonce dragen, en daarom wordt hun aantal met een ratel bijgehouden die alleen omlaag mag.</p><span class="proof-source">server/middleware/csp.js; public/fonts/fonts.css; NORM.json</span></details></article>
+            <article class="capability"><h3>Een Rust-motor zonder crates</h3><p>RTG Pay, de bank, de ledengids en de kluis draaien in een native motor die alleen de standaardbibliotheek van Rust gebruikt.</p><details class="proof-detail"><summary>Ook de cryptografie</summary><p>De AEAD is een eigen ChaCha20-Poly1305 volgens RFC 8439. Hij is getoetst tegen de officiële testvectoren uit die RFC. Het algoritme is niet zelf bedacht, er zit alleen geen externe crate onder. Een aparte Rust Sentinel staat vóór de Node-poort, zodat de app ook bij een defect buiten Node om kan worden afgesloten.</p><span class="proof-source">motor/Cargo.toml; motor/src/aead.rs; docs/sentinel.md</span></details></article>
+            <article class="capability"><h3>Taalmodellen eerst lokaal</h3><p>Regelwerk en controleerbare extractie gebruiken geen model. Vrije verrijking gaat bij voorkeur naar een modelserver in eigen beheer.</p><details class="proof-detail"><summary>De schakelaar</summary><p>Met RTG_EXTERNE_AI_UIT=1 zijn externe aanbieders hard afgesloten. Zonder model werkt elk kernproces gewoon door, in een handmatige werkmodus. Het label onder een antwoord geeft aan waar dat ene verzoek werkelijk is uitgevoerd. Het komt niet uit de configuratie.</p><span class="proof-source">server/ai.js; server/local-ai-poort.js; server/ai-stand.js</span></details></article>
+            <article class="capability"><h3>Rekenen op uw eigen toestel</h3><p>Spraak naar tekst kan volledig in uw browser draaien, in een afgeschermde cel die geen netwerk heeft.</p><details class="proof-detail"><summary>Een grens van de browser</summary><p>De cel is een sandbox-iframe met connect-src 'none'. Dat uw stem dit toestel niet verlaat, dwingt dus de browser af en niet alleen onze code. De server zegt nooit dat iets op uw toestel is gebeurd, want dat kan hij per definitie niet zien.</p><span class="proof-source">server/routes/toestel.js; public/shared/toestel/cel.js; public/shared/toestel/spraak.js</span></details></article>
+            <article class="capability"><h3>Een poort voor al het geld</h3><p>Elke betaling gaat door één poort. Geld verlaat RTG nooit vanzelf: de software zet het klaar en een mens voert het uit.</p><details class="proof-detail"><summary>Een bank die stuk kan</summary><p>Voor proeven is er een synthetische bank met vier afloopen: betaald, geweigerd, traag en terugboeking. De uitkomst volgt reproduceerbaar uit de idempotentiesleutel. Deze bank vervangt alleen de rail en nooit de poort. Hij weigert te starten in productie of naast een echte provider.</p><span class="proof-source">server/kern/pay/poort.js; server/betaal/synthetisch.js</span></details></article>
+            <article class="capability"><h3>Schrijven is bevestigd schrijven</h3><p>Waar een schrijfactie bewijs moet zijn, keert ze pas terug als de opslag het heeft bevestigd.</p><details class="proof-detail"><summary>Waarom dat apart staat</summary><p>Duurzaam schrijven gaat via fsync en een rename, en de lijst met aanroepers wordt door de keuring bewaakt. Een functie die zonder fout terugkeert, heeft daarmee nog niets bewezen. Juist een valse bevestiging lijkt op bewijs.</p><span class="proof-source">server/db/duurzaam.js; scripts/check.js</span></details></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="story-section" id="bewijs">
+        <div class="story-inner">
+          <div class="story-intro">
+            <div><p class="story-kicker">Bewijs in plaats van beloften</p><h2>Een meter die niet kan zakken, is versiering.</h2></div>
+            <div class="story-intro-text">
+              <p>Elke bewering in dit huis heeft een bewijsgraad: onbekend, vermoed, gemeten of bewezen.</p>
+              <p>Een getal in de documentatie wordt uit een register geschreven en niet met de hand overgetypt. Een meting die niet heeft gedraaid, geldt nooit als goede uitslag. En als we een toets nooit hebben zien zakken, vertrouwen we hem niet.</p>
+            </div>
+          </div>
+          <div class="outcomes">
+            <article class="outcome"><span class="outcome-number">01</span><h3>Een zoeker die breekt</h3><p>Een tegenstander bestookt RTG Pay met reeksen over bedragen, volgorde, gelijktijdigheid en storingen.</p><details class="proof-detail"><summary>Wat hij vond</summary><p>Bij de eerste ronde vond hij een betaalverzoek dat twee keer betaald werd als het tegelijk met twee verschillende sleutels binnenkwam, terwijl de sluitcontrole groen bleef. Dat is gerepareerd met een slot per verzoek. Het verkleinde tegenvoorbeeld draait nu als vaste toets mee, en een tweede meting wijst aan op welke stap het voor het eerst misging.</p><span class="proof-source">scripts/tegenvoorbeeld.js; test/verzoekbetaal-race.test.js; scripts/lib/divergentie.js</span></details></article>
+            <article class="outcome"><span class="outcome-number">02</span><h3>Ratels die één kant op gaan</h3><p>Technische schuld wordt geteld, en de teller mag alleen dalen.</p><details class="proof-detail"><summary>Ook als het instrument blind wordt</summary><p>Wie een ratel omhoog zet, schrijft de reden erbij, plus wat hem weer omlaag brengt. Bij sommige meters gaat de ratel juist alleen omhoog. Een schuld die daalt doordat de meter minder ziet, is de gevaarlijkste vorm van vooruitgang.</p><span class="proof-source">NORM.json; scripts/check.js</span></details></article>
+            <article class="outcome"><span class="outcome-number">03</span><h3>Een agent mag alleen versmallen</h3><p>Een mandaat aan software kan bestaande bevoegdheid alleen inperken. Er komt nooit iets bij.</p><details class="proof-detail"><summary>De regels in de code</summary><p>De speelruimte is een doorsnede: wat het beleid toestaat, wat bewezen is, wat het mandaat overlaat en wat de context op dat moment toelaat. Een leeg mandaat betekent dicht. Een plan van een model voert zelf niets uit, en één verboden stap laat het hele plan zakken. De stap wordt niet stil overgeslagen.</p><span class="proof-source">server/kern/stuur/mandaat.js; server/kern/stuur/plan.js</span></details></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="capability-section tech-open" id="open" aria-labelledby="opentitel">
+        <div class="story-inner">
+          <div class="capability-heading">
+            <div><p class="story-kicker">Eerlijk is eerlijk</p><h2 id="opentitel">Wat nog niet af is.</h2></div>
+            <p>Een techniekpagina die alleen goed nieuws heeft, zegt niets. Dit zijn de grenzen die we zelf hebben gemeten.</p>
+          </div>
+          <div class="capability-grid">
+            <article class="capability"><h3>Niet elke handeling heeft een terugweg</h3><p>Voor het merendeel van de handelingen die software zou kunnen uitvoeren, is nog geen terugweg bewezen. Daarom krijgt een model daar geen zelfstandige bevoegdheid over.</p><details class="proof-detail"><summary>Hoe we dat meten</summary><p>Een herstelproef voert telkens een paar uit: heen, kijken, terug en weer kijken. Daarna vergelijkt hij de inhoud van de opslag. "Exact hersteld" en "gecompenseerd" tellen we nooit bij elkaar op, want een creditnota wist geen factuur.</p><span class="proof-source">scripts/herstelproef.js; scripts/lib/herstelwereld.js</span></details></article>
+            <article class="capability"><h3>Herhaalbaarheid is niet overal gemeten</h3><p>Een deel van de schrijfroutes is beproefd op wat een tweede, identieke aanroep doet. Het grootste deel nog niet.</p><details class="proof-detail"><summary>Wat het doel is</summary><p>Het doel is niet dat alles idempotent wordt. Het doel is dat alles is ingedeeld. Een route die bewust een tweede handeling uitvoert, is af zodra dat vaststaat en bewezen is.</p><span class="proof-source">server/kern/mutatie.js; server/lib/idemsleutels.js</span></details></article>
+            <article class="capability"><h3>Toegankelijkheid is gemeten met een browser</h3><p>Contrast, structuur en de grootte van raakvlakken worden op elk scherm gecontroleerd. Er heeft alleen nog nooit een mens met een beperking door RTG gelopen.</p><details class="proof-detail"><summary>Waarom dat ertoe doet</summary><p>Een scan ziet geen verwarrende volgorde, geen formulier dat te snel verloopt en geen uitleg die alleen voor zienden klopt. Wat de poorten afdwingen staat apart van wat alleen een mens kan beoordelen.</p><span class="proof-source">scripts/a11y.js</span></details></article>
+            <article class="capability"><h3>Een groen scherm is geen vrijgave</h3><p>We publiceren geen samengesteld cijfer dat "klaar" zegt. Ieder getal staat apart, met zijn bewijsgraad en de datum van de meting.</p><details class="proof-detail"><summary>Waarom geen totaalscore</summary><p>Losse eerlijke getallen kunnen samen een gevaarlijk gevoel van zekerheid geven. Daarom zet de keuring een bewijsgroen nooit om in een go-live-groen.</p><span class="proof-source">scripts/zekerheid.js; scripts/check.js</span></details></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="principle">
+        <p class="story-kicker">Het RTG-principe</p>
+        <h2>Slim genoeg om te helpen. Begrensd genoeg om van u te blijven.</h2>
+        <p>Ziet u iets wat niet klopt, of wilt u het met de mensen erachter over de techniek hebben? Daar staan we open voor. Mail ons. Er wordt niets automatisch verzonden.</p>
+        <div class="world-actions"><a class="button button-primary" href="mailto:roellie.i@gmail.com?subject=Techniek%20RTG">Mail over de techniek</a><a class="button button-ghost" href="../../../#techniek">Terug naar de start</a></div>
+      </section>
+    </main>
+
+    <footer class="world-footer"><p>Leven. Reizen. Werken. Bijdragen.</p><nav aria-label="Voetnavigatie"><a href="../../../">Startpagina</a><a href="#privacy">Privacy</a><a href="#stapel">De stapel</a><a href="#bewijs">Bewijs</a><a href="#open">Wat nog niet af is</a></nav></footer>
+  </div>
+  <script src="../../shared/i18n.js?v=20260920-language-panel" defer></script>
+</body>
+</html>

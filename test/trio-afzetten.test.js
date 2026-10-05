@@ -23,29 +23,38 @@ const http = require('http');
 const { EventEmitter } = require('events');
 const { maakWacht } = require('../server/trio-wacht');
 
-/* Twee opeenvolgende vrije poorten: maakWacht rekent BASISPOORT + i. */
-async function tweePoorten() {
+/* Opeenvolgende vrije poorten: maakWacht rekent BASISPOORT + i. */
+async function tweePoorten(aantal = 2) {
   for (let poging = 0; poging < 50; poging++) {
     const basis = 40000 + Math.floor(Math.random() * 20000);
-    const vrij = await Promise.all([basis, basis + 1].map((p) => new Promise((klaar) => {
+    const vrij = await Promise.all(Array.from({ length: aantal }, (_, i) => basis + i).map((p) => new Promise((klaar) => {
       const s = http.createServer().once('error', () => klaar(false))
         .listen(p, '127.0.0.1', () => s.close(() => klaar(true)));
     })));
     if (vrij.every(Boolean)) return basis;
   }
-  throw new Error('geen twee opeenvolgende vrije poorten');
+  throw new Error('geen ' + aantal + ' opeenvolgende vrije poorten');
 }
 
 /* Een nepserver per poort; `stand` bepaalt wat hij antwoordt, `spoor` legt de
-   volgorde van gebeurtenissen vast over alle servers heen. */
+   volgorde van gebeurtenissen vast over alle servers heen. Zoals de echte
+   server VOERT hij een promote uit zodra hij binnenkomt (`leider`), en kan het
+   antwoord daarna nog op zich laten wachten (`vertraging`): laden, migreren en
+   een backup gaan voor het antwoord uit. Een demote met 200 is uitgevoerd. */
 function nepServer(port, nr, stand, spoor) {
   const s = http.createServer((req, res) => {
     const pad = req.url.split('?')[0];
     let status = 404;
     if (pad === '/api/health') status = stand.gezond ? 200 : 503;
-    else if (pad === '/api/cluster/promote') { status = stand.promote; spoor.push('promote:' + nr); }
-    else if (pad === '/api/cluster/demote') { status = stand.demote; spoor.push('demote:' + nr); }
-    res.writeHead(status); res.end();
+    else if (pad === '/api/cluster/promote') {
+      status = stand.promote; spoor.push('promote:' + nr);
+      if (status === 200) stand.leider = true;
+    } else if (pad === '/api/cluster/demote') {
+      status = stand.demote; spoor.push('demote:' + nr);
+      if (stand.bijDemote) stand.bijDemote();
+      if (status === 200) stand.leider = false;
+    }
+    setTimeout(() => { res.writeHead(status); res.end(); }, pad === '/api/cluster/promote' ? (stand.vertraging || 0) : 0);
   });
   return new Promise((klaar) => s.listen(port, '127.0.0.1', () => klaar(s)));
 }
@@ -108,4 +117,94 @@ test('3. een bevestigde afzetting stopt niets, en dan volgt de promotie', async 
       'eerst afzetten, dan promoveren: ' + spoor.join(', '));
     assert.equal(w.actieve(), 1);
   } finally { w.stop(); await sluit(); }
+});
+
+/* ----------------------------------------------------------------------------
+   DE SPIEGELKANT (tweede herkeuring van C6): een promotie die bij de
+   poortwachter een TIME-OUT geeft, is niet mislukt. De server kan hem gewoon
+   hebben uitgevoerd -- laden, migreren en een backup gaan voor het antwoord
+   uit -- en is dan leider. Wie daarna een volgende promoveert, heeft er twee.
+   Op de code van ronde 1 zakken 4 en 5 met twee leiders, en 6 met verkeer naar
+   een server die net is afgezet.
+   -------------------------------------------------------------------------- */
+const leiders = (stand) => stand.map((st, i) => (st.leider ? i + 1 : 0)).filter(Boolean);
+
+test('4. een promotie die een time-out geeft maar WEL is uitgevoerd, wordt afgezet voordat de volgende leider wordt', { timeout: 20000 }, async () => {
+  const basis = await tweePoorten(3);
+  const spoor = [];
+  const stand = [{ gezond: true, promote: 200, demote: 200 }, { gezond: false, promote: 200, demote: 200 },
+    { gezond: false, promote: 200, demote: 200 }];
+  const nep = await Promise.all(stand.map((st, i) => nepServer(basis + i, i + 1, st, spoor)));
+  const w = maakWacht({ AANTAL: 3, BASISPOORT: basis, SLEUTEL: 'toets', FAILBACK_MS: 10000, PROMOTE_MS: 300, log: () => {} });
+  w.servers.forEach((s, i) => { s.child = nepKind(i + 1, spoor, true); });
+  try {
+    await w.kiesActieve('start');
+    assert.deepEqual(leiders(stand), [1]);
+    stand[0].gezond = false;                                   // server 1 valt weg
+    stand[1].gezond = true; stand[1].vertraging = 2000;        // server 2 promoveert traag
+    stand[2].gezond = true;                                    // server 3 staat klaar
+    await w.kiesActieve('server 1 reageert niet meer');
+    assert.deepEqual(leiders(stand), [3], 'precies een leider (' + spoor.join(', ') + ')');
+    assert.ok(spoor.indexOf('demote:2') > spoor.indexOf('promote:2') && spoor.indexOf('promote:3') > spoor.indexOf('demote:2'),
+      'eerst de trage kandidaat afzetten, dan pas de volgende: ' + spoor.join(', '));
+    assert.equal(w.actieve(), 2);
+  } finally { w.stop(); await Promise.all(nep.map((s) => new Promise((r) => s.close(r)))); }
+});
+
+/* Een failback-opstelling: server 2 is leider, server 1 is terug en wordt na
+   FAILBACK_MS (hier 0) weer leider. */
+async function failback(promoteVertraging) {
+  const basis = await tweePoorten(2);
+  const spoor = [];
+  const stand = [{ gezond: false, promote: 200, demote: 200 }, { gezond: true, promote: 200, demote: 200 }];
+  const nep = await Promise.all(stand.map((st, i) => nepServer(basis + i, i + 1, st, spoor)));
+  const w = maakWacht({ AANTAL: 2, BASISPOORT: basis, SLEUTEL: 'toets', FAILBACK_MS: 0, PROMOTE_MS: 300, log: () => {} });
+  w.servers.forEach((s, i) => { s.child = nepKind(i + 1, spoor, true); });
+  await w.hartslag();
+  assert.equal(w.actieve(), 1, 'server 2 is eerst leider');
+  spoor.length = 0;
+  stand[0].gezond = true; stand[0].vertraging = promoteVertraging;
+  return { w, spoor, stand, sluit: () => Promise.all(nep.map((s) => new Promise((r) => s.close(r)))) };
+}
+
+test('5. failback: een trage promotie van de terugkeerder geeft geen twee leiders', { timeout: 20000 }, async () => {
+  const { w, spoor, stand, sluit } = await failback(2000);
+  try {
+    await w.hartslag();                       // server 1 is weer gezond
+    await w.hartslag();                       // en neemt het werk terug
+    assert.deepEqual(leiders(stand), [2], 'de oude leider is teruggezet en de trage terugkeerder afgezet: ' + spoor.join(', '));
+    assert.equal(w.actieve(), 1);
+  } finally { w.stop(); await sluit(); }
+});
+
+test('6. failback: tijdens de wissel stuurt de poortwachter niets naar de server die wordt afgezet', { timeout: 20000 }, async () => {
+  const { w, stand, sluit } = await failback(0);
+  try {
+    let actiefBijDemote = null;
+    stand[1].bijDemote = () => { actiefBijDemote = w.actieve(); };
+    await w.hartslag();
+    await w.hartslag();
+    assert.equal(actiefBijDemote, -1, 'een afgezette stand-by antwoordt 200 en bewaart niets; tijdens de wissel hoort er geen actieve te zijn');
+    assert.equal(w.actieve(), 0, 'na de wissel is server 1 actief');
+    assert.deepEqual(leiders(stand), [1]);
+  } finally { w.stop(); await sluit(); }
+});
+
+test('7. kan een trage kandidaat niet aantoonbaar worden afgezet, dan wordt er niemand anders leider', { timeout: 20000 }, async () => {
+  const basis = await tweePoorten(3);
+  const spoor = [];
+  const stand = [{ gezond: true, promote: 200, demote: 200 }, { gezond: false, promote: 200, demote: 500 },
+    { gezond: false, promote: 200, demote: 200 }];
+  const nep = await Promise.all(stand.map((st, i) => nepServer(basis + i, i + 1, st, spoor)));
+  const w = maakWacht({ AANTAL: 3, BASISPOORT: basis, SLEUTEL: 'toets', FAILBACK_MS: 10000, PROMOTE_MS: 300, log: () => {} });
+  w.servers.forEach((s, i) => { s.child = nepKind(i + 1, spoor, i !== 1); });   // server 2 sterft niet
+  try {
+    await w.kiesActieve('start');
+    stand[0].gezond = false;
+    stand[1].gezond = true; stand[1].vertraging = 2000;
+    stand[2].gezond = true;
+    await w.kiesActieve('server 1 reageert niet meer');
+    assert.ok(!spoor.includes('promote:3'), 'geen tweede kandidaat zolang de eerste misschien leider is: ' + spoor.join(', '));
+    assert.equal(w.actieve(), 1, 'de onzekere kandidaat geldt als actief, zodat de volgende ronde hem eerst afzet');
+  } finally { w.stop(); await Promise.all(nep.map((s) => new Promise((r) => s.close(r)))); }
 });

@@ -18,14 +18,18 @@ function itemSleutel(it) {
 }
 function soort(x) { return Array.isArray(x) ? 'array' : (x && typeof x === 'object' ? 'object' : 'scalar'); }
 /* opBotsing (optioneel): wordt aangeroepen met het pad zodra BEIDE kanten
-   hetzelfde blad anders wijzigden en de onze wint. De uitkomst verandert er
-   niet door -- merge3 blijft puur -- maar een verloren update is dan niet meer
-   stil (RTG-V1-RELEASE C6). */
+   hetzelfde blad anders wijzigden en de onze wint, of de ene kant verwijderde
+   wat de andere wijzigde (dan blijft de wijziging en verdwijnt de verwijdering;
+   de tweede herkeuring van C6). De uitkomst verandert er niet door -- merge3
+   blijft puur -- maar een verloren update is dan niet meer stil. */
 function merge3(base, ours, theirs, opBotsing, pad) {
   const botst = () => { if (opBotsing) { try { opBotsing(pad || ''); } catch (e) {} } };
   const dieper = (k) => (pad ? pad + '.' : '') + k;
-  if (theirs === undefined) return ours;
-  if (ours === undefined) return theirs;
+  if (theirs === undefined || ours === undefined) {
+    const blijft = theirs === undefined ? ours : theirs;
+    if (base !== undefined && blijft !== undefined && _j(blijft) !== _j(base)) botst();
+    return blijft;
+  }
   if (soort(ours) !== soort(theirs) || (base !== undefined && soort(base) !== soort(ours))) {
     if (_j(ours) !== _j(base) && _j(theirs) !== _j(base) && _j(ours) !== _j(theirs)) botst();
     return _j(ours) !== _j(base) ? ours : theirs; // structuur veranderde: de gewijzigde kant

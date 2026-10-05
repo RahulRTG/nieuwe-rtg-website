@@ -14,14 +14,17 @@ const { spawn } = require('child_process');
 const { maakSpreiding } = require('./trio-spreiding');
 const { maakAfzetten } = require('./trio-afzetten');
 
-function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log }) {
+function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log, PROMOTE_MS = 15000 }) {
   const servers = [];
   for (let i = 0; i < AANTAL; i++) servers.push({ nr: i + 1, port: BASISPOORT + i, child: null, healthy: false, healthySince: 0, restarts: 0, rol: 'uit' });
   let activeIdx = -1;
   let switching = null; // lopende overname, zodat er nooit twee tegelijk lopen
   let stopping = false;
-  const spreiding = maakSpreiding({ servers, apiCall: (...a) => apiCall(...a), log });
-  const { zetAf } = maakAfzetten({ servers, spreiding, log });
+  /* Een promote laadt, migreert en maakt een backup voordat hij antwoordt; daar
+     is de 1,5 s van een gezondheidscontrole te kort voor. */
+  const spreiding = maakSpreiding({ servers, log,
+    apiCall: (port, pad, method) => apiCall(port, pad, method, pad.startsWith('/api/cluster/promote') ? PROMOTE_MS : 1500) });
+  const { zetAf, promoveer, wissel } = maakAfzetten({ servers, spreiding, log });
 
   /* ---------- de drie servers starten en bewaken ---------- */
 
@@ -57,9 +60,9 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log }) {
     });
   }
 
-  function apiCall(port, pad, method) {
+  function apiCall(port, pad, method, wachtMs = 1500) {
     return new Promise(resolve => {
-      const req = http.request({ host: '127.0.0.1', port, path: pad, method, timeout: 1500, headers: { 'x-rtg-cluster': SLEUTEL } }, res => {
+      const req = http.request({ host: '127.0.0.1', port, path: pad, method, timeout: wachtMs, headers: { 'x-rtg-cluster': SLEUTEL } }, res => {
         let body = '';
         res.on('data', d => body += d);
         res.on('end', () => resolve({ status: res.statusCode, body }));
@@ -89,9 +92,11 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log }) {
                het afnemen niet, dan wordt zijn proces gestopt; en lukt ook dat
                niet, dan promoveren we deze ronde niemand (./trio-afzetten.js). */
             if (activeIdx >= 0 && !await zetAf(activeIdx)) return;
-            if (!await spreiding.zetRol(i, 'leider')) continue; // promotie mislukt, probeer de volgende
-            activeIdx = i;
-            log((reden ? reden + '; ' : '') + 'server ' + s.nr + ' (poort ' + s.port + ') is nu actief');
+            const uit = await promoveer(i);
+            if (uit === 'nee') continue; // aantoonbaar geen leider: probeer de volgende
+            activeIdx = i;               // ook bij 'onzeker': dan zet de volgende ronde hem eerst af
+            log((reden ? reden + '; ' : '') + 'server ' + s.nr + ' (poort ' + s.port + ') is nu actief' +
+              (uit === 'onzeker' ? ', onbevestigd' : ''));
             return;
           }
         }
@@ -133,19 +138,12 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log }) {
       // krijgt het werk terug ("tot die het weer doet")
       const beter = servers.findIndex(s => s.healthy && s.healthySince && Date.now() - s.healthySince >= FAILBACK_MS);
       if (beter >= 0 && beter < activeIdx) {
+        /* Een failback is vrijwillig. Tijdens de wissel is er geen actieve, zodat
+           de poortwachter niets stuurt naar een server die we net afzetten
+           (./trio-afzetten.js wissel). */
         const oudIdx = activeIdx;
-        const oud = servers[oudIdx];
-        /* Een failback is vrijwillig: bevestigt de gezonde leider zijn
-           afzetting niet, dan blijft hij leider en proberen we het later. */
-        if (!await spreiding.zetRol(oudIdx, spreiding.naLeiderschap())) {
-          log('server ' + oud.nr + ' bevestigt zijn afzetting niet; geen failback deze ronde');
-        } else if (await spreiding.zetRol(beter, 'leider')) {
-          activeIdx = beter;
-          log('server ' + servers[beter].nr + ' doet het weer en neemt het werk terug; server ' + oud.nr +
-            (spreiding.aan() ? ' loopt mee als volger' : ' is weer standby'));
-        } else {
-          await spreiding.zetRol(oudIdx, 'leider'); // terugdraaien
-        }
+        activeIdx = -1;
+        activeIdx = await wissel(oudIdx, beter);
       }
     }
     /* En tot slot de meelopers gelijktrekken: elke gezonde server die geen

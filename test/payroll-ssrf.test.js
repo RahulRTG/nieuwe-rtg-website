@@ -110,3 +110,24 @@ test('8. een gewoon antwoord via een echte stroom komt door', async () => {
   const r = await haalBron('https://regels.voorbeeld.nl/nl.json', async () => new Response('{"versie":"nl-2026.1"}'));
   assert.deepEqual(r, { versie: 'nl-2026.1' });
 });
+
+test('9. het PRODUCTIEPAD (urlBron) breekt een te groot antwoord ook af, en leest een BOM', async () => {
+  /* Toetsen 6-8 roepen haalBron rechtstreeks aan. Zou urlBron terugvallen op een
+     eigen fetch met r.json(), dan bleven die groen terwijl precies de hang en de
+     ontbrekende grens van ronde 1 terug zijn (tweede herkeuring van C5). */
+  const blok = new Uint8Array(256 * 1024).fill(32);
+  let gestuurd = 0;
+  const groot = new ReadableStream({ pull(c) { gestuurd += blok.length; c.enqueue(blok); if (gestuurd > MAX_BYTES * 2) c.close(); } });
+  await assert.rejects(() => urlBron({ url: 'https://regels.voorbeeld.nl/nl.json', fetchImpl: async () => new Response(groot) }).haal(), /meer dan/);
+  const metBom = urlBron({ url: 'https://regels.voorbeeld.nl/nl.json', fetchImpl: async () => new Response('﻿{"versie":"nl-2026.2"}') });
+  assert.deepEqual(await metBom.haal(), { versie: 'nl-2026.2' });
+});
+
+test('10. een punt in de naam maakt nog geen publiek domein: interne netwerknamen worden geweigerd', () => {
+  for (const url of ['https://redis.rtg_data/x.json', 'https://motor.rtg_data:3100/x.json', 'https://db.internal/x.json',
+    'https://nas.lan/x.json', 'https://printer.local/x.json', 'https://x.home.arpa/x.json']) {
+    assert.match(String(keurBronUrl(url)), /publiek topdomein|privé|gereserveerd|eigen netwerk/, url);
+  }
+  for (const url of ['https://regels.voorbeeld.nl/nl.json', 'https://loontabel.voorbeeld.invalid/nl.json', 'https://xn--bcher-kva.example/x.json'])
+    assert.equal(keurBronUrl(url), null, url + ' blijft gewoon mogen');
+});

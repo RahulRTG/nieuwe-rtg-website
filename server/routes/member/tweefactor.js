@@ -79,13 +79,18 @@ module.exports = (kern) => {
     res.status(r.status || 200).json(r);
   });
 
+  /* Dezelfde rem en accountemmer als de tweede inlogstap hieronder: anders is
+     de code die de factor uitzet hier onbeperkt te raden (herkeuring C3). */
   app.post('/api/mijn/tweefactor/uit', auth, async (req, res) => {
     if (!eisLid(req, res)) return;
     const u = req.session.account;
+    const doelEmmer = 'tweede:doel:' + u.id;
+    if (tooManyTries(res, doelEmmer)) return;
     if (!u.password_hash || !await accounts.verifyPassword(String(req.body.huidig || ''), u.password_hash)) {
       return res.status(403).json({ error: 'Het wachtwoord klopt niet.' });
     }
     const r = tweefactor.uit(u, req.body.code);
+    if (r.status === 403) noteFailedTry(doelEmmer, req.ip, 10);
     if (r.ok) spoor(req, 'tweefactor-uit', {});
     res.status(r.status || 200).json(r);
   });
@@ -108,22 +113,16 @@ module.exports = (kern) => {
         Het wachtwoord is stap een, de code is stap twee, en beide zijn nodig.
 
      EN DE CODE IS NIET ONBEPERKT TE RADEN (RTG-V1-RELEASE C3). Punt 2 houdt het
-     bewijs heel bij een verkeerde code, en zonder rem was dat vijf minuten lang
-     gokken zo snel als het netwerk toelaat. Twee emmers, zoals bij de
-     wachtwoordinlog: een per ACCOUNT en een per BRON. De accountemmer hangt met
-     opzet niet aan het bewijs -- wie het wachtwoord kent haalt met een nieuwe
-     inlog een vers bewijs, en een emmer per bewijs zou dan per inlog opnieuw
-     tien gokken geven. De emmer wordt bij succes niet geleegd (die tafel is van
-     het auth-domein); de opruimlus ruimt hem op zodra hij stil is.
+     bewijs heel bij een verkeerde code; zonder rem was dat vijf minuten gokken.
+     Twee emmers: een per ACCOUNT (niet per bewijs: een nieuwe inlog geeft een
+     vers bewijs) en een per BRON. Bij succes niet geleegd; de opruimlus ruimt
+     hem op zodra hij stil is.
 
      BEWUST EEN SLOT EN GEEN VERTRAGING, anders dan het wachtwoord in
-     ../auth/inlog.js. Daar zou een slot op het account een vreemde de macht geven
-     een lid buiten te houden. Hier heeft wie aanklopt het wachtwoord al, en de
-     ruimte van een code is 10^6: een vertraging van twee seconden per gok laat
-     een aanvaller met veel adressen er alsnog doorheen. Net als bij het
-     wachtwoord gaat er bij een vol slot een brute-force-melding uit, en die kan
-     het adres in quarantaine zetten (server.js noteFailedTry). Dat is
-     huisbeleid en geen eigen keuze van deze route. */
+     ../auth/inlog.js: wie hier aanklopt heeft het wachtwoord al, en tegen 10^6
+     codes helpt een vertraging een aanvaller met veel adressen niet. Een vol
+     slot meldt brute force, en dat kan het adres in quarantaine zetten
+     (server.js noteFailedTry); zie het besluitpunt in het auditdocument. */
   app.post('/api/auth/tweede', async (req, res, next) => {
     try {
     const u = accounts.verifyActionToken(req.body.bewijs, 'inlog2');

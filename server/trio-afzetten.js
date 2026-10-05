@@ -1,4 +1,5 @@
-/* AFZETTEN OF STOPPEN -- het trio kent nooit twee schrijvers tegelijk.
+/* AFZETTEN OF STOPPEN -- het trio kent nooit twee leiders tegelijk (zonder
+   spreiding is de leider de enige schrijver).
 
    De poortwachter (./trio-wacht.js) nam de oude leider zijn rol "best effort"
    af en promoveerde de nieuwe ook als dat afnemen mislukte. Een leider die
@@ -15,7 +16,19 @@
    en wachten we tot het weg is. De herstartlus in ./trio-wacht.js brengt hem
    daarna terug als stand-by, en die schrijft niet. Lukt ook dat stoppen niet
    binnen de grens, dan promoveren we NIET: liever een paar seconden geen leider
-   dan twee. */
+   dan twee.
+
+   DE SPIEGELKANT (tweede herkeuring van C6): een promotie die niet bevestigd is,
+   is daarmee niet mislukt. Een time-out zegt niets over de server; laden,
+   migreren en een backup gaan voor zijn antwoord uit, en daarna is hij gewoon
+   leider. Wie dan de volgende kandidaat promoveert, heeft er twee. Dus wordt
+   ook een kandidaat eerst aantoonbaar afgezet (promoveer hieronder).
+
+   WAT HIER NIET DICHT IS: een stand-by antwoordt op een schrijfverzoek met 200
+   en bewaart niets (db/index.js bewaar). wissel() houdt het verkeer daarom weg
+   tijdens de failback, maar een verzoek dat al onderweg was en een demote die
+   een time-out gaf maar wel is uitgevoerd, raken die stand-by nog. Zie
+   RTG-V1-RELEASE-READINESS-AUDIT.md. */
 'use strict';
 
 const STOP_MS = 5000;
@@ -37,7 +50,36 @@ function maakAfzetten({ servers, spreiding, log }) {
     if (!uit) log('server ' + s.nr + ' is niet binnen ' + STOP_MS + ' ms gestopt; er wordt deze ronde niemand gepromoveerd');
     return uit;
   }
-  return { zetAf };
+
+  /* 'ja' is leider; 'nee' is aantoonbaar geen leider; 'onzeker' kon niet worden
+     afgezet en geldt als leider tot de volgende ronde hem afzet. */
+  async function promoveer(i) {
+    if (await spreiding.zetRol(i, 'leider')) return 'ja';
+    return (await zetAf(i)) ? 'nee' : 'onzeker';
+  }
+
+  /* DE FAILBACK, vrijwillig: de oude leider af, de betere erop. Geeft de nieuwe
+     actieve terug, -1 als de volgende hartslag moet kiezen. De aanroeper zet de
+     actieve tijdens de wissel op -1. Een demote die niet is bevestigd laat de
+     oude leider staan, zoals voorheen: een demote is goedkoop, dus geen antwoord
+     betekent een server die vastzit, en die opnieuw promoveren laadt de data van
+     schijf over een geheugen dat nog niet bewaard kan zijn. */
+  async function wissel(oudIdx, beter) {
+    const oud = servers[oudIdx];
+    if (!await spreiding.zetRol(oudIdx, spreiding.naLeiderschap())) {
+      log('server ' + oud.nr + ' bevestigt zijn afzetting niet; geen failback deze ronde');
+      return oudIdx;
+    }
+    const uit = await promoveer(beter);
+    if (uit !== 'nee') {
+      log('server ' + servers[beter].nr + (uit === 'ja' ? ' doet het weer en neemt het werk terug'
+        : ' bevestigt zijn promotie niet en kon niet worden afgezet; hij geldt als actief') + '; server ' + oud.nr +
+        (spreiding.aan() ? ' loopt mee als volger' : ' is weer standby'));
+      return beter;
+    }
+    return (await promoveer(oudIdx)) === 'nee' ? -1 : oudIdx;   // terugdraaien
+  }
+  return { zetAf, promoveer, wissel };
 }
 
 module.exports = { maakAfzetten, STOP_MS };

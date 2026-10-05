@@ -90,3 +90,22 @@ test('7. de melder telt en noemt geen inhoud', () => {
   assert.equal(teller.aantal, voor + 1);
   assert.match(regel, /wallets/); assert.match(regel, /a\.saldo/);
 });
+
+test('8. de ene kant verwijdert wat de andere wijzigt: de wijziging blijft, en het wordt gemeld (tweede herkeuring C6)', () => {
+  // wij verwijderden een sleutel, zij wijzigden hem
+  let r = met({ a: { s: 1 }, b: 1 }, { b: 1 }, { a: { s: 2 }, b: 1 });
+  assert.deepEqual(r.uit, { a: { s: 2 }, b: 1 }, 'de uitkomst verandert niet');
+  assert.deepEqual(r.paden, ['a']);
+  // zij verwijderden een item uit een lijst met id, wij wijzigden het
+  r = met([{ id: 1, n: 0 }, { id: 2 }], [{ id: 1, n: 5 }, { id: 2 }], [{ id: 2 }]);
+  assert.deepEqual(r.uit, [{ id: 1, n: 5 }, { id: 2 }]);
+  assert.deepEqual(r.paden, ['[id:1]']);
+});
+
+test('9. een verwijdering zonder tegenwijziging, of een toevoeging aan een kant, botst niet', () => {
+  assert.deepEqual(met({ a: 1, b: 1 }, { b: 1 }, { a: 1, b: 1 }).paden, [], 'wij verwijderden, zij lieten staan');
+  assert.deepEqual(met({ a: 1, b: 1 }, { a: 1, b: 1 }, { b: 1 }).paden, [], 'zij verwijderden, wij lieten staan');
+  assert.deepEqual(met({ b: 1 }, { a: 1, b: 1 }, { b: 1 }).paden, [], 'alleen wij voegden toe');
+  assert.deepEqual(met({ b: 1 }, { b: 1 }, { a: 2, b: 1 }).paden, [], 'alleen zij voegden toe');
+  assert.deepEqual(met({ a: 1 }, {}, {}).paden, [], 'beide verwijderden');
+});

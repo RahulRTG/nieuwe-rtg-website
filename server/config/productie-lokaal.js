@@ -24,13 +24,26 @@ function keurLokaleBouwstanden(env, fouten, waarschuwingen) {
   if (env.RTG_DEV_LINKS === '1')
     fouten.push('RTG_DEV_LINKS=1 in productie: herstel- en verificatielinks en sms-codes zouden in het HTTP-antwoord staan, en daarmee is elk account over te nemen. Zet hem uit.');
 
-  /* Twee meet- en proefstanden die ELK antwoord raken, dezelfde klasse als
-     RTG_DEV_LINKS (de herkeuring van C4). RTG_VERRAAD en RTG_KLOK gooien zelf al
-     in productie (lib/verraad.js, lib/klok.js); deze twee deden dat niet. */
+  /* Meet- en proefstanden die ELK antwoord raken, dezelfde klasse als
+     RTG_DEV_LINKS (de herkeuring van C4). RTG_STAATLOG telt alleen in de twee
+     standen die hem echt aanzetten (staatlog.js begin), zodat RTG_STAATLOG=false
+     geen start breekt met een melding die niet klopt. */
   if (env.RTG_LIEG)
     fouten.push('RTG_LIEG staat aan in productie: de gekozen paden geven met opzet een leeg antwoord. Zet hem uit.');
-  if (env.RTG_STAATLOG && env.RTG_STAATLOG !== '0')
+  if (env.RTG_STAATLOG === '1' || env.RTG_STAATLOG === '2')
     fouten.push('RTG_STAATLOG staat aan in productie: elk antwoord draagt de omvang van de opslag. Zet hem uit.');
+
+  /* RTG_VERRAAD, RTG_KLOK en RTG_DUURZAAM=uit weigeren zichzelf al, maar alleen
+     bij NODE_ENV=production (lib/verraad.js, lib/klok.js, lib/duurzaam.js). Op
+     een openbaar adres zonder NODE_ENV startte de server dan met een opslag die
+     schrijfacties weggooit of een verzette klok (tweede herkeuring van C4). Hier
+     staan ze, zodat ./openbaar.js ze ook daar hard weigert. */
+  if (String(env.RTG_VERRAAD || '').split(',').some(d => d.trim()))
+    fouten.push('RTG_VERRAAD staat aan in productie: de opslag gooit met opzet schrijfacties weg. Zet hem uit.');
+  if (String(env.RTG_KLOK || '').trim())
+    fouten.push('RTG_KLOK staat aan in productie: een verzette klok raakt sessies, facturen en het auditlog. Zet hem uit.');
+  if (String(env.RTG_DUURZAAM || '').toLowerCase() === 'uit')
+    fouten.push('RTG_DUURZAAM=uit in productie: bevestigd werk zou niet zijn vastgelegd. Zet hem uit.');
 
   for (const naam of ['SMTP_SANDBOX', 'SMS_SANDBOX', 'STRIPE_CONNECT_SANDBOX', 'SEPA_SANDBOX']) {
     if (env[naam] === '1')

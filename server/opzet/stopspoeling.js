@@ -63,10 +63,11 @@ function genadeVan(graceMs) {
 function bijCrash({ save, flushBijAfsluiten, accounts, inBundel, exit, graceMs }) {
   const stopMet = exit || ((code) => process.exit(code));
   const grens = genadeVan(graceMs);
-  /* Kan de vraag niet beantwoord worden, dan gaan we uit van WEL een bundel:
-     een overgeslagen flush kost een venster, een halve flush kost geld. */
-  let halverwege = false;
-  try { halverwege = typeof inBundel === 'function' && inBundel() === true; } catch (e) { halverwege = true; }
+  /* Kan de vraag niet beantwoord worden -- hij gooit, of er is geen vraag
+     meegegeven -- dan gaan we uit van WEL een bundel: een overgeslagen flush
+     kost een venster, een halve flush kost geld. */
+  let halverwege = true;
+  try { halverwege = typeof inBundel !== 'function' || inBundel() !== false; } catch (e) { halverwege = true; }
   let spoel = null;
   try { spoel = maakStopspoeling({ save, flushBijAfsluiten, accounts }); spoel.spoelSynchroon(); }
   catch (e) { try { save(); } catch (x) {} }

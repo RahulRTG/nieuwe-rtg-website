@@ -22,6 +22,7 @@ const { veiligeExternalUrl } = require('../ssrf');
 
 const TIJDSLIMIET_MS = 10000;
 const MAX_BYTES = 2 * 1024 * 1024;
+const NIET_PUBLIEK = new Set(['internal', 'local', 'localhost', 'localdomain', 'lan', 'home', 'corp', 'intranet', 'arpa']);
 
 /* null als het adres mag, anders de reden in woorden. */
 function keurBronUrl(url) {
@@ -30,6 +31,14 @@ function keurBronUrl(url) {
   if (u.protocol !== 'https:') return 'alleen https';
   const host = u.hostname.replace(/^\[|\]$/g, '').replace(/\.+$/, '').toLowerCase();
   if (!host.includes('.') && !host.includes(':')) return 'een naam zonder domein wijst naar het eigen netwerk';
+  /* Een punt maakt een naam nog geen publiek domein: in de eigen compose-uitrol
+     heten de diensten ook `redis.rtg_data` (de tweede herkeuring van C5). Het
+     topdomein moet er dus uitzien als een publiek topdomein, en een paar bekende
+     interne achtervoegsels tellen niet. */
+  const top = host.split('.').pop();
+  if (!host.includes(':') && !/^\d+$/.test(top) &&
+    (!/^(?:[a-z]{2,63}|xn--[a-z0-9-]{1,59})$/.test(top) || NIET_PUBLIEK.has(top)))
+    return 'geen publiek topdomein: dit wijst naar een eigen netwerk';
   u.hostname = host;
   const keur = veiligeExternalUrl(u.toString());
   return keur.ok ? null : keur.reden;
@@ -56,7 +65,8 @@ async function leesBegrensd(r, signaal) {
     if (lengte > MAX_BYTES) { try { await lezer.cancel(); } catch (e) { /* weg is weg */ } throw new Error('bron stuurde meer dan ' + MAX_BYTES + ' bytes'); }
     delen.push(value);
   }
-  return JSON.parse(Buffer.concat(delen.map((d) => Buffer.from(d))).toString('utf8'));
+  /* Een BOM vooraan las r.json() gewoon weg; Buffer.toString laat hem staan. */
+  return JSON.parse(Buffer.concat(delen.map((d) => Buffer.from(d))).toString('utf8').replace(/^\uFEFF/, ''));
 }
 
 async function haalBron(url, haalOp, limietMs) {

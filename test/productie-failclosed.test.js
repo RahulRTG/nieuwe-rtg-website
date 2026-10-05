@@ -197,3 +197,18 @@ test('19. RTG_DEV_LINKS op een ONBEKEND adres zonder NODE_ENV: geen blokkade, we
     assert.ok(r.waarschuwingen.some(f => /RTG_DEV_LINKS/.test(f)), 'maar het staat er wel (' + (APP_URL || 'geen APP_URL') + ')');
   }
 });
+
+test('20. een OPENBAAR adres zonder NODE_ENV weigert ook de proefstanden die zichzelf alleen in productie weigeren (C4)', () => {
+  /* Tweede herkeuring van C4: RTG_VERRAAD, RTG_KLOK en RTG_DUURZAAM=uit gooien
+     zelf alleen bij NODE_ENV=production, en RTG_LIEG en RTG_STAATLOG hadden
+     geen toets op dit pad. */
+  const { NODE_ENV, ...zonderProd } = VEILIG;
+  for (const [vlag, waarde] of [['RTG_LIEG', '/api/'], ['RTG_STAATLOG', '1'], ['RTG_VERRAAD', 'schrijf-verloren'],
+    ['RTG_KLOK', '+1u'], ['RTG_DUURZAAM', 'uit']]) {
+    const r = config.valideer({ ...zonderProd, APP_URL: PUBLIEK, [vlag]: waarde });
+    assert.ok(r.hardeFouten.some(f => f.includes(vlag)), vlag + '=' + waarde + ' hoort op een openbaar adres hard te weigeren');
+  }
+  const r = config.valideer({ ...VEILIG, RTG_STAATLOG: 'false' });
+  assert.equal([...r.fouten, ...r.hardeFouten].some(f => f.includes('RTG_STAATLOG')), false,
+    'RTG_STAATLOG=false zet niets aan en hoort de start niet te breken');
+});

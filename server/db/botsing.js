@@ -17,7 +17,7 @@ function melder(sleutel) {
   return (pad) => {
     teller.aantal += 1;
     console.warn('[db] botsing tussen processen in ' + sleutel + (pad ? ' bij ' + pad : '') +
-      ': beide kanten wijzigden hetzelfde veld, de laatste schrijver wint (' + teller.aantal + ' sinds de start).');
+      ': beide kanten veranderden hetzelfde veld (of de ene verwijderde wat de andere wijzigde), een van beide gaat verloren (' + teller.aantal + ' sinds de start).');
   };
 }
 

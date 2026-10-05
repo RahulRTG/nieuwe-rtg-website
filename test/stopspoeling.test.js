@@ -76,7 +76,10 @@ function handlerVan(bron, kop) {
 test('4. de crashweg in server.js geeft de crash door aan bijCrash (in code, niet in commentaar)', () => {
   const h = handlerVan(code('server/server.js'), "process.on('uncaughtException'");
   assert.match(h, /\.bijCrash\(/, 'de crashweg hoort de gedeelde stopspoeling te gebruiken');
-  assert.match(h, /bijCrash\(\{[^}]*\binBundel\b/, 'de crashweg hoort te weten of er een bundel open staat (toets 4g)');
+  assert.match(h, /bijCrash\(\{[^}]*\binBundel\s*(?:,|\}|:\s*inBundel\b)/,
+    'de crashweg geeft de ECHTE bundelvraag mee en geen eigen functie (toets 4g; tweede herkeuring van D1)');
+  assert.match(code('server/server.js'), /const \{[^}]*\binBundel\b[^}]*\} = require\('\.\/db'\)/,
+    'en die bundelvraag is die van de opslag');
   assert.doesNotMatch(h, /process\.exit\(\s*0\s*\)/, 'een crash mag nooit als nette afsluiting eindigen');
 });
 
@@ -88,7 +91,7 @@ test('4b. bijCrash spoelt alles en stopt met exitcode 1', async () => {
       save: () => geroepen.push('save'),
       flushBijAfsluiten: async () => { geroepen.push('db'); },
       accounts: { flushBijAfsluiten: async () => { geroepen.push('accounts'); } },
-      exit: klaar, graceMs: 2000 }));
+      inBundel: () => false, exit: klaar, graceMs: 2000 }));
     assert.equal(code, 1, 'een crash eindigt met exitcode 1');
     assert.deepEqual(geroepen.sort(), ['accounts', 'db', 'journaal', 'save', 'vertaalkast']);
     assert.ok(Date.now() - begin >= 190, 'minstens 200 ms, zodat het log nog wegkomt');
@@ -115,7 +118,8 @@ test('4e. een crash MIDDEN IN een bundel flusht de opslag niet (anders ligt er e
   for (const [naam, inBundel, verwachtFlush] of [
     ['buiten een bundel', () => false, true],
     ['binnen een bundel', () => true, false],
-    ['bundelvraag gooit', () => { throw new Error('kapot'); }, false]]) {
+    ['bundelvraag gooit', () => { throw new Error('kapot'); }, false],
+    ['geen bundelvraag meegegeven', undefined, false]]) {
     const geroepen = [];
     const code = await new Promise((klaar) => bijCrash({ save: () => geroepen.push('save'),
       flushBijAfsluiten: async () => { geroepen.push('db'); },

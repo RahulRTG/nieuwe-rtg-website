@@ -126,3 +126,32 @@ test('3. de rem zit op het ACCOUNT: wisselende adressen en een vers bewijs geven
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+test('4. uitzetten deelt de rem: tien foute codes op /uit, en ook de juiste zet de factor niet meer uit', async () => {
+  /* De tweede herkeuring vond dezelfde toets() op /api/mijn/tweefactor/uit,
+     zonder rem: met een sessie en het wachtwoord was de code daar onbeperkt te
+     raden. */
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tweede-rem4-'));
+  const srv = await startServer({ env: { RTG_DATA_DIR: dir } });
+  const base = srv.base;
+  const post = postJson(base);
+  const uit = async (token, code) => (await fetch(base + '/api/mijn/tweefactor/uit', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify({ huidig: 'geheim12', code }) })).status;
+  try {
+    const reg = await post('/api/auth/register', { name: 'Rem Vier', email: 'tweede-rem4@voorbeeld.test', password: 'geheim12', geboortedatum: '1990-01-01' });
+    const begin = await post('/api/mijn/tweefactor/begin', { huidig: 'geheim12' }, reg.token);
+    await post('/api/mijn/tweefactor/bevestig', { code: totpCode(begin.geheim, Date.now(), 30) }, reg.token);
+    const geldig = new Set([-30000, 0, 30000].map(d => totpCode(begin.geheim, Date.now() + d, 30)));
+    let fout = '000000';
+    for (let i = 0; geldig.has(fout); i++) fout = String(100000 + i);
+    for (let i = 1; i <= 10; i++) assert.equal(await uit(reg.token, fout), 403, 'poging ' + i + ' is een gewone afwijzing');
+    assert.equal(await uit(reg.token, totpCode(begin.geheim, Date.now() + 30000, 30)), 429,
+      'na tien foute codes zit uitzetten op slot, ook voor de juiste code');
+    const stand = await post('/api/mijn/tweefactor', {}, reg.token);
+    assert.equal(stand.aan, true, 'de tweede factor staat nog aan');
+  } finally {
+    await stop(srv);
+    try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
+  }
+});

@@ -119,3 +119,19 @@ test('10. de kantoordeur verandert NIET voor lokaal/onbekend (demo en toetsen bl
   assert.equal(productiedeur.codeDicht({ APP_URL: 'http://localhost:3000' }), null, 'lokaal: de gedeelde code blijft werken');
   assert.equal(productiedeur.codeDicht({}), null, 'onbekend adres: geen productie-afdwinging');
 });
+
+/* C4 (RTG_DEV_LINKS): de vlag zet herstel-/verificatielinks en sms-codes in het
+   HTTP-antwoord. Hij hoort door dezelfde poort als RTG_DEMO te worden geweigerd:
+   in productie, en op een openbaar adres ook zonder NODE_ENV. */
+test('11. productie + RTG_DEV_LINKS=1 weigert de start (C4)', () => {
+  const r = config.valideer({ ...VEILIG, RTG_DEV_LINKS: '1' });
+  assert.ok(weigert(r), 'RTG_DEV_LINKS=1 in productie hoort de start te blokkeren');
+  assert.ok([...r.fouten, ...r.hardeFouten].some(f => /RTG_DEV_LINKS/.test(f)));
+});
+
+test('12. een OPENBAAR adres zonder NODE_ENV + RTG_DEV_LINKS=1 => hardeFouten (C4)', () => {
+  const { NODE_ENV, ...zonderProd } = VEILIG;
+  const r = config.valideer({ ...zonderProd, APP_URL: PUBLIEK, RTG_DEV_LINKS: '1' });
+  assert.ok(r.hardeFouten.some(f => /RTG_DEV_LINKS/.test(f)),
+    'op een openbaar adres hoort RTG_DEV_LINKS een harde fout te zijn: ' + JSON.stringify(r.hardeFouten));
+});

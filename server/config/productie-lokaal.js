@@ -14,6 +14,16 @@ function keurLokaleBouwstanden(env, fouten, waarschuwingen) {
   if (env.RTG_GEZIN_REM_UIT === '1')
     fouten.push('RTG_GEZIN_REM_UIT=1 in productie: het raden van gezinscodes zou onbeperkt zijn. Zet hem uit.');
 
+  /* RTG_DEV_LINKS zet de herstellink, de verificatielink en de sms-code in het
+     HTTP-antwoord (routes/auth.js, member/herstelkanaal.js, algpin.js), zodat
+     toetsen de stroom kunnen doorlopen. Op een echte server is dat elk account
+     over te nemen met een POST op een willekeurig adres -- precies het gat uit
+     de kop van routes/auth.js. Hier stond hij niet, dus een vergeten vlag kwam
+     zonder melding door de productiekeuring (RTG-V1-RELEASE C4). Via
+     ./openbaar.js geldt dit ook op een openbaar adres zonder NODE_ENV. */
+  if (env.RTG_DEV_LINKS === '1')
+    fouten.push('RTG_DEV_LINKS=1 in productie: herstel- en verificatielinks en sms-codes zouden in het HTTP-antwoord staan, en daarmee is elk account over te nemen. Zet hem uit.');
+
   for (const naam of ['SMTP_SANDBOX', 'SMS_SANDBOX', 'STRIPE_CONNECT_SANDBOX', 'SEPA_SANDBOX']) {
     if (env[naam] === '1')
       fouten.push(naam + '=1 is uitsluitend lokaal: een contract-sandbox mag productie nooit als een echte integratie laten starten.');

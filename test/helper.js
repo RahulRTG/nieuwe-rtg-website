@@ -372,9 +372,11 @@ async function startEens(opts) {
        zegt hij voorgoed "in orde" -- precies de vorm waar LAT-regel 10 voor
        waarschuwt. */
     env: {
-      // toetsen doorlopen de hele herstelstroom; op een echte server staat
-      // deze vlag uit en komt er nooit een link of code in een antwoord
-      RTG_DEV_LINKS: '1',
+      /* toetsen doorlopen de hele herstelstroom; op een echte server staat
+         deze vlag uit en komt er nooit een link of code in een antwoord. In
+         een PRODUCTIEtoets dus ook niet: de productiekeuring weigert hem
+         (config/productie-lokaal.js), net als RTG_DEMO hieronder. */
+      ...(((opts.env || {}).NODE_ENV) === 'production' ? {} : { RTG_DEV_LINKS: '1' }),
       /* De meeste toetsen leunen op de demo-stand (vaste inlog, bekend
          eigenaarsaccount). Op een echte server staat die UIT tenzij iemand hem
          aanzet -- hij stond aan zolang NODE_ENV niet gezet was, en dat zette het

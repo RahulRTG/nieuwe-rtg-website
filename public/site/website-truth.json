@@ -1,6 +1,7 @@
 {
-  "schema": 2,
+  "schema": 4,
   "source": [
+    "public/apps/app-main.js",
     "public/shared/rtg-edge-worlds.js",
     "server/kern/pasladder.js",
     "server/kern/appgids.js",
@@ -8,7 +9,7 @@
     "public/apps/leverancier.html",
     "public/apps/app.html"
   ],
-  "sourceHash": "852427e8e438423cb293863c8a806634f76aa4619da0d2438d5f125701a7311b",
+  "sourceHash": "721f6f3111b9f319504b153004ad6bcddd55634309cc3709b919fcd7d901118d",
   "platform": [
     {
       "id": "organisatie",
@@ -55,7 +56,7 @@
         "Je ledenpas ligt in je wallet, de tegel rechts onder de klok"
       ],
       "note": "Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.",
-      "sourceHash": "ef97a4a90b6f449df94da64941336e7a3ebb322c570eae3dda538ddd393491e7"
+      "sourceHash": "4518f9e8a0fb598b5cf843a09356b045fee334449da9ffadc41fda4691f9dddd"
     }
   ],
   "worlds": {
@@ -66,16 +67,800 @@
       "homeRoute": "/apps/wereld.html",
       "workspaceRoute": "/apps/werkruimte.html?gebied=living",
       "action": "Vergelijk werelden",
-      "groupCount": 2,
-      "featureCount": 12,
+      "groupCount": 3,
+      "featureCount": 59,
       "groups": [
         {
-          "name": "Leefmodel",
-          "count": 5
+          "name": "Appschermen",
+          "count": 50,
+          "apps": [
+            {
+              "id": "link:vooruitzicht",
+              "name": "Het Vooruitzicht",
+              "kind": "link",
+              "route": "/apps/living-os.html",
+              "summary": "Het Vooruitzicht, de cockpit van LivingOS: geld, tijd, energie, mensen en beleving als een samenhangende wereld vooruit bekijken.",
+              "actions": [
+                "Beschrijf het gewenste resultaat en de harde grenzen; vergelijk de waarschijnlijke, ideale en verstoorde wereld",
+                "Bekijk wat lokaal klaarstaat en waarop providers nog moeten antwoorden",
+                "Geef alleen de voorbereiding vrij; boeken en betalen blijven apart geblokkeerd"
+              ],
+              "note": "Gereed betekent pas gereed als de echte provider dat heeft bevestigd; een mooie voorspelling is geen bewijs. Een simulatie helpt kiezen maar beslist niet."
+            },
+            {
+              "id": "link:vandaag",
+              "name": "Vandaag",
+              "kind": "link",
+              "route": "/apps/life.html",
+              "summary": "RTG Life: alles wat vandaag over jouw leven bij RTG te zeggen valt, op een scherm.",
+              "actions": [
+                "Begin bij \"Uw dag\": alles wat vandaag ergens staat, op volgorde van de klok",
+                "Lees bovenaan waar vandaag het meeste te winnen valt",
+                "Bekijk je signalen; wat niet gemeten wordt zegt dat er ook bij",
+                "Zet onderaan je noodkaart klaar: wie er gebeld moet worden als jij het even niet kunt vertellen",
+                "Spring door naar Doelen, Balans of je afspraken"
+              ],
+              "note": "Dit scherm meet zelf niets en legt niets vast: het leest de lagen die je al had. Staat er \"niet gemeten\", dan is er geen bron, en niet een slechte uitslag. RTG deelt je dag ook niet in -- het weet niet hoeveel energie je hebt of wat er buiten RTG in je dag staat, en een indeling verzinnen uit de rest levert een zelfverzekerd verkeerd plan. Ook je noodkaart is een lezer: de allergenen erop komen uit je zorgprofiel, dus er staat nooit iets op wat je daar hebt weggehaald, en niemand kan hem op afstand opvragen."
+            },
+            {
+              "id": "link:leven",
+              "name": "Mijn leven",
+              "kind": "link",
+              "route": "/apps/leven.html",
+              "summary": "Mijn leven: uw levenslijn en wat er speelt, uit alle bronnen tegelijk.",
+              "actions": [
+                "Bovenaan staat of er iets aandacht vraagt; loopt alles, dan staat dat er ook",
+                "Daaronder uw lijn: de fasen waarvan hier iets bekend is, met de bron erbij",
+                "De mentor onderin antwoordt op wat er in uw lijn staat, met zijn gegevens eronder"
+              ],
+              "note": "Fasen waarvan hier niets bekend is, staan er niet -- ook niet grijs. Wie geen studie, geen kinderen of geen pensioen heeft, mist niets: dit is geen lijst die af moet. Dit scherm regelt zelf niets en beslist niets over u; het opent hooguit een deur."
+            },
+            {
+              "id": "link:sociaal",
+              "name": "Sociaal",
+              "kind": "link",
+              "route": "/apps/sociaal.html",
+              "summary": "RTG Sociaal: wat er tussen u en uw kring speelt, uit alle sociale apps tegelijk.",
+              "actions": [
+                "Bovenaan staat wat op u wacht: een onbeantwoord gesprek, een bijeenkomst die eraan komt",
+                "Tik een regel aan om naar de app te gaan die hem heeft; daar antwoordt en plaatst u",
+                "Onderaan staat de hele sociale wereld, als er niets openstaat"
+              ],
+              "note": "Dit scherm praat zelf niet en plaatst zelf niets, met opzet. Er staat ook geen teller van volgers of likes: dit is een overzicht van wat er speelt, geen aansporing om vaker te kijken."
+            },
+            {
+              "id": "link:geldcommand",
+              "name": "Geld",
+              "kind": "link",
+              "route": "/apps/geld.html",
+              "summary": "RTG Geld: hoe u er financieel voor staat, uit alle gelddomeinen tegelijk.",
+              "actions": [
+                "Bovenaan staat wat aandacht vraagt: een verlopen toezegging, een openstaande verrekening",
+                "Tik een regel aan om naar de module te gaan die hem heeft; daar betaalt en verrekent u",
+                "Onderaan staat de hele geldwereld"
+              ],
+              "note": "Dit scherm betaalt zelf niets en telt zelf niets op: elk bedrag komt uit de module die het bijhoudt. Staat er \"niet alles is opgehaald\", lees dat dan als een onvolledig beeld en niet als een gezond beeld."
+            },
+            {
+              "id": "link:mediaos",
+              "name": "RTG Media",
+              "kind": "link",
+              "route": "/apps/media.html",
+              "summary": "RTG Media: één mediawereld -- muziek, video, korte video en live bij elkaar.",
+              "actions": [
+                "Kies een stand: Muziek, Kijk of Flow -- het is dezelfde wereld",
+                "Open \"alles hierover\" en zie het hele stuk: de maker, zijn andere werk en de clips met dit geluid eronder",
+                "Stuur uw wereld zelf bij met meer, minder, nooit en verras me"
+              ],
+              "note": "Bij elk stuk staat waarom het er staat. Wat u niet zelf hebt gezegd, weegt hier niet mee."
+            },
+            {
+              "id": "link:veilig",
+              "name": "RTG Veilig",
+              "kind": "link",
+              "route": "/apps/veilig.html",
+              "summary": "RTG Veilig: Thuiswacht, Codewoord, Vitaal en Thuisrust als vier standen van een app, op een kring die je een keer instelt.",
+              "actions": [
+                "Wissel bovenin van stand: onderweg, stil om hulp vragen, dagelijks melden, of rust",
+                "Vul je kring een keer; alle vier de standen gebruiken dezelfde mensen",
+                "Stuur een keer een proefalarm, zodat je weet dat de keten echt werkt"
+              ],
+              "note": "De klok tikt op de server en niet in de app, dus het werkt juist wel als je telefoon uitvalt. Wat het niet is: een alarmcentrale -- er wordt niemand gebeld en er kijkt geen mens mee."
+            },
+            {
+              "id": "link:wallet",
+              "name": "Wallet",
+              "kind": "link",
+              "route": "/apps/geld.html#wallet",
+              "summary": "RTG Geld: hoe u er financieel voor staat, uit alle gelddomeinen tegelijk.",
+              "actions": [
+                "Bovenaan staat wat aandacht vraagt: een verlopen toezegging, een openstaande verrekening",
+                "Tik een regel aan om naar de module te gaan die hem heeft; daar betaalt en verrekent u",
+                "Onderaan staat de hele geldwereld"
+              ],
+              "note": "Dit scherm betaalt zelf niets en telt zelf niets op: elk bedrag komt uit de module die het bijhoudt. Staat er \"niet alles is opgehaald\", lees dat dan als een onvolledig beeld en niet als een gezond beeld."
+            },
+            {
+              "id": "link:bank",
+              "name": "Bank",
+              "kind": "link",
+              "route": "/apps/geld.html#bank",
+              "summary": "RTG Geld: hoe u er financieel voor staat, uit alle gelddomeinen tegelijk.",
+              "actions": [
+                "Bovenaan staat wat aandacht vraagt: een verlopen toezegging, een openstaande verrekening",
+                "Tik een regel aan om naar de module te gaan die hem heeft; daar betaalt en verrekent u",
+                "Onderaan staat de hele geldwereld"
+              ],
+              "note": "Dit scherm betaalt zelf niets en telt zelf niets op: elk bedrag komt uit de module die het bijhoudt. Staat er \"niet alles is opgehaald\", lees dat dan als een onvolledig beeld en niet als een gezond beeld."
+            },
+            {
+              "id": "link:wbw",
+              "name": "Samen betalen",
+              "kind": "link",
+              "route": "/apps/geld.html#wbw",
+              "summary": "RTG Geld: hoe u er financieel voor staat, uit alle gelddomeinen tegelijk.",
+              "actions": [
+                "Bovenaan staat wat aandacht vraagt: een verlopen toezegging, een openstaande verrekening",
+                "Tik een regel aan om naar de module te gaan die hem heeft; daar betaalt en verrekent u",
+                "Onderaan staat de hele geldwereld"
+              ],
+              "note": "Dit scherm betaalt zelf niets en telt zelf niets op: elk bedrag komt uit de module die het bijhoudt. Staat er \"niet alles is opgehaald\", lees dat dan als een onvolledig beeld en niet als een gezond beeld."
+            },
+            {
+              "id": "link:rtgcode",
+              "name": "Betaalcode",
+              "kind": "link",
+              "route": "/apps/geld.html#rtgcode",
+              "summary": "RTG Geld: hoe u er financieel voor staat, uit alle gelddomeinen tegelijk.",
+              "actions": [
+                "Bovenaan staat wat aandacht vraagt: een verlopen toezegging, een openstaande verrekening",
+                "Tik een regel aan om naar de module te gaan die hem heeft; daar betaalt en verrekent u",
+                "Onderaan staat de hele geldwereld"
+              ],
+              "note": "Dit scherm betaalt zelf niets en telt zelf niets op: elk bedrag komt uit de module die het bijhoudt. Staat er \"niet alles is opgehaald\", lees dat dan als een onvolledig beeld en niet als een gezond beeld."
+            },
+            {
+              "id": "link:balans",
+              "name": "Balans",
+              "kind": "link",
+              "route": "/apps/geld.html#balans",
+              "summary": "RTG Geld: hoe u er financieel voor staat, uit alle gelddomeinen tegelijk.",
+              "actions": [
+                "Bovenaan staat wat aandacht vraagt: een verlopen toezegging, een openstaande verrekening",
+                "Tik een regel aan om naar de module te gaan die hem heeft; daar betaalt en verrekent u",
+                "Onderaan staat de hele geldwereld"
+              ],
+              "note": "Dit scherm betaalt zelf niets en telt zelf niets op: elk bedrag komt uit de module die het bijhoudt. Staat er \"niet alles is opgehaald\", lees dat dan als een onvolledig beeld en niet als een gezond beeld."
+            },
+            {
+              "id": "link:labfonds",
+              "name": "Fonds",
+              "kind": "link",
+              "route": "/apps/geld.html#labfonds",
+              "summary": "RTG Geld: hoe u er financieel voor staat, uit alle gelddomeinen tegelijk.",
+              "actions": [
+                "Bovenaan staat wat aandacht vraagt: een verlopen toezegging, een openstaande verrekening",
+                "Tik een regel aan om naar de module te gaan die hem heeft; daar betaalt en verrekent u",
+                "Onderaan staat de hele geldwereld"
+              ],
+              "note": "Dit scherm betaalt zelf niets en telt zelf niets op: elk bedrag komt uit de module die het bijhoudt. Staat er \"niet alles is opgehaald\", lees dat dan als een onvolledig beeld en niet als een gezond beeld."
+            },
+            {
+              "id": "link:mecenaat",
+              "name": "Mecenaat",
+              "kind": "link",
+              "route": "/apps/geld.html#mecenaat",
+              "summary": "RTG Geld: hoe u er financieel voor staat, uit alle gelddomeinen tegelijk.",
+              "actions": [
+                "Bovenaan staat wat aandacht vraagt: een verlopen toezegging, een openstaande verrekening",
+                "Tik een regel aan om naar de module te gaan die hem heeft; daar betaalt en verrekent u",
+                "Onderaan staat de hele geldwereld"
+              ],
+              "note": "Dit scherm betaalt zelf niets en telt zelf niets op: elk bedrag komt uit de module die het bijhoudt. Staat er \"niet alles is opgehaald\", lees dat dan als een onvolledig beeld en niet als een gezond beeld."
+            },
+            {
+              "id": "link:nalatenschap",
+              "name": "Nalatenschap",
+              "kind": "link",
+              "route": "/apps/geld.html#nalatenschap",
+              "summary": "RTG Geld: hoe u er financieel voor staat, uit alle gelddomeinen tegelijk.",
+              "actions": [
+                "Bovenaan staat wat aandacht vraagt: een verlopen toezegging, een openstaande verrekening",
+                "Tik een regel aan om naar de module te gaan die hem heeft; daar betaalt en verrekent u",
+                "Onderaan staat de hele geldwereld"
+              ],
+              "note": "Dit scherm betaalt zelf niets en telt zelf niets op: elk bedrag komt uit de module die het bijhoudt. Staat er \"niet alles is opgehaald\", lees dat dan als een onvolledig beeld en niet als een gezond beeld."
+            },
+            {
+              "id": "link:logboek",
+              "name": "Logboek",
+              "kind": "link",
+              "route": "/apps/geld.html#logboek",
+              "summary": "RTG Geld: hoe u er financieel voor staat, uit alle gelddomeinen tegelijk.",
+              "actions": [
+                "Bovenaan staat wat aandacht vraagt: een verlopen toezegging, een openstaande verrekening",
+                "Tik een regel aan om naar de module te gaan die hem heeft; daar betaalt en verrekent u",
+                "Onderaan staat de hele geldwereld"
+              ],
+              "note": "Dit scherm betaalt zelf niets en telt zelf niets op: elk bedrag komt uit de module die het bijhoudt. Staat er \"niet alles is opgehaald\", lees dat dan als een onvolledig beeld en niet als een gezond beeld."
+            },
+            {
+              "id": "link:wereldlaag",
+              "name": "Alles bij elkaar",
+              "kind": "link",
+              "route": "/apps/wereld.html",
+              "summary": "RTG Wereld: al je sociale kanten in één app. Bovenaan kies je de wereld, de app blijft dezelfde.",
+              "actions": [
+                "Schakel bovenaan tussen Alles, Lifestyle, Business, Communities en Privé",
+                "Alles wat je in De Salon, op Pulse of op het zakelijke prikbord plaatst, komt hier samen in één tijdlijn",
+                "Tik \"Bericht\" bij iemand: je springt naar Berichten, in het gesprek met die persoon"
+              ],
+              "note": "Eén identiteit, één netwerk, één app: je hoeft niet naar een aparte werk-app om een zakelijk contact te spreken, want het is gewoon dezelfde persoon."
+            },
+            {
+              "id": "link:pulse",
+              "name": "Pulse",
+              "kind": "link",
+              "route": "/apps/pulse.html",
+              "summary": "Pulse: wat er nu speelt in jouw RTG-wereld, rustig gebundeld.",
+              "actions": [
+                "Lees de hoogtepunten van vandaag",
+                "Tik door naar de app waar iets gebeurt",
+                "Stel in waarover je seintjes wilt"
+              ],
+              "note": "Geen eindeloze feed: Pulse toont wat er is en houdt dan op. Dat is bewust."
+            },
+            {
+              "id": "link:camera",
+              "name": "Camera",
+              "kind": "link",
+              "route": "/apps/camera.html",
+              "summary": "RTG Camera: foto's maken en nabewerken in de eigen studio.",
+              "actions": [
+                "Maak een foto met de zoeker",
+                "Bewerk in de studio: licht, kleur, kader",
+                "Bewaar of deel bewust"
+              ],
+              "note": "De beste bewerking is licht: probeer eerst de belichting voor je naar filters grijpt."
+            },
+            {
+              "id": "link:berichten",
+              "name": "Berichten",
+              "kind": "link",
+              "route": "/apps/comm.html",
+              "summary": "Berichten: al je contact in een app. Sturen, bellen, videobellen, snaps en afspraken in een gesprekslijst.",
+              "actions": [
+                "Open een gesprek en kies daar wat het wordt: tekst, bellen of videobellen",
+                "Deel een snap of plan een afspraak vanuit hetzelfde gesprek",
+                "Zoek op codenaam om een nieuw gesprek te beginnen"
+              ],
+              "note": "Contact met iemand is EEN ding, geen vier apps: alles van dezelfde persoon staat in hetzelfde gesprek, ook wat vroeger in Bellen of Snaps woonde."
+            },
+            {
+              "id": "link:vonk",
+              "name": "Daten",
+              "kind": "link",
+              "route": "/apps/vonk.html",
+              "summary": "RTG Vonk: niet meer mensen, sneller de juiste - met een plek precies in het midden.",
+              "actions": [
+                "Zeg per onderwerp wat verplicht is, wat een sterke voorkeur en wat leuk meegenomen",
+                "Elke dag hooguit zes mensen die wederzijds passen, met de reden erbij waarom je ze ziet",
+                "Bij een wederzijdse like kiezen jullie blind uit drie plekken op gelijke reistijd"
+              ],
+              "note": "Wat je van een ander vraagt ziet niemand; van je eigen antwoorden bepaal je zelf per onderwerp wie ze mag zien."
+            },
+            {
+              "id": "link:cercle",
+              "name": "Cercle",
+              "kind": "link",
+              "route": "/apps/cercle.html",
+              "summary": "Cercle: uw besloten kring binnen de Salon.",
+              "actions": [
+                "Zie wat uw kring deelt",
+                "Nodig uit wie erbij hoort",
+                "Organiseer een besloten moment"
+              ],
+              "note": "Klein houden is de kracht van een kring; kwaliteit van gezelschap boven aantal."
+            },
+            {
+              "id": "link:entourage",
+              "name": "Entourage",
+              "kind": "link",
+              "route": "/apps/entourage.html",
+              "summary": "Entourage: de mensen om u heen (chauffeur, oppas, staf) op één plek geregeld.",
+              "actions": [
+                "Zet afspraken met uw vaste mensen",
+                "Deel alleen wat zij nodig hebben",
+                "Betaal en verantwoord netjes via de app"
+              ],
+              "note": "Duidelijke afspraken maken vaste mensen beter; de app houdt ze voor beide kanten bij."
+            },
+            {
+              "id": "link:rendezvous",
+              "name": "Rendez-vous",
+              "kind": "link",
+              "route": "/apps/rendezvous.html",
+              "summary": "Rendez-vous: besloten introducties, waar de ontmoeting het product is.",
+              "actions": [
+                "Zet uw profiel op, geef aan waar u wanneer bent en wanneer u meestal kunt",
+                "Bij een wederzijdse interesse ziet u waar u tegelijk bent en welk dagdeel u beiden uitkomt",
+                "Met Arrange it stelt Rahul een ontmoeting samen; keurt u beiden goed, dan regelt De Rechterhand het"
+              ],
+              "note": "Uw verblijfplaats geeft u zelf op en niemand ziet uw dagdelen; bij een match hoort u alleen waar en wanneer u elkaar treft."
+            },
+            {
+              "id": "link:attenties",
+              "name": "Attenties",
+              "kind": "link",
+              "route": "/apps/attenties.html",
+              "summary": "Attenties: kleine gebaren op het juiste moment, verzorgd door uw Rechterhand.",
+              "actions": [
+                "Kies een gelegenheid en een attentie",
+                "Wij verzorgen inpakken en bezorgen",
+                "Volg de status discreet in de app"
+              ],
+              "note": "Een attentie op tijd is meer waard dan een groot gebaar te laat; de agenda helpt u herinneren."
+            },
+            {
+              "id": "link:ontdek",
+              "name": "Overzicht",
+              "kind": "link",
+              "route": "/apps/rtg.html",
+              "summary": "RTG - Het Huis: de website van het huis als een high-end magazine op een pagina; swipe zijwaarts om te bladeren.",
+              "actions": [
+                "Swipe (of gebruik de pijlen) om door de bladen te bladeren",
+                "Lees per blad een tak: de passen, reizen, care, leren, cultuur, De Salon, de foundation en partners",
+                "Op het slotblad spring je naar het 3D-uitzicht of terug naar het bureaublad"
+              ],
+              "note": "Een magazine als app: geen losse internetpagina's, alles in een pagina die je doorbladert, in de rustige huisstijl."
+            },
+            {
+              "id": "link:commerce",
+              "name": "Commerce",
+              "kind": "link",
+              "route": "/apps/commerce.html",
+              "summary": "RTG Commerce: wat er te koop staat, wat er NIET te koop staat en waarom, en je mand over verkopers heen.",
+              "actions": [
+                "Zie per aanbod wat je ermee kunt: prijzen, reserveren, kopen, leveren, annuleren, terugsturen",
+                "Kies een verkoper en zie welke regels buiten de etalage vallen, met de reden erbij",
+                "Leg dingen van verschillende verkopers in een mand; je krijgt per verkoper een afrekening",
+                "Ga naar de verkoper met je keuze mee: die staat bovenaan zijn scherm klaar"
+              ],
+              "note": "Er is bewust geen knop \"betaal alles\": achter die regels zitten verschillende partijen, en RTG bevestigt niets namens hen. Ook een doorgegeven keuze is geen bestelling -- dat blijft aan jou en aan de verkoper."
+            },
+            {
+              "id": "link:rechterhand",
+              "name": "Privekantoor",
+              "kind": "link",
+              "route": "/apps/lifestyle.html",
+              "summary": "Het Privékantoor: de ene app van uw Lifestyle Pass. Alles wat u heeft op één levensbeeld, met de Rechterhand als uitvoerende hand.",
+              "actions": [
+                "Begin bij Nu: één kop die zegt of u iets moet doen, plus uw ochtend- of avondbriefing",
+                "Zeg onder Nu wanneer u weg bent; wij zoeken op wat daar in uw andere apps mee samenhangt: paspoorten, een verzekering, de vaccinatie van de hond, een toezegging die u al deed",
+                "Vooruit bundelt alle termijnen uit die apps, inclusief wat al te laat is",
+                "Onder Mandaat bepaalt u per onderwerp hoever wij zonder u gaan, en tot welk bedrag",
+                "Een zaak valt uiteen in deelopdrachten die elk uw eigen grens volgen",
+                "Woning, Kring, Bezit, Reis en Veilig zijn de kamers waar u het invult",
+                "Kantoor is de plattegrond van twintig werelden"
+              ],
+              "note": "Over gezondheid en nalatenschap beslist u zelf: die blijven besloten, komen niet op ons bureau, en daar kunt u ons geen mandaat voor geven."
+            },
+            {
+              "id": "link:wonen",
+              "name": "Wonen",
+              "kind": "link",
+              "route": "/apps/wonen.html",
+              "summary": "Mijn thuis brengt de dingen die aandacht vragen samen, zonder van uw woning een dashboard vol techniek te maken.",
+              "actions": [
+                "Zie in één oogopslag hoe het thuis gaat",
+                "Ga rechtstreeks naar onderhoud, documenten of verbonden apparaten",
+                "Bekijk alleen echte meldingen en echte koppelingen"
+              ],
+              "note": "Geen melding betekent hier ook echt geen melding; LivingOS verzint geen storing om het scherm gevuld te laten lijken."
+            },
+            {
+              "id": "link:maison",
+              "name": "Maison",
+              "kind": "link",
+              "route": "/apps/maison.html",
+              "summary": "Maison: uw huishouden en staf -- wie er werkt, welke taken lopen, en wat er speelt in en om huis.",
+              "actions": [
+                "Zet uw huishoudelijk personeel erbij met rol en contact",
+                "Geef een taak aan iemand met een datum, en vink hem af",
+                "Houd een logboek bij van wat er in en om huis speelt"
+              ],
+              "note": "Afspraken die opgeschreven staan hoeven door niemand van de twee onthouden te worden."
+            },
+            {
+              "id": "link:table",
+              "name": "Table",
+              "kind": "link",
+              "route": "/apps/table.html",
+              "summary": "Table: de prive-diners en events die u ZELF geeft.",
+              "actions": [
+                "Maak een gelegenheid met datum en locatie",
+                "Zet de gastenlijst erbij met dieet en voorkeuren, en maak de tafelindeling",
+                "Stel het menu per gang samen"
+              ],
+              "note": "Alles blijft bewaard en is herbruikbaar, dus de volgende keer begint u niet opnieuw. Reserveren bij een zaak doet u in Het Huis."
+            },
+            {
+              "id": "link:cellier",
+              "name": "Cellier",
+              "kind": "link",
+              "route": "/apps/cellier.html",
+              "summary": "Cellier: uw wijnkelder, bijgehouden en aangevuld met verstand.",
+              "actions": [
+                "Bekijk uw kelder en drinkvensters",
+                "Laat aanvullen op advies",
+                "Reserveer flessen voor een diner"
+              ],
+              "note": "Het drinkvenster zegt wanneer een fles op zijn mooist is; de kelder let er voor u op."
+            },
+            {
+              "id": "link:garderobe",
+              "name": "Garde-robe",
+              "kind": "link",
+              "route": "/apps/garderobe.html",
+              "summary": "Garde-robe: uw garderobe in beeld, met de styling van de boutieks.",
+              "actions": [
+                "Bekijk wat er hangt en wat er mist",
+                "Ontvang stylingvoorstellen van uw huizen",
+                "Laat een maat naar de paskamer brengen"
+              ],
+              "note": "Een garderobe die klopt is stiller dan een kast die vol is; wij letten op de gaten."
+            },
+            {
+              "id": "link:muziek",
+              "name": "Muziek",
+              "kind": "link",
+              "route": "/apps/muziek.html",
+              "summary": "RTG Sound: muziek voor je dag, samengesteld zonder gejaag.",
+              "actions": [
+                "Kies een sfeer of kanaal",
+                "Speel af en bedien vanaf elk scherm",
+                "Bewaar wat je mooi vindt"
+              ],
+              "note": "Muziek zonder eindeloos scrollen: kies één sfeer en laat hem gewoon spelen."
+            },
+            {
+              "id": "link:podium",
+              "name": "Live",
+              "kind": "link",
+              "route": "/apps/podium.html",
+              "summary": "RTG Podium: het eigen live-streamingkanaal (18+, met verificatie).",
+              "actions": [
+                "Kijk live streams van makers",
+                "Steun een maker met een cadeau via RTG Pay",
+                "Abonneer op wie je vaker wilt zien"
+              ],
+              "note": "Cadeaus zijn echt geld: de app vraagt altijd eerst een bevestiging."
+            },
+            {
+              "id": "link:theater",
+              "name": "Films en series",
+              "kind": "link",
+              "route": "/apps/theater.html",
+              "summary": "RTG Theater: de videobibliotheek op bioscoopniveau, tot 4K zonder hercompressie.",
+              "actions": [
+                "Kies een kanaal of titel",
+                "Kijk in de kwaliteit die je verbinding aankan",
+                "Reageer op titels waar dat open staat"
+              ],
+              "note": "Alles is vooraf goedgekeurd door het kantoor; daarom vind je hier geen ruis."
+            },
+            {
+              "id": "link:clips",
+              "name": "Video",
+              "kind": "link",
+              "route": "/apps/clips.html",
+              "summary": "RTG Clips: korte video's van leden; jouw clips blijven op jouw toestel.",
+              "actions": [
+                "Bekijk de eindige dagselectie",
+                "Maak zelf een clip; hij blijft lokaal bij jou",
+                "Deel bewust, niet automatisch"
+              ],
+              "note": "De selectie is bewust eindig: als hij op is, is hij op. Geen oneindige scroll."
+            },
+            {
+              "id": "link:spelen",
+              "name": "Spelen",
+              "kind": "link",
+              "route": "/apps/spelen.html?pas=",
+              "summary": "Spelen: bordspellen en partyspellen met vrienden, live tegen elkaar.",
+              "actions": [
+                "Start een lobby en nodig vrienden uit",
+                "Kies een spel: van dammen tot Magnaat",
+                "Praat mee in de spelchat"
+              ],
+              "note": "Sommige spellen hebben een leeftijdspoort; dat regelt de app automatisch netjes voor je."
+            },
+            {
+              "id": "link:nieuws",
+              "name": "Nieuws",
+              "kind": "link",
+              "route": "/apps/nieuws.html",
+              "summary": "RTG Nieuws: de redactie bundelt wat voor leden telt.",
+              "actions": [
+                "Lees artikelen per rubriek",
+                "Bewaar wat je later wilt lezen",
+                "Reageer waar dat kan"
+              ],
+              "note": "Kwaliteit boven snelheid: liever één goed stuk dan tien snelle."
+            },
+            {
+              "id": "link:krant",
+              "name": "Krant",
+              "kind": "link",
+              "route": "/apps/krant.html",
+              "summary": "RTG Krant: lees de kranten die nieuwsbedrijven binnen RTG uitgeven, elk in de eigen huisstijl.",
+              "actions": [
+                "Kies een krant in de gids of open er een op adres",
+                "Blader per rubriek en lees het volledige artikel",
+                "De voorpagina staat in de eigen huisstijl van de krant"
+              ],
+              "note": "Onafhankelijk nieuws binnen het huis: elke titel met een eigen gezicht, gemaakt in de RTG Redactie."
+            },
+            {
+              "id": "link:sport",
+              "name": "Sport",
+              "kind": "link",
+              "route": "/apps/sport.html",
+              "summary": "RTG Sport: kampen, lessen en sportieve activiteiten van partners.",
+              "actions": [
+                "Bekijk het aanbod en de data",
+                "Meld je aan voor een kamp of les",
+                "Stel een vraag aan de organisatie"
+              ],
+              "note": "Begin klein: één vast uur per week houd je langer vol dan een groots plan."
+            },
+            {
+              "id": "link:mall",
+              "name": "Mall",
+              "kind": "link",
+              "route": "/apps/mall.html",
+              "summary": "De RTG Mall: de enige plek waar je bij RTG koopt, van eigen-merk tot boutieks, plus de bibliotheken.",
+              "actions": [
+                "Bestel eigen-merk en boerderijproducten direct",
+                "Blader door de App- en Reis-Bibliotheek; installeren is inbegrepen",
+                "Leg mode apart of laat een maat naar de paskamer brengen"
+              ],
+              "note": "De bibliotheken zijn een pas-voordeel: tienduizenden apps en een miljoen reisgidsen, zonder bijbetalen."
+            },
+            {
+              "id": "link:mijnmall",
+              "name": "Mijn bestellingen",
+              "kind": "link",
+              "route": "/apps/mijnmall.html",
+              "summary": "Mijn Mall: wat u bewaarde, de reizen die u bouwt en de vragen die u uitzette.",
+              "actions": [
+                "Bewaar iets uit de Mall in een lijst",
+                "Bouw een reis uit verblijf, vervoer, tafel en iets te doen",
+                "Plaats een vraag als u iets niet vindt, en kies zelf uit de reacties"
+              ],
+              "note": "Er wordt hier niets afgerekend: elke regel gaat naar de partij die hem levert, met zijn eigen bevestiging."
+            },
+            {
+              "id": "link:pay",
+              "name": "RTG Pay",
+              "kind": "link",
+              "route": "/apps/pay.html",
+              "summary": "RTG Pay: betalen en tikken tussen vrienden, veilig en direct.",
+              "actions": [
+                "Stuur of vraag een tik",
+                "Bekijk je saldo en geschiedenis",
+                "Splits een rekening met je gezelschap"
+              ],
+              "note": "Voor elke betaling zie je eerst een bevestiging; niets gaat er zonder jouw akkoord uit."
+            },
+            {
+              "id": "link:appdossier",
+              "name": "App-dossier",
+              "kind": "link",
+              "route": "/apps/appstore-dossier.html",
+              "summary": "Het inkoopdossier: wat er over een app van derden bekend is, en wat wij er juist NIET over beweren.",
+              "actions": [
+                "Lees eerst wat de app nooit krijgt en waar uw gegevens blijven",
+                "Kijk bij elke bewering naar de bron ernaast; die wijst een bestand aan dat na te lezen is",
+                "Sluit af met \"Wat dit dossier NIET zegt\" -- daar begint uw eigen onderzoek"
+              ],
+              "note": "Zonder app in het adres toont deze pagina het kanaaldossier: wat voor ELKE app van derden hier geldt, en welke machtigingen er met opzet niet bestaan. Die vraag hoeft u maar een keer te stellen."
+            },
+            {
+              "id": "link:huis",
+              "name": "Logeren bij leden",
+              "kind": "link",
+              "route": "/apps/thuis.html",
+              "summary": "RTG Thuis: logeren bij leden, wereldwijd -- met alle premium functies gratis.",
+              "actions": [
+                "Zoek een huis op plaats en datums; superhosts en toppers staan bovenaan",
+                "Boek met 0% servicekosten; bij keyless krijg je een deurcode voor self check-in",
+                "Zet je eigen huis live als host: kortingen, borg, co-hosts en gratis AI-prijsadvies"
+              ],
+              "note": "Bij elke boeking krijg je automatisch alle reisregels van het land mee -- visum, verkeer, alarmnummer en meer."
+            },
+            {
+              "id": "link:uitgaan",
+              "name": "Uitgaan",
+              "kind": "link",
+              "route": "/apps/uitgaan.html",
+              "summary": "Uitgaan: bars, clubs en beachclubs met hun avonden en gastenlijsten.",
+              "actions": [
+                "Bekijk de avonden per adres",
+                "Zet jezelf op de gastenlijst",
+                "Laat je entreecode zien aan de deur"
+              ],
+              "note": "Je leeftijdslaag bepaalt wat je ziet; dat is voor je eigen veiligheid en die van de zaak."
+            },
+            {
+              "id": "link:foodcourt",
+              "name": "Food Court",
+              "kind": "link",
+              "route": "/apps/foodcourt.html",
+              "summary": "De Food Court: alle restaurants op een rij, reserveren in een paar tikken.",
+              "actions": [
+                "Kies een restaurant en bekijk de tijdsloten",
+                "Reserveer; de zaak beslist en je krijgt bericht",
+                "Bekijk keuken, prijs en ledenvoordeel per zaak"
+              ],
+              "note": "Reserveer ruim vooruit voor de populaire avonden; annuleren kan altijd netjes in de app."
+            },
+            {
+              "id": "link:spelavond",
+              "name": "Game Night",
+              "kind": "link",
+              "route": "/apps/spelscherm.html",
+              "summary": "Het gedeelde spelscherm: een lopend potje op de televisie, voor iedereen in de kamer.",
+              "actions": [
+                "Open een potje in de app en kies \"Op het grote scherm\"",
+                "Typ de code hier over",
+                "Iedereen speelt gewoon op zijn eigen telefoon"
+              ],
+              "note": "Dit scherm kijkt alleen mee: het heeft geen inlog en toont nooit iemands eigen kaarten of letters."
+            },
+            {
+              "id": "link:tweedescherm",
+              "name": "Tweede scherm",
+              "kind": "link",
+              "route": "/apps/scherm.html",
+              "summary": "Tweede scherm: spiegel je werkplek of maak er een extra werkplek van.",
+              "actions": [
+                "Koppel met de code op je hoofdscherm",
+                "Kies spiegelen of een eigen werkplek",
+                "Ontkoppel met één tik"
+              ],
+              "note": "Een tweede scherm naast de kassa scheelt loopwerk: orders links, afrekenen rechts."
+            }
+          ]
         },
         {
-          "name": "Uw leven",
-          "count": 7
+          "name": "Standen in de ledenapp",
+          "count": 5,
+          "apps": [
+            {
+              "id": "tab:betalen",
+              "name": "Betalen",
+              "kind": "tab",
+              "route": "/apps/app.html",
+              "summary": "Betalen is een vaste stand binnen de RTG ledenapp. U blijft in dezelfde omgeving terwijl deze stand opent.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies de stand Betalen",
+                "Ga daar verder met uw eigen gegevens"
+              ],
+              "note": "Een stand is geen losse openbare app. De ledenapp bewaakt welke persoonlijke inhoud u kunt zien."
+            },
+            {
+              "id": "tab:assets",
+              "name": "Assets",
+              "kind": "tab",
+              "route": "/apps/app.html",
+              "summary": "Assets is een vaste stand binnen de RTG ledenapp. U blijft in dezelfde omgeving terwijl deze stand opent.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies de stand Assets",
+                "Ga daar verder met uw eigen gegevens"
+              ],
+              "note": "Een stand is geen losse openbare app. De ledenapp bewaakt welke persoonlijke inhoud u kunt zien."
+            },
+            {
+              "id": "tab:salon",
+              "name": "Salon",
+              "kind": "tab",
+              "route": "/apps/app.html",
+              "summary": "Salon is een vaste stand binnen de RTG ledenapp. U blijft in dezelfde omgeving terwijl deze stand opent.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies de stand Salon",
+                "Ga daar verder met uw eigen gegevens"
+              ],
+              "note": "Een stand is geen losse openbare app. De ledenapp bewaakt welke persoonlijke inhoud u kunt zien."
+            },
+            {
+              "id": "tab:bestellen",
+              "name": "Bestellen",
+              "kind": "tab",
+              "route": "/apps/app.html",
+              "summary": "Bestellen is een vaste stand binnen de RTG ledenapp. U blijft in dezelfde omgeving terwijl deze stand opent.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies de stand Bestellen",
+                "Ga daar verder met uw eigen gegevens"
+              ],
+              "note": "Een stand is geen losse openbare app. De ledenapp bewaakt welke persoonlijke inhoud u kunt zien."
+            },
+            {
+              "id": "tab:gezin",
+              "name": "Gezin",
+              "kind": "tab",
+              "route": "/apps/app.html",
+              "summary": "Gezin is een vaste stand binnen de RTG ledenapp. U blijft in dezelfde omgeving terwijl deze stand opent.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies de stand Gezin",
+                "Ga daar verder met uw eigen gegevens"
+              ],
+              "note": "Een stand is geen losse openbare app. De ledenapp bewaakt welke persoonlijke inhoud u kunt zien."
+            }
+          ]
+        },
+        {
+          "name": "Kiezers in de ledenapp",
+          "count": 4,
+          "apps": [
+            {
+              "id": "os:rtf",
+              "name": "RTFoundation",
+              "kind": "os",
+              "route": "/apps/app.html",
+              "summary": "RTFoundation is een kiezer binnen de RTG ledenapp. Vanuit deze ingang kiest u de omgeving die bij uw situatie past.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies RTFoundation",
+                "Selecteer daarna een beschikbare omgeving"
+              ],
+              "note": "Een kiezer heeft geen los openbaar adres. Welke omgeving beschikbaar is, wordt in de ledenapp bepaald."
+            },
+            {
+              "id": "os:snaps",
+              "name": "Snaps",
+              "kind": "os",
+              "route": "/apps/app.html",
+              "summary": "Snaps is een kiezer binnen de RTG ledenapp. Vanuit deze ingang kiest u de omgeving die bij uw situatie past.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies Snaps",
+                "Selecteer daarna een beschikbare omgeving"
+              ],
+              "note": "Een kiezer heeft geen los openbaar adres. Welke omgeving beschikbaar is, wordt in de ledenapp bepaald."
+            },
+            {
+              "id": "os:bellen",
+              "name": "Bellen",
+              "kind": "os",
+              "route": "/apps/app.html",
+              "summary": "Bellen is een kiezer binnen de RTG ledenapp. Vanuit deze ingang kiest u de omgeving die bij uw situatie past.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies Bellen",
+                "Selecteer daarna een beschikbare omgeving"
+              ],
+              "note": "Een kiezer heeft geen los openbaar adres. Welke omgeving beschikbaar is, wordt in de ledenapp bepaald."
+            },
+            {
+              "id": "os:videobellen",
+              "name": "Videobellen",
+              "kind": "os",
+              "route": "/apps/app.html",
+              "summary": "Videobellen is een kiezer binnen de RTG ledenapp. Vanuit deze ingang kiest u de omgeving die bij uw situatie past.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies Videobellen",
+                "Selecteer daarna een beschikbare omgeving"
+              ],
+              "note": "Een kiezer heeft geen los openbaar adres. Welke omgeving beschikbaar is, wordt in de ledenapp bepaald."
+            }
+          ]
         }
       ],
       "tools": [
@@ -128,20 +913,215 @@
       "homeRoute": "/apps/reizen.html",
       "workspaceRoute": "/apps/werkruimte.html?gebied=reizen",
       "action": "Open reisdetail",
-      "groupCount": 3,
-      "featureCount": 14,
+      "groupCount": 2,
+      "featureCount": 15,
       "groups": [
         {
-          "name": "Plannen",
-          "count": 6
+          "name": "Appschermen",
+          "count": 13,
+          "apps": [
+            {
+              "id": "link:reizen",
+              "name": "Reizen & Veilig",
+              "kind": "link",
+              "route": "/apps/reizen-veilig.html",
+              "summary": "Reizen en Veilig: plannen, vervoer, aankomst en vrijwillige veiligheidsdeling in één reiswerkruimte.",
+              "actions": [
+                "Plan vervoer op tijd, prijs en uitstoot",
+                "Open uw samengestelde reizen naast de live reisdag",
+                "Kies per moment wie uw plan, voortgang of tijdelijke locatie mag zien"
+              ],
+              "note": "Locatie delen staat standaard uit, stopt automatisch en kan ieder moment handmatig worden beëindigd."
+            },
+            {
+              "id": "link:vluchten",
+              "name": "Vluchten",
+              "kind": "link",
+              "route": "/apps/vluchten.html",
+              "summary": "RTG Vluchten: je vluchten en de private aviation van partners.",
+              "actions": [
+                "Bekijk vluchten en beschikbaarheid",
+                "Vraag een boeking aan; de partner bevestigt",
+                "Volg je reis in de app"
+              ],
+              "note": "Boekingen zijn pas definitief na bevestiging; de app zegt dat ook eerlijk."
+            },
+            {
+              "id": "link:ov",
+              "name": "Openbaar vervoer",
+              "kind": "link",
+              "route": "/apps/ov.html",
+              "summary": "RTG Vervoer: een rit boeken, het OV en de bedrijfspendel in één app met live GPS.",
+              "actions": [
+                "Boek een rit naar een RTG-zaak, halte of favoriete plek",
+                "Check in op bus, trein, metro of veerboot",
+                "Reserveer je plek in de pendel van je werkgever"
+              ],
+              "note": "De prijs staat vast zodra je aanvraagt; wat je daarna ziet is dezelfde prijs."
+            },
+            {
+              "id": "link:navigatie",
+              "name": "Navigatie",
+              "kind": "link",
+              "route": "/apps/navigatie.html",
+              "summary": "RTG Navigatie: het huiseigen navigatiesysteem in 3D, met alles wat wij kunnen.",
+              "actions": [
+                "Zoek een zaak, halte, loket of laadpaal en rijd erheen",
+                "Kies auto, EV, fiets, lopen of OV; de ETA past mee",
+                "Zet lagen aan (tank, laad, Flits) en meld zelf een wegprobleem"
+              ],
+              "note": "De kaart is helemaal van ons: geen Google, geen externe tegels. Sleep om rond te kijken, knijp om te zoomen."
+            },
+            {
+              "id": "link:move",
+              "name": "Haal ik het?",
+              "kind": "link",
+              "route": "/apps/move.html",
+              "summary": "RTG Move: niet waar u heen gaat maar of u het HAALT - per overgang in uw reis een oordeel, met de dekking erbij.",
+              "actions": [
+                "Zie per overgang hoeveel tijd u hebt en hoeveel u nodig hebt",
+                "De dekking zegt over welk deel van uw reis Move iets kon zeggen; de rest is niet onbekend maar ongemeten",
+                "Ga verder brengt u naar de volgende plek in Navigatie; Move verzet zelf niets"
+              ],
+              "note": "Een krappe overgang is geen fout maar een waarschuwing: een reservering verzetten raakt een tweede persoon, dus dat blijft mensenwerk."
+            },
+            {
+              "id": "link:flits",
+              "name": "Verkeer",
+              "kind": "link",
+              "route": "/apps/flits.html",
+              "summary": "RTG Flits: het rustige rijscherm met meldingen van de community.",
+              "actions": [
+                "Zie flitsers, files en ongevallen op je route",
+                "Meld zelf met één tik of met je stem",
+                "De landregels bepalen wat getoond mag worden"
+              ],
+              "note": "Handen aan het stuur: alles kan met spraak, en de app houdt zelf zijn mond op het juiste moment."
+            },
+            {
+              "id": "link:stad",
+              "name": "Stad",
+              "kind": "link",
+              "route": "/apps/stad.html",
+              "summary": "Mijn Stad: het burgerloket van jouw stad binnen RTG.",
+              "actions": [
+                "Bekijk wat er in je stad speelt",
+                "Regel je stadszaken digitaal",
+                "Meld iets aan de gemeente"
+              ],
+              "note": "Een goede melding heeft een foto en een plek; dan kan de buitendienst er direct mee aan de slag."
+            },
+            {
+              "id": "link:reisboek",
+              "name": "Reisboek",
+              "kind": "link",
+              "route": "/apps/reisboek.html",
+              "summary": "Reisboek: uw prive-reisdossier -- per reis een draaiboek in plaats van losse bevestigingen.",
+              "actions": [
+                "Zet per reis de heen- en terugreis en de tussenstops",
+                "Leg de verblijven en het dag-tot-dag-programma vast",
+                "Bewaar de reisdocumenten met hun geldigheid"
+              ],
+              "note": "Het overzicht seint welke documenten binnenkort verlopen. Dat is het enige waar u vlak voor vertrek niets meer aan kunt doen."
+            },
+            {
+              "id": "link:hangar",
+              "name": "Hangar",
+              "kind": "link",
+              "route": "/apps/hangar.html",
+              "summary": "Hangar: uw privevliegtuigen en charters, met vlieguren en de laatst bekende positie.",
+              "actions": [
+                "Zet een toestel erbij met type, registratie, thuishaven en stoelen",
+                "Boek de vluchten met vlieguren en bemanning",
+                "Zie per toestel de eerstvolgende vlucht en de totale vlieguren"
+              ],
+              "note": "De positie is de aankomst van de recentste vlucht, anders de thuishaven. Geen live tracking, en dat zegt de app er ook bij."
+            },
+            {
+              "id": "link:residentie",
+              "name": "Verblijven",
+              "kind": "link",
+              "route": "/apps/residentie.html",
+              "summary": "De Residence: het virtuele grandhotel van RTG om elkaar te leren kennen -- voor je echt op date gaat.",
+              "actions": [
+                "Speel samen: midgetgolf, darts, kegelen of baantjes zwemmen; in het restaurant stelt het huis vragen",
+                "Praat met de zaal via de balk onderin, of stuur een schittering of hartje",
+                "Je suite is een compleet penthouse (bed, douche, keuken, telefoon); nodig iemand uit via de huistelefoon"
+              ],
+              "note": "Alles is inbegrepen bij de pas en iedereen heet er bij zijn codenaam: gezellig zonder scores, streaks of winkeltjes."
+            },
+            {
+              "id": "link:aankomst",
+              "name": "Aankomst",
+              "kind": "link",
+              "route": "/apps/arrival.html",
+              "summary": "Invisible Arrival: een tijdelijke gastpas waarmee een zaak uw komst kan voorbereiden zonder uw route of GPS te volgen.",
+              "actions": [
+                "Vertel Rahul het moment, gezelschap en alleen de wensen die voor dit bezoek nodig zijn",
+                "Controleer het voorstel voordat u de aanvraag verstuurt",
+                "Deel vrijwillig onderweg, in de buurt of gearriveerd; stop delen wanneer u wilt"
+              ],
+              "note": "De tijdelijke pas is het toegangsbewijs en verloopt na het bezoek. Deel hem dus niet met anderen."
+            },
+            {
+              "id": "link:routedossier",
+              "name": "Routedossier",
+              "kind": "link",
+              "route": "/apps/routedossier.html",
+              "summary": "Het routedossier: wat we van elke route werkelijk weten, over elf schakels.",
+              "actions": [
+                "Lees per schakel hoeveel routes bewezen zijn en hoeveel ongemeten",
+                "Klik een schakel aan om alleen de routes te zien waar die schakel op staat",
+                "Open een route voor zijn volledige dossier, met per schakel de bron en de reden"
+              ],
+              "note": "Ongemeten betekent niet onveilig: het betekent dat niemand het heeft nagevraagd. Twee schakels staan voor elke route op ongemeten omdat er nog geen instrument voor bestaat, en dat zegt het scherm er zelf bij."
+            },
+            {
+              "id": "link:ovroutes",
+              "name": "OV-routes",
+              "kind": "link",
+              "route": "/apps/ovroutes.html",
+              "summary": "De OV-routetekenaar: lijnen en haltes op de kaart zetten.",
+              "actions": [
+                "Teken een lijn met haltes",
+                "Zet tijden en frequenties",
+                "Publiceer naar de reisapp"
+              ],
+              "note": "Teken eerst de haltes, dan de lijn; dat werkt sneller en preciezer."
+            }
+          ]
         },
         {
-          "name": "Onderweg",
-          "count": 5
-        },
-        {
-          "name": "Private travel",
-          "count": 3
+          "name": "Standen in de ledenapp",
+          "count": 2,
+          "apps": [
+            {
+              "id": "tab:reizen",
+              "name": "Reizen",
+              "kind": "tab",
+              "route": "/apps/app.html",
+              "summary": "Reizen is een vaste stand binnen de RTG ledenapp. U blijft in dezelfde omgeving terwijl deze stand opent.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies de stand Reizen",
+                "Ga daar verder met uw eigen gegevens"
+              ],
+              "note": "Een stand is geen losse openbare app. De ledenapp bewaakt welke persoonlijke inhoud u kunt zien."
+            },
+            {
+              "id": "tab:terplaatse",
+              "name": "Ter plaatse",
+              "kind": "tab",
+              "route": "/apps/app.html",
+              "summary": "Ter plaatse is een vaste stand binnen de RTG ledenapp. U blijft in dezelfde omgeving terwijl deze stand opent.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies de stand Ter plaatse",
+                "Ga daar verder met uw eigen gegevens"
+              ],
+              "note": "Een stand is geen losse openbare app. De ledenapp bewaakt welke persoonlijke inhoud u kunt zien."
+            }
+          ]
         }
       ],
       "tools": [
@@ -199,24 +1179,243 @@
       "homeRoute": "/apps/kantoor.html",
       "workspaceRoute": "/apps/werkruimte.html?gebied=kantoor",
       "action": "Open werkbank",
-      "groupCount": 4,
+      "groupCount": 2,
       "featureCount": 17,
       "groups": [
         {
-          "name": "Dag & team",
-          "count": 5
+          "name": "Appschermen",
+          "count": 16,
+          "apps": [
+            {
+              "id": "link:werkos",
+              "name": "RTG Werk OS",
+              "kind": "link",
+              "route": "/apps/werk.html",
+              "summary": "RTG Werk OS: de werkplek van een hele organisatie -- projecten, kennis, klanten, service, bouw, IT, contracten en besluiten.",
+              "actions": [
+                "Ga naar binnen met de werkruimtecode en uw eigen lid-token; dat is bewust iets anders dan uw RTG-pas",
+                "Lees uw startscherm: het volgt uw rollen, en wat geen bron heeft staat er als NIET GEMETEN in plaats van als nul",
+                "Kies een module en zie de lijst plus wat aandacht vraagt; koppel eenmalig uw RTG-account voor agenda, postvak en kluis"
+              ],
+              "note": "Wat u niet mag zien, staat er niet als lege doos; en wat nergens wordt gemeten, staat er met de reden erbij."
+            },
+            {
+              "id": "link:rtgone",
+              "name": "RTG One",
+              "kind": "link",
+              "route": "/apps/rtgone.html",
+              "summary": "RTG One: de gezamenlijke command room voor personeel van RTG en RTF, met werkstromen, besluiten en governance in een gecontroleerde omgeving.",
+              "actions": [
+                "Bekijk wat vandaag aandacht vraagt",
+                "Maak vanuit RTMAIL een werkstroom met eigenaar, bewijs en deadline",
+                "Leg besluiten via de juiste vier-ogenroute vast en volg iedere actie in het auditlog"
+              ],
+              "note": "Wissel bewust tussen het RTG-huis, het RTF-huis en de gedeelde ruimte; gegevens en rechten blijven per huis afgeschermd."
+            },
+            {
+              "id": "link:decisionroom",
+              "name": "Decision Room",
+              "kind": "link",
+              "route": "/apps/decision-room.html",
+              "summary": "De Decision Room brengt alleen echte, onderbouwde voorstellen naar de mensen die bevoegd zijn om te beslissen.",
+              "actions": [
+                "Open een voorstel uit de besluitagenda",
+                "Bekijk bedoeling, geld, risico, alternatief en gekoppelde bronnen",
+                "Leg uw keuze met reden en eventuele voorwaarde vast"
+              ],
+              "note": "Rahul mag ordenen en voorbereiden, maar nooit bevestigen; bij hoge impact blijft de vier-ogenroute verplicht."
+            },
+            {
+              "id": "link:projectroom",
+              "name": "Project Room",
+              "kind": "link",
+              "route": "/apps/project-room.html",
+              "summary": "De Project Room maakt van een goedgekeurd besluit een rustige uitvoeringsroute met één eigenaar, gekoppelde bronnen en bewijs van resultaat.",
+              "actions": [
+                "Rond steeds de eerstvolgende uitvoerbare stap af",
+                "Lees in het dossier waarom het project bestaat en waar iedere bron woont",
+                "Leg bewijs vast en laat de projecteigenaar het aantoonbare resultaat opleveren"
+              ],
+              "note": "Een afgevinkte takenlijst is nog geen resultaat: menselijke oplevering blijft geblokkeerd totdat alle taken klaar zijn en echt bewijs is vastgelegd."
+            },
+            {
+              "id": "link:rtmail",
+              "name": "RTMail",
+              "kind": "link",
+              "route": "/apps/rtmail.html",
+              "summary": "RTG Mail: je eigen postvak binnen RTG, op je codenaam. Post lezen en schrijven, opbergen, zoeken en gesprekken volgen.",
+              "actions": [
+                "Wissel van map met de balk bovenaan: postvak in, archief, prullenbak en verzonden -- opbergen is een MAP, je post is nooit weg omdat je op een knop drukte",
+                "Zoek in je eigen postvak; berg op, geef een ster of laat een bericht sluimeren tot morgen",
+                "Open het gesprek om vraag en antwoord onder elkaar te zien, en vraag Rahul om een samenvatting: elke regel wijst terug naar het bericht waar hij vandaan komt",
+                "Je vindt RTG Mail ook als kanaal in de Berichten-app, tussen je andere gesprekken",
+                "RTG Mail bezorgt en bewaart; geld en toegang regel je altijd zelf in de bron-app"
+              ],
+              "note": "Alles op codenaam: je echte naam blijft in de kluis, ook in je post. Links en bijlagen van niet-geverifieerde afzenders blijven geblokkeerd."
+            },
+            {
+              "id": "link:magnaat",
+              "name": "Magnaat",
+              "kind": "link",
+              "route": "/apps/magnaat.html",
+              "summary": "Magnaat Wereld: oefen met echte RTG-werkprocessen in een volledig synthetische ondernemerswereld.",
+              "actions": [
+                "Kies een functie of servicedossier",
+                "Werk via de afgeschermde computer en PDA",
+                "Reken gevolgen veilig door in de economische cockpit"
+              ],
+              "note": "Geen spelhandeling raakt productiegegevens, echte betalingen of klantcommunicatie."
+            },
+            {
+              "id": "link:office",
+              "name": "RTDocs",
+              "kind": "link",
+              "route": "/apps/office.html",
+              "summary": "RTDocs: de juiste versie, context en beoordeling bij elkaar.",
+              "actions": [
+                "Zie welk document nu nodig is en waarom",
+                "Open inhoud, historie en betrokkenen als één dossier",
+                "Vraag menselijke beoordeling aan zodra het dossier klaar is"
+              ],
+              "note": "Alles wordt vanzelf bewaard; RTDocs toont wat compleet is, maar laat besluiten altijd aan een mens."
+            },
+            {
+              "id": "link:onderneming",
+              "name": "Onderneming",
+              "kind": "link",
+              "route": "/apps/onderneming.html",
+              "summary": "Mijn onderneming: van \"ik denk erover na\" tot een draaiend bedrijf, in een scherm.",
+              "actions": [
+                "Begin met een werktitel; er hoeft nog niets te kloppen",
+                "Vul je prijs, kostprijs en vaste lasten in: we rekenen twaalf maanden vooruit in drie scenario's",
+                "Lees de stress test, die je plan met opzet probeert te breken, en leg daarna je ondernemingsplan vast"
+              ],
+              "note": "Wat je ziet hangt af van waar je staat: een idee krijgt geen debiteurenbeheer, en waar niets te meten valt staat er geen cijfer."
+            },
+            {
+              "id": "link:loonstrook",
+              "name": "Loon",
+              "kind": "link",
+              "route": "/apps/loonstrook.html",
+              "summary": "Mijn loon: je loonstroken van alle bedrijven waar je werkt, in gewone taal.",
+              "actions": [
+                "Zie per periode wat er bruto binnenkwam en wat er afging",
+                "Lees waarom het bedrag zo uitkwam, stap voor stap",
+                "Kijk wie je identiteitsgegevens opvroeg, en waarom"
+              ],
+              "note": "Alleen afgeronde loonruns komen hier; een proefberekening van je werkgever is nog geen loonstrook."
+            },
+            {
+              "id": "link:school",
+              "name": "School",
+              "kind": "link",
+              "route": "/apps/rtgschool.html",
+              "summary": "RTG School: je leerpaspoort dat een leven lang meegaat, met lessen, oefenen, examentraining en je eigen Rahul Bijles.",
+              "actions": [
+                "Schrijf je in op je fase van de officiele ladder; je paspoort telt elk behaald leerdoel mee",
+                "Kies een groep of fase, lees de les en oefen vijf opgaven; bij vier goed wordt het doel bijgeschreven",
+                "Train voor een examen (terugblik pas aan het eind) of vraag het niveau-advies; Rahul Bijles legt alles geduldig uit op jouw niveau"
+              ],
+              "note": "Alles hier is oefening en advies: over overgaan, toelating en echte examens beslissen mensen en de officiele instellingen. Geen scores buiten de sessie, geen ranglijsten; leren is geen wedstrijd."
+            },
+            {
+              "id": "link:browser",
+              "name": "Web",
+              "kind": "link",
+              "route": "/apps/browser.html",
+              "summary": "De RTG-browser: blader door het besloten web van het huis en bezoek de sites die leden hebben gebouwd.",
+              "actions": [
+                "Typ een adres in de balk (bijv. jouwzaak.rtg) of kies een site op RTG Start",
+                "Ga terug en vooruit zoals in een echte browser",
+                "Elke site buigt mee met je vensterbreedte: telefoon, tablet of desktop"
+              ],
+              "note": "Een eigen web binnen RTG: geen extern internet, alles op codenaam en tussen leden."
+            },
+            {
+              "id": "link:sitemaker",
+              "name": "Website",
+              "kind": "link",
+              "route": "/apps/sitemaker.html",
+              "summary": "De Website-maker: begin een eigen bedrijf en bouw met de muis je eigen website, klaar om online te gaan.",
+              "actions": [
+                "Bouw je site uit blokken: klik en typ, kies beeld, accentkleur en licht of donker",
+                "Stel de telefoon-, tablet- en desktopversie apart in",
+                "Klik op Ga online: je site krijgt een RTG-adres (naam.rtg) en staat in de RTG-browser"
+              ],
+              "note": "Voor beginnende ondernemers: van leeg doek tot online bedrijf, alles binnen het huis en op codenaam."
+            },
+            {
+              "id": "link:horeca",
+              "name": "Horeca",
+              "kind": "link",
+              "route": "/apps/horeca.html",
+              "summary": "RTG Horeca: de zaal en de keuken op een scherm.",
+              "actions": [
+                "Open een rekening op een tafel en zet de bestelling erop, met de allergie in een eigen veld",
+                "Geef een gang vrij; pas dan verschijnt hij op het keukenscherm, met de gewenste serveertijd",
+                "Bovenaan staat wat gasten vragen, met de minuten erbij: eerst \"Ik ga\", daarna \"Gedaan\""
+              ],
+              "note": "De keuken begint pas als de zaal een gang vrijgeeft: zo bepaalt de zaal het tempo van het diner en de keuken dat van de bereiding."
+            },
+            {
+              "id": "link:partnernetwerk",
+              "name": "Partner Network",
+              "kind": "link",
+              "route": "/apps/partner-network.html",
+              "summary": "Symbiotic Partner Network: bedrijven werken rond één gastbelofte samen zonder hun hele dossiers te delen.",
+              "actions": [
+                "Open het gezamenlijke servicecontract",
+                "Vergelijk capaciteit, kwaliteit, marge en privacy per partner",
+                "Kies een herstelroute wanneer een deelnemer de belofte niet kan dragen"
+              ],
+              "note": "Iedere partner ontvangt alleen wat nodig is voor zijn eigen deel; de gezamenlijke uitkomst blijft controleerbaar."
+            },
+            {
+              "id": "link:vertegenwoordiging",
+              "name": "Mijn team",
+              "kind": "link",
+              "route": "/apps/vertegenwoordiging.html",
+              "summary": "Mijn team: wie mag wat namens u, sinds wanneer, tot wanneer, en wat er namens u is gedaan.",
+              "actions": [
+                "Bekijk voor elke machtiging wat er opengaat - en even groot wat er met zekerheid niet opengaat",
+                "Zet uw eigen grens: deze bevoegdheden geeft u aan niemand, ook niet aan wie u al gemachtigd heeft",
+                "Trek een machtiging op elk moment in, per direct en zonder reden"
+              ],
+              "note": "Een machtiging versmalt wat u zelf al mocht; zij voegt er nooit iets aan toe. Aanvaarden doet u altijd zelf, en wat er namens u gebeurde blijft in uw spoor staan ook nadat u intrekt - intrekken stopt de toekomst en niet het verleden."
+            },
+            {
+              "id": "link:loopbaan",
+              "name": "Mijn loopbaan",
+              "kind": "link",
+              "route": "/apps/loopbaan.html",
+              "summary": "Mijn loopbaan: wat er gebeurde, wanneer, en wie dat heeft bevestigd - chronologisch en per regel.",
+              "actions": [
+                "Schrijf op wat er gebeurd is; het staat er als door u opgegeven tot iemand anders het bevestigt",
+                "Zie per bevestiging wat zij WEL vaststelt en wat zij niet zegt - RTG valideert de prestatie zelf nooit",
+                "Deel EEN regel met een code die verloopt, zodat een club of sponsor iets kan nakijken zonder uw loopbaan te zien"
+              ],
+              "note": "Er staat hier geen cijfer, geen niveau en geen vergelijking met iemand anders; de zeven voorraden hebben met opzet geen totaal. Intrekken haalt niets weg - de regel blijft staan met uw reden erbij, want een loopbaan die je kunt poetsen is geen bewijs."
+            }
+          ]
         },
         {
-          "name": "Maken & delen",
-          "count": 5
-        },
-        {
-          "name": "Ondernemen",
-          "count": 5
-        },
-        {
-          "name": "Regie",
-          "count": 2
+          "name": "Kiezers in de ledenapp",
+          "count": 1,
+          "apps": [
+            {
+              "id": "os:werk",
+              "name": "Werk",
+              "kind": "os",
+              "route": "/apps/app.html",
+              "summary": "Werk is een kiezer binnen de RTG ledenapp. Vanuit deze ingang kiest u de omgeving die bij uw situatie past.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies Werk",
+                "Selecteer daarna een beschikbare omgeving"
+              ],
+              "note": "Een kiezer heeft geen los openbaar adres. Welke omgeving beschikbaar is, wordt in de ledenapp bepaald."
+            }
+          ]
         }
       ],
       "tools": [
@@ -274,32 +1473,177 @@
       "homeRoute": "/apps/foundation/index.html",
       "workspaceRoute": "/apps/werkruimte.html?gebied=foundation",
       "action": "Ga verder",
-      "groupCount": 6,
-      "featureCount": 62,
+      "groupCount": 2,
+      "featureCount": 12,
       "groups": [
         {
-          "name": "Start & leren",
-          "count": 14
+          "name": "Appschermen",
+          "count": 11,
+          "apps": [
+            {
+              "id": "link:rtfbuurt",
+              "name": "RTFoundation in jouw buurt",
+              "kind": "link",
+              "route": "/apps/foundation/os-publiek.html",
+              "summary": "RTFoundation in jouw buurt: wat er loopt, waar je binnen kunt lopen en hoe je meedoet.",
+              "actions": [
+                "Kies je stad en zie welke projecten er draaien",
+                "Bekijk de activiteiten die openstaan, met datum, plek en of er nog plek is",
+                "Lees hoe je meedoet als vrijwilliger of als ondernemer"
+              ],
+              "note": "Er staat met opzet geen enkel getal over hulpvragen op deze pagina: in een kleine buurt is zo'n getal geen statistiek maar een aanwijzing. De maat is: wat zou je op een poster in het buurthuis hangen?"
+            },
+            {
+              "id": "link:foundationzorg",
+              "name": "Zorg",
+              "kind": "link",
+              "route": "/apps/foundation/zorg.html",
+              "summary": "Hulp & Zorg in FoundationOS: echte zorgmomenten, een rustige hulpwijzer en uw begeleider op een plek.",
+              "actions": [
+                "Bekijk wat er voor u of uw gezin aankomt",
+                "Vind zonder nieuw dossier een passende eerste stap bij uw vraag",
+                "Controleer welke medische intake u tijdelijk met een aanbieder deelt"
+              ],
+              "note": "De app verzint geen begeleider of voortgang. Alleen gegevens uit uw Foundation-profiel en RTG Care verschijnen; delen blijft uw keuze."
+            },
+            {
+              "id": "link:rtfportaal",
+              "name": "RTFoundation portaal",
+              "kind": "link",
+              "route": "/apps/foundation/os-portaal.html",
+              "summary": "Het portaal voor partnerstichtingen, gemeenten en lokale ondernemers: uw eigen dossier, op uw eigen code.",
+              "actions": [
+                "Vul de code in die u van het RTF-kantoor kreeg (RTFP voor een stichting, RTFG voor een gemeente, RTFO voor een bedrijf)",
+                "Een stichting ziet de samenwerkingsafspraken en de eigen projecten; een gemeente uitsluitend getelde cijfers; een ondernemer waar zijn bijdrage terechtkwam",
+                "De code blijft in dit tabblad en wordt nergens bewaard -- op een gedeelde computer sluit u hem weg door het tabblad te sluiten"
+              ],
+              "note": "Een gemeente krijgt hier nooit een dossier of een naam te zien, en buurten met minder dan vijf hulpvragen worden samengevoegd: een klein getal in een kleine buurt is geen statistiek meer."
+            },
+            {
+              "id": "link:connect",
+              "name": "Ontdekken",
+              "kind": "link",
+              "route": "/apps/connect.html",
+              "summary": "Ontdekken: nieuwsgierigheid als ingang, en je gaat weg met iets wat je hebt geleerd, gedaan of doorgegeven.",
+              "actions": [
+                "Zeg waar je nieuwsgierig naar bent; een enkel onderwerp is genoeg om te beginnen",
+                "Volg een vraag die je van je eigen onderwerp naar iets nieuws brengt",
+                "Verzet je horizon: van vertrouwd naar ontdekken, en terug",
+                "Kijk onderaan wat je hebt gezien, begrepen, geoefend, gemaakt of doorgegeven"
+              ],
+              "note": "Er zijn geen likes, geen volgers, geen reeksen en geen niveau. Wat je hebt gedaan staat er als lijst per onderwerp en nooit als cijfer, en het wordt met niemand vergeleken -- ook niet verborgen als sorteervolgorde. Wat je bekeek maar niet aanraakte, hoe lang je keek en wanneer je keek, wordt niet vastgelegd; wat je ziet komt van wat je zelf hebt aangegeven. De lijst houdt op: twaalf per keer, en dan is het genoeg. Delen en samenwerken hebben hier nog geen knop, want die bereiken een tweede mens en dat wordt in dit huis klaargezet en nooit automatisch verstuurd."
+            },
+            {
+              "id": "link:rtfbord",
+              "name": "Het bord",
+              "kind": "link",
+              "route": "/apps/foundation/bord.html",
+              "summary": "Het bord: jullie gezinsbord met briefjes en plannen.",
+              "actions": [
+                "Hang er een briefje op",
+                "Schuif kaartjes naar klaar",
+                "Kijk wat de anderen erop zetten"
+              ],
+              "note": "Een briefje op het bord is nooit zeuren; zo weet iedereen het gewoon."
+            },
+            {
+              "id": "link:rtfschrift",
+              "name": "Het schrift",
+              "kind": "link",
+              "route": "/apps/foundation/schrift.html",
+              "summary": "Het schrift: live meeschrijven met de les.",
+              "actions": [
+                "Doe mee met wat de juf of meester deelt",
+                "Schrijf je eigen aantekeningen",
+                "Alles wordt vanzelf bewaard"
+              ],
+              "note": "In je eigen woorden opschrijven werkt beter dan overtypen; dan snapt je hoofd het echt."
+            },
+            {
+              "id": "link:klimaat",
+              "name": "Klimaatfonds",
+              "kind": "link",
+              "route": "/apps/foundation/klimaatfonds.html",
+              "summary": "Het klimaatvenster op het Living Lab: wat bewoners willen weten over duurzaamheid in hun buurt, en wat daarvan onderzocht wordt.",
+              "actions": [
+                "Kies je stad; je ziet de labs die open zijn",
+                "Lees de vragen die bewoners aandroegen en steun er een -- een stem draagt een naam of alias, zodat er per persoon een telt",
+                "Zet je eigen vraag erbij; met draagvlak kan er een onderzoek van komen, en dan blijft zichtbaar waar hij vandaan kwam"
+              ],
+              "note": "Dit is een venster en geen tweede lab: klimaat is de soort \"duurzaam\" in het Living Lab van de stichting, en alles wat je hier doet gebeurt daar. Het geld staat er ook niet -- dat staat in het labfonds, want twee boekhoudingen naast elkaar lopen uiteen."
+            },
+            {
+              "id": "link:buurtruil",
+              "name": "Buurtruil",
+              "kind": "link",
+              "route": "/apps/foundation/buurtruil.html",
+              "summary": "Spullen die je weggeeft of zoekt, binnen je eigen RTF-stad. Zonder geld en zonder prijs.",
+              "actions": [
+                "Kies je stad en zet erbij wat je weggeeft of zoekt -- je naam staat er niet bij, je codenaam wel",
+                "Zie je iets? Laat belangstelling weten; de eigenaar ziet dat en bepaalt zelf wat hij ermee doet",
+                "Klopt er iets niet, meld het dan: bij twee meldingen van verschillende leden verdwijnt het uit de lijst"
+              ],
+              "note": "Er wordt niets namens jou verstuurd: belangstelling is een vinkje dat de eigenaar ophaalt, geen bericht dat vertrekt. En er staat nergens een bedrag -- zodra dat er komt is het een marktplaats, met btw- en retourregels die deze laag niet draagt."
+            },
+            {
+              "id": "link:kwesties",
+              "name": "Wat speelt er",
+              "kind": "link",
+              "route": "/apps/foundation/kwesties.html",
+              "summary": "Iets in je straat, buurt of stad dat beter moet? Breng het in en je krijgt altijd een uitkomst terug, met de reden erbij.",
+              "actions": [
+                "Schrijf op wat er speelt, zoals je het tegen een buur zou zeggen, en zet erbij waar het speelt",
+                "Volg in je lijst hoe het ermee staat; zolang er niets is besloten kun je hem intrekken",
+                "Is er besloten, klap de kwestie open: je leest de uitkomst, de reden en wie besliste"
+              ],
+              "note": "Je naam staat er niet bij: wie je kwestie behandelt, ziet alleen de kwestie. Een uitkomst verandert niet meer; komt er iets nieuws, dan wordt hij heropend en begint een nieuwe ronde."
+            },
+            {
+              "id": "link:geven",
+              "name": "Geven",
+              "kind": "link",
+              "route": "/apps/foundation/geven.html",
+              "summary": "Geven aan de RTFoundation: je ziet eerst wat er gebeurt, en pas daarna bevestig je.",
+              "actions": [
+                "Kies een bedrag en wat voor gift het is (eenmalig, voor een project, of periodiek)",
+                "Zeg of er iets tegenover staat -- dan is het sponsoring en geen gift, en dat verandert wat je terugkrijgt",
+                "Bekijk wat er gebeurt en bevestig pas daarna; er gaat pas geld als je op die tweede knop drukt"
+              ],
+              "note": "Het bedrag gaat van je RTG Pay-wallet naar de wallet van de stichting, en die betaalt zichzelf daarvandaan uit naar haar eigen bankrekening. De transactiekosten komen van de ontvanger af, dus er komt iets minder binnen dan je geeft -- dat staat er vooraf bij."
+            },
+            {
+              "id": "link:vrienden",
+              "name": "Vrienden",
+              "kind": "link",
+              "route": "/apps/foundation/vrienden.html",
+              "summary": "Contacten: je vrienden, snaps en verhalen, veilig geregeld.",
+              "actions": [
+                "Stuur snaps en bekijk verhalen",
+                "Nieuwe vrienden keurt een grote goed",
+                "Blokkeer of meld wat niet oké is"
+              ],
+              "note": "Echte vrienden vragen nooit om geheimen voor je ouders; dat is een rood vlaggetje."
+            }
+          ]
         },
         {
-          "name": "Klein beginnen",
-          "count": 7
-        },
-        {
-          "name": "Spelen & samen",
-          "count": 7
-        },
-        {
-          "name": "Gezin & dag",
-          "count": 8
-        },
-        {
-          "name": "Zelfstandig leven",
-          "count": 13
-        },
-        {
-          "name": "Vooruit & hulp",
-          "count": 13
+          "name": "Standen in de ledenapp",
+          "count": 1,
+          "apps": [
+            {
+              "id": "tab:zorg",
+              "name": "Zorgaanbod",
+              "kind": "tab",
+              "route": "/apps/app.html",
+              "summary": "Zorgaanbod is een vaste stand binnen de RTG ledenapp. U blijft in dezelfde omgeving terwijl deze stand opent.",
+              "actions": [
+                "Open uw RTG ledenapp",
+                "Kies de stand Zorgaanbod",
+                "Ga daar verder met uw eigen gegevens"
+              ],
+              "note": "Een stand is geen losse openbare app. De ledenapp bewaakt welke persoonlijke inhoud u kunt zien."
+            }
+          ]
         }
       ],
       "tools": [

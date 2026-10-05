@@ -46,6 +46,10 @@ function nepServer(port, nr, stand, spoor) {
     const pad = req.url.split('?')[0];
     let status = 404;
     let lijf = '';
+    if (pad === '/api/health' && stand.healthEens) {   // een eenmalig trage, mislukte controle
+      const h = stand.healthEens; stand.healthEens = null;
+      return setTimeout(() => { res.writeHead(h.status); res.end(); }, h.ms);
+    }
     if (pad === '/api/health') {
       /* Een echte server is BEZIG tijdens zijn promote (laden, migreren en de
          backup zijn synchroon) en antwoordt dan niet gezond. */
@@ -277,5 +281,46 @@ test('12. failback: een terugkeerder die "onzeker" blijft, geldt als actief (de 
     await w.hartslag();
     assert.deepEqual(leiders(stand), [1], 'de oude is niet teruggezet naast een mogelijke nieuwe leider');
     assert.equal(w.actieve(), 0);
+  } finally { w.stop(); await sluit(); }
+});
+
+test('13. een failback begint niet terwijl een kiesActieve van de proxy al loopt', { timeout: 30000 }, async () => {
+  /* De reproductie S11 van de herkeuring van ronde 4: zonder `!switching` in de
+     failbackvoorwaarde lopen een overname en een wissel tegelijk. */
+  const basis = await tweePoorten(3);
+  const spoor = [];
+  const stand = [{ gezond: false, promote: 200, demote: 200 }, { gezond: false, promote: 200, demote: 200 },
+    { gezond: true, promote: 200, demote: 200 }];
+  const nep = await Promise.all(stand.map((st, i) => nepServer(basis + i, i + 1, st, spoor)));
+  const w = maakWacht({ AANTAL: 3, BASISPOORT: basis, SLEUTEL: 'toets', FAILBACK_MS: 0, PROMOTE_MS: 4000, log: () => {} });
+  w.servers.forEach((s, i) => { s.child = nepKind(i + 1, spoor, true); });
+  let max = 0;
+  const meet = setInterval(() => { max = Math.max(max, leiders(stand).length); }, 5);
+  try {
+    await w.hartslag();
+    assert.equal(w.actieve(), 2);
+    stand[0].gezond = true; stand[1].gezond = true;
+    stand[0].healthEens = { ms: 400, status: 503 };   // de eerste controle van server 1 faalt traag
+    stand[0].vertraging = 1000;                        // en zijn promote duurt een seconde
+    w.servers[2].healthy = false; w.servers[2].rol = 'uit';             // zoals trio-proxy.js doet
+    const k = w.kiesActieve('server 3 liet een verzoek vallen');
+    await new Promise((r) => setTimeout(r, 50));
+    await Promise.all([k, w.hartslag()]);
+    await new Promise((r) => setTimeout(r, 1500));
+    assert.ok(max <= 1, 'nooit twee leiders tegelijk: ' + spoor.join(', '));
+  } finally { clearInterval(meet); w.stop(); await Promise.all(nep.map((s) => new Promise((r) => s.close(r)))); }
+});
+
+test('14. de poortwachter stuurt geen verkeer naar een actieve die zegt geen leider te zijn', { timeout: 20000 }, async () => {
+  /* N2 van ronde 4: tussen de gezondheidscontrole en de herpromotie van een
+     herstarte actieve liet wachtOpActieve verzoeken door naar een stand-by, en
+     die antwoordt 200 zonder te bewaren. */
+  const { w, stand, sluit } = await failback(0);
+  try {
+    stand[0].gezond = false;
+    w.servers[1].meldtLeider = false;                 // de hartslag las net "stand-by"
+    assert.equal(await w.wachtOpActieve(300), -1, 'geen doel zolang de actieve geen leider is');
+    w.servers[1].meldtLeider = true;
+    assert.equal(await w.wachtOpActieve(300), 1);
   } finally { w.stop(); await sluit(); }
 });

@@ -49,7 +49,7 @@ async function leesStand(apiCall, port) {
 function maakAfzetten({ servers, spreiding, log }) {
   function weg(kind) { return kind.exitCode !== null || kind.signalCode !== null; }
   async function zetAf(idx) {
-    if (await spreiding.zetRol(idx, spreiding.naLeiderschap())) return true;
+    if (await spreiding.zetRol(idx, spreiding.naLeiderschap())) { servers[idx].meldtLeider = false; return true; }
     const s = servers[idx];
     if (!s || !s.child || weg(s.child)) return true;   // er draait niets meer dat kan schrijven
     const kind = s.child;
@@ -67,7 +67,7 @@ function maakAfzetten({ servers, spreiding, log }) {
   /* 'ja' is leider; 'nee' is aantoonbaar geen leider; 'onzeker' kon niet worden
      afgezet en geldt als leider tot de volgende ronde hem afzet. */
   async function promoveer(i) {
-    if (await spreiding.zetRol(i, 'leider')) return 'ja';
+    if (await spreiding.zetRol(i, 'leider')) { servers[i].meldtLeider = true; return 'ja'; }
     return (await zetAf(i)) ? 'nee' : 'onzeker';
   }
 

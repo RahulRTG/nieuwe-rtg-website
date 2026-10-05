@@ -72,7 +72,7 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log, PROMOTE_MS =
       req.end();
     });
   }
-  const stand = port => leesStand(apiCall, port);   // gezond, en of hij zegt leider te zijn
+  const stand = port => leesStand(apiCall, port);   // gezond, en zegt hij leider te zijn
   const isGezond = async port => (await stand(port)).gezond;
 
   /* ---------- wie is actief ---------- */
@@ -86,6 +86,7 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log, PROMOTE_MS =
           const s = servers[i];
           if (!s.child) continue;
           const st = await stand(s.port);
+          s.meldtLeider = st.leider;
           if (st.gezond) {
             if (i === activeIdx && st.leider !== false) return; // actieve leeft toch nog
             /* Eerst de oude leider zijn leiderschap afnemen, dan pas de nieuwe
@@ -143,9 +144,8 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log, PROMOTE_MS =
       // krijgt het werk terug ("tot die het weer doet")
       const beter = servers.findIndex(s => s.healthy && s.healthySince && Date.now() - s.healthySince >= FAILBACK_MS);
       if (beter >= 0 && beter < activeIdx && !switching) {
-        /* Vrijwillig, en zonder actieve tijdens de wissel (./trio-afzetten.js
-           wissel). Onder het slot van kiesActieve: anders ziet een kiesActieve
-           van de proxy de -1 en promoveert hij de oude terug. */
+        /* Zonder actieve tijdens de wissel, en onder het slot van kiesActieve
+           (./trio-afzetten.js wissel). */
         const oudIdx = activeIdx;
         activeIdx = -1;
         switching = wissel(oudIdx, beter)
@@ -163,7 +163,8 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log, PROMOTE_MS =
     return new Promise(resolve => {
       const t0 = Date.now();
       (function kijk() {
-        if (activeIdx >= 0 && servers[activeIdx].healthy) return resolve(activeIdx);
+        // ook een herstarte stand-by is gezond
+        if (activeIdx >= 0 && servers[activeIdx].healthy && servers[activeIdx].meldtLeider !== false) return resolve(activeIdx);
         if (Date.now() - t0 > maxMs || stopping) return resolve(-1);
         setTimeout(kijk, 200);
       })();

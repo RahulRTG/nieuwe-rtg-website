@@ -67,12 +67,11 @@ function tel(map, filter) {
   return n;
 }
 
-/* De domeinen uit de bron en niet uit een lijst hier: server/config/domeinen.js
-   is de ene plek waar staat welke domeinen een proces kan bedienen (de router
-   en de opslagkeuring lezen hem allebei). */
+/* De domeinen uit de bron en niet uit een lijst hier: opzet/routes.js is de
+   plek waar het besluit valt welke domeinen dit proces kan bedienen. */
 function domeinenUitBron() {
-  const m = /ALLE_DOMEINEN = Object\.freeze\(\[([^\]]*)\]\)/.exec(lees('server/config/domeinen.js'));
-  if (!m) throw new Error('ALLE_DOMEINEN niet gevonden in server/config/domeinen.js; de kaart zou dan gokken');
+  const m = /const ALLE_DOMEINEN = \[([^\]]*)\]/.exec(lees('server/opzet/routes.js'));
+  if (!m) throw new Error('ALLE_DOMEINEN niet gevonden in server/opzet/routes.js; de kaart zou dan gokken');
   return m[1].split(',').map(s => s.trim().replace(/^'|'$/g, '')).filter(Boolean);
 }
 

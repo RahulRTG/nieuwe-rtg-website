@@ -154,8 +154,8 @@ test('14. productie + SQLite + een opgesplitst RTG_DOMAINS weigert de start (C6)
 
 test('15. CONTRAST: een schrijvend proces op SQLite blijft een geldige productiestand (C6)', () => {
   assert.equal(opslagFout(config.valideer(SQLITE)), false, 'het bestaande besluit: een bak met sqlite mag');
-  assert.equal(opslagFout(config.valideer({ ...SQLITE, RTG_DOMAINS: require('../server/config/domeinen').ALLE_DOMEINEN.join(',') })), false,
-    'alle domeinen in een proces is een schrijver');
+  assert.equal(opslagFout(config.valideer({ ...SQLITE, RTG_DOMAINS: '' })), false,
+    'een lege RTG_DOMAINS is geen splitsing');
   assert.equal(opslagFout(config.valideer({ ...VEILIG, RTG_SPREIDING: '1' })), false, 'PostgreSQL met spreiding is de bedoelde stand');
 });
 
@@ -165,11 +165,8 @@ test('16. een OPENBAAR adres zonder NODE_ENV + SQLite + spreiding => hardeFouten
   assert.ok(r.hardeFouten.some(f => /Meerdere schrijvende processen op SQLite/.test(f)), JSON.stringify(r.hardeFouten));
 });
 
-test('17. de keuring en de router lezen dezelfde domeinlijst, en er is geen kopie (C6)', () => {
-  const lees = (f) => require('fs').readFileSync(require('path').join(__dirname, '..', f), 'utf8');
-  for (const f of ['server/opzet/routes.js', 'server/config/productie-opslag.js']) {
-    const bron = lees(f);
-    assert.match(bron, /require\('(\.\.\/config|\.)\/domeinen'\)/, f + ' hoort de domeinlijst uit server/config/domeinen.js te lezen');
-    assert.doesNotMatch(bron, /ALLE_DOMEINEN\s*=\s*\[/, f + ' draagt een eigen kopie van de lijst; die loopt bij het eerste nieuwe domein uiteen');
-  }
+test('17. een uitgeschreven volledige domeinlijst telt ook als splitsing, met de uitweg erbij (C6)', () => {
+  const r = config.valideer({ ...SQLITE, RTG_DOMAINS: 'auth,member,supplier,office,staff,social,techniek,zakelijk,wereld' });
+  assert.ok(opslagFout(r), 'de keuring houdt geen kopie van de domeinlijst bij, dus een gezette RTG_DOMAINS is een splitsing');
+  assert.ok([...r.fouten, ...r.hardeFouten].some(f => /DATABASE_URL/.test(f)), 'en de melding noemt de uitweg');
 });

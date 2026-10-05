@@ -48,13 +48,16 @@ function bestaatDbJson(env) {
 }
 
 /* Welke stand zet een tweede schrijver op dezelfde opslag? null als er een is.
-   De domeinlijst is dezelfde als die van de router (./domeinen.js). */
-const { ALLE_DOMEINEN } = require('./domeinen');
+   Een GEZETTE RTG_DOMAINS betekent een opgesplitst proces: zonder de variabele
+   bedient een proces alle domeinen (../opzet/routes.js), en wie hem zet doet dat
+   om de rest door een ander proces te laten doen. Ook de volledige lijst
+   uitschrijven telt hier mee -- een kopie van die lijst zou bij het eerste
+   nieuwe domein uiteenlopen, en een strengere keuring met een heldere uitweg
+   (haal de variabele weg) is beter dan een dubbele waarheid. */
 function meerdereSchrijvers(env) {
   if (env.RTG_SPREIDING === '1') return 'RTG_SPREIDING=1';
-  if (env.RTG_DOMAINS === undefined) return null;
-  const gekozen = new Set(String(env.RTG_DOMAINS).split(',').map(s => s.trim()).filter(s => s && s !== '-'));
-  return ALLE_DOMEINEN.every(d => gekozen.has(d)) ? null : 'RTG_DOMAINS=' + env.RTG_DOMAINS;
+  if (env.RTG_DOMAINS !== undefined && String(env.RTG_DOMAINS).trim() !== '') return 'RTG_DOMAINS=' + env.RTG_DOMAINS;
+  return null;
 }
 
 function keurOpslag(env, fouten, waarschuwingen) {

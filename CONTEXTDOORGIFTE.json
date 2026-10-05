@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-05T09:30:44.118Z",
-  "commit": "d3427db96",
+  "op": "2026-10-05T09:35:53.083Z",
+  "commit": "d0de7307e",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/contextdoorgifte.js",
@@ -19,7 +19,7 @@
   "i10AuthZonderContext": "omlaag"
  },
  "ratel": {
-  "i5StilNaSluiten": 4,
+  "i5StilNaSluiten": 0,
   "i9EnterWith": 0,
   "i1AandeelMetCorrelatie": 0,
   "i3CorrelatieOneens": 0,
@@ -29,14 +29,14 @@
  "gemeten": {
   "i5": {
    "perContext": {
-    "handeling": "stil",
-    "effectmeter": "stil",
-    "kosten/haak": "stil",
-    "ai-context": "stil",
+    "handeling": "weigert",
+    "effectmeter": "weigert",
+    "kosten/haak": "meldt",
+    "ai-context": "weigert",
     "verzoekcontext": "weigert",
     "bijeen": "weigert"
    },
-   "stilNaSluiten": 4,
+   "stilNaSluiten": 0,
    "contexten": 6
   },
   "i9": {
@@ -44,15 +44,15 @@
    "waar": []
   },
   "i1": {
-   "binnenVerzoek": 56,
+   "binnenVerzoek": 59,
    "metVerzoekCorrelatie": 0,
    "metActor": 0,
-   "metSessie": 43,
+   "metSessie": 45,
    "kanalen": {
-    "rtg:sessies:v1": 18,
+    "rtg:sessies:v1": 20,
     "sse": 33,
     "link-rem": 2,
-    "rtg:intrekking:v1": 3
+    "rtg:intrekking:v1": 4
    },
    "aandeelMetCorrelatie": 0
   },
@@ -64,7 +64,7 @@
   "i4": {
    "gezetInVerzoek": 19,
    "gevuurdNaAfloop": 19,
-   "naAfloopMetDrager": 10,
+   "naAfloopMetDrager": 11,
    "naAfloopMetAiSessie": 11,
    "plekken": {
     "plan (server/kern/journaalbestand.js:105)": 12,
@@ -89,17 +89,17 @@
    },
    "statussen": {
     "200": 786,
-    "400": 480,
+    "400": 479,
     "403": 722,
     "404": 951,
-    "409": 175,
+    "409": 176,
     "503": 61
    },
    "rollen": [
     "member",
     "supplier"
    ],
-   "sessieHernieuwd": 8
+   "sessieHernieuwd": 9
   }
  }
 }

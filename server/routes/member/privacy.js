@@ -11,8 +11,17 @@ module.exports = (kern) => {
   const { lidBoard, lidBoardLog, lidBoardLogKeten } = kern.lidboard;
   const { wisLid } = maakVergeten(kern);
 
+  /* Inzage en vergetelheid (AVG art. 15 en 17) gelden voor IEDER account, ook
+     een gratis account (tier 'guest' MET account). Hier stond `tier === 'guest'`,
+     en dat is twee mensen (SAMENLEVING.md par. 11.2): het weigerde naast de
+     bezoeker zonder account ook het gratis lid, dat zo zijn gegevens niet kon
+     inzien of wissen -- sinds 5 oktober 2026 ook niet het gezin met kinderen
+     dat aan zijn account hangt. Alleen de bezoeker zonder account blijft
+     buiten: die heeft niets om in te zien of te wissen. */
+  const zonderAccount = (req) => req.session.tier === 'guest' && !req.session.account;
+
   app.post('/api/privacy/export', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    if (zonderAccount(req)) return res.status(403).json({ error: 'Alleen voor wie een account heeft.' });
     const key = req.session.key;
     /* De gastgesprekken komen sinds de verhuizing uit de communicatiekern
        (kern/comm/gast.js) en niet meer rechtstreeks uit db.data.guestChats.
@@ -25,6 +34,7 @@ module.exports = (kern) => {
     const chats = commGast ? commGast.voorLid(key) : {};
     const likes = db.data.posts.filter(p => p.likedBy && p.likedBy[key]).map(p => ({ postId: p.id, author: p.author }));
     const state = stateFor(req.session, req.body.lang);
+    const eigenGezin = req.session.account ? kern.rtf.eigenGezin(req.session.account.id) : null;
     res.json({
       exportedAt: new Date().toISOString(),
       note: 'Alle gegevens die RTG over u bewaart, onder uw codenaam (pseudonimisering).',
@@ -38,6 +48,8 @@ module.exports = (kern) => {
       guestChats: chats,
       likedPosts: likes,
       notifications: db.data.notifications[key] || [],
+      // het gezin aan dit account (foundation/gezinseigenaar.js): profielen en codenamen
+      foundationGezin: eigenGezin && eigenGezin.gezin ? eigenGezin : null,
       /* Uw boardroom hoort in dit dossier. Die knoppen bepalen of uw locatie
          gedeeld wordt, of uw paspoort opvraagbaar is en of u vindbaar bent:
          dat is niet zomaar een voorkeur, dat is de instelling waarmee u uw
@@ -96,7 +108,7 @@ module.exports = (kern) => {
   /* Definitief verwijderen. Het beleid (welke takken weg, wat wordt
      geanonimiseerd, wat blijft met grond) woont in kern/vergeten.js. */
   app.post('/api/privacy/delete', auth, async (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    if (zonderAccount(req)) return res.status(403).json({ error: 'Alleen voor wie een account heeft.' });
     // await: sinds de bytes (mediastore, kluis) meegaan is dit ook I/O, en de
     // bevestiging hoort pas te komen als het echt gebeurd is
     await wisLid(req.session);

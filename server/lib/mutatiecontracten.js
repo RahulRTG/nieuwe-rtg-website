@@ -140,7 +140,6 @@ const CONTRACTEN = Object.assign({},
      loket zijn. Eigen bestand omdat het interessante in het VERSCHIL tussen die
      twee helften zit -- zie de kop. */
   require('./mutatiecontracten-tweedehand').CONTRACTEN,
-  // het teruggaverecht van een reis uitvoeren (passkey, vier ogen vanaf duizend euro)
   require('./mutatiecontracten-reisteruggave').CONTRACTEN,
   require('./mutatiecontracten-afstemming').CONTRACTEN,
   require('./mutatiecontracten-wonen').CONTRACTEN,

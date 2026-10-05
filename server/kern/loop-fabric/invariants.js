@@ -1,6 +1,7 @@
 'use strict';
 
 const P=require('./protocol');
+const constitution=require('./constitution');
 const forbiddenObservation=new Set(['text','title','sourceActorRef','actorRef','personId','email','name']);
 const forbiddenReceipt=new Set(['actorRef','authorityRef','operationId']);
 
@@ -16,6 +17,7 @@ function projection(state) {
   const receipts=new Set();
   for (const row of Object.values(state.changes || {})) {
     const receipt=row.receipt || {};
+    constitution.assertChangeReceipt(receipt);
     for (const key of Object.keys(receipt)) if (forbiddenReceipt.has(key))
       P.fail('FABRIC_DOMAIN_TRUTH','De Fabric-projectie bevat uitvoerings- of authorityinhoud uit het brondomein.',500);
     if (!receipt.receiptId || !receipt.sourceDomain || !receipt.observationRef || !receipt.decisionRef || !receipt.newRef)

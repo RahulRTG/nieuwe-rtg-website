@@ -187,6 +187,8 @@
     "loopfabric:decisions:controle": "node scripts/loop-fabric-decisions.js --controle",
     "loopfabric:unlock": "node scripts/loop-fabric-unlock.js",
     "loopfabric:unlock:controle": "node scripts/loop-fabric-unlock.js --controle",
+    "loopfabric:constitution": "node scripts/loop-fabric-constitution.js",
+    "loopfabric:constitution:controle": "node scripts/loop-fabric-constitution.js --controle",
     "inlinestijl": "node scripts/inlinestijl-ronde.js",
     "inlinestijl:toon": "node scripts/inlinestijl-ronde.js --toon",
     "deelindex": "node scripts/deelindex.js",

@@ -1,5 +1,6 @@
 'use strict';
 const P=require('./protocol');
+const constitution=require('./constitution');
 
 const MEMORY_CLASSES=Object.freeze(['PERSONAL','RELATIONSHIP_SHARED','ORGANIZATIONAL','DOMAIN_ASSET','COMMONS']);
 const EPISTEMIC_TYPES=Object.freeze(['HUMAN_STATED','SYSTEM_OBSERVED','AUTHORITY_DECIDED','SOURCE_VERIFIED',
@@ -8,7 +9,7 @@ const USES=Object.freeze(['decision','recall','cross-domain','ai','aggregate','p
 
 function issue(value) {
   P.fields(value,['schemaVersion','eligibilityId','sourceRef','purpose','memoryClass','audience','basis','allowedFields','uses',
-    'issuedAt','validUntil','retention','epistemicType','supersedes']);
+    'issuedAt','validUntil','retention','epistemicType','supersedes','aiScopes','promotionFrom','capabilityId']);
   const sourceRef=P.objectRef(value.sourceRef),purpose=P.text(value.purpose,120);
   if (!MEMORY_CLASSES.includes(value.memoryClass)) P.fail('ELIGIBILITY_INVALID','Onbekende memory class.');
   if (!EPISTEMIC_TYPES.includes(value.epistemicType)) P.fail('ELIGIBILITY_INVALID','Onbekende epistemische herkomst.');
@@ -24,11 +25,13 @@ function issue(value) {
   const retention=value.retention;
   if (!retention || typeof retention!=='object' || Array.isArray(retention)) P.fail('ELIGIBILITY_INVALID','Expliciete retentie ontbreekt.');
   P.fields(retention,['mode','policyId']);
-  const normalized={schemaVersion:1,sourceRef,purpose,memoryClass:value.memoryClass,audience,
+  const normalized={schemaVersion:1,constitutionVersion:constitution.VERSION,sourceRef,purpose,memoryClass:value.memoryClass,audience,
     basis:normalizedBasis,allowedFields,uses,issuedAt:P.instant(value.issuedAt,'issued_at'),
     validUntil:value.validUntil?P.instant(value.validUntil,'valid_until'):null,
     retention:{mode:P.text(retention.mode,80),policyId:P.text(retention.policyId,120)},
-    epistemicType:value.epistemicType,supersedes:value.supersedes?P.objectRef(value.supersedes):null};
+    epistemicType:value.epistemicType,supersedes:value.supersedes?P.objectRef(value.supersedes):null,
+    aiScopes:Array.isArray(value.aiScopes)?value.aiScopes:[],promotionFrom:value.promotionFrom?P.clone(value.promotionFrom):null,
+    capabilityId:value.capabilityId?P.text(value.capabilityId,120):null};
   if (normalized.validUntil && normalized.validUntil<=normalized.issuedAt)
     P.fail('ELIGIBILITY_INVALID','Learning eligibility is al verlopen.');
   if (normalized.memoryClass==='PERSONAL'&&(normalized.uses['cross-domain']||normalized.uses.aggregate||normalized.uses.publish))
@@ -37,6 +40,7 @@ function issue(value) {
     P.fail('COMMONS_RELEASE_REQUIRED','Commons Memory vereist een expliciete vrijgave.',403);
   if (normalized.uses.ai&&!['AI_EXPLICIT_SCOPE','EXPLICIT_CONSENT_FOR_AI'].includes(normalized.basis.type))
     P.fail('AI_SCOPE_REQUIRED','AI-gebruik vereist een afzonderlijke expliciete scope.',403);
+  normalized.aiScopes=constitution.validateEligibility(normalized);
   normalized.eligibilityId='le_'+P.hash(normalized).slice(0,30);return normalized;
 }
 
@@ -61,7 +65,8 @@ function minimal(value) {
   const e=value&&value.eligibilityId?value:issue(value);
   return {eligibilityId:e.eligibilityId,sourceRef:P.clone(e.sourceRef),purpose:e.purpose,memoryClass:e.memoryClass,
     audienceHash:P.hash(e.audience),allowedFieldsHash:P.hash(e.allowedFields),uses:P.clone(e.uses),issuedAt:e.issuedAt,
-    validUntil:e.validUntil,retention:P.clone(e.retention),epistemicType:e.epistemicType};
+    validUntil:e.validUntil,retention:P.clone(e.retention),epistemicType:e.epistemicType,
+    constitutionVersion:e.constitutionVersion||constitution.VERSION,aiScopes:P.clone(e.aiScopes||[]),capabilityId:e.capabilityId||null};
 }
 
 module.exports={MEMORY_CLASSES,EPISTEMIC_TYPES,USES,issue,evaluate,minimal};

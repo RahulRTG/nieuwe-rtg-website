@@ -140,10 +140,13 @@ process.on('unhandledRejection', reason => {
 // Een niet-afgevangen synchrone uitzondering laat de staat mogelijk half klaar
 // achter; we loggen hem mét stack en stoppen netjes, zodat de proces-manager
 // (Docker/systemd) ons herstart in plaats van door te draaien op kapotte staat.
+/* Vooraf geladen: een require IN de handler kan zelf falen (EMFILE) als de
+   crash juist door uitgeputte bestandsdescriptors komt. */
+const stopspoeling = require('./opzet/stopspoeling');
 process.on('uncaughtException', err => {
   log.uitzondering(err, { bron: 'uncaughtException', fataal: true });
   // dezelfde spoeling als SIGTERM, begrensd, altijd exitcode 1 (opzet/stopspoeling.js)
-  require('./opzet/stopspoeling').bijCrash({ save, flushBijAfsluiten, accounts });
+  stopspoeling.bijCrash({ save, flushBijAfsluiten, accounts, inBundel });
 });
 
 /* HET ADRES VAN DE LINK IN EEN E-MAIL KOMT NIET UIT HET VERZOEK.

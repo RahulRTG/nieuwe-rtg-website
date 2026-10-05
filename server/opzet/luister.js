@@ -6,6 +6,9 @@
    eigen TLS-certificaat via ACME, en de afsluiter op SIGTERM/SIGINT.
    ========================================================================== */
 'use strict';
+/* Vooraf geladen en niet in de signaalhandler: een require daar kan falen
+   (EMFILE), en dan valt de hele afsluitspoeling weg. */
+const { maakStopspoeling } = require('./stopspoeling');
 
 module.exports = function luister(deps) {
   const { app, log, db, accounts, save, webpush, kern, DATA_DIR, flushBijAfsluiten } = deps;
@@ -136,7 +139,7 @@ module.exports = function luister(deps) {
     console.log(`[stop] ${sig} ontvangen, data wordt bewaard...`);
     /* save(), journaal en vertaalkast, en daarna de write-behind: dezelfde lijst
        als de crashweg in ../server.js, uit ./stopspoeling.js. */
-    const spoel = require('./stopspoeling').maakStopspoeling({ save, flushBijAfsluiten, accounts });
+    const spoel = maakStopspoeling({ save, flushBijAfsluiten, accounts });
     spoel.spoelSynchroon();
     spoel.spoelAsynchroon().finally(() => {
       server.close(() => process.exit(0));

@@ -76,6 +76,7 @@ function handlerVan(bron, kop) {
 test('4. de crashweg in server.js geeft de crash door aan bijCrash (in code, niet in commentaar)', () => {
   const h = handlerVan(code('server/server.js'), "process.on('uncaughtException'");
   assert.match(h, /\.bijCrash\(/, 'de crashweg hoort de gedeelde stopspoeling te gebruiken');
+  assert.match(h, /bijCrash\(\{[^}]*\binBundel\b/, 'de crashweg hoort te weten of er een bundel open staat (toets 4g)');
   assert.doesNotMatch(h, /process\.exit\(\s*0\s*\)/, 'een crash mag nooit als nette afsluiting eindigen');
 });
 
@@ -107,6 +108,51 @@ test('4d. bijCrash eindigt nooit met 0 en zet zijn timers niet op unref', () => 
   const s = code('server/opzet/stopspoeling.js');
   assert.doesNotMatch(s, /exit\(\s*0\s*\)|stopMet\(\s*0\s*\)/);
   assert.doesNotMatch(s, /\.unref\(\)/, 'een unref\'d timer houdt het proces niet wakker');
+});
+
+test('4e. een crash MIDDEN IN een bundel flusht de opslag niet (anders ligt er een halve mutatie op schijf)', async () => {
+  const { bijCrash } = require('../server/opzet/stopspoeling');
+  for (const [naam, inBundel, verwachtFlush] of [
+    ['buiten een bundel', () => false, true],
+    ['binnen een bundel', () => true, false],
+    ['bundelvraag gooit', () => { throw new Error('kapot'); }, false]]) {
+    const geroepen = [];
+    const code = await new Promise((klaar) => bijCrash({ save: () => geroepen.push('save'),
+      flushBijAfsluiten: async () => { geroepen.push('db'); },
+      accounts: { flushBijAfsluiten: async () => { geroepen.push('accounts'); } },
+      inBundel, exit: klaar, graceMs: 2000 }));
+    assert.equal(code, 1, naam + ': altijd exitcode 1');
+    assert.ok(geroepen.includes('save'), naam + ': save() loopt altijd (binnen een bundel zet die alleen een vlag)');
+    assert.equal(geroepen.includes('db'), verwachtFlush, naam + ': write-behind ' + (verwachtFlush ? 'wel' : 'NIET') + ' flushen');
+    assert.equal(geroepen.includes('accounts'), verwachtFlush, naam + ': accounts ' + (verwachtFlush ? 'wel' : 'NIET') + ' flushen');
+  }
+});
+
+test('4f. de genadetermijn is begrensd en valt bij onzin terug op 5 s', () => {
+  const { genadeVan } = require('../server/opzet/stopspoeling');
+  assert.equal(genadeVan(1000), 1000);
+  assert.equal(genadeVan(50), 200, 'minstens 200 ms voor het log');
+  assert.equal(genadeVan(10 ** 12), 60000, 'een getal boven 2^31 zou de timer laten overlopen naar ~1 ms');
+  assert.equal(genadeVan('abc'), 5000, 'NaN zou beide timers meteen laten afgaan');
+  assert.equal(genadeVan(-5), 5000);
+});
+
+test('4g. ECHTE opslag: een crash midden in een geldbundel laat de bundel atomair', { timeout: 30000 }, () => {
+  const { spawnSync } = require('child_process');
+  const os = require('os');
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-crashbundel-'));
+  const env = { ...process.env, RTG_STORE: 'sqlite', RTG_DATA_DIR: map, NODE_ENV: 'test' };
+  delete env.DATABASE_URL; delete env.REDIS_URL;
+  const fixture = path.join(__dirname, 'fixtures', 'crashbundel.js');
+  const draai = (modus) => spawnSync(process.execPath, [fixture, modus], { env, encoding: 'utf8', timeout: 20000 });
+  try {
+    assert.equal(draai('zaai').status, 0, 'zaaien lukt');
+    const crash = draai('crash-in-bundel');
+    assert.equal(crash.status, 1, 'de crash eindigt met exitcode 1: ' + crash.stderr.slice(-300));
+    const lees = draai('lees');
+    assert.deepEqual(JSON.parse(lees.stdout), { X: 100, Y: 0 },
+      'op schijf hoort de bundel heel of helemaal niet te staan; {X:50,Y:0} is 50 die nergens aankomt');
+  } finally { try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {} }
 });
 
 test('5. de SIGTERM-weg gebruikt dezelfde spoeling', () => {

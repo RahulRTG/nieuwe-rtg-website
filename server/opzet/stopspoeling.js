@@ -44,10 +44,29 @@ function maakStopspoeling({ save, flushBijAfsluiten, accounts }) {
    zodat een write-behind die blijft hangen de herstart niet tegenhoudt. De
    timers staan NIET .unref(): een unref'd timer houdt het proces niet wakker, en
    was dit de laatste handle, dan viel het proces met exitcode 0 om. `exit` en
-   `graceMs` zijn er voor de toets; in productie is het process.exit. */
-function bijCrash({ save, flushBijAfsluiten, accounts, exit, graceMs }) {
+   `graceMs` zijn er voor de toets; in productie is het process.exit.
+
+   EEN CRASH MIDDEN IN EEN BUNDEL BLIJFT ATOMAIR. De handler draait in de
+   context van de callback die gooide, dus ook binnen een open bijeen()-bundel
+   (../db/bijeen.js). Daar staat de eerste helft van een mutatie al in het
+   geheugen (X afgeschreven) en de tweede nog niet (Y nog niet bijgeschreven).
+   save() weet dat en zet daar alleen een vlag; de write-behind-flush weet het
+   niet en zou de halve bundel vastleggen. Dan gaat er geld weg dat nergens
+   aankomt. Is er een bundel open, dan spoelen we daarom alleen de append-only
+   journalen en NIET de opslag: liever het laatste venster kwijt dan een halve
+   geldmutatie op schijf (RTG-V1-RELEASE D1, gevonden door de herkeuring). */
+const GRENS_STANDAARD = 5000, GRENS_MAX = 60000;
+function genadeVan(graceMs) {
+  const g = Number(graceMs !== undefined ? graceMs : process.env.RTG_CRASH_GRACE_MS);
+  return Number.isFinite(g) && g > 0 ? Math.min(Math.max(200, g), GRENS_MAX) : GRENS_STANDAARD;
+}
+function bijCrash({ save, flushBijAfsluiten, accounts, inBundel, exit, graceMs }) {
   const stopMet = exit || ((code) => process.exit(code));
-  const grens = Math.max(200, Number(graceMs || process.env.RTG_CRASH_GRACE_MS || 5000));
+  const grens = genadeVan(graceMs);
+  /* Kan de vraag niet beantwoord worden, dan gaan we uit van WEL een bundel:
+     een overgeslagen flush kost een venster, een halve flush kost geld. */
+  let halverwege = false;
+  try { halverwege = typeof inBundel === 'function' && inBundel() === true; } catch (e) { halverwege = true; }
   let spoel = null;
   try { spoel = maakStopspoeling({ save, flushBijAfsluiten, accounts }); spoel.spoelSynchroon(); }
   catch (e) { try { save(); } catch (x) {} }
@@ -55,8 +74,8 @@ function bijCrash({ save, flushBijAfsluiten, accounts, exit, graceMs }) {
   let klaar = false;
   const einde = () => { if (!klaar) { klaar = true; stopMet(1); } };
   const stop = () => setTimeout(einde, Math.max(0, klaarNa - Date.now()));
-  if (spoel) spoel.spoelAsynchroon().finally(stop); else stop();
+  if (spoel && !halverwege) spoel.spoelAsynchroon().finally(stop); else stop();
   setTimeout(einde, grens);
 }
 
-module.exports = { maakStopspoeling, bijCrash };
+module.exports = { maakStopspoeling, bijCrash, genadeVan };

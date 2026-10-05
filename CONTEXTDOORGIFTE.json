@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-05T09:35:53.083Z",
-  "commit": "d0de7307e",
+  "op": "2026-10-05T09:39:18.071Z",
+  "commit": "df9163df2",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/contextdoorgifte.js",
@@ -24,7 +24,7 @@
   "i1AandeelMetCorrelatie": 0,
   "i3CorrelatieOneens": 0,
   "i10AuthZonderContext": 0,
-  "i4LekPlekken": 4
+  "i4LekPlekken": 0
  },
  "gemeten": {
   "i5": {
@@ -44,13 +44,13 @@
    "waar": []
   },
   "i1": {
-   "binnenVerzoek": 59,
+   "binnenVerzoek": 60,
    "metVerzoekCorrelatie": 0,
    "metActor": 0,
-   "metSessie": 45,
+   "metSessie": 46,
    "kanalen": {
     "rtg:sessies:v1": 20,
-    "sse": 33,
+    "sse": 34,
     "link-rem": 2,
     "rtg:intrekking:v1": 4
    },
@@ -62,17 +62,12 @@
    "oneens": 0
   },
   "i4": {
-   "gezetInVerzoek": 19,
-   "gevuurdNaAfloop": 19,
-   "naAfloopMetDrager": 11,
-   "naAfloopMetAiSessie": 11,
-   "plekken": {
-    "plan (server/kern/journaalbestand.js:105)": 12,
-    "planSpoel (server/kern/kosten/meter.js:136)": 4,
-    "planSpoel (server/kern/kantoor/mensdeur-spoel.js:74)": 2,
-    "plan (server/kern/beleidsmotor/slapend.js:54)": 1
-   },
-   "lekPlekken": 4
+   "gezetInVerzoek": 0,
+   "gevuurdNaAfloop": 0,
+   "naAfloopMetDrager": 0,
+   "naAfloopMetAiSessie": 0,
+   "plekken": {},
+   "lekPlekken": 0
   },
   "i10": {
    "authPunten": 3103,
@@ -88,10 +83,10 @@
     "POST": 3175
    },
    "statussen": {
-    "200": 786,
+    "200": 787,
     "400": 479,
     "403": 722,
-    "404": 951,
+    "404": 950,
     "409": 176,
     "503": 61
    },

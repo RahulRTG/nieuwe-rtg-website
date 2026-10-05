@@ -22,7 +22,7 @@ test('Vandaag herhalen: dagstapel, fout komt vandaag terug, en daarna eerlijk le
     const g = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Fam Herhaal', naam: 'Mam', pin: '1234' });
     const k = await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token,
       naam: 'Isa', rol: 'kind', groep: 'tiener', geboortedatum: '2011-05-14' });
-    const kindToken = (await post('/api/foundation/gezin/profiel/kies', { code: g.code, profielId: k.profiel.id })).token;
+    const kindToken = (await post('/api/foundation/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: k.profiel.id })).token;
     await post('/api/rtf/leren/lijst-maak', { code: g.code, token: kindToken, naam: 'Frans H3',
       paren: [{ v: 'de hond', a: 'le chien' }, { v: 'de kat', a: 'le chat' }] });
     const GOED = { 'de hond': 'le chien', 'de kat': 'le chat' };

@@ -57,11 +57,11 @@ test.before(async () => {
   const kind = await post('/api/foundation/gezin/profiel/maak', { code, token: ouderTok, naam: 'Kind', rol: 'kind', groep: 'po' });
   kindNaam = kind.body.profiel.codenaam;
   assert.ok(kindNaam, 'het kind heeft een codenaam');
-  kindTok = (await post('/api/foundation/gezin/profiel/kies', { code, profielId: kind.body.profiel.id })).body.token;
+  kindTok = (await post('/api/foundation/gezin/profiel/kies', { gezinscode: g.body.gezinscode, profielId: kind.body.profiel.id })).body.token;
   assert.ok(kindTok, 'en een profieltoken');
 
   const gast = await post('/api/foundation/gezin/profiel/maak', { code, token: ouderTok, naam: 'Oppas', rol: 'gast' });
-  gastTok = (await post('/api/foundation/gezin/profiel/kies', { code, profielId: gast.body.profiel.id })).body.token;
+  gastTok = (await post('/api/foundation/gezin/profiel/kies', { gezinscode: g.body.gezinscode, profielId: gast.body.profiel.id })).body.token;
   assert.ok(gastTok, 'de oppas kan gewoon inloggen -- en hoort hier tóch niets te mogen');
 });
 test.after(() => stop(srv && srv.child));

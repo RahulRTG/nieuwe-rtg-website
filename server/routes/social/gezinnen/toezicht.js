@@ -5,13 +5,17 @@ module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
   const { app, auth, geenGast, rtf, connectieTussen, verbActief, sseToCustomer, sseClients, sseSend, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder } = kern;
   const { lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardLog } = kern.lidboard;
-/* Live-kanaal voor de RTF-vriendenlaag: net als /api/stream, maar op gezin-token.
+/* Live-kanaal voor de RTF-vriendenlaag: net als /api/stream, maar op de gezinssessie.
    De verbinding staat in dezelfde sseClients-lijst, met de handle als sleutel, zodat
    dm-, snap-, verzoek- en belsignalen de RTF-app net zo bereiken als de RTG-app.
-   EventSource kan geen header sturen, dus code en token gaan als query-parameter. */
-app.get('/api/rtf/social/stream', (req, res) => {
-  const sess = rtf.verifieerProfiel(req.query.code, req.query.token);
-  if (!sess || sess.gast) return res.status(401).end();
+   EventSource kan geen header sturen; daarom opent hij met een EENMALIG stroomticket
+   van een minuut (B18, foundation/gezinsstroom.js) en nooit met de sessie in de URL.
+   Elke hartslag kijkt of de sessie achter het ticket nog leeft. */
+app.get('/api/rtf/social/stream', async (req, res) => {
+  const s = await rtf.gezinsstroom.open(req.query.code, req.query.ticket, 'sociaal');
+  if (!s.ok) return res.status(s.status === 503 ? 503 : 401).end();
+  if (s.p.rol === 'gast' || !s.handle) return res.status(401).end();
+  const sess = { handle: s.handle };
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', Connection: 'keep-alive' });
   res.write('retry: 3000\n\n');
   const client = { tier: 'rtf', key: sess.handle, res };
@@ -20,8 +24,9 @@ app.get('/api/rtf/social/stream', (req, res) => {
   const sinds = Number(req.headers['last-event-id'] || req.query.since || 0);
   if (sinds) speelOpnieuw(res, sess.handle, sinds);
   sseSend(res, 'hello', {});
-  const ping = setInterval(() => res.write(': ping\n\n'), 25000);
-  req.on('close', () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); });
+  const stop = () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); };
+  const ping = setInterval(() => { if (!s.leeft()) { stop(); return res.end(); } res.write(': ping\n\n'); }, 25000);
+  req.on('close', stop);
 });
 /* Belsignaal vanuit de RTF-app naar een vriend (RTF of RTG). Zelfde WebRTC-flow
    als bij de leden; de server is alleen het signaleringskanaal. */

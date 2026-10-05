@@ -40,10 +40,10 @@ async function gezin(naam) {
   const g = (await post('/api/foundation/gezin/maak', { gezinsnaam: naam, naam: 'Ouder ' + naam, pin: '1234' })).body;
   const kind = (await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token,
     naam: 'Tiener ' + naam, rol: 'gezinslid', groep: 'jong' })).body;
-  const kidToken = (await post('/api/foundation/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id })).body.token;
+  const kidToken = (await post('/api/foundation/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id })).body.token;
   const oppas = (await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token,
     naam: 'Oppas ' + naam, rol: 'gast' })).body;
-  const gastToken = (await post('/api/foundation/gezin/profiel/kies', { code: g.code, profielId: oppas.profiel.id })).body.token;
+  const gastToken = (await post('/api/foundation/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: oppas.profiel.id })).body.token;
   const conn = (await soc('/connections', { code: g.code, token: kidToken })).body;
   return { code: g.code, ouder: g.token, kid: kidToken, gast: gastToken, handle: conn.me, codenaam: conn.codename };
 }

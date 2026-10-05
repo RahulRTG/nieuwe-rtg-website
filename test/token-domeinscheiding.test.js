@@ -1,10 +1,10 @@
 /* ============================================================================
-   TOKEN-DOMEINSCHEIDING — regressie voor RTG-V1-RELEASE blocker 1.
+   TOKEN-DOMEINSCHEIDING -- regressie voor RTG-V1-RELEASE blocker 1.
 
    DE FOUT (bewezen in de audit): `verifyToken` onderscheidde een SESSIEtoken
    (body `id.exp.uitgegeven.sid`) niet van een ACTIEtoken (body
    `id.purpose.exp.nonce`). Beide tekenden met dezelfde sessiesleutel, en
-   `Number('inlog2') < Date.now()` is false — dus het 2FA-bewijs (en elk ander
+   `Number('inlog2') < Date.now()` is false -- dus het 2FA-bewijs (en elk ander
    actietoken: verify-email, mailwissel, sso-overdracht) werkte als volwaardige
    Bearer-sessie. Volledige 2FA-bypass + sessie uit een gelekte e-maillink.
 
@@ -46,7 +46,7 @@ async function versLid(suffix) {
 }
 
 /* ---------------------------------------------------------------------------
-   DEEL A — de sessieverifier (unit, zonder server).
+   DEEL A -- de sessieverifier (unit, zonder server).
    ------------------------------------------------------------------------- */
 
 test('A1. een geldig SESSIE-token wordt geaccepteerd', async () => {
@@ -138,7 +138,7 @@ test('A10. de 2FA-flow blijft werken: verifyActionToken(inlog2) geeft de gebruik
 });
 
 /* ---------------------------------------------------------------------------
-   DEEL B — end-to-end securitytest tegen een echte server.
+   DEEL B -- end-to-end securitytest tegen een echte server.
 
    password → 2FA-challenge (bewijs) → bewijs als Bearer op een ledenroute
    MOET 401 geven, nooit accounttoegang. En de echte tweede stap moet wel

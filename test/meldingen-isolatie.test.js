@@ -1,5 +1,5 @@
 /* ============================================================================
-   MELDINGEN-ISOLATIE — regressie voor RTG-V1-RELEASE blocker 2.
+   MELDINGEN-ISOLATIE -- regressie voor RTG-V1-RELEASE blocker 2.
 
    DE FOUT (bewezen in de audit): persoonlijke meldingen gingen via
    notify(customerTier,...) naar de GEDEELDE bak db.data.notifications[tier] en
@@ -31,7 +31,7 @@ const crypto = require('crypto');
 const { startServer, stop, postJson, kantoorAlsPersoon } = require('./helper');
 
 /* ---------------------------------------------------------------------------
-   DEEL A — de routering van meld/notify, geïsoleerd (geen server).
+   DEEL A -- de routering van meld/notify, geïsoleerd (geen server).
    ------------------------------------------------------------------------- */
 function maakMeldingen(DEMO) {
   const publishes = [];
@@ -88,7 +88,7 @@ test('A4. DEMO: een persona-sleutel (==pas) wordt persoonlijk bezorgd (demo heef
 });
 
 /* ---------------------------------------------------------------------------
-   DEEL B — end-to-end tegen een echte server: twee leden, dezelfde pas.
+   DEEL B -- end-to-end tegen een echte server: twee leden, dezelfde pas.
    A krijgt een persoonlijke conciërge-melding; B mag die niet kunnen LEZEN.
    (De realtime/SSE-isolatie is deterministisch bewezen in A1: een persoonlijke
    melding gaat als doel:'key' naar precies die sleutel, en sse.js levert zo'n

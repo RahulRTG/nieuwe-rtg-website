@@ -88,6 +88,14 @@ function demoAan(env) {
   return (env && env.RTG_MAGNAAT_TEST === '1') || (env && env.RTG_DEMO === '1');
 }
 
+/* Kort antwoord op "is dit adres aantoonbaar openbaar?" voor poorten die alleen
+   dat hoeven te weten (de inlogrem, de kantoordeur). Fail-safe: bij twijfel false
+   -- een aanroeper die dit als beveiligingssignaal leest, krijgt nooit per
+   ongeluk 'openbaar' door een storing. */
+function isOpenbaar(env) {
+  try { return installatieSoort(env || process.env).soort === 'openbaar'; } catch (e) { return false; }
+}
+
 /* De keuring zelf. Draait BUITEN de productietak van ../config.js -- dat is de
    hele bedoeling -- en schrijft in drie bakken:
 
@@ -166,4 +174,4 @@ function keurOpenbareBouwstand(env, bakken) {
   return stand;
 }
 
-module.exports = { adresSoort, installatieSoort, keurOpenbareBouwstand };
+module.exports = { adresSoort, installatieSoort, isOpenbaar, keurOpenbareBouwstand };

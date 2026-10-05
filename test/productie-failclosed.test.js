@@ -1,5 +1,5 @@
 /* ============================================================================
-   PRODUCTIE FAIL-CLOSED — regressie voor RTG-V1-RELEASE blocker 3.
+   PRODUCTIE FAIL-CLOSED -- regressie voor RTG-V1-RELEASE blocker 3.
 
    DE FOUT (bewezen in de audit): vrijwel alle productie-hardening hing aan
    NODE_ENV==='production'. Een publieke installatie met een openbaar APP_URL

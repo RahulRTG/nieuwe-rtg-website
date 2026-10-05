@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-05T03:09:36.459Z",
-  "commit": "ff3482c9",
-  "boomVuil": false,
-  "boomAnders": 3,
+  "op": "2026-10-05T13:15:53.387Z",
+  "commit": "544d54d2",
+  "boomVuil": true,
+  "boomAnders": 6,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v22.22.2"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -4200,7 +4200,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1412",
+   "bestand": "server/server.js:1426",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

@@ -62,7 +62,7 @@ function maakTransactie({ db, runbooks, register, journaal, gezondheid, zwaar })
     /* De twee zware rechten van een recept. Meer dan honderd objecten in een
        ronde vraagt massamutatie. Een menselijk akkoord telt alleen mét
        herstel-forceren; zonder telt het als afwezig, en zegt de weigering het
-       alleen als de routering er werkelijk om vroeg ('hand'). */
+       alleen als de routering er werkelijk om vroeg (NIVEAUS.hand). */
     const massa = !droog && zwaar && Number(o.max) > 100 ? zwaar(o.door, 'massamutatie') : null;
     if (massa) return Object.assign({ certificaat: cert }, massa);
     const geenRecht = !droog && zwaar && o.menselijkAkkoord ? zwaar(o.door, 'herstel-forceren') : null;
@@ -72,7 +72,7 @@ function maakTransactie({ db, runbooks, register, journaal, gezondheid, zwaar })
     }
 
     const r = runbooks.voer(String(id), Object.assign({}, o, { menselijkAkkoord: !!o.menselijkAkkoord && !geenRecht }));
-    if (r && r.error && geenRecht && r.oordeel && r.oordeel.niveau === 'hand') {
+    if (r && r.error && geenRecht && r.oordeel && r.oordeel.niveau === NIVEAUS.hand) {
       return Object.assign({ certificaat: cert, voorcontrole: voor, oordeel: r.oordeel }, geenRecht);
     }
     if (r && r.error) return Object.assign({ certificaat: cert, voorcontrole: voor }, r);

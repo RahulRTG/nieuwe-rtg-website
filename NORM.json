@@ -4021,6 +4021,15 @@
       "meter": "zelfpoortendeToetsen 46 -> 47",
       "reden": "test/gezinsdeur.pg.test.js (B18) vereist echte PostgreSQL- en Redis-diensten: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode en een rotatie op A tegen de oude code op B. Lokaal met die diensten gedraaid en groen; zonder het advisory lock en FOR UPDATE in server/pg/collectietransactie.js zakte hij 3 van 3. Hij staat in scripts/lib/pg-toetslijst.js en als uitzondering in deze norm.",
       "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL en Redis."
+    },
+    {
+      "datum": "2026-10-04",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 254,
+      "meter": "kernGedeeld 254 -> 255",
+      "reden": "`betaalWaarheid` wordt nu ook door het supplier-domein aangeraakt: de horecateruggave betaalt een online betaling terug langs dezelfde betaalwaarheid waarlangs hij binnenkwam (besluit van de eigenaar, 4 oktober 2026: de zaak voert uit, per wijze). Een tweede terugbetaalweg naast de betaalwaarheid zou het bedrag langs een andere route laten lopen dan de betaling zelf.",
+      "waarheen": "server/kern/horeca/teruggave.js, GRENZEN.json (supplier) en test/horeca-teruggave-online.test.js"
     }
   ],
   "prestatie": {

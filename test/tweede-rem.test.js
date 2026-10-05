@@ -225,3 +225,46 @@ test('6. een geslaagde code leegt de emmer (N4)', async () => {
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+test('7. een geslaagde code leegt de emmer van het ACCOUNT en niet die van het adres (herkeuring N4)', () => {
+  /* Leegde een geslaagde code ook de bronemmer, dan zette een aanvaller met een
+     eigen account met tweede factor de limiet van 50 per adres terug wanneer hij
+     wilde: zes slachtoffers keer negen gokken vanaf een adres gaven nul keer 429.
+     Een eenheidstoets, want de echte limiet (50) vraagt vijftig accounts. */
+  const { maakTweedeStapRem } = require('../server/kern/identiteit/tweedestap-rem');
+  const loginFails = new Map();
+  const noteFailedTry = (emmer) => loginFails.set(emmer, (loginFails.get(emmer) || 0) + 1);
+  const rem = maakTweedeStapRem({ tooManyTries: () => false, noteFailedTry, loginFails });
+  for (let i = 0; i < 9; i++) rem.mis('slachtoffer', '203.0.113.7');
+  rem.mis('aanvaller', '203.0.113.7');
+  rem.gelukt('aanvaller', '203.0.113.7');
+  assert.equal(loginFails.get('tweede:bron:203.0.113.7'), 10, 'de gokken vanaf dit adres blijven staan');
+  assert.equal(loginFails.has('tweede:doel:aanvaller'), false, 'het account van de geslaagde code begint opnieuw');
+  assert.equal(loginFails.get('tweede:doel:slachtoffer'), 9, 'en de andere accounts ook niet');
+});
+
+test('8. nieuwe herstelcodes delen de rem: tien foute codes op /codes, en ook de juiste geeft dan geen codes (N2)', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tweede-rem8-'));
+  const srv = await startServer({ env: { RTG_DATA_DIR: dir } });
+  const base = srv.base, post = postJson(base), email = 'tweede-rem8@voorbeeld.test';
+  let n = 0;
+  const codes = async (token, code) => {
+    const r = await fetch(base + '/api/mijn/tweefactor/codes', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token, 'X-Forwarded-For': '198.51.100.' + (++n) },
+      body: JSON.stringify({ huidig: 'geheim12', code }) });
+    return { status: r.status, body: await r.json().catch(() => ({})) };
+  };
+  try {
+    const { geheim, fout } = await lidMetFactor(base, post, email);
+    const login = await post('/api/auth/login', { login: email, password: 'geheim12', pasApp: 'rtg' });
+    const sessie = await post('/api/auth/tweede', { bewijs: login.bewijs, code: totpCode(geheim, Date.now() - 30000, 30) });
+    assert.ok(sessie.token, 'het lid logt in met de tweede factor');
+    for (let i = 1; i <= 10; i++) assert.equal((await codes(sessie.token, fout)).status, 403, 'poging ' + i);
+    const juist = await codes(sessie.token, totpCode(geheim, Date.now() + 30000, 30));
+    assert.equal(juist.status, 429, 'na tien foute codes zit /codes op slot, ook voor de juiste code (kreeg ' + juist.status + ')');
+    assert.equal(juist.body.codes, undefined, 'en er komen geen nieuwe herstelcodes uit');
+  } finally {
+    await stop(srv);
+    try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
+  }
+});

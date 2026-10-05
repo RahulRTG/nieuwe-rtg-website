@@ -10,6 +10,14 @@
    verzoek met een methode die iets kan veranderen een 503 met Retry-After;
    lezen en de clusterroutes blijven open.
 
+   WAT HIER ONDERSCHEIDT (herkeuring van N6): een verse stand-by gaf al 503,
+   omdat zijn opslag nog niet klaar is (opslagPoort in
+   server/middleware/remmen.js). Die eerste bewering zakt dus niet zonder de fix.
+   De toets leunt op de stand NA een afzetting, waar de opslag wel klaar is en
+   alleen deze poort weigert. Daar wordt ook de TEKST gelezen, en een
+   betaalwebhook geprobeerd: stond de poort pas na de lijfpoort, dan las de
+   webhook zijn lijf en antwoordde hij zelf.
+
    Draai los: node --test test/standbypoort.test.js
    ========================================================================== */
 const test = require('node:test');
@@ -49,7 +57,17 @@ test('een stand-by weigert schrijfverzoeken met 503, en schrijft weer zodra hij 
 
     const demote = await post('/api/cluster/demote', {}, { 'x-rtg-cluster': SLEUTEL });
     assert.equal(demote.status, 200);
-    assert.equal((await registreer(3)).status, 503, 'na de afzetting weigert hij weer');
+    const na = await registreer(3);
+    assert.equal(na.status, 503, 'na de afzetting weigert hij weer');
+    assert.match(na.body.error || '', /stand-by/, 'en het is deze poort die weigert, niet de opslagpoort: ' + na.body.error);
+    assert.equal(na.retry, '2');
+
+    /* De poort staat VOOR de betaalwebhooks: een webhook die een stand-by
+       bereikt, hoort opnieuw te proberen en niet door zijn eigen handler te
+       worden beantwoord. */
+    const webhook = await post('/api/betaal/webhook', { type: 'payment_intent.succeeded' }, { 'stripe-signature': 't=1,v1=00' });
+    assert.equal(webhook.status, 503, 'een betaalwebhook op een stand-by krijgt 503 (kreeg ' + webhook.status + ')');
+    assert.match(webhook.body.error || '', /stand-by/, 'van deze poort, voor de handler: ' + webhook.body.error);
   } finally {
     await stop(srv);
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}

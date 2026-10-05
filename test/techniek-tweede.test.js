@@ -113,3 +113,23 @@ test('5. de rem is gedeeld: tien foute codes hier sluiten ook de gewone tweede s
   const viaLid = await api('/api/auth/tweede', { bewijs: lid.body.bewijs, code: juisteCode() }, null, '198.51.100.98');
   assert.equal(viaLid.status, 429, 'dezelfde accountemmer');
 });
+
+test('6. het recht wordt in de tweede stap opnieuw gelezen: ingetrokken tussen stap een en twee is dicht', async () => {
+  /* Het bewijs leeft vijf minuten. De herkeuring liet de hercontrole weg en geen
+     toets zakte; met deze wel. Een eigen account, want de eigenaar zit na toets 5
+     op slot. */
+  const email = 'techniek-tweede6@voorbeeld.test';
+  const reg = await api('/api/auth/register', { name: 'Tech Zes', email, password: 'geheim12', geboortedatum: '1990-01-01' });
+  assert.ok(reg.body.token, 'registratie: ' + JSON.stringify(reg.body).slice(0, 160));
+  const verleen = await api('/api/techniek/toegang', { email }, ownerToken);
+  assert.equal(verleen.status, 200, 'de eigenaar verleent toegang: ' + JSON.stringify(verleen.body).slice(0, 160));
+  const begin = await api('/api/mijn/tweefactor/begin', { huidig: 'geheim12' }, reg.body.token);
+  await api('/api/mijn/tweefactor/bevestig', { code: totpCode(begin.body.geheim, Date.now(), 30) }, reg.body.token);
+  const stap1 = await api('/api/techniek/inloggen', { login: email, wachtwoord: 'geheim12' });
+  assert.ok(stap1.body.bewijs, 'met recht en tweede factor komt er een bewijs: ' + JSON.stringify(stap1.body).slice(0, 160));
+  const intrek = await api('/api/techniek/toegang', { email, actie: 'intrek' }, ownerToken);
+  assert.equal(intrek.status, 200, 'de eigenaar trekt het recht in: ' + JSON.stringify(intrek.body).slice(0, 160));
+  const stap2 = await api('/api/techniek/inloggen', { bewijs: stap1.body.bewijs, code: totpCode(begin.body.geheim, Date.now() + 30000, 30) });
+  assert.equal(stap2.status, 401, 'zonder recht geen techniektoken, ook met de juiste code (kreeg ' + stap2.status + ')');
+  assert.equal(stap2.body.token, undefined);
+});

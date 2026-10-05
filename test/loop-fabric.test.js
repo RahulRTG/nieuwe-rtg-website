@@ -227,3 +227,12 @@ test('visibility en huidige WorkOS-bevoegdheid begrenzen inbox en recall zonder 
   assert.equal(recall.code,'AUTHORITY_REVOKED');
   assert.equal(f.fabric._read().recalls && Object.keys(f.fabric._read().recalls).length,0);
 });
+
+test('eventdeelname blijft volledig werken zonder learningbijdrage of groepsprofiel',async()=>{
+  const f=fixture(),event=await f.setupEvent(),planId=await f.eventRun(event.blueprintId,'user-2');
+  const plan=f.row('user-2','plan',planId);
+  assert.equal(plan.status,'completed');assert.ok(plan.acknowledgedAt);
+  assert.equal(f.db.data.livingWorld.history.some(x=>x.protocol&&x.protocol.planRef&&x.protocol.planRef.id===planId),false);
+  await f.fabric.sync('WLOOP');assert.equal(f.fabric.inbox('user-1','WLOOP').items.length,0);
+  assert.equal(JSON.stringify(f.db.data.loopFabric).includes('user-2'),false);
+});

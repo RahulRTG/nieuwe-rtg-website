@@ -18,7 +18,15 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
   const operations=require('./operations')({read,sourceAdapters,time});
   const query=require('./recall-query')({read,sourceAdapters,time});
   const {target,consumerOf,authorityFor,inbox,inboxFor,candidates}=query;
-  const validateDecisionContext=require('./decision-context')({read,livingWorld,workSource,time,target});
+  const validateDecisionContext=require('./decision-context')({read,workSource,sourceAdapters,time,target});
+  function registerSource(domain,source) {
+    const id=P.text(domain,60);
+    if(sourceAdapters[id]&&sourceAdapters[id]!==source)
+      P.fail('SOURCE_ALREADY_REGISTERED','Dit brondomein heeft al een Loop Fabric-adapter.',409);
+    for(const method of ['deliver','protocolEvents','resolveObservation','learningEligibility'])
+      if(!source||typeof source[method]!=='function')P.fail('SOURCE_ADAPTER_INVALID','De bronadapter mist '+method+'.');
+    sourceAdapters[id]=source;return {ok:true,domain:id};
+  }
   async function sync(workspaceCode) {
     const world=await livingWorld.deliver('loop-fabric',async event=>{
       const result=await projector.ingest(event); if (!result.ok) throw Object.assign(new Error(result.error),result);
@@ -31,7 +39,14 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
       const result=await livingWorld.returnChangeReceipt(event.receipt);
       if (!result.ok) throw Object.assign(new Error(result.error),result);
     }) : {deliveredThrough:0};
-    return {ok:true,world,work,returned};
+    const additional={};
+    if(workspaceCode)for(const [domain,source] of Object.entries(sourceAdapters)){
+      if(['living-world','workos'].includes(domain)||source.consumerDomain!=='workos')continue;
+      additional[domain]=await source.deliver(workspaceCode,'loop-fabric',async event=>{
+        const result=await projector.ingest(event);if(!result.ok)throw Object.assign(new Error(result.error),result);
+      });
+    }
+    return {ok:true,world,work,returned,additional};
   }
   async function syncSource(domain,scopeId) {
     const source=sourceAdapters[domain];
@@ -117,7 +132,7 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
     } catch(e) { return P.error(e); }
   }
   const proofFor=(actorRef,consumer)=>projector.proofFor(actorRef,consumer);
-  return {ingest:projector.ingest,sync,syncSource,inbox,inboxFor,candidates,present,disposition,
+  return {ingest:projector.ingest,sync,syncSource,registerSource,inbox,inboxFor,candidates,present,disposition,
     consumerForRecall,sweepRetention,rebuild:projector.rebuild,proof:projector.proof,proofFor,
     operations:operations.snapshot,validateDecisionContext,_read:read};
 };

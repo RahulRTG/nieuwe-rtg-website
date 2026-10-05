@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-10-05T19:39:47.224Z",
-  "commit": "21166e263",
+  "op": "2026-10-05T22:29:00.275Z",
+  "commit": "520b2432b",
   "boomVuil": true,
-  "boomAnders": 4,
+  "boomAnders": 10,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5296,
-  "geclassificeerd": 5270,
+  "totaal": 5298,
+  "geclassificeerd": 5272,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3167,
    "NOT_APPLICABLE": 1275,
    "LEGACY_PENDING_CLASSIFICATION": 26,
-   "PROTECTED": 655,
+   "PROTECTED": 657,
    "INTENTIONALLY_NON_IDEMPOTENT": 173
   },
-  "vastgesteldDoorMens": 2155,
+  "vastgesteldDoorMens": 2157,
   "afgeleidDoorScript": 3115,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4369,
+   "AUTHENTICATED": 4371,
    "PUBLIC": 134,
    "OBJECT_SCOPED": 764,
    "(niet af te leiden -- vraagt een verklaring)": 13,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4882,
-   "niet gemeten": 148
+   "niet gemeten": 150
   },
   "voorstellen": {
    "BLOCKED_BY_TEST_FIXTURE": 1,
@@ -290,6 +290,18 @@
   },
   {
    "route": "POST /api/office/service/kwaliteit",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/learning/review",
+   "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/service/learning/withdraw",
    "bedoeld": "CAPABILITY_GATED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -71792,6 +71804,50 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.learning.review",
+   "route": "POST /api/office/service/learning/review",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.service.learning.withdraw",
+   "route": "POST /api/office/service/learning/withdraw",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "officeAuth",
+     "balieAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

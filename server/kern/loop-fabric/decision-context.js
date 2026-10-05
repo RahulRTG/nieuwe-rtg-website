@@ -2,8 +2,7 @@
 
 const P=require('./protocol');
 
-module.exports=function decisionContext({read,livingWorld,workSource,time,target}) {
-  const sources={'living-world':livingWorld,workos:workSource};
+module.exports=function decisionContext({read,workSource,sourceAdapters,time,target}) {
   return function validate(actorRef,workspaceCode,value) {
     try {
       P.fields(value,['observationRef','observationHash','procedureRef','changeTargetRef','placeRef','blueprintRef','scopeRefs','expectation','successCriteria','purpose']);
@@ -13,7 +12,7 @@ module.exports=function decisionContext({read,livingWorld,workSource,time,target
       const observations=read().observations,indexed=observations[P.refKey(observationRef)] || observations[observationRef.id];
       if (!indexed || P.refKey(indexed.record.objectRef)!==P.refKey(observationRef))
         P.fail('OBSERVATION_NOT_INDEXED','Open de actuele Observation-inbox voordat u hierover besluit.',409);
-      const source=sources[observationRef.domain];
+      const source=sourceAdapters[observationRef.domain];
       if (!source || typeof source.resolveObservation!=='function' || typeof source.learningEligibility!=='function')
         P.fail('SOURCE_UNAVAILABLE','Het observatiebrondomein is niet aangesloten.',503);
       const eligible=source.learningEligibility(observationRef,target(authority.workspaceCode),{purpose:value.purpose,use:'decision'});

@@ -105,7 +105,7 @@ function fixture(previous,settings={}) {
     out=await api.post('/api/bedrijf/besluit/sluit',{besluitId:id,evalueerOp:'2026-11-01'});
     assert.equal(out.status,200,JSON.stringify(out.body)); return db.data.werkruimtes.WLOOP.besluiten[id];
   }
-  const api={db,world,workSource,academy,academySource,fabric,command,row,setupEvent,eventRun,decide,
+  const api={db,bewerkCollectie,world,workSource,academy,academySource,fabric,command,row,setupEvent,eventRun,decide,
     propose,
     time:()=>now,clock:value=>{now=value;},fault:(name,when)=>{fault=name?{name,when}:null;},
     procedureRef:()=>({domain:'workos',type:'procedure',id:'procedure_v1',version:1}),

@@ -5,13 +5,14 @@
   "warning": "Roadmap autoriseert geen runtimecode. Iedere vertical slice doorloopt opnieuw alle acceptance gates.",
   "sourceFlows": {
     "summary": {
-      "GO": 7,
+      "GO": 8,
       "PHASE": 6,
       "STOP": 8
     },
     "newGo": [
       "library-edition-to-academy",
-      "experience.living-world-commons-release"
+      "experience.living-world-commons-release",
+      "service.process-improvement"
     ],
     "implementedGo": [
       "experience.living-world-contribution",
@@ -19,10 +20,11 @@
       "academy.practice-to-knowledge",
       "workos.accessibility-procedure",
       "workos.near-miss-runbook",
+      "service.process-improvement",
       "library.feedback-to-edition",
       "library-edition-to-academy"
     ],
-    "note": "D23 en één source-local D13 Commons-release zijn bewezen; P12 blijft gedeeltelijk tot een tweede echte source owner dezelfde semantiek bewijst."
+    "note": "D23, één source-local D13 Commons-release en D15 service process learning zijn bewezen; brede capabilityfamilies blijven flowgewijs gefaseerd."
   },
   "decisions": {
     "blockedCapabilities": 84,

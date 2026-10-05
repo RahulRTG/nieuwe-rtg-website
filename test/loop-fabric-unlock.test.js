@@ -9,8 +9,8 @@ test('98 technische blockers hebben exact één primaire prerequisite',()=>{
 });
 
 test('roadmap registreert bewezen nieuwe GO-flows en houdt alle 32 schaalcapabilities STOP',()=>{
-  const r=build();assert.deepEqual(r.sourceFlows.newGo,['library-edition-to-academy','experience.living-world-commons-release']);
-  assert.equal(r.sourceFlows.implementedGo.length,7);
+  const r=build();assert.deepEqual(r.sourceFlows.newGo,['library-edition-to-academy','experience.living-world-commons-release','service.process-improvement']);
+  assert.equal(r.sourceFlows.implementedGo.length,8);
   assert.equal(r.scale.count,32);assert.ok(r.scale.blockers.every(x=>x.status==='STOP'));
   assert.deepEqual([...new Set(r.scale.blockers.map(x=>x.domain))].sort(),['commerce','media-culture','mobility']);
   assert.match(r.stopStatement,/blijven STOP/);

@@ -11,7 +11,8 @@ const FLOWS=Object.freeze([
     occurrence:'vrijwillige plaatsgebonden contribution',observationOpportunity:'geaccepteerde source-owned contribution',
     expectationDecision:'WorkOS-besluit met exacte observation- en targetversie',claimContest:'contribution.contest en supersession',
     changeTarget:'versioned WorkOS procedure',sourceIssuedReceipt:'workos.change.applied',
-    verificationPath:'nieuwe Living World contribution met verificationOf en causalClaim=false',memoryClass:'DOMAIN_ASSET',
+    verificationPath:'nieuwe Living World contribution met verificationOf en causalClaim=false',
+    memoryClass:'RELATIONSHIP_SHARED naar afzonderlijke Organizational process change; geen stille Personal/Commons-promotie',
     retention:'living-world.contribution.lifecycle.v1',recallContext:'place/blueprint/procedure plus actuele WorkOS-authority',
     recoveryReplay:'Living World outbox, checkpoint, replay en rebuild',
     tests:['test/loop-fabric.test.js','test/loop-fabric.pg.test.js','test/living-world-sqlite.test.js'],prerequisite:none}),
@@ -131,6 +132,22 @@ const FLOWS=Object.freeze([
     memoryClass:'UNDECIDED_PERSONAL_OR_ORGANIZATIONAL',retention:'niet uniform en deels arbeids-/communicatiecontext',
     recallContext:'niet toestaan zonder afzonderlijk doel',recoveryReplay:'geen uniforme veilige overdracht',
     tests:['test/bedrijf-service.test.js'],prerequisite:'menselijke beslissing over werknemerscontext, supportinhoud en surveillancegrens'}),
+
+  flow('service.process-improvement','service','GO',{
+    semanticOwner:'service voor Case/procesobservatie; workos voor Decision en procedure',
+    canonicalState:'serviceZaken blijft Case-bron; serviceLearning bevat alleen gereviewde minimale procesobservaties',
+    mutationPoint:'server/kern/service/loop-source.js: reviewCase/withdraw en server/bedrijf/loop-source-change.js: apply',
+    authority:'actuele Service-zetel plus actuele besluitbevoegdheid in de ontvangende WorkOS-werkruimte',
+    occurrence:'menselijke serviceoverdracht met structureel gemeten herhaling of opvolging',
+    observationOpportunity:'expliciete Service-review maakt alleen allowlisted procesmetadata vrij',
+    expectationDecision:'WorkOS-besluit bevriest bronhash, procescontext, verwachting en succescriterium',
+    claimContest:'withdrawal trekt toekomstig gebruik in; gesprek of ticket wordt geen organizational memory',
+    changeTarget:'versioned WorkOS serviceprocedure',sourceIssuedReceipt:'workos.change.applied',
+    verificationPath:'volgende gereviewde serviceoverdracht met verificationOf; causalClaim=false',memoryClass:'ORGANIZATIONAL',
+    retention:'service.process-observation.180d.v1; Case volgt eigen source retention',
+    recallContext:'stabiele service-process scope plus actuele WorkOS authority, purpose en eligibility',
+    recoveryReplay:'Service source outbox/checkpoint/dead-letter, WorkOS outbox en Fabric rebuild',
+    tests:['test/loop-fabric-service-slice.test.js','test/servicekwaliteit.test.js','test/loop-fabric.test.js'],prerequisite:none}),
 
   flow('library.feedback-to-edition','dom-library','GO',{
     semanticOwner:'library',canonicalState:'Work feedback, revisions, immutable Editions en journal',

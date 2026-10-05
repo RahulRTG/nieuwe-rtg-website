@@ -4,11 +4,11 @@ Datum: 5 oktober 2026
 
 Deze fase reduceert blockers. Zij geeft geen brede runtimegoedkeuring en bevat geen nieuwe learning-adapter.
 
-## B01 source-owned flows
+## Source-owned flows
 
-B01 bevat 21 bronflows: 7 GO, 6 PHASE en 8 STOP.
+Het flowregister bevat 22 bronflows: 8 GO, 6 PHASE en 8 STOP.
 
-Nieuw GO: 2. Geïmplementeerde en bewezen GO-flows: `experience.living-world-contribution`, `experience.living-world-commons-release`, `academy.practice-to-knowledge`, `workos.accessibility-procedure`, `workos.near-miss-runbook`, `library.feedback-to-edition`, `library-edition-to-academy`.
+Nieuw GO: 3. Geïmplementeerde en bewezen GO-flows: `experience.living-world-contribution`, `experience.living-world-commons-release`, `academy.practice-to-knowledge`, `workos.accessibility-procedure`, `workos.near-miss-runbook`, `service.process-improvement`, `library.feedback-to-edition`, `library-edition-to-academy`.
 
 De volledige velden per flow staan in `LOOP-FABRIC-SOURCE-FLOWS.json`.
 

@@ -18,6 +18,9 @@ async function post(path, body) {
   });
   return { status: r.status, body: await r.json().catch(() => ({})) };
 }
+async function get(path,headers={}) {
+  const r=await fetch(srv.base+path,{headers}); return {status:r.status,body:await r.json().catch(()=>({}))};
+}
 
 test.before(async () => {
   srv = await h.startServer({ env: {
@@ -29,6 +32,9 @@ test.before(async () => {
 test.after(async () => { if (srv) await h.stop(srv.child); });
 
 test('alle Loop Fabric HTTP-ingangen bestaan en blijven zonder identiteit dicht', async () => {
+  const operations=await get('/api/loop/operations');
+  assert.equal(operations.status,200,'de lokale testhost valt onder dezelfde interne deur als /api/metrics');
+  assert.equal(operations.body.privacy.sourceContentCopied,false);
   for (const [path, status] of [
     ['/api/loop/observation/inbox', 401],
     ['/api/loop/recall/present', 401],

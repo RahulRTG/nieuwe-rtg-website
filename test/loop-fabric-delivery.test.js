@@ -54,3 +54,14 @@ test('changed replay, checkpointcorruptie en failure metadata falen gesloten',()
   assert.equal(JSON.stringify(failure.row.deadLetters[event.id]).includes('privateText'),false);
   assert.throws(()=>D.checkpoint({sequence:'1'}),error=>error.code==='CHECKPOINT_CORRUPT');
 });
+
+test('volgordegaten stoppen een geordende bron en leaseherstel gebruikt één bronklok',()=>{
+  const delivery={},second={id:'event-2',sequence:2,type:'source.changed'};
+  const gap=D.claim(delivery,'c',second,{at:T0,workerId:'region-a',requireNext:true});
+  assert.equal(gap.outOfOrder,true);assert.equal(gap.expected,1);
+  D.claim(delivery,'c',event,{at:T0,workerId:'region-a',leaseMs:30000,requireNext:true});
+  assert.equal(D.claim(delivery,'c',event,{at:'2026-10-05T09:59:59.000Z',workerId:'region-b'}).busy,true,
+    'een achterlopende worker mag een geldige lease niet stelen');
+  assert.equal(D.claim(delivery,'c',event,{at:T1,workerId:'region-c'}).claimed,true,
+    'na de gedeelde lease-deadline kan een andere worker herstellen');
+});

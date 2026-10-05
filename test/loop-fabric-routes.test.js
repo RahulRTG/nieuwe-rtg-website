@@ -11,7 +11,7 @@ function response() {
 
 test('Loop Fabric-routes staan achter de liddeur en leiden de actor uit de sessie af',async()=>{
   const routes={},auth=()=>{},calls=[];
-  const app={post(path,...handlers){routes[path]=handlers;}};
+  const app={post(path,...handlers){routes[path]=handlers;},get(){}};
   const loopFabric={sync:async code=>{calls.push(['sync',code]);return {ok:true};},
     syncSource:async(domain,id)=>{calls.push(['syncSource',domain,id]);return {ok:true};},
     present:async(actor,input)=>{calls.push(['present',actor,input]);return {ok:true,actor};},
@@ -31,6 +31,15 @@ test('Loop Fabric-routes staan achter de liddeur en leiden de actor uit de sessi
   await routes['/api/loop/recall/present'][1](academyReq,response());
   assert.deepEqual(calls[2],['syncSource','leerhuis','ACADEMY']);
   assert.equal(calls[3][1],'lid:4','Leerhuis-actor wordt server-side uit de RTG-sessie afgeleid');
+});
+
+test('operationele Fabric-tellers gebruiken exact de bestaande verborgen metricsdeur',()=>{
+  const gets={},app={get(path,handler){gets[path]=handler;},post(){}},loopFabric={operations:()=>({privacy:{sourceContentCopied:false}})};
+  require('../server/routes/loop-fabric')({app,auth:()=>{},loopFabric});
+  const outside=response();gets['/api/loop/operations']({socket:{remoteAddress:'203.0.113.8'},get:()=>''},outside);
+  assert.equal(outside.statusCode,404);
+  const inside=response();gets['/api/loop/operations']({socket:{remoteAddress:'127.0.0.1'},get:()=>''},inside);
+  assert.equal(inside.statusCode,200);assert.equal(inside.body.privacy.sourceContentCopied,false);
 });
 
 test('WorkOS-change gebruikt persoonlijk lid en actuele dubbele bevoegdheid als bronactor',async()=>{

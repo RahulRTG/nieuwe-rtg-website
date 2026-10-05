@@ -113,6 +113,7 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
         if (!row.consumers) row.consumers={};
         const result=D.claim(row.consumers,consumer,event,{at:time(),workerId,leaseMs:options.leaseMs}); Object.assign(map,s); return result;
       });
+      if (claimed.conflict) P.fail(claimed.code,'Dezelfde delivery-sequence heeft andere inhoud.',409);
       if (!claimed.claimed) { if (claimed.complete) { current=Math.max(current,event.sequence); continue; } blocked=claimed.lease; break; }
       try { await handle(P.clone(event)); }
       catch(error) {
@@ -135,7 +136,13 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
   }
   function deliveryStatus(org,consumer) {
     const delivery=state(db.data.leerhuisLoopDelivery || {}),row=delivery.organizations[org],events=protocolEvents(org);
-    return D.summary(row && row.consumers && row.consumers[consumer],Math.max(0,...events.map(x=>x.sequence)),time());
+    return D.summary(row && row.consumers && row.consumers[consumer],Math.max(0,...events.map(x=>x.sequence)),time(),events);
+  }
+  function deliveryStatuses() {
+    const s=state(db.data.leerhuisLoopDelivery || {}),rows=[];
+    for (const [org,row] of Object.entries(s.organizations)) for (const consumer of Object.keys(row.consumers || {}))
+      rows.push({scopeHash:P.hash(org).slice(0,20),consumer,...deliveryStatus(org,consumer)});
+    return rows;
   }
   async function replayDeadLetter(org,consumer,eventId) {
     return tx(map=>{
@@ -154,5 +161,5 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
     return checked.geldig && checked.issuer==='rtg.service.leerhuis' ? {ok:true,mode:'signed',proof:checked}
       : {ok:false,code:'SERVICE_PROOF_INVALID',error:'De Leerhuis-servicehandtekening klopt niet.'};
   }
-  return {authorization,artifact,resolveObservation,protocolEvents,deliver,deliveryStatus,replayDeadLetter,verifyReceipt};
+  return {authorization,artifact,resolveObservation,protocolEvents,deliver,deliveryStatus,deliveryStatuses,replayDeadLetter,verifyReceipt};
 };

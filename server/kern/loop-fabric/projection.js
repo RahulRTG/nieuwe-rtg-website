@@ -1,6 +1,6 @@
 'use strict';
 
-const P=require('./protocol'),M=require('./model'),envelope=require('../envelop');
+const P=require('./protocol'),M=require('./model'),envelope=require('../envelop'),invariants=require('./invariants');
 
 module.exports=function projection({read,tx,time,livingWorld,workSource,sourceAdapters}) {
   const relationId=(from,relation,to)=>'lin_'+P.hash([P.refKey(from),relation,P.refKey(to)]).slice(0,32);
@@ -99,6 +99,7 @@ module.exports=function projection({read,tx,time,livingWorld,workSource,sourceAd
           correlatie:event.envelop && event.envelop.correlatie || event.id,
           oorzaak:event.envelop && event.envelop.id || event.id,classificatie:'intern'});
         M.append(state,'source.ingested',{eventId:event.id},at,env);
+        invariants.projection(state);
         if (Buffer.byteLength(P.canonical(state))>25*1024*1024)
           P.fail('CAPACITY','De Loop Fabric-projectie vraagt onderhoud; er is niets verwijderd.',503);
         Object.assign(raw,state); return {ok:true,replay:false,eventId:event.id};
@@ -123,7 +124,7 @@ module.exports=function projection({read,tx,time,livingWorld,workSource,sourceAd
         for (const event of events) { project(state,event); state.consumed[event.id]=P.hash(event); }
         const at=time(),env=envelope.maak({id:'lfb_'+P.hash([at,events.map(e=>e.id)]).slice(0,28),at,kanaal:'loop-fabric',
           actor:'systeem',correlatie:null,oorzaak:null,classificatie:'intern'});
-        M.append(state,'index.rebuilt',{events:events.length},at,env); Object.assign(raw,state);
+        M.append(state,'index.rebuilt',{events:events.length},at,env); invariants.projection(state); Object.assign(raw,state);
         return {ok:true,events:events.length,observations:Object.keys(state.observations).length,
           changes:Object.keys(state.changes).length,lineage:Object.keys(state.lineage).length};
       });
@@ -137,7 +138,7 @@ module.exports=function projection({read,tx,time,livingWorld,workSource,sourceAd
           row.record.objectRef.type!=='tombstone') {
         expired.push(P.clone(row.record.objectRef)); tombstone(state,row.record.objectRef,'expired',before);
       }
-      Object.assign(raw,state); return {ok:true,expired:expired.length};
+      invariants.projection(state); Object.assign(raw,state); return {ok:true,expired:expired.length};
     });
   }
   function proof(actorRef,workspaceCode) {

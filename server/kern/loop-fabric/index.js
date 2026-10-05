@@ -14,6 +14,7 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
   const sourceAdapters={'living-world':livingWorld,workos:workSource};
   if (academySource) sourceAdapters.leerhuis=academySource;
   const projector=require('./projection')({read,tx,time,livingWorld,workSource,sourceAdapters});
+  const operations=require('./operations')({read,sourceAdapters,time});
   const validateDecisionContext=require('./decision-context')({read,livingWorld,workSource,time,target});
   const observationSources=sourceAdapters;
   async function sync(workspaceCode) {
@@ -212,5 +213,6 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
   }
   const proofFor=(actorRef,consumer)=>projector.proofFor(actorRef,consumer);
   return {ingest:projector.ingest,sync,syncSource,inbox,inboxFor,candidates,present,disposition,
-    consumerForRecall,sweepRetention,rebuild:projector.rebuild,proof:projector.proof,proofFor,validateDecisionContext,_read:read};
+    consumerForRecall,sweepRetention,rebuild:projector.rebuild,proof:projector.proof,proofFor,
+    operations:operations.snapshot,validateDecisionContext,_read:read};
 };

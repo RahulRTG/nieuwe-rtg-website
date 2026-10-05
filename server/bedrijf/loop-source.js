@@ -230,6 +230,8 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,serviceProof,no
     if (!/^[a-z][a-z0-9.-]{1,79}$/.test(consumer) || typeof handle!=='function') throw new Error('Invalid WorkOS Loop consumer');
     if (limit && typeof limit==='object') { options=limit; limit=100; }
     const workspace=workspaceFrom(read(),workspaceCode), start=D.checkpoint(workspace.loopProtocol && workspace.loopProtocol.delivery[consumer]);
+    const sourceThrough=workspace.loopProtocol && workspace.loopProtocol.outbox && workspace.loopProtocol.outbox.length || 0;
+    if (start.sequence>sourceThrough) P.fail('CHECKPOINT_CORRUPT','Het WorkOS-checkpoint ligt voorbij de bron-outbox.',503);
     const workerId=options.workerId || 'workos-'+P.hash([process.pid,consumer,time(),Math.random()]).slice(0,16);
     let cursor=start.sequence,blocked=null;
     const events=(workspace.loopProtocol && workspace.loopProtocol.outbox || []).filter(e=>e.sequence>cursor)
@@ -237,8 +239,10 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,serviceProof,no
     for (const event of events) {
       const at=time(),claimed=await tx(map=>{
         const current=workspaceFrom(map,workspaceCode),state=protocolState(current);
-        return D.claim(state.delivery,consumer,event,{at,workerId,leaseMs:options.leaseMs});
+        return D.claim(state.delivery,consumer,event,{at,workerId,leaseMs:options.leaseMs,requireNext:true});
       });
+      if (claimed.conflict) P.fail(claimed.code,'Dezelfde delivery-sequence heeft andere inhoud.',409);
+      if (claimed.outOfOrder) P.fail(claimed.code,'De delivery-outbox heeft een volgordegat.',503);
       if (!claimed.claimed) { if (claimed.complete) { cursor=Math.max(cursor,event.sequence); continue; } blocked=claimed.lease; break; }
       try { await handle(P.clone(event)); }
       catch(error) {
@@ -260,7 +264,17 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,serviceProof,no
   }
   function deliveryStatus(workspaceCode,consumer) {
     const workspace=workspaceFrom(read(),workspaceCode),state=workspace.loopProtocol || {outbox:[],delivery:{}};
-    return D.summary(state.delivery && state.delivery[consumer],(state.outbox||[]).length,time());
+    const events=state.outbox || [];
+    return D.summary(state.delivery && state.delivery[consumer],events.length,time(),events);
+  }
+  function deliveryStatuses() {
+    const rows=[];
+    for (const workspace of Object.values(read())) {
+      const state=workspace.loopProtocol;if (!state || !state.delivery) continue;
+      for (const consumer of Object.keys(state.delivery)) rows.push({scopeHash:P.hash(workspace.code).slice(0,20),consumer,
+        ...deliveryStatus(workspace.code,consumer)});
+    }
+    return rows;
   }
   async function replayDeadLetter(workspaceCode,consumer,eventId) {
     return tx(map=>{
@@ -279,5 +293,5 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,serviceProof,no
       : {ok:false,code:'SERVICE_PROOF_INVALID',error:'De WorkOS-servicehandtekening klopt niet.'};
   }
   return {apply,observeIncident,lifecycleObservation,authorization,artifact,procedure,resolveObservation,protocolEvents,
-    deliver,deliveryStatus,replayDeadLetter,verifyReceipt};
+    deliver,deliveryStatus,deliveryStatuses,replayDeadLetter,verifyReceipt};
 };

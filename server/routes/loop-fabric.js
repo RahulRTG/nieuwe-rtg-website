@@ -1,5 +1,6 @@
 'use strict';
 const {idVanKey}=require('../lib/lidsleutel');
+const {magMeten}=require('../meetpoort');
 
 module.exports=({app,auth,loopFabric})=>{
   const send=(res,out)=>res.status(out.status || 200).json(out);
@@ -15,6 +16,10 @@ module.exports=({app,auth,loopFabric})=>{
     if (consumer.domain!=='leerhuis') return req.session.key;
     const id=idVanKey(req.session.key); return id==null ? null : 'lid:'+id;
   };
+  app.get('/api/loop/operations',(req,res)=>{
+    if (!magMeten(req)) return res.status(404).json({error:'Onbekend eindpunt.'});
+    res.json(loopFabric.operations());
+  });
   app.post('/api/loop/observation/inbox',auth,async(req,res)=>{
     try {
       const consumer=consumerOf(req.body),actor=actorFor(req,consumer);

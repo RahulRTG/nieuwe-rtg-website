@@ -96,5 +96,6 @@ module.exports = function makeLivingWorld({db,save,bewerkCollectie,sources,now})
   return {prepare:prepareWorldAction,execute,view:projection.view,saloon:projection.saloon,mediaLinks:projection.mediaLinks,
     portfolio:require('./portfolio')(read,time),deliver:loopSource.deliver,
     protocolEvents:loopSource.protocolEvents,resolveObservation:loopSource.resolveObservation,
-    returnChangeReceipt:loopSource.returnChangeReceipt};
+    returnChangeReceipt:loopSource.returnChangeReceipt,deliveryStatus:loopSource.deliveryStatus,
+    deliveryStatuses:loopSource.deliveryStatuses,replayDeadLetter:loopSource.replayDeadLetter};
 };

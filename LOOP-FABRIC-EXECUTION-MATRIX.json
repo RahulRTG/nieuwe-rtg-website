@@ -11,7 +11,7 @@
     "PROHIBITED",
     "NO_LEARNING_VALUE"
   ],
-  "goRule": "Default bij twijfel is PHASE. Alleen B00 is GO en voegt geen runtimelearning toe.",
+  "goRule": "Default bij twijfel is PHASE. Een batch met technische candidates blijft PHASE totdat afzonderlijke source-flows alle poorten halen.",
   "sharedPrerequisites": [
     "source-flowdecompositie per brede capability",
     "versioned source change target waar afwezig",
@@ -187,8 +187,8 @@
       ],
       "readiness": {
         "READY_TO_IMPLEMENT": 0,
-        "NEEDS_TECHNICAL_PREREQUISITE": 9,
-        "NEEDS_HUMAN_DECISION": 4,
+        "NEEDS_TECHNICAL_PREREQUISITE": 13,
+        "NEEDS_HUMAN_DECISION": 0,
         "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
@@ -197,7 +197,8 @@
         "D06_WORKFORCE_DEVELOPMENT"
       ],
       "technicalPrerequisites": [
-        "P02_VERSIONED_WORK_PROCESS_TARGET"
+        "P02_VERSIONED_WORK_PROCESS_TARGET",
+        "P07_WORKFORCE_PROCESS_SEPARATION"
       ],
       "blastRadius": {
         "sourceOwners": 13,
@@ -221,10 +222,10 @@
       },
       "blockers": [
         "durable-event",
-        "human-decision",
-        "memory-class",
-        "purpose-scope",
         "recovery-proof",
+        "retention-proof",
+        "source-contract",
+        "source-flow",
         "source-object",
         "versioned-change-target"
       ]
@@ -368,8 +369,8 @@
       ],
       "readiness": {
         "READY_TO_IMPLEMENT": 0,
-        "NEEDS_TECHNICAL_PREREQUISITE": 10,
-        "NEEDS_HUMAN_DECISION": 4,
+        "NEEDS_TECHNICAL_PREREQUISITE": 12,
+        "NEEDS_HUMAN_DECISION": 2,
         "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
@@ -383,7 +384,8 @@
         "P01_VERSIONED_SOURCE_RELEASE",
         "P04_VERSIONED_SERVICE_PROCEDURE",
         "P05_REVIEWED_FAILURE_ARTIFACT",
-        "P06_VERSIONED_PHYSICAL_HANDOFF"
+        "P06_VERSIONED_PHYSICAL_HANDOFF",
+        "P13_AI_PURPOSE_SCOPE"
       ],
       "blastRadius": {
         "sourceOwners": 14,
@@ -411,6 +413,9 @@
         "memory-class",
         "purpose-scope",
         "recovery-proof",
+        "retention-proof",
+        "source-contract",
+        "source-flow",
         "source-object",
         "versioned-change-target"
       ]
@@ -497,7 +502,7 @@
     {
       "id": "B07_DISCOVERY_AI_NETWORK",
       "name": "Edge, Saloon en World Network",
-      "status": "STOP",
+      "status": "PHASE",
       "domains": [
         "edge-ai",
         "saloon",
@@ -518,8 +523,8 @@
       ],
       "readiness": {
         "READY_TO_IMPLEMENT": 0,
-        "NEEDS_TECHNICAL_PREREQUISITE": 0,
-        "NEEDS_HUMAN_DECISION": 11,
+        "NEEDS_TECHNICAL_PREREQUISITE": 11,
+        "NEEDS_HUMAN_DECISION": 0,
         "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
@@ -528,7 +533,10 @@
         "D13_DISCOVERY_COMMONS",
         "D14_AI_ASSISTANCE"
       ],
-      "technicalPrerequisites": [],
+      "technicalPrerequisites": [
+        "P12_VERSION_BOUND_COMMONS_RELEASE",
+        "P13_AI_PURPOSE_SCOPE"
+      ],
       "blastRadius": {
         "sourceOwners": 11,
         "kernelModules": 30,
@@ -549,15 +557,16 @@
         ]
       },
       "blockers": [
-        "human-decision",
-        "memory-class",
-        "purpose-scope"
+        "recovery-proof",
+        "retention-proof",
+        "source-contract",
+        "source-flow"
       ]
     },
     {
       "id": "B08_HUMAN_PROGRAMS",
       "name": "Foundation, Living Lab, Travel, Talent en communities",
-      "status": "STOP",
+      "status": "PHASE",
       "domains": [
         "community-events",
         "foundationos",
@@ -607,8 +616,8 @@
       ],
       "readiness": {
         "READY_TO_IMPLEMENT": 0,
-        "NEEDS_TECHNICAL_PREREQUISITE": 0,
-        "NEEDS_HUMAN_DECISION": 38,
+        "NEEDS_TECHNICAL_PREREQUISITE": 30,
+        "NEEDS_HUMAN_DECISION": 8,
         "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
@@ -622,7 +631,12 @@
         "D11_COMMUNITY_EVENTS",
         "D12_DATING"
       ],
-      "technicalPrerequisites": [],
+      "technicalPrerequisites": [
+        "P07_WORKFORCE_PROCESS_SEPARATION",
+        "P09_TRAVEL_STRUCTURAL_LESSON",
+        "P10_FOUNDATION_VOLUNTARY_LESSON",
+        "P11_EVENT_FEEDBACK_RELEASE"
+      ],
       "blastRadius": {
         "sourceOwners": 38,
         "kernelModules": 117,
@@ -647,13 +661,17 @@
         "lawful-basis",
         "memory-class",
         "purpose-scope",
-        "retention"
+        "recovery-proof",
+        "retention",
+        "retention-proof",
+        "source-contract",
+        "source-flow"
       ]
     },
     {
       "id": "B09_REGULATED_PRIVATE",
       "name": "Identity, Pay, zorg, persoonlijk, communicatie en governance",
-      "status": "STOP",
+      "status": "PHASE",
       "domains": [
         "communication",
         "governance",
@@ -752,8 +770,8 @@
       ],
       "readiness": {
         "READY_TO_IMPLEMENT": 0,
-        "NEEDS_TECHNICAL_PREREQUISITE": 0,
-        "NEEDS_HUMAN_DECISION": 86,
+        "NEEDS_TECHNICAL_PREREQUISITE": 13,
+        "NEEDS_HUMAN_DECISION": 73,
         "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
         "PROHIBITED": 0,
         "NO_LEARNING_VALUE": 0
@@ -771,7 +789,9 @@
         "D21_FINANCIAL_PROFILING",
         "D22_COMMERCIAL_CLAIMS"
       ],
-      "technicalPrerequisites": [],
+      "technicalPrerequisites": [
+        "P08_PERSONAL_STRUCTURAL_RELEASE"
+      ],
       "blastRadius": {
         "sourceOwners": 86,
         "kernelModules": 2495,
@@ -797,7 +817,11 @@
         "lawful-basis",
         "memory-class",
         "purpose-scope",
-        "retention"
+        "recovery-proof",
+        "retention",
+        "retention-proof",
+        "source-contract",
+        "source-flow"
       ]
     }
   ]

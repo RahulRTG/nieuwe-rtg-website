@@ -1,4 +1,6 @@
 'use strict';
+const {dossierForCapability}=require('./loop-fabric-decision-policy');
+const constitution=require('../../server/kern/loop-fabric/constitution');
 
 const READINESS=Object.freeze(['READY_TO_IMPLEMENT','NEEDS_TECHNICAL_PREREQUISITE','NEEDS_HUMAN_DECISION',
   'BLOCKED_BY_SCALE_ARCHITECTURE','PROHIBITED','NO_LEARNING_VALUE']);
@@ -88,8 +90,17 @@ function classify(row) {
     action:'KEEP_OUTSIDE_FABRIC',reason:'De capability bezit geen semantische learning lifecycle.',blockers:[]};
   if (row.classification==='PROHIBITED_FROM_LEARNING') return {readiness:'PROHIBITED',batchId,
     action:'ENFORCE_DENY',reason:'De primaire inhoud mag bewust geen learning artifact worden.',blockers:[]};
+  const dossier=dossierForCapability(row.id);
+  if (dossier&&constitution.RESOLVED_DECISIONS.includes(dossier.id)) return {
+    readiness:'NEEDS_TECHNICAL_PREREQUISITE',batchId,decisionDossierId:dossier.id,
+    action:'IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW',
+    reason:'De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.',
+    blockers:['source-flow','source-contract','retention-proof','recovery-proof']};
   if (row.classification==='HUMAN_REVIEW_REQUIRED') return {readiness:'NEEDS_HUMAN_DECISION',batchId,
-    action:'NO_RUNTIME_IMPLEMENTATION',reason:'Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.',
+    action:dossier&&constitution.GENERIC_LEARNING_CLOSED.includes(dossier.id)?'ENFORCE_GENERIC_DENY_UNTIL_VALIDATED':'NO_RUNTIME_IMPLEMENTATION',
+    reason:dossier&&constitution.GENERIC_LEARNING_CLOSED.includes(dossier.id)
+      ?'Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.'
+      :'Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.',
     blockers:['human-decision','lawful-basis','retention']};
   if (row.classification==='PARTIALLY_LOOP_CAPABLE') {
     if (PARTIAL_HUMAN.has(row.id)) return {readiness:'NEEDS_HUMAN_DECISION',batchId,action:'KEEP_PROVEN_SLICE_ONLY',

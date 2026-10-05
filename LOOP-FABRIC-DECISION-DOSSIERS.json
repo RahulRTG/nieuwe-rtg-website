@@ -4,8 +4,11 @@
   "sourceOfTruth": false,
   "warning": "Technisch/productadvies, geen juridisch advies. LEGAL_VALIDATION_REQUIRED blijft geblokkeerd tot bevoegde validatie.",
   "summary": {
-    "blockedCapabilities": 144,
+    "originalBlockedCapabilities": 144,
+    "blockedCapabilities": 84,
+    "resolvedCapabilities": 60,
     "decisionFamilies": 22,
+    "resolvedFamilies": 8,
     "reduction": 122,
     "classifications": {
       "ETHICAL/SAFETY": 3,
@@ -17,7 +20,7 @@
     }
   },
   "coverage": {
-    "expected": [
+    "expectedOriginal": [
       "arrival",
       "avondos",
       "betalen",
@@ -162,6 +165,92 @@
       "werk-rtf",
       "werving",
       "zakelijk"
+    ],
+    "remainingHuman": [
+      "betalen",
+      "connectionos",
+      "contracten",
+      "democratie",
+      "democratie-partijen",
+      "dom-bank-advies",
+      "dom-bank-incasso",
+      "dom-bank-inzicht",
+      "dom-bank-krediet",
+      "dom-bank-passen",
+      "dom-bank-rekening-open",
+      "dom-bank-sepa",
+      "dom-bank-spaardoel",
+      "dom-bank-storten",
+      "dom-bank-vastelasten",
+      "dom-bank-zakelijk",
+      "dom-beschermdeur",
+      "dom-bestanden",
+      "dom-care",
+      "dom-gemeente",
+      "dom-kmar",
+      "dom-kosten",
+      "dom-lab",
+      "dom-labfonds",
+      "dom-livinglab",
+      "dom-livinglab-bewoner",
+      "dom-onboarding",
+      "dom-overheid",
+      "dom-partner-uitbetaling",
+      "dom-pay-tegoed",
+      "dom-pay-tegoed-zaak",
+      "dom-pay-terug",
+      "dom-pay-vooraf",
+      "dom-pay-wallet",
+      "dom-rekening",
+      "dom-rtgid",
+      "dom-samen",
+      "dom-veiligheid",
+      "dom-wallet",
+      "eigenaarherstel",
+      "foundation",
+      "foundation-school",
+      "geldwereld",
+      "gld-aitegoed",
+      "gld-cadeau",
+      "gld-claims",
+      "gld-munt",
+      "gld-prijsgarantie",
+      "gld-prijzen",
+      "gld-punten",
+      "gld-rekening",
+      "gld-splitsen",
+      "kern-berichten",
+      "kern-comm",
+      "kern-locatie",
+      "kern-meldingen",
+      "kern-memo",
+      "medicijnen",
+      "member",
+      "member-connect",
+      "member-snaps",
+      "office-school",
+      "ondertiteling",
+      "opvangwijzer",
+      "ov-mail-binnen",
+      "ov-zorgprofiel",
+      "paspoort",
+      "rtgone",
+      "service-bel",
+      "supplier",
+      "tenant",
+      "tg-aanmeld",
+      "tg-account",
+      "tg-gegevens",
+      "tg-inlog",
+      "tg-link",
+      "tg-pin",
+      "tg-sso",
+      "tg-zegel",
+      "verificatie",
+      "vertegenwoordiging",
+      "vonk",
+      "wbw",
+      "webauthn"
     ],
     "assigned": [
       "arrival",
@@ -397,7 +486,8 @@
         "capabilities": 21,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "LEGAL_VALIDATION_REQUIRED"
     },
     {
       "id": "D01_PERSONAL_MEMORY",
@@ -476,7 +566,8 @@
         "capabilities": 13,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "RESOLVED_PRODUCT_POLICY"
     },
     {
       "id": "D06_WORKFORCE_DEVELOPMENT",
@@ -554,7 +645,8 @@
         "capabilities": 11,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "RESOLVED_PRODUCT_POLICY"
     },
     {
       "id": "D11_COMMUNITY_EVENTS",
@@ -631,7 +723,8 @@
         "capabilities": 11,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "RESOLVED_PRODUCT_POLICY"
     },
     {
       "id": "D17_SECURITY_CREDENTIALS",
@@ -708,7 +801,8 @@
         "capabilities": 11,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "LEGAL_VALIDATION_REQUIRED"
     },
     {
       "id": "D04_COMMUNICATION_CONTENT",
@@ -783,7 +877,8 @@
         "capabilities": 9,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "OPEN"
     },
     {
       "id": "D19_GOVERNANCE",
@@ -857,7 +952,8 @@
         "capabilities": 8,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "OPEN"
     },
     {
       "id": "D21_FINANCIAL_PROFILING",
@@ -931,7 +1027,8 @@
         "capabilities": 8,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "LEGAL_VALIDATION_REQUIRED"
     },
     {
       "id": "D07_TRAVEL_EXPERIENCE",
@@ -1004,7 +1101,8 @@
         "capabilities": 7,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "RESOLVED_PRODUCT_POLICY"
     },
     {
       "id": "D13_DISCOVERY_COMMONS",
@@ -1077,7 +1175,8 @@
         "capabilities": 6,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "RESOLVED_PRODUCT_POLICY"
     },
     {
       "id": "D14_AI_ASSISTANCE",
@@ -1150,7 +1249,8 @@
         "capabilities": 6,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "RESOLVED_PRODUCT_POLICY"
     },
     {
       "id": "D16_ACCOUNT_ORGANIZATION",
@@ -1222,7 +1322,8 @@
         "capabilities": 6,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "OPEN"
     },
     {
       "id": "D08_FOUNDATION_ASSISTANCE",
@@ -1293,7 +1394,8 @@
         "capabilities": 5,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "RESOLVED_PRODUCT_POLICY"
     },
     {
       "id": "D09_CHILD_EDUCATION",
@@ -1363,7 +1465,8 @@
         "capabilities": 4,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "LEGAL_VALIDATION_REQUIRED"
     },
     {
       "id": "D10_RESEARCH_PARTICIPATION",
@@ -1433,7 +1536,8 @@
         "capabilities": 4,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "OPEN"
     },
     {
       "id": "D03_HEALTH_CONTEXT",
@@ -1502,7 +1606,8 @@
         "capabilities": 3,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "LEGAL_VALIDATION_REQUIRED"
     },
     {
       "id": "D18_IDENTITY_VERIFICATION",
@@ -1571,7 +1676,8 @@
         "capabilities": 3,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "LEGAL_VALIDATION_REQUIRED"
     },
     {
       "id": "D22_COMMERCIAL_CLAIMS",
@@ -1640,7 +1746,8 @@
         "capabilities": 3,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "OPEN"
     },
     {
       "id": "D05_DOCUMENT_CONTENT",
@@ -1708,7 +1815,8 @@
         "capabilities": 2,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "OPEN"
     },
     {
       "id": "D02_LOCATION_CONTEXT",
@@ -1775,7 +1883,8 @@
         "capabilities": 1,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "OPEN"
     },
     {
       "id": "D12_DATING",
@@ -1842,7 +1951,8 @@
         "capabilities": 1,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "LEGAL_VALIDATION_REQUIRED"
     },
     {
       "id": "D15_SERVICE_IMPROVEMENT",
@@ -1909,7 +2019,8 @@
         "capabilities": 1,
         "to": "NEEDS_TECHNICAL_PREREQUISITE",
         "directReady": 0
-      }
+      },
+      "decisionStatus": "RESOLVED_PRODUCT_POLICY"
     }
   ],
   "educationDossier": {
@@ -1984,11 +2095,28 @@
     },
     "safeDefault": "Geen Library-naar-Academy overdracht.",
     "recommendation": "Begin met één gratis, interne Academy-context, exact Edition X, geselecteerde ContentNodes, citation verplicht, geen derivatives of AI-training, en withdrawal voor toekomstige cursusversies.",
+    "selectedDecision": {
+      "editionScope": "EXACT_EDITION",
+      "contentScope": "SELECTED_CONTENT_NODES",
+      "economics": "FREE",
+      "academyAudience": "NAMED_INTERNAL_CONTEXT",
+      "language": "EXACT_EDITION_LANGUAGE",
+      "citation": "REQUIRED",
+      "attribution": "REQUIRED",
+      "derivatives": "DENIED",
+      "aiTraining": "DENIED",
+      "aiAssistance": "DENIED_UNLESS_SEPARATELY_GRANTED",
+      "futureEditions": "DENIED",
+      "withdrawal": "BLOCK_FUTURE_CURRICULUM_VERSIONS",
+      "historicalUse": "AUDIT_CONTEXT_ONLY",
+      "ownership": "SOURCE_DOMAINS_REMAIN_AUTHORITATIVE"
+    },
     "unlockImpact": {
       "capabilities": 7,
       "to": "NEEDS_TECHNICAL_PREREQUISITE",
       "directReady": 0
-    }
+    },
+    "decisionStatus": "RESOLVED_PRODUCT_POLICY"
   },
   "constitutionCandidates": [
     {

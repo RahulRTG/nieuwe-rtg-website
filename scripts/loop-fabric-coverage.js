@@ -103,6 +103,11 @@ function build() {
       crossDomainHandoffs:decision.status==='LOOP_CAPABLE'?['SOURCE_REF_TO_AUTHORIZED_CONSUMER']:
         decision.status==='PARTIALLY_LOOP_CAPABLE'?['LIMITED_PROVEN_FLOW_ONLY']:[],missing:missing(decision.status)};
     row.execution=executionPolicy.classify(row);
+    if(row.classification==='HUMAN_REVIEW_REQUIRED'&&row.execution.readiness==='NEEDS_TECHNICAL_PREREQUISITE'){
+      const migrated={...decision,status:'NOT_YET_LOOP_CAPABLE'};
+      row.loop=loopShape(evidence.signals,migrated.status);row.participation=participation(migrated);row.missing=missing(migrated.status);
+      row.participation.lawfulBasis='PRODUCT_POLICY_RESOLVED_SOURCE_MUST_PROVE';
+    }
     const dossier=decisionPolicy.dossierForCapability(row.id);
     if(dossier)row.execution.decisionDossierId=dossier.id;
     const prerequisite=prerequisitePolicy.prerequisiteForCapability(row.id);
@@ -117,7 +122,7 @@ function build() {
     d.capabilities++;d[row.classification]++;if(!['NO_LEARNING_VALUE','PROHIBITED_FROM_LEARNING'].includes(row.classification))d.eligibleFlows++;}
   const consent={explicitConsentNeeded:0,otherBasisMustBeProven:0,organizationalOrTechnicalState:0,prohibited:0,humanOrLegalReview:0};
   for(const row of capabilities){if(row.classification==='PROHIBITED_FROM_LEARNING')consent.prohibited++;
-    else if(row.classification==='HUMAN_REVIEW_REQUIRED')consent.humanOrLegalReview++;
+    else if(row.execution.readiness==='NEEDS_HUMAN_DECISION')consent.humanOrLegalReview++;
     else if(row.participation.consent==='EXPLICIT_WHERE_PERSONAL')consent.explicitConsentNeeded++;
     else if(['workos','hospitality','commerce','mobility','service-support'].includes(row.domain))consent.organizationalOrTechnicalState++;
     else if(row.classification!=='NO_LEARNING_VALUE')consent.otherBasisMustBeProven++;}

@@ -12,12 +12,12 @@ test('Execution Matrix dekt iedere capability exact eenmaal en is reproduceerbaa
     assert.ok(batch.blastRadius.privacyImpact);assert.ok(batch.blastRadius.authorityImpact);}
 });
 
-test('alleen de reeds bewezen eindpoort is GO; high-volume en beslisbatches stoppen',()=>{
+test('alleen de bewezen eindpoort is GO; technische batches faseren en high-volume stopt',()=>{
   const byId=Object.fromEntries(build().batches.map(row=>[row.id,row]));
   assert.equal(byId.B00_FINAL_GUARDS.status,'GO');
   assert.equal(byId.B00_FINAL_GUARDS.blastRadius.newSharedPrimitive,'geen');
   assert.equal(byId.B06_HIGH_VOLUME.status,'STOP');
-  assert.equal(byId.B08_HUMAN_PROGRAMS.status,'STOP');
-  assert.equal(byId.B09_REGULATED_PRIVATE.status,'STOP');
+  assert.equal(byId.B08_HUMAN_PROGRAMS.status,'PHASE');
+  assert.equal(byId.B09_REGULATED_PRIVATE.status,'PHASE');
   assert.ok(byId.B01_PROVEN_CLOSURE.readiness.NEEDS_TECHNICAL_PREREQUISITE>0);
 });

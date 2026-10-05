@@ -17,16 +17,18 @@ function build(){
     sourceFlows:{summary:flows.summary,newGo:[],implementedGo:flows.flows.filter(x=>x.status==='GO').map(x=>x.id),
       note:'De GO-flows waren al bewezen; deze fase voegt geen runtimeadapter toe.'},
     decisions:{blockedCapabilities:decisions.summary.blockedCapabilities,families:decisions.summary.decisionFamilies,
-      topFive:decisions.dossiers.slice(0,5).map(x=>({id:x.id,title:x.title,unlock:x.unlockImpact.capabilities,classification:x.classification}))},
+      resolvedCapabilities:decisions.summary.resolvedCapabilities,
+      topFive:decisions.dossiers.filter(x=>x.decisionStatus==='RESOLVED_PRODUCT_POLICY').slice(0,5)
+        .map(x=>({id:x.id,title:x.title,unlock:x.unlockImpact.capabilities,classification:x.classification}))},
     prerequisites:{expected,assigned,complete:JSON.stringify(expected)===JSON.stringify(assigned),
       nodes:PREREQUISITES.slice().sort((a,b)=>b.unlockCount-a.unlockCount||a.id.localeCompare(b.id)),protocolGates:PROTOCOL_GATES},
     scale:{count:scaleBlockers.length,status:'STOP',blockers:scaleBlockers},
     roadmap:[
-      {order:1,step:'Besluit D23_LIBRARY_EDUCATION_RELEASE',why:'begrensde, versiegebonden en goed testbare cross-domain semantiek',unlocks:['P01_VERSIONED_SOURCE_RELEASE'],nextProof:'V01 Library Edition X -> interne Academy curriculumversie'},
-      {order:2,step:'Bewijs P04_VERSIONED_SERVICE_PROCEDURE op één HACCP-procedure',why:'operationele state zonder gastprofiel en hergebruik van WorkOS runbookpatroon',unlocks:['supplier-haccp'],nextProof:'V02 bottleneck -> procedureversie -> volgende service verification'},
-      {order:3,step:'Besluit D15_SERVICE_IMPROVEMENT',why:'maakt grens tussen ticketinhoud en structurele procesles expliciet',unlocks:['service'],nextProof:'V03 geminimaliseerde supportles met return path'},
-      {order:4,step:'Bouw P05_REVIEWED_FAILURE_ARTIFACT',why:'kleinste technische occurrence-to-learning promotie',unlocks:['dom-foutmelder'],nextProof:'V04 browserfailure -> review -> runbookchange -> verification'},
-      {order:5,step:'Besluit D11_COMMUNITY_EVENTS en pas daarna één eventflow',why:'hoge productwaarde maar deelnemerprivacy moet eerst zijn besloten',unlocks:['ontmoetingen','tickets','supplier-events','dom-agenda','dom-meet','bk-tickets','fs-terrein','fs-werk','fs-gast'],nextProof:'V05 eventprocedure zonder deelnemersprofiel'},
+      {order:1,step:'Bouw P01_VERSIONED_SOURCE_RELEASE voor goedgekeurd D23',why:'begrensde, versiegebonden en goed testbare cross-domain semantiek',unlocks:['dom-library','leerhuis'],nextProof:'V01 Library Edition X -> interne Academy curriculumversie'},
+      {order:2,step:'Bewijs P04_VERSIONED_SERVICE_PROCEDURE op één serviceprocedure',why:'D15 begrenst de inhoud; procesmetadata kan zonder klantprofiel leren',unlocks:['service','supplier-haccp'],nextProof:'V02 bottleneck -> procedureversie -> volgende service verification'},
+      {order:3,step:'Bouw P11_EVENT_FEEDBACK_RELEASE op één eventflow',why:'D11 bepaalt eventscope, no-disadvantage, review en unlinking',unlocks:['ontmoetingen','tickets','supplier-events'],nextProof:'V03 eventfeedback -> geminimaliseerde les -> volgende event verification'},
+      {order:4,step:'Bouw P08_PERSONAL_STRUCTURAL_RELEASE',why:'D01 levert de generieke private-first grens voor één vrijwillige promotieslice',unlocks:['één begrensde persoonlijke contribution-flow'],nextProof:'V04 personal observation -> unlinked structural lesson'},
+      {order:5,step:'Bouw P12_VERSION_BOUND_COMMONS_RELEASE met twee source owners',why:'D13 is besloten maar vereist source-local release en withdrawal',unlocks:['één Saloon- en één World Network-release'],nextProof:'V05 exact object/version -> Commons -> withdrawal'},
       {order:6,step:'P02_VERSIONED_WORK_PROCESS_TARGET per objectieve procesflow',why:'grote technische leverage, maar employee-bound subflows blijven uitgesloten',unlocks:['kantoorpakket','ondernemersos','office','command-zien','command-doen','command-besturen','zaakregie','zaakregie-beheer','dom-werkplek'],nextProof:'V06 project outcome -> process version -> next-project recall'},
       {order:7,step:'P03_ASSET_INTERVENTION_LIFECYCLE na assetauthoritybesluit',why:'maakt onderhoudsgeheugen mogelijk zonder bewonersgeschiedenis',unlocks:['vastgoed','dom-thuis','dom-residentie','dom-home'],nextProof:'V07 issue -> intervention -> recurrence observation'}
     ],
@@ -43,21 +45,21 @@ function md(data){
   data.decisions.topFive.forEach((x,i)=>lines.push(`| ${i+1} | ${x.id} ${x.title} | ${x.unlock} | ${x.classification} |`));
   lines.push('','Alle opties, defaults, gevolgen en Constitution-kandidaatregels staan in `RTG-LOOP-FABRIC-DECISION-DOSSIERS.md`.','',
     '## Technische prerequisite graph','',
-    'De 38 technische capabilities hebben ieder precies één primaire bronprerequisite. De protocolpoorten eronder worden hergebruikt; zij zijn geen nieuwe engines.','',
+    `De ${data.prerequisites.expected.length} technische capabilities hebben ieder precies één primaire bronprerequisite. De protocolpoorten eronder worden hergebruikt; zij zijn geen nieuwe engines.`,'',
     '| Prerequisite | Consumers | Omvang | Risico |','|---|---:|---|---|');
   for(const p of data.prerequisites.nodes)lines.push(`| ${p.id} ${p.title} | ${p.unlockCount} | ${p.implementationScope} | ${p.risk} |`);
   lines.push('','### Gedeelde bestaande poorten','');
   for(const g of data.prerequisites.protocolGates)lines.push(`- **${g.id}:** ${g.rule} Hergebruik: ${g.reuse}.`);
   lines.push('','## Unlock Roadmap','');
-  for(const r of data.roadmap)lines.push(`${r.order}. **${r.step}**  `,`   Waarom: ${r.why}  `,`   Ontgrendelt: ${r.unlocks.map(x=>'`'+x+'`').join(', ')}  `,`   Bewijsslice: ${r.nextProof}`,'');
+  for(const r of data.roadmap)lines.push(`${r.order}. **${r.step}**`,`   Waarom: ${r.why}`,`   Ontgrendelt: ${r.unlocks.map(x=>'`'+x+'`').join(', ')}`,`   Bewijsslice: ${r.nextProof}`,'');
   lines.push('## Schaalblok','',`Alle ${data.scale.count} capabilities blijven **STOP**.`,'',
     '| Domein | Capabilities | Fabric-blocker | Benodigde beslissing | Richting |','|---|---:|---|---|---|');
   for(const domain of [...new Set(data.scale.blockers.map(x=>x.domain))]){const rows=data.scale.blockers.filter(x=>x.domain===domain),x=rows[0];
     lines.push(`| ${domain} | ${rows.length} | ${x.component}: ${x.reason} | ${x.decision} | ${x.direction} |`);}
   lines.push('','Geen van deze schaalblockers is gebruikt om een centrale store, grotere in-memory map of distributed runtime te bouwen.','',
     '## Implementatiebesluit','',
-    'Er is geen nieuwe B01-flow GO geworden. Daarom is in deze fase geen runtimecode gebouwd. De vijf GO-sourceflows waren reeds bewezen; PHASE- en STOP-flows blijven dicht.','',
-    'De eerstvolgende productbeslissing met een veilige technische proof is D23 Library Education Release. Zonder dat besluit blijft ook die overdracht gesloten.','');
+    'De productbesluiten verplaatsen capabilities naar technische prerequisites, niet rechtstreeks naar GO. Iedere flow blijft dicht totdat zijn broncontract en verticale bewijsslice groen zijn.','',
+    'De eerste veilige technische proof is de goedgekeurde D23 Library Education Release.','');
   return lines.join('\n')+'\n';
 }
 function main(){const data=build(),json=JSON.stringify(data,null,2)+'\n',doc=md(data);if(process.argv.includes('--controle')){

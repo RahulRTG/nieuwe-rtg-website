@@ -4,34 +4,34 @@ Datum: 5 oktober 2026
 
 Dit is technisch en productmatig architectuuradvies, geen juridisch advies. Dossiers met `LEGAL_VALIDATION_REQUIRED` blijven fail-closed tot bevoegde validatie.
 
-De 144 capabilityblockers zijn teruggebracht tot 22 semantisch verschillende beslissingen. Geen capability staat in twee dossiers.
+De oorspronkelijke 144 capabilityblockers zijn teruggebracht tot 22 semantisch verschillende beslissingen. 60 capabilities hebben nu een productbesluit; 84 blijven menselijk of juridisch geblokkeerd.
 
 ## Leverage
 
 | Dossier | Type | Capabilities | Veilige default |
 |---|---|---:|---|
-| D20_PAYMENT_OPERATIONS Betaaluitvoering en financieel bronspoor | LEGAL_VALIDATION_REQUIRED | 21 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D01_PERSONAL_MEMORY Persoonlijke levenscontext | PRIVACY_POLICY | 13 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D06_WORKFORCE_DEVELOPMENT Werknemers-, talent- en loopbaancontext | MIXED | 11 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D11_COMMUNITY_EVENTS Community-, event- en groepsdeelname | PRIVACY_POLICY | 11 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D17_SECURITY_CREDENTIALS Credentials, toegang en veiligheidscontext | LEGAL_VALIDATION_REQUIRED | 11 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D04_COMMUNICATION_CONTENT Communicatie en gesprekken | MIXED | 9 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D19_GOVERNANCE Governance, democratie en vertegenwoordiging | GOVERNANCE | 8 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D21_FINANCIAL_PROFILING Financiële inzichten, krediet en AI | LEGAL_VALIDATION_REQUIRED | 8 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D07_TRAVEL_EXPERIENCE Reiservaring en toekomstige reisrecall | MIXED | 7 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D13_DISCOVERY_COMMONS Saloon, sociaal/professioneel netwerk en Commons | PRODUCT_POLICY | 6 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D14_AI_ASSISTANCE AI-assistentie, inference en voorspellen | ETHICAL/SAFETY | 6 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D16_ACCOUNT_ORGANIZATION Account-, profiel- en organisatiecontext | PRIVACY_POLICY | 6 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D08_FOUNDATION_ASSISTANCE Foundation-hulp en programma-ervaring | ETHICAL/SAFETY | 5 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D09_CHILD_EDUCATION Kinderen, school en oudercontext | LEGAL_VALIDATION_REQUIRED | 4 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D10_RESEARCH_PARTICIPATION Living Lab en onderzoeksdeelname | MIXED | 4 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D03_HEALTH_CONTEXT Zorg- en gezondheidscontext | LEGAL_VALIDATION_REQUIRED | 3 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D18_IDENTITY_VERIFICATION Identiteitsverificatie en gegevensdeling | LEGAL_VALIDATION_REQUIRED | 3 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D22_COMMERCIAL_CLAIMS Prijzen, garanties en commerciële claims | MIXED | 3 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D05_DOCUMENT_CONTENT Bestanden, memo en samenvattingen | PRIVACY_POLICY | 2 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D02_LOCATION_CONTEXT Locatie en aanwezigheid | PRIVACY_POLICY | 1 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D12_DATING Dating en intieme voorkeuren | ETHICAL/SAFETY | 1 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
-| D15_SERVICE_IMPROVEMENT Service- en supportverbetering | MIXED | 1 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D20_PAYMENT_OPERATIONS Betaaluitvoering en financieel bronspoor | LEGAL_VALIDATION_REQUIRED / LEGAL_VALIDATION_REQUIRED | 21 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D01_PERSONAL_MEMORY Persoonlijke levenscontext | PRIVACY_POLICY / RESOLVED_PRODUCT_POLICY | 13 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D06_WORKFORCE_DEVELOPMENT Werknemers-, talent- en loopbaancontext | MIXED / RESOLVED_PRODUCT_POLICY | 11 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D11_COMMUNITY_EVENTS Community-, event- en groepsdeelname | PRIVACY_POLICY / RESOLVED_PRODUCT_POLICY | 11 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D17_SECURITY_CREDENTIALS Credentials, toegang en veiligheidscontext | LEGAL_VALIDATION_REQUIRED / LEGAL_VALIDATION_REQUIRED | 11 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D04_COMMUNICATION_CONTENT Communicatie en gesprekken | MIXED / OPEN | 9 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D19_GOVERNANCE Governance, democratie en vertegenwoordiging | GOVERNANCE / OPEN | 8 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D21_FINANCIAL_PROFILING Financiële inzichten, krediet en AI | LEGAL_VALIDATION_REQUIRED / LEGAL_VALIDATION_REQUIRED | 8 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D07_TRAVEL_EXPERIENCE Reiservaring en toekomstige reisrecall | MIXED / RESOLVED_PRODUCT_POLICY | 7 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D13_DISCOVERY_COMMONS Saloon, sociaal/professioneel netwerk en Commons | PRODUCT_POLICY / RESOLVED_PRODUCT_POLICY | 6 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D14_AI_ASSISTANCE AI-assistentie, inference en voorspellen | ETHICAL/SAFETY / RESOLVED_PRODUCT_POLICY | 6 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D16_ACCOUNT_ORGANIZATION Account-, profiel- en organisatiecontext | PRIVACY_POLICY / OPEN | 6 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D08_FOUNDATION_ASSISTANCE Foundation-hulp en programma-ervaring | ETHICAL/SAFETY / RESOLVED_PRODUCT_POLICY | 5 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D09_CHILD_EDUCATION Kinderen, school en oudercontext | LEGAL_VALIDATION_REQUIRED / LEGAL_VALIDATION_REQUIRED | 4 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D10_RESEARCH_PARTICIPATION Living Lab en onderzoeksdeelname | MIXED / OPEN | 4 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D03_HEALTH_CONTEXT Zorg- en gezondheidscontext | LEGAL_VALIDATION_REQUIRED / LEGAL_VALIDATION_REQUIRED | 3 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D18_IDENTITY_VERIFICATION Identiteitsverificatie en gegevensdeling | LEGAL_VALIDATION_REQUIRED / LEGAL_VALIDATION_REQUIRED | 3 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D22_COMMERCIAL_CLAIMS Prijzen, garanties en commerciële claims | MIXED / OPEN | 3 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D05_DOCUMENT_CONTENT Bestanden, memo en samenvattingen | PRIVACY_POLICY / OPEN | 2 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D02_LOCATION_CONTEXT Locatie en aanwezigheid | PRIVACY_POLICY / OPEN | 1 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D12_DATING Dating en intieme voorkeuren | ETHICAL/SAFETY / LEGAL_VALIDATION_REQUIRED | 1 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
+| D15_SERVICE_IMPROVEMENT Service- en supportverbetering | MIXED / RESOLVED_PRODUCT_POLICY | 1 | Optionele learning en cross-domain recall blijven dicht; de primaire dienst blijft werken. |
 
 ## Dossiers
 

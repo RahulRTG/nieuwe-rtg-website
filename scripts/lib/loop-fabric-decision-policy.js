@@ -157,6 +157,10 @@ const EDUCATION_DOSSIER=Object.freeze({id:'D23_LIBRARY_EDUCATION_RELEASE',title:
     learners:['bestaande legitiem uitgegeven cursus blijft aantoonbaar beschikbaar volgens releasevoorwaarden'],
     retention:['releasebewijs en lineage duurzaam; broninhoud niet dupliceren'],lineage:['Edition/ContentNode -> Academy curriculum version, zonder truth promotion']},
   safeDefault:'Geen Library-naar-Academy overdracht.',recommendation:'Begin met één gratis, interne Academy-context, exact Edition X, geselecteerde ContentNodes, citation verplicht, geen derivatives of AI-training, en withdrawal voor toekomstige cursusversies.',
+  selectedDecision:{editionScope:'EXACT_EDITION',contentScope:'SELECTED_CONTENT_NODES',economics:'FREE',academyAudience:'NAMED_INTERNAL_CONTEXT',
+    language:'EXACT_EDITION_LANGUAGE',citation:'REQUIRED',attribution:'REQUIRED',derivatives:'DENIED',aiTraining:'DENIED',
+    aiAssistance:'DENIED_UNLESS_SEPARATELY_GRANTED',futureEditions:'DENIED',withdrawal:'BLOCK_FUTURE_CURRICULUM_VERSIONS',
+    historicalUse:'AUDIT_CONTEXT_ONLY',ownership:'SOURCE_DOMAINS_REMAIN_AUTHORITATIVE'},
   unlockImpact:{capabilities:7,to:'NEEDS_TECHNICAL_PREREQUISITE',directReady:0}});
 
 function dossierForCapability(id){return DOSSIERS.find(d=>d.capabilityIds.includes(id))||null;}

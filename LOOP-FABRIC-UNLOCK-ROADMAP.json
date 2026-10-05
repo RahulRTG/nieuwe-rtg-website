@@ -20,15 +20,10 @@
     "note": "De GO-flows waren al bewezen; deze fase voegt geen runtimeadapter toe."
   },
   "decisions": {
-    "blockedCapabilities": 144,
+    "blockedCapabilities": 84,
     "families": 22,
+    "resolvedCapabilities": 60,
     "topFive": [
-      {
-        "id": "D20_PAYMENT_OPERATIONS",
-        "title": "Betaaluitvoering en financieel bronspoor",
-        "unlock": 21,
-        "classification": "LEGAL_VALIDATION_REQUIRED"
-      },
       {
         "id": "D01_PERSONAL_MEMORY",
         "title": "Persoonlijke levenscontext",
@@ -48,96 +43,258 @@
         "classification": "PRIVACY_POLICY"
       },
       {
-        "id": "D17_SECURITY_CREDENTIALS",
-        "title": "Credentials, toegang en veiligheidscontext",
-        "unlock": 11,
-        "classification": "LEGAL_VALIDATION_REQUIRED"
+        "id": "D07_TRAVEL_EXPERIENCE",
+        "title": "Reiservaring en toekomstige reisrecall",
+        "unlock": 7,
+        "classification": "MIXED"
+      },
+      {
+        "id": "D13_DISCOVERY_COMMONS",
+        "title": "Saloon, sociaal/professioneel netwerk en Commons",
+        "unlock": 6,
+        "classification": "PRODUCT_POLICY"
       }
     ]
   },
   "prerequisites": {
     "expected": [
+      "arrival",
+      "avondos",
       "bedrijf",
       "bk-eten",
+      "bk-reiswijzer",
+      "bk-reizen",
+      "bk-tickets",
+      "bk-verblijf",
+      "carriereledger",
       "command-besturen",
       "command-doen",
       "command-zien",
+      "connect",
+      "dagmetingen",
+      "doelen",
+      "dom-agenda",
       "dom-boeken",
       "dom-doos",
       "dom-eigendomein",
       "dom-foutmelder",
+      "dom-genootschap",
       "dom-home",
       "dom-leerstof",
       "dom-les",
       "dom-library",
+      "dom-meet",
+      "dom-metier",
       "dom-onderwijs",
       "dom-plaats",
+      "dom-reisbureau",
       "dom-residentie",
+      "dom-rtfkantoor",
+      "dom-rtfos",
       "dom-site",
       "dom-thuis",
+      "dom-vak",
       "dom-werkplek",
+      "dom-werkvloer",
       "experience-platform",
+      "fs-gast",
+      "fs-terrein",
+      "fs-werk",
       "gastos",
+      "gemoed",
+      "gewoonten",
+      "ghost",
+      "instantreality",
       "kantoorpakket",
+      "kern-rahul",
+      "kern-waardering",
+      "knelpunt",
       "leerhuis",
+      "levenos",
+      "life",
+      "member-werk",
+      "neiging",
       "office",
       "ondernemersos",
+      "ontmoetingen",
+      "oog",
+      "ov-aandacht",
       "ov-bijles",
+      "ov-kantoorgesprek",
       "ov-krant",
+      "ov-spar",
       "ov-stad",
+      "ov-werkmail",
+      "privekantoor",
+      "rechterhand",
+      "rtf-contacten",
       "rtf-leerpaspoort",
+      "rugdekking",
+      "rust",
+      "salon",
+      "service",
+      "social",
+      "socialewereld",
+      "staff",
+      "stuur",
+      "supplier-apply",
+      "supplier-events",
       "supplier-haccp",
       "supplier-pos",
       "supplier-rooms",
       "supplier-salon",
+      "tickets",
+      "tijdlijn",
+      "training",
+      "vakbewijs",
       "vastgoed",
       "verzorging",
+      "voeding",
       "wereld",
+      "werk-rtf",
+      "werving",
       "zaakregie",
-      "zaakregie-beheer"
+      "zaakregie-beheer",
+      "zakelijk"
     ],
     "assigned": [
+      "arrival",
+      "avondos",
       "bedrijf",
       "bk-eten",
+      "bk-reiswijzer",
+      "bk-reizen",
+      "bk-tickets",
+      "bk-verblijf",
+      "carriereledger",
       "command-besturen",
       "command-doen",
       "command-zien",
+      "connect",
+      "dagmetingen",
+      "doelen",
+      "dom-agenda",
       "dom-boeken",
       "dom-doos",
       "dom-eigendomein",
       "dom-foutmelder",
+      "dom-genootschap",
       "dom-home",
       "dom-leerstof",
       "dom-les",
       "dom-library",
+      "dom-meet",
+      "dom-metier",
       "dom-onderwijs",
       "dom-plaats",
+      "dom-reisbureau",
       "dom-residentie",
+      "dom-rtfkantoor",
+      "dom-rtfos",
       "dom-site",
       "dom-thuis",
+      "dom-vak",
       "dom-werkplek",
+      "dom-werkvloer",
       "experience-platform",
+      "fs-gast",
+      "fs-terrein",
+      "fs-werk",
       "gastos",
+      "gemoed",
+      "gewoonten",
+      "ghost",
+      "instantreality",
       "kantoorpakket",
+      "kern-rahul",
+      "kern-waardering",
+      "knelpunt",
       "leerhuis",
+      "levenos",
+      "life",
+      "member-werk",
+      "neiging",
       "office",
       "ondernemersos",
+      "ontmoetingen",
+      "oog",
+      "ov-aandacht",
       "ov-bijles",
+      "ov-kantoorgesprek",
       "ov-krant",
+      "ov-spar",
       "ov-stad",
+      "ov-werkmail",
+      "privekantoor",
+      "rechterhand",
+      "rtf-contacten",
       "rtf-leerpaspoort",
+      "rugdekking",
+      "rust",
+      "salon",
+      "service",
+      "social",
+      "socialewereld",
+      "staff",
+      "stuur",
+      "supplier-apply",
+      "supplier-events",
       "supplier-haccp",
       "supplier-pos",
       "supplier-rooms",
       "supplier-salon",
+      "tickets",
+      "tijdlijn",
+      "training",
+      "vakbewijs",
       "vastgoed",
       "verzorging",
+      "voeding",
       "wereld",
+      "werk-rtf",
+      "werving",
       "zaakregie",
-      "zaakregie-beheer"
+      "zaakregie-beheer",
+      "zakelijk"
     ],
     "complete": true,
     "nodes": [
+      {
+        "id": "P08_PERSONAL_STRUCTURAL_RELEASE",
+        "title": "Personal to Structural Release",
+        "consumers": [
+          "rechterhand",
+          "neiging",
+          "privekantoor",
+          "life",
+          "doelen",
+          "dagmetingen",
+          "gemoed",
+          "gewoonten",
+          "training",
+          "tijdlijn",
+          "voeding",
+          "rust",
+          "ov-spar"
+        ],
+        "sharedSemantics": "Een vrijwillige persoonlijke bijdrage maakt na minimization en unlinking een nieuw structureel artifact; de private bron wordt niet gekopieerd.",
+        "reuse": [
+          "Learning eligibility promotionFrom",
+          "unlinking",
+          "source retention"
+        ],
+        "counterexample": "Private Recall blijft Personal Memory en gebruikt geen structurele release.",
+        "implementationScope": "medium: één vrijwillige bronflow plus unlink/delete/revoke proof",
+        "risk": "heridentificatie via provenance of te rijke lesson",
+        "dependencies": [
+          "explicit contribution",
+          "minimization",
+          "unlinking receipt",
+          "new artifact id",
+          "source revocation path"
+        ],
+        "unlockCount": 13
+      },
       {
         "id": "P01_VERSIONED_SOURCE_RELEASE",
         "title": "Versioned Source Release",
@@ -169,6 +326,74 @@
           "durable source event",
           "withdrawal path",
           "consumer-owned versioned target"
+        ],
+        "unlockCount": 11
+      },
+      {
+        "id": "P07_WORKFORCE_PROCESS_SEPARATION",
+        "title": "Workforce Process Separation",
+        "consumers": [
+          "staff",
+          "dom-werkvloer",
+          "ov-kantoorgesprek",
+          "ov-werkmail",
+          "member-werk",
+          "carriereledger",
+          "supplier-apply",
+          "werving",
+          "vakbewijs",
+          "dom-metier",
+          "dom-vak"
+        ],
+        "sharedSemantics": "Alleen versioned processtate kan organizational learning voeden; menselijke prestatie, communicatie en loopbaan blijven afzonderlijk en private-first.",
+        "reuse": [
+          "WorkOS authority",
+          "versioned work process target",
+          "Learning Constitution LC07"
+        ],
+        "counterexample": "Een werknemersnotitie, mail of populariteit is geen procesles.",
+        "implementationScope": "high: source-flowdecompositie vóór één objectieve proces-slice",
+        "risk": "surveillancegeheugen vermomd als procesverbetering",
+        "dependencies": [
+          "process owner",
+          "field allowlist",
+          "no-person-score gate",
+          "retention",
+          "verification"
+        ],
+        "unlockCount": 11
+      },
+      {
+        "id": "P11_EVENT_FEEDBACK_RELEASE",
+        "title": "Event Feedback Release",
+        "consumers": [
+          "ontmoetingen",
+          "social",
+          "rtf-contacten",
+          "tickets",
+          "supplier-events",
+          "dom-agenda",
+          "dom-meet",
+          "bk-tickets",
+          "fs-terrein",
+          "fs-werk",
+          "fs-gast"
+        ],
+        "sharedSemantics": "Vrijwillige feedback is event- en purpose-bound en wordt pas na review/minimization een structurele eventles.",
+        "reuse": [
+          "Living World observation",
+          "WorkOS decision/change",
+          "personal structural release"
+        ],
+        "counterexample": "Eventdeelname, groepslidmaatschap en locatiegeschiedenis zijn geen release.",
+        "implementationScope": "medium: één versioned eventprocedure met no-disadvantage test",
+        "risk": "social graph of langdurige locatiehistorie ontstaat indirect",
+        "dependencies": [
+          "event source version",
+          "voluntary feedback",
+          "review",
+          "unlinking",
+          "next-event verification"
         ],
         "unlockCount": 11
       },
@@ -246,7 +471,8 @@
           "supplier-pos",
           "supplier-salon",
           "supplier-rooms",
-          "bk-eten"
+          "bk-eten",
+          "service"
         ],
         "sharedSemantics": "Een bevoegde serviceowner wijzigt een concrete procedureversie en verifieert bij een volgende service-uitvoering.",
         "reuse": [
@@ -264,7 +490,123 @@
           "source outbox/receipt",
           "next-service verification"
         ],
+        "unlockCount": 7
+      },
+      {
+        "id": "P09_TRAVEL_STRUCTURAL_LESSON",
+        "title": "Travel Structural Lesson",
+        "consumers": [
+          "avondos",
+          "arrival",
+          "instantreality",
+          "dom-reisbureau",
+          "bk-reizen",
+          "bk-verblijf",
+          "bk-reiswijzer"
+        ],
+        "sharedSemantics": "Triprecall blijft Personal; alleen vrijwillig vrijgegeven, geminimaliseerde reisuitkomsten worden losgekoppelde structurele lessons.",
+        "reuse": [
+          "personal structural release",
+          "Travel source state",
+          "policy-aware Recall"
+        ],
+        "counterexample": "Een boeking of bewegingshistorie is geen learning consent.",
+        "implementationScope": "high: eerst één verstorings- of toegankelijkheidsflow",
+        "risk": "reizigersprofiel en locatiehistorie lekken",
+        "dependencies": [
+          "trip source version",
+          "voluntary release",
+          "location minimization",
+          "unlinking",
+          "future-trip recall policy"
+        ],
+        "unlockCount": 7
+      },
+      {
+        "id": "P12_VERSION_BOUND_COMMONS_RELEASE",
+        "title": "Version-bound Commons Release",
+        "consumers": [
+          "zakelijk",
+          "socialewereld",
+          "connect",
+          "dom-genootschap",
+          "salon",
+          "kern-waardering"
+        ],
+        "sharedSemantics": "De source owner geeft object/versie, doel, audience, reuse, attribution, AI- en derivative scope expliciet vrij en kan withdraw/supersede uitgeven.",
+        "reuse": [
+          "Learning eligibility COMMONS",
+          "source rights/versioning",
+          "lineage refs"
+        ],
+        "counterexample": "Waarderen, volgen, aankopen of bereik vormen geen Commons-release.",
+        "implementationScope": "medium: klein source-local contract met twee concrete release-eigenaren",
+        "risk": "impliciete publicatie en epistemic laundering",
+        "dependencies": [
+          "source authority",
+          "versioned source",
+          "withdrawal",
+          "attribution",
+          "no-pay-to-rank gate"
+        ],
         "unlockCount": 6
+      },
+      {
+        "id": "P13_AI_PURPOSE_SCOPE",
+        "title": "AI Purpose Scope",
+        "consumers": [
+          "oog",
+          "ghost",
+          "knelpunt",
+          "kern-rahul",
+          "ov-aandacht",
+          "stuur"
+        ],
+        "sharedSemantics": "Assistance, inference en training zijn afzonderlijke source-issued uses; AI-output behoudt epistemische herkomst en mutatieauthority.",
+        "reuse": [
+          "Learning eligibility aiScopes",
+          "AI provenance",
+          "authority decisions"
+        ],
+        "counterexample": "Een AI-voorstel is geen source-verified feit en gebruik van assistentie is geen trainingstoestemming.",
+        "implementationScope": "medium: adapters per AI-entrypoint; training default deny",
+        "risk": "inference wordt feit of toegestane context wordt voor training hergebruikt",
+        "dependencies": [
+          "purpose binding",
+          "current authorization",
+          "provenance type",
+          "training deny",
+          "source mutation gate"
+        ],
+        "unlockCount": 6
+      },
+      {
+        "id": "P10_FOUNDATION_VOLUNTARY_LESSON",
+        "title": "Foundation Voluntary Lesson",
+        "consumers": [
+          "levenos",
+          "rugdekking",
+          "werk-rtf",
+          "dom-rtfkantoor",
+          "dom-rtfos"
+        ],
+        "sharedSemantics": "Hulp en vrijwillige ervaringsbijdrage zijn afzonderlijke lifecycles; weigering heeft aantoonbaar geen behandel- of kansnadeel.",
+        "reuse": [
+          "Learning eligibility",
+          "Foundation source authority",
+          "personal structural release"
+        ],
+        "counterexample": "Toegang tot hulp en dossierinhoud zijn geen learning artifact.",
+        "implementationScope": "medium/high: no-disadvantage gate plus één vrijwillige projectles",
+        "risk": "dwang door machtsasymmetrie",
+        "dependencies": [
+          "service eligibility independence",
+          "explicit contribution",
+          "minimization",
+          "withdrawal",
+          "organizational decision"
+        ],
+        "unlockCount": 5
       },
       {
         "id": "P05_REVIEWED_FAILURE_ARTIFACT",
@@ -318,37 +660,37 @@
     "protocolGates": [
       {
         "id": "G01_ELIGIBILITY",
-        "consumers": 38,
+        "consumers": 98,
         "reuse": "server/kern/loop-fabric/learning-eligibility.js",
         "rule": "Iedere bron geeft purpose, basis, memory class, fields, audience, uses en retention uit."
       },
       {
         "id": "G02_DURABLE_DELIVERY",
-        "consumers": 38,
+        "consumers": 98,
         "reuse": "source-owned outbox/checkpoint/dead-letter",
         "rule": "Committed bronstate overleeft consumeruitval en replay."
       },
       {
         "id": "G03_SOURCE_RECEIPT",
-        "consumers": 36,
+        "consumers": 98,
         "reuse": "ChangeReceipt plus service-receipt",
         "rule": "Alleen de bron van gewijzigde state bevestigt Change."
       },
       {
         "id": "G04_CURRENT_AUTHORITY",
-        "consumers": 38,
+        "consumers": 98,
         "reuse": "brondomein-authority adapters",
         "rule": "Decision, Change en Recall herbeoordelen actuele authority."
       },
       {
         "id": "G05_POLICY_RECALL",
-        "consumers": 38,
+        "consumers": 98,
         "reuse": "Loop Fabric Recall Broker",
         "rule": "Recall resolveert live bron, visibility, retention, contest en correction."
       },
       {
         "id": "G06_VERIFICATION_OBSERVATION",
-        "consumers": 38,
+        "consumers": 98,
         "reuse": "Observation plus verificationOf, causalClaim=false",
         "rule": "Verification is een nieuwe bronwaarneming en geen causale conclusie."
       }
@@ -651,56 +993,52 @@
   "roadmap": [
     {
       "order": 1,
-      "step": "Besluit D23_LIBRARY_EDUCATION_RELEASE",
+      "step": "Bouw P01_VERSIONED_SOURCE_RELEASE voor goedgekeurd D23",
       "why": "begrensde, versiegebonden en goed testbare cross-domain semantiek",
       "unlocks": [
-        "P01_VERSIONED_SOURCE_RELEASE"
+        "dom-library",
+        "leerhuis"
       ],
       "nextProof": "V01 Library Edition X -> interne Academy curriculumversie"
     },
     {
       "order": 2,
-      "step": "Bewijs P04_VERSIONED_SERVICE_PROCEDURE op één HACCP-procedure",
-      "why": "operationele state zonder gastprofiel en hergebruik van WorkOS runbookpatroon",
+      "step": "Bewijs P04_VERSIONED_SERVICE_PROCEDURE op één serviceprocedure",
+      "why": "D15 begrenst de inhoud; procesmetadata kan zonder klantprofiel leren",
       "unlocks": [
+        "service",
         "supplier-haccp"
       ],
       "nextProof": "V02 bottleneck -> procedureversie -> volgende service verification"
     },
     {
       "order": 3,
-      "step": "Besluit D15_SERVICE_IMPROVEMENT",
-      "why": "maakt grens tussen ticketinhoud en structurele procesles expliciet",
-      "unlocks": [
-        "service"
-      ],
-      "nextProof": "V03 geminimaliseerde supportles met return path"
-    },
-    {
-      "order": 4,
-      "step": "Bouw P05_REVIEWED_FAILURE_ARTIFACT",
-      "why": "kleinste technische occurrence-to-learning promotie",
-      "unlocks": [
-        "dom-foutmelder"
-      ],
-      "nextProof": "V04 browserfailure -> review -> runbookchange -> verification"
-    },
-    {
-      "order": 5,
-      "step": "Besluit D11_COMMUNITY_EVENTS en pas daarna één eventflow",
-      "why": "hoge productwaarde maar deelnemerprivacy moet eerst zijn besloten",
+      "step": "Bouw P11_EVENT_FEEDBACK_RELEASE op één eventflow",
+      "why": "D11 bepaalt eventscope, no-disadvantage, review en unlinking",
       "unlocks": [
         "ontmoetingen",
         "tickets",
-        "supplier-events",
-        "dom-agenda",
-        "dom-meet",
-        "bk-tickets",
-        "fs-terrein",
-        "fs-werk",
-        "fs-gast"
+        "supplier-events"
       ],
-      "nextProof": "V05 eventprocedure zonder deelnemersprofiel"
+      "nextProof": "V03 eventfeedback -> geminimaliseerde les -> volgende event verification"
+    },
+    {
+      "order": 4,
+      "step": "Bouw P08_PERSONAL_STRUCTURAL_RELEASE",
+      "why": "D01 levert de generieke private-first grens voor één vrijwillige promotieslice",
+      "unlocks": [
+        "één begrensde persoonlijke contribution-flow"
+      ],
+      "nextProof": "V04 personal observation -> unlinked structural lesson"
+    },
+    {
+      "order": 5,
+      "step": "Bouw P12_VERSION_BOUND_COMMONS_RELEASE met twee source owners",
+      "why": "D13 is besloten maar vereist source-local release en withdrawal",
+      "unlocks": [
+        "één Saloon- en één World Network-release"
+      ],
+      "nextProof": "V05 exact object/version -> Commons -> withdrawal"
     },
     {
       "order": 6,

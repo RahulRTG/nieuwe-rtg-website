@@ -34,8 +34,8 @@
   ],
   "readinessSummary": {
     "READY_TO_IMPLEMENT": 1,
-    "NEEDS_TECHNICAL_PREREQUISITE": 38,
-    "NEEDS_HUMAN_DECISION": 144,
+    "NEEDS_TECHNICAL_PREREQUISITE": 98,
+    "NEEDS_HUMAN_DECISION": 84,
     "BLOCKED_BY_SCALE_ARCHITECTURE": 32,
     "PROHIBITED": 5,
     "NO_LEARNING_VALUE": 8
@@ -7299,11 +7299,11 @@
     }
   ],
   "consentCoverage": {
-    "explicitConsentNeeded": 23,
-    "otherBasisMustBeProven": 100,
+    "explicitConsentNeeded": 24,
+    "otherBasisMustBeProven": 61,
     "organizationalOrTechnicalState": 46,
     "prohibited": 5,
-    "humanOrLegalReview": 46
+    "humanOrLegalReview": 84
   },
   "capabilities": [
     {
@@ -7839,16 +7839,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
+        "technicalPrerequisiteId": "P07_WORKFORCE_PROCESS_SEPARATION"
       }
     },
     {
@@ -7958,16 +7960,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -8058,16 +8062,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B07_DISCOVERY_AI_NETWORK",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D13_DISCOVERY_COMMONS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D13_DISCOVERY_COMMONS"
+        "technicalPrerequisiteId": "P12_VERSION_BOUND_COMMONS_RELEASE"
       }
     },
     {
@@ -8277,16 +8283,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B05_SERVICE_OPERATIONS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D15_SERVICE_IMPROVEMENT",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D15_SERVICE_IMPROVEMENT"
+        "technicalPrerequisiteId": "P04_VERSIONED_SERVICE_PROCEDURE"
       }
     },
     {
@@ -8571,16 +8579,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -8676,16 +8686,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -8793,16 +8805,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B07_DISCOVERY_AI_NETWORK",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D13_DISCOVERY_COMMONS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D13_DISCOVERY_COMMONS"
+        "technicalPrerequisiteId": "P12_VERSION_BOUND_COMMONS_RELEASE"
       }
     },
     {
@@ -8843,21 +8857,31 @@
       "classification": "HUMAN_REVIEW_REQUIRED",
       "classificationReason": "De flow raakt gereguleerde, hoog-impact- of bijzondere persoonsgegevens; code kan de vereiste rechtsgrond niet vaststellen.",
       "loop": {
-        "occurrences": [],
-        "observations": [],
+        "occurrences": [
+          "SEMANTIC_MUTATION"
+        ],
+        "observations": [
+          "SOURCE_OWNED_ONLY"
+        ],
         "expectations": [],
         "decisions": [],
         "claimsContests": [],
-        "changes": [],
-        "verification": [],
-        "recallOpportunities": []
+        "changes": [
+          "SOURCE_OWNED_CHANGE_REQUIRED"
+        ],
+        "verification": [
+          "NEW_SOURCE_OBSERVATION"
+        ],
+        "recallOpportunities": [
+          "CONTEXTUAL_SOURCE_RESOLUTION"
+        ]
       },
       "participation": {
-        "eligibility": "HUMAN_OR_LEGAL_DECISION_REQUIRED",
+        "eligibility": "SOURCE_MUST_ISSUE",
         "purposes": [
           "DOMAIN_IMPROVEMENT_EXPLICIT"
         ],
-        "lawfulBasis": "UNDECIDED",
+        "lawfulBasis": "PRODUCT_POLICY_RESOLVED_SOURCE_MUST_PROVE",
         "consent": "NOT_INFERRED_FROM_USE",
         "allowedMemoryClasses": [
           "ORGANIZATIONAL"
@@ -8871,21 +8895,25 @@
       },
       "crossDomainHandoffs": [],
       "missing": [
-        "lawful-basis-decision",
-        "purpose-and-field-allowlist",
-        "retention-decision"
+        "source-issued-learning-eligibility",
+        "semantic-observation-or-outcome",
+        "source-change-receipt",
+        "recall-policy",
+        "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "decisionDossierId": "D11_COMMUNITY_EVENTS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "lawful-basis",
-          "retention"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D11_COMMUNITY_EVENTS"
+        "technicalPrerequisiteId": "P11_EVENT_FEEDBACK_RELEASE"
       }
     },
     {
@@ -8981,16 +9009,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D11_COMMUNITY_EVENTS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D11_COMMUNITY_EVENTS"
+        "technicalPrerequisiteId": "P11_EVENT_FEEDBACK_RELEASE"
       }
     },
     {
@@ -9139,16 +9169,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D11_COMMUNITY_EVENTS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D11_COMMUNITY_EVENTS"
+        "technicalPrerequisiteId": "P11_EVENT_FEEDBACK_RELEASE"
       }
     },
     {
@@ -9535,16 +9567,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D11_COMMUNITY_EVENTS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D11_COMMUNITY_EVENTS"
+        "technicalPrerequisiteId": "P11_EVENT_FEEDBACK_RELEASE"
       }
     },
     {
@@ -11335,16 +11369,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE"
+        "technicalPrerequisiteId": "P10_FOUNDATION_VOLUNTARY_LESSON"
       }
     },
     {
@@ -11446,16 +11482,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B07_DISCOVERY_AI_NETWORK",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D13_DISCOVERY_COMMONS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D13_DISCOVERY_COMMONS"
+        "technicalPrerequisiteId": "P12_VERSION_BOUND_COMMONS_RELEASE"
       }
     },
     {
@@ -11769,8 +11807,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -12170,16 +12208,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B07_DISCOVERY_AI_NETWORK",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D14_AI_ASSISTANCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D14_AI_ASSISTANCE"
+        "technicalPrerequisiteId": "P13_AI_PURPOSE_SCOPE"
       }
     },
     {
@@ -12263,16 +12303,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B07_DISCOVERY_AI_NETWORK",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D14_AI_ASSISTANCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D14_AI_ASSISTANCE"
+        "technicalPrerequisiteId": "P13_AI_PURPOSE_SCOPE"
       }
     },
     {
@@ -12519,16 +12561,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
+        "technicalPrerequisiteId": "P09_TRAVEL_STRUCTURAL_LESSON"
       }
     },
     {
@@ -12620,16 +12664,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
+        "technicalPrerequisiteId": "P09_TRAVEL_STRUCTURAL_LESSON"
       }
     },
     {
@@ -12714,16 +12760,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
+        "technicalPrerequisiteId": "P09_TRAVEL_STRUCTURAL_LESSON"
       }
     },
     {
@@ -13011,16 +13059,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -13103,16 +13153,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -13162,21 +13214,31 @@
       "classification": "HUMAN_REVIEW_REQUIRED",
       "classificationReason": "De flow raakt gereguleerde, hoog-impact- of bijzondere persoonsgegevens; code kan de vereiste rechtsgrond niet vaststellen.",
       "loop": {
-        "occurrences": [],
-        "observations": [],
+        "occurrences": [
+          "SEMANTIC_MUTATION"
+        ],
+        "observations": [
+          "SOURCE_OWNED_ONLY"
+        ],
         "expectations": [],
         "decisions": [],
         "claimsContests": [],
-        "changes": [],
-        "verification": [],
-        "recallOpportunities": []
+        "changes": [
+          "SOURCE_OWNED_CHANGE_REQUIRED"
+        ],
+        "verification": [
+          "NEW_SOURCE_OBSERVATION"
+        ],
+        "recallOpportunities": [
+          "CONTEXTUAL_SOURCE_RESOLUTION"
+        ]
       },
       "participation": {
-        "eligibility": "HUMAN_OR_LEGAL_DECISION_REQUIRED",
+        "eligibility": "SOURCE_MUST_ISSUE",
         "purposes": [
           "DOMAIN_IMPROVEMENT_EXPLICIT"
         ],
-        "lawfulBasis": "UNDECIDED",
+        "lawfulBasis": "PRODUCT_POLICY_RESOLVED_SOURCE_MUST_PROVE",
         "consent": "EXPLICIT_WHERE_PERSONAL",
         "allowedMemoryClasses": [
           "PERSONAL"
@@ -13190,21 +13252,25 @@
       },
       "crossDomainHandoffs": [],
       "missing": [
-        "lawful-basis-decision",
-        "purpose-and-field-allowlist",
-        "retention-decision"
+        "source-issued-learning-eligibility",
+        "semantic-observation-or-outcome",
+        "source-change-receipt",
+        "recall-policy",
+        "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "lawful-basis",
-          "retention"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -13245,8 +13311,12 @@
       "classification": "HUMAN_REVIEW_REQUIRED",
       "classificationReason": "De flow raakt gereguleerde, hoog-impact- of bijzondere persoonsgegevens; code kan de vereiste rechtsgrond niet vaststellen.",
       "loop": {
-        "occurrences": [],
-        "observations": [],
+        "occurrences": [
+          "SEMANTIC_MUTATION"
+        ],
+        "observations": [
+          "SOURCE_OWNED_ONLY"
+        ],
         "expectations": [
           "SOURCE_EVENT_CANDIDATE"
         ],
@@ -13254,16 +13324,22 @@
           "SOURCE_EVENT_CANDIDATE"
         ],
         "claimsContests": [],
-        "changes": [],
-        "verification": [],
-        "recallOpportunities": []
+        "changes": [
+          "SOURCE_OWNED_CHANGE_REQUIRED"
+        ],
+        "verification": [
+          "NEW_SOURCE_OBSERVATION"
+        ],
+        "recallOpportunities": [
+          "CONTEXTUAL_SOURCE_RESOLUTION"
+        ]
       },
       "participation": {
-        "eligibility": "HUMAN_OR_LEGAL_DECISION_REQUIRED",
+        "eligibility": "SOURCE_MUST_ISSUE",
         "purposes": [
           "DOMAIN_IMPROVEMENT_EXPLICIT"
         ],
-        "lawfulBasis": "UNDECIDED",
+        "lawfulBasis": "PRODUCT_POLICY_RESOLVED_SOURCE_MUST_PROVE",
         "consent": "EXPLICIT_WHERE_PERSONAL",
         "allowedMemoryClasses": [
           "PERSONAL"
@@ -13277,21 +13353,25 @@
       },
       "crossDomainHandoffs": [],
       "missing": [
-        "lawful-basis-decision",
-        "purpose-and-field-allowlist",
-        "retention-decision"
+        "source-issued-learning-eligibility",
+        "semantic-observation-or-outcome",
+        "source-change-receipt",
+        "recall-policy",
+        "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "lawful-basis",
-          "retention"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -13374,16 +13454,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -13526,8 +13608,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -13619,16 +13701,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -13711,16 +13795,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -13803,16 +13889,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -14041,8 +14129,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -14151,16 +14239,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B07_DISCOVERY_AI_NETWORK",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D14_AI_ASSISTANCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D14_AI_ASSISTANCE"
+        "technicalPrerequisiteId": "P13_AI_PURPOSE_SCOPE"
       }
     },
     {
@@ -14295,21 +14385,31 @@
       "classification": "HUMAN_REVIEW_REQUIRED",
       "classificationReason": "De flow raakt gereguleerde, hoog-impact- of bijzondere persoonsgegevens; code kan de vereiste rechtsgrond niet vaststellen.",
       "loop": {
-        "occurrences": [],
-        "observations": [],
+        "occurrences": [
+          "SEMANTIC_MUTATION"
+        ],
+        "observations": [
+          "SOURCE_OWNED_ONLY"
+        ],
         "expectations": [],
         "decisions": [],
         "claimsContests": [],
-        "changes": [],
-        "verification": [],
-        "recallOpportunities": []
+        "changes": [
+          "SOURCE_OWNED_CHANGE_REQUIRED"
+        ],
+        "verification": [
+          "NEW_SOURCE_OBSERVATION"
+        ],
+        "recallOpportunities": [
+          "CONTEXTUAL_SOURCE_RESOLUTION"
+        ]
       },
       "participation": {
-        "eligibility": "HUMAN_OR_LEGAL_DECISION_REQUIRED",
+        "eligibility": "SOURCE_MUST_ISSUE",
         "purposes": [
           "DOMAIN_IMPROVEMENT_EXPLICIT"
         ],
-        "lawfulBasis": "UNDECIDED",
+        "lawfulBasis": "PRODUCT_POLICY_RESOLVED_SOURCE_MUST_PROVE",
         "consent": "NOT_INFERRED_FROM_USE",
         "allowedMemoryClasses": [
           "ORGANIZATIONAL"
@@ -14323,21 +14423,25 @@
       },
       "crossDomainHandoffs": [],
       "missing": [
-        "lawful-basis-decision",
-        "purpose-and-field-allowlist",
-        "retention-decision"
+        "source-issued-learning-eligibility",
+        "semantic-observation-or-outcome",
+        "source-change-receipt",
+        "recall-policy",
+        "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "lawful-basis",
-          "retention"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE"
+        "technicalPrerequisiteId": "P10_FOUNDATION_VOLUNTARY_LESSON"
       }
     },
     {
@@ -14430,16 +14534,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
+        "technicalPrerequisiteId": "P07_WORKFORCE_PROCESS_SEPARATION"
       }
     },
     {
@@ -14524,16 +14630,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -14624,16 +14732,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B07_DISCOVERY_AI_NETWORK",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D13_DISCOVERY_COMMONS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D13_DISCOVERY_COMMONS"
+        "technicalPrerequisiteId": "P12_VERSION_BOUND_COMMONS_RELEASE"
       }
     },
     {
@@ -15327,16 +15437,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D11_COMMUNITY_EVENTS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D11_COMMUNITY_EVENTS"
+        "technicalPrerequisiteId": "P11_EVENT_FEEDBACK_RELEASE"
       }
     },
     {
@@ -15747,16 +15859,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
+        "technicalPrerequisiteId": "P07_WORKFORCE_PROCESS_SEPARATION"
       }
     },
     {
@@ -16155,8 +16269,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -16288,8 +16402,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -16386,16 +16500,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE"
+        "technicalPrerequisiteId": "P10_FOUNDATION_VOLUNTARY_LESSON"
       }
     },
     {
@@ -16648,8 +16764,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -16746,8 +16862,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -16936,8 +17052,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -17027,8 +17143,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -17160,16 +17276,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B02_WORK_OPERATIONS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
+        "technicalPrerequisiteId": "P07_WORKFORCE_PROCESS_SEPARATION"
       }
     },
     {
@@ -17261,16 +17379,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
+        "technicalPrerequisiteId": "P07_WORKFORCE_PROCESS_SEPARATION"
       }
     },
     {
@@ -17375,16 +17495,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B05_SERVICE_OPERATIONS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D14_AI_ASSISTANCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D14_AI_ASSISTANCE"
+        "technicalPrerequisiteId": "P13_AI_PURPOSE_SCOPE"
       }
     },
     {
@@ -18065,16 +18187,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
+        "technicalPrerequisiteId": "P07_WORKFORCE_PROCESS_SEPARATION"
       }
     },
     {
@@ -18911,16 +19035,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
+        "technicalPrerequisiteId": "P09_TRAVEL_STRUCTURAL_LESSON"
       }
     },
     {
@@ -19005,8 +19131,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -19111,16 +19237,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D11_COMMUNITY_EVENTS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D11_COMMUNITY_EVENTS"
+        "technicalPrerequisiteId": "P11_EVENT_FEEDBACK_RELEASE"
       }
     },
     {
@@ -19206,16 +19334,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D11_COMMUNITY_EVENTS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D11_COMMUNITY_EVENTS"
+        "technicalPrerequisiteId": "P11_EVENT_FEEDBACK_RELEASE"
       }
     },
     {
@@ -19704,16 +19834,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B07_DISCOVERY_AI_NETWORK",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D13_DISCOVERY_COMMONS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D13_DISCOVERY_COMMONS"
+        "technicalPrerequisiteId": "P12_VERSION_BOUND_COMMONS_RELEASE"
       }
     },
     {
@@ -20343,16 +20475,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B02_WORK_OPERATIONS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
+        "technicalPrerequisiteId": "P07_WORKFORCE_PROCESS_SEPARATION"
       }
     },
     {
@@ -20551,16 +20685,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
+        "technicalPrerequisiteId": "P07_WORKFORCE_PROCESS_SEPARATION"
       }
     },
     {
@@ -20648,16 +20784,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
+        "technicalPrerequisiteId": "P07_WORKFORCE_PROCESS_SEPARATION"
       }
     },
     {
@@ -21061,16 +21199,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE"
+        "technicalPrerequisiteId": "P10_FOUNDATION_VOLUNTARY_LESSON"
       }
     },
     {
@@ -21180,16 +21320,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D08_FOUNDATION_ASSISTANCE"
+        "technicalPrerequisiteId": "P10_FOUNDATION_VOLUNTARY_LESSON"
       }
     },
     {
@@ -21268,8 +21410,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -22972,8 +23114,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -23059,8 +23201,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -23148,8 +23290,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -23333,8 +23475,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -23418,8 +23560,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -23502,8 +23644,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -23593,8 +23735,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -23681,8 +23823,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -23769,8 +23911,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -23857,8 +23999,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -23943,8 +24085,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -24032,8 +24174,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -24118,8 +24260,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -24205,8 +24347,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -24387,8 +24529,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -24490,8 +24632,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -24575,8 +24717,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -24660,8 +24802,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -24748,8 +24890,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -24832,8 +24974,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -24914,8 +25056,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -25121,8 +25263,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -25327,8 +25469,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -25410,8 +25552,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -25745,8 +25887,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -26929,16 +27071,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B07_DISCOVERY_AI_NETWORK",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D14_AI_ASSISTANCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D14_AI_ASSISTANCE"
+        "technicalPrerequisiteId": "P13_AI_PURPOSE_SCOPE"
       }
     },
     {
@@ -27105,16 +27249,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B07_DISCOVERY_AI_NETWORK",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D13_DISCOVERY_COMMONS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D13_DISCOVERY_COMMONS"
+        "technicalPrerequisiteId": "P12_VERSION_BOUND_COMMONS_RELEASE"
       }
     },
     {
@@ -27227,16 +27373,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
+        "technicalPrerequisiteId": "P09_TRAVEL_STRUCTURAL_LESSON"
       }
     },
     {
@@ -27332,16 +27480,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
+        "technicalPrerequisiteId": "P09_TRAVEL_STRUCTURAL_LESSON"
       }
     },
     {
@@ -27430,16 +27580,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D07_TRAVEL_EXPERIENCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D07_TRAVEL_EXPERIENCE"
+        "technicalPrerequisiteId": "P09_TRAVEL_STRUCTURAL_LESSON"
       }
     },
     {
@@ -27654,16 +27806,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D11_COMMUNITY_EVENTS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D11_COMMUNITY_EVENTS"
+        "technicalPrerequisiteId": "P11_EVENT_FEEDBACK_RELEASE"
       }
     },
     {
@@ -27974,8 +28128,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -28061,8 +28215,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -28147,8 +28301,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -28796,8 +28950,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -29353,8 +29507,8 @@
       "execution": {
         "readiness": "NEEDS_HUMAN_DECISION",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "Rechtsgrond, doel, retentie of maatschappelijke keuze kan niet uit code worden afgeleid.",
+        "action": "ENFORCE_GENERIC_DENY_UNTIL_VALIDATED",
+        "reason": "Generiek learninggebruik is productmatig gesloten; een gespecialiseerde toepassing blijft afhankelijk van afzonderlijke validatie.",
         "blockers": [
           "human-decision",
           "lawful-basis",
@@ -29447,16 +29601,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B07_DISCOVERY_AI_NETWORK",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D14_AI_ASSISTANCE",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D14_AI_ASSISTANCE"
+        "technicalPrerequisiteId": "P13_AI_PURPOSE_SCOPE"
       }
     },
     {
@@ -29539,16 +29695,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B09_REGULATED_PRIVATE",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D01_PERSONAL_MEMORY",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D01_PERSONAL_MEMORY"
+        "technicalPrerequisiteId": "P08_PERSONAL_STRUCTURAL_RELEASE"
       }
     },
     {
@@ -29730,16 +29888,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B02_WORK_OPERATIONS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
+        "technicalPrerequisiteId": "P07_WORKFORCE_PROCESS_SEPARATION"
       }
     },
     {
@@ -29823,16 +29983,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B02_WORK_OPERATIONS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D06_WORKFORCE_DEVELOPMENT"
+        "technicalPrerequisiteId": "P07_WORKFORCE_PROCESS_SEPARATION"
       }
     },
     {
@@ -30445,16 +30607,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D11_COMMUNITY_EVENTS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D11_COMMUNITY_EVENTS"
+        "technicalPrerequisiteId": "P11_EVENT_FEEDBACK_RELEASE"
       }
     },
     {
@@ -30556,16 +30720,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D11_COMMUNITY_EVENTS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D11_COMMUNITY_EVENTS"
+        "technicalPrerequisiteId": "P11_EVENT_FEEDBACK_RELEASE"
       }
     },
     {
@@ -30657,16 +30823,18 @@
         "vertical-slice-proof"
       ],
       "execution": {
-        "readiness": "NEEDS_HUMAN_DECISION",
+        "readiness": "NEEDS_TECHNICAL_PREREQUISITE",
         "batchId": "B08_HUMAN_PROGRAMS",
-        "action": "NO_RUNTIME_IMPLEMENTATION",
-        "reason": "De capability mengt persoonlijke of hoog-impact context met operationele state; de toegestane scheiding is niet besloten.",
+        "decisionDossierId": "D11_COMMUNITY_EVENTS",
+        "action": "IMPLEMENT_RESOLVED_POLICY_THROUGH_SOURCE_FLOW",
+        "reason": "De productgrens is besloten; source-owned state, authority, release/retentie en herstel moeten nu per flow worden bewezen.",
         "blockers": [
-          "human-decision",
-          "memory-class",
-          "purpose-scope"
+          "source-flow",
+          "source-contract",
+          "retention-proof",
+          "recovery-proof"
         ],
-        "decisionDossierId": "D11_COMMUNITY_EVENTS"
+        "technicalPrerequisiteId": "P11_EVENT_FEEDBACK_RELEASE"
       }
     }
   ]

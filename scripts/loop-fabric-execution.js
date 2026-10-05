@@ -26,7 +26,8 @@ function build() {
     while(queue.length&&seen.size<10000) for(const dep of dependencies.get(queue.shift())||[]) if(!seen.has(dep)){seen.add(dep);queue.push(dep);}
     const kernels=[...seen].filter(file=>file.startsWith('server/kern/')||file.startsWith('server/bedrijf/'));
     const readiness=Object.fromEntries(READINESS.map(name=>[name,capabilities.filter(row=>row.execution.readiness===name).length]));
-    batches.push({id,name:meta.name,status:meta.status,domains:[...new Set(capabilities.map(row=>row.domain))].sort(),
+    const status=id==='B00_FINAL_GUARDS'?'GO':readiness.NEEDS_TECHNICAL_PREREQUISITE>0?'PHASE':'STOP';
+    batches.push({id,name:meta.name,status,domains:[...new Set(capabilities.map(row=>row.domain))].sort(),
       capabilities:capabilities.map(row=>row.id),readiness,
       decisionDossiers:[...new Set(capabilities.map(row=>row.execution.decisionDossierId).filter(Boolean))].sort(),
       technicalPrerequisites:[...new Set(capabilities.map(row=>row.execution.technicalPrerequisiteId).filter(Boolean))].sort(),
@@ -38,7 +39,7 @@ function build() {
   }
   return {schemaVersion:1,kind:'RTG_LOOP_FABRIC_EXECUTION_MATRIX',sourceOfTruth:false,
     warning:'Dit is een preflight- en migratieregister. GO autoriseert alleen de beschreven scope; source domains blijven eigenaar.',
-    readinessClasses:READINESS,goRule:'Default bij twijfel is PHASE. Alleen B00 is GO en voegt geen runtimelearning toe.',
+    readinessClasses:READINESS,goRule:'Default bij twijfel is PHASE. Een batch met technische candidates blijft PHASE totdat afzonderlijke source-flows alle poorten halen.',
     sharedPrerequisites:['source-flowdecompositie per brede capability','versioned source change target waar afwezig',
       'durable source event/outbox en recoverybewijs','actuele authority plus source-issued eligibility per flow',
       'partitioneringsbesluit vóór high-volume aansluiting'],

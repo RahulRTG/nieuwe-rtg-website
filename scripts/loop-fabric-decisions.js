@@ -5,25 +5,29 @@ const ROOT=path.join(__dirname,'..'),OUT=path.join(ROOT,'LOOP-FABRIC-DECISION-DO
   DOC=path.join(ROOT,'RTG-LOOP-FABRIC-DECISION-DOSSIERS.md');
 const {DOSSIERS,EDUCATION_DOSSIER}=require('./lib/loop-fabric-decision-policy');
 const {RULES}=require('./lib/loop-fabric-constitution-policy');
+const constitution=require('../server/kern/loop-fabric/constitution');
 function build(){
   const coverage=require(path.join(ROOT,'LOOP-FABRIC-COVERAGE.json')),
     blocked=coverage.capabilities.filter(x=>x.execution.readiness==='NEEDS_HUMAN_DECISION'),ids=blocked.map(x=>x.id).sort(),
-    assigned=DOSSIERS.flatMap(d=>d.capabilityIds).sort();
+    assigned=DOSSIERS.flatMap(d=>d.capabilityIds).sort(),resolved=DOSSIERS.filter(d=>constitution.RESOLVED_DECISIONS.includes(d.id)),
+    dossiers=DOSSIERS.map(d=>({...d,decisionStatus:constitution.RESOLVED_DECISIONS.includes(d.id)?'RESOLVED_PRODUCT_POLICY':
+      constitution.GENERIC_LEARNING_CLOSED.includes(d.id)?'LEGAL_VALIDATION_REQUIRED':'OPEN'})),allIds=coverage.capabilities.map(x=>x.id);
   return {schemaVersion:1,kind:'RTG_LOOP_FABRIC_DECISION_DOSSIERS',sourceOfTruth:false,
     warning:'Technisch/productadvies, geen juridisch advies. LEGAL_VALIDATION_REQUIRED blijft geblokkeerd tot bevoegde validatie.',
-    summary:{blockedCapabilities:ids.length,decisionFamilies:DOSSIERS.length,reduction:ids.length-DOSSIERS.length,
+    summary:{originalBlockedCapabilities:assigned.length,blockedCapabilities:ids.length,resolvedCapabilities:resolved.flatMap(d=>d.capabilityIds).length,
+      decisionFamilies:DOSSIERS.length,resolvedFamilies:resolved.length,reduction:assigned.length-DOSSIERS.length,
       classifications:Object.fromEntries([...new Set(DOSSIERS.map(d=>d.classification))].sort().map(k=>[k,DOSSIERS.filter(d=>d.classification===k).length]))},
-    coverage:{expected:ids,assigned,complete:JSON.stringify(ids)===JSON.stringify(assigned)},
-    dossiers:DOSSIERS.slice().sort((a,b)=>b.unlockImpact.capabilities-a.unlockImpact.capabilities||a.id.localeCompare(b.id)),
-    educationDossier:EDUCATION_DOSSIER,constitutionCandidates:RULES};
+    coverage:{expectedOriginal:assigned,remainingHuman:ids,assigned,complete:assigned.every(id=>allIds.includes(id))&&ids.every(id=>assigned.includes(id))},
+    dossiers:dossiers.sort((a,b)=>b.unlockImpact.capabilities-a.unlockImpact.capabilities||a.id.localeCompare(b.id)),
+    educationDossier:{...EDUCATION_DOSSIER,decisionStatus:'RESOLVED_PRODUCT_POLICY'},constitutionCandidates:RULES};
 }
 const esc=x=>String(x).replace(/\|/g,'\\|');
 function markdown(data){
   const lines=['# RTG Loop Fabric Decision Dossiers','','Datum: 5 oktober 2026','',
     'Dit is technisch en productmatig architectuuradvies, geen juridisch advies. Dossiers met `LEGAL_VALIDATION_REQUIRED` blijven fail-closed tot bevoegde validatie.','',
-    `De ${data.summary.blockedCapabilities} capabilityblockers zijn teruggebracht tot ${data.summary.decisionFamilies} semantisch verschillende beslissingen. Geen capability staat in twee dossiers.`,
+    `De oorspronkelijke ${data.summary.originalBlockedCapabilities} capabilityblockers zijn teruggebracht tot ${data.summary.decisionFamilies} semantisch verschillende beslissingen. ${data.summary.resolvedCapabilities} capabilities hebben nu een productbesluit; ${data.summary.blockedCapabilities} blijven menselijk of juridisch geblokkeerd.`,
     '','## Leverage','','| Dossier | Type | Capabilities | Veilige default |','|---|---|---:|---|'];
-  for(const d of data.dossiers)lines.push(`| ${d.id} ${esc(d.title)} | ${d.classification} | ${d.capabilityIds.length} | ${esc(d.safeDefault)} |`);
+  for(const d of data.dossiers)lines.push(`| ${d.id} ${esc(d.title)} | ${d.classification} / ${d.decisionStatus} | ${d.capabilityIds.length} | ${esc(d.safeDefault)} |`);
   lines.push('','## Dossiers','');
   for(const d of data.dossiers){lines.push(`### ${d.id} - ${d.title}`,'',`**Vraag:** ${d.question}`,'',`**Waarom code dit niet kan bepalen:** ${d.why}`,'',
     `**Type:** \`${d.classification}\``,'',`**Capabilities (${d.capabilityIds.length}):** ${d.capabilityIds.map(x=>'`'+x+'`').join(', ')}`,'',

@@ -2,9 +2,9 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs');
 const {build,md,OUT,DOC}=require('../scripts/loop-fabric-unlock');
 
-test('38 technische blockers hebben exact één primaire prerequisite',()=>{
-  const r=build();assert.equal(r.prerequisites.expected.length,38);assert.equal(r.prerequisites.complete,true);
-  assert.equal(new Set(r.prerequisites.assigned).size,38);assert.deepEqual(JSON.parse(fs.readFileSync(OUT,'utf8')),r);
+test('98 technische blockers hebben exact één primaire prerequisite',()=>{
+  const r=build();assert.equal(r.prerequisites.expected.length,98);assert.equal(r.prerequisites.complete,true);
+  assert.equal(new Set(r.prerequisites.assigned).size,98);assert.deepEqual(JSON.parse(fs.readFileSync(OUT,'utf8')),r);
   assert.equal(fs.readFileSync(DOC,'utf8'),md(r));
 });
 

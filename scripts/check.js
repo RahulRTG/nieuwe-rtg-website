@@ -5981,7 +5981,10 @@ try {
    dat ook, zodat de winst blijft staan. */
 console.log('\n74) roteren met de hand neemt niet toe');
 {
-  const ROTATIE_MAX = 12;
+  /* 12 -> 13: de gezinsdeur van main (B18, server/foundation/gezinscode.js) kwam
+     binnen nadat deze ratel stond en roteert met de hand. Het werkwoord dat hem
+     vervangt (vernieuw) staat in fase1/rotaties, en die zet hem terug. */
+  const ROTATIE_MAX = 13;
   const vorm = /rotatie\s*\+\s*1|rotatie \|\| 1\) \+ 1|rotatie\) \|\| 0\) \+ 1|rotatie \|\| 0\) \+ 1/;
   const plekken = [];
   const loop = (d) => {

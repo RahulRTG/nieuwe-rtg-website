@@ -47,12 +47,38 @@ test('5. zonder opBotsing gedraagt merge3 zich als voorheen', () => {
   assert.deepEqual(merge3({ s: 1 }, { s: 2 }, { s: 3 }), { s: 2 });
 });
 
-test('6. de SQLite-opslag geeft BEIDE merges een melder mee (in code, niet in commentaar)', () => {
-  const bron = fs.readFileSync(path.join(__dirname, '..', 'server/db/sqlite.js'), 'utf8')
-    .replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
-  const aanroepen = bron.match(/merge3\([^;]*\)/g) || [];
-  assert.equal(aanroepen.length, 2, 'verwacht precies de twee merges (opslaan en peilen): ' + aanroepen.join(' | '));
-  for (const a of aanroepen) assert.match(a, /melder\(/, 'deze merge meldt een botsing niet: ' + a);
+/* De volledige aanroep, met gebalanceerde haakjes: een regex stopt bij de
+   eerste ')' en ziet dan merge3(JSON.parse(x) zonder de rest. */
+function aanroepen(bron, kop) {
+  const uit = [];
+  for (let i = bron.indexOf(kop); i >= 0; i = bron.indexOf(kop, i + 1)) {
+    let diepte = 0;
+    for (let j = i + kop.length - 1; j < bron.length; j++) {
+      if (bron[j] === '(') diepte++;
+      else if (bron[j] === ')' && --diepte === 0) { uit.push(bron.slice(i, j + 1)); break; }
+    }
+  }
+  return uit;
+}
+
+test('6. ELKE SQLite-merge in server/db geeft een melder mee (in code, niet in commentaar)', () => {
+  /* Eerst stond hier alleen sqlite.js, en zei het commitbericht "beide merges".
+     Het waren er vier: de herkeuring vond er twee op het GELDPAD zonder melder
+     (economische-boeking-sqlite.js voor saldi en boekingen, collectie-sqlite.js
+     voor bewerkCollectie). Daarom leest deze toets nu de hele map, en zakt hij
+     ook als er een vijfde bijkomt zonder melder. */
+  const map = path.join(__dirname, '..', 'server/db');
+  const bestanden = fs.readdirSync(map).filter((f) => /sqlite.*\.js$/.test(f));
+  let gevonden = 0;
+  for (const f of bestanden) {
+    const bron = fs.readFileSync(path.join(map, f), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+    for (const a of aanroepen(bron, 'merge3(')) {
+      gevonden++;
+      assert.match(a, /melder\(/, f + ': deze merge meldt een botsing niet: ' + a);
+    }
+  }
+  assert.ok(gevonden >= 4, 'verwacht minstens de vier bekende SQLite-merges, gevonden: ' + gevonden);
 });
 
 test('7. de melder telt en noemt geen inhoud', () => {

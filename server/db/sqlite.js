@@ -147,7 +147,7 @@ function pollSqlite() {
       const baseJson = laatsteJson.get(sleutel);
       const hunJson = uitStore(r.val);
       const lokaalOpenstaand = baseJson !== undefined && JSON.stringify(db.data[sleutel]) !== baseJson;
-      const waarde = lokaalOpenstaand ? merge3(JSON.parse(baseJson), db.data[sleutel], JSON.parse(hunJson), melder(sleutel)) : JSON.parse(hunJson);
+      const waarde = lokaalOpenstaand ? merge3(JSON.parse(baseJson), db.data[sleutel], JSON.parse(hunJson), db.writable ? melder(sleutel) : undefined) : JSON.parse(hunJson);
       voorbereid.push({ sleutel, waarde, hunJson, lokaalOpenstaand, ver: r.ver });
     }
     audits.publiceerSnapshots(audit);

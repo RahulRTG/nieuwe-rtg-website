@@ -6,6 +6,7 @@
 const { SLEUTEL, vind: heeftRegel, vindBeweging, bewegingGelijk, saldoSamen,
   boekingenSamen } = require('./economische-identiteit');
 const publiceerCollectie = require('./collectie-publicatie');
+const { melder } = require('./botsing'); // C6: een botsing op het geldpad is hoorbaar
 
 module.exports = ({ db, verbinding, statements, merge3, uitStore, naarStore,
   laatsteJson, toegepast, voorcheck }) => {
@@ -29,7 +30,7 @@ module.exports = ({ db, verbinding, statements, merge3, uitStore, naarStore,
     const hunJson = uitStore(rij.val), hun = JSON.parse(hunJson);
     if (!laatsteJson.has(k)) return hun;
     const basisJson = laatsteJson.get(k);
-    return JSON.stringify(lokaal) === basisJson ? hun : merge3(JSON.parse(basisJson), lokaal, hun);
+    return JSON.stringify(lokaal) === basisJson ? hun : merge3(JSON.parse(basisJson), lokaal, hun, melder(k));
   }
 
   return function boekEenmaal(invoer, werk) {

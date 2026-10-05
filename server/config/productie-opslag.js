@@ -55,7 +55,8 @@ function bestaatDbJson(env) {
    nieuwe domein uiteenlopen, en een strengere keuring met een heldere uitweg
    (haal de variabele weg) is beter dan een dubbele waarheid. */
 function meerdereSchrijvers(env) {
-  if (env.RTG_SPREIDING === '1') return 'RTG_SPREIDING=1';
+  // spreiding gaat alleen aan met de vlag EN een bus (../trio-spreiding.js); dezelfde voorwaarde hier
+  if (env.RTG_SPREIDING === '1' && env.REDIS_URL) return 'RTG_SPREIDING=1';
   if (env.RTG_DOMAINS !== undefined && String(env.RTG_DOMAINS).trim() !== '') return 'RTG_DOMAINS=' + env.RTG_DOMAINS;
   return null;
 }

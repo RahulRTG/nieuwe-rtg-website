@@ -159,6 +159,12 @@ test('15. CONTRAST: een schrijvend proces op SQLite blijft een geldige productie
   assert.equal(opslagFout(config.valideer({ ...VEILIG, RTG_SPREIDING: '1' })), false, 'PostgreSQL met spreiding is de bedoelde stand');
 });
 
+test('15b. spreiding zonder bus staat niet aan, en is dan ook geen tweede schrijver (C6)', () => {
+  const { REDIS_URL, ...zonderBus } = SQLITE;
+  assert.equal(opslagFout(config.valideer({ ...zonderBus, RTG_SPREIDING: '1' })), false,
+    'trio-spreiding.js zet spreiding alleen aan met RTG_SPREIDING=1 EN REDIS_URL');
+});
+
 test('16. een OPENBAAR adres zonder NODE_ENV + SQLite + spreiding => hardeFouten (C6)', () => {
   const { NODE_ENV, ...zonderProd } = SQLITE;
   const r = config.valideer({ ...zonderProd, APP_URL: PUBLIEK, RTG_SPREIDING: '1' });

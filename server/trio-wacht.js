@@ -12,6 +12,7 @@ const http = require('http');
 const path = require('path');
 const { spawn } = require('child_process');
 const { maakSpreiding } = require('./trio-spreiding');
+const { maakAfzetten } = require('./trio-afzetten');
 
 function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log }) {
   const servers = [];
@@ -20,6 +21,7 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log }) {
   let switching = null; // lopende overname, zodat er nooit twee tegelijk lopen
   let stopping = false;
   const spreiding = maakSpreiding({ servers, apiCall: (...a) => apiCall(...a), log });
+  const { zetAf } = maakAfzetten({ servers, spreiding, log });
 
   /* ---------- de drie servers starten en bewaken ---------- */
 
@@ -83,8 +85,10 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log }) {
             if (i === activeIdx) return; // actieve leeft toch nog
             /* Eerst de oude leider zijn leiderschap afnemen, dan pas de nieuwe
                promoveren -- nooit twee leiders tegelijk. Met spreiding blijft de
-               oude meewerken als volger; zonder gaat hij naar stand-by. */
-            if (activeIdx >= 0) await spreiding.zetRol(activeIdx, spreiding.naLeiderschap()); // best effort
+               oude meewerken als volger; zonder gaat hij naar stand-by. Lukt
+               het afnemen niet, dan wordt zijn proces gestopt; en lukt ook dat
+               niet, dan promoveren we deze ronde niemand (./trio-afzetten.js). */
+            if (activeIdx >= 0 && !await zetAf(activeIdx)) return;
             if (!await spreiding.zetRol(i, 'leider')) continue; // promotie mislukt, probeer de volgende
             activeIdx = i;
             log((reden ? reden + '; ' : '') + 'server ' + s.nr + ' (poort ' + s.port + ') is nu actief');
@@ -131,8 +135,11 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log }) {
       if (beter >= 0 && beter < activeIdx) {
         const oudIdx = activeIdx;
         const oud = servers[oudIdx];
-        await spreiding.zetRol(oudIdx, spreiding.naLeiderschap());
-        if (await spreiding.zetRol(beter, 'leider')) {
+        /* Een failback is vrijwillig: bevestigt de gezonde leider zijn
+           afzetting niet, dan blijft hij leider en proberen we het later. */
+        if (!await spreiding.zetRol(oudIdx, spreiding.naLeiderschap())) {
+          log('server ' + oud.nr + ' bevestigt zijn afzetting niet; geen failback deze ronde');
+        } else if (await spreiding.zetRol(beter, 'leider')) {
           activeIdx = beter;
           log('server ' + servers[beter].nr + ' doet het weer en neemt het werk terug; server ' + oud.nr +
             (spreiding.aan() ? ' loopt mee als volger' : ' is weer standby'));

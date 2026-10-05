@@ -4021,6 +4021,15 @@
       "meter": "zelfpoortendeToetsen 46 -> 47",
       "reden": "test/gezinsdeur.pg.test.js (B18) vereist echte PostgreSQL- en Redis-diensten: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode en een rotatie op A tegen de oude code op B. Lokaal met die diensten gedraaid en groen; zonder het advisory lock en FOR UPDATE in server/pg/collectietransactie.js zakte hij 3 van 3. Hij staat in scripts/lib/pg-toetslijst.js en als uitzondering in deze norm.",
       "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL en Redis."
+    },
+    {
+      "datum": "2026-10-05",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1682,
+      "meter": "kernBreedte 1682 -> 1683",
+      "reden": "De zware rechten van Toezicht openen nu echt iets (keuze van de eigenaar: aansluiten). De kluis-inzage in routes/kantoren moet het recht kluis-inzage nalezen, en krijgt daarvoor EEN smalle naam: kern.zwaarRecht, de poort vereist() van kern/command/toegang.js. Via `command` zou het domein kantoren de operator, de recepten en het beleid kunnen bereiken; dezelfde vorm als kern.bijstand.",
+      "waarheen": "GRENZEN.json (kantoren draagt zwaarRecht), server/opzet/aanbouw.js en test/command-zware-rechten.test.js"
     }
   ],
   "prestatie": {
@@ -4429,15 +4438,6 @@
       "pad": "test/gezinsdeur.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de raceproef voor de gezinsdeur (B18: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode, en een rotatie op A tegen de oude code op B) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
-    },
-    {
-      "datum": "2026-10-05",
-      "soort": "structureel",
-      "sleutel": "kernBreedte",
-      "van": 1682,
-      "meter": "kernBreedte 1682 -> 1683",
-      "reden": "De zware rechten van Toezicht openen nu echt iets (keuze van de eigenaar: aansluiten). De kluis-inzage in routes/kantoren moet het recht kluis-inzage nalezen, en krijgt daarvoor EEN smalle naam: kern.zwaarRecht, de poort vereist() van kern/command/toegang.js. Via `command` zou het domein kantoren de operator, de recepten en het beleid kunnen bereiken; dezelfde vorm als kern.bijstand.",
-      "waarheen": "GRENZEN.json (kantoren draagt zwaarRecht), server/opzet/aanbouw.js en test/command-zware-rechten.test.js"
     }
   ]
 }

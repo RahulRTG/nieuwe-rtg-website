@@ -1,8 +1,8 @@
 /* DE CORRELATIE VAN EEN VERZOEK MAAKT DE SERVER, ALTIJD (Fase 2, besluit B1a).
 
-   Hier stond `req.headers['x-request-id'] || randomBytes(8)`: de aanroeper koos
-   het id, in elke lengte (4000 tekens kwamen gewoon terug). Dat id is geen
-   versiering. De effectbon (server/effectbon.js) en de geldketen
+   In ../log.js stond `req.headers['x-request-id'] || randomBytes(8)`: de
+   aanroeper koos het id, in elke lengte (4000 tekens kwamen gewoon terug).
+   Dat id is geen versiering. De effectbon (../effectbon.js) en de geldketen
    (kern/kantoor/geldketen.js, `uitvoerVerzoek`) KOPPELEN erop: een proxy die bij
    een herhaling hetzelfde id meestuurt gaf twee uitvoeringen dezelfde sleutel,
    en `voorspellingVan` pakte dan het dossier van de eerste.

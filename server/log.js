@@ -111,7 +111,7 @@ const log = {
 
 /* Express-middleware: log elk verzoek met correlatie, methode, pad, status en
    duur; het id gaat terug als X-Request-Id. Health-checks op debug. Het id maakt
-   de SERVER; een client-id is alleen `extern` (zie ./correlatie.js). */
+   de SERVER; een client-id is alleen `extern` (zie ./lib/correlatie.js). */
 /* Het pad in VORM, zoals het journaal het bewaart: /api/lid/42 wordt
    /api/lid/:id. Zo tellen honderd verzoeken naar honderd leden als een regel, en
    belandt er geen nummer in het journaal dat naar een persoon leidt. Uit het
@@ -131,7 +131,7 @@ const journaalPad = (p) => { try { return journaalMod().padVorm(p); } catch (e) 
 let journaalStuk = false;   // een kapot journaal meldt zich een keer, niet bij elk verzoek
 
 function middleware() {
-  const correlatie = require('./correlatie');
+  const correlatie = require('./lib/correlatie');
   return (req, res, next) => {
     const id = correlatie.nieuw(), extern = correlatie.extern(req.headers['x-request-id']);
     req.id = id; req.externeId = extern;

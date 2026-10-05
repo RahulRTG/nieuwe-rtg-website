@@ -1,5 +1,5 @@
 /* ============================================================================
-   DE CORRELATIE MAAKT DE SERVER (Fase 2, besluit B1a; server/correlatie.js).
+   DE CORRELATIE MAAKT DE SERVER (Fase 2, besluit B1a; server/lib/correlatie.js).
 
    Een X-Request-Id van de client werd ongetoetst de correlatie van het verzoek,
    in elke lengte -- en die correlatie is een SLEUTEL: de effectbon en de
@@ -23,7 +23,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { middleware } = require('../server/log');
-const correlatie = require('../server/correlatie');
+const correlatie = require('../server/lib/correlatie');
 
 function verzoek(kop) {
   const headers = {};

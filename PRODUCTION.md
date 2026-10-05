@@ -374,7 +374,7 @@ CRL die interne clients ophalen. De CA-sleutel en de intrekkingslijst staan onde
 - **Observability** — gestructureerde JSON-logs (`server/log.js`), per verzoek
   een correlatie-id (`X-Request-Id`, altijd door de server gemaakt; een
   meegestuurde `X-Request-Id` staat alleen als begrensd `extern` in de logregel,
-  zie `server/correlatie.js`), duur en status; centrale foutafhandeling
+  zie `server/lib/correlatie.js`), duur en status; centrale foutafhandeling
   met stack; een eigen in-memory fout-aggregatie op het techniekbord (ERR-01 +
   de storingslijst); optionele EXTERNE alarmering erbovenop via
   `ERR_WEBHOOK_URL` (een webhook-POST naar Slack/Discord/eigen endpoint, met

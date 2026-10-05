@@ -10,5 +10,5 @@ module.exports = (kern, hulp) => {
     represents: (actor, ref) => !!account(actor) && (actor === ref || organization(ref)?.eigenaar === actor)
   };
   kern.library = require('../kern/library')({ db: hulp.db, bewerkCollectie: hulp.bewerkCollectie,
-    store: require('../db').STORE, identities });
+    store: require('../db').STORE, identities, serviceProof: hulp.zegel });
 };

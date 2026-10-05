@@ -5,16 +5,21 @@ const KINDS = ['correction', 'clarity', 'translation', 'accessibility', 'source'
 function command(ctx) {
   const { w, data: d, action, id, actor, at } = ctx;
   if (action === 'feedback.create') {
-    M.fields(d, ['editionId', 'nodeId', 'kind', 'message', 'evidenceRefs']);
+    M.fields(d, ['editionId', 'nodeId', 'kind', 'message', 'evidenceRefs', 'verificationOf', 'assessment']);
     const edition = M.get(w.editions, d.editionId);
     if (edition.status !== 'released') M.fail('RELEASE_REQUIRED', 'Feedback hoort bij een vrijgegeven editie.', 409);
     const anchor = edition.snapshot.content.find(n => n.nodeId === d.nodeId);
     if (!anchor) M.fail('NOT_FOUND', 'Dit inhoudsanker staat niet in de editie.', 404);
     if (!KINDS.includes(d.kind)) M.fail('INVALID_INPUT', 'Kies een ondersteund feedbacktype.');
+    if ((d.verificationOf&&!d.assessment)||(!d.verificationOf&&d.assessment))
+      M.fail('INVALID_INPUT','Verificatie vraagt zowel een ChangeReceipt als een eerlijke uitkomst.');
+    if (d.assessment&&!['improved','not-improved','mixed','unknown','not-checked'].includes(d.assessment))
+      M.fail('INVALID_INPUT','Kies een geldige verificatie-uitkomst.');
     w.feedback[id] = { id, workId: w.id, editionId: edition.id, nodeId: anchor.nodeId,
       revisionId: anchor.revision.id, revisionHash: anchor.revision.hash, kind: d.kind,
       message: M.text(d.message, 4000), evidenceRefs: M.strings(d.evidenceRefs || [], 20),
-      status: 'open', createdBy: actor, createdAt: at, decision: null, resolution: null };
+      status: 'open', createdBy: actor, createdAt: at, decision: null, resolution: null,
+      verificationOf:d.verificationOf||null,assessment:d.assessment||null };
     return { id, editionId: edition.id, nodeId: anchor.nodeId, status: 'open' };
   }
   if (action === 'feedback.decide') {

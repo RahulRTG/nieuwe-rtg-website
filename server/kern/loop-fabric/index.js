@@ -3,7 +3,7 @@
 const P=require('./protocol'), M=require('./model'), envelope=require('../envelop');
 const klok=require('../../lib/klok');
 
-module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSource,academySource,now}) {
+module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSource,academySource,librarySource,now}) {
   const own=require('../eigencollectie')({db,domein:'kern/loop-fabric',bezit:{loopFabric:'kaart'}});
   const time=now || (()=>klok.datum().toISOString());
   const read=()=>M.state(own.kijk('loopFabric'));
@@ -13,6 +13,7 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
   };
   const sourceAdapters={'living-world':livingWorld,workos:workSource};
   if (academySource) sourceAdapters.leerhuis=academySource;
+  if (librarySource) sourceAdapters.library=librarySource;
   const projector=require('./projection')({read,tx,time,livingWorld,workSource,sourceAdapters});
   const operations=require('./operations')({read,sourceAdapters,time});
   const query=require('./recall-query')({read,sourceAdapters,time});

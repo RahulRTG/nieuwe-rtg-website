@@ -15,7 +15,7 @@ const handlers = {
   'edition.withdraw': require('./editions'), 'edition.warn': require('./editions'),
   'publication.consent': publication, 'publication.revoke-consent': publication, 'publication.confirm': publication
 };
-module.exports = function makeLibrary({ db, bewerkCollectie, store, identities, now }) {
+module.exports = function makeLibrary({ db, bewerkCollectie, store, identities, now, serviceProof }) {
   const own = require('../eigencollectie')({ db, domein: 'kern/library', bezit: { libraryKernel: 'kaart', libraryReader: 'kaart' } });
   const read = () => M.state(own.kijk('libraryKernel'));
   const time = now || (() => klok.datum().toISOString());
@@ -57,6 +57,8 @@ module.exports = function makeLibrary({ db, bewerkCollectie, store, identities, 
           M.version(ctx.w, input.expectedRevision);
         }
         Object.assign(ctx, { action, data: M.clone(input.data), id: 'lib_' + receiptKey.slice(0, 32), receiptKey });
+        if(action==='feedback.create'&&ctx.data.verificationOf&&!loopSource.hasReceipt(ctx.w.id,ctx.data.verificationOf))
+          M.fail('CHANGE_RECEIPT_REQUIRED','De verificatie verwijst niet naar een source-issued Library ChangeReceipt.',409);
         const result = handlers[action](ctx);
         ctx.w.revision++; ctx.w.updatedAt = ctx.at; ctx.w.updatedBy = actor;
         const event = journal.append(ctx, result, input.operationId);
@@ -106,5 +108,7 @@ module.exports = function makeLibrary({ db, bewerkCollectie, store, identities, 
     } catch (e) { return error(e); }
   }
   const reader = require('./reader')({ own, bewerkCollectie, store, identities, libraryRead: read, now: time });
-  return { execute, query, reader, deliver: journal.outbox({ read, transaction }) };
+  const deliver=journal.outbox({read,transaction});
+  const loopSource=require('./loop-source')({read,deliver,identities,time,serviceProof});
+  return { execute, query, reader, deliver, loopSource };
 };

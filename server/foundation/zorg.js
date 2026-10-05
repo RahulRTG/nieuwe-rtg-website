@@ -96,6 +96,7 @@ function wisGezin(g) {
      zonder gezin, of bij een nieuw gezin op hetzelfde adres, weigert hij. */
   if (ctx.gezinscode) ctx.gezinscode.vergeet(g.code).catch(() => null);
 }
+ctx.wisGezin = wisGezin; // ook voor foundation.js vergeetAccount: een verwijderd ouderaccount
 function volwassenen(g) { return Object.values(g.profielen || {}).filter(p => ['beheerder', 'ouder'].includes(p.rol)); }
 async function adultCheck(g, req, res) {
   const p = profielVan(g, req.body && req.body.token);

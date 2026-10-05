@@ -171,10 +171,10 @@ test('alleen een PASS-dossier van exact de releasecommit opent de routepoort', a
   const goed = await serverVoor({ env, root:goedRoot });
   t.after(() => goed.sluit());
   assert.equal((await vraag(goed, '/api/rtfos/casussen')).status, 200);
-  for (const pad of ['/api/foundation/gezin/inloggen', '/api/foundation/school/school/activeren',
+  for (const pad of ['/api/foundation/school/school/activeren',
     '/api/lab2/mijn', '/api/lab2/bewoner/paspoort',
     '/api/les/mee', '/api/member/sport/tickets', '/api/sport/scan',
-    '/api/foundation/registratie/status', '/api/rtf/social/stream']) {
+    '/api/foundation/registratie/status']) {
     assert.equal((await vraag(goed, pad)).status, 503,
       pad + ' blijft technisch dicht ondanks juridische vrijgave');
   }
@@ -196,7 +196,11 @@ test('alleen een PASS-dossier van exact de releasecommit opent de routepoort', a
      het als sessie en gaan met het dossier gewoon open. */
   for (const pad of ['/api/rtf/samen/mee', '/api/rtf/leerling/paspoort'])
     assert.equal((await vraag(goed, pad)).status, 200, pad + ' draagt het gemigreerde gezinstoken');
-  assert.equal(goed.geraakt.length, 6);
+  /* En de gezinsdeur zelf is gemigreerd (B18): de 128-bit gezinscode en de
+     social-stream met een eenmalig stroomticket gaan met het dossier open. */
+  for (const pad of ['/api/foundation/gezin/inloggen', '/api/rtf/social/stream'])
+    assert.equal((await vraag(goed, pad)).status, 200, pad + ' is gemigreerd (foundation.family_profile_access)');
+  assert.equal(goed.geraakt.length, 8);
 });
 
 test('iedere bekende onvolwassen Foundation-credential heeft een blijvende productiesluiting', () => {
@@ -211,14 +215,6 @@ test('iedere bekende onvolwassen Foundation-credential heeft een blijvende produ
     'POST /api/les/maak', 'POST /api/les/leraar', 'POST /api/les/volgende',
     'POST /api/les/sluit', 'POST /api/les/mee', 'POST /api/les/kijk',
     'POST /api/les/antwoord',
-    'POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/inloggen',
-    'POST /api/foundation/gezin/profiel/kies', 'GET /api/foundation/gezin/x/mij',
-    'GET /api/foundation/gezin/x/berichten',
-    'POST /api/foundation/gezin/uitnodiging/maak',
-    'POST /api/foundation/gezin/uitnodigingen',
-    'POST /api/foundation/gezin/uitnodiging/bekijk',
-    'POST /api/foundation/gezin/uitnodiging/accepteer',
-    'GET /api/rtf/social/stream',
     'POST /api/foundation/school/school/activeren',
     'POST /api/foundation/school/school/overzicht',
     'POST /api/foundation/school/personeel/status',
@@ -244,6 +240,15 @@ test('iedere bekende onvolwassen Foundation-credential heeft een blijvende produ
      sessie draagt (rtfschool.js samenSess -> rtf.verifieerProfiel) sinds B17 ook:
      Samen staat niet meer in NOG_GESLOTEN. */
   assert.equal(maakPoort.isNogGeslotenCredentialroute('POST', '/api/rtf/samen/mee'), false);
+  /* De gezinsdeur is gemigreerd (B18, foundation.family_profile_access): niet meer
+     blijvend dicht, wel nog onder de beschermde-functiepoort (B8). */
+  for (const route of ['POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/inloggen',
+    'POST /api/foundation/gezin/profiel/kies', 'GET /api/foundation/gezin/x/mij',
+    'POST /api/foundation/gezin/uitnodiging/accepteer', 'GET /api/rtf/social/stream']) {
+    const [methode, pad] = route.split(' ');
+    assert.equal(gesloten(methode, pad, {}), false, route);
+    assert.equal(maakPoort.isBeschermdeRoute(methode, pad, {}), true, route + ' (B8)');
+  }
   /* En de lescredential onder /api/foundation is gemigreerd (B17): niet meer blijvend dicht. */
   for (const pad of ['/api/foundation/les/join', '/api/foundation/bord/stroke', '/api/foundation/ai'])
     assert.equal(maakPoort.isNogGeslotenCredentialroute('POST', pad, {}), false, pad);

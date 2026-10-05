@@ -1,0 +1,8 @@
+/* De techniekpagina leent het hele verhaalontwerp van de werelden (world.css) en
+   zet hier alleen zijn eigen accent. Bordeaux is het accent op ivoor; op zwart
+   wordt het goud, want bordeaux is nooit tekstkleur op zwart (CLAUDE.md). */
+body[data-world="tech"]{--world:#7f1634;--world-soft:rgba(127,22,52,.22);--world-image:linear-gradient(135deg,#1d1a16,#0b0908 62%)}
+.tech-story .world-hero h1{max-width:900px}
+.tech-story .principle .story-kicker{color:#c9ad6a}
+.tech-story .proof-source{color:#5f554c}
+.tech-open{background:#e2dbcf}

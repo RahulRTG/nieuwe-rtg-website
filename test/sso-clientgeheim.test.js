@@ -6,13 +6,13 @@
      2. de sleutel hoort bij de organisatie: een blob naar een andere org
         verplaatst gaat niet open, en een opgerekte datum ook niet;
      3. roteren laat het vorige geheim een begrensde tijd meelopen, niet langer;
-     4. een geheim vervalt;
+     4. een geheim vervalt (B22: -b22);
      5. zonder sleutel weigert zetten (ook in productie zonder RTG_VAULT_KEY) en
         is de inlog dicht met de reden;
      6. een geheim uit de oude opslag wordt bij het laden herzegeld;
      7. de ruil probeert het oude geheim alleen na invalid_client.
 
-   Draai los: node --test test/sso-clientgeheim.test.js */
+   Los: node --test test/sso-clientgeheim.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -113,10 +113,10 @@ test('3. roteren met overlap: nieuw eerst, het oude een begrensde tijd, dan weg'
   const dicht = rotatie.sluitOverlap(org, w, NU + DAG);
   assert.deepEqual(cg.geldige(org, dicht, NU + DAG).geheimen, ['tweede']);
   assert.throws(() => rotatie.sluitOverlap(org, dicht, NU + DAG), e => e.status === 409);
-  assert.throws(() => rotatie.roteer(org, 'x', w, { overlapDagen: 31 }, NU), e => e.code === 'OVERLAP_ONGELDIG');
+  assert.throws(() => rotatie.roteer(org, 'x', w, { overlapDagen: 8 }, NU), e => e.code === 'OVERLAP_ONGELDIG');
   // de overlap duurt nooit langer dan het verval van het oude geheim
   const kort = rotatie.roteer(org, 'a', null, { dagen: 2 }, NU).waarde;
-  const verder = rotatie.roteer(org, 'b', kort, { overlapDagen: 30 }, NU).waarde;
+  const verder = rotatie.roteer(org, 'b', kort, { overlapDagen: 7 }, NU).waarde;
   assert.equal(cg.stand(org, verder, NU).overlap.tot, new Date(NU + 2 * DAG).toISOString());
 });
 
@@ -130,9 +130,9 @@ test('4. een geheim vervalt, en een vervaldatum is begrensd', () => {
   assert.equal(cg.stand(org, w, NU + 2 * DAG).bruikbaar, false);
   assert.equal(JSON.parse(w.slice(cg.MERK.length)).sloten[0].vervalt, new Date(NU + DAG).toISOString());
   assert.equal(cg.stand(org, rotatie.roteer(org, 's', null, {}, NU).waarde, NU).vervalt,
-    new Date(NU + 365 * DAG).toISOString(), 'standaard 365 dagen');
-  for (const o of [{ dagen: 731 }, { dagen: 0 }, { vervalt: new Date(NU - DAG).toISOString() },
-    { vervalt: new Date(NU + 800 * DAG).toISOString() }])
+    new Date(NU + 30 * DAG).toISOString(), 'standaard 30');
+  for (const o of [{ dagen: 91 }, { dagen: 0 }, { vervalt: new Date(NU - DAG).toISOString() },
+    { vervalt: new Date(NU + 91 * DAG).toISOString() }])
     assert.throws(() => rotatie.roteer(org, 'x', null, o, NU), e => e.code === 'VERVAL_ONGELDIG', JSON.stringify(o));
 });
 

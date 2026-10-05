@@ -87,7 +87,7 @@ test('een becijferde schooltoets landt als bewijs in het paspoort, met de leraar
   const gezin = (await fnd('/gezin/maak', { gezinsnaam: 'Familie Bewijs', naam: 'Ouder Bewijs', pin: '4321' })).body;
   const kind = (await fnd('/gezin/profiel/maak', { code: gezin.code, token: gezin.token,
     naam: 'Sanne', rol: 'kind', groep: 'kind' })).body;
-  const kindToken = (await fnd('/gezin/profiel/kies', { code: gezin.code, profielId: kind.profiel.id })).body.token;
+  const kindToken = (await fnd('/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
   await fnd('/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
   await fnd('/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
 

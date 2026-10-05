@@ -20,22 +20,30 @@ require('./foundation/onderwijs')(ctx);
 /* De gezins-helpers (gezinnen, profielen, PIN, codenamen, sessiehulpen)
    staan als deelmodule in foundation/gezinshulp.js; hier komen ze terug in
    scope voor de wiring hieronder. */
-const { G, nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
-  magSolliciteren, groepLeeftijd, isBeschermd, schoonGroep, isGast, KLEUREN, hashPin, checkPin, geldigePin,
-  schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle, socialProfielen, profielInfoVanHandle,
-  pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij, gezinstoken } = require('./foundation/gezinshulp')(ctx);
+const hulp = require('./foundation/gezinshulp')(ctx);
+const { G, GROEPEN, GROEP_INFO, actualiseerGroep, magSolliciteren, groepLeeftijd, isBeschermd, isGast, checkPin,
+  ensureCodenaam, rtfHandle, socialProfielen, profielInfoVanHandle, gezinVan, profielVan, beheerderVan,
+  gezinstoken, gezinscode, gezinsstroom, plicht } = hulp;
 
-/* De gezinsroutes (gezin maken/inloggen, profielen, berichten) draaien als
-   submodule op een gedeelde context, een keer opgebouwd bij het opstarten. */
-const gctx = { router, F, G, save, nu, rid, schoon, crypto, eigenVeld, encS, decS, teVaak, misluktePoging, goedePoging, ipVan, tokenUit,
-  nieuweGezinscode, ROLLEN, GROEPEN, GROEP_INFO, geboorteInfo, groepVanLeeftijd, actualiseerGroep,
-  schoonGroep, isBeschermd, isGast, KLEUREN,
-  hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle,
-  socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij,
-  gezinstoken, bewerkCollectie: ctx.bewerkCollectie };
+/* De gezinsroutes (gezin maken/inloggen, profielen, berichten, de gezinsdeur)
+   draaien als submodule op een gedeelde context: de gezins-helpers plus de basis. */
+const gctx = Object.assign({ router, F, save, nu, rid, schoon, crypto, eigenVeld, encS, decS, teVaak,
+  misluktePoging, goedePoging, ipVan, tokenUit, bewerkCollectie: ctx.bewerkCollectie }, hulp);
+plicht.bewaak(router); // vóór de gezinsroutes: ./foundation/accountplicht.js
 require('./foundation/gezin')(gctx);
 require('./foundation/gezinstoegang')(gctx);
 require('./foundation/gezinssessie')(gctx);
+require('./foundation/gezinsdeur')(gctx);
+// het gezin aan een ouderaccount: zie de kop van ./foundation/gezinseigenaar.js
+const eigen = require('./foundation/gezinseigenaar')(gctx, ctx, plicht);
+/* De zware passkeypoort komt later in de montage (opzet/kernlaag7-eigenaar.js). */
+const setPasskey = f => { gctx.passkeyVan = f; };
+// na de ceremonie opnieuw opzoeken (B19)
+function koppelPasskey(s, userId) {
+  const g = G()[s.g.code], p = g && eigenVeld(g.profielen, s.p.id);
+  if (p) { p.passkey = { userId, at: nu() }; save(); }
+  return !!p;
+}
 
 /* Wat dit gezin kost, en wie het betaalt (foundation/kosten.js). Een eigen
    bestandje, want het antwoord draagt een belofte en geen bedrag: de
@@ -62,7 +70,7 @@ function familieVan(req, res) {
    context (voor de les-AI), de zorg-module locatiePubliek/oppasinfoPubliek
    (voor het gastoverzicht). */
 Object.assign(ctx, { G, gezinVan, profielVan, familieVan, sessieVan,
-  isGast, isBeschermd, ensureCodenaam, rtfHandle, checkPin, gezinstoken });
+  isGast, isBeschermd, ensureCodenaam, rtfHandle, checkPin, gezinstoken, gezinscode, gezinsstroom });
 require('./foundation/vooruit')(ctx);
 const { leeftijdInstr } = require('./foundation/buddy')(ctx);
 require('./foundation/zorg')(ctx);
@@ -73,6 +81,7 @@ require('./foundation/zorg')(ctx);
    gedeelde gezins-helpers gaan hier op de context. */
 const { gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht,
   kanaalInfo, setPushHook, bezorgAanGasten, berichtVanGast } = require('./foundation/gasten')(ctx);
+ctx.unlinkGast = unlinkGast; // late: vergeetAccount in gezinseigenaar.js
 require('./foundation/berichten')(ctx);
 /* Een bericht VAN RTG aan een gezinslid. Eigen module omdat het een andere
    vraag is dan chatten tussen gezinsleden: hier is de afzender het huis en de
@@ -98,15 +107,10 @@ function setAutomatisering(a) {
 const { verifieerProfiel, bewaarSollicitatie, alGesolliciteerd } = require('./foundation/sollicitaties')(ctx);
 const { setMarkt } = require('./foundation/markt')(ctx);
 
-/* ALLEEN HET LEVEN-TEKEN -- maar wel MET DE NAAM VAN DE DIENST erbij, en dat
-   is geen versiering. Deze route is het enige levensteken van de rtf-groep in
-   de vloot (test/vloot.test.js draait die groep met `rtf:-`, dus zonder eigen
-   routes). Een kaal {ok:true} bewijst dan alleen dat IETS op dit pad antwoordde
-   -- de poortwachter ervoor kan dat net zo goed zelf zijn -- en het is ook niet
-   te onderscheiden van een vervalst antwoord, want de liegpoort vervangt elk
-   antwoord door precies {ok:true}. Wie zegt dat hij leeft, hoort te zeggen wie.
-   Verder niets: geen AI-modus, geen pid, geen looptijd. De hele geschiedenis
-   van deze route staat op een plek in scripts/lib/publiekeroutes.js. */
+/* ALLEEN HET LEVEN-TEKEN, MET DE NAAM VAN DE DIENST: het enige levensteken van
+   de rtf-groep in de vloot (test/vloot.test.js), en een kaal {ok:true} is niet
+   te onderscheiden van de liegpoort. Wie zegt dat hij leeft, zegt wie. Verder
+   niets; de geschiedenis staat in scripts/lib/publiekeroutes.js. */
 router.get('/health', (req, res) => res.json({ ok: true, dienst: 'rtfoundation' }));
 
 /* De onderwijskern (het leerpaspoort) komt LAAT binnen: hij wordt in
@@ -147,4 +151,4 @@ const { groepen, leerlingPassen } = require('./foundation/leeftijdsgroepen')({ G
 /* de gezinsagenda draait op de RTG-agendamotor, die pas na de sociale kern
    bestaat: server.js bindt hem laat, zoals de marktplaats */
 const setAgenda = m => ctx.setAgenda(m);
-module.exports = { aanGezinslid, setOnderwijs, setAgenda, router, setKostenHook, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen, setSchoolMail, schoolMailAdresActief:schoolMail && schoolMail.schoolMailAdresActief, foundationMailAdresActief:foundationMail && foundationMail.foundationMailAdresActief, accepteerGast };
+module.exports = { gezinsstroom, setPasskey, koppelPasskey, aanGezinslid, setOnderwijs, setAgenda, router, setKostenHook, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen, setSchoolMail, schoolMailAdresActief:schoolMail && schoolMail.schoolMailAdresActief, foundationMailAdresActief:foundationMail && foundationMail.foundationMailAdresActief, accepteerGast, ...eigen };

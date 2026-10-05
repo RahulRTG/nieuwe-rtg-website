@@ -28,7 +28,7 @@ module.exports = (kern) => {
       updatedAt: new Date().toISOString(), startedAt: new Date().toISOString(), arrived: false
     };
     liveSave();
-    if (dest) notifySupplier(dest.code, { icon: 'gps', title: 'Gast onderweg', body: db.data.live[key].codename + ' is naar u onderweg.' });
+    if (dest) (notifySupplier.naOpslag || notifySupplier)(dest.code, { icon: 'gps', title: 'Gast onderweg', body: db.data.live[key].codename + ' is naar u onderweg.' });
     pushLive(key);
     res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
   });
@@ -76,7 +76,7 @@ module.exports = (kern) => {
     if (!r.al) {
       liveSave();
       const dest = findSupplier(r.L.destCode);
-      if (dest) notifySupplier(dest.code, { icon: 'ster', title: 'Gast gearriveerd', body: r.L.codename + ' meldt dat hij bij u is.' });
+      if (dest) (notifySupplier.naOpslag || notifySupplier)(dest.code, { icon: 'ster', title: 'Gast gearriveerd', body: r.L.codename + ' meldt dat hij bij u is.' });
     }
     pushLive(key);
     res.json({ ok: true, live: liveStateFor(key, req.body.lang) });

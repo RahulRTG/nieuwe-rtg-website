@@ -5,6 +5,10 @@
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, notifySupplier,
     logboek, schrijfLog, bewaakMinimum, nu, rond3, rond2, artikelen, recepten, menuItemVan, artikelVan } = ctx;
+  // Alle keukenmutaties wonen genest in suppliers; publiceer daarom alleen die
+  // collectie. De brede fallback houdt oude/injecteerbare opslagimplementaties
+  // bruikbaar zonder de eigendomsgrens voor SQLite en PostgreSQL te verliezen.
+  const bewaarZaak = () => typeof save.sleutels === 'function' ? save.sleutels(['suppliers']) : save();
   function receptZet(s, menuItemId, regels) {
     const m = menuItemVan(s, menuItemId);
     if (!m) return { status: 404, error: 'Dit gerecht staat niet op het menu.' };
@@ -16,7 +20,7 @@ module.exports = (ctx) => {
       uit.push({ artikelId: a.id, hoeveelheid: h });
     }
     recepten(s)[m.id] = uit;
-    save();
+    bewaarZaak();
     return { ok: true, recept: uit };
   }
   function kostprijsVan(s, menuItemId) {
@@ -47,6 +51,7 @@ module.exports = (ctx) => {
   /* ---------- de automatische afboeking bij elke verkoop ---------- */
   function boekVerkoopAf(s, verkoopItems, bron) {
     if (!s) return;
+    const hadRecepten = !!(s.recepten && typeof s.recepten === 'object');
     let geboekt = 0;
     for (const it of (Array.isArray(verkoopItems) ? verkoopItems : []).slice(0, 60)) {
       const m = menuItemVan(s, it.id || it.name);
@@ -63,7 +68,11 @@ module.exports = (ctx) => {
         geboekt++;
       }
     }
-    if (geboekt) save();
+    /* recepten(s) initialiseert bij de eerste verkoop ook een lege receptkaart.
+       Dat is een echte mutatie en werd voorheen alleen toevallig door de brede
+       leveranciersmelding erna opgeslagen. De keuken bezit en bewaart haar
+       eigen toestand nu zelf. */
+    if (geboekt || !hadRecepten) bewaarZaak();
     return geboekt;
   }
 
@@ -77,7 +86,7 @@ module.exports = (ctx) => {
     a.aantal = g;
     schrijfLog(s, { soort: 'telling', artikelId: a.id, artikel: a.naam, delta, wie: schoon(wie, 40) || 'team', oms: 'Geteld: ' + g + ' ' + a.eenheid });
     bewaakMinimum(s, a);
-    save();
+    bewaarZaak();
     return { ok: true, artikel: a, verschil: delta };
   }
   function verspilling(s, artikelId, hoeveelheid, reden, wie) {
@@ -88,7 +97,7 @@ module.exports = (ctx) => {
     a.aantal = rond3(a.aantal - h);
     schrijfLog(s, { soort: 'verspilling', artikelId: a.id, artikel: a.naam, delta: -h, wie: schoon(wie, 40) || 'team', oms: schoon(reden, 80) || 'Breuk of derving' });
     bewaakMinimum(s, a);
-    save();
+    bewaarZaak();
     return { ok: true, artikel: a };
   }
   function levering(s, artikelId, hoeveelheid, kostprijs, wie) {
@@ -101,7 +110,7 @@ module.exports = (ctx) => {
     if (Number.isFinite(k) && k >= 0 && k <= 100000) a.kostprijs = rond2(k); // de laatste inkoopprijs is de kostprijs
     schrijfLog(s, { soort: 'levering', artikelId: a.id, artikel: a.naam, delta: h, wie: schoon(wie, 40) || 'team', oms: 'Levering binnen' + (Number.isFinite(k) ? ', ' + k.toFixed(2) + ' euro per ' + a.eenheid : '') });
     bewaakMinimum(s, a);
-    save();
+    bewaarZaak();
     return { ok: true, artikel: a };
   }
 

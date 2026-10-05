@@ -122,13 +122,11 @@ function beoordeel(collectie, oudeLengte, nieuweLengte, opties) {
   return { oordeel: 'meld', krimp, grens, rij };
 }
 
-/* Dezelfde Proxy voor dezelfde data, zodat `db.data === db.data` blijft kloppen
-   en niemand twee wikkels om een ding krijgt. */
+/* Een Proxy per data-object: `db.data === db.data` blijft kloppen. */
 const wikkels = new WeakMap();
 const instellingen = new WeakMap();
-
-// Alleen eigen wikkels: verse sleutels, zonder een schrijfbaar doel uit te geven.
-function collectieSleutels(data) { return Object.keys(instellingen.get(data)?.doel || data); }
+const inventaris = require('./begroting-inventaris');
+const { collectieSleutels, rijSleutels } = inventaris;
 
 // Een opslagcommit toetst zijn latere publicatie vooraf. Geen uitzondering op
 // het budget: dezelfde predicate, vóór SQLite de transactie onomkeerbaar maakt.
@@ -156,21 +154,24 @@ function bewaak(data, deps) {
   const grens = (deps && Number.isFinite(deps.grens)) ? deps.grens : KRIMPGRENS;
   levensteken(meld, modus, grens);
 
+  const vorm = { nu, modus, grens, doel: data };
+  inventaris.registreer(data, data);
+
   const wikkel = new Proxy(data, {
     set(doel, sleutel, waarde) {
       const oud = doel[sleutel];
       /* Alleen een collectie die door een ANDERE collectie wordt vervangen telt
          hier. Al het andere -- een teller, een object, een nieuwe sleutel --
          gaat ongemoeid door. */
-      if (!Array.isArray(oud) || !Array.isArray(waarde)) { doel[sleutel] = waarde; return true; }
+      if (!Array.isArray(oud) || !Array.isArray(waarde)) return inventaris.vervang(doel, sleutel, waarde);
       /* Buiten een verzoek doet het huis zijn eigen werk (veger, migratie,
          seed); daar hoort geen budget op. */
       const h = nu.huidige();
-      if (!h) { doel[sleutel] = waarde; return true; }
+      if (!h) return inventaris.vervang(doel, sleutel, waarde);
 
       const uit = beoordeel(String(sleutel), oud.length, waarde.length,
         { pad: h.pad, correlatie: h.correlatie, modus, grens });
-      if (uit.oordeel === 'door') { doel[sleutel] = waarde; return true; }
+      if (uit.oordeel === 'door') return inventaris.vervang(doel, sleutel, waarde);
 
       if (uit.oordeel === 'weiger') {
         meld('error', 'begroting: handeling geweigerd', {
@@ -181,13 +182,15 @@ function bewaak(data, deps) {
          van wat er legitiem groot is (LAT.md regel 5). */
       meld('warn', 'begroting: zou zijn geweigerd', {
         id: h.correlatie, p: h.pad, collectie: String(sleutel), rijen: uit.krimp, grens: uit.grens });
-      doel[sleutel] = waarde;
-      return true;
-    }
+      return inventaris.vervang(doel, sleutel, waarde);
+    },
+    deleteProperty: inventaris.verwijder,
+    defineProperty: inventaris.definieer
   });
   wikkels.set(data, wikkel);
   wikkels.set(wikkel, wikkel);   // bewaak(bewaakt) geeft dezelfde wikkel terug
-  instellingen.set(wikkel, { nu, modus, grens, doel: data });
+  instellingen.set(wikkel, vorm);
+  inventaris.registreer(wikkel, data);
   return wikkel;
 }
 
@@ -197,4 +200,4 @@ function stand() {
     laatste: teller.laatste.slice(0, 10) };
 }
 
-module.exports = { bewaak, beoordeel, toetsOpslag, collectieSleutels, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };
+module.exports = { bewaak, beoordeel, toetsOpslag, collectieSleutels, rijSleutels, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };

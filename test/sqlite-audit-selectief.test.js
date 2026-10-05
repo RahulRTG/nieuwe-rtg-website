@@ -716,7 +716,7 @@ for (const soort of ['order', 'rit']) {
   });
 }
 
-test('betaalde order behoudt brede leveranciersmelding voor nog onbehouden keukeninitialisatie', async t => {
+test('betaalde order laat keuken en melding elk uitsluitend hun eigen collectie bewaren', async t => {
   const p = aanvraagMetMelding(t, 'order');
   const order = { ref: 'BETAAL', customerKey: p.actor.key, supplierCode: p.zaak.code,
     supplierName: p.zaak.name, customerCodename: 'Anna', total: 12, paid: false, status: 'nieuw',
@@ -726,13 +726,12 @@ test('betaalde order behoudt brede leveranciersmelding voor nog onbehouden keuke
   p.ctx.orderMetRef = ref => p.db.data.orders.find(o => o.ref === ref);
   p.ctx.keuken = require('../server/kern/keuken')({ db: p.db, save: p.ctx.save,
     crypto: p.ctx.crypto, schoon: p.ctx.schoon, notifySupplier: p.ctx.notifySupplier }).keuken;
-  p.ctx.notifySupplier.naOpslag = () => assert.fail('betaalOrderVoor heeft nog een brede opslaggrens nodig');
   const betaal = require('../server/kern/lidacties/betalen')(p.ctx).betaalOrderVoor;
   assert.equal((await betaal(p.actor, { ref: order.ref })).ok, true);
   assert.equal(p.lees('orders')[0].paid, true);
   assert.deepEqual(p.lees('suppliers')[0].recepten, {}, 'echte keuken initialiseert zonder geboekte voorraadregel of eigen save');
-  assert.equal(p.breed(), 2); assert.equal(p.scans(), 3, 'fixture, betaaldomein en brede melding');
-  assert.equal(p.lees('ander').waarde, 3);
+  assert.equal(p.breed(), 1); assert.equal(p.scans(), 2, 'fixture en betaaldomein; keuken en melding blijven gericht');
+  assert.equal(p.lees('ander').waarde, 1, 'een vreemde pending mutatie lift niet mee met keuken of melding');
   assert.deepEqual(p.signalen, ['notify', 'supplier', 'office']);
   assert.equal((await betaal(p.actor, { ref: order.ref })).status, 409);
   assert.equal(p.lees('supplierNotifications').AAA.length, 1, 'retry maakt geen tweede melding');

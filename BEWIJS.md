@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2327 bestanden en 15967 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2328 bestanden en 15970 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2327 |
-| losse beweringen (`test(...)`) | 15967 |
+| toetsbestanden | 2328 |
+| losse beweringen (`test(...)`) | 15970 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2152 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2153 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2024 bestanden, 15439 beweringen.
+2025 bestanden, 15442 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -323,6 +323,7 @@ toets omvalt.
 | `command-router.test.js` | 2 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `command-routes-bestuur.test.js` | 11 | gezakt op `liegpoort /api/` | DE BESTUURSROUTES VAN RTG COMMAND -- beleid, simulatie, journaal, toezicht. WAAROM DIT BESTAND ER IS. |
 | `command-routes-herstel.test.js` | 8 | gezakt op `liegpoort /api/` | DE HERSTELROUTES VAN RTG COMMAND -- runbooks, zaken, de operator, de zandbak en de eerste stap van een overname. De tegenhanger van test/command-routes-bestuur.test.js: daar staat wat er BESLOTEN wordt, hier wat er... |
+| `command-toegang-eerlijk.test.js` | 3 | gezakt op `===->!==#0` | EEN RECHT DAT NIETS OPENT, ZEGT DAT (UITVOERINGSPLAN par. 8: command/toegang.geef/breekGlas, "KEEP LOCAL, onderzoeken"). |
 | `command.test.js` | 19 | gezakt op `===->!==#0` | RTG Command (kern/command/): de bestuurslaag van het RTG- en RTF-kantoor bewijst hier zijn zes harde beloftes. Zoeken vindt over domeinen heen; het objectdossier meet zijn afhankelijkheden in plaats van ze op te... |
 | `commandlagen.test.js` | 11 | gezakt op `liegpoort /api/` | De ROUTES van de lagen die op de Command-ruggengraat staan: canary, zandbak, master data, overname, API-poort, landen, steden en het alarm. WAAROM DIT NAAST DE MOTORTOETSEN STAAT. |
 | `commerce-kern.test.js` | 19 | gezakt op `&&->||#0` | DE COMMERCE-KERN -- werkwoorden, koopbaar, afrekening. WAT HIER WORDT VASTGEHOUDEN. |

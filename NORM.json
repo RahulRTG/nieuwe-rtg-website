@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 2012,
-    "toetsenNietGemeten": 129,
+    "toetsenNietGemeten": 131,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -4021,6 +4021,16 @@
       "meter": "zelfpoortendeToetsen 46 -> 47",
       "reden": "test/gezinsdeur.pg.test.js (B18) vereist echte PostgreSQL- en Redis-diensten: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode en een rotatie op A tegen de oude code op B. Lokaal met die diensten gedraaid en groen; zonder het advisory lock en FOR UPDATE in server/pg/collectietransactie.js zakte hij 3 van 3. Hij staat in scripts/lib/pg-toetslijst.js en als uitzondering in deze norm.",
       "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL en Redis."
+    },
+    {
+      "datum": "2026-10-05",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 129,
+      "vervalt": "2027-01-03",
+      "meter": "toetsenNietGemeten 129 -> 131",
+      "reden": "Twee nieuwe toetsbestanden voor de auditreparaties (PR #488): test/actietoken-geen-sessie.test.js (audit B-1, een actietoken geldt niet als sessie) en test/redis-url-niet-gelogd.test.js (audit A-P1-01, de Redis-URL gaat zonder gebruiker en wachtwoord het log in). Beide zijn met de hand nagetrokken: zonder de fix in server/accounts/tokens.js zakt de eerste, zonder urlZonderGeheim in server/bus.js de tweede. De mutatiemotor is er niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
     }
   ],
   "prestatie": {

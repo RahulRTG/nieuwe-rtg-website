@@ -139,7 +139,6 @@ test('12. een OPENBAAR adres zonder NODE_ENV + RTG_DEV_LINKS=1 => hardeFouten (C
 /* C6 (SQLite met meerdere schrijvers): de merge tussen processen laat de
    laatste schrijver winnen, dus een tweede schrijvend proces op SQLite
    verliest stil updates. Een schrijver op SQLite blijft een geldige stand. */
-const opslagKeuring = require('../server/config/productie-opslag');
 const { DATABASE_URL: _weg, ...SQLITE } = { ...VEILIG, RTG_STORE: 'sqlite' };
 const opslagFout = (r) => [...r.fouten, ...r.hardeFouten].some(f => /Meerdere schrijvende processen op SQLite/.test(f));
 
@@ -155,7 +154,7 @@ test('14. productie + SQLite + een opgesplitst RTG_DOMAINS weigert de start (C6)
 
 test('15. CONTRAST: een schrijvend proces op SQLite blijft een geldige productiestand (C6)', () => {
   assert.equal(opslagFout(config.valideer(SQLITE)), false, 'het bestaande besluit: een bak met sqlite mag');
-  assert.equal(opslagFout(config.valideer({ ...SQLITE, RTG_DOMAINS: opslagKeuring.ALLE_DOMEINEN.join(',') })), false,
+  assert.equal(opslagFout(config.valideer({ ...SQLITE, RTG_DOMAINS: require('../server/config/domeinen').ALLE_DOMEINEN.join(',') })), false,
     'alle domeinen in een proces is een schrijver');
   assert.equal(opslagFout(config.valideer({ ...VEILIG, RTG_SPREIDING: '1' })), false, 'PostgreSQL met spreiding is de bedoelde stand');
 });
@@ -166,11 +165,11 @@ test('16. een OPENBAAR adres zonder NODE_ENV + SQLite + spreiding => hardeFouten
   assert.ok(r.hardeFouten.some(f => /Meerdere schrijvende processen op SQLite/.test(f)), JSON.stringify(r.hardeFouten));
 });
 
-test('17. de domeinlijst van de keuring is dezelfde als die van de router (C6)', () => {
-  const bron = require('fs').readFileSync(require('path').join(__dirname, '..', 'server/opzet/routes.js'), 'utf8');
-  const m = /const ALLE_DOMEINEN = \[([^\]]*)\]/.exec(bron);
-  assert.ok(m, 'ALLE_DOMEINEN niet gevonden in server/opzet/routes.js');
-  const router = m[1].split(',').map(s => s.trim().replace(/^'|'$/g, '')).filter(Boolean);
-  assert.deepEqual([...router].sort(), [...opslagKeuring.ALLE_DOMEINEN].sort(),
-    'loopt deze lijst uit elkaar, dan telt de keuring een proces met alle domeinen als tweede schrijver of andersom');
+test('17. de keuring en de router lezen dezelfde domeinlijst, en er is geen kopie (C6)', () => {
+  const lees = (f) => require('fs').readFileSync(require('path').join(__dirname, '..', f), 'utf8');
+  for (const f of ['server/opzet/routes.js', 'server/config/productie-opslag.js']) {
+    const bron = lees(f);
+    assert.match(bron, /require\('(\.\.\/config|\.)\/domeinen'\)/, f + ' hoort de domeinlijst uit server/config/domeinen.js te lezen');
+    assert.doesNotMatch(bron, /ALLE_DOMEINEN\s*=\s*\[/, f + ' draagt een eigen kopie van de lijst; die loopt bij het eerste nieuwe domein uiteen');
+  }
 });

@@ -48,10 +48,8 @@ function bestaatDbJson(env) {
 }
 
 /* Welke stand zet een tweede schrijver op dezelfde opslag? null als er een is.
-   De domeinlijst staat hier en niet geimporteerd, omdat ../opzet/routes.js bij
-   het laden routes aanhangt; test/productie-failclosed.test.js houdt de twee
-   lijsten gelijk. */
-const ALLE_DOMEINEN = ['auth', 'member', 'supplier', 'office', 'staff', 'social', 'techniek', 'zakelijk', 'wereld'];
+   De domeinlijst is dezelfde als die van de router (./domeinen.js). */
+const { ALLE_DOMEINEN } = require('./domeinen');
 function meerdereSchrijvers(env) {
   if (env.RTG_SPREIDING === '1') return 'RTG_SPREIDING=1';
   if (env.RTG_DOMAINS === undefined) return null;
@@ -103,4 +101,4 @@ function keurOpslag(env, fouten, waarschuwingen) {
   return store;
 }
 
-module.exports = { keurOpslag, bestaatDbJson, meerdereSchrijvers, ALLE_DOMEINEN };
+module.exports = { keurOpslag, bestaatDbJson, meerdereSchrijvers };

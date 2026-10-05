@@ -12,7 +12,7 @@
     "leerhuis"
   ],
   "summary": {
-    "GO": 6,
+    "GO": 7,
     "PHASE": 6,
     "STOP": 8
   },
@@ -40,6 +40,32 @@
         "test/loop-fabric.test.js",
         "test/loop-fabric.pg.test.js",
         "test/living-world-sqlite.test.js"
+      ],
+      "prerequisite": "NOT_APPLICABLE"
+    },
+    {
+      "id": "experience.living-world-commons-release",
+      "capabilityId": "experience-platform",
+      "status": "GO",
+      "semanticOwner": "living-world",
+      "canonicalState": "livingWorld.contributions[*].sharing.release",
+      "mutationPoint": "server/kern/living-world/contributions.js: contribution.create/withdraw",
+      "authority": "uitsluitend contributor; place owner reviewt inhoud maar bezit de Commons-release niet",
+      "occurrence": "maker geeft exact de contribution-versie afzonderlijk aan Commons vrij",
+      "observationOpportunity": "alleen released contribution wordt een Fabric Observation",
+      "expectationDecision": "release legt purpose, audience, reuse, attribution, AI- en derivative scope vooraf vast",
+      "claimContest": "contribution.contest, correction/supersession en source withdrawal",
+      "changeTarget": "source-local versioned Commons release",
+      "sourceIssuedReceipt": "source event plus exact versioned LearningEligibility; geen cross-domain ChangeReceipt nodig voor publicatie",
+      "verificationPath": "review bevestigt alleen behandeling; publicatie verhoogt epistemische status niet",
+      "memoryClass": "COMMONS",
+      "retention": "living-world.contribution.lifecycle.v1; withdrawal maakt toekomstige resolution onmogelijk",
+      "recallContext": "community discovery op actuele source-versie; AI scopes blijven afzonderlijk en nu leeg",
+      "recoveryReplay": "Living World operation receipt, durable history/outbox, checkpoint en rebuild",
+      "tests": [
+        "test/living-world-commons-release.test.js",
+        "test/living-world.test.js",
+        "test/loop-fabric.test.js"
       ],
       "prerequisite": "NOT_APPLICABLE"
     },

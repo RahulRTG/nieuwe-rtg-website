@@ -10,14 +10,14 @@ module.exports = ({read,time,sources}) => {
     const placeVisible = id => s.places[id] && M.visible(s.places[id],key);
     const bpVisible = b => b.owner === key || M.visible(b,key) && placeVisible(b.placeId);
     const contributionVisible = c => c.owner === key || placeVisible(c.placeId) && (
-      s.places[c.placeId].owner === key || (c.sharing && c.sharing.visibility || 'community') === 'community'
+      s.places[c.placeId].owner === key || (c.sharing && c.sharing.visibility || 'private') === 'community'
         && ['accepted','superseded'].includes(c.status));
     function contribution(c) {
       const out = {...known(c,'contribution'),placeId:c.placeId,kind:c.kind,title:c.title,text:c.text,
         observedAt:c.observedAt,validUntil:c.validUntil,basis:c.basis,
         current:s.places[c.placeId].status === 'published' && M.activeKnowledge(c,at,s),
         supersedes:c.supersedes,supersededBy:c.supersededBy || null,
-        visibility:c.sharing && c.sharing.visibility || 'community',
+        visibility:c.sharing && c.sharing.visibility || 'private',
         purpose:c.sharing && c.sharing.purpose || 'world-memory',
         contests:M.clone(c.contests || []),verificationOf:M.clone(c.verificationOf),assessment:c.assessment || null,
         review:c.review ? {by:sources.name(c.review.by),at:c.review.at,reason:c.review.reason} : null,

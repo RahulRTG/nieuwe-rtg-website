@@ -14,8 +14,8 @@ function build(){
   const scaleBlockers=scale.map(row=>({capabilityId:row.id,domain:row.domain,status:'STOP',...SCALE_DECISIONS[row.domain]}));
   return {schemaVersion:1,kind:'RTG_LOOP_FABRIC_UNLOCK_ROADMAP',sourceOfTruth:false,
     warning:'Roadmap autoriseert geen runtimecode. Iedere vertical slice doorloopt opnieuw alle acceptance gates.',
-    sourceFlows:{summary:flows.summary,newGo:['library-edition-to-academy'],implementedGo:flows.flows.filter(x=>x.status==='GO').map(x=>x.id),
-      note:'D23 is nu als nieuwe source-owned cross-domain flow bewezen; brede capabilities blijven flowgewijs gefaseerd.'},
+    sourceFlows:{summary:flows.summary,newGo:['library-edition-to-academy','experience.living-world-commons-release'],implementedGo:flows.flows.filter(x=>x.status==='GO').map(x=>x.id),
+      note:'D23 en één source-local D13 Commons-release zijn bewezen; P12 blijft gedeeltelijk tot een tweede echte source owner dezelfde semantiek bewijst.'},
     decisions:{blockedCapabilities:decisions.summary.blockedCapabilities,families:decisions.summary.decisionFamilies,
       resolvedCapabilities:decisions.summary.resolvedCapabilities,
       topFive:decisions.dossiers.filter(x=>x.decisionStatus==='RESOLVED_PRODUCT_POLICY').slice(0,5)

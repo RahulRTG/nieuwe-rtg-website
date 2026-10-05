@@ -8,17 +8,19 @@ const eligibility = require('../loop-fabric/learning-eligibility');
 
 module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
   function learningEligibility(row) {
-    const share=row.sharing || {visibility:'community',purpose:'world-memory',recipients:[],consent:{basis:'voluntary-contribution'}};
+    const share=row.sharing || {visibility:'private',purpose:'personal-contribution-draft',recipients:[],consent:{basis:'none'}};
+    if(share.visibility==='private'||share.visibility==='stewards')return null;
     const audience=share.visibility==='community'?[{domain:'living-world',id:'commons'}]:(share.recipients||[]);
     return eligibility.issue({sourceRef:{domain:'living-world',type:'observation',id:row.id,version:row.revision},
       purpose:share.purpose,memoryClass:share.visibility==='community'?'COMMONS':'RELATIONSHIP_SHARED',audience,
-      basis:{type:share.consent&&share.consent.basis==='explicit'?'EXPLICIT_CONSENT':'VOLUNTARY_EXPLICIT_CONTRIBUTION'},
+      basis:{type:share.visibility==='community'?'EXPLICIT_RELEASE':'EXPLICIT_CONSENT'},
       allowedFields:['title','text','observedAt','status','contests','assessment'],uses:{decision:true,recall:true,'cross-domain':audience.some(x=>x.domain!=='living-world'),
-        ai:false,aggregate:false,publish:false},issuedAt:row.recordedAt||row.createdAt,validUntil:row.validUntil||null,
+        ai:false,aggregate:false,publish:share.visibility==='community'},issuedAt:row.recordedAt||row.createdAt,validUntil:row.validUntil||null,
       retention:{mode:'SOURCE_LIFECYCLE',policyId:'living-world.contribution.lifecycle.v1'},epistemicType:'HUMAN_STATED'});
   }
   function observationRecord(row) {
     if (!row) return null;
+    const issued=learningEligibility(row);if(!issued)return null;
     return {objectRef:{domain:'living-world',type:'observation',id:row.id,version:row.revision},
       placeRef:{domain:'living-world',type:'place',id:row.placeId,version:row.placeVersion || null},
       planRef:row.planId ? {domain:'living-world',type:'plan',id:row.planId,version:row.planVersion || null} : null,
@@ -29,7 +31,7 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
       review:M.clone(row.review || null),contests:M.clone(row.contests || []),
       supersedes:row.supersedes || null,supersededBy:row.supersededBy || null,
       verificationOf:M.clone(row.verificationOf || null),assessment:row.assessment || null,
-      eligibility:learningEligibility(row)};
+      eligibility:issued};
   }
 
   function resolveObservation(ref,target) {
@@ -39,7 +41,7 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
       let row = s.contributions && s.contributions[r.id], corrected = false;
       if (!row) protocol.fail('SOURCE_MISSING','De observatie bestaat niet meer bij de bron.',404);
       while (row.supersededBy && s.contributions[row.supersededBy]) { row = s.contributions[row.supersededBy]; corrected = true; }
-      const share = row.sharing || {visibility:'community',purpose:'world-memory',recipients:[]};
+      const share = row.sharing || {visibility:'private',purpose:'personal-contribution-draft',recipients:[]};
       const allowed = share.visibility === 'community' || target && (share.recipients || [])
         .some(x=>x.domain === target.domain && x.id === target.id);
       if (!allowed) protocol.fail('SOURCE_DENIED','De actuele bronpolicy staat deze ontvanger niet toe.',403);
@@ -56,7 +58,8 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
       if (!row) protocol.fail('SOURCE_MISSING','De eligibility-bron bestaat niet meer.',404);
       while(row.supersededBy&&s.contributions[row.supersededBy])row=s.contributions[row.supersededBy];
       const current={domain:'living-world',type:'observation',id:row.id,version:row.revision};
-      return eligibility.evaluate(learningEligibility(row),{sourceRef:current,purpose:request.purpose,
+      const issued=learningEligibility(row);if(!issued)protocol.fail('LEARNING_NOT_RELEASED','Deze bijdrage is niet voor learning vrijgegeven.',403);
+      return eligibility.evaluate(issued,{sourceRef:current,purpose:request.purpose,
         recipient:target,use:request.use||'recall'},time());
     } catch(error) { return protocol.error(error); }
   }
@@ -68,7 +71,7 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
       return {id:'lw-snapshot-'+protocol.hash([row.id,row.revision]).slice(0,28),sequence:null,
         at:row.updatedAt,action:'contribution.snapshot',objectRef:M.ref('contribution',row.id),
         protocol:observationRecord(row),envelop:old ? old.envelop : null};
-    });
+    }).filter(event=>event.protocol);
   }
 
   async function returnChangeReceipt(receipt) {

@@ -74,7 +74,9 @@ module.exports = function makeLivingWorld({db,save,bewerkCollectie,sources,now})
         envelop:envelope.maak({id:eventId,at,kanaal:'living-world',actor:key,
           correlatie:receipt,oorzaak:null,
           classificatie:action.startsWith('contribution.') ? 'persoonsgegeven' : 'intern'})};
-      if (action.startsWith('contribution.')) event.protocol = loopSource.observationRecord(s.contributions[out.result.id]);
+      if (action.startsWith('contribution.')) {
+        const record=loopSource.observationRecord(s.contributions[out.result.id]);if(record)event.protocol=record;
+      }
       event.hash = M.hash(event); s.history.push(event);
       out.result.receiptId = event.id;
       s.receipts[receiptKey] = {fingerprint,out:M.clone(out)};

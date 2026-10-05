@@ -5,22 +5,24 @@
   "warning": "Roadmap autoriseert geen runtimecode. Iedere vertical slice doorloopt opnieuw alle acceptance gates.",
   "sourceFlows": {
     "summary": {
-      "GO": 6,
+      "GO": 7,
       "PHASE": 6,
       "STOP": 8
     },
     "newGo": [
-      "library-edition-to-academy"
+      "library-edition-to-academy",
+      "experience.living-world-commons-release"
     ],
     "implementedGo": [
       "experience.living-world-contribution",
+      "experience.living-world-commons-release",
       "academy.practice-to-knowledge",
       "workos.accessibility-procedure",
       "workos.near-miss-runbook",
       "library.feedback-to-edition",
       "library-edition-to-academy"
     ],
-    "note": "D23 is nu als nieuwe source-owned cross-domain flow bewezen; brede capabilities blijven flowgewijs gefaseerd."
+    "note": "D23 en één source-local D13 Commons-release zijn bewezen; P12 blijft gedeeltelijk tot een tweede echte source owner dezelfde semantiek bewijst."
   },
   "decisions": {
     "blockedCapabilities": 84,

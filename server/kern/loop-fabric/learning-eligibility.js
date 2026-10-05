@@ -8,7 +8,7 @@ const EPISTEMIC_TYPES=Object.freeze(['HUMAN_STATED','SYSTEM_OBSERVED','AUTHORITY
 const USES=Object.freeze(['decision','recall','cross-domain','ai','aggregate','publish']);
 
 function issue(value) {
-  P.fields(value,['schemaVersion','eligibilityId','sourceRef','purpose','memoryClass','audience','basis','allowedFields','uses',
+  P.fields(value,['schemaVersion','constitutionVersion','eligibilityId','sourceRef','purpose','memoryClass','audience','basis','allowedFields','uses',
     'issuedAt','validUntil','retention','epistemicType','supersedes','aiScopes','promotionFrom','capabilityId']);
   const sourceRef=P.objectRef(value.sourceRef),purpose=P.text(value.purpose,120);
   if (!MEMORY_CLASSES.includes(value.memoryClass)) P.fail('ELIGIBILITY_INVALID','Onbekende memory class.');

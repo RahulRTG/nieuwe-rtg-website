@@ -40,7 +40,7 @@ const activeKnowledge = (c, at, state) => c.status === 'accepted' && (!c.validUn
     && state.plans[c.planId].participation && !state.plans[c.planId].participation.revokedAt));
 function knowledgeVisible(c, key, state) {
   const place = state && state.places && state.places[c.placeId];
-  const visibility = c.sharing && c.sharing.visibility || 'community';
+  const visibility = c.sharing && c.sharing.visibility || 'private';
   return c.owner === key || place && place.owner === key || visibility === 'community';
 }
 function selectKnowledge(state, placeId, ids, at, key) {

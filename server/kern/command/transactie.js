@@ -47,7 +47,7 @@ function certificaatVan(rb) {
       'alleen wat terugDraaibaar zegt' };
 }
 
-function maakTransactie({ db, runbooks, register, journaal, gezondheid }) {
+function maakTransactie({ db, runbooks, register, journaal, gezondheid, zwaar }) {
   const voorcontrole = (rb, cert) => poorten.voorcontrole({ rb, cert, runbooks, gezondheid });
   const verifieer = (rb, cert, geraakt) => poorten.verifieer({ rb, cert, geraakt, register, db });
 
@@ -59,12 +59,22 @@ function maakTransactie({ db, runbooks, register, journaal, gezondheid }) {
     const droog = o.droog !== false;
     const voor = voorcontrole(rb, cert);
 
+    /* De twee zware rechten van een recept. Meer dan honderd objecten in een
+       ronde vraagt massamutatie. Een menselijk akkoord telt alleen mét
+       herstel-forceren; zonder telt het als afwezig, en zegt de weigering het
+       alleen als de routering er werkelijk om vroeg ('hand'). */
+    const massa = !droog && zwaar && Number(o.max) > 100 ? zwaar(o.door, 'massamutatie') : null;
+    if (massa) return Object.assign({ certificaat: cert }, massa);
+    const geenRecht = !droog && zwaar && o.menselijkAkkoord ? zwaar(o.door, 'herstel-forceren') : null;
     if (!droog && !voor.mag) {
       return { error: 'De voorcontrole houdt dit tegen: ' + voor.blokkerend.map(b => b.waarom).join('; '),
         status: 409, certificaat: cert, voorcontrole: voor };
     }
 
-    const r = runbooks.voer(String(id), o);
+    const r = runbooks.voer(String(id), Object.assign({}, o, { menselijkAkkoord: !!o.menselijkAkkoord && !geenRecht }));
+    if (r && r.error && geenRecht && r.oordeel && r.oordeel.niveau === 'hand') {
+      return Object.assign({ certificaat: cert, voorcontrole: voor, oordeel: r.oordeel }, geenRecht);
+    }
     if (r && r.error) return Object.assign({ certificaat: cert, voorcontrole: voor }, r);
 
     if (droog) {

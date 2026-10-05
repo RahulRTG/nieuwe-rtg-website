@@ -2326,14 +2326,6 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
-    "command-toegang-eerlijk.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/command/toegang.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
     "command.e2e.js": {
       "soort": "server",
       "staat": "gezakt",

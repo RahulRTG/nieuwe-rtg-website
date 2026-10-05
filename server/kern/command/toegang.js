@@ -34,14 +34,10 @@ const ZWAAR = {
 
 const NOOD_MINUTEN = 60;
 
-/* EERLIJK OVER WAT DIT OPENT. geldig(), vanWie() en open() hebben buiten dit
-   bestand geen lezer: geen van de vijf zware handelingen vraagt hier of er een
-   recht openstaat. Een recht geven of de nooddeur openen legt dus vast wie wat
-   vroeg en waarom, maar opent niets. Dat staat in het antwoord in plaats van
-   dat het scherm "open" zegt. test/command-toegang-eerlijk.test.js zakt zodra
-   er een lezer bijkomt; dan hoort deze zin weg en de poort beproefd. */
-const NIET_AFGEDWONGEN = 'Dit recht wordt nog door geen enkele poort gelezen: het legt vast wie wat ' +
-  'vroeg en waarom, maar opent niets. Of de zware handelingen het gaan lezen, is een besluit.';
+/* EEN ZWAAR RECHT IS PERSOONLIJK. De gedeelde kantoorcode geeft en krijgt er
+   geen: een spoor dat eindigt bij een gedeelde code is een alibi (KANTOOR.md).
+   Waar de vijf rechten gelezen worden: test/command-zware-rechten.test.js. */
+const gedeeld = (w) => /gedeelde code/i.test(String(w || ''));
 
 function maakToegang({ opslag, save, crypto, journaal }) {
   function rij() {
@@ -58,7 +54,7 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     const r = ZWAAR[String(recht)];
     if (!r) return { error: 'Dat recht bestaat niet of hoeft niet tijdelijk gegeven te worden: ' + recht, status: 404 };
     if (!aan) return { error: 'Aan wie?', status: 400 };
-    if (!door) return { error: 'Zonder herleidbare gever wordt er geen recht uitgedeeld.', status: 403 };
+    if (!door || gedeeld(door) || gedeeld(aan)) return { error: 'Een zwaar recht geeft en krijgt alleen een mens op naam, niet de gedeelde code.', status: 403 };
     if (String(aan) === String(door)) return { error: 'Een zwaar recht geef je niet aan jezelf; laat een ander het doen.', status: 403 };
     if (!reden || String(reden).trim().length < 4) return { error: 'Een tijdelijk recht vraagt een reden.', status: 400 };
     const min = Math.min(Number(minuten || r.maxMinuten), r.maxMinuten);
@@ -68,7 +64,7 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     if (save) save();
     journaal.noteer({ actor: door, actie: 'recht tijdelijk geven', objectType: 'recht', objectId: item.id,
       niveau: NIVEAUS.hand, reden, na: { recht: item.recht, aan: item.aan, tot: item.tot } });
-    return { recht: item, nietAfgedwongen: NIET_AFGEDWONGEN };
+    return { recht: item };
   }
 
   /* DE NOODDEUR. Geen tweede mens, want in een calamiteit is die er niet -- en
@@ -76,7 +72,7 @@ function maakToegang({ opslag, save, crypto, journaal }) {
   function breekGlas(recht, door, reden) {
     const r = ZWAAR[String(recht)];
     if (!r) return { error: 'Dat recht bestaat niet: ' + recht, status: 404 };
-    if (!door) return { error: 'Zonder herleidbare medewerker gaat de nooddeur niet open.', status: 403 };
+    if (!door || gedeeld(door)) return { error: 'De nooddeur gaat alleen open voor een mens op naam, niet voor de gedeelde code.', status: 403 };
     if (!reden || String(reden).trim().length < 10) return { error: 'De nooddeur vraagt een volledige reden (minstens tien tekens); die staat straks in het journaal.', status: 400 };
     const min = Math.min(NOOD_MINUTEN, r.maxMinuten);
     const item = { id: crypto.randomUUID(), recht: String(recht), aan: String(door), door: String(door),
@@ -85,7 +81,7 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     if (save) save();
     journaal.noteer({ actor: door, actie: 'noodtoegang openen', objectType: 'recht', objectId: item.id,
       niveau: NIVEAUS.hand, risico: 95, reden, na: { recht: item.recht, tot: item.tot, nood: true } });
-    return { recht: item, nietAfgedwongen: NIET_AFGEDWONGEN,
+    return { recht: item,
       waarschuwing: 'Deze noodtoegang staat in het journaal en vervalt om ' + item.tot + '.' };
   }
 
@@ -106,6 +102,11 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     const n = nu();
     return rij().some(x => !x.ingetrokken && x.aan === String(wie) && x.recht === String(recht) && x.tot > n);
   };
+  /* De poort voor de vijf handelingen: null als het recht openstaat, anders
+     een weigering die zegt welk recht en hoe je het krijgt. */
+  const vereist = (wie, recht) => (!gedeeld(wie) && geldig(wie, recht)) ? null : { status: 403, recht,
+    error: 'Dit vraagt het tijdelijke recht "' + recht + '" (' + ZWAAR[recht].wat + '). Een collega op naam ' +
+      'geeft het via /api/command/recht/geef, of open de nooddeur met een reden.' };
   const vanWie = (wie) => { const n = nu(); return rij().filter(x => x.aan === String(wie) && !x.ingetrokken && x.tot > n); };
   const open = () => { const n = nu(); return rij().filter(x => !x.ingetrokken && x.tot > n); };
 
@@ -146,7 +147,7 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     };
   }
 
-  return { geef, breekGlas, trekIn, geldig, vanWie, open, graaf, mandaat, mandatenVan, ZWAAR, NOOD_MINUTEN };
+  return { geef, breekGlas, trekIn, geldig, vereist, vanWie, open, graaf, mandaat, mandatenVan, ZWAAR, NOOD_MINUTEN };
 }
 
-module.exports = { maakToegang, ZWAAR, NOOD_MINUTEN, NIET_AFGEDWONGEN };
+module.exports = { maakToegang, ZWAAR, NOOD_MINUTEN };

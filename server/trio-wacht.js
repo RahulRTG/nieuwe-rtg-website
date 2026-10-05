@@ -12,7 +12,7 @@ const http = require('http');
 const path = require('path');
 const { spawn } = require('child_process');
 const { maakSpreiding } = require('./trio-spreiding');
-const { maakAfzetten } = require('./trio-afzetten');
+const { maakAfzetten, leesStand } = require('./trio-afzetten');
 
 function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log, PROMOTE_MS = 15000 }) {
   const servers = [];
@@ -72,7 +72,8 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log, PROMOTE_MS =
       req.end();
     });
   }
-  const isGezond = async port => { const r = await apiCall(port, '/api/health', 'GET'); return !!(r && r.status === 200); };
+  const stand = port => leesStand(apiCall, port);   // gezond, en of hij zegt leider te zijn
+  const isGezond = async port => (await stand(port)).gezond;
 
   /* ---------- wie is actief ---------- */
 
@@ -84,14 +85,15 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log, PROMOTE_MS =
         for (let i = 0; i < servers.length; i++) {
           const s = servers[i];
           if (!s.child) continue;
-          if (await isGezond(s.port)) {
-            if (i === activeIdx) return; // actieve leeft toch nog
+          const st = await stand(s.port);
+          if (st.gezond) {
+            if (i === activeIdx && st.leider !== false) return; // actieve leeft toch nog
             /* Eerst de oude leider zijn leiderschap afnemen, dan pas de nieuwe
                promoveren -- nooit twee leiders tegelijk. Met spreiding blijft de
                oude meewerken als volger; zonder gaat hij naar stand-by. Lukt
                het afnemen niet, dan wordt zijn proces gestopt; en lukt ook dat
                niet, dan promoveren we deze ronde niemand (./trio-afzetten.js). */
-            if (activeIdx >= 0 && !await zetAf(activeIdx)) return;
+            if (activeIdx >= 0 && activeIdx !== i && !await zetAf(activeIdx)) return;
             const uit = await promoveer(i);
             if (uit === 'nee') continue; // aantoonbaar geen leider: probeer de volgende
             activeIdx = i;               // ook bij 'onzeker': dan zet de volgende ronde hem eerst af
@@ -123,7 +125,9 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log, PROMOTE_MS =
   }
   async function hartslagRonde() {
     for (const s of servers) {
-      const ok = s.child ? await isGezond(s.port) : false;
+      const st = s.child ? await stand(s.port) : { gezond: false, leider: null };
+      const ok = st.gezond;
+      s.meldtLeider = st.leider;
       if (ok && !s.healthy) s.healthySince = Date.now();
       /* Onbereikbaar is altijd rol 'uit'. Zo krijgt een server die wegvalt geen
          verkeer meer toebedeeld, en pakt stemAf() hem vanzelf weer op zodra hij
@@ -131,19 +135,23 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log, PROMOTE_MS =
       if (!ok) { s.healthySince = 0; s.rol = 'uit'; }
       s.healthy = ok;
     }
-    if (activeIdx < 0 || !servers[activeIdx].healthy) {
-      await kiesActieve(activeIdx < 0 ? null : 'server ' + servers[activeIdx].nr + ' reageert niet meer');
+    const act = servers[activeIdx];
+    if (activeIdx < 0 || !act.healthy || act.meldtLeider === false) {
+      await kiesActieve(activeIdx < 0 ? null : 'server ' + act.nr + (act.healthy ? ' zegt geen leider te zijn' : ' reageert niet meer'));
     } else {
       // failback: een lager genummerde server die weer 10 seconden gezond is,
       // krijgt het werk terug ("tot die het weer doet")
       const beter = servers.findIndex(s => s.healthy && s.healthySince && Date.now() - s.healthySince >= FAILBACK_MS);
-      if (beter >= 0 && beter < activeIdx) {
-        /* Een failback is vrijwillig. Tijdens de wissel is er geen actieve, zodat
-           de poortwachter niets stuurt naar een server die we net afzetten
-           (./trio-afzetten.js wissel). */
+      if (beter >= 0 && beter < activeIdx && !switching) {
+        /* Vrijwillig, en zonder actieve tijdens de wissel (./trio-afzetten.js
+           wissel). Onder het slot van kiesActieve: anders ziet een kiesActieve
+           van de proxy de -1 en promoveert hij de oude terug. */
         const oudIdx = activeIdx;
         activeIdx = -1;
-        activeIdx = await wissel(oudIdx, beter);
+        switching = wissel(oudIdx, beter)
+          .then((nieuw) => { activeIdx = nieuw; }, (e) => log('failback mislukt: ' + (e && e.message)))
+          .finally(() => { switching = null; });
+        await switching;
       }
     }
     /* En tot slot de meelopers gelijktrekken: elke gezonde server die geen

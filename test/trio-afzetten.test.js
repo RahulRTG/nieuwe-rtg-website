@@ -45,16 +45,22 @@ function nepServer(port, nr, stand, spoor) {
   const s = http.createServer((req, res) => {
     const pad = req.url.split('?')[0];
     let status = 404;
-    if (pad === '/api/health') status = stand.gezond ? 200 : 503;
-    else if (pad === '/api/cluster/promote') {
+    let lijf = '';
+    if (pad === '/api/health') {
+      /* Een echte server is BEZIG tijdens zijn promote (laden, migreren en de
+         backup zijn synchroon) en antwoordt dan niet gezond. */
+      status = stand.gezond && !stand.bezig ? 200 : 503;
+      lijf = JSON.stringify(typeof stand.leider === 'boolean' ? { ok: true, leider: stand.leider } : { ok: true });
+    } else if (pad === '/api/cluster/promote') {
       status = stand.promote; spoor.push('promote:' + nr);
       if (status === 200) stand.leider = true;
+      if (stand.vertraging) { stand.bezig = true; setTimeout(() => { stand.bezig = false; }, stand.vertraging); }
     } else if (pad === '/api/cluster/demote') {
       status = stand.demote; spoor.push('demote:' + nr);
       if (stand.bijDemote) stand.bijDemote();
       if (status === 200) stand.leider = false;
     }
-    setTimeout(() => { res.writeHead(status); res.end(); }, pad === '/api/cluster/promote' ? (stand.vertraging || 0) : 0);
+    setTimeout(() => { res.writeHead(status); res.end(lijf); }, pad === '/api/cluster/promote' ? (stand.vertraging || 0) : 0);
   });
   return new Promise((klaar) => s.listen(port, '127.0.0.1', () => klaar(s)));
 }
@@ -153,12 +159,12 @@ test('4. een promotie die een time-out geeft maar WEL is uitgevoerd, wordt afgez
 
 /* Een failback-opstelling: server 2 is leider, server 1 is terug en wordt na
    FAILBACK_MS (hier 0) weer leider. */
-async function failback(promoteVertraging) {
+async function failback(promoteVertraging, PROMOTE_MS = 300) {
   const basis = await tweePoorten(2);
   const spoor = [];
   const stand = [{ gezond: false, promote: 200, demote: 200 }, { gezond: true, promote: 200, demote: 200 }];
   const nep = await Promise.all(stand.map((st, i) => nepServer(basis + i, i + 1, st, spoor)));
-  const w = maakWacht({ AANTAL: 2, BASISPOORT: basis, SLEUTEL: 'toets', FAILBACK_MS: 0, PROMOTE_MS: 300, log: () => {} });
+  const w = maakWacht({ AANTAL: 2, BASISPOORT: basis, SLEUTEL: 'toets', FAILBACK_MS: 0, PROMOTE_MS, log: () => {} });
   w.servers.forEach((s, i) => { s.child = nepKind(i + 1, spoor, true); });
   await w.hartslag();
   assert.equal(w.actieve(), 1, 'server 2 is eerst leider');
@@ -207,4 +213,69 @@ test('7. kan een trage kandidaat niet aantoonbaar worden afgezet, dan wordt er n
     assert.ok(!spoor.includes('promote:3'), 'geen tweede kandidaat zolang de eerste misschien leider is: ' + spoor.join(', '));
     assert.equal(w.actieve(), 1, 'de onzekere kandidaat geldt als actief, zodat de volgende ronde hem eerst afzet');
   } finally { w.stop(); await Promise.all(nep.map((s) => new Promise((r) => s.close(r)))); }
+});
+
+/* ----------------------------------------------------------------------------
+   DE DERDE HERKEURING vond twee wegen die de reparatie van ronde 2 liet liggen
+   of zelf opende, en drie mutanten die geen toets ving.
+   -------------------------------------------------------------------------- */
+test('8. een kiesActieve van de proxy TIJDENS de failback-wissel promoveert de oude leider niet terug', { timeout: 20000 }, async () => {
+  const { w, stand, sluit } = await failback(1200, 5000);
+  try {
+    const wissel = w.hartslag();                     // server 1 is terug en neemt het werk terug: zijn promote duurt 1,2 s
+    await new Promise((r) => setTimeout(r, 300));
+    await w.kiesActieve('server 2 liet een verzoek vallen');   // zoals trio-proxy.js en trio-werkers.js doen
+    await wissel;
+    assert.deepEqual(leiders(stand), [1], 'precies een leider na de wissel');
+    assert.equal(w.actieve(), 0);
+  } finally { w.stop(); await sluit(); }
+});
+
+test('9. een actieve die zegt GEEN leider te zijn (herstart als stand-by) wordt opnieuw gepromoveerd', { timeout: 20000 }, async () => {
+  const { w, spoor, stand, sluit } = await failback(0);
+  try {
+    assert.deepEqual(leiders(stand), [2]);
+    stand[0].gezond = false;                        // server 1 blijft weg, er is geen failback
+    stand[1].leider = false;                        // server 2 crashte en kwam terug als stand-by
+    await w.hartslag();
+    assert.ok(spoor.includes('promote:2'), 'de stand-by wordt weer leider: ' + spoor.join(', '));
+    assert.deepEqual(leiders(stand), [2]);
+    assert.equal(w.actieve(), 1);
+  } finally { w.stop(); await sluit(); }
+});
+
+test('10. een promote die langer duurt dan een gezondheidscontrole krijgt de tijd (PROMOTE_MS)', { timeout: 20000 }, async () => {
+  const basis = await tweePoorten(2);
+  const spoor = [];
+  const stand = [{ gezond: true, promote: 200, demote: 200, vertraging: 2000 }, { gezond: false, promote: 200, demote: 200 }];
+  const nep = await Promise.all(stand.map((st, i) => nepServer(basis + i, i + 1, st, spoor)));
+  const w = maakWacht({ AANTAL: 2, BASISPOORT: basis, SLEUTEL: 'toets', FAILBACK_MS: 10000, log: () => {} });
+  w.servers.forEach((s, i) => { s.child = nepKind(i + 1, spoor, true); });
+  try {
+    await w.kiesActieve('start');
+    assert.ok(!spoor.some((x) => x.startsWith('demote:') || x.startsWith('kill:')), 'een trage maar gewone promote wordt niet afgeschoten: ' + spoor.join(', '));
+    assert.equal(w.actieve(), 0);
+  } finally { w.stop(); await Promise.all(nep.map((s) => new Promise((r) => s.close(r)))); }
+});
+
+test('11. failback: lukken de terugkeerder EN het terugdraaien niet, dan is er geen actieve (en niet stil de oude)', { timeout: 20000 }, async () => {
+  const { w, stand, sluit } = await failback(0);
+  try {
+    stand[0].promote = 500; stand[1].promote = 500;   // geen van beide wordt leider
+    await w.hartslag();                               // server 1 is weer gezond: failback (FAILBACK_MS 0)
+    assert.deepEqual(leiders(stand), [], 'niemand is leider');
+    assert.equal(w.actieve(), -1, 'dan kiest de volgende hartslag; de oude blijft niet stil de actieve');
+  } finally { w.stop(); await sluit(); }
+});
+
+test('12. failback: een terugkeerder die "onzeker" blijft, geldt als actief (de oude wordt niet teruggezet)', { timeout: 20000 }, async () => {
+  const { w, stand, spoor, sluit } = await failback(2000);
+  try {
+    stand[0].demote = 500;                                          // afzetten lukt niet
+    w.servers[0].child = nepKind(1, spoor, false);                  // en stoppen ook niet
+    await w.hartslag();
+    await w.hartslag();
+    assert.deepEqual(leiders(stand), [1], 'de oude is niet teruggezet naast een mogelijke nieuwe leider');
+    assert.equal(w.actieve(), 0);
+  } finally { w.stop(); await sluit(); }
 });

@@ -25,13 +25,26 @@
    ook een kandidaat eerst aantoonbaar afgezet (promoveer hieronder).
 
    WAT HIER NIET DICHT IS: een stand-by antwoordt op een schrijfverzoek met 200
-   en bewaart niets (db/index.js bewaar). wissel() houdt het verkeer daarom weg
-   tijdens de failback, maar een verzoek dat al onderweg was en een demote die
-   een time-out gaf maar wel is uitgevoerd, raken die stand-by nog. Zie
-   RTG-V1-RELEASE-READINESS-AUDIT.md. */
+   en bewaart niets (db/index.js bewaar). wissel() houdt het verkeer weg tijdens
+   de failback en de hartslag promoveert een actieve die zegt geen leider te
+   zijn (leesStand), maar een verzoek dat al onderweg was, het venster tot de
+   volgende hartslag en de werkers van RTG_POORTWACHTERS raken die stand-by nog.
+   Zie RTG-V1-RELEASE-READINESS-AUDIT.md. */
 'use strict';
 
 const STOP_MS = 5000;
+
+/* Gezond, en wat de server ZELF over zijn leiderschap zegt (`leider` in
+   /api/health; null als hij het niet zegt). De boekhouding van de poortwachter
+   is niet genoeg: een server die herstartte is stand-by, een demote kan een
+   time-out geven en toch zijn uitgevoerd, en een 'onzeker' moet ooit worden
+   nagekeken (derde herkeuring van C6). */
+async function leesStand(apiCall, port) {
+  const r = await apiCall(port, '/api/health', 'GET');
+  if (!r || r.status !== 200) return { gezond: false, leider: null };
+  try { const b = JSON.parse(r.body); return { gezond: true, leider: typeof b.leider === 'boolean' ? b.leider : null }; }
+  catch (e) { return { gezond: true, leider: null }; }
+}
 
 function maakAfzetten({ servers, spreiding, log }) {
   function weg(kind) { return kind.exitCode !== null || kind.signalCode !== null; }
@@ -82,4 +95,4 @@ function maakAfzetten({ servers, spreiding, log }) {
   return { zetAf, promoveer, wissel };
 }
 
-module.exports = { maakAfzetten, STOP_MS };
+module.exports = { maakAfzetten, leesStand, STOP_MS };

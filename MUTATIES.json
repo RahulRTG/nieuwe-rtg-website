@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-04T19:06:28.140Z",
-    "commit": "6c19cab6",
+    "op": "2026-10-05T11:26:36.831Z",
+    "commit": "7e27340ca",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -5364,6 +5364,14 @@
       "gezakt": 2,
       "geprobeerd": 3
     },
+    "herhaalbesluit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/herhaalbesluit.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "herhaalpakket.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -9027,6 +9035,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "mutatie-html.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/mutatie-html.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "mutatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -11015,11 +11031,42 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
+    "praktijk-betalen.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/werk/praktijk-betalen.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "praktijk-betalen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalwaarheid/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "praktijk-http.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "praktijk-leverancier.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bedrijf/praktijk-vorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 3
+    },
+    "praktijk-transacties-http.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "praktijk.e2e.js": {
@@ -11435,6 +11482,14 @@
       "operator": "getal+1#1",
       "gezakt": 1,
       "geprobeerd": 8
+    },
+    "registerratel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/registerratel.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "registerratels.test.js": {
       "soort": "gericht",
@@ -15577,6 +15632,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "verhalen-aankomst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/verhalen.js",
+      "operator": "&&->||#14",
+      "gezakt": 1,
+      "geprobeerd": 86
     },
     "verhuur.test.js": {
       "soort": "server",

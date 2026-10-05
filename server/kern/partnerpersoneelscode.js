@@ -88,9 +88,8 @@ function maakPersoneelscodes({ db, crypto, bewerkCollectie, zoekPartner, nu }) {
   }
 
   /* "Roteren" op het kantoor is VERNIEUWEN (kern/bearercode-keten.js): een mens
-     op naam kiest een nieuwe looptijd en de teller begint opnieuw, met hetzelfde
-     maximum. De vorige code is daarna niets meer waard; een al ingetrokken code
-     houdt haar eerste intrekking. Volgnummer en geschiedenis gaan mee. */
+     op naam kiest een nieuwe looptijd, de teller begint opnieuw met hetzelfde
+     maximum, en de vorige code is daarna niets meer waard. */
   async function roteer({ id, dagen, door }) {
     const plek = String(id || '');
     const wie = String(door || '').slice(0, 100);

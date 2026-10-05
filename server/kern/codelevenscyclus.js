@@ -1,8 +1,7 @@
 /* Gedeelde levenscyclus voor codes die zonder account een kleine deur openen.
 
-   In PostgreSQL en SQLite loopt iedere beslissing door EEN collectietransactie.
-   Daardoor zijn max-use versus max-use en intrekken versus gebruiken werkelijk
-   geserialiseerd tussen processen. `transactie()` laat de portalen bovendien
+   In PostgreSQL en SQLite loopt iedere beslissing door EEN collectietransactie,
+   dus max-use tegen max-use en intrekken tegen gebruiken zijn geserialiseerd. `transactie()` laat de portalen bovendien
    de code, de koppeling aan de persoon en hun auditregel in diezelfde commit
    zetten. De kale code verlaat alleen de uitgifte; op schijf staat zijn hash. */
 'use strict';
@@ -117,10 +116,8 @@ module.exports = ({ opslag, staat, nu, rid, crypto, save, bewerkCollectie }) => 
       return { ok: true, toegang: publiek(r) };
     }
 
-    /* VERNIEUWEN en niet roteren: een medewerker kiest de termijn en het gebruik
-       opnieuw (geldig_dagen, max_gebruik). Deze codes hebben een eigen hash en
-       vorm, dus geen bearer.vernieuw(); wel dezelfde keten (volgnummer,
-       geschiedenis, intrekking van de oude), met de reden van de mens erbij. */
+    /* Vernieuwen: een mens kiest termijn en gebruik opnieuw. Eigen hash, dus
+       geen bearer.vernieuw(), wel dezelfde keten (kern/bearercode-keten.js). */
     function roteer(id, invoer) {
       const oud = rijen.find(x => x.id === String(id || ''));
       if (!oud) return { status: 404, error: 'Deze toegangscode bestaat niet.' };

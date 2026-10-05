@@ -15,4 +15,11 @@ function sessieDelen(body) {
   return d;
 }
 
-module.exports = { sessieDelen };
+/* Het DOEL van een actietoken staat op de plek waar een sessietoken zijn exp
+   heeft. Een doel dat zelf een getal is (of een punt bevat) zou daar voor een
+   tijdveld kunnen doorgaan: dus nooit uitgeven. Kleine letters, cijfers en
+   streepjes, beginnend met een letter. */
+const DOEL = /^[a-z][a-z0-9-]{0,39}$/;
+const doelGeldig = (doel) => typeof doel === 'string' && DOEL.test(doel);
+
+module.exports = { sessieDelen, doelGeldig };

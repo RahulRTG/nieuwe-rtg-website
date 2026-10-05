@@ -19,6 +19,7 @@
 'use strict';
 
 const { NIVEAUS } = require('../frictie');
+const klok = require('../../lib/klok');
 
 /* De zware bevoegdheden. Alleen deze zijn tijdelijk uit te delen -- de rest
    hangt gewoon aan de kantoorinlog. Een lijst, want "alles kan tijdelijk" is
@@ -33,6 +34,15 @@ const ZWAAR = {
 
 const NOOD_MINUTEN = 60;
 
+/* EERLIJK OVER WAT DIT OPENT. geldig(), vanWie() en open() hebben buiten dit
+   bestand geen lezer: geen van de vijf zware handelingen vraagt hier of er een
+   recht openstaat. Een recht geven of de nooddeur openen legt dus vast wie wat
+   vroeg en waarom, maar opent niets. Dat staat in het antwoord in plaats van
+   dat het scherm "open" zegt. test/command-toegang-eerlijk.test.js zakt zodra
+   er een lezer bijkomt; dan hoort deze zin weg en de poort beproefd. */
+const NIET_AFGEDWONGEN = 'Dit recht wordt nog door geen enkele poort gelezen: het legt vast wie wat ' +
+  'vroeg en waarom, maar opent niets. Of de zware handelingen het gaan lezen, is een besluit.';
+
 function maakToegang({ opslag, save, crypto, journaal }) {
   function rij() {
     return opslag.bak('commandRechten');
@@ -40,8 +50,8 @@ function maakToegang({ opslag, save, crypto, journaal }) {
   function mandaten() {
     return opslag.bak('commandMandaten');
   }
-  const nu = () => new Date().toISOString();
-  const straks = (min) => new Date(Date.now() + min * 60000).toISOString();
+  const nu = () => klok.datum().toISOString();
+  const straks = (min) => new Date(klok.nu() + min * 60000).toISOString();
 
   /* Tijdelijk recht geven. Vier ogen: wie het geeft is niet wie het krijgt. */
   function geef(recht, aan, door, reden, minuten) {
@@ -58,7 +68,7 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     if (save) save();
     journaal.noteer({ actor: door, actie: 'recht tijdelijk geven', objectType: 'recht', objectId: item.id,
       niveau: NIVEAUS.hand, reden, na: { recht: item.recht, aan: item.aan, tot: item.tot } });
-    return { recht: item };
+    return { recht: item, nietAfgedwongen: NIET_AFGEDWONGEN };
   }
 
   /* DE NOODDEUR. Geen tweede mens, want in een calamiteit is die er niet -- en
@@ -75,7 +85,8 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     if (save) save();
     journaal.noteer({ actor: door, actie: 'noodtoegang openen', objectType: 'recht', objectId: item.id,
       niveau: NIVEAUS.hand, risico: 95, reden, na: { recht: item.recht, tot: item.tot, nood: true } });
-    return { recht: item, waarschuwing: 'Deze noodtoegang staat in het journaal en vervalt om ' + item.tot + '.' };
+    return { recht: item, nietAfgedwongen: NIET_AFGEDWONGEN,
+      waarschuwing: 'Deze noodtoegang staat in het journaal en vervalt om ' + item.tot + '.' };
   }
 
   function trekIn(id, door, reden) {
@@ -138,4 +149,4 @@ function maakToegang({ opslag, save, crypto, journaal }) {
   return { geef, breekGlas, trekIn, geldig, vanWie, open, graaf, mandaat, mandatenVan, ZWAAR, NOOD_MINUTEN };
 }
 
-module.exports = { maakToegang, ZWAAR, NOOD_MINUTEN };
+module.exports = { maakToegang, ZWAAR, NOOD_MINUTEN, NIET_AFGEDWONGEN };

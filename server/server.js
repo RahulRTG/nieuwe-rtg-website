@@ -2376,7 +2376,7 @@ const hulp = {
      paar doorgeven zonder de andere. */
   ordersVanKlant, ordersVanZaak, pasTegoedToe, herstelTegoed, path, pickupCode, afhaalcode, pinSlot, pushLive, rememberSession,
   reserveerTafel, rtf, rtmail, save, schoon, sessieregister, sendPush, sendPushToUser, sociaal, sseToCustomer,
-  sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zetServiceOverdracht, zorgContact,
+  sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zetServiceOverdracht, zorgContact, zegel,
   /* Voor "wie van je vrienden is er nu" (kern/spellen/presence.js): de levende
      lijst van open live-verbindingen, en dezelfde functiepoort die
      /api/member/spel zou weigeren. Ze gaan naar de KERNLAGEN en niet naar de

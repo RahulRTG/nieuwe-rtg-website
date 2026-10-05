@@ -16,7 +16,8 @@ const SLEUTELS = {
   'POST /api/loop/proof': { zelfdeVerzoek: true },
   'POST /api/bedrijf/loop/procedure/change': { zelfdeVerzoek: true },
   'POST /api/bedrijf/loop/runbook/change': { zelfdeVerzoek: true },
-  'POST /api/bedrijf/loop/incident/observe': { zelfdeVerzoek: true }
+  'POST /api/bedrijf/loop/incident/observe': { zelfdeVerzoek: true },
+  'POST /api/bedrijf/loop/incident/lifecycle': { zelfdeVerzoek: true }
 };
 
 module.exports = { SLEUTELS };

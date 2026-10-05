@@ -29,5 +29,14 @@ module.exports = (sctx) => {
       verificationOf:req.body.verificationOf,assessment:req.body.assessment});
     res.status(out.status || 200).json(out);
   });
+  app.post('/api/bedrijf/loop/incident/lifecycle',async (req,res)=>{
+    const access=werkPoort(req,res,'service'); if (!access) return;
+    if (!access.l || !access.l.id)
+      return res.status(403).json({error:'Observation-lifecycle vereist een persoonlijk WorkOS-lid.',code:'PERSONAL_AUTHORITY_REQUIRED'});
+    const actorRef=access.l.rtgKey || 'work-member:'+access.l.id;
+    const out=await workLoopSource.lifecycleObservation({actorRef,memberId:access.l.id,workspaceCode:access.w.code,
+      operationId:req.body.operationId,observationRef:req.body.observationRef,status:req.body.status,reason:req.body.reason});
+    res.status(out.status || 200).json(out);
+  });
   return {};
 };

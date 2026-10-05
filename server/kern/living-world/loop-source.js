@@ -3,6 +3,7 @@
 const M = require('./model');
 const envelope = require('../envelop');
 const protocol = require('../loop-fabric/protocol');
+const delivery = require('../loop-fabric/delivery');
 
 module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
   function observationRecord(row) {
@@ -23,13 +24,16 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
     try {
       const r = protocol.objectRef(ref), s = read();
       if (r.domain !== 'living-world' || r.type !== 'observation') protocol.fail('INVALID_REF','Dit is geen Living World-observatie.');
-      let row = M.get(s,'contributions',r.id), corrected = false;
+      let row = s.contributions && s.contributions[r.id], corrected = false;
+      if (!row) protocol.fail('SOURCE_MISSING','De observatie bestaat niet meer bij de bron.',404);
       while (row.supersededBy && s.contributions[row.supersededBy]) { row = s.contributions[row.supersededBy]; corrected = true; }
       const share = row.sharing || {visibility:'community',purpose:'world-memory',recipients:[]};
       const allowed = share.visibility === 'community' || target && (share.recipients || [])
         .some(x=>x.domain === target.domain && x.id === target.id);
-      if (!allowed || row.status === 'withdrawn' || row.status === 'rejected')
-        protocol.fail('SOURCE_NOT_AVAILABLE','Deze observatie is niet voor dit doel beschikbaar.',404);
+      if (!allowed) protocol.fail('SOURCE_DENIED','De actuele bronpolicy staat deze ontvanger niet toe.',403);
+      if (row.status === 'withdrawn') protocol.fail('SOURCE_WITHDRAWN','Deze observatie is door de bron ingetrokken.',410);
+      if (row.status === 'rejected') protocol.fail('SOURCE_NOT_AVAILABLE','Deze observatie is door de bron afgewezen.',404);
+      if (row.validUntil && row.validUntil<=time()) protocol.fail('SOURCE_EXPIRED','Deze observatie is verlopen.',410);
       return {ok:true,observation:observationRecord(row),corrected,
         requestedRef:r,sourceCurrentVersion:row.revision};
     } catch(e) { return protocol.error(e); }
@@ -39,7 +43,7 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
     const s = read(), byId = new Map(s.history.filter(e=>e.protocol).map(e=>[e.protocol.objectRef.id,e]));
     return Object.values(s.contributions).map(row=>{
       const old = byId.get(row.id);
-      return {id:'lw-snapshot-'+row.id+'-'+row.revision,sequence:null,
+      return {id:'lw-snapshot-'+protocol.hash([row.id,row.revision]).slice(0,28),sequence:null,
         at:row.updatedAt,action:'contribution.snapshot',objectRef:M.ref('contribution',row.id),
         protocol:observationRecord(row),envelop:old ? old.envelop : null};
     });
@@ -80,24 +84,49 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
     } catch(e) { return protocol.error(e); }
   }
 
-  async function deliver(consumer,handle,limit=100) {
+  async function deliver(consumer,handle,limit=100,options={}) {
     if (!/^[a-z][a-z0-9.-]{1,79}$/.test(consumer) || typeof handle !== 'function') throw new Error('Invalid Living World consumer');
-    const start = read().delivery[consumer] || 0;
-    let cursor = start;
+    if (limit && typeof limit==='object') { options=limit; limit=100; }
+    const start=delivery.checkpoint(read().delivery[consumer]),workerId=options.workerId ||
+      'living-world-'+protocol.hash([process.pid,consumer,time(),Math.random()]).slice(0,16);
+    let cursor=start.sequence,blocked=null;
     const events = read().history.map((event,index)=>({...event,sequence:event.sequence || index+1}))
-      .filter(event=>event.sequence>start).slice(0,Math.max(1,Math.min(limit,100)));
+      .filter(event=>event.sequence>cursor).sort((a,b)=>a.sequence-b.sequence).slice(0,Math.max(1,Math.min(limit,100)));
     for (const event of events) {
-      await handle(M.clone(event));
+      const claimed=await mutate(current=>{
+        const s=Object.assign(M.empty(),M.clone(current)),result=delivery.claim(s.delivery,consumer,event,
+          {at:time(),workerId,leaseMs:options.leaseMs}); Object.assign(current,s); return result;
+      });
+      if (!claimed.claimed) { if (claimed.complete) { cursor=Math.max(cursor,event.sequence); continue; } blocked=claimed.lease; break; }
+      try { await handle(M.clone(event)); }
+      catch(error) {
+        const failure=await mutate(current=>{
+          const s=Object.assign(M.empty(),M.clone(current)),result=delivery.failed(s.delivery,consumer,event,error,
+            {at:time(),workerId,maxAttempts:options.maxAttempts}); Object.assign(current,s); return result;
+        });
+        if (failure.deadLettered) throw Object.assign(new Error('Delivery staat in de dead-letterwachtrij.'),
+          {loopFabric:true,code:'DEAD_LETTERED',status:503,eventId:event.id});
+        throw error;
+      }
       await mutate(current=>{
-        const s = Object.assign(M.empty(),M.clone(current)), seen = s.delivery[consumer] || 0;
-        if (seen < cursor) protocol.fail('CURSOR_CONFLICT','Herhaal de overdracht vanaf het duurzame checkpoint.',409);
-        if (seen === cursor) s.delivery[consumer]=event.sequence;
+        const s=Object.assign(M.empty(),M.clone(current));
+        delivery.complete(s.delivery,consumer,event,{at:time(),workerId});
         Object.assign(current,s);
       });
       cursor=event.sequence;
     }
-    return {deliveredThrough:cursor};
+    return {deliveredThrough:cursor,blocked};
+  }
+  function deliveryStatus(consumer) {
+    const s=read(),events=s.history.map((event,index)=>({...event,sequence:event.sequence || index+1}));
+    return delivery.summary(s.delivery[consumer],Math.max(0,...events.map(x=>x.sequence)),time());
+  }
+  async function replayDeadLetter(consumer,eventId) {
+    return mutate(current=>{
+      const s=Object.assign(M.empty(),M.clone(current)),result=delivery.replay(s.delivery,consumer,eventId,time());
+      Object.assign(current,s); return {ok:true,...result};
+    });
   }
 
-  return {observationRecord,resolveObservation,protocolEvents,returnChangeReceipt,deliver};
+  return {observationRecord,resolveObservation,protocolEvents,returnChangeReceipt,deliver,deliveryStatus,replayDeadLetter};
 };

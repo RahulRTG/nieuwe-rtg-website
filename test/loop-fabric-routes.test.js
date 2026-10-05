@@ -37,7 +37,8 @@ test('WorkOS-change gebruikt persoonlijk lid en actuele dubbele bevoegdheid als 
   const routes={},calls=[],app={post(path,handler){routes[path]=handler;}};
   const access={w:{code:'WLOOP'},l:{id:'lead',rtgKey:'server-user'},rechten:['kennis','besluit']};
   const workLoopSource={apply:async input=>{calls.push(['change',input]);return {ok:true};},
-    observeIncident:async input=>{calls.push(['observe',input]);return {ok:true};}};
+    observeIncident:async input=>{calls.push(['observe',input]);return {ok:true};},
+    lifecycleObservation:async input=>{calls.push(['lifecycle',input]);return {ok:true};}};
   require('../server/bedrijf/loop-change')({app,werkPoort:()=>access,workLoopSource});
   const req={body:{actorRef:'spoofed-user',operationId:'route_change_operation_01',decisionId:'decision_1',
     procedureRef:{domain:'workos',type:'procedure',id:'p1',version:1},data:{title:'t',text:'x'}}},res=response();
@@ -61,6 +62,7 @@ test('alle Loop Fabric-transportdeuren verklaren een woordelijke retry als hetze
     'POST /api/loop/proof',
     'POST /api/bedrijf/loop/procedure/change',
     'POST /api/bedrijf/loop/runbook/change',
-    'POST /api/bedrijf/loop/incident/observe'
+    'POST /api/bedrijf/loop/incident/observe',
+    'POST /api/bedrijf/loop/incident/lifecycle'
   ]) assert.deepEqual(SLEUTELS[route],{zelfdeVerzoek:true},route);
 });

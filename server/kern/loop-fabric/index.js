@@ -87,12 +87,20 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
     return rows.map(ref=>P.objectRef(ref,{versioned:false}));
   }
   const sameScope=(left,right)=>left.domain===right.domain && left.type===right.type && left.id===right.id;
+  function unavailable(receipt,code,detail) {
+    const status={SOURCE_DENIED:'denied',PURPOSE_DENIED:'denied',AUTHORITY_REVOKED:'denied',SOURCE_MISSING:'source_missing',
+      NOT_FOUND:'source_missing',SOURCE_EXPIRED:'stale',SOURCE_WITHDRAWN:'unavailable',SOURCE_NOT_AVAILABLE:'unavailable',
+      SOURCE_CHANGED:'stale',CHECK_NOT_RUN:'not_checked'}[code] || 'unavailable';
+    return {changeReceiptId:receipt.receiptId,status,reasonCode:code || 'SOURCE_UNAVAILABLE',
+      source:{domain:receipt.observationRef.domain,refHash:P.hash(P.refKey(receipt.observationRef))},
+      why:detail || 'De actuele bron kon deze context niet beschikbaar stellen.'};
+  }
   function candidates(actorRef,context) {
     P.fields(context,['workspaceCode','consumer','placeRef','blueprintRef','subjectRef','scopeRefs','action','purpose']);
     const consumer=consumerOf(context),authority=authorityFor(actorRef,consumer,['kennis'],context);
     if (!authority.ok) return authority;
     const scopes=contextScopes(context);
-    const action=P.text(context.action,100),purpose=P.text(context.purpose,120), state=read(), items=[];
+    const action=P.text(context.action,100),purpose=P.text(context.purpose,120), state=read(), items=[],outcomes=[];
     for (const entry of Object.values(state.changes)) {
       const receipt=entry.receipt, rc=receipt.context || {};
       const receiptScopes=[...(rc.scopeRefs || [rc.placeRef,rc.blueprintRef].filter(Boolean)),receipt.previousRef,receipt.newRef]
@@ -102,15 +110,16 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
       if (!receiptConsumer || receiptConsumer.domain!==consumer.domain || receiptConsumer.id!==consumer.id || rc.purpose!==purpose ||
           !scopes.every(scope=>receiptScopes.some(row=>sameScope(scope,row)))) continue;
       const source=observationSources[receipt.observationRef.domain];
-      if (!source || typeof source.resolveObservation!=='function') continue;
+      if (!source || typeof source.resolveObservation!=='function') { outcomes.push(unavailable(receipt,'SOURCE_UNAVAILABLE')); continue; }
       const observationResult=source.resolveObservation(receipt.observationRef,consumer);
-      if (!observationResult.ok) continue;
+      if (!observationResult.ok) { outcomes.push(unavailable(receipt,observationResult.code,observationResult.error)); continue; }
       const changeSource=sourceAdapters[receipt.sourceDomain];
-      if (!changeSource || typeof changeSource.artifact!=='function') continue;
+      if (!changeSource || typeof changeSource.artifact!=='function') { outcomes.push(unavailable(receipt,'SOURCE_UNAVAILABLE')); continue; }
       const artifactResult=changeSource.artifact(actorRef,consumer.id,receipt.newRef);
-      if (!artifactResult.ok) continue;
+      if (!artifactResult.ok) { outcomes.push(unavailable(receipt,artifactResult.code,artifactResult.error)); continue; }
       const observation=observationResult.observation, contested=observation.contests.length>0;
-      if (observation.sharing.purpose!==purpose) continue;
+      if (observation.sharing.purpose!==purpose) { outcomes.push(unavailable(receipt,'PURPOSE_DENIED')); continue; }
+      if (observation.validUntil && observation.validUntil<=time()) { outcomes.push(unavailable(receipt,'SOURCE_EXPIRED')); continue; }
       const status=!artifactResult.current ? 'superseded-change' : contested ? 'contested'
         : observationResult.corrected ? 'corrected' : 'current';
       const candidateId='recall_'+P.hash([receipt.receiptId,P.refKey(observation.objectRef),scopes.map(P.refKey),action]).slice(0,28);
@@ -125,7 +134,7 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
         visibility:observation.sharing.visibility,purpose:observation.sharing.purpose});
     }
     items.sort((a,b)=>b.appliedAt.localeCompare(a.appliedAt));
-    return {ok:true,consumer,asOf:time(),items};
+    return {ok:true,consumer,asOf:time(),items,outcomes};
   }
   async function present(actorRef,input) {
     try {
@@ -139,9 +148,9 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
           return {...P.clone(old.result),replay:true};
         }
         const at=time(), recallId='rr_'+key.slice(0,30), recall={recallId,actorRef,context:P.clone(input.context),
-          candidates:P.clone(result.items),recalledAt:at,disposition:null};
+          candidates:P.clone(result.items),omissions:P.clone(result.outcomes || []),recalledAt:at,disposition:null};
         state.recalls[recallId]=recall;
-        const env=envelope.maak({id:'lfr_'+key.slice(0,28),at,kanaal:'loop-fabric',actor:actorRef,
+        const env=envelope.maak({id:'lfr_'+key.slice(0,28),at,kanaal:'loop-fabric',actor:'systeem',
           correlatie:recallId,oorzaak:null,classificatie:'persoonsgegeven'});
         M.append(state,'recall.presented',{recallId,candidates:result.items.map(x=>x.candidateId)},at,env);
         const out={ok:true,recall:P.clone(recall),replay:false}; state.operations[key]={fingerprint,result:P.clone(out)};
@@ -175,7 +184,33 @@ module.exports=function makeLoopFabric({db,bewerkCollectie,livingWorld,workSourc
     const recall=read().recalls[String(recallId || '')];
     return recall ? consumerOf(recall.context) : null;
   }
+  async function sweepRetention(input) {
+    try {
+      P.fields(input,['operationId','recallsBefore','observationsBefore']);
+      const operationId=P.operationId(input.operationId),recallsBefore=P.instant(input.recallsBefore,'recalls_before');
+      const observationsBefore=P.instant(input.observationsBefore || time(),'observations_before');
+      const expired=await projector.expireObservations(observationsBefore);
+      const fingerprint=P.hash(input),key=P.hash(['retention',operationId]);
+      return await tx(raw=>{
+        const state=M.state(raw),old=state.operations[key];
+        if (old) {
+          if (old.fingerprint!==fingerprint) P.fail('REPLAY_CONFLICT','Deze retention-operatie hoort bij andere invoer.',409);
+          return {...P.clone(old.result),replay:true};
+        }
+        const removed=[];
+        for (const [id,recall] of Object.entries(state.recalls)) if (recall.recalledAt<recallsBefore) {
+          removed.push(id); delete state.recalls[id];
+        }
+        for (const [id,operation] of Object.entries(state.operations)) {
+          const recallId=operation.result && (operation.result.recall && operation.result.recall.recallId || operation.result.recallId);
+          if (recallId && removed.includes(recallId)) delete state.operations[id];
+        }
+        const result={ok:true,expiredObservations:expired.expired,removedRecalls:removed.length,replay:false};
+        state.operations[key]={fingerprint,result:P.clone(result)}; Object.assign(raw,state); return result;
+      });
+    } catch(e) { return P.error(e); }
+  }
   const proofFor=(actorRef,consumer)=>projector.proofFor(actorRef,consumer);
   return {ingest:projector.ingest,sync,syncSource,inbox,inboxFor,candidates,present,disposition,
-    consumerForRecall,rebuild:projector.rebuild,proof:projector.proof,proofFor,validateDecisionContext,_read:read};
+    consumerForRecall,sweepRetention,rebuild:projector.rebuild,proof:projector.proof,proofFor,validateDecisionContext,_read:read};
 };

@@ -26,6 +26,33 @@ const CLAIMS_TOEGESTAAN = new Set(['leeftijd18', 'leeftijd21', 'lid', 'pas', 'fo
 
 const b64u = (b) => Buffer.from(b).toString('base64url');
 
+function canoniekBericht(value) {
+  if (Array.isArray(value)) return '[' + value.map(canoniekBericht).join(',') + ']';
+  if (value && typeof value==='object') return '{' + Object.keys(value).sort()
+    .map(key=>JSON.stringify(key)+':'+canoniekBericht(value[key])).join(',') + '}';
+  return JSON.stringify(value===undefined ? null : value);
+}
+
+const berichtHash=value=>crypto.createHash('sha256').update(canoniekBericht(value)).digest('hex');
+
+function controleerBericht(proof,payload,publiekeSleutelB64u,options={}) {
+  try {
+    if (!proof || proof.algorithm!=='Ed25519' || proof.canonicalizationVersion!==1 || proof.schemaVersion!==1 ||
+        !proof.keyId || !proof.issuer || !proof.payloadHash || !proof.signature || !proof.issuedAt)
+      return {geldig:false,reden:'vorm'};
+    const calculated=berichtHash(payload);
+    if (calculated!==proof.payloadHash) return {geldig:false,reden:'payload'};
+    const statement={algorithm:proof.algorithm,keyId:proof.keyId,issuer:proof.issuer,schemaVersion:proof.schemaVersion,
+      canonicalizationVersion:proof.canonicalizationVersion,payloadHash:proof.payloadHash,issuedAt:proof.issuedAt};
+    const pub=crypto.createPublicKey({key:Buffer.from(publiekeSleutelB64u,'base64url'),format:'der',type:'spki'});
+    if (!crypto.verify(null,Buffer.from(canoniekBericht(statement)),pub,Buffer.from(proof.signature,'base64url')))
+      return {geldig:false,reden:'handtekening'};
+    if (options.revokedAt && proof.issuedAt>=options.revokedAt) return {geldig:false,reden:'sleutel-ingetrokken'};
+    return {geldig:true,issuer:proof.issuer,keyId:proof.keyId,payloadHash:proof.payloadHash,
+      historisch:!!options.revokedAt && proof.issuedAt<options.revokedAt};
+  } catch(e) { return {geldig:false,reden:'fout'}; }
+}
+
 /* Pure, offline verificatie: alleen de publieke sleutel (base64url SPKI-DER)
    nodig. Geen server, geen state. Dit is wat een partner-app draait. */
 function controleer(token, publiekeSleutelB64u, nu) {
@@ -71,6 +98,7 @@ function maakZegel({ dataDir }) {
   master = leesOfPubliceer(masterPad, () => crypto.randomBytes(32), (p) => fs.readFileSync(p));
 
   function publiekeSleutel() { return b64u(pubDer); }
+  const sleutelId = 'ed25519:' + crypto.createHash('sha256').update(pubDer).digest('hex').slice(0,24);
 
   // Paarsgewijs pseudoniem: stabiel per (codenaam, partner), onkoppelbaar erbuiten.
   function pseudoniem(codenaam, partner) {
@@ -93,10 +121,18 @@ function maakZegel({ dataDir }) {
     return p + '.' + s;
   }
 
+  function tekenBericht(issuer,payload,options={}) {
+    const statement={algorithm:'Ed25519',keyId:options.keyId || sleutelId,issuer:String(issuer || ''),schemaVersion:1,
+      canonicalizationVersion:1,payloadHash:berichtHash(payload),issuedAt:String(options.issuedAt || new Date().toISOString())};
+    if (!statement.issuer) throw new Error('Een servicebewijs vereist een issuer.');
+    return {...statement,signature:crypto.sign(null,Buffer.from(canoniekBericht(statement)),priv).toString('base64url')};
+  }
+
   return {
     publiekeSleutel, pseudoniem, zegel,
-    controleer: (token, nu) => controleer(token, publiekeSleutel(), nu)
+    controleer: (token, nu) => controleer(token, publiekeSleutel(), nu),sleutelId,
+    tekenBericht,controleerBericht:(proof,payload,options)=>controleerBericht(proof,payload,publiekeSleutel(),options)
   };
 }
 
-module.exports = { maakZegel, controleer, CLAIMS_TOEGESTAAN };
+module.exports = { maakZegel, controleer, controleerBericht, canoniekBericht, berichtHash, CLAIMS_TOEGESTAAN };

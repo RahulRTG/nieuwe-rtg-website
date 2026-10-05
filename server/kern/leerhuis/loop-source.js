@@ -7,9 +7,10 @@
 'use strict';
 
 const P=require('../loop-fabric/protocol');
+const D=require('../loop-fabric/delivery');
 const {heeftBestuur,relatieActief}=require('./oordeel');
 
-module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,now}) {
+module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,serviceProof,now}) {
   const time=now || (()=>new Date().toISOString());
   const tx=fn=>{
     if (typeof bewerkCollectie!=='function') P.fail('STORAGE_UNAVAILABLE','Leerhuis Loop-delivery vereist duurzame collectietransacties.',503);
@@ -58,6 +59,9 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,now})
         sourceAuditRef:{nr:row.nr,hash:row.hash}}];
       if (row.soort==='loopChangeReceipt') {
         const receipt={...P.clone(row.data),integrityRef:{auditId:'leerhuis:'+org+':'+row.nr,hash:row.hash}};
+        receipt.protocolVersion=1;
+        if (serviceProof && typeof serviceProof.tekenBericht==='function')
+          receipt.serviceProof=serviceProof.tekenBericht('rtg.service.leerhuis',receipt,{issuedAt:receipt.appliedAt});
         return [{id,sequence:row.nr,type:'leerhuis.change.applied',receipt,sourceAuditRef:{nr:row.nr,hash:row.hash}}];
       }
       return [];
@@ -69,7 +73,7 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,now})
       if (recipient.domain!=='leerhuis' || r.domain!=='leerhuis' || r.type!=='practice-observation')
         P.fail('PURPOSE_DENIED','Deze observatie hoort niet bij deze ontvanger.',403);
       const proposal=st.voorstellen[r.id];
-      if (!proposal || proposal.at!==r.version) P.fail('NOT_FOUND','Dit praktijkvoorstel is niet beschikbaar.',404);
+      if (!proposal || proposal.at!==r.version) P.fail('SOURCE_MISSING','Dit praktijkvoorstel bestaat niet meer bij de bron.',404);
       const row=leerhuis.spoor(org).find(x=>x.soort==='voorstel' && x.data.id===r.id && x.at===r.version);
       if (!row) P.fail('NOT_FOUND','De bronregel van dit praktijkvoorstel ontbreekt.',404);
       const out=observation(org,row),rejected=proposal.stand==='REJECTED';
@@ -93,26 +97,62 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,now})
         (item.actief ? {domain:'leerhuis',type:'knowledge',id:r.id,version:item.actief} : r)};
     } catch(e) { return P.error(e); }
   }
-  async function deliver(org,consumer,handle,limit=100) {
+  async function deliver(org,consumer,handle,limit=100,options={}) {
     if (!/^[a-z][a-z0-9.-]{1,79}$/.test(consumer) || typeof handle!=='function') throw new Error('Invalid Leerhuis Loop consumer');
+    if (limit && typeof limit==='object') { options=limit; limit=100; }
     const events=protocolEvents(org),maxSource=Math.max(0,...leerhuis.spoor(org).map(row=>Number(row.nr)||0));
     const raw=db.data.leerhuisLoopDelivery || {},delivery=state(raw),cursor=Number(delivery.organizations[org] &&
-      delivery.organizations[org].consumers && delivery.organizations[org].consumers[consumer] || 0);
+      delivery.organizations[org].consumers && D.checkpoint(delivery.organizations[org].consumers[consumer]).sequence || 0);
     if (!Number.isSafeInteger(cursor) || cursor<0 || cursor>maxSource) P.fail('CHECKPOINT_CORRUPT','Het Leerhuis-checkpoint valt buiten het bronspoor.',503);
-    let current=cursor;
-    for (const event of events.filter(x=>x.sequence>cursor).slice(0,Math.max(1,Math.min(Number(limit)||100,1000)))) {
-      await handle(P.clone(event));
+    const workerId=options.workerId || 'leerhuis-'+P.hash([process.pid,consumer,time(),Math.random()]).slice(0,16);
+    let current=cursor,blocked=null;
+    for (const event of events.filter(x=>x.sequence>cursor).sort((a,b)=>a.sequence-b.sequence)
+      .slice(0,Math.max(1,Math.min(Number(limit)||100,1000)))) {
+      const claimed=await tx(map=>{
+        const s=state(map),row=s.organizations[org] || (s.organizations[org]={consumers:{}});
+        if (!row.consumers) row.consumers={};
+        const result=D.claim(row.consumers,consumer,event,{at:time(),workerId,leaseMs:options.leaseMs}); Object.assign(map,s); return result;
+      });
+      if (!claimed.claimed) { if (claimed.complete) { current=Math.max(current,event.sequence); continue; } blocked=claimed.lease; break; }
+      try { await handle(P.clone(event)); }
+      catch(error) {
+        const failure=await tx(map=>{
+          const s=state(map),row=s.organizations[org] || (s.organizations[org]={consumers:{}});
+          const result=D.failed(row.consumers,consumer,event,error,{at:time(),workerId,maxAttempts:options.maxAttempts}); Object.assign(map,s); return result;
+        });
+        if (failure.deadLettered) throw Object.assign(new Error('Delivery staat in de dead-letterwachtrij.'),
+          {loopFabric:true,code:'DEAD_LETTERED',status:503,eventId:event.id});
+        throw error;
+      }
       await tx(map=>{
         const s=state(map),row=s.organizations[org] || (s.organizations[org]={consumers:{}});
         if (!row.consumers) row.consumers={};
-        const seen=Number(row.consumers[consumer] || 0);
-        if (seen!==current && seen<event.sequence) P.fail('CURSOR_CONFLICT','Herhaal vanaf het duurzame Leerhuis-checkpoint.',409);
-        if (seen<event.sequence) row.consumers[consumer]=event.sequence;
-        Object.assign(map,s);
+        D.complete(row.consumers,consumer,event,{at:time(),workerId}); Object.assign(map,s);
       });
       current=event.sequence;
     }
-    return {deliveredThrough:current,sourceThrough:maxSource};
+    return {deliveredThrough:current,sourceThrough:maxSource,blocked};
   }
-  return {authorization,artifact,resolveObservation,protocolEvents,deliver};
+  function deliveryStatus(org,consumer) {
+    const delivery=state(db.data.leerhuisLoopDelivery || {}),row=delivery.organizations[org],events=protocolEvents(org);
+    return D.summary(row && row.consumers && row.consumers[consumer],Math.max(0,...events.map(x=>x.sequence)),time());
+  }
+  async function replayDeadLetter(org,consumer,eventId) {
+    return tx(map=>{
+      const s=state(map),row=s.organizations[org] || (s.organizations[org]={consumers:{}});
+      if (!row.consumers) row.consumers={};
+      const result=D.replay(row.consumers,consumer,eventId,time()); Object.assign(map,s); return {ok:true,...result};
+    });
+  }
+  function verifyReceipt(receipt) {
+    if (!receipt || receipt.sourceDomain!=='leerhuis') return {ok:false,code:'SERVICE_PROOF_INVALID',error:'Receipt issuer en brondomein verschillen.'};
+    if (!receipt.serviceProof) return {ok:true,mode:'in-process'};
+    if (!serviceProof || typeof serviceProof.controleerBericht!=='function')
+      return {ok:false,code:'SERVICE_PROOF_UNAVAILABLE',error:'De servicehandtekening kan hier niet worden gecontroleerd.'};
+    const payload=P.clone(receipt); delete payload.serviceProof;
+    const checked=serviceProof.controleerBericht(receipt.serviceProof,payload);
+    return checked.geldig && checked.issuer==='rtg.service.leerhuis' ? {ok:true,mode:'signed',proof:checked}
+      : {ok:false,code:'SERVICE_PROOF_INVALID',error:'De Leerhuis-servicehandtekening klopt niet.'};
+  }
+  return {authorization,artifact,resolveObservation,protocolEvents,deliver,deliveryStatus,replayDeadLetter,verifyReceipt};
 };

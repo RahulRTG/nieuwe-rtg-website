@@ -1,11 +1,12 @@
 'use strict';
 
 const P = require('../kern/loop-fabric/protocol');
+const D = require('../kern/loop-fabric/delivery');
 const envelope = require('../kern/envelop');
 const roles = require('./rollen-beleid');
 const { werkMutatie } = require('./gebeurtenis');
 
-module.exports = function makeWorkLoopSource({db,bewerkCollectie,now}) {
+module.exports = function makeWorkLoopSource({db,bewerkCollectie,serviceProof,now}) {
   const time=now || (()=>new Date().toISOString());
   const read=()=>db.data.werkruimtes || {};
   const tx=fn=>{
@@ -14,8 +15,9 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,now}) {
   };
   function protocolState(workspace) {
     if (!workspace.loopProtocol || workspace.loopProtocol.schemaVersion !== 1)
-      workspace.loopProtocol={schemaVersion:1,operations:{},observations:{},receipts:{},outbox:[],delivery:{}};
+      workspace.loopProtocol={schemaVersion:1,operations:{},observations:{},lifecycles:{},receipts:{},outbox:[],delivery:{}};
     if (!workspace.loopProtocol.observations) workspace.loopProtocol.observations={};
+    if (!workspace.loopProtocol.lifecycles) workspace.loopProtocol.lifecycles={};
     return workspace.loopProtocol;
   }
   function member(workspace,actorRef,memberId,required=['kennis','besluit'],at=time()) {
@@ -83,6 +85,34 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,now}) {
       });
     } catch(e) { return P.error(e); }
   }
+  async function lifecycleObservation(input) {
+    try {
+      P.fields(input,['actorRef','memberId','workspaceCode','operationId','observationRef','status','reason']);
+      const operationId=P.operationId(input.operationId),actorRef=P.text(input.actorRef,160),memberId=P.text(input.memberId,100);
+      if (!['deleted','anonymized','expired'].includes(input.status)) P.fail('INVALID_INPUT','Kies deleted, anonymized of expired.');
+      const ref=P.objectRef(input.observationRef),fingerprint=P.hash(input),operationKey=P.hash([actorRef,operationId]);
+      return await tx(map=>{
+        const workspace=workspaceFrom(map,input.workspaceCode),at=time(); member(workspace,actorRef,memberId,['service'],at);
+        const state=protocolState(workspace),previous=state.operations[operationKey];
+        if (previous) {
+          if (previous.fingerprint!==fingerprint) P.fail('REPLAY_CONFLICT','Deze operatie-ID hoort bij andere invoer.',409);
+          return {...P.clone(previous.result),replay:true};
+        }
+        const observation=state.observations[ref.id];
+        if (!observation || !refEqual(observation.objectRef,ref)) P.fail('SOURCE_MISSING','Deze observatie bestaat niet meer.',404);
+        const lifecycle={objectRef:P.clone(ref),subjectRef:P.clone(observation.subjectRef),scopeRefs:P.clone(observation.scopeRefs),
+          title:'Niet meer beschikbaar',text:'',observedAt:observation.observedAt,recordedAt:at,sourceActorRef:null,
+          status:input.status,sharing:{visibility:'restricted',purpose:'unlinked',recipients:[]},basis:'source-lifecycle',
+          review:null,contests:[],verificationOf:null,assessment:null,reasonCode:P.text(input.reason,200)};
+        delete state.observations[ref.id]; state.lifecycles[ref.id]=P.clone(lifecycle);
+        const eventId='wll_'+operationKey.slice(0,28);
+        appendEvent(state,{id:eventId,type:'workos.observation.'+input.status,protocol:P.clone(lifecycle),
+          envelop:envelope.maak({id:eventId,at,kanaal:'workos',actor:actorRef,correlatie:operationId,oorzaak:null,classificatie:'intern'})});
+        const result={ok:true,status:input.status,refHash:P.hash(P.refKey(ref)),replay:false};
+        state.operations[operationKey]={fingerprint,result:P.clone(result)}; return result;
+      });
+    } catch(e) { return P.error(e); }
+  }
   async function apply(input) {
     try {
       P.fields(input,['actorRef','memberId','workspaceCode','operationId','decisionId','procedureRef','changeTargetRef','data']);
@@ -126,7 +156,7 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,now}) {
           van:old.id,naar:next.id,actor:authority.row.naam,reden:decision.titel,bron:'workos/loop',occurredAt:at});
         if (!audit.ok) P.fail('AUDIT_REJECTED',audit.error,audit.status);
         const receiptId='wcr_'+operationKey.slice(0,28), decisionRef={domain:'workos',type:'decision',id:decision.id,version:decision.geslotenAt};
-        const receipt={receiptId,sourceDomain:'workos',sourceObject:{domain:'workos',type:changeTargetRef.type+'-line',id:old.vorigeId || old.id,version:null},
+        const receipt={receiptId,sourceDomain:'workos',protocolVersion:1,sourceObject:{domain:'workos',type:changeTargetRef.type+'-line',id:old.vorigeId || old.id,version:null},
           previousRef:changeTargetRef,newRef:{domain:'workos',type:changeTargetRef.type,id:next.id,version:next.versie},
           changeType:changeTargetRef.type+'.version-created',decisionRef,observationRef:P.clone(decision.loopContext.observationRef),
           expectation:{statement:decision.loopContext.expectation,successCriteria:P.clone(decision.loopContext.successCriteria),
@@ -137,6 +167,8 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,now}) {
             placeRef:P.clone(decision.loopContext.placeRef || null),blueprintRef:P.clone(decision.loopContext.blueprintRef || null),
             purpose:decision.loopContext.purpose},integrityRef:null};
         receipt.integrityRef={auditId:audit.gebeurtenis.id,hash:P.hash(receipt)};
+        if (serviceProof && typeof serviceProof.tekenBericht==='function')
+          receipt.serviceProof=serviceProof.tekenBericht('rtg.service.workos',receipt,{issuedAt:at});
         state.receipts[receiptId]=P.clone(receipt);
         const eventId='wle_'+operationKey.slice(0,28);
         const event={id:eventId,type:'workos.change.applied',receipt:P.clone(receipt),
@@ -173,11 +205,14 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,now}) {
   function resolveObservation(ref,recipient) {
     try {
       const r=P.objectRef(ref),workspace=workspaceFrom(read(),recipient && recipient.id);
+      const lifecycle=workspace.loopProtocol && workspace.loopProtocol.lifecycles && workspace.loopProtocol.lifecycles[r.id];
+      if (lifecycle) P.fail(lifecycle.status==='expired'?'SOURCE_EXPIRED':'SOURCE_MISSING',
+        'Deze WorkOS-observatie is niet meer beschikbaar.',lifecycle.status==='expired'?410:404);
       const observation=workspace.loopProtocol && workspace.loopProtocol.observations && workspace.loopProtocol.observations[r.id];
       if (r.domain!=='workos' || r.type!=='incident-observation' || !observation || !refEqual(observation.objectRef,r))
-        P.fail('NOT_FOUND','Deze WorkOS-observatie is niet beschikbaar.',404);
+        P.fail('SOURCE_MISSING','Deze WorkOS-observatie bestaat niet meer bij de bron.',404);
       if (!(observation.sharing.recipients||[]).some(x=>x.domain===recipient.domain && x.id===recipient.id))
-        P.fail('PURPOSE_DENIED','Deze observatie is niet met deze ontvanger gedeeld.',403);
+        P.fail('SOURCE_DENIED','Deze observatie is niet met deze ontvanger gedeeld.',403);
       return {ok:true,observation:P.clone(observation),corrected:false};
     } catch(e) { return P.error(e); }
   }
@@ -185,26 +220,64 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,now}) {
     const spaces=read(), selected=workspaceCode ? [workspaceFrom(spaces,workspaceCode)] : Object.values(spaces);
     return selected.flatMap(workspace=>[
       ...Object.values(workspace.loopProtocol && workspace.loopProtocol.observations || {})
-        .map(observation=>({id:'snapshot-'+observation.objectRef.id,type:'workos.incident.observed',protocol:P.clone(observation)})),
+        .map(observation=>({id:'snapshot-work-observation-'+P.hash(P.refKey(observation.objectRef)).slice(0,24),type:'workos.incident.observed',protocol:P.clone(observation)})),
+      ...Object.values(workspace.loopProtocol && workspace.loopProtocol.lifecycles || {})
+        .map(observation=>({id:'snapshot-work-lifecycle-'+P.hash(P.refKey(observation.objectRef)).slice(0,24),type:'workos.observation.'+observation.status,protocol:P.clone(observation)})),
       ...Object.values(workspace.loopProtocol && workspace.loopProtocol.receipts || {})
-        .map(receipt=>({id:'snapshot-'+receipt.receiptId,type:'workos.change.applied',receipt:P.clone(receipt)}))]);
+        .map(receipt=>({id:'snapshot-work-receipt-'+P.hash(receipt.receiptId).slice(0,24),type:'workos.change.applied',receipt:P.clone(receipt)}))]);
   }
-  async function deliver(workspaceCode,consumer,handle,limit=100) {
+  async function deliver(workspaceCode,consumer,handle,limit=100,options={}) {
     if (!/^[a-z][a-z0-9.-]{1,79}$/.test(consumer) || typeof handle!=='function') throw new Error('Invalid WorkOS Loop consumer');
-    const workspace=workspaceFrom(read(),workspaceCode), start=workspace.loopProtocol && workspace.loopProtocol.delivery[consumer] || 0;
-    let cursor=start;
-    const events=(workspace.loopProtocol && workspace.loopProtocol.outbox || []).filter(e=>e.sequence>start)
-      .slice(0,Math.max(1,Math.min(limit,100)));
+    if (limit && typeof limit==='object') { options=limit; limit=100; }
+    const workspace=workspaceFrom(read(),workspaceCode), start=D.checkpoint(workspace.loopProtocol && workspace.loopProtocol.delivery[consumer]);
+    const workerId=options.workerId || 'workos-'+P.hash([process.pid,consumer,time(),Math.random()]).slice(0,16);
+    let cursor=start.sequence,blocked=null;
+    const events=(workspace.loopProtocol && workspace.loopProtocol.outbox || []).filter(e=>e.sequence>cursor)
+      .sort((a,b)=>a.sequence-b.sequence).slice(0,Math.max(1,Math.min(limit,100)));
     for (const event of events) {
-      await handle(P.clone(event));
+      const at=time(),claimed=await tx(map=>{
+        const current=workspaceFrom(map,workspaceCode),state=protocolState(current);
+        return D.claim(state.delivery,consumer,event,{at,workerId,leaseMs:options.leaseMs});
+      });
+      if (!claimed.claimed) { if (claimed.complete) { cursor=Math.max(cursor,event.sequence); continue; } blocked=claimed.lease; break; }
+      try { await handle(P.clone(event)); }
+      catch(error) {
+        const failure=await tx(map=>{
+          const current=workspaceFrom(map,workspaceCode),state=protocolState(current);
+          return D.failed(state.delivery,consumer,event,error,{at:time(),workerId,maxAttempts:options.maxAttempts});
+        });
+        if (failure.deadLettered) throw Object.assign(new Error('Delivery staat in de dead-letterwachtrij.'),
+          {loopFabric:true,code:'DEAD_LETTERED',status:503,eventId:event.id});
+        throw error;
+      }
       await tx(map=>{
-        const current=workspaceFrom(map,workspaceCode), state=protocolState(current), seen=state.delivery[consumer] || 0;
-        if (seen<cursor) P.fail('CURSOR_CONFLICT','Herhaal de overdracht vanaf het duurzame checkpoint.',409);
-        if (seen===cursor) state.delivery[consumer]=event.sequence;
+        const current=workspaceFrom(map,workspaceCode),state=protocolState(current);
+        D.complete(state.delivery,consumer,event,{at:time(),workerId});
       });
       cursor=event.sequence;
     }
-    return {deliveredThrough:cursor};
+    return {deliveredThrough:cursor,blocked};
   }
-  return {apply,observeIncident,authorization,artifact,procedure,resolveObservation,protocolEvents,deliver};
+  function deliveryStatus(workspaceCode,consumer) {
+    const workspace=workspaceFrom(read(),workspaceCode),state=workspace.loopProtocol || {outbox:[],delivery:{}};
+    return D.summary(state.delivery && state.delivery[consumer],(state.outbox||[]).length,time());
+  }
+  async function replayDeadLetter(workspaceCode,consumer,eventId) {
+    return tx(map=>{
+      const workspace=workspaceFrom(map,workspaceCode),state=protocolState(workspace);
+      return {ok:true,...D.replay(state.delivery,consumer,eventId,time())};
+    });
+  }
+  function verifyReceipt(receipt) {
+    if (!receipt || receipt.sourceDomain!=='workos') return {ok:false,code:'SERVICE_PROOF_INVALID',error:'Receipt issuer en brondomein verschillen.'};
+    if (!receipt.serviceProof) return {ok:true,mode:'in-process'};
+    if (!serviceProof || typeof serviceProof.controleerBericht!=='function')
+      return {ok:false,code:'SERVICE_PROOF_UNAVAILABLE',error:'De servicehandtekening kan hier niet worden gecontroleerd.'};
+    const payload=P.clone(receipt); delete payload.serviceProof;
+    const checked=serviceProof.controleerBericht(receipt.serviceProof,payload);
+    return checked.geldig && checked.issuer==='rtg.service.workos' ? {ok:true,mode:'signed',proof:checked}
+      : {ok:false,code:'SERVICE_PROOF_INVALID',error:'De WorkOS-servicehandtekening klopt niet.'};
+  }
+  return {apply,observeIncident,lifecycleObservation,authorization,artifact,procedure,resolveObservation,protocolEvents,
+    deliver,deliveryStatus,replayDeadLetter,verifyReceipt};
 };

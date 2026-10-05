@@ -39,7 +39,8 @@ test('alle Loop Fabric HTTP-ingangen bestaan en blijven zonder identiteit dicht'
        niet om een generieke authcode af te dwingen. */
     ['/api/bedrijf/loop/procedure/change', 403],
     ['/api/bedrijf/loop/runbook/change', 403],
-    ['/api/bedrijf/loop/incident/observe', 403]
+    ['/api/bedrijf/loop/incident/observe', 403],
+    ['/api/bedrijf/loop/incident/lifecycle', 403]
   ]) {
     const r = await post(path, { workspaceCode: 'WLOOP' });
     assert.equal(r.status, status, path + ' hoort zonder identiteit dicht te blijven: ' + JSON.stringify(r.body));

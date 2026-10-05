@@ -393,7 +393,7 @@ F, F3–F6):
 |---|---|---|---|---|---|
 | N1 | P1 | **FIXED_MET_KANTTEKENING.** De deur is dicht en herkeurd. Het doel is niet bereikt zolang N3 open staat | `e8374b84`, `4c70964c`, `d6f51cc4` | **Vóór:** `/api/techniek/inloggen` gaf na wachtwoord en toegangslijst meteen een accounttoken, ook voor de eigenaar met tweede factor. **Na:** met de tweede factor aan komt er een bewijs van vijf minuten met een eigen doel (`tech2`). Dezelfde route ruilt het met een code om voor een techniektoken van een dag. Een gewoon inlogbewijs werkt hier niet, en dit bewijs werkt niet bij `/api/auth/tweede`. In de tweede stap wordt het recht opnieuw gelezen. De techniekpagina vraagt de code. | `test/techniek-tweede.test.js` 1-6. Toets 6 trekt het recht in tussen stap een en twee. |
 | N2 | P2 | **VERIFIED FIXED** | `e8374b84`, `d6f51cc4` | **Vóór:** `/api/mijn/tweefactor/codes` gaf op sessie plus wachtwoord tien nieuwe herstelcodes. Met zo'n code zette `/uit` de tweede factor uit. **Na:** de route eist ook een geldige code (TOTP of herstelcode) en deelt de rem van de tweede stap. | `test/mijnrtg-routes.test.js` 9 (contract gewijzigd: een code is verplicht) en `test/tweede-rem.test.js` 8 (tien foute codes sluiten ook de juiste). |
-| N4 | P2 | **VERIFIED FIXED.** Het restpunt van de herkeuring (de bronemmer) is FIXED in `d6f51cc4`; onafhankelijke herkeuring loopt nog | `e8374b84`, `d6f51cc4` | **Vóór:** tien foute codes meldden brute force, en dat zette het adres van de laatste poging een uur in quarantaine. **Na:** het slot van vijf minuten blijft, ook voor de juiste code. Het slot meldt zich als `tweede-stap-slot`: een waarschuwing op het veiligheidsbord, en de noodrem reageert er niet op. Een geslaagde code leegt alleen de emmer van het ACCOUNT. Leegde hij ook die van het adres, dan zette een aanvaller met een eigen account de limiet van 50 per adres terug (herkeuring: 6 slachtoffers × 9 gokken vanaf een adres, 0 keer 429). | `test/tweede-rem.test.js` 5-7 en `test/noodrem-bron.test.js` 3 (het wachtwoordslot blijft wel quarantaine geven). |
+| N4 | P2 | **VERIFIED FIXED**, ook het restpunt (de bronemmer, `d6f51cc4`, apart herkeurd) | `e8374b84`, `d6f51cc4` | **Vóór:** tien foute codes meldden brute force, en dat zette het adres van de laatste poging een uur in quarantaine. **Na:** het slot van vijf minuten blijft, ook voor de juiste code. Het slot meldt zich als `tweede-stap-slot`: een waarschuwing op het veiligheidsbord, en de noodrem reageert er niet op. Een geslaagde code leegt alleen de emmer van het ACCOUNT. Leegde hij ook die van het adres, dan zette een aanvaller met een eigen account de limiet van 50 per adres terug (herkeuring: 6 slachtoffers × 9 gokken vanaf een adres, 0 keer 429). | `test/tweede-rem.test.js` 5-7 en `test/noodrem-bron.test.js` 3 (het wachtwoordslot blijft wel quarantaine geven). |
 | N6 | P1 (trio) → P2 | **FIXED_MET_KANTTEKENING.** De ingang is dicht en herkeurd. Het restvenster is N11 | `e8374b84`, `d6f51cc4` | **Vóór:** een server die niet schrijft (`RTG_ROL=standby`, of afgezet door de poortwachter) antwoordde 200 op een schrijfverzoek en bewaarde niets. **Na:** `server/opzet/standbypoort.js` staat vóór de betaalwebhooks en de body-lezer. Zolang `db.writable` false is, krijgt elk verzoek dat iets kan veranderen een 503 met `Retry-After: 2`. Lezen en `/api/cluster/*` blijven open. | `test/standbypoort.test.js`. Op de stand na een afzetting leest hij de tekst van de weigering, en hij stuurt een betaalwebhook (met de poort na de lijfpoort gaf die 200). |
 
 ### Herkeuring (op `3d817478`, onafhankelijk)
@@ -417,6 +417,16 @@ F, F3–F6):
   - Een brute force op het WACHTWOORD zet het adres nog steeds in quarantaine.
   - Restpunt (P3): een geslaagde code leegde ook de bronemmer. FIXED in
     `d6f51cc4`, en toets 7 vangt de mutant (M9).
+- **Herkeuring van `d6f51cc4` (onafhankelijk): het N4-restpunt is VERIFIED
+  FIXED.**
+  - Zelf gezien, met een aanvaller en zes slachtoffers, 54 foute gokken vanaf
+    een adres en drie eigen geslaagde codes ertussen. Op de oude code kwam er
+    geen enkele 429. Op de nieuwe kwam de eerste 429 bij gok 51. Op de oude code
+    zonder die eigen codes kwam de 429 ook bij gok 51: het gat zat dus precies
+    in `gelukt()`.
+  - M1, M4, M5, M9 en M12 zakken elk op de bewering die de toets noemt.
+  - Geen omzeiling gevonden. Geen andere deur raakt `tweede:bron:`, en een
+    geslaagde wachtwoordinlog leegt alleen de emmers van de wachtwoordinlog.
 - **N6: FIXED_MET_KANTTEKENING.**
   - Zelf gezien, op de stand na promote en demote: oud gaf 200 en verloor de
     schrijfactie stil. Nieuw: 503 op alle muterende verzoeken; GET, HEAD en de
@@ -450,6 +460,7 @@ bestaand token blijft werken, dus de eigenaar kan de stand-by wel bekijken.
 | **N13** | P3 | OPEN | `server/routes/member/tweefactor.js` `/codes`, `/uit` | Een fout wachtwoord op `/codes` en `/uit` vult geen emmer. Met een gestolen sessie is het wachtwoord daar onbeperkt te raden. Al zo vóór deze tak. | Zelf gezien door de herkeuring: 30 foute wachtwoorden, 30 keer 403, geen 429. | De wachtwoordemmer van de inlog ook hier laten vullen. |
 | **N14** | P3 | OPEN | `server/trio-proxy.js` | De proxy geeft een 503 van een stand-by gewoon door aan de client. Opnieuw proberen gebeurt alleen bij een netwerkfout. | Alleen code gelezen, niet live. | Een 503 met `Retry-After` van een stand-by bij de volgende server proberen, als het lijf nog in handen is. |
 | **N15** | Info | OPEN | o.a. `/api/doos/update` | Een paar GET-routes schrijven. Op een stand-by gaan die schrijfacties stil verloren, want de poort laat GET door. | Herkeuring, code gelezen. | Die routes POST maken. |
+| **N17** | Info | Bewust zo | `server/kern/identiteit/tweedestap-rem.js`, `server/opzet/onderhoud.js` | De bronemmer loopt alleen nog af via de onderhoudsveger (15 minuten stilte). Een gedeeld adres (NAT, kantoor) dat binnen die tijd 50 mislukte codes over meerdere leden haalt, zit vijf minuten op slot, en een geslaagde code heft dat niet op. | Herkeuring van `d6f51cc4`, code gelezen. | Geen actie: dat is de prijs van N4, en limiet 50 met een slot van vijf minuten houdt hem klein. |
 | **N16** | Info | OPEN | `server/kern/identiteit/tweedestap-rem.js` | Het slot is nu een waarschuwing. Er gaat dus geen bericht meer naar de eigenaar, en ook niet naar het lid, terwijl een vol slot betekent dat iemand zijn wachtwoord kent. | Herkeuring, code gelezen. | Het lid een bericht sturen bij een vol slot, zonder quarantaine. |
 
 ### Besluitpunten voor de eigenaar
@@ -484,6 +495,10 @@ bestaand token blijft werken, dus de eigenaar kan de stand-by wel bekijken.
 - **PASS: de suites eromheen.** `noodrem-bron`, `mijnrtg-routes`, `techniek`,
   `tweefactor`, `beveiliging`, `isolatie-techniek`, `api-contract` en
   `trio-afzetten`: 88/88.
+- **PASS: de onafhankelijke herkeuring van `d6f51cc4`.** `tweede-rem` 8/8,
+  `techniek-tweede` 6/6, `standbypoort` 1/1, `mijnrtg-routes` 12/12,
+  `noodrem-bron` 3/3 en `tweefactor` 18/18. De aanval op de bronemmer is live
+  nagespeeld op de oude en de nieuwe code.
 - **PASS: mutaties, zelf gedraaid op `d6f51cc4`.** M9, M1, M4, M5 en M12 zakken
   elk in hun toets. Zonder de standbypoort zakt de toets ook. M12 zakt op de
   webhookbewering: de webhook gaf dan 200 op een stand-by.

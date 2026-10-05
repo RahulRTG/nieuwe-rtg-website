@@ -35,7 +35,7 @@ async function potjeDammen() {
   const t = Date.now();
   const g = await json(await fnd('/gezin/maak', { gezinsnaam: 'Maatje ' + t, naam: 'Ouder ' + t, pin: '1234', groep: 'volw' }));
   const oom = await json(await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Oom ' + t, rol: 'gezinslid', groep: 'volw' }));
-  const kies = await json(await fnd('/gezin/profiel/kies', { code: g.code, profielId: oom.profiel.id }));
+  const kies = await json(await fnd('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: oom.profiel.id }));
   const A = { code: g.code, token: g.token };
   const B = { code: g.code, token: kies.token };
   await rtfSpel('random', { soort: 'dam', grootte: 2 }, A);

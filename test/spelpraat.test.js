@@ -275,7 +275,7 @@ test('twee profielen uit hetzelfde gezin praten, en hun naam staat erbij', async
   });
   const g = await json(await fnd('/gezin/maak', { gezinsnaam: 'Praatgezin ' + t, naam: 'Ouder', pin: '1234' }));
   const p2 = await json(await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Oom', rol: 'gezinslid', groep: 'volw' }));
-  const kies = await json(await fnd('/gezin/profiel/kies', { code: g.code, profielId: p2.profiel.id }));
+  const kies = await json(await fnd('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: p2.profiel.id }));
   const A = { code: g.code, token: g.token }, B = { code: g.code, token: kies.token };
   const spel = (actie, body, s) => fetch(BASE + '/api/rtf/spel/' + actie, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },

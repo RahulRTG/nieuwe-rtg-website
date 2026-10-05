@@ -29,7 +29,7 @@ test.before(async () => {
   ouder = { code: g.code, token: g.token };
   const k = await api('/gezin/profiel/maak', Object.assign({}, ouder, { naam: 'Mila', rol: 'kind', groep: 'tiener' }));
   kindId = k.body.profiel.id;
-  kind = { code: g.code, token: (await api('/gezin/profiel/kies', { code: g.code, profielId: kindId })).body.token };
+  kind = { code: g.code, token: (await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kindId })).body.token };
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}

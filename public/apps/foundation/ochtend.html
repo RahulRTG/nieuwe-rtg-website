@@ -111,7 +111,7 @@ if (window.RTGUitvoer) RTGUitvoer.bron(function () {
 
 async function laad(){
   try{
-    const d = await fetch('/api/foundation/gezin/'+s.code+'/ochtend?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/ochtend',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     if (d.error) throw new Error(d.error);
     stand = d;
     // de zachte weektelling: hoeveel ochtenden waren er de laatste zeven dagen rond

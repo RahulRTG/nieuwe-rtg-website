@@ -9,10 +9,8 @@
 
    WAAROM ZE ONGETEST WAREN
 
-   Er BESTAAT een test/techniek.test.js, maar die roept de module rechtstreeks
-   aan (techniek.draaiChecks) en gaat nooit over HTTP. Dezelfde motor, tweede
-   deur, en de deur was ongetoetst -- exact het patroon dat ook bij de leerlaag
-   opdook. De rechtencontrole zit hier in de route (techAuth + eigenaarAlleen),
+   test/techniek.test.js roept de module rechtstreeks aan en gaat nooit over
+   HTTP: dezelfde motor, tweede deur, en de deur was ongetoetst. De rechtencontrole zit hier in de route (techAuth + eigenaarAlleen),
    dus juist die deur is wat er te bewijzen valt.
 
    WAT HIER OP HET SPEL STAAT
@@ -34,9 +32,10 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const { zwaarApi } = require('./zwaarpasskey');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-techsso-'));
-let srv, base, eigenaar, vreemd, office;
+let srv, base, eigenaar, vreemd, office, zw;
 
 const vraag = (pad, opts = {}) => fetch(base + pad, {
   method: opts.method || 'POST',
@@ -59,6 +58,7 @@ test.before(async () => {
   const o = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
   assert.ok(o.body.token, 'de eigenaar kan inloggen: ' + o.tekst.slice(0, 200));
   eigenaar = o.body.token;
+  zw = await zwaarApi(post, base, eigenaar); // B22
 
   // een gewoon lid, en een kantoorsessie: allebei mogen hier niet komen
   const u = Date.now().toString().slice(-9);
@@ -102,7 +102,7 @@ test('1. het techniekbord is van de eigenaar, niet van een lid en niet van kanto
 
 test('2. de eigenaar zet een SSO-koppeling; het clientSecret komt er nooit meer uit', async () => {
   const GEHEIM = 'zeer-geheim-' + Math.random().toString(36).slice(2, 10);
-  const zet = await post('/api/techniek/sso', { org: 'klantx', naam: 'Klant X BV',
+  const zet = await zw('/api/techniek/sso', { org: 'klantx', naam: 'Klant X BV',
     issuer: 'https://login.klantx-idp.test', clientId: 'rtg-klantx',
     clientSecret: GEHEIM, domeinen: ['klantx.nl'], actief: true }, eigenaar);
   assert.equal(zet.status, 200, zet.tekst.slice(0, 300));
@@ -118,7 +118,7 @@ test('2. de eigenaar zet een SSO-koppeling; het clientSecret komt er nooit meer 
 
   /* Een domein mag bij hoogstens een organisatie horen. Zonder die regel kan de
      IdP van klant Y een medewerker van klant X claimen. */
-  const botsing = await post('/api/techniek/sso', { org: 'klanty', naam: 'Klant Y',
+  const botsing = await zw('/api/techniek/sso', { org: 'klanty', naam: 'Klant Y',
     issuer: 'https://login.klanty-idp.test', clientId: 'rtg-klanty',
     clientSecret: 'ander-geheim', domeinen: ['klantx.nl'] }, eigenaar);
   assert.equal(botsing.status, 400, 'een domein van een ander is niet te claimen');
@@ -137,7 +137,7 @@ test('3. schakelen, een proef draaien op een IdP die niet bestaat, en opruimen',
   const proef = await post('/api/techniek/sso/proef', { org: 'klantx' }, eigenaar);
   assert.notEqual(proef.status, 500, 'een onbereikbare IdP valt niet om: ' + proef.status);
 
-  const intern = await post('/api/techniek/sso', { org: 'binnen', naam: 'Binnendoor',
+  const intern = await zw('/api/techniek/sso', { org: 'binnen', naam: 'Binnendoor',
     issuer: 'http://127.0.0.1:9', clientId: 'x', clientSecret: 'y', domeinen: ['binnen.test'] }, eigenaar);
   if (intern.status === 200) {
     const p2 = await post('/api/techniek/sso/proef', { org: 'binnen' }, eigenaar);

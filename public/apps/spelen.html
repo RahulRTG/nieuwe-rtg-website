@@ -413,6 +413,7 @@
      je als gegevens mee naar buiten neemt. -->
 <script src="/shared/uitvoer.js"></script>
 <script src="/apps/foundation/sessie.js"></script>
+<script src="/shared/gezinsstroom.js"></script>
 <script>if(!localStorage.getItem('rtg_member_token') && window.Sessie) Sessie.toegang('magnaat');</script>
 <script>
 const $ = s => document.querySelector(s);
@@ -815,17 +816,22 @@ async function openPotje(id){
 }
 let stream = null;
 function verbindStream(){
+  const opSocial = (e)=>{
+    let d = {}; try{ d = JSON.parse(e.data); }catch(err){ return; }
+    if (d.kind !== 'spel') return;
+    if (huidig && d.potje === huidig.id && !$('#vSpel').hidden) ververs();
+    else if (!$('#vLobby').hidden) laadLobby();
+  };
   try{
-    const url = memberTok
-      ? '/api/stream?token=' + encodeURIComponent(memberTok)
-      : '/api/rtf/social/stream?code=' + encodeURIComponent(rtfSess.code) + '&token=' + encodeURIComponent(rtfSess.token);
-    stream = new EventSource(url); // herverbindt zelf na een dip
-    stream.addEventListener('social', (e)=>{
-      let d = {}; try{ d = JSON.parse(e.data); }catch(err){ return; }
-      if (d.kind !== 'spel') return;
-      if (huidig && d.potje === huidig.id && !$('#vSpel').hidden) ververs();
-      else if (!$('#vLobby').hidden) laadLobby();
-    });
+    if (!memberTok) {
+      /* gezinssessie: nooit in de URL (B18); /shared/gezinsstroom.js vraagt een eenmalig stroomticket */
+      if (window.RTGGezinsstroom) stream = RTGGezinsstroom.open({ code: rtfSess.code, token: rtfSess.token, kanaal: 'sociaal',
+        url: (t, sinds) => '/api/rtf/social/stream?code=' + encodeURIComponent(rtfSess.code) + '&ticket=' + t + (sinds ? '&since=' + sinds : ''),
+        op: { social: opSocial } });
+      return;
+    }
+    stream = new EventSource('/api/stream?token=' + encodeURIComponent(memberTok)); // herverbindt zelf na een dip
+    stream.addEventListener('social', opSocial);
   }catch(e){}
 }
 // terug in beeld (tab-wissel, telefoon uit de zak): meteen even verversen

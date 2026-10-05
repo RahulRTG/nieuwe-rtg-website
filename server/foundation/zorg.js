@@ -92,6 +92,9 @@ function wisGezin(g) {
   if (typeof ctx.wisGezinsagenda !== 'function') throw new Error('gezinsagenda-wisser ontbreekt');
   ctx.wisGezinsagenda(g.code);
   delete G()[g.code]; save();
+  /* De gezinscode gaat mee (B18). Lukt dat nu niet, dan opent hij toch niets:
+     zonder gezin, of bij een nieuw gezin op hetzelfde adres, weigert hij. */
+  if (ctx.gezinscode) ctx.gezinscode.vergeet(g.code).catch(() => null);
 }
 function volwassenen(g) { return Object.values(g.profielen || {}).filter(p => ['beheerder', 'ouder'].includes(p.rol)); }
 async function adultCheck(g, req, res) {

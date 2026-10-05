@@ -23,7 +23,7 @@ async function gezin(naam) {
   const t = naam + Date.now().toString().slice(-5);
   const g = (await fnd('/gezin/maak', { gezinsnaam: t, naam: 'Ouder ' + t, pin: '1234' })).body;
   const kp = (await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind ' + t, rol: 'kind', groep: 'kind' })).body;
-  const kies = (await fnd('/gezin/profiel/kies', { code: g.code, profielId: kp.profiel.id })).body;
+  const kies = (await fnd('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kp.profiel.id })).body;
   return { ouder: { code: g.code, token: g.token }, kind: { code: g.code, token: kies.token } };
 }
 

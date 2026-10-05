@@ -125,20 +125,10 @@ function makeCodename() {
 /* ondertekening van staatloze tokens (de token-vorm zelf staat in ./users). */
 function sign(body) { return crypto.createHmac('sha256', S.SECRET).update(body).digest('hex').slice(0, 32); }
 
-/* ONDERTEKENEN MET EEN AFGELEIDE SLEUTEL, en waarom dat geen luxe is.
-
-   `sign` tekent met S.SECRET -- de SESSIEsleutel. Een actietoken (2FA-bewijs,
-   e-mailbevestiging, mailwissel, sso-overdracht) dat ook met S.SECRET tekent is
-   byte-voor-byte niet te onderscheiden van een sessietoken voor wie alleen de
-   handtekening controleert: precies het gat waardoor `verifyToken` een
-   `inlog2`-bewijs als volwaardige sessie aannam (RTG-V1-RELEASE blocker 1).
-
-   De uitweg is dezelfde domeinscheiding die `sleutelVoor` al levert: teken een
-   actietoken met de per-doel afgeleide sleutel, zodat een sessieverifier (die op
-   S.SECRET controleert) hem cryptografisch nooit kan accepteren, en een
-   actieverifier voor doel A nooit een token voor doel B. Een lege/onbekende
-   sleutel geeft NIETS terug -- fail-closed, zodat een niet-geinitialiseerde
-   kluis niet stilzwijgend op een vaste handtekening uitkomt. */
+/* Ondertekenen met een AFGELEIDE sleutel (sleutelVoor), voor actietokens.
+   Met S.SECRET zou een actietoken niet van een sessietoken te onderscheiden
+   zijn (RTG-V1-RELEASE blocker 1; zie ./actietokens.js). Een lege sleutel
+   geeft null: fail-closed, nooit een vaste handtekening. */
 function signMet(sleutel, body) {
   if (!sleutel || (Buffer.isBuffer(sleutel) && !sleutel.length)) return null;
   return crypto.createHmac('sha256', sleutel).update(String(body)).digest('hex').slice(0, 32);

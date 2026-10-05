@@ -73,13 +73,40 @@ function handlerVan(bron, kop) {
   throw new Error('handler niet gesloten: ' + kop);
 }
 
-test('4. de crashweg loopt langs dezelfde spoeling en eindigt nooit met exitcode 0', () => {
+test('4. de crashweg in server.js geeft de crash door aan bijCrash (in code, niet in commentaar)', () => {
   const h = handlerVan(code('server/server.js'), "process.on('uncaughtException'");
-  assert.match(h, /maakStopspoeling\(/, 'de crashweg hoort de gedeelde stopspoeling te gebruiken');
-  assert.match(h, /\.spoelSynchroon\(\)/);
-  assert.match(h, /\.spoelAsynchroon\(\)/, 'ook de write-behind hoort bij een crash geprobeerd te worden');
+  assert.match(h, /\.bijCrash\(/, 'de crashweg hoort de gedeelde stopspoeling te gebruiken');
   assert.doesNotMatch(h, /process\.exit\(\s*0\s*\)/, 'een crash mag nooit als nette afsluiting eindigen');
-  assert.doesNotMatch(h, /\.unref\(\)/, 'een unref\'d timer houdt het proces niet wakker');
+});
+
+test('4b. bijCrash spoelt alles en stopt met exitcode 1', async () => {
+  const { bijCrash } = require('../server/opzet/stopspoeling');
+  await metSpionnen(async (geroepen) => {
+    const begin = Date.now();
+    const code = await new Promise((klaar) => bijCrash({
+      save: () => geroepen.push('save'),
+      flushBijAfsluiten: async () => { geroepen.push('db'); },
+      accounts: { flushBijAfsluiten: async () => { geroepen.push('accounts'); } },
+      exit: klaar, graceMs: 2000 }));
+    assert.equal(code, 1, 'een crash eindigt met exitcode 1');
+    assert.deepEqual(geroepen.sort(), ['accounts', 'db', 'journaal', 'save', 'vertaalkast']);
+    assert.ok(Date.now() - begin >= 190, 'minstens 200 ms, zodat het log nog wegkomt');
+  });
+});
+
+test('4c. een write-behind die blijft hangen houdt de crash niet tegen', { timeout: 5000 }, async () => {
+  const { bijCrash } = require('../server/opzet/stopspoeling');
+  const begin = Date.now();
+  const code = await new Promise((klaar) => bijCrash({ save: () => {},
+    flushBijAfsluiten: () => new Promise(() => {}), exit: klaar, graceMs: 300 }));
+  assert.equal(code, 1);
+  assert.ok(Date.now() - begin < 2000, 'de genadetermijn begrenst het wachten');
+});
+
+test('4d. bijCrash eindigt nooit met 0 en zet zijn timers niet op unref', () => {
+  const s = code('server/opzet/stopspoeling.js');
+  assert.doesNotMatch(s, /exit\(\s*0\s*\)|stopMet\(\s*0\s*\)/);
+  assert.doesNotMatch(s, /\.unref\(\)/, 'een unref\'d timer houdt het proces niet wakker');
 });
 
 test('5. de SIGTERM-weg gebruikt dezelfde spoeling', () => {

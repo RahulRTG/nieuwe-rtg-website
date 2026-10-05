@@ -36,4 +36,27 @@ function maakStopspoeling({ save, flushBijAfsluiten, accounts }) {
   return { spoelSynchroon, spoelAsynchroon };
 }
 
-module.exports = { maakStopspoeling };
+/* DE CRASHWEG (uncaughtException in ../server.js). Dezelfde spoeling als
+   SIGTERM, en daarna altijd exitcode 1 -- een crash mag nooit als nette
+   afsluiting eindigen, want dan herstart geen proces-manager hem.
+
+   Minstens 200 ms, zodat het log nog wegkomt; hooguit RTG_CRASH_GRACE_MS (5 s),
+   zodat een write-behind die blijft hangen de herstart niet tegenhoudt. De
+   timers staan NIET .unref(): een unref'd timer houdt het proces niet wakker, en
+   was dit de laatste handle, dan viel het proces met exitcode 0 om. `exit` en
+   `graceMs` zijn er voor de toets; in productie is het process.exit. */
+function bijCrash({ save, flushBijAfsluiten, accounts, exit, graceMs }) {
+  const stopMet = exit || ((code) => process.exit(code));
+  const grens = Math.max(200, Number(graceMs || process.env.RTG_CRASH_GRACE_MS || 5000));
+  let spoel = null;
+  try { spoel = maakStopspoeling({ save, flushBijAfsluiten, accounts }); spoel.spoelSynchroon(); }
+  catch (e) { try { save(); } catch (x) {} }
+  const klaarNa = Date.now() + 200;
+  let klaar = false;
+  const einde = () => { if (!klaar) { klaar = true; stopMet(1); } };
+  const stop = () => setTimeout(einde, Math.max(0, klaarNa - Date.now()));
+  if (spoel) spoel.spoelAsynchroon().finally(stop); else stop();
+  setTimeout(einde, grens);
+}
+
+module.exports = { maakStopspoeling, bijCrash };

@@ -142,22 +142,8 @@ process.on('unhandledRejection', reason => {
 // (Docker/systemd) ons herstart in plaats van door te draaien op kapotte staat.
 process.on('uncaughtException', err => {
   log.uitzondering(err, { bron: 'uncaughtException', fataal: true });
-  /* DEZELFDE SPOELING ALS SIGTERM (RTG-V1-RELEASE D1). Hier stond alleen
-     save(); journaal, vertaalkast en write-behind gingen bij een crash verloren.
-     Begrensd: we wachten op de write-behind tot RTG_CRASH_GRACE_MS (5 s), en de
-     exitcode blijft 1 -- een crash mag nooit als nette afsluiting eindigen. */
-  let spoel = null;
-  try { spoel = require('./opzet/stopspoeling').maakStopspoeling({ save, flushBijAfsluiten, accounts }); spoel.spoelSynchroon(); }
-  catch (e) { try { save(); } catch (x) {} }
-  /* Minstens 200 ms zodat het log nog wegkomt. Deze timers staan NIET .unref():
-     een unref'd timer houdt het proces niet wakker, en was dit ooit de laatste
-     handle, dan viel het proces ervoor al om met exitcode 0 -- een crash die
-     zich voordoet als een nette afsluiting wordt door geen enkele
-     proces-manager herstart. */
-  const klaarNa = Date.now() + 200;
-  const stop = () => setTimeout(() => process.exit(1), Math.max(0, klaarNa - Date.now()));
-  if (spoel) spoel.spoelAsynchroon().finally(stop); else stop();
-  setTimeout(() => process.exit(1), Math.max(200, Number(process.env.RTG_CRASH_GRACE_MS || 5000)));
+  // dezelfde spoeling als SIGTERM, begrensd, altijd exitcode 1 (opzet/stopspoeling.js)
+  require('./opzet/stopspoeling').bijCrash({ save, flushBijAfsluiten, accounts });
 });
 
 /* HET ADRES VAN DE LINK IN EEN E-MAIL KOMT NIET UIT HET VERZOEK.
@@ -1084,49 +1070,14 @@ app.get('/api/stream', (req, res) => {
   });
 });
 
-/* NOTIFICATIES OPHALEN -- UIT TWEE BAKKEN, EN DAT IS GEEN VERDUBBELING.
-
-   Er zijn twee wegen naar een lid en ze schrijven op een andere sleutel:
-   notify() in opzet/meldingen.js schrijft op TIER (alle Business-leden krijgen
-   bericht), meldLid() in opzet/meldaan.js op de SLEUTEL van het lid (deze reis
-   is bevestigd). Dit eindpunt las alleen de eerste. Een persoonlijk bericht
-   kwam dus wel in db.data.notifications[user-4] te staan, was over de
-   live-verbinding even zichtbaar, en verdween bij de eerste herlaadbeurt -- de
-   stilste fout van allemaal, want er stond nergens een foutmelding.
-
-   Bij een demo-sessie IS de sleutel de tier; dan wordt er een bak gelezen en
-   niet twee, anders staat elk bericht er dubbel. */
-/* UIT DE PERSOONLIJKE BAK ALLES, UIT DE PAS-BAK ALLEEN BROADCASTS.
-
-   De persoonlijke meldingen van een lid staan onder zijn SLEUTEL ('user-<id>').
-   De pas-bak (db.data.notifications[tier]) is gedeeld door alle leden van die
-   pas en mag daarom alleen EXPLICIETE broadcasts prijsgeven -- anders zou een
-   persoonlijke melding die ooit (per abuis) in een pas-bak belandde alsnog bij
-   een ander lid verschijnen. Dat is de leeszijde van blocker 2: ook als een
-   schrijver zich vergist, lekt hier niets.
-
-   In DEMO valt de sleutel samen met de pas; dan is er één bak en die is van de
-   persona zelf -- geen dubbeling en geen gedeelde lezers. */
-const meldingenVan = (sess) => {
-  const eigen = (db.data.notifications[sess.key] || []);
-  if (!sess.tier || sess.key === sess.tier) return eigen.slice(0, 40);
-  const broadcasts = (db.data.notifications[sess.tier] || []).filter(n => n && n.broadcast);
-  if (!broadcasts.length) return eigen.slice(0, 40);
-  return eigen.concat(broadcasts)
-    .sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')))
-    .slice(0, 40);
-};
+/* Welke bakken een lid ziet en afvinkt: ./opzet/meldingenlezen.js. */
+const { meldingenVan, markeerGelezen } = require('./opzet/meldingenlezen').maakMeldingenLezer(db);
 
 app.post('/api/notifications', auth, (req, res) => {
   res.json({ notifications: meldingenVan(req.session) });
 });
 app.post('/api/notifications/read', auth, (req, res) => {
-  /* ALLEEN DE EIGEN BAK. Hier stond ook req.session.tier, de GEDEELDE pas-bak:
-     dan zette één lid de meldingen van alle leden met dezelfde pas op gelezen.
-     De persoonlijke meldingen staan onder de sleutel; de gedeelde broadcasts in
-     de pas-bak worden niet door een enkel lid gemuteerd. */
-  const eigen = req.session.key;
-  if (eigen) (db.data.notifications[eigen] || []).forEach(n => n.read = true);
+  markeerGelezen(req.session.key); // alleen de eigen bak, nooit de gedeelde pas-bak
   save();
   res.json({ ok: true });
 });

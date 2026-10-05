@@ -88,10 +88,8 @@ function demoAan(env) {
   return (env && env.RTG_MAGNAAT_TEST === '1') || (env && env.RTG_DEMO === '1');
 }
 
-/* Kort antwoord op "is dit adres aantoonbaar openbaar?" voor poorten die alleen
-   dat hoeven te weten (de inlogrem, de kantoordeur). Fail-safe: bij twijfel false
-   -- een aanroeper die dit als beveiligingssignaal leest, krijgt nooit per
-   ongeluk 'openbaar' door een storing. */
+/* "Is dit adres aantoonbaar openbaar?" voor poorten die alleen dat vragen (de
+   inlogrem). Bij twijfel false: een storing maakt een adres nooit openbaar. */
 function isOpenbaar(env) {
   try { return installatieSoort(env || process.env).soort === 'openbaar'; } catch (e) { return false; }
 }
@@ -103,14 +101,10 @@ function isOpenbaar(env) {
      fouten         het bestaande gedrag (alleen blokkerend in productie)
      waarschuwingen luid, maar houden niets tegen
 
-   Op een AANTOONBAAR OPENBAAR adres zijn de productieregels GEEN schaduw meer:
-   zowel de demostand (een AANGEZETTE stand: verzonnen accounts, een pincode uit
-   de broncode, een betaalprovider die zichzelf bevestigt) ALS een ontbrekende
-   productiebeveiliging (geen kluissleutel, versleuteling-at-rest uit, geen
-   webhook-secret) gaan naar hardeFouten. Beveiliging van een publiek adres mag
-   niet afhangen van NODE_ENV (RTG-V1-RELEASE blocker 3). 'onbekend' blijft wel
-   een melding, zodat een lokale start of een toets niet omvalt op een adres dat
-   niemand als publiek heeft opgegeven. */
+   Op een AANTOONBAAR OPENBAAR adres zijn de productieregels geen schaduw: de
+   demostand en een ontbrekende productiebeveiliging gaan allebei naar
+   hardeFouten (blocker 3). 'onbekend' blijft een melding, zodat een lokale
+   start of een toets niet omvalt. */
 function keurOpenbareBouwstand(env, bakken) {
   const { fouten, waarschuwingen, hardeFouten, productie } = bakken;
   const stand = installatieSoort(env);
@@ -135,24 +129,11 @@ function keurOpenbareBouwstand(env, bakken) {
       + 'een pincode uit de broncode en een betaalprovider die zichzelf bevestigt.');
   }
 
-  /* FAIL-CLOSED OP EEN OPENBAAR ADRES (RTG-V1-RELEASE blocker 3).
-
-     Hier stond een SCHADUWRONDE: een openbare installatie die niet op production
-     staat kwam de productiekeuring (versleuteling-at-rest, de sleutels van de
-     identiteitskluis, de betaalcontroles) alleen als MELDING tegen, zodat een
-     site "die vandaag draait morgen niet meer opkomt" niet werd afgebroken.
-
-     Dat is precies de gevonden zwakte: wie APP_URL op een openbaar adres zet maar
-     NODE_ENV vergeet, start dan met de identiteitskluis zonder sleutel en met de
-     gedeelde kantoorcode open -- met alleen logregels die voorbijscrollen.
-     Beveiliging mag niet afhangen van iemand die toevallig NODE_ENV goed zet.
-
-     Daarom gelden de productieregels nu HARD zodra het adres aantoonbaar openbaar
-     is: de productiekeuring draait, en elke fout gaat naar hardeFouten -- die
-     breken de start af ongeacht NODE_ENV (../config.js). 'onbekend' blijft buiten
-     schot (dan valt een lokale start of een toets niet om op een adres dat
-     niemand als publiek heeft opgegeven); alleen een als publiek OPGEGEVEN adres
-     dwingt dit af. */
+  /* FAIL-CLOSED OP EEN OPENBAAR ADRES (RTG-V1-RELEASE blocker 3). Hier stond
+     een schaduwronde die de productiekeuring alleen als MELDING liet lopen: wie
+     NODE_ENV vergat, startte publiek zonder kluissleutel en met de gedeelde
+     kantoorcode open. Nu breekt elke productiefout de start af ongeacht NODE_ENV;
+     'onbekend' blijft buiten schot. */
   if (stand.soort === 'openbaar' && !productie) {
     const productieFouten = [];
     try { require('./productie').keur(env, productieFouten, waarschuwingen); }

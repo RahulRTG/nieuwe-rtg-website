@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T12:17:20.018Z",
-    "commit": "bc3864d68",
+    "op": "2026-10-05T12:33:34.665Z",
+    "commit": "64d4ca447",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3001,6 +3001,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "dienstdrager.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kosten/haak.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
     },
     "dienstidentiteit.test.js": {
       "soort": "puur",

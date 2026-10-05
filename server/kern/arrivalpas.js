@@ -1,11 +1,11 @@
 /* DE ARRIVAL PASS als credential (livingos.invisible_arrival_pass).
 
    De gast heeft geen account; zijn pass is een bearer. Daarom: de SERVER maakt
-   hem (AR.<32 hex>, 128 bits via ./bearercode.js -- vroeger koos de browser
-   hem, met randomUUID 122 bits); hij staat alleen als hash in `arrivalToegang`
-   en kaal alleen in het antwoord op de aanvraag of een rotatie; hij vervalt op
-   aankomst + 12 uur en een aanvraag mag hooguit HORIZON_DAGEN vooruit;
-   max_gebruik telt PULSEN (lezen is geremd en vervalt met de pass); intrekken,
+   hem (AR.<32 hex>, 128 bits via ./bearercode.js v2); hij staat alleen als
+   hash in `arrivalToegang` en kaal alleen in het antwoord op de aanvraag of een
+   rotatie; hij vervalt op aankomst + 12 uur (een voorbije aankomst krijgt er
+   geen) en een aanvraag mag hooguit HORIZON_DAGEN vooruit;
+   max_gebruik telt PULSEN (lezen is geremd); intrekken,
    roteren en gebruiken lopen in een collectietransactie; een reservering die
    niet doorgaat sluit de pass; zoeken is constant-time.
 
@@ -99,8 +99,7 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
   function aanvraag({ requestToken, supplierCode, reserveringId, datum, tijd }) {
     const ah = aanvraagHash(requestToken);
     const tot = aankomst(datum, tijd) + NA_AANKOMST_MS;
-    // een pass die bij uitgifte al verlopen is, is geen pass; v1 gaf hem met 200
-    if (!(tot > ms() + 60000)) return { status: 400, error: 'Deze aankomst ligt al voorbij; daar hoort geen Arrival Pass meer bij.' };
+    if (!(tot > ms() + 6e4)) return { status: 400, error: 'Deze aankomst is voorbij.' };
     return transactie(bron => {
       let bestaand = null;
       for (const r of Object.values(bron)) if (bearer.zelfdeHash(r && r.aanvraag_hash, ah)) bestaand = r;

@@ -143,8 +143,13 @@ const BRON = require('./lib/meetbron').bron();
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1',
   NODE_OPTIONS: nodeOpties, RTG_TOETSDUUR: duurpad, RTG_TOETSBRON: BRON };
 const pgSuite = require('./lib/suite-pg');
+/* De incrementele bewijsronde (scripts/evidence.js) geeft een SELECTIE mee, maar
+   draait net als een scherf zonder database; de verplichte PostgreSQL-job in
+   dezelfde CI-run bewijst de PG-lijst. Zonder deze uitzondering zakte een PG-toets
+   die de planner koos op "vereist een database" in plaats van op zijn code. */
+const incrementeel = process.env.RTG_EVIDENCE_MODE === 'incremental';
 const opslagPlan = pgSuite.plan(bestanden, env, !selectie.length && !deel && !zonderIjkingen && !zonderZware,
-  !selectie.length && !!(deel || zonderIjkingen || zonderZware));
+  (!selectie.length && !!(deel || zonderIjkingen || zonderZware)) || incrementeel);
 const lokaleBestanden = opslagPlan.bestanden;
 let pgBron = null;
 

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-04T21:13:00.073Z",
-    "commit": "35abf8d99",
+    "op": "2026-10-05T04:44:40.197Z",
+    "commit": "9642ccc7f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -15246,6 +15246,14 @@
       "module": "server/kern/uploadquarantaine.js",
       "operator": "===->!==#0",
       "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "v2-migraties.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/collectie-bewerken.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "vakbewijs-kluis.test.js": {

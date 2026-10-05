@@ -322,7 +322,8 @@
     "site.werelden.foundationos": "site/werelden/foundationos.html",
     "site.werelden.livingos": "site/werelden/livingos.html",
     "site.werelden.travelos": "site/werelden/travelos.html",
-    "site.werelden.workos": "site/werelden/workos.html"
+    "site.werelden.workos": "site/werelden/workos.html",
+    "site.techniek": "site/techniek/techniek.html"
   },
   "oordelen": [
     {
@@ -2673,6 +2674,12 @@
       "rol": "eigenaar",
       "doelgroep": "publiek",
       "doel": "Begrijpen wat WorkOS voor mijn organisatie kan betekenen aan de hand van een uitgewerkt voorbeeldmoment."
+    },
+    "site/techniek/techniek.html": {
+      "capability": "site.techniek",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen hoe RTG onder de motorkap werkt (codenamen, kluis, CSP, lokale modellen, meters), met de bestanden erbij en wat nog niet af is."
     }
   }
 }

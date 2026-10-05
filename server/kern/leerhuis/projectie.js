@@ -22,7 +22,8 @@
 const leeg = (org) => ({
   id: org, org: null, bestuur: {}, relaties: {}, eenheden: {}, rollen: {}, vaardigheden: {}, kennis: {}, curricula: {},
   personen: {}, trainers: {}, bewijs: {}, beoordelingen: {}, certificaten: {}, beleid: {}, voorstellen: {},
-  scenarios: {}, impacts: [], startplannen: {}, werk: [], sleutels: {}, bezwaren: {}, evc: {}, loopReceipts: {}
+  scenarios: {}, impacts: [], startplannen: {}, werk: [], sleutels: {}, bezwaren: {}, evc: {}, loopReceipts: {},
+  educationUses: []
 });
 
 function persoon(st, key) {
@@ -73,6 +74,7 @@ function pas(st, r) {
       break;
     }
     case 'curriculum': st.curricula[d.id] = { ...d, versie: ((st.curricula[d.id] || {}).versie || 0) + 1, stand: 'DRAFT', at: r.at }; break;
+    case 'libraryEducationUse': st.educationUses.push({ ...d, door:r.door, at:r.at }); break;
     case 'curriculumStand': st.curricula[d.id].stand = d.naar; break;
     case 'rolToegewezen': { const p = persoon(st, d.persoon); if (!p.rollen.includes(d.rol)) p.rollen.push(d.rol); break; }
     case 'rolIngetrokken': { const p = persoon(st, d.persoon); p.rollen = p.rollen.filter(x => x !== d.rol); break; }

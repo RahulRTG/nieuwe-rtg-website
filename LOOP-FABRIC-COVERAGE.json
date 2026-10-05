@@ -12,8 +12,8 @@
   },
   "measured": {
     "capabilities": 228,
-    "routes": 5419,
-    "mutationContracts": 5293,
+    "routes": 5422,
+    "mutationContracts": 5296,
     "screens": 326
   },
   "classifications": [
@@ -42,7 +42,7 @@
   },
   "semanticSurfaces": {
     "evidenceLevel": "STATIC_SOURCE_CANDIDATE_NOT_LEARNING_PROOF",
-    "kernelFiles": 2588,
+    "kernelFiles": 2591,
     "kernelGroups": [
       {
         "group": "_root",
@@ -370,7 +370,7 @@
       },
       {
         "group": "leerhuis",
-        "files": 29
+        "files": 30
       },
       {
         "group": "leerstof-data",
@@ -406,7 +406,7 @@
       },
       {
         "group": "library",
-        "files": 13
+        "files": 14
       },
       {
         "group": "lid",
@@ -438,7 +438,7 @@
       },
       {
         "group": "loop-fabric",
-        "files": 14
+        "files": 15
       },
       {
         "group": "luchthaven",
@@ -1511,6 +1511,7 @@
       "server/kern/leerhuis/acties-cert.js",
       "server/kern/leerhuis/acties-evc.js",
       "server/kern/leerhuis/acties-kennis.js",
+      "server/kern/leerhuis/acties-library.js",
       "server/kern/leerhuis/acties-mens.js",
       "server/kern/leerhuis/acties-oordeel.js",
       "server/kern/leerhuis/gereedheid.js",
@@ -1553,6 +1554,7 @@
       "server/kern/leverancier/zaak.js",
       "server/kern/library/agreements.js",
       "server/kern/library/editions.js",
+      "server/kern/library/education.js",
       "server/kern/library/feedback.js",
       "server/kern/library/index.js",
       "server/kern/library/journal.js",
@@ -4874,6 +4876,7 @@
       "server/kern/leverancier/zaak.js",
       "server/kern/library/agreements.js",
       "server/kern/library/editions.js",
+      "server/kern/library/education.js",
       "server/kern/library/feedback.js",
       "server/kern/library/index.js",
       "server/kern/library/journal.js",
@@ -4906,6 +4909,7 @@
       "server/kern/livinglab/ledger.js",
       "server/kern/livinglab/mensen.js",
       "server/kern/livinglab/vraagbesluit.js",
+      "server/kern/loop-fabric/constitution.js",
       "server/kern/loop-fabric/coverage-policy.js",
       "server/kern/loop-fabric/index.js",
       "server/kern/loop-fabric/learning-eligibility.js",
@@ -14765,7 +14769,7 @@
         "mutationRoutes": 3,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 37,
+        "kernelDependencyCount": 38,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/leerhuis.js"
@@ -14783,6 +14787,7 @@
           "server/kern/leerhuis/acties-cert.js",
           "server/kern/leerhuis/acties-evc.js",
           "server/kern/leerhuis/acties-kennis.js",
+          "server/kern/leerhuis/acties-library.js",
           "server/kern/leerhuis/acties-mens.js",
           "server/kern/leerhuis/acties-oordeel.js",
           "server/kern/leerhuis/acties-simulatie.js",
@@ -14794,10 +14799,9 @@
           "server/kern/leerhuis/index.js",
           "server/kern/leerhuis/lees.js",
           "server/kern/leerhuis/namen.js",
-          "server/kern/leerhuis/oordeel.js",
-          "server/kern/leerhuis/projectie.js"
+          "server/kern/leerhuis/oordeel.js"
         ],
-        "kernelDependenciesOmitted": 13,
+        "kernelDependenciesOmitted": 14,
         "screens": [
           "public/apps/leerhuis.html"
         ],
@@ -14899,7 +14903,7 @@
         "mutationRoutes": 1021,
         "declaredMutationSemantics": 314,
         "sourceFileCount": 196,
-        "kernelDependencyCount": 2485,
+        "kernelDependencyCount": 2488,
         "screenCount": 38,
         "sourceFiles": [
           "server/routes/agenda.js",
@@ -14946,7 +14950,7 @@
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js"
         ],
-        "kernelDependenciesOmitted": 2461,
+        "kernelDependenciesOmitted": 2464,
         "screens": [
           "public/apps/belastingkantoor.html",
           "public/apps/chauffeur.html",
@@ -15891,7 +15895,7 @@
         "mutationRoutes": 649,
         "declaredMutationSemantics": 374,
         "sourceFileCount": 106,
-        "kernelDependencyCount": 113,
+        "kernelDependencyCount": 114,
         "screenCount": 21,
         "sourceFiles": [
           "server/routes/atelierweb.js",
@@ -15938,7 +15942,7 @@
           "server/kern/bank/eigendom.js",
           "server/kern/bedrijfscontrole.js"
         ],
-        "kernelDependenciesOmitted": 89,
+        "kernelDependenciesOmitted": 90,
         "screens": [
           "public/apps/backoffice.html",
           "public/apps/boardroom.html",
@@ -19663,9 +19667,9 @@
         "/api/library"
       ],
       "behaviourEvidence": {
-        "routeCount": 39,
-        "mutationRoutes": 39,
-        "declaredMutationSemantics": 39,
+        "routeCount": 42,
+        "mutationRoutes": 42,
+        "declaredMutationSemantics": 42,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
         "screenCount": 0,
@@ -25582,7 +25586,7 @@
         "mutationRoutes": 7,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2460,
+        "kernelDependencyCount": 2463,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/code.js",
@@ -25616,7 +25620,7 @@
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js"
         ],
-        "kernelDependenciesOmitted": 2436,
+        "kernelDependenciesOmitted": 2439,
         "screens": [
           "public/apps/geld.html"
         ],
@@ -26126,7 +26130,7 @@
         "mutationRoutes": 0,
         "declaredMutationSemantics": 0,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 2461,
+        "kernelDependencyCount": 2464,
         "screenCount": 0,
         "sourceFiles": [
           "server/routes/social.js",
@@ -26159,7 +26163,7 @@
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js"
         ],
-        "kernelDependenciesOmitted": 2437,
+        "kernelDependenciesOmitted": 2440,
         "screens": [],
         "screensOmitted": 0,
         "signals": [
@@ -26234,7 +26238,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2461,
+        "kernelDependencyCount": 2464,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/winkel.js",
@@ -26268,7 +26272,7 @@
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js"
         ],
-        "kernelDependenciesOmitted": 2437,
+        "kernelDependenciesOmitted": 2440,
         "screens": [
           "public/apps/app.html"
         ],
@@ -26584,7 +26588,7 @@
         "mutationRoutes": 5,
         "declaredMutationSemantics": 5,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 2460,
+        "kernelDependencyCount": 2463,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/vertaal.js",
@@ -26617,7 +26621,7 @@
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js"
         ],
-        "kernelDependenciesOmitted": 2436,
+        "kernelDependenciesOmitted": 2439,
         "screens": [
           "public/apps/vertaler.html"
         ],

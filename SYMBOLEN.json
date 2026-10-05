@@ -3,23 +3,23 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-05",
-  "commit": "f49921666"
+  "commit": "21166e263"
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5332,
-  "gelezen": 5019,
+  "bestandenGezien": 5335,
+  "gelezen": 5022,
   "nietGelezen": 313,
   "waarvanBundeldeel": 313,
   "waarvanParsefout": 0,
-  "symbolen": 25696,
-  "bestandenMetUitvoer": 4148,
-  "uitvoerMetNamen": 1802,
+  "symbolen": 25712,
+  "bestandenMetUitvoer": 4151,
+  "uitvoerMetNamen": 1805,
   "uitvoerOnvolledig": 3,
   "uitvoerZonderNamen": 2343,
   "zonderUitvoer": 871,
-  "requireKanten": 6863,
-  "seconden": 4.3
+  "requireKanten": 6874,
+  "seconden": 4.1
  },
  "nietGelezen": [
   {
@@ -68355,6 +68355,44 @@
    ]
   },
   {
+   "bestand": "server/kern/leerhuis/acties-library.js",
+   "symbolen": [
+    {
+     "naam": "tekst",
+     "soort": "pijl",
+     "lijn": 4,
+     "geexporteerd": false
+    },
+    {
+     "naam": "lijst",
+     "soort": "pijl",
+     "lijn": 5,
+     "geexporteerd": false
+    },
+    {
+     "naam": "resolve",
+     "soort": "functie",
+     "lijn": 7,
+     "geexporteerd": false
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "curriculumLibraryUse",
+     "curriculumUitLibrary"
+    ]
+   },
+   "requires": [
+    "server/kern/leerhuis/hulp.js",
+    "server/kern/leerhuis/standen.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/leerhuis/index.js"
+   ]
+  },
+  {
    "bestand": "server/kern/leerhuis/acties-mens.js",
    "symbolen": [
     {
@@ -68709,6 +68747,7 @@
     "server/kern/leerhuis/acties-cert.js",
     "server/kern/leerhuis/acties-evc.js",
     "server/kern/leerhuis/acties-kennis.js",
+    "server/kern/leerhuis/acties-library.js",
     "server/kern/leerhuis/acties-mens.js",
     "server/kern/leerhuis/acties-oordeel.js",
     "server/kern/leerhuis/acties-simulatie.js",
@@ -68722,79 +68761,79 @@
     {
      "naam": "maakLeerhuis",
      "soort": "functie",
-     "lijn": 42,
+     "lijn": 43,
      "geexporteerd": true
     },
     {
      "naam": "nieuwId",
      "soort": "pijl",
-     "lijn": 45,
+     "lijn": 46,
      "geexporteerd": false
     },
     {
      "naam": "spoorLees",
      "soort": "pijl",
-     "lijn": 52,
+     "lijn": 53,
      "geexporteerd": false
     },
     {
      "naam": "stand",
      "soort": "pijl",
-     "lijn": 55,
+     "lijn": 56,
      "geexporteerd": false
     },
     {
      "naam": "weigering",
      "soort": "pijl",
-     "lijn": 60,
+     "lijn": 61,
      "geexporteerd": false
     },
     {
      "naam": "plan",
      "soort": "functie",
-     "lijn": 64,
+     "lijn": 65,
      "geexporteerd": false
     },
     {
      "naam": "schrijf",
      "soort": "functie",
-     "lijn": 84,
+     "lijn": 86,
      "geexporteerd": false
     },
     {
      "naam": "doe",
      "soort": "functie",
-     "lijn": 97,
+     "lijn": 99,
      "geexporteerd": false
     },
     {
      "naam": "doeVast",
      "soort": "functie",
-     "lijn": 123,
+     "lijn": 125,
      "geexporteerd": false
     },
     {
      "naam": "uitkomst",
      "soort": "functie",
-     "lijn": 143,
+     "lijn": 145,
      "geexporteerd": false
     },
     {
      "naam": "spoorKlopt",
      "soort": "pijl",
-     "lijn": 148,
+     "lijn": 150,
      "geexporteerd": false
     },
     {
      "naam": "organisaties",
      "soort": "pijl",
-     "lijn": 149,
+     "lijn": 151,
      "geexporteerd": false
     },
     {
      "naam": "startpakketLaden",
      "soort": "pijl",
-     "lijn": 156,
+     "lijn": 158,
      "geexporteerd": false
     }
    ],
@@ -68811,6 +68850,7 @@
     "server/kern/leerhuis/acties-cert.js",
     "server/kern/leerhuis/acties-evc.js",
     "server/kern/leerhuis/acties-kennis.js",
+    "server/kern/leerhuis/acties-library.js",
     "server/kern/leerhuis/acties-mens.js",
     "server/kern/leerhuis/acties-oordeel.js",
     "server/kern/leerhuis/acties-simulatie.js",
@@ -69150,19 +69190,19 @@
     {
      "naam": "persoon",
      "soort": "functie",
-     "lijn": 28,
+     "lijn": 29,
      "geexporteerd": false
     },
     {
      "naam": "standUitSpoor",
      "soort": "functie",
-     "lijn": 35,
+     "lijn": 36,
      "geexporteerd": true
     },
     {
      "naam": "pas",
      "soort": "functie",
-     "lijn": 42,
+     "lijn": 43,
      "geexporteerd": false
     }
    ],
@@ -69291,6 +69331,7 @@
     "server/kern/leerhuis/acties-bouw.js",
     "server/kern/leerhuis/acties-evc.js",
     "server/kern/leerhuis/acties-kennis.js",
+    "server/kern/leerhuis/acties-library.js",
     "server/kern/leerhuis/acties-mens.js",
     "server/kern/leerhuis/acties-oordeel.js",
     "server/kern/leerhuis/oordeel.js",
@@ -72637,9 +72678,69 @@
    ],
    "extern": [],
    "gebruiktDoor": [
+    "server/kern/library/education.js",
     "server/kern/library/index.js",
     "server/kern/library/publication.js",
     "server/kern/library/reader.js"
+   ]
+  },
+  {
+   "bestand": "server/kern/library/education.js",
+   "symbolen": [
+    {
+     "naam": "ref",
+     "soort": "pijl",
+     "lijn": 5,
+     "geexporteerd": true
+    },
+    {
+     "naam": "latest",
+     "soort": "functie",
+     "lijn": 6,
+     "geexporteerd": false
+    },
+    {
+     "naam": "activeVersion",
+     "soort": "functie",
+     "lijn": 7,
+     "geexporteerd": false
+    },
+    {
+     "naam": "requirements",
+     "soort": "functie",
+     "lijn": 8,
+     "geexporteerd": false
+    },
+    {
+     "naam": "command",
+     "soort": "functie",
+     "lijn": 12,
+     "geexporteerd": true
+    },
+    {
+     "naam": "resolver",
+     "soort": "functie",
+     "lijn": 47,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "command",
+     "ref",
+     "resolver"
+    ]
+   },
+   "requires": [
+    "server/kern/library/editions.js",
+    "server/kern/library/model.js",
+    "server/kern/library/policy.js",
+    "server/kern/library/rights.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/library/index.js"
    ]
   },
   {
@@ -72681,37 +72782,37 @@
     {
      "naam": "read",
      "soort": "pijl",
-     "lijn": 20,
+     "lijn": 22,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "transaction",
      "soort": "pijl",
-     "lijn": 22,
+     "lijn": 24,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "context",
      "soort": "functie",
-     "lijn": 27,
+     "lijn": 29,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "error",
      "soort": "pijl",
-     "lijn": 32,
+     "lijn": 34,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "execute",
      "soort": "functie",
-     "lijn": 36,
+     "lijn": 38,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "query",
      "soort": "functie",
-     "lijn": 75,
+     "lijn": 77,
      "geexporteerd": "onbekend"
     }
    ],
@@ -72723,6 +72824,7 @@
     "server/kern/eigencollectie.js",
     "server/kern/library/agreements.js",
     "server/kern/library/editions.js",
+    "server/kern/library/education.js",
     "server/kern/library/feedback.js",
     "server/kern/library/journal.js",
     "server/kern/library/loop-source.js",
@@ -72746,19 +72848,19 @@
     {
      "naam": "append",
      "soort": "functie",
-     "lijn": 8,
+     "lijn": 9,
      "geexporteerd": true
     },
     {
      "naam": "verify",
      "soort": "functie",
-     "lijn": 21,
+     "lijn": 22,
      "geexporteerd": true
     },
     {
      "naam": "outbox",
      "soort": "functie",
-     "lijn": 32,
+     "lijn": 33,
      "geexporteerd": true
     }
    ],
@@ -73009,6 +73111,7 @@
    "gebruiktDoor": [
     "server/kern/library/agreements.js",
     "server/kern/library/editions.js",
+    "server/kern/library/education.js",
     "server/kern/library/feedback.js",
     "server/kern/library/index.js",
     "server/kern/library/journal.js",
@@ -73093,6 +73196,7 @@
    "gebruiktDoor": [
     "server/kern/library/agreements.js",
     "server/kern/library/editions.js",
+    "server/kern/library/education.js",
     "server/kern/library/feedback.js",
     "server/kern/library/index.js",
     "server/kern/library/loop-source.js",
@@ -73253,13 +73357,25 @@
     {
      "naam": "applicable",
      "soort": "functie",
-     "lijn": 10,
+     "lijn": 11,
      "geexporteerd": true
     },
     {
      "naam": "rights",
      "soort": "functie",
-     "lijn": 15,
+     "lijn": 16,
+     "geexporteerd": true
+    },
+    {
+     "naam": "educationApplicable",
+     "soort": "functie",
+     "lijn": 68,
+     "geexporteerd": true
+    },
+    {
+     "naam": "missingEducation",
+     "soort": "functie",
+     "lijn": 74,
      "geexporteerd": true
     }
    ],
@@ -73269,6 +73385,8 @@
      "ACTIONS",
      "active",
      "applicable",
+     "educationApplicable",
+     "missingEducation",
      "rights"
     ]
    },
@@ -73279,6 +73397,7 @@
    "extern": [],
    "gebruiktDoor": [
     "server/kern/library/editions.js",
+    "server/kern/library/education.js",
     "server/kern/library/index.js",
     "server/kern/library/publication.js"
    ]
@@ -77731,6 +77850,50 @@
    ]
   },
   {
+   "bestand": "server/kern/loop-fabric/constitution.js",
+   "symbolen": [
+    {
+     "naam": "validateEligibility",
+     "soort": "functie",
+     "lijn": 32,
+     "geexporteerd": true
+    },
+    {
+     "naam": "assertChangeReceipt",
+     "soort": "functie",
+     "lijn": 59,
+     "geexporteerd": true
+    },
+    {
+     "naam": "manifest",
+     "soort": "functie",
+     "lijn": 65,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "AI_SCOPES",
+     "GENERIC_LEARNING_CLOSED",
+     "RESOLVED_DECISIONS",
+     "RULES",
+     "VERSION",
+     "assertChangeReceipt",
+     "manifest",
+     "validateEligibility"
+    ]
+   },
+   "requires": [
+    "server/kern/loop-fabric/protocol.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/loop-fabric/invariants.js",
+    "server/kern/loop-fabric/learning-eligibility.js"
+   ]
+  },
+  {
    "bestand": "server/kern/loop-fabric/coverage-policy.js",
    "symbolen": [
     {
@@ -77943,7 +78106,7 @@
     {
      "naam": "projection",
      "soort": "functie",
-     "lijn": 7,
+     "lijn": 8,
      "geexporteerd": true
     }
    ],
@@ -77954,6 +78117,7 @@
     ]
    },
    "requires": [
+    "server/kern/loop-fabric/constitution.js",
     "server/kern/loop-fabric/protocol.js"
    ],
    "extern": [],
@@ -77967,19 +78131,19 @@
     {
      "naam": "issue",
      "soort": "functie",
-     "lijn": 9,
+     "lijn": 10,
      "geexporteerd": true
     },
     {
      "naam": "evaluate",
      "soort": "functie",
-     "lijn": 43,
+     "lijn": 47,
      "geexporteerd": true
     },
     {
      "naam": "minimal",
      "soort": "functie",
-     "lijn": 60,
+     "lijn": 64,
      "geexporteerd": true
     }
    ],
@@ -77995,6 +78159,7 @@
     ]
    },
    "requires": [
+    "server/kern/loop-fabric/constitution.js",
     "server/kern/loop-fabric/protocol.js"
    ],
    "extern": [],
@@ -78308,6 +78473,7 @@
     "server/kern/library/loop-source.js",
     "server/kern/living-world/contributions.js",
     "server/kern/living-world/loop-source.js",
+    "server/kern/loop-fabric/constitution.js",
     "server/kern/loop-fabric/decision-context.js",
     "server/kern/loop-fabric/delivery.js",
     "server/kern/loop-fabric/index.js",
@@ -160249,7 +160415,14 @@
   },
   {
    "bestand": "server/opzet/loop-fabric.js",
-   "symbolen": [],
+   "symbolen": [
+    {
+     "naam": "educationReleaseToets",
+     "soort": "pijl",
+     "lijn": 5,
+     "geexporteerd": "onbekend"
+    }
+   ],
    "uitvoer": {
     "vorm": "functie",
     "namen": null
@@ -167509,27 +167682,33 @@
      "geexporteerd": "onbekend"
     },
     {
+     "naam": "educationReleaseToets",
+     "soort": "pijl",
+     "lijn": 38,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "actor",
      "soort": "functie",
-     "lijn": 49,
+     "lijn": 51,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "volwassenLid",
      "soort": "pijl",
-     "lijn": 55,
+     "lijn": 57,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stuur",
      "soort": "pijl",
-     "lijn": 59,
+     "lijn": 61,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zonderNiveau",
      "soort": "pijl",
-     "lijn": 91,
+     "lijn": 93,
      "geexporteerd": "onbekend"
     }
    ],
@@ -167839,13 +168018,13 @@
     {
      "naam": "readerCommand",
      "soort": "pijl",
-     "lijn": 35,
+     "lijn": 38,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "readerRead",
      "soort": "pijl",
-     "lijn": 37,
+     "lijn": 40,
      "geexporteerd": "onbekend"
     }
    ],

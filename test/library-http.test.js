@@ -1,6 +1,6 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
-const h = require('./helper'), { driver, fullScenario } = require('./lib/library-fixture');
+const h = require('./helper'), { driver, fullScenario, grant } = require('./lib/library-fixture');
 let srv; const tokens = {}, actors = [];
 async function request(path, body, actor) {
   const r = await fetch(srv.base + '/api/library/' + path, { method: 'POST',
@@ -58,6 +58,15 @@ test('echte server: achttien stappen, uitgeschakelde optionele diensten en alle 
     content: 'De herinnering met gecorrigeerde datum en preciezere uitleg.', changeSummary: 'Verduidelijkt na feedback.' });
   await d.command(d.A, 'feedback.resolve', { feedbackId: feedback.result.id, revisionId: correction.result.id, summary: 'Passage verduidelijkt.' });
   assert.equal((await request('feedback/list', { workId: s.workId, editionId: s.e2 }, d.B)).body.feedback[0].status, 'resolved');
+  for(const holder of [d.A,d.B])await d.command(holder,'rights.grant',grant(s.workId,holder,d.A,{
+    scope:{type:'edition-nodes',id:s.e2,nodeIds:[s.nodeId]},actions:['education'],
+    purpose:'education.internal:HTTPACADEMY:internal',conditions:{attributionRequired:true}}));
+  const education=await d.command(d.A,'education.release',{editionId:s.e2,nodeIds:[s.nodeId],academyOrganization:'HTTPACADEMY',
+    academyContext:'internal',citation:'Geschiedenis van IJmuiden, Edition 2.',attribution:'Library A en Library B'});
+  const educationGet=await request('education/get',{workId:s.workId,releaseId:education.result.id},d.A);
+  assert.equal(educationGet.body.educationRelease.currentVersion,1);
+  await d.command(d.A,'education.withdraw',{releaseId:education.result.id,reason:'HTTP withdrawal proof.'});
+  assert.equal((await request('education/get',{workId:s.workId,releaseId:education.result.id},d.A)).body.educationRelease.currentVersion,2);
   assert.equal((await request('work/get', { workId: s.workId }, actors[2])).status, 404);
   const forged = await request('rights/grant', await d.input('rights.grant', { grantor: actors[1], actor: actors[0] }), actors[2]);
   assert.equal(forged.status, 404);

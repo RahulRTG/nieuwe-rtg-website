@@ -39,10 +39,10 @@ function version(w, expected) {
   if (!Number.isSafeInteger(expected) || expected !== w.revision)
     fail('STALE_REVISION', 'Open de actuele werkrevisie.', 409);
 }
-function empty() { return { schemaVersion: 2, works: {}, receipts: {}, journal: [], delivery: {} }; }
+function empty() { return { schemaVersion: 3, works: {}, receipts: {}, journal: [], delivery: {} }; }
 function state(raw) {
   if (Object.keys(raw).length === 0) return empty();
-  if (![1, 2].includes(raw.schemaVersion) || !raw.works || !raw.receipts || !Array.isArray(raw.journal) || !raw.delivery)
+  if (![1, 2, 3].includes(raw.schemaVersion) || !raw.works || !raw.receipts || !Array.isArray(raw.journal) || !raw.delivery)
     fail('SCHEMA_UNAVAILABLE', 'De Library-opslag heeft een onbekende versie.', 503);
   const s = clone(raw);
   if (s.schemaVersion === 1) {
@@ -51,6 +51,10 @@ function state(raw) {
       w.feedback = {};
     }
     s.schemaVersion = 2;
+  }
+  if (s.schemaVersion === 2) {
+    for (const w of Object.values(s.works)) w.educationReleases = w.educationReleases || {};
+    s.schemaVersion = 3;
   }
   return s;
 }

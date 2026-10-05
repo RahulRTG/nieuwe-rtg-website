@@ -14,8 +14,8 @@ function build(){
   const scaleBlockers=scale.map(row=>({capabilityId:row.id,domain:row.domain,status:'STOP',...SCALE_DECISIONS[row.domain]}));
   return {schemaVersion:1,kind:'RTG_LOOP_FABRIC_UNLOCK_ROADMAP',sourceOfTruth:false,
     warning:'Roadmap autoriseert geen runtimecode. Iedere vertical slice doorloopt opnieuw alle acceptance gates.',
-    sourceFlows:{summary:flows.summary,newGo:[],implementedGo:flows.flows.filter(x=>x.status==='GO').map(x=>x.id),
-      note:'De GO-flows waren al bewezen; deze fase voegt geen runtimeadapter toe.'},
+    sourceFlows:{summary:flows.summary,newGo:['library-edition-to-academy'],implementedGo:flows.flows.filter(x=>x.status==='GO').map(x=>x.id),
+      note:'D23 is nu als nieuwe source-owned cross-domain flow bewezen; brede capabilities blijven flowgewijs gefaseerd.'},
     decisions:{blockedCapabilities:decisions.summary.blockedCapabilities,families:decisions.summary.decisionFamilies,
       resolvedCapabilities:decisions.summary.resolvedCapabilities,
       topFive:decisions.dossiers.filter(x=>x.decisionStatus==='RESOLVED_PRODUCT_POLICY').slice(0,5)
@@ -38,7 +38,7 @@ function md(data){
   const lines=['# RTG Loop Fabric Blocker Reduction','','Datum: 5 oktober 2026','',
     'Deze fase reduceert blockers. Zij geeft geen brede runtimegoedkeuring en bevat geen nieuwe learning-adapter.','',
     '## B01 source-owned flows','',`B01 bevat ${Object.values(data.sourceFlows.summary).reduce((a,b)=>a+b,0)} bronflows: ${data.sourceFlows.summary.GO} GO, ${data.sourceFlows.summary.PHASE} PHASE en ${data.sourceFlows.summary.STOP} STOP.`,
-    '',`Nieuw GO: ${data.sourceFlows.newGo.length}. De GO-flows waren al geïmplementeerd en bewezen: ${data.sourceFlows.implementedGo.map(x=>'`'+x+'`').join(', ')}.`,'',
+    '',`Nieuw GO: ${data.sourceFlows.newGo.length}. Geïmplementeerde en bewezen GO-flows: ${data.sourceFlows.implementedGo.map(x=>'`'+x+'`').join(', ')}.`,'',
     'De volledige velden per flow staan in `LOOP-FABRIC-SOURCE-FLOWS.json`.','',
     '## Menselijke beslissingen','',`${data.decisions.blockedCapabilities} blockers zijn exact eenmaal verdeeld over ${data.decisions.families} beslisfamilies.`,'',
     '| Rang | Dossier | Unlock | Type |','|---:|---|---:|---|'];

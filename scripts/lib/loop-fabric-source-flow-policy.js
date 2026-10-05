@@ -146,15 +146,18 @@ const FLOWS=Object.freeze([
     recallContext:'alleen persoonlijke Reader-functie',recoveryReplay:'reader operation idempotency',
     tests:['test/library-studio-reader.test.js','test/loop-fabric-library-slice.test.js'],
     prerequisite:'PROHIBITED_FROM_LEARNING zonder afzonderlijke vrijwillige feedbackhandeling'}),
-  flow('library-edition-to-academy','dom-library','STOP',{
-    semanticOwner:'library voor Edition/rechten; academy voor curriculum',canonicalState:'nog geen cross-domain education release',
-    mutationPoint:'nog niet aanwezig',authority:'rechthebbende release plus afzonderlijke Academy curriculumowner vereist',
+  flow('library-edition-to-academy','dom-library','GO',{
+    semanticOwner:'library voor Edition/rechten; academy voor curriculum',canonicalState:'Library educationReleases plus Leerhuis curriculumspoor',
+    mutationPoint:'server/kern/library/education.js en server/kern/leerhuis/acties-library.js',authority:'agreement publisher plus actuele edition-node onderwijsrechten; afzonderlijke Academy CURRICULUM_OWNER',
     occurrence:'voorgenomen gebruik van Edition/ContentNode in onderwijs',observationOpportunity:none,
-    expectationDecision:'edition-bound onderwijsdoel moet vooraf worden vastgelegd',claimContest:'withdrawal/correction moeten beide domeinen bereiken',
-    changeTarget:'eigen Academy curriculumversie',sourceIssuedReceipt:'Library education release en Academy change receipt ontbreken',
-    verificationPath:'Academy outcome is geen Library-rechtenbewijs',memoryClass:'CONTROLLED_CROSS_DOMAIN',retention:'nog te beslissen',
-    recallContext:'Edition X, Academy context Z, doel Y en actuele rechten',recoveryReplay:'nog niet aanwezig',tests:[],
-    prerequisite:'Decision D-EDU: edition/content scope, prijs, afleiding, AI, withdrawal en bestaande cursusversies'}),
+    expectationDecision:'exact Edition X, ContentNodes, interne Academy-context, citation en attribution liggen vooraf vast',
+    claimContest:'Library withdrawal/supersession blokkeert nieuw Academy-gebruik; historisch curriculum blijft auditcontext',
+    changeTarget:'eigen versioned Academy curriculumverwijzing',sourceIssuedReceipt:'versioned Library EducationRelease; Academy hashketen bevestigt eigen curriculumversie',
+    verificationPath:'Academy-use blijft gebruik; feedback wordt afzonderlijk Library-feedback en wijzigt geen Edition',
+    memoryClass:'RELATIONSHIP_SHARED',retention:'library.education.release.v1 en append-only Academy-audit',
+    recallContext:'exact Edition, geselecteerde ContentNodes, interne Academy-context en actuele rechten/authority',
+    recoveryReplay:'Library operation receipt/journal/outbox plus Leerhuis idempotentiesleutel/hashketen',
+    tests:['test/library-academy-release.test.js','test/library-kernel.test.js','test/leerhuis-grenzen.test.js'],prerequisite:none}),
 
   flow('livinglab.participant-observation','dom-livinglab','STOP',{
     semanticOwner:'living-lab',canonicalState:'studie.dossier deelnemers/observaties/metingen',

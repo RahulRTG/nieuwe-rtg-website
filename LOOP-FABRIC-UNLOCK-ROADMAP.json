@@ -5,19 +5,22 @@
   "warning": "Roadmap autoriseert geen runtimecode. Iedere vertical slice doorloopt opnieuw alle acceptance gates.",
   "sourceFlows": {
     "summary": {
-      "GO": 5,
+      "GO": 6,
       "PHASE": 6,
-      "STOP": 9
+      "STOP": 8
     },
-    "newGo": [],
+    "newGo": [
+      "library-edition-to-academy"
+    ],
     "implementedGo": [
       "experience.living-world-contribution",
       "academy.practice-to-knowledge",
       "workos.accessibility-procedure",
       "workos.near-miss-runbook",
-      "library.feedback-to-edition"
+      "library.feedback-to-edition",
+      "library-edition-to-academy"
     ],
-    "note": "De GO-flows waren al bewezen; deze fase voegt geen runtimeadapter toe."
+    "note": "D23 is nu als nieuwe source-owned cross-domain flow bewezen; brede capabilities blijven flowgewijs gefaseerd."
   },
   "decisions": {
     "blockedCapabilities": 84,

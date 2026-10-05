@@ -5,7 +5,8 @@ const ACTIONS = ['edit', 'publish', 'translate', 'adapt', 'archive', 'education'
 function active(g, at) { return g.status === 'active' && g.startsAt <= at && (!g.endsAt || g.endsAt > at); }
 function covers(g, edition) {
   return g.scope.type === 'work' || g.scope.type === 'edition' && g.scope.id === edition.id ||
-    g.scope.type === 'nodes' && edition.snapshot.content.every(n => g.scope.nodeIds.includes(n.nodeId));
+    g.scope.type === 'nodes' && edition.snapshot.content.every(n => g.scope.nodeIds.includes(n.nodeId)) ||
+    g.scope.type === 'edition-nodes' && g.scope.id === edition.id && edition.snapshot.content.every(n => g.scope.nodeIds.includes(n.nodeId));
 }
 function applicable(g, edition, publisher, at) {
   return active(g, at) && g.grantee === publisher && g.actions.includes('publish') &&
@@ -29,10 +30,11 @@ function rights(ctx) {
     let scope;
     if (d.scope.type === 'work' && d.scope.id === w.id) scope = { type: 'work', id: w.id };
     else if (d.scope.type === 'edition') scope = { type: 'edition', id: M.get(w.editions, d.scope.id).id };
-    else if (d.scope.type === 'nodes') {
+    else if (d.scope.type === 'nodes' || d.scope.type === 'edition-nodes') {
       scope = { type: 'nodes', nodeIds: M.strings(d.scope.nodeIds) };
       if (!scope.nodeIds.length) M.fail('INVALID_SCOPE', 'Selecteer inhoudsankers.');
       scope.nodeIds.forEach(n => M.get(w.nodes, n));
+      if (d.scope.type === 'edition-nodes') scope = { ...scope, type: 'edition-nodes', id: M.get(w.editions, d.scope.id).id };
     } else M.fail('INVALID_SCOPE', 'De scope valt buiten dit werk.');
     const actions = M.strings(d.actions);
     if (!actions.length || actions.some(x => !ACTIONS.includes(x))) M.fail('UNSUPPORTED_RIGHT', 'Kies afzonderlijke ondersteunde rechten.');
@@ -63,4 +65,14 @@ function rights(ctx) {
   }
   M.fail('UNKNOWN_ACTION', 'Onbekende rechtenhandeling.');
 }
-module.exports = { rights, applicable, active, ACTIONS };
+function educationApplicable(g, edition, nodeIds, publisher, academyOrganization, academyContext, at) {
+  return active(g, at) && g.grantee === publisher && g.actions.includes('education') &&
+    g.purpose === `education.internal:${academyOrganization}:${academyContext}` && g.languages.includes(edition.language) &&
+    (g.territories.includes('WORLD') || g.territories.includes(edition.territory)) && g.scope.type === 'edition-nodes' &&
+    g.scope.id === edition.id && nodeIds.every(id => g.scope.nodeIds.includes(id)) && g.conditions.attributionRequired === true;
+}
+function missingEducation(w, edition, nodeIds, agreement, academyOrganization, academyContext, at) {
+  return agreement.rightsHolders.filter(holder => !Object.values(w.grants).some(g => g.grantor === holder &&
+    educationApplicable(g, edition, nodeIds, agreement.publisher, academyOrganization, academyContext, at)));
+}
+module.exports = { rights, applicable, active, educationApplicable, missingEducation, ACTIONS };

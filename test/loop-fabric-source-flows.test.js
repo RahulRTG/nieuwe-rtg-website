@@ -4,7 +4,7 @@ const {build,OUT}=require('../scripts/loop-fabric-source-flows');
 
 test('B01 is opgesplitst in bronflows met volledige stoppoort en reproduceerbaar register',()=>{
   const registry=build(),disk=JSON.parse(fs.readFileSync(OUT,'utf8'));assert.deepEqual(disk,registry);
-  assert.deepEqual(registry.summary,{GO:5,PHASE:6,STOP:9});
+  assert.deepEqual(registry.summary,{GO:6,PHASE:6,STOP:8});
   assert.deepEqual(registry.capabilities,['bedrijf','dom-library','dom-livinglab','experience-platform','leerhuis']);
   for(const row of registry.flows){
     for(const key of ['semanticOwner','canonicalState','mutationPoint','authority','occurrence','observationOpportunity',
@@ -14,10 +14,10 @@ test('B01 is opgesplitst in bronflows met volledige stoppoort en reproduceerbaar
   }
 });
 
-test('alleen sourceflows uit de vier bestaande bewijsslices zijn GO en persoonlijke state blijft dicht',()=>{
+test('bestaande bewijsslices en D23 zijn GO terwijl persoonlijke state dicht blijft',()=>{
   const rows=Object.fromEntries(build().flows.map(x=>[x.id,x]));
   assert.deepEqual(Object.values(rows).filter(x=>x.status==='GO').map(x=>x.id).sort(),[
-    'academy.practice-to-knowledge','experience.living-world-contribution','library.feedback-to-edition',
+    'academy.practice-to-knowledge','experience.living-world-contribution','library.feedback-to-edition','library-edition-to-academy',
     'workos.accessibility-procedure','workos.near-miss-runbook'].sort());
   assert.equal(rows['library.personal-reader-state'].status,'STOP');
   assert.equal(rows['experience.resume-attention'].status,'STOP');

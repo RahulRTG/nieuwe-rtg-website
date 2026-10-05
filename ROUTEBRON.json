@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-05T11:54:30.615Z",
-  "commit": "0a6329b53"
+  "op": "2026-10-05T19:38:44.293Z",
+  "commit": "21166e263"
  },
  "vergelekenMet": {
   "register": "SCHRIJFANALYSE.json",
@@ -16,9 +16,9 @@
  },
  "grens": "Een verschil is pas een TEGENSPRAAK als beide betrokken bestanden stilstaan sinds het stempel van het andere register. Verschilt de leeftijd, dan vergelijk je twee momenten -- dat wordt hier apart geteld en nooit als tegenspraak gepresenteerd.",
  "gemeten": {
-  "routerRoutes": 5423,
+  "routerRoutes": 5426,
   "routerRoutesZonderBestand": 4,
-  "routerRoutesMetBestand": 5419,
+  "routerRoutesMetBestand": 5422,
   "bronRoutesMetBestand": 4441,
   "beideKennen": 4122,
   "gelijk": 4086,
@@ -26,9 +26,9 @@
   "waarvanVerouderd": 36,
   "waarvanTegenspraak": 0,
   "waarvanNietVastTeStellen": 0,
-  "alleenRouter": 1297,
+  "alleenRouter": 1300,
   "alleenBron": 319,
-  "toetsbaarPct": 76.1
+  "toetsbaarPct": 76
  },
  "verschillen": [
   {
@@ -2106,6 +2106,9 @@
   "POST /api/library/edition/get",
   "POST /api/library/edition/warn",
   "POST /api/library/edition/withdraw",
+  "POST /api/library/education/get",
+  "POST /api/library/education/release",
+  "POST /api/library/education/withdraw",
   "POST /api/library/feedback/create",
   "POST /api/library/feedback/decide",
   "POST /api/library/feedback/list",
@@ -14673,13 +14676,13 @@
   {
    "route": "POST /api/leerhuis/doe",
    "bestand": "server/routes/leerhuis.js",
-   "regel": 63,
+   "regel": 65,
    "samengesteld": false
   },
   {
    "route": "POST /api/leerhuis/lees",
    "bestand": "server/routes/leerhuis.js",
-   "regel": 79,
+   "regel": 81,
    "samengesteld": false
   },
   {
@@ -14929,6 +14932,24 @@
    "samengesteld": false
   },
   {
+   "route": "POST /api/library/education/get",
+   "bestand": "server/routes/library.js",
+   "regel": 37,
+   "samengesteld": false
+  },
+  {
+   "route": "POST /api/library/education/release",
+   "bestand": "server/routes/library.js",
+   "regel": 35,
+   "samengesteld": false
+  },
+  {
+   "route": "POST /api/library/education/withdraw",
+   "bestand": "server/routes/library.js",
+   "regel": 36,
+   "samengesteld": false
+  },
+  {
    "route": "POST /api/library/feedback/create",
    "bestand": "server/routes/library.js",
    "regel": 31,
@@ -14955,7 +14976,7 @@
   {
    "route": "POST /api/library/proof",
    "bestand": "server/routes/library.js",
-   "regel": 50,
+   "regel": 53,
    "samengesteld": false
   },
   {
@@ -14985,67 +15006,67 @@
   {
    "route": "POST /api/library/reader/bookmark",
    "bestand": "server/routes/library.js",
-   "regel": 44,
+   "regel": 47,
    "samengesteld": false
   },
   {
    "route": "POST /api/library/reader/bookmark/remove",
    "bestand": "server/routes/library.js",
-   "regel": 45,
+   "regel": 48,
    "samengesteld": false
   },
   {
    "route": "POST /api/library/reader/highlight",
    "bestand": "server/routes/library.js",
-   "regel": 46,
+   "regel": 49,
    "samengesteld": false
   },
   {
    "route": "POST /api/library/reader/highlight/remove",
    "bestand": "server/routes/library.js",
-   "regel": 47,
+   "regel": 50,
    "samengesteld": false
   },
   {
    "route": "POST /api/library/reader/note",
    "bestand": "server/routes/library.js",
-   "regel": 48,
+   "regel": 51,
    "samengesteld": false
   },
   {
    "route": "POST /api/library/reader/note/remove",
    "bestand": "server/routes/library.js",
-   "regel": 49,
+   "regel": 52,
    "samengesteld": false
   },
   {
    "route": "POST /api/library/reader/open",
    "bestand": "server/routes/library.js",
-   "regel": 39,
+   "regel": 42,
    "samengesteld": false
   },
   {
    "route": "POST /api/library/reader/progress",
    "bestand": "server/routes/library.js",
-   "regel": 43,
+   "regel": 46,
    "samengesteld": false
   },
   {
    "route": "POST /api/library/reader/proof",
    "bestand": "server/routes/library.js",
-   "regel": 41,
+   "regel": 44,
    "samengesteld": false
   },
   {
    "route": "POST /api/library/reader/search",
    "bestand": "server/routes/library.js",
-   "regel": 42,
+   "regel": 45,
    "samengesteld": false
   },
   {
    "route": "POST /api/library/reader/state",
    "bestand": "server/routes/library.js",
-   "regel": 40,
+   "regel": 43,
    "samengesteld": false
   },
   {
@@ -21207,7 +21228,7 @@
   {
    "route": "POST /api/office/leerhuis/open",
    "bestand": "server/routes/leerhuis.js",
-   "regel": 122,
+   "regel": 124,
    "samengesteld": false
   },
   {

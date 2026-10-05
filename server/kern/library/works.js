@@ -9,7 +9,7 @@ module.exports = function works(ctx) {
       type: M.text(d.type, 80), originalLanguage: M.text(d.language, 40), responsible,
       governanceRef: M.text(d.governanceRef || '', 300, false), lifecycle: 'active', revision: 0,
       createdAt: at, updatedAt: at, createdBy: actor, updatedBy: actor,
-      nodes: {}, structure: [], feedback: {}, contributions: {}, agreements: {}, grants: {}, editions: {}, releases: {},
+      nodes: {}, structure: [], feedback: {}, contributions: {}, agreements: {}, grants: {}, editions: {}, releases: {}, educationReleases: {},
       activeAgreementId: null };
     s.works[id] = row; ctx.w = row;
     return { id };

@@ -32,6 +32,9 @@ module.exports = ({ app, auth, library }) => {
   app.post('/api/library/feedback/list', auth, read('feedback'));
   app.post('/api/library/feedback/decide', auth, command('feedback.decide'));
   app.post('/api/library/feedback/resolve', auth, command('feedback.resolve'));
+  app.post('/api/library/education/release', auth, command('education.release'));
+  app.post('/api/library/education/withdraw', auth, command('education.withdraw'));
+  app.post('/api/library/education/get', auth, read('education-release'));
   const readerCommand = action => async (req, res) => send(res,
     await library.reader.execute(req.session.key, action, req.body, req.documentAuthority));
   const readerRead = kind => (req, res) => send(res,

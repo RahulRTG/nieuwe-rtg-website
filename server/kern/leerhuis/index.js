@@ -31,7 +31,8 @@ const { standUitSpoor } = require('./projectie');
 const { Weigering, PERSOON, ID } = require('./hulp');
 
 const ACTIES = Object.assign({}, require('./acties-bouw'), require('./acties-kennis'), require('./acties-mens'),
-  require('./acties-oordeel'), require('./acties-simulatie'), require('./acties-cert'), require('./acties-evc'));
+  require('./acties-oordeel'), require('./acties-simulatie'), require('./acties-cert'), require('./acties-evc'),
+  require('./acties-library'));
 
 /* Besluit B4 (ACADEMY.md par. 5): deze drie handelingen zijn een verklaring
    over een mens, en die mag nooit bevestigd zijn terwijl de opslag hem nog niet
@@ -39,7 +40,7 @@ const ACTIES = Object.assign({}, require('./acties-bouw'), require('./acties-ken
    write-behind, want een relatie of een oefening is geen verklaring. */
 const DUURZAAM = new Set(['certificaatUitgeven', 'certificaatStand', 'beoordelingAfronden']);
 
-function maakLeerhuis({ db, save, nu, bijeen, inBundel, bronToets }) {
+function maakLeerhuis({ db, save, nu, bijeen, inBundel, bronToets, educationReleaseToets }) {
   const klok = nu || Date.now;
   const eigen = require('../eigencollectie')({ db, domein: 'kern/leerhuis', bezit: { leerhuis: 'kaart' } });
   const nieuwId = () => crypto.randomBytes(6).toString('hex');
@@ -73,7 +74,8 @@ function maakLeerhuis({ db, save, nu, bijeen, inBundel, bronToets }) {
         return { antwoord: { ok: true, herhaald: true, id: (eerder.data || {}).id || null, nr: eerder.nr } };
       }
     }
-    const r = ACTIES[actie](st, invoer || {}, door, { nu: klok, id: nieuwId, sleutel: o.sleutel || null, org });
+    const r = ACTIES[actie](st, invoer || {}, door, { nu: klok, id: nieuwId, sleutel: o.sleutel || null, org,
+      educationReleaseToets });
     const gebeurtenissen = Array.isArray(r) ? r : r.gebeurtenissen;
     if (!gebeurtenissen.length) return { antwoord: { ok: true, geschreven: 0, uit: r.uit || null } };
     return { gebeurtenissen, uit: r.uit || null };

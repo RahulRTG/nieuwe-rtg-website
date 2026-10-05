@@ -4,7 +4,8 @@ const NAMES = { 'work.create': 'library.work.created', 'contribution.accept': 'l
   'agreement.accept': 'library.agreement.accepted', 'edition.freeze': 'library.edition.frozen',
   'publication.confirm': 'library.publication.released', 'structure.reorder': 'library.structure.reordered',
   'feedback.create': 'library.feedback.created', 'feedback.decide': 'library.feedback.decided',
-  'feedback.resolve': 'library.feedback.resolved' };
+  'feedback.resolve': 'library.feedback.resolved', 'education.release': 'library.education.released',
+  'education.withdraw': 'library.education.withdrawn' };
 function append(ctx, result, operationId) {
   const { s, w, actor, action, at, receiptKey } = ctx;
   const eventId = 'libevt_' + receiptKey.slice(0, 32);

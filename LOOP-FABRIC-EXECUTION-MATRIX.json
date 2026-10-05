@@ -86,7 +86,7 @@
       "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 14,
-        "kernelModules": 2472,
+        "kernelModules": 2475,
         "mutationContracts": 59,
         "routes": 62,
         "screens": 10,
@@ -140,9 +140,9 @@
       ],
       "blastRadius": {
         "sourceOwners": 5,
-        "kernelModules": 117,
-        "mutationContracts": 281,
-        "routes": 281,
+        "kernelModules": 118,
+        "mutationContracts": 284,
+        "routes": 284,
         "screens": 5,
         "dataSchema": "eerst flowmanifest; geen runtime-opslag",
         "newSharedPrimitive": "geen nieuwe runtimeprimitive; build-time flowdecompositie",
@@ -202,7 +202,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 13,
-        "kernelModules": 121,
+        "kernelModules": 122,
         "mutationContracts": 1056,
         "routes": 1077,
         "screens": 29,
@@ -794,7 +794,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 86,
-        "kernelModules": 2495,
+        "kernelModules": 2498,
         "mutationContracts": 2071,
         "routes": 2093,
         "screens": 97,

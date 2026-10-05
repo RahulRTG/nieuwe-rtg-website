@@ -3,6 +3,7 @@ const M = require('./model'), P = require('./policy'), journal = require('./jour
 const { requirements, publication } = require('./publication');
 const { intact } = require('./editions');
 const studio = require('./studio'), feedback = require('./feedback');
+const education = require('./education');
 const klok = require('../../lib/klok');
 const handlers = {
   'work.create': require('./works'), 'revision.add': require('./works'),
@@ -11,6 +12,7 @@ const handlers = {
   'rights.grant': require('./rights').rights, 'rights.revoke': require('./rights').rights,
   'structure.reorder': studio.command,
   'feedback.create': feedback.command, 'feedback.decide': feedback.command, 'feedback.resolve': feedback.command,
+  'education.release': education.command, 'education.withdraw': education.command,
   'edition.create': require('./editions'), 'edition.freeze': require('./editions'),
   'edition.withdraw': require('./editions'), 'edition.warn': require('./editions'),
   'publication.consent': publication, 'publication.revoke-consent': publication, 'publication.confirm': publication
@@ -74,7 +76,7 @@ module.exports = function makeLibrary({ db, bewerkCollectie, store, identities, 
   }
   function query(actor, kind, input, authority) {
     try {
-      M.fields(input, ['workId', 'editionId']);
+      M.fields(input, ['workId', 'editionId', 'releaseId']);
       const ctx = context(actor, read(), input.workId, authority);
       if (kind === 'context') return { ok: true, actorRef: actor, policy: M.POLICY };
       if (kind === 'work-list') {
@@ -90,6 +92,9 @@ module.exports = function makeLibrary({ db, bewerkCollectie, store, identities, 
       if (kind === 'work') return { ok: true, work: M.clone(ctx.w) };
       if (kind === 'workspace') return { ok: true, workspace: studio.workspace(ctx.w) };
       if (kind === 'feedback') return { ok: true, feedback: feedback.list(ctx.w, input.editionId) };
+      if (kind === 'education-release') {
+        const row=M.get(ctx.w.educationReleases,input.releaseId);return {ok:true,educationRelease:M.clone(row)};
+      }
       if (kind === 'proof') {
         const events = ctx.s.journal.filter(e => e.workId === ctx.w.id);
         Object.values(ctx.w.editions).filter(e => e.status !== 'draft').forEach(intact);
@@ -110,5 +115,6 @@ module.exports = function makeLibrary({ db, bewerkCollectie, store, identities, 
   const reader = require('./reader')({ own, bewerkCollectie, store, identities, libraryRead: read, now: time });
   const deliver=journal.outbox({read,transaction});
   const loopSource=require('./loop-source')({read,deliver,identities,time,serviceProof});
-  return { execute, query, reader, deliver, loopSource };
+  const educationResolve=education.resolver({read,time});
+  return { execute, query, reader, deliver, loopSource, education:{resolve:educationResolve} };
 };

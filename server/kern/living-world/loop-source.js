@@ -16,7 +16,8 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
       basis:{type:share.visibility==='community'?'EXPLICIT_RELEASE':'EXPLICIT_CONSENT'},
       allowedFields:['title','text','observedAt','status','contests','assessment'],uses:{decision:true,recall:true,'cross-domain':audience.some(x=>x.domain!=='living-world'),
         ai:false,aggregate:false,publish:share.visibility==='community'},issuedAt:row.recordedAt||row.createdAt,validUntil:row.validUntil||null,
-      retention:{mode:'SOURCE_LIFECYCLE',policyId:'living-world.contribution.lifecycle.v1'},epistemicType:'HUMAN_STATED'});
+      retention:{mode:'SOURCE_LIFECYCLE',policyId:'living-world.contribution.lifecycle.v1'},epistemicType:'HUMAN_STATED',
+      capabilityId:'experience-platform'});
   }
   function observationRecord(row) {
     if (!row) return null;

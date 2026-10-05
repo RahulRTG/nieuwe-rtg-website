@@ -50,7 +50,8 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
       audience:out.sharing.recipients,basis:{type:'VOLUNTARY_PRACTICE_PROPOSAL'},
       allowedFields:['title','text','observedAt','status','contests','assessment'],uses:{decision:true,recall:true,'cross-domain':false,
         ai:false,aggregate:false,publish:false},issuedAt:out.recordedAt,validUntil:null,
-      retention:{mode:'SOURCE_LIFECYCLE',policyId:'leerhuis.practice-proposal.lifecycle.v1'},epistemicType:'HUMAN_STATED'});
+      retention:{mode:'SOURCE_LIFECYCLE',policyId:'leerhuis.practice-proposal.lifecycle.v1'},epistemicType:'HUMAN_STATED',
+      capabilityId:'leerhuis'});
     return out;
   }
   function protocolEvents(org) {

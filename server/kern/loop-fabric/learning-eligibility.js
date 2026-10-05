@@ -31,7 +31,7 @@ function issue(value) {
     retention:{mode:P.text(retention.mode,80),policyId:P.text(retention.policyId,120)},
     epistemicType:value.epistemicType,supersedes:value.supersedes?P.objectRef(value.supersedes):null,
     aiScopes:Array.isArray(value.aiScopes)?value.aiScopes:[],promotionFrom:value.promotionFrom?P.clone(value.promotionFrom):null,
-    capabilityId:value.capabilityId?P.text(value.capabilityId,120):null};
+    capabilityId:P.text(value.capabilityId,120)};
   if (normalized.validUntil && normalized.validUntil<=normalized.issuedAt)
     P.fail('ELIGIBILITY_INVALID','Learning eligibility is al verlopen.');
   if (normalized.memoryClass==='PERSONAL'&&(normalized.uses['cross-domain']||normalized.uses.aggregate||normalized.uses.publish))

@@ -7,7 +7,7 @@ function artifact(overrides={}) { return E.issue({sourceRef:ref,purpose:'future-
   audience:[{domain:'travelos',id:'member-1'}],basis:{type:'EXPLICIT_CONSENT'},allowedFields:['accessibilityNeed','observedAt'],
   uses:{decision:false,recall:true,'cross-domain':false,ai:false,aggregate:false,publish:false},issuedAt:at,
   validUntil:'2027-10-05T10:00:00.000Z',retention:{mode:'EXPIRY_OR_WITHDRAWAL',policyId:'travel.experience.personal.v1'},
-  epistemicType:'HUMAN_STATED',...overrides}); }
+  epistemicType:'HUMAN_STATED',capabilityId:'dom-reisbureau',...overrides}); }
 
 test('source-issued eligibility bindt doel, bronversie, publiek, gebruik en retentie',()=>{
   const row=artifact();assert.ok(row.eligibilityId);assert.equal(row.memoryClass,'PERSONAL');

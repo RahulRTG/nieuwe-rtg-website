@@ -1,13 +1,23 @@
 'use strict';
 const P=require('./protocol');
 
-const VERSION='2026-10-05.1';
+const VERSION='2026-10-06.1';
 const AI_SCOPES=Object.freeze(['assistance','inference','training']);
 const RESOLVED_DECISIONS=Object.freeze(['D01_PERSONAL_MEMORY','D06_WORKFORCE_DEVELOPMENT','D07_TRAVEL_EXPERIENCE',
   'D08_FOUNDATION_ASSISTANCE','D11_COMMUNITY_EVENTS','D13_DISCOVERY_COMMONS','D14_AI_ASSISTANCE',
   'D15_SERVICE_IMPROVEMENT','D23_LIBRARY_EDUCATION_RELEASE']);
 const GENERIC_LEARNING_CLOSED=Object.freeze(['D03_HEALTH_CONTEXT','D09_CHILD_EDUCATION','D12_DATING',
   'D17_SECURITY_CREDENTIALS','D18_IDENTITY_VERIFICATION','D20_PAYMENT_OPERATIONS','D21_FINANCIAL_PROFILING']);
+const PROHIBITED_CAPABILITIES=Object.freeze(['member-dm','gedachten','noodkaart','dom-notities','rtf-samen']);
+const NO_LEARNING_VALUE_CAPABILITIES=Object.freeze(['dom-asset','kern-state','kern-live','kern-taal','kern-klok','kern-gids','ov-media','ov-browser']);
+const GENERIC_CLOSED_CAPABILITIES=Object.freeze([
+  'medicijnen','dom-care','ov-zorgprofiel','opvangwijzer','office-school','foundation','foundation-school','vonk',
+  'webauthn','eigenaarherstel','dom-beschermdeur','dom-rtgid','dom-veiligheid','dom-kmar','tg-inlog','tg-sso','tg-pin','tg-zegel','tg-link',
+  'verificatie','paspoort','tg-gegevens','wbw','betalen','dom-rekening','dom-bank-rekening-open','dom-bank-storten','dom-bank-sepa',
+  'dom-bank-incasso','dom-bank-passen','dom-bank-zakelijk','dom-wallet','dom-pay-wallet','dom-pay-tegoed','dom-pay-tegoed-zaak',
+  'dom-pay-terug','dom-pay-vooraf','dom-partner-uitbetaling','gld-munt','gld-rekening','gld-splitsen','gld-cadeau','gld-punten',
+  'geldwereld','dom-bank-inzicht','dom-bank-vastelasten','dom-bank-spaardoel','dom-bank-krediet','dom-bank-advies','dom-kosten','gld-aitegoed'
+]);
 const RULES=Object.freeze([
   {id:'LC01',text:'Gebruik van een dienst is geen toestemming voor optionele learning.'},
   {id:'LC02',text:'Memory classes promoveren alleen via een afzonderlijk source-issued artifact en eligibility.'},
@@ -31,6 +41,13 @@ const RULES=Object.freeze([
 
 function validateEligibility(value) {
   const basis=value.basis&&value.basis.type;
+  const capabilityId=P.text(value.capabilityId,120);
+  if(PROHIBITED_CAPABILITIES.includes(capabilityId))
+    P.fail('LEARNING_PROHIBITED','Deze capability mag geen learning artifact uitgeven.',403);
+  if(NO_LEARNING_VALUE_CAPABILITIES.includes(capabilityId))
+    P.fail('NO_LEARNING_VALUE','Deze capability heeft bewust geen learning lifecycle.',403);
+  if(GENERIC_CLOSED_CAPABILITIES.includes(capabilityId))
+    P.fail('GENERIC_LEARNING_CLOSED','Deze gevoelige capability heeft geen generiek learningpad.',403);
   if(['SERVICE_USE','IMPLIED_USE','ACCOUNT_EXISTS'].includes(basis))
     P.fail('LEARNING_CONSENT_NOT_INFERRED','Dienstgebruik is geen learninggrond.',403);
   if(value.retention&&['FOREVER','DEFAULT_FOREVER'].includes(value.retention.mode))
@@ -63,5 +80,8 @@ function assertChangeReceipt(receipt) {
 }
 
 function manifest(){return {schemaVersion:1,version:VERSION,rules:RULES,resolvedDecisions:RESOLVED_DECISIONS,
-  genericLearningClosed:GENERIC_LEARNING_CLOSED,aiScopes:AI_SCOPES};}
-module.exports={VERSION,RULES,AI_SCOPES,RESOLVED_DECISIONS,GENERIC_LEARNING_CLOSED,validateEligibility,assertChangeReceipt,manifest};
+  genericLearningClosed:GENERIC_LEARNING_CLOSED,prohibitedCapabilities:PROHIBITED_CAPABILITIES,
+  noLearningValueCapabilities:NO_LEARNING_VALUE_CAPABILITIES,genericClosedCapabilities:GENERIC_CLOSED_CAPABILITIES,
+  aiScopes:AI_SCOPES};}
+module.exports={VERSION,RULES,AI_SCOPES,RESOLVED_DECISIONS,GENERIC_LEARNING_CLOSED,PROHIBITED_CAPABILITIES,
+  NO_LEARNING_VALUE_CAPABILITIES,GENERIC_CLOSED_CAPABILITIES,validateEligibility,assertChangeReceipt,manifest};

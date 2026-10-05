@@ -46,7 +46,7 @@ module.exports = function makeWorkLoopSource({db,bewerkCollectie,serviceProof,no
       basis:{type:'VOLUNTARY_WORKPLACE_SAFETY_REPORT'},allowedFields:['title','text','observedAt','status','assessment'],
       uses:{decision:true,recall:true,'cross-domain':false,ai:false,aggregate:false,publish:false},issuedAt:observation.recordedAt,
       validUntil:null,retention:{mode:'SOURCE_LIFECYCLE',policyId:'workos.incident-observation.lifecycle.v1'},
-      epistemicType:'HUMAN_STATED'});
+      epistemicType:'HUMAN_STATED',capabilityId:'bedrijf'});
   }
   async function observeIncident(input) {
     try {

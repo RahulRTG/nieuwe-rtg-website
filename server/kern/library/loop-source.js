@@ -20,7 +20,8 @@ module.exports=function makeLibraryLoopSource({read,deliver,identities,time,serv
       audience:[{domain:'library',id:row.id}],basis:{type:'VOLUNTARY_CONTENT_FEEDBACK'},
       allowedFields:['kind','message','evidenceRefs','status','decision','resolution'],uses:{decision:true,recall:true,
         'cross-domain':false,ai:false,aggregate:false,publish:false},issuedAt:feedback.createdAt,validUntil:null,
-      retention:{mode:'SOURCE_LIFECYCLE',policyId:'library.feedback.lifecycle.v1'},epistemicType:'HUMAN_STATED'});
+      retention:{mode:'SOURCE_LIFECYCLE',policyId:'library.feedback.lifecycle.v1'},epistemicType:'HUMAN_STATED',
+      capabilityId:'dom-library'});
   }
   function observation(row,feedback) {
     const subject={domain:'library',type:'edition',id:row.id+':'+feedback.editionId,version:feedback.revisionHash};

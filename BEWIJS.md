@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2317 bestanden en 15839 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2317 bestanden en 15841 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2317 |
-| losse beweringen (`test(...)`) | 15839 |
+| losse beweringen (`test(...)`) | 15841 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1953 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2020 bestanden, 15329 beweringen.
+2020 bestanden, 15331 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -957,7 +957,7 @@ toets omvalt.
 | `loonstrook-portaal.test.js` | 1 | gezakt op `liegpoort /api/` | Het werknemersportaal: komt er een LOONSTROOK uit, van de klok tot het scherm van de medewerker? WAAROM DEZE TOETS ER IS. |
 | `loop-fabric-academy-slice.test.js` | 2 | gezakt op `===->!==#0` | Derde bewijsslice: Leerhuis gebruikt een eigen append-only bronspoor, governance en kennisversies. De Fabric vervoert alleen refs en receipts. |
 | `loop-fabric-architecture-gate.test.js` | 3 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `loop-fabric-constitution.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `loop-fabric-constitution.test.js` | 6 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-coverage.test.js` | 4 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-decisions.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-delivery.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

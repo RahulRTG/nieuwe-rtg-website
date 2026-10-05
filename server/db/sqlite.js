@@ -1,6 +1,5 @@
-/* SQLite/WAL: collecties hebben versies; de poll leest externe wijzigingen.
-   Schrijvers delen dezelfde transactionele store.db. De twee auditjournalen
-   hebben eigen rijen; db.data blijft de leesprojectie van dezelfde opslag. */
+/* SQLite/WAL: collecties hebben versies, de poll leest externe wijzigingen en
+   de twee auditjournalen hebben eigen rijen in dezelfde transactie. */
 const path = require('path');
 const kluis = require('../kluis');
 const state = require('./state');
@@ -22,8 +21,7 @@ let kvdb = null;
 const toegepast = new Map();   // collectie -> versienummer dat dit proces al toegepast heeft
 const laatsteJson = new Map(); // collectie -> laatst weggeschreven JSON (om ongewijzigde over te slaan)
 
-// De opgeslagen waarde is (met RTG_ENC_KEY) versleuteld; in het geheugen en in
-// laatsteJson houden we altijd de leesbare JSON aan, alleen op schijf staat cijfer.
+// Alleen op schijf is de JSON versleuteld; laatsteJson blijft leesbaar.
 const uitStore = v => kluis.ontsleutel(v);       // ruwe kolomwaarde -> leesbare JSON
 const naarStore = j => kluis.versleutel(j);      // leesbare JSON -> op te slaan waarde
 
@@ -75,14 +73,17 @@ function saveSqlite(force, sleutels, extraAudit = [], duurzaam = false) {
     throw new TypeError('Een gerichte save vereist bestaande collecties');
   sqliteInit();
   if (duurzaam) return require('./sqlite-duurzaam')(kvdb,
-    () => saveSqlite(true, sleutels, extraAudit), vouwWalSqlite);
+    () => saveSqlite(sleutels === undefined, sleutels, extraAudit), vouwWalSqlite);
   const audits = auditMotor(), doos = audits.doos();
   const auditOps = [...audits.vervangingen(db.data), ...(doos?.auditOps || []), ...extraAudit];
   const auditSleutels = new Set(auditOps.map(op => op.naam));
   const gewijzigd = [];
   const nu = Date.now();
   let uitgesteld = false;
-  for (const k of sleutels === undefined ? collectieSleutels(db.data) : [...new Set(sleutels)]) {
+  // Force is een volledige herstel-/afsluitflush; een gewone sleutellijst blijft gericht.
+  const teBewaren = force || sleutels === undefined
+    ? collectieSleutels(db.data) : [...new Set(sleutels)];
+  for (const k of teBewaren) {
     if (auditSleutels.has(k) || audits.bezit(db.data, k)) continue;
     if (voorcheck.magOverslaan(k, db.data[k], force || sleutels !== undefined, nu)) { uitgesteld = true; continue; }
     const j = JSON.stringify(db.data[k]);

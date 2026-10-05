@@ -68,7 +68,14 @@
     let uit = f.querySelector('[role=status]'); if (!uit) { uit = document.createElement('p'); uit.setAttribute('role','status'); f.append(uit); }
     uit.textContent = 'Bewaren…';
     try {
-      const r = await api(soort,b); concepten.delete(formulierSleutel(f)); await laad(true); K.meld('Bewaard.');
+      const r = await api(soort,b); concepten.delete(formulierSleutel(f));
+      /* Na een geslaagde handeling keert de werktafel terug naar het overzicht.
+         Sluit bij werk ook de hele werkkaart, zodat een formulier dat dieper in
+         de kaart stond niet onzichtbaar open blijft. Andere conceptformulieren
+         worden door laad() met hun invoer en open stand hersteld. */
+      const eigenaar = f.closest('details[data-pr-werk]') || f.closest('details[data-pr-open]');
+      if (eigenaar) eigenaar.open = false;
+      await laad(true); K.meld('Bewaard.');
       if (r.link) {
         const ontvangst=document.createElement('div'); ontvangst.setAttribute('role','status');
         const a=document.createElement('a');a.className='pr-link';a.href=r.link;a.textContent=new URL(r.link,location.origin).href;

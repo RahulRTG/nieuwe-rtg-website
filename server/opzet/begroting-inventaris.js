@@ -29,9 +29,12 @@ function verwijder(doel, sleutel) {
 
 function definieer(doel, sleutel, descriptor) {
   const bestond = Object.prototype.hasOwnProperty.call(doel, sleutel);
+  const oudDescriptor = bestond ? Object.getOwnPropertyDescriptor(doel, sleutel) : null;
   const oud = doel[sleutel];
   const ok = Reflect.defineProperty(doel, sleutel, descriptor);
-  if (ok && (!bestond || Array.isArray(oud) !== Array.isArray(doel[sleutel]))) wis(doel);
+  const nieuwDescriptor = ok ? Object.getOwnPropertyDescriptor(doel, sleutel) : null;
+  if (ok && (!bestond || Array.isArray(oud) !== Array.isArray(doel[sleutel]) ||
+      Boolean(oudDescriptor?.enumerable) !== Boolean(nieuwDescriptor?.enumerable))) wis(doel);
   return ok;
 }
 

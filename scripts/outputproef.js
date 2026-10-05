@@ -412,7 +412,7 @@ function meetEen(route, toets, opties) {
     if (B.green(mutation)) return { staat: 'blind', evidence };
     if (kentBasis) return { staat: 'merkt', evidence };
     const control = draaiToets(path.join(WORTEL, 'test', toets),
-      { RTG_LIEG: '', RTG_LIEG_EXACT: '', RTG_LIEG_METHODE: '', RTG_LIEG_JOURNAAL: '' }, 240000);
+      { RTG_LIEG: null, RTG_LIEG_EXACT: null, RTG_LIEG_METHODE: null, RTG_LIEG_JOURNAAL: null }, 240000);
     evidence.control = control;
     return { staat: B.green(control) ? 'merkt' : 'stoornis',
       basis: B.green(control) ? 'groen' : 'rood', evidence };

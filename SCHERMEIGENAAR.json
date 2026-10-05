@@ -318,6 +318,7 @@
     "site.passen.community": "site/passen/community.html",
     "site.passen.lifestyle-pass": "site/passen/lifestyle-pass.html",
     "site.passen.rtg-pass": "site/passen/rtg-pass.html",
+    "site.techniek": "site/techniek/techniek.html",
     "site.werelden.foundationos": "site/werelden/foundationos.html",
     "site.werelden.livingos": "site/werelden/livingos.html",
     "site.werelden.travelos": "site/werelden/travelos.html",
@@ -2642,6 +2643,12 @@
       "rol": "eigenaar",
       "doelgroep": "publiek",
       "doel": "Begrijpen wat de RTG Pass (het hele platform) inhoudt en de pas ervaren."
+    },
+    "site/techniek/techniek.html": {
+      "capability": "site.techniek",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen hoe RTG technisch is opgebouwd, welke grenzen aantoonbaar zijn en waar de bijbehorende bron en metingen staan."
     },
     "site/werelden/foundationos.html": {
       "capability": "site.werelden.foundationos",

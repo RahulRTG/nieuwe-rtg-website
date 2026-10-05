@@ -488,6 +488,9 @@ function draaiToets(bestand, env, wacht, forceer, logPrefix) {
   const vlaggen = ['--test', '--test-reporter=tap'];
   if (forceer) vlaggen.push('--test-force-exit');
   const childEnv = Object.assign({}, process.env, env || {});
+  for (const [naam, waarde] of Object.entries(env || {})) {
+    if (waarde === null || waarde === undefined) delete childEnv[naam];
+  }
   // This is an independent TAP runner, even when the instrument is tested by
   // node:test. Inheriting its internal child marker suppresses the TAP output.
   delete childEnv.NODE_TEST_CONTEXT;
@@ -503,8 +506,17 @@ function draaiToets(bestand, env, wacht, forceer, logPrefix) {
        Over een ronde van uren stapelen die zich op, houden ze poorten en geheugen
        vast, en vervuilen ze de metingen die erna komen. */
     killSignal: 'SIGKILL',
+    /* De testrunner krijgt een eigen procesgroep. Na een time-out is de runner
+       zelf al dood, maar een door een toets gestarte server kan nog in die
+       groep leven. Alleen de groepsleider doden laat dat kleinkind als wees
+       achter; de negatieve pid hieronder ruimt de hele kring op. */
+    detached: process.platform !== 'win32',
     env: childEnv
   });
+  if (process.platform !== 'win32' && r.pid) {
+    try { process.kill(-r.pid, 'SIGKILL'); }
+    catch (e) { if (e.code !== 'ESRCH') throw e; }
+  }
   const uit = String(r.stdout || '');
   if (logPrefix) {
     fs.writeFileSync(logPrefix + '.tap', uit);
@@ -518,7 +530,15 @@ function draaiToets(bestand, env, wacht, forceer, logPrefix) {
      deze telling heet dat "overleefd", en dan beschuldigt de motor een toets van
      iets wat hij niet heeft gedaan: hij heeft niets gedaan. */
   const over = /^# skipped (\d+)/m.exec(uit);
-  const toetsen = geteld ? Number(geteld[1]) : 0;
+  let toetsen = geteld ? Number(geteld[1]) : 0;
+  /* Node telt een leeg bestand zelf als een geslaagde test. Dat is alleen de
+     bestandslader en geen uitgevoerde controle. Herken die ene synthetische
+     subtest aan de bestandsnaam, zodat een leeg bestand nooit een groene
+     basislijn of mutatieclaim kan leveren. */
+  const subtests = [...uit.matchAll(/^# Subtest: (.+)$/gm)].map(m => m[1].trim());
+  const rel = path.relative(WORTEL, bestand).split(path.sep).join('/');
+  if (toetsen === 1 && subtests.length === 1 &&
+      (subtests[0] === rel || subtests[0] === bestand.split(path.sep).join('/'))) toetsen = 0;
   const overgeslagen = over ? Number(over[1]) : 0;
   return { gezakt, toetsen, overgeslagen, alGeslagen: toetsen > 0 && overgeslagen >= toetsen,
     tijdout: !!(r.error && r.error.code === 'ETIMEDOUT'), status: r.status, signal: r.signal,

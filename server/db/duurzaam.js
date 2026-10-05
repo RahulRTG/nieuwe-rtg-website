@@ -91,10 +91,10 @@ module.exports = ({ save }) => {
     let sqliteBevestigd = false;
     if (STORE === 'sqlite') {
       /* Een bundel die al exact weet welke collecties zij muteerde hoeft voor
-         duurzaamheid niet alsnog de hele wereld te serialiseren. `force`
-         houdt de opgegeven collecties exact; zonder lijst blijft dit bewust de
-         volledige afsluit-/herstelronde. */
-      const uit = sqlite.saveSqlite(true, sleutels, [], true);
+         duurzaamheid niet alsnog de hele wereld te serialiseren. De lijst
+         houdt die commit gericht; zonder lijst blijft dit bewust de volledige
+         afsluit-/herstelronde. */
+      const uit = sqlite.saveSqlite(false, sleutels, [], true);
       alGelijk = !!(uit && uit.alGelijk);
       sqliteBevestigd = uit?.duurzaam === true;
       /* Een procescrash na COMMIT was al door scripts/crashgrenzen.js bewezen.

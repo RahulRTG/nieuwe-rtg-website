@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T14:26:01.833Z",
-    "commit": "395ddb7c",
+    "op": "2026-10-05T16:17:14.200Z",
+    "commit": "6453dcc3",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -15248,6 +15248,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "trio-afzetten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/trio-wacht.js",
+      "operator": ">=->>#0",
+      "gezakt": 3,
+      "geprobeerd": 2
     },
     "trio-kleef.test.js": {
       "soort": "puur",

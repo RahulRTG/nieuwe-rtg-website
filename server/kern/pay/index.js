@@ -33,7 +33,7 @@ module.exports = (ctxIn) => {
     betaaldienstKosten, betaalOpdrachten, waarde, accounts, payBoekingenVoegToe, betaalWaarheid } = ctxIn;
   if (typeof payBoekingenVoegToe !== 'function')
     throw new Error('pay: payBoekingenVoegToe ontbreekt. Zonder die weg landt geen enkele grootboekregel in het transactiegrootboek.');
-  const paySave = require('./opslag')({ db, save });
+  const paySave = require('./opslag')({ save });
   /* DE TIJD VAN DE HELE PAYLAAG, uit de huisklok en niet uit het
      besturingssysteem. Elk deelbestand hieronder leest `nu` uit deze ctx, dus
      deze ene regel bepaalt of vervaldatums, aflopende reserveringen, de

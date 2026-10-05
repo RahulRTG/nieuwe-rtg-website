@@ -11,11 +11,8 @@ const SLEUTELS = Object.freeze([
   'waardePosities', 'suppliers'
 ]);
 
-module.exports = ({ db, save }) => () => {
-  const sleutels = SLEUTELS.filter(k => Object.hasOwn(db.data, k));
-  return sleutels.length && typeof save.sleutels === 'function'
-    ? save.sleutels(sleutels)
-    : save();
-};
+module.exports = ({ save }) => () => typeof save.bestaande === 'function'
+  ? save.bestaande(SLEUTELS)
+  : save();
 
 module.exports.SLEUTELS = SLEUTELS;

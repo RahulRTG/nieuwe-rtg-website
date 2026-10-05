@@ -56,6 +56,13 @@ save.sleutels = keys => {
     throw new Error('Selectieve opslag vereist bestaande collecties.');
   return bewaar([...new Set(keys)]);
 };
+// De datalaag snijdt een vast domeinvlak tot de aanwezige collecties terug.
+save.bestaande = keys => {
+  if (!Array.isArray(keys) || !keys.length || keys.some(k => typeof k !== 'string' || !k))
+    throw new Error('Selectieve opslag vereist een niet-lege sleutellijst.');
+  const aanwezig = [...new Set(keys)].filter(k => Object.hasOwn(db.data, k));
+  return aanwezig.length ? bewaar(aanwezig) : bewaar();
+};
 save.audit = require('./audit-poort')({ db, store: STORE, sqlite, bundelDoos, bewaar });
 function bewaar(sleutels, auditOp) {
   if (!db.writable) return;

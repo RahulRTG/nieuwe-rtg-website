@@ -19,12 +19,7 @@ module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs
   ledenvoordeelVoor, facturatie, pay }) => {
 
   const lidSleutels = ['orders', 'boekingen', 'rides', 'punten'];
-  const lidSave = () => {
-    const sleutels = lidSleutels.filter(k => Object.hasOwn(db.data, k));
-    return sleutels.length && typeof save.sleutels === 'function'
-      ? save.sleutels(sleutels)
-      : save();
-  };
+  const lidSave = () => typeof save.bestaande === 'function' ? save.bestaande(lidSleutels) : save();
 
   /* Een betaalde lidtransactie wordt een factuur -- waarom dat er niet was en
      waarom het op EEN plek staat: zie de kop van ./lidacties/factuur.js. */

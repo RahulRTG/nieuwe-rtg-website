@@ -370,6 +370,16 @@ test('expliciete auditopslag stelt grote bestaande collecties niet uit', t => {
   for (const keys of [null, [], ['ontbreekt'], [42]]) assert.throws(() => p.save.sleutels(keys), /bestaande collecties/);
 });
 
+test('de datalaag snijdt een domeinvlak tot bestaande collecties terug', t => {
+  const p = proef(t);
+  p.db.data.aanwezig = { nummer: 1 };
+  p.db.data.ander.waarde = 7;
+  p.save.bestaande(['aanwezig', 'ontbreekt', 'aanwezig']);
+  assert.deepEqual(p.lees('aanwezig'), { nummer: 1 });
+  assert.equal(p.lees('ander').waarde, 1, 'een domeincommit neemt geen vreemde mutatie mee');
+  assert.throws(() => p.save.bestaande([]), /niet-lege sleutellijst/);
+});
+
 test('selectieve save houdt foutinjectie en de gewone duurzame bundel intact', async t => {
   const p = proef(t), verraad = require('../server/lib/verraadfase');
   const fout = t.mock.method(verraad, 'sla', name => name === 'schrijf-faalt');

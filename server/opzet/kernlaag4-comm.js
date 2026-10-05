@@ -16,12 +16,7 @@ module.exports = (kern, hulp) => {
      bewaren hoeft ieder bericht niet de hele wereld opnieuw te vergelijken. */
   const commSleutels = ['commGesprekken', 'commBerichten', 'commStand',
     'memberChats', 'applyChats', 'guestChats', 'collegaChats'];
-  const commSave = () => {
-    const sleutels = commSleutels.filter(k => Object.hasOwn(db.data, k));
-    return sleutels.length && typeof save.sleutels === 'function'
-      ? save.sleutels(sleutels)
-      : save();
-  };
+  const commSave = () => typeof save.bestaande === 'function' ? save.bestaande(commSleutels) : save();
 
 /* ---------------------- RTG Communication Core ----------------------
    Een gespreksmodel voor het hele platform (kern/comm). Elke module die een

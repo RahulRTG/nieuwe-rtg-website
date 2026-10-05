@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-04T21:24:36.984Z",
-  "completedAt": "2026-10-04T21:25:33.562Z",
+  "startedAt": "2026-10-05T03:10:05.782Z",
+  "completedAt": "2026-10-05T03:11:36.865Z",
   "node": "v22.22.2",
   "command": "npm run language:proof",
   "testExitCode": 0,
-  "testOutputSha256": "54c20c7b29e68f3d21b157cee83310bde9ff65cf3491da6c1dbfe3af5d102909",
+  "testOutputSha256": "068a0c4194573998ff98fc30a883e80ccb93ba0554718393dc73fbc68dd272de",
   "sources": {
     "public/apps/access/meaning.js": "268dc805c892ee0e351c14fd2f8d955aa292b556a20af8109bece178559c8bf4",
     "public/apps/access/portal.css": "5575f01be901faa917a15d866de060e33b0a1fb261767303343d8157d3202524",

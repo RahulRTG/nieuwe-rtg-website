@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-05T09:16:19.303Z",
-    "commit": "b100219e",
+    "op": "2026-10-05T20:38:55.488Z",
+    "commit": "150757cf",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 0,
     "instrument": "scripts/gastsplitsing.js",
     "node": "v22.22.0"
   },
@@ -11,7 +11,7 @@
   "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
   "uitleg": "Per plek in server/ die op de gast toetst: maakt de code het onderscheid tussen bezoeker en gratis account, en wat zegt de weigering dat er nodig is. account-belofte = de tekst zegt dat een account of profiel volstaat, terwijl de code ook het gratis account weigert.",
   "gemeten": {
-    "bestanden": 123,
+    "bestanden": 124,
     "plekken": 139,
     "perSoort": {
       "vertakt": 23,
@@ -520,7 +520,7 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/tweefactor.js:22",
+      "plek": "server/routes/member/tweefactor.js:23",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
@@ -705,17 +705,17 @@
       "zegt": "De RTG Wallet is voor leden."
     },
     {
-      "plek": "server/server.js:547",
+      "plek": "server/server.js:543",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/server.js:1258",
+      "plek": "server/server.js:1237",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/server.js:1284",
+      "plek": "server/server.js:1263",
       "soort": "vertakt",
       "zegt": null
     }

@@ -7,7 +7,10 @@ test('coverage registry omvat iedere functieschakelaar precies eenmaal en is rep
   assert.deepEqual(onDisk,built);assert.equal(built.capabilities.length,built.measured.capabilities);
   assert.equal(new Set(built.capabilities.map(x=>x.id)).size,built.capabilities.length);
   for(const row of built.capabilities){assert.ok(row.semanticOwner.id);assert.ok(row.entryPoints.length);assert.ok(row.classificationReason);
-    assert.ok(row.participation.retention);assert.ok(row.participation.eligibility);}
+    assert.ok(row.participation.retention);assert.ok(row.participation.eligibility);
+    assert.ok(Array.isArray(row.behaviourEvidence.kernelDependencies));}
+  assert.ok(built.semanticSurfaces.kernelFiles>2000);assert.ok(built.semanticSurfaces.kernelGroups.length>100);
+  assert.equal(built.semanticSurfaces.evidenceLevel,'STATIC_SOURCE_CANDIDATE_NOT_LEARNING_PROOF');
 });
 
 test('gevoelige keuzes falen gesloten en bewezen Fabric blijft zichtbaar',()=>{

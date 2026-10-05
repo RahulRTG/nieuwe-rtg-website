@@ -9,6 +9,8 @@ const read=name=>JSON.parse(fs.readFileSync(path.join(ROOT,name),'utf8'));
 const routeSource=read('ROUTEBRON.json').perRoute;
 const mutation=read('MUTATIECONTRACT.json').rijen;
 const screens=read('SCHERMFUNCTIE.json').perScherm;
+const symbols=read('SYMBOLEN.json').perBestand,dependencies=new Map(symbols.map(row=>[row.bestand,row.requires||[]]));
+const sourceCache=new Map();
 const SIGNALS=Object.freeze({
   decision:['besluit','decision','approve','goedkeur','afwijs','reject'],
   feedback:['feedback','review','klacht','complaint','correct','betwist','contest'],
@@ -28,17 +30,39 @@ function sourcesFor(capability) {
   const matched=routeSource.filter(row=>capability.paden.some(prefix=>routeMatches(row.route,prefix)));
   return [...new Set(matched.map(row=>row.bestand))].sort();
 }
+function source(file){if(sourceCache.has(file))return sourceCache.get(file);let value='';
+  try{value=fs.readFileSync(path.join(ROOT,file),'utf8').toLowerCase();}catch{}sourceCache.set(file,value);return value;}
+function dependencyClosure(files) {
+  const seen=new Set(files),queue=files.slice();
+  while(queue.length&&seen.size<5000){const file=queue.shift();for(const dep of dependencies.get(file)||[])
+    if(!seen.has(dep)){seen.add(dep);queue.push(dep);}}
+  return [...seen].sort();
+}
 function evidenceFor(capability) {
   const routes=routeSource.filter(row=>capability.paden.some(prefix=>routeMatches(row.route,prefix)));
   const muts=mutation.filter(row=>capability.paden.some(prefix=>routeMatches(row.route,prefix)));
-  const files=[...new Set(routes.map(row=>row.bestand))].sort(),content=files.map(file=>{
-    try{return fs.readFileSync(path.join(ROOT,file),'utf8').toLowerCase();}catch{return '';}
-  }).join('\n');
+  const files=[...new Set(routes.map(row=>row.bestand))].sort(),closure=dependencyClosure(files),content=closure.map(source).join('\n');
+  const kernels=closure.filter(file=>file.startsWith('server/kern/')||file.startsWith('server/bedrijf/'));
   const signals=Object.entries(SIGNALS).filter(([,words])=>words.some(word=>content.includes(word))).map(([key])=>key);
   const relatedScreens=screens.filter(screen=>(screen.paden||[]).some(p=>capability.paden.some(prefix=>p===prefix||p.startsWith(prefix+'/'))));
   return {routeCount:routes.length,mutationRoutes:muts.length,declaredMutationSemantics:muts.filter(x=>x.herkomst==='mens').length,
-    sourceFiles:files.slice(0,16),sourceFilesOmitted:Math.max(0,files.length-16),screens:relatedScreens.map(x=>x.bestand).slice(0,12),
+    sourceFiles:files.slice(0,16),sourceFilesOmitted:Math.max(0,files.length-16),kernelDependencies:kernels.slice(0,24),
+    kernelDependenciesOmitted:Math.max(0,kernels.length-24),screens:relatedScreens.map(x=>x.bestand).slice(0,12),
     screensOmitted:Math.max(0,relatedScreens.length-12),signals};
+}
+function semanticSurfaces() {
+  const rows=symbols.filter(row=>row.bestand.startsWith('server/')).map(row=>({file:row.bestand,text:source(row.bestand)}));
+  const pick=(regex)=>rows.filter(row=>regex.test(row.text)).map(row=>row.file).sort();
+  const kernels=rows.filter(row=>row.file.startsWith('server/kern/')).map(row=>row.file),groups={};
+  for(const file of kernels){const rest=file.slice('server/kern/'.length),group=rest.includes('/')?rest.split('/')[0]:'_root';groups[group]=(groups[group]||0)+1;}
+  return {evidenceLevel:'STATIC_SOURCE_CANDIDATE_NOT_LEARNING_PROOF',kernelFiles:kernels.length,kernelGroups:Object.entries(groups)
+    .map(([group,files])=>({group,files})).sort((a,b)=>a.group.localeCompare(b.group)),
+    stateMachineCandidates:pick(/\b(status|stand|state)\b[\s\S]{0,120}(=|switch|includes\()/),
+    decisionCandidates:pick(/\b(besluit|decision|approve|goedkeur|afwijs|reject)\b/),
+    feedbackComplaintCandidates:pick(/\b(feedback|klacht|complaint|correctie|contest|betwist)\b/),
+    deliveryRecoveryCandidates:pick(/\b(outbox|checkpoint|dead.?letter|retry|rollback|recovery|herstel)\b/),
+    aiActionCandidates:pick(/\b(inferred|inference|model|ai[-_. ]|rahul)\b/),
+    physicalHandoffCandidates:pick(/\b(arrival|scan|poort|deur|dispatch|uitgifte|overdracht|geolocation|locatie)\b/)};
 }
 function loopShape(signals,status) {
   const possible=name=>signals.includes(name)?['SOURCE_EVENT_CANDIDATE']:[];
@@ -89,7 +113,8 @@ function build() {
     warning:'Deze afgeleide registry bewijst vindbaarheid en expliciete deelnamekeuzes; brondomeinen blijven eigenaar van betekenis en eligibility.',
     sources:{capabilities:'server/functies/register',routes:'ROUTEBRON.json',mutations:'MUTATIECONTRACT.json',screens:'SCHERMFUNCTIE.json'},
     measured:{capabilities:capabilities.length,routes:routeSource.length,mutationContracts:mutation.length,screens:screens.length},
-    classifications:policy.CLASSIFICATIONS,domains:Object.values(domains).sort((a,b)=>a.domain.localeCompare(b.domain)),consentCoverage:consent,capabilities};
+    classifications:policy.CLASSIFICATIONS,semanticSurfaces:semanticSurfaces(),
+    domains:Object.values(domains).sort((a,b)=>a.domain.localeCompare(b.domain)),consentCoverage:consent,capabilities};
 }
 function main(){const next=JSON.stringify(build(),null,2)+'\n';if(process.argv.includes('--controle')){
   const old=fs.existsSync(OUT)?fs.readFileSync(OUT,'utf8'):'';if(old!==next){console.error('LOOP-FABRIC-COVERAGE.json loopt achter; draai node scripts/loop-fabric-coverage.js');process.exit(1);}

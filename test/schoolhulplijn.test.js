@@ -44,7 +44,7 @@ async function opzet(naam) {
   const klas = { code: kl.code, leraarToken: p.personeelToken };
   const g = await json(await api('/gezin/maak', { gezinsnaam: 'Fam ' + naam, naam: 'Ouder ' + naam, pin: '1234' }));
   const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind ' + naam, rol: 'kind', groep: 'kind' }));
-  const kindToken = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const kindToken = (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).token;
   await api('/school/koppel', { code: g.code, token: kindToken, klasCode: klas.code });
   return { sch, klas, g, kindToken };
 }

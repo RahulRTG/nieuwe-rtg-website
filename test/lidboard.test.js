@@ -52,7 +52,7 @@ async function lid(naam) {
 async function gezinMetKind(naam) {
   const g = await json(await api('/gezin/maak', { gezinsnaam: naam, naam: 'Ouder ' + naam, pin: '1234' }));
   const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Tiener', rol: 'gezinslid', groep: 'tiener' }));
-  const kidToken = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const kidToken = (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).token;
   const conn = await json(await soc('/connections', { code: g.code, token: kidToken }));
   return { g, kidHandle: conn.me };
 }

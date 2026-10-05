@@ -29,9 +29,9 @@ test.before(async () => {
   base = srv.base;
   const t = Date.now().toString().slice(-6);
   const g = (await fnd('/gezin/maak', { gezinsnaam: 'Bieb ' + t, naam: 'Ouder ' + t, pin: '1234' })).body;
-  ouder = { code: g.code, token: g.token };
+  ouder = { code: g.code, gezinscode: g.gezinscode, token: g.token };
   const kp = (await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind ' + t, rol: 'kind', groep: 'kind' })).body;
-  const kies = (await fnd('/gezin/profiel/kies', { code: g.code, profielId: kp.profiel.id })).body;
+  const kies = (await fnd('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kp.profiel.id })).body;
   kind = { code: g.code, token: kies.token };
 });
 test.after(() => stop(srv && srv.child));
@@ -120,7 +120,7 @@ test('8. elke leeftijd heeft echte apps, ook de allerkleinsten', async () => {
   // en wat een kleuter door de leeftijdspoort ziet, is ook echt iets
   const t = Date.now().toString().slice(-6);
   const mp = (await fnd('/gezin/profiel/maak', { code: ouder.code, token: ouder.token, naam: 'Klein ' + t, rol: 'kind', groep: 'mini' })).body;
-  const kies = (await fnd('/gezin/profiel/kies', { code: ouder.code, profielId: mp.profiel.id })).body;
+  const kies = (await fnd('/gezin/profiel/kies', { gezinscode: ouder.gezinscode, profielId: mp.profiel.id })).body;
   const mini = { code: ouder.code, token: kies.token };
   const cat = await bieb('/catalogus', { per: 48 }, mini);
   assert.equal(cat.status, 200);

@@ -85,8 +85,8 @@ if (publiek) {
      "eerste livegang zonder geld"-beleid meer over de B2B2C-productiepoort. */
   if (env.RTG_AI_UIT !== '1' && env.RTG_EXTERNE_AI_UIT !== '1')
     fouten.push('De lokale-eerst livegang vereist RTG_AI_UIT=1 of RTG_EXTERNE_AI_UIT=1.');
-  if (!env.OFFICE_TOTP_SECRET)
-    fouten.push('OFFICE_TOTP_SECRET ontbreekt; publieke enterprise-livegang vereist 2FA op de backoffice.');
+  /* Geen OFFICE_TOTP_SECRET-eis meer (4 oktober 2026): in productie opent de
+     kantoorcode niets (B10) en koppelen vraagt een eigen passkey (B24). */
 
   if (live.RTG_PUBLISH_HOST !== '0.0.0.0' && live.RTG_PUBLISH_HOST !== '::')
     fouten.push('RTG_PUBLISH_HOST moet publiek binden (0.0.0.0 of ::); nu: ' + (live.RTG_PUBLISH_HOST || 'leeg') + '.');

@@ -35,7 +35,7 @@ test.after(() => {
 async function gezinMetTiener(naam) {
   const g = await json(await api('/gezin/maak', { gezinsnaam: naam, naam: 'Ouder ' + naam, pin: '1234' }));
   const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Tiener', rol: 'gezinslid', groep: 'tiener' }));
-  const kidToken = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const kidToken = (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).token;
   const conn = await json(await soc('/connections', { code: g.code, token: kidToken }));
   return { g, kidToken, kidHandle: conn.me, kidCodenaam: conn.codename, kidBeschermd: conn.beschermd };
 }
@@ -103,7 +103,7 @@ test('oudervoeg is alleen voor de beheerder, en 16+ (groep jong) houdt de open l
   const fam = await gezinMetTiener('Grens');
   // een 16+ gezinslid (groep jong) is NIET beschermd: zoeken werkt gewoon
   const jong = await json(await api('/gezin/profiel/maak', { code: fam.g.code, token: fam.g.token, naam: 'Grote Zus', rol: 'gezinslid', groep: 'jong' }));
-  const jongToken = (await json(await api('/gezin/profiel/kies', { code: fam.g.code, profielId: jong.profiel.id }))).token;
+  const jongToken = (await json(await api('/gezin/profiel/kies', { gezinscode: fam.g.gezinscode, profielId: jong.profiel.id }))).token;
   const conn = await json(await soc('/connections', { code: fam.g.code, token: jongToken }));
   assert.equal(conn.beschermd, false, '16+ is niet beschermd');
   assert.equal((await soc('/find', { code: fam.g.code, token: jongToken, q: 'ster' })).status, 200, '16+ mag gewoon zoeken');

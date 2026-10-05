@@ -71,7 +71,7 @@ test('2. beheerder sluit een profiel of het hele gezin; een kind kan dat niet; d
   const kind = await F('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Noor', rol: 'kind',
     geboortedatum: '2016-04-12', pin: '1357' });
   assert.equal(kind.status, 200, kind.tekst);
-  const kies = await F('/gezin/profiel/kies', { code: g.code, profielId: kind.body.profiel.id, pin: '1357' });
+  const kies = await F('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.body.profiel.id, pin: '1357' });
   assert.match(kies.body.token, GZ);
   const kt = kies.body.token;
   // de consumers onder /api/rtf lezen het nieuwe token
@@ -88,7 +88,7 @@ test('2. beheerder sluit een profiel of het hele gezin; een kind kan dat niet; d
   assert.equal((await post('/api/rtf/toegang', { code: g.code, token: kt })).status, 403);
   assert.equal(await mij(g.code, kt), 403);
   // het kind komt terug met zijn eigen pincode, en een nieuwe pincode sluit hem weer
-  const terug = (await F('/gezin/profiel/kies', { code: g.code, profielId: kind.body.profiel.id, pin: '1357' })).body.token;
+  const terug = (await F('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.body.profiel.id, pin: '1357' })).body.token;
   assert.equal(await mij(g.code, terug), 200);
   await F('/gezin/profiel/wijzig', { code: g.code, token: g.token, profielId: kind.body.profiel.id, pin: '9753' });
   assert.equal(await mij(g.code, terug), 403, 'een nieuwe pincode meldt het kind overal af');

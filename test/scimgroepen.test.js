@@ -69,7 +69,7 @@ test.before(async () => {
      er niet voor de volledigheid maar voor bewering 3. */
   for (const [org, domein] of [['O-GA', 'klant-a.nl'], ['O-GB', 'klant-b.nl']]) {
     const k = await api('/api/techniek/sso', { org, naam: org, issuer: 'https://idp.' + domein,
-      clientId: 'cid', clientSecret: 'geheim', domeinen: domein }, tech);
+      clientId: 'cid', domeinen: domein }, tech);
     assert.equal(k.status, 200, 'koppeling ' + org + ': ' + JSON.stringify(k.body).slice(0, 140));
   }
   const a = await api('/api/techniek/sso/scimsleutel', { org: 'O-GA' }, tech);

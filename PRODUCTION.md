@@ -159,7 +159,7 @@ logboeken, energie-instellingen): `scripts/mac/LEESMIJ.md`. Weghalen kan met
 | `RTG_ENC_KEY` | Versleuteling-at-rest. 64 hex-tekens (`openssl rand -hex 32`). **Zonder dit weigert iedere productiestart; er is geen plaintext-override.** |
 | `RTG_VAULT_KEY` | De sleutel van de identiteitskluis (echte naam, e-mail, telefoon). 64 hex-tekens. **Zonder dit weigert de start.** Staat hij niet in de omgeving, dan maakt de server hem als bestand `vault.key` in de datamap — naast `rtg.db`. Wie die map steelt heeft dan de data én de sleutel, en zijn de codenamen weer namen. Hoort uit een secrets manager te komen |
 | `RTG_SECRET_KEY` | Ondertekent de sessietokens. 64 hex-tekens. **Zonder dit weigert de start**, om dezelfde reden: anders komt `secret.key` naast de database te liggen, en kan wie hem heeft zelf geldige sessies maken |
-| `OFFICE_CODE` | Gedeeld backofficegeheim van minimaal 12 willekeurige tekens. Verplicht naast TOTP; nooit per proces laten wisselen |
+| `OFFICE_CODE` | **Niet meer nodig** (4 oktober 2026): in productie opent de gedeelde kantoorcode niets (B10) en koppelen vraagt een eigen passkey (B24). Gezet = genegeerd, met een regel in het opstartlog |
 | `DATABASE_URL` | PostgreSQL voor gedeelde, multi-instance data. De app kan lokaal op SQLite proefdraaien, maar **go-live weigert zonder PostgreSQL** |
 | `APP_URL` | Vast publiek HTTPS-adres voor herstel-, uitnodigings- en bevestigingslinks. **Zonder dit weigert productie; de Host-kop is nooit een veilige bron.** |
 | `REDIS_URL` | Gedeelde realtime-bus, intrekking en atomische RTG-PIN-antifraudegrenzen. **Go-live weigert zonder Redis** |
@@ -643,7 +643,7 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 - [ ] Een rollback is op de echte host geoefend met een uitrolbon; volumes zijn daarbij niet teruggezet
 - [ ] Logs komen ergens terecht (Loki/CloudWatch/Datadog)
 - [ ] GitHub repository variables `RTG_LIVE_URL` én `RTG_LIVE_COMMIT` gezet; de publieke sonde prikt elke vijf minuten van buitenaf door DNS en TLS heen en bindt het bewijs aan de werkelijk uitgerolde commit
-- [ ] `OFFICE_TOTP_SECRET` gezet en de authenticator-app gekoppeld (2FA op de backoffice; **de keuring blokkeert de productiestart zolang hij ontbreekt**, en een geheim onder de 16 base32-tekens telt niet als tweede factor). Zonder deze factor staat de backoffice — auditlog, tijdlijn met codenamen, export — achter alleen de statische `OFFICE_CODE`, en de officedeur remt per IP, dus verspreid raden komt daar langs. Dit was een waarschuwing; `scripts/docker/controle.js` eiste het al hard voor livegang, en die twee zeggen nu hetzelfde
+- [ ] `OFFICE_CODE` en `OFFICE_TOTP_SECRET` NIET gezet: sinds 4 oktober 2026 geen eis meer (besluit van de eigenaar). In productie opent de gedeelde code niets (B10, `kern/kantoor/productiedeur.js`) en gebruikt het koppelen van een uitnodiging de TOTP niet (B24, `kern/eenaccount/koppelen.js`); het kantoor gaat open op naam, met een passkey. Staan ze toch gezet, dan negeert de server ze en zegt hij dat in een regel van het opstartlog; `npm run golive` waarschuwt
 - [ ] Inlog-auditlog gecontroleerd na de eerste inlog (RTG HQ, kaart "Inlogactiviteit")
 - [ ] Rate-limiter bevestigd: in productie geeft de API boven 300 verzoeken/minuut/IP een 429 (test/livegang.test.js bewijst dit)
 - [ ] Schone start bevestigd: elke echte omgeving heeft `RTG_MAGNAAT_TEST` uit en bevat geen voorbeeldzaken, testpersoneel of voorbeeldposts; ook een database die eerder als testomgeving begon wordt bij de start opgeschoond (test/livegang.test.js)

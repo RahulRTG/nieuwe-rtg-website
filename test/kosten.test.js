@@ -333,7 +333,7 @@ test('een kind in het gezin komt niet bij het kostenoverzicht', async () => {
   const pid = kind.body.profiel && kind.body.profiel.id;
   assert.ok(pid, 'geen kindprofiel: ' + JSON.stringify(kind.body).slice(0, 160));
 
-  const kies = await api('/api/foundation/gezin/profiel/kies', { code, profielId: pid });
+  const kies = await api('/api/foundation/gezin/profiel/kies', { gezinscode: gemaakt.body.gezinscode, profielId: pid });
   assert.ok(kies.body.token, 'het kind kreeg geen sessie; dan toetst de rest hieronder niets');
 
   const r = await api('/api/foundation/kosten', { code }, kies.body.token);

@@ -142,15 +142,22 @@ process.on('unhandledRejection', reason => {
 // (Docker/systemd) ons herstart in plaats van door te draaien op kapotte staat.
 process.on('uncaughtException', err => {
   log.uitzondering(err, { bron: 'uncaughtException', fataal: true });
-  try { save(); } catch (e) {}
-  /* De 200 ms zijn er zodat het log nog wegkomt. Deze timer stond .unref(), en
-     dat is het tegenovergestelde van wat hier moet gebeuren: een unref'd timer
-     houdt het proces niet wakker. In de praktijk viel dat nooit op, want een
-     draaiende server heeft handles zat -- maar het is een val die openligt: was
-     dit ooit de laatste handle, dan viel het proces ervoor al om, met exitcode
-     0, en een crash die zich voordoet als een nette afsluiting wordt door geen
-     enkele proces-manager herstart. Hij houdt het proces nu die 200 ms vast. */
-  setTimeout(() => process.exit(1), 200);
+  /* DEZELFDE SPOELING ALS SIGTERM (RTG-V1-RELEASE D1). Hier stond alleen
+     save(); journaal, vertaalkast en write-behind gingen bij een crash verloren.
+     Begrensd: we wachten op de write-behind tot RTG_CRASH_GRACE_MS (5 s), en de
+     exitcode blijft 1 -- een crash mag nooit als nette afsluiting eindigen. */
+  let spoel = null;
+  try { spoel = require('./opzet/stopspoeling').maakStopspoeling({ save, flushBijAfsluiten, accounts }); spoel.spoelSynchroon(); }
+  catch (e) { try { save(); } catch (x) {} }
+  /* Minstens 200 ms zodat het log nog wegkomt. Deze timers staan NIET .unref():
+     een unref'd timer houdt het proces niet wakker, en was dit ooit de laatste
+     handle, dan viel het proces ervoor al om met exitcode 0 -- een crash die
+     zich voordoet als een nette afsluiting wordt door geen enkele
+     proces-manager herstart. */
+  const klaarNa = Date.now() + 200;
+  const stop = () => setTimeout(() => process.exit(1), Math.max(0, klaarNa - Date.now()));
+  if (spoel) spoel.spoelAsynchroon().finally(stop); else stop();
+  setTimeout(() => process.exit(1), Math.max(200, Number(process.env.RTG_CRASH_GRACE_MS || 5000)));
 });
 
 /* HET ADRES VAN DE LINK IN EEN E-MAIL KOMT NIET UIT HET VERZOEK.

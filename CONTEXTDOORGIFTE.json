@@ -1,13 +1,13 @@
 {
  "stempel": {
-  "op": "2026-10-05T11:36:38.802Z",
-  "commit": "6447f20f1",
+  "op": "2026-10-05T11:52:33.026Z",
+  "commit": "844a6c128",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/contextdoorgifte.js",
   "node": "v22.22.0"
  },
- "uitleg": "Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Zeven invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.",
+ "uitleg": "Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Negen invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.",
  "hoe": "npm run contextdoorgifte",
  "grens": "Alleen statische leden- en zaakroutes die de rolkaart een rol geeft (vandaag allemaal POST, zie noemer.perMethode) met een leeg lijf, geen PostgreSQL- of Redis-stand, alleen timers via de globale timerfuncties. Een lege noemer is niet vast te stellen.",
  "richting": {
@@ -18,7 +18,10 @@
   "i4LekPlekken": "omlaag",
   "i5StilNaSluiten": "omlaag",
   "i9EnterWith": "omlaag",
-  "i10AuthZonderContext": "omlaag"
+  "i10AuthZonderContext": "omlaag",
+  "i13TweedeIdentiteit": "omlaag",
+  "i14FrameAfwezig": "omlaag",
+  "i14FrameOneens": "omlaag"
  },
  "ratel": {
   "i5StilNaSluiten": 0,
@@ -28,7 +31,10 @@
   "i10AuthZonderContext": 0,
   "i4LekPlekken": 0,
   "i2ClientSleutel": 0,
-  "i2ExternFout": 0
+  "i2ExternFout": 0,
+  "i13TweedeIdentiteit": 0,
+  "i14FrameAfwezig": 0,
+  "i14FrameOneens": 0
  },
  "gemeten": {
   "i5": {
@@ -38,25 +44,26 @@
     "kosten/haak": "meldt",
     "ai-context": "weigert",
     "verzoekcontext": "weigert",
+    "verzoekframe": "weigert",
     "bijeen": "weigert"
    },
    "stilNaSluiten": 0,
-   "contexten": 6
+   "contexten": 7
   },
   "i9": {
    "enterWith": 0,
    "waar": []
   },
   "i1": {
-   "binnenVerzoek": 59,
+   "binnenVerzoek": 68,
    "metVerzoekCorrelatie": 0,
    "metActor": 0,
-   "metSessie": 45,
+   "metSessie": 51,
    "kanalen": {
-    "rtg:sessies:v1": 20,
+    "rtg:sessies:v1": 26,
     "sse": 33,
     "link-rem": 2,
-    "rtg:intrekking:v1": 4
+    "rtg:intrekking:v1": 7
    },
    "aandeelMetCorrelatie": 0
   },
@@ -86,6 +93,19 @@
    "plekken": {},
    "lekPlekken": 0
   },
+  "i13": {
+   "geidentificeerd": 3112,
+   "herkend": 4,
+   "tweedeIdentiteit": 0,
+   "naSluiten": 0
+  },
+  "i14": {
+   "authPunten": 3106,
+   "metFrame": 3106,
+   "eens": 3106,
+   "oneens": 0,
+   "waarom": {}
+  },
   "i10": {
    "authPunten": 3106,
    "metHandeling": 3106,
@@ -103,15 +123,15 @@
     "200": 786,
     "400": 478,
     "403": 722,
-    "404": 951,
-    "409": 177,
+    "404": 952,
+    "409": 176,
     "503": 61
    },
    "rollen": [
     "member",
     "supplier"
    ],
-   "sessieHernieuwd": 9
+   "sessieHernieuwd": 12
   }
  }
 }

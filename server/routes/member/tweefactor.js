@@ -114,7 +114,16 @@ module.exports = (kern) => {
      opzet niet aan het bewijs -- wie het wachtwoord kent haalt met een nieuwe
      inlog een vers bewijs, en een emmer per bewijs zou dan per inlog opnieuw
      tien gokken geven. De emmer wordt bij succes niet geleegd (die tafel is van
-     het auth-domein); de opruimlus ruimt hem op zodra hij stil is. */
+     het auth-domein); de opruimlus ruimt hem op zodra hij stil is.
+
+     BEWUST EEN SLOT EN GEEN VERTRAGING, anders dan het wachtwoord in
+     ../auth/inlog.js. Daar zou een slot op het account een vreemde de macht geven
+     een lid buiten te houden. Hier heeft wie aanklopt het wachtwoord al, en de
+     ruimte van een code is 10^6: een vertraging van twee seconden per gok laat
+     een aanvaller met veel adressen er alsnog doorheen. Net als bij het
+     wachtwoord gaat er bij een vol slot een brute-force-melding uit, en die kan
+     het adres in quarantaine zetten (server.js noteFailedTry). Dat is
+     huisbeleid en geen eigen keuze van deze route. */
   app.post('/api/auth/tweede', async (req, res, next) => {
     try {
     const u = accounts.verifyActionToken(req.body.bewijs, 'inlog2');

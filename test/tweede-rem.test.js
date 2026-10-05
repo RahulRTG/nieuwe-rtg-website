@@ -88,3 +88,41 @@ test('een enkele typefout houdt de juiste code niet tegen', async () => {
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+test('3. de rem zit op het ACCOUNT: wisselende adressen en een vers bewijs geven geen nieuwe gokken', async () => {
+  /* Twee keuzes die de herkeuring met een mutatie liet omvallen zonder dat deze
+     toets zakte: een emmer per bewijs, en alleen een emmer per adres. Een
+     aanvaller met het wachtwoord heeft allebei in de hand. */
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tweede-rem3-'));
+  const srv = await startServer({ env: { RTG_DATA_DIR: dir } });
+  const base = srv.base;
+  const post = postJson(base);
+  const vanAdres = async (ip, pad, body) => {
+    const r = await fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip },
+      body: JSON.stringify(body) });
+    return { status: r.status, body: await r.json().catch(() => ({})) };
+  };
+  try {
+    const email = 'tweede-rem3@voorbeeld.test', wachtwoord = 'geheim12';
+    const reg = await post('/api/auth/register', { name: 'Rem Drie', email, password: wachtwoord, geboortedatum: '1990-01-01' });
+    const begin = await post('/api/mijn/tweefactor/begin', { huidig: wachtwoord }, reg.token);
+    await post('/api/mijn/tweefactor/bevestig', { code: totpCode(begin.geheim, Date.now(), 30) }, reg.token);
+    const geldig = new Set([-30000, 0, 30000].map(d => totpCode(begin.geheim, Date.now() + d, 30)));
+    let fout = '000000';
+    for (let i = 0; geldig.has(fout); i++) fout = String(100000 + i);
+
+    let bewijs = (await post('/api/auth/login', { login: email, password: wachtwoord, pasApp: 'rtg' })).bewijs;
+    for (let i = 1; i <= 10; i++) {
+      if (i === 6) bewijs = (await post('/api/auth/login', { login: email, password: wachtwoord, pasApp: 'rtg' })).bewijs;
+      const r = await vanAdres('198.51.100.' + i, '/api/auth/tweede', { bewijs, code: fout });
+      assert.equal(r.status, 403, 'poging ' + i + ' vanaf een eigen adres is een gewone afwijzing');
+    }
+    const juist = totpCode(begin.geheim, Date.now() + 30000, 30);
+    const daarna = await vanAdres('198.51.100.77', '/api/auth/tweede', { bewijs, code: juist });
+    assert.equal(daarna.status, 429,
+      'tien gokken over tien adressen en twee bewijzen sluiten het ACCOUNT, ook voor een nieuw adres (kreeg ' + daarna.status + ')');
+  } finally {
+    await stop(srv);
+    try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
+  }
+});

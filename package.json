@@ -240,6 +240,7 @@
     "schermgedrag": "node scripts/schermgedrag.js",
     "schermfunctie": "node scripts/schermfunctie.js",
     "schermfunctie:controle": "node scripts/schermfunctie.js --controle",
+    "contextdoorgifte": "node scripts/contextdoorgifte.js",
     "contextproef": "node scripts/contextproef.js",
     "kernherkomst": "node scripts/kernherkomst.js",
     "faalproef": "node scripts/faalproef.js",

@@ -108,6 +108,7 @@ const REGISTER = {
   'CAPABILITEIT.json': { eigenRatel: 'test/capabilities.test.js' },
   'CODEWERELD.json': { eigenRatel: 'test/codewereld.test.js' },
   'COMMERCE.json': { eigenRatel: 'scripts/check.js' },
+  'CONTEXTDOORGIFTE.json': { eigenRatel: 'test/contextdoorgifte.test.js' },
   'CONTROLS.json': { eigenRatel: 'test/controls.test.js' },
   'ENVELOP.json': { eigenRatel: 'test/actorvormen.test.js' },
   'GEZAG.json': { eigenRatel: 'test/gezag.test.js' },

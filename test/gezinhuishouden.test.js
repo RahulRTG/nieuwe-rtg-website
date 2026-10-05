@@ -61,7 +61,7 @@ async function gezin(naam) {
   const maak = async (pnaam, rol) => {
     const r = await post('/gezin/profiel/maak', { code: g.code, token: g.token, naam: pnaam, rol });
     assert.equal(r.status, 200, pnaam + ' is aangemaakt');
-    const kies = await post('/gezin/profiel/kies', { code: g.code, profielId: r.body.profiel.id });
+    const kies = await post('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: r.body.profiel.id });
     return { id: r.body.profiel.id, token: kies.body.token, naam: pnaam };
   };
   const mij = await haal('/gezin/' + g.code + '/keuken', g.token);

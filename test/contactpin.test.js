@@ -533,7 +533,7 @@ function soc(pad, body) {
 async function gezinMetKind(naam) {
   const g = await json(await fond('/gezin/maak', { gezinsnaam: naam, naam: 'Ouder ' + naam, pin: '1234' }));
   const kind = await json(await fond('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind', rol: 'gezinslid', groep: 'tiener' }));
-  const kidToken = (await json(await fond('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const kidToken = (await json(await fond('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).token;
   return { g, kidToken };
 }
 

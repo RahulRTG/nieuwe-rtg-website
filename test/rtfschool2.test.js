@@ -42,7 +42,7 @@ test.before(async () => {
     naam: 'Sam', rol: 'kind', groep: 'tiener', kleur: '#3A7BD5' }));
   kindId = kind.profiel.id;
   sleutel = g.code + ':' + kindId;
-  kindToken = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: kindId }))).token;
+  kindToken = (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kindId }))).token;
   await api('/school/koppel', { code: g.code, token: g.token, klasCode: klas.code, profielId: kindId });
   await api('/school/uitnodiging/antwoord', { code: g.code, token: kindToken, klasCode: klas.code, akkoord: true });
 });
@@ -99,7 +99,7 @@ test('2. de leerplanner zet huiswerk, leerstappen en de toets per dag op een rij
 
 test('3. de oppas ziet de gezinsagenda, maar de schoolzaken niet', async () => {
   const gast = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Oppas Els', rol: 'gast' }));
-  const gastToken = (await json(await api('/gezin/profiel/kies', { code: g.code, profielId: gast.profiel.id }))).token;
+  const gastToken = (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: gast.profiel.id }))).token;
   const b = await json(await api('/gezin/agenda/bereik', { code: g.code, token: gastToken, van: plus(0), tot: plus(14) }));
   assert.equal(b.magBewerken, false, 'een oppas leest mee, schrijft niet');
   assert.ok(!b.items.some(i => i.bron === 'school'), 'huiswerk en toetsen zijn van het gezin, niet van de oppas');

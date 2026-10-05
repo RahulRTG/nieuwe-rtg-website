@@ -18,8 +18,12 @@
 
 module.exports = function startControle({ PRODUCTION, DEMO, accounts, eigenaar }) {
   if (!PRODUCTION) return;
-  /* OFFICE_CODE en TOTP zijn vóór deze fase al harde productievoorwaarden in
-     config/productie-identiteit.js. Hier geen zachtere, onbereikbare melding. */
+  /* OFFICE_CODE en OFFICE_TOTP_SECRET openen in productie niets (B10, B24;
+     geen eis meer sinds 4 oktober 2026). Staan ze toch gezet, dan worden ze
+     genegeerd -- en dat gebeurt niet stil: een regel zegt welke en waarom. */
+  const genegeerd = ['OFFICE_CODE', 'OFFICE_TOTP_SECRET'].filter(n => process.env[n]);
+  if (genegeerd.length) console.warn('[start] ' + genegeerd.join(' en ') + (genegeerd.length > 1 ? ' staan' : ' staat') +
+    ' gezet maar ' + (genegeerd.length > 1 ? 'worden' : 'wordt') + ' in productie genegeerd (B10/B24): het kantoor opent alleen op naam, met een passkey.');
   if (DEMO) console.warn('[start] LET OP: Magnaat Test is AAN in productie. Dit hoort uitsluitend op de afzonderlijke testinstallatie.');
   /* SMTP en AI worden al door config/productie.js hard geblokkeerd. Hier geen
      zachte waarschuwing meer: die suggereerde ten onrechte dat productie in

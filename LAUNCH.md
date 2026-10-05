@@ -174,7 +174,7 @@ bleef.
    `LIVEGANG.md`); onderstaande lijst is wat je bewust moet kiezen:
    - `NODE_ENV=production`
    - `RTG_ENC_KEY` en de twee kluissleutels — zonder deze weigert de start
-   - `OFFICE_CODE=<eigen sterke code>` (vervangt RTG-OFFICE)
+   - geen `OFFICE_CODE`/-TOTP meer (B10/B24, 4 okt 2026)
    - `DEMO_USER` / `DEMO_PASS` wijzigen of demo-account uitzetten
    - `SMTP_URL=smtp://user:pass@host:587` + `MAIL_FROM="Rahul Travel Group <no-reply@domein.nl>"`
    - **AI:** de standaard livegangroute zet `RTG_AI_UIT=1` — geen externe

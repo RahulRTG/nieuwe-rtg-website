@@ -71,7 +71,7 @@ async function gezin(naam, opties) {
       Object.assign({ code: g.code, token: g.token, naam: pnaam, rol }, pin ? { pin } : {}));
     assert.equal(r.status, 200, pnaam + ' (' + rol + ') is aangemaakt: ' + JSON.stringify(r.body).slice(0, 160));
     const id = r.body.profiel.id;
-    const kies = await post('/gezin/profiel/kies', Object.assign({ code: g.code, profielId: id },
+    const kies = await post('/gezin/profiel/kies', Object.assign({ gezinscode: g.gezinscode, profielId: id },
       pin ? { pin } : {}));
     assert.ok(kies.body.token, pnaam + ' heeft een eigen token: ' + JSON.stringify(kies.body).slice(0, 160));
     return { id, token: kies.body.token, naam: pnaam };

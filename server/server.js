@@ -613,7 +613,7 @@ function tooManyTries(res, bucket) {
    meer nodig voor hij iemand onterecht buitensluit. Wie niets meegeeft krijgt
    tien. */
 let bronLoosGemeld = false;
-function noteFailedTry(bucket, bron, limiet) {
+function noteFailedTry(bucket, bron, limiet, soort) {
   const grens = Number(limiet) > 0 ? Number(limiet) : 10;
   const f = loginFails.get(bucket) || { n: 0, until: 0 };
   f.n += 1;
@@ -631,13 +631,16 @@ function noteFailedTry(bucket, bron, limiet) {
       try { require('./log').log.warn('noteFailedTry zonder bron (' + String(bucket).split(':')[0] +
         '): de noodrem telt deze deur als aparte aanvaller. Geef req.ip mee.'); } catch (e) {}
     }
-    // de rate-limit sloeg aan: dit ziet eruit als brute force op een inlog
-    if (beveilig) beveilig.meld('brute-force', 'kritiek',
+    /* De rem sloeg aan. Een eigen `soort` meldt het als waarschuwing en NIET als
+       brute force, dus zonder noodrem (kern/identiteit/tweedestap-rem.js, N4). */
+    if (beveilig) beveilig.meld(soort || 'brute-force', soort ? 'waarschuwing' : 'kritiek',
       'Te veel mislukte inlogpogingen (' + String(bucket).split(':')[0] + '). De inlog is tijdelijk op slot gezet; mogelijk een brute-force-aanval.',
       { bron: bucket, aanvaller: String(bron || bucket) });
   }
   loginFails.set(bucket, f);
 }
+// de gedeelde rem voor elke deur die een tweede-factorcode toetst
+const tweedeStapRem = require('./kern/identiteit/tweedestap-rem').maakTweedeStapRem({ tooManyTries, noteFailedTry, loginFails });
 
 /* ---------- demo-account: één inlog (Rahul / Imran) voor elk kanaal ----------
    Zo kunt u het klantportaal, de leverancier-app en het personeelskanaal met
@@ -2216,7 +2219,7 @@ const kern = {
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, carriereledger, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, corrigeerFactuur, markt,
-  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, beleidsmotor, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
+  noteFailedTry, tweedeStapRem, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, beleidsmotor, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, ...ondernemerpoort, save, scheduleFor, schoon, sectiesForOrder, sendPush,

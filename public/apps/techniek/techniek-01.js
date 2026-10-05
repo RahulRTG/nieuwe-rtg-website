@@ -19,13 +19,22 @@
   function toonLogin(){ $('#vLogin').hidden=false; $('#vBord').hidden=true; }
   function toonBord(){ $('#vLogin').hidden=true; $('#vBord').hidden=false; }
 
+  /* Met de tweede factor aan geeft de eerste stap een bewijs; dan vraagt de
+     pagina de code en stuurt dezelfde knop bewijs en code (server/routes/techniek/inlog.js). */
+  var bewijs = null;
+  function eersteStap(){ bewijs=null; $('#liCode').hidden=true; $('#liCode').value=''; }
   $('#bLogin').addEventListener('click', function(){
     $('#loginFout').textContent='';
-    api('/api/techniek/inloggen', { method:'POST', body:{ login:$('#liLogin').value.trim(), wachtwoord:$('#liPass').value } })
-      .then(function(d){ token=d.token; sessionStorage.setItem('techToken', token); start(); })
-      .catch(function(e){ $('#loginFout').textContent = e.message; });
+    var body = bewijs ? { bewijs:bewijs, code:$('#liCode').value.trim() }
+      : { login:$('#liLogin').value.trim(), wachtwoord:$('#liPass').value };
+    api('/api/techniek/inloggen', { method:'POST', body:body })
+      .then(function(d){
+        if (d.tweedeFactorNodig){ bewijs=d.bewijs; $('#liCode').hidden=false; $('#liCode').focus(); $('#loginFout').textContent=d.uitleg||''; return; }
+        eersteStap(); token=d.token; sessionStorage.setItem('techToken', token); start(); })
+      .catch(function(e){ if (/verlopen/.test(e.message)) eersteStap(); $('#loginFout').textContent = e.message; });
   });
   $('#liPass').addEventListener('keydown', function(e){ if(e.key==='Enter') $('#bLogin').click(); });
+  $('#liCode').addEventListener('keydown', function(e){ if(e.key==='Enter') $('#bLogin').click(); });
   $('#bUit').addEventListener('click', function(){ token=null; sessionStorage.removeItem('techToken'); if(timer)clearInterval(timer); toonLogin(); });
   $('#bVernieuw').addEventListener('click', function(){ laad(); });
 

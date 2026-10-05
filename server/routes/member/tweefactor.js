@@ -17,7 +17,7 @@ const { legInlogVast } = require('../../kern/identiteit/inlogherkomst');
 
 module.exports = (kern) => {
   const { app, auth, accounts, handelingsspoor, tweefactor, stateFor, sessieregister, commercieel,
-    tooManyTries, noteFailedTry } = kern;
+    tweedeStapRem: rem } = kern;
 
   const eisLid = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }
@@ -68,29 +68,39 @@ module.exports = (kern) => {
     res.status(r.status || 200).json(r);
   });
 
+  /* NIEUWE HERSTELCODES VRAGEN OOK EEN GELDIGE CODE (N2, besluit van de
+     eigenaar). Met alleen sessie en wachtwoord haalde je hier een verse
+     herstelcode, en daarmee kwam je langs de code die /uit vraagt. */
   app.post('/api/mijn/tweefactor/codes', auth, async (req, res) => {
     if (!eisLid(req, res)) return;
     const u = req.session.account;
+    if (rem.dicht(res, u.id, req.ip)) return;
     if (!u.password_hash || !await accounts.verifyPassword(String(req.body.huidig || ''), u.password_hash)) {
       return res.status(403).json({ error: 'Het wachtwoord klopt niet.' });
     }
+    const t = tweefactor.toets(u, req.body.code);
+    if (!t.ok) {
+      rem.mis(u.id, req.ip);
+      return res.status(403).json({ error: 'Die code klopt niet. Nieuwe herstelcodes vragen een code uit uw authenticator of een herstelcode.' });
+    }
+    rem.gelukt(u.id, req.ip);
     const r = tweefactor.nieuweCodes(u);
     if (r.ok) spoor(req, 'tweefactor-codes-vernieuwd', {});
     res.status(r.status || 200).json(r);
   });
 
-  /* Dezelfde rem en accountemmer als de tweede inlogstap hieronder: anders is
-     de code die de factor uitzet hier onbeperkt te raden (herkeuring C3). */
+  /* Dezelfde rem en emmers als de tweede inlogstap hieronder: anders is de code
+     die de factor uitzet hier onbeperkt te raden (herkeuring C3). */
   app.post('/api/mijn/tweefactor/uit', auth, async (req, res) => {
     if (!eisLid(req, res)) return;
     const u = req.session.account;
-    const doelEmmer = 'tweede:doel:' + u.id;
-    if (tooManyTries(res, doelEmmer)) return;
+    if (rem.dicht(res, u.id, req.ip)) return;
     if (!u.password_hash || !await accounts.verifyPassword(String(req.body.huidig || ''), u.password_hash)) {
       return res.status(403).json({ error: 'Het wachtwoord klopt niet.' });
     }
     const r = tweefactor.uit(u, req.body.code);
-    if (r.status === 403) noteFailedTry(doelEmmer, req.ip, 10);
+    if (r.status === 403) rem.mis(u.id, req.ip);
+    else if (r.ok) rem.gelukt(u.id, req.ip);
     if (r.ok) spoor(req, 'tweefactor-uit', {});
     res.status(r.status || 200).json(r);
   });
@@ -114,27 +124,19 @@ module.exports = (kern) => {
 
      EN DE CODE IS NIET ONBEPERKT TE RADEN (RTG-V1-RELEASE C3). Punt 2 houdt het
      bewijs heel bij een verkeerde code; zonder rem was dat vijf minuten gokken.
-     Twee emmers: een per ACCOUNT (niet per bewijs: een nieuwe inlog geeft een
-     vers bewijs) en een per BRON. Bij succes niet geleegd; de opruimlus ruimt
-     hem op zodra hij stil is.
-
-     BEWUST EEN SLOT EN GEEN VERTRAGING, anders dan het wachtwoord in
-     ../auth/inlog.js: wie hier aanklopt heeft het wachtwoord al, en tegen 10^6
-     codes helpt een vertraging een aanvaller met veel adressen niet. Een vol
-     slot meldt brute force, en dat kan het adres in quarantaine zetten
-     (server.js noteFailedTry); zie het besluitpunt in het auditdocument. */
+     De emmers, het slot en waarom er geen quarantaine bij komt, staan in
+     ../../kern/identiteit/tweedestap-rem.js. */
   app.post('/api/auth/tweede', async (req, res, next) => {
     try {
     const u = accounts.verifyActionToken(req.body.bewijs, 'inlog2');
     if (!u) return res.status(401).json({ error: 'Deze inlogpoging is verlopen. Log opnieuw in.' });
-    const doelEmmer = 'tweede:doel:' + u.id, bronEmmer = 'tweede:bron:' + req.ip;
-    if (tooManyTries(res, doelEmmer) || tooManyTries(res, bronEmmer)) return;
+    if (rem.dicht(res, u.id, req.ip)) return;
     const r = tweefactor.toets(u, req.body.code);
     if (!r.ok) {
-      noteFailedTry(doelEmmer, req.ip, 10);
-      noteFailedTry(bronEmmer, req.ip, 50);
+      rem.mis(u.id, req.ip);
       return res.status(403).json({ error: r.error || 'Die code klopt niet.' });
     }
+    rem.gelukt(u.id, req.ip);
     await accounts.trekInActie(req.body.bewijs, 'inlog2');
     if (accounts.wachtIntrekkingen) await accounts.wachtIntrekkingen();
 

@@ -165,3 +165,63 @@ test('4. uitzetten deelt de rem: tien foute codes op /uit, en ook de juiste zet 
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* ----------------------------------------------------------------------------
+   N4 (besluit van de eigenaar, 5 oktober 2026): EEN SLOT, GEEN QUARANTAINE. Wie
+   hier aanklopt kent het wachtwoord al. Meldde een vol slot zich als brute force,
+   dan ging het adres van de laatste poging een uur in quarantaine -- en dat kon
+   het adres van het lid zelf zijn. Zie server/kern/identiteit/tweedestap-rem.js.
+   -------------------------------------------------------------------------- */
+async function lidMetFactor(base, post, email) {
+  const reg = await post('/api/auth/register', { name: 'Rem N4', email, password: 'geheim12', geboortedatum: '1990-01-01' });
+  const begin = await post('/api/mijn/tweefactor/begin', { huidig: 'geheim12' }, reg.token);
+  await post('/api/mijn/tweefactor/bevestig', { code: totpCode(begin.geheim, Date.now(), 30) }, reg.token);
+  const geldig = new Set([-30000, 0, 30000].map(d => totpCode(begin.geheim, Date.now() + d, 30)));
+  let fout = '000000';
+  for (let i = 0; geldig.has(fout); i++) fout = String(100000 + i);
+  return { geheim: begin.geheim, fout };
+}
+async function vanaf(base, ip, pad, body) {
+  const r = await fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip },
+    body: JSON.stringify(body) });
+  return { status: r.status, body: await r.json().catch(() => ({})) };
+}
+
+test('5. een vol slot op de tweede stap zet het adres NIET in quarantaine (N4)', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tweede-rem5-'));
+  const srv = await startServer({ env: { RTG_DATA_DIR: dir } });
+  const base = srv.base, post = postJson(base), ip = '203.0.113.50', email = 'tweede-rem5@voorbeeld.test';
+  try {
+    const { fout } = await lidMetFactor(base, post, email);
+    const bewijs = (await vanaf(base, ip, '/api/auth/login', { login: email, password: 'geheim12', pasApp: 'rtg' })).body.bewijs;
+    for (let i = 1; i <= 10; i++) assert.equal((await vanaf(base, ip, '/api/auth/tweede', { bewijs, code: fout })).status, 403);
+    assert.equal((await vanaf(base, ip, '/api/auth/tweede', { bewijs, code: fout })).status, 429, 'het slot zit erop');
+    const daarna = await vanaf(base, ip, '/api/auth/login', { login: email, password: 'fout-wachtwoord', pasApp: 'rtg' });
+    assert.notEqual(daarna.body.error, 'Toegang geblokkeerd (quarantaine).', 'het adres staat niet in quarantaine');
+    assert.equal(daarna.status, 401, 'het adres krijgt gewoon een antwoord op zijn inlog (kreeg ' + daarna.status + ')');
+  } finally {
+    await stop(srv);
+    try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+test('6. een geslaagde code leegt de emmer (N4)', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tweede-rem6-'));
+  const srv = await startServer({ env: { RTG_DATA_DIR: dir } });
+  const base = srv.base, post = postJson(base), email = 'tweede-rem6@voorbeeld.test';
+  try {
+    const { geheim, fout } = await lidMetFactor(base, post, email);
+    let bewijs = (await post('/api/auth/login', { login: email, password: 'geheim12', pasApp: 'rtg' })).bewijs;
+    for (let i = 1; i <= 9; i++) assert.equal(await status(base, '/api/auth/tweede', { bewijs, code: fout }), 403);
+    const binnen = await post('/api/auth/tweede', { bewijs, code: totpCode(geheim, Date.now() + 30000, 30) });
+    assert.ok(binnen.token, 'de juiste code na negen typefouten geeft een sessie');
+    bewijs = (await post('/api/auth/login', { login: email, password: 'geheim12', pasApp: 'rtg' })).bewijs;
+    for (let i = 1; i <= 9; i++) {
+      assert.equal(await status(base, '/api/auth/tweede', { bewijs, code: fout }), 403,
+        'na een geslaagde code telt de emmer opnieuw vanaf nul (poging ' + i + ')');
+    }
+  } finally {
+    await stop(srv);
+    try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
+  }
+});

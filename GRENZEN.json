@@ -1328,7 +1328,8 @@
       "zorgZet",
       "zzpwacht",
       "partnerPersoneelscode",
-      "zwaarbewijs"
+      "zwaarbewijs",
+      "tweedeStapRem"
     ],
     "memo": [],
     "meting": [],
@@ -2495,7 +2496,9 @@
       "webauthnStapOpOpties",
       "zekeringMag",
       "zwaar",
-      "zwaarbewijs"
+      "zwaarbewijs",
+      "tweedeStapRem",
+      "tweefactor"
     ],
     "tenant": [
       "bedrijf",

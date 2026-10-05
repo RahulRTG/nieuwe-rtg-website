@@ -395,19 +395,27 @@ test('8. het geheim komt pas na het wachtwoord -- en het e-mailadres staat op pr
   zonderNaamOfAdres((await api('/api/mijn/post/alles-uit', {}, lid.token)).body, lid, 'post/alles-uit');
 });
 
-test('9. nieuwe herstelcodes maken de oude ongeldig, en dat vraagt het wachtwoord', async () => {
+test('9. nieuwe herstelcodes maken de oude ongeldig, en dat vraagt het wachtwoord EN een code', async () => {
   const lid = await nieuwLid();
   const beg = await api('/api/mijn/tweefactor/begin', { huidig: WACHTWOORD }, lid.token);
   const aan = await api('/api/mijn/tweefactor/bevestig', { code: totpCode(beg.body.geheim) }, lid.token);
   assert.equal(aan.status, 200, JSON.stringify(aan.body));
   const oude = aan.body.herstelcodes;
 
-  const zonder = await api('/api/mijn/tweefactor/codes', { huidig: 'fout' }, lid.token);
+  const zonder = await api('/api/mijn/tweefactor/codes', { huidig: 'fout', code: totpCode(beg.body.geheim) }, lid.token);
   assert.equal(zonder.status, 403);
   assert.match(zonder.body.error, /wachtwoord klopt niet/);
   assert.equal(zonder.body.herstelcodes, undefined, 'een fout wachtwoord leverde toch een nieuwe set op');
 
-  const nieuw = await api('/api/mijn/tweefactor/codes', { huidig: WACHTWOORD }, lid.token);
+  /* Alleen het wachtwoord is NIET genoeg (N2 uit de V1-audit, besluit van de
+     eigenaar). Was het dat wel, dan haalde wie sessie en wachtwoord heeft hier
+     een verse herstelcode, en kwam daarmee langs de code die /uit vraagt. */
+  const zonderCode = await api('/api/mijn/tweefactor/codes', { huidig: WACHTWOORD }, lid.token);
+  assert.equal(zonderCode.status, 403, 'alleen het wachtwoord gaf toch nieuwe herstelcodes');
+  assert.equal(zonderCode.body.herstelcodes, undefined);
+
+  // de code van het volgende venster: die van nu is bij het aanzetten al gebruikt
+  const nieuw = await api('/api/mijn/tweefactor/codes', { huidig: WACHTWOORD, code: totpCode(beg.body.geheim, Date.now() + 30000) }, lid.token);
   assert.equal(nieuw.status, 200, JSON.stringify(nieuw.body));
   assert.equal(nieuw.body.herstelcodes.length, 10);
   assert.equal(nieuw.body.herstelcodes.filter(c => oude.includes(c)).length, 0,

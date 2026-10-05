@@ -9,12 +9,12 @@
    werkkopie, effectteller, AI-uitvoeringen, handelingsmeting) blijft in zijn
    eigen winkel; daar hoort het frame met opzet NIET bij.
 
-   IN DE SCHADUW. Het frame wordt geopend en gevuld, maar NIEMAND beslist er nog
-   op: er is geen lezer in server/ buiten de twee schrijvers (opzet/envelop.js
-   voor de actor, de kostenhaak voor de drager) en de montage. De meter
-   (scripts/contextdoorgifte.js, I13 en I14) houdt het naast de bestaande
-   contexten; test/verzoekframe.test.js zakt zodra iemand er een besluit op
-   neemt voordat dat een besluit IS.
+   EEN LEZER, EN DIE BESLIST NIETS (Fase 2, PR 5). De bus-envelop
+   (kern/envelop.js) leest via voorBus() correlatie, oorzaak, actor-codenaam en
+   hoedanigheid -- late binding, zodat de kern opzet/ niet kent. Verder geen
+   lezer in server/ buiten de twee schrijvers (opzet/envelop.js voor de actor,
+   de kostenhaak voor de drager) en de montage; test/verzoekframe.test.js zakt
+   zodra er een lezer bij komt voordat dat een besluit IS.
 
    DE VAKKEN
      correlatie    van de server (lib/correlatie.js), nooit een kop
@@ -22,9 +22,9 @@
      oorzaak       de correlatie van het werk dat dit veroorzaakte, of null
      soort         verzoek | dienst | webhook | overdracht
      actor         { sleutel, codenaam, deur, identiteit, agent } -- EEN keer,
-                   via identificeer(); `codenaam` blijft null tot er een lezer
-                   is (een opzoeking in de kluis per verzoek zonder lezer kost
-                   iets en levert niets)
+                   via identificeer(); `codenaam` alleen uit de sessie die de
+                   ledenpoort net keurde (account.codename), anders null --
+                   nooit de datasleutel en nooit een opzoeking per verzoek
      hoedanigheid  { naam: null, reden } -- de sessie draagt er geen. NOOIT uit
                    req.body: identificeer() neemt alleen de envelop, en die zet
                    een poortwachter uit de sessie
@@ -42,12 +42,14 @@
 'use strict';
 const { AsyncLocalStorage } = require('async_hooks');
 const correlatie = require('../lib/correlatie');
+const envelop = require('../kern/envelop');
 
 const winkel = new AsyncLocalStorage();
 const SOORTEN = Object.freeze(['verzoek', 'dienst', 'webhook', 'overdracht']);
 const GEEN_HOEDANIGHEID = Object.freeze({ naam: null, sinds: null,
   reden: 'de sessie draagt geen hoedanigheid; alleen een aan de sessiesleutel getoetste machtiging kan er een geven' });
-const tellers = { geopend: 0, geidentificeerd: 0, herkend: 0, tweedeIdentiteit: 0, naSluiten: 0, overgedragen: 0 };
+const tellers = { geopend: 0, geidentificeerd: 0, herkend: 0, tweedeIdentiteit: 0, naSluiten: 0, overgedragen: 0,
+  codenaamGeweigerd: 0 };
 const vanReq = new WeakMap();
 
 function nieuw({ soort, correlatie: c, extern, oorzaak } = {}) {
@@ -92,11 +94,18 @@ function identificeer(actor) {
   schrijfbaar(f, 'identificeren');
   if (f.actor) { tellers.tweedeIdentiteit++; throw fout('FRAME_AL_GEIDENTIFICEERD', 'dit frame is al geidentificeerd'); }
   const a = actor || {};
-  f.actor = Object.freeze({ sleutel: a.sleutel || null, codenaam: null, deur: a.deur || null,
+  f.actor = Object.freeze({ sleutel: a.sleutel || null, codenaam: codenaamVan(a.codenaam, a.sleutel), deur: a.deur || null,
     identiteit: a.identiteit || 'onbekend', agent: a.agent || null });
   f.stand = 'geidentificeerd';
   tellers.geidentificeerd++;
   return f.actor;
+}
+
+/* Een codenaam gaat op de bus, dus de zeef van de envelop keurt hem hier, EEN
+   keer. Een datasleutel (gelijk aan de sleutel, of user-<n>) is geen codenaam. */
+function codenaamVan(c, sleutel) {
+  if (c == null || c === sleutel || /^user-\d+$/.test(String(c))) return null;
+  try { return envelop.keurActor(String(c)); } catch (e) { tellers.codenaamGeweigerd++; return null; }
 }
 
 /* De brug vanuit opzet/envelop.zet(), de ENIGE schrijver van de actor. Gooit
@@ -108,13 +117,17 @@ function identificeer(actor) {
    (gezag erbij, kantoor wordt eigenaar). Dat is geen tweede identiteit maar
    dezelfde, herkend. Dus: dezelfde sleutel telt als `herkend` en verandert
    niets; een ANDERE sleutel is de fout waar I13 over gaat. */
-function uitEnvelop(env) {
+function uitEnvelop(env, req) {
   try {
     const f = winkel.getStore();
     if (!f) return;
     const a = (env && env.actor) || {};
     if (f.actor && f.stand !== 'gesloten' && f.actor.sleutel && f.actor.sleutel === (a.id || null)) { tellers.herkend++; return; }
-    identificeer({ sleutel: a.id, deur: a.soort, identiteit: a.identiteit, agent: a.agent });
+    /* De codenaam alleen van DEZE sessie: de ledenpoort zette req.session vlak
+       voor zet(), en de sleutel moet dezelfde zijn. Nooit uit req.body. */
+    const s = req && req.session, acc = s && s.account;
+    const codenaam = a.soort === 'lid' && acc && s.key && s.key === a.id ? acc.codename : null;
+    identificeer({ sleutel: a.id, codenaam, deur: a.soort, identiteit: a.identiteit, agent: a.agent });
   } catch (e) { /* geteld in identificeer/schrijfbaar */ }
 }
 
@@ -144,6 +157,18 @@ function overdraag(fn, { actor, drager, herkomst } = {}) {
   });
 }
 
+/* Wat de bus-envelop uit het frame leest -- en niets meer. Een gesloten frame
+   levert niets: werk na afloop erft geen verzoekidentiteit (I4). De oorzaak is
+   het werk dat dit frame veroorzaakte, en anders het verzoek zelf. */
+function voorBus() {
+  const f = winkel.getStore();
+  if (!f || f.stand === 'gesloten') return null;
+  const h = f.hoedanigheid;
+  return { correlatie: f.correlatie, oorzaak: f.oorzaak || f.correlatie, actor: f.actor ? f.actor.codenaam : null,
+    hoedanigheid: h && h.naam ? { naam: h.naam, grond: h.grond || null } : null };
+}
+envelop.zetFrameBron(voorBus);
+
 /* Een bevroren afdruk voor de meter en de toetsen. Geen lezer in server/. */
 function huidig() {
   const f = winkel.getStore();
@@ -151,4 +176,4 @@ function huidig() {
 }
 
 module.exports = { middleware, hervat, open, identificeer, uitEnvelop, zetDrager, sluit, overdraag,
-  huidig, tellers: () => Object.assign({}, tellers), SOORTEN };
+  huidig, voorBus, tellers: () => Object.assign({}, tellers), SOORTEN };

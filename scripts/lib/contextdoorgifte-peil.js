@@ -29,7 +29,7 @@ const aic = S('ai-context');
 const vf = S('opzet/verzoekframe');
 
 const leeg = () => ({
-  envelop: { binnenVerzoek: 0, metVerzoekCorrelatie: 0, metActor: 0, metSessie: 0, kanalen: {} },
+  envelop: { binnenVerzoek: 0, metVerzoekCorrelatie: 0, metActor: 0, actorSleutel: 0, metSessie: 0, kanalen: {} },
   auth: { n: 0, post: 0, metHandeling: 0, metAiContext: 0, metEffectteller: 0, postMetAlleDrie: 0,
     correlatieEens: 0, correlatieOneens: 0, metFrame: 0, frameEens: 0, frameOneens: 0, frameWaarom: {} },
   i2: [],
@@ -57,6 +57,7 @@ kenv.maak = function (o) {
       e.kanalen[r.kanaal] = (e.kanalen[r.kanaal] || 0) + 1;
       if (r.correlatie && r.correlatie === h.correlatie) e.metVerzoekCorrelatie++;
       if (r.actor) e.metActor++;
+      if (r.actor && /^user-\d+$/.test(r.actor)) e.actorSleutel++;   // I8: een datasleutel op de bus
       if (haak.wieNu() !== haak.HUIS) e.metSessie++;
     }
   } catch (e) { /* peilen breekt nooit een verzoek */ }
@@ -153,7 +154,7 @@ function ijk() {
     try { vf.identificeer({ sleutel: 'ijk-b' }); } catch (e) { /* verwacht: dat is de ijking */ }
     aic.inContext({ ip: req.ip, req }, () => {
       haak.binnen(haak.drager('lid', 'ijk'), () => {
-        kenv.maak({ kanaal: 'ijk', correlatie: req.id });
+        kenv.maak({ kanaal: 'ijk', correlatie: req.id, actor: 'user-1' });   // I8: een datasleutel
         naAfloop = AsyncResource.bind(() => setTimeout(() => {}, 1));
       });
     });

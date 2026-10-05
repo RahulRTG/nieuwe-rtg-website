@@ -13,13 +13,14 @@
    Deze meter is die probe als blijvend instrument: het frame dat erna komt
    moet tegen DEZE getallen bewijzen dat het iets oplost.
 
-   WAT HIJ MEET -- negen invarianten, elk apart en met opzet geen totaalcijfer:
+   WAT HIJ MEET -- tien invarianten, elk apart en met opzet geen totaalcijfer:
 
      I1  een envelop die binnen een verzoek ontstaat, draagt diens correlatie
      I2  de correlatie maakt de server; een client-id is alleen `extern`, begrensd
      I3  handeling, ai-context en req.envelop zijn het eens over de correlatie
      I4  achtergrondwerk erft geen verzoekidentiteit (timers na afloop)
      I5  na sluiten zegt geen context stil "gelukt"
+     I8  op de bus staat als actor een codenaam en nooit een datasleutel user-<n>
      I9  geen enterWith in server/
      I13 elk verzoekframe heeft precies een identiteit (een andere sleutel na
          de eerste is een fout; dezelfde, scherper bekeken, is `herkend`)
@@ -77,6 +78,7 @@ const RICHTING = {
   i3CorrelatieOneens: 'omlaag',
   i4LekPlekken: 'omlaag',
   i5StilNaSluiten: 'omlaag',
+  i8ActorSleutel: 'omlaag',
   i9EnterWith: 'omlaag',
   i10AuthZonderContext: 'omlaag',
   i13TweedeIdentiteit: 'omlaag',
@@ -353,6 +355,7 @@ function ijkServer(R) {
   else {
     if (j.timers.gevuurdNaAfloop < 1 || j.timers.naAfloopMetDrager < 1) fout.push('I4 ziet een timer na afloop niet');
     if (j.envelop.metVerzoekCorrelatie < 1) fout.push('I1 ziet een envelop met verzoekcorrelatie niet');
+    if (!(j.envelop.actorSleutel >= 1)) fout.push('I8 ziet een datasleutel op de bus niet');
     if (j.auth.n - j.auth.metHandeling < 1) fout.push('I10 ziet een auth-punt zonder handeling niet');
     if (j.auth.correlatieEens < 1) fout.push('I3 ziet een correlatie die klopt niet');
     if (!(j.auth.frameOneens >= 1)) fout.push('I14 ziet een frame dat het oneens is niet');
@@ -370,7 +373,7 @@ function samenvatting({ i5, i9, server }) {
   if (server) {
     const m = server.R.meting;
     g.i1 = { binnenVerzoek: m.envelop.binnenVerzoek, metVerzoekCorrelatie: m.envelop.metVerzoekCorrelatie,
-      metActor: m.envelop.metActor, metSessie: m.envelop.metSessie, kanalen: m.envelop.kanalen,
+      metActor: m.envelop.metActor, actorSleutel: m.envelop.actorSleutel || 0, metSessie: m.envelop.metSessie, kanalen: m.envelop.kanalen,
       aandeelMetCorrelatie: breuk(m.envelop.metVerzoekCorrelatie, m.envelop.binnenVerzoek) };
     g.i2 = meetI2(server.i2, m.i2);
     g.i3 = { authPunten: m.auth.n, eens: m.auth.correlatieEens, oneens: m.auth.correlatieOneens };
@@ -397,6 +400,7 @@ function samenvatting({ i5, i9, server }) {
 function tandenVan(g) {
   const t = { i5StilNaSluiten: g.i5.stilNaSluiten, i9EnterWith: g.i9.enterWith };
   if (g.i1 && g.i1.binnenVerzoek) t.i1AandeelMetCorrelatie = g.i1.aandeelMetCorrelatie;
+  if (g.i1 && g.i1.binnenVerzoek) t.i8ActorSleutel = g.i1.actorSleutel || 0;
   if (g.i2) t.i2ClientSleutel = g.i2.clientSleutel;
   if (g.i2 && g.i2.externFout !== null) t.i2ExternFout = g.i2.externFout;
   if (g.i3 && g.i3.authPunten) t.i3CorrelatieOneens = g.i3.oneens;
@@ -457,7 +461,7 @@ if (require.main === module) {
     const { stempel } = require('./lib/stempel');
     const uit = {
       stempel: stempel(),
-      uitleg: 'Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Negen invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.',
+      uitleg: 'Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Tien invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.',
       hoe: 'npm run contextdoorgifte',
       grens: 'Alleen statische leden- en zaakroutes die de rolkaart een rol geeft (vandaag allemaal POST, zie noemer.perMethode) met een leeg lijf, geen PostgreSQL- of Redis-stand, alleen timers via de globale timerfuncties. Een lege noemer is niet vast te stellen.',
       richting: RICHTING,

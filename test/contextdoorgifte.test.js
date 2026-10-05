@@ -2,7 +2,7 @@
    DE CONTEXTDOORGIFTE MAG ALLEEN DE GOEDE KANT OP (scripts/contextdoorgifte.js,
    CONTEXTDOORGIFTE.json).
 
-   Negen invarianten uit het Fase 2-onderzoek naar een verzoekframe. Wat vandaag
+   Tien invarianten uit het Fase 2-onderzoek naar een verzoekframe. Wat vandaag
    rood is staat op zijn huidige stand in `ratel` en mag alleen verbeteren; wat
    groen is mag niet terugvallen. Deze toets houdt drie dingen vast:
 
@@ -36,7 +36,7 @@ test('het register draagt een tand voor elke invariant, en ligt niet onder zijn 
   const fout = m.vergelijk(r.ratel, m.tandenVan(r.gemeten));
   assert.deepStrictEqual(fout, [], 'het register loopt achter op zijn eigen ratel: ' + fout.join('; ') +
     ' -- draai npm run contextdoorgifte en kijk welke invariant terugviel');
-  /* Geen samengesteld cijfer: negen invarianten blijven negen. */
+  /* Geen samengesteld cijfer: tien invarianten blijven tien. */
   assert.ok(!('totaal' in r.gemeten) && !('score' in r.gemeten), 'een totaalcijfer verbergt welke invariant bewoog');
 });
 
@@ -86,9 +86,9 @@ test('zelfijking: het instrument slaat uit op bekend-foute invoer', () => {
   const blind = { ijkKlaar: true, ijk: { timers: { gevuurdNaAfloop: 0, naAfloopMetDrager: 0 },
     envelop: { metVerzoekCorrelatie: 0 }, auth: { n: 0, metHandeling: 0, correlatieEens: 0, metFrame: 0, frameOneens: 0 } },
     frameIjk: { tweedeIdentiteit: 0 } };
-  assert.strictEqual(m.ijkServer(blind).length, 7, 'een peiling die niets ziet heet stuk, niet "alles in orde"');
+  assert.strictEqual(m.ijkServer(blind).length, 8, 'een peiling die niets ziet heet stuk, niet "alles in orde"');
   /* Een peiling van voor het verzoekframe (geen frame-velden) is ook blind voor I13 en I14. */
   assert.strictEqual(m.ijkServer({ ijkKlaar: true, ijk: { timers: { gevuurdNaAfloop: 1, naAfloopMetDrager: 1 },
-    envelop: { metVerzoekCorrelatie: 1 }, auth: { n: 2, metHandeling: 1, correlatieEens: 1 } } }).length, 3);
+    envelop: { metVerzoekCorrelatie: 1, actorSleutel: 1 }, auth: { n: 2, metHandeling: 1, correlatieEens: 1 } } }).length, 3);
   assert.ok(m.ijkServer(null).length > 0, 'geen peiling is geen uitslag');
 });

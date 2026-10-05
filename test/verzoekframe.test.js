@@ -132,19 +132,26 @@ test('hervat: een context die de body-lezer kwijtraakte, krijgt zijn eigen frame
   assert.equal(gezien && gezien.correlatie, 'srv-hervat');
 });
 
-test('schaduw: niemand in server/ leest het frame, alleen de envelop en de montage', () => {
+test('een lezer: de bus-envelop via zetFrameBron; verder niemand in server/ (PR 5)', () => {
   const { zonderCommentaar } = require('../scripts/lib/bron');
   const wortel = path.join(__dirname, '..', 'server');
-  const gevonden = [];
+  const gevonden = [], bronnen = [];
   const loop = (map) => {
     for (const e of fs.readdirSync(map, { withFileTypes: true })) {
       const p = path.join(map, e.name);
       if (e.isDirectory()) { if (e.name !== 'data' && e.name !== 'node_modules') loop(p); continue; }
       if (!e.name.endsWith('.js')) continue;
-      if (/verzoekframe['"]/.test(zonderCommentaar(fs.readFileSync(p, 'utf8')))) gevonden.push(path.relative(wortel, p));
+      const bron = zonderCommentaar(fs.readFileSync(p, 'utf8'));
+      if (/verzoekframe['"]/.test(bron)) gevonden.push(path.relative(wortel, p));
+      if (/\.zetFrameBron\s*\(/.test(bron)) bronnen.push(path.relative(wortel, p));
     }
   };
   loop(wortel);
   assert.deepEqual(gevonden.sort(), ['opzet/envelop.js', 'opzet/verzoekketen.js'],
     'een nieuwe lezer van het verzoekframe is een besluit (Fase 2, PR 5 en later), geen bijvangst');
+  assert.deepEqual(bronnen, ['opzet/verzoekframe.js'],
+    'de bus-envelop leest het frame op EEN manier, en het frame hangt zich daar zelf in');
+  /* En wat die lezer krijgt is identiteit, geen werkstaat. */
+  const v = verzoek();
+  v.binnen(() => assert.deepEqual(Object.keys(frame.voorBus()).sort(), ['actor', 'correlatie', 'hoedanigheid', 'oorzaak']));
 });

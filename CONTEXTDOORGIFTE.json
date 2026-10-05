@@ -1,13 +1,13 @@
 {
  "stempel": {
-  "op": "2026-10-05T12:17:11.413Z",
-  "commit": "105836f36",
+  "op": "2026-10-05T12:33:25.320Z",
+  "commit": "e40699ce4",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/contextdoorgifte.js",
   "node": "v22.22.0"
  },
- "uitleg": "Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Elf invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.",
+ "uitleg": "Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Twaalf invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.",
  "hoe": "npm run contextdoorgifte",
  "grens": "Alleen statische leden- en zaakroutes die de rolkaart een rol geeft (vandaag allemaal POST, zie noemer.perMethode) met een leeg lijf, geen PostgreSQL- of Redis-stand, alleen timers via de globale timerfuncties. Een lege noemer is niet vast te stellen.",
  "richting": {
@@ -19,6 +19,7 @@
   "i5StilNaSluiten": "omlaag",
   "i8ActorSleutel": "omlaag",
   "i9EnterWith": "omlaag",
+  "i11ZonderOorzaak": "omlaag",
   "i12AbonneeInVerzoek": "omlaag",
   "i10AuthZonderContext": "omlaag",
   "i13TweedeIdentiteit": "omlaag",
@@ -38,7 +39,8 @@
   "i14FrameAfwezig": 0,
   "i14FrameOneens": 0,
   "i8ActorSleutel": 0,
-  "i12AbonneeInVerzoek": 0
+  "i12AbonneeInVerzoek": 0,
+  "i11ZonderOorzaak": 0
  },
  "gemeten": {
   "i5": {
@@ -93,9 +95,15 @@
    ]
   },
   "i3": {
-   "authPunten": 3106,
-   "eens": 3106,
+   "authPunten": 3108,
+   "eens": 3108,
    "oneens": 0
+  },
+  "i11": {
+   "proeven": 1,
+   "buiten": "04f2f959b1931026",
+   "oorzaak": "04f2f959b1931026",
+   "zonderOorzaak": 0
   },
   "i4": {
    "gezetInVerzoek": 0,
@@ -106,25 +114,25 @@
    "lekPlekken": 0
   },
   "i13": {
-   "geidentificeerd": 3112,
+   "geidentificeerd": 3114,
    "herkend": 4,
    "tweedeIdentiteit": 0,
    "naSluiten": 0
   },
   "i14": {
-   "authPunten": 3106,
-   "metFrame": 3106,
-   "eens": 3106,
+   "authPunten": 3108,
+   "metFrame": 3108,
+   "eens": 3108,
    "oneens": 0,
    "waarom": {}
   },
   "i10": {
-   "authPunten": 3106,
-   "metHandeling": 3106,
-   "metAiContext": 3106,
-   "metEffectteller": 3106,
-   "post": 3106,
-   "postMetAlleDrie": 3106
+   "authPunten": 3108,
+   "metHandeling": 3108,
+   "metAiContext": 3108,
+   "metEffectteller": 3108,
+   "post": 3108,
+   "postMetAlleDrie": 3108
   },
   "noemer": {
    "verzoeken": 3175,
@@ -133,10 +141,10 @@
    },
    "statussen": {
     "200": 786,
-    "400": 477,
+    "400": 478,
     "403": 722,
     "404": 952,
-    "409": 177,
+    "409": 176,
     "503": 61
    },
    "rollen": [

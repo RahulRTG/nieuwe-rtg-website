@@ -1,5 +1,5 @@
 /* Werkelijke HTTP-deurproef. De protocol- en end-to-endproeven gaan dieper in
-   op betekenis; deze proef bewijst op een echte server dat alle vijf nieuwe
+   op betekenis; deze proef bewijst op een echte server dat alle Loop-ingangen
    ingangen gemount zijn en zonder server-derived actor/WorkOS-context dicht
    blijven. Daarmee komen ze ook uit waarneming in het routejournaal terecht. */
 'use strict';
@@ -37,7 +37,9 @@ test('alle Loop Fabric HTTP-ingangen bestaan en blijven zonder identiteit dicht'
     /* werkPoort gebruikt voor alle bestaande WorkOS-routes 403 voor een
        onbekende werkruimte/lidcombinatie; deze slice verandert die betekenis
        niet om een generieke authcode af te dwingen. */
-    ['/api/bedrijf/loop/procedure/change', 403]
+    ['/api/bedrijf/loop/procedure/change', 403],
+    ['/api/bedrijf/loop/runbook/change', 403],
+    ['/api/bedrijf/loop/incident/observe', 403]
   ]) {
     const r = await post(path, { workspaceCode: 'WLOOP' });
     assert.equal(r.status, status, path + ' hoort zonder identiteit dicht te blijven: ' + JSON.stringify(r.body));

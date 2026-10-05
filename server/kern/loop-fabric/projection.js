@@ -13,27 +13,30 @@ module.exports=function projection({read,tx,time,livingWorld,workSource}) {
   }
   function project(state,event) {
     if (event.protocol) {
-      const observation=P.clone(event.protocol),id=observation.objectRef.id;
+      const observation=P.clone(event.protocol),id=P.refKey(observation.objectRef);
       state.observations[id]={eventId:event.id,eventHash:P.hash(event),record:{objectRef:observation.objectRef,
-        placeRef:observation.placeRef,planRef:observation.planRef,blueprintRef:observation.blueprintRef,
+        subjectRef:observation.subjectRef || observation.placeRef,scopeRefs:observation.scopeRefs ||
+          [observation.placeRef,observation.blueprintRef].filter(Boolean),placeRef:observation.placeRef,
+        planRef:observation.planRef,blueprintRef:observation.blueprintRef,
         status:observation.status,sharing:observation.sharing,recordedAt:observation.recordedAt,
         verificationOf:observation.verificationOf,assessment:observation.assessment}};
-      lineage(state,observation.objectRef,'observed_at',observation.placeRef,{domain:'living-world',eventRef:event.id,
+      const subject=observation.subjectRef || observation.placeRef;
+      lineage(state,observation.objectRef,'observed_at',subject,{domain:observation.objectRef.domain,eventRef:event.id,
         at:observation.recordedAt,visibility:observation.sharing.visibility,provenance:{basis:observation.basis}});
       if (observation.planRef) lineage(state,observation.planRef,'produced_observation',observation.objectRef,
-        {domain:'living-world',eventRef:event.id,at:observation.recordedAt,visibility:observation.sharing.visibility});
+        {domain:observation.objectRef.domain,eventRef:event.id,at:observation.recordedAt,visibility:observation.sharing.visibility});
       if (observation.verificationOf) lineage(state,observation.verificationOf,'observed_after_change',observation.objectRef,
-        {domain:'living-world',eventRef:event.id,at:observation.observedAt,visibility:observation.sharing.visibility,
+        {domain:observation.objectRef.domain,eventRef:event.id,at:observation.observedAt,visibility:observation.sharing.visibility,
           provenance:{assessment:observation.assessment,note:'temporal-verification-not-causality'}});
     }
     if (event.receipt) {
-      const receipt=P.clone(event.receipt),receiptRef={domain:'workos',type:'change-receipt',id:receipt.receiptId,version:1};
+      const receipt=P.clone(event.receipt),receiptRef={domain:receipt.sourceDomain,type:'change-receipt',id:receipt.receiptId,version:1};
       state.changes[receipt.receiptId]={eventId:event.id,eventHash:P.hash(event),receipt};
-      lineage(state,receipt.observationRef,'informed_decision',receipt.decisionRef,{domain:'workos',eventRef:event.id,
+      lineage(state,receipt.observationRef,'informed_decision',receipt.decisionRef,{domain:receipt.sourceDomain,eventRef:event.id,
         receiptRef:receipt.receiptId,at:receipt.appliedAt,visibility:'workspace',provenance:{contextHash:receipt.expectation.contextHash}});
-      lineage(state,receipt.decisionRef,'authorized_change',receipt.newRef,{domain:'workos',eventRef:event.id,
+      lineage(state,receipt.decisionRef,'authorized_change',receipt.newRef,{domain:receipt.sourceDomain,eventRef:event.id,
         receiptRef:receipt.receiptId,at:receipt.appliedAt,visibility:'workspace'});
-      lineage(state,receipt.newRef,'confirmed_by',receiptRef,{domain:'workos',eventRef:event.id,
+      lineage(state,receipt.newRef,'confirmed_by',receiptRef,{domain:receipt.sourceDomain,eventRef:event.id,
         receiptRef:receipt.receiptId,at:receipt.appliedAt,visibility:'workspace'});
     }
   }

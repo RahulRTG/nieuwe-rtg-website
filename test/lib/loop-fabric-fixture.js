@@ -28,7 +28,12 @@ function fixture(previous) {
     lead:{id:'lead',naam:'Olivia Organisator',status:'actief',rtgKey:'user-1',rollen:[{id:'directie',van:null,tot:null,at:now}]}
   },kennis:{procedure_v1:{id:'procedure_v1',titel:'Event toegankelijkheidscheck',tekst:'Controleer de hoofdingang.',
     soort:'procedure',eigenaar:'Olivia Organisator',versie:1,recht:'kennis',vorigeId:null,vervallen:false,
-    geldigTot:'2027-10-04',laatstGeControleerd:'2026-10-04',at:now,door:'Olivia Organisator'}},
+    geldigTot:'2027-10-04',laatstGeControleerd:'2026-10-04',at:now,door:'Olivia Organisator'},
+    runbook_v1:{id:'runbook_v1',titel:'Uitrol-runbook',tekst:'Controleer de primaire route.',
+      soort:'runbook',eigenaar:'Olivia Organisator',versie:1,recht:'kennis',vorigeId:null,vervallen:false,
+      geldigTot:'2027-10-04',laatstGecontroleerd:'2026-10-04',at:now,door:'Olivia Organisator'}},
+    storingen:{incident_1:{id:'incident_1',wat:'Bij de uitrol is de terugvalroute bijna overgeslagen.',ernst:'near-miss',
+      begonnenAt:now,opgelostAt:null,tickets:[],evaluatie:null,at:now,door:'Olivia Organisator'}},
     besluiten:{},journaal:[],gebeurtenissen:[],at:now};
   db.data.werkruimtes={WLOOP:workspace};
   async function command(actor,action,data,operationId) {
@@ -64,11 +69,12 @@ function fixture(previous) {
     return plan.id;
   }
   function decisionRoutes() {
-    const routes={}, app={post:(path,handler)=>{routes[path]=handler;}}, member=workspace.leden.lead;
+    const currentWorkspace=db.data.werkruimtes.WLOOP;
+    const routes={}, app={post:(path,handler)=>{routes[path]=handler;}}, member=currentWorkspace.leden.lead;
     let rid=0;
     const sctx={app,save:()=>{},schoon:(v,n)=>String(v == null ? '' : v).trim().slice(0,n),nu:()=>now,
       rid:()=>('decision_'+(++rid)),dag:()=>now.slice(0,10),
-      werkPoort:()=>({w:workspace,l:member,directie:false,rechten:['kennis','besluit']}),
+      werkPoort:()=>({w:currentWorkspace,l:member,directie:false,rechten:['kennis','besluit']}),
       log:(w,l,wat,waarover,reden)=>w.journaal.push({wat,waarover,reden,wie:l.naam,at:now}),
       eigenVeld:(map,key)=>Object.prototype.hasOwnProperty.call(map,key) ? map[key] : null,loopFabric:fabric,
       regelMagSluiten:()=>({ontbreekt:[]})};
@@ -93,12 +99,13 @@ function fixture(previous) {
     assert.equal((await api.post('/api/bedrijf/besluit/stemronde',{besluitId:id})).status,200);
     assert.equal((await api.post('/api/bedrijf/besluit/stem',{besluitId:id,stem:'voor',toelichting:'Uitvoeren en nameten.'})).status,200);
     out=await api.post('/api/bedrijf/besluit/sluit',{besluitId:id,evalueerOp:'2026-11-01'});
-    assert.equal(out.status,200,JSON.stringify(out.body)); return workspace.besluiten[id];
+    assert.equal(out.status,200,JSON.stringify(out.body)); return db.data.werkruimtes.WLOOP.besluiten[id];
   }
   const api={db,world,workSource,fabric,command,row,setupEvent,eventRun,decide,
     propose,
     time:()=>now,clock:value=>{now=value;},fault:(name,when)=>{fault=name?{name,when}:null;},
-    procedureRef:()=>({domain:'workos',type:'procedure',id:'procedure_v1',version:1})};
+    procedureRef:()=>({domain:'workos',type:'procedure',id:'procedure_v1',version:1}),
+    runbookRef:()=>({domain:'workos',type:'runbook',id:'runbook_v1',version:1})};
   Object.defineProperty(api,'workspace',{get:()=>db.data.werkruimtes.WLOOP});
   return api;
 }

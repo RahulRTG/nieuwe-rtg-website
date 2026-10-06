@@ -17,9 +17,10 @@
    het pad staat in INLOG_PADEN.
 
    Elke toets met een eigen lid, zodat ze niet van elkaars volgorde afhangen.
-   Toets 6 laat de inlogpauze springen en staat daarom als laatste. Elk verzoek
+   Toets 7 laat de inlogpauze springen en staat daarom als laatste. Elk verzoek
    komt van een eigen adres, zodat de rem per adres en de quarantaine van De
-   Wacht niet meten wat hier niet getoetst wordt.
+   Wacht niet meten wat hier niet getoetst wordt. Behalve in toets 6, die juist
+   de rem per adres meet.
 
    Draai los: node --test test/staffjoin-orakel.test.js
    ========================================================================== */
@@ -88,7 +89,7 @@ test.before(async () => {
   // vooraf, want de registratie gaat dicht zodra de noodrem drie bronnen telt
   for (const e of ['eva@orakel.test', 'ruben@orakel.test', 'wout@orakel.test',
     'xander@orakel.test', 'tom@orakel.test', 'pim@orakel.test', 'uit@joinorg.test',
-    'iris@orakel.test']) await lid(e);
+    'iris@orakel.test', 'olaf@orakel.test']) await lid(e);
   // Vera ook met een gebruikersnaam: toets 3 gokt onder allebei
   await lid('vera@orakel.test', VERA_NAAM);
 });
@@ -261,6 +262,42 @@ test('5. een geclaimde kassacode die de manager introk, geeft goed en fout wacht
   }
 });
 
+/* DE REM PER ADRES OP DE AANMELDING (I7 uit de keuring van ronde 6). Een
+   geslaagde aanmelding leegde de adresemmer ('join:'+adres). Met een eigen
+   account en een eigen kassacode zette een aanvaller hem dus terug wanneer hij
+   wilde: de les van N4 (kern/identiteit/wachtwoordrem.js, de kop). Hier: negen
+   weigeringen, een geslaagde aanmelding, dan de tiende weigering, en daarna is
+   het adres dicht (429), ook voor een aanmelding die verder klopt.
+
+   VANAF EEN LOKAAL ADRES, zoals in test/werkplek-rem.test.js: gaat de emmer
+   dicht, dan meldt hij brute force en zet de noodrem een vreemd adres in
+   quarantaine (403 voor alles). Die 403 zou een ontbrekende rem toedekken; het
+   schild laat lokale adressen door, dus hier is de echte 429 te zien. */
+test('6. een geslaagde aanmelding zet de rem per adres niet terug', async () => {
+  const OLAF = 'olaf@orakel.test';
+  const vanAdres = async (ip, body) => {
+    const r = await fetch(srv.base + '/api/supplier/staff/join', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip }, body: JSON.stringify(body) });
+    return { status: r.status, tekst: await r.text() };
+  };
+  const L = '127.0.0.1';
+  const eigen = await kassacode(kikunoi), nogEen = await kassacode(kikunoi);
+  for (let i = 0; i < 9; i++) {
+    const r = await vanAdres(L, { bedrijf: zaakNaam, kassacode: 'RTG-VERZONNEN-' + i, login: OLAF, password: WW });
+    assert.equal(r.status, 401, 'weigering ' + (i + 1) + ': ' + r.status + ' ' + r.tekst.slice(0, 120));
+  }
+  const gelukt = await vanAdres(L, { bedrijf: zaakNaam, kassacode: eigen, login: OLAF, password: WW });
+  assert.equal(gelukt.status, 200, 'de eigen aanmelding slaagt: ' + gelukt.status + ' ' + gelukt.tekst.slice(0, 120));
+  const tiende = await vanAdres(L, { bedrijf: zaakNaam, kassacode: 'RTG-VERZONNEN-9', login: OLAF, password: WW });
+  assert.equal(tiende.status, 401, 'de tiende weigering zelf is nog 401: ' + tiende.status);
+  const dicht = await vanAdres(L, { bedrijf: zaakNaam, kassacode: nogEen, login: OLAF, password: WW });
+  assert.equal(dicht.status, 429, 'na tien weigeringen vanaf dit adres is het dicht, ook als er tussendoor een '
+    + 'aanmelding slaagde: ' + dicht.status + ' ' + dicht.tekst.slice(0, 120));
+  // TEGENPROEF: een ander adres is niet dicht; de echte status van een weigering
+  const ander = await vanAdres('::1', { bedrijf: zaakNaam, kassacode: 'RTG-VERZONNEN', login: OLAF, password: WW });
+  assert.equal(ander.status, 401, 'een ander adres krijgt de gewone weigering: ' + ander.status + ' ' + ander.tekst.slice(0, 120));
+});
+
 /* De pauze laten springen zoals een echte aanval: zes bronnen, elk elf mislukte
    pogingen op een eigen naam (zie test/inlogpauze-spelling.test.js). */
 async function laatPauzeSpringen() {
@@ -275,7 +312,7 @@ async function laatPauzeSpringen() {
   assert.equal(proef.status, 503, 'de pauze hoort na zes bronnen gesprongen te zijn: ' + kort(proef));
 }
 
-test('6. de inlogpauze geldt ook voor de aanmelding (laatste toets: de pauze blijft staan)', async () => {
+test('7. de inlogpauze geldt ook voor de aanmelding (laatste toets: de pauze blijft staan)', async () => {
   const code = await kassacode(kikunoi);
   await laatPauzeSpringen();
   for (const pad of ['/api/supplier/staff/join', '/api/supplier/staff/join/']) {

@@ -15,7 +15,8 @@
      3. de kassacode voor DIT lid: een geclaimde code hervat alleen voor wie hem
         claimde, en een uitgezet account komt er niet door;
      4. pas dan "al aangemeld", en de koppeling.
-   Zonder geldige kassacode wordt het account dus niet eens opgezocht.
+   Zonder geldige kassacode wordt het wachtwoord dus niet eens getoetst. Het
+   account wordt wel meteen opgezocht, maar alleen als sleutel voor de rem.
 
    DEZELFDE ACCOUNTEMMER ALS DE GEWONE INLOG. Met een geldige kassacode is een
    fout wachtwoord wel een gok, en die telt in de emmer op het account van
@@ -61,23 +62,27 @@ app.post('/api/supplier/staff/join', async (req, res) => {
   // een weigering in stap 1 tot en met 3; `gok` alleen bij een fout wachtwoord
   async function onjuist(gok) {
     noteFailedTry(bucket, req.ip);
-    if (gok) accountRem.gok(req.ip, login);
-    await accountRem.wacht(login);   // bij ELKE weigering; zie de kop
+    if (gok) accountRem.gok(req.ip, login, lid);
+    await accountRem.wacht(login, lid);   // bij ELKE weigering; zie de kop
     return res.status(401).json({ error: ONJUIST });
   }
   let s, lid;
   try {
+    /* Het account wordt hier al opgezocht, maar alleen als SLEUTEL voor de
+       accountemmer: die hangt aan het account en niet aan de getikte naam (I1),
+       en ook een weigering in stap 1 wacht zolang het account onder vuur ligt.
+       Of het bestaat en of het wachtwoord klopt, telt pas in stap 2. */
+    lid = accounts.findByLogin(login);
     // 1) het bedrijf en zijn kassacode, nog zonder het account
     s = findSupplierByName(bedrijf);
     if (!s || !(await uitnodiging.kassacodeHoortBij(kassacode, s.code))) return onjuist(false);
     // 2) een eigen RTG-account (een betaalde pas is niet nodig)
-    lid = accounts.findByLogin(login);
     if (!lid || !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) return onjuist(true);
     // 3) de code voor dit lid, en een lid dat nog actief is
     if ((accounts.isActief && !accounts.isActief(lid)) ||
         !(await uitnodiging.kassacodeHoortBij(kassacode, s.code, lid))) return onjuist(false);
   } catch (e) { console.error('[staff-join] veilige verwerking mislukt'); return res.status(503).json({ error: STUK }); }
-  accountRem.gelukt(login);
+  accountRem.gelukt(login, lid);
   // 4) alles klopt: niet dubbel aanmelden bij hetzelfde bedrijf
   if (accounts.staffByMember(s.code, lid.id)) {
     return res.status(409).json({ error: 'U bent al aangemeld bij dit bedrijf. Log in met uw persoonlijke RTG-account.' });

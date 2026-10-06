@@ -34,6 +34,7 @@ const { zwaarApi } = require('./zwaarpasskey');
 const NORA = 'nora@rtg.example', NORA_WW = 'werk';
 const EIGENAAR = 'roellie.i@gmail.com', EIGENAAR_WW = 'Imran';
 const WW = 'geheim12';
+const VERA_NAAM = 'vera.orakel';
 const PAUZE = /Inloggen is enkele minuten gepauzeerd/;
 /* Ruim boven een gewoon antwoord en ruim onder de twee seconden van de
    accountemmer, zoals in test/inlogrem.test.js. */
@@ -71,8 +72,8 @@ async function kassacode(zaak) {
   assert.equal(inv.status, 200, 'uitnodiging: ' + kort(inv));
   return inv.body.invite.kassacode;
 }
-async function lid(email) {
-  const reg = await api('/api/auth/register', { name: 'Lid ' + email.split('@')[0], email, password: WW, geboortedatum: '1990-01-01' });
+async function lid(email, username) {
+  const reg = await api('/api/auth/register', { name: 'Lid ' + email.split('@')[0], email, username, password: WW, geboortedatum: '1990-01-01' });
   assert.ok(reg.body.token, 'registratie van ' + email + ': ' + kort(reg));
   return email;
 }
@@ -84,8 +85,10 @@ test.before(async () => {
   ponto = await managerVan('PONTO');
   zaakNaam = kikunoi.naam;
   // vooraf, want de registratie gaat dicht zodra de noodrem drie bronnen telt
-  for (const e of ['eva@orakel.test', 'ruben@orakel.test', 'vera@orakel.test', 'wout@orakel.test',
+  for (const e of ['eva@orakel.test', 'ruben@orakel.test', 'wout@orakel.test',
     'xander@orakel.test', 'tom@orakel.test', 'pim@orakel.test', 'uit@joinorg.test']) await lid(e);
+  // Vera ook met een gebruikersnaam: toets 3 gokt onder allebei
+  await lid('vera@orakel.test', VERA_NAAM);
 });
 test.after(async () => {
   await stop(srv);
@@ -160,15 +163,17 @@ test('3. een gok op het wachtwoord telt in de accountemmer van de gewone inlog',
      ligt de grens van de aanmelding op die van /api/auth/login (25), en niet
      ergens anders.
 
-     EN IN DRIE SPELLINGEN. De inlog legt het adres in kleine letters en zonder
-     spaties in de emmer. Doet de aanmelding dat anders, dan krijgt elke
-     spelling een eigen emmer en telt een aanval in hoofdletters nergens mee.
-     De 25e gok heeft daarom een afwijkende spelling, en de inlog hieronder
-     meet op de kleine letters. */
-  const SPELLING = ['  Vera@Orakel.Test ', VERA, VERA.toUpperCase()];
+     EN IN VIJF SPELLINGEN, ONDER TWEE NAMEN. De emmer hangt aan het ACCOUNT
+     dat findByLogin vindt, en dat vindt Vera op haar e-mailadres en op haar
+     gebruikersnaam, in elke spelling. Hing de emmer aan de getikte tekst, dan
+     kreeg elke naam en elke spelling een eigen emmer en telde een aanval in
+     hoofdletters of onder de gebruikersnaam nergens mee (I1). De 25e gok
+     gebruikt daarom de gebruikersnaam, en de inlog hieronder meet op het
+     e-mailadres in kleine letters. */
+  const SPELLING = ['  Vera@Orakel.Test ', VERA, 'VERA.ORAKEL', VERA.toUpperCase(), ' ' + VERA_NAAM + ' '];
   const duur = [];
   for (let i = 0; i < 25; i++) {
-    const r = await join(zaakNaam, code, SPELLING[i % 3], 'gok' + i);
+    const r = await join(zaakNaam, code, SPELLING[i % SPELLING.length], 'gok' + i);
     assert.equal(r.status, 401, 'gok ' + i + ': ' + kort(r));
     duur.push(r.ms);
   }

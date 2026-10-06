@@ -1,5 +1,5 @@
 /* Accounts, deel "sessiegrens": EEN OPVATTING VAN `sessies_vanaf`, voor
-   sessie- en actietokens.
+   sessie- en actietokens, en onderaan een van een uitgezet account.
 
    Per account staat een moment, en wat daarvoor is uitgegeven telt niet meer.
    Dat geldt voor een sessietoken (./tokens.js) en sinds RTG-V1 N12 ook voor
@@ -55,4 +55,25 @@ function voorGrens(u, uitgegeven) {
   return Number(u.sessies_vanaf || 0) > (Number.isFinite(t) ? t : 0);
 }
 
-module.exports = { voorGrens };
+/* EN EEN OPVATTING VAN "UITGEZET" (RTG-V1 N20). De tweede reden waarom een
+   geldig getekend token niet meer telt: het account staat op non-actief,
+   bijvoorbeeld uit dienst gemeld door de organisatie via SCIM
+   (accounts/users.js zetActief). Staatloze tokens zijn niet allemaal terug te
+   halen, een vlag op het account wel. Uitzetten is geen wissen: zet de
+   organisatie het account weer aan, dan telt een token dat nog niet verlopen
+   of ingetrokken is gewoon weer.
+
+   Het gold alleen voor een sessietoken. Een actietoken (2FA-bewijs,
+   mailboxlink, sso-overdracht) gaf bij een uitgezet account de gebruiker
+   terug, dus een openstaande mailwissel ging door en een bewijs uit stap een
+   leverde een (meteen weer geweigerd) sessietoken op, met een verbruikte code
+   en een vastgelegde inlog. Nu lezen verifyToken, verifyActionToken en
+   accounts.isActief alle drie deze functie, zodat "uit dienst" niet per deur
+   iets anders kan betekenen.
+
+   ALLEEN DE WAARDE 0 IS UIT. De kolom staat standaard op 1, en een account
+   zonder kolom (van voor de migratie) of zonder account (dat beslist de
+   aanroeper, zoals bij voorGrens) is niet uitgezet. */
+const uitgezet = (u) => !!u && u.actief === 0;
+
+module.exports = { voorGrens, uitgezet };

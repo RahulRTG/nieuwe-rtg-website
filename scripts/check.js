@@ -2058,7 +2058,17 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
          gevaarlijke richting bij deze regel: een gemiste melding is stil.
          Routes die hun bewijs echt in het lijf dragen (RTG iD met een idToken)
          staan nu bij naam op de publieke lijst, met die reden erbij. */
-      if (POORT_BINNEN.test(staart) || /\b(401|403)\b/.test(staart)) { viaBinnen++; continue; }
+      if (POORT_BINNEN.test(staart)) { viaBinnen++; continue; }
+      /* EEN KALE 401 OF 403 IS EEN TEKSTAFSTAND EN GEEN POORT. Hij telt hier
+         als gesloten, maar hij maakt een uitzondering met een reden niet
+         overbodig. /api/auth/login flipte daar drie keer op: zijn 401 schoof
+         het venster in of uit zodra de handler korter of langer werd (de laatste
+         keer toen de wachtwoordrem naar kern/identiteit/wachtwoordrem.js
+         verhuisde, N28), terwijl er niets veranderde aan wie er binnenkomt.
+         ./lib/publiek.js zegt daar zelf: de naam blijft staan. De opruimcontrole
+         hieronder geldt dus alleen voor een echte poort (een poortwachter of
+         POORT_BINNEN). */
+      if (/\b(401|403)\b/.test(staart)) { viaBinnen++; if (PUBLIEK.has(pad)) gezien.add(pad); continue; }
       if (PUBLIEK.has(pad)) { gezien.add(pad); continue; }
       gaten++;
       fout(path.relative(ROOT, f) + ': ' + pad + ' heeft geen poort en staat niet op de publieke lijst' +

@@ -29,15 +29,23 @@
    saldo of een betaling.
 
    Staat VOOR de betaalwebhooks en de body-lezer (./verzoekketen.js): een
-   weigering hoeft het lijf niet te lezen. */
+   weigering hoeft het lijf niet te lezen.
+
+   EN EEN TWEEDE BLIK BIJ HET ANTWOORD (N11): een verzoek dat hier nog door
+   mocht en tijdens zijn werk de afzetting meemaakte, krijgt geen 200 maar een
+   503. Waarom en waar precies staat in ./standbypoort-antwoord.js. */
 'use strict';
+
+const { bewaakAntwoord } = require('./standbypoort-antwoord');
 
 const LEZEN = new Set(['GET', 'HEAD', 'OPTIONS']);
 
 function standbyPoort(db) {
   return function (req, res, next) {
-    if (db.writable || LEZEN.has(req.method)) return next();
+    if (LEZEN.has(req.method)) return next();
+    // De clusterroute blijft vrij, ook bij het antwoord: de demote zelf zegt 200.
     if (String(req.path || '').startsWith('/api/cluster/')) return next();
+    if (db.writable) { bewaakAntwoord(res, db); return next(); }
     res.set('Retry-After', '2');
     res.status(503).json({ error: 'Deze server is stand-by en neemt nu geen wijzigingen aan. Probeer het over een paar seconden opnieuw.' });
   };

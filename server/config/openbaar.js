@@ -138,11 +138,13 @@ function keurOpenbareBouwstand(env, bakken) {
     for (const f of schaduwFouten) {
       waarschuwingen.push('SCHADUW (zou de start blokkeren met NODE_ENV=production): ' + f);
     }
-    if (schaduwFouten.length) {
-      waarschuwingen.push('SCHADUW: ' + schaduwFouten.length + ' productieregel(s) zouden deze start blokkeren. '
-        + 'APP_URL wijst naar een openbaar adres (' + stand.host + ') terwijl NODE_ENV niet op production staat, '
-        + 'dus de productiekeuring wordt overgeslagen. Zet NODE_ENV=production zodra bovenstaande klopt.');
-    }
+    /* A-P1-02: een openbare installatie zonder NODE_ENV=production start NIET.
+       Het was een melding; nu is het een harde fout, want zonder die vlag
+       draaien de productiekeuring, de testomgevingsgrendels en de cookieregels
+       niet. 'onbekend' blijft een melding: het adres is dan niet vast te stellen. */
+    hardeFouten.push('APP_URL wijst naar een openbaar adres (' + stand.host + ') terwijl NODE_ENV niet op production staat. '
+      + 'Dan wordt de productiekeuring overgeslagen (' + schaduwFouten.length + ' regel(s) zouden nu blokkeren). '
+      + 'Zet NODE_ENV=production (alle officiele startpaden doen dat al), of zet APP_URL op een lokaal adres.');
   }
 
   return stand;

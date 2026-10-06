@@ -82,6 +82,12 @@ while IFS= read -r regel || [ -n "$regel" ]; do
   export "$naam=$waarde"
 done < "$ENVBESTAND"
 
+# Dit script start ALTIJD de publieke server. NODE_ENV=production wordt hier
+# afgedwongen en niet aan het omgevingsbestand overgelaten (audit A-P1-02): een
+# bestand zonder die regel liet de server anders met ontwikkelaarsgedrag op een
+# publiek adres draaien. Net als scripts/native-start.js.
+export NODE_ENV=production
+
 # ---------- 2. node zoeken ----------
 # Homebrew ACHTERAAN: launchd geeft een daemon een kale PATH zonder node, dus
 # achteraan is genoeg om hem te vinden. Vooraan zou een oude node in

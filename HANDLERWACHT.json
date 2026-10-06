@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-06T02:48:28.752Z",
-  "commit": "77b3d146",
+  "op": "2026-10-06T07:59:50.699Z",
+  "commit": "1e7a7a90",
   "boomVuil": false,
   "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
@@ -315,13 +315,13 @@
  "perRoute": [
   {
    "sleutel": "POST /api/aanmeld/start",
-   "bestand": "server/routes/aanmeldgesprek.js:59",
+   "bestand": "server/routes/aanmeldgesprek.js:65",
    "staat": "openbaar",
    "reden": "het aanmeldgesprek begint voor er een account is; rem van 40 berichten per minuut per ip"
   },
   {
    "sleutel": "POST /api/aanmeld/zeg",
-   "bestand": "server/routes/aanmeldgesprek.js:66",
+   "bestand": "server/routes/aanmeldgesprek.js:72",
    "staat": "eigenControle"
   },
   {

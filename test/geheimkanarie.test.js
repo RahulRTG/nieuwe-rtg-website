@@ -132,3 +132,31 @@ test('productie met alleen geheimen en verder niets: de weigering noemt namen, n
   assert.notEqual(code, 0, 'een productieserver zonder geldige configuratie hoort te weigeren');
   eisSchoon('productieweigering', s.uit);
 });
+
+/* A-P1-01 LETTERLIJK, zoals de audit hem reproduceerde: FAKE-AUDIT-SECRET in de
+   Redis-URL, tegen een ECHTE Redis die een wachtwoord eist (dus het AUTH-foutpad,
+   niet alleen een dichte poort), en dezelfde klasse voor de database- en
+   provider-URL's. Nergens in stdout of stderr mag de string staan. */
+test('A-P1-01: FAKE-AUDIT-SECRET in Redis-, database- en provider-URLs komt nergens in de uitvoer', async t => {
+  const GEHEIM = 'FAKE-AUDIT-SECRET';
+  const redisPoort = await vrijePoort();
+  const redis = spawn('redis-server', ['--port', String(redisPoort), '--bind', '127.0.0.1', '--requirepass', 'het-echte-wachtwoord',
+    '--save', '', '--appendonly', 'no'], { stdio: 'ignore' });
+  t.after(() => redis.kill('SIGKILL'));
+  await new Promise(r => setTimeout(r, 400));
+  assert.equal(redis.exitCode, null, 'redis-server is vereist voor deze proef en startte niet');
+  const s = await start({ REDIS_URL: 'redis://default:' + GEHEIM + '@127.0.0.1:' + redisPoort + '/0',
+    DATABASE_URL: 'postgresql://rtg:' + GEHEIM + '@127.0.0.1:1/rtg',
+    SMTP_URL: 'smtps://post:' + GEHEIM + '@127.0.0.1:1', LOCAL_AI_URL: 'http://tok:' + GEHEIM + '@127.0.0.1:1', LOCAL_AI_MODEL: 'x',
+    ERR_WEBHOOK_URL: 'http://hook:' + GEHEIM + '@127.0.0.1:1/fout' });
+  t.after(() => s.stop());
+  const antwoorden = [];
+  for (const [m, p] of [['GET', '/api/health'], ['POST', '/api/auth/forgot'], ['POST', '/api/chat'], ['GET', '/api/notifications']])
+    antwoorden.push(await roep(s.basis, m, p, '{"email":"a@b.nl","bericht":"hoi"}'));
+  await new Promise(r => setTimeout(r, 2500));
+  const alles = [...s.uit, ...antwoorden.map(a => a.tekst + a.koppen)].join('\n');
+  assert.ok(alles.length > 0, 'de server gaf geen uitvoer; dan is er niets gemeten');
+  assert.match(alles, /WRONGPASS/, 'het Redis-AUTH-foutpad werd niet geraakt; dan bewijst deze proef niets over A-P1-01');
+  const i = alles.indexOf(GEHEIM);
+  assert.equal(i, -1, 'FAKE-AUDIT-SECRET gelekt: ' + alles.slice(Math.max(0, i - 120), i + 40));
+});

@@ -514,6 +514,10 @@ const EIGEN_MODULE = new Map([
   ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sqlite.test.js', ['server/kern/living-world/index.js']],
   ['living-world.pg.test.js', ['server/kern/living-world/index.js']],
+  /* Deze toets gebruikt bewust de gedeelde living-world-fixture. Daardoor staat
+     de echte bronrequire een niveau dieper en kan modulesVan() hem niet uit het
+     toetsbestand zelf afleiden. De Commons-grendels zitten in actions.js. */
+  ['living-world-commons-release.test.js', ['server/kern/living-world/actions.js']],
   // This worker test executes the real source in a VM, not through require.
   ['pass-cache.test.js', ['public/shared/sw-pass-assets.js']],
   ['operationeel-meter.test.js', ['scripts/lib/operationeel/beoordeel.js']],

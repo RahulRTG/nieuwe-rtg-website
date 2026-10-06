@@ -60,73 +60,73 @@ De 98 technische capabilities hebben ieder precies één primaire bronprerequisi
 
 ## Unlock Roadmap
 
-1. **P08_PERSONAL_STRUCTURAL_RELEASE — PROVEN_BOUNDED**
+1. **P08_PERSONAL_STRUCTURAL_RELEASE: PROVEN_BOUNDED**
    Semantiek: Een vrijwillige persoonlijke bijdrage maakt na minimization en unlinking een nieuw structureel artifact; de private bron wordt niet gekopieerd.
    Capabilities: `rechterhand`, `neiging`, `privekantoor`, `life`, `doelen`, `dagmetingen`, `gemoed`, `gewoonten`, `training`, `tijdlijn`, `voeding`, `rust`, `ov-spar`
    Bewijs: `experience.living-world-contribution`, `service.process-improvement`
    Volgende grens: Iedere nieuwe bron vereist eigen vrijwilligheid, minimization en unlinkingbewijs.
 
-2. **P01_VERSIONED_SOURCE_RELEASE — PROVEN_BOUNDED**
+2. **P01_VERSIONED_SOURCE_RELEASE: PROVEN_BOUNDED**
    Semantiek: Een bron geeft exact object, versie, scope, doel, geldigheid en withdrawalstatus vrij; de consumer kopieert geen bronwaarheid.
    Capabilities: `leerhuis`, `dom-les`, `dom-leerstof`, `dom-onderwijs`, `ov-bijles`, `rtf-leerpaspoort`, `dom-library`, `dom-boeken`, `ov-krant`, `dom-site`, `dom-eigendomein`
    Bewijs: `library-edition-to-academy`
    Volgende grens: Nieuwe source owners blijven PHASE tot hun eigen versioned release en withdrawal zijn bewezen.
 
-3. **P07_WORKFORCE_PROCESS_SEPARATION — PHASE**
+3. **P07_WORKFORCE_PROCESS_SEPARATION: PHASE**
    Semantiek: Alleen versioned processtate kan organizational learning voeden; menselijke prestatie, communicatie en loopbaan blijven afzonderlijk en private-first.
    Capabilities: `staff`, `dom-werkvloer`, `ov-kantoorgesprek`, `ov-werkmail`, `member-werk`, `carriereledger`, `supplier-apply`, `werving`, `vakbewijs`, `dom-metier`, `dom-vak`
    Bewijs: geen volledige source-slice
    Volgende grens: Decomposeer eerst processtate en menselijke context; LC07 blokkeert persoonsgerichte organizational memory.
 
-4. **P11_EVENT_FEEDBACK_RELEASE — PROVEN_BOUNDED**
+4. **P11_EVENT_FEEDBACK_RELEASE: PROVEN_BOUNDED**
    Semantiek: Vrijwillige feedback is event- en purpose-bound en wordt pas na review/minimization een structurele eventles.
    Capabilities: `ontmoetingen`, `social`, `rtf-contacten`, `tickets`, `supplier-events`, `dom-agenda`, `dom-meet`, `bk-tickets`, `fs-terrein`, `fs-werk`, `fs-gast`
    Bewijs: `experience.living-world-contribution`, `workos.accessibility-procedure`
    Volgende grens: Andere event owners blijven PHASE tot hun eigen source version en no-disadvantage pad bestaan.
 
-5. **P02_VERSIONED_WORK_PROCESS_TARGET — PHASE**
+5. **P02_VERSIONED_WORK_PROCESS_TARGET: PHASE**
    Semantiek: Een organisatorisch procesobject heeft stabiele lijn, immutable versie en bevoegde source change.
    Capabilities: `kantoorpakket`, `ondernemersos`, `office`, `bedrijf`, `command-zien`, `command-doen`, `command-besturen`, `zaakregie`, `zaakregie-beheer`, `dom-werkplek`
    Bewijs: `workos.accessibility-procedure`, `workos.near-miss-runbook`
    Volgende grens: Kies per capability eerst een concreet, niet-persoonsgebonden procesobject.
 
-6. **P03_ASSET_INTERVENTION_LIFECYCLE — PHASE**
+6. **P03_ASSET_INTERVENTION_LIFECYCLE: PHASE**
    Semantiek: Issue, diagnose, interventie, assetversie en verificatie blijven bij het asset-/werelddomein en scheiden actor van asset history.
    Capabilities: `wereld`, `experience-platform`, `dom-plaats`, `ov-stad`, `vastgoed`, `verzorging`, `dom-thuis`, `dom-residentie`, `dom-home`, `dom-doos`
    Bewijs: geen volledige source-slice
    Volgende grens: Asset authority, intervention versioning, retention en source receipt ontbreken; dom-doos is hier correct ondergebracht.
 
-7. **P04_VERSIONED_SERVICE_PROCEDURE — PROVEN_BOUNDED**
+7. **P04_VERSIONED_SERVICE_PROCEDURE: PROVEN_BOUNDED**
    Semantiek: Een bevoegde serviceowner wijzigt een concrete procedureversie en verifieert bij een volgende service-uitvoering.
    Capabilities: `gastos`, `supplier-haccp`, `supplier-pos`, `supplier-salon`, `supplier-rooms`, `bk-eten`, `service`
    Bewijs: `service.process-improvement`
    Volgende grens: Hospitality- en leveranciersprocedures blijven source-specifiek PHASE.
 
-8. **P09_TRAVEL_STRUCTURAL_LESSON — PHASE**
+8. **P09_TRAVEL_STRUCTURAL_LESSON: PHASE**
    Semantiek: Triprecall blijft Personal; alleen vrijwillig vrijgegeven, geminimaliseerde reisuitkomsten worden losgekoppelde structurele lessons.
    Capabilities: `avondos`, `arrival`, `instantreality`, `dom-reisbureau`, `bk-reizen`, `bk-verblijf`, `bk-reiswijzer`
    Bewijs: geen volledige source-slice
    Volgende grens: Nog geen begrensde vrijwillige tripbron met locatie-minimization en toekomstig recallcontract.
 
-9. **P12_VERSION_BOUND_COMMONS_RELEASE — PROVEN_ONE_SOURCE**
+9. **P12_VERSION_BOUND_COMMONS_RELEASE: PROVEN_ONE_SOURCE**
    Semantiek: De source owner geeft object/versie, doel, audience, reuse, attribution, AI- en derivative scope expliciet vrij en kan withdraw/supersede uitgeven.
    Capabilities: `zakelijk`, `socialewereld`, `connect`, `dom-genootschap`, `salon`, `kern-waardering`
    Bewijs: `experience.living-world-commons-release`
    Volgende grens: Geen generiek platformcontract zonder tweede semantisch gelijkwaardige source owner.
 
-10. **P13_AI_PURPOSE_SCOPE — PHASE**
+10. **P13_AI_PURPOSE_SCOPE: PHASE**
    Semantiek: Assistance, inference en training zijn afzonderlijke source-issued uses; AI-output behoudt epistemische herkomst en mutatieauthority.
    Capabilities: `oog`, `ghost`, `knelpunt`, `kern-rahul`, `ov-aandacht`, `stuur`
    Bewijs: geen volledige source-slice
    Volgende grens: Training blijft constitutioneel deny; adapters wachten op concrete source-owned AI-use contracts.
 
-11. **P10_FOUNDATION_VOLUNTARY_LESSON — PHASE**
+11. **P10_FOUNDATION_VOLUNTARY_LESSON: PHASE**
    Semantiek: Hulp en vrijwillige ervaringsbijdrage zijn afzonderlijke lifecycles; weigering heeft aantoonbaar geen behandel- of kansnadeel.
    Capabilities: `levenos`, `rugdekking`, `werk-rtf`, `dom-rtfkantoor`, `dom-rtfos`
    Bewijs: geen volledige source-slice
    Volgende grens: Nog geen source-flow die no-disadvantage, withdrawal en organizational decision gezamenlijk bewijst.
 
-12. **P05_REVIEWED_FAILURE_ARTIFACT — PHASE**
+12. **P05_REVIEWED_FAILURE_ARTIFACT: PHASE**
    Semantiek: Een technische occurrence wordt pas na bevoegde review een minimale operationele les.
    Capabilities: `dom-foutmelder`
    Bewijs: geen volledige source-slice

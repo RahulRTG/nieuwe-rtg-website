@@ -65,7 +65,7 @@ function md(data){
   lines.push('','### Gedeelde bestaande poorten','');
   for(const g of data.prerequisites.protocolGates)lines.push(`- **${g.id}:** ${g.rule} Hergebruik: ${g.reuse}.`);
   lines.push('','## Unlock Roadmap','');
-  for(const r of data.roadmap)lines.push(`${r.order}. **${r.step} — ${r.status}**`,`   Semantiek: ${r.why}`,`   Capabilities: ${r.unlocks.map(x=>'`'+x+'`').join(', ')}`,`   Bewijs: ${r.proof.length?r.proof.map(x=>'`'+x+'`').join(', '):'geen volledige source-slice'}`,`   Volgende grens: ${r.nextProof}`,'');
+  for(const r of data.roadmap)lines.push(`${r.order}. **${r.step}: ${r.status}**`,`   Semantiek: ${r.why}`,`   Capabilities: ${r.unlocks.map(x=>'`'+x+'`').join(', ')}`,`   Bewijs: ${r.proof.length?r.proof.map(x=>'`'+x+'`').join(', '):'geen volledige source-slice'}`,`   Volgende grens: ${r.nextProof}`,'');
   lines.push('## Technisch fixed point','',`**Bereikt: ${data.fixedPoint.reached?'ja':'nee'}.** ${data.fixedPoint.reason}`,'',
     `Veilig uitvoerbaar technisch werk zonder nieuwe beslissing: **${data.fixedPoint.safeTechnicalWorkWithoutNewDecision?'ja':'nee'}**.`,'');
   lines.push('## Schaalblok','',`Alle ${data.scale.count} capabilities blijven **STOP**.`,'',

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2317 bestanden en 15841 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2317 bestanden en 15842 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,13 +13,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2317 |
-| losse beweringen (`test(...)`) | 15841 |
+| losse beweringen (`test(...)`) | 15842 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1953 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1962 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 162 |
-| alleen in de kop *genoemd*, nog niet gemeten | 33 |
-| niets van beide | 169 |
+| alleen in de kop *genoemd*, nog niet gemeten | 32 |
+| niets van beide | 161 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2020 bestanden, 15331 beweringen.
+2020 bestanden, 15332 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -896,7 +896,7 @@ toets omvalt.
 | `levensloop.test.js` | 1 | gezakt op `liegpoort /api/` | DE LEVENSLOOP -- een mens van aanmelding tot tweede baan. WAAROM DIT ER IS De andere twee toetsen kijken in de breedte: 157 mensen kunnen bij hun werk (menselijkebanen) en mensen doen dingen met elkaar... |
 | `leverancierpoort.test.js` | 16 | gezakt op `===->!==#0` | DE LEVERANCIERSPOORT: de acht functies waar elke supplier-route langs komt. WAAROM DEZE TOETS ER NU PAS IS. |
 | `lib.test.js` | 7 | gezakt op `===->!==#0` | Unit-tests voor de zuivere hulplibs (server/lib). Geen server nodig. |
-| `library-academy-release.test.js` | 6 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `library-academy-release.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `library-http.test.js` | 2 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `library-kernel.test.js` | 23 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `library-sqlite.test.js` | 1 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -930,7 +930,7 @@ toets omvalt.
 | `livegang-pakket.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `livegang.test.js` | 3 | gezakt op `liegpoort /api/` | De livegang: in productie start het platform schoon en op slot. - geen demozaken in de catalogus, geen demopersoneel, geen voorbeeldposts - de demo-inlog is dicht (leden en zaken) - de rate-limiter staat aan |
 | `living-experience.test.js` | 7 | gezakt op `===->!==#0` | De ervaringscompiler wijst kapotte bestemming, toestand, wereld en overdracht af. Ontbrekend, veranderd of overgeslagen bewijs kan nooit groen worden. |
-| `living-world-commons-release.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `living-world-commons-release.test.js` | 3 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `living-world-http.test.js` | 2 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `living-world-sources.test.js` | 5 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `living-world-sqlite.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -957,21 +957,21 @@ toets omvalt.
 | `loonstrook-portaal.test.js` | 1 | gezakt op `liegpoort /api/` | Het werknemersportaal: komt er een LOONSTROOK uit, van de klok tot het scherm van de medewerker? WAAROM DEZE TOETS ER IS. |
 | `loop-fabric-academy-slice.test.js` | 2 | gezakt op `===->!==#0` | Derde bewijsslice: Leerhuis gebruikt een eigen append-only bronspoor, governance en kennisversies. De Fabric vervoert alleen refs en receipts. |
 | `loop-fabric-architecture-gate.test.js` | 3 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `loop-fabric-constitution.test.js` | 6 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `loop-fabric-coverage.test.js` | 4 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `loop-fabric-constitution.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `loop-fabric-coverage.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-decisions.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-delivery.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `loop-fabric-execution.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `loop-fabric-execution.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-http.test.js` | 1 | gezakt op `liegpoort /api/` | Werkelijke HTTP-deurproef. De protocol- en end-to-endproeven gaan dieper in op betekenis; deze proef bewijst op een echte server dat alle Loop-ingangen ingangen gemount zijn en zonder server-derived... |
-| `loop-fabric-learning-eligibility.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `loop-fabric-learning-eligibility.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-library-slice.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-lifecycle.test.js` | 3 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-operations.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-routes.test.js` | 4 | gezakt op `===->!==#0` | De Loop Fabric-routeproef bewijst dat de HTTP-deuren de actor uit de sessie en het persoonlijke WorkOS-lid afleiden, en ontbrekende bevoegdheid vóór de bronmutatie afwijzen. |
 | `loop-fabric-service-proof.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `loop-fabric-service-slice.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `loop-fabric-source-flows.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `loop-fabric-unlock.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `loop-fabric-service-slice.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `loop-fabric-source-flows.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `loop-fabric-unlock.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-workos-slice.test.js` | 2 | gezakt op `===->!==#0` | Tweede bewijsslice: dezelfde federatieve contracten dragen een interne WorkOS near-miss en een versioned runbook, zonder Living World-semantiek. |
 | `loop-fabric.pg.test.js` | 1 | al rood | De PostgreSQL-proef bewijst multi-instance serialisatie, payloadgebonden replay, herstel na verloren commitantwoord en duurzame Loop Fabric-projectie over een herstart. |
 | `loop-fabric.test.js` | 12 | gezakt op `===->!==#0` | De federatieve Loop Fabric-slice bewijst observation, bevoegd WorkOS-besluit, source-issued change receipt, doelgebonden recall en niet-causale verificatie. De adversarial paden dekken intrekking, correctie, contest,... |

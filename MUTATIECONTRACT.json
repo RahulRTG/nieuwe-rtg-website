@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-05T14:04:01.061Z",
-  "commit": "b71cd833",
+  "op": "2026-10-06T04:11:01.474Z",
+  "commit": "bfb6e82d9",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,19 +10,19 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5261,
-  "geclassificeerd": 5236,
+  "totaal": 5264,
+  "geclassificeerd": 5239,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3168,
    "NOT_APPLICABLE": 1264,
    "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 625,
-   "INTENTIONALLY_NON_IDEMPOTENT": 180
+   "INTENTIONALLY_NON_IDEMPOTENT": 182
   },
-  "vastgesteldDoorMens": 2120,
+  "vastgesteldDoorMens": 2123,
   "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4330,
+   "AUTHENTICATED": 4333,
    "PUBLIC": 134,
    "OBJECT_SCOPED": 766,
    "(niet af te leiden -- vraagt een verklaring)": 15,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4882,
-   "niet gemeten": 113
+   "niet gemeten": 116
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -69194,7 +69194,7 @@
    "semantiek": {
     "klasse": "hooguitEens"
    },
-   "duplicaatregel": "nietIdempotent",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -69215,7 +69215,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": "nietIdempotent",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -69236,7 +69236,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "leest",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -130923,7 +130923,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,

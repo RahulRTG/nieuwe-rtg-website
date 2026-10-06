@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-06T20:47:25.934Z",
-    "commit": "a565fa3dc",
-    "boomVuil": true,
-    "boomAnders": 9,
+    "op": "2026-10-06T20:53:08.708Z",
+    "commit": "7d9bedba2",
+    "boomVuil": false,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
   },
@@ -12366,7 +12366,7 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/releaseketenwacht.js",
-      "operator": "===->!==#0",
+      "operator": "voorwaarde-omkeren#0",
       "gezakt": 2,
       "geprobeerd": 1
     },

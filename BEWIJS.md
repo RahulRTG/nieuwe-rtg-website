@@ -1506,7 +1506,7 @@ toets omvalt.
 | `release-hardening.test.js` | 12 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `release-trust.test.js` | 8 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `release-workflow-bewijs.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `releaseketenwacht.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `releaseketenwacht.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rem.test.js` | 6 | gezakt op `&&->||#0` | Test voor de eigen rate-limiter (server/rem.js): binnen het venster mag een sleutel tot `limit` verzoeken, daarboven springt de rem aan; sleutels tellen los; `skip` slaat over; een verlopen venster telt weer vanaf... |
 | `remduurzaam.test.js` | 5 | gezakt op `liegpoort /api/` | EEN REM DIE EEN MENS OVERHAALT, STAAT VAST VOORDAT HIJ BEVESTIGD WORDT. GELDLAT.md kreeg op 6 september 2026 een derde been in zijn reikwijdte. |
 | `rendezvous.test.js` | 32 | gezakt op `liegpoort /api/` | Integratietests voor Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass. Twee leden zetten een profiel op, liken elkaar (wederzijds = match), en Rahul stelt een jetset-date voor op een gedeelde locatie. |

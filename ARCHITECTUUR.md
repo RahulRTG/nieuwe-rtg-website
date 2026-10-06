@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5388 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5391 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5388 |
-| servermodules (`server/**/*.js`) | 4073 |
+| API-endpoints | 5391 |
+| servermodules (`server/**/*.js`) | 4078 |
 | routebestanden (`server/routes/**`) | 638 |
 | kernmodules (`server/kern/**`) | 2560 |
 | schermen (`public/**/*.html`) | 326 |
 | gedeelde browsermodules (`public/shared/*.js`) | 425 |
-| toetsbestanden (`test/*.test.js`) | 2026 |
-| schermtoetsen (`test/*.e2e.js`) | 303 |
+| toetsbestanden (`test/*.test.js`) | 2028 |
+| schermtoetsen (`test/*.e2e.js`) | 304 |
 
 ## 2. De weg van een verzoek
 
@@ -117,7 +117,7 @@ zie §5 -- er zijn nog 254 kern-namen die meer dan één domein aanraakt.
 | `office` | 98 | 22 | 3 | 98 |
 | `staff` | 27 | 9 | 1 | 43 |
 | `social` | 76 | 10 | 31 | 71 |
-| `techniek` | 79 | 20 | 1 | 64 |
+| `techniek` | 80 | 20 | 1 | 65 |
 | `zakelijk` | 13 | 2 | 0 | 0 |
 | `wereld` | 15 | 3 | 0 | 0 |
 
@@ -129,7 +129,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3664 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3666 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -153,7 +153,7 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 ```
 app(213) auth(130) supplierAuth(66) officeAuth(48) db(40) liveCodename(36) status(32)
 accounts(30) schoon(23) boardroomWie(20) codenaamVan(20) managerOnly(19) save(19)
-rtf(18) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth(13)
+rtf(19) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth(13)
 crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)
 payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)
 logActivity(8) mail(7) naamAuth(7) sseToSupplier(7) onboarding(6) notifySupplier(6)

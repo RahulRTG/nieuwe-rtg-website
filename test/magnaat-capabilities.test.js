@@ -204,7 +204,7 @@ test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
    gezin/stroom/ticket, gezin/sessie/verleng en gezin/passkey/weg), alle zes als router.post of
    router.get op dezelfde /api/foundation-router. /api/rtf/gezin/passkey schrijft zijn volle
    adres op en wordt gewoon gezien. */
-const GEMIST_MAX = 592;   // +2 imap/roteer, +4 foundation/les, +2 gezin/sessie, +6 gezinsdeur, +1 les/stroomticket: bekende vorm
+const GEMIST_MAX = 593;   // +2 imap/roteer, +4 foundation/les, +2 gezin/sessie, +6 gezinsdeur, +1 les/stroomticket, +1 gezin/toestemming/gezondheid: bekende vorm
 const SPOOK_MAX = 6;      // routes die de bronscanner noemt en de router niet
 
 test('de bronscanner loopt niet verder achter op de router dan is vastgelegd', () => {

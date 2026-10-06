@@ -189,6 +189,9 @@ const EIGENAAR = {
       'het workflow waar het over gaat' },
   'AUDITOPSLAG.md': { handmatig: true, lezer: 'test/auditopslag-pg.test.js',
     waarom: 'legt de PG-stand van de auditopslag vast (A-P1-05); een besluit en geen meting, en de toets leest het document' },
+  'AUDITBOEK.md': { handmatig: true, lezer: 'test/auditboek.pg.test.js',
+    waarom: 'legt het PostgreSQL-auditboek en zijn externe verankering vast; een besluit en geen meting, en de toets ' +
+      'eist dat elk gebeurtenistype van de gesloten lijst in het document staat' },
   'BEREIK.json': { handmatig: true, lezer: 'test/bereikbaar.test.js',
     waarom: 'schuldlijst van schermen zonder klikroute; wordt met de hand bijgehouden en mag alleen krimpen. ' +
       'Precies daarom kon een nieuw script hem stil overschrijven zonder dat een schrijverscan iets zag.' },

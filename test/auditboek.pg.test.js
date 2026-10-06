@@ -308,3 +308,11 @@ test('18. een boek zonder enig anker is NIET in orde (onbekend), ook al klopt de
   assert.equal(u.ok, false); assert.ok(codes(u).includes('geenAnker'));
   assert.equal(codes(u).includes('ketenGebroken'), false);
 });
+
+test('AUDITBOEK.md noemt elk gebeurtenistype van de gesloten lijst (document en code lopen niet uiteen)', () => {
+  const fs = require('node:fs'); const path = require('node:path');
+  const { GEBEURTENISSEN } = require('../server/kern/auditboek/gebeurtenissen');
+  const doc = fs.readFileSync(path.join(__dirname, '..', 'AUDITBOEK.md'), 'utf8');
+  const ontbrekend = Object.keys(GEBEURTENISSEN).filter(t => !doc.includes('`' + t + '`'));
+  assert.deepEqual(ontbrekend, []);
+});

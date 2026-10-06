@@ -16,9 +16,9 @@ Een gesloten catalogus; wat er niet staat kan het boek niet in. Elke waarde heef
 | security | `kritiek.geweigerd`, `bezitsbewijs.geweigerd`, `sessie.ingetrokken`, `inzage.kluis` | **niemand** — gecatalogiseerd, schrijvers niet aangesloten |
 | beheer | `auditboek.init`, `auditboek.verificatie`, `auditboek.retentie` | `scripts/auditboek.js` en `bewaring.js` |
 | beheer | `beheer.rol.gewijzigd`, `beheer.sleutel.gewisseld`, `beheer.config.gewijzigd` | **niemand** — gecatalogiseerd, schrijvers niet aangesloten |
-| release | `release.kandidaat.gebouwd`, `.getest`, `release.gate` | `scripts/artefactketen.js` (bij `promoveer --auditboek` uit de ondertekende keten); `release.gate` niemand |
-| promotie | `promotie.aangevraagd/geweigerd/uitgevoerd` | `scripts/artefactketen.js promoveer`, `noteer-uitgevoerd` (door `live.sh deploy`) |
-| rollback | `rollback.aangevraagd/geweigerd/uitgevoerd` | `scripts/artefactketen.js terugdraai`, `noteer-uitgevoerd` (door `live.sh rollback`) |
+| release | `release.kandidaat.gebouwd`, `release.kandidaat.getest`, `release.gate` | `scripts/artefactketen.js` (bij `promoveer --auditboek` uit de ondertekende keten); `release.gate` niemand |
+| promotie | `promotie.aangevraagd`, `promotie.geweigerd`, `promotie.uitgevoerd` | `scripts/artefactketen.js promoveer`, `noteer-uitgevoerd` (door `live.sh deploy`) |
+| rollback | `rollback.aangevraagd`, `rollback.geweigerd`, `rollback.uitgevoerd` | `scripts/artefactketen.js terugdraai`, `noteer-uitgevoerd` (door `live.sh rollback`) |
 
 De actor komt uit de sessie of de CI-run, nooit uit het verzoek; een sleutel die geen codenaam/rol/run-id is wordt gepseudonimiseerd (`h:` + SHA-256-prefix).
 

@@ -50,7 +50,9 @@
      niet alleen in een kop die clients niet lezen.
    - EEN STORING WORDT NOOIT ONTHOUDEN. Een 5xx mag opnieuw geprobeerd worden;
      een storing vastspijkeren zou van een haperend moment een permanente
-     weigering maken.
+     weigering maken. Dat geldt ook voor een 5xx die pas NA res.json ontstond
+     (de 503 van de stand-bypoort): onthouden wordt de status die werkelijk
+     vertrok, zie ../lib/eindstatus.js.
    - DE KAS IS BEGRENSD EN VERGEET. Een dag TTL, een vaste bovengrens met
      wegvallen-van-de-oudste. Idempotentiesleutels beschermen tegen dubbelklikken
      en herhaalde verzoeken, niet tegen de eeuwigheid.
@@ -66,7 +68,7 @@
    meet binnen een proces en na elkaar, dus die ziet precies wat dit belooft. */
 'use strict';
 const crypto = require('crypto');
-const verzoekcontext = require('../db/verzoekcontext');
+const { bewaarBijEind } = require('../lib/eindstatus');
 const { isEenmalig } = require('../lib/eenmalig-geheim-routes');
 const { EIGEN, doetHetZelf } = require('./idempotentie-eigen');
 
@@ -129,7 +131,9 @@ module.exports = () => {
           }
         } catch (e) { /* een antwoord dat niet te serialiseren is, is niet te herhalen */ }
       };
-      if (!verzoekcontext.haakNaCommit(bewaar)) bewaar();
+      /* Pas als vaststaat welke status werkelijk vertrok (N11): een 200 die de
+         stand-bypoort nog een 503 maakte, is hier nooit onthouden. */
+      bewaarBijEind(res, bewaar);
       return echteJson(data);
     };
     next();

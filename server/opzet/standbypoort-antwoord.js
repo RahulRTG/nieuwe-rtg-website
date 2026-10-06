@@ -24,7 +24,8 @@
    ruilen. De haak wordt gezet in de poort, dus NA elke laag die eerder in de
    keten res.end omwikkelt (effectbon, effectmeter, staatlog en de
    PostgreSQL-grens) en is daarmee de buitenste: elke aanroep van res.end komt
-   eerst hier.
+   eerst hier. (Alleen de wikkel van ../lib/eindstatus.js komt later en zit er
+   dus omheen, maar die geeft eerst door en kijkt pas daarna naar de status.)
 
    WAT HIJ NIET KAN, en dat blijft rest:
    - een antwoord waarvan de koppen al weg zijn (een stroom die al schreef,
@@ -32,11 +33,16 @@
      draaien en wordt met rust gelaten.
    - een afzetting EN een nieuwe promotie binnen een verzoek: bij het antwoord
      schrijft hij dan weer, en een save() in het gat is verloren.
-   - de idempotentielagen (../lib/idem-poort.js, ../lib/dubbeltik.js,
-     ../middleware/idempotentie.js) onthouden een 2xx al in res.json, dus
-     VOOR deze haak. Komt dezelfde sleutel terug nadat dit proces opnieuw
-     leider is, dan herhalen zij die 2xx. In PostgreSQL-modus niet: daar
-     onthouden zij pas na de commit, en die komt er bij een 503 niet.
+
+   EN DE IDEMPOTENTIELAGEN KIJKEN NAAR WAT HIER UITKOMT. ../lib/idem-poort.js,
+   ../lib/dubbeltik.js en ../middleware/idempotentie.js onthielden een 2xx al
+   in res.json, dus VOOR deze haak, en de herhaling waar onze 503 om vraagt
+   kreeg dan 200 herhaald:true over iets dat niet stond. Dat gold voor een
+   sleutel van de client (de kop Idempotency-Key, `idem` of
+   `idempotentieSleutel` in het lijf) EN voor een verklaarde route zonder
+   sleutel: daar leidt de idem-poort er zelf een af (../lib/idemsleutels.js,
+   venster van seconden). Sinds de herkeuring onthouden ze pas de status die
+   werkelijk vertrok (../lib/eindstatus.js).
 
    EN IN POSTGRESQL-MODUS BETEKENT db.writable IETS ANDERS. Daar houdt het
    alleen save() tegen; de antwoordcommit in ../db/postgres-verzoeken.js kijkt
@@ -55,34 +61,57 @@ const OUDLIJF = ['content-encoding', 'content-length', 'content-range', 'content
 const TEKST = 'Deze server is tijdens het verzoek stand-by gezet. Of de wijziging is bewaard, ' +
   'staat daardoor niet vast. Kijk het na en probeer het over een paar seconden opnieuw.';
 
+/* Een bron die in res pijpt (sendFile: een leesstroom op een bestand) blijft
+   na de vervanging open: bij 'finish' koppelt hij los, maar hij sluit niet,
+   en zijn bestandsdescriptor bleef staan (gemeten: 26 open na 30 vervangen
+   verzoeken van 8 MB, ook na vijf seconden en een gc). Dus sluiten we hem. */
+const sluit = (bron) => { if (bron && typeof bron.destroy === 'function') bron.destroy(); };
+
 function bewaakAntwoord(res, db) {
   const echtEnd = res.end, echtWrite = res.write;
+  const bronnen = new Set();
   let begonnen = false, vervangen = false;
   /* begonnen en niet alleen headersSent: de PostgreSQL-grens buffert de
      writes van een muterend verzoek tot zijn commit, en dan staan er al
      stukken klaar terwijl headersSent nog false is. */
   const moetWeg = () => !begonnen && !res.headersSent && !db.writable &&
     (res.statusCode || 200) < 400;
+  if (typeof res.on === 'function') res.on('pipe', (bron) => { if (vervangen) sluit(bron); else bronnen.add(bron); });
+  /* De vlag gaat pas om vlak voor het eigen end. Zou het omzetten van de
+     koppen gooien (dat doet het alleen als ze al weg zijn, en moetWeg sluit
+     dat uit), dan slikte een vroege vlag elke latere end() en hing het verzoek
+     tot de time-out. Nu gaat dan het oorspronkelijke antwoord door: koppen die
+     al weg zijn, waren toch niet meer te veranderen. */
   function vervang() {
+    const oud = res.statusCode, oudBericht = res.statusMessage;
+    try {
+      for (const k of OUDLIJF) res.removeHeader(k);
+      res.statusCode = 503;
+      if (res.statusMessage) res.statusMessage = 'Service Unavailable';
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('Retry-After', '2');
+    } catch (e) {
+      res.statusCode = oud; res.statusMessage = oudBericht;
+      require('../log').log.warn('[standbypoort] antwoord niet te vervangen (' + e.message + '); het gaat ongewijzigd door.');
+      return false;
+    }
     vervangen = true;
-    for (const k of OUDLIJF) res.removeHeader(k);
-    res.statusCode = 503;
-    if (res.statusMessage) res.statusMessage = 'Service Unavailable';
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store');
-    res.setHeader('Retry-After', '2');
     echtEnd.call(res, JSON.stringify({ error: TEKST, code: 'STANDBY_TIJDENS_VERZOEK' }));
+    for (const bron of bronnen) sluit(bron);
+    bronnen.clear();
+    return true;
   }
   // Na de vervanging slikken we de rest: een pipe schrijft gewoon door.
   res.write = function (...a) {
     if (vervangen) return true;
-    if (moetWeg()) { vervang(); return true; }
+    if (moetWeg() && vervang()) return true;
     begonnen = true;
     return echtWrite.apply(res, a);
   };
   res.end = function (...a) {
     if (vervangen) return res;
-    if (moetWeg()) { vervang(); return res; }
+    if (moetWeg() && vervang()) return res;
     return echtEnd.apply(res, a);
   };
 }

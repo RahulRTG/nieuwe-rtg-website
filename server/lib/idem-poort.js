@@ -85,7 +85,8 @@
 'use strict';
 
 const crypto = require('crypto');
-const verzoekcontext = require('../db/verzoekcontext');
+/* Pas onthouden als vaststaat wat er werkelijk vertrok: ./eindstatus.js (N11). */
+const { bewaarBijEind } = require('./eindstatus');
 const { VENSTER_MS } = require('./idemsleutels');
 const { isEenmalig } = require('./eenmalig-geheim-routes');
 /* De bewaarkast staat apart: dat is een gegevensstructuur (ring, vervaltijd,
@@ -160,13 +161,14 @@ function maakIdemPoort(opties) {
     res.json = (lijf) => {
       const status = res.statusCode || 200;
       /* De kast beslist zelf of dit bewaard mag worden (alleen een geslaagd
-         antwoord) en snoeit meteen daarna. Levert hij false, dan is er niets
-         onthouden en mag een volgende poging het werk echt opnieuw doen. */
+         antwoord) en snoeit meteen daarna. Levert hij false, of vertrok er een
+         andere status (een 503 van de stand-bypoort), dan is er niets onthouden
+         en doet een volgende poging het werk echt opnieuw. */
       const bewaar = () => {
         if (kast.zet(id, { status, lijf, afdruk }, vensterMs)) rond({ status, lijf });
         else rond(null);
       };
-      if (!verzoekcontext.haakNaCommit(bewaar)) bewaar();
+      bewaarBijEind(res, bewaar);
       return echteJson(lijf);
     };
     /* Een verzoek dat nooit bij res.json komt (crash, stream, afgebroken

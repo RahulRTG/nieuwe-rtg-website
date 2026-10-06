@@ -73,6 +73,7 @@ const isVervangen = (res) => {
   assert.match(lijf.error, /niet vast/, 'de tekst zegt eerlijk dat het onzeker is, niet dat het mislukte');
   assert.equal(res.getHeader('Retry-After'), '2');
   assert.match(String(res.getHeader('Content-Type')), /application\/json/);
+  assert.equal(res.getHeader('Cache-Control'), 'no-store', 'een 503 over een onzekere stand hoort niet in een cache');
 };
 
 test('json: schrijft bij de ingang, afgezet voor het antwoord -> 503 in plaats van 200', () => {
@@ -97,15 +98,54 @@ test('send en redirect lopen via dezelfde haak, en de Location verdwijnt', () =>
   isVervangen(c.res);
 });
 
-test('koppen over het oude lijf gaan weg: verpakking, lengte, cookie', () => {
+/* Letterlijk genoemd en NIET uit de module gelezen: een lijst die de toets van
+   de code leent, krimpt mee als iemand er een kop uit haalt. Een achtergebleven
+   Content-Disposition maakt van de 503 in een browser een download van de
+   foutmelding; een Content-Range of Transfer-Encoding beschrijft een lijf dat
+   er niet meer is. */
+const OUDE_KOPPEN = {
+  'Content-Encoding': 'gzip', 'Content-Length': '999', 'Content-Range': 'bytes 0-998/5000',
+  'Content-Disposition': 'attachment; filename="bon.pdf"', 'Content-Language': 'nl',
+  'Content-Location': '/api/iets/1', 'ETag': '"x"', 'Last-Modified': 'Tue, 06 Oct 2026 05:00:00 GMT',
+  'Location': '/klaar', 'Set-Cookie': 'rtg=nieuw', 'Transfer-Encoding': 'chunked', 'Accept-Ranges': 'bytes'
+};
+
+test('koppen over het oude lijf gaan weg: alle twaalf', () => {
   const { res } = doorPoort({}, (r, db) => {
-    r.set('Content-Encoding', 'gzip').set('Content-Length', '999').set('Set-Cookie', 'rtg=nieuw').set('ETag', '"x"');
+    r.set(OUDE_KOPPEN);
+    for (const k of Object.keys(OUDE_KOPPEN)) assert.equal(r.getHeader(k), OUDE_KOPPEN[k], 'vooraf gezet: ' + k);
     db.writable = false;
     r.send(zlib.gzipSync(JSON.stringify({ ok: true })));
   });
   isVervangen(res);
-  for (const k of ['content-encoding', 'content-length', 'set-cookie', 'etag'])
+  for (const k of Object.keys(OUDE_KOPPEN))
     assert.equal(res.getHeader(k), undefined, k + ' hoort niet bij het 503-lijf');
+});
+
+test('een eigen statustekst van het succes gaat mee weg', () => {
+  const { res } = doorPoort({}, (r, db) => { r.statusMessage = 'Gelukt'; db.writable = false; r.json({ ok: true }); });
+  isVervangen(res);
+  assert.equal(res.statusMessage, 'Service Unavailable', 'geen "503 Gelukt" op de lijn');
+});
+
+/* Het omzetten van de koppen gooit alleen als ze al weg zijn, en moetWeg sluit
+   dat uit. Gebeurt het toch, dan hoort het verzoek niet te HANGEN: de vlag die
+   latere schrijfacties slikt, mag pas om als het eigen lijf echt vertrekt. */
+test('lukt het vervangen niet, dan gaat het oorspronkelijke antwoord door en hangt er niets', () => {
+  const gooi = () => { throw Object.assign(new Error('koppen al weg'), { code: 'ERR_HTTP_HEADERS_SENT' }); };
+  // Bij het weghalen van de oude koppen, en bij het zetten van de nieuwe (dan is de status al 503).
+  for (const methode of ['removeHeader', 'setHeader']) {
+    const { res } = doorPoort({}, (r, db) => {
+      r.statusMessage = 'Gelukt';
+      r[methode] = gooi;
+      db.writable = false;
+      r.write('eerste;'); r.end('slot');
+    });
+    assert.equal(res.einden, 1, methode + ': end() is aangekomen, het verzoek hangt niet tot de time-out');
+    assert.equal(res.statusCode, 200, methode + ': de status van het oorspronkelijke antwoord staat terug');
+    assert.equal(res.statusMessage, 'Gelukt', methode + ': en zijn statustekst ook');
+    assert.equal(res.lijf(), 'eerste;slot', methode);
+  }
 });
 
 test('een fout blijft staan: alleen een SUCCES wordt vervangen', () => {
@@ -191,6 +231,42 @@ test('in de echte web()-app: json, gecomprimeerd, redirect en sendFile (een pipe
   }
 });
 
+/* Een vervangen sendFile: de leesstroom koppelt bij 'finish' los van res,
+   maar sloot zich niet, en zijn bestandsdescriptor bleef open (de herkeuring
+   mat 26 open na 30 verzoeken). Het bestand is groot genoeg om niet vanzelf
+   uitgelezen te zijn voordat de 503 vertrekt. */
+test('een vervangen sendFile sluit zijn leesstroom', async () => {
+  const web = require('../server/web');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-n11-bron-'));
+  const bestand = path.join(dir, 'groot.bin');
+  fs.writeFileSync(bestand, Buffer.alloc(8 * 1024 * 1024, 7));
+  const db = { writable: true };
+  const app = web();
+  app.use(standbyPoort(db));
+  app.post('/bestand', (req, res) => { db.writable = false; res.sendFile(bestand); });
+  const stromen = [];
+  const echt = fs.createReadStream;
+  fs.createReadStream = function (...a) { const s = echt.apply(this, a); if (a[0] === bestand) stromen.push(s); return s; };
+  const srv = app.listen(0, '127.0.0.1');
+  await new Promise(r => srv.once('listening', r));
+  try {
+    const r = await fetch('http://127.0.0.1:' + srv.address().port + '/bestand', { method: 'POST' });
+    assert.equal(r.status, 503);
+    assert.equal(JSON.parse(await r.text()).code, 'STANDBY_TIJDENS_VERZOEK');
+    assert.equal(stromen.length, 1, 'de route opende het bestand');
+    const dicht = await new Promise((klaar) => {
+      if (stromen[0].closed) return klaar(true);
+      const t = setTimeout(() => klaar(false), 2000);
+      stromen[0].once('close', () => { clearTimeout(t); klaar(true); });
+    });
+    assert.equal(dicht, true, 'de leesstroom blijft open: een bestandsdescriptor per vervangen sendFile');
+  } finally {
+    fs.createReadStream = echt;
+    await new Promise(r => srv.close(r));
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 /* ---------- 3. boven de PostgreSQL-grens ----------
    Daar betekent db.writable minder: de antwoordcommit in
    server/db/postgres-verzoeken.js kijkt niet naar db.writable, en een save()
@@ -244,4 +320,253 @@ test('boven de PostgreSQL-grens: een 503 na de afzetting commit niets, zonder af
     grens.stop();
     await new Promise(r => srv.close(r));
   }
+});
+
+/* ---------- 4. de herhaling na de 503: de idempotentielagen ----------
+   De 503 vraagt om een nieuwe poging met dezelfde sleutel. De drie lagen die
+   een antwoord onthouden (server/lib/idem-poort.js, server/lib/dubbeltik.js,
+   server/middleware/idempotentie.js) deden dat al in res.json, VOOR de haak er
+   een 503 van maakte, en gaven die herhaling dan 200 herhaald:true terwijl de
+   route niet opnieuw draaide. Sinds de herkeuring onthouden ze de status die
+   werkelijk vertrok (server/lib/eindstatus.js).
+
+   Per laag apart, zodat een terugval in EEN laag een eigen toets laat zakken,
+   en daarna de hele keten in de volgorde van server/opzet/: stand-bypoort,
+   idem-poort, compressie, dubbeltik, idempotentie. */
+const maakIdemPoort = require('../server/lib/idem-poort');
+const { maakDubbeltik } = require('../server/lib/dubbeltik');
+const maakIdempotentie = require('../server/middleware/idempotentie');
+const wacht = (ms) => new Promise(r => setTimeout(r, ms));
+const stilleDubbeltik = () => maakDubbeltik({ log: { warn() {} } }).middleware();
+
+async function ketenApp(lagen, { eigenHttp = false } = {}) {
+  const web = require('../server/web');
+  const db = { writable: true };
+  const stand = { afzetten: false, keer: 0, rem: null, groot: false };
+  const app = web();
+  app.use(standbyPoort(db));
+  app.use(web.json());
+  for (const laag of lagen) app.use(laag);
+  const route = async (req, res) => {
+    stand.keer++;
+    if (stand.rem) await stand.rem;
+    if (stand.afzetten) db.writable = false;
+    res.json({ ok: true, keer: stand.keer, vulsel: stand.groot ? 'v'.repeat(4096) : '' });
+  };
+  app.post('/api/proef/herhaal', route);
+  app.post('/api/gewoonten/maak', route);   // verklaard in server/lib/idemsleutels-basis.js: zelfde verzoek
+  const vorige = process.env.RTG_EIGEN_HTTP;
+  if (eigenHttp) process.env.RTG_EIGEN_HTTP = '1';
+  const srv = app.listen(0, '127.0.0.1');
+  if (eigenHttp) { if (vorige === undefined) delete process.env.RTG_EIGEN_HTTP; else process.env.RTG_EIGEN_HTTP = vorige; }
+  await new Promise(r => srv.once('listening', r));
+  const basis = 'http://127.0.0.1:' + srv.address().port;
+  const stuur = async (pad, { kop = {}, lijf = {} } = {}, signaal) => {
+    const r = await fetch(basis + pad, { method: 'POST', signal: signaal,
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer lid-a', ...kop }, body: JSON.stringify(lijf) });
+    return { status: r.status, lijf: await r.json() };
+  };
+  const sluit = () => new Promise(r => { if (srv.closeAllConnections) srv.closeAllConnections(); srv.close(r); });
+  return { db, stand, stuur, sluit };
+}
+
+/* De kern van de bevinding, voor een pad en een sleutelvorm: eerst de 503,
+   dan opnieuw leider, dan dezelfde poging. Die hoort de route te laten draaien.
+   Een derde poging daarna laat zien dat de laag gewoon blijft beschermen:
+   anders zou "nooit meer onthouden" deze toets ook halen. */
+async function naDe503(app, pad, vorm, naam) {
+  app.stand.afzetten = true; app.db.writable = true;
+  const keer = app.stand.keer;
+  const a = await app.stuur(pad, vorm);
+  assert.equal(a.status, 503, naam + ': de eerste poging wordt een 503');
+  assert.equal(a.lijf.code, 'STANDBY_TIJDENS_VERZOEK', naam);
+  app.stand.afzetten = false; app.db.writable = true;   // opnieuw leider
+  const b = await app.stuur(pad, vorm);
+  assert.equal(b.status, 200, naam);
+  assert.notEqual(b.lijf.herhaald, true,
+    naam + ': de herhaling na een 503 kreeg een bewaarde 200 (' + JSON.stringify(b.lijf).slice(0, 80) + ')');
+  assert.equal(app.stand.keer, keer + 2, naam + ': de route hoort opnieuw te draaien');
+  const c = await app.stuur(pad, vorm);
+  assert.equal(c.lijf.herhaald, true, naam + ': controle, daarna onthoudt de laag gewoon weer');
+  assert.equal(app.stand.keer, keer + 2, naam + ': en draait de route niet nog een keer');
+}
+
+test('idem-poort: na de 503 doet dezelfde sleutel het werk opnieuw (kop en verklaarde sleutel)', async () => {
+  const app = await ketenApp([maakIdemPoort()]);
+  try {
+    await naDe503(app, '/api/proef/herhaal', { kop: { 'Idempotency-Key': 'n11-idem-kop' } }, 'kop Idempotency-Key');
+    // Geen sleutel van de client: de poort leidt er zelf een af uit de verklaring van de route.
+    await naDe503(app, '/api/gewoonten/maak', { lijf: { naam: 'lopen' } }, 'verklaarde sleutel');
+  } finally { await app.sluit(); }
+});
+
+test('dubbeltik: na de 503 doet dezelfde sleutel het werk opnieuw (lijf idem en de kop)', async () => {
+  const app = await ketenApp([stilleDubbeltik()]);
+  try {
+    await naDe503(app, '/api/proef/herhaal', { lijf: { idem: 'n11-dubbel-lijf' } }, 'lijf idem');
+    await naDe503(app, '/api/proef/herhaal', { kop: { 'Idempotency-Key': 'n11-dubbel-kop' } }, 'kop Idempotency-Key');
+  } finally { await app.sluit(); }
+});
+
+test('idempotentie: na de 503 doet dezelfde sleutel het werk opnieuw (idempotentieSleutel en idem)', async () => {
+  const app = await ketenApp([maakIdempotentie()]);
+  try {
+    await naDe503(app, '/api/proef/herhaal', { lijf: { idempotentieSleutel: 'n11-idempo-lijf' } }, 'lijf idempotentieSleutel');
+    await naDe503(app, '/api/proef/herhaal', { lijf: { idem: 'n11-idempo-idem' } }, 'lijf idem');
+  } finally { await app.sluit(); }
+});
+
+test('de hele keten in volgorde, ook een gecomprimeerd antwoord dat pas later eindigt', async () => {
+  const { jsonGzip } = require('../server/middleware/compressie');
+  const app = await ketenApp([maakIdemPoort(), jsonGzip(), stilleDubbeltik(), maakIdempotentie()]);
+  try {
+    await naDe503(app, '/api/proef/herhaal', { kop: { 'Idempotency-Key': 'n11-keten-kop' } }, 'keten, kop');
+    await naDe503(app, '/api/proef/herhaal', { lijf: { idem: 'n11-keten-idem' } }, 'keten, lijf idem');
+    await naDe503(app, '/api/proef/herhaal', { lijf: { idempotentieSleutel: 'n11-keten-sleutel' } }, 'keten, idempotentieSleutel');
+    await naDe503(app, '/api/gewoonten/maak', { lijf: { naam: 'zwemmen' } }, 'keten, verklaard');
+    /* Boven de kilobyte en met Accept-Encoding comprimeert de compressielaag
+       ASYNCHROON: res.end komt pas na de zlib-ronde, als de lagen hun res.json
+       al lang hebben gehad. */
+    app.stand.groot = true;
+    await naDe503(app, '/api/proef/herhaal', { kop: { 'Accept-Encoding': 'gzip' }, lijf: { idem: 'n11-keten-groot' } },
+      'keten, gecomprimeerd');
+  } finally { await app.sluit(); }
+});
+
+/* Wie TEGELIJK met dezelfde sleutel binnenkomt, wacht in de idem-poort en de
+   dubbeltik op de uitslag van de eerste. Werd die een 503, dan hoort de wachter
+   geen 200 herhaald:true te krijgen maar het zelf te doen: hier valt hij dan
+   op dezelfde afzetting en krijgt hij zijn eigen 503. */
+for (const [naam, laag, vorm] of [
+  ['idem-poort', () => maakIdemPoort(), { kop: { 'Idempotency-Key': 'n11-wacht-kop' } }],
+  ['dubbeltik', stilleDubbeltik, { lijf: { idem: 'n11-wacht-lijf' } }]
+]) {
+  test(naam + ': een wachter achter een eerste die een 503 werd, krijgt geen bewaarde 200', async () => {
+    const app = await ketenApp([laag()]);
+    try {
+      let los;
+      app.stand.rem = new Promise(r => { los = r; });
+      const eerste = app.stuur('/api/proef/herhaal', vorm);
+      await wacht(50);
+      const tweede = app.stuur('/api/proef/herhaal', vorm);
+      await wacht(50);
+      assert.equal(app.stand.keer, 1, 'de tweede wacht op de eerste in plaats van ernaast te draaien');
+      app.stand.afzetten = true;
+      los();
+      const [a, b] = await Promise.all([eerste, tweede]);
+      assert.equal(a.status, 503);
+      assert.notEqual(b.lijf.herhaald, true, 'de wachter kreeg de 200 die nooit vertrok: ' + JSON.stringify(b.lijf).slice(0, 80));
+      /* De dragende regel. Kreeg de wachter het antwoord van de eerste, dan
+         maakte zijn eigen haak daar hier toevallig ook een 503 van (de afzetting
+         stond nog); dat het werk opnieuw gebeurde, ziet alleen de teller. */
+      assert.equal(app.stand.keer, 2, 'de wachter deed het werk zelf in plaats van het antwoord van de eerste te krijgen');
+      assert.equal(b.status, 503, 'en viel daarbij op dezelfde afzetting');
+    } finally { app.stand.rem = null; await app.sluit(); }
+  });
+}
+
+/* WAAROM NIET OP 'finish' ALLEEN. Een klant die het opgeeft (een load
+   balancer die afbreekt en het straks opnieuw probeert) sluit de verbinding,
+   en node:http geeft daarna geen 'finish' meer. De route maakt zijn werk af,
+   en dat antwoord hoort onthouden te worden: de nieuwe poging met dezelfde
+   sleutel krijgt het dan terug in plaats van het werk een tweede keer te doen.
+   Zo deed de idem-poort het al, en dat mag de reparatie niet slopen. */
+test('idem-poort: een antwoord na een afgebroken verbinding wordt nog steeds onthouden', async () => {
+  const app = await ketenApp([maakIdemPoort()]);
+  try {
+    let los;
+    app.stand.rem = new Promise(r => { los = r; });
+    const vorm = { kop: { 'Idempotency-Key': 'n11-afgebroken' } };
+    const ac = new AbortController();
+    const eerste = app.stuur('/api/proef/herhaal', vorm, ac.signal).catch(e => ({ afgebroken: e.name }));
+    await wacht(50);
+    ac.abort();
+    assert.ok((await eerste).afgebroken, 'de klant gaf het op');
+    await wacht(50);
+    los();
+    await wacht(100);   // de route maakt zijn werk af, zonder iemand aan de lijn
+    app.stand.rem = null;
+    const b = await app.stuur('/api/proef/herhaal', vorm);
+    assert.equal(b.status, 200);
+    assert.equal(b.lijf.herhaald, true, 'de nieuwe poging krijgt het antwoord dat de route al gaf');
+    assert.equal(app.stand.keer, 1, 'en het werk gebeurt geen tweede keer');
+  } finally { app.stand.rem = null; await app.sluit(); }
+});
+
+/* In PostgreSQL-modus wacht server/lib/eindstatus.js NIET op res.end: daar
+   stelt de verzoekgrens het eind uit tot na de commit, en direct na de
+   aanroep van res.end staat er dan nog een 200 terwijl de commit nog moet
+   komen. Daar onthouden de lagen via haakNaCommit, en bij een mislukte commit
+   dus niets. */
+test('boven de PostgreSQL-grens: een mislukte commit laat geen onthouden 200 achter', async () => {
+  const web = require('../server/web');
+  const state = require('../server/db/state');
+  const context = require('../server/db/verzoekcontext');
+  const maakGrens = require('../server/db/postgres-verzoeken');
+  let faal = true;
+  const motor = {
+    async commitVerzoek(data, wijzigingen) {
+      if (faal) throw new Error('verbinding viel voor de COMMIT weg');
+      for (const w of wijzigingen) data[w.sleutel] = JSON.parse(w.waardeJson);
+      return { geschreven: wijzigingen.length };
+    },
+    pool: { query: async () => ({ rows: [] }) }, laadAlles: async () => state.getRuweData(),
+    openstaandeWijzigingen: () => []
+  };
+  const grens = maakGrens({ store: 'postgres', db: state.db, state, motor: () => motor,
+    slot: fn => fn(), basisKlaar: () => true });
+  grens.gestart();
+  const db = { writable: true };
+  const app = web();
+  app.use(grens.middleware());
+  app.use(standbyPoort(db));
+  app.use(web.json());
+  for (const laag of [maakIdemPoort(), stilleDubbeltik(), maakIdempotentie()]) app.use(laag);
+  let keer = 0;
+  app.post('/api/proef/herhaal', (req, res) => {
+    keer++;
+    state.db.data.bewijs.push({ id: 'keer-' + keer }); context.noteerSave();
+    res.json({ ok: true, keer });
+  });
+  const srv = app.listen(0, '127.0.0.1');
+  await new Promise(r => srv.once('listening', r));
+  const basis = 'http://127.0.0.1:' + srv.address().port;
+  const stuur = async (vorm) => {
+    const r = await fetch(basis + '/api/proef/herhaal', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer lid-a', ...(vorm.kop || {}) },
+      body: JSON.stringify(vorm.lijf || {}) });
+    return { status: r.status, lijf: await r.json() };
+  };
+  try {
+    for (const vorm of [{ kop: { 'Idempotency-Key': 'n11-pg-kop' } }, { lijf: { idempotentieSleutel: 'n11-pg-lijf' } }]) {
+      state.setRuweData({ bewijs: [] });
+      faal = true;
+      const voor = keer;
+      const a = await stuur(vorm);
+      assert.equal(a.status, 503, 'de commit mislukte');
+      faal = false;
+      await grens.herstelNu();
+      const b = await stuur(vorm);
+      assert.equal(b.status, 200);
+      assert.notEqual(b.lijf.herhaald, true, 'een 200 die nooit is gecommit, werd onthouden: ' + JSON.stringify(b.lijf));
+      assert.equal(keer, voor + 2, 'de route draaide opnieuw');
+      assert.equal(state.getRuweData().bewijs.length, 1, 'en nu staat het er een keer');
+    }
+  } finally {
+    grens.stop();
+    await new Promise(r => srv.close(r));
+  }
+});
+
+/* De eigen HTTP-motor (server/lib/http1-res.js, RTG_EIGEN_HTTP=1) geeft
+   'finish' BINNEN zijn end. De dubbeltik ruimt op 'finish' een rij op die nog
+   niet bewaard is; komt die eerst, dan is er daarna niets meer te herhalen.
+   De dubbeltik staat hier ALLEEN: met de andere twee erbij vangen die de
+   herhaling op en ziet niemand dat de dubbeltik zijn rij kwijt is. */
+test('op de eigen HTTP-motor: dezelfde uitkomst, en de dubbeltik blijft daarna beschermen', async () => {
+  const app = await ketenApp([stilleDubbeltik()], { eigenHttp: true });
+  try {
+    await naDe503(app, '/api/proef/herhaal', { lijf: { idem: 'n11-eigen-idem' } }, 'eigen motor, lijf idem');
+    await naDe503(app, '/api/proef/herhaal', { kop: { 'Idempotency-Key': 'n11-eigen-kop' } }, 'eigen motor, kop');
+  } finally { await app.sluit(); }
 });

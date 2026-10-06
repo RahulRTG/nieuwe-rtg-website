@@ -5630,6 +5630,14 @@
       "gezakt": 2,
       "geprobeerd": 3
     },
+    "herhaalbesluit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/herhaalbesluit.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "herhaalpakket.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -12092,6 +12100,14 @@
       "operator": "getal+1#1",
       "gezakt": 1,
       "geprobeerd": 8
+    },
+    "registerratel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/registerratel.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "registerratels.test.js": {
       "soort": "gericht",

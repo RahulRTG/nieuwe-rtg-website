@@ -106,7 +106,10 @@ function isMetadata(bestand, args) {
 }
 function noteerSub(bestand, args) {
   const lijst = Array.isArray(args) ? args.map(String) : [];
-  spoor.onwaarneembaar.add((path.basename(String(bestand || '')) + ' ' + lijst.slice(0, 3).join(' ')).trim());
+  /* Een absoluut pad binnen de wortel wordt relatief: het pad van deze machine
+     hoort niet in een register, en het maakt twee machines ongelijk. */
+  const kort = lijst.slice(0, 3).map((x) => (path.isAbsolute(x) && rel(x) ? rel(x) : x));
+  spoor.onwaarneembaar.add((path.basename(String(bestand || '')) + ' ' + kort.join(' ')).trim());
 }
 function omhulSub(naam, ontleed) {
   const orig = cp[naam];

@@ -34,7 +34,8 @@ const WERKER_NR = process.env.RTG_TRIO_WERKER_NR || '1';
 const LOKAAL_TLS = process.env.RTG_LOKAAL_TLS === '1';
 
 const PORT = Number(process.env.PORT || 3000);
-const HOST = process.env.RTG_BIND || undefined;
+// de toetsstand luistert alleen op de loopback, ook als poortwachter (config/omgeving.js)
+const HOST = require('./config/omgeving').luisterHost(process.env, '') || undefined;
 const AANTAL = 3;
 const BASISPOORT = Number(process.env.RTG_TRIO_BASIS || PORT + 1); // 3001, 3002, 3003
 const SLEUTEL = crypto.randomBytes(24).toString('hex'); // deelt het trio onderling

@@ -34,8 +34,11 @@ module.exports = function luister(deps) {
      RTG_BIND overschrijft dit als iemand het bewust anders wil. Draait de
      server los (npm run single), dan blijft hij gewoon op alle interfaces --
      dan is hij zelf de voordeur. */
-  const HOST = process.env.RTG_BIND ||
-    ((process.env.RTG_CLUSTER_KEY || process.env.RTG_DOMAINS) ? '127.0.0.1' : '');
+  /* De toetsstand luistert ALTIJD op de loopback (../config/omgeving.js): hij
+     opent deuren die alleen voor toetsen bestaan. De startkeuring heeft een
+     RTG_BIND buiten de loopback dan al geweigerd. */
+  const HOST = require('../config/omgeving').luisterHost(process.env,
+    (process.env.RTG_CLUSTER_KEY || process.env.RTG_DOMAINS) ? '127.0.0.1' : '');
   function gestart() {
     /* Het protocol uit de werkelijkheid en niet uit een aanname. Met RTG_TLS=1
        termineert de app zelf TLS (web/index.js), en dan stond hier tot nu toe

@@ -35,7 +35,10 @@
         geven geen verse gokken, op geen van beide deuren en in beide
         richtingen. findByLogin vindt het account onder al die namen, dus de
         rem hoort dat ook te doen (I1 uit de keuring van ronde 6). En een
-        onbekende naam geeft hetzelfde antwoord als een fout wachtwoord.
+        onbekende naam geeft hetzelfde antwoord als een fout wachtwoord;
+     9. de adresemmer voedt de noodrem ook: vijftig gokken op vijftig accounts
+        vanaf een adres zetten dat adres in quarantaine, en een ander adres
+        blijft open (R10 uit de keuring van ronde 6).
 
    Waarom de tijd wordt gemeten en niet alleen de status: het account krijgt met
    opzet een VERTRAGING en geen slot (test/inlogrem.test.js). Een trage machine
@@ -372,5 +375,40 @@ test('8. een account is een emmer, in elke spelling en onder elke naam: e-mailad
       assert.equal(onbekend.status + ' ' + JSON.stringify(onbekend.body), bekend.status + ' ' + JSON.stringify(bekend.body),
         pad + ': een onbekende naam geeft hetzelfde antwoord als een fout wachtwoord');
     }
+  });
+});
+
+/* DE ADRESEMMER VOEDT DE NOODREM (R10 uit de keuring van ronde 6). Toets 7
+   houdt dat vast voor de accountemmer; voor de emmer op het adres alleen (50)
+   deed niets dat. Een eigen `soort` in die noteFailedTry maakt van de melding
+   een waarschuwing zonder noodrem, en dan blijft een adres dat op vijftig
+   accounts gokt gewoon open (de rem geeft dan 429, nooit 403).
+
+   Vijftig verschillende namen, om en om op beide deuren: geen enkele emmer van
+   adres plus account en geen accountemmer komt boven een, dus alleen de
+   adresemmer gaat dicht. Een vreemd adres, want het schild zet een lokaal adres
+   nooit in quarantaine. */
+test('9. de adresemmer voedt de noodrem: na 50 gokken op 50 accounts vanaf een adres staat dat adres in quarantaine', async () => {
+  await metServer(async ({ poging }) => {
+    const DADER = '198.51.100.99';
+    for (let i = 0; i < 50; i++) {
+      const pad = i % 2 ? GEWOON : WERK;
+      const r = await poging(pad, DADER, 'verspreid' + i + '@voorbeeld.test', 'fout' + i);
+      assert.equal(r.status, 401, 'gok ' + (i + 1) + ' op ' + pad + ': ' + r.status + ' ' + JSON.stringify(r.body).slice(0, 120));
+    }
+    /* De vijftigste sloot de adresemmer en meldde brute force met dit adres
+       als aanvaller. Gewacht op de toestand: de quarantaine wordt vastgelegd,
+       en het juiste wachtwoord helpt dit adres dan op geen van beide deuren. */
+    for (const pad of [WERK, GEWOON]) {
+      const dader = await wachtOpWaarde(async () => {
+        const r = await poging(pad, DADER, NORA, NORA_WW);
+        return r.status === 403 ? r : null;
+      }, { ms: 10000, wat: 'quarantaine (403) voor ' + DADER + ' op ' + pad });
+      assert.match(String(dader.body.error), /quarantaine/, pad + ': het is de quarantaine: ' + JSON.stringify(dader.body));
+    }
+    /* TEGENPROEF: een ander adres staat er niet in, en Nora komt daar met het
+       juiste wachtwoord gewoon binnen; de echte status. */
+    const ander = await poging(WERK, '198.51.100.98', NORA, NORA_WW);
+    assert.equal(ander.status, 200, 'een ander adres blijft open: ' + JSON.stringify(ander.body).slice(0, 160));
   });
 });

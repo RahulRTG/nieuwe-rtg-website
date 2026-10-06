@@ -4,7 +4,7 @@ const prerequisite=(id,title,consumers,values)=>Object.freeze({id,title,consumer
   unlockCount:consumers.length});
 const KNOWLEDGE=['leerhuis','dom-les','dom-leerstof','dom-onderwijs','ov-bijles','rtf-leerpaspoort','dom-library','dom-boeken','ov-krant','dom-site','dom-eigendomein'];
 const WORK=['kantoorpakket','ondernemersos','office','bedrijf','command-zien','command-doen','command-besturen','zaakregie','zaakregie-beheer','dom-werkplek'];
-const ASSET=['wereld','experience-platform','dom-plaats','ov-stad','vastgoed','verzorging','dom-thuis','dom-residentie','dom-home'];
+const ASSET=['wereld','experience-platform','dom-plaats','ov-stad','vastgoed','verzorging','dom-thuis','dom-residentie','dom-home','dom-doos'];
 const SERVICE=['gastos','supplier-haccp','supplier-pos','supplier-salon','supplier-rooms','bk-eten'];
 const PERSONAL=['rechterhand','neiging','privekantoor','life','doelen','dagmetingen','gemoed','gewoonten','training','tijdlijn','voeding','rust','ov-spar'];
 const WORKFORCE=['staff','dom-werkvloer','ov-kantoorgesprek','ov-werkmail','member-werk','carriereledger','supplier-apply','werving','vakbewijs','dom-metier','dom-vak'];
@@ -45,12 +45,6 @@ const PREREQUISITES=Object.freeze([
     counterexample:'Ruwe logregels en stacktraces zijn geen memory en mogen geen bronpayload lekken.',
     implementationScope:'small: reviewstate, allowlist en link naar source occurrence',risk:'secrets of persoonsgegevens uit logs kopiëren',
     dependencies:['technical owner','review decision','minimization','retention','change target']}),
-  prerequisite('P06_VERSIONED_PHYSICAL_HANDOFF','Versioned Physical Handoff State',['dom-doos'],{
-    sharedSemantics:'Een fysieke overdracht heeft stabiele objectidentiteit, custody/version, bevoegde overdracht en bevestigde ontvangst.',
-    reuse:['ObjectRef','existing commerce handoff state','source-issued receipt pattern'],
-    counterexample:'Een betaling of aankoopclaim is geen fysiek custodybewijs.',
-    implementationScope:'medium: fysieke state en authority bij beide zijden',risk:'consumer schrijft bronstate of claimt ontvangst namens tegenpartij',
-    dependencies:['custody owner','handoff version','dual authority','source receipt','delivery verification']}),
   prerequisite('P07_WORKFORCE_PROCESS_SEPARATION','Workforce Process Separation',WORKFORCE,{
     sharedSemantics:'Alleen versioned processtate kan organizational learning voeden; menselijke prestatie, communicatie en loopbaan blijven afzonderlijk en private-first.',
     reuse:['WorkOS authority','versioned work process target','Learning Constitution LC07'],
@@ -88,6 +82,10 @@ const PREREQUISITES=Object.freeze([
     dependencies:['purpose binding','current authorization','provenance type','training deny','source mutation gate']})
 ]);
 
+const REJECTED_PREREQUISITES=Object.freeze([{id:'P06_VERSIONED_PHYSICAL_HANDOFF',status:'REJECTED_BY_SOURCE_RECHECK',
+  reason:'dom-doos is hardwaretelemetrie en updatebeheer, geen fysieke custody-overdracht. De eerdere naamgebaseerde indeling was semantisch onjuist.',
+  correctedTo:'P03_ASSET_INTERVENTION_LIFECYCLE',consumers:[]}]);
+
 const TECHNICAL_CONSUMER_COUNT=new Set(PREREQUISITES.flatMap(p=>p.consumers)).size;
 const PROTOCOL_GATES=Object.freeze([
   {id:'G01_ELIGIBILITY',consumers:TECHNICAL_CONSUMER_COUNT,reuse:'server/kern/loop-fabric/learning-eligibility.js',rule:'Iedere bron geeft purpose, basis, memory class, fields, audience, uses en retention uit.'},
@@ -108,4 +106,4 @@ const SCALE_DECISIONS=Object.freeze({
 });
 
 function prerequisiteForCapability(id){return PREREQUISITES.find(p=>p.consumers.includes(id))||null;}
-module.exports={PREREQUISITES,PROTOCOL_GATES,SCALE_DECISIONS,prerequisiteForCapability};
+module.exports={PREREQUISITES,REJECTED_PREREQUISITES,PROTOCOL_GATES,SCALE_DECISIONS,prerequisiteForCapability};

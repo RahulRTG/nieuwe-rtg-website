@@ -203,7 +203,7 @@
       "blastRadius": {
         "sourceOwners": 13,
         "kernelModules": 122,
-        "mutationContracts": 1056,
+        "mutationContracts": 1058,
         "routes": 1077,
         "screens": 29,
         "dataSchema": "versioned source targets en duurzame events waar zij ontbreken",
@@ -382,9 +382,9 @@
       ],
       "technicalPrerequisites": [
         "P01_VERSIONED_SOURCE_RELEASE",
+        "P03_ASSET_INTERVENTION_LIFECYCLE",
         "P04_VERSIONED_SERVICE_PROCEDURE",
         "P05_REVIEWED_FAILURE_ARTIFACT",
-        "P06_VERSIONED_PHYSICAL_HANDOFF",
         "P13_AI_PURPOSE_SCOPE"
       ],
       "blastRadius": {

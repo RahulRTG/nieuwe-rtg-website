@@ -13,7 +13,7 @@
   "measured": {
     "capabilities": 228,
     "routes": 5422,
-    "mutationContracts": 5296,
+    "mutationContracts": 5298,
     "screens": 326
   },
   "classifications": [
@@ -1626,6 +1626,7 @@
       "server/kern/livinglab/waarnemen.js",
       "server/kern/livinglab/werkplaats.js",
       "server/kern/logies.js",
+      "server/kern/loop-fabric/constitution.js",
       "server/kern/loop-fabric/coverage-policy.js",
       "server/kern/loop-fabric/decision-context.js",
       "server/kern/loop-fabric/delivery.js",
@@ -15892,8 +15893,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 669,
-        "mutationRoutes": 649,
-        "declaredMutationSemantics": 374,
+        "mutationRoutes": 651,
+        "declaredMutationSemantics": 376,
         "sourceFileCount": 106,
         "kernelDependencyCount": 114,
         "screenCount": 21,
@@ -21008,7 +21009,7 @@
           "durable-event",
           "recovery-proof"
         ],
-        "technicalPrerequisiteId": "P06_VERSIONED_PHYSICAL_HANDOFF"
+        "technicalPrerequisiteId": "P03_ASSET_INTERVENTION_LIFECYCLE"
       }
     },
     {

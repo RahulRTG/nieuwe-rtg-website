@@ -6,7 +6,7 @@
   "sourceFlows": {
     "summary": {
       "GO": 8,
-      "PHASE": 6,
+      "PHASE": 8,
       "STOP": 8
     },
     "newGo": [
@@ -265,6 +265,15 @@
       "zakelijk"
     ],
     "complete": true,
+    "rejectedHypotheses": [
+      {
+        "id": "P06_VERSIONED_PHYSICAL_HANDOFF",
+        "status": "REJECTED_BY_SOURCE_RECHECK",
+        "reason": "dom-doos is hardwaretelemetrie en updatebeheer, geen fysieke custody-overdracht. De eerdere naamgebaseerde indeling was semantisch onjuist.",
+        "correctedTo": "P03_ASSET_INTERVENTION_LIFECYCLE",
+        "consumers": []
+      }
+    ],
     "nodes": [
       {
         "id": "P08_PERSONAL_STRUCTURAL_RELEASE",
@@ -300,7 +309,15 @@
           "new artifact id",
           "source revocation path"
         ],
-        "unlockCount": 13
+        "unlockCount": 13,
+        "proofStatus": {
+          "status": "PROVEN_BOUNDED",
+          "proof": [
+            "experience.living-world-contribution",
+            "service.process-improvement"
+          ],
+          "next": "Iedere nieuwe bron vereist eigen vrijwilligheid, minimization en unlinkingbewijs."
+        }
       },
       {
         "id": "P01_VERSIONED_SOURCE_RELEASE",
@@ -334,7 +351,14 @@
           "withdrawal path",
           "consumer-owned versioned target"
         ],
-        "unlockCount": 11
+        "unlockCount": 11,
+        "proofStatus": {
+          "status": "PROVEN_BOUNDED",
+          "proof": [
+            "library-edition-to-academy"
+          ],
+          "next": "Nieuwe source owners blijven PHASE tot hun eigen versioned release en withdrawal zijn bewezen."
+        }
       },
       {
         "id": "P07_WORKFORCE_PROCESS_SEPARATION",
@@ -368,7 +392,12 @@
           "retention",
           "verification"
         ],
-        "unlockCount": 11
+        "unlockCount": 11,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [],
+          "next": "Decomposeer eerst processtate en menselijke context; LC07 blokkeert persoonsgerichte organizational memory."
+        }
       },
       {
         "id": "P11_EVENT_FEEDBACK_RELEASE",
@@ -402,7 +431,15 @@
           "unlinking",
           "next-event verification"
         ],
-        "unlockCount": 11
+        "unlockCount": 11,
+        "proofStatus": {
+          "status": "PROVEN_BOUNDED",
+          "proof": [
+            "experience.living-world-contribution",
+            "workos.accessibility-procedure"
+          ],
+          "next": "Andere event owners blijven PHASE tot hun eigen source version en no-disadvantage pad bestaan."
+        }
       },
       {
         "id": "P02_VERSIONED_WORK_PROCESS_TARGET",
@@ -435,7 +472,15 @@
           "source receipt",
           "verification occurrence"
         ],
-        "unlockCount": 10
+        "unlockCount": 10,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [
+            "workos.accessibility-procedure",
+            "workos.near-miss-runbook"
+          ],
+          "next": "Kies per capability eerst een concreet, niet-persoonsgebonden procesobject."
+        }
       },
       {
         "id": "P03_ASSET_INTERVENTION_LIFECYCLE",
@@ -449,7 +494,8 @@
           "verzorging",
           "dom-thuis",
           "dom-residentie",
-          "dom-home"
+          "dom-home",
+          "dom-doos"
         ],
         "sharedSemantics": "Issue, diagnose, interventie, assetversie en verificatie blijven bij het asset-/werelddomein en scheiden actor van asset history.",
         "reuse": [
@@ -467,7 +513,12 @@
           "actor unlinking",
           "recurrence observation"
         ],
-        "unlockCount": 9
+        "unlockCount": 10,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [],
+          "next": "Asset authority, intervention versioning, retention en source receipt ontbreken; dom-doos is hier correct ondergebracht."
+        }
       },
       {
         "id": "P04_VERSIONED_SERVICE_PROCEDURE",
@@ -497,7 +548,14 @@
           "source outbox/receipt",
           "next-service verification"
         ],
-        "unlockCount": 7
+        "unlockCount": 7,
+        "proofStatus": {
+          "status": "PROVEN_BOUNDED",
+          "proof": [
+            "service.process-improvement"
+          ],
+          "next": "Hospitality- en leveranciersprocedures blijven source-specifiek PHASE."
+        }
       },
       {
         "id": "P09_TRAVEL_STRUCTURAL_LESSON",
@@ -527,7 +585,12 @@
           "unlinking",
           "future-trip recall policy"
         ],
-        "unlockCount": 7
+        "unlockCount": 7,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [],
+          "next": "Nog geen begrensde vrijwillige tripbron met locatie-minimization en toekomstig recallcontract."
+        }
       },
       {
         "id": "P12_VERSION_BOUND_COMMONS_RELEASE",
@@ -556,7 +619,14 @@
           "attribution",
           "no-pay-to-rank gate"
         ],
-        "unlockCount": 6
+        "unlockCount": 6,
+        "proofStatus": {
+          "status": "PROVEN_ONE_SOURCE",
+          "proof": [
+            "experience.living-world-commons-release"
+          ],
+          "next": "Geen generiek platformcontract zonder tweede semantisch gelijkwaardige source owner."
+        }
       },
       {
         "id": "P13_AI_PURPOSE_SCOPE",
@@ -585,7 +655,12 @@
           "training deny",
           "source mutation gate"
         ],
-        "unlockCount": 6
+        "unlockCount": 6,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [],
+          "next": "Training blijft constitutioneel deny; adapters wachten op concrete source-owned AI-use contracts."
+        }
       },
       {
         "id": "P10_FOUNDATION_VOLUNTARY_LESSON",
@@ -613,7 +688,12 @@
           "withdrawal",
           "organizational decision"
         ],
-        "unlockCount": 5
+        "unlockCount": 5,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [],
+          "next": "Nog geen source-flow die no-disadvantage, withdrawal en organizational decision gezamenlijk bewijst."
+        }
       },
       {
         "id": "P05_REVIEWED_FAILURE_ARTIFACT",
@@ -637,31 +717,12 @@
           "retention",
           "change target"
         ],
-        "unlockCount": 1
-      },
-      {
-        "id": "P06_VERSIONED_PHYSICAL_HANDOFF",
-        "title": "Versioned Physical Handoff State",
-        "consumers": [
-          "dom-doos"
-        ],
-        "sharedSemantics": "Een fysieke overdracht heeft stabiele objectidentiteit, custody/version, bevoegde overdracht en bevestigde ontvangst.",
-        "reuse": [
-          "ObjectRef",
-          "existing commerce handoff state",
-          "source-issued receipt pattern"
-        ],
-        "counterexample": "Een betaling of aankoopclaim is geen fysiek custodybewijs.",
-        "implementationScope": "medium: fysieke state en authority bij beide zijden",
-        "risk": "consumer schrijft bronstate of claimt ontvangst namens tegenpartij",
-        "dependencies": [
-          "custody owner",
-          "handoff version",
-          "dual authority",
-          "source receipt",
-          "delivery verification"
-        ],
-        "unlockCount": 1
+        "unlockCount": 1,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [],
+          "next": "Technische reviewauthority, allowlist, tijdretentie, versioned change target en source outbox ontbreken."
+        }
       }
     ],
     "protocolGates": [
@@ -1000,61 +1061,108 @@
   "roadmap": [
     {
       "order": 1,
-      "step": "Bouw P01_VERSIONED_SOURCE_RELEASE voor goedgekeurd D23",
-      "why": "begrensde, versiegebonden en goed testbare cross-domain semantiek",
+      "step": "P08_PERSONAL_STRUCTURAL_RELEASE",
+      "status": "PROVEN_BOUNDED",
+      "why": "Een vrijwillige persoonlijke bijdrage maakt na minimization en unlinking een nieuw structureel artifact; de private bron wordt niet gekopieerd.",
       "unlocks": [
-        "dom-library",
-        "leerhuis"
+        "rechterhand",
+        "neiging",
+        "privekantoor",
+        "life",
+        "doelen",
+        "dagmetingen",
+        "gemoed",
+        "gewoonten",
+        "training",
+        "tijdlijn",
+        "voeding",
+        "rust",
+        "ov-spar"
       ],
-      "nextProof": "V01 Library Edition X -> interne Academy curriculumversie"
+      "nextProof": "Iedere nieuwe bron vereist eigen vrijwilligheid, minimization en unlinkingbewijs.",
+      "proof": [
+        "experience.living-world-contribution",
+        "service.process-improvement"
+      ]
     },
     {
       "order": 2,
-      "step": "Bewijs P04_VERSIONED_SERVICE_PROCEDURE op één serviceprocedure",
-      "why": "D15 begrenst de inhoud; procesmetadata kan zonder klantprofiel leren",
+      "step": "P01_VERSIONED_SOURCE_RELEASE",
+      "status": "PROVEN_BOUNDED",
+      "why": "Een bron geeft exact object, versie, scope, doel, geldigheid en withdrawalstatus vrij; de consumer kopieert geen bronwaarheid.",
       "unlocks": [
-        "service",
-        "supplier-haccp"
+        "leerhuis",
+        "dom-les",
+        "dom-leerstof",
+        "dom-onderwijs",
+        "ov-bijles",
+        "rtf-leerpaspoort",
+        "dom-library",
+        "dom-boeken",
+        "ov-krant",
+        "dom-site",
+        "dom-eigendomein"
       ],
-      "nextProof": "V02 bottleneck -> procedureversie -> volgende service verification"
+      "nextProof": "Nieuwe source owners blijven PHASE tot hun eigen versioned release en withdrawal zijn bewezen.",
+      "proof": [
+        "library-edition-to-academy"
+      ]
     },
     {
       "order": 3,
-      "step": "Bouw P11_EVENT_FEEDBACK_RELEASE op één eventflow",
-      "why": "D11 bepaalt eventscope, no-disadvantage, review en unlinking",
+      "step": "P07_WORKFORCE_PROCESS_SEPARATION",
+      "status": "PHASE",
+      "why": "Alleen versioned processtate kan organizational learning voeden; menselijke prestatie, communicatie en loopbaan blijven afzonderlijk en private-first.",
       "unlocks": [
-        "ontmoetingen",
-        "tickets",
-        "supplier-events"
+        "staff",
+        "dom-werkvloer",
+        "ov-kantoorgesprek",
+        "ov-werkmail",
+        "member-werk",
+        "carriereledger",
+        "supplier-apply",
+        "werving",
+        "vakbewijs",
+        "dom-metier",
+        "dom-vak"
       ],
-      "nextProof": "V03 eventfeedback -> geminimaliseerde les -> volgende event verification"
+      "nextProof": "Decomposeer eerst processtate en menselijke context; LC07 blokkeert persoonsgerichte organizational memory.",
+      "proof": []
     },
     {
       "order": 4,
-      "step": "Bouw P08_PERSONAL_STRUCTURAL_RELEASE",
-      "why": "D01 levert de generieke private-first grens voor één vrijwillige promotieslice",
+      "step": "P11_EVENT_FEEDBACK_RELEASE",
+      "status": "PROVEN_BOUNDED",
+      "why": "Vrijwillige feedback is event- en purpose-bound en wordt pas na review/minimization een structurele eventles.",
       "unlocks": [
-        "één begrensde persoonlijke contribution-flow"
+        "ontmoetingen",
+        "social",
+        "rtf-contacten",
+        "tickets",
+        "supplier-events",
+        "dom-agenda",
+        "dom-meet",
+        "bk-tickets",
+        "fs-terrein",
+        "fs-werk",
+        "fs-gast"
       ],
-      "nextProof": "V04 personal observation -> unlinked structural lesson"
+      "nextProof": "Andere event owners blijven PHASE tot hun eigen source version en no-disadvantage pad bestaan.",
+      "proof": [
+        "experience.living-world-contribution",
+        "workos.accessibility-procedure"
+      ]
     },
     {
       "order": 5,
-      "step": "Bouw P12_VERSION_BOUND_COMMONS_RELEASE met twee source owners",
-      "why": "D13 is besloten maar vereist source-local release en withdrawal",
-      "unlocks": [
-        "één Saloon- en één World Network-release"
-      ],
-      "nextProof": "V05 exact object/version -> Commons -> withdrawal"
-    },
-    {
-      "order": 6,
-      "step": "P02_VERSIONED_WORK_PROCESS_TARGET per objectieve procesflow",
-      "why": "grote technische leverage, maar employee-bound subflows blijven uitgesloten",
+      "step": "P02_VERSIONED_WORK_PROCESS_TARGET",
+      "status": "PHASE",
+      "why": "Een organisatorisch procesobject heeft stabiele lijn, immutable versie en bevoegde source change.",
       "unlocks": [
         "kantoorpakket",
         "ondernemersos",
         "office",
+        "bedrijf",
         "command-zien",
         "command-doen",
         "command-besturen",
@@ -1062,20 +1170,136 @@
         "zaakregie-beheer",
         "dom-werkplek"
       ],
-      "nextProof": "V06 project outcome -> process version -> next-project recall"
+      "nextProof": "Kies per capability eerst een concreet, niet-persoonsgebonden procesobject.",
+      "proof": [
+        "workos.accessibility-procedure",
+        "workos.near-miss-runbook"
+      ]
+    },
+    {
+      "order": 6,
+      "step": "P03_ASSET_INTERVENTION_LIFECYCLE",
+      "status": "PHASE",
+      "why": "Issue, diagnose, interventie, assetversie en verificatie blijven bij het asset-/werelddomein en scheiden actor van asset history.",
+      "unlocks": [
+        "wereld",
+        "experience-platform",
+        "dom-plaats",
+        "ov-stad",
+        "vastgoed",
+        "verzorging",
+        "dom-thuis",
+        "dom-residentie",
+        "dom-home",
+        "dom-doos"
+      ],
+      "nextProof": "Asset authority, intervention versioning, retention en source receipt ontbreken; dom-doos is hier correct ondergebracht.",
+      "proof": []
     },
     {
       "order": 7,
-      "step": "P03_ASSET_INTERVENTION_LIFECYCLE na assetauthoritybesluit",
-      "why": "maakt onderhoudsgeheugen mogelijk zonder bewonersgeschiedenis",
+      "step": "P04_VERSIONED_SERVICE_PROCEDURE",
+      "status": "PROVEN_BOUNDED",
+      "why": "Een bevoegde serviceowner wijzigt een concrete procedureversie en verifieert bij een volgende service-uitvoering.",
       "unlocks": [
-        "vastgoed",
-        "dom-thuis",
-        "dom-residentie",
-        "dom-home"
+        "gastos",
+        "supplier-haccp",
+        "supplier-pos",
+        "supplier-salon",
+        "supplier-rooms",
+        "bk-eten",
+        "service"
       ],
-      "nextProof": "V07 issue -> intervention -> recurrence observation"
+      "nextProof": "Hospitality- en leveranciersprocedures blijven source-specifiek PHASE.",
+      "proof": [
+        "service.process-improvement"
+      ]
+    },
+    {
+      "order": 8,
+      "step": "P09_TRAVEL_STRUCTURAL_LESSON",
+      "status": "PHASE",
+      "why": "Triprecall blijft Personal; alleen vrijwillig vrijgegeven, geminimaliseerde reisuitkomsten worden losgekoppelde structurele lessons.",
+      "unlocks": [
+        "avondos",
+        "arrival",
+        "instantreality",
+        "dom-reisbureau",
+        "bk-reizen",
+        "bk-verblijf",
+        "bk-reiswijzer"
+      ],
+      "nextProof": "Nog geen begrensde vrijwillige tripbron met locatie-minimization en toekomstig recallcontract.",
+      "proof": []
+    },
+    {
+      "order": 9,
+      "step": "P12_VERSION_BOUND_COMMONS_RELEASE",
+      "status": "PROVEN_ONE_SOURCE",
+      "why": "De source owner geeft object/versie, doel, audience, reuse, attribution, AI- en derivative scope expliciet vrij en kan withdraw/supersede uitgeven.",
+      "unlocks": [
+        "zakelijk",
+        "socialewereld",
+        "connect",
+        "dom-genootschap",
+        "salon",
+        "kern-waardering"
+      ],
+      "nextProof": "Geen generiek platformcontract zonder tweede semantisch gelijkwaardige source owner.",
+      "proof": [
+        "experience.living-world-commons-release"
+      ]
+    },
+    {
+      "order": 10,
+      "step": "P13_AI_PURPOSE_SCOPE",
+      "status": "PHASE",
+      "why": "Assistance, inference en training zijn afzonderlijke source-issued uses; AI-output behoudt epistemische herkomst en mutatieauthority.",
+      "unlocks": [
+        "oog",
+        "ghost",
+        "knelpunt",
+        "kern-rahul",
+        "ov-aandacht",
+        "stuur"
+      ],
+      "nextProof": "Training blijft constitutioneel deny; adapters wachten op concrete source-owned AI-use contracts.",
+      "proof": []
+    },
+    {
+      "order": 11,
+      "step": "P10_FOUNDATION_VOLUNTARY_LESSON",
+      "status": "PHASE",
+      "why": "Hulp en vrijwillige ervaringsbijdrage zijn afzonderlijke lifecycles; weigering heeft aantoonbaar geen behandel- of kansnadeel.",
+      "unlocks": [
+        "levenos",
+        "rugdekking",
+        "werk-rtf",
+        "dom-rtfkantoor",
+        "dom-rtfos"
+      ],
+      "nextProof": "Nog geen source-flow die no-disadvantage, withdrawal en organizational decision gezamenlijk bewijst.",
+      "proof": []
+    },
+    {
+      "order": 12,
+      "step": "P05_REVIEWED_FAILURE_ARTIFACT",
+      "status": "PHASE",
+      "why": "Een technische occurrence wordt pas na bevoegde review een minimale operationele les.",
+      "unlocks": [
+        "dom-foutmelder"
+      ],
+      "nextProof": "Technische reviewauthority, allowlist, tijdretentie, versioned change target en source outbox ontbreken.",
+      "proof": []
     }
   ],
+  "fixedPoint": {
+    "reached": true,
+    "implementedGo": 8,
+    "remainingPhase": 8,
+    "remainingStop": 8,
+    "reason": "Alle acht source-flows die zelfstandig alle stoppoorten halen zijn geïmplementeerd. Iedere resterende flow mist source-specifieke authority, retention, versioning/receipt/recovery, een menselijke of juridische beslissing, of bewezen schaalarchitectuur.",
+    "safeTechnicalWorkWithoutNewDecision": false
+  },
   "stopStatement": "De 32 scale-blocked capabilities blijven STOP; deze roadmap bouwt geen distributed architecture."
 }

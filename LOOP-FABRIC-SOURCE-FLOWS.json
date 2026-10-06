@@ -14,6 +14,8 @@
   ],
   "capabilities": [
     "bedrijf",
+    "dom-doos",
+    "dom-foutmelder",
     "dom-library",
     "dom-livinglab",
     "experience-platform",
@@ -22,7 +24,7 @@
   ],
   "summary": {
     "GO": 8,
-    "PHASE": 6,
+    "PHASE": 8,
     "STOP": 8
   },
   "flows": [
@@ -350,6 +352,56 @@
         "test/bedrijf-service.test.js"
       ],
       "prerequisite": "menselijke beslissing over werknemerscontext, supportinhoud en surveillancegrens"
+    },
+    {
+      "id": "service.browser-failure-review",
+      "capabilityId": "dom-foutmelder",
+      "status": "PHASE",
+      "semanticOwner": "service-foutsignaal voor de geaggregeerde foutvorm; techniek voor latere review",
+      "canonicalState": "serviceFoutsignalen bevat een anonieme teller per foutvingerafdruk; ruwe logs blijven een andere bron",
+      "mutationPoint": "server/routes/fout.js en server/kern/service/foutsignaal.js: meld",
+      "authority": "publieke occurrence heeft geen actor; een expliciete technische reviewauthority bestaat nog niet",
+      "occurrence": "onbevestigde browserfout, begrensd en zonder accountidentiteit",
+      "observationOpportunity": "pas een toekomstige review mag een allowlisted failure artifact uitgeven",
+      "expectationDecision": "geen versioned verwachting of reviewbesluit in de bron",
+      "claimContest": "onbetrouwbare publieke invoer kan niet als feit worden behandeld",
+      "changeTarget": "geen versioned source-owned proces- of softwaretarget",
+      "sourceIssuedReceipt": "geen",
+      "verificationPath": "geen receipt-bound volgende uitvoering",
+      "memoryClass": "ORGANIZATIONAL na review; ruwe melding is geen memory",
+      "retention": "maximaal 2000 signalen met oudste-evictie, maar geen doelgebonden tijdretentie voor een lesson",
+      "recallContext": "nog niet toegestaan; alleen techniekbord toont de bronteller",
+      "recoveryReplay": "bron bewaart een teller via save; geen operation-id, outbox of durable reviewdelivery",
+      "tests": [
+        "test/service-foutsignaal.test.js",
+        "test/fout-route.test.js"
+      ],
+      "prerequisite": "P05 Reviewed Failure Artifact plus reviewauthority, versioned change target, retentie en recovery-outbox"
+    },
+    {
+      "id": "zaakdoos.device-update-learning",
+      "capabilityId": "dom-doos",
+      "status": "PHASE",
+      "semanticOwner": "zaakdoos voor apparaatstatus; kantoorregie voor gewenste updateversie",
+      "canonicalState": "doosUpdate, doosUpdateStatus, doosMetingen en per-doos sleutelregister",
+      "mutationPoint": "server/routes/kantoren/index.js: update-zet; server/routes/doos-kloon.js: update/status; server/routes/doos.js: meting",
+      "authority": "kantoor zet doelversie; apparaat meldt uitsluitend binnen zijn actuele doossleutel en zaak",
+      "occurrence": "apparaatupdate slaagt of faalt en een volgende meting meldt de draaiende versie",
+      "observationOpportunity": "update-uitkomst kan asset-scoped observation worden zonder zaakinhoud",
+      "expectationDecision": "doosUpdate bevat doelversie, maar nog geen immutable decision/contextversie per apparaat",
+      "claimContest": "apparaatstatus is een signed/scoped self-report en nog geen onafhankelijke verificatie",
+      "changeTarget": "softwareversie van één Zaakdoos als asset",
+      "sourceIssuedReceipt": "geen Loop ChangeReceipt van de apparaatbron",
+      "verificationPath": "volgende bevoegde meting kan versie bevestigen; dit is nog niet receipt-bound",
+      "memoryClass": "DOMAIN_ASSET",
+      "retention": "begrensde aantallen, maar geen expliciete asset-learningretentie of supersession",
+      "recallContext": "volgende updatevoorbereiding voor exact apparaat en actuele sleutel/zaak",
+      "recoveryReplay": "save bestaat; update-status mist operation-id, outbox/checkpoint en changed-replaybescherming",
+      "tests": [
+        "test/doos-eigen-sleutel.test.js",
+        "test/doos-update.test.js"
+      ],
+      "prerequisite": "P03 Asset Intervention Lifecycle; P06 physical handoff was een semantische misclassificatie"
     },
     {
       "id": "service.process-improvement",

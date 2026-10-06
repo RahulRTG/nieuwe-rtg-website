@@ -67,13 +67,21 @@ async function shot(page, name) {
   const out = path.join(__dirname,'../artifacts/mobile-content'); fs.mkdirSync(out,{recursive:true});
   await page.screenshot({path:path.join(out,name+'.png')});
 }
-/* "TypeError: Load failed" is wat WebKit meldt voor een fetch die afbreekt omdat
-   zijn DOCUMENT wordt verlaten (herladen, context dicht). Chromium meldt die niet.
-   Alleen precies die tekst, en alleen terwijl de toets zelf weg-navigeert, telt
-   niet; buiten dat venster blijft hij een clientfout, en dan zegt netwerkStand()
-   welk adres het was. Geteld wordt hij wel (stand.afgebroken). */
+/* WEBKIT MELDT EEN VERZOEK DAT AFBREEKT OMDAT ZIJN DOCUMENT WORDT VERLATEN
+   (herladen, pagina of context dicht) als clientfout, en in twee vormen:
+   "TypeError: Load failed", en "<adres> due to access control checks." -- dat
+   laatste is WebKits misleidende tekst voor dezelfde afbreking; voor een adres op
+   de EIGEN server bestaat er geen toegangscontrole die kan falen. Chromium meldt
+   geen van beide. Alleen die twee vormen, alleen voor de eigen server, en alleen
+   terwijl de toets zelf weg-navigeert, tellen niet als clientfout; ze worden wel
+   geteld (stand.afgebroken). Buiten dat venster blijven ze een fout, en dan zegt
+   netwerkStand() welk adres het was. */
 const AFGEBROKEN = 'TypeError: Load failed';
-const bak = (errors, stand) => ({ push(m) { if (stand.weg && m === AFGEBROKEN) stand.afgebroken++; else errors.push(m); } });
+const afgebroken = (m, host) => m === AFGEBROKEN ||
+  (!!host && m.includes(host + '/') && / due to access control checks\.$/.test(m));
+const bak = (errors, stand, host) => ({ push(m) {
+  if (stand.weg && afgebroken(m, host)) stand.afgebroken++; else errors.push(m);
+} });
 const lopend = new WeakMap(), mislukt = new WeakMap();
 function netwerk(p) {
   const open = new Map(), fout = [];
@@ -87,13 +95,16 @@ function netwerkStand(p) {
   return 'hangend: ' + JSON.stringify(open.slice(0, 12)) + '; mislukt: ' + JSON.stringify((mislukt.get(p) || []).slice(0, 12));
 }
 test('de afbreekzeef laat alleen een WebKit-afbreking tijdens het weg-navigeren door', () => {
-  const errors = [], stand = {weg:false, afgebroken:0}, b = bak(errors, stand);
-  b.push(AFGEBROKEN);
-  assert.deepEqual(errors, [AFGEBROKEN], 'buiten het venster is hij een gewone clientfout');
+  const errors = [], stand = {weg:false, afgebroken:0}, host = '127.0.0.1:4000', b = bak(errors, stand, host);
+  const eigen = 'Fetch API cannot load http://' + host + '/api/ik/beelden due to access control checks.';
+  const vreemd = 'Fetch API cannot load https://elders.test/x due to access control checks.';
+  b.push(AFGEBROKEN); b.push(eigen);
+  assert.deepEqual(errors, [AFGEBROKEN, eigen], 'buiten het venster zijn het gewone clientfouten');
   stand.weg = true;
-  b.push(AFGEBROKEN); b.push('TypeError: iets anders'); b.push(AFGEBROKEN + ' uitgebreid');
-  assert.deepEqual(errors, [AFGEBROKEN, 'TypeError: iets anders', AFGEBROKEN + ' uitgebreid'], 'alleen precies die tekst');
-  assert.equal(stand.afgebroken, 1, 'en hij wordt geteld, niet weggegooid');
+  b.push(AFGEBROKEN); b.push(eigen); b.push(vreemd); b.push('TypeError: iets anders'); b.push(AFGEBROKEN + ' uitgebreid');
+  assert.deepEqual(errors.slice(2), [vreemd, 'TypeError: iets anders', AFGEBROKEN + ' uitgebreid'],
+    'alleen precies die twee vormen, en de tweede alleen voor de eigen server');
+  assert.equal(stand.afgebroken, 2, 'en ze worden geteld, niet weggegooid');
 });
 for (const engine of engines) {
   for (const width of [390,1440]) test(engine+' '+width+': Work, Horeca en Network houden hun inhoud', {skip}, async () => {
@@ -138,7 +149,7 @@ for (const engine of engines) {
     try {
       const ctx = await context(browser,390), errors = [], stand = {weg:false, afgebroken:0};
       let page = await ctx.newPage();
-      const volg = (p) => { h.letOpFouten(p, bak(errors, stand)); netwerk(p); };
+      const volg = (p) => { h.letOpFouten(p, bak(errors, stand, new URL(srv.base).host)); netwerk(p); };
       volg(page);
       let held = 0;
       const vertraag = async r => {held++;await new Promise(resolve => setTimeout(resolve,1200));await r.continue();};
@@ -164,7 +175,7 @@ for (const engine of engines) {
          de CONTEXT, dus een tweede pagina erft de bladen en niet de onderschepping. */
       if (delayed) {
         const verder = await ctx.newPage(); volg(verder);
-        await page.close(); page = verder;
+        stand.weg = true; await page.close(); stand.weg = false; page = verder;
         await page.goto(srv.base + '/apps/app.html?pas=rtg', {waitUntil:'domcontentloaded'});
       }
       stand.weg = true;

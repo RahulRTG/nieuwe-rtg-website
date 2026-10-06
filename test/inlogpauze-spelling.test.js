@@ -6,7 +6,9 @@
    dezelfde handler laat komen (padMatch in server/web/routing.js, en de index
    in server/web/routeindex.js). Een herkeuring zag het zelf: tijdens een
    gesprongen pauze gaf /api/auth/login een 503 en /api/auth/login/ een 200,
-   en /api/aanmeld/zeg/ gaf een token. Dat gold voor alle paden op de lijst.
+   en /api/aanmeld/zeg/ gaf een token. Dat gold voor elk pad op de lijst dat
+   een handler heeft; /api/staff/login heeft er geen, en daar gaf ook de vorm
+   met slash 404 (deel 2 meet dat, zie hieronder).
 
    Besluit van de eigenaar: de pauze krijgt dezelfde opvatting van "dit pad" als
    de router, en leent die van de router in plaats van er een eigen
@@ -188,6 +190,22 @@ function kern(r) {
 test('2. op een echte server: geen spelling van een inlogpad komt langs een gesprongen pauze', async () => {
   const srv = await nieuweServer();
   try {
+    /* WELKE INLOGPADEN EEN HANDLER HEBBEN, gemeten voordat de pauze springt.
+       Het commentaar boven INLOG_PADEN in server/middleware/remmen.js zegt dat
+       de vorm met slash bij elk pad MET een handler langs de oude pauze kwam,
+       en noemt /api/staff/login als het pad zonder. Dat is een bewering over
+       deze server, dus wordt hij hier gemeten en niet aangenomen: geen handler
+       is de 404 van de afsluiter ('Onbekend eindpunt.') op de vorm met slash.
+       Krijgt /api/staff/login ooit een handler, of verliest een ander pad de
+       zijne, dan zakt dit met de zin die moet meebewegen. */
+    const zonderHandler = [];
+    for (const p of INLOG_PADEN) {
+      if (kern(await stuur(srv.base, p + '/', {})) === '404 Onbekend eindpunt.') zonderHandler.push(p);
+    }
+    assert.deepEqual(zonderHandler, ['/api/staff/login'],
+      'het commentaar boven INLOG_PADEN (server/middleware/remmen.js) noemt /api/staff/login als het enige inlogpad zonder handler; ' +
+      'klopt dat niet meer, werk die zin dan bij samen met deze verwachting');
+
     await laatPauzeSpringen(srv.base);
 
     /* Het ijkpad: per inlogpad een pad met DEZELFDE VORM (zelfde segmenten,

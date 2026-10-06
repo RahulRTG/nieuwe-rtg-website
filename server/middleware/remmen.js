@@ -104,16 +104,20 @@ function hoofdzekering({ db, accounts, eigenaar }) {
    vergelijking op req.path, terwijl de router een pad met een slash erachter
    (/api/auth/login/) bij dezelfde handler laat komen. Tijdens een gesprongen
    pauze gaf /api/auth/login een 503 en kwam /api/auth/login/ gewoon bij de
-   handler (met het goede wachtwoord: een sessie), en dat gold voor alle paden
-   op deze lijst. De vergelijking loopt daarom via
-   vastePaden() uit ../web/routeindex.js: precies de sleutels waarop de router
-   een vast pad zoekt. Geen eigen normalisatie ernaast, want die zou ruimer of
-   krapper uitvallen dan de router en dan is er weer een tweede opvatting.
-   Hoofdletters, procentcodering, een dubbele slash of een punt-segment brengen
-   een verzoek bij geen enkele handler op deze lijst; laat de router dat ooit
-   wel toe, dan hoort dat in vastePaden() en volgt de pauze vanzelf.
-   test/inlogpauze-spelling.test.js legt het oordeel van de pauze naast dat van
-   de router, en draait de pauze op een echte server. */
+   handler (met het goede wachtwoord: een sessie), en dat gold voor elk pad op
+   deze lijst dat een handler heeft. /api/staff/login heeft er vandaag geen:
+   daar gaf ook de vorm met slash 404 'Onbekend eindpunt.' en geen sessie.
+   Welke paden een handler hebben, meet test/inlogpauze-spelling.test.js op een
+   echte server, zodat die zin niet ongemerkt veroudert.
+
+   De vergelijking loopt daarom via vastePaden() uit ../web/routeindex.js:
+   precies de sleutels waarop de router een vast pad zoekt. Geen eigen
+   normalisatie ernaast, want die zou ruimer of krapper uitvallen dan de router
+   en dan is er weer een tweede opvatting. Hoofdletters, procentcodering, een
+   dubbele slash of een punt-segment brengen een verzoek bij geen enkele handler
+   op deze lijst; laat de router dat ooit wel toe, dan hoort dat in vastePaden()
+   en volgt de pauze vanzelf. Dezelfde toets legt het oordeel van de pauze naast
+   dat van de router, en draait de pauze op een echte server. */
 const INLOG_PADEN = ['/api/login', '/api/auth/login', '/api/auth/register', '/api/auth/forgot',
   '/api/auth/reset', '/api/office/login', '/api/supplier/login', '/api/staff/login', '/api/aanmeld/zeg'];
 const INLOG_SET = new Set(INLOG_PADEN);

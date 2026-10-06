@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-06T19:26:27.106Z",
-    "commit": "55bf229e5",
+    "op": "2026-10-06T20:25:07.774Z",
+    "commit": "51075de45",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7361,12 +7361,19 @@
     },
     "library-sqlite.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "server/kern/library/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "library-studio-reader.test.js": {
       "soort": "puur",
-      "staat": "al rood",
-      "gezakteZonderMutatie": 1
+      "staat": "gezakt",
+      "module": "server/kern/library/model.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "library.pg.test.js": {
       "soort": "puur",
@@ -7894,7 +7901,11 @@
     },
     "loop-fabric-lifecycle.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "server/bedrijf/loop-source.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "loop-fabric-operations.test.js": {
       "soort": "puur",

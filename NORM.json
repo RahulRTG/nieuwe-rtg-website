@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4541,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1682,
+    "kernBreedte": 1683,
     "kernGedeeld": 254,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 51,
@@ -4162,6 +4162,15 @@
       "meter": "toetsenNietGemeten 129 -> 130",
       "reden": "test/auditopslag-pg.test.js legt de PG-stand van de auditopslag vast (A-P1-05, AUDITOPSLAG.md); met de hand nagetrokken: de poort voor postgres iets laten teruggeven laat twee van de vier toetsen zakken.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-10-05",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1682,
+      "meter": "kernBreedte 1682 -> 1683",
+      "reden": "De zware rechten van Toezicht openen nu echt iets (keuze van de eigenaar: aansluiten). De kluis-inzage in routes/kantoren moet het recht kluis-inzage nalezen, en krijgt daarvoor EEN smalle naam: kern.zwaarRecht, de poort vereist() van kern/command/toegang.js. Via `command` zou het domein kantoren de operator, de recepten en het beleid kunnen bereiken; dezelfde vorm als kern.bijstand.",
+      "waarheen": "GRENZEN.json (kantoren draagt zwaarRecht), server/opzet/aanbouw.js en test/command-zware-rechten.test.js"
     }
   ],
   "prestatie": {
@@ -4213,7 +4222,7 @@
     "wekkersZonderTrede": "2026-09-02",
     "wekkersOnverklaard": "2026-09-02",
     "meetleerBlind": "2026-09-02",
-    "kernBreedte": "2026-09-28",
+    "kernBreedte": "2026-10-05",
     "kernGedeeld": "2026-09-28",
     "registersUitVuileBoom": "2026-09-10",
     "laatSpoorVerdacht": "2026-09-03",

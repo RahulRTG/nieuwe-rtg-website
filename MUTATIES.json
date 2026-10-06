@@ -2366,6 +2366,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "command-zware-rechten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/afdelingen/inzage.js",
+      "operator": "return-weg#0",
+      "gezakt": 3,
+      "geprobeerd": 6
+    },
     "command.e2e.js": {
       "soort": "server",
       "staat": "gezakt",

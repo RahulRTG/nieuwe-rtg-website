@@ -37,7 +37,8 @@ module.exports = (kern) => {
      we dat -- precies wat routes/office/werk.js met wieKijkt() al deed. */
   app.post('/api/office/inzage', officeAuth, async (req, res) => {
     const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
-    try { stuur(res, await afdelingen.naamInzage(String(req.body.kamer || ''), req.body.codenaam, wie)); }
+    try { stuur(res, await afdelingen.naamInzage(String(req.body.kamer || ''), req.body.codenaam, wie,
+      kern.zwaarRecht)); }
     catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: MIS }); }
   });
   // de kantine: de kaart van vandaag lezen en zetten

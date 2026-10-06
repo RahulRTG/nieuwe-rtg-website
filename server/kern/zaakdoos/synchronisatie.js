@@ -20,6 +20,7 @@
    Krijgt dezelfde ctx als ./proxy.js. */
 'use strict';
 const { nu: klokNu } = require('../../lib/klok');
+const { REF_SLEUTELS } = require('./journaal');
 
 module.exports = (ctx) => {
   const { db, save, st, journaal, teller, journaalGeldig,
@@ -63,13 +64,14 @@ module.exports = (ctx) => {
     st.cloudTokenCache = (await r.json()).token;
     return st.cloudTokenCache;
   }
-  // lokaal aangemaakte nummers (ref/id/pickup) vertalen naar hun cloud-versie
+  /* lokaal aangemaakte nummers (ref/id/pickup) vertalen naar hun cloud-versie.
+     De sleutels staan in ./journaal.js: het journaal bewaart van een antwoord
+     precies deze, dus lezen en bewaren delen een lijst. */
   function leerRefs(lokaalRes, cloudRes, kaart) {
-    const SLEUTELS = ['ref', 'id', 'pickup', 'orderRef'];
     (function loop(a, b) {
       if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return;
       for (const k of Object.keys(a)) {
-        if (SLEUTELS.includes(k) && typeof a[k] === 'string' && typeof b[k] === 'string' && a[k] !== b[k]) kaart[a[k]] = b[k];
+        if (REF_SLEUTELS.includes(k) && typeof a[k] === 'string' && typeof b[k] === 'string' && a[k] !== b[k]) kaart[a[k]] = b[k];
         else if (a[k] && b[k] && typeof a[k] === 'object') loop(a[k], b[k]);
       }
     })(lokaalRes, cloudRes);

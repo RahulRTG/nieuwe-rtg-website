@@ -142,11 +142,16 @@ module.exports = function lijfpoort(deps) {
 
   /* Zaakdoos, lokale modus: elke geslaagde zaak-schrijfactie komt in het
      journaal, zodat hij na herstel van de lijn wordt nagespeeld naar de cloud.
-     Inloggen en de livestream horen bij de doos zelf en spelen we niet na. */
+     Inloggen en de livestream horen bij de doos zelf en spelen we niet na.
+
+     WELK PAD MEEGAAT BESLIST journaalPadOk, EN NIET DEZE REGEL (N27). Hier stond
+     een eigen, letterlijke lijst naast die in kern/zaakdoos, en allebei misten
+     /api/supplier/login/ (met slash) en /api/supplier/mijn/login. Nu een plek:
+     kern/zaakdoos/journaal.js, die de inlogroutes leest zoals de router. */
   if (zaakdoos.actief) {
     app.use((req, res, next) => {
       if (zaakdoos.modusVan() !== 'lokaal' || req.method !== 'POST') return next();
-      if (!req.path.startsWith('/api/supplier/') || req.path === '/api/supplier/login' || req.path.startsWith('/api/supplier/stream')) return next();
+      if (!zaakdoos.journaalPadOk(req.path)) return next();
       const echteJson = res.json.bind(res);
       res.json = (d) => { if (res.statusCode < 300) zaakdoos.schrijfJournaal(req.path, req.body, d); return echteJson(d); };
       next();

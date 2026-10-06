@@ -86,22 +86,8 @@ function observeer(feit) {
     { collectie: feit.collectie, van: feit.voorLengte, naar: feit.naLengte });
   return true;
 }
-/* NA AFLOOP ZEGT NIEMAND STIL "GELUKT" (Fase 2, I5). Een timer of een losse
-   belofte erft de context van het verzoek dat hem startte; schrijft hij na
-   `finish`, dan leest niemand het meer (de meting, de effectkop, het
-   AI-label zijn weg). Elke context die dat merkt, telt het HIER, en de eerste
-   keer per soort ook in het log. afgelopen() is de enige vraag; de handeling
-   is de levensduur van het verzoek, tot er een verzoekframe is. */
-const naAfloopTeller = Object.create(null);
-function afgelopen() { const h = huidige(); return !!(h && h.gesloten); }
-function naAfloopMeld(laag, soort) {
-  const k = laag + ':' + String(soort || 'onbekend').slice(0, 60);
-  if (!naAfloopTeller[k]) {
-    try { require('../log').log.warn('schrijven na afloop van het verzoek', { k, p: (huidige() || {}).pad }); } catch (e) {}
-  }
-  naAfloopTeller[k] = (naAfloopTeller[k] || 0) + 1;
-}
-const naAfloop = () => Object.assign({}, naAfloopTeller);
+// Na afloop van het verzoek schrijven telt en meldt: ./naafloop.js (Fase 2, I5).
+const { afgelopen, naAfloopMeld, naAfloop } = require('./naafloop')(() => huidige());
 
 /* De meting afsluiten en de uitslag teruggeven. Apart van de middleware zodat
    een toets hem kan aanroepen zonder een server op te zetten -- en zodat de

@@ -10,12 +10,10 @@
    van de app praat alleen met db.data en de helpers hieronder; welke motor er
    onder draait merkt ze niet.
 
-   Deze module is opgesplitst: ./state (de gedeelde levende staat), ./merge (de
-   3-weg samenvoeging), ./opslag (bestandslaag), ./snapshot (het write-behind
-   volledige-snapshot-schrijven), ./sqlite en ./postgres (de motoren), ./gidsen
-   (grootboek van zaken + ledengids) en ./tx (transactie-index + grootboek).
-   Hier de load/save-orchestratie, het aanzetten van de opslag en het samenstellen
-   van de publieke API. */
+   Opgesplitst in ./state (levende staat), ./merge (3-weg), ./opslag (bestanden),
+   ./snapshot (write-behind), ./sqlite en ./postgres (motoren), ./gidsen (zaken +
+   ledengids) en ./tx (transactie-index + grootboek). Hier de load/save-
+   orchestratie, het aanzetten van de opslag en de publieke API. */
 const verraadfase = require('../lib/verraadfase');
 const effectmeter = require('../effectmeter');
 const state = require('./state');

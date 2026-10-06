@@ -3,7 +3,7 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-06",
-  "commit": "4d1ba639"
+  "commit": "7d887ef52"
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
@@ -12,14 +12,14 @@
   "nietGelezen": 313,
   "waarvanBundeldeel": 313,
   "waarvanParsefout": 0,
-  "symbolen": 26504,
+  "symbolen": 26505,
   "bestandenMetUitvoer": 4319,
   "uitvoerMetNamen": 1916,
   "uitvoerOnvolledig": 5,
   "uitvoerZonderNamen": 2398,
   "zonderUitvoer": 882,
   "requireKanten": 7249,
-  "seconden": 11.7
+  "seconden": 10.4
  },
  "nietGelezen": [
   {
@@ -865,7 +865,7 @@
   {
    "bestand": "public/apps/library/app/app-01.js",
    "reden": "bundeldeel: begint middenin een programma en is pas samengevoegd te lezen (scripts/bundel.js)",
-   "melding": "parsefout regel 19: verwacht '}' bij <eof>"
+   "melding": "parsefout regel 22: verwacht '}' bij <eof>"
   },
   {
    "bestand": "public/apps/library/app/app-02.js",
@@ -215860,93 +215860,99 @@
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "list",
-     "soort": "functie",
-     "lijn": 9,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "openWork",
+     "naam": "edgeContext",
      "soort": "functie",
      "lijn": 10,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "loadWork",
-     "soort": "functie",
-     "lijn": 11,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "drawWork",
+     "naam": "list",
      "soort": "functie",
      "lijn": 12,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "editNode",
+     "naam": "openWork",
      "soort": "functie",
      "lijn": 13,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "move",
+     "naam": "loadWork",
      "soort": "functie",
      "lijn": 14,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "drawPublish",
+     "naam": "drawWork",
      "soort": "functie",
      "lijn": 15,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "soloSetup",
+     "naam": "editNode",
      "soort": "functie",
      "lijn": 16,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "release",
+     "naam": "move",
      "soort": "functie",
      "lijn": 17,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "loadFeedback",
+     "naam": "drawPublish",
      "soort": "functie",
      "lijn": 18,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "openReader",
+     "naam": "soloSetup",
+     "soort": "functie",
+     "lijn": 19,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "release",
      "soort": "functie",
      "lijn": 20,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "loadReaderState",
+     "naam": "loadFeedback",
      "soort": "functie",
      "lijn": 21,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "drawReader",
-     "soort": "functie",
-     "lijn": 22,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "sendFeedback",
+     "naam": "openReader",
      "soort": "functie",
      "lijn": 23,
      "geexporteerd": "onbekend"
     },
     {
-     "naam": "mobile",
+     "naam": "loadReaderState",
      "soort": "functie",
      "lijn": 24,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "drawReader",
+     "soort": "functie",
+     "lijn": 25,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "sendFeedback",
+     "soort": "functie",
+     "lijn": 26,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "mobile",
+     "soort": "functie",
+     "lijn": 27,
      "geexporteerd": "onbekend"
     }
    ],

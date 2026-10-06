@@ -145,6 +145,7 @@ async function maakUitbetaling(opdracht) {
     try { res = sandbox.sepa({ bedrag, valuta, referentie, iban, begunstigde, omschrijving }); }
     catch (e) { throw voorDeDeur(e); }
   } else if (stripe) {
+    require('./betaal/uitbetaalgrendel').eisOpen('uitbetaling');
     const bevestiging = UITGAAND_BEWUST_DICHT ? ' De installatie staat bewust in deze gesloten stand.' : '';
     const e = new Error('Uitbetaling veilig geblokkeerd: een IBAN in Stripe-metadata is geen echte betaalbestemming. Koppel eerst een gecontroleerde uitbetaalrail.' + bevestiging);
     e.code = 'UITBETAALRAIL_NIET_ACTIEF';

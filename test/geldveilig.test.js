@@ -26,7 +26,7 @@ test('Stripe maakt geen schijn-payout met een IBAN in metadata', () => {
   const code = `
     const b=require('./server/betaal');
     b.maakUitbetaling({bedrag:100,iban:'NL00BANK0123456789'}).then(()=>process.exit(9)).catch(e=>{
-      if(e.code!=='UITBETAALRAIL_NIET_ACTIEF') { console.error(e); process.exit(8); }
+      if(e.code!=='UITBETAALGRENDEL_DICHT' && e.code!=='UITBETAALRAIL_NIET_ACTIEF') { console.error(e); process.exit(8); }
     });`;
   const r = spawnSync(process.execPath, ['-e', code], {
     cwd: path.join(__dirname, '..'), encoding: 'utf8',

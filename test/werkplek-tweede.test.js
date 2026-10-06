@@ -172,6 +172,12 @@ test('4. foute codes tellen in de gedeelde rem: na tien is het dicht, ook bij /a
     const r = await api('/api/supplier/mijn/login', { bewijs: stap1.body.bewijs, code: verkeerdeCode(lid.geheim) }, null, ip);
     assert.equal(r.status, 403, 'poging ' + i);
   }
+  /* Het slot gaat VOOR de codetoets: ook een elfde foute code krijgt 429 en geen
+     403. Kwam het slot pas na de toets, dan zei een foute code nog 'klopt
+     niet' en een goede 429 (mutant M16 van de herkeuring). */
+  const elfde = await werkLogin(lid.email, WW, null, '198.51.100.97');
+  const fout = await api('/api/supplier/mijn/login', { bewijs: elfde.body.bewijs, code: verkeerdeCode(lid.geheim) }, null, '198.51.100.97');
+  assert.equal(fout.status, 429, 'ook een foute code stuit eerst op het slot (kreeg ' + fout.status + ')');
   const stap1 = await werkLogin(lid.email, WW, null, '198.51.100.99');
   const dicht = await api('/api/supplier/mijn/login', { bewijs: stap1.body.bewijs, code: lid.code() }, null, '198.51.100.99');
   assert.equal(dicht.status, 429, 'op slot is op slot, ook voor de juiste code (kreeg ' + dicht.status + ')');

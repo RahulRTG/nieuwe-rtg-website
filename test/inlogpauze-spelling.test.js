@@ -251,9 +251,11 @@ test('2. op een echte server: geen spelling van een inlogpad komt langs een gesp
        gewone ledenroute zegt 401 en geen 503. */
     for (const pad of ['/api/aanmeld/start', '/api/aanmeld/start/']) {
       const r = await stuur(srv.base, pad, {});
-      assert.notEqual(r.status, 503, pad + ' hoort open te blijven tijdens de inlogpauze: ' + r.body.slice(0, 80));
+      assert.equal(r.status, 200, pad + ' hoort open te blijven tijdens de inlogpauze: ' + r.body.slice(0, 80));
     }
+    /* Precies de status van de handler, en niet alleen "geen 503": een 404 (de
+       route weg) of een 500 liet de tegenproef anders ook slagen (herkeuring). */
     const leden = await stuur(srv.base, '/api/state', {});
-    assert.notEqual(leden.status, 503, 'de app zelf blijft open; alleen de inlog pauzeert');
+    assert.equal(leden.status, 401, 'de app zelf blijft open; alleen de inlog pauzeert (kreeg ' + leden.status + ')');
   } finally { srv.op(); }
 });

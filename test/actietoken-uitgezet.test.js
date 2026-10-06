@@ -184,7 +184,11 @@ test('B. in server/accounts/ vergelijkt alleen sessiegrens.js `actief` met 0, en
   const vergelijkers = [];
   for (const naam of fs.readdirSync(MAP).filter(n => n.endsWith('.js')).sort()) {
     const code = zonderCommentaar(fs.readFileSync(path.join(MAP, naam), 'utf8'));
-    if (/\.actief\s*[!=]==?\s*0\b|\b0\s*[!=]==?\s*\w+\.actief\b/.test(code)) vergelijkers.push(naam);
+    /* Een vergelijking met 0, maar ook een ontkenning van het veld (`!u.actief`):
+       die zegt hetzelfde over "uit" en liet als mutant M16 alle toetsen groen.
+       Een aanroep (testomgeving.actief(env)) is iets anders en telt niet. */
+    if (/\.actief\s*[!=]==?\s*0\b|\b0\s*[!=]==?\s*\w+\.actief\b/.test(code) ||
+        /!\s*[\w.]+\.actief\b(?!\s*\()/.test(code)) vergelijkers.push(naam);
   }
   assert.deepEqual(vergelijkers, ['sessiegrens.js'],
     'een tweede opvatting van "uitgezet" in server/accounts/: lees uitgezet() uit sessiegrens.js');

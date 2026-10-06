@@ -1,5 +1,5 @@
-/* Accounts, deel "actietokens": de DOEL-GEBONDEN tokens (2FA-bewijs 'inlog2'
-   en 'tech2', e-mailbevestiging 'verify-email', 'mailwissel',
+/* Accounts, deel "actietokens": de DOEL-GEBONDEN tokens (2FA-bewijs 'inlog2',
+   'tech2' en 'werk2', e-mailbevestiging 'verify-email', 'mailwissel',
    'sso-overdracht'). Afgesplitst uit ./tokens.js -- niet alleen voor de
    modulegrootte, maar omdat een actietoken een andere KLASSE is dan een
    sessietoken en dat verschil nu ook in de bestandsindeling staat
@@ -24,8 +24,8 @@
    kende, kwam dus binnen op een bewijs dat hij vlak voor de wijziging had
    gehaald. Per doel:
 
-     inlog2, tech2      het bewijs van stap een is het OUDE wachtwoord; een
-                        tweede factor maakt dat niet weer geldig;
+     inlog2, tech2,     het bewijs van stap een is het OUDE wachtwoord; een
+     werk2              tweede factor maakt dat niet weer geldig;
      sso-overdracht     een overdracht van voor de grens hoort bij een inlog
                         die de grens juist ongedaan maakte;
      mailwissel         wie zijn wachtwoord wijzigt OMDAT er iemand meekeek,
@@ -70,8 +70,9 @@ const { voorGrens, uitgezet } = require('./sessiegrens');
    leest. Een token van voor de uitrol heeft geen vijfde deel, en wat ermee
    gebeurt is een keuze per doel, met de kosten erbij:
 
-     DICHT voor de inlogbewijzen (inlog2, tech2, sso-overdracht). Ze leven vijf
-     minuten of een minuut en zitten in een open tabblad. Weigeren kost op zijn
+     DICHT voor de inlogbewijzen (inlog2, tech2, werk2, sso-overdracht). Ze
+     leven vijf minuten of een minuut en zitten in een open tabblad. Werk2 is
+     nieuw (N19) en had nooit een oude vorm. Weigeren kost op zijn
      hoogst een nieuwe inlog, en een bewijs van een tweede stap waarvan niet
      vast te stellen is of het van voor of na de grens is, bewijst niets. Draaien
      oude en nieuwe knopen tijdens een uitrol naast elkaar (het trio), dan kan

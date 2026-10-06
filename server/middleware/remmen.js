@@ -95,6 +95,10 @@ function hoofdzekering({ db, accounts, eigenaar }) {
    JUISTE woorden een 503. /api/aanmeld/start blijft open, want een gesprek
    beginnen geeft niemand iets.
 
+   /api/supplier/mijn/login staat erop om dezelfde reden (N19): de werkplekinlog
+   van een lid geeft een werksessie of een bewijs voor de tweede stap, en de
+   tweede stap loopt over hetzelfde pad. Tijdens de pauze wacht die dus ook.
+
    DEZE LIJST IS NIET ELKE DEUR NAAR EEN SESSIE. Het kantoorgesprek
    (/api/kantoor/gesprek/zeg), de techniekinlog, de passkey-inlog en de
    SSO-wissel staan er niet op. Een deur toevoegen zegt dus niets over of de
@@ -119,7 +123,8 @@ function hoofdzekering({ db, accounts, eigenaar }) {
    en volgt de pauze vanzelf. Dezelfde toets legt het oordeel van de pauze naast
    dat van de router, en draait de pauze op een echte server. */
 const INLOG_PADEN = ['/api/login', '/api/auth/login', '/api/auth/register', '/api/auth/forgot',
-  '/api/auth/reset', '/api/office/login', '/api/supplier/login', '/api/staff/login', '/api/aanmeld/zeg'];
+  '/api/auth/reset', '/api/office/login', '/api/supplier/login', '/api/staff/login', '/api/aanmeld/zeg',
+  '/api/supplier/mijn/login'];
 const INLOG_SET = new Set(INLOG_PADEN);
 const { vastePaden } = require('../web/routeindex');
 function isInlogPad(pad) { return vastePaden(String(pad || '')).some(p => INLOG_SET.has(p)); }

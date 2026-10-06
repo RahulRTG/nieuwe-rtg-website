@@ -38,11 +38,18 @@ async function lidMetToestel() {
   return { token: reg.token, jwk, sign, teken };
 }
 
-test('1. een ONGEBONDEN sessie komt langs een zwaar pad, en het antwoord zegt dat het gat er is', async () => {
+test('1. een ONGEBONDEN sessie met account wordt standaard geweigerd, met de weg erheen', async () => {
   const l = await lidMetToestel();
   const r = await api('/api/privacy/inzage', {}, l.token);
-  assert.notEqual(r.status, 401, 'ongebonden sessies zijn in "aanbevolen" niet geblokkeerd');
-  assert.match(String(r.kop.get('rtg-niet-afgedwongen') || ''), /bezitsbewijs/);
+  assert.equal(r.status, 403, 'zonder toestelbinding geen zwaar pad: ' + JSON.stringify(r.body).slice(0, 160));
+  assert.match(String(r.body.error), /Bevestig dit toestel/, 'de weigering zegt hoe het wel kan');
+  assert.equal(r.body.bezitsbewijs, 'vereist');
+});
+
+test('1b. de weg erheen blijft open: binden zelf is geen zwaar pad', async () => {
+  const l = await lidMetToestel();
+  const u = (await api('/api/mijn/toestel/uitdaging', {}, l.token));
+  assert.equal(u.status, 200, 'een ongebonden sessie moet kunnen binden, anders is dit een buitensluiting');
 });
 
 test('2. een GEBONDEN sessie zonder bewijs wordt standaard geweigerd; met geldig bewijs niet', async () => {

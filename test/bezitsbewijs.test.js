@@ -155,12 +155,21 @@ test('5b. een ONGEBONDEN sessie komt er in "aanbevolen" langs, en dat wordt geze
 
 test('5c. in "verplicht" komt een ongebonden sessie er niet langs', async () => {
   const { b } = await opzet();
-  const uit = await b.controleer({ sess: los, methode: 'POST', pad: '/api/pay/tik', kop: null, stand: 'verplicht' });
+  const metAccount = Object.assign({}, los, { account: { id: 1 }, tier: 'rtg' });
+  const uit = await b.controleer({ sess: metAccount, methode: 'POST', pad: '/api/pay/tik', kop: null, stand: 'verplicht' });
   assert.equal(uit.stand, 'geweigerd');
   assert.equal(uit.code, 403);
+  assert.match(uit.reden, /Bevestig dit toestel/);
 });
 
-test('5d. een onbekende stand valt terug op de VEILIGE kant (aanbevolen) en zegt dat', () => {
+test('5c2. een sessie ZONDER account kan niet binden: geen dood spoor, wel een gemeld gat', async () => {
+  const { b } = await opzet();
+  const uit = await b.controleer({ sess: Object.assign({}, los, { account: null }), methode: 'POST', pad: '/api/pay/tik', kop: null, stand: 'verplicht' });
+  assert.equal(uit.stand, 'onbeschermd');
+  assert.ok(uit.nietAfgedwongen);
+});
+
+test('5d. een onbekende stand valt terug op de VEILIGE kant (verplicht) en zegt dat', () => {
   const oud = process.env.RTG_BEZITSBEWIJS;
   const oudEnv = process.env.NODE_ENV;
   try {
@@ -168,15 +177,15 @@ test('5d. een onbekende stand valt terug op de VEILIGE kant (aanbevolen) en zegt
     const b = maakBezitsbewijs({ db: { data: {} }, save() {}, toestellen: null });
     process.env.RTG_BEZITSBEWIJS = 'verplicth';        // typefout
     const s = b.standNu();
-    assert.equal(s.stand, 'aanbevolen', 'een typefout mag een zwaar pad niet in de schaduw zetten');
+    assert.equal(s.stand, 'verplicht', 'een typefout mag een zwaar pad niet in de schaduw zetten');
     assert.match(s.reden, /onbekende waarde/);
     delete process.env.RTG_BEZITSBEWIJS;
-    assert.equal(b.standNu().stand, 'aanbevolen', 'A-P1-04: de standaard is afdwingen');
+    assert.equal(b.standNu().stand, 'verplicht', 'A-P1-04: de standaard is verplicht, ook voor ongebonden sessies');
     process.env.RTG_BEZITSBEWIJS = 'schaduw';
     process.env.NODE_ENV = 'test';
     assert.equal(b.standNu().stand, 'schaduw', 'buiten productie blijft schaduw een bewuste keuze');
     process.env.NODE_ENV = 'production';
-    assert.equal(b.standNu().stand, 'aanbevolen', 'in productie telt schaduw niet voor zware paden');
+    assert.equal(b.standNu().stand, 'verplicht', 'in productie telt schaduw niet voor zware paden');
   } finally {
     if (oud === undefined) delete process.env.RTG_BEZITSBEWIJS; else process.env.RTG_BEZITSBEWIJS = oud;
     if (oudEnv === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = oudEnv;

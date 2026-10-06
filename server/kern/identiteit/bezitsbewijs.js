@@ -117,7 +117,9 @@ function maakBezitsbewijs({ db, save, toestellen }) {
     const binding = sess && sess.sessieContext && sess.sessieContext.sleutelbinding;
     const toestelId = binding && binding.keyRef;
     if (!toestelId) {
-      if (stand === 'verplicht') {
+      /* Alleen waar het lid het ZELF kan oplossen: een sessie met een eigen account kan een
+         toestel binden; een gast of pas-sessie zonder account niet (dood spoor). */
+      if (stand === 'verplicht' && sess && sess.account && sess.tier !== 'guest') {
         return { stand: 'geweigerd', code: 403,
           reden: 'Deze handeling vraagt een toestel dat zijn sleutel kan aantonen. Bevestig dit toestel in "Waar ben ik aanwezig".' };
       }

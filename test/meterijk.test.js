@@ -1209,6 +1209,29 @@ const IJKINGEN = {
       } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
     }
   },
+  loopFabricTijdelijk: {
+    /* Zelfde vorm als activeringOndergrens: hij leest LOOP-FABRIC-COVERAGE.json en
+       meet niet zelf (registerklopt houdt dat bestand vers). Slaat hij uit als
+       een capability van een oordeel naar een tijdelijke stand gaat, en weigert
+       hij een register dat er niet is of leeg is -- nul zou "alles is rond"
+       betekenen. */
+    proef: () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-loopratel-ijk-'));
+      const pad = path.join(dir, 'LOOP-FABRIC-COVERAGE.json');
+      const met = (klassen) => JSON.stringify({ capabilities: klassen.map((c, i) => ({ id: 'c' + i, classification: c })) });
+      try {
+        fs.writeFileSync(pad, met(['NOT_YET_LOOP_CAPABLE', 'HUMAN_REVIEW_REQUIRED', 'LOOP_CAPABLE']));
+        assert.equal(norm.leesLoopFabric(pad), 1, 'de meter leest wat er in het bestand staat');
+        fs.writeFileSync(pad, met(['NOT_YET_LOOP_CAPABLE', 'PARTIALLY_LOOP_CAPABLE', 'LOOP_CAPABLE']));
+        const na = norm.leesLoopFabric(pad);
+        assert.equal(na, 2, 'en beweegt mee als een oordeel een tijdelijke stand wordt');
+        assert.throws(() => norm.leesLoopFabric(path.join(dir, 'bestaat-niet.json')), /ontbreekt/);
+        fs.writeFileSync(pad, JSON.stringify({ capabilities: [] }));
+        assert.throws(() => norm.leesLoopFabric(pad), /meter zonder invoer/);
+        return na - 1;
+      } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+    }
+  },
   verstrengelingOnverklaard: {
     /* Een require van het ene deel van RTG naar het andere die op geen enkele
        afleiding past. Een tijdelijk bestand in een eigen domein dat naar een

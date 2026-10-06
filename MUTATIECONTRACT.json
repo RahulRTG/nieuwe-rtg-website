@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-06T13:03:48.324Z",
-  "commit": "a00a9fb9",
-  "boomVuil": true,
-  "boomAnders": 5,
+  "op": "2026-10-06T13:14:29.510Z",
+  "commit": "3fb34641",
+  "boomVuil": false,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v26.10.0"
  },
@@ -11,16 +11,16 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 5322,
-  "geclassificeerd": 5296,
+  "geclassificeerd": 5294,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3166,
+   "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1278,
-   "LEGACY_PENDING_CLASSIFICATION": 26,
+   "LEGACY_PENDING_CLASSIFICATION": 28,
    "PROTECTED": 670,
    "INTENTIONALLY_NON_IDEMPOTENT": 182
   },
   "vastgesteldDoorMens": 2182,
-  "afgeleidDoorScript": 3114,
+  "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4381,
    "PUBLIC": 138,
@@ -36,7 +36,7 @@
    "niet gemeten": 175
   },
   "voorstellen": {
-   "BLOCKED_BY_TEST_FIXTURE": 1,
+   "BLOCKED_BY_TEST_FIXTURE": 3,
    "NOT_APPLICABLE": 1
   },
   "metingVan": "2026-09-29T18:39:11.935Z"
@@ -21252,14 +21252,12 @@
   {
    "mutatieId": "foundation.gezin.inloggen",
    "route": "POST /api/foundation/gezin/inloggen",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
     "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -21269,10 +21267,10 @@
     "grond": null,
     "hindernis": "Vul naast de gezinscode uw eigen pincode in."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
+   "voorstelGrond": "de proef kwam er niet bij: \"Vul naast de gezinscode uw eigen pincode in.\""
   },
   {
    "mutatieId": "foundation.gezin.keuken.idee",
@@ -21796,14 +21794,12 @@
   {
    "mutatieId": "foundation.gezin.profiel.kies",
    "route": "POST /api/foundation/gezin/profiel/kies",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
     "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -21813,10 +21809,10 @@
     "grond": null,
     "hindernis": "Dit profiel bestaat niet meer."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
+   "voorstelGrond": "de proef kwam er niet bij: \"Dit profiel bestaat niet meer.\""
   },
   {
    "mutatieId": "foundation.gezin.profiel.maak",

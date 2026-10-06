@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-06T13:04:14.584Z",
-  "commit": "a00a9fb9",
-  "boomVuil": true,
-  "boomAnders": 16,
+  "op": "2026-10-06T13:14:47.154Z",
+  "commit": "3fb34641",
+  "boomVuil": false,
+  "boomAnders": 3,
   "instrument": "scripts/mutatieboek.js",
   "node": "v26.10.0"
  },
@@ -28,7 +28,7 @@
  },
  "bewijsgraad": {
   "metingGebruikt": false,
-  "metingReden": "de meting is van commit 387b942c5 en HEAD staat op a00a9fb9; een meting van een andere stand is geen grond voor een status",
+  "metingReden": "de meting is van commit 387b942c5 en HEAD staat op 3fb34641; een meting van een andere stand is geen grond voor een status",
   "metingGemetenOp": "2026-09-29T18:39:11.935Z",
   "perGraad": [
    {
@@ -307,13 +307,13 @@
   {
    "bron": "IDEMSCHULD.json",
    "veld": "schrijfroutes",
-   "vastgelegd": 5283,
+   "vastgelegd": 5352,
    "nu": 5352,
-   "vastgelegdOp": "2026-10-04",
+   "vastgelegdOp": "2026-10-06",
    "zelfdeVraag": "API-paden die niet GET zijn",
-   "verschil": 69,
-   "gelijk": false,
-   "duiding": "de vastlegging is van 2026-10-04; sindsdien zijn er routes bijgekomen"
+   "verschil": 0,
+   "gelijk": true,
+   "duiding": "gelijk"
   },
   {
    "bron": "IDEMPROEF.json",

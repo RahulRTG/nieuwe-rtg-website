@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-06T14:21:54.345Z",
-    "commit": "4d5309156",
-    "boomVuil": true,
-    "boomAnders": 1,
+    "op": "2026-10-06T14:40:32.269Z",
+    "commit": "116c7294f",
+    "boomVuil": false,
+    "boomAnders": 0,
     "instrument": "scripts/edgedekking.js",
     "node": "v26.10.0"
   },

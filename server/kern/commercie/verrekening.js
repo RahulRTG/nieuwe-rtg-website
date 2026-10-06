@@ -44,6 +44,7 @@
    De injecteerbare `nu` blijft bestaan -- toetsen zetten hem -- maar de TERUGVAL
    is de klok en niet Date.now(). */
 const klok = require('../../lib/klok');
+const { maakSleutel } = require('../../db/economische-identiteit');
 
 const REK = {
   ledenvoordeel: 'rtg:ledenvoordeel',
@@ -84,7 +85,9 @@ function maakVerrekening({ db, save, boekAsync, prijsmeldingen, allocatie, rekLi
       let r;
       try {
         r = await boek({ van: REK.ledenvoordeel, naar: rekPartner(o.supplierCode), centen: bedrag,
-          soort: 'ledenvoordeel', oms: 'RTG-ledenvoordeel, bijgelegd', ref: o.ref });
+          soort: 'ledenvoordeel', oms: 'RTG-ledenvoordeel, bijgelegd', ref: o.ref,
+          // een keer per bestelling, ook als de ronde na een crash opnieuw loopt
+          economischeSleutel: maakSleutel('pay-handeling', ['ledenvoordeel', o.ref]) });
       } catch (e) { r = { error: String((e && e.message) || e) }; }
       if (r && !r.error) {
         o.voordeelOpbouw.status = 'verrekend';
@@ -115,7 +118,8 @@ function maakVerrekening({ db, save, boekAsync, prijsmeldingen, allocatie, rekLi
       let r;
       try {
         r = await boek({ van: REK.prijsgarantie, naar: rekLid(m.codenaam), centen: m.rechtgezetCenten,
-          soort: 'prijsgarantie', oms: 'Ledenprijsgarantie, verschil rechtgezet', ref: m.id });
+          soort: 'prijsgarantie', oms: 'Ledenprijsgarantie, verschil rechtgezet', ref: m.id,
+          economischeSleutel: maakSleutel('pay-handeling', ['prijsgarantie', m.id]) });
       } catch (e) { r = { error: String((e && e.message) || e) }; }
       if (r && !r.error) {
         m.boekingRef = (r.boeking || {}).id || null;

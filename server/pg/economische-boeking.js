@@ -102,11 +102,14 @@ module.exports = (ctx, schrijver) => {
           return { status: 503, code: 'ECONOMISCHE_SLEUTEL_ONTBREEKT',
             error: 'De grootboekregel bestaat zonder economische sleutel; herstel is vereist.' };
         }
+        const hadLive = new Set(collecties.filter(k => Object.hasOwn(dataNu, k)));
         try {
           for (const k of collecties) dataNu[k] = concept[k];
           antwoord = werk();
+          // zie db/economische-boeking-sqlite.js: de bewerker mag de bak vervangen
+          for (const k of collecties) concept[k] = dataNu[k];
         } finally {
-          for (const [k, v] of liveRefs) dataNu[k] = v;
+          for (const [k, v] of liveRefs) { if (hadLive.has(k)) dataNu[k] = v; else delete dataNu[k]; }
         }
         if (antwoord && typeof antwoord.then === 'function')
           throw new Error('De bewerker van een economische boeking mag niet asynchroon zijn.');

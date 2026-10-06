@@ -6,9 +6,10 @@
    NIETS aan de boekingsregels. */
 function maakOpladen(basis) {
   const { betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save,
-    motorklant, geldModus, keyVanCodenaam, plafondFout, betaalWaarheid,
+    motorklant, geldModus, keyVanCodenaam, plafondFout, betaalWaarheid, reserveerSleutel,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP } = basis;
   const { randomUUID } = require('crypto');
+  const { maakSleutel } = require('../../db/economische-identiteit');
 
   /* ---------- opladen (Apple Pay / kaart via de betaal-naad) ---------- */
   async function laadOp({ codenaam, centen, idem, oms, userId, interneStap }) {
@@ -56,10 +57,17 @@ function maakOpladen(basis) {
      bevestigt, kern/settlement.js). Die tweede weg bestond niet en daar ging
      het geld verloren. Een tweede boekingsregel ernaast zou hetzelfde soort
      fout zijn: twee bronnen die ooit uit de pas lopen. Dus een. */
-  async function oplaadAfronden({ codenaam, centen, oms, ref, economischeSleutel }) {
+  /* EEN KEER PER BETALING: de sleutel komt hier uit het betaling-id (`ref`),
+     dat beide wegen hierheen dragen (./oplaadwaarheid.js en kern/settlement.js).
+     Een herhaling van welke kant ook landt op dezelfde sleutel. Geen id: geen
+     boeking, want dan is er niets om een herhaling aan te herkennen. */
+  async function oplaadAfronden({ codenaam, centen, oms, ref }) {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c <= 0) return { status: 400, error: 'Geen geldig bedrag om bij te schrijven.' };
-    const b = await boekAsync({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref, economischeSleutel });
+    if (ref == null || String(ref) === '')
+      return { status: 400, error: 'Een oplading wordt alleen bijgeschreven op het id van haar betaling.' };
+    const b = await boekAsync({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref,
+      economischeSleutel: maakSleutel('pay-oplaad', [String(ref)]) });
     if (b.error) return b;
     /* DE TRANSACTIEKOSTEN, op het OPLAADMOMENT. Dat is niet toevallig de plek:
        WAARDE.md par. 1 zegt het al met zoveel woorden -- transactiekosten
@@ -147,7 +155,9 @@ function maakOpladen(basis) {
     try { return !!(await keyVanCodenaam(codenaam)); } catch (e) { return false; }
   }
 
-  return { laadOp, oplaadAfronden, koppelBank, koppelKosten, reconcileVanMotor, zorgSaldo, bestaatLid };
+  // eerst boeken, bij een tekort bijladen en met dezelfde sleutel opnieuw: ./dekking.js
+  const betaalMetDekking = require('./dekking')({ boekAsync, zorgSaldo, reserveerSleutel });
+  return { laadOp, oplaadAfronden, koppelBank, koppelKosten, reconcileVanMotor, zorgSaldo, betaalMetDekking, bestaatLid };
 }
 
 module.exports = { maakOpladen };

@@ -23,6 +23,8 @@
 'use strict';
 
 const MAX = 20000; // ring: zoveel sleutels houden we vast
+/* De handeling waarin een boeking valt: ./idem-handeling.js. */
+const { handeling, volgendeStap } = require('./idem-handeling');
 
 /* `naam` is de sleutel in de database, bijv. 'payIdem' of 'bankIdem'; de
    afdrukken staan naast in '<naam>Afdruk'. `d` geeft het datablok, `save`
@@ -40,8 +42,15 @@ const MAX = 20000; // ring: zoveel sleutels houden we vast
    mee. Dat wordt hier NIET geregeld: `bijeen()` zelf sluit sinds 12 september
    aan op een openstaande bundel die dezelfde belofte doet (db/bijeen.js). Dat
    is met opzet daar en niet hier -- anders zou elke aanroeper van een commit
-   die vraag apart moeten stellen, en de eerste die hem vergeet doet dat stil. */
-module.exports = function maakIdem({ d, save, naam, bijeen, duurzaam }) {
+   die vraag apart moeten stellen, en de eerste die hem vergeet doet dat stil.
+
+   `sleutelPlicht` (optioneel, een functie): geeft hij true, dan is een handeling
+   ZONDER sleutel en buiten een andere handeling een weigering -- ook als de
+   aanroeper geen `geld` verklaarde. RTG Pay zet hem in motorstand: daar draagt
+   elke boeking een sleutel, en zonder sleutel van de client is die er niet.
+   Hier en niet bij de boeking, want de boeking komt NA zorgSaldo, en dan kan
+   er al geld van een kaart zijn gegaan. */
+function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht }) {
   function store() {
     if (!d()[naam] || typeof d()[naam] !== 'object') d()[naam] = { _keys: [] };
     if (!Array.isArray(d()[naam]._keys)) d()[naam]._keys = [];
@@ -97,6 +106,12 @@ module.exports = function maakIdem({ d, save, naam, bijeen, duurzaam }) {
           'Stuur een `idem` mee en gebruik bij een herhaling dezelfde waarde.',
         waarom: String(opties.geld) };
     }
+    if (!sleutel && typeof sleutelPlicht === 'function' && sleutelPlicht() && !handeling.getStore()) {
+      return { status: 400, code: 'IDEMPOTENTIESLEUTEL_VERPLICHT',
+        error: 'Deze opdracht verplaatst geld en vraagt een idempotentiesleutel. ' +
+          'Stuur een `idem` mee en gebruik bij een herhaling dezelfde waarde.',
+        waarom: 'elke boeking bij het grootboek draagt een sleutel die een herhaling herkent' };
+    }
     if (!sleutel) return werk();
     const s = store();
     const a = afdrukStore();
@@ -121,7 +136,7 @@ module.exports = function maakIdem({ d, save, naam, bijeen, duurzaam }) {
        te landen (zie de kop): met bijeen flusht de save() hieronder ook de
        saves die het werk zelf deed, in een commit. */
     const doeWerkEnLegVast = async () => {
-      try { r = await werk(); }
+      try { r = await handeling.run({ naam, sleutel, stappen: 0 }, werk); }
       catch (e) { fout = e; }
       /* Vastleggen en pas daarna de vlucht sluiten. Er staat geen await tussen, dus
          een derde verzoek ziet altijd of de bewaarde sleutel of de vlucht -- nooit
@@ -148,4 +163,7 @@ module.exports = function maakIdem({ d, save, naam, bijeen, duurzaam }) {
     if (fout) throw fout;
     return r;
   };
-};
+}
+
+module.exports = maakIdem;
+module.exports.volgendeStap = volgendeStap;

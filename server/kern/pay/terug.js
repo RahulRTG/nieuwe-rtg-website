@@ -137,7 +137,11 @@ module.exports = (ctx) => {
       return { ok: true, teruggestort: gevraagd, restant: saldoVan(rek),
         naar: rekening.kort(u.iban), opdrachtId: op.id, opdrachtStatus: na.status,
         uitleg: 'Het bedrag is van uw saldo af en staat klaar om verstuurd te worden.' };
-    });
+    /* Een geldhandeling, ook voor de idem-laag: zonder sleutel geen afboeking.
+       De afboeking hierboven draagt dan een economische sleutel uit die idem
+       (../../lib/idem.js volgendeStap), zodat de motor een retry na een crash
+       herkent die de JS-opslag niet meer kent. */
+    }, { geld: 'boekt saldo af om het naar de eigen bankrekening te sturen' });
   }
 
   /* De teruggang: weigert de rail hem definitief, dan komt het geld terug op de

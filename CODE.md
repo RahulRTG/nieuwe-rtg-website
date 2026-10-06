@@ -90,8 +90,8 @@ het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
 
 `scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
 
-**<!--getal:symbolen.gelezen-->5201<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->26505<!--/getal--> benoemde symbolen met een regelnummer,
-<!--getal:symbolen.kanten-->7249<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
+**<!--getal:symbolen.gelezen-->5202<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->26511<!--/getal--> benoemde symbolen met een regelnummer,
+<!--getal:symbolen.kanten-->7267<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
 mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
 wat een impactvraag nodig heeft.
 
@@ -116,7 +116,7 @@ Eén detail dat er bijna stil verkeerd in ging, en dat overal elders net zo geld
 `module.exports` kent **drie** standen, niet twee. Een bestand dat
 `module.exports = (kern) => {...}` doet, exporteert wel degelijk iets maar zonder
 namen — dat als een lege lijst noteren leest als "exporteert niets", en dat is
-onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2398<!--/getal--> bestanden hier. Het register draagt daarom de vórm
+onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2396<!--/getal--> bestanden hier. Het register draagt daarom de vórm
 (`object`, `functie`, `anders`), en `geexporteerd` staat per symbool op
 `onbekend` in plaats van op een vals `nee`.
 
@@ -207,7 +207,7 @@ Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->975<!-
 
 `scripts/aanroepgraaf.js` → `AANROEPGRAAF.json` (`npm run aanroepgraaf`) legt de
 laatste twee schakels: **wie roept wie aan**, en **welk symbool handelt deze
-route af**. <!--getal:graaf.kanten-->30271<!--/getal--> kanten, <!--getal:graaf.aanroepers-->11749<!--/getal--> symbolen waarvan bekend is wie ze
+route af**. <!--getal:graaf.kanten-->30289<!--/getal--> kanten, <!--getal:graaf.aanroepers-->11754<!--/getal--> symbolen waarvan bekend is wie ze
 aanroept, en <!--getal:graaf.routesMetSymbool-->3309<!--/getal--> routes met minstens één afgehandeld symbool.
 
 Daarmee loopt de keten van scherm tot functie, uit registers alleen:
@@ -227,7 +227,7 @@ uit een `require` komt, **én** het doelbestand dat symbool ook echt kent.
 
 #### Een kwart opgelost is hier geen tekort
 
-Van de <!--getal:graaf.aanroepen-->174511<!--/getal--> aanroepen is <!--getal:graaf.opgelostPct-->25.3<!--/getal-->% naar een symbool te herleiden (18,1%
+Van de <!--getal:graaf.aanroepen-->174577<!--/getal--> aanroepen is <!--getal:graaf.opgelostPct-->25.3<!--/getal-->% naar een symbool te herleiden (18,1%
 toen deze meter werd gebouwd; §0.7 bracht de rest). Dat getal zonder indeling
 nodigt uit tot de verkeerde reparatie — iemand gaat de resolver "verbeteren" tot
 hij `res.json` aan een bestand knoopt. Daarom staat de rest ingedeeld:
@@ -236,7 +236,7 @@ hij `res.json` aan een bestand knoopt. Daarom staat de rest ingedeeld:
 |---|---|---|
 | ingebouwd | 25.345 | `String()`, `Object.freeze()`, `JSON.parse()` |
 | kader | 10.735 | `res.json()`, `app.post()`, `req.body` |
-| contextobject | <!--getal:graaf.contextobject-->20432<!--/getal--> | `k.instantMutate()` — zie hieronder (was 20.961 vóór §0.7) |
+| contextobject | <!--getal:graaf.contextobject-->20404<!--/getal--> | `k.instantMutate()` — zie hieronder (was 20.961 vóór §0.7) |
 | lokale waarde | 20.218 | `uit.push()` op iets dat hier is verklaard |
 | methode op waarde | 30.250 | `iets().nogwat()` — geen naam om op te lossen |
 | **overig** | **<!--getal:graaf.overig-->461<!--/getal-->** | de echte restbak: 2,3% van alle aanroepen |
@@ -272,7 +272,7 @@ lessen die elders net zo gelden:
    of lokale verklaring zijn, vallen daarom uit de bindingen. Grof, en met
    opzet.
 
-Wat na die vier overblijft is <!--getal:graaf.doelOnbekend-->0<!--/getal-->. Dat is hier geen lege controle: <!--getal:graaf.kanten-->30271<!--/getal-->
+Wat na die vier overblijft is <!--getal:graaf.doelOnbekend-->0<!--/getal-->. Dat is hier geen lege controle: <!--getal:graaf.kanten-->30289<!--/getal-->
 kanten zijn tegen de symbooltabel van hun doelbestand gehouden.
 
 Sinds 20 september 2026 staat er een **vijfde** soort naast die vier, en die
@@ -468,13 +468,13 @@ geen uitvoer van de fabriek.
 
 | | vóór §0.7 | na |
 |---|---|---|
-| aanroepkanten | 17.596 | <!--getal:graaf.kanten-->30271<!--/getal--> |
+| aanroepkanten | 17.596 | <!--getal:graaf.kanten-->30289<!--/getal--> |
 | aanroepen herleid | 18,1% | <!--getal:graaf.opgelostPct-->25.3<!--/getal-->% |
 | routes met een symbool | 2346 | <!--getal:graaf.routesMetSymbool-->3309<!--/getal--> |
-| post `contextobject` | 20.961 | <!--getal:graaf.contextobject-->20432<!--/getal--> |
+| post `contextobject` | 20.961 | <!--getal:graaf.contextobject-->20404<!--/getal--> |
 
-<!--getal:graaf.viaKern-->4848<!--/getal--> kanten bestaan puur dankzij deze herkomst. Van die kanten wijzen er
-<!--getal:graaf.viaKernZonderSymbool-->2923<!--/getal--> alleen het **bestand** aan en niet de functie, en dat is geen slordigheid
+<!--getal:graaf.viaKern-->4843<!--/getal--> kanten bestaan puur dankzij deze herkomst. Van die kanten wijzen er
+<!--getal:graaf.viaKernZonderSymbool-->2921<!--/getal--> alleen het **bestand** aan en niet de functie, en dat is geen slordigheid
 maar wat er te weten valt: een fabriek mag `{ walletVoeg: voeg }` teruggeven, en
 dan is de zaknaam `walletVoeg` terwijl het symbool `voeg` heet. Een gok naar een
 symbool dat er niet is, zou de graaf onbetrouwbaar maken op precies de plek waar
@@ -536,7 +536,7 @@ weet.
 | module van buiten | `path.join()`, `fs.readFileSync()` | soort `externeModule` (<!--getal:graaf.externeModule-->960<!--/getal-->) |
 | eigen zak van een domein | `const { H, heleCenten } = horeca` | soort `uitgepaktObject` (<!--getal:graaf.uitgepaktObject-->1646<!--/getal-->) |
 | module die zelf een functie is | `const rem = require('../rem'); rem({…})` | **kant** naar dat bestand (<!--getal:graaf.moduleAlsFunctie-->105<!--/getal-->) |
-| methode op iets ingevoerds | `const { log } = require('../log'); log.warn()` | **kant** naar dat bestand (<!--getal:graaf.lidOpInvoer-->297<!--/getal-->) |
+| methode op iets ingevoerds | `const { log } = require('../log'); log.warn()` | **kant** naar dat bestand (<!--getal:graaf.lidOpInvoer-->301<!--/getal-->) |
 | uitgepakt uit een fabriek | `const { publiek } = require('./beeld')({…})` | **kant** naar dat bestand (<!--getal:graaf.uitFabriek-->275<!--/getal-->) |
 
 De laatste drie leveren échte kanten op, geen indeling. De eerste twee niet, en
@@ -559,7 +559,7 @@ eerst door de bestaanscontrole en produceerden **303 "bevindingen"** — de mete
 beschuldigde de code van een ontbrekend symbool dat hij zelf niet had ingevuld.
 `doelOnbekend` staat weer op <!--getal:graaf.doelOnbekend-->0<!--/getal-->.
 
-Eindstand van de graaf na §0.7 en §0.8: <!--getal:graaf.kanten-->30271<!--/getal--> kanten,
+Eindstand van de graaf na §0.7 en §0.8: <!--getal:graaf.kanten-->30289<!--/getal--> kanten,
 <!--getal:graaf.opgelostPct-->25.3<!--/getal-->% herleid, <!--getal:graaf.routesMetSymbool-->3309<!--/getal--> routes met een symbool.
 
 **Een huisregel die twee keer moest worden geleerd:** zet geen voorbeeld met een
@@ -832,14 +832,14 @@ Drie stappen, in deze volgorde:
 1. ~~**Gedragsdekking van `public/`**~~ — gedaan in §0.5: 6,6% → <!--getal:codewereld.bronPublicPct-->41.3<!--/getal-->%.
    Wat er nu nog onder zit zijn de <!--getal:schermgedrag.zonderGrond-->153<!--/getal--> schermen die hun paden opbouwen; die
    zijn statisch niet te volgen en vallen onder punt 2.
-2. ~~**De <!--getal:graaf.contextobject-->20432<!--/getal--> contextobject-aanroepen via een runtime-meting**~~ — gemeten in
+2. ~~**De <!--getal:graaf.contextobject-->20404<!--/getal--> contextobject-aanroepen via een runtime-meting**~~ — gemeten in
    §0.6, en de uitkomst keert de stap om: maar <!--getal:context.metSpoor-->213<!--/getal--> routes reiken tijdens een
    verzoek naar de kern. De rest haalt zijn namen bij het BEDRADEN op, en dat is
    statisch zichtbaar. Wat overblijft voor runtime is de late binding, en dat is
    klein.
 3. ~~**`kern.save` terugvoeren naar de module die hem erin zette**~~ — gedaan in
    §0.7. Het wás goedkoper dan de runtime-weg: <!--getal:kern.namen-->1338<!--/getal--> namen met een herkomst,
-   <!--getal:graaf.viaKern-->4848<!--/getal--> nieuwe kanten, en de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.3<!--/getal-->%.
+   <!--getal:graaf.viaKern-->4843<!--/getal--> nieuwe kanten, en de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.3<!--/getal-->%.
 4. **Pas dan de Architect**, met een eerlijke opgave van wat hij niet weet.
 
 Wat er ná deze ronde nog ligt, in volgorde van wat het waard is:

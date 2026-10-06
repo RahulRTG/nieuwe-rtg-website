@@ -3,23 +3,23 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-06",
-  "commit": "7df862bea"
+  "commit": "90b361662"
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5514,
-  "gelezen": 5201,
+  "bestandenGezien": 5515,
+  "gelezen": 5202,
   "nietGelezen": 313,
   "waarvanBundeldeel": 313,
   "waarvanParsefout": 0,
-  "symbolen": 26505,
-  "bestandenMetUitvoer": 4319,
-  "uitvoerMetNamen": 1916,
+  "symbolen": 26511,
+  "bestandenMetUitvoer": 4320,
+  "uitvoerMetNamen": 1919,
   "uitvoerOnvolledig": 5,
-  "uitvoerZonderNamen": 2398,
+  "uitvoerZonderNamen": 2396,
   "zonderUitvoer": 882,
-  "requireKanten": 7249,
-  "seconden": 10.3
+  "requireKanten": 7267,
+  "seconden": 11.7
  },
  "nietGelezen": [
   {
@@ -9569,39 +9569,45 @@
      "geexporteerd": false
     },
     {
+     "naam": "maakSleutel",
+     "soort": "functie",
+     "lijn": 42,
+     "geexporteerd": true
+    },
+    {
      "naam": "gelijk",
      "soort": "functie",
-     "lijn": 20,
+     "lijn": 52,
      "geexporteerd": true
     },
     {
      "naam": "bewegingGelijk",
      "soort": "functie",
-     "lijn": 27,
+     "lijn": 59,
      "geexporteerd": true
     },
     {
      "naam": "vind",
      "soort": "functie",
-     "lijn": 33,
+     "lijn": 65,
      "geexporteerd": true
     },
     {
      "naam": "vindBeweging",
      "soort": "functie",
-     "lijn": 40,
+     "lijn": 72,
      "geexporteerd": true
     },
     {
      "naam": "saldoSamen",
      "soort": "pijl",
-     "lijn": 59,
+     "lijn": 91,
      "geexporteerd": true
     },
     {
      "naam": "boekingenSamen",
      "soort": "pijl",
-     "lijn": 71,
+     "lijn": 103,
      "geexporteerd": true
     }
    ],
@@ -9609,20 +9615,36 @@
     "vorm": "object",
     "namen": [
      "SLEUTEL",
+     "SOORTEN",
      "bewegingGelijk",
      "boekingenSamen",
      "gelijk",
+     "maakSleutel",
      "saldoSamen",
      "vind",
      "vindBeweging"
     ]
    },
    "requires": [],
-   "extern": [],
+   "extern": [
+    "crypto"
+   ],
    "gebruiktDoor": [
     "server/db/economische-boeking-sqlite.js",
     "server/db/economische-boeking.js",
     "server/kern/betaalopdracht/terugboeking.js",
+    "server/kern/commercie/ronde.js",
+    "server/kern/commercie/verrekening.js",
+    "server/kern/mobiliteit/abonnement.js",
+    "server/kern/mobiliteit/kaartje.js",
+    "server/kern/mobiliteit/storing.js",
+    "server/kern/ov/reizen.js",
+    "server/kern/pay/boeking.js",
+    "server/kern/pay/opladen.js",
+    "server/kern/pay/verzoeken.js",
+    "server/kern/reisbureau-betaling.js",
+    "server/kern/synergie.js",
+    "server/kern/vonk/payment.js",
     "server/pg/economische-boeking.js"
    ]
   },
@@ -28143,10 +28165,25 @@
   },
   {
    "bestand": "server/kern/betaalopdracht/terugboeking.js",
-   "symbolen": [],
+   "symbolen": [
+    {
+     "naam": "boekOpSleutel",
+     "soort": "functie",
+     "lijn": 22,
+     "geexporteerd": true
+    },
+    {
+     "naam": "boekTerugEenmaal",
+     "soort": "functie",
+     "lijn": 61,
+     "geexporteerd": false
+    }
+   ],
    "uitvoer": {
-    "vorm": "functie",
-    "namen": null
+    "vorm": "object",
+    "namen": [
+     "boekOpSleutel"
+    ]
    },
    "requires": [
     "server/db/economische-identiteit.js"
@@ -28156,6 +28193,7 @@
    ],
    "gebruiktDoor": [
     "server/kern/bank/uitgang.js",
+    "server/kern/pay/boeking.js",
     "server/kern/pay/kas-boek.js",
     "server/kern/pay/partner.js",
     "server/kern/pay/tegoed-gedeeld.js",
@@ -43278,43 +43316,43 @@
     {
      "naam": "maakRonde",
      "soort": "functie",
-     "lijn": 48,
+     "lijn": 49,
      "geexporteerd": true
     },
     {
      "naam": "herkansFees",
      "soort": "functie",
-     "lijn": 53,
+     "lijn": 54,
      "geexporteerd": false
     },
     {
      "naam": "markeerVerlengbaar",
      "soort": "functie",
-     "lijn": 65,
+     "lijn": 69,
      "geexporteerd": false
     },
     {
      "naam": "meldTegoeden",
      "soort": "functie",
-     "lijn": 88,
+     "lijn": 92,
      "geexporteerd": false
     },
     {
      "naam": "verreken",
      "soort": "functie",
-     "lijn": 105,
+     "lijn": 109,
      "geexporteerd": false
     },
     {
      "naam": "draai",
      "soort": "functie",
-     "lijn": 122,
+     "lijn": 126,
      "geexporteerd": false
     },
     {
      "naam": "stap",
      "soort": "pijl",
-     "lijn": 124,
+     "lijn": 128,
      "geexporteerd": false
     }
    ],
@@ -43327,6 +43365,7 @@
     ]
    },
    "requires": [
+    "server/db/economische-identiteit.js",
     "server/kern/commercie/contract.js",
     "server/lib/klok.js"
    ],
@@ -43859,37 +43898,37 @@
     {
      "naam": "maakVerrekening",
      "soort": "functie",
-     "lijn": 56,
+     "lijn": 57,
      "geexporteerd": true
     },
     {
      "naam": "orders",
      "soort": "functie",
-     "lijn": 60,
+     "lijn": 61,
      "geexporteerd": false
     },
     {
      "naam": "verrekenLedenvoordeel",
      "soort": "functie",
-     "lijn": 66,
+     "lijn": 67,
      "geexporteerd": false
     },
     {
      "naam": "verrekenPrijsgarantie",
      "soort": "functie",
-     "lijn": 107,
+     "lijn": 110,
      "geexporteerd": false
     },
     {
      "naam": "maakSociaalBetaalbaar",
      "soort": "functie",
-     "lijn": 138,
+     "lijn": 142,
      "geexporteerd": false
     },
     {
      "naam": "openstaand",
      "soort": "functie",
-     "lijn": 153,
+     "lijn": 157,
      "geexporteerd": false
     }
    ],
@@ -43901,6 +43940,7 @@
     ]
    },
    "requires": [
+    "server/db/economische-identiteit.js",
     "server/kern/commercie/subsidie.js",
     "server/lib/klok.js"
    ],
@@ -95063,49 +95103,49 @@
     {
      "naam": "dagenMs",
      "soort": "pijl",
-     "lijn": 30,
+     "lijn": 32,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aboKoop",
      "soort": "functie",
-     "lijn": 35,
+     "lijn": 37,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aboVan",
      "soort": "pijl",
-     "lijn": 100,
+     "lijn": 108,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aboStand",
      "soort": "functie",
-     "lijn": 104,
+     "lijn": 112,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aboGeldtOp",
      "soort": "functie",
-     "lijn": 120,
+     "lijn": 128,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aboBeeld",
      "soort": "functie",
-     "lijn": 125,
+     "lijn": 133,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aboMijn",
      "soort": "pijl",
-     "lijn": 139,
+     "lijn": 147,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "aboAanbod",
      "soort": "functie",
-     "lijn": 143,
+     "lijn": 151,
      "geexporteerd": "onbekend"
     }
    ],
@@ -95113,7 +95153,9 @@
     "vorm": "functie",
     "namen": null
    },
-   "requires": [],
+   "requires": [
+    "server/db/economische-identiteit.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
     "server/kern/mobiliteit/index.js"
@@ -95725,43 +95767,43 @@
     {
      "naam": "ensureKaartjes",
      "soort": "functie",
-     "lijn": 36,
+     "lijn": 38,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaartMet",
      "soort": "pijl",
-     "lijn": 40,
+     "lijn": 42,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaartenVan",
      "soort": "pijl",
-     "lijn": 41,
+     "lijn": 43,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "lijnVanZaak",
      "soort": "pijl",
-     "lijn": 43,
+     "lijn": 45,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "halteVan",
      "soort": "pijl",
-     "lijn": 44,
+     "lijn": 46,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaartStand",
      "soort": "functie",
-     "lijn": 48,
+     "lijn": 50,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "kaartKoop",
      "soort": "functie",
-     "lijn": 76,
+     "lijn": 78,
      "geexporteerd": "onbekend"
     }
    ],
@@ -95769,7 +95811,9 @@
     "vorm": "functie",
     "namen": null
    },
-   "requires": [],
+   "requires": [
+    "server/db/economische-identiteit.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
     "server/kern/mobiliteit/index.js"
@@ -96764,31 +96808,31 @@
     {
      "naam": "ensureStoringen",
      "soort": "functie",
-     "lijn": 23,
+     "lijn": 25,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "storingMeld",
      "soort": "functie",
-     "lijn": 29,
+     "lijn": 31,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "storingBeeld",
      "soort": "pijl",
-     "lijn": 54,
+     "lijn": 56,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "storingLijst",
      "soort": "pijl",
-     "lijn": 58,
+     "lijn": 60,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "storingTeruggave",
      "soort": "functie",
-     "lijn": 69,
+     "lijn": 71,
      "geexporteerd": "onbekend"
     }
    ],
@@ -96796,7 +96840,9 @@
     "vorm": "functie",
     "namen": null
    },
-   "requires": [],
+   "requires": [
+    "server/db/economische-identiteit.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
     "server/kern/mobiliteit/index.js"
@@ -105368,37 +105414,37 @@
     {
      "naam": "kaart",
      "soort": "functie",
-     "lijn": 11,
+     "lijn": 13,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "codeMaak",
      "soort": "functie",
-     "lijn": 40,
+     "lijn": 42,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "codeIntrek",
      "soort": "pijl",
-     "lijn": 47,
+     "lijn": 49,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "hierIn",
      "soort": "functie",
-     "lijn": 49,
+     "lijn": 51,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "checkUit",
      "soort": "functie",
-     "lijn": 61,
+     "lijn": 63,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "mijn",
      "soort": "functie",
-     "lijn": 92,
+     "lijn": 97,
      "geexporteerd": "onbekend"
     }
    ],
@@ -105406,7 +105452,9 @@
     "vorm": "functie",
     "namen": null
    },
-   "requires": [],
+   "requires": [
+    "server/db/economische-identiteit.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
     "server/kern/ov/index.js"
@@ -107550,54 +107598,42 @@
    "gebruiktDoor": []
   },
   {
-   "bestand": "server/kern/pay/boeken.js",
-   "symbolen": [
-    {
-     "naam": "pasToe",
-     "soort": "functie",
-     "lijn": 55,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "boek",
-     "soort": "functie",
-     "lijn": 66,
-     "geexporteerd": "onbekend"
-    },
-    {
-     "naam": "boekAsync",
-     "soort": "functie",
-     "lijn": 88,
-     "geexporteerd": "onbekend"
-    }
-   ],
-   "uitvoer": {
-    "vorm": "functie",
-    "namen": null
-   },
-   "requires": [],
-   "extern": [],
-   "gebruiktDoor": []
-  },
-  {
    "bestand": "server/kern/pay/boeking.js",
    "symbolen": [
     {
-     "naam": "pasToe",
+     "naam": "sleutelFout",
      "soort": "functie",
      "lijn": 34,
      "geexporteerd": "onbekend"
     },
     {
+     "naam": "pasToe",
+     "soort": "functie",
+     "lijn": 47,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "boek",
      "soort": "functie",
-     "lijn": 42,
+     "lijn": 55,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "sleutelVan",
+     "soort": "functie",
+     "lijn": 85,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "boekAsync",
      "soort": "functie",
-     "lijn": 64,
+     "lijn": 111,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "reserveerSleutel",
+     "soort": "pijl",
+     "lijn": 148,
      "geexporteerd": "onbekend"
     }
    ],
@@ -107605,7 +107641,11 @@
     "vorm": "functie",
     "namen": null
    },
-   "requires": [],
+   "requires": [
+    "server/db/economische-identiteit.js",
+    "server/kern/betaalopdracht/terugboeking.js",
+    "server/lib/idem-handeling.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
     "server/kern/pay/index.js"
@@ -107634,6 +107674,19 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": []
+  },
+  {
+   "bestand": "server/kern/pay/dekking.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "functie",
+    "namen": null
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/kern/pay/opladen.js"
+   ]
   },
   {
    "bestand": "server/kern/pay/graaf.js",
@@ -108136,43 +108189,43 @@
     {
      "naam": "laadOp",
      "soort": "functie",
-     "lijn": 14,
+     "lijn": 15,
      "geexporteerd": false
     },
     {
      "naam": "oplaadAfronden",
      "soort": "functie",
-     "lijn": 59,
+     "lijn": 64,
      "geexporteerd": false
     },
     {
      "naam": "koppelKosten",
      "soort": "functie",
-     "lijn": 87,
+     "lijn": 95,
      "geexporteerd": false
     },
     {
      "naam": "koppelBank",
      "soort": "functie",
-     "lijn": 94,
+     "lijn": 102,
      "geexporteerd": false
     },
     {
      "naam": "reconcileVanMotor",
      "soort": "functie",
-     "lijn": 102,
+     "lijn": 110,
      "geexporteerd": false
     },
     {
      "naam": "zorgSaldo",
      "soort": "functie",
-     "lijn": 122,
+     "lijn": 130,
      "geexporteerd": false
     },
     {
      "naam": "bestaatLid",
      "soort": "functie",
-     "lijn": 146,
+     "lijn": 154,
      "geexporteerd": false
     }
    ],
@@ -108183,6 +108236,8 @@
     ]
    },
    "requires": [
+    "server/db/economische-identiteit.js",
+    "server/kern/pay/dekking.js",
     "server/kern/pay/oplaadwaarheid.js"
    ],
    "extern": [
@@ -108219,13 +108274,13 @@
     {
      "naam": "partnerOverzicht",
      "soort": "functie",
-     "lijn": 71,
+     "lijn": 70,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "partnerUitbetaal",
      "soort": "functie",
-     "lijn": 92,
+     "lijn": 91,
      "geexporteerd": "onbekend"
     }
    ],
@@ -108982,7 +109037,7 @@
     {
      "naam": "terugGave",
      "soort": "functie",
-     "lijn": 91,
+     "lijn": 90,
      "geexporteerd": "onbekend"
     }
    ],
@@ -109000,37 +109055,37 @@
     {
      "naam": "stuur",
      "soort": "functie",
-     "lijn": 11,
+     "lijn": 13,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "verzoekMaak",
      "soort": "functie",
-     "lijn": 34,
+     "lijn": 37,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "verzoekenVoor",
      "soort": "functie",
-     "lijn": 64,
+     "lijn": 67,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "verzoekBetaal",
      "soort": "functie",
-     "lijn": 84,
+     "lijn": 87,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "verzoekIntrek",
      "soort": "functie",
-     "lijn": 109,
+     "lijn": 118,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "overzicht",
      "soort": "functie",
-     "lijn": 126,
+     "lijn": 135,
      "geexporteerd": "onbekend"
     }
    ],
@@ -109039,6 +109094,7 @@
     "namen": null
    },
    "requires": [
+    "server/db/economische-identiteit.js",
     "server/kern/pay/huis.js",
     "server/kern/pay/tik.js"
    ],
@@ -109188,7 +109244,7 @@
     {
      "naam": "terugZaak",
      "soort": "functie",
-     "lijn": 106,
+     "lijn": 107,
      "geexporteerd": "onbekend"
     }
    ],
@@ -115146,49 +115202,49 @@
     {
      "naam": "maakReisbetaling",
      "soort": "functie",
-     "lijn": 29,
+     "lijn": 30,
      "geexporteerd": true
     },
     {
      "naam": "nieuwId",
      "soort": "pijl",
-     "lijn": 33,
+     "lijn": 34,
      "geexporteerd": false
     },
     {
      "naam": "pay",
      "soort": "pijl",
-     "lijn": 42,
+     "lijn": 43,
      "geexporteerd": false
     },
     {
      "naam": "bureau",
      "soort": "pijl",
-     "lijn": 43,
+     "lijn": 44,
      "geexporteerd": false
     },
     {
      "naam": "betaal",
      "soort": "functie",
-     "lijn": 45,
+     "lijn": 46,
      "geexporteerd": false
     },
     {
      "naam": "rijenVan",
      "soort": "functie",
-     "lijn": 132,
+     "lijn": 135,
      "geexporteerd": false
     },
     {
      "naam": "alleRijen",
      "soort": "functie",
-     "lijn": 135,
+     "lijn": 138,
      "geexporteerd": false
     },
     {
      "naam": "uitkeringenVan",
      "soort": "functie",
-     "lijn": 136,
+     "lijn": 139,
      "geexporteerd": false
     }
    ],
@@ -115200,6 +115256,7 @@
     ]
    },
    "requires": [
+    "server/db/economische-identiteit.js",
     "server/kern/eigencollectie.js",
     "server/kern/reisbureau-geldrijen.js",
     "server/kern/reisbureau-teruggave.js"
@@ -139963,91 +140020,91 @@
     {
      "naam": "maakSynergie",
      "soort": "functie",
-     "lijn": 9,
+     "lijn": 11,
      "geexporteerd": true
     },
     {
      "naam": "id",
      "soort": "pijl",
-     "lijn": 11,
+     "lijn": 13,
      "geexporteerd": false
     },
     {
      "naam": "nu",
      "soort": "pijl",
-     "lijn": 12,
+     "lijn": 14,
      "geexporteerd": false
     },
     {
      "naam": "vandaag",
      "soort": "pijl",
-     "lijn": 13,
+     "lijn": 15,
      "geexporteerd": false
     },
     {
      "naam": "store",
      "soort": "functie",
-     "lijn": 16,
+     "lijn": 18,
      "geexporteerd": false
     },
     {
      "naam": "lees",
      "soort": "pijl",
-     "lijn": 20,
+     "lijn": 22,
      "geexporteerd": false
     },
     {
      "naam": "vind",
      "soort": "pijl",
-     "lijn": 21,
+     "lijn": 23,
      "geexporteerd": false
     },
     {
      "naam": "doetMee",
      "soort": "pijl",
-     "lijn": 22,
+     "lijn": 24,
      "geexporteerd": false
     },
     {
      "naam": "zeg",
      "soort": "pijl",
-     "lijn": 23,
+     "lijn": 25,
      "geexporteerd": false
     },
     {
      "naam": "dealMaak",
      "soort": "functie",
-     "lijn": 28,
+     "lijn": 30,
      "geexporteerd": false
     },
     {
      "naam": "dealReageer",
      "soort": "functie",
-     "lijn": 57,
+     "lijn": 59,
      "geexporteerd": false
     },
     {
      "naam": "dealStop",
      "soort": "functie",
-     "lijn": 77,
+     "lijn": 79,
      "geexporteerd": false
     },
     {
      "naam": "dealsVoorZaak",
      "soort": "pijl",
-     "lijn": 87,
+     "lijn": 89,
      "geexporteerd": false
     },
     {
      "naam": "pakketten",
      "soort": "pijl",
-     "lijn": 90,
+     "lijn": 92,
      "geexporteerd": false
     },
     {
      "naam": "pakketKoop",
      "soort": "functie",
-     "lijn": 98,
+     "lijn": 100,
      "geexporteerd": false
     }
    ],
@@ -140058,6 +140115,7 @@
     ]
    },
    "requires": [
+    "server/db/economische-identiteit.js",
     "server/kern/eigencollectie.js"
    ],
    "extern": [],
@@ -146246,33 +146304,39 @@
    "bestand": "server/kern/vonk/payment.js",
    "symbolen": [
     {
+     "naam": "vonkSleutel",
+     "soort": "pijl",
+     "lijn": 9,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "betaalIntern",
      "soort": "functie",
-     "lijn": 8,
+     "lijn": 13,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "boek",
      "soort": "pijl",
-     "lijn": 14,
+     "lijn": 19,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "deelname",
      "soort": "pijl",
-     "lijn": 15,
+     "lijn": 20,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "terug",
      "soort": "pijl",
-     "lijn": 16,
+     "lijn": 21,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "sluit",
      "soort": "pijl",
-     "lijn": 25,
+     "lijn": 30,
      "geexporteerd": "onbekend"
     }
    ],
@@ -146281,6 +146345,7 @@
     "namen": null
    },
    "requires": [
+    "server/db/economische-identiteit.js",
     "server/kern/bewijsvlak/runtime.js",
     "server/kern/bewijsvlak/v3-external-hook.js"
    ],
@@ -154615,7 +154680,7 @@
     {
      "naam": "naAntwoord",
      "soort": "functie",
-     "lijn": 11,
+     "lijn": 16,
      "geexporteerd": true
     }
    ],
@@ -154632,6 +154697,7 @@
     "server/kern/kantoor/mensdeur.js",
     "server/lib/antwoordspoor.js",
     "server/lib/dubbeltik.js",
+    "server/lib/eindstatus.js",
     "server/lib/idem-poort.js",
     "server/log.js",
     "server/meting-tenant.js",
@@ -154639,7 +154705,8 @@
     "server/middleware/functieschakelaars.js",
     "server/opzet/auditmeting.js",
     "server/opzet/handeling.js",
-    "server/opzet/rtgai-meelezer.js"
+    "server/opzet/rtgai-meelezer.js",
+    "server/opzet/verzoekframe.js"
    ]
   },
   {
@@ -155807,19 +155874,19 @@
     {
      "naam": "naEindstatus",
      "soort": "functie",
-     "lijn": 44,
+     "lijn": 45,
      "geexporteerd": true
     },
     {
      "naam": "beslis",
      "soort": "pijl",
-     "lijn": 48,
+     "lijn": 49,
      "geexporteerd": false
     },
     {
      "naam": "bewaarBijEind",
      "soort": "functie",
-     "lijn": 77,
+     "lijn": 71,
      "geexporteerd": true
     }
    ],
@@ -155831,7 +155898,8 @@
     ]
    },
    "requires": [
-    "server/db/verzoekcontext.js"
+    "server/db/verzoekcontext.js",
+    "server/lib/antwoord-einde.js"
    ],
    "extern": [],
    "gebruiktDoor": [
@@ -156311,6 +156379,32 @@
    ]
   },
   {
+   "bestand": "server/lib/idem-handeling.js",
+   "symbolen": [
+    {
+     "naam": "volgendeStap",
+     "soort": "functie",
+     "lijn": 34,
+     "geexporteerd": true
+    }
+   ],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "handeling",
+     "volgendeStap"
+    ]
+   },
+   "requires": [],
+   "extern": [
+    "node:async_hooks"
+   ],
+   "gebruiktDoor": [
+    "server/kern/pay/boeking.js",
+    "server/lib/idem.js"
+   ]
+  },
+  {
    "bestand": "server/lib/idem-kast.js",
    "symbolen": [
     {
@@ -156484,29 +156578,39 @@
    "bestand": "server/lib/idem.js",
    "symbolen": [
     {
+     "naam": "maakIdem",
+     "soort": "functie",
+     "lijn": 53,
+     "geexporteerd": false
+    },
+    {
      "naam": "store",
      "soort": "functie",
-     "lijn": 45,
-     "geexporteerd": "onbekend"
+     "lijn": 54,
+     "geexporteerd": false
     },
     {
      "naam": "afdrukStore",
      "soort": "functie",
-     "lijn": 50,
-     "geexporteerd": "onbekend"
+     "lijn": 59,
+     "geexporteerd": false
     },
     {
      "naam": "doeWerkEnLegVast",
      "soort": "pijl",
-     "lijn": 123,
-     "geexporteerd": "onbekend"
+     "lijn": 138,
+     "geexporteerd": false
     }
    ],
    "uitvoer": {
-    "vorm": "functie",
-    "namen": null
+    "vorm": "object",
+    "namen": [
+     "volgendeStap"
+    ]
    },
-   "requires": [],
+   "requires": [
+    "server/lib/idem-handeling.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
     "server/kern/bank/index.js",
@@ -168566,97 +168670,97 @@
     {
      "naam": "nieuw",
      "soort": "functie",
-     "lijn": 49,
+     "lijn": 50,
      "geexporteerd": false
     },
     {
      "naam": "fout",
      "soort": "pijl",
-     "lijn": 56,
+     "lijn": 57,
      "geexporteerd": false
     },
     {
      "naam": "open",
      "soort": "functie",
-     "lijn": 58,
+     "lijn": 59,
      "geexporteerd": true
     },
     {
      "naam": "middleware",
      "soort": "functie",
-     "lijn": 61,
+     "lijn": 62,
      "geexporteerd": true
     },
     {
      "naam": "dicht",
      "soort": "pijl",
-     "lijn": 68,
+     "lijn": 69,
      "geexporteerd": false
     },
     {
      "naam": "hervat",
      "soort": "functie",
-     "lijn": 75,
+     "lijn": 76,
      "geexporteerd": true
     },
     {
      "naam": "schrijfbaar",
      "soort": "functie",
-     "lijn": 83,
+     "lijn": 84,
      "geexporteerd": false
     },
     {
      "naam": "identificeer",
      "soort": "functie",
-     "lijn": 88,
+     "lijn": 89,
      "geexporteerd": true
     },
     {
      "naam": "codenaamVan",
      "soort": "functie",
-     "lijn": 103,
+     "lijn": 104,
      "geexporteerd": false
     },
     {
      "naam": "uitEnvelop",
      "soort": "functie",
-     "lijn": 117,
+     "lijn": 118,
      "geexporteerd": true
     },
     {
      "naam": "zetDrager",
      "soort": "functie",
-     "lijn": 133,
+     "lijn": 134,
      "geexporteerd": true
     },
     {
      "naam": "sluit",
      "soort": "functie",
-     "lijn": 143,
+     "lijn": 144,
      "geexporteerd": true
     },
     {
      "naam": "achtergrond",
      "soort": "functie",
-     "lijn": 150,
+     "lijn": 151,
      "geexporteerd": true
     },
     {
      "naam": "overdraag",
      "soort": "functie",
-     "lijn": 159,
+     "lijn": 160,
      "geexporteerd": true
     },
     {
      "naam": "voorBus",
      "soort": "functie",
-     "lijn": 164,
+     "lijn": 165,
      "geexporteerd": true
     },
     {
      "naam": "huidig",
      "soort": "functie",
-     "lijn": 174,
+     "lijn": 175,
      "geexporteerd": true
     }
    ],
@@ -168682,6 +168786,7 @@
     "server/kern/agentteken.js",
     "server/kern/envelop.js",
     "server/kern/kosten/haak.js",
+    "server/lib/antwoord-einde.js",
     "server/lib/correlatie.js",
     "server/lib/losvanverzoek.js"
    ],

@@ -20,6 +20,7 @@
 'use strict';
 
 const { geldrijenVoor } = require('./reisbureau-geldrijen');
+const { maakSleutel } = require('../db/economische-identiteit');
 
 /* De positie waar RTG de reissom int. Een eigen naam en niet `rtg:reserve`:
    die bak is van de fondsafdracht (opzet/kern-geldnaden.js), en twee
@@ -69,7 +70,9 @@ function maakReisbetaling({ db, save, crypto, payVan, reisbureauVan, nu }) {
 
     const b = await p.boekAsync({
       van: 'lid:' + codenaam, naar: KAS, centen: opbouw.totaalCenten,
-      soort: 'reis', oms: 'Reis ' + (a.titel || a.tripId), ref: a.ref
+      soort: 'reis', oms: 'Reis ' + (a.titel || a.tripId), ref: a.ref,
+      // een reis wordt een keer betaald, ook over een crash of een tweede instantie heen
+      economischeSleutel: maakSleutel('pay-handeling', ['reis', a.ref])
     });
     if (!b || b.error) return { status: (b && b.status) || 502, error: (b && b.error) || 'Betaling mislukt.' };
 

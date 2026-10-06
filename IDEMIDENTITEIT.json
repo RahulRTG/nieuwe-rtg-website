@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-27T17:42:02.214Z",
-    "commit": "84352cb1",
+    "op": "2026-10-06T21:26:38.190Z",
+    "commit": "90b361662",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 4,
     "instrument": "scripts/idemidentiteit.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "soort": "triage",
   "uitleg": "Waaraan ziet dit huis dat twee aanroepen hetzelfde verzoek dragen -- per plek waar idempotentie wordt gedaan, in twee families: langs metIdem en met de hand ernaast. Gelezen is elke metIdem-aanroep onder server/, plus elke opzoeking op een idem-sleutel die daar met de hand omheen gaat; lexicaal, dus zonder iets uit te voeren.",
@@ -310,7 +310,7 @@
     },
     {
       "bestand": "server/kern/pay/opladen.js",
-      "regel": 28,
+      "regel": 29,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -350,7 +350,7 @@
     },
     {
       "bestand": "server/kern/pay/partner.js",
-      "regel": 114,
+      "regel": 113,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -450,7 +450,7 @@
     },
     {
       "bestand": "server/kern/pay/verkoop.js",
-      "regel": 104,
+      "regel": 103,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -471,7 +471,7 @@
     },
     {
       "bestand": "server/kern/pay/verzoeken.js",
-      "regel": 17,
+      "regel": 19,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -489,7 +489,7 @@
     },
     {
       "bestand": "server/kern/pay/verzoeken.js",
-      "regel": 50,
+      "regel": 53,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -516,7 +516,7 @@
     },
     {
       "bestand": "server/kern/pay/verzoeken.js",
-      "regel": 88,
+      "regel": 91,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -562,7 +562,7 @@
     },
     {
       "bestand": "server/kern/pay/zaakbetaling.js",
-      "regel": 117,
+      "regel": 118,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [

@@ -607,7 +607,9 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        pasToe() aanwijst, met bestandsnaam erbij. Bij de knip zijn de
        bestandsnaam en de handhaverlijst meeverhuisd naar boeken.js en is de
        regel zelf letterlijk gelijk gebleven -- anders wijst de wet naar een
-       verplaatste regel en toetst ze niets meer. */
+       verplaatste regel en toetst ze niets meer. Die schrijfweg woont inmiddels
+       in ./boeking.js; boeken.js was een dode kopie met een sleutelloze
+       boekAsync en is op 6 oktober 2026 verwijderd. */
     /* DERTIEN REGELS STONDEN HIER EN ZIJN ER WEER AF, en ze stonden er te lang.
        De communicatiekern en wat eraan vastzit (comm/index, comm/wie, de twee
        comm-deuren, auth, vergeten), de zes van de werkplaats-ronde

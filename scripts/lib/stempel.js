@@ -109,9 +109,9 @@ function isCodePad(padNaam) {
     /^docker-compose(?:\.[^/]+)?\.ya?ml$/.test(p);
 }
 
-function git(args) {
+function git(args, wortel) {
   try {
-    return execFileSync('git', args, { cwd: WORTEL, encoding: 'utf8',
+    return execFileSync('git', args, { cwd: wortel || WORTEL, encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'] }).trim();
   } catch (e) { return ''; }
 }
@@ -119,9 +119,9 @@ function git(args) {
 /* `extra` komt er ONGEWIJZIGD bij, voor wat alleen dit instrument weet -- het
    aantal routes van dat moment, de gebruikte seed, de opstelling. Zie
    scripts/poortwacht.js, die zijn omgevingsvlaggen meegeeft. */
-function gitRuw(args) {
+function gitRuw(args, wortel) {
   try {
-    return execFileSync('git', args, { cwd: WORTEL, encoding: 'utf8',
+    return execFileSync('git', args, { cwd: wortel || WORTEL, encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'] });
   } catch (e) { return ''; }
 }
@@ -130,10 +130,10 @@ function gitRuw(args) {
    zelf opgeeft: een naam die je moet intikken, gaat afwijken van het bestand
    dat werkelijk meet. Buiten de repo (of geen script) -> null, en dan valt de
    versheid terug op de strengste regel. */
-function instrumentPad() {
+function instrumentPad(wortel) {
   const a = process.argv[1];
   if (!a) return null;
-  const rel = path.relative(WORTEL, a).replace(/\\/g, '/');
+  const rel = path.relative(wortel || WORTEL, a).replace(/\\/g, '/');
   return (rel && !rel.startsWith('..')) ? rel : null;
 }
 
@@ -202,40 +202,43 @@ function sluiting(startPad) {
   return gezien;
 }
 
-function stempel(extra) {
-  const commit = git(['rev-parse', '--short', 'HEAD']) || null;
+function stempel(extra, opties) {
+  const wortel = opties && opties.wortel ? path.resolve(opties.wortel) : WORTEL;
+  const commit = git(['rev-parse', '--short', 'HEAD'], wortel) || null;
   /* --porcelain geeft een regel per gewijzigd bestand; leeg = schone boom.
      Faalt git (geen repo, geen git), dan is het ONBEKEND en niet 'schoon':
      onbekend als schoon lezen is precies de fout die dit veld moet voorkomen. */
-  const vuil = commit === null ? null : vuileBoom();
+  const vuil = commit === null ? null : vuileBoom(wortel);
   return Object.assign({
     op: new Date().toISOString(),
     commit,
     boomVuil: vuil === null ? null : vuil.code.length > 0,
     boomAnders: vuil === null ? null : vuil.anders.length,
-    instrument: instrumentPad(),
+    instrument: instrumentPad(wortel),
     node: process.version
   }, extra || {});
 }
 
 /* Productiebewijs gebruikt geen verkorte Git-identiteit. Een prefix is handig
    voor mensen, maar twee bewijsbestanden horen exact aan dezelfde commit. */
-function exactStempel(extra) {
-  const uit = stempel(extra);
-  uit.commit = git(['rev-parse', '--verify', 'HEAD']) || null;
+function exactStempel(extra, opties) {
+  const wortel = opties && opties.wortel ? path.resolve(opties.wortel) : WORTEL;
+  const uit = stempel(extra, { wortel });
+  uit.commit = git(['rev-parse', '--verify', 'HEAD'], wortel) || null;
   return uit;
 }
 
 /* Wat er ongecommit staat, gesplitst in code (de lijst CODE hierboven) en de
    rest. Faalt git, dan null: onbekend als schoon lezen is precies de fout die
    dit veld moet voorkomen. */
-function vuileBoom() {
+function vuileBoom(wortel) {
+  const root = wortel || WORTEL;
   /* ONGETRIMD opvragen. `git()` trimt zijn uitvoer, en daarmee verdwijnt de
      spatie waarmee " M pad" begint -- een vaste positie tellen gaf dan een pad
      dat een letter miste, en elk gewijzigd codebestand belandde stilzwijgend
      bij "buiten de code". Precies de kant op die niemand wil. */
-  const status = gitRuw(['status', '--porcelain']);
-  if (status === '' && !git(['rev-parse', '--short', 'HEAD'])) return null;
+  const status = gitRuw(['status', '--porcelain'], root);
+  if (status === '' && !git(['rev-parse', '--short', 'HEAD'], root)) return null;
   const regels = status.split('\n').filter(r => r.trim());
   const code = [], anders = [];
   for (const r of regels) {

@@ -79,7 +79,7 @@ module.exports = (ctx) => {
     o.btwBedrag = opbouw ? opbouw.btwBedrag : null;
     o.toelichting = scho((body || {}).toelichting, 200) || null; o.antwoordAt = nu();
     save();
-    notify(o.customerTier, { icon: 'agenda', title: o.supplierName, body: 'Uw offerte-aanvraag is beantwoord: ' + prijs.toLocaleString('nl-NL') + ' euro. Akkoord geven kan in de Mall.', scope: 'orders' });
+    notify(o.customerKey, { icon: 'agenda', title: o.supplierName, body: 'Uw offerte-aanvraag is beantwoord: ' + prijs.toLocaleString('nl-NL') + ' euro. Akkoord geven kan in de Mall.', scope: 'orders' });
     sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
     return { status: 200, ok: true, offerte: publiekZaak(o) };
   }
@@ -90,7 +90,7 @@ module.exports = (ctx) => {
     if (o.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + o.status + '.' };
     o.status = 'afgewezen'; o.antwoordAt = nu();
     save();
-    notify(o.customerTier, { icon: 'agenda', title: o.supplierName, body: 'De zaak kan uw klus helaas niet aannemen.', scope: 'orders' });
+    notify(o.customerKey, { icon: 'agenda', title: o.supplierName, body: 'De zaak kan uw klus helaas niet aannemen.', scope: 'orders' });
     sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
     return { status: 200, ok: true };
   }

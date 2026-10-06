@@ -119,6 +119,8 @@ test('partnerapp rendert de servergedreven Connection-keuzes',()=>{
 
 test('een ingetrokken partnerdeelname blokkeert een nieuwe betaling maar laat een bevestigde date staan',async()=>{
   const maakBetaling=require('../server/kern/vonk/payment');let boekingen=0;
+  const trustRuntime=require('../server/kern/bewijsvlak/runtime');
+  const voor=trustRuntime.current().metrics.aggregate('payment.authorize',30);
   const open={id:'m-open',a:'a',b:'b',betaald:{},status:'wacht-op-betaling',
     tafel:{supplierCode:'DATE3',datum:'2026-10-02',tijd:'20:00',soort:'diner'}};
   const confirmed={id:'m-confirmed',a:'a',b:'b',betaald:{a:'eerder'},status:'bevestigd',reserveringId:'r1',
@@ -130,4 +132,49 @@ test('een ingetrokken partnerdeelname blokkeert een nieuwe betaling maar laat ee
   assert.equal(geweigerd.code,'PARTNER_NOT_PARTICIPATING');assert.equal(boekingen,0);assert.equal(open.tafel,null);
   const bestaand=await betaal('a','m-confirmed');
   assert.equal(bestaand.status,200);assert.equal(confirmed.reserveringId,'r1');
+  const na=trustRuntime.current().metrics.aggregate('payment.authorize',30);
+  assert.equal(na.denied-voor.denied,1,'ingetrokken deelname blijft zichtbaar maar is geen storing');
+  assert.equal(na.succeeded-voor.succeeded,1,'een reeds bevestigde geldstatus telt technisch als succes');
+});
+
+test('Vonk fabriceert zonder hospitality-ingress geen providerbevestiging',async()=>{
+  const runtime=require('../server/kern/bewijsvlak/runtime');
+  runtime.configure({state:{},mode:'shadow',nu:()=>new Date().toISOString()});
+  const maakBetaling=require('../server/kern/vonk/payment');
+  const match={id:'m-proof',a:'a',b:'b',betaald:{},status:'wacht-op-betaling',
+    tafel:{supplierCode:'DATE4',supplierName:'Tafelhuis',datum:'2026-10-02',tijd:'20:00',soort:'diner'}};
+  const data={matches:[match]};
+  const betaal=maakBetaling({d:()=>data,save:()=>{},nu:()=>new Date().toISOString(),
+    geblokkeerd:()=>false,codenaamVan:x=>x,pay:{boekAsync:async()=>({ok:true})},
+    reserveerTafel:()=>({ok:true,reservering:{id:'R-proof',status:'aangevraagd'}}),notify:()=>{},
+    partnerEligible:()=>true,PRIJS_CENTEN:1000,RTG_CENTEN:500});
+  assert.equal((await betaal('a','m-proof')).status,200);
+  assert.equal((await betaal('b','m-proof')).status,200);
+  assert.equal(match.status,'reservering-aangevraagd','een aanvraag wordt nooit als bevestiging vertaald');
+  assert.equal(match.reservationEvidence.state,'PENDING');
+  const evidence=runtime.current().v3.store.list('evidence');
+  assert.equal(evidence.filter(x=>x.factType==='external.commitment.recorded').length,0,
+    'zonder het echte hospitalitydomein ontstaat ook geen lokale commitmentclaim');
+  assert.equal(evidence.filter(x=>x.factType==='external.provider.confirmed').length,0,
+    'een succesvolle RTG-reserveringsfunctie is nog geen extern providerbewijs');
+  const claim=runtime.current().v3.store.list('claims').find(x=>x.claimType==='external.fulfilled');
+  assert.equal(claim,undefined,'zonder domeinbewijs is er niets om te beoordelen');
+});
+
+test('een truthy evidence-failure of ongeverifieerd bevestigd antwoord opent nooit een date',async()=>{
+  const runtime=require('../server/kern/bewijsvlak/runtime');
+  runtime.configure({state:{},mode:'shadow',nu:()=>new Date().toISOString()});
+  const maakBetaling=require('../server/kern/vonk/payment');
+  for(const antwoord of [{ok:false,shadow:true,code:'EXTERNAL_EVIDENCE_FAILED'},
+    {ok:true,reservering:{id:'R-onbewezen',status:'bevestigd'}}]){
+    const match={id:'m-'+Math.random(),a:'a',b:'b',betaald:{},status:'wacht-op-betaling',
+      tafel:{supplierCode:'DATE4',supplierName:'Tafelhuis',datum:'2026-10-02',tijd:'20:00',soort:'diner'}};
+    const betaal=maakBetaling({d:()=>({matches:[match]}),save:()=>{},nu:()=>new Date().toISOString(),
+      geblokkeerd:()=>false,codenaamVan:x=>x,pay:{boekAsync:async()=>({ok:true})},
+      reserveerTafel:()=>antwoord,notify:()=>{},partnerEligible:()=>true,PRIJS_CENTEN:1000,RTG_CENTEN:500});
+    await betaal('a',match.id);await betaal('b',match.id);
+    assert.equal(match.status,'reservering-onbekend');
+    assert.notEqual(match.status,'bevestigd');
+    assert.equal(match.reservationEvidence.state,'UNKNOWN');
+  }
 });

@@ -92,7 +92,8 @@ async function roep(spoor, poort, methode, pad, lijf, koppen) {
 }
 
 test('een geslaagde schrijfhandeling laat precies een regel na, met wie en wat', async () => {
-  const { auditspoor } = opzet();
+  const saves = [];
+  const { auditspoor } = opzet({ save: sleutels => saves.push(sleutels) });
   const { srv, poort } = await maakServer(auditspoor, (req, res) => {
     req.session = { key: 'user-42' };
     res.status(200).json({ ok: true });
@@ -105,6 +106,7 @@ test('een geslaagde schrijfhandeling laat precies een regel na, met wie en wat',
     assert.strictEqual(regels[0].actor, 'user-42');
     assert.strictEqual(regels[0].uitslag, '200');
     assert.strictEqual(regels[0].niveau, 'api');
+    assert.deepStrictEqual(saves, [['apiSpoor']], 'het spoor schrijft uitsluitend zijn eigen collectie');
   } finally { srv.close(); }
 });
 

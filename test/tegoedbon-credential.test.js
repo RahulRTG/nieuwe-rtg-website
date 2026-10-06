@@ -340,3 +340,34 @@ test('de saldopublicatie houdt een rekening op nul vast', () => {
   assert.deepEqual(uit, { 'extern:tegoed': 0, 'lid:B': 1200 });
   assert.equal(Object.keys(saldoSamen({})({ live: {}, commit: {} })).length, 0, 'wat nergens staat, komt er niet bij');
 });
+
+/* FASE 1: de tegoedbon op bearercode v2, als gelijke van de cadeaukaart
+   (UITVOERINGSPLAN-AUTHORITY par. 6.1). Een absoluut einde dat de rotatie
+   overleeft, een keer te gebruiken, geen afgeleide toegang. Een overschreven
+   einde opent niets, en een v1-bon wordt bij de rotatie v2 met hetzelfde einde.
+   MUTATIE GEZIEN ZAKKEN: nieuweToegang terug naar geldigMs/maxGebruik (v1) --
+   zakt op de contractversie; roteren weer met nieuweToegang -- zakt op v1->v2. */
+test('bearercode v2: contracthash op de bon, een verlengd einde opent niets, v1 wordt v2 bij rotatie', async () => {
+  const w = wereld();
+  w.saldi()['lid:Koper'] = 10000;
+  const koop = await w.tegoed.tegoedKoop({ codenaam: 'Koper', centen: 2000, idem: 'v2a' });
+  const bon = w.data.payTegoedBon[koop.tegoed.id];
+  assert.deepEqual([bon.toegang.contractversie, bon.toegang.gebruiksvorm, bon.toegang.max_gebruik, bon.toegang.afgeleid],
+    [2, 'teller', 1, 'geen']);
+  const einde = bon.toegang.expires_at;
+  bon.toegang.expires_at = '2099-01-01T00:00:00.000Z';
+  assert.equal((await w.tegoed.tegoedVerzilver({ codenaam: 'X', code: koop.tegoed.code, idem: 'v2v' })).status, 409,
+    'een overschreven einde opent niets');
+  bon.toegang.expires_at = einde;
+
+  const koop2 = await w.tegoed.tegoedKoop({ codenaam: 'Koper', centen: 1000, idem: 'v2b' });
+  const v1 = w.data.payTegoedBon[koop2.tegoed.id].toegang;
+  for (const veld of ['contractversie', 'contracthash', 'afgeleid', 'gebruiksvorm', 'stapOp', 'bron_toegang', 'geschiedenis']) delete v1[veld];
+  const rot = await w.tegoed.tegoedRoteer({ codenaam: 'Koper', tegoedId: koop2.tegoed.id, idem: 'v2r' });
+  assert.equal(rot.ok, true, JSON.stringify(rot));
+  const nieuw = w.data.payTegoedBon[koop2.tegoed.id].toegang;
+  assert.equal(nieuw.contractversie, 2);
+  assert.equal(nieuw.expires_at, v1.expires_at, 'hetzelfde einde');
+  const ver = await w.tegoed.tegoedVerzilver({ codenaam: 'Ontvanger', code: rot.tegoed.code, idem: 'v2z' });
+  assert.equal(ver.ok, true, JSON.stringify(ver));
+});

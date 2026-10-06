@@ -1,16 +1,10 @@
-/* Cryptografische grens voor bewijs dat buiten RTG ontstaat.
-
-   Een JSON-veld `status: PASS` is geen bewijs. Deze lezer eist daarom drie
-   afzonderlijke, alleen-lezen zaken: het exacte dossier, een detached
-   Ed25519-handtekening daarover en de werkelijk gemounte bewijsbestanden die
-   het dossier met SHA-256 noemt. De publieke sleutel komt uit de gecommitte
-   releaseconfiguratie en nooit uit het dossier zelf. */
 'use strict';
 
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const trust = require('./release-trust');
+const machine = require('./external-machine-evidence');
 
 const FORMAAT = 'rtg-external-release-v3';
 const MAX_DOSSIER_BYTES = 64 * 1024;
@@ -19,16 +13,13 @@ const ALLE_CONTROLES = Object.freeze([
   'tlsDdosRand', 'onafhankelijkePentest', 'juridischeVrijgave',
   'privacyDpia', 'backupHerstel', 'deploymentRollback',
   'observabilityIncident',
-  /* Een aanwezige provider- of SMTP-sleutel zegt alleen dat iets is
-     geconfigureerd. Deze controles vragen bewijsbytes van een echte,
-     releasegebonden levering/proef voordat READY mogelijk is. Een bewust
-     uitgeschakelde rail kan dus alleen via een door de releasebeoordelaar
-     ondertekend out-of-scopebewijs worden afgedekt, nooit via de env-var zelf. */
   'paymentProvider', 'payoutProvider', 'webhookDelivery',
   'refundPayoutSettlement', 'reconciliation',
   'emailDeliveryRecovery', 'smsDelivery', 'malwareDefinitionsScan',
-  'objectStorage', 'imageVulnerabilityScan', 'foundationMinderjarigen'
+  'objectStorage', 'imageVulnerabilityScan', 'connectionRealtime',
+  'foundationMinderjarigen'
 ]);
+const { GELD_CONTROLES, MACHINE_CONTROLES, RUNNER_CONTROLES } = machine;
 const FOUNDATION_CONTROLES = Object.freeze([
   'juridischeVrijgave', 'privacyDpia', 'foundationMinderjarigen'
 ]);
@@ -79,7 +70,9 @@ function controleerStructuur(dossier, releaseCommit, vereisteControles, opties =
     return fout('goedkeuring-ongeldig');
   for (const naam of vereisteControles) {
     const controle = dossier.controles && dossier.controles[naam];
-    if (!controle || controle.status !== 'PASS') return fout('controle-niet-pass:' + naam);
+    const buitenRail = GELD_CONTROLES.includes(naam) && controle && controle.status === 'OUT_OF_SCOPE';
+    if (!controle || (controle.status !== 'PASS' && !buitenRail))
+      return fout('controle-niet-pass:' + naam);
     if (!controle.bewijs || typeof controle.bewijs !== 'object' ||
         !veiligeBestandsnaam(controle.bewijs.bestand) ||
         !/^[a-f0-9]{64}$/i.test(String(controle.bewijs.sha256 || '')))
@@ -127,22 +120,29 @@ function controleerBestanden({ dossierPad, handtekeningPad, bewijsRoot, sleutelP
     const bewijsMapStat = fs.lstatSync(bewijsRoot);
     if (!bewijsMapStat.isDirectory() || bewijsMapStat.isSymbolicLink())
       return fout('bewijsmap-onbruikbaar');
-    const bestanden = [];
+    const bestanden = [], rapporten = new Map();
     for (const naam of vereisteControles) {
-      const bewijs = dossier.controles[naam].bewijs;
+      const dossierControle = dossier.controles[naam];
+      const bewijs = dossierControle.bewijs;
       const bytes = leesRegulier(path.join(bewijsRoot, bewijs.bestand), MAX_BEWIJS_BYTES);
       const echt = sha256(bytes);
       if (echt !== String(bewijs.sha256).toLowerCase()) return fout('bewijsbytes-wijken-af:' + naam);
+      if (MACHINE_CONTROLES.includes(naam))
+        rapporten.set(naam, machine.machineRapport(bytes, naam, structuur.commit, dossierControle.status,
+          { trustRoot, buildAnchor:ankers.BUILD }));
       bestanden.push({ controle:naam, bestand:bewijs.bestand, sha256:echt, bytes:bytes.length });
     }
+    const moneyMode = GELD_CONTROLES.every(naam => rapporten.has(naam)) ? machine.geldKeten(rapporten) : null;
     const foundation = dossier.controles && dossier.controles.foundationMinderjarigen;
     return { ok:true, reden:'ondertekend-bewijs-geldig', commit:structuur.commit,
       dossierSha256:sha256(dossierBytes), handtekeningSha256:sha256(Buffer.from(handtekeningTekst, 'ascii')),
-      sleutelSha256:sha256(sleutelBytes), bewijsBestanden:bestanden,
+      sleutelSha256:sha256(sleutelBytes), bewijsBestanden:bestanden, moneyMode,
       foundation:foundation ? { vrijgave:foundation.vrijgave,
         leeftijdscontrole:foundation.leeftijdscontrole, moderatie:foundation.moderatie } : null };
   } catch (e) {
     if (e && ['ENOENT', 'ENOTDIR'].includes(e.code)) return fout('bewijsbestand-ontbreekt');
+    if (e && /^(?:machine-|runner-|image-|rail-|geldketen-|lokaal-)/.test(String(e.message || '')))
+      return fout(e.message);
     return fout('bewijsbestand-onbruikbaar');
   }
 }
@@ -165,6 +165,7 @@ function samenvatting(controle) {
   return { ok:true, reden:controle.reden, commit:controle.commit,
     dossierSha256:controle.dossierSha256, handtekeningSha256:controle.handtekeningSha256,
     sleutelSha256:controle.sleutelSha256, bewijsBestanden:controle.bewijsBestanden,
+    moneyMode:controle.moneyMode,
     foundation:controle.foundation };
 }
 
@@ -189,6 +190,7 @@ function foundationReleaseBlokkades(controle, runtime) {
 }
 
 module.exports = { FORMAAT, MAX_DOSSIER_BYTES, MAX_BEWIJS_BYTES, ALLE_CONTROLES,
+  GELD_CONTROLES, MACHINE_CONTROLES, RUNNER_CONTROLES,
   FOUNDATION_CONTROLES, sha256, netteTekst, geldigMoment, veiligeBestandsnaam,
   leesRegulier, controleerStructuur, controleerBestanden, padenVoorDossier,
   controleerReleaseRoot, samenvatting, foundationReleaseBlokkades };

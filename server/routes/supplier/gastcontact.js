@@ -41,7 +41,7 @@ app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
   commGast.stuurZaak(lijn.code, lijn.lidKey, lijn.dept, text, req.actor.name,
     { lang: talen.taalVan(req.body.lang) });
   logActivity(req.supplier.code, req.actor, 'antwoordde ' + (meta.codename || 'een gast') + ' (' + lijn.dept + ')');
-  notify(meta.tier || 'rtg', { icon: 'berichten', title: req.supplier.name + ' · ' + lijn.dept, body: text.slice(0, 90), scope: 'gchat' });
+  notify(lijn.lidKey, { icon: 'berichten', title: req.supplier.name + ' · ' + lijn.dept, body: text.slice(0, 90), scope: 'gchat' });
   sseToCustomer(lijn.lidKey, 'sync', { scope: 'gchat' });
   sseToSupplier(req.supplier.code, 'sync', { scope: 'gchat' });
   // 'zaak': het team ziet de hele naam van de collega die antwoordde
@@ -107,7 +107,7 @@ app.post('/api/supplier/guest/connect', supplierAuth, (req, res) => {
   L.connected = [...new Set([...(L.connected || []), req.supplier.code])];
   save();
   logActivity(req.supplier.code, req.actor, 'verbond met gast ' + codename);
-  notify(L.tier, { icon: 'rechterhand', title: req.supplier.name, body: 'Volgt uw aankomst om alles voor u klaar te zetten.', scope: 'live' });
+  notify(key, { icon: 'rechterhand', title: req.supplier.name, body: 'Volgt uw aankomst om alles voor u klaar te zetten.', scope: 'live' });
   pushLive(key);
   res.json({ ok: true, guests: guestsFor(req.supplier.code) });
 });
@@ -128,7 +128,7 @@ app.post('/api/supplier/guest/aangekomen', supplierAuth, (req, res) => {
   if (!r.al) {
     save();
     logActivity(req.supplier.code, req.actor, 'bevestigde de aankomst van ' + codename);
-    notify(r.L.tier, { icon: 'gps', title: 'Aangekomen', body: req.supplier.name + ' heeft uw aankomst bevestigd.', scope: 'live' });
+    notify(key, { icon: 'gps', title: 'Aangekomen', body: req.supplier.name + ' heeft uw aankomst bevestigd.', scope: 'live' });
   }
   pushLive(key);
   res.json({ ok: true, guests: guestsFor(req.supplier.code) });

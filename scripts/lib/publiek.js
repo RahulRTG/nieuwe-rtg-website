@@ -18,6 +18,10 @@
 'use strict';
 
 const PUBLIEK = new Map([
+  ['/api/werk-leverancier/beeld', 'Tijdelijk hash-only capabilitygeheim voor één leveranciersopdracht; huidige uitgeversrechten en tenant worden iedere keer gecontroleerd.'],
+  ['/api/werk-leverancier/besluit', 'Eenmalig leveranciersantwoord op precies één versie, met actuele capabilitycontrole en duurzame opslag. Geen accounttoegang.'],
+  ['/api/werk-gast/betaling/start', 'Actuele klantcapability plus financieel bevoegd vrijgegeven betaalverzoek; serverbedrag en ontvanger duurzaam vast vóór provideroproep, nooit zelf betaald verklaren.'],
+  ['/api/werk-gast/betaling/status', 'Actuele klantcapability toont uitsluitend de centrale providerwaarheid van de eigen opdracht; geen betalingId uit de client.'],
   ['/api/werk-gast/beeld', 'Een gast heeft geen RTG-account: een tijdelijk 256-bit geheim toont precies één afspraak; opslag bewaart alleen de hash en iedere lezing controleert intrekking en tenantstatus.'],
   ['/api/werk-gast/besluit', 'Dezelfde beperkte gastlink, met versiecontrole: uitsluitend eenmalig akkoord of afwijzen van het gedeelde voorstel, geen account of andere rechten.'],
   // ---- de deuren zelf: hier kan per definitie nog geen sessie zijn ----

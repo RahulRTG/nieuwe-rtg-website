@@ -36,6 +36,8 @@
       kern/volwassen.js -- dezelfde die de progressiegrens gebruikt. */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 const { BEVOEGDHEDEN, NOOIT, HOEDANIGHEDEN, SLEUTELS, bestaat } = require('./bevoegdheden');
 const M = require('./machtiging');
 const { simuleer } = require('./simulatie');
@@ -49,7 +51,7 @@ function maakVertegenwoordiging(state) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/vertegenwoordiging',
     bezit: { vertegenwoordigingen: 'kaart' } });
 
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const naam = (k) => (codenaamVan && codenaamVan(k)) || 'een lid';
   const volw = (k) => (typeof volwassen === 'function' ? !!volwassen(k) : false);

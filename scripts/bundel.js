@@ -95,6 +95,9 @@ const bundels = {
   // daarmee over de 10 KB-lat; opgeknipt precies langs die grens
   'shared/uitvoer.js': 'shared/uitvoer',
   'apps/notities/app.js': 'apps/notities/app',
+  // LibraryOS Studio + Reader delen één gesloten UI-staat; de browser krijgt
+  // één bestand, de bron blijft langs de Reader-naad onder de modulegrens.
+  'apps/library/app.js': 'apps/library/app',
   'apps/rtgschool/leer.js': 'apps/rtgschool/leer',
   'apps/schoolpartner/app.js': 'apps/schoolpartner/app',
   /* De vijf enterprise-delen van School Partner. Ze delen geen scope met

@@ -171,7 +171,7 @@ function inlog(){
    woord, hetzelfde teken en dezelfde kleur als op het scherm van het lid dat
    straks de rekening krijgt (/shared/kostenbeeld.js). */
 const graad = g => window.RTGKosten.graad(g);
-const wieTekst = w => !w ? '' : (w.soort === 'huis' ? 'het huis' : w.soort + ' ' + w.id);
+const wieTekst = w => !w ? '' : (w.soort === 'huis' ? 'het huis' : w.soort === 'dienst' ? 'de dienst ' + w.id : w.soort + ' ' + w.id);
 
 /* Wat de gebruiker kost, tegenover wat hij betaalt. Het percentage staat er
    NOOIT alleen: eronder staat over hoeveel gebruikers geen bijdrage bekend is,

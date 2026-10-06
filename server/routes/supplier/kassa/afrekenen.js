@@ -118,7 +118,7 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
     factuurVoorLid({ supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
       codenaam: o.customerCodename, ref: o.ref, methode: method, regels: regelsVanItems(o.items) });
     sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
-    notify(o.customerKey || o.customerTier, { icon: '\u{1F9FE}', title: req.supplier.name, body: 'De rekening aan ' + chk.table + ' is voldaan. Bedankt en tot ziens.', scope: 'orders' });
+    notify(o.customerKey, { icon: '\u{1F9FE}', title: req.supplier.name, body: 'De rekening aan ' + chk.table + ' is voldaan. Bedankt en tot ziens.', scope: 'orders' });
   }
   /* EEN GEBUNDELDE KASSABON VOOR HET HELE TAFELTICKET -- en die draagt een merk.
 

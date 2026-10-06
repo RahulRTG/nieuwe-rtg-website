@@ -12,22 +12,32 @@ const GELDIG_MS = 365 * 86400000;
 const MAX_GEBRUIK = 100;
 
 module.exports = ({ crypto, nu = () => klok.datum().toISOString() }) => {
-  const bearer = require('./bearercode')({ crypto, namespace: 'pay.giftcard_value_code', nu });
   /* Opmaak telt niet: `GC-1A2B-...`, `gc1a2b...` en een oude `RTG-GC-A1B2C3`
-     worden allemaal eerst tot hun letters en cijfers teruggebracht. */
+     worden allemaal eerst tot hun letters en cijfers teruggebracht. Die
+     normalisatie gaat de bearerlaag IN (`normaal`), zodat de hash in maak()
+     meteen klopt; tot bearercode v2 werd hij na de uitgifte overschreven. De
+     hash is dezelfde als toen: kaal() was al hoofdletters zonder witruimte. */
   const kaal = s => String(s == null ? '' : s).toUpperCase().replace(/[^0-9A-Z]/g, '');
-  const codeHash = c => bearer.hash(kaal(c));
+  const bearer = require('./bearercode')({ crypto, namespace: 'pay.giftcard_value_code', nu, normaal: kaal });
+  const codeHash = c => bearer.hash(c);
   const weergave = c => { const k = kaal(c); return k.slice(0, 2) + '-' + k.slice(2).match(/.{1,4}/g).join('-'); };
   const afdruk = s => crypto.createHash('sha256').update(String(s)).digest('hex');
   const sleutel = v => { const s = String(v == null ? '' : v).trim(); return /^[A-Za-z0-9_.:-]{1,128}$/.test(s) ? s : null; };
 
-  function nieuweToegang(issuer, kaart, vervalt) {
+  /* Bearercode v2: een absoluut einde dat een rotatie overleeft (verlooptOp)
+     of een jaar vanaf nu, honderd verzilveringen, en geen afgeleide toegang --
+     de code IS de toegang, er ontstaat geen sessie. */
+  function nieuweToegang(issuer, kaart) {
     const g = bearer.maak({ prefix: 'GC', issuer, doel: DOEL, scope: SCOPE,
       onderwerp: { soort: 'cadeaukaart', id: kaart.id, supplierCode: kaart.supplierCode },
-      geldigMs: GELDIG_MS, maxGebruik: MAX_GEBRUIK });
-    g.toegang.code_hash = codeHash(g.code);
-    if (vervalt) g.toegang.expires_at = vervalt;
+      geldigheid: { duurMs: GELDIG_MS }, gebruik: { max: MAX_GEBRUIK }, afgeleid: 'geen' });
     return { code: weergave(g.code), toegang: g.toegang };
+  }
+  /* Een nieuwe code met hetzelfde einde en dezelfde teller. Een v1-kaart wordt
+     daarbij v2 (plan par. 3.4: nooit stil bij het lezen, wel bij de rotatie). */
+  function roteerToegang(oud, door) {
+    const n = bearer.roteer(oud, { actor: door, prefix: 'GC', afgeleid: 'geen' });
+    return { code: weergave(n.code), toegang: n.toegang };
   }
 
   /* Wat er naar buiten gaat: GEEN code en GEEN hash. */
@@ -36,7 +46,7 @@ module.exports = ({ crypto, nu = () => klok.datum().toISOString() }) => {
     stand: bearer.reden(g.toegang, { doel: DOEL, scope: SCOPE, negeerGebruik: true }) || 'actief',
     toegang: bearer.publiek(g.toegang), legacy24: !!g.legacy24 });
 
-  return { bearer, kaal, codeHash, weergave, afdruk, sleutel, nieuweToegang, naarBuiten, nu,
+  return { bearer, kaal, codeHash, weergave, afdruk, sleutel, nieuweToegang, roteerToegang, naarBuiten, nu,
     DOEL, SCOPE, GELDIG_MS, MAX_GEBRUIK };
 };
 

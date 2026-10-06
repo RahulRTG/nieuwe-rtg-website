@@ -8,6 +8,8 @@
 
    Afgesplitst van ./index.js, dat de poort en het profiel houdt. Krijgt de
    gedeelde ctx, net als ./match. */
+const crypto = require('crypto');
+const klok = require('../../lib/klok');
 const W = require('./wensen');
 const { plekVan } = require('./vak');
 
@@ -54,8 +56,6 @@ module.exports = (ctx) => {
     if (!poort.ok) return { status: 403, error: poort.reden };
     const ik = d().profielen[key];
     if (!ik) return { status: 200, profiel: null, mensen: [], uitleg: 'Maak eerst uw profiel; daarna stelt Vonk elke dag een kleine selectie voor.' };
-    /* `orde` bepaalt alleen de VOLGORDE en gaat het antwoord niet in. Er komt
-       geen cijfer op een mens te staan -- ONTMOETEN.md par. 4.4. */
     const basis = Object.entries(d().profielen)
       .filter(([k, p]) => k !== key && p.actief !== false
         && !geblokkeerd(key, k)
@@ -63,11 +63,25 @@ module.exports = (ctx) => {
         && !likeVan(key, k) && !matchTussen(key, k));
     const door = basis.filter(([, p]) => hardePoort(ik, p));
     const wegDoorEis = basis.length - door.length;   // wat de harde eisen ECHT weghaalden
+    /* DE VOLGORDE IS EEN DAGLOT, GEEN OORDEEL. Hier stond een verborgen sleutel
+       -- wensen maal honderd, plus gedeelde interesses, min afstand -- en die
+       besliste via `slice(0, 6)` niet alleen de volgorde maar WIE er verscheen.
+       Dat is een cijfer op een mens als sorteersleutel, wat ONTMOETEN.md par.
+       4.4 "hier absoluut" verbiedt, ook intern. En omdat hij vast was, zag een
+       lid elke dag dezelfde zes en kwam wie laag uitviel nooit in beeld (par.
+       3.7: nieuwe leden krijgen een redelijke kans).
+
+       Nu: binnen de harde filters hierboven een volgorde die per KIJKER en per
+       DAG vastligt (sha256 van dag, kijker en kandidaat). Zelfde dag, zelfde
+       zes; morgen andere. De wensen houden hun werk -- verplicht filtert, en de
+       reden noemt overeenkomsten en open punten -- maar ze ordenen niemand.
+       Besluit van 4 oktober 2026; "Mijn Zes"-plekken met een reden (par. 3.5)
+       kunnen hier later op voortbouwen. */
+    const dag = klok.datum().toISOString().slice(0, 10);
+    const lot = k => crypto.createHash('sha256').update('vonk-dag|' + dag + '|' + key + '|' + k).digest('hex');
     const mensen = door
-      .map(([k, p]) => ({ k, p, orde: W.weegt(ik, p) * 100
-        + (p.interesses || []).filter(i => ik.interesses.includes(i)).length * 10
-        - (km(ik, p) || 0) / 10 }))
-      .sort((x, y) => y.orde - x.orde)
+      .map(([k, p]) => ({ k, p, lot: lot(k) }))
+      .sort((x, y) => (x.lot < y.lot ? -1 : x.lot > y.lot ? 1 : 0))
       .slice(0, DAG_MAX)
       .map(({ k, p }) => publiek(k, p, false, 'kandidaten', {
         gemeen: (p.interesses || []).filter(i => ik.interesses.includes(i)),

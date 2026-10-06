@@ -70,8 +70,11 @@ module.exports = function maakConnectionCommunication({ product, db, save, crypt
     const r = root(), b = binding(actor, c.counterpart, c.scope, capability);
     if (active === false) Consent.revoke(r.consent, b, { at: now() });
     else Consent.grant(r.consent, b, { at: now() });
-    if (active === false) calls.close(c, capability === CALL_TYPES.video ? 'video' : 'voice', 'CONSENT_REVOKED');
+    const gesloten = active === false
+      ? calls.close(c, capability === CALL_TYPES.video ? 'video' : 'voice', 'CONSENT_REVOKED') : 0;
     save(); ping(c.counterpart, 'consent', c.scope);
+    if (active === false) Consent.propagated(r.consent, b, now(), { activeSessionsClosed: gesloten,
+      storageRevision: (Consent.record(r.consent, b) || {}).revision || null });
     return communicationStatus(actor, input);
   }
   function sendText(actor, input, value) {

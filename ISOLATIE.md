@@ -618,7 +618,7 @@ allebei "werken" en na een jaar iets anders zeggen.
 en houdt hij niets tegen, en de prijs staat op de kaart die de eigenaar leest
 (`herkomstSchaduw`). `CONTROLPLANE.md`: je kunt niet afdwingen wat nooit in de
 schaduw heeft gelopen — en de prijs is echt en gemeten: na de eerste geslaagde
-`doe` houdt een lid **<!--getal:isolatie.herkomstprijsLid-->36<!--/getal--> van
+`doe` houdt een lid **<!--getal:isolatie.herkomstprijsLid-->37<!--/getal--> van
 de 120** AI-paden over, en een zaak 9 van de 53. Dat getal staat in
 `ISOLATIEPROEF.json` (`noemers.herkomst.prijsPerRol`) en niet in een zin, want
 een zin veroudert stil — wat hier al een keer is gebeurd: er stond 43, gemeten

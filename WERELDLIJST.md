@@ -20,8 +20,8 @@ Drie soorten onderdeel, en ze gedragen zich verschillend:
 | **LivingOS** | `/apps/rtg.html` | 59 |
 | **WorkOS** | `/apps/kantoor.html` | 17 |
 | **TravelOS** | `/apps/reizen.html` | 15 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | 12 |
-| | **samen** | **103** |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | 13 |
+| | **samen** | **104** |
 
 ## LivingOS
 
@@ -137,7 +137,7 @@ Huis: `/apps/reizen.html` — 15 onderdelen.
 
 ## FoundationOS
 
-Huis: `/apps/foundation/os-publiek.html` — 12 onderdelen.
+Huis: `/apps/foundation/os-publiek.html` — 13 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -146,6 +146,7 @@ Huis: `/apps/foundation/os-publiek.html` — 12 onderdelen.
 | Zorgaanbod | `tab:zorg` | `/apps/app.html (stand zorg)` |
 | RTFoundation portaal | `link:rtfportaal` | `/apps/foundation/os-portaal.html` |
 | Ontdekken | `link:connect` | `/apps/connect.html` |
+| LibraryOS | `link:library` | `/apps/library.html` |
 | Het bord | `link:rtfbord` | `/apps/foundation/bord.html` |
 | Het schrift | `link:rtfschrift` | `/apps/foundation/schrift.html` |
 | Klimaatfonds | `link:klimaat` | `/apps/foundation/klimaatfonds.html` |

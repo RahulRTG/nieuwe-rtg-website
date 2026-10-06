@@ -112,7 +112,7 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
     save();
     try {
       if (notify) for (const k of Object.keys(b.antwoorden)) {
-        if (b.antwoorden[k] === 'ja' && k !== sess.key) notify(k, 'Afgelast: ' + b.wat);
+        if (b.antwoorden[k] === 'ja' && k !== sess.key) notify(k, { title: 'Genootschap', body: 'Afgelast: ' + b.wat });
       }
     } catch (e) {}
     return { ok: true, bijeenkomst: publiek(b, sess) };

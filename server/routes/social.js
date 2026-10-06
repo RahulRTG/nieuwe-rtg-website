@@ -2,7 +2,30 @@
    over RTG en RTFoundation, plus snaps, 24-uurs verhalen en het bellen.
    Praat alleen via de kern met de gedeelde data en realtime, zodat dit domein
    later als een eigen proces kan draaien zonder de routes aan te passen. */
-module.exports = (kern) => {
+const turnConfig = require('../config/turn');
+
+function iceServers(req, env = process.env) {
+  // Standaard onze EIGEN STUN-server (server/stun.js), afgeleid van de host waarop
+  // het lid de app bereikt (of STUN_PUBLIC_HOST/STUN_URL). Geen Google meer, tenzij
+  // je die expliciet als terugval aanzet met STUN_FALLBACK_GOOGLE=1.
+  const publiekeProductie = env.NODE_ENV === 'production' && env.RTG_PRIVATE_BETA !== '1';
+  const stunProjectie = turnConfig.projecteerStun({ APP_URL:env.APP_URL,
+    STUN_URL:env.STUN_URL, STUN_PUBLIC_HOST:env.STUN_PUBLIC_HOST, STUN_PORT:env.STUN_PORT },
+  { publiekeProductie, requestHost:req && req.hostname });
+  const stun = stunProjectie.urls ? [...stunProjectie.urls] : [];
+  if (!publiekeProductie && env.STUN_FALLBACK_GOOGLE === '1') stun.push('stun:stun.l.google.com:19302');
+  const list = [];
+  if (stun.length) list.push({ urls:stun });
+  // Expliciete allowlist: de TURN-laag krijgt geen volledige procesomgeving en
+  // de statische configuratie-audit kan zien welke runtimevelden echt werken.
+  const relay = turnConfig.projecteerTurn({ TURN_URL:env.TURN_URL,
+    TURN_SECRET:env.TURN_SECRET, TURN_USER:env.TURN_USER, TURN_PASS:env.TURN_PASS },
+  { publiekeProductie });
+  if (relay.server) list.push(relay.server);
+  return list;
+}
+
+function socialeRoutes(kern) {
   const { app, db, rtf, webpush, pinBeveiliging } = kern;
 
   // Hoort dit kind-handle echt bij het gezin van deze beheerder? (voogd-check)
@@ -69,25 +92,8 @@ app.get('/api/push/key', (req, res) => {
    dan maakt de server per aanvraag KORTLEVENDE inloggegevens (1 uur geldig,
    HMAC over het verloopmoment) in plaats van een vast wachtwoord dat op
    straat kan komen. Vast TURN_USER/TURN_PASS blijft werken als terugval. */
-function iceServers(req) {
-  // Standaard onze EIGEN STUN-server (server/stun.js), afgeleid van de host waarop
-  // het lid de app bereikt (of STUN_PUBLIC_HOST/STUN_URL). Geen Google meer, tenzij
-  // je die expliciet als terugval aanzet met STUN_FALLBACK_GOOGLE=1.
-  const poort = process.env.STUN_PORT || 3478;
-  const host = process.env.STUN_PUBLIC_HOST || (req && req.hostname) || 'localhost';
-  const stun = process.env.STUN_URL ? process.env.STUN_URL.split(',').map(s => s.trim()) : ['stun:' + host + ':' + poort];
-  if (process.env.STUN_FALLBACK_GOOGLE === '1') stun.push('stun:stun.l.google.com:19302');
-  const list = [{ urls: stun }];
-  const urls = process.env.TURN_URL ? process.env.TURN_URL.split(',').map(s => s.trim()) : null;
-  if (urls && process.env.TURN_SECRET) {
-    const nodeCrypto = require('crypto');
-    const username = Math.floor(Date.now() / 1000 + 3600) + ':rtg';
-    const credential = nodeCrypto.createHmac('sha1', process.env.TURN_SECRET).update(username).digest('base64');
-    list.push({ urls, username, credential });
-  } else if (urls && process.env.TURN_USER && process.env.TURN_PASS) {
-    list.push({ urls, username: process.env.TURN_USER, credential: process.env.TURN_PASS });
-  }
-  return list;
-}
 app.get('/api/ice', (req, res) => res.json({ iceServers: iceServers(req) }));
-};
+}
+
+socialeRoutes.iceServers = iceServers;
+module.exports = socialeRoutes;

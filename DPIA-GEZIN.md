@@ -119,6 +119,11 @@ De bijbehorende code:
    Twee dingen die het meten opleverde: een **anoniem** gezin heeft geen kanaal
    voor de aankondiging (geen account en geen contactgegeven, met opzet), dus
    daar is de aankondiging een stempel op het gezin plus de openbare mededeling.
+   Die mededeling staat sinds 6 oktober 2026 (besluit van de eigenaar: nu
+   starten) op het welkomscherm van FoundationOS en op de privacypagina
+   (`#bewaren`): gezinnen met alleen een code van zes tekens zijn niet mee te
+   nemen en worden niet vóór 6 november 2026 gewist; met een gezinscode die met
+   GC. begint neem je het gezin mee naar je account.
    En de gezinscode verloopt na 366 dagen (`kern/bearercode.js`): een anoniem
    gezin dat een jaar niets doet en geen lopende sessie heeft, kan na dag 366
    sowieso niet meer binnen. De termijn haalt het dus niets af dat het nog had.

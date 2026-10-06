@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-05T16:29:38.092Z",
-  "commit": "f5769378",
+  "op": "2026-10-06T14:44:13.034Z",
+  "commit": "b75ea5e29",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
-  "node": "v22.22.0"
+  "node": "v26.10.0"
  },
  "gemeten": {
-  "artefacten": 348,
-  "bron": 27,
-  "afgeleid": 188,
+  "artefacten": 372,
+  "bron": 40,
+  "afgeleid": 199,
   "fragmenten": 27,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 1,
-  "metEigenaar": 215,
-  "afgeleidEigenaarHard": 187,
-  "afgeleidGrendelt": 27,
-  "metStempel": 120,
+  "metEigenaar": 226,
+  "afgeleidEigenaarHard": 198,
+  "afgeleidGrendelt": 28,
+  "metStempel": 122,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -221,6 +221,18 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "AUDITOPSLAG.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -746,6 +758,20 @@
    "stempelInstrument": "scripts/connectlus.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run connectlus:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONTEXTDOORGIFTE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/contextdoorgifte.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/contextdoorgifte.js"
+   ],
+   "stempelInstrument": "scripts/contextdoorgifte.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run contextdoorgifte",
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -2192,6 +2218,54 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "LIBRARYOS-RESULTAAT.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LIBRARYOS-STUDIO-READER-RESULTAAT.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LIBRARYOS-STUDIO-READER.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LIBRARYOS.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "LIEGRONDE.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/liegronde.js",
@@ -2239,6 +2313,66 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LOOP-FABRIC-COVERAGE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/loop-fabric-coverage.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LOOP-FABRIC-DECISION-DOSSIERS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/loop-fabric-decisions.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LOOP-FABRIC-EXECUTION-MATRIX.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/loop-fabric-execution.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LOOP-FABRIC-SOURCE-FLOWS.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/loop-fabric-source-flows.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "LOOP-FABRIC-UNLOCK-ROADMAP.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/loop-fabric-unlock.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -2475,6 +2609,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "MENSGROND.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/mensgrond.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/mensgrond.js"
+   ],
+   "stempelInstrument": "scripts/mensgrond.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run mensgrond:vastleggen",
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {
@@ -3005,7 +3153,7 @@
     "scripts/outputband.js",
     "scripts/outputproef.js"
    ],
-   "stempelInstrument": "scripts/outputproef.js",
+   "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "npm run meetronde -- --alleen=outputproef",
    "grendelt": false,
@@ -3336,6 +3484,18 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "RELEASEKETEN.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "REPRESENTATIE.md",
    "soort": "FRAGMENTEN",
    "eigenaar": "scripts/getallen.js",
@@ -3441,6 +3601,126 @@
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/routebron.js --vastleggen",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RTG-LEARNING-CONSTITUTION.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/loop-fabric-constitution.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RTG-LEARNING-LOOPS-ARCHITECTUURONDERZOEK.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RTG-LOOP-FABRIC-BLOCKER-REDUCTION.md",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/loop-fabric-unlock.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RTG-LOOP-FABRIC-CODEBASE-COVERAGE.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RTG-LOOP-FABRIC-COMPLETION.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RTG-LOOP-FABRIC-DECISION-DOSSIERS.md",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/loop-fabric-decisions.js",
+   "graad": "verklaard",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RTG-LOOP-FABRIC-EXECUTION-MATRIX.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RTG-LOOP-FABRIC-FINAL-AFBOUW.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RTG-LOOP-FABRIC-VERTICAL-SLICE.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "RTG-V1-RELEASE-READINESS-AUDIT.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -4007,11 +4287,11 @@
    "naam": "TIKKEN.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/tikken.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/tikken.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/tikken.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run tikken",
    "grendelt": false,
@@ -4128,6 +4408,20 @@
    "stempelInstrument": "scripts/tredeproef.js",
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/tredeproef.js --alle --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TRUST_EVIDENCE_PLANE.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/trust-evidence-plane.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/trust-evidence-plane.js"
+   ],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
    "grendelt": false,
    "botsingVerklaard": null
   },

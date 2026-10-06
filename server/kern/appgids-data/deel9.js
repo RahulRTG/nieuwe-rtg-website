@@ -57,6 +57,11 @@ module.exports = {
      'Lees in de eigen lezer; de lettergrootte stel je zelf in',
      'Je leesplek reist met je account mee: op elk toestel ga je verder waar je was'],
     'Bewust geen leesdoelen en geen reeksen -- lezen is geen wedstrijd. De server bewaart alleen je leesplek.'),
+  '/apps/library.html': G('Foundation LibraryOS: samen kennis maken, vastleggen, vrijgeven, lezen en aantoonbaar verbeteren.',
+    ['Begin een Work en schrijf in stabiele onderdelen met append-only revisies',
+     'Leg samenwerking en rechten expliciet vast voordat u een Edition bevriest',
+     'Lees exact de vrijgegeven editie en geef feedback die naar een nieuwe revisie kan leiden'],
+    'Een correctie overschrijft nooit stil een oude editie. Persoonlijke leesnotities staan los van het Work; Foundation wordt niet automatisch eigenaar.'),
   /* Foundation Connect. De tip gaat over wat het scherm NIET doet, en dat is
      hier de helft van het product: een ontdeklijst zonder likes, zonder
      volgers en zonder niveau is zo ongewoon dat een mens het uitgelegd moet

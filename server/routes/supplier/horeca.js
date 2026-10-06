@@ -27,6 +27,7 @@ module.exports = (kern) => {
   require('./horeca/rekening')(ctx);       // openen, regels
   require('./horeca/rekeninglezen')(ctx);  // gangen vrijgeven, en kijken
   require('./horeca/correctie')(ctx);  // wat er eraf gaat als een gerecht misging, met grond en reden
+  require('./horeca/teruggave')(ctx);  // en het geld dat daarna terug moet, per wijze, door de manager
   require('./horeca/gezelschap')(ctx); // wie zit er aan tafel, en wat staat op wiens naam
   require('./horeca/schuif')(ctx);     // verplaatsen, samenvoegen, splitsen
   require('./horeca/verdeling')(ctx);  // wie betaalt welk deel -- één rekening, geen knip

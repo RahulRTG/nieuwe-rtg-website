@@ -80,7 +80,7 @@ const belasting = require('./lib/belasting');
    schrijfacties. Zie de kop daar waarom "geen 2xx" niet genoeg is. */
 const rolproef = require('./lib/rolproef');
 /* WANNEER en TEGEN WELKE CODE dit is gemeten; zie scripts/versheid.js. */
-const { stempel } = require('./lib/stempel');
+const { exactStempel } = require('./lib/stempel');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.MEGA_PORT || 4090);
@@ -1231,7 +1231,10 @@ if (require.main !== module) { module.exports = { alleRoutes }; return; }
      vraag welke stand er toevallig draaide. */
   const cijfers = {
     gedraaid: new Date().toISOString(),
-    stempel: stempel(),
+    /* Productie- en releasebewijs bindt aan de VOLLEDIGE Git-identiteit. Een
+       verkorte prefix is prettig om te lezen, maar niet exact genoeg om een
+       zware CI-meting ondubbelzinnig aan haar bron te koppelen. */
+    stempel: exactStempel(),
     uitleg: 'Gemeten uitslag van npm run beproeving: storm (gelijktijdige verhalen onder ' +
       'belasting), geld (blijft het grootboek sluiten), misbruik (houden de deuren) en ' +
       'herstel (komt de gewone aanroep terug binnen zijn grens na de storm).',

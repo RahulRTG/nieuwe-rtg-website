@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 const { splitsBruto } = require('../server/kern/fiscaal/digitaal');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-geld-'));
@@ -225,14 +225,20 @@ test('8. intrekken laat een RECHT achter, geen automatische terugboeking', async
   const recht = lijst.body.open[0];
   assert.equal(recht.centen, PRIJS);
 
-  assert.equal((await api('/api/appstore/kantoor/teruggave', { id: recht.id, besluit: 'terugbetaald' }, office)).status, 400,
-    'ook een teruggave draagt een naam');
+  /* WIE BETAALT TERUG komt uit de SESSIE. De gedeelde kantoorcode is geen
+     mens en komt er niet door, ook niet met een getypte naam in het lijf. */
+  const gedeeld = await api('/api/appstore/kantoor/teruggave', { id: recht.id, besluit: 'terugbetaald', door: 'Sam van RTG' }, office);
+  assert.equal(gedeeld.status, 403, 'de gedeelde code betaalt niet terug, hoe de naam in het lijf ook luidt');
+  const opNaam = await kantoorAlsPersoon(base);
+  assert.ok(opNaam, 'een kantoormens op naam');
   const saldoVoor = (await api('/api/pay/overzicht', {}, lid)).body.saldo;
-  const g = await api('/api/appstore/kantoor/teruggave', { id: recht.id, besluit: 'terugbetaald', door: 'Sam van RTG' }, office);
+  const g = await api('/api/appstore/kantoor/teruggave', { id: recht.id, besluit: 'terugbetaald', door: 'Iemand Anders' }, opNaam);
   assert.equal(g.status, 200, JSON.stringify(g.body));
+  assert.notEqual(g.body.recht.besluit.door, 'Iemand Anders', 'een naam in het lijf telt niet');
+  assert.ok(g.body.recht.besluit.door, 'de sessie levert de actor');
   assert.equal((await api('/api/pay/overzicht', {}, lid)).body.saldo, saldoVoor + PRIJS, 'het lid heeft zijn geld terug');
   assert.equal((await api('/api/appstore/kantoor/teruggaven', {}, office)).body.open.length, 0);
-  assert.equal((await api('/api/appstore/kantoor/teruggave', { id: recht.id, besluit: 'terugbetaald', door: 'Sam' }, office)).status, 409,
+  assert.equal((await api('/api/appstore/kantoor/teruggave', { id: recht.id, besluit: 'terugbetaald' }, opNaam)).status, 409,
     'en twee keer terugbetalen kan niet');
   const g2 = await fetch(base + '/api/pay/gezond').then(async r => ({ status: r.status, body: await r.json() }));
   assert.equal(g2.body.klopt, true, 'ook na een teruggave uit drie potjes sluit het grootboek');

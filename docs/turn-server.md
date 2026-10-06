@@ -23,20 +23,28 @@ belverbinding. Je hoeft in de app-code niets te wijzigen.
 Zet deze bij de RTG-server (of in je proces-manager / container):
 
 ```
-# STUN (standaard staat een publieke Google-STUN al aan; eigen STUN mag ook)
-STUN_URL=stun:turn.rahultravelgroup.example:3478
+# STUN (RTG gebruikt standaard de eigen host; expliciet zetten mag)
+STUN_PUBLIC_HOST=<publiek-turn-domein>
+STUN_URL=stun:<publiek-turn-domein>:3478
 
-# TURN (verplicht voor betrouwbaar bellen op mobiel)
-TURN_URL=turn:turn.rahultravelgroup.example:3478,turns:turn.rahultravelgroup.example:5349
-TURN_USER=rtg
-TURN_PASS=<een-sterk-geheim>
+# TURN (verplicht voor publieke voice/video; vervang de haakjes eerst)
+TURN_URL=turns:<publiek-turn-domein>:5349?transport=tcp
+TURN_SECRET=<willekeurig-geheim-uit-de-secrets-manager>
 ```
 
-- Meerdere URL's mogen met komma's gescheiden (bijv. UDP + TLS).
-- `turns:` (TURN over TLS, poort 5349) is belangrijk: op netwerken die alleen
-  poort 443/TLS toestaan is dit vaak de enige weg die werkt.
+- Deze haakjes zijn uitleg, geen geaccepteerde productieconfiguratie. Publieke
+  productie weigert placeholders, `.test`/`.example`, localhost, private IP's,
+  een ontbrekende/ongeldige poort en plaintext `turn:`.
+- Meerdere volledige `turns:`-URL's mogen met komma's gescheiden. Lege
+  lijstitems worden niet naar clients geprojecteerd en blokkeren productie.
+- Gebruik een publiek bereikbare host met een geldig TLS-certificaat. Poort
+  5349 is gebruikelijk; poort 443 kan als coturn daar werkelijk luistert.
+- `TURN_SECRET` of `TURN_PASS` moet minstens 32 daadwerkelijk willekeurige
+  tekens bevatten. Herhaalde tekens en bekende placeholders gelden niet als
+  sterk geheim. Genereer en bewaar dit in de secrets manager.
 - Herstart de server na het zetten van de variabelen. Controleer daarna:
-  `curl https://<host>/api/ice` moet je TURN-server teruggeven.
+  `curl https://<host>/api/ice` moet uitsluitend niet-lege, veilige ICE-items
+  teruggeven. Dit bewijst alleen projectie, niet dat media door het relais liep.
 
 ## 2. coturn installeren (aanbevolen, open source)
 
@@ -54,8 +62,8 @@ listening-port=3478
 tls-listening-port=5349
 # vervang door het publieke IP van de server:
 external-ip=<PUBLIEK_IP>
-realm=turn.rahultravelgroup.example
-server-name=turn.rahultravelgroup.example
+realm=<publiek-turn-domein>
+server-name=<publiek-turn-domein>
 
 # Aanrader: tijdelijke, per-gebruiker inloggegevens (zie sectie 3)
 use-auth-secret
@@ -66,8 +74,8 @@ static-auth-secret=<zelfde-geheim-als-in-de-app>
 # user=rtg:<een-sterk-geheim>
 
 # TLS-certificaat (bijv. van Let's Encrypt):
-cert=/etc/letsencrypt/live/turn.rahultravelgroup.example/fullchain.pem
-pkey=/etc/letsencrypt/live/turn.rahultravelgroup.example/privkey.pem
+cert=/etc/letsencrypt/live/<publiek-turn-domein>/fullchain.pem
+pkey=/etc/letsencrypt/live/<publiek-turn-domein>/privkey.pem
 
 # beperk de relaypoorten en sluit interne adressen uit
 min-port=49152
@@ -85,7 +93,7 @@ sudo systemctl enable coturn
 sudo systemctl restart coturn
 ```
 
-## 3. Beveiliging: gebruik tijdelijke inloggegevens (TURN REST)
+## 3. Beveiliging: tijdelijke inloggegevens (TURN REST)
 
 Vaste `TURN_USER`/`TURN_PASS` in de app zijn eenvoudig maar worden aan elke
 client meegegeven; lekt het wachtwoord, dan kan iemand je relaybandbreedte
@@ -97,21 +105,10 @@ misbruiken. Voor productie is de nette aanpak **kortlevende inloggegevens**
   `password = base64(HMAC-SHA1(static-auth-secret, username))`.
 - `/api/ice` geeft dan dat verse paar terug in plaats van een vast wachtwoord.
 
-Zo ziet zo'n uitbreiding er in de server uit (te plaatsen in `iceServers()` in
-`server/server.js` als je overstapt op REST-credentials):
-
-```js
-const crypto = require('crypto');
-function turnCred(secret) {
-  const username = String(Math.floor(Date.now() / 1000) + 3600); // 1 uur geldig
-  const credential = crypto.createHmac('sha1', secret).update(username).digest('base64');
-  return { username, credential };
-}
-// in iceServers(): als process.env.TURN_SECRET gezet is, gebruik turnCred(...)
-// i.p.v. TURN_USER/TURN_PASS, met dezelfde TURN_URL.
-```
-
-Zet dan `static-auth-secret` in coturn gelijk aan `TURN_SECRET` in de app.
+Deze keten is al geïmplementeerd. Zet `static-auth-secret` in coturn gelijk aan
+`TURN_SECRET` in de app. `/api/ice` projecteert dan een één uur geldig paar.
+Een vaste `TURN_USER` + sterke `TURN_PASS` wordt nog ondersteund, maar vergroot
+de gevolgen van uitlekken en is niet de voorkeursroute.
 
 ## 4. Firewall / poorten
 
@@ -123,12 +120,15 @@ Open op de TURN-server:
 
 ## 5. Testen
 
-- **trickle-ice testpagina:** open de officiele WebRTC "Trickle ICE" testtool,
+- **trickle-ice testpagina:** open de officiële WebRTC "Trickle ICE" testtool,
   vul je `turns:`-URL + inloggegevens in en klik "Gather candidates". Je moet
   regels van type `relay` zien; dat bewijst dat TURN werkt.
-- **In de app:** bel tussen twee toestellen op verschillende netwerken (bijv.
-  een op wifi, een op 4G zonder wifi). Zonder TURN mislukt dit vaak; met TURN
-  verbindt het.
+- **Releasebewijs:** de verplichte `connectionRealtime`-runner gebruikt twee
+  aantoonbaar verschillende netwerk-AS'en, forceert een relay-only selected
+  pair en verstuurt minstens 64 KiB in beide richtingen. Het getekende dossier
+  herverifieert deze waarneming. Alleen `/api/ice` ophalen, twee clients op
+  hetzelfde netwerk of een handmatige schermafbeelding kan release nooit groen
+  maken.
 
 ## 6. Schaal en kosten
 
@@ -142,8 +142,9 @@ Open op de TURN-server:
 
 ## Samengevat
 
-1. Draai coturn met TLS op een server met publiek IP.
-2. Zet `TURN_URL`, `TURN_USER`, `TURN_PASS` (of `TURN_SECRET` voor REST) bij de
+1. Draai coturn met TLS op een server met publiek IP en publiek DNS-certificaat.
+2. Zet een volledige `turns:`-`TURN_URL` en bij voorkeur `TURN_SECRET` bij de
    RTG-server en herstart.
 3. `GET /api/ice` geeft de TURN-server dan mee; de app pakt hem automatisch op.
-4. Overweeg kortlevende inloggegevens voor productie.
+4. Maak en onderteken daarna het echte tweennetwerk-machinebewijs; pas dat kan
+   publieke release-readiness openen.

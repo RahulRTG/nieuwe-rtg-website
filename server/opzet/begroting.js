@@ -13,15 +13,14 @@
 
    Maar een massamutatie ziet er hier bijna altijd hetzelfde uit: `db.data.X`
    krijgt een filter, een slice of een lege lijst toegewezen. De telling per vorm
-   staat in README.md ("De begroting"), en die is de enige -- hij stond hier ook
-   als tabel en dat zijn twee plekken voor een waarheid (LAT.md regel 4).
+   staat in README.md ("De begroting"), en die is de enige: een tweede tabel hier
+   zou twee plekken voor een waarheid zijn (LAT.md regel 4).
 
-   De set-val kent oude en nieuwe lengte vóór de toekenning. Een ontbrekende
-   collectie aanmaken is geen massaverwijdering; alleen vervanging van een
-   bestaande array valt hieronder.
+   De set-val kent oude en nieuwe lengte vóór de toekenning; alleen vervanging
+   van een bestaande array valt hieronder, een nieuwe collectie niet.
 
    WAT DAT NIET IS: dekking. Deze laag dekt de VORM van een massaverwijdering,
-   niet elke plek waar dit huis rijen kwijtraakt.
+   niet elke plek waar rijen verdwijnen.
 
    WAT ER NIET ONDER VALT, en dat hoort er hard bij: de drie splice-plekken, elke
    wijziging BINNEN een rij, en alles wat via push groeit. Groei is bewust geen
@@ -122,13 +121,11 @@ function beoordeel(collectie, oudeLengte, nieuweLengte, opties) {
   return { oordeel: 'meld', krimp, grens, rij };
 }
 
-/* Dezelfde Proxy voor dezelfde data, zodat `db.data === db.data` blijft kloppen
-   en niemand twee wikkels om een ding krijgt. */
+/* Een Proxy per data-object: `db.data === db.data` blijft kloppen. */
 const wikkels = new WeakMap();
 const instellingen = new WeakMap();
-
-// Alleen eigen wikkels: verse sleutels, zonder een schrijfbaar doel uit te geven.
-function collectieSleutels(data) { return Object.keys(instellingen.get(data)?.doel || data); }
+const inventaris = require('./begroting-inventaris');
+const { collectieSleutels, rijSleutels } = inventaris;
 
 // Een opslagcommit toetst zijn latere publicatie vooraf. Geen uitzondering op
 // het budget: dezelfde predicate, vóór SQLite de transactie onomkeerbaar maakt.
@@ -156,21 +153,24 @@ function bewaak(data, deps) {
   const grens = (deps && Number.isFinite(deps.grens)) ? deps.grens : KRIMPGRENS;
   levensteken(meld, modus, grens);
 
+  const vorm = { nu, modus, grens, doel: data, log: deps && deps.log };
+  inventaris.registreer(data, data);
+
   const wikkel = new Proxy(data, {
     set(doel, sleutel, waarde) {
       const oud = doel[sleutel];
       /* Alleen een collectie die door een ANDERE collectie wordt vervangen telt
          hier. Al het andere -- een teller, een object, een nieuwe sleutel --
          gaat ongemoeid door. */
-      if (!Array.isArray(oud) || !Array.isArray(waarde)) { doel[sleutel] = waarde; return true; }
+      if (!Array.isArray(oud) || !Array.isArray(waarde)) return inventaris.vervang(doel, sleutel, waarde);
       /* Buiten een verzoek doet het huis zijn eigen werk (veger, migratie,
          seed); daar hoort geen budget op. */
       const h = nu.huidige();
-      if (!h) { doel[sleutel] = waarde; return true; }
+      if (!h) return inventaris.vervang(doel, sleutel, waarde);
 
       const uit = beoordeel(String(sleutel), oud.length, waarde.length,
         { pad: h.pad, correlatie: h.correlatie, modus, grens });
-      if (uit.oordeel === 'door') { doel[sleutel] = waarde; return true; }
+      if (uit.oordeel === 'door') return inventaris.vervang(doel, sleutel, waarde);
 
       if (uit.oordeel === 'weiger') {
         meld('error', 'begroting: handeling geweigerd', {
@@ -181,13 +181,15 @@ function bewaak(data, deps) {
          van wat er legitiem groot is (LAT.md regel 5). */
       meld('warn', 'begroting: zou zijn geweigerd', {
         id: h.correlatie, p: h.pad, collectie: String(sleutel), rijen: uit.krimp, grens: uit.grens });
-      doel[sleutel] = waarde;
-      return true;
-    }
+      return inventaris.vervang(doel, sleutel, waarde);
+    },
+    deleteProperty: inventaris.verwijder,
+    defineProperty: inventaris.definieer
   });
   wikkels.set(data, wikkel);
   wikkels.set(wikkel, wikkel);   // bewaak(bewaakt) geeft dezelfde wikkel terug
-  instellingen.set(wikkel, { nu, modus, grens, doel: data });
+  instellingen.set(wikkel, vorm);
+  inventaris.registreer(wikkel, data);
   return wikkel;
 }
 
@@ -197,4 +199,4 @@ function stand() {
     laatste: teller.laatste.slice(0, 10) };
 }
 
-module.exports = { bewaak, beoordeel, toetsOpslag, collectieSleutels, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };
+module.exports = { bewaak, instelling: v => instellingen.get(v), beoordeel, toetsOpslag, collectieSleutels, rijSleutels, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };

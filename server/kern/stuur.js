@@ -23,6 +23,7 @@ const INTERNE_GOEDKEURING = Symbol('stuur-goedgekeurd');
 /* De verbodslijst, de licht/zwaar-classificatie en de deeltakenparser wonen in
    ./stuur/classificatie.js; ze worden hier nog steeds geexporteerd. */
 const agentteken = require('./agentteken');
+const { losVanVerzoek } = require('../lib/losvanverzoek');
 const { VERBODEN, classificeer, parseSubs } = require('./stuur/classificatie');
 const rail = require('./stuur/rail');
 
@@ -60,16 +61,23 @@ function maakStuur({ log, anthropic, app, crypto, isolatie }) {
     if (auth) koppen.Authorization = auth;
     // A5: de AI handelt zichtbaar NAMENS deze mens (kern/agentteken.js)
     koppen[agentteken.KOP] = agentteken.kop('rahul');
+    // I11: dit verzoek is de oorzaak van de interne aanroep (ondertekend)
+    const oorzaak = agentteken.oorzaakKop(req.id);
+    if (oorzaak) koppen[agentteken.KOP_OORZAAK] = oorzaak;
     try {
-      const r = await fetch('http://127.0.0.1:' + poort + pad, {
+      /* In de nulcontext (B6a): undici zet bij de eerste fetch een GEDEELDE
+         timer, en die erfde dit verzoek en vuurde erna met zijn identiteit
+         (I4, gevonden door de I11-meting). De keten gaat via de kop hierboven. */
+      const r = await losVanVerzoek(() => fetch('http://127.0.0.1:' + poort + pad, {
         method: 'POST', headers: koppen, body: JSON.stringify(body == null ? {} : body),
         signal: AbortSignal.timeout(TIMEOUT_MS)
-      });
+      }));
       const antwoord = await r.json().catch(() => ({}));
       // wat de route zelf over de handelaar zegt; null als niemand het vastlegde
       const agent = r.headers.get('x-rtg-handelaar') || null;
+      const keten = r.headers.get('x-rtg-oorzaak') || null;   // wat het frame daar als oorzaak nam
       try { log && log.info && log.info('stuur', { pad, s: r.status, agent }); } catch (e) {}
-      return { status: r.status, antwoord, agent };
+      return { status: r.status, antwoord, agent, oorzaak: keten };
     } catch (e) {
       return { status: 502, error: 'De actie kwam niet aan: ' + (e && e.name === 'TimeoutError' ? 'tijd verstreken.' : 'interne fout.') };
     }

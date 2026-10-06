@@ -9,6 +9,12 @@
 const ROUTES = new Set([
   // De domeinbon controleert eerst de actuele rol; een antwoordcache mag die niet overslaan.
   'POST /api/bedrijf/praktijk/delen',
+  'POST /api/bedrijf/praktijk/leverancier',
+  'POST /api/bedrijf/praktijk/betaalverzoek',
+  'POST /api/werk-leverancier/beeld',
+  'POST /api/werk-leverancier/besluit',
+  'POST /api/werk-gast/betaling/start',
+  'POST /api/werk-gast/betaling/status',
   'POST /api/bedrijf/praktijk/inrichten',
   'POST /api/bedrijf/praktijk/aanbod',
   'POST /api/bedrijf/praktijk/vraag',

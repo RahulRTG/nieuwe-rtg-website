@@ -1086,6 +1086,13 @@
       ]
     },
     {
+      "naam": "LibraryOS",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "library",
+      "url": "/apps/library.html"
+    },
+    {
       "naam": "Ontdekken",
       "wereld": "FoundationOS",
       "soort": "link",

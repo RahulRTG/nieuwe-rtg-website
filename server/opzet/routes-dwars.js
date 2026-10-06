@@ -57,6 +57,8 @@ module.exports = function hangDwarseRoutersOp(grens) {
   require('../routes/vertaal')(grens('vertaal'));
   require('../routes/memo')(grens('memo'));
   require('../routes/boeken')(grens('boeken'));
+  require('../routes/library')(grens('library'));
+  require('../routes/loop-fabric')(grens('loop-fabric'));
   require('../routes/onderwijs')(grens('onderwijs'));
   require('../routes/leerstof')(grens('leerstof'));
   require('../routes/bijles')(grens('bijles'));

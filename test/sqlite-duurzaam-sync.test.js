@@ -49,6 +49,25 @@ test('FULL legt KV en audit atomair vast, publiceert na commit en scant één ke
   assert.equal(j.aantal(), 1); assert.equal(j.controleer().heel, true);
 });
 
+test('gerichte duurzame bundel gebruikt FULL zonder vreemde collecties te serialiseren', async t => {
+  const p = setup(t);
+  p.db.data.doel = { waarde: 1 }; p.save(); p.sql.length = 0;
+  let vreemdeScans = 0;
+  Object.defineProperty(p.db.data.ander, 'toJSON', {
+    value() { vreemdeScans++; return { waarde: this.waarde }; }
+  });
+  await p.bijeen(() => {
+    p.db.data.doel.waarde = 2;
+    p.save.sleutels(['doel']);
+    assert.equal(p.lees('doel').waarde, 1, 'de bundel publiceert niet vóór de commit');
+  }, { duurzaam: true });
+  assert.equal(vreemdeScans, 0, 'een gerichte bundel leest geen vreemde collectie');
+  assert.deepEqual(writes(p).map(r => r.mode), [2]);
+  assert.equal(commits(p).filter(r => r.mode === 2).length, 1);
+  assert.equal(p.lees('doel').waarde, 2);
+  assert.equal(p.mode(p.writer), 1);
+});
+
 test('gewone en selectieve saves blijven NORMAL; reeds FULL of EXTRA wordt niet verlaagd', t => {
   const p = setup(t);
   p.db.data.ander.waarde = 2; p.save();

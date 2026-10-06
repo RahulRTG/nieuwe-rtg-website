@@ -53,6 +53,8 @@ test('config: veilige productie is foutloos', () => {
     RTF_IBAN: 'NL11FOUND0000000001', RTG_MEDIA_BACKEND: 's3',
     RTG_MEDIA_S3_BUCKET: 'rtg-productie-media',
     RTG_MEDIA_S3_KEY: 'AKIA0123456789PRODUCTIE', RTG_MEDIA_S3_SECRET: 'm'.repeat(40),
+    STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com', STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
+    TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
     RTG_HERSTEL_SMS_UIT_BEWUST: '1', STRIPE_UITGAAND_UIT_BEWUST: '1',
     RTG_ISOLATIE_AFDWINGEN: '1',
     RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl' });
@@ -286,6 +288,16 @@ test('log.middleware: zet een X-Request-Id op het antwoord', () => {
   middleware()(req, res, () => {});
   assert.ok(req.id, 'req.id gezet');
   assert.equal(headers['X-Request-Id'], req.id);
+});
+
+test('log.middleware: een X-Request-Id van de client wordt extern, nooit de correlatie (B1a)', () => {
+  const headers = {};
+  const req = { headers: { 'x-request-id': 'ZELFGEKOZEN-correlatie' }, method: 'GET', path: '/x' };
+  const res = { set: (k, v) => { headers[k] = v; }, on: () => {} };
+  middleware()(req, res, () => {});
+  assert.notEqual(req.id, 'ZELFGEKOZEN-correlatie');
+  assert.equal(headers['X-Request-Id'], req.id);
+  assert.equal(req.externeId, 'ZELFGEKOZEN-correlatie');
 });
 
 test('log.foutMiddleware: geeft nette 500 met id, lekt geen details', () => {

@@ -26,6 +26,7 @@ sentinel-data/
 deploy/live.env
 .rtg-live-release
 .rtg-secrets/
+.rtg-compliance/
 backups/
 .vercel
 public/dist/

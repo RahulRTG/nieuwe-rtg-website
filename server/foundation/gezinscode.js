@@ -89,9 +89,13 @@ function maak({ db, crypto, bewerkCollectie, G, productie = process.env.NODE_ENV
     if (!adres) return Promise.reject(new Error('gezinscode vereist een gezin'));
     return transactie(kaart => {
       const vorige = eigenRij(kaart, adres);
-      const m = bearer.maak({ prefix: 'GC', issuer: 'rtg.foundation', doel: DOEL, scope: SCOPE,
-        onderwerp: { gezin: adres, id: String(g.id || '') }, geldigMs: require('../kern/bearercode').MAX_GELDIG_MS, maxGebruik: MAX_GEBRUIK });
-      m.toegang.rotatie = vorige && Number.isSafeInteger(vorige.rotatie) ? vorige.rotatie + 1 : 1;
+      const basis = { prefix: 'GC', issuer: 'rtg.foundation', doel: DOEL, scope: SCOPE,
+        onderwerp: { gezin: adres, id: String(g.id || '') } };
+      const MAX = require('../kern/bearercode').MAX_GELDIG_MS;
+      // een volgende code is een nieuwe termijn: vernieuwen, met de keten erbij
+      const m = vorige && String(door || '').trim()
+        ? bearer.vernieuw(vorige, Object.assign({ geldigheid: { duurMs: MAX }, gebruik: { max: MAX_GEBRUIK }, afgeleid: 'geen' }, basis), String(door))
+        : bearer.maak(Object.assign({ geldigMs: MAX, maxGebruik: MAX_GEBRUIK }, basis));
       m.toegang.uitgegeven_door = String(door || '').slice(0, 40);
       kaart[adres] = m.toegang;
       return m.code;

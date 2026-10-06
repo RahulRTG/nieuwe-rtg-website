@@ -6,6 +6,8 @@ module.exports = sctx => {
   const { app, db, save, crypto, kern, werkPoort, log, rid } = sctx;
   const werk = require('./praktijk-werk')(sctx);
   const deel = require('./praktijk-delen')(sctx);
+  const leverancier = require('./praktijk-leverancier')(sctx);
+  const betalen = require('./praktijk-betalen')(sctx);
   const hash = s => crypto.createHash('sha256').update(s).digest('hex');
   const stuur = (res, r) => { res.set('Cache-Control', 'no-store'); return res.status(r.status || 200).json(r); };
   function poort(req, res, recht) {
@@ -23,13 +25,13 @@ module.exports = sctx => {
     const oud = V.pak(g.w.praktijkBonnen, sleutel);
     if (oud) {
       if (oud.vinger !== vinger) return V.fout('Deze herhaalsleutel hoort bij andere gegevens.', 409);
-      return soort === 'delen' ? V.fout('De link is al uitgegeven. Maak zo nodig een nieuwe link.', 409) : oud.antwoord;
+      return ['delen', 'leverancier'].includes(soort) ? V.fout('De handeling is al verwerkt. Vernieuw het overzicht; maak zo nodig een nieuwe link.', 409) : oud.antwoord;
     }
     if (Object.keys(g.w.praktijkBonnen || {}).length >= 20000) return V.fout('Het bewaarlimiet is bereikt. Neem contact op met RTG.', 429);
     const r = doe();
     if (!r.error) {
       (g.w.praktijkBonnen || (g.w.praktijkBonnen = {}))[sleutel] = { vinger,
-        antwoord: soort === 'delen' ? { ok: true } : r };
+        antwoord: ['delen', 'leverancier'].includes(soort) ? { ok: true } : r };
       save();
     }
     return r;
@@ -56,16 +58,25 @@ module.exports = sctx => {
     },
     vraag: (g, b) => werk.vraag(g.w, g.l, b),
     stap: (g, b) => werk.stap(g.w, g.l, b),
-    delen: (g, b) => deel.delen(g.w, g.l, b)
+    delen: (g, b) => deel.delen(g.w, g.l, b),
+    leverancier: leverancier.handeling,
+    betaalverzoek: betalen.instellen
   };
   app.post('/api/bedrijf/praktijk/beeld', (req, res) => {
-    const g = poort(req, res); if (g) stuur(res, V.beeld(g.w, req.body || {}));
+    const g = poort(req, res); if (!g) return;
+    const uit = V.beeld(g.w, req.body || {});
+    uit.werk.forEach(x => { x.betaling = betalen.beeld(g.w,V.project(g.w,x.id),x); });
+    stuur(res, { ...uit, rechten: g.rechten });
   });
   async function praktijkMutatie(req, res, soort) {
     let r;
     await kern.bijeen(() => {
       const g = poort(req, res, ['inrichten', 'aanbod', 'delen'].includes(soort) ? 'werkruimte' : 'project');
       if (!g) return;
+      if (['leverancier','betaalverzoek'].includes(soort) &&
+          !['werkruimte','geld','geld.goedkeuren'].every(recht => g.rechten.includes(recht))) {
+        r = V.fout('U heeft ook werkruimtebeheer en financiële goedkeuringsrechten nodig.',403); return;
+      }
       // Rechten, versie, idempotentie en mutatie staan samen in de requestcommit.
       r = wijzig(g, soort, req.body || {}, () => functies[soort](g, req.body || {}));
     }, { duurzaam: true });
@@ -76,6 +87,10 @@ module.exports = sctx => {
   app.post('/api/bedrijf/praktijk/vraag', (req, res) => praktijkMutatie(req, res, 'vraag'));
   app.post('/api/bedrijf/praktijk/stap', (req, res) => praktijkMutatie(req, res, 'stap'));
   app.post('/api/bedrijf/praktijk/delen', (req, res) => praktijkMutatie(req, res, 'delen'));
-  require('./praktijk-gast')(sctx, deel, stuur);
+  app.post('/api/bedrijf/praktijk/leverancier', (req, res) => praktijkMutatie(req, res, 'leverancier'));
+  app.post('/api/bedrijf/praktijk/betaalverzoek', (req, res) => praktijkMutatie(req, res, 'betaalverzoek'));
+  require('./praktijk-gast')(sctx, deel, stuur, betalen);
+  require('./praktijk-leverancier-routes')(sctx, leverancier, stuur);
+  require('./praktijk-betalen-routes')(sctx, deel, betalen, stuur);
   return { praktijk: { beeld: V.beeld, ...functies, wijzig } };
 };

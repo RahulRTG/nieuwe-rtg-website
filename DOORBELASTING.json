@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-30T20:13:02.873Z",
-    "commit": "ec186c7b2",
+    "op": "2026-10-04T13:08:29.157Z",
+    "commit": "1407edcf",
     "boomVuil": false,
-    "boomAnders": 7,
+    "boomAnders": 1,
     "instrument": "scripts/doorbelasting.js",
-    "node": "v26.10.0"
+    "node": "v22.22.0"
   },
   "graad": "gemeten",
   "wat": "of de doorbelasting van RTG aantoonbaar te classificeren is: per vorm en per euro",
@@ -21,13 +21,13 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1549,
-    "geldvormen": 219,
-    "volgbaar": 37,
+    "vormenTotaal": 1551,
+    "geldvormen": 221,
+    "volgbaar": 39,
     "perHerkomstveld": {
-      "bron": 19,
+      "bron": 20,
       "provider": 1,
-      "herkomst": 3,
+      "herkomst": 4,
       "aanbieder": 7,
       "leverancier": 8,
       "economischeHerkomst": 4
@@ -46,6 +46,8 @@
       "server/kern/groothandel/assortiment.js",
       "server/kern/horeca/bon-maak.js",
       "server/kern/horeca/foliolaag.js",
+      "server/kern/horeca/teruggave.js",
+      "server/kern/horeca/teruggave.js",
       "server/kern/kosten/providerfactuur.js",
       "server/kern/kosten/providerfactuur.js",
       "server/kern/magnaat-leven/contract.js",
@@ -198,8 +200,8 @@
         "volgbaar": 1
       },
       "server/kern/horeca": {
-        "geldvormen": 3,
-        "volgbaar": 2
+        "geldvormen": 5,
+        "volgbaar": 4
       },
       "server/kern/koppel.js": {
         "geldvormen": 2,

@@ -93,7 +93,11 @@ function lees(wortel) {
         kanaal: m[1].replace(/['"]/g, ''),
         doorgeef,
         classificatie: /envelop\s*:\s*\{[^}]*classificatie\s*:/.test(arg),
-        actor: /envelop\s*:\s*\{[^}]*actor\s*:/.test(arg)
+        actor: /envelop\s*:\s*\{[^}]*actor\s*:/.test(arg),
+        /* De hoedanigheid (v2, besluit B3b) komt uit het verzoekframe en NOOIT
+           uit een opgave: de bus neemt hem daar niet van over, en een plek die
+           hem toch meegeeft denkt dat hij iets zet wat er niet aankomt. */
+        hoedanigheid: /envelop\s*:\s*\{[^}]*hoedanigheid\s*:/.test(arg)
       });
     }
   }
@@ -109,6 +113,7 @@ function analyse(plekken) {
     metClassificatie: eigen.filter(p => p.classificatie).length,
     metActor: eigen.filter(p => p.actor).length,
     zonderClassificatie: eigen.filter(p => !p.classificatie).map(p => p.bestand + ' (' + p.kanaal + ')'),
+    hoedanigheidInOpgave: plekken.filter(p => p.hoedanigheid).map(p => p.bestand + ' (' + p.kanaal + ')'),
     lijst: plekken
   };
 }
@@ -130,6 +135,9 @@ if (require.main === module) {
       console.log('\nZonder classificatie (die gaan als "onbekend" de bus over):\n  ' +
         uit.zonderClassificatie.join('\n  '));
     else console.log('\nElke plek die zelf een bericht samenstelt, zegt hoe gevoelig het is.');
+    if (uit.hoedanigheidInOpgave.length)
+      console.log('\nGeven een hoedanigheid op (die komt uit het verzoekframe, niet hier):\n  ' +
+        uit.hoedanigheidInOpgave.join('\n  '));
   }
 }
 

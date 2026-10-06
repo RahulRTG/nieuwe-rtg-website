@@ -41,7 +41,7 @@
                   het antwoord als `nietAfgedwongen`.
      verplicht    sluit dat gat: zonder gebonden toestel geen zware handeling.
 
-   De stand komt uit RTG_BEZITSBEWIJS en valt terug op `schaduw`. Een onbekende
+   De stand komt uit RTG_BEZITSBEWIJS en valt (sinds A-P1-04) terug op `aanbevolen`. Een onbekende
    waarde valt OOK terug op schaduw en zegt dat: een typefout in een
    omgevingsvariabele hoort geen beveiliging aan of uit te zetten.
    ========================================================================== */
@@ -58,13 +58,7 @@ const SPELING_MS = 90 * 1000;
 
 const zwaarPad = (pad) => PADEN.find(p => String(pad || '').startsWith(p.pad)) || null;
 
-const STANDEN = ['schaduw', 'aanbevolen', 'verplicht'];
-function standNu() {
-  const v = String(process.env.RTG_BEZITSBEWIJS || '').trim().toLowerCase();
-  if (!v) return { stand: 'schaduw', reden: 'niet ingesteld' };
-  if (!STANDEN.includes(v)) return { stand: 'schaduw', reden: 'onbekende waarde "' + v + '"; teruggevallen op schaduw' };
-  return { stand: v, reden: 'ingesteld' };
-}
+const { standNu } = require('./bezitsstand');
 
 function maakBezitsbewijs({ db, save, toestellen }) {
   const { maakMeter } = require('./bezitsmeter');
@@ -97,7 +91,16 @@ function maakBezitsbewijs({ db, save, toestellen }) {
     const zwaar = zwaarPad(pad);
     if (!zwaar) return { stand: 'nvt' };
     const werkelijk = stand || standNu().stand;
-    const uit = await beoordeel({ sess, methode, pad, kop, stand: werkelijk === 'schaduw' ? 'aanbevolen' : werkelijk, zwaar });
+    let uit;
+    try {
+      uit = await beoordeel({ sess, methode, pad, kop, stand: werkelijk === 'schaduw' ? 'aanbevolen' : werkelijk, zwaar });
+    } catch (e) {
+      /* A-P1-04: EEN STORING IN DE VERIFIER IS GEEN DOORGANG. Op een zwaar pad
+         weigeren we (fail closed) in plaats van de handeling ongecontroleerd
+         door te laten; alleen de bewuste schaduwstand laat door. */
+      uit = { stand: 'geweigerd', code: 503, storing: true,
+        reden: 'Het bezitsbewijs kon niet worden gecontroleerd; er is niets uitgevoerd. Probeer het zo opnieuw.' };
+    }
     /* IN DE SCHADUW WEIGEREN WIJ NOOIT. Het oordeel wordt wel volledig
        uitgerekend en teruggegeven, want anders meet je niets en blijft de stand
        voor altijd op schaduw staan omdat niemand weet wat er zou gebeuren. */
@@ -114,9 +117,13 @@ function maakBezitsbewijs({ db, save, toestellen }) {
     const binding = sess && sess.sessieContext && sess.sessieContext.sleutelbinding;
     const toestelId = binding && binding.keyRef;
     if (!toestelId) {
+      /* Geen stil privilege: een sessie die niet kan binden (gast, pas zonder eigen account)
+         krijgt een zwaar pad niet omdat binden technisch onmogelijk is. */
       if (stand === 'verplicht') {
-        return { stand: 'geweigerd', code: 403,
-          reden: 'Deze handeling vraagt een toestel dat zijn sleutel kan aantonen. Bevestig dit toestel in "Waar ben ik aanwezig".' };
+        const kanBinden = sess && sess.account && sess.tier !== 'guest';
+        return { stand: 'geweigerd', code: 403, reden: kanBinden
+          ? 'Deze handeling vraagt een toestel dat zijn sleutel kan aantonen. Bevestig dit toestel in "Waar ben ik aanwezig".'
+          : 'Deze handeling vraagt een eigen RTG-account met een bevestigd toestel. Maak of gebruik een account en bevestig daarna dit toestel.' };
       }
       return { stand: 'onbeschermd', waarom: zwaar.reden,
         nietAfgedwongen: 'Deze sessie heeft geen sleutelbinding, dus een gestolen token zou hier wel doorheen komen. Bevestig dit toestel om dat te sluiten.' };

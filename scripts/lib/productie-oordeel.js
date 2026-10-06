@@ -166,6 +166,12 @@ function beoordeel(invoer) {
   if (externGepind)
     eis(String(externControle.commit || '') === String(commit || ''),
       'Cryptografisch extern bewijs hoort niet exact bij de releasecommit.');
+  if (externGepind) {
+    eis(zonderRail ? externControle.moneyMode === 'RAIL_DISABLED' : externControle.moneyMode === 'LIVE',
+      zonderRail
+        ? 'READY_ZONDER_RAIL vereist vijf machineleesbare OUT_OF_SCOPE-bewijzen voor dezelfde server-side betaalstop.'
+        : 'Volledige READY vereist één aantoonbaar gekoppelde live geldketen; rail-disabled bewijs is niet voldoende.');
+  }
   if (externGepind)
     for (const blokkade of require('../../server/config/external-release')
       .foundationReleaseBlokkades(externControle, golive && golive.foundation))

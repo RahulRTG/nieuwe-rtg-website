@@ -164,3 +164,26 @@ test('startupmigratie hasht en sluit legacycodes; een niet-duurzame commit blijf
   assert.equal(dbStuk.data.luchthaven.boekingen[0].code, 'VL-STUK01',
     'zonder duurzame commit wordt de levende toestand niet als gemigreerd verkocht');
 });
+
+/* ROTEREN (kern/bearercode-keten.js): een verloren pas krijgt een verse code
+   voor DEZELFDE reisdag. Het einde komt niet later, het gebruik telt door, de
+   oude code doet niets meer en de geschiedenis zegt `geroteerd`. Mutatie:
+   vernieuwen in plaats van roteren laat de soort en de teller zakken. */
+test('roteren houdt de reisdag, telt het gebruik door en sluit de oude code', async () => {
+  const { db, kern } = maak();
+  const boek = await kern.boek({ key: 'lid-a', codenaam: 'Kobalt', vluchtId: 'vl_open' });
+  const code1 = (await kern.incheck({ key: 'lid-a', boekingId: boek.boekingId })).pass.code;
+  assert.equal((await kern.controleerEnClaim({ code: code1, partnerCode: 'AIRSHOP' })).geldig, true);
+  const oud = db.data.luchthaven.boekingen[0].toegang;
+  const r = await kern.roteer({ key: 'lid-a', boekingId: boek.boekingId, verwachteRotatie: 1 });
+  assert.equal(r.status, 200);
+  const rij = db.data.luchthaven.boekingen[0], nieuw = rij.toegang;
+  assert.equal(nieuw.rotatie, oud.rotatie + 1);
+  assert.equal(nieuw.expires_at, oud.expires_at, 'een rotatie verlengt de pas niet');
+  assert.equal(nieuw.gebruik, 1, 'het gebruik van de oude code telt door');
+  assert.equal(nieuw.geschiedenis.at(-1).soort, 'geroteerd');
+  assert.equal(nieuw.geschiedenis.at(-1).door, kern.toegang.lidHash('lid-a'));
+  assert.equal(rij.pass_historie.at(-1).intrekreden, 'geroteerd');
+  assert.equal((await kern.controleerEnClaim({ code: code1, partnerCode: 'SHOP2' })).geldig, false);
+  assert.equal((await kern.controleerEnClaim({ code: r.pass.code, partnerCode: 'SHOP2' })).geldig, true);
+});

@@ -115,7 +115,20 @@ module.exports = ({ rij, zelf, schrijfRegel, veelOpdracht, heeftOpslag, vastlegg
        bevestigd; deze regel zegt dat het onze regel is die er staat. Dat is geen
        dubbelop: `bijeen` commit de hele werkkopie, en een lege catch ergens in de
        mutatie zou de regel kunnen hebben weggelaten zonder dat de commit faalt. */
-    if (!regel || !rij().some(r => r === regel)) {
+    /* Een transactionele opslag publiceert na de commit een NIEUWE objectboom.
+       De regel die hierboven in de werkkopie is gebouwd staat dan inhoudelijk
+       wel duurzaam in de database, maar kan nooit meer dezelfde
+       JavaScript-objectidentiteit hebben. Objectidentiteit als bewijs maakte
+       daarom juist de veilige COW-opslag onbruikbaar en sloot onder meer de
+       ledenbalie en boekhoudexport met een 503.
+
+       De ketenhash is de identiteit van deze auditregel: hij bindt alle
+       inhoud, het volgnummer en de vorige schakel. We zoeken na de commit dus
+       de exact gehashte schakel terug. Alleen een werkelijk ontbrekende of
+       afwijkende regel blijft fail-closed. `nr` staat ook in de hash, maar de
+       expliciete vergelijking maakt de bedoelde ketenpositie zichtbaar. */
+    const terug = regel && rij().some(r => r && r.hash === regel.hash && r.nr === regel.nr);
+    if (!terug) {
       return { ok: false, status: 503, reden: 'regel-niet-teruggevonden',
         error: 'Dit is niet vast te leggen; het spoor was na het vastleggen niet terug te vinden.' };
     }

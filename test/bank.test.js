@@ -372,14 +372,17 @@ test('salarisrun uit de klokuren: het voorstel matcht op de lid-koppeling en de 
   assert.ok(noraIban, 'Nora heeft een betaalrekening');
 
   // de manager boekt klokcorrecties: Nora en Mateo werkten allebei 2 uur deze
-  // maand (vergeten te klokken); bij een maandgrens klemt de test naar vandaag
+  // maand (vergeten te klokken); bij een maandgrens klemt de test naar de
+  // lopende UTC-periode. API-datums zijn ISO/UTC; een lokale maandstart kon in
+  // de eerste Amsterdamse uren nog september zijn terwijl de loonrun oktober
+  // opende, waardoor een correcte salarisrun alleen onder belasting rood werd.
   const roster = await api('supplier/roster', { code: 'KIKUNOI' });
   const mateo = roster.body.staff.find(x => x.role === 'manager');
   const nora = roster.body.staff.find(x => x.name === 'Nora Prins');
   const mgr = (await api('supplier/login', { code: 'KIKUNOI', staffId: mateo.id, pin: '1234' })).body.token;
   const nu = new Date();
   let inAt = new Date(nu.getTime() - 3 * 3600000);
-  const maandStart = new Date(nu.getFullYear(), nu.getMonth(), 1, 0, 1);
+  const maandStart = new Date(Date.UTC(nu.getUTCFullYear(), nu.getUTCMonth(), 1, 0, 1));
   if (inAt < maandStart) inAt = maandStart;
   const uitAt = new Date(inAt.getTime() + 2 * 3600000);
   const c1 = await api('staff/klok/correctie', { staffId: nora.id, in: inAt.toISOString(), uit: uitAt.toISOString() }, mgr);

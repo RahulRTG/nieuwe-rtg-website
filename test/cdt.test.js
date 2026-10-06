@@ -173,6 +173,7 @@ test('5. de tijdlijn heeft geen gaten: precies een open blok', async () => {
   const af = await api('/api/staff/mob/cdt/afmelden', { chauffeurskaart: KAART }, pda);
   assert.equal(af.status, 200);
   assert.equal(af.body.dienst.lopend, false);
+  assert.ok(af.body.dienst.blokken.length >= 3, 'afmelden bewaart de gereden en gepauzeerde blokken');
   assert.ok(af.body.dienst.blokken.every(b => !b.open), 'na afmelden staat er geen blok meer open');
   const nogmaals = await api('/api/staff/mob/cdt/afmelden', { chauffeurskaart: KAART }, pda);
   assert.equal(nogmaals.status, 404, 'afmelden zonder lopende dienst kan niet');

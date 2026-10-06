@@ -35,5 +35,5 @@ module.exports = ({ db }) => function kostenpoort(req, res, next) {
   if (!code || !gezinnen[code]) return next();
   const drager = kostenhaak.drager('gezin', code);
   kostenhaak.meld('verzoek', 1, { drager, pas: 'gezin' });
-  kostenhaak.binnen(drager, next, 'gezin');
+  kostenhaak.binnen(drager, next, 'gezin', 'lichaam');   // herkomst: B5a, zie hierboven
 };

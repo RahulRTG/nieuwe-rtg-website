@@ -152,6 +152,9 @@ test('7. echte server: intrekken is van de eigenaar, en daarna koppelt de code n
     assert.equal(k.status, 401, 'een ingetrokken uitnodiging koppelde toch: ' + JSON.stringify(k.body));
     assert.equal((await api('/api/office/kantoor/uitnodiging/intrek', { id: 'uitn_bestaatniet' }, eig)).status, 404);
     const o = await api('/api/office/kantoor/uitnodigingen', {}, eig);
+    assert.equal(o.status, 200);
+    assert.equal(o.body.uitnodigingen.find(x => x.id === u.body.id)?.stand, 'ingetrokken',
+      'het overzicht toont de ingetrokken uitnodiging met haar echte toestand');
     assert.equal(JSON.stringify(o.body).includes(u.body.code.slice(3)), false, 'het overzicht toont de code');
   } finally {
     await stop(srv);

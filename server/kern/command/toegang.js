@@ -1,5 +1,5 @@
-/* RECHTEN DIE VANZELF WEER WEGGAAN -- tijdelijke bevoegdheid, noodtoegang en
-   het mandaat om namens iemand te handelen.
+/* RECHTEN DIE VANZELF WEER WEGGAAN -- tijdelijke bevoegdheid en noodtoegang.
+   (Het mandaat om namens iemand te handelen is opgeheven; zie verderop.)
 
    DE KERN VAN DEZE MODULE IS DE VERVALDATUM. Een zwaar recht dat je krijgt en
    houdt, is over een jaar een recht waarvan niemand meer weet waarom het er is
@@ -19,6 +19,7 @@
 'use strict';
 
 const { NIVEAUS } = require('../frictie');
+const klok = require('../../lib/klok');
 
 /* De zware bevoegdheden. Alleen deze zijn tijdelijk uit te delen -- de rest
    hangt gewoon aan de kantoorinlog. Een lijst, want "alles kan tijdelijk" is
@@ -33,22 +34,24 @@ const ZWAAR = {
 
 const NOOD_MINUTEN = 60;
 
+/* EEN ZWAAR RECHT IS PERSOONLIJK. De gedeelde kantoorcode geeft en krijgt er
+   geen: een spoor dat eindigt bij een gedeelde code is een alibi (KANTOOR.md).
+   Waar de vijf rechten gelezen worden: test/command-zware-rechten.test.js. */
+const gedeeld = (w) => /gedeelde code/i.test(String(w || ''));
+
 function maakToegang({ opslag, save, crypto, journaal }) {
   function rij() {
     return opslag.bak('commandRechten');
   }
-  function mandaten() {
-    return opslag.bak('commandMandaten');
-  }
-  const nu = () => new Date().toISOString();
-  const straks = (min) => new Date(Date.now() + min * 60000).toISOString();
+  const nu = () => klok.datum().toISOString();
+  const straks = (min) => new Date(klok.nu() + min * 60000).toISOString();
 
   /* Tijdelijk recht geven. Vier ogen: wie het geeft is niet wie het krijgt. */
   function geef(recht, aan, door, reden, minuten) {
     const r = ZWAAR[String(recht)];
     if (!r) return { error: 'Dat recht bestaat niet of hoeft niet tijdelijk gegeven te worden: ' + recht, status: 404 };
     if (!aan) return { error: 'Aan wie?', status: 400 };
-    if (!door) return { error: 'Zonder herleidbare gever wordt er geen recht uitgedeeld.', status: 403 };
+    if (!door || gedeeld(door) || gedeeld(aan)) return { error: 'Een zwaar recht geeft en krijgt alleen een mens op naam, niet de gedeelde code.', status: 403 };
     if (String(aan) === String(door)) return { error: 'Een zwaar recht geef je niet aan jezelf; laat een ander het doen.', status: 403 };
     if (!reden || String(reden).trim().length < 4) return { error: 'Een tijdelijk recht vraagt een reden.', status: 400 };
     const min = Math.min(Number(minuten || r.maxMinuten), r.maxMinuten);
@@ -66,7 +69,7 @@ function maakToegang({ opslag, save, crypto, journaal }) {
   function breekGlas(recht, door, reden) {
     const r = ZWAAR[String(recht)];
     if (!r) return { error: 'Dat recht bestaat niet: ' + recht, status: 404 };
-    if (!door) return { error: 'Zonder herleidbare medewerker gaat de nooddeur niet open.', status: 403 };
+    if (!door || gedeeld(door)) return { error: 'De nooddeur gaat alleen open voor een mens op naam, niet voor de gedeelde code.', status: 403 };
     if (!reden || String(reden).trim().length < 10) return { error: 'De nooddeur vraagt een volledige reden (minstens tien tekens); die staat straks in het journaal.', status: 400 };
     const min = Math.min(NOOD_MINUTEN, r.maxMinuten);
     const item = { id: crypto.randomUUID(), recht: String(recht), aan: String(door), door: String(door),
@@ -75,7 +78,8 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     if (save) save();
     journaal.noteer({ actor: door, actie: 'noodtoegang openen', objectType: 'recht', objectId: item.id,
       niveau: NIVEAUS.hand, risico: 95, reden, na: { recht: item.recht, tot: item.tot, nood: true } });
-    return { recht: item, waarschuwing: 'Deze noodtoegang staat in het journaal en vervalt om ' + item.tot + '.' };
+    return { recht: item,
+      waarschuwing: 'Deze noodtoegang staat in het journaal en vervalt om ' + item.tot + '.' };
   }
 
   function trekIn(id, door, reden) {
@@ -95,24 +99,23 @@ function maakToegang({ opslag, save, crypto, journaal }) {
     const n = nu();
     return rij().some(x => !x.ingetrokken && x.aan === String(wie) && x.recht === String(recht) && x.tot > n);
   };
+  /* De poort voor de vijf handelingen: null als het recht openstaat, anders
+     een weigering die zegt welk recht en hoe je het krijgt. */
+  const vereist = (wie, recht) => (!gedeeld(wie) && geldig(wie, recht)) ? null : { status: 403, recht,
+    error: 'Dit vraagt het tijdelijke recht "' + recht + '" (' + ZWAAR[recht].wat + '). Een collega op naam ' +
+      'geeft het via /api/command/recht/geef, of open de nooddeur met een reden.' };
   const vanWie = (wie) => { const n = nu(); return rij().filter(x => x.aan === String(wie) && !x.ingetrokken && x.tot > n); };
   const open = () => { const n = nu(); return rij().filter(x => !x.ingetrokken && x.tot > n); };
 
-  /* MANDAAT: X mag namens Y handelen, tot een datum, voor een afgebakend
-     terrein. Ook dit vervalt vanzelf. */
-  function mandaat(van, aan, terrein, door, tot, reden) {
-    if (!van || !aan || !terrein) return { error: 'Een mandaat vraagt van wie, aan wie en waarvoor.', status: 400 };
-    if (!door) return { error: 'Zonder herleidbare actor wordt er geen mandaat vastgelegd.', status: 403 };
-    if (!tot) return { error: 'Een mandaat zonder einddatum is geen mandaat maar een overdracht.', status: 400 };
-    const m = { id: crypto.randomUUID(), van: String(van), aan: String(aan), terrein: String(terrein),
-      door: String(door), reden: String(reden || ''), at: nu(), tot: String(tot) };
-    mandaten().push(m);
-    if (save) save();
-    journaal.noteer({ actor: door, actie: 'mandaat vastleggen', objectType: 'mandaat', objectId: m.id,
-      niveau: NIVEAUS.hand, reden: m.reden, na: { van: m.van, aan: m.aan, terrein: m.terrein, tot: m.tot } });
-    return { mandaat: m };
-  }
-  const mandatenVan = (wie) => { const n = nu(); return mandaten().filter(m => (m.aan === String(wie) || m.van === String(wie)) && m.tot > n); };
+  /* Hier stond `mandaat()`: X mag namens Y handelen, tot een datum. Opgeheven op
+     4 oktober 2026. `tot` was vrije tekst die als TEKST werd vergeleken ("morgen"
+     verliep nooit, een datum in het verleden werd aanvaard), er was geen maximum
+     en geen intrekken, en geen enkele route of scherm las de mandaten. Een
+     machtiging zonder geldigheidscontract en zonder lezer is geen bevoegdheid
+     maar een regel die eruitziet als een. Wie namens iemand handelt, gaat langs
+     kern/vertegenwoordiging/ (mens-namens-mens) of kern/stuur/mandaat.js (de AI).
+     De collectie `commandMandaten` blijft geregistreerd zodat bestaande rijen
+     niet verdwijnen; niets schrijft of leest haar nog. */
 
   /* DE RECHTENGRAAF: wie heeft nu wat, waarom, van wie en tot wanneer. Dit is
      de vraag die bij een audit als eerste komt en die zonder deze laag alleen
@@ -128,14 +131,13 @@ function maakToegang({ opslag, save, crypto, journaal }) {
         at: x.at, tot: x.tot, nood: x.nood })),
       nood: levend.filter(x => x.nood).length,
       verlopen: verlopen.length,
-      mandaten: mandaten().filter(m => m.tot > n),
       /* Wat een lege lijst hier betekent, staat erbij: geen actieve zware
          rechten is een goede uitslag, geen ontbrekende meting. */
       uitleg: levend.length ? null : 'Er staan op dit moment geen zware rechten open. Dat is de bedoelde rusttoestand.'
     };
   }
 
-  return { geef, breekGlas, trekIn, geldig, vanWie, open, graaf, mandaat, mandatenVan, ZWAAR, NOOD_MINUTEN };
+  return { geef, breekGlas, trekIn, geldig, vereist, vanWie, open, graaf, ZWAAR, NOOD_MINUTEN };
 }
 
 module.exports = { maakToegang, ZWAAR, NOOD_MINUTEN };

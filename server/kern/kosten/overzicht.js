@@ -71,8 +71,8 @@ module.exports = (ctx) => {
   /* De gemeten regels van één drager. Soorten waar deze gebruiker niets van
      verbruikte staan er niet bij; soorten die NIEMAND meet staan apart in
      nietGemeten(), want dat is een gat in de meting en geen nulverbruik. */
-  function directeRegels(periode, drager) {
-    const rij = meter.kijk(periode, drager) || {};
+  function directeRegels(periode, drager, periodebeeld) {
+    const rij = periodebeeld ? (periodebeeld[String(drager)] || {}) : (meter.kijk(periode, drager) || {});
     return gemeten().filter(s => Number(rij[s.id]) > 0).map(s => regelVan(periode, s.id, Number(rij[s.id])));
   }
 
@@ -82,8 +82,12 @@ module.exports = (ctx) => {
      dat nul is omdat er iets ontbreekt. */
   function directeKostenPerDrager(periode) {
     const uit = {};
-    for (const dr of meter.dragers(periode)) {
-      uit[dr] = directeRegels(periode, dr).reduce((a, r) => a + (r.millicenten || 0), 0);
+    /* Eén consistent maandbeeld voor de hele verdeling. Eerder bouwde
+       directeRegels voor iedere drager opnieuw een diepe kopie van dezelfde
+       maand, waardoor N dragers N volledige maandkopieën kostten. */
+    const periodebeeld = meter.kijkPeriode(periode);
+    for (const dr of Object.keys(periodebeeld)) {
+      uit[dr] = directeRegels(periode, dr, periodebeeld).reduce((a, r) => a + (r.millicenten || 0), 0);
     }
     return uit;
   }

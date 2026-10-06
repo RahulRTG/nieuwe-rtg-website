@@ -1,11 +1,11 @@
 /* DE ARRIVAL PASS als credential (livingos.invisible_arrival_pass).
 
    De gast heeft geen account; zijn pass is een bearer. Daarom: de SERVER maakt
-   hem (AR.<32 hex>, 128 bits via ./bearercode.js -- vroeger koos de browser
-   hem, met randomUUID 122 bits); hij staat alleen als hash in `arrivalToegang`
-   en kaal alleen in het antwoord op de aanvraag of een rotatie; hij vervalt op
-   aankomst + 12 uur en een aanvraag mag hooguit HORIZON_DAGEN vooruit;
-   max_gebruik telt PULSEN (lezen is geremd en vervalt met de pass); intrekken,
+   hem (AR.<32 hex>, 128 bits via ./bearercode.js v2); hij staat alleen als
+   hash in `arrivalToegang` en kaal alleen in het antwoord op de aanvraag of een
+   rotatie; hij vervalt op aankomst + 12 uur (een voorbije aankomst krijgt er
+   geen) en een aanvraag mag hooguit HORIZON_DAGEN vooruit;
+   max_gebruik telt PULSEN (lezen is geremd); intrekken,
    roteren en gebruiken lopen in een collectietransactie; een reservering die
    niet doorgaat sluit de pass; zoeken is constant-time.
 
@@ -65,9 +65,8 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
     }
     const g = bearer.maak({ prefix: 'AR', issuer: 'rtg.gast.arrival', doel: DOEL, scope: SCOPE,
       onderwerp: { soort: 'arrival', id: rij.id, supplierCode: rij.supplierCode, reserveringId: rij.reserveringId },
-      geldigMs: Date.parse(rij.tot) - ms(), maxGebruik: MAX_PULSEN });
+      geldigheid: { verlooptOp: rij.tot }, gebruik: { max: MAX_PULSEN }, afgeleid: 'geen' });
     g.toegang.rotatie = rotatie;
-    g.toegang.expires_at = rij.tot;
     rij.toegang = g.toegang;
     rij.bijgewerkt_at = nu();
     return g.code;
@@ -100,6 +99,7 @@ module.exports = ({ db, bewerkCollectie, crypto, nu = () => klok.datum().toISOSt
   function aanvraag({ requestToken, supplierCode, reserveringId, datum, tijd }) {
     const ah = aanvraagHash(requestToken);
     const tot = aankomst(datum, tijd) + NA_AANKOMST_MS;
+    if (!(tot > ms() + 6e4)) return { status: 400, error: 'Deze aankomst is voorbij.' };
     return transactie(bron => {
       let bestaand = null;
       for (const r of Object.values(bron)) if (bearer.zelfdeHash(r && r.aanvraag_hash, ah)) bestaand = r;

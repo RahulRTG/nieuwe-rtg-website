@@ -28,6 +28,7 @@
        hernoemde de tegels naar gewone woorden ("Video" in plaats van "Clips"),
        en een tak die daarvoor aftakte kent die keuze nog niet. */
     mediaos:     { naam: 'RTG Media',    url: '/apps/media.html' },
+    library:     { naam: T('app.library', 'LibraryOS'), url: '/apps/library.html' },
     office:      { naam: 'RTDocs',       url: '/apps/office.html' },
     /* werkrol: zie app-main-24a3.js. Alle drie praten alleen met /api/rtgone
        achter officeAuth: zonder kantoorsleutel is de ingang een omleiding. */

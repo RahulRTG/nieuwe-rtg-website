@@ -229,3 +229,38 @@ test('9. echte server: eenmaal tonen, roteren, intrekken en uit dienst', async (
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* FASE 1, PROEF B: de werkruimtesessie op bearercode v2. Het tegendeel van
+   proef A (de cadeaukaart): een DUUR in plaats van een absoluut einde, gebruik
+   'sessie' in plaats van een teller, en afgeleid 'perAanroep' -- de epoch wordt
+   bij elke aanroep opnieuw getoetst, er ontstaat niets dat blijft. */
+test('10. bearercode v2: sessie in plaats van max_gebruik 0, een contracthash, en legacy blijft v1', () => {
+  const { z, w, schuif } = wereld();
+  const lid = z.geefLid(w, w.leden.a);
+  const t = w.leden.a.sessies[0];
+  assert.deepEqual([t.contractversie, t.gebruiksvorm, t.afgeleid], [2, 'sessie', 'perAanroep']);
+  for (let i = 0; i < 50; i++) assert.ok(z.lidVan(w, lid), 'een sessie raakt niet op');
+
+  const einde = t.expires_at;
+  t.expires_at = '2099-01-01T00:00:00.000Z';
+  assert.equal(z.lidVan(w, lid), null, 'een verlengd einde opent niets');
+  t.expires_at = einde;
+  t.onderwerp.lidId = 'b';
+  assert.equal(z.lidVan(w, lid), null, 'een sessie omhangen naar een ander lid opent niets');
+  t.onderwerp.lidId = 'a';
+  assert.ok(z.lidVan(w, lid), 'teruggezet werkt hij weer');
+
+  S.sluit(w.leden.a);
+  assert.equal(z.lidVan(w, lid), null, 'de epoch sluit nog steeds elke sessie');
+
+  const ws = { W1: { code: 'W1', leden: { a: { id: 'a', status: 'actief', token: 'cd'.repeat(24) } } } };
+  z.migreer(ws);
+  const oud = ws.W1.leden.a.sessies[0];
+  assert.equal(oud.contractversie, undefined, 'een oude sleutel blijft v1: zijn hash kwam niet uit maak()');
+  assert.ok(z.lidVan(ws.W1, 'cd'.repeat(24)), 'en werkt onder de v1-regels');
+  const nieuw = z.roteer(ws.W1, 'cd'.repeat(24), 'lid');
+  assert.equal(ws.W1.leden.a.sessies.find(x => !x.ingetrokken_at).contractversie, 2, 'na roteren is hij v2');
+  assert.ok(z.lidVan(ws.W1, nieuw));
+  schuif(8 * 86400000);
+  assert.equal(z.lidVan(ws.W1, nieuw), null, 'zeven dagen, ook na de overstap');
+});

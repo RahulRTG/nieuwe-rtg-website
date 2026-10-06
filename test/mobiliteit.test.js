@@ -253,6 +253,7 @@ test('7. de matcher: afwijzen op grenzen, kiezen met een uitleg', async () => {
   for (const f of gekozen.factoren) {
     assert.ok(f.uitleg && f.uitleg.length > 3, 'elke factor legt zichzelf uit: ' + f.naam);
     assert.ok(f.punten <= f.max, 'geen factor scoort boven zijn eigen gewicht');
+    assert.notEqual(f.naam, 'beoordeling', 'een cijfer op de chauffeur hoort niet in de score');
   }
   assert.equal(gekozen.score, Math.round(gekozen.factoren.reduce((s, f) => s + f.punten, 0) /
     gekozen.factoren.reduce((s, f) => s + f.max, 0) * 100), 'de score is de som van de factoren, niet los daarvan');
@@ -265,7 +266,12 @@ test('8. de wegingen zijn beleid: zwaarder op eerlijk verdelen verandert de uitk
   assert.equal(zet.status, 200);
   assert.equal(zet.body.gewichten.eerlijk, 60);
   assert.equal(zet.body.gewichten.nabijheid, 5);
-  assert.equal(zet.body.gewichten.beoordeling, voor.beoordeling, 'een factor die je niet noemt blijft staan');
+  assert.equal(zet.body.gewichten.energie, voor.energie, 'een factor die je niet noemt blijft staan');
+  /* De beoordeling van een chauffeur is geen factor: dat is een cijfer op een
+     mens (PLANNING.md par. 5.1). Hij staat niet in de gewichten en is ook niet
+     terug te zetten. */
+  assert.ok(!('beoordeling' in voor), 'geen beoordeling in de standaardgewichten');
+  assert.equal((await api('/api/supplier/mob/wegingen', { gewichten: { beoordeling: 10 } }, zaak)).status, 400);
   // onzin wordt geweigerd in plaats van stil genegeerd
   assert.equal((await api('/api/supplier/mob/wegingen', { gewichten: { verzonnen: 10 } }, zaak)).status, 400);
   assert.equal((await api('/api/supplier/mob/wegingen', { gewichten: { eerlijk: 500 } }, zaak)).status, 400);
@@ -406,6 +412,8 @@ test('11. de bedrijfspendel: een regel wordt een dienstregeling wordt een rit', 
   const leeg = await api('/api/supplier/mob/pendel/plan', { id: pid, datum: maandag }, zaak);
   assert.equal(leeg.status, 200);
   assert.equal(leeg.body.gemaakt.length, 0, 'zonder reserveringen rijdt er geen lege bus');
+  // alle negen vertrekken van de maandag zijn overgeslagen, en niet stil verdwenen
+  assert.equal(leeg.body.overgeslagen.length, 9, 'elk vertrek staat als overgeslagen: ' + JSON.stringify(leeg.body).slice(0, 200));
   assert.ok(leeg.body.overgeslagen.every(x => x.reden === 'geen reserveringen'));
 });
 

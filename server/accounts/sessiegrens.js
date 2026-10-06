@@ -1,0 +1,58 @@
+/* Accounts, deel "sessiegrens": EEN OPVATTING VAN `sessies_vanaf`, voor
+   sessie- en actietokens.
+
+   Per account staat een moment, en wat daarvoor is uitgegeven telt niet meer.
+   Dat geldt voor een sessietoken (./tokens.js) en sinds RTG-V1 N12 ook voor
+   een actietoken (./actietokens.js).
+
+   WIE DE GRENS ZET. Vier wegen (paden vanaf server/), niet allemaal op
+   verzoek van het lid:
+     wachtwoord        accounts/herstel.js setPassword (en de zaaiweg in
+                       accounts/users.js zetWachtwoordHash): het lid wijzigt
+                       zijn wachtwoord, dus wat hij eerder uitgaf telt niet meer;
+     herstel           accounts/herstel.js consumeReset: hetzelfde, via de link;
+     eigenaarsherstel  routes/eigenaarherstel.js, via accounts/users.js
+                       zetSessiegrens: na een quorum, want een herstel dat de
+                       sessie van een indringer laat staan, herstelt niets;
+     pas naar gast     kern/aanmeldingen/naargast.js, via zetSessiegrens: het
+                       lid, het kantoor of een regel van de eigenaar verlaagt de
+                       pas, en een ingelogde telefoon hield anders de oude.
+
+   Bij die laatste gaat de grens over de PAS in de sessie en niet over wat het
+   lid uitgaf. Dat een openstaande verify-email- of mailwissellink dan ook
+   afvalt, is een bijgevolg: de grens kent geen soort zetter, en het lid vraagt
+   een nieuwe link aan. De toets van N12 (actietoken-sessiegrens) houdt het
+   blok hierboven tegen de bron.
+
+   WAT DE GRENS NIET ZET: "sluit alle andere sessies" van het lid
+   (routes/member/sessies.js sluit-overige). Die knop trekt per sessie-id in en
+   laat `sessies_vanaf` staan, dus een openstaand actietoken overleeft hem. De
+   mail aan het oude adres bij een mailwissel zegt daarom terecht OOK "wijzig
+   uw wachtwoord".
+
+   NIET DE ENIGE LEZER. ./staff-sessie.js vergelijkt het inlogmoment van een
+   leverancierssessie (lidInlogOp) nog met een eigen regel. Voor elk geldig
+   moment geeft die hetzelfde antwoord; een ontbrekend moment behandelt hij
+   anders, en dat valt buiten deze module.
+
+   WAAROM HIER EN NIET INLINE. De vergelijking stond in verifyToken. Een tweede
+   kopie in de actietokens zou op een dag een ander antwoord geven op "vanaf
+   wanneer telt een token niet meer" (LAT.md regel 4), en dat merkt niemand
+   tot een token na een wachtwoordwijziging blijft werken.
+
+   ONTBREEKT HET UITGIFTEMOMENT OF IS HET GEEN GETAL, dan geldt het als moment
+   0: het token valt af zodra er ooit een grens is gezet. Dat is de kant
+   waarheen een grens hoort te falen. Zonder die terugval maakt NaN elke
+   vergelijking false, en dan laat de grens het token juist DOOR.
+
+   GEEN ACCOUNT: false, en geen TypeError. Of het account bestaat, beslist de
+   aanroeper; beide aanroepers geven dan zelf al null terug. */
+'use strict';
+
+function voorGrens(u, uitgegeven) {
+  if (!u) return false;
+  const t = Number(uitgegeven);
+  return Number(u.sessies_vanaf || 0) > (Number.isFinite(t) ? t : 0);
+}
+
+module.exports = { voorGrens };

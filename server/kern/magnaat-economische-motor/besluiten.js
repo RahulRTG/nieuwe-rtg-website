@@ -14,6 +14,15 @@
 const { SCHOKKEN, WERKACTIVITEITEN, rond, geld } = require('./constanten');
 
 module.exports = (m) => {
+  /* De economische projectie is bewust uitsluitend JSON-data: zij wordt door
+     alle opslagmotoren als JSON bewaard. In SQLite wordt die levende data
+     bovendien door een mutatietracker-Proxy bewaakt. `structuredClone` weigert
+     iedere Proxy met DataCloneError, waardoor zowel /economie/beslis als
+     /economie/analyse vóór hun domeinwerk op 500 eindigden. Serialiseren maakt
+     hier niet alleen dezelfde duurzame kopie, maar haalt ook uitsluitend voor
+     deze atomaire werkkopie de opslag-Proxy weg. */
+  const kopieStaat = () => JSON.parse(JSON.stringify(m.state()));
+
   function getal(v, veld) {
     const n = Number(v);
     if (!Number.isFinite(n)) return { error: veld + ' moet een getal zijn.' };
@@ -24,7 +33,7 @@ module.exports = (m) => {
      gaan de boekingen het journaal in. Een weigering laat NIETS achter -- ook
      geen gebeurtenis in het bewijs. */
   function transactie(actor, werk) {
-    const e = structuredClone(m.state());
+    const e = kopieStaat();
     const hulp = { audit: (actie, detail) => m.audit(e, actor, actie, detail) };
     const uitkomst = m.metOorzaak('besluit:' + String(actor || 'systeem').slice(0, 100), () => werk(e, hulp));
     if (uitkomst && (uitkomst.status || uitkomst.error)) return uitkomst;

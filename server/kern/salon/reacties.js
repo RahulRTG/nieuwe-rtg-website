@@ -80,8 +80,8 @@ module.exports = ({ db, save, liveCodename, codenaamVan, keyVanCodenaam, zijnVri
     save();
     // wie genoemd is krijgt een seintje, en de maker als iemand op zijn post reageert
     try {
-      for (const key of reactie.noemt) if (key !== sess.key && notify) notify(key, 'Je bent genoemd in De Salon.');
-      if (notify && p.authorKey && p.authorKey !== sess.key) notify(p.authorKey, 'Nieuwe reactie op je Salon-post.');
+      for (const key of reactie.noemt) if (key !== sess.key && notify) notify(key, { title: 'De Salon', body: 'Je bent genoemd in De Salon.' });
+      if (notify && p.authorKey && p.authorKey !== sess.key) notify(p.authorKey, { title: 'De Salon', body: 'Nieuwe reactie op je Salon-post.' });
     } catch (e) {}
     return { ok: true, reactie: publiekeReactie(reactie, sess) };
   }

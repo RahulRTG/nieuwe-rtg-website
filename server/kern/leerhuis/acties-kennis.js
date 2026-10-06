@@ -82,6 +82,24 @@ module.exports = {
               reden: 'verversing: kennis ' + i.id + ' ging naar versie ' + i.versie + ' (' + i.impactKlasse + ')' } });
         }
     }
+    if (i.naar === 'ACTIVE' && v.voorstel) {
+      const voorstel=st.voorstellen[v.voorstel];
+      const approval=voorstel && voorstel.historie.slice().reverse().find(h=>h.stand==='APPROVED');
+      if (!voorstel || !approval) weiger('de kennisversie verwijst niet naar een goedgekeurd praktijkvoorstel',409);
+      const at=new Date(ctx.nu()).toISOString(),receiptId='lhcr_'+ctx.id();
+      const previousRef=k.actief ? {domain:'leerhuis',type:'knowledge',id:st.id+':'+k.id,version:k.actief} : null;
+      const newRef={domain:'leerhuis',type:'knowledge',id:st.id+':'+k.id,version:i.versie};
+      uit.push({soort:'loopChangeReceipt',data:{receiptId,sourceDomain:'leerhuis',
+        sourceObject:{domain:'leerhuis',type:'knowledge-line',id:st.id+':'+k.id,version:null},previousRef,newRef,
+        changeType:'knowledge.version-activated',decisionRef:{domain:'leerhuis',type:'practice-proposal-decision',id:voorstel.id,version:approval.at},
+        observationRef:{domain:'leerhuis',type:'practice-observation',id:voorstel.id,version:voorstel.at},
+        expectation:{statement:voorstel.verwachting || voorstel.voorstel,successCriteria:voorstel.succescriteria || [],
+          contextHash:null},operationId:ctx.sleutel || ('leerhuis:'+st.id+':'+k.id+':'+i.versie),
+        correlationId:receiptId,appliedAt:at,actorRef:door,
+        authorityRef:{organization:st.id,role:'KNOWLEDGE_OWNER'},context:{organizationCode:st.id,
+          consumer:{domain:'leerhuis',id:st.id},scopeRefs:[newRef],purpose:voorstel.purpose || 'academy-practice-improvement'},
+        integrityRef:null}});
+    }
     return uit;
   },
 
@@ -93,10 +111,20 @@ module.exports = {
     if (!relatieActief(st, door)) weiger('alleen wie hier werkt of meedoet kan een voorstel indienen', 403);
     for (const veld of ['probleem', 'voorstel', 'reden']) if (!i[veld]) weiger('een voorstel noemt ' + veld, 400);
     if (i.kennis && !st.kennis[i.kennis]) weiger('kennisitem ' + i.kennis + ' bestaat niet', 404);
-    return [{ soort: 'voorstel', data: { id: eigenId(st.voorstellen, i.id, ctx), kennis: i.kennis || null, probleem: tekst(i.probleem, 800),
+    if (i.verificationOf) {
+      const ref=i.verificationOf;
+      if (!ref || ref.domain!=='leerhuis' || ref.type!=='change-receipt' || ref.version!==1 ||
+          !st.loopReceipts[ref.id]) weiger('het te verifiëren wijzigingsbewijs bestaat niet in dit leerhuis',404);
+    }
+    const kennisVersie=i.kennis && st.kennis[i.kennis] ? st.kennis[i.kennis].actief : null;
+    return [{ soort: 'voorstel', data: { id: eigenId(st.voorstellen, i.id, ctx), kennis: i.kennis || null, kennisVersie,
+      probleem: tekst(i.probleem, 800),
       huidigeRegel: tekst(i.huidigeRegel, 800), voorstel: tekst(i.voorstel, 1600), reden: tekst(i.reden, 800),
       bewijs: tekst(i.bewijs, 800), voorbeelden: tekst(i.voorbeelden, 800), risico: tekst(i.risico, 300),
-      domein: tekst(i.domein, 60) } }];
+      domein: tekst(i.domein, 60),verwachting:tekst(i.verwachting,1200),
+      succescriteria:Array.isArray(i.succescriteria) ? i.succescriteria.slice(0,8).map(x=>tekst(x,300)) : [],
+      purpose:tekst(i.purpose || 'academy-practice-improvement',120),verificationOf:i.verificationOf || null,
+      assessment:i.assessment ? tekst(i.assessment,40) : null } }];
   },
 
   voorstelStand(st, i, door) {

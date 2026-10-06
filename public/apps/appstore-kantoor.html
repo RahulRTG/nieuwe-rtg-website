@@ -246,8 +246,8 @@ async function laad(){
   });
   document.querySelectorAll('[data-tg]').forEach(el => {
     const id = el.dataset.tg, reden = () => el.querySelector('.treden').value;
-    el.querySelector('.tbet').addEventListener('click', () => doe('/api/appstore/kantoor/teruggave', { id, besluit: 'terugbetaald', reden: reden(), door: wie() }, 'Terugbetaald.'));
-    el.querySelector('.tafw').addEventListener('click', () => doe('/api/appstore/kantoor/teruggave', { id, besluit: 'afgewezen', reden: reden(), door: wie() }, 'Afgewezen.'));
+    el.querySelector('.tbet').addEventListener('click', () => doe('/api/appstore/kantoor/teruggave', { id, besluit: 'terugbetaald', reden: reden() }, 'Terugbetaald.'));
+    el.querySelector('.tafw').addEventListener('click', () => doe('/api/appstore/kantoor/teruggave', { id, besluit: 'afgewezen', reden: reden() }, 'Afgewezen.'));
   });
   const hc = $('#hcDoe');
   if (hc) hc.addEventListener('click', async () => {

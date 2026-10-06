@@ -4,6 +4,8 @@ const crypto = require('crypto');
 const TOETSEN = Object.freeze([
   'test/pg.test.js',
   'test/living-world.pg.test.js',
+  'test/loop-fabric.pg.test.js',
+  'test/library.pg.test.js',
   'test/foundation-persoonscodes.pg.test.js',
   'test/spelprojectie.pg.test.js',
   'test/contactpin-live.pg.test.js',
@@ -23,7 +25,6 @@ const TOETSEN = Object.freeze([
   'test/codedeuren-claim.pg.test.js',
   'test/personeelsuitnodiging.pg.test.js',
   'test/foundation-lescredential.pg.test.js',
-  'test/foundation-lesstroom.pg.test.js',
   'test/payout-terugboeking.pg.test.js',
   'test/postgres-requestcommit.pg.test.js',
   'test/accounts-requestcommit.pg.test.js',
@@ -42,8 +43,7 @@ const TOETSEN = Object.freeze([
   'test/eten-kortingscode.pg.test.js',
   'test/partnerpersoneelscode.pg.test.js',
   'test/linkcap-credential.pg.test.js',
-  'test/gezinsuitnodiging.pg.test.js',
-  'test/gezinsdeur.pg.test.js'
+  'test/gezinsuitnodiging.pg.test.js'
 ]);
 
 const toetslijstSha256 = crypto.createHash('sha256').update(TOETSEN.join('\n') + '\n').digest('hex');

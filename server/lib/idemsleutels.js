@@ -170,7 +170,8 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-leerhuis').SLEUTELS,
   require('./idemsleutels-conciergelus').SLEUTELS,
   require('./idemsleutels-eigengezin').SLEUTELS,
-  require('./idemsleutels-toestemming').SLEUTELS);
+  require('./idemsleutels-toestemming').SLEUTELS,
+  require('./idemsleutels-reisteruggave').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

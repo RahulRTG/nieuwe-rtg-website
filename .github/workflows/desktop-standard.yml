@@ -30,15 +30,6 @@ jobs:
       - run: node scripts/browserinstall.js
       - if: matrix.width == 390
         run: npx playwright install --with-deps webkit
-      - if: matrix.width == 390
-        name: TIJDELIJK - WebKit-hervatten twaalf keer (gaat eruit voor review)
-        run: |
-          for i in $(seq 1 12); do
-            echo "ronde $i"
-            node --test --test-concurrency=1 --test-name-pattern="webkit: Pass" test/mobile-content.e2e.js || exit 1
-          done
-        env:
-          RTG_TEST_WEBKIT: '1'
       - run: npm run desktop:controle -- --width ${{ matrix.width }}
       - if: matrix.width == 1440
         run: node --test --test-concurrency=1 test/warm-presentation.e2e.js test/world-desktop-identity.e2e.js

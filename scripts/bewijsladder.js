@@ -70,7 +70,9 @@ const K = { dim: '\x1b[2m', groen: '\x1b[32m', rood: '\x1b[31m', geel: '\x1b[33m
 const LADDER = [
   { id: 'snel', naam: 'Snelle bewijzen', wat: 'huisregels, statische analyse, geheimen, het contract van de keten zelf',
     patronen: [/check\.js$/, /ast-scan\.js$/, /document-fitness\.js$/, /geheimen\.js$/, /ci-keten\.js$/, /releaseketenwacht\.js$/, /ci-lokaal\.js$/,
-      /deltapoort\.js$/, /normverval\.js$/, /wetten\.js$/, /getallen\.js$/, /samenhang\.js$/, /keuring\.js$/, /codeql-verdict\.js$/, /^git diff$/] },
+      /deltapoort\.js$/, /normverval\.js$/, /wetten\.js$/, /getallen\.js$/, /samenhang\.js$/, /keuring\.js$/, /codeql-verdict\.js$/, /^git diff$/,
+      /* register tegen code, statisch en in seconden (ZERO.md golf A) */
+      /schermfunctie\.js$/] },
   { id: 'geraakt', naam: 'Wat kan deze wijziging raken', wat: 'de affected-graaf: welk bewijs moet opnieuw',
     patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /verstrengeling\.js$/, /activering\.js$/,
       /* De Evidence Engine is dezelfde sport op bewijsniveau: basisbewijs

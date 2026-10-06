@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-06T22:57:31.545Z",
-  "commit": "d97f6792f",
+  "op": "2026-10-06T19:38:28.092Z",
+  "commit": "f3816ac97",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -401,7 +401,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/besluit/advies",
-   "bestand": "server/bedrijf/besluit.js:59",
+   "bestand": "server/bedrijf/besluit.js:75",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -419,7 +419,7 @@
   },
   {
    "sleutel": "POST /api/bedrijf/besluit/maak",
-   "bestand": "server/bedrijf/besluit.js:35",
+   "bestand": "server/bedrijf/besluit.js:43",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -437,19 +437,19 @@
   },
   {
    "sleutel": "POST /api/bedrijf/besluit/sluit",
-   "bestand": "server/bedrijf/besluit.js:106",
+   "bestand": "server/bedrijf/besluit.js:122",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/besluit/stem",
-   "bestand": "server/bedrijf/besluit.js:88",
+   "bestand": "server/bedrijf/besluit.js:104",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
   {
    "sleutel": "POST /api/bedrijf/besluit/stemronde",
-   "bestand": "server/bedrijf/besluit.js:73",
+   "bestand": "server/bedrijf/besluit.js:89",
    "staat": "bewaakt",
    "wacht": "werkPoort"
   },
@@ -4092,7 +4092,7 @@
   },
   {
    "sleutel": "POST /api/supplier/mijn/login",
-   "bestand": "server/routes/supplier/pda/posities.js:106",
+   "bestand": "server/routes/supplier/pda/posities-inlog.js:86",
    "staat": "eigenControle"
   },
   {

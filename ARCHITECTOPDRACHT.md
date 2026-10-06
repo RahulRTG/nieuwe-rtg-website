@@ -81,7 +81,7 @@ Na elke fase stopt de agent en rapporteert. Een mens zegt go.
 (geschat 65.000 tot 75.000 tokens, tekens gedeeld door drie tot drie en een
 half, graad `vermoed`). Er hangt meer aan dan het lijkt:
 
-- 77 getalmerktekens (`<!--getal:...-->`) die `scripts/getallen.js` bijhoudt
+- 77 getalmerktekens (de HTML-commentaren die `scripts/getallen.js` bijhoudt)
   (`DOCUMENTEN`, regel 675) en `test/getallen.test.js` bewaakt;
 - 7 wetten in `WETTEN.json` met `bron.bestand: CLAUDE.md` en een letterlijk
   anker;

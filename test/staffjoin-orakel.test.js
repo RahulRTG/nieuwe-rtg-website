@@ -17,7 +17,7 @@
    het pad staat in INLOG_PADEN.
 
    Elke toets met een eigen lid, zodat ze niet van elkaars volgorde afhangen.
-   Toets 5 laat de inlogpauze springen en staat daarom als laatste. Elk verzoek
+   Toets 6 laat de inlogpauze springen en staat daarom als laatste. Elk verzoek
    komt van een eigen adres, zodat de rem per adres en de quarantaine van De
    Wacht niet meten wat hier niet getoetst wordt.
 
@@ -66,12 +66,13 @@ async function managerVan(code) {
   return { token: ml.body.token, naam: roster.body.supplier.name };
 }
 let uitnodigingen = 0;
-async function kassacode(zaak) {
+async function uitnodiging(zaak) {
   // een eigen naam per uitnodiging: dezelfde naam geeft de zaak niet twee keer uit
   const inv = await api('/api/supplier/staff/invite', { name: 'Proef ' + (++uitnodigingen) + ' Orakel', func: 'Bediening' }, zaak.token);
   assert.equal(inv.status, 200, 'uitnodiging: ' + kort(inv));
-  return inv.body.invite.kassacode;
+  return inv.body.invite;
 }
+const kassacode = async (zaak) => (await uitnodiging(zaak)).kassacode;
 async function lid(email, username) {
   const reg = await api('/api/auth/register', { name: 'Lid ' + email.split('@')[0], email, username, password: WW, geboortedatum: '1990-01-01' });
   assert.ok(reg.body.token, 'registratie van ' + email + ': ' + kort(reg));
@@ -86,7 +87,8 @@ test.before(async () => {
   zaakNaam = kikunoi.naam;
   // vooraf, want de registratie gaat dicht zodra de noodrem drie bronnen telt
   for (const e of ['eva@orakel.test', 'ruben@orakel.test', 'wout@orakel.test',
-    'xander@orakel.test', 'tom@orakel.test', 'pim@orakel.test', 'uit@joinorg.test']) await lid(e);
+    'xander@orakel.test', 'tom@orakel.test', 'pim@orakel.test', 'uit@joinorg.test',
+    'iris@orakel.test']) await lid(e);
   // Vera ook met een gebruikersnaam: toets 3 gokt onder allebei
   await lid('vera@orakel.test', VERA_NAAM);
 });
@@ -236,6 +238,29 @@ test('4. een account dat zijn organisatie uit dienst meldde, koppelt zich niet',
   assert.equal(tom.status, 200, 'dezelfde code werkt voor een actief lid: ' + kort(tom));
 });
 
+/* EEN INGETROKKEN CODE DIE AL GECLAIMD WAS, IS GEEN ORAKEL (M16 uit de keuring
+   van ronde 6). kassacodeHoortBij laat een geclaimde code in stap 1 door, maar
+   alleen zolang hij nog geldig is: daar staat `herstelGeldig`. Zonder die
+   toets kwam een ingetrokken code door stap 1, en dan gaf het goede
+   wachtwoord in stap 3 een ander antwoord dan een fout wachtwoord in stap 2. */
+test('5. een geclaimde kassacode die de manager introk, geeft goed en fout wachtwoord hetzelfde antwoord', async () => {
+  const IRIS = 'iris@orakel.test';
+  const inv = await uitnodiging(kikunoi);
+  // TEGENPROEF vooraf: de code werkte, de echte status
+  const eerst = await join(zaakNaam, inv.kassacode, IRIS, WW);
+  assert.equal(eerst.status, 200, 'Iris wisselt de code in: ' + kort(eerst));
+  const intrek = await api('/api/supplier/staff/invite/intrek', { id: inv.id, reden: 'proef M16' }, kikunoi.token);
+  assert.equal(intrek.status, 200, 'de manager trekt de geclaimde code in: ' + kort(intrek));
+
+  const verzonnen = await join(zaakNaam, 'RTG-VERZONNEN', IRIS, WW);
+  assert.equal(verzonnen.status, 401, 'een verzonnen code: ' + kort(verzonnen));
+  for (const [naam, r] of [['goed wachtwoord', await join(zaakNaam, inv.kassacode, IRIS, WW)],
+    ['fout wachtwoord', await join(zaakNaam, inv.kassacode, IRIS, 'fout')]]) {
+    assert.equal(r.status + ' ' + r.tekst, verzonnen.status + ' ' + verzonnen.tekst,
+      naam + ' met de ingetrokken code hoort exact hetzelfde te antwoorden als een verzonnen code (kreeg ' + kort(r) + ')');
+  }
+});
+
 /* De pauze laten springen zoals een echte aanval: zes bronnen, elk elf mislukte
    pogingen op een eigen naam (zie test/inlogpauze-spelling.test.js). */
 async function laatPauzeSpringen() {
@@ -250,7 +275,7 @@ async function laatPauzeSpringen() {
   assert.equal(proef.status, 503, 'de pauze hoort na zes bronnen gesprongen te zijn: ' + kort(proef));
 }
 
-test('5. de inlogpauze geldt ook voor de aanmelding (laatste toets: de pauze blijft staan)', async () => {
+test('6. de inlogpauze geldt ook voor de aanmelding (laatste toets: de pauze blijft staan)', async () => {
   const code = await kassacode(kikunoi);
   await laatPauzeSpringen();
   for (const pad of ['/api/supplier/staff/join', '/api/supplier/staff/join/']) {

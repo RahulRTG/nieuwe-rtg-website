@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T16:29:29.071Z",
-    "commit": "6f75110b",
+    "op": "2026-10-06T05:55:57.665Z",
+    "commit": "a016a2f4",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -770,6 +770,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "appwerkt-glad.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/appwerkt.js",
+      "operator": "!==->===#4",
+      "gezakt": 1,
+      "geprobeerd": 36
     },
     "appwerkt-onderschepper.test.js": {
       "soort": "puur",

@@ -271,3 +271,17 @@ test('15. de promotiepoort (productie-promotie) en de uitrolpoort weigeren een k
   geweigerd(() => eis(kand('a', 'b', '1')), 'KETEN_ONGELDIG');                           // artefact na de test vervangen
   assert.match(fs.readFileSync(path.join(REPO, 'scripts/lib/productie-promotie.js'), 'utf8'), /if \(!isNative\) eisKetenbesluit\(/);
 });
+
+test('16. de zelfproef slaagt op de echte verificateur en ZAKT op een verificateur die alles goedkeurt', () => {
+  const zp = require('../scripts/lib/artefactketen-zelfproef');
+  assert.deepEqual(zp.proef(), { ok: true, faal: [] });
+  const echt = k.controleer;
+  try {
+    k.controleer = () => ({ ok: true });
+    const u = zp.proef();
+    assert.equal(u.ok, false, 'een verificateur die alles goedkeurt moet de zelfproef laten zakken');
+    assert.ok(u.faal.length >= 3, u.faal.join('; '));
+  } finally { k.controleer = echt; }
+  const cli = require('node:child_process').spawnSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'artefactketen.js'), 'zelfproef'], { encoding: 'utf8' });
+  assert.equal(cli.status, 0, cli.stdout + cli.stderr);
+});

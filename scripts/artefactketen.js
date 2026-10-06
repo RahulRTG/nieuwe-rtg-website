@@ -37,6 +37,11 @@ const door = () => { const d = eis('door'); return { soort: 'release-authority',
 async function main(cmd) {
   const env = process.env;
   switch (cmd) {
+    case 'zelfproef': {
+      const u = require('./lib/artefactketen-zelfproef').proef();
+      if (!u.ok) throw Object.assign(new Error('De ketenverificateur weigert niet wat hij moet weigeren: ' + u.faal.join('; ')), { code: 'ZELFPROEF' });
+      return 'zelfproef: de verificateur accepteert de eerlijke keten en weigert alle aanvallen';
+    }
     case 'gebouwd': {
       const v = { commit: eis('commit'), run: eis('run'), digest: eis('digest'), backupDigest: eis('backup-digest'),
         imageId: eis('image-id'), backupImageId: eis('backup-image-id') };

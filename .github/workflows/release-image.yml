@@ -197,6 +197,8 @@ jobs:
       # niets verwisselen; na deze stap wordt er NIETS meer gebouwd (de wacht
       # `geen-bouw-na-test` bewaakt dat). Zie RELEASEKETEN.md.
       # ------------------------------------------------------------------
+      - name: De ketenverificateur kan zakken (zelfproef zonder geheimen)
+        run: node scripts/artefactketen.js zelfproef
       - name: Artefact (digest en image-id) ondertekend vastleggen
         env:
           RTG_RELEASE_SIGN_KEY: ${{ secrets.RTG_RELEASE_SIGN_KEY }}

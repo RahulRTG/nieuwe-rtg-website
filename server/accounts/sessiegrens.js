@@ -68,8 +68,21 @@ function voorGrens(u, uitgegeven) {
    terug, dus een openstaande mailwissel ging door en een bewijs uit stap een
    leverde een (meteen weer geweigerd) sessietoken op, met een verbruikte code
    en een vastgelegde inlog. Nu lezen verifyToken, verifyActionToken en
-   accounts.isActief alle drie deze functie, zodat "uit dienst" niet per deur
-   iets anders kan betekenen.
+   accounts.isActief alle drie deze functie, zodat "uit dienst" binnen
+   server/accounts/ niet per deur iets anders kan betekenen (de toets van N20,
+   actietoken-uitgezet, houdt dat tegen de bron).
+
+   NIET DE ENIGE LEZER, ook hier niet. Buiten server/accounts/ vergelijken
+   deze bestanden `actief` nog zelf met 0 (paden vanaf server/):
+     bedrijf/deuren.js                (twee keer)
+     bedrijf/productie-identiteit.js
+     kern/mail-publiek.js
+     scim/user-sync.js
+     scim/vorm.js
+   en routes/scim.js logt daarnaast `actief === 1`. De vergelijkingen met 0
+   betekenen vandaag hetzelfde als uitgezet(). Dat ze accounts.isActief gaan
+   lezen, valt buiten N20; dat deze lijst klopt, houdt de toets van N20 tegen
+   de bron.
 
    ALLEEN DE WAARDE 0 IS UIT. De kolom staat standaard op 1, en een account
    zonder kolom (van voor de migratie) of zonder account (dat beslist de

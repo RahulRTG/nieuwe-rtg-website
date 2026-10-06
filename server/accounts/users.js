@@ -220,7 +220,8 @@ function zetActief(id, aan) {
   mirror.markUser(id);
   return getUserById(id);
 }
-// wat "uitgezet" is, staat op een plek: ook de tokens lezen het daar
+// wat "uitgezet" is, staat binnen server/accounts/ op een plek: ook de tokens
+// lezen het daar (wie het erbuiten zelf vergelijkt: ./sessiegrens.js)
 const isActief = (u) => !!u && !uitgezet(u);
 
 /* Het schrijven zelf, los van waar de hash vandaan komt. Twee kopieen van deze

@@ -18,15 +18,19 @@
    of ingetrokken is weer, zoals bij een sessie. "Sluit alle andere sessies"
    (N21) blijft bewust buiten deze grens en wordt hier niet getoetst.
 
-   Deel A is per doel, zonder server. Deel B houdt de opvatting op een plek.
-   Deel C is inlog2 tegen een echte server, met een echte SCIM-PATCH tussen stap
-   een en stap twee. A en C zakken zonder de fix.
+   Deel A is per doel, zonder server, ook voor een mailboxlink in de oude vorm
+   en voor een account met sessiegrens. Deel B houdt de opvatting op een plek,
+   en de lijst van eigen vergelijkingen buiten server/accounts/ in
+   sessiegrens.js tegen de bron. Deel C is inlog2 tegen een echte server, met
+   een echte SCIM-PATCH tussen stap een en stap twee. A en C zakken zonder de
+   fix.
 
    Draai los: node --test test/actietoken-uitgezet.test.js
    ========================================================================== */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -38,6 +42,7 @@ process.env.NODE_ENV = 'test';
 process.env.RTG_MAGNAAT_TEST = '1';
 
 const accounts = require('../server/accounts');
+const kluis = require('../server/accounts/kluis');
 accounts.init();
 
 const { startServer, stop } = require('./helper');
@@ -96,6 +101,63 @@ test('A. tegenproef: een sessietoken weigert een uitgezet account op dezelfde ma
   assert.equal(accounts.isActief(accounts.getUserById(u.id)), true);
 });
 
+/* DE TWEE VORMEN DIE DE GEVALLEN HIERBOVEN NIET RAKEN. Die geven alleen tokens
+   in de nieuwe vorm uit, op accounts zonder sessiegrens. Een mutatie die
+   "uitgezet" alleen liet gelden voor een token met een uitgiftemoment, of
+   alleen voor een account zonder grens, overleefde ze daardoor allebei (de
+   herkeuring van N20). Uitgezet gaat over het ACCOUNT: niet over de vorm van
+   het token en niet over de grens ernaast. */
+
+/* Een token in de OUDE vorm (`id.doel.exp.nonce`, zonder uitgiftemoment),
+   getekend met de echte per-doel sleutel, zoals oudeVorm() in
+   actietoken-sessiegrens.test.js. Alleen de mailboxlinks dragen die vorm nog
+   (als moment 0, zie server/accounts/actietokens.js); de inlogbewijzen zijn in
+   de oude vorm al dicht, dus daar valt voor "uitgezet" niets te toetsen. */
+function mailboxlinkOudeVorm(userId, doel) {
+  const body = userId + '.' + doel + '.' + (Date.now() + TTL[doel]) + '.' +
+    crypto.randomBytes(16).toString('base64url');
+  return Buffer.from(body).toString('base64url') + '.' +
+    kluis.signMet(kluis.sleutelVoor('actie:' + doel), body);
+}
+
+for (const doel of ['verify-email', 'mailwissel']) {
+  test('A. ' + doel + ' in de oude vorm: een uitgezet account heeft ook dan geen geldige link, weer aan en hij telt weer', async () => {
+    const u = await nieuwLid();
+    const oud = mailboxlinkOudeVorm(u.id, doel);
+    assert.equal(Buffer.from(oud.split('.')[0], 'base64url').toString().split('.').length, 4,
+      'voorwaarde: het lichaam heeft geen vijfde deel, dus geen uitgiftemoment');
+    assert.equal(accounts.verifyActionToken(oud, doel).id, u.id,
+      'voorwaarde: zonder grens werkt een link in de oude vorm (moment 0)');
+
+    accounts.zetActief(u.id, false);
+    assert.equal(accounts.verifyActionToken(oud, doel), null,
+      'een link zonder uitgiftemoment van een uitgezet account telt niet: uitgezet gaat niet over de vorm');
+
+    accounts.zetActief(u.id, true);
+    const weer = accounts.verifyActionToken(oud, doel);
+    assert.ok(weer && weer.id === u.id, 'weer aan: de link telt weer tot zijn eigen exp');
+  });
+}
+
+for (const [doel, ttl] of Object.entries(TTL)) {
+  test('A. ' + doel + ' bij een account MET sessiegrens: uitgezet weigert ook dan, weer aan en het telt weer', async () => {
+    const u = await nieuwLid();
+    const grens = accounts.zetSessiegrens(u.id);
+    assert.ok(Number(grens.sessies_vanaf) > 0, 'voorwaarde: de sessiegrens staat');
+    const tok = accounts.issueActionToken(u.id, doel, ttl);
+    assert.equal(accounts.verifyActionToken(tok, doel).id, u.id,
+      'voorwaarde: een token van NA de grens werkt, dus alleen "uitgezet" kan het hierna tegenhouden');
+
+    accounts.zetActief(u.id, false);
+    assert.equal(accounts.verifyActionToken(tok, doel), null,
+      'een ' + doel + '-token van een uitgezet account telt niet, ook als er een sessiegrens staat');
+
+    accounts.zetActief(u.id, true);
+    const weer = accounts.verifyActionToken(tok, doel);
+    assert.ok(weer && weer.id === u.id, 'weer aan: het token telt weer');
+  });
+}
+
 /* ---------------------------------------------------------------------------
    DEEL B -- EEN opvatting van "uitgezet".
    ------------------------------------------------------------------------- */
@@ -113,8 +175,9 @@ test('B. uitgezet: alleen de waarde 0 is uit, en zonder account gooit hij niet',
    deur iemand binnenlaat die de andere buiten houdt. Daarom: in server/accounts/
    vergelijkt alleen sessiegrens.js `actief` met 0, gelezen ZONDER commentaar,
    en de drie lezers roepen uitgezet() aan. Buiten server/accounts/ staan nog
-   lezers met een eigen vergelijking (onder meer scim/, bedrijf/ en
-   kern/mail-publiek.js); die vallen buiten deze toets en buiten N20. */
+   lezers met een eigen vergelijking; dat die uitgezet() gaan lezen valt buiten
+   N20, maar sessiegrens.js NOEMT ze, en de toets hieronder houdt die lijst
+   tegen de bron. */
 test('B. in server/accounts/ vergelijkt alleen sessiegrens.js `actief` met 0, en de drie lezers roepen hem aan', () => {
   const { zonderCommentaar } = require('../scripts/lib/bron');
   const MAP = path.join(__dirname, '..', 'server', 'accounts');
@@ -128,6 +191,44 @@ test('B. in server/accounts/ vergelijkt alleen sessiegrens.js `actief` met 0, en
   for (const naam of ['tokens.js', 'actietokens.js', 'users.js']) {
     const code = zonderCommentaar(fs.readFileSync(path.join(MAP, naam), 'utf8'));
     assert.match(code, /\buitgezet\s*\(\s*u\s*\)/, naam + ' leest uitgezet() uit sessiegrens.js');
+  }
+});
+
+/* DE KOP VAN sessiegrens.js BEWEERT NIET MEER DAN ER STAAT. Hij zei eerst dat
+   "uit dienst" door de drie lezers nergens iets anders kon betekenen, terwijl
+   buiten server/accounts/ zes eigen vergelijkingen stonden (de herkeuring van
+   N20). Nu noemt hij ze, en een lijst die niemand natelt is na de eerstvolgende
+   nieuwe deur weer te breed. Dus: elk bestand buiten server/accounts/ dat
+   `actief` met 0 vergelijkt staat in het blok "NIET DE ENIGE LEZER, ook hier
+   niet", met het juiste aantal, en wat er staat vergelijkt ook echt. Een
+   vergelijking met 1 (routes/scim.js logt er een) hoort er ook bij genoemd. */
+test('B. de kop van sessiegrens.js noemt precies de eigen vergelijkingen van `actief` buiten server/accounts/', () => {
+  const { zonderCommentaar } = require('../scripts/lib/bron');
+  const SERVER = path.join(__dirname, '..', 'server');
+  const kop = fs.readFileSync(path.join(SERVER, 'accounts', 'sessiegrens.js'), 'utf8');
+  const start = kop.indexOf('NIET DE ENIGE LEZER, ook hier niet');
+  assert.ok(start > 0, 'het blok over de lezers buiten server/accounts/ staat in sessiegrens.js');
+  const blok = kop.slice(start, kop.indexOf('\n\n', start));
+
+  const AANTAL = { twee: 2, drie: 3, vier: 4 };
+  const genoemd = {};
+  for (const m of blok.matchAll(/^[ \t]+([\w/.-]+\.js)\b[ \t]*(?:\((\w+) keer\))?/gm)) genoemd[m[1]] = AANTAL[m[2]] || 1;
+
+  const metNul = {};
+  const metEen = [];
+  for (const rel of fs.readdirSync(SERVER, { recursive: true }).map(String).sort()) {
+    const pad = rel.split(path.sep).join('/');
+    if (!pad.endsWith('.js') || pad.startsWith('accounts/') || pad.startsWith('data/')) continue;
+    const code = zonderCommentaar(fs.readFileSync(path.join(SERVER, rel), 'utf8'));
+    const nul = code.match(/\.actief\s*[!=]==?\s*0\b|\b0\s*[!=]==?\s*[\w.]+\.actief\b/g);
+    if (nul) metNul[pad] = nul.length;
+    if (/\.actief\s*[!=]==?\s*1\b|\b1\s*[!=]==?\s*[\w.]+\.actief\b/.test(code)) metEen.push(pad);
+  }
+  assert.ok(Object.keys(metNul).length > 0, 'voorwaarde: de scan vindt de vergelijkingen (anders meet hij niets)');
+  assert.deepEqual(genoemd, metNul,
+    'de lijst in sessiegrens.js wijkt af van de bron: lees accounts.isActief, of noem het bestand (met aantal) in die kop');
+  for (const pad of metEen) {
+    assert.ok(blok.includes(pad), pad + ' vergelijkt `actief` met 1 en staat niet in de kop van sessiegrens.js');
   }
 });
 

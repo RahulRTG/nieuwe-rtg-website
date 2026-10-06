@@ -65,6 +65,24 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils redis-server
       - name: Playwright + Chromium voor de volledige schermsuite
         run: node scripts/browserinstall.js
+      - name: Bepaal immutable GHCR-tag
+        shell: bash
+        run: |
+          repo="${GITHUB_REPOSITORY,,}"
+          echo "RTG_CANDIDATE_IMAGE=ghcr.io/$repo:candidate-${GITHUB_SHA::12}-${GITHUB_RUN_ID}" >> "$GITHUB_ENV"
+          echo "RTG_CANDIDATE_BACKUP_IMAGE=ghcr.io/$repo:candidate-backup-${GITHUB_SHA::12}-${GITHUB_RUN_ID}" >> "$GITHUB_ENV"
+      # EEN BOUW. Het image wordt hier gebouwd en nergens anders opnieuw. De
+      # runtimebytes (inhoudsbewijs, Rust-binaries, frontend-build) gaan uit
+      # dit image terug de werkboom in, zodat de afbouw hieronder exact deze
+      # bytes test. Zie scripts/lib/kwalificatie.js.
+      - name: Bouw het releasekandidaat (eenmalig)
+        run: |
+          docker build --pull --build-arg "RTG_RELEASE_COMMIT=$GITHUB_SHA" --tag "$RTG_CANDIDATE_IMAGE" .
+          docker build --pull --build-arg "RTG_RELEASE_COMMIT=$GITHUB_SHA" --target backup-runtime --tag "$RTG_CANDIDATE_BACKUP_IMAGE" .
+      - name: Kwalificatie vóór de tests (werkboom = image, byte voor byte)
+        run: |
+          node scripts/kwalificatie.js --uit-image --image="$RTG_CANDIDATE_IMAGE" --backup="$RTG_CANDIDATE_BACKUP_IMAGE"
+          node scripts/kwalificatie.js --controle --fase=voor
       # Dit is dezelfde softwarepoort die vóór een echte uitrol draait:
       # volledige suite op deze commit, releasegate en stagingrepetitie. Een
       # losse check + test liet herstel, mutatiecontracten en staging buiten.
@@ -79,6 +97,9 @@ jobs:
         # npm test heeft alle PG-bestanden al in afzonderlijke databases
         # uitgevoerd. Een tweede run zou de door SUITE gepinde bytes vervangen.
         run: node scripts/ci-pg-bewijs.js
+      # Een stap die runtime-invoer herschreef, maakt de kwalificatie ongeldig.
+      - name: Kwalificatie na de tests (werkboom = nog steeds het image)
+        run: node scripts/kwalificatie.js --controle --fase=na
       - name: Softwarebewijs bewaren, ook bij een mislukte ronde
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -114,12 +135,6 @@ jobs:
           RTG_CONTAINER_PORT: "443"
           RTG_ENV_FILE: .env.example
           RTG_POSTGRES_PASSWORD_FILE: .env.example
-      - name: Bepaal immutable GHCR-tag
-        shell: bash
-        run: |
-          repo="${GITHUB_REPOSITORY,,}"
-          echo "RTG_CANDIDATE_IMAGE=ghcr.io/$repo:candidate-${GITHUB_SHA::12}-${GITHUB_RUN_ID}" >> "$GITHUB_ENV"
-          echo "RTG_CANDIDATE_BACKUP_IMAGE=ghcr.io/$repo:candidate-backup-${GITHUB_SHA::12}-${GITHUB_RUN_ID}" >> "$GITHUB_ENV"
       - name: Ondertekening vóór publicatie bewijzen
         env:
           RTG_RELEASE_SIGN_KEY: ${{ secrets.RTG_RELEASE_SIGN_KEY }}
@@ -132,14 +147,14 @@ jobs:
       # komt. Dit workflow publiceert bewust GEEN officiële release: daarvoor
       # moeten container-golive, rollbackrepetitie, extern dossier en de
       # uiteindelijke READY-uitspraak op exact hetzelfde kandidaatimage volgen.
-      - name: Bouw en publiceer het releasekandidaat
+      # Publiceer HETZELFDE image dat getest is: geen tweede docker build.
+      - name: Publiceer het geteste releasekandidaat
         run: |
-          docker build --pull --build-arg "RTG_RELEASE_COMMIT=$GITHUB_SHA" --tag "$RTG_CANDIDATE_IMAGE" .
-          docker build --pull --build-arg "RTG_RELEASE_COMMIT=$GITHUB_SHA" --target backup-runtime --tag "$RTG_CANDIDATE_BACKUP_IMAGE" .
           docker push "$RTG_CANDIDATE_IMAGE"
           docker push "$RTG_CANDIDATE_BACKUP_IMAGE"
           docker pull "$RTG_CANDIDATE_IMAGE"
           docker pull "$RTG_CANDIDATE_BACKUP_IMAGE"
+          node scripts/kwalificatie.js --gepubliceerd --image="$RTG_CANDIDATE_IMAGE" --backup="$RTG_CANDIDATE_BACKUP_IMAGE"
           echo "Kandidaten gepubliceerd: $RTG_CANDIDATE_IMAGE en $RTG_CANDIDATE_BACKUP_IMAGE"
 
       # ------------------------------------------------------------------
@@ -168,9 +183,9 @@ jobs:
           digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_IMAGE" | cut -d@ -f2)"
           backup_digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_BACKUP_IMAGE" | cut -d@ -f2)"
           test -n "$digest" && test -n "$backup_digest" || { echo "Geen RepoDigest: er is niets om aan te binden."; exit 1; }
-          node scripts/imageherkomst.js --binden --image="$RTG_CANDIDATE_IMAGE" --digest="$digest" \
+          node scripts/imageherkomst.js --binden --rol=app --image="$RTG_CANDIDATE_IMAGE" --digest="$digest" \
             --bewijs=.release/image-release-bewijs.json --sbom=.release/sbom.json --uit=.release/herkomst.json
-          node scripts/imageherkomst.js --binden --image="$RTG_CANDIDATE_BACKUP_IMAGE" --digest="$backup_digest" \
+          node scripts/imageherkomst.js --binden --rol=backup --image="$RTG_CANDIDATE_BACKUP_IMAGE" --digest="$backup_digest" \
             --bewijs=.release/image-release-bewijs.json --sbom=.release/sbom-backup.json --uit=.release/herkomst-backup.json
 
       # Een publieke sleutel is geen optionele versiering. Zonder vastgelegd
@@ -180,12 +195,14 @@ jobs:
           inhoud="$(node -e "process.stdout.write(require('./.release/image-release-bewijs.json').inhoudSha256||'')")"
           digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_IMAGE" | cut -d@ -f2)"
           backup_digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_BACKUP_IMAGE" | cut -d@ -f2)"
+          app_id="$(docker image inspect --format='{{.Id}}' "$RTG_CANDIDATE_IMAGE")"
+          backup_id="$(docker image inspect --format='{{.Id}}' "$RTG_CANDIDATE_BACKUP_IMAGE")"
           node scripts/imageherkomst.js --controle --eis-kandidaat --herkomst=.release/herkomst.json \
             --sbom=.release/sbom.json --image="$RTG_CANDIDATE_IMAGE" --draait="$digest" \
-            --commit="$GITHUB_SHA" --bewijs-inhoud="$inhoud"
+            --commit="$GITHUB_SHA" --bewijs-inhoud="$inhoud" --rol=app --image-id="$app_id"
           node scripts/imageherkomst.js --controle --eis-kandidaat --herkomst=.release/herkomst-backup.json \
             --sbom=.release/sbom-backup.json --image="$RTG_CANDIDATE_BACKUP_IMAGE" --draait="$backup_digest" \
-            --commit="$GITHUB_SHA" --bewijs-inhoud="$inhoud"
+            --commit="$GITHUB_SHA" --bewijs-inhoud="$inhoud" --rol=backup --image-id="$backup_id"
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
@@ -198,6 +215,9 @@ jobs:
             .release/bron-release-bewijs.json
             .release/prerelease-workflows.json
             .release/image-release-bewijs.json
+            .release/kwalificatie-image.json
+            .release/kwalificatie-voor.json
+            .release/kwalificatie-na.json
             .release/ci-suite.json
             .release/ci-pg-bewijs.json
             .release/ci-schermsuite-bewijs.json

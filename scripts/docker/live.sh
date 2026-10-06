@@ -126,6 +126,11 @@ case "$opdracht" in
       geldige_rollbackset "$vorig" "$vorig_backup" "$vorige_pin" || {
         echo "[live] bestaande release heeft geen volledige immutable rollbackset" >&2; exit 65;
       }
+      # Een rollbackdoel moet eerder gekwalificeerd en ondertekend gepromoveerd
+      # zijn; een image dat ooit buiten de keten om draaide, is dat niet.
+      node scripts/promotieboek.js --rollback --image-id="$vorig" --backup-id="$vorig_backup" --pin="$vorige_pin" || {
+        echo "[live] de draaiende release staat niet als bewezen rollbackdoel in het promotieboek; uitrol geweigerd" >&2; exit 65;
+      }
       printf '%s\n%s\n%s\n' "$vorig" "$vorig_backup" "$vorige_pin" > "$ROLLBACK_STATE"
     else
       [ "$(lees RTG_EERSTE_UITROL)" = "BEVESTIGD-ZONDER-ROLLBACK" ] || {
@@ -140,6 +145,10 @@ case "$opdracht" in
       echo "[live] releasebron, READY of kandidaatbewijs veranderde vóór de wissel" >&2
       exit 65
     }
+    # Deze kandidaat wordt het volgende bewezen rollbackdoel; lukt dat niet,
+    # dan gaat hij ook niet live.
+    node scripts/promotieboek.js --archiveer --image-id="$kandidaat_id" \
+      --backup-id="$kandidaat_backup_id" --pin="$bewijs_pin" || exit 65
     # Image-ID's zijn immutable; een verplaatste lokale tag kan hier niets meer
     # verwisselen tussen controle en `compose up`.
     IMAGE="$kandidaat"
@@ -293,11 +302,11 @@ case "$opdracht" in
     node scripts/imageherkomst.js --controle --eis-kandidaat \
       --herkomst=.release/herkomst.json --sbom=.release/sbom.json \
       --image="$kandidaat" --draait="$kandidaat_digest" --commit="$release_commit" \
-      --bewijs-inhoud="$image_inhoud"
+      --bewijs-inhoud="$image_inhoud" --rol=app --image-id="$kandidaat_id"
     node scripts/imageherkomst.js --controle --eis-kandidaat \
       --herkomst=.release/herkomst-backup.json --sbom=.release/sbom-backup.json \
       --image="$kandidaat_backup" --draait="$backup_digest" --commit="$release_commit" \
-      --bewijs-inhoud="$image_inhoud"
+      --bewijs-inhoud="$image_inhoud" --rol=backup --image-id="$kandidaat_backup_id"
     docker run --rm --entrypoint node "$kandidaat_registry" \
       scripts/release-bewijs.js --controle /app/release-bewijs.json
     bewijs_tmp="$(mktemp "$bewijs_map/.image-bewijs.XXXXXX")"
@@ -478,6 +487,8 @@ case "$opdracht" in
     geldige_rollbackset "$IMAGE" "$BACKUP_IMAGE" "$RTG_RELEASE_BEWIJS_SHA256" || {
       echo "[live] rollbackset of zijn bewijs-pin is beschadigd" >&2; exit 65;
     }
+    node scripts/promotieboek.js --rollback --image-id="$IMAGE" --backup-id="$BACKUP_IMAGE" \
+      --pin="$RTG_RELEASE_BEWIJS_SHA256" || exit 65
     compose up -d --no-build motor app sentinel backup
     wacht_ready && probe_lokaal
     printf '%s\n%s\n%s\n' "$IMAGE" "$BACKUP_IMAGE" "$RTG_RELEASE_BEWIJS_SHA256" > "$STATE"

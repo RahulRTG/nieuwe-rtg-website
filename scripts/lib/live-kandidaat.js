@@ -37,7 +37,7 @@ function lees(root, rel) {
 }
 function bestandHash(root, rel) { return hash(fs.readFileSync(path.join(root, rel))); }
 
-function controleerKeten(root, { commit, verwijzing, digest, backup, inhoudSha256, bronBoom }) {
+function controleerKeten(root, { commit, verwijzing, digest, backup, inhoudSha256, bronBoom, imageId }) {
   const documentRel = backup ? REL.backupHerkomst : REL.herkomst;
   const sbomRel = backup ? REL.backupSbom : REL.sbom;
   if (!geldigeVerwijzing(verwijzing, backup) || !geldigDigest(digest))
@@ -50,7 +50,8 @@ function controleerKeten(root, { commit, verwijzing, digest, backup, inhoudSha25
   } catch (e) { throw new Error('Getekende imageherkomst/SBOM ontbreekt voor de kandidaat.'); }
   const controle = herkomst.controleerKandidaatHerkomst({ document, sbomBytes,
     publiekPem:publiek, draait:digest, commit, image:verwijzing,
-    bewijsInhoudSha256:inhoudSha256, uitvoering:herkomst.uitvoeringHashes(root) });
+    bewijsInhoudSha256:inhoudSha256, uitvoering:herkomst.uitvoeringHashes(root),
+    imageId, rol:backup ? 'backup' : 'app' });
   if (!controle.ok) throw new Error('Getekende kandidaat-herkomst is ongeldig: ' + controle.klachten.join(' '));
   if (!document.bron || document.bron.boom !== bronBoom)
     throw new Error('Getekende kandidaat-herkomst hoort niet bij het gecontroleerde CI-bronbewijs.');
@@ -85,7 +86,8 @@ function controleerOwnerImageBasis(root, commit, keten) {
         .equals(Buffer.from(fs.readFileSync(path.join(root, REL.image)))))
     throw new Error('Het runtime-imagebewijs wijkt byte-voor-byte af van het CI-imageartefact.');
   const appKeten = controleerKeten(root, { commit, verwijzing:keten.imageVerwijzing,
-    digest:keten.imageDigest, inhoudSha256:image.inhoudSha256, bronBoom:bron.boom, backup:false });
+    digest:keten.imageDigest, inhoudSha256:image.inhoudSha256, bronBoom:bron.boom, backup:false,
+    imageId:keten.imageId });
   return { image, imageArtifact, bron, appKeten };
 }
 
@@ -152,7 +154,8 @@ function controleerInvoer(root, commit, keten, opties = {}) {
       throw new Error('De container-golive hoort niet bij de verse volledige eigenaars-readbackbytes.');
   }
   const backupKeten = controleerKeten(root, { commit, verwijzing:keten.backupVerwijzing,
-    digest:keten.backupDigest, inhoudSha256:image.inhoudSha256, bronBoom:bron.boom, backup:true });
+    digest:keten.backupDigest, inhoudSha256:image.inhoudSha256, bronBoom:bron.boom, backup:true,
+    imageId:keten.backupId });
   return { image, imageArtifact, bron, pg, golive, runtime, ownerReadback, appKeten, backupKeten };
 }
 
@@ -176,7 +179,8 @@ function maakBootstrap(root, gegevens) {
   if (!/^[a-f0-9]{40,64}$/.test(commit) || !geldigId(gegevens.imageId) || !geldigId(gegevens.backupId))
     throw new Error('Bootstrapkandidaatcommit of image-id is ongeldig.');
   const keten = { imageVerwijzing:gegevens.imageVerwijzing, imageDigest:gegevens.imageDigest,
-    backupVerwijzing:gegevens.backupVerwijzing, backupDigest:gegevens.backupDigest };
+    backupVerwijzing:gegevens.backupVerwijzing, backupDigest:gegevens.backupDigest,
+    imageId:gegevens.imageId, backupId:gegevens.backupId };
   const invoer = controleerInvoer(root, commit, keten, { bootstrapOnly:true });
   if (invoer.runtime.imageId !== gegevens.imageId)
     throw new Error('Het gestarte kandidaatproces draaide niet uit de bootstrap-image-ID.');
@@ -208,7 +212,8 @@ function controleerBootstrap(root, commit) {
     imageVerwijzing:rapport.image && rapport.image.verwijzing,
     imageDigest:rapport.image && rapport.image.digest,
     backupVerwijzing:rapport.backup && rapport.backup.verwijzing,
-    backupDigest:rapport.backup && rapport.backup.digest
+    backupDigest:rapport.backup && rapport.backup.digest,
+    imageId:rapport.image && rapport.image.id, backupId:rapport.backup && rapport.backup.id
   }, { bootstrapOnly:true });
   const bronnen = bootstrapBronnen(root);
   if (rapport.image.bewijsInhoudSha256 !== invoer.image.inhoudSha256 ||
@@ -266,7 +271,8 @@ function ownerKandidaatBinding(root, gegevens) {
   }
   if (!geldigId(gegevens.imageId)) throw new Error('Eigenaarsbewijsimage-ID is ongeldig.');
   const basis = controleerOwnerImageBasis(root, commit, {
-    imageVerwijzing:gegevens.imageVerwijzing, imageDigest:gegevens.imageDigest
+    imageVerwijzing:gegevens.imageVerwijzing, imageDigest:gegevens.imageDigest,
+    imageId:gegevens.imageId
   });
   const inhoud = { soort:'release', commit, imageId:gegevens.imageId,
     imageImmutable:basis.appKeten.immutable,
@@ -348,7 +354,8 @@ function maak(root, gegevens) {
   if (!/^[a-f0-9]{40,64}$/.test(commit) || !geldigId(gegevens.imageId) || !geldigId(gegevens.backupId))
     throw new Error('Kandidaatcommit of image-id is ongeldig.');
   const keten = { imageVerwijzing:gegevens.imageVerwijzing, imageDigest:gegevens.imageDigest,
-    backupVerwijzing:gegevens.backupVerwijzing, backupDigest:gegevens.backupDigest };
+    backupVerwijzing:gegevens.backupVerwijzing, backupDigest:gegevens.backupDigest,
+    imageId:gegevens.imageId, backupId:gegevens.backupId };
   const invoer = controleerInvoer(root, commit, keten);
   if (invoer.runtime.imageId !== gegevens.imageId)
     throw new Error('Het gestarte kandidaatproces draaide niet uit de vast te leggen image-ID.');
@@ -386,7 +393,8 @@ function controleer(root, commit) {
     imageVerwijzing:rapport.image && rapport.image.verwijzing,
     imageDigest:rapport.image && rapport.image.digest,
     backupVerwijzing:rapport.backup && rapport.backup.verwijzing,
-    backupDigest:rapport.backup && rapport.backup.digest
+    backupDigest:rapport.backup && rapport.backup.digest,
+    imageId:rapport.image && rapport.image.id, backupId:rapport.backup && rapport.backup.id
   });
   if (rapport.image.bewijsInhoudSha256 !== invoer.image.inhoudSha256 ||
       rapport.bronBewijsBoom !== invoer.bron.boom ||

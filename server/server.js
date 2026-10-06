@@ -47,6 +47,8 @@ const accounts = require('./accounts');
 const eigenaar = require('./eigenaar');
 const mail = require('./mail');
 const logboek = require('./log');
+// Elke console-regel van dit proces gaat door de centrale redactie (log-redactie.js).
+require('./log-redactie').bewaakConsole();
 const log = logboek.log;
 const testomgeving = require('./testomgeving');
 const betaal = require('./betaal');

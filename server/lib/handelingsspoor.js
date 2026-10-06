@@ -105,7 +105,7 @@ function maakHandelingsspoor({ db, save, nu, max }) {
 
   const rij = () => opslag ? opslag.view() : eigen.bak('handelingLog');
 
-  function noteer({ wie, methode, pad, status, afdruk, grof }) {
+  function noteer({ wie, methode, pad, status, afdruk, grof, stand }) {
     const regel = {
       at: grof ? burger.dag(tijd()) : new Date(tijd()).toISOString(),
       wie: String(wie || 'anoniem').slice(0, 60),
@@ -114,6 +114,7 @@ function maakHandelingsspoor({ db, save, nu, max }) {
       status: Number(status) || 0,
       afdruk: String(afdruk || '')
     };
+    if (stand) regel.stand = String(stand).slice(0, 20);   // A-P1-05: `toegestaan` = voor de handeling, duurzaam
     if (opslag) return opslag.append(vorige => keten.schakel(regel, vorige?.hash || null, (Number(vorige?.nr) || 0) + 1), r => Boolean(r?.hash));
     return keten.noteerIn(rij(), regel, grens);
   }
@@ -185,4 +186,5 @@ function maakHandelingsspoor({ db, save, nu, max }) {
 module.exports = maakHandelingsspoor;
 module.exports._afdrukVan = afdrukVan;
 module.exports._wieVan = wieVan;
+module.exports.wieVan = wieVan;
 module.exports.MAX = MAX;

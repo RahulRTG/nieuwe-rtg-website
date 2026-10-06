@@ -9,6 +9,7 @@
 module.exports = (octx) => {
   const { kern } = octx;
   const { app, officeAuth, ankerdienst, ankerpost } = kern;
+  require('../../lib/ankertimer').start({ ankerpost, log: console });   // A-P1-05: periodiek anker
 
 /* HET ANKER: het ene getal dat naar buiten moet.
 
@@ -26,7 +27,7 @@ module.exports = (octx) => {
    regel om te wijzigen. Waar het blok heen gaat is een besluit over uw
    infrastructuur, en dat hoort bij een mens. Zie server/lib/ankerdienst.js. */
 app.post('/api/office/anker', officeAuth, (req, res) => {
-  res.json(Object.assign({ ok: true, post: ankerpost.stand() },
+  res.json(Object.assign({ ok: true, post: ankerpost.stand(), periodiek: require('../../lib/ankertimer').stand() },
     ankerdienst.stand(req.body && req.body.blok ? req.body.blok : null)));
 });
 

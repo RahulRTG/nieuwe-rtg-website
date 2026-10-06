@@ -42,6 +42,9 @@ if (require.main !== module) return;
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+/* De gemeten invoer voor het stempel (ARCHITECTOPDRACHT.md fase 2); zonder
+   invoerspoor-preload is dit undefined en verandert het stempel niet. */
+const { blok: invoerBlok } = require('./lib/invoerspoor');
 const { parse } = require('./ast/parser');
 const { loop } = require('./ast/walk');
 
@@ -223,7 +226,10 @@ const uit = {
      dekkingsvraag triviaal waar, dus scripts/codewereld.js telt hem apart. */
   soort: 'index',
   uitleg: 'De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.',
-  stempel: { op: new Date().toISOString().slice(0, 10), commit },
+  /* De looptijd staat in het STEMPEL en niet bij `gemeten`: het is meetmetadata
+     zoals het tijdstip, en in de inhoud maakte hij twee runs op dezelfde commit
+     ongelijk (ARCHITECTOPDRACHT.md fase 2, de determinismeproef). */
+  stempel: { op: new Date().toISOString().slice(0, 10), commit, seconden: Math.round((Date.now() - t0) / 100) / 10, invoer: invoerBlok(['SYMBOLEN.json']) },
   grens: 'Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.',
   gemeten: {
     bestandenGezien: perBestand.length + nietGelezen.length,
@@ -237,8 +243,7 @@ const uit = {
     uitvoerOnvolledig: perBestand.filter(b => b.uitvoer && b.uitvoer.vorm === 'object-onvolledig').length,
     uitvoerZonderNamen: perBestand.filter(b => b.uitvoer && !b.uitvoer.namen).length,
     zonderUitvoer: perBestand.filter(b => !b.uitvoer).length,
-    requireKanten: perBestand.reduce((n, b) => n + b.requires.length, 0),
-    seconden: Math.round((Date.now() - t0) / 100) / 10
+    requireKanten: perBestand.reduce((n, b) => n + b.requires.length, 0)
   },
   nietGelezen,
   perBestand
@@ -247,7 +252,7 @@ const uit = {
 fs.writeFileSync(path.join(WORTEL, 'SYMBOLEN.json'), JSON.stringify(uit, null, 1) + '\n');
 const g = uit.gemeten;
 console.log('SYMBOLEN.json geschreven');
-console.log('  gelezen     ', g.gelezen + '/' + g.bestandenGezien, 'bestanden,', g.symbolen, 'symbolen,', g.requireKanten, 'require-kanten in', g.seconden + 's');
+console.log('  gelezen     ', g.gelezen + '/' + g.bestandenGezien, 'bestanden,', g.symbolen, 'symbolen,', g.requireKanten, 'require-kanten in', uit.stempel.seconden + 's');
 console.log('  niet gelezen', g.nietGelezen, '(' + g.waarvanBundeldeel, 'bundeldelen,', g.waarvanParsefout, 'parsefouten)');
 console.log('  uitvoer     ', g.uitvoerMetNamen, 'met een volledige namenlijst,', g.uitvoerOnvolledig, 'onvolledig (spread of Object.assign),',
   g.uitvoerZonderNamen, 'zonder namen,', g.zonderUitvoer, 'geen module.exports');

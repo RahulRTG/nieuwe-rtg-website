@@ -2526,7 +2526,7 @@ loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
 inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->26505<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->7249<!--/getal--> require-kanten heen en terug, met de eigen parser
+met een regelnummer en <!--getal:symbolen.kanten-->7251<!--/getal--> require-kanten heen en terug, met de eigen parser
 en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->313<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
@@ -2546,7 +2546,7 @@ grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
-<!--getal:graaf.kanten-->30271<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
+<!--getal:graaf.kanten-->30273<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
 (<!--getal:graaf.routesMetSymbool-->3309<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
 <!--getal:graaf.opgelostPct-->25.3<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is

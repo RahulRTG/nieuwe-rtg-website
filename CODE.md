@@ -91,7 +91,7 @@ het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
 `scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
 
 **<!--getal:symbolen.gelezen-->5201<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->26505<!--/getal--> benoemde symbolen met een regelnummer,
-<!--getal:symbolen.kanten-->7249<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
+<!--getal:symbolen.kanten-->7251<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
 mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
 wat een impactvraag nodig heeft.
 
@@ -207,7 +207,7 @@ Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->975<!-
 
 `scripts/aanroepgraaf.js` → `AANROEPGRAAF.json` (`npm run aanroepgraaf`) legt de
 laatste twee schakels: **wie roept wie aan**, en **welk symbool handelt deze
-route af**. <!--getal:graaf.kanten-->30271<!--/getal--> kanten, <!--getal:graaf.aanroepers-->11749<!--/getal--> symbolen waarvan bekend is wie ze
+route af**. <!--getal:graaf.kanten-->30273<!--/getal--> kanten, <!--getal:graaf.aanroepers-->11749<!--/getal--> symbolen waarvan bekend is wie ze
 aanroept, en <!--getal:graaf.routesMetSymbool-->3309<!--/getal--> routes met minstens één afgehandeld symbool.
 
 Daarmee loopt de keten van scherm tot functie, uit registers alleen:
@@ -227,7 +227,7 @@ uit een `require` komt, **én** het doelbestand dat symbool ook echt kent.
 
 #### Een kwart opgelost is hier geen tekort
 
-Van de <!--getal:graaf.aanroepen-->174511<!--/getal--> aanroepen is <!--getal:graaf.opgelostPct-->25.3<!--/getal-->% naar een symbool te herleiden (18,1%
+Van de <!--getal:graaf.aanroepen-->174513<!--/getal--> aanroepen is <!--getal:graaf.opgelostPct-->25.3<!--/getal-->% naar een symbool te herleiden (18,1%
 toen deze meter werd gebouwd; §0.7 bracht de rest). Dat getal zonder indeling
 nodigt uit tot de verkeerde reparatie — iemand gaat de resolver "verbeteren" tot
 hij `res.json` aan een bestand knoopt. Daarom staat de rest ingedeeld:
@@ -272,7 +272,7 @@ lessen die elders net zo gelden:
    of lokale verklaring zijn, vallen daarom uit de bindingen. Grof, en met
    opzet.
 
-Wat na die vier overblijft is <!--getal:graaf.doelOnbekend-->0<!--/getal-->. Dat is hier geen lege controle: <!--getal:graaf.kanten-->30271<!--/getal-->
+Wat na die vier overblijft is <!--getal:graaf.doelOnbekend-->0<!--/getal-->. Dat is hier geen lege controle: <!--getal:graaf.kanten-->30273<!--/getal-->
 kanten zijn tegen de symbooltabel van hun doelbestand gehouden.
 
 Sinds 20 september 2026 staat er een **vijfde** soort naast die vier, en die
@@ -468,7 +468,7 @@ geen uitvoer van de fabriek.
 
 | | vóór §0.7 | na |
 |---|---|---|
-| aanroepkanten | 17.596 | <!--getal:graaf.kanten-->30271<!--/getal--> |
+| aanroepkanten | 17.596 | <!--getal:graaf.kanten-->30273<!--/getal--> |
 | aanroepen herleid | 18,1% | <!--getal:graaf.opgelostPct-->25.3<!--/getal-->% |
 | routes met een symbool | 2346 | <!--getal:graaf.routesMetSymbool-->3309<!--/getal--> |
 | post `contextobject` | 20.961 | <!--getal:graaf.contextobject-->20432<!--/getal--> |
@@ -559,7 +559,7 @@ eerst door de bestaanscontrole en produceerden **303 "bevindingen"** — de mete
 beschuldigde de code van een ontbrekend symbool dat hij zelf niet had ingevuld.
 `doelOnbekend` staat weer op <!--getal:graaf.doelOnbekend-->0<!--/getal-->.
 
-Eindstand van de graaf na §0.7 en §0.8: <!--getal:graaf.kanten-->30271<!--/getal--> kanten,
+Eindstand van de graaf na §0.7 en §0.8: <!--getal:graaf.kanten-->30273<!--/getal--> kanten,
 <!--getal:graaf.opgelostPct-->25.3<!--/getal-->% herleid, <!--getal:graaf.routesMetSymbool-->3309<!--/getal--> routes met een symbool.
 
 **Een huisregel die twee keer moest worden geleerd:** zet geen voorbeeld met een

@@ -54,6 +54,13 @@ const { alleRoutes } = require('./lib/routes');
 
 const WORTEL = path.join(__dirname, '..');
 const ANDER = 'SCHRIJFANALYSE.json';
+/* De gemeten invoer voor het stempel (ARCHITECTOPDRACHT.md fase 2); zonder
+   invoerspoor-preload is dit undefined en verandert het stempel niet. Hij
+   staat NA de declaraties hierboven: scripts/stillezing.js telt een lezing
+   lexicaal (een registernaam binnen 200 tekens), en tussen de requires en
+   ANDER duwde hij die naam buiten het venster -- het bereik daalde zonder dat
+   er een lezing verdween. */
+const { blok: invoerBlok } = require('./lib/invoerspoor');
 
 function git(args) {
   try { return execFileSync('git', args, { cwd: WORTEL }).toString().trim(); }
@@ -139,7 +146,7 @@ const uit = {
      dekkingsvraag triviaal waar, dus scripts/codewereld.js telt hem apart. */
   soort: 'meting',
   uitleg: 'De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om ' + ANDER + ' toetsbaar te maken; zonder tweede bron betekent "geen tegenspraak" niets.',
-  stempel: { op: new Date().toISOString(), commit },
+  stempel: { op: new Date().toISOString(), commit, invoer: invoerBlok(['ROUTEBRON.json']) },
   vergelekenMet: { register: ANDER, stempel: anderStempel },
   grens: 'Een verschil is pas een TEGENSPRAAK als beide betrokken bestanden stilstaan sinds het stempel van het andere register. Verschilt de leeftijd, dan vergelijk je twee momenten -- dat wordt hier apart geteld en nooit als tegenspraak gepresenteerd.',
   gemeten: {

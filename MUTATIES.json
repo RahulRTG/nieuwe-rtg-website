@@ -15925,6 +15925,14 @@
       "staat": "geen bronmutatie mogelijk",
       "reden": "overleefde 17 mutaties in public/apps/voertuig.js en rit.js. Deze toets legt tekst en sleutelnamen vast, geen rekenend gedrag; geen enkele bronoperator raakt een letterlijke string. Met de hand nagetrokken op de foutklasse die hij wel bewaakt (een hernoemde opslagsleutel): tweemaal raak"
     },
+    "vonk-daglot.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vonk/wensen.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "vonk-experience.test.js": {
       "soort": "puur",
       "staat": "gezakt",

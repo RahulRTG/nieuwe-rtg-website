@@ -72,6 +72,8 @@
    eigen account de grens van 50 per adres terug wanneer hij wilde, en gokte hij
    vanaf een adres onbeperkt op de accounts van anderen. Dat is de les van N4
    (./tweedestap-rem.js); de adresemmer loopt vanzelf af (../../opzet/onderhoud.js).
+   De aanmelding van personeel houdt zich met haar eigen adresemmer aan dezelfde
+   regel (I7).
 
    Deze module houdt zelf geen staat: alles staat in de gedeelde `loginFails`.
    Elke deur bouwt haar eigen exemplaar uit de drie bestaande kernfuncties, en

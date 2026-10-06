@@ -82,12 +82,15 @@ app.post('/api/supplier/staff/join', async (req, res) => {
     if ((accounts.isActief && !accounts.isActief(lid)) ||
         !(await uitnodiging.kassacodeHoortBij(kassacode, s.code, lid))) return onjuist(false);
   } catch (e) { console.error('[staff-join] veilige verwerking mislukt'); return res.status(503).json({ error: STUK }); }
+  /* Alleen de accountemmer leeg, zoals bij de gewone inlog. De adresemmer
+     ('join:'+adres) blijft staan: een geslaagde aanmelding bewijst iets over
+     dit account en niets over wat er verder vanaf dit adres klopt (I7, de les
+     van N4; zie de kop van de rem). Hij loopt vanzelf af. */
   accountRem.gelukt(login, lid);
   // 4) alles klopt: niet dubbel aanmelden bij hetzelfde bedrijf
   if (accounts.staffByMember(s.code, lid.id)) {
     return res.status(409).json({ error: 'U bent al aangemeld bij dit bedrijf. Log in met uw persoonlijke RTG-account.' });
   }
-  loginFails.delete(bucket);
   let v;
   try { v = await verbindCode(lid, kassacode, legacyPin ? { pin } : {}, s.code); }
   catch (e) { console.error('[staff-join] veilige verwerking mislukt'); return res.status(503).json({ error: STUK }); }

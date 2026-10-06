@@ -34,7 +34,7 @@ const kill = () => process.kill(process.pid, 'SIGKILL');
 
 const voegToe = require(path.join(SERVER, 'kern/pay/loshistorie'))(db);
 const payBoekingenVoegToe = (rij) => {
-  if (gewapend && proef === 'motor-stuur' && rij.soort === 'p2p') kill();
+  if (gewapend && (proef === 'motor-stuur' || proef === 'motor-dekking') && rij.soort === 'p2p') kill();
   return voegToe(rij);
 };
 /* De betaalwaarheid krijgt een eigen save: zodra hij een AFGEHANDELDE
@@ -44,10 +44,11 @@ const bwSave = (...a) => {
       Object.values(db.data.betaalWaarheid || {}).some(w => w && w.afgehandeldAt)) kill();
   return dbm.save(...a);
 };
-let providerStatus = 'processing';
+let providerStatus = proef === 'motor-dekking' ? 'succeeded' : 'processing';
+let providerAanroepen = 0;
 const betaal = {
-  maakBetaling: async (o) => ({ id: 'pi_ABC', status: providerStatus, aanbieder: 'stripe',
-    bedrag: o.bedrag, valuta: 'eur', referentie: o.referentie }),
+  maakBetaling: async (o) => { providerAanroepen++; return { id: 'pi_ABC', status: providerStatus, aanbieder: 'stripe',
+    bedrag: o.bedrag, valuta: 'eur', referentie: o.referentie }; },
   haalBetaling: async () => ({ id: 'pi_ABC', status: 'succeeded', aanbieder: 'stripe', bedrag: 2500, valuta: 'eur' })
 };
 const betaalWaarheid = require(path.join(SERVER, 'kern/betaalwaarheid'))({ d: () => db.data, save: bwSave, crypto, betaal, log: null });
@@ -83,6 +84,32 @@ const motorSaldi = async () =>
     meld({ herhaling: { ok: !!r.ok, status: r.status || 200, error: r.error || null },
       motor: { ALFA: s['lid:ALFA'] || 0, BETA: s['lid:BETA'] || 0 },
       spiegel: { ALFA: pay.saldoVan('lid:ALFA'), BETA: pay.saldoVan('lid:BETA') } });
+    process.exit(0);
+  }
+  /* motor-dekking: het lid heeft PRECIES genoeg, de eerste poging boekt
+     zonder bijladen, en de kill valt voor de JS-commit. De retry met dezelfde
+     idem mag de kaart niet aanraken: het saldo in de spiegel is dan al nul,
+     maar de boeking bestaat. */
+  if (proef === 'motor-dekking' && fase === 'heen') {
+    const r = await fetch(process.env.RTG_MOTOR_GELD_URL + '/api/pay/boekguard', { method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ van: 'extern:oplaad', naar: 'lid:ALFA', centen: 2500, soort: 'oplaad',
+        oms: 'start', ref: 'start', idem: 'pay-tegoed:' + 'c'.repeat(64) }) });
+    if (r.status !== 200) throw new Error('startsaldo: ' + r.status);
+    await pay.reconcileVanMotor();
+    gewapend = true;
+    await pay.stuur({ van: 'ALFA', aanCodenaam: 'BETA', centen: 2500, idem: 'klik-d' });
+    meld({ fout: 'de kill is niet gevallen' });
+    process.exit(3);
+  }
+  if (proef === 'motor-dekking' && fase === 'terug') {
+    await pay.reconcileVanMotor();
+    const voor = Object.keys(db.data.betaalWaarheid || {}).length;
+    const r = await pay.stuur({ van: 'ALFA', aanCodenaam: 'BETA', centen: 2500, idem: 'klik-d' });
+    const s = await motorSaldi();
+    meld({ herhaling: { ok: !!r.ok, status: r.status || 200, error: r.error || null, bijgeladen: r.bijgeladen },
+      providerAanroepen, nieuweBetalingen: Object.keys(db.data.betaalWaarheid || {}).length - voor,
+      motor: { ALFA: s['lid:ALFA'] || 0, BETA: s['lid:BETA'] || 0 } });
     process.exit(0);
   }
   if (proef === 'js-webhook' && fase === 'heen') {

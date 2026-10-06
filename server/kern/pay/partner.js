@@ -11,7 +11,7 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { save, rekLid, rekPartner, saldoVan, metIdem, boek, boekAsync, zorgSaldo,
+  const { save, rekLid, rekPartner, saldoVan, metIdem, boek, boekAsync, betaalMetDekking,
     betaaldienstKosten, opdrachten, grootboek, MIN_CENTEN, MAX_CENTEN, fees,
     economischeBoekingEenmaal, geldModus } = ctx;
   const boekTerugEenmaal = require('../betaalopdracht/terugboeking');
@@ -49,10 +49,9 @@ module.exports = (ctx) => {
     if (!supplierCode || !codenaam) return { status: 400, error: 'Van wie, naar welke zaak?' };
     return metIdem(idem ? 'partnerin:' + codenaam + ':' + idem : null,
       'partnerin|' + codenaam + '|' + supplierCode + '|' + c, async () => {
-        const z = await zorgSaldo({ codenaam, centen: c, idem });
+        const { z, b } = await betaalMetDekking({ codenaam, centen: c, idem, boeking: { van: rekLid(codenaam),
+          naar: rekPartner(supplierCode), centen: c, soort: soort || 'verkoop', oms: oms || 'Betaling', ref: ref || null } });
         if (z.error) return z;
-        const b = await boekAsync({ van: rekLid(codenaam), naar: rekPartner(supplierCode), centen: c,
-          soort: soort || 'verkoop', oms: oms || 'Betaling', ref: ref || null });
         if (b.error) return b;
         let kosten = 0;
         try { kosten = Math.max(0, Math.round(betaaldienstKosten(c) || 0)); } catch (e) { kosten = 0; }

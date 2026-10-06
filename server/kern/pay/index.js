@@ -78,7 +78,7 @@ module.exports = (ctxIn) => {
      ./boeking.js. Dat is een ander onderwerp dan dit bestand: wie daar iets
      verandert, verandert wat er met GELD gebeurt; wie hier iets verandert,
      verandert welke ONDERDELEN aan elkaar hangen. */
-  const { pasToe, boek, boekAsync } = require('./boeking')({
+  const { pasToe, boek, boekAsync, reserveerSleutel } = require('./boeking')({
     saldi, saldoVan, grootboek, payBoekingenVoegToe, save: paySave, id, schoon, nu, waardePoort,
     betalingenUit, uitFout, geldModus, motorklant, schaduw, boekEenmaal: economischeBoekingEenmaal,
     MIN_CENTEN, MAX_CENTEN });
@@ -86,9 +86,9 @@ module.exports = (ctxIn) => {
   /* Het oplaaddeel (laadOp, bankdekking, zorgSaldo, herstart-reconcile) staat
      in ./opladen.js; het krijgt de guard (boekAsync) en de helpers mee en
      raakt de boekingsregels zelf niet aan. */
-  const { laadOp, oplaadAfronden, koppelBank, koppelKosten, reconcileVanMotor, zorgSaldo, bestaatLid } = require('./opladen').maakOpladen({
+  const { laadOp, oplaadAfronden, koppelBank, koppelKosten, reconcileVanMotor, zorgSaldo, betaalMetDekking, bestaatLid } = require('./opladen').maakOpladen({
     betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save: paySave,
-    motorklant, geldModus, keyVanCodenaam, plafondFout, betaalWaarheid,
+    motorklant, geldModus, keyVanCodenaam, plafondFout, betaalWaarheid, reserveerSleutel,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP
   });
 
@@ -102,7 +102,7 @@ module.exports = (ctxIn) => {
   const ctx = {
     db, save: paySave, economischeBoekingEenmaal, bewerkCollectie, crypto, betaal, schoon, nu, d,
     saldi, grootboek, klompjes, saldiKijk, grootboekKijk, klompjesKijk,
-    rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, geldModus, zorgSaldo, seintje, bestaatLid,
+    rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, geldModus, zorgSaldo, betaalMetDekking, seintje, bestaatLid,
     betaaldienstKosten: betaaldienstKosten || (() => 0), waarde, accounts,
     opdrachten: betaalOpdrachten,
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX,

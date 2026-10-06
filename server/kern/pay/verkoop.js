@@ -21,7 +21,7 @@
    staat het luid in het log met de boekingsreferentie erbij -- stil doorgaan
    mag hier niet (LAT-regel 5). */
 module.exports = (ctx) => {
-  const { save, rekLid, rekPartner, saldoVan, metIdem, boekAsync, zorgSaldo, seintje,
+  const { save, rekLid, rekPartner, saldoVan, metIdem, boekAsync, betaalMetDekking, seintje,
     MIN_CENTEN, MAX_CENTEN } = ctx;
 
   /* `inhoudingen` is [{ naar, centen, oms }]. Een inhouding van nul wordt
@@ -40,10 +40,9 @@ module.exports = (ctx) => {
 
     return metIdem(idem ? 'verkoop:' + naarPartner + ':' + idem : null,
       'verkoop|' + codenaam + '|' + naarPartner + '|' + bruto + '|' + som, async () => {
-        const z = await zorgSaldo({ codenaam, centen: bruto, idem });
+        const { z, b } = await betaalMetDekking({ codenaam, centen: bruto, idem, boeking: { van: rekLid(codenaam),
+          naar: rekPartner(naarPartner), centen: bruto, soort: soort || 'verkoop', oms: oms || 'Verkoop', ref: ref || null } });
         if (z.error) return z;
-        const b = await boekAsync({ van: rekLid(codenaam), naar: rekPartner(naarPartner), centen: bruto,
-          soort: soort || 'verkoop', oms: oms || 'Verkoop', ref: ref || null });
         if (b.error) return b;
 
         const gedaan = [];

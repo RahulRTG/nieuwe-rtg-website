@@ -21,6 +21,7 @@ module.exports = function maakMotorklant(opties) {
   const v = maakMotorverbinding({
     boekPad: '/api/pay/boekguard',
     saldiPad: '/api/motor/saldi',
+    bekendPad: '/api/pay/boekbekend',
     watBoeking: 'de boeking',
     watSaldi: 'native saldi'
   }, opties);
@@ -29,6 +30,8 @@ module.exports = function maakMotorklant(opties) {
     /* Geguard boeken: de motor neemt de beslissing (bijv. 402 bij onvoldoende
        saldo) en de JS-engine spiegelt pas na zijn bevestiging. */
     boekGuard: v.boek,
+    /* Alleen lezen: bestaat deze boeking al bij de motor (./boeking.js)? */
+    boekBekend: v.bekend,
     saldiSnapshot: v.saldi,
     stand: v.stand
   };

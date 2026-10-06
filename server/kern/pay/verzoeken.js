@@ -7,7 +7,7 @@ const { maakSleutel } = require('../../db/economische-identiteit');
 
 module.exports = (ctx) => {
   const { crypto, save, schoon, nu, d, klompjes, klompjesKijk, grootboek, grootboekKijk, rekLid, saldoVan, walletRuimte,
-    id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, waarde,
+    id, metIdem, boekAsync, betaalMetDekking, seintje, bestaatLid, waarde,
     MIN_CENTEN, MAX_CENTEN, walletMax, KASCODE_MS } = ctx;
 
   async function stuur({ van, aanCodenaam, centen, oms, idem, soort }) {
@@ -17,9 +17,10 @@ module.exports = (ctx) => {
     // oms blijft buiten de afdruk: vrije tekst mag geen 409 veroorzaken
     const afdruk = 'stuur|' + van + '|' + aan + '|' + Math.round(Number(centen)) + '|' + (soort || 'p2p');
     return metIdem(idem ? 'stuur:' + van + ':' + idem : null, afdruk, async () => {
-      const z = await zorgSaldo({ codenaam: van, centen, idem });
+      // eerst boeken, bij een tekort bijladen (./dekking.js)
+      const { z, b } = await betaalMetDekking({ codenaam: van, centen, idem,
+        boeking: { van: rekLid(van), naar: rekLid(aan), centen, soort: soort || 'p2p', oms: oms || 'Zomaar' } });
       if (z.error) return z;
-      const b = await boekAsync({ van: rekLid(van), naar: rekLid(aan), centen, soort: soort || 'p2p', oms: oms || 'Zomaar' });
       if (b.error) return b;
       seintje(aan);
       return { ok: true, saldo: saldoVan(rekLid(van)), bijgeladen: z.bijgeladen, boeking: b.boeking.id };
@@ -27,7 +28,7 @@ module.exports = (ctx) => {
   }
   /* De huisrekening van RTG staat in ./huis.js -- een eigen onderwerp (geld dat
      het stelsel verlaat of van buiten komt), en dit bestand liep over de 10 kB. */
-  const { huisIn, huisUit } = require('./huis')({ schoon, metIdem, zorgSaldo, boekAsync, rekLid, seintje,
+  const { huisIn, huisUit } = require('./huis')({ schoon, metIdem, betaalMetDekking, boekAsync, rekLid, seintje,
     bestaatLid, MIN_CENTEN, MAX_CENTEN });
 
   /* Een Klompje (goudklompje, het RTG-eigen betaalverzoek): vraag een bedrag aan een of meer vrienden. Met splitsMetMij
@@ -94,7 +95,9 @@ module.exports = (ctx) => {
       if (inBetaling.has(v.id)) return { status: 409, error: 'Dit verzoek wordt op dit moment al betaald.' };
       inBetaling.add(v.id);
       try {
-        const z = await zorgSaldo({ codenaam, centen: v.centen, idem });
+        const { z, b } = await betaalMetDekking({ codenaam, centen: v.centen, idem, boeking: {
+          van: rekLid(codenaam), naar: rekLid(v.van), centen: v.centen, soort: 'klompje', oms: v.oms, ref: v.id,
+          economischeSleutel: maakSleutel('pay-klompje', [v.id]) } });
         if (z.error) return z;
         /* EEN BETALING PER VERZOEK, ook over instanties heen. Het slot
            hierboven staat in het geheugen van DIT proces; een tweede instantie
@@ -102,8 +105,6 @@ module.exports = (ctx) => {
            een keer. De sleutel hangt daarom aan het VERZOEK: de tweede boeking
            krijgt van het grootboek de eerste terug (`herhaald`), en dan is dit
            verzoek al betaald en wordt het niet nog eens als betaling gemeld. */
-        const b = await boekAsync({ van: rekLid(codenaam), naar: rekLid(v.van), centen: v.centen, soort: 'klompje', oms: v.oms, ref: v.id,
-          economischeSleutel: maakSleutel('pay-klompje', [v.id]) });
         if (b.error) return b;
         if (v.status === 'open') { v.status = 'betaald'; v.betaaldAt = nu(); save(); }
         if (b.herhaald) return { ok: true, alBetaald: true, saldo: saldoVan(rekLid(codenaam)), bijgeladen: z.bijgeladen };

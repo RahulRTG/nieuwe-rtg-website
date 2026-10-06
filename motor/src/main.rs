@@ -793,6 +793,11 @@ fn route_met_opslag(state: &RwLock<State>, req: &Request, bestand_slot: Option<&
     // read-only endpoints met een body: alleen een read-lock
     match req.path.as_str() {
         "/api/pay/overzicht" => return json_resp(state.read().unwrap().overzicht(codenaam)),
+        // alleen lezen: kent de motor deze sleutel al (zie State::boek_guard_bekend)
+        "/api/pay/boekbekend" => return json_resp(state.read().unwrap().boek_guard_bekend(
+            body.str_at("van").unwrap_or(""), body.str_at("naar").unwrap_or(""),
+            body.i64_at("centen").unwrap_or(0), body.str_at("soort").unwrap_or("boeking"),
+            body.str_at("ref"), idem)),
         "/api/supplier/pay/overzicht" => return json_resp(state.read().unwrap().partner_overzicht(supplier)),
         _ => {}
     }

@@ -150,6 +150,43 @@ test('G2: kill -9 tussen de motorbevestiging en de JS-commit, dan dezelfde retry
   } finally { eigen.stop(); fs.rmSync(dir, { recursive: true, force: true }); }
 });
 
+test('P1: kill -9 na de motorboeking, retry met dezelfde idem -- de kaart wordt niet opnieuw belast', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-p1-'));
+  const eigen = await startEchteMotor();
+  try {
+    const env = Object.assign({}, process.env, { RTG_STORE: 'sqlite', RTG_DATA_DIR: dir, NODE_ENV: 'test',
+      RTG_MOTOR_GELD: 'motor', RTG_MOTOR_GELD_URL: eigen.url, NODE_NO_WARNINGS: '1' });
+    const kind = path.join(__dirname, 'lib', 'geld-crashkind.js');
+    const heen = spawnSync(process.execPath, [kind, 'motor-dekking', 'heen'], { env, encoding: 'utf8' });
+    assert.equal(heen.signal, 'SIGKILL', 'de kill moet echt gevallen zijn: ' + heen.stdout + heen.stderr);
+    assert.equal(await eigen.saldo('lid:BETA'), 2500, 'de motor had de boeking al bevestigd');
+    const terug = spawnSync(process.execPath, [kind, 'motor-dekking', 'terug'], { env, encoding: 'utf8' });
+    assert.equal(terug.status, 0, terug.stdout + terug.stderr);
+    const uit = JSON.parse(terug.stdout.trim().split('\n').pop());
+    assert.equal(uit.herhaling.ok, true, JSON.stringify(uit));
+    assert.equal(uit.providerAanroepen, 0, 'geen enkele aanroep naar de kaartaanbieder bij een herhaling');
+    assert.equal(uit.nieuweBetalingen, 0, 'geen nieuwe betaalwaarheid-record');
+    assert.deepEqual(uit.motor, { ALFA: 0, BETA: 2500 }, 'saldo exact: een boeking, geen opwaardering');
+  } finally { eigen.stop(); fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('P1: een echt tekort laadt een keer bij en boekt daarna, met dezelfde sleutel', async () => {
+  let aanroepen = 0;
+  const betaal = { maakBetaling: async (o) => { aanroepen++; return { id: 'pi_p1_' + aanroepen, status: 'succeeded',
+    aanbieder: 'stripe', bedrag: o.bedrag, valuta: 'eur', referentie: o.referentie }; } };
+  const { pay } = opbouw({ betaal, spelers: ['KORT', 'ONTV'] });
+  await startsaldo(pay, 'KORT', 500);
+  const r = await pay.stuur({ van: 'KORT', aanCodenaam: 'ONTV', centen: 2500, idem: 'kort-1' });
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.equal(aanroepen, 1);
+  assert.equal(await motor.saldo('lid:ONTV'), 2500);
+  assert.equal(await motor.saldo('lid:KORT'), 500 + r.bijgeladen - 2500);
+  const nog = await pay.stuur({ van: 'KORT', aanCodenaam: 'ONTV', centen: 2500, idem: 'kort-1' });
+  assert.equal(nog.ok, true);
+  assert.equal(aanroepen, 1, 'de herhaling raakt de kaart niet');
+  assert.equal(await motor.saldo('lid:ONTV'), 2500);
+});
+
 test('G4: twee instanties betalen hetzelfde betaalverzoek met elk een eigen sleutel -- een keer afgeschreven', async () => {
   const spelers = ['VRAGER', 'BETALER'];
   const a = opbouw({ spelers });

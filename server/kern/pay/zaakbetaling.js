@@ -32,7 +32,7 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { schoon, rekLid, rekPartner, saldoVan, metIdem, boekAsync, zorgSaldo, seintje,
+  const { schoon, rekLid, rekPartner, saldoVan, metIdem, boekAsync, betaalMetDekking, seintje,
     MIN_CENTEN, MAX_CENTEN } = ctx;
 
   const REK_HUIS = 'extern:treasury';
@@ -67,10 +67,11 @@ module.exports = (ctx) => {
         if (c > 0) {
           /* EEN knop: schiet het saldo tekort, dan laadt de wallet zelf bij en
              betaalt door -- exact zoals bij een Klompje of de kassa. */
-          const z = await zorgSaldo({ codenaam: lid, centen: c, idem });
+          const { z, b } = await betaalMetDekking({ codenaam: lid, centen: c, idem,
+            boeking: { van: rekLid(lid), naar, centen: c, soort: soort || 'zaak', oms, ref } });
           if (z.error) return z;
           bijgeladen = z.bijgeladen || 0;
-          eerste = await boekAsync({ van: rekLid(lid), naar, centen: c, soort: soort || 'zaak', oms, ref });
+          eerste = b;
           if (eerste.error) return eerste;
         }
         if (bij > 0) {

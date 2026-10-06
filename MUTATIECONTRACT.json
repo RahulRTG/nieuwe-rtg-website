@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-05T14:04:01.061Z",
-  "commit": "b71cd833",
+  "op": "2026-10-06T02:53:09.092Z",
+  "commit": "2ca8caebe",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,8 +10,8 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5261,
-  "geclassificeerd": 5236,
+  "totaal": 5260,
+  "geclassificeerd": 5235,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3167,
    "NOT_APPLICABLE": 1263,
@@ -20,9 +20,9 @@
    "INTENTIONALLY_NON_IDEMPOTENT": 180
   },
   "vastgesteldDoorMens": 2120,
-  "afgeleidDoorScript": 3116,
+  "afgeleidDoorScript": 3115,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4330,
+   "AUTHENTICATED": 4329,
    "PUBLIC": 134,
    "OBJECT_SCOPED": 766,
    "(niet af te leiden -- vraagt een verklaring)": 15,
@@ -32,7 +32,7 @@
   "bewijs": {
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
-   "kale ronde: geen uitspraak": 4882,
+   "kale ronde: geen uitspraak": 4881,
    "niet gemeten": 113
   },
   "voorstellen": {
@@ -130833,7 +130833,7 @@
    "semantiek": {
     "klasse": "nietHerhaalbaar"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,

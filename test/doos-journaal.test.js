@@ -327,3 +327,36 @@ test('8. de ingekorte regel vertaalt bij het naspelen dezelfde nummers als het v
     for (const d of dozen) { try { fs.rmSync(d.dir, { recursive: true, force: true }); } catch (e) {} }
   }
 });
+
+/* HET OVERSLAAN ZELF, DOOR speelNa (ronde 6b). Toets 6 vraagt journaalGeldig;
+   deze laat speelNa een oude regel met een wachtwoordlijf tussen twee gewone
+   tegenkomen. Die regel bereikt de cloud niet, de twee andere wel en in volgorde,
+   de teller telt hem, en de melding noemt het lijf: hier stond 'zegel/pad
+   ongeldig', en dat stuurde wie het las naar de verkeerde plek. */
+test('9. speelNa slaat een oude regel met een wachtwoordlijf over en zegt dat het lijf de reden kan zijn', async () => {
+  const cloud = await nepCloud({ ok: true });
+  const d = doosMetCloud(cloud.base);
+  const gezegd = []; const warn = console.warn;
+  try {
+    eisLangsSlot1(d.doos);
+    const zegel = zegelVan(d.dir);
+    d.db.data.doosJournaal = [
+      { seq: 1, pad: '/api/supplier/order/maak', body: { stap: 1 }, res: null, at: 1 },
+      { seq: 2, pad: PAD_4B, body: { account: { Wachtwoord: 'geheim' } }, res: null, at: 2 },
+      { seq: 3, pad: '/api/supplier/order/klaar', body: { stap: 3 }, res: null, at: 3 }
+    ].map(e => Object.assign(e, { zegel: zegel(e) }));
+    console.warn = (m) => { gezegd.push(String(m)); };
+    let klaar;
+    try { klaar = await d.doos.speelNa(); } finally { console.warn = warn; }
+    assert.equal(klaar, true, 'het journaal speelt na');
+    assert.equal(d.db.data.doosJournaal.length, 0, 'ook de geweigerde regel is van het journaal af');
+    assert.deepEqual(cloud.ontvangen.map(o => o.body), [{ stap: 1 }, { stap: 3 }], 'alleen de twee gewone regels bereiken de cloud, in volgorde');
+    assert.equal(d.doos.status().journaalGeweigerd, 1, 'de teller telt de geweigerde regel');
+    assert.deepEqual(gezegd, ['[doos] journaalregel geweigerd (zegel, pad of lijf ongeldig), overgeslagen: ' + PAD_4B],
+      'de melding noemt het lijf, en alleen het pad');
+  } finally {
+    console.warn = warn;
+    await cloud.dicht();
+    try { fs.rmSync(d.dir, { recursive: true, force: true }); } catch (e) {}
+  }
+});

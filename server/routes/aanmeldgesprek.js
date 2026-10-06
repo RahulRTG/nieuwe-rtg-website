@@ -99,7 +99,18 @@ module.exports = (kern) => {
          (../kern/identiteit/tweedestap-rem.js). Geen eigen codestap in dit
          gesprek: elke deur die codes toetst is een plek om die rem te vergeten.
          De uitleg van de poort zegt "uw wachtwoord klopt", en hier waren het
-         sleutelwoorden; die zin vervangen we, de rest blijft van de poort. */
+         sleutelwoorden; die zin vervangen we, de rest blijft van de poort.
+
+         KANTTEKENING (herkeuring N3, bewust niet gerepareerd). Na de code legt
+         /api/auth/tweede deze inlog vast als 'wachtwoord+totp' (of
+         'wachtwoord+herstelcode'), bron 'auth/tweede': het bewijs zegt niet met
+         welke eerste factor het verdiend is. De vertrouwensstand klopt
+         (tweefactor, kennis+bezit), maar het sessiescherm zegt "wachtwoord en
+         authenticator" terwijl er geen wachtwoord is gebruikt -- wat het MIJN
+         RTG-blok hieronder voor het pad zonder tweede factor juist voorkomt.
+         De eerste factor in het bewijs laten meereizen is een nieuw veld en een
+         besluit van de eigenaar. Toets 8 van test/aanmeldgesprek-tweede.test.js
+         zakt zodra deze alinea niet meer klopt. */
       const tweedeStap = tweefactor.inlogPoort(user);
       if (tweedeStap) {
         const zin = await naarTaal('Je sleutelwoorden kloppen. Typ nu de code uit je authenticator, of een van je herstelcodes.', lang);

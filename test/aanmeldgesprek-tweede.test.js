@@ -13,10 +13,16 @@
    kort bewijs met doel `inlog2` en geen token; /api/auth/tweede ruilt dat met een
    code om, met de gedeelde rem uit server/kern/identiteit/tweedestap-rem.js. Een
    account dat door zijn organisatie op non-actief is gezet krijgt niets, met
-   dezelfde tekst als de gewone inlog. En het gesprek staat in de inlogpauze van
-   de noodrem-ladder (server/middleware/remmen.js), anders is het de ene inlogdeur
-   die tijdens een brute-force-aanval openblijft. Zonder inlogpoort start de route
-   niet: stil terugvallen op een sessie zou dezelfde fout opnieuw zijn.
+   dezelfde tekst als de gewone inlog, ook als zijn tweede factor aanstaat. En
+   het gesprek staat in de inlogpauze van de noodrem-ladder
+   (server/middleware/remmen.js), omdat het een sessie of een bewijs geeft. Dat
+   maakt het niet de laatste open deur: wat er nog buiten die lijst valt, staat
+   in de kop van INLOG_PADEN. Zonder inlogpoort start de route niet: stil
+   terugvallen op een sessie zou dezelfde fout opnieuw zijn.
+
+   Toets 8 is geen reparatie maar een KANTTEKENING die waar moet blijven: na
+   sleutelwoorden en code heet de sessie 'wachtwoord+totp'. Zie het commentaar
+   bij de tweede stap in server/routes/aanmeldgesprek.js.
 
    Draai los: node --test test/aanmeldgesprek-tweede.test.js
    ========================================================================== */
@@ -181,22 +187,39 @@ test('5. een account dat zijn organisatie op non-actief zette, krijgt uit het ge
   const sleutel = await api('/api/techniek/sso/scimsleutel', { org: 'ag2org' }, eigenaarToken);
   assert.equal(sleutel.status, 200, 'SCIM-sleutel: ' + JSON.stringify(sleutel.body).slice(0, 200));
   const scimKop = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (sleutel.body.sleutel || sleutel.body.token) };
+  const uitDienst = async (email) => {
+    const zoek = await fetch(srv.base + '/api/scim/v2/Users?filter=' + encodeURIComponent('userName eq "' + email + '"'), { headers: scimKop });
+    const lijst = await zoek.json();
+    const id = lijst.Resources && lijst.Resources[0] && lijst.Resources[0].id;
+    assert.ok(id, 'de organisatie vindt haar medewerker: ' + JSON.stringify(lijst).slice(0, 200));
+    const uit = await fetch(srv.base + '/api/scim/v2/Users/' + encodeURIComponent(id), { method: 'PATCH', headers: scimKop,
+      body: JSON.stringify({ schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'], Operations: [{ op: 'replace', path: 'active', value: false }] }) });
+    assert.equal(uit.status, 200, 'de organisatie meldt ' + email + ' uit dienst');
+  };
 
   const email = 'ag2-uit@ag2-org.test';
   await lidMetWoorden(email, false);
-  const zoek = await fetch(srv.base + '/api/scim/v2/Users?filter=' + encodeURIComponent('userName eq "' + email + '"'), { headers: scimKop });
-  const lijst = await zoek.json();
-  const id = lijst.Resources && lijst.Resources[0] && lijst.Resources[0].id;
-  assert.ok(id, 'de organisatie vindt haar medewerker: ' + JSON.stringify(lijst).slice(0, 200));
-  const uit = await fetch(srv.base + '/api/scim/v2/Users/' + encodeURIComponent(id), { method: 'PATCH', headers: scimKop,
-    body: JSON.stringify({ schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'], Operations: [{ op: 'replace', path: 'active', value: false }] }) });
-  assert.equal(uit.status, 200, 'de organisatie meldt hem uit dienst');
-
+  await uitDienst(email);
   const r = await gesprekInlog(email, '198.51.100.5');
   assert.equal(r.status, 403, 'uit dienst is dicht, ook met de juiste sleutelwoorden: ' + JSON.stringify(r.body).slice(0, 200));
   assert.equal(r.body.token, undefined);
   assert.equal(r.body.bewijs, undefined);
   assert.equal(r.body.error, NIET_ACTIEF, 'met dezelfde tekst als /api/auth/login');
+
+  /* EN MET DE TWEEDE FACTOR AAN (herkeuring N3, mutant M8). De actief-poort
+     staat VOOR de inlogpoort, zoals in ./auth/inlog.js. Draai je die twee om,
+     dan krijgt een uit dienst gemeld account een bewijs voor de tweede stap in
+     plaats van de 403 met de reden, en het eerste account hierboven merkt
+     daar niets van: dat heeft geen tweede factor. */
+  const email2 = 'ag2-uit-tweede@ag2-org.test';
+  await lidMetWoorden(email2, true);
+  await uitDienst(email2);
+  const r2 = await gesprekInlog(email2, '198.51.100.6');
+  assert.equal(r2.status, 403, 'uit dienst is dicht, ook met een tweede factor: ' + JSON.stringify(r2.body).slice(0, 200));
+  assert.equal(r2.body.error, NIET_ACTIEF, 'met dezelfde tekst als /api/auth/login');
+  assert.equal(r2.body.token, undefined);
+  assert.equal(r2.body.bewijs, undefined, 'geen bewijs voor de tweede stap: wie uit dienst is, hoort zijn code niet eens te mogen typen');
+  assert.equal(r2.body.tweedeFactorNodig, undefined);
 });
 
 test('6. het gesprek zit in de inlogpauze; het begin ervan niet', () => {
@@ -221,4 +244,28 @@ test('7. zonder inlogpoort start de route niet, in plaats van stil terug te vall
   assert.throws(() => require('../server/routes/aanmeldgesprek')(kern), /tweefactor/,
     'een gesprek dat de tweede factor niet kan vragen, hoort niet te bestaan');
   assert.deepEqual(routes, [], 'er hangt dan ook geen enkele route');
+});
+
+/* KANTTEKENING, GEEN REPARATIE. Na sleutelwoorden en code legt /api/auth/tweede
+   de inlog vast als 'wachtwoord+totp': het bewijs zegt niet welke eerste factor
+   het was. De VERTROUWENSSTAND klopt wel (twee factoren, kennis plus bezit) en
+   die hoort te blijven kloppen. Het LABEL klopt niet, en dat staat met reden in
+   het commentaar bij de tweede stap in server/routes/aanmeldgesprek.js. Deze
+   toets houdt dat commentaar waar; hij bewaakt geen gewenst gedrag. */
+test('8. na sleutelwoorden en code: de stand is twee factoren, het label zegt nog wachtwoord (kanttekening)', async () => {
+  const email = 'ag2-label@voorbeeld.test';
+  const { geheim } = await lidMetWoorden(email, true);
+  const r = await gesprekInlog(email, '198.51.100.8');
+  assert.ok(r.body.bewijs, 'een bewijs uit het gesprek: ' + JSON.stringify(r.body).slice(0, 160));
+  const goed = await api('/api/auth/tweede', { bewijs: r.body.bewijs, code: juisteCode(geheim) }, null, '198.51.100.8');
+  assert.equal(goed.status, 200, JSON.stringify(goed.body).slice(0, 200));
+  const s = await api('/api/mijn/sessies', {}, goed.body.token);
+  assert.equal(s.status, 200, JSON.stringify(s.body).slice(0, 200));
+  const deze = (s.body.sessies || []).find(x => x.sid === s.body.huidige);
+  assert.ok(deze, 'de sessie uit de tweede stap staat in de lijst: ' + JSON.stringify(s.body).slice(0, 300));
+  assert.equal(deze.vertrouwen && deze.vertrouwen.stand, 'tweefactor',
+    'kennis plus bezit is twee factoren, welke kennis het ook was');
+  assert.equal(deze.soort, 'wachtwoord+totp',
+    'KANTTEKENING N3: zakt dit omdat het label nu de sleutelwoorden noemt, dan is de kanttekening opgelost. ' +
+    'Pas deze toets dan niet aan maar vervang hem: haal de alinea weg uit server/routes/aanmeldgesprek.js en eis hier het nieuwe label.');
 });

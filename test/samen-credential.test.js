@@ -167,7 +167,7 @@ test('roteren is vernieuwen: nieuwe termijn, oude dicht, rotatie +1, soort verni
   assert.equal(k.toegang.geschiedenis.at(-1).door, 'Beryl');
   assert.equal(k.toegang.issuer, 'Amber', 'de uitgever blijft');
   assert.equal(k.toegang.gebruik, 0, 'de teller begint opnieuw');
-  assert.equal(Date.parse(k.toegang.expires_at), klok + T.GELDIG_MS, 'geen nieuwe termijn');
+  assert.equal(Date.parse(k.toegang.expires_at), klok + T.PROFIELEN.samen.geldigMs, 'een verse termijn vanaf nu');
   assert.ok(Date.parse(k.toegang.expires_at) > Date.parse(oud.expires_at));
   assert.equal(k.toegang_historie.at(-1).code_hash, oud.code_hash);
 

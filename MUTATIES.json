@@ -2212,6 +2212,14 @@
       ],
       "posities": 1
     },
+    "codevergelijking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bearercode.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "codewereld.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"

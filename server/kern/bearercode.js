@@ -13,6 +13,19 @@
 
 const MAX_GELDIG_MS = 366 * 86400000;
 
+/* De vergelijking zelf, los van een namespace, zodat een laag met een eigen
+   hashvoorvoegsel (kern/codelevenscyclus.js) dezelfde gebruikt en geen tweede
+   schrijft (Fase 0, D13). Elke rij wordt afgelopen, ook na een treffer. */
+function hashGelijk(crypto, a, b) {
+  if (!/^[a-f0-9]{64}$/i.test(String(a || '')) || !/^[a-f0-9]{64}$/i.test(String(b || ''))) return false;
+  return crypto.timingSafeEqual(Buffer.from(String(a), 'hex'), Buffer.from(String(b), 'hex'));
+}
+function vindOpHash(crypto, rijen, gezocht, veld = 'code_hash') {
+  let gevonden = null;
+  for (const rij of rijen || []) if (rij && hashGelijk(crypto, rij[veld], gezocht)) gevonden = rij;
+  return gevonden;
+}
+
 module.exports = ({ crypto, namespace, nu = () => new Date().toISOString() }) => {
   if (!crypto || typeof crypto.randomBytes !== 'function' || typeof crypto.createHash !== 'function' ||
       typeof crypto.timingSafeEqual !== 'function') throw new Error('bearercode vereist node:crypto');
@@ -22,10 +35,7 @@ module.exports = ({ crypto, namespace, nu = () => new Date().toISOString() }) =>
   const normaal = waarde => String(waarde == null ? '' : waarde).trim().toUpperCase();
   const hash = waarde => crypto.createHash('sha256')
     .update('rtg-bearer-v1|' + ns + '|' + normaal(waarde)).digest('hex');
-  const zelfdeHash = (a, b) => {
-    if (!/^[a-f0-9]{64}$/i.test(String(a || '')) || !/^[a-f0-9]{64}$/i.test(String(b || ''))) return false;
-    return crypto.timingSafeEqual(Buffer.from(String(a), 'hex'), Buffer.from(String(b), 'hex'));
-  };
+  const zelfdeHash = (a, b) => hashGelijk(crypto, a, b);
   const vind = (rijen, code, veld = 'code_hash') => {
     const gezocht = hash(code);
     let gevonden = null;
@@ -101,3 +111,5 @@ module.exports = ({ crypto, namespace, nu = () => new Date().toISOString() }) =>
 };
 
 module.exports.MAX_GELDIG_MS = MAX_GELDIG_MS;
+module.exports.hashGelijk = hashGelijk;
+module.exports.vindOpHash = vindOpHash;

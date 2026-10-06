@@ -7,6 +7,8 @@
    zetten. De kale code verlaat alleen de uitgifte; op schijf staat zijn hash. */
 'use strict';
 
+const { vindOpHash } = require('./bearercode');
+
 const DEFAULT_DAGEN = 90;
 const DEFAULT_MAX_GEBRUIK = 500;
 const MAX_DAGEN = 366;
@@ -14,13 +16,15 @@ const MAX_GEBRUIK = 10000;
 
 module.exports = ({ opslag, staat, nu, rid, crypto, save, bewerkCollectie }) => {
   if (typeof opslag !== 'function' || typeof nu !== 'function' || typeof rid !== 'function' ||
-      !crypto || typeof crypto.randomBytes !== 'function' || typeof save !== 'function') {
+      !crypto || typeof crypto.randomBytes !== 'function' || typeof crypto.timingSafeEqual !== 'function' ||
+      typeof save !== 'function') {
     throw new Error('codelevenscyclus mist zijn opslag, klok, generator, crypto of save');
   }
 
   const schoon = v => String(v == null ? '' : v).trim();
   const normaal = v => schoon(v).toUpperCase().slice(0, 80);
   const hash = v => crypto.createHash('sha256').update('rtg-code-v1|' + normaal(v)).digest('hex');
+  const opCode = (rijen, kaleCode) => vindOpHash(crypto, rijen, hash(kaleCode)); // constante tijd (D13)
   const lijst = () => {
     const r = opslag();
     if (!Array.isArray(r)) throw new Error('codelevenscyclus-opslag is geen lijst');
@@ -91,7 +95,7 @@ module.exports = ({ opslag, staat, nu, rid, crypto, save, bewerkCollectie }) => 
     }
 
     function controleer(kaleCode, verwacht, binding) {
-      const r = rijen.find(x => x.code_hash === hash(kaleCode)) || null;
+      const r = opCode(rijen, kaleCode);
       const waarom = reden(r, verwacht || {});
       if (waarom) return fout(waarom);
       /* De onderwerp-koppeling wordt BINNEN hetzelfde slot bekeken en VOOR de

@@ -273,6 +273,7 @@ test('gastrol: een oppas/familielid mag meehelpen maar niet bij de privezaken', 
   assert.equal((await api('/gezin/spaardoel/maak', { code: g.code, token: lt, naam: 'fiets', doel: 50 })).status, 200);
 
   // belangrijke gezinsinfo: de ouder vult in, de gast (oppas) mag het lezen maar niet wijzigen
+  await api('/gezin/toestemming/gezondheid', { code: g.code, token: g.token, aan: true });
   assert.equal((await api('/gezin/oppasinfo', { code: g.code, token: gt, allergie: 'stiekem' })).status, 403);
   const bewaard = await api('/gezin/oppasinfo', { code: g.code, token: g.token,
     noodcontacten: [{ naam: 'Mam', wie: 'Moeder', telefoon: '06 12 34 56 78' }, { naam: '', telefoon: '' }],
@@ -296,6 +297,7 @@ test('privacy: gevoelige data ligt versleuteld op schijf en het gezin kan alles 
     .map(f => path.join(TMP, f)).filter(f => fs.existsSync(f)).map(f => fs.readFileSync(f, 'utf8')).join('\n');
   const voorSchrijven = opSchijf();
   await api('/gezin/locatie', { code: g.code, token: kt, status: 'op school', lat: 52.31337, lon: 4.94211 });
+  await api('/gezin/toestemming/gezondheid', { code: g.code, token: g.token, aan: true });
   await api('/gezin/oppasinfo', { code: g.code, token: g.token, allergie: 'GEHEIM-ALLERGIE-PINDAKAAS', eten: '', huisregels: '' });
   await api('/gezin/bericht', { code: g.code, token: kt, naar: 'allen', soort: 'hulp', tekst: 'GEHEIM-BERICHT-IK-WIL-PRATEN' });
   /* WACHTEN TOT DEZE SCHRIJFACTIES ER ECHT IN ZITTEN, en niet 200 ms gokken.
@@ -393,6 +395,7 @@ test('oppas met RTG-pas: koppelt zijn gastprofiel en krijgt de gezinsmeldingen i
   assert.ok(ber.berichten.some(b => b.vanNaam === 'Opa' && /pas graag op/.test(b.tekst)), 'het antwoord staat in de gezinsberichten');
 
   // de ouder vult de belangrijke info en agenda in en deelt een locatie
+  await api('/gezin/toestemming/gezondheid', { code: g.code, token: g.token, aan: true });
   await api('/gezin/oppasinfo', { code: g.code, token: g.token, allergie: 'Pinda-allergie bij Sanne', eten: 'Bed om 19:30', huisregels: 'Schoenen uit' });
   await api('/gezin/agenda', { code: g.code, token: g.token, titel: 'Zwemles', datum: '2026-09-01', tijd: '16:00' });
   await api('/gezin/locatie', { code: g.code, token: g.token, status: 'op school', lat: 52.1, lon: 5.1 });

@@ -269,9 +269,25 @@ test('een uitzondering zonder vervaldatum of over de datum laat hem zakken', () 
   metRepo(h => {
     const basis = commitGrond(h);
     const met = (u) => { h.schrijfNorm(grond({ uitzonderingen: [u] })); return h.draai('2026-06-01', '--basis', basis); };
+    fs.mkdirSync(path.join(h.map, 'public'), { recursive: true });
+    fs.writeFileSync(path.join(h.map, 'public', 'x.html'), '<p style="x">x</p>\n');
     assert.match(met({ regel: 'inline-stijl', pad: 'public/x.html', reden: 'r' }).uit, /geen vervaldatum/);
     assert.match(met({ regel: 'inline-stijl', pad: 'public/x.html', reden: 'r', vervalt: '2026-01-05' }).uit, /verlopen op/);
     assert.equal(met({ regel: 'inline-stijl', pad: 'public/x.html', reden: 'r', vervalt: '2026-12-01' }).code, 0);
+  });
+});
+
+test('een uitzondering op een bestand dat niet bestaat laat hem zakken, ook met een geldige datum', () => {
+  /* Twee stonden er in NORM.json, met een reden en een datum in de toekomst, en
+     ze werden door niets gezien. Een uitzondering die naar niets wijst, dekt
+     niets af -- maar leest als een besluit. */
+  metRepo(h => {
+    const basis = commitGrond(h);
+    h.schrijfNorm(grond({ uitzonderingen: [{ regel: 'zelfpoortende-toets', pad: 'test/bestaat-niet.pg.test.js',
+      reden: 'r', vervalt: '2026-12-01' }] }));
+    const r = h.draai('2026-06-01', '--basis', basis);
+    assert.equal(r.code, 1, r.uit);
+    assert.match(r.uit, /bestaat niet/);
   });
 });
 

@@ -162,6 +162,29 @@ test('7 - een mens van RTG laat toe, en daarna gaat het gratis wel', async () =>
     'een ongeverifieerde gast kan het uitgeversdossier niet openen');
 });
 
+test('7b - het eigen journaal en de eigen cijfers, en niets van een ander', async () => {
+  /* Deze twee leespaden stonden in NORM.json als "nieuw endpoint zonder toets"
+     (samenvoeg-PR #137); dit is de toets die die uitzondering beloofde. Wat hij
+     vasthoudt is de grens uit kern/appstore/journaal.js: een uitgever ziet wat
+     er met ZIJN apps gebeurde, en nooit een regel over de app van een ander. */
+  const j = await api('/api/appstore/persoon/journaal', { n: 500 }, lid);
+  assert.equal(j.status, 200, JSON.stringify(j.body));
+  assert.ok(Array.isArray(j.body.lijst) && j.body.lijst.length, 'na een publicatie hoort er iets in het journaal te staan');
+  assert.ok(j.body.lijst.length <= 200, 'het eigen journaal is begrensd op 200, ook als er meer wordt gevraagd');
+  assert.ok(j.body.lijst.some(r => r.over === 'van-een-mens'), 'het besluit over de eigen app hoort erin');
+  const org = (await api('/api/appstore/persoon', {}, lid)).body.org;
+  for (const r of j.body.lijst)
+    assert.ok(r.over === 'van-een-mens' || r.wie === org,
+      'een regel die niet over de eigen app gaat en niet door de eigen org is gedaan, lekt: ' + JSON.stringify(r));
+
+  const c = await api('/api/appstore/persoon/cijfers', { dagen: 7 }, lid);
+  assert.equal(c.status, 200, JSON.stringify(c.body));
+  assert.deepEqual(c.body.apps.map(a => a.sleutel), ['van-een-mens'], 'de cijfers gaan over de eigen apps en alleen die');
+
+  for (const pad of ['/api/appstore/persoon/journaal', '/api/appstore/persoon/cijfers'])
+    assert.equal((await api(pad, {}, gast)).status, 403, pad + ' hoort dicht te zijn voor een ongeverifieerde gast');
+});
+
 test('8 - EEN PRIJS WORDT GEWEIGERD, en de reden staat erbij', async () => {
   /* Dit is de grens van 27 augustus 2026 en de kern van dit bestand. */
   const r = await api('/api/appstore/persoon/inzenden',

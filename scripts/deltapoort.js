@@ -214,6 +214,16 @@ function telSkips(tekst) {
   return n;
 }
 
+/* De lijst van de PostgreSQL-job, uit de ene bron die de draaier en het
+   releasebewijs ook lezen. Onleesbaar is leeg: dan geldt de volle regel. */
+let pgCache = null;
+function pgLijst() {
+  if (pgCache) return pgCache;
+  try { pgCache = new Set(require('./lib/pg-toetslijst').TOETSEN); }
+  catch (e) { pgCache = new Set(); }
+  return pgCache;
+}
+
 /* Elke regel krijgt (bestand, voor, na) en geeft nul of meer bevindingen.
    `voor` is null bij een nieuw bestand -- dat is precies het onderscheid
    tussen de twee latten, en het staat daarom in elke regel expliciet. */
@@ -327,6 +337,20 @@ const REGELS = [
     wat: 'toetsen die zichzelf overslaan als een dienst ontbreekt',
     geldt: isDienstToets,
     keur(pad, voor, na) {
+      /* WIE DE DIENST IN DE DRAAIER HEEFT GEZET, HEEFT GEDAAN WAT DE HULPTEKST
+         HIERONDER VRAAGT. Een bestand op scripts/lib/pg-toetslijst.js draait in
+         de PostgreSQL-job, en scripts/pgtoetsen.js laat die job zakken op elke
+         skip, todo of annulering. Daar is de skip dus geen ontsnapping maar de
+         lokale helft van een toets die elders verplicht volledig draait -- en
+         check.js regel 25 eist dat elk bestand dat op een database poort, op die
+         lijst staat.
+
+         Zonder deze uitzondering vroeg elke nieuwe pg-toets een handmatige
+         uitzondering in NORM.json. Dat waren er 31, allemaal met dezelfde reden
+         en dezelfde vervaldatum: een regel die zijn eigen voorgeschreven
+         oplossing niet herkende, en daarom per bestand werd omzeild. Staat het
+         bestand NIET op de lijst, dan geldt de volle regel nog steeds. */
+      if (pgLijst().has(pad)) return [];
       const nu = telSkips(na);
       if (voor === null) return nu ? [{ bericht: 'nieuw toetsbestand met ' + nu + ' toets(en) die zichzelf kunnen overslaan',
         hulp: 'een toets die zichzelf overslaat draait op de standaardmachine niet; zet de dienst in de draaier of schrijf hem zonder' }] : [];

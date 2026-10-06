@@ -92,7 +92,7 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
     // Kostencontext op de ZAAKCODE en NA de abonnementspoort (KOSTEN.md par. 6).
     const drager = kostenhaak.drager('zaak', req.supplier.code);
     kostenhaak.meld('verzoek', 1, { drager, pas: 'zaak' });
-    require('./kritiekspoor').poort(req, res, req.actor.staffId || sess.lidKey || ('zaak:' + req.supplier.code), () => kostenhaak.binnen(drager, next, 'zaak'));
+    require('./kritiekspoor').poort(req, res, req.actor.staffId || sess.lidKey || ('zaak:' + req.supplier.code), () => kostenhaak.binnen(drager, next, 'zaak', 'sessie'));
   }
 
   // Mag deze mens werken in een zaak van dit genre: ./persoonspoort.js.

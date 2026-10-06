@@ -78,8 +78,16 @@ function ontleed(d) {
   return SOORTEN_DRAGER.includes(s) && s !== 'huis' ? { soort: s, id: t.slice(k + 1) } : { soort: 'huis', id: HUIS };
 }
 
-/* Draai fn met deze drager als eigenaar van alles wat erin gebeurt. */
-function binnen(d, fn, pas) { return context.run({ drager: d || HUIS, pas: pas || null }, fn); }
+/* Draai fn met deze drager als eigenaar van alles wat erin gebeurt. `herkomst`
+   zegt waar de poort hem vandaan haalde ('sessie' of 'lichaam'); de waarnemer
+   (opzet/verzoekframe.js, late binding zoals de meter) schrijft hem in het
+   verzoekframe. Een waarnemer die gooit, raakt het verzoek niet. */
+let waarnemer = null;
+function zetWaarnemer(fn) { waarnemer = typeof fn === 'function' ? fn : null; }
+function binnen(d, fn, pas, herkomst) {
+  if (waarnemer) { try { waarnemer(d || HUIS, herkomst || null); } catch (e) {} }
+  return context.run({ drager: d || HUIS, pas: pas || null }, fn);
+}
 function wieNu() { const s = context.getStore(); return (s && s.drager) || HUIS; }
 
 /* De late binding. Eén meter, en de tweede aanroep vervangt de eerste in plaats
@@ -124,5 +132,5 @@ function magUitgeven(d) {
   catch (e) { return { ok: true }; }
 }
 
-module.exports = { binnen, wieNu, drager, ontleed, zetMeter, meterStaat, meld,
+module.exports = { binnen, zetWaarnemer, wieNu, drager, ontleed, zetMeter, meterStaat, meld,
   zetGrenswacht, magUitgeven, HUIS, SOORTEN_DRAGER };

@@ -110,10 +110,9 @@ const log = {
 
 
 
-/* Express-middleware: log elk verzoek met een correlatie-id, methode, pad,
-   status en duur. Het id komt terug in de response-header (X-Request-Id) zodat
-   een gebruiker of monitor een klacht aan een logregel kan koppelen. Gezondheid-
-   checks loggen we op debug, zodat ze de productielog niet volspammen. */
+/* Express-middleware: log elk verzoek met correlatie, methode, pad, status en
+   duur; het id gaat terug als X-Request-Id. Health-checks op debug. Het id maakt
+   de SERVER; een client-id is alleen `extern` (zie ./lib/correlatie.js). */
 /* Het pad in VORM, zoals het journaal het bewaart: /api/lid/42 wordt
    /api/lid/:id. Zo tellen honderd verzoeken naar honderd leden als een regel, en
    belandt er geen nummer in het journaal dat naar een persoon leidt. Uit het
@@ -133,10 +132,10 @@ const journaalPad = (p) => { try { return journaalMod().padVorm(p); } catch (e) 
 let journaalStuk = false;   // een kapot journaal meldt zich een keer, niet bij elk verzoek
 
 function middleware() {
-  const crypto = require('crypto');
+  const correlatie = require('./lib/correlatie');
   return (req, res, next) => {
-    const id = req.headers['x-request-id'] || crypto.randomBytes(8).toString('hex');
-    req.id = id;
+    const id = correlatie.nieuw(), extern = correlatie.extern(req.headers['x-request-id']);
+    req.id = id; req.externeId = extern;
     res.set('X-Request-Id', id);
     const start = process.hrtime.bigint();
     naAntwoord(res, () => {
@@ -144,7 +143,7 @@ function middleware() {
       const stil = req.path === '/api/health' || req.path === '/api/ready';
       const niveau = res.statusCode >= 500 ? 'error' : res.statusCode >= 400 ? 'warn' : (stil ? 'debug' : 'info');
       const veiligPad = journaalPad(req.path);
-      schrijf(niveau, 'verzoek', { id, m: req.method, p: veiligPad, s: res.statusCode, ms: Math.round(ms) });
+      schrijf(niveau, 'verzoek', { id, extern, m: req.method, p: veiligPad, s: res.statusCode, ms: Math.round(ms) });
       /* Ook naar het doorgeefjournaal, want een logbestand is geen scherm. Hier
          staat alles al klaar, dus dit kost niets extra's. Het pad gaat er in
          VORM in (/api/lid/:id) -- honderd verzoeken naar honderd leden tellen zo

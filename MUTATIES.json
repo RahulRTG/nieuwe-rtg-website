@@ -2785,6 +2785,14 @@
       "gezakt": 7,
       "geprobeerd": 4
     },
+    "correlatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/correlatie.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 6
+    },
     "crashas.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15905,6 +15913,14 @@
       "staat": "gezakt",
       "module": "server/db/verzoekcontext.js",
       "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "verzoekframe.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/verzoekframe.js",
+      "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
     },

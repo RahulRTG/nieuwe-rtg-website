@@ -28,6 +28,7 @@ module.exports = function maakUitbetaalrail(deps) {
       try { resultaat = sandbox.sepa({ bedrag, valuta, referentie, iban, begunstigde, omschrijving }); }
       catch (error) { throw nietVerstuurd(error); }
     } else if (stripe) {
+      require('./uitbetaalgrendel').eisOpen('uitbetaling');
       const uitleg = uitgaandBewustDicht ? ' De installatie staat bewust in deze gesloten stand.' : '';
       const error = new Error('Uitbetaling veilig geblokkeerd: een IBAN in Stripe-metadata is geen echte betaalbestemming. Koppel eerst een gecontroleerde uitbetaalrail.' + uitleg);
       error.code = 'UITBETAALRAIL_NIET_ACTIEF';

@@ -58,6 +58,8 @@ module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, 
     const { aanbieder, providerId, bedrag, valuta = 'eur', idempotentieSleutel } = opdracht || {};
     if (!providerId) throw new Error('Een terugbetaling heeft een providerbetaling nodig.');
     if (!Number.isFinite(bedrag) || bedrag <= 0) throw new Error('Terugbetaalbedrag moet positief zijn.');
+    if ((aanbieder === 'mollie' && mollie) || (aanbieder === 'stripe' && stripe) || (aanbieder === 'adyen' && adyen))
+      require('./uitbetaalgrendel').eisOpen('terugbetaling');
     if (aanbieder === 'mollie' && mollie) {
       const r = await mollie.refunds.create(providerId, { amount: mollieBedrag(bedrag, valuta),
         description: String(opdracht.omschrijving || 'RTG-terugbetaling').slice(0, 255) },

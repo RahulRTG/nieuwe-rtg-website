@@ -121,8 +121,8 @@ function maakTokens(getUserById) {
          uitgerekend deze deur, waar elk verzoek langskomt, stond nog op de
          kale vergelijking. */
       if (!veiligGelijk(kluis.sign(body), sig)) return null;
-      const [id, exp, uitgegeven, sid] = body.split('.');
-      if (Number(exp) < Date.now()) return null;
+      const [id, exp, uitgegeven, sid] = require('./tokenvorm').sessieDelen(body) || [];
+      if (!id || Number(exp) < Date.now()) return null;
       if (isIngetrokken(token)) return null; // uitgelogd: de handtekening klopt, wij niet meer
       /* En de sessie zelf. Dit is de tweede deur, en hij bestaat omdat de eerste
          het token nodig heeft -- dat heeft alleen de houder. Zonder deze regel
@@ -144,8 +144,8 @@ function maakTokens(getUserById) {
   }
   /* Doel-gebonden token (bijv. e-mailbevestiging), los van de sessie. */
   function issueActionToken(userId, purpose, ttlMs) {
-    /* De nonce maakt ook twee uitgiftes in dezelfde milliseconde afzonderlijk
-       intrekbaar. De eerste drie delen blijven gelijk voor oude verifiers. */
+    if (!require('./tokenvorm').doelGeldig(purpose)) throw new Error('ongeldig doel voor een actietoken');
+    // de nonce maakt twee uitgiftes in dezelfde ms afzonderlijk intrekbaar
     const body = userId + '.' + purpose + '.' + (Date.now() + ttlMs) + '.' +
       crypto.randomBytes(16).toString('base64url');
     return Buffer.from(body).toString('base64url') + '.' + kluis.sign(body);
@@ -156,7 +156,6 @@ function maakTokens(getUserById) {
     try {
       const [b64, sig] = String(token).split('.');
       if (!b64 || !sig) return null;
-      // zelfde reden als bij verifyToken: ook dit is een geheim
       if (!veiligGelijk(kluis.sign(Buffer.from(b64, 'base64url').toString()), sig)) return null;
       const [id, p, exp] = Buffer.from(b64, 'base64url').toString().split('.');
       if (p !== purpose || Number(exp) < Date.now()) return null;

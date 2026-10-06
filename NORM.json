@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 2012,
-    "toetsenNietGemeten": 130,
+    "toetsenNietGemeten": 132,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -4102,6 +4102,26 @@
       "meter": "toetsenNietGemeten 129 -> 130",
       "reden": "test/uitbetaalgrendel.test.js is nieuw (audit A-P0-02, harde release-gate voor echt geld uit het huis) en de mutatiemotor is er nog niet langs geweest. Met de hand nagetrokken: de grendel uit de terugbetalingstak halen en de bewijs-eis uit stand() halen lieten elk toetsen zakken.",
       "waarheen": "De eerstvolgende volledige mutatieronde meet hem en haalt hem uit deze telling."
+    },
+    {
+      "datum": "2026-10-05",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 129,
+      "vervalt": "2027-01-03",
+      "meter": "toetsenNietGemeten 129 -> 131",
+      "reden": "Twee nieuwe toetsbestanden voor de auditreparaties (PR #488): test/actietoken-geen-sessie.test.js (audit B-1, een actietoken geldt niet als sessie) en test/redis-url-niet-gelogd.test.js (audit A-P1-01, de Redis-URL gaat zonder gebruiker en wachtwoord het log in). Beide zijn met de hand nagetrokken: zonder de fix in server/accounts/tokens.js zakt de eerste, zonder urlZonderGeheim in server/bus.js de tweede. De mutatiemotor is er niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
+    {
+      "datum": "2026-10-06",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 131,
+      "vervalt": "2027-01-04",
+      "meter": "toetsenNietGemeten 131 -> 132",
+      "reden": "test/actietoken-families.test.js is nieuw: de tweede aanvalsronde op audit B-1. Drie lagen (de vorm van elke actietokenfamilie tegen sessieDelen, de uitgifte van elk doel in de bron tegen doelGeldig, en een echt actietoken op meerdere beschermde deuren), met een controle dat echte sessievormen wel doorkomen. Met de hand nagetrokken met drie mutaties die alle drie zakten, elk op de bedoelde laag: sessieDelen laat alles door (laag 1 en 3), doelGeldig accepteert getallen (laag 2), de uitgifte weigert niets meer (laag 2b). De mutatiemotor is er niet langs geweest.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
     }
   ],
   "prestatie": {

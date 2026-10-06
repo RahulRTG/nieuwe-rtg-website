@@ -1,5 +1,19 @@
 /* De correlatierug: een interne keten van voordeur tot event, worker en provider.
-   Een chain-id is alleen samenhang. Hij verleent nooit toegang of bevoegdheid. */
+   Een chain-id is alleen samenhang. Hij verleent nooit toegang of bevoegdheid.
+
+   EEN BRON, EN DAT IS HET VERZOEKFRAME (besluit van de eigenaar, 6 oktober
+   2026). Deze module maakte per verzoek een eigen willekeurige chain-id, naast
+   de correlatie van opzet/verzoekframe.js. Daardoor wisselde de keten binnen
+   een verzoek van naam: de verzoekwortel heette chain_<willekeur>, en zodra er
+   een gebeurtenis liep zette uitEvent() hem op de correlatie van de envelop --
+   die van het frame komt. Twee waarheden over dezelfde keten.
+
+   Nu wordt de keten AFGELEID uit de correlatie (ketenVan): het frame opent de
+   verzoekwortel (opzet/verzoekframe.js), en deze module maakt er geen meer.
+   Een correlatie maakt de server altijd zelf (lib/correlatie.js), dus een kop
+   van buiten kan de keten nog steeds niet kiezen. Buiten een verzoek (een
+   expliciete servicehop met verifieerCarrier, een toets) is er geen frame, en
+   dan is een met inContext geopende keten het enige wat er is. */
 'use strict';
 
 const { AsyncLocalStorage } = require('async_hooks');
@@ -7,11 +21,12 @@ const crypto = require('crypto');
 const { bevries } = require('./canon');
 
 const opslag = new AsyncLocalStorage();
+const gemaakt = new WeakSet();
 const nieuw = (p) => p + '_' + (crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(16).toString('hex'));
 
 function maak(invoer) {
   const i = invoer || {};
-  return bevries({
+  const c = bevries({
     version: 1,
     chainId: i.chainId || nieuw('chain'),
     stepId: i.stepId || nieuw('step'),
@@ -24,10 +39,24 @@ function maak(invoer) {
     economicPrincipalRef: i.economicPrincipalRef || null,
     classification: i.classification || 'onbekend'
   });
+  gemaakt.add(c);
+  return c;
+}
+
+/* De ketennaam van een correlatie. Een al gevormde chain-id blijft wie hij is. */
+function ketenVan(correlatie) {
+  if (correlatie == null || correlatie === '') return null;
+  const c = String(correlatie);
+  return c.startsWith('chain_') ? c : 'chain_' + c;
 }
 
 function huidige() { return opslag.getStore() || null; }
-function inContext(context, fn) { return opslag.run(maak(context), fn); }
+/* Een context die maak() al heeft gemaakt, draait als zichzelf: het verzoekframe
+   zet na de body-lezer DEZELFDE wortel terug en geen kopie met een nieuwe stap. */
+function inContext(context, fn) {
+  const c = context && gemaakt.has(context) ? context : maak(context);
+  return opslag.run(c, fn);
+}
 
 function kind(phase, extra) {
   const ouder = huidige();
@@ -42,24 +71,13 @@ function kind(phase, extra) {
 function uitEvent(envelop) {
   const ouder = huidige();
   return maak(Object.assign({}, ouder || {}, {
-    chainId: (envelop && envelop.correlatie) || (ouder && ouder.chainId),
+    chainId: (envelop && ketenVan(envelop.correlatie)) || (ouder && ouder.chainId),
     stepId: (envelop && envelop.id) || nieuw('step'),
     causedBy: (envelop && envelop.oorzaak) || null,
     actorRef: (envelop && envelop.actor) || (ouder && ouder.actorRef) || null,
     classification: (envelop && envelop.classificatie) || 'onbekend',
     phase: 'event'
   }));
-}
-
-function middleware() {
-  return (req, res, next) => {
-    /* Een publieke header wordt niet als keten vertrouwd. Providerbruggen mogen
-       na handtekeningcontrole expliciet inContext() gebruiken. */
-    const context = maak({ requestId: req.id || null, phase: 'request' });
-    req.trustContext = context;
-    res.set('X-RTG-Correlation', context.chainId);
-    opslag.run(context, next);
-  };
 }
 
 /* Getekende carrier voor een vertrouwde servicehop. Alleen correlation en
@@ -90,4 +108,4 @@ function verifieerCarrier(headers, secret, opties) {
   return maak({ chainId, causedBy: stepId, phase: 'service-hop' });
 }
 
-module.exports = { maak, huidige, inContext, kind, uitEvent, middleware, carrier, verifieerCarrier };
+module.exports = { maak, huidige, inContext, kind, uitEvent, ketenVan, carrier, verifieerCarrier };

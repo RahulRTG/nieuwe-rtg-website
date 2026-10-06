@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2128 bestanden, 16134 beweringen.
+2128 bestanden, 16135 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2012,7 +2012,7 @@ toets omvalt.
 | `verzoek-intrekken.test.js` | 4 | gezakt op `liegpoort /api/` | EEN BETAALVERZOEK INTREKKEN -- 2 endpoints, aan beide kanten van het huis. De dekkingsmeting wees /api/pay/verzoek/intrek (lid vraagt een vriend) en /api/supplier/betaalverzoek/intrek (zaak vraagt een klant) aan als... |
 | `verzoekbetaal-race.test.js` | 2 | gezakt op `!==->===#0` | TWEE KEER TEGELIJK BETALEN IS EEN KEER BETALEN (BEWIJSLUS.md par. 6). |
 | `verzoekcontext-wikkel.test.js` | 10 | gezakt op `true->false#0` | DE WIKKEL VAN DE VERZOEKCONTEXT -- wat er in de opslag belandt, en wat niet. server/db/verzoekcontext.js geeft elk verzoek een eigen werkkopie: lezen gaat door een Proxy, schrijven landt in de kopie, en pas de... |
-| `verzoekframe.test.js` | 8 | gezakt op `===->!==#0` | HET VERZOEKFRAME (server/opzet/verzoekframe.js) -- Fase 2, besluit B2a, in de schaduw. Deze toetsen houden de levenscyclus vast: open (correlatie van de server, extern begrensd), identificeer EEN keer en alleen via... |
+| `verzoekframe.test.js` | 9 | gezakt op `===->!==#0` | HET VERZOEKFRAME (server/opzet/verzoekframe.js) -- Fase 2, besluit B2a, in de schaduw. Deze toetsen houden de levenscyclus vast: open (correlatie van de server, extern begrensd), identificeer EEN keer en alleen via... |
 | `verzorging-leden.test.js` | 5 | gezakt op `liegpoort /api/` | De LEDENkant van de beauty-salon en barbier (kern/verzorging/beautyleden.js). Knippen, scheren en nagels waren alleen voor de zaak zelf te zien; nu boekt een lid er zelf, op codenaam, in DEZELFDE agenda als de salon. |
 | `verzorging.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Verzorging: de beauty-salon en barbier (Velvet & Blade), petcare (Amics) en de kinderopvang met nanny-service (Nido). Bewaakt de agenda zonder dubbele stoelen, de stoel-soortregel, de walk-in rij, het pension met... |
 | `verzuimrooster.test.js` | 4 | gezakt op `liegpoort /api/` | EEN MENS DIE TOCH EEN AFWEZIGE MEDEWERKER INPLANT, ZIET HET ERBIJ (PERSONEEL.md par. 4, PLANNING.md par. |

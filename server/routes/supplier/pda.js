@@ -23,7 +23,9 @@ module.exports = (kern) => {
      gedeelde context, een keer opgebouwd bij het opstarten; de netwerklaag
      gaat eerst de context in omdat de positieslaag netState gebruikt. */
   const kctx = { DEMO, accounts, anthropic, app, crypto, db, findSupplier, logActivity, loginFails, managerOnly, noteFailedTry, notifySupplier, rememberSession, save, schoon, sseToSupplier, supplierAuth, supplierState, tooManyTries, orderMetRef, ordersVanZaak,
-    heeftKantoor };
+    heeftKantoor,
+    // de tweede factor van het lid, voor de werkplekinlog (./pda/posities-inlog.js)
+    tweefactor: kern.tweefactor };
   const deelNet = require('./pda/netwerk')(kctx);
   Object.assign(kctx, deelNet);
   require('./pda/posities')(kctx);

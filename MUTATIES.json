@@ -204,6 +204,13 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "actietoken-uitgezet.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "activering.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6317,6 +6324,13 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "inlogpauze-spelling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "inlogrem.test.js": {
       "soort": "server",
@@ -17350,6 +17364,20 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "werkplek-tweede.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "werkplek-tweede.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 13,
       "scherp": "gezakt"
     },
     "werkplek-wijzigen.test.js": {

@@ -450,7 +450,7 @@
     $('#gateStep').innerHTML = teamBack('tcBack')+
       '<form class="lform" id="codeForm" autocomplete="off">'+
         teamField('tcCode', 'pd.tc.code', 'Code uit uw authenticator of herstelcode', 'text',
-          'inputmode="numeric" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" '+
+          'autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" '+
           'aria-label="'+esc(T('pd.tc.code', 'Code uit uw authenticator of herstelcode'))+'" data-i18n-aria="pd.tc.code" required')+
         '<div class="access-error" id="tcErr" role="alert" data-i18n-ignore></div>'+
         '<button class="access-primary" type="submit">'+teamText('pd.access.codego', 'Bevestig en ga naar mijn werkplek.')+'</button>'+

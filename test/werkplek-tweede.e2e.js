@@ -17,7 +17,9 @@
        sectorwissel die de pagina opnieuw laadt.
 
    Het codeveld is in beide gevallen het veld van de techniekpagina:
-   inputmode numeric, autocomplete one-time-code en een aria-label.
+   autocomplete one-time-code en een aria-label, en GEEN inputmode numeric. Het
+   veld neemt ook een herstelcode, en die bestaat uit letters en cijfers; een
+   cijfertoetsenbord op een telefoon maakt die niet in te typen (herkeuring).
 
    Elke toets met een eigen lid, behalve waar Nora Prins uit de zaaiset (Sal de
    Mar en Vora Beach Club) de gewone weg draagt; de server en de browser worden
@@ -125,7 +127,7 @@ async function codeveldKlopt(page, selector) {
       aria: el.getAttribute('aria-label') };
   }, selector);
   assert.ok(v, selector + ' staat er');
-  assert.equal(v.inputmode, 'numeric');
+  assert.notEqual(v.inputmode, 'numeric', 'een herstelcode bevat letters: geen cijfertoetsenbord');
   assert.equal(v.autocomplete, 'one-time-code');
   assert.ok(v.aria && v.aria.length > 3, 'het veld draagt een aria-label');
 }

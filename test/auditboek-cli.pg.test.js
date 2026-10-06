@@ -86,10 +86,11 @@ test('CLI NEGATIEF: een onbereikbare ankerbestemming geeft exit 2, nooit 0', asy
   db = await maakDb(BRON); t.after(() => db.close());
   maakEnv(t);
   cli('init'); assert.equal(cli('anker').status, 0);
-  fs.chmodSync(dirs[1], 0o000);
-  t.after(() => { try { fs.chmodSync(dirs[1], 0o755); } catch (e) {} });
+  /* Een bestand op de plek van de ankermap: onleesbaar voor ELKE gebruiker, ook root
+     (rechten zeggen hier niets), dus deze toets hoeft zichzelf nooit over te slaan. */
+  fs.rmSync(dirs[1], { recursive: true, force: true });
+  fs.writeFileSync(dirs[1], 'geen map');
   const r = cli('verifieer', '--strikt', '--zonder-regel');
-  if (process.getuid && process.getuid() === 0) return t.skip('root leest elke map; sink-uitval is hier niet na te bootsen met rechten (zie auditboek-pg test 11)');
   assert.equal(r.status, 2, r.ruw); assert.equal(r.j.uitslag, 'niet-vast-te-stellen');
 });
 

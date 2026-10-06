@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-06T15:29:23.859Z",
-    "commit": "d1577121",
+    "op": "2026-10-06T15:38:59.442Z",
+    "commit": "a9778fdd",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -16638,6 +16638,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "werkplek-tweede.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
       "scherp": "gezakt"
     },
     "werkplek-tweede.test.js": {

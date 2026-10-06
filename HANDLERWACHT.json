@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-10-05T09:56:17.642Z",
-  "commit": "c07eea11",
+  "op": "2026-10-05T14:04:08.850Z",
+  "commit": "b71cd833",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 1,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 654,
-  "bewaakt": 560,
+  "zonderBewakerslaag": 655,
+  "bewaakt": 561,
   "openbaarMetReden": 53,
   "eigenControle": 21,
   "sleutelDoorgegeven": 12,
@@ -57,7 +57,7 @@
   },
   {
    "naam": "familieVan",
-   "aantal": 60
+   "aantal": 61
   },
   {
    "naam": "klasVan",
@@ -1282,43 +1282,43 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/afspraak",
-   "bestand": "server/foundation/gasten/gezondheid.js:97",
+   "bestand": "server/foundation/gasten/gezondheid.js:99",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/afspraak/verwijder",
-   "bestand": "server/foundation/gasten/gezondheid.js:109",
+   "bestand": "server/foundation/gasten/gezondheid.js:112",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/medicijn",
-   "bestand": "server/foundation/gasten/gezondheid.js:68",
+   "bestand": "server/foundation/gasten/gezondheid.js:69",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/medicijn/gegeven",
-   "bestand": "server/foundation/gasten/gezondheid.js:85",
+   "bestand": "server/foundation/gasten/gezondheid.js:87",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/medicijn/verwijder",
-   "bestand": "server/foundation/gasten/gezondheid.js:78",
+   "bestand": "server/foundation/gasten/gezondheid.js:80",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/meting",
-   "bestand": "server/foundation/gasten/gezondheid.js:118",
+   "bestand": "server/foundation/gasten/gezondheid.js:121",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/meting/verwijder",
-   "bestand": "server/foundation/gasten/gezondheid.js:132",
+   "bestand": "server/foundation/gasten/gezondheid.js:136",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -1407,13 +1407,13 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/locatie",
-   "bestand": "server/foundation/zorg.js:15",
+   "bestand": "server/foundation/zorg.js:17",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/locatie/stop",
-   "bestand": "server/foundation/zorg.js:36",
+   "bestand": "server/foundation/zorg.js:38",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
@@ -1443,7 +1443,7 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/oppasinfo",
-   "bestand": "server/foundation/zorg.js:65",
+   "bestand": "server/foundation/zorg.js:67",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
@@ -1525,6 +1525,12 @@
    "wacht": "gezinVan"
   },
   {
+   "sleutel": "POST /api/foundation/gezin/toestemming/gezondheid",
+   "bestand": "server/foundation/gezondheidstoestemming.js:52",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
    "sleutel": "POST /api/foundation/gezin/uitnodiging/accepteer",
    "bestand": "server/foundation/gezinsuitnodiging.js:134",
    "staat": "zonderWachtMetReden",
@@ -1598,19 +1604,19 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen",
-   "bestand": "server/foundation/zorg.js:107",
+   "bestand": "server/foundation/zorg.js:118",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/bevestig",
-   "bestand": "server/foundation/zorg.js:114",
+   "bestand": "server/foundation/zorg.js:125",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/intrekken",
-   "bestand": "server/foundation/zorg.js:122",
+   "bestand": "server/foundation/zorg.js:133",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },

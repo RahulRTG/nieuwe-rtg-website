@@ -2555,6 +2555,7 @@
       "server/lib/mutatiecontracten-geldgrens.js",
       "server/lib/mutatiecontracten-gelduit.js",
       "server/lib/mutatiecontracten-gezinsdeur.js",
+      "server/lib/mutatiecontracten-gezinstoken.js",
       "server/lib/mutatiecontracten-hardening-checkpoint.js",
       "server/lib/mutatiecontracten-hindernis.js",
       "server/lib/mutatiecontracten-horeca-correctie.js",
@@ -16471,7 +16472,7 @@
       "behaviourEvidence": {
         "routeCount": 367,
         "mutationRoutes": 339,
-        "declaredMutationSemantics": 135,
+        "declaredMutationSemantics": 138,
         "sourceFileCount": 84,
         "kernelDependencyCount": 90,
         "screenCount": 26,

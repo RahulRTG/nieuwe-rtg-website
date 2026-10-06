@@ -96,6 +96,8 @@ test('echte productieserver: de kantoorcode opent niets, op naam met een passkey
   const stroom = await fetch(base + '/api/office/stream?token=' + oudeCodeSessie, { headers: { 'X-Forwarded-Proto': 'https' } });
   assert.equal(stroom.status, 401, 'ook niet via een query-token');
   await stroom.body?.cancel().catch(() => {});
+  const ruil = await api('/api/stroom/ticket', { stroom: 'kantoor' }, oudeCodeSessie);
+  assert.equal(ruil.status, 401, 'en ook geen stroomticket: de ruil stelt dezelfde vraag als de deur');
 
   // 4. op naam, maar het account heeft geen passkey: dicht met de weg erheen
   const zonder = await api('/api/account/start', { rol: 'kantoor' }, lid);

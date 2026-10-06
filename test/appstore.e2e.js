@@ -15,6 +15,7 @@
    Draait alleen waar Playwright beschikbaar is; anders overgeslagen.
    Draai: npm run e2e */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
   wachtOpTekst } = require('./helper');
@@ -145,7 +146,7 @@ const PROEF_HTML = '<!doctype html><html lang="nl"><head><meta charset="utf-8"><
   '<p id="uit">bezig</p><p id="wie">bezig</p><p id="ouder">bezig</p>' +
   '<script src="app.js"></script></body></html>';
 
-test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', { skip: !pw && 'Playwright niet beschikbaar' }, async () => {
+test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', { skip: vereist('browser', !!pw, 'Playwright niet beschikbaar') }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-e2e-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   const base = srv.base;
@@ -233,7 +234,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
    doorlopen, en een `const` die verderop stond zat op dat moment nog in zijn
    dode zone. Gevolg: de hele afdeling viel stil, de API antwoordde vrolijk 200,
    en geen enkele toets over de lijn merkte iets. */
-test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Playwright niet beschikbaar' }, async () => {
+test('de winkel en het uitgeversbureau openen zonder fouten', { skip: vereist('browser', !!pw, 'Playwright niet beschikbaar') }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-ui-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   const base = srv.base;
@@ -382,7 +383,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
    omdat de fout die je hier zoekt alleen in een venster bestaat -- een bon die
    niet optelt op het scherm, een knop die twee keer boekt, een keuringspagina
    die zonder naam toch doorgaat. */
-test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwright niet beschikbaar' }, async () => {
+test('de bon, de koop en de keuringskant in een browser', { skip: vereist('browser', !!pw, 'Playwright niet beschikbaar') }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-geld-e2e-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   const base = srv.base;

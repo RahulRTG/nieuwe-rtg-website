@@ -52,7 +52,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { execFileSync } = require('node:child_process');
+const procinfo = require('./procinfo');
 
 const ROOT = path.join(__dirname, '..', '..');
 /* Het pad is te verleggen, en niet voor productie -- daar is het altijd
@@ -71,24 +71,10 @@ const TERMINAAL = ['PASSED', 'FAILED', 'ABORTED'];
    afleiding als scripts/afbouw-slot.js -- veld 22 geteld NA de ")", want de
    procesnaam zelf kan spaties en haakjes bevatten. */
 function procesStart(pid) {
-  try {
-    const stat = fs.readFileSync('/proc/' + pid + '/stat', 'utf8');
-    const na = stat.slice(stat.lastIndexOf(')') + 2).split(' ');
-    return Number(na[19]) || null;
-  } catch (e) {
-    /* macOS heeft geen /proc. `ps lstart` is daar de stabiele identiteit van
-       dezelfde procesinstantie (op seconden nauwkeurig), in tegenstelling tot
-       alleen een PID. Daarmee blijft PID-hergebruik ook op ontwikkel-Macs
-       veilig; `null` is alleen nog de fail-closed uitkomst wanneer het platform
-       werkelijk geen starttijd kan leveren. */
-    try {
-      const begin = execFileSync('ps', ['-o', 'lstart=', '-p', String(pid)], {
-        encoding: 'utf8', env: Object.assign({}, process.env, { LC_ALL: 'C' })
-      }).trim();
-      const tijd = Date.parse(begin);
-      return Number.isFinite(tijd) ? tijd : null;
-    } catch (geenPs) { return null; }
-  }
+  /* /proc op Linux, `ps lstart` op macOS (op seconden nauwkeurig), en null als
+     het platform werkelijk geen starttijd levert -- de fail-closed uitkomst.
+     De lezing zelf staat in ./procinfo.js, op een plek voor alle scripts. */
+  return procinfo.procesStart(pid);
 }
 /* EEN ZOMBIE IS GEEN LEVEND WERK, en dat onderscheid is hier niet academisch.
 
@@ -107,19 +93,11 @@ function procesStart(pid) {
 function procesLeeft(pid) {
   if (!Number.isSafeInteger(pid) || pid < 2) return false;
   try { process.kill(pid, 0); } catch (e) { return e.code === 'EPERM'; }
-  try {
-    const stat = fs.readFileSync('/proc/' + pid + '/stat', 'utf8');
-    const na = stat.slice(stat.lastIndexOf(')') + 2).split(' ');
-    if (na[0] === 'Z') return false;          // defunct: adresseerbaar, maar houdt niets meer vast
-  } catch (e) {
-    /* macOS heeft geen /proc, maar ps onderscheidt daar dezelfde zombie. Zonder
-       deze tweede lezing bleef een door de proef geveld kind vijf seconden
-       schijnbaar leven omdat zijn ouder hem nog niet had geoogst. */
-    try {
-      const stand = execFileSync('ps', ['-o', 'stat=', '-p', String(pid)], { encoding: 'utf8' }).trim();
-      if (/^Z/.test(stand)) return false;
-    } catch (geenPs) { /* voorzichtig: als ook ps niets zegt, telt het PID als levend */ }
-  }
+  /* Op Linux uit /proc, op macOS uit `ps stat` (./procinfo.js): zonder die
+     tweede lezing bleef een door de proef geveld kind vijf seconden schijnbaar
+     leven omdat zijn ouder hem nog niet had geoogst. Zegt geen van beide iets
+     (null), dan telt het PID voorzichtig als levend. */
+  if (procinfo.isZombie(pid) === true) return false;   // defunct: adresseerbaar, maar houdt niets meer vast
   return true;
 }
 /* LEEFT DIT NOG, EN IS HET NOG HETZELFDE? Een PID dat leeft maar een andere
@@ -141,15 +119,11 @@ const merk = (pid) => ({ pid: Number(pid), start: procesStart(Number(pid)) });
 
    Dit is met opzet GEEN omgevingsvlag: een vlag kan iedereen zetten, en dan
    verdwijnt de bescherming tegen een echte tweede ronde. Hier wordt de
-   OUDERKETEN gelopen (veld 4 van /proc/<pid>/stat) en moet de wortel van de
-   ronde daarin staan met dezelfde starttijd. Zonder /proc is het antwoord nee:
-   dan blijft de oude, strenge uitslag staan. */
-function ouderVan(pid) {
-  try {
-    const stat = fs.readFileSync('/proc/' + pid + '/stat', 'utf8');
-    return Number(stat.slice(stat.lastIndexOf(')') + 2).split(' ')[1]) || 0;
-  } catch (e) { return 0; }
-}
+   OUDERKETEN gelopen (veld 4 van /proc/<pid>/stat, of `ps ppid` waar /proc
+   niet bestaat; ./procinfo.js) en moet de wortel van de ronde daarin staan met
+   dezelfde starttijd. Is de ouder op geen van beide manieren te lezen, dan is
+   het antwoord nee: dan blijft de oude, strenge uitslag staan. */
+function ouderVan(pid) { return procinfo.ouderVan(pid); }
 function eigenLijn(afloop, vanaf = process.pid) {
   const w = afloop && afloop.wortel;
   if (!w || !zelfdeProces(w)) return false;
@@ -167,17 +141,7 @@ function eigenLijn(afloop, vanaf = process.pid) {
    start die een werker start is drie diep. */
 function kringVan(wortel, gezien = new Set()) {
   const uit = [];
-  let kinderen = [], viaProc = true;
-  try {
-    kinderen = fs.readFileSync('/proc/' + wortel + '/task/' + wortel + '/children', 'utf8')
-      .trim().split(/\s+/).filter(Boolean).map(Number);
-  } catch (e) {
-    viaProc = false;
-    try {
-      kinderen = execFileSync('pgrep', ['-P', String(wortel)], { encoding: 'utf8' })
-        .trim().split(/\s+/).filter(Boolean).map(Number);
-    } catch (geenKinderen) { kinderen = []; }
-  }
+  const { pids: kinderen, viaProc } = procinfo.kinderen(wortel);
   for (const k of kinderen) {
     if (gezien.has(k)) continue;
     gezien.add(k);
@@ -330,13 +294,8 @@ function eigenVoorouder(pid) {
   while (ouder > 1 && !gezien.has(ouder)) {
     if (ouder === pid) return true;
     gezien.add(ouder);
-    try {
-      const stat = fs.readFileSync('/proc/' + ouder + '/stat', 'utf8');
-      ouder = Number(stat.slice(stat.lastIndexOf(')') + 2).split(' ')[1]);
-    } catch (e) {
-      try { ouder = Number(execFileSync('ps', ['-o', 'ppid=', '-p', String(ouder)], { encoding: 'utf8' }).trim()); }
-      catch (geenOuder) { return false; }
-    }
+    ouder = procinfo.ouderVan(ouder);
+    if (!ouder) return false;
   }
   return false;
 }

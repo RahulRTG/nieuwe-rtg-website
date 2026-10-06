@@ -89,6 +89,11 @@ jobs:
       - name: Volledige software-afbouw
         run: npm run afbouw:software
         env:
+          # RTG_EIS_INFRA=alles (test/infra.js): deze runner levert PostgreSQL, Redis,
+          # redis-server, xmllint, openssl, /proc, ps en Chromium, en de Rust-binaries
+          # komen uit het image (kwalificatie --uit-image). Een toets die daar toch
+          # een ontbrekende soort vindt, ZAKT -- een release telt geen skip als groen.
+          RTG_EIS_INFRA: alles
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
           REDIS_URL: redis://localhost:6379
           RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef

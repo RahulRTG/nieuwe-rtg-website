@@ -97,7 +97,7 @@
      server doet dat op /api/stream bewust zo. */
   function live() {
     if (!w.EventSource || ES) return;
-    try { ES = new EventSource('/api/stream?token=' + encodeURIComponent(w.Geld.token() || '')); }
+    try { ES = RTGStroom.open('/api/stream', { token: w.Geld.token() || '' }); }
     catch (e) { return; }
     ES.addEventListener('sync', function (e) {
       var scope = null;

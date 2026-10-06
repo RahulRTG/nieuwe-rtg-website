@@ -43,7 +43,8 @@ module.exports = (kern) => {
 
   function gebruikerUit(req) {
     const auth = req.get('authorization') || '';
-    const token = auth.replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
+    // nooit uit het adres: een sessie in een URL belandt in logs en geschiedenis
+    const token = auth.replace(/^Bearer\s+/i, '') || (req.body && req.body.token);
     return token ? accounts.verifyToken(token) : null;
   }
   function techAuth(req, res, next) {

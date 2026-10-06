@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
 <script src="/shared/id.js"></script>
+<script src="/shared/stroom.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mijn Stad</title>
@@ -140,7 +141,7 @@ function render(){
 let ES = null, EST = null;
 function live(){
   if (!window.EventSource || ES || !TOKEN) return;
-  try { ES = new EventSource('/api/stream?token=' + encodeURIComponent(TOKEN)); } catch (e) { return; }
+  try { ES = RTGStroom.open('/api/stream', { token: TOKEN }); } catch (e) { return; }
   ES.addEventListener('sync', e => {
     let scope = null; try { scope = JSON.parse(e.data).scope; } catch (x) {}
     if (scope !== 'stad' || !B) return;

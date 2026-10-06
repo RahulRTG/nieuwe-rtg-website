@@ -88,18 +88,18 @@ const UITZONDERINGEN = new Map([
     'de inlog zelf: deze route MAAKT de kantoorsessie, dus kan hij hem niet eisen. ' +
     'Begrensd met de gedeelde snelheidsrem op mislukte pogingen'],
   ['GET /api/office/doc',
-    'querytoken: een downloadlink draagt geen Authorization-kop. De handler doet ' +
-    'officeQueryMag(req.query.token) en geeft anders 401 (routes/office/werk.js)'],
+    'de scan komt met fetch en de Authorization-kop (geen token in het adres meer). De handler ' +
+    'doet zelf officeQueryMag/officeQueryOpNaam op de kop en geeft anders 401/403 (routes/office/werk.js)'],
   ['GET /api/office/stream',
-    'querytoken: EventSource kan geen Authorization-kop meesturen. Zelfde ' +
-    'officeQueryMag-controle in de handler (routes/office/toegang.js)'],
+    'EventSource kan geen Authorization-kop meesturen; de handler opent met een eenmalig ' +
+    'stroomticket (kern/sessiestroom.js) en doet daarna officeQueryMag (routes/office/toegang.js)'],
   ['POST /api/supplier/login',
     'de inlog zelf: deze route MAAKT de zaak-sessie, dus kan hij hem niet eisen'],
   ['POST /api/supplier/mijn/login',
     'de personeelsinlog op een gedeeld apparaat (naam plus pincode); ook deze route ' +
     'maakt de sessie die hij anders zou moeten eisen'],
   ['GET /api/supplier/stream',
-    'EventSource kan geen Authorization-kop meesturen; zelfde querytoken-vorm als de ' +
+    'EventSource kan geen Authorization-kop meesturen; zelfde stroomticket-vorm als de ' +
     'office-stream hierboven'],
   ['POST /api/supplier/apply',
     'solliciteren bij een zaak kan per definitie niet achter de inlog van die ' +

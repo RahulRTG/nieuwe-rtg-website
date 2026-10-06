@@ -15,6 +15,7 @@
    hebben. Draai ze daarom serieel via `npm run test:pg` (of geef elke toets een
    eigen database). */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 
 /* Alleen DATABASE_URL is nodig. De oude poort stond ook op het NPM-pakket 'pg'
@@ -24,7 +25,7 @@ const assert = require('node:assert/strict');
 const URL = process.env.DATABASE_URL || process.env.PG_URL;
 
 if (!URL) {
-  test('postgres-opslag (overgeslagen: geen DATABASE_URL)', { skip: true }, () => {});
+  test('postgres-opslag (overgeslagen: geen DATABASE_URL)', { skip: vereist('pg', false, 'geen DATABASE_URL') }, () => {});
 } else {
   const { merge3 } = require('../server/db');
   const { maakPg } = require('../server/pg');

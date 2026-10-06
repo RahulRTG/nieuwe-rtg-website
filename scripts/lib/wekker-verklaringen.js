@@ -92,6 +92,10 @@ module.exports = [
      (AUTHORITY.md fase 3). Hij begint ALLEEN binnen een open verzoek naar
      /api/supplier/stream en stopt bij `close` -- geen werk dat vanzelf terugkomt,
      maar een verbinding die open wordt gehouden voor wie hem zelf opende. */
+  /* De levensteken-ping van de ledenstroom /api/stream, met de deur uit
+     server/server.js naar server/opzet/stroomtoegang.js verhuisd (6 oktober
+     2026, stroomtickets). Zelfde vorm als die van de leveranciersstroom. */
+  { bestand: 'server/opzet/stroomtoegang.js', reden: 'de keep-alive-ping van een open ledenstroom: hij start binnen het verzoek van wie de stroom met een ticket opent, stopt bij het sluiten, en begint zelf geen werk' },
   { bestand: 'server/routes/supplier/stroom.js', reden: 'de keep-alive-ping van een open leveranciersstroom: hij start binnen het verzoek van wie de stroom opent, stopt bij het sluiten, en de stroom zelf wordt per bericht gekeurd (kern/sse.js geldig())' },
   { bestand: 'server/kern/sse.js', reden: 'de afleverlaag van realtime-berichten. Staat de functie kern-live uit, dan komt er geen verbinding tot stand en heeft deze abonnee niemand om aan te leveren -- hij begint zelf geen werk' },
 

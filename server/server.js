@@ -1022,46 +1022,11 @@ function leesUploadDataUrl(fname) {
 
 
 
-/* Live-verbinding. EventSource kan geen Authorization-header sturen, dus het
-   token gaat als query-parameter. */
-app.get('/api/stream', (req, res) => {
-  const token = req.query.token;
-  const sess = resolveSession(token);
-  if (!sess) return res.status(401).end();
-  const isolatieRealtime = require('./middleware/isolatiepoort-realtime');
-  const bewaakt = isolatieRealtime.registreer({ res, token, sessie: sess });
-  if (!bewaakt.toegestaan) return res.status(bewaakt.status || 503).json(bewaakt.antwoord);
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache, no-transform',
-    'Connection': 'keep-alive'
-  });
-  /* Open de SSE-handshake nu. De PostgreSQL-antwoordgrens buffert gewone
-     antwoorden tot COMMIT; voor deze read-only stroom is flushHeaders het
-     expliciete teken dat de stream veilig mag beginnen. */
-  if (typeof res.flushHeaders === 'function') res.flushHeaders();
-  res.write('retry: 3000\n\n');
-  const client = { tier: sess.tier, key: sess.key, res };
-  sseClients.push(client);
-  // gemiste persoonlijke events opnieuw afspelen (na een korte verbroken verbinding)
-  const sinds = Number(req.headers['last-event-id'] || req.query.since || 0);
-  if (sinds) speelOpnieuw(res, sess.key, sinds);
-  // onopgehaalde notificaties meteen meesturen -- uit dezelfde twee bakken als
-  // /api/notifications hieronder, anders mist de handshake juist de
-  // persoonlijke berichten
-  const unread = meldingenVan(sess).filter(n => !n.read);
-  sseSend(res, 'hello', { unread });
-  const ping = setInterval(() => {
-    if (!isolatieRealtime.magSchrijven(res)) return clearInterval(ping);
-    res.write(': ping\n\n');
-  }, 25000);
-  req.on('close', () => {
-    clearInterval(ping);
-    isolatieRealtime.vergeet(res);
-    const i = sseClients.indexOf(client);
-    if (i >= 0) sseClients.splice(i, 1);
-  });
-});
+/* Live-verbinding en de ruil van sessie naar stroomticket: ./opzet/stroomtoegang.js.
+   Een sessie staat nooit meer in een adres; meldingenVan komt hieronder pas
+   tot stand en wordt dus pas bij een verzoek gelezen. */
+const { sessiestroom } = require('./opzet/stroomtoegang')({ app, db, crypto, bewerkCollectie, accounts,
+  resolveSession, sseClients, sseSend, speelOpnieuw, meldingenVan: sess => meldingenVan(sess) });
 
 /* Welke bakken een lid ziet en afvinkt: ./opzet/meldingenlezen.js. */
 const { meldingenVan, markeerGelezen } = require('./opzet/meldingenlezen').maakMeldingenLezer((naam) => db.data.notifications[naam]);
@@ -2216,7 +2181,7 @@ const kern = {
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
   securityLogKeten, handelingsspoor, ankerdienst, ankerpost,
-  zorgContact, klantSalon, salonClaimcode, afhaalcode, tickettoegang,
+  zorgContact, klantSalon, salonClaimcode, afhaalcode, tickettoegang, sessiestroom,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,
   stemmingVoor: stemming.stemmingVoor,

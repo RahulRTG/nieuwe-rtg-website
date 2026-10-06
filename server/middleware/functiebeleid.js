@@ -33,7 +33,7 @@ module.exports = ({ db, accounts, functies, sessionFor, findSupplier, bevoegdVan
     if (bevoegd) {
       const f = functies.functieVoorPad(p);
       if (f && f.vermogen) {
-        const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
+        const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token);
         let gebruiker = null, tier = null, sessie = null;
         try { if (tok) gebruiker = accounts.verifyToken(tok); } catch (e) {}
         /* De sessie ALTIJD ophalen, niet alleen als het accounttoken faalt:
@@ -99,7 +99,7 @@ module.exports = ({ db, accounts, functies, sessionFor, findSupplier, bevoegdVan
     // De doelgroep van dit verzoek: uit het pad (leverancier/personeel/intern/
     // foundation) of uit de pas van het ingelogde lid (RTG/Lifestyle/Business).
     let user = null, sessieTier = null, zaakGenre = null;
-    const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
+    const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token);
     try { if (tok) user = accounts.verifyToken(tok); } catch (e) {}
     // geen accounttoken? dan kan het een sessietoken zijn: een gast (de gratis
     // app) of een demo-pas; zo kan de boardroom ook de gratis app besturen

@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, keurLidGoed } = require('./helper');
+const { startServer, keurLidGoed, stroomAdres } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-spellen-'));
@@ -364,7 +364,7 @@ test('online: een vriend verschijnt als zijn stream opengaat en verdwijnt als hi
   assert.deepEqual(leeg.online, [], 'niemand verbonden, dus niemand aanwezig');
   assert.equal(leeg.aantal, 0);
 
-  const stroom = await opentStream(BASE + '/api/stream?token=' + encodeURIComponent(b.tok));
+  const stroom = await opentStream(await stroomAdres(BASE, '/api/stream', b.tok));
   try {
     const erbij = await json(await raw('/member/spel/online', {}, a.tok));
     assert.equal(erbij.aantal, 1, 'de vriend met een open stream is aanwezig');
@@ -392,7 +392,7 @@ test('online: de vriendenkring komt van de server, niet uit het verzoek', async 
      niemand verbonden is -- dat bewijst zijn eigen vriend hieronder. */
   const { a } = await tweeVrienden();
   const { a: vriendVanVreemde, b: vreemde } = await tweeVrienden();
-  const stroom = await opentStream(BASE + '/api/stream?token=' + encodeURIComponent(vreemde.tok));
+  const stroom = await opentStream(await stroomAdres(BASE, '/api/stream', vreemde.tok));
   try {
     const bewijs = await json(await raw('/member/spel/online', {}, vriendVanVreemde.tok));
     assert.equal(bewijs.aantal, 1, 'de vreemde staat echt open (anders toetst het onderstaande niets)');

@@ -322,6 +322,10 @@ jobs:
           # over en draait in een eigen stille stap hieronder, waar hij WEL iets
           # bewijst. Overslaan is dus geen verzwakking maar een verhuizing.
           RTG_SNELLE_TOETS: '1'
+          # RTG_EIS_INFRA (test/infra.js): wat deze job installeert, EIST hij ook. Ontbreekt
+          # het toch, dan zakt de toets in plaats van zich stil over te slaan -- een
+          # overgeslagen toets telt in CI niet als geslaagd.
+          RTG_EIS_INFRA: redis-server,xmllint,openssl,proc,ps
       - name: De dekking van deze scherf bewaren
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -417,6 +421,10 @@ jobs:
           exit "$uitslag"
         env:
           RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
+          # RTG_EIS_INFRA (test/infra.js): wat deze job installeert, EIST hij ook. Ontbreekt
+          # het toch, dan zakt de toets in plaats van zich stil over te slaan -- een
+          # overgeslagen toets telt in CI niet als geslaagd.
+          RTG_EIS_INFRA: openssl,proc,ps
       - name: De dekking van deze ijking bewaren
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -485,6 +493,11 @@ jobs:
           npm run test:deel -- --bestanden=${{ matrix.zwaar }}.test.js --zonder-ijkingen 2>&1 | tee /tmp/zwaar.log || uitslag=$?
           if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/zwaar.log; fi
           exit "$uitslag"
+        env:
+          # RTG_EIS_INFRA (test/infra.js): wat deze job installeert, EIST hij ook. Ontbreekt
+          # het toch, dan zakt de toets in plaats van zich stil over te slaan -- een
+          # overgeslagen toets telt in CI niet als geslaagd.
+          RTG_EIS_INFRA: openssl,proc,ps
       - name: De duurmeting van deze toets bewaren
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -652,6 +665,10 @@ jobs:
           export RTG_TOETSBRON="$(node -p 'require("./scripts/lib/meetbron").bron()')"
           node scripts/pgtoetsen.js
         env:
+          # RTG_EIS_INFRA (test/infra.js): wat deze job installeert, EIST hij ook. Ontbreekt
+          # het toch, dan zakt de toets in plaats van zich stil over te slaan -- een
+          # overgeslagen toets telt in CI niet als geslaagd.
+          RTG_EIS_INFRA: pg,redis
           REDIS_URL: redis://localhost:6379
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
           RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
@@ -736,6 +753,10 @@ jobs:
         run: npm run evidence:run -- --plan=.evidence/plan.json --kind=unit
         env:
           RTG_E2E_STRICT: '1'
+          # RTG_EIS_INFRA (test/infra.js): wat deze job installeert, EIST hij ook. Ontbreekt
+          # het toch, dan zakt de toets in plaats van zich stil over te slaan -- een
+          # overgeslagen toets telt in CI niet als geslaagd.
+          RTG_EIS_INFRA: redis-server,xmllint,openssl,proc,ps
           RTG_SNELLE_TOETS: '1'
 
   incremental-browser:
@@ -799,6 +820,10 @@ jobs:
         run: npm run evidence:run -- --plan=.evidence/plan.json --kind=e2e
         env:
           RTG_E2E_STRICT: '1'
+          # RTG_EIS_INFRA (test/infra.js): wat deze job installeert, EIST hij ook. Ontbreekt
+          # het toch, dan zakt de toets in plaats van zich stil over te slaan -- een
+          # overgeslagen toets telt in CI niet als geslaagd.
+          RTG_EIS_INFRA: browser,redis-server,xmllint,openssl,proc,ps
           RTG_SNELLE_TOETS: '1'
       - name: Chromium-cache uitsluitend vanaf de vertrouwde hoofdlijn bewaren
         if: success() && steps.browser-cache.outputs.cache-hit != 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -1317,6 +1342,10 @@ jobs:
           exit "$uitslag"
         env:
           RTG_E2E_STRICT: '1'
+          # RTG_EIS_INFRA (test/infra.js): wat deze job installeert, EIST hij ook. Ontbreekt
+          # het toch, dan zakt de toets in plaats van zich stil over te slaan -- een
+          # overgeslagen toets telt in CI niet als geslaagd.
+          RTG_EIS_INFRA: browser
       # Elk deel schrijft alleen zijn eigen kwart van het schermjournaal. Een
       # kwart op zichzelf beoordelen zou alle toetsen uit de andere drie delen
       # ten onrechte als ontbrekend aanmerken. Bewaar de vier delen daarom met

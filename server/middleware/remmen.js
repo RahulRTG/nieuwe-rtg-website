@@ -71,7 +71,9 @@ function hoofdzekering({ db, accounts, eigenaar }) {
     const p = req.path;
     if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
     try {
-      const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || req.query.token;
+      /* Alleen uit de kop: een sessie in het adres wordt nergens meer aangenomen
+         (een live-stroom opent met een stroomticket, kern/sessiestroom.js). */
+      const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '');
       const u = tok ? accounts.verifyToken(tok) : null;
       if (eigenaar.isEigenaar(accounts, u)) return next(); // de eigenaar mag er wel bij
     } catch (e) {}

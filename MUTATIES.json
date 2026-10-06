@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-06T07:59:14.353Z",
-    "commit": "43c42fc8",
+    "op": "2026-10-06T15:29:23.859Z",
+    "commit": "d1577121",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -176,6 +176,13 @@
       "geprobeerd": 1
     },
     "actietoken-sessiegrens.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "actietoken-uitgezet.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
@@ -6105,6 +6112,13 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "inlogpauze-spelling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "inlogrem.test.js": {
       "soort": "server",
@@ -16624,6 +16638,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "werkplek-tweede.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 13,
       "scherp": "gezakt"
     },
     "werkplek-wijzigen.test.js": {

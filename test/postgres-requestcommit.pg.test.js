@@ -4,6 +4,7 @@
    retryen. */
 'use strict';
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const web = require('../server/web');
 const context = require('../server/db/verzoekcontext');
@@ -13,7 +14,7 @@ const { merge3 } = require('../server/db/merge');
 const kluis = require('../server/kluis');
 
 const URL = process.env.DATABASE_URL || process.env.PG_URL;
-const OVERSLAAN = URL ? false : 'DATABASE_URL ontbreekt; deze proef vereist echte PostgreSQL';
+const OVERSLAAN = vereist('pg', !!URL, 'DATABASE_URL ontbreekt; deze proef vereist echte PostgreSQL');
 const wacht = ms => new Promise(r => setTimeout(r, ms));
 function begrens(belofte, naam, ms = 5000) {
   let timer;

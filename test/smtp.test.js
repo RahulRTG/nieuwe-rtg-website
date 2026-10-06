@@ -11,6 +11,7 @@
    certificaat normaal, dus in de TLS-tests zetten we tijdelijk
    NODE_TLS_REJECT_UNAUTHORIZED uit (alleen om dit wegwerpcert te accepteren). */
 const { test } = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const net = require('node:net');
 const tls = require('node:tls');
@@ -169,7 +170,7 @@ test('ook smarthost-post kan door RTG zelf met DKIM worden ondertekend', () => {
   assert.equal(dkim.controleer({ koppen, lijf, veld:koppen['DKIM-Signature'], publiekeSleutel:paar.publiek }).ok, true);
 });
 
-test('STARTTLS: de client schakelt over en doet AUTH LOGIN pas daarna', { skip: !TLS_OK }, async () => {
+test('STARTTLS: de client schakelt over en doet AUTH LOGIN pas daarna', { skip: vereist('openssl', TLS_OK, 'openssl kon geen certificaat maken') }, async () => {
   const oud = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   let s;
@@ -189,7 +190,7 @@ test('STARTTLS: de client schakelt over en doet AUTH LOGIN pas daarna', { skip: 
   }
 });
 
-test('implicit TLS (smtps://) met AUTH PLAIN', { skip: !TLS_OK }, async () => {
+test('implicit TLS (smtps://) met AUTH PLAIN', { skip: vereist('openssl', TLS_OK, 'openssl kon geen certificaat maken') }, async () => {
   const oud = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   let s;

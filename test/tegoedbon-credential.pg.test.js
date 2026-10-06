@@ -18,11 +18,12 @@
    escrow" (kreeg 2). Teruggedraaid, daarna groen. */
 'use strict';
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 
 const URL = process.env.DATABASE_URL || process.env.PG_URL;
-const OVERSLAAN = URL ? false : 'DATABASE_URL ontbreekt; deze proef vereist een echte PostgreSQL';
+const OVERSLAAN = vereist('pg', !!URL, 'DATABASE_URL ontbreekt; deze proef vereist een echte PostgreSQL');
 
 test('tegoedbon: claim en escrowboeking zijn atomair over twee PostgreSQL-instances en crash/hervat',
   { skip: OVERSLAAN, timeout: 120000 }, async () => {

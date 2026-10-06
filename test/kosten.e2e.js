@@ -26,13 +26,14 @@
    Draait alleen waar Playwright beschikbaar is; anders overgeslagen.
    Draai: npm run e2e */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten, kantoorAlsPersoon } = require('./helper');
 const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
 test('het kostenbord: laadt, toont het voorbehoud, en zet een tarief',
-  { skip: !pw && 'Playwright niet beschikbaar' }, async () => {
+  { skip: vereist('browser', !!pw, 'Playwright niet beschikbaar') }, async () => {
   const srv = await startServer();
   const base = srv.base;
   let browser = null;
@@ -109,7 +110,7 @@ test('het kostenbord: laadt, toont het voorbehoud, en zet een tarief',
   }
 });
 
-test('het kostenbord is vanuit de boardroom te bereiken', { skip: !pw && 'Playwright niet beschikbaar' }, async () => {
+test('het kostenbord is vanuit de boardroom te bereiken', { skip: vereist('browser', !!pw, 'Playwright niet beschikbaar') }, async () => {
   const srv = await startServer();
   const base = srv.base;
   let browser = null;

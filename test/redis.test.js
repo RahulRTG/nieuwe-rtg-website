@@ -5,12 +5,16 @@
    wireprotocol echt klopt. Zonder redis-server worden de tests overgeslagen.
    Los: node --test test/redis.test.js */
 const { test, before, after } = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert');
 const net = require('node:net');
 const { spawnSync, spawn } = require('node:child_process');
 const eigen = require('../server/redis');
 
 const HEEFT_REDIS = spawnSync('sh', ['-c', 'command -v redis-server']).status === 0;
+/* Onder RTG_EIS_INFRA=redis-server (CI installeert hem) zakt dit bestand als hij
+   ontbreekt, in plaats van drie toetsen stil over te slaan (test/infra.js). */
+const OVERSLAAN = vereist('redis-server', HEEFT_REDIS, 'redis-server is niet geinstalleerd');
 const wacht = ms => new Promise(r => setTimeout(r, ms));
 function vrijePoort() {
   return new Promise(res => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); }); });
@@ -134,7 +138,7 @@ async function sluit(clients) {
   }
 }
 
-test('set/get gaan over de eigen client', { skip: !HEEFT_REDIS }, async () => {
+test('set/get gaan over de eigen client', { skip: OVERSLAAN }, async () => {
   const c = eigen.createClient({ url: URL }); c.on('error', () => {});
   try {
     await metDeadline(c.connect(), 8000, 'connect');
@@ -155,7 +159,7 @@ test('set/get gaan over de eigen client', { skip: !HEEFT_REDIS }, async () => {
   } finally { await c.quit().catch(() => c.disconnect()); }
 });
 
-test('publish/subscribe binnen de eigen client', { skip: !HEEFT_REDIS }, async () => {
+test('publish/subscribe binnen de eigen client', { skip: OVERSLAAN }, async () => {
   const sub = eigen.createClient({ url: URL }); sub.on('error', () => {});
   const pub = eigen.createClient({ url: URL }); pub.on('error', () => {});
   try {
@@ -178,7 +182,7 @@ test('publish/subscribe binnen de eigen client', { skip: !HEEFT_REDIS }, async (
   } finally { await sluit([sub, pub]); }
 });
 
-test('kruisvalidatie met redis-cli: beide kanten op', { skip: !HEEFT_REDIS }, async () => {
+test('kruisvalidatie met redis-cli: beide kanten op', { skip: OVERSLAAN }, async () => {
   // Een ontbrekende scheidsrechter mag nooit een lege PASS opleveren.
   assert.strictEqual(spawnSync('sh', ['-c', 'command -v redis-cli']).status, 0,
     'redis-cli is vereist voor onafhankelijke protocolvalidatie');

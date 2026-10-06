@@ -17,11 +17,12 @@
 'use strict';
 
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 
 const PG_URL = process.env.DATABASE_URL || process.env.PG_URL;
-const OVERSLAAN = PG_URL ? false : 'vereist een echte DATABASE_URL voor twee onafhankelijke instances';
+const OVERSLAAN = vereist('pg', !!PG_URL, 'vereist een echte DATABASE_URL voor twee onafhankelijke instances');
 
 test('de herstelsleutel is hash-only, trekt atomair in bij heruitgifte en claimt een keer over twee instances',
   { skip: OVERSLAAN, timeout: 120000 }, async () => {

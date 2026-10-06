@@ -26,6 +26,7 @@
    ========================================================================== */
 /* LET OP -- deze toets vraagt de database VOOR ZICHZELF (zie leden-gids-pg). */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
@@ -33,7 +34,7 @@ const path = require('path');
 const { startServer, stop } = require('./helper');
 
 const HEEFT_PG = !!(process.env.DATABASE_URL || process.env.PG_URL);
-const OVERSLAAN = HEEFT_PG ? false : 'geen DATABASE_URL: de snapshot-rem bestaat alleen in de Postgres-stand';
+const OVERSLAAN = vereist('pg', !!HEEFT_PG, 'geen DATABASE_URL: de snapshot-rem bestaat alleen in de Postgres-stand');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };

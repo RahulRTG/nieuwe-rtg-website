@@ -243,16 +243,23 @@ test('een oude tranche kan alleen met een numeriek voldoende, gedateerde aflossi
   });
 });
 
-test('een verlopen prestatiemeter wordt onder prestatie gevonden en niet als verdwenen gemeld', () => {
+test('een verlopen schuld op een PRESTATIEmeter wordt in norm.prestatie gezocht, niet als verdwenen gemeld', () => {
   metRepo(h => {
-    const n = grond({ prestatie: { p99Ms: 233 }, notities: [{ datum: '2026-05-01', meter: 'p99Ms 144 -> 233',
-      reden: 'storm', soort: 'schuld', sleutel: 'p99Ms', van: 144, vervalt: '2026-07-01' }] });
-    h.schrijfNorm(n); h.git('add', '-A'); h.git('commit', '-qm', 'prestatiemeter');
+    const schuld = (p99) => grond({
+      prestatie: { p99Ms: p99 },
+      notities: [{ datum: '2026-05-01', meter: 'p99Ms 144 -> 233', reden: 'samenvoeging', soort: 'schuld',
+        sleutel: 'p99Ms', van: 144, vervalt: '2026-07-01' }]
+    });
+    h.schrijfNorm(schuld(233));
+    h.git('add', '-A'); h.git('commit', '-qm', 'met prestatieschuld');
     const basis = h.git('rev-parse', 'HEAD').trim();
-    const r = h.draai('2026-08-01', '--basis', basis);
-    assert.equal(r.code, 1, r.uit);
-    assert.match(r.uit, /staat op 233 en hoort terug naar 144/);
-    assert.doesNotMatch(r.uit, /meter staat niet meer/);
+    const na = h.draai('2026-08-01', '--basis', basis);
+    assert.equal(na.code, 1, na.uit);
+    assert.doesNotMatch(na.uit, /staat niet meer in NORM/, 'de meter staat er wel: in prestatie');
+    assert.match(na.uit, /staat op 233 en hoort terug naar 144/);
+    h.schrijfNorm(schuld(140));
+    const betaald = h.draai('2026-08-01', '--basis', basis);
+    assert.match(betaald.uit, /afbetaald/, betaald.uit);
   });
 });
 

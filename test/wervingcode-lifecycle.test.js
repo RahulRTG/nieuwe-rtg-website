@@ -194,6 +194,49 @@ test('intrekken en roteren maken oude codes server-side nutteloos', async () => 
   assert.equal(await s.api.zoekInvite(rotatie.kassacode), null);
 });
 
+/* Roteren van een uitnodiging is VERNIEUWEN (kern/bearercode-keten.js): de
+   manager krijgt een nieuwe code met weer dertig dagen en een verse claim, de
+   oude opent niets meer, het volgnummer gaat een omhoog en de geschiedenis
+   zegt `vernieuwd` -- ook voor een v1-rij van voor bearercode v2. */
+test('roteren is vernieuwen: nieuwe termijn, oude dicht, rotatie +1, soort vernieuwd', async () => {
+  const s = opstelling();
+  const DAG = 86400000;
+  const eerste = await s.api.maakInvite(zaak, manager, { naam: 'Iris', role: 'staff', func: 'Bar', idem: 'vernieuw' });
+  const rij = () => s.collecties.staffInvites.ZAAK.find(x => x.id === eerste.id);
+  const oud = rij().toegang;
+  assert.equal(oud.contractversie, 2, 'de uitgifte is bearercode v2');
+  assert.equal(oud.gebruiksvorm, 'teller');
+  assert.equal(oud.max_gebruik, 1);
+  assert.equal(Date.parse(oud.expires_at) - Date.parse(oud.issued_at), 30 * DAG);
+  const nieuw = await s.api.roteerInvite('ZAAK', eerste.id, 'Tweede Manager', 'vernieuw-een');
+  assert.equal(nieuw.ok, true);
+  const t = rij().toegang;
+  assert.equal(await s.api.zoekInvite(eerste.kassacode), null, 'de oude code opent nog iets');
+  assert.ok(await s.api.zoekInvite(nieuw.kassacode), 'de nieuwe code opent niets');
+  assert.equal(oud.intrekreden, 'vernieuwd');
+  assert.equal(t.rotatie, oud.rotatie + 1);
+  assert.equal(t.geschiedenis.at(-1).soort, 'vernieuwd');
+  assert.equal(t.geschiedenis.at(-1).door, 'Tweede Manager');
+  assert.equal(t.geschiedenis.at(-1).einde_was, oud.expires_at);
+  assert.equal(t.issuer, oud.issuer, 'de uitgever blijft wie de code eerst uitgaf');
+  assert.equal(t.gebruik, 0, 'de teller begint opnieuw');
+  assert.equal(Date.parse(t.expires_at) - Date.parse(t.issued_at), 30 * DAG, 'geen nieuwe termijn');
+  assert.ok(Date.parse(t.issued_at) >= Date.parse(oud.issued_at));
+  assert.equal(rij().code_historie.at(-1).code_hash, oud.code_hash, 'de oude hash bleef niet in de historie');
+
+  const legacy = opstelling();
+  legacy.collecties.staffInvites.ZAAK = [{ kassacode: 'XYZ789', naam: 'Oud', role: 'staff', func: 'Balie',
+    door: 'oude manager', createdAt: new Date().toISOString(), expires: Date.now() + DAG, used: false }];
+  const [l] = (await legacy.api.lijstInvites('ZAAK')).invites;
+  const lOud = legacy.collecties.staffInvites.ZAAK[0].toegang;
+  const lNieuw = await legacy.api.roteerInvite('ZAAK', l.id, manager.name);
+  const lt = legacy.collecties.staffInvites.ZAAK[0].toegang;
+  assert.ok(await legacy.api.zoekInvite(lNieuw.kassacode));
+  assert.equal(lt.contractversie, 2, 'een v1-rij wordt bij het vernieuwen v2');
+  assert.equal(lt.rotatie, 2);
+  assert.ok(Date.parse(lt.expires_at) > Date.parse(lOud.expires_at), 'een v1-rij kreeg geen nieuwe termijn');
+});
+
 test('een zwakke legacy-kassacode wordt hash-only opgeslagen maar fail-closed tot rotatie', async () => {
   const s = opstelling();
   const oudeCode = 'ABC234';

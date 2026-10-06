@@ -369,3 +369,28 @@ test('10. een oude querycredential sluit fail-closed en werkt pas na rotatie wee
   const code = nieuw.link.split('#code=')[1];
   assert.equal((await Promise.resolve(api.open(code))).uitnodiging.open, true);
 });
+
+/* VERNIEUWEN (kern/bearercode-keten.js): een nieuwe reislink krijgt een eigen
+   termijn van dertig dagen en een verse claim. De oude link opent niets meer,
+   de uitgever blijft, en wie hem opnieuw uitgaf staat in de geschiedenis. */
+test('11. een nieuwe reislink is een vernieuwing met een eigen termijn', async () => {
+  const db = { data: { reisUitnodigingen: {} } };
+  const api = require('../server/kern/reisuitnodiging').maakReisuitnodiging({
+    db, save() {}, crypto: require('node:crypto'), invoer: { neemOver() {} }, idGeverifieerd() { return true; }
+  }).reisuitnodiging;
+  const uit = await Promise.resolve(api.nodigUit('lid:A', 'Kobalt',
+    [{ soort: 'verblijf', titel: 'Hotel', van: dag(20), tot: dag(22) }], 'vernieuw-eerste'));
+  const oudeCode = uit.link.split('#code=')[1];
+  const rij = db.data.reisUitnodigingen[uit.uitnodiging.id], oud = rij.toegang;
+  const nieuw = await Promise.resolve(api.roteer('lid:A', rij.id, 'Kobalt-2', 'vernieuw-tweede'));
+  const t = db.data.reisUitnodigingen[rij.id].toegang;
+  assert.equal(t.rotatie, (oud.rotatie || 1) + 1);
+  assert.equal(t.geschiedenis.at(-1).soort, 'vernieuwd');
+  assert.equal(t.geschiedenis.at(-1).door, 'Kobalt-2');
+  assert.equal(t.geschiedenis.at(-1).einde_was, oud.expires_at);
+  assert.equal(t.issuer, oud.issuer, 'de uitgever blijft');
+  assert.equal(Date.parse(t.expires_at) - Date.parse(t.issued_at), 30 * 86400000);
+  assert.ok(Date.parse(t.expires_at) >= Date.parse(oud.expires_at), 'een vernieuwing eindigt nooit eerder');
+  assert.notEqual((await Promise.resolve(api.open(oudeCode))).status, 200);
+  assert.equal((await Promise.resolve(api.open(nieuw.link.split('#code=')[1]))).uitnodiging.open, true);
+});

@@ -73,7 +73,9 @@ test('de lescredentials van onderwijs claimen atomair over twee PG/Redis-instanc
         const dataA = await a.laadAlles();
         const TA = toegang(a, dataA);
         const les = await TA.nieuweLes();
-        await a.bewerkCollectie(T.COLLECTIE, dataA, w => { w[les.lesId].lescode.max_gebruik = 11; });
+        await a.bewerkCollectie(T.COLLECTIE, dataA, w => { // v2: na de ingreep de contracthash opnieuw tekenen, anders `gemanipuleerd`
+          const t = w[les.lesId].lescode; t.max_gebruik = 11;
+          t.contracthash = require('../server/kern/bearercode')({ crypto, namespace: 'foundation-les' }).contracthash(t); });
         const dataB = await b.laadAlles();
         const TB = toegang(b, dataB);
 
@@ -97,7 +99,8 @@ test('de lescredentials van onderwijs claimen atomair over twee PG/Redis-instanc
         const r2 = db.waarde[les2.lesId];
         if (mee.ok) assert.equal(r2.lescode_historie[0].code_hash !== undefined && r2.leerlingen[mee.studentId] !== undefined, true);
         else assert.equal(mee.status, 410, 'na de rotatie is de oude code vervangen: ' + JSON.stringify(mee));
-        assert.equal(r2.lescode.gebruik, 0, 'de nieuwe code is nog door niemand gebruikt');
+        // roteren (kern/bearercode-keten.js): de teller loopt door, dus een toetreding van VOOR de rotatie telt mee
+        assert.equal(r2.lescode.gebruik, mee.ok ? 1 : 0, 'de nieuwe code telt precies de toetredingen van voor de rotatie');
         assert.equal((await TB.claim(les2.lescode)).status, 410, 'daarna opent de oude code niets meer, ook op B');
         assert.ok((await TB.claim(rot.lescode)).ok, 'en de nieuwe wel');
       } finally {

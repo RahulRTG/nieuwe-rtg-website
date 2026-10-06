@@ -16,6 +16,7 @@
                   scope of de hash overschrijft, krijgt `gemanipuleerd` en geen
                   werkende code.
      roteer       nieuwe code, oude ingetrokken, einde NOOIT later.
+     vernieuw     een mens geeft een nieuwe termijn uit; doel en uitgever blijven.
      leidAf       een kindtoegang die alleen kan versmallen.
    Een v2-controle zonder doel of scope is `controle-onvolledig`: leeg is dicht. */
 'use strict';
@@ -24,7 +25,7 @@ const AFGELEID = new Set(['geen', 'perAanroep', 'sluit']);
 const STAPOP = new Set(['geen', 'uitgifte', 'gebruik', 'beide']);
 const VELDEN = ['issuer', 'doel', 'scope', 'onderwerp', 'issued_at', 'expires_at', 'max_gebruik',
   'gebruiksvorm', 'code_hash', 'bron_toegang', 'stapOp', 'afgeleid'];
-const GESCHIEDENIS_MAX = 20;
+const { keten } = require('./bearercode-keten');
 
 /* Een vaste volgorde van sleutels, zodat dezelfde inhoud dezelfde hash geeft. */
 function stabiel(v) {
@@ -126,14 +127,9 @@ module.exports = ({ crypto, ns, nu, hash, codeNieuw, plafondMs, sluit, spoor }) 
       geldigheid: { verlooptOp: oud.expires_at },
       gebruik: oud.gebruiksvorm === 'sessie' ? 'sessie' : { max: oud.max_gebruik },
       afgeleid: oud.afgeleid || afgeleid, stapOp: oud.stapOp || 'geen', bron_toegang: oud.bron_toegang || null });
-    const t = nieuw.toegang;
-    t.gebruik = oud.gebruik;
-    t.rotatie = (Number(oud.rotatie) || 1) + 1;
-    const nu_ = nu();
-    t.geschiedenis = [].concat(oud.geschiedenis || [], [{ rotatie: oud.rotatie || 1, geroteerd_at: nu_, door: String(actor || 'onbekend').slice(0, 100) }])
-      .slice(-GESCHIEDENIS_MAX);
-    intrekken(oud, actor, 'geroteerd');
-    meld('geroteerd', t);
+    nieuw.toegang.gebruik = oud.gebruik;
+    keten({ oud, nieuw, intrekken, actor, soort: 'geroteerd', nu: nu() });
+    meld('geroteerd', nieuw.toegang);
     return nieuw;
   }
 
@@ -160,8 +156,8 @@ module.exports = ({ crypto, ns, nu, hash, codeNieuw, plafondMs, sluit, spoor }) 
     return kind;
   }
 
-  return { maak, voorReden, naReden, trekIn, roteer, leidAf, contracthash };
+  return { maak, voorReden, naReden, trekIn, roteer, leidAf, contracthash, meld };
 };
 
 module.exports.VELDEN = VELDEN;
-module.exports.GESCHIEDENIS_MAX = GESCHIEDENIS_MAX;
+module.exports.GESCHIEDENIS_MAX = require('./bearercode-keten').GESCHIEDENIS_MAX;

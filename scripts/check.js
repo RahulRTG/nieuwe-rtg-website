@@ -5992,11 +5992,14 @@ try {
    dat ook, zodat de winst blijft staan. */
 console.log('\n75) roteren met de hand neemt niet toe');
 {
-  /* 12 -> 13: de gezinsdeur van main (B18, server/foundation/gezinscode.js) kwam
-     binnen nadat deze ratel stond en roteert met de hand. Het werkwoord dat hem
-     vervangt (vernieuw) staat in fase1/rotaties, en die zet hem terug. */
-  const ROTATIE_MAX = 13;
-  const vorm = /rotatie\s*\+\s*1|rotatie \|\| 1\) \+ 1|rotatie\) \|\| 0\) \+ 1|rotatie \|\| 0\) \+ 1/;
+  /* 12 -> 15 op 5 oktober 2026, en dat is geen achteruitgang: twaalf plekken
+     zijn omgezet naar bearer.roteer()/vernieuw(), en de meter las tegelijk
+     zonder spaties en zag daardoor vijftien plekken die er al stonden
+     (afhaalcode, arrivalpas, ov, tickets, rtgid-koppel, ...). Vanaf hier alleen omlaag. */
+  const ROTATIE_MAX = 15;
+  /* Gelezen ZONDER spaties: `(u.toegang.rotatie||1)+1` ontsnapte aan de eerste
+     vorm van deze regel, die alleen de gespatieerde schrijfwijze kende. */
+  const vorm = { test: r => /rotatie(\)?\|\|[01]\)|\))*\+1(?!\d)/.test(r.replace(/\s+/g, '')) };
   const plekken = [];
   const loop = (d) => {
     for (const e of fs.readdirSync(d, { withFileTypes: true })) {

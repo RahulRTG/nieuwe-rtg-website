@@ -29,7 +29,7 @@ function wereld({ crypto = nodeCrypto } = {}) {
   const pas = drager => k.pasUitgeven(fid, eid, { drager, rechten: [{ soort: 'festival.entree', dagen: [dag.id] }] });
   const scan = (code, richting) => k.scan(fid, eid, { code, plek: poort.id, datum: '2027-07-02', tijd: '13:00', poort: 'Noord', richting });
   const editie = () => db.data.festivals[fid].edities[eid];
-  return { db, k, fid, eid, pas, scan, editie };
+  return { db, k, fid, eid, pas, scan, editie, dag };
 }
 
 test('1. 128 bits, issuer/doel/scope, verval aan het eind van de editie; op schijf alleen de hash', () => {
@@ -65,6 +65,42 @@ test('3. de drager toont: dat roteert, en de vorige code opent niets meer', () =
   assert.equal(w.scan(toon.code).stand, 'groen');
 });
 
+/* Het werkwoord (kern/bearercode-keten.js): komt het eind van de editie uit
+   op het einde van de vorige code, dan ROTEERT tonen -- zelfde einde, het
+   binnenkomen telt door. Kreeg de editie er een dag bij, dan is het een
+   nieuwe termijn en dus VERNIEUWEN. In beide gevallen opent de oude niets. */
+test('3a. tonen roteert: zelfde einde, rotatie +1, de teller loopt door', () => {
+  const w = wereld();
+  const uit = w.pas('KOBALT');
+  assert.equal(w.scan(uit.pas.code).stand, 'groen');
+  const oud = JSON.parse(JSON.stringify(w.editie().passen[uit.pas.id].toegang));
+  const toon = w.k.pasToon(w.fid, w.eid, 'KOBALT', uit.pas.id);
+  const t = w.editie().passen[uit.pas.id].toegang;
+  assert.equal(t.rotatie, oud.rotatie + 1);
+  assert.equal(t.expires_at, oud.expires_at, 'roteren schoof het einde op');
+  assert.equal(t.gebruik, 1, 'roteren zette de teller terug');
+  assert.equal(t.issuer, 'rtg.festival.organisator', 'de uitgever van de pas blijft');
+  assert.deepEqual(t.geschiedenis.at(-1), { rotatie: 1, soort: 'geroteerd', geroteerd_at: t.geschiedenis.at(-1).geroteerd_at,
+    door: 'rtg.lid.festivalpas', einde_was: oud.expires_at });
+  assert.equal(w.scan(uit.pas.code).status, 404, 'de oude code opent nog iets');
+  assert.equal(w.scan(toon.code, 'uit').stand, 'groen');
+});
+
+test('3b. een editie met een extra dag: tonen vernieuwt, met de nieuwe termijn', () => {
+  const w = wereld();
+  const uit = w.pas('KOBALT');
+  const oud = JSON.parse(JSON.stringify(w.editie().passen[uit.pas.id].toegang));
+  w.k.dagZet(w.fid, w.eid, { datum: '2027-07-03', open: '12:00', sluit: '23:00' });
+  const toon = w.k.pasToon(w.fid, w.eid, 'KOBALT', uit.pas.id);
+  const t = w.editie().passen[uit.pas.id].toegang;
+  assert.equal(t.rotatie, 2);
+  assert.equal(t.expires_at, '2027-07-04T23:59:59.999Z', 'de termijn volgt de editie niet');
+  assert.equal(t.geschiedenis.at(-1).soort, 'vernieuwd');
+  assert.equal(t.geschiedenis.at(-1).einde_was, oud.expires_at);
+  assert.equal(w.scan(uit.pas.code).status, 404, 'de oude code opent nog iets');
+  assert.equal(w.scan(toon.code).stand, 'groen');
+});
+
 test('4. intrekken op pas-id sluit de code aan de poort (naar buiten mag nog)', () => {
   const w = wereld();
   const uit = w.pas('KOBALT');
@@ -78,7 +114,13 @@ test('4. intrekken op pas-id sluit de code aan de poort (naar buiten mag nog)', 
 test('5. verlopen: na de editie opent de code niets, ook als de dag in de vraag klopt', () => {
   const w = wereld();
   const uit = w.pas('KOBALT');
-  w.editie().passen[uit.pas.id].toegang.expires_at = '2020-01-01T00:00:00.000Z';
+  /* v2: wie alleen het einde overschrijft krijgt `gemanipuleerd`; een echt
+     verlopen record draagt een contracthash over dat einde. */
+  const t = w.editie().passen[uit.pas.id].toegang;
+  t.expires_at = '2020-01-01T00:00:00.000Z';
+  assert.match(w.scan(uit.pas.code).zin, /gemanipuleerd/);
+  const t2 = w.editie().passen[uit.pas.id].toegang; // de transactie schreef een verse kopie terug
+  t2.contracthash = require('../server/kern/bearercode')({ crypto: nodeCrypto, namespace: 'festivalos.toegangspas' }).contracthash(t2);
   const r = w.scan(uit.pas.code);
   assert.equal(r.stand, 'rood');
   assert.match(r.zin, /verlopen/);
@@ -115,5 +157,7 @@ test('7. een oude kale pascode wordt niet gehonoreerd en verdwijnt uit de opslag
                                                                       -> toets 4
    F5 poort.js: de `pasReden`-controle weg                           -> toets 5
    F6 bearercode.vind met vroege uitgang (return bij de eerste treffer) -> toets 6
+   F8 pas-toegang.js: in geef() altijd vernieuw (geen roteer)          -> toets 3a
+   F9 pas-toegang.js: in geef() altijd roteer                         -> toets 3b
    F7 pas-toegang.js: migreer() niet aanroepen en opCode ook op p.code laten
       zoeken                                                          -> toets 7 */

@@ -112,14 +112,16 @@ module.exports = ({ transactie, vindCode, statusReden, publiek, bearer, invoer,
         return { status: 409, herhaald: true,
           error: 'De nieuwe reislink is al eenmalig getoond en wordt niet herhaald.',
           uitnodiging: publiek(u) };
-      bearer.intrekken(u.toegang, actor || door, 'geroteerd');
-      u.code_historie = Array.isArray(u.code_historie) ? u.code_historie : [];
-      u.code_historie.push({ code_hash: u.toegang.code_hash, ingetrokken_at: u.toegang.ingetrokken_at,
-        rotatie: u.toegang.rotatie });
-      const gemaakt = bearer.maak({ prefix: 'REIS', issuer: actor || door, doel: DOEL,
+      /* Vernieuwen en niet roteren: wie de link opnieuw uitgeeft krijgt een
+         verse termijn van dertig dagen en een verse claim. De uitgever blijft;
+         wie nu uitgeeft staat als `door` in de geschiedenis. */
+      const oud = u.toegang;
+      const gemaakt = bearer.vernieuw(oud, { prefix: 'REIS', issuer: oud.issuer, doel: DOEL,
         scope: SCOPE, onderwerp: { soort: 'reisuitnodiging', id: u.id },
-        geldigMs: 30 * 86400000, maxGebruik: 1 });
-      gemaakt.toegang.rotatie = (u.toegang.rotatie || 1) + 1;
+        geldigheid: { duurMs: 30 * 86400000 }, gebruik: { max: 1 }, afgeleid: 'geen' }, actor || door);
+      u.code_historie = Array.isArray(u.code_historie) ? u.code_historie : [];
+      u.code_historie.push({ code_hash: oud.code_hash, ingetrokken_at: oud.ingetrokken_at,
+        rotatie: oud.rotatie });
       u.toegang = gemaakt.toegang;
       u.laatste_rotatie = { idem_hash: idemHash,
         dubbeltik_hash: idemHash ? null : tikHash, at: nu() };

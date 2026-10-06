@@ -179,3 +179,26 @@ test('startup houdt verkeer dicht tot de autoritatieve Samen-migratie committe',
   'de lokale pre-ready-tak committeert Samen en boarding-pass in volgorde vóór hij beide open zet');
   assert.match(bron, /startPostgres:\s*startPostgresMetSalon/);
 });
+
+/* VERNIEUWEN (kern/bearercode-keten.js): de gastheer geeft op naam een verse
+   deelcode uit met een eigen termijn en een verse teller. Wie al meedeed blijft
+   lid; de oude code laat niemand meer binnen. */
+test('een nieuwe deelcode is een vernieuwing: volgnummer, geschiedenis, eigen termijn', async () => {
+  const { db, samen } = bouw();
+  const host = sessie('host'), kind = sessie('kind');
+  const uit = await samen.maak(host, 'rtf-samen-vernieuw-0001');
+  await samen.doeMee(kind, uit.deelcode);
+  const oud = db.data.samenRtfKamers[uit.kamer.id].toegang;
+  const nieuw = await samen.roteer(host, uit.kamer.id, 'rtf-samen-vernieuw-0002');
+  const k = db.data.samenRtfKamers[uit.kamer.id], t = k.toegang;
+  assert.equal(t.rotatie, oud.rotatie + 1);
+  assert.equal(t.geschiedenis.at(-1).soort, 'vernieuwd');
+  assert.equal(t.geschiedenis.at(-1).door, 'Profiel host');
+  assert.equal(t.geschiedenis.at(-1).einde_was, oud.expires_at);
+  assert.equal(Date.parse(t.expires_at) - Date.parse(t.issued_at), 6 * 3600000);
+  assert.ok(Date.parse(t.expires_at) >= Date.parse(oud.expires_at), 'een vernieuwing eindigt nooit eerder');
+  assert.equal(t.gebruik, 0, 'de teller begint opnieuw');
+  assert.ok(k.leden.some(l => l.handle === kind.handle), 'wie al meedeed blijft lid');
+  assert.equal((await samen.doeMee(sessie('laat'), uit.deelcode)).status, 404);
+  assert.equal((await samen.doeMee(sessie('later'), nieuw.deelcode)).status, 200);
+});

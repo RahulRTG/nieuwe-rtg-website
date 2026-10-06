@@ -140,3 +140,43 @@ test('browser bewaart uitsluitend kamer-id en caches herhalen uitgifte nooit', (
     assert.ok(nooit['POST ' + route]);
   }
 });
+
+/* De gastheer VERNIEUWT de deelcode (kern/bearercode-keten.js): weer twaalf uur
+   en elf plaatsen, de oude opent niets meer, het volgnummer gaat een omhoog en
+   de geschiedenis zegt `vernieuwd`. Ook een v1-kamer van voor bearercode v2. */
+test('roteren is vernieuwen: nieuwe termijn, oude dicht, rotatie +1, soort vernieuwd', () => {
+  let klok = Date.parse('2026-10-05T08:00:00.000Z');
+  const T = require('../server/kern/samen-toegang');
+  const st = T({ crypto, nu: () => new Date(klok).toISOString() });
+  const kamers = {};
+  const k = { id: 'sk' + 'a'.repeat(32), toegang_historie: [] };
+  const eerste = st.nieuw(kamers, k, 'Amber');
+  k.toegang = eerste.toegang; kamers[k.id] = k;
+  const oud = k.toegang;
+  assert.equal(oud.contractversie, 2, 'de uitgifte is bearercode v2');
+  assert.equal(oud.max_gebruik, T.MAX_GEBRUIK);
+  st.gebruik(k);
+  klok += 3600000;
+  const nieuw = st.roteer(kamers, k, 'Beryl');
+  assert.equal(st.zoek(kamers, eerste.code), null, 'de oude code vindt de kamer nog');
+  assert.equal(st.zoek(kamers, nieuw.code), k);
+  assert.equal(st.reden(k), null, 'de nieuwe code opent niets');
+  assert.equal(st.reden({ toegang: oud }), 'ingetrokken');
+  assert.equal(k.toegang.rotatie, 2);
+  assert.equal(k.toegang.geschiedenis.at(-1).soort, 'vernieuwd');
+  assert.equal(k.toegang.geschiedenis.at(-1).door, 'Beryl');
+  assert.equal(k.toegang.issuer, 'Amber', 'de uitgever blijft');
+  assert.equal(k.toegang.gebruik, 0, 'de teller begint opnieuw');
+  assert.equal(Date.parse(k.toegang.expires_at), klok + T.GELDIG_MS, 'geen nieuwe termijn');
+  assert.ok(Date.parse(k.toegang.expires_at) > Date.parse(oud.expires_at));
+  assert.equal(k.toegang_historie.at(-1).code_hash, oud.code_hash);
+
+  const legacy = { OUD123: { code: 'OUD123', gastheer: 'Oud', leden: [], at: klok } };
+  st.migreerLegacy(legacy);
+  const lk = Object.values(legacy)[0];
+  assert.equal(lk.toegang.contractversie, undefined, 'de legacy-rij is v1');
+  const ln = st.roteer(legacy, lk, 'Oud');
+  assert.equal(lk.toegang.contractversie, 2, 'een v1-rij wordt bij het vernieuwen v2');
+  assert.equal(lk.toegang.rotatie, 2);
+  assert.equal(st.zoek(legacy, ln.code), lk);
+});

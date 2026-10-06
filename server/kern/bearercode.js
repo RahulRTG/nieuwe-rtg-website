@@ -19,6 +19,7 @@
 
 const klok = require('../lib/klok');
 const maakV2 = require('./bearercode-v2');
+const { keten } = require('./bearercode-keten');
 
 const MAX_GELDIG_MS = 366 * 86400000;
 /* SCHADUW voor de stille duur: een v1-code zonder bruikbare geldigMs krijgt
@@ -138,10 +139,24 @@ module.exports = ({ crypto, namespace, nu = () => klok.datum().toISOString(), no
 
   const trekIn = (toegang, actor, redenTekst) => v2.trekIn(toegang, intrekken, actor, redenTekst);
   const roteer = (oud, opties) => v2.roteer(oud, intrekken, opties);
+  /* Vernieuwen: een mens geeft een NIEUWE termijn uit; doel en uitgever blijven
+     (kern/bearercode-keten.js). Altijd v2: zonder `geldigheid` weigert maak(). */
+  const vernieuw = (oud, spec, actor) => {
+    if (!oud) throw Object.assign(new Error('bearercode: er is geen toegang om te vernieuwen'), { code: 'niet-vernieuwbaar' });
+    if (!String(actor || '').trim()) throw Object.assign(new Error('bearercode: vernieuwen doet een mens op naam'), { code: 'actor-ontbreekt' });
+    const s = Object.assign({ onderwerp: oud.onderwerp }, spec);
+    for (const k of ['doel', 'issuer']) {
+      if (oud[k] && String(s[k] || '').trim() !== oud[k]) throw Object.assign(new Error('bearercode: een vernieuwing houdt het ' + k), { code: 'ander-' + k });
+    }
+    if (!s.geldigheid) throw Object.assign(new Error('bearercode: een vernieuwing draagt een eigen termijn'), { code: 'geldigheid-ontbreekt' });
+    const nieuw = keten({ oud, nieuw: v2.maak(s), intrekken, actor, soort: 'vernieuwd', nu: nu() });
+    v2.meld('vernieuwd', nieuw.toegang);
+    return nieuw;
+  };
   const leidAf = (ouder, verzoek) => v2.leidAf(ouder, verzoek, reden);
 
   return { normaal, hash, zelfdeHash, vind, codeNieuw, maak, reden, gebruik, intrekken, publiek,
-    trekIn, roteer, leidAf, contracthash: v2.contracthash };
+    trekIn, roteer, vernieuw, leidAf, contracthash: v2.contracthash };
 };
 
 module.exports.MAX_GELDIG_MS = MAX_GELDIG_MS;

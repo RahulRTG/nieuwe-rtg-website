@@ -4,7 +4,7 @@ const {build,OUT}=require('../scripts/loop-fabric-coverage');
 
 test('coverage registry omvat iedere functieschakelaar precies eenmaal en is reproduceerbaar',()=>{
   const built=build(),onDisk=JSON.parse(fs.readFileSync(OUT,'utf8'));
-  assert.deepEqual(onDisk,built);assert.equal(built.capabilities.length,built.measured.capabilities);
+  assert.deepEqual(onDisk,built,'LOOP-FABRIC-COVERAGE.json loopt achter op de code -- draai: npm run loopfabric:coverage');assert.equal(built.capabilities.length,built.measured.capabilities);
   assert.equal(new Set(built.capabilities.map(x=>x.id)).size,built.capabilities.length);
   for(const row of built.capabilities){assert.ok(row.semanticOwner.id);assert.ok(row.entryPoints.length);assert.ok(row.classificationReason);
     assert.ok(row.participation.retention);assert.ok(row.participation.eligibility);

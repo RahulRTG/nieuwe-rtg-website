@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-06T16:44:21.467Z",
-    "commit": "c69fddd70",
+    "op": "2026-10-06T19:22:22.559Z",
+    "commit": "de31e29f2",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -8229,6 +8229,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "loopfabric-ratel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/norm.js",
+      "operator": "voorwaarde-omkeren#2",
+      "gezakt": 2,
+      "geprobeerd": 22
     },
     "losvanverzoek.test.js": {
       "soort": "puur",

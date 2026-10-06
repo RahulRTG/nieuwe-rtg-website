@@ -3,7 +3,9 @@
    (seq) en padgebonden. Getoetst: een geschreven regel krijgt een volgnummer en
    een geldig zegel; manipuleren maakt het zegel ongeldig; alleen zaak-paden gaan
    erin (nooit inloggen, accounts, de doos zelf of een pad met ..); en een te
-   grote body wordt geweigerd.
+   grote body wordt geweigerd. Sinds N27 ook: geen inlogroute in welke spelling
+   ook, van het antwoord alleen de refs, geen lijf met een wachtwoord, en een
+   oude regel die dat wel heeft gaat bij het naspelen niet naar de cloud.
    Draai los: node --test test/doos-journaal.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -67,5 +69,58 @@ test('3. een te grote body wordt geweigerd (geen onzin in het journaal)', () => 
   try {
     doos.schrijfJournaal('/api/supplier/overschot', { blob: 'x'.repeat(70 * 1024) }, { ok: true });
     assert.equal((db.data.doosJournaal || []).length, 0, 'de te grote regel is geweigerd');
+  } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+});
+
+/* N27: de inlogroutes in elke spelling die de router aanneemt, en wat er van een
+   regel overblijft. De echte doos in lokale modus staat in
+   test/doos-inlogjournaal.test.js; dit zijn de losse sloten, elk apart. */
+test('4. geen inlogroute in het journaal, ook niet met een slash of via de werkplekinlog', () => {
+  const { doos, db, dir } = verseDoos();
+  try {
+    for (const pad of ['/api/supplier/login', '/api/supplier/login/', '/api/supplier/mijn/login', '/api/supplier/mijn/login/']) {
+      assert.equal(doos.journaalPadOk(pad), false, pad + ' is een inlog');
+      doos.schrijfJournaal(pad, { bewijs: 'b-' + pad, code: '123456' }, { token: 'tok-' + pad });
+    }
+    assert.equal((db.data.doosJournaal || []).length, 0, 'geen enkele inlog is gejournald');
+    // de slash maakt van een gewone zaakroute geen inlog
+    assert.equal(doos.journaalPadOk('/api/supplier/overschot/'), true);
+  } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+});
+
+test('5. van het antwoord blijft alleen wat het naspelen leest; een wachtwoordlijf gaat er niet in', () => {
+  const { doos, db, dir } = verseDoos();
+  try {
+    doos.schrijfJournaal('/api/supplier/mijn/wissel', { code: 'VORA' }, { token: 'a'.repeat(48), supplier: { code: 'VORA' } });
+    doos.schrijfJournaal('/api/supplier/staff/invite', { name: 'X' }, { ok: true, invite: { id: 'sinv-1', kassacode: 'KC.GEHEIM' }, link: '#werving=KC.GEHEIM' });
+    doos.schrijfJournaal('/api/supplier/order/maak', { items: [1] }, { order: { ref: 'R-1', pickup: 'P7', regels: [{ naam: 'soep' }, { id: 'r2' }] } });
+    doos.schrijfJournaal('/api/supplier/staff/join', { bedrijf: 'Sal de Mar', kassacode: 'KC', login: 'a@b.c', password: 'geheim' }, { ok: true });
+    const rij = db.data.doosJournaal;
+    assert.deepEqual(rij.map(e => e.pad), ['/api/supplier/mijn/wissel', '/api/supplier/staff/invite', '/api/supplier/order/maak'],
+      'de aanmelding met een RTG-wachtwoord staat er niet in');
+    assert.equal(rij[0].res, null, 'geen werktoken uit een wissel');
+    assert.deepEqual(rij[1].res, { invite: { id: 'sinv-1' } }, 'geen kassacode, wel de ref');
+    assert.deepEqual(rij[2].res, { order: { ref: 'R-1', pickup: 'P7', regels: [null, { id: 'r2' }] } }, 'de vorm blijft, voor leerRefs');
+    assert.ok(rij.every(e => doos.journaalGeldig(e)), 'de ingekorte regels dragen een geldig zegel');
+  } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+});
+
+test('6. een regel van voor de reparatie, met een geldig zegel, wordt bij het naspelen overgeslagen', () => {
+  const { doos, dir } = verseDoos();
+  try {
+    const key = fs.readFileSync(path.join(dir, 'dooszegel.key'));
+    const zegel = (e) => require('crypto').createHmac('sha256', key)
+      .update(JSON.stringify({ seq: e.seq, pad: e.pad, body: e.body || {}, res: e.res || null, at: e.at })).digest('base64url');
+    const goed = { seq: 1, pad: '/api/supplier/overschot', body: { item: 'soep' }, res: null, at: 1 };
+    goed.zegel = zegel(goed);
+    assert.equal(doos.journaalGeldig(goed), true, 'de zegelberekening van de toets klopt met die van de doos');
+    for (const oud of [
+      { seq: 2, pad: '/api/supplier/login/', body: { username: 'rahul', password: 'Imran' }, res: null, at: 2 },
+      { seq: 3, pad: '/api/supplier/mijn/login', body: { bewijs: 'b', code: '123456' }, res: null, at: 3 },
+      { seq: 4, pad: '/api/supplier/staff/join', body: { login: 'a@b.c', password: 'geheim' }, res: null, at: 4 }
+    ]) {
+      oud.zegel = zegel(oud);
+      assert.equal(doos.journaalGeldig(oud), false, oud.pad + ' gaat niet meer naar de cloud');
+    }
   } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
 });

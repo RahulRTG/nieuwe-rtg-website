@@ -137,6 +137,8 @@
     "promotie:controle": "node scripts/live-vrijgave.js",
     "external:teken": "node scripts/external-release-teken.js",
     "extern:bewijs": "node scripts/extern-bewijs.js",
+    "extern:bewijs:stripe-connect": "node scripts/extern-bewijs-stripe-connect.js",
+    "vrijgave:stand": "node scripts/vrijgave-stand.js",
     "staging:repetitie": "node scripts/staging-repetitie.js",
     "afbouw:oordeel": "node scripts/afbouwoordeel.js",
     "afbouw:snel": "npm run release:gate && npm run staging:repetitie && npm run afbouw:oordeel",

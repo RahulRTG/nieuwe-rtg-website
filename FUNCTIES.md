@@ -21,9 +21,9 @@ het?**
 | Bedrijfsgenres | **79** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2561** |
+| Kernmodules (`server/kern/**`) | **2563** |
 | App-pagina's (`public/apps/**.html`) | **315** |
-| Testbestanden | **2332** |
+| Testbestanden | **2340** |
 
 ## De vier werelden
 
@@ -269,7 +269,7 @@ ook blokkeert.
   _voor: intern_
 - **Schoolgoedkeuring (RTF School)** (`office-school`) — Scholen goedkeuren of afwijzen voordat ze personeel en klassen kunnen aanmaken.  
   _voor: intern_
-- **Werk OS (werkruimtes)** (`bedrijf`) — De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten. Uit = geen enkele werkruimte of gedeeld gastvoorstel werkt meer.  
+- **Werk OS (werkruimtes)** (`bedrijf`) — De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten. Uit = geen enkele werkruimte of gedeeld klant- of leveranciersvoorstel werkt meer.  
   _voor: intern, business, leverancier, personeel_
 - **RTG Command: zien** (`command-zien`) — De puls van alle domeinen, de zoekbalk over alles en het objectdossier met zijn tijdlijn.  
   _voor: intern_

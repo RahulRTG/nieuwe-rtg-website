@@ -26,6 +26,11 @@ module.exports = ({ db, verbinding, statements, auditMotor, mutaties, voorcheck,
   }
 
   function saveSqlite(force, sleutels, extraAudit = [], duurzaam = false) {
+    /* Een gerichte save noemt bestaande collecties. Een tikfout of een lege lijst
+       zou anders stil niets bewaren en toch slagen. */
+    if (sleutels !== undefined && (!Array.isArray(sleutels) || (!sleutels.length && !extraAudit.length) ||
+        sleutels.some(k => typeof k !== 'string' || !Object.hasOwn(db.data, k))))
+      throw new TypeError('Een gerichte save vereist bestaande collecties');
     if (duurzaam) return require('./sqlite-duurzaam')(verbinding(),
       () => bewaar(true, sleutels, extraAudit, false), vouwWal);
     return bewaar(force, sleutels, extraAudit, false);

@@ -34,13 +34,19 @@ test('leesinventaris volgt nieuwe en verwijderde sleutels zonder getters of schr
   const bewaakt = begroting.bewaak(data, { log() {}, modus: 'weigeren', grens: 0,
     handeling: { huidige: () => ({ pad: '/api/proef', correlatie: 'inventaris' }) } });
   assert.deepEqual(begroting.collectieSleutels(bewaakt), ['oud', 'afgeleid']);
+  assert.deepEqual(begroting.rijSleutels(bewaakt), ['oud']);
   assert.equal(gelezen, 0, 'inventarisatie leest geen collectie-inhoud');
   bewaakt.nieuw = []; delete bewaakt.oud;
   assert.deepEqual(begroting.collectieSleutels(bewaakt), ['afgeleid', 'nieuw']);
+  assert.deepEqual(begroting.rijSleutels(bewaakt), ['nieuw']);
+  bewaakt.nieuw = { geen: 'rijcollectie' };
+  assert.deepEqual(begroting.collectieSleutels(bewaakt), ['afgeleid', 'nieuw']);
+  assert.deepEqual(begroting.rijSleutels(bewaakt), [], 'typewissel ververst de rij-inventaris');
   bewaakt.proef = [1, 2];
   assert.throws(() => { bewaakt.proef = []; }, begroting.BegrotingOverschreden);
   assert.deepEqual(bewaakt.proef, [1, 2]);
   assert.deepEqual(begroting.collectieSleutels({ gewoon: [] }), ['gewoon']);
+  assert.deepEqual(begroting.rijSleutels({ gewoon: [], object: {} }), ['gewoon']);
 });
 
 /* Een nagemaakt verzoek eromheen, want de begroting doet buiten een verzoek

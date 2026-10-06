@@ -101,14 +101,21 @@ test('toegangsschrijvers behouden volledige bundel en falen vóór bevestiging b
 
 test('beide echte auditmiddlewares bewaren hun keten zonder vreemde collecties te lezen', t => {
   const p = proef(t);
+  const exec = DatabaseSync.prototype.exec; let commits = 0;
+  t.mock.method(DatabaseSync.prototype, 'exec', function(sql) {
+    if (sql === 'COMMIT') commits++;
+    return exec.call(this, sql);
+  });
   let gelezen = 0;
   Object.defineProperty(p.db.data.ander, 'toJSON', { value() { gelezen++; return { waarde: this.waarde }; }, configurable: true });
   const handeling = require('../server/lib/handelingsspoor')({ db: p.db, save: p.save });
   const audit = require('../server/opzet/auditspoor').maakAuditspoor({ db: p.db, save: p.save });
+  const commitsVoorAntwoord = commits;
   const req = { method: 'POST', path: '/api/documenten/zet', body: { tekst: 'privé' }, session: { key: 'actor' } };
   const res = new EventEmitter(); res.statusCode = 200;
   handeling.middleware(req, res, () => {}); audit.middleware()(req, res, () => {});
   res.emit('finish');
+  assert.equal(commits - commitsVoorAntwoord, 1, 'beide antwoordsporen delen één SQLite-transactie');
   assert.equal(gelezen, 0, 'auditopslag serialiseert geen andere domeinen');
   assert.equal(p.lees('handelingLog').length, 1);
   assert.equal(p.lees('apiSpoor').commandJournaalTotaal, 1);
@@ -363,6 +370,16 @@ test('expliciete auditopslag stelt grote bestaande collecties niet uit', t => {
   for (const keys of [null, [], ['ontbreekt'], [42]]) assert.throws(() => p.save.sleutels(keys), /bestaande collecties/);
 });
 
+test('de datalaag snijdt een domeinvlak tot bestaande collecties terug', t => {
+  const p = proef(t);
+  p.db.data.aanwezig = { nummer: 1 };
+  p.db.data.ander.waarde = 7;
+  p.save.bestaande(['aanwezig', 'ontbreekt', 'aanwezig']);
+  assert.deepEqual(p.lees('aanwezig'), { nummer: 1 });
+  assert.equal(p.lees('ander').waarde, 1, 'een domeincommit neemt geen vreemde mutatie mee');
+  assert.throws(() => p.save.bestaande([]), /niet-lege sleutellijst/);
+});
+
 test('selectieve save houdt foutinjectie en de gewone duurzame bundel intact', async t => {
   const p = proef(t), verraad = require('../server/lib/verraadfase');
   const fout = t.mock.method(verraad, 'sla', name => name === 'schrijf-faalt');
@@ -548,7 +565,7 @@ test('eigen melding veroorzaakt geen deelcommit in een bestaande duurzame bundel
   assert.equal(p.lees('ander').waarde, 9);
 });
 
-test('factuur bewaart haar domein breed en gebruikt daarna de eigen meldingsschrijver', t => {
+test('factuur bewaart alleen haar domein en gebruikt daarna de eigen meldingsschrijver', t => {
   const p = proef(t), m = meldingPoort(p, () => {});
   p.db.data.facturen = []; p.db.data.factuurTeller = 0; p.save();
   let scans = 0;
@@ -566,8 +583,8 @@ test('factuur bewaart haar domein breed en gebruikt daarna de eigen meldingsschr
   const r = motor.boek({ totaal: 24.20, btw: 21, koper: { key: 'lid' },
     verkoperNaam: 'De zaak', verkoperCode: 'AAA', methode: 'rtg', ref: 'bon-1' });
   assert.equal(r.ok, true);
-  assert.equal(scans, 1, 'alleen de eigen factuur-save scant het andere domein');
-  assert.equal(p.lees('ander').waarde, 2, 'latere vreemde wijziging wordt niet door de melding geflusht');
+  assert.equal(scans, 0, 'factuur en melding serialiseren geen vreemd domein');
+  assert.equal(p.lees('ander').waarde, 1, 'vreemde pending wijzigingen worden niet door de factuur of melding geflusht');
   assert.equal(p.lees('facturen')[0].id, r.factuur.id);
   assert.equal(p.lees('notifications').lid.length, 1);
   assert.equal(p.lees('notifications').lid[0].title, 'Nieuwe factuur');
@@ -718,7 +735,7 @@ for (const soort of ['order', 'rit']) {
   });
 }
 
-test('betaalde order behoudt brede leveranciersmelding voor nog onbehouden keukeninitialisatie', async t => {
+test('betaalde order laat keuken en melding elk uitsluitend hun eigen collectie bewaren', async t => {
   const p = aanvraagMetMelding(t, 'order');
   const order = { ref: 'BETAAL', customerKey: p.actor.key, supplierCode: p.zaak.code,
     supplierName: p.zaak.name, customerCodename: 'Anna', total: 12, paid: false, status: 'nieuw',
@@ -728,7 +745,6 @@ test('betaalde order behoudt brede leveranciersmelding voor nog onbehouden keuke
   p.ctx.orderMetRef = ref => p.db.data.orders.find(o => o.ref === ref);
   p.ctx.keuken = require('../server/kern/keuken')({ db: p.db, save: p.ctx.save,
     crypto: p.ctx.crypto, schoon: p.ctx.schoon, notifySupplier: p.ctx.notifySupplier }).keuken;
-  p.ctx.notifySupplier.naOpslag = () => assert.fail('betaalOrderVoor heeft nog een brede opslaggrens nodig');
   const betaal = require('../server/kern/lidacties/betalen')(p.ctx).betaalOrderVoor;
   assert.equal((await betaal(p.actor, { ref: order.ref })).ok, true);
   assert.equal(p.lees('orders')[0].paid, true);

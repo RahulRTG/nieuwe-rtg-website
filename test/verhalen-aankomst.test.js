@@ -35,6 +35,8 @@ test('het verhaal ontdekt automatische aankomst, verkeerde afstand en een verlor
     (p,b,l)=>{if(p.endsWith('/update'))l.nabij=true;},
     (p,b,l)=>{if(p.endsWith('/update'))l.nabij=false;},
     (p,b,l)=>{if(p.endsWith('/aangekomen'))l.arrived=false;},
-    (p,b,l)=>{if(p.endsWith('/aangekomen'))l.aankomstDoor='server';}
+    (p,b,l)=>{if(p.endsWith('/aangekomen'))l.aankomstDoor='server';},
+    (p,b,l)=>{if(p.endsWith('/aangekomen'))delete l.aankomstAt;},
+    (p,b,l)=>{if(p.endsWith('/state'))l.arrived=false;}
   ]) await assert.rejects(()=>proef(fout),assert.AssertionError);
 });

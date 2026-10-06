@@ -1,19 +1,19 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-10-06",
+  "vastgelegd": "2026-10-05",
   "gemeten": {
-    "bestanden": 2660,
-    "domeinenTotaal": 694,
-    "koopbareVormen": 618,
-    "koopbareDomeinen": 126,
+    "bestanden": 2666,
+    "domeinenTotaal": 693,
+    "koopbareVormen": 617,
+    "koopbareDomeinen": 124,
     "envelopDrempel": 8,
     "envelop": 45,
-    "veldenDomeineigen": 788,
+    "veldenDomeineigen": 789,
     "veldenNietEnvelop": 1057,
-    "gelijkendeVormparen": 18,
+    "gelijkendeVormparen": 17,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 44,
+    "werkwoordCombinaties": 45,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
@@ -72,14 +72,14 @@
     "zaak"
   ],
   "perWerkwoord": {
-    "toon": 96,
-    "prijs": 40,
-    "beschikbaarheid": 55,
+    "toon": 94,
+    "prijs": 39,
+    "beschikbaarheid": 54,
     "reserveer": 32,
     "bevestig": 61,
     "lever": 25,
     "annuleer": 37,
-    "retour": 9
+    "retour": 8
   },
   "overalAanwezig": [],
   "matrix": [
@@ -979,46 +979,6 @@
       "telt": 4
     },
     {
-      "domein": "kern/reisbureau",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": true,
-        "retour": true
-      },
-      "bewijs": {
-        "toon": "overzicht",
-        "bevestig": "boek",
-        "annuleer": "annuleer",
-        "retour": "terugboeken"
-      },
-      "telt": 4
-    },
-    {
-      "domein": "kern/reisbureau-teruggave",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": false,
-        "retour": true
-      },
-      "bewijs": {
-        "toon": "lijst",
-        "beschikbaarheid": "open",
-        "bevestig": "terugboeken",
-        "retour": "maakTeruggave"
-      },
-      "telt": 4
-    },
-    {
       "domein": "kern/stuur",
       "heeft": {
         "toon": true,
@@ -1305,6 +1265,25 @@
         "toon": "beeld",
         "reserveer": "blokkeer",
         "bevestig": "koop"
+      },
+      "telt": 3
+    },
+    {
+      "domein": "kern/reisbureau",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "overzicht",
+        "bevestig": "boek",
+        "annuleer": "annuleer"
       },
       "telt": 3
     },
@@ -1635,20 +1614,20 @@
       "telt": 2
     },
     {
-      "domein": "kern/reisbureau-nazorg",
+      "domein": "kern/reisbureau-betaling",
       "heeft": {
-        "toon": true,
-        "prijs": true,
+        "toon": false,
+        "prijs": false,
         "beschikbaarheid": false,
         "reserveer": false,
-        "bevestig": false,
+        "bevestig": true,
         "lever": false,
         "annuleer": false,
-        "retour": false
+        "retour": true
       },
       "bewijs": {
-        "toon": "lidBeeld",
-        "prijs": "herbereken"
+        "bevestig": "terugboeken",
+        "retour": "terugboeken"
       },
       "telt": 2
     },
@@ -2315,21 +2294,6 @@
       "telt": 0
     },
     {
-      "domein": "kern/reisbureau-betaling",
-      "heeft": {
-        "toon": false,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {},
-      "telt": 0
-    },
-    {
       "domein": "kern/reisbureau-geldrijen",
       "heeft": {
         "toon": false,
@@ -2541,9 +2505,9 @@
     {
       "gelijkenis": 0.89,
       "a": "server/kern/reisbureau-betaling.js",
-      "b": "server/kern/reisbureau-teruggave.js",
+      "b": "server/kern/reisbureau-geldrijen.js",
       "domeinA": "kern/reisbureau-betaling",
-      "domeinB": "kern/reisbureau-teruggave",
+      "domeinB": "kern/reisbureau-geldrijen",
       "gedeeld": [
         "bewijs",
         "bronObject",
@@ -2557,26 +2521,9 @@
     },
     {
       "gelijkenis": 0.89,
-      "a": "server/kern/reisbureau-geldrijen.js",
-      "b": "server/kern/reisbureau-teruggave.js",
-      "domeinA": "kern/reisbureau-geldrijen",
-      "domeinB": "kern/reisbureau-teruggave",
-      "gedeeld": [
-        "bewijs",
-        "bronObject",
-        "economischeEigenaar",
-        "economischeHerkomst",
-        "grond",
-        "land",
-        "naarWie",
-        "relatie"
-      ]
-    },
-    {
-      "gelijkenis": 0.89,
-      "a": "server/kern/reisbureau-teruggave.js",
+      "a": "server/kern/reisbureau-betaling.js",
       "b": "server/kern/waarde/economischeherkomst.js",
-      "domeinA": "kern/reisbureau-teruggave",
+      "domeinA": "kern/reisbureau-betaling",
       "domeinB": "kern/waarde",
       "gedeeld": [
         "bewijs",
@@ -2591,9 +2538,9 @@
     },
     {
       "gelijkenis": 0.89,
-      "a": "server/kern/reisbureau-teruggave.js",
+      "a": "server/kern/reisbureau-betaling.js",
       "b": "server/kern/waarde/omkering.js",
-      "domeinA": "kern/reisbureau-teruggave",
+      "domeinA": "kern/reisbureau-betaling",
       "domeinB": "kern/waarde",
       "gedeeld": [
         "bewijs",

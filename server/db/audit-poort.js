@@ -2,7 +2,17 @@
 /* Dezelfde adapter overleeft standby -> schrijver -> standby. Een passieve
    constructor migreert niets; promotie hoeft domeinservices niet te herbouwen. */
 const vorm = require('./audit-vorm');
-module.exports = ({ db, store, sqlite, bundelDoos, bewaar }) => ({
+const { AsyncLocalStorage } = require('node:async_hooks');
+module.exports = ({ db, store, sqlite, bundelDoos, bewaar }) => {
+  const batches = new AsyncLocalStorage();
+  const batch = fn => {
+    if (batches.getStore()) return fn();
+    const ops = [];
+    const uit = batches.run(ops, fn);
+    if (ops.length) bewaar([], ops);
+    return uit;
+  };
+  return { batch,
   open(naam) {
     if (store !== 'sqlite') return null;
     vorm.eis(naam);
@@ -15,7 +25,10 @@ module.exports = ({ db, store, sqlite, bundelDoos, bewaar }) => ({
     bereid();
     const voer = op => {
       if (!db.writable) return undefined;
-      bereid(); bewaar([], op); return op.resultaat;
+      bereid();
+      const batch = batches.getStore();
+      if (batch) batch.push(op); else bewaar([], op);
+      return op.resultaat;
     };
     return {
       view() {
@@ -27,4 +40,5 @@ module.exports = ({ db, store, sqlite, bundelDoos, bewaar }) => ({
       rewrite: werk => voer({ naam, type: 'rewrite', werk, resultaat: {} })
     };
   }
-});
+  };
+};

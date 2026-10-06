@@ -25,8 +25,7 @@ let kvdb = null;
 const toegepast = new Map();   // collectie -> versienummer dat dit proces al toegepast heeft
 const laatsteJson = new Map(); // collectie -> laatst weggeschreven JSON (om ongewijzigde over te slaan)
 
-// De opgeslagen waarde is (met RTG_ENC_KEY) versleuteld; in het geheugen en in
-// laatsteJson houden we altijd de leesbare JSON aan, alleen op schijf staat cijfer.
+// Alleen op schijf is de JSON versleuteld; laatsteJson blijft leesbaar.
 const uitStore = v => kluis.ontsleutel(v);       // ruwe kolomwaarde -> leesbare JSON
 const naarStore = j => kluis.versleutel(j);      // leesbare JSON -> op te slaan waarde
 
@@ -66,8 +65,7 @@ function loadSqlite() {
   }
   return audits.laad(data, audit);
 }
-// De statements zijn per verbinding altijd dezelfde: één keer voorbereiden
-// in plaats van bij elke save opnieuw (SQLite hoeft dan niet te hercompileren).
+// Bereid de vaste statements eenmaal per verbinding voor.
 let stmt = null;
 function statements() {
   if (stmt) return stmt;

@@ -5,6 +5,8 @@
 module.exports = (kern) => {
   const { alcoholGrensVan, app, auth, isFavoriet, crypto, db, express, findSupplier, geborenVan, i18n, ledenPrijs,
           leeftijdVan, logActivity, managerOnly, media, publicSupplier, save, schoon, sseToOffice, supplierAuth } = kern;
+  const bewaar = sleutels => typeof save.sleutels === 'function' ? save.sleutels(sleutels) : save();
+  const noteer = logActivity.alleenActiviteit || logActivity;
 
 
 
@@ -20,11 +22,11 @@ app.post('/api/supplier/price', supplierAuth, (req, res) => {
   };
   db.data.supplierPrices.unshift(entry);
   db.data.supplierPrices = db.data.supplierPrices.slice(0, 200);
-  save();
+  bewaar(['supplierPrices']);
   // backoffice ziet het live binnenkomen
   sseToOffice('sync', { scope: 'prices' });
   sseToOffice('notify', { icon: 'betalen', title: 'Nieuwe dynamische prijs', body: req.supplier.name + ': ' + service + ', € ' + price });
-  logActivity(req.supplier.code, req.actor, 'gaf een prijs door: ' + service + ' (€ ' + price + ')');
+  noteer(req.supplier.code, req.actor, 'gaf een prijs door: ' + service + ' (€ ' + price + ')');
   res.json({ ok: true, entry });
 });
 
@@ -72,8 +74,8 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
     recept: String(m.recept || '').slice(0, 1500)
     };
   });
-  save();
-  logActivity(req.supplier.code, req.actor, 'werkte de menukaart bij');
+  bewaar(['suppliers']);
+  noteer(req.supplier.code, req.actor, 'werkte de menukaart bij');
   res.json({ ok: true, menu: req.supplier.menu });
 });
 
@@ -82,7 +84,7 @@ app.post('/api/supplier/menu/foto', express.json({ limit: '6mb' }), supplierAuth
   const item = (req.supplier.menu || []).find(m => String(m.id) === String(req.body.id || ''));
   if (!item) return res.status(404).json({ error: 'Dit gerecht staat niet op de kaart.' });
   if (req.body.verwijder === true) {
-    delete item.foto; save();
+    delete item.foto; bewaar(['suppliers']);
     return res.json({ ok: true, id: item.id, foto: null });
   }
   const img = String(req.body.foto || '');
@@ -90,8 +92,8 @@ app.post('/api/supplier/menu/foto', express.json({ limit: '6mb' }), supplierAuth
   if (img.length > 1.5 * 1024 * 1024) return res.status(413).json({ error: 'Foto te groot (maximaal ongeveer 1 MB).' });
   const ref = await media.bewaarPubliek(img, 1.5 * 1024 * 1024);
   if (!ref) return res.status(400).json({ error: 'Foto kon niet veilig worden opgeslagen.' });
-  item.foto = ref; save();
-  logActivity(req.supplier.code, req.actor, 'plaatste een foto bij gerecht "' + item.name + '"');
+  item.foto = ref; bewaar(['suppliers']);
+  noteer(req.supplier.code, req.actor, 'plaatste een foto bij gerecht "' + item.name + '"');
   res.json({ ok: true, id: item.id, foto: ref });
 });
 

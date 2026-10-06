@@ -38,13 +38,14 @@
 
 // Pas bij de meting laden: begroting gebruikt zelf de handelingscontext.
 function collectieSleutels(data) { return require('./begroting').collectieSleutels(data); }
+function rijSleutels(data) { return require('./begroting').rijSleutels(data); }
 
 /* Alleen top-level arrays tellen. Een object of een getal in db.data is geen
    collectie met rijen, en meetellen zou het getal betekenisloos maken. */
 function tel(data) {
   const uit = new Map();
   if (!data || typeof data !== 'object') return uit;
-  for (const sleutel of collectieSleutels(data)) {
+  for (const sleutel of rijSleutels(data)) {
     const v = data[sleutel];
     if (Array.isArray(v)) uit.set(sleutel, v.length);
   }
@@ -67,4 +68,4 @@ function verschil(voor, na) {
   return wijzigingen;
 }
 
-module.exports = { tel, verschil, collectieSleutels };
+module.exports = { tel, verschil, collectieSleutels, rijSleutels };

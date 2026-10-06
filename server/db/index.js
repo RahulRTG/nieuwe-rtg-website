@@ -58,6 +58,13 @@ save.sleutels = keys => {
     throw new Error('Selectieve opslag vereist bestaande collecties.');
   return bewaar([...new Set(keys)]);
 };
+// De datalaag snijdt een vast domeinvlak tot de aanwezige collecties terug.
+save.bestaande = keys => {
+  if (!Array.isArray(keys) || !keys.length || keys.some(k => typeof k !== 'string' || !k))
+    throw new Error('Selectieve opslag vereist een niet-lege sleutellijst.');
+  const aanwezig = [...new Set(keys)].filter(k => Object.hasOwn(db.data, k));
+  return aanwezig.length ? bewaar(aanwezig) : bewaar();
+};
 save.audit = require('./audit-poort')({ db, store: STORE, sqlite, bundelDoos, bewaar });
 function bewaar(sleutels, auditOp) {
   if (!db.writable) return;
@@ -90,9 +97,15 @@ function bewaar(sleutels, auditOp) {
      telt dus de POGING; een bundel van drie plus zijn commit telt vier. Bewust:
      de vraag is niet "hoeveel" maar "iets of niets", en die mag geen tak missen. */
   effectmeter.tel('opslag');
+  const auditOps = auditOp ? (Array.isArray(auditOp) ? auditOp : [auditOp]) : [];
   const doos = bundelDoos();
   if (doos && doos.open) {
-    if (auditOp) sqlite.auditMotor().stage(doos, auditOp);
+    for (const op of auditOps) sqlite.auditMotor().stage(doos, op);
+    if (sleutels === undefined) doos.volledig = true;
+    else {
+      if (!doos.sleutels) doos.sleutels = new Set();
+      for (const sleutel of sleutels) doos.sleutels.add(sleutel);
+    }
     doos.nodig = true; return;
   } // binnen bijeen: aan het eind, in een commit
   // verraadfase = de motor ACHTER de opstartpoort; zie ../lib/verraadfase.js
@@ -109,7 +122,7 @@ function bewaar(sleutels, auditOp) {
     postgres.planSave();
   } else if (STORE === 'sqlite') {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
-    sqlite.saveSqlite(Boolean(sleutels), sleutels, auditOp ? [auditOp] : []);
+    sqlite.saveSqlite(Boolean(sleutels), sleutels, auditOps);
   } else if (STORE === 'geheugen') {
     // GEHEUGEN: versleutelde, incrementele brok-per-collectie-opslag (write-behind).
     geheugen.saveGeheugen();

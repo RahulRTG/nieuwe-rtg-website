@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-10-05T23:24:48.106Z",
-    "commit": "19464408",
-    "routesToen": 5387
+    "op": "2026-10-05T14:25:29.666Z",
+    "commit": "656b69b8",
+    "routesToen": 5391
   },
   "aangeraakt": [
     "GET /",
@@ -847,6 +847,7 @@
     "POST /api/foundation/gezin/spaardoel/maak",
     "POST /api/foundation/gezin/spaardoel/verwijder",
     "POST /api/foundation/gezin/stroom/ticket",
+    "POST /api/foundation/gezin/toestemming/gezondheid",
     "POST /api/foundation/gezin/uitnodiging/accepteer",
     "POST /api/foundation/gezin/uitnodiging/bekijk",
     "POST /api/foundation/gezin/uitnodiging/intrek",
@@ -3491,6 +3492,7 @@
     "POST /api/rtf/vacatures",
     "POST /api/rtf/welzijn/dagboek",
     "POST /api/rtf/welzijn/stemming",
+    "POST /api/rtf/welzijn/toestemming",
     "POST /api/rtfkantoor/advies",
     "POST /api/rtfkantoor/club/afspraak",
     "POST /api/rtfkantoor/club/afspraak-zet",
@@ -4983,6 +4985,7 @@
     "POST /api/techniek/beveiliging/afhandelen",
     "POST /api/techniek/beveiliging/auto",
     "POST /api/techniek/bevestig/opties",
+    "POST /api/techniek/bewaren/gezinnen",
     "POST /api/techniek/bewaren/veeg",
     "POST /api/techniek/controle/incident",
     "POST /api/techniek/controle/integriteit",

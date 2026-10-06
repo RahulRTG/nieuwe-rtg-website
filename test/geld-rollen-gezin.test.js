@@ -62,6 +62,8 @@ const haal = (pad, token) => fetch(base + '/api/foundation' + pad, {
 async function maakGezin(merk) {
   const g = (await post('/gezin/maak', { gezinsnaam: 'Fam ' + merk, naam: 'Moeder ' + merk, pin: '1234' })).body;
   assert.ok(g.code && g.token, 'gezin ' + merk + ' bestaat: ' + JSON.stringify(g).slice(0, 160));
+  // art. 9: zonder toestemming weigert de zorgkaart al vóór de rolcontrole die dit meet
+  await post('/gezin/toestemming/gezondheid', { code: g.code, token: g.token, aan: true });
 
   const kind = (await post('/gezin/profiel/maak',
     { code: g.code, token: g.token, naam: 'Kind ' + merk, rol: 'kind' })).body;

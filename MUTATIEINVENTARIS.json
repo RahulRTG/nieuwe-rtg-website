@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-06T14:42:23.197Z",
-  "commit": "b3ab576b9",
+  "op": "2026-10-06T19:39:44.429Z",
+  "commit": "f3816ac97",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 7,
   "instrument": "scripts/mutatieinventaris.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "uitleg": "De vijf inventarissen uit EEN bron, met per stap hoeveel er afvallen en waarom. Zonder dit bestand heten vier verschillende getallen allemaal \"het aantal routes\", en is elk percentage dat erop rust niet na te rekenen.",
  "grens": "Dit telt wat de ROUTER kent. Een mutatie die niet over HTTP binnenkomt -- een taak, een achtergrondlus, een migratie -- staat hier niet in en is daarmee niet geteld, niet veilig.",

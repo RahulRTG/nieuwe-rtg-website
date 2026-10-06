@@ -77,8 +77,9 @@ test.before(async () => {
   const leugenMap = verseMap();
   const voor = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: leugenMap, OFFICE_CODE: 'KANTOOR-BNKD-2' } });
   await bankLive(voor.base, 'KANTOOR-BNKD-2');
+  const weg = new Promise(r => voor.child.once('exit', r));
   stop(voor.child);
-  await new Promise(r => setTimeout(r, 1500));
+  await weg;
   leugen = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: leugenMap, OFFICE_CODE: 'KANTOOR-BNKD-2',
     RTG_VERRAAD: 'schrijf-verloren' } });
   eerlijk = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: verseMap(), OFFICE_CODE: 'KANTOOR-BNKD-1' } });

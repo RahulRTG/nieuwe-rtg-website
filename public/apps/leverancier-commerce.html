@@ -72,6 +72,11 @@
   .stap span{font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);border:1px solid var(--line);border-radius:0;padding:.14rem .5rem;}
   .stap span.nu{border-color:var(--gold);color:var(--gold);}
   .leeg{color:var(--muted);font-size:.88rem;padding:1.2rem 0;}
+  .leeg a{color:var(--rtg-leesgoud,var(--gold)) !important;}
+  input.b15{min-width:15rem !important;}
+  input.b12{min-width:12rem !important;}
+  input.b10{min-width:10rem !important;}
+  input.w9{width:9rem !important;}
   .stuk{border:1px solid var(--burgundy);border-radius:0;padding:.7rem .9rem;color:var(--burgundy);font-size:.83rem;margin-bottom:1rem;}
   .nietkan{border:1px dashed var(--line);border-radius:0;padding:.7rem .9rem;color:var(--soft);font-size:.8rem;line-height:1.55;margin-top:.7rem;}
   #melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.2rem;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9;}
@@ -111,7 +116,7 @@ const api = (pad, body) => fetch(pad, {
   if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
 if (!TOKEN) {
-  $('#main').innerHTML = '<p class="leeg">Log eerst in op uw zaak via <a href="/apps/leverancier.html" style="color:var(--rtg-leesgoud,var(--gold));">de leverancier-app</a>.</p>';
+  $('#main').innerHTML = '<p class="leeg">Log eerst in op uw zaak via <a href="/apps/leverancier.html">de leverancier-app</a>.</p>';
 } else { start(); }
 
 let SOORTEN = [], TOEGANG = [], PUBLIEK = null;
@@ -188,7 +193,7 @@ function tekenNieuw(nietGebouwd){
   $('#nieuw').innerHTML =
     '<h3>Nieuwe verkoopweg</h3>' +
     '<div class="rij">' +
-      '<input id="n-naam" placeholder="Naam, bijvoorbeeld Onze webshop" style="min-width:15rem;">' +
+      '<input id="n-naam" placeholder="Naam, bijvoorbeeld Onze webshop" class="b15">' +
       '<select id="n-soort" aria-label="Soort verkoopweg">' + SOORTEN.map(s => '<option value="'+esc(s.id)+'">'+esc(s.label)+'</option>').join('') + '</select>' +
       '<select id="n-toegang" aria-label="Toegang tot verkoopweg">' + TOEGANG.map(t => {
         const kan = t.kan === null ? magPubliek : t.kan !== false;
@@ -246,9 +251,9 @@ function kaartVan(x){
   let acties = '';
   if (x.stand === 'gevraagd') {
     acties = '<div class="rij">' +
-      '<input placeholder="Uw ordernummer (optioneel)" data-kenmerk="'+esc(x.id)+'" style="min-width:12rem;">' +
+      '<input placeholder="Uw ordernummer (optioneel)" data-kenmerk="'+esc(x.id)+'" class="b12">' +
       '<button class="knop doe" data-zet="'+esc(x.id)+'" data-naar="aanvaard">Terugnemen</button>' +
-      '<input placeholder="Reden bij afwijzen" data-reden="'+esc(x.id)+'" style="min-width:12rem;">' +
+      '<input placeholder="Reden bij afwijzen" data-reden="'+esc(x.id)+'" class="b12">' +
       '<button class="knop" data-zet="'+esc(x.id)+'" data-naar="afgewezen">Afwijzen</button></div>';
   } else if (x.stand === 'onderweg') {
     acties = '<div class="rij"><select data-staat="'+esc(x.id)+'">' +
@@ -257,8 +262,8 @@ function kaartVan(x){
   } else if (x.stand === 'beoordeeld') {
     acties = '<div class="rij"><select data-uitkomst="'+esc(x.id)+'">' +
       ['geld-terug','deels-terug','tegoed','vervanging','reparatie','niets'].map(s => '<option value="'+s+'">'+s+'</option>').join('') +
-      '</select><input placeholder="Bedrag in euro (bij deels)" data-bedrag="'+esc(x.id)+'" style="width:9rem;">' +
-      '<input placeholder="Reden" data-reden2="'+esc(x.id)+'" style="min-width:10rem;">' +
+      '</select><input placeholder="Bedrag in euro (bij deels)" data-bedrag="'+esc(x.id)+'" class="w9">' +
+      '<input placeholder="Reden" data-reden2="'+esc(x.id)+'" class="b10">' +
       '<button class="knop doe" data-zet="'+esc(x.id)+'" data-naar="afgehandeld">Afhandelen</button></div>';
   }
   const voorraad = x.voorraadKan == null ? '' :

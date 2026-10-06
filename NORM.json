@@ -14,24 +14,24 @@
     "carriereDomeinenGemeten": 15,
     "dbDeuren": 539,
     "dbDeurenSchrijvend": 275,
-    "dekkingPct": 83,
+    "dekkingPct": 84,
     "dekkingWaargenomenPct": 100,
     "delenZonderOnderwerp": 0,
     "dependencies": 0,
     "devPakketten": 1,
     "e2eBestanden": 307,
     "endpointsNooitAangeraakt": 0,
-    "endpointsZonderTest": 896,
+    "endpointsZonderTest": 854,
     "faalproefGezakt": 0,
     "gluurGaten": 0,
     "gluurGecontroleerd": 2417,
     "gluurOnbewaakt": 0,
-    "inlineStijlAttributen": 4541,
+    "inlineStijlAttributen": 4515,
     "kernBreedsteBestand": 71,
     "kernBreedte": 1685,
     "kernGedeeld": 254,
     "kernOngebruikt": 0,
-    "keuringDekkingAdvies": 52,
+    "keuringDekkingAdvies": 50,
     "keuringDubbeling": 185,
     "keuringOmvang": 343,
     "keuringScheef": 14,
@@ -59,7 +59,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 2126,
+    "testbestanden": 2128,
     "toetsenNietGemeten": 129,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -146,15 +146,15 @@
     "edgeDubbeleEigenaars": 12,
     "rtgDodeKanalen": 0,
     "edgeVeldIdentiteit": 0,
-    "edgeVeldWereld": 283,
-    "edgeVeldContext": 284,
+    "edgeVeldWereld": 284,
+    "edgeVeldContext": 285,
     "edgeVeldObject": 0,
     "edgeVeldActiviteit": 0,
     "edgeVeldPresence": 0,
     "edgeVeldVoortzetting": 0,
-    "edgeVeldHoofdactie": 61,
+    "edgeVeldHoofdactie": 62,
     "edgeVeldTrust": 0,
-    "edgeVeldContextZelf": 14,
+    "edgeVeldContextZelf": 15,
     "positieZonderTermijn": 1,
     "positieNietVergeten": 17,
     "positieStromenGezien": 35,
@@ -4294,17 +4294,17 @@
     "keuringOmvang": "2026-09-27",
     "testbestanden": "2026-10-06",
     "toetsenNietGemeten": "2026-10-06",
-    "inlineStijlAttributen": "2026-10-04",
+    "inlineStijlAttributen": "2026-10-06",
     "ratelTanden": "2026-10-04",
     "metingenZonderRatel": "2026-10-04",
     "bewijsAchterstand": "2026-10-06",
     "toetsenOngevoeligPct": "2026-09-05",
-    "endpointsZonderTest": "2026-10-04",
-    "dekkingPct": "2026-10-04",
+    "endpointsZonderTest": "2026-10-06",
+    "dekkingPct": "2026-10-06",
     "keuringScheef": "2026-10-04",
     "keuringTeGroot": "2026-10-04",
     "keuringDubbeling": "2026-09-15",
-    "keuringDekkingAdvies": "2026-10-04",
+    "keuringDekkingAdvies": "2026-10-06",
     "dbDeuren": "2026-09-28",
     "dbDeurenSchrijvend": "2026-08-28",
     "browserpoortToetsen": "2026-10-06",
@@ -4404,15 +4404,15 @@
     "edgeDubbeleEigenaars": "2026-09-23",
     "rtgDodeKanalen": "2026-09-23",
     "edgeVeldIdentiteit": "2026-09-23",
-    "edgeVeldWereld": "2026-10-04",
-    "edgeVeldContext": "2026-10-04",
+    "edgeVeldWereld": "2026-10-06",
+    "edgeVeldContext": "2026-10-06",
     "edgeVeldObject": "2026-09-23",
     "edgeVeldActiviteit": "2026-09-23",
     "edgeVeldPresence": "2026-09-23",
     "edgeVeldVoortzetting": "2026-09-23",
-    "edgeVeldHoofdactie": "2026-10-04",
+    "edgeVeldHoofdactie": "2026-10-06",
     "edgeVeldTrust": "2026-09-23",
-    "edgeVeldContextZelf": "2026-10-04",
+    "edgeVeldContextZelf": "2026-10-06",
     "bewijsAlleenKeten": "2026-10-06",
     "positieZonderTermijn": "2026-10-04",
     "positieNietVergeten": "2026-10-04",
@@ -4424,264 +4424,5 @@
     "bronBlindeBestanden": "2026-10-04",
     "zelfpoortendeToetsen": "2026-10-06"
   },
-  "uitzonderingen": [
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/commerce.html",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere commerce-tak van PR #129; de 13 eenmalige stijlattributen gaan naar componentklassen bij het aflossen van COMMERCE.md"
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/kosten.html",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere kostprijstak van PR #125; het ene attribuut verhuist naar de gedeelde kostprijs-tekenlaag"
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/leverancier-commerce.html",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere commerce-tak van PR #129; de zes eenmalige stijlattributen gaan naar de commerce-stijlkop"
-    },
-    {
-      "regel": "inline-stijl",
-      "pad": "public/apps/leverancier/leverancier-56a.js",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere commerce-tak van PR #129; de zes schermspecifieke attributen worden bij de volgende leveranciersbundelknip klassen"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/accounts/users.js",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #123/#131; de wachtwoordzaaiing wordt als eigen accountmodule afgesplitst"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/kern/fiscaal/index.js",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #120/#129; de commerce-fiscale regels krijgen een eigen fiscaal deelbestand"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/kern/magnaatwereld.js",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #132; de al te grote Magnaatwereld groeide 41 bytes en wordt langs de bestaande wereldkamers verder gesplitst"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/kern/vergeten.js",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #106/#132; duurzame privacywissing verhuist naar een eigen vergeetregister"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/opzet/diensten2.js",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #112/#125; de kostprijsdiensten worden in een derde dienstenkamer aangesloten"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/opzet/kernlaag4.js",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere kostprijstak van PR #125; de economische besturingslaag krijgt een eigen kernlaagdeel"
-    },
-    {
-      "regel": "omvang",
-      "pad": "server/opzet/leverancierpoort.js",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #112/#125; de kostprijs- en gezagsroutes worden naar een leverancierspoortdeel verplaatst"
-    },
-    {
-      "regel": "nieuw-endpoint-zonder-toets",
-      "pad": "server/routes/appstore/persoon.js",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere makerstak van PR #126; de vier lees- en intrekpaden krijgen expliciete HTTP-contracttoetsen naast de bestaande kern- en schermtoetsen"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/grafsteen.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #132; de proef vereist bewust PostgreSQL, draait in CI met die dienst en blijft lokaal expliciet overgeslagen tot de standaarddraaier PostgreSQL start"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/kascode-credential.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de kas- en tikcode-raceproef (claim over twee instances, hervatten na een crash, tikteller) vereist echte PostgreSQL; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die dienst, terwijl hij lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/algpin-herstel.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor de herstelsleutel van de algemene pin (claim, heruitgifte die intrekt, over twee instances) vereist een echte PostgreSQL-dienst; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die dienst, terwijl hij lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/zaakdoos-sleutel.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor de sleutel per Zaakdoos (twee rotaties van dezelfde doos, het plafond per zaak en een intrekking tegen een uitgifte over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/arrivalpas.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de Arrival Pass-raceproef (aanvraag, voorbereidingsclaim, rotatie en intrekking over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/afhaalcode.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de afhaalcode-raceproef (claim, rotatie en betaalweg over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/giftcard-credential.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de cadeaukaart-raceproef (saldo, deelbedragen, kassasleutel, rotatie, intrekking en de migratie van oude codes over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/ticketcodes.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor de entreecode van een activiteitenticket en de code van een OV-vervoerbewijs (twee poorten, twee conducteurs, scan tegen rotatie, over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/boarding-pass.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de boardingpass-raceproef vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/contactpin-live.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de live contactpinproef vereist echte PostgreSQL; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI, terwijl een lokale machine zonder database geen vervangend groen bewijs mag produceren"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/foundation-persoonscodes.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de multi-instance atomiciteitsproef voor persoonscodes vereist echte PostgreSQL; de centrale pg-draaier voert hem verplicht uit en de lokale skip voorkomt dat SQLite ten onrechte als hetzelfde bewijs wordt behandeld"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/intrekking-multi-instance.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de intrekkingsproef vereist twee processen met echte PostgreSQL en Redis; hij staat in de verplichte pg-draaier en CI levert beide diensten, terwijl lokaal zonder die topologie geen zwakker scenario als geslaagd mag tellen"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/payout-terugboeking.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de gelijktijdige payout-terugboeking bewijst juist de PostgreSQL-transactie en kan niet eerlijk op een ontbrekende dienst draaien; scripts/lib/pg-toetslijst.js maakt hem verplicht in CI en lokaal blijft het ontbreken zichtbaar als skip"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/postgres-requestcommit.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de requestcommit-proef toetst echte PostgreSQL-commit- en rollbacksemantiek; hij draait verplicht in de centrale pg-draaier en wordt lokaal zonder PostgreSQL niet vervangen door een niet-equivalente neptransactie"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/rtf-samen-credential.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de Samen-credentialrace vereist echte PostgreSQL; registratie in scripts/lib/pg-toetslijst.js dwingt uitvoering in CI af en de lokale skip voorkomt vals bewijs zonder gedeelde opslag"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/rtgid-credential.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de RTG-ID credentialrace vereist echte PostgreSQL; de CI-pg-draaier voert hem verplicht uit en lokaal zonder database blijft expliciet zichtbaar dat dit bewijs niet is geleverd"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/salon-claimcode.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de Salon-claimcoderace vereist echte PostgreSQL; hij staat verplicht in de CI-pg-draaier en een lokale skip is veiliger dan dezelfde invariant op een ander opslagmodel te veinzen"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/tegoedbon-credential.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de tegoedbonrace en de hervatte saga na een crash over twee instances bewijzen juist de PostgreSQL-collectie- en economische transactie; scripts/lib/pg-toetslijst.js maakt hem verplicht in CI en lokaal zonder database blijft het ontbreken zichtbaar als skip"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/spelprojectie.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de spelprojectie-claimrace vereist echte PostgreSQL; scripts/lib/pg-toetslijst.js laat CI hem verplicht uitvoeren en lokaal zonder die dienst wordt geen zwakker resultaat als equivalent bewijs geaccepteerd"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/accounts-requestcommit.pg.test.js",
-      "vervalt": "2026-12-27",
-      "reden": "de accountwerkkopie als deelnemer aan de PostgreSQL-requestcommit vereist echte PostgreSQL (unieke botsing, verouderde basis en een gedode backend bestaan alleen daar); scripts/lib/pg-toetslijst.js laat CI hem verplicht zonder skip draaien, en een lokale skip is eerlijker dan dezelfde invariant op een nagemaakte client te veinzen -- dat deel dekt test/accounts-transactie.test.js al"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/restdeuren.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef van de vier restdeuren (OV-incheckcode, bezorgcode, festivalpas, activiteit-incheckcode) over twee instances vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/horecabon-credential.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor de horecabon en het polsbandsaldo (saldo, deelbedragen, kassasleutel, koppeling aan twee gastsessies, rotatie en de migratie van oude 32-bitcodes over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/eten-kortingscode.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor de promotiecode van RTG Eten (het laatste gebruik, de grens per lid en dezelfde rekening over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/codedeuren-claim.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef van vier codedeuren (concernuitnodiging, kantooruitnodiging, terugvalcode van de supportbevestiging en teamkamercode, elk over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl lokaal zonder die infrastructuur expliciet wordt overgeslagen in plaats van een lichtere opslag als bewijs te laten gelden"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/personeelsuitnodiging.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor de personeelsuitnodiging (twee leden op twee instances om dezelfde eenmalige code) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/partnerpersoneelscode.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor de personeelscode per medewerker van het partnerkanaal (B14: twee boekingen tegelijk op het laatste gebruik, een rotatie tegen een boeking met de oude code en een intrekking tegen een uitgifte, over twee instances) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/linkcap-credential.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor de RTG Link-drager (link.capability_aanvaarden, B15: twee claims op twee instances, intrekken tegen claimen, en alleen hashes in PostgreSQL) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/foundation-lescredential.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor de lescode van RTFoundation-onderwijs (twaalf leerlingen op twee instances om elf plekken, en een rotatie op A tegen een toetreding met de oude code op B) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/gezinsuitnodiging.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor de gezinsuitnodiging (twee instances en twaalf tikken om dezelfde eenmalige uitnodiging, die een profiel met een gezinssessie oplevert) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/foundation-lesstroom.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor het stroomticket van RTFoundation-onderwijs (B25: acht gelijktijdige claims op een eenmalig ticket over twee instances, en een intrekking op A tegen een claim op B) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/gezinsdeur.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor de gezinsdeur (B18: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode, en een rotatie op A tegen de oude code op B) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
-    }
-  ]
+  "uitzonderingen": []
 }

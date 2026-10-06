@@ -153,3 +153,12 @@
    dus hij klopt ook op een pagina zonder themalaag. Gemeten 11,04:1 licht en
    16,16:1 donker. */
 .h-witlink { color: light-dark(#3A3733, #FFFFFF) !important; text-decoration: underline !important; }
+
+/* Uit het beveiligingsbord van de leverancier-app (leverancier-56a.js): een
+   lijstrij met een lijn eronder en de knop rechts, en de rode ernst. Zelfde
+   regel als hierboven: !important, zodat de klasse wint zoals het attribuut
+   won. */
+.h-lijstrij { border-bottom: 1px solid var(--line) !important; padding: .4rem 0 !important; display: flex !important; justify-content: space-between !important; gap: .5rem !important; }
+.h-rij3 { display: flex !important; gap: .3rem !important; }
+.h-zelfboven { align-self: flex-start !important; }
+.h-rood { color: var(--rood) !important; }

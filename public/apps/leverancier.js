@@ -6573,10 +6573,10 @@
    letterlijk dezelfde. Dit deel: de staart van het beveiligingsbord. */
 /* de incidenten op het beveiligingsbord */
     if (cmd.incidenten && cmd.incidenten.length){
-      h += '<div class="st-sec">'+T('bev.incs','Incidenten')+'</div><div class="card" style="margin-bottom:0.5rem;">'+
-        cmd.incidenten.map(x => '<div style="border-bottom:1px solid var(--line);padding:0.4rem 0;display:flex;justify-content:space-between;gap:0.5rem;">'+
-          '<span><b'+(x.ernst==='kritiek'||x.ernst==='hoog'?' style="color:var(--rood);"':'')+'>'+(x.sos?'':'')+esc(x.soort)+'</b> · '+esc(x.post)+' · '+esc(x.guardNaam||'')+'<br><span class="sub">'+esc(x.tekst)+'</span></span>'+
-          '<button class="bev-inc" data-id="'+x.id+'" style="align-self:flex-start;">'+(x.status==='open'?T('bev.afh','Afhandelen'):T('bev.heropen','Heropen'))+'</button></div>').join('')+'</div>';
+      h += '<div class="st-sec">'+T('bev.incs','Incidenten')+'</div><div class="card h-mb50">'+
+        cmd.incidenten.map(x => '<div class="h-lijstrij">'+
+          '<span><b'+(x.ernst==='kritiek'||x.ernst==='hoog'?' class="h-rood"':'')+'>'+(x.sos?'':'')+esc(x.soort)+'</b> · '+esc(x.post)+' · '+esc(x.guardNaam||'')+'<br><span class="sub">'+esc(x.tekst)+'</span></span>'+
+          '<button class="bev-inc h-zelfboven" data-id="'+x.id+'">'+(x.status==='open'?T('bev.afh','Afhandelen'):T('bev.heropen','Heropen'))+'</button></div>').join('')+'</div>';
     }
     el.innerHTML = h;
     wireFuncBlok(el);
@@ -6612,9 +6612,9 @@
     const el = $('#bevAvLijst'); if (!el) return;
     let d; try { d = await API.call('/supplier/beveiliging/aanvragen'); } catch(e){ return; }
     if (!d.open.length && !d.afgerond.length){ el.innerHTML = '<div class="softline">'+T('bev.geenav','Nog geen inzetaanvragen.')+'</div>'; return; }
-    el.innerHTML = d.open.map(a => '<div style="border-bottom:1px solid var(--line);padding:0.4rem 0;display:flex;justify-content:space-between;gap:0.5rem;">'+
+    el.innerHTML = d.open.map(a => '<div class="h-lijstrij">'+
       '<span><b>'+esc(a.klant)+'</b> · '+esc(a.object)+' · '+esc(a.datum)+' · '+a.aantal+'× '+esc(a.shiftId)+'</span>'+
-      '<span style="display:flex;gap:0.3rem;"><button class="abtn" data-avplan="'+a.ref+'">'+T('bev.avplan','Inplannen')+'</button>'+
+      '<span class="h-rij3"><button class="abtn" data-avplan="'+a.ref+'">'+T('bev.avplan','Inplannen')+'</button>'+
       '<button class="abtn ghost" data-avweg="'+a.ref+'">'+T('bev.avweg','Afwijzen')+'</button></span></div>').join('')+
       (d.afgerond.length? '<div class="sub h-mt40">'+d.afgerond.slice(0,5).map(a=>esc(a.object)+' ('+esc(a.status)+')').join(' · ')+'</div>':'');
     el.querySelectorAll('[data-avplan]').forEach(x => x.addEventListener('click', async () => {

@@ -1,11 +1,9 @@
 /* ============================================================================
    DE BEDOELING PER SCHRIJFROUTE -- mensenwerk in het contractregister.
 
-   scripts/mutatiecontract.js leidt vier van de vijf assen af uit een bron: de
-   routes en hun deur uit de draaiende router, het duplicaatgedrag uit
-   ./idemsleutels.js, het bewijs uit IDEMPROEF.json. Wat een machine niet kan
-   waarnemen is de BEDOELING: of een tweede aanroep een dubbeltik is of een
-   tweede handeling, en of een open deur open HOORT te staan.
+   scripts/mutatiecontract.js leidt routes, deuren, duplicaatgedrag en bewijs
+   af. Alleen de BEDOELING blijft mensenwerk: is herhaling een dubbeltik of een
+   tweede handeling, en hoort een open deur open te staan?
 
    Dat staat hier, per route, met de reden erbij.
 
@@ -58,6 +56,8 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-vrijheid').CONTRACTEN,
   require('./mutatiecontracten-magnaatleven').CONTRACTEN,
   require('./mutatiecontracten-democratie').CONTRACTEN,
+  require('./mutatiecontracten-eigengezin').CONTRACTEN,
+  require('./mutatiecontracten-toestemming').CONTRACTEN,
   require('./mutatiecontracten-leerhuis').CONTRACTEN,
   require('./mutatiecontracten-carriereledger').CONTRACTEN,
   require('./mutatiecontracten-vakschema').CONTRACTEN,
@@ -99,6 +99,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-restdeuren').CONTRACTEN,
   require('./mutatiecontracten-codedeuren').CONTRACTEN,
   require('./mutatiecontracten-lesfamilie').CONTRACTEN,
+  require('./mutatiecontracten-lesstroom').CONTRACTEN,
   require('./mutatiecontracten-werksleutels').CONTRACTEN,
   require('./mutatiecontracten-machinesleutels').CONTRACTEN,
   require('./mutatiecontracten-ssogeheim').CONTRACTEN,

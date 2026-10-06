@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9826 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9833 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -182,7 +182,7 @@ omlaag.
 
 ## `apps/foundation/gezin-rt.js`
 
-`public/apps/foundation/gezin-rt/` -- 3 delen, 195 regels in de delen
+`public/apps/foundation/gezin-rt/` -- 3 delen, 208 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -202,7 +202,7 @@ omlaag.
 
 ## `apps/foundation/sessie.js`
 
-`public/apps/foundation/sessie/` -- 4 delen, 404 regels in de delen
+`public/apps/foundation/sessie/` -- 4 delen, 422 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -213,7 +213,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 115 delen, 9834 regels in de delen
+`public/apps/leverancier/` -- 115 delen, 9836 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -389,7 +389,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 32 delen, 3246 regels in de delen
+`public/apps/personeel/` -- 32 delen, 3252 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -526,7 +526,7 @@ omlaag.
 
 ## `apps/techniek.js`
 
-`public/apps/techniek/` -- 10 delen, 944 regels in de delen
+`public/apps/techniek/` -- 10 delen, 943 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -538,7 +538,7 @@ omlaag.
 | `techniek-03.js` | een functie globaal aan- of uitzetten |
 | `techniek-03a.js` | het doelgroepfilter met chips, en het zoeken erin |
 | `techniek-03c.js` | de automatische noodrem aan- of uitzetten |
-| `techniek-03d-sso.js` | SSO-CLIENTGEHEIMEN (besluit B16) |
+| `techniek-03d-sso.js` | SSO-CLIENTGEHEIMEN (B16, B22): alleen de STAND, nooit het geheim; roteren vraagt een verse passkey (RTGZwaar) |
 | `techniek-04.js` | De laatste stand van het statusbord, zodat "meenemen" uit het EIGEN model leest en niet uit de kaartjes op het scherm |
 
 ## `apps/werkplek-bureaus.js`
@@ -819,12 +819,12 @@ omlaag.
 
 ## `shared/rtg-edge-smart-menu.js`
 
-`public/shared/rtg-edge-smart-menu/` -- 2 delen, 250 regels in de delen
+`public/shared/rtg-edge-smart-menu/` -- 2 delen, 295 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `rtg-edge-smart-menu-00.js` | Twee gezichten, één hamburger: lokale context en heel RTG blijven in het bestaande Edge-menu |
-| `rtg-edge-smart-menu-01.js` | De menupanelen, focus en koppeling aan de bestaande Edge-schil |
+| `rtg-edge-smart-menu-01.js` | Dezelfde appcatalogus als de widgets: mobiel mag geen apps verliezen |
 
 ## `shared/rtg-schil.js`
 
@@ -902,14 +902,14 @@ omlaag.
 
 ## `shared/werkos.js`
 
-`public/shared/werkos/` -- 7 delen, 686 regels in de delen
+`public/shared/werkos/` -- 7 delen, 692 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `werkos-01.js` | RTG Werk-OS |
-| `werkos-01b.js` | De onderbalk is een onyx commandobalk, geen los merkobject |
-| `werkos-01bb.js` | Op de telefoon blijft de driedelige WerkOS-schil volledig bruikbaar |
-| `werkos-01c.js` | Beweging bevestigt alleen een wissel van werkvlak |
+| `werkos-01b.js` | WerkOS-commandobalk, Command Center en tabletindeling |
+| `werkos-01bb.js` | WerkOS op mobiel: compacte rail, context en bereikbare bediening |
+| `werkos-01c.js` | WerkOS-beweging, vaste rail en contextschil |
 | `werkos-02.js` | Command Center |
 | `werkos-03.js` | bouwen en spiegelen |
 | `werkos-04.js` | DE BORDSCHIL: het vlak dat over de app komt met de werkvlakken erin |

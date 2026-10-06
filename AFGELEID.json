@@ -3,16 +3,16 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-09-30T20:13:04.979Z",
-  "commit": "ec186c7b2",
+  "op": "2026-10-05T16:29:38.092Z",
+  "commit": "f5769378",
   "boomVuil": false,
-  "boomAnders": 10,
+  "boomAnders": 1,
   "instrument": "scripts/afgeleid.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "gemeten": {
-  "artefacten": 347,
-  "bron": 26,
+  "artefacten": 348,
+  "bron": 27,
   "afgeleid": 188,
   "fragmenten": 27,
   "momentopname": 1,
@@ -20,7 +20,7 @@
   "afgeleidZonderEigenaar": 1,
   "metEigenaar": 215,
   "afgeleidEigenaarHard": 187,
-  "afgeleidGrendelt": 26,
+  "afgeleidGrendelt": 27,
   "metStempel": 120,
   "stempelAnders": 0
  },
@@ -971,6 +971,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run doorwerking:vast",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DPIA-GEZIN.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -2660,7 +2672,7 @@
    "stempelInstrument": "scripts/mutatie.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run mutatie",
-   "grendelt": false,
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {

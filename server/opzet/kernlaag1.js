@@ -52,6 +52,9 @@ kern.magnaatLeren = require('../kern/spellen/magnaat/leerkring')({ db, save, cry
    op de kern -- een regel die bepaalt wat er van iemand bewaard blijft, hoort
    vindbaar te zijn onder een naam. */
 kern.volwassen = maakVolwassen({ accounts: hulp.accounts });
+/* Dezelfde poort voor het gezin aan een ouderaccount (foundation/gezinseigenaar.js):
+   een kind gaat pas open als de eigenaar volwassen() is, en geen tweede regel. */
+rtf.setVolwassen((sleutel) => kern.volwassen(sleutel) === true);
 Object.assign(kern, require('../kern/spellen')({
   db, save, bewerkCollectie, crypto, zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, sseToCustomer,
   isGeblokkeerd: kern.isGeblokkeerd, socialZoek: kern.socialZoek, sociaalRate: kern.sociaalRate,
@@ -92,6 +95,8 @@ Object.assign(kern, require('../kern/veiligheid')({
 Object.assign(kern, require('../kern/instant-reality')({ db, save, crypto, schoon }));
 kern.meldAan = meldAan;
 kern.meldLid = meldLid;
+// de aankondiging van de gezinsbewaartermijn landt op de sleutel van de ouder (foundation/gezinbewaren.js)
+if (rtf.gezinBewaren) rtf.gezinBewaren.setMelder(meldLid);
 
 /* Rahul kijkt mee (kern/kijken.js): een foto van iets, en hij zegt wat het is.
    De foto wordt nergens bewaard; zie de kop van die module. */

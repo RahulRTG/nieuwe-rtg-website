@@ -75,14 +75,25 @@
     </div>
     <div style="color:var(--zacht);font-size:.82rem;padding:.3rem 0 0;">Wat je typt wordt niet bewaard. Dit is geen medisch advies; bij klachten is de huisarts je adres.</div>
   </div>
+
+  <div class="deel">Toestemming</div>
+  <!-- art. 9: de aparte toestemming, en de weg om hem in te trekken (alleen voor een ouder of de beheerder) -->
+  <div class="kaart blok" id="toestemBlok" hidden>
+    <h2>Toestemming voor gezondheidsgegevens</h2>
+    <p id="toestemStand"></p>
+    <button class="knop klein grijs" id="toestemIntrek" type="button" hidden>Toestemming intrekken en alles wissen</button>
+    <div class="fout" id="toestemFout"></div>
+  </div>
 </div>
 
 <script src="sessie.js"></script>
+<script src="gezondheidstoestemming.js"></script>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisProfiel()) return;
 const api = Sessie.api;
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug:'index.html' });
@@ -91,7 +102,7 @@ let data = null, gekozen = null;
 
 async function laad(){
   try{
-    data = await fetch('/api/foundation/gezin/'+s.code+'/gezondheid?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    data = await fetch('/api/foundation/gezin/'+s.code+'/gezondheid',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     if (data.error) throw new Error(data.error);
     // allergiekaart
     $('#allergie').innerHTML = data.allergie
@@ -102,8 +113,27 @@ async function laad(){
     $('#kies').innerHTML = data.personen.map(p=>'<button data-pid="'+p.pid+'" class="'+(p.pid===gekozen?'aan':'')+'">'+esc(p.naam)+(p.teGeven?' · '+p.teGeven+'':'')+'</button>').join('');
     $('#kies').querySelectorAll('button').forEach(b=> b.onclick = ()=>{ gekozen = b.dataset.pid; toon(); });
     toon();
+    toonToestemming();
   }catch(e){ $('#paneel').innerHTML = '<div class="kaart blok"><div class="leeg">Kon het gezondheidsmaatje niet laden.</div></div>'; }
 }
+
+/* De toestemming is van het gezin; alleen een ouder of de beheerder ziet de
+   knop. Intrekken wist medicijnen, afspraken, metingen, de allergieregel en het
+   dagboek van wie jonger is dan 16 -- vandaar de bevestiging met WIS. */
+function toonToestemming(){
+  $('#toestemBlok').hidden = !data.magZorgprofiel;
+  $('#toestemStand').textContent = data.toestemming
+    ? 'U hebt toestemming gegeven om gezondheidsgegevens van het gezin te bewaren. Intrekken wist ze allemaal, ook het gevoelsdagboek van kinderen onder de 16.'
+    : 'Er is nog geen toestemming gegeven. Die vragen we zodra u voor het eerst iets invult.';
+  $('#toestemIntrek').hidden = !data.toestemming;
+}
+$('#toestemIntrek').onclick = async ()=>{
+  $('#toestemFout').textContent='';
+  const ja = prompt('Alle gezondheidsgegevens van het gezin worden gewist. Typ WIS om door te gaan.');
+  if (ja !== 'WIS') return;
+  try{ await api('/gezin/toestemming/gezondheid', { code:s.code, token:s.token, aan:false, bevestig:'WIS' }); laad(); }
+  catch(e){ $('#toestemFout').textContent = e.message; }
+};
 
 /* Meenemen (shared/uitvoer.js): de kaart van het hele gezin, want dat is wat
    de kiezer hierboven laat zien -- per gezinslid de medicijnen, de afspraken
@@ -181,7 +211,7 @@ function bind(p){
   $('#mAdd').onclick = async ()=>{
     $('#mFout').textContent='';
     const naam = $('#mNaam').value.trim(); if(!naam) return $('#mFout').textContent='Vul een medicijn in.';
-    try{ await api('/gezin/gezondheid/medicijn', { code:s.code, token:s.token, voor:p.pid, naam, dosis:$('#mDosis').value, tijd:$('#mTijd').value }); laad(); }
+    try{ await RTFToestemming.metToestemming(() => api('/gezin/gezondheid/medicijn', { code:s.code, token:s.token, voor:p.pid, naam, dosis:$('#mDosis').value, tijd:$('#mTijd').value })); laad(); }
     catch(e){ $('#mFout').textContent = e.message; }
   };
   $('#paneel').querySelectorAll('.rij[data-afs]').forEach(rij=> rij.querySelector('[data-afsdel]').onclick = ()=> doe('/gezin/gezondheid/afspraak/verwijder', { voor:p.pid, afspraakId:rij.dataset.afs }, true));
@@ -190,14 +220,14 @@ function bind(p){
     const wat = $('#aWat').value.trim(), datum = $('#aDatum').value;
     if(!wat) return $('#aFout').textContent='Wat voor afspraak?';
     if(!datum) return $('#aFout').textContent='Kies een datum.';
-    try{ await api('/gezin/gezondheid/afspraak', { code:s.code, token:s.token, voor:p.pid, wat, datum, tijd:$('#aTijd').value, waar:$('#aWaar').value }); laad(); }
+    try{ await RTFToestemming.metToestemming(() => api('/gezin/gezondheid/afspraak', { code:s.code, token:s.token, voor:p.pid, wat, datum, tijd:$('#aTijd').value, waar:$('#aWaar').value })); laad(); }
     catch(e){ $('#aFout').textContent = e.message; }
   };
   $('#gAdd').onclick = async ()=>{
     $('#gFout').textContent='';
     const gewicht = Number($('#gGew').value)||undefined, lengte = Number($('#gLen').value)||undefined;
     if(!gewicht && !lengte) return $('#gFout').textContent='Vul een gewicht of lengte in.';
-    try{ await api('/gezin/gezondheid/meting', { code:s.code, token:s.token, voor:p.pid, gewicht, lengte, datum:$('#gDat').value||undefined }); laad(); }
+    try{ await RTFToestemming.metToestemming(() => api('/gezin/gezondheid/meting', { code:s.code, token:s.token, voor:p.pid, gewicht, lengte, datum:$('#gDat').value||undefined })); laad(); }
     catch(e){ $('#gFout').textContent = e.message; }
   };
 }
@@ -210,6 +240,7 @@ async function doe(pad, extra, herlaad){
 laad();
 Sessie.coach({ kind: 'gezondheid', chat: $('#chat'), input: $('#vraag'), knop: $('#stuur') });
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}());
 </script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>

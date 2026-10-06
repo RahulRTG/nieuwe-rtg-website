@@ -47,7 +47,7 @@ async function gezin(naam) {
 async function kindVan(g) {
   const kind = await json(await fond('/gezin/profiel/maak',
     { code: g.code, token: g.token, naam: 'Kind', rol: 'gezinslid', groep: 'tiener' }));
-  const token = (await json(await fond('/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const token = (await json(await fond('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).token;
   return { token, id: kind.profiel.id };
 }
 async function nieuwLid(naam) {

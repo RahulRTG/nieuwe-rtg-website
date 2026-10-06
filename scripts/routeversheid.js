@@ -312,9 +312,14 @@ function vervalVan({ cellen, afh, registerVan, gewijzigdVoor }) {
     if (ZONDER_REGISTER.has(cel.bron)) continue;
     const reg = registerVan(cel.bron);
     if (!reg) { onbekend.push({ schakel, reden: 'onbekend welk register de bron `' + cel.bron + '` schrijft' }); continue; }
-    const basis = { schakel, register: reg.register, commit: reg.commit, herdraai: reg.herdraai };
+    const commit = cel.evidenceCommit || reg.commit;
+    const basis = { schakel, register: reg.register, commit, herdraai: reg.herdraai,
+      ...(cel.evidenceBinding ? { evidenceBinding: cel.evidenceBinding } : {}) };
+    if (cel.provenance === 'HISTORICAL_UNREVALIDATED') {
+      onbekend.push({ ...basis, reden: 'historische route-evidence is niet opnieuw gevalideerd' }); continue;
+    }
     if (!afh || !afh.handler) { onbekend.push({ ...basis, reden: 'geen gemeten bestand voor deze route (ROUTEBRON.json kent hem niet)' }); continue; }
-    const ch = gewijzigdVoor(reg.commit);
+    const ch = gewijzigdVoor(commit);
     if (!ch || ch.reden) { onbekend.push({ ...basis, reden: (ch && ch.reden) || 'meetcommit onbekend' }); continue; }
     const gm = [...afh.gemeten].filter(([b]) => ch.gewijzigd.has(b)).map(([bestand, k]) => ({ bestand, ...k }));
     if (gm.length) { verouderd.push({ ...basis, geraakt: gm }); continue; }

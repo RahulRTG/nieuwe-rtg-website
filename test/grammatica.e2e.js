@@ -116,6 +116,10 @@ async function zetProef(page, wat) {
    toets die daardoor zakt zegt iets over de toetsdriver en niets over het
    product. */
 async function trek(page, hoogte) {
+  // De geopende actielaag vervangt de compacte Edge. Sluit die via de echte
+  // bediening voordat het gebaar op de compacte balk begint.
+  await page.keyboard.press('Escape');
+  await wachtOpStilVak(page, '.rtg-adaptive-bar');
   /* Omhoog trekken OPENT een laag -- een lade bij een kleine trek, de taakmodus
      bij een grote. Wachten tot die laag er staat is de toestand waar elke
      aanroeper daarna over beweert; wachtOpRust keert terug voordat er iets is

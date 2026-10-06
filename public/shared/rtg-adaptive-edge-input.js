@@ -46,11 +46,22 @@
   /* De drempels staan in de grammatica (EDGE.md par. 11); zonder tabel zijn de
      gebaren op de balk uit en blijven tik, Cmd+K en Alt+pijl werken. */
   function drempels(rt) { var g = rt.win.RTGGrammatica; return g && g.DREMPELS || null; }
+  function busy(rt) {
+    if (rt.host.dataset.rtgSurface) return true;
+    var owner = rt.win.RTGEdge2;
+    if (owner && owner.isBusy) return owner.isBusy(rt.doc, false);
+    var active = rt.doc.activeElement;
+    return !!(rt.customPanel || rt.host.contains(active) || active &&
+      (active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName)));
+  }
   function bind(rt, handlers) {
     var down = false, x = 0, y = 0, lastX = 0, lastY = 0, timer = null, held = false, blockClickUntil = 0;
-    var scrollTimer = null, lastScroll = rt.win.scrollY || 0;
+    var scrollTimer = null, positions = new WeakMap(), listeners = [];
+    function listen(target, type, callback, options) {
+      target.addEventListener(type, callback, options); listeners.push([target, type, callback, options]);
+    }
     var D = null;
-    rt.bar.addEventListener('pointerdown', function (event) {
+    listen(rt.bar, 'pointerdown', function (event) {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
       D = drempels(rt);
       if (!D) return;
@@ -62,7 +73,7 @@
         haptic(rt.win);
       }, D.lang);
     });
-    rt.bar.addEventListener('pointermove', function (event) {
+    listen(rt.bar, 'pointermove', function (event) {
       if (!down) return;
       lastX = event.clientX; lastY = event.clientY;
       if (Math.abs(event.clientX - x) + Math.abs(event.clientY - y) > D.stil) {
@@ -90,12 +101,12 @@
       }
       else if (dy > D.veeg) handlers.state('peek');
     }
-    rt.bar.addEventListener('pointerup', stop);
-    rt.bar.addEventListener('pointercancel', function () { stop(null); });
-    rt.bar.addEventListener('click', function (event) {
+    listen(rt.bar, 'pointerup', stop);
+    listen(rt.bar, 'pointercancel', function () { stop(null); });
+    listen(rt.bar, 'click', function (event) {
       if (Date.now() < blockClickUntil) { event.preventDefault(); event.stopImmediatePropagation(); }
     }, true);
-    rt.doc.addEventListener('keydown', function (event) {
+    listen(rt.doc, 'keydown', function (event) {
       var input = /^(INPUT|TEXTAREA|SELECT)$/.test(event.target && event.target.tagName || '');
       if (!input && (event.metaKey || event.ctrlKey) && String(event.key).toLowerCase() === 'k') {
         event.preventDefault(); handlers.rahul();
@@ -103,31 +114,45 @@
         event.preventDefault(); handlers.deck(event.key === 'ArrowRight' ? 1 : -1);
       } else if (event.key === 'Escape') handlers.escape();
     });
-    /* WIE SCROLDE (EDGE.md, ronde 2). Een scroll zonder gebaar -- een anker, een
-       scrollTo van het scherm -- liet de balk opkijken en 520 ms later weer
-       zakken: een flikkering. Of een scroll van de mens kwam, heeft een eigenaar
-       (rtg-edge-2-context.js); de balk vraagt het met diens gestureBind en
-       gestureFresh op een eigen stand, net als de loader, en houdt geen tweede
-       definitie. Alleen waar Edge 2 draait: op de landing en de sitepagina's
-       blijft het zoals het was. */
+    // Only fresh user gestures fold the bar; programmatic scrolling must not.
+    // Gesture ownership stays with Edge 2, including nested app scrollers.
     var e2 = rt.win.RTGEdge2, gebaar = null;
     if (e2 && e2.gestureBind && e2.gestureFresh) { gebaar = { events: [] }; e2.gestureBind(gebaar, rt.win); }
-    rt.win.addEventListener('scroll', function () {
-      var now = rt.win.scrollY || 0, moved = Math.abs(now - lastScroll); lastScroll = now;
-      if (moved < 8 || rt.manual || rt.model.state === 'expanded') return;
+    positions.set(rt.doc, rt.win.scrollY || 0);
+    listen(rt.doc, 'focusin', function (event) {
+      var target = event.target;
+      if (rt.model.state === 'peek' && !rt.host.contains(target) &&
+          (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) {
+        handlers.state('dock');
+      }
+    });
+    listen(rt.doc, 'scroll', function (event) {
+      var target = event.target;
+      if (target !== rt.doc && (!(target instanceof rt.win.Element) || rt.edge.root.contains(target))) return;
+      var now = target === rt.doc ? rt.win.scrollY || 0 : target.scrollTop;
+      var delta = now - (positions.get(target) || 0); positions.set(target, now);
+      if (Math.abs(delta) < 8 || rt.manual || rt.model.state === 'expanded' || busy(rt)) return;
       if (gebaar && !e2.gestureFresh(gebaar)) return;
-      handlers.state('peek', 'auto'); rt.win.clearTimeout(scrollTimer);
+      handlers.state(delta > 0 ? 'peek' : 'dock', 'auto'); rt.win.clearTimeout(scrollTimer);
       scrollTimer = rt.win.setTimeout(function () {
         if (!rt.manual && rt.model.state === 'peek') handlers.state('dock', 'auto');
-      }, 520);
-    }, { passive: true });
+      }, 900);
+    }, { passive: true, capture: true });
+    // Capture nested app scrollers as well as document scroll; a panel being
+    // used never folds itself away. Destroy/start must not retain old listeners.
+    return function () {
+      rt.win.clearTimeout(timer); rt.win.clearTimeout(scrollTimer);
+      listeners.concat(gebaar ? gebaar.events : []).forEach(function (item) {
+        item[0].removeEventListener(item[1], item[2], item[3]);
+      });
+    };
   }
   // Public stories can use the same sheet without constructing a second bar.
   function closePanel(rt) {
     if (!rt || !rt.customPanel) return;
     var panel = rt.customPanel;
     panel.node.hidden = true; panel.parent.insertBefore(panel.node, panel.next && panel.next.parentNode === panel.parent ? panel.next : null);
-    rt.customPanel = null; reflect(rt); rt.sheetList.hidden = false;
+    rt.customPanel = null; delete rt.sheet.dataset.rtgCustomPanel; if (panel.onClose) panel.onClose(); reflect(rt); rt.sheetList.hidden = false;
     if (rt.controls) rt.controls.hidden = false;
     if (panel.focus && panel.focus.isConnected) panel.focus.focus({ preventScroll: true });
   }
@@ -135,8 +160,8 @@
     if (!rt || !node || node.ownerDocument !== rt.doc || !node.parentNode) return false;
     if (rt.customPanel && rt.customPanel.node === node) { setState('dock'); return true; }
     if (rt.host.contains(node)) return false;
-    closePanel(rt); setState('expanded');
-    rt.customPanel = { node: node, parent: node.parentNode, next: node.nextSibling, focus: rt.doc.activeElement };
+    closePanel(rt); setState('expanded'); rt.sheet.dataset.rtgCustomPanel = 'true';
+    rt.customPanel = { node: node, parent: node.parentNode, next: node.nextSibling, focus: rt.doc.activeElement, onClose: options && options.onClose };
     /* Het paneel van de host vervangt de lijst: een lege melding van daarvoor hoort
        er niet verborgen onder te blijven staan (stap 17, test/experience-rtg.e2e.js). */
     rt.sheetList.textContent = ''; rt.sheetList.hidden = true; if (rt.controls) rt.controls.hidden = true;
@@ -148,5 +173,5 @@
     if (focus) focus.focus({ preventScroll: true });
     return true;
   }
-  w.RTGAdaptiveEdgeInput = Object.freeze({ bind: bind, openPanel: openPanel, closePanel: closePanel, haptic: haptic, prepare: prepare, closeContext: closeContext, reflect: reflect });
+  w.RTGAdaptiveEdgeInput = Object.freeze({ bind: bind, busy: busy, openPanel: openPanel, closePanel: closePanel, haptic: haptic, prepare: prepare, closeContext: closeContext, reflect: reflect });
 }(window));

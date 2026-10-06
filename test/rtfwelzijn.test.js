@@ -29,9 +29,9 @@ test.before(async () => {
   g = gz.body;
   ouder = { code: g.code, token: g.token };
   const k = await api('/gezin/profiel/maak', Object.assign({}, ouder, { naam: 'Juno', rol: 'kind', groep: 'kind' }));
-  kind = { code: g.code, token: (await api('/gezin/profiel/kies', { code: g.code, profielId: k.body.profiel.id })).body.token };
+  kind = { code: g.code, token: (await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: k.body.profiel.id })).body.token };
   const ga = await api('/gezin/profiel/maak', Object.assign({}, ouder, { naam: 'Oppas Bo', rol: 'gast' }));
-  gast = { code: g.code, token: (await api('/gezin/profiel/kies', { code: g.code, profielId: ga.body.profiel.id })).body.token };
+  gast = { code: g.code, token: (await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: ga.body.profiel.id })).body.token };
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -41,6 +41,11 @@ test.after(() => {
 test('1. opt-in en een woord per dag: bewaren, herzien, en nooit een cijfer', async () => {
   let d = await wz('dagboek', kind);
   assert.equal(d.body.stemmingen.length, 0, 'zonder eigen keuze bewaart de server niets');
+  // art. 9 (DPIA-GEZIN.md): voor een kind onder de 16 geeft eerst een ouder toestemming
+  const zonder = await wz('stemming', Object.assign({}, kind, { gevoel: 'verdrietig' }));
+  assert.equal(zonder.status, 409, 'zonder toestemming wordt er niets bewaard');
+  assert.equal(zonder.body.hoe, 'toestemming');
+  assert.equal((await api('/gezin/toestemming/gezondheid', Object.assign({ aan: true }, ouder))).status, 200);
   const r = await wz('stemming', Object.assign({}, kind, { gevoel: 'verdrietig' }));
   assert.equal(r.status, 200);
   assert.equal(r.body.dag.gevoel, 'verdrietig', 'een gevoel is een woord, geen score');
@@ -59,6 +64,9 @@ test('2. prive per profiel: de ouder heeft zijn EIGEN dagboek en ziet dat van he
   const d = await wz('dagboek', ouder);
   assert.equal(d.body.stemmingen.length, 0,
     'het dagboek van het kind is onzichtbaar voor de ouder -- er bestaat geen route naartoe');
+  // een volwassene geeft zijn eigen toestemming; die van het gezin geldt voor hem niet
+  assert.equal((await wz('stemming', Object.assign({}, ouder, { gevoel: 'moe' }))).status, 409);
+  assert.equal((await wz('toestemming', Object.assign({ aan: true }, ouder))).status, 200);
   await wz('stemming', Object.assign({}, ouder, { gevoel: 'moe' }));
   const dk = await wz('dagboek', kind);
   assert.equal(dk.body.dagVandaag.gevoel, 'blij', 'en andersom lekt er ook niets');

@@ -29,7 +29,9 @@ function opKleur(hex) {
     huidig: lees,
     actief: function () { var s = lees(); return !!(s && s.code && s.token); },
     zet: schrijf,
-    wisProfiel: function () { var s = lees(); if (s) { afmelden(s); delete s.token; delete s.profiel; schrijf(s); } },
+    wisProfiel: function () { var s = lees(); if (s) { wissel(s); schrijf(s); } },
+    /* na een geslaagde wissel: de bewaarde sessie afmelden en vergeten */
+    wisselKlaar: function () { var s = lees(); if (s && s.wissel) { afmelden({ code: s.code, token: s.wissel }); delete s.wissel; schrijf(s); } },
     uitloggen: function () { afmelden(lees()); schrijf(null); },
     naam: function () { var s = lees(); return (s && s.profiel && s.profiel.naam) || ''; },
     /* De deur van de RTFoundation.
@@ -43,8 +45,9 @@ function opKleur(hex) {
        binnenkomt. De weg terug staat in de deur zelf, dus niemand raakt
        opgesloten.
 
-       De pagina's roepen dit aan als `if (!Sessie.eisProfiel()) throw ...`;
-       die worp blijft staan en stopt de rest van de pagina zoals altijd. */
+       Elke tool initialiseert binnen zijn eigen functie. Als eisProfiel()
+       weigert, stopt een vroege return de initialisatie zonder paginafout.
+       De toegangsdeur en de servercontrole blijven volledig van kracht. */
     deur: function (soort) {
       var doel = document.querySelector('main') || document.querySelector('[role="main"]') || document.body;
       function toon() {

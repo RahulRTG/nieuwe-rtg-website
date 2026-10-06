@@ -169,7 +169,7 @@ test('de klas telt patronen zonder wie, en besproken is weg', async () => {
 
   const gezin = (await fnd('/gezin/maak', { gezinsnaam: 'Familie Kring', naam: 'Ouder Kring', pin: '4321' })).body;
   const kind = (await fnd('/gezin/profiel/maak', { code: gezin.code, token: gezin.token, naam: 'Bram', rol: 'kind', groep: 'kind' })).body;
-  const kindToken = (await fnd('/gezin/profiel/kies', { code: gezin.code, profielId: kind.profiel.id })).body.token;
+  const kindToken = (await fnd('/gezin/profiel/kies', { gezinscode: gezin.gezinscode, profielId: kind.profiel.id })).body.token;
   await fnd('/school/koppel', { code: gezin.code, token: gezin.token, klasCode: klas.code, profielId: kind.profiel.id });
   await fnd('/school/uitnodiging/antwoord', { code: gezin.code, token: kindToken, klasCode: klas.code, akkoord: true });
 

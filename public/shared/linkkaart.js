@@ -104,7 +104,7 @@
     h += '<div class="knoppen">';
     inhoud.knoppen.forEach(function (k, i) {
       h += '<button type="button" class="doen" data-i="' + i + '">' + esc(k.tekst) +
-        (k.uitleg ? ' <span style="font-weight:400;opacity:.8;">· ' + esc(k.uitleg) + '</span>' : '') + '</button>';
+        (k.uitleg ? ' <span class="linkkaart-intentie-uitleg" >· ' + esc(k.uitleg) + '</span>' : '') + '</button>';
     });
     /* "Annuleren" veronderstelt dat er iets te annuleren VALT. Bij een code
        waar deze scanner niets mee kan -- een entree-code in de leden-app, de

@@ -124,7 +124,8 @@
   .klkies button.aan{border-color:var(--txt);transform:scale(1.12);}
   .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
   .rij{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.4rem;}
-  .codebig{text-transform:uppercase;letter-spacing:.3em;text-align:center;font-size:1.25rem;font-weight:700;}
+  #gCode{letter-spacing:.04em;}
+  #gCode[hidden]{display:none;}
   .mini{text-align:center;margin-top:1.4rem;font-size:.82rem;color:var(--zacht);}
   /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
      2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
@@ -204,10 +205,11 @@
   <div class="hero">
     <h2 data-wh-copy="family">Uw gezin krijgt hier een eigen plek.</h2>
     <p class="deck" data-wh-copy="familyIntro">Maak een gezinsomgeving aan of open de omgeving die u al heeft. FoundationOS is en blijft 100% gratis.</p>
-    <!-- De standaard Edge projecteert deze bestaande knoppen. De originele
-         handlers en gezinsrechten blijven eigenaar van de handeling. -->
-    <div class="knoprij rtg-duimbalk rtg-edge-owned-bar">
+    <!-- These primary actions remain in the page and are also forwarded by
+         the shared Edge. This static button group is not a second dock. -->
+    <div class="knoprij foundation-entry-actions" data-rtg-edge-controls>
       <button class="knop hoofd" id="bMaak" data-hoofdactie>Maak een gezin aan</button>
+      <button class="knop grijs" id="bAccount">Via mijn RTG-account</button>
       <button class="knop grijs" id="bLogin">Inloggen bij je gezin</button>
       <a class="knop grijs kaal" href="registreren.html">School, vrijwilliger of stichting</a>
     </div>
@@ -621,11 +623,42 @@
 <!-- inloggen met gezinscode -->
 <dialog id="dlgLogin"><div class="kaart modal">
   <h3>Inloggen bij je gezin</h3>
-  <div class="sub">Vul de gezinscode én je eigen pincode in. Zo tonen we nooit eerst alle namen.</div>
-  <input class="veld codebig" id="gCode" placeholder="GEZINSCODE" maxlength="6" autocapitalize="characters">
+  <div class="sub" id="gUitleg">Vul de gezinscode én je eigen pincode in. Zo tonen we nooit eerst alle namen.</div>
+  <input class="veld" id="gCode" placeholder="Gezinscode (GC.…)" maxlength="80" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-label="Gezinscode">
   <input class="veld" id="gPin" type="password" placeholder="Jouw pincode" inputmode="numeric" maxlength="6" autocomplete="current-password">
   <div class="fout" id="gFout"></div>
   <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="gDoe">Verder</button></div>
+</div></dialog>
+
+<!-- Het gezin aan uw RTG-account (eigen-gezin.js). Geen gezinscode en geen
+     pincode: uw account is de sleutel. Een kind toevoegen of openen gaat pas
+     als RTG uw paspoort heeft gecontroleerd; tot dan staat er waarom. -->
+<dialog id="dlgAccount" aria-labelledby="aTitel"><div class="kaart modal">
+  <h3 id="aTitel">Mijn gezin</h3>
+  <div class="sub" id="aSub">Uw gezin hangt aan uw eigen RTG-account. Geen gezinscode, geen pincode.</div>
+  <div id="aMaak" hidden>
+    <input class="veld" id="aGezin" placeholder="Naam van uw gezin" maxlength="40" aria-label="Naam van uw gezin">
+    <input class="veld" id="aNaam" placeholder="Uw naam in het gezin" maxlength="40" aria-label="Uw naam in het gezin">
+    <div><label class="mini"><input type="checkbox" id="aBevoegd"> Ik ben ouder of verzorger en mag dit gezin aanmaken.</label></div>
+    <div><label class="mini"><input type="checkbox" id="aPrivacy"> Ik heb de <a href="privacy.html">privacy-uitleg</a> gelezen.</label></div>
+  </div>
+  <!-- Een gezin van voor het account meenemen: de gezinscode plus de pincode van
+       de beheerder, net als bij de gezinsdeur. Daarna is het account de sleutel. -->
+  <details id="aMee" hidden>
+    <summary class="mini">Ik heb al een gezin: neem het mee naar mijn account</summary>
+    <input class="veld" id="aMCode" placeholder="Gezinscode (GC.…)" maxlength="48" autocapitalize="characters" aria-label="Gezinscode">
+    <input class="veld" id="aMPin" type="password" placeholder="Uw pincode als beheerder" inputmode="numeric" maxlength="6" autocomplete="current-password" aria-label="Uw pincode als beheerder">
+    <button class="knop grijs klein" id="aMDoe">Gezin meenemen</button>
+  </details>
+  <div id="aProfielen" hidden></div>
+  <div id="aKind" hidden>
+    <div class="mini" id="aKindUitleg"></div>
+    <input class="veld" id="aKNaam" placeholder="Naam van uw kind" maxlength="40" aria-label="Naam van uw kind">
+    <input class="veld" id="aKGeboren" type="date" aria-label="Geboortedatum van uw kind">
+    <button class="knop grijs klein" id="aKDoe">Kind toevoegen</button>
+  </div>
+  <div class="fout" id="aFout" role="alert"></div>
+  <div class="rij"><button class="knop grijs klein" data-sluit>Sluiten</button><button class="knop" id="aDoe" hidden>Gezin aanmaken</button></div>
 </div></dialog>
 
 <!-- Verplichte onboarding + contract voor volwassen gezinsleden -->
@@ -798,7 +831,7 @@ async function start(){
   }
   if (s && s.code){ // profiel wisselen: opnieuw met de eigen PIN, zonder namenlijst
     location.hash='';
-    Sessie.wisProfiel(); toon('vWelkom'); $('#gCode').value=s.code;
+    Sessie.wisProfiel(); toon('vWelkom'); wisselStand(true);
     try { $('#dlgLogin').showModal(); setTimeout(()=>$('#gPin').focus(),50); } catch(e){}
     return;
   }
@@ -807,7 +840,7 @@ async function start(){
 }
 
 function veiligeKeuzes(code, d, pin){
-  Sessie.zet({code,gezin:d.gezin});$('#pGezinNaam').textContent=d.gezin.naam;
+  Sessie.zet(Object.assign({}, Sessie.huidig() || {}, {code:d.gezin.code,gezin:d.gezin}));$('#pGezinNaam').textContent=d.gezin.naam;
   const grid=$('#pGrid');grid.innerHTML='';
   (d.keuzes||[]).forEach(p=>{const a=document.createElement('button');a.className='prof';
     const avatar=esc(p.avatar||'ster');
@@ -816,14 +849,31 @@ function veiligeKeuzes(code, d, pin){
 }
 function rolTekst(p){ return p.beheerder?'Beheerder':({ouder:'Ouder',kind:'Kind',gezinslid:'Gezinslid',gast:'Oppas of familie'}[p.rol]||''); }
 
-async function open(code, profielId, pin){
-  const d = await api('/gezin/profiel/kies', { code, profielId, pin });
-  Sessie.zet({ code, token: d.token, gezin: d.gezin, profiel: d.profiel });
+/* B18: binnenkomen met de gezinscode (128 bits) of, bij profiel wisselen op dit
+   apparaat, met de bewaarde sessie; het zes-tekenadres opent zelf niets. */
+function drager(code){
+  const s = Sessie.huidig() || {};
+  return code ? { gezinscode: code } : { code: s.code, token: s.wissel };
+}
+function wisselStand(aan){
+  const s = Sessie.huidig() || {};
+  const wissel = !!(aan && s.code && s.wissel);
+  $('#gCode').hidden = wissel; $('#gCode').value = '';
+  $('#gUitleg').textContent = wissel ? 'Ander profiel: vul je eigen pincode in.' : 'Vul de gezinscode én je eigen pincode in. Zo tonen we nooit eerst alle namen.';
+}
+function binnen(d){
+  const oud = Sessie.huidig() || {};
+  Sessie.zet({ code: d.gezin.code, token: d.token, gezin: d.gezin, profiel: d.profiel, wissel: oud.wissel });
+  Sessie.wisselKlaar();
   location.hash=''; location.reload();
+}
+async function open(code, profielId, pin){
+  const d = await api('/gezin/profiel/kies', Object.assign(drager(code), { profielId, pin }));
+  binnen(d);
 }
 
 $('#bMaak').addEventListener('click', ()=> $('#dlgMaak').showModal());
-$('#bLogin').addEventListener('click', ()=> $('#dlgLogin').showModal());
+$('#bLogin').addEventListener('click', ()=>{ wisselStand(true); $('#dlgLogin').showModal(); });
 $('#pAnder').addEventListener('click', ()=>{ Sessie.uitloggen(); toon('vWelkom'); });
 
 $('#mDoe').addEventListener('click', async ()=>{
@@ -832,19 +882,25 @@ $('#mDoe').addEventListener('click', async ()=>{
     const d = await api('/gezin/maak', { gezinsnaam: $('#mGezin').value, naam: $('#mNaam').value, pin: $('#mPin').value.trim(), avatar: mAv, kleur: mKl,
       bevoegdGezin:$('#mBevoegd').checked, privacyAkkoord:$('#mPrivacy').checked });
     Sessie.zet({ code: d.code, token: d.token, gezin: d.gezin, profiel: d.profiel });
+    // de gezinscode staat alleen in dit antwoord: beheer.html toont hem een keer
+    try { sessionStorage.setItem('rtf_gezinscode_nieuw', d.gezinscode || ''); } catch(e){}
     $('#dlgMaak').close();
     location.href='beheer.html#gezinsopbouw';
   }catch(e){ $('#mFout').textContent = e.message; }
 });
 $('#gDoe').addEventListener('click', async ()=>{
   $('#gFout').textContent='';
-  const code = $('#gCode').value.trim().toUpperCase();
+  const code = $('#gCode').hidden ? '' : $('#gCode').value.trim().toUpperCase();
   const pin=$('#gPin').value.trim();
-  try{ const d=await api('/gezin/inloggen',{code,pin});$('#dlgLogin').close();
-    if(d.token){Sessie.zet({code,token:d.token,gezin:d.gezin,profiel:d.profiel});location.hash='';location.reload();}
+  try{ const d=await api('/gezin/inloggen',Object.assign(drager(code),{pin}));$('#dlgLogin').close();
+    if(d.token) binnen(d);
     else veiligeKeuzes(code,d,pin);
   }
-  catch(e){ $('#gFout').textContent = e.message; }
+  catch(e){
+    $('#gFout').textContent = e.message;
+    // de bewaarde sessie is verlopen of ingetrokken: dan is het de gezinscode
+    if (!code && e.status === 403){ const s = Sessie.huidig(); if (s){ delete s.wissel; Sessie.zet(s); } wisselStand(false); }
+  }
 });
 
 // ---- verplichte onboarding + contract (alleen volwassen gezinsleden) ----
@@ -945,6 +1001,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/glyf.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="eigen-gezin.js" defer></script>
 <script src="premium.js" defer></script>
 </body>
 </html>

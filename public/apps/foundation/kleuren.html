@@ -76,8 +76,9 @@
      vandaag; er is geen lijst die iemand mee naar buiten wil nemen. -->
 <script src="/shared/uitvoer.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisProfiel()) return;
 Sessie.balk($('#balk'), { terug: 'index.html' });
 
 const KLEUREN = [
@@ -195,6 +196,7 @@ $('#opnieuw').addEventListener('click', nieuweRonde);
 $('#volgend').addEventListener('click', nieuweRonde);
 nieuweRonde();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+}());
 </script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>

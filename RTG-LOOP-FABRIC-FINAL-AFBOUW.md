@@ -1,8 +1,8 @@
 # RTG Loop Fabric - definitieve technische afbouw
 
-Datum: 6 oktober 2026  
-Branch: `codex/libraryos-kernel`  
-Uitgangspunt van deze afbouw: `2569d2c1b`  
+Datum: 6 oktober 2026
+Branch: `codex/libraryos-kernel`
+Uitgangspunt van deze afbouw: `2569d2c1b`
 Actuele Constitution: `2026-10-06.1`
 
 ## 1. Uitkomst
@@ -38,7 +38,7 @@ De uitvoeringsreadiness veranderde wel:
 
 De 60 opgeloste menselijke blockers zijn niet als runtime-GO witgewassen. Zij zijn verplaatst naar concrete technische bronprerequisites. Runtime-connected, volledig bewezen source-flows gingen van 5 naar 8.
 
-De actuele meting telt 5.422 routes, 5.298 mutatiecontracten en 326 schermen.
+De actuele meting op de samengevoegde main-basis telt 5.444 routerroutes, waarvan 5.440 herleidbaar zijn naar een bronbestand, 5.313 mutatiecontracten en 326 schermen.
 
 ## 3. Human blockers
 
@@ -278,8 +278,8 @@ De 25 MiB-grens blijft hard. De 32 commerce-, mobility- en media/culture-capabil
 | PostgreSQL race/replay/restart | 1/1 groen met geïsoleerde database |
 | Governancegenerators en registers | 21/21 groen in de gerichte governanceset |
 | Gerichte mutatieronde | 9/9 tests zakten op bronmutatie |
-| Repository mutatiemeter | 1.962 gedood, 0 overleefd, 162 niet meetbaar |
-| Scherpe mutatieronde uit register | 913 inhoud, 19 alleen inlog |
+| Repository mutatiemeter | 2.166 gedood, 0 overleefd, 174 niet meetbaar |
+| Scherpe mutatieronde uit register | 1.074 inhoud, 25 alleen inlog |
 | Statische huiskeuring | 73/73 regels, `Alles in orde` |
 | Secretscan | schoon |
 | Schaaltest | 10k, 100k en 1M uitgevoerd |
@@ -293,7 +293,7 @@ De brede repositorystatus is niet groen en is niet als Fabricbewijs gepresenteer
 - `npm test` start niet via de standaardscriptketen omdat `cargo` op deze host ontbreekt;
 - een directe `node scripts/test-runner.js` toont bestaande product/registerfailures en sandboxgebonden `listen EPERM`-failures, en is na een lang stilstaand segment afgebroken;
 - de afgebroken run is **niet uitgevoerd tot voltooiing** en dus niet groen;
-- de mutatie-inventaris telt 5.298 schrijfroutes, waarvan 5.272 geclassificeerd en 26 bestaande legacygaten;
+- de mutatie-inventaris telt 5.313 schrijfroutes, waarvan 5.287 geclassificeerd en 26 bestaande legacygaten;
 - de geïsoleerde Loop Fabric PostgreSQL-test is wel afzonderlijk werkelijk groen;
 - de werkboomwijziging `SUITE.json` van de afgebroken baseline-run is teruggezet.
 
@@ -328,8 +328,9 @@ CI/huiskeuring en gerichte tests bewaken:
 6. `8a5ebfc156bdd64daae0b54876746bdc1c7cc506` - `feat: enforce capability-bound learning eligibility`
 7. `c2261401909f51cc0f65d78b2cf9d483ab7a506b` - `docs: prove loop fabric fixed point`
 8. `42f33160a329e97549ec13f2097ebd0ecd3013b6` - `test: record final loop fabric mutation proof`
+9. `c0246cf67` - `docs: finalize loop fabric technical fixed point`
 
-Dit rapport zelf staat in de aansluitende lokale documentatiecommit; de exacte carrier-hash staat na commit in `git log -1` en in het eindbericht. Er is niets gepusht, gemerged of als PR geopend.
+De aansluiting op de actuele `main`-basis wordt vastgelegd in de daaropvolgende integratiemerge. De uiteindelijke PR- en merge-identiteit staan in het eindbericht.
 
 ## 25. Exact bestandsmanifest
 
@@ -363,6 +364,7 @@ Gewijzigd:
 - `server/kern/living-world/contributions.js`, `server/kern/living-world/index.js`, `server/kern/living-world/loop-source.js`, `server/kern/living-world/model.js`, `server/kern/living-world/projection.js`
 - `server/kern/loop-fabric/decision-context.js`, `server/kern/loop-fabric/index.js`, `server/kern/loop-fabric/invariants.js`, `server/kern/loop-fabric/learning-eligibility.js`
 - `server/lib/mutatiecontracten-library.js`, `server/lib/mutatiecontracten-service-kantoor.js`
+- `server/lib/mutatiecontracten.js`
 - `server/opzet/loop-fabric.js`, `server/opzet/servicelaag.js`
 - `server/routes/leerhuis.js`, `server/routes/library.js`, `server/routes/service-kantoor.js`
 - `test/lib/living-world-fixture.js`, `test/lib/loop-fabric-fixture.js`

@@ -21,7 +21,7 @@ test.before(async () => {
   const post = (p, b) => fetch(base + p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) }).then(r => r.json());
   const g = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Vakgezin', naam: 'Mam', pin: '1234' });
   const kp = await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Sem', rol: 'kind', groep: 'tiener' });
-  const kies = await post('/api/foundation/gezin/profiel/kies', { code: g.code, profielId: kp.profiel.id });
+  const kies = await post('/api/foundation/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kp.profiel.id });
   sess = { code: g.code, token: kies.token };
   assert.ok(sess.token, 'het kind-profiel is ingelogd');
 });

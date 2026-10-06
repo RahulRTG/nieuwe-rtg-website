@@ -51,9 +51,6 @@ const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
 const rtgKlok = require('./lib/klok');
-/* De hashketen onder het inlog-auditlog; zie logInlog verderop voor waarom juist
-   dat log eraan hangt. */
-const { noteerIn: ketenNoteerIn, verifieer: ketenVerifieer, top: ketenTop } = require('./lib/keten');
 const { db, load, save, bijeen, inBundel, persistentieStand, bewerkCollectie, economischeBoekingEenmaal, DATA_DIR, STORE, opslagKlaar: opslagMotorKlaar, pgPoolStatus, postgresSchrijfStand, postgresVerzoekMiddleware, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsHaalWacht,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
@@ -661,32 +658,9 @@ function checkCred(username, password) {
   return userOk && passOk;
 }
 
-/* ---------- het inlog-auditlog ----------
-   Elke inlogpoging (gelukt of mislukt, op elk kanaal) komt in een afgeschermd
-   log: wie, waar vandaan, wanneer. Zo is een aanval of een gestolen code
-   achteraf altijd te reconstrueren; het kantoor leest het log in RTG HQ.
-
-   AAN DE KETEN. Dit log is precies wat iemand die binnen is als eerste zou
-   willen bijstellen: één mislukte reeks pogingen wegpoetsen en het bezoek is
-   nooit gebeurd. Elke regel draagt daarom de hash van de vorige, zodat een
-   wijziging of een verwijdering MIDDEN in het log aantoonbaar breekt. Wat dat
-   wel en niet tegenhoudt staat in de kop van lib/keten.js -- kort: het ziet
-   niet dat iemand de NIEUWSTE regels wegknipt, daar is het anker voor.
-
-   Regels van vóór deze keten dragen geen hash; verifieer() telt die apart en
-   veroordeelt ze niet, dus een bestaande installatie gaat hier niet stuk op. */
-function logInlog(kanaal, ok, wie, req) {
-  const lijst = db.data.securityLog = db.data.securityLog || [];
-  ketenNoteerIn(lijst, {
-    at: new Date().toISOString(), kanaal, ok: !!ok,
-    wie: schoon(wie, 60) || null, ip: String((req && req.ip) || '')
-  }, 5000);
-  save();
-}
-
-/* De ketenstand van het inlog-auditlog: hetzelfde getal dat inzagelog.ketenTop()
-   voor het inzagejournaal geeft. Het kantoor toont hem naast het log, zodat
-   "klopt dit spoor nog" een antwoord heeft in plaats van een aanname. */
+/* Inlogherkomst bezit de geketende vastlegging én de lezer van datzelfde spoor. */
+const { logInlog, securityLogKeten } =
+  require('./kern/identiteit/inlogherkomst').maakInlogspoor({ db, save, schoon });
 /* HET HANDELINGSSPOOR, als EEN instantie.
 
    De lijfpoort maakt er zelf ook een aan om de middleware te hangen. Dat mag,
@@ -713,10 +687,6 @@ const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db });
    RTG (./lib/ankerpost.js). Zonder RTG_ANKERPOST_URL doet die post niets en
    zegt hij dat -- geen bestemming blijft "niet in bedrijf". */
 const ankerpost = require('./lib/ankerpost').maakAnkerpost({ ankerdienst });
-function securityLogKeten() {
-  const lijst = (db.data && db.data.securityLog) || [];
-  return Object.assign({ top: ketenTop(lijst) }, ketenVerifieer(lijst));
-}
 
 /* DE LEVERANCIERSPOORT staat in ./opzet/leverancierpoort.js: de twee
    SSE-wegen, de melding aan een zaak, de code-index, de opzoeking, de poort
@@ -788,11 +758,9 @@ const salonClaimcode = require('./kern/salon-claimcode')({
 const afhaalcode = require('./kern/afhaalcode')({ db, bewerkCollectie, crypto });
 const tickettoegang = require('./kern/tickettoegang')({ db, save, bewerkCollectie, crypto,
   oudeRijen: () => ({ boekingen: db.data.boekingen, posSales: db.data.posSales }) });
-/* PostgreSQL neemt pas asynchroon over (startPostgresMetSalon); de lokale
-   migraties draaien na Samen. */
+// PostgreSQL neemt asynchroon over; lokaal migreert na Samen.
 const startPostgresMetSalon = () => {
-  /* opslagstart roept deze ingang voor elke motor aan. Een lokale standby mag
-     daardoor niet via de inerte Postgres-tak ten onrechte "gemigreerd" worden. */
+  // per motor aangeroepen: een lokale standby migreert niet via de Postgres-tak
   if (STORE !== 'postgres') return Promise.resolve(false);
   salonMigratieKlaar = false;
   rtfSamenMigratieKlaar = false;
@@ -806,6 +774,7 @@ const startPostgresMetSalon = () => {
       throw new Error('TravelOS boarding-passmigratie ontbreekt bij de opslagstart.');
     await kern.lucht.migreerBoardingPasses();
     await kern.bedrijf.migreerSleutels(bewerkCollectie);
+    await kern.partnerOudeCodes.migreerOudeCodes();
   })).then(gestart => {
     salonMigratieKlaar = true;
     rtfSamenMigratieKlaar = true;
@@ -1513,12 +1482,7 @@ function findPartner(code) {
   return db.data.partners.find(p => p.code === code) || null;
 }
 
-/* De personeelscode zoekt niet meer hier (raw, lineair): hij is een 128-bit
-   credential per medewerker in kern/partnerpersoneelscode.js (B14). */
-
-
-
-
+// Personeelscode: kern/partnerpersoneelscode.js (B14; oude codes weg, B21).
 
 /* ================= LEVERANCIER-KANAAL =================
    Eén app voor alle leverancierstypes. Communiceert live (SSE) met de
@@ -2187,15 +2151,13 @@ const { ritVerder, ritBezetting } = maakVervoer({
 /* ================= BACKOFFICE (RTG) =================
    De backoffice ziet alle binnenkomende dynamische prijzen, bestellingen en
    ritten live. Demo-toegang met een vaste code. */
-// In productie mag de demo-backofficecode ('RTG-OFFICE') nooit werken: zonder een
-// eigen OFFICE_CODE wordt hij onraadbaar willekeurig, zodat de deur dichtblijft
-// tot er een echte code is gezet. Buiten productie houden we de demo-code.
-/* Zonder eigen OFFICE_CODE wordt hij onraadbaar willekeurig -- ALTIJD, niet
-   alleen in productie. De terugval op 'RTG-OFFICE' hing aan dezelfde vergeten
-   vlag als hierboven, en die code staat letterlijk in deze repo: iedereen die
-   hem gelezen heeft kon de backoffice van deze server openen. De demo-code komt
-   alleen nog terug als de demo-modus uitdrukkelijk aanstaat. */
-const OFFICE_CODE = process.env.OFFICE_CODE || (DEMO ? 'RTG-OFFICE' : crypto.randomBytes(18).toString('hex'));
+/* Zonder eigen OFFICE_CODE wordt hij onraadbaar willekeurig -- ALTIJD. De
+   terugval op 'RTG-OFFICE' staat letterlijk in deze repo en komt alleen terug
+   als de demo-modus uitdrukkelijk aanstaat. In productie wordt een gezette
+   OFFICE_CODE NIET gelezen (B10, 4 oktober 2026): de code opent daar niets, en
+   opzet/startcontrole.js zegt in een regel dat hij genegeerd wordt. */
+const OFFICE_CODE = process.env.OFFICE_CODE && !PRODUCTION ? process.env.OFFICE_CODE
+  : (DEMO ? 'RTG-OFFICE' : crypto.randomBytes(18).toString('hex'));
 
 
 /* De backoffice-laag (officeAuth, officeState, pendingVerifications) staat in
@@ -2410,9 +2372,8 @@ require('./opzet/kernlaag6b')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);
 require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet
 
-/* JSON/SQLite/geheugen zijn al geladen: verwijder oude kale codes (Salon,
-   Samen, boarding, WerkOS) vóór verkeer. Lokaal commit dat synchroon, anders
-   weigert de start. */
+/* JSON/SQLite/geheugen geladen: oude kale codes (Salon, Samen, boarding,
+   WerkOS, B21 partnerpersoneel) weg vóór verkeer; lokaal synchroon of niet starten. */
 /* Een losse server migreert vóór listen(); een trio-standby pas in
    /api/cluster/promote, na zijn verse load() (fail-closed, geen crashlus). */
 if (STORE !== 'postgres' && db.writable) migreerLokaleToegang();
@@ -2439,6 +2400,8 @@ function migreerLokaleToegang() {
     boardingPassMigratieKlaar = true;
     if (kern.bedrijf.migreerSleutels(bewerkCollectie) instanceof Promise)
       throw new Error('Lokale WerkOS-sleutelmigratie committe niet synchroon.');
+    if (kern.partnerOudeCodes.migreerOudeCodes() instanceof Promise)
+      throw new Error('Lokale B21-migratie (oude personeelscodes) committe niet synchroon.');
   }
 }
 

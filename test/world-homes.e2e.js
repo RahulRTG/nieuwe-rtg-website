@@ -24,7 +24,7 @@ async function open(page, route) {
   await page.goto(srv.base + route, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
   await page.waitForSelector('body[data-rtg-desktop-state="ready"]');
-  if (await page.locator('.wp-domain:not([open])>summary').count()) await page.locator('.wp-domain>summary').click();
+  if (await page.locator('.wp-domain:not([open])>summary:visible').count()) await page.locator('.wp-domain>summary').click();
   await page.waitForFunction(() => !document.body.hasAttribute('data-rtg-world-start') || document.body.dataset.rtgWorldStart === 'ready');
 }
 async function actions(page) {
@@ -47,7 +47,7 @@ test('new homes fit mobile and desktop, use one Edge and retain visible free Fou
       await page.setViewportSize({ width, height: 900 });
       for (const route of routes) {
         await open(page, route);
-        await page.waitForFunction(() => [...document.querySelectorAll('.wp-photo>img')].filter(e => e.checkVisibility()).some(e => e.complete && e.naturalWidth));
+        await page.waitForFunction(() => [...document.querySelectorAll('.wh-photo>img,.wp-photo>img')].filter(e => e.checkVisibility()).some(e => e.complete && e.naturalWidth));
         assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, route + ' at ' + width);
         if (width === 390) {
@@ -56,10 +56,14 @@ test('new homes fit mobile and desktop, use one Edge and retain visible free Fou
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, route + ' RTL');
           await page.evaluate(() => window.RTGi18n.set('nl'));
         }
-        const heading = page.locator('.wp-heading h2:visible').first();
-        assert.match(await heading.evaluate(e => getComputedStyle(e).fontFamily), /Inter/);
+        const heading = page.locator(width < 1000 ? '.wh-photo h1:visible' : '.wp-heading h2:visible').first();
+        assert.match(await heading.evaluate(e => getComputedStyle(e).fontFamily), /Bodoni/);
+        if (width < 1000) {
+          assert.equal(await page.locator('.wp-scene:visible').count(), 0, 'mobile retains its original home, without another scene');
+          assert.equal(await page.locator('.wh-photo h1:visible').count(), 1, 'one original editorial hero');
+        }
         if (route.includes('foundation')) {
-          assert.match(await page.locator('.wp-free').innerText(), /100% gratis/);
+          assert.match(await page.locator(width < 1000 ? '.wh-free:visible' : '.wp-free:visible').first().innerText(), /100% gratis/);
           await page.locator('#vWelkom .wh-support').scrollIntoViewIfNeeded();
           const supportGeometry = await page.locator('#vWelkom .wh-support').evaluate(e => {
             const r = e.getBoundingClientRect();
@@ -78,8 +82,31 @@ test('new homes fit mobile and desktop, use one Edge and retain visible free Fou
     await page.fill('#mNaam', 'Naam blijft staan');
     await page.evaluate(() => window.RTGi18n.set('en'));
     assert.equal(await page.locator('#mNaam').inputValue(), 'Naam blijft staan');
-    assert.match(await page.locator('.wp-free').textContent(), /100% free/);
+    assert.match(await page.locator('#vWelkom .wh-free').textContent(), /100% free/);
     assert.deepEqual(errors, []);
+  } finally { await ctx.close(); }
+});
+
+test('Living atmosphere remains a full photograph with transparent readability layers', { skip }, async () => {
+  const ctx = await context(), page = await ctx.newPage();
+  try {
+    await open(page, '/apps/wereld.html');
+    await page.waitForSelector('.living-welcome');
+    const photo = await page.locator('.living-example-photo').evaluate(el => {
+      const image = el.querySelector('img'), rect = image.getBoundingClientRect();
+      return { loaded: image.complete && image.naturalWidth > 0, height: rect.height, width: rect.width,
+        layers: [...el.querySelectorAll('.living-example-head,.living-example-copy')].map(node => {
+          const style = getComputedStyle(node); return { background: style.backgroundImage, color: style.backgroundColor };
+        }) };
+    });
+    assert.equal(photo.loaded, true);
+    assert.ok(photo.height >= 390 && photo.width >= 300, 'the actual image fills the editorial composition');
+    for (const layer of photo.layers) {
+      assert.match(layer.background, /linear-gradient/, 'source-owned reading gradient remains present');
+      assert.equal(layer.color, 'rgba(0, 0, 0, 0)', 'no opaque palette card hides the photograph');
+    }
+    assert.equal(await page.locator('.rtg-adaptive-bar').count(), 1);
+    assert.match(await page.locator('.living-example-head').innerText(), /Voorbeeldmoment/);
   } finally { await ctx.close(); }
 });
 
@@ -102,7 +129,7 @@ test('a confirmed journey reaches the new hero and language changes preserve imp
     await page.fill('#invTekst', 'Mijn eigen bevestiging');
     await page.evaluate(() => window.RTGi18n.set('en'));
     assert.equal(await page.locator('#invTekst').inputValue(), 'Mijn eigen bevestiging');
-    assert.equal(await page.locator('#worldTravelTitle').innerText(), 'Somewhere else entirely.');
+    assert.equal(await page.locator('#worldTravelTitle').innerText(), 'Your journey begins here.');
     assert.match(await page.locator('#worldTravelDetail').innerText(), /Dubai/);
     await page.locator('#worldTravelAction').click();
     await page.waitForSelector('[data-blad="reizen"]:visible');
@@ -123,7 +150,7 @@ test('Work Home opens the new home with actual appointments and exposes an outag
     await open(page, '/apps/office.html');
     await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
     await page.waitForURL('**/apps/kantoor.html');
-    await page.waitForSelector('.wp-domain>summary'); await page.locator('.wp-domain>summary').click();
+    if (await page.locator('.wp-domain:not([open])>summary:visible').count()) await page.locator('.wp-domain>summary').click();
     await page.waitForSelector('#vandaag .cv-titel');
     assert.match(await page.locator('#vandaag').innerText(), /Eigen overleg/);
     await page.evaluate(() => window.RTGi18n.set('en'));
@@ -140,7 +167,7 @@ test('a Foundation child keeps personal tabs and all apps in the standard Edge, 
   const family = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Testgezin', naam: 'Ouder', pin: '1234', bevoegdGezin: true, privacyAkkoord: true });
   await post('/api/foundation/gezin/agenda', { code: family.code, token: family.token, titel: 'Samen wandelen', datum: new Date().toISOString().slice(0, 10), tijd: '16:00' });
   const child = await post('/api/foundation/gezin/profiel/maak', { code: family.code, token: family.token, naam: 'Milan', rol: 'kind', geboortedatum: '2015-04-04', pin: '5678', kleur: '#3A7BD5' });
-  const chosen = await post('/api/foundation/gezin/profiel/kies', { code: family.code, profielId: child.profiel.id, pin: '5678' });
+  const chosen = await post('/api/foundation/gezin/profiel/kies', { gezinscode: family.gezinscode, profielId: child.profiel.id, pin: '5678' });
   const ctx = await context(null, { code: family.code, token: chosen.token, profiel: chosen.profiel }), page = await ctx.newPage();
   try {
     await open(page, routes[2]);

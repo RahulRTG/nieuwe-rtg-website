@@ -225,3 +225,21 @@ test('bevestigbaar en duurzaam zijn twee verschillende dingen', () => {
   assert.equal(uit.bevestigbaar, false);
   assert.equal(uit.duurzaam, false);
 });
+
+
+test('duurzame SQLite-commit serialiseert één keer; backupcheckpoint flusht nog wel nieuwe RAM', () => {
+  const uit = JSON.parse(inProces({ RTG_DATA_DIR: verseMap(), RTG_STORE: 'sqlite' }, `
+    const p=require('./server/db'), sqlite=require('./server/db/sqlite');
+    (async()=>{ await p.load(); let scans=0;
+      p.db.data.scantoets={n:1,toJSON(){scans++;return {n:this.n};}};
+      const r=p.saveDuurzaam(), een=scans;
+      p.db.data.scantoets.n=2; const backup=p.checkpointSqlite();
+      const opgeslagen=sqlite.loadSqlite().scantoets;
+      console.log(JSON.stringify({duurzaam:r.duurzaam,een,backup,scans,opgeslagen}));
+    })();`));
+  assert.equal(uit.duurzaam, true);
+  assert.equal(uit.een, 1, 'de succesvolle commit hoeft niet opnieuw volledig te serialiseren');
+  assert.equal(uit.backup, true);
+  assert.equal(uit.scans, 2, 'backupcheckpoint schrijft zijn eigen nog niet gecommitte RAM');
+  assert.deepEqual(uit.opgeslagen, { n: 2 });
+});

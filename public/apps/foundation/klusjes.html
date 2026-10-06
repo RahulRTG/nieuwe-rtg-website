@@ -85,8 +85,9 @@
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisProfiel()) return;
 const api = Sessie.api;
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug:'index.html' });
@@ -113,7 +114,7 @@ for (let i=1;i<=10;i++){ const o=document.createElement('option'); o.value=i; o.
 
 async function laad(){
   try{
-    const d = await fetch('/api/foundation/gezin/'+s.code+'/klussen?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/klussen',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     magBeheren = d.magBeheren; mijnId = d.mijnId;
     $('#maakBlok').style.display = magBeheren ? 'block' : 'none';
     if (!magBeheren) $('#intro').textContent = 'Help mee in huis en verdien sterren! Tik een klusje aan als je het gedaan hebt; een ouder keurt het goed en de sterren zijn van jou.';
@@ -198,13 +199,14 @@ $('#kDoe').onclick = async ()=>{
 
 (async ()=>{
   try{
-    const d = await fetch('/api/foundation/gezin/'+s.code+'/mij?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/mij',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     (d.profielen||[]).filter(p=>!p.gast).forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.naam; $('#kVoor').appendChild(o); });
   }catch(e){}
   laad();
   laadGeld();
 })();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}());
 </script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>

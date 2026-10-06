@@ -452,7 +452,7 @@ function herstelBron(voor, paden, wortel = WORTEL) {
   }
 }
 
-function draaiToets(bestand, env, wacht, forceer) {
+function draaiToets(bestand, env, wacht, forceer, logPrefix) {
   /* DE REPORTER STAAT VASTGEPIND OP TAP, want deze functie leest de uitslag
      met /^# tests/ en /^not ok/. Tot Node 22 was TAP de standaard zonder TTY;
      op Node 24 is dat de spec-reporter geworden en las de motor ineens NIETS
@@ -461,7 +461,12 @@ function draaiToets(bestand, env, wacht, forceer) {
      leunt, meet de standaardinstelling (LAT regel 10). */
   const vlaggen = ['--test', '--test-reporter=tap'];
   if (forceer) vlaggen.push('--test-force-exit');
-  const r = spawnSync('node', vlaggen.concat([bestand]), {
+  const childEnv = Object.assign({}, process.env, env || {});
+  // This is an independent TAP runner, even when the instrument is tested by
+  // node:test. Inheriting its internal child marker suppresses the TAP output.
+  delete childEnv.NODE_TEST_CONTEXT;
+  const gestartOp = new Date().toISOString();
+  const r = spawnSync(process.execPath, vlaggen.concat([bestand]), {
     cwd: WORTEL, encoding: 'utf8', timeout: wacht || WACHT_NUL, maxBuffer: 64 * 1024 * 1024,
     /* SIGKILL EN NIET HET STANDAARD SIGTERM, en dat is geen ruwheid maar een
        lek dat ik heb zien ontstaan. Bij een time-out stuurt spawnSync SIGTERM,
@@ -472,9 +477,13 @@ function draaiToets(bestand, env, wacht, forceer) {
        Over een ronde van uren stapelen die zich op, houden ze poorten en geheugen
        vast, en vervuilen ze de metingen die erna komen. */
     killSignal: 'SIGKILL',
-    env: Object.assign({}, process.env, env || {})
+    env: childEnv
   });
   const uit = String(r.stdout || '');
+  if (logPrefix) {
+    fs.writeFileSync(logPrefix + '.tap', uit);
+    fs.writeFileSync(logPrefix + '.stderr', String(r.stderr || ''));
+  }
   const gezakt = (uit.match(/^not ok /gm) || []).length;
   const geteld = /^# tests (\d+)/m.exec(uit);
   /* OOK DE OVERGESLAGEN TOETSEN TELLEN, en dat is geen bijzaak. Een bestand dat
@@ -486,7 +495,10 @@ function draaiToets(bestand, env, wacht, forceer) {
   const toetsen = geteld ? Number(geteld[1]) : 0;
   const overgeslagen = over ? Number(over[1]) : 0;
   return { gezakt, toetsen, overgeslagen, alGeslagen: toetsen > 0 && overgeslagen >= toetsen,
-    tijdout: r.error && r.error.code === 'ETIMEDOUT' };
+    tijdout: !!(r.error && r.error.code === 'ETIMEDOUT'), status: r.status, signal: r.signal,
+    error: r.error ? r.error.code || 'PROCESS_ERROR' : null, gestartOp, klaarOp: new Date().toISOString(),
+    stdoutSha256: require('crypto').createHash('sha256').update(uit).digest('hex'),
+    stderrSha256: require('crypto').createHash('sha256').update(String(r.stderr || '')).digest('hex') };
 }
 
 /* TOETSEN DIE DE SERVER STARTEN IN PLAATS VAN HEM TE REQUIREN, en waarom die een
@@ -1029,12 +1041,77 @@ const EIGEN_MODULE = new Map([
      raakt /api/ nooit: de liegpoort kan hem niet raken, dus die "overleefde" zei
      niets over de toets. De bronmutatie op kluisindex.js wel. Bevestigd. */
   ['toestel-kluisindex.e2e.js', ['public/shared/toestel/kluisindex.js']],
+  /* De Studio Pro bewerkt een echte foto en video in de BROWSER: canvas,
+     ongedaan/opnieuw, keyframes en de master-export lopen door RTGMediaEditor
+     en raken /api/ niet, dus de liegpoort zei niets over deze toets. De motor
+     in studio-pro-engine.js wel. Bevestigd: ===->!==#0 laat hem zakken. */
+  ['media-studio-pro.e2e.js', ['public/apps/media/studio-pro-engine.js']],
+  /* `rtg dev` draait zijn eigen gastheer op een eigen poort, dus de liegpoort
+     van de RTG-server zat naast zijn onderwerp. Wat hij beproeft is de
+     gastheer in scripts/rtg-dev.js (de cel, de brug, de weigering met velden).
+     Bevestigd: ===->!==#0 (het bestand van de app opzoeken) laat hem zakken. */
+  ['rtg-dev.e2e.js', ['scripts/rtg-dev.js']],
+  /* De schermranden meten de UITKOMST in de browser (overloop, de Adaptive
+     Edge en zijn wereldpaneel); er gaat geen antwoord van /api/ in om dat de
+     liegpoort kan raken. De Edge start alleen op zijn kern: zonder
+     RTGAdaptiveEdgeCore wordt rtgAdaptiveReady nooit gezet en wacht de toets
+     vergeefs. Bevestigd: ===->!==#0 in de exportregel laat hem zakken
+     (page.waitForFunction, 30 s), en met de hand nagedaan met dezelfde uitslag. */
+  ['website-screen-edges.e2e.js', ['public/shared/rtg-adaptive-edge-core.js']],
   /* De verdiepingsreis opent elf nieuwe schermen en gebruikt op elk scherm de
      eerste betekenisvolle bediening. De intake van de Decision Room is de
      zwaarste eerste schakel: zonder de klikafhandeling komt de dialoog niet in
      beeld en stopt de reis meteen. Bevestigd door de gerichte mutatieronde;
      `!==` omkeren in die afhandeling laat de browsertoets zakken. */
   ['verdiepende-schermen.e2e.js', ['public/apps/decision-room.js']],
+  /* De bestemmingsproef draait bezoek() uit scripts/appwerkt.js tegen een
+     eigen kleine server zonder /api/, dus de liegpoort raakte hem niet en
+     noemde hem "overleefd". Zijn onderwerp is het oordeel op de LANDING:
+     alias, andere capability, verkeerd geadresseerd. Bevestigd door de motor:
+     `===` omkeren in scripts/lib/bestemming.js laat hem zakken. */
+  ['appwerkt-bestemming.e2e.js', ['scripts/lib/bestemming.js', 'scripts/appwerkt.js']],
+  /* De leegte-meting zet haar eigen bladen met setContent en raakt /api/
+     nooit; de liegpoort zei dus niets. Wat hij beproeft is de meting die in de
+     pagina draait, mob.BRON uit scripts/mobielkeuring.js. Bevestigd door de
+     motor: `&&` -> `||` daarin laat hem zakken (zevende poging). */
+  ['leegtemeting.e2e.js', ['scripts/mobielkeuring.js']],
+  /* De wereldverhalen draaien lokaal in de browser en sturen met opzet niets
+     naar /api/ (de toets eist nul schrijfverzoeken), dus de liegpoort liet hem
+     ongemoeid. Bevestigd door de motor: storyline-world.js kreeg een mutatie en
+     overleefde die, `&&` -> `||` in storyline-stage.js laat hem zakken. */
+  ['storyline-worlds.e2e.js', ['public/site/storyline-world.js', 'public/site/storyline-stage.js']],
+  /* De WerkOS-schil laadt public/shared/werkos.js met addScriptTag in een
+     eigen setContent-pagina, zonder server en zonder /api/: de liegpoort kon
+     hem niet raken. Bevestigd door de motor: return-weg in werkos.js laat hem
+     zakken (zesde poging). */
+  ['werkos-schil.e2e.js', ['public/shared/werkos.js']],
+  /* DE LIEGPOORT ZIT IN DEZE TOETS ZELF: liegend-scherm start zijn server al
+     met RTG_LIEG=/api/, dus de liegpoort van de motor verandert niets aan wat
+     hij ziet en "overleefd" zei niets over de toets. Zijn oordeel komt uit
+     scripts/lib/schermleugen.js (vindKlachten en vergelijk); een bronmutatie
+     daarin laat hem zakken. Bevestigd door de motor. */
+  ['liegend-scherm.e2e.js', ['scripts/lib/schermleugen.js']],
+  /* De toestelrekenlaag rekent in de BROWSER en raakt /api/ nergens: hij haalt
+     alleen /toestel/manifest.json en de artefacten op, dus de liegpoort zat
+     naast zijn onderwerp. Wat hij beproeft zijn de poorten (welke kandidaat
+     wint, en waarom een externe wordt uitgesloten), de rekenaar (grendel, cel,
+     plafond) en de opslag (geen download zonder tik). Bevestigd door de motor:
+     `===` omdraaien in poorten.js laat hem zakken (pas na de herkansing met
+     --test-force-exit, want de bevroren-klok van de toets wacht 60 s). */
+  ['toestel.e2e.js', ['public/shared/toestel/poorten.js', 'public/shared/toestel/rekenaar.js',
+    'public/shared/toestel/opslag.js']],
+  /* De werkruimte bewaart haar kamers in localStorage en niet op de server:
+     bewaarRuimte, sluit en het terughalen draaien in de schil zelf, dus een
+     liegende /api/ raakt niet wat hij beweert. Zijn onderwerp is RTGSchil in
+     public/shared/rtg-schil.js (de gebundelde vorm die de pagina laadt; de
+     delen in rtg-schil/ zijn los geen programma). Bevestigd door de motor. */
+  ['werkruimte.e2e.js', ['public/shared/rtg-schil.js']],
+  /* DE BROWSERPOORT start geen server en leest geen /api/: hij vraagt alleen
+     of de browserzoektocht in test/helper.js een antwoord geeft (en onder
+     RTG_E2E_STRICT=1 of die browser ook start). De liegpoort zat dus naast zijn
+     onderwerp. Bevestigd door de motor, in de diepe ronde: return-weg in
+     laadPlaywright (`return mod` -> undefined) laat hem zakken. */
+  ['browserpoort.e2e.js', ['test/helper.js']],
   /* i18n-auto laadt de automatische vertaallaag met vm.runInNewContext en heeft
      daar dus geen require voor. Zonder deze regel mat de motor alleen
      server/lib/ui-bronnen.js -- de module van EEN van de zes beweringen -- en
@@ -1090,6 +1167,12 @@ const EIGEN_MODULE = new Map([
     'server/kern/rtgai.js',
     'server/kern/zelfzorg/index.js'
   ]],
+  /* De mediapoort zoals een browser hem ervaart: op een LAN-adres de reden
+     "onveilig", in een kader het allow-recht, een weigering met haar oorzaak.
+     Dat is gedrag van RTGMedia en geen /api/-antwoord, dus de liegpoort zei
+     niets over hem. Bevestigd door de motor: !== -> === in media.js laat hem
+     zakken. */
+  ['media.e2e.js', ['public/shared/media.js']],
   /* De blinde vlek zoekt structuurfouten in de PAGINA'S en niet in een module.
      Hij staat er met een kandidaat en niet met een reden, omdat ik niet ga
      beweren dat het onmeetbaar is voordat de motor het heeft geprobeerd:
@@ -1166,6 +1249,27 @@ const GEEN_BRONMUTATIE = new Map([
   ['omzetproef.test.js', 'ratel op een register; elf handmutaties, alle elf raak -- waaronder de twee bevindingen stil wegpoetsen'],
   ['afbouwafloop.test.js', 'de afbouwwet woont in scripts/ en niet in server/; vijf handmutaties, alle vijf raak (zie de kop hierboven)'],
   ['afbouwketen.test.js', 'idem, met echte processen; de vijf handmutaties vonden er twee echte gaten mee (hartslag, PASSED-only)'],
+  /* De paginascan is een CENSUS: elke pagina in public/ open, en per pagina
+     geen onafgevangen fout, een titel, een taal, inhoud en geen 404 op een
+     eigen bestand. Hij staat aan geen enkele module vast, en zijn nulmeting
+     duurt langer dan het budget van de motor: met public/shared/basis.js als
+     module (de basislaag die op bijna elke pagina laadt) kwam al de nulmeting
+     als 'te langzaam' terug (0 mutaties geprobeerd, 4 oktober 2026). Met de
+     hand nagetrokken op beide assen, op een groene nulmeting: in basis.js
+     document.body.setAttribute -> zetAttribuut laat hem zakken op de
+     onafgevangen TypeError, en in apps/app.html src="/shared/meelezen.js" naar
+     een bestand dat niet bestaat laat hem zakken op de 404. Beide teruggezet. */
+  ['paginas.e2e.js', 'census over alle pagina\'s in public/ zonder eigen module, en de nulmeting past niet in het budget: met public/shared/basis.js als module kwam de nulmeting terug als te langzaam (0 mutaties geprobeerd). Tweemaal met de hand raak op een groene nulmeting: een TypeError in basis.js (setAttribute -> zetAttribuut) laat hem zakken op de onafgevangen fout, een scriptbron in apps/app.html naar een niet-bestaand bestand op de 404'],
+  /* De deelmenuwacht zet /shared/deelmenu.js op een kale pagina die geen /api/
+     leest. De motor probeerde drie mutaties in public/shared/deelmenu.js: de
+     twee returnwaarden van start() overleefden (die voeden alleen de teller van
+     vergeefse pogingen), en `===` -> `!==` in de id-ontdubbeling maakte een
+     eindeloze lus IN de pagina, zodat de toets bleef hangen ('te langzaam').
+     Wat hij bewaakt is een letterlijke optie, `subtree: true`, en daar komt
+     geen operator. Met de hand nagetrokken op 4 oktober 2026: `subtree: false`
+     laat toets 1 zakken (de wacht wordt niet wakker, wachtTot loopt af) en
+     toets 2 blijft groen. Daarna teruggezet. */
+  ['deelmenuwacht.e2e.js', 'bewaakt de optie subtree: true van de wacht in public/shared/deelmenu.js, en geen operator raakt een objectliteraal; 3 mutaties geprobeerd: twee returnwaarden van start() overleefden, === -> !== in de id-ontdubbeling liet de pagina eindeloos lussen (te langzaam). Handmutatie subtree: true -> false laat toets 1 zakken, toets 2 blijft groen'],
   /* De waarheidstoets leest operationele claims in HTML en letterlijke
      antwoordteksten. De mechanische JS-operatoren raken dat soort leugen niet
      en overleefden 52 irrelevante mutaties. Handmatig een vaste Kyoto-claim
@@ -1381,6 +1485,75 @@ const GEEN_BRONMUTATIE = new Map([
   ['livinglab-observatorium.test.js', 'motor muteerde de bedrading in livinglab/index.js; 4 handmutaties in observatorium(seinen).js, alle vier raak: zwaarste() omgedraaid laat toets 2, 3 en 4 zakken, klachtfilter !== open toets 3, geldbron-grendel weg toets 4, stilgelegd/klachten nooit storing toets 2 en 3'],
   ['travel-bearer-productiepoort.test.js', 'sinds de migratie van #403 is PER_ROUTE leeg: de poort houdt niets tegen, dus een mutatie in de methode- of NODE_ENV-grendel verandert niets waarneembaars (isProductie omgedraaid: 8/8 groen, terecht); wat er wel te zien is, is bewaakt: een route terug aan de grendel (/api/arrival/request) laat toets 1, 2, 6 en 8 zakken'],
   ['toestel-routes.test.js', 'raakt geen enkel /api/-pad (alleen /toestel/cel, /cel.js, /manifest.json en /artefact/:sha, zonder authpoort), dus de liegpoort zit naast zijn onderwerp; 3 handmutaties in server/routes/toestel.js raak: connect-src self in de cel-CSP laat toets 1 zakken, de sha-formaatcontrole weg en immutable weg allebei toets 5'],
+  /* VIJF SCHERMTOETSEN DIE DE LIEGPOORT OVERLEEFDEN (4 oktober 2026). Elk eerst
+     in EIGEN_MODULE gezet en door de motor gehaald; geen kreeg daar een eerlijk
+     'gezakt', en per regel staat waarom niet en wat met de hand WEL raak was.
+     Allemaal daarna teruggezet. */
+  /* laatstedrie: de camerakant loopt via RTGMedia.vraag, maar de motor vond in
+     media.js 34 plekken en geen raakte de weg van een geslaagde stroom. De
+     poorten van RTG Eye en het tweede scherm zijn TEKST in de HTML en inline
+     script, en een .html haalt node --check niet. */
+  ['laatstedrie.e2e.js', 'overleefde 34 mutaties in public/shared/media.js (diep); de twee poortbeweringen lezen vaste tekst in oog.html en scherm.html, en inline script haalt node --check niet. 2 handmutaties raak: `if (vooraf)` -> `if (!vooraf)` in vraag() (de stroom wordt nooit gevraagd) en beeld.srcObject = null in camera.html laten allebei de zoekerwacht zakken; de token-grendel omdraaien in oog.html en scherm.html bleef groen (oog valt terug op dezelfde personeelstekst via RTGDeur, scherm leest #poort voordat de 401 hem vervangt)'],
+  /* a11y-hermeet: de motor raakt in scripts/a11y-hermeet.js alleen de
+     wachttijden en de playState-vergelijking van de wacht, en een langere of
+     kortere wacht verandert de uitkomst niet. Wat de toets vastlegt is OF er een
+     tweede meting komt en wat die teruggeeft. */
+  ['a11y-hermeet.e2e.js', 'overleefde 5 mutaties in scripts/a11y-hermeet.js (diep): wachttijden en de playState-wacht, die de uitkomst niet bepalen. 2 handmutaties raak: de tweede meting overslaan (return res) laat "een grond die er een tel later niet meer is, telt niet" zakken (1 !== 0), en een tweede meting die het contrast leeg teruggeeft laat "en de tweede meting ziet hem nog steeds" zakken (0 !== 1)'],
+  /* deelmenuronde: de toets levert de aaneengeplakte DELEN uit
+     public/shared/deelmenu/, niet het bundelbestand. Deel 01 en 03 zijn losse
+     fragmenten die node --check niet halen, dus de motor kan ze niet muteren;
+     deel 02 wel, maar zijn eerste === -> !== maakt een eindeloze lus en dan is
+     de uitslag 'te langzaam'. De operatoren van de motor zelf, met de hand op
+     deel 03 gezet, zijn wel raak. */
+  ['deelmenuronde.e2e.js', 'de toets bundelt public/shared/deelmenu/deelmenu-0{1,2,3}.js; 01 en 03 zijn fragmenten die node --check niet halen (0 pogingen), 02 gaf na 2 pogingen een eindeloze lus (te langzaam). Twee motoroperatoren met de hand op deelmenu-03.js raak: getal+1 op de balkopruimer (for b = 1) laat toets 2, 3 en 4 zakken, return-weg in geenMenu.open (undefined in plaats van null) laat toets 2 zakken'],
+  /* rtg-edge-2: dertig browserproeven over acht routes en twee schermmaten;
+     alleen al de nulmeting duurt 251 s (gemeten, los gedraaid) en de motor geeft
+     er 240, dus hij komt nooit aan een mutatie toe. Wat hij bewaakt is de vorm
+     van de rand (een top-, zij- en onderrand, geen tweede in een kader). */
+  ['rtg-edge-2.e2e.js', 'nulmeting 251 s tegen een motorgrens van 240 s (twee keer te langzaam, 0 pogingen). 2 handmutaties raak, alle 22 toetsen rood: het eerste === -> !== in public/shared/rtg-edge-2.js (de motoroperator zelf) en isEmbedded() in rtg-edge-2-context.js die een topscherm als ingebed leest (self!==top -> self===top) -- dan bouwt geen route zijn rand en zakt de wacht op data-rtg-edge-2-rendered'],
+  /* wereldbreedte: de beweringen zijn GEOMETRIE (scrollWidth tegen 390px, de
+     rail binnen het venster, een paneel van minstens 120px per knop). De motor
+     meldde in living-os.js na 23 pogingen een 'gezakt' op getal+1#4, maar dat is
+     een meervoudsvorm die bij nul brongebeurtenissen niets verandert; met de hand
+     herhaald bleef hij een keer groen en zakte hij een keer op de railpositie --
+     een flake en geen bevestiging, dus die telt hier niet. */
+  ['wereldbreedte.e2e.js', 'geometrie (scrollWidth, railpositie, paneelhoogte), geen rekenend gedrag; 23 mutaties in public/apps/living-os.js, en de ene "gezakt" (getal+1 in een meervoudsvorm) herhaalde niet met de hand. 2 handmutaties raak: min-width 190px op de railknoppen in shared/living-os.css laat de breedtebewering zakken, en de data-view-binding weghalen in living-os.js laat "geen zichtbaar paneel" zakken (intent, decisions, evidence)'],
+  /* TWEE SCHERMTOETSEN DIE DE LIEGPOORT OVERLEEFDEN EN WAAR OOK EEN EIGEN MODULE
+     NIETS ZEGT (4 oktober 2026). Beide met de motor geprobeerd en daarna met de
+     hand beproefd; de regel noemt wat er raak was.
+
+     rtfrust: rust.html stuurt niets naar de server, dus de liegpoort zat naast
+     zijn onderwerp. De ademteller en het stiltemoment staan in een INLINE script
+     in de pagina zelf; met rust.html als module maakte de motor 0 pogingen
+     (node --check weigert een .html), en de losse scripts van de pagina
+     (tekenen.js, sessie.js) dragen die logica niet.
+
+     identiteitschermen: wat hij vastlegt is TEKST -- beloften die op rtgid.html,
+     passkeys.html en in de Balans-stand (public/apps/geld/balansb.js) staan,
+     en de AFWEZIGHEID van een reeksteller. Met balansb.js als module overleefde
+     hij 13 mutaties, en terecht: geen bronoperator raakt een letterlijke string. */
+  ['rtfrust.e2e.js', 'de logica staat inline in public/apps/foundation/rust.html en de motor muteert geen .html (0 pogingen, node --check weigert hem); 2 handmutaties in dat inline script raak: de fasewissel van 4000 naar 9000 ms laat de toets zakken op het wachten op "Houd vast", en tijdens de minuut een tekst in #stilTekst zetten laat de bewering "het scherm is stil" zakken'],
+  ['identiteitschermen.e2e.js', 'legt tekst en afwezigheid vast, geen rekenend gedrag; overleefde 13 mutaties in public/apps/geld/balansb.js (de Balans-stand). 3 handmutaties raak: "nooit meer gegevens dan gevraagd" uit rtgid.html laat toets 1 zakken, "Geen streaks" uit balansb.js laat toets 2 zakken, en een regel "3 dagen op rij" in balansb.js laat toets 2 zakken op de reeksteller'],
+  /* TWEE SCHERMTOETSEN DIE DE LIEGPOORT OVERLEEFDEN (4 oktober 2026), en
+     terecht: geen van beide leest een /api/-antwoord.
+
+     csp.e2e.js leest de CSP-KOP en luistert naar securitypolicyviolation. Een
+     poging in EIGEN_MODULE met server/middleware/voordeur.js overleefde (1
+     mutatie, ===->!==#0 in opPagina) -- en meer krijgt hij niet: de toets
+     duurt ruim drie minuten, boven het mutatiebudget van 90 s, dus de motor
+     neemt na de eerste trage poging de uitslag en stopt. De beleidsregel zelf
+     (CSP() en STIJLSTEMPEL in csp.js) is een tekenreeks, en daar komt geen
+     operator in. Met de hand nagetrokken, tweemaal raak: 'unsafe-inline' in
+     script-src laat de kopbewering op / zakken, en de stempelaar uitzetten
+     (`if(!n)return;` -> `return;`) laat de browser 352 keer een eigen
+     stijlblok blokkeren.
+
+     juridischeschermen.e2e.js leest de TEKST van vier statische HTML-pagina's;
+     er is geen module die die tekst maakt. Met de hand nagetrokken, tweemaal
+     raak: "Autoriteit Persoonsgegevens" weg uit privacy.html laat de
+     klachtrechteis zakken, en "Marriott" in voorwaarden.html de merkregel. */
+  ['csp.e2e.js', 'CSP-kop en browserblokkades; 1 mutatie in voordeur.js overleefd (traag: 210 s tegen een budget van 90 s, dus een schot), het beleid zelf is een tekenreeks; 2 handmutaties raak: unsafe-inline in script-src laat de kopbewering zakken, de stijlstempelaar uit laat 352 blokkades zien'],
+  ['juridischeschermen.e2e.js', 'tekstcontract op vier statische HTML-pagina\'s, geen module maakt die tekst; 2 handmutaties raak: Autoriteit Persoonsgegevens weg uit privacy.html laat de klachtrechteis zakken, Marriott in voorwaarden.html de merkregel'],
 ]);
 
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets
@@ -1649,10 +1822,106 @@ function proefServer(naam) {
     : { soort: 'server', staat: 'overleefd', operator: 'liegpoort /api/' };
 }
 
+/* GERICHTE BRONMUTATIES gebruiken dezelfde draaier, herstelwacht en schrijver.
+   De declaratie bevat alleen exacte bytes, hashes en de verwachte foutmelding;
+   geen meegeleverd commando of gefingeerde uitslag. Een nieuwe kandidaat moet
+   opnieuw worden gemeten. Voorbeeld: --gericht=/absolute/cases.json. */
+const sha256 = bytes => require('crypto').createHash('sha256').update(bytes).digest('hex');
+function gerichteBron(proef, wortel = WORTEL) {
+  wortel = fs.realpathSync(wortel);
+  if (!proef || typeof proef !== 'object' ||
+      !/^test\/[a-zA-Z0-9_.-]+\.(?:test|e2e)\.js$/.test(proef.test || '') ||
+      !/^(?:server|scripts|public)\/[a-zA-Z0-9_./-]+\.(?:js|html|css)$/.test(proef.module || '') ||
+      proef.module.split('/').includes('..')) throw Error('Ongeldig gericht bron- of toetspad.');
+  for (const [pad, verwacht] of [[proef.test, proef.testSha256], [proef.module, proef.sourceSha256]]) {
+    const absoluut = path.join(wortel, pad);
+    if (fs.realpathSync(absoluut) !== absoluut || !/^[a-f0-9]{64}$/.test(verwacht || '') ||
+        sha256(fs.readFileSync(absoluut)) !== verwacht) throw Error('Gerichte bronbinding klopt niet: ' + pad);
+  }
+  const bron = fs.readFileSync(path.join(wortel, proef.module), 'utf8');
+  if (typeof proef.find !== 'string' || !proef.find || typeof proef.replace !== 'string' ||
+      proef.find === proef.replace || bron.split(proef.find).length !== 2 ||
+      typeof proef.expectedFailure !== 'string' || !proef.expectedFailure.trim() ||
+      typeof proef.rationale !== 'string' || !proef.rationale.trim())
+    throw Error('Een gerichte mutant vereist één exacte vervanging, foutclaim en reden.');
+  return { bron, mutant: bron.replace(proef.find, () => proef.replace) };
+}
+function laadGericht(bestand) {
+  if (['.env', 'local.env', 'server/.env', 'deploy/live.env'].some(p => fs.existsSync(path.join(WORTEL, p))) ||
+      ['DATABASE_URL', 'PG_URL', 'REDIS_URL', 'RTG_DATA_DIR', 'RTG_LIEG', 'RTG_METEN_OP_VUILE_BOOM'].some(k => process.env[k]))
+    throw Error('Gerichte mutaties vereisen een geïsoleerde checkout zonder externe doelen.');
+  const schoon = require('./lib/stempel').eisSchoneBoom('gerichte mutatiemeting');
+  if (!schoon.ok) throw Error(schoon.reden);
+  const spec = JSON.parse(fs.readFileSync(bestand, 'utf8'));
+  const git = args => require('child_process').execFileSync('git', args, { cwd: WORTEL, encoding: 'utf8' }).trim();
+  if (spec.schema !== 'RTG_DIRECTED_MUTATIONS/v1' || !/^[a-f0-9]{40}$/.test(spec.commit || '') ||
+      spec.commit !== git(['rev-parse', 'HEAD']) || !Array.isArray(spec.cases) || !spec.cases.length)
+    throw Error('Gerichte mutaties vereisen de exacte huidige kandidaat en een niet-lege casuslijst.');
+  const seen = new Set();
+  for (const proef of spec.cases) {
+    gerichteBron(proef);
+    if (seen.has(proef.test)) throw Error('Dubbele gerichte toets: ' + proef.test);
+    seen.add(proef.test);
+  }
+  if (typeof spec.evidenceDirectory !== 'string' || !path.isAbsolute(spec.evidenceDirectory))
+    throw Error('Een absolute bewijsmap buiten de checkout is vereist.');
+  fs.mkdirSync(spec.evidenceDirectory, { recursive: true });
+  const bewijs = fs.realpathSync(spec.evidenceDirectory);
+  if (bewijs === WORTEL || bewijs.startsWith(WORTEL + path.sep)) throw Error('Bewijsmap moet buiten de checkout staan.');
+  const binding = { commit: spec.commit, tree: git(['rev-parse', 'HEAD^{tree}']), node: process.version,
+    runtimeSha256: sha256(fs.readFileSync(process.execPath)), instrumentSha256: sha256(fs.readFileSync(__filename)),
+    declarationSha256: sha256(fs.readFileSync(bestand)) };
+  return { ...spec, evidenceDirectory: bewijs, binding };
+}
+function gerichteAssertie(tap, verwacht) {
+  return String(tap).split(/(?=^not ok |^ok |^# tests |^1\.\.)/m)
+    .some(blok => blok.startsWith('not ok ') && /code: ['\"]ERR_ASSERTION['\"]/.test(blok) && blok.includes(verwacht));
+}
+function proefGericht(proef, spec) {
+  const { bron, mutant } = gerichteBron(proef), absoluut = path.join(WORTEL, proef.module);
+  const prefix = path.join(spec.evidenceDirectory, path.basename(proef.test));
+  const complete = r => !r.tijdout && !r.error && !r.signal && r.toetsen > 0 && r.overgeslagen === 0;
+  const groen = r => complete(r) && r.status === 0 && r.gezakt === 0;
+  const voorBaseline = bronStand(null);
+  const nul = draaiToets(path.join(WORTEL, proef.test), null, WACHT_NUL, false, prefix + '.baseline');
+  const baselineSchade = bijwerkingVan(voorBaseline, bronStand(null));
+  if (baselineSchade.length) { herstelBron(voorBaseline, baselineSchade); throw Error('Baseline wijzigt bron: ' + baselineSchade.join(', ')); }
+  const evidence = { ...spec.binding, test: proef.test, module: proef.module,
+    testSha256: proef.testSha256, sourceSha256: proef.sourceSha256,
+    mutantSha256: sha256(mutant), rationale: proef.rationale, find: proef.find, replace: proef.replace,
+    expectedFailure: proef.expectedFailure, baseline: nul, op: new Date().toISOString() };
+  let staat = 'al rood', mutantRun, herstel;
+  if (groen(nul)) {
+    const voor = bronStand(absoluut);
+    mutantRun = metMutatie(absoluut, mutant, () => draaiToets(path.join(WORTEL, proef.test), null,
+      WACHT_MUTATIE, false, prefix + '.mutant'));
+    const schade = bijwerkingVan(voor, bronStand(absoluut));
+    if (schade.length) { herstelBron(voor, schade); staat = 'bijwerking'; evidence.bijwerking = schade; }
+    else if (fs.readFileSync(absoluut, 'utf8') !== bron) throw Error('Mutatiebron niet hersteld: ' + proef.module);
+    else {
+      herstel = draaiToets(path.join(WORTEL, proef.test), null, WACHT_NUL, false, prefix + '.restored');
+      const herstelSchade = bijwerkingVan(voorBaseline, bronStand(null));
+      if (herstelSchade.length) { herstelBron(voorBaseline, herstelSchade); throw Error('Herproef wijzigt bron: ' + herstelSchade.join(', ')); }
+      const assertie = gerichteAssertie(fs.readFileSync(prefix + '.mutant.tap', 'utf8'), proef.expectedFailure);
+      staat = complete(mutantRun) && mutantRun.status === 1 && mutantRun.gezakt > 0 && assertie && groen(herstel)
+        ? 'gezakt' : groen(mutantRun) && groen(herstel) ? 'overleefd' : 'onvolledig gericht bewijs';
+    }
+  }
+  evidence.mutant = mutantRun || null; evidence.restored = herstel || null; evidence.staat = staat;
+  const bewijsbestand = prefix + '.evidence.json';
+  fs.writeFileSync(bewijsbestand, JSON.stringify(evidence, null, 2) + '\n');
+  return { soort: 'gericht', staat, module: proef.module, operator: 'expliciete bronmutatie',
+    gezakt: mutantRun ? mutantRun.gezakt : 0, geprobeerd: mutantRun ? 1 : 0,
+    bewijs: { bestand: bewijsbestand, sha256: sha256(fs.readFileSync(bewijsbestand)), commit: spec.commit,
+      sourceSha256: proef.sourceSha256, testSha256: proef.testSha256 } };
+}
+
 if (require.main === module) {
   const args = process.argv.slice(2);
   const losse = args.filter(a => !a.startsWith('--'));
   const alleen = args.includes('--puur') ? 'puur' : args.includes('--server') ? 'server' : null;
+  const gerichtArg = args.find(a => a.startsWith('--gericht='));
+  const gericht = gerichtArg ? laadGericht(gerichtArg.slice(10)) : null;
 
   /* HET AFBOUWSLOT, EN WAAROM HET HIER ONTBRAK.
 
@@ -1690,6 +1959,7 @@ if (require.main === module) {
 
   let namen = fs.readdirSync(TEST).filter(n => n.endsWith('.test.js')).sort();
   if (losse.length) namen = losse.map(a => path.basename(a));
+  if (gericht) namen = gericht.cases.map(p => path.basename(p.test));
 
   const puur = namen.filter(n => !isServerToets(n));
   const server = namen.filter(n => isServerToets(n));
@@ -1702,8 +1972,8 @@ if (require.main === module) {
   /* Een gerichte herproef mag geen half afgemaakte VOLLEDIGE ronde uit de
      voortgangscache mee vastleggen. Bij losse bestanden is MUTATIES.json daarom
      de basis; de uitkomst van die losse proef ververst daarna de cache vanzelf. */
-  const uitslag = Object.assign(laad(UITSLAG), losse.length ? {} : laad(VOORTGANG));
-  const opnieuw = args.includes('--opnieuw');
+  const uitslag = Object.assign(laad(UITSLAG), losse.length || gericht ? {} : laad(VOORTGANG));
+  const opnieuw = !!gericht || args.includes('--opnieuw');
   /* Na ELK bestand wegschrijven, en overslaan wat er al in staat. Het serverdeel
      duurt uren; een motor die alleen aan het eind wegschrijft verliest bij een
      ctrl-C alles, en dan draait niemand hem ooit af. */
@@ -1754,6 +2024,12 @@ if (require.main === module) {
         r.staat + (r.operator ? '  [' + r.operator + (r.module ? ' in ' + r.module : '') + ']' : ''));
     }
   };
+
+  if (gericht) {
+    doe(namen, n => proefGericht(gericht.cases.find(p => path.basename(p.test) === n), gericht));
+    vastleggen();
+    process.exit(namen.every(n => uitslag[n].staat === 'gezakt') ? 0 : 1);
+  }
 
   if (alleen !== 'server') {
     console.log('  --- A: pure toetsen, bronmutatie (eerste plek per operator) ---');
@@ -1836,7 +2112,7 @@ if (require.main === module) {
   console.log('\n  Uitslag in MUTATIES.json; npm run bewijs zet hem in BEWIJS.md.\n');
 }
 
-module.exports = { OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG, NIET_MUTEREN,
+module.exports = { gerichteAssertie, gerichteBron, laadGericht, proefGericht, OPERATOREN, muteer, codemasker, modulesVan, UITSLAG, VOORTGANG, NIET_MUTEREN,
   DUN_ONDER, dekkingVan, overleverTelling,
   SPOOR, ruimEerderOp, schrijfSpoor, metMutatie, DEUREN,
   /* draaiToets naar buiten, zodat scripts/outputproef.js hem kan gebruiken in

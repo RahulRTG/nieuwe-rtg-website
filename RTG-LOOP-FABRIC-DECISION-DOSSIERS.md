@@ -904,4 +904,3 @@ Uitzonderingen: Doelgebonden gevalideerde adapters per domein, nooit een catch-a
 Runtime enforcement: sensitivity policy blokkeert cross-domain en AI standaard; expliciete domeinadapter vereist.
 
 Benodigde tests: high-impact artifact rejected by generic adapter; technical incident excludes source payload.
-

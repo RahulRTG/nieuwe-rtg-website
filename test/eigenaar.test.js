@@ -88,7 +88,7 @@ test('juridische grens: ook de eigenaar leest geen privé kinder- of leden-inhou
   // een gezin met een beschermd kind (t/m 15) en een privébericht van het kind
   const g = await json(await api('/api/foundation/gezin/maak', { gezinsnaam: 'Fam Grens', naam: 'Ouder', pin: '1234' }));
   const kind = await json(await api('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Kind Grens', rol: 'kind', groep: 'kind' }));
-  const kindTok = (await json(await api('/api/foundation/gezin/profiel/kies', { code: g.code, profielId: kind.profiel.id }))).token;
+  const kindTok = (await json(await api('/api/foundation/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).token;
 
   // het beschermde kind is onvindbaar in de sociale laag, OOK met een eigenaar-token:
   // er is simpelweg geen backoffice-endpoint dat privéberichten van een kind teruggeeft,

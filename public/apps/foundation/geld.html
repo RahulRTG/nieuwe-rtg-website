@@ -83,9 +83,10 @@
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
 const api = window.Sessie ? Sessie.api : null;
-if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisFamilie()) return;
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
@@ -104,7 +105,7 @@ if (window.RTGUitvoer) RTGUitvoer.bron(function () {
 
 async function laadDoelen(){
   try{
-    const d = await fetch('/api/foundation/gezin/'+s.code+'/spaardoelen?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/spaardoelen',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     const box = $('#doelen');
     DOELEN = d.spaardoelen || [];
     if (!d.spaardoelen || !d.spaardoelen.length){ box.innerHTML = '<div class="leeg">Nog geen spaardoel. Begin er hieronder een; klein mag ook.</div>'; return; }
@@ -160,6 +161,7 @@ $('#vraag').addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){
 
 laadDoelen(); tip();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}());
 </script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>

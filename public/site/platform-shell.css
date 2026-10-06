@@ -1,4 +1,3 @@
-@import url('../shared/rtg-public-warm.css');
 @import url('../shared/rtg-world-widgets.css');
 /* The world-home geometry is imported unchanged. This layer supplies public content. */
 body[data-public-platform]{--wh-ink:#f6efe3;--wh-soft:#d8cfc2;--wh-gold:#e2c389;--wh-bg:#100e0b;background:#100e0b!important;color:var(--wh-ink)!important;font-family:Inter,sans-serif;--wd-surface:#15130f;--wd-line:rgba(216,187,135,.3)}
@@ -17,7 +16,7 @@ body[data-public-platform] :is(button,input,select){font-family:Inter,sans-serif
 .pp-header .wd-icon svg,.pp-shell .wd-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 
 .pp-subtitle{grid-column:1;font-size:.82rem;color:var(--wh-soft)}
-.pp-shell h2,.pp-shell h3{font-family:"Bodoni Moda",Georgia,serif;font-weight:400;color:var(--wh-ink);letter-spacing:-.025em}
+.pp-shell h1,.pp-shell h2,.pp-shell h3{font-family:"Bodoni Moda",Georgia,serif;font-weight:400;color:var(--wh-ink);letter-spacing:-.025em}
 .pp-shell p{line-height:1.6}
 .pp-shell .wd-people h2{font-size:1.75rem;margin:0 0 1rem}
 .pp-person{width:100%;text-align:start;background:transparent;border:0;border-bottom:1px solid var(--wd-line);cursor:pointer}
@@ -35,7 +34,7 @@ body[data-public-platform] :is(button,input,select){font-family:Inter,sans-serif
 .pp-feature>.pp-feature-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
 .pp-feature::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,8,6,.02) 25%,rgba(10,8,6,.2) 40%,rgba(10,8,6,.94));z-index:-1}
 .pp-feature-copy{padding:1.5rem;width:100%}
-.pp-feature-copy h2{font-size:clamp(2rem,3vw,3.3rem);line-height:1.08;max-width:21ch;margin:.45rem 0 .75rem}
+.pp-feature-copy :is(h1,h2){font-size:clamp(2rem,3vw,3.3rem);line-height:1.08;max-width:21ch;margin:.45rem 0 .75rem}
 .pp-feature-copy p{font-size:.92rem;max-width:48ch;margin:.6rem 0 1rem}
 .pp-button{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;min-height:44px;padding:.65rem 1.3rem;border:1px solid #d0ae78;border-radius:var(--rtg-radius-system);background:linear-gradient(110deg,#edcf99,#c4a279);color:#1c150e!important;font:500 .8rem/1.4 Inter,sans-serif;text-decoration:none;cursor:pointer}
 .pp-button:hover{filter:brightness(1.08)}
@@ -120,7 +119,7 @@ body[data-public-platform] :is(button,input,select){font-family:Inter,sans-serif
  .pp-shell>.wd-greeting{display:block;width:100%;border:0;padding:0;margin:0}.pp-shell .wd-greeting h1{font-size:.85rem;font-family:Inter,sans-serif;margin:0}.pp-shell .wd-greeting>p{display:none}.pp-subtitle{display:block;font-size:.75rem;margin-top:.4rem}
  .pp-shell>.wd-people{display:none}.pp-shell>.wd-favorites{display:flex;gap:1rem;position:static;width:100%}.pp-shell>.wd-favorites>:not(:first-child){display:none}
  .pp-shell .wd-home{width:100%;min-width:0}.pp-stories{gap:1.1rem;margin:1rem 0 1.4rem}.pp-story{flex:0 0 5.3rem;font-size:.8rem}.pp-story img,.pp-story>.wd-icon{width:5rem;height:5rem}
- .pp-mobile-intro{display:block;font-size:1.7rem!important;line-height:1.2;margin:.5rem 0 1rem}.pp-feature{min-height:560px}.pp-feature-copy{padding:1.1rem}.pp-feature-copy h2{font-size:2.2rem;max-width:20ch}.pp-feature-copy p{font-size:.9rem}.pp-feature-copy .pp-button{background:transparent;border:0;border-radius:0;border-bottom:1px solid var(--wh-gold);color:var(--wh-gold)!important;padding:.45rem 0;font-size:.95rem}
+ .pp-mobile-intro{display:block;font-size:1.7rem!important;line-height:1.2;margin:.5rem 0 1rem}.pp-feature{min-height:560px}.pp-feature-copy{padding:1.1rem}.pp-feature-copy :is(h1,h2){font-size:2.2rem;max-width:20ch}.pp-feature-copy p{font-size:.9rem}.pp-feature-copy .pp-button{background:transparent;border:0;border-radius:0;border-bottom:1px solid var(--wh-gold);color:var(--wh-gold)!important;padding:.45rem 0;font-size:.95rem}
  .pp-side-widget{width:100%;margin:0!important}.pp-shell>.wd-favorites>.pp-widget{width:100%}.pp-shell>.wd-favorites .pp-widget-body>.pp-widget-photo{max-height:130px}
  .pp-shell>.wd-library{display:block;width:100%;margin-top:1rem;padding-top:1.5rem;border-top:1px solid var(--wd-line)}.pp-shell .wd-library-heading{display:block}.pp-shell .wd-library-heading h2{font-size:1.8rem;margin-bottom:.5rem}.pp-library-tools{flex-wrap:wrap;margin:1rem 0}.pp-search-label{flex:1;min-width:180px}.pp-shell input.wd-search{width:100%;min-height:44px;padding:.65rem;background:#211a12;color:var(--wh-ink);border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);display:block;margin-top:.3rem}
  .pp-shell .wd-catalog{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}.pp-widget{border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);overflow:hidden;background:#17130f}
@@ -129,7 +128,50 @@ body[data-public-platform] :is(button,input,select){font-family:Inter,sans-serif
  .pp-shell .wd-focus{width:100%;border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial)}.pp-shell .wd-focus-head{display:flex;flex-wrap:wrap;gap:1rem;padding:1rem;border-bottom:1px solid var(--wd-line)}.wd-focus-head h2{font-size:1.5rem}.pp-detail-content{padding:1rem}.pp-architecture{grid-template-columns:1fr}
  .pp-detail-content :is(.pass-grid,.pass-cards){grid-template-columns:1fr}.pp-list-view .pp-widget{grid-template-columns:1fr}.pp-footer{display:block}
 }
-@media(max-width:370px){.pp-context{font-size:.95rem}.pp-shell .wd-catalog{grid-template-columns:1fr}.pp-feature{min-height:490px}.pp-feature-copy h2{font-size:2rem}.pp-brand{font-size:2.3rem!important}.pp-header{gap:.5rem}.pp-profile{min-width:40px}}
+
+.pp-section-title{margin:28px 0 0;padding-top:24px;border-top:1px solid var(--wd-line);font:400 1.5rem/1.2 "Bodoni Moda",Georgia,serif!important}
+.pp-section-title+.pp-section-index{margin-top:10px;padding-top:0;border-top:0}
+.pp-section-index .pp-button{min-height:40px;padding:8px 12px;border-color:rgba(216,187,135,.24);border-radius:var(--rtg-radius-system)!important;background:rgba(27,23,18,.78);color:var(--wh-soft)!important;font-size:11px}
+.pp-section-index .pp-button:hover{border-color:rgba(226,195,137,.62);color:var(--wh-ink)!important;filter:none}
+
+/* Social-tech front door: photographic like the app, with a restrained
+   technical layer. The native world shell and its single Edge remain owners
+   of geometry and navigation. */
+body[data-public-platform="app"]{background:
+  linear-gradient(rgba(226,195,137,.025) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(226,195,137,.025) 1px,transparent 1px),#100e0b!important;background-size:48px 48px}
+body[data-public-platform="app"] .pp-header{background:rgba(16,14,11,.9)!important;backdrop-filter:blur(22px) saturate(1.25)}
+body[data-public-platform="app"] .pp-feature{box-shadow:0 34px 90px rgba(0,0,0,.34),inset 0 0 0 1px rgba(255,244,224,.035)}
+body[data-public-platform="app"] .pp-feature::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.22;background:
+  linear-gradient(90deg,transparent 0 24.9%,rgba(232,202,153,.24) 25%,transparent 25.1% 74.9%,rgba(232,202,153,.24) 75%,transparent 75.1%),
+  linear-gradient(transparent 0 32.9%,rgba(232,202,153,.16) 33%,transparent 33.1% 65.9%,rgba(232,202,153,.16) 66%,transparent 66.1%)}
+.pp-technology-signal{position:absolute;z-index:2;inset:18px 18px auto auto;display:grid;grid-template-columns:auto auto;align-items:center;column-gap:8px;margin:0!important;padding:10px 12px;border:1px solid rgba(236,211,170,.34);border-radius:var(--rtg-radius-system);background:rgba(12,11,9,.66);backdrop-filter:blur(16px);box-shadow:0 14px 40px rgba(0,0,0,.22);font:500 9px/1.4 Inter,sans-serif!important;letter-spacing:.08em;text-transform:uppercase;color:#f4eadc!important}
+.pp-technology-signal .pp-signal-pulse{grid-row:1/3;width:7px;height:7px;border-radius:50%;background:#82d6ae;box-shadow:0 0 0 4px rgba(130,214,174,.12),0 0 16px rgba(130,214,174,.5)}
+.pp-technology-signal small{font:500 8px/1.2 Inter,sans-serif;color:#d9bb82;letter-spacing:.14em}
+.pp-technology-signal strong{font:600 10px/1.25 Inter,sans-serif;color:#fff7ea;letter-spacing:.06em}
+.pp-technology-signal>span:last-child{grid-column:2;font-size:8px;color:#d6c8b7;letter-spacing:.04em;text-transform:none}
+.pp-secure-link{display:inline-flex;min-height:44px;align-items:center;margin-top:8px;color:#fff4df;text-decoration:none;border-bottom:1px solid rgba(226,195,137,.58);font-size:13px}
+.pp-secure-link::after{content:'\2197';margin-inline-start:30px;color:#e2c389}
+.pp-world-facts{padding-top:.65rem;border-top:1px solid var(--wd-line);color:var(--wh-gold)!important;font-size:.72rem!important;line-height:1.55!important}
+body[data-public-platform="app"] .pp-widget{position:relative;overflow:hidden;border-color:rgba(216,187,135,.25);background:linear-gradient(145deg,rgba(37,29,21,.9),rgba(17,15,12,.96))}
+body[data-public-platform="app"] .pp-widget-photo{height:160px;filter:saturate(.9) contrast(1.03);transition:transform .45s ease,filter .45s ease}
+body[data-public-platform="app"] .pp-widget:hover .pp-widget-photo{transform:scale(1.025);filter:saturate(1.04) contrast(1.04)}
+body[data-public-platform="app"] [data-public-widget="socialApp"]{grid-column:span 2;background:linear-gradient(145deg,rgba(61,35,29,.88),rgba(17,15,12,.97))}
+body[data-public-platform="app"] [data-public-widget="socialApp"] .pp-widget-photo{height:210px}
+body[data-public-platform="app"] .pp-detail-content .app-truth-detail{background:rgba(14,12,10,.82)}
+
+@media(max-width:999px){
+ body[data-public-platform="app"]{background:linear-gradient(180deg,#221910,#100e0b 300px)!important}
+ .pp-technology-signal{inset:14px 14px auto auto;padding:8px 9px}
+ .pp-technology-signal small{display:block;font-size:7px}
+ .pp-technology-signal strong{grid-column:2}
+ .pp-secure-link{font-size:13px}
+ body[data-public-platform="app"] [data-public-widget="socialApp"]{grid-column:1/-1}
+ body[data-public-platform="app"] [data-public-widget="socialApp"] .pp-widget-photo{height:150px}
+}
+@media(max-width:420px){.pp-technology-signal>span:last-child{display:none}.pp-technology-signal{grid-template-columns:auto auto}.pp-feature-copy{padding-top:64px!important}}
+@media(prefers-reduced-motion:reduce){body[data-public-platform="app"] .pp-widget-photo{transition:none}}
+@media(max-width:370px){.pp-context{font-size:.95rem}.pp-shell .wd-catalog{grid-template-columns:1fr}.pp-feature{min-height:490px}.pp-feature-copy :is(h1,h2){font-size:2rem}.pp-brand{font-size:2.3rem!important}.pp-header{gap:.5rem}.pp-profile{min-width:40px}}
 @media(prefers-reduced-motion:reduce){body[data-public-platform] *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
 
@@ -177,3 +219,47 @@ body[data-public-platform] .wd-greeting>.pp-language-notice:not([hidden]){displa
 body[data-public-platform] .pp-filter{background:#17130f!important;color:var(--wh-ink)!important}
 
 .pp-section-index{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;padding-top:24px;border-top:1px solid var(--wd-line)}
+
+/* The public narrative is already a complete content surface. It does not
+   borrow the member world's welcome, personal photo editor or extra tab row. */
+body[data-public-platform] .pp-shell>.pp-language-notice{grid-column:2/-1;order:-1}
+body[data-public-platform] .pp-shell>.pp-language-notice[hidden]{display:none!important}
+body[data-public-platform] .pp-shell .pp-feature{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;min-height:440px;border:1px solid var(--wd-line);border-radius:var(--rtg-radius-editorial);background:#18120f}
+body[data-public-platform] .pp-feature>.wp-photo{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;z-index:-2;border:0;border-radius:0;background:none}
+body[data-public-platform] .pp-feature>.wp-photo>.pp-feature-photo{display:block;position:static;width:100%;height:100%;aspect-ratio:auto;object-fit:cover;object-position:center}
+body[data-public-platform] .pp-feature::after{display:block;content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(14,10,8,.02) 0%,rgba(14,10,8,.14) 24%,rgba(14,10,8,.76) 66%,rgba(14,10,8,.96))}
+body[data-public-platform] .pp-feature-copy{display:flex;flex-direction:column;align-items:flex-start;width:100%;padding:28px;gap:0}
+body[data-public-platform][data-rtg-layout="standard"] .pp-feature-copy :is(h1,h2){font:400 clamp(36px,3.8vw,60px)/1.04 "Bodoni Moda",Didot,Georgia,serif!important;letter-spacing:-.045em!important;max-width:17ch;margin:10px 0 12px;color:#fff6e9;text-wrap:balance}
+body[data-public-platform] .pp-feature-copy p{max-width:44ch;margin:8px 0 16px;color:#f1e8db;font-size:15px;line-height:1.6}
+body[data-public-platform] .pp-feature-copy .pp-overline{font-size:10px;letter-spacing:.2em;color:#e4c391}
+body[data-public-platform] .pp-feature-copy .pp-boundary{font-size:11px;line-height:1.5;color:#d3c6b7;margin-top:12px;max-width:48ch}
+body[data-public-platform] .pp-feature-copy .pp-itinerary{padding:0;background:none;border:0;color:#e4c391;line-height:1.5;margin:0 0 4px}
+body[data-public-platform] .pp-stories{display:flex;gap:12px;padding:4px 0 12px;margin:0;overflow:auto;scrollbar-width:none;scroll-snap-type:x mandatory}
+body[data-public-platform] .pp-story{flex:0 0 72px;min-width:0;scroll-snap-align:start;font-size:11px;line-height:1.3}
+body[data-public-platform] .pp-story>:is(img,.wd-icon){display:block!important;width:56px!important;height:56px!important;margin:0 auto 6px!important;border:1px solid var(--wd-line);border-radius:50%;object-fit:cover;padding:3px}
+body[data-public-platform] .pp-story-more>.wd-icon{padding:17px!important}
+body[data-public-platform] .pp-story[aria-pressed="true"]{color:var(--wh-gold)}
+body[data-public-platform] .pp-shell :is(.wp-tabs,.wp-edit-images),body[data-public-platform]>.wp-atmosphere{display:none!important}
+body[data-public-platform] .pp-shell :is(h1,h2,h3),body[data-public-platform] .pp-detail-content :is(h1,h2,h3){font-family:"Bodoni Moda",Didot,Georgia,serif!important;font-weight:400;letter-spacing:-.03em}
+@media(max-width:999px){
+ body[data-public-platform][data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]{padding-top:64px!important}
+ body[data-public-platform][data-rtg-desktop] :is(.pp-shell,.pp-detail-shell){width:calc(100% - 32px)!important;max-width:680px;margin:12px auto 24px!important;padding-bottom:calc(var(--rtg-adaptive-inset,96px) + 12px);gap:16px}
+ body[data-public-platform] :is(.pp-shell,.pp-detail-shell)>.wd-greeting{display:none!important}
+ body[data-public-platform] .pp-header{height:64px;min-height:64px;padding:8px 16px!important;gap:10px;flex-wrap:nowrap}
+ body[data-public-platform] .pp-brand{font-size:34px!important}
+ body[data-public-platform] .pp-context{font-size:13px;min-width:0;white-space:nowrap;margin-inline-end:auto}
+ body[data-public-platform] .pp-shell>.wd-favorites{display:none!important}
+ body[data-public-platform] .pp-shell .pp-feature{min-height:clamp(360px,58svh,500px);border-radius:var(--rtg-radius-editorial)}
+ body[data-public-platform] .pp-feature-copy{padding:22px 20px}
+ body[data-public-platform][data-rtg-layout="standard"] .pp-feature-copy :is(h1,h2){font-size:clamp(36px,10vw,48px)!important;max-width:17ch;margin-bottom:10px}
+ body[data-public-platform] .pp-feature-copy p{font-size:14px;margin-bottom:12px;line-height:1.55}
+ body[data-public-platform] .pp-feature-copy .pp-button{font-size:14px;min-height:44px;padding:10px 0;border:0;border-bottom:1px solid rgba(226,195,137,.65);border-radius:0;background:transparent;color:#f2d5a4!important}
+ body[data-public-platform] .pp-feature-copy .pp-boundary{font-size:10px;margin-top:9px}
+ body[data-public-platform] .pp-stepper{gap:5px;padding:0;min-height:24px}
+ body[data-public-platform] .pp-shell>.wd-library{margin-top:0;padding-top:18px}
+ body[data-public-platform] .pp-shell.wd-expanded>.wd-library{display:none!important}
+ body[data-public-platform] .pp-shell.wd-expanded .pp-detail{border:0;border-radius:0;background:transparent}
+ body[data-public-platform] .pp-detail-content{padding:12px 0}
+ body[data-public-platform] .pp-detail-content .world-room{min-height:0}
+ body[data-public-platform] .pp-footer{padding:0 16px calc(var(--rtg-adaptive-inset,96px) + 20px)}
+}

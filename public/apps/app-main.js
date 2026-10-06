@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'f0f5b40c';
+var RTG_BOUW = 'a9ad1479';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -2352,9 +2352,14 @@ var RTG_BOUW = 'f0f5b40c';
     const lijst = LADERS_PER_TAB[tab];
     if (!lijst || gevuldeTabs[tab]) return;
     gevuldeTabs[tab] = true;
-    // een gratis gebruiker heeft geen reizen, betalen, AI, assets of zorg: die
-    // tabbladen staan voor hem verborgen, dus halen we er ook niets voor op
-    if (user.tier === 'guest' && ['reizen','betalen','ai','assets','zorg'].includes(tab)) return;
+    // een gratis gebruiker heeft geen reizen, betalen, AI of assets: die
+    // tabbladen staan voor hem verborgen, dus halen we er ook niets voor op.
+    // Zorg wel, zodra hij een eigen account heeft: dat tabblad hoort bij
+    // FoundationOS, en dat staat open na het aanmaken van een account
+    // (besluit van de eigenaar, 5 oktober 2026). Een bezoeker zonder account
+    // ziet het nog steeds niet.
+    if (user.tier === 'guest' && ['reizen','betalen','ai','assets'].includes(tab)) return;
+    if (tab === 'zorg' && user.tier === 'guest' && !user.account) return;
     for (const [naam, fn] of lijst) stap(naam, fn);
   }
 
@@ -2499,7 +2504,9 @@ var RTG_BOUW = 'f0f5b40c';
     const guest = user.tier === 'guest';
     stap('scherm-aanloop', () => {
     $('#codeChipTxt').textContent = user.codename;
-    ['reizen','betalen','ai','assets','zorg'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
+    ['reizen','betalen','ai','assets'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
+    // zorg hoort bij FoundationOS: open voor elk eigen account, ook gratis
+    { const b = document.querySelector('.tabbar button[data-tab="zorg"]'); if (b) b.style.display = (guest && !user.account) ? 'none' : ''; }
     // het OS-beginscherm leest dit: zonder pas geen wallet-tegel en geen balk
     // van Rahul, want allebei zijn ze voor leden
     document.getElementById('app').classList.toggle('os-gast', guest);
@@ -9158,40 +9165,40 @@ var RTG_BOUW = 'f0f5b40c';
     const kanBetalen = user && user.tier !== 'guest';
     let ov = document.getElementById('etalage-ov');
     if (!ov){ ov = document.createElement('div'); ov.id = 'etalage-ov';
-      ov.style.cssText = 'position:fixed;inset:0;z-index:120;background:rgba(0,0,0,0.55);display:flex;align-items:flex-end;justify-content:center;';
+      ov.className = 'salon-etalage';
       document.body.appendChild(ov);
       ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
     }
     const eur2 = n => '€ ' + Number(n||0).toLocaleString(lang());
     const items = d.items || [];
     const html =
-      '<div style="width:100%;max-width:560px;max-height:88vh;overflow-y:auto;background:var(--bg);border-radius:0;border:1px solid var(--line);">' +
-      '<div style="position:relative;">' +
-        (p.foto ? '<img src="' + p.foto + '" alt="" style="width:100%;height:150px;object-fit:cover;border-radius:0;">' : '<div style="height:80px;"></div>') +
-        '<button id="etaClose" style="position:absolute;top:0.7rem;right:0.7rem;background:rgba(0,0,0,0.5);color:#fff;border:none;border-radius:0;width:34px;height:34px;font-size:1rem;cursor:pointer;">✕</button>' +
+      '<div class="salon-etalage-blad" >' +
+      '<div class="salon-etalage-beeld" >' +
+        (p.foto ? '<img src="' + p.foto + '" alt="" class="salon-etalage-foto" >' : '<div class="salon-etalage-zonder-foto" ></div>') +
+        '<button id="etaClose" class="salon-etalage-sluit" >✕</button>' +
       '</div>' +
-      '<div style="padding:1rem 1.1rem 1.4rem;">' +
-        '<div style="display:flex;align-items:center;gap:0.6rem;"><b style="font-size:1.1rem;font-family:\'Bodoni Moda\',serif;">' + escT(p.name) + '</b>' +
-          '<button id="etaVolg" style="margin-left:auto;background:' + (p.volgIk ? 'var(--rtg-leesgoud,var(--goud))' : 'none') + ';color:' + (p.volgIk ? '#000' : 'var(--rtg-leesgoud,var(--goud))') + ';border:1px solid var(--rtg-leesgoud,var(--goud));border-radius:0;padding:0.3rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;cursor:pointer;">' + (p.volgIk ? '✓ ' + T('sal.volgt','Volgt') : '+ ' + T('sal.volg','Volg')) + '</button></div>' +
-        '<div style="font-size:0.74rem;color:var(--soft);margin-top:0.2rem;">' + (p.icon ? p.icon + ' ' : '') + escT(p.typeLabel || '') + ' · ' + escT(p.city || '') + ' · ' + p.volgers + ' ' + T('sal.volgers','volgers') + '</div>' +
-        (p.bio ? '<div style="font-size:0.86rem;margin-top:0.6rem;line-height:1.5;">' + escT(p.bio) + '</div>' : '') +
-        (kanBetalen ? '<button id="etaBetaal" class="mo-pay" style="width:100%;justify-content:center;margin-top:0.8rem;padding:0.7rem;">' + FID_MINI + T('dp.betaaldirect','Betaal direct met Face ID') + '</button>' : '') +
+      '<div class="salon-etalage-inhoud" >' +
+        '<div class="salon-etalage-kop" ><b class="salon-etalage-naam" >' + escT(p.name) + '</b>' +
+          '<button id="etaVolg" class="salon-etalage-volg' + (p.volgIk ? ' volgt' : '') + '">' + (p.volgIk ? '✓ ' + T('sal.volgt','Volgt') : '+ ' + T('sal.volg','Volg')) + '</button></div>' +
+        '<div class="salon-etalage-meta" >' + (p.icon ? p.icon + ' ' : '') + escT(p.typeLabel || '') + ' · ' + escT(p.city || '') + ' · ' + p.volgers + ' ' + T('sal.volgers','volgers') + '</div>' +
+        (p.bio ? '<div class="salon-etalage-bio" >' + escT(p.bio) + '</div>' : '') +
+        (kanBetalen ? '<button id="etaBetaal" class="mo-pay salon-etalage-betaal" >' + FID_MINI + T('dp.betaaldirect','Betaal direct met Face ID') + '</button>' : '') +
         (vz.length ? '<div class="h-mt80">' + vz.map(v =>
-          '<div style="border:1px solid var(--rtg-leesgoud,var(--goud));border-radius:0;padding:0.7rem 0.9rem;margin-top:0.5rem;background:var(--card);">' +
-          '<div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--goud));">' + FID_MINI + T('dp.verzoek','Betaalverzoek') + '</div>' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-top:0.3rem;"><span style="font-size:0.85rem;">' + escT(v.omschrijving || '') + '</span><b style="color:var(--rtg-leesgoud,var(--goud));white-space:nowrap;">' + eur2((v.bedrag||0)/100) + '</b></div>' +
-          '<button class="mo-pay js-vzpay" data-vz="' + v.ref + '" style="width:100%;justify-content:center;margin-top:0.5rem;padding:0.6rem;">' + FID_MINI + T('dp.betaalverzoek','Betaal dit verzoek') + '</button></div>').join('') + '</div>' : '') +
+          '<div class="salon-etalage-verzoek" >' +
+          '<div class="salon-etalage-soort" >' + FID_MINI + T('dp.verzoek','Betaalverzoek') + '</div>' +
+          '<div class="salon-etalage-bedragrij" ><span class="salon-etalage-omschrijving" >' + escT(v.omschrijving || '') + '</span><b class="salon-etalage-bedrag" >' + eur2((v.bedrag||0)/100) + '</b></div>' +
+          '<button class="mo-pay js-vzpay salon-etalage-betaalverzoek" data-vz="' + v.ref + '" >' + FID_MINI + T('dp.betaalverzoek','Betaal dit verzoek') + '</button></div>').join('') + '</div>' : '') +
         (items.length
           ? items.map(it =>
-            '<div style="border:1px solid var(--line);border-radius:0;padding:0.7rem 0.9rem;margin-top:0.7rem;">' +
-            '<div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--goud));">' + (it.soort === 'folder' ? '' + T('sal.folder','Folder') : it.soort === 'deal' ? '' + T('sal.deal','Aanbieding') : it.soort === 'poll' ? 'Poll' : '' + T('sal.bericht','Bericht')) + '</div>' +
-            (it.folder ? '<div style="font-weight:600;margin-top:0.2rem;">' + escT(it.folder.titel) + '</div>' +
-              ((it.folder.fotos && it.folder.fotos.length) ? '<div style="display:flex;gap:0.4rem;overflow-x:auto;margin-top:0.45rem;">' + it.folder.fotos.map(f => '<img src="' + f + '" alt="" style="height:90px;border-radius:0;flex-shrink:0;">').join('') + '</div>' : '') +
-              ((it.folder.items && it.folder.items.length) ? '<div style="margin-top:0.45rem;display:grid;gap:0.2rem;">' + it.folder.items.map(x => '<div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>' + escT(x.naam) + '</span>' + (x.prijs != null ? '<span class="h-leesgoud">' + eur2(x.prijs) + '</span>' : '') + '</div>').join('') + '</div>' : '')
-              : (it.deal ? '<div style="font-weight:600;margin-top:0.2rem;">' + escT(it.deal.titel) + (it.deal.mijnClaim ? ' · <span class="h-leesgoud">' + escT(it.deal.mijnClaim.status || '') + '</span>' : '') + '</div>'
-              : '<div style="font-size:0.85rem;margin-top:0.2rem;">' + escT(it.text || '') + '</div>')) +
+            '<div class="salon-etalage-item" >' +
+            '<div class="salon-etalage-soort" >' + (it.soort === 'folder' ? '' + T('sal.folder','Folder') : it.soort === 'deal' ? '' + T('sal.deal','Aanbieding') : it.soort === 'poll' ? 'Poll' : '' + T('sal.bericht','Bericht')) + '</div>' +
+            (it.folder ? '<div class="salon-etalage-titel" >' + escT(it.folder.titel) + '</div>' +
+              ((it.folder.fotos && it.folder.fotos.length) ? '<div class="salon-etalage-fotos" >' + it.folder.fotos.map(f => '<img src="' + f + '" alt="" class="salon-etalage-folderfoto" >').join('') + '</div>' : '') +
+              ((it.folder.items && it.folder.items.length) ? '<div class="salon-etalage-producten" >' + it.folder.items.map(x => '<div class="salon-etalage-product" ><span>' + escT(x.naam) + '</span>' + (x.prijs != null ? '<span class="h-leesgoud">' + eur2(x.prijs) + '</span>' : '') + '</div>').join('') + '</div>' : '')
+              : (it.deal ? '<div class="salon-etalage-titel" >' + escT(it.deal.titel) + (it.deal.mijnClaim ? ' · <span class="h-leesgoud">' + escT(it.deal.mijnClaim.status || '') + '</span>' : '') + '</div>'
+              : '<div class="salon-etalage-bericht" >' + escT(it.text || '') + '</div>')) +
             '</div>').join('')
-          : '<div style="text-align:center;color:var(--soft);font-size:0.82rem;padding:1.4rem 0;">' + T('sal.etaleeg','Nog geen folders of aanbiedingen.') + '</div>') +
+          : '<div class="salon-etalage-leeg" >' + T('sal.etaleeg','Nog geen folders of aanbiedingen.') + '</div>') +
       '</div></div>';
     ov.innerHTML = html;
     ov.querySelector('#etaClose').addEventListener('click', () => ov.remove());

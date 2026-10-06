@@ -22,7 +22,9 @@ test('Gevoelsdagboek: aantikken is vluchtig, bewaren is een keuze, herzien kan',
     const g = await post('/api/foundation/gezin/maak', { gezinsnaam: 'Fam Zon', naam: 'Mam', pin: '1234' });
     const k = await post('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token,
       naam: 'Juno', rol: 'kind', groep: 'kind', geboortedatum: '2015-02-18' });
-    const kindToken = (await post('/api/foundation/gezin/profiel/kies', { code: g.code, profielId: k.profiel.id })).token;
+    const kindToken = (await post('/api/foundation/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: k.profiel.id })).token;
+    // art. 9: voor een kind onder de 16 geeft de ouder apart toestemming (DPIA-GEZIN.md)
+    await post('/api/foundation/gezin/toestemming/gezondheid', { code: g.code, token: g.token, aan: true });
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();

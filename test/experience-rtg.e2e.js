@@ -26,7 +26,26 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    page.on('response',r=>{if(r.status()>=400&&!r.url().includes('/api/'))failed.push(r.url());});
    page.on('request',r=>{if(!['GET','HEAD'].includes(r.method())&&!['/api/talen','/api/vertaal/ui'].includes(new URL(r.url()).pathname))mutations.push(r.url());});
    await page.goto(srv.base+'/',{waitUntil:'domcontentloaded'});await ready(page);
+   await page.waitForFunction(()=>document.documentElement.dataset.websiteTruth==='actueel');
    assert.equal(await page.locator('.rtg-adaptive-bar').count(),1);
+   assert.match(await page.locator('#platform-story-title').innerText(),/Technologie die mensen dichter bij elkaar brengt/i);
+   assert.equal(await page.locator('.pp-story[data-public-story]').count(),4);
+   assert.match(await page.locator('.pp-technology-signal').innerText(),/SOCIAL TECHNOLOGY[\s\S]*LivingOS/i);
+   assert.equal(new URL(await page.locator('.pp-secure-link').getAttribute('href')).pathname,'/apps/app.html');
+   assert.match(await page.locator('[data-public-world-facts="work"]').innerText(),/17 apps.*MAPPEN/i);
+   await page.locator('#platform-search').fill('RTDocs');
+   assert.equal(await page.locator('[data-public-widget="work"]:visible').count(),1);
+   assert.equal(await page.locator('[data-public-widget="travel"]:visible').count(),0);
+   await page.locator('[data-public-widget="work"] .pp-widget-head').click();
+   await page.locator('[data-room="work"] .app-truth-detail').click();
+   assert.equal(await page.locator('[data-room="work"] .app-truth-groups a').count(),17);
+   const eersteApp=page.locator('[data-room="work"] .app-truth-app-detail').first();
+   await eersteApp.locator('summary').click();
+   assert.notEqual((await eersteApp.locator('.app-truth-app-summary').innerText()).trim(),'');
+   assert.ok(await eersteApp.locator('.app-truth-actions li').count()>0);
+   assert.notEqual((await eersteApp.locator('.app-truth-note').innerText()).trim(),'');
+   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
+   await page.locator('#platform-search').fill('');
    assert.equal(await page.locator('.arrival-interface img').count(),3);
    assert.equal(await page.locator('[data-stage-screen] img').count(),3);
    assert.equal(await page.evaluate(()=>{const r=document.querySelector('.rtg-adaptive-bar').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight}),true);
@@ -39,9 +58,11 @@ test('De publieke B2B2C-ervaring wisselt van kant, zoekt in de echte app en past
    await page.locator('.role-switch [data-role-select="gebruiker"]').click();
    assert.equal(await page.evaluate(()=>sessionStorage.getItem('rtg-www-role')),'gebruiker');
    assert.match(await page.locator('#roleCapabilities').innerText(),/Foundation/);
+   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
    await page.locator('.pp-section-index button', {hasText:'De RTG Graph'}).click();
    await page.locator('[data-graph-topic="werknemer"]').click();
    assert.match(await page.locator('#graphCaption').innerText(),/uren/i);
+   await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="home"]').click();
    await page.locator('.pp-section-index button', {hasText:'Verken het RTG-platform'}).click();
    await page.keyboard.press('Control+k');
    await page.locator('#commandSearch').fill('personeel');
@@ -81,7 +102,7 @@ test('static project path and JavaScript-disabled visitors retain content and re
       if (javaScriptEnabled) {
         await ready(page);
         assert.equal(await page.locator('#roleCta').getAttribute('href'), 'https://app.rahultravelgroup.com/apps/werk.html');
-        assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#1b1b18');
+        assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.rtg-adaptive-bar')).getPropertyValue('--edge-bar-bg').trim()), '#1b1713');
       } else {
         assert.equal(await page.locator('[data-room]:visible').count(), 4);
         assert.equal(await page.locator('[data-faq]:visible').count(), 23);

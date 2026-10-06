@@ -12,8 +12,8 @@
   },
   "measured": {
     "capabilities": 228,
-    "routes": 5422,
-    "mutationContracts": 5298,
+    "routes": 5440,
+    "mutationContracts": 5313,
     "screens": 326
   },
   "classifications": [
@@ -3018,6 +3018,7 @@
       "server/routes/techniek/aikosten.js",
       "server/routes/techniek/beheer.js",
       "server/routes/techniek/betalingen.js",
+      "server/routes/techniek/bewaren.js",
       "server/routes/techniek/boardroom/index.js",
       "server/routes/techniek/boardroom/schakelaar.js",
       "server/routes/techniek/bord.js",
@@ -3201,6 +3202,7 @@
       "server/bewaartermijnen.js",
       "server/bewaarveger.js",
       "server/config/productie-geld.js",
+      "server/config/productie-identiteit.js",
       "server/config/release-trust.js",
       "server/db/ledengids.js",
       "server/effectbon.js",
@@ -5193,7 +5195,6 @@
       "server/local-ai.js",
       "server/mail.js",
       "server/middleware/blokafsplitsing.js",
-      "server/middleware/foundation-nog-gesloten.js",
       "server/middleware/foundation-productiepoort.js",
       "server/middleware/isolatiepoort.js",
       "server/middleware/remmen.js",
@@ -5459,6 +5460,8 @@
       "server/config/productie.js",
       "server/db/bijeen.js",
       "server/db/collectie-postgres.js",
+      "server/db/duurzaam.js",
+      "server/db/index.js",
       "server/db/ledengids-zoek.js",
       "server/db/ledengids.js",
       "server/db/opslagfout.js",
@@ -6728,6 +6731,7 @@
       "server/routes/member/bureau-lus.js",
       "server/routes/member/bureau.js",
       "server/routes/member/comm.js",
+      "server/routes/member/gezin.js",
       "server/routes/member/handel/uitjes.js",
       "server/routes/member/handel/vastgoed.js",
       "server/routes/member/handel/winkel.js",
@@ -6899,6 +6903,7 @@
       "server/routes/techniek/diagnose.js",
       "server/routes/techniek/isolatie.js",
       "server/routes/techniek/papieren.js",
+      "server/routes/techniek/sso-geheim.js",
       "server/routes/techniek/wacht.js",
       "server/routes/tenant.js",
       "server/routes/tenant/bijstand.js",
@@ -6970,6 +6975,7 @@
       "server/smtp-in-server.js",
       "server/smtp-in.js",
       "server/sso/binnenkomst.js",
+      "server/sso/clientgeheim.js",
       "server/sso/haal.js",
       "server/sso/jwks.js",
       "server/sso/saml/index.js",
@@ -9042,9 +9048,9 @@
         "/api/rtf"
       ],
       "behaviourEvidence": {
-        "routeCount": 248,
-        "mutationRoutes": 247,
-        "declaredMutationSemantics": 91,
+        "routeCount": 255,
+        "mutationRoutes": 254,
+        "declaredMutationSemantics": 98,
         "sourceFileCount": 23,
         "kernelDependencyCount": 56,
         "screenCount": 28,
@@ -14903,7 +14909,7 @@
         "routeCount": 1022,
         "mutationRoutes": 1021,
         "declaredMutationSemantics": 314,
-        "sourceFileCount": 196,
+        "sourceFileCount": 197,
         "kernelDependencyCount": 2488,
         "screenCount": 38,
         "sourceFiles": [
@@ -14924,7 +14930,7 @@
           "server/routes/kantoorpakket.js",
           "server/routes/kosten.js"
         ],
-        "sourceFilesOmitted": 180,
+        "sourceFilesOmitted": 181,
         "kernelDependencies": [
           "server/bedrijf/aansluiting.js",
           "server/bedrijf/beeld-consolidatie.js",
@@ -15892,10 +15898,10 @@
         "/api/office"
       ],
       "behaviourEvidence": {
-        "routeCount": 669,
+        "routeCount": 671,
         "mutationRoutes": 651,
         "declaredMutationSemantics": 376,
-        "sourceFileCount": 106,
+        "sourceFileCount": 107,
         "kernelDependencyCount": 114,
         "screenCount": 21,
         "sourceFiles": [
@@ -15916,7 +15922,7 @@
           "server/routes/kantoren/bank-incasso.js",
           "server/routes/kantoren/bank-passkey.js"
         ],
-        "sourceFilesOmitted": 90,
+        "sourceFilesOmitted": 91,
         "kernelDependencies": [
           "server/kern/agentteken.js",
           "server/kern/appgids-data/deel1.js",
@@ -16152,10 +16158,10 @@
         "/api/foundation"
       ],
       "behaviourEvidence": {
-        "routeCount": 359,
-        "mutationRoutes": 332,
-        "declaredMutationSemantics": 128,
-        "sourceFileCount": 82,
+        "routeCount": 367,
+        "mutationRoutes": 339,
+        "declaredMutationSemantics": 135,
+        "sourceFileCount": 84,
         "kernelDependencyCount": 84,
         "screenCount": 26,
         "sourceFiles": [
@@ -16170,13 +16176,13 @@
           "server/foundation/gasten/ochtend.js",
           "server/foundation/gasten/verjaardagen.js",
           "server/foundation/gezin.js",
+          "server/foundation/gezinsdeur.js",
           "server/foundation/gezinssessie.js",
           "server/foundation/gezinstoegang.js",
           "server/foundation/gezinsuitnodiging.js",
-          "server/foundation/kosten.js",
-          "server/foundation/leden-mail.js"
+          "server/foundation/gezondheidstoestemming.js"
         ],
-        "sourceFilesOmitted": 66,
+        "sourceFilesOmitted": 68,
         "kernelDependencies": [
           "server/kern/agenda-ics.js",
           "server/kern/agenda-idempotentie.js",

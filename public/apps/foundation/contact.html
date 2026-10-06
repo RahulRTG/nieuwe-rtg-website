@@ -74,15 +74,16 @@
      dat rondgaat is precies wat je hier niet wilt. -->
 <script src="/shared/uitvoer.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisProfiel()) return;
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug:'index.html' });
 function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]); }
 let leden = {}, actief = null;
 
 async function laadLeden(){
-  const d = await fetch('/api/foundation/gezin/'+s.code+'/mij?token='+encodeURIComponent(s.token)).then(r=>r.json());
+  const d = await fetch('/api/foundation/gezin/'+s.code+'/mij',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
   (d.profielen||[]).forEach(p=>{ if(p.id!==s.profiel.id) leden[p.id]=p; });
   GezinRT.init({ base:'/api/foundation', code:s.code, token:s.token, mijnId:s.profiel.id, mijnNaam:s.profiel.naam,
     leden:Object.values(leden), onChat: onChat });
@@ -90,7 +91,7 @@ async function laadLeden(){
 function onChat(m){
   if (actief && (m.van===actief || m.naar===actief) && (m.van===s.profiel.id || m.van===actief)){
     voegBericht(m); // in het open gesprek
-    if (m.van===actief) fetch('/api/foundation/gezin/'+s.code+'/chat/'+actief+'?token='+encodeURIComponent(s.token)); // gelezen
+    if (m.van===actief) fetch('/api/foundation/gezin/'+s.code+'/chat/'+actief,{headers:{Authorization:'Bearer '+s.token}}); // gelezen
   }
   laadLijst();
 }
@@ -139,6 +140,7 @@ $('#tVideo').onclick=()=> actief && GezinRT.bel(actief, true);
 
 (async ()=>{ await laadLeden(); laadLijst(); })();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}());
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>

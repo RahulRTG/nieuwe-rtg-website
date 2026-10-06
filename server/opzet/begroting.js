@@ -16,15 +16,9 @@
    staat in README.md ("De begroting"), en die is de enige -- hij stond hier ook
    als tabel en dat zijn twee plekken voor een waarheid (LAT.md regel 4).
 
-   Wat je hier moet weten: het zijn er ongeveer 116, en de EERSTE LEZING ZEI 254.
-   Die was te royaal, want 138 van de 142 `= []` staan achter een
-   `if (!Array.isArray(db.data.X))` -- dat is een collectie AANMAKEN en geen
-   leeghalen, en de val slaat er terecht niet op aan (de oude waarde is dan geen
-   array).
-
-   Die 116 zijn te onderscheppen VOORDAT ze landen, met een `set`-val op db.data:
-   daar is de oude lengte bekend, de nieuwe ook, en is er nog niets gebeurd. Geen
-   simulatie maar de echte handeling, tegengehouden op de drempel.
+   De set-val kent oude en nieuwe lengte vóór de toekenning. Een ontbrekende
+   collectie aanmaken is geen massaverwijdering; alleen vervanging van een
+   bestaande array valt hieronder.
 
    WAT DAT NIET IS: dekking. Deze laag dekt de VORM van een massaverwijdering,
    niet elke plek waar dit huis rijen kwijtraakt.
@@ -33,10 +27,6 @@
    wijziging BINNEN een rij, en alles wat via push groeit. Groei is bewust geen
    weigering -- te hard groeien is opslag en geen verlies, en er een grens op
    zetten breekt legitiem werk zonder dat er iets onherstelbaars tegenover staat.
-
-   WAT HET KOST. Gemeten op 450 sleutels, twee miljoen leesacties: 251 ms zonder
-   Proxy, 294 ms met -- 0,02 microseconde per lees, 59 nanoseconde per schrijf.
-   Op een p50 van 13 ms is dat niet te zien.
 
    EN DE BELANGRIJKSTE KEUZE: HIJ STAAT STANDAARD OP MELDEN. Meten, ratelen, dan
    handhaven; met RTG_BEGROTING=weigeren gaat de tand erin. Wat er gemeten is
@@ -84,6 +74,7 @@ function levensteken(meld, modus, grens) {
 /* Wat er is tegengehouden of zou zijn, sinds het opstarten. Dit getal bouwt de
    catalogus: zolang er legitieme handelingen in staan, kan de tand er niet in. */
 const teller = { gezien: 0, overschreden: 0, geweigerd: 0, laatste: [] };
+const weigert = (collectie, krimp, grens, modus) => krimp > grens && modus === 'weigeren' && grenzen.handhaaft(collectie);
 
 function onthoud(rij) {
   teller.laatste.unshift(rij);
@@ -125,7 +116,7 @@ function beoordeel(collectie, oudeLengte, nieuweLengte, opties) {
   /* WEIGEREN IS NIET OVERAL VEILIG: de zes collecties van het vergeetpad melden
      ook in de weigerstand, want daar haalt een handeling alles van een lid weg
      en is de omvang per ontwerp onbegrensd. Zie BEGROTING.json. */
-  if (modus === 'weigeren' && grenzen.handhaaft(collectie)) {
+  if (weigert(collectie, krimp, grens, modus)) {
     teller.geweigerd++; return { oordeel: 'weiger', krimp, grens, rij };
   }
   return { oordeel: 'meld', krimp, grens, rij };
@@ -134,6 +125,20 @@ function beoordeel(collectie, oudeLengte, nieuweLengte, opties) {
 /* Dezelfde Proxy voor dezelfde data, zodat `db.data === db.data` blijft kloppen
    en niemand twee wikkels om een ding krijgt. */
 const wikkels = new WeakMap();
+const instellingen = new WeakMap();
+
+// Alleen eigen wikkels: verse sleutels, zonder een schrijfbaar doel uit te geven.
+function collectieSleutels(data) { return Object.keys(instellingen.get(data)?.doel || data); }
+
+// Een opslagcommit toetst zijn latere publicatie vooraf. Geen uitzondering op
+// het budget: dezelfde predicate, vóór SQLite de transactie onomkeerbaar maakt.
+function toetsOpslag(data, sleutel, waarde) {
+  const i = instellingen.get(data), oud = data?.[sleutel];
+  if (!i || !Array.isArray(oud) || !Array.isArray(waarde) || !i.nu.huidige()) return;
+  const krimp = oud.length - waarde.length;
+  if (krimp > 0 && weigert(String(sleutel), krimp, i.grens, i.modus))
+    throw new BegrotingOverschreden(String(sleutel), krimp, i.grens);
+}
 
 function bewaak(data, deps) {
   if (!data || typeof data !== 'object') return data;
@@ -182,6 +187,7 @@ function bewaak(data, deps) {
   });
   wikkels.set(data, wikkel);
   wikkels.set(wikkel, wikkel);   // bewaak(bewaakt) geeft dezelfde wikkel terug
+  instellingen.set(wikkel, { nu, modus, grens, doel: data });
   return wikkel;
 }
 
@@ -191,4 +197,4 @@ function stand() {
     laatste: teller.laatste.slice(0, 10) };
 }
 
-module.exports = { bewaak, beoordeel, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };
+module.exports = { bewaak, beoordeel, toetsOpslag, collectieSleutels, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };

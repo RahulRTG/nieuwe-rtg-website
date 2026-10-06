@@ -89,8 +89,9 @@
 <script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
 <script>
+(function foundationPage() {
 const $ = s => document.querySelector(s);
-if (!window.Sessie || !Sessie.eisProfiel()) throw new Error('geen sessie');
+if (!window.Sessie || !Sessie.eisProfiel()) return;
 const api = Sessie.api;
 const s = Sessie.huidig();
 Sessie.balk($('#balk'), { terug:'index.html' });
@@ -110,7 +111,7 @@ if (window.RTGUitvoer) RTGUitvoer.bron(function () {
 
 async function laad(){
   try{
-    const d = await fetch('/api/foundation/gezin/'+s.code+'/ochtend?token='+encodeURIComponent(s.token)).then(r=>r.json());
+    const d = await fetch('/api/foundation/gezin/'+s.code+'/ochtend',{headers:{Authorization:'Bearer '+s.token}}).then(r=>r.json());
     if (d.error) throw new Error(d.error);
     stand = d;
     // de zachte weektelling: hoeveel ochtenden waren er de laatste zeven dagen rond
@@ -191,6 +192,7 @@ $('#sWat').addEventListener('keydown', e=>{ if (e.key==='Enter') $('#sDoe').clic
 
 laad();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}());
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>

@@ -208,7 +208,13 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      reden van /api/techniek in kern/bestuursroutes.js, en test/platformregister.test.js
      en test/schakelkast-dekking.test.js waren groen voordat dit getal werd verzet.
      `onverklaard <= 10` beweegt niet mee. */
-  assert.ok(zonder.length <= 150,
+  /* 150 -> 151: DE WISRONDE VAN DE GEZINNEN (DPIA-GEZIN.md, 5 oktober 2026).
+     POST /api/techniek/bewaren/gezinnen is de knop waarmee de eigenaar het wissen
+     van aangekondigde gezinnen vrijgeeft, naast /api/techniek/bewaren/veeg. Dat is
+     bediening van het platform: een bewaartermijn die je niet kunt uitvoeren omdat
+     een schakelaar uit staat, is een belofte die breekt. Hij valt onder de reden van
+     /api/techniek in kern/bestuursroutes.js. `onverklaard <= 10` beweegt niet mee. */
+  assert.ok(zonder.length <= 151,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');

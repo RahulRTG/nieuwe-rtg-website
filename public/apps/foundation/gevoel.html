@@ -62,6 +62,11 @@
     <div class="h-mt70" id="bewaarRij" hidden>
       <button class="knop klein" id="bewaarKnop" type="button">Bewaar in mijn dagboekje</button>
       <span style="color:var(--zacht);font-size:.8rem;margin-left:0.5rem;">alleen jij kunt erin kijken</span>
+      <!-- art. 9: een gevoel bewaren vraagt eerst een aparte toestemming (DPIA-GEZIN.md) -->
+      <p id="toestemRij" class="h-mt70" hidden>
+        <span id="toestemTekst"></span>
+        <button class="knop klein" id="toestemKnop" type="button" hidden>Ja, ik wil mijn gevoelens bewaren</button>
+      </p>
     </div>
   </div>
 
@@ -70,6 +75,8 @@
     <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Mijn dagboekje</h2>
     <p style="color:var(--zacht);font-size:.85rem;line-height:1.5;margin-bottom:0.5rem;">Alleen jij ziet dit. Niet papa, niet mama, niemand.</p>
     <div id="dagboekStrook" style="display:flex;gap:.35rem;flex-wrap:wrap;"></div>
+    <!-- vanaf 16 is de toestemming van jezelf, en dus ook het intrekken -->
+    <button class="knop klein grijs h-mt70" id="toestemIntrek" type="button" hidden>Toestemming intrekken en mijn dagboekje wissen</button>
     <div id="hulpRegel" hidden style="margin-top:.8rem;background:var(--paneel2);border-left:3px solid var(--goud);border-radius:0;padding:.7rem .9rem;font-size:.9rem;line-height:1.5;">
       Je had een paar zware dagen achter elkaar. Dat hoef je niet alleen te dragen:
       <a href="steun.html" class="i-1ta0zs">praat met iemand</a> of kijk in de
@@ -196,19 +203,41 @@ const ZWAAR = ['verdrietig', 'bang', 'boos'];
 const api = (actie, body) => fetch('/api/rtf/welzijn/' + actie, {
   method: 'POST', headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(Object.assign({ code: s && s.code, token: s && s.token }, body || {}))
-}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+}).then(async r => { const d = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(d.error || 'Er ging iets mis.'); e.hoe = d.hoe; e.zelf = d.zelf; throw e; } return d; });
 
-$('#bewaarKnop').addEventListener('click', async () => {
+/* Toestemming apart en bij eerste gebruik: wie 16 of ouder is geeft hem hier
+   zelf, met een eigen knop; voor een jonger kind zegt de server dat een ouder
+   hem geeft. Daarna wordt het gekozen gevoel alsnog bewaard. */
+async function bewaar() {
   if (!gekozen) return;
   try {
     await api('stemming', { gevoel: gekozen.id });
+    $('#toestemRij').hidden = true;
     laadDagboek(); // een bron van waarheid: het dagboek zet de knoptekst
-  } catch (e) { $('#bewaarKnop').textContent = e.message; }
+  } catch (e) {
+    if (e.hoe !== 'toestemming') { $('#bewaarKnop').textContent = e.message; return; }
+    $('#toestemRij').hidden = false;
+    $('#toestemTekst').textContent = e.zelf
+      ? 'Een gevoel bewaren is een gegeven over hoe het met je gaat. Dat doen we alleen als je dat apart goedvindt. Je kunt het later intrekken; dan wordt je dagboekje gewist. '
+      : e.message;
+    $('#toestemKnop').hidden = !e.zelf;
+  }
+}
+$('#bewaarKnop').addEventListener('click', bewaar);
+$('#toestemIntrek').addEventListener('click', async () => {
+  if (!confirm('Je dagboekje wordt gewist en er wordt niets meer bewaard. Doorgaan?')) return;
+  try { await api('toestemming', { aan: false }); location.reload(); } catch (e) { alert(e.message); }
+});
+$('#toestemKnop').addEventListener('click', async () => {
+  try { await api('toestemming', { aan: true }); bewaar(); }
+  catch (e) { $('#toestemTekst').textContent = e.message; }
 });
 
 async function laadDagboek() {
   let d;
   try { d = await api('dagboek'); } catch (e) { return; } // een oppas heeft hier geen dagboekje
+  $('#toestemIntrek').hidden = !(d.toestemming && d.zelfToestemming);
   $('#dagboekBlok').hidden = !d.stemmingen.length;
   if (!d.stemmingen.length) return;
   const naam = {};

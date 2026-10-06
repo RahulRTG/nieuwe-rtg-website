@@ -146,18 +146,35 @@ test('2. "al aangemeld" pas na een geldige kassacode EN een goed wachtwoord', as
 test('3. een gok op het wachtwoord telt in de accountemmer van de gewone inlog', async () => {
   const VERA = 'vera@orakel.test', WOUT = 'wout@orakel.test';
   const inlog = (login, password) => api('/api/auth/login', { login, password });
-  const voor = await inlog(VERA, 'fout');
-  assert.equal(voor.status, 401);
-  assert.ok(voor.ms < VERTRAAGD_MS, 'nog niets aan de hand: een fout wachtwoord is snel (' + voor.ms + 'ms)');
   const code = await kassacode(kikunoi), vanXander = await kassacode(kikunoi);
   assert.equal((await join(zaakNaam, vanXander, 'xander@orakel.test', WW)).status, 200, 'Xander wisselt zijn code in');
 
   /* Vijfentwintig gokken met een geldige code, elk van een eigen adres: de rem
-     per adres ziet er niets van, de accountemmer wel. */
+     per adres ziet er niets van, de accountemmer wel.
+
+     ALLEEN LANGS DE AANMELDING, EN VOOR DE EERSTE /api/auth/login. Hier stond
+     eerst een gewone inlog voor en een na de gokken, en die zetten met hun
+     EIGEN grens de vertraging aan: met een grens van 1000 in de aanmelding
+     bleef deze toets groen terwijl een aanval die alleen hier gokt nooit
+     vertraagd werd. Daarom moet de 25e gok zelf wachten en de 24e niet. Zo
+     ligt de grens van de aanmelding op die van /api/auth/login (25), en niet
+     ergens anders.
+
+     EN IN DRIE SPELLINGEN. De inlog legt het adres in kleine letters en zonder
+     spaties in de emmer. Doet de aanmelding dat anders, dan krijgt elke
+     spelling een eigen emmer en telt een aanval in hoofdletters nergens mee.
+     De 25e gok heeft daarom een afwijkende spelling, en de inlog hieronder
+     meet op de kleine letters. */
+  const SPELLING = ['  Vera@Orakel.Test ', VERA, VERA.toUpperCase()];
+  const duur = [];
   for (let i = 0; i < 25; i++) {
-    const r = await join(zaakNaam, code, VERA, 'gok' + i);
+    const r = await join(zaakNaam, code, SPELLING[i % 3], 'gok' + i);
     assert.equal(r.status, 401, 'gok ' + i + ': ' + kort(r));
+    duur.push(r.ms);
   }
+  assert.ok(duur[23] < VERTRAAGD_MS, 'de 24e gok wacht nog niet: de grens is niet lager dan bij de inlog (' + duur[23] + 'ms)');
+  assert.ok(duur[24] >= VERTRAAGD_MS, 'de 25e gok bij de aanmelding laat zelf de vertraging ingaan, '
+    + 'in alle spellingen samen (' + duur[24] + 'ms)');
   const na = await inlog(VERA, 'fout');
   assert.equal(na.status, 401);
   assert.ok(na.ms >= VERTRAAGD_MS, 'de gokken bij de aanmelding telden mee: /api/auth/login wacht nu (' + na.ms + 'ms)');

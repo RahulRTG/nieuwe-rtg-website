@@ -74,12 +74,12 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->4008<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->4074<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
 |---|---|---|---|
-| bewijsDraagt (proof-carrying) | 1 | <!--getal:machine.bewijsDraagt-->17<!--/getal--> | `kern/commercie/bewijstoken.js` |
+| bewijsDraagt (proof-carrying) | 1 | <!--getal:machine.bewijsDraagt-->20<!--/getal--> | `kern/commercie/bewijstoken.js` |
 | beleid (veiligheidskern) | 0 | 15 | `kern/commercie/veiligheidskern.js` |
 | gevolg (wat raakt dit aan) | 0 | 0 | `kern/stuur/gevolg.js` |
 | bewijsstand (bewezen) | 0 | 0 | `VERTROUWEN.json` |
@@ -93,10 +93,10 @@ aantal routes dat hem raakt (`handler` / `bestand`):
 | assurance (passkey, stap-op) | 2 | 49 | `kern/identiteit/vertrouwen.js` |
 | frictie | 2 | 98 | `kern/frictie/motor.js` |
 | simulatie | 10 | 103 | `kern/command/simulatie.js` |
-| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->203<!--/getal--> | `kern/envelop.js` |
+| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->213<!--/getal--> | `kern/envelop.js` |
 | idempotentie | 13 | 114 | `lib/idem-poort.js` |
 | aiVindbaar | 173 | 173 | `kern/stuur/beleid.js` |
-| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->306<!--/getal--> | `kern/kantoor/kluispoort.js` |
+| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->313<!--/getal--> | `kern/kantoor/kluispoort.js` |
 | herhaling (beschermd) | 1675 | 1675 | `IDEMPROEF.json` |
 
 Vier assen staan als **ongemeten met een reden** en nooit als 0: doelvindbaarheid
@@ -115,8 +115,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2780<!--/getal--> van de
-   <!--getal:machine.muterend-->4008<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2690<!--/getal--> van de
+   <!--getal:machine.muterend-->4074<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 
    **Let op de noemer: die is op 14 september 2026 verschoven, en een ronde van

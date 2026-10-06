@@ -637,3 +637,85 @@ jobs:
           name: routejournaal
           path: routejournaal.log
           retention-days: 30
+
+  # ---- DE REGISTERS ALS VOORSTEL ----
+  #
+  # De meetronde hierboven legt niets vast, en dat blijft zo. Maar een artefact
+  # dat na dertig dagen verdwijnt zonder dat iemand het ophaalt, is een meting
+  # die voor de ratels nooit heeft gedraaid -- en dat gebeurde: IDEMPROEF.json
+  # liep op 6 oktober 2026 negen dagen achter op de AI-lijst, en
+  # gevolgdekking:controle kon daardoor de keten niet in (ZERO.md par. 6).
+  #
+  # Deze job zet de registers op een eigen tak en opent een CONCEPT-PR. Hij
+  # MERGET NIETS: een ronde die zichzelf vastlegt, legt ook een verslechtering
+  # vast, en mergen blijft mensenwerk (ONDERHOUD.md). De rechten om te pushen en
+  # een PR te openen staan alleen op DEZE job. `actions: write` is er voor een
+  # ding: de CI van die PR starten, want een PR van het GITHUB_TOKEN start er zelf
+  # geen -- `workflow_dispatch` is de ene uitzondering die GitHub daarop maakt.
+  #
+  # Het zijn gewone git- en gh-stappen en geen eigen script, met opzet: een eigen
+  # script in een werkstroom is voor scripts/lib/werkstroom.js een POORT, en dit
+  # bewijst niets. Het als uitzondering in GEEN_POORT zetten zou een lijst laten
+  # groeien die met zoveel woorden leeg hoort te blijven.
+  registers-pr:
+    name: De registers van de ronde als voorstel (concept-PR)
+    needs: dekking
+    if: always() && needs.dekking.result != 'skipped' && needs.dekking.result != 'cancelled'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: registers
+          path: ronde-registers
+      # Alleen registers in de WORTEL en alleen .json: het artefact komt uit een
+      # andere job, en een naam met een map erin of een ander soort bestand hoort
+      # niet ongemerkt in een commit. Iets vreemds laat het hele voorstel zakken.
+      # Geen verschil is een uitslag en geen fout: dan bevestigt de ronde wat er
+      # al stond. Het TOKEN komt nooit in .git/config -- de checkout liet er bewust
+      # geen achter; daar staat alleen een helper die $GH_TOKEN pas bij de push
+      # uit de omgeving van deze ene stap leest.
+      - name: Het voorstel openen (een mens merget)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          tak="ronde/registers-$GITHUB_RUN_ID"
+          shopt -s nullglob
+          registers=()
+          for pad in ronde-registers/*; do
+            naam="$(basename "$pad")"
+            [[ "$naam" =~ ^[A-Z][A-Z0-9-]*\.json$ ]] || { echo "dit hoort niet in een registervoorstel: $naam"; exit 1; }
+            registers=("${registers[@]}" "$naam")
+          done
+          [ ${#registers[@]} -gt 0 ] || { echo "het artefact bevat geen enkel register"; exit 1; }
+          git checkout -b "$tak"
+          for naam in "${registers[@]}"; do cp "ronde-registers/$naam" "$naam"; done
+          git add -- "${registers[@]}"
+          if git diff --cached --quiet; then echo "de registers zijn gelijk aan $GITHUB_SHA; geen voorstel nodig"; exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -q -m "Registers van de ronde $GITHUB_RUN_ID (${GITHUB_SHA:0:8})" -m "$RUN_URL"
+          git config credential.helper '!f() { echo username=x-access-token; echo "password=$GH_TOKEN"; }; f'
+          git push "https://github.com/$GITHUB_REPOSITORY.git" "HEAD:refs/heads/$tak"
+          lijst="$(printf -- '- `%s`\n' "${registers[@]}")"
+          gh pr create --draft --base main --head "$tak" \
+            --title "Registers van de ronde $GITHUB_RUN_ID (${GITHUB_SHA:0:8})" \
+            --body "$(printf '%s\n' \
+              '## Wat dit is' '' \
+              "De wekelijkse ronde heeft deze registers gemeten op \`$GITHUB_SHA\` ([run]($RUN_URL))." \
+              'Dit is een **voorstel**: niets is vastgelegd. Mergen is mensenwerk.' '' \
+              '## Registers' '' "$lijst" '' \
+              '## Voor wie dit beoordeelt' '' \
+              '- De ratels oordelen in de CI van deze PR. Een rode norm is een uitslag over de meting en geen reden om de lat te verzetten (ZERO.md).' \
+              '- Registers die hiervan zijn afgeleid zijn niet herbouwd; een keuring die daarover zakt, wijst aan welke afleiding nog moet draaien.' \
+              '- Is main sinds deze commit verder gegaan, dan beschrijven deze registers een oudere stand. Hun stempel zegt welke.')"
+          gh workflow run ci.yml --ref "$tak" -f verwachte_commit="$(git rev-parse HEAD)"

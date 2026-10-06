@@ -113,9 +113,10 @@ test('inhoudelijke feedback sluit via een nieuwe revisie en Edition 2', async ()
     assert.ok(proof.events.some(e => e.type === name), name);
 });
 
-test('schema 1 migreert structuur en feedback zonder historische editiebytes te wijzigen', () => {
+test('schema 1 migreert structuur, feedback en onderwijsreleases zonder historische editiebytes te wijzigen', () => {
   const legacy = { schemaVersion: 1, works: { w: { nodes: { b: {}, a: {} } } }, receipts: {}, journal: [], delivery: {} };
   const migrated = M.state(legacy);
-  assert.equal(migrated.schemaVersion, 2); assert.deepEqual(migrated.works.w.structure, ['a', 'b']);
-  assert.deepEqual(migrated.works.w.feedback, {}); assert.equal(legacy.schemaVersion, 1);
+  assert.equal(migrated.schemaVersion, 3); assert.deepEqual(migrated.works.w.structure, ['a', 'b']);
+  assert.deepEqual(migrated.works.w.feedback, {}); assert.deepEqual(migrated.works.w.educationReleases, {});
+  assert.equal(legacy.schemaVersion, 1);
 });

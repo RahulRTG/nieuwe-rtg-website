@@ -54,6 +54,45 @@ const WORTEL = path.join(__dirname, '..', '..');
    er geen programma is en dat een mens of een keuring hem onderhoudt -- dan hoort
    er een LEZER bij te staan, want een register dat niemand leest is geen register. */
 const EIGENAAR = {
+  /* LibraryOS en de RTG Loop Fabric (#502, 6 oktober 2026). Die tak bracht
+     acht gegenereerde registers en tien handgeschreven documenten mee zonder
+     te zeggen wie ze schrijft; bij de samenvoeging van alle open PR's stonden
+     ze daardoor alle achttien op ONBESLIST. De schrijvers zijn hier niet
+     geraden: elk script staat als `writeFileSync` op dit bestand in zijn bron,
+     en de --controle-stand ervan houdt het register tegen een verse meting. */
+  'LOOP-FABRIC-COVERAGE.json': { schrijver: 'scripts/loop-fabric-coverage.js',
+    waarom: 'npm run loopfabric:coverage schrijft het; test/loop-fabric-coverage.test.js eist dat het reproduceerbaar is.' },
+  'LOOP-FABRIC-EXECUTION-MATRIX.json': { schrijver: 'scripts/loop-fabric-execution.js',
+    waarom: 'npm run loopfabric:execution schrijft het; test/loop-fabric-execution.test.js eist dat het reproduceerbaar is.' },
+  'LOOP-FABRIC-SOURCE-FLOWS.json': { schrijver: 'scripts/loop-fabric-source-flows.js',
+    waarom: 'npm run loopfabric:flows schrijft het; --controle houdt het tegen de bron.' },
+  'LOOP-FABRIC-DECISION-DOSSIERS.json': { schrijver: 'scripts/loop-fabric-decisions.js',
+    waarom: 'npm run loopfabric:decisions schrijft het samen met RTG-LOOP-FABRIC-DECISION-DOSSIERS.md.' },
+  'RTG-LOOP-FABRIC-DECISION-DOSSIERS.md': { schrijver: 'scripts/loop-fabric-decisions.js',
+    waarom: 'de leesbare vorm van LOOP-FABRIC-DECISION-DOSSIERS.json, uit dezelfde ronde.' },
+  'LOOP-FABRIC-UNLOCK-ROADMAP.json': { schrijver: 'scripts/loop-fabric-unlock.js',
+    waarom: 'npm run loopfabric:unlock schrijft het samen met RTG-LOOP-FABRIC-BLOCKER-REDUCTION.md.' },
+  'RTG-LOOP-FABRIC-BLOCKER-REDUCTION.md': { schrijver: 'scripts/loop-fabric-unlock.js',
+    waarom: 'de leesbare vorm van LOOP-FABRIC-UNLOCK-ROADMAP.json; test/loop-fabric-unlock.test.js vergelijkt hem byte voor byte.' },
+  'RTG-LEARNING-CONSTITUTION.json': { schrijver: 'scripts/loop-fabric-constitution.js',
+    waarom: 'npm run loopfabric:constitution schrijft het; test/loop-fabric-constitution.test.js houdt het tegen de bron.' },
+  /* Twee registers die elk op hun eigen tak net onder de vloer van toets 4
+     vielen en samen eroverheen gingen: de contextmeting van Fase 2 (#482) en
+     het Trust & Evidence-manifest (#447). Beide schrijven ze zelf. */
+  'CONTEXTDOORGIFTE.json': { schrijver: 'scripts/contextdoorgifte.js',
+    waarom: 'npm run contextdoorgifte schrijft het (met de ratel onder `ratel`); test/contextdoorgifte-server.test.js houdt een deelronde ertegen.' },
+  'TRUST_EVIDENCE_PLANE.json': { schrijver: 'scripts/trust-evidence-plane.js',
+    waarom: 'npm run trust:manifest schrijft het; keuringsregel 74 (scripts/check.js) eist dat het bij de uitvoerbare kern hoort.' },
+  'LIBRARYOS.md': { soort: 'BRON', waarom: 'Handgeschreven ontwerp van LibraryOS (#502); de kernel- en HTTP-toetsen leveren het bewijs.' },
+  'LIBRARYOS-RESULTAAT.md': { soort: 'BRON', waarom: 'Handgeschreven opleververslag van LibraryOS (#502).' },
+  'LIBRARYOS-STUDIO-READER.md': { soort: 'BRON', waarom: 'Handgeschreven ontwerp van Studio en de private Reader (#502).' },
+  'LIBRARYOS-STUDIO-READER-RESULTAAT.md': { soort: 'BRON', waarom: 'Handgeschreven opleververslag van Studio en Reader (#502).' },
+  'RTG-LEARNING-LOOPS-ARCHITECTUURONDERZOEK.md': { soort: 'BRON', waarom: 'Handgeschreven architectuuronderzoek naar de leerlussen (#502).' },
+  'RTG-LOOP-FABRIC-CODEBASE-COVERAGE.md': { soort: 'BRON', waarom: 'Handgeschreven toelichting bij LOOP-FABRIC-COVERAGE.json (#502); geen script schrijft dit document.' },
+  'RTG-LOOP-FABRIC-EXECUTION-MATRIX.md': { soort: 'BRON', waarom: 'Handgeschreven toelichting bij LOOP-FABRIC-EXECUTION-MATRIX.json (#502); geen script schrijft dit document.' },
+  'RTG-LOOP-FABRIC-COMPLETION.md': { soort: 'BRON', waarom: 'Handgeschreven afbouwverslag van de Loop Fabric (#502).' },
+  'RTG-LOOP-FABRIC-FINAL-AFBOUW.md': { soort: 'BRON', waarom: 'Handgeschreven eindverslag van de Loop Fabric-afbouw (#502).' },
+  'RTG-LOOP-FABRIC-VERTICAL-SLICE.md': { soort: 'BRON', waarom: 'Handgeschreven beschrijving van de verticale slice (#502).' },
   'MENSGROND.json': { schrijver: 'scripts/mensgrond.js',
     waarom: 'De gesloten lijst mensgronden woont in scripts/lib/mensgrond.js; deze meter legt hem naast de effecten, de bodem, de mandaatgrammatica en de herstelregisters, en is de enige schrijver.' },
   /* Uit ONVERKLAARDE_BOTSING gehaald op 28 september 2026, toen een verse

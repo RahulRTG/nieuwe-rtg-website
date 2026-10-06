@@ -98,7 +98,12 @@ function git(args, wortel) {
 /* De wijzigingen tussen de meetcommit en `tegen` (standaard HEAD), als lijst
    { status, pad }. Een hernoeming levert beide kanten op. */
 function wijzigingen(van, tegen, wortel) {
-  const uit = git(['diff', '--name-status', '--no-renames', van, tegen || 'HEAD'], wortel);
+  /* `werkboom` vergelijkt met wat er nu op schijf staat (gevolgde bestanden):
+     dat is wat de ijking nodig heeft, en wat een agent ziet die midden in een
+     wijziging zit. Standaard is HEAD, zoals scripts/versheid.js. */
+  const args = tegen === 'werkboom' ? ['diff', '--name-status', '--no-renames', van]
+    : ['diff', '--name-status', '--no-renames', van, tegen || 'HEAD'];
+  const uit = git(args, wortel);
   return uit.split('\n').filter(Boolean).map((r) => {
     const [status, ...rest] = r.split('\t');
     return { status: status[0], pad: rest.join('\t') };

@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-10-04",
+  "vastgelegd": "2026-10-06",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4541,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1682,
+    "kernBreedte": 1684,
     "kernGedeeld": 254,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 51,
@@ -164,6 +164,15 @@
     "aankomstUitPositie": 0
   },
   "notities": [
+    {
+      "datum": "2026-10-06",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1682,
+      "meter": "kernBreedte 1682 -> 1684; kernGedeeld blijft 254",
+      "reden": "Foundation LibraryOS en de Federated Loop Fabric voegen ieder precies één source-owned kernvermogen toe aan de routelaag: library en loopFabric. De routes lezen de ene duurzaam geïnitialiseerde instantie uit de kern-tas; rechtstreeks opnieuw require/builden in een route zou parallelle state, authority en delivery-checkpoints maken. De groei is dus de expliciete domeingrens van twee nieuwe platformcapabilities, niet een helper die uit de kern-tas kan worden gehouden.",
+      "waarheen": "server/opzet/library.js, server/opzet/loop-fabric.js, server/routes/library.js, server/routes/loop-fabric.js en de Library-/Loop-Fabric-scenario- en architectuurtests"
+    },
     {
       "datum": "2026-09-28",
       "soort": "structureel",

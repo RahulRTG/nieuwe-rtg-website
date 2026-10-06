@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-06T14:25:16.846Z",
-  "commit": "2590ae2d6",
+  "op": "2026-10-06T14:42:34.278Z",
+  "commit": "abece4aef",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatieboek.js",
@@ -28,7 +28,7 @@
  },
  "bewijsgraad": {
   "metingGebruikt": false,
-  "metingReden": "de meting is van commit 387b942c5 en HEAD staat op 2590ae2d6; een meting van een andere stand is geen grond voor een status",
+  "metingReden": "de meting is van commit 387b942c5 en HEAD staat op abece4aef; een meting van een andere stand is geen grond voor een status",
   "metingGemetenOp": "2026-09-29T18:39:11.935Z",
   "perGraad": [
    {

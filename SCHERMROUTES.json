@@ -2,24 +2,24 @@
  "soort": "index",
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
-  "op": "2026-09-29",
-  "commit": "4984ab46"
+  "op": "2026-10-06",
+  "commit": "4d1ba639"
  },
  "grens": "Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.",
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-09-29T19:34:03.462Z",
-   "commit": "4984ab46"
+   "op": "2026-10-06T13:25:58.537Z",
+   "commit": "4d1ba639"
   },
-  "bekendePaden": 5286
+  "bekendePaden": 5432
  },
  "gemeten": {
-  "schermenMetPad": 422,
-  "nietGelezen": 3,
-  "exactePaden": 955,
-  "verwijzingen": 1142,
-  "voorvoegsels": 145,
+  "schermenMetPad": 434,
+  "nietGelezen": 0,
+  "exactePaden": 975,
+  "verwijzingen": 1166,
+  "voorvoegsels": 148,
   "basisPaden": 2,
   "doodPad": 0,
   "doodPadVerwijzingen": 0
@@ -29,26 +29,7 @@
   "/api/rtf/social"
  ],
  "doodPad": [],
- "nietGelezen": [
-  {
-   "bestand": "public/shared/werkos/werkos-01.js",
-   "reden": "bundeldeel, geknipt middenin een sjabloon; gelezen via public/shared/werkos.js",
-   "viaBundel": "public/shared/werkos.js",
-   "viaBundelGevonden": 0
-  },
-  {
-   "bestand": "public/shared/werkos/werkos-01b.js",
-   "reden": "bundeldeel, geknipt middenin een sjabloon; gelezen via public/shared/werkos.js",
-   "viaBundel": "public/shared/werkos.js",
-   "viaBundelGevonden": 0
-  },
-  {
-   "bestand": "public/shared/werkos/werkos-01c.js",
-   "reden": "bundeldeel, geknipt middenin een sjabloon; gelezen via public/shared/werkos.js",
-   "viaBundel": "public/shared/werkos.js",
-   "viaBundelGevonden": 0
-  }
- ],
+ "nietGelezen": [],
  "perPad": [
   {
    "pad": "/api/fluister",
@@ -164,6 +145,16 @@
    "aantal": 5
   },
   {
+   "pad": "/api/foundation",
+   "schermen": [
+    "public/apps/app-main/app-main-43.js",
+    "public/apps/foundation/contact.html",
+    "public/apps/foundation/gezin-rt/gezin-rt-01.js",
+    "public/shared/gezinsstroom.js"
+   ],
+   "aantal": 4
+  },
+  {
    "pad": "/api/bestanden/haal",
    "schermen": [
     "public/apps/boeken/app.js",
@@ -222,15 +213,6 @@
     "public/shared/interface/world-widget-data.js"
    ],
    "aantal": 4
-  },
-  {
-   "pad": "/api/foundation",
-   "schermen": [
-    "public/apps/app-main/app-main-43.js",
-    "public/apps/foundation/contact.html",
-    "public/apps/foundation/gezin-rt/gezin-rt-01.js"
-   ],
-   "aantal": 3
   },
   {
    "pad": "/api/doos/status",
@@ -393,6 +375,14 @@
    "schermen": [
     "public/apps/appstore-dossier.html",
     "public/apps/mall.html"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/office/boardroom/bevestig/opties",
+   "schermen": [
+    "public/apps/boardroom-besluiten.js",
+    "public/apps/boardroom.html"
    ],
    "aantal": 2
   },
@@ -725,6 +715,14 @@
    "aantal": 2
   },
   {
+   "pad": "/api/leerhuis/lees",
+   "schermen": [
+    "public/apps/leerhuis-deur.js",
+    "public/apps/leerhuis.js"
+   ],
+   "aantal": 2
+  },
+  {
    "pad": "/api/medicatie",
    "schermen": [
     "public/apps/life.html",
@@ -865,6 +863,14 @@
    "schermen": [
     "public/apps/reisboek.js",
     "public/apps/reizen.html"
+   ],
+   "aantal": 2
+  },
+  {
+   "pad": "/api/reisbureau/mijn",
+   "schermen": [
+    "public/apps/reisbureau-experience.js",
+    "public/apps/reisbureau.html"
    ],
    "aantal": 2
   },
@@ -1498,6 +1504,48 @@
    "aantal": 1
   },
   {
+   "pad": "/api/office/bedrijfsmaat",
+   "schermen": [
+    "public/apps/boardroom-besluiten.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/beslisgeheugen",
+   "schermen": [
+    "public/apps/boardroom-besluiten.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/beslisgeheugen/intrek",
+   "schermen": [
+    "public/apps/boardroom-besluiten.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/beslisgeheugen/leg",
+   "schermen": [
+    "public/apps/boardroom-besluiten.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/cadeaubon",
+   "schermen": [
+    "public/apps/boardroom-besluiten.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/office/cadeaubon/stand",
+   "schermen": [
+    "public/apps/boardroom-besluiten.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/boardroom/ai",
    "schermen": [
     "public/apps/boardroom-eigenaar.js"
@@ -1611,13 +1659,6 @@
   },
   {
    "pad": "/api/office/beleidsmotor/afdwingen/zet",
-   "schermen": [
-    "public/apps/boardroom.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/office/boardroom/bevestig/opties",
    "schermen": [
     "public/apps/boardroom.html"
    ],
@@ -2177,6 +2218,13 @@
    "aantal": 1
   },
   {
+   "pad": "/api/festival/gast/pas/toon",
+   "schermen": [
+    "public/apps/festival-gast.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/festival/gast/passen",
    "schermen": [
     "public/apps/festival-gast.js"
@@ -2199,6 +2247,13 @@
   },
   {
    "pad": "/api/reserveer",
+   "schermen": [
+    "public/apps/foodcourt.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/reserveringen/mijn",
    "schermen": [
     "public/apps/foodcourt.html"
    ],
@@ -2352,6 +2407,13 @@
    "aantal": 1
   },
   {
+   "pad": "/api/foundation/les/stroomticket",
+   "schermen": [
+    "public/apps/foundation/realtime.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/foundation/reis/aanvraag",
    "schermen": [
     "public/apps/foundation/reis.html"
@@ -2383,6 +2445,13 @@
    "pad": "/api/foundation/tip",
    "schermen": [
     "public/apps/foundation/schrift.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/foundation/gezin/sessie/intrek",
+   "schermen": [
+    "public/apps/foundation/sessie/sessie-00.js"
    ],
    "aantal": 1
   },
@@ -3563,9 +3632,9 @@
    "aantal": 1
   },
   {
-   "pad": "/api/leerhuis/lees",
+   "pad": "/api/leerhuis/doe",
    "schermen": [
-    "public/apps/leerhuis.js"
+    "public/apps/leerhuis-deur.js"
    ],
    "aantal": 1
   },
@@ -3857,6 +3926,34 @@
    "aantal": 1
   },
   {
+   "pad": "/api/experience/bootstrap",
+   "schermen": [
+    "public/apps/living-world/client.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/experience/intent/execute",
+   "schermen": [
+    "public/apps/living-world/client.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/experience/intent/preview",
+   "schermen": [
+    "public/apps/living-world/client.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/living-world/view",
+   "schermen": [
+    "public/apps/living-world/client.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/carriere/regel/toon",
    "schermen": [
     "public/apps/loopbaanbewijs.html"
@@ -4000,6 +4097,13 @@
    "pad": "/api/lucht/vlucht/vertraag",
    "schermen": [
     "public/apps/luchthaven.html"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/supplier/mall/aanvraag/behandel",
+   "schermen": [
+    "public/apps/mall-aanvraag-acties.js"
    ],
    "aantal": 1
   },
@@ -4655,13 +4759,6 @@
    "aantal": 1
   },
   {
-   "pad": "/api/mall/aanvraag/sluit",
-   "schermen": [
-    "public/apps/mijnmall-aanvragen.js"
-   ],
-   "aantal": 1
-  },
-  {
    "pad": "/api/mall/aanvragen/mijn",
    "schermen": [
     "public/apps/mijnmall-aanvragen.js"
@@ -5173,6 +5270,13 @@
    "aantal": 1
   },
   {
+   "pad": "/api/reisbureau/boek",
+   "schermen": [
+    "public/apps/reisbureau-experience.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/reis/wijzer",
    "schermen": [
     "public/apps/reisbureau.html"
@@ -5202,20 +5306,6 @@
   },
   {
    "pad": "/api/reisbureau/annuleer",
-   "schermen": [
-    "public/apps/reisbureau.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/reisbureau/boek",
-   "schermen": [
-    "public/apps/reisbureau.html"
-   ],
-   "aantal": 1
-  },
-  {
-   "pad": "/api/reisbureau/mijn",
    "schermen": [
     "public/apps/reisbureau.html"
    ],
@@ -6167,6 +6257,34 @@
    "aantal": 1
   },
   {
+   "pad": "/api/techniek/bevestig/opties",
+   "schermen": [
+    "public/apps/techniek/techniek-03d-sso.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/techniek/sso",
+   "schermen": [
+    "public/apps/techniek/techniek-03d-sso.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/techniek/sso/geheim",
+   "schermen": [
+    "public/apps/techniek/techniek-03d-sso.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/techniek/sso/geheim/overlap/sluit",
+   "schermen": [
+    "public/apps/techniek/techniek-03d-sso.js"
+   ],
+   "aantal": 1
+  },
+  {
    "pad": "/api/techniek/papieren",
    "schermen": [
     "public/apps/techniek/techniek-04.js"
@@ -6469,6 +6587,13 @@
   },
   {
    "pad": "/api/service/bevestig",
+   "schermen": [
+    "public/shared/basis/basis-02b.js"
+   ],
+   "aantal": 1
+  },
+  {
+   "pad": "/api/service/bevestiging/toon",
    "schermen": [
     "public/shared/basis/basis-02b.js"
    ],
@@ -7159,6 +7284,19 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/boardroom-besluiten.js",
+   "exact": [
+    "/api/office/bedrijfsmaat",
+    "/api/office/beslisgeheugen",
+    "/api/office/beslisgeheugen/intrek",
+    "/api/office/beslisgeheugen/leg",
+    "/api/office/boardroom/bevestig/opties",
+    "/api/office/cadeaubon",
+    "/api/office/cadeaubon/stand"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/boardroom-eigenaar.js",
    "exact": [
     "/api/boardroom/ai",
@@ -7483,6 +7621,7 @@
    "bestand": "public/apps/festival-gast.js",
    "exact": [
     "/api/festival/gast/edities",
+    "/api/festival/gast/pas/toon",
     "/api/festival/gast/passen",
     "/api/festival/gast/programma"
    ],
@@ -7500,7 +7639,8 @@
    "exact": [
     "/api/foodcourt",
     "/api/foodcourt/tijden",
-    "/api/reserveer"
+    "/api/reserveer",
+    "/api/reserveringen/mijn"
    ],
    "voorvoegsels": []
   },
@@ -7519,6 +7659,14 @@
    "voorvoegsels": [
     "/api/foundation/gezin/",
     "/api/rtf/baby/"
+   ]
+  },
+  {
+   "bestand": "public/apps/foundation/beheer-gezinscode.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/foundation",
+    "/api/foundation/gezin/"
    ]
   },
   {
@@ -7546,9 +7694,7 @@
    "bestand": "public/apps/foundation/bord.html",
    "exact": [],
    "voorvoegsels": [
-    "/api/foundation",
-    "/api/foundation/opgaven/",
-    "/api/foundation/schrift/"
+    "/api/foundation"
    ]
   },
   {
@@ -7597,6 +7743,13 @@
    ],
    "voorvoegsels": [
     "/api/foundation/gezin/"
+   ]
+  },
+  {
+   "bestand": "public/apps/foundation/eigen-gezin.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/rtf/eigen-gezin"
    ]
   },
   {
@@ -7886,7 +8039,9 @@
   },
   {
    "bestand": "public/apps/foundation/realtime.js",
-   "exact": [],
+   "exact": [
+    "/api/foundation/les/stroomticket"
+   ],
    "voorvoegsels": [
     "/api/foundation/les/"
    ]
@@ -7942,7 +8097,8 @@
     "/api/rtf/tiener/toets-stap"
    ],
    "voorvoegsels": [
-    "/api/foundation"
+    "/api/foundation",
+    "/api/foundation/gezin/"
    ]
   },
   {
@@ -7972,6 +8128,7 @@
   {
    "bestand": "public/apps/foundation/sessie/sessie-00.js",
    "exact": [
+    "/api/foundation/gezin/sessie/intrek",
     "/api/rtf/toegang"
    ],
    "voorvoegsels": [
@@ -8653,6 +8810,14 @@
    ]
   },
   {
+   "bestand": "public/apps/leerhuis-deur.js",
+   "exact": [
+    "/api/leerhuis/doe",
+    "/api/leerhuis/lees"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/leerhuis.js",
    "exact": [
     "/api/leerhuis/lees"
@@ -8731,6 +8896,13 @@
    ]
   },
   {
+   "bestand": "public/apps/library/api.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/library/"
+   ]
+  },
+  {
    "bestand": "public/apps/life-lagen.js",
    "exact": [
     "/api/auth/me"
@@ -8791,6 +8963,16 @@
    "exact": [
     "/api/instant-reality",
     "/api/instant-reality/event"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/apps/living-world/client.js",
+   "exact": [
+    "/api/experience/bootstrap",
+    "/api/experience/intent/execute",
+    "/api/experience/intent/preview",
+    "/api/living-world/view"
    ],
    "voorvoegsels": []
   },
@@ -8891,6 +9073,15 @@
    "exact": [],
    "voorvoegsels": [
     "/api/member/rechterhand/"
+   ]
+  },
+  {
+   "bestand": "public/apps/mall-aanvraag-acties.js",
+   "exact": [
+    "/api/supplier/mall/aanvraag/behandel"
+   ],
+   "voorvoegsels": [
+    "/api/mall/aanvraag/"
    ]
   },
   {
@@ -9135,7 +9326,6 @@
    "bestand": "public/apps/mijnmall-aanvragen.js",
    "exact": [
     "/api/mall/aanvraag/kies",
-    "/api/mall/aanvraag/sluit",
     "/api/mall/aanvragen/mijn"
    ],
    "voorvoegsels": []
@@ -9501,6 +9691,14 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/reisbureau-experience.js",
+   "exact": [
+    "/api/reisbureau/boek",
+    "/api/reisbureau/mijn"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/reisbureau.html",
    "exact": [
     "/api/reis/wijzer",
@@ -9508,14 +9706,13 @@
     "/api/reisbureau/advies",
     "/api/reisbureau/afzeggen",
     "/api/reisbureau/annuleer",
-    "/api/reisbureau/boek",
     "/api/reisbureau/mijn",
     "/api/reisbureau/wijzig"
    ],
    "voorvoegsels": []
   },
   {
-   "bestand": "public/apps/reisuitnodiging.html",
+   "bestand": "public/apps/reisuitnodiging-client.js",
    "exact": [],
    "voorvoegsels": [
     "/api/"
@@ -10115,6 +10312,16 @@
    ]
   },
   {
+   "bestand": "public/apps/techniek/techniek-03d-sso.js",
+   "exact": [
+    "/api/techniek/bevestig/opties",
+    "/api/techniek/sso",
+    "/api/techniek/sso/geheim",
+    "/api/techniek/sso/geheim/overlap/sluit"
+   ],
+   "voorvoegsels": []
+  },
+  {
    "bestand": "public/apps/techniek/techniek-04.js",
    "exact": [
     "/api/techniek/papieren",
@@ -10325,6 +10532,20 @@
    "voorvoegsels": []
   },
   {
+   "bestand": "public/apps/werk/praktijk-gast.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/werk-gast/"
+   ]
+  },
+  {
+   "bestand": "public/apps/werk/praktijk-leverancier.js",
+   "exact": [],
+   "voorvoegsels": [
+    "/api/werk-leverancier/"
+   ]
+  },
+  {
    "bestand": "public/apps/werk/status.js",
    "exact": [
     "/api/tenant/herstelproef",
@@ -10417,6 +10638,7 @@
    "exact": [
     "/api/service/bel/mijn",
     "/api/service/bevestig",
+    "/api/service/bevestiging/toon",
     "/api/service/bevestigingen",
     "/api/service/keuzes",
     "/api/service/mens",
@@ -10483,6 +10705,13 @@
    "bestand": "public/shared/foutmelder.js",
    "exact": [
     "/api/fout/client"
+   ],
+   "voorvoegsels": []
+  },
+  {
+   "bestand": "public/shared/gezinsstroom.js",
+   "exact": [
+    "/api/foundation"
    ],
    "voorvoegsels": []
   },

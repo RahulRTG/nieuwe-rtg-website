@@ -114,7 +114,10 @@ function omhulSub(naam, ontleed) {
   cp[naam] = function (...a) {
     let meta = false;
     try { const [b, args] = ontleed(a); meta = isMetadata(b, args); if (!meta) noteerSub(b, args); } catch (e) { /* nooit breken */ }
-    if (!meta) return orig.apply(this, a);
+    /* Ook een subproces dat WEL invoer is, draait stil voor de omgeving: het
+       krijgt de hele omgeving mee, en dat is geen lezing door de generator.
+       Zo'n meting is al onbekend door `onwaarneembaar`, en de namen van alle
+       variabelen van de machine horen niet in een register. */
     spoor.stil = (spoor.stil || 0) + 1;
     try { return orig.apply(this, a); } finally { spoor.stil -= 1; }
   };

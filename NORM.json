@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 2012,
-    "toetsenNietGemeten": 133,
+    "toetsenNietGemeten": 130,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -4132,6 +4132,16 @@
       "meter": "toetsenNietGemeten 132 -> 133",
       "reden": "test/actietoken-omgekeerd.test.js (B-1, derde ronde) is met de hand nagetrokken met een mutatie: de lengtecontrole van sessieVan losgelaten zakte vóór de reparatie (een actietoken-nonce kon voor een sessie-id doorgaan) en zakt er nu niet meer op, omdat sessieVan via sessieDelen leest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
+      "datum": "2026-10-06",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 129,
+      "vervalt": "2027-01-04",
+      "meter": "toetsenNietGemeten 129 -> 130",
+      "reden": "test/bezitsbewijs-afgedwongen.test.js is nieuw (audit A-P1-04, zware paden standaard afgedwongen) en de mutatiemotor is er nog niet langs geweest. Met de hand nagetrokken: de standaard terug naar schaduw liet 2 toetsen zakken, de fail-closed tak op nvt zetten liet toets 5e zakken.",
+      "waarheen": "De eerstvolgende volledige mutatieronde meet hem en haalt hem uit deze telling."
     }
   ],
   "prestatie": {

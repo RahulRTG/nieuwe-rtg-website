@@ -112,22 +112,23 @@ const CONTROL = {
   control: 'AUDIT-KETEN-VERANKERD',
   wat: 'het wegknippen van de NIEUWSTE auditregels valt op tegen een extern anker',
   eigenaar: 'Security',
-  bewijs: ['test/keten.test.js', 'test/ankerdienst.test.js', 'test/ankerdienst-echt.test.js'],
-  bewijsstuk: 'POST /api/office/anker -- het blok met de kop van elk journaal, plus de tegenproef',
-  dekking: { beproefd: 0, totaal: 5, eenheid: 'auditjournalen met een anker dat BUITEN staat' },
-  /* De noemer is 5 en niet 4: sinds het handelingsspoor erbij kwam zijn er vijf
-     journalen om te ankeren (inzage, inlog, handelingen, onderzoekslab en de
-     boardroom-journalen samen). Een noemer die niet meegroeit, maakt van een gat
-     stilletjes een percentage. */
-  grens: 'DE DIENST DRAAIT, MAAR DE CONTROL IS NIET IN BEDRIJF: het anker staat nergens '  +
-    'buiten. server/lib/ankerdienst.js ' +
-    'verzamelt de kop van elk journaal in een blok en rekent ermee af zodra dat blok wordt ' +
-    'teruggevoerd; de tegenproef is beproefd (vier weggeknipte regels worden betrapt terwijl ' +
-    'de overgebleven keten perfect klopt). Wat ontbreekt is de BESTEMMING: zolang niemand het ' +
-    'blok op een gescheiden plek wegzet, beschermt dit niets tegen kopafknipping. Die bestemming ' +
-    'is met opzet geen taak van deze software -- een anker in dezelfde database is geen anker ' +
-    'maar een tweede regel om te wijzigen. De dienst meldt daarom NIET IN BEDRIJF tot er een ' +
-    'blok wordt teruggevoerd, in plaats van groen omdat de code bestaat.',
+  bewijs: ['test/keten.test.js', 'test/ankerdienst.test.js', 'test/ankerdienst-echt.test.js',
+    'test/ankerketen.test.js', 'test/ankertimer.test.js', 'test/auditspoor-atomair.pg.test.js'],
+  bewijsstuk: 'POST /api/office/anker -- het GETEKENDE blok met de kop van elk journaal, plus de tegenproef',
+  dekking: { beproefd: 0, totaal: 7, eenheid: 'auditjournalen met een anker dat BUITEN staat' },
+  /* De noemer is 7: inzage, inlog, handelingen, onderzoekslab, de
+     boardroom-journalen samen, en sinds audit P1-3c het API-spoor en het
+     besluitjournaal van RTG Command. Een noemer die niet meegroeit, maakt van
+     een gat stilletjes een percentage. */
+  grens: 'DE KETEN IS GEBOUWD, MAAR DE CONTROL IS NIET IN BEDRIJF zolang er geen echte tweede machine ' +
+    'staat. Wat er wel is (audit P1-3): het blok wordt getekend met een Ed25519-sleutel die niet in de ' +
+    'database staat (server/lib/ankerzegel.js), de ankertimer haalt elke ronde eerst het vorige blok terug ' +
+    'en rekent ermee af -- een afwijking laat het alarm afgaan en er gaat dan geen nieuw blok weg -- en ' +
+    'publieke productie start niet zonder RTG_ANKERPOST_URL (server/config/productie-anker.js). ' +
+    'scripts/ankerontvanger.js is een REFERENTIE-ontvanger (alleen bijschrijven, geen teruggang); de ' +
+    'echte bestemming op een andere machine met onveranderlijke opslag is een besluit over de ' +
+    'infrastructuur en staat buiten deze software. Een tweede machine BINNEN RTG ziet vervalsing door een ' +
+    'hand; wie beide machines bestuurt, kan beide koppen afknippen (ankerpost.js punt 5).',
   inBedrijf: false
 };
 

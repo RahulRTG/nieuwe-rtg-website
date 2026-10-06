@@ -517,7 +517,7 @@ test('het eigenaarsadres is niet via de openbare registratie te claimen', async 
     STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com',
     STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
     TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
-    ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
+    RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
     // deze proef gaat niet over betalen; de rail staat daarom hard dicht
     RTG_BETALEN_UIT: '1',
     // er is nog geen extern SMS-kanaal; telefoonherstel blijft in deze

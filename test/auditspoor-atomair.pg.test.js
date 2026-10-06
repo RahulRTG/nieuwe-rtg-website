@@ -154,3 +154,78 @@ test('auditspoor in PostgreSQL: atomair met de mutatie, vervalsing wordt 503 + a
       try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {}
     }
   });
+
+/* De twee vroege commitpaden op de PostgreSQL-laag zelf, en dan ook de
+   ECONOMISCHE boeking, die de serverproef hierboven niet raakt. Faalt de
+   auditschrijf in die transactie, dan rolt de geldboeking mee terug. */
+test('pg-laag: collectietransactie en economische boeking committen hun spoor, of niets',
+  { skip: OVERSLAAN, timeout: 60000 }, async () => {
+    const crypto = require('node:crypto');
+    const { maakPg } = require('../server/pg');
+    const { merge3 } = require('../server/db/merge');
+    const kluis = require('../server/kluis');
+    const keten = require('../server/lib/keten');
+    const p = maakPg({ merge3, kluis, log: { warn() {} }, url: URL });
+    const lees = async k => { const r = await p.pool.query('SELECT val FROM kv WHERE key=$1', [k]); return r.rows[0] ? JSON.parse(kluis.ontsleutel(r.rows[0].val)) : undefined; };
+    try {
+      await p.pool.query('DROP TRIGGER IF EXISTS weiger_audit ON kv').catch(() => {});
+      await p.schema();
+      await p.pool.query("DELETE FROM kv WHERE key IN ('handelingLog','saldoProef','paySaldi','payBoekingen')");
+      await p.pool.query("DELETE FROM economische_boekingen");
+      const data = {};
+      await p.commitVerzoek(data, [
+        { sleutel: 'handelingLog', basisBestaat: false, basisJson: null, waardeBestaat: true, waardeJson: '[]' },
+        { sleutel: 'saldoProef', basisBestaat: false, basisJson: null, waardeBestaat: true, waardeJson: '{}' },
+        { sleutel: 'paySaldi', basisBestaat: false, basisJson: null, waardeBestaat: true, waardeJson: '{}' },
+        { sleutel: 'payBoekingen', basisBestaat: false, basisJson: null, waardeBestaat: true, waardeJson: '[]' }]);
+      const spoorMet = (wat) => {
+        const l = JSON.parse(JSON.stringify(data.handelingLog || []));
+        keten.noteerIn(l, { at: new Date().toISOString(), wie: 'user-1', pad: '/api/proef', stand: 'vastgelegd', wat }, 50000);
+        return { wijzigingen: [{ sleutel: 'handelingLog', basisBestaat: true, basisJson: JSON.stringify(data.handelingLog),
+          waardeBestaat: true, waardeJson: JSON.stringify(l) }], geschreven: false };
+      };
+      const boeking = (n) => {
+        const ref = 'proef-' + n;
+        const identiteit = { domein: 'pay', van: 'lid:a', naar: 'lid:b', centen: 100, soort: 'proef', ref };
+        const invoer = { sleutel: 'pay-kas:' + crypto.createHash('sha256').update(ref).digest('hex'),
+          afdruk: crypto.createHash('sha256').update('afdruk' + ref).digest('hex'), identiteit,
+          collecties: ['payBoekingen', 'paySaldi'] };
+        const werk = () => {
+          const rij = { id: 'PB-' + n, van: 'lid:a', naar: 'lid:b', centen: 100, soort: 'proef', ref };
+          data.payBoekingen.unshift(rij);
+          data.paySaldi['lid:b'] = (data.paySaldi['lid:b'] || 0) + 100;
+          return { ok: true, boeking: rij };
+        };
+        return { invoer, werk };
+      };
+
+      /* Gezond: mutatie en spoor samen. */
+      const s1 = spoorMet('collectie');
+      await p.bewerkCollectie('saldoProef', data, w => { w.a = 1; }, s1);
+      assert.equal(s1.geschreven, true);
+      assert.equal((await lees('saldoProef')).a, 1);
+      assert.equal((await lees('handelingLog')).length, 1);
+      const b1 = boeking(1), s2 = spoorMet('economisch');
+      const u1 = await p.boekEenmaal(data, b1.invoer, b1.werk, s2);
+      assert.equal(u1.ok, true); assert.equal(s2.geschreven, true);
+      assert.equal((await lees('payBoekingen')).length, 1);
+      assert.equal((await lees('handelingLog')).length, 2);
+
+      /* Het spoor faalt: niets van de mutatie staat vast. */
+      await p.pool.query(`CREATE OR REPLACE FUNCTION weiger_audit() RETURNS trigger AS $$
+        BEGIN RAISE EXCEPTION 'audit-schrijfactie faalt (geinjecteerd)'; END $$ LANGUAGE plpgsql`);
+      await p.pool.query(`CREATE TRIGGER weiger_audit BEFORE UPDATE ON kv FOR EACH ROW
+        WHEN (NEW.key = 'handelingLog') EXECUTE FUNCTION weiger_audit()`);
+      await assert.rejects(p.bewerkCollectie('saldoProef', data, w => { w.a = 2; }, spoorMet('collectie-faalt')), /geinjecteerd/);
+      assert.equal((await lees('saldoProef')).a, 1, 'de collectiemutatie rolde mee terug');
+      const b2 = boeking(2);
+      await assert.rejects(p.boekEenmaal(data, b2.invoer, b2.werk, spoorMet('economisch-faalt')), /geinjecteerd/);
+      assert.equal((await lees('payBoekingen')).length, 1, 'de geldboeking rolde mee terug');
+      const sleutelRij = await p.pool.query('SELECT 1 FROM economische_boekingen WHERE sleutel=$1', [b2.invoer.sleutel]);
+      assert.equal(sleutelRij.rows.length, 0, 'en de economische sleutel ook');
+      assert.equal((await lees('handelingLog')).length, 2);
+    } finally {
+      await p.pool.query('DROP TRIGGER IF EXISTS weiger_audit ON kv').catch(() => {});
+      await p.sluit();
+    }
+  });

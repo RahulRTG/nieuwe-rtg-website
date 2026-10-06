@@ -43,7 +43,7 @@ test('config: veilige productie is foutloos', () => {
        op ERR_WEBHOOK_URL. Een "veilige productie" die SENTRY_DSN zet en
        ERR_WEBHOOK_URL niet, heeft in werkelijkheid GEEN externe alarmering --
        en deze toets zei dat dat foutloos was. */
-    REDIS_URL: 'r', ERR_WEBHOOK_URL: 'https://haak.voorbeeld.test/rtg', SMTP_URL: 'm',
+    REDIS_URL: 'r', RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', RTG_ANKERPOST_SLEUTEL: 'anker-sleutel', ERR_WEBHOOK_URL: 'https://haak.voorbeeld.test/rtg', SMTP_URL: 'm',
     MAIL_PROVIDER_DKIM: '1', OPENAI_API_KEY: 'test-ai-key',
     STRIPE_SECRET_KEY: 'k', STRIPE_WEBHOOK_SECRET: 'whsec_k',
     RTG_MOTOR_GELD: 'motor', RTG_MOTOR_GELD_URL: 'http://motor:3100',

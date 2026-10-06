@@ -82,6 +82,13 @@ const CATALOGUS = [
     waar: 'server/opzet/meldaan.js schrijf() EN server/opzet/meldingen.js notify(), voor de melding wordt weggeschreven',
     contract: 'RECOVERABLE',
     raakt: 'STATE -- de uitkomst staat vast en de betrokkene hoort er nooit van' },
+  /* A-P1-03: de contractstand van een lid is niet te lezen. De toegangspoort
+     moet dan DICHT gaan voor betaald werk; een kapotte verifier mag niet als ja
+     klinken. */
+  { naam: 'contractstand-faalt',
+    wat: 'het opzoeken van de lidmaatschapsafspraak gooit een fout',
+    waar: 'server/opzet/diensten2.js contractStandVoor()',
+    raakt: 'FAILURE -- de poort moet dichtgaan: een betaalde capability voor een lid van wie niet vaststaat dat zijn afspraak loopt' },
   { naam: 'klok-vooruit',
     wat: 'de klok loopt voor of achter',
     waar: 'server/lib/klok.js (RTG_KLOK, eigen schakelaar)',

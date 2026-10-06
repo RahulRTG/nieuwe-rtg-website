@@ -176,10 +176,13 @@ function contractStandVoor(sess) {
        "GEEN_CONTRACT" -- dat laatste zou een storing in de bewijslaag als een
        bevinding over het lid laten lezen (CONTROLPLANE.md: ONBEKEND is geen
        WEIGEREN). */
-    if (!lees || typeof lees.stand !== 'function') return null;
+    /* A-P1-03: GEEN LAAG bij een betalende pas is een STORING en geen vrijbrief.
+       Hier stond `return null`, en dan liep elk betaald verzoek ongezien door. */
+    if (!lees || typeof lees.stand !== 'function') return lidpoort.onbekend(sess.tier, 'de aanmeldingenlaag is niet beschikbaar');
     /* A-P1-03: het OORDEEL wordt bij elk verzoek gerekend (een verlopen contract
        mag geen tien minuten blijven doorwerken); alleen het WEGEN in de schaduw
        blijft per venster. Een gratis lid kost geen opzoeking. */
+    if (require('../lib/verraad').sla('contractstand-faalt')) throw new Error('verraad: contractstand-faalt');
     oordeel = lidpoort.beoordeel(sess.tier, lees.stand(sess.account.id), nu);
     const eerder = contractGezien.get(sleutel);
     if (!(eerder && nu - eerder.at < CONTRACT_VENSTER) && oordeel.stand !== 'NIET_BETALEND') {
@@ -191,7 +194,11 @@ function contractStandVoor(sess) {
       if (contractGezien.size >= CONTRACT_DAK) contractGezien.clear();
       contractGezien.set(sleutel, { at: nu });
     }
-  } catch (e) { return null; }
+  } catch (e) {
+    /* Een leesfout bij een betalende pas: onbekend, en dus GEEN betaalde
+       capability (lidpoort.afgedwongen). Een gratis pas verliest niets. */
+    return lidpoort.onbekend(sess.tier, 'de contractstand kon niet worden gelezen');
+  }
   return oordeel;
 }
 
@@ -286,8 +293,9 @@ function auth(req, res, next) {
          side en per verzoek: geen uitlog nodig, en het token zelf verandert niet.
          req.session wordt een kopie, zodat een gedeeld sessieobject niet muteert. */
       if (lidpoort.afgedwongen(cs)) {
-        req.session = Object.assign({}, sess, { tier: lidpoort.BASIS_TIER, tierVoorContract: sess.tier, contractGeeindigd: true });
-        res.set('RTG-Contract', 'geeindigd');
+        req.session = Object.assign({}, sess, { tier: lidpoort.BASIS_TIER, tierVoorContract: sess.tier,
+          contractGeeindigd: cs.stand === lidpoort.STAND.GEEINDIGD, contractOnbekend: cs.stand === lidpoort.STAND.ONBEKEND });
+        res.set('RTG-Contract', cs.stand === lidpoort.STAND.ONBEKEND ? 'onbekend' : 'geeindigd');
       }
       /* NIET-AFGEDWONGEN STAAT OP HET ANTWOORD, want een regel die niets doet en
          dat niet zegt, is over een half jaar een regel waarvan niemand weet of hij
@@ -295,9 +303,17 @@ function auth(req, res, next) {
          kop, en twee regels die beide niet afdwingen horen beide zichtbaar te
          blijven -- een kop die er stil een van weggooit is dezelfde fout als twee
          uitkomsten op een hoop. */
-      if (cs.bezwaar) res.append('RTG-Niet-Afgedwongen', cs.regel);
+      if (cs.bezwaar && !lidpoort.afgedwongen(cs)) res.append('RTG-Niet-Afgedwongen', cs.regel);
     }
-  } catch (e) {}   // een storing in de bewijslaag is geen overtreding
+  } catch (e) {
+    /* A-P1-03: deze tak mocht stil doorlaten. Een betalende pas waarvan niet
+       vast te stellen is of zijn afspraak loopt, krijgt dit verzoek de
+       basislaag -- de gratis app blijft werken, betaald werk niet. */
+    if (lidpoort.afgedwongen(lidpoort.onbekend(sess.tier, 'storing in de contractpoort'))) {
+      req.session = Object.assign({}, sess, { tier: lidpoort.BASIS_TIER, tierVoorContract: sess.tier, contractOnbekend: true });
+      try { res.set('RTG-Contract', 'onbekend'); } catch (e2) { /* de kop is extra */ }
+    }
+  }
   /* HET BEZITSBEWIJS (MIJN RTG blok 4), op hetzelfde keelgat als de boardroom
      hierboven en om dezelfde reden: een regel die op een van de 213
      routebestanden moet worden herhaald, staat er over een half jaar op 212.

@@ -41,7 +41,7 @@ test.before(async () => {
   assert.ok(baas, 'de eigenaar is ingelogd');
   baasId = (await api('/api/auth/me', {}, baas)).body.user.id;
   const k = kantoorPasskey(base);
-  pk = Object.assign(k, { sleutel: await k.zet(baas) });
+  pk = Object.assign(k, { sleutel: await k.zet(baas, 'Imran') });
   const u = (Date.now() % 1e8).toString().padStart(8, '0');
   const r = await api('/api/auth/register', { name: 'Lid Vrijgave', email: 'vg' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });

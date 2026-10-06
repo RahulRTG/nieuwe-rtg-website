@@ -13194,7 +13194,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/experience.js"
         ],
@@ -13203,7 +13203,9 @@
           "server/kern/economie/principal.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/living-world.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "feedback",
@@ -15083,7 +15085,7 @@
         "declaredMutationSemantics": 3,
         "sourceFileCount": 1,
         "kernelDependencyCount": 38,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/leerhuis.js"
         ],
@@ -15116,6 +15118,7 @@
         ],
         "kernelDependenciesOmitted": 14,
         "screens": [
+          "public/apps/leerhuis-werk.html",
           "public/apps/leerhuis.html"
         ],
         "screensOmitted": 0,
@@ -15217,7 +15220,7 @@
         "declaredMutationSemantics": 315,
         "sourceFileCount": 199,
         "kernelDependencyCount": 2566,
-        "screenCount": 38,
+        "screenCount": 39,
         "sourceFiles": [
           "server/routes/agenda.js",
           "server/routes/alpine.js",
@@ -15278,7 +15281,7 @@
           "public/apps/horeca-pda.html",
           "public/apps/horeca.html"
         ],
-        "screensOmitted": 26,
+        "screensOmitted": 27,
         "signals": [
           "decision",
           "feedback",
@@ -20026,14 +20029,16 @@
         "declaredMutationSemantics": 42,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 0,
+        "screenCount": 1,
         "sourceFiles": [
           "server/routes/library.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
+        "screens": [
+          "public/apps/library.html"
+        ],
         "screensOmitted": 0,
         "signals": [
           "decision",
@@ -22466,7 +22471,7 @@
         "declaredMutationSemantics": 24,
         "sourceFileCount": 2,
         "kernelDependencyCount": 0,
-        "screenCount": 3,
+        "screenCount": 4,
         "sourceFiles": [
           "server/routes/member/mall-vindlaag.js",
           "server/routes/member/winkel-bieb.js"
@@ -22475,6 +22480,7 @@
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/leverancier-aanvragen.html",
           "public/apps/mall.html",
           "public/apps/mijnmall.html",
           "public/apps/uitgaan.html"

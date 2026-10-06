@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-06",
-  "commit": "a7d5f265",
-  "seconden": 10.6,
+  "commit": "750d4ccd",
+  "seconden": 11,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -1269,8 +1269,6 @@
     "scripts/ast/parser.js",
     "scripts/ast/walk.js",
     "scripts/bundel.js",
-    "scripts/lib/invoerspoor-preload.js",
-    "scripts/lib/invoerspoor.js",
     "scripts/symbolen.js",
     "server/accounts/achtergrond.js",
     "server/accounts/actiebewijs.js",

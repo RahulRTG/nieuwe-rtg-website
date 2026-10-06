@@ -141,7 +141,7 @@
       "blastRadius": {
         "sourceOwners": 5,
         "kernelModules": 118,
-        "mutationContracts": 284,
+        "mutationContracts": 290,
         "routes": 284,
         "screens": 5,
         "dataSchema": "eerst flowmanifest; geen runtime-opslag",
@@ -203,7 +203,7 @@
       "blastRadius": {
         "sourceOwners": 13,
         "kernelModules": 122,
-        "mutationContracts": 1057,
+        "mutationContracts": 1060,
         "routes": 1078,
         "screens": 29,
         "dataSchema": "versioned source targets en duurzame events waar zij ontbreken",
@@ -795,7 +795,7 @@
       "blastRadius": {
         "sourceOwners": 86,
         "kernelModules": 2498,
-        "mutationContracts": 2071,
+        "mutationContracts": 2072,
         "routes": 2093,
         "screens": 97,
         "dataSchema": "geen learning-opslag vóór menselijke/juridische beslissing",

@@ -1539,6 +1539,33 @@ jobs:
             VERANDERBEREIK-RONDE.json
           if-no-files-found: error
           retention-days: 5
+      # DE TOETS-ROUTEKAART OVER RONDES, EN HIJ BLOKKEERT NIETS
+      # (ARCHITECTOPDRACHT.md fase 3). Attributie en veranderbereik verdwijnen
+      # na vijf dagen; ATTRIBUTIE.json bewaart per toets alleen een aantal.
+      # Deze stap voegt de relaties toets -> route van deze ronde samen met het
+      # GECOMMITTE register (de laatste vijf rondes), zodat een relatie een
+      # waarneming over rondes wordt in plaats van een momentopname. Zoals
+      # TOETSDUUR.json: CI zet hem klaar, een mens commit hem -- een register dat
+      # zichzelf bijwerkt, verandert wat de Architect zegt buiten de historie om.
+      - name: De toets-routekaart over rondes (meten, geen poort)
+        if: always()
+        run: |
+          set -o pipefail
+          rondes=$(find duurmetingen -name .toetsduur -type f | sed 's/^/--ronde /' | tr '\n' ' ')
+          test -n "$rondes"
+          vorige=""
+          if [ -f TOETSROUTES.json ]; then vorige="--vorige TOETSROUTES.json"; fi
+          node scripts/toetsroutes.js \
+            --lees journalen/test/routejournaal.log \
+            $rondes $vorige --commit "${{ github.sha }}" --schrijf
+      - name: De toets-routekaart bewaren (een mens commit hem)
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: toetsroutes
+          path: TOETSROUTES.json
+          if-no-files-found: error
+          retention-days: 30
       # EERST METEN, DAN OVERSCHRIJVEN. De drift vergelijkt het GECOMMITTE
       # register met deze verse meting; de stap hieronder schrijft dat register
       # weg. In de omgekeerde volgorde vergelijkt hij het nieuwe bestand met

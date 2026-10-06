@@ -692,4 +692,7 @@ function main() {
 
 if (require.main === module) process.exit(main());
 module.exports = { meet, raakt, alleToetsen, afhankelijken, routeKaart,
-  kennisVan, rondeVan, KENNIS, RONDE };
+  kennisVan, rondeVan, KENNIS, RONDE,
+  /* ook voor scripts/toetsroutes.js: een journaal en een ronde worden op EEN
+     plek gelezen, en niet in een tweede parser opnieuw bedacht */
+  leesRonde, leesJournalen };

@@ -21,7 +21,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const { maakAuthenticator } = require('./webauthn-authenticator');
 
 const pw = laadPlaywright();
@@ -49,8 +49,8 @@ test('productie, via het scherm: uitnodiging koppelen met de eigen passkey en da
   t.after(async () => {
     sluit = true;
     if (browser) await browser.close();
-    if (child) stop(child);
-    fs.rmSync(tmp, { recursive: true, force: true });
+    if (child) await stopHard(child);
+    fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
     assert.deepEqual(routeFouten, [], 'de opstelling stuurde elk verzoek door naar de server');
   });
   const srv = await startServer({ env: { NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: tmp,

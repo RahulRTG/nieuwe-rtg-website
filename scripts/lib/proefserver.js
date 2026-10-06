@@ -30,7 +30,10 @@ function start({ poort, merk }) {
   const child = spawn(process.execPath, ['server/server.js'], {
     cwd: WORTEL,
     env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: TMP, NODE_ENV: 'test',
-      SMTP_URL: '', ANTHROPIC_API_KEY: '', RTG_DEMO: '1' },
+      SMTP_URL: '', ANTHROPIC_API_KEY: '', RTG_DEMO: '1',
+      // Bezitsbewijs is standaard verplicht (A-P1-04): een sessie zonder gebonden toestel wordt geweigerd. Deze proefserver meet de ANDERE deuren met
+      // gewone demo-sessies; de afdwinging zelf is bewezen in test/bezitsbewijs-afgedwongen.test.js. Een meegegeven waarde wint.
+      RTG_BEZITSBEWIJS: process.env.RTG_BEZITSBEWIJS || 'aanbevolen' },
     stdio: ['ignore', 'ignore', 'ignore']
   });
   return { child, base: 'http://127.0.0.1:' + poort, TMP };

@@ -15,7 +15,7 @@ Twee aanroepers, beide met `?.` en een terugval:
 
 - In PostgreSQL leven beide sporen in de gewone database-snapshot (`db.data`), geschreven via `save()`. Ze zijn dus **niet kwijt**, maar ze zijn een **lijst met een ringgrens** in plaats van rijen die alleen groeien.
 - De hashketen bewijst nog steeds wat er STAAT; de ringgrens kan oudste regels laten afvallen. In SQLite is dat een apart besluit (730 dagen op tijd, `inzagelog-bewaring`); voor de twee sporen hierboven is er in PostgreSQL **geen tijdgebonden bewaring**, alleen de ringgrens.
-- Het kritieke spoor van A-P1-05 (`opzet/kritiekspoor.js`) vraagt `vastleggen` (duurzaam, met bevestigde commit) en is dus wél afhankelijk van de PG-commitroute, niet van deze poort.
+- Het kritieke spoor van A-P1-05 (het kritiekspoor uit PR #499) vraagt `vastleggen` (duurzaam, met bevestigde commit) en is dus wél afhankelijk van de PG-commitroute, niet van deze poort.
 
 ## Open besluit (niet genomen, niet gebouwd)
 

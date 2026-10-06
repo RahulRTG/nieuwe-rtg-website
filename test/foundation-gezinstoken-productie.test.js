@@ -25,7 +25,7 @@ const os = require('node:os');
 const path = require('node:path');
 const poort = require('../server/middleware/foundation-productiepoort');
 const { maakGetekendeVrijgave } = require('./foundation-vrijgave-fixture');
-const { startServer, stop, stopNet, keurLidGoed } = require('./helper');
+const { startServer, stop, stopHard, stopNet, keurLidGoed } = require('./helper');
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const ROOT = path.join(__dirname, '..');
@@ -165,7 +165,6 @@ const SLEUTELS = { RTG_ENC_KEY: 'k'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64), R
    dat een handler in een nagemaakte app dat doet. */
 test('echte productieserver: de consumers werken op het nieuwe token, een oud kaal token opent niets', async t => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gezinstoken-prod-'));
-  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
   /* Sinds 5 oktober 2026 komt een kind in productie alleen binnen via het
      account van een ouder met een gecontroleerd paspoort (gezinseigenaar.js,
      gezinshulp.js profielVan). Het gezin ontstaat daarom langs die weg; het
@@ -190,7 +189,8 @@ test('echte productieserver: de consumers werken op het nieuwe token, een oud ka
   } finally { await stopNet(eerst.child); }
 
   const { child, base } = await startServer({ env: { ...PROD, ...SLEUTELS, RTG_DATA_DIR: tmp } });
-  t.after(() => stop(child));
+  t.after(() => stopHard(child));   // eerst het proces echt weg, dan pas de map
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
   const post = (pad, body) => fetch(base + pad, { method: 'POST', headers: PROXY,
     body: JSON.stringify(body || { code: 'GEZIN', token: 'x'.repeat(32) }) });
   // de consumers buiten de beschermde-functiepoort: open, en op het nieuwe token

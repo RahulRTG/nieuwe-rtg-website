@@ -21,7 +21,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const { maakAuthenticator } = require('./webauthn-authenticator');
 
 const pw = laadPlaywright();
@@ -36,13 +36,13 @@ const tel = () => '06' + String(10000000 + Math.floor(Math.random() * 8e7));
 test('productie, via het scherm: uitnodiging koppelen met de eigen passkey en daarna het kantoor in',
   { skip: geenBrowser(pw), timeout: 180000 }, async t => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoorkoppel-e2e-'));
-  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
   const { child, base } = await startServer({ env: { NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: tmp,
     APP_URL: APP + '/', SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
     ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg', ...KEYS, RTG_OWNER_EMAIL: EIGENAAR,
     RTG_OWNER_BOOTSTRAP: BOOTSTRAP, OFFICE_CODE: 'GEHEIME-CODE-123', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     RTG_ISOLATIE_AFDWINGEN: '1', RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1' } });
-  t.after(() => stop(child));
+  t.after(() => stopHard(child));   // eerst het proces echt weg, dan pas de map
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
   const api = (pad, body, token) => fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json',
     'X-Forwarded-Proto': 'https', ...(token ? { Authorization: 'Bearer ' + token } : {}) }, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));

@@ -3654,6 +3654,7 @@
       "server/kern/magnaat-economenlab-training.js",
       "server/kern/magnaat-economische-motor/besluiten.js",
       "server/kern/magnaat-grootboek/index.js",
+      "server/kern/magnaat-kantoorregels/tabel-breed.js",
       "server/kern/magnaat-kantoorregels/tabel-lid.js",
       "server/kern/magnaat-kantoorregels/tabel-platform.js",
       "server/kern/magnaat-kantoorregels/tabel.js",

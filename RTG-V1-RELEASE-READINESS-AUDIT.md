@@ -1,6 +1,6 @@
 # RTG V1 — RELEASE READINESS AUDIT
 
-> **STATUS 5 oktober 2026 — remediatie ronde 1, 2 en 3 uitgevoerd.**
+> **STATUS 6 oktober 2026 — remediatie ronde 1 tot en met 4 uitgevoerd.**
 >
 > - **Ronde 1:** de 2 P0's, de P1 en de kapotte release-gate uit ronde 0 zijn
 >   gerepareerd, met regressietests én een onafhankelijke adversariële
@@ -11,11 +11,15 @@
 >   techniek-inlog zonder tweede factor) plus negen kleinere punten.
 > - **Ronde 3:** de besluiten over N1, N2, N4 en N6 zijn uitgevoerd. N2 en N4
 >   zijn VERIFIED FIXED. N1 en N6 zijn dicht met een kanttekening.
-> - **Verdict nu:** 🟡 CONDITIONAL GO, **81/100**. De nieuwe code-voorwaarde is
->   N3: het aanmeldgesprek met sleutelwoorden geeft nog een sessie zonder
->   tweede factor, en daarmee staat het doel van N1 open.
+> - **Ronde 4:** N3, N11 en N12 zijn VERIFIED FIXED, na een herkeuring per
+>   bevinding en een gezamenlijke eindkeuring. Er staat geen P0 of P1 meer open
+>   in de code.
+> - **Verdict nu:** 🟡 CONDITIONAL GO, **84/100**. Wat nog open staat:
+>   - de externe poorten F3–F6;
+>   - een besluit over twee P2's die er al waren: N19 (een werksessie zonder
+>     tweede factor) en N18 (een slash omzeilt de inlogpauze).
 >
-> Zie **§REMEDIATIESTATUS** (ronde 1, 2 en 3) direct onder sectie A. De
+> Zie **§REMEDIATIESTATUS** (ronde 1 tot en met 4) direct onder sectie A. De
 > oorspronkelijke ronde-0-bevindingen blijven hieronder staan met hun status
 > (OPEN / FIXED / VERIFIED FIXED).
 
@@ -257,12 +261,12 @@ staan hier zodat ze niet verdwijnen.
 
 | ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
 |---|---|---|---|---|---|---|
-| **N1** | **P1** | FIXED_MET_KANTTEKENING (ronde 3; doel open door N3) | `server/routes/techniek/inlog.js:56` | `/api/techniek/inloggen` geeft na wachtwoord en toegangslijst `accounts.issueToken(user.id, 1)` zonder `tweefactor`-poort. Voor de eigenaar en elk account op de techniektoegangslijst is de tweede factor daar geen drempel. | Code gelezen door twee herkeurders en de implementer. Niet uitgevoerd. | Dezelfde tweede stap als `/api/auth/login` (bewijs, daarna `/api/auth/tweede`), of een `code` in hetzelfde verzoek. Vraagt een kleine aanpassing in de techniekpagina. |
+| **N1** | **P1** | FIXED_MET_KANTTEKENING (ronde 3; doel open door N3). Doel bereikt in ronde 4, nu N3 VERIFIED FIXED is | `server/routes/techniek/inlog.js:56` | `/api/techniek/inloggen` geeft na wachtwoord en toegangslijst `accounts.issueToken(user.id, 1)` zonder `tweefactor`-poort. Voor de eigenaar en elk account op de techniektoegangslijst is de tweede factor daar geen drempel. | Code gelezen door twee herkeurders en de implementer. Niet uitgevoerd. | Dezelfde tweede stap als `/api/auth/login` (bewijs, daarna `/api/auth/tweede`), of een `code` in hetzelfde verzoek. Vraagt een kleine aanpassing in de techniekpagina. |
 | **N2** | P2 | VERIFIED FIXED (ronde 3) | `server/routes/member/tweefactor.js` `/codes` | Nieuwe herstelcodes vragen alleen sessie + wachtwoord. Met zo'n code zet `/uit` de tweede factor uit, dus de rem op `/uit` houdt wie sessie én wachtwoord heeft niet tegen. `test/mijnrtg-routes.test.js` 9 legt "vraagt het wachtwoord" vast als contract. | Uitgevoerd door de herkeuring van ronde 3: 10 nieuwe codes, daarna `/uit` 200. | Een geldige code (TOTP of herstelcode) eisen voor `/codes`, zoals `/uit`. Geen scherm gebruikt de route, dus het raakt alleen het API-contract. |
 | **N3** | P2 → **P1** (ronde 3) | OPEN | `server/routes/aanmeldgesprek.js:73-77` | Het aanmeldgesprek met sleutelwoorden geeft een sessietoken zonder `inlogPoort` en zonder tweede factor, ook als de tweede stap op slot zit. | Uitgevoerd door de herkeuring van ronde 3: token terwijl `/api/auth/tweede` 429 gaf. | Langs dezelfde inlogpoort laten lopen. |
 | **N4** | P2 | VERIFIED FIXED (ronde 3) | `server/server.js` `noteFailedTry` | Tien foute codes melden brute force, en dat zet het adres van de laatste poging een uur in quarantaine. Wie het wachtwoord kent, kan negen gokken vooraf laden; de eerste typefout van het lid zet dan zijn eigen adres in quarantaine. De emmer wordt bij succes niet geleegd. | Quarantaine uitgevoerd door de herkeuring van ronde 3. | Zie besluitpunt 2. |
 | **N5** | P3 | OPEN | `server/server.js:584` | De pogingenemmers zijn een `Map` per proces. Met meerdere processen krijgt elk proces opnieuw tien gokken. | Code gelezen. | Emmers via Redis delen als `REDIS_URL` gezet is. |
-| **N6** | P1 (alleen met het trio) | FIXED_MET_KANTTEKENING (ronde 3; restvenster N11, P2) | `server/db/index.js:61` `bewaar`, `server/trio-schaduw.js` | Een stand-by antwoordt 200 op een schrijfverzoek en bewaart niets. Sinds `d8d6154c`, `4c68adee` en `b6c423e2` krijgt een stand-by tijdens de failback geen verkeer, en een actieve die geen leider is, wordt opnieuw gepromoveerd en krijgt tot dan niets. Het venster blijft bestaan voor: een verzoek dat al onderweg was, en de werkers van `RTG_POORTWACHTERS` (die sturen bij actief -1 naar de eerste gezonde server). | Herkeuring ronde 2 en 3, deels met echte processen. | Op de server zelf: een muterend verzoek krijgt 503 als `!db.writable`, in plaats van 200 zonder bewaren. Raakt elke route, dus een eigen ronde. |
+| **N6** | P1 (alleen met het trio) | FIXED_MET_KANTTEKENING (ronde 3; restvenster N11, P2). N11 is VERIFIED FIXED in ronde 4 | `server/db/index.js:61` `bewaar`, `server/trio-schaduw.js` | Een stand-by antwoordt 200 op een schrijfverzoek en bewaart niets. Sinds `d8d6154c`, `4c68adee` en `b6c423e2` krijgt een stand-by tijdens de failback geen verkeer, en een actieve die geen leider is, wordt opnieuw gepromoveerd en krijgt tot dan niets. Het venster blijft bestaan voor: een verzoek dat al onderweg was, en de werkers van `RTG_POORTWACHTERS` (die sturen bij actief -1 naar de eerste gezonde server). | Herkeuring ronde 2 en 3, deels met echte processen. | Op de server zelf: een muterend verzoek krijgt 503 als `!db.writable`, in plaats van 200 zonder bewaren. Raakt elke route, dus een eigen ronde. |
 | **N7** | P3 | OPEN | `server/kern/ssrf.js:72-87` | De gedeelde SSRF-poort: `startsWith('fc'/'fd')` weigert ook domeinnamen (`fd.nl`, `fcbarcelona.com`), en enkele IPv6-vormen (`::7f00:1`, NAT64 `64:ff9b::/96`) komen erdoor. De school-webhooks laten `redis`, `localhost.` en `metadata.google.internal.` nog door; de reparatie van C5 zit alleen in de payrollmodule. | Herkeuring ronde 2 en 3. IPv6 niet te meten in de sandbox. | De regels van `bronophalen.js` naar `ssrf.js` tillen, met een IP-literal-tak die alleen op IP's kijkt. |
 | **N8** | P3 | OPEN | `server/config/openbaar.js:66-87`, diverse `RTG_*` | Een publiek IPv6-literal en `RTG_ACME`/`RTG_TLS_DOMAIN` worden niet als openbaar ingedeeld, dus `RTG_DEV_LINKS` krijgt daar alleen een waarschuwing. Ongekeurd zijn ook `RTG_GRENS_MELD`, `RTG_SCHOOL_WEBHOOK_INTERN`, `RTG_SCRYPT_*`, `RTG_ANKERPOST_ONVEILIG`, `RTG_DOOS_SLEUTEL`, `RTG_CSP_NONCE=0`, `RTG_BEZITSBEWIJS=uit`, `RTG_DOELBINDING=uit` en `RTG_SCHORSPOORT_UIT`. Daarnaast verraadt `/api/auth/forgot` via `tweestaps` of een account bestaat. | Herkeuring ronde 2 en 3. | De keuring per vlag afleiden uit de `lees()` van de module zelf, in plaats van kopieën. |
 | **N9** | P3 | OPEN | `server/opzet/stopspoeling.js`, `server/db/bijeen.js` | Een crash uit een andere context terwijl een bundel half staat (op een niet-geldcollectie boven 512 KB, of na een `save()` van een ander verzoek binnen de genadetermijn) kan de halve stand alsnog wegschrijven. SIGTERM met een open achtergrondbundel eindigt met 0 op een halve stand. De PostgreSQL-modus is niet live beproefd. | Herkeuring ronde 2, deels zelf gemeten. | Een procesbrede teller van open bundels, of de schrijfpoort bevriezen bij een crash. |
@@ -454,9 +458,9 @@ bestaand token blijft werken, dus de eigenaar kan de stand-by wel bekijken.
 
 | ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
 |---|---|---|---|---|---|---|
-| **N3** | **P1** (was P2) | OPEN | `server/routes/aanmeldgesprek.js:77` | Het aanmeldgesprek met sleutelwoorden geeft `issueToken` (30 dagen) zonder `inlogPoort` en zonder tweede factor. Dat geldt ook voor de eigenaar met tweede factor, en het token opent de techniekpagina. Daarmee staat het doel van N1 open. | Zelf gezien door de herkeuring: `/api/aanmeld/start` en `/zeg` gaven een token, en `GET /api/techniek/tenant` gaf daarmee 200. | Zie besluitpunt 1. |
-| **N11** | P2 (alleen met het trio) | OPEN | `server/opzet/standbypoort.js:39`, `server/db/index.js:61` | Een verzoek dat al voorbij de poort is op het moment van de afzetting, krijgt nog 200 en wordt niet bewaard. De poort kijkt alleen bij de ingang, en `bewaar()` keert stil terug. | Zelf gezien door de herkeuring: `zet` verstuurd, 5 of 30 ms later de demote. `zet` antwoordde ±160 ms na de demote met 200, en na een nieuwe promotie stond er niets. | Zie besluitpunt 2. |
-| **N12** | P3 | OPEN | `server/accounts/actietokens.js:31-48` | Een `tech2`- of inlogbewijs van vóór een wachtwoordwijziging werkt na die wijziging nog (vijf minuten). `verifyActionToken` kijkt niet naar `sessies_vanaf`. Voor het inlogbewijs was dat al zo vóór deze tak. | Zelf gezien door de herkeuring: de oude sessie gaf 401, het oude bewijs plus een herstelcode gaf 200 en een werkend token. | Actietokens laten vervallen bij `sessies_vanaf`, zoals sessietokens. Raakt elk doel, dus ook herstellinks. |
+| **N3** | **P1** (was P2) | VERIFIED FIXED (ronde 4) | `server/routes/aanmeldgesprek.js:77` | Het aanmeldgesprek met sleutelwoorden geeft `issueToken` (30 dagen) zonder `inlogPoort` en zonder tweede factor. Dat geldt ook voor de eigenaar met tweede factor, en het token opent de techniekpagina. Daarmee staat het doel van N1 open. | Zelf gezien door de herkeuring: `/api/aanmeld/start` en `/zeg` gaven een token, en `GET /api/techniek/tenant` gaf daarmee 200. | Zie besluitpunt 1. |
+| **N11** | P2 (alleen met het trio) | VERIFIED FIXED (ronde 4) | `server/opzet/standbypoort.js:39`, `server/db/index.js:61` | Een verzoek dat al voorbij de poort is op het moment van de afzetting, krijgt nog 200 en wordt niet bewaard. De poort kijkt alleen bij de ingang, en `bewaar()` keert stil terug. | Zelf gezien door de herkeuring: `zet` verstuurd, 5 of 30 ms later de demote. `zet` antwoordde ±160 ms na de demote met 200, en na een nieuwe promotie stond er niets. | Zie besluitpunt 2. |
+| **N12** | P3 | VERIFIED FIXED (ronde 4) | `server/accounts/actietokens.js:31-48` | Een `tech2`- of inlogbewijs van vóór een wachtwoordwijziging werkt na die wijziging nog (vijf minuten). `verifyActionToken` kijkt niet naar `sessies_vanaf`. Voor het inlogbewijs was dat al zo vóór deze tak. | Zelf gezien door de herkeuring: de oude sessie gaf 401, het oude bewijs plus een herstelcode gaf 200 en een werkend token. | Actietokens laten vervallen bij `sessies_vanaf`, zoals sessietokens. Raakt elk doel, dus ook herstellinks. |
 | **N13** | P3 | OPEN | `server/routes/member/tweefactor.js` `/codes`, `/uit` | Een fout wachtwoord op `/codes` en `/uit` vult geen emmer. Met een gestolen sessie is het wachtwoord daar onbeperkt te raden. Al zo vóór deze tak. | Zelf gezien door de herkeuring: 30 foute wachtwoorden, 30 keer 403, geen 429. | De wachtwoordemmer van de inlog ook hier laten vullen. |
 | **N14** | P3 | OPEN | `server/trio-proxy.js` | De proxy geeft een 503 van een stand-by gewoon door aan de client. Opnieuw proberen gebeurt alleen bij een netwerkfout. | Alleen code gelezen, niet live. | Een 503 met `Retry-After` van een stand-by bij de volgende server proberen, als het lijf nog in handen is. |
 | **N15** | Info | OPEN | o.a. `/api/doos/update` | Een paar GET-routes schrijven. Op een stand-by gaan die schrijfacties stil verloren, want de poort laat GET door. | Herkeuring, code gelezen. | Die routes POST maken. |
@@ -516,6 +520,204 @@ bestaand token blijft werken, dus de eigenaar kan de stand-by wel bekijken.
   buiten de vier besluiten. N11 raakt het antwoord van elke route, en N12 elk
   soort actietoken. Ze horen eerst een besluit te krijgen.
 - N13 tot en met N16 zijn kleiner of bestonden al vóór deze tak.
+
+---
+
+## REMEDIATIESTATUS — ronde 4: N3, N11 en N12 (6 oktober 2026)
+
+Branch: `codex/rtg-v1-release-blockers` (PR #487). De eigenaar besliste over de
+drie besluitpunten van ronde 3, telkens met de aanbevolen keuze:
+
+- **N3:** (a), dezelfde tweede stap als de gewone inlog;
+- **N11:** (a), bij het antwoord opnieuw kijken;
+- **N12:** (a), elk actietoken vervalt bij de sessiegrens.
+
+Alle drie gingen in deze PR. De werkwijze is die van de vorige rondes, nu als
+workflow met een eigen branch per bevinding:
+
+1. een implementer bouwt de reparatie, met een regressietoets die op de basis
+   (`c881636c`) zakt;
+2. een andere agent herkeurt adversarieel;
+3. bevindingen binnen het besluit worden hersteld en opnieuw gekeurd (hooguit
+   twee rondes).
+
+Daarna is alles samengevoegd en deden **drie nieuwe keurders samen een
+eindkeuring**, elk vanuit een eigen hoek: de restpunten van N11, het samenspel
+van N3 en N12, en een brede regressie met de poorten. Een volledigheidscriticus
+las hun rapporten na.
+
+### Nieuw verdict (code): 🟡 CONDITIONAL GO — Release readiness: 84/100
+
+**Waarom hoger dan 81.**
+
+- **De laatste open P1 in de code (N3) is dicht, en dat is bewezen.** De
+  herkeuring en de eindkeuring speelden live na dat de eigenaar met tweede
+  factor via het aanmeldgesprek alleen een bewijs krijgt, en dat de
+  techniekpagina daarmee 401 geeft. Zonder dat bewijs geen sessie.
+- **N11** (P2 in het trio) en **N12** (P3) zijn dicht en herkeurd.
+- Er staat geen P0 of P1 meer open in de code.
+
+**Waarom niet hoger.**
+
+- De eindkeuring vond **twee P2's die er al vóór deze branch waren**:
+  - N18: een pad met een slash erachter komt langs de inlogpauze;
+  - N19: `/api/supplier/mijn/login` geeft een werksessie op alleen het
+    wachtwoord, ook als de tweede factor aan staat.
+- Die twee horen een besluit te krijgen. Het zijn twee nieuwe deuren naast de
+  deuren die N1 en N3 dichtdeden.
+- De externe poorten van ronde 1 (sectie F, F3–F6) staan nog open, en de
+  PostgreSQL-stand van N11 en N12 is niet live beproefd.
+
+**Voorwaarden voor GO:**
+
+- de externe poorten F3–F6;
+- **aanbevolen vóór GO: een besluit over N19 en N18** (zie de besluitpunten).
+
+### Per bevinding — BEFORE / FIX / AFTER / REGRESSIE
+
+| # | Sev | Status | Commits | BEFORE → AFTER | Regressie (zakt vóór, slaagt na) |
+|---|---|---|---|---|---|
+| N3 | P1 | **VERIFIED FIXED** | `b1a9a7a4`, `71ff5d0c`, `43c42fc8` | **Vóór:** `/api/aanmeld/zeg` gaf na de sleutelwoorden een sessie van 30 dagen, zonder tweede factor en zonder de poorten van `/api/auth/login`. **Na:** met de tweede factor aan komt alleen het antwoord van `tweefactor.inlogPoort` terug: een bewijs `inlog2` en een eigen zin ("Je sleutelwoorden kloppen"). `/api/auth/tweede` ruilt dat om met de gedeelde rem. Een account met actief 0 krijgt 403 met de tekst van de gewone inlog, ook als de tweede factor aan staat. `/api/aanmeld/zeg` staat in `INLOG_PADEN`. Zonder `tweefactor.inlogPoort` start de route niet, en `GRENZEN.json` laat het domein `tweefactor` lezen. Er is **geen client** van het gesprek (gegrept); het antwoord heeft dezelfde vorm als dat van `/api/auth/login`. | `test/aanmeldgesprek-tweede.test.js` 1-8. Op de basis zakten er 6 van de 7 (toets 1 bewaakt het ongewijzigde pad). Zes mutanten van de implementer en M8 van de herkeuring worden gevangen. |
+| N11 | P2 (trio) | **VERIFIED FIXED** | `e63e33dd`, `7762f1cd`, `43c42fc8`, `4a7327ec`, `fb7bcf56` | **Vóór:** een server die tijdens een verzoek werd afgezet, antwoordde 200 terwijl `bewaar()` stil niets bewaarde. **Na:** `server/opzet/standbypoort-antwoord.js` vervangt bij het antwoord een SUCCES door 503, met `Retry-After: 2`, `Cache-Control: no-store` en de tekst dat het niet vaststaat. Dat gebeurt als het proces bij de ingang schreef en bij het antwoord niet meer. Een stroom die al begonnen is, blijft ongemoeid. `server/lib/eindstatus.js` laat idem-poort, dubbeltik en `middleware/idempotentie` pas onthouden als vaststaat welke status vertrok. Zonder dat kreeg de herhaling waar de 503 om vraagt een bewaarde 200 over iets dat niet stond. | `test/standbypoort-antwoord.test.js` (25) en `test/standbypoort-race.test.js` (3). Op de basis braken alle vijf de racepogingen de invariant. In de eindkeuring werden 30 mutanten op `eindstatus.js` gedraaid: 23 gedood, 5 gelijkwaardig, en M18/M19 sinds `fb7bcf56` ook gedood. |
+| N12 | P3 | **VERIFIED FIXED** | `a9333c1a`, `313f60ca`, `43c42fc8` | **Vóór:** `verifyActionToken` keek niet naar `sessies_vanaf`. Een bewijs van vóór een wachtwoordwijziging gaf erna met een code een werkende sessie. **Na:** een actietoken draagt zijn uitgiftemoment als vijfde deel, en `server/accounts/sessiegrens.js` is de ENE vergelijking voor sessie- en actietokens. Een token in de oude vorm (zonder uitgiftemoment): dicht voor `inlog2`, `tech2` en `sso-overdracht`; als moment 0 voor `verify-email` en `mailwissel`. | `test/actietoken-sessiegrens.test.js` (22) en het e2e-scenario uit de herkeuring. Elk van de vijf doelen vervalt bij elk van de drie grenszetters. |
+
+### Herkeuringsverloop
+
+- **N3.** Herkeuring 1: VERIFIED FIXED, met drie P3's binnen het besluit:
+  - een toetsgat (M8);
+  - het commentaar "de ene inlogdeur" klopte niet;
+  - na sleutelwoorden plus code heet de inlog in het spoor
+    `wachtwoord+totp`.
+
+  Hersteld in `71ff5d0c`. Dat laatste label is een kanttekening die toets 8
+  vastlegt; er is met opzet geen nieuw veld bijgekomen. Herkeuring 2: VERIFIED
+  FIXED, met de slash als bevinding buiten het besluit (N18).
+- **N11.** Herkeuring 1: FIXED_MET_KANTTEKENING. Drie punten:
+  - de idempotentielagen onthielden een 200 vóór de haak er een 503 van maakte;
+  - een vervangen `sendFile` hield zijn bestand open;
+  - op koppen ontbraken toetsen.
+
+  Hersteld in `7762f1cd`. Herkeuring 2: VERIFIED FIXED, maar die herstelronde
+  gaf zelf een regressie: met een `Idempotency-Key` per verzoek een
+  `MaxListenersExceededWarning`. Daarnaast een toetsgat (E08). Beide hersteld in
+  `43c42fc8`.
+- **N12.** Herkeuring 1: VERIFIED FIXED, met een te ruim commentaar (hersteld in
+  `313f60ca`). Herkeuring 2: VERIFIED FIXED; alleen informatieve punten.
+- **Eindkeuring op `43c42fc8`** (drie keurders en een criticus):
+  - **samenspel: GROEN.** Live nagespeeld: het bewijs uit het gesprek vervalt
+    na een wachtwoordwijziging en na een herstel via e-mail. Een juiste code
+    zonder een van beide geeft een sessie. 60 auth-toetsbestanden: 449 van 450
+    geslaagd, 1 overgeslagen (PostgreSQL).
+  - **N11-restpunten: GROEN_MET_KANTTEKENING.** Er kwam geen waarschuwing meer
+    op een lidroute. M18/M19 overleefden: een onbegrensde grens zou een echt lek
+    verbergen. Hersteld in `fb7bcf56`.
+  - **regressie: ROOD**, op drie punten die door deze branch kwamen:
+    1. toets 3 van `standbypoort-race` zakt onder `RTG_ROUTELOG`. De
+       auditmeting van de testrun hangt dan een eigen luisteraar op; ook op de
+       basis gaf dat al een waarschuwing. Hersteld in `4a7327ec`;
+    2. de klokwacht-ratel steeg van 32 naar 39. De nieuwe toetsen wachten nu op
+       een toestand; hersteld in `fb7bcf56`;
+    3. `SEMANTIEK.json` en `CAPABILITEIT.json` liepen achter; herijkt.
+
+    De drie andere rode bestanden (sentinel, magnaat-capabilities, bewijskosten)
+    zijn ook rood op de basis. Ze komen door de omgeving: geen Rust-motor en een
+    ondiepe kloon.
+  - **CI op `fc8e7c1c`** zakte in scherf 3 op dezelfde toets 3. Daarmee is
+    ontdekt dat de CI `RTG_ROUTELOG` zet.
+
+  De herstelcommits na de eindkeuring (`4a7327ec`, `fb7bcf56`) zijn met
+  mutaties nagetrokken, maar **niet meer onafhankelijk herkeurd**. De CI op
+  `0b1d1ade` moet ze bevestigen.
+
+### Bewust zo
+
+- **N12, tokens in de oude vorm.** Een inlogbewijs van vóór de uitrol (`inlog2`,
+  `tech2`, `sso-overdracht`) wordt geweigerd; dat kost hooguit een nieuwe inlog.
+  Een mailboxlink (`verify-email`, `mailwissel`) telt als moment 0. Die valt
+  alleen af als er ooit een grens is gezet, net als een sessietoken zonder
+  uitgiftemoment.
+  - Voor `mailwissel` wijkt dat af van de aanbeveling: die leeft een etmaal en
+    geen minuten. De reden staat in de kop van `actietokens.js`.
+  - **Rol niet gemengd uit.** Een oude knoop aanvaardt nieuwe tokens zonder naar
+    de grens te kijken, en een nieuwe knoop weigert oude bewijzen.
+- **N3 heeft alleen een serverkant.** Er is geen scherm voor het gesprek. Komt
+  er een, dan hoort het `tweedeFactorNodig` af te handelen zoals het
+  ledeninlogscherm al doet.
+
+### Nieuwe bevindingen (OPEN)
+
+| ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
+|---|---|---|---|---|---|---|
+| **N18** | P2 | OPEN, al aanwezig | `server/middleware/remmen.js` `inlogpauzePoort` | De inlogpauze vergelijkt `req.path` letterlijk, maar de router laat een pad met een slash erachter bij dezelfde handler komen. Tijdens een gesprongen pauze gaf `/api/auth/login/` 200, en `/api/aanmeld/zeg/` een token. Dat geldt voor alle negen paden in `INLOG_PADEN`. | Zelf gezien door herkeuring 2 van N3, op de basis en op de fix. | Zie besluitpunt 2. |
+| **N19** | P2 | OPEN, al aanwezig | `server/routes/supplier/pda/posities.js:106` (`POST /api/supplier/mijn/login`) | Een lid met de tweede factor aan krijgt op alleen e-mail en wachtwoord een werksessie die aan zijn account hangt, zonder `tweefactor.inlogPoort`. Het pad staat ook niet in `INLOG_PADEN`. | Zelf gezien in de eindkeuring: `/api/auth/login` gaf een bewijs, `/api/supplier/mijn/login` gaf een token, en `/api/supplier/state` gaf daarmee 200. Op de basis precies zo. | Zie besluitpunt 1. |
+| **N20** | P3 | OPEN, al aanwezig | `server/accounts/actietokens.js` `verifyActionToken` | Een actietoken controleert `actief === 0` niet. Bij een uitgezet account geven alle vijf de doelen de gebruiker terug, terwijl een sessietoken daar null geeft. | Zelf gezien door de herkeuringen van N12. | Zie besluitpunt 3. |
+| **N21** | P3 | OPEN, al aanwezig | `server/routes/member/sessies.js` (sluit-overige) | "Sluit alle andere sessies" trekt per sessie in en verzet `sessies_vanaf` niet. Een openstaande mailwissel of een inlogbewijs blijft dus geldig; voor het inlogbewijs blijft wel een code nodig. | Zelf gezien in de herkeuring van N12 en in de eindkeuring. | Zie besluitpunt 3. |
+| **N22** | Info | OPEN, al aanwezig | kantoorroutes `/api/office/*` met `Idempotency-Key` | 12 'finish'-luisteraars bij een grens van 11: een `MaxListenersExceededWarning` per verzoek, ook in productie. Op de basis waren het 11 bij een grens van 10, dus de marge is gelijk gebleven. | Zelf gezien in de eindkeuring, op vier kantoorroutes. | Uitzoeken welke laag de negende luisteraar hangt; een `close`-luisteraar volstaat daar mogelijk. |
+| **N23** | Info | OPEN, al aanwezig | `server/accounts/herstel.js` tegenover `tokens.js` en `actietokens.js` | De grens wordt gezet met `lib/klok` (te verzetten met `RTG_KLOK`), de uitgifte met `Date.now()`. Onder een verzette klok vallen tokens verkeerd. In productie weigert `RTG_KLOK`. | Zelf gezien in de eindkeuring. | Beide met dezelfde klok. |
+| **N24** | P3 | OPEN, al aanwezig | `server/routes/aanmeldgesprek.js`, `server/kern/sleutelwoorden-uitdaging.js` | Het gesprek schrijft niets in het inlogspoor (`logInlog`), ook geen geweigerde poging. Daarnaast zegt het na de eerste twee woorden alleen "ik hoor je ... terug" als die twee goed waren. Wie gokt, weet dus vóór het derde woord of de eerste twee klopten. | Alleen in de code gelezen, door herkeuring 2 van N3. | Het spoor aansluiten. De echo pas na alle woorden geven. |
+| **N25** | Info | OPEN | PostgreSQL-stand van N11 en N12 | Niet live beproefd met een echte `DATABASE_URL`: de 503 boven de PG-grens, de commit die dan niet komt, en het verse lezen van `sessies_vanaf`. Alleen met de nepmotor van de toetsen. | Volledigheidscriticus van de eindkeuring. | De `*.pg.test.js` en `standbypoort-antwoord` draaien met een database (in CI gebeurt dat voor de PG-toetsen). |
+
+### Besluitpunten voor de eigenaar
+
+1. **N19 (P2): `/api/supplier/mijn/login` zonder tweede factor.**
+   - **(a) Aanbevolen:** dezelfde `inlogPoort` als `/api/auth/login`, met een
+     eigen bewijsdoel dat alleen deze deur omruilt. Het pad komt daarnaast in
+     `INLOG_PADEN`.
+   - (b) De werkplek alleen openen vanuit een bestaande lidsessie.
+   - (c) Zo laten, met de reden in het document.
+2. **N18 (P2): een slash achter een pad omzeilt de inlogpauze.**
+   - **(a) Aanbevolen:** in `inlogpauzePoort` het pad normaliseren (slashes aan
+     het eind weghalen) voordat de lijst wordt geraadpleegd. Met een toets op een
+     echte server.
+   - (b) Zo laten.
+3. **N20 en N21 (P3): de grens van actietokens.**
+   - **(a) Aanbevolen:** `verifyActionToken` weigert een uitgezet account, net
+     als een sessie. "Sluit alle andere sessies" blijft zoals het is, met de
+     reden in het document: er blijft een code nodig, en de knop gaat over
+     sessies.
+   - (b) Allebei: ook "sluit alle andere sessies" zet de grens. Dat logt het lid
+     op dit apparaat niet uit, maar maakt elke openstaande link ongeldig.
+   - (c) Zo laten.
+
+### Testbewijs (PASS / FAIL / INFRA / NIET GEVERIFIEERD)
+
+- **PASS: de regressiesuites op `fb7bcf56`.**
+
+  | Suite | Uitslag |
+  |---|---|
+  | `aanmeldgesprek-tweede` | 8/8 |
+  | `actietoken-sessiegrens` | 22/22 |
+  | `standbypoort-antwoord` | 25/25 |
+  | `standbypoort-race` | 3/3, ook met `RTG_ROUTELOG` |
+  | `klokwacht` | 6/6 (wachtschuld weer 32) |
+
+- **PASS: de suites eromheen.**
+  - De drie sporen en hun omgeving: 195/195.
+  - De idempotentielagen: 98/98.
+  - In de eindkeuring: 26 bestanden met idem, dubbeltik, idempotent, standby of
+    trio in de naam, en 60 auth-bestanden (449/450, 1 PostgreSQL overgeslagen).
+- **PASS: de statische poorten op `0b1d1ade`.** `npm run check` en `npm run
+  norm` zijn gehaald, net als de deltapoort tegen main en `document-fitness`.
+- **PASS: `registerklopt`**, op de bekende `bewijskosten` 9 na.
+- **PASS: CI op `c881636c`**: helemaal groen.
+- **FAIL, opgelost: CI op `fc8e7c1c`.** Scherf 3 zakte op toets 3 van
+  `standbypoort-race` (`RTG_ROUTELOG`); opgelost in `4a7327ec`.
+- **INFRA:**
+  - `bewijskosten` 9 (ondiepe kloon);
+  - sentinel en magnaat-capabilities zonder de Rust-motor;
+  - `gevolgcontract` zolang er worktrees van een workflow onder
+    `.claude/worktrees/` staan.
+- **NIET GEVERIFIEERD:**
+  - de CI op `0b1d1ade`;
+  - de PostgreSQL-stand (N25);
+  - een gemengde uitrol van N12;
+  - `npm run ci:lokaal` als geheel.
+
+### Wat deze ronde NIET heeft gedaan (bewust)
+
+N18 tot en met N25 zijn vastgelegd en niet gerepareerd. Ze bestonden al vóór
+deze branch of vallen buiten de drie besluiten, en horen eerst een besluit te
+krijgen.
 
 ---
 

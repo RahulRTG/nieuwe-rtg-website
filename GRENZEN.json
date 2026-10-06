@@ -5,7 +5,8 @@
       "intakeStart",
       "intakeZeg",
       "sessieregister",
-      "stateFor"
+      "stateFor",
+      "tweefactor"
     ],
     "aanmeldingen": [
       "aanmeldingen"

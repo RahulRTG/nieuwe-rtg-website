@@ -87,9 +87,15 @@ function hoofdzekering({ db, accounts, eigenaar }) {
    pointe van de ladder: een brute force richt zich op de inlog, dus de
    verdediging sluit de inlog -- niet de app. De zekering draagt een 'tot' en
    dooft vanzelf (zekeringGesprongen); de eigenaar kan hem eerder resetten of
-   juist handmatig trekken (dan zonder 'tot'). */
+   juist handmatig trekken (dan zonder 'tot').
+
+   /api/aanmeld/zeg hoort erbij (N3): langs de sleutelwoorden geeft dat gesprek
+   een sessie of een bewijs voor de tweede stap, en zonder deze regel was het de
+   ene inlogdeur die openbleef terwijl de rest dicht was. De pauze pas bij het
+   munten toetsen zou een orakel zijn: alleen na de JUISTE woorden een 503.
+   /api/aanmeld/start blijft open, want een gesprek beginnen geeft niemand iets. */
 const INLOG_PADEN = ['/api/login', '/api/auth/login', '/api/auth/register', '/api/auth/forgot',
-  '/api/auth/reset', '/api/office/login', '/api/supplier/login', '/api/staff/login'];
+  '/api/auth/reset', '/api/office/login', '/api/supplier/login', '/api/staff/login', '/api/aanmeld/zeg'];
 function inlogpauzePoort({ db }) {
   const { zekeringGesprongen } = require('../techniek');
   return (req, res, next) => {

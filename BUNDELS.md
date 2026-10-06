@@ -609,7 +609,7 @@ omlaag.
 
 ## `shared/clipdeler.js`
 
-`public/shared/clipdeler/` -- 2 delen, 218 regels in de delen
+`public/shared/clipdeler/` -- 2 delen, 225 regels in de delen
 
 | deel | onderwerp |
 |---|---|

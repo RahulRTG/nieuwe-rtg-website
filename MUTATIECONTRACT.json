@@ -1,31 +1,31 @@
 {
  "stempel": {
-  "op": "2026-10-06T20:11:27.279Z",
-  "commit": "8f1352869",
-  "boomVuil": false,
-  "boomAnders": 1,
+  "op": "2026-10-06T22:29:21.931Z",
+  "commit": "f8b75699",
+  "boomVuil": true,
+  "boomAnders": 8,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5322,
-  "geclassificeerd": 5297,
+  "totaal": 5326,
+  "geclassificeerd": 5301,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1278,
    "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 670,
-   "INTENTIONALLY_NON_IDEMPOTENT": 185
+   "INTENTIONALLY_NON_IDEMPOTENT": 189
   },
-  "vastgesteldDoorMens": 2185,
+  "vastgesteldDoorMens": 2189,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4381,
-   "PUBLIC": 138,
-   "OBJECT_SCOPED": 773,
-   "(niet af te leiden -- vraagt een verklaring)": 14,
+   "PUBLIC": 139,
+   "OBJECT_SCOPED": 775,
+   "(niet af te leiden -- vraagt een verklaring)": 15,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 175
+   "niet gemeten": 179
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -21249,6 +21249,25 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtc.ijs.gezinsbellen",
+   "route": "POST /api/foundation/gezin/ice",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "foundation.gezin.inloggen",
    "route": "POST /api/foundation/gezin/inloggen",
    "semantiek": {
@@ -25285,6 +25304,25 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtc.ijs.schoolbellen",
+   "route": "POST /api/foundation/school/ice",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": null,
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -32696,6 +32734,25 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtc.ijs.uitgeven",
+   "route": "POST /api/ice",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -86973,6 +87030,27 @@
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtc.ijs.gezin",
+   "route": "POST /api/rtf/ice",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinsPoort"
     ]
    },
    "bewijs": null,

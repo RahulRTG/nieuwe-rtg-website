@@ -16,7 +16,9 @@ const uitgifte = (mutatieId, toegang, gemeten) => ({ mutatieId, herkomst: 'mens'
 
 const CONTRACTEN = {
   'POST /api/ice': uitgifte('rtc.ijs.uitgeven',
-    { klasse: 'AUTHENTICATED', uitleg: 'een geldige Bearer-sessie (lid, personeel, zaak of kantoor); zonder sessie 401 en alleen STUN' },
+    { klasse: 'PUBLIC', waarom: 'De router laat iedereen binnen omdat elke soort sessie (lid, personeel, zaak, ' +
+      'kantoor) hier belt; de route stelt de actor zelf vast via resolveSession. Zonder geldige Bearer-sessie: 401 ' +
+      'en alleen STUN, dus geen credential. De rem is het plafond per actor (kern/rtc/ijs.js).' },
     'test/rtc-relay.test.js: zonder sessie 401 zonder TURN, met een lid een credential met kloppende HMAC en ' +
     'ondoorzichtig label, en na het plafond 429; test/schild.test.js idem'),
   'POST /api/rtf/ice': uitgifte('rtc.ijs.gezin',

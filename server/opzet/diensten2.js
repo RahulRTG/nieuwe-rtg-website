@@ -324,7 +324,7 @@ function auth(req, res, next) {
      nooit met de AI praat als kosteloos. */
   const drager = kostenhaak.drager('lid', sess.key);
   kostenhaak.meld('verzoek', 1, { drager, pas: sess.tier });
-  kostenhaak.binnen(drager, next, sess.tier);
+  require('./kritiekspoor').poort(req, res, sess.key, () => kostenhaak.binnen(drager, next, sess.tier));
   }
 }
 

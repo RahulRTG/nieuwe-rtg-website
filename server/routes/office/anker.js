@@ -26,7 +26,7 @@ module.exports = (octx) => {
    regel om te wijzigen. Waar het blok heen gaat is een besluit over uw
    infrastructuur, en dat hoort bij een mens. Zie server/lib/ankerdienst.js. */
 app.post('/api/office/anker', officeAuth, (req, res) => {
-  res.json(Object.assign({ ok: true, post: ankerpost.stand() },
+  res.json(Object.assign({ ok: true, post: ankerpost.stand(), periodiek: require('../../lib/ankertimer').stand() },
     ankerdienst.stand(req.body && req.body.blok ? req.body.blok : null)));
 });
 

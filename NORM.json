@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 2012,
-    "toetsenNietGemeten": 129,
+    "toetsenNietGemeten": 131,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -4021,6 +4021,16 @@
       "meter": "zelfpoortendeToetsen 46 -> 47",
       "reden": "test/gezinsdeur.pg.test.js (B18) vereist echte PostgreSQL- en Redis-diensten: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode en een rotatie op A tegen de oude code op B. Lokaal met die diensten gedraaid en groen; zonder het advisory lock en FOR UPDATE in server/pg/collectietransactie.js zakte hij 3 van 3. Hij staat in scripts/lib/pg-toetslijst.js en als uitzondering in deze norm.",
       "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL en Redis."
+    },
+    {
+      "datum": "2026-10-06",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 129,
+      "vervalt": "2027-01-04",
+      "meter": "toetsenNietGemeten 129 -> 131",
+      "reden": "test/kritiekspoor.test.js en test/ankertimer.test.js zijn nieuw (audit A-P1-05) en de mutatiemotor is er nog niet langs geweest. Met de hand nagetrokken: de uitkomst van de vastlegger negeren liet toets 2 van kritiekspoor zakken, de actor vervangen door anoniem liet toets 1 zakken, en een mislukte ankerronde als geslaagd noteren liet ankertimer zakken.",
+      "waarheen": "De eerstvolgende volledige mutatieronde meet ze en haalt ze uit deze telling."
     }
   ],
   "prestatie": {

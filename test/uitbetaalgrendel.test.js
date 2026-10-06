@@ -34,7 +34,8 @@ test('als het register ooit open staat wijst bewijs naar een bestaand dossier', 
 
 test('elke echte providertak van terugbetaling en uitbetaling gaat langs de grendel (bron)', () => {
   const lees = (p) => fs.readFileSync(path.join(__dirname, '..', p), 'utf8');
-  assert.match(lees('server/betaal.js'), /uitbetaalgrendel'\)\.eisOpen\('uitbetaling'\)/);
+  // maakUitbetaling woont sinds de opsplitsing van betaal.js in betaal/uitbetaling.js
+  assert.match(lees('server/betaal/uitbetaling.js'), /uitbetaalgrendel'\)\.eisOpen\('uitbetaling'\)/);
   assert.match(lees('server/betaal/naslag.js'), /uitbetaalgrendel'\)\.eisOpen\('terugbetaling'\)/);
 });
 

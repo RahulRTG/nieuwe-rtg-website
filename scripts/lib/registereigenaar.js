@@ -146,6 +146,8 @@ const EIGENAAR = {
   'RELEASEKETEN.md': { handmatig: true, lezer: 'test/releaseketenwacht.test.js',
     waarom: 'voorstel voor de releaseketen (A-P0-01); het document is een besluit en geen meting, en de toets leest ' +
       'het workflow waar het over gaat' },
+  'AUDITOPSLAG.md': { handmatig: true, lezer: 'test/auditopslag-pg.test.js',
+    waarom: 'legt de PG-stand van de auditopslag vast (A-P1-05); een besluit en geen meting, en de toets leest het document' },
   'BEREIK.json': { handmatig: true, lezer: 'test/bereikbaar.test.js',
     waarom: 'schuldlijst van schermen zonder klikroute; wordt met de hand bijgehouden en mag alleen krimpen. ' +
       'Precies daarom kon een nieuw script hem stil overschrijven zonder dat een schrijverscan iets zag.' },

@@ -145,6 +145,7 @@ jobs:
         run: |
           npm run ci-keten
           node scripts/document-fitness.js
+          npm run releaseketenwacht
           npm run check
       - name: Vertrouwde content-addressed main-basis zoeken
         id: basis

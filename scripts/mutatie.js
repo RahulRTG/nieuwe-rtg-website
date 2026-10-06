@@ -702,6 +702,11 @@ const EIGEN_MODULE = new Map([
      hem niet. Statisch ziet de motor dan geen module, en toetsenNietGemeten zou
      het schrijven van deze toets bestraffen. */
   ['zwaarstap.test.js', ['public/shared/zwaarstap.js']],
+  /* DE DEURVERKOOP laadt zijn route via een PADVARIABELE (require(ROUTE)) met
+     een nagemaakte kern, zodat twee kopers door elkaar kunnen lopen. Statisch
+     ziet de motor dan geen module. De bron is de route zelf: de vasthouding
+     na de await zetten laat toets 1 zakken. */
+  ['deurverkoop-race.test.js', ['server/routes/supplier/tickets-verkoop.js']],
   /* DE MOMENTPROEF wordt door zijn toets als TEKST gelezen (fs.readFileSync) en
      niet gerequired: de toets bewaakt de VORM van het instrument -- zakt het op
      een open schakel, draagt elke bevinding een reden, staan B en D er allebei --

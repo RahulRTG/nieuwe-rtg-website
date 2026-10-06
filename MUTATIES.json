@@ -2962,6 +2962,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "deurverkoop-race.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/supplier/tickets-verkoop.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "dienst-vervalt.test.js": {
       "soort": "puur",
       "staat": "gezakt",

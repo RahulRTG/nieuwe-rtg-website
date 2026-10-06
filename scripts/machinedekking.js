@@ -712,4 +712,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { meet, bouwGraaf, ASSEN, UIT_EXECUTIONMAP, ONGEMETEN };
+module.exports = { meet, bouwGraaf, ASSEN, UIT_EXECUTIONMAP, ONGEMETEN, BEWEZEN_LEZINGEN };

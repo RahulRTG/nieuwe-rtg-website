@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T16:29:29.071Z",
-    "commit": "6f75110b",
+    "op": "2026-10-06T07:59:14.353Z",
+    "commit": "43c42fc8",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -47,6 +47,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "aanmeldgesprek-tweede.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
       "scherp": "gezakt"
     },
     "aanmeldgesprek.test.js": {
@@ -167,6 +174,13 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "actietoken-sessiegrens.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "activering.test.js": {
       "soort": "puur",
@@ -14359,6 +14373,21 @@
       "operator": "getal+1#0",
       "gezakt": 3,
       "geprobeerd": 4
+    },
+    "standbypoort-antwoord.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/standbypoort.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "standbypoort-race.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "standbypoort.test.js": {
       "soort": "server",

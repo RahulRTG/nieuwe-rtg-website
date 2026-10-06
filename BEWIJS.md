@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2333 bestanden en 15999 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2332 bestanden en 15998 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2333 |
-| losse beweringen (`test(...)`) | 15999 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 249 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2158 |
+| toetsbestanden | 2332 |
+| losse beweringen (`test(...)`) | 15998 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2157 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2029 bestanden, 15470 beweringen.
+2028 bestanden, 15469 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -309,7 +309,6 @@ toets omvalt.
 | `codecredentials.test.js` | 19 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `codedeuren-claim.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor vier codedeuren die op 27 september 2026 van `remaining` naar `migrated` gingen: workos.concern_uitnodiging, office.kantooruitnodiging, service.balie_bevestigingscode en... |
 | `codegrens.test.js` | 3 | geen bruikbare mutatie | CODE-AI-001 -- DE RUNTIME-AI KOMT NOOIT AAN DE BRON. Dit huis heeft vandaag twee gescheiden intelligenties, en die scheiding is waardevoller dan hij eruitziet: RUNTIME het stuur (kern/stuur/*) bestuurt RTG via... |
-| `codevergelijking.test.js` | 4 | gezakt op `false->true#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `codewereld.test.js` | 7 | geen module gevonden | DE CODEWERELD TELT INDEXEN NIET ALS GEDRAG. Twee keer op rij sprong hier een dekkingsgetal omhoog zonder dat er iets bij was gekomen: eerst bij SYMBOLEN.json (bronbereik 33% -> 100%) en daarna bij AANROEPGRAAF.json... |
 | `collectie-transactie-sqlite.test.js` | 1 | gezakt op `===->!==#0` | De collectie-transactie tegen twee ECHTE processen op dezelfde SQLite-WAL. Eén verwachte revisie mag precies één keer winnen; een gooiende callback mag geen gewijzigde RAM- of schijfstaat achterlaten. |
 | `collega-namen.test.js` | 4 | gezakt op `liegpoort /api/` | De namenregel op de werkvloer: COLLEGA'S zien elkaar overal met de echte naam: het eigen rooster en team, het personeelsnetwerk tussen zaken van elk genre, en de ketenchat van de hulpdiensten. KLANTEN blijven op... |
@@ -1629,7 +1628,7 @@ toets omvalt.
 | `servicecaps-releasepoort.test.js` | 2 | geen module gevonden | SERVICECAPABILITIES ZIJN EEN RELEASEPOORT, GEEN RAPPORT. scripts/check.js heeft bewust een aflopende ratel voor dagelijks werk. |
 | `servicegesprek.test.js` | 6 | gezakt op `liegpoort /api/` | BELLEN NAAR RTG, BINNEN DE APP. Geen telefoonnet: geen provider, geen nummer, en geen telefoonnummer dat de identiteitskluis verlaat. |
 | `servicekwaliteit.test.js` | 6 | gezakt op `===->!==#0` | DE KWALITEITSMETING -- en vooral wat zij NIET meet. Een callcenter meet afhandeltijd en tickets per medewerker, en beloont daarmee precies het verkeerde: wie een zaak snel sluit scoort beter dan wie hem oplost. |
-| `servicemachtiging.test.js` | 11 | gezakt op `liegpoort /api/` | DE SERVICEMACHTIGING EN DE SUPPORTBEVESTIGING. TWEE GRENZEN DIE HIER WORDEN VASTGEZET. |
+| `servicemachtiging.test.js` | 14 | gezakt op `liegpoort /api/` | DE SERVICEMACHTIGING EN DE SUPPORTBEVESTIGING. TWEE GRENZEN DIE HIER WORDEN VASTGEZET. |
 | `servicemens.test.js` | 9 | gezakt op `liegpoort /api/` | "IK WIL EEN MENS" -- HET CONTRACT. DE FOUT DIE HIER WORDT VASTGEZET. |
 | `servicepatroon.test.js` | 6 | gezakt op `liegpoort /api/` | HET PATROON, HET INCIDENT EN HET FOUTSIGNAAL. DE SCHAALWINST WAAR DEZE LAAG VOOR BESTAAT: twintig mensen melden dezelfde storing, een mens bevestigt dat het er een is, en vanaf dat moment is het EEN technische... |
 | `servicepost.test.js` | 5 | gezakt op `liegpoort /api/` | RTMAIL ALS INGANG VAN RTG SERVICE -- en de twee dingen die daar mis kunnen gaan. Het besluit van de eigenaar was: de melder wordt teruggevonden via de IDENTITEITSKLUIS. |

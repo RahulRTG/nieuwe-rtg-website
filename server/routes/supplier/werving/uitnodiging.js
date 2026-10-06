@@ -117,10 +117,23 @@ module.exports = ({ kern }) => {
       encodeURIComponent(String(kassacode || ''));
   }
 
+  /* HOORT DEZE KASSACODE BIJ DIT BEDRIJF, en is hij nog bruikbaar? Alleen een
+     ja of nee, en er wordt niets geclaimd (N29). Zonder `lid` telt ook een code
+     die al geclaimd is: zo kan de aanmeldroute de code toetsen VOORDAT zij het
+     account bekijkt. Met `lid` alleen als die claim van dat lid is, precies
+     zoals verbindCode hem hervat (./uitnodiging-claim.js). */
+  const kassacodeHoortBij = (kassacode, supplierCode, lid) => transactie(bron => {
+    const inv = vindIn(bron, kassacode);
+    if (!inv || inv.supplierCode !== supplierCode) return false;
+    if (!inv.claim) return !geldig(inv);
+    if (!['bezig', 'voltooid'].includes(inv.claim.status) || herstelGeldig(inv)) return false;
+    return !lid || Number(inv.claim.memberId) === Number(lid.id);
+  });
+
   const ctx = { accounts, db, crypto, bearer, logActivity, notifySupplier,
     transactie, lijstVan, publiek, vindIn, geldig, herstelGeldig, supplierVanCode,
     idemHash, doel: DOEL, scope: SCOPE, dagen: DAGEN, dubbeltikMs: DUBBELTIK_MS, kern };
-  return Object.assign({ wervingsBasis, wervingsLink },
+  return Object.assign({ wervingsBasis, wervingsLink, kassacodeHoortBij },
     require('./uitnodiging-uitgifte')(ctx), require('./uitnodiging-claim')(ctx));
 };
 

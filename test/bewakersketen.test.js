@@ -106,8 +106,9 @@ const UITZONDERINGEN = new Map([
     'zaak (routes/supplier/werving/sollicitaties.js)'],
   ['POST /api/supplier/staff/join',
     'een nieuwe medewerker meldt zich met bedrijfsnaam plus kassacode; hij HEEFT ' +
-    'de zaak-inlog nog niet. Begrensd met tooManyTries op het IP-adres ' +
-    '(routes/supplier/werving/personeel.js)'],
+    'de zaak-inlog nog niet. Begrensd met tooManyTries op het IP-adres, de ' +
+    'accountemmer van de gewone inlog en de inlogpauze ' +
+    '(routes/supplier/werving/personeel-aanmelden.js)'],
   ['POST /api/supplier/roster',
     'het "wie ben jij"-scherm voor de personeelsinlog: op kassacode de namenlijst. ' +
     'Geen bewakerslaag maar wel een eigen snelheidsrem (rosterMag op het IP) in ' +

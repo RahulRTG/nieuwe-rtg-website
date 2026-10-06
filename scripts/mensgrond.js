@@ -169,9 +169,15 @@ function meet() {
 
     perKant[kant] = perKant[kant] || {};
     perKant[kant][d.uitkomst] = (perKant[kant][d.uitkomst] || 0) + 1;
-    perRoute.push({ methode: r.methode, pad: r.pad, rol, kant, uitkomst: d.uitkomst, duur: d.duur || null,
-      waarom: d.waarom, niveau, gronden: g.gronden.map(x => x.grond), effectgraad: prof.graad,
-      poorten: Object.keys(poorten).filter(n => poorten[n]), machineBereik: bereik, kandidaatKlaar: klaar });
+    /* Een rij draagt alleen wat iets zegt: `duur`, `machineBereik` en `kandidaatKlaar`
+       staan er alleen als ze gezet zijn, want over vierduizend rijen is een `false` per
+       veld een register dat niemand meer opent. */
+    const rij = { methode: r.methode, pad: r.pad, rol, kant, uitkomst: d.uitkomst, waarom: d.waarom, niveau,
+      gronden: g.gronden.map(x => x.grond), effectgraad: prof.graad, poorten: Object.keys(poorten).filter(n => poorten[n]) };
+    if (d.duur) rij.duur = d.duur;
+    if (bereik) rij.machineBereik = true;
+    if (klaar) rij.kandidaatKlaar = true;
+    perRoute.push(rij);
   }
   perRoute.sort((a, b) => (a.pad + a.methode).localeCompare(b.pad + b.methode));
 
@@ -260,7 +266,11 @@ function main() {
       process.exitCode = 3;
       return;
     }
-    fs.writeFileSync(DOEL, JSON.stringify(u, null, 1) + '\n');
+    /* Een rij per regel: leesbaar in een diff, en een derde van de omvang. */
+    const { perRoute, ...kop } = u;
+    const tekst = JSON.stringify(kop, null, 1).replace(/\n}$/, ',\n "perRoute": [\n' +
+      perRoute.map(r => '  ' + JSON.stringify(r)).join(',\n') + '\n ]\n}');
+    fs.writeFileSync(DOEL, tekst + '\n');
     console.log('  vastgelegd in MENSGROND.json\n');
     return;
   }

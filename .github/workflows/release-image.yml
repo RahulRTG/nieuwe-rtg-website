@@ -92,6 +92,8 @@ jobs:
             .release/release-gate-bewijs.json
             .release/staging-bewijs.json
             .release/afbouwoordeel.json
+            .release/artefactketen.json
+            .release/artefacttest-bewijs.json
             .release/prerelease-workflows.json
           include-hidden-files: true
           if-no-files-found: error
@@ -186,6 +188,34 @@ jobs:
           node scripts/imageherkomst.js --controle --eis-kandidaat --herkomst=.release/herkomst-backup.json \
             --sbom=.release/sbom-backup.json --image="$RTG_CANDIDATE_BACKUP_IMAGE" --draait="$backup_digest" \
             --commit="$GITHUB_SHA" --bewijs-inhoud="$inhoud"
+
+      # ------------------------------------------------------------------
+      # GARANTIE 1: DE TESTS OP EXACT DE GEPUBLICEERDE BYTES. Het digest hierboven
+      # is het artefact. Eerst wordt het ondertekend vastgelegd (gebouwd), dan
+      # haalt de test het OP BIJ DIGEST op, leest terug welk digest de engine
+      # ziet en draait de controles in dat image. Een tag of een herbouw kan hier
+      # niets verwisselen; na deze stap wordt er NIETS meer gebouwd (de wacht
+      # `geen-bouw-na-test` bewaakt dat). Zie RELEASEKETEN.md.
+      # ------------------------------------------------------------------
+      - name: Artefact (digest en image-id) ondertekend vastleggen
+        env:
+          RTG_RELEASE_SIGN_KEY: ${{ secrets.RTG_RELEASE_SIGN_KEY }}
+        run: |
+          digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_IMAGE" | cut -d@ -f2)"
+          backup_digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_BACKUP_IMAGE" | cut -d@ -f2)"
+          image_id="$(docker image inspect --format='{{.Id}}' "$RTG_CANDIDATE_IMAGE")"
+          backup_id="$(docker image inspect --format='{{.Id}}' "$RTG_CANDIDATE_BACKUP_IMAGE")"
+          node scripts/artefactketen.js gebouwd --commit="$GITHUB_SHA" --run="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --digest="$digest" --backup-digest="$backup_digest" --image-id="$image_id" --backup-image-id="$backup_id"
+      - name: De tests draaien tegen exact het gepubliceerde digest
+        env:
+          RTG_RELEASE_SIGN_KEY: ${{ secrets.RTG_RELEASE_SIGN_KEY }}
+        run: |
+          digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_IMAGE" | cut -d@ -f2)"
+          backup_digest="$(docker inspect --format='{{index .RepoDigests 0}}' "$RTG_CANDIDATE_BACKUP_IMAGE" | cut -d@ -f2)"
+          node scripts/artefactketen.js testen --commit="$GITHUB_SHA" --repo="${RTG_CANDIDATE_IMAGE%:*}" --digest="$digest" \
+            --backup-repo="${RTG_CANDIDATE_BACKUP_IMAGE%:*}" --backup-digest="$backup_digest"
+          node scripts/artefactketen.js controleer
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:

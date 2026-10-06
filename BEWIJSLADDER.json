@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-04T16:16:12.767Z",
-    "commit": "c02fe5304",
+    "op": "2026-10-06T13:09:57.012Z",
+    "commit": "dc1565f0",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/bewijsladder.js",
     "node": "v26.10.0"
   },
@@ -177,6 +177,23 @@
           "keten": [
             "ci.yml",
             "ronde.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
+        {
+          "doel": "scripts/releaseketenwacht.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
           ],
           "aanleiding": [
             "pull_request",
@@ -1404,7 +1421,7 @@
   "uitleg": "Welk bewijsmechanisme op welke sport van de bewijsladder staat, afgeleid uit de keten in .github/workflows en uit de scripts zelf. Per sport de stand (staat, een stap weg, bestaat niet) en per mechanisme of het lokaal draait, alleen in de keten, of beide.",
   "grens": "De SPORTEN zijn verklaard en niet gemeten: dat een soort bewijs hier ontbreekt, zegt deze meter niet. Van de mechanismen erop meet hij dat ze DRAAIEN en waar -- niet of het bewijs dat ze leveren goed is, en niet of het genoeg is. `alleenKeten` telt en oordeelt niet: zeven van die mechanismen lezen een artefact uit een andere job en kunnen lokaal per definitie niet draaien. En er staat met opzet geen samengesteld eindoordeel onder deze tabel (KEURING.md par. 5).",
   "telling": {
-    "mechanismen": 78,
+    "mechanismen": 79,
     "sporten": 12,
     "staat": 6,
     "stap": 6,

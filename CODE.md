@@ -90,13 +90,13 @@ het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
 
 `scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
 
-**<!--getal:symbolen.gelezen-->4560<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->23473<!--/getal--> benoemde symbolen met een regelnummer,
-<!--getal:symbolen.kanten-->6083<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
+**<!--getal:symbolen.gelezen-->5022<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->25712<!--/getal--> benoemde symbolen met een regelnummer,
+<!--getal:symbolen.kanten-->6874<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
 mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
 wat een impactvraag nodig heeft.
 
-<!--getal:symbolen.nietGelezen-->309<!--/getal--> bestanden zijn **niet** gelezen, en die staan in het register met hun
-reden: alle <!--getal:symbolen.bundeldeel-->309<!--/getal--> zijn bundeldelen (`public/apps/<naam>/`), fragmenten die middenin een
+<!--getal:symbolen.nietGelezen-->313<!--/getal--> bestanden zijn **niet** gelezen, en die staan in het register met hun
+reden: alle <!--getal:symbolen.bundeldeel-->313<!--/getal--> zijn bundeldelen (`public/apps/<naam>/`), fragmenten die middenin een
 functie beginnen en pas samengevoegd een programma vormen. Echte parsefouten:
 <!--getal:symbolen.parsefout-->0<!--/getal--> — en elke andere waarde dan nul laat het script met een foutcode
 eindigen, want een parsefout búiten een bundeldeel is een bevinding en geen ruis.
@@ -116,7 +116,7 @@ Eén detail dat er bijna stil verkeerd in ging, en dat overal elders net zo geld
 `module.exports` kent **drie** standen, niet twee. Een bestand dat
 `module.exports = (kern) => {...}` doet, exporteert wel degelijk iets maar zonder
 namen — dat als een lege lijst noteren leest als "exporteert niets", en dat is
-onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2150<!--/getal--> bestanden hier. Het register draagt daarom de vórm
+onwaar voor <!--getal:symbolen.uitvoerZonderNamen-->2343<!--/getal--> bestanden hier. Het register draagt daarom de vórm
 (`object`, `functie`, `anders`), en `geexporteerd` staat per symbool op
 `onbekend` in plaats van op een vals `nee`.
 
@@ -134,8 +134,8 @@ elke dekkingsvraag triviaal waar; alleen de tweede teller zegt nog iets.
 bronboom aflopen (dat doet `SCHRIJFANALYSE.json`) maar het de **router** vragen —
 wat de server werkelijk aanbiedt — en daar de plek in de bron bij zoeken.
 
-<!--getal:routebron.vergeleken-->4122<!--/getal--> routes kennen beide wegen (was 32), <!--getal:routebron.gelijk-->4090<!--/getal--> geven hetzelfde bestand,
-**<!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken** en <!--getal:routebron.verouderd-->32<!--/getal--> verschil dat er geen is.
+<!--getal:routebron.vergeleken-->4122<!--/getal--> routes kennen beide wegen (was 32), <!--getal:routebron.gelijk-->4085<!--/getal--> geven hetzelfde bestand,
+**<!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken** en <!--getal:routebron.verouderd-->36<!--/getal--> verschil dat er geen is.
 
 Dat ene verschil is de opbrengst van de hele oefening. `POST /api/auth/me` staat
 volgens de router in `inlog-pas.js` en volgens `SCHRIJFANALYSE.json` in
@@ -197,11 +197,11 @@ geldt:
    bestaan er". Daardoor heette `/api/instant-reality/event` dood terwijl de
    router hem gewoon aanbiedt — zijn routebestand staat op één regel, dus de
    bronindex vond hem niet. `ROUTEBRON.json` draagt daarom **twee** lijsten:
-   `alleRoutes` (<!--getal:routebron.routerRoutes-->5186<!--/getal-->, bestaan) en `perRoute` (met bestand), en
+   `alleRoutes` (<!--getal:routebron.routerRoutes-->5444<!--/getal-->, bestaan) en `perRoute` (met bestand), en
    <!--getal:routebron.zonderBestand-->4<!--/getal--> routes zitten wél in de eerste en niet in de tweede.
 
 Nul dode paden is hier geen lege controle: <!--getal:schermroutes.paden-->955<!--/getal--> exacte paden zijn tegen
-<!--getal:routebron.routerRoutes-->5186<!--/getal--> echte routes gehouden.
+<!--getal:routebron.routerRoutes-->5444<!--/getal--> echte routes gehouden.
 
 ### 0.4 De aanroepgraaf en de brug route → symbool (3 september 2026)
 

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-06T08:06:14.299Z",
-    "commit": "c0246cf67",
-    "boomVuil": true,
-    "boomAnders": 58,
+    "op": "2026-10-06T19:26:27.106Z",
+    "commit": "55bf229e5",
+    "boomVuil": false,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -7344,6 +7344,35 @@
       "gezakt": 6,
       "geprobeerd": 1
     },
+    "library-http.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "library-kernel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/library/model.js",
+      "operator": "===->!==#0",
+      "gezakt": 23,
+      "geprobeerd": 1
+    },
+    "library-sqlite.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "library-studio-reader.test.js": {
+      "soort": "puur",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
+    "library.pg.test.js": {
+      "soort": "puur",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 2
+    },
     "lidabonnement-deur.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7784,6 +7813,22 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "loop-fabric-academy-slice.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/loop-fabric/protocol.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "loop-fabric-architecture-gate.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/loop-fabric/invariants.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "loop-fabric-constitution.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7800,6 +7845,22 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "loop-fabric-decisions.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/loop-fabric-decisions.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "loop-fabric-delivery.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/loop-fabric/delivery.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 2
+    },
     "loop-fabric-execution.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7808,6 +7869,13 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "loop-fabric-http.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "loop-fabric-learning-eligibility.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7815,6 +7883,42 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
+    },
+    "loop-fabric-library-slice.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/loop-fabric/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "loop-fabric-lifecycle.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "loop-fabric-operations.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/loop-fabric/delivery.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "loop-fabric-routes.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/loop-fabric.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "loop-fabric-service-proof.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/zegel.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "loop-fabric-service-slice.test.js": {
       "soort": "puur",
@@ -7838,6 +7942,27 @@
       "module": "scripts/loop-fabric-unlock.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "loop-fabric-workos-slice.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/loop-fabric/protocol.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "loop-fabric.pg.test.js": {
+      "soort": "puur",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
+    "loop-fabric.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/loop-fabric/protocol.js",
+      "operator": "===->!==#0",
+      "gezakt": 12,
       "geprobeerd": 1
     },
     "loopbaan.e2e.js": {
@@ -9185,6 +9310,14 @@
       "reden": "toetst de opruimwacht van deze motor; die twee om elkaar heen draaien zegt niets"
     },
     "mutationproof-aggregate.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/mutationproof-model.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "mutationproof-canary.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/mutationproof-model.js",

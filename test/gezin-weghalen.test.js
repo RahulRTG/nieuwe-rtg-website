@@ -52,6 +52,7 @@ const morgen = n => new Date(Date.now() + (n || 1) * 86400000).toISOString().sli
    AVG-verzoek het gezin meteen, en dan valt er niets in te trekken. */
 async function gezin() {
   const g = (await api('/gezin/maak', { gezinsnaam: 'De Wit', naam: 'Ouder Een', pin: '2468' })).body;
+  await api('/gezin/toestemming/gezondheid', { code: g.code, token: g.token, aan: true }); // art. 9
   const mk = async (naam, rol) => {
     const p = (await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam, rol })).body;
     const t = (await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: p.profiel.id })).body.token;

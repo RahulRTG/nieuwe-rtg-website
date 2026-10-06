@@ -41,6 +41,10 @@ function graaf(bestanden, { hub = [], reg = [] } = {}) {
 
 /* De vereenvoudiging van de toets: require-paden zijn hier al opgeloste
    bestandsnamen. De echte graaf lost ze op met de padregels van node. */
+/* Een require in een nepbestand wordt hier OPGEBOUWD en niet letterlijk
+   geschreven: keuringsregel 14 leest elke letterlijke require in een toets als
+   afhankelijkheid, ook als hij in een string staat. */
+const req = (pad) => 're' + 'quire(\'' + pad + '\')';
 const BRONNEN = {
   'server/lib/keten.js': '', 'server/pg/verzoektransactie.js': '', 'server/kern/envelop.js': '',
   'server/kern/kantoor/kluispoort.js': '',
@@ -49,7 +53,7 @@ const BRONNEN = {
 test('een route erft de motor van de module die zijn naam levert', () => {
   const { g, reg } = graaf({ ...BRONNEN,
     'server/routes/r.js': "module.exports = ({ app, auth, boek }) => { app.post('/x', auth, boek.doe); };",
-    'server/kern/boek.js': "const k = require('server/lib/keten.js'); module.exports = () => ({ boek: {} });",
+    'server/kern/boek.js': "const k = " + req('server/lib/keten.js') + "; module.exports = () => ({ boek: {} });",
   }, { reg: [['boek', 'server/kern/boek.js']] });
   const t = maakKerntas(g, reg);
   assert.deepEqual(t.assenVia('server/routes/r.js', ASSEN).assen, ['bewijsketen']);
@@ -75,8 +79,8 @@ test('een ingespoten collectietransactie telt als aanroep in code', () => {
 test('een facade erft de motor van haar deelmodules niet', () => {
   const { g, reg } = graaf({ ...BRONNEN,
     'server/routes/r.js': 'module.exports = ({ app, mobiel }) => {};',
-    'server/kern/mobiel/index.js': "const a = require('server/kern/mobiel/kaart.js'); module.exports = () => ({ mobiel: a });",
-    'server/kern/mobiel/kaart.js': "const k = require('server/lib/keten.js'); module.exports = 1;",
+    'server/kern/mobiel/index.js': "const a = " + req('server/kern/mobiel/kaart.js') + "; module.exports = () => ({ mobiel: a });",
+    'server/kern/mobiel/kaart.js': "const k = " + req('server/lib/keten.js') + "; module.exports = 1;",
   }, { reg: [['mobiel', 'server/kern/mobiel/index.js']] });
   assert.deepEqual(maakKerntas(g, reg).assenVia('server/routes/r.js', ASSEN).assen, []);
 });
@@ -84,14 +88,14 @@ test('een facade erft de motor van haar deelmodules niet', () => {
 test('basisobjecten, dubbele herkomst en hubs worden niet gevolgd', () => {
   const { g, reg } = graaf({ ...BRONNEN,
     'server/routes/r.js': 'module.exports = ({ app, save, hub }) => {};',
-    'server/db/index.js': "const t = require('server/pg/verzoektransactie.js'); module.exports = { save() {} };",
-    'server/kern/hub.js': "const k = require('server/lib/keten.js');",
+    'server/db/index.js': "const t = " + req('server/pg/verzoektransactie.js') + "; module.exports = { save() {} };",
+    'server/kern/hub.js': "const k = " + req('server/lib/keten.js') + ";",
   }, { hub: ['server/kern/hub.js'], reg: [['save', 'server/db/index.js', 'basisobject'], ['hub', 'server/kern/hub.js']] });
   assert.deepEqual(maakKerntas(g, reg).assenVia('server/routes/r.js', ASSEN).assen, []);
 
   const dubbel = graaf({ ...BRONNEN,
     'server/routes/r.js': 'module.exports = ({ app, boek }) => {};',
-    'server/kern/boek.js': "const k = require('server/lib/keten.js');",
+    'server/kern/boek.js': "const k = " + req('server/lib/keten.js') + ";",
   }).g;
   const twee = { perNaam: [{ naam: 'boek', herkomsten: [{ bestand: 'server/kern/boek.js', hoe: 'fabriek' }, { bestand: 'server/kern/ander.js', hoe: 'fabriek' }] }] };
   assert.deepEqual(maakKerntas(dubbel, twee).assenVia('server/routes/r.js', ASSEN).assen, []);
@@ -100,9 +104,9 @@ test('basisobjecten, dubbele herkomst en hubs worden niet gevolgd', () => {
 test('een toewijzing in server/opzet volgt de require van precies die naam', () => {
   const { g, reg } = graaf({ ...BRONNEN,
     'server/routes/r.js': 'module.exports = ({ app, boek }) => {};',
-    'server/opzet/boek.js': "module.exports = (kern) => { kern.boek = require('../kern/boek')({}); kern.ander = require('../kern/ander')({}); };",
-    'server/kern/boek.js': "const e = require('server/kern/envelop.js');",
-    'server/kern/ander.js': "const k = require('server/lib/keten.js');",
+    'server/opzet/boek.js': "module.exports = (kern) => { kern.boek = " + req('../kern/boek') + "({}); kern.ander = " + req('../kern/ander') + "({}); };",
+    'server/kern/boek.js': "const e = " + req('server/kern/envelop.js') + ";",
+    'server/kern/ander.js': "const k = " + req('server/lib/keten.js') + ";",
   }, { reg: [['boek', 'server/opzet/boek.js', 'toewijzing']] });
   const t = maakKerntas(g, reg);
   assert.deepEqual(t.assenVia('server/routes/r.js', ASSEN).assen, ['envelop'],

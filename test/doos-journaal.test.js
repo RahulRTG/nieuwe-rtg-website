@@ -211,7 +211,11 @@ test('7. slot 4B: een wachtwoordsleutel in elke spelling en op elke diepte houdt
     const gemist = { herkend: [], geschreven: [], geldig: [], tegen: [] };
     const lengte = () => (db.data.doosJournaal || []).length;
     let seq = 0;
-    for (const spelling of SPELLINGEN) {
+    /* Elke weigering zegt het hardop (./proxy.js), met alleen het pad. Hier
+       560 keer, dus de regels worden geteld in plaats van getoond. */
+    const gezegd = []; const warn = console.warn;
+    console.warn = (m) => { gezegd.push(String(m)); };
+    try { for (const spelling of SPELLINGEN) {
       for (let niveau = 1; niveau <= MAX_DIEPTE; niveau++) {
         for (const lijst of [false, true]) {
           const waar = spelling + ' op niveau ' + niveau + (lijst ? ' via een lijst' : '');
@@ -232,12 +236,94 @@ test('7. slot 4B: een wachtwoordsleutel in elke spelling en op elke diepte houdt
           if (draagtWachtwoord(gewoon) || lengte() !== nu + 1 || !doos.journaalGeldig(tegen)) gemist.tegen.push(waar);
         }
       }
-    }
+    } } finally { console.warn = warn; }
     const kop = (l) => l.length + ' gemist, o.a. ' + l.slice(0, 4).join('; ');
+    assert.deepEqual(gezegd, Array(SPELLINGEN.length * MAX_DIEPTE * 2 - gemist.geschreven.length)
+      .fill('[doos] niet gejournald (wachtwoord in het lijf): ' + PAD_4B), 'elke weigering zegt het, met alleen het pad');
     assert.deepEqual(gemist.herkend, [], 'draagtWachtwoord herkent: ' + kop(gemist.herkend));
     assert.deepEqual(gemist.geschreven, [], 'schrijfJournaal weigert: ' + kop(gemist.geschreven));
     assert.deepEqual(gemist.geldig, [], 'journaalGeldig weigert bij het naspelen: ' + kop(gemist.geldig));
     assert.deepEqual(gemist.tegen, [], 'een gewone sleutel in dezelfde vorm gaat er wel in: ' + kop(gemist.tegen));
     assert.equal(lengte(), SPELLINGEN.length * MAX_DIEPTE * 2, 'precies de tegenproeven staan erin');
   } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+});
+
+/* DE REFVERTALING OVERLEEFT HET INKORTEN (ronde 6b). Slot 4A bewaart van een
+   antwoord alleen wat leerRefs leest, en dat moet dan ook ALLES zijn wat
+   leerRefs leest. Dezelfde twee regels gaan twee keer door speelNa, tegen een
+   nagemaakte cloud: een keer zoals schrijfJournaal ze ingekort bewaart, een keer
+   met het volle antwoord eronder (met de hand gezegeld, want schrijfJournaal kort
+   altijd in). De twee refkaarten moeten gelijk zijn aan elkaar EN aan de
+   uitgeschreven kaart. Dat laatste omdat het inkorten en leerRefs een lijst
+   delen: valt orderRef daaruit, dan verdwijnt hij aan beide kanten tegelijk en
+   ziet de vergelijking alleen niets. De tweede regel moet de cloud bereiken met
+   de cloudnummers, want daarvoor bestaat de kaart. En onder `id` en `ref` staat
+   ook een object en een getal: alleen een tekst gaat als ref mee, dus een
+   kassacode onder een object-`id` blijft buiten het journaal. */
+async function nepCloud(antwoord) {
+  const ontvangen = [];
+  const srv = http.createServer((req, res) => {
+    let lijf = '';
+    req.on('data', (d) => { lijf += d; });
+    req.on('end', () => {
+      let uit = null;
+      if (req.method === 'POST' && req.url === '/api/supplier/login') uit = { token: 'cloud-token' };
+      else if (req.method === 'POST' && req.url.startsWith('/api/supplier/order/')) {
+        ontvangen.push({ pad: req.url, body: JSON.parse(lijf || '{}') });
+        uit = req.url === '/api/supplier/order/maak' ? antwoord : { ok: true };
+      }
+      res.writeHead(uit ? 200 : 404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(uit || { error: 'onbekend' }));
+    });
+  });
+  await new Promise(ok => srv.listen(0, '127.0.0.1', ok));
+  return { ontvangen, base: 'http://127.0.0.1:' + srv.address().port,
+    dicht: () => new Promise(ok => { srv.closeAllConnections(); srv.close(ok); }) };
+}
+/* CLOUDS wordt bij het maken van de doos uit de omgeving gelezen; daarna mag hij terug. */
+function doosMetCloud(base) {
+  const was = process.env.RTG_DOOS_CLOUD;
+  process.env.RTG_DOOS_CLOUD = base;
+  try { return verseDoos(); } finally { if (was === undefined) delete process.env.RTG_DOOS_CLOUD; else process.env.RTG_DOOS_CLOUD = was; }
+}
+test('8. de ingekorte regel vertaalt bij het naspelen dezelfde nummers als het volle antwoord', async () => {
+  const VOL = { ok: true, token: 'werk.GEHEIM', order: {
+    ref: 'L-1', pickup: 'LP-1', orderRef: 'LO-1', kassacode: 'KC.GEHEIM',
+    id: { ref: 'L-2', kassacode: 'KC.GEHEIM' },          // een object onder id
+    bon: { ref: 17, pickup: 'LP-2' },                    // een getal onder ref
+    regels: [{ id: 'L-3', naam: 'soep' }] } };
+  const INGEKORT = { order: { ref: 'L-1', pickup: 'LP-1', orderRef: 'LO-1', id: { ref: 'L-2' }, bon: { pickup: 'LP-2' }, regels: [{ id: 'L-3' }] } };
+  const CLOUD = { ok: true, order: { ref: 'C-1', pickup: 'CP-1', orderRef: 'CO-1', id: { ref: 'C-2' }, bon: { ref: 18, pickup: 'CP-2' },
+    regels: [{ id: 'C-3', naam: 'soep' }] } };
+  const KAART = { 'L-1': 'C-1', 'LP-1': 'CP-1', 'LO-1': 'CO-1', 'L-2': 'C-2', 'LP-2': 'CP-2', 'L-3': 'C-3' };
+  const KLAAR = { orderRef: 'LO-1', ref: 'L-1', pickup: 'LP-2', regel: 'L-3', item: 'L-2', notitie: 'blijft' };
+  const KLAAR_IN_DE_CLOUD = { orderRef: 'CO-1', ref: 'C-1', pickup: 'CP-2', regel: 'C-3', item: 'C-2', notitie: 'blijft' };
+  const cloud = await nepCloud(CLOUD);
+  const dozen = [];
+  try {
+    // ingekort: zoals schrijfJournaal hem bewaart
+    const a = doosMetCloud(cloud.base); dozen.push(a);
+    a.doos.schrijfJournaal('/api/supplier/order/maak', { items: [1] }, VOL);
+    a.doos.schrijfJournaal('/api/supplier/order/klaar', KLAAR, { ok: true });
+    assert.deepEqual(a.db.data.doosJournaal[0].res, INGEKORT, 'alleen tekst onder een ref-sleutel gaat mee, ook in een object en een lijst');
+    assert.ok(!JSON.stringify(a.db.data.doosJournaal).includes('GEHEIM'), 'geen token en geen kassacode in de ingekorte regels');
+    assert.equal(await a.doos.speelNa(), true, 'het ingekorte journaal speelt na');
+    // vol: dezelfde regels met het volle antwoord eronder
+    const b = doosMetCloud(cloud.base); dozen.push(b);
+    const zegel = zegelVan(b.dir);
+    b.db.data.doosJournaal = [
+      { seq: 1, pad: '/api/supplier/order/maak', body: { items: [1] }, res: VOL, at: 1 },
+      { seq: 2, pad: '/api/supplier/order/klaar', body: KLAAR, res: { ok: true }, at: 2 }
+    ].map(e => Object.assign(e, { zegel: zegel(e) }));
+    assert.equal(await b.doos.speelNa(), true, 'het volle journaal speelt na');
+
+    assert.equal(a.db.data.doosJournaal.length + b.db.data.doosJournaal.length, 0, 'beide journalen zijn leeg nagespeeld');
+    assert.deepEqual(a.db.data.doosRefKaart, b.db.data.doosRefKaart, 'ingekort en vol leren dezelfde refkaart');
+    assert.deepEqual(a.db.data.doosRefKaart, KAART, 'de refkaart vertaalt ref, pickup, orderRef en id, ook genest en in een lijst');
+    const klaar = cloud.ontvangen.filter(o => o.pad === '/api/supplier/order/klaar').map(o => o.body);
+    assert.deepEqual(klaar, [KLAAR_IN_DE_CLOUD, KLAAR_IN_DE_CLOUD], 'de tweede regel bereikt de cloud met de cloudnummers, ingekort en vol');
+  } finally {
+    await cloud.dicht();
+    for (const d of dozen) { try { fs.rmSync(d.dir, { recursive: true, force: true }); } catch (e) {} }
+  }
 });

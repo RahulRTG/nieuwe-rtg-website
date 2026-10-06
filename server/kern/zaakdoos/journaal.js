@@ -43,7 +43,12 @@ function journaalPadOk(pad) {
    bewaren is bewaren wat niemand leest, en daar zat het geheim: een werktoken
    na een wissel, een nieuwe pincode, een kassacode, de code van een cadeaukaart.
    Nooit "alles behalve het gevoelige": een veld dat er morgen bij komt, blijft
-   buiten het journaal. De vorm blijft staan, zodat leerRefs hetzelfde pad loopt. */
+   buiten het journaal. De vorm blijft staan, zodat leerRefs hetzelfde pad loopt.
+   Alleen een TEKST gaat als ref mee; onder een object-`id` wordt verder gezocht,
+   zodat wat daar naast een ref staat thuisblijft. Toets 8 van
+   test/doos-journaal.test.js speelt een ingekorte en een volle regel na en eist
+   van allebei dezelfde, uitgeschreven refkaart: een vergelijking alleen zou een
+   sleutel missen die uit deze gedeelde lijst valt. */
 const REF_SLEUTELS = Object.freeze(['ref', 'id', 'pickup', 'orderRef']);
 function alleenRefs(x) {
   if (!x || typeof x !== 'object') return null;

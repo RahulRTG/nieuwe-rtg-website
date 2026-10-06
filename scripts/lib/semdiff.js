@@ -171,8 +171,15 @@ function ontleed(ruw) {
 
   return [...bestanden.values()].map((f) => {
     const k = klasseVanBestand(f.pad, f.regels);
+    /* `cosmetic` is een oordeel over CODE: alleen commentaar en witruimte
+       veranderden. isCosmetisch leest daarvoor de commentaartekens van JS, en die
+       betekenen in Markdown iets anders -- een regel die met `**` begint is daar
+       vet gedrukte tekst. Een document dat alleen zulke regels kreeg, heette
+       daarom cosmetisch, terwijl klasseVanBestand een document altijd
+       `documentatie` noemt. Alleen code kan dus "alleen commentaar" zijn. */
+    const kanCosmetisch = soortVan(f.pad) === 'code';
     return { pad: f.pad, soort: soortVan(f.pad), verwijderd: f.verwijderd,
-      klasse: f.regels.length ? k.klasse : (f.cosmetisch ? 'cosmetic' : k.klasse),
+      klasse: f.regels.length || !kanCosmetisch ? k.klasse : (f.cosmetisch ? 'cosmetic' : k.klasse),
       regels: f.regels.length, cosmetisch: f.cosmetisch, redenen: k.redenen };
   }).sort((x, y) => x.pad.localeCompare(y.pad));
 }

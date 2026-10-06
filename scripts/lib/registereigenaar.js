@@ -174,6 +174,9 @@ const EIGENAAR = {
     waarom: 'Handmatig geschreven grondwet (de universele bodem en SAM-01 t/m 07); de meetgetallen erin komen uit ONVERVREEMDBAAR.json en zijn met de hand overgenomen, er is geen generator die het schrijft.' },
   'LANGUAGE-AUDIT.md': { soort: 'BRON',
     waarom: 'Handmatig beoordeelde bevindingen en resterende taalgrenzen; geen automatisch gegenereerd register.' },
+  'ZERO.md': { soort: 'BRON',
+    waarom: 'de grondwet van het Zero-Debt-programma: besluiten en de ontleding van golf 0, met de hand geschreven; ' +
+      'de getallen erin zijn een gedateerde nulmeting en geen register' },
   /* De aanleiding zelf. Er is geen schrijvend script: de lijst wordt met de hand
      onderhouden en mag alleen krimpen. */
   /* De consolidatieronde van 23 september 2026: de meting (welke schermen

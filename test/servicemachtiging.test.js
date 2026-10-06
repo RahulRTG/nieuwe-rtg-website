@@ -36,7 +36,7 @@ test('een machtiging versmalt alleen, en zegt wat er wegviel', async () => {
   const l = laag();
   const z = l.zaken.open({ melder: 'user-1', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
   const v = await l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', reden: REDEN,
-    capabilities: ['organisatie.stand', 'betaling.stand', 'verzonnen.recht'] });
+    capabilities: ['organisatie.stand', 'betaling.stand', 'verzonnen.recht'], bevestigd: ['organisatie.stand', 'betaling.stand', 'verzonnen.recht'] });
   assert.deepEqual(v.machtiging.capabilities, ['organisatie.stand'],
     'er kwam iets bij dat het team niet nodig heeft: ' + JSON.stringify(v.machtiging.capabilities));
   assert.deepEqual(v.geweigerd.sort(), ['betaling.stand', 'verzonnen.recht'],
@@ -47,7 +47,7 @@ test('een machtiging opent niets bij een andere zaak', async () => {
   const l = laag();
   const a = l.zaken.open({ melder: 'user-1', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
   const b = l.zaken.open({ melder: 'user-1', onderwerp: 'zaak', titel: 'Tweede werkruimtevraag' }).zaak;
-  const v = await l.machtigingen.verleen({ zaakId: a.id, mens: 'nadia', reden: REDEN, capabilities: ['organisatie.stand'] });
+  const v = await l.machtigingen.verleen({ zaakId: a.id, mens: 'nadia', reden: REDEN, capabilities: ['organisatie.stand'], bevestigd: ['organisatie.stand'] });
   assert.equal(l.machtigingen.magNu(v.machtiging.id, 'organisatie.stand', { zaakId: a.id }).mag, true);
   const nee = l.machtigingen.magNu(v.machtiging.id, 'organisatie.stand', { zaakId: b.id });
   assert.equal(nee.mag, false, 'dezelfde mens opende met een machtiging van zaak A ook zaak B');
@@ -57,7 +57,7 @@ test('een machtiging opent niets bij een andere zaak', async () => {
 test('verlopen is een berekende toestand en geen opruimactie', async () => {
   const l = laag();
   const z = l.zaken.open({ melder: 'user-1', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
-  const v = await l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', reden: REDEN, capabilities: ['organisatie.stand'] });
+  const v = await l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', reden: REDEN, capabilities: ['organisatie.stand'], bevestigd: ['organisatie.stand'] });
   /* De klok terugzetten in de opslag, niet de stand. Zou er ergens een
      opgeslagen `verlopen: true` staan, dan blijft deze machtiging geldig tot
      een schoonmaker langskomt -- en dan hangt de belofte "hij verloopt vanzelf"
@@ -71,7 +71,7 @@ test('een bevoegdheid zonder lezer krijgt geen machtiging of zware ceremonie', a
   const l = laag();
   const z = l.zaken.open({ melder: 'user-1', onderwerp: 'account', titel: 'Ik kan niet meer inloggen' }).zaak;
   assert.equal(z.team, 'toegang');
-  const v = await l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', capabilities: ['identiteit.openen'],
+  const v = await l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', capabilities: ['identiteit.openen'], bevestigd: ['identiteit.openen'],
     reden: 'account recovery, het lid meldt zich aan de balie' });
   assert.equal(v.status, 403);
   assert.deepEqual(v.geweigerd, ['identiteit.openen']);
@@ -244,7 +244,7 @@ test('D16. zonder vaststaand spoor geen machtiging: weigering, fout en geen jour
   for (const [naam, journaal] of Object.entries(gevallen)) {
     const l = laagMet(journaal);
     const z = l.zaken.open({ melder: 'user-1', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
-    const v = await l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', reden: REDEN, capabilities: ['organisatie.stand'] });
+    const v = await l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', reden: REDEN, capabilities: ['organisatie.stand'], bevestigd: ['organisatie.stand'] });
     assert.equal(v.status, 503, naam + ': ' + JSON.stringify(v));
     assert.equal((l.db.data.serviceMachtigingen || []).length, 0, naam + ': er ontstond toegang zonder spoor');
   }
@@ -258,7 +258,7 @@ test('D16. het spoor staat vast VOORDAT de machtiging bestaat', async () => {
     return { ok: true };
   } });
   const z = l.zaken.open({ melder: 'user-1', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;
-  const v = await l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', reden: REDEN, capabilities: ['organisatie.stand'] });
+  const v = await l.machtigingen.verleen({ zaakId: z.id, mens: 'nadia', reden: REDEN, capabilities: ['organisatie.stand'], bevestigd: ['organisatie.stand'] });
   assert.ok(v.ok, JSON.stringify(v));
   assert.equal(opHetMoment, 0, 'de machtiging stond al in de opslag toen het spoor werd geschreven');
   assert.equal(l.db.data.serviceMachtigingen.length, 1);

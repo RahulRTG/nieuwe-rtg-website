@@ -103,6 +103,7 @@ module.exports = (h) => {
     /* VERSMALLEN GEBEURT BIJ HET AANVAARDEN EN NIET BIJ HET VRAGEN. Zo staat er
        in de opslag wat er WERKELIJK geldt, en niet wat iemand ooit vroeg. */
     const smal = M.versmalMachtiging(bevoegdhedenVan(clientKey), m);
+    if (smal.onbepaalbaar) return { status: 503, error: smal.reden, code: smal.onbepaalbaar.code };
     if (!smal.bevoegdheden.length) {
       return { status: 409, error: 'Na uw eigen grens blijft er niets van deze machtiging over. ' +
         'Er valt dus niets te aanvaarden.' };

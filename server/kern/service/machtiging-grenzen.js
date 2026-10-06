@@ -33,4 +33,22 @@ const ZWAAR = {};
 const AI_VOOR = 'ai:';
 const isAi = (wie) => String(wie || '').startsWith(AI_VOOR);
 
-module.exports = { ZWAAR, AI_VOOR, isAi };
+/* DE VERSMALLING VAN EEN SERVICEMACHTIGING, op de huiswet uit
+   kern/namens/versmalling.js en niet op een eigen doorsnede:
+     gevraagd       wat de medewerker vraagt
+     geverEffectief wat het LID zelf bevestigde -- zonder bevestiging is er geen
+                    gever, en dan gaat er niets open (ONBEKEND, niet LEEG)
+     beleid         wat het team voor deze zaak nodig heeft
+     context        voor een AI-aanroeper valt zwaar werk weg
+   De uitslag draagt per afgevallen capability de bron die hem tegenhield. */
+const { versmalNamens } = require('../namens/versmalling');
+function versmalService({ gevraagd, bevestigd, teamMag, mens }) {
+  const context = gevraagd.filter(c => !(isAi(mens) && ZWAAR[c]));
+  const r = versmalNamens({ gevraagd, geverEffectief: Array.isArray(bevestigd) ? bevestigd : null,
+    beleid: teamMag, context });
+  if (!r.ok) return { gekregen: [], geweigerd: gevraagd.slice(), onbepaalbaar: r.weigering };
+  const gekregen = gevraagd.filter(c => r.effectief.includes(c));
+  return { gekregen, geweigerd: gevraagd.filter(c => !gekregen.includes(c)), versmald: r.versmald, onbepaalbaar: null };
+}
+
+module.exports = { ZWAAR, AI_VOOR, isAi, versmalService };

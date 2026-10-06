@@ -1284,6 +1284,14 @@
       "gezakt": 3,
       "geprobeerd": 2
     },
+    "benoemde-toekenningen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/namens/versmalling.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "beproeving-contract.test.js": {
       "soort": "puur",
       "staat": "gezakt",

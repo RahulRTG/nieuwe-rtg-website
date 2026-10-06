@@ -40,6 +40,7 @@ const { naAntwoord } = require('../lib/antwoord-einde');
    gemeten wordt, wat die meting NIET ziet en wat hij kost erbij. */
 const { tel, verschil } = require('./handelingtelling');
 const mutatietracker = require('../db/mutatietracker');
+require('../lib/losvanverzoek');   // nulcontext vastleggen VOOR het eerste verzoek
 const context = new AsyncLocalStorage();
 
 /* De grens waarboven een handeling het vermelden waard is. Bewust geen blokkade:
@@ -62,10 +63,11 @@ function huidige() {
 /* Een handeling laten zeggen wat hij aanraakt, voor wat een rij-telling niet
    ziet (een wijziging BINNEN een rij). HIJ MELDT EN HIJ WEIGERT NIET: buiten een
    verzoek geeft hij false, en een aanroeper mag dat nooit als toestemming lezen
-   -- anders liep een loonrun vast op een meting. */
+   -- anders liep een loonrun vast op een meting. Na afloop ook, en geteld. */
 function raakt(soort, aantal) {
   const h = huidige();
   if (!h) return false;
+  if (h.gesloten) { naAfloopMeld('handeling', soort); return false; }
   const n = Number(aantal);
   h.gemeld.push({ soort: String(soort || 'onbekend').slice(0, 60), aantal: Number.isFinite(n) ? n : 1 });
   return true;
@@ -84,6 +86,22 @@ function observeer(feit) {
     { collectie: feit.collectie, van: feit.voorLengte, naar: feit.naLengte });
   return true;
 }
+/* NA AFLOOP ZEGT NIEMAND STIL "GELUKT" (Fase 2, I5). Een timer of een losse
+   belofte erft de context van het verzoek dat hem startte; schrijft hij na
+   `finish`, dan leest niemand het meer (de meting, de effectkop, het
+   AI-label zijn weg). Elke context die dat merkt, telt het HIER, en de eerste
+   keer per soort ook in het log. afgelopen() is de enige vraag; de handeling
+   is de levensduur van het verzoek, tot er een verzoekframe is. */
+const naAfloopTeller = Object.create(null);
+function afgelopen() { const h = huidige(); return !!(h && h.gesloten); }
+function naAfloopMeld(laag, soort) {
+  const k = laag + ':' + String(soort || 'onbekend').slice(0, 60);
+  if (!naAfloopTeller[k]) {
+    try { require('../log').log.warn('schrijven na afloop van het verzoek', { k, p: (huidige() || {}).pad }); } catch (e) {}
+  }
+  naAfloopTeller[k] = (naAfloopTeller[k] || 0) + 1;
+}
+const naAfloop = () => Object.assign({}, naAfloopTeller);
 
 /* De meting afsluiten en de uitslag teruggeven. Apart van de middleware zodat
    een toets hem kan aanroepen zonder een server op te zetten -- en zodat de
@@ -193,4 +211,5 @@ function hervat() {
 
 mutatietracker.voegWaarnemerToe(observeer);
 
-module.exports = { middleware, hervat, huidige, raakt, observeer, sluit, tel, verschil, GRENS };
+module.exports = { middleware, hervat, huidige, raakt, observeer, sluit, tel, verschil, GRENS,
+  afgelopen, naAfloopMeld, naAfloop };

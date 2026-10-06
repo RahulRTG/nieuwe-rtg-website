@@ -67,6 +67,7 @@
 'use strict';
 
 const { AsyncLocalStorage } = require('async_hooks');
+const handeling = require('./opzet/handeling');
 
 /* Dezelfde vlag als de opslagmeter (server/staatlog.js). Uit is de stand die je
    krijgt als je niets doet. */
@@ -110,7 +111,11 @@ function perVerzoek(fn) {
 function tel(soort, hoeveel) {
   const t = winkel.getStore();
   if (!t || !Object.prototype.hasOwnProperty.call(t, soort)) return;
+  /* Na afloop is de kop al weg: tellen zou een teller ophogen die niemand meer
+     leest. Dat wordt zichtbaar geteld in opzet/handeling.js (I5). */
+  if (handeling.afgelopen()) { handeling.naAfloopMeld('effectmeter', soort); return false; }
   t[soort] += (hoeveel == null ? 1 : Number(hoeveel)) || 0;
+  return true;
 }
 
 /* De teller van DIT verzoek, of null. Voor wie de stand niet als tekst wil maar als

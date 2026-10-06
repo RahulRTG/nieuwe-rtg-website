@@ -2720,6 +2720,22 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "contextdoorgifte-server.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/contextdoorgifte.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "contextdoorgifte.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/contextdoorgifte.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
     "contextpakket.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7823,6 +7839,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "losvanverzoek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kosten/haak.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 10
+    },
     "luchthaven-vip.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -9241,6 +9265,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 9,
       "scherp": "gezakt"
+    },
+    "naafloop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/handeling.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "naamlaag.test.js": {
       "soort": "server",

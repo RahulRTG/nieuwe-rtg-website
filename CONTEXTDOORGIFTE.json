@@ -1,0 +1,100 @@
+{
+ "stempel": {
+  "op": "2026-10-05T09:39:18.071Z",
+  "commit": "df9163df2",
+  "boomVuil": false,
+  "boomAnders": 0,
+  "instrument": "scripts/contextdoorgifte.js",
+  "node": "v22.22.0"
+ },
+ "uitleg": "Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Zes invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.",
+ "hoe": "npm run contextdoorgifte",
+ "grens": "Alleen statische leden- en zaakroutes die de rolkaart een rol geeft (vandaag allemaal POST, zie noemer.perMethode) met een leeg lijf, geen PostgreSQL- of Redis-stand, alleen timers via de globale timerfuncties. Een lege noemer is niet vast te stellen.",
+ "richting": {
+  "i1AandeelMetCorrelatie": "omhoog",
+  "i3CorrelatieOneens": "omlaag",
+  "i4LekPlekken": "omlaag",
+  "i5StilNaSluiten": "omlaag",
+  "i9EnterWith": "omlaag",
+  "i10AuthZonderContext": "omlaag"
+ },
+ "ratel": {
+  "i5StilNaSluiten": 0,
+  "i9EnterWith": 0,
+  "i1AandeelMetCorrelatie": 0,
+  "i3CorrelatieOneens": 0,
+  "i10AuthZonderContext": 0,
+  "i4LekPlekken": 0
+ },
+ "gemeten": {
+  "i5": {
+   "perContext": {
+    "handeling": "weigert",
+    "effectmeter": "weigert",
+    "kosten/haak": "meldt",
+    "ai-context": "weigert",
+    "verzoekcontext": "weigert",
+    "bijeen": "weigert"
+   },
+   "stilNaSluiten": 0,
+   "contexten": 6
+  },
+  "i9": {
+   "enterWith": 0,
+   "waar": []
+  },
+  "i1": {
+   "binnenVerzoek": 60,
+   "metVerzoekCorrelatie": 0,
+   "metActor": 0,
+   "metSessie": 46,
+   "kanalen": {
+    "rtg:sessies:v1": 20,
+    "sse": 34,
+    "link-rem": 2,
+    "rtg:intrekking:v1": 4
+   },
+   "aandeelMetCorrelatie": 0
+  },
+  "i3": {
+   "authPunten": 3103,
+   "eens": 3103,
+   "oneens": 0
+  },
+  "i4": {
+   "gezetInVerzoek": 0,
+   "gevuurdNaAfloop": 0,
+   "naAfloopMetDrager": 0,
+   "naAfloopMetAiSessie": 0,
+   "plekken": {},
+   "lekPlekken": 0
+  },
+  "i10": {
+   "authPunten": 3103,
+   "metHandeling": 3103,
+   "metAiContext": 3103,
+   "metEffectteller": 3103,
+   "post": 3103,
+   "postMetAlleDrie": 3103
+  },
+  "noemer": {
+   "verzoeken": 3175,
+   "perMethode": {
+    "POST": 3175
+   },
+   "statussen": {
+    "200": 787,
+    "400": 479,
+    "403": 722,
+    "404": 950,
+    "409": 176,
+    "503": 61
+   },
+   "rollen": [
+    "member",
+    "supplier"
+   ],
+   "sessieHernieuwd": 9
+  }
+ }
+}

@@ -526,6 +526,7 @@ const REGISTERS = [
   ['SCHERMFUNCTIE.json', 'npm run schermfunctie', 'welke paren schermen dezelfde API-paden aanroepen, en welke schermen doorverwijzen -- de meting onder SCHERMEIGENAAR.json'],
   ['ROUTEBRON.json', 'node scripts/routebron.js --vastleggen', 'de routelijst waar SCHERMROUTES tegen meet -- veroudert hij, dan verzint de dode-padenteller er'],
   ['CONTEXTPROEF.json', 'node scripts/contextproef.js --vastleggen', 'of de async-context blijft staan waar hij moet blijven staan'],
+  ['CONTEXTDOORGIFTE.json', 'npm run contextdoorgifte', 'of de identiteit van een verzoek door de async-contexten loopt waar hij hoort, en niet verder (Fase 2, I1-I10)'],
   ['FAALPROEF.json', 'node scripts/faalproef.js --vastleggen', 'wat er gebeurt als een afhankelijkheid wegvalt'],
   /* LUSSEN.json veroudert sneller dan de meeste registers, want elke lus die
      erbij komt is een lus die er niet in staat. Een verouderde lusindex ziet er

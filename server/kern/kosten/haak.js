@@ -27,8 +27,8 @@
    account zijn ECHTE huiskosten; ze op een willekeurig lid boeken zou een
    factuur opleveren voor iets dat dat lid niet heeft gedaan.
 
-   Geen require's in dit bestand, met opzet: server/ai.js hangt eraan en die
-   moet kunnen laden zonder dat de kern bestaat. */
+   Geen require's bovenin dit bestand, met opzet: server/ai.js hangt eraan en
+   die moet kunnen laden zonder dat de kern bestaat. */
 'use strict';
 
 const { AsyncLocalStorage } = require('async_hooks');
@@ -95,6 +95,11 @@ function meld(soortId, aantal, opties) {
   if (!sink) return false;
   const o = opties || {};
   const s = context.getStore();
+  /* NA AFLOOP VAN HET VERZOEK (I5) blijft de drager staan -- werk dat dit
+     verzoek in gang zette, is zijn kost -- maar het wordt geteld in plaats van
+     stil geboekt. Lui geladen: de kop van dit bestand belooft dat ai.js het
+     zonder kern kan laden. */
+  try { const h = require('../../opzet/handeling'); if (h.afgelopen()) h.naAfloopMeld('kosten', soortId); } catch (e) {}
   try { return !!sink({ drager: o.drager || wieNu(), soort: soortId, aantal,
     pas: o.pas || (s && s.pas) || null, bron: o.bron || null }); }
   catch (e) { return false; }

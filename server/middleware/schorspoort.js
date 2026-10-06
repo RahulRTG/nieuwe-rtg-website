@@ -43,10 +43,16 @@ module.exports = ({ pad, ttlMs, log } = {}) => {
     if (!SCHRIJFT.has(req.method) || !req.path.startsWith('/api/')) return next();
     /* De vervalstaat komt uit de GEDEELDE lezer (server/lib/vervalstaat.js),
        dezelfde die de bewijspoort van het AI-stuur gebruikt: een waarheid,
-       twee poorten. */
+       twee poorten. Die lezer zoekt het pad op zoals de router het leest
+       (N26): /api/x/ is dezelfde handler als /api/x, dus ook dezelfde
+       schorsing. */
     const s = staatVan(req.method, req.path, { pad, ttlMs });
     if (!s || s.staat !== 'geschorst') return next();
-    const sleutel = req.method + ' ' + req.path;
+    /* Eenmaal melden PER ROUTE en niet per spelling. Op req.path groeide deze
+       verzameling met elke nieuwe waarde van een :param (elk id een regel in
+       het log en een plek in het geheugen); de registersleutel is begrensd
+       door het register. */
+    const sleutel = s.route || (req.method + ' ' + req.path);
     const reden = s.reden || 'bewijs gezakt';
     if (log && !gemeld.has(sleutel)) {
       gemeld.add(sleutel);

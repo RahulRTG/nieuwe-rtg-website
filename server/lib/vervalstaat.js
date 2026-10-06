@@ -27,6 +27,7 @@
 const fs = require('fs');
 const path = require('path');
 const { segmentPatroon } = require('./padvorm');
+const { vastePaden } = require('../web/routeindex');
 
 /* RTG_VERTROUWEN wijst het register desgewenst ergens anders heen (een
    toets met een verzonnen stand, of een afwijkende inrichting). Bij elke
@@ -54,7 +55,9 @@ function laad(pad, ttlMs) {
       const methode = sleutel.slice(0, spatie);
       const p = sleutel.slice(spatie + 1);
       const rx = segmentPatroon(p);
-      const rij = { methode, staat: u.staat, reden: u.reden || '' };
+      /* `route` is de sleutel uit het register, zodat een lezer weet WELKE
+         route hij raakte en niet alleen met welke spelling hij binnenkwam. */
+      const rij = { methode, staat: u.staat, reden: u.reden || '', route: sleutel };
       if (rx) vers.vormen.push(Object.assign({ rx }, rij));
       else vers.letterlijk.set(sleutel, rij);
     }
@@ -65,14 +68,43 @@ function laad(pad, ttlMs) {
 }
 
 /* De staat van EEN route, of null als het register hem niet kent (of er niet
-   is). Nooit een verzonnen 'bewezen': wie niets weet, zegt niets. */
+   is). Nooit een verzonnen 'bewezen': wie niets weet, zegt niets.
+
+   WAT "DIT PAD" IS, BESLIST DE ROUTER (N26 in de V1-audit). Hier stond een
+   letterlijke opzoeking op het pad zoals het binnenkwam, terwijl de router een
+   vast pad ook MET een slash erachter bij dezelfde handler laat komen (padMatch
+   in ../web/routing.js), en een :param-route ook (zijn RegExp eindigt op \/?).
+   Een geschorste schrijfroute was daardoor met een slash erachter gewoon uit te
+   voeren: /api/foundation/les/maak gaf 503, /api/foundation/les/maak/ maakte
+   een les aan.
+
+   Het verzoekpad gaat daarom eerst door vastePaden() uit ../web/routeindex.js,
+   precies de sleutels waarop de router zoekt, en pas DAARNA wordt er
+   letterlijk vergeleken of een patroon gematcht. Dezelfde functie leest de
+   inlogpauze (isInlogPad in ../middleware/remmen.js, N18). Geen eigen
+   normalisatie ernaast: die valt ruimer of krapper uit dan de router, en dan is
+   er weer een tweede opvatting van hetzelfde pad. Hoofdletters, een dubbele
+   slash binnenin of procentcodering brengen een verzoek bij geen handler;
+   test/schorspoort-spelling.test.js laat de router dat zelf zeggen.
+
+   EEN GRENS DIE VANDAAG NIETS RAAKT. Een route op de WORTEL van een gemounte
+   router (router.post('/') onder app.use('/api/x', router)) bereikt de router
+   ook als /api/x//, en dat ziet vastePaden() niet: het register kent geen
+   mounts. Gemeten in de echte app op 6 oktober 2026: er is een gemounte
+   router (/api/foundation) en geen enkele schrijvende route op zijn wortel. */
 function staatVan(methode, pad, opties) {
   const o = opties || {};
   const k = laad(o.pad, o.ttlMs);
-  const letterlijk = k.letterlijk.get(methode + ' ' + pad);
-  if (letterlijk) return letterlijk;
-  const v = k.vormen.find(x => x.methode === methode && x.rx.test(pad));
-  return v || null;
+  const paden = vastePaden(String(pad || ''));
+  for (const p of paden) {
+    const letterlijk = k.letterlijk.get(methode + ' ' + p);
+    if (letterlijk) return letterlijk;
+  }
+  for (const p of paden) {
+    const v = k.vormen.find(x => x.methode === methode && x.rx.test(p));
+    if (v) return v;
+  }
+  return null;
 }
 
 const isGeschorst = (methode, pad, opties) => {

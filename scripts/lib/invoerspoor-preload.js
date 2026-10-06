@@ -155,4 +155,7 @@ try {
   });
 } catch (e) { spoor.onwaarneembaar.add('omgeving: niet waar te nemen'); }
 
+/* Wie het spoor heeft, kan het blok ook zonder pad opvragen -- een generator
+   buiten deze boom (de proefgenerator van de toets) kent dat pad niet. */
+spoor.blok = (uitvoer) => require('./invoerspoor').blok(uitvoer);
 global.__rtgInvoerspoor = spoor;

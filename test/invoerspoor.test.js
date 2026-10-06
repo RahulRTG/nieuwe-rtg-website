@@ -21,7 +21,6 @@ const { execFileSync, spawnSync } = require('child_process');
 const { invoerVersheid } = require('../scripts/lib/invoerspoor');
 
 const PRELOAD = path.join(__dirname, '..', 'scripts', 'lib', 'invoerspoor-preload.js');
-const BLOK = path.join(__dirname, '..', 'scripts', 'lib', 'invoerspoor.js');
 
 function repo() {
   const d = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-invoer-'));
@@ -38,7 +37,7 @@ function repo() {
     "'use strict';",
     "const fs = require('fs');",
     "const { execSync } = require('child_process');",
-    'const { blok } = require(' + JSON.stringify(BLOK) + ');',
+    "const blok = (u) => (global.__rtgInvoerspoor ? global.__rtgInvoerspoor.blok(u) : undefined);",
     "const a = fs.readFileSync('a.txt', 'utf8');",
     "const lijst = fs.readdirSync('d');",
     "const c = fs.existsSync('c.txt');",

@@ -79,13 +79,27 @@ const PORT = Number(process.env.LADDER_PORT || 4400);
 
 /* ---------- de deur naar de server ---------- */
 const agent = new http.Agent({ keepAlive: true, maxSockets: 64 });
+/* DE TOESTELLEN VAN DE LADDERLEDEN. Sinds A-P1-04 (#498, #505) vraagt een zwaar
+   pad standaard een bezitsbewijs van een gebonden sessie, en een echt lid
+   bevestigt daarvoor eerst zijn toestel. De ladder doet dat ook (zie nieuwLid):
+   wie dat overslaat, meet een gast die de app niet kan bestaan. Alleen tokens
+   die HIER staan krijgen een handtekening; een verzonnen of verminkt token in de
+   aanvalstreden blijft ongetekend, precies zoals bij een echte aanvaller. */
+const TOESTELLEN = new Map();
+const { zwaarPad } = require('../server/kern/identiteit/bezitsbewijs');
 function maakVraag(host, port) {
   return function vraag(method, pad, token, body, opt) {
+    const teken = token && TOESTELLEN.get(token);
+    const bewijs = teken && zwaarPad(String(pad).split('?')[0]) ? teken(method, String(pad).split('?')[0]) : Promise.resolve(null);
+    return bewijs.then(kop => verstuur(method, pad, token, body, opt, kop));
+  };
+  function verstuur(method, pad, token, body, opt, bewijskop) {
     const t0 = Date.now();
     return new Promise(resolve => {
       const data = method === 'GET' ? null : JSON.stringify(body === undefined ? {} : body);
       const headers = { 'Content-Type': 'application/json' };
       if (token) headers.Authorization = 'Bearer ' + token;
+      if (bewijskop) headers['rtg-bezitsbewijs'] = bewijskop;
       if (data) headers['Content-Length'] = Buffer.byteLength(data);
       let klaar = false;
       const af = (status, tekst) => {
@@ -105,7 +119,7 @@ function maakVraag(host, port) {
       if (opt && opt.afbreken) { if (data) req.write(data); req.end(); setTimeout(() => req.destroy(), 5); return; }
       if (data) req.write(data); req.end();
     });
-  };
+  }
 }
 
 /* ---------- de werkbank die elke trede krijgt ---------- */
@@ -142,6 +156,25 @@ const proefserver = require('./lib/proefserver');
 const bootEigen = () => proefserver.start({ poort: PORT, merk: 'ladder' });
 const wachtGezond = (vraag, pogingen) => proefserver.wachtGezond(vraag, pogingen);
 
+/* Bevestig het toestel van een ladderlid zoals de app dat doet: een P-256-
+   sleutel die niet te exporteren is, een uitdaging, en de binding. Lukt het
+   niet, dan zegt de ladder dat hardop in plaats van stil ongebonden te meten. */
+async function bindToestel(vraag, tok) {
+  const { webcrypto } = require('crypto');
+  const kp = await webcrypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign', 'verify']);
+  const jwk = await webcrypto.subtle.exportKey('jwk', kp.publicKey);
+  const sign = async t => Buffer.from(await webcrypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, kp.privateKey, Buffer.from(t, 'utf8'))).toString('base64url');
+  const u = await vraag('POST', '/api/mijn/toestel/uitdaging', tok, {});
+  if (!(u.data && u.data.nonce)) { console.log('  ' + K.geel + 'let op: geen toesteluitdaging (' + u.status + ')' + K.reset); return; }
+  const b = await vraag('POST', '/api/mijn/toestel/bind', tok, { jwk, handtekening: await sign(u.data.nonce), naam: 'Ladder' });
+  if (b.status !== 200) { console.log('  ' + K.geel + 'let op: toestel niet gebonden (' + b.status + ')' + K.reset); return; }
+  TOESTELLEN.set(tok, async (methode, pad) => {
+    const kop = Buffer.from(JSON.stringify({ methode, pad, tijd: Date.now(),
+      jti: 'j' + crypto.randomBytes(12).toString('hex').slice(0, 20) })).toString('base64url');
+    return kop + '.' + await sign(kop);
+  });
+}
+
 /* ---------- de rollen die de treden nodig hebben ---------- */
 async function haalRollen(vraag) {
   const rollen = { lid: null, lid2: null, lid2Codenaam: null, zaak: null, zaakCode: null, paden: ['/api/state', '/api/pay/overzicht', '/api/order', '/api/member/find', '/api/supplier/state', '/api/office/state', '/api/notifications', '/api/chat'] };
@@ -151,6 +184,7 @@ async function haalRollen(vraag) {
     const reg = await vraag('POST', '/api/auth/register', null, { name: 'Ladder ' + u, email: 'ladder' + u + '@voorbeeld.test', phone: '0612345678', password: 'Geheim' + u + '!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     const tok = reg.data && reg.data.token;
     if (tok) await vraag('POST', '/api/verify/upload', tok, { image: KYC });
+    if (tok) await bindToestel(vraag, tok);
     return tok;
   }
   try {

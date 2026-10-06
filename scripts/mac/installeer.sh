@@ -174,7 +174,7 @@ else
   mv "$TIJDELIJK" "$ENVBESTAND"
   chmod 600 "$ENVBESTAND"
   zeg "geschreven: $ENVBESTAND (rechten 600, eigenaar $GEBRUIKER)"
-  zeg "Het 2FA-geheim voor de backoffice staat er als otpauth-regel in; scan die met je authenticator-app."
+  zeg "Het productiekantoor opent uitsluitend op naam met de eigen passkey van de medewerker; er is geen gedeelde kantoorcode of losse TOTP."
 fi
 
 # ---------- 3. logboek ----------

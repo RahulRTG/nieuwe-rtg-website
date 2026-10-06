@@ -25,7 +25,7 @@ function reisAanbod(db) {
   }));
 }
 
-function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan }) {
+function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, reisbetalingVan }) {
   const nu = () => new Date().toISOString();
   // de visumtaak-laag is optioneel en laat gebonden; zonder haar loopt alles door
   const visum = () => (visumtaakVan && visumtaakVan()) || null;
@@ -139,7 +139,10 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan }
     /* De aanvragenrij gaat MEE naar beneden in plaats van dat de nazorg zelf
        db.data opzoekt: waar deze collectie woont, hoort op een plek te staan. */
     rij: () => (Array.isArray(db.data.reisAanvragen) ? db.data.reisAanvragen : []),
-    save, nu, dossier, visum, meldLid });
+    save, nu, dossier, visum, meldLid,
+    // laat gebonden: de betaallaag wordt na het reisbureau gemount (opzet/kernlaag2.js)
+    terugboeken: (ref, o) => { const rb = reisbetalingVan && reisbetalingVan();
+      return rb ? rb.terugboeken(ref, o) : { status: 503, error: 'de betaallaag van het reisbureau draait niet mee' }; } });
 
   /* De deur voor kern/reisbureau-betaling.js: twee lezers en EEN schrijver, zodat
      die laag niet in deze bak hoeft te graaien. Waarom, staat in de kop daar. */

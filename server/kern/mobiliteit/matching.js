@@ -26,11 +26,14 @@ const STANDAARD_GEWICHTEN = {
   nabijheid: 30,          // hoe dicht staat de wagen bij de reiziger
   aankomsttijd: 20,       // verwachte aanrijtijd
   eerlijk: 15,            // wie had vandaag het minste werk
-  beoordeling: 10,        // wat vinden reizigers ervan
   energie: 10,            // accu of tank
   vervolgkans: 5,         // eindigt de rit waar de chauffeur toch heen wilde
   kosten: 10              // wat kost deze inzet
 };
+
+/* Geen beoordeling van de chauffeur: dat is een cijfer op een mens (PLANNING.md
+   5.1). Een oude gewichtenkaart brengt hem niet terug. */
+const VERVALLEN = ['beoordeling'];
 
 // harde grenzen die niet per stad verschillen
 const MAX_AANRIJ_MIN = 25;       // verder dan dit is geen toewijzing maar een belofte
@@ -57,9 +60,11 @@ module.exports = (ctx) => {
   function matchGewichten(waar = {}) {
     ensureMatching();
     const m = opslag.bak('mobMatching');
-    return Object.assign({}, STANDAARD_GEWICHTEN, m.standaard || {},
+    const uit = Object.assign({}, STANDAARD_GEWICHTEN, m.standaard || {},
       (waar.stad && m.steden[waar.stad]) || {},
       (waar.vervoerder && m.vervoerders[waar.vervoerder]) || {});
+    for (const k of VERVALLEN) delete uit[k];   // een oude kaart brengt hem niet terug
+    return uit;
   }
 
   function matchGewichtenZet(body = {}) {
@@ -95,7 +100,7 @@ module.exports = (ctx) => {
   const punt = (deel, gewicht) => Math.round(Math.max(0, Math.min(1, deel)) * gewicht);
 
   /* Rangschik de vloot voor deze opdracht. `pool` is een lijst
-     { asset, chauffeur, beoordeling, gepland } die de dispatch aanlevert;
+     { asset, chauffeur, gepland } die de dispatch aanlevert;
      matching hoeft dus niets van roosters of accounts te weten.
 
      Geeft ALTIJD ook de afgewezen kandidaten terug, met hun reden. Zonder dat
@@ -129,7 +134,6 @@ module.exports = (ctx) => {
       const km = meters / 1000;
       const gedaan = telling.get(k.chauffeur) || 0;
       const energie = Number.isFinite(a.energieNiveau) ? a.energieNiveau : 100;
-      const beoordeling = Number.isFinite(k.beoordeling) ? k.beoordeling : 4.5;
       const gepland = Number.isFinite(k.gepland) ? k.gepland : 0;
       // eindigt deze rit in de buurt van waar de chauffeur toch heen moest?
       const vervolg = k.wilNaar && opdracht.naar ? haversine(k.wilNaar, opdracht.naar) : null;
@@ -141,8 +145,6 @@ module.exports = (ctx) => {
           uitleg: 'aanrijtijd ongeveer ' + aanrij + ' min' },
         { naam: 'eerlijk', punten: punt(1 - (gedaan / maxRitten), gew.eerlijk), max: gew.eerlijk,
           uitleg: gedaan + ' rit(ten) vandaag; de drukste collega staat op ' + maxRitten },
-        { naam: 'beoordeling', punten: punt((beoordeling - 3) / 2, gew.beoordeling), max: gew.beoordeling,
-          uitleg: 'beoordeling ' + beoordeling.toFixed(1) },
         { naam: 'energie', punten: punt((energie - MIN_ENERGIE_PCT) / (100 - MIN_ENERGIE_PCT), gew.energie), max: gew.energie,
           uitleg: energie + '% energie' },
         { naam: 'vervolgkans', punten: punt(vervolg == null ? 0.5 : 1 - Math.min(1, vervolg / 20000), gew.vervolgkans), max: gew.vervolgkans,

@@ -27,7 +27,7 @@ const { UITKOMST } = require('../server/kern/commercie/besluit');
 const { maakSchaduw, RIJP } = require('../server/kern/commercie/schaduw');
 
 const nu = () => 1_700_000_000_000;
-const bevoegd = g => bev.maakBevoegdheid({ capability: 'money.refund', grenzen: g, door: 'manager', nu });
+const bevoegd = g => bev.maakBevoegdheid({ capability: 'money.refund', scope: '*', grenzen: g, door: 'manager', nu });
 const motor = g => ({ zoekBevoegdheid: () => bevoegd(g) });
 
 function verzoeken(n, centenVan) {

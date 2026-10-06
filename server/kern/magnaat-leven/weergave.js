@@ -63,7 +63,13 @@ function aandacht(st, c) {
    verandert, verandert niets aan het leven. Zonder kopie ging een onderhandeling
    stuk doordat een aanroeper `rondes.pop()` deed op wat hij voor zijn eigen
    lijst hield. */
-const toon = (st, boek, nu, weg) => structuredClone(Object.assign(beeld(st, boek, nu), { terwijlWeg: weg || null }));
+/* Het leven is duurzame JSON-staat. In SQLite hangt daar een transparante
+   mutatietracker-Proxy omheen; structuredClone weigert iedere Proxy met een
+   DataCloneError. De JSON-grens is hier bovendien precies het API-contract:
+   zij levert een los beeld en kan geen opslagreferentie naar buiten geven. */
+const toon = (st, boek, nu, weg) => JSON.parse(JSON.stringify(
+  Object.assign(beeld(st, boek, nu), { terwijlWeg: weg || null })
+));
 
 function beeld(st, boek, nu) {
   const c = boek.cijfers(st), a = st.aanbod ? AANBOD[st.aanbod] : null, alle = st.deals.map(dealBeeld);

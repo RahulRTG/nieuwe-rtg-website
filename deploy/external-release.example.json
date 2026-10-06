@@ -8,7 +8,7 @@
   "controles": {
     "tlsDdosRand": {
       "status": "OPEN",
-      "bewijs": { "bestand": "tls-ddos-rapport.pdf", "sha256": "VUL-IN-SHA256" }
+      "bewijs": { "bestand": "tls-ddos-rand.json", "sha256": "VUL-IN-SHA256" }
     },
     "onafhankelijkePentest": {
       "status": "OPEN",
@@ -73,6 +73,10 @@
     "imageVulnerabilityScan": {
       "status": "OPEN",
       "bewijs": { "bestand": "image-vulnerability-scan.json", "sha256": "VUL-IN-SHA256" }
+    },
+    "connectionRealtime": {
+      "status": "OPEN",
+      "bewijs": { "bestand": "connection-realtime-turn.json", "sha256": "VUL-IN-SHA256" }
     },
     "foundationMinderjarigen": {
       "status": "OPEN",

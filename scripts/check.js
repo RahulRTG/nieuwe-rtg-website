@@ -3413,6 +3413,8 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
 {
   const TOEGESTAAN = new Map([
     ['server/bedrijf/praktijk.js', 'Werk van een organisatie en de herhaalsleutel worden samen duurzaam bevestigd; verlies na een geslaagde reactie zou dubbel werk veroorzaken.'],
+    ['server/bedrijf/praktijk-leverancier-routes.js', 'Leveranciersbeslissing en eenmalig gebruik moeten duurzaam staan vóór bevestiging.'],
+    ['server/bedrijf/praktijk-betalen-routes.js', 'Betaalopdracht, ontvanger en hervatopties moeten duurzaam staan vóór extern netwerkverkeer.'],
     ['server/bedrijf/praktijk-gast.js', 'Gastakkoord op een voorstel wordt pas bevestigd na duurzame opslag van dezelfde versie en beslissing.'],
     ['server/db/duurzaam.js', 'hier WOONT de primitive sinds db/index.js is opgeknipt'],
     ['server/db/sqlite-duurzaam.js', 'de bestaande SQLite-primitive bevestigt haar eigen FULL-COMMIT of gecontroleerde no-opbarrière; geen nieuwe domeinaanroeper'],
@@ -3430,6 +3432,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/lib/verraad-catalogus.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep. Stond op verraad.js tot de catalogus daar op 13 september uit is geknipt (keuringsregel 13); de lijst is daarmee VERPLAATST en niet gegroeid'],
     ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
     ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],
+    ['server/opzet/lijfpoort.js', 'bouwt de duurzame vastlegger voor het kritiekspoor: een geldhandeling, privacyexport of machtiging gaat pas door als de regel `toegestaan` aantoonbaar staat (A-P1-05)'],
     ['server/kern/pay/index.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed'],
     ['server/kern/economie/runtime/index.js', 'economische waarheid: intent, ledger en evidence worden vóór bevestiging als één bundel vastgelegd'],
     ['server/kern/fonds.js', 'fondsallocatie: een bevestigde verdeling mag niet na een herstart verdwijnen'],
@@ -5969,6 +5972,58 @@ try {
   ok('werelden, app-routes en pasprijzen zijn uit de centrale appbronnen opgebouwd');
 } catch (e) {
   fout(e.message);
+}
+
+console.log('\n74) Trust & Evidence Plane-manifest hoort bij de uitvoerbare kern');
+try {
+  cp.execFileSync(process.execPath, [path.join(ROOT, 'scripts/trust-evidence-plane.js'), '--check'], { stdio: 'pipe' });
+  ok('correlatieketen, capabilities, constitution en modulehashes horen bij deze bron');
+} catch (e) {
+  fout('TRUST_EVIDENCE_PLANE.json ontbreekt of is verouderd; draai npm run trust:manifest');
+}
+
+/* ============================================================================
+   75) ROTEREN MET DE HAND NEEMT NIET TOE
+
+   UITVOERINGSPLAN par. 7.1: bearercode v2 heeft `roteer()` (nieuwe code, oude
+   dicht, einde nooit later, geschiedenis begrensd). Twaalf domeinen hoogden de
+   rotatie nog zelf op. Ze verschillen in wat een rotatie MAG (een vers einde of
+   het oude), dus ze gaan per domein om en niet in een keer -- maar er komt er
+   geen bij. De ratel mag alleen omlaag; staat hij te hoog, dan zegt deze regel
+   dat ook, zodat de winst blijft staan. */
+console.log('\n75) roteren met de hand neemt niet toe');
+{
+  /* 12 -> 15 op 5 oktober 2026, en dat is geen achteruitgang: twaalf plekken
+     zijn omgezet naar bearer.roteer()/vernieuw(), en de meter las tegelijk
+     zonder spaties en zag daardoor vijftien plekken die er al stonden
+     (afhaalcode, arrivalpas, ov, tickets, rtgid-koppel, ...). Vanaf hier alleen omlaag. */
+  const ROTATIE_MAX = 15;
+  /* Gelezen ZONDER spaties: `(u.toegang.rotatie||1)+1` ontsnapte aan de eerste
+     vorm van deze regel, die alleen de gespatieerde schrijfwijze kende. De twee
+     alternatieven beginnen met een ander teken, anders kan een reeks `)||0)`
+     op twee manieren gelezen worden en loopt de regex exponentieel vast (CodeQL). */
+  const vorm = { test: r => /rotatie(?:\|\|[01]\)|\))*\+1(?!\d)/.test(r.replace(/\s+/g, '')) };
+  const plekken = [];
+  const loop = (d) => {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const q = path.join(d, e.name);
+      if (e.isDirectory()) { if (!['data', 'node_modules'].includes(e.name)) loop(q); continue; }
+      if (!e.name.endsWith('.js') || /^bearercode/.test(e.name)) continue;
+      fs.readFileSync(q, 'utf8').split('\n').forEach((r, i) => {
+        if (vorm.test(r)) plekken.push(path.relative(ROOT, q) + ':' + (i + 1));
+      });
+    }
+  };
+  loop(path.join(ROOT, 'server'));
+  if (plekken.length > ROTATIE_MAX) {
+    fout(plekken.length + ' plekken roteren met de hand terwijl de ratel op ' + ROTATIE_MAX + ' staat. ' +
+      'Gebruik bearer.roteer() (kern/bearercode-v2.js): ' + plekken.join(', '));
+  } else if (plekken.length < ROTATIE_MAX) {
+    fout('nog ' + plekken.length + ' plekken roteren met de hand; zet ROTATIE_MAX in scripts/check.js op ' +
+      plekken.length + ' zodat de winst blijft staan');
+  } else {
+    ok(plekken.length + ' plekken roteren nog met de hand (ratel, alleen omlaag)');
+  }
 }
 
 /* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.

@@ -11,8 +11,11 @@
      npm run live:init -- --eigenaar=jij@domein.nl \
        --url=https://jouw-domein.nl --smtp-url=smtps://...
 
-   --docker maakt ook aparte PostgreSQL- en geldsnapshot-sleutelbestanden. Bestaande
-   geheimen worden nooit stil overschreven; --force is bewust en expliciet.
+   --docker maakt ook aparte PostgreSQL- en geldsnapshot-sleutelbestanden. De
+   publieke Docker-opstelling maakt daarnaast het besloten compliancebestand.
+   Bestaande geheimen of ingevulde papieren worden nooit stil overschreven;
+   --force is bewust en expliciet voor de sleutelset, niet voor menselijke
+   compliance-antwoorden.
    --stil drukt gegenereerde geheimen niet naar terminal/loggeschiedenis. */
 'use strict';
 
@@ -112,6 +115,7 @@ for (const [naam, waarde, uitleg] of regels) {
 
 if (!stil) {
   console.log(blok.join('\n'));
+  console.log('\n# Het productiekantoor gebruikt geen gedeelde code of losse TOTP. Iedere medewerker opent het op naam met een eigen passkey.');
 }
 
 function schrijfNieuw(doel, inhoud) {
@@ -132,6 +136,9 @@ if (schrijven) {
       : '';
     const motorSleutelDoel = docker
       ? path.resolve(optie('--motor-sleutel-doel') || path.join(path.dirname(doel), '.rtg-secrets', 'motor_state_key'))
+      : '';
+    const papierenDoel = docker && !priveBeta
+      ? path.resolve(optie('--papieren-doel') || path.join(path.dirname(doel), '.rtg-compliance', 'papieren.json'))
       : '';
     // Eerst ALLE doelen controleren; zo laat een tweede run nooit een half
     // vernieuwde sleutelset achter.
@@ -169,6 +176,15 @@ if (schrijven) {
       } else {
         schrijfNieuw(motorSleutelDoel, 'k-' + hex(8) + ':' + hex(32) + '\n');
         console.log('# Aparte geldsnapshot-sleutelring: ' + motorSleutelDoel + ' (rechten 600).');
+      }
+      if (papierenDoel && fs.existsSync(papierenDoel)) {
+        // Ook --force mag nooit de door mensen ingevulde juridische/contact-
+        // gegevens terugzetten naar leeg. Sleutels roteren en papier wissen
+        // zijn twee volstrekt verschillende operatorhandelingen.
+        console.log('# Bestaand compliancebestand blijft ongewijzigd: ' + papierenDoel);
+      } else if (papierenDoel) {
+        schrijfNieuw(papierenDoel, JSON.stringify({ antwoorden: {}, bijgewerkt: null }, null, 2) + '\n');
+        console.log('# Apart compliancebestand: ' + papierenDoel + ' (rechten 600).');
       }
     }
     const envTekst = blok.join('\n') + '\n' + (bewaardeGenesis

@@ -860,6 +860,11 @@ body.rtg-stijl .kpi .l,body.rtg-stijl .kpi small{
 
 /* rijen pilknoppen: tabs boven een lijst, of chips om te filteren */
 body.rtg-stijl .tabs,body.rtg-stijl .chips{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:.9rem;}
+/* Een author-stijl met display:flex wint anders van de browserregel voor
+   [hidden]. Een beveiligde tabrij kan dan zichtbaar en klikbaar worden voordat
+   de serverpoort hem heeft vrijgegeven. Hidden is hier een toestand, niet een
+   vormgevingssuggestie. */
+body.rtg-stijl .tabs[hidden],body.rtg-stijl .chips[hidden]{display:none!important;}
 /* sommige pagina's zetten er kale <button>'s in zonder eigen classe; dat is
    dezelfde rij en hoort er dus ook hetzelfde uit te zien */
 body.rtg-stijl .tab,body.rtg-stijl .chip,body.rtg-stijl .pil,

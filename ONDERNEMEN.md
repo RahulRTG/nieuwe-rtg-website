@@ -679,3 +679,67 @@ omvatten zelfstandige, winkel, dienstverlening, meerdere locaties en stichting;
 de browserketen loopt op 390 en 1440 pixels. Dit bewijst deze werkstroom, niet
 alle sectorale processen, fiscale regels, resourcecapaciteit, live externe
 boekingssystemen of de hele toekomstige RTG World-architectuur.
+
+### Leveranciersopdrachten en klantbetalingen
+
+De werktafel kan een opdracht klaarzetten voor een leverancier zonder RTG-account
+of eigen software. De bevoegde medewerker vult leverancier, datum, locatie,
+inkoopbedrag en voorwaarden in en deelt zelf de beperkte leverancierslink.
+Pas het leveranciersantwoord maakt de bestaande projecttaak bevestigd of
+afgewezen. Een verzoek om annulering blijft `annulering-gevraagd` totdat de
+leverancier instemt; een weigering laat de boeking bestaan. Uitvoering vereist
+afzonderlijk bewijs. Dit werkt voor diensten, vervoer, verhuur, leveringen en
+activiteiten, niet uitsluitend voor reizen. Er worden geen mails verstuurd.
+
+Deze link toont geen klantprijs, klantenbestand of andere projectonderdelen.
+Hij is maximaal zeven dagen geldig, roteerbaar, doelgebonden, hash-only en
+eenmalig voor de betreffende taakversie. De leverancier noemt een naam en
+referentie; bezit van de link is geen geverifieerde identiteit. Actuele
+werkruimte-, project-, klant-, geld- en geldgoedkeuringsrechten van de uitgever
+zijn vereist. Een klantlink roteren trekt leverancierslinks niet in.
+
+Klantbetalingen gebruiken de bestaande `betaalWaarheid` en hosted betaalrails.
+De installatiebeheerder koppelt expliciet een werkruimte aan de bestaande
+platformrekening via `RTG_WERK_BETAALONTVANGERS`, met de echte rekeningnaam,
+provider en toegestane valuta. `RTG_WERK_BETAAL_ORIGIN` is een vaste HTTPS-origin.
+Zonder beide instellingen blijft online betalen uit. De werkplekbeheerder met
+financiële goedkeuringsrechten zet daarna per bevestigde opdracht het
+betaalverzoek aan. De klant ziet de ontvanger en bevestigt bij de provider.
+Het volledige afgesproken bedrag komt uit de server; de client kan geen
+bedrag, provider of bestemming kiezen. Mollie is hier beperkt tot munten met
+twee decimalen; andere rails vereisen expliciet toegelaten provider-valuta.
+Valuta met afwijkende providereenheden staan in deze werkstroom dicht:
+Stripe ISK/UGX en Adyen CLP/CVE/IDR/ISK. Zie de
+[Stripe-valutaregels](https://docs.stripe.com/currencies) en
+[Adyen-valuta-eenheden](https://docs.adyen.com/development-resources/currency-codes).
+
+Opdracht, ontvanger, provideropties en hervatsleutel staan duurzaam vóór het
+eerste netwerkverzoek. Dubbelklikken, herhaalde links en herstel na uitval
+gebruiken dezelfde economische betaling. Een onbekende uitkomst blijft zichtbaar;
+zij geeft geen vrijbrief voor een tweede betaling. Alleen geverifieerde
+providerinformatie bepaalt de centrale status, ook bij latere webhooks.
+Betaling betekent geen uitgevoerde opdracht. Annuleren blijft geblokkeerd
+zolang de betaling financiële afstemming vraagt. Deze werktafel heeft nog
+geen terugbetaalknop; terugbetalingen vereisen afzonderlijke bevoegde
+afstemming in de provideradministratie en verwerking van diens terugmelding.
+
+De oorspronkelijke klantlink blijft in de eigen browser; het capabilitygeheim
+gaat niet mee naar de provider of terugkeer-URL. Na betaling kan de klant in
+die afspraak de status vernieuwen. De werktafel leest dezelfde betaalwaarheid.
+Generieke antwoordcaches staan voor deze routes uit, zodat intrekking en
+rechten nooit door een oud antwoord worden overgeslagen.
+
+Grenzen van deze oplevering: ontvangen op de bestaande platformrekening,
+geen individuele connected accounts, verdeling of automatische uitbetaling
+aan leveranciers. De bestemming van klantgelden is niet in productie ingesteld.
+Leveranciers zonder software kunnen de RTG-link gebruiken; rechtstreekse
+boekings-API's van hotels, airlines of andere externe systemen zijn nog niet
+gekoppeld. Een bevestigingslink is geen bewijs van beschikbaarheid in zo'n
+systeem. Er is geen live geld bewogen of echte externe boeking gemaakt.
+
+Bewijs: `test/praktijk-leverancier.test.js`, `test/praktijk-betalen.test.js`,
+`test/praktijk-transacties-http.test.js` en de uitgebreide `test/praktijk.e2e.js`.
+De HTTP-keten gebruikt een lokale Stripe-protocolfixture, controleert herstart,
+scope en herhaling; de browserketen bedient leverancierswerk op 390 en 1440 px.
+`test/praktijk-betalen.e2e.js` controleert daarnaast de betaalbediening met
+API-fixtures op beide breedtes; dat is geen live providerproef.

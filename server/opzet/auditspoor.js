@@ -52,6 +52,7 @@ const burger = require('../lib/burgerpad');
 const crypto = require('crypto');
 const { maakJournaal } = require('../kern/command/journaal');
 const verzoekcontext = require('../db/verzoekcontext');
+const antwoordspoor = require('../lib/antwoordspoor');
 
 const SCHRIJFT = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
@@ -70,7 +71,7 @@ function maakAuditspoor(deps) {
      eigen doos, zodat de twee ketens elkaar niet in de weg zitten. */
   const vak = () => eigen.bak('apiSpoor');
   const auditOpslag = save.audit?.open('apiSpoor');
-  const bewaarSpoor = () => save.sleutels ? save.sleutels(['apiSpoor']) : save();
+  const bewaarSpoor = () => save.sleutels ? save.sleutels(['apiSpoor']) : save(['apiSpoor']);
   const journaal = maakJournaal({ db, save: bewaarSpoor, crypto, vak, auditOpslag });
 
   /* De actor, in volgorde van zekerheid. req.session en req.supplier zijn door
@@ -119,7 +120,7 @@ function maakAuditspoor(deps) {
       /* PostgreSQL neemt het spoor mee vóór dezelfde requestcommit. Buiten die
          stand blijft de bestaande finish-haak (en zijn best-effort gedrag). */
       if (!verzoekcontext.haakVoorCommit(noteer)) {
-        res.on('finish', () => { try { noteer(); } catch (e) {} });
+        antwoordspoor(res, noteer, save.audit?.batch);
       }
       next();
     };

@@ -253,6 +253,27 @@ services:
       retries: 12
       start_period: 20s
 
+  # Verse eigenaarsmeting tegen de ECHTE productie-PostgreSQL. Dit proces
+  # krijgt geen app-/releasevolume en geen publieke of kandidaatnetwerken. Het
+  # leest uitsluitend de eigenaar en een databasesnapshot en draagt daarna één
+  # gesanitiseerde, noncegebonden bewijsregel via stdout aan de host over.
+  ownerproof:
+    <<: *rtg-beveiliging
+    profiles: ["release"]
+    image: ${RTG_IMAGE:-rtg-app:local}
+    command: ["node", "scripts/docker/start.js", "owner-proof"]
+    environment:
+      NODE_ENV: production
+      RTG_ENV_FILE: /run/secrets/rtg_env
+      RTG_POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - rtg_env
+      - postgres_password
+    networks:
+      - data
+    depends_on:
+      postgres: { condition: service_healthy }
+
   # De echte productieconfiguratie wordt in deze service alleen gelezen door
   # `scripts/golive.js`. Er start geen server of worker. Alle bereikbare state
   # blijft de tijdelijke kandidaatstate hieronder. Alleen de opruimende S3-
@@ -273,6 +294,12 @@ services:
       RTG_MOTOR_SHADOW: http://keurmotor:3100
       RTG_MOTOR_GELD_URL: http://keurmotor:3100
       RTG_MOTOR_EXPECT_GENESIS: ${RTG_KEUR_MOTOR_EXPECT_GENESIS:-}
+      # Het gesanitiseerde ownerbewijs in /run/rtg-release telt alleen als het
+      # bij exact de huidige commit en lokaal geïnspecteerde immutable image-ID
+      # hoort. Oude bootstrap- of vorige-releasebewijzen vallen hierdoor dicht.
+      RTG_RELEASE_COMMIT: ${RTG_RELEASE_COMMIT:-}
+      RTG_OWNER_IMAGE_ID: ${RTG_OWNER_IMAGE_ID:-}
+      RTG_OWNER_IMAGE_IMMUTABLE: ${RTG_OWNER_IMAGE_IMMUTABLE:-}
       RTG_CLAMD_HOST: keurclamav
       RTG_CLAMD_PORT: 3310
       RTG_CAPABILITY_RUST_BIN: /app/rtg-motor

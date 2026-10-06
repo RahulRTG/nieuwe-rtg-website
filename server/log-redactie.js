@@ -12,6 +12,17 @@ function geheimVrij(waarde) {
     .replace(/\/api\/projectie\/[^/\s?#]+/gi, '/api/projectie/:credential');
 }
 
+/* Een verbindings-URL (redis://, postgres://, ...) zonder gebruikersnaam en
+   wachtwoord, om te loggen. Alleen schema, host en poort blijven over. Een
+   onleesbare waarde wordt NIET teruggegeven zoals ze is: dan kon het geheim er
+   alsnog in zitten. */
+function urlZonderGeheim(url) {
+  try {
+    const u = new URL(String(url));
+    return u.protocol + '//' + u.host + (u.pathname && u.pathname !== '/' ? u.pathname : '');
+  } catch (e) { return '[onleesbare url]'; }
+}
+
 function veiligeWaarde(waarde, diepte = 0) {
   if (typeof waarde === 'string') return geheimVrij(waarde);
   if (waarde == null || typeof waarde !== 'object' || diepte > 3) return waarde;
@@ -30,4 +41,4 @@ function veiligeFout(err) {
   return veilig;
 }
 
-module.exports = { geheimVrij, veiligeWaarde, veiligeFout };
+module.exports = { geheimVrij, veiligeWaarde, veiligeFout, urlZonderGeheim };

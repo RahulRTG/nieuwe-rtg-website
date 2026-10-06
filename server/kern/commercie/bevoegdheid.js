@@ -45,46 +45,21 @@ const klok = require('../../lib/klok');
 
 const MAX_DIEPTE = 8;
 
-/* De grenzen die een bevoegdheid kan dragen. Elke grens heeft een `krimp`:
-   hoe je twee waarden combineert zodat delegatie altijd versmalt. Voor een
-   bedrag is dat het minimum; voor een vinkje "alleen eigen vestiging" is
-   aanzetten juist een versmalling, dus daar is het een OF. */
-const GRENZEN = {
-  maxCenten: { soort: 'getal', krimp: (a, b) => Math.min(a, b),
-    uitleg: 'het hoogste bedrag per handeling' },
-  maxPerDagCenten: { soort: 'getal', krimp: (a, b) => Math.min(a, b),
-    uitleg: 'het hoogste bedrag per dag, over alle handelingen samen' },
-  maxAantalPerDag: { soort: 'getal', krimp: (a, b) => Math.min(a, b),
-    uitleg: 'het hoogste aantal handelingen per dag' },
-  alleenEigenVestiging: { soort: 'vlag', krimp: (a, b) => a || b,
-    uitleg: 'alleen op de eigen vestiging; aanzetten versmalt' },
-  apparaatVertrouwd: { soort: 'vlag', krimp: (a, b) => a || b,
-    uitleg: 'alleen vanaf een vertrouwd apparaat; aanzetten versmalt' },
-  omkeerbaarVerplicht: { soort: 'vlag', krimp: (a, b) => a || b,
-    uitleg: 'alleen als de handeling terug te draaien is' }
-};
-
-/* Twee grenzensets combineren tot de engste van de twee. Een grens die de ene
-   kant NIET stelt, telt niet als "onbeperkt" maar wordt overgenomen van de
-   ander -- anders zou een delegatie die een grens vergeet, hem opheffen. Dat is
-   precies de fout die deze functie moet uitsluiten. */
-function versmal(basis, extra) {
-  const uit = { ...(basis || {}) };
-  for (const [naam, waarde] of Object.entries(extra || {})) {
-    const g = GRENZEN[naam];
-    if (!g) continue;                       // een onbekende grens verruimt niets
-    uit[naam] = (naam in uit) ? g.krimp(uit[naam], waarde) : waarde;
-  }
-  return uit;
-}
+const { GRENZEN, keurGrenzen, versmal } = require('./bevoegdheid-grenzen');
 
 /* Een bevoegdheid. `bron` zegt waar hij vandaan komt -- dat is wat de keten
    navertelbaar maakt. */
 function maakBevoegdheid({ capability, scope, grenzen, bron, door, nu }) {
   const tijd = nu || klok.nu;
+  /* Geen stille "overal": leeg is dicht. Wie overal bedoelt schrijft '*' (zoals
+     GELD_INNEN); besluit.js maakt van deze fout ONBEKEND, nooit TOESTAAN. */
+  if (scope == null || String(scope).trim() === '')
+    throw new Error('Een bevoegdheid vraagt een expliciete scope; schrijf "*" als hij overal geldt.');
+  const fout = keurGrenzen(grenzen);
+  if (fout.length) throw new Error('Ongeldige grens: ' + fout.join('; ') + '.');
   return {
     capability: String(capability || ''),
-    scope: scope == null ? '*' : String(scope),
+    scope: String(scope),
     grenzen: versmal({}, grenzen),
     bron: bron || null,                     // de bevoegdheid waaruit deze is afgeleid
     door: door || null,
@@ -116,6 +91,10 @@ function delegeer(van, { capability, scope, grenzen, door, nu }) {
      een lus. Acht is ruim -- directeur, manager, agent, deelproces is er vier --
      en de grens bestaat om een ongelimiteerd groeiende rij te voorkomen, niet om
      een echt geval tegen te houden. */
+  // een onleesbare grens wordt geweigerd, niet stil overgeslagen
+  const fout = keurGrenzen(grenzen);
+  if (fout.length) return { error: 'Deze delegatie heeft een ongeldige grens: ' + fout.join('; ') + '.' };
+
   if (van.diepte >= MAX_DIEPTE)
     return { error: 'Deze delegatieketen is te diep (' + MAX_DIEPTE + '); leg de bevoegdheid rechtstreeks vast.' };
 
@@ -139,8 +118,16 @@ function past(b, { scope, waardeCenten, context }) {
   if (!b) return 'Er is geen bevoegdheid voor deze handeling.';
   const ctx = context || {};
 
-  if (b.scope !== '*' && scope != null && String(scope) !== b.scope)
-    return 'Deze bevoegdheid geldt voor ' + b.scope + ' en niet voor ' + scope + '.';
+  /* Zonder scope tegen een bevoegdheid MET scope: weigeren (leeg is dicht). "geldt
+     voor" laat besluit.js (bezwaarIsHard) er WEIGEREN van maken, niet BEPERKT. */
+  if (b.scope !== '*' && (scope == null || String(scope) !== b.scope))
+    return scope == null
+      ? 'Deze bevoegdheid geldt voor ' + b.scope + ' en het verzoek noemt niet waarvoor.'
+      : 'Deze bevoegdheid geldt voor ' + b.scope + ' en niet voor ' + scope + '.';
+
+  const onleesbaar = keurGrenzen(b.grenzen);
+  if (onleesbaar.length)
+    return 'De grenzen van deze bevoegdheid zijn niet te lezen (' + onleesbaar.join('; ') + '); daarom geldt hij nu niet.';
 
   const bedrag = Math.round(Number(waardeCenten) || 0);
   if (Number.isFinite(b.grenzen.maxCenten) && bedrag > b.grenzen.maxCenten)
@@ -162,6 +149,9 @@ function past(b, { scope, waardeCenten, context }) {
    grootboek en deze laag niet. */
 function pastBinnenDag(b, { vandaagCenten, vandaagAantal, waardeCenten }) {
   if (!b) return 'Er is geen bevoegdheid voor deze handeling.';
+  const onleesbaar = keurGrenzen(b.grenzen);
+  if (onleesbaar.length)
+    return 'De grenzen van deze bevoegdheid zijn niet te lezen (' + onleesbaar.join('; ') + '); daarom geldt hij nu niet.';
   const bedrag = Math.round(Number(waardeCenten) || 0);
   const alCenten = Math.round(Number(vandaagCenten) || 0);
   const alAantal = Math.round(Number(vandaagAantal) || 0);
@@ -190,4 +180,4 @@ function euro(centen) {
     { minimumFractionDigits: centen % 100 ? 2 : 0, maximumFractionDigits: 2 });
 }
 
-module.exports = { GRENZEN, MAX_DIEPTE, maakBevoegdheid, delegeer, versmal, past, pastBinnenDag, herkomst, euro };
+module.exports = { GRENZEN, MAX_DIEPTE, maakBevoegdheid, delegeer, versmal, keurGrenzen, past, pastBinnenDag, herkomst, euro };

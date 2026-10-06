@@ -50,6 +50,30 @@ function agentVan(req) {
   } catch (e) { return null; }
 }
 
+/* DE OORZAAK (Fase 2, I11). De interne aanroep is een NIEUW verzoek met een
+   eigen correlatie; zonder meer brak daar de keten en was het enige spoor terug
+   een logregel. De kop draagt de correlatie van het verzoek waarin Rahul werd
+   gevraagd, ondertekend met hetzelfde procesgeheim: een HMAC, want de waarde
+   zelf is geen geheim maar mag niet door een buitenstaander gekozen worden --
+   anders hangt iemand zijn klik aan andermans keten. Vals of afwezig is null. */
+const KOP_OORZAAK = 'x-rtg-oorzaak';
+const CORRELATIE = /^[A-Za-z0-9._-]{1,64}$/;
+const teken = (c) => crypto.createHmac('sha256', GEHEIM).update(String(c)).digest('hex');
+function oorzaakKop(correlatie) {
+  if (!CORRELATIE.test(String(correlatie || ''))) return null;
+  return correlatie + '.' + teken(correlatie);
+}
+function oorzaakVan(req) {
+  try {
+    const w = String((req && req.headers && req.headers[KOP_OORZAAK]) || '');
+    const i = w.lastIndexOf('.');
+    if (i < 1) return null;
+    const c = w.slice(0, i), t = Buffer.from(w.slice(i + 1)), echt = Buffer.from(teken(c));
+    if (!CORRELATIE.test(c) || t.length !== echt.length) return null;
+    return crypto.timingSafeEqual(t, echt) ? c : null;
+  } catch (e) { return null; }
+}
+
 /* Het antwoord zegt het terug (server/effectbon.js roept dit aan bij res.end):
    alleen als de envelop een agent draagt, en dan alleen de agentnaam. */
 function meld(req, res) {
@@ -57,4 +81,4 @@ function meld(req, res) {
   if (ag && res && !res.headersSent) res.setHeader('X-RTG-Handelaar', ag);
 }
 
-module.exports = { KOP, kop, agentVan, meld, NAMEN };
+module.exports = { KOP, kop, agentVan, meld, NAMEN, KOP_OORZAAK, oorzaakKop, oorzaakVan };

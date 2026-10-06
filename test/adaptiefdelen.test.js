@@ -29,7 +29,7 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const SCHERMEN = ['office', 'app', 'bestanden', 'reizen-veilig', 'reizen',
   'sociaal', 'comm', 'meet', 'vonk', 'rendezvous', 'entourage', 'attenties', 'cercle', 'sociaal-prive', 'magnaat',
-  'leverancier-aanvragen', 'mijnmall', 'wereld', 'living-world'];
+  'leverancier-aanvragen', 'mijnmall', 'wereld', 'living-world', 'library'];
 /* De volgorde die het register eist: eerst de leer, dan de delen, dan het register.
    De objectpoort (shared/objectverwijzing.js, stap 20) is zo'n deel: het register
    pakt hem bij het laden, en zonder poort gaat er geen object door. */

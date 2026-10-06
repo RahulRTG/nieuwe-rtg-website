@@ -125,6 +125,15 @@ function makeCodename() {
 /* ondertekening van staatloze tokens (de token-vorm zelf staat in ./users). */
 function sign(body) { return crypto.createHmac('sha256', S.SECRET).update(body).digest('hex').slice(0, 32); }
 
+/* Ondertekenen met een AFGELEIDE sleutel (sleutelVoor), voor actietokens.
+   Met S.SECRET zou een actietoken niet van een sessietoken te onderscheiden
+   zijn (RTG-V1-RELEASE blocker 1; zie ./actietokens.js). Een lege sleutel
+   geeft null: fail-closed, nooit een vaste handtekening. */
+function signMet(sleutel, body) {
+  if (!sleutel || (Buffer.isBuffer(sleutel) && !sleutel.length)) return null;
+  return crypto.createHmac('sha256', sleutel).update(String(body)).digest('hex').slice(0, 32);
+}
+
 /* EEN SLEUTEL VOOR EEN ANDER DOEL, AFGELEID EN NIET DE SESSIESLEUTEL ZELF.
 
    Er zijn buiten deze kluis dingen die ondertekend moeten worden -- het
@@ -156,5 +165,5 @@ function sleutelVoor(doel) { return afleidSleutel(S.SECRET, doel); }
 module.exports = {
   CODENAMES, enc, dec, encVeld, decVeld, emailHash, normalizePhone, phoneHash,
   scryptAsync, hashPasswordSync, hashDemoSync, hashPassword, verifyPassword, moetVernieuwen,
-  zaaiHash, makeCodename, sign, SCRYPT_N, SCRYPT_R, SCRYPT_P, sleutelVoor, afleidSleutel
+  zaaiHash, makeCodename, sign, signMet, SCRYPT_N, SCRYPT_R, SCRYPT_P, sleutelVoor, afleidSleutel
 };

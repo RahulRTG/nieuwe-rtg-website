@@ -7,7 +7,7 @@
    verlengen van een gezinssessie met een echte passkeyceremonie.
 
    De eenheden staan in test/gezinscode.test.js; de race over twee
-   PostgreSQL-instances in test/gezinsdeur.pg.test.js.
+   PostgreSQL-instances in test/gezinsuitnodiging.pg.test.js.
 
    Draai los: node --test test/gezinsdeur.test.js */
 'use strict';
@@ -31,7 +31,8 @@ async function post(pad, body, extra) {
   let lijf = {}; try { lijf = JSON.parse(tekst); } catch (e) {}
   return { status: r.status, body: lijf, tekst, koppen: r.headers };
 }
-const F = (pad, body, extra) => post('/api/foundation' + pad, body, extra);
+// Een volledig pad gaat ongewijzigd door, zodat de routedekking het ziet.
+const F = (pad, body, extra) => post(pad.startsWith('/api/') ? pad : '/api/foundation' + pad, body, extra);
 const kop = token => ({ Authorization: 'Bearer ' + token });
 const mij = (code, token) => fetch(base + '/api/foundation/gezin/' + code + '/mij', { headers: kop(token) }).then(r => r.status);
 const GC = /^GC\.[0-9A-F]{32}$/, GZ = /^GZ\.[0-9A-F]{32}$/, GS = /^GS\.[0-9A-F]{32}$/;

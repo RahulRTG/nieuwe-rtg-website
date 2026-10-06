@@ -84,7 +84,18 @@ module.exports = function maakHervat(ctx) {
     return uit;
   }
 
-  return { hervat, openstaand, onbekend };
+  // Leg de expliciet bevestigde opdracht binnen de duurzame requestcommit vast,
+  // vóór netwerkverkeer. De veegronde kan hem na een processtop hervatten.
+  function bereidVoor(id, opties = {}) {
+    const r = doos()[id];
+    if (!r) throw new Error('Betaling niet gevonden.');
+    if (r.providerId || r.start) return;
+    r.start = module.exports.startVan(opties);
+    gebeurtenis(r, 'PROVIDER_START', { bron: r.start.aanbieder || 'automatisch', hervat: false });
+    save();
+  }
+
+  return { hervat, openstaand, onbekend, bereidVoor };
 };
 
 module.exports.WACHT_MS = WACHT_MS;

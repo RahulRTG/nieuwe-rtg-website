@@ -11,6 +11,12 @@
 
 module.exports = (kern, hulp) => {
   const { accounts, anthropic, crypto, db, findSupplier, rtmail, save } = hulp;
+  /* De communicatiekern bezit drie actuele collecties en kan bij de eerste
+     lezing nog uit vier oude voorraden overnemen. Door dit vlak expliciet te
+     bewaren hoeft ieder bericht niet de hele wereld opnieuw te vergelijken. */
+  const commSleutels = ['commGesprekken', 'commBerichten', 'commStand',
+    'memberChats', 'applyChats', 'guestChats', 'collegaChats'];
+  const commSave = () => typeof save.bestaande === 'function' ? save.bestaande(commSleutels) : save();
 
 /* ---------------------- RTG Communication Core ----------------------
    Een gespreksmodel voor het hele platform (kern/comm). Elke module die een
@@ -58,7 +64,7 @@ const commActorNaam = require('../kern/comm/wie').maakNaam({
    Alleen de weergave gaat hierlangs -- wie ergens IN mag hangt aan de
    deelnemerslijst en verandert hier niet. */
 const commNaam = (sleutel) => commActorNaam(sleutel) || (kern.codenaamVan ? kern.codenaamVan(sleutel) : null) || null;
-kern.comm = require('../kern/comm').maakComm({ db, save, crypto,
+kern.comm = require('../kern/comm').maakComm({ db, save: commSave, crypto,
   codenaamVan: kern.codenaamVan, naamVan: commNaam,
   sein: require('../kern/comm/wie').maakSein({ sseToCustomer: hulp.sseToCustomer,
     sseToSupplier: hulp.sseToSupplier, sseToOffice: hulp.sseToOffice }) });
@@ -73,20 +79,20 @@ kern.commBronnen = require('../kern/comm/bronnen').maakBronnen({ db,
    sinds de verhuizing IN de kern (kern/comm/dm.js), met de oude geschiedenis
    die er per paar eenmalig bij wordt gehaald. Zo is er nog maar een plek waar
    deze gesprekken staan. */
-kern.commDm = require('../kern/comm/dm').maakCommDm({ db, save, comm: kern.comm, dmSleutel: kern.dmSleutel });
+kern.commDm = require('../kern/comm/dm').maakCommDm({ db, save: commSave, comm: kern.comm, dmSleutel: kern.dmSleutel });
 /* En dezelfde brug voor de collegaberichten op de werkvloer (kern/comm/
    collega.js). Die kon pas verhuizen sinds een deelnemer ook een mens BINNEN
    EEN ZAAK kan zijn; routes/staff/collega.js schrijft er sindsdien in, met
    dezelfde antwoordvorm zodat de PDA en de zaak-app niets merken. */
-kern.commCollega = require('../kern/comm/collega').maakCommCollega({ db, save, comm: kern.comm });
+kern.commCollega = require('../kern/comm/collega').maakCommCollega({ db, save: commSave, comm: kern.comm });
 /* En het gastcontact: de lijn tussen een lid en een zaak, per afdeling
    (kern/comm/gast.js). Het eerste gesprek waarin een codenaam en een bedrijf
    samen zitten, en daarmee het gesprek waarvoor het actormodel is gemaakt. */
-kern.commGast = require('../kern/comm/gast').maakCommGast({ db, save, comm: kern.comm });
+kern.commGast = require('../kern/comm/gast').maakCommGast({ db, save: commSave, comm: kern.comm });
 /* En de sollicitatiechat (kern/comm/werk.js): werkgever tegenover sollicitant,
    waarbij die sollicitant een lid kan zijn OF een profiel binnen een RTF-gezin.
    De laatste van de vier grote voorraden. */
-kern.commWerk = require('../kern/comm/werk').maakCommWerk({ db, save, comm: kern.comm });
+kern.commWerk = require('../kern/comm/werk').maakCommWerk({ db, save: commSave, comm: kern.comm });
 kern.commAi = require('../kern/berichten/ai')({
   // de kern gooit als een gesprek niet van jou is; de AI-laag verwacht null
   draad: (mijKey, gesprekId) => { try { return kern.comm.draad(mijKey, gesprekId); } catch (e) { return null; } },

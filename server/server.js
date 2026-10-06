@@ -3,33 +3,9 @@
    De kern werkt zonder model. Vrije taal kan lokaal via LOCAL_AI_URL; externe
    aanbieders zijn optionele, expliciete uitwijk. */
 
-/* DE ONDERGRENS VAN DE RUNTIME, en waarom hij hier hard staat.
-
-   De accountsdatabase draait op `node:sqlite`. Die bestaat vanaf Node 22 en
-   laadt sinds 22.13 ZONDER `--experimental-sqlite`; de zelf-herstart met die
-   vlag die hier stond is daarmee vervallen. Op een oudere Node klapt het pas
-   veel later stuk op een `require('node:sqlite')` diep in de opslaglaag -- een
-   foutmelding die niets zegt over de echte oorzaak. `LAUNCH.md` beloofde
-   bovendien jarenlang "Node 18+", dus dit was geen theoretisch scenario maar een
-   gedocumenteerde valkuil.
-
-   Een `engines`-veld in package.json waarschuwt alleen bij `npm install` en doet
-   niets bij `node server/server.js`. Daarom staat de grens hier, vóór het eerste
-   require: falen op de eerste regel met de reden erbij. De grens staat op 22.13
-   en niet op 22.0, want dat is de versie waarop node:sqlite zonder vlag laadt --
-   precies wat deze server doet. Zelfde getal als in package.json en .nvmrc. */
-const NODE_MINIMAAL = [22, 13];
-const nodeDelen = process.versions.node.split('.').map(Number);
-if (!Number.isFinite(nodeDelen[0]) ||
-    nodeDelen[0] < NODE_MINIMAAL[0] ||
-    (nodeDelen[0] === NODE_MINIMAAL[0] && nodeDelen[1] < NODE_MINIMAAL[1])) {
-  console.error(
-    '[start] Node ' + process.versions.node + ' is te oud. RTG vereist Node ' +
-    NODE_MINIMAAL.join('.') + ' of nieuwer, omdat de accountsdatabase op de ' +
-    'ingebouwde node:sqlite draait. Zie LIVEGANG.md.'
-  );
-  process.exit(78);
-}
+/* Fail vóór ieder ander onderdeel wanneer de ingebouwde SQLite-runtime mist;
+   config/node-versie.js bezit de versiegrens en de uitleg. */
+require('./config/node-versie').eisOndersteundeNode();
 
 const { idVanKey } = require('./lib/lidsleutel');
 
@@ -74,6 +50,7 @@ const logboek = require('./log');
 const log = logboek.log;
 const testomgeving = require('./testomgeving');
 const betaal = require('./betaal');
+const maakTrustBewijs = require('./opzet/trust-bewijs');
 const systeemKlok = require('./lib/klok');
 const { schoon, ledenPrijs, rondEuro, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
 const { totpOk } = require('./kern/totp');
@@ -140,17 +117,13 @@ process.on('unhandledRejection', reason => {
 // Een niet-afgevangen synchrone uitzondering laat de staat mogelijk half klaar
 // achter; we loggen hem mét stack en stoppen netjes, zodat de proces-manager
 // (Docker/systemd) ons herstart in plaats van door te draaien op kapotte staat.
+/* Vooraf geladen: een require IN de handler kan zelf falen (EMFILE) als de
+   crash juist door uitgeputte bestandsdescriptors komt. */
+const stopspoeling = require('./opzet/stopspoeling');
 process.on('uncaughtException', err => {
   log.uitzondering(err, { bron: 'uncaughtException', fataal: true });
-  try { save(); } catch (e) {}
-  /* De 200 ms zijn er zodat het log nog wegkomt. Deze timer stond .unref(), en
-     dat is het tegenovergestelde van wat hier moet gebeuren: een unref'd timer
-     houdt het proces niet wakker. In de praktijk viel dat nooit op, want een
-     draaiende server heeft handles zat -- maar het is een val die openligt: was
-     dit ooit de laatste handle, dan viel het proces ervoor al om, met exitcode
-     0, en een crash die zich voordoet als een nette afsluiting wordt door geen
-     enkele proces-manager herstart. Hij houdt het proces nu die 200 ms vast. */
-  setTimeout(() => process.exit(1), 200);
+  // dezelfde spoeling als SIGTERM, begrensd, altijd exitcode 1 (opzet/stopspoeling.js)
+  stopspoeling.bijCrash({ save, flushBijAfsluiten, accounts, inBundel });
 });
 
 /* HET ADRES VAN DE LINK IN EEN E-MAIL KOMT NIET UIT HET VERZOEK.
@@ -199,6 +172,12 @@ function appUrl(req) {
 require('./config').pasToe(process.env, log);
 
 load();
+
+/* Trust leest dezelfde geladen request-state als de domeinen. Dit moet na
+   load(): vóór die grens is db.data bewust nog afwezig. */
+const { trustPlane, bewijsHospitalityBesluit, markeerHospitalityRequest } =
+  maakTrustBewijs({ db, save, betaal,
+    vindReservering: id => (db.data.reserveringen || []).find(r => r.id === id) });
 
 /* Eén blijvende waarheid voor inkomende betalingen, vóór routes en webhooks
    worden bedraad. Ze hangt niet aan Stripe of Mollie: providers leveren alleen
@@ -617,7 +596,7 @@ function tooManyTries(res, bucket) {
    meer nodig voor hij iemand onterecht buitensluit. Wie niets meegeeft krijgt
    tien. */
 let bronLoosGemeld = false;
-function noteFailedTry(bucket, bron, limiet) {
+function noteFailedTry(bucket, bron, limiet, soort) {
   const grens = Number(limiet) > 0 ? Number(limiet) : 10;
   const f = loginFails.get(bucket) || { n: 0, until: 0 };
   f.n += 1;
@@ -635,13 +614,16 @@ function noteFailedTry(bucket, bron, limiet) {
       try { require('./log').log.warn('noteFailedTry zonder bron (' + String(bucket).split(':')[0] +
         '): de noodrem telt deze deur als aparte aanvaller. Geef req.ip mee.'); } catch (e) {}
     }
-    // de rate-limit sloeg aan: dit ziet eruit als brute force op een inlog
-    if (beveilig) beveilig.meld('brute-force', 'kritiek',
+    /* De rem sloeg aan. Een eigen `soort` meldt het als waarschuwing en NIET als
+       brute force, dus zonder noodrem (kern/identiteit/tweedestap-rem.js, N4). */
+    if (beveilig) beveilig.meld(soort || 'brute-force', soort ? 'waarschuwing' : 'kritiek',
       'Te veel mislukte inlogpogingen (' + String(bucket).split(':')[0] + '). De inlog is tijdelijk op slot gezet; mogelijk een brute-force-aanval.',
       { bron: bucket, aanvaller: String(bron || bucket) });
   }
   loginFails.set(bucket, f);
 }
+// de gedeelde rem voor elke deur die een tweede-factorcode toetst
+const tweedeStapRem = require('./kern/identiteit/tweedestap-rem').maakTweedeStapRem({ tooManyTries, noteFailedTry, loginFails });
 
 /* ---------- demo-account: één inlog (Rahul / Imran) voor elk kanaal ----------
    Zo kunt u het klantportaal, de leverancier-app en het personeelskanaal met
@@ -700,7 +682,8 @@ const ankerpost = require('./lib/ankerpost').maakAnkerpost({ ankerdienst });
 const { sseToSupplier, sseToOffice, notifySupplier, supplierIndex,
   findSupplier, supplierAuth, persoonsPoort, logActivity } =
   require('./opzet/leverancierpoort')({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
-    grootSupplierSync, busGeef: () => bus, kernGeef: () => kern });
+    grootSupplierSync, busGeef: () => bus, kernGeef: () => kern,
+    markeerHospitalityRequest });
 
 /* De dienstenlaag -- live updates (SSE), meldingen en web-push, en de diensten
    die daarop leunen (archief, beveiliging, de Wacht, RTmail, naamlaag, antivirus)
@@ -731,6 +714,7 @@ const {
      opzet/leverancierpoort.js, dat hem al zo binnenkrijgt. */
   kernGeef: () => kern
 });
+tweefactor.rem = tweedeStapRem;   // de rem hoort bij de tweede factor: geen eigen kern-naam
 koppelSessiesBus(bus);
 /* De twee draden terug, hier gezet en niet daar (zie de kop van diensten.js):
    beide worden per verzoek gelezen door middleware die HIERBOVEN al gemount is.
@@ -1077,35 +1061,14 @@ app.get('/api/stream', (req, res) => {
   });
 });
 
-/* NOTIFICATIES OPHALEN -- UIT TWEE BAKKEN, EN DAT IS GEEN VERDUBBELING.
-
-   Er zijn twee wegen naar een lid en ze schrijven op een andere sleutel:
-   notify() in opzet/meldingen.js schrijft op TIER (alle Business-leden krijgen
-   bericht), meldLid() in opzet/meldaan.js op de SLEUTEL van het lid (deze reis
-   is bevestigd). Dit eindpunt las alleen de eerste. Een persoonlijk bericht
-   kwam dus wel in db.data.notifications[user-4] te staan, was over de
-   live-verbinding even zichtbaar, en verdween bij de eerste herlaadbeurt -- de
-   stilste fout van allemaal, want er stond nergens een foutmelding.
-
-   Bij een demo-sessie IS de sleutel de tier; dan wordt er een bak gelezen en
-   niet twee, anders staat elk bericht er dubbel. */
-const meldingenVan = (sess) => {
-  const opTier = db.data.notifications[sess.tier] || [];
-  if (!sess.key || sess.key === sess.tier) return opTier;
-  const opSleutel = db.data.notifications[sess.key] || [];
-  if (!opSleutel.length) return opTier;
-  return opTier.concat(opSleutel)
-    .sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')))
-    .slice(0, 40);
-};
+/* Welke bakken een lid ziet en afvinkt: ./opzet/meldingenlezen.js. */
+const { meldingenVan, markeerGelezen } = require('./opzet/meldingenlezen').maakMeldingenLezer((naam) => db.data.notifications[naam]);
 
 app.post('/api/notifications', auth, (req, res) => {
   res.json({ notifications: meldingenVan(req.session) });
 });
 app.post('/api/notifications/read', auth, (req, res) => {
-  for (const bak of [req.session.tier, req.session.key]) {
-    if (bak) (db.data.notifications[bak] || []).forEach(n => n.read = true);
-  }
+  markeerGelezen(req.session.key); // alleen de eigen bak, nooit de gedeelde pas-bak
   save();
   res.json({ ok: true });
 });
@@ -1635,6 +1598,8 @@ const {
 } = maakErvaring({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan,
+  trustPlane,
+  bewijsHospitalityBesluit,
   // de gedekte tafel (kern/tafeldek.js) wordt pas in kernlaag7 gebouwd; laat gebonden
   tafeldekVan: () => kern.tafeldek,
   /* RTG Pay wordt pas in kernlaag3 gebouwd -- ver na deze regel -- en de

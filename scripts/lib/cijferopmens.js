@@ -163,6 +163,19 @@ const UITZONDERINGEN = [
       'dezelfde tekst krijgen hetzelfde getal ongeacht wie erachter zit. De sortering ordent de MATCH en ' +
       'niet de persoon. Gaat weeg() ooit een eigenschap van het onderwerp lezen, dan verdwijnt het ' +
       'bewijsfragment en vervalt deze uitzondering vanzelf.'
+  },
+  {
+    id: 'mobiliteit-inzetweging',
+    onderwerp: 'de inzet van een wagen voor een rit',
+    woorden: ['score'],
+    bestanden: ['server/kern/mobiliteit/matching.js'],
+    bewijs: { bestand: 'server/kern/mobiliteit/matching.js', bevat: "const VERVALLEN = ['beoordeling'];" },
+    reden: 'het getal 0-100 van de dispatch weegt afstand, aanrijtijd, energie, planning en richting van ' +
+      'een INZET, en "eerlijk" telt wat een chauffeur vandaag TOEKOMT (minste ritten eerst, de vorm van ' +
+      'kern/beveiliging/rooster/aanvragen.js). De factor `beoordeling` -- wat reizigers van de chauffeur ' +
+      'vonden -- is er op 4 oktober 2026 uitgehaald omdat dat wel een cijfer op een mens was. Het ' +
+      'bewijsfragment is die uitsluiting: verdwijnt hij, dan vervalt deze uitzondering vanzelf. De opbouw ' +
+      'reist mee als `factoren`, zoals KANTOORMACHT.md eist.'
   }
 ];
 

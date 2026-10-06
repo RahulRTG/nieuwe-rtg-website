@@ -75,6 +75,29 @@ De inlogreis logt **met opzet verkeerd in**: de sonde toetst dat het pad antwoor
 
 <!-- einde SLO.json -->
 
+### Capabilityketen
+
+Naast HTTP-verzoeken meet de Trust & Evidence Plane de zes fasen van de
+zakelijke keten afzonderlijk:
+
+`availability -> experience -> booking -> payment -> fulfillment -> outcome`
+
+De doelen staan in `SLO.json` onder `capabilityProfielen`. De duurzame meter in
+`server/kern/bewijsvlak/metrics.js` bewaart per dag alleen begrensde tellers en
+latentiehistogrammen. Hij scheidt technische fouten van beleidsweigeringen en
+domeinuitkomsten. Daardoor verlaagt `FULL`, `REJECTED` of `POLICY_DENIED` niet
+stilletjes de technische beschikbaarheid, maar blijft het resultaat wel
+meetbaar. Een meting krijgt pas het oordeel "gehaald" als sampleomvang,
+vensterdekking, freshness, beschikbaarheid en latentie allemaal bewezen zijn.
+De stand staat samen met de HTTP-doelen in RTG Command.
+
+Deze metrics zijn een afgeleide projectie van Trust & Evidence Plane V3, niet
+de waarheid zelf. Een groene HTTP-call bewijst alleen technische uitvoering.
+Een boeking, betaling of intrekking krijgt pas een domeinuitspraak wanneer het
+bijbehorende requirement-profiel voldoende actueel en bevoegd bewijs uit de
+vereiste truth classes bevat. `UNKNOWN`, conflicts en ontbrekende evidence
+blijven daarom zichtbaar naast latency en beschikbaarheid.
+
 Doel 4 en 5 staan strenger dan doel 1, en dat is geen slordigheid: wie niet kan
 inloggen ziet niets, en wie niet kan betalen ziet een half afgeronde transactie.
 Dat weegt zwaarder dan een trage overzichtspagina.
@@ -119,7 +142,7 @@ bovengrens voor de kwaliteit.
    terug, maar niemand start hem elke minuut. Dat is een cron op een machine die
    niet van ons is, en dus een inrichtingsbesluit en geen code in deze repo.
 2. **Een kanaal dat iemand wakker maakt.** Er is nu wél een alarm
-   (`server/kern/command/alarm.js`, werkplek **Alarm** in RTG Command): zeven
+   (`server/kern/command/alarm.js`, werkplek **Alarm** in RTG Command): negen
    controles op de lagen die er al zijn, met de drempels in `SLO.json`. Hij
    piept bij het ontstaan en bij het oplossen -- niet elke ronde, want een
    melding die steeds terugkomt leert mensen om hem weg te klikken. Wat er

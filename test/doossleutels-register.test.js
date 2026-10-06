@@ -140,3 +140,39 @@ test('4. constante tijd: timingSafeEqual over gelijke lengtes', async () => {
   } finally { if (vorig === undefined) delete process.env.RTG_DOOS_SLEUTEL; else process.env.RTG_DOOS_SLEUTEL = vorig; }
 });
 
+
+/* Een tweede uitgifte voor dezelfde doos bij dezelfde zaak is VERNIEUWEN
+   (kern/bearercode-keten.js): een mens op naam kiest looptijd en scope, de vorige
+   sleutel opent niets meer, en volgnummer en geschiedenis lopen door. Een v1-
+   sleutel van voor de overgang moet evengoed te vernieuwen zijn. */
+test('5. opnieuw uitgeven is vernieuwen: nieuwe termijn en scope, oude dicht, ook vanaf v1', async () => {
+  let t = Date.parse('2026-09-27T09:00:00Z');
+  const { db, s } = register(() => t);
+  const r = await s.geef({ doos: 'doos-x', zaak: 'KIKUNOI', dagen: 10, door: 'k' });
+  const oud = JSON.parse(JSON.stringify(db.data.doosSleutels['doos-x'].toegang));
+  t += 86400000;
+  const n = await s.geef({ doos: 'doos-x', zaak: 'KIKUNOI', dagen: 30, scope: ['meting'], door: 'kantoor:mw-b' });
+  const nieuw = db.data.doosSleutels['doos-x'].toegang;
+  assert.equal(n.rotatie, 2);
+  assert.equal(nieuw.expires_at, new Date(t + 30 * 86400000).toISOString(), 'de gekozen looptijd telt vanaf nu');
+  assert.deepEqual(nieuw.scope, ['zaakdoos.meting']);
+  assert.deepEqual(nieuw.geschiedenis.at(-1), { rotatie: 1, soort: 'vernieuwd', geroteerd_at: new Date(t).toISOString(),
+    door: 'kantoor:mw-b', einde_was: oud.expires_at });
+  assert.equal(s.welke('doos-x', r.sleutel, 'meting'), null, 'de oude opent niets meer');
+  assert.equal(s.welke('doos-x', n.sleutel, 'meting').doos, 'doos-x');
+  assert.deepEqual(s.welke('doos-x', n.sleutel, 'rapport'), { fout: 'scope-ontbreekt' });
+  assert.deepEqual(s.dozen('KIKUNOI').map(d => [d.doos, d.stand, d.rotatie]), [['doos-x', 'geldig', 2]]);
+
+  // een v1-sleutel (geen geldigheid), zoals hij nog in de opslag kan staan
+  const v1 = require('../server/kern/bearercode')({ crypto, namespace: 'devices.zaakdoos_sleutel', nu: () => new Date(t).toISOString() })
+    .maak({ prefix: 'ZD', issuer: 'rtg.zaakdoos', doel: 'zaakdoos-apparaat', scope: ['zaakdoos.meting'],
+      onderwerp: { doos: 'doos-v', zaak: 'KIKUNOI' }, geldigMs: 5 * 86400000, maxGebruik: 1 });
+  db.data.doosSleutels['doos-v'] = { doos: 'doos-v', zaak: 'KIKUNOI', toegang: v1.toegang, uitgegeven_door: 'k' };
+  const n1 = await s.geef({ doos: 'doos-v', zaak: 'KIKUNOI', door: 'k' });
+  const t1 = db.data.doosSleutels['doos-v'].toegang;
+  assert.equal(t1.contractversie, 2);
+  assert.equal(t1.rotatie, 2);
+  assert.equal(t1.geschiedenis.at(-1).soort, 'vernieuwd');
+  assert.equal(s.welke('doos-v', v1.code, 'meting'), null);
+  assert.equal(s.welke('doos-v', n1.sleutel, 'meting').doos, 'doos-v');
+});

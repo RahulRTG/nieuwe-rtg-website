@@ -4,6 +4,7 @@
 'use strict';
 
 const OUD_MAILVELD = 'SMTP_' + 'HOST';
+const turn = require('./turn');
 
 function keurCommunicatie(env, fouten, waarschuwingen, priveBeta) {
   /* mail.js leest SMTP_URL (of de afzonderlijke MAIL_DIRECT-route), niet het
@@ -46,6 +47,32 @@ function keurCommunicatie(env, fouten, waarschuwingen, priveBeta) {
      beheerder telefoonherstel aantoonbaar fail-closed heeft uitgeschakeld. */
   if (!priveBeta && env.RTG_HERSTEL_SMS_UIT_BEWUST !== '1') {
     fouten.push('Geen echte SMS-provider aangesloten: zet RTG_HERSTEL_SMS_UIT_BEWUST=1 om telefoonherstel bewust fail-closed uit te schakelen.');
+  }
+
+  /* Voice en video staan in Connection OS als werkelijk geïmplementeerde
+     capabilities. Alleen STUN is daarvoor geen volledige productieketen:
+     symmetrische NAT, streng 4G en bedrijfsfirewalls vereisen een relais. Een
+     publieke release mag die acties dus niet projecteren terwijl TURN slechts
+     een waarschuwing is. Private/lokale beta blijft bruikbaar voor een directe
+     netwerkproef, maar publieke productie faalt hier dicht. */
+  if (!priveBeta) {
+    const stun = turn.projecteerStun(env, { publiekeProductie:true });
+    if (!stun.urls || stun.fouten.length) {
+      fouten.push('STUN-configuratie is niet veilig voor publieke productie: gebruik een geldig stun:/stuns:-adres met expliciete poort op exact STUN_PUBLIC_HOST (of de APP_URL-host); geen lege items, externe host, testnaam of lokaal/privaat adres (' +
+        [...new Set(stun.fouten.map(x => x.reden))].join(', ') + ').');
+    }
+    const relay = turn.ontleedLijst(env.TURN_URL, { publiekeProductie:true });
+    if (!String(env.TURN_URL || '').trim()) {
+      fouten.push('TURN_URL ontbreekt: live voice/video is dan niet betrouwbaar via 4G, symmetrische NAT en bedrijfsfirewalls.');
+    }
+    if (String(env.TURN_URL || '').trim() && (!relay.urls.length || relay.fouten.length))
+      fouten.push('TURN_URL is niet veilig voor publieke productie: gebruik uitsluitend volledige turns:-adressen met een openbare host en expliciete geldige poort; geen lege items, plaintext turn:, testnamen of lokale/private adressen (' +
+        [...new Set(relay.fouten.map(x => x.reden))].join(', ') + ').');
+    if (!turn.credentials(env))
+      fouten.push('TURN-authenticatie ontbreekt of is te zwak: zet een willekeurig TURN_SECRET (32+ tekens) of geldige TURN_USER plus een willekeurige TURN_PASS (32+ tekens); herhaling en plaatshouders tellen niet.');
+    if (env.STUN_FALLBACK_GOOGLE === '1') {
+      fouten.push('STUN_FALLBACK_GOOGLE=1 is niet toegestaan in publieke productie: gebruik de eigen STUN/TURN-keten zonder stille externe metadata-uitgang.');
+    }
   }
 }
 

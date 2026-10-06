@@ -10,39 +10,45 @@
    kern/pay/poort.js: de naad met de minste bedrading eroverheen. */
 'use strict';
 
-module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, weigerUit, mollieBedrag }) {
+module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, weigerUit, mollieBedrag,
+  markProviderEvidence }) {
   /* Wie er betaalde en vanaf welk IBAN: ./betaler.js. Daar staat ook waarom
      alleen Mollie dat geeft, en -- belangrijker -- wat je er NIET mee mag doen:
      een bevestiging zet nooit een uitbetaalbestemming, hij bevestigt er alleen
      een die het lid zelf heeft ingevoerd. */
   const { betalerVan } = require('./betaler');
+  const verified = (value, provider) => {
+    if (typeof markProviderEvidence === 'function') markProviderEvidence(value, provider,
+      ['api', 'retrieve', provider, value.id, value.status].join(':'), provider + '-authenticated-api');
+    return value;
+  };
 
   async function haalBetaling(aanbieder, id) {
     weigerUit();
     if (aanbieder === 'mollie' && mollie) {
       const p = await mollie.payments.retrieve(id);
-      return { id: p.id, status: p.status, aanbieder: 'mollie',
+      return verified({ id: p.id, status: p.status, aanbieder: 'mollie',
         referentie: p.metadata && p.metadata.referentie,
         bedrag: p.amount && Math.round(Number(p.amount.value) * 100),
         valuta: p.amount && String(p.amount.currency || '').toLowerCase(),
         checkoutUrl: p._links && p._links.checkout && p._links.checkout.href,
-        ...betalerVan(p.details) };
+        ...betalerVan(p.details) }, 'mollie');
     }
     if (aanbieder === 'stripe' && stripe) {
       const isSessie = String(id).startsWith('cs_');
-      if (isSessie) return stripeGehost.haal(id);
+      if (isSessie) return verified(await stripeGehost.haal(id), 'stripe');
       const p = await stripe.paymentIntents.retrieve(id);
-      return { id: p.id, status: p.status, aanbieder: 'stripe',
+      return verified({ id: p.id, status: p.status, aanbieder: 'stripe',
         referentie: p.metadata && p.metadata.referentie,
         bedrag: Math.round(Number(p.amount_received != null ? p.amount_received : p.amount) || 0),
-        valuta: p.currency, clientSecret: p.client_secret };
+        valuta: p.currency, clientSecret: p.client_secret }, 'stripe');
     }
     if (aanbieder === 'adyen' && adyen) {
       const p = await adyen.paymentLinks.retrieve(id);
-      return { id: p.id, status: p.status, aanbieder: 'adyen', referentie: p.reference,
+      return verified({ id: p.id, status: p.status, aanbieder: 'adyen', referentie: p.reference,
         bedrag: p.amount && Math.round(Number(p.amount.value)),
         valuta: p.amount && String(p.amount.currency || '').toLowerCase(),
-        checkoutUrl: p.url, betaalId: p.pspReference || null };
+        checkoutUrl: p.url, betaalId: p.pspReference || null }, 'adyen');
     }
     throw new Error('Deze betaalprovider is niet beschikbaar.');
   }
@@ -52,6 +58,8 @@ module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, 
     const { aanbieder, providerId, bedrag, valuta = 'eur', idempotentieSleutel } = opdracht || {};
     if (!providerId) throw new Error('Een terugbetaling heeft een providerbetaling nodig.');
     if (!Number.isFinite(bedrag) || bedrag <= 0) throw new Error('Terugbetaalbedrag moet positief zijn.');
+    if ((aanbieder === 'mollie' && mollie) || (aanbieder === 'stripe' && stripe) || (aanbieder === 'adyen' && adyen))
+      require('./uitbetaalgrendel').eisOpen('terugbetaling');
     if (aanbieder === 'mollie' && mollie) {
       const r = await mollie.refunds.create(providerId, { amount: mollieBedrag(bedrag, valuta),
         description: String(opdracht.omschrijving || 'RTG-terugbetaling').slice(0, 255) },

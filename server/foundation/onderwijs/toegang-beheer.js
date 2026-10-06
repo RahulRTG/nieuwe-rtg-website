@@ -5,7 +5,7 @@
    Hoort bij ./toegang.js (CODECREDENTIALS.json, foundation.onderwijs_les_tokens). */
 'use strict';
 
-module.exports = ({ bearer, transactie, maakSleutel, dicht, kaal, nu, DOEL, SCOPE }) => {
+module.exports = ({ bearer, transactie, dicht, kaal, nu, DOEL, SCOPE }) => {
   /* Beheer door de leraar, telkens opnieuw gecontroleerd BINNEN de transactie. */
   function alsLeraar(lesId, sleutel, werk) {
     const gezocht = bearer.hash(kaal(sleutel));
@@ -20,13 +20,16 @@ module.exports = ({ bearer, transactie, maakSleutel, dicht, kaal, nu, DOEL, SCOP
       return werk(les);
     });
   }
+  /* ROTEREN en niet vernieuwen: de nieuwe lescode eindigt met de les, net als de
+     oude, en de toetredingen tellen door tegen het plafond van de klas (dat de
+     ledenlijst in claim() ook al bewaakt). Volgnummer, geschiedenis en de
+     intrekking: kern/bearercode-keten.js. De historie hier draagt de HASH, zodat
+     een oude code "vervangen" zegt en niet "onbekend". */
   const roteerLescode = (lesId, sleutel) => alsLeraar(lesId, sleutel, les => {
-    bearer.intrekken(les.lescode, 'leraar', 'geroteerd');
-    les.lescode_historie.push({ code_hash: les.lescode.code_hash, ingetrokken_at: les.lescode.ingetrokken_at,
-      rotatie: les.lescode.rotatie });
+    const oud = les.lescode;
+    const nieuw = bearer.roteer(oud, { actor: 'leraar', prefix: 'LES', afgeleid: 'geen' });
+    les.lescode_historie.push({ code_hash: oud.code_hash, ingetrokken_at: oud.ingetrokken_at, rotatie: oud.rotatie });
     if (les.lescode_historie.length > 20) les.lescode_historie.shift();
-    const nieuw = maakSleutel('lescode', les);
-    nieuw.toegang.rotatie = (les.lescode.rotatie || 1) + 1;
     les.lescode = nieuw.toegang;
     return { ok: true, lescode: nieuw.code, toegang: bearer.publiek(les.lescode) };
   });

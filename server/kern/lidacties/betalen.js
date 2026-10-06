@@ -114,7 +114,7 @@ async function betaalOrderVoor(session, body) {
   // betaald = definitief: het keukenbrein boekt de ingredienten af via de recepten
   try { keuken.boekVerkoopAf(findSupplier(o.supplierCode), o.items || [], 'bestelling ' + o.ref); } catch (e) {}
   // nu pas hoort de zaak ervan: betaald = definitief
-  notifySupplier(o.supplierCode, { icon: 'hotel', title: 'Nieuwe bestelling (betaald)', body: o.customerCodename + ', ' + o.items.reduce((n, i) => n + i.qty, 0) + ' item(s), \u20AC ' + o.total + (o.allergyNote ? ' \u00B7 allergie: ' + o.allergyNote : '') });
+  (notifySupplier.naOpslag || notifySupplier)(o.supplierCode, { icon: 'hotel', title: 'Nieuwe bestelling (betaald)', body: o.customerCodename + ', ' + o.items.reduce((n, i) => n + i.qty, 0) + ' item(s), \u20AC ' + o.total + (o.allergyNote ? ' \u00B7 allergie: ' + o.allergyNote : '') });
   sseToSupplier(o.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
   return { ok: true, order: o, bijgeladen: geld.bijgeladen || 0 };

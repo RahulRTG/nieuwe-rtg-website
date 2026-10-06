@@ -10,16 +10,16 @@ staan loodrecht op elkaar: een wereld is een plek, een groep is een publiek.
 
 | groep | functies | wie dat is |
 |---|---:|---|
-| **RTG-leden** | 145 | Leden met de RTG Pass. |
-| **Lifestyle** | 148 | Leden met de Lifestyle Pass. |
-| **Business** | 160 | Leden met de Business Pass (zakelijk). |
-| **Gratis app** | 45 | De gratis RTG-app, zonder pas (rondkijken en bij partners bestellen). |
-| **Leveranciers** | 57 | Partners en hun personeel in de partner-app. |
-| **Personeel** | 44 | Medewerkers in de personeels-app (PDA). |
+| **RTG-leden** | 169 | Leden met de RTG Pass. |
+| **Lifestyle** | 173 | Leden met de Lifestyle Pass. |
+| **Business** | 185 | Leden met de Business Pass (zakelijk). |
+| **Gratis app** | 53 | De gratis RTG-app, zonder pas (rondkijken en bij partners bestellen). |
+| **Leveranciers** | 64 | Partners en hun personeel in de partner-app. |
+| **Personeel** | 49 | Medewerkers in de personeels-app (PDA). |
 | **Foundation** | 48 | Gezinnen, leerlingen en scholen in de RTF-app. |
-| **RTG intern** | 18 | De RTG-backoffice en integraties (intern). |
+| **RTG intern** | 21 | De RTG-backoffice en integraties (intern). |
 
-Totaal 197 functieschakelaars in 17 categorieën.
+Totaal 228 functieschakelaars in 17 categorieën.
 
 ## Het verschil tussen de passen
 
@@ -27,10 +27,10 @@ Dit is de vraag waar een prijskaartje aan hangt, dus hier staat hij kaal:
 
 | | functies | waarvan uniek |
 |---|---:|---:|
-| RTG Pass | 145 | . |
-| Lifestyle Pass | 148 | 0 |
-| Business Pass | 160 | 12 |
-| Gratis app | 45 | . |
+| RTG Pass | 169 | . |
+| Lifestyle Pass | 173 | 0 |
+| Business Pass | 185 | 12 |
+| Gratis app | 53 | . |
 
 **Wat er boven de RTG Pass uit komt, de hele lijst:**
 
@@ -38,14 +38,16 @@ Dit is de vraag waar een prijskaartje aan hangt, dus hier staat hij kaal:
   <br>De veertien premium-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison, Garde-robe, Mecenaat, Nalatenschap, Logboek, Cercle, Hangar, Entourage, Attenties en Rendez-vous.
 - **RTG Zakelijk (professioneel netwerk)** -- Lifestyle + Business
   <br>De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.
+- **Bellen met RTG (in de app)** -- Lifestyle + Business
+  <br>Bellen met RTG Service binnen de app, zonder telefoonnet en zonder nummer.
 - **Het Privékantoor (Lifestyle)** -- Lifestyle + Business
   <br>De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn.
 - **Werk OS (werkruimtes)** -- Business
   <br>De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten.
 - **Wervingslink (in dienst via een link)** -- Business
   <br>De uitnodigingslink van een werkgever: kijken wie je uitnodigt (openbaar, alleen bedrijfsnaam en functie) en jezelf eraan verbinden met je eigen RTG-account.
-- **De werkvloer** -- Business
-  <br>Tafels, keukenbord en bedieningskaart op de vloer van een zaak.
+- **Tenant Control Plane (white-label)** -- Business
+  <br>Welke organisatie een werkruimte draait, welk merk zij daar voert, en hoe een groep van haar identiteitsprovider een rol wordt.
 - **De werkplek** -- Business
   <br>Het persoonlijke werkstation van een medewerker.
 - **Metier (vakwerk)** -- Business
@@ -79,13 +81,15 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## Gratis app -- 45 functies
+## Gratis app -- 53 functies
 
 *De gratis RTG-app, zonder pas (rondkijken en bij partners bestellen).*
 
 ### Leden (RTG-app)
 
 - **Leden-app (algemeen)** -- Alle ledenfuncties in de RTG-app.
+- **RTG Neiging (Mijn neigingen)** -- De intake die zichzelf afkapt, en de kaart met wat RTG van je denkt te weten.
+- **Kwesties inbrengen (DemocratieOS)** -- Een burger brengt een kwestie in en volgt wat ermee gebeurt.
 - **De app-staat** -- De ene aanroep waarmee de app zijn hele beeld ophaalt.
 - **De live-verbinding** -- De open lijn (SSE) waarover meldingen en verversingen binnenkomen, plus de verbindingsgegevens voor bellen.
 - **Meldingen en push** -- De meldingen in de app, de voorkeuren daarvoor en de push naar het toestel.
@@ -96,19 +100,20 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **App-gids en uitleg** -- De gids die per scherm uitlegt wat je er kunt doen.
 - **Waarderen en reageren** -- Likes, reacties, reviews en favorieten door het hele platform.
 
+### Sociaal (De Salon)
+
+- **De Salon (feed, volgen, deals)** -- De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.
+
 ### Genres & diensten
 
 - **Bestellen & bezorgen** -- Bestellen bij een zaak (ophalen of laten bezorgen) met live volgen.
 - **Tickets & activiteiten** -- Tickets kopen met tijdslot en een oplichtende entreecode.
 
-### Sociaal (De Salon)
-
-- **De Salon (feed, volgen, deals)** -- De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.
-
 ### Eigen apps
 
 - **RTG Hospitality Guest OS (de gastkant)** -- Bestellen vanaf je eigen telefoon: aan tafel via de QR, op je hotelkamer op de gastrekening, in de club op je polsband, en van huis uit laten bezorgen, afhalen of een foodcourt-mandje bij meer loketten.
 - **RTG Invisible Arrival** -- Een beveiligde aankomstpas voor reservering, capaciteitscontrole en minimale live aankomststatus.
+- **Rust (Thuisrust)** -- Stilte die vanzelf eindigt, terwijl je kring erdoor komt.
 
 ### Betalen & verificatie
 
@@ -130,10 +135,15 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 ### RTFoundation
 
 - **Living Lab: de bewonerskant** -- Meedoen met een labpas, een onderzoeksvraag aandragen, stemmen en het labpaspoort.
+- **Leerstof** -- Het lesmateriaal achter het onderwijs.
+- **Onderwijs (paspoort en ladder)** -- Inschrijven, het leerpaspoort en de leerladder.
+- **Bijles** -- Het bijlesgesprek met de begeleider.
+- **Het labfonds** -- De financiering van onderzoeksprojecten.
 
 ### Winkel en media
 
 - **De Mall** -- De etages en de gids met alle partners.
+- **App Store (apps van derden)** -- De winkelkant van het derdenkanaal: bladeren, installeren, machtigen, kopen en openen in de cel.
 - **Media-assets** -- Het uitleveren van geuploade media.
 - **Media uitleveren** -- Het uitleveren van geuploade afbeeldingen en bestanden aan de app.
 
@@ -153,9 +163,9 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Toegang en identiteit
 
-- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten.
+- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten -- met een wachtwoord of met een passkey.
 - **Account en profiel** -- Het eigen account: rollen, koppelingen en het cv van een lid.
-- **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
+- **Inloggen via een andere partij (SSO en SCIM)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort, en de SCIM-deur waarlangs die provider accounts aanmaakt en uitzet.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
 - **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
@@ -172,7 +182,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## RTG-leden -- 145 functies
+## RTG-leden -- 169 functies
 
 *Leden met de RTG Pass.*
 
@@ -184,6 +194,10 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Vrienden verbinden** -- Vriendschapsverzoeken en de vriendengraaf tussen leden: zoeken op codenaam, of toevoegen met de eigen contactpin (ook als QR).
 - **Vacatures & solliciteren (leden)** -- Leden solliciteren met hun cv op vacatures bij partners.
 - **RTG Wereld (de ene sociale app)** -- De laag over De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen heen: één tijdlijn met een schakelaar (Alles, Lifestyle, Business, Communities, Privé) en de sprong naar de berichten-app.
+- **RTG Service (hulp vragen)** -- De hulplijn van een lid: iets melden vanuit het scherm waar je stond, je lopende zaken zien, een medewerker toegang bevestigen, en om een MENS vragen.
+- **Automatisch ondertitelen in een gesprek** -- Een deelnemer laat zijn eigen stem omzetten naar tekst met een LOKAAL model; de regel komt in de meeleesbaan van het gesprek.
+- **RTG Neiging (Mijn neigingen)** -- De intake die zichzelf afkapt, en de kaart met wat RTG van je denkt te weten.
+- **Kwesties inbrengen (DemocratieOS)** -- Een burger brengt een kwestie in en volgt wat ermee gebeurt.
 - **De app-staat** -- De ene aanroep waarmee de app zijn hele beeld ophaalt.
 - **De live-verbinding** -- De open lijn (SSE) waarover meldingen en verversingen binnenkomen, plus de verbindingsgegevens voor bellen.
 - **Meldingen en push** -- De meldingen in de app, de voorkeuren daarvoor en de push naar het toestel.
@@ -197,6 +211,13 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **App-gids en uitleg** -- De gids die per scherm uitlegt wat je er kunt doen.
 - **Waarderen en reageren** -- Likes, reacties, reviews en favorieten door het hele platform.
 
+### Sociaal (De Salon)
+
+- **De Salon (feed, volgen, deals)** -- De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.
+- **Salon-ontmoetingen (in de buurt)** -- Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.
+- **Sociale laag (RTG + RTF)** -- De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam.
+- **RTF contacten & familiekoppeling** -- De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.
+
 ### Genres & diensten
 
 - **Bestellen & bezorgen** -- Bestellen bij een zaak (ophalen of laten bezorgen) met live volgen.
@@ -208,13 +229,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Onderweg (live locatie)** -- Het live onderweg-scherm: positie, ETA en verbonden partners.
 - **Contracten (leden tekenen)** -- Digitale contracten die een lid in de app ondertekent.
 - **Groothandel & markt** -- De brede B2B/B2C-marktplaats: horeca koopt in, leden bestellen boodschappen, met AI-bijbestellen.
-
-### Sociaal (De Salon)
-
-- **De Salon (feed, volgen, deals)** -- De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.
-- **Salon-ontmoetingen (in de buurt)** -- Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.
-- **Sociale laag (RTG + RTF)** -- De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam.
-- **RTF contacten & familiekoppeling** -- De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.
+- **RTG Commerce (mand & retour)** -- De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug.
 
 ### Eigen apps
 
@@ -231,12 +246,14 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **RTG Office (kantoorpakket)** -- Het eigen kantoorpakket: tekstdocumenten en rekenbladen op uw account, alleen-lezen te delen op codenaam.
 - **RTG Ondernemers-OS** -- Van "ik denk erover na" tot een draaiend bedrijf in een scherm: de verkenning en de stress test, de rechtsvorm en het oprichtingsproject, het dagbeeld met debiteuren, btw, kas en capaciteit, de verkooppijplijn en het bestuur met de UBO-afleiding.
 - **RTG Vonk (dating)** -- Dating op codenaam met de Salon-veiligheidslat: 18+, geverifieerd paspoort, een eindige dagselectie, en bij een match automatisch een tafel rond het midden van beide woonplaatsen (EUR 10 p.p., waarvan EUR 5 voor RTG).
+- **RTG Connection OS** -- De gedeelde, afschakelbare communicatie- en medialaag onder Vonk en Rendez-vous.
 - **RTG Media (één mediawereld)** -- De laag die Klankwerk, Theater, Clips en Podium tot één wereld maakt: drie standen (muziek, kijk, flow) op dezelfde catalogus, één makersprofiel, één volgrelatie, één bibliotheek en de eigen smaakregelaars.
 - **RTG Clips (korte video’s)** -- Korte verticale video’s die alleen op het toestel van de maker staan (OPFS); kijken is rechtstreeks P2P.
 - **RTG Hospitality Guest OS (de gastkant)** -- Bestellen vanaf je eigen telefoon: aan tafel via de QR, op je hotelkamer op de gastrekening, in de club op je polsband, en van huis uit laten bezorgen, afhalen of een foodcourt-mandje bij meer loketten.
 - **RTG Evening OS (een avond plannen)** -- Een hele avond als plan: eten, iets drinken en de rit naar huis, binnen je budget en op tijd thuis.
 - **RTG Invisible Arrival** -- Een beveiligde aankomstpas voor reservering, capaciteitscontrole en minimale live aankomststatus.
 - **RTG Het Vooruitzicht (scenario- en eventlaag)** -- De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen: intenties, drie werelden, providerbewijs en herstel bij een verstoring.
+- **RTG Experience Platform** -- De vier werelden, hun contextprojecties, resume state, attention en gebrokerde acties.
 - **RTG Life (het ene scherm)** -- Het overzichtsscherm en de dagcoach: ze lezen de lagen hieronder en leggen ze naast elkaar.
 - **Doelen** -- Waar u begon, waar u heen wilt en waarom; de mijlpalen worden afgeleid en niet bewaard.
 - **Dagmetingen en toestellen** -- Slaap, beweging, water en gewicht, zelf ingevuld of door een gekoppeld toestel weggeschreven.
@@ -249,11 +266,20 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Voeding (weekplan)** -- Een weekplan voor wat u wilt eten.
 - **Noodkaart** -- Een noodcontact en, als u dat wilt, uw allergenen en middelen.
 - **Verzorging (kapper, barbier, nagels)** -- De salonagenda vanaf de kant van het lid, op codenaam.
+- **Kinderopvang (ouderkant)** -- Welke kinderopvang er is en hoeveel plek daar vrij is, plus een aanvraag klaarzetten en zelf weer intrekken.
+- **Knelpunten (welke weg ligt open)** -- Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan.
+- **Vertegenwoordiging (wie mag iets namens mij)** -- Machtigingen van mens tot mens: wie mag wat namens een lid, sinds wanneer, tot wanneer, en wat is er namens hem gedaan.
+- **Rugdekking (wie staat er achter mij)** -- Wat een lid ziet van het programma waarmee RTG achter hem staat: welke soort, welk bedrag, tot wanneer, en wat RTG ervoor terugvraagt.
+- **Mijn loopbaan (het carriere ledger)** -- De loopbaan van een mens als chronologische reeks: wat er gebeurde, wanneer, en wie dat heeft bevestigd.
+- **Rust (Thuisrust)** -- Stilte die vanzelf eindigt, terwijl je kring erdoor komt.
+- **Ontdekken (leren, doen, doorgeven)** -- Een ontdeklijst die wordt samengesteld uit lagen die RTG al heeft: leerstof en wat er in de buurt gebeurt.
+- **RTG Academy (leren, bewijzen, certificeren)** -- Het leerhuis: van rol en officiele kennis via oefenen, simulatie, werk onder toezicht en een onafhankelijke beoordeling naar een certificaat, en terug via verbetervoorstellen uit de praktijk.
 
 ### Betalen & verificatie
 
 - **Betaalverkeer** -- Betalingen (demo of Stripe) en de RTG Pay-wallet.
 - **Passkeys (WebAuthn)** -- Inloggen met vingerafdruk, gezicht of beveiligingssleutel.
+- **Herstel van het eigenaarsaccount** -- De weg terug zonder toestel: twee van de drie herstel-delen, zeven dagen wachttijd, en elke werkende passkey breekt hem af.
 - **Identiteitsverificatie (KYC)** -- Leden uploaden hun identiteitsbewijs en RTG beoordeelt het.
 - **Paspoort delen (gecontroleerd)** -- Het toestemmingsgestuurde kanaal waarlangs een partner een identiteit opvraagt (ja/nee, ID-kaart of scan), met melding en weigering voor het lid.
 - **Vakbewijs indienen** -- Leden leggen de stukken vast die hun werk vraagt (VOG, BIG-registratie, legitimatiebewijs); RTG tekent af dat het stuk is gezien en beoordeelt de inhoud niet.
@@ -262,18 +288,22 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 - **Rahul doet het (AI-stuur)** -- De AI voert acties uit op elk toegestaan API-pad, met de eigen inlog van wie het vraagt (nooit meer rechten dan de persoon zelf).
 
+### RTG-Backoffice
+
+- **Loop Fabric: overdracht en recall** -- Duurzame, beleidsgebonden overdracht van bronobservaties, wijzigingsbonnen en recall tussen RTG-domeinen.
+
 ### Diensten (leden)
 
 - **Overheidsloket** -- Belasting, toeslagen, rijbewijs, voertuigen, KVK, uitkeringen, bezwaar, subsidies en waterschap in een loket.
 - **Gemeenteloket** -- Meldingen, aanvragen en gemeentezaken.
 - **Thuis (verhuur en logeren)** -- Advertenties, reviews en boekingen tussen leden onderling.
 - **Residentie** -- Het woon- en verblijfsdeel van het platform.
-- **Luchtvaart en luchthaven** -- Vluchten, boarding passes en de luchthavendiensten.
 - **Reisbureau** -- Reisadvies en het samenstellen van een reis.
 - **Zorg en welzijn** -- De zorgkant: intakes, begeleiding en welzijnsdiensten.
 - **Agenda** -- De agenda: afspraken, uitnodigingen en planning.
 - **RTG Meet (vergaderkamers)** -- Vergaderkamers op codenaam; beeld en geluid lopen peer-to-peer.
 - **Navigatie** -- Routes en navigatie onderweg.
+- **RTG Move (haal ik het?)** -- Of uw reis in de tijd klopt, en wat er breekt als iets verschuift.
 - **Plaats (aanwezigheid en nadering)** -- Hekken, toestemmingsvensters en waarnemingen; de motor draait op het toestel.
 - **Reizen boeken** -- Het boeken zelf: aanbod, slots, betalen en de eigen boekingen, inclusief het partnerkanaal voor niet-leden.
 - **Verblijf en reserveringen** -- Verblijf, de deur van een kamer, reserveren en het annuleren daarvan.
@@ -290,8 +320,8 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Cultuur en gezelschap
 
+- **Foundation LibraryOS kernel** -- Besloten werken, afspraken, rechten en editiegebonden vrijgave; geen publieke catalogus of verkoop.
 - **Het Genootschap** -- Het besloten genootschap: kringen, bijeenkomsten en beheer.
-- **Sport** -- Sportprogramma's, teams en wedstrijden.
 - **Muziek** -- Van lied tot zaal: maken, uitgeven en beluisteren.
 - **Galerij** -- De beeldgalerij van leden en partners.
 - **Boeken** -- De bibliotheek en het lezen.
@@ -301,10 +331,16 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 ### RTFoundation
 
 - **Living Lab: de bewonerskant** -- Meedoen met een labpas, een onderzoeksvraag aandragen, stemmen en het labpaspoort.
+- **Leerstof** -- Het lesmateriaal achter het onderwijs.
+- **Onderwijs (paspoort en ladder)** -- Inschrijven, het leerpaspoort en de leerladder.
+- **Bijles** -- Het bijlesgesprek met de begeleider.
+- **Het labfonds** -- De financiering van onderzoeksprojecten.
+- **Samen (stadsraad)** -- De gezamenlijke uitslagen en besluiten met stadspartners.
 
 ### Winkel en media
 
 - **De Mall** -- De etages en de gids met alle partners.
+- **App Store (apps van derden)** -- De winkelkant van het derdenkanaal: bladeren, installeren, machtigen, kopen en openen in de cel.
 - **Bestanden (kluis)** -- De persoonlijke bestandenkluis.
 - **Notities** -- De notitie-app: losse aantekeningen en lijstjes van een lid.
 - **Leden-website** -- De eigen website die een lid of zaak kan bouwen.
@@ -319,7 +355,6 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Storingsmelding uit de browser** -- Meldt een onafgevangen fout aan het logboek: melding, bestand, regel en pagina.
 - **RTG iD** -- De digitale identiteit en het delen daarvan.
 - **Veiligheidsdiensten** -- De beveiligingskant voor leden en zaken.
-- **Grensdiensten (KMar)** -- De grens- en documentcontrole bij reizen.
 - **Onboarding** -- De eerste stappen na aanmelden: profiel compleet maken.
 
 ### Geld
@@ -337,7 +372,9 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **De AI-bankier** -- Rahul kijkt mee met de rekeningen en geeft advies; hij besluit niets.
 - **Wallet** -- De wallet van een lid binnen RTG Pay.
 - **Walletsaldo en betalen binnen RTG** -- Saldo aanhouden, opladen, tikken en betaalverzoeken binnen het gesloten RTG-circuit.
-- **Tegoed voor een ander** -- Tegoed kopen voor iemand anders, verzilveren met een code, en verlopen tegoed terugnemen.
+- **Tegoed voor een ander** -- Tegoed kopen voor iemand anders, verzilveren met een code, een nieuwe code maken, intrekken, en verlopen tegoed terugnemen.
+- **Saldo terugstorten naar het lid** -- Het eigen walletsaldo terugstorten naar de eigen bankrekening.
+- **Wat mijn gebruik kost** -- Het lid ziet wat zijn eigen gebruik van RTG kost, met de bewijsgraad erbij, en wie dat betaalt.
 - **Betalen en betaalverzoeken** -- Rechtstreeks betalen aan een partner, betaalverzoeken en de betaalopties.
 - **Rekening en facturen** -- De openstaande rekening, het afrekenen daarvan en losse facturen.
 - **Rekening splitsen** -- Een rekening samen delen en ieders deel betalen.
@@ -350,9 +387,9 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Toegang en identiteit
 
-- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten.
+- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten -- met een wachtwoord of met een passkey.
 - **Account en profiel** -- Het eigen account: rollen, koppelingen en het cv van een lid.
-- **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
+- **Inloggen via een andere partij (SSO en SCIM)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort, en de SCIM-deur waarlangs die provider accounts aanmaakt en uitzet.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
 - **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
@@ -365,7 +402,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## Lifestyle -- 148 functies
+## Lifestyle -- 173 functies
 
 *Leden met de Lifestyle Pass.*
 
@@ -379,7 +416,12 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **De Rechterhand (Lifestyle-suite)** -- De veertien premium-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison, Garde-robe, Mecenaat, Nalatenschap, Logboek, Cercle, Hangar, Entourage, Attenties en Rendez-vous.
 - **RTG Zakelijk (professioneel netwerk)** -- De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.
 - **RTG Wereld (de ene sociale app)** -- De laag over De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen heen: één tijdlijn met een schakelaar (Alles, Lifestyle, Business, Communities, Privé) en de sprong naar de berichten-app.
+- **RTG Service (hulp vragen)** -- De hulplijn van een lid: iets melden vanuit het scherm waar je stond, je lopende zaken zien, een medewerker toegang bevestigen, en om een MENS vragen.
+- **Bellen met RTG (in de app)** -- Bellen met RTG Service binnen de app, zonder telefoonnet en zonder nummer.
+- **Automatisch ondertitelen in een gesprek** -- Een deelnemer laat zijn eigen stem omzetten naar tekst met een LOKAAL model; de regel komt in de meeleesbaan van het gesprek.
+- **RTG Neiging (Mijn neigingen)** -- De intake die zichzelf afkapt, en de kaart met wat RTG van je denkt te weten.
 - **Het Privékantoor (Lifestyle)** -- De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn.
+- **Kwesties inbrengen (DemocratieOS)** -- Een burger brengt een kwestie in en volgt wat ermee gebeurt.
 - **De app-staat** -- De ene aanroep waarmee de app zijn hele beeld ophaalt.
 - **De live-verbinding** -- De open lijn (SSE) waarover meldingen en verversingen binnenkomen, plus de verbindingsgegevens voor bellen.
 - **Meldingen en push** -- De meldingen in de app, de voorkeuren daarvoor en de push naar het toestel.
@@ -393,6 +435,13 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **App-gids en uitleg** -- De gids die per scherm uitlegt wat je er kunt doen.
 - **Waarderen en reageren** -- Likes, reacties, reviews en favorieten door het hele platform.
 
+### Sociaal (De Salon)
+
+- **De Salon (feed, volgen, deals)** -- De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.
+- **Salon-ontmoetingen (in de buurt)** -- Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.
+- **Sociale laag (RTG + RTF)** -- De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam.
+- **RTF contacten & familiekoppeling** -- De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.
+
 ### Genres & diensten
 
 - **Bestellen & bezorgen** -- Bestellen bij een zaak (ophalen of laten bezorgen) met live volgen.
@@ -404,13 +453,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Onderweg (live locatie)** -- Het live onderweg-scherm: positie, ETA en verbonden partners.
 - **Contracten (leden tekenen)** -- Digitale contracten die een lid in de app ondertekent.
 - **Groothandel & markt** -- De brede B2B/B2C-marktplaats: horeca koopt in, leden bestellen boodschappen, met AI-bijbestellen.
-
-### Sociaal (De Salon)
-
-- **De Salon (feed, volgen, deals)** -- De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.
-- **Salon-ontmoetingen (in de buurt)** -- Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.
-- **Sociale laag (RTG + RTF)** -- De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam.
-- **RTF contacten & familiekoppeling** -- De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.
+- **RTG Commerce (mand & retour)** -- De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug.
 
 ### Eigen apps
 
@@ -427,12 +470,14 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **RTG Office (kantoorpakket)** -- Het eigen kantoorpakket: tekstdocumenten en rekenbladen op uw account, alleen-lezen te delen op codenaam.
 - **RTG Ondernemers-OS** -- Van "ik denk erover na" tot een draaiend bedrijf in een scherm: de verkenning en de stress test, de rechtsvorm en het oprichtingsproject, het dagbeeld met debiteuren, btw, kas en capaciteit, de verkooppijplijn en het bestuur met de UBO-afleiding.
 - **RTG Vonk (dating)** -- Dating op codenaam met de Salon-veiligheidslat: 18+, geverifieerd paspoort, een eindige dagselectie, en bij een match automatisch een tafel rond het midden van beide woonplaatsen (EUR 10 p.p., waarvan EUR 5 voor RTG).
+- **RTG Connection OS** -- De gedeelde, afschakelbare communicatie- en medialaag onder Vonk en Rendez-vous.
 - **RTG Media (één mediawereld)** -- De laag die Klankwerk, Theater, Clips en Podium tot één wereld maakt: drie standen (muziek, kijk, flow) op dezelfde catalogus, één makersprofiel, één volgrelatie, één bibliotheek en de eigen smaakregelaars.
 - **RTG Clips (korte video’s)** -- Korte verticale video’s die alleen op het toestel van de maker staan (OPFS); kijken is rechtstreeks P2P.
 - **RTG Hospitality Guest OS (de gastkant)** -- Bestellen vanaf je eigen telefoon: aan tafel via de QR, op je hotelkamer op de gastrekening, in de club op je polsband, en van huis uit laten bezorgen, afhalen of een foodcourt-mandje bij meer loketten.
 - **RTG Evening OS (een avond plannen)** -- Een hele avond als plan: eten, iets drinken en de rit naar huis, binnen je budget en op tijd thuis.
 - **RTG Invisible Arrival** -- Een beveiligde aankomstpas voor reservering, capaciteitscontrole en minimale live aankomststatus.
 - **RTG Het Vooruitzicht (scenario- en eventlaag)** -- De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen: intenties, drie werelden, providerbewijs en herstel bij een verstoring.
+- **RTG Experience Platform** -- De vier werelden, hun contextprojecties, resume state, attention en gebrokerde acties.
 - **RTG Life (het ene scherm)** -- Het overzichtsscherm en de dagcoach: ze lezen de lagen hieronder en leggen ze naast elkaar.
 - **Doelen** -- Waar u begon, waar u heen wilt en waarom; de mijlpalen worden afgeleid en niet bewaard.
 - **Dagmetingen en toestellen** -- Slaap, beweging, water en gewicht, zelf ingevuld of door een gekoppeld toestel weggeschreven.
@@ -445,11 +490,20 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Voeding (weekplan)** -- Een weekplan voor wat u wilt eten.
 - **Noodkaart** -- Een noodcontact en, als u dat wilt, uw allergenen en middelen.
 - **Verzorging (kapper, barbier, nagels)** -- De salonagenda vanaf de kant van het lid, op codenaam.
+- **Kinderopvang (ouderkant)** -- Welke kinderopvang er is en hoeveel plek daar vrij is, plus een aanvraag klaarzetten en zelf weer intrekken.
+- **Knelpunten (welke weg ligt open)** -- Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan.
+- **Vertegenwoordiging (wie mag iets namens mij)** -- Machtigingen van mens tot mens: wie mag wat namens een lid, sinds wanneer, tot wanneer, en wat is er namens hem gedaan.
+- **Rugdekking (wie staat er achter mij)** -- Wat een lid ziet van het programma waarmee RTG achter hem staat: welke soort, welk bedrag, tot wanneer, en wat RTG ervoor terugvraagt.
+- **Mijn loopbaan (het carriere ledger)** -- De loopbaan van een mens als chronologische reeks: wat er gebeurde, wanneer, en wie dat heeft bevestigd.
+- **Rust (Thuisrust)** -- Stilte die vanzelf eindigt, terwijl je kring erdoor komt.
+- **Ontdekken (leren, doen, doorgeven)** -- Een ontdeklijst die wordt samengesteld uit lagen die RTG al heeft: leerstof en wat er in de buurt gebeurt.
+- **RTG Academy (leren, bewijzen, certificeren)** -- Het leerhuis: van rol en officiele kennis via oefenen, simulatie, werk onder toezicht en een onafhankelijke beoordeling naar een certificaat, en terug via verbetervoorstellen uit de praktijk.
 
 ### Betalen & verificatie
 
 - **Betaalverkeer** -- Betalingen (demo of Stripe) en de RTG Pay-wallet.
 - **Passkeys (WebAuthn)** -- Inloggen met vingerafdruk, gezicht of beveiligingssleutel.
+- **Herstel van het eigenaarsaccount** -- De weg terug zonder toestel: twee van de drie herstel-delen, zeven dagen wachttijd, en elke werkende passkey breekt hem af.
 - **Identiteitsverificatie (KYC)** -- Leden uploaden hun identiteitsbewijs en RTG beoordeelt het.
 - **Paspoort delen (gecontroleerd)** -- Het toestemmingsgestuurde kanaal waarlangs een partner een identiteit opvraagt (ja/nee, ID-kaart of scan), met melding en weigering voor het lid.
 - **Vakbewijs indienen** -- Leden leggen de stukken vast die hun werk vraagt (VOG, BIG-registratie, legitimatiebewijs); RTG tekent af dat het stuk is gezien en beoordeelt de inhoud niet.
@@ -458,18 +512,22 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 - **Rahul doet het (AI-stuur)** -- De AI voert acties uit op elk toegestaan API-pad, met de eigen inlog van wie het vraagt (nooit meer rechten dan de persoon zelf).
 
+### RTG-Backoffice
+
+- **Loop Fabric: overdracht en recall** -- Duurzame, beleidsgebonden overdracht van bronobservaties, wijzigingsbonnen en recall tussen RTG-domeinen.
+
 ### Diensten (leden)
 
 - **Overheidsloket** -- Belasting, toeslagen, rijbewijs, voertuigen, KVK, uitkeringen, bezwaar, subsidies en waterschap in een loket.
 - **Gemeenteloket** -- Meldingen, aanvragen en gemeentezaken.
 - **Thuis (verhuur en logeren)** -- Advertenties, reviews en boekingen tussen leden onderling.
 - **Residentie** -- Het woon- en verblijfsdeel van het platform.
-- **Luchtvaart en luchthaven** -- Vluchten, boarding passes en de luchthavendiensten.
 - **Reisbureau** -- Reisadvies en het samenstellen van een reis.
 - **Zorg en welzijn** -- De zorgkant: intakes, begeleiding en welzijnsdiensten.
 - **Agenda** -- De agenda: afspraken, uitnodigingen en planning.
 - **RTG Meet (vergaderkamers)** -- Vergaderkamers op codenaam; beeld en geluid lopen peer-to-peer.
 - **Navigatie** -- Routes en navigatie onderweg.
+- **RTG Move (haal ik het?)** -- Of uw reis in de tijd klopt, en wat er breekt als iets verschuift.
 - **Plaats (aanwezigheid en nadering)** -- Hekken, toestemmingsvensters en waarnemingen; de motor draait op het toestel.
 - **Reizen boeken** -- Het boeken zelf: aanbod, slots, betalen en de eigen boekingen, inclusief het partnerkanaal voor niet-leden.
 - **Verblijf en reserveringen** -- Verblijf, de deur van een kamer, reserveren en het annuleren daarvan.
@@ -486,8 +544,8 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Cultuur en gezelschap
 
+- **Foundation LibraryOS kernel** -- Besloten werken, afspraken, rechten en editiegebonden vrijgave; geen publieke catalogus of verkoop.
 - **Het Genootschap** -- Het besloten genootschap: kringen, bijeenkomsten en beheer.
-- **Sport** -- Sportprogramma's, teams en wedstrijden.
 - **Muziek** -- Van lied tot zaal: maken, uitgeven en beluisteren.
 - **Galerij** -- De beeldgalerij van leden en partners.
 - **Boeken** -- De bibliotheek en het lezen.
@@ -497,10 +555,16 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 ### RTFoundation
 
 - **Living Lab: de bewonerskant** -- Meedoen met een labpas, een onderzoeksvraag aandragen, stemmen en het labpaspoort.
+- **Leerstof** -- Het lesmateriaal achter het onderwijs.
+- **Onderwijs (paspoort en ladder)** -- Inschrijven, het leerpaspoort en de leerladder.
+- **Bijles** -- Het bijlesgesprek met de begeleider.
+- **Het labfonds** -- De financiering van onderzoeksprojecten.
+- **Samen (stadsraad)** -- De gezamenlijke uitslagen en besluiten met stadspartners.
 
 ### Winkel en media
 
 - **De Mall** -- De etages en de gids met alle partners.
+- **App Store (apps van derden)** -- De winkelkant van het derdenkanaal: bladeren, installeren, machtigen, kopen en openen in de cel.
 - **Bestanden (kluis)** -- De persoonlijke bestandenkluis.
 - **Notities** -- De notitie-app: losse aantekeningen en lijstjes van een lid.
 - **Leden-website** -- De eigen website die een lid of zaak kan bouwen.
@@ -515,7 +579,6 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Storingsmelding uit de browser** -- Meldt een onafgevangen fout aan het logboek: melding, bestand, regel en pagina.
 - **RTG iD** -- De digitale identiteit en het delen daarvan.
 - **Veiligheidsdiensten** -- De beveiligingskant voor leden en zaken.
-- **Grensdiensten (KMar)** -- De grens- en documentcontrole bij reizen.
 - **Onboarding** -- De eerste stappen na aanmelden: profiel compleet maken.
 
 ### Geld
@@ -533,7 +596,9 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **De AI-bankier** -- Rahul kijkt mee met de rekeningen en geeft advies; hij besluit niets.
 - **Wallet** -- De wallet van een lid binnen RTG Pay.
 - **Walletsaldo en betalen binnen RTG** -- Saldo aanhouden, opladen, tikken en betaalverzoeken binnen het gesloten RTG-circuit.
-- **Tegoed voor een ander** -- Tegoed kopen voor iemand anders, verzilveren met een code, en verlopen tegoed terugnemen.
+- **Tegoed voor een ander** -- Tegoed kopen voor iemand anders, verzilveren met een code, een nieuwe code maken, intrekken, en verlopen tegoed terugnemen.
+- **Saldo terugstorten naar het lid** -- Het eigen walletsaldo terugstorten naar de eigen bankrekening.
+- **Wat mijn gebruik kost** -- Het lid ziet wat zijn eigen gebruik van RTG kost, met de bewijsgraad erbij, en wie dat betaalt.
 - **Betalen en betaalverzoeken** -- Rechtstreeks betalen aan een partner, betaalverzoeken en de betaalopties.
 - **Rekening en facturen** -- De openstaande rekening, het afrekenen daarvan en losse facturen.
 - **Rekening splitsen** -- Een rekening samen delen en ieders deel betalen.
@@ -546,9 +611,9 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Toegang en identiteit
 
-- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten.
+- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten -- met een wachtwoord of met een passkey.
 - **Account en profiel** -- Het eigen account: rollen, koppelingen en het cv van een lid.
-- **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
+- **Inloggen via een andere partij (SSO en SCIM)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort, en de SCIM-deur waarlangs die provider accounts aanmaakt en uitzet.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
 - **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
@@ -561,7 +626,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## Business -- 160 functies
+## Business -- 185 functies
 
 *Leden met de Business Pass (zakelijk).*
 
@@ -575,7 +640,12 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **De Rechterhand (Lifestyle-suite)** -- De veertien premium-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison, Garde-robe, Mecenaat, Nalatenschap, Logboek, Cercle, Hangar, Entourage, Attenties en Rendez-vous.
 - **RTG Zakelijk (professioneel netwerk)** -- De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.
 - **RTG Wereld (de ene sociale app)** -- De laag over De Salon, Pulse, RTG Zakelijk, de genootschappen en de verhalen heen: één tijdlijn met een schakelaar (Alles, Lifestyle, Business, Communities, Privé) en de sprong naar de berichten-app.
+- **RTG Service (hulp vragen)** -- De hulplijn van een lid: iets melden vanuit het scherm waar je stond, je lopende zaken zien, een medewerker toegang bevestigen, en om een MENS vragen.
+- **Bellen met RTG (in de app)** -- Bellen met RTG Service binnen de app, zonder telefoonnet en zonder nummer.
+- **Automatisch ondertitelen in een gesprek** -- Een deelnemer laat zijn eigen stem omzetten naar tekst met een LOKAAL model; de regel komt in de meeleesbaan van het gesprek.
+- **RTG Neiging (Mijn neigingen)** -- De intake die zichzelf afkapt, en de kaart met wat RTG van je denkt te weten.
 - **Het Privékantoor (Lifestyle)** -- De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn.
+- **Kwesties inbrengen (DemocratieOS)** -- Een burger brengt een kwestie in en volgt wat ermee gebeurt.
 - **De app-staat** -- De ene aanroep waarmee de app zijn hele beeld ophaalt.
 - **De live-verbinding** -- De open lijn (SSE) waarover meldingen en verversingen binnenkomen, plus de verbindingsgegevens voor bellen.
 - **Meldingen en push** -- De meldingen in de app, de voorkeuren daarvoor en de push naar het toestel.
@@ -589,6 +659,13 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **App-gids en uitleg** -- De gids die per scherm uitlegt wat je er kunt doen.
 - **Waarderen en reageren** -- Likes, reacties, reviews en favorieten door het hele platform.
 
+### Sociaal (De Salon)
+
+- **De Salon (feed, volgen, deals)** -- De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.
+- **Salon-ontmoetingen (in de buurt)** -- Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.
+- **Sociale laag (RTG + RTF)** -- De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam.
+- **RTF contacten & familiekoppeling** -- De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.
+
 ### Genres & diensten
 
 - **Bestellen & bezorgen** -- Bestellen bij een zaak (ophalen of laten bezorgen) met live volgen.
@@ -600,13 +677,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Onderweg (live locatie)** -- Het live onderweg-scherm: positie, ETA en verbonden partners.
 - **Contracten (leden tekenen)** -- Digitale contracten die een lid in de app ondertekent.
 - **Groothandel & markt** -- De brede B2B/B2C-marktplaats: horeca koopt in, leden bestellen boodschappen, met AI-bijbestellen.
-
-### Sociaal (De Salon)
-
-- **De Salon (feed, volgen, deals)** -- De Salon-tijdlijn: partner-posts volgen, aanbiedingen claimen, polls en de etalage.
-- **Salon-ontmoetingen (in de buurt)** -- Wederzijdse connecties die vlakbij zijn spreken veilig af (18+, geverifieerd), met contract, live-locatie naar RTG en SOS.
-- **Sociale laag (RTG + RTF)** -- De gedeelde sociale laag: zoeken, verbinden, DM, snaps, verhalen en bellen op codenaam.
-- **RTF contacten & familiekoppeling** -- De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.
+- **RTG Commerce (mand & retour)** -- De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug.
 
 ### Eigen apps
 
@@ -623,12 +694,14 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **RTG Office (kantoorpakket)** -- Het eigen kantoorpakket: tekstdocumenten en rekenbladen op uw account, alleen-lezen te delen op codenaam.
 - **RTG Ondernemers-OS** -- Van "ik denk erover na" tot een draaiend bedrijf in een scherm: de verkenning en de stress test, de rechtsvorm en het oprichtingsproject, het dagbeeld met debiteuren, btw, kas en capaciteit, de verkooppijplijn en het bestuur met de UBO-afleiding.
 - **RTG Vonk (dating)** -- Dating op codenaam met de Salon-veiligheidslat: 18+, geverifieerd paspoort, een eindige dagselectie, en bij een match automatisch een tafel rond het midden van beide woonplaatsen (EUR 10 p.p., waarvan EUR 5 voor RTG).
+- **RTG Connection OS** -- De gedeelde, afschakelbare communicatie- en medialaag onder Vonk en Rendez-vous.
 - **RTG Media (één mediawereld)** -- De laag die Klankwerk, Theater, Clips en Podium tot één wereld maakt: drie standen (muziek, kijk, flow) op dezelfde catalogus, één makersprofiel, één volgrelatie, één bibliotheek en de eigen smaakregelaars.
 - **RTG Clips (korte video’s)** -- Korte verticale video’s die alleen op het toestel van de maker staan (OPFS); kijken is rechtstreeks P2P.
 - **RTG Hospitality Guest OS (de gastkant)** -- Bestellen vanaf je eigen telefoon: aan tafel via de QR, op je hotelkamer op de gastrekening, in de club op je polsband, en van huis uit laten bezorgen, afhalen of een foodcourt-mandje bij meer loketten.
 - **RTG Evening OS (een avond plannen)** -- Een hele avond als plan: eten, iets drinken en de rit naar huis, binnen je budget en op tijd thuis.
 - **RTG Invisible Arrival** -- Een beveiligde aankomstpas voor reservering, capaciteitscontrole en minimale live aankomststatus.
 - **RTG Het Vooruitzicht (scenario- en eventlaag)** -- De persoonlijke scenario- en eventlaag waarmee een lid een toekomstige ervaring veilig kan verkennen: intenties, drie werelden, providerbewijs en herstel bij een verstoring.
+- **RTG Experience Platform** -- De vier werelden, hun contextprojecties, resume state, attention en gebrokerde acties.
 - **RTG Life (het ene scherm)** -- Het overzichtsscherm en de dagcoach: ze lezen de lagen hieronder en leggen ze naast elkaar.
 - **Doelen** -- Waar u begon, waar u heen wilt en waarom; de mijlpalen worden afgeleid en niet bewaard.
 - **Dagmetingen en toestellen** -- Slaap, beweging, water en gewicht, zelf ingevuld of door een gekoppeld toestel weggeschreven.
@@ -641,15 +714,26 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Voeding (weekplan)** -- Een weekplan voor wat u wilt eten.
 - **Noodkaart** -- Een noodcontact en, als u dat wilt, uw allergenen en middelen.
 - **Verzorging (kapper, barbier, nagels)** -- De salonagenda vanaf de kant van het lid, op codenaam.
+- **Kinderopvang (ouderkant)** -- Welke kinderopvang er is en hoeveel plek daar vrij is, plus een aanvraag klaarzetten en zelf weer intrekken.
+- **Knelpunten (welke weg ligt open)** -- Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan.
+- **Vertegenwoordiging (wie mag iets namens mij)** -- Machtigingen van mens tot mens: wie mag wat namens een lid, sinds wanneer, tot wanneer, en wat is er namens hem gedaan.
+- **Rugdekking (wie staat er achter mij)** -- Wat een lid ziet van het programma waarmee RTG achter hem staat: welke soort, welk bedrag, tot wanneer, en wat RTG ervoor terugvraagt.
+- **Mijn loopbaan (het carriere ledger)** -- De loopbaan van een mens als chronologische reeks: wat er gebeurde, wanneer, en wie dat heeft bevestigd.
+- **Rust (Thuisrust)** -- Stilte die vanzelf eindigt, terwijl je kring erdoor komt.
+- **Ontdekken (leren, doen, doorgeven)** -- Een ontdeklijst die wordt samengesteld uit lagen die RTG al heeft: leerstof en wat er in de buurt gebeurt.
+- **RTG Academy (leren, bewijzen, certificeren)** -- Het leerhuis: van rol en officiele kennis via oefenen, simulatie, werk onder toezicht en een onafhankelijke beoordeling naar een certificaat, en terug via verbetervoorstellen uit de praktijk.
 
 ### RTG-Backoffice
 
 - **Werk OS (werkruimtes)** -- De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten.
+- **Loop Fabric: overdracht en recall** -- Duurzame, beleidsgebonden overdracht van bronobservaties, wijzigingsbonnen en recall tussen RTG-domeinen.
+- **Tenant Control Plane (white-label)** -- Welke organisatie een werkruimte draait, welk merk zij daar voert, en hoe een groep van haar identiteitsprovider een rol wordt.
 
 ### Betalen & verificatie
 
 - **Betaalverkeer** -- Betalingen (demo of Stripe) en de RTG Pay-wallet.
 - **Passkeys (WebAuthn)** -- Inloggen met vingerafdruk, gezicht of beveiligingssleutel.
+- **Herstel van het eigenaarsaccount** -- De weg terug zonder toestel: twee van de drie herstel-delen, zeven dagen wachttijd, en elke werkende passkey breekt hem af.
 - **Identiteitsverificatie (KYC)** -- Leden uploaden hun identiteitsbewijs en RTG beoordeelt het.
 - **Paspoort delen (gecontroleerd)** -- Het toestemmingsgestuurde kanaal waarlangs een partner een identiteit opvraagt (ja/nee, ID-kaart of scan), met melding en weigering voor het lid.
 - **Vakbewijs indienen** -- Leden leggen de stukken vast die hun werk vraagt (VOG, BIG-registratie, legitimatiebewijs); RTG tekent af dat het stuk is gezien en beoordeelt de inhoud niet.
@@ -665,12 +749,12 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Gemeenteloket** -- Meldingen, aanvragen en gemeentezaken.
 - **Thuis (verhuur en logeren)** -- Advertenties, reviews en boekingen tussen leden onderling.
 - **Residentie** -- Het woon- en verblijfsdeel van het platform.
-- **Luchtvaart en luchthaven** -- Vluchten, boarding passes en de luchthavendiensten.
 - **Reisbureau** -- Reisadvies en het samenstellen van een reis.
 - **Zorg en welzijn** -- De zorgkant: intakes, begeleiding en welzijnsdiensten.
 - **Agenda** -- De agenda: afspraken, uitnodigingen en planning.
 - **RTG Meet (vergaderkamers)** -- Vergaderkamers op codenaam; beeld en geluid lopen peer-to-peer.
 - **Navigatie** -- Routes en navigatie onderweg.
+- **RTG Move (haal ik het?)** -- Of uw reis in de tijd klopt, en wat er breekt als iets verschuift.
 - **Plaats (aanwezigheid en nadering)** -- Hekken, toestemmingsvensters en waarnemingen; de motor draait op het toestel.
 - **Reizen boeken** -- Het boeken zelf: aanbod, slots, betalen en de eigen boekingen, inclusief het partnerkanaal voor niet-leden.
 - **Verblijf en reserveringen** -- Verblijf, de deur van een kamer, reserveren en het annuleren daarvan.
@@ -687,8 +771,8 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Cultuur en gezelschap
 
+- **Foundation LibraryOS kernel** -- Besloten werken, afspraken, rechten en editiegebonden vrijgave; geen publieke catalogus of verkoop.
 - **Het Genootschap** -- Het besloten genootschap: kringen, bijeenkomsten en beheer.
-- **Sport** -- Sportprogramma's, teams en wedstrijden.
 - **Muziek** -- Van lied tot zaal: maken, uitgeven en beluisteren.
 - **Galerij** -- De beeldgalerij van leden en partners.
 - **Boeken** -- De bibliotheek en het lezen.
@@ -697,7 +781,6 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Werk (zaken en personeel)
 
-- **De werkvloer** -- Tafels, keukenbord en bedieningskaart op de vloer van een zaak.
 - **De werkplek** -- Het persoonlijke werkstation van een medewerker.
 - **Metier (vakwerk)** -- Het vakwerk van zelfstandigen en ambachtslieden.
 - **Vakritmes** -- Werkritmes en tijdregistratie per vak.
@@ -710,10 +793,16 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 ### RTFoundation
 
 - **Living Lab: de bewonerskant** -- Meedoen met een labpas, een onderzoeksvraag aandragen, stemmen en het labpaspoort.
+- **Leerstof** -- Het lesmateriaal achter het onderwijs.
+- **Onderwijs (paspoort en ladder)** -- Inschrijven, het leerpaspoort en de leerladder.
+- **Bijles** -- Het bijlesgesprek met de begeleider.
+- **Het labfonds** -- De financiering van onderzoeksprojecten.
+- **Samen (stadsraad)** -- De gezamenlijke uitslagen en besluiten met stadspartners.
 
 ### Winkel en media
 
 - **De Mall** -- De etages en de gids met alle partners.
+- **App Store (apps van derden)** -- De winkelkant van het derdenkanaal: bladeren, installeren, machtigen, kopen en openen in de cel.
 - **Bestanden (kluis)** -- De persoonlijke bestandenkluis.
 - **Notities** -- De notitie-app: losse aantekeningen en lijstjes van een lid.
 - **Leden-website** -- De eigen website die een lid of zaak kan bouwen.
@@ -728,7 +817,6 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Storingsmelding uit de browser** -- Meldt een onafgevangen fout aan het logboek: melding, bestand, regel en pagina.
 - **RTG iD** -- De digitale identiteit en het delen daarvan.
 - **Veiligheidsdiensten** -- De beveiligingskant voor leden en zaken.
-- **Grensdiensten (KMar)** -- De grens- en documentcontrole bij reizen.
 - **Onboarding** -- De eerste stappen na aanmelden: profiel compleet maken.
 
 ### Geld
@@ -747,7 +835,9 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **De AI-bankier** -- Rahul kijkt mee met de rekeningen en geeft advies; hij besluit niets.
 - **Wallet** -- De wallet van een lid binnen RTG Pay.
 - **Walletsaldo en betalen binnen RTG** -- Saldo aanhouden, opladen, tikken en betaalverzoeken binnen het gesloten RTG-circuit.
-- **Tegoed voor een ander** -- Tegoed kopen voor iemand anders, verzilveren met een code, en verlopen tegoed terugnemen.
+- **Tegoed voor een ander** -- Tegoed kopen voor iemand anders, verzilveren met een code, een nieuwe code maken, intrekken, en verlopen tegoed terugnemen.
+- **Saldo terugstorten naar het lid** -- Het eigen walletsaldo terugstorten naar de eigen bankrekening.
+- **Wat mijn gebruik kost** -- Het lid ziet wat zijn eigen gebruik van RTG kost, met de bewijsgraad erbij, en wie dat betaalt.
 - **Betalen en betaalverzoeken** -- Rechtstreeks betalen aan een partner, betaalverzoeken en de betaalopties.
 - **Rekening en facturen** -- De openstaande rekening, het afrekenen daarvan en losse facturen.
 - **Rekening splitsen** -- Een rekening samen delen en ieders deel betalen.
@@ -760,9 +850,9 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Toegang en identiteit
 
-- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten.
+- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten -- met een wachtwoord of met een passkey.
 - **Account en profiel** -- Het eigen account: rollen, koppelingen en het cv van een lid.
-- **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
+- **Inloggen via een andere partij (SSO en SCIM)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort, en de SCIM-deur waarlangs die provider accounts aanmaakt en uitzet.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
 - **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
@@ -775,7 +865,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## Personeel -- 44 functies
+## Personeel -- 49 functies
 
 *Medewerkers in de personeels-app (PDA).*
 
@@ -789,12 +879,21 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 ### RTG-Backoffice
 
 - **Werk OS (werkruimtes)** -- De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten.
+- **Loop Fabric: overdracht en recall** -- Duurzame, beleidsgebonden overdracht van bronobservaties, wijzigingsbonnen en recall tussen RTG-domeinen.
 
 ### Personeel & integraties
 
 - **Personeels-app (PDA)** -- De personeels-app: rooster, klokken, verlof/ziek, taken, team en de vertrouwenspersoon.
 - **Wervingslink (in dienst via een link)** -- De uitnodigingslink van een werkgever: kijken wie je uitnodigt (openbaar, alleen bedrijfsnaam en functie) en jezelf eraan verbinden met je eigen RTG-account.
 - **Rahul doet het (AI-stuur)** -- De AI voert acties uit op elk toegestaan API-pad, met de eigen inlog van wie het vraagt (nooit meer rechten dan de persoon zelf).
+
+### Diensten (leden)
+
+- **Luchtvaart en luchthaven** -- Vluchten, boarding passes en de luchthavendiensten.
+
+### Cultuur en gezelschap
+
+- **Sport** -- Sportprogramma's, teams en wedstrijden.
 
 ### Werk (zaken en personeel)
 
@@ -815,6 +914,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Winkel en media
 
+- **App Store: inzenden door uitgevers** -- De uitgeverskant: een organisatie vraagt een uitgeversplek aan en zendt een app in.
 - **Media-assets** -- Het uitleveren van geuploade media.
 - **Media uitleveren** -- Het uitleveren van geuploade afbeeldingen en bestanden aan de app.
 
@@ -822,13 +922,14 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 - **Storingsmelding uit de browser** -- Meldt een onafgevangen fout aan het logboek: melding, bestand, regel en pagina.
 - **RTG iD** -- De digitale identiteit en het delen daarvan.
+- **Grensdiensten (KMar)** -- De grens- en documentcontrole bij reizen.
 - **Onboarding** -- De eerste stappen na aanmelden: profiel compleet maken.
 
 ### Toegang en identiteit
 
-- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten.
+- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten -- met een wachtwoord of met een passkey.
 - **Account en profiel** -- Het eigen account: rollen, koppelingen en het cv van een lid.
-- **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
+- **Inloggen via een andere partij (SSO en SCIM)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort, en de SCIM-deur waarlangs die provider accounts aanmaakt en uitzet.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
 - **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
@@ -858,7 +959,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## Leveranciers -- 57 functies
+## Leveranciers -- 64 functies
 
 *Partners en hun personeel in de partner-app.*
 
@@ -876,6 +977,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 ### Partners (leveranciers)
 
 - **Partner-app (algemeen)** -- Alle leveranciersfuncties.
+- **Voedselveiligheid (HACCP)** -- Het temperatuurlogboek en de HACCP-metingen van een keuken.
 - **Kassa (POS)** -- Het kassascherm per sector: afrekenen en RTG-code innen.
 - **Partner-Salon (marketing)** -- Het bedrijfsprofiel op De Salon: posts, aanbiedingen, polls en volgers.
 - **Events & mise-en-place** -- Eventkeuken, menukeuze met allergenen en de mise-en-place-planner.
@@ -889,6 +991,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 ### RTG-Backoffice
 
 - **Werk OS (werkruimtes)** -- De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten.
+- **Loop Fabric: overdracht en recall** -- Duurzame, beleidsgebonden overdracht van bronobservaties, wijzigingsbonnen en recall tussen RTG-domeinen.
 
 ### Betalen & verificatie
 
@@ -898,6 +1001,14 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 - **Wervingslink (in dienst via een link)** -- De uitnodigingslink van een werkgever: kijken wie je uitnodigt (openbaar, alleen bedrijfsnaam en functie) en jezelf eraan verbinden met je eigen RTG-account.
 - **Rahul doet het (AI-stuur)** -- De AI voert acties uit op elk toegestaan API-pad, met de eigen inlog van wie het vraagt (nooit meer rechten dan de persoon zelf).
+
+### Diensten (leden)
+
+- **Luchtvaart en luchthaven** -- Vluchten, boarding passes en de luchthavendiensten.
+
+### Cultuur en gezelschap
+
+- **Sport** -- Sportprogramma's, teams en wedstrijden.
 
 ### Werk (zaken en personeel)
 
@@ -918,6 +1029,7 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Winkel en media
 
+- **App Store: inzenden door uitgevers** -- De uitgeverskant: een organisatie vraagt een uitgeversplek aan en zendt een app in.
 - **Media-assets** -- Het uitleveren van geuploade media.
 - **Media uitleveren** -- Het uitleveren van geuploade afbeeldingen en bestanden aan de app.
 
@@ -925,20 +1037,22 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 - **Storingsmelding uit de browser** -- Meldt een onafgevangen fout aan het logboek: melding, bestand, regel en pagina.
 - **RTG iD** -- De digitale identiteit en het delen daarvan.
+- **Grensdiensten (KMar)** -- De grens- en documentcontrole bij reizen.
 - **Onboarding** -- De eerste stappen na aanmelden: profiel compleet maken.
 
 ### Geld
 
-- **Tegoed vanuit een zaak** -- Een zaak zet tegoed klaar voor personeel of klanten, en neemt verlopen tegoed terug.
+- **Tegoed vanuit een zaak** -- Een zaak zet tegoed klaar voor personeel of klanten, maakt een nieuwe code of trekt in, en neemt verlopen tegoed terug.
+- **Vooraf vastzetten aan de kassa** -- Een zaak zet een maximum vast op de code van een lid (borg, open rekening, ritprijs) en legt later het werkelijke bedrag vast.
 - **Partnersaldo uitbetalen** -- Het RTG Pay-saldo van een zaak naar zijn bankrekening sturen.
 - **Pasprijzen en balans** -- De publieke prijslijst van de passen en het balansoverzicht van een lid.
 - **Commerciele claims en tarieven** -- Wat RTG publiek belooft over prijzen, vergoedingen en de sociale afdracht, met per bewering de bron en hoe hard zij is.
 
 ### Toegang en identiteit
 
-- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten.
+- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten -- met een wachtwoord of met een passkey.
 - **Account en profiel** -- Het eigen account: rollen, koppelingen en het cv van een lid.
-- **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
+- **Inloggen via een andere partij (SSO en SCIM)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort, en de SCIM-deur waarlangs die provider accounts aanmaakt en uitzet.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
 - **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
@@ -976,6 +1090,8 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 - **Spelen (spellen met vrienden)** -- Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.
 - **RTFoundation (levenslijn, mentor en levenspas)** -- De levenslijn met wat er speelt en wat eraan komt, de mentor die opent en nooit stuurt, en de levenspas: wie mag wat van u zien.
+- **Knelpunten (welke weg ligt open)** -- Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan.
+- **Ontdekken (leren, doen, doorgeven)** -- Een ontdeklijst die wordt samengesteld uit lagen die RTG al heeft: leerstof en wat er in de buurt gebeurt.
 
 ### RTFoundation
 
@@ -984,15 +1100,14 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Vacatures & solliciteren (RTF)** -- De vacature- en sollicitatielaag binnen de RTFoundation-app.
 - **Het RTF-kantoor** -- Het eigen kantoor van de stichting: kamers, clubs en het onderzoekslab.
 - **Foundation OS** -- Steden, partnerstichtingen, projecten, vrijwilligers, geld, hulpvragen en verantwoording.
+- **Voordeur beschermzaak (zonder account)** -- De eigen ingang naar hulp bij geweld en uitbuiting: eerst "ben je nu veilig", dan pas de rest, en een code die de mens zelf weer kan intrekken.
 - **Het Onderzoekslab** -- Projecten, fases, bevindingen en de kennisbank van het lab.
 - **Het RTF Living Lab** -- De onderzoekscyclus, de ethieklaag, de bewijsmotor, de apparatuur en de pijplijn naar verandering.
 - **Living Lab: de bewonerskant** -- Meedoen met een labpas, een onderzoeksvraag aandragen, stemmen en het labpaspoort.
-- **Het labfonds** -- De financiering van onderzoeksprojecten.
-- **Samen (stadsraad)** -- De gezamenlijke uitslagen en besluiten met stadspartners.
 - **Klaslokaal (lesmaker)** -- De live les: klascode, vragen en antwoorden.
-- **Leerstof** -- Het lesmateriaal achter het onderwijs.
-- **Onderwijs (paspoort en ladder)** -- Inschrijven, het leerpaspoort en de leerladder.
-- **Bijles** -- Het bijlesgesprek met de begeleider.
+- **Leerpaspoort (leerling)** -- De leerlingkant van onderwijs, leerstof, examen en bijles, achter de leeftijdspas.
+- **Het labfonds** -- De financiering van onderzoeksprojecten.
+- **Samen (gezin)** -- De gedeelde kamer van een gezin: plek, chat en muziek achter de gezinsdeur.
 
 ### Diensten (leden)
 
@@ -1000,7 +1115,6 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Cultuur en gezelschap
 
-- **Sport** -- Sportprogramma's, teams en wedstrijden.
 - **Muziek** -- Van lied tot zaal: maken, uitgeven en beluisteren.
 - **Boeken** -- De bibliotheek en het lezen.
 
@@ -1019,9 +1133,9 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Toegang en identiteit
 
-- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten.
+- **Inloggen en registreren** -- De voordeur: inloggen, uitloggen, registreren en wachtwoord vergeten -- met een wachtwoord of met een passkey.
 - **Account en profiel** -- Het eigen account: rollen, koppelingen en het cv van een lid.
-- **Inloggen via een andere partij (SSO)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort.
+- **Inloggen via een andere partij (SSO en SCIM)** -- De terugkeer van een identiteitsprovider, met de ondertekende state als poort, en de SCIM-deur waarlangs die provider accounts aanmaakt en uitzet.
 - **Pincode en sleutelwoorden** -- De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.
 - **Zegel, codes en rechtenbeheer** -- Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.
 - **RTG Link (scannen en capabilities)** -- De adres- en capabilitylaag: een gescande code duiden, het bedoelingsscherm, tijdelijke capabilities (zoals een vraagcode of een kassacode) en de eigen koppelingenlijst.
@@ -1047,9 +1161,13 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ---
 
-## RTG intern -- 18 functies
+## RTG intern -- 21 functies
 
 *De RTG-backoffice en integraties (intern).*
+
+### Leden (RTG-app)
+
+- **Partijen plaatsen voorstellen (DemocratieOS)** -- Een partij uit het register plaatst met haar eigen sleutel voorstellen bij openbare kwesties.
 
 ### Eigen apps
 
@@ -1060,10 +1178,12 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 - **Backoffice (algemeen)** -- Het RTG-actiecentrum: orders, ritten, prestaties, verificaties en partneraanvragen.
 - **Schoolgoedkeuring (RTF School)** -- Scholen goedkeuren of afwijzen voordat ze personeel en klassen kunnen aanmaken.
+- **Werk OS (werkruimtes)** -- De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten.
+- **Loop Fabric: overdracht en recall** -- Duurzame, beleidsgebonden overdracht van bronobservaties, wijzigingsbonnen en recall tussen RTG-domeinen.
 - **RTG Command: zien** -- De puls van alle domeinen, de zoekbalk over alles en het objectdossier met zijn tijdlijn.
 - **RTG Command: doen** -- De operator, de runbooks en de uitzonderingenrij: herstellen en afhandelen.
 - **RTG Command: besturen** -- Beleidsregels zetten, simuleren, agents begrenzen en zware rechten tijdelijk uitdelen.
-- **Werk OS (werkruimtes)** -- De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten.
+- **Tenant Control Plane (white-label)** -- Welke organisatie een werkruimte draait, welk merk zij daar voert, en hoe een groep van haar identiteitsprovider een rol wordt.
 
 ### Personeel & integraties
 
@@ -1071,7 +1191,6 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 
 ### Werk (zaken en personeel)
 
-- **De werkvloer** -- Tafels, keukenbord en bedieningskaart op de vloer van een zaak.
 - **De werkplek** -- Het persoonlijke werkstation van een medewerker.
 - **Metier (vakwerk)** -- Het vakwerk van zelfstandigen en ambachtslieden.
 - **Vakritmes** -- Werkritmes en tijdregistratie per vak.
@@ -1080,4 +1199,8 @@ client op app. Zie de opmerking bovenaan `scripts/groepen.js`.
 - **Facturen** -- De facturatie van en naar een zaak.
 - **Kantoorgesprek** -- Het gesprek waarmee een zaak zijn kantoor inricht.
 - **RTG Mail: post van buiten aannemen** -- De buitenpoort die echte e-mail van een vreemde mailserver aanneemt, uitpakt en in het juiste postvak aflevert.
+
+### RTFoundation
+
+- **Het labfonds** -- De financiering van onderzoeksprojecten.
 

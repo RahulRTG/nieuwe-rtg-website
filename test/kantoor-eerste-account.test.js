@@ -57,6 +57,9 @@ const kantoorOpen = (api, lid, s, n = 1) => metPasskey(api, '/api/account/start'
 test('verse productie: de eigenaar machtigt met zijn passkey het eerste kantooraccount op naam', async t => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoor-eerste-'));
   const { child, base } = await startServer({ env: { NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: tmp,
+    // Productie start alleen met een geldige STUN- en TURN-configuratie (#444).
+    STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com', STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
+    TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
     APP_URL: APP + '/', SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
     ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg', ...KEYS, RTG_OWNER_EMAIL: EIGENAAR,
     RTG_OWNER_BOOTSTRAP: BOOTSTRAP, OFFICE_CODE: CODE, OFFICE_TOTP_SECRET: TOTP, RTG_ISOLATIE_AFDWINGEN: '1',

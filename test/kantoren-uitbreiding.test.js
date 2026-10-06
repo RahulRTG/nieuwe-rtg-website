@@ -86,6 +86,16 @@ test('4. de identiteitskluis: kamers met inzagerecht zien de naam, andere niet, 
      `naam: 'Noor'` is hier een VERVALSINGSPOGING: dat veld bepaalde vroeger wie
      er onder de inzage in het auditlog kwam te staan. Het moet nu genegeerd
      worden -- zie de assertie onderaan deze test. */
+  /* De echte naam vraagt het zware recht kluis-inzage op naam
+     (kern/command/toegang.js). Zonder: 403, en ook die poging staat in het log.
+     De eigenaar opent hier de nooddeur met een reden; een collega op naam had
+     het ook via /api/command/recht/geef kunnen geven. */
+  const zonder = await api('/api/office/inzage', { kamer: 'klantenservice', codenaam: lidCodenaam }, office);
+  assert.equal(zonder.status, 403, 'de kluis ging open zonder het zware recht');
+  assert.match(String(zonder.body.error || ''), /kluis-inzage/);
+  const nood = await api('/api/command/recht/nood', { recht: 'kluis-inzage',
+    reden: 'De toets vraagt de naam van een testlid op om de kluispoort te bewijzen.' }, office);
+  assert.equal(nood.status, 200, JSON.stringify(nood.body));
   const ok = await api('/api/office/inzage', { kamer: 'klantenservice', codenaam: lidCodenaam, naam: 'Noor' }, office);
   assert.equal(ok.status, 200);
   assert.equal(ok.body.inzage.naam, 'Kluis Testlid');
@@ -106,6 +116,7 @@ test('4. de identiteitskluis: kamers met inzagerecht zien de naam, andere niet, 
   const kluisRegels = board.body.audit.filter(a => /Identiteitskluis/.test(a.wat));
   assert.ok(kluisRegels.length >= 3, 'de opvragingen staan in het auditlog (nu: ' + kluisRegels.length + ')');
   assert.ok(kluisRegels.some(a => /geen treffer/.test(a.wat)), 'ook de misgreep is gelogd');
+  assert.ok(kluisRegels.some(a => /GEWEIGERD/.test(a.wat)), 'ook de geweigerde poging is gelogd');
   /* HET AUDITSPOOR IS NIET IN TE VULLEN DOOR WIE ERIN STAAT.
      De eerste opvraging hierboven stuurde `naam: 'Noor'` mee. Kwam die waarde
      in het log, dan kon iedereen met de gedeelde kantoorcode de zwaarste

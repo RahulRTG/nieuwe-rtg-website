@@ -335,12 +335,12 @@ omlaag.
 
 ## `apps/library/app.js`
 
-`public/apps/library/app/` -- 2 delen, 31 regels in de delen
+`public/apps/library/app/` -- 2 delen, 34 regels in de delen
 
 | deel | onderwerp |
 |---|---|
-| `app-01.js` | Library Studio, publicatie en Reader-interacties |
-| `app-02.js` | Library Reader, feedback en aanvullende browserinteracties |
+| `app-01.js` | LibraryOS, het scherm: Studio (werken, knooppunten, publiceren, vrijgeven en feedback) |
+| `app-02.js` | LibraryOS, de private Reader: een editie openen en lezen, feedback sturen, en de mobiele weergave |
 
 ## `apps/meldkamer.js`
 
@@ -526,7 +526,7 @@ omlaag.
 
 ## `apps/techniek.js`
 
-`public/apps/techniek/` -- 10 delen, 943 regels in de delen
+`public/apps/techniek/` -- 10 delen, 952 regels in de delen
 
 | deel | onderwerp |
 |---|---|

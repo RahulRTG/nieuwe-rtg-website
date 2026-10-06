@@ -33,12 +33,13 @@ const SCOPE = ['tegoed.verzilveren'];
 
 module.exports = ({ d, save, crypto, nu, bewerkCollectie }) => {
   const iso = () => new Date(nu()).toISOString();
-  const bearer = require('../bearercode')({ crypto, namespace: 'pay-tegoed', nu: iso });
+  const kaal = s => String(s == null ? '' : s).toUpperCase().replace(/[^0-9A-Z]/g, '');
+  // de normalisatie gaat de bearerlaag in (v2), zodat de hash niet na maak() wordt overschreven
+  const bearer = require('../bearercode')({ crypto, namespace: 'pay-tegoed', nu: iso, normaal: kaal });
   /* Opmaak telt niet: een mens tikt `TG-1A2B-...` of plakt `tg1a2b...`.
      Streepjes, punten en spaties vallen weg vóór het hashen, bij de uitgifte
      en bij het zoeken hetzelfde. */
-  const kaal = s => String(s == null ? '' : s).toUpperCase().replace(/[^0-9A-Z]/g, '');
-  const codeHash = code => bearer.hash(kaal(code));
+  const codeHash = code => bearer.hash(code);
   const weergave = code => {
     const k = kaal(code);
     return k.slice(0, 2) + '-' + k.slice(2).match(/.{1,4}/g).join('-');
@@ -72,10 +73,14 @@ module.exports = ({ d, save, crypto, nu, bewerkCollectie }) => {
      `vervalt` (ms) is de vervaldatum van de BON; een rotatie houdt hem gelijk. */
   function nieuweToegang(issuer, bonId, vervalt) {
     const g = bearer.maak({ prefix: 'TG', issuer, doel: DOEL, scope: SCOPE,
-      onderwerp: { soort: 'tegoedbon', id: bonId }, geldigMs: vervalt - nu(), maxGebruik: 1 });
-    g.toegang.code_hash = codeHash(g.code);
-    g.toegang.expires_at = new Date(vervalt).toISOString();
+      onderwerp: { soort: 'tegoedbon', id: bonId }, geldigheid: { verlooptOp: new Date(vervalt).toISOString() },
+      gebruik: { max: 1 }, afgeleid: 'geen' });
     return { code: weergave(g.code), toegang: g.toegang };
+  }
+  /* Bearercode v2: hetzelfde einde, en een v1-bon wordt hier v2. */
+  function roteerToegang(oud, door) {
+    const n = bearer.roteer(oud, { actor: door, prefix: 'TG', afgeleid: 'geen' });
+    return { code: weergave(n.code), toegang: n.toegang };
   }
 
   /* Constant-time over de hele collectie: bearer.vind loopt ALLE rijen af en
@@ -97,6 +102,6 @@ module.exports = ({ d, save, crypto, nu, bewerkCollectie }) => {
   });
   const kopie = t => JSON.parse(JSON.stringify(t));
 
-  return { COL, REK_TEGOED, VERVAL_MS, DOEL, SCOPE, bearer, kaal, codeHash,
+  return { COL, REK_TEGOED, VERVAL_MS, DOEL, SCOPE, bearer, kaal, codeHash, roteerToegang,
     transactie, kijk, nieuweToegang, zoek, vervalt, verlopen, naarBuiten, kopie, iso };
 };

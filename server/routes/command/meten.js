@@ -12,8 +12,7 @@
    machine draait, waar geen kantoorsessie is. Hij zit achter dezelfde
    RTG_METRICS_TOKEN als /api/metrics, met dezelfde regel: geen token gezet, dan
    alleen vanaf een intern adres. Zonder die twee sloten zou iedereen die het
-   pad kent een groene maand kunnen inspuiten, en dan meet dit scherm de
-   goedgelovigheid van de server. */
+   pad kent een groene maand kunnen inspuiten. */
 'use strict';
 
 const { meetpoort } = require('../../meetpoort');
@@ -22,9 +21,8 @@ const { NIVEAUS } = require('../../kern/frictie');
 
 module.exports = (ctx) => {
   const { app, officeAuth, veilig, wie, command } = ctx;
-  /* bezitsbewijs en doelpoort staan hier niet meer: die twee zijn met de
-     schaduwmeters mee verhuisd naar ./schaduwmeters.js, en een naam pakken die
-     je niet gebruikt is precies wat regel 39 van de keuring tegenhoudt. */
+  /* bezitsbewijs en doelpoort wonen in ./schaduwmeters.js; een ongebruikte
+     naam pakken houdt keuringsregel 39 tegen. */
   /* De routes die iets INRICHTEN (koppelingen, landen, steden, overname) staan
      in ./inrichten.js: dit bestand gaat over meten en uitrollen. Ze zijn uit
      elkaar gehaald toen dit bestand over de 10 kB-grens ging, op de naad die er
@@ -123,7 +121,8 @@ module.exports = (ctx) => {
   app.post('/api/command/mdm', officeAuth, (req, res) => veilig(res, () => command.mdm.meet()));
   app.post('/api/command/mdm/gouden', officeAuth, (req, res) => veilig(res, () =>
     command.mdm.gouden(String(req.body.sleutel || ''))));
-  app.post('/api/command/mdm/samen', officeAuth, (req, res) => veilig(res, () =>
+  app.post('/api/command/mdm/samen', officeAuth, (req, res) => veilig(res, () => // >100: massamutatie
+    ((req.body.verliezers || []).length > 100 && command.toegang.vereist(wie(req), 'massamutatie')) ||
     command.mdm.voegSamen(req.body.doel, req.body.verliezers, wie(req), req.body.reden)));
   app.post('/api/command/mdm/terug', officeAuth, (req, res) => veilig(res, () =>
     command.mdm.terug(req.body.verliezers, wie(req))));

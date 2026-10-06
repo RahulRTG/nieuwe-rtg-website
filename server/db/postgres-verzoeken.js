@@ -3,6 +3,7 @@
 'use strict';
 
 const context = require('./verzoekcontext');
+const { naAntwoord } = require('../lib/antwoord-einde');
 /* Fout -> antwoord + serverlog: ./opslagfout.js (raakt geen toestand hier). */
 const { foutAntwoord, namenVan } = require('./opslagfout');
 
@@ -156,7 +157,7 @@ module.exports = function maakPostgresVerzoeken(o) {
         gebufferd.push(a); return true;
       };
       const ruim = () => { stromen.delete(res); if (!res.finished) context.sluit(ctx); };
-      res.on('close', ruim); res.on('finish', () => stromen.delete(res));
+      res.on('close', ruim); naAntwoord(res, () => stromen.delete(res));
       res.end = (...args) => {
         if (eindigt) return res;
         eindigt = true;

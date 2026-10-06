@@ -39,6 +39,16 @@ test('zonder gezinsprofiel opent geen van de acht deuren iets', async () => {
   }
 });
 
+test('een eigen ledenaccount krijgt zijn beeldkeuzes terug', async () => {
+  const lid = (await post('/api/auth/register', { name:'Beeldkeuze', email:'beeldkeuze@test.invalid',
+    phone:'0611112222', password:'geheim123', geboortedatum:'1990-01-01', tier:'rtg' })).body;
+  assert.ok(lid.token);
+  const r = await fetch(srv.base + '/api/ik/beelden', { method:'POST',
+    headers:{'Content-Type':'application/json',Authorization:'Bearer '+lid.token}, body:'{}' });
+  assert.equal(r.status,200);
+  assert.deepEqual((await r.json()).images,{},'een nieuw account heeft een eigen, leeg overzicht');
+});
+
 test('een profiel kiest alleen uit zijn eigen bestanden, en een ander gezin krijgt 404', async () => {
   const a = await profiel('Gezin Eigen');
   const b = await profiel('Gezin Buren');

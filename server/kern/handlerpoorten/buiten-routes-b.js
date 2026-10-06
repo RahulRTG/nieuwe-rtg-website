@@ -38,6 +38,15 @@ const ROUTEPOORTEN = {
   /* HET GEZIN. gezinVan / familieVan zoeken het gezin bij de code in het lichaam.
      De handlers zijn benoemde functies die als handler worden doorgegeven, dus
      geen enkele lezer ziet hun lichaam bij de route. */
+  /* Drie deuren die de vormherkenning na de refactor naar bearercode v2
+     (gezinssessie en lesstroom, #469/#475) niet meer zag: het geheim zelf is
+     de sleutel, met een rem per IP en per gezin ervoor. */
+  'POST /api/foundation/gezin/inloggen': { toegang: 'OBJECT_SCOPED', veld: 'gezinscode',
+    wat: 'dragerVan(req): de 128-bit gezinscode, of code plus gezinstoken; daarna de eigen pincode' },
+  'POST /api/foundation/gezin/profiel/kies': { toegang: 'OBJECT_SCOPED', veld: 'gezinscode',
+    wat: 'dragerVan(req), zelfde drager als gezin/inloggen; daarna de pincode van dat profiel' },
+  'POST /api/foundation/les/join': { toegang: 'OBJECT_SCOPED', veld: 'lescode',
+    wat: 'toegang.claim(lescode): de lescode is de sleutel en telt een toetreding in de collectietransactie' },
   'POST /api/foundation/gezin/uitnodiging/maak': { toegang: 'OBJECT_SCOPED', veld: 'code',
     wat: 'gezinVan(code) plus beheerderVan(); alleen de beheerder nodigt uit' },
   'POST /api/foundation/gezin/uitnodigingen': { toegang: 'OBJECT_SCOPED', veld: 'code',

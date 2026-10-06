@@ -311,6 +311,69 @@ Vier besluiten over de maten die nog een keuze vroegen; de eerste drie staan in
   bij RTG zelf; `test/bedrijfsmaattoelating.test.js` houdt vast dat ze open staan
   en de reden dragen.
 
+### 2.9 De mensgronden (6 oktober 2026)
+
+De vraag gaat omgekeerd: niet *mag de machine dit?* maar **waarom staat hier een
+mens?** Kan de machine iets veilig, bevoegd, controleerbaar en herstelbaar zelf,
+dan hoort het in beginsel geen mensenwerk te zijn. Het antwoord mag niet elke keer
+opnieuw ter discussie staan, en daarom is het een GESLOTEN lijst
+(`scripts/lib/mensgrond.js`): fysieke aanwezigheid, oordeel, toestemming, relatie,
+wettelijke bevoegdheid, tweede persoon, geld, onomkeerbaar en terugweg onbewezen.
+
+Twee invarianten, en ze spiegelen elkaar:
+
+- **menselijk werk zonder geldige grond = automatiseringsschuld;**
+- **automatisering over een geldige grond heen = overtreding.**
+
+Vier dingen die het ontwerp dragen en niet mogen sneuvelen:
+
+- **Een grond is geen trede.** De treden blijven `geen / tonen / klaarzetten /
+  uitvoeren`; een grond zegt WAAROM er een mens staat en niet hoe hoog. `BLOCKED`
+  (wachten op een ander) is geen grond maar een toestand, en die heet in de
+  controlplane `ONBEKEND` of `UITSTELLEN`.
+- **Blijvend en tot-bewijs worden nooit opgeteld.** Geld blijft geld; een
+  ontbrekende terugweg verdwijnt zodra hij bewezen is. Alleen die tweede soort is de
+  weg naar minder handwerk -- de eerste is vaak het product zelf.
+- **CAN_VERIFY en CAN_RECOVER zijn poorten en geen stemmen.** Het gevolg moet
+  gemeten zijn en de terugweg bewezen; drie van vier groen laat de machine niet gaan.
+- **Er is geen Human Dependency Ratio.** Wie een percentage mensenwerk omlaag duwt,
+  duwt ook toestemming, een relatie en een oordeel weg. Er wordt geteld per grond en
+  per uitkomst.
+
+De meter (`npm run mensgrond`, `MENSGROND.json`) verzint geen tweede classificatie:
+hij vertaalt de effecten (`kern/isolatie/effecten.js`), de bodem
+(`kern/frictie/bodem.js`), `NOOIT_AUTONOOM` en de deur van de eigenaar naar een woord
+uit de lijst, en legt de herstelregisters ernaast. De eerste meting over
+<!--getal:mensgrond.muterend-->4028<!--/getal--> muterende handelingen:
+
+- **<!--getal:mensgrond.overtreding-->6<!--/getal--> overtredingen**, en het zijn precies de
+  kleine handelingen van het beleid (`mediaos/stuur` en `/volg`, `leerstof/oefen` en
+  `/antwoord`, `bijles/vraag`, `member/voorstel/intrek`). `KLEIN` heet "een kleine
+  omkeerbare handeling", en van geen enkele is de terugweg beproefd. Ze zijn LATENT:
+  er draait geen mandaat in productie, dus het is een overtreding in de grammatica en
+  nog niet in een handeling die zelfstandig liep.
+- **<!--getal:mensgrond.schuld-->0<!--/getal--> automatiseringsschuld.** Dat is geen
+  compliment maar een gevolg van het bewijs: van de muterende handelingen hebben er
+  <!--getal:mensgrond.terugweg-->79<!--/getal--> een bewezen terugweg (of een meting
+  zonder effect). De mens staat er vrijwel overal OOK omdat de terugweg onbewezen is,
+  en <!--getal:mensgrond.totBewijs-->39<!--/getal--> handelingen hebben geen andere
+  grond dan dat -- dat is de werkelijke voorraad automatiseringskandidaten, en hij
+  groeit met de herstelproef en niet met een besluit.
+- **<!--getal:mensgrond.onbekend-->30<!--/getal--> onbekend**, nooit gelezen als geldig of
+  als schuld.
+
+Drie fouten die de meter in zijn eerste rondes maakte, en die als toets vastliggen
+(`test/mensgrond.test.js`): een niet-bewezen LEZING een overtreding noemen (een oordeel
+harder dan het bewijs), `/api/logout` en de instellingen van een zaak schuld noemen
+(daar beslist een lid of een zaak over zijn eigen zaken -- de grond toestemming in zijn
+zuiverste vorm -- en schuld bestaat alleen in RTG's eigen werk), en de terugstortstand,
+de juridische positie van RTG, "mens tot er bewijs is" noemen omdat zijn effect alleen
+`CONFIGUREREN` heet. Wat achter de deur van de eigenaar staat, is een oordeel.
+
+Twee gronden hebben geen bron per route en staan in `ongemeten`, nooit als nul:
+fysieke aanwezigheid en wettelijke bevoegdheid (de persoonseis en de klasse
+`voorbehouden` zijn op handeling en genre ingedeeld, niet op route).
+
 ---
 
 ## 3. De architectuur, onderdeel voor onderdeel
@@ -329,7 +392,8 @@ Vier besluiten over de maten die nog een keuze vroegen; de eerste drie staan in
 | Planner | **staat als kern** | `kern/stuur/plan.js`: voert niets uit, bezit niets |
 | Independent Critic | **besluit** | de tegenproef krijgt ANDERE invoer (plan, beleid, ruwe cijfers), nooit de redenering; een critic op dezelfde invoer is een stempel (`KANTOORMACHT.md`) |
 | Deterministic Verification | **staat** | `kern/command/transactie-poorten.js`: een controle die niet kon draaien is niet geslaagd |
-| Policy + Streefstand + Mandate | **stap weg + besluit** | `kern/beleidsmotor/` in de schaduw, `kern/stuur/mandaat.js` zonder aanroepers; een streefstand met tolerantie per dimensie bestaat niet |
+| Policy + Streefstand + Mandate | **stap weg + besluit** | `kern/beleidsmotor/` in de schaduw, `kern/stuur/mandaat.js` zonder aanroepers; de streefstand staat sinds 27 september als `kern/streefbeeld.js` (C7), maar als VANGRAIL rond de afgesloten maanden en nog niet als gewenste toekomstige stand (par. 8) |
+| Mensgrond | **staat als meter** (6 oktober) | `scripts/lib/mensgrond.js` (de gesloten lijst) en `npm run mensgrond`: waarom staat er bij elke handeling een mens (par. 2.9) |
 | tonen | **staat voor het kantoor** | C2: drie paden |
 | klaarzetten, uitvoeren | **jaren weg** | 7 van de 118 AI-schrijfparen dragen een gemeten gevolg, een beproefde terugweg en een beschermde herhaling (`INTELLIGENTIE.md` par. 6) |
 | Boardroom | **staat** | vraagt een identiteit; de enige plek waar een besluit vandaag een naam heeft |
@@ -463,3 +527,133 @@ doorgestreept met de datum; de besluiten staan in par. 2.5.
     per lid (C15). Die maat rekent alleen over de lopende maand, dus een besluit
     dat hem als verwachting draagt, krijgt bij het toetsen geen oordeel maar de
     reden -- zo hoort het, want de bijdrage per pas van toen is niet bewaard.
+
+---
+
+## 8. Van pre-startup naar wereldschaal: de kaart
+
+Geschreven op 6 oktober 2026 als antwoord op de opdracht om de interne machine van
+RTG/RTF te bouwen: *waar staan we, wat is de volgende bewezen streefstand, wat
+ontbreekt, wat doet de machine zelf, waar is een mens nodig en waarom, en wat leren
+we ervan.* Eerst gelezen, toen gebouwd; het meeste staat al.
+
+### 8.1 Wat er al staat
+
+| begrip uit de opdracht | staat als |
+|---|---|
+| huidige bewezen toestand | `kern/bedrijfsmaat/` (de sensor, vier elementen per maat, de groepspoort aan de bron) |
+| streefstand met tolerantie | `kern/streefbeeld.js` (C7) -- een vangrail, zie 8.2 |
+| fase uit bewijsbare voorwaarden | `kern/onderneming/fase.js` -- voor de onderneming van een LID, afgeleid uit feiten |
+| klimmen op bewijs, met een mensrem | `kern/command/uitrolregie.js` -- de functietrap, niet de onderneming |
+| plan | `kern/stuur/plan.js` (een capabilityplan; voert niets uit) |
+| mandaat | `kern/stuur/mandaat.js` (versmalt, leeg is dicht, nul aanroepers) |
+| bewijs, verificatie | `command/transactie-poorten.js`, `kern/envelop.js`, de bewijsgraden van `BESTUUR.md` |
+| beslisgeheugen, leren | `kern/beslisgeheugen.js` (C13), `CODE.md` besluit 4 |
+| forecast met trefzekerheid | `kern/kosten/vooruitblik.js` (alleen kosten) |
+| simulatie | `command/simulatie.js` (alleen ops) |
+| schaduw | `kern/pay/schaduw.js`, `kern/commercie/schaduw.js`, `kern/beleidsmotor/` |
+| ochtendkaart | `kern/ochtendkaart.js` (`PERSONEEL.md`; stelt niets voor, B4) |
+| uitleg, consequentie, actiestaat | `shared/edge/actiestaat.js`, `shared/adaptief/grammatica.js` (vijf gewichten) |
+| leren als dossier | `kern/carriereledger/`, `kern/connect/leerdossier.js` |
+| mensgronden | `scripts/lib/mensgrond.js` + `npm run mensgrond` (par. 2.9) |
+
+### 8.2 Wat werkelijk ontbreekt
+
+1. **Een gewenste toekomstige stand.** Het streefbeeld is het gemiddelde van drie
+   afgesloten maanden met hun spreiding als tolerantie. Dat is een VANGRAIL (*wat mag
+   niet slechter worden*) en geen streefstand (*waar gaan we heen*). Vóór de start
+   bestaan er geen drie maanden, dus levert het niets -- terwijl de opdracht juist bij
+   nul begint.
+2. **Een fase van RTG zelf.** Er zijn drie ladders die erop lijken (de
+   ondernemingsfase van een lid, de uitroltrap, R0-R5 en A0-A4 in `MAATSTAF.md`) en
+   geen enkele zegt waar RTG als onderneming staat.
+3. **Een kloof per dimensie** tussen bewezen stand en streefstand, met de
+   afhankelijkheden ertussen.
+4. **Een serveroordeel per persoon en object** (`EDGE.md`: ronde 3). Zonder dat kan
+   een Human Work-scherm alleen projecteren wat de client zelf denkt, en dat mag niet.
+5. **De terugweg.** Niet als laag maar als bewijs: zie de handelingen die alleen op
+   `terugweg-onbewezen` een mens dragen (par. 2.9).
+
+### 8.3 Wat botst met besluiten die al genomen zijn
+
+- **`streefstand` is bezet** (het veld van elk gevolgcontract; de keuring van
+  `gevolgcontract/keuring.js` zet `doel` er zelfs actief naar om). De code heet daarom
+  `streefbeeld`, en een vooruitkijkende uitbreiding hoort dáár bij en krijgt geen
+  derde naam.
+- **`fase`, `FASEN` en `trede` zijn bezet**, `FASEN` zelfs achtvoudig (`SEMANTIEK.json`).
+  Een ladder van zestien fasen van idee tot voortdurende evolutie zou de zesde
+  gezagsladder op een nieuwe as zijn. De vorm die past is die van
+  `kern/onderneming/fase.js`: een fase WORDT AFGELEID uit feiten en kan niet worden
+  gezet -- en dat is precies de eis dat niemand RTG tot scale-up kan verklaren.
+- **"Noordster" is een codenaam van een lid** in de toetsen. Een codenaam als
+  begripsnaam is een privacyfout in wording; de richting heet hier gewoon *de
+  richting*.
+- **`waarde` is de geldlaag** (`WAARDE.md`, `kern/waarde/`). Waardedimensies krijgen dus
+  een andere naam.
+- **Een kansenmotor** zit tegen INT-04 (geen samengesteld cijfer) en tegen
+  `CONNECT.md` (de mixer verdeelt plekken, geen punten). Een kans is een hypothese met
+  een reden in woorden, nooit een score.
+- **Personeelsbehoefte voorspellen** botst vandaag met **C23**: het eigen kantoor blijft
+  ongeteld, want met een klein kantoor is elk getal een getal over een mens. Daarbij
+  geldt de trefzekerheidsregel: zonder drie gemeten perioden geen band.
+- **"3.794 zelfstandig afgehandeld"** is vandaag onwaar (`PERSONEEL.md` par. 5): er
+  handelt niets zelfstandig. Een ochtendkaart zegt "door het team opgelost" of
+  "klaargezet en bevestigd", nooit "zelfstandig".
+
+### 8.4 De besluiten die de eigenaar moet nemen
+
+- **M1. Mag een streefbeeld een gewenste stand dragen die de eigenaar zelf zet?** C7
+  zegt: de machine stelt voor, de eigenaar tekent. Een vooruitkijkende stand betekent
+  dat de eigenaar een getal INVOERT, en dat verandert wie de streefstand schrijft.
+- **M2. Krijgt RTG een eigen ondernemingsfase, afgeleid uit feiten?** Met
+  `kern/onderneming/fase.js` als vorm, en misschien als motor: RTG als eerste klant van
+  zijn eigen WorkOS (besluit B1 van `PERSONEEL.md`).
+- **M3. Is "gegevens verlaten het huis" een eigen mensgrond?** De lijst kent hem niet;
+  het effect `BULK_UITVOER` staat open en de meter meldt hem.
+- **M4. Is andermans gegevens wijzigen een tweede-persoon-grond?** De meter zegt nu ja
+  (de strenge kant); dat maakt veel kantoorroutes tot mensenwerk.
+- **M5. Wat gebeurt er met de zes kleine handelingen?** Een terugweg bewijzen, of ze van
+  `klein` naar `voorstel` zetten. Het tweede is een productkeuze: Rahul kan dan niet
+  meer vanzelf een stuk aanzetten of iemand volgen.
+
+### 8.5 De kleinste volledige snede
+
+*Pre-startup: de eerste RTF-gezinnen en de eerste betalende leden.* Niet omdat die
+belangrijk klinkt, maar omdat elke schakel al bestaat behalve twee, en die twee zijn
+precies M1 en M2:
+
+```
+streefbeeld (gewenst: n leden, n gezinnen; ONBEKEND waar geen bron)   M1
+  -> bewezen stand uit de bedrijfsmaten (groepspoort: onder de grens geen getal)
+  -> kloof per dimensie, met graad en reden
+  -> plan.js: welke handelingen de kloof raken
+  -> per stap de mensgrond (scripts/lib/mensgrond.js)
+       machine: alleen tonen en klaarzetten (C2)
+       mens:    een uitnodiging versturen (tweede persoon), een pas toekennen (oordeel)
+  -> de mens bevestigt via de bestaande route
+  -> beslisgeheugen legt de verwachting vast (C13)
+  -> nameting per maat na de termijn
+  -> nieuwe stand -> nieuwe kloof
+```
+
+Wat deze snede bewijst is niet dat RTG zichzelf bestuurt maar dat de lus SLUIT: een
+kloof leidt tot een mensmoment met een grond, het mensmoment tot een vastgelegde
+verwachting, en de nameting tot een nieuwe kloof. De toets is een ketenproef in de vorm
+van `scripts/tafelproef.js` (per schakel: handelt A, en ziet B dat?).
+
+### 8.6 De modulegrens
+
+- `scripts/lib/mensgrond.js` -- de gesloten lijst en de indeling; geen opslag, geen route.
+  Hij woont in `scripts/` en niet in `server/kern/`, en dat is een uitslag van de
+  keuring en geen voorkeur: een servermodule die nergens in de runtime wordt
+  aangeroepen is een capability zonder caller (`CONTROLPLANE.md`). Hij verhuist naar
+  `server/kern/` op de dag dat de eerste lezer in de runtime er is -- het Human
+  Work-scherm -- en dan als EEN bron, nooit als kopie.
+- `server/kern/streefbeeld.js` -- blijft de enige eigenaar van de streefstand; een
+  gewenste stand (M1) wordt een uitbreiding, geen tweede module.
+- Een kloofberekening hoort een LENS te zijn (par. 0): een verklaarde vraag over de
+  bedrijfsmaten zonder eigen opslag.
+- Een Human Work-projectie leest de grond, het gewicht (`grammatica.js`) en het
+  serveroordeel, en verzint er geen eigen tekst of bevoegdheid bij. Hij wacht op ronde 3
+  van `EDGE.md`.
+- `scripts/mensgrond.js` meet; niets in `server/` leest hem of de lijst (CODE-AI-001).

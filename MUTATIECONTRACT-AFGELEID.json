@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-10-06T19:25:36.120Z",
-  "commit": "55bf229e5",
+  "op": "2026-10-06T20:11:21.249Z",
+  "commit": "8f1352869",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Afgeleide mutatiecontracten -- GEEN MENS HEEFT HIER OVER NAGEDACHT. Geschreven door node scripts/mutatiecontract.js --afleiden, en overschreven bij elke volgende gang.",
  "grens": "Alleen BLOCKED_BY_TEST_FIXTURE. Vijf van de zes standen doen een uitspraak over GEDRAG en die mag geen script zetten -- geen meting leest de bedoeling van een handeling af. Deze stand doet de omgekeerde uitspraak: wij weten het niet, en dit is waarom de proef er niet bij kwam. De grond is hard: de route gaf zijn eigen hindernis terug. Wie een regel wil verbeteren, verhuist hem naar server/lib/mutatiecontracten.js -- een mens wint van een script.",
  "waardeloosVoor": "Een regel hier zegt NIETS over veiligheid en niets over idempotentie. Alleen: deze route bestaat, hij is niet gemeten, en dit moet er in scripts/lib/idemwereld.js komen voordat hij iets kan zeggen. Het is de wachtrij met per regel de reden -- beter dan diezelfde routes ongeteld op een hoop onder LEGACY.",
- "aantal": 3113,
+ "aantal": 3112,
  "contracten": {
   "POST /api/aandacht": {
    "mutatieId": "aandacht",
@@ -4294,22 +4294,6 @@
     "op": "2026-10-06"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Geen landpakket voor .\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
-  },
-  "POST /api/command/mandaat": {
-   "mutatieId": "command.mandaat",
-   "herkomst": "afgeleid",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "toegang": {
-    "klasse": "AUTHENTICATED"
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "afgetekend": {
-    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
-    "op": "2026-10-06"
-   },
-   "watErMoetKomen": "de proef kwam hier niet bij: \"Een mandaat vraagt van wie, aan wie en waarvoor.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/command/mdm/gouden": {
    "mutatieId": "command.mdm.gouden",

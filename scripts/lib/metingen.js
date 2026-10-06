@@ -108,6 +108,7 @@ const REGISTER = {
   'CAPABILITEIT.json': { eigenRatel: 'test/capabilities.test.js' },
   'CODEWERELD.json': { eigenRatel: 'test/codewereld.test.js' },
   'COMMERCE.json': { eigenRatel: 'scripts/check.js' },
+  'CONTEXTDOORGIFTE.json': { eigenRatel: 'test/contextdoorgifte.test.js' },
   'CONTROLS.json': { eigenRatel: 'test/controls.test.js' },
   'ENVELOP.json': { eigenRatel: 'test/actorvormen.test.js' },
   'GEZAG.json': { eigenRatel: 'test/gezag.test.js' },
@@ -313,6 +314,12 @@ const REGISTER = {
      citaten en nul vormfouten, en dat het register gelijk is aan een verse meting.
      Een maat die stil verdwijnt of een citaat dat niet meer klopt, laat hem zakken. */
   'BEDRIJFSMAAT.json': { eigenRatel: 'test/bedrijfsmaat.test.js' },
+  /* GRAAFAS.json draagt niet alleen een generator. De laatste toets in
+     test/graafas.test.js meet de grafen vers en vergelijkt de vastgelegde
+     `gemeten`-vorm exact; de mutatieproeven erboven bewijzen bovendien dat een
+     verzonnen as en maker de meter werkelijk laten zakken. Dit register hing
+     dus al aan een ratel, maar die relatie ontbrak in deze inventaris. */
+  'GRAAFAS.json': { eigenRatel: 'test/graafas.test.js' },
   /* CONNECTLUS.json meet of de ontdekkingsdomeinen de lus DELEN (CONNECT.md
      par. 1). Zelfde soort als CARRIEREVORM, STAGEVORM en NAMENSVORM hierboven,
      en om exact dezelfde reden is de geratelde waarde het BEREIK: dat er 0 van
@@ -415,6 +422,12 @@ const REGISTER = {
      die verdwijnt zonder besluit is precies de stille faalvorm die deze laag
      moet vangen. */
   'OMZETPROEF.json': { eigenRatel: 'test/omzetproef.test.js' },
+
+  /* Het Trust & Evidence-manifest is content-addressed. De eigen controle
+     herberekent alle modulehashes en vergelijkt de volledige JSON byte voor
+     byte; scripts/check.js voert precies die --check-weg als harde keuring uit.
+     Een achterlopend manifest zakt dus werkelijk en is geen los rapport. */
+  'TRUST_EVIDENCE_PLANE.json': { eigenRatel: 'scripts/trust-evidence-plane.js' },
 
   /* De landdekking heeft twee tanden die de TEGENOVERGESTELDE kant op staan, en
      dat is met opzet: `landenVolledig` mag alleen omhoog en `landenZonderEnige`
@@ -570,6 +583,10 @@ const REGISTER = {
      naar 2818 meldde), dus deze regel is geen bewering -- zie de kop over de
      helft die mensenwerk blijft. */
   'MACHINEDEKKING.json': { eigenRatel: 'test/machinedekking.test.js' },
+  /* Twee tellers die alleen mogen dalen (overtreding, onbekend), met de grondwaarde in
+     het register zelf; toets 10 van test/mensgrond.test.js vergelijkt de verse meting.
+     Automatiseringsschuld heeft met opzet geen ratel: hij stijgt als er bewijs bijkomt. */
+  'MENSGROND.json': { eigenRatel: 'test/mensgrond.test.js' },
   /* Drie tanden in NORM.json, geen eigenRatel: de gevraagde meter is "onbekende
      gevolgpaden mag alleen dalen", en dat is precies wat een ratel doet. */
   'GEVOLGDEKKING.json': { meter: ['gevolgPadenOnbekend', 'gevolgContractVolledig', 'gevolgContractenGezakt'] },

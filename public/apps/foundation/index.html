@@ -23,6 +23,7 @@
   .logo{font-family:var(--serif);font-size:2.3rem;font-weight:500;letter-spacing:-.01em;line-height:1.1;}
   .logo b{color:var(--rtg-leesgoud,var(--goud));font-weight:600;}
   .deck{color:var(--zacht);max-width:36rem;margin:.9rem auto 0;line-height:1.55;}
+  .mededeling{color:var(--zacht);max-width:36rem;margin:1.2rem auto 0;line-height:1.55;font-size:.88rem;}
   .grpbadge{display:inline-block;font-size:.9rem;vertical-align:middle;background:var(--paneel2);border:1px solid var(--lijn);color:var(--rtg-leesgoud,var(--goud));border-radius:0;padding:.15rem .7rem;margin-left:.4rem;font-family:var(--sans,inherit);font-weight:600;}
   /* De hub in de RTG OS-look: de tegels zijn app-iconen op een hoofdscherm,
      squircles met een klein label eronder; de teksten en pijlen zwijgen. */
@@ -213,6 +214,16 @@
       <button class="knop grijs" id="bLogin">Inloggen bij je gezin</button>
       <a class="knop grijs kaal" href="registreren.html">School, vrijwilliger of stichting</a>
     </div>
+    <!-- DE OPENBARE MEDEDELING (DPIA-GEZIN.md, R-G8; foundation/gezinbewaren.js).
+         Een gezin van voor 4 oktober 2026 zonder account heeft geen kanaal: geen
+         account en geen contactgegeven. Deze regel is de aankondiging die het wel
+         bereikt, op de plek waar zo iemand terugkomt. -->
+    <p class="mededeling" id="mededelingOudeGezinnen">
+      <b>Had u al een gezin zonder RTG-account?</b> Met een gezinscode die met GC. begint neemt u het
+      mee via "Via mijn RTG-account". Een gezin met alleen een code van zes tekens (van vóór
+      4 oktober 2026) is niet meer te openen of mee te nemen; dat wissen we, niet vóór 6 november 2026.
+      <a href="privacy.html#bewaren">Waarom en hoe</a>.
+    </p>
     <!-- MIJN LEVEN HOORT HIER, op het welkomscherm en niet tussen de tegels.
          De tegels zitten achter een gezinslogin; dit beeld hangt juist aan uw
          RTG-LIDMAATSCHAP en niet aan een gezinsprofiel, dus achter die deur

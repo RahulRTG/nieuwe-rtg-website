@@ -21,6 +21,7 @@ const HELE_BETAALDOMEINEN = [
 ];
 
 const GELDACTIES = [
+  /^\/api\/werk-gast\/betaling\/start$/,
   /^\/api\/bank\/(?:storten|overboek|naar-wallet|van-wallet|sepa|bulk|salaris)(?:\/|$)/,
   /^\/api\/bank\/pas\/betaal$/,
   /^\/api\/bank\/krediet\/aflossing$/,

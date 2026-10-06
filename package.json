@@ -107,6 +107,11 @@
     "evidence:control": "node scripts/evidence-control.js build",
     "evidence:control:verify": "node scripts/evidence-control.js verify",
     "evidence:calibrate": "node scripts/evidence-calibration.js",
+    "trust:proof": "node --test test/trust-evidence-plane.test.js test/trust-evidence-plane-v3.test.js",
+    "trust:manifest": "node scripts/trust-evidence-plane.js",
+    "trust:manifest:check": "node scripts/trust-evidence-plane.js --check",
+    "trust:evidence:migrate-v2": "node scripts/trust-evidence-v2-migrate.js",
+    "trust:evidence:export": "node scripts/trust-evidence-export.js",
     "bewijsladder": "node scripts/bewijsladder.js",
     "bewijsladder:vast": "node scripts/bewijsladder.js --vastleggen",
     "bewijsladder:controle": "node scripts/bewijsladder.js --controle",
@@ -195,6 +200,7 @@
     "deelindex": "node scripts/deelindex.js",
     "bewijs": "node scripts/bewijs.js",
     "objectmodel": "node scripts/objectmodel.js",
+    "makers:vast": "node scripts/makers.js --vastleggen",
     "carrierevorm": "node scripts/carrierevorm.js",
     "bedrijfsmaat": "node scripts/bedrijfsmaat.js",
     "bedrijfsmaat:vast": "node scripts/bedrijfsmaat.js --vastleggen",
@@ -252,6 +258,7 @@
     "schermgedrag": "node scripts/schermgedrag.js",
     "schermfunctie": "node scripts/schermfunctie.js",
     "schermfunctie:controle": "node scripts/schermfunctie.js --controle",
+    "contextdoorgifte": "node scripts/contextdoorgifte.js",
     "contextproef": "node scripts/contextproef.js",
     "kernherkomst": "node scripts/kernherkomst.js",
     "faalproef": "node scripts/faalproef.js",
@@ -442,6 +449,9 @@
     "gevolgdekking:controle": "node scripts/gevolgdekking.js --controle",
     "machinedekking": "node scripts/machinedekking.js",
     "machinedekking:vastleggen": "node scripts/machinedekking.js --vastleggen",
+    "mensgrond": "node scripts/mensgrond.js",
+    "mensgrond:vastleggen": "node scripts/mensgrond.js --vastleggen",
+    "mensgrond:controle": "node scripts/mensgrond.js --controle",
     "machinedekking:controle": "node scripts/machinedekking.js --controle",
     "edgekaart": "node scripts/edgekaart.js",
     "edgekaart:controle": "node scripts/edgekaart.js --controle",
@@ -504,7 +514,8 @@
     "experience:check": "node scripts/experience.js --check",
     "experience:prove": "node scripts/experience.js --prove",
     "experience:report": "node scripts/experience.js --report",
-    "experience:gate": "node scripts/experience.js --gate"
+    "experience:gate": "node scripts/experience.js --gate",
+    "releaseketenwacht": "node scripts/releaseketenwacht.js"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

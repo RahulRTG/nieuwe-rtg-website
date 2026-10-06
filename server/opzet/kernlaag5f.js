@@ -32,4 +32,18 @@ module.exports = (kern, hulp) => {
      reden als kern.festival hierboven. */
   kern.horecaBonlaag = require('../kern/horeca/bon')({ db, bewerkCollectie, crypto });
   kern.etenKorting = require('../kern/eten/kortingscode')({ db, bewerkCollectie, crypto });
+  /* De horecateruggave betaalt online geld terug langs de betaalwaarheid. Een
+     router leest die niet zelf: dat maakte betaalWaarheid een naam die het
+     supplier-domein met andere domeinen deelt (kernGedeeld). Hier krijgt de
+     zaak alleen de twee handelingen die de teruggave nodig heeft, laat gebonden
+     (de betaalwaarheid hangt in kernlaag3) en afwezig als zij er niet is, zodat
+     kern/horeca/teruggave.js dan met reden weigert. */
+  const waarheidDoet = naam => {
+    const w = kern.betaalWaarheid;
+    return w && typeof w[naam] === 'function' ? w[naam].bind(w) : undefined;
+  };
+  kern.horecaTerugbetaling = Object.freeze({
+    get van() { return waarheidDoet('van'); },
+    get terugbetalen() { return waarheidDoet('terugbetalen'); }
+  });
 };

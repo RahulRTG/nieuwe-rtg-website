@@ -13,7 +13,8 @@ const post = (pad, body, token) => fetch(base + pad, { method:'POST',
   headers:{ 'Content-Type':'application/json', ...(token ? { Authorization:'Bearer ' + token } : {}) },
   body:JSON.stringify(body || {}) });
 const json = r => r.json();
-const f = (pad, body) => post('/api/foundation' + pad, body);
+// Een volledig pad gaat ongewijzigd door, zodat de routedekking het ziet.
+const f = (pad, body) => post(pad.startsWith('/api/') ? pad : '/api/foundation' + pad, body);
 
 test.before(async () => {
   ({ child, base } = await startServer({ env:{ RTG_DATA_DIR:map, SMTP_URL:'' } }));

@@ -20,6 +20,8 @@
 'use strict';
 
 const envelop = require('./envelop');
+const haak = require('./kosten/haak');
+const frame = require('../opzet/verzoekframe');
 
 const DIENSTEN = Object.freeze({
   bewaarveger: 'wist dossiers en posities na hun bewaartermijn (AVG)',
@@ -42,11 +44,18 @@ const actorVan = (naam) => 'dienst:' + naam;
 const zonderCijferreeks = (id) => String(id).replace(/[\d\s.-]{4}(?=[\d\s.-])/g, m => m + ':');
 
 /* Voer fn uit als deze dienst. Een onbekende naam is een fout in de code, geen
-   randgeval: die hoort bij het opstarten of in een toets te zakken. */
+   randgeval: die hoort bij het opstarten of in een toets te zakken.
+
+   EEN DIENST IS ACHTERGRONDWERK (Fase 2, PR 7; B4b en B6a). Hij draait in de
+   NULCONTEXT -- een timer die ooit binnen een verzoek werd gezet, erft dat
+   verzoek niet -- in een eigen verzoekframe met actor `dienst:<naam>`, en zijn
+   kosten landen op de drager `dienst:<naam>` en niet op `huis`: apart per
+   dienst, in de wereld van het huis. Het frame komt uit opzet/verzoekframe.js. */
 function alsDienst(naam, fn) {
   if (!Object.prototype.hasOwnProperty.call(DIENSTEN, naam)) throw new Error('dienstidentiteit: onbekende dienst ' + naam);
-  const e = envelop.alsStart(envelop.maak({ kanaal: 'dienst', actor: actorVan(naam), classificatie: 'intern' }));
-  return envelop.inKeten(e, fn);
+  return frame.achtergrond('dienst', { actor: { sleutel: actorVan(naam), deur: 'dienst', identiteit: 'bewezen' },
+    drager: haak.drager('dienst', naam), herkomst: 'dienst' }, () =>
+    envelop.inKeten(envelop.alsStart(envelop.maak({ kanaal: 'dienst', actor: actorVan(naam), classificatie: 'intern' })), fn));
 }
 
 /* Een gekoppeld toestel. De id is die van het toestel en niet die van het lid:

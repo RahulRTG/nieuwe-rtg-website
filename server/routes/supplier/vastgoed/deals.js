@@ -53,7 +53,7 @@ app.post('/api/supplier/bezichtiging/beslis', supplierAuth, (req, res) => {
     }
   } else return res.status(400).json({ error: 'Onbekende actie.' });
   save();
-  notify(b.customerTier || b.key, { icon: '\u{1F3E1}', title: s.name,
+  notify(b.customerKey || b.key, { icon: '\u{1F3E1}', title: s.name,
     body: req.body.actie === 'bevestigen'
       ? 'Bezichtiging van ' + p.titel + ' bevestigd: ' + String(b.moment).replace('T', ' ').slice(0, 16) + (b.keyless ? ' \u00B7 keyless toegang staat klaar.' : '')
       : 'De bezichtiging van ' + p.titel + ' kon helaas niet.', scope: 'vastgoed' });
@@ -92,7 +92,7 @@ app.post('/api/supplier/bod/beslis', supplierAuth, (req, res) => {
     b.status = 'tegenbod'; b.tegenbod = Math.round(tb);
   } else return res.status(400).json({ error: 'Onbekende actie.' });
   save();
-  notify(b.customerTier || b.key, { icon: '\u{1F3E1}', title: s.name,
+  notify(b.customerKey || b.key, { icon: '\u{1F3E1}', title: s.name,
     body: b.status === 'geaccepteerd' ? 'Uw bod op ' + p.titel + ' is geaccepteerd! We stellen een contract op.'
       : b.status === 'tegenbod' ? 'Tegenbod op ' + p.titel + ': \u20AC ' + b.tegenbod.toLocaleString('nl-NL')
       : 'Uw bod op ' + p.titel + ' is helaas afgewezen.', scope: 'vastgoed' });

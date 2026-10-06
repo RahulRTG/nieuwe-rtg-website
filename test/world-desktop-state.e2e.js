@@ -33,6 +33,15 @@ test.before(async () => {
   await post('/api/comm/stuur', { id: conversation, tekst: 'Dit is ons echte testgesprek.' }, other);
 });
 test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+// De ster verschijnt pas bij hover of focus op de kaart. Een muisklik zakte in CI
+// op die verschijnwissel (scrollen haalde de hover weg); het toetsenbord is de
+// stabiele weg en bedient dezelfde knop: focus op de kaart, Tab naar de ster, Enter.
+const speld = async (page, id) => {
+  await page.locator(`.wd-library [data-widget="${id}"] .wd-widget-open`).focus();
+  await page.keyboard.press('Tab');
+  await page.waitForFunction(i => document.activeElement && document.activeElement.matches(`.wd-library [data-widget="${i}"] .wd-widget-pin`), id);
+  await page.keyboard.press('Enter');
+};
 test('a failed preference read cannot overwrite stored widgets; explicit changes survive reload', { skip }, async () => {
   await post('/api/ik/workspace/zet', { scope: 'living', workspace: { order: ['notities'], hidden: [] } });
   const ctx = await context(), page = await ctx.newPage(); let writes = 0;
@@ -43,8 +52,7 @@ test('a failed preference read cannot overwrite stored widgets; explicit changes
     await page.waitForFunction(() => /konden niet worden opgehaald/.test(document.querySelector('.wd-favorites').textContent));
     if (await page.locator('.wd-app-controls').getAttribute('open') === null) await page.locator('.wd-app-controls>summary').click();
     await page.locator('#wdSearch').fill('geld');
-    await page.locator('.wd-library [data-widget="geld"]').hover();
-    await page.locator('.wd-library [data-widget="geld"] .wd-widget-pin').click();
+    await speld(page, 'geld');
     assert.equal(writes, 0);
     assert.deepEqual((await post('/api/ik/workspace', { scope: 'living' })).workspace.order, ['notities']);
     await page.unroute('**/api/ik/workspace');
@@ -53,8 +61,7 @@ test('a failed preference read cannot overwrite stored widgets; explicit changes
     const saved = page.waitForResponse(r => r.url().endsWith('/api/ik/workspace/zet'));
     if (await page.locator('.wd-app-controls').getAttribute('open') === null) await page.locator('.wd-app-controls>summary').click();
     await page.locator('#wdSearch').fill('geld');
-    await page.locator('.wd-library [data-widget="geld"]').hover();
-    await page.locator('.wd-library [data-widget="geld"] .wd-widget-pin').click(); await saved;
+    await speld(page, 'geld'); await saved;
     await page.reload(); await page.waitForSelector('.wd-favorites [data-widget="geld"]');
     assert.deepEqual((await post('/api/ik/workspace', { scope: 'living' })).workspace.order, ['notities', 'geld']);
     assert.deepEqual((await post('/api/ik/workspace', { scope: 'travel' })).workspace.order, []);

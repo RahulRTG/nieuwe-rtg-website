@@ -34,7 +34,9 @@ const EIGEN = [
   '/api/giftcard/roteer',
   '/api/supplier/betaalverzoek',
   '/api/appstore/koop',
-  '/api/appstore/kantoor/teruggave'
+  '/api/appstore/kantoor/teruggave',
+  // de horecateruggave leest haar eigen sleutel en beslist zelf over een herhaling
+  '/api/supplier/horeca/teruggave'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

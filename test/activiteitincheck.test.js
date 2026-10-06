@@ -69,6 +69,41 @@ test('3. een nieuwe code trekt de vorige in', () => {
   assert.equal(w.deur.inchecken(w.req, 'A1', nieuw.inschrijving.checkinCode).ok, true);
 });
 
+/* Het werkwoord (kern/bearercode-keten.js): een nieuwe code met hetzelfde
+   einde (kwijt, gelekt) ROTEERT; is de activiteit verzet, dan is het een
+   nieuwe termijn en dus VERNIEUWEN. Beide: de oude opent niets meer. */
+test('3a. een nieuwe code op dezelfde dag roteert: zelfde einde, rotatie +1', () => {
+  const w = wereld();
+  const r = w.deur.inschrijven(w.req, 'A1', { codenaam: 'HV-AAAAA' });
+  const oud = w.staat().activiteiten[0].inschrijvingen[0].checkin_toegang;
+  const nieuw = w.deur.nieuweCode(w.req, 'A1', r.inschrijving.id);
+  const t = w.staat().activiteiten[0].inschrijvingen[0].checkin_toegang;
+  assert.equal(t.rotatie, oud.rotatie + 1);
+  assert.equal(t.expires_at, oud.expires_at, 'roteren schoof het einde op');
+  assert.equal(t.geschiedenis.at(-1).soort, 'geroteerd');
+  assert.equal(t.geschiedenis.at(-1).door, 'bevoegd');
+  assert.equal(w.deur.inchecken(w.req, 'A1', r.inschrijving.checkinCode).status, 404);
+  assert.equal(w.deur.inchecken(w.req, 'A1', nieuw.inschrijving.checkinCode).ok, true);
+});
+
+test('3b. de activiteit is verzet: een nieuwe code vernieuwt, met de nieuwe dag als einde', () => {
+  const w = wereld();
+  const r = w.deur.inschrijven(w.req, 'A1', { codenaam: 'HV-AAAAA' });
+  const s = w.staat();
+  const oud = s.activiteiten[0].inschrijvingen[0].checkin_toegang;
+  const later = new Date(Date.now() + 40 * 86400000).toISOString().slice(0, 10);
+  s.activiteiten[0].wanneer = later;
+  w.kv.rtfos = JSON.stringify(s);
+  const nieuw = w.deur.nieuweCode(w.req, 'A1', r.inschrijving.id);
+  const t = w.staat().activiteiten[0].inschrijvingen[0].checkin_toegang;
+  assert.equal(t.rotatie, 2);
+  assert.equal(t.expires_at, later + 'T23:59:59.999Z', 'de termijn volgt de verzette dag niet');
+  assert.equal(t.geschiedenis.at(-1).soort, 'vernieuwd');
+  assert.equal(t.geschiedenis.at(-1).einde_was, oud.expires_at);
+  assert.equal(w.deur.inchecken(w.req, 'A1', r.inschrijving.checkinCode).status, 404);
+  assert.equal(w.deur.inchecken(w.req, 'A1', nieuw.inschrijving.checkinCode).ok, true);
+});
+
 test('4. afmelden trekt de code in', () => {
   const w = wereld();
   const r = w.deur.inschrijven(w.req, 'A1', { codenaam: 'HV-AAAAA' });
@@ -119,6 +154,8 @@ test('8. zonder bevoegdheid in de stad geen nieuwe code', () => {
       tak weg                                                        -> toets 2
    A2 activiteiten-deur.js: in geefCode `bearer.intrekken(vorig, ...)` weg en
       de hash van de vorige laten staan (nieuwe toegang niet toekennen) -> toets 3
+   A8 activiteiten-deur.js: in geefCode altijd vernieuw              -> toets 3a
+   A9 activiteiten-deur.js: in geefCode altijd roteer                -> toets 3b
    A3 activiteiten-deur.js: intrekken in afmelden weg               -> toets 4
    A4 activiteiten-deur.js: `eind` op +90 dagen in plaats van de activiteitsdag
                                                                     -> toets 1 en 5

@@ -70,7 +70,18 @@ module.exports = (ctx) => {
       const m = s.machtigingen.find(x => x.id === String(mId || ''));
       if (!m || (m.vanKey !== key && m.naarKey !== key))
         return { status: 404, error: 'Machtiging niet gevonden.' };
+      if (m.ingetrokken) return { status: 200, ok: true, herhaald: true };
       m.ingetrokken = true;
+      /* HET SPOOR, bij BEIDE kanten (Fase 0, D15). Geven liet een regel na,
+         intrekken niet: de principaal zag een machtiging verschijnen en nooit
+         verdwijnen, en de gemachtigde wist niet waarom zijn toegang stopte. */
+      for (const [wie, ander] of [[m.vanKey, m.naarKey], [m.naarKey, m.vanKey]]) {
+        const log = logVan(wie, s);
+        log.unshift({ om: iso(), dienst: m.dienst, attributen: [],
+          soort: 'machtiging ' + (wie === m.vanKey ? 'aan ' : 'van ') + codenaamUit(ander) +
+            ' ingetrokken door ' + (wie === key ? 'u' : codenaamUit(key)) });
+        cap(log, MAX_LOG);
+      }
     /* Alleen de sessies die op DEZE machtiging draaien gaan dicht.
 
        Hier stond `x.memberKey === m.vanKey && x.namens`, en dat sloot elke

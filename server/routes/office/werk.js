@@ -118,7 +118,7 @@ app.post('/api/office/reply', officeAuth, (req, res) => {
   md.needsConcierge = false;
   accounts.saveMemberState(u.id, md);
   broadcastSync([u.tier], 'chat');
-  notify(u.tier, { icon: 'berichten', title: 'Uw concierge', body: text.slice(0, 80), scope: 'chat' });
+  notify('user-' + u.id, { icon: 'berichten', title: 'Uw concierge', body: text.slice(0, 80), scope: 'chat' });
   // Het antwoord verschijnt in de app van het lid (met push-melding); RTG gebruikt
   // geen externe berichtenkanalen.
   const inbox = conciergeInbox();

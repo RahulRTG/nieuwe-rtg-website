@@ -6,6 +6,9 @@
    eigen TLS-certificaat via ACME, en de afsluiter op SIGTERM/SIGINT.
    ========================================================================== */
 'use strict';
+/* Vooraf geladen en niet in de signaalhandler: een require daar kan falen
+   (EMFILE), en dan valt de hele afsluitspoeling weg. */
+const { maakStopspoeling } = require('./stopspoeling');
 
 module.exports = function luister(deps) {
   const { app, log, db, accounts, save, webpush, kern, DATA_DIR, flushBijAfsluiten } = deps;
@@ -134,14 +137,11 @@ module.exports = function luister(deps) {
   // Netjes afsluiten: data wegschrijven, verbindingen sluiten, dan pas stoppen.
   for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
     console.log(`[stop] ${sig} ontvangen, data wordt bewaard...`);
-    try { save(); } catch (e) {}
-    /* Journaal en vertaalkast spoelen per venster; wat nu nog in die stapels
-       staat, staat nog nergens. Synchroon, want een asynchrone spoeling haalt
-       process.exit() niet meer. */
-    try { require('../kern/journaalbestand').spoelAlle(); } catch (e) {}
-    try { require('../lib/vertaalkast').spoelAlle(); } catch (e) {}
-    // Bij Postgres: nog een laatste flush zodat niets in de write-behind hangt.
-    Promise.allSettled([Promise.resolve(flushBijAfsluiten()), Promise.resolve(accounts.flushBijAfsluiten())]).finally(() => {
+    /* save(), journaal en vertaalkast, en daarna de write-behind: dezelfde lijst
+       als de crashweg in ../server.js, uit ./stopspoeling.js. */
+    const spoel = maakStopspoeling({ save, flushBijAfsluiten, accounts });
+    spoel.spoelSynchroon();
+    spoel.spoelAsynchroon().finally(() => {
       server.close(() => process.exit(0));
     });
     // Vangnet als de flush hangt. Bij write-behind (Postgres) kan een laatste

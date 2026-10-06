@@ -34,7 +34,17 @@ const CODE_DICHT = 'KANTOORCODE_NIET_IN_PRODUCTIE';
 const WEG = 'Log in met uw eigen RTG-account, kies de kantoorrol (/api/account/start met rol "kantoor") ' +
   'en bevestig met uw passkey. Hebt u de kantoorrol nog niet, vraag de eigenaar dan om een uitnodiging op naam.';
 
-const isProductie = (env) => String((env || process.env).NODE_ENV || '') === 'production';
+/* "Productie" is hier breder dan NODE_ENV. Een AANTOONBAAR OPENBAAR adres
+   (APP_URL op een publiek domein) telt net zo goed: de gedeelde kantoorcode mag
+   daar nooit open, ook niet als iemand NODE_ENV=production vergeet te zetten
+   (RTG-V1-RELEASE blocker 3). 'onbekend'/'lokaal' blijven buiten productie, dus
+   de toetsen en de demo veranderen niet. */
+const { installatieSoort } = require('../../config/openbaar');
+const isProductie = (env) => {
+  const e = env || process.env;
+  if (String(e.NODE_ENV || '') === 'production') return true;
+  try { return installatieSoort(e).soort === 'openbaar'; } catch (x) { return false; }
+};
 
 /* De oude deur: /api/office/login en het kantoorgesprek. */
 function codeDicht(env) {

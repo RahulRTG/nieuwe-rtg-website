@@ -51,13 +51,12 @@ module.exports = function verzoekketen(deps) {
      RTG_PROXY_HOPS=0 zet het vertrouwen helemaal uit: dan telt alleen het adres
      van de verbinding zelf. Dat is de juiste stand voor een app die zonder proxy
      aan het internet hangt. */
-  app.set('trust proxy', Number(process.env.RTG_PROXY_HOPS != null ? process.env.RTG_PROXY_HOPS : 1));
+  require('./proxyvertrouwen')(app, process.env);
   /* WIE die proxy is. Zonder opgave vertrouwen we alleen loopback en private
      adressen -- de gebruikelijke plek voor een reverse proxy. Een bezoeker die
      rechtstreeks vanaf het internet binnenkomt valt daar nooit onder, dus zijn
      X-Forwarded-For wordt genegeerd in plaats van geloofd. Staat de proxy op een
      publiek adres, zet die dan hier (komma-gescheiden). */
-  app.set('proxy ips', String(process.env.RTG_PROXY_IPS || '').split(',').map(s => s.trim()).filter(Boolean));
   /* DE EFFECTMETER, en met opzet als EERSTE laag van de keten.
 
      Hij hing eerst naast de staatmeter, halverwege, en meldde daar `geen` op een
@@ -67,7 +66,7 @@ module.exports = function verzoekketen(deps) {
      iets gebeurde is erger dan geen meter, dus staat hij nu boven alles wat
      parkeert. Zie server/effectmeter.js.
 
-     Zonder RTG_STAATLOG hangt hij helemaal niet in de keten. */
+     Zonder RTG_STAATLOG hangt hij niet in de keten. */
   /* DE EFFECTBON STAAT ERBOVEN, om precies de les hierboven: hij opent de tellercontext
      (de effectmeter hergebruikt die) en staat ALTIJD aan. Eronder zou hij zijn context na
      de body-lezer openen en dezelfde stilte melden -- op de laag die in PRODUCTIE moet
@@ -79,6 +78,11 @@ module.exports = function verzoekketen(deps) {
      staat vóór bodylezers en dus ook vóór de rauwe betaalwebhooks. */
   if (typeof postgresVerzoekMiddleware === 'function') app.use(postgresVerzoekMiddleware());
   app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
+  /* De Trust & Evidence-correlatie loopt door ELK verzoek, ook wanneer de route
+     zelf nog geen claims schrijft. Het publieke request-id blijft een logref;
+     de interne chain-id is apart, ondoorzichtig en verleent nooit toegang. */
+  app.use(require('../kern/bewijsvlak/context').middleware());
+  app.use(require('./verzoekframe').middleware()); // identiteit van dit werk (schaduw)
   // wat verandert dit verzoek: rijen per collectie voor en na (blast radius).
   // NA het logboek want hij leunt op req.id; bewust niet in save(). Zie de kop
   // van ./handeling.js voor de afweging en de gemeten kosten.
@@ -90,8 +94,8 @@ module.exports = function verzoekketen(deps) {
   app.use(require('./handeling').middleware({
     klasse: require('../kern/handelingsklasse').maakHandelingsklasse({}).klasseVoor
   }));
-  /* De meting draait NA het logboek en VOOR de routes: hij hangt aan res.finish,
-     dus hij ziet alles wat er daarna gebeurt, inclusief de 404's. */
+  /* De meting draait NA het logboek en VOOR de routes (res.finish): hij ziet
+     alles daarna, ook de 404's. */
   app.use(require('../meting').middleware());
   /* Het routejournaal staat ernaast en doet alleen iets met RTG_ROUTELOG gezet
      (de testrun). Het levert de dekkingsmeting waargenomen feiten in plaats van
@@ -117,11 +121,7 @@ module.exports = function verzoekketen(deps) {
 
   /* De meelees-laag van de RTG AI (kern/rtgai.js): telt alleen mee met het
      verkeer en doet verder niets; de kern wordt verderop aangesloten. */
-  let rtgaiMeelezer = null;
-  app.use((req, res, next) => {
-    res.on('finish', () => { try { if (rtgaiMeelezer) rtgaiMeelezer.lees(req.method, req.path, res.statusCode); } catch (e) {} });
-    next();
-  });
+  const zetRtgaiMeelezer = require('./rtgai-meelezer')(app);
 
   /* Een installatie die bewust zonder betalen publiceert, mag nergens een
      betaling simuleren of alleen administratief als voldaan markeren. Deze
@@ -129,6 +129,7 @@ module.exports = function verzoekketen(deps) {
      grootboeken hebben verderop nog een tweede, interne stop voor taken die
      niet via HTTP lopen. */
   require('./betaalstop')({ app });
+  require('./standbypoort')({ app, db });
 
   /* De liegpoort (./liegpoort.js) doet niets zonder RTG_LIEG. Staat die wel,
      dan laat hij de gekozen endpoints een geldig maar LEEG antwoord geven --
@@ -140,15 +141,15 @@ module.exports = function verzoekketen(deps) {
   require('./lijfpoort')({ app, express, db, save, log, betaal, betaalWaarheid, muntbetaal,
     opslagKlaar, zaakdoos, muntenVan, settleFactuurVan, opdrachtenVan });
   /* NA de lijfpoort, want die leest de body -- en dat lezen breekt de
-     handelingscontext van stap 3. Zonder deze regel is server/opzet/begroting.js
-     blind voor elke POST met een body, en dat is elke mutatie. Het hele verhaal
-     staat bij hervat() in ./handeling.js. */
+     handelingscontext van stap 3 (en het verzoekframe). Zonder deze regel is
+     begroting.js blind voor elke POST met een body; zie hervat() in ./handeling.js. */
   app.use(require('./handeling').hervat());
+  app.use(require('./verzoekframe').hervat());
 
   return {
     schild, zetWacht, lieg,
     ssrf: require('../kern/ssrf'), // SSRF-afweer voor client-bepaalde uitgaande doelen
-    zetRtgai: (r) => { rtgaiMeelezer = r; }
+    zetRtgai: zetRtgaiMeelezer
   };
 };
 // de dieptewacht woont in ./lijfpoort.js; hier alleen doorgegeven voor wie hem

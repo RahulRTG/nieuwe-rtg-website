@@ -58,6 +58,19 @@
    module, en tot die er is staat hij niet in deze meter maar in `motoren`, waar
    hij over modules gaat en niet over routes.
 
+   DE DERDE AS, `tas` (6 oktober 2026, besluit van de eigenaar). LibraryOS en de
+   Loop Fabric (#502) lopen door een collectietransactie en een envelop, en
+   stonden toch op nul assen: alles komt uit de tas. Daarom is er nu een derde
+   meetweg (./lib/kerntas.js), en hij is met opzet NIET de fout van hierboven:
+   geen hub, geen basisobject (`save` telt niet), alleen de module die de naam
+   zelf levert en niet haar deelmodules, en een as alleen als die module de bron
+   van de as REQUIRET -- of, voor de ingespoten collectietransactie, haar in code
+   aanroept. Het is nog steeds per MODULE en niet per functie: een module die op
+   een plek een collectietransactie draagt, markeert elke route die een naam uit
+   haar gebruikt. Daarom staat `tas` apart (perAs.tas, perRoute.tas,
+   mutatiesAlleenViaTas) en wordt hij nooit bij `handler` of `bestand` opgeteld;
+   een route telt pas als `zonder enige as` als ook de tas niets vindt.
+
    Wie die twee optelt of gemiddelt, maakt een getal dat niets meer meet. Het
    verschil tussen de twee is zelf informatie: staat een as op 200 (bestand) en 2
    (handler), dan hangt hij aan een bestand en niet aan een handeling.
@@ -87,6 +100,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 const { alleRoutes } = require('./lib/routes.js');
+const { maakKerntas } = require('./lib/kerntas.js');
 const { EIST_MENS } = require('./kantoormacht.js');
 /* DE DEFINITIE VAN EEN VOLLEDIGE KETEN KOMT UIT DE CODE EN NIET UIT DEZE METER.
    server/kern/kantoor/geldketen.js bezit de handelingsklassen (welke assen zijn
@@ -337,10 +351,10 @@ function bouwGraaf() {
   };
 
   const herkomst = new Map();
-  let herkomstBron = null;
+  let herkomstBron = null, herkomstReg = null;
   try {
     const reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'KERNHERKOMST.json'), 'utf8'));
-    herkomstBron = reg.stempel || null;
+    herkomstBron = reg.stempel || null; herkomstReg = reg;
     for (const r of reg.perNaam) if (r.herkomsten.length === 1) herkomst.set(r.naam, r.herkomsten[0].bestand);
   } catch (e) { /* geen herkomst: de bovengrens valt terug op requires, en dat staat in de uitslag */ }
 
@@ -382,7 +396,7 @@ function bouwGraaf() {
       viaZak.get(b).add(f);
     }
   }
-  return { alle, tekst, buren, vraagt, viaZak, hub, hubdrempel: HUBDREMPEL, herkomstBron, herkomstNamen: herkomst.size };
+  return { alle, tekst, buren, vraagt, viaZak, hub, hubdrempel: HUBDREMPEL, herkomstBron, herkomstNamen: herkomst.size, herkomstReg };
 }
 
 /* ---------------------------------------------------------------------------
@@ -418,6 +432,8 @@ function meet() {
   const routes = alleRoutes();
   const graaf = bouwGraaf();
   const span = spans(routes, graaf.tekst);
+  /* De derde meetweg, de kern-tas (./lib/kerntas.js): structureel en apart geteld. */
+  const tas = maakKerntas(graaf, graaf.herkomstReg);
 
   /* DE BREEDTEKEURING. Een token dat in meer dan een kwart van de routebestanden
      staat, meet niets meer. Hij wordt afgekeurd en genoemd. */
@@ -442,12 +458,12 @@ function meet() {
 
   const soft = Object.entries(ASSEN).filter(([, a]) => !a.uitRouter);
   const perAs = {};
-  for (const naam of Object.keys(ASSEN)) perAs[naam] = { handler: 0, bestand: 0 };
+  for (const naam of Object.keys(ASSEN)) perAs[naam] = { handler: 0, bestand: 0, tas: 0 };
   for (const naam of Object.keys(UIT_EXECUTIONMAP)) perAs[naam] = { handler: 0, bestand: 0, uitKaart: true };
 
   const perRoute = [];
   const histogram = new Map();
-  let muterend = 0, zonderEnigeAs = 0, geenSpan = 0, hubRoutes = 0, lezingen = 0;
+  let muterend = 0, zonderEnigeAs = 0, geenSpan = 0, hubRoutes = 0, lezingen = 0, alleenViaTas = 0;
 
   const buurTekstCache = new Map();
   const buurTekst = (f) => {
@@ -486,12 +502,15 @@ function meet() {
       if (rij && as.raakt(rij[as.veld])) { onder.push(naam); boven.push(naam); }
     }
 
+    const viaTas = inHub ? [] : tas.assenVia(r.bestand, ASSEN).assen;
     for (const a of onder) perAs[a].handler++;
     for (const a of boven) perAs[a].bestand++;
+    for (const a of viaTas) perAs[a].tas++;
     if (mut) {
       histogram.set(onder.length, (histogram.get(onder.length) || 0) + 1);
-      if (!boven.length) zonderEnigeAs++;
-      perRoute.push({ methode: r.methode, pad: r.pad, bestand: r.bestand, onder, boven });
+      if (!boven.length && !viaTas.length) zonderEnigeAs++;
+      if (!boven.length && viaTas.length) alleenViaTas++;
+      perRoute.push({ methode: r.methode, pad: r.pad, bestand: r.bestand, onder, boven, tas: viaTas });
     }
   }
 
@@ -578,7 +597,10 @@ function meet() {
       'zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de ' +
       'kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op ' +
       '"idempotent". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook ' +
-      'zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. De assen uit EXECUTION_MAP.json ' +
+      'zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. ' +
+      'Sinds 6 oktober 2026 een derde meetweg, `tas` (scripts/lib/kerntas.js): de module die een fabriek of toewijzing in de ' +
+      'kern-tas legt, telt een as alleen als zij of een directe require de BRON van die as inlaadt (structureel, geen woord), ' +
+      'plus de ingespoten collectietransactie als aanroep. Ook `tas` wordt nooit bij de andere twee opgeteld. De assen uit EXECUTION_MAP.json ' +
       'zijn gelezen en niet hier geteld.',
     stempel: stempel(),
     bronnen: {
@@ -604,6 +626,8 @@ function meet() {
       volledigeKetens: volledig,
       ketens,
       mutatiesZonderEnigeAs: zonderEnigeAs,
+      mutatiesAlleenViaTas: alleenViaTas,
+      kerntas: { namenGevolgd: tas.levert.size, toewijzingOnopgelost: tas.onopgelost.slice().sort() },
       mutatiesZonderHandlerSpan: geenSpan,
       bestandsasOnbruikbaar: hubRoutes,
       hubdrempel: graaf.hubdrempel,
@@ -712,4 +736,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { meet, bouwGraaf, ASSEN, UIT_EXECUTIONMAP, ONGEMETEN };
+module.exports = { meet, bouwGraaf, ASSEN, UIT_EXECUTIONMAP, ONGEMETEN, BEWEZEN_LEZINGEN };

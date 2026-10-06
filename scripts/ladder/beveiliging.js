@@ -354,6 +354,7 @@ const PUBLIEK = new Map([
      over kan zeggen. */
   ['GET /api/metrics', 'bewaakt met een token of een intern adres; de dwaler klopt van binnenuit en komt er daarom langs'],
   ['GET /api/metrics/kort', 'idem'],
+  ['GET /api/loop/operations', 'de bedrijfstelling van de Loop Fabric (#502), achter dezelfde magMeten-poort (server/meetpoort.js); idem'],
   /* ---- bijgewerkt na de ladderronde van 18 augustus 2026 ----
      Twaalf routes die de dwaler als RAAK meldde en die stuk voor stuk BEWUST
      openbaar zijn; bij elk staat de reden zoals hij ook in de broncode staat.

@@ -9,10 +9,10 @@
    regel HERHAALDE het antwoord -- dus ook de kale lescode en de leraarssleutel.
    Met hash-only codes mag dat niet meer: de regel is weg en de route staat hier.
 
-   /les/join stond tijdelijk in MUTATIECONTRACT-AFGELEID.json. De hernieuwde
-   proef bereikt de atomaire claim nu wel, waardoor die tijdelijke grond is
-   verdwenen. Het nagekeken contract staat daarom hier: iedere claim geeft één
-   nieuwe leerlingsleutel en een herhaling mag die nooit uit een cache tonen. */
+   /les/join is na de naleesronde ook een menselijk contract: meedoen claimt de
+   lescode en toont een verse leerlingsleutel precies eenmaal. Het afgeleide
+   BLOCKED_BY_TEST_FIXTURE-oordeel was alleen de oude meetgrens en mag die
+   bedoeling niet blijven vervangen. */
 'use strict';
 const AF = { door: 'Claude, de lescredentialmodule en haar routes gelezen en beproefd', op: '2026-09-29' };
 const OP = '2026-09-29';
@@ -32,13 +32,14 @@ const CONTRACTEN = {
       'de leraarssleutel die hij terugkrijgt ZIJN de toegang. De rem staat op de route (20 per uur per adres)' },
     'Elke oproep maakt een nieuwe les met een eigen 128-bit lescode en leraarssleutel; met dezelfde `idem` weigert de kern (409) zonder codes.',
     'test/foundation-lescredential.test.js en test/foundation-lescredential-server.test.js: twee lessen hebben verschillende codes, en dezelfde idem geeft 409 zonder lescode of token'),
-  'POST /api/foundation/les/join': EENMALIG('foundation.les.join',
-    { klasse: 'PUBLIC', waarom: 'meedoen gebeurt vóór een account bestaat; de 128-bit lescode is de begrensde geloofsbrief en de route heeft een adresrem plus een lesplafond' },
-    'Meedoen claimt de gekozen naam atomair en geeft de leerlingsleutel precies eenmaal; dezelfde naam krijgt daarna 409 zonder sleutel.',
-    'test/foundation-lescredential.test.js en test/foundation-lescredential-server.test.js: een naam wordt eenmaal geclaimd, een dubbele claim krijgt 409 en iedere leerling krijgt een eigen sleutel'),
   'POST /api/foundation/les/code/roteer': EENMALIG('foundation.les.code.roteren', LES,
     'Roteren geeft elke keer een nieuwe lescode en trekt de vorige in.',
     'test/foundation-lescredential.test.js en test/foundation-lescredential-server.test.js: na roteren opent de oude lescode niets (410) en de nieuwe wel, tegen een echte server'),
+  'POST /api/foundation/les/join': EENMALIG('foundation.les.join',
+    { klasse: 'OBJECT_SCOPED', objectVeld: 'lescode',
+      uitleg: 'de 128-bit lescode uit het lijf is de claim op DIE les; een onbekende of ingetrokken code opent niets' },
+    'Meedoen legt de naam atomair vast en toont de verse leerlingsleutel eenmaal; dezelfde naam krijgt daarna 409 zonder sleutel.',
+    'test/foundation-lescredential.test.js en test/foundation-lescredential-server.test.js: een geldige lescode geeft een eigen leerlingsleutel, dezelfde naam krijgt 409 en een ingetrokken code opent niets'),
   'POST /api/foundation/les/code/intrekken': STAND('foundation.les.code.intrekken',
     'test/foundation-lescredential.test.js en test/foundation-lescredential-server.test.js: intrekken zet ingetrokken_at eenmaal; daarna geeft meedoen 410 en een tweede intrekking verandert niets'),
   'POST /api/foundation/les/leerling/intrekken': STAND('foundation.les.leerling.intrekken',

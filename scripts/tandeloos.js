@@ -146,6 +146,20 @@ function blokken(bron) {
    als het ongemakkelijk wordt. Elke regel hieronder is een oordeel dat iemand
    kan nalezen en omdraaien. */
 const BEOORDEELD = new Map([
+  ['mobiliteit.test.js::leeg.body.gemaakt',
+    'zonder reserveringen hoort er geen rit te komen; de tegenproef staat in supplier-comm-mob-payroll.test.js toets 8: met een gereserveerde plaats maakt dezelfde planner precies een rit (met een mutatie nagetrokken)'],
+  ['eenaccount.test.js::leeg.body.rollen',
+    'een vers account heeft niets gekoppeld; even verderop staat dezelfde lijst WEL gevuld (some op personeel bij KIKUNOI)'],
+  ['office-payroll-dekking.test.js::leeg.body.runs',
+    'voor de eerste run is er niets; direct erna staat de lijst op precies een run (deepEqual op het id) en later op twee'],
+  ['salonbron-fotobank.test.js::leeg.body.fotos',
+    'de beeldbank begint leeg; na de upload staat de url erin (includes), dus dezelfde lijst vult aantoonbaar'],
+  ['staff-inzet-mob.test.js::leeg.body.lopend',
+    'het bord begint leeg; later in hetzelfde bestand wordt de rit in lopend gevonden (find op ref)'],
+  ['werkplek.test.js::zonder.body.bedrijven',
+    'een lid zonder sleutel ziet niets; met een sleutel ziet hij precies RTF (deepEqual op de codes), dus de lijst vult wel'],
+  ['rtfos-netwerk.test.js::dicht.body.mislukt',
+    '"niets mislukt" IS de bewering; een ontbrekend veld laat deepEqual zakken en .join gooien, en dat elke stad echt een aanvraag kreeg toetst het blok direct erna'],
   ['zaak-inrichting.test.js::vreemd.body.rooms',
     'de tegenhanger staat ernaast: bij de buren staat de kamer er nog wel (some), dus beide kanten zijn afgedekt'],
   ['zaak-inrichting.test.js::weg.body.rooms',

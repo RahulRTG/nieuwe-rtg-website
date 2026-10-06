@@ -38,3 +38,15 @@ jobs:
         uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
         with:
           category: "/language:javascript-typescript"
+          output: codeql-results
+      - name: Nul bevindingen op deze commit bewijzen
+        run: node scripts/codeql-verdict.js --dir=codeql-results --out=.release/codeql-verdict.json
+      - name: Commitgebonden CodeQL-verdict bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: codeql-verdict
+          path: .release/codeql-verdict.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90

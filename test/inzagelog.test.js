@@ -139,3 +139,36 @@ test('zonder database valt er niets om', () => {
   assert.deepEqual(inzagelog.lijst(), []);
   assert.equal(inzagelog.samenvatting().totaal, 0);
 });
+
+test('een transactionele commit vindt dezelfde gehashte regel in een nieuwe objectboom terug', async () => {
+  const db = { data: {} };
+  inzagelog.zet(db, () => {}, async mutatie => {
+    await mutatie();
+    // Zoals een COW-commit: publiceer inhoudelijk dezelfde toestand als een
+    // verse objectboom. Referentiegelijkheid mag hier geen bewijsvoorwaarde zijn.
+    db.data = structuredClone(db.data);
+  }, () => true);
+
+  const uit = await inzagelog.noteerVast({
+    door: { id: 7, naam: 'eigenaar' }, over: { id: 42, codenaam: 'ZILVEREN HERT' },
+    waarom: 'KYC-controle', bron: 'backoffice/verificaties'
+  });
+  assert.equal(uit.ok, true, JSON.stringify(uit));
+  assert.equal(db.data.inzageLog.length, 1);
+  assert.equal(db.data.inzageLog[0].hash, uit.regel.hash,
+    'de na commit teruggevonden ketenhash is exact de geschreven regel');
+});
+
+test('een commit die de auditregel verliest blijft fail-closed', async () => {
+  const db = { data: {} };
+  inzagelog.zet(db, () => {}, async mutatie => {
+    await mutatie();
+    db.data = { ...structuredClone(db.data), inzageLog: [] };
+  }, () => true);
+
+  const uit = await inzagelog.noteerVast({
+    door: { id: 7 }, over: { id: 42 }, waarom: 'KYC-controle', bron: 'backoffice'
+  });
+  assert.equal(uit.ok, false);
+  assert.equal(uit.reden, 'regel-niet-teruggevonden');
+});

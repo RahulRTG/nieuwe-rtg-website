@@ -58,8 +58,12 @@
    ========================================================================== */
 'use strict';
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { maakBatches } = require('./lib/testbatches');
+const { wegingVoor } = require('./lib/delen');
+const { prijzen } = require('./lib/duurprijs');
 
 const WORTEL = path.join(__dirname, '..');
 const TEST = path.join(WORTEL, 'test');
@@ -148,13 +152,18 @@ if (require.main === module) {
   if (alleen.length) console.log('  ' + K.grijs + alleen.length +
     ' toets(en) draaien apart (scripts/lib/geisoleerd.js)' + K.uit + '\n');
 
+  const concurrency = Math.max(2, Math.min(4,
+    os.availableParallelism ? os.availableParallelism() : 4));
   const draai = (lijst) => spawnSync(process.execPath,
-    ['--test', ...lijst.map(n => path.join('test', n))],
+    ['--test', '--test-concurrency=' + concurrency, '--test-timeout=600000', '--test-force-exit',
+      ...lijst.map(n => path.join('test', n))],
     { cwd: WORTEL, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
 
   const rondes = [];
   for (const n of alleen) rondes.push(draai([n]));
-  if (samen.length) rondes.push(draai(samen));
+  const w = wegingVoor(samen), p = prijzen(w.gewicht, { andere: w.andere });
+  const batches = maakBatches(samen, { gewicht: naam => w.gewicht.get(naam) || p.prijsVoor(naam) });
+  for (const batch of batches) rondes.push(draai(batch));
 
   const tekst = rondes.map(u => String(u.stdout || '') + String(u.stderr || '')).join('\n');
   const uit = { status: rondes.some(u => u.status !== 0) ? 1 : 0 };
@@ -167,7 +176,7 @@ if (require.main === module) {
      groene regel als bewijs van rood toont, stuurt de lezer de verkeerde kant
      op, en dat is precies wat deze poort moet voorkomen. */
   const meldingen = tekst.split('\n').filter(r =>
-    !/^\s*(ok|# Subtest:)/.test(r) &&
+    !/^\s*(ok|# Subtest:|[✔✖])/.test(r) &&
     (MERKEN.some(m => r.includes(m.merk)) || /draai: npm run/.test(r)));
   if (uit.status === 0) {
     console.log('  ' + K.groen + 'Alle registers kloppen met een verse meting.' + K.uit + '\n');
@@ -182,8 +191,13 @@ if (require.main === module) {
   if (regels.length) for (const m of regels) console.error('    ' + m.trim());
   else {
     console.error('    ' + K.grijs + 'geen register meldde dat het achterloopt; er zakte iets anders:' + K.uit);
-    for (const r of tekst.split('\n').filter(r => /^not ok /.test(r)).slice(0, 10))
-      console.error('    ' + r.trim());
+    for (const ronde of rondes.filter(r => r.status !== 0)) {
+      const regels = (String(ronde.stdout || '') + String(ronde.stderr || '')).split('\n');
+      const eerste = regels.findIndex(r => /^\s*(not ok |✖ )/.test(r));
+      const begin = eerste < 0 ? Math.max(0, regels.length - 30) : eerste;
+      for (const regel of regels.slice(begin, begin + 30).filter(Boolean))
+        console.error('    ' + regel.trim());
+    }
   }
   console.error('\n  ' + K.grijs + 'Draai de genoemde opdracht(en), commit het register, en draai dit opnieuw.' + K.uit + '\n');
   process.exit(1);

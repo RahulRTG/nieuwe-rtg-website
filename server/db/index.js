@@ -10,12 +10,10 @@
    van de app praat alleen met db.data en de helpers hieronder; welke motor er
    onder draait merkt ze niet.
 
-   Deze module is opgesplitst: ./state (de gedeelde levende staat), ./merge (de
-   3-weg samenvoeging), ./opslag (bestandslaag), ./snapshot (het write-behind
-   volledige-snapshot-schrijven), ./sqlite en ./postgres (de motoren), ./gidsen
-   (grootboek van zaken + ledengids) en ./tx (transactie-index + grootboek).
-   Hier de load/save-orchestratie, het aanzetten van de opslag en het samenstellen
-   van de publieke API. */
+   Opgesplitst in ./state (levende staat), ./merge (3-weg), ./opslag (bestanden),
+   ./snapshot (write-behind), ./sqlite en ./postgres (motoren), ./gidsen (zaken +
+   ledengids) en ./tx (transactie-index + grootboek). Hier de load/save-
+   orchestratie, het aanzetten van de opslag en de publieke API. */
 const verraadfase = require('../lib/verraadfase');
 const effectmeter = require('../effectmeter');
 const state = require('./state');
@@ -49,12 +47,21 @@ const { load, startSqliteSync } = require('./starten')({ save });
 const { flushBijAfsluiten, opslagKlaar } = require('./afsluiten');
 const { planSnapshot } = snapshot;
 
-function save() { return bewaar(); }
+/* save(collecties) is dezelfde gerichte weg als save.sleutels(collecties);
+   zonder argument blijft het de volledige save. */
+function save(collecties) { return collecties === undefined ? bewaar() : save.sleutels(collecties); }
 // Expliciete schrijvers hoeven niet bij iedere auditregel de hele wereld te scannen.
 save.sleutels = keys => {
   if (!Array.isArray(keys) || !keys.length || keys.some(k => typeof k !== 'string' || !Object.hasOwn(db.data, k)))
     throw new Error('Selectieve opslag vereist bestaande collecties.');
   return bewaar([...new Set(keys)]);
+};
+// De datalaag snijdt een vast domeinvlak tot de aanwezige collecties terug.
+save.bestaande = keys => {
+  if (!Array.isArray(keys) || !keys.length || keys.some(k => typeof k !== 'string' || !k))
+    throw new Error('Selectieve opslag vereist een niet-lege sleutellijst.');
+  const aanwezig = [...new Set(keys)].filter(k => Object.hasOwn(db.data, k));
+  return aanwezig.length ? bewaar(aanwezig) : bewaar();
 };
 save.audit = require('./audit-poort')({ db, store: STORE, sqlite, bundelDoos, bewaar });
 function bewaar(sleutels, auditOp) {
@@ -88,9 +95,15 @@ function bewaar(sleutels, auditOp) {
      telt dus de POGING; een bundel van drie plus zijn commit telt vier. Bewust:
      de vraag is niet "hoeveel" maar "iets of niets", en die mag geen tak missen. */
   effectmeter.tel('opslag');
+  const auditOps = auditOp ? (Array.isArray(auditOp) ? auditOp : [auditOp]) : [];
   const doos = bundelDoos();
   if (doos && doos.open) {
-    if (auditOp) sqlite.auditMotor().stage(doos, auditOp);
+    for (const op of auditOps) sqlite.auditMotor().stage(doos, op);
+    if (sleutels === undefined) doos.volledig = true;
+    else {
+      if (!doos.sleutels) doos.sleutels = new Set();
+      for (const sleutel of sleutels) doos.sleutels.add(sleutel);
+    }
     doos.nodig = true; return;
   } // binnen bijeen: aan het eind, in een commit
   // verraadfase = de motor ACHTER de opstartpoort; zie ../lib/verraadfase.js
@@ -107,7 +120,7 @@ function bewaar(sleutels, auditOp) {
     postgres.planSave();
   } else if (STORE === 'sqlite') {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
-    sqlite.saveSqlite(Boolean(sleutels), sleutels, auditOp ? [auditOp] : []);
+    sqlite.saveSqlite(Boolean(sleutels), sleutels, auditOps);
   } else if (STORE === 'geheugen') {
     // GEHEUGEN: versleutelde, incrementele brok-per-collectie-opslag (write-behind).
     geheugen.saveGeheugen();
@@ -119,11 +132,6 @@ function bewaar(sleutels, auditOp) {
 const bewerkCollectie = require('./collectie-bewerken')({
   store: STORE, postgres, sqlite, db, save
 });
-/* Lezen via dezelfde datalaaggrens als schrijven. Nieuwe domeinadapters hoeven
-   hierdoor niet zelf een rechtstreekse deur naar db.data te openen. De bron
-   blijft de live request-/storeweergave van de datalaag; dit is geen cache of
-   tweede waarheid. */
-const leesCollectie = (sleutel) => db.data[sleutel];
 
 // De tx-veegronde kapt pas na de duurzame grootboek-upsert en doet dat via de
 // autoritatieve collectiepoort; nooit als kale achtergrond-save.
@@ -135,7 +143,7 @@ db.verversVerzoekCollectie = async () => { if (STORE === 'postgres') await postg
 function onExternalChange(cb) { state.setExternCb(cb); }
 
 module.exports = {
-  db, load, save, saveDuurzaam, bijeen, inBundel, bewerkCollectie, leesCollectie, economischeBoekingEenmaal, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
+  db, load, save, saveDuurzaam, bijeen, inBundel, bewerkCollectie, leesCollectie: sleutel => db.data[sleutel], economischeBoekingEenmaal, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
   startPostgres: postgres.startPostgres, flushBijAfsluiten, pgPing: postgres.pgPing,
   opslagKlaar, pgPoolStatus: postgres.pgPoolStatus, postgresSchrijfStand: postgres.schrijfStand,
   postgresVerzoekMiddleware: postgres.verzoekMiddleware, onExternalChange, merge3, schrijfDuurzaam: opslag.schrijfDuurzaam,

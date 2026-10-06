@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-30T10:15:07.426Z",
-    "commit": "16068c776",
+    "op": "2026-10-06T14:40:32.269Z",
+    "commit": "116c7294f",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 0,
     "instrument": "scripts/edgedekking.js",
-    "node": "v24.18.0"
+    "node": "v26.10.0"
   },
   "uitleg": "Per scherm onder public/apps: welke velden van het Edge-contract het scherm publiceert, gemeten in een echte browser via window.RTGEdgeBlikveld.lees(), als vers lid met een RTG Pass en getekende overeenkomst, op 390x844 (touch), elk scherm in een eigen lege browsercontext. 'ja' = er staat een waarde (lees herkomst erbij: context valt terug op de documenttitel); 'nvt' = de body verklaart met data-rtg-edge-nvt-<veld>=reden dat het veld hier niet bestaat; 'na-openen' = de body verklaart met data-rtg-edge-na-openen-<veld>=reden dat het pas na openen ontstaat (telt nooit als ja); een reden per veld, en zonder reden of met beide verklaringen 'nee'. De redenen staan per scherm in redenen. zelf telt alleen de herkomsten uit ZELF in scripts/edgedekking.js. De stand bij binnenkomst: er wordt niets aangeklikt. Waarden worden niet bewaard, alleen of er een is (de redenen zijn wat het scherm in zijn eigen HTML verklaart, geen sessiewaarden). geen-blikveld draagt de eerste ontbrekende schakel van de laadketen, in de pagina nagelezen. Wat in de volle ronde (vier tegelijk) geen blikveld had, niet tot rust kwam of een veld verloor, is daarna los herhaald en die uitslag telt; eersteRonde zegt wat de volle ronde zag als dat anders was. gebreken in de telling = op hoeveel schermen.",
   "sessie": "lid",
@@ -328,22 +328,7 @@
     "/apps/zakelijk.html",
     "/apps/zorgbalie.html"
   ],
-  "aanvaardAchteruit": [
-    {
-      "pad": "/apps/reisuitnodiging.html",
-      "veld": "wereld",
-      "was": "ja",
-      "nu": "nee",
-      "status": "geen-blikveld"
-    },
-    {
-      "pad": "/apps/reisuitnodiging.html",
-      "veld": "context",
-      "was": "ja",
-      "nu": "nee",
-      "status": "geen-blikveld"
-    }
-  ],
+  "aanvaardAchteruit": [],
   "schermen": {
     "/apps/agenda.html": {
       "status": "gemeten",
@@ -12987,6 +12972,78 @@
       "gebreken": [],
       "stabiel": true
     },
+    "/apps/library.html": {
+      "status": "gemeten",
+      "http": 200,
+      "velden": {
+        "identiteit": "nee",
+        "wereld": "ja",
+        "context": "ja",
+        "object": "nee",
+        "activiteit": "nee",
+        "presence": "nee",
+        "voortzetting": "nee",
+        "hoofdactie": "ja",
+        "trust": "nee"
+      },
+      "herkomst": {
+        "identiteit": "geen",
+        "wereld": "pagina",
+        "context": "scherm",
+        "object": "geen",
+        "activiteit": "geen",
+        "presence": "geen",
+        "voortzetting": "geen",
+        "hoofdactie": "scherm:data-hoofdactie",
+        "trust": "geen"
+      },
+      "acties": {
+        "RTGAdaptief": {
+          "totaal": 0,
+          "perStaat": {
+            "AFWEZIG": 0,
+            "GEBLOKKEERD": 0,
+            "BESCHIKBAAR": 0,
+            "LOPEND": 0
+          },
+          "zonderStaat": 0,
+          "gezagBekend": 0,
+          "geblokkeerdZonderWaarom": 0,
+          "gevolg": {
+            "bekend": 0,
+            "onvolledig": 0,
+            "onbekend": 0,
+            "zonder": 0
+          },
+          "herstelBekend": 0,
+          "metGewicht": 0,
+          "metGebreken": 0
+        },
+        "edge-compat": {
+          "totaal": 0,
+          "perStaat": {
+            "AFWEZIG": 0,
+            "GEBLOKKEERD": 0,
+            "BESCHIKBAAR": 0,
+            "LOPEND": 0
+          },
+          "zonderStaat": 0,
+          "gezagBekend": 0,
+          "geblokkeerdZonderWaarom": 0,
+          "gevolg": {
+            "bekend": 0,
+            "onvolledig": 0,
+            "onbekend": 0,
+            "zonder": 0
+          },
+          "herstelBekend": 0,
+          "metGewicht": 0,
+          "metGebreken": 0
+        }
+      },
+      "gebreken": [],
+      "stabiel": true
+    },
     "/apps/life.html": {
       "status": "gemeten",
       "http": 200,
@@ -21126,10 +21183,10 @@
     }
   },
   "telling": {
-    "schermen": 315,
-    "metBlikveld": 284,
+    "schermen": 316,
+    "metBlikveld": 285,
     "perStatus": {
-      "gemeten": 284,
+      "gemeten": 285,
       "geen-blikveld": 2,
       "omgeleid": 29,
       "fout": 0
@@ -21145,13 +21202,13 @@
       "identiteit": {
         "ja": 0,
         "zelf": 0,
-        "nee": 284,
+        "nee": 285,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 31
       },
       "wereld": {
-        "ja": 283,
+        "ja": 284,
         "zelf": 0,
         "nee": 1,
         "nvt": 0,
@@ -21159,8 +21216,8 @@
         "zonderMeting": 31
       },
       "context": {
-        "ja": 284,
-        "zelf": 14,
+        "ja": 285,
+        "zelf": 15,
         "nee": 0,
         "nvt": 0,
         "na-openen": 0,
@@ -21169,7 +21226,7 @@
       "object": {
         "ja": 0,
         "zelf": 0,
-        "nee": 282,
+        "nee": 283,
         "nvt": 0,
         "na-openen": 2,
         "zonderMeting": 31
@@ -21177,7 +21234,7 @@
       "activiteit": {
         "ja": 0,
         "zelf": 0,
-        "nee": 284,
+        "nee": 285,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 31
@@ -21185,7 +21242,7 @@
       "presence": {
         "ja": 0,
         "zelf": 0,
-        "nee": 284,
+        "nee": 285,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 31
@@ -21193,14 +21250,14 @@
       "voortzetting": {
         "ja": 0,
         "zelf": 0,
-        "nee": 284,
+        "nee": 285,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 31
       },
       "hoofdactie": {
-        "ja": 61,
-        "zelf": 54,
+        "ja": 62,
+        "zelf": 55,
         "nee": 220,
         "nvt": 3,
         "na-openen": 0,
@@ -21209,7 +21266,7 @@
       "trust": {
         "ja": 0,
         "zelf": 0,
-        "nee": 284,
+        "nee": 285,
         "nvt": 0,
         "na-openen": 0,
         "zonderMeting": 31

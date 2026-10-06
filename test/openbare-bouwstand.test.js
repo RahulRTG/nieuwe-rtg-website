@@ -55,18 +55,22 @@ test('geen APP_URL is onbekend, en een onleesbaar adres ook -- met de reden erbi
 test('Magnaat Test op een openbaar adres is een HARDE fout, ook zonder NODE_ENV=production', () => {
   const r = valideer({ APP_URL: 'https://app.rahultravelgroup.com', RTG_MAGNAAT_TEST: '1' });
   assert.equal(r.productie, false, 'deze omgeving is juist NIET productie -- dat is het hele punt');
-  assert.equal(r.hardeFouten.length, 1, 'de grendel ging niet af: ' + JSON.stringify(r.hardeFouten));
-  assert.match(r.hardeFouten[0], /RTG_MAGNAAT_TEST=1/);
-  assert.match(r.hardeFouten[0], /app\.rahultravelgroup\.com/);
+  /* Sinds blocker 3 gelden OOK de andere productieregels hard op een openbaar
+     adres, dus er kunnen meer hardeFouten zijn dan alleen de demo-grendel. De
+     demo-grendel moet er in elk geval bij zijn, met zijn eigen boodschap. */
+  assert.ok(r.hardeFouten.length >= 1, 'de grendel ging niet af: ' + JSON.stringify(r.hardeFouten));
+  const demoFout = r.hardeFouten.find(f => /RTG_MAGNAAT_TEST=1/.test(f));
+  assert.ok(demoFout, 'de demo-grendel ontbreekt: ' + JSON.stringify(r.hardeFouten));
+  assert.match(demoFout, /app\.rahultravelgroup\.com/);
   // en hij zegt wat er dan openstaat, niet alleen dat het niet mag
-  assert.match(r.hardeFouten[0], /pincode die in de broncode staat/);
-  assert.match(r.hardeFouten[0], /Zet de vlag uit/);
+  assert.match(demoFout, /pincode die in de broncode staat/);
+  assert.match(demoFout, /Zet de vlag uit/);
 });
 
 test('de oude demo-vlag valt onder dezelfde grendel', () => {
   const r = valideer({ APP_URL: 'https://rtg.nl', RTG_DEMO: '1' });
-  assert.equal(r.hardeFouten.length, 1);
-  assert.match(r.hardeFouten[0], /RTG_DEMO=1/);
+  assert.ok(r.hardeFouten.length >= 1);
+  assert.ok(r.hardeFouten.some(f => /RTG_DEMO=1/.test(f)));
 });
 
 /* DE TEGENPROEF, EN ZONDER HAAR IS DE TOETS HIERBOVEN WAARDELOOS. De
@@ -86,8 +90,18 @@ test('lokaal en onbekend blijven gewoon draaien -- de grendel breekt het normale
 });
 
 test('een openbaar adres zonder demostand wordt niet tegengehouden', () => {
-  const r = valideer({ APP_URL: 'https://app.rahultravelgroup.com' });
+  const r = valideer({ APP_URL: 'https://app.rahultravelgroup.com', NODE_ENV: 'production' });
   assert.equal(r.hardeFouten.length, 0);
+});
+
+test('een openbaar adres zonder complete productiebeveiliging wordt tegengehouden (fail-closed, blocker 3)', () => {
+  /* Vóór blocker 3 werd een openbaar adres zonder demostand NIET tegengehouden
+     (de productiekeuring was daar slechts een melding). Dat was de zwakte: een
+     publiek adres zonder NODE_ENV startte met de identiteitskluis zonder sleutel.
+     Nu gelden de productieregels hard zodra het adres aantoonbaar openbaar is. */
+  const r = valideer({ APP_URL: 'https://app.rahultravelgroup.com' });
+  assert.ok(r.hardeFouten.length > 0, 'een publiek adres zonder productiebeveiliging hoort fail-closed te weigeren');
+  assert.ok(r.hardeFouten.some(f => /openbaar adres/.test(f)));
 });
 
 /* ZWIJGEN IS DE DERDE FAALVORM. Staat de vlag aan terwijl het adres onbekend
@@ -101,20 +115,19 @@ test('Magnaat Test zonder bekend adres blokkeert niet, maar zwijgt ook niet', ()
   assert.match(m[0], /NIET vast te stellen/);
 });
 
-/* DE SCHADUWRONDE. Een openbare installatie buiten productie komt de
-   productiekeuring nooit tegen; die draait hier wel, maar uitsluitend als
-   melding. Twee dingen moeten kloppen: de regels worden GEZIEN, en ze
-   BLOKKEREN niet. */
-test('op een openbaar adres draait de productiekeuring mee als melding, zonder te blokkeren', () => {
+/* FAIL-CLOSED (blocker 3). Een openbare installatie buiten productie kwam de
+   productiekeuring vroeger alleen als SCHADUW-melding tegen; nu gelden die regels
+   HARD. Twee dingen moeten kloppen: de regels die ertoe doen komen langs, en ze
+   BLOKKEREN de start (hardeFouten), niet als loutere waarschuwing. */
+test('op een openbaar adres gelden de productieregels hard -- ze blokkeren de start', () => {
   const r = valideer({ APP_URL: 'https://app.rahultravelgroup.com' });
-  const schaduw = r.waarschuwingen.filter(w => w.startsWith('SCHADUW'));
-  assert.ok(schaduw.length > 1, 'de schaduwronde meldt niets: ' + JSON.stringify(r.waarschuwingen).slice(0, 400));
-  // de regels die er het meest toe doen komen langs
-  assert.ok(schaduw.some(w => /RTG_VAULT_KEY/.test(w)), 'de kluissleutel wordt niet gemeld');
-  assert.ok(schaduw.some(w => /RTG_ENC_KEY/.test(w)), 'versleuteling-at-rest wordt niet gemeld');
-  assert.ok(schaduw.some(w => /zouden deze start blokkeren/.test(w)), 'de optelsom ontbreekt');
-  assert.equal(r.hardeFouten.length, 0, 'de schaduwronde blokkeert, en dat hoort zij niet te doen');
-  assert.equal(r.fouten.length, 0, 'de schaduwronde lekt in de gewone foutenbak');
+  assert.ok(r.hardeFouten.some(w => /RTG_VAULT_KEY/.test(w)), 'de kluissleutel wordt niet hard afgedwongen');
+  assert.ok(r.hardeFouten.some(w => /RTG_ENC_KEY/.test(w)), 'versleuteling-at-rest wordt niet hard afgedwongen');
+  // A-P1-02 (#494): de vlag zelf is een harde fout, met het aantal regels erbij
+  assert.ok(r.hardeFouten.some(w => /NODE_ENV niet op production/.test(w)), 'de NODE_ENV-grendel ontbreekt');
+  assert.ok(r.hardeFouten.some(w => /Op dit openbare adres geldt ook/.test(w)), 'de afzonderlijke regels ontbreken');
+  assert.equal(r.waarschuwingen.filter(w => w.startsWith('SCHADUW')).length, 0, 'geen schaduw meer: de regels gelden hard');
+  assert.equal(r.fouten.length, 0, 'de openbaar-keuring hoort in hardeFouten, niet in de gewone foutenbak');
 });
 
 test('in echte productie verandert er niets aan het bestaande gedrag', () => {
@@ -170,9 +183,7 @@ test('de server START NIET met Magnaat Test op een openbaar adres', () => {
   assert.match(r.tekst, /start afgebroken/);
   assert.match(r.tekst, /hangt NIET aan NODE_ENV/);
   assert.match(r.tekst, /app\.rahultravelgroup\.com/);
-  /* En de schaduwronde staat er dus ook echt, met de optelsom: dit is wat een
-     beheerder te zien krijgt in plaats van niets. */
-  assert.match(r.tekst, /SCHADUW: \d+ productieregel\(s\) zouden deze start blokkeren/);
+  assert.match(r.tekst, /NODE_ENV niet op production/);
 });
 
 test('een lokale Magnaat Test-installatie komt gewoon op', async () => {
@@ -183,4 +194,21 @@ test('een lokale Magnaat Test-installatie komt gewoon op', async () => {
     const j = await r.json();
     assert.equal(j.testomgeving, true, 'de helper draait niet in Magnaat Test; dan bewijst deze rij niets');
   } finally { await stop(s); }
+});
+
+test('A-P1-02: een openbaar adres zonder NODE_ENV=production start NIET; onbekend en lokaal wel doorgelaten', () => {
+  const r = startPoging({ APP_URL: 'https://app.rahultravelgroup.com' });
+  assert.equal(r.code, 1, 'publiek zonder production kwam gewoon op');
+  assert.match(r.tekst, /NODE_ENV niet op production/);
+  const onbekend = valideer({ APP_URL: 'niet-te-lezen' });
+  assert.equal(onbekend.hardeFouten.length, 0, 'een onbekend adres hoort niet te blokkeren');
+  const lokaal = valideer({ APP_URL: 'http://localhost:3000' });
+  assert.equal(lokaal.hardeFouten.length, 0);
+});
+
+test('A-P1-02: elk officieel startpad zet NODE_ENV=production zelf', () => {
+  const lees = (p) => fs.readFileSync(path.join(__dirname, '..', p), 'utf8');
+  assert.match(lees('scripts/mac/rtg-start.sh'), /^export NODE_ENV=production$/m);
+  assert.match(lees('scripts/native-start.js'), /NODE_ENV:\s*'production'/);
+  assert.match(lees('Dockerfile'), /^ENV NODE_ENV=production$/m);
 });

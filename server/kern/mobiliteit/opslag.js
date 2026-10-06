@@ -111,6 +111,10 @@ module.exports = function maakOpslag({ db }) {
     return waarde;
   }
 
+  /* De bestaande eigen collecties voor een gerichte commit. De kern hoeft zo
+     niet buiten deze deur in db.data te kijken om haar opslagvlak te kennen. */
+  const bestaande = () => Object.keys(REGISTER).filter(naam => Object.hasOwn(db.data, naam));
+
   /* ----------------------------------------------------------------------------
      WAT MOBILITEIT VAN ANDEREN LEEST, en nergens schrijft. Drie draden, alle
      drie lezend. Dit is wat het kost om dit domein ooit apart te draaien.
@@ -127,7 +131,7 @@ module.exports = function maakOpslag({ db }) {
     live: () => db.data.live || {}
   };
 
-  return { bak, zetBak, vreemd, REGISTER, NIET_GEBOUWD };
+  return { bak, zetBak, bestaande, vreemd, REGISTER, NIET_GEBOUWD };
 };
 
 module.exports.REGISTER = REGISTER;

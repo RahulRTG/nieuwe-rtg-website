@@ -1,6 +1,6 @@
 'use strict';
 // Gastlinks verlenen alleen de expliciet gedeelde projectweergave, geen lidmaatschap.
-module.exports = ({ app, db, save, kern }, deel, stuur) => {
+module.exports = ({ app, db, save, kern }, deel, stuur, betalen) => {
   async function actueel() {
     if (typeof db.verversVerzoekCollectie === 'function') {
       await db.verversVerzoekCollectie('tenants');
@@ -11,7 +11,7 @@ module.exports = ({ app, db, save, kern }, deel, stuur) => {
   app.post('/api/werk-gast/beeld', async (req, res) => {
     await actueel();
     const g = deel.gast(req.body || {});
-    stuur(res, g ? deel.gastBeeld(g) : weg);
+    stuur(res, g ? { ...deel.gastBeeld(g), betaling:betalen.beeld(g.w,g.p,g.x) } : weg);
   });
   app.post('/api/werk-gast/besluit', async (req, res) => {
     await actueel();

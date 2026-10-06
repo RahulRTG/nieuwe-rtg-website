@@ -66,6 +66,7 @@ const keten = require('./keten');
 const klok = require('./klok');
 const verzoekcontext = require('../db/verzoekcontext');
 const burger = require('./burgerpad');
+const antwoordspoor = require('./antwoordspoor');
 
 const MAX = 50000;          // ruim genoeg voor een jaar bij dit verkeer, en begrensd
 const SCHRIJFT = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
@@ -104,7 +105,7 @@ function maakHandelingsspoor({ db, save, nu, max }) {
 
   const rij = () => opslag ? opslag.view() : eigen.bak('handelingLog');
 
-  function noteer({ wie, methode, pad, status, afdruk, grof }) {
+  function noteer({ wie, methode, pad, status, afdruk, grof, stand }) {
     const regel = {
       at: grof ? burger.dag(tijd()) : new Date(tijd()).toISOString(),
       wie: String(wie || 'anoniem').slice(0, 60),
@@ -113,6 +114,7 @@ function maakHandelingsspoor({ db, save, nu, max }) {
       status: Number(status) || 0,
       afdruk: String(afdruk || '')
     };
+    if (stand) regel.stand = String(stand).slice(0, 20);   // A-P1-05: `toegestaan` = voor de handeling, duurzaam
     if (opslag) return opslag.append(vorige => keten.schakel(regel, vorige?.hash || null, (Number(vorige?.nr) || 0) + 1), r => Boolean(r?.hash));
     return keten.noteerIn(rij(), regel, grens);
   }
@@ -170,10 +172,10 @@ function maakHandelingsspoor({ db, save, nu, max }) {
       const pseudoniem = burger.isBurgerpad(pad);
       noteer({ wie: pseudoniem ? burger.PSEUDONIEM : wieVan(req), methode: req.method,
         pad, status, afdruk: pseudoniem ? '' : afdrukVan(req.body), grof: pseudoniem });
-      if (!opslag) { if (save.sleutels) save.sleutels(['handelingLog']); else save(); }
+      if (!opslag) { if (save.sleutels) save.sleutels(['handelingLog']); else save(['handelingLog']); }
     };
     if (!verzoekcontext.haakVoorCommit(schrijf)) {
-      res.on('finish', () => { try { schrijf(); } catch (e) {} });
+      antwoordspoor(res, schrijf, save.audit?.batch);
     }
     next();
   }
@@ -184,4 +186,5 @@ function maakHandelingsspoor({ db, save, nu, max }) {
 module.exports = maakHandelingsspoor;
 module.exports._afdrukVan = afdrukVan;
 module.exports._wieVan = wieVan;
+module.exports.wieVan = wieVan;
 module.exports.MAX = MAX;

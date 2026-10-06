@@ -29,6 +29,22 @@ const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { ontleedDeel, verdeel, indeling, zetDuren } = require('../scripts/lib/delen');
+const { maakBatches, STANDAARD_MAX } = require('../scripts/lib/testbatches');
+
+test('de lokale loper begrenst de Node-procesrij zonder een toets te verliezen', () => {
+  const lijst = Array.from({ length: STANDAARD_MAX * 2 + 17 }, (_, i) =>
+    'toets-' + String(i).padStart(3, '0') + '.test.js');
+  const zwaar = new Set(lijst.slice(0, 7));
+  const batches = maakBatches(lijst, { gewicht: naam => zwaar.has(naam) ? 1000 : 1 });
+  assert.equal(batches.length, 3);
+  assert.ok(batches.every(b => b.length <= STANDAARD_MAX), 'een procesbatch is groter dan de harde grens');
+  assert.deepEqual(batches.flat().slice().sort(), lijst.slice().sort(),
+    'de begrenzing verloor of dupliceerde een toetsbestand');
+  assert.ok(batches.every(b => b.some(n => zwaar.has(n))),
+    'de bekende zware bestanden zijn niet over de processen verdeeld');
+  assert.deepEqual(maakBatches(lijst, { gewicht: naam => zwaar.has(naam) ? 1000 : 1 }), batches,
+    'dezelfde invoer hoort exact hetzelfde uitvoeringsplan te geven');
+});
 const { IJKINGEN, KORT } = require('../scripts/lib/ijkingen');
 const vloer = require('../scripts/dekkingsvloer');
 

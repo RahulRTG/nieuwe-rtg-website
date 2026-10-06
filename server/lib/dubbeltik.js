@@ -36,7 +36,8 @@
       apps breken. Doorlaten is hier precies wat er vandaag ook gebeurt.
 
    WAT ER NIET WORDT BEWAARD: alles wat geen 2xx is (een mislukte poging hoort
-   herhaalbaar te zijn) en alles wat niet via res.json gaat. Zie
+   herhaalbaar te zijn), een 2xx die toch een 503 werd (./eindstatus.js) en
+   alles wat niet via res.json gaat. Zie
    server/opzet/poortwachters.js voor waarom deze laag NA de compressie hangt --
    dat kostte negentien stil onbeschermde routes.
    ========================================================================== */
@@ -44,7 +45,8 @@
 
 const crypto = require('crypto');
 const klok = require('./klok');
-const verzoekcontext = require('../db/verzoekcontext');
+const { naAntwoord } = require('./antwoord-einde');
+const { bewaarBijEind } = require('./eindstatus');   // N11: pas bij de eindstatus
 /* De kast met zijn drie grenzen (tijd, aantal, bytes) staat in
    ./dubbeltikkast.js: dat is geheugenbeheer en niet verzoekafhandeling, en het
    is daar los te toetsen zonder server. */
@@ -101,7 +103,7 @@ function maakDubbeltik(opties) {
   const log = o.log || null;
 
   const kast = maakKast({ ttlMs: o.ttlMs, max: o.max, maxBytes: o.maxBytes, nu });
-  const gemist = new Set();  // paden die al een keer gemeld zijn (zie res.on('finish'))
+  const gemist = new Set();  // paden die al een keer door de finish-haak gemeld zijn
   const staat = { gezien: 0, herhaald: 0, doorgelaten: 0, bewaard: 0, gemist: 0 };
 
   function wek(rij, uitslag) {
@@ -158,7 +160,7 @@ function maakDubbeltik(opties) {
             staat.bewaard++;
             wek(rij, rij);
           };
-          if (!verzoekcontext.haakNaCommit(bewaar)) bewaar();
+          bewaarBijEind(res, bewaar);
         } else {
           kast.verwijder(id);
           wek(rij, null);
@@ -168,7 +170,7 @@ function maakDubbeltik(opties) {
       /* Geen JSON-antwoord (een download, een redirect, een stream) of een
          verbinding die afbreekt: dan is er niets om te herhalen, en een rij die
          voor eeuwig "in vlucht" staat zou elke volgende poging laten hangen. */
-      res.on('finish', () => {
+      naAntwoord(res, () => {
         if (rij.klaar) { kast.meet(id, res.getHeader && res.getHeader('content-length')); return; }
         kast.verwijder(id);
         wek(rij, null);

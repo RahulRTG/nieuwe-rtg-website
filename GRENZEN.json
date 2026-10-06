@@ -5,7 +5,8 @@
       "intakeStart",
       "intakeZeg",
       "sessieregister",
-      "stateFor"
+      "stateFor",
+      "tweefactor"
     ],
     "aanmeldingen": [
       "aanmeldingen"
@@ -43,6 +44,7 @@
       "codenaamVan",
       "geborenVan",
       "idGeverifieerd",
+      "kluisAuth",
       "leeftijdVan",
       "onboarding",
       "tenant"
@@ -131,6 +133,8 @@
     ],
     "bedrijf": [
       "agenda",
+      "betaal",
+      "betaalWaarheid",
       "assetBeeld",
       "assetMet",
       "bedrijf",
@@ -692,6 +696,7 @@
       "zaakAbonnement",
       "zelfzorg",
       "zwaar",
+      "zwaarRecht",
       "zwaarbewijs"
     ],
     "klok": [
@@ -2086,6 +2091,7 @@
       "stuurRoep"
     ],
     "supplier": [
+      "horecaTerugbetaling",
       "ALT_IDEE",
       "ANNULEERGRONDEN",
       "AUTOVERKOOP_BRANDSTOF",
@@ -2505,7 +2511,8 @@
       "webauthnStapOpOpties",
       "zekeringMag",
       "zwaar",
-      "zwaarbewijs"
+      "zwaarbewijs",
+      "tweefactor"
     ],
     "tenant": [
       "bedrijf",

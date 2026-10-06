@@ -60,7 +60,7 @@ module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) 
     // de anderen een seintje, maar alleen de leden en alleen een keer
     try {
       if (notify) for (const l of (p.gr.leden || [])) {
-        if (l.key !== sess.key) notify(l.key, 'Nieuw bericht op het prikbord van ' + p.gr.naam);
+        if (l.key !== sess.key) notify(l.key, { title: 'Genootschap', body: 'Nieuw bericht op het prikbord van ' + p.gr.naam });
       }
     } catch (e) {}
     return { ok: true, bericht: publiek(bericht, sess) };

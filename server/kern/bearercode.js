@@ -8,24 +8,50 @@
 
    De kale code wordt precies eenmaal aan de uitgever gegeven. Op schijf staat
    alleen `code_hash`; zoeken vergelijkt hashes met timingSafeEqual en stopt
-   niet bij de eerste rij. */
+   niet bij de eerste rij.
+
+   VERSIE 2 staat in ./bearercode-v2.js en gaat aan zodra een aanroeper
+   `geldigheid` meegeeft. Zonder dat veld is dit exact v1 (vastgelegd in
+   test/bearercode.test.js). Twee fabriekopties zijn nieuw: `normaal` (een
+   domein dat zijn codes anders normaliseert, zodat de hash in maak() meteen
+   klopt en niet achteraf wordt overschreven) en `sluit`/`spoor` voor v2. */
 'use strict';
 
-const MAX_GELDIG_MS = 366 * 86400000;
+const klok = require('../lib/klok');
+const maakV2 = require('./bearercode-v2');
+const { keten } = require('./bearercode-keten');
 
-module.exports = ({ crypto, namespace, nu = () => new Date().toISOString() }) => {
+const MAX_GELDIG_MS = 366 * 86400000;
+/* SCHADUW voor de stille duur: een v1-code zonder bruikbare geldigMs krijgt
+   nog steeds 30 dagen, maar dat wordt hier GETELD per namespace en doel (geen
+   onderwerp, geen code, geen mens). Pas als deze teller in productie op nul
+   staat, kan de stille duur een weigering worden zonder een domein te breken. */
+const STILLE_DUUR = new Map();
+
+/* De vergelijking zelf, los van een namespace, zodat een laag met een eigen
+   hashvoorvoegsel (kern/codelevenscyclus.js) dezelfde gebruikt en geen tweede
+   schrijft (Fase 0, D13). Elke rij wordt afgelopen, ook na een treffer. */
+function hashGelijk(crypto, a, b) {
+  if (!/^[a-f0-9]{64}$/i.test(String(a || '')) || !/^[a-f0-9]{64}$/i.test(String(b || ''))) return false;
+  return crypto.timingSafeEqual(Buffer.from(String(a), 'hex'), Buffer.from(String(b), 'hex'));
+}
+function vindOpHash(crypto, rijen, gezocht, veld = 'code_hash') {
+  let gevonden = null;
+  for (const rij of rijen || []) if (rij && hashGelijk(crypto, rij[veld], gezocht)) gevonden = rij;
+  return gevonden;
+}
+
+module.exports = ({ crypto, namespace, nu = () => klok.datum().toISOString(), normaal: eigenNormaal, sluit, spoor }) => {
   if (!crypto || typeof crypto.randomBytes !== 'function' || typeof crypto.createHash !== 'function' ||
       typeof crypto.timingSafeEqual !== 'function') throw new Error('bearercode vereist node:crypto');
   const ns = String(namespace || '').trim();
   if (!ns) throw new Error('bearercode vereist een vaste namespace');
 
-  const normaal = waarde => String(waarde == null ? '' : waarde).trim().toUpperCase();
+  const normaal = typeof eigenNormaal === 'function' ? waarde => String(eigenNormaal(waarde))
+    : waarde => String(waarde == null ? '' : waarde).trim().toUpperCase();
   const hash = waarde => crypto.createHash('sha256')
     .update('rtg-bearer-v1|' + ns + '|' + normaal(waarde)).digest('hex');
-  const zelfdeHash = (a, b) => {
-    if (!/^[a-f0-9]{64}$/i.test(String(a || '')) || !/^[a-f0-9]{64}$/i.test(String(b || ''))) return false;
-    return crypto.timingSafeEqual(Buffer.from(String(a), 'hex'), Buffer.from(String(b), 'hex'));
-  };
+  const zelfdeHash = (a, b) => hashGelijk(crypto, a, b);
   const vind = (rijen, code, veld = 'code_hash') => {
     const gezocht = hash(code);
     let gevonden = null;
@@ -40,8 +66,18 @@ module.exports = ({ crypto, namespace, nu = () => new Date().toISOString() }) =>
     const geheim = crypto.randomBytes(16).toString('hex').toUpperCase(); // 128 bits
     return p ? p + '.' + geheim : geheim;
   };
-  const maak = ({ prefix, issuer, doel, scope, onderwerp, geldigMs, maxGebruik = 1 }) => {
+  const v2 = maakV2({ crypto, ns, nu, hash, codeNieuw: p => codeNieuw(p), plafondMs: MAX_GELDIG_MS, sluit, spoor });
+  const maak = (opdracht) => {
+    if (opdracht && opdracht.geldigheid !== undefined) return v2.maak(opdracht);
+    return maakV1(opdracht || {});
+  };
+  const maakV1 = ({ prefix, issuer, doel, scope, onderwerp, geldigMs, maxGebruik = 1 }) => {
     const issuedAt = nu();
+    if (!Number(geldigMs)) {
+      const sleutel = ns + '|' + String(doel || '').trim().slice(0, 100);
+      STILLE_DUUR.set(sleutel, (STILLE_DUUR.get(sleutel) || 0) + 1);
+      if (spoor) spoor({ soort: 'stille-duur', namespace: ns, doel: String(doel || ''), at: issuedAt });
+    }
     const duur = Math.max(1000, Math.min(Number(geldigMs) || 30 * 86400000, MAX_GELDIG_MS));
     const kaleCode = codeNieuw(prefix);
     const toegang = {
@@ -66,6 +102,10 @@ module.exports = ({ crypto, namespace, nu = () => new Date().toISOString() }) =>
   };
   const reden = (toegang, verwacht = {}) => {
     if (!toegang) return 'onbekend';
+    if (toegang.contractversie !== 2) return redenV1(toegang, verwacht);
+    return v2.voorReden(toegang, verwacht) || v2.naReden(toegang, verwacht, redenV1(toegang, verwacht));
+  };
+  const redenV1 = (toegang, verwacht) => {
     if (verwacht.doel && toegang.doel !== verwacht.doel) return 'verkeerd-doel';
     const scopes = [].concat(verwacht.scope || []);
     if (scopes.some(s => !(toegang.scope || []).includes(s))) return 'scope-ontbreekt';
@@ -97,7 +137,29 @@ module.exports = ({ crypto, namespace, nu = () => new Date().toISOString() }) =>
     ingetrokken_at: toegang.ingetrokken_at, rotatie: toegang.rotatie
   } : null;
 
-  return { normaal, hash, zelfdeHash, vind, codeNieuw, maak, reden, gebruik, intrekken, publiek };
+  const trekIn = (toegang, actor, redenTekst) => v2.trekIn(toegang, intrekken, actor, redenTekst);
+  const roteer = (oud, opties) => v2.roteer(oud, intrekken, opties);
+  /* Vernieuwen: een mens geeft een NIEUWE termijn uit; doel en uitgever blijven
+     (kern/bearercode-keten.js). Altijd v2: zonder `geldigheid` weigert maak(). */
+  const vernieuw = (oud, spec, actor) => {
+    if (!oud) throw Object.assign(new Error('bearercode: er is geen toegang om te vernieuwen'), { code: 'niet-vernieuwbaar' });
+    if (!String(actor || '').trim()) throw Object.assign(new Error('bearercode: vernieuwen doet een mens op naam'), { code: 'actor-ontbreekt' });
+    const s = Object.assign({ onderwerp: oud.onderwerp }, spec);
+    for (const k of ['doel', 'issuer']) {
+      if (oud[k] && String(s[k] || '').trim() !== oud[k]) throw Object.assign(new Error('bearercode: een vernieuwing houdt het ' + k), { code: 'ander-' + k });
+    }
+    if (!s.geldigheid) throw Object.assign(new Error('bearercode: een vernieuwing draagt een eigen termijn'), { code: 'geldigheid-ontbreekt' });
+    const nieuw = keten({ oud, nieuw: v2.maak(s), intrekken, actor, soort: 'vernieuwd', nu: nu() });
+    v2.meld('vernieuwd', nieuw.toegang);
+    return nieuw;
+  };
+  const leidAf = (ouder, verzoek) => v2.leidAf(ouder, verzoek, reden);
+
+  return { normaal, hash, zelfdeHash, vind, codeNieuw, maak, reden, gebruik, intrekken, publiek,
+    trekIn, roteer, vernieuw, leidAf, contracthash: v2.contracthash };
 };
 
 module.exports.MAX_GELDIG_MS = MAX_GELDIG_MS;
+module.exports.hashGelijk = hashGelijk;
+module.exports.vindOpHash = vindOpHash;
+module.exports.stilleDuur = () => Object.fromEntries(STILLE_DUUR);

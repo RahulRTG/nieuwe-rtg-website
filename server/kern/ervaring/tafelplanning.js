@@ -4,7 +4,9 @@
    tafel; de tafelstatussen lopen automatisch mee. Draait op dezelfde context als
    kern/ervaring/tafels.js, plus de gedeelde rijpMaak-sweep. */
 module.exports = (ctx, { rijpMaak }) => {
-  const { db, save, notify, sseToCustomer, sseToSupplier, id, nu, vandaag, tafeldekVan } = ctx;
+  const { db, save, notify, sseToCustomer, sseToSupplier, id, nu, vandaag, tafeldekVan, trustPlane } = ctx;
+
+  const { observe, metricTimer, finish } = require('./trust-meting')(trustPlane);
 
   const tafelVan = (s, naam) => (s.tables || []).find(t => t.name === String(naam || ''));
 
@@ -62,20 +64,48 @@ module.exports = (ctx, { rijpMaak }) => {
     const r = (db.data.reserveringen || []).find(x => x.id === rid && x.supplierCode === supplier.code);
     if (!r) return { status: 404, error: 'Reservering niet gevonden.' };
     const t = r.tafel ? tafelVan(supplier, r.tafel) : null;
+    const fulfillmentTimer = metricTimer({ capability: 'hospitality.fulfill',
+      boundary: 'supplier:' + supplier.code });
     if (actie === 'aangekomen') {
-      if (!['bevestigd', 'aangevraagd'].includes(r.status)) return { status: 409, error: 'Deze reservering is al ' + r.status + '.' };
+      if (!['bevestigd', 'aangevraagd'].includes(r.status)) {
+        finish(fulfillmentTimer, { outcome: 'DENIED', domainOutcome: 'INVALID_STATE', errorClass: 'STATE_CONFLICT' });
+        return { status: 409, error: 'Deze reservering is al ' + r.status + '.' };
+      }
       r.status = 'aangekomen';
       if (t) t.status = 'bezet';
     } else if (actie === 'no-show') {
-      if (r.status !== 'bevestigd') return { status: 409, error: 'Alleen een bevestigde reservering kan een no-show zijn.' };
+      if (r.status !== 'bevestigd') {
+        finish(fulfillmentTimer, { outcome: 'DENIED', domainOutcome: 'INVALID_STATE', errorClass: 'STATE_CONFLICT' });
+        return { status: 409, error: 'Alleen een bevestigde reservering kan een no-show zijn.' };
+      }
       r.status = 'no-show';
       if (t && t.status === 'gereserveerd') t.status = 'vrij';
     } else if (actie === 'vertrokken') {
-      if (r.status !== 'aangekomen') return { status: 409, error: 'De gast is nog niet gemeld als aangekomen.' };
+      if (r.status !== 'aangekomen') {
+        finish(fulfillmentTimer, { outcome: 'DENIED', domainOutcome: 'INVALID_STATE', errorClass: 'STATE_CONFLICT' });
+        return { status: 409, error: 'De gast is nog niet gemeld als aangekomen.' };
+      }
       r.status = 'afgerond';
       if (t) t.status = 'vrij';
-    } else return { status: 400, error: 'Onbekende actie.' };
-    save();
+    } else {
+      finish(fulfillmentTimer, { outcome: 'DENIED', domainOutcome: 'INVALID_ACTION', errorClass: 'INVALID_INPUT' });
+      return { status: 400, error: 'Onbekende actie.' };
+    }
+    try { save(); }
+    catch (e) {
+      finish(fulfillmentTimer, { outcome: 'FAILED', domainOutcome: 'STATUS_NOT_PERSISTED',
+        errorClass: e.code || 'STORAGE_EXCEPTION' });
+      throw e;
+    }
+    finish(fulfillmentTimer, { outcome: 'SUCCEEDED',
+      domainOutcome: actie === 'vertrokken' ? 'COMPLETED' : actie === 'aangekomen' ? 'STARTED' : 'NO_SHOW',
+      measurementKey: 'fulfillment:' + r.id + ':' + actie });
+    observe({ capability: 'hospitality.fulfill', boundary: 'supplier:' + supplier.code,
+      subjectRef: { domain: 'hospitality', type: 'reservation', id: r.id },
+      predicate: actie === 'vertrokken' ? 'hospitality.fulfillment.completed'
+        : actie === 'aangekomen' ? 'hospitality.fulfillment.started' : 'hospitality.fulfillment.no-show',
+      value: { status: r.status }, evidence: { status: r.status, supplierRef: supplier.code },
+      policy: { id: 'hospitality-policy', version: 1, decision: 'SHADOW' } });
     sseToSupplier(supplier.code, 'sync', { scope: 'reserveringen' });
     return { ok: true, reservering: r };
   }

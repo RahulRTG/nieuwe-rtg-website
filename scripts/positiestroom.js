@@ -120,7 +120,7 @@ const STROMEN = [
   { naam: 'live-onderweg', wat: 'de positie van een lid dat Onderweg aanzet',
     bron: [S('routes/member/onderweg.js', 'L.lat = lat; L.lng = lng; L.updatedAt = new Date().toISOString(); gewijzigd = true;')],
     collectie: 'live', sleutel: 'sessiesleutel', van: 'lid', klasse: 'venster',
-    termijn: { soort: 'venster', bewijs: S('routes/member/onderweg.js', 'if (L) { L.active = false; delete L.lat; delete L.lng; save(); pushLive(key); }') },
+    termijn: { soort: 'venster', bewijs: S('routes/member/onderweg.js', 'if (L) { L.active = false; delete L.lat; delete L.lng; liveSave(); pushLive(key); }') },
     waarom: 'sinds N14 wist /api/live/stop de positie; de bewaarveger van zeven dagen is het vangnet voor wie ' +
       'nooit op stop drukt. Tot 29 september zette stoppen alleen active op false (NAVIGATIE.md par. 6.2).' },
 

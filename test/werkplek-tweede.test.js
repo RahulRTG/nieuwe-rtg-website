@@ -58,7 +58,12 @@ const werkLogin = (login, password, extra, ip) =>
    TOTP-code werkt een keer (server/kern/totp.js weigert een herhaling binnen
    zijn venster) en het venster kent er drie, waarvan het aanzetten er al een
    opmaakt; daarna komt er een herstelcode. Zo zakt een toets die vaker de juiste
-   code nodig heeft niet op de herhaalrem in plaats van op wat hij toetst. */
+   code nodig heeft niet op de herhaalrem in plaats van op wat hij toetst.
+
+   Nooit de code van de VORIGE stap: die is nog maar tot de volgende stapgrens
+   geldig, en dat kan een paar milliseconden zijn (de e2e viel daar onder
+   belasting een keer precies tussen). Deze stap en de volgende blijven
+   minstens dertig seconden geldig. */
 async function zetTweedeAan(token, wachtwoord) {
   const begin = await api('/api/mijn/tweefactor/begin', { huidig: wachtwoord }, token);
   assert.ok(begin.body.geheim, 'tweede factor beginnen: ' + kort(begin.body));
@@ -68,7 +73,7 @@ async function zetTweedeAan(token, wachtwoord) {
   const herstelcodes = aan.body.herstelcodes || [];
   const gebruikt = new Set([eerste]), reserve = herstelcodes.slice(1);
   const code = () => {
-    for (const d of [30000, 0, -30000]) {
+    for (const d of [30000, 0]) {
       const c = totpCode(geheim, Date.now() + d, 30);
       if (!gebruikt.has(c)) { gebruikt.add(c); return c; }
     }
@@ -328,4 +333,33 @@ test('12. met alleen het wachtwoord hoort niemand of dit account ergens werkt', 
   const stap2 = await api('/api/supplier/mijn/login', { bewijs: stap1.body.bewijs, code: los.code() });
   assert.equal(stap2.status, 404, 'na de code wel het eerlijke antwoord: ' + kort(stap2.body));
   assert.equal(stap2.body.token, undefined);
+});
+
+test('13. een geslaagde code bij de werkdeur leegt de accountemmer van de gedeelde rem', async () => {
+  /* Negen typefouten en dan de juiste code: daarna begint het account opnieuw
+     bij nul. Zonder rem.gelukt bleven de negen staan, en zette de eerstvolgende
+     typefout van het lid hem vijf minuten buiten, ook met de juiste code in de
+     hand (het patroon van test/tweede-rem.test.js toets 6, nu voor deze deur).
+     Een eigen adres, zodat de bronemmer van de andere toetsen niet meetelt. */
+  const lid = await eigenWerknemer('werk2-gelukt@voorbeeld.test', true);
+  const ip = '198.51.100.150';
+  const fout = verkeerdeCode(lid.geheim);
+  let stap1 = await werkLogin(lid.email, WW, null, ip);
+  assert.ok(stap1.body.bewijs, kort(stap1.body));
+  for (let i = 1; i <= 9; i++) {
+    const r = await api('/api/supplier/mijn/login', { bewijs: stap1.body.bewijs, code: fout }, null, ip);
+    assert.equal(r.status, 403, 'typefout ' + i);
+  }
+  const binnen = await api('/api/supplier/mijn/login', { bewijs: stap1.body.bewijs, code: lid.code() }, null, ip);
+  assert.equal(binnen.status, 200, 'de juiste code na negen typefouten geeft de werksessie: ' + kort(binnen.body));
+  assert.ok(binnen.body.token);
+  stap1 = await werkLogin(lid.email, WW, null, ip);
+  assert.ok(stap1.body.bewijs, kort(stap1.body));
+  for (let i = 1; i <= 9; i++) {
+    const r = await api('/api/supplier/mijn/login', { bewijs: stap1.body.bewijs, code: fout }, null, ip);
+    assert.equal(r.status, 403, 'na een geslaagde code telt de emmer opnieuw vanaf nul (typefout ' + i + ', kreeg ' + r.status + ')');
+  }
+  const weer = await api('/api/supplier/mijn/login', { bewijs: stap1.body.bewijs, code: lid.code() }, null, ip);
+  assert.equal(weer.status, 200, 'en de juiste code werkt nog, geen slot: ' + kort(weer.body));
+  assert.ok(weer.body.token);
 });

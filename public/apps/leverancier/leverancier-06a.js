@@ -48,10 +48,25 @@
     });
   }
 
+  /* "DIT WAS UW LAATSTE HERSTELCODE" (N19). Een herstelcode als tweede stap
+     zegt hoeveel er over zijn (`let` in het antwoord), en dat hoort de
+     medewerker te horen, zoals in de personeels-app. Na het inloggen laadt de
+     sectorwissel de pagina vaak opnieuw, en dan is een toast weg voor hij
+     gelezen is: daarom reist het bericht via sessionStorage mee en toont de
+     pagina die de app opent het. Zonder sessionStorage meteen. */
+  const HERSTELBERICHT = 'rtg_sup_herstelbericht';
+  function bewaarBericht(m){ try { sessionStorage.setItem(HERSTELBERICHT, m); } catch(e){ toast(m); } }
+  function toonBericht(){
+    let m = null;
+    try { m = sessionStorage.getItem(HERSTELBERICHT); sessionStorage.removeItem(HERSTELBERICHT); } catch(e){}
+    if (m) toast(m);
+  }
+
   // Productie gebruikt uitsluitend /supplier/mijn/login. Alleen de expliciete
   // Magnaat Test-kiezer mag nog naar de oude /supplier/login.
   async function login(body, legacy, silent){
     if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return false; }
+    let bericht = null;
     try {
       let d;
       const route = legacy ? '/supplier/login' : '/supplier/mijn/login';
@@ -62,7 +77,7 @@
         if (!pos) throw e1;
         d = await API.call(route, Object.assign({ positie: pos }, body));
       }
-      if (!legacy && d.tweedeFactorNodig) d = await vraagCode(d, body);
+      if (!legacy && d.tweedeFactorNodig) { d = await vraagCode(d, body); bericht = d.let || null; }
       API.token = d.token;
       applyState(d.state);
       if (legacy) koppelAanRtgAccount(body, false); // uitsluitend testmigratie
@@ -73,6 +88,7 @@
       return false;
     }
     try { localStorage.setItem('rtg_sup_token', API.token); } catch(e){}
+    if (bericht) bewaarBericht(bericht);
     // de zaak opent zijn eigen sector-app (behalve midden in een kassa-station)
     if (!pendingStation && naarEigenSector(S)) return true;
     if (pendingStation){
@@ -82,6 +98,7 @@
       try { localStorage.removeItem('rtg_sup_station'); } catch(e){}
       enterApp();
     }
+    toonBericht();
     return true;
   }
 
@@ -121,6 +138,7 @@
       applyState(st);
       let stn = null; try { stn = localStorage.getItem('rtg_sup_station'); } catch(e2){}
       if (stn) enterStation(stn); else enterApp();
+      toonBericht();   // na de sectorwissel: het bericht van de inlog hierboven
     } catch(e){
       API.token = null;
       try { localStorage.removeItem('rtg_sup_token'); } catch(e2){}

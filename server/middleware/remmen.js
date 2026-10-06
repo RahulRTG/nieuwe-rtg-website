@@ -97,18 +97,32 @@ function hoofdzekering({ db, accounts, eigenaar }) {
 
    DEZE LIJST IS NIET ELKE DEUR NAAR EEN SESSIE. Het kantoorgesprek
    (/api/kantoor/gesprek/zeg), de techniekinlog, de passkey-inlog en de
-   SSO-wissel staan er niet op, en de vergelijking is letterlijk op req.path.
-   Een deur toevoegen zegt dus niets over of de rest dicht is. En LETTERLIJK
-   betekent ook: de router laat een pad met een slash erachter
-   (/api/auth/login/) bij dezelfde handler komen, en die vergelijkt hier niet
-   gelijk. Dat gold al voor alle paden op deze lijst en staat als eigen
-   bevinding in het auditdocument (herkeuring N3). */
+   SSO-wissel staan er niet op. Een deur toevoegen zegt dus niets over of de
+   rest dicht is.
+
+   WAT "DIT PAD" IS, BESLIST DE ROUTER (N18). Hier stond een letterlijke
+   vergelijking op req.path, terwijl de router een pad met een slash erachter
+   (/api/auth/login/) bij dezelfde handler laat komen. Tijdens een gesprongen
+   pauze gaf /api/auth/login een 503 en kwam /api/auth/login/ gewoon bij de
+   handler (met het goede wachtwoord: een sessie), en dat gold voor alle paden
+   op deze lijst. De vergelijking loopt daarom via
+   vastePaden() uit ../web/routeindex.js: precies de sleutels waarop de router
+   een vast pad zoekt. Geen eigen normalisatie ernaast, want die zou ruimer of
+   krapper uitvallen dan de router en dan is er weer een tweede opvatting.
+   Hoofdletters, procentcodering, een dubbele slash of een punt-segment brengen
+   een verzoek bij geen enkele handler op deze lijst; laat de router dat ooit
+   wel toe, dan hoort dat in vastePaden() en volgt de pauze vanzelf.
+   test/inlogpauze-spelling.test.js legt het oordeel van de pauze naast dat van
+   de router, en draait de pauze op een echte server. */
 const INLOG_PADEN = ['/api/login', '/api/auth/login', '/api/auth/register', '/api/auth/forgot',
   '/api/auth/reset', '/api/office/login', '/api/supplier/login', '/api/staff/login', '/api/aanmeld/zeg'];
+const INLOG_SET = new Set(INLOG_PADEN);
+const { vastePaden } = require('../web/routeindex');
+function isInlogPad(pad) { return vastePaden(String(pad || '')).some(p => INLOG_SET.has(p)); }
 function inlogpauzePoort({ db }) {
   const { zekeringGesprongen } = require('../techniek');
   return (req, res, next) => {
-    if (!INLOG_PADEN.includes(req.path)) return next();
+    if (!isInlogPad(req.path)) return next();
     const z = db.data && db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.inlogpauze;
     if (!zekeringGesprongen(z)) return next();
     res.set('Retry-After', '60');
@@ -116,4 +130,4 @@ function inlogpauzePoort({ db }) {
   };
 }
 
-module.exports = { remOpDeDeur, opslagPoort, hoofdzekering, inlogpauzePoort, INLOG_PADEN };
+module.exports = { remOpDeDeur, opslagPoort, hoofdzekering, inlogpauzePoort, INLOG_PADEN, isInlogPad };

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-05T20:09:41.587Z",
-  "commit": "42aada418",
+  "op": "2026-10-05T14:04:01.061Z",
+  "commit": "b71cd833",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -16,15 +16,15 @@
    "BLOCKED_BY_TEST_FIXTURE": 3168,
    "NOT_APPLICABLE": 1264,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 623,
-   "INTENTIONALLY_NON_IDEMPOTENT": 181
+   "PROTECTED": 625,
+   "INTENTIONALLY_NON_IDEMPOTENT": 180
   },
   "vastgesteldDoorMens": 2120,
   "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4332,
+   "AUTHENTICATED": 4330,
    "PUBLIC": 134,
-   "OBJECT_SCOPED": 764,
+   "OBJECT_SCOPED": 766,
    "(niet af te leiden -- vraagt een verklaring)": 15,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
@@ -21941,6 +21941,25 @@
    },
    "bewijs": null,
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.toestemming.gezondheid",
+   "route": "POST /api/foundation/gezin/toestemming/gezondheid",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -91174,6 +91193,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "welzijn.dagboek.toestemming",
+   "route": "POST /api/rtf/welzijn/toestemming",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinsPoort"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfkantoor.advies",
    "route": "POST /api/rtfkantoor/advies",
    "semantiek": {
@@ -130872,6 +130912,28 @@
     "grond": null,
     "hindernis": "Ongeldige beveiligingshandeling."
    },
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.bewaren.veeg",
+   "route": "POST /api/techniek/bewaren/gezinnen",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "techAuth",
+     "eigenaarAlleen"
+    ]
+   },
+   "bewijs": null,
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,

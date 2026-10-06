@@ -65,6 +65,7 @@ async function gezin(naam, opties) {
   const g = (await post('/gezin/maak',
     { gezinsnaam: 'Fam ' + naam, naam: 'Moeder ' + naam, pin: '1234' })).body;
   assert.ok(g.code && g.token, 'het gezin bestaat: ' + JSON.stringify(g).slice(0, 160));
+  await post('/gezin/toestemming/gezondheid', { code: g.code, token: g.token, aan: true }); // art. 9
 
   const maak = async (pnaam, rol, pin) => {
     const r = await post('/gezin/profiel/maak',

@@ -95,6 +95,8 @@ Object.assign(kern, require('../kern/veiligheid')({
 Object.assign(kern, require('../kern/instant-reality')({ db, save, crypto, schoon }));
 kern.meldAan = meldAan;
 kern.meldLid = meldLid;
+// de aankondiging van de gezinsbewaartermijn landt op de sleutel van de ouder (foundation/gezinbewaren.js)
+if (rtf.gezinBewaren) rtf.gezinBewaren.setMelder(meldLid);
 
 /* Rahul kijkt mee (kern/kijken.js): een foto van iets, en hij zegt wat het is.
    De foto wordt nergens bewaard; zie de kop van die module. */

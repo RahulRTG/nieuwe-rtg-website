@@ -5999,8 +5999,10 @@ console.log('\n75) roteren met de hand neemt niet toe');
      (afhaalcode, arrivalpas, ov, tickets, rtgid-koppel, ...). Vanaf hier alleen omlaag. */
   const ROTATIE_MAX = 15;
   /* Gelezen ZONDER spaties: `(u.toegang.rotatie||1)+1` ontsnapte aan de eerste
-     vorm van deze regel, die alleen de gespatieerde schrijfwijze kende. */
-  const vorm = { test: r => /rotatie(\)?\|\|[01]\)|\))*\+1(?!\d)/.test(r.replace(/\s+/g, '')) };
+     vorm van deze regel, die alleen de gespatieerde schrijfwijze kende. De twee
+     alternatieven beginnen met een ander teken, anders kan een reeks `)||0)`
+     op twee manieren gelezen worden en loopt de regex exponentieel vast (CodeQL). */
+  const vorm = { test: r => /rotatie(?:\|\|[01]\)|\))*\+1(?!\d)/.test(r.replace(/\s+/g, '')) };
   const plekken = [];
   const loop = (d) => {
     for (const e of fs.readdirSync(d, { withFileTypes: true })) {

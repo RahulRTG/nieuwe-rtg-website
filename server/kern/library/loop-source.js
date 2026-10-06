@@ -63,7 +63,7 @@ module.exports=function makeLibraryLoopSource({read,deliver,identities,time,serv
   }
   function libraryProtocolEvents(workId){return read().journal.flatMap(event=>mapped(event,workId));}
   function hasReceipt(workId,ref) {try {const r=P.objectRef(ref);return r.domain==='library'&&r.type==='change-receipt'&&
-    protocolEvents(workId).some(event=>event.receipt&&event.receipt.receiptId===r.id&&r.version===1);}catch{return false;}}
+    libraryProtocolEvents(workId).some(event=>event.receipt&&event.receipt.receiptId===r.id&&r.version===1);}catch{return false;}}
   async function deliverScope(workId,consumer,handle,limit=100){
     const scoped=consumer+'.'+P.hash(workId).slice(0,16);
     return deliver(scoped,async event=>{for(const row of mapped(event,workId))await handle(row);},limit);

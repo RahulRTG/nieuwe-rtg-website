@@ -6,7 +6,7 @@ test('144 oorspronkelijke blockers blijven traceerbaar na 60 productbesluiten',(
   const d=build();assert.equal(d.summary.originalBlockedCapabilities,144);assert.equal(d.summary.blockedCapabilities,84);
   assert.equal(d.summary.resolvedCapabilities,60);assert.equal(d.summary.decisionFamilies,22);
   assert.equal(d.coverage.complete,true);assert.equal(new Set(d.coverage.assigned).size,144);
-  assert.deepEqual(JSON.parse(fs.readFileSync(OUT,'utf8')),d);assert.equal(fs.readFileSync(DOC,'utf8'),markdown(d));
+  assert.deepEqual(JSON.parse(fs.readFileSync(OUT,'utf8')),d,'LOOP-FABRIC-DECISION-DOSSIERS.json loopt achter op de code -- draai: npm run loopfabric:decisions');assert.equal(fs.readFileSync(DOC,'utf8'),markdown(d),'het beslisdocument loopt achter op de code -- draai: npm run loopfabric:decisions');
   for(const row of d.dossiers){assert.ok(row.question);assert.ok(row.why);assert.ok(row.safeDefault);assert.ok(row.recommendation);
     assert.ok(['PRODUCT_POLICY','PRIVACY_POLICY','GOVERNANCE','LEGAL_VALIDATION_REQUIRED','ETHICAL/SAFETY','MIXED'].includes(row.classification));
     assert.ok(row.options.length>=2);for(const option of row.options)for(const key of ['product','privacy','learning','ai','crossDomain','retention','userControl','implementation'])assert.ok(option.consequences[key]);}

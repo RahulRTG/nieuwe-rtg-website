@@ -11,7 +11,7 @@ const base=overrides=>E.issue({sourceRef:ref('service','lesson','l1'),purpose:'s
   epistemicType:'SYSTEM_OBSERVED',capabilityId:'service',...overrides});
 
 test('Constitution is versioned, machineleesbaar en gelijk aan runtimebron',()=>{
-  const disk=JSON.parse(fs.readFileSync(OUT,'utf8'));assert.deepEqual(disk,build());assert.equal(disk.version,C.VERSION);
+  const disk=JSON.parse(fs.readFileSync(OUT,'utf8'));assert.deepEqual(disk,build(),'RTG-LEARNING-CONSTITUTION.json loopt achter op de code -- draai: npm run loopfabric:constitution');assert.equal(disk.version,C.VERSION);
   assert.ok(disk.rules.length>=18);assert.ok(disk.resolvedDecisions.includes('D23_LIBRARY_EDUCATION_RELEASE'));
 });
 

@@ -839,8 +839,8 @@ fn boeking_is(boeking: &Json, van: &str, naar: &str, centen: i64,
    (herstel), zodat de motor nooit een sleutel bewaart die hij na een herstart
    zou weigeren. test/geld-motorsleutel.test.js legt de JS-lijst tegen deze
    binary; een soort die alleen aan een kant staat, laat hem zakken. */
-pub const ECONOMISCHE_SOORTEN: [&str; 8] = ["payout-terug", "pay-tegoed", "pay-kas", "pay-oplaad",
-    "pay-vonk", "pay-klompje", "pay-handeling", "pay-stap"];
+pub const ECONOMISCHE_SOORTEN: [&str; 9] = ["payout-terug", "pay-tegoed", "pay-kas", "pay-oplaad",
+    "pay-vonk", "pay-klompje", "pay-handeling", "pay-stap", "pay-uitbetaling"];
 
 fn economische_sleutel_geldig(sleutel: &str) -> bool {
     let rest = match sleutel.strip_prefix("pay:").or_else(|| sleutel.strip_prefix("bank:")) {

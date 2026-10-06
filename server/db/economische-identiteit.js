@@ -20,7 +20,9 @@ const heeft = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
      pay-klompje    de betaling van EEN betaalverzoek, op het id van het verzoek
      pay-handeling  een boeking op een bedrijfsobject buiten een idem-handeling
                     (een OV-rit, een storingsteruggave, een verrekening)
-     pay-stap       stap n binnen een idem-handeling (lib/idem.js volgendeStap)
+     pay-stap       stap n binnen een idem-handeling (lib/idem-handeling.js)
+     pay-uitbetaling  een uitbetaling naar een externe rekening via een
+                    uitbetaalrail (Stripe Connect), op het id van de opdracht
 
    WAAROM DE LIJST HIER EN IN DE MOTOR LETTERLIJK GELIJK MOET ZIJN. De motor
    (motor/src/pay.rs, ECONOMISCHE_SOORTEN) weigert elke andere vorm met 400, en
@@ -28,7 +30,7 @@ const heeft = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
    JS-kant stuurde `pay-oplaad:BW-...` en de motor kende alleen drie soorten.
    test/geld-motorsleutel.test.js legt beide lijsten tegen de ECHTE binary. */
 const SOORTEN = Object.freeze(['payout-terug', 'pay-tegoed', 'pay-kas', 'pay-oplaad',
-  'pay-vonk', 'pay-klompje', 'pay-handeling', 'pay-stap']);
+  'pay-vonk', 'pay-klompje', 'pay-handeling', 'pay-stap', 'pay-uitbetaling']);
 const SLEUTEL = new RegExp('^(?:' + SOORTEN.join('|') + '):[a-f0-9]{64}$');
 
 /* Maakt een sleutel uit een soort en de delen van een BEDRIJFSidentiteit (een

@@ -79,10 +79,8 @@ module.exports = function verzoekketen(deps) {
   if (typeof postgresVerzoekMiddleware === 'function') app.use(postgresVerzoekMiddleware());
   app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
   /* Het verzoekframe: identiteit van dit werk, en de ENIGE bron van de keten.
-     De Trust & Evidence-wortel loopt nog steeds door ELK verzoek, ook wanneer de
-     route zelf geen claims schrijft, maar het frame opent hem en zijn keten is
-     de correlatie van het frame (besluit van 6 oktober 2026; zie de kop van
-     kern/bewijsvlak/context.js). Een chain-id verleent nooit toegang. */
+     Het opent ook de Trust & Evidence-wortel van ELK verzoek, met als keten de
+     correlatie van het frame (zie kern/bewijsvlak/context.js). */
   app.use(require('./verzoekframe').middleware());
   // wat verandert dit verzoek: rijen per collectie voor en na (blast radius).
   // NA het logboek want hij leunt op req.id; bewust niet in save(). Zie de kop

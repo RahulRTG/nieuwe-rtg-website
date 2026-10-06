@@ -76,7 +76,20 @@ function alleenRefs(x) {
    van test/doos-journaal.test.js na N29 groen zonder draagtWachtwoord. Nu eisen
    ze een pad dat slot 1 passeert, toets 7 daar neemt elke spelling op elke
    diepte die de dieptewacht doorlaat, en toets 2 van
-   test/doos-inlogjournaal.test.js gaat door een echte doos. */
+   test/doos-inlogjournaal.test.js gaat door een echte doos.
+
+   HET GEVOLG VOOR DE AANMELDING, UITGESCHREVEN (P4 uit ronde 6, met opzet geen
+   ander gedrag). Zonder lijn geeft /api/supplier/staff/join op de doos gewoon
+   200, en de koppeling komt in de accountopslag van de DOOS. In het journaal
+   komt hij niet (sinds N27 door dit slot, sinds N29 al door slot 1), dus hij
+   wordt nooit nagespeeld en de cloud hoort er niets van. Na herstel is de doos
+   weer doorgeefluik; wie zich zonder lijn aanmeldde, staat dan niet op het
+   rooster in de cloud en moet zich daar opnieuw aanmelden. Dat laatste volgt
+   uit de code en is niet op een doos met een terugkerende lijn beproefd. Het is
+   de prijs van geen RTG-wachtwoord op het kastje: nagespeeld zou de aanmelding
+   dat wachtwoord tot de lijn terugkomt onversleuteld op het kastje laten
+   liggen. Of de doos een aanmelding zonder lijn moet weigeren in plaats van
+   lokaal toe te laten, is een productbesluit en staat open. */
 const WACHTWOORD = Object.freeze(['password', 'wachtwoord']);
 function draagtWachtwoord(lijf) {
   const stapel = [lijf];

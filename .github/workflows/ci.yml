@@ -681,7 +681,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: preflight
     if: needs.preflight.outputs.mode == 'incremental' && needs.preflight.outputs.unit != '0'
-    timeout-minutes: 30
+    # DEZE JOB DRAAIT OOK DE IJKINGEN DIE HET PLAN OPNIEUW WIL ZIEN, en daarmee
+    # past hij niet meer in dertig minuten. In de volledige ronde heeft meterijk
+    # een eigen job van dertig minuten; hier komt hij NA de batches. Gemeten op
+    # 6 oktober 2026 (#487, run 37525729907): installeren en bouwen 1m21s, de
+    # batches tot en met klok 6m57s, en meterijk was na 16m58s nog bezig toen
+    # de job op dertig minuten werd afgekapt. Zelfstandig duurde meterijk die
+    # dag 15m42s, 21m37s en 23m26s (runs 37507709887, 37450225350, 37507194793).
+    # Opgeteld is dat tot ruim 31 minuten, dus vijftig laat marge zonder dat een
+    # echte hang uren kost -- de testrunner geeft een ijking zelf veertig.
+    timeout-minutes: 50
     services:
       postgres:
         image: postgres:16-alpine

@@ -197,7 +197,10 @@ een meter af te leiden is.
 | Vondst | Klasse | Waarom het hier staat |
 |---|---|---|
 | 188 dubbele `class`-attributen in 38 bronbestanden | ontdekt, DEFECT | Er is geen meter en geen poort. De reparatie herstelt zichtbare opmaak en vraagt daarom een eigen PR met schermcontrole. |
-| `versheid`, `gevolgdekking:controle`, `schermfunctie:controle` en `tikken:controle` rood op HEAD | DRIFT | Geen van de vier draait in ci.yml, dus een groene CI zei er niets over. |
+| `gevolgdekking:controle` rood | DEBT, nieuw ingevoerd | `/api/bestanden/actie` staat sinds 27 september in de AI-voorstellijst, maar de idempotentieproef kreeg hem nooit aan het werk (geen bestand in de proefkluis, drie keer 404). Weghalen tot hij gemeten is, of de proefwereld uitbreiden plus een volle ronde: een besluit. Het andere deel (het tik-contract) is in golf A gerepareerd. |
+| `versheid` rood op HEAD | DRIFT, en een correctie op de nulmeting | Hij draait al als poort in `ronde.yml`, direct na de meetronde die de poortregisters in dezelfde job opnieuw meet. In ci.yml zou hij per constructie rood staan. Of de ronde zijn registers vastlegt, is een besluit van de eigenaar (kop van `scripts/versheid.js`). |
+| `schermfunctie:controle` rood | gerepareerd in golf A | Register opnieuw gemeten, en de controle staat nu in ci.yml (8 seconden). |
+| `tikken:controle` rood | **onjuist in de nulmeting** | Het ingecheckte `TIKKEN.json` had al nul schermen zonder reden, en een verse meting op deze tak ook (276 van 316 binnen vijf tikken). Het rood kwam uit de meetomgeving van de nulmeting en niet uit de code. Hij hoort niet in ci.yml: een meting duurt ruim twintig minuten in een echte browser. |
 | CI-stap "nieuwe routes komen met een toets" uitgecommentarieerd sinds 27 augustus | DEBT | De eigen hersteldatum is verlopen, en de oorzaak (de server van main hangt in een worktree) is niet onderzocht. |
 | De screenshots `gebruiker.png` en `organisatie.png` zijn niet deterministisch | DRIFT | Bij een ongewijzigde bron veranderen de bytes, dus elke `websitebeelden` levert een schijnwijziging op. |
 

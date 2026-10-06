@@ -15,9 +15,13 @@
 
    Let op wat dat betekent na een AVG-wissing: die herzegelt het venster
    (kern/command/journaal.js `wisActor`), dus een anker van daarvoor rekent dan
-   af als `herschreven`. Dat is met opzet geen groen: of het die wissing was,
-   beoordeelt een mens, en die zet daarna met de hand een nieuw anker
-   (/api/office/anker/post). */
+   af als `herschreven`. Hier stond dat een mens daarna met de hand opnieuw
+   ankerde; dan zette ELKE wissing het externe anker stil. Nu legt de wissing
+   zelf een getekende herzegeling vast (./ankerherzegel.js), en alleen een
+   herschrijving die zo'n record PRECIES verklaart, rekent af als in orde. Een
+   onverklaarde herschrijving blijft een afwijking. RUW hieronder is de weg naar
+   de regels zelf, want die verklaring kijkt naar de inhoud en niet alleen naar
+   de kop. */
 function zegelRij(lijst, totaal) {
   const l = Array.isArray(lijst) ? lijst : [];
   const t = Math.max(Number(totaal) || 0, l.length);
@@ -66,4 +70,12 @@ const BEWARING = {
   commandJournaal: { max: 5000 }
 };
 
-module.exports = { JOURNALEN, BEWARING, zegelRij };
+/* De zegelketens als RUWE regels (oudste-eerst) met hun teller: alleen deze
+   journalen kunnen een herzegeling dragen, want alleen zij worden door een
+   AVG-wissing herschreven (kern/command/journaal.js `wisActor`). */
+const RUW = {
+  apiSpoor: (d) => { const a = d.apiSpoor || {}; return { lijst: a.commandJournaal || [], totaal: a.commandJournaalTotaal }; },
+  commandJournaal: (d) => ({ lijst: d.commandJournaal || [], totaal: d.commandJournaalTotaal })
+};
+
+module.exports = { JOURNALEN, BEWARING, RUW, zegelRij };

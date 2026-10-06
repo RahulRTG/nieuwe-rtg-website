@@ -32,6 +32,8 @@ test.after(() => {
 
 async function gezin() {
   const g = await json(await api('/gezin/maak', { gezinsnaam: 'Gezond', naam: 'Ouder', pin: '2468' }));
+  // art. 9: de ouder geeft apart toestemming voor gezondheidsgegevens (test/gezondheidstoestemming.test.js)
+  await api('/gezin/toestemming/gezondheid', { code: g.code, token: g.token, aan: true });
   const kind = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Noor', rol: 'kind' }));
   const kt = (await json(await api('/gezin/profiel/kies', { gezinscode: g.gezinscode, profielId: kind.profiel.id }))).token;
   const gast = await json(await api('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Oma', rol: 'gast' }));

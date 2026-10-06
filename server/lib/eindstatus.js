@@ -59,7 +59,8 @@ function naEindstatus(res, fn) {
      Idempotency-Key staan idem-poort en dubbeltik allebei op res, en dan was dit
      de elfde 'finish'-luisteraar: een MaxListenersExceededWarning per verzoek,
      ook op een gezonde leider (herkeuring N11). Geen lek, want het is er precies
-     een per res (WACHT). Een grens van 0 is onbegrensd en blijft dat. */
+     een per res (WACHT). Een grens van 0 is onbegrensd en blijft dat. De grens
+     geldt per emitter, dus ook 'close' en 'pipe' krijgen er een bij. */
   if (typeof res.getMaxListeners === 'function' && typeof res.setMaxListeners === 'function') {
     const max = res.getMaxListeners();
     if (max > 0 && Number.isFinite(max)) res.setMaxListeners(max + 1);

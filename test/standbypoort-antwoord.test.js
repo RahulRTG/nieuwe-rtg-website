@@ -336,22 +336,34 @@ test('boven de PostgreSQL-grens: een 503 na de afzetting commit niets, zonder af
 const maakIdemPoort = require('../server/lib/idem-poort');
 const { maakDubbeltik } = require('../server/lib/dubbeltik');
 const maakIdempotentie = require('../server/middleware/idempotentie');
-const wacht = (ms) => new Promise(r => setTimeout(r, ms));
+/* Wachten op een TOESTAND en niet op een tijd (KLOKWACHT.json): de lus tikt tot
+   de voorwaarde waar is, en geeft het na twee seconden op met de reden. */
+async function totdat(voorwaarde, wat) {
+  for (let i = 0; i < 400; i++) {
+    if (voorwaarde()) return;
+    await new Promise(r => setTimeout(r, 5));
+  }
+  throw new Error('niet bereikt: ' + wat);
+}
 const stilleDubbeltik = () => maakDubbeltik({ log: { warn() {} } }).middleware();
 
 async function ketenApp(lagen, { eigenHttp = false } = {}) {
   const web = require('../server/web');
   const db = { writable: true };
-  const stand = { afzetten: false, keer: 0, rem: null, groot: false };
+  const stand = { afzetten: false, keer: 0, rem: null, groot: false, aangekomen: 0, gesloten: 0, klaar: 0 };
   const app = web();
   app.use(standbyPoort(db));
   app.use(web.json());
+  // het lijf is gelezen en het verzoek gaat de lagen in: daar wacht een tweede
+  app.use((req, res, next) => { stand.aangekomen++; next(); });
   for (const laag of lagen) app.use(laag);
   const route = async (req, res) => {
     stand.keer++;
+    res.on('close', () => { stand.gesloten++; });
     if (stand.rem) await stand.rem;
     if (stand.afzetten) db.writable = false;
     res.json({ ok: true, keer: stand.keer, vulsel: stand.groot ? 'v'.repeat(4096) : '' });
+    stand.klaar++;
   };
   app.post('/api/proef/herhaal', route);
   app.post('/api/gewoonten/maak', route);   // verklaard in server/lib/idemsleutels-basis.js: zelfde verzoek
@@ -447,9 +459,10 @@ for (const [naam, laag, vorm] of [
       let los;
       app.stand.rem = new Promise(r => { los = r; });
       const eerste = app.stuur('/api/proef/herhaal', vorm);
-      await wacht(50);
+      await totdat(() => app.stand.keer === 1, 'de eerste staat in de route');
       const tweede = app.stuur('/api/proef/herhaal', vorm);
-      await wacht(50);
+      await totdat(() => app.stand.aangekomen === 2, 'de tweede staat in de lagen');
+      await new Promise(r => setImmediate(r));
       assert.equal(app.stand.keer, 1, 'de tweede wacht op de eerste in plaats van ernaast te draaien');
       app.stand.afzetten = true;
       los();
@@ -479,12 +492,13 @@ test('idem-poort: een antwoord na een afgebroken verbinding wordt nog steeds ont
     const vorm = { kop: { 'Idempotency-Key': 'n11-afgebroken' } };
     const ac = new AbortController();
     const eerste = app.stuur('/api/proef/herhaal', vorm, ac.signal).catch(e => ({ afgebroken: e.name }));
-    await wacht(50);
+    await totdat(() => app.stand.keer === 1, 'de route draait');
     ac.abort();
     assert.ok((await eerste).afgebroken, 'de klant gaf het op');
-    await wacht(50);
+    await totdat(() => app.stand.gesloten === 1, 'de server zag de verbinding dichtgaan');
     los();
-    await wacht(100);   // de route maakt zijn werk af, zonder iemand aan de lijn
+    // de route maakt zijn werk af, zonder iemand aan de lijn
+    await totdat(() => app.stand.klaar === 1, 'de route gaf zijn antwoord');
     app.stand.rem = null;
     const b = await app.stuur('/api/proef/herhaal', vorm);
     assert.equal(b.status, 200);
@@ -613,6 +627,13 @@ test('eindstatus: de eigen finish-luisteraar laat de grens van tien niet waarsch
   } finally { process.off('warning', luister); }
   assert.equal(waarschuwingen.length, 0, 'een bekende luisteraar extra is geen lek en hoort geen waarschuwing te geven');
   assert.equal(res.listenerCount('finish'), 11);
+  assert.equal(res.getMaxListeners(), 11, 'de grens gaat precies een omhoog: onbegrensd of ruimer verbergt een echt lek');
+  process.on('warning', luister);
+  try {
+    res.on('finish', () => {});   // een twaalfde, vreemde luisteraar
+    await new Promise(r => setImmediate(r));
+  } finally { process.off('warning', luister); }
+  assert.equal(waarschuwingen.length, 1, 'een echte extra luisteraar daarboven waarschuwt nog steeds');
 
   const onbegrensd = luisterRes();
   onbegrensd.setMaxListeners(0);

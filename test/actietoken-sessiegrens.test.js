@@ -46,7 +46,12 @@ test.after(() => { try { fs.rmSync(TMP, { recursive: true, force: true }); } cat
 
 const DOELEN = { 'inlog2': 5 * 60 * 1000, 'tech2': 5 * 60 * 1000, 'sso-overdracht': 60000,
   'mailwissel': 24 * 3600 * 1000, 'verify-email': 3 * 86400000 };
-const even = () => new Promise(r => setTimeout(r, 5)); // de grens ligt dan zeker NA de uitgifte
+/* Tot de klok een tik verder staat: dan ligt de grens zeker NA de uitgifte. Een
+   wacht op een toestand (de klok verschoof) en geen gok over hoe lang dat duurt. */
+async function even() {
+  const t = Date.now();
+  while (Date.now() <= t) await new Promise(r => setImmediate(r));
+}
 
 /* Drie functies die de grens zetten, en alle drie horen hetzelfde te doen.
    zetSessiegrens is de weg van het eigenaarsherstel en van pas naar gast; de

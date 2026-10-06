@@ -172,7 +172,14 @@ test('een gezonde leider: een POST met Idempotency-Key geeft geen MaxListenersEx
         body: JSON.stringify({ woorden: ['egel', 'fazant', 'gerbil', 'hamster'] }) });
       assert.equal(r.status, 200, 'zet ' + i);
     }
-    await wacht(200);
+    /* De waarschuwing komt via stderr ACHTER het antwoord aan. Wacht dus tot die
+       stroom drie rondes achter elkaar niet meer groeit: een toestand (rust),
+       geen vaste tijd. */
+    for (let rustig = 0, vorige = -1, i = 0; rustig < 3 && i < 100; i++) {
+      rustig = stderr.length === vorige ? rustig + 1 : 0;
+      vorige = stderr.length;
+      await wacht(50);
+    }
     assert.doesNotMatch(stderr, /MaxListenersExceededWarning/, 'geen waarschuwing over te veel luisteraars');
   } finally {
     await stop(srv);

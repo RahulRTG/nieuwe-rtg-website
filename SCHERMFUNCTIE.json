@@ -3,16 +3,16 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-10-06",
-    "commit": "f53a1fe1e"
+    "commit": "235f0826"
   },
   "bronnen": {
     "schermroutes": {
       "op": "2026-10-06",
-      "commit": "5674039a3"
+      "commit": "bc7e30bd2"
     },
     "schermgedrag": {
       "op": "2026-10-06",
-      "commit": "ce0a96a57"
+      "commit": "643c390ff"
     }
   },
   "ruis": [
@@ -7015,10 +7015,11 @@
         "/api/library"
       ],
       "zonderServer": false,
-      "inkomend": 3,
-      "inIndex": 4,
+      "inkomend": 4,
+      "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
+        "public/apps/foundation/os-publiek.html",
         "server/kern/appcatalogus-rijen/deel1b.js",
         "server/kern/appgids-data/deel9.js"
       ]

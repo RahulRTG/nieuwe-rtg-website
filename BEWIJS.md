@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2334 bestanden en 16023 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2335 bestanden en 16027 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2334 |
-| losse beweringen (`test(...)`) | 16023 |
+| toetsbestanden | 2335 |
+| losse beweringen (`test(...)`) | 16027 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2159 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2160 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2030 bestanden, 15494 beweringen.
+2031 bestanden, 15498 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1865,6 +1865,7 @@ toets omvalt.
 | `uitvoerproef.test.js` | 17 | gezakt op `true->false#0` | DE UITVOER-SCHAKEL: LEKT HET ANTWOORD VAN EEN DOORLAAT? WAT ER MIS WAS. |
 | `upload-poort.test.js` | 4 | gezakt op `liegpoort /api/` | DEZELFDE INHOUD, TWEE WEGEN NAAR BINNEN -- EN MAAR EEN POORT. De Ontsmetter hangt als scan-net over elke verzoek-body: alles wat eruitziet als een complete data-URL ("data:<mime>;base64,<...>") wordt gescand, waar in... |
 | `uploadquarantaine.test.js` | 5 | gezakt op `===->!==#0` | De uploadgrens in het klein: bytes staan tijdens de keuring in een aparte map, bereiken de route alleen na de eigen én externe scan, en blijven bij geen enkel oordeel als terugvindbaar virusbestand liggen. |
+| `v2-migraties.test.js` | 4 | gezakt op `===->!==#0` | DRIE DRAGERS NAAR BEARERCODE V2 (UITVOERINGSPLAN par. 7.1). |
 | `vakbewijs-kluis.test.js` | 5 | gezakt op `true->false#0` | HET NUMMER WOONT IN DE KLUIS -- gemeten aan de OPSLAG, niet aan de uitgang. WAAROM DIT EEN EIGEN BESTAND IS. |
 | `vakbewijs-routes.test.js` | 10 | gezakt op `liegpoort /api/` | DE WEG VAN EEN VAKBEWIJS, OVER ECHTE ROUTES. WAAROM DIT BESTAAT, EN HET STAAT ZWART OP WIT IN test/persoonseis.test.js: daar is een mutatie AFGESLAGEN. |
 | `vakken.test.js` | 4 | gezakt op `liegpoort /api/` | De vakmannen-golf: tien alledaagse vakken (autogarage, schoonmaak, hovenier, wasserij, rijschool, dierenarts, tandarts, fotograaf, verhuizer, IT-hulp) op de vakwerk-motor, elk met een demo-zaak op het Dienstenplein;... |

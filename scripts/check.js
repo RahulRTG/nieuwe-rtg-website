@@ -5981,6 +5981,45 @@ try {
   fout('TRUST_EVIDENCE_PLANE.json ontbreekt of is verouderd; draai npm run trust:manifest');
 }
 
+/* ============================================================================
+   75) ROTEREN MET DE HAND NEEMT NIET TOE
+
+   UITVOERINGSPLAN par. 7.1: bearercode v2 heeft `roteer()` (nieuwe code, oude
+   dicht, einde nooit later, geschiedenis begrensd). Twaalf domeinen hoogden de
+   rotatie nog zelf op. Ze verschillen in wat een rotatie MAG (een vers einde of
+   het oude), dus ze gaan per domein om en niet in een keer -- maar er komt er
+   geen bij. De ratel mag alleen omlaag; staat hij te hoog, dan zegt deze regel
+   dat ook, zodat de winst blijft staan. */
+console.log('\n75) roteren met de hand neemt niet toe');
+{
+  /* 12 -> 13: de gezinsdeur van main (B18, server/foundation/gezinscode.js) kwam
+     binnen nadat deze ratel stond en roteert met de hand. Het werkwoord dat hem
+     vervangt (vernieuw) staat in fase1/rotaties, en die zet hem terug. */
+  const ROTATIE_MAX = 13;
+  const vorm = /rotatie\s*\+\s*1|rotatie \|\| 1\) \+ 1|rotatie\) \|\| 0\) \+ 1|rotatie \|\| 0\) \+ 1/;
+  const plekken = [];
+  const loop = (d) => {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const q = path.join(d, e.name);
+      if (e.isDirectory()) { if (!['data', 'node_modules'].includes(e.name)) loop(q); continue; }
+      if (!e.name.endsWith('.js') || /^bearercode/.test(e.name)) continue;
+      fs.readFileSync(q, 'utf8').split('\n').forEach((r, i) => {
+        if (vorm.test(r)) plekken.push(path.relative(ROOT, q) + ':' + (i + 1));
+      });
+    }
+  };
+  loop(path.join(ROOT, 'server'));
+  if (plekken.length > ROTATIE_MAX) {
+    fout(plekken.length + ' plekken roteren met de hand terwijl de ratel op ' + ROTATIE_MAX + ' staat. ' +
+      'Gebruik bearer.roteer() (kern/bearercode-v2.js): ' + plekken.join(', '));
+  } else if (plekken.length < ROTATIE_MAX) {
+    fout('nog ' + plekken.length + ' plekken roteren met de hand; zet ROTATIE_MAX in scripts/check.js op ' +
+      plekken.length + ' zodat de winst blijft staan');
+  } else {
+    ok(plekken.length + ' plekken roteren nog met de hand (ratel, alleen omlaag)');
+  }
+}
+
 /* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.
 
    Op 13 september 2026 heb ik twee keer op een dag "de gate is groen" gezegd op

@@ -80,9 +80,15 @@ test('2. issuer, doel en scope: de pass hoort bij EEN aankomst bij EEN zaak', ()
   t.doel = 'iets-anders';
   assert.equal(w.kern.lees(a.code, w.reserveringVan).status, 401, 'een ander doel opent niets');
   t.doel = 'arrival-pass';
+  /* Een scope die na uitgifte met de hand wordt aangepast, maakt de pass DICHT
+     (A3: een beveiligingsveld verandert alleen via gebruik, intrekken of
+     roteren). Ook een versmalling: wie de opslag kan wijzigen, mag de pass niet
+     herschrijven tot iets dat er nooit is uitgegeven. */
   t.scope = ['arrival.pass.lezen'];
-  assert.equal(w.kern.lees(a.code, w.reserveringVan).status, 200, 'lezen mag met lezen-scope');
-  assert.equal(w.kern.puls(a.code, 'onderweg', w.reserveringVan).status, 401, 'maar pulsen niet');
+  assert.equal(w.kern.lees(a.code, w.reserveringVan).status, 401, 'een met de hand gewijzigde scope opende de pass');
+  assert.equal(w.kern.puls(a.code, 'onderweg', w.reserveringVan).status, 401, 'en pulsen ook niet');
+  t.scope = ['arrival.pass.lezen', 'arrival.puls'];
+  assert.equal(w.kern.lees(a.code, w.reserveringVan).status, 200, 'het oorspronkelijke record opent weer');
   t.scope = ['arrival.pass.lezen', 'arrival.puls'];
   t.onderwerp.supplierCode = 'ANDER';
   assert.equal(w.kern.lees(a.code, w.reserveringVan).status, 401, 'een onderwerp van een andere zaak telt niet');

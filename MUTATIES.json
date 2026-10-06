@@ -15414,6 +15414,14 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
+    "v2-migraties.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/collectie-bewerken.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "vakbewijs-kluis.test.js": {
       "soort": "puur",
       "staat": "gezakt",

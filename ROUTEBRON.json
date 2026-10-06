@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-06T22:04:48.968Z",
-  "commit": "f3fc5459",
+  "op": "2026-10-06T22:06:04.788Z",
+  "commit": "ca4686b8",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -5476,7 +5476,7 @@
    "omgeving": [],
    "onwaarneembaar": [
     "git log -1 --format=%cI",
-    "node /home/user/nieuwe-rtg-website/scripts/routekaart.js --json"
+    "node scripts/routekaart.js --json"
    ],
    "nodeHoofdversie": 22
   }

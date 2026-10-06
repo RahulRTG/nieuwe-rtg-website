@@ -832,16 +832,23 @@ fn boeking_is(boeking: &Json, van: &str, naar: &str, centen: i64,
         boeking.str_at("ref") == ref_
 }
 
-/* Drie soorten economische sleutel, gelijk aan SLEUTEL in
-   server/db/economische-identiteit.js: een teruggeboekte uitbetaling
-   (`payout-terug:`), geld dat een tegoedbon uit de escrow haalt
-   (`pay-tegoed:`) en een deel onder een kascode-claim (`pay-kas:`).
-   Daarachter altijd een SHA-256 en nooit vrije tekst. */
+/* De soorten economische sleutel, LETTERLIJK gelijk aan SOORTEN in
+   server/db/economische-identiteit.js (waar ook staat wat elke soort is).
+   Daarachter altijd een SHA-256 en nooit vrije tekst. Deze ene lijst geldt voor
+   een nieuwe boeking (met_economisch) EN voor het inlezen van een snapshot
+   (herstel), zodat de motor nooit een sleutel bewaart die hij na een herstart
+   zou weigeren. test/geld-motorsleutel.test.js legt de JS-lijst tegen deze
+   binary; een soort die alleen aan een kant staat, laat hem zakken. */
+pub const ECONOMISCHE_SOORTEN: [&str; 8] = ["payout-terug", "pay-tegoed", "pay-kas", "pay-oplaad",
+    "pay-vonk", "pay-klompje", "pay-handeling", "pay-stap"];
+
 fn economische_sleutel_geldig(sleutel: &str) -> bool {
-    let rest = sleutel.strip_prefix("pay:").or_else(|| sleutel.strip_prefix("bank:"));
-    let hash = match rest.and_then(|r| r.strip_prefix("payout-terug:")
-        .or_else(|| r.strip_prefix("pay-tegoed:"))
-        .or_else(|| r.strip_prefix("pay-kas:"))) {
+    let rest = match sleutel.strip_prefix("pay:").or_else(|| sleutel.strip_prefix("bank:")) {
+        Some(r) => r,
+        None => return false,
+    };
+    let hash = match ECONOMISCHE_SOORTEN.iter()
+        .find_map(|soort| rest.strip_prefix(soort).and_then(|r| r.strip_prefix(':'))) {
         Some(v) => v,
         None => return false,
     };
@@ -1251,6 +1258,34 @@ mod tests {
             "alle velden, niet alleen het id, vormen de projectie-identiteit");
         assert!(State::new().laad_gevalideerd(&s.snapshot()).is_err(),
             "snapshotdrift mag niet als geldwaarheid starten");
+    }
+
+    /* Een bevestigde kaartbetaling stuurde `pay-oplaad:BW-<hex>` en de motor
+       kende die soort niet: 400, en de oplading bleef voor altijd
+       onbijgeschreven. Elke soort uit de gedeelde lijst boekt nu precies een
+       keer, overleeft een snapshot, en een niet-gehashte waarde blijft 400. */
+    #[test]
+    fn elke_economische_soort_boekt_eenmaal_en_overleeft_een_snapshot() {
+        let hash = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let mut s = State::new();
+        for (i, soort) in ECONOMISCHE_SOORTEN.iter().enumerate() {
+            let sleutel = format!("{}:{}", soort, hash);
+            let r = format!("ref-{}", i);
+            assert_eq!(s.boek_guard_eenmaal("extern:oplaad", "lid:C", 100, "oplaad", "x",
+                Some(r.clone()), Some(&sleutel)).status, 200, "{}", soort);
+            let twee = s.boek_guard_eenmaal("extern:oplaad", "lid:C", 100, "oplaad", "x",
+                Some(r), Some(&sleutel));
+            assert_eq!(twee.body.bool_at("herhaald"), true, "{}", soort);
+        }
+        assert_eq!(s.grb.saldo_van("lid:C"), 100 * ECONOMISCHE_SOORTEN.len() as i64);
+        assert!(State::new().laad_gevalideerd(&s.snapshot()).is_ok(),
+            "een sleutel die de motor aannam, moet hij na een herstart ook weer inlezen");
+        for fout in ["pay-oplaad:BW-0E110F5CC2524185F291", "pay-oplaad:0123456789ABCDEF0123456789abcdef0123456789abcdef0123456789abcdef",
+                     "pay-oplaad", "pay-oplaadx:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"] {
+            assert_eq!(s.boek_guard_eenmaal("extern:oplaad", "lid:C", 1, "oplaad", "x",
+                Some("f".into()), Some(fout)).status, 400, "{}", fout);
+        }
+        assert_eq!(s.grb.saldo_van("lid:C"), 100 * ECONOMISCHE_SOORTEN.len() as i64);
     }
 }
 

@@ -3,6 +3,8 @@
    elkaar met een aanraking) staat in ./tik.js. EEN knop overal: is er te weinig saldo, dan laadt de
    wallet zelf bij (autolaad in de kern) en betaalt door. Krijgt de gedeelde ctx van
    kern/pay/index.js. */
+const { maakSleutel } = require('../../db/economische-identiteit');
+
 module.exports = (ctx) => {
   const { crypto, save, schoon, nu, d, klompjes, klompjesKijk, grootboek, grootboekKijk, rekLid, saldoVan, walletRuimte,
     id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, waarde,
@@ -94,11 +96,17 @@ module.exports = (ctx) => {
       try {
         const z = await zorgSaldo({ codenaam, centen: v.centen, idem });
         if (z.error) return z;
-        const b = await boekAsync({ van: rekLid(codenaam), naar: rekLid(v.van), centen: v.centen, soort: 'klompje', oms: v.oms, ref: v.id });
+        /* EEN BETALING PER VERZOEK, ook over instanties heen. Het slot
+           hierboven staat in het geheugen van DIT proces; een tweede instantie
+           met een eigen sleutel ziet het niet en boekte bij de motor gewoon nog
+           een keer. De sleutel hangt daarom aan het VERZOEK: de tweede boeking
+           krijgt van het grootboek de eerste terug (`herhaald`), en dan is dit
+           verzoek al betaald en wordt het niet nog eens als betaling gemeld. */
+        const b = await boekAsync({ van: rekLid(codenaam), naar: rekLid(v.van), centen: v.centen, soort: 'klompje', oms: v.oms, ref: v.id,
+          economischeSleutel: maakSleutel('pay-klompje', [v.id]) });
         if (b.error) return b;
-        v.status = 'betaald';
-        v.betaaldAt = nu();
-        save();
+        if (v.status === 'open') { v.status = 'betaald'; v.betaaldAt = nu(); save(); }
+        if (b.herhaald) return { ok: true, alBetaald: true, saldo: saldoVan(rekLid(codenaam)), bijgeladen: z.bijgeladen };
         seintje(v.van);
         return { ok: true, saldo: saldoVan(rekLid(codenaam)), bijgeladen: z.bijgeladen };
       } finally {

@@ -60,7 +60,8 @@ module.exports = (ctxIn) => {
   /* duurzaam: geld is de enige laag waar bevestigen vóór duurzaamheid een belofte
      is die de opslag nog niet heeft gedaan. Boeking en idem-sleutel zitten al in
      EEN bundel (zie lib/idem.js); deze vlag maakt die bundel ook duurzaam. */
-  const metIdem = require('../../lib/idem')({ d, save: paySave, naam: 'payIdem', bijeen, duurzaam: true });
+  const metIdem = require('../../lib/idem')({ d, save: paySave, naam: 'payIdem', bijeen, duurzaam: true,
+    sleutelPlicht: () => geldModus === 'motor' });
 
   /* De waardepoort (./poort.js): de toets die VOOR elke boeking gaat -- de oude
      saldo-regel als bodem, daarbovenop klasse, beleid, reserveringen en plafond.
@@ -79,7 +80,8 @@ module.exports = (ctxIn) => {
      verandert welke ONDERDELEN aan elkaar hangen. */
   const { pasToe, boek, boekAsync } = require('./boeking')({
     saldi, saldoVan, grootboek, payBoekingenVoegToe, save: paySave, id, schoon, nu, waardePoort,
-    betalingenUit, uitFout, geldModus, motorklant, schaduw, MIN_CENTEN, MAX_CENTEN });
+    betalingenUit, uitFout, geldModus, motorklant, schaduw, boekEenmaal: economischeBoekingEenmaal,
+    MIN_CENTEN, MAX_CENTEN });
 
   /* Het oplaaddeel (laadOp, bankdekking, zorgSaldo, herstart-reconcile) staat
      in ./opladen.js; het krijgt de guard (boekAsync) en de helpers mee en

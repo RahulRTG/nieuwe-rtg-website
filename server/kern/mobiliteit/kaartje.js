@@ -29,6 +29,8 @@ const PRODUCTEN = {
   zitplaats: { naam: 'Zitplaats', factor: 1, urenGeldig: 24, ritten: 1, toeslag: 150 }
 };
 
+const { maakSleutel } = require('../../db/economische-identiteit');
+
 module.exports = (ctx) => {
   const { db, save, crypto, id, schoon, nu, codenaamVan, haversine, pay,
     findSupplier, ovPrijsVan, modAan, magVerkopen, notify, opslag } = ctx;
@@ -121,13 +123,17 @@ module.exports = (ctx) => {
         idem: body.idem ? 'kaartlaad:' + schoon(body.idem, 60) : undefined });
       if (l.error) return { status: l.status || 402, error: l.error };
     }
+    // id voor de boeking, sleutel eraan: zie ./abonnement.js
+    const aankoopId = id('kt');
     const b = await pay.boekAsync({ van: rek, naar: 'partner:' + zaak.code, centen: prijs, soort: 'ovkaart',
-      oms: p.naam + ' · ' + lijn.naam + (van ? ' · ' + van.naam + ' - ' + naar.naam : '') });
+      oms: p.naam + ' · ' + lijn.naam + (van ? ' · ' + van.naam + ' - ' + naar.naam : ''), ref: aankoopId,
+      economischeSleutel: maakSleutel('pay-handeling', body.idem
+        ? ['ovkaart', codenaam, schoon(body.idem, 60)] : ['ovkaart', aankoopId]) });
     if (b.error) return { status: b.status || 400, error: b.error };
 
     const start = new Date();
     const k = {
-      id: id('kt'),
+      id: aankoopId,
       key: session.key, codenaam,
       vervoerder: zaak.code, vervoerderNaam: zaak.name,
       lijnId: lijn.id, lijnNaam: lijn.naam, soort: lijn.soort,

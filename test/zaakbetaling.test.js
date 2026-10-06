@@ -18,6 +18,7 @@
    5. een annulering boekt het geld ECHT terug, en maar een keer.
 
    Draai los: node --experimental-sqlite --test test/zaakbetaling.test.js */
+const metDekking = require('./lib/dekking');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -226,14 +227,14 @@ test('verzilverde punten landen in de wallet, niet in een tweede saldo', async (
 test('een mislukte of herhaalde betaling laat geen boeking en geen verdampt tegoed achter', async () => {
   const MAX = 500000;   // MAX_CENTEN uit kern/pay/stand.js
   const geboekt = [];
-  const nepPay = require('../server/kern/pay/zaakbetaling')({
+  const nepPay = require('../server/kern/pay/zaakbetaling')(metDekking({
     schoon: (x, n) => String(x == null ? '' : x).slice(0, n),
     rekLid: c => 'lid:' + c, rekPartner: c => 'partner:' + c, saldoVan: () => 0,
     metIdem: (sleutel, afdruk, werk) => werk(),
     boekAsync: async (b) => { geboekt.push(b); return { ok: true, boeking: { id: 'B' + geboekt.length } }; },
     zorgSaldo: async () => ({ ok: true, bijgeladen: 0 }),
     seintje: () => {}, MIN_CENTEN: 1, MAX_CENTEN: MAX
-  });
+  }));
 
   // 1. boven de grens: weigeren, en niets boeken
   const teGroot = await nepPay.betaalZaak({ codenaam: 'A', supplierCode: 'Z', centen: MAX + 1, bijlageCenten: 0 });

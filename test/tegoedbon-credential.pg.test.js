@@ -17,6 +17,7 @@
    beide instances claimden, en de proef zakte op "precies een boeking uit de
    escrow" (kreeg 2). Teruggedraaid, daarna groen. */
 'use strict';
+const metDekking = require('./lib/dekking');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
@@ -44,7 +45,7 @@ test('tegoedbon: claim en escrowboeking zijn atomair over twee PostgreSQL-instan
         data.payBoekingen.unshift(rij);
         return { ok: true, boeking: rij };
       };
-      return require('../server/kern/pay/tegoed')({
+      return require('../server/kern/pay/tegoed')(metDekking({
         crypto, save() {}, nu: () => nu, d: () => data,
         schoon: (s, m) => String(s == null ? '' : s).slice(0, m),
         rekLid: c => 'lid:' + c, rekPartner: c => 'partner:' + c,
@@ -59,7 +60,7 @@ test('tegoedbon: claim en escrowboeking zijn atomair over twee PostgreSQL-instan
         },
         zorgSaldo: async () => ({ ok: true }), seintje() {}, bestaatLid: async () => true,
         MIN_CENTEN: 1, MAX_CENTEN: 500000
-      });
+      }));
     };
     const lees = async pg => {
       const { rows } = await pg.pool.query(

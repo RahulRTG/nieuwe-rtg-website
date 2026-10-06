@@ -37,6 +37,7 @@
 'use strict';
 
 const verzoekcontext = require('../db/verzoekcontext');
+const { naAntwoord } = require('./antwoord-einde');
 
 const WACHT = Symbol('eindstatus');
 
@@ -55,18 +56,11 @@ function naEindstatus(res, fn) {
   if (typeof vorige === 'function') {
     res.end = function (...a) { const uit = vorige.apply(this, a); beslis(); return uit; };
   }
-  /* EEN BEKENDE LUISTERAAR EXTRA, EN DE GRENS GAAT EVEN MEE OMHOOG. Met een
-     Idempotency-Key staan idem-poort en dubbeltik allebei op res, en dan was dit
-     de elfde 'finish'-luisteraar: een MaxListenersExceededWarning per verzoek,
-     ook op een gezonde leider (herkeuring N11). Geen lek, want het is er precies
-     een per res (WACHT). Een grens van 0 is onbegrensd en blijft dat. De grens
-     geldt per emitter, dus ook 'close' en 'pipe' krijgen er een bij. */
-  if (typeof res.getMaxListeners === 'function' && typeof res.setMaxListeners === 'function') {
-    const max = res.getMaxListeners();
-    if (max > 0 && Number.isFinite(max)) res.setMaxListeners(max + 1);
-  }
-  if (typeof res.prependListener === 'function') res.prependListener('finish', beslis);
-  else if (typeof res.on === 'function') res.on('finish', beslis);
+  /* Vooraan in de gedeelde rij van ./antwoord-einde.js en niet als eigen
+     luisteraar: daarmee staat er per antwoord nog steeds EEN 'finish'-luisteraar
+     (eerder was dit de elfde, met een MaxListenersExceededWarning per verzoek;
+     herkeuring N11), en beslist de eindstatus voor de dubbeltik opruimt. */
+  naAntwoord(res, beslis, { vooraan: true });
 }
 
 /* De vorm die alle drie de lagen gebruiken: bewaar() in PostgreSQL na de

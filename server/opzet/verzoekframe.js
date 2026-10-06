@@ -37,6 +37,7 @@ const envelop = require('../kern/envelop');
 const haak = require('../kern/kosten/haak');
 const { oorzaakVan } = require('../kern/agentteken');
 const { losVanVerzoek } = require('../lib/losvanverzoek');
+const { naAntwoord } = require('../lib/antwoord-einde');
 
 const winkel = new AsyncLocalStorage();
 const SOORTEN = Object.freeze(['verzoek', 'dienst', 'webhook', 'overdracht']);
@@ -66,7 +67,7 @@ function middleware() {
     if (f.oorzaak && typeof res.setHeader === 'function') res.setHeader('X-RTG-Oorzaak', f.oorzaak);
     vanReq.set(req, f);
     const dicht = () => sluit(f);
-    res.on('finish', dicht); res.on('close', dicht);
+    naAntwoord(res, dicht); res.on('close', dicht);
     return winkel.run(f, next);
   };
 }

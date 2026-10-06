@@ -1,31 +1,31 @@
 {
  "stempel": {
-  "op": "2026-10-06T07:58:31.404Z",
-  "commit": "3cb30ef92",
+  "op": "2026-10-05T14:04:01.061Z",
+  "commit": "b71cd833",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5264,
+  "totaal": 5261,
   "geclassificeerd": 5236,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3165,
-   "NOT_APPLICABLE": 1264,
-   "LEGACY_PENDING_CLASSIFICATION": 28,
-   "PROTECTED": 628,
-   "INTENTIONALLY_NON_IDEMPOTENT": 179
+   "BLOCKED_BY_TEST_FIXTURE": 3168,
+   "NOT_APPLICABLE": 1263,
+   "LEGACY_PENDING_CLASSIFICATION": 25,
+   "PROTECTED": 625,
+   "INTENTIONALLY_NON_IDEMPOTENT": 180
   },
-  "vastgesteldDoorMens": 2123,
-  "afgeleidDoorScript": 3113,
+  "vastgesteldDoorMens": 2120,
+  "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4329,
-   "PUBLIC": 138,
-   "OBJECT_SCOPED": 764,
-   "(niet af te leiden -- vraagt een verklaring)": 17,
+   "AUTHENTICATED": 4330,
+   "PUBLIC": 134,
+   "OBJECT_SCOPED": 766,
+   "(niet af te leiden -- vraagt een verklaring)": 15,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
@@ -33,10 +33,9 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4882,
-   "niet gemeten": 116
+   "niet gemeten": 113
   },
   "voorstellen": {
-   "BLOCKED_BY_TEST_FIXTURE": 3,
    "NOT_APPLICABLE": 1
   },
   "metingVan": "2026-09-29T18:39:11.935Z"
@@ -512,30 +511,6 @@
   },
   {
    "route": "POST /api/werk-gast/besluit",
-   "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/werk-gast/betaling/start",
-   "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/werk-gast/betaling/status",
-   "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/werk-leverancier/beeld",
-   "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "PUBLIC",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/werk-leverancier/besluit",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "PUBLIC",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -6438,25 +6413,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "bedrijf.praktijk.betaalverzoek",
-   "route": "POST /api/bedrijf/praktijk/betaalverzoek",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "velden",
-   "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "bedrijf.praktijk.delen",
    "route": "POST /api/bedrijf/praktijk/delen",
    "semantiek": {
@@ -6478,25 +6434,6 @@
   {
    "mutatieId": "bedrijf.praktijk.inrichten",
    "route": "POST /api/bedrijf/praktijk/inrichten",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "velden",
-   "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "bedrijf.praktijk.leverancier",
-   "route": "POST /api/bedrijf/praktijk/leverancier",
    "semantiek": {
     "klasse": "idempotent"
    },
@@ -21191,12 +21128,14 @@
   {
    "mutatieId": "foundation.gezin.inloggen",
    "route": "POST /api/foundation/gezin/inloggen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -21206,10 +21145,10 @@
     "grond": null,
     "hindernis": "Vul naast de gezinscode uw eigen pincode in."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Vul naast de gezinscode uw eigen pincode in.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.keuken.idee",
@@ -21733,12 +21672,14 @@
   {
    "mutatieId": "foundation.gezin.profiel.kies",
    "route": "POST /api/foundation/gezin/profiel/kies",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -21748,10 +21689,10 @@
     "grond": null,
     "hindernis": "Dit profiel bestaat niet meer."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Dit profiel bestaat niet meer.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.profiel.maak",
@@ -22000,6 +21941,25 @@
    },
    "bewijs": null,
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.toestemming.gezondheid",
+   "route": "POST /api/foundation/gezin/toestemming/gezondheid",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -22470,12 +22430,14 @@
   {
    "mutatieId": "foundation.les.join",
    "route": "POST /api/foundation/les/join",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -22485,10 +22447,10 @@
     "grond": null,
     "hindernis": "Te veel pogingen. Wacht een paar minuten en probeer het opnieuw."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Te veel pogingen. Wacht een paar minuten en probeer het opnieuw.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.les.leerling.intrekken",
@@ -91168,6 +91130,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "welzijn.dagboek.toestemming",
+   "route": "POST /api/rtf/welzijn/toestemming",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinsPoort"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfkantoor.advies",
    "route": "POST /api/rtfkantoor/advies",
    "semantiek": {
@@ -130872,6 +130855,28 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "foundation.gezin.bewaren.veeg",
+   "route": "POST /api/techniek/bewaren/gezinnen",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "techAuth",
+     "eigenaarAlleen"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "techniek.controle.incident",
    "route": "POST /api/techniek/controle/incident",
    "semantiek": {
@@ -137652,82 +137657,6 @@
   {
    "mutatieId": "werk.gast.besluit",
    "route": "POST /api/werk-gast/besluit",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "PUBLIC",
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "werk-gast.betaling.start",
-   "route": "POST /api/werk-gast/betaling/start",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "PUBLIC",
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "werk-gast.betaling.status",
-   "route": "POST /api/werk-gast/betaling/status",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "PUBLIC",
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "werk-leverancier.beeld",
-   "route": "POST /api/werk-leverancier/beeld",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "PUBLIC",
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": []
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "werk-leverancier.besluit",
-   "route": "POST /api/werk-leverancier/besluit",
    "semantiek": {
     "klasse": "idempotent"
    },

@@ -1,17 +1,17 @@
 {
  "stempel": {
-  "op": "2026-10-06T07:54:35.280Z",
-  "commit": "42496f8f9",
+  "op": "2026-10-05T14:04:08.850Z",
+  "commit": "b71cd833",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 660,
-  "bewaakt": 562,
-  "openbaarMetReden": 57,
+  "zonderBewakerslaag": 655,
+  "bewaakt": 561,
+  "openbaarMetReden": 53,
   "eigenControle": 21,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
@@ -57,7 +57,7 @@
   },
   {
    "naam": "familieVan",
-   "aantal": 60
+   "aantal": 61
   },
   {
    "naam": "klasVan",
@@ -108,16 +108,16 @@
    "aantal": 8
   },
   {
-   "naam": "praktijkMutatie -> poort",
-   "aantal": 7
-  },
-  {
    "naam": "sessieVan",
    "aantal": 7
   },
   {
    "naam": "rtf.verifieerProfiel",
    "aantal": 6
+  },
+  {
+   "naam": "praktijkMutatie -> poort",
+   "aantal": 5
   },
   {
    "naam": "sessie",
@@ -737,49 +737,37 @@
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/aanbod",
-   "bestand": "server/bedrijf/praktijk.js:86",
+   "bestand": "server/bedrijf/praktijk.js:75",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/beeld",
-   "bestand": "server/bedrijf/praktijk.js:65",
+   "bestand": "server/bedrijf/praktijk.js:61",
    "staat": "bewaakt",
    "wacht": "poort"
   },
   {
-   "sleutel": "POST /api/bedrijf/praktijk/betaalverzoek",
-   "bestand": "server/bedrijf/praktijk.js:91",
-   "staat": "bewaakt",
-   "wacht": "praktijkMutatie -> poort"
-  },
-  {
    "sleutel": "POST /api/bedrijf/praktijk/delen",
-   "bestand": "server/bedrijf/praktijk.js:89",
+   "bestand": "server/bedrijf/praktijk.js:78",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/inrichten",
-   "bestand": "server/bedrijf/praktijk.js:85",
-   "staat": "bewaakt",
-   "wacht": "praktijkMutatie -> poort"
-  },
-  {
-   "sleutel": "POST /api/bedrijf/praktijk/leverancier",
-   "bestand": "server/bedrijf/praktijk.js:90",
+   "bestand": "server/bedrijf/praktijk.js:74",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/stap",
-   "bestand": "server/bedrijf/praktijk.js:88",
+   "bestand": "server/bedrijf/praktijk.js:77",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/vraag",
-   "bestand": "server/bedrijf/praktijk.js:87",
+   "bestand": "server/bedrijf/praktijk.js:76",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
@@ -1294,43 +1282,43 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/afspraak",
-   "bestand": "server/foundation/gasten/gezondheid.js:97",
+   "bestand": "server/foundation/gasten/gezondheid.js:99",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/afspraak/verwijder",
-   "bestand": "server/foundation/gasten/gezondheid.js:109",
+   "bestand": "server/foundation/gasten/gezondheid.js:112",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/medicijn",
-   "bestand": "server/foundation/gasten/gezondheid.js:68",
+   "bestand": "server/foundation/gasten/gezondheid.js:69",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/medicijn/gegeven",
-   "bestand": "server/foundation/gasten/gezondheid.js:85",
+   "bestand": "server/foundation/gasten/gezondheid.js:87",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/medicijn/verwijder",
-   "bestand": "server/foundation/gasten/gezondheid.js:78",
+   "bestand": "server/foundation/gasten/gezondheid.js:80",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/meting",
-   "bestand": "server/foundation/gasten/gezondheid.js:118",
+   "bestand": "server/foundation/gasten/gezondheid.js:121",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/gezondheid/meting/verwijder",
-   "bestand": "server/foundation/gasten/gezondheid.js:132",
+   "bestand": "server/foundation/gasten/gezondheid.js:136",
    "staat": "bewaakt",
    "wacht": "familieVan"
   },
@@ -1419,13 +1407,13 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/locatie",
-   "bestand": "server/foundation/zorg.js:15",
+   "bestand": "server/foundation/zorg.js:17",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/locatie/stop",
-   "bestand": "server/foundation/zorg.js:36",
+   "bestand": "server/foundation/zorg.js:38",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
@@ -1455,7 +1443,7 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/oppasinfo",
-   "bestand": "server/foundation/zorg.js:65",
+   "bestand": "server/foundation/zorg.js:67",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
@@ -1537,6 +1525,12 @@
    "wacht": "gezinVan"
   },
   {
+   "sleutel": "POST /api/foundation/gezin/toestemming/gezondheid",
+   "bestand": "server/foundation/gezondheidstoestemming.js:52",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
    "sleutel": "POST /api/foundation/gezin/uitnodiging/accepteer",
    "bestand": "server/foundation/gezinsuitnodiging.js:134",
    "staat": "zonderWachtMetReden",
@@ -1610,19 +1604,19 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen",
-   "bestand": "server/foundation/zorg.js:107",
+   "bestand": "server/foundation/zorg.js:118",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/bevestig",
-   "bestand": "server/foundation/zorg.js:114",
+   "bestand": "server/foundation/zorg.js:125",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/wissen/intrekken",
-   "bestand": "server/foundation/zorg.js:122",
+   "bestand": "server/foundation/zorg.js:133",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -4193,30 +4187,6 @@
    "bestand": "server/bedrijf/praktijk-gast.js:16",
    "staat": "openbaar",
    "reden": "Dezelfde beperkte gastlink, met versiecontrole: uitsluitend eenmalig akkoord of afwijzen van het gedeelde voorstel, geen account of andere rechten."
-  },
-  {
-   "sleutel": "POST /api/werk-gast/betaling/start",
-   "bestand": "server/bedrijf/praktijk-betalen-routes.js:9",
-   "staat": "openbaar",
-   "reden": "Actuele klantcapability plus financieel bevoegd vrijgegeven betaalverzoek; serverbedrag en ontvanger duurzaam vast vóór provideroproep, nooit zelf betaald verklaren."
-  },
-  {
-   "sleutel": "POST /api/werk-gast/betaling/status",
-   "bestand": "server/bedrijf/praktijk-betalen-routes.js:24",
-   "staat": "openbaar",
-   "reden": "Actuele klantcapability toont uitsluitend de centrale providerwaarheid van de eigen opdracht; geen betalingId uit de client."
-  },
-  {
-   "sleutel": "POST /api/werk-leverancier/beeld",
-   "bestand": "server/bedrijf/praktijk-leverancier-routes.js:10",
-   "staat": "openbaar",
-   "reden": "Tijdelijk hash-only capabilitygeheim voor één leveranciersopdracht; huidige uitgeversrechten en tenant worden iedere keer gecontroleerd."
-  },
-  {
-   "sleutel": "POST /api/werk-leverancier/besluit",
-   "bestand": "server/bedrijf/praktijk-leverancier-routes.js:14",
-   "staat": "openbaar",
-   "reden": "Eenmalig leveranciersantwoord op precies één versie, met actuele capabilitycontrole en duurzame opslag. Geen accounttoegang."
   },
   {
    "sleutel": "POST /api/werkmail/bezorg",

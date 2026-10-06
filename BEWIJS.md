@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2333 bestanden en 16002 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2333 bestanden en 16001 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2333 |
-| losse beweringen (`test(...)`) | 16002 |
+| losse beweringen (`test(...)`) | 16001 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2158 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2029 bestanden, 15473 beweringen.
+2029 bestanden, 15472 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -198,7 +198,6 @@ toets omvalt.
 | `beleidsmotor-werkwoorden.test.js` | 4 | gezakt op `liegpoort /api/` | DE BOARDROOM ALS WERKRUIMTE, DE KAMERS APART (AUTHORITY.md fase 4, schaduw). Vier dingen die niet mogen sneuvelen: 1. |
 | `beleidsmotor.test.js` | 7 | gezakt op `liegpoort /api/` | DE BELEIDSMOTOR IN DE SCHADUW (AUTHORITY.md fase 1, besluiten A1 en A3). Vier dingen die niet mogen sneuvelen: 1. |
 | `belofte.test.js` | 4 | gezakt op `!==->===#0` | Het belofteregister (scripts/belofte.js + BELOFTE.json): elke toezegging draagt haar dekking, en die dekking moet er echt zijn. Deze toets bewijst dat de meter de drie standen goed uit elkaar houdt -- en vooral dat... |
-| `benoemde-toekenningen.test.js` | 7 | gezakt op `===->!==#0` | BENOEMDE TOEKENNINGEN OP DE HUISWET (Fase 1, spoor 2). De machtiging van een vertegenwoordiger en de servicemachtiging hadden elk een eigen doorsnede. |
 | `beproeving-contract.test.js` | 2 | gezakt op `+->-#2` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `bereikbaar.test.js` | 2 | geen module gevonden | ELK SCHERM MOET TE BEREIKEN ZIJN DOOR TE TIKKEN. Geen aannames. |
 | `berichten.test.js` | 10 | gezakt op `liegpoort /api/` | De Berichten-app (routes/member/berichten.js): alle gesprekken van het platform op een plek -- Rahul, de Berichtenbox van MijnOverheid en de Pulse-reacties (de vrienden-DM's en werk-chats liften op dezelfde lijst mee). |
@@ -1531,6 +1530,7 @@ toets omvalt.
 | `rtgzetel.test.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtmail-ai.test.js` | 8 | gezakt op `liegpoort /api/` | De AI-hulp bij een gesprek: samenvatten, actiepunten en het uitleggen van phishing-risico. Drie beweringen, en de eerste is de voorwaarde waaronder de andere twee mogen bestaan: 1. |
 | `rtmail-bestuur.test.js` | 12 | gezakt op `liegpoort /api/` | RTMAIL, het bestuur: rechten, delegatie, journaal, bewaartermijn, juridische bewaring, aantoonbare vernietiging en export. De zes beweringen die deze laag draagt, en ze zijn allemaal van het soort waar een... |
+| `rtmail-delegatie.test.js` | 6 | gezakt op `===->!==#0` | RTMAIL, delegatie op de huiswet (UITVOERINGSPLAN par. 8: rtmail-recht.delegeer, REDESIGN FIRST). |
 | `rtmail-lid.test.js` | 7 | gezakt op `liegpoort /api/` | RTMAIL aan de lid-kant: elk nieuw lid krijgt een welkom in zijn eigen postvak, dat als kanaal in de verenigde Berichten-app verschijnt en te lezen is. End-to-end tegen een echte server. |
 | `rtmail-schrijf.test.js` | 10 | gezakt op `liegpoort /api/` | RTMAIL, de schrijfkant: concepten, uitgesteld verzenden, handtekening, afwezigheid, aliassen en de regels die bij de BEZORGING draaien. De vier beweringen die er het meest toe doen: 1. |
 | `rtmail-team.test.js` | 9 | gezakt op `liegpoort /api/` | RTMAIL-teams: een adres dat meerdere mensen samen lezen (receptie@partner.rtg). Toetst de vier beloftes van kern/rtmail-team.js: het adres volgt de oprichter, een team kaapt nooit een bestaand postvak, toewijzen... |

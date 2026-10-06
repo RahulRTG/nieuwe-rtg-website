@@ -12670,6 +12670,14 @@
       "gezakt": 12,
       "scherp": "gezakt"
     },
+    "rtmail-delegatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/rtmail-lijn.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "rtmail-lid.test.js": {
       "soort": "server",
       "staat": "gezakt",

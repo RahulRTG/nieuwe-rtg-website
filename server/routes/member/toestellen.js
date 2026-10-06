@@ -12,11 +12,17 @@
    ========================================================================== */
 'use strict';
 const klok = require('../../lib/klok');
+const { schoneJwk, idVan } = require('../../kern/identiteit/toestelsleutels');
+const { maakHerbevestiging } = require('../../kern/identiteit/herbevestiging');
 
 const TOKEN_MAX_MS = 30 * 24 * 3600 * 1000;
 
 module.exports = (kern) => {
-  const { app, auth, accounts, sessieregister, toestellen, handelingsspoor } = kern;
+  const { app, auth, accounts, sessieregister, toestellen, handelingsspoor, tooManyTries, noteFailedTry } = kern;
+  /* De zware poort via een getter: hij wordt later in de montage gebouwd dan
+     deze routes (opzet/kernlaag7-eigenaar.js). */
+  const herbevestiging = maakHerbevestiging({ accounts, zwaarVan: () => kern.zwaarbewijs,
+    tooManyTries, noteFailedTry });
 
   const eisLid = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }
@@ -47,6 +53,40 @@ module.exports = (kern) => {
   app.post('/api/mijn/toestel/bind', auth, async (req, res) => {
     if (!eisLid(req, res)) return;
     if (!toestellen) return res.status(503).json({ error: 'Toestelbinding is hier niet beschikbaar.' });
+
+    /* EEN SESSIE BINDT EEN KEER (P1-1). De sleutelbinding is wat een gestolen
+       token waardeloos maakt; mocht een tweede binding met een ANDERE sleutel
+       hem vervangen, dan bond een dief met alleen het token zijn eigen sleutel
+       en tekende hij daarna zelf elk bezitsbewijs. Dezelfde sleutel nog een
+       keer mag -- dat verandert niets. Een andere sleutel vraagt een nieuwe
+       inlog, en die geeft een nieuwe sessie. De kern zegt hetzelfde
+       (sessieregister.vul); hier staat hij VOOR toestellen.bind, zodat een
+       geweigerde poging ook geen toestel op het account achterlaat. */
+    const bestaand = req.session.sessieContext && req.session.sessieContext.sleutelbinding;
+    const jwkNieuw = schoneJwk(req.body.jwk);
+    if (bestaand && bestaand.keyRef && (!jwkNieuw || idVan(jwkNieuw) !== bestaand.keyRef)) {
+      spoor(req, 'toestel-herbinding-geweigerd', {});
+      return res.status(409).json({ opnieuwInloggen: true,
+        error: 'Deze sessie is al aan een toestel gebonden. Een andere sleutel binden kan alleen in een nieuwe sessie: log opnieuw in op dat toestel.' });
+    }
+
+    /* DE EERSTE BINDING VAN EEN OUDE SESSIE vraagt een herbevestiging. Vlak na
+       het inloggen heeft de mens zich net getoond; daarna is het token het enige
+       bewijs, en dat is precies wat een dief heeft. Onbekend is niet vers. */
+    if (!bestaand) {
+      /* Een register dat niet te lezen is, zegt niets over wanneer de mens er
+         was: dan geldt de sessie als oud en vraagt binden een herbevestiging. */
+      let rij = null;
+      try { rij = sessieregister && req.session.sid ? sessieregister.lees(req.session.sid) : null; } catch (e) { rij = null; }
+      if (!herbevestiging.versGeopend(rij && rij.geopendOp)) {
+        const hb = await herbevestiging.eis(req, res, { actie: 'toestel-binden', wegen: ['wachtwoord', 'passkey'],
+          omschrijving: 'Dit toestel bevestigen in een sessie die langer dan tien minuten open staat' });
+        if (hb.verstuurd) return;
+        if (!hb.ok) { spoor(req, 'toestel-binding-geweigerd', { reden: 'herbevestiging' });
+          return herbevestiging.stuur(res, Object.assign({}, hb, { passkey: herbevestiging.heeftPasskey(req.session.account) })); }
+      }
+    }
+
     const r = await toestellen.bind(req.session.key, req.body.jwk, req.body.handtekening, req.body.naam);
     if (r.error) return res.status(400).json(r);
 
@@ -74,6 +114,14 @@ module.exports = (kern) => {
            waar deze laag over gaat. */
         sleutelbinding: { keyRef: r.toestelId, schema: 'rtg-bezitsbewijs-v1', herkomst: hk }
       });
+      /* Een gelijktijdige tweede binding die de controle hierboven net voor
+         was, weigert de kern alsnog. Dan is DEZE binding niet in de sessie
+         gekomen, en dat hoort het antwoord te zeggen in plaats van `ok`. */
+      if (uit && uit.reden === 'herbinding') {
+        spoor(req, 'toestel-herbinding-geweigerd', {});
+        return res.status(409).json({ opnieuwInloggen: true,
+          error: 'Deze sessie is al aan een toestel gebonden. Een andere sleutel binden kan alleen in een nieuwe sessie: log opnieuw in op dat toestel.' });
+      }
       inSessie = !!(uit && uit.ok);
     }
     spoor(req, 'toestel-gebonden', { toestelId: r.toestelId, nieuw: !!r.nieuw });

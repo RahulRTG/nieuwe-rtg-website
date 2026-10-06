@@ -377,6 +377,12 @@ async function startEens(opts) {
          een PRODUCTIEtoets dus ook niet: de productiekeuring weigert hem
          (config/productie-lokaal.js), net als RTG_DEMO hieronder. */
       ...(((opts.env || {}).NODE_ENV) === 'production' ? {} : { RTG_DEV_LINKS: '1' }),
+      /* Een toetsserver hoort bij deze machine: de loopback. In de toetsstand
+         dwingt de server dat zelf af (server/config/omgeving.js); voor een toets
+         die NODE_ENV=development meegeeft is dit het bewijs van een lokale
+         installatie dat RTG_DEV_LINKS hierboven vraagt (CONFIG P1-2). Een toets
+         die een ander adres wil, geeft RTG_BIND zelf mee. */
+      RTG_BIND: '127.0.0.1',
       /* De meeste toetsen leunen op de demo-stand (vaste inlog, bekend
          eigenaarsaccount). Op een echte server staat die UIT tenzij iemand hem
          aanzet -- hij stond aan zolang NODE_ENV niet gezet was, en dat zette het

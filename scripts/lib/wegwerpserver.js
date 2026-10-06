@@ -54,6 +54,10 @@
 function gereedschapsomgeving({ poort, datamap }, eigen) {
   const env = Object.assign({}, process.env, {
     PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
+    /* Een meetserver is van deze machine en van niemand anders: alleen de
+       loopback. Dat is ook wat RTG_DEV_LINKS (contextdoorgifte) als bewijs van
+       een lokale installatie vraagt (server/config/omgeving.js). */
+    RTG_BIND: '127.0.0.1',
     /* DE SCHORSPOORT STAAT UIT OP EEN MEETSERVER, en dat is geen versoepeling
        maar de reparatie van een lus die zichzelf dichttrok.
 

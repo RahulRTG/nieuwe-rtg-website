@@ -106,6 +106,7 @@ module.exports = (kern) => {
        alvast kijken zou dit een manier maken om te ontdekken welke adressen een
        RTG-account hebben, en dat is precies de vraag die de kluis niet hoort te
        beantwoorden. */
+    if (!appUrl(req)) return res.status(503).json({ error: require('../../lib/linkbasis').ONTBREEKT, code: 'app-url-ontbreekt' });
     const tok = accounts.issueActionToken(u.id, 'mailwissel', WISSEL_MS);
     const md = accounts.getMemberState(u.id) || {};
     /* Bind de link aan precies deze aanvraag. Een oudere link voor adres A mag

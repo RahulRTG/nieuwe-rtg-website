@@ -3,6 +3,7 @@
    de gedeelde context een keer bij het opstarten vanuit routes/auth.js. */
 const eigenaar = require('../../eigenaar'); // een bron van waarheid over wie de eigenaar is
 const { legInlogVast } = require('../../kern/identiteit/inlogherkomst');
+const { ONTBREEKT } = require('../../lib/linkbasis');
 
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
@@ -12,6 +13,9 @@ app.post('/api/auth/register', async (req, res) => {
   // Registratie-zekering (een noodrem-trede dooft vanzelf; zie techniek.js).
   const zReg = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.registratie;
   if (require('../../techniek').zekeringGesprongen(zReg)) return res.status(503).json({ error: 'Registreren is tijdelijk uitgeschakeld.' });
+  /* De bevestigingsmail draagt een link, en die wordt nooit gebouwd uit een kop
+     van de aanvrager (lib/linkbasis.js). Zonder vaste basis: eerst niets aanmaken. */
+  if (!appUrl(req)) return res.status(503).json({ error: ONTBREEKT, code: 'app-url-ontbreekt' });
   /* De poortcontrole staat in ./aanmeldcontrole.js: wat mag er binnenkomen en
      met welke pas. Die geeft een fout terug of de schoongemaakte velden; hier
      blijft staan wat we met een GOEDGEKEURDE aanmelding doen. */
@@ -100,6 +104,7 @@ app.post('/api/auth/verify-email', async (req, res, next) => {
 
 app.post('/api/auth/resend', auth, (req, res) => {
   if (!req.session.account) return res.status(403).json({ error: 'Alleen voor accounts.' });
+  if (!appUrl(req)) return res.status(503).json({ error: ONTBREEKT, code: 'app-url-ontbreekt' });
   const u = req.session.account;
   const vtok = accounts.issueActionToken(u.id, 'verify-email', 3 * 86400000);
   const md = accounts.getMemberState(u.id) || {};

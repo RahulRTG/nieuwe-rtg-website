@@ -186,7 +186,7 @@ test('6. verlengen met een passkey: zeven dagen erbij, gebonden aan deze sessie;
   const zonderPk = await post('/api/rtf/gezin/passkey', { code: g.code, token: g.token }, kop(lid));
   assert.equal(zonderPk.status, 403, 'een account zonder passkey koppelt niets (geen terugval): ' + zonderPk.tekst);
   const pk = kantoorPasskey(base);
-  const sleutel = await pk.zet(lid);
+  const sleutel = await pk.zet(lid, 'geheim123');
   const origin = new URL(base).origin;
   assert.equal((await post('/api/rtf/gezin/passkey', { code: g.code, token: 'GZ.' + '0'.repeat(32) }, kop(lid))).status, 403);
   const vraag = await post('/api/rtf/gezin/passkey', { code: g.code, token: g.token }, kop(lid));

@@ -190,15 +190,21 @@ test('18. productie + RTG_LIEG of RTG_STAATLOG weigert de start (C4)', () => {
     'RTG_STAATLOG=0 is uit');
 });
 
-test('19. RTG_DEV_LINKS op een ONBEKEND adres zonder NODE_ENV: geen blokkade, wel een waarschuwing (C4)', () => {
+/* Deze toets stond eerst andersom ("onbekend: geen blokkade, wel een
+   waarschuwing") en legde daarmee het gat vast: een server zonder APP_URL op een
+   publiek IP startte met elk account over te nemen (CONFIG P1-2). RTG_DEV_LINKS
+   vraagt de STRENGE richting -- bewezen lokaal of geen start -- net als
+   RTG_PRIVATE_BETA. */
+test('19. RTG_DEV_LINKS op een ONBEKEND adres zonder NODE_ENV: geen start (C4, CONFIG P1-2)', () => {
   const { NODE_ENV, ...zonderProd } = VEILIG;
   for (const APP_URL of [undefined, 'https://rtg-intern', 'https://rtg.example.com']) {
     const env = { ...zonderProd, RTG_DEV_LINKS: '1' };
     if (APP_URL) env.APP_URL = APP_URL; else delete env.APP_URL;
     const r = config.valideer(env);
-    assert.equal(r.hardeFouten.some(f => /RTG_DEV_LINKS/.test(f)), false, 'onbekend is geen openbaar: geen harde fout');
-    assert.ok(r.waarschuwingen.some(f => /RTG_DEV_LINKS/.test(f)), 'maar het staat er wel (' + (APP_URL || 'geen APP_URL') + ')');
+    assert.ok(r.hardeFouten.some(f => /RTG_DEV_LINKS/.test(f)), 'onbekend is niet lokaal: harde fout (' + (APP_URL || 'geen APP_URL') + ')');
   }
+  const lokaal = config.valideer({ ...zonderProd, RTG_DEV_LINKS: '1', APP_URL: 'http://localhost:3000' });
+  assert.equal(lokaal.hardeFouten.some(f => /RTG_DEV_LINKS/.test(f)), false, 'een bewezen lokale installatie mag hem zetten');
 });
 
 test('20. een OPENBAAR adres zonder NODE_ENV weigert ook de proefstanden die zichzelf alleen in productie weigeren (C4)', () => {

@@ -107,7 +107,7 @@ test('echte productieserver: de kantoorcode opent niets, op naam met een passkey
 
   // 5. een passkey op het eigen account, en dan de ceremonie aan de kantoordeur
   const sleutel = maakAuthenticator(new URL(APP).hostname);
-  const ro = await api('/api/webauthn/registreer/opties', {}, lid);
+  const ro = await api('/api/webauthn/registreer/opties', { huidig: 'Geheim123!' }, lid);
   assert.equal(ro.status, 200, 'registratieopties: ' + JSON.stringify(ro.body).slice(0, 160));
   const rr = await api('/api/webauthn/registreer', { antwoord: sleutel.registratieAntwoord(ro.body.opties.challenge, APP),
     naam: 'Toestel kantoor' }, lid);

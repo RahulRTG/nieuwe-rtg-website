@@ -64,7 +64,7 @@ test('het clientgeheim: zetten, roteren met overlap, nooit terug, en dicht met d
     password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
   const kantoor = (await api('/api/office/login', { code: 'KANTOOR-SSOGEHEIM' })).body.token;
   assert.ok(lid && kantoor);
-  const zw = await zwaarApi(api, proef.base, eig); // B22: verse passkey onder elk geheim
+  const zw = await zwaarApi(api, proef.base, eig, 'Imran'); // B22: verse passkey onder elk geheim
 
   for (const org of ['goed', 'gerekt', 'oud']) {
     const r = await zw('/api/techniek/sso', koppeling(org, GEHEIM), eig);

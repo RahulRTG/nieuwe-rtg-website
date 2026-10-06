@@ -162,10 +162,17 @@ const APP_URL_VAST = (() => {
   if (eerste) return 'https://' + eerste.replace(/^https?:\/\//, '').replace(/\/+$/, '');
   return null;
 })();
+/* 4 (vervolg). "Gewoon de header" was buiten productie OOK een server zonder
+   NODE_ENV op een publiek adres, en daar schreef een POST /api/auth/forgot met
+   `Origin: https://kwaad.example` precies die link in de mail. De kop levert de
+   basis nu alleen als de link naar deze machine of het eigen netwerk wijst, of
+   in de toetsstand (die alleen op de loopback luistert). Anders: '' -- en dan
+   weigert de route die een link wil versturen, met de reden (lib/linkbasis.js). */
+const linkbasis = require('./lib/linkbasis');
 function appUrl(req) {
   if (APP_URL_VAST) return APP_URL_VAST;
   if (PRODUCTION) return 'https://localhost';
-  return (req && req.headers && req.headers.origin) || (req ? req.protocol + '://' + req.get('host') : '');
+  return linkbasis.basisUitVerzoek(req, process.env);
 }
 
 // Fail-fast: weiger te starten als productie onveilig is ingesteld (demo aan,

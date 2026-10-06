@@ -35,7 +35,7 @@ const tel = () => '06' + String(10000000 + Math.floor(Math.random() * 8e7));
 
 async function zetPasskey(api, lid) {
   const sleutel = maakAuthenticator(HOST);
-  const ro = await api('/api/webauthn/registreer/opties', {}, lid);
+  const ro = await api('/api/webauthn/registreer/opties', { huidig: 'Geheim123!' }, lid);
   const rr = await api('/api/webauthn/registreer', { antwoord: sleutel.registratieAntwoord(ro.body.opties.challenge, APP), naam: 'Toestel' }, lid);
   assert.equal(rr.status, 200, kort(rr.body));
   return sleutel;

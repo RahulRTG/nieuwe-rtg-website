@@ -31,6 +31,8 @@ const { ZWARE_ACTIES } = require('./webauthn-acties');
    versienummer: verandert de vorm ooit, dan verlopen oude ceremonies vanzelf in
    plaats van half te passen. */
 const ZWAAR_BINDING = 'rtg-zwaar-v1';
+const { sla } = require('../lib/verraad');
+const STORING = 'De bevestiging kon niet worden gecontroleerd; er is niets uitgevoerd.';
 
 /* DE SESSIESLEUTEL VOOR DE BINDING -- een vingerafdruk van het bearer-token en
    niet het token zelf, want dat zou daarmee in de ceremonie-opslag terechtkomen.
@@ -80,7 +82,12 @@ module.exports = ({ zwaarBeveiliging, appUrl, log, beveiligVan, accounts, envelo
     }
     if (!user) return { status: 403, error: 'Deze handeling hoort bij een eigen RTG-account.' };
 
-    if (!zwaarBeveiliging.nodig(user)) {
+    // A-P1-04: storing is geen "geen passkey" (dat opent de terugval)
+    let heeft;
+    try { if (sla('passkeypoort-faalt')) throw new Error('verraad'); heeft = zwaarBeveiliging.nodig(user); }
+    catch (e) { return { status: 503, error: STORING }; }
+
+    if (!heeft) {
       // geld op kantoor: geen terugval (besluit eigenaar 25-09-2026, routes/kantoren/bank-passkey.js)
       if (zonderTerugval) return { status: 403, watNu: 'passkey-zetten', actie,
         error: (omschrijving || 'Deze handeling') + ' vraagt een passkey, en dit account heeft er nog geen. ' +
@@ -103,9 +110,14 @@ module.exports = ({ zwaarBeveiliging, appUrl, log, beveiligVan, accounts, envelo
         error: 'Bevestig deze handeling met uw passkey.' };
     }
 
-    const r = await zwaarBeveiliging.maak(user, actie, binding(actie, sleutel),
-      req.body.ceremonie, req.body.antwoord, oorsprong(req), gastheer(req));
-    if (r.error) return r;
+    let r;
+    try {
+      r = await zwaarBeveiliging.maak(user, actie, binding(actie, sleutel),
+        req.body.ceremonie, req.body.antwoord, oorsprong(req), gastheer(req));
+    } catch (e) { return { status: 503, error: STORING }; }
+    // nodig:false = de passkey verdween tussendoor
+    if (!r || r.error || !r.ok || r.nodig === false)
+      return r && r.error ? r : { status: 401, error: 'De passkey kon deze handeling niet bevestigen.' };
 
     if (log && log.info) log.info('zwaar-bevestigd', { actie, door: user.id });
     const bb = beveiligNu();
@@ -151,5 +163,8 @@ module.exports = ({ zwaarBeveiliging, appUrl, log, beveiligVan, accounts, envelo
     try { return accounts.getUserById(Number(k.slice(5))) || null; } catch (e) { return null; }
   }
 
-  return { opties, eis, binding, stuur, sessieSleutel, boardroomUser };
+  // staat er een passkey? (ook voor ./identiteit/herbevestiging.js)
+  const heeftPasskey = user => !!(user && zwaarBeveiliging.nodig(user));
+
+  return { opties, eis, binding, stuur, sessieSleutel, boardroomUser, heeftPasskey };
 };

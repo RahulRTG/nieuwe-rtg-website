@@ -31,51 +31,34 @@
    elkaar lopen. */
 'use strict';
 
-/* Gereserveerde en niet-routeerbare naamruimtes. Een adres hierin is geen bewijs
-   van openbaar EN geen bewijs van lokaal -- het is een naam die nooit op het
-   open internet uitkomt maar ook geen privaat netwerkadres is. RFC 6761 (.test,
-   .invalid, .example, .localhost) plus de twee achtervoegsels die dit huis zelf
-   in zijn eigen documenten gebruikt. */
-const ONBESLIST_ACHTERVOEGSEL = ['.test', '.invalid', '.example', '.localhost', '.internal', '.intern',
-  /* RFC 2606 reserveert niet alleen die TLD's maar OOK drie tweede-niveau-domeinen,
-     en die stonden er eerst niet bij. Gevolg: `rtg.example.com` -- dat twee
-     bestaande toetsen als APP_URL gebruiken (golive, poortwacht) -- werd als
-     `openbaar` aangemerkt. Vandaag brak dat niets omdat die toetsen met
-     NODE_ENV=production draaien, waar de bestaande grendel het al afvangt; de
-     CLASSIFICATIE was er niet minder fout om, en hij zou bij de eerste toets
-     zonder die vlag alsnog bijten. */
-  '.example.com', '.example.net', '.example.org'];
-
-function priveIPv4(host) {
-  if (/^10\./.test(host) || /^192\.168\./.test(host)) return true;
-  const m = /^172\.(\d+)\./.exec(host);
-  return !!m && Number(m[1]) >= 16 && Number(m[1]) <= 31;
-}
-
-/* 'lokaal' | 'openbaar' | 'onbekend' voor een kale hostnaam (zonder schema).
-   Een lege of onleesbare naam is 'onbekend' en nooit iets anders. */
-function adresSoort(host) {
-  const h = String(host || '').trim().toLowerCase();
-  if (!h) return 'onbekend';
-  if (h === 'localhost' || h === '127.0.0.1' || h === '::1' || h === '[::1]') return 'lokaal';
-  if (h.endsWith('.local')) return 'lokaal';
-  if (priveIPv4(h)) return 'lokaal';
-  if (h === 'example.com' || h === 'example.net' || h === 'example.org') return 'onbekend';
-  if (ONBESLIST_ACHTERVOEGSEL.some(s => h.endsWith(s))) return 'onbekend';
-  /* Een naam zonder punt is een hostnaam op het eigen netwerk (een
-     containernaam, een servicenaam), geen publiek domein. */
-  if (!h.includes('.')) return 'onbekend';
-  /* Een adres waar de wereld bij kan, is per definitie niet te bewijzen vanaf
-     binnen het proces. Wat hier overblijft is een naam die als publiek domein
-     is OPGEGEVEN, en dat is de bewering waar we hem aan houden. */
-  return 'openbaar';
-}
+/* De adressoort (lokaal | openbaar | onbekend) van een kale hostnaam staat in
+   ./adressoort.js: een eigen onderwerp, en dit bestand ging erdoor over de 10 KB. */
+const { adresSoort } = require('./adressoort');
 
 /* De soort van deze installatie, afgeleid uit het adres dat zij zelf opgeeft.
    APP_URL is daarvoor de juiste bron en niet de Host-header: productie mag
    gevoelige links niet uit die header afleiden (../config/productie.js), dus
    APP_URL is al het vaste publieke adres van dit huis. */
 function installatieSoort(env) {
+  /* EEN TWEEDE OPGAVE: een publiek certificaat. Wie RTG_ACME=1 met een
+     RTG_TLS_DOMAIN zet, vraagt Let's Encrypt om een certificaat voor die naam --
+     en dat lukt alleen als de wereld die naam op deze machine kan bereiken. Dat
+     is dus net zo goed een bewering "ik ben openbaar" als APP_URL, en hij gaat
+     voor: een lokaal APP_URL naast een publiek certificaat is een installatie
+     die zichzelf tegenspreekt, en bij twijfel telt de openbare kant.
+
+     RTG_DOMAINS ook. Die variabele draagt meestal de namen van CODEdomeinen
+     (member, social -- server/opzet/routes.js), en die hebben geen punt en
+     blijven dus 'onbekend'. Maar ../server.js leest het eerste element als
+     HOSTNAAM voor de links in een e-mail (APP_URL_VAST), dus staat er een
+     publieke naam in, dan beweert de installatie daarmee dat ze daar woont. */
+  const lijst = (v) => String(v || '').split(',').map(d => d.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/[/:].*$/, '')).filter(Boolean);
+  const opgaven = [
+    ...(env && env.RTG_ACME === '1' ? lijst(env.RTG_TLS_DOMAIN).map(h => [h, 'RTG_TLS_DOMAIN (RTG_ACME=1)']) : []),
+    ...lijst(env && env.RTG_DOMAINS).map(h => [h, 'RTG_DOMAINS'])
+  ];
+  const publiek = opgaven.find(([h]) => adresSoort(h) === 'openbaar');
+  if (publiek) return { soort: 'openbaar', host: publiek[0], reden: null, bron: publiek[1] };
   const ruw = String((env && env.APP_URL) || '').trim();
   if (!ruw) return { soort: 'onbekend', host: null, reden: 'APP_URL is niet gezet' };
   let host = null;
@@ -129,10 +112,23 @@ function keurOpenbareBouwstand(env, bakken) {
       + 'een pincode uit de broncode en een betaalprovider die zichzelf bevestigt.');
   }
 
-  // RTG_DEV_LINKS op een niet-openbaar adres: geen blokkade, wel hardop (C4)
-  if (stand.soort !== 'openbaar' && env.RTG_DEV_LINKS === '1' && !productie)
-    waarschuwingen.push('RTG_DEV_LINKS=1: herstellinks staan in het antwoord; openbaar of niet is niet vast te stellen ('
-      + (stand.reden || stand.host) + '). Staat het open, zet de vlag uit.');
+  /* RTG_DEV_LINKS ALLEEN OP EEN AANTOONBAAR LOKALE INSTALLATIE (P1-2 config).
+     Hier stond een waarschuwing voor elk adres dat niet aantoonbaar openbaar
+     was -- de VOORZICHTIGE richting van dit bestand. Voor deze vlag is dat de
+     verkeerde: hij zet de herstellink, de verificatielink en de sms-code in het
+     antwoord, dus een POST met het e-mailadres van een ander neemt diens
+     account over. Een server zonder APP_URL op een publiek IP is 'onbekend', en
+     startte daarmee met elk account open. Deze vlag vraagt daarom de STRENGE
+     richting, dezelfde als RTG_PRIVATE_BETA in ./productie-lokaal.js: bewezen
+     lokaal, of geen start. In productie weigert ./productie-lokaal.js hem al. */
+  if (env.RTG_DEV_LINKS === '1' && !productie) {
+    const bewijs = require('./omgeving').bewezenLokaal(env);
+    if (!bewijs.ja) hardeFouten.push('RTG_DEV_LINKS=1 terwijl niet vast te stellen is dat deze installatie alleen lokaal '
+      + 'bereikbaar is (' + bewijs.waarom + '). Met deze vlag staan herstel- en verificatielinks en sms-codes in het '
+      + 'HTTP-antwoord, en is elk account over te nemen met alleen een e-mailadres. Zet APP_URL op een lokaal adres '
+      + '(localhost, .local of een privaat netwerkadres), zet RTG_BIND=127.0.0.1, of zet de vlag uit.');
+    else waarschuwingen.push('RTG_DEV_LINKS=1: herstellinks staan in het antwoord (' + bewijs.waarom + ').');
+  }
 
   /* FAIL-CLOSED OP EEN OPENBAAR ADRES (RTG-V1-RELEASE blocker 3). Hier stond
      een schaduwronde die de productiekeuring alleen als MELDING liet lopen: wie

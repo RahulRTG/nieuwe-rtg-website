@@ -89,6 +89,11 @@ module.exports = (tctx) => {
     stuur(res, r);
   });
 
+  /* Het doel van een registratie door het herstelvenster (kern/webauthn.js
+     regOpties): de uitdaging is verdiend door het open venster, en geen
+     ledensessie kan hem afmaken. */
+  const HERSTEL_DOEL = 'eigenaarherstel-venster';
+
   /* HET VENSTER: een nieuwe passkey zetten, en verder niets. Geen sessie, geen
      token, geen inzage -- de aanvrager moet daarna gewoon inloggen met de
      sleutel die hij zojuist heeft gezet. */
@@ -97,7 +102,7 @@ module.exports = (tctx) => {
     if (!eigenaarherstel.herstelvensterOpen()) return res.status(403).json({ error: 'Er staat geen herstelvenster open.' });
     const u = eigenaarUser();
     if (!u) return res.status(404).json({ error: 'Er is geen eigenaarsaccount.' });
-    stuur(res, await webauthn.registratie.opties(u, gastheer(req)));
+    stuur(res, await webauthn.registratie.opties(u, gastheer(req), HERSTEL_DOEL));
   });
 
   app.post('/api/herstel/eigenaar/passkey', async (req, res) => {
@@ -106,7 +111,7 @@ module.exports = (tctx) => {
     const u = eigenaarUser();
     if (!u) return res.status(404).json({ error: 'Er is geen eigenaarsaccount.' });
     const r = await webauthn.registratie.maak(u, req.body.antwoord,
-      String((req.body && req.body.naam) || 'Hersteld toestel'), oorsprong(req), gastheer(req));
+      String((req.body && req.body.naam) || 'Hersteld toestel'), oorsprong(req), gastheer(req), HERSTEL_DOEL);
     if (r.error) { noteFailedTry(remBucket(req), req.ip); return stuur(res, r); }
     /* HET VENSTER GAAT EEN KEER OP. Wie hem gebruikt, sluit hem -- anders is een
        geslaagd herstel vijftien minuten lang een open deur voor iedereen die

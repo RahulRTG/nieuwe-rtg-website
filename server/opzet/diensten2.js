@@ -235,8 +235,18 @@ function resolveSession(token) {
    `sid: null` -- "deze sessie heeft geen identiteit", en dat is waar. */
 function metContext(sess, sid) {
   sess.sid = sid;
-  const rij = sessieregister.lees(sid);
-  if (rij) { sess.sessieContext = rij.context; sessieregister.raak(sid); }
+  /* A-P1-04: EEN REGISTER DAT NIET TE LEZEN IS, IS NIET LEEG. Zonder deze vangst
+     gooide een storing hier door tot in auth() en viel ELK ingelogd verzoek om --
+     en de verleiding is dan een `catch` die stil verder gaat, waarna een sessie
+     met een sleutelbinding eruitziet als een sessie zonder. In de stand
+     `aanbevolen` komt die op een zwaar pad door: precies het gestolen token waar
+     de binding voor bestaat. Dus: de lichte paden lopen door zonder context (een
+     storing is geen overtreding), en de vlag zegt het bezitsbewijs dat het de
+     binding NIET weet (kern/identiteit/bezitsbewijs.js weigert dan). */
+  let rij;
+  try { rij = sessieregister.lees(sid); }
+  catch (e) { sess.sessieContextStoring = true; return sess; }
+  if (rij) { sess.sessieContext = rij.context; try { sessieregister.raak(sid); } catch (e) { /* het venster opschuiven is extra */ } }
   return sess;
 }
 

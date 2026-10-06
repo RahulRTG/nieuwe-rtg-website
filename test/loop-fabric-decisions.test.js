@@ -27,3 +27,10 @@ test('Constitutionregels noemen blocker, tegenvoorbeeld, enforcement en tests',(
   for(const row of build().constitutionCandidates){assert.ok(row.resolves.length);assert.ok(row.domains.length);
     assert.ok(row.counterexample);assert.ok(row.exceptions);assert.ok(row.runtime);assert.ok(row.tests.length);}
 });
+
+test('decisiontabellen ontsnappen iedere backslash en tabelscheider',()=>{
+  const d=build();d.dossiers[0]={...d.dossiers[0],title:'bron\\pad|doel',safeDefault:'houd\\privé|dicht'};
+  const doc=markdown(d);
+  assert.ok(doc.includes('bron\\\\pad\\|doel'));
+  assert.ok(doc.includes('houd\\\\privé\\|dicht'));
+});

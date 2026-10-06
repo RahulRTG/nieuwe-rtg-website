@@ -21,7 +21,7 @@ function build(){
     dossiers:dossiers.sort((a,b)=>b.unlockImpact.capabilities-a.unlockImpact.capabilities||a.id.localeCompare(b.id)),
     educationDossier:{...EDUCATION_DOSSIER,decisionStatus:'RESOLVED_PRODUCT_POLICY'},constitutionCandidates:RULES};
 }
-const esc=x=>String(x).replace(/\|/g,'\\|');
+const esc=x=>String(x).replace(/\\/g,'\\\\').replace(/\|/g,'\\|');
 function markdown(data){
   const lines=['# RTG Loop Fabric Decision Dossiers','','Datum: 5 oktober 2026','',
     'Dit is technisch en productmatig architectuuradvies, geen juridisch advies. Dossiers met `LEGAL_VALIDATION_REQUIRED` blijven fail-closed tot bevoegde validatie.','',
@@ -43,7 +43,7 @@ function markdown(data){
   for(const r of data.constitutionCandidates)lines.push(`### ${r.id}`,'',r.rule,'',`Lost blockers op uit: ${r.resolves.map(x=>'`'+x+'`').join(', ')}.`,'',
     `Domeinen: ${r.domains.map(x=>'`'+x+'`').join(', ')}.`,'',`Tegenvoorbeeld: ${r.counterexample}`,'',`Uitzonderingen: ${r.exceptions}`,'',
     `Runtime enforcement: ${r.runtime}`,'',`Benodigde tests: ${r.tests.join('; ')}.`,'');
-  return lines.join('\n')+'\n';
+  return lines.join('\n').replace(/\n+$/,'')+'\n';
 }
 function main(){const data=build(),json=JSON.stringify(data,null,2)+'\n',md=markdown(data);if(process.argv.includes('--controle')){
   if(!fs.existsSync(OUT)||fs.readFileSync(OUT,'utf8')!==json||!fs.existsSync(DOC)||fs.readFileSync(DOC,'utf8')!==md){console.error('Loop Fabric decision dossiers lopen achter.');process.exit(1);}

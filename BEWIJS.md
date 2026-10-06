@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2360 bestanden en 16108 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2360 bestanden en 16109 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2360 |
-| losse beweringen (`test(...)`) | 16108 |
+| losse beweringen (`test(...)`) | 16109 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 270 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2166 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2055 bestanden, 15578 beweringen.
+2055 bestanden, 15579 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -972,7 +972,7 @@ toets omvalt.
 | `loop-fabric-architecture-gate.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-constitution.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-coverage.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `loop-fabric-decisions.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `loop-fabric-decisions.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-delivery.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-execution.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `loop-fabric-http.test.js` | 1 | -- | Werkelijke HTTP-deurproef. De protocol- en end-to-endproeven gaan dieper in op betekenis; deze proef bewijst op een echte server dat alle Loop-ingangen ingangen gemount zijn en zonder server-derived... |

@@ -1,39 +1,39 @@
 {
  "stempel": {
-  "op": "2026-10-06T08:01:04.359Z",
-  "commit": "c0246cf67",
+  "op": "2026-10-06T13:03:48.324Z",
+  "commit": "a00a9fb9",
   "boomVuil": true,
-  "boomAnders": 54,
+  "boomAnders": 5,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v24.18.0"
+  "node": "v26.10.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5313,
-  "geclassificeerd": 5287,
+  "totaal": 5322,
+  "geclassificeerd": 5296,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3167,
-   "NOT_APPLICABLE": 1276,
+   "BLOCKED_BY_TEST_FIXTURE": 3166,
+   "NOT_APPLICABLE": 1278,
    "LEGACY_PENDING_CLASSIFICATION": 26,
-   "PROTECTED": 664,
-   "INTENTIONALLY_NON_IDEMPOTENT": 180
+   "PROTECTED": 670,
+   "INTENTIONALLY_NON_IDEMPOTENT": 182
   },
-  "vastgesteldDoorMens": 2172,
-  "afgeleidDoorScript": 3115,
+  "vastgesteldDoorMens": 2182,
+  "afgeleidDoorScript": 3114,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4378,
-   "PUBLIC": 134,
+   "AUTHENTICATED": 4381,
+   "PUBLIC": 138,
    "OBJECT_SCOPED": 770,
-   "(niet af te leiden -- vraagt een verklaring)": 15,
+   "(niet af te leiden -- vraagt een verklaring)": 17,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
   "bewijs": {
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
-   "kale ronde: geen uitspraak": 4882,
-   "niet gemeten": 165
+   "kale ronde: geen uitspraak": 4881,
+   "niet gemeten": 175
   },
   "voorstellen": {
    "BLOCKED_BY_TEST_FIXTURE": 1,
@@ -524,6 +524,30 @@
   },
   {
    "route": "POST /api/werk-gast/besluit",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "PUBLIC",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/werk-gast/betaling/start",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "PUBLIC",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/werk-gast/betaling/status",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "PUBLIC",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/werk-leverancier/beeld",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "PUBLIC",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/werk-leverancier/besluit",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "PUBLIC",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -1943,7 +1967,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "kluisAuth"
     ]
    },
    "bewijs": {
@@ -6502,6 +6526,25 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "bedrijf.praktijk.betaalverzoek",
+   "route": "POST /api/bedrijf/praktijk/betaalverzoek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "velden",
+   "toegang": {
+    "waargenomen": null,
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "bedrijf.praktijk.delen",
    "route": "POST /api/bedrijf/praktijk/delen",
    "semantiek": {
@@ -6523,6 +6566,25 @@
   {
    "mutatieId": "bedrijf.praktijk.inrichten",
    "route": "POST /api/bedrijf/praktijk/inrichten",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "velden",
+   "toegang": {
+    "waargenomen": null,
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bedrijf.praktijk.leverancier",
+   "route": "POST /api/bedrijf/praktijk/leverancier",
    "semantiek": {
     "klasse": "idempotent"
    },
@@ -12751,33 +12813,6 @@
     "zonderSleutel": "ongemeten",
     "grond": null,
     "hindernis": "Geen landpakket voor ."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "command.mandaat",
-   "route": "POST /api/command/mandaat",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "officeAuth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-09-29T18:39:11.935Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Een mandaat vraagt van wie, aan wie en waarvoor."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
@@ -70242,6 +70277,69 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "reisbureau.teruggave.besluiten",
+   "route": "POST /api/office/reisbureau/teruggave",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "zwaar.opties.reisteruggave",
+   "route": "POST /api/office/reisbureau/teruggave/opties",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "reisbureau.teruggave.lezen",
+   "route": "POST /api/office/reisbureau/teruggaven",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "reisbureau.thuis.kantoor",
    "route": "POST /api/office/reisbureau/thuis",
    "semantiek": {
@@ -115464,6 +115562,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "supplier.horeca.teruggave.uitvoeren",
+   "route": "POST /api/supplier/horeca/teruggave",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "object: rekeningId",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "supplier.horeca.venue.concept",
    "route": "POST /api/supplier/horeca/venue/concept",
    "semantiek": {
@@ -138754,6 +138873,82 @@
   {
    "mutatieId": "werk.gast.besluit",
    "route": "POST /api/werk-gast/besluit",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "werk-gast.betaling.start",
+   "route": "POST /api/werk-gast/betaling/start",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "werk-gast.betaling.status",
+   "route": "POST /api/werk-gast/betaling/status",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "werk-leverancier.beeld",
+   "route": "POST /api/werk-leverancier/beeld",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "werk-leverancier.besluit",
+   "route": "POST /api/werk-leverancier/besluit",
    "semantiek": {
     "klasse": "idempotent"
    },

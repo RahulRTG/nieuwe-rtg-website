@@ -1,9 +1,9 @@
 {
-  "catalogi": 1203,
-  "verschillendeNamen": 731,
+  "catalogi": 1208,
+  "verschillendeNamen": 734,
   "namenInMeerDomeinen": 131,
   "woordenMetMeerBetekenissen": 113,
-  "betekenissenTotaal": 422,
+  "betekenissenTotaal": 424,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 34,
@@ -442,7 +442,7 @@
     },
     {
       "naam": "VELDEN",
-      "betekenissenVanDitWoord": 11,
+      "betekenissenVanDitWoord": 12,
       "waar": [
         "server/kern/beleidsmotor/index.js",
         "server/kern/leerhuis/schaduw.js"
@@ -1829,8 +1829,8 @@
     },
     {
       "naam": "VELDEN",
-      "domeinen": 12,
-      "betekenissen": 11,
+      "domeinen": 13,
+      "betekenissen": 12,
       "hoogsteOverlap": 0.75,
       "soort": "gemengd",
       "waar": [
@@ -1856,6 +1856,18 @@
             "bestemming",
             "datum",
             "tot"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/bearercode-v2.js"
+          ],
+          "leden": 11,
+          "voorbeeld": [
+            "issuer",
+            "doel",
+            "scope",
+            "onderwerp"
           ]
         },
         {
@@ -3709,5 +3721,5 @@
       ]
     }
   ],
-  "bestanden": 4066
+  "bestanden": 4236
 }

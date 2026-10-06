@@ -155,3 +155,4 @@ Geen van deze schaalblockers is gebruikt om een centrale store, grotere in-memor
 De productbesluiten verplaatsen capabilities naar technische prerequisites, niet rechtstreeks naar GO. Iedere flow blijft dicht totdat zijn broncontract en verticale bewijsslice groen zijn.
 
 De begrensde proofs voor D23, D15, D11, D13 en D01 zijn uitgevoerd. Brede capabilityfamilies worden daardoor niet automatisch GO: iedere nieuwe source owner moet dezelfde stoppoorten zelfstandig bewijzen.
+

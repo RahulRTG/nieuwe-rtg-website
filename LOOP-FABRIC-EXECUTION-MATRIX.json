@@ -203,8 +203,8 @@
       "blastRadius": {
         "sourceOwners": 13,
         "kernelModules": 122,
-        "mutationContracts": 1058,
-        "routes": 1079,
+        "mutationContracts": 1057,
+        "routes": 1078,
         "screens": 29,
         "dataSchema": "versioned source targets en duurzame events waar zij ontbreken",
         "newSharedPrimitive": "geen",

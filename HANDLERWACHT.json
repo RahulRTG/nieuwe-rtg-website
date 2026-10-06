@@ -1,17 +1,17 @@
 {
  "stempel": {
-  "op": "2026-10-06T07:58:45.567Z",
-  "commit": "c0246cf67",
+  "op": "2026-10-06T13:04:06.557Z",
+  "commit": "a00a9fb9",
   "boomVuil": true,
-  "boomAnders": 54,
+  "boomAnders": 11,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v24.18.0"
+  "node": "v26.10.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 659,
-  "bewaakt": 565,
-  "openbaarMetReden": 53,
+  "zonderBewakerslaag": 665,
+  "bewaakt": 567,
+  "openbaarMetReden": 57,
   "eigenControle": 21,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
@@ -108,16 +108,16 @@
    "aantal": 8
   },
   {
+   "naam": "praktijkMutatie -> poort",
+   "aantal": 7
+  },
+  {
    "naam": "sessieVan",
    "aantal": 7
   },
   {
    "naam": "rtf.verifieerProfiel",
    "aantal": 6
-  },
-  {
-   "naam": "praktijkMutatie -> poort",
-   "aantal": 5
   },
   {
    "naam": "sessie",
@@ -315,13 +315,13 @@
  "perRoute": [
   {
    "sleutel": "POST /api/aanmeld/start",
-   "bestand": "server/routes/aanmeldgesprek.js:59",
+   "bestand": "server/routes/aanmeldgesprek.js:65",
    "staat": "openbaar",
    "reden": "het aanmeldgesprek begint voor er een account is; rem van 40 berichten per minuut per ip"
   },
   {
    "sleutel": "POST /api/aanmeld/zeg",
-   "bestand": "server/routes/aanmeldgesprek.js:66",
+   "bestand": "server/routes/aanmeldgesprek.js:72",
    "staat": "eigenControle"
   },
   {
@@ -360,7 +360,7 @@
   },
   {
    "sleutel": "POST /api/auth/tweede",
-   "bestand": "server/routes/member/tweefactor.js:109",
+   "bestand": "server/routes/member/tweefactor.js:129",
    "staat": "eigenControle"
   },
   {
@@ -761,37 +761,49 @@
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/aanbod",
-   "bestand": "server/bedrijf/praktijk.js:75",
+   "bestand": "server/bedrijf/praktijk.js:86",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/beeld",
-   "bestand": "server/bedrijf/praktijk.js:61",
+   "bestand": "server/bedrijf/praktijk.js:65",
    "staat": "bewaakt",
    "wacht": "poort"
   },
   {
+   "sleutel": "POST /api/bedrijf/praktijk/betaalverzoek",
+   "bestand": "server/bedrijf/praktijk.js:91",
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
+  },
+  {
    "sleutel": "POST /api/bedrijf/praktijk/delen",
-   "bestand": "server/bedrijf/praktijk.js:78",
+   "bestand": "server/bedrijf/praktijk.js:89",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/inrichten",
-   "bestand": "server/bedrijf/praktijk.js:74",
+   "bestand": "server/bedrijf/praktijk.js:85",
+   "staat": "bewaakt",
+   "wacht": "praktijkMutatie -> poort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/praktijk/leverancier",
+   "bestand": "server/bedrijf/praktijk.js:90",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/stap",
-   "bestand": "server/bedrijf/praktijk.js:77",
+   "bestand": "server/bedrijf/praktijk.js:88",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
   {
    "sleutel": "POST /api/bedrijf/praktijk/vraag",
-   "bestand": "server/bedrijf/praktijk.js:76",
+   "bestand": "server/bedrijf/praktijk.js:87",
    "staat": "bewaakt",
    "wacht": "praktijkMutatie -> poort"
   },
@@ -1126,7 +1138,7 @@
   },
   {
    "sleutel": "POST /api/cluster/:actie",
-   "bestand": "server/server.js:901",
+   "bestand": "server/server.js:885",
    "staat": "openbaar",
    "reden": "de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet"
   },
@@ -4096,7 +4108,7 @@
   },
   {
    "sleutel": "POST /api/techniek/inloggen",
-   "bestand": "server/routes/techniek/inlog.js:29",
+   "bestand": "server/routes/techniek/inlog.js:57",
    "staat": "eigenControle"
   },
   {
@@ -4213,6 +4225,30 @@
    "reden": "Dezelfde beperkte gastlink, met versiecontrole: uitsluitend eenmalig akkoord of afwijzen van het gedeelde voorstel, geen account of andere rechten."
   },
   {
+   "sleutel": "POST /api/werk-gast/betaling/start",
+   "bestand": "server/bedrijf/praktijk-betalen-routes.js:9",
+   "staat": "openbaar",
+   "reden": "Actuele klantcapability plus financieel bevoegd vrijgegeven betaalverzoek; serverbedrag en ontvanger duurzaam vast vóór provideroproep, nooit zelf betaald verklaren."
+  },
+  {
+   "sleutel": "POST /api/werk-gast/betaling/status",
+   "bestand": "server/bedrijf/praktijk-betalen-routes.js:24",
+   "staat": "openbaar",
+   "reden": "Actuele klantcapability toont uitsluitend de centrale providerwaarheid van de eigen opdracht; geen betalingId uit de client."
+  },
+  {
+   "sleutel": "POST /api/werk-leverancier/beeld",
+   "bestand": "server/bedrijf/praktijk-leverancier-routes.js:10",
+   "staat": "openbaar",
+   "reden": "Tijdelijk hash-only capabilitygeheim voor één leveranciersopdracht; huidige uitgeversrechten en tenant worden iedere keer gecontroleerd."
+  },
+  {
+   "sleutel": "POST /api/werk-leverancier/besluit",
+   "bestand": "server/bedrijf/praktijk-leverancier-routes.js:14",
+   "staat": "openbaar",
+   "reden": "Eenmalig leveranciersantwoord op precies één versie, met actuele capabilitycontrole en duurzame opslag. Geen accounttoegang."
+  },
+  {
    "sleutel": "POST /api/werkmail/bezorg",
    "bestand": "server/routes/werkmail.js:58",
    "staat": "openbaar",
@@ -4230,7 +4266,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1412",
+   "bestand": "server/server.js:1375",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

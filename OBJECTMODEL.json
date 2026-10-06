@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-10-06",
   "gemeten": {
-    "bestanden": 2702,
-    "vormen": 1582,
-    "velden": 2248,
-    "modules": 874,
-    "domeinen": 308,
+    "bestanden": 2784,
+    "vormen": 1600,
+    "velden": 2289,
+    "modules": 886,
+    "domeinen": 310,
     "envelopDrempel": 19,
     "envelop": 29,
-    "veldenDomeineigen": 1575,
-    "veldenGedeeldVanafVier": 233,
-    "gelijkendeVormparen": 70
+    "veldenDomeineigen": 1606,
+    "veldenGedeeldVanafVier": 234,
+    "gelijkendeVormparen": 64
   },
   "envelop": [
     "aantal",
@@ -226,6 +226,18 @@
       ]
     },
     {
+      "veld": "aan",
+      "domeinen": 13,
+      "waar": [
+        "kern/afdelingen",
+        "kern/command",
+        "kern/geldbeleid",
+        "kern/klok",
+        "kern/lidboard",
+        "kern/pay"
+      ]
+    },
+    {
       "veld": "categorie",
       "domeinen": 13,
       "waar": [
@@ -262,15 +274,27 @@
       ]
     },
     {
-      "veld": "aan",
+      "veld": "land",
+      "domeinen": 13,
+      "waar": [
+        "bedrijf",
+        "kern/commercie",
+        "kern/concern",
+        "kern/labfonds",
+        "kern/ledenbalie-inzage",
+        "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "besluit",
       "domeinen": 12,
       "waar": [
-        "kern/afdelingen",
-        "kern/command",
-        "kern/geldbeleid",
-        "kern/klok",
-        "kern/lidboard",
-        "kern/pay"
+        "kern/aanmeldingen",
+        "kern/appstore",
+        "kern/commercie",
+        "kern/gemeente",
+        "kern/labfonds",
+        "kern/ledenbalie-zaken"
       ]
     },
     {
@@ -358,18 +382,6 @@
       ]
     },
     {
-      "veld": "land",
-      "domeinen": 12,
-      "waar": [
-        "bedrijf",
-        "kern/commercie",
-        "kern/concern",
-        "kern/labfonds",
-        "kern/ledenbalie-inzage",
-        "kern/livinglab"
-      ]
-    },
-    {
       "veld": "rol",
       "domeinen": 12,
       "waar": [
@@ -394,15 +406,15 @@
       ]
     },
     {
-      "veld": "besluit",
-      "domeinen": 11,
+      "veld": "bewijs",
+      "domeinen": 12,
       "waar": [
-        "kern/aanmeldingen",
-        "kern/appstore",
-        "kern/commercie",
-        "kern/gemeente",
-        "kern/labfonds",
-        "kern/ledenbalie-zaken"
+        "kern/horeca",
+        "kern/invoer",
+        "kern/leerhuis",
+        "kern/livinglab",
+        "kern/magnaat-controle",
+        "kern/magnaat-trainingslobby-acties"
       ]
     },
     {
@@ -478,6 +490,18 @@
       ]
     },
     {
+      "veld": "version",
+      "domeinen": 11,
+      "waar": [
+        "bedrijf",
+        "kern/bewijsvlak",
+        "kern/connection-communication-media",
+        "kern/connection-profile-media",
+        "kern/document-contracten",
+        "kern/experience"
+      ]
+    },
+    {
       "veld": "kind",
       "domeinen": 11,
       "waar": [
@@ -499,30 +523,6 @@
         "kern/koppel",
         "kern/livinglab",
         "kern/office"
-      ]
-    },
-    {
-      "veld": "eigenaar",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/leerhuis",
-        "kern/levensgraaf",
-        "kern/onderneming",
-        "kern/reisgezelschap"
-      ]
-    },
-    {
-      "veld": "kanaal",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/concern",
-        "kern/envelop",
-        "kern/library",
-        "kern/living-world",
-        "kern/loop-fabric"
       ]
     }
   ],
@@ -956,6 +956,25 @@
       ]
     },
     {
+      "gelijkenis": 0.91,
+      "a": "server/kern/reisbureau-betaling.js",
+      "b": "server/kern/reisbureau-teruggave.js",
+      "domeinA": "kern/reisbureau-betaling",
+      "domeinB": "kern/reisbureau-teruggave",
+      "gedeeld": [
+        "bedragCenten",
+        "bewijs",
+        "bronObject",
+        "economischeEigenaar",
+        "economischeHerkomst",
+        "grond",
+        "land",
+        "naarWie",
+        "relatie",
+        "valuta"
+      ]
+    },
+    {
       "gelijkenis": 0.9,
       "a": "server/kern/spellen/projectie.js",
       "b": "server/kern/spelprojectie-toegang.js",
@@ -1076,19 +1095,6 @@
       "gelijkenis": 0.8,
       "a": "server/kern/library/journal.js",
       "b": "server/bedrijf/loop-source-change.js",
-      "domeinA": "kern/library",
-      "domeinB": "bedrijf",
-      "gedeeld": [
-        "classificatie",
-        "correlatie",
-        "kanaal",
-        "oorzaak"
-      ]
-    },
-    {
-      "gelijkenis": 0.8,
-      "a": "server/kern/library/journal.js",
-      "b": "server/bedrijf/loop-source-lifecycle.js",
       "domeinA": "kern/library",
       "domeinB": "bedrijf",
       "gedeeld": [

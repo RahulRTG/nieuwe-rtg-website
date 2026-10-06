@@ -1,3 +1,4 @@
+/* Library Studio, publicatie en Reader-interacties. */
 (function(){'use strict';
 var A=window.LibraryAPI,$=function(s){return document.querySelector(s)},state={actor:null,works:[],work:null,node:null,reader:null,readerState:null,readerIndex:0};
 function status(t,bad){$('#status').textContent=t;$('#status').style.color=bad?'var(--red)':''}

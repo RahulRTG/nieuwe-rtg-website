@@ -161,6 +161,17 @@ const REGISTER = {
   'LANGUAGECAPABILITY.json': { eigenRatel: 'scripts/language-proof.js' },
   'MEANINGPARITY.json': { eigenRatel: 'scripts/language-proof.js' },
   'LANGUAGEFAILOVER.json': { eigenRatel: 'scripts/language-proof.js' },
+  /* De Loop Fabric-registers zijn bestuurlijke classificaties en geen lineaire
+     kwaliteitscijfers. Hun eigen generator is de ratel: --controle vergelijkt
+     de versioned bronregels met het ingecheckte register en de bijbehorende
+     tests bewijzen ook de fail-closed kant. Een aantalsratel zou hier juist
+     sturen op meer LOOP_CAPABLE in plaats van op de correcte classificatie. */
+  'LOOP-FABRIC-COVERAGE.json': { eigenRatel: 'scripts/loop-fabric-coverage.js' },
+  'LOOP-FABRIC-DECISION-DOSSIERS.json': { eigenRatel: 'scripts/loop-fabric-decisions.js' },
+  'LOOP-FABRIC-EXECUTION-MATRIX.json': { eigenRatel: 'scripts/loop-fabric-execution.js' },
+  'LOOP-FABRIC-SOURCE-FLOWS.json': { eigenRatel: 'scripts/loop-fabric-source-flows.js' },
+  'LOOP-FABRIC-UNLOCK-ROADMAP.json': { eigenRatel: 'scripts/loop-fabric-unlock.js' },
+  'RTG-LEARNING-CONSTITUTION.json': { eigenRatel: 'scripts/loop-fabric-constitution.js' },
   'LAATSPOOR.json': { meter: ['laatSpoorVerdacht'] },
   'ROLLBACKBESLUIT.json': { meter: ['rollbackUitzonderingen'] },
   'FAALPROEF.json': { meter: ['faalproefGezakt'] },

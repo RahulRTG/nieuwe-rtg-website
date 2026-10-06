@@ -162,11 +162,12 @@ test('5c. in "verplicht" komt een ongebonden sessie er niet langs', async () => 
   assert.match(uit.reden, /Bevestig dit toestel/);
 });
 
-test('5c2. een sessie ZONDER account kan niet binden: geen dood spoor, wel een gemeld gat', async () => {
+test('5c2. een sessie ZONDER account krijgt geen stil privilege: ook geweigerd, met de weg erheen', async () => {
   const { b } = await opzet();
   const uit = await b.controleer({ sess: Object.assign({}, los, { account: null }), methode: 'POST', pad: '/api/pay/tik', kop: null, stand: 'verplicht' });
-  assert.equal(uit.stand, 'onbeschermd');
-  assert.ok(uit.nietAfgedwongen);
+  assert.equal(uit.stand, 'geweigerd');
+  assert.equal(uit.code, 403);
+  assert.match(uit.reden, /eigen RTG-account/);
 });
 
 test('5d. een onbekende stand valt terug op de VEILIGE kant (verplicht) en zegt dat', () => {

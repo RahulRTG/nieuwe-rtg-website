@@ -44,6 +44,11 @@ function blok(uitvoer) {
   const s = global.__rtgInvoerspoor;
   if (!s) return undefined;
   const uit = new Set((uitvoer || []).map((p) => String(p).replace(/\\/g, '/')));
+  /* Het meetinstrument zelf is geen invoer: het bepaalt het stempel en niet de
+     inhoud. Zonder deze regel maakt elke verbetering aan het spoor alle
+     metingen verouderd. */
+  uit.add('scripts/lib/invoerspoor-preload.js');
+  uit.add('scripts/lib/invoerspoor.js');
   for (const w of s.schrijf) uit.add(w);
   const lees = new Set(s.lees);
   /* Wat via require() is geladen, telt als gelezen: dat is de code van de

@@ -60,9 +60,10 @@ module.exports = ({ lijst, zekeringen, autoStaat, save, meld, isoleer }) => {
 
      AANVALLERS, EN NIET DEUREN -- dat was de fout. Hier stond `.map(m => m.sleutel)`,
      en die sleutel is `brute-force|<bucket>`. Een bucket is fijnmazig met opzet:
-     'auth:<ip>:<inlognaam>' (server/server.js). De inlognaam hoort daarin voor de
+     'auth:<ip>:<account>', met het account gehasht
+     (kern/identiteit/wachtwoordrem.js). Het account hoort daarin voor de
      snelheidsrem, want anders zet iemand het account van een ander op slot door
-     het fout te raden -- maar hij hoort NIET in de telling van deze noodrem.
+     het fout te raden -- maar het hoort NIET in de telling van deze noodrem.
 
      Wat er daardoor gebeurde: een script vanaf EEN adres dat zes gebruikersnamen
      probeert leverde zes "bronnen" op, en het hele platform ging in onderhoud.

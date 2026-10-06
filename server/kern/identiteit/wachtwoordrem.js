@@ -1,15 +1,23 @@
 /* DE REM OP EEN WACHTWOORD -- een plek voor elke deur die er een toetst.
 
-   Twee deuren toetsen een RTG-wachtwoord om er een sessie voor te geven: de
-   gewone inlog (/api/auth/login) en de werkplekinlog van een lid
-   (/api/supplier/mijn/login). De rem stond alleen in de eerste. De tweede telde
-   alleen per ADRES, dus dertig foute wachtwoorden op een account vanaf dertig
-   adressen werden nergens geremd (N28 van de V1-audit, eindkeuring ronde 5), en
-   wat daar gegokt werd, telde bij de gewone inlog niet mee. Een deur met eigen
-   emmers geeft per deur opnieuw tien gokken; dat is dezelfde les als de rem op
-   de tweede factor (./tweedestap-rem.js, RTG-V1-RELEASE C3). Beide deuren delen
-   daarom DEZE emmers, op dezelfde namen: wat op de een gegokt wordt, telt ook
-   op de ander.
+   Vier deuren toetsen een RTG-wachtwoord op een inlognaam, en twee daarvan
+   delen deze rem: de gewone inlog (/api/auth/login) en de werkplekinlog van een
+   lid (/api/supplier/mijn/login). De rem stond alleen in de eerste. De
+   tweede telde alleen per ADRES, dus dertig foute wachtwoorden op een account
+   vanaf dertig adressen werden nergens geremd (N28 van de V1-audit,
+   eindkeuring ronde 5), en wat daar gegokt werd, telde bij de gewone inlog niet
+   mee. Een deur met eigen emmers geeft per deur opnieuw tien gokken; dat is
+   dezelfde les als de rem op de tweede factor (./tweedestap-rem.js,
+   RTG-V1-RELEASE C3). Beide deuren delen daarom DEZE emmers, op dezelfde namen:
+   wat op de een gegokt wordt, telt ook op de ander.
+
+   DE ANDERE TWEE STAAN HIER NOG BUITEN, dus de rem geldt niet overal. De
+   techniekinlog (/api/techniek/inloggen) remt met een eigen emmer 'tech:', de
+   aanmelding van personeel (/api/supplier/staff/join) met 'join:' (N29). Wat
+   daar gegokt wordt, telt hier niet mee. Wie er een aansluit, gebruikt deze
+   hulp: een nagebouwde emmernaam loopt uit de pas zodra hier een naam
+   verandert, en dat is al eens gebeurd (de emmer van adres plus account,
+   hieronder).
 
    DRIE EMMERS, uit routes/auth/inlog.js hierheen gehaald, met dezelfde grenzen:
      - adres plus account (10). Raakt alleen de aanvaller, en daarna 429;
@@ -19,8 +27,17 @@
        twee seconden op elke mislukte poging. Een slot op het account geeft een
        vreemde de macht om een lid uit zijn eigen account te houden. Wie het
        wachtwoord weet, komt dus zonder wachten binnen (test/inlogrem.test.js).
-   Het account staat gehasht in de emmernaam, zodat een e-mailadres nooit in het
-   geheugen van de rem of in een beveiligingsmelding belandt.
+
+   HET ACCOUNT STAAT GEHASHT IN ELKE EMMERNAAM DIE HET DRAAGT, in die van het
+   account en in die van adres plus account. Een emmer die dichtgaat, meldt zijn
+   naam als bron van een beveiligingsmelding (noteFailedTry in ../../server.js),
+   en die melding wordt bewaard; het vergeten van een account (../vergeten.js)
+   raakt haar niet. De emmer van adres plus account droeg de inlognaam eerst in
+   klare tekst, terwijl deze kop al beloofde dat dat niet kon: na tien foute
+   gokken stond "brute-force|auth:<adres>:<e-mailadres>" in de opslag. Op de
+   werkdeur was dat nieuw, want haar oude emmer 'mijn:'+adres droeg geen
+   inlognaam. Een e-mailadres hoort niet in een spoor, net zo min als een echte
+   naam naast een codenaam. test/werkplek-rem.test.js zoekt het in de datamap.
 
    DE NOODREM. Elke emmer die dichtgaat meldt zich via noteFailedTry als brute
    force, met het adres als aanvaller (../../server.js). Hier geen eigen soort:
@@ -45,10 +62,13 @@ const VERTRAGING_MS = 2000;
 const vingerafdruk = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex').slice(0, 24);
 
 function maakWachtwoordRem({ tooManyTries, noteFailedTry, loginFails }) {
+  /* EEN ACCOUNT, EEN SLEUTEL. findByLogin vindt het account ook als de
+     inlognaam andere hoofdletters of witruimte draagt; elke spelling hoort dus
+     in dezelfde emmers, anders is elke spelling een verse rij gokken. */
   const emmers = (ip, login) => {
-    const sleutel = String(login || '').toLowerCase().trim();
-    return { paar: 'auth:' + ip + ':' + sleutel.slice(0, 60), bron: 'auth:bron:' + ip,
-      doel: 'auth:doel:' + vingerafdruk('account:' + sleutel) };
+    const account = vingerafdruk('account:' + String(login || '').toLowerCase().trim());
+    return { paar: 'auth:' + ip + ':' + account, bron: 'auth:bron:' + ip,
+      doel: 'auth:doel:' + account };
   };
   return {
     /* true als de emmer van adres plus account of die van het adres dicht is;

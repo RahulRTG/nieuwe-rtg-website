@@ -140,7 +140,7 @@ test('noodrem trede 1: elke brute-force-bron gaat de quarantaine in via de haak'
 test('noodrem: EEN aanvaller met zes deuren telt als EEN bron', () => {
   /* Dit was de fout die het hele platform kon sluiten. De noodrem telde de
      BUCKET van de snelheidsrem, en die is fijnmazig met opzet:
-     'auth:<ip>:<inlognaam>'. Een script vanaf een adres dat zes namen probeert
+     'auth:<ip>:<account>'. Een script vanaf een adres dat zes namen probeert
      -- credential stuffing -- leverde daarmee zes "bronnen" op.
 
      Zes meldingen, zes verschillende buckets, EEN aanvaller. Er hoort niets te

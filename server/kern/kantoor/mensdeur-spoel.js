@@ -6,7 +6,7 @@
    uitleg verdient -- hij heeft dit huis een gebroken PostgreSQL-opstelling
    gekost.
 
-   WAT ER MISGING. De eerste versie deed in `res.on('finish')` het voor de hand
+   WAT ER MISGING. De eerste versie deed in een finish-haak het voor de hand
    liggende: db.data muteren en save() roepen. Dat brak de PostgreSQL-opstelling
    volledig -- twee instances op een gedeelde database, en de server werd niet
    meer `ready` (`writeHealthy: false`, elk verzoek 503). Niet af en toe:

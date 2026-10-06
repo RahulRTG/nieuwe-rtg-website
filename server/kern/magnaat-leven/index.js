@@ -16,8 +16,8 @@ const { volgendeDag } = require('./dag');
 const { ACTIES } = require('./acties');
 const { toon } = require('./weergave');
 const speelronde = require('./speelronde');
-const { controleer, bevries } = require('./bewaking');
 const { oordeelGeef, oordeelOverzicht } = require('./oordeel');
+const { maakLevenstransactie } = require('./transactie');
 
 const KIES_START = 'Kies waar je begint: ' + Object.values(R.STARTPOSITIES).map(x => x.naam.toLowerCase()).join(', ') + '.';
 
@@ -25,6 +25,7 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
   const boek = maakBoek({ db });
   const eigen = require('../eigencollectie')({ db, domein: 'kern/magnaat-leven', bezit: { magnaatLeven: 'kaart', magnaatOordelen: 'lijst', magnaatSteden: 'kaart' } });
   const levens = () => eigen.bak('magnaatLeven');
+  const beschermd = maakLevenstransactie({ boek, save, meld, koppel });
 
   function haal(key, opnieuw, moeilijkheid, start) {
     const alle = levens();
@@ -78,31 +79,6 @@ function maakLeven({ db, save = () => {}, nu = () => Date.now() } = {}) {
       const weg = n >= 2 ? { dagen: n, van: voor, meldingen: st.meldingen.filter(m => m.dag > voor && m.soort !== 'info' && m.soort !== 'rtg').slice(0, 8) } : null;
       return bewaarEnToon(st, weg);
     });
-  }
-
-  /* Het vangnet om alles wat een leven verandert. Nog niets geboekt: terug naar
-     hoe het was. Wel geboekt: bevriezen, want het journaal gaat niet terug.
-     En kloppen de invarianten na afloop niet, dan ook bevriezen. */
-  function beschermd(st, doe) {
-    const voor = structuredClone(st), volgorde = st.boek.boekVolgorde;
-    try {
-      const r = doe();
-      const schending = r && r.nieuw ? [] : controleer(st, boek);
-      if (!schending.length) return r;
-      bevries(st, schending[0], meld);
-      save();
-      return { status: 409, error: 'Dit leven is bevroren: ' + schending[0] + '.' };
-    } catch (e) {
-      if (st.boek.boekVolgorde === volgorde) {
-        for (const k of Object.keys(st)) delete st[k];
-        Object.assign(st, voor);
-        koppel(st, boek);
-        return { status: 500, error: 'Er ging iets mis bij deze handeling. Er is niets veranderd.' };
-      }
-      bevries(st, 'een handeling brak af nadat er al geboekt was', meld);
-      save();
-      return { status: 500, error: 'Er ging iets mis na een boeking. Dit leven is bevroren om je boeken te beschermen; begin opnieuw.' };
-    }
   }
 
   /* V5: een handeling met een vangnet eromheen (./bewaking.js). Een `verzoek`-sleutel

@@ -186,15 +186,16 @@ test('8. de rechtengraaf: geven, breken en intrekken zijn alle drie zichtbaar', 
   assert.equal(dicht.actief.filter(a => a.id === id).length, 0, 'het ingetrokken recht is weg');
 });
 
-test('9. een mandaat zonder einddatum is geen mandaat', async () => {
-  const zonder = await api('mandaat', { van: 'a', aan: 'b', terrein: 'command', reden: 'de routetoets' });
-  assert.equal(zonder.status, 400, 'zonder tot-datum wordt het geweigerd');
-  assert.match(String(zonder.body.error || ''), /einddatum|overdracht/i, zonder.body.error);
-
+/* Het command-mandaat is opgeheven (4 oktober 2026, besluit van de eigenaar):
+   het legde een machtiging vast die niemand las, met een `tot` die als tekst
+   werd vergeleken. Mens-namens-mens loopt via kern/vertegenwoordiging, de AI
+   via kern/stuur/mandaat.js. Deze toets houdt vast dat de deur dicht blijft. */
+test('9. het command-mandaat bestaat niet meer', async () => {
   const tot = new Date(Date.now() + 3600 * 1000).toISOString();
-  const met = await moet('mandaat', { van: 'a', aan: 'b', terrein: 'command', tot,
-    reden: 'de routetoets legt een tijdelijk mandaat neer' }, 'een mandaat met einddatum');
-  assert.ok(met && typeof met === 'object', 'het mandaat komt terug');
+  const r = await api('mandaat', { van: 'a', aan: 'b', terrein: 'command', tot, reden: 'de routetoets' });
+  assert.equal(r.status, 404, 'de opgeheven mandaatroute antwoordt weer');
+  const graaf = await moet('rechten', {}, 'de graaf');
+  assert.equal(graaf.mandaten, undefined, 'de graaf draagt weer mandaten');
 });
 
 test('10. het agent-toezicht: stoppen, grenzen zetten en hervatten', async () => {

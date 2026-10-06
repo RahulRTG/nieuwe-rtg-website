@@ -49,6 +49,7 @@ test('2. zoeken op een beroep werkt in beide werelden; alles is gratis en determ
   for (const a of las.body.items) { assert.equal(a.beroep, 'Lasser'); assert.equal(a.prijsCenten, 0); assert.match(a.uitleg, /altijd gratis/); }
   const ond = await api(base, '/catalogus', { ...sess, wereld: 'zaken', zoek: 'ondernemer' });
   assert.ok(ond.body.totaal >= 10000, 'ondernemer-apps in de zakenwereld');
+  assert.ok(ond.body.items.length > 0, 'de gezochte ondernemer levert echte resultaten');
   assert.ok(ond.body.items.every(a => a.wereld === 'zaken'));
   // soort x beroep combineert; dezelfde pagina geeft dezelfde apps
   const a1 = await api(base, '/catalogus', { ...sess, wereld: 'techniek', beroep: 'Melkveehouder', soort: 'Leerpad', pagina: 2 });

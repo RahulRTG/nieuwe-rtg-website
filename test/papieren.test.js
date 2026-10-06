@@ -18,6 +18,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { spawnSync } = require('node:child_process');
 
 // de module leest zijn opslagpad bij het laden; daarom eerst een verse map
 const EIGEN = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pap-'));
@@ -174,4 +175,44 @@ test('10. EEN MERKTEKEN ZONDER VRAAG IS OOK EEN GAT', () => {
   const met = papieren.vulIn(bron + '\n\nVerantwoordelijke: {{eenveldzonder_vraag}}\n');
   assert.equal(papieren.telGaten(met), 1, 'een merkteken zonder vraag telt als gat');
   assert.match(met, /\{\{eenveldzonder_vraag\}\}/, 'en blijft zichtbaar in de tekst staan');
+});
+
+test('11. de live-kandidaat leest het expliciete ingevulde compliancebestand, niet brede appdata', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pap-keur-'));
+  try {
+    const appdata = path.join(tmp, 'appdata');
+    const compliance = path.join(tmp, 'compliance');
+    fs.mkdirSync(appdata);
+    fs.mkdirSync(compliance);
+    const bestand = path.join(compliance, 'papieren.json');
+    const antwoorden = Object.fromEntries(papieren.VRAGEN.map((v, i) => [v.id, {
+      waarde: 'Kandidaatbewijs ' + i + ': ' + v.veld,
+      parkeer: false,
+      door: 'Release-eigenaar',
+      at: '2026-10-01T08:00:00.000Z'
+    }]));
+    fs.writeFileSync(bestand, JSON.stringify({ antwoorden, bijgewerkt: '2026-10-01T08:00:00.000Z' }), { mode: 0o600 });
+
+    /* Een apart proces bootst het keurgolive-proces na: modules lezen hun
+       configuratie bij require(). RTG_DATA_DIR wijst bewust naar een lege map;
+       alleen het expliciete, read-only gemounte bestand mag de stand leveren. */
+    const modulePad = path.join(__dirname, '..', 'server', 'papieren');
+    const code = [
+      "const p=require(process.argv[1]);",
+      "const o=require(process.argv[1] + '/opslag');",
+      "process.stdout.write(JSON.stringify({klaar:p.klaar(),open:p.overzicht().open,bestand:o.BESTAND,tekst:p.document('verwerkingsregister').tekst}));"
+    ].join('');
+    const r = spawnSync(process.execPath, ['-e', code, modulePad], {
+      encoding: 'utf8',
+      env: { ...process.env, RTG_DATA_DIR: appdata, RTG_PAPIEREN_FILE: bestand }
+    });
+    assert.equal(r.status, 0, r.stderr);
+    const stand = JSON.parse(r.stdout);
+    assert.equal(stand.klaar, true);
+    assert.equal(stand.open, 0);
+    assert.equal(stand.bestand, bestand);
+    assert.match(stand.tekst, /Kandidaatbewijs/);
+    assert.equal(fs.readdirSync(appdata).length, 0,
+      'de kandidaat had geen productie-appdata nodig om het ingevulde papier te zien');
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });

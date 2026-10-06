@@ -14,13 +14,18 @@
       's nachts belt, mag niet achter het systeem zitten dat op dat moment het
       probleem is. Het staat in een leesbaar bestand op de schijf.
 
-   Het bestand bevat privénummers en staat daarom op 0600, in server/data/ --
-   die map staat in .gitignore en hoort daar te blijven. */
+   Het bestand bevat privénummers en staat daarom op 0600. Buiten productie
+   valt het terug op server/data/. De live-opstelling wijst met
+   RTG_PAPIEREN_FILE bewust naar een afzonderlijke compliance-map: de app mag
+   daar schrijven, terwijl de eenmalige go-livekandidaat exact dat ene domein
+   alleen-lezen ziet en nooit het brede productievolume. */
 const fs = require('fs');
 const path = require('path');
 
-const DIR = process.env.RTG_DATA_DIR || path.join(__dirname, '..', 'data');
-const BESTAND = path.join(DIR, 'papieren.json');
+const BESTAND = process.env.RTG_PAPIEREN_FILE
+  ? path.resolve(process.env.RTG_PAPIEREN_FILE)
+  : path.join(process.env.RTG_DATA_DIR || path.join(__dirname, '..', 'data'), 'papieren.json');
+const DIR = path.dirname(BESTAND);
 const LEEG = () => ({ antwoorden: {}, bijgewerkt: null });
 
 /* Lezen faalt nooit hard: geen bestand betekent "nog niets uitgevraagd", en dat

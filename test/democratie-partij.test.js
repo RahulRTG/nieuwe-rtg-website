@@ -243,6 +243,8 @@ test('8. over HTTP: elke route, de partijdeur zonder sleutel dicht, de eigenaar 
   assert.equal(pl.status, 200, 'plaats: ' + JSON.stringify(pl.body));
   const vid = pl.body.voorstel.id;
   assert.equal((await api('/api/democratie/partij/voorstel/toelicht', { id: vid, tekst: 'Twee bankjes, betaald uit het wijkbudget.' }, null, sleutel(s))).status, 200);
+  assert.ok((await api('/api/democratie/partij/voorstel/mijn', {}, null, sleutel(s))).body.voorstellen
+    .find(v => v.id === vid).toelichtingen.some(t => t.tekst === 'Twee bankjes, betaald uit het wijkbudget.'));
   assert.equal((await api('/api/democratie/partij/voorstel/aanname', { id: vid, veld: 'betaler', waarde: 'Wijkbudget', bron: 'Begroting 2027' }, null, sleutel(s))).status, 200);
   assert.equal((await api('/api/democratie/partij/voorstel/mijn', {}, null, sleutel(s))).body.voorstellen[0].id, vid);
 

@@ -1,0 +1,414 @@
+{
+  "format": "rtg-trust-evidence-plane-v3",
+  "mode": "shadow",
+  "promise": "evidence coordinates domains; domains retain meaning and ownership",
+  "universalProtocol": [
+    "INTENT",
+    "AUTHORITY",
+    "COMMITMENT",
+    "EXECUTION",
+    "CONFIRMATION",
+    "SETTLEMENT",
+    "OUTCOME"
+  ],
+  "truthClasses": [
+    "TECHNICAL",
+    "DOMAIN",
+    "EXTERNAL",
+    "OPERATIONAL"
+  ],
+  "finality": [
+    "UNKNOWN",
+    "UNVERIFIED",
+    "SOURCE_ATTESTED",
+    "CROSS_VERIFIED",
+    "RECONCILED",
+    "DISPUTED",
+    "REVERSED",
+    "CANCELLED"
+  ],
+  "correlationChain": [
+    "availability",
+    "experience",
+    "booking",
+    "payment",
+    "fulfillment",
+    "outcome"
+  ],
+  "capabilities": [
+    {
+      "id": "hospitality.availability.check",
+      "version": 1,
+      "owner": "hospitality",
+      "phase": "availability",
+      "risk": "medium",
+      "sloProfile": "availability-v1",
+      "implemented": true
+    },
+    {
+      "id": "experience.propose",
+      "version": 1,
+      "owner": "experience",
+      "phase": "experience",
+      "risk": "medium",
+      "sloProfile": "experience-v1",
+      "implemented": true
+    },
+    {
+      "id": "reservation.request",
+      "version": 1,
+      "owner": "hospitality",
+      "phase": "booking",
+      "risk": "high",
+      "sloProfile": "booking-v1",
+      "implemented": true
+    },
+    {
+      "id": "payment.authorize",
+      "version": 1,
+      "owner": "pay",
+      "phase": "payment",
+      "risk": "critical",
+      "sloProfile": "payment-v1",
+      "implemented": true
+    },
+    {
+      "id": "hospitality.fulfill",
+      "version": 1,
+      "owner": "hospitality",
+      "phase": "fulfillment",
+      "risk": "medium",
+      "sloProfile": "fulfillment-v1",
+      "implemented": true
+    },
+    {
+      "id": "outcome.observe",
+      "version": 1,
+      "owner": "experience",
+      "phase": "outcome",
+      "risk": "medium",
+      "sloProfile": "outcome-v1",
+      "implemented": true
+    }
+  ],
+  "sloProfiles": [
+    {
+      "id": "availability-v1",
+      "version": 1,
+      "availabilityTarget": 99.9,
+      "windowDays": 30,
+      "minimumSamples": 200,
+      "minimumCoverage": 0.05,
+      "freshnessMinutes": 1440,
+      "latency": {
+        "quantile": 0.9,
+        "maxMs": 250
+      }
+    },
+    {
+      "id": "experience-v1",
+      "version": 1,
+      "availabilityTarget": 99.9,
+      "windowDays": 30,
+      "minimumSamples": 200,
+      "minimumCoverage": 0.05,
+      "freshnessMinutes": 1440,
+      "latency": {
+        "quantile": 0.9,
+        "maxMs": 250
+      }
+    },
+    {
+      "id": "booking-v1",
+      "version": 1,
+      "availabilityTarget": 99.9,
+      "windowDays": 30,
+      "minimumSamples": 200,
+      "minimumCoverage": 0.05,
+      "freshnessMinutes": 1440,
+      "latency": {
+        "quantile": 0.9,
+        "maxMs": 1000
+      }
+    },
+    {
+      "id": "payment-v1",
+      "version": 1,
+      "availabilityTarget": 99.95,
+      "windowDays": 30,
+      "minimumSamples": 200,
+      "minimumCoverage": 0.05,
+      "freshnessMinutes": 720,
+      "latency": {
+        "quantile": 0.99,
+        "maxMs": 1000
+      }
+    },
+    {
+      "id": "fulfillment-v1",
+      "version": 1,
+      "availabilityTarget": 99.9,
+      "windowDays": 30,
+      "minimumSamples": 200,
+      "minimumCoverage": 0.05,
+      "freshnessMinutes": 1440,
+      "latency": {
+        "quantile": 0.9,
+        "maxMs": 500
+      }
+    },
+    {
+      "id": "outcome-v1",
+      "version": 1,
+      "availabilityTarget": 99.9,
+      "windowDays": 30,
+      "minimumSamples": 200,
+      "minimumCoverage": 0.05,
+      "freshnessMinutes": 4320,
+      "latency": {
+        "quantile": 0.9,
+        "maxMs": 250
+      }
+    }
+  ],
+  "constitution": [
+    {
+      "id": "TEP-01",
+      "rule": "same-idempotency-key-same-input-one-effect"
+    },
+    {
+      "id": "TEP-02",
+      "rule": "same-idempotency-key-different-input-conflict"
+    },
+    {
+      "id": "TEP-03",
+      "rule": "claim-never-grants-permission"
+    },
+    {
+      "id": "TEP-04",
+      "rule": "unknown-compatibility-denies-mutation"
+    },
+    {
+      "id": "TEP-05",
+      "rule": "unknown-slo-is-not-healthy"
+    },
+    {
+      "id": "TEP-06",
+      "rule": "every-retry-keeps-input-hash"
+    },
+    {
+      "id": "TEP-07",
+      "rule": "ambiguous-money-requires-reconciliation"
+    },
+    {
+      "id": "TEP-08",
+      "rule": "ledger-stores-references-not-domain-ownership"
+    },
+    {
+      "id": "TEP-09",
+      "rule": "shadow-policy-never-enforces"
+    },
+    {
+      "id": "TEP-10",
+      "rule": "migration-unknown-never-auto-runs"
+    },
+    {
+      "id": "TEP-11",
+      "rule": "evidence-is-observation-not-truth"
+    },
+    {
+      "id": "TEP-12",
+      "rule": "claims-require-sufficient-authorized-evidence"
+    },
+    {
+      "id": "TEP-13",
+      "rule": "absence-of-proof-never-proves-success"
+    },
+    {
+      "id": "TEP-14",
+      "rule": "unknown-never-authorizes-blind-irreversible-retry"
+    },
+    {
+      "id": "TEP-15",
+      "rule": "consequential-decisions-produce-immutable-explanation-evidence"
+    }
+  ],
+  "requirementProfiles": [
+    {
+      "id": "money.settlement",
+      "version": 3,
+      "claimType": "payment.settled",
+      "requirements": [
+        "domain-posting",
+        "provider-settlement",
+        "reconciliation-match"
+      ],
+      "completeFinality": "RECONCILED"
+    },
+    {
+      "id": "external.fulfillment",
+      "version": 3,
+      "claimType": "external.fulfilled",
+      "requirements": [
+        "domain-commitment",
+        "provider-confirmation",
+        "operational-outcome"
+      ],
+      "completeFinality": "CROSS_VERIFIED"
+    },
+    {
+      "id": "authority.revocation",
+      "version": 3,
+      "claimType": "authority.revoked",
+      "requirements": [
+        "revocation",
+        "propagation"
+      ],
+      "completeFinality": "CROSS_VERIFIED"
+    }
+  ],
+  "authorityContracts": [
+    {
+      "id": "money.domain",
+      "version": 1,
+      "signer": "rtg:money-domain-adapter",
+      "factTypes": [
+        "payment.ledger.posted",
+        "payment.reconciliation.matched"
+      ]
+    },
+    {
+      "id": "money.provider",
+      "version": 1,
+      "signer": "rtg:money-provider-adapter",
+      "factTypes": [
+        "payment.provider.settled",
+        "payment.reversed",
+        "payment.disputed"
+      ]
+    },
+    {
+      "id": "money.execution",
+      "version": 1,
+      "signer": "rtg:money-execution-adapter",
+      "factTypes": [
+        "payment.provider.outcome_unknown"
+      ]
+    },
+    {
+      "id": "external.domain",
+      "version": 1,
+      "signer": "rtg:external-domain-adapter",
+      "factTypes": [
+        "external.commitment.recorded",
+        "external.cancelled",
+        "external.disputed"
+      ]
+    },
+    {
+      "id": "external.provider",
+      "version": 1,
+      "signer": "rtg:external-provider-adapter",
+      "factTypes": [
+        "external.provider.confirmed",
+        "external.cancelled",
+        "external.disputed"
+      ]
+    },
+    {
+      "id": "external.operational",
+      "version": 1,
+      "signer": "rtg:external-outcome-adapter",
+      "factTypes": [
+        "external.outcome.observed"
+      ]
+    },
+    {
+      "id": "authority.owner",
+      "version": 1,
+      "signer": "rtg:authority-owner-adapter",
+      "factTypes": [
+        "authority.granted",
+        "authority.revoked"
+      ]
+    },
+    {
+      "id": "authority.expiry",
+      "version": 1,
+      "signer": "rtg:authority-expiry-adapter",
+      "factTypes": [
+        "authority.expired"
+      ]
+    },
+    {
+      "id": "authority.propagation",
+      "version": 1,
+      "signer": "rtg:authority-propagation-adapter",
+      "factTypes": [
+        "authority.revocation.propagated"
+      ]
+    },
+    {
+      "id": "trust.decision",
+      "version": 1,
+      "signer": "rtg:policy-decision-adapter",
+      "factTypes": [
+        "decision.recorded"
+      ]
+    }
+  ],
+  "integration": {
+    "allHttpRequests": "server/opzet/verzoekketen.js",
+    "allBusEvents": "server/kern/envelop.js",
+    "experienceBroker": "server/kern/experience/broker.js",
+    "hospitalityBooking": "server/kern/ervaring/tafels.js",
+    "hospitalityFulfillment": "server/kern/ervaring/tafelplanning.js",
+    "connectionPayment": "server/kern/vonk/payment.js",
+    "hospitalityOutcome": "server/kern/ervaring/leden/waardering.js",
+    "commandSlo": "server/kern/command/slo.js",
+    "moneyIntegrity": "server/kern/betaalwaarheid/index.js",
+    "externalDependencyIntegrity": "server/kern/vonk/payment.js",
+    "authorityRevocationIntegrity": "server/kern/connection-communication.js"
+  },
+  "proof": {
+    "command": "npm run trust:proof",
+    "tests": [
+      "test/trust-evidence-plane.test.js",
+      "test/trust-evidence-plane-v3.test.js"
+    ],
+    "status": "EXECUTED_BY_TEST_RUNNER"
+  },
+  "modules": {
+    "canon.js": "17109112893ee8757ae64d2c55c21381805a8012a88c5e1356c18a475fb76350",
+    "context.js": "6dafd79e8468e08de3d353521c0e168b983d8dd99f300917827161396040eb20",
+    "contract.js": "97d65662095ec50716ef3f4029ea1bccbe0cca30585225d80ebbd6c9a9ce7a95",
+    "ledger.js": "0bb7269544f5de7d38b0d628980fdb71197cff25fb6b61142dab4bc03ac8857f",
+    "claims.js": "9e74ce48e67da4678c01bd4892c5aa2bc4a83cd72e211a6191287eba30e19afd",
+    "capabilities.js": "24ee8e4607356aa4aeb0410dfecd8512ee8a866a3c983b757682cf76f9c02862",
+    "compatibility.js": "76e505a6cc6a1c0154a1fd53c5e4f780c54fc5365183163256affedfcd52e5c5",
+    "retry.js": "4c85b695d8851aa7ac17e21e2350af23a3d3463c19ed2134c2f85010f961506d",
+    "transport.js": "6ba871129b8a64b8314297dca4cdfba230fd3bea947f019bf8c37e132f1bd94c",
+    "migration.js": "6e979742721207805eb0f9fc3ad1f8661c8e3876581aaf9691b50699494572f3",
+    "provenance.js": "4b943e105054245f0d3c3580f0572f164fd20680485da1273781e3fbbf103695",
+    "constitution.js": "fd127e342001e645f9c5aa99f399a4370c3ba2fa97910435296de5dfb17b4697",
+    "slo-profiles.js": "9926521e440060edbf0a46f8031b210eec05a018fdf212c517d60160aa5b8883",
+    "metrics-slo.js": "1c05637b58fd1ad23ec01524da0d965ef3e164b8842e128077a1021895fce7ad",
+    "metrics.js": "01c3f3635ecff038032300b4bf94a78f8f0ccb141fa482857e54f1c0d07974ef",
+    "plane.js": "6e0ac3a96503f4a282cf992714e0b9efd2c70483ea223b5dc7586f99ce1a5315",
+    "runtime.js": "ab81a023748445c656e3464bef3bddd863e08760387bc45a51dbf6fd239c8ea3",
+    "hospitality-chain.js": "165917adff462dfee31592c69f3cbd3b019b8c738fa5f837017393666568d70a",
+    "v3-contract.js": "85b7dbf3ccd80ab4b240832b216b3cd27d30d24e2acd773adcb3597f99369595",
+    "v3-store.js": "0b841467edaaab9943faa7affd0d2389ae6df2b44a2f7794dafe0e9900ecf2a2",
+    "v3-authority-contracts.js": "812a197658bafdb5765102faf2e7984775c1f6c7628071bdee7a351d5ba330fb",
+    "v3-authorities.js": "a1b9ba62fb4f3793cc8d1ff58794f818fd924081d2f355822aa4fffedf9f765a",
+    "v3-profiles.js": "cdae44483683d8c25c33aa80b0161f439a688e0cae8442cb740304a41b5598f8",
+    "v3-resolver.js": "eb2e3bc45b72f0e9ee5ad66aa3f2de237383e5fdd1d1152b1025f85d6516e9a8",
+    "v3-decisions.js": "83afd2b18a9daf6949ab695d828c910c7d8a03be7024a11fa86032fc1690d461",
+    "v3-reconciliation.js": "6fee4a2a75cc620ef64496e1f559d6ff334a209b653481e08fde584f8aacb90f",
+    "v3-pilots.js": "4d1687e49cbbee29be33d99041b9bc6df3778eea127da2a5b7de696a60d681ff",
+    "v3-plane.js": "487541746b9a9030b549fad66e7d9ddd0bdd4e53e0aa562e749c84ae9c3a416c",
+    "v3-money-hook.js": "a49a603d0f102e705fdeaf434e3f31541c71cef065ec947b457bd8fceea80894",
+    "v3-external-hook.js": "1d25985e6820d9996275171995d90a1fce85f9d0adedcd8947882164fc792d55",
+    "v3-authority-hook.js": "b234733d5d9c5c1fb9af46eb72d8ebb6905a266e2c46ffea7337d3bb47a19941"
+  }
+}

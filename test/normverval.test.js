@@ -217,6 +217,45 @@ test('een VERLOPEN schuld laat hem zakken zolang de meter niet terug is, en open
   });
 });
 
+test('een oude tranche kan alleen met een numeriek voldoende, gedateerde aflossing sluiten', () => {
+  metRepo(h => {
+    const notitie = (aflossingsbewijs) => ({ datum: '2026-05-01', meter: 'keuringTeGroot 10 -> 14', reden: 'even niet',
+      soort: 'schuld', sleutel: 'keuringTeGroot', van: 10, naar: 14, vervalt: '2026-07-01', aflossingsbewijs });
+    const latere = (begin) => [
+      { datum: '2026-06-01', meter: 'keuringTeGroot 14 -> 20', reden: 'nieuwe noemer', soort: 'structureel', waarheen: 'nieuwe noemer' },
+      { datum: '2026-06-01', meter: 'keuringTeGroot ' + begin + ' -> 30', reden: 'volgende noemer', soort: 'structureel', waarheen: 'volgende noemer' }
+    ];
+    const bewijs = (naar) => ({ datum: '2026-06-01', van: 20, naar, bewijs: 'twee vastgelegde overgangen',
+      bronVan: 'keuringTeGroot 14 -> 20', bronNaar: 'keuringTeGroot ' + naar + ' -> 30' });
+    const norm = (naar) => grond({ meters: { keuringTeGroot: 30 }, notities: [notitie(bewijs(naar)), ...latere(naar)] });
+    h.schrijfNorm(norm(17));
+    h.git('add', '-A'); h.git('commit', '-qm', 'latere stand met historische schuld');
+    const basis = h.git('rev-parse', 'HEAD').trim();
+
+    const teKlein = h.draai('2026-08-01', '--basis', basis);
+    assert.equal(teKlein.code, 1, 'drie verbetering betaalt geen schuld van vier\n' + teKlein.uit);
+    assert.match(teKlein.uit, /verbetert 3, maar de schuld is 4/);
+
+    h.schrijfNorm(norm(16));
+    const betaald = h.draai('2026-08-01', '--basis', basis);
+    assert.equal(betaald.code, 0, 'een bewezen verbetering van vier betaalt de oude +4, ook als latere schuld apart bestaat\n' + betaald.uit);
+    assert.match(betaald.uit, /als tranche afbetaald/);
+  });
+});
+
+test('een verlopen prestatiemeter wordt onder prestatie gevonden en niet als verdwenen gemeld', () => {
+  metRepo(h => {
+    const n = grond({ prestatie: { p99Ms: 233 }, notities: [{ datum: '2026-05-01', meter: 'p99Ms 144 -> 233',
+      reden: 'storm', soort: 'schuld', sleutel: 'p99Ms', van: 144, vervalt: '2026-07-01' }] });
+    h.schrijfNorm(n); h.git('add', '-A'); h.git('commit', '-qm', 'prestatiemeter');
+    const basis = h.git('rev-parse', 'HEAD').trim();
+    const r = h.draai('2026-08-01', '--basis', basis);
+    assert.equal(r.code, 1, r.uit);
+    assert.match(r.uit, /staat op 233 en hoort terug naar 144/);
+    assert.doesNotMatch(r.uit, /meter staat niet meer/);
+  });
+});
+
 /* ==================== 4. DE UITZONDERINGEN VAN DE DELTAPOORT ==================== */
 
 test('een uitzondering zonder vervaldatum of over de datum laat hem zakken', () => {
@@ -322,4 +361,10 @@ test('slechter kent het verschil tussen een vloer en een plafond', () => {
   assert.equal(verval.slechter('omhoog', 68, 71), true, 'lager is slechter bij een vloer');
   assert.equal(verval.slechter('omhoog', 75, 71), false);
   assert.equal(verval.slechter('omlaag', 3, 3), false, 'gelijk is niet slechter');
+});
+
+test('overgang leest uitsluitend de genoemde meter en ondersteunt decimale komma', () => {
+  assert.deepEqual(verval.overgang({ meter: 'p99Ms 144 -> 233, eventLoopP99Ms 64,8 -> 97,9' }, 'eventLoopP99Ms'),
+    { van: 64.8, naar: 97.9 });
+  assert.equal(verval.overgang({ meter: 'p99MsExtra 1 -> 2' }, 'p99Ms'), null, 'geen deelwoordmatch');
 });

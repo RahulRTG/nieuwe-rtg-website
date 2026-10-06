@@ -33,7 +33,7 @@ const nu = () => 1_700_000_000_000;
 function opstelling({ maxCenten = 500000, beleid, zonderToken, kern } = {}) {
   const db = { data: {} };
   const token = maakBewijstoken({ sleutel: 'een-geheim-voor-de-toets', nu, gezien: geheugenGezien(nu) });
-  const bevoegd = bev.maakBevoegdheid({ capability: 'reis.boek', grenzen: { maxCenten }, door: 'agent', nu });
+  const bevoegd = bev.maakBevoegdheid({ capability: 'reis.boek', scope: '*', grenzen: { maxCenten }, door: 'agent', nu });
   const motor = maakBesluit({ zoekBevoegdheid: () => bevoegd, nu, beleid,
     munt: zonderToken ? null : token.munt });
   const V = maakVoornemens({ db, save: () => {}, nu, beslis: motor.beslis,

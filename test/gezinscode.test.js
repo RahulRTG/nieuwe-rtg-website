@@ -5,7 +5,7 @@
    constant-time zoeken over alle gezinnen, een gewist adres dat bij een nieuw
    gezin niets opent, en het eenmalige ticket per kanaal dat met de sessie
    ophoudt. De routes op een echte server staan in test/gezinsdeur.test.js, de
-   race over twee PostgreSQL-instances in test/gezinsdeur.pg.test.js.
+   race over twee PostgreSQL-instances in test/gezinsuitnodiging.pg.test.js.
 
    Draai los: node --test test/gezinscode.test.js */
 'use strict';

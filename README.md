@@ -4780,7 +4780,15 @@ en wordt bij het opstarten teruggezet, dus een herstart draait hem niet terug.
 - **Tokens gehasht op schijf:** in `db.json` staat alleen de sha256-hash van elk sessietoken. Wie de database in handen krijgt, kan daarmee niet inloggen. Sessies verlopen na 30 dagen zonder gebruik.
 - **Rate-limiting:** wachtwoorden, backoffice-code en personeels-PIN's zijn beschermd tegen raden (tien pogingen, dan vijf minuten wachten; PIN's: vijf pogingen, een minuut, per persoon).
 - **De ledeninlog remt op drie emmers, niet op één** (`server/routes/auth/inlog.js`): per IP+account (10, dan vijf minuten slot), per bron (50) en per doel-account (25). Die derde was er niet, en dat was een gat met een naam: een emmer op IP+account remt tien gokken van één adres en verder niets, dus veertig adressen op hetzelfde account waren veertig verse emmers. Gemeten voor de reparatie: veertig gokken, nul remmen, en het echte wachtwoord werkte daarna nog. De doel-emmer geeft bewust **geen slot maar een vertraging** van twee seconden per mislukte poging — een slot zou een vreemde de macht geven om een lid uit zijn eigen account te houden door vijfentwintig gokken te verbranden. Wie het wachtwoord weet komt tijdens een aanval dus zonder vertraging binnen. Het doel wordt gehasht voordat het een emmernaam wordt, zodat een e-mailadres nooit in het geheugen van de rem of in een beveiligingsmelding belandt. De passkey-kant deed dit al zo (`routes/auth/webauthn.js`); de wachtwoordkant liep achter. Bewaakt door `test/inlogrem.test.js`.
-- **De kantoor-inlog is een gesprek** (`server/kern/kantoorgesprek.js`, `public/shared/kantoorgesprek.js`): Rahul vraagt de kantoorcode en, als `OFFICE_TOTP_SECRET` staat, de tweede factor — geen codeveld meer. Drie dingen maken dat geen zwakkere deur. Wat je intypt wordt **nergens** bewaard (geen gespreksgeheugen, geen log met de code erin; de machine onthoudt alleen wélke vraag openstaat). Het scherm **maskeert** de invoer zodra de server `verborgen` op de vraag zet, want een chatvenster toont normaal wat je typt. En de misslagen lopen in **dezelfde teller en dezelfde bucket** als `/api/office/login` (`office:<ip>`), dus tien pogingen zetten allebei de deuren vijf minuten op slot — anders had je de backoffice makkelijker te raden gemaakt door hem vriendelijker te maken. Een fout antwoord zegt niet wélke helft fout was. **Keuringsregel 18** bewaakt dat de deur maar op één plek staat: dat is met schade geleerd, want `/api/office/login` was op vijf schermen los nagebouwd en toen de tweede factor kwam, kreeg maar één van die vijf een veld ervoor — de andere vier liepen vast op een vraag die ze niet konden stellen.
+- **De kantoor-inlog kent één productiedeur.** In productie opent het kantoor
+  uitsluitend voor een account op naam met een verse passkeyceremonie
+  (`server/kern/kantoor/productiedeur.js`). Een gedeelde `OFFICE_CODE` of losse
+  `OFFICE_TOTP_SECRET` wordt daar geweigerd en is ook geen productievereiste.
+  De gesprekservaring (`server/kern/kantoorgesprek.js`,
+  `public/shared/kantoorgesprek.js`) blijft buiten productie beschikbaar voor
+  toetsen en demo's: invoer wordt niet bewaard, geheime vragen worden
+  gemaskeerd en alle misslagen delen dezelfde rate-limitbucket. Zo bestaat er
+  geen tweede, anonieme rechtenroute naast de persoonlijke productiedeur.
 - **Persoonlijke login bij partners:** in een partner-app logt iedereen in op de eigen naam met een persoonlijke pincode (of het bedrijfsaccount met gebruikersnaam en wachtwoord). Alleen de bedrijfscode geeft geen toegang; zo staat elke handeling op een persoon.
 - **Ledenprijsgarantie in code:** een lid betaalt bij een partner nooit meer dan de eigen publieke prijs van die partner. De ledenprijs wordt server-side afgekapt op de publieke prijs, zowel bij het opslaan van de menukaart als bij het plaatsen van een bestelling.
 - **Security-headers:** Content-Security-Policy (`default-src 'self'`, `font-src 'self'`: geen extern verkeer, ook niet voor fonts — die staan zelf in `public/fonts/`), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy` (camera, microfoon en locatie alleen voor de eigen apps).
@@ -4874,7 +4882,7 @@ geen documentatie maar reclame.
   bestaat en niet half af is.
 - **Rahul vraagt het papierwerk uit; hij vult het nooit zelf in.** In beide
   documenten stond eerst een rij `[VUL IN]`-plekken. Een invullijst vult
-  niemand in, dus stond het er nog steeds. Nu stelt Rahul de 19 vragen uit
+  niemand in, dus stond het er nog steeds. Nu stelt Rahul de 18 vragen uit
   `server/papieren/vragen.js` op de technische pagina — één per keer, met erbij
   waaróm hij het vraagt (KvK-nummer, wie er 's nachts beslist bij een lek, of
   er een verwerkersovereenkomst ligt). Er zit **geen generatiepad** in die
@@ -4882,10 +4890,15 @@ geen documentatie maar reclame.
   verzonnen KvK-nummer is erger dan een leeg veld — een leeg veld ziet
   iedereen, een verzonnen nummer gelooft iedereen. Weet iemand iets niet, dan
   parkeert Rahul het eerlijk als "nog niet bekend"; dat telt gewoon als open en
-  de keuring gaat er niet overheen. De antwoorden staan in
-  `server/data/papieren.json` (0600, buiten git en buiten de database) — juist
+  de keuring gaat er niet overheen. Lokaal staan de antwoorden in
+  `server/data/papieren.json`; de live-opstelling gebruikt het expliciete
+  `RTG_PAPIEREN_FILE` in `.rtg-compliance/papieren.json` (0600, buiten git en
+  buiten de database). De go-livekandidaat ziet alleen die map read-only — juist
   omdat de database tijdens een datalek het ding is dat je misschien niet
   vertrouwt, moet het draaiboek daar los van leesbaar zijn.
+  `npm run papierwerk -- --live` maakt het invulvel in diezelfde map;
+  `npm run papierwerk -- --live --lees` schrijft de antwoorden terug naar exact
+  het bestand dat de productie-app en de keuring gebruiken.
 
 ## RTG Mail
 
@@ -6100,3 +6113,95 @@ Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk 
 - **DATALEK.md** — het datalek-draaiboek: de 72-uursklok van art. 33, wie wat doet, en wat er vooraf uitgevraagd moet zijn.
 - **PRODUCTION.md** / **LAUNCH.md** — runbook en livegang-checklist.
 - **scripts/mac/LEESMIJ.md** — RTG als launchd-dienst op een Mac (Mac mini als thuisserver): `sudo scripts/mac/installeer.sh`.
+## RTG Trust & Evidence Plane V3
+
+De gemeenschappelijke control plane staat in `server/kern/bewijsvlak/`. Hij
+maakt van CI-bewijs, runtimehandelingen en zakelijke ketens geen nieuw
+superdomein: ieder domein houdt zijn eigen betekenis en opslag. Het vlak draagt
+alleen claims, contractversies, policybesluiten, idempotency, causaliteit,
+provenance en bewijsreferenties.
+
+Elk HTTP-verzoek krijgt bij de voordeur een interne correlation chain. De
+eventenvelop erft die keten en zet bij een vervolg automatisch de directe
+oorzaak. Een publieke correlation-header wordt nooit vertrouwd als interne
+keten. De eerste verticale client is hospitality:
+
+`availability -> experience -> booking -> payment -> fulfillment -> outcome`
+
+De runner in `server/kern/bewijsvlak/hospitality-chain.js` bezit geen van die
+zes stappen. Hij weigert te starten wanneer een echte domeinadapter ontbreekt,
+geeft iedere adapter een vaste idempotency key en inputhash en schrijft iedere
+retry als evidence receipt. Een ambigue geldactie wordt zonder expliciete
+reconciliatie nooit automatisch herhaald.
+
+De runtime staat voorlopig in `shadow`: bestaande domeinpolicies blijven de
+enige autoriteit. De plane vergelijkt, verbindt en bewijst, maar kan geen
+handeling toestaan die het domein weigert. `TRUST_EVIDENCE_PLANE.json` bindt de
+capabilitycontracten, constitutionele invarianten en modulehashes aan de bron.
+
+Elke fase heeft daarnaast een duurzame capabilitymeter. Die meet technische
+beschikbaarheid, histogramlatentie, freshness, vensterdekking, foutbudget,
+replays, foutklassen en begrensde domeinuitkomsten. `DENIED` en
+`NOT_APPLICABLE` blijven zichtbaar maar tellen niet als technische storing:
+een volle tafel of geldige policyweigering is geen kapotte service. De meter
+bewaart geen actor, invoer of fouttekst. Herhaalde measurementsleutels tellen
+eenmaal en een andere betekenis onder dezelfde sleutel wordt geweigerd.
+
+De zes normen staan als `capabilityProfielen` in `SLO.json`. RTG Command toont
+ze naast de HTTP-SLO's. Daarmee kan een procesherstart het bewijs niet wissen
+en blijft "onvoldoende gemeten" de uitslag totdat sampleomvang, dekking en
+freshness werkelijk voldoen.
+
+- `npm run trust:proof` beproeft de correlation chain, hash-ledger,
+  idempotency, retries, outbox/inbox, compatibility, SLO-fail-closed gedrag,
+  migratieplanning, provenance en de volledige hospitalityketen.
+- `npm run trust:manifest` vernieuwt het machineleesbare manifest.
+- `npm run trust:manifest:check` weigert een manifest dat niet meer bij de bron
+hoort; `npm run check` voert dezelfde controle uit.
+
+V3 zet boven de domeinketen één universeel bewijsprotocol:
+
+`INTENT -> AUTHORITY -> COMMITMENT -> EXECUTION -> CONFIRMATION -> SETTLEMENT -> OUTCOME`
+
+Een `EvidenceRecord` blijft een waarneming. Alleen een versiegebonden
+requirement-profiel en resolver mogen daar een reproduceerbare claim uit
+afleiden. Claims noemen hun bewijs, profiel- en resolverdigest, geldigheidstijd,
+completeness en finality. Een nieuwe correctie schrijft een oude claim nooit
+over: `REVERSED`, `DISPUTED` en `CANCELLED` zijn nieuwe feiten in dezelfde
+geschiedenis. De vier bronklassen blijven apart: technisch, domein, extern en
+operationeel. Een bron telt alleen binnen haar expliciete authority-scope en
+geldigheidsvenster. Sinds de authority-hardening is die scope alleen niet meer
+genoeg: iedere requirement verwijst naar een onveranderlijk, versiegebonden
+authority/source-contract. Dat contract bindt feitsoort, bron, authority,
+interne signer, provider, capability en domein. Vrije callerstrings kunnen geen
+V3-bewijs meer maken; alleen de beperkte money-, external-, authority- en
+decision-adapters kunnen de eenmalige interne attestatie afgeven. Een verkeerde
+authority, source, signer of provider wordt vóór opslag geweigerd.
+
+De primaire ledger bewaart geen domeinpayload. Hij houdt uitsluitend de
+contentdigest, een digest van de volledige metadata en veilige contractrefs;
+de subjectref en authorityref staan alleen als digest in de evidence-index. De
+`evidenceId` bindt content, subject, capability, authority én metadata, zodat
+gelijke payloads van twee subjects nooit over die grens dedupliceren. Een oude
+state die nog raw `content` bevat start bewust fail-closed met
+`LEGACY_RAW_EVIDENCE_REQUIRES_MIGRATION`: migratie/archivering is een expliciete
+operatorhandeling en herschrijft de auditgeschiedenis niet stil.
+
+Ook groei is fail-closed. De primaire keten accepteert standaard maximaal
+100.000 records en 50.000 evidence-descriptors; V3 begrenst evidence/claims op
+50.000, decisions/reconciliations op 25.000 en conflicts op 10.000. Een exacte
+replay blijft mogelijk, maar een nieuw record boven de grens krijgt
+`EVIDENCE_CAPACITY_REACHED`. Er wordt nooit automatisch oudste historie
+verwijderd. Voor productievolume moet een geverifieerde immutable archiefsink de
+state vóór die grens overnemen; de actuele bezetting staat in de snapshot.
+
+Ontbrekend, verlopen, onbevoegd of conflicterend bewijs staat als evidence debt
+in de V3-snapshot. `UNKNOWN` kan nooit een blinde geldretry of onomkeerbare actie
+toestaan. Het besluit `DO_NOT_RETRY` opent een immutable reconciliatiezaak en
+maakt eigen decision evidence; dat bewijs bewijst uitsluitend dát het besluit
+genomen is en kan niet circulair de onderliggende betaling bewijzen.
+
+Drie productiegrenzen leveren nu shadow-bewijs: `betaalwaarheid` voor Money
+Integrity, de Vonk-reserveringsnaad voor External Dependency Integrity en de
+Connection-consent/call-naad voor Authority & Revocation Integrity. Provider-
+bevestiging zonder waargenomen fulfilment blijft bewust onvolledig.

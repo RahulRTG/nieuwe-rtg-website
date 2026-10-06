@@ -43,6 +43,7 @@
       "codenaamVan",
       "geborenVan",
       "idGeverifieerd",
+      "kluisAuth",
       "leeftijdVan",
       "onboarding",
       "tenant"
@@ -131,6 +132,8 @@
     ],
     "bedrijf": [
       "agenda",
+      "betaal",
+      "betaalWaarheid",
       "assetBeeld",
       "assetMet",
       "bedrijf",
@@ -2076,6 +2079,7 @@
       "stuurRoep"
     ],
     "supplier": [
+      "horecaTerugbetaling",
       "ALT_IDEE",
       "ANNULEERGRONDEN",
       "AUTOVERKOOP_BRANDSTOF",

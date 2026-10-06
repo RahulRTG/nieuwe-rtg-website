@@ -46,6 +46,7 @@
 'use strict';
 const { AsyncLocalStorage } = require('async_hooks');
 const crypto = require('crypto');
+const trustContext = require('./bewijsvlak/context');
 /* De tijd komt van de huisklok en niet van het OS. Dat is hier geen detail: een
    envelop is de enige tijdstempel die een gebeurtenis draagt, en met `new Date()`
    trekt hij zich van RTG_KLOK niets aan. Dan is geen enkele beproeving op
@@ -100,6 +101,7 @@ const huidige = () => keten.getStore() || null;
 function maak(opgave) {
   const o = opgave || {};
   const ouder = huidige();
+  const trust = trustContext.huidige();
   const classificatie = CLASSIFICATIES[o.classificatie] ? o.classificatie : 'onbekend';
   return Object.freeze({
     id: o.id || nieuwId(),
@@ -108,8 +110,8 @@ function maak(opgave) {
     kanaal: o.kanaal || null,
     actor: keurActor(o.actor != null ? o.actor : (ouder ? ouder.actor : null)),
     /* De keten: zonder ouder is deze gebeurtenis zelf het begin. */
-    correlatie: o.correlatie || (ouder ? ouder.correlatie : null) || null,
-    oorzaak: o.oorzaak || (ouder ? ouder.id : null) || null,
+    correlatie: o.correlatie || (ouder ? ouder.correlatie : null) || (trust ? trust.chainId : null) || null,
+    oorzaak: o.oorzaak || (ouder ? ouder.id : null) || (trust ? trust.stepId : null) || null,
     classificatie
   });
 }
@@ -117,7 +119,7 @@ function maak(opgave) {
 /* Alles wat binnen fn gebeurt, hoort bij deze envelop. */
 function inKeten(envelop, fn) {
   if (!envelop) return fn();
-  return keten.run(envelop, fn);
+  return keten.run(envelop, () => trustContext.inContext(trustContext.uitEvent(envelop), fn));
 }
 
 /* De correlatie invullen als hij nog leeg is: de eerste gebeurtenis van een

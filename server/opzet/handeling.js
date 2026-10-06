@@ -35,9 +35,11 @@
 'use strict';
 
 const { AsyncLocalStorage } = require('async_hooks');
+const { naAntwoord } = require('../lib/antwoord-einde');
 /* De rij-telling staat apart in ./handelingtelling.js, met de kop over WAT er
    gemeten wordt, wat die meting NIET ziet en wat hij kost erbij. */
 const { tel, verschil } = require('./handelingtelling');
+const mutatietracker = require('../db/mutatietracker');
 const context = new AsyncLocalStorage();
 
 /* De grens waarboven een handeling het vermelden waard is. Bewust geen blokkade:
@@ -69,6 +71,20 @@ function raakt(soort, aantal) {
   return true;
 }
 
+/* Exacte collectie-aanwijzing uit de db-proxy. We bewaren alleen de lengte bij
+   de eerste en de laatste mutatie binnen DIT verzoek. Tien pushes worden zo
+   één delta +10 en niet tien logregels. Een wijziging in een rij blijft, zoals
+   voorheen, delta nul; raakt() blijft de expliciete uitweg voor massa-updates. */
+function observeer(feit) {
+  const h = huidige();
+  if (!h || !h.trackerDekking || !feit || typeof feit.collectie !== 'string') return false;
+  const oud = h.observaties.get(feit.collectie);
+  if (oud) oud.naar = feit.naLengte;
+  else h.observaties.set(feit.collectie,
+    { collectie: feit.collectie, van: feit.voorLengte, naar: feit.naLengte });
+  return true;
+}
+
 /* De meting afsluiten en de uitslag teruggeven. Apart van de middleware zodat
    een toets hem kan aanroepen zonder een server op te zetten -- en zodat de
    optelling die op het scherm komt dezelfde is als die een toets ijkt. */
@@ -86,7 +102,12 @@ function sluit(h, data, klasse) {
     try { Object.assign(h, klasse(h.methode, h.pad)); } catch (e) { h.klassefout = true; }
   }
   try {
-    h.wijzigingen = verschil(h.voor, tel(data));
+    if (h.trackerDekking) {
+      h.wijzigingen = [...h.observaties.values()]
+        .map(w => Object.assign({}, w, { delta: w.naar - w.van }))
+        .filter(w => w.delta !== 0)
+        .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+    } else h.wijzigingen = verschil(h.voor, tel(data));
     h.geraakt = h.wijzigingen.reduce((n, w) => n + Math.abs(w.delta), 0)
       + h.gemeld.reduce((n, g) => n + Math.abs(g.aantal), 0);
     h.doel = h.wijzigingen.map(w => w.collectie);
@@ -119,7 +140,9 @@ function middleware(deps) {
       correlatie: (req && req.id) || null,
       pad: (req && req.path) || null,
       methode: (req && req.method) || null,
-      voor: tel(data),
+      trackerDekking: mutatietracker.isBewaakt(data),
+      voor: mutatietracker.isBewaakt(data) ? null : tel(data),
+      observaties: new Map(),
       gemeld: [],
       wijzigingen: [],
       geraakt: 0,
@@ -128,7 +151,7 @@ function middleware(deps) {
     };
     try { if (req) req.handeling = h; } catch (e) { /* bevroren req: dan alleen in de context */ }
 
-    res.on('finish', () => {
+    naAntwoord(res, () => {
       let laatste = null;
       try { laatste = geefData(); } catch (e) { laatste = null; }
       sluit(h, laatste, klasse);
@@ -168,4 +191,6 @@ function hervat() {
   };
 }
 
-module.exports = { middleware, hervat, huidige, raakt, sluit, tel, verschil, GRENS };
+mutatietracker.voegWaarnemerToe(observeer);
+
+module.exports = { middleware, hervat, huidige, raakt, observeer, sluit, tel, verschil, GRENS };

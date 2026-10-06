@@ -5,12 +5,12 @@
     "activeringOndergrens": 49,
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
-    "beweringenZonderVulcontrole": 92,
-    "bewijsAchterstand": 1717,
-    "bewijsAlleenKeten": 24,
+    "beweringenZonderVulcontrole": 84,
+    "bewijsAchterstand": 680,
+    "bewijsAlleenKeten": 23,
     "bewijsCellenBewezen": 28249,
     "bronBlindeBestanden": 0,
-    "browserpoortToetsen": 419,
+    "browserpoortToetsen": 423,
     "carriereDomeinenGemeten": 15,
     "dbDeuren": 536,
     "dbDeurenSchrijvend": 275,
@@ -19,9 +19,9 @@
     "delenZonderOnderwerp": 0,
     "dependencies": 0,
     "devPakketten": 1,
-    "e2eBestanden": 300,
+    "e2eBestanden": 304,
     "endpointsNooitAangeraakt": 0,
-    "endpointsZonderTest": 860,
+    "endpointsZonderTest": 859,
     "faalproefGezakt": 0,
     "gluurGaten": 0,
     "gluurGecontroleerd": 2417,
@@ -33,7 +33,7 @@
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 51,
     "keuringDubbeling": 178,
-    "keuringOmvang": 332,
+    "keuringOmvang": 330,
     "keuringScheef": 14,
     "keuringStuk": 0,
     "keuringTeGroot": 12,
@@ -59,8 +59,8 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 2012,
-    "toetsenNietGemeten": 129,
+    "testbestanden": 2052,
+    "toetsenNietGemeten": 85,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -71,7 +71,7 @@
     "wekkersZonderTrede": 0,
     "wettenOnbewezen": 5,
     "zaakwigGezakt": 0,
-    "zelfpoortendeToetsen": 48,
+    "zelfpoortendeToetsen": 46,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 3,
@@ -127,12 +127,12 @@
     "veranderbereikZonderBereik": 530,
     "stilLezing": 5,
     "stilLezingMeters": 61,
-    "stilLezingBereik": 643,
+    "stilLezingBereik": 655,
     "bewijsOnderscheidt": 6,
     "connectDomeinenGemeten": 23,
     "afgeleidZonderEigenaar": 1,
     "afgeleidOnbeslist": 105,
-    "afgeleidMetEigenaar": 215,
+    "afgeleidMetEigenaar": 216,
     "herbouwVerschilt": 0,
     "herbouwBewezen": 14,
     "veranderbereikStatisch": 1164,
@@ -1984,7 +1984,16 @@
       "sleutel": "bewijsAchterstand",
       "van": 985,
       "vervalt": "2026-12-15",
-      "reden": "Vier posten erbij bij de samenvoeging van 24 takken, alle vier in object-vooraf: nieuwe routes die een bestaand object willen bedienen dat de proef niet zelf heeft aangemaakt. Geen enkele post wisselde van soort, dus dit is groei in omvang en niet in aard. De sluitweg per post staat in BEWIJSSCHULD.json. OPNIEUW BESLOTEN op 2026-10-04 door de eigenaar, met een nieuwe datum: de schuld is van 3178 naar 1717 gezakt (gemeten, vastgelegd met norm.js --vastleggen) maar nog niet terug op 985. Wat ontbreekt staat per post in BEWIJSSCHULD.json; de grootste is output-niet-toerekenbaar (1037 routes, sluitweg node scripts/outputproef.js --meet=<n>), dan object-vooraf (323) en idem-ongeclassificeerd (152). Aflossen gebeurt in een eigen PR en niet in deze samenvoeging."
+      "reden": "Vier posten erbij bij de samenvoeging van 24 takken, alle vier in object-vooraf: nieuwe routes die een bestaand object willen bedienen dat de proef niet zelf heeft aangemaakt. Geen enkele post wisselde van soort, dus dit is groei in omvang en niet in aard. De sluitweg per post staat in BEWIJSSCHULD.json. OPNIEUW BESLOTEN op 2026-10-04 door de eigenaar, met een nieuwe datum: de schuld is van 3178 naar 1717 gezakt (gemeten, vastgelegd met norm.js --vastleggen) maar nog niet terug op 985. Wat ontbreekt staat per post in BEWIJSSCHULD.json; de grootste is output-niet-toerekenbaar (1037 routes, sluitweg node scripts/outputproef.js --meet=<n>), dan object-vooraf (323) en idem-ongeclassificeerd (152). Aflossen gebeurt in een eigen PR en niet in deze samenvoeging.",
+      "naar": 989,
+      "aflossingsbewijs": {
+        "datum": "2026-08-31",
+        "van": 1997,
+        "naar": 1966,
+        "bewijs": "de structurele NORM-notities van 2026-08-31 sluiten op 1997 en hervatten op 1966",
+        "bronVan": "bewijsAchterstand 989 -> 1997",
+        "bronNaar": "bewijsAchterstand 1966 -> 2605"
+      }
     },
     {
       "datum": "2026-08-27",
@@ -2083,7 +2092,12 @@
       "sleutel": "bronBlindeBestanden",
       "van": 0,
       "vervalt": "2026-09-30",
-      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Drie werkos-delen zijn niet los te ontleden: de knip loopt midden door een CSS-sjabloon. Op main was werkos-01 nog EEN bestand. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 0."
+      "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Drie werkos-delen zijn niet los te ontleden: de knip loopt midden door een CSS-sjabloon. Op main was werkos-01 nog EEN bestand. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 0.",
+      "afgelost": {
+        "op": "2026-10-04",
+        "meter": "bronBlindeBestanden 3 -> 0",
+        "hoe": "De drie werkos-delen (public/shared/werkos/werkos-01.js, -01b.js, -01c.js) waren voor de lexer onleesbaar omdat de bundelknip midden door EEN CSS-template liep (werkos-01bb.js lag er ook in, maar lexte toevallig). Elke naad tussen de vier delen sluit nu de template en opent een nieuwe (een backtick plus een plus aan het eind, een backtick aan het begin), zodat elk deel op zichzelf lexbaar is. De openingsopmerking van 01b, 01bb en 01c staat daardoor als JS-commentaar boven de nieuwe template in plaats van als CSS-commentaar erin, zodat de onderwerpregel van elk deel (BUNDELS.md) dezelfde blijft. De bundel public/shared/werkos.js is opnieuw gebouwd: de CSS-constante verschilt alleen in die drie commentaren (zonder commentaar en witruimte byte voor byte gelijk), en alles na de constante is ongewijzigd. De tand wordt aangedraaid naar 0."
+      }
     },
     {
       "datum": "2026-08-27",
@@ -2091,6 +2105,7 @@
       "soort": "schuld",
       "sleutel": "metingenZonderRatel",
       "van": 19,
+      "naar": 20,
       "vervalt": "2026-09-30",
       "reden": "Samenvoeging van 24 takken (tak samenvoeging-negen-2026-08-18). Een meetbestand in de wortel dat aan geen enkele ratel hangt. Bewust genoteerd als schuld en niet stil verlaagd; de meter hoort terug naar 19."
     },
@@ -3998,29 +4013,19 @@
       "soort": "structureel",
       "sleutel": "bewijsAlleenKeten",
       "van": 18,
-      "meter": "bewijsAlleenKeten 18 -> 24 (gemeten op een schone boom; het ingecheckte register stond nog op 18 terwijl main vers al 21 meet). Op uitdrukkelijk besluit van de eigenaar van 2026-10-04.",
+      "meter": "bewijsAlleenKeten 18 -> 23 (na de integratie van alle open takken; de eigenaar stond 24 toe) (gemeten op een schone boom; het ingecheckte register stond nog op 18 terwijl main vers al 21 meet). Op uitdrukkelijk besluit van de eigenaar van 2026-10-04.",
       "reden": "Zes mechanismen draaien alleen in de keten omdat ze per definitie een kandidaat-SHA, een CI-run of de veertien routejournalen van GitHub nodig hebben. Drie kwamen met #443 op main en werden nooit gemeten: scripts/evidence.js, evidence-control.js en evidence-calibration.js. Drie komen met #444: tooling/scripts/mutationproof.js (mutationproof.yml), scripts/outputcollect.js en scripts/outputproof.js (ronde.yml). Geen ervan vervangt een lokale proef; het zijn kandidaatgebonden omhulsels eromheen.",
       "waarheen": "De lokale tegenhangers dragen dezelfde vraag: scripts/mutatie.js voor de mutatieproef, scripts/outputproef.js voor de outputproef, en npm run evidence:plan voor het bewijsplan. Zodra scripts/ci-lokaal.js die opdrachten met een lokale kandidaat kan draaien, tellen ze als lokaal bereikbaar en zakt de teller weer."
     },
     {
       "datum": "2026-10-04",
       "soort": "schuld",
-      "sleutel": "zelfpoortendeToetsen",
-      "van": 47,
-      "vervalt": "2027-01-04",
-      "meter": "zelfpoortendeToetsen 47 -> 48",
-      "reden": "test/foundation-lesstroom.pg.test.js is nieuw (het stroomticket van RTFoundation-onderwijs, besluit B25): acht gelijktijdige claims op een eenmalig ticket over twee instances (precies een opent de stroom) en een intrekking op A tegen een claim op B. Dat kan niet eerlijk zonder PostgreSQL en Redis en slaat lokaal zonder DATABASE_URL over. Lokaal tegen echte PostgreSQL en Redis groen; met de mutatie 'de claim laat het ticket staan' zakte hij. Hij staat in scripts/lib/pg-toetslijst.js (verplicht in CI) en als uitzondering onder zelfpoortende-toets.",
-      "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL en Redis."
-    },
-    {
-      "datum": "2026-10-04",
-      "soort": "schuld",
-      "sleutel": "zelfpoortendeToetsen",
-      "van": 46,
+      "sleutel": "toetsenNietGemeten",
+      "van": 339,
       "vervalt": "2027-01-02",
-      "meter": "zelfpoortendeToetsen 46 -> 47",
-      "reden": "test/gezinsdeur.pg.test.js (B18) vereist echte PostgreSQL- en Redis-diensten: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode en een rotatie op A tegen de oude code op B. Lokaal met die diensten gedraaid en groen; zonder het advisory lock en FOR UPDATE in server/pg/collectietransactie.js zakte hij 3 van 3. Hij staat in scripts/lib/pg-toetslijst.js en als uitzondering in deze norm.",
-      "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL en Redis."
+      "meter": "toetsenNietGemeten 339 -> 341",
+      "reden": "De gezinsdeur (B18/B19) brengt twee nieuwe toetsbestanden mee waar de mutatiemotor nog niet langs is: test/gezinsdeur.test.js (echte server) en test/gezinscode.test.js (de eenheden). Met de hand nagetrokken met zestien mutaties in gezinscode.js, gezinsstroom.js, gezinstoken.js, gezinstoegang.js, gezinsdeur.js, basis.js en foundation-nog-gesloten.js; alle zestien zakten (een, de queryterugval in tokenUit, pas nadat de toets een VERSE sessie in de URL zette in plaats van een al afgemelde). Dit is instrumentdekking en geen oordeel over de toetsen.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
     }
   ],
   "prestatie": {
@@ -4039,7 +4044,7 @@
     "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). scripts/normverval.js keurt alleen wat vanaf hier bij komt. DE GRENS IS NU TWEE KEER OPGESCHOVEN, en dat is geen verzachting maar twee keer dezelfde oorzaak. De eerste keer (18 -> 19 augustus) schreef main twee notities op een eigen tak waar deze regel niet bestond. De tweede keer (19 -> 21 augustus) kwamen bij de samenvoeging van 23 PR-takken elf notities van 20 augustus mee, geschreven op takken die van dezelfde dag zijn als de regel en hem dus niet kenden. WAAROM ZE NIET ALSNOG WORDEN INGEDEELD: een soort toekennen aan andermans notitie betekent hem woorden in de mond leggen -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Dat is precies de reden die de eerste verschuiving al gaf. WAT DAT KOST, EERLIJK: elf verlagingen uit die ronde staan nu zonder soort in het register. Ze dragen wel allemaal een uitgeschreven reden -- wat ze missen is het VELD. En om te laten zien dat dit geen uitweg voor mezelf is: alle acht notities die deze samenvoeging zelf schrijft (2026-08-21) dragen een soort, zeven daarvan als schuld met een sleutel, een van-waarde en een einddatum. Vanaf 21 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
   },
   "sinds": {
-    "keuringOmvang": "2026-09-27",
+    "keuringOmvang": "2026-10-04",
     "testbestanden": "2026-10-04",
     "toetsenNietGemeten": "2026-10-04",
     "inlineStijlAttributen": "2026-10-04",
@@ -4161,7 +4166,7 @@
     "edgeVeldHoofdactie": "2026-10-04",
     "edgeVeldTrust": "2026-09-23",
     "edgeVeldContextZelf": "2026-10-04",
-    "bewijsAlleenKeten": "2026-09-28",
+    "bewijsAlleenKeten": "2026-10-04",
     "positieZonderTermijn": "2026-10-04",
     "positieNietVergeten": "2026-10-04",
     "positieStromenGezien": "2026-09-29",
@@ -4417,18 +4422,6 @@
       "pad": "test/gezinsuitnodiging.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de raceproef voor de gezinsuitnodiging (twee instances en twaalf tikken om dezelfde eenmalige uitnodiging, die een profiel met een gezinssessie oplevert) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/foundation-lesstroom.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor het stroomticket van RTFoundation-onderwijs (B25: acht gelijktijdige claims op een eenmalig ticket over twee instances, en een intrekking op A tegen een claim op B) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
-    },
-    {
-      "regel": "zelfpoortende-toets",
-      "pad": "test/gezinsdeur.pg.test.js",
-      "vervalt": "2026-10-15",
-      "reden": "de raceproef voor de gezinsdeur (B18: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode, en een rotatie op A tegen de oude code op B) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
     }
   ]
 }

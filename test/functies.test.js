@@ -40,7 +40,9 @@ test('functies: een uitgezette functie blokkeert zijn pad', () => {
 });
 
 test('functies: een gesloten werkplek sluit ook de gedeelde gastvoorstellen', () => {
-  for (const pad of ['/api/werk-gast/beeld', '/api/werk-gast/besluit']) {
+  for (const pad of ['/api/werk-gast/beeld', '/api/werk-gast/besluit',
+    '/api/werk-gast/betaling/start', '/api/werk-gast/betaling/status',
+    '/api/werk-leverancier/beeld', '/api/werk-leverancier/besluit']) {
     assert.equal(functies.functieVoorPad(pad).id, 'bedrijf');
     assert.equal(functies.padGeblokkeerd(pad, { bedrijf: { aan: false } }).id, 'bedrijf');
     assert.equal(functies.padGeblokkeerd(pad, { bedrijf: { aan: true } }), null);

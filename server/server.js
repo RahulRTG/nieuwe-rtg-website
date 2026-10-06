@@ -3,33 +3,9 @@
    De kern werkt zonder model. Vrije taal kan lokaal via LOCAL_AI_URL; externe
    aanbieders zijn optionele, expliciete uitwijk. */
 
-/* DE ONDERGRENS VAN DE RUNTIME, en waarom hij hier hard staat.
-
-   De accountsdatabase draait op `node:sqlite`. Die bestaat vanaf Node 22 en
-   laadt sinds 22.13 ZONDER `--experimental-sqlite`; de zelf-herstart met die
-   vlag die hier stond is daarmee vervallen. Op een oudere Node klapt het pas
-   veel later stuk op een `require('node:sqlite')` diep in de opslaglaag -- een
-   foutmelding die niets zegt over de echte oorzaak. `LAUNCH.md` beloofde
-   bovendien jarenlang "Node 18+", dus dit was geen theoretisch scenario maar een
-   gedocumenteerde valkuil.
-
-   Een `engines`-veld in package.json waarschuwt alleen bij `npm install` en doet
-   niets bij `node server/server.js`. Daarom staat de grens hier, vóór het eerste
-   require: falen op de eerste regel met de reden erbij. De grens staat op 22.13
-   en niet op 22.0, want dat is de versie waarop node:sqlite zonder vlag laadt --
-   precies wat deze server doet. Zelfde getal als in package.json en .nvmrc. */
-const NODE_MINIMAAL = [22, 13];
-const nodeDelen = process.versions.node.split('.').map(Number);
-if (!Number.isFinite(nodeDelen[0]) ||
-    nodeDelen[0] < NODE_MINIMAAL[0] ||
-    (nodeDelen[0] === NODE_MINIMAAL[0] && nodeDelen[1] < NODE_MINIMAAL[1])) {
-  console.error(
-    '[start] Node ' + process.versions.node + ' is te oud. RTG vereist Node ' +
-    NODE_MINIMAAL.join('.') + ' of nieuwer, omdat de accountsdatabase op de ' +
-    'ingebouwde node:sqlite draait. Zie LIVEGANG.md.'
-  );
-  process.exit(78);
-}
+/* Fail vóór ieder ander onderdeel wanneer de ingebouwde SQLite-runtime mist;
+   config/node-versie.js bezit de versiegrens en de uitleg. */
+require('./config/node-versie').eisOndersteundeNode();
 
 const { idVanKey } = require('./lib/lidsleutel');
 
@@ -74,6 +50,7 @@ const logboek = require('./log');
 const log = logboek.log;
 const testomgeving = require('./testomgeving');
 const betaal = require('./betaal');
+const maakTrustBewijs = require('./opzet/trust-bewijs');
 const systeemKlok = require('./lib/klok');
 const { schoon, ledenPrijs, rondEuro, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
 const { totpOk } = require('./kern/totp');
@@ -199,6 +176,12 @@ function appUrl(req) {
 require('./config').pasToe(process.env, log);
 
 load();
+
+/* Trust leest dezelfde geladen request-state als de domeinen. Dit moet na
+   load(): vóór die grens is db.data bewust nog afwezig. */
+const { trustPlane, bewijsHospitalityBesluit, markeerHospitalityRequest } =
+  maakTrustBewijs({ db, save, betaal,
+    vindReservering: id => (db.data.reserveringen || []).find(r => r.id === id) });
 
 /* Eén blijvende waarheid voor inkomende betalingen, vóór routes en webhooks
    worden bedraad. Ze hangt niet aan Stripe of Mollie: providers leveren alleen
@@ -700,7 +683,8 @@ const ankerpost = require('./lib/ankerpost').maakAnkerpost({ ankerdienst });
 const { sseToSupplier, sseToOffice, notifySupplier, supplierIndex,
   findSupplier, supplierAuth, persoonsPoort, logActivity } =
   require('./opzet/leverancierpoort')({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
-    grootSupplierSync, busGeef: () => bus, kernGeef: () => kern });
+    grootSupplierSync, busGeef: () => bus, kernGeef: () => kern,
+    markeerHospitalityRequest });
 
 /* De dienstenlaag -- live updates (SSE), meldingen en web-push, en de diensten
    die daarop leunen (archief, beveiliging, de Wacht, RTmail, naamlaag, antivirus)
@@ -1635,6 +1619,8 @@ const {
 } = maakErvaring({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan,
+  trustPlane,
+  bewijsHospitalityBesluit,
   // de gedekte tafel (kern/tafeldek.js) wordt pas in kernlaag7 gebouwd; laat gebonden
   tafeldekVan: () => kern.tafeldek,
   /* RTG Pay wordt pas in kernlaag3 gebouwd -- ver na deze regel -- en de

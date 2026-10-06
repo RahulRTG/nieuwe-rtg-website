@@ -663,7 +663,9 @@ function aanvraagMetMelding(t, soort, oudeMelding = false) {
   }, save);
   const ctx = { db: p.db, save, crypto: require('node:crypto'),
     schoon: (v, n) => String(v ?? '').slice(0, n), PERSONAS: { rtg: { codename: 'Anna' } },
-    findSupplier: code => code === zaak.code ? zaak : null, ledenPrijs: (_publiek, prijs) => prijs,
+    // Via de levende werkkopie, zoals supplierIndex in productie: een ruwe
+    // fixtureverwijzing zou de mutatietracker van #447 omzeilen.
+    findSupplier: code => code === zaak.code ? p.db.data.suppliers.find(s => s.code === code) : null, ledenPrijs: (_publiek, prijs) => prijs,
     optieAan: (_s, naam) => naam !== 'betaalVooraf', leeftijdVan: () => 35, geborenVan: () => '1991-01-01',
     idGeverifieerd: () => true, pickupCode: () => '42', zorgVoor: () => null, zorgMee: () => null,
     liveCodename: () => 'Anna', haversine: () => null, openLijnVoor() {},
@@ -731,7 +733,10 @@ test('betaalde order behoudt brede leveranciersmelding voor nog onbehouden keuke
   assert.equal((await betaal(p.actor, { ref: order.ref })).ok, true);
   assert.equal(p.lees('orders')[0].paid, true);
   assert.deepEqual(p.lees('suppliers')[0].recepten, {}, 'echte keuken initialiseert zonder geboekte voorraadregel of eigen save');
-  assert.equal(p.breed(), 2); assert.equal(p.scans(), 3, 'fixture, betaaldomein en brede melding');
+  // Met de mutatietracker van #447 serialiseert een brede save alleen de
+  // collecties die als geraakt zijn aangewezen; 'ander' wordt daardoor een keer
+  // minder gelezen dan bij de volledige scan van vroeger.
+  assert.equal(p.breed(), 2); assert.equal(p.scans(), 2, 'alleen geraakte collecties worden gelezen');
   assert.equal(p.lees('ander').waarde, 3);
   assert.deepEqual(p.signalen, ['notify', 'supplier', 'office']);
   assert.equal((await betaal(p.actor, { ref: order.ref })).status, 409);

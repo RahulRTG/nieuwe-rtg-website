@@ -174,13 +174,13 @@ test('4. na opruimen slaat de poort wel om -- anders bewijst hij alleen dat hij 
 
 test('5. een hergebruikt PID wordt niet voor een oud kind aangezien', () => {
   /* Zonder deze regel ruimt de opvolger een wildvreemd proces op dat toevallig
-     hetzelfde nummer erfde. Het onderscheid is de STARTTIJD uit /proc. */
-  const { pad, map } = verse();
+     hetzelfde nummer erfde. Het onderscheid is de STARTTIJD uit /proc op Linux
+     en uit de proceslijst op macOS. De productcode levert die identiteit; de
+     proef mag niet zelf een Linux-only bron nabouwen. */
+  const { A, pad, map } = verse();
   const kind = langLevendKind();
-  const echteStart = (() => {
-    const stat = fs.readFileSync('/proc/' + kind + '/stat', 'utf8');
-    return Number(stat.slice(stat.lastIndexOf(')') + 2).split(' ')[19]);
-  })();
+  const echteStart = A.procesStart(kind);
+  assert.ok(Number.isFinite(echteStart), 'het platform levert een stabiele processtarttijd');
   fs.writeFileSync(pad, JSON.stringify({
     runId: 'run-hergebruik', taak: 'proefronde', stand: 'PASSED',
     gestart: new Date().toISOString(), geeindigd: new Date().toISOString(),

@@ -121,7 +121,7 @@ module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify,
     if ((gr.leden || []).length >= MAX_LEDEN) return { error: 'Dit genootschap is vol.' };
     if (!gr.uitnodigingen.includes(doel)) gr.uitnodigingen.push(doel);
     save();
-    try { if (notify) notify(doel, 'Je bent uitgenodigd voor een genootschap: ' + gr.naam); } catch (e) {}
+    try { if (notify) notify(doel, { title: 'Genootschap', body: 'Je bent uitgenodigd voor een genootschap: ' + gr.naam }); } catch (e) {}
     return { ok: true, uitgenodigd: codenaamVan(doel) };
   }
 

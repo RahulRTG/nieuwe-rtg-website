@@ -17,8 +17,10 @@
         '<p><b>' + e(new Intl.NumberFormat(document.documentElement.lang || navigator.language,{style:'currency',currency:d.valuta}).format(d.bedragMinor/10**d.decimalen)) + '</b></p>' +
         '<p>' + e(d.stand) + (d.datum ? ' · ' + e(d.datum) + ' · ' + e(d.tijdzone) : '') + '</p><p>' + e(d.locatie) + '</p>' +
         (d.onderdelen.length ? '<h2>Onderdelen</h2><ul>' + d.onderdelen.map(t => '<li>' + e(t.titel) + ' · ' + e(t.stand) + (t.datum ? ' · ' + e(t.datum) : '') + ' · ' + e(t.herkomst) + '</li>').join('') + '</ul>' : '') +
-        '<p>Deze link geeft alleen toegang tot deze afspraak. RTG verstuurt hiermee geen betaling.</p><div role="status"></div>' +
+        '<p>Deze link geeft alleen toegang tot deze afspraak. Akkoord met het voorstel is nog geen betaling.</p><div role="status"></div>' +
+        window.RTGPraktijkBetalen.gast(d.betaling) +
         (d.magAntwoorden ? '<div class="pr-rij"><button class="knop p" data-keuze="akkoord">Akkoord met dit voorstel</button><button class="knop" data-keuze="afwijzen">Voorstel afwijzen</button></div>' : '');
+      window.RTGPraktijkBetalen.bind(el,d,api,laad);
       el.querySelectorAll('[data-keuze]').forEach(k => k.addEventListener('click',async () => {
         const knoppen = el.querySelectorAll('button'); knoppen.forEach(b => b.disabled = true);
         try { await api('besluit',{ keuze:k.dataset.keuze,versie:d.versie }); await laad(); }

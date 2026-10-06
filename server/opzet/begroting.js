@@ -187,7 +187,7 @@ function bewaak(data, deps) {
   });
   wikkels.set(data, wikkel);
   wikkels.set(wikkel, wikkel);   // bewaak(bewaakt) geeft dezelfde wikkel terug
-  instellingen.set(wikkel, { nu, modus, grens, doel: data });
+  instellingen.set(wikkel, { nu, modus, grens, doel: data, log: deps && deps.log });
   return wikkel;
 }
 
@@ -197,4 +197,4 @@ function stand() {
     laatste: teller.laatste.slice(0, 10) };
 }
 
-module.exports = { bewaak, beoordeel, toetsOpslag, collectieSleutels, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };
+module.exports = { bewaak, instelling: v => instellingen.get(v), beoordeel, toetsOpslag, collectieSleutels, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };

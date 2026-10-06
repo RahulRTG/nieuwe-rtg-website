@@ -51,13 +51,12 @@ module.exports = function verzoekketen(deps) {
      RTG_PROXY_HOPS=0 zet het vertrouwen helemaal uit: dan telt alleen het adres
      van de verbinding zelf. Dat is de juiste stand voor een app die zonder proxy
      aan het internet hangt. */
-  app.set('trust proxy', Number(process.env.RTG_PROXY_HOPS != null ? process.env.RTG_PROXY_HOPS : 1));
+  require('./proxyvertrouwen')(app, process.env);
   /* WIE die proxy is. Zonder opgave vertrouwen we alleen loopback en private
      adressen -- de gebruikelijke plek voor een reverse proxy. Een bezoeker die
      rechtstreeks vanaf het internet binnenkomt valt daar nooit onder, dus zijn
      X-Forwarded-For wordt genegeerd in plaats van geloofd. Staat de proxy op een
      publiek adres, zet die dan hier (komma-gescheiden). */
-  app.set('proxy ips', String(process.env.RTG_PROXY_IPS || '').split(',').map(s => s.trim()).filter(Boolean));
   /* DE EFFECTMETER, en met opzet als EERSTE laag van de keten.
 
      Hij hing eerst naast de staatmeter, halverwege, en meldde daar `geen` op een
@@ -79,6 +78,10 @@ module.exports = function verzoekketen(deps) {
      staat vóór bodylezers en dus ook vóór de rauwe betaalwebhooks. */
   if (typeof postgresVerzoekMiddleware === 'function') app.use(postgresVerzoekMiddleware());
   app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
+  /* De Trust & Evidence-correlatie loopt door ELK verzoek, ook wanneer de route
+     zelf nog geen claims schrijft. Het publieke request-id blijft een logref;
+     de interne chain-id is apart, ondoorzichtig en verleent nooit toegang. */
+  app.use(require('../kern/bewijsvlak/context').middleware());
   // wat verandert dit verzoek: rijen per collectie voor en na (blast radius).
   // NA het logboek want hij leunt op req.id; bewust niet in save(). Zie de kop
   // van ./handeling.js voor de afweging en de gemeten kosten.
@@ -117,11 +120,7 @@ module.exports = function verzoekketen(deps) {
 
   /* De meelees-laag van de RTG AI (kern/rtgai.js): telt alleen mee met het
      verkeer en doet verder niets; de kern wordt verderop aangesloten. */
-  let rtgaiMeelezer = null;
-  app.use((req, res, next) => {
-    res.on('finish', () => { try { if (rtgaiMeelezer) rtgaiMeelezer.lees(req.method, req.path, res.statusCode); } catch (e) {} });
-    next();
-  });
+  const zetRtgaiMeelezer = require('./rtgai-meelezer')(app);
 
   /* Een installatie die bewust zonder betalen publiceert, mag nergens een
      betaling simuleren of alleen administratief als voldaan markeren. Deze
@@ -148,7 +147,7 @@ module.exports = function verzoekketen(deps) {
   return {
     schild, zetWacht, lieg,
     ssrf: require('../kern/ssrf'), // SSRF-afweer voor client-bepaalde uitgaande doelen
-    zetRtgai: (r) => { rtgaiMeelezer = r; }
+    zetRtgai: zetRtgaiMeelezer
   };
 };
 // de dieptewacht woont in ./lijfpoort.js; hier alleen doorgegeven voor wie hem

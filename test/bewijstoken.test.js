@@ -164,11 +164,11 @@ test('5. de grenzen worden met dezelfde functie getoetst als een gewone bevoegdh
   const { token, bevoegd } = opstelling({ grenzen: { maxCenten: 25000, apparaatVertrouwd: true } });
   const m = token.munt(bevoegd, { actor: 'x' });
 
-  const opOnvertrouwd = token.verbruik(m.token, { waardeCenten: 100, context: { apparaatVertrouwd: false } });
+  const opOnvertrouwd = token.verbruik(m.token, { capability: 'money.refund', waardeCenten: 100, context: { apparaatVertrouwd: false } });
   assert.ok(opOnvertrouwd.error);
   assert.match(opOnvertrouwd.error, /vertrouwd apparaat/);
 
-  const teVeel = token.verbruik(m.token, { waardeCenten: 37000, context: { apparaatVertrouwd: true } });
+  const teVeel = token.verbruik(m.token, { capability: 'money.refund', waardeCenten: 37000, context: { apparaatVertrouwd: true } });
   assert.match(teVeel.error, /hoger dan de bevoegdheid/);
 
   // een token voor een ander soort handeling doet hier niets
@@ -184,21 +184,21 @@ test('5b. een token voor een bedrag laat geen groter bedrag door', () => {
   const { token, bevoegd } = opstelling({ grenzen: { maxCenten: 25000 } });
   const klein = token.munt(bevoegd, { actor: 'x', waardeCenten: 100 });
 
-  const teVeel = token.verbruik(klein.token, { waardeCenten: 5000 });
+  const teVeel = token.verbruik(klein.token, { capability: 'money.refund', waardeCenten: 5000 });
   assert.ok(teVeel.error, 'ruim binnen de bevoegdheid, maar niet binnen dit token');
   assert.match(teVeel.error, /gemunt voor/);
 
   // precies het bedrag mag wel, en minder ook
   assert.equal(token.verbruik(token.munt(bevoegd, { actor: 'x', waardeCenten: 100 }).token,
-    { waardeCenten: 100 }).ok, true);
+    { capability: 'money.refund', waardeCenten: 100 }).ok, true);
   assert.equal(token.verbruik(token.munt(bevoegd, { actor: 'x', waardeCenten: 100 }).token,
-    { waardeCenten: 40 }).ok, true);
+    { capability: 'money.refund', waardeCenten: 40 }).ok, true);
 
   // een token ZONDER bedrag valt terug op de bevoegdheidsgrens en niet op nul
   const open = token.munt(bevoegd, { actor: 'x' });
   assert.equal(open.claim.waardeCenten, null);
-  assert.equal(token.verbruik(open.token, { waardeCenten: 20000 }).ok, true);
-  assert.match(token.verbruik(token.munt(bevoegd, { actor: 'x' }).token, { waardeCenten: 30000 }).error,
+  assert.equal(token.verbruik(open.token, { capability: 'money.refund', waardeCenten: 20000 }).ok, true);
+  assert.match(token.verbruik(token.munt(bevoegd, { actor: 'x' }).token, { capability: 'money.refund', waardeCenten: 30000 }).error,
     /hoger dan de bevoegdheid/);
 });
 
@@ -208,21 +208,21 @@ test('6. eenmalig is eenmalig, en zonder geheugen gaat het niet door', () => {
   const { token, bevoegd } = opstelling();
   const m = token.munt(bevoegd, { actor: 'x', waardeCenten: 5000 });
 
-  assert.equal(token.verbruik(m.token, { waardeCenten: 5000 }).ok, true);
-  const tweede = token.verbruik(m.token, { waardeCenten: 5000 });
+  assert.equal(token.verbruik(m.token, { capability: 'money.refund', waardeCenten: 5000 }).ok, true);
+  const tweede = token.verbruik(m.token, { capability: 'money.refund', waardeCenten: 5000 });
   assert.equal(tweede.herhaling, true);
   assert.match(tweede.error, /al gebruikt/);
 
   // een leesvraag mag herbruikbaar zijn -- maar dan met zoveel woorden
   const leesbaar = token.munt(bevoegd, { actor: 'x', eenmalig: false });
   assert.equal(leesbaar.claim.eenmalig, false);
-  assert.equal(token.verbruik(leesbaar.token, { waardeCenten: 1 }).ok, true);
-  assert.equal(token.verbruik(leesbaar.token, { waardeCenten: 1 }).ok, true);
+  assert.equal(token.verbruik(leesbaar.token, { capability: 'money.refund', waardeCenten: 1 }).ok, true);
+  assert.equal(token.verbruik(leesbaar.token, { capability: 'money.refund', waardeCenten: 1 }).ok, true);
 
   // zonder plek om gebruikte tokens te onthouden gaat een eenmalig token NIET door
   const zonderGeheugen = maakBewijstoken({ sleutel: SLEUTEL, nu });
   const m2 = zonderGeheugen.munt(bevoegd, { actor: 'x' });
-  assert.match(zonderGeheugen.verbruik(m2.token, { waardeCenten: 1 }).error, /plek om gebruikte tokens/);
+  assert.match(zonderGeheugen.verbruik(m2.token, { capability: 'money.refund', waardeCenten: 1 }).error, /plek om gebruikte tokens/);
 });
 
 test('7. een token onder een ander beleid wordt geweigerd en niet doorgelaten', () => {

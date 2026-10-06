@@ -173,6 +173,13 @@ echte betalingen: `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` of een andere
 provider; anders `RTG_BETALEN_UIT=1`. Voor AI: `ANTHROPIC_API_KEY` of een andere
 provider; anders `RTG_AI_UIT=1`.
 
+Het productiekantoor gebruikt geen `OFFICE_CODE` en geen losse
+`OFFICE_TOTP_SECRET`. Iedere medewerker logt in met het eigen RTG-account,
+start de kantoorrol op naam en bevestigt die deur met een verse passkey. De
+gedeelde code/TOTP-deur wordt in productie geweigerd vóórdat een code wordt
+vergeleken. `OFFICE_CODE` en `OFFICE_TOTP_SECRET` blijven alleen beschikbaar
+buiten productie voor afgeschermde demo's en geautomatiseerde toetsen.
+
 Veilige tussenstand: er is nog geen externe herstel-SMS en geen geactiveerde
 uitgaande Stripe-rail. Productie start daarom alleen wanneer
 `RTG_HERSTEL_SMS_UIT_BEWUST=1` expliciet bevestigt dat herstel voor accounts met
@@ -581,10 +588,18 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 **De enige productieroute:**
 
 1. Volg `LIVEGANG.md`: bereid host, geheimen, externe backup en echte providers
-   voor; rond code en gegenereerde registers af en commit een schone bron.
-2. Laat `Release-imagekandidaat` op die exacte commit lopen. Download het
-   artefact `herkomst` ongewijzigd naar `.release/` en vul de twee unieke
-   kandidaat-tags in `deploy/live.env` in.
+   voor; vul het compliancebestand met `npm run papierwerk -- --live` en lees
+   het na invullen met `npm run papierwerk -- --live --lees` terug; rond code
+   en gegenereerde registers af en commit een schone bron.
+2. Laat op die exacte commit eerst de vier prereleasepoorten uit `LIVEGANG.md`
+   groen eindigen: handmatige volledige CI met `verwachte_commit`, de Node
+   26/4k/17g-Beproeving, Desktop 1440/390 en CodeQL met een nul-resultaten-SARIF-
+   verdict op exact dezelfde commit. Start pas daarna
+   `Release-imagekandidaat`. Die workflow weigert zelf iedere ontbrekende,
+   oudere, rode of anders gecommitte prerelease-uitspraak voordat hij bouwt of
+   publiceert, en bindt het resulterende dossier met BUILD aan de herkomst.
+   Download het artefact `herkomst` ongewijzigd naar `.release/` en vul de twee
+   unieke kandidaat-tags in `deploy/live.env` in.
 3. Verzamel de echte onafhankelijke bewijsbestanden, vul het commitgebonden
    externe dossier en laat de vaste releasebeoordelaar het ondertekenen.
 4. Draai `npm run live:check`, `npm run live:golive` en daarna
@@ -602,8 +617,25 @@ dev-lekken, registratie/eigenaar/backoffice werken.
    padbehoudende HTTP→HTTPS-redirect en bewaart
    `.release/publieke-tls-bewijs.json`; vervolgens lopen veiligheidsrand en SLO.
 
-- [ ] `npm run live:golive` geeft exitcode 0 in de productiecontainer
-- [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar, en er hoort al een RTG-account bij (verplicht; leeg of het voorbeeldadres blokkeert de start). `RTG_OWNER_BOOTSTRAP` is na die eerste registratie volledig uit de productieomgeving verwijderd. Overdragen kan later op de technische pagina onder "Eigenaarschap"
+- [ ] `npm run live:golive` geeft exitcode 0 in de productiecontainer. Op een
+      verse host mag de eerste ronde uitsluitend op `RTG_OWNER_BOOTSTRAP`
+      blokkeren; draai dan `npm run live:owner` en herhaal `live:golive`
+- [ ] `npm run papierwerk -- --live --lees` heeft alle 18 echte antwoorden in
+      exact `.rtg-compliance/papieren.json` vastgelegd; onbekende feiten zijn
+      niet ingevuld om de poort kunstmatig groen te maken
+- [ ] `RTG_OWNER_EMAIL` is het echte adres van de eigenaar, en er hoort al een
+      RTG-account bij. De eerste eigenaar is vóór de publieke wissel uit exact
+      het begrensd gekeurde kandidaatimage aangemaakt én door een tweede proces
+      uit PostgreSQL teruggelezen. `RTG_OWNER_BOOTSTRAP` is daarna volledig uit
+      de productieomgeving verwijderd. Overdragen kan later op de technische
+      pagina onder "Eigenaarschap"
+- [ ] Ook na de eerste installatie heeft deze release een vers
+      `rtg-owner-readback-bewijs-v2`: `live:golive` heeft de effectieve eigenaar
+      opnieuw met alleen `SELECT` uit de echte productie-PostgreSQL gelezen en
+      het bewijs aan current DB snapshot, nonce, commit en immutable image
+      gebonden. `ownerproof` heeft geen productie- of releasevolume;
+      `keurgolive` ontvangt alleen het gehashte bewijs. Na vier uur of na
+      restore/drift moet de ronde opnieuw
 - [ ] `.env` ingevuld; `NODE_ENV=production`; `RTG_ENC_KEY` gezet
 - [ ] Versleuteling in rust bewezen op de echte machine: `node --test test/rust.test.js` is groen. Die test zet gegevens via de gewone endpoints in een server en zoekt daarna de hele datamap byte voor byte af; hij vertrouwt niet op de belofte
 - [ ] De sleutels (`RTG_ENC_KEY`, `RTG_VAULT_KEY`, `RTG_SECRET_KEY`) staan als omgevingsvariabele, **niet** in de datamap. Zonder deze regel schrijft de server ze als bestand naast de data, en dan opent een gestolen schijf zichzelf
@@ -648,8 +680,19 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 - [ ] Rate-limiter bevestigd: in productie geeft de API boven 300 verzoeken/minuut/IP een 429 (test/livegang.test.js bewijst dit)
 - [ ] Schone start bevestigd: elke echte omgeving heeft `RTG_MAGNAAT_TEST` uit en bevat geen voorbeeldzaken, testpersoneel of voorbeeldposts; ook een database die eerder als testomgeving begon wordt bij de start opgeschoond (test/livegang.test.js)
 - [ ] Schild getest: de applicatie-WAF blokkeert sondes (wp-admin, .env, pad-klimmen) en de DDoS-rem zet een stormend IP 15 minuten op de banlijst; meldingen komen op het beveiligingsbord binnen (test/schild.test.js)
-- [ ] Rand-DDoS geregeld: DNS achter Cloudflare (of gelijkwaardig) met proxy aan, zodat volumetrische golven de server nooit bereiken; de app-WAF en -rem zijn de tweede linie
-- [ ] TURN draait: coturn met `use-auth-secret` en `static-auth-secret` gelijk aan `TURN_SECRET`; `/api/ice` geeft kortlevende inloggegevens terug en (video)bellen werkt vanaf 4G/strenge firewalls
+- [ ] Rand-DDoS geregeld via een aantoonbaar passende EU/self-hosted of bewust
+      geaccepteerde randdienst, zodat volumetrische golven de server niet
+      bereiken; Cloudflare is een mogelijke externe afhankelijkheid, nooit een
+      verplichte of impliciet soevereine keuze. De app-WAF en -rem zijn de
+      tweede linie
+- [ ] TURN draait: coturn met publiek vertrouwd TLS, uitsluitend een volledige
+      `turns:`-URL met expliciete poort, `use-auth-secret` en
+      `static-auth-secret` gelijk aan een sterk willekeurig `TURN_SECRET`;
+      `/api/ice` geeft kortlevende inloggegevens en geen lege URL-items terug en
+      een echte tweennetwerkproef bewijst voice én video vanaf 4G en een streng
+      firewallnetwerk. Het getekende releasebewijs eist verschillende
+      netwerk-AS'en, relay-only en echte bytes in beide richtingen. Alleen een
+      bereikbare ICE-route is geen bewijs. Zonder deze keten blokkeert publieke productie
 
 ---
 
@@ -666,16 +709,19 @@ Dit is het deel dat je niet in dit repo kunt afvinken:
    schrijvers, globaal-unieke id's), met tests voor correctheid en multi-writer.
    Wat nog rest: load-tests op productievolume, afstemmen van pool/connlimits, en
    een read-replica-/backup-strategie voor Postgres zelf.
-4. **Kinderen en moderatie (het zwaarst).** De RTFoundation richt zich op
-   minderjarigen, met chat, snaps en (video)bellen. Dat vereist: echte moderatie
-   (mensen + tooling, niet alleen block/report), leeftijdsverificatie, een DPIA,
-   meldroutes en toezicht. Dit is een *voorwaarde om te mogen starten*, geen
-   latere feature.
+4. **Kinderen en moderatie (het zwaarst).** Foundation blijft in de beperkte
+   volwassen release gesloten. Openstelling voor minderjarigen vereist vooraf
+   echte moderatie (mensen + tooling, niet alleen block/report),
+   leeftijdsverificatie, een DPIA, meldroutes en toezicht. Dit is een
+   voorwaarde voor het openen van Foundation, niet voor een release waarin de
+   productpolicy Foundation aantoonbaar dicht houdt.
 5. **Juridisch.** Voorwaarden, verwerkersovereenkomsten, cookie-/privacybeleid
    en aansprakelijkheid moeten door een jurist zijn getoetst voor de doelgroepen
    en landen waarin je draait.
 6. **Breder testen.** De testsuite dekt de kritieke paden (veiligheid, realtime,
    betaal-naad, config, opslag). UI-flows en edge-cases verdienen meer dekking.
 
-Kort: **de code is klaar om te draaien; het product is klaar om te starten
-zodra de zes punten hierboven zijn geregeld.**
+Kort: **de bron kan pas releaseklaar worden genoemd wanneer de commitgebonden
+poorten groen zijn. Het product kan pas starten wanneer daarnaast alle gekozen
+host-, provider-, juridische en operationele voorwaarden aantoonbaar zijn
+gesloten. Ontbrekend bewijs blijft `UNKNOWN`.**

@@ -87,7 +87,8 @@ test('boekingen: zelfde semantiek + de 50000-cap knipt zonder kopie per toevoegi
   // dubbele refs: .find-semantiek (eerste = nieuwste wint), net als de oude scans
   const dubbel = { ...maakB(7), status: 'nieuwer' };
   boekingenVoegToe(dubbel);
-  assert.equal(boekingMetRef('RTG-B-7'), dubbel, 'de nieuwste met die ref wint, zoals .find op nieuwste-eerst');
+  // db.data geeft de bewaakte (getrackte) rij terug; daartegen vergelijken.
+  assert.equal(boekingMetRef('RTG-B-7'), db.data.boekingen[0], 'de nieuwste met die ref wint, zoals .find op nieuwste-eerst');
 });
 
 test('de veegronde archiveert nooit een oude dubbel over de nieuwste ref heen', () => {
@@ -141,10 +142,11 @@ test('de index werkt incrementeel: toevoegen bouwt hem niet opnieuw op', () => {
     supplierCode: 'KIKUNOI', customerKey: 'user-spion', customerTier: 'rtg', at: new Date().toISOString()
   };
   db.data = { orders: [spion], boekingen: [] };
+  const spionInDb = db.data.orders[0]; // de bewaakte rij zoals db.data hem teruggeeft
   for (let i = 0; i < 200; i++) ordersVoegToe(maakOrder(i));
 
   // eerste lezing: de index staat (of wordt gebouwd); daarna is de teller stil
-  assert.equal(orderMetRef('RTG-O-SPION'), spion, 'de spion zit gewoon in de index');
+  assert.equal(orderMetRef('RTG-O-SPION'), spionInDb, 'de spion zit gewoon in de index');
   const na = gelezen;
   assert.ok(na > 0, 'de index is echt opgebouwd -- anders meet deze toets niets');
 
@@ -153,7 +155,7 @@ test('de index werkt incrementeel: toevoegen bouwt hem niet opnieuw op', () => {
      pad niet meer. */
   for (let i = 200; i < 210; i++) ordersVoegToe(maakOrder(i));
   assert.equal(orderMetRef('RTG-O-205').ref, 'RTG-O-205', 'het nieuwe ticket is gewoon vindbaar');
-  assert.deepEqual(ordersVanKlant('user-spion'), [spion], 'en de klantlijst klopt nog');
+  assert.deepEqual(ordersVanKlant('user-spion'), [spionInDb], 'en de klantlijst klopt nog');
   assert.equal(gelezen, na,
     'de index is opnieuw opgebouwd na een toevoeging (' + (gelezen - na) + ' extra herbouw-lezingen) -- ' +
     'het incrementele pad werkt niet meer en elke lezing wordt O(n)');

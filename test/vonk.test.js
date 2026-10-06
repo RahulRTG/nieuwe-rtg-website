@@ -96,7 +96,7 @@ test('3. wederzijdse like = match + automatisch een tafel rond het midden', asyn
   assert.equal(inbreker.status, 404, 'een derde komt de chat niet in');
 });
 
-test('4. beide betalen EUR 10 vooraf; dan pas staat de reservering vast', async () => {
+test('4. beide betalen; daarna bevestigt de geauthenticeerde zaak pas de tafel', async () => {
   const mijnA = await api('/api/vonk/mijn', {}, A.token);
   const m = mijnA.body.matches[0];
   assert.equal(m.status, 'wacht-op-betaling');
@@ -106,8 +106,25 @@ test('4. beide betalen EUR 10 vooraf; dan pas staat de reservering vast', async 
   assert.equal(b1.status, 200);
   assert.notEqual(b1.body.status2, 'bevestigd', 'een kant betaald is nog niet vast');
   const b2 = await api('/api/vonk/betaal', { id: m.id }, B.token);
-  assert.equal(b2.body.status2, 'bevestigd', 'allebei betaald: de date staat');
-  const na = await api('/api/vonk/mijn', {}, A.token);
+  assert.equal(b2.body.status2, 'reservering-aangevraagd',
+    'ook na beide betalingen is alleen een aanvraag gedaan');
+  let na = await api('/api/vonk/mijn', {}, A.token);
+  assert.equal(na.body.matches[0].status, 'reservering-aangevraagd');
+  assert.equal(na.body.matches[0].reservering.state, 'PENDING');
+  assert.ok(na.body.matches[0].reservering.missing.includes('provider-confirmation'));
+  const reserveringId = na.body.matches[0].reservering.reference;
+  assert.ok(reserveringId, 'de deelnemers krijgen hun eigen aanvraagreferentie');
+  const roster = await api('/api/supplier/roster', { code: m.tafel.supplierCode });
+  const manager = roster.body.staff.find(s => s.role === 'manager');
+  const supplier = (await api('/api/supplier/login', { code: m.tafel.supplierCode,
+    staffId: manager.id, pin: '1234' })).body.token;
+  const besluit = await api('/api/supplier/reservering/beslis',
+    { id: reserveringId, action: 'bevestig' }, supplier);
+  assert.equal(besluit.status, 200, JSON.stringify(besluit.body));
+  assert.equal(besluit.body.evidence.state, 'CONFIRMED', JSON.stringify(besluit.body));
+  assert.ok(besluit.body.evidence.missing.includes('operational-outcome'),
+    'supplieracceptatie is nog geen bewijs dat de date werkelijk is uitgevoerd');
+  na = await api('/api/vonk/mijn', {}, A.token);
   assert.equal(na.body.matches[0].status, 'bevestigd');
 });
 

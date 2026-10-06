@@ -64,6 +64,19 @@ function start(doel, env = process.env) {
   let opdracht;
   if (doel === 'app') opdracht = [process.execPath, ['server/server.js']];
   else if (doel === 'motor') opdracht = ['/app/rtg-motor', []];
+  else if (doel === 'owner-init') {
+    if (String(env.RTG_OWNER_BOOTSTRAP || '').length < 16)
+      throw new Error('owner-init vereist het nog actieve eenmalige RTG_OWNER_BOOTSTRAP-geheim');
+    /* Alleen deze begrensde hosthandeling opent de buiten-verzoekschrijver.
+       Het account wordt daarna door een tweede productieproces uit PostgreSQL
+       teruggelezen; de publieke server draait nooit in deze stand. */
+    env.NODE_ENV = 'bootstrap';
+    opdracht = [process.execPath, ['scripts/eigenaar-aanmaken.js', '--maak', ...process.argv.slice(3)]];
+  }
+  else if (doel === 'owner-proof') {
+    env.NODE_ENV = 'production';
+    opdracht = [process.execPath, ['scripts/eigenaar-postgres-bewijs.js']];
+  }
   else throw new Error('onbekend Docker-doel: ' + doel);
 
   if (doel === 'motor' && String(env.RTG_MOTOR_TOKEN || '').length < 16)

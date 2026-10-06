@@ -1,17 +1,17 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-10-05",
+  "vastgelegd": "2026-10-04",
   "gemeten": {
-    "bestanden": 2659,
-    "vormen": 1549,
-    "velden": 2209,
-    "modules": 854,
-    "domeinen": 306,
+    "bestanden": 2733,
+    "vormen": 1567,
+    "velden": 2249,
+    "modules": 866,
+    "domeinen": 308,
     "envelopDrempel": 19,
-    "envelop": 28,
-    "veldenDomeineigen": 1540,
+    "envelop": 29,
+    "veldenDomeineigen": 1570,
     "veldenGedeeldVanafVier": 230,
-    "gelijkendeVormparen": 24
+    "gelijkendeVormparen": 25
   },
   "envelop": [
     "aantal",
@@ -39,6 +39,7 @@
     "tijd",
     "titel",
     "tot",
+    "type",
     "uitleg",
     "van",
     "wat"
@@ -66,18 +67,6 @@
         "kern/command",
         "kern/leerhuis",
         "kern/lidboard"
-      ]
-    },
-    {
-      "veld": "type",
-      "domeinen": 18,
-      "waar": [
-        "bedrijf",
-        "kern/antivirus",
-        "kern/command",
-        "kern/commerce",
-        "kern/connection-communication",
-        "kern/connection-communication-call"
       ]
     },
     {
@@ -225,6 +214,18 @@
       ]
     },
     {
+      "veld": "aan",
+      "domeinen": 13,
+      "waar": [
+        "kern/afdelingen",
+        "kern/command",
+        "kern/geldbeleid",
+        "kern/klok",
+        "kern/lidboard",
+        "kern/pay"
+      ]
+    },
+    {
       "veld": "categorie",
       "domeinen": 13,
       "waar": [
@@ -261,15 +262,27 @@
       ]
     },
     {
-      "veld": "aan",
+      "veld": "land",
+      "domeinen": 13,
+      "waar": [
+        "bedrijf",
+        "kern/commercie",
+        "kern/concern",
+        "kern/labfonds",
+        "kern/ledenbalie-inzage",
+        "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "besluit",
       "domeinen": 12,
       "waar": [
-        "kern/afdelingen",
-        "kern/command",
-        "kern/geldbeleid",
-        "kern/klok",
-        "kern/lidboard",
-        "kern/pay"
+        "kern/aanmeldingen",
+        "kern/appstore",
+        "kern/commercie",
+        "kern/gemeente",
+        "kern/labfonds",
+        "kern/ledenbalie-zaken"
       ]
     },
     {
@@ -357,18 +370,6 @@
       ]
     },
     {
-      "veld": "land",
-      "domeinen": 12,
-      "waar": [
-        "bedrijf",
-        "kern/commercie",
-        "kern/concern",
-        "kern/labfonds",
-        "kern/ledenbalie-inzage",
-        "kern/livinglab"
-      ]
-    },
-    {
       "veld": "rol",
       "domeinen": 12,
       "waar": [
@@ -393,15 +394,15 @@
       ]
     },
     {
-      "veld": "besluit",
-      "domeinen": 11,
+      "veld": "bewijs",
+      "domeinen": 12,
       "waar": [
-        "kern/aanmeldingen",
-        "kern/appstore",
-        "kern/commercie",
-        "kern/gemeente",
-        "kern/labfonds",
-        "kern/ledenbalie-zaken"
+        "kern/horeca",
+        "kern/invoer",
+        "kern/leerhuis",
+        "kern/livinglab",
+        "kern/magnaat-controle",
+        "kern/magnaat-trainingslobby-acties"
       ]
     },
     {
@@ -513,15 +514,15 @@
       ]
     },
     {
-      "veld": "bewijs",
+      "veld": "grond",
       "domeinen": 11,
       "waar": [
-        "kern/horeca",
-        "kern/invoer",
-        "kern/leerhuis",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties"
+        "kern/connect",
+        "kern/economie",
+        "kern/factuurcorrectie",
+        "kern/identiteit",
+        "kern/kosten",
+        "kern/neiging"
       ]
     }
   ],
@@ -540,7 +541,6 @@
         "oorzaak",
         "past",
         "terugDraaibaar",
-        "type",
         "veld"
       ]
     },
@@ -574,34 +574,6 @@
     },
     {
       "gelijkenis": 1,
-      "a": "server/kern/magnaat-werkroutefabriek.js",
-      "b": "server/kern/magnaatwereld.js",
-      "domeinA": "kern/magnaat-werkroutefabriek",
-      "domeinB": "kern/magnaatwereld",
-      "gedeeld": [
-        "max",
-        "min",
-        "placeholder",
-        "type",
-        "verplicht"
-      ]
-    },
-    {
-      "gelijkenis": 1,
-      "a": "server/kern/webplatform-live.js",
-      "b": "server/kern/webplatform.js",
-      "domeinA": "kern/webplatform-live",
-      "domeinB": "kern/webplatform",
-      "gedeeld": [
-        "lk",
-        "lt",
-        "rk",
-        "rt",
-        "type"
-      ]
-    },
-    {
-      "gelijkenis": 1,
       "a": "server/kern/agent.js",
       "b": "server/kern/personeel.js",
       "domeinA": "kern/agent",
@@ -615,15 +587,28 @@
     },
     {
       "gelijkenis": 1,
-      "a": "server/kern/connection-communication-call.js",
-      "b": "server/kern/connection-communication.js",
-      "domeinA": "kern/connection-communication-call",
-      "domeinB": "kern/connection-communication",
+      "a": "server/kern/magnaat-werkroutefabriek.js",
+      "b": "server/kern/magnaatwereld.js",
+      "domeinA": "kern/magnaat-werkroutefabriek",
+      "domeinB": "kern/magnaatwereld",
       "gedeeld": [
-        "incoming",
-        "revision",
-        "state",
-        "type"
+        "max",
+        "min",
+        "placeholder",
+        "verplicht"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/webplatform-live.js",
+      "b": "server/kern/webplatform.js",
+      "domeinA": "kern/webplatform-live",
+      "domeinB": "kern/webplatform",
+      "gedeeld": [
+        "lk",
+        "lt",
+        "rk",
+        "rt"
       ]
     },
     {
@@ -649,21 +634,22 @@
       ]
     },
     {
-      "gelijkenis": 0.9,
-      "a": "server/kern/command/runbookcatalogus.js",
-      "b": "server/kern/zaakcommand/runbooks.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/zaakcommand",
+      "gelijkenis": 0.91,
+      "a": "server/kern/reisbureau-betaling.js",
+      "b": "server/kern/reisbureau-teruggave.js",
+      "domeinA": "kern/reisbureau-betaling",
+      "domeinB": "kern/reisbureau-teruggave",
       "gedeeld": [
-        "actie",
-        "certificaat",
-        "klantImpact",
-        "naar",
-        "oorzaak",
-        "past",
-        "terugDraaibaar",
-        "type",
-        "veld"
+        "bedragCenten",
+        "bewijs",
+        "bronObject",
+        "economischeEigenaar",
+        "economischeHerkomst",
+        "grond",
+        "land",
+        "naarWie",
+        "relatie",
+        "valuta"
       ]
     },
     {
@@ -685,17 +671,20 @@
       ]
     },
     {
-      "gelijkenis": 0.83,
-      "a": "server/kern/magnaat-werkroutefabriek.js",
-      "b": "server/kern/magnaatwereld.js",
-      "domeinA": "kern/magnaat-werkroutefabriek",
-      "domeinB": "kern/magnaatwereld",
+      "gelijkenis": 0.89,
+      "a": "server/kern/command/runbookcatalogus.js",
+      "b": "server/kern/zaakcommand/runbooks.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
       "gedeeld": [
-        "max",
-        "min",
-        "placeholder",
-        "type",
-        "verplicht"
+        "actie",
+        "certificaat",
+        "klantImpact",
+        "naar",
+        "oorzaak",
+        "past",
+        "terugDraaibaar",
+        "veld"
       ]
     },
     {
@@ -713,6 +702,19 @@
         "publiekePrijs",
         "sku",
         "varianten"
+      ]
+    },
+    {
+      "gelijkenis": 0.8,
+      "a": "server/kern/magnaat-werkroutefabriek.js",
+      "b": "server/kern/magnaatwereld.js",
+      "domeinA": "kern/magnaat-werkroutefabriek",
+      "domeinB": "kern/magnaatwereld",
+      "gedeeld": [
+        "max",
+        "min",
+        "placeholder",
+        "verplicht"
       ]
     },
     {
@@ -875,6 +877,21 @@
         "gratis",
         "nr",
         "prijsCenten"
+      ]
+    },
+    {
+      "gelijkenis": 0.6,
+      "a": "server/kern/reisbureau-betaling.js",
+      "b": "server/kern/reisbureau-teruggave.js",
+      "domeinA": "kern/reisbureau-betaling",
+      "domeinB": "kern/reisbureau-teruggave",
+      "gedeeld": [
+        "aan",
+        "economischeHerkomst",
+        "grond",
+        "hoe",
+        "uitgevoerd",
+        "valuta"
       ]
     },
     {

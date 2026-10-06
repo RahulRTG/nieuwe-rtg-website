@@ -90,6 +90,51 @@ const op = (naam) => {
   return gevonden;
 };
 
+test('een bestemmingsmutatie breekt de route, zonder commentaar of gewone tekst te veranderen', () => {
+  const bron = "/* '/api/voorbeeld' */ const tekst='apps 3'; fetch('/api/werk');";
+  const na = muteer(bron, op('route-doel-weg'));
+  const gezien = [];
+  new Function('fetch', na)(pad => gezien.push(pad));
+  assert.deepEqual(gezien, ['/__rtg_mutatie__']);
+  assert.ok(na.startsWith("/* '/api/voorbeeld' */ const tekst='apps 3';"));
+  assert.equal(muteer("const tekst='gewone uitleg';", op('route-doel-weg')), null);
+});
+
+test('een browserexportmutatie ontneemt de API en houdt de JavaScript geldig', () => {
+  const bron = 'w.RTGProef = { start() { return 7; } };';
+  const voor = {}, na = {};
+  new Function('w', bron)(voor);
+  new Function('w', muteer(bron, op('browser-export-weg')))(na);
+  assert.equal(voor.RTGProef.start(), 7);
+  assert.equal(na.RTGProef, undefined);
+  assert.equal(muteer('// w.RTGProef = {};', op('browser-export-weg')), null);
+});
+
+test('een omgekeerde ontkenning neemt de andere tak zonder tekst of ongelijkheid te veranderen', () => {
+  const bron = 'if (!ok) return 1; return 2;';
+  const voor = new Function('ok', bron), na = new Function('ok', muteer(bron, op('voorwaarde-omkeren')));
+  assert.deepEqual([voor(true), voor(false)], [2, 1]);
+  assert.deepEqual([na(true), na(false)], [1, 2]);
+  assert.equal(muteer('if (x !== y) return 1;', op('voorwaarde-omkeren')), null);
+  assert.equal(muteer("const tekst='if (!ok)'; // if (!ok)", op('voorwaarde-omkeren')), null);
+});
+
+test('een relatieve API-actie verandert het aangeroepen doel, niet andere argumenten of uitleg', () => {
+  const bron = "/* api('uitleg') */ const tekst=\"api('tekst')\"; office.api('open', {id:7});";
+  let gezien;
+  new Function('office', muteer(bron, op('api-actie-weg')))({api: (...args) => { gezien = args; }});
+  assert.deepEqual(gezien, ['__rtg_mutatie__', {id:7}]);
+  assert.equal(muteer("const tekst=\"api('open')\";", op('api-actie-weg')), null);
+  assert.equal(muteer('api(doel)', op('api-actie-weg')), null);
+});
+
+test('een ingeschakelde code-optie kan uit zonder returnwaarden of tekst te raken', () => {
+  assert.equal(muteer("observeer(knoop, { childList:true, subtree: true });", op('optie-uit'), 0),
+    "observeer(knoop, { childList: false, subtree: true });");
+  assert.equal(muteer("const tekst='subtree: true';", op('optie-uit'), 0), null);
+  assert.equal(muteer('function ok(){ return true; }', op('optie-uit'), 0), null);
+});
+
 test('getal+1 verhoogt het eerste getal in CODE met een', () => {
   assert.equal(muteer('const cap = 5;', op('getal+1'), 0), 'const cap = 6;');
   assert.equal(muteer('const a = 0; const b = 9;', op('getal+1'), 1), 'const a = 0; const b = 10;',

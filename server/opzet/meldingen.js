@@ -57,6 +57,15 @@ function meld(tier, note, bewaar) {
   if (verraad.sla('sterf-voor-bericht')) {
     try { process.kill(process.pid, 'SIGKILL'); } catch (e) { process.abort(); }
   }
+  /* EEN MELDING IS EEN OBJECT ({ title, body, ... }), NOOIT EEN LOSSE TEKST.
+     Acht plekken gaven hier een tekst mee; `...note` spreidde die in losse
+     letters ({0:'K',1:'l',...}), zodat de melding leeg aankwam -- en een ervan
+     schreef in een bak 'kantoor' die geen enkele lezer heeft. Besluit van
+     4 oktober 2026: weigeren in plaats van omzetten, zodat elke aanroeper zelf
+     kiest of hij op een pas of op een lid meldt (zie ./meldaan.js).
+     test/notify-vorm.test.js houdt ook de bron schoon. */
+  if (!note || typeof note !== 'object' || Array.isArray(note))
+    throw new TypeError('notify() verwacht een melding als object ({ title, body }), geen ' + (Array.isArray(note) ? 'lijst' : typeof note) + '.');
   const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
   // meldingsvoorkeuren (kern/ervaring.js): een uitgezette scope wordt niet
   // opgeslagen en niet gepusht; zonder voorkeur staat alles aan

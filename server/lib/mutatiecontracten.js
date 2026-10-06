@@ -114,8 +114,9 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-naleesronde-b').CONTRACTEN,
   require('./mutatiecontracten-naleesronde-c').CONTRACTEN,
   require('./mutatiecontracten-opvangwijzer').CONTRACTEN,
-  require('./mutatiecontracten-horeca-correctie').CONTRACTEN,
   require('./mutatiecontracten-inhaal').CONTRACTEN,
+  // horecacorrectie en de twee teruggaveloketten
+  require('./mutatiecontracten-teruggave').CONTRACTEN,
   /* De nazorg van een reisaanvraag: vier routes die samen de weg terug uit een
      toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,

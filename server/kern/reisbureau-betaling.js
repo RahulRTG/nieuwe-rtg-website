@@ -20,7 +20,6 @@
 'use strict';
 
 const { geldrijenVoor } = require('./reisbureau-geldrijen');
-const { spiegelVoor } = require('./reisbureau-terugboeking');
 
 /* De positie waar RTG de reissom int. Een eigen naam en niet `rtg:reserve`:
    die bak is van de fondsafdracht (opzet/kern-geldnaden.js), en twee
@@ -114,52 +113,20 @@ function maakReisbetaling({ db, save, crypto, payVan, reisbureauVan, nu }) {
 
     /* De EIGENAAR schrijft de betaling op zijn eigen rij; mislukt dat, dan
        verzint deze laag geen succes. */
+    /* `van` is het BETAALADRES op de bon: een teruggave gaat daarheen terug en
+       zoekt het niet opnieuw op (zie ./reisbureau-teruggave.js). */
     const gezet = rb.markeerBetaald(a.ref, {
-      at: stempel, boeking: b.boeking.id, centen: opbouw.totaalCenten, valuta: 'EUR' });
+      at: stempel, boeking: b.boeking.id, centen: opbouw.totaalCenten, valuta: 'EUR', van: codenaam });
     if (gezet.error) return { status: gezet.status || 409, error: gezet.error };
     return { ok: true, betaling: gezet.betaald, rijen: metBoeking.rijen.length };
   }
 
-  /* ---------- de weg terug ----------
-     De SPIEGEL wordt puur berekend (./reisbureau-terugboeking.js) en hier alleen
-     bewaard: twee schrijvers op een verklaarde bak is wat keuringsregel 63
-     tegenhoudt. Er wordt GEEN geld verplaatst -- er ontstaat een teruggaveRECHT
-     dat een mens uitvoert, net als bij kern/horeca/correctie.js. */
-  function terugboeken(ref, { reden, geldrijIds } = {}) {
-    const rb = bureau();
-    if (!rb) return { status: 503, error: 'Het reisbureau is niet beschikbaar.' };
-    const a = rb.aanvraagVan(ref);
-    if (!a) return { status: 404, error: 'Aanvraag niet gevonden.' };
-    if (!a.betaald) return { status: 409, error: 'Deze reis is niet betaald; er valt niets terug te draaien.' };
-
-    const bestaand = rijenVan(a.ref);
-    const uit = spiegelVoor({ rijen: bestaand, kiesIds: geldrijIds || null, reden,
-      boekingId: a.betaald.boeking });
-    if (!uit.ok) return { status: 409, error: 'Deze terugboeking kan niet.', hoe: uit.waarom };
-
-    const stempel = klok();
-    for (const x of uit.rijen) {
-      const r = x.rij;
-      eigen.bak('reisGeldrijen').push({
-        id: nieuwId('RGH'), ref: a.ref, at: stempel, spiegelVan: x.spiegelVan,
-        bedragCenten: r.bedragCenten, valuta: r.valuta,
-        economischeHerkomst: r.economischeHerkomst,
-        economischeEigenaar: r.economischeEigenaar, naarWie: r.naarWie,
-        grond: r.grond, bronObject: r.bronObject, relatie: r.relatie,
-        land: r.land, bewijs: r.bewijs
-      });
-    }
-    /* Het RECHT, en niet de betaling. */
-    eigen.bak('reisTeruggaven').push({
-      id: nieuwId('RTG'), ref: a.ref, at: stempel,
-      centen: uit.terugCenten, valuta: 'EUR', volledig: uit.volledig,
-      economischeHerkomst: 'rtg', aan: 'lid', grond: String(reden).slice(0, 200),
-      uitgevoerd: false,
-      hoe: 'teruggaveRECHT; een mens van het kantoor voert hem uit langs kern/pay (GELD.md)'
-    });
-    save();
-    return { ok: true, teruggedraaid: uit.rijen.length, centen: uit.terugCenten, volledig: uit.volledig };
-  }
+  /* ---------- de weg terug: ./reisbureau-teruggave.js ----------
+     Afgesplitst op de 10 kB-grens toen er een UITVOERDER bij kwam. Hij krijgt
+     de `eigen`-greep van DIT bestand mee en schrijft dus als deze eigenaar,
+     niet ernaast (keuringsregel 63). */
+  const terug = require('./reisbureau-teruggave').maakTeruggave({
+    eigen, bureau, pay, klok, nieuwId, save, rijenVan: (ref) => rijenVan(ref), KAS });
 
   /* De herkomstrijen van EEN reis, voor de meter en voor het kantoor. */
   function rijenVan(ref) {
@@ -170,8 +137,9 @@ function maakReisbetaling({ db, save, crypto, payVan, reisbureauVan, nu }) {
     return eigen.kijk('reisUitkeringen').filter(r => r.ref === String(ref || ''));
   }
 
-  return { reisbetaling: { betaal, terugboeken, rijenVan, alleRijen, uitkeringenVan,
-    teruggavenVan: (ref) => eigen.kijk('reisTeruggaven').filter(r => r.ref === String(ref || '')), KAS } };
+  return { reisbetaling: { betaal, rijenVan, alleRijen, uitkeringenVan, KAS,
+    terugboeken: terug.terugboeken, teruggavenVan: terug.teruggavenVan, teruggavenOpen: terug.teruggavenOpen,
+    teruggaveVan: terug.teruggaveVan, teruggaveUitvoeren: terug.uitvoeren, teruggaveAfwijzen: terug.afwijzen } };
 }
 
 module.exports = { maakReisbetaling, KAS };

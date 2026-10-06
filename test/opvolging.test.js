@@ -127,6 +127,8 @@ test('afronden kan niet zonder dat iemand keek, en niet zonder naam', async () =
 
   const toe = await kl('/school/hulplijn/toewijzen', { id, mentor: 'Mentor Vera' });
   assert.equal(toe.status, 200);
+  assert.equal(toe.body.toegewezen.naam, 'Mentor Vera');
+  assert.equal((await kl('/school/hulplijn/bewaking')).body.meldingen.find(x => x.id === id).fase, 'toegewezen');
   await kl('/school/hulplijn/oppakken', { id, notitie: 'gebeld' });
 
   assert.equal((await kl('/school/hulplijn/afronden', { id })).status, 400, 'afronden zonder naam');

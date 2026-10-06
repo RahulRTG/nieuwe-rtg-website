@@ -49,7 +49,9 @@ const { load, startSqliteSync } = require('./starten')({ save });
 const { flushBijAfsluiten, opslagKlaar } = require('./afsluiten');
 const { planSnapshot } = snapshot;
 
-function save() { return bewaar(); }
+/* save(collecties) is dezelfde gerichte weg als save.sleutels(collecties);
+   zonder argument blijft het de volledige save. */
+function save(collecties) { return collecties === undefined ? bewaar() : save.sleutels(collecties); }
 // Expliciete schrijvers hoeven niet bij iedere auditregel de hele wereld te scannen.
 save.sleutels = keys => {
   if (!Array.isArray(keys) || !keys.length || keys.some(k => typeof k !== 'string' || !Object.hasOwn(db.data, k)))

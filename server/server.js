@@ -2283,9 +2283,8 @@ const kern = {
   paspoortVervaldatumVan, paspoortGeboortejaarVan
 };
 
-/* De helpers en constanten uit dit bestand die de kernlagen nodig hebben, op
-   EEN plek in plaats van een eigen lijstje per laag. Wat hier niet in staat maar
-   wel wordt gebruikt, valt bij het opstarten meteen om. */
+/* Centrale injecties voor de kernlagen; ontbrekende helpers laten de server
+   bij het opstarten omvallen. */
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
   anthropic, app, archief, betaal, betaalOpdrachten, beveilig, capGezondheid, bijeen, bewerkCollectie, leesCollectie, economischeBoekingEenmaal, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,

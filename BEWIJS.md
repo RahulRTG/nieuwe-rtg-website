@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2333 bestanden en 15996 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2333 bestanden en 16005 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2333 |
-| losse beweringen (`test(...)`) | 15996 |
+| losse beweringen (`test(...)`) | 16005 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2158 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2028 bestanden, 15466 beweringen.
+2029 bestanden, 15476 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1063,6 +1063,7 @@ toets omvalt.
 | `menselijkebanen.test.js` | 4 | gezakt op `liegpoort /api/` | DE MENSELIJKE BANEN -- kan elk mens in dit huis bij zijn eigen werk? WAAROM DIT ER IS Dit huis kent 60 afdelingen en 157 mensen met een baan: van de kok in KIKUNOI tot de meldkamer van GUARDIA, van de... |
 | `menselijkeuitvoering.test.js` | 11 | gezakt op `===->!==#0` | DE MENSELIJKE UITVOERING ALS PROJECTIE (scripts/menselijkeuitvoering.js). MENSELIJKE_UITVOERING.json is afgeleid bewijs en geen documentatie. |
 | `menselijkverkeer.test.js` | 5 | gezakt op `liegpoort /api/` | HET MENSELIJKE VERKEER -- wat mensen hier met elkaar doen. WAAROM DIT ER NAAST test/menselijkebanen.test.js STAAT Die toets bewijst dat 157 mensen bij hun werk kunnen. |
+| `mensgrond.test.js` | 10 | gezakt op `===->!==#0` | DE MENSGRONDEN (scripts/lib/mensgrond.js) en hun meter (scripts/mensgrond.js). De lijst beweert iets dat in twee richtingen kan breken, en elke richting is een andere schade: - een grond die STIL wegvalt, laat de... |
 | `mensmutatie.test.js` | 6 | gezakt op `!==->===#1` | DE TIEN MUTATIES DRIJVEN NIET AF VAN DE BRON (scripts/mensmutatie.js). WAAROM DIT BESTAAT. |
 | `menstaal.test.js` | 13 | gezakt op `&&->||#0` | HET MENSENTAAL-CONTRACT -- klopt het corpus, en dekt de rail het? server/kern/stuur/menstaal.json zegt per menselijke zin wat er MAG gebeuren. |
 | `merge3.property.test.js` | 5 | gezakt op `===->!==#0` | Eigenschap-gedreven (property-based) tests voor merge3, de 3-weg-samenvoeging die het hart is van de multi-writer-opslag. In plaats van een handvol vaste gevallen genereren we duizenden willekeurige situaties en... |
@@ -2068,7 +2069,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-305 bestanden, 530 beweringen.
+304 bestanden, 529 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2081,7 +2082,6 @@ toets omvalt.
 | `apps-ui.e2e.js` | 12 | gezakt op `liegpoort /api/` | Scherm-tests voor de overige vlaggenschip-apps: leverancier, lid en backoffice. Elk logt in via een API-token in localStorage (net als de PDA- test), opent de app in een echte browser en controleert dat de beveiligde... |
 | `appstore.e2e.js` | 3 | gezakt op `liegpoort /api/` | DE CEL IN EEN ECHTE BROWSER -- het enige bewijs dat telt voor deze laag. test/appstore.test.js bewijst wat de SERVER doet. |
 | `appwerkt-bestemming.e2e.js` | 1 | gezakt op `===->!==#0` | BEREIKBAAR IN EEN ECHTE BROWSER -- doorverwijzingen die pas na het laden gebeuren. Een synthetisch huis met vier schermen en een eigen register. |
-| `appwerkt-glad.e2e.js` | 1 | gezakt op `!==->===#4` | DE BEDEKT-METING MAG NIET OP EEN ANIMATIE WACHTEN (scripts/appwerkt.js bedektDoorSchil, 6 oktober 2026). Een scherm met `scroll-behavior: smooth` laat scrollIntoView animeren. |
 | `appwerkt-schil.e2e.js` | 1 | gezakt op `-->+#0` | BEDIENBAAR MEET HET SCHERM, NIET DE SCHIL -- in een echte browser. Een synthetisch scherm met de gedeelde schil erop (30 knoppen onder .rtg-edge-chrome, plus de toetsknop van het veeggebaar die met opzet buiten beeld... |
 | `avond-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET AVONDSCHERM (/apps/avond.html) IN EEN ECHTE BROWSER. test/avond.test.js bewijst dat de avondroutes de klok en het budget als GRENS behandelen en dat een tafel nooit verder komt dan `aangevraagd`. |
 | `bankkamer.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op de BANKKAMER van de boardroom (kantoren.html, sectie vBank). WAAROM DIT BESTAND ER IS. |

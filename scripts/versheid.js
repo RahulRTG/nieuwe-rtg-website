@@ -227,6 +227,10 @@ const REGISTERS = [
      (test/machinedekking.test.js, via npm run machinedekking:controle): twee
      schulden die alleen mogen dalen, en `volledigeKetens` die alleen mag stijgen. */
   ['MACHINEDEKKING.json', 'npm run machinedekking:vastleggen', 'of de motoren van dit huis bij dezelfde handeling langskomen'],
+  /* DE MENSGRONDEN (AUTONOMIE.md par. 2.9). Hij veroudert met elke nieuwe muterende
+     route en met elke verse ronde van de herstel- en idempotentieproef; zijn tanden
+     zitten op de inhoud (overtreding en onbekend mogen alleen dalen). */
+  ['MENSGROND.json', 'npm run mensgrond:vastleggen', 'waarom er bij elke muterende handeling een mens staat, per grond'],
   /* DE GEVOLGDEKKING (EXECUTIE.md blok 4). Twee assen die nooit worden opgeteld: wat
      de proef zag veranderen, en wat een mens erover heeft verklaard. Hij veroudert op
      twee manieren -- een nieuwe AI-bereikbare route, en een verse idempotentieronde. */

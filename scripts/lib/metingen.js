@@ -571,6 +571,10 @@ const REGISTER = {
      naar 2818 meldde), dus deze regel is geen bewering -- zie de kop over de
      helft die mensenwerk blijft. */
   'MACHINEDEKKING.json': { eigenRatel: 'test/machinedekking.test.js' },
+  /* Twee tellers die alleen mogen dalen (overtreding, onbekend), met de grondwaarde in
+     het register zelf; toets 10 van test/mensgrond.test.js vergelijkt de verse meting.
+     Automatiseringsschuld heeft met opzet geen ratel: hij stijgt als er bewijs bijkomt. */
+  'MENSGROND.json': { eigenRatel: 'test/mensgrond.test.js' },
   /* Drie tanden in NORM.json, geen eigenRatel: de gevraagde meter is "onbekende
      gevolgpaden mag alleen dalen", en dat is precies wat een ratel doet. */
   'GEVOLGDEKKING.json': { meter: ['gevolgPadenOnbekend', 'gevolgContractVolledig', 'gevolgContractenGezakt'] },

@@ -87,7 +87,8 @@ const MIGRATIES = [
   { n: 2, naam: 'sso-koppelingen-en-identiteiten', op: (db) => require('../sso').zorgTabel(db) },
   { n: 3, naam: 'scim-sleutels', op: (db) => require('../scim').zorgTabel(db) },
   /* De aan/uit-vlag op een account: uit dienst gemeld door de IdP van een klant
-     moet elke lopende sessie meteen wegnemen. Zie accounts/tokens.js. */
+     moet elke lopende sessie meteen wegnemen, en elk actietoken ook. Zie
+     uitgezet in accounts/sessiegrens.js. */
   { n: 4, naam: 'account-actief', op: (db) => voegKolomToe(db, 'users', 'actief', 'INTEGER NOT NULL DEFAULT 1') },
   /* Een wachtwoordwijziging hoort ELKE lopende sessie te beeindigen. Tokens zijn
      hier staatloos, dus er valt niets weg te gooien; wat wel kan is een grens per

@@ -97,6 +97,13 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
       return k && k.heel === false ? (k.waarom || 'de keten is gebroken') + ' (bij ' + k.bij + ')' : null;
     });
 
+    /* Het AUDITspoor: de auditwacht loopt alle journalen na en hoort van de
+       requestmerge wanneer een keten gebroken bleek (../../lib/auditwacht.js).
+       Een vervalst spoor is geen 409 voor wie toevallig schrijft, maar een
+       alarm voor wie het moet weten (audit P1-4). */
+    probeer('auditspoor-gebroken', 'Een auditspoor is gebroken of niet meer verankerd', 'hoog', () =>
+      require('../../lib/auditwacht').bevinding());
+
     voegAanvullendeAlarmcontrolesToe(probeer, { slo, kwaliteit, d });
 
     return uit;

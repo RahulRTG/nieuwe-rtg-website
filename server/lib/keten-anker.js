@@ -59,8 +59,28 @@ function verankerPunt(regels) {
      herschreven het volgnummer van het anker is er nog, maar met een andere
                  hash: de geschiedenis is op dat punt vervangen.
      weg         het anker valt buiten wat er nog is (een begrensd journaal dat
-                 zo ver is doorgeschoven); niet te beoordelen, en dat zeggen we. */
-function verifieerTegenAnker(regels, anker) {
+                 zo ver is doorgeschoven).
+
+   `weg` IS ALLEEN IN ORDE ALS DE BEWARING HET VERKLAART (audit P2-5). Hier stond
+   `ok: true` bij elke verdwenen ankerregel. Dan is de goedkoopste aanval op het
+   anker niet de kop afknippen maar ALLES tot en met de geankerde regel weggooien
+   en een paar nieuwe regels erbij zetten: de kop staat dan hoger dan het anker,
+   de geankerde regel is "uit het journaal geschoven" en de controle zei groen.
+   Een journaal schuift alleen door zijn BEWARING: het is vol (`max`), of de
+   geankerde regel is ouder dan de termijn (`dagen`). Verklaart geen van beide
+   het, dan is er iets weg dat er nog hoorde te staan -- `ok: false`. Wie geen
+   bewaring meegeeft, krijgt dus geen groen: niet te beoordelen is geen in orde. */
+function bewaringVerklaart(l, anker, bewaring) {
+  const b = bewaring || {};
+  if (Number(b.max) > 0 && l.length >= Number(b.max)) return 'het journaal zit aan zijn bovengrens van ' + b.max + ' regels';
+  const at = anker && anker.at ? Date.parse(anker.at) : NaN;
+  const nu = typeof b.nu === 'function' ? b.nu() : (Number(b.nu) || Date.now());
+  if (Number(b.dagen) > 0 && Number.isFinite(at) && nu - at > Number(b.dagen) * 86400000)
+    return 'de geankerde regel is ouder dan de bewaartermijn van ' + b.dagen + ' dagen';
+  return null;
+}
+
+function verifieerTegenAnker(regels, anker, bewaring) {
   const l = Array.isArray(regels) ? regels : [];
   if (!anker || typeof anker.nr !== 'number') return { ok: false, reden: 'geen bruikbaar anker' };
   const kop = verankerPunt(l);
@@ -74,8 +94,12 @@ function verifieerTegenAnker(regels, anker) {
 
   const bijAnker = l.find(r => r && Number(r.nr) === anker.nr);
   if (!bijAnker) {
-    return { ok: true, weg: true,
-      reden: 'regel ' + anker.nr + ' is uit het begrensde journaal geschoven; niet te beoordelen' };
+    const verklaring = bewaringVerklaart(l, anker, bewaring);
+    if (verklaring) return { ok: true, weg: true,
+      reden: 'regel ' + anker.nr + ' is uit het begrensde journaal geschoven: ' + verklaring };
+    return { ok: false, weg: true,
+      reden: 'regel ' + anker.nr + ' is verdwenen terwijl de bewaring dat niet verklaart -- ' +
+        'het journaal is niet vol en de regel is niet ouder dan de termijn' };
   }
   if (bijAnker.hash !== anker.hash) {
     return { ok: false, herschreven: true,

@@ -300,14 +300,16 @@ test('gelijktijdige auditregels worden op de actuele ketenkop herketend, nooit o
   assert.equal(keten.verifieer(samen).ok, true);
   const vervalst = ons.map(x => ({ ...x }));
   vervalst[1].pad = '/api/herschreven';
+  /* Een gebroken keten is sinds audit P1-4 geen conflict (409, laad opnieuw)
+     maar een eigen code: 503 met de reden, en een alarm (lib/auditwacht.js). */
   assert.throws(() => mergeHandeling(basis, vervalst, hun),
-    e => e && e.code === 'PG_REQUEST_CONFLICT');
+    e => e && e.code === 'PG_AUDIT_KETEN_GEBROKEN');
   const kapot = ons.map(x => ({ ...x })); kapot[0].hash = 'vals';
   assert.throws(() => mergeHandeling(basis, kapot, hun),
-    e => e && e.code === 'PG_REQUEST_CONFLICT', 'een kapotte lokale keten wordt niet stil hersteld');
+    e => e && e.code === 'PG_AUDIT_KETEN_GEBROKEN', 'een kapotte lokale keten wordt niet stil hersteld');
   const hashloos = ons.map(x => ({ ...x })); delete hashloos[0].hash;
   assert.throws(() => mergeHandeling(basis, hashloos, basis),
-    e => e && e.code === 'PG_REQUEST_CONFLICT', 'een nieuwe hashloze regel geldt niet als legacybewijs');
+    e => e && e.code === 'PG_AUDIT_KETEN_GEBROKEN', 'een nieuwe hashloze regel geldt niet als legacybewijs');
   const dubbelNr = [keten.schakel({ at: 'dubbel', pad: '/api/dubbel' }, basis[0].hash, basis[0].nr),
     ...basis];
   assert.throws(() => mergeHandeling(basis, dubbelNr, basis),
@@ -357,7 +359,7 @@ test('gelijktijdige API-journaalregels behouden teller, volgorde en zegelketen',
   const kapot = JSON.parse(JSON.stringify(een.db.data.apiSpoor));
   kapot.commandJournaal[1].zegel = 'vals';
   assert.throws(() => mergeApiSpoor(basis, kapot, twee.db.data.apiSpoor),
-    e => e && e.code === 'PG_REQUEST_CONFLICT', 'een kapot lokaal zegel wordt niet stil hersteld');
+    e => e && e.code === 'PG_AUDIT_KETEN_GEBROKEN', 'een kapot lokaal zegel wordt niet stil hersteld');
 });
 
 test('commitfout geeft 503 en laat geen dirty RAM of succes-naCommit achter', async () => {

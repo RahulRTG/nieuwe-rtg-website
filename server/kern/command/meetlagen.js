@@ -52,6 +52,9 @@ function maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOff
        plaats van een waarde, zodat het alarm hem vindt zodra hij er is. */
     foutmelder });
   alarm.tikker();
+  /* Een gebroken auditspoor laat het alarm METEEN wegen, niet pas bij de
+     volgende tik (../../lib/auditwacht.js, audit P1-4). */
+  require('../../lib/auditwacht').haakAlarm(() => alarm.weeg());
 
   /* DE GEZONDHEIDSKAART. Niet "wat staat er in de gegevens" (dat is ./puls.js)
      maar "doen de vermogens het, en hoe hard is dat bewijs". Hij hangt hier

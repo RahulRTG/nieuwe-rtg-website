@@ -10,7 +10,7 @@ const { SLEUTEL, vind: heeftRegel, vindBeweging, bewegingGelijk, saldoSamen,
   boekingenSamen } = require('../db/economische-identiteit');
 const publiceerCollectie = require('../db/collectie-publicatie');
 
-module.exports = (ctx) => {
+module.exports = (ctx, schrijver) => {
   const { pool, merge3, uitStore, naarStore, toegepast, laatsteJson,
     laatsteGrootte, laatsteLengte, laatsteCheck } = ctx;
 
@@ -46,12 +46,19 @@ module.exports = (ctx) => {
   }
 
 
-  async function boekEenmaal(dataNu, invoer, werk) {
+  /* `spoor`: de auditregels van het lopende verzoek, in DEZE transactie (audit
+     P0-1; zie ./collectietransactie.js voor het waarom). Alleen op het pad dat
+     werkelijk boekt: een herhaling met een bekende sleutel legt niets nieuws
+     vast, en een weigering rolt terug. */
+  async function boekEenmaal(dataNu, invoer, werk, spoor) {
     geldig(invoer, werk);
     const sleutel = String(invoer.sleutel), afdruk = String(invoer.afdruk);
     const collecties = [...new Set(invoer.collecties.map(String))].sort();
+    const spoorLijst = spoor && schrijver
+      ? schrijver.sorteer((spoor.wijzigingen || []).filter(w => !collecties.includes(w.sleutel))) : [];
+    if (spoor) spoor.geschreven = false;
     const client = await pool.connect();
-    let gecommit = false, antwoord, standen = [], bestaand = false;
+    let gecommit = false, antwoord, standen = [], bestaand = false, spoorPublicaties = [];
     const rijen = new Map(), concept = {}, begin = new Map();
     try {
       await client.query('BEGIN');
@@ -64,7 +71,7 @@ module.exports = (ctx) => {
       }
       /* Dezelfde vaste volgorde als de gewone PostgreSQL-schrijflanen voorkomt
          een deadlock wanneer een flush en een economische commit elkaar raken. */
-      for (const k of collecties)
+      for (const k of [...new Set([...collecties, ...spoorLijst.map(w => w.sleutel)])].sort())
         await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [k]);
       for (const k of collecties) {
         const r = await client.query('SELECT val, ver, weg FROM kv WHERE key=$1 FOR UPDATE', [k]);
@@ -127,14 +134,17 @@ module.exports = (ctx) => {
         await client.query(
           'INSERT INTO economische_boekingen(sleutel,afdruk,antwoord) VALUES($1,$2,$3)',
           [sleutel, afdruk, naarStore(JSON.stringify(antwoord))]);
+        if (spoorLijst.length) spoorPublicaties = await schrijver.schrijfIn(client, spoorLijst);
       }
       await client.query('COMMIT');
       gecommit = true;
+      if (spoor && spoorPublicaties.length) spoor.geschreven = true;
     } catch (e) {
       if (!gecommit) try { await client.query('ROLLBACK'); } catch (x) {}
       throw e;
     } finally { client.release(); }
 
+    if (spoorPublicaties.length) schrijver.publiceer(dataNu, spoorPublicaties);
     /* Caches pas NA COMMIT bijwerken. Op het herhaalpad blijft dbJson de
        databasebasis en mag een eventueel lokaal openstaand verschil later nog
        door de gewone merge worden weggeschreven. */

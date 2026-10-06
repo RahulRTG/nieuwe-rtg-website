@@ -8,7 +8,10 @@ const journaal = p => require('../server/kern/command/journaal').maakJournaal({ 
 
 test('migratie bewaart hashloze regels, volgorde, teller en onbekende metadata; nieuwe append gebruikt de geketende kop', t => {
   const oud = keten.schakel({ at: '2026-09-01', pad: '/oud' }, null, 7);
-  const bron = [{ at: '2026-09-02', pad: '/legacy' }, oud];
+  /* Hashloze regels van VOOR de keten staan ONDER de oudste geketende regel
+     (nieuwste-eerst); een hashloze regel daarboven is sinds audit P1-2 een
+     breuk en geen erfenis (lib/keten.js). */
+  const bron = [oud, { at: '2026-08-31', pad: '/legacy' }];
   const p = proef(t, { handelingLog: bron, apiSpoor: { eigenMeta: { behoud: true }, commandJournaalTotaal: 91 } });
   const h = p.handeling(), j = journaal(p);
   assert.deepEqual(p.lees('handelingLog'), bron);

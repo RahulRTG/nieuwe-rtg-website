@@ -1,7 +1,7 @@
 {
   "simulatiemodules": 69,
-  "kernmodules": 2561,
-  "kernDomeinen": 676,
+  "kernmodules": 2493,
+  "kernDomeinen": 674,
   "perWereld": {
     "magnaat": {
       "modules": 66,
@@ -90,8 +90,8 @@
       "aantal": 1
     }
   ],
-  "gedeeldeOnderwerpen": 16,
-  "kandidaatparen": 42,
+  "gedeeldeOnderwerpen": 15,
+  "kandidaatparen": 41,
   "parenMetGedeeldeVorm": 0,
   "paren": [
     {
@@ -112,13 +112,6 @@
       "onderwerp": "acties",
       "simulatie": "server/kern/spellen/magnaat/acties.js",
       "rtg": "server/kern/vertegenwoordiging/acties.js",
-      "vormgelijkenis": 0.07,
-      "meetbaar": true
-    },
-    {
-      "onderwerp": "capabilities",
-      "simulatie": "server/kern/magnaat-capabilities.js",
-      "rtg": "server/kern/bewijsvlak/capabilities.js",
       "vormgelijkenis": 0.07,
       "meetbaar": true
     },
@@ -231,6 +224,13 @@
       "onderwerp": "bord",
       "simulatie": "server/kern/spellen/magnaat/bord.js",
       "rtg": "server/kern/lidboard/bord.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bord",
+      "simulatie": "server/kern/spellen/magnaat/bord.js",
+      "rtg": "server/kern/stadsweefsel/bord.js",
       "vormgelijkenis": 0,
       "meetbaar": false
     }

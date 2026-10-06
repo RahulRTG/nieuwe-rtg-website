@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5391 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5392 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5391 |
-| servermodules (`server/**/*.js`) | 4078 |
-| routebestanden (`server/routes/**`) | 638 |
-| kernmodules (`server/kern/**`) | 2561 |
+| API-endpoints | 5392 |
+| servermodules (`server/**/*.js`) | 4082 |
+| routebestanden (`server/routes/**`) | 639 |
+| kernmodules (`server/kern/**`) | 2562 |
 | schermen (`public/**/*.html`) | 326 |
 | gedeelde browsermodules (`public/shared/*.js`) | 425 |
-| toetsbestanden (`test/*.test.js`) | 2028 |
+| toetsbestanden (`test/*.test.js`) | 2030 |
 | schermtoetsen (`test/*.e2e.js`) | 304 |
 
 ## 2. De weg van een verzoek

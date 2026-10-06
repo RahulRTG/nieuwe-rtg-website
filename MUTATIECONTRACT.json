@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-06T08:15:30.497Z",
-  "commit": "7b11243f3",
-  "boomVuil": false,
-  "boomAnders": 1,
+  "op": "2026-10-06T12:53:45.144Z",
+  "commit": "7bcd08bf3",
+  "boomVuil": true,
+  "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v24.18.0"
  },
@@ -11,15 +11,15 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 5267,
-  "geclassificeerd": 5239,
+  "geclassificeerd": 5242,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3165,
    "NOT_APPLICABLE": 1264,
-   "LEGACY_PENDING_CLASSIFICATION": 28,
+   "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 630,
-   "INTENTIONALLY_NON_IDEMPOTENT": 180
+   "INTENTIONALLY_NON_IDEMPOTENT": 183
   },
-  "vastgesteldDoorMens": 2126,
+  "vastgesteldDoorMens": 2129,
   "afgeleidDoorScript": 3113,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4330,
@@ -36,7 +36,6 @@
    "niet gemeten": 119
   },
   "voorstellen": {
-   "BLOCKED_BY_TEST_FIXTURE": 3,
    "NOT_APPLICABLE": 1
   },
   "metingVan": "2026-09-29T18:39:11.935Z"
@@ -21191,12 +21190,14 @@
   {
    "mutatieId": "foundation.gezin.inloggen",
    "route": "POST /api/foundation/gezin/inloggen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -21206,10 +21207,10 @@
     "grond": null,
     "hindernis": "Vul naast de gezinscode uw eigen pincode in."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Vul naast de gezinscode uw eigen pincode in.\""
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.keuken.idee",
@@ -21733,12 +21734,14 @@
   {
    "mutatieId": "foundation.gezin.profiel.kies",
    "route": "POST /api/foundation/gezin/profiel/kies",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -21748,10 +21751,10 @@
     "grond": null,
     "hindernis": "Dit profiel bestaat niet meer."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Dit profiel bestaat niet meer.\""
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.profiel.maak",
@@ -22489,12 +22492,14 @@
   {
    "mutatieId": "foundation.les.join",
    "route": "POST /api/foundation/les/join",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -22504,10 +22509,10 @@
     "grond": null,
     "hindernis": "Te veel pogingen. Wacht een paar minuten en probeer het opnieuw."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Te veel pogingen. Wacht een paar minuten en probeer het opnieuw.\""
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.les.leerling.intrekken",

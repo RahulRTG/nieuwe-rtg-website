@@ -3,16 +3,16 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-10-06",
-    "commit": "4d1ba639"
+    "commit": "4fcf387f3"
   },
   "bronnen": {
     "schermroutes": {
-      "op": "2026-09-29",
-      "commit": "4984ab46"
+      "op": "2026-10-06",
+      "commit": "4d1ba639"
     },
     "schermgedrag": {
-      "op": "2026-09-29",
-      "commit": "4984ab46"
+      "op": "2026-10-06",
+      "commit": "4d1ba639"
     }
   },
   "ruis": [
@@ -151,9 +151,9 @@
   "totaal": {
     "schermen": 327,
     "aliassen": 20,
-    "zonderServer": 57,
+    "zonderServer": 54,
     "zonderInkomend": 1,
-    "overlapParen": 14,
+    "overlapParen": 20,
     "titelbotsingen": 1,
     "menuOpAlias": 0
   },
@@ -232,6 +232,62 @@
       ]
     },
     {
+      "a": "public/apps/foundation/bord.html",
+      "b": "public/apps/foundation/schrift.html",
+      "gedeeld": 3,
+      "jaccard": 0.6,
+      "omvatting": 1,
+      "voorbeeld": [
+        "/api/foundation",
+        "/api/foundation/les/",
+        "/api/foundation/les/stroomticket"
+      ]
+    },
+    {
+      "a": "public/apps/foundation/beheer.html",
+      "b": "public/apps/foundation/contact.html",
+      "gedeeld": 2,
+      "jaccard": 1,
+      "omvatting": 1,
+      "voorbeeld": [
+        "/api/foundation",
+        "/api/foundation/gezin/"
+      ]
+    },
+    {
+      "a": "public/apps/foundation/beheer.html",
+      "b": "public/apps/foundation/school.html",
+      "gedeeld": 2,
+      "jaccard": 0.67,
+      "omvatting": 1,
+      "voorbeeld": [
+        "/api/foundation",
+        "/api/foundation/gezin/"
+      ]
+    },
+    {
+      "a": "public/apps/foundation/bord.html",
+      "b": "public/apps/foundation/markt.html",
+      "gedeeld": 2,
+      "jaccard": 0.67,
+      "omvatting": 1,
+      "voorbeeld": [
+        "/api/foundation/les/",
+        "/api/foundation/les/stroomticket"
+      ]
+    },
+    {
+      "a": "public/apps/foundation/contact.html",
+      "b": "public/apps/foundation/school.html",
+      "gedeeld": 2,
+      "jaccard": 0.67,
+      "omvatting": 1,
+      "voorbeeld": [
+        "/api/foundation",
+        "/api/foundation/gezin/"
+      ]
+    },
+    {
       "a": "public/apps/foundation/gezondheid-welzijn.html",
       "b": "public/apps/foundation/zorg.html",
       "gedeeld": 2,
@@ -240,6 +296,17 @@
       "voorbeeld": [
         "/api/care/mijn",
         "/api/foundation/gezin/"
+      ]
+    },
+    {
+      "a": "public/apps/foundation/markt.html",
+      "b": "public/apps/foundation/schrift.html",
+      "gedeeld": 2,
+      "jaccard": 0.4,
+      "omvatting": 1,
+      "voorbeeld": [
+        "/api/foundation/les/",
+        "/api/foundation/les/stroomticket"
       ]
     },
     {
@@ -276,6 +343,17 @@
       ]
     },
     {
+      "a": "public/apps/leerhuis-werk.html",
+      "b": "public/apps/leerhuis.html",
+      "gedeeld": 2,
+      "jaccard": 1,
+      "omvatting": 1,
+      "voorbeeld": [
+        "/api/leerhuis/doe",
+        "/api/leerhuis/lees"
+      ]
+    },
+    {
       "a": "public/apps/reizen.html",
       "b": "public/apps/rit.html",
       "gedeeld": 4,
@@ -298,17 +376,6 @@
         "/api/salon/plaats",
         "/api/salon/reacties",
         "/api/salon/reageer"
-      ]
-    },
-    {
-      "a": "public/apps/foundation/bord.html",
-      "b": "public/apps/foundation/schrift.html",
-      "gedeeld": 2,
-      "jaccard": 0.33,
-      "omvatting": 0.5,
-      "voorbeeld": [
-        "/api/foundation",
-        "/api/foundation/les/"
       ]
     },
     {
@@ -1066,9 +1133,15 @@
         "/api/office/balie/zoek",
         "/api/office/bank/entiteitrekening",
         "/api/office/bank/entiteitrekening/zet",
+        "/api/office/bedrijfsmaat",
         "/api/office/beleidsmotor",
         "/api/office/beleidsmotor/afdwingen/zet",
+        "/api/office/beslisgeheugen",
+        "/api/office/beslisgeheugen/intrek",
+        "/api/office/beslisgeheugen/leg",
         "/api/office/boardroom/bevestig/opties",
+        "/api/office/cadeaubon",
+        "/api/office/cadeaubon/stand",
         "/api/office/doos/gedeeld/zet",
         "/api/office/doos/sleutel",
         "/api/office/doos/sleutel/weg",
@@ -1817,6 +1890,7 @@
       "schil": [],
       "paden": [
         "/api/festival/gast/edities",
+        "/api/festival/gast/pas/toon",
         "/api/festival/gast/passen",
         "/api/festival/gast/programma",
         "/api/festival/groep",
@@ -1962,12 +2036,14 @@
       "paden": [
         "/api/foodcourt",
         "/api/foodcourt/tijden",
-        "/api/reserveer"
+        "/api/reserveer",
+        "/api/reserveringen/mijn"
       ],
       "schilPaden": [],
       "domeinen": [
         "/api/foodcourt",
-        "/api/reserveer"
+        "/api/reserveer",
+        "/api/reserveringen"
       ],
       "zonderServer": false,
       "inkomend": 17,
@@ -2108,6 +2184,7 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
+        "/api/foundation",
         "/api/foundation/gezin/"
       ],
       "schilPaden": [],
@@ -2217,8 +2294,7 @@
       "paden": [
         "/api/foundation",
         "/api/foundation/les/",
-        "/api/foundation/opgaven/",
-        "/api/foundation/schrift/"
+        "/api/foundation/les/stroomticket"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -2806,6 +2882,7 @@
       ],
       "paden": [
         "/api/foundation/impact",
+        "/api/rtf/eigen-gezin",
         "/api/rtf/leerling/dag",
         "/api/rtf/leerling/paspoort",
         "/api/rtf/leven/kring",
@@ -3358,7 +3435,8 @@
         "public/apps/foundation/premium.js"
       ],
       "paden": [
-        "/api/foundation/les/"
+        "/api/foundation/les/",
+        "/api/foundation/les/stroomticket"
       ],
       "schilPaden": [],
       "domeinen": [
@@ -4272,6 +4350,7 @@
       ],
       "paden": [
         "/api/foundation",
+        "/api/foundation/gezin/",
         "/api/rtf/tiener/toets-stap"
       ],
       "schilPaden": [],
@@ -4358,6 +4437,7 @@
       "paden": [
         "/api/foundation",
         "/api/foundation/les/",
+        "/api/foundation/les/stroomticket",
         "/api/foundation/schrift/opslaan",
         "/api/foundation/tip"
       ],
@@ -6632,12 +6712,17 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "nee",
+      "schrijft": "onbekend",
       "schil": [],
-      "paden": [],
+      "paden": [
+        "/api/leerhuis/doe",
+        "/api/leerhuis/lees"
+      ],
       "schilPaden": [],
-      "domeinen": [],
-      "zonderServer": true,
+      "domeinen": [
+        "/api/leerhuis"
+      ],
+      "zonderServer": false,
       "inkomend": 2,
       "inIndex": 2,
       "inkomendVan": [
@@ -6657,6 +6742,7 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
+        "/api/leerhuis/doe",
         "/api/leerhuis/lees"
       ],
       "schilPaden": [],
@@ -6751,12 +6837,15 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
+        "/api/mall/aanvraag/",
         "/api/supplier/mall",
+        "/api/supplier/mall/aanvraag/behandel",
         "/api/supplier/mall/aanvraag/reageer",
         "/api/supplier/mall/aanvragen"
       ],
       "schilPaden": [],
       "domeinen": [
+        "/api/mall",
         "/api/supplier"
       ],
       "zonderServer": false,
@@ -6916,12 +7005,16 @@
         }
       ],
       "rollen": [],
-      "schrijft": "nee",
+      "schrijft": "onbekend",
       "schil": [],
-      "paden": [],
+      "paden": [
+        "/api/library/"
+      ],
       "schilPaden": [],
-      "domeinen": [],
-      "zonderServer": true,
+      "domeinen": [
+        "/api/library"
+      ],
+      "zonderServer": false,
       "inkomend": 3,
       "inIndex": 4,
       "inkomendVan": [
@@ -7104,12 +7197,20 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "nee",
+      "schrijft": "onbekend",
       "schil": [],
-      "paden": [],
+      "paden": [
+        "/api/experience/bootstrap",
+        "/api/experience/intent/execute",
+        "/api/experience/intent/preview",
+        "/api/living-world/view"
+      ],
       "schilPaden": [],
-      "domeinen": [],
-      "zonderServer": true,
+      "domeinen": [
+        "/api/experience",
+        "/api/living-world"
+      ],
+      "zonderServer": false,
       "inkomend": 5,
       "inIndex": 3,
       "inkomendVan": [
@@ -8078,8 +8179,8 @@
       "schil": [],
       "paden": [
         "/api/mall/aanvraag",
+        "/api/mall/aanvraag/",
         "/api/mall/aanvraag/kies",
-        "/api/mall/aanvraag/sluit",
         "/api/mall/aanvragen/mijn",
         "/api/mall/bestellingen",
         "/api/mall/bewaard",
@@ -8090,11 +8191,13 @@
         "/api/mall/lijst/regel-weg",
         "/api/mall/lijst/weg",
         "/api/mall/lijsten",
-        "/api/mall/wijzigingen"
+        "/api/mall/wijzigingen",
+        "/api/supplier/mall/aanvraag/behandel"
       ],
       "schilPaden": [],
       "domeinen": [
-        "/api/mall"
+        "/api/mall",
+        "/api/supplier"
       ],
       "zonderServer": false,
       "inkomend": 8,
@@ -9304,7 +9407,7 @@
       "rollen": [
         "member"
       ],
-      "schrijft": "ja",
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/reis/wijzer",
@@ -9348,7 +9451,7 @@
       "aliasNaar": null,
       "wereld": [],
       "rollen": [],
-      "schrijft": "niet vast te stellen",
+      "schrijft": "onbekend",
       "schil": [],
       "paden": [
         "/api/"
@@ -9488,7 +9591,9 @@
           "sleutel": "link:rendezvous"
         }
       ],
-      "rollen": [],
+      "rollen": [
+        "member"
+      ],
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
@@ -9770,6 +9875,7 @@
         "/api/samen/",
         "/api/service/bel/mijn",
         "/api/service/bevestig",
+        "/api/service/bevestiging/toon",
         "/api/service/bevestigingen",
         "/api/service/keuzes",
         "/api/service/mens",
@@ -10692,6 +10798,7 @@
         "/api/techniek/betalingen/status",
         "/api/techniek/beveiliging/afhandelen",
         "/api/techniek/beveiliging/auto",
+        "/api/techniek/bevestig/opties",
         "/api/techniek/controle/incident",
         "/api/techniek/controle/integriteit",
         "/api/techniek/controle/inventaris?soort=",
@@ -10705,6 +10812,9 @@
         "/api/techniek/papieren",
         "/api/techniek/papieren/antwoord",
         "/api/techniek/papieren/document?naam=",
+        "/api/techniek/sso",
+        "/api/techniek/sso/geheim",
+        "/api/techniek/sso/geheim/overlap/sluit",
         "/api/techniek/status",
         "/api/techniek/toegang",
         "/api/techniek/wacht/",
@@ -11297,7 +11407,9 @@
           "sleutel": "link:vonk"
         }
       ],
-      "rollen": [],
+      "rollen": [
+        "member"
+      ],
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
@@ -11474,12 +11586,16 @@
         "/api/tenant/bijstand",
         "/api/tenant/bootstrap",
         "/api/tenant/herstelproef",
-        "/api/tenant/status"
+        "/api/tenant/status",
+        "/api/werk-gast/",
+        "/api/werk-leverancier/"
       ],
       "schilPaden": [],
       "domeinen": [
         "/api/bedrijf",
-        "/api/tenant"
+        "/api/tenant",
+        "/api/werk-gast",
+        "/api/werk-leverancier"
       ],
       "zonderServer": false,
       "inkomend": 18,

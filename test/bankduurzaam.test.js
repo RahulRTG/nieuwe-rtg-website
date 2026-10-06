@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, verwachtServerfout } = require('./helper');
+const { startServer, stop } = require('./helper');
 
 const mappen = [];
 const verseMap = () => { const m = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bnkd-')); mappen.push(m); return m; };
@@ -66,13 +66,23 @@ test.before(async () => {
      De strenge poort in helper.js laat een ronde zakken op een onafgevangen
      serveruitzondering, en dat hoort ook. Hem hier VERWACHTEN is zelf een
      bewering: komt de worp niet, dan zakt de ronde op de gemiste verwachting. */
-  verwachtServerfout(/\[duurzaam\] de commit is niet vastgelegd/,
-    'de liegende opslag hoort de duurzame commit te laten mislukken -- dat is de kern van deze toets');
-  eerlijk = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: verseMap(), OFFICE_CODE: 'KANTOOR-BNKD-1' } });
-  leugen = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: verseMap(), OFFICE_CODE: 'KANTOOR-BNKD-2',
+  /* A-P1-05: /api/bank/ is een kritiek pad, dus de poort (opzet/kritiekspoor.js) weigert onder
+     een liegende opslag al VOOR de bankcode draait: 503, niets uitgevoerd. De worp uit
+     bijeen() die deze toets eerder VERWACHTTE komt daardoor niet meer; de bewering over wat
+     de client te horen krijgt is dezelfde, en strenger. */
+  /* A-P1-05: een kantoorhandeling op /api/office/bank/ wordt geweigerd als het spoor niet
+     aantoonbaar kan worden vastgelegd -- ook dit "live zetten". Op een liegende server kan
+     dat dus niet meer: de boardroom zet de bank daarom live op een EERLIJKE server met
+     dezelfde datamap, en pas daarna start de liegende server op die map. */
+  const leugenMap = verseMap();
+  const voor = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: leugenMap, OFFICE_CODE: 'KANTOOR-BNKD-2' } });
+  await bankLive(voor.base, 'KANTOOR-BNKD-2');
+  stop(voor.child);
+  await new Promise(r => setTimeout(r, 1500));
+  leugen = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: leugenMap, OFFICE_CODE: 'KANTOOR-BNKD-2',
     RTG_VERRAAD: 'schrijf-verloren' } });
+  eerlijk = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: verseMap(), OFFICE_CODE: 'KANTOOR-BNKD-1' } });
   await bankLive(eerlijk.base, 'KANTOOR-BNKD-1');
-  await bankLive(leugen.base, 'KANTOOR-BNKD-2');
 });
 test.after(() => {
   stop(eerlijk && eerlijk.child); stop(leugen && leugen.child);
@@ -104,6 +114,8 @@ test('2. onder een liegende opslag komt er GEEN akkoord en GEEN IBAN', async () 
     'een akkoord dat de opslag niet bevestigt mag niet met een 2xx worden bevestigd (kreeg ' + akk.status + ')');
   assert.ok(!(akk.body && akk.body.rekening && akk.body.rekening.iban),
     'en er mag geen IBAN in het antwoord staan: ' + JSON.stringify(akk.body).slice(0, 160));
+  assert.equal(akk.status, 503, 'de poort weigert eerlijk (503) in plaats van een fout uit de bank');
+  assert.equal(akk.body.spoor, 'niet-vastgelegd');
 
   /* EN WAT HIER NIET WORDT BEWEERD. Ik heb hier eerst bij gezet dat het
      overzicht daarna geen rekening mag tonen, en dat is fout: `schrijf-verloren`

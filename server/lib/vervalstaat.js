@@ -90,15 +90,16 @@ function laad(pad, ttlMs) {
    EEN GRENS DIE VANDAAG NIETS RAAKT, EN EEN TOETS DIE DAT ZO HOUDT. Een route
    die op een SLASH eindigt, komt met een slash EXTRA bij zijn handler, en die
    spelling vindt deze lezer niet. Dat geldt voor elke vorm waarin die slash
-   ontstaat: een vast pad (app.post('/api/t/') bereikt de router ook als
-   /api/t//), een :param-route (app.put('/api/p/:id/'), ook /api/p/1//) en de
-   wortel van een gemounte router (router.post('/') onder app.use('/api/x',
-   router), ook /api/x//). De oorzaak is de registersleutel: leesLagen() in
-   ../web/routing.js haalt de slash weg (/api/t, /api/p/:id, /api/x), de router
-   niet, dus vastePaden() komt hooguit op /api/t/ uit. Hier een slash extra
-   weghalen is geen uitweg: dan sluit de poort ook /api/t// van een route die
-   ZONDER slash is opgehangen, een spelling die de router nergens heen brengt,
-   en dat is de tweede opvatting van het pad waar deze functie juist vanaf is.
+   ontstaat: een vast pad (een POST op '/api/t/' bereikt de router ook als
+   /api/t//), een :param-route (een PUT op '/api/p/:id/', ook /api/p/1//) en de
+   wortel van een gemounte router (een POST op '/' van een router die onder
+   '/api/x' hangt, ook /api/x//). De oorzaak is de registersleutel: leesLagen()
+   in ../web/routing.js haalt de slash weg (/api/t, /api/p/:id, /api/x), de
+   router niet, dus vastePaden() komt hooguit op /api/t/ uit. Hier een slash
+   extra weghalen is geen uitweg: dan sluit de poort ook /api/t// van een route
+   die ZONDER slash is opgehangen, een spelling die de router nergens heen
+   brengt, en dat is de tweede opvatting van het pad waar deze functie juist
+   vanaf is.
    Wat wel kan is vasthouden dat zo'n route niet bestaat: toets 5 in
    test/schorspoort-spelling.test.js hangt elke schrijvende laag van de ECHTE
    router opnieuw op, vraagt de router per spelling of hij bij de handler
@@ -106,7 +107,11 @@ function laad(pad, ttlMs) {
    een .all()-route (de sleutel draagt ALL, gezocht wordt op de methode van
    het verzoek) en een :param midden in een segment (segmentPatroon() kent
    alleen /:). Gemeten op 6 oktober 2026: 5291 schrijvende lagen, van geen
-   enkele vorm een. */
+   enkele vorm een.
+
+   DE VOORBEELDEN STAAN IN WOORDEN EN NIET ALS AANROEP. De capabilityscanner
+   (../kern/magnaat-capabilities-bronnen.js) leest server/ met commentaar en
+   al, en telde ze als aanroep geschreven als twee routes die niet bestaan. */
 function staatVan(methode, pad, opties) {
   const o = opties || {};
   const k = laad(o.pad, o.ttlMs);

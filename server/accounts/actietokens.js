@@ -1,5 +1,5 @@
-/* Accounts, deel "actietokens": de DOEL-GEBONDEN tokens (2FA-bewijs 'inlog2'
-   en 'tech2', e-mailbevestiging 'verify-email', 'mailwissel',
+/* Accounts, deel "actietokens": de DOEL-GEBONDEN tokens (2FA-bewijs 'inlog2',
+   'tech2' en 'werk2', e-mailbevestiging 'verify-email', 'mailwissel',
    'sso-overdracht'). Afgesplitst uit ./tokens.js -- niet alleen voor de
    modulegrootte, maar omdat een actietoken een andere KLASSE is dan een
    sessietoken en dat verschil nu ook in de bestandsindeling staat
@@ -24,8 +24,8 @@
    kende, kwam dus binnen op een bewijs dat hij vlak voor de wijziging had
    gehaald. Per doel:
 
-     inlog2, tech2      het bewijs van stap een is het OUDE wachtwoord; een
-                        tweede factor maakt dat niet weer geldig;
+     inlog2, tech2,     het bewijs van stap een is het OUDE wachtwoord; een
+     werk2              tweede factor maakt dat niet weer geldig;
      sso-overdracht     een overdracht van voor de grens hoort bij een inlog
                         die de grens juist ongedaan maakte;
      mailwissel         wie zijn wachtwoord wijzigt OMDAT er iemand meekeek,
@@ -36,12 +36,32 @@
                         zelf aan (/api/auth/resend).
 
    De vergelijking zelf staat in ./sessiegrens.js, dezelfde als voor een
-   sessietoken: een opvatting van de grens voor sessie- en actietokens. */
+   sessietoken: een opvatting van de grens voor sessie- en actietokens.
+
+   EN EEN UITGEZET ACCOUNT HEEFT GEEN GELDIG ACTIETOKEN (RTG-V1 N20, besluit van
+   de eigenaar), met dezelfde opvatting van "uitgezet" als een sessie
+   (./sessiegrens.js uitgezet). De herkeuring van N12 zag dat alle vijf de doelen
+   bij een account op non-actief de gebruiker teruggaven. Per doel:
+
+     inlog2, tech2,     het sessietoken dat de deur daarna uitgaf, viel al bij
+     sso-overdracht     verifyToken af, maar de deur meldde succes, verbruikte
+                        bij inlog2 en tech2 de code (een herstelcode is dan
+                        weg) en legde bij inlog2 en sso een inlog vast; nu 401
+                        en blijft de code heel;
+     mailwissel         een openstaande wissel zette het inlogadres van een
+                        uit dienst gemeld account om;
+     verify-email       de link bevestigde een adres namens dat account.
+
+   Geen van de vijf is een herstelweg: het wachtwoordherstel loopt over een
+   gehashte code (./herstel.js) en niet over een actietoken. Een geweigerd token
+   wordt niet ingetrokken: zet de organisatie het account weer aan, dan werkt
+   het tot zijn eigen exp, zoals een sessietoken. "Sluit alle andere sessies"
+   blijft hier bewust buiten (RTG-V1 N21). */
 'use strict';
 const crypto = require('crypto');
 const kluis = require('./kluis');
 const { veiligGelijk } = require('../kern/util');
-const { voorGrens } = require('./sessiegrens');
+const { voorGrens, uitgezet } = require('./sessiegrens');
 const { doelGeldig } = require('./tokenvorm');
 
 /* DE OUDE VORM: EEN TOKEN ZONDER UITGIFTEMOMENT.
@@ -51,8 +71,9 @@ const { doelGeldig } = require('./tokenvorm');
    leest. Een token van voor de uitrol heeft geen vijfde deel, en wat ermee
    gebeurt is een keuze per doel, met de kosten erbij:
 
-     DICHT voor de inlogbewijzen (inlog2, tech2, sso-overdracht). Ze leven vijf
-     minuten of een minuut en zitten in een open tabblad. Weigeren kost op zijn
+     DICHT voor de inlogbewijzen (inlog2, tech2, werk2, sso-overdracht). Ze
+     leven vijf minuten of een minuut en zitten in een open tabblad. Werk2 is
+     nieuw (N19) en had nooit een oude vorm. Weigeren kost op zijn
      hoogst een nieuwe inlog, en een bewijs van een tweede stap waarvan niet
      vast te stellen is of het van voor of na de grens is, bewijst niets. Draaien
      oude en nieuwe knopen tijdens een uitrol naast elkaar (het trio), dan kan
@@ -105,6 +126,8 @@ function maakActieTokens({ getUserById, strikt, isIngetrokken }) {
       if (uitgegeven === undefined && !OUDE_VORM_ALS_MOMENT_NUL.has(purpose)) return null;
       const u = getUserById(Number(id));
       if (voorGrens(u, uitgegeven)) return null;
+      /* En een uitgezet account, net als bij een sessietoken (RTG-V1 N20). */
+      if (uitgezet(u)) return null;
       return u;
     } catch (e) { return null; }
   }

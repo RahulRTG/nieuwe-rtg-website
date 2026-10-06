@@ -80,7 +80,7 @@ const ROUTEPOORTEN = {
   'POST /api/supplier/login': { toegang: 'AUTHENTICATED',
     wat: 'leverancierscode, en met staffId ook de personeelscontrole' },
   'POST /api/supplier/mijn/login': { toegang: 'AUTHENTICATED',
-    wat: 'accounts.findByLogin + verifyPassword, met een rem per IP' },
+    wat: 'accounts.findByLogin + verifyPassword, met een rem per IP; met de tweede factor aan daarna bewijs (werk2) plus code, met de gedeelde rem' },
   'POST /api/techniek/inloggen': { toegang: 'AUTHENTICATED',
     wat: 'findByLogin + wachtwoord; antwoordt met opzet op elke fout hetzelfde' },
   'POST /api/staff': { toegang: 'AUTHENTICATED',

@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 0,
     "browserpoortToetsen": 426,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 539,
+    "dbDeuren": 540,
     "dbDeurenSchrijvend": 275,
     "dekkingPct": 83,
     "dekkingWaargenomenPct": 100,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 2126,
-    "toetsenNietGemeten": 129,
+    "toetsenNietGemeten": 137,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -71,7 +71,7 @@
     "wekkersZonderTrede": 0,
     "wettenOnbewezen": 5,
     "zaakwigGezakt": 0,
-    "zelfpoortendeToetsen": 46,
+    "zelfpoortendeToetsen": 48,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 3,
@@ -4273,6 +4273,36 @@
       "meter": "activeringOndergrens 49 -> 50",
       "reden": "Samenvoeging van alle 50 open PR's op integrate/all-open-prs-20261006. De functie democratie (DemocratieOS, al op main) staat nu in ACTIVERING.json omdat dat register opnieuw is gemeten; zijn envelop is een ondergrens omdat de meter `post` als onbekende kernsleutel leest in een routemodule met positionele parameters (routes/democratie/index.js). Een beperking van de meter, geen nieuwe koppeling.",
       "waarheen": "De activeringsmeter routemodules met positionele parameters laten herkennen."
+    },
+    {
+      "datum": "2026-10-06",
+      "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 539,
+      "vervalt": "2027-01-04",
+      "meter": "dbDeuren 539 -> 540",
+      "reden": "server/lib/auditwacht.js (audit P1-4) leest de vijf auditjournalen rechtstreeks uit db.data om bij het opstarten en periodiek hun keten na te lopen; een gebroken spoor wordt zo een alarm in plaats van een stille 409. Het is een LEZER van de journalen die al aan db.data hangen; de ankerjournalen die uit ankerdienst.js werden geknipt raken db.data juist niet (de deur bleef bij ankerdienst.js).",
+      "waarheen": "De journalen krijgen een gedeelde leesaccessor (dezelfde die ankerdienst.js gebruikt), en de auditwacht leest via die accessor."
+    },
+    {
+      "datum": "2026-10-06",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 129,
+      "vervalt": "2027-01-04",
+      "meter": "toetsenNietGemeten 129 -> 137",
+      "reden": "Acht nieuwe toetsbestanden voor de auditspoorreparatie (P0-1, P1-2, P1-3, P1-4, P2-5, P2-7): auditspoor-atomair.pg, auditatomair-sqlite, auditwacht, auditherkomst, ankerketen, productie-anker, en de gegroeide ankerdienst- en ankertimertoetsen. Met de hand nagetrokken: zonder het meenemen van het spoor in pg/collectietransactie.js of pg/economische-boeking.js, met de oude conflictcode voor een gebroken keten, zonder de alarmcontrole, met de oude verifieer() of de oude verifieerTegenAnker() zakken ze; en tegen de servercode van de basis zakken ze allemaal behalve de SQLite-proef (die stand was al veilig; met de voorregel van het kritiekspoor genegeerd zakt hij wel).",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
+    {
+      "datum": "2026-10-06",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 46,
+      "vervalt": "2027-01-04",
+      "meter": "zelfpoortendeToetsen 46 -> 48",
+      "reden": "test/auditspoor-atomair.pg.test.js (audit P0-1/P1-4) heeft twee toetsen die een echte PostgreSQL vereisen: een trigger die alleen de auditschrijf laat falen, tegen een echte server en tegen de PG-laag. Lokaal tegen PostgreSQL 16 gedraaid en groen (scripts/pgtoetsen.js: 43 van 43 bestanden). Hij staat in scripts/lib/pg-toetslijst.js en als uitzondering in deze norm.",
+      "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL."
     }
   ],
   "prestatie": {
@@ -4682,6 +4712,12 @@
       "pad": "test/gezinsdeur.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de raceproef voor de gezinsdeur (B18: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode, en een rotatie op A tegen de oude code op B) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/auditspoor-atomair.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "de atomiciteitsproef van het auditspoor (audit P0-1/P1-4: een trigger laat alleen de auditschrijf falen, en een vervalst spoor moet 503 en een alarm geven) vereist een echte PostgreSQL; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die dienst, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
     }
   ]
 }

@@ -1,16 +1,10 @@
 /* De ketencontroles onder de requestmerge van de auditsporen (./verzoeksporen.js):
    wat er gebeurt als een keten gebroken is, en hoe een zegelketen van het
    command-journaal wordt nagerekend. Geknipt uit verzoeksporen.js op de 10 kB
-   van keuringsregel 13; de auditwacht (lib/auditwacht.js) leest commandHeel ook. */
+   van keuringsregel 13. De zegelcontrole zelf woont in ../lib/zegelketen.js. */
 'use strict';
 
-const crypto = require('node:crypto');
-
-function zonder(regel, velden) {
-  const uit = { ...(regel || {}) };
-  for (const veld of velden) delete uit[veld];
-  return uit;
-}
+const { zonder, commandHash, commandHeel } = require('../lib/zegelketen');
 
 /* EEN GEBROKEN KETEN IS GEEN CONFLICT (audit P1-4). Hier stond voor allebei
    `conflict()`, en daarmee kreeg elke schrijfhandeling na een vervalsing een
@@ -20,27 +14,15 @@ function zonder(regel, velden) {
    reden, db/opslagfout.js) en een melding aan de auditwacht, die het alarm
    laat afgaan. */
 function gebroken(journaal, kant, tekst) {
-  try { require('../lib/auditwacht').meld(journaal, tekst, 'requestmerge/' + kant); } catch (x) {}
+  /* Het alarm mag de weigering nooit tegenhouden, maar faalt het melden, dan
+     staat dat in het log: een wacht die stil omvalt, is precies wat hier wordt
+     gerepareerd. De weigering zelf gaat altijd door. */
+  try { require('../lib/auditwacht').meld(journaal, tekst, 'requestmerge/' + kant); }
+  catch (x) { console.error('[auditwacht] melding mislukt:', x && x.message); }
   const e = new Error(tekst + ' Het auditspoor is gebroken; deze handeling wordt niet vastgelegd zolang dat zo is.');
   e.code = 'PG_AUDIT_KETEN_GEBROKEN';
   e.journaal = journaal;
   throw e;
-}
-
-function commandHash(regel) {
-  return crypto.createHash('sha256').update(JSON.stringify(regel)).digest('hex').slice(0, 32);
-}
-
-function commandHeel(lijst) {
-  const l = Array.isArray(lijst) ? lijst : [];
-  for (let i = 0; i < l.length; i++) {
-    const r = l[i];
-    if (!r || !r.id || !r.zegel) return false;
-    const kern = zonder(r, ['zegel']);
-    if (commandHash(kern) !== r.zegel) return false;
-    if (i > 0 && r.vorig !== l[i - 1].zegel) return false;
-  }
-  return true;
 }
 
 module.exports = { gebroken, commandHash, commandHeel, zonder };

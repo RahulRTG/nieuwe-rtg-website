@@ -29,24 +29,26 @@ function zegelRij(lijst, totaal) {
   return uit;
 }
 
-/* De journalen, met de weg naar hun regels. Staat er een journaal bij, dan
+/* De journalen, met de weg naar hun regels. Elke weg krijgt de DATA van de
+   ankerdienst en niet de database: de deur naar de opslag blijft bij
+   ./ankerdienst.js. Staat er een journaal bij, dan
    hoort hij HIER erbij -- en de dekking in keten-anker.js CONTROL hoort mee te
    bewegen, want de noemer is het aantal journalen en niet het aantal dat we
    toevallig hebben aangesloten. */
 const JOURNALEN = {
-  inzageLog: (db) => (db.data && db.data.inzageLog) || [],
-  securityLog: (db) => (db.data && db.data.securityLog) || [],
-  handelingLog: (db) => (db.data && db.data.handelingLog) || [],
+  inzageLog: (d) => d.inzageLog || [],
+  securityLog: (d) => d.securityLog || [],
+  handelingLog: (d) => d.handelingLog || [],
   /* livingLab en de boardroom-journalen staan PER LAB respectievelijk PER LID.
      Een blok met duizend koppen is geen anker maar een tweede database, dus
      nemen we hier de gezamenlijke kop: de hash over alle koppen samen. Verdwijnt
      er in één lid-journaal een regel, dan verandert die gezamenlijke hash. */
-  livingLabAudit: (db) => ((db.data && db.data.livingLab && db.data.livingLab.audit) || []),
-  apiSpoor: (db) => {
-    const a = (db.data && db.data.apiSpoor) || {};
+  livingLabAudit: (d) => (d.livingLab && d.livingLab.audit) || [],
+  apiSpoor: (d) => {
+    const a = d.apiSpoor || {};
     return zegelRij(a.commandJournaal, a.commandJournaalTotaal);
   },
-  commandJournaal: (db) => zegelRij(db.data && db.data.commandJournaal, db.data && db.data.commandJournaalTotaal)
+  commandJournaal: (d) => zegelRij(d.commandJournaal, d.commandJournaalTotaal)
 };
 
 /* DE BEWARING PER JOURNAAL (audit P2-5): een geankerde regel die verdween, is

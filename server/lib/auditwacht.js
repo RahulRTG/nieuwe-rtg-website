@@ -64,7 +64,7 @@ function meld(journaal, reden, bron) {
 /* Het besluitjournaal en het API-spoor dragen een zegelketen (kern/command/
    journaal.js) en geen hashketen; dezelfde controle als de requestmerge. */
 function commandHeel(lijst) {
-  return require('../pg/spoorketen').commandHeel(lijst);
+  return require('./zegelketen').commandHeel(lijst);
 }
 
 function journalen(db) {

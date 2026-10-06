@@ -52,6 +52,7 @@ const { zaadUit, sleutelpaar, kanoniek, teTekenen, DOEL } = require('./ankerzege
 function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
   const tijd = nu || klok.nu;
   const env = omgeving || process.env;
+  const data = () => (db && db.data) || {};
   let paar = null, paarGezocht = false;
   /* Laat: het procesgeheim staat pas klaar als de kluis is opgestart. Zolang
      er geen zaad is, wordt het later opnieuw geprobeerd. */
@@ -82,7 +83,7 @@ function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
      het NIET alleen hier, want dan ankert het niets. */
   function blok() {
     const punten = {};
-    for (const [naam, haal] of Object.entries(JOURNALEN)) punten[naam] = verankerPunt(haal(db));
+    for (const [naam, haal] of Object.entries(JOURNALEN)) punten[naam] = verankerPunt(haal(data()));
     punten.ledenBoardLog = boardroomPunt();
     const kaal = { at: new Date(tijd()).toISOString(), punten };
     const zegel = crypto.createHash('sha256').update(JSON.stringify(kaal)).digest('hex').slice(0, 32);
@@ -127,7 +128,7 @@ function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
     for (const [naam, haal] of Object.entries(JOURNALEN)) {
       const anker = eerder.punten[naam];
       if (!anker) { perJournaal[naam] = { ok: true, reden: 'stond niet in het blok' }; continue; }
-      const uit = verifieerTegenAnker(haal(db), anker, Object.assign({ nu: tijd }, BEWARING[naam] || {}));
+      const uit = verifieerTegenAnker(haal(data()), anker, Object.assign({ nu: tijd }, BEWARING[naam] || {}));
       perJournaal[naam] = uit;
       if (!uit.ok) { alles = false; if (uit.ingekort) ingekort.push(naam); }
     }

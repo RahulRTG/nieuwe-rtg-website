@@ -66,14 +66,13 @@ const klok = require('./klok');
 const verzoekcontext = require('../db/verzoekcontext');
 const burger = require('./burgerpad');
 const antwoordspoor = require('./antwoordspoor');
-const releaseidentiteit = require('./releaseidentiteit');
 
 const MAX = 50000;          // ruim genoeg voor een jaar bij dit verkeer, en begrensd
 const SCHRIJFT = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 /* De afdruk van een body en WIE er handelt: ./handelingwie.js (geknipt op de
    10 kB van keuringsregel 13 toen de regel een verzoek-id en release kreeg). */
-const { afdrukVan, wieVan } = require('./handelingwie');
+const { afdrukVan, wieVan, maakRegel } = require('./handelingwie');
 
 function maakHandelingsspoor({ db, save, nu, max }) {
   const tijd = nu || klok.nu;
@@ -83,43 +82,8 @@ function maakHandelingsspoor({ db, save, nu, max }) {
 
   const rij = () => opslag ? opslag.view() : eigen.bak('handelingLog');
 
-  /* EEN BOUWER VOOR DE REGEL. noteer() legt hem aan de keten; de vroege
-     commit (db/verzoekspoor.js) legt hem in zijn eigen transactie aan de keten.
-     Twee bouwers lopen binnen een half jaar uiteen, en dan dekt de keten twee
-     soorten regels.
-
-     `verzoek` en `release` (audit P2-7) staan IN de regel en dus onder de hash:
-     het verzoek koppelt de regel aan het logboek en aan de andere sporen van
-     hetzelfde verzoek (lib/correlatie.js maakt het id, de server en nooit de
-     client), de release zegt met welke code hij geschreven is. Een burgerpad
-     krijgt geen verzoek-id: dat is precies de weg naar de mens die daar met
-     opzet ontbreekt. */
-  function regelVan({ wie, methode, pad, status, afdruk, grof, stand, verzoek, collecties }) {
-    const r = {
-      at: grof ? burger.dag(tijd()) : new Date(tijd()).toISOString(),
-      wie: String(wie || 'anoniem').slice(0, 60),
-      methode: String(methode || '').slice(0, 10),
-      pad: String(pad || '').slice(0, 200),
-      status: Number(status) || 0,
-      afdruk: String(afdruk || '')
-    };
-    if (stand) r.stand = String(stand).slice(0, 20);   // A-P1-05: `toegestaan` = voor de handeling, duurzaam
-    if (collecties && collecties.length) r.collecties = [].concat(collecties).map(String).join(',').slice(0, 200);
-    if (verzoek && !grof) r.verzoek = String(verzoek).slice(0, 40);
-    const release = releaseidentiteit.release();
-    if (release) r.release = release;   // nooit een verzonnen versie
-    return r;
-  }
-
-  /* De regel voor een VROEGE commit (db/verzoekspoor.js): de domeinmutatie van
-     dit verzoek is in dezelfde transactie als deze regel gecommit. */
-  function regelVoorVroegeCommit(req, collecties) {
-    const pad = String(req.path || req.url || '');
-    const pseudoniem = burger.isBurgerpad(pad);
-    return regelVan({ wie: pseudoniem ? burger.PSEUDONIEM : wieVan(req), methode: req.method, pad, status: 0,
-      afdruk: pseudoniem ? '' : afdrukVan(req.body), grof: pseudoniem, stand: 'vastgelegd',
-      verzoek: req.id, collecties });
-  }
+  /* De regel zelf, en die van een vroege commit: ./handelingwie.js. */
+  const { regelVan, regelVoorVroegeCommit } = maakRegel(tijd);
 
   function noteer(opdracht) {
     const regel = regelVan(opdracht);

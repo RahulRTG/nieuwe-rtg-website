@@ -278,3 +278,44 @@ async function telling(office, id) {
   assert.ok(r, 'de regel ' + id + ' staat op het bord');
   return r;
 }
+
+/* ---- A-P1-03: een VOORBIJE overeenkomst zet de pas per verzoek op de basislaag ---- */
+
+test('12. eenheden: wat wordt afgedwongen en wat blijft onbekend', () => {
+  const nu = Date.parse('2026-10-06T12:00:00Z');
+  const o = (status, eindigtOp) => poort.beoordeel('rtg', { id: 'c', status, eindigtOp }, nu);
+  assert.equal(poort.afgedwongen(o('GEEINDIGD')), true, 'een geeindigd contract wordt afgedwongen');
+  assert.equal(poort.afgedwongen(o('OPZEGGEND', '2026-10-05T00:00:00Z')), true, 'een opzegging voorbij zijn einddatum loopt niet meer');
+  assert.equal(poort.afgedwongen(o('OPZEGGEND', '2026-11-05T00:00:00Z')), false, 'een opzegging die nog loopt blijft staan');
+  assert.equal(poort.afgedwongen(o('ACTIEF')), false);
+  assert.equal(poort.afgedwongen(poort.beoordeel('rtg', null, nu)), false, 'GEEN_CONTRACT is "ik weet het niet" en dwingt niets af');
+  assert.equal(poort.afgedwongen(o('CONCEPT')), false, 'een nog niet getekende afspraak is niet voorbij');
+  assert.equal(poort.afgedwongen(poort.beoordeel('guest', null, nu)), false);
+  assert.equal(poort.BASIS_TIER, 'guest');
+});
+
+test('13. over de echte server: contract voorbij -> basislaag, zonder opnieuw in te loggen', async () => {
+  const office = await kantoorAlsPersoon(base, api);
+  const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const email = u + '@x.nl';
+  const reg = (await api('/api/auth/register', { name: 'Voorbij ' + u, email,
+    phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body;
+  const aanvraag = (await api('/api/aanmelding/aanvraag', { pas: 'rtg', naam: 'Voorbij ' + u, contact: email }, reg.token)).body;
+  const id = aanvraag.aanmelding && aanvraag.aanmelding.id;
+  assert.equal((await api('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, office)).status, 200);
+  const nu = await api('/api/mijn/abonnement', {}, reg.token);
+  assert.equal(nu.status, 200);
+  assert.equal(nu.kop.get('rtg-contract'), null, 'een lopend contract draagt geen basislaagkop');
+  assert.equal((await api('/api/mijn/abonnement/opzeggen', {}, reg.token)).status, 200, 'het lid zegt op');
+  const nogLopend = await api('/api/mijn/abonnement', {}, reg.token);
+  assert.equal(nogLopend.kop.get('rtg-contract'), null, 'een opzegging met einddatum in de toekomst loopt nog');
+
+  // dezelfde datamap, 400 dagen later (de minimumtermijn van 12 maanden is dan voorbij): de einddatum is gepasseerd
+  stop(srv);
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_KLOK: '+400d' } }); base = srv.base;
+  const login = (await api('/api/auth/login', { login: email, password: 'geheim123', pasApp: 'rtg' })).body;
+  assert.ok(login.token, 'inloggen blijft kunnen: de basislaag is de gratis app, geen uitsluiting');
+  const later = await api('/api/mijn/abonnement', {}, login.token);
+  assert.equal(later.kop.get('rtg-contract'), 'geeindigd', 'de server zet dit verzoek op de basislaag');
+});

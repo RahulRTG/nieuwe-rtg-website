@@ -24,7 +24,7 @@
   <form id="create"><label class="label" for="new-title">Titel</label><input class="field" id="new-title" maxlength="300" required>
   <label class="label" for="new-type">Soort</label><select class="field" id="new-type"><option value="book">Boek</option><option value="manual">Handleiding</option><option value="local-history">Lokale geschiedenis</option><option value="research">Onderzoek</option><option value="learning-material">Lesmateriaal</option><option value="oral-history">Oral history</option><option value="other">Anders</option></select>
   <label class="label" for="new-language">Taal</label><input class="field" id="new-language" value="nl" maxlength="40" required>
-  <button class="btn primary" type="submit">Werk beginnen</button></form>
+  <button class="btn primary" type="submit" data-hoofdactie>Werk beginnen</button></form>
 </aside>
 <main id="main" class="main"><section id="welcome"><span class="ey">Leave the world richer</span><h2>Van menselijke kennis naar een blijvende editie</h2><p class="lead">Leg inhoud vast in stabiele delen. Publiceer alleen met expliciete afspraken en rechten. Feedback verandert nooit stil een bestaande editie.</p><div class="empty">Kies links een werk of begin een nieuw werk.</div></section>
   <section id="studio" class="hide"><span id="work-kind" class="ey"></span><h2 id="work-title"></h2><p id="work-desc" class="lead"></p><div class="row"><button id="new-node" class="btn primary">Nieuw onderdeel</button><button id="show-feedback" class="btn">Feedback</button><button id="refresh" class="btn">Verversen</button></div><h3>Inhoud</h3><div id="nodes"></div>
@@ -34,6 +34,9 @@
 </main>
 <aside id="side" class="side"><section id="publish-empty"><span class="label">Publicatie</span><p class="muted">Kies een werk om afspraken, rechten en edities te zien.</p></section><section id="publish" class="hide"><span class="label">Samenwerking</span><div id="governance"></div><h3>Nieuwe editie</h3><p class="muted">De publicatiestap maakt een immutable snapshot. Latere inhoud wordt een opvolgende editie.</p><button id="release" class="btn primary">Edition maken en vrijgeven</button><h3>Edities</h3><div id="editions"></div></section></aside>
 </div>
+<script src="/shared/adaptief.js"></script><script src="/shared/adaptief/grammatica.js"></script>
+<script src="/shared/objectverwijzing.js"></script><script src="/shared/adaptief/vorm.js"></script>
+<script src="/shared/adaptief/register.js"></script>
 <script src="/shared/uitvoer.js"></script><script src="/apps/library/api.js"></script><script src="/apps/library/app.js"></script>
 <script src="/shared/rtg-world-desktop.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

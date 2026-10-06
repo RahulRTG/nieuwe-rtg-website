@@ -687,7 +687,6 @@ const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db });
    RTG (./lib/ankerpost.js). Zonder RTG_ANKERPOST_URL doet die post niets en
    zegt hij dat -- geen bestemming blijft "niet in bedrijf". */
 const ankerpost = require('./lib/ankerpost').maakAnkerpost({ ankerdienst });
-require('./lib/ankertimer').start({ ankerpost, log });   // A-P1-05: het blok gaat periodiek naar buiten
 
 /* DE LEVERANCIERSPOORT staat in ./opzet/leverancierpoort.js: de twee
    SSE-wegen, de melding aan een zaak, de code-index, de opzoeking, de poort

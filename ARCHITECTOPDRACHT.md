@@ -115,7 +115,7 @@ verplaatsen, geen redactie. Twijfel over een blok gaat naar de grondwet.
 
 **Stop/go.**
 
-- `test/agentinstructies.test.js`: elk ankerblok uit de inventaris staat
+- Een nieuwe toets (werknaam `agentinstructies`): elk ankerblok uit de inventaris staat
   letterlijk op zijn bestemming; `AGENTS.md` en `CLAUDE.md` bevatten geen
   dubbele inhoud; de grondwet blijft onder een maximum in bytes.
   Mutatie: haal één verplaatste regel weg, en de toets zakt.

@@ -42,6 +42,9 @@ if (require.main !== module) return;
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+/* De gemeten invoer voor het stempel (ARCHITECTOPDRACHT.md fase 2); zonder
+   invoerspoor-preload is dit undefined en verandert het stempel niet. */
+const { blok: invoerBlok } = require('./lib/invoerspoor');
 const { parse } = require('./ast/parser');
 const { loop } = require('./ast/walk');
 
@@ -223,7 +226,7 @@ const uit = {
      dekkingsvraag triviaal waar, dus scripts/codewereld.js telt hem apart. */
   soort: 'index',
   uitleg: 'De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.',
-  stempel: { op: new Date().toISOString().slice(0, 10), commit },
+  stempel: { op: new Date().toISOString().slice(0, 10), commit, invoer: invoerBlok(['SYMBOLEN.json']) },
   grens: 'Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.',
   gemeten: {
     bestandenGezien: perBestand.length + nietGelezen.length,

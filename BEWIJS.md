@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2332 bestanden en 15997 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2333 bestanden en 15999 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2332 |
-| losse beweringen (`test(...)`) | 15997 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2157 |
+| toetsbestanden | 2333 |
+| losse beweringen (`test(...)`) | 15999 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 249 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2158 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2028 bestanden, 15468 beweringen.
+2029 bestanden, 15470 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -748,7 +748,7 @@ toets omvalt.
 | `idemidentiteit-velden.test.js` | 9 | gezakt op `!==->===#0` | WAT EEN ROUTE MET `velden` BELOOFT, EN WAT DE AFDRUK ERVAN MAAKT. ----------------------------------------------------------------- Deze toets verandert niets aan het gedrag. |
 | `idemidentiteit.test.js` | 4 | gezakt op `===->!==#0` | WAT MAAKT TWEE AANROEPEN HETZELFDE VERZOEK -- de meter, en zijn eigen ijking. IDEMIDENTITEIT.json beantwoordt de vraag die na #269/#270 overbleef: waar zit nog een identiteit die te smal is? |
 | `idemmeting.test.js` | 7 | gezakt op `===->!==#0` | DE METING ALS CLASSIFICATIEGROND, EN DE POORT ERVOOR. WAAROM DEZE TOETS BESTAAT. |
-| `idempotentie.test.js` | 9 | gezakt op `===->!==#0` | DE IDEMPOTENTIELAAG, NAGETROKKEN. Een sleutel, een uitvoering: de herhaling krijgt hetzelfde antwoord en de handler draait niet nog een keer. |
+| `idempotentie.test.js` | 7 | gezakt op `===->!==#0` | DE IDEMPOTENTIELAAG, NAGETROKKEN. Een sleutel, een uitvoering: de herhaling krijgt hetzelfde antwoord en de handler draait niet nog een keer. |
 | `idemproef.test.js` | 36 | gezakt op `===->!==#0` | HET OORDEEL VAN DE IDEMPOTENTIEPROEF, los van een server. De ronde zelf (scripts/idemproef-route.js) heeft een echte server nodig en muteert onderweg; het oordeel is puur en hoort hier. |
 | `idemschuld.test.js` | 6 | gezakt op `&&->||#0` | DE IDEM-SCHULD MAG ALLEEN KRIMPEN. Er zijn 3650 schrijfroutes. |
 | `idemtoerekening.test.js` | 5 | gezakt op `return-weg#4` | DE TOEREKENING VAN DE IDEMPOTENTIEPROEF -- belandt VOORWERK in het vak van de gemeten handeling? WAT ER MISGING, en het stond als GERUSTHEID in de bron. |
@@ -1155,6 +1155,7 @@ toets omvalt.
 | `normbasis.test.js` | 7 | gezakt op `===->!==#0` | DE HANDHAVER OP DE BASISLIJN VAN DE NORM. scripts/normbasis.js legt NORM.json van deze tak naast die van main en weigert een meter die LOSSER staat zonder reden. |
 | `normprestatie.test.js` | 9 | gezakt op `expliciete bronmutatie` | DE PRESTATIELAT (scripts/norm.js + BEPROEVING.json). De ratel bewaakte tot nu toe alleen statische meters: dekking, keuring, dependencies. |
 | `normverval.test.js` | 18 | gezakt op `===->!==#0` | DE IJKING VAN HET VERVAL -- regel 2 van de lat, op de bewaker van de ratel. scripts/normverval.js bewaakt de enige plek waar de lat omlaag kan: de hand. |
+| `notify-vorm.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `notities.test.js` | 3 | gezakt op `liegpoort /api/` | Notities & Taken: het bord, samen werken op codenaam, en de herinnering die een gekoppelde agenda-afspraak wordt (een wekkerlaag, niet drie). |
 | `notitiesduurzaam.test.js` | 11 | gezakt op `liegpoort /api/` | HET BORD BEVESTIGT NIET WAT DE OPSLAG NOG NIET HEEFT. De ketenronde weerlegde een belofte die niemand had opgeschreven: een notitie werd met 200 bevestigd en was na een herstart weg (KETENS.json, keten NOTITIE,... |
 | `objectlaag.test.js` | 24 | gezakt op `return-weg#0` | De objectlaag (LIFE.md fase 2): niet apps maar objecten -- persoon, groep, event, elk met de caps die er ECHT bij horen. De vier beloften die deze toetsen bewaken: 1. |

@@ -9451,6 +9451,14 @@
       "gezakt": 7,
       "geprobeerd": 1
     },
+    "notify-vorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/meldingen.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
     "notities.e2e.js": {
       "soort": "server",
       "staat": "gezakt",

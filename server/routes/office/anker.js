@@ -9,7 +9,7 @@
 module.exports = (octx) => {
   const { kern } = octx;
   const { app, officeAuth, ankerdienst, ankerpost } = kern;
-  require('../../lib/ankertimer').start({ ankerpost, log: kern.log || console });   // A-P1-05: periodiek anker
+  require('../../lib/ankertimer').start({ ankerpost, log: console });   // A-P1-05: periodiek anker
 
 /* HET ANKER: het ene getal dat naar buiten moet.
 

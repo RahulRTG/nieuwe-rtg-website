@@ -36,13 +36,30 @@ const tel = () => '06' + String(10000000 + Math.floor(Math.random() * 8e7));
 test('productie, via het scherm: uitnodiging koppelen met de eigen passkey en daarna het kantoor in',
   { skip: geenBrowser(pw), timeout: 180000 }, async t => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoorkoppel-e2e-'));
-  const { child, base } = await startServer({ env: { NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: tmp,
+  /* EEN opruiming, in de volgorde die de opstelling vraagt. node:test draait
+     t.after-hooks in de volgorde van registratie, dus drie losse hooks stopten
+     eerst de SERVER en sloten pas daarna de browser -- terwijl de service
+     worker en de Edge-scripts na de laatste assert nog bestanden ophaalden.
+     Die verzoeken lopen via route.fetch naar de server; met de server weg
+     werd dat ECONNRESET of "Request context disposed", als unhandledRejection
+     na een groene toets. Eerst de browser dicht (dan stopt het verkeer), dan
+     de server, dan de map. */
+  let child, browser, sluit = false;
+  const routeFouten = [];
+  t.after(async () => {
+    sluit = true;
+    if (browser) await browser.close();
+    if (child) await stopHard(child);
+    fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+    assert.deepEqual(routeFouten, [], 'de opstelling stuurde elk verzoek door naar de server');
+  });
+  const srv = await startServer({ env: { NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: tmp,
     APP_URL: APP + '/', SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
     ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg', ...KEYS, RTG_OWNER_EMAIL: EIGENAAR,
     RTG_OWNER_BOOTSTRAP: BOOTSTRAP, OFFICE_CODE: 'GEHEIME-CODE-123', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     RTG_ISOLATIE_AFDWINGEN: '1', RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1' } });
-  t.after(() => stopHard(child));   // eerst het proces echt weg, dan pas de map
-  t.after(() => fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
+  child = srv.child;
+  const base = srv.base;
   const api = (pad, body, token) => fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json',
     'X-Forwarded-Proto': 'https', ...(token ? { Authorization: 'Bearer ' + token } : {}) }, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -67,15 +84,27 @@ test('productie, via het scherm: uitnodiging koppelen met de eigen passkey en da
   assert.equal(uitn.status, 200, kort(uitn.body));
   assert.match(uitn.body.code, /^KU\.[0-9A-F]{32}$/i);
 
-  const browser = await pw.chromium.launch(browserOpties(pw));
-  t.after(() => browser.close());
+  browser = await pw.chromium.launch(browserOpties(pw));
   const c = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' });
   /* de opstelling: https://rtg.voorbeeld.test wordt de lokale server */
+  /* Een doorgestuurd verzoek dat faalt OMDAT de opruiming de browser sluit,
+     is geen bevinding: dat is het verkeer dat na de laatste assert nog liep.
+     Alleen die ene oorzaak wordt genegeerd -- de vlag `sluit` staat dan aan en
+     de fout is een sluitfout. Elke andere fout (de server weg terwijl de toets
+     nog loopt, een ECONNRESET midden in de keten) breekt het verzoek af en
+     laat de toets zakken via routeFouten. */
+  const sluitFout = /has been closed|context disposed|Target closed/i;
   await c.route(APP + '/**', async route => {
     const u = new URL(route.request().url());
-    const response = await route.fetch({ url: base + u.pathname + u.search, maxRedirects: 0,
-      headers: { ...route.request().headers(), 'x-forwarded-proto': 'https' } });
-    await route.fulfill({ response });
+    try {
+      const response = await route.fetch({ url: base + u.pathname + u.search, maxRedirects: 0,
+        headers: { ...route.request().headers(), 'x-forwarded-proto': 'https' } });
+      await route.fulfill({ response });
+    } catch (err) {
+      if (sluit && sluitFout.test(String(err && err.message))) return;
+      routeFouten.push(u.pathname + ': ' + String(err && err.message).split('\n')[0]);
+      await route.abort('failed').catch(() => {});
+    }
   });
   await c.addInitScript(tok => {
     localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
@@ -126,4 +155,5 @@ test('productie, via het scherm: uitnodiging koppelen met de eigen passkey en da
   const rollen = (await api('/api/account/rollen', {}, mwLid)).body.rollen || [];
   assert.ok(rollen.some(r => r.rol === 'kantoor'), 'de kantoorrol hangt aan zijn account');
   assert.deepEqual(fouten, [], 'geen paginafouten');
+  assert.deepEqual(routeFouten, [], 'de opstelling stuurde elk verzoek door naar de server');
 });

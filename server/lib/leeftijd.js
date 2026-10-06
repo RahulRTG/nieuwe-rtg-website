@@ -44,4 +44,14 @@ function leeftijdsgroepVan(lft) {
   return '21+';
 }
 
-module.exports = { leeftijdVan, leeftijdsgroepVan, LID_MIN_LEEFTIJD, LID_MAX_LEEFTIJD };
+/* AVG-TOESTEMMING: onder 16 geeft een ouder hem (UAVG art. 5). Een kind zonder
+   geboortedatum telt als jonger -- bij twijfel de strengere weg. Een plek, want
+   het dagboek (kern/welzijn.js) en het intrekken door de ouder
+   (foundation/gezondheidstoestemming.js) moeten precies hetzelfde kind bedoelen. */
+const AVG_TOESTEMMING_LEEFTIJD = 16;
+function ouderGeeftToestemming(p) {
+  const l = leeftijdVan(p && p.geboren);
+  return l == null ? !!(p && p.rol === 'kind') : l < AVG_TOESTEMMING_LEEFTIJD;
+}
+
+module.exports = { leeftijdVan, ouderGeeftToestemming, AVG_TOESTEMMING_LEEFTIJD, leeftijdsgroepVan, LID_MIN_LEEFTIJD, LID_MAX_LEEFTIJD };

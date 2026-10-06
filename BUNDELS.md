@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 485 delen, 0 zonder onderwerp.**
+**60 bundels, 486 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -213,7 +213,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 115 delen, 9836 regels in de delen
+`public/apps/leverancier/` -- 116 delen, 9898 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -225,6 +225,7 @@ omlaag.
 | `leverancier-04.js` | het chatvenster met een partner |
 | `leverancier-05.js` | aanmelden als medewerker bij een zaak |
 | `leverancier-06.js` | de personeelskiezer: wie ben jij |
+| `leverancier-06a.js` | inloggen met het eigen RTG-account, met de tweede stap, en de app openen |
 | `leverancier-07.js` | een account voor alles: partner kiezen en de staat toepassen |
 | `leverancier-08.js` | de bonnenstatistiek van de kassa |
 | `leverancier-09.js` | de looplijst per station, op tijd gesorteerd |
@@ -380,7 +381,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 32 delen, 3252 regels in de delen
+`public/apps/personeel/` -- 32 delen, 3290 regels in de delen
 
 | deel | onderwerp |
 |---|---|

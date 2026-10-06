@@ -2962,14 +2962,6 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
-    "deurverkoop-race.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/routes/supplier/tickets-verkoop.js",
-      "operator": "===->!==#0",
-      "gezakt": 4,
-      "geprobeerd": 1
-    },
     "dienst-vervalt.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -9451,14 +9443,6 @@
       "gezakt": 7,
       "geprobeerd": 1
     },
-    "notify-vorm.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/opzet/meldingen.js",
-      "operator": "!==->===#0",
-      "gezakt": 2,
-      "geprobeerd": 2
-    },
     "notities.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -11629,6 +11613,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "reisteruggave.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "reisuitnodiging.e2e.js": {
@@ -15713,14 +15704,6 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
-    "versmallingswetten.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/commercie/bevoegdheid.js",
-      "operator": "===->!==#0",
-      "gezakt": 8,
-      "geprobeerd": 1
-    },
     "verstrengeling.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15924,14 +15907,6 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "overleefde 17 mutaties in public/apps/voertuig.js en rit.js. Deze toets legt tekst en sleutelnamen vast, geen rekenend gedrag; geen enkele bronoperator raakt een letterlijke string. Met de hand nagetrokken op de foutklasse die hij wel bewaakt (een hernoemde opslagsleutel): tweemaal raak"
-    },
-    "vonk-daglot.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/vonk/wensen.js",
-      "operator": "true->false#0",
-      "gezakt": 1,
-      "geprobeerd": 1
     },
     "vonk-experience.test.js": {
       "soort": "puur",

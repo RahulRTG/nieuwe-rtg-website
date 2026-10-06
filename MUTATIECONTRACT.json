@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-06T04:15:58.860Z",
-  "commit": "465d67853",
+  "op": "2026-10-06T04:20:12.133Z",
+  "commit": "1c211e740",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,19 +10,19 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5262,
-  "geclassificeerd": 5237,
+  "totaal": 5264,
+  "geclassificeerd": 5239,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3168,
-   "NOT_APPLICABLE": 1263,
+   "NOT_APPLICABLE": 1264,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 626,
-   "INTENTIONALLY_NON_IDEMPOTENT": 180
+   "PROTECTED": 625,
+   "INTENTIONALLY_NON_IDEMPOTENT": 182
   },
-  "vastgesteldDoorMens": 2121,
+  "vastgesteldDoorMens": 2123,
   "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4331,
+   "AUTHENTICATED": 4333,
    "PUBLIC": 134,
    "OBJECT_SCOPED": 766,
    "(niet af te leiden -- vraagt een verklaring)": 15,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4882,
-   "niet gemeten": 114
+   "niet gemeten": 116
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -69189,6 +69189,69 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "reisbureau.teruggave.besluiten",
+   "route": "POST /api/office/reisbureau/teruggave",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "zwaar.opties.reisteruggave",
+   "route": "POST /api/office/reisbureau/teruggave/opties",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "reisbureau.teruggave.lezen",
+   "route": "POST /api/office/reisbureau/teruggaven",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "reisbureau.thuis.kantoor",
    "route": "POST /api/office/reisbureau/thuis",
    "semantiek": {
@@ -114362,27 +114425,6 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "supplier.horeca.teruggave.uitvoeren",
-   "route": "POST /api/supplier/horeca/teruggave",
-   "semantiek": {
-    "klasse": "sleutelVereist"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": "object: rekeningId",
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "supplierAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

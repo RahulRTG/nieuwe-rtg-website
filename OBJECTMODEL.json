@@ -3,15 +3,15 @@
   "vastgelegd": "2026-10-06",
   "gemeten": {
     "bestanden": 2660,
-    "vormen": 1551,
-    "velden": 2212,
+    "vormen": 1549,
+    "velden": 2209,
     "modules": 855,
-    "domeinen": 306,
+    "domeinen": 307,
     "envelopDrempel": 19,
     "envelop": 28,
-    "veldenDomeineigen": 1542,
-    "veldenGedeeldVanafVier": 230,
-    "gelijkendeVormparen": 24
+    "veldenDomeineigen": 1536,
+    "veldenGedeeldVanafVier": 231,
+    "gelijkendeVormparen": 26
   },
   "envelop": [
     "aantal",
@@ -225,6 +225,18 @@
       ]
     },
     {
+      "veld": "aan",
+      "domeinen": 13,
+      "waar": [
+        "kern/afdelingen",
+        "kern/command",
+        "kern/geldbeleid",
+        "kern/klok",
+        "kern/lidboard",
+        "kern/pay"
+      ]
+    },
+    {
       "veld": "categorie",
       "domeinen": 13,
       "waar": [
@@ -261,15 +273,27 @@
       ]
     },
     {
-      "veld": "aan",
+      "veld": "land",
+      "domeinen": 13,
+      "waar": [
+        "bedrijf",
+        "kern/commercie",
+        "kern/concern",
+        "kern/labfonds",
+        "kern/ledenbalie-inzage",
+        "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "besluit",
       "domeinen": 12,
       "waar": [
-        "kern/afdelingen",
-        "kern/command",
-        "kern/geldbeleid",
-        "kern/klok",
-        "kern/lidboard",
-        "kern/pay"
+        "kern/aanmeldingen",
+        "kern/appstore",
+        "kern/commercie",
+        "kern/gemeente",
+        "kern/labfonds",
+        "kern/ledenbalie-zaken"
       ]
     },
     {
@@ -357,18 +381,6 @@
       ]
     },
     {
-      "veld": "land",
-      "domeinen": 12,
-      "waar": [
-        "bedrijf",
-        "kern/commercie",
-        "kern/concern",
-        "kern/labfonds",
-        "kern/ledenbalie-inzage",
-        "kern/livinglab"
-      ]
-    },
-    {
       "veld": "rol",
       "domeinen": 12,
       "waar": [
@@ -393,15 +405,15 @@
       ]
     },
     {
-      "veld": "besluit",
-      "domeinen": 11,
+      "veld": "bewijs",
+      "domeinen": 12,
       "waar": [
-        "kern/aanmeldingen",
-        "kern/appstore",
-        "kern/commercie",
-        "kern/gemeente",
-        "kern/labfonds",
-        "kern/ledenbalie-zaken"
+        "kern/horeca",
+        "kern/invoer",
+        "kern/leerhuis",
+        "kern/livinglab",
+        "kern/magnaat-controle",
+        "kern/magnaat-trainingslobby-acties"
       ]
     },
     {
@@ -510,18 +522,6 @@
         "kern/levensgraaf",
         "kern/onderneming",
         "kern/reisgezelschap"
-      ]
-    },
-    {
-      "veld": "bewijs",
-      "domeinen": 11,
-      "waar": [
-        "kern/horeca",
-        "kern/invoer",
-        "kern/leerhuis",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties"
       ]
     }
   ],
@@ -646,6 +646,25 @@
         "vaardigheden",
         "voertuig",
         "vogGeldigTot"
+      ]
+    },
+    {
+      "gelijkenis": 0.91,
+      "a": "server/kern/reisbureau-betaling.js",
+      "b": "server/kern/reisbureau-teruggave.js",
+      "domeinA": "kern/reisbureau-betaling",
+      "domeinB": "kern/reisbureau-teruggave",
+      "gedeeld": [
+        "bedragCenten",
+        "bewijs",
+        "bronObject",
+        "economischeEigenaar",
+        "economischeHerkomst",
+        "grond",
+        "land",
+        "naarWie",
+        "relatie",
+        "valuta"
       ]
     },
     {
@@ -875,6 +894,21 @@
         "gratis",
         "nr",
         "prijsCenten"
+      ]
+    },
+    {
+      "gelijkenis": 0.6,
+      "a": "server/kern/reisbureau-betaling.js",
+      "b": "server/kern/reisbureau-teruggave.js",
+      "domeinA": "kern/reisbureau-betaling",
+      "domeinB": "kern/reisbureau-teruggave",
+      "gedeeld": [
+        "aan",
+        "economischeHerkomst",
+        "grond",
+        "hoe",
+        "uitgevoerd",
+        "valuta"
       ]
     },
     {

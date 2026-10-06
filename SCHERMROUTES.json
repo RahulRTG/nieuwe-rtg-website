@@ -3,14 +3,14 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-06",
-  "commit": "5674039a3"
+  "commit": "bc7e30bd2"
  },
  "grens": "Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.",
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-10-06T14:23:49.125Z",
-   "commit": "f248f4fd0"
+   "op": "2026-10-06T14:41:08.840Z",
+   "commit": "cacddba83"
   },
   "bekendePaden": 5432
  },

@@ -39,7 +39,11 @@ test('de startwikkel bouwt de database-URL uit een apart geheim en bewaart expli
 });
 
 function veiligeBasis(extra) {
+  const fs = require('node:fs'); const os = require('node:os'); const pad = require('node:path');
+  const pub = pad.join(fs.mkdtempSync(pad.join(os.tmpdir(), 'rtg-anker-')), 'audit-anker.pub');
+  fs.writeFileSync(pub, require('node:crypto').generateKeyPairSync('ed25519').publicKey.export({ type: 'spki', format: 'pem' }));
   return Object.assign({
+    RTG_AUDIT_ANKER_DIRS: '/srv/anker-a,/srv/anker-b', RTG_AUDIT_ANKER_PUBLIC_KEY_FILE: pub,
     NODE_ENV: 'production', RTG_ENC_KEY: 'e'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64),
     RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@voorbeeld.test',
     DATABASE_URL: 'postgresql://rtg:test@postgres/rtg',

@@ -3,16 +3,16 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-06T18:57:49.148Z",
-  "commit": "e3f80661",
+  "op": "2026-10-06T20:05:41.604Z",
+  "commit": "b7a46c6e",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.0"
  },
  "gemeten": {
-  "artefacten": 373,
-  "bron": 41,
+  "artefacten": 375,
+  "bron": 43,
   "afgeleid": 199,
   "fragmenten": 27,
   "momentopname": 1,
@@ -148,6 +148,18 @@
   {
    "naam": "AFSPRAAK.md",
    "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "AGENTS.md",
+   "soort": "BRON",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],
@@ -599,14 +611,14 @@
   },
   {
    "naam": "CLAUDE.md",
-   "soort": "FRAGMENTEN",
-   "eigenaar": "scripts/getallen.js",
-   "graad": "merkteken",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": false,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -952,6 +964,18 @@
    "stempelInstrument": "scripts/doctrine.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run doctrine",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DOCUMENTENKAART.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
    "grendelt": false,
    "botsingVerklaard": null
   },

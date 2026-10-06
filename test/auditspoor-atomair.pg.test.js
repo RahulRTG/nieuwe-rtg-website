@@ -30,7 +30,7 @@ const OVERSLAAN = URL ? false : 'DATABASE_URL ontbreekt; deze proef vereist een 
 
 test('auditspoor in PostgreSQL: atomair met de mutatie, vervalsing wordt 503 + alarm, anker ziet herschrijving',
   { skip: OVERSLAAN, timeout: 180000 }, async (t) => {
-    const { startServer, stop, verwachtServerfout } = require('./helper');
+    const { startServer, stop, verwachtServerfout, wachtOpWaarde } = require('./helper');
     /* De geinjecteerde triggerfout is een echte opslagstoring van de
        collectietransactie en hoort als zodanig in het log. */
     verwachtServerfout(/audit-schrijfactie faalt \(geinjecteerd\)/, 'de trigger van toets 1b laat de auditschrijf falen');
@@ -59,7 +59,6 @@ test('auditspoor in PostgreSQL: atomair met de mutatie, vervalsing wordt 503 + a
       await pool.query("UPDATE kv SET val=$2, ver=nextval('kv_ver_seq') WHERE key=$1", [k, kluis.versleutel(JSON.stringify(v))]);
       await pool.query("SELECT pg_notify('rtg_kv', $1)", [k]).catch(() => {});
     };
-    const wacht = ms => new Promise(r => setTimeout(r, ms));
     const verwijderTrigger = () => pool.query('DROP TRIGGER IF EXISTS weiger_audit ON kv').catch(() => {});
     try {
       const reg = await api('/api/auth/register', { name: 'Audit Proef', email: 'auditpg@example.test',
@@ -94,8 +93,13 @@ test('auditspoor in PostgreSQL: atomair met de mutatie, vervalsing wordt 503 + a
       });
 
       /* Een paar gewone handelingen erbij, zodat er een midden is. */
+      /* De geinjecteerde storing sloot de schrijfpoort; wacht tot het herstel hem
+         weer opent (een toestand, geen tijd). */
+      const klaar = () => wachtOpWaarde(async () => (await fetch(A.base + '/api/ready')).status === 200,
+        { ms: 15000, stap: 100, wat: 'een schrijfgezonde server' });
+      await klaar();
       for (let i = 0; i < 3; i++) {
-        await wacht(300);
+        await klaar();
         const k = await api('/api/pay/kascode', { maxCenten: 3000 + i, idem: 'v' + i }, token);
         assert.equal(k.http, 200, 'na de storing loopt het weer: ' + JSON.stringify(k));
       }
@@ -107,19 +111,19 @@ test('auditspoor in PostgreSQL: atomair met de mutatie, vervalsing wordt 503 + a
       const vervalsing = async (naam, maak) => {
         await t.test('2. ' + naam + ': 503 met de reden, geen mutatie, en een actief alarm', async () => {
           await schrijf('handelingLog', maak(JSON.parse(JSON.stringify(goed))));
-          await wacht(1500);
+          /* Geen wachttijd nodig: de requestmerge leest de rij in PostgreSQL
+             onder FOR UPDATE, dus ook een instance die de vervalsing nog niet
+             via LISTEN zag, rekent met de vervalste keten. */
           const kasVoor = await ruw('payKasToegang');
           const k = await api('/api/pay/kascode', { maxCenten: 4000, idem: 'na-' + naam }, token);
           assert.equal(k.http, 503, 'geen stille 409: ' + JSON.stringify(k));
           assert.equal(k.reden, 'auditspoor-gebroken');
           assert.equal(k.journaal, 'handelingLog');
           assert.equal(await ruw('payKasToegang'), kasVoor, 'de mutatie staat niet vast');
-          let alarm = null;
-          for (let i = 0; i < 40 && !(alarm && alarm.actief); i++) {
-            await wacht(250);
-            alarm = ((await lees('commandAlarmen')) || {})['auditspoor-gebroken'];
-          }
-          assert.ok(alarm && alarm.actief, 'het alarm staat actief in PostgreSQL: ' + JSON.stringify(alarm));
+          const alarm = await wachtOpWaarde(async () => {
+            const a = ((await lees('commandAlarmen')) || {})['auditspoor-gebroken'];
+            return a && a.actief ? a : null;
+          }, { ms: 10000, stap: 100, wat: 'het alarm auditspoor-gebroken actief in PostgreSQL' });
           assert.equal(alarm.ernst, 'hoog');
           assert.match(alarm.wat, /handelingLog/);
         });

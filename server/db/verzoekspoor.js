@@ -91,19 +91,19 @@ function voorVroegeCommit(collecties, ruw) {
   return { wijzigingen, verwacht, geschreven: false, ctx };
 }
 
-/* Na de vroege commit: wat er mee is gecommit, laat de werkkopie los. Bleef
-   een vak staan omdat het verzoek er TIJDENS de transactie nog iets bij zette,
-   dan zou de requestcommit dezelfde regels een tweede keer aanbieden; dat
-   wordt een harde fout van het verzoek in plaats van een dubbel spoor. */
+/* Na de vroege commit: wat er mee is gecommit, laat de werkkopie los, zodat
+   de requestcommit dezelfde regels niet nog eens aanbiedt.
+
+   Is een vak TIJDENS de transactie veranderd -- een vroege commit die niet
+   werd afgewacht (de aanwezigheid van de dag) terwijl het verzoek intussen
+   zijn voorregel schreef -- dan blijft het vak staan met zijn oude basis. Dat
+   is veilig en geen fout van het verzoek: de requestmerge (pg/verzoeksporen.js)
+   neemt alleen toevoegingen over en slaat een regel die de database al draagt
+   met dezelfde inhoud over, zodat er niets dubbel en niets verloren gaat. Een
+   harde fout hier zou het eerste verzoek van de dag van een lid laten zakken. */
 function naVroegeCommit(spoor) {
   if (!spoor || !spoor.geschreven) return;
-  for (const [sleutel, json] of spoor.verwacht) {
-    if (!vak.laatVakLos(spoor.ctx, sleutel, json) && spoor.ctx && !spoor.ctx.hardeFout) {
-      spoor.ctx.hardeFout = Object.assign(new Error('Het auditspoor ' + sleutel +
-        ' veranderde tijdens een vroege commit; dit verzoek kan zijn spoor niet zonder dubbeling afmaken.'),
-        { code: 'PG_SPOOR_GELIJKTIJDIG' });
-    }
-  }
+  for (const [sleutel, json] of spoor.verwacht) vak.laatVakLos(spoor.ctx, sleutel, json);
 }
 
 module.exports = { SPOREN, haakRegel, voorVroegeCommit, naVroegeCommit };

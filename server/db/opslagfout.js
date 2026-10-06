@@ -32,7 +32,7 @@ function meldIntern(req, err) {
      bevat geen waarden, uitsluitend het structurele pad waar twee schrijvers
      elkaar raakten, en hoort daarom wel in het interne bewijslog. */
   if (!err || !['PG_SAVE_ONTBREEKT', 'PG_ONGEZOND', 'PG_GEEN_COMMIT', 'PG_REQUEST_CONFLICT',
-    'PG_AUDIT_KETEN_GEBROKEN', 'PG_SPOOR_GELIJKTIJDIG'].includes(err.code)) return;
+    'PG_AUDIT_KETEN_GEBROKEN'].includes(err.code)) return;
   console.error('[opslagpoort] ' + err.code + ' op ' + (req && req.method) + ' ' + (req && req.path)
     + ': ' + String(err.message || '').slice(0, 300));
 }

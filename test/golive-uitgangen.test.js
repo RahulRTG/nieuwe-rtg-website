@@ -70,13 +70,13 @@ test('mediaproef faalt gesloten bij ontbrekende config of providerfout', async (
 
 test('alarmbewijs vraagt een werkelijk ontvangen 2xx-zelfproef', async () => {
   const maak = antwoord => () => ({ actief: true, zelfproef: async () => antwoord });
-  const groen = await beproefAlarm({ ERR_WEBHOOK_URL: 'https://alarm.example.test/geheim' }, {
+  const groen = await beproefAlarm({ RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://alarm.example.test/geheim' }, {
     maakFoutmelder: maak({ ok: true, status: 204 })
   });
   assert.equal(alarmBewijsGeldig(groen), true);
   assert.equal(Object.values(groen).join(' ').includes('geheim'), false, 'webhookpad blijft uit bewijs');
 
-  const rood = await beproefAlarm({ ERR_WEBHOOK_URL: 'https://alarm.example.test' }, {
+  const rood = await beproefAlarm({ RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://alarm.example.test' }, {
     maakFoutmelder: maak({ ok: false, status: 500, reden: 'ontvanger antwoordde 500' })
   });
   assert.equal(alarmBewijsGeldig(rood), false);
@@ -85,7 +85,7 @@ test('alarmbewijs vraagt een werkelijk ontvangen 2xx-zelfproef', async () => {
 
 test('een geweigerde of ontbrekende alarmuitgang is nooit bewijs', async () => {
   assert.equal((await beproefAlarm({})).ok, false);
-  const geweigerd = await beproefAlarm({ ERR_WEBHOOK_URL: 'https://alarm.example.test' }, {
+  const geweigerd = await beproefAlarm({ RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://alarm.example.test' }, {
     maakFoutmelder: () => ({ actief: false })
   });
   assert.equal(geweigerd.ok, false);

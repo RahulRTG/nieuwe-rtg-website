@@ -19,7 +19,7 @@
 'use strict';
 
 const OPSLAGWEIGERING = Object.freeze({ PG_REQUEST_CONFLICT: 409, PG_AUDIT_KETEN_GEBROKEN: 503,
-  PG_SPOOR_GELIJKTIJDIG: 503, PG_REQUEST_GRAFSTEEN: 409 });
+  PG_REQUEST_GRAFSTEEN: 409 });
 
 module.exports = function afsluiters({ app, path, PUBLIC_DIR, log }) {
   app.use('/api', (req, res) => res.status(404).json({ error: 'Onbekend eindpunt.' }));

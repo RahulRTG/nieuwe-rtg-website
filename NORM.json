@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 2012,
-    "toetsenNietGemeten": 129,
+    "toetsenNietGemeten": 130,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -164,6 +164,16 @@
     "aankomstUitPositie": 0
   },
   "notities": [
+    {
+      "datum": "2026-10-06",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 129,
+      "vervalt": "2027-01-04",
+      "meter": "toetsenNietGemeten 129 -> 130",
+      "reden": "test/auditopslag-pg.test.js legt de PG-stand van de auditopslag vast (A-P1-05, AUDITOPSLAG.md); met de hand nagetrokken: de poort voor postgres iets laten teruggeven laat twee van de vier toetsen zakken.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
     {
       "datum": "2026-09-28",
       "soort": "structureel",

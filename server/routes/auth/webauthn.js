@@ -22,14 +22,39 @@ module.exports = (actx) => {
   const gastheer = req => { try { return new URL(oorsprong(req)).hostname; } catch (e) { return req.hostname; } };
   const vingerafdruk = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex').slice(0, 24);
 
-  /* ---- registreren en beheren (ingelogd) ---- */
+  /* ---- registreren en beheren (ingelogd) ----
+
+     EEN NIEUWE PASSKEY VRAAGT DE MENS EN NIET ALLEEN ZIJN TOKEN (P1-2). Een
+     passkey blijft staan als het token allang verlopen is, en hij voldoet aan
+     de zware poort. Met alleen `auth` voegde wie een token stal er een eigen
+     sleutel aan toe en was hij voorgoed binnen. Nu:
+
+       - nog geen passkey op het account: het huidige wachtwoord (`huidig`);
+       - wel een passkey: een verse vinger op een die er al stond (de zware
+         poort, actie `passkey-nieuw`, zonder terugval). Een wachtwoord is dan
+         NIET genoeg -- wie de passkey zette, koos voor iets sterkers dan wat
+         gestolen kan worden.
+
+     De bevestiging valt bij de OPTIES, want daar ontstaat de uitdaging. Het
+     afmaken eist dat de uitdaging met precies DEZE sessie als doel is
+     uitgegeven (kern/webauthn.js regMaak): een andere sessie kan hem niet
+     inwisselen, en een route die de bevestiging oversloeg kan er geen maken. */
+  const herbevestiging = require('../../kern/identiteit/herbevestiging').maakHerbevestiging({
+    accounts, zwaarVan: () => actx.zwaarbewijs, tooManyTries, noteFailedTry, loginFails });
+  const regDoel = req => 'ledensessie:' + actx.zwaarbewijs.sessieSleutel(req);
   app.post('/api/webauthn/registreer/opties', auth, async (req, res) => {
     const u = eisAccount(req, res); if (!u) return;
-    stuur(res, await webauthn.registratie.opties(u, gastheer(req)));
+    const heeft = herbevestiging.heeftPasskey(u);
+    const hb = await herbevestiging.eis(req, res, { actie: 'passkey-nieuw',
+      wegen: heeft ? ['passkey'] : ['wachtwoord'], omschrijving: 'Een passkey toevoegen' });
+    if (hb.verstuurd) return;
+    if (!hb.ok) return herbevestiging.stuur(res, hb);
+    stuur(res, await webauthn.registratie.opties(u, gastheer(req), regDoel(req)));
   });
   app.post('/api/webauthn/registreer', auth, async (req, res) => {
     const u = eisAccount(req, res); if (!u) return;
-    stuur(res, await webauthn.registratie.maak(u, req.body.antwoord, req.body.naam, oorsprong(req), gastheer(req)));
+    stuur(res, await webauthn.registratie.maak(u, req.body.antwoord, req.body.naam, oorsprong(req), gastheer(req),
+      regDoel(req)));
   });
   app.post('/api/webauthn/lijst', auth, (req, res) => {
     const u = eisAccount(req, res); if (!u) return;
@@ -46,9 +71,16 @@ module.exports = (actx) => {
      redenering hangt aan het bezit van een sleutel, niet aan wie je bent. Wie er
      nog geen heeft, kan er ook geen kwijtraken. */
   const zwaar = actx.zwaarbewijs;
+  /* Het loket voor de ceremonie. Drie handelingen van een lid aan zijn eigen
+     sleutels lopen erdoor; een andere naam krijgt hij niet, want dit loket staat
+     achter de ledeninlog en hoort geen ceremonie voor de eigenaar uit te geven.
+     Zonder `actie` blijft het `passkey-weg`, zoals het altijd was. */
+  const LOKET_ACTIES = ['passkey-weg', 'passkey-nieuw', 'toestel-binden'];
   app.post('/api/webauthn/bevestig/opties', auth, async (req, res) => {
     const u = eisAccount(req, res); if (!u) return;
-    const r = await zwaar.opties(u, 'passkey-weg', zwaar.sessieSleutel(req), req);
+    const actie = req.body && req.body.actie ? String(req.body.actie) : 'passkey-weg';
+    if (!LOKET_ACTIES.includes(actie)) return res.status(400).json({ error: 'Onbekende bevestiging.' });
+    const r = await zwaar.opties(u, actie, zwaar.sessieSleutel(req), req);
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json(r);
   });

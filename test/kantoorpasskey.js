@@ -10,7 +10,7 @@
 
    Gebruik:
      const pk = kantoorPasskey(base);
-     const sleutelA = await pk.zet(lidTokenVanA);   // op zijn EIGEN account
+     const sleutelA = await pk.zet(lidTokenVanA, wachtwoordVanA);   // op zijn EIGEN account
      const c = await pk.ceremonie(sleutelA, '/api/office/bank/incasso/opties', { tot }, kantoorTokenVanA);
      // c = { ceremonie, antwoord } -- mee in het lichaam van de handeling
 */
@@ -23,9 +23,11 @@ function kantoorPasskey(base) {
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
-  async function zet(lidToken) {
+  /* Het wachtwoord is verplicht: een eerste passkey vraagt het (P1-2). */
+  async function zet(lidToken, wachtwoord) {
+    if (!wachtwoord) throw new Error('kantoorPasskey.zet: geef het wachtwoord van dit account mee; een passkey toevoegen vraagt het.');
     const sleutel = maakAuthenticator(new URL(base).hostname);
-    const o = await post('/api/webauthn/registreer/opties', {}, lidToken);
+    const o = await post('/api/webauthn/registreer/opties', { huidig: wachtwoord }, lidToken);
     if (o.status !== 200) throw new Error('registratieopties: ' + JSON.stringify(o.body).slice(0, 160));
     const r = await post('/api/webauthn/registreer',
       { antwoord: sleutel.registratieAntwoord(o.body.opties.challenge, origin), naam: 'Toestel kantoor' }, lidToken);

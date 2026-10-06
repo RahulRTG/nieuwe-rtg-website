@@ -96,7 +96,7 @@ test('5. voltooien kan niet binnen de wachttijd, en het venster blijft dicht', a
 });
 
 test('6. met een passkey worden inrichten en afbreken hard', async () => {
-  const opties = await api('/api/webauthn/registreer/opties', {}, lid);
+  const opties = await api('/api/webauthn/registreer/opties', { huidig: 'Imran' }, lid);
   const reg = await api('/api/webauthn/registreer',
     { antwoord: sleutel.registratieAntwoord(opties.body.opties.challenge, origin), naam: 'Toestel' }, lid);
   assert.equal(reg.status, 200, JSON.stringify(reg.body).slice(0, 160));

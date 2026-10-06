@@ -52,6 +52,9 @@ test('de boardroom legt een besluit vast en zet de cadeaubon om, vanaf het scher
     await p.locator('#bNaam').fill('Virtuele vinger');
     const reg = antwoord(p, '/api/webauthn/registreer');
     await p.locator('#bMaak').click();
+    /* Een passkey toevoegen vraagt eerst het huidige wachtwoord (P1-2). */
+    await p.locator('#rtgHbWw').fill('Imran');
+    await p.getByRole('button', { name: 'Bevestig', exact: true }).click();
     assert.equal((await reg).status(), 200, 'de passkey is geregistreerd');
     await p.locator('#sleutels', { hasText: 'Virtuele vinger' }).waitFor();
 

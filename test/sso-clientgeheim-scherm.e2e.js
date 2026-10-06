@@ -39,7 +39,7 @@ test('de techniekpagina toont het SSO-clientgeheim alleen als stand, en roteert 
       Authorization: 'Bearer ' + token }, body: JSON.stringify(body || {}) })
       .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
     const lid = (await api('/api/auth/login', { login: OWNER, password: 'Imran', pasApp: 'business' })).body.token;
-    const zw = await zwaarApi(api, base, lid);
+    const zw = await zwaarApi(api, base, lid, 'Imran');
     const post = (pad, body) => zw(pad, body, inlog.token).then(r => r.body);
     const gezet = await post('/api/techniek/sso', { org: 'schermklant', naam: 'Schermklant BV',
       issuer: 'https://idp.schermklant.test', clientId: 'c', clientSecret: EERSTE, domeinen: ['schermklant.test'] });

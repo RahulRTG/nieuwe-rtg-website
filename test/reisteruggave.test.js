@@ -90,8 +90,8 @@ test('1. afzeggen na betalen zet een recht klaar; vanaf duizend euro tekent een 
 
   const a = await medewerker(1);
   const b = await medewerker(2);
-  const sleutelA = await pk.zet(a.lid);
-  const sleutelB = await pk.zet(b.lid);
+  const sleutelA = await pk.zet(a.lid, 'Geheim123!');
+  const sleutelB = await pk.zet(b.lid, 'Geheim123!');
   const lijst = await api('/api/office/reisbureau/teruggaven', {}, a.kantoor);
   assert.ok(lijst.body.open.some(r => r.id === id), 'het recht staat in de lijst');
   assert.equal(lijst.body.vierOgenVanafCenten, 100000);

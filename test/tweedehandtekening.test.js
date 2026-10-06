@@ -92,8 +92,8 @@ test.before(async () => {
   eenB = await medewerker(2);
   const lidB = medewerker.lid;
   pk = kantoorPasskey(base);
-  sleutelA = await pk.zet(lidA);
-  sleutelB = await pk.zet(lidB);
+  sleutelA = await pk.zet(lidA, 'Geheim123!');
+  sleutelB = await pk.zet(lidB, 'Geheim123!');
 
   const u = Date.now().toString(36);
   lid = (await api('/api/auth/register', { name: 'Rekeninghouder', email: 'rh' + u + '@voorbeeld.test',

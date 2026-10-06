@@ -69,7 +69,9 @@ const ZWARE_ACTIES = Object.freeze([
   'gezin-passkey-koppel',       // POST /api/rtf/gezin/passkey  (B19: eigen passkey aan het eigen gezinsprofiel)
   'gezin-sessie-verleng',       // POST /api/foundation/gezin/sessie/verleng  (B19: zeven dagen erbij, foundation/gezinsdeur.js)
   'kantoor-koppel',             // POST /api/account/koppel  (kantooruitnodiging, in productie; B24)
-  'passkey-weg'                 // POST /api/webauthn/weg
+  'passkey-weg',                // POST /api/webauthn/weg
+  'passkey-nieuw',              // POST /api/webauthn/registreer/opties  (P1-2: een TWEEDE passkey vraagt een vinger op de eerste)
+  'toestel-binden'              // POST /api/mijn/toestel/bind  (P1-1: herbevestiging buiten het verse venster, naast het wachtwoord)
 ]);
 
 module.exports = { PIN_ACTIES, ZWARE_ACTIES };

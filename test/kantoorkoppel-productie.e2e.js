@@ -73,7 +73,7 @@ test('productie, via het scherm: uitnodiging koppelen met de eigen passkey en da
   const eigLid = (await reg('Eigenaar', EIGENAAR, { eigenaarSleutel: BOOTSTRAP })).body.token;
   assert.ok(eigLid, 'eigenaar geregistreerd');
   const eigSleutel = maakAuthenticator(HOST);
-  const ro = await api('/api/webauthn/registreer/opties', {}, eigLid);
+  const ro = await api('/api/webauthn/registreer/opties', { huidig: 'Geheim123!' }, eigLid);
   assert.equal((await api('/api/webauthn/registreer', { antwoord: eigSleutel.registratieAntwoord(ro.body.opties.challenge, APP), naam: 'E' }, eigLid)).status, 200);
   const teken = (b, n) => ({ ceremonie: b.ceremonie, antwoord: eigSleutel.loginAntwoord(b.opties.challenge, APP, n) });
   const st = await api('/api/account/start', { rol: 'kantoor' }, eigLid);

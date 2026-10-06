@@ -51,20 +51,23 @@ vereist: bellen mag direct, en `/api/rtc/stand` zegt dan eerlijk
 ## 1. Omgevingsvariabelen op de app-host
 
 ```
-TURN_URL=turns:turn.<domein>:5349?transport=tcp
+TURN_URL=turns:turn.<domein>:5349?transport=tcp,turn:turn.<domein>:3478?transport=udp
 TURN_SECRET=<uit de secretstore, zie par. 3>
-# optioneel; standaard 3600, begrensd op [300, 14400] seconden
-TURN_CREDENTIAL_TTL=3600
+# optioneel; standaard 14400 (4 uur), alleen korter te zetten, minimaal 300
+TURN_CREDENTIAL_TTL=14400
 ```
 
-- Publieke productie accepteert alleen volledige `turns:`-adressen met een
-  openbare host en expliciete poort (geen `turn:`, geen `?transport=udp`, geen
-  testnamen of private adressen). Meerdere adressen mogen komma-gescheiden;
-  **elk** adres moet de relayproef halen.
-- **Waarom een uur TTL**: coturn toetst de tijd in de gebruikersnaam bij elk
-  geauthenticeerd verzoek, ook de Refresh en CreatePermission tijdens een
-  lopend gesprek. Korter dan een gesprek breekt het gesprek. Clients halen bij
-  elke nieuwe oproep een vers credential.
+- Publieke productie (besluit 6 oktober 2026) eist **minstens één** `turns:`-
+  adres (TLS over TCP, komt door vrijwel elke firewall) en staat daarnaast
+  `turn:` **alleen met `?transport=udp`** toe (betere gesprekskwaliteit; media
+  blijft DTLS-SRTP-versleuteld, TURN-berichten dragen een HMAC). Een kale
+  `turn:` of `turn:` over TCP, `turns:` over UDP, testnamen en private adressen
+  worden geweigerd. **Elk** adres moet de relayproef halen.
+- **Waarom vier uur TTL** (besluit 6 oktober 2026): coturn toetst de tijd in de
+  gebruikersnaam bij elk geauthenticeerd verzoek, ook de Refresh en
+  CreatePermission tijdens een lopend gesprek. Vier uur is de langste
+  gespreksduur in Connection OS, dus een lang gesprek via het relais valt niet
+  halverwege weg. Clients halen bij elke nieuwe oproep een vers credential.
 - `RTG_RTC_UIT=1` is de kill switch: geen ICE-servers, geen belsignalen, voice
   en video dicht in elke laag.
 

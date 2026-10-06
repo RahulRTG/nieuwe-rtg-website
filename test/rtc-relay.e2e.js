@@ -71,7 +71,7 @@ test('een fout, verlopen of gemanipuleerd credential verbindt niet', opts, async
   assert.ok(browser && coturn, 'draait na de positieve toets');
   const udp = 'turn:127.0.0.1:' + coturn.poort + '?transport=udp';
   const geldig = turn.tijdelijk(GEHEIM, { actor: 'proef' });
-  const verlopen = turn.tijdelijk(GEHEIM, { actor: 'proef', nu: () => Date.now() - 3 * 3600000 });
+  const verlopen = turn.tijdelijk(GEHEIM, { actor: 'proef', nu: () => Date.now() - turn.TTL_MAX * 1000 - 60000 });
   const vreemd = turn.tijdelijk(crypto.randomBytes(32).toString('hex'), { actor: 'proef' });
   const besturing = await relayGesprek(browser, [{ urls: [udp], username: geldig.username, credential: geldig.credential }]);
   assert.equal(besturing.ok, true, 'besturingsproef: het geldige credential werkt in deze opstelling');

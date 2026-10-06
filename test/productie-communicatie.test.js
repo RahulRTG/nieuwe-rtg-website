@@ -84,6 +84,30 @@ test('publieke TURN-config weigert plaintext, onvolledige, lokale en test-relays
   }
 });
 
+test('UDP-TURN mag naast turns: (besluit 6 oktober 2026), nooit alleen, nooit kaal of via TCP', () => {
+  const beide=basis(); beide.TURN_URL='turns:turn.rahultravelgroup.com:5349?transport=tcp,turn:turn.rahultravelgroup.com:3478?transport=udp';
+  assert.equal(keur(beide).fouten.some(x => /TURN/.test(x)), false, 'turns: plus turn:?transport=udp is geldig');
+  assert.deepEqual(turn.ontleedLijst(beide.TURN_URL, { publiekeProductie:true }).fouten, []);
+  for (const url of ['turn:turn.rahultravelgroup.com:3478?transport=udp',
+    'turns:turn.rahultravelgroup.com:5349?transport=tcp,turn:turn.rahultravelgroup.com:3478?transport=tcp',
+    'turns:turn.rahultravelgroup.com:5349?transport=tcp,turn:turn.rahultravelgroup.com:3478']) {
+    const env=basis(); env.TURN_URL=url;
+    assert.equal(keur(env).fouten.some(x => /TURN_URL is niet veilig/.test(x)), true, url);
+    assert.equal(turn.projecteerTurn(env, { publiekeProductie:true }).server, null, url);
+  }
+  assert.equal(turn.ontleedLijst('turn:turn.rahultravelgroup.com:3478?transport=udp', { publiekeProductie:true })
+    .fouten.some(f => f.reden === 'turns-adres-ontbreekt'), true, 'alleen UDP komt niet door elke firewall');
+});
+
+test('een TURN-credential draagt standaard vier uur en nooit langer', () => {
+  const env=basis();
+  const p=turn.projecteerTurn(env, { publiekeProductie:true, nu:()=>1_000_000_000 });
+  assert.equal(Number(p.server.username.split(':')[0]), 1_000_000 + 4*3600);
+  assert.equal(turn.ttlVan({ TURN_CREDENTIAL_TTL:'99999' }), 4*3600);
+  assert.equal(turn.ttlVan({ TURN_CREDENTIAL_TTL:'600' }), 600);
+  assert.equal(turn.ttlVan({ TURN_CREDENTIAL_TTL:'10' }), 300);
+});
+
 test('TURN-credentials moeten werkelijk sterk zijn en ICE-projectie bevat geen lege items', () => {
   const herhaald=basis(); herhaald.TURN_SECRET='t'.repeat(48);
   assert.equal(keur(herhaald).fouten.some(x => /TURN-authenticatie/.test(x)), true);

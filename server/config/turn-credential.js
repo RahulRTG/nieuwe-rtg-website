@@ -36,9 +36,12 @@ function credentials(env, { publiekeProductie = false } = {}) {
 /* De levensduur van een uitgegeven TURN-credential. coturn toetst de
    tijdstempel in de gebruikersnaam bij ELK geauthenticeerd verzoek, ook bij de
    Refresh en CreatePermission tijdens een lopend gesprek; korter dan een
-   gesprek mag dus niet zonder dat de client vernieuwt. Een uur is de vaste
-   standaard, TURN_CREDENTIAL_TTL mag hem binnen [5 min, 4 uur] zetten. */
-const TTL_STANDAARD = 3600, TTL_MIN = 300, TTL_MAX = 4 * 3600;
+   gesprek mag dus niet zonder dat de client vernieuwt. Vier uur is de vaste
+   standaard (besluit eigenaar, 6 oktober 2026): gelijk aan de maximale duur
+   van een actief gesprek in Connection OS, zodat een lang gesprek via het
+   relais niet halverwege wegvalt. TURN_CREDENTIAL_TTL mag hem binnen
+   [5 min, 4 uur] korter zetten, nooit langer. */
+const TTL_STANDAARD = 4 * 3600, TTL_MIN = 300, TTL_MAX = 4 * 3600;
 function ttlVan(env) {
   const n = Number(env.TURN_CREDENTIAL_TTL);
   if (!Number.isFinite(n) || !Number.isInteger(n)) return TTL_STANDAARD;

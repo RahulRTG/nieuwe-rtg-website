@@ -82,8 +82,8 @@ test('TURN: /api/ice geeft kortlevende inloggegevens met een kloppende HMAC, en 
   }
   assert.match(turn.username, /^\d+:[A-Za-z0-9_-]{22}$/, 'verloop plus een ondoorzichtig actorlabel');
   const verloopt = Number(turn.username.split(':')[0]);
-  assert.ok(verloopt * 1000 > Date.now() + 30 * 60000, 'minstens een half uur geldig');
-  assert.ok(verloopt * 1000 < Date.now() + 2 * 3600000, 'maar niet eeuwig');
+  assert.ok(verloopt * 1000 > Date.now() + 3.5 * 3600000, 'standaard vier uur geldig (de langste gespreksduur)');
+  assert.ok(verloopt * 1000 <= Date.now() + 4 * 3600000 + 5000, 'maar nooit langer dan vier uur');
   const verwacht = crypto.createHmac('sha1', TURN_SECRET).update(turn.username).digest('base64');
   assert.equal(turn.credential, verwacht, 'de HMAC klopt met het gedeelde geheim (coturn use-auth-secret)');
 });

@@ -66,7 +66,7 @@ function keurCommunicatie(env, fouten, waarschuwingen, priveBeta) {
       fouten.push('TURN_URL ontbreekt: live voice/video is dan niet betrouwbaar via 4G, symmetrische NAT en bedrijfsfirewalls.');
     }
     if (String(env.TURN_URL || '').trim() && (!relay.urls.length || relay.fouten.length))
-      fouten.push('TURN_URL is niet veilig voor publieke productie: gebruik uitsluitend volledige turns:-adressen met een openbare host en expliciete geldige poort; geen lege items, plaintext turn:, testnamen of lokale/private adressen (' +
+      fouten.push('TURN_URL is niet veilig voor publieke productie: gebruik minstens een volledig turns:-adres, eventueel aangevuld met turn:...?transport=udp, met een openbare host en expliciete geldige poort; geen lege items, kale of TCP-plaintext turn:, testnamen of lokale/private adressen (' +
         [...new Set(relay.fouten.map(x => x.reden))].join(', ') + ').');
     if (!turn.credentials(env, { publiekeProductie:true }))
       fouten.push('TURN-authenticatie ontbreekt of is te zwak: zet een willekeurig TURN_SECRET (32+ tekens) voor kortlevende TURN REST-credentials; herhaling en plaatshouders tellen niet, en een vaste TURN_USER/TURN_PASS is in publieke productie niet toegestaan omdat die ongewijzigd naar elke browser gaat.');

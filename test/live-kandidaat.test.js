@@ -177,7 +177,9 @@ test('een kandidaat zonder ECHTE geslaagde TURN-relayproef promoveert niet', () 
       teWeinigBytes: g => { g.turnRelay.urls[0].bytesBA = 1024; },
       plaintext: g => { g.turnRelay.urls[0].url = 'turn:turn.rahultravelgroup.com:3478'; },
       leeg: g => { g.turnRelay.urls = []; },
-      eenAdresGezakt: g => { g.turnRelay.urls.push({ ...g.turnRelay.urls[0], ok:false, reden:'TURN_NETWERK_FOUT' }); }
+      eenAdresGezakt: g => { g.turnRelay.urls.push({ ...g.turnRelay.urls[0], ok:false, reden:'TURN_NETWERK_FOUT' }); },
+      alleenUdp: g => { g.turnRelay.urls[0].url = 'turn:turn.rahultravelgroup.com:3478?transport=udp'; },
+      kaleTurnErnaast: g => { g.turnRelay.urls.push({ ...g.turnRelay.urls[0], url:'turn:turn.rahultravelgroup.com:3478' }); }
     };
     for (const [naam, maakStuk] of Object.entries(varianten)) {
       const g = JSON.parse(JSON.stringify(goed)); maakStuk(g);
@@ -187,6 +189,13 @@ test('een kandidaat zonder ECHTE geslaagde TURN-relayproef promoveert niet', () 
         backupVerwijzing:BACKUP_REF, backupDigest:BACKUP_DIGEST, backupId:BACKUP_ID }),
       /TURN-relayproef/, naam);
     }
+    // besturingsproef: turns: plus een geslaagd turn:?transport=udp promoveert wel
+    const g = JSON.parse(JSON.stringify(goed));
+    g.turnRelay.urls.push({ ...g.turnRelay.urls[0], url:'turn:turn.rahultravelgroup.com:3478?transport=udp', transport:'udp' });
+    fs.writeFileSync(pad, JSON.stringify(g) + '\n');
+    assert.doesNotThrow(() => kandidaat.maak(root, { commit,
+      imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID,
+      backupVerwijzing:BACKUP_REF, backupDigest:BACKUP_DIGEST, backupId:BACKUP_ID }));
   } finally { fs.rmSync(root, { recursive:true, force:true }); }
 });
 

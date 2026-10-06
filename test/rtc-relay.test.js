@@ -310,7 +310,7 @@ test('end-to-end: /api/ice alleen voor een sessie, kortlevend, HMAC klopt, en de
   assert.equal(JSON.stringify(a.iceServers).includes('turn:'), false, 'geen TURN voor wie niet is ingelogd');
   assert.equal((await fetch(base + '/api/ice', { headers: { Authorization: 'Bearer nep' } })).status, 401);
   assert.equal((await fetch(base + '/api/rtf/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code: 'XXXX', token: 'nep' }) })).status, 401);
+    body: JSON.stringify({ code: 'XXXX', token: 'nep' }) })).status, 403, 'gezinsPoort weigert een vreemd profiel');
 
   const login = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ tier: 'rtg' }) })).json();

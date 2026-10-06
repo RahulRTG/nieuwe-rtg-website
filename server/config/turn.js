@@ -67,8 +67,15 @@ function ontleedUrl(waarde, { publiekeProductie = false } = {}) {
   const m = url.match(/^(turns?):(\[[0-9a-f:.]+\]|[^\s:/?#]+):(\d{1,5})(?:\?transport=(tcp|udp))?$/i);
   if (!m) return { ok:false, reden:'formaat-host-of-poort-ongeldig' };
   const schema = m[1].toLowerCase(), poort = Number(m[3]);
-  if (publiekeProductie && schema !== 'turns') return { ok:false, reden:'plaintext-turn-niet-toegestaan' };
-  if (publiekeProductie && m[4] && m[4].toLowerCase() !== 'tcp')
+  /* Publieke productie (besluit eigenaar, 6 oktober 2026): `turns:` over TCP,
+     en daarnaast `turn:` UITSLUITEND met expliciet ?transport=udp. Media blijft
+     DTLS-SRTP-versleuteld en de TURN-berichten dragen een HMAC; UDP geeft
+     betere gesprekskwaliteit. Een kale `turn:` (de browser probeert dan ook
+     TCP zonder TLS) en `turns:` over UDP blijven geweigerd. */
+  const transport = m[4] ? m[4].toLowerCase() : null;
+  if (publiekeProductie && schema === 'turn' && transport !== 'udp')
+    return { ok:false, reden:'plaintext-turn-niet-toegestaan' };
+  if (publiekeProductie && schema === 'turns' && transport && transport !== 'tcp')
     return { ok:false, reden:'onveilig-transport' };
   if (!Number.isInteger(poort) || poort < 1 || poort > 65535) return { ok:false, reden:'poort-ongeldig' };
   const host = m[2].replace(/^\[|\]$/g, '');
@@ -77,7 +84,16 @@ function ontleedUrl(waarde, { publiekeProductie = false } = {}) {
   return { ok:true, url, schema, host, poort, transport:m[4] ? m[4].toLowerCase() : null };
 }
 
+/* Een lijst moet in publieke productie minstens EEN turns:-adres dragen: UDP
+   komt niet door elke bedrijfsfirewall, TLS over TCP vrijwel altijd. */
 function ontleedLijst(waarde, opties) {
+  const uit = ontleedLijstKaal(waarde, opties);
+  if (opties && opties.publiekeProductie && uit.urls.length && !uit.urls.some(u => /^turns:/i.test(u)))
+    uit.fouten.push({ index:-1, reden:'turns-adres-ontbreekt' });
+  return uit;
+}
+
+function ontleedLijstKaal(waarde, opties) {
   const bron = String(waarde || '');
   if (!bron.trim()) return { urls:[], fouten:[] };
   const urls = [], fouten = [];

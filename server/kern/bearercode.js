@@ -8,8 +8,17 @@
 
    De kale code wordt precies eenmaal aan de uitgever gegeven. Op schijf staat
    alleen `code_hash`; zoeken vergelijkt hashes met timingSafeEqual en stopt
-   niet bij de eerste rij. */
+   niet bij de eerste rij.
+
+   VERSIE 2 staat in ./bearercode-v2.js en gaat aan zodra een aanroeper
+   `geldigheid` meegeeft. Zonder dat veld is dit exact v1 (vastgelegd in
+   test/bearercode.test.js). Twee fabriekopties zijn nieuw: `normaal` (een
+   domein dat zijn codes anders normaliseert, zodat de hash in maak() meteen
+   klopt en niet achteraf wordt overschreven) en `sluit`/`spoor` voor v2. */
 'use strict';
+
+const klok = require('../lib/klok');
+const maakV2 = require('./bearercode-v2');
 
 const MAX_GELDIG_MS = 366 * 86400000;
 
@@ -26,13 +35,14 @@ function vindOpHash(crypto, rijen, gezocht, veld = 'code_hash') {
   return gevonden;
 }
 
-module.exports = ({ crypto, namespace, nu = () => new Date().toISOString() }) => {
+module.exports = ({ crypto, namespace, nu = () => klok.datum().toISOString(), normaal: eigenNormaal, sluit, spoor }) => {
   if (!crypto || typeof crypto.randomBytes !== 'function' || typeof crypto.createHash !== 'function' ||
       typeof crypto.timingSafeEqual !== 'function') throw new Error('bearercode vereist node:crypto');
   const ns = String(namespace || '').trim();
   if (!ns) throw new Error('bearercode vereist een vaste namespace');
 
-  const normaal = waarde => String(waarde == null ? '' : waarde).trim().toUpperCase();
+  const normaal = typeof eigenNormaal === 'function' ? waarde => String(eigenNormaal(waarde))
+    : waarde => String(waarde == null ? '' : waarde).trim().toUpperCase();
   const hash = waarde => crypto.createHash('sha256')
     .update('rtg-bearer-v1|' + ns + '|' + normaal(waarde)).digest('hex');
   const zelfdeHash = (a, b) => hashGelijk(crypto, a, b);
@@ -50,7 +60,12 @@ module.exports = ({ crypto, namespace, nu = () => new Date().toISOString() }) =>
     const geheim = crypto.randomBytes(16).toString('hex').toUpperCase(); // 128 bits
     return p ? p + '.' + geheim : geheim;
   };
-  const maak = ({ prefix, issuer, doel, scope, onderwerp, geldigMs, maxGebruik = 1 }) => {
+  const v2 = maakV2({ crypto, ns, nu, hash, codeNieuw: p => codeNieuw(p), plafondMs: MAX_GELDIG_MS, sluit, spoor });
+  const maak = (opdracht) => {
+    if (opdracht && opdracht.geldigheid !== undefined) return v2.maak(opdracht);
+    return maakV1(opdracht || {});
+  };
+  const maakV1 = ({ prefix, issuer, doel, scope, onderwerp, geldigMs, maxGebruik = 1 }) => {
     const issuedAt = nu();
     const duur = Math.max(1000, Math.min(Number(geldigMs) || 30 * 86400000, MAX_GELDIG_MS));
     const kaleCode = codeNieuw(prefix);
@@ -76,6 +91,10 @@ module.exports = ({ crypto, namespace, nu = () => new Date().toISOString() }) =>
   };
   const reden = (toegang, verwacht = {}) => {
     if (!toegang) return 'onbekend';
+    if (toegang.contractversie !== 2) return redenV1(toegang, verwacht);
+    return v2.voorReden(toegang, verwacht) || v2.naReden(toegang, verwacht, redenV1(toegang, verwacht));
+  };
+  const redenV1 = (toegang, verwacht) => {
     if (verwacht.doel && toegang.doel !== verwacht.doel) return 'verkeerd-doel';
     const scopes = [].concat(verwacht.scope || []);
     if (scopes.some(s => !(toegang.scope || []).includes(s))) return 'scope-ontbreekt';
@@ -107,7 +126,12 @@ module.exports = ({ crypto, namespace, nu = () => new Date().toISOString() }) =>
     ingetrokken_at: toegang.ingetrokken_at, rotatie: toegang.rotatie
   } : null;
 
-  return { normaal, hash, zelfdeHash, vind, codeNieuw, maak, reden, gebruik, intrekken, publiek };
+  const trekIn = (toegang, actor, redenTekst) => v2.trekIn(toegang, intrekken, actor, redenTekst);
+  const roteer = (oud, opties) => v2.roteer(oud, intrekken, opties);
+  const leidAf = (ouder, verzoek) => v2.leidAf(ouder, verzoek, reden);
+
+  return { normaal, hash, zelfdeHash, vind, codeNieuw, maak, reden, gebruik, intrekken, publiek,
+    trekIn, roteer, leidAf, contracthash: v2.contracthash };
 };
 
 module.exports.MAX_GELDIG_MS = MAX_GELDIG_MS;

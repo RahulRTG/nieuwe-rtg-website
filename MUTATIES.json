@@ -1039,6 +1039,22 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "bearercode-v2.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bearercode.js",
+      "operator": "===->!==#0",
+      "gezakt": 11,
+      "geprobeerd": 2
+    },
+    "bearercode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/bearercode.js",
+      "operator": "false->true#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "bedrading.test.js": {
       "soort": "puur",
       "staat": "gezakt",

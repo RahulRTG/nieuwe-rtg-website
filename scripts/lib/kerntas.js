@@ -61,7 +61,7 @@ function maakKerntas(graaf, reg) {
     if (!VOLG.test(h.hoe || '')) continue;
     let mod = h.bestand;
     if (mod && mod.startsWith('server/opzet/')) {
-      const esc = r.naam.replace(/[$]/g, '\\$');
+      const esc = r.naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const m = new RegExp('\\bkern\\.' + esc + '\\s*=\\s*(?:await\\s+)?require\\(\\s*[\'"]([^\'"]+)[\'"]').exec(code(mod));
       mod = m ? los(h.bestand, m[1]) : null;
       if (!mod) { onopgelost.push(r.naam); continue; }

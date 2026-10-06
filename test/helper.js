@@ -389,6 +389,8 @@ async function startEens(opts) {
         Object.prototype.hasOwnProperty.call(opts.env || {}, 'RTG_MAGNAAT_TEST')
         ? {} : { RTG_MAGNAAT_TEST: '1' }),
       ...process.env, NODE_ENV: 'test',
+      // Toetsleden loggen met een wachtwoord in zonder toestel; de productiestandaard (verplicht, A-P1-04) hoort alleen in de toetsen die dat zelf bewijzen.
+      RTG_BEZITSBEWIJS: process.env.RTG_BEZITSBEWIJS || 'aanbevolen',
       RTG_TOETS: path.basename(String(process.argv[1] || 'onbekend')),
       ...(eigenMap ? { RTG_DATA_DIR: eigenMap } : {}),
       ...(opts.env || {}), PORT: String(port)

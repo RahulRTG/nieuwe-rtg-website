@@ -41,6 +41,8 @@
    dezelfde reden als bij kern/economie/firewall.js. */
 'use strict';
 
+const klok = require('../../lib/klok');
+
 const { bestaat, HOEDANIGHEDEN, BEVOEGDHEDEN } = require('./bevoegdheden');
 
 /* Vijf jaar. Niet omdat vier fout is, maar omdat een looptijd een GRENS moet
@@ -57,7 +59,7 @@ const tijd = (v) => { const t = Date.parse(v); return Number.isFinite(t) ? t : n
 function stand(m, nu) {
   if (!m || typeof m !== 'object') return 'ingetrokken';
   if (m.ingetrokken) return 'ingetrokken';
-  const t = nu == null ? Date.now() : nu;
+  const t = nu == null ? klok.nu() : nu;
   const eind = tijd(m.tot);
   if (eind == null || eind <= t) return 'verlopen';
   if (!m.aanvaard) return 'voorgesteld';
@@ -81,7 +83,7 @@ function stand(m, nu) {
    precies wat de cliënt niet kan zien. */
 function vorm(data, opties) {
   const d = data || {}, o = opties || {};
-  const nu = o.nu == null ? Date.now() : o.nu;
+  const nu = o.nu == null ? klok.nu() : o.nu;
 
   const hoedanigheid = String(d.hoedanigheid || '').trim();
   if (!HOEDANIGHEDEN.includes(hoedanigheid)) {

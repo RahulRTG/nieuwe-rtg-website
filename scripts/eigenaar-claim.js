@@ -11,6 +11,7 @@
 'use strict';
 
 const fs = require('fs');
+const cp = require('child_process');
 const { maskerEmail } = require('./lib/geenlek');
 const https = require('https');
 const path = require('path');
@@ -126,17 +127,43 @@ async function main() {
     if (antwoord.status < 200 || antwoord.status >= 300)
       throw new Error((antwoord.data && antwoord.data.error) || ('registratie gaf HTTP ' + antwoord.status));
 
-    schrijfZonderBootstrap(envPad, tekst);
-    console.log('✓ Eigenaarsaccount aangemaakt; bootstrapgeheim is verwijderd.');
-    console.log('  Bevestig nu de e-mail en gebruik daarna de technische pagina.');
+    /* Registratie alleen is geen bewijs dat PostgreSQL daarna de autoritatieve
+       rij teruglevert. Laat het geheim daarom staan; uitsluitend `live:owner`
+       mag na de schone productie-readback het bewijs schrijven en deze deur
+       sluiten. */
+    console.log('✓ Eigenaarsaccount aangemaakt; bootstrapgeheim blijft dicht te zetten na DB-readback.');
+    console.log('  Draai scripts/docker/live.sh owner om PostgreSQL terug te lezen en de deur aantoonbaar te sluiten.');
   } finally {
     dialoog.sluit();
   }
 }
 
-module.exports = { zonderBootstrap, schrijfZonderBootstrap, plaatselijkeRegistratie };
+function sluitNaOfflineBewijs(opties = {}) {
+  const root = opties.root || ROOT;
+  const envPad = path.resolve(opties.envPad || process.env.RTG_ENV_FILE || path.join(root, '.env.productie'));
+  const proofPath = path.resolve(opties.proofPath || path.join(root, '.release', 'owner-readback-bewijs.json'));
+  let commit = opties.commit;
+  if (!commit) {
+    const r = cp.spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd:root, encoding:'utf8' });
+    commit = String(r.stdout || '').trim();
+  }
+  const bewijs = require('./lib/live-kandidaat').controleerOwnerReadbackBestand(proofPath, { commit });
+  const tekst = fs.readFileSync(envPad, 'utf8');
+  const eigenaarEmail = String(leesEnv(tekst).RTG_OWNER_EMAIL || '').trim().toLowerCase();
+  const eigenaarHash = require('crypto').createHash('sha256').update(eigenaarEmail).digest('hex');
+  if (!eigenaarEmail || bewijs.database.ownerEmailSha256 !== eigenaarHash)
+    throw new Error('Eigenaars-readbackbewijs hoort niet bij RTG_OWNER_EMAIL uit dit productie-envbestand.');
+  schrijfZonderBootstrap(envPad, tekst);
+  console.log('✓ Eenmalige bootstrapwaarde na kandidaat- en PostgreSQL-readbackbewijs atomisch verwijderd.');
+}
 
-if (require.main === module) main().catch(e => {
-  console.error('[eigenaar] ' + (e.message || e));
-  process.exit(1);
-});
+module.exports = { zonderBootstrap, schrijfZonderBootstrap, plaatselijkeRegistratie,
+  sluitNaOfflineBewijs };
+
+if (require.main === module) {
+  const taak = process.argv.slice(2);
+  const uitvoering = taak.length === 1 && taak[0] === '--sluit-offline'
+    ? Promise.resolve().then(sluitNaOfflineBewijs)
+    : taak.length ? Promise.reject(new Error('Onbekende eigenaarstaak.')) : main();
+  uitvoering.catch(e => { console.error('[eigenaar] ' + (e.message || e)); process.exit(1); });
+}

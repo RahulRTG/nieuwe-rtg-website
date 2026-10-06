@@ -7,6 +7,7 @@ const S = require('./state');
 const kluis = require('./kluis');
 const { veiligGelijk } = require('../kern/util');
 const mirror = require('./mirror');
+const { voorGrens } = require('./sessiegrens');
 
 /* DE ENE VORM VAN EEN TOKEN.
 
@@ -30,12 +31,9 @@ const strikt = (t) => (typeof t === 'string' && TOKENVORM.test(t) ? t : null);
 
 function maakTokens(getUserById) {
   /* ---------- staatloze ondertekende tokens ---------- */
-  /* Het token draagt nu ook WANNEER het is uitgegeven. Dat is de enige manier om
-     bij een staatloos token later te kunnen zeggen "alles van voor dit moment
-     telt niet meer" -- en dat is precies wat een wachtwoordwijziging hoort te
-     doen. Een oud token zonder dat derde deel geldt als uitgegeven op moment 0
-     en valt dus af zodra er ooit een grens is gezet; dat is de juiste kant om
-     naar te falen. */
+  /* Het token draagt ook WANNEER het is uitgegeven (deel 3): alleen zo valt bij
+     een staatloos token te zeggen "wat hiervoor kwam, telt niet meer". Hoe de
+     grens dat leest, ook zonder deel 3: ./sessiegrens.js (ook voor actietokens). */
   /* HET VIERDE EN HET VIJFDE DEEL: EEN SESSIE-ID EN EEN APPARAAT.
 
      TWEE TAKKEN CLAIMDEN ALLEBEI PLEK VIER, en dat is opgelost in plaats van
@@ -79,7 +77,7 @@ function maakTokens(getUserById) {
     if (!token) return null;
     try {
       const b64 = String(token).split('.')[0];
-      const sid = Buffer.from(b64, 'base64url').toString().split('.')[3];
+      const sid = (require('./tokenvorm').sessieDelen(Buffer.from(b64, 'base64url').toString()) || [])[3];
       return sid && /^[A-Za-z0-9_-]{12}$/.test(sid) ? sid : null;
     } catch (e) { return null; }
   }
@@ -121,20 +119,23 @@ function maakTokens(getUserById) {
          uitgerekend deze deur, waar elk verzoek langskomt, stond nog op de
          kale vergelijking. */
       if (!veiligGelijk(kluis.sign(body), sig)) return null;
-      const [id, exp, uitgegeven, sid] = body.split('.');
-      if (Number(exp) < Date.now()) return null;
+      /* Een sessietoken heeft cijfers op de plek van id, exp en uitgegeven
+         (./tokenvorm.js, audit B-1); een actietoken draagt daar zijn doel. Naast
+         de domeinscheiding van ./actietokens.js (een eigen sleutel per doel) is
+         dit de tweede, onafhankelijke grendel. */
+      const [id, exp, uitgegeven, sid] = require('./tokenvorm').sessieDelen(body) || [];
+      if (!id || !Number.isFinite(Number(exp)) || Number(exp) < Date.now()) return null;
       if (isIngetrokken(token)) return null; // uitgelogd: de handtekening klopt, wij niet meer
       /* En de sessie zelf. Dit is de tweede deur, en hij bestaat omdat de eerste
          het token nodig heeft -- dat heeft alleen de houder. Zonder deze regel
          is "sluit die andere sessie" een knop die niets doet. */
       if (sid && sessieIngetrokken(sid)) return null;
       const u = getUserById(Number(id));
-      /* De grens per account: alles wat voor sessies_vanaf is uitgegeven, geldt
-         niet meer. Een wachtwoordwijziging zet die grens (zie setPassword), en
-         daarmee vliegt elke lopende sessie eruit -- ook de sessie van iemand die
-         het wachtwoord kende en er niet meer bij hoort. Dat was de hele reden
-         voor de wijziging. */
-      if (u && Number(u.sessies_vanaf || 0) > Number(uitgegeven || 0)) return null;
+      /* De grens per account: wat voor sessies_vanaf is uitgegeven, telt niet
+         meer. Een wachtwoordwijziging zet hem (zie setPassword), en dan vliegt
+         elke lopende sessie eruit -- ook die van wie het wachtwoord kende en er
+         niet meer bij hoort. */
+      if (voorGrens(u, uitgegeven)) return null;
       /* De ene plek waar een uitgezet account eruit valt. Zie de toelichting bij
          de kolom in accounts/index.js: staatloze tokens zijn niet allemaal
          terug te halen, een vlag op het account wel. */
@@ -142,31 +143,14 @@ function maakTokens(getUserById) {
       return u;
     } catch (e) { return null; }
   }
-  /* Doel-gebonden token (bijv. e-mailbevestiging), los van de sessie. */
-  function issueActionToken(userId, purpose, ttlMs) {
-    /* De nonce maakt ook twee uitgiftes in dezelfde milliseconde afzonderlijk
-       intrekbaar. De eerste drie delen blijven gelijk voor oude verifiers. */
-    const body = userId + '.' + purpose + '.' + (Date.now() + ttlMs) + '.' +
-      crypto.randomBytes(16).toString('base64url');
-    return Buffer.from(body).toString('base64url') + '.' + kluis.sign(body);
-  }
-  function verifyActionToken(token, purpose) {
-    token = strikt(token);   // zelfde strikte vorm als een sessietoken
-    if (!token) return null;
-    try {
-      const [b64, sig] = String(token).split('.');
-      if (!b64 || !sig) return null;
-      // zelfde reden als bij verifyToken: ook dit is een geheim
-      if (!veiligGelijk(kluis.sign(Buffer.from(b64, 'base64url').toString()), sig)) return null;
-      const [id, p, exp] = Buffer.from(b64, 'base64url').toString().split('.');
-      if (p !== purpose || Number(exp) < Date.now()) return null;
-      /* Zonder deze regel is trekInActie een gebaar: het token staat dan wel op
-         de lijst, maar niemand kijkt ernaar. Dat was hierboven bij het uitloggen
-         precies het gat (aanvalsronde 2, punt 14) -- niet nog een keer. */
-      if (isIngetrokken(token)) return null;
-      return getUserById(Number(id));
-    } catch (e) { return null; }
-  }
+  /* De DOEL-GEBONDEN tokens (2FA-bewijs, e-mailbevestiging, mailwissel,
+     sso-overdracht) staan in ./actietokens.js. Ze zijn een andere KLASSE dan een
+     sessietoken en tekenen met een per-doel afgeleide sleutel; de scheiding staat
+     daarom ook in de bestandsindeling (RTG-V1-RELEASE blocker 1). De factory
+     krijgt de gedeelde onderdelen mee, zodat er maar EEN tokenvorm en EEN
+     intrekkingslijst bestaat. */
+  const { issueActionToken, verifyActionToken } =
+    require('./actietokens').maakActieTokens({ getUserById, strikt, isIngetrokken });
 
   /* E-mailbevestiging en wachtwoord-herstel staan in ./herstel.js. Een
      herstelcode is geen sessietoken: hij wordt gehasht bewaard in plaats van

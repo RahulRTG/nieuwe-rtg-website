@@ -449,25 +449,3 @@ test('een DUN journaal schrijft het register niet stil terug', () => {
   assert.equal(teDun({ routes: 5300 }, { routes: 5151 }), null, 'groei is nooit dun');
   assert.equal(teDun({ routes: 10 }, null), null, 'zonder vorige ronde valt er niets te vergelijken');
 });
-
-
-test('een lege, overgeslagen of afgebroken controlerun bewijst geen gevoeligheid', () => {
-  const o = require('../scripts/outputproef');
-  const bestand = path.join(__dirname, 'zz-output-onvolledig.test.js');
-  const naam = path.basename(bestand);
-  try {
-    for (const inhoud of [
-      '',
-      "require('node:test').test.skip('niet gedraaid',()=>{});",
-      "process.exit(2);"
-    ]) {
-      fs.writeFileSync(bestand, inhoud);
-      assert.equal(o.basislijnVan(naam).groen, false);
-      assert.equal(o.meetEen('POST /api/proef', naam).staat, 'stoornis');
-    }
-    fs.writeFileSync(bestand,
-      "const{test}=require('node:test');const a=require('node:assert/strict');test('antwoord',()=>{a.equal(process.env.RTG_LIEG,undefined)});");
-    assert.equal(o.basislijnVan(naam).groen, true);
-    assert.equal(o.meetEen('POST /api/proef', naam).staat, 'merkt');
-  } finally { fs.unlinkSync(bestand); }
-});

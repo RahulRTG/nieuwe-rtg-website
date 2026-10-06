@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-05T01:18:00.697Z",
-  "commit": "ca0a3a151",
+  "op": "2026-10-06T14:44:09.908Z",
+  "commit": "992876536",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
-  "node": "v24.18.0"
+  "node": "v26.10.0"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
@@ -198,253 +198,253 @@
  "historie": {
   "auth-onbeslist": [
    {
-    "op": "2026-10-01",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-04",
     "aantal": 1
    },
    {
     "op": "2026-10-05",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 1
    }
   ],
   "capability-in-handler": [
    {
-    "op": "2026-10-01",
-    "aantal": 560
-   },
-   {
     "op": "2026-10-04",
     "aantal": 560
    },
    {
     "op": "2026-10-05",
+    "aantal": 560
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 560
    }
   ],
   "objectpoort": [
    {
-    "op": "2026-10-01",
-    "aantal": 52
-   },
-   {
     "op": "2026-10-04",
     "aantal": 52
    },
    {
     "op": "2026-10-05",
+    "aantal": 52
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 52
    }
   ],
   "output-deuren": [
    {
-    "op": "2026-10-01",
-    "aantal": 21
-   },
-   {
     "op": "2026-10-04",
     "aantal": 21
    },
    {
     "op": "2026-10-05",
+    "aantal": 21
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 21
    }
   ],
   "lichaamssleutel": [
    {
-    "op": "2026-10-01",
-    "aantal": 102
-   },
-   {
     "op": "2026-10-04",
     "aantal": 102
    },
    {
     "op": "2026-10-05",
+    "aantal": 102
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 102
    }
   ],
   "output-niet-toerekenbaar": [
    {
-    "op": "2026-10-01",
-    "aantal": 1037
-   },
-   {
     "op": "2026-10-04",
     "aantal": 0
    },
    {
     "op": "2026-10-05",
+    "aantal": 0
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 0
    }
   ],
   "output-blind": [
    {
-    "op": "2026-10-01",
-    "aantal": 0
-   },
-   {
     "op": "2026-10-04",
     "aantal": 0
    },
    {
     "op": "2026-10-05",
+    "aantal": 0
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
-    "op": "2026-10-01",
-    "aantal": 4
-   },
-   {
     "op": "2026-10-04",
     "aantal": 4
    },
    {
     "op": "2026-10-05",
+    "aantal": 4
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 4
    }
   ],
   "audit-wisselend": [
    {
-    "op": "2026-10-01",
-    "aantal": null
-   },
-   {
     "op": "2026-10-04",
     "aantal": null
    },
    {
     "op": "2026-10-05",
+    "aantal": null
+   },
+   {
+    "op": "2026-10-06",
     "aantal": null
    }
   ],
   "audit-verklaard": [
    {
-    "op": "2026-10-01",
-    "aantal": null
-   },
-   {
     "op": "2026-10-04",
     "aantal": null
    },
    {
     "op": "2026-10-05",
+    "aantal": null
+   },
+   {
+    "op": "2026-10-06",
     "aantal": null
    }
   ],
   "rollback-gezakt": [
    {
-    "op": "2026-10-01",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-04",
     "aantal": 1
    },
    {
     "op": "2026-10-05",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 1
    }
   ],
   "object-vooraf": [
    {
-    "op": "2026-10-01",
-    "aantal": 323
-   },
-   {
     "op": "2026-10-04",
     "aantal": 323
    },
    {
     "op": "2026-10-05",
+    "aantal": 323
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 323
    }
   ],
   "proefruis": [
    {
-    "op": "2026-10-01",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-04",
     "aantal": 1
    },
    {
     "op": "2026-10-05",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 1
    }
   ],
   "gevolg-onbekend": [
    {
-    "op": "2026-10-01",
-    "aantal": 96
-   },
-   {
     "op": "2026-10-04",
     "aantal": 96
    },
    {
     "op": "2026-10-05",
+    "aantal": 96
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 96
    }
   ],
   "droogloop-onbeoordeeld": [
    {
-    "op": "2026-10-01",
-    "aantal": 2
-   },
-   {
     "op": "2026-10-04",
     "aantal": 2
    },
    {
     "op": "2026-10-05",
+    "aantal": 2
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
-    "op": "2026-10-01",
-    "aantal": 49
-   },
-   {
     "op": "2026-10-04",
     "aantal": 49
    },
    {
     "op": "2026-10-05",
+    "aantal": 49
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 49
    }
   ],
   "idem-ongeclassificeerd": [
    {
-    "op": "2026-10-01",
-    "aantal": 152
-   },
-   {
     "op": "2026-10-04",
     "aantal": 152
    },
    {
     "op": "2026-10-05",
+    "aantal": 152
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 152
    }
   ],
   "wegwerpserver-kopieen": [
    {
-    "op": "2026-10-01",
-    "aantal": 3
-   },
-   {
     "op": "2026-10-04",
     "aantal": 3
    },
    {
     "op": "2026-10-05",
+    "aantal": 3
+   },
+   {
+    "op": "2026-10-06",
     "aantal": 3
    }
   ]

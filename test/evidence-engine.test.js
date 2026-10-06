@@ -97,6 +97,27 @@ test('uitvoerder versmalt alleen REPROVE en schaalt UNKNOWN op naar full', () =>
   ]) }, 'e2e').unit, [], 'de browserhelft start geen unitwerk');
 });
 
+test('de nachtelijke force-full vlag bereikt de planner echt', () => {
+  assert.deepEqual(uitvoerder.planOpties([], { RTG_FORCE_FULL: '1' }), { forceFull: true });
+  assert.deepEqual(uitvoerder.planOpties(['--full'], {}), { forceFull: true });
+  assert.deepEqual(uitvoerder.planOpties([], { RTG_FORCE_FULL: '0' }), { forceFull: false });
+  let ontvangen = null;
+  const plan = uitvoerder.maakPlan([], { RTG_FORCE_FULL: '1' }, (opties) => {
+    ontvangen = opties;
+    return { mode: 'full' };
+  });
+  assert.deepEqual(ontvangen, { forceFull: true });
+  assert.equal(plan.mode, 'full');
+});
+
+test('een handmatige bewijsrun bindt input, event en echte HEAD aan dezelfde commit', () => {
+  const sha = 'a'.repeat(40);
+  assert.deepEqual(controlPlane.bindCommit(sha, sha, sha), { commit:sha, event:sha, head:sha });
+  assert.throws(() => controlPlane.bindCommit('a'.repeat(39), sha, sha), /geen volledige/);
+  assert.throws(() => controlPlane.bindCommit(sha, 'b'.repeat(40), sha), /eventcommit/);
+  assert.throws(() => controlPlane.bindCommit(sha, sha, 'b'.repeat(40)), /HEAD/);
+});
+
 test('de GitHub-samenvatting ontsnapt backslashes vóór tabelstrepen', () => {
   assert.equal(uitvoerder.markdownCel('reden \\| tweede\nregel'),
     'reden ' + '\\'.repeat(3) + '| tweede regel');
@@ -219,13 +240,21 @@ test('de gesplitste incrementele poort is fail-closed over beide helften', () =>
 
 test('de mergepoort eist alleen de poorten van de gekozen risicobaan en niets minder', () => {
   const basis = { mode: 'merge', route: 'incremental', risk: 'product', event: 'pull_request',
-    norm: 'success', security: 'success', dependency: 'success', adversarial: 'skipped',
-    container: 'success' };
+    keuringen: 'success', norm: 'success', security: 'success', dependency: 'success', adversarial: 'skipped',
+    container: 'success', schermen: 'skipped' };
   assert.match(evidenceGate.controleer(basis), /Merge Gate/);
+  assert.throws(() => evidenceGate.controleer({ ...basis, keuringen: 'failure' }), /keuringen=failure/);
+  assert.throws(() => evidenceGate.controleer({ ...basis, keuringen: 'skipped' }), /keuringen=skipped/);
   assert.throws(() => evidenceGate.controleer({ ...basis, dependency: 'skipped' }), /dependency=skipped/);
   assert.throws(() => evidenceGate.controleer({ ...basis, risk: 'sensitive', adversarial: 'skipped' }),
     /adversarial=skipped/);
   assert.match(evidenceGate.controleer({ ...basis, risk: 'light', container: 'skipped' }), /Merge Gate/);
+  assert.throws(() => evidenceGate.controleer({ ...basis, route: 'full', schermen: 'failure',
+    adversarial: 'success', container: 'success' }), /schermen=failure/);
+  assert.throws(() => evidenceGate.controleer({ ...basis, route: 'full', schermen: 'skipped',
+    adversarial: 'success', container: 'success' }), /schermen=skipped/);
+  assert.match(evidenceGate.controleer({ ...basis, route: 'full', schermen: 'success',
+    adversarial: 'success', container: 'success' }), /Merge Gate/);
   assert.throws(() => evidenceGate.controleer({ ...basis, risk: '' }), /onbekende risicobaan/);
 });
 
@@ -247,10 +276,13 @@ test('warme browserfabriek ruimt contexten op zonder het gedeelde proces te slui
     launch: async () => { geisoleerd++; return browser; }
   } };
   const gedeeld = metGedeeldeBrowser(mod, 'ws://bewijs');
-  const client = await Reflect.get(gedeeld.chromium, 'launch')({ headless: true });
+  const client = await Reflect.get(gedeeld.chromium, 'launch')({
+    headless: true, args: ['--no-sandbox'], executablePath: '/warme-host/chromium'
+  });
   assert.equal(await client.newContext(), 'context');
   await client.close();
-  assert.equal(verbonden, 'ws://bewijs');
+  assert.equal(verbonden, 'ws://bewijs',
+    'de standaardopties van browserOpties mogen de warme browser niet omzeilen');
   assert.equal(browserDicht, 1, 'een testbestand moet zijn clientverbinding afsluiten');
   const apart = await Reflect.get(gedeeld.chromium, 'launch')({ args: ['--use-fake-device-for-media-stream'] });
   await apart.close();

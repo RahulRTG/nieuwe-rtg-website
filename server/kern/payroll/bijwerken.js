@@ -25,6 +25,7 @@
    een pdf wil inlezen, bouwt dat als een BRON die een pakket oplevert -- dan
    valt het onder dezelfde keuring als al het andere. */
 'use strict';
+const { haalBron } = require('./bronophalen');
 
 /* Hoe vaak er gekeken wordt. Tarieven veranderen niet per uur; dagelijks is
    ruim genoeg en houdt de bron met rust. De ronde is bovendien stil als er
@@ -152,15 +153,16 @@ function maakBijwerken({ regelpakket, opslag, save, nu, log, dekking, fetchImpl 
    laat het keuren. Er wordt hier BEWUST niets geparst of gerepareerd -- wat er
    niet als geldig pakket uitkomt, hoort af te ketsen op de keuring en niet
    half-goed naar binnen te glippen. */
+/* Keuren, tijdslimiet en groottegrens staan in ./bronophalen.js: dezelfde
+   keuring als bij het registreren, en een bron van voor die regel wordt alsnog
+   geweigerd voordat er iets wordt aangeroepen (RTG-V1-RELEASE C5). */
 function urlBron({ naam, url, fetchImpl }) {
   const haalOp = fetchImpl || (typeof fetch === 'function' ? fetch : null);
   return {
     naam: naam || url, soort: 'url', url,
     async haal() {
       if (!haalOp) throw new Error('geen fetch beschikbaar in deze omgeving');
-      const r = await haalOp(url, { headers: { accept: 'application/json' } });
-      if (!r.ok) throw new Error('bron gaf status ' + r.status);
-      return await r.json();
+      return haalBron(url, haalOp);
     }
   };
 }

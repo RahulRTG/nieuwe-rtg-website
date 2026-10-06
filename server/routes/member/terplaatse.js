@@ -96,7 +96,7 @@ module.exports = (kern) => {
     e.guests.push({ key: req.session.key, codename, qty, at: new Date().toISOString(), checkedIn: false });
     save();
     notifySupplier(s.code, { icon: 'ticket', title: 'Aanmelding voor ' + e.name, body: codename + ', ' + qty + ' pers.' });
-    notify(req.session.tier, { icon: 'ticket', title: s.name, body: 'U staat op de gastenlijst van ' + e.name + ' (' + e.date + (e.time ? ', ' + e.time : '') + '), ' + qty + ' pers. Uw codenaam is uw toegang.', scope: 'events' });
+    notify(req.session.key, { icon: 'ticket', title: s.name, body: 'U staat op de gastenlijst van ' + e.name + ' (' + e.date + (e.time ? ', ' + e.time : '') + '), ' + qty + ' pers. Uw codenaam is uw toegang.', scope: 'events' });
     sseToSupplier(s.code, 'sync', { scope: 'events' });
     sseToOffice('sync', { scope: 'events' });
     res.json({ ok: true, spotsLeft: Math.max(0, e.capacity - taken - qty) });

@@ -73,8 +73,8 @@ const tekst = (v, max) => {
   return s.length > (max || 200) ? s.slice(0, max || 200) : s;
 };
 
-/* Maak de envelop en hang hem aan het verzoek. Geeft hem ook terug, zodat een
-   poortwachter er meteen iets mee kan zonder req opnieuw te lezen. */
+/* Maak de envelop, hang hem aan het verzoek en geef hem terug. Hier, en nergens
+   anders, wordt het verzoekframe geidentificeerd (./verzoekframe.js). */
 function zet(req, gegevens) {
   let env;
   try { env = maak(req, gegevens); }
@@ -88,6 +88,7 @@ function zet(req, gegevens) {
       fout: tekst([e && e.message].concat(fouten).filter(Boolean).join('; '), 240) };
   }
   try { if (req) req.envelop = env; } catch (e) { /* een bevroren req: dan alleen teruggeven */ }
+  frame.uitEnvelop(env, req);   // gooit nooit; een weigering telt
   return env;
 }
 
@@ -135,6 +136,7 @@ function context(req, fouten) {
    andere klok te lezen. */
 const klok = require('../lib/klok');
 const { agentVan } = require('../kern/agentteken'); // A5: de AI namens de mens
+const frame = require('./verzoekframe');
 
 function maak(req, g) {
   g = g || {};
@@ -152,9 +154,7 @@ function maak(req, g) {
     capability: tekst(g.capability, 120),
     gezag: g.gezagBron ? { bron: tekst(g.gezagBron, 60), baas: !!g.gezagBaas } : null,
     context: context(req, fouten),
-    // GEEN tweede correlatie-id: server/log.js zet er al een op elk verzoek en
-    // echoot hem als X-Request-Id. Er zelf een maken zou twee waarheden geven
-    // die uiteenlopen zodra iemand er een gaat gebruiken (LAT.md regel 4).
+    // GEEN tweede correlatie-id: server/log.js zet er al een (LAT.md regel 4).
     correlatie: leesVeilig(() => (req && req.id) || null, 'correlatie', fouten),
     // leeg blijft leeg: een `fout`-veld dat er altijd staat leest niemand meer
     ...(fouten.length ? { fout: tekst(fouten.join('; '), 240) } : {})

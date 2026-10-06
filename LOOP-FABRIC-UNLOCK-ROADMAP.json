@@ -1,0 +1,1305 @@
+{
+  "schemaVersion": 1,
+  "kind": "RTG_LOOP_FABRIC_UNLOCK_ROADMAP",
+  "sourceOfTruth": false,
+  "warning": "Roadmap autoriseert geen runtimecode. Iedere vertical slice doorloopt opnieuw alle acceptance gates.",
+  "sourceFlows": {
+    "summary": {
+      "GO": 8,
+      "PHASE": 8,
+      "STOP": 8
+    },
+    "newGo": [
+      "library-edition-to-academy",
+      "experience.living-world-commons-release",
+      "service.process-improvement"
+    ],
+    "implementedGo": [
+      "experience.living-world-contribution",
+      "experience.living-world-commons-release",
+      "academy.practice-to-knowledge",
+      "workos.accessibility-procedure",
+      "workos.near-miss-runbook",
+      "service.process-improvement",
+      "library.feedback-to-edition",
+      "library-edition-to-academy"
+    ],
+    "note": "D23, één source-local D13 Commons-release en D15 service process learning zijn bewezen; brede capabilityfamilies blijven flowgewijs gefaseerd."
+  },
+  "decisions": {
+    "blockedCapabilities": 84,
+    "families": 22,
+    "resolvedCapabilities": 60,
+    "topFive": [
+      {
+        "id": "D01_PERSONAL_MEMORY",
+        "title": "Persoonlijke levenscontext",
+        "unlock": 13,
+        "classification": "PRIVACY_POLICY"
+      },
+      {
+        "id": "D06_WORKFORCE_DEVELOPMENT",
+        "title": "Werknemers-, talent- en loopbaancontext",
+        "unlock": 11,
+        "classification": "MIXED"
+      },
+      {
+        "id": "D11_COMMUNITY_EVENTS",
+        "title": "Community-, event- en groepsdeelname",
+        "unlock": 11,
+        "classification": "PRIVACY_POLICY"
+      },
+      {
+        "id": "D07_TRAVEL_EXPERIENCE",
+        "title": "Reiservaring en toekomstige reisrecall",
+        "unlock": 7,
+        "classification": "MIXED"
+      },
+      {
+        "id": "D13_DISCOVERY_COMMONS",
+        "title": "Saloon, sociaal/professioneel netwerk en Commons",
+        "unlock": 6,
+        "classification": "PRODUCT_POLICY"
+      }
+    ]
+  },
+  "prerequisites": {
+    "expected": [
+      "arrival",
+      "avondos",
+      "bedrijf",
+      "bk-eten",
+      "bk-reiswijzer",
+      "bk-reizen",
+      "bk-tickets",
+      "bk-verblijf",
+      "carriereledger",
+      "command-besturen",
+      "command-doen",
+      "command-zien",
+      "connect",
+      "dagmetingen",
+      "doelen",
+      "dom-agenda",
+      "dom-boeken",
+      "dom-doos",
+      "dom-eigendomein",
+      "dom-foutmelder",
+      "dom-genootschap",
+      "dom-home",
+      "dom-leerstof",
+      "dom-les",
+      "dom-library",
+      "dom-meet",
+      "dom-metier",
+      "dom-onderwijs",
+      "dom-plaats",
+      "dom-reisbureau",
+      "dom-residentie",
+      "dom-rtfkantoor",
+      "dom-rtfos",
+      "dom-site",
+      "dom-thuis",
+      "dom-vak",
+      "dom-werkplek",
+      "dom-werkvloer",
+      "experience-platform",
+      "fs-gast",
+      "fs-terrein",
+      "fs-werk",
+      "gastos",
+      "gemoed",
+      "gewoonten",
+      "ghost",
+      "instantreality",
+      "kantoorpakket",
+      "kern-rahul",
+      "kern-waardering",
+      "knelpunt",
+      "leerhuis",
+      "levenos",
+      "life",
+      "member-werk",
+      "neiging",
+      "office",
+      "ondernemersos",
+      "ontmoetingen",
+      "oog",
+      "ov-aandacht",
+      "ov-bijles",
+      "ov-kantoorgesprek",
+      "ov-krant",
+      "ov-spar",
+      "ov-stad",
+      "ov-werkmail",
+      "privekantoor",
+      "rechterhand",
+      "rtf-contacten",
+      "rtf-leerpaspoort",
+      "rugdekking",
+      "rust",
+      "salon",
+      "service",
+      "social",
+      "socialewereld",
+      "staff",
+      "stuur",
+      "supplier-apply",
+      "supplier-events",
+      "supplier-haccp",
+      "supplier-pos",
+      "supplier-rooms",
+      "supplier-salon",
+      "tickets",
+      "tijdlijn",
+      "training",
+      "vakbewijs",
+      "vastgoed",
+      "verzorging",
+      "voeding",
+      "wereld",
+      "werk-rtf",
+      "werving",
+      "zaakregie",
+      "zaakregie-beheer",
+      "zakelijk"
+    ],
+    "assigned": [
+      "arrival",
+      "avondos",
+      "bedrijf",
+      "bk-eten",
+      "bk-reiswijzer",
+      "bk-reizen",
+      "bk-tickets",
+      "bk-verblijf",
+      "carriereledger",
+      "command-besturen",
+      "command-doen",
+      "command-zien",
+      "connect",
+      "dagmetingen",
+      "doelen",
+      "dom-agenda",
+      "dom-boeken",
+      "dom-doos",
+      "dom-eigendomein",
+      "dom-foutmelder",
+      "dom-genootschap",
+      "dom-home",
+      "dom-leerstof",
+      "dom-les",
+      "dom-library",
+      "dom-meet",
+      "dom-metier",
+      "dom-onderwijs",
+      "dom-plaats",
+      "dom-reisbureau",
+      "dom-residentie",
+      "dom-rtfkantoor",
+      "dom-rtfos",
+      "dom-site",
+      "dom-thuis",
+      "dom-vak",
+      "dom-werkplek",
+      "dom-werkvloer",
+      "experience-platform",
+      "fs-gast",
+      "fs-terrein",
+      "fs-werk",
+      "gastos",
+      "gemoed",
+      "gewoonten",
+      "ghost",
+      "instantreality",
+      "kantoorpakket",
+      "kern-rahul",
+      "kern-waardering",
+      "knelpunt",
+      "leerhuis",
+      "levenos",
+      "life",
+      "member-werk",
+      "neiging",
+      "office",
+      "ondernemersos",
+      "ontmoetingen",
+      "oog",
+      "ov-aandacht",
+      "ov-bijles",
+      "ov-kantoorgesprek",
+      "ov-krant",
+      "ov-spar",
+      "ov-stad",
+      "ov-werkmail",
+      "privekantoor",
+      "rechterhand",
+      "rtf-contacten",
+      "rtf-leerpaspoort",
+      "rugdekking",
+      "rust",
+      "salon",
+      "service",
+      "social",
+      "socialewereld",
+      "staff",
+      "stuur",
+      "supplier-apply",
+      "supplier-events",
+      "supplier-haccp",
+      "supplier-pos",
+      "supplier-rooms",
+      "supplier-salon",
+      "tickets",
+      "tijdlijn",
+      "training",
+      "vakbewijs",
+      "vastgoed",
+      "verzorging",
+      "voeding",
+      "wereld",
+      "werk-rtf",
+      "werving",
+      "zaakregie",
+      "zaakregie-beheer",
+      "zakelijk"
+    ],
+    "complete": true,
+    "rejectedHypotheses": [
+      {
+        "id": "P06_VERSIONED_PHYSICAL_HANDOFF",
+        "status": "REJECTED_BY_SOURCE_RECHECK",
+        "reason": "dom-doos is hardwaretelemetrie en updatebeheer, geen fysieke custody-overdracht. De eerdere naamgebaseerde indeling was semantisch onjuist.",
+        "correctedTo": "P03_ASSET_INTERVENTION_LIFECYCLE",
+        "consumers": []
+      }
+    ],
+    "nodes": [
+      {
+        "id": "P08_PERSONAL_STRUCTURAL_RELEASE",
+        "title": "Personal to Structural Release",
+        "consumers": [
+          "rechterhand",
+          "neiging",
+          "privekantoor",
+          "life",
+          "doelen",
+          "dagmetingen",
+          "gemoed",
+          "gewoonten",
+          "training",
+          "tijdlijn",
+          "voeding",
+          "rust",
+          "ov-spar"
+        ],
+        "sharedSemantics": "Een vrijwillige persoonlijke bijdrage maakt na minimization en unlinking een nieuw structureel artifact; de private bron wordt niet gekopieerd.",
+        "reuse": [
+          "Learning eligibility promotionFrom",
+          "unlinking",
+          "source retention"
+        ],
+        "counterexample": "Private Recall blijft Personal Memory en gebruikt geen structurele release.",
+        "implementationScope": "medium: één vrijwillige bronflow plus unlink/delete/revoke proof",
+        "risk": "heridentificatie via provenance of te rijke lesson",
+        "dependencies": [
+          "explicit contribution",
+          "minimization",
+          "unlinking receipt",
+          "new artifact id",
+          "source revocation path"
+        ],
+        "unlockCount": 13,
+        "proofStatus": {
+          "status": "PROVEN_BOUNDED",
+          "proof": [
+            "experience.living-world-contribution",
+            "service.process-improvement"
+          ],
+          "next": "Iedere nieuwe bron vereist eigen vrijwilligheid, minimization en unlinkingbewijs."
+        }
+      },
+      {
+        "id": "P01_VERSIONED_SOURCE_RELEASE",
+        "title": "Versioned Source Release",
+        "consumers": [
+          "leerhuis",
+          "dom-les",
+          "dom-leerstof",
+          "dom-onderwijs",
+          "ov-bijles",
+          "rtf-leerpaspoort",
+          "dom-library",
+          "dom-boeken",
+          "ov-krant",
+          "dom-site",
+          "dom-eigendomein"
+        ],
+        "sharedSemantics": "Een bron geeft exact object, versie, scope, doel, geldigheid en withdrawalstatus vrij; de consumer kopieert geen bronwaarheid.",
+        "reuse": [
+          "Library Edition/snapshot/rights",
+          "Leerhuis knowledge/curriculum versions",
+          "Library journal/outbox"
+        ],
+        "counterexample": "Persoonlijke Reader-state en leerlingvoortgang zijn geen content release.",
+        "implementationScope": "medium: source-local release records en adapters; geen algemene Rights Engine",
+        "risk": "rights laundering en oude release op nieuwe versie",
+        "dependencies": [
+          "source authority",
+          "source-issued eligibility",
+          "durable source event",
+          "withdrawal path",
+          "consumer-owned versioned target"
+        ],
+        "unlockCount": 11,
+        "proofStatus": {
+          "status": "PROVEN_BOUNDED",
+          "proof": [
+            "library-edition-to-academy"
+          ],
+          "next": "Nieuwe source owners blijven PHASE tot hun eigen versioned release en withdrawal zijn bewezen."
+        }
+      },
+      {
+        "id": "P07_WORKFORCE_PROCESS_SEPARATION",
+        "title": "Workforce Process Separation",
+        "consumers": [
+          "staff",
+          "dom-werkvloer",
+          "ov-kantoorgesprek",
+          "ov-werkmail",
+          "member-werk",
+          "carriereledger",
+          "supplier-apply",
+          "werving",
+          "vakbewijs",
+          "dom-metier",
+          "dom-vak"
+        ],
+        "sharedSemantics": "Alleen versioned processtate kan organizational learning voeden; menselijke prestatie, communicatie en loopbaan blijven afzonderlijk en private-first.",
+        "reuse": [
+          "WorkOS authority",
+          "versioned work process target",
+          "Learning Constitution LC07"
+        ],
+        "counterexample": "Een werknemersnotitie, mail of populariteit is geen procesles.",
+        "implementationScope": "high: source-flowdecompositie vóór één objectieve proces-slice",
+        "risk": "surveillancegeheugen vermomd als procesverbetering",
+        "dependencies": [
+          "process owner",
+          "field allowlist",
+          "no-person-score gate",
+          "retention",
+          "verification"
+        ],
+        "unlockCount": 11,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [],
+          "next": "Decomposeer eerst processtate en menselijke context; LC07 blokkeert persoonsgerichte organizational memory."
+        }
+      },
+      {
+        "id": "P11_EVENT_FEEDBACK_RELEASE",
+        "title": "Event Feedback Release",
+        "consumers": [
+          "ontmoetingen",
+          "social",
+          "rtf-contacten",
+          "tickets",
+          "supplier-events",
+          "dom-agenda",
+          "dom-meet",
+          "bk-tickets",
+          "fs-terrein",
+          "fs-werk",
+          "fs-gast"
+        ],
+        "sharedSemantics": "Vrijwillige feedback is event- en purpose-bound en wordt pas na review/minimization een structurele eventles.",
+        "reuse": [
+          "Living World observation",
+          "WorkOS decision/change",
+          "personal structural release"
+        ],
+        "counterexample": "Eventdeelname, groepslidmaatschap en locatiegeschiedenis zijn geen release.",
+        "implementationScope": "medium: één versioned eventprocedure met no-disadvantage test",
+        "risk": "social graph of langdurige locatiehistorie ontstaat indirect",
+        "dependencies": [
+          "event source version",
+          "voluntary feedback",
+          "review",
+          "unlinking",
+          "next-event verification"
+        ],
+        "unlockCount": 11,
+        "proofStatus": {
+          "status": "PROVEN_BOUNDED",
+          "proof": [
+            "experience.living-world-contribution",
+            "workos.accessibility-procedure"
+          ],
+          "next": "Andere event owners blijven PHASE tot hun eigen source version en no-disadvantage pad bestaan."
+        }
+      },
+      {
+        "id": "P02_VERSIONED_WORK_PROCESS_TARGET",
+        "title": "Versioned Work Process Target",
+        "consumers": [
+          "kantoorpakket",
+          "ondernemersos",
+          "office",
+          "bedrijf",
+          "command-zien",
+          "command-doen",
+          "command-besturen",
+          "zaakregie",
+          "zaakregie-beheer",
+          "dom-werkplek"
+        ],
+        "sharedSemantics": "Een organisatorisch procesobject heeft stabiele lijn, immutable versie en bevoegde source change.",
+        "reuse": [
+          "WorkOS workspace.kennis versioning",
+          "loop-source-change",
+          "workspace audit/outbox"
+        ],
+        "counterexample": "Een personeelsnotitie of gesprek is geen procesobject.",
+        "implementationScope": "medium/high: per WorkOS-flow een echt procesdoel kiezen; geen generieke JSON-procedure",
+        "risk": "werknemerscontext als procesmemory vermommen",
+        "dependencies": [
+          "process owner",
+          "current authority",
+          "version-bound decision",
+          "source receipt",
+          "verification occurrence"
+        ],
+        "unlockCount": 10,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [
+            "workos.accessibility-procedure",
+            "workos.near-miss-runbook"
+          ],
+          "next": "Kies per capability eerst een concreet, niet-persoonsgebonden procesobject."
+        }
+      },
+      {
+        "id": "P03_ASSET_INTERVENTION_LIFECYCLE",
+        "title": "Asset Intervention Lifecycle",
+        "consumers": [
+          "wereld",
+          "experience-platform",
+          "dom-plaats",
+          "ov-stad",
+          "vastgoed",
+          "verzorging",
+          "dom-thuis",
+          "dom-residentie",
+          "dom-home",
+          "dom-doos"
+        ],
+        "sharedSemantics": "Issue, diagnose, interventie, assetversie en verificatie blijven bij het asset-/werelddomein en scheiden actor van asset history.",
+        "reuse": [
+          "Living World ObjectRef/versioning",
+          "LivingOS source collections",
+          "Loop Fabric unlinking/recall policy"
+        ],
+        "counterexample": "Een reiservaring of bewonersdagboek is geen assetinterventie.",
+        "implementationScope": "high: owner/supplier/resident authority en intervention state machine per assetfamilie",
+        "risk": "vorige bewoner of bezoeker lekt via asset recall",
+        "dependencies": [
+          "asset-scoped authority",
+          "versioned intervention",
+          "source receipt",
+          "actor unlinking",
+          "recurrence observation"
+        ],
+        "unlockCount": 10,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [],
+          "next": "Asset authority, intervention versioning, retention en source receipt ontbreken; dom-doos is hier correct ondergebracht."
+        }
+      },
+      {
+        "id": "P04_VERSIONED_SERVICE_PROCEDURE",
+        "title": "Versioned Service Procedure",
+        "consumers": [
+          "gastos",
+          "supplier-haccp",
+          "supplier-pos",
+          "supplier-salon",
+          "supplier-rooms",
+          "bk-eten",
+          "service"
+        ],
+        "sharedSemantics": "Een bevoegde serviceowner wijzigt een concrete procedureversie en verifieert bij een volgende service-uitvoering.",
+        "reuse": [
+          "WorkOS runbook slice",
+          "hospitality source state",
+          "Loop delivery/dead-letter"
+        ],
+        "counterexample": "Gastvoorkeuren, werknemersgedrag en marketingprofielen zijn geen procedure.",
+        "implementationScope": "medium: één HACCP of serviceprocedure als eerste bronobject",
+        "risk": "gast-/werknemerinhoud in organizational lesson",
+        "dependencies": [
+          "procedure owner",
+          "versioning",
+          "minimal operational observation",
+          "source outbox/receipt",
+          "next-service verification"
+        ],
+        "unlockCount": 7,
+        "proofStatus": {
+          "status": "PROVEN_BOUNDED",
+          "proof": [
+            "service.process-improvement"
+          ],
+          "next": "Hospitality- en leveranciersprocedures blijven source-specifiek PHASE."
+        }
+      },
+      {
+        "id": "P09_TRAVEL_STRUCTURAL_LESSON",
+        "title": "Travel Structural Lesson",
+        "consumers": [
+          "avondos",
+          "arrival",
+          "instantreality",
+          "dom-reisbureau",
+          "bk-reizen",
+          "bk-verblijf",
+          "bk-reiswijzer"
+        ],
+        "sharedSemantics": "Triprecall blijft Personal; alleen vrijwillig vrijgegeven, geminimaliseerde reisuitkomsten worden losgekoppelde structurele lessons.",
+        "reuse": [
+          "personal structural release",
+          "Travel source state",
+          "policy-aware Recall"
+        ],
+        "counterexample": "Een boeking of bewegingshistorie is geen learning consent.",
+        "implementationScope": "high: eerst één verstorings- of toegankelijkheidsflow",
+        "risk": "reizigersprofiel en locatiehistorie lekken",
+        "dependencies": [
+          "trip source version",
+          "voluntary release",
+          "location minimization",
+          "unlinking",
+          "future-trip recall policy"
+        ],
+        "unlockCount": 7,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [],
+          "next": "Nog geen begrensde vrijwillige tripbron met locatie-minimization en toekomstig recallcontract."
+        }
+      },
+      {
+        "id": "P12_VERSION_BOUND_COMMONS_RELEASE",
+        "title": "Version-bound Commons Release",
+        "consumers": [
+          "zakelijk",
+          "socialewereld",
+          "connect",
+          "dom-genootschap",
+          "salon",
+          "kern-waardering"
+        ],
+        "sharedSemantics": "De source owner geeft object/versie, doel, audience, reuse, attribution, AI- en derivative scope expliciet vrij en kan withdraw/supersede uitgeven.",
+        "reuse": [
+          "Learning eligibility COMMONS",
+          "source rights/versioning",
+          "lineage refs"
+        ],
+        "counterexample": "Waarderen, volgen, aankopen of bereik vormen geen Commons-release.",
+        "implementationScope": "medium: klein source-local contract met twee concrete release-eigenaren",
+        "risk": "impliciete publicatie en epistemic laundering",
+        "dependencies": [
+          "source authority",
+          "versioned source",
+          "withdrawal",
+          "attribution",
+          "no-pay-to-rank gate"
+        ],
+        "unlockCount": 6,
+        "proofStatus": {
+          "status": "PROVEN_ONE_SOURCE",
+          "proof": [
+            "experience.living-world-commons-release"
+          ],
+          "next": "Geen generiek platformcontract zonder tweede semantisch gelijkwaardige source owner."
+        }
+      },
+      {
+        "id": "P13_AI_PURPOSE_SCOPE",
+        "title": "AI Purpose Scope",
+        "consumers": [
+          "oog",
+          "ghost",
+          "knelpunt",
+          "kern-rahul",
+          "ov-aandacht",
+          "stuur"
+        ],
+        "sharedSemantics": "Assistance, inference en training zijn afzonderlijke source-issued uses; AI-output behoudt epistemische herkomst en mutatieauthority.",
+        "reuse": [
+          "Learning eligibility aiScopes",
+          "AI provenance",
+          "authority decisions"
+        ],
+        "counterexample": "Een AI-voorstel is geen source-verified feit en gebruik van assistentie is geen trainingstoestemming.",
+        "implementationScope": "medium: adapters per AI-entrypoint; training default deny",
+        "risk": "inference wordt feit of toegestane context wordt voor training hergebruikt",
+        "dependencies": [
+          "purpose binding",
+          "current authorization",
+          "provenance type",
+          "training deny",
+          "source mutation gate"
+        ],
+        "unlockCount": 6,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [],
+          "next": "Training blijft constitutioneel deny; adapters wachten op concrete source-owned AI-use contracts."
+        }
+      },
+      {
+        "id": "P10_FOUNDATION_VOLUNTARY_LESSON",
+        "title": "Foundation Voluntary Lesson",
+        "consumers": [
+          "levenos",
+          "rugdekking",
+          "werk-rtf",
+          "dom-rtfkantoor",
+          "dom-rtfos"
+        ],
+        "sharedSemantics": "Hulp en vrijwillige ervaringsbijdrage zijn afzonderlijke lifecycles; weigering heeft aantoonbaar geen behandel- of kansnadeel.",
+        "reuse": [
+          "Learning eligibility",
+          "Foundation source authority",
+          "personal structural release"
+        ],
+        "counterexample": "Toegang tot hulp en dossierinhoud zijn geen learning artifact.",
+        "implementationScope": "medium/high: no-disadvantage gate plus één vrijwillige projectles",
+        "risk": "dwang door machtsasymmetrie",
+        "dependencies": [
+          "service eligibility independence",
+          "explicit contribution",
+          "minimization",
+          "withdrawal",
+          "organizational decision"
+        ],
+        "unlockCount": 5,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [],
+          "next": "Nog geen source-flow die no-disadvantage, withdrawal en organizational decision gezamenlijk bewijst."
+        }
+      },
+      {
+        "id": "P05_REVIEWED_FAILURE_ARTIFACT",
+        "title": "Reviewed Failure Artifact",
+        "consumers": [
+          "dom-foutmelder"
+        ],
+        "sharedSemantics": "Een technische occurrence wordt pas na bevoegde review een minimale operationele les.",
+        "reuse": [
+          "error correlation",
+          "WorkOS incident observation",
+          "dead-letter metadata"
+        ],
+        "counterexample": "Ruwe logregels en stacktraces zijn geen memory en mogen geen bronpayload lekken.",
+        "implementationScope": "small: reviewstate, allowlist en link naar source occurrence",
+        "risk": "secrets of persoonsgegevens uit logs kopiëren",
+        "dependencies": [
+          "technical owner",
+          "review decision",
+          "minimization",
+          "retention",
+          "change target"
+        ],
+        "unlockCount": 1,
+        "proofStatus": {
+          "status": "PHASE",
+          "proof": [],
+          "next": "Technische reviewauthority, allowlist, tijdretentie, versioned change target en source outbox ontbreken."
+        }
+      }
+    ],
+    "protocolGates": [
+      {
+        "id": "G01_ELIGIBILITY",
+        "consumers": 98,
+        "reuse": "server/kern/loop-fabric/learning-eligibility.js",
+        "rule": "Iedere bron geeft purpose, basis, memory class, fields, audience, uses en retention uit."
+      },
+      {
+        "id": "G02_DURABLE_DELIVERY",
+        "consumers": 98,
+        "reuse": "source-owned outbox/checkpoint/dead-letter",
+        "rule": "Committed bronstate overleeft consumeruitval en replay."
+      },
+      {
+        "id": "G03_SOURCE_RECEIPT",
+        "consumers": 98,
+        "reuse": "ChangeReceipt plus service-receipt",
+        "rule": "Alleen de bron van gewijzigde state bevestigt Change."
+      },
+      {
+        "id": "G04_CURRENT_AUTHORITY",
+        "consumers": 98,
+        "reuse": "brondomein-authority adapters",
+        "rule": "Decision, Change en Recall herbeoordelen actuele authority."
+      },
+      {
+        "id": "G05_POLICY_RECALL",
+        "consumers": 98,
+        "reuse": "Loop Fabric Recall Broker",
+        "rule": "Recall resolveert live bron, visibility, retention, contest en correction."
+      },
+      {
+        "id": "G06_VERIFICATION_OBSERVATION",
+        "consumers": 98,
+        "reuse": "Observation plus verificationOf, causalClaim=false",
+        "rule": "Verification is een nieuwe bronwaarneming en geen causale conclusie."
+      }
+    ]
+  },
+  "scale": {
+    "count": 32,
+    "status": "STOP",
+    "blockers": [
+      {
+        "capabilityId": "bestellen",
+        "domain": "commerce",
+        "status": "STOP",
+        "component": "Lineage Index en Change Router",
+        "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+        "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+        "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+      },
+      {
+        "capabilityId": "verhuur",
+        "domain": "mobility",
+        "status": "STOP",
+        "component": "Change Router, checkpoints en Recall projection",
+        "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+        "decision": "partition ownership, event ordering, clock semantics en region failover",
+        "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+      },
+      {
+        "capabilityId": "charter",
+        "domain": "mobility",
+        "status": "STOP",
+        "component": "Change Router, checkpoints en Recall projection",
+        "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+        "decision": "partition ownership, event ordering, clock semantics en region failover",
+        "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+      },
+      {
+        "capabilityId": "retail",
+        "domain": "commerce",
+        "status": "STOP",
+        "component": "Lineage Index en Change Router",
+        "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+        "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+        "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+      },
+      {
+        "capabilityId": "onderweg",
+        "domain": "mobility",
+        "status": "STOP",
+        "component": "Change Router, checkpoints en Recall projection",
+        "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+        "decision": "partition ownership, event ordering, clock semantics en region failover",
+        "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+      },
+      {
+        "capabilityId": "groothandel",
+        "domain": "commerce",
+        "status": "STOP",
+        "component": "Lineage Index en Change Router",
+        "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+        "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+        "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+      },
+      {
+        "capabilityId": "commerce",
+        "domain": "commerce",
+        "status": "STOP",
+        "component": "Lineage Index en Change Router",
+        "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+        "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+        "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+      },
+      {
+        "capabilityId": "spellen",
+        "domain": "media-culture",
+        "status": "STOP",
+        "component": "Lineage Index en Recall ranking",
+        "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+        "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+        "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+      },
+      {
+        "capabilityId": "podium",
+        "domain": "media-culture",
+        "status": "STOP",
+        "component": "Lineage Index en Recall ranking",
+        "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+        "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+        "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+      },
+      {
+        "capabilityId": "theater",
+        "domain": "media-culture",
+        "status": "STOP",
+        "component": "Lineage Index en Recall ranking",
+        "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+        "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+        "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+      },
+      {
+        "capabilityId": "flits",
+        "domain": "mobility",
+        "status": "STOP",
+        "component": "Change Router, checkpoints en Recall projection",
+        "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+        "decision": "partition ownership, event ordering, clock semantics en region failover",
+        "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+      },
+      {
+        "capabilityId": "ov",
+        "domain": "mobility",
+        "status": "STOP",
+        "component": "Change Router, checkpoints en Recall projection",
+        "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+        "decision": "partition ownership, event ordering, clock semantics en region failover",
+        "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+      },
+      {
+        "capabilityId": "mobiliteit",
+        "domain": "mobility",
+        "status": "STOP",
+        "component": "Change Router, checkpoints en Recall projection",
+        "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+        "decision": "partition ownership, event ordering, clock semantics en region failover",
+        "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+      },
+      {
+        "capabilityId": "mediaos",
+        "domain": "media-culture",
+        "status": "STOP",
+        "component": "Lineage Index en Recall ranking",
+        "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+        "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+        "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+      },
+      {
+        "capabilityId": "clips",
+        "domain": "media-culture",
+        "status": "STOP",
+        "component": "Lineage Index en Recall ranking",
+        "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+        "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+        "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+      },
+      {
+        "capabilityId": "supplier-finance",
+        "domain": "commerce",
+        "status": "STOP",
+        "component": "Lineage Index en Change Router",
+        "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+        "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+        "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+      },
+      {
+        "capabilityId": "supplier-ride",
+        "domain": "mobility",
+        "status": "STOP",
+        "component": "Change Router, checkpoints en Recall projection",
+        "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+        "decision": "partition ownership, event ordering, clock semantics en region failover",
+        "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+      },
+      {
+        "capabilityId": "dom-lucht",
+        "domain": "mobility",
+        "status": "STOP",
+        "component": "Change Router, checkpoints en Recall projection",
+        "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+        "decision": "partition ownership, event ordering, clock semantics en region failover",
+        "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+      },
+      {
+        "capabilityId": "dom-nav",
+        "domain": "mobility",
+        "status": "STOP",
+        "component": "Change Router, checkpoints en Recall projection",
+        "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+        "decision": "partition ownership, event ordering, clock semantics en region failover",
+        "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+      },
+      {
+        "capabilityId": "dom-move",
+        "domain": "mobility",
+        "status": "STOP",
+        "component": "Change Router, checkpoints en Recall projection",
+        "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+        "decision": "partition ownership, event ordering, clock semantics en region failover",
+        "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+      },
+      {
+        "capabilityId": "dom-sport",
+        "domain": "media-culture",
+        "status": "STOP",
+        "component": "Lineage Index en Recall ranking",
+        "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+        "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+        "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+      },
+      {
+        "capabilityId": "dom-muziek",
+        "domain": "media-culture",
+        "status": "STOP",
+        "component": "Lineage Index en Recall ranking",
+        "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+        "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+        "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+      },
+      {
+        "capabilityId": "dom-galerij",
+        "domain": "media-culture",
+        "status": "STOP",
+        "component": "Lineage Index en Recall ranking",
+        "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+        "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+        "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+      },
+      {
+        "capabilityId": "dom-fluister",
+        "domain": "media-culture",
+        "status": "STOP",
+        "component": "Lineage Index en Recall ranking",
+        "reason": "mediafanout en interactievolume overschrijden de 25 MiB centrale projectiegrens",
+        "decision": "content/domain partitions, bounded recall query en withdrawal fanout",
+        "direction": "indexeer versiegebonden refs; geen kijktelemetrie of centrale rankingmemory"
+      },
+      {
+        "capabilityId": "dom-verkoop",
+        "domain": "commerce",
+        "status": "STOP",
+        "component": "Lineage Index en Change Router",
+        "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+        "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+        "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+      },
+      {
+        "capabilityId": "dom-facturen",
+        "domain": "commerce",
+        "status": "STOP",
+        "component": "Lineage Index en Change Router",
+        "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+        "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+        "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+      },
+      {
+        "capabilityId": "dom-mall",
+        "domain": "commerce",
+        "status": "STOP",
+        "component": "Lineage Index en Change Router",
+        "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+        "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+        "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+      },
+      {
+        "capabilityId": "dom-appstore",
+        "domain": "commerce",
+        "status": "STOP",
+        "component": "Lineage Index en Change Router",
+        "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+        "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+        "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+      },
+      {
+        "capabilityId": "dom-appstore-uitgever",
+        "domain": "commerce",
+        "status": "STOP",
+        "component": "Lineage Index en Change Router",
+        "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+        "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+        "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+      },
+      {
+        "capabilityId": "bk-ritten",
+        "domain": "mobility",
+        "status": "STOP",
+        "component": "Change Router, checkpoints en Recall projection",
+        "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+        "decision": "partition ownership, event ordering, clock semantics en region failover",
+        "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+      },
+      {
+        "capabilityId": "bk-bezorgen",
+        "domain": "mobility",
+        "status": "STOP",
+        "component": "Change Router, checkpoints en Recall projection",
+        "reason": "journey- en positie-events zijn hoogvolume, out-of-order en regiongevoelig",
+        "decision": "partition ownership, event ordering, clock semantics en region failover",
+        "direction": "batch per journey/source; projecteer alleen semantische outcomes"
+      },
+      {
+        "capabilityId": "ov-suppliers",
+        "domain": "commerce",
+        "status": "STOP",
+        "component": "Lineage Index en Change Router",
+        "reason": "transactie- en catalogusvolume maakt centrale objectmap en globale rebuild onveilig",
+        "decision": "tenant/domain partition key, queryprojectie en mass revocation",
+        "direction": "partitioneer minimale refs; Pay/Commerce blijven source truth"
+      }
+    ]
+  },
+  "roadmap": [
+    {
+      "order": 1,
+      "step": "P08_PERSONAL_STRUCTURAL_RELEASE",
+      "status": "PROVEN_BOUNDED",
+      "why": "Een vrijwillige persoonlijke bijdrage maakt na minimization en unlinking een nieuw structureel artifact; de private bron wordt niet gekopieerd.",
+      "unlocks": [
+        "rechterhand",
+        "neiging",
+        "privekantoor",
+        "life",
+        "doelen",
+        "dagmetingen",
+        "gemoed",
+        "gewoonten",
+        "training",
+        "tijdlijn",
+        "voeding",
+        "rust",
+        "ov-spar"
+      ],
+      "nextProof": "Iedere nieuwe bron vereist eigen vrijwilligheid, minimization en unlinkingbewijs.",
+      "proof": [
+        "experience.living-world-contribution",
+        "service.process-improvement"
+      ]
+    },
+    {
+      "order": 2,
+      "step": "P01_VERSIONED_SOURCE_RELEASE",
+      "status": "PROVEN_BOUNDED",
+      "why": "Een bron geeft exact object, versie, scope, doel, geldigheid en withdrawalstatus vrij; de consumer kopieert geen bronwaarheid.",
+      "unlocks": [
+        "leerhuis",
+        "dom-les",
+        "dom-leerstof",
+        "dom-onderwijs",
+        "ov-bijles",
+        "rtf-leerpaspoort",
+        "dom-library",
+        "dom-boeken",
+        "ov-krant",
+        "dom-site",
+        "dom-eigendomein"
+      ],
+      "nextProof": "Nieuwe source owners blijven PHASE tot hun eigen versioned release en withdrawal zijn bewezen.",
+      "proof": [
+        "library-edition-to-academy"
+      ]
+    },
+    {
+      "order": 3,
+      "step": "P07_WORKFORCE_PROCESS_SEPARATION",
+      "status": "PHASE",
+      "why": "Alleen versioned processtate kan organizational learning voeden; menselijke prestatie, communicatie en loopbaan blijven afzonderlijk en private-first.",
+      "unlocks": [
+        "staff",
+        "dom-werkvloer",
+        "ov-kantoorgesprek",
+        "ov-werkmail",
+        "member-werk",
+        "carriereledger",
+        "supplier-apply",
+        "werving",
+        "vakbewijs",
+        "dom-metier",
+        "dom-vak"
+      ],
+      "nextProof": "Decomposeer eerst processtate en menselijke context; LC07 blokkeert persoonsgerichte organizational memory.",
+      "proof": []
+    },
+    {
+      "order": 4,
+      "step": "P11_EVENT_FEEDBACK_RELEASE",
+      "status": "PROVEN_BOUNDED",
+      "why": "Vrijwillige feedback is event- en purpose-bound en wordt pas na review/minimization een structurele eventles.",
+      "unlocks": [
+        "ontmoetingen",
+        "social",
+        "rtf-contacten",
+        "tickets",
+        "supplier-events",
+        "dom-agenda",
+        "dom-meet",
+        "bk-tickets",
+        "fs-terrein",
+        "fs-werk",
+        "fs-gast"
+      ],
+      "nextProof": "Andere event owners blijven PHASE tot hun eigen source version en no-disadvantage pad bestaan.",
+      "proof": [
+        "experience.living-world-contribution",
+        "workos.accessibility-procedure"
+      ]
+    },
+    {
+      "order": 5,
+      "step": "P02_VERSIONED_WORK_PROCESS_TARGET",
+      "status": "PHASE",
+      "why": "Een organisatorisch procesobject heeft stabiele lijn, immutable versie en bevoegde source change.",
+      "unlocks": [
+        "kantoorpakket",
+        "ondernemersos",
+        "office",
+        "bedrijf",
+        "command-zien",
+        "command-doen",
+        "command-besturen",
+        "zaakregie",
+        "zaakregie-beheer",
+        "dom-werkplek"
+      ],
+      "nextProof": "Kies per capability eerst een concreet, niet-persoonsgebonden procesobject.",
+      "proof": [
+        "workos.accessibility-procedure",
+        "workos.near-miss-runbook"
+      ]
+    },
+    {
+      "order": 6,
+      "step": "P03_ASSET_INTERVENTION_LIFECYCLE",
+      "status": "PHASE",
+      "why": "Issue, diagnose, interventie, assetversie en verificatie blijven bij het asset-/werelddomein en scheiden actor van asset history.",
+      "unlocks": [
+        "wereld",
+        "experience-platform",
+        "dom-plaats",
+        "ov-stad",
+        "vastgoed",
+        "verzorging",
+        "dom-thuis",
+        "dom-residentie",
+        "dom-home",
+        "dom-doos"
+      ],
+      "nextProof": "Asset authority, intervention versioning, retention en source receipt ontbreken; dom-doos is hier correct ondergebracht.",
+      "proof": []
+    },
+    {
+      "order": 7,
+      "step": "P04_VERSIONED_SERVICE_PROCEDURE",
+      "status": "PROVEN_BOUNDED",
+      "why": "Een bevoegde serviceowner wijzigt een concrete procedureversie en verifieert bij een volgende service-uitvoering.",
+      "unlocks": [
+        "gastos",
+        "supplier-haccp",
+        "supplier-pos",
+        "supplier-salon",
+        "supplier-rooms",
+        "bk-eten",
+        "service"
+      ],
+      "nextProof": "Hospitality- en leveranciersprocedures blijven source-specifiek PHASE.",
+      "proof": [
+        "service.process-improvement"
+      ]
+    },
+    {
+      "order": 8,
+      "step": "P09_TRAVEL_STRUCTURAL_LESSON",
+      "status": "PHASE",
+      "why": "Triprecall blijft Personal; alleen vrijwillig vrijgegeven, geminimaliseerde reisuitkomsten worden losgekoppelde structurele lessons.",
+      "unlocks": [
+        "avondos",
+        "arrival",
+        "instantreality",
+        "dom-reisbureau",
+        "bk-reizen",
+        "bk-verblijf",
+        "bk-reiswijzer"
+      ],
+      "nextProof": "Nog geen begrensde vrijwillige tripbron met locatie-minimization en toekomstig recallcontract.",
+      "proof": []
+    },
+    {
+      "order": 9,
+      "step": "P12_VERSION_BOUND_COMMONS_RELEASE",
+      "status": "PROVEN_ONE_SOURCE",
+      "why": "De source owner geeft object/versie, doel, audience, reuse, attribution, AI- en derivative scope expliciet vrij en kan withdraw/supersede uitgeven.",
+      "unlocks": [
+        "zakelijk",
+        "socialewereld",
+        "connect",
+        "dom-genootschap",
+        "salon",
+        "kern-waardering"
+      ],
+      "nextProof": "Geen generiek platformcontract zonder tweede semantisch gelijkwaardige source owner.",
+      "proof": [
+        "experience.living-world-commons-release"
+      ]
+    },
+    {
+      "order": 10,
+      "step": "P13_AI_PURPOSE_SCOPE",
+      "status": "PHASE",
+      "why": "Assistance, inference en training zijn afzonderlijke source-issued uses; AI-output behoudt epistemische herkomst en mutatieauthority.",
+      "unlocks": [
+        "oog",
+        "ghost",
+        "knelpunt",
+        "kern-rahul",
+        "ov-aandacht",
+        "stuur"
+      ],
+      "nextProof": "Training blijft constitutioneel deny; adapters wachten op concrete source-owned AI-use contracts.",
+      "proof": []
+    },
+    {
+      "order": 11,
+      "step": "P10_FOUNDATION_VOLUNTARY_LESSON",
+      "status": "PHASE",
+      "why": "Hulp en vrijwillige ervaringsbijdrage zijn afzonderlijke lifecycles; weigering heeft aantoonbaar geen behandel- of kansnadeel.",
+      "unlocks": [
+        "levenos",
+        "rugdekking",
+        "werk-rtf",
+        "dom-rtfkantoor",
+        "dom-rtfos"
+      ],
+      "nextProof": "Nog geen source-flow die no-disadvantage, withdrawal en organizational decision gezamenlijk bewijst.",
+      "proof": []
+    },
+    {
+      "order": 12,
+      "step": "P05_REVIEWED_FAILURE_ARTIFACT",
+      "status": "PHASE",
+      "why": "Een technische occurrence wordt pas na bevoegde review een minimale operationele les.",
+      "unlocks": [
+        "dom-foutmelder"
+      ],
+      "nextProof": "Technische reviewauthority, allowlist, tijdretentie, versioned change target en source outbox ontbreken.",
+      "proof": []
+    }
+  ],
+  "fixedPoint": {
+    "reached": true,
+    "implementedGo": 8,
+    "remainingPhase": 8,
+    "remainingStop": 8,
+    "reason": "Alle acht source-flows die zelfstandig alle stoppoorten halen zijn geïmplementeerd. Iedere resterende flow mist source-specifieke authority, retention, versioning/receipt/recovery, een menselijke of juridische beslissing, of bewezen schaalarchitectuur.",
+    "safeTechnicalWorkWithoutNewDecision": false
+  },
+  "stopStatement": "De 32 scale-blocked capabilities blijven STOP; deze roadmap bouwt geen distributed architecture."
+}

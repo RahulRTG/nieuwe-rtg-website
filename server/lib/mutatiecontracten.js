@@ -1,11 +1,9 @@
 /* ============================================================================
    DE BEDOELING PER SCHRIJFROUTE -- mensenwerk in het contractregister.
 
-   scripts/mutatiecontract.js leidt vier van de vijf assen af uit een bron: de
-   routes en hun deur uit de draaiende router, het duplicaatgedrag uit
-   ./idemsleutels.js, het bewijs uit IDEMPROEF.json. Wat een machine niet kan
-   waarnemen is de BEDOELING: of een tweede aanroep een dubbeltik is of een
-   tweede handeling, en of een open deur open HOORT te staan.
+   scripts/mutatiecontract.js leidt routes, deuren, duplicaatgedrag en bewijs
+   af. Alleen de BEDOELING blijft mensenwerk: is herhaling een dubbeltik of een
+   tweede handeling, en hoort een open deur open te staan?
 
    Dat staat hier, per route, met de reden erbij.
 
@@ -34,6 +32,8 @@
 'use strict';
 
 const CONTRACTEN = Object.assign({},
+  require('./mutatiecontracten-library').CONTRACTEN,
+  require('./mutatiecontracten-loop-fabric').CONTRACTEN,
   require('./mutatiecontracten-living-world').CONTRACTEN,
   require('./mutatiecontracten-mall-aanvraag').CONTRACTEN,
   require('./mutatiecontracten-beelden').CONTRACTEN,
@@ -114,8 +114,9 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-naleesronde-b').CONTRACTEN,
   require('./mutatiecontracten-naleesronde-c').CONTRACTEN,
   require('./mutatiecontracten-opvangwijzer').CONTRACTEN,
-  require('./mutatiecontracten-horeca-correctie').CONTRACTEN,
   require('./mutatiecontracten-inhaal').CONTRACTEN,
+  // horecacorrectie en de twee teruggaveloketten
+  require('./mutatiecontracten-teruggave').CONTRACTEN,
   /* De nazorg van een reisaanvraag: vier routes die samen de weg terug uit een
      toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,
@@ -146,8 +147,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-project-room').CONTRACTEN,
   // de zware poort: drie ceremonieloketten, met opzet niet herhaalbaar
   require('./mutatiecontracten-zwaar').CONTRACTEN,
-  /* Het eigenaarsherstel: zeven routes, per stuk beantwoord of een herhaling
-     een ander antwoord krijgt. Eigen bestand, zie de kop daar. */
+  // het eigenaarsherstel: zeven routes, zie de kop daar
   require('./mutatiecontracten-herstel').CONTRACTEN,
   require('./mutatiecontracten-kantoorstuur').CONTRACTEN,
   require('./mutatiecontracten-rtgboek').CONTRACTEN,

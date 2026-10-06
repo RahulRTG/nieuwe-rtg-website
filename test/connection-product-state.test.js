@@ -41,7 +41,8 @@ test('een eerste Rendez-vous-ja kan de introductie niet openen', () => {
 
 test('zonder wederzijdse call-consent en met implemented:false route ontstaan geen call- of routeacties', () => {
   const state = Vonk.match({ key: 'a', now: '2026-09-22T12:00:00.000Z', match: {
-    id: 'm1', a: 'a', b: 'b', status: 'bevestigd', tafel: { datum: '2026-09-22' }, betaald: {}, halfweg: { keuzes: {} }
+    id: 'm1', a: 'a', b: 'b', status: 'bevestigd', tafel: { datum: '2026-09-22' }, betaald: {}, halfweg: { keuzes: {} },
+    reservationEvidence: { state: 'CONFIRMED', finality: 'SOURCE_ATTESTED', missing: ['operational-outcome'] }
   } });
   const edge = ProductState.resolve({ actor: 'member', product: 'vonk', productState: state,
     access: { pass: 'member', verified: true, adult: true }, subject: 'a', context: { id: 'm1' } });
@@ -54,13 +55,31 @@ test('zonder wederzijdse call-consent en met implemented:false route ontstaan ge
 
 test('een bevestigde toekomstige Vonk-date projecteert alleen Date en Safety', () => {
   const state = Vonk.match({ key: 'a', now: '2026-09-22T12:00:00.000Z', match: {
-    id: 'm2', a: 'a', b: 'b', status: 'bevestigd', tafel: { datum: '2026-09-24' }, betaald: { a:true, b:true }, halfweg: { keuzes: {} }
+    id: 'm2', a: 'a', b: 'b', status: 'bevestigd', tafel: { datum: '2026-09-24' }, betaald: { a:true, b:true }, halfweg: { keuzes: {} },
+    reservationEvidence: { state: 'CONFIRMED', finality: 'SOURCE_ATTESTED', missing: ['operational-outcome'] }
   } });
   const edge = ProductState.resolve({ actor: 'member', product: 'vonk', productState: state,
     access: { pass: 'member', verified: true, adult: true }, subject: 'a', context: { id: 'm2' } });
   assert.equal(edge.state, 'DATE_CONFIRMED');
   assert.deepEqual(edge.actions.map(a => a.id), ['date', 'safety']);
   assert.ok(!edge.actions.some(a => ['chat', 'meet', 'voice', 'route'].includes(a.id)));
+});
+
+test('een statusstring zonder providerbevestiging opent nooit de Date-surface', () => {
+  for (const reservationEvidence of [
+    { state: 'UNKNOWN', finality: 'UNKNOWN', missing: ['provider-confirmation'] },
+    { state: 'CONFIRMED', finality: 'SOURCE_ATTESTED', missing: ['provider-confirmation'] }
+  ]) {
+    const state = Vonk.match({ key: 'a', now: '2026-09-22T12:00:00.000Z', match: {
+      id: 'm-onzeker', a: 'a', b: 'b', status: 'bevestigd', tafel: { datum: '2026-09-22' },
+      betaald: { a: true, b: true }, halfweg: { keuzes: {} }, reservationEvidence
+    } });
+    const edge = ProductState.resolve({ actor: 'member', product: 'vonk', productState: state,
+      access: { pass: 'member', verified: true, adult: true }, subject: 'a', context: { id: 'm-onzeker' } });
+    assert.equal(state.state, 'RESERVATION_UNKNOWN');
+    assert.equal(edge.surface, 'VONK_MATCH');
+    assert.ok(!edge.actions.some(action => action.id === 'date'));
+  }
 });
 
 test('Rendez-vous projecteert een echte Concierge-service maar geen automatische reservering', () => {

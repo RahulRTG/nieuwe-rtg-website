@@ -40,12 +40,14 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
   const opslag = require('./opslag')({ db });   // de enige db-aanraking; zie ./opslag.js
   const register = require('./register').RTG;
   const journaal = require('./journaal').maakJournaal({ db, save, crypto, opslag });
-  const beleid = require('./beleid').maakBeleid({ db, save, crypto, journaal, opslag });
-  const risico = require('../frictie').maakRisico({ beleid });
+  // de zware rechten eerst: beleid, toezicht en transactie lezen ze (vereist)
   const toegang = require('./toegang').maakToegang({ db, save, crypto, journaal, opslag });
+  const zwaar = toegang.vereist;
+  const beleid = require('./beleid').maakBeleid({ db, save, crypto, journaal, opslag, zwaar });
+  const risico = require('../frictie').maakRisico({ beleid });
   const zaken = require('./zaken').maakZaken({ db, save, crypto, journaal, beleid, opslag });
   const runbooks = require('./runbooks').maakRunbooks({ db, save, crypto, journaal, risico, beleid, register, opslag });
-  const toezicht = require('./toezicht').maakToezicht({ db, save, journaal, beleid, opslag });
+  const toezicht = require('./toezicht').maakToezicht({ db, save, journaal, beleid, opslag, zwaar });
   const operator = require('./operator').maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic, register, opslag });
   const puls = require('./puls').maakPuls({ db, runbooks, zaken, toezicht, journaal, beleid, register });
   const simulatie = require('./simulatie').maakSimulatie({ db, runbooks, zaken, beleid, risico, register });
@@ -86,7 +88,7 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
 
   /* HERSTEL ALS TRANSACTIE: het enige pad waarlangs de routes een recept
      draaien. Na de kaart: zijn voorcontrole leest die. */
-  const transactie = require('./transactie').maakTransactie({ db, runbooks, register, journaal, gezondheid });
+  const transactie = require('./transactie').maakTransactie({ db, runbooks, register, journaal, gezondheid, zwaar });
 
   /* DE CONFIGURATIETIJDLIJN: drie bestaande bronnen op één lijn, niets eigens. */
   const tijdlijn = require('./tijdlijn').maakTijdlijn({ db, journaal, opslag });

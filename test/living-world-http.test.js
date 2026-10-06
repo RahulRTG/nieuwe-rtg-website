@@ -62,7 +62,9 @@ test('HTTP: gesloten menselijke lus met betalingen, AI en push uit',async()=>{
   assert.equal((await view(tokenB)).plans[0].acknowledgedAt,null);
   p=(await action(tokenB,'plan.acknowledge',{id:p.id,revision:p.revision,consentImpact:true})).result;
   const contribution=(await action(tokenB,'contribution.create',{placeId:place,planId:p.id,kind:'knowledge',
-    title:'Ontmoetingsplek',text:'Spreek af bij de ingang van de haven.',observedAt:new Date().toISOString()})).result;
+    title:'Ontmoetingsplek',text:'Spreek af bij de ingang van de haven.',observedAt:new Date().toISOString(),
+    sharing:{visibility:'community',purpose:'world-memory',recipients:[],consent:true,returnUpdates:false,
+      release:{attribution:'World B',reuse:['read','cite'],aiScopes:[],derivativeScope:'denied'}}})).result;
   assert.equal((await view(tokenC)).contributions.length,0);
   let c=(await action(tokenA,'contribution.review',{id:contribution.id,revision:contribution.revision,
     decision:'accepted',reason:'Zelf gecontroleerd.'})).result;

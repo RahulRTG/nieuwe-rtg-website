@@ -64,7 +64,7 @@ test('vier eenmalige codes claimen atomair over twee PG/Redis-instances',
       const service = (pg, data) => {
         const db = { data, writable: true };
         const zaken = require('../server/kern/service/zaak')({ db, save() {}, crypto });
-        const machtigingen = require('../server/kern/service/machtiging')({ db, save() {}, crypto, zaken });
+        const machtigingen = require('../server/kern/service/machtiging')({ db, save() {}, crypto, zaken, inzagelog: { noteerVast: async () => ({ ok: true }) } });
         return { zaken, bev: require('../server/kern/service/bevestiging')({ db, save() {}, crypto, zaken, machtigingen,
           bewerkCollectie: bewerk(pg, data) }) };
       };

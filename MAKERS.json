@@ -1,10 +1,10 @@
 {
   "uitleg": "Gemeten met scripts/makers.js; de vraag en de methode staan in de kop van dat bestand en in CREATE.md par. 3. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist. De envelop is niet hier afgeleid maar overgenomen uit OBJECTMODEL.json.",
-  "vastgelegd": "2026-09-15",
+  "vastgelegd": "2026-10-04",
   "gemeten": {
     "makers": 8,
     "bestanden": 74,
-    "vormen": 19,
+    "vormen": 17,
     "paren": 28,
     "metGedeeldeKern": 1,
     "drempel": 0.6
@@ -14,7 +14,7 @@
       "id": "websitemaker",
       "naam": "Website-maker",
       "bestanden": 19,
-      "vormen": 7,
+      "vormen": 5,
       "talen": 9,
       "opslag": [
         "ledenSites",

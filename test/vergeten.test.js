@@ -105,7 +105,7 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
      rechtstreeks lezen wat er op schijf staat, zonder dat de test een
      databaseschema hoeft te kennen dat met elke functie kan veranderen. */
   kind = spawn(process.execPath, [SERVER], {
-    env: { ...process.env, NODE_ENV: 'test', PORT: String(PORT), RTG_DATA_DIR: TMP,
+    env: { ...process.env, NODE_ENV: 'test', RTG_BEZITSBEWIJS: 'aanbevolen', PORT: String(PORT), RTG_DATA_DIR: TMP,
       SMTP_URL: '', RTG_DEMO: '1', RTG_STORE: 'json' },
     // stderr naar 'pipe' zodat de strenge poort meeleest (zie helper.bewaakKind)
     stdio: ['ignore', 'ignore', 'pipe']

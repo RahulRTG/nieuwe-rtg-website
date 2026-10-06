@@ -67,6 +67,8 @@ module.exports = [
     uitleg: 'Hekken, toestemmingsvensters en waarnemingen; de motor draait op het toestel.', paden: ['/api/plaats'] },
 
   // ---------- cultuur, sport en gezelschap ----------
+  { id: 'dom-library', categorie: 'Cultuur en gezelschap', naam: 'Foundation LibraryOS kernel', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Besloten werken, afspraken, rechten en editiegebonden vrijgave; geen publieke catalogus of verkoop.', paden: ['/api/library'] },
   { id: 'dom-genootschap', categorie: 'Cultuur en gezelschap', naam: 'Het Genootschap', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Het besloten genootschap: kringen, bijeenkomsten en beheer.', paden: ['/api/genootschap'] },
   { id: 'dom-sport', categorie: 'Cultuur en gezelschap', naam: 'Sport', standaard: true, doelgroepen: ZAAK,

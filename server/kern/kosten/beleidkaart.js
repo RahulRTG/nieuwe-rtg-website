@@ -45,6 +45,7 @@ const BELEID = {
   zaak: { stand: 'inbegrepen', uitleg: 'Wat een zaak betaalt staat in zijn leverancierscontract; een tweede rekening ernaast zou daarmee botsen.' },
   gezin: { stand: 'rtfoundation', uitleg: 'De RTFoundation is gratis voor elk gezin. Het gezin ziet wat het kost; de RTFoundation betaalt.' },
   lab: { stand: 'rtfoundation', uitleg: 'Een lab van het Living Lab draait op de begroting van de RTFoundation. Het lab ziet tot op de cent wat het kost -- dat is precies wat een subsidiegever vraagt -- en de deelnemers krijgen er nooit een rekening voor.' },
+  dienst: { stand: 'huis', uitleg: 'Achtergrondwerk van een benoemde dienst van RTG: onze eigen rekening, apart geteld per dienst.' },
   huis: { stand: 'huis', uitleg: 'Verbruik zonder eigenaar: onze eigen rekening.' }
 };
 
@@ -58,6 +59,7 @@ const STANDEN = ['inbegrepen', 'doorbelasten', 'rtfoundation', 'huis'];
 const VAST = {
   lab: 'Een lab factureert zijn deelnemers niet. Onderzoek waarin de bewoner meebetaalt aan het onderzoek waaraan hij meedoet, is geen onderzoek maar een verkoop; die schakelaar hoort niet te bestaan.',
   gezin: 'De RTFoundation is gratis voor elk gezin. Dat is een belofte en geen instelling; wie dat wil veranderen verandert de RTFoundation, niet deze schakelaar.',
+  dienst: 'Een dienst van RTG werkt voor het huis. Zijn verbruik aan een gebruiker toewijzen zou een rekening zijn voor iets dat die gebruiker niet heeft gedaan.',
   huis: 'Verbruik zonder eigenaar is onze eigen rekening. Die aan een gebruiker toewijzen zou een rekening zijn voor iets dat hij niet heeft gedaan.'
 };
 

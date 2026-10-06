@@ -72,8 +72,13 @@ function pad() {
 function noteerUitvoering(aanbieder, plaats) {
   const c = huidig();
   if (!c) return;
+  /* Na afloop is het antwoord al weg en leest niemand dit label meer: geteld in
+     opzet/handeling.js in plaats van stil bewaard (I5). */
+  const h = c.req && c.req.handeling;
+  if (h && h.gesloten) { require('./opzet/handeling').naAfloopMeld('ai-context', aanbieder); return false; }
   if (!Array.isArray(c.uitvoering)) c.uitvoering = [];
   if (c.uitvoering.length < 50) c.uitvoering.push({ aanbieder: String(aanbieder || ''), plaats: String(plaats || '') });
+  return true;
 }
 
 const uitvoeringen = () => {

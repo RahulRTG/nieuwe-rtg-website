@@ -70,6 +70,17 @@ test('zonder --maak verandert er niets en zegt het script dat er geen eigenaar i
   assert.match(draai(map, []).tekst, /0 in de kluis/);
 });
 
+test('--eis-bestaand sluit een verse host en opent pas na aantoonbaar eigenaarschap', () => {
+  const map = versDatamap();
+  const leeg = draai(map, ['--eis-bestaand']);
+  assert.equal(leeg.code, 1, leeg.tekst);
+  assert.match(leeg.tekst, /niet aantoonbaar.*teruggelezen/);
+  assert.equal(draai(map, ['--maak', '--naam=Rahul Imran Ismail', '--geboren=1990-01-31']).code, 0);
+  const aanwezig = draai(map, ['--eis-bestaand']);
+  assert.equal(aanwezig.code, 0, aanwezig.tekst);
+  assert.match(aanwezig.tekst, /isEigenaar\(\)\s+JA/);
+});
+
 /* DE DIAGNOSE MOET HET OORDEEL VAN DE DEUR HERHALEN, NIET EEN EIGEN VERSIE.
 
    Deze twee toetsen bestaan omdat het script anders een geruststelling wordt: met

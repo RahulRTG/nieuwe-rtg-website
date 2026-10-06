@@ -14,6 +14,7 @@
    Alleen https. Een loontabel over een onbeveiligde lijn is geen loontabel: wie
    ertussen zit, bepaalt wat honderden mensen krijgen uitbetaald. */
 'use strict';
+const { keurBronUrl } = require('./bronophalen');
 
 module.exports = ({ opslag, save, tijd }) => {
   const norm = (l) => String(l || 'NL').toUpperCase();
@@ -32,6 +33,13 @@ function zetBron(land, bron, door) {
   const url = String((bron && bron.url) || '').trim();
   if (!/^https:\/\/[^\s]+$/i.test(url))
     return { status: 400, error: 'Een bron is een https-adres dat een regelpakket als JSON teruggeeft.' };
+  /* Het open internet en niets anders (RTG-V1-RELEASE C5). De ronde haalt dit
+     adres op met de rechten van de server; een bron op 169.254.169.254 of 10.x
+     laat ons eigen netwerk uitlezen. De keuring staat in ./bronophalen.js,
+     en ./bijwerken.js gebruikt dezelfde bij het ophalen. */
+  const reden = keurBronUrl(url);
+  if (reden)
+    return { status: 400, error: 'Een bron hoort op het open internet te staan (' + reden + '). Een intern adres laten ophalen is een deur naar ons eigen netwerk.' };
   if (!door) return { status: 400, error: 'Noteer wie deze bron toevoegt.' };
   const rij = bronbak()[l] = bronbak()[l] || [];
   const bestaand = rij.find(b => b.url === url);

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-04T13:27:32.216Z",
-    "commit": "5b3772f58",
+    "op": "2026-10-04T05:42:46.727Z",
+    "commit": "8ca7c863",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 0,
     "instrument": "scripts/plaatsvorm.js",
-    "node": "v24.18.0"
+    "node": "v22.22.0"
   },
   "uitleg": "Wat verstaat RTG onder een plaats? Elke objectvorm die een plaats draagt, per domein, over drie assen: de vorm (gedeelde velden), de woordenschat (hoeveel manieren om een punt te schrijven) en de aspecten (etiket, zichtbaarheid, toestand, bewijs, termijn naast de plek). Gemeten met de lezer van scripts/objectmodel.js.",
   "graad": "vermoed",
@@ -52,7 +52,7 @@
         "school"
       ],
       "vorm": {
-        "velden": 176,
+        "velden": 175,
         "inAlleDomeinen": [],
         "inMinstensHelft": 0,
         "inEenDomeinPct": 90.3

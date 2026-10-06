@@ -40,8 +40,16 @@ test('de client gebruikt uitsluitend tijdelijke Vonk-fototickets', () => {
 test('Vonk-fasen onderscheiden match, gesprek, bevestigde en actieve date', () => {
   assert.equal(Vonk.fase({}, '2026-09-22'), 'MATCH');
   assert.equal(Vonk.fase({ berichten:[{ tekst:'Hoi' }] }, '2026-09-22'), 'CONVERSATION');
-  assert.equal(Vonk.fase({ status:'bevestigd', tafel:{ datum:'2026-09-24' } }, '2026-09-22'), 'DATE_CONFIRMED');
-  assert.equal(Vonk.fase({ status:'bevestigd', tafel:{ datum:'2026-09-22' } }, '2026-09-22'), 'DATE_ACTIVE');
+  const bewijs={ state:'CONFIRMED', finality:'SOURCE_ATTESTED', missing:['operational-outcome'] };
+  assert.equal(Vonk.fase({ status:'bevestigd', reservering:bewijs,
+    tafel:{ datum:'2026-09-24' } }, '2026-09-22'), 'DATE_CONFIRMED');
+  assert.equal(Vonk.fase({ status:'bevestigd', reservering:bewijs,
+    tafel:{ datum:'2026-09-22' } }, '2026-09-22'), 'DATE_ACTIVE');
+  assert.equal(Vonk.fase({ status:'bevestigd', reservering:{ state:'CONFIRMED',
+    missing:['provider-confirmation'] }, tafel:{ datum:'2026-09-22' } }, '2026-09-22'),
+  'RESERVATION_UNKNOWN');
+  assert.equal(Vonk.fase({ status:'bevestigd', reservering:{ state:'UNKNOWN', missing:[] },
+    tafel:{ datum:'2026-09-22' } }, '2026-09-22'), 'RESERVATION_UNKNOWN');
 });
 
 test('gesprekstarters gebruiken uitsluitend geprojecteerde matchvelden', () => {

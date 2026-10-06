@@ -1,15 +1,14 @@
 /* DE REISUITNODIGING -- een klaargezette reis en een eenmalige bearer-link.
 
-   De link geeft nooit een pas en bewaart geen schaduwprofiel. De code zelf is
+   De link geeft nooit een pas en bewaart geen schaduwprofiel. De code is
    128 bits, verlaat alleen de uitgifte en staat daarna uitsluitend als hash in
    reisUitnodigingen. Controle, claim, intrekking en rotatie lopen door dezelfde
    collectietransactie. De overdracht naar reisInvoer is een herstelbare saga:
    eerst wordt de code exclusief aan dit lid geclaimd, daarna schrijft
    invoer.neemOver idempotent op uitnodigings-id, en pas dan wordt de claim
-   voltooid. Een crash kan daardoor worden hervat door hetzelfde lid en nooit
-   door een tweede lid.
+   voltooid. Een crash hervat daardoor hetzelfde lid en nooit een tweede.
 
-   Er gaan geen bestanden mee. Alleen gelezen reisregels worden overgenomen;
+   Er gaan geen bestanden mee; alleen gelezen reisregels gaan over, en
    bewijsstukken blijven in de kluis van hun eigenaar. */
 'use strict';
 const klok = require('../lib/klok');
@@ -145,7 +144,7 @@ module.exports.maakReisuitnodiging = ({ db, save, bewerkCollectie, crypto, invoe
       do {
         gemaakt = bearer.maak({ prefix: 'REIS', issuer: doorWie || door,
           doel: DOEL, scope: SCOPE, onderwerp: { soort: 'reisuitnodiging', id },
-          geldigMs: DAGEN_GELDIG * 86400000, maxGebruik: 1 });
+          geldigheid: { duurMs: DAGEN_GELDIG * 864e5 }, gebruik: { max: 1 }, afgeleid: 'geen' });
       } while (Object.values(bron).some(x => x && x.toegang && x.toegang.code_hash === gemaakt.toegang.code_hash));
       const u = { id, soort, door, doorCodenaam: doorCodenaam || null, doorWie: doorWie || null,
         bestemming: (rij.find(o => o.bestemming) || {}).bestemming || '',

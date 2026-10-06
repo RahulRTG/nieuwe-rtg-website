@@ -619,7 +619,13 @@ async function beoordeelWeigeringen(page, weigering, gezegd, serverfout) {
 
    Streng met opzet: pas als ALLE 45 meetpunten van de knop (na hem in beeld te
    schuiven, zoals een mens scrolt) op de schil vallen. Een knop die half
-   bedekt is, is nog aan te tikken en blijft een zaak voor de gewone tik. */
+   bedekt is, is nog aan te tikken en blijft een zaak voor de gewone tik.
+
+   EN HIJ SCROLT DIRECT, NIET GLAD (6 oktober 2026). Een scherm met
+   `scroll-behavior: smooth` laat scrollIntoView ANIMEREN, en deze functie mat
+   meteen daarna: de knop stond dan nog op zijn oude plek, onder de balk. Zo
+   meldde de meting op os-portaal.html vier "bedekte" tegels die na de animatie
+   vrij lagen (0 van 45 meetpunten). `behavior: 'instant'` gaat boven de CSS. */
 async function bedektDoorSchil(page) {
   try {
     return await page.evaluate(() => {
@@ -631,7 +637,7 @@ async function bedektDoorSchil(page) {
       const knoppen = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
         .filter(zie).filter((el) => !el.closest(SCHIL) && !el.closest('#rtg-lang-modal'));
       for (const el of knoppen) {
-        el.scrollIntoView({ block: 'center', inline: 'center' });
+        el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' });
         const r = el.getBoundingClientRect();
         let punten = 0, onderSchil = 0, door = null;
         for (let a = 1; a < 10; a++) for (let c = 1; c < 6; c++) {
@@ -646,7 +652,7 @@ async function bedektDoorSchil(page) {
           uit.push((el.innerText || el.getAttribute('aria-label') || el.title || '(naamloos)').trim().replace(/\s+/g, ' ').slice(0, 30) + ' onder ' + door);
         }
       }
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       return uit;
     });
   } catch (e) { return []; }
@@ -812,7 +818,7 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { onderschepper, weigerZin, rijen, maakContext, bezoek, bedien, POORTEN };
+module.exports = { onderschepper, weigerZin, rijen, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN };
 
 if (require.main === module) (async () => {
   /* Een gefilterde ronde vergelijken met het VOLLEDIGE register telt appels bij

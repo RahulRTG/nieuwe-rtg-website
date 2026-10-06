@@ -7,7 +7,7 @@
    Elke handeling vraagt een NAAM (`door`). Een kantoorsessie is een code en geen
    mens; zonder naam is er straks een besluit waar niemand bij hoorde. */
 module.exports = (kern) => {
-  const { app, officeAuth, appstore } = kern;
+  const { app, officeAuth, kluisAuth, appstore } = kern;
 
   const antwoord = (res, r) => (r && r.error) ? res.status(r.status || 400).json(r) : res.json(r);
   const naam = (req) => String(req.body.door || '').trim().slice(0, 80);
@@ -93,9 +93,16 @@ module.exports = (kern) => {
     res.json({ open: geld().openRechten(),
       let: 'Een ingetrokken app die iemand had gekocht, laat een recht achter. Terugbetalen of afwijzen is een besluit van een mens; er gebeurt hier niets vanzelf.' });
   });
-  app.post('/api/appstore/kantoor/teruggave', officeAuth, async (req, res) => {
+  /* WIE BETAALT TERUG, uit de SESSIE en nooit uit het lijf. Hier stond
+     `door: naam(req)` -- een vrij invulveld, zodat iedereen met de gedeelde
+     kantoorcode elke naam onder een geldbesluit kon zetten. De actor van een
+     handeling die geld beweegt komt uit de sessie (AUTHORITY.md, P0b), dus
+     deze deur staat achter kluisAuth: de gedeelde code komt er niet door
+     (403, inloggen-op-naam), een kantoormens op naam wel. Een `door` in het
+     lijf wordt genegeerd. */
+  app.post('/api/appstore/kantoor/teruggave', kluisAuth, async (req, res) => {
     if (!geld()) return geenGeld(res);
     antwoord(res, await geld().rechtDoe({ id: req.body.id, besluit: String(req.body.besluit || ''),
-      reden: req.body.reden, door: naam(req), idem: req.body.idem }));
+      reden: req.body.reden, door: req.officeKey, idem: req.body.idem }));
   });
 };

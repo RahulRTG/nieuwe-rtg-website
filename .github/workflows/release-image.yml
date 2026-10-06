@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   packages: write
 
 jobs:
@@ -42,6 +43,15 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: npm
+      # De kandidaat mag zijn eigen groene software-afbouw niet gebruiken om de
+      # voorafgaande onafhankelijke poorten te vervangen. Deze stap leest alleen
+      # GitHub Actions-metadata van exact dezelfde commit en schrijft het dossier
+      # dat later door BUILD aan beide image-digests wordt gebonden.
+      - name: Exacte voorafgaande workflowbewijzen binden
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RTG_RELEASE_EXPECTED_COMMIT: ${{ github.sha }}
+        run: node scripts/release-workflow-bewijs.js
       - name: Ondertekeningsrollen vóór bouw bewijzen
         env:
           RTG_RELEASE_SIGN_KEY: ${{ secrets.RTG_RELEASE_SIGN_KEY }}
@@ -82,6 +92,7 @@ jobs:
             .release/release-gate-bewijs.json
             .release/staging-bewijs.json
             .release/afbouwoordeel.json
+            .release/prerelease-workflows.json
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 90
@@ -185,6 +196,7 @@ jobs:
             .release/herkomst.json
             .release/herkomst-backup.json
             .release/bron-release-bewijs.json
+            .release/prerelease-workflows.json
             .release/image-release-bewijs.json
             .release/ci-suite.json
             .release/ci-pg-bewijs.json
@@ -192,5 +204,6 @@ jobs:
             .release/release-gate-bewijs.json
             .release/staging-bewijs.json
             .release/afbouwoordeel.json
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 90

@@ -10,12 +10,10 @@
    van de app praat alleen met db.data en de helpers hieronder; welke motor er
    onder draait merkt ze niet.
 
-   Deze module is opgesplitst: ./state (de gedeelde levende staat), ./merge (de
-   3-weg samenvoeging), ./opslag (bestandslaag), ./snapshot (het write-behind
-   volledige-snapshot-schrijven), ./sqlite en ./postgres (de motoren), ./gidsen
-   (grootboek van zaken + ledengids) en ./tx (transactie-index + grootboek).
-   Hier de load/save-orchestratie, het aanzetten van de opslag en het samenstellen
-   van de publieke API. */
+   Opgesplitst in ./state (levende staat), ./merge (3-weg), ./opslag (bestanden),
+   ./snapshot (write-behind), ./sqlite en ./postgres (motoren), ./gidsen (zaken +
+   ledengids) en ./tx (transactie-index + grootboek). Hier de load/save-
+   orchestratie, het aanzetten van de opslag en de publieke API. */
 const verraadfase = require('../lib/verraadfase');
 const effectmeter = require('../effectmeter');
 const state = require('./state');
@@ -49,8 +47,9 @@ const { load, startSqliteSync } = require('./starten')({ save });
 const { flushBijAfsluiten, opslagKlaar } = require('./afsluiten');
 const { planSnapshot } = snapshot;
 
-// De oude terugval-API save(['collectie']) blijft gericht.
-function save(sleutels) { return bewaar(sleutels); }
+/* save(collecties) is dezelfde gerichte weg als save.sleutels(collecties);
+   zonder argument blijft het de volledige save. */
+function save(collecties) { return collecties === undefined ? bewaar() : save.sleutels(collecties); }
 // Expliciete schrijvers hoeven niet bij iedere auditregel de hele wereld te scannen.
 save.sleutels = keys => {
   if (!Array.isArray(keys) || !keys.length || keys.some(k => typeof k !== 'string' || !Object.hasOwn(db.data, k)))
@@ -121,7 +120,7 @@ function bewaar(sleutels, auditOp) {
     postgres.planSave();
   } else if (STORE === 'sqlite') {
     // SQLite: kruisproces-sync via versienummers en de poll (geen Redis-mirror).
-    sqlite.saveSqlite(false, sleutels, auditOps);
+    sqlite.saveSqlite(Boolean(sleutels), sleutels, auditOps);
   } else if (STORE === 'geheugen') {
     // GEHEUGEN: versleutelde, incrementele brok-per-collectie-opslag (write-behind).
     geheugen.saveGeheugen();

@@ -7,6 +7,8 @@ const spec = () => ({title:'North Sea Wreck Day',summary:'Een gezamenlijk voorbe
   requirements:['Organisator controleert geschiktheid voor deze uitvoering'],
   steps:[{kind:'learn',text:'Bespreek uw voorbereiding'},{kind:'equipment',text:'Controleer de uitrusting'}],
   mediaRef:'video:owned',remixAllowed:true});
+const commonsSharing = (purpose='world-memory') => ({visibility:'community',purpose,recipients:[],consent:true,
+  returnUpdates:false,release:{attribution:'Community contributor',reuse:['read','cite'],aiScopes:[],derivativeScope:'denied'}});
 function fixture(previous) {
   const db = {data:previous || {}};
   let t = '2026-10-01T10:00:00.000Z', seq = 0, failSave = false, media = true, context = {};
@@ -47,4 +49,4 @@ function fixture(previous) {
   return {db,world,command,row,setup,preparePlan,complete,spec,
     clock:v=>{t=v;},time:()=>t,context:v=>{context=v;},failSave:v=>{failSave=v;},media:v=>{media=v;}};
 }
-module.exports = {fixture,spec};
+module.exports = {fixture,spec,commonsSharing};

@@ -17,6 +17,7 @@ const path = require('path');
 const config = require('../server/config');
 const foundationVrijgave = require('../server/config/foundation-vrijgave');
 const accountDuurzaamheid = require('../server/accounts/duurzaamheid');
+const liveKandidaat = require('./lib/live-kandidaat');
 const RELEASE = path.join(__dirname, '..', '.release');
 const RAPPORT = path.join(RELEASE, 'golive-bewijs.json');
 /* De live-wrapper draait deze keuring bewust in de read-only app-container en
@@ -31,6 +32,7 @@ const uit = [];
 const blokkeer = (t) => uit.push(['✗', t, true]);
 const waarschuw = (t) => uit.push(['⚠', t, false]);
 const goed = (t) => uit.push(['✓', t, false]);
+let ownerReadback = null;
 
 /* .env.productie inlezen (alleen KEY=waarde-regels; # is commentaar). */
 function leesEnvBestand(pad) {
@@ -107,6 +109,32 @@ function leesEnvBestand(pad) {
   else goed('B2B2C-identiteit: accountmutaties zijn gedeeld en transactioneel duurzaam.');
   if (env.RTG_OWNER_BOOTSTRAP)
     blokkeer('RTG_OWNER_BOOTSTRAP staat nog in de productieomgeving. Gebruik hem uitsluitend voor de eerste eigenaarsregistratie en verwijder hem vóór go-live.');
+  else {
+    const bewijsPad = env.RTG_OWNER_READBACK_PROOF_FILE ||
+      (fs.existsSync('/run/rtg-release/owner-readback-bewijs.json')
+        ? '/run/rtg-release/owner-readback-bewijs.json'
+        : path.join(RELEASE, 'owner-readback-bewijs.json'));
+    try {
+      const bewijs = liveKandidaat.controleerOwnerReadbackBestand(bewijsPad, {
+        commit:String(env.RTG_RELEASE_COMMIT || '').toLowerCase(),
+        imageId:String(env.RTG_OWNER_IMAGE_ID || ''),
+        imageImmutable:String(env.RTG_OWNER_IMAGE_IMMUTABLE || ''),
+        eisVers:true
+      });
+      ownerReadback = { formaat:bewijs.formaat, commit:bewijs.commit, imageId:bewijs.imageId,
+        bewijsSha256:bewijs.bewijsSha256,
+        postgresReadback:bewijs.database.directAuthoritativeReadback,
+        directReadOnly:bewijs.database.readOnlyMeasurement,
+        ownerAuthorized:bewijs.database.ownerAuthorized,
+        ownerEmailSha256:bewijs.database.ownerEmailSha256,
+        databaseIdentitySha256:bewijs.database.identitySha256,
+        databaseSnapshotSha256:bewijs.database.snapshotSha256,
+        observedAt:bewijs.database.observedAt, validUntil:bewijs.geldigTot };
+      goed('Eigenaar: vers en alleen-lezen uit de echte productie-PostgreSQL teruggelezen.');
+    } catch (e) {
+      blokkeer('Eigenaar is niet vers uit productie-PostgreSQL voor dit kandidaatimage aangetoond: ' + e.message);
+    }
+  }
   /* Een server kan veilig draaien met alle geldwegen dicht. Dat maakt de
      configuratie geldig, maar niet de volledige B2B2C-operatie productieklaar.
      Deze drie punten zijn daarom een GO-LIVE-poort en geen startvoorwaarde:
@@ -246,7 +274,11 @@ function leesEnvBestand(pad) {
        eigenaar gezet is en niet op het voorbeeld staat. */
     goed('Eigenaar van de technische pagina: ' + maskerEmail(env.RTG_OWNER_EMAIL));
 
-  // 6. kantoorcode en -TOTP: in productie genegeerd (B10/B24, 4 okt 2026)
+  // 6. de productiedeur van de backoffice. De gedeelde code/TOTP-combinatie
+  //    bestaat hier niet: productiedeur.js accepteert alleen een medewerker op
+  //    naam met een verse passkeyceremonie en valt nooit op de codedeur terug.
+  goed('Backoffice opent in productie uitsluitend op naam, met een verse passkey; de gedeelde code/TOTP-deur is gesloten.');
+  //    Kantoorcode en -TOTP: in productie genegeerd (B10/B24, 4 okt 2026).
   if (env.OFFICE_CODE || env.OFFICE_TOTP_SECRET) waarschuw('OFFICE_CODE/-TOTP_SECRET genegeerd (B10/B24).');
 
   // 7. Magnaat Test en de verouderde snelle testinlog mogen nooit op de echte
@@ -331,6 +363,7 @@ function leesEnvBestand(pad) {
     gedeeldeMedia,
     alarmering,
     accounts: accountStand,
+    ownerReadback,
     foundation: foundationStand,
     controles: uit.map(([teken, tekst, hard]) => ({ teken, hard: !!hard, tekst: zonderGeheim(tekst) }))
   };

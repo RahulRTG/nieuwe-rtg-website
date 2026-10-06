@@ -25,6 +25,24 @@ if (publiek) {
 const motorSleutelPad = path.resolve(ROOT, process.env.RTG_MOTOR_STATE_KEY_SECRET_FILE ||
   live.RTG_MOTOR_STATE_KEY_SECRET_FILE || '.rtg-secrets/motor_state_key');
 
+function symbolischeComponent(pad) {
+  const absoluut = path.resolve(pad);
+  const ontleed = path.parse(absoluut);
+  const delen = absoluut.slice(ontleed.root.length).split(path.sep).filter(Boolean);
+  let huidig = ontleed.root;
+  for (let i = 0; i < delen.length; i += 1) {
+    huidig = path.join(huidig, delen[i]);
+    if (!fs.lstatSync(huidig).isSymbolicLink()) continue;
+    /* macOS publiceert deze drie vaste, door het systeem beheerde aliassen
+       naar /private. Ze zijn geen door de RTG-operator verwisselbare
+       padcomponent en mogen een legitiem volume onder /var niet blokkeren. */
+    const macOsSysteemAlias = process.platform === 'darwin' && i === 0 &&
+      new Set(['var', 'tmp', 'etc']).has(delen[i]);
+    if (!macOsSysteemAlias) return huidig;
+  }
+  return null;
+}
+
 function rechten(pad, geheim) {
   try {
     const mode = fs.statSync(pad).mode & 0o777;
@@ -92,6 +110,46 @@ if (publiek) {
     fouten.push('RTG_PUBLISH_HOST moet publiek binden (0.0.0.0 of ::); nu: ' + (live.RTG_PUBLISH_HOST || 'leeg') + '.');
   if (String(live.RTG_PUBLISH_PORT || '') !== '443' || String(live.RTG_CONTAINER_PORT || '') !== '443')
     fouten.push('De live-poorten moeten RTG_PUBLISH_PORT=443 en RTG_CONTAINER_PORT=443 zijn.');
+  const papierenHostDir = String(live.RTG_PAPIEREN_HOST_DIR || '').trim();
+  if (!papierenHostDir) fouten.push('RTG_PAPIEREN_HOST_DIR ontbreekt; wijs hem naar de aparte compliance-map uit live:init.');
+  else {
+    const papierenDir = path.resolve(ROOT, papierenHostDir);
+    const papierenPad = path.join(papierenDir, 'papieren.json');
+    try {
+      /* Dit pad wordt straks als schrijfbare host-bind in de app gehangen.
+         `statSync` volgt symlinks en kon daardoor een keurig ogende 0700-map
+         goedkeuren terwijl Compose in werkelijkheid een ander (mogelijk veel
+         breder) hostpad mountte. Ook een symlink in een oudercomponent telt:
+         de geconfigureerde authority boundary moet letterlijk dezelfde map
+         zijn als de kernel uiteindelijk opent. Een mountpoint is geen symlink
+         en blijft gewoon geldig. */
+      const gekoppeldeComponent = symbolischeComponent(papierenDir);
+      if (gekoppeldeComponent)
+        throw new Error('de compliance-map of een ouderpad is een symbolische koppeling');
+      const dirStat = fs.lstatSync(papierenDir);
+      if (!dirStat.isDirectory()) fouten.push(papierenDir + ' is geen compliance-map.');
+      else {
+        fs.accessSync(papierenDir, fs.constants.R_OK | fs.constants.W_OK);
+        if (process.platform !== 'win32' && (dirStat.mode & 0o077))
+          fouten.push(papierenDir + ' is te breed toegankelijk; vereist 700.');
+      }
+      const bestandStat = fs.lstatSync(papierenPad);
+      if (bestandStat.isSymbolicLink())
+        throw new Error('papieren.json is een symbolische koppeling');
+      if (!bestandStat.isFile()) fouten.push(papierenPad + ' is geen gewoon bestand.');
+      else {
+        fs.accessSync(papierenPad, fs.constants.R_OK | fs.constants.W_OK);
+        if (process.platform !== 'win32' && (bestandStat.mode & 0o077))
+          fouten.push(papierenPad + ' is te breed leesbaar; vereist 600.');
+        const inhoud = JSON.parse(fs.readFileSync(papierenPad, 'utf8'));
+        if (!inhoud || typeof inhoud !== 'object' || !inhoud.antwoorden || typeof inhoud.antwoorden !== 'object')
+          fouten.push(papierenPad + ' heeft geen geldig antwoordenregister.');
+      }
+    } catch (e) {
+      fouten.push('Aparte compliance-opslag ontbreekt, is ongeldig of niet lees/schrijfbaar: ' +
+        papierenPad + ' (' + String(e && e.message || e).slice(0, 180) + '). Draai live:init of herstel dit bestand.');
+    }
+  }
   const backupDir = String(live.RTG_BACKUP_HOST_DIR || '');
   if (!path.isAbsolute(backupDir)) fouten.push('RTG_BACKUP_HOST_DIR moet een absolute map op een afzonderlijke schijf/mount zijn.');
   else {
@@ -118,8 +176,10 @@ if (publiek) {
   catch (e) { fouten.push('Publiek back-upcertificaat ontbreekt of is ongeldig: ' + certPad + '.'); }
   if (!env.ERR_WEBHOOK_URL)
     waarschuwingen.push('Geen ERR_WEBHOOK_URL: de externe GitHub-sonde merkt totale uitval, maar interne fouten melden dan alleen op het techniekbord.');
-  if (!env.TURN_URL || !env.TURN_SECRET)
-    waarschuwingen.push('TURN_URL/TURN_SECRET ontbreken: videobellen werkt via eigen STUN, maar niet gegarandeerd door strenge 4G/bedrijfsfirewalls.');
+  /* TURN wordt niet nogmaals los als waarschuwing gekeurd. De gedeelde
+     productieconfiguratie hierboven blokkeert publieke voice/video wanneer de
+     volledige relay-authenticatie ontbreekt; zo kunnen hostpoort en runtime
+     nooit een verschillend oordeel geven. */
 }
 
 console.log('\n=== RTG ' + (publiek ? 'publieke live-keuring' : 'self-host-keuring') + ' ===\n');

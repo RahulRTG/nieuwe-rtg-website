@@ -16,6 +16,7 @@
    "ONBEKEND" IS GEEN "SLAPEND". Een zetel zonder datum is pas slapend als deze
    meting zelf al 90 dagen loopt; daarvoor weten we het niet. */
 'use strict';
+const { losVanVerzoek } = require('../../lib/losvanverzoek');
 
 const BEWAAR_DAGEN = 90;
 const DAG = 86400000;
@@ -51,7 +52,7 @@ function maakSlapend({ bak, kijk, save, bewerkCollectie, nu }) {
   }
   function plan() {
     if (zetter) return;
-    zetter = setTimeout(() => { zetter = null; try { spoel(); } catch (e) { /* een meting houdt niets tegen */ } }, SPOEL_MS);
+    zetter = losVanVerzoek(setTimeout, () => { zetter = null; try { spoel(); } catch (e) { /* een meting houdt niets tegen */ } }, SPOEL_MS);
     if (zetter.unref) zetter.unref();
   }
 

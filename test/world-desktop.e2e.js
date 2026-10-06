@@ -32,6 +32,15 @@ test.before(async () => {
   note = (await post('/api/notities/mijn')).eigen.find(x => x.titel === 'Desktop taken');
 });
 test.after(async () => { if (browser) await browser.close(); if (srv) await stop(srv.child); });
+// De ster verschijnt pas bij hover of focus op de kaart. Een muisklik zakte in CI
+// op die verschijnwissel (scrollen haalde de hover weg); het toetsenbord is de
+// stabiele weg en bedient dezelfde knop: focus op de kaart, Tab naar de ster, Enter.
+const speld = async (page, id) => {
+  await page.locator(`.wd-library [data-widget="${id}"] .wd-widget-open`).focus();
+  await page.keyboard.press('Tab');
+  await page.waitForFunction(i => document.activeElement && document.activeElement.matches(`.wd-library [data-widget="${i}"] .wd-widget-pin`), id);
+  await page.keyboard.press('Enter');
+};
 test('four desktop worlds use one composition and one Edge; the mobile home stays usable', { skip }, async () => {
   const ctx = await context(null), page = await ctx.newPage(), errors = []; letOpFouten(page, errors);
   try {
@@ -176,8 +185,7 @@ test('Foundation widgets read the chosen family profile without a paid member ac
     assert.match(await page.locator('.wd-favorites [data-widget="foundation-agenda"]').innerText(), /Samen wandelen/);
     await page.locator('.wd-app-controls>summary').click();
     await page.locator('#wdSearch').fill('schrijven');
-    await page.locator('.wd-library [data-widget="foundation-schrijven"]').hover();
-    await page.locator('.wd-library [data-widget="foundation-schrijven"] .wd-widget-pin').click();
+    await speld(page, 'foundation-schrijven');
     for (const id of ['foundation-leren', 'foundation-schrijven']) {
       await page.waitForSelector('.wd-favorites [data-widget="' + id + '"] [data-state="ready"]');
     }

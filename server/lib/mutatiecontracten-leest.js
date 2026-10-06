@@ -115,7 +115,7 @@ const CONTRACTEN = Object.assign(Object.fromEntries([
     nagekeken: 'met de hand, 2026-09-06: server/routes/office/mensdeur.js roept alleen ' +
       'kern.mensdeurStand() aan, en server/kern/kantoor/mensdeur.js stand() leest via ' +
       'eigen.kijk() -- lezen zonder scheppen, geen save(), geen toewijzing. De schrijfweg ' +
-      'van die module (tel) hangt aan res.on("finish") en is een andere ingang',
+      'van die module (tel) hangt aan de finish-haak en is een andere ingang',
     afgetekend: { door: 'Claude (Opus 5), handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-06' }
   },
   'POST /api/metier/zoek': {

@@ -87,6 +87,21 @@ test('een gezakt servicedoel gaat af, met de naam erbij', () => {
   assert.equal(seinen.length, 1, 'en er gaat een sein naar het bord');
 });
 
+test('gezakt of verouderd capabilitybewijs alarmeert zonder onbekende startstand', () => {
+  const rood = maak(Object.assign({}, RUSTIG, { slo: { doelen: [], capabilities: [
+    { capability: 'payment.authorize', oordeel: 'niet gehaald', reasons: ['AVAILABILITY_TARGET_MISSED'],
+      availability: { eligible: 200 } },
+    { capability: 'reservation.request', oordeel: 'onvoldoende gemeten',
+      reasons: ['STALE_MEASUREMENTS'], availability: { eligible: 25 } },
+    { capability: 'outcome.observe', oordeel: 'onvoldoende gemeten',
+      reasons: ['STALE_MEASUREMENTS'], availability: { eligible: 0 } }
+  ] } })).alarm.controles();
+  assert.match(rood.find(x => x.id === 'capability-gezakt').wat, /payment\.authorize/);
+  assert.match(rood.find(x => x.id === 'capability-verouderd').wat, /reservation\.request/);
+  assert.equal(rood.some(x => /outcome\.observe/.test(x.wat)), false,
+    'een capability zonder eerste meting veroorzaakt geen vals verouderingsalarm');
+});
+
 test('een lopend alarm piept niet elke ronde opnieuw', () => {
   /* DE KERN. Een melding die elke ronde terugkomt, leert mensen om hem weg te
      klikken -- en dan is de volgende, echte melding ook weg. */

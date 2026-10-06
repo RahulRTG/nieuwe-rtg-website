@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **226** in 17 categorieën |
-| Apps in de leden-catalogus | **89** in 8 categorieën |
+| Functieschakelaars (aan/uit per functie) | **228** in 17 categorieën |
+| Apps in de leden-catalogus | **90** in 8 categorieën |
 | Bedrijfsgenres | **79** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2563** |
-| App-pagina's (`public/apps/**.html`) | **315** |
-| Testbestanden | **2340** |
+| Kernmodules (`server/kern/**`) | **2674** |
+| App-pagina's (`public/apps/**.html`) | **316** |
+| Testbestanden | **2435** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 226 functieschakelaars
+# 1. De 228 functieschakelaars
 
 ### Leden (RTG-app) — 27
 
@@ -263,7 +263,7 @@ ook blokkeert.
 - **Regie: rechtzetten & regels** (`zaakregie-beheer`) — Administratieve drift rechtzetten, een ronde terugdraaien, de eigen grenzen zetten en het spoor van de zaak lezen.  
   _voor: leverancier_
 
-### RTG-Backoffice — 7
+### RTG-Backoffice — 8
 
 - **Backoffice (algemeen)** (`office`) — Het RTG-actiecentrum: orders, ritten, prestaties, verificaties en partneraanvragen.  
   _voor: intern_
@@ -271,6 +271,8 @@ ook blokkeert.
   _voor: intern_
 - **Werk OS (werkruimtes)** (`bedrijf`) — De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten. Uit = geen enkele werkruimte of gedeeld klant- of leveranciersvoorstel werkt meer.  
   _voor: intern, business, leverancier, personeel_
+- **Loop Fabric: overdracht en recall** (`loop-fabric`) — Duurzame, beleidsgebonden overdracht van bronobservaties, wijzigingsbonnen en recall tussen RTG-domeinen. Uit = bronwaarheid blijft intact, maar nieuwe overdracht en recall pauzeren.  
+  _voor: rtg, lifestyle, business, intern, leverancier, personeel_
 - **RTG Command: zien** (`command-zien`) — De puls van alle domeinen, de zoekbalk over alles en het objectdossier met zijn tijdlijn.  
   _voor: intern_
 - **RTG Command: doen** (`command-doen`) — De operator, de runbooks en de uitzonderingenrij: herstellen en afhandelen.  
@@ -392,8 +394,10 @@ ook blokkeert.
 - **Sparren en parkeren** (`ov-spar`) — De sparlijst: iets parkeren om er later op terug te komen.  
   _voor: rtg, lifestyle, business_
 
-### Cultuur en gezelschap — 7
+### Cultuur en gezelschap — 8
 
+- **Foundation LibraryOS kernel** (`dom-library`) — Besloten werken, afspraken, rechten en editiegebonden vrijgave; geen publieke catalogus of verkoop.  
+  _voor: rtg, lifestyle, business_
 - **Het Genootschap** (`dom-genootschap`) — Het besloten genootschap: kringen, bijeenkomsten en beheer.  
   _voor: rtg, lifestyle, business_
 - **Sport** (`dom-sport`) — Sportprogramma's, teams en wedstrijden.  
@@ -559,7 +563,7 @@ ook blokkeert.
 - **Festival: uw pas, programma en groep** (`fs-gast`) — De kant van de bezoeker: de eigen pas en edities, het programma met wat er getekend is, en een groep waarvan u zelf de code deelt.  
   _voor: rtg, lifestyle, business, gast_
 
-# 2. De 89 apps in de leden-catalogus
+# 2. De 90 apps in de leden-catalogus
 
 Wat een lid op zijn homescreen kan zetten. De schakelaars hierboven bepalen of
 ze werken; dit is wat hij ziet.
@@ -601,7 +605,7 @@ ze werken; dit is wat hij ziet.
 - **Cellier** `/apps/cellier.html` — Uw wijnkelder: per fles domein, jaargang, aantal, waarde en drinkvenster. Het overzicht wijst aan wat nu op dronk is, met de kelderwaarde. Een fles schenken telt af.
 - **Uitgaan** `/apps/uitgaan.html` — Bars, clubs en beachclubs met hun avonden en gastenlijsten.
 
-### Media & creatie — 27
+### Media & creatie — 28
 
 - **RTG Media** `/apps/media.html` — Eén mediawereld over Klankwerk, Theater, Clips en Podium heen: muziek, kijk en flow als drie standen op dezelfde catalogus, met één makersprofiel en uw eigen regelaars in plaats van een algoritme.
 - **Camera** `/apps/camera.html` — Fotograferen, plus RTG Eye: voertuigschouw en hands-free werkvloerlog.
@@ -627,6 +631,7 @@ ze werken; dit is wat hij ziet.
 - **Memo** `/apps/memo.html` — Spraakmemo's opnemen; de audio staat als gewoon bestand in je Bestanden-kluis. Het toestel luistert mee voor een transcript en Rahul vat samen als jij dat vraagt.
 - **Scanner** `/apps/scanner.html` — Documenten vastleggen met de camera of uit je foto's, documentmodus voor leesbaar papier, en bewaren als PDF of losse foto's in je Bestanden-kluis.
 - **Boeken** `/apps/boeken.html` — De huisbibliotheek plus je eigen tekstbestanden uit de kluis, met een rustige lezer. Alleen je leesplek reist mee; geen leesdoelen, geen reeksen.
+- **Foundation LibraryOS** `/apps/library.html` — Van menselijke kennis naar een immutable Edition: schrijven, expliciete afspraken en rechten, rustig lezen, inhoudelijke feedback en een aantoonbare volgende editie.
 - **RTG Krant** `/apps/krant.html` — De kiosk: de kranten die nieuwsbedrijven binnen RTG uitgeven, elk in de eigen huisstijl.
 - **Nieuws** `/apps/nieuws.html` — RTG Nieuws per rubriek, met wat je later wilt lezen bewaard.
 - **Garde-robe** `/apps/garderobe.html` — Uw digitale garderobe: per stuk type, merk, kleur, maat en waar het hangt -- welke woning, welke kast. Plus uw vaklui: kleermaker, schoenmaker, stomerij.

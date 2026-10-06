@@ -41,7 +41,8 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
   const CSP_NONCE = process.env.RTG_CSP_NONCE !== '0';
   const functies = require('../functies');
 
-  remOpDeDeur(app, PRODUCTION || process.env.RTG_RATELIMIT === '1');
+  // inlogrem ook op een aantoonbaar openbaar adres, niet alleen bij NODE_ENV=production (blocker 3)
+  remOpDeDeur(app, PRODUCTION || process.env.RTG_RATELIMIT === '1' || require('../config/openbaar').isOpenbaar());
   app.use(opslagPoort(opslagKlaar));
   app.use(hoofdzekering({ db, accounts, eigenaar }));
   // de kleine degraded mode van de noodrem-ladder: alleen de inlogpaden

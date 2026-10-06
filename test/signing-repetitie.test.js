@@ -113,7 +113,8 @@ test('generale repetitie: de signingstappen van release-image.yml lopen als proc
 
   // "Bevries CI-uitvoering en exacte Git-bron" (de suites zelf draaien hier niet)
   fs.mkdirSync(path.join(root, '.release'), { recursive: true });
-  for (const f of ['ci-suite.json', 'ci-schermsuite-bewijs.json', 'ci-pg-bewijs.json'])
+  for (const f of ['ci-suite.json', 'ci-schermsuite-bewijs.json', 'ci-pg-bewijs.json',
+    'prerelease-workflows.json'])
     fs.writeFileSync(path.join(root, '.release', f), JSON.stringify({ repetitie: f }) + '\n');
   stap('bronbewijs', ['scripts/bron-release-bewijs.js']);
 
@@ -163,6 +164,14 @@ test('generale repetitie: de signingstappen van release-image.yml lopen als proc
   assert.equal(H.controleerHandtekening(zonder, doc.handtekening.waarde, pem(rollen.BUILD.publicKey, 'spki')), true);
   assert.equal(H.controleerHandtekening(zonder, doc.handtekening.waarde, pem(rollen.PROMOTION.publicKey, 'spki')), false,
     'een buildhandtekening klopt ook onder het promotieanker');
+
+  // Een nieuw prerelease-dossier na de ondertekening hoort niet meer bij deze
+  // kandidaat. De strenge controle herberekent alle bevroren uitvoeringsbytes.
+  fs.appendFileSync(path.join(root, '.release', 'prerelease-workflows.json'), 'gewijzigd\n');
+  assert.notEqual(controle(image, DIGEST, 'sbom.json', 'herkomst.json').status, 0,
+    'gewijzigd voorafgaand workflowbewijs bleef geldig onder BUILD');
+  fs.writeFileSync(path.join(root, '.release', 'prerelease-workflows.json'),
+    JSON.stringify({ repetitie:'prerelease-workflows.json' }) + '\n');
 
   // wat er draait is een ander image: dan is het niet deze kandidaat
   assert.notEqual(controle(image, DIGEST, 'sbom.json', 'herkomst.json', { draait: BACKUP_DIGEST }).status, 0,

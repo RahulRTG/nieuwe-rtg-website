@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {fixture}=require('./lib/living-world-fixture');
+const {fixture,commonsSharing}=require('./lib/living-world-fixture');
 
 test('Saloon toont overdracht en beoordeling bij Actie aan de bevoegde ontvanger',async()=>{
   const f=fixture(),{placeId,blueprintId}=await f.setup(),id=await f.preparePlan(blueprintId);
@@ -18,7 +18,7 @@ test('Saloon toont overdracht en beoordeling bij Actie aan de bevoegde ontvanger
   p=f.row('A','plan',id);
   await f.command('A','plan.issue',{id,revision:p.revision,reason:'Afspraak bespreken'});
   assert.equal((await read('A','actie')).items[0].id,'livingworld:'+id,'menselijke eigenaar blijft vindbaar');
-  const c=await f.command('B','contribution.create',{placeId,kind:'knowledge',title:'Actuele tip',text:'Een waarneming',observedAt:f.time()});
+  const c=await f.command('B','contribution.create',{placeId,kind:'knowledge',title:'Actuele tip',text:'Een waarneming',observedAt:f.time(),sharing:commonsSharing()});
   assert.ok((await read('A','actie')).items.some(i=>i.id==='livingworld:'+c.id));
   assert.equal((await read('B','actie')).items.length,0,'eigen bijdrage geeft geen zelfreview');
   await f.command('A','contribution.review',{id:c.id,revision:1,decision:'accepted',reason:'Gecontroleerd'});
@@ -28,7 +28,7 @@ test('Saloon toont overdracht en beoordeling bij Actie aan de bevoegde ontvanger
 
 test('plekbeheerder mag eigen bijdragen niet via zelfreview publiceren',async()=>{
   const f=fixture(),{placeId}=await f.setup();
-  const c=await f.command('A','contribution.create',{placeId,kind:'knowledge',title:'Eigen tip',text:'Zelf geschreven',observedAt:f.time()});
+  const c=await f.command('A','contribution.create',{placeId,kind:'knowledge',title:'Eigen tip',text:'Zelf geschreven',observedAt:f.time(),sharing:commonsSharing()});
   const denied=await f.world.execute('A','contribution.review',{id:c.id,revision:1,decision:'accepted',reason:'Zelf nagekeken'},'self-review-owner');
   assert.equal(denied.status,403);assert.equal(f.row('A','contribution',c.id).status,'pending');
   assert.equal(f.world.view('B').pulse.length,0);
@@ -57,7 +57,7 @@ test('reisverbinding bewaart alleen een verwijzing; wijzigingen, privérechten e
 
 test('Connect volgt beoordeling, correctie en intrekking van de bron zonder duplicaatdossier',async()=>{
   const f=fixture(),{placeId}=await f.setup();
-  const data={placeId,kind:'knowledge',title:'Oude tip',text:'Eerste waarneming',observedAt:f.time()};
+  const data={placeId,kind:'knowledge',title:'Oude tip',text:'Eerste waarneming',observedAt:f.time(),sharing:commonsSharing()};
   const old=await f.command('B','contribution.create',data);
   assert.deepEqual(f.world.portfolio('B'),[]);
   await f.command('A','contribution.review',{id:old.id,revision:1,decision:'accepted',reason:'Nagekeken'});
@@ -81,7 +81,7 @@ test('Connect volgt beoordeling, correctie en intrekking van de bron zonder dupl
 test('intrekking van deelname blokkeert latere review en verwijdert eerder bewijs uit Connect',async()=>{
   const f=fixture(),{placeId,blueprintId}=await f.setup(),planId=await f.preparePlan(blueprintId);
   await f.complete(planId);
-  const data={placeId,planId,kind:'knowledge',title:'Mijn ervaring',text:'Een bijdrage',observedAt:f.time()};
+  const data={placeId,planId,kind:'knowledge',title:'Mijn ervaring',text:'Een bijdrage',observedAt:f.time(),sharing:commonsSharing()};
   const accepted=await f.command('B','contribution.create',data),pending=await f.command('B','contribution.create',data);
   await f.command('A','contribution.review',{id:accepted.id,revision:1,decision:'accepted',reason:'Nagekeken'});
   assert.equal(f.world.portfolio('B').length,1);

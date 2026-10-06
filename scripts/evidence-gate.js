@@ -23,10 +23,16 @@ function controleer(args) {
     if (!['constitution', 'sensitive', 'product', 'light'].includes(args.risk)) {
       throw new Error('onbekende risicobaan: ' + args.risk);
     }
-    const vereist = [['norm', true], ['security', true],
+    const vereist = [['keuringen', true], ['norm', true], ['security', true],
       ['dependency', args.event === 'pull_request'],
       ['adversarial', volledig || ['constitution', 'sensitive'].includes(args.risk)],
-      ['container', volledig || args.risk !== 'light']];
+      ['container', volledig || args.risk !== 'light'],
+      /* De volledige route voert vier schermscherven uit. Hun oordeel stond
+         buiten de beschermde aggregate, waardoor een rode schermsuite naast
+         een groene mergecheck kon bestaan. Incrementeel bewijs gebruikt zijn
+         eigen geselecteerde browserhelft; daar is de volledige schermjob met
+         opzet skipped en mag alleen success/skipped gelden. */
+      ['schermen', volledig]];
     const gezakt = vereist.filter(([naam, nodig]) => nodig
       ? args[naam] !== 'success'
       : !['success', 'skipped'].includes(args[naam]));

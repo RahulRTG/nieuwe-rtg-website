@@ -124,3 +124,50 @@ test('6. constante tijd: elke rij wordt vergeleken, met timingSafeEqual over 32 
   assert.ok(await s.claim(a.code));
   assert.equal(gezien.length, 3, 'de claim zoekt ook over alle rijen');
 });
+
+/* Het kantoorwerkwoord "roteren" is VERNIEUWEN (kern/bearercode-keten.js): een
+   mens op naam kiest een nieuwe looptijd, de teller begint opnieuw met hetzelfde
+   maximum, en de geschiedenis zegt het. Een v1-record van voor de overgang moet
+   evengoed te vernieuwen zijn -- naar v2. */
+test('7. roteren is vernieuwen: nieuwe termijn, verse teller, oude dicht, ook vanaf v1', async () => {
+  let t = Date.parse('2026-09-29T09:00:00Z');
+  const { db, s } = register(() => t);
+  const r = await s.geef({ partner: 'ATLAS', dagen: 10, maxGebruik: 3, door: 'k' });
+  assert.ok(await s.claim(r.code));
+  const oud = JSON.parse(JSON.stringify(db.data[K.COLLECTIE][r.id].toegang));
+  t += 86400000;
+  const n = await s.roteer({ id: r.id, dagen: 30, door: 'kantoor:mw-b' });
+  const nieuw = db.data[K.COLLECTIE][r.id].toegang;
+  assert.equal(nieuw.rotatie, oud.rotatie + 1);
+  assert.equal(nieuw.expires_at, new Date(t + 30 * 86400000).toISOString(), 'de gekozen looptijd telt vanaf nu');
+  assert.equal(nieuw.gebruik, 0);
+  assert.equal(nieuw.max_gebruik, 3, 'het maximum blijft');
+  assert.deepEqual(nieuw.geschiedenis.at(-1), { rotatie: 1, soort: 'vernieuwd', geroteerd_at: new Date(t).toISOString(),
+    door: 'kantoor:mw-b', einde_was: oud.expires_at });
+  assert.equal(s.welke(r.code), null, 'de oude opent niets meer');
+  assert.equal(s.welke(n.code).resterend, 3);
+  assert.equal(s.lijst('ATLAS')[0].stand, 'geldig', 'het overzicht controleert met doel en scope');
+
+  // een v1-record (geen geldigheid) zoals het nog in de opslag kan staan
+  const v1 = require('../server/kern/bearercode')({ crypto, namespace: 'partnerkanaal.personeelscode',
+    nu: () => new Date(t).toISOString() }).maak({ prefix: 'PK', issuer: K.ISSUER, doel: K.DOEL, scope: K.SCOPE.slice(),
+    onderwerp: { partner: 'ATLAS', medewerker: 'pm_' + '1'.repeat(16) }, geldigMs: 5 * 86400000, maxGebruik: 2 });
+  db.data[K.COLLECTIE]['pm_' + '1'.repeat(16)] = { id: 'pm_' + '1'.repeat(16), partner: 'ATLAS', label: null, toegang: v1.toegang };
+  assert.equal(s.welke(v1.code).resterend, 2, 'een v1-code werkt nog');
+  const n1 = await s.roteer({ id: 'pm_' + '1'.repeat(16), door: 'k' });
+  const t1 = db.data[K.COLLECTIE]['pm_' + '1'.repeat(16)].toegang;
+  assert.equal(t1.contractversie, 2);
+  assert.equal(t1.rotatie, 2);
+  assert.equal(t1.geschiedenis.at(-1).soort, 'vernieuwd');
+  assert.equal(s.welke(v1.code), null);
+  assert.ok(s.welke(n1.code));
+});
+
+/* Het plafond per partner telt GELDIGE codes. Een v2-controle zonder scope is
+   `controle-onvolledig`, en dan telde geen enkele code als geldig: het plafond
+   sloot nooit. */
+test('8. het plafond per partner telt de geldige v2-codes', async () => {
+  const { s } = register();
+  for (let i = 0; i < K.MAX_PER_PARTNER; i++) assert.equal((await s.geef({ partner: 'ATLAS', door: 'k' })).ok, true);
+  assert.equal((await s.geef({ partner: 'ATLAS', door: 'k' })).status, 409);
+});

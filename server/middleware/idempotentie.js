@@ -43,14 +43,25 @@
      een token in een kas ligt.
    - HET EERSTE ANTWOORD WINT, PLUS `herhaald: true`. De herhaling krijgt status
      en lijf van de eerste uitvoering terug, met de kop X-Idempotentie: herhaald,
-     en de handler draait niet. Ook een 4xx wordt herhaald: dezelfde vraag,
-     hetzelfde oordeel.
+     en de handler draait niet.
+   - ALLEEN EEN GESLAAGD ANTWOORD WORDT ONTHOUDEN (2xx zonder `ok: false`).
+     Hier stond "ook een 4xx wordt herhaald: dezelfde vraag, hetzelfde oordeel",
+     en dat sprak de twee lagen ervoor tegen (lib/idem-poort.js en
+     lib/dubbeltik.js, die net als de geldlaag lib/idem.js alleen een succes
+     bewaren). Het gevolg was een val: een 409 omdat de toestand nog niet
+     klopte, de toestand hersteld, dezelfde sleutel opnieuw -- en de oude 409
+     kwam 24 uur lang uit deze kas terwijl de route nu wel had gewerkt. Een
+     weigering die van de toestand afhangt, is een TOESTANDSCONTROLE en geen
+     idempotentie (MUTATIECONTRACT.md); die hoort de route opnieuw te doen.
+     Besluit van 4 oktober 2026.
 
      `herhaald` is de bestaande huistaal van de geldlaag. Het hoort in het lijf,
      niet alleen in een kop die clients niet lezen.
    - EEN STORING WORDT NOOIT ONTHOUDEN. Een 5xx mag opnieuw geprobeerd worden;
      een storing vastspijkeren zou van een haperend moment een permanente
-     weigering maken.
+     weigering maken. Dat geldt ook voor een 5xx die pas NA res.json ontstond
+     (de 503 van de stand-bypoort): onthouden wordt de status die werkelijk
+     vertrok, zie ../lib/eindstatus.js.
    - DE KAS IS BEGRENSD EN VERGEET. Een dag TTL, een vaste bovengrens met
      wegvallen-van-de-oudste. Idempotentiesleutels beschermen tegen dubbelklikken
      en herhaalde verzoeken, niet tegen de eeuwigheid.
@@ -66,7 +77,7 @@
    meet binnen een proces en na elkaar, dus die ziet precies wat dit belooft. */
 'use strict';
 const crypto = require('crypto');
-const verzoekcontext = require('../db/verzoekcontext');
+const { bewaarBijEind } = require('../lib/eindstatus');
 const { isEenmalig } = require('../lib/eenmalig-geheim-routes');
 const { EIGEN, doetHetZelf } = require('./idempotentie-eigen');
 
@@ -123,13 +134,17 @@ module.exports = () => {
       const bewaar = () => {
         try {
           const lijf = JSON.stringify(data);
-          if (res.statusCode < 500 && typeof lijf === 'string' && lijf.length <= MAX_LIJF) {
+          const geslaagd = res.statusCode >= 200 && res.statusCode < 300 &&
+            !(data && typeof data === 'object' && data.ok === false);
+          if (geslaagd && typeof lijf === 'string' && lijf.length <= MAX_LIJF) {
             ruim();
             kas.set(id, { status: res.statusCode, lijf, op: Date.now() });
           }
         } catch (e) { /* een antwoord dat niet te serialiseren is, is niet te herhalen */ }
       };
-      if (!verzoekcontext.haakNaCommit(bewaar)) bewaar();
+      /* Pas als vaststaat welke status werkelijk vertrok (N11): een 200 die de
+         stand-bypoort nog een 503 maakte, is hier nooit onthouden. */
+      bewaarBijEind(res, bewaar);
       return echteJson(data);
     };
     next();

@@ -114,6 +114,25 @@ module.exports = ({ transactie, zoekIn, vanId, geldig, mutatie, t }) => {
     });
   }
 
+  /* Een DEEL van een afboeking terug op de bon (een teruggave na een correctie,
+     kern/horeca/teruggave.js). Nooit meer dan er met die afboeking afging, en
+     `idem` maakt een herhaling tot de eerste terugboeking. */
+  function terug({ zaak, id, ref, centen, idem, bron: herkomst }) {
+    return transactie(bron => {
+      const b = vanId(bron, zaak, id);
+      const m = b && (b.mutaties || []).find(x => x && x.ref === ref && x.soort === 'afgeboekt');
+      if (!m) return { status: 404, error: 'Deze afboeking kennen we niet.' };
+      const al = (b.mutaties || []).find(x => x && x.soort === 'teruggeboekt' && x.idem === idem);
+      if (al) return { ok: true, herhaald: true, saldo: b.saldo };
+      const ruimte = -m.centen - (m.hersteld ? -m.centen : 0) -
+        (b.mutaties || []).filter(x => x && x.soort === 'teruggeboekt' && x.ref === ref).reduce((n, x) => n + x.centen, 0);
+      if (!(centen > 0) || centen > ruimte) return { status: 409, error: 'Er kan nog ' + (ruimte / 100).toFixed(2) + ' terug op deze bon.' };
+      b.saldo += centen;
+      mutatie(b, { centen, soort: 'teruggeboekt', ref, idem, bron: herkomst || null });
+      return { ok: true, saldo: b.saldo };
+    });
+  }
+
   /* Het restsaldo van een band terug naar de gast: op nul, in de transactie. */
   function leeg({ zaak, id }) {
     return transactie(bron => {
@@ -126,5 +145,5 @@ module.exports = ({ transactie, zoekIn, vanId, geldig, mutatie, t }) => {
     });
   }
 
-  return { lees, koppel, opSessie, intrek, roteer, herstel, leeg };
+  return { terug, lees, koppel, opSessie, intrek, roteer, herstel, leeg };
 };

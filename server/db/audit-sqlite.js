@@ -159,6 +159,6 @@ module.exports = ({ db, kv, decode, encode, bump }) => {
   }
   function poll() { publiceerSnapshots(require('./sqlite-poll').snapshot(kv, snapshots)); }
   return { open, view, bezit, vervangingen, pasToe, stage, publicaties, naCommit, laad, poll, snapshots, publiceerSnapshots,
-    bestaat: naam => Boolean(q.meta.get(naam)),
+    bestaat: naam => Boolean(q.meta.get(naam)), beheert: naam => cache.has(naam),
     context: fn => { context = fn; }, doos: () => { const d = context(); return d?.committen ? d : null; } };
 };

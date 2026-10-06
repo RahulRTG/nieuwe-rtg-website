@@ -1,0 +1,6 @@
+{
+  "open": false,
+  "reden": "A-P0-02: RTG kan uitbetalingen en terugbetalingen via een echte provider in V1 niet end-to-end bewijzen (settlement, refunds, retries, crashherstel, reconciliatie). De rail blijft dicht tot dat met een echte sandbox-settlement is aangetoond.",
+  "voorwaarden": ["payoutProvider", "refundPayoutSettlement", "reconciliation"],
+  "bewijs": null
+}

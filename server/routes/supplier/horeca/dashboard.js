@@ -67,6 +67,9 @@ module.exports = (kern) => {
     const perWijze = {};
     for (const r of betaald) for (const b of (r.betalingen || []))
       perWijze[b.wijze] = (perWijze[b.wijze] || 0) + heleCenten(b.centen);
+    // een uitgevoerde teruggave gaat af bij de wijze waarlangs hij terugging
+    for (const r of betaald) for (const t of (r.terugbetalingen || []))
+      if (t.stand === 'uitgevoerd') perWijze[t.wijze] = (perWijze[t.wijze] || 0) - heleCenten(t.centen);
 
     const omzet = betaald.reduce((t, r) => t + totaal(r).netto, 0);
     const fooi = betaald.reduce((t, r) => t + totaal(r).fooi, 0);

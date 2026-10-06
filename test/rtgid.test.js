@@ -180,6 +180,16 @@ test('5. machtigen (mantelzorg): B logt in namens A, herroepbaar, alles in het l
   // en intrekken maakt er direct een einde aan
   await api('/api/rtgid/machtig/intrek', { id: mId }, lidA);
   assert.equal((await api('/api/rtgid/wie', { idToken })).status, 403, 'lopende namens-sessies gaan mee dicht');
+  // en het intrekken laat een spoor na, bij allebei (Fase 0, D15)
+  const spoor = (l, tekst) => l.body.log.filter(r => r.soort.includes('ingetrokken') && r.soort.includes(tekst));
+  assert.equal(spoor(await api('/api/rtgid/inzage', {}, lidA), 'aan ' + codeB).length, 1, 'A ziet de intrekking in zijn log');
+  const bijB = spoor(await api('/api/rtgid/inzage', {}, lidB), 'van ');
+  assert.equal(bijB.length, 1, 'B ziet dat zijn machtiging stopte');
+  assert.ok(!bijB[0].soort.includes('door u'), 'B leest wie het deed, niet "u": ' + bijB[0].soort);
+  // een tweede intrekking schrijft geen tweede regel
+  const nog = await api('/api/rtgid/machtig/intrek', { id: mId }, lidA);
+  assert.equal(nog.body.herhaald, true);
+  assert.equal(spoor(await api('/api/rtgid/inzage', {}, lidA), 'aan ' + codeB).length, 1);
 });
 
 test('6. de poorten: vals token, onbekende koppel, gast en anoniem', async () => {

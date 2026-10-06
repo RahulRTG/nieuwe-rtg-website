@@ -14,13 +14,13 @@
 #     geld op de cent, misbruik geweigerd, dekking). Die gaan niet over hoe
 #     snel de runner is, dus als er een zakt, zakt deze workflow.
 #
-#   MACHINE-AFHANKELIJK -> meten en tonen, niet oordelen.
-#     p99, doorvoer en event-loopvertraging op een GitHub-runner zijn andere
-#     getallen dan op de ontwikkelmachine. scripts/norm.js weet dat: hij
-#     vergelijkt alleen binnen dezelfde vingerafdruk (kernen/geheugen/platform/
-#     modus) en meldt anders "NIET VERGELEKEN". Die cijfers komen hier dus in
-#     de samenvatting en in een artefact terecht, en niet in een oordeel. Een
-#     p99 van een andere machine is geen slechtere p99 maar een andere.
+#   MACHINE-AFHANKELIJK -> alleen oordelen na bewezen vergelijkbaarheid.
+#     p99 en event-loopvertraging op een andere runner zijn andere getallen.
+#     De CI-validator eist daarom exact dezelfde bronvingerafdruk als NORM.json
+#     en een kalibratie binnen factor 1,4. Klopt die herkomst niet, dan zegt de
+#     job niet "slechter" maar zakt hij fail-closed als ONVERGELIJKBAAR. Klopt
+#     zij wel, dan zijn de prestatielatten echte poorten -- inclusief verlopen
+#     schulden; een gewone PASS van het brede harnas is dan niet genoeg.
 #
 # Wie hem tussendoor wil draaien: de Actions-tab, "Run workflow".
 
@@ -54,6 +54,15 @@ on:
         description: Alleen diagnose; CPU-profielen kunnen prestatieschuld niet sluiten
         type: boolean
         default: false
+      omvang:
+        # Alleen binnen scope full: welke van de zware jobs draaien er.
+        description: 'Bij scope full: alleen de Beproeving, of alle vier de zware jobs?'
+        required: true
+        default: 'beproeving'
+        type: choice
+        options:
+          - beproeving
+          - alles
 
 permissions:
   contents: read
@@ -293,14 +302,26 @@ jobs:
     name: De Beproeving (storm, geld, misbruik, herstel)
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      # De meting moet aan het event-SHA hangen, niet aan een branchnaam die
+      # tijdens de run kan verschuiven. De validator eist de volle 40 tekens.
+      RTG_BEPROEVING_EXPECTED_COMMIT: ${{ github.sha }}
+      RTG_BEPROEVING_NODE_MAJOR: '26'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
+      # LAATSTE_METING.json staat in Git. De wachtstand leeft daarom uitsluitend
+      # onder .release: voorbereiden mag de tracked boom niet zelf vervuilen.
+      - name: Bron, runtime en schone commit binden
+        run: node scripts/beproeving-ci-bewijs.js --voorbereiden
+      # Pas na de wachtstand installeren. Ook een npm-ci-storing levert zo een
+      # actueel NIET_GEMETEN-register op in plaats van het ingecheckte oude.
       - run: npm ci
       # De beproeving zakt zelf (exitcode 1) zodra een van zijn drempels breekt.
       # `tee` zodat de volledige uitvoer ook bij een zak in het artefact staat:
@@ -308,6 +329,14 @@ jobs:
       # in beeld was, en dan weet je wel DAT hij zakte en niet waarop.
       - name: De Beproeving (sqlite-schaal)
         run: npm run beproeving 2>&1 | tee beproeving.log
+      # Ook na een crash of rood oordeel uitvoeren. Deze poort vergelijkt alleen
+      # met exact de bron uit NORM.json en een kalibratie binnen factor 1,4. De
+      # verlopen p99- en event-loop-schuld gebruikt de oude lat uit datzelfde
+      # register; een gewone groene Beproeving of een getal van andere hardware volstaat
+      # dus niet. De log wordt apart bewaard omdat ook de validator kan zakken.
+      - name: Exacte prestatie-aflossing controleren
+        if: always()
+        run: node scripts/beproeving-ci-bewijs.js --controleer 2>&1 | tee beproeving-ci-controle.log
       # Ook als de stap hierboven zakt willen we de cijfers hebben.
       # DE TIJD VERSTRIJKT ALLEEN HIER. Een schuld met een vervaldatum wordt in
       # ci.yml pas opgemerkt als iemand pusht; op een stille week gebeurt dat
@@ -353,21 +382,24 @@ jobs:
             # De ACTUELE meting eerst, ook als hij rood is. BEPROEVING.json is de
             # geaccepteerde basislijn en schuift alleen na een geslaagde ronde;
             # wie alleen die toont, laat een gezakte ronde onzichtbaar blijven.
-            if [ -f LAATSTE_METING.json ]; then
+            if [ -f .release/beproeving-ci-meting.json ]; then
               echo '```json'
-              cat LAATSTE_METING.json
-              echo '```'
-            elif [ -f BEPROEVING.json ]; then
-              echo '```json'
-              cat BEPROEVING.json
+              cat .release/beproeving-ci-meting.json
               echo '```'
             else
               echo '_Er is geen meting geschreven; zie het artefact voor de uitvoer._'
             fi
+            if [ -f .release/beproeving-ci-oordeel.json ]; then
+              echo ''
+              echo '### Vergelijkbaarheid en prestatielat'
+              echo '```json'
+              cat .release/beproeving-ci-oordeel.json
+              echo '```'
+            fi
             echo ''
             echo '> De prestatiecijfers hierboven zijn op een GitHub-runner gemeten.'
-            echo '> `scripts/norm.js` vergelijkt ze niet met de lat op de ontwikkelmachine:'
-            echo '> een p99 van een andere machine is geen slechtere p99 maar een andere.'
+            echo '> Alleen dezelfde bronvingerafdruk én vergelijkbare kalibratie worden beoordeeld.'
+            echo '> Een andere machine wordt niet goedgekeurd: het CI-oordeel wordt dan fail-closed ONVERGELIJKBAAR.'
           } >> "$GITHUB_STEP_SUMMARY"
       - name: De uitvoer bewaren
         if: always()
@@ -376,13 +408,17 @@ jobs:
           name: beproeving
           path: |
             beproeving.log
+            beproeving-ci-controle.log
             BEPROEVING.json
-            LAATSTE_METING.json
+            .release/beproeving-ci-start.json
+            .release/beproeving-ci-meting.json
+            .release/beproeving-ci-oordeel.json
+          if-no-files-found: error
           retention-days: 30
 
   tot-crash:
-    if: github.event_name != 'workflow_dispatch' || inputs.scope == 'full'
     name: Tot crash (escalerende druk tot iets breekt)
+    if: github.event_name != 'workflow_dispatch' || (inputs.scope == 'full' && inputs.omvang == 'alles')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -420,8 +456,8 @@ jobs:
           retention-days: 30
 
   heapproef:
-    if: github.event_name != 'workflow_dispatch' || inputs.scope == 'full'
     name: Heapproef (houdt de server geheugen vast?)
+    if: github.event_name != 'workflow_dispatch' || (inputs.scope == 'full' && inputs.omvang == 'alles')
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -460,8 +496,8 @@ jobs:
           retention-days: 30
 
   dekking:
-    if: github.event_name != 'workflow_dispatch' || inputs.scope == 'full'
     name: Waargenomen endpoint-dekking en de samenhang
+    if: github.event_name != 'workflow_dispatch' || (inputs.scope == 'full' && inputs.omvang == 'alles')
     runs-on: ubuntu-latest
     # 90 was genoeg voor de suite plus de dekking; de meetronde komt er met
     # ongeveer vijfendertig minuten bij (zeven instrumenten, elk tegen een eigen

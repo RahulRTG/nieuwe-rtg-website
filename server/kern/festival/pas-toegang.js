@@ -10,7 +10,7 @@
    - issuer, doel en scope, verval aan het eind van de editie (laatste dag + een
      nacht), max_gebruik = het plafond van de bearerlaag: een weekendpas scant
      vaak, dus binnenkomen wordt GETELD en niet begrensd;
-   - intrekken en roteren lopen, net als de scan, in EEN collectietransactie op
+   - intrekken, roteren en vernieuwen lopen, net als de scan, in EEN collectietransactie op
      `festivals` (PostgreSQL: advisory lock + FOR UPDATE), zodat twee poorten
      een pas niet tegelijk "binnen" zetten en een intrekking nooit half wint;
    - zoeken vergelijkt elke hash van de editie met timingSafeEqual en stopt niet
@@ -63,19 +63,26 @@ module.exports = (ctx) => {
     return (f && f.edities && f.edities[String(eid || '')]) || null;
   };
 
-  // Geeft de pas een (nieuwe) code; de vorige gaat ingetrokken de historie in.
-  function geef(e, p, issuer) {
+  /* Geeft de pas een (nieuwe) code. De termijn is het eind van de editie en
+     wordt elke keer uitgerekend. Komt die uit op het einde van de vorige code
+     (het gewone geval: de drager toont, de getoonde code kan gelekt zijn), dan
+     is dat ROTEREN -- zelfde einde, binnenkomen telt door. Is het einde anders
+     (de editie kreeg dagen, of de vorige was verlopen), dan is het een nieuwe
+     termijn en dus VERNIEUWEN; de uitgever van de pas blijft, `door` gaat de
+     geschiedenis in. Beide trekken de vorige in (kern/bearercode-keten.js). */
+  function geef(e, p, door) {
     const vorig = p.toegang;
-    if (vorig) {
-      bearer.intrekken(vorig, issuer, 'nieuwe pascode');
-      p.toegang_historie = (p.toegang_historie || []).concat([vorig]).slice(-12);
-    }
     const eind = Math.max(0, ...(e.dagen || []).map(d => Date.parse(String((d || {}).datum) + 'T23:59:59.999Z')).filter(Number.isFinite));
     const tot = eind ? eind + DAG : Date.parse(nu()) + 90 * DAG;
-    const g = bearer.maak({ prefix: 'FP', issuer, doel: DOEL, scope: SCOPE,
+    const spec = { prefix: 'FP', issuer: (vorig && vorig.issuer) || door, doel: DOEL, scope: SCOPE,
       onderwerp: { soort: 'festivalpas', id: p.id, drager_hash: afdruk(p.drager) },
-      geldigMs: tot - Date.parse(nu()), maxGebruik: PLAFOND });
-    g.toegang.rotatie = ((vorig && vorig.rotatie) || 0) + 1;
+      // het einde exact (geen ms-drift tussen twee klokaanroepen); een termijn
+      // die al voorbij is krijgt, zoals in v1, nog een seconde
+      geldigheid: tot > Date.parse(nu()) + 2000 ? { verlooptOp: new Date(tot).toISOString() } : { duurMs: 1000 }, gebruik: { max: PLAFOND }, afgeleid: 'geen' };
+    const g = !vorig ? bearer.maak(spec)
+      : Date.parse(vorig.expires_at) === tot && tot > Date.parse(nu()) + 2000
+        ? bearer.roteer(vorig, { actor: door, prefix: 'FP', afgeleid: 'geen' })
+        : bearer.vernieuw(vorig, spec, door);
     p.toegang = g.toegang;
     return g.code;
   }

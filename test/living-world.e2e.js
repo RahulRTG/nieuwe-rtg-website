@@ -75,7 +75,9 @@ for(const width of [390,1440])test(width+'px: Living World maakt, bevestigt, her
  await traveler.getByRole('button',{name:'Iets achterlaten',exact:true}).click();
  await traveler.locator('#lwField-planId').selectOption(plan.id);
  await traveler.locator('#lwField-title').fill('Verzamelen bij de haven '+width);
- await traveler.locator('#lwField-text').fill('Spreek vooraf een precieze ontmoetingsplek af.');await confirm(traveler);
+ await traveler.locator('#lwField-text').fill('Spreek vooraf een precieze ontmoetingsplek af.');
+ await traveler.locator('#lwField-communityRelease').check();
+ await traveler.locator('#lwField-attribution').fill('Reiziger');await confirm(traveler);
  const contribution=(await post('/api/living-world/view',{},member)).contributions.find(c=>c.title==='Verzamelen bij de haven '+width);
  await page.goto(srv.base+contribution.url);await page.waitForSelector('[data-lw-action="contribution.review"]');
  await page.locator('[data-lw-action="contribution.review"]').click();await page.locator('#lwField-decision').selectOption('accepted');

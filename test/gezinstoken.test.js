@@ -90,8 +90,12 @@ test('4. vervaltijd: zeven dagen (B19), het kanaal twaalf uur, en nooit langer',
 test('4b. B19: een sessie van voor het besluit (dertig dagen op schijf) houdt na zeven dagen op', () => {
   const { z, g, schuif } = wereld();
   const t = z.geef(g, g.profielen.b);
+  // Zoals B17 hem schreef: een v1-rij (zonder contract) met dertig dagen. Een v2-rij
+  // achteraf verlengen is geen oude sessie maar manipulatie, en die weigert v2 al.
   const s = g.profielen.b.sessies[0];
-  s.expires_at = new Date(T0 + 30 * 86400000).toISOString();   // zoals B17 hem schreef
+  for (const k of ['gebruiksvorm', 'contractversie', 'afgeleid', 'stapOp', 'bron_toegang', 'geschiedenis', 'contracthash']) delete s[k];
+  s.max_gebruik = 0;
+  s.expires_at = new Date(T0 + 30 * 86400000).toISOString();
   schuif(6 * 86400000);
   assert.equal(z.vind(g, t).id, 'b');
   schuif(86400000);

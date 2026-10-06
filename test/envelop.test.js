@@ -27,15 +27,16 @@ const { maakBus } = require('../server/bus');
 const { maakSse } = require('../server/kern/sse');
 const meter = require('../scripts/envelop');
 
-test('1. een envelop draagt acht velden en geen negende', () => {
+test('1. een envelop draagt negen velden en geen tiende', () => {
   /* De opsomming staat er voluit omdat de envelop GESLOTEN is: zodra er een
      veld bij mag, staat er binnen een jaar inhoud in en is het een tweede
      berichtformaat. Deze toets zakt zowel bij een veld erbij als bij een veld
-     eraf. */
+     eraf. Het negende (hoedanigheid) is besluit B3b; zie test/envelopv2.test.js. */
   const e = E.maak({ kanaal: 'sse' });
   assert.deepEqual(Object.keys(e).sort(),
-    ['actor', 'at', 'classificatie', 'correlatie', 'id', 'kanaal', 'oorzaak', 'versie']);
+    ['actor', 'at', 'classificatie', 'correlatie', 'hoedanigheid', 'id', 'kanaal', 'oorzaak', 'versie']);
   assert.equal(e.versie, E.VERSIE);
+  assert.equal(E.VERSIE, 2);
   assert.ok(/^\d{4}-\d{2}-\d{2}T/.test(e.at), 'de tijd staat in ISO');
   assert.notEqual(E.maak({ kanaal: 'x' }).id, E.maak({ kanaal: 'x' }).id, 'elke gebeurtenis een eigen id');
   assert.ok(Object.isFrozen(e), 'een envelop ligt vast zodra hij bestaat');
@@ -162,6 +163,12 @@ test('10. elke plek die zelf een bericht samenstelt, zegt hoe gevoelig het is', 
   assert.ok(uit.stelenZelfSamen >= 6, 'de meter vindt de publicerende plekken, nu: ' + uit.stelenZelfSamen);
   assert.deepEqual(uit.zonderClassificatie, [],
     'zonder classificatie: ' + uit.zonderClassificatie.join(', '));
+});
+
+test('10b. geen publicerende plek geeft een hoedanigheid op (v2: die komt uit het frame)', () => {
+  assert.deepEqual(meter.meet().hoedanigheidInOpgave, []);
+  const uit = meter.analyse([{ bestand: 'd.js', kanaal: 'sse', doorgeef: false, classificatie: true, actor: false, hoedanigheid: true }]);
+  assert.deepEqual(uit.hoedanigheidInOpgave, ['d.js (sse)'], 'de meter ziet hem wel');
 });
 
 test('11. tegenproef: de meter ziet het verschil tussen samenstellen en doorgeven', () => {

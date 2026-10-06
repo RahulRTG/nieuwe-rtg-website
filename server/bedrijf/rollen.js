@@ -15,6 +15,7 @@ const { werkVeld } = require('./gebeurtenis');
 /* De tabellen staan in ./rollen-register.js: wie een rol of een recht bijzet
    wil ze in een blik zien, en hier zouden ze de werking overwoekeren. */
 const { REDEN_NODIG, RECHTEN, ROLLEN } = require('./rollen-register');
+const beleid = require('./rollen-beleid');
 
 module.exports = (sctx) => {
   const { app, save, schoon, nu, rid, dag, beheerVan, lidVan, eigenVeld } = sctx;
@@ -25,21 +26,13 @@ module.exports = (sctx) => {
      nog niets) en `tot` voor tijdelijke toegang. Buiten het venster telt hij
      niet mee -- niet als "bijna" en niet als "nog even". */
   function rollenVan(l) {
-    const vandaag = dag();
-    return (l.rollen || [])
-      .filter(r => (!r.van || r.van <= vandaag) && (!r.tot || r.tot >= vandaag))
-      .map(r => r.id);
+    return beleid.rollenVan(l,dag());
   }
   function rechtenVan(l) {
-    const uit = new Set();
-    for (const id of rollenVan(l)) {
-      const r = ROLLEN.find(x => x.id === id);
-      for (const recht of (r ? r.rechten : [])) uit.add(recht);
-    }
-    return [...uit];
+    return beleid.rechtenVan(l,dag());
   }
   const mag = (l, recht) => rechtenVan(l).includes(recht);
-  const leest = (l) => rollenVan(l).some(id => (ROLLEN.find(x => x.id === id) || {}).alleenLezen);
+  const leest = (l) => beleid.leest(l,dag());
 
   function log(w, wie, wat, waarover, reden) {
     w.journaal = (w.journaal || []);

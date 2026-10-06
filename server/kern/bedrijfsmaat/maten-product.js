@@ -86,6 +86,6 @@ module.exports = [
   { id: 'performance.snelheid', domein: 'performance', wereld: 'rtg-intern', eenheid: 'seconden, p90 en p99',
     betekenis: 'Hoe snel leesendpoints antwoorden, tegen het servicedoel.', berekening: 'kwantielen van rtg_duur_seconden',
     actualiteit: 'live', privacy: 'huis', minGroep: null, eigenaar: 'kern/command', graad: 'gemeten', afhankelijk: [],
-    bron: [c(SLO, 'function kwantielGrens')], definitie: [c('SLO.json', 'p90 van rtg_duur_seconden')],
+    bron: [c('server/kern/command/slo-rekenen.js', 'function berekenKwantielgrens')], definitie: [c('SLO.json', 'p90 van rtg_duur_seconden')],
     projectie: [c(SLO, 'function doelStand')], bewijs: [c('SLO.json', '"minimumDekking"')], groepsgrens: null, waarom: {} }
 ];

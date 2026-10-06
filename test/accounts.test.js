@@ -110,7 +110,12 @@ test('twee gelijktijdig uitgegeven actietokens zijn afzonderlijk intrekbaar', as
     twee = accounts.issueActionToken(u.id, 'verify-email', 60000);
   } finally { Date.now = echtNu; }
   assert.notEqual(een, twee, 'uitgiftes in dezelfde milliseconde mogen geen gedeelde geloofsbrief opleveren');
-  assert.equal(Buffer.from(een.split('.')[0], 'base64url').toString().split('.').length, 4);
+  /* id.doel.exp.nonce.uitgegeven: de nonce blijft deel vier, en sinds N12 staat
+     het uitgiftemoment als vijfde deel erachter (de sessiegrens leest het). */
+  const delen = Buffer.from(een.split('.')[0], 'base64url').toString().split('.');
+  assert.equal(delen.length, 5);
+  assert.ok(delen[3], 'de nonce staat er nog');
+  assert.equal(delen[4], '1900000000000', 'het uitgiftemoment komt van dezelfde klok als de vervaltijd');
   assert.ok(accounts.verifyActionToken(een, 'verify-email'));
   assert.ok(accounts.verifyActionToken(twee, 'verify-email'));
   await accounts.trekInActie(een, 'verify-email');

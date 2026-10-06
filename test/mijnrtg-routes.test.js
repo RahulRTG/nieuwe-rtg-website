@@ -41,9 +41,10 @@ const { totpCode } = require('../server/kern/totp');
 
 let srv, base;
 
-const api = (pad, body, token) => fetch(base + pad, {
+const api = (pad, body, token, bewijs) => fetch(base + pad, {
   method: 'POST',
-  headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+  headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}),
+    ...(bewijs ? { 'rtg-bezitsbewijs': bewijs } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -97,6 +98,14 @@ async function toestel() {
     teken: async (tekst) => Buffer.from(await webcrypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' },
       kp.privateKey, Buffer.from(String(tekst), 'utf8'))).toString('base64url')
   };
+}
+
+/* A-P1-04: een toestel intrekken is een zwaar pad en vraagt standaard een bezitsbewijs
+   van een gebonden sessie: het toestel tekent methode, pad, tijd en een eenmalig id. */
+async function bewijsVoor(t, pad) {
+  const kop = Buffer.from(JSON.stringify({ methode: 'POST', pad, tijd: Date.now(),
+    jti: 'j' + Math.random().toString(36).slice(2).padEnd(20, 'x').slice(0, 20) })).toString('base64url');
+  return kop + '.' + await t.teken(kop);
 }
 
 /* Een uitdaging halen en hem ondertekend terugsturen -- de weg die de browser
@@ -284,11 +293,12 @@ test('6. intrekken sluit de sessies op dat toestel, en het toestel komt niet sti
   assert.equal(bind2.status, 200, JSON.stringify(bind2.body));
   assert.equal(bind2.body.nieuw, false, 'hetzelfde toestel gold als een nieuw toestel');
 
-  const onbekend = await api('/api/mijn/toestel/introk', { toestelId: 'b'.repeat(32) }, tweede);
+  const IP = '/api/mijn/toestel/introk';
+  const onbekend = await api(IP, { toestelId: 'b'.repeat(32) }, tweede, await bewijsVoor(t, IP));
   assert.equal(onbekend.status, 400);
   assert.match(onbekend.body.error, /Onbekend toestel/);
 
-  const intr = await api('/api/mijn/toestel/introk', { toestelId: t.id }, tweede);
+  const intr = await api(IP, { toestelId: t.id }, tweede, await bewijsVoor(t, IP));
   assert.equal(intr.status, 200, JSON.stringify(intr.body));
   assert.equal(intr.body.sessiesGesloten, 1, 'de andere sessie op dit toestel bleef open');
   assert.match(intr.body.nietGeraakt, /Deze sessie blijft open/);
@@ -395,19 +405,27 @@ test('8. het geheim komt pas na het wachtwoord -- en het e-mailadres staat op pr
   zonderNaamOfAdres((await api('/api/mijn/post/alles-uit', {}, lid.token)).body, lid, 'post/alles-uit');
 });
 
-test('9. nieuwe herstelcodes maken de oude ongeldig, en dat vraagt het wachtwoord', async () => {
+test('9. nieuwe herstelcodes maken de oude ongeldig, en dat vraagt het wachtwoord EN een code', async () => {
   const lid = await nieuwLid();
   const beg = await api('/api/mijn/tweefactor/begin', { huidig: WACHTWOORD }, lid.token);
   const aan = await api('/api/mijn/tweefactor/bevestig', { code: totpCode(beg.body.geheim) }, lid.token);
   assert.equal(aan.status, 200, JSON.stringify(aan.body));
   const oude = aan.body.herstelcodes;
 
-  const zonder = await api('/api/mijn/tweefactor/codes', { huidig: 'fout' }, lid.token);
+  const zonder = await api('/api/mijn/tweefactor/codes', { huidig: 'fout', code: totpCode(beg.body.geheim) }, lid.token);
   assert.equal(zonder.status, 403);
   assert.match(zonder.body.error, /wachtwoord klopt niet/);
   assert.equal(zonder.body.herstelcodes, undefined, 'een fout wachtwoord leverde toch een nieuwe set op');
 
-  const nieuw = await api('/api/mijn/tweefactor/codes', { huidig: WACHTWOORD }, lid.token);
+  /* Alleen het wachtwoord is NIET genoeg (N2 uit de V1-audit, besluit van de
+     eigenaar). Was het dat wel, dan haalde wie sessie en wachtwoord heeft hier
+     een verse herstelcode, en kwam daarmee langs de code die /uit vraagt. */
+  const zonderCode = await api('/api/mijn/tweefactor/codes', { huidig: WACHTWOORD }, lid.token);
+  assert.equal(zonderCode.status, 403, 'alleen het wachtwoord gaf toch nieuwe herstelcodes');
+  assert.equal(zonderCode.body.herstelcodes, undefined);
+
+  // de code van het volgende venster: die van nu is bij het aanzetten al gebruikt
+  const nieuw = await api('/api/mijn/tweefactor/codes', { huidig: WACHTWOORD, code: totpCode(beg.body.geheim, Date.now() + 30000) }, lid.token);
   assert.equal(nieuw.status, 200, JSON.stringify(nieuw.body));
   assert.equal(nieuw.body.herstelcodes.length, 10);
   assert.equal(nieuw.body.herstelcodes.filter(c => oude.includes(c)).length, 0,

@@ -4,11 +4,14 @@ module.exports = ({ product, root, save, id, now, context, mutual, limit, isBloc
   const project = (call, actor) => ({ id: call.id, type: call.type, state: call.state,
     incoming: call.from !== actor, revision: call.revision });
   function close(c, type, reason) {
+    let gesloten = 0;
     for (const call of root().calls) if (call.product === product && call.scope === c.scope && call.pair === c.pair &&
       (!type || call.type === type) && ['RINGING', 'ACTIVE'].includes(call.state)) {
       call.state = reason || 'ENDED'; call.revision += 1; call.updatedAt = now();
+      gesloten += 1;
       ping(call.from, 'call', call.scope, call.id); ping(call.to, 'call', call.scope, call.id);
     }
+    return gesloten;
   }
   function find(actor, callId) {
     const call = root().calls.find(x => x.id === String(callId || '') && x.product === product &&

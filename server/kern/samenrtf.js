@@ -9,7 +9,7 @@ module.exports = ({ db, save, bewerkCollectie, crypto, schoon, zijnVrienden,
   const eigen = require('./eigencollectie')({ db, domein: 'kern/samenrtf',
     bezit: { samenRtfKamers: 'kaart' } });
   const iso = () => new Date(tijd()).toISOString();
-  const toegang = require('./samenrtf-toegang')({ crypto, nu: iso });
+  const toegang = require('./samen-toegang')({ crypto, nu: iso, profiel: 'rtf' });
   const MAX_KAMERS = 5000;
   const MAX_EIGEN = 20;
   const BEWAAR_MS = 90 * 86400000;

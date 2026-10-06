@@ -7,10 +7,8 @@
    uit routes/ledenbalie.js. Wie een zetel heeft, werkt hier; wie er geen heeft,
    krijgt de reden te horen in plaats van "geen toegang".
 
-   GEEN ZOEKBALK OVER DE WERELD. Deze routes werken op een ZAAK. Een medewerker
-   opent SUP-81929 en krijgt wat bij SUP-81929 hoort -- niet een veld waarin hij
-   elk lid kan opzoeken en alles kan opendoen. Vrije inzage bestaat nog steeds,
-   maar loopt langs de bestaande balieroutes met hun reden en hun journaalregel.
+   Deze routes werken op een zaak. Vrije inzage loopt via de bestaande
+   balieroutes met hun reden en journaalregel.
    Dat onderscheid is de reden dat deze laag er is.
 
    EN HET SCHERM VAN DE MEDEWERKER OPENT NIETS UIT ZICHZELF. Een zaak zegt dat
@@ -102,6 +100,10 @@ module.exports = (kern) => {
      niets over -- de klacht blijft van de balie. */
   app.post('/api/office/service/koppel', officeAuth, balieAuth, (req, res) => veilig(res, () =>
     serviceLoop.koppel(kort(lijf(req).id, 40), { soort: kort(lijf(req).soort, 30), code: kort(lijf(req).code, 60), door: req.balieKey })));
+
+  /* Een zaak wordt hier niet gekopieerd. Service leidt uitsluitend de vaste,
+     geminimaliseerde procesvorm af; gesprekken en melder blijven in de zaak. */
+  require('./service-kantoor-learning')(kern,{veilig,lijf,kort,balieAuth});
 
   /* ------------------------------------------------------- bevestigingen -- */
   /* Om een bevestiging VRAGEN. De code komt hier niet terug maar in de app van

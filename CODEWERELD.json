@@ -1,58 +1,66 @@
 {
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
-    "op": "2026-09-29",
-    "commit": "eaacb8c3"
+    "op": "2026-10-06",
+    "commit": "9d3b8c58a"
   },
   "registers": {
-    "geteld": 190,
-    "opRoute": 68,
-    "opBestand": 105,
+    "geteld": 206,
+    "opRoute": 69,
+    "opBestand": 117,
     "opSymbool": 1,
-    "zonderAs": 16
+    "zonderAs": 19
   },
   "assen": {
     "route": {
-      "sleutels": 6564,
-      "registers": 82
+      "sleutels": 6791,
+      "registers": 85
     },
     "bestand": {
-      "sleutels": 5813,
-      "registers": 154
+      "sleutels": 6266,
+      "registers": 170
     },
     "symbool": {
-      "sleutels": 24495,
+      "sleutels": 26359,
       "registers": 1,
       "reden": null,
       "gereedschapAanwezig": true,
       "gereedschap": "scripts/ast/ (eigen parser, met lijn- en positie-informatie)",
       "proef": {
         "gedraaid": true,
-        "bestanden": 3911,
-        "geparsed": 3911,
+        "bestanden": 4260,
+        "geparsed": 4260,
         "gefaald": 0,
         "gefaaldLijst": [],
-        "symbolen": 17210,
-        "seconden": 3.9
+        "symbolen": 18725,
+        "seconden": 5
       }
     }
   },
   "ruggengraat": {
-    "paden": 6564,
-    "inMeerDanEenRegister": 6119,
-    "pct": 93.2,
+    "paden": 6791,
+    "inMeerDanEenRegister": 6374,
+    "pct": 93.9,
     "verdeling": [
       {
+        "registers": 37,
+        "paden": 1
+      },
+      {
+        "registers": 36,
+        "paden": 6
+      },
+      {
         "registers": 35,
-        "paden": 5
+        "paden": 4
       },
       {
         "registers": 34,
-        "paden": 3
+        "paden": 1
       },
       {
         "registers": 33,
-        "paden": 3
+        "paden": 4
       },
       {
         "registers": 32,
@@ -60,133 +68,133 @@
       },
       {
         "registers": 31,
-        "paden": 4
+        "paden": 9
       },
       {
         "registers": 30,
-        "paden": 6
-      },
-      {
-        "registers": 29,
-        "paden": 26
-      },
-      {
-        "registers": 28,
-        "paden": 26
-      },
-      {
-        "registers": 27,
-        "paden": 62
-      },
-      {
-        "registers": 26,
-        "paden": 119
-      },
-      {
-        "registers": 25,
-        "paden": 250
-      },
-      {
-        "registers": 24,
-        "paden": 383
-      },
-      {
-        "registers": 23,
-        "paden": 719
-      },
-      {
-        "registers": 22,
-        "paden": 1075
-      },
-      {
-        "registers": 21,
-        "paden": 690
-      },
-      {
-        "registers": 20,
-        "paden": 344
-      },
-      {
-        "registers": 19,
-        "paden": 169
-      },
-      {
-        "registers": 18,
-        "paden": 191
-      },
-      {
-        "registers": 17,
-        "paden": 159
-      },
-      {
-        "registers": 16,
-        "paden": 211
-      },
-      {
-        "registers": 15,
-        "paden": 281
-      },
-      {
-        "registers": 14,
-        "paden": 145
-      },
-      {
-        "registers": 13,
-        "paden": 61
-      },
-      {
-        "registers": 12,
-        "paden": 44
-      },
-      {
-        "registers": 11,
-        "paden": 13
-      },
-      {
-        "registers": 10,
-        "paden": 17
-      },
-      {
-        "registers": 9,
-        "paden": 31
-      },
-      {
-        "registers": 8,
-        "paden": 93
-      },
-      {
-        "registers": 7,
         "paden": 21
       },
       {
-        "registers": 6,
-        "paden": 72
+        "registers": 29,
+        "paden": 32
       },
       {
-        "registers": 5,
+        "registers": 28,
         "paden": 75
       },
       {
+        "registers": 27,
+        "paden": 131
+      },
+      {
+        "registers": 26,
+        "paden": 257
+      },
+      {
+        "registers": 25,
+        "paden": 358
+      },
+      {
+        "registers": 24,
+        "paden": 700
+      },
+      {
+        "registers": 23,
+        "paden": 1050
+      },
+      {
+        "registers": 22,
+        "paden": 594
+      },
+      {
+        "registers": 21,
+        "paden": 430
+      },
+      {
+        "registers": 20,
+        "paden": 310
+      },
+      {
+        "registers": 19,
+        "paden": 222
+      },
+      {
+        "registers": 18,
+        "paden": 172
+      },
+      {
+        "registers": 17,
+        "paden": 257
+      },
+      {
+        "registers": 16,
+        "paden": 281
+      },
+      {
+        "registers": 15,
+        "paden": 114
+      },
+      {
+        "registers": 14,
+        "paden": 77
+      },
+      {
+        "registers": 13,
+        "paden": 44
+      },
+      {
+        "registers": 12,
+        "paden": 20
+      },
+      {
+        "registers": 11,
+        "paden": 11
+      },
+      {
+        "registers": 10,
+        "paden": 6
+      },
+      {
+        "registers": 9,
+        "paden": 17
+      },
+      {
+        "registers": 8,
+        "paden": 108
+      },
+      {
+        "registers": 7,
+        "paden": 53
+      },
+      {
+        "registers": 6,
+        "paden": 52
+      },
+      {
+        "registers": 5,
+        "paden": 46
+      },
+      {
         "registers": 4,
-        "paden": 62
+        "paden": 90
       },
       {
         "registers": 3,
-        "paden": 345
+        "paden": 386
       },
       {
         "registers": 2,
-        "paden": 411
+        "paden": 432
       },
       {
         "registers": 1,
-        "paden": 445
+        "paden": 417
       }
     ]
   },
   "brug": {
     "uitleg": "paren route -> bestand die BINNEN EEN RIJ van een register staan; alleen daar beweert een register dat die twee bij elkaar horen",
-    "paden": 5612,
+    "paden": 5768,
     "registersDieSpreken": [
       "AANROEPGRAAF.json",
       "DOELGROEPBEREIK.json",
@@ -196,9 +204,9 @@
       "ROUTEBRON.json",
       "SCHRIJFANALYSE.json"
     ],
-    "verschilToetsbaar": 5383,
-    "verschilDekkingPct": 95.9,
-    "verschillen": 35,
+    "verschilToetsbaar": 5461,
+    "verschilDekkingPct": 94.7,
+    "verschillen": 42,
     "soortBeslistIn": "ROUTEBRON.json -- daar wordt een verschil ingedeeld als `verouderd` of `tegenspraak`; deze meter telt alleen DAT ze verschillen",
     "verschilReden": null,
     "verschilLijst": [
@@ -223,23 +231,6 @@
         ]
       },
       {
-        "pad": "/gezin/agenda",
-        "bestanden": [
-          {
-            "bestand": "server/foundation/gasten/gezinsagenda.js",
-            "volgens": [
-              "AANROEPGRAAF.json"
-            ]
-          },
-          {
-            "bestand": "server/foundation/gasten/gezinsleven.js",
-            "volgens": [
-              "SCHRIJFANALYSE.json"
-            ]
-          }
-        ]
-      },
-      {
         "pad": "/api/bedrijf/werkruimte/maak",
         "bestanden": [
           {
@@ -252,6 +243,23 @@
           },
           {
             "bestand": "server/bedrijf/index.js",
+            "volgens": [
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      },
+      {
+        "pad": "/gezin/agenda",
+        "bestanden": [
+          {
+            "bestand": "server/foundation/gasten/gezinsagenda.js",
+            "volgens": [
+              "AANROEPGRAAF.json"
+            ]
+          },
+          {
+            "bestand": "server/foundation/gasten/gezinsleven.js",
             "volgens": [
               "SCHRIJFANALYSE.json"
             ]
@@ -305,6 +313,44 @@
           },
           {
             "bestand": "server/routes/member/salon.js",
+            "volgens": [
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      },
+      {
+        "pad": "/api/supplier/horeca/bon/maak",
+        "bestanden": [
+          {
+            "bestand": "server/routes/supplier/horeca/bonkaart.js",
+            "volgens": [
+              "AANROEPGRAAF.json",
+              "MACHINEDEKKING.json",
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/supplier/horeca/bonnen.js",
+            "volgens": [
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      },
+      {
+        "pad": "/api/supplier/horeca/bon",
+        "bestanden": [
+          {
+            "bestand": "server/routes/supplier/horeca/bonkaart.js",
+            "volgens": [
+              "AANROEPGRAAF.json",
+              "MACHINEDEKKING.json",
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/supplier/horeca/bonnen.js",
             "volgens": [
               "SCHRIJFANALYSE.json"
             ]
@@ -386,6 +432,25 @@
         ]
       },
       {
+        "pad": "/api/supplier/roster",
+        "bestanden": [
+          {
+            "bestand": "server/routes/supplier/toegang-roster.js",
+            "volgens": [
+              "AANROEPGRAAF.json",
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/supplier/toegang.js",
+            "volgens": [
+              "MACHINEDEKKING.json",
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      },
+      {
         "pad": "/api/bedrijf/geconsolideerd",
         "bestanden": [
           {
@@ -416,25 +481,6 @@
           },
           {
             "bestand": "server/routes/auth/inlog.js",
-            "volgens": [
-              "SCHRIJFANALYSE.json"
-            ]
-          }
-        ]
-      },
-      {
-        "pad": "/api/doos/update/status",
-        "bestanden": [
-          {
-            "bestand": "server/routes/doos-kloon.js",
-            "volgens": [
-              "AANROEPGRAAF.json",
-              "MACHINEDEKKING.json",
-              "ROUTEBRON.json"
-            ]
-          },
-          {
-            "bestand": "server/routes/doos.js",
             "volgens": [
               "SCHRIJFANALYSE.json"
             ]
@@ -517,6 +563,44 @@
         ]
       },
       {
+        "pad": "/api/supplier/horeca/offline/sync",
+        "bestanden": [
+          {
+            "bestand": "server/routes/supplier/horeca/offline.js",
+            "volgens": [
+              "AANROEPGRAAF.json",
+              "MACHINEDEKKING.json",
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/supplier/horeca/bonnen.js",
+            "volgens": [
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      },
+      {
+        "pad": "/api/supplier/horeca/offline/handelingen",
+        "bestanden": [
+          {
+            "bestand": "server/routes/supplier/horeca/offline.js",
+            "volgens": [
+              "AANROEPGRAAF.json",
+              "MACHINEDEKKING.json",
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/supplier/horeca/bonnen.js",
+            "volgens": [
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
+      },
+      {
         "pad": "/api/supplier/horeca/gang/vrij",
         "bestanden": [
           {
@@ -573,94 +657,19 @@
         ]
       },
       {
-        "pad": "/api/supplier/apply/chat",
+        "pad": "/api/supplier/ticket/deurverkoop",
         "bestanden": [
           {
-            "bestand": "server/routes/supplier/werving/sollchat.js",
+            "bestand": "server/routes/supplier/tickets-verkoop.js",
             "volgens": [
               "AANROEPGRAAF.json",
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/supplier/tickets.js",
+            "volgens": [
               "MACHINEDEKKING.json",
-              "ROUTEBRON.json"
-            ]
-          },
-          {
-            "bestand": "server/routes/supplier/werving/sollicitaties.js",
-            "volgens": [
-              "DOELGROEPBEREIK.json",
-              "SCHRIJFANALYSE.json"
-            ]
-          }
-        ]
-      },
-      {
-        "pad": "/api/supplier/apply/chat/send",
-        "bestanden": [
-          {
-            "bestand": "server/routes/supplier/werving/sollchat.js",
-            "volgens": [
-              "AANROEPGRAAF.json",
-              "MACHINEDEKKING.json",
-              "ROUTEBRON.json"
-            ]
-          },
-          {
-            "bestand": "server/routes/supplier/werving/sollicitaties.js",
-            "volgens": [
-              "SCHRIJFANALYSE.json"
-            ]
-          }
-        ]
-      },
-      {
-        "pad": "/api/spar/lijst",
-        "bestanden": [
-          {
-            "bestand": "server/routes/member/persoonlijk-spar.js",
-            "volgens": [
-              "DOELGROEPBEREIK.json",
-              "ROUTEBRON.json"
-            ]
-          },
-          {
-            "bestand": "server/routes/member/persoonlijk.js",
-            "volgens": [
-              "SCHRIJFANALYSE.json"
-            ]
-          }
-        ]
-      },
-      {
-        "pad": "/api/office/anker",
-        "bestanden": [
-          {
-            "bestand": "server/routes/office/anker.js",
-            "volgens": [
-              "KANTOORMACHT.json",
-              "ROUTEBRON.json"
-            ]
-          },
-          {
-            "bestand": "server/routes/office/toegang.js",
-            "volgens": [
-              "SCHRIJFANALYSE.json"
-            ]
-          }
-        ]
-      },
-      {
-        "pad": "/api/office/anker/reken",
-        "bestanden": [
-          {
-            "bestand": "server/routes/office/anker.js",
-            "volgens": [
-              "KANTOORMACHT.json",
-              "MACHINEDEKKING.json",
-              "ROUTEBRON.json"
-            ]
-          },
-          {
-            "bestand": "server/routes/office/toegang.js",
-            "volgens": [
               "SCHRIJFANALYSE.json"
             ]
           }
@@ -670,12 +679,12 @@
   },
   "bronbereik": {
     "uitleg": "twee getallen, met opzet. `genoemd` = door enig register (de symboolindex noemt alles, dus dit meet STRUCTUUR: welke functies, wat uitgevoerd, wie hangt ervan af). `gedrag` = door minstens een register buiten die index (schrijft het, is het bewezen, is het herhaalbaar). Alleen het tweede is de bovengrens voor een vraag over gedrag.",
-    "bestanden": 5109,
-    "genoemd": 5109,
+    "bestanden": 5514,
+    "genoemd": 5514,
     "pct": 100,
-    "gedrag": 2871,
-    "gedragPct": 56.2,
-    "relatie": 5109,
+    "gedrag": 4353,
+    "gedragPct": 78.9,
+    "relatie": 5514,
     "indexregisters": [
       {
         "register": "AANROEPGRAAF.json",
@@ -701,52 +710,52 @@
     "zwijgendeRegisters": [
       {
         "register": "SCHERMGEDRAG.json",
-        "bestanden": 148
+        "bestanden": 153
       }
     ],
     "indexgrens": "een register telt als index als hij zichzelf zo verklaart (soort: index) of minstens 95% van een boom noemt. Een index zegt WAAR iets woont en WAT met wat samenhangt; hij zegt niet of het schrijft, klopt of bewezen is -- daarom telt hij niet mee voor de gedragsteller.",
     "perBoom": [
       {
         "boom": "server",
-        "bestanden": 3911,
-        "genoemd": 3911,
+        "bestanden": 4260,
+        "genoemd": 4260,
         "pct": 100,
-        "gedrag": 2365,
-        "gedragPct": 60.5
+        "gedrag": 3835,
+        "gedragPct": 90
       },
       {
         "boom": "public",
-        "bestanden": 1198,
-        "genoemd": 1198,
+        "bestanden": 1254,
+        "genoemd": 1254,
         "pct": 100,
-        "gedrag": 506,
-        "gedragPct": 42.2
+        "gedrag": 518,
+        "gedragPct": 41.3
       }
     ],
-    "serverPct": 60.5,
-    "publicPct": 42.2,
+    "serverPct": 90,
+    "publicPct": 41.3,
     "nooitGenoemdVoorbeeld": [],
     "zonderGedragVoorbeeld": [
-      "server/accounts/achtergrond.js",
       "server/accounts/demohash.js",
-      "server/accounts/duurzaamheid.js",
-      "server/accounts/gebonden.js",
       "server/accounts/mirror-wachtrij.js",
-      "server/accounts/onderhoud.js",
-      "server/accounts/publiekmail.js",
+      "server/accounts/tokenvorm.js",
       "server/accounts/transactie-volgers.js",
-      "server/accounts/transactie.js",
-      "server/accounts/wachtwoord.js",
-      "server/ai-context.js",
-      "server/ai-kompas.js",
-      "server/ai-kort.js",
-      "server/ai-prijzen.js",
-      "server/ai-stand.js",
-      "server/bedrijf/contractklok.js",
-      "server/bedrijf/gebeurtenis-lezen.js",
-      "server/bedrijf/gebeurtenis-veld.js",
-      "server/bedrijf/handeling-lijst.js",
-      "server/bedrijf/oplosbaar.js"
+      "server/bedrijf/loop-context.js",
+      "server/bedrijf/oplosbaar.js",
+      "server/bedrijf/rollen-beleid.js",
+      "server/betaal/betaler.js",
+      "server/betaal-connect.js",
+      "server/betaal-sandbox.js",
+      "server/bewaarbeleid-eigenregie.js",
+      "server/config/connection-realtime-evidence.js",
+      "server/config/evidence-runner-trust.js",
+      "server/config/node-versie.js",
+      "server/config/productie-invoer.js",
+      "server/config/productie-pin.js",
+      "server/db/audit-projectie.js",
+      "server/db/audit-vorm.js",
+      "server/db/botsing.js",
+      "server/db/collectie-publicatie.js"
     ]
   },
   "noemers": {
@@ -754,91 +763,95 @@
     "perRegister": [
       {
         "register": "ROUTEBRON.json",
-        "paden": 5306
+        "paden": 5452
       },
       {
         "register": "DEKKING.json",
-        "paden": 5275
-      },
-      {
-        "register": "MUTATIECONTRACT.json",
-        "paden": 5174
-      },
-      {
-        "register": "POORTWACHT.json",
-        "paden": 5071
-      },
-      {
-        "register": "EXECUTION_MAP.json",
-        "paden": 5020
-      },
-      {
-        "register": "IDEMPROEF.json",
-        "paden": 5020
-      },
-      {
-        "register": "FAALPROEF.json",
-        "paden": 4961
-      },
-      {
-        "register": "ROLPROEF.json",
-        "paden": 4782
+        "paden": 5432
       },
       {
         "register": "OUTPUTPROEF.json",
-        "paden": 4726
+        "paden": 5342
+      },
+      {
+        "register": "MUTATIECONTRACT.json",
+        "paden": 5318
+      },
+      {
+        "register": "POORTWACHT.json",
+        "paden": 5252
       },
       {
         "register": "VERTROUWEN.json",
-        "paden": 4717
+        "paden": 5252
+      },
+      {
+        "register": "FAALPROEF.json",
+        "paden": 5184
+      },
+      {
+        "register": "ROLPROEF.json",
+        "paden": 5184
+      },
+      {
+        "register": "EXECUTION_MAP.json",
+        "paden": 5148
+      },
+      {
+        "register": "IDEMPROEF.json",
+        "paden": 5148
       },
       {
         "register": "ONBEWEZEN.json",
         "paden": 4498
       },
       {
+        "register": "IDEMSCHULD.json",
+        "paden": 4448
+      },
+      {
         "register": "SCHRIJFANALYSE.json",
         "paden": 4441
       },
       {
-        "register": "IDEMSCHULD.json",
-        "paden": 4432
-      },
-      {
         "register": "STAATPROEF.json",
-        "paden": 4239
+        "paden": 4396
       },
       {
         "register": "INVOERPROEF.json",
-        "paden": 3995
+        "paden": 4376
+      },
+      {
+        "register": "MENSGROND.json",
+        "paden": 4024
       },
       {
         "register": "MACHINEDEKKING.json",
-        "paden": 3955
+        "paden": 4005
       },
       {
         "register": "HANDELINGPROEF.json",
-        "paden": 3900
+        "paden": 4002
       },
       {
         "register": "UITVOERPROEF.json",
-        "paden": 3898
+        "paden": 4000
+      },
+      {
+        "register": "AUDITPROEF.json",
+        "paden": 3999
       },
       {
         "register": "WAAROM.json",
         "paden": 3805
       },
       {
-        "register": "AUDITPROEF.json",
-        "paden": 3730
-      },
-      {
         "register": "AANROEPGRAAF.json",
-        "paden": 3244
+        "paden": 3301
       },
       {
         "register": "MUTATIECONTRACT-AFGELEID.json",
-        "paden": 3116
+        "paden": 3115
       },
       {
         "register": "IDOR.json",
@@ -846,31 +859,35 @@
       },
       {
         "register": "SCHERMFUNCTIE.json",
-        "paden": 1460
+        "paden": 1492
       },
       {
         "register": "SCHERMROUTES.json",
-        "paden": 1098
+        "paden": 1121
+      },
+      {
+        "register": "CODECREDENTIALS.json",
+        "paden": 1042
       },
       {
         "register": "MUTATIECONTRACT-VOORSTEL.json",
         "paden": 1026
       },
       {
-        "register": "CODECREDENTIALS.json",
-        "paden": 953
+        "register": "HANDLERWACHT.json",
+        "paden": 677
       },
       {
-        "register": "HANDLERWACHT.json",
-        "paden": 646
+        "register": "TIKKEN.json",
+        "paden": 589
       },
       {
         "register": "DOODSPOOR.json",
         "paden": 586
       },
       {
-        "register": "TIKKEN.json",
-        "paden": 529
+        "register": "LOOP-FABRIC-COVERAGE.json",
+        "paden": 434
       },
       {
         "register": "INHOUDSKAART.json",
@@ -882,15 +899,15 @@
       },
       {
         "register": "ONDERNEMERBEWIJS.json",
-        "paden": 359
+        "paden": 365
       },
       {
         "register": "EDGEDEKKING.json",
-        "paden": 313
+        "paden": 316
       },
       {
         "register": "DOELGROEPBEREIK.json",
-        "paden": 270
+        "paden": 265
       },
       {
         "register": "GEVOLGDEKKING.json",
@@ -902,7 +919,7 @@
       },
       {
         "register": "IDEMBESLUIT.json",
-        "paden": 163
+        "paden": 167
       },
       {
         "register": "BEVOEGD.json",
@@ -914,23 +931,39 @@
     {
       "register": "AANROEPGRAAF.json",
       "as": "bestand",
-      "paden": 3244,
-      "bestanden": 3422,
+      "paden": 3301,
+      "bestanden": 3693,
       "symbolen": 0,
-      "paren": 3253
+      "paren": 3309
     },
     {
       "register": "ROUTEBRON.json",
       "as": "route",
-      "paden": 5306,
-      "bestanden": 706,
+      "paden": 5452,
+      "bestanden": 730,
       "symbolen": 0,
-      "paren": 5303
+      "paren": 5449
+    },
+    {
+      "register": "SYMBOLEN.json",
+      "as": "symbool",
+      "paden": 0,
+      "bestanden": 5520,
+      "symbolen": 26359,
+      "paren": 0
     },
     {
       "register": "DEKKING.json",
       "as": "route",
-      "paden": 5275,
+      "paden": 5432,
+      "bestanden": 0,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "OUTPUTPROEF.json",
+      "as": "route",
+      "paden": 5342,
       "bestanden": 0,
       "symbolen": 0,
       "paren": 0
@@ -938,23 +971,55 @@
     {
       "register": "MUTATIECONTRACT.json",
       "as": "route",
-      "paden": 5174,
+      "paden": 5318,
       "bestanden": 1,
       "symbolen": 0,
       "paren": 0
     },
     {
-      "register": "SYMBOLEN.json",
-      "as": "symbool",
-      "paden": 0,
-      "bestanden": 5115,
-      "symbolen": 24495,
+      "register": "POORTWACHT.json",
+      "as": "route",
+      "paden": 5252,
+      "bestanden": 1,
+      "symbolen": 0,
       "paren": 0
     },
     {
-      "register": "POORTWACHT.json",
+      "register": "VERTROUWEN.json",
       "as": "route",
-      "paden": 5071,
+      "paden": 5252,
+      "bestanden": 1,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "FAALPROEF.json",
+      "as": "route",
+      "paden": 5184,
+      "bestanden": 4,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "ROLPROEF.json",
+      "as": "route",
+      "paden": 5184,
+      "bestanden": 1,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "EXECUTION_MAP.json",
+      "as": "route",
+      "paden": 5148,
+      "bestanden": 4,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "IDEMPROEF.json",
+      "as": "route",
+      "paden": 5148,
       "bestanden": 1,
       "symbolen": 0,
       "paren": 0
@@ -968,60 +1033,12 @@
       "paren": 4652
     },
     {
-      "register": "EXECUTION_MAP.json",
-      "as": "route",
-      "paden": 5020,
-      "bestanden": 4,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
-      "register": "IDEMPROEF.json",
-      "as": "route",
-      "paden": 5020,
-      "bestanden": 1,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
-      "register": "FAALPROEF.json",
-      "as": "route",
-      "paden": 4961,
-      "bestanden": 4,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
-      "register": "ROLPROEF.json",
-      "as": "route",
-      "paden": 4782,
-      "bestanden": 1,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
-      "register": "OUTPUTPROEF.json",
-      "as": "route",
-      "paden": 4726,
-      "bestanden": 0,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
-      "register": "VERTROUWEN.json",
-      "as": "route",
-      "paden": 4717,
-      "bestanden": 0,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
       "register": "MACHINEDEKKING.json",
       "as": "route",
-      "paden": 3955,
-      "bestanden": 692,
+      "paden": 4005,
+      "bestanden": 701,
       "symbolen": 0,
-      "paren": 3958
+      "paren": 4008
     },
     {
       "register": "ONBEWEZEN.json",
@@ -1034,7 +1051,7 @@
     {
       "register": "IDEMSCHULD.json",
       "as": "route",
-      "paden": 4432,
+      "paden": 4448,
       "bestanden": 1,
       "symbolen": 0,
       "paren": 0
@@ -1042,7 +1059,7 @@
     {
       "register": "STAATPROEF.json",
       "as": "route",
-      "paden": 4239,
+      "paden": 4396,
       "bestanden": 1,
       "symbolen": 0,
       "paren": 0
@@ -1050,15 +1067,31 @@
     {
       "register": "INVOERPROEF.json",
       "as": "route",
-      "paden": 3995,
+      "paden": 4376,
       "bestanden": 1,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "LOOP-FABRIC-COVERAGE.json",
+      "as": "bestand",
+      "paden": 434,
+      "bestanden": 3804,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "MENSGROND.json",
+      "as": "route",
+      "paden": 4024,
+      "bestanden": 2,
       "symbolen": 0,
       "paren": 0
     },
     {
       "register": "HANDELINGPROEF.json",
       "as": "route",
-      "paden": 3900,
+      "paden": 4002,
       "bestanden": 1,
       "symbolen": 0,
       "paren": 0
@@ -1066,7 +1099,15 @@
     {
       "register": "UITVOERPROEF.json",
       "as": "route",
-      "paden": 3898,
+      "paden": 4000,
+      "bestanden": 1,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "AUDITPROEF.json",
+      "as": "route",
+      "paden": 3999,
       "bestanden": 1,
       "symbolen": 0,
       "paren": 0
@@ -1080,34 +1121,26 @@
       "paren": 0
     },
     {
-      "register": "AUDITPROEF.json",
-      "as": "route",
-      "paden": 3730,
-      "bestanden": 1,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
       "register": "MUTATIECONTRACT-AFGELEID.json",
       "as": "route",
-      "paden": 3116,
+      "paden": 3115,
       "bestanden": 1,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
-      "register": "SCHERMFUNCTIE.json",
-      "as": "route",
-      "paden": 1460,
-      "bestanden": 587,
       "symbolen": 0,
       "paren": 0
     },
     {
       "register": "LUSSEN.json",
       "as": "bestand",
-      "paden": 39,
-      "bestanden": 1886,
+      "paden": 48,
+      "bestanden": 2246,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "SCHERMFUNCTIE.json",
+      "as": "route",
+      "paden": 1492,
+      "bestanden": 599,
       "symbolen": 0,
       "paren": 0
     },
@@ -1120,18 +1153,18 @@
       "paren": 0
     },
     {
-      "register": "SCHERMROUTES.json",
+      "register": "CODECREDENTIALS.json",
       "as": "route",
-      "paden": 1098,
-      "bestanden": 426,
+      "paden": 1042,
+      "bestanden": 544,
       "symbolen": 0,
       "paren": 0
     },
     {
-      "register": "CODECREDENTIALS.json",
+      "register": "SCHERMROUTES.json",
       "as": "route",
-      "paden": 953,
-      "bestanden": 447,
+      "paden": 1121,
+      "bestanden": 434,
       "symbolen": 0,
       "paren": 0
     },
@@ -1139,7 +1172,7 @@
       "register": "ACTIVERING.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 1232,
+      "bestanden": 1336,
       "symbolen": 0,
       "paren": 0
     },
@@ -1154,16 +1187,24 @@
     {
       "register": "MUTATIES.json",
       "as": "bestand",
-      "paden": 0,
-      "bestanden": 772,
+      "paden": 20,
+      "bestanden": 894,
       "symbolen": 0,
       "paren": 0
     },
     {
       "register": "HANDLERWACHT.json",
       "as": "route",
-      "paden": 646,
+      "paden": 677,
       "bestanden": 13,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "TIKKEN.json",
+      "as": "route",
+      "paden": 589,
+      "bestanden": 1,
       "symbolen": 0,
       "paren": 0
     },
@@ -1176,26 +1217,18 @@
       "paren": 0
     },
     {
-      "register": "TIKKEN.json",
-      "as": "route",
-      "paden": 529,
-      "bestanden": 0,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
       "register": "DOELGROEPBEREIK.json",
       "as": "route",
-      "paden": 270,
-      "bestanden": 200,
+      "paden": 265,
+      "bestanden": 206,
       "symbolen": 0,
-      "paren": 965
+      "paren": 1013
     },
     {
       "register": "SCHERMGEDRAG.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 422,
+      "bestanden": 434,
       "symbolen": 0,
       "paren": 0
     },
@@ -1218,7 +1251,7 @@
     {
       "register": "ONDERNEMERBEWIJS.json",
       "as": "route",
-      "paden": 359,
+      "paden": 365,
       "bestanden": 1,
       "symbolen": 0,
       "paren": 0
@@ -1226,16 +1259,8 @@
     {
       "register": "EDGEDEKKING.json",
       "as": "route",
-      "paden": 313,
+      "paden": 316,
       "bestanden": 1,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
-      "register": "SEMANTIEK.json",
-      "as": "bestand",
-      "paden": 0,
-      "bestanden": 253,
       "symbolen": 0,
       "paren": 0
     },
@@ -1243,7 +1268,15 @@
       "register": "KERNHERKOMST.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 249,
+      "bestanden": 264,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "SEMANTIEK.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 255,
       "symbolen": 0,
       "paren": 0
     },
@@ -1267,7 +1300,7 @@
       "register": "AFGELEID.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 182,
+      "bestanden": 198,
       "symbolen": 0,
       "paren": 0
     },
@@ -1290,7 +1323,7 @@
     {
       "register": "IDEMBESLUIT.json",
       "as": "route",
-      "paden": 163,
+      "paden": 167,
       "bestanden": 0,
       "symbolen": 0,
       "paren": 0
@@ -1306,8 +1339,8 @@
     {
       "register": "ISOLATIEPROEF.json",
       "as": "bestand",
-      "paden": 56,
-      "bestanden": 64,
+      "paden": 55,
+      "bestanden": 89,
       "symbolen": 0,
       "paren": 0
     },
@@ -1328,15 +1361,15 @@
       "paren": 0
     },
     {
-      "register": "LIEGRONDE.json",
+      "register": "VINDBAAR.json",
       "as": "route",
-      "paden": 99,
+      "paden": 100,
       "bestanden": 1,
       "symbolen": 0,
       "paren": 0
     },
     {
-      "register": "VINDBAAR.json",
+      "register": "LIEGRONDE.json",
       "as": "route",
       "paden": 99,
       "bestanden": 1,
@@ -1376,18 +1409,18 @@
       "paren": 0
     },
     {
-      "register": "EDGEKAART.json",
+      "register": "STILLEZING.json",
       "as": "bestand",
-      "paden": 3,
-      "bestanden": 78,
+      "paden": 0,
+      "bestanden": 86,
       "symbolen": 0,
       "paren": 0
     },
     {
-      "register": "STILLEZING.json",
+      "register": "EDGEKAART.json",
       "as": "bestand",
-      "paden": 0,
-      "bestanden": 81,
+      "paden": 3,
+      "bestanden": 79,
       "symbolen": 0,
       "paren": 0
     },
@@ -1396,6 +1429,22 @@
       "as": "route",
       "paden": 75,
       "bestanden": 0,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "BEWIJSLADDER.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 72,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "BEDRIJFSMAAT.json",
+      "as": "bestand",
+      "paden": 1,
+      "bestanden": 70,
       "symbolen": 0,
       "paren": 0
     },
@@ -1416,14 +1465,6 @@
       "paren": 0
     },
     {
-      "register": "BEDRIJFSMAAT.json",
-      "as": "bestand",
-      "paden": 1,
-      "bestanden": 64,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
       "register": "WEKKERS.json",
       "as": "bestand",
       "paden": 3,
@@ -1432,18 +1473,18 @@
       "paren": 0
     },
     {
-      "register": "BEWIJSLADDER.json",
+      "register": "REFUNDMIGRATIE.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 62,
+      "bestanden": 60,
       "symbolen": 0,
       "paren": 0
     },
     {
-      "register": "REFUNDMIGRATIE.json",
+      "register": "DOORBELASTING.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 59,
+      "bestanden": 57,
       "symbolen": 0,
       "paren": 0
     },
@@ -1456,17 +1497,9 @@
       "paren": 0
     },
     {
-      "register": "DOORBELASTING.json",
-      "as": "bestand",
-      "paden": 0,
-      "bestanden": 55,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
       "register": "KANTOORMACHT.json",
       "as": "route",
-      "paden": 43,
+      "paden": 46,
       "bestanden": 7,
       "symbolen": 0,
       "paren": 25
@@ -1474,8 +1507,16 @@
     {
       "register": "MUTATIEBOEK.json",
       "as": "route",
-      "paden": 49,
+      "paden": 52,
       "bestanden": 1,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "BODEMDRUK.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 49,
       "symbolen": 0,
       "paren": 0
     },
@@ -1528,6 +1569,22 @@
       "paren": 0
     },
     {
+      "register": "VERSTRENGELING.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 46,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "PLAATSVORM.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 45,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
       "register": "MUTATIESEMANTIEK.json",
       "as": "route",
       "paden": 37,
@@ -1544,10 +1601,18 @@
       "paren": 0
     },
     {
-      "register": "VERSTRENGELING.json",
+      "register": "OVERGANGSVORM.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 41,
+      "bestanden": 40,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "POSITIESTROOM.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 40,
       "symbolen": 0,
       "paren": 0
     },
@@ -1556,22 +1621,6 @@
       "as": "bestand",
       "paden": 8,
       "bestanden": 28,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
-      "register": "NORM.json",
-      "as": "bestand",
-      "paden": 0,
-      "bestanden": 34,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
-      "register": "OBJECTMODEL.json",
-      "as": "bestand",
-      "paden": 0,
-      "bestanden": 33,
       "symbolen": 0,
       "paren": 0
     },
@@ -1585,6 +1634,14 @@
     },
     {
       "register": "MAGNAATLAB.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 31,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "OBJECTMODEL.json",
       "as": "bestand",
       "paden": 0,
       "bestanden": 29,
@@ -1720,6 +1777,14 @@
       "paren": 0
     },
     {
+      "register": "NORM.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 13,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
       "register": "RUST-MIGRATIES.json",
       "as": "bestand",
       "paden": 0,
@@ -1748,6 +1813,22 @@
       "as": "bestand",
       "paden": 0,
       "bestanden": 11,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "POSITIEPROEF.json",
+      "as": "route",
+      "paden": 9,
+      "bestanden": 1,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "TRUST_EVIDENCE_PLANE.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 10,
       "symbolen": 0,
       "paren": 0
     },
@@ -1904,6 +1985,22 @@
       "paren": 0
     },
     {
+      "register": "MUTATIEINVENTARIS.json",
+      "as": "route",
+      "paden": 3,
+      "bestanden": 1,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "ROLLBACKBESLUIT.json",
+      "as": "bestand",
+      "paden": 2,
+      "bestanden": 2,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
       "register": "WETBRONNEN.json",
       "as": "bestand",
       "paden": 0,
@@ -1928,10 +2025,18 @@
       "paren": 0
     },
     {
-      "register": "MUTATIEINVENTARIS.json",
-      "as": "route",
-      "paden": 2,
-      "bestanden": 1,
+      "register": "LOOP-FABRIC-SOURCE-FLOWS.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 3,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "RTG-LEARNING-CONSTITUTION.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 3,
       "symbolen": 0,
       "paren": 0
     },
@@ -1969,14 +2074,6 @@
     },
     {
       "register": "HEAPPROEF.json",
-      "as": "bestand",
-      "paden": 1,
-      "bestanden": 1,
-      "symbolen": 0,
-      "paren": 0
-    },
-    {
-      "register": "ROLLBACKBESLUIT.json",
       "as": "bestand",
       "paden": 1,
       "bestanden": 1,
@@ -2040,6 +2137,14 @@
       "paren": 0
     },
     {
+      "register": "CONTEXTDOORGIFTE.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 1,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
       "register": "DOCTRINE.json",
       "as": "bestand",
       "paden": 0,
@@ -2056,10 +2161,10 @@
       "paren": 0
     },
     {
-      "register": "HERREKENBAAR.json",
-      "as": "route",
-      "paden": 1,
-      "bestanden": 0,
+      "register": "GASTSPLITSING.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 1,
       "symbolen": 0,
       "paren": 0
     },
@@ -2068,6 +2173,14 @@
       "as": "route",
       "paden": 1,
       "bestanden": 0,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "KENNISINDEX.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 1,
       "symbolen": 0,
       "paren": 0
     },
@@ -2089,6 +2202,14 @@
     },
     {
       "register": "LAATSTE_METING.json",
+      "as": "bestand",
+      "paden": 0,
+      "bestanden": 1,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "LOOP-FABRIC-UNLOCK-ROADMAP.json",
       "as": "bestand",
       "paden": 0,
       "bestanden": 1,
@@ -2352,6 +2473,14 @@
       "paren": 0
     },
     {
+      "register": "HERREKENBAAR.json",
+      "as": "geen",
+      "paden": 0,
+      "bestanden": 0,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
       "register": "KLOKWACHT.json",
       "as": "geen",
       "paden": 0,
@@ -2369,6 +2498,22 @@
     },
     {
       "register": "LANDEN.json",
+      "as": "geen",
+      "paden": 0,
+      "bestanden": 0,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "LOOP-FABRIC-DECISION-DOSSIERS.json",
+      "as": "geen",
+      "paden": 0,
+      "bestanden": 0,
+      "symbolen": 0,
+      "paren": 0
+    },
+    {
+      "register": "LOOP-FABRIC-EXECUTION-MATRIX.json",
       "as": "geen",
       "paden": 0,
       "bestanden": 0,

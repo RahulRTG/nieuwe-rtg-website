@@ -17,6 +17,7 @@ const { legInlogVast } = require('../../kern/identiteit/inlogherkomst');
 
 module.exports = (kern) => {
   const { app, auth, accounts, handelingsspoor, tweefactor, stateFor, sessieregister, commercieel } = kern;
+  const rem = tweefactor.rem;   // gedeeld met elke deur die een code toetst (kern/identiteit/tweedestap-rem.js)
 
   const eisLid = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }
@@ -67,24 +68,39 @@ module.exports = (kern) => {
     res.status(r.status || 200).json(r);
   });
 
+  /* NIEUWE HERSTELCODES VRAGEN OOK EEN GELDIGE CODE (N2, besluit van de
+     eigenaar). Met alleen sessie en wachtwoord haalde je hier een verse
+     herstelcode, en daarmee kwam je langs de code die /uit vraagt. */
   app.post('/api/mijn/tweefactor/codes', auth, async (req, res) => {
     if (!eisLid(req, res)) return;
     const u = req.session.account;
+    if (rem.dicht(res, u.id, req.ip)) return;
     if (!u.password_hash || !await accounts.verifyPassword(String(req.body.huidig || ''), u.password_hash)) {
       return res.status(403).json({ error: 'Het wachtwoord klopt niet.' });
     }
+    const t = tweefactor.toets(u, req.body.code);
+    if (!t.ok) {
+      rem.mis(u.id, req.ip);
+      return res.status(403).json({ error: 'Die code klopt niet. Nieuwe herstelcodes vragen een code uit uw authenticator of een herstelcode.' });
+    }
+    rem.gelukt(u.id, req.ip);
     const r = tweefactor.nieuweCodes(u);
     if (r.ok) spoor(req, 'tweefactor-codes-vernieuwd', {});
     res.status(r.status || 200).json(r);
   });
 
+  /* Dezelfde rem en emmers als de tweede inlogstap hieronder: anders is de code
+     die de factor uitzet hier onbeperkt te raden (herkeuring C3). */
   app.post('/api/mijn/tweefactor/uit', auth, async (req, res) => {
     if (!eisLid(req, res)) return;
     const u = req.session.account;
+    if (rem.dicht(res, u.id, req.ip)) return;
     if (!u.password_hash || !await accounts.verifyPassword(String(req.body.huidig || ''), u.password_hash)) {
       return res.status(403).json({ error: 'Het wachtwoord klopt niet.' });
     }
     const r = tweefactor.uit(u, req.body.code);
+    if (r.status === 403) rem.mis(u.id, req.ip);
+    else if (r.ok) rem.gelukt(u.id, req.ip);
     if (r.ok) spoor(req, 'tweefactor-uit', {});
     res.status(r.status || 200).json(r);
   });
@@ -105,13 +121,22 @@ module.exports = (kern) => {
         nieuwe inlog waard, en dan gaan mensen hun tweede factor uitzetten;
      3. er komt hier geen enkele route bij die het bewijs alleen al genoeg maakt.
         Het wachtwoord is stap een, de code is stap twee, en beide zijn nodig.
-     ---------------------------------------------------------------------- */
+
+     EN DE CODE IS NIET ONBEPERKT TE RADEN (RTG-V1-RELEASE C3). Punt 2 houdt het
+     bewijs heel bij een verkeerde code; zonder rem was dat vijf minuten gokken.
+     De emmers, het slot en waarom er geen quarantaine bij komt, staan in
+     ../../kern/identiteit/tweedestap-rem.js. */
   app.post('/api/auth/tweede', async (req, res, next) => {
     try {
     const u = accounts.verifyActionToken(req.body.bewijs, 'inlog2');
     if (!u) return res.status(401).json({ error: 'Deze inlogpoging is verlopen. Log opnieuw in.' });
+    if (rem.dicht(res, u.id, req.ip)) return;
     const r = tweefactor.toets(u, req.body.code);
-    if (!r.ok) return res.status(403).json({ error: r.error || 'Die code klopt niet.' });
+    if (!r.ok) {
+      rem.mis(u.id, req.ip);
+      return res.status(403).json({ error: r.error || 'Die code klopt niet.' });
+    }
+    rem.gelukt(u.id, req.ip);
     await accounts.trekInActie(req.body.bewijs, 'inlog2');
     if (accounts.wachtIntrekkingen) await accounts.wachtIntrekkingen();
 

@@ -34,6 +34,7 @@ function maakKantoor({ db, save, bewerkCollectie, sessionFor, eigenaar, accounts
       'twee woorden uit dezelfde sessie. Log in met uw eigen RTG-account en koppel daarin de kantoorrol.'
   });
 
+  const { poort } = require('../../opzet/kritiekspoor');
   function officeAuth(req, res, next) {
     const header = req.get('authorization') || '';
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
@@ -42,16 +43,14 @@ function maakKantoor({ db, save, bewerkCollectie, sessionFor, eigenaar, accounts
       // B10: in productie alleen op naam met een passkey (./productiedeur.js)
       const pd = productiedeur.sessieMag(sess);
       if (!pd.ok) return res.status(pd.status).json(pd.body);
-      // geen lidKey = geen mens achter dit token; zie ENVELOP.json (bevinding)
       envelop.zet(req, { soort: 'kantoor', id: sess.lidKey || null,
         identiteit: sess.lidKey ? 'bewezen' : 'anoniem' });
       // het handvat van de mens: waarmee een besluit kan zien dat twee
       // handelingen niet van dezelfde persoon zijn (kern/appstore/vierogen.js)
       req.officeKey = sess.lidKey || null;
       try { mensdeur.tel(req, res, !!sess.lidKey); } catch (e) {}
-      return next();
+      return poort(req, res, sess.lidKey || 'kantoor', next);
     }
-    // de eigenaar komt ook met zijn eigen accountlogin binnen (geen aparte code nodig)
     try {
       const u = token && accounts.verifyToken(token);
       if (u && eigenaar.isEigenaar(accounts, u)) {
@@ -62,7 +61,7 @@ function maakKantoor({ db, save, bewerkCollectie, sessionFor, eigenaar, accounts
         envelop.zet(req, { soort: 'eigenaar', id: 'user-' + u.id,
           identiteit: 'bewezen', gezagBron: 'eigenaar', gezagBaas: true });
         try { mensdeur.tel(req, res, true); } catch (e) {}
-        return next();
+        return poort(req, res, 'user-' + u.id, next);
       }
     } catch (e) {}
     return res.status(401).json({ error: 'Geen backoffice-sessie.' });

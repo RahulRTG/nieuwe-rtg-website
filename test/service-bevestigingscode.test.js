@@ -26,7 +26,7 @@ function laag() {
     timingSafeEqual: (a, b) => { vergelijkingen++; return crypto.timingSafeEqual(a, b); } });
   const basis = require('../server/db/collectie-bewerken')({ store: 'json', db, save });
   const zaken = require('../server/kern/service/zaak')({ db, save, crypto });
-  const machtigingen = require('../server/kern/service/machtiging')({ db, save, crypto, zaken });
+  const machtigingen = require('../server/kern/service/machtiging')({ db, save, crypto, zaken, inzagelog: { noteerVast: async () => ({ ok: true }) } });
   const bev = require('../server/kern/service/bevestiging')({ db, save, crypto: telCrypto, zaken, machtigingen,
     bewerkCollectie: (s, w) => { sleutels.push(s); return basis(s, w); } });
   const zaak = (melder) => zaken.open({ melder: melder || 'user-7', onderwerp: 'zaak', titel: 'Werkruimte reageert niet' }).zaak;

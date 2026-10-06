@@ -39,3 +39,41 @@ test('herhaalde geldverhalen blijven binnen de walletlimiet en controleren elke 
   assert.ok(eisen >= 84);
   assert.deepEqual(saldi, { A: 200000, B: 0 });
 });
+
+test('het onderweg-verhaal maakt van een positie alleen een voorstel en bevestigt aankomst apart', async () => {
+  const verhaal = VERHALEN.find(v => v.id === 'onderweg-en-aankomen');
+  const bestemming = { code: 'PONTO', loc: { lat: 38.92, lng: 1.44 } };
+  const aanroepen = [];
+  const wb = {
+    eis(naam, ok, fout) { assert.ok(ok, naam + ': ' + fout); },
+    async stap(naam, methode, pad, token, body) {
+      aanroepen.push({ naam, methode, pad, token, body });
+      if (pad === '/api/live/start') return { data: { live: { active: true, dest: bestemming } } };
+      if (pad === '/api/live/update' && body.lat !== bestemming.loc.lat) {
+        return { data: { live: { active: true, nabij: false, arrived: false } } };
+      }
+      if (pad === '/api/live/update') {
+        return { data: { live: { active: true, nabij: true, arrived: false } } };
+      }
+      /* Het verhaal (uit #444) leest de bevestigde aankomst ook terug en
+         bevestigt haar een tweede keer: beide moeten dezelfde stand geven. */
+      if (pad === '/api/live/aangekomen' || pad === '/api/live/state') {
+        return { data: { live: { active: true, nabij: false, arrived: true, aankomstDoor: 'lid',
+          aankomstAt: '2026-10-04T10:00:00.000Z' } } };
+      }
+      assert.fail('onverwachte verhaalstap: ' + pad);
+    }
+  };
+
+  await verhaal.doe(wb, { ploeg: { gast: { token: 'lid-token' } }, supCode: 'PONTO' });
+
+  assert.deepEqual(aanroepen.map(r => r.pad), [
+    '/api/live/start',
+    '/api/live/update',
+    '/api/live/update',
+    '/api/live/aangekomen',
+    '/api/live/state',
+    '/api/live/aangekomen'
+  ]);
+  assert.equal(aanroepen.at(-1).token, 'lid-token');
+});

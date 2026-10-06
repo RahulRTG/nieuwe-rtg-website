@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-10-06",
   "gemeten": {
-    "bestanden": 2661,
-    "vormen": 1549,
-    "velden": 2209,
-    "modules": 854,
-    "domeinen": 306,
+    "bestanden": 2702,
+    "vormen": 1582,
+    "velden": 2248,
+    "modules": 874,
+    "domeinen": 308,
     "envelopDrempel": 19,
-    "envelop": 28,
-    "veldenDomeineigen": 1540,
-    "veldenGedeeldVanafVier": 230,
-    "gelijkendeVormparen": 24
+    "envelop": 29,
+    "veldenDomeineigen": 1575,
+    "veldenGedeeldVanafVier": 233,
+    "gelijkendeVormparen": 70
   },
   "envelop": [
     "aantal",
@@ -39,6 +39,7 @@
     "tijd",
     "titel",
     "tot",
+    "type",
     "uitleg",
     "van",
     "wat"
@@ -66,18 +67,6 @@
         "kern/command",
         "kern/leerhuis",
         "kern/lidboard"
-      ]
-    },
-    {
-      "veld": "type",
-      "domeinen": 18,
-      "waar": [
-        "bedrijf",
-        "kern/antivirus",
-        "kern/command",
-        "kern/commerce",
-        "kern/connection-communication",
-        "kern/connection-communication-call"
       ]
     },
     {
@@ -201,6 +190,18 @@
       ]
     },
     {
+      "veld": "actor",
+      "domeinen": 14,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/envelop",
+        "kern/experience",
+        "kern/living-world"
+      ]
+    },
+    {
       "veld": "open",
       "domeinen": 14,
       "waar": [
@@ -297,6 +298,18 @@
       ]
     },
     {
+      "veld": "updatedAt",
+      "domeinen": 12,
+      "waar": [
+        "kern/architect",
+        "kern/atelier",
+        "kern/connection-communication-call",
+        "kern/economie",
+        "kern/hardwarelab",
+        "kern/hoteldorp"
+      ]
+    },
+    {
       "veld": "waarde",
       "domeinen": 12,
       "waar": [
@@ -342,18 +355,6 @@
         "kern/geldgraaf",
         "kern/leerhuis",
         "kern/levenslijn"
-      ]
-    },
-    {
-      "veld": "actor",
-      "domeinen": 12,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/commercie",
-        "kern/envelop",
-        "kern/experience",
-        "kern/living-world"
       ]
     },
     {
@@ -453,18 +454,6 @@
       ]
     },
     {
-      "veld": "updatedAt",
-      "domeinen": 11,
-      "waar": [
-        "kern/architect",
-        "kern/atelier",
-        "kern/connection-communication-call",
-        "kern/economie",
-        "kern/hardwarelab",
-        "kern/hoteldorp"
-      ]
-    },
-    {
       "veld": "duurMin",
       "domeinen": 11,
       "waar": [
@@ -486,6 +475,18 @@
         "kern/concern",
         "kern/livinglab",
         "kern/machtiging"
+      ]
+    },
+    {
+      "veld": "kind",
+      "domeinen": 11,
+      "waar": [
+        "kern/boerderij",
+        "kern/connection-communication",
+        "kern/connection-communication-actions",
+        "kern/connection-communication-media",
+        "kern/economie",
+        "kern/experience"
       ]
     },
     {
@@ -513,15 +514,15 @@
       ]
     },
     {
-      "veld": "bewijs",
+      "veld": "kanaal",
       "domeinen": 11,
       "waar": [
-        "kern/horeca",
-        "kern/invoer",
-        "kern/leerhuis",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties"
+        "bedrijf",
+        "kern/concern",
+        "kern/envelop",
+        "kern/library",
+        "kern/living-world",
+        "kern/loop-fabric"
       ]
     }
   ],
@@ -540,7 +541,6 @@
         "oorzaak",
         "past",
         "terugDraaibaar",
-        "type",
         "veld"
       ]
     },
@@ -574,30 +574,324 @@
     },
     {
       "gelijkenis": 1,
-      "a": "server/kern/magnaat-werkroutefabriek.js",
-      "b": "server/kern/magnaatwereld.js",
-      "domeinA": "kern/magnaat-werkroutefabriek",
-      "domeinB": "kern/magnaatwereld",
+      "a": "server/kern/living-world/index.js",
+      "b": "server/kern/loop-fabric/index.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "kern/loop-fabric",
       "gedeeld": [
-        "max",
-        "min",
-        "placeholder",
-        "type",
-        "verplicht"
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
       ]
     },
     {
       "gelijkenis": 1,
-      "a": "server/kern/webplatform-live.js",
-      "b": "server/kern/webplatform.js",
-      "domeinA": "kern/webplatform-live",
-      "domeinB": "kern/webplatform",
+      "a": "server/kern/living-world/index.js",
+      "b": "server/kern/loop-fabric/projection.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "kern/loop-fabric",
       "gedeeld": [
-        "lk",
-        "lt",
-        "rk",
-        "rt",
-        "type"
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/living-world/index.js",
+      "b": "server/kern/service/loop-source.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "kern/service",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/living-world/index.js",
+      "b": "server/bedrijf/loop-source-change.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/living-world/index.js",
+      "b": "server/bedrijf/loop-source-lifecycle.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/living-world/index.js",
+      "b": "server/bedrijf/loop-source.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/living-world/loop-source.js",
+      "b": "server/kern/loop-fabric/index.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "kern/loop-fabric",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/living-world/loop-source.js",
+      "b": "server/kern/loop-fabric/projection.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "kern/loop-fabric",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/living-world/loop-source.js",
+      "b": "server/kern/service/loop-source.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "kern/service",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/living-world/loop-source.js",
+      "b": "server/bedrijf/loop-source-change.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/living-world/loop-source.js",
+      "b": "server/bedrijf/loop-source-lifecycle.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/living-world/loop-source.js",
+      "b": "server/bedrijf/loop-source.js",
+      "domeinA": "kern/living-world",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/loop-fabric/index.js",
+      "b": "server/kern/service/loop-source.js",
+      "domeinA": "kern/loop-fabric",
+      "domeinB": "kern/service",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/loop-fabric/index.js",
+      "b": "server/bedrijf/loop-source-change.js",
+      "domeinA": "kern/loop-fabric",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/loop-fabric/index.js",
+      "b": "server/bedrijf/loop-source-lifecycle.js",
+      "domeinA": "kern/loop-fabric",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/loop-fabric/index.js",
+      "b": "server/bedrijf/loop-source.js",
+      "domeinA": "kern/loop-fabric",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/loop-fabric/projection.js",
+      "b": "server/kern/service/loop-source.js",
+      "domeinA": "kern/loop-fabric",
+      "domeinB": "kern/service",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/loop-fabric/projection.js",
+      "b": "server/bedrijf/loop-source-change.js",
+      "domeinA": "kern/loop-fabric",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/loop-fabric/projection.js",
+      "b": "server/bedrijf/loop-source-lifecycle.js",
+      "domeinA": "kern/loop-fabric",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/loop-fabric/projection.js",
+      "b": "server/bedrijf/loop-source.js",
+      "domeinA": "kern/loop-fabric",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/service/loop-source.js",
+      "b": "server/bedrijf/loop-source-change.js",
+      "domeinA": "kern/service",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/service/loop-source.js",
+      "b": "server/bedrijf/loop-source-lifecycle.js",
+      "domeinA": "kern/service",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/service/loop-source.js",
+      "b": "server/bedrijf/loop-source.js",
+      "domeinA": "kern/service",
+      "domeinB": "bedrijf",
+      "gedeeld": [
+        "actor",
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
       ]
     },
     {
@@ -615,15 +909,28 @@
     },
     {
       "gelijkenis": 1,
-      "a": "server/kern/connection-communication-call.js",
-      "b": "server/kern/connection-communication.js",
-      "domeinA": "kern/connection-communication-call",
-      "domeinB": "kern/connection-communication",
+      "a": "server/kern/magnaat-werkroutefabriek.js",
+      "b": "server/kern/magnaatwereld.js",
+      "domeinA": "kern/magnaat-werkroutefabriek",
+      "domeinB": "kern/magnaatwereld",
       "gedeeld": [
-        "incoming",
-        "revision",
-        "state",
-        "type"
+        "max",
+        "min",
+        "placeholder",
+        "verplicht"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/webplatform-live.js",
+      "b": "server/kern/webplatform.js",
+      "domeinA": "kern/webplatform-live",
+      "domeinB": "kern/webplatform",
+      "gedeeld": [
+        "lk",
+        "lt",
+        "rk",
+        "rt"
       ]
     },
     {
@@ -650,24 +957,6 @@
     },
     {
       "gelijkenis": 0.9,
-      "a": "server/kern/command/runbookcatalogus.js",
-      "b": "server/kern/zaakcommand/runbooks.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/zaakcommand",
-      "gedeeld": [
-        "actie",
-        "certificaat",
-        "klantImpact",
-        "naar",
-        "oorzaak",
-        "past",
-        "terugDraaibaar",
-        "type",
-        "veld"
-      ]
-    },
-    {
-      "gelijkenis": 0.9,
       "a": "server/kern/spellen/projectie.js",
       "b": "server/kern/spelprojectie-toegang.js",
       "domeinA": "kern/spellen",
@@ -685,17 +974,20 @@
       ]
     },
     {
-      "gelijkenis": 0.83,
-      "a": "server/kern/magnaat-werkroutefabriek.js",
-      "b": "server/kern/magnaatwereld.js",
-      "domeinA": "kern/magnaat-werkroutefabriek",
-      "domeinB": "kern/magnaatwereld",
+      "gelijkenis": 0.89,
+      "a": "server/kern/command/runbookcatalogus.js",
+      "b": "server/kern/zaakcommand/runbooks.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
       "gedeeld": [
-        "max",
-        "min",
-        "placeholder",
-        "type",
-        "verplicht"
+        "actie",
+        "certificaat",
+        "klantImpact",
+        "naar",
+        "oorzaak",
+        "past",
+        "terugDraaibaar",
+        "veld"
       ]
     },
     {
@@ -717,176 +1009,93 @@
     },
     {
       "gelijkenis": 0.8,
-      "a": "server/kern/tenant/brug.js",
-      "b": "server/bedrijf/leden.js",
-      "domeinA": "kern/tenant",
+      "a": "server/kern/library/journal.js",
+      "b": "server/kern/living-world/index.js",
+      "domeinA": "kern/library",
+      "domeinB": "kern/living-world",
+      "gedeeld": [
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 0.8,
+      "a": "server/kern/library/journal.js",
+      "b": "server/kern/living-world/loop-source.js",
+      "domeinA": "kern/library",
+      "domeinB": "kern/living-world",
+      "gedeeld": [
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 0.8,
+      "a": "server/kern/library/journal.js",
+      "b": "server/kern/loop-fabric/index.js",
+      "domeinA": "kern/library",
+      "domeinB": "kern/loop-fabric",
+      "gedeeld": [
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 0.8,
+      "a": "server/kern/library/journal.js",
+      "b": "server/kern/loop-fabric/projection.js",
+      "domeinA": "kern/library",
+      "domeinB": "kern/loop-fabric",
+      "gedeeld": [
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 0.8,
+      "a": "server/kern/library/journal.js",
+      "b": "server/kern/service/loop-source.js",
+      "domeinA": "kern/library",
+      "domeinB": "kern/service",
+      "gedeeld": [
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
+      ]
+    },
+    {
+      "gelijkenis": 0.8,
+      "a": "server/kern/library/journal.js",
+      "b": "server/bedrijf/loop-source-change.js",
+      "domeinA": "kern/library",
       "domeinB": "bedrijf",
       "gedeeld": [
-        "afdeling",
-        "extern",
-        "functie",
-        "rollen"
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
       ]
     },
     {
-      "gelijkenis": 0.78,
-      "a": "server/kern/samen.js",
-      "b": "server/kern/samenrtf.js",
-      "domeinA": "kern/samen",
-      "domeinB": "kern/samenrtf",
+      "gelijkenis": 0.8,
+      "a": "server/kern/library/journal.js",
+      "b": "server/bedrijf/loop-source-lifecycle.js",
+      "domeinA": "kern/library",
+      "domeinB": "bedrijf",
       "gedeeld": [
-        "benGastheer",
-        "chat",
-        "gastheer",
-        "leden",
-        "now",
-        "pad",
-        "toegang"
-      ]
-    },
-    {
-      "gelijkenis": 0.75,
-      "a": "server/kern/ai/contextpakket.js",
-      "b": "server/kern/stuur/luspakket.js",
-      "domeinA": "kern/ai",
-      "domeinB": "kern/stuur",
-      "gedeeld": [
-        "berichten",
-        "graad",
-        "kort",
-        "magSamenvatten",
-        "magVervallen",
-        "prioriteit"
-      ]
-    },
-    {
-      "gelijkenis": 0.75,
-      "a": "server/kern/architect/index.js",
-      "b": "server/kern/atelier/index.js",
-      "domeinA": "kern/architect",
-      "domeinB": "kern/atelier",
-      "gedeeld": [
-        "brief",
-        "collectie",
-        "concept",
-        "huis",
-        "kritiek",
-        "updatedAt"
-      ]
-    },
-    {
-      "gelijkenis": 0.75,
-      "a": "server/kern/architect/index.js",
-      "b": "server/kern/hardwarelab/index.js",
-      "domeinA": "kern/architect",
-      "domeinB": "kern/hardwarelab",
-      "gedeeld": [
-        "brief",
-        "collectie",
-        "concept",
-        "huis",
-        "kritiek",
-        "updatedAt"
-      ]
-    },
-    {
-      "gelijkenis": 0.75,
-      "a": "server/kern/architect/index.js",
-      "b": "server/kern/studio/index.js",
-      "domeinA": "kern/architect",
-      "domeinB": "kern/studio",
-      "gedeeld": [
-        "brief",
-        "collectie",
-        "concept",
-        "huis",
-        "kritiek",
-        "updatedAt"
-      ]
-    },
-    {
-      "gelijkenis": 0.75,
-      "a": "server/kern/atelier/index.js",
-      "b": "server/kern/hardwarelab/index.js",
-      "domeinA": "kern/atelier",
-      "domeinB": "kern/hardwarelab",
-      "gedeeld": [
-        "brief",
-        "collectie",
-        "concept",
-        "huis",
-        "kritiek",
-        "updatedAt"
-      ]
-    },
-    {
-      "gelijkenis": 0.75,
-      "a": "server/kern/atelier/index.js",
-      "b": "server/kern/studio/index.js",
-      "domeinA": "kern/atelier",
-      "domeinB": "kern/studio",
-      "gedeeld": [
-        "brief",
-        "collectie",
-        "concept",
-        "huis",
-        "kritiek",
-        "updatedAt"
-      ]
-    },
-    {
-      "gelijkenis": 0.75,
-      "a": "server/kern/hardwarelab/index.js",
-      "b": "server/kern/studio/index.js",
-      "domeinA": "kern/hardwarelab",
-      "domeinB": "kern/studio",
-      "gedeeld": [
-        "brief",
-        "collectie",
-        "concept",
-        "huis",
-        "kritiek",
-        "updatedAt"
-      ]
-    },
-    {
-      "gelijkenis": 0.71,
-      "a": "server/kern/connection-communication-media.js",
-      "b": "server/kern/connection-communication.js",
-      "domeinA": "kern/connection-communication-media",
-      "domeinB": "kern/connection-communication",
-      "gedeeld": [
-        "from",
-        "kind",
-        "pair",
-        "scope",
-        "to"
-      ]
-    },
-    {
-      "gelijkenis": 0.63,
-      "a": "server/kern/geloofbieb.js",
-      "b": "server/kern/reisbieb/index.js",
-      "domeinA": "kern/geloofbieb",
-      "domeinB": "kern/reisbieb",
-      "gedeeld": [
-        "categorie",
-        "categorieLabel",
-        "gratis",
-        "nr",
-        "prijsCenten"
-      ]
-    },
-    {
-      "gelijkenis": 0.6,
-      "a": "server/kern/rtgone-projecten.js",
-      "b": "server/kern/rtgone.js",
-      "domeinA": "kern/rtgone-projecten",
-      "domeinB": "kern/rtgone",
-      "gedeeld": [
-        "bewijs",
-        "herzieOp",
-        "voorWie"
+        "classificatie",
+        "correlatie",
+        "kanaal",
+        "oorzaak"
       ]
     }
   ]

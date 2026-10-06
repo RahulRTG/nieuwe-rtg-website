@@ -27,6 +27,7 @@ const FUNCTIES = [].concat(
      reden bij cat-genres hierboven. */
   require('./cat-life2'),
   require('./cat-partners'),
+  require('./cat-loop-fabric'),
   /* De drie Command-schakelaars staan sinds cat-partners.js door zijn
      omvangsgrens ging in een eigen bestand, op precies deze plek zodat de
      volgorde van FUNCTIES onveranderd blijft: bij twee functies met hetzelfde

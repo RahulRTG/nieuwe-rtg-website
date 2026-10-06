@@ -928,6 +928,7 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
      de bibliotheek (boeken = boeken) en de eigen bank. */
   const NIET_DERDE = [
     ['/api/boeken/', 'de RTG-bibliotheek: "boeken" zijn hier dingen met bladzijden'],
+    ['/api/library/', 'Foundation LibraryOS: werken, edities en leeshandelingen binnen RTG; geen bestelling bij een derde'],
     ['/api/bank/', 'de eigen bank van RTG; een overboeking gaat niet langs een derde']
   ];
   const MAG_ZONDER = new Map([

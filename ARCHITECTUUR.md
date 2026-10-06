@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5391 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5444 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5391 |
-| servermodules (`server/**/*.js`) | 4089 |
-| routebestanden (`server/routes/**`) | 638 |
-| kernmodules (`server/kern/**`) | 2563 |
-| schermen (`public/**/*.html`) | 326 |
+| API-endpoints | 5444 |
+| servermodules (`server/**/*.js`) | 4130 |
+| routebestanden (`server/routes/**`) | 641 |
+| kernmodules (`server/kern/**`) | 2597 |
+| schermen (`public/**/*.html`) | 327 |
 | gedeelde browsermodules (`public/shared/*.js`) | 425 |
-| toetsbestanden (`test/*.test.js`) | 2042 |
-| schermtoetsen (`test/*.e2e.js`) | 304 |
+| toetsbestanden (`test/*.test.js`) | 2055 |
+| schermtoetsen (`test/*.e2e.js`) | 305 |
 
 ## 2. De weg van een verzoek
 
@@ -61,7 +61,6 @@ betaal
 muntbetaal
 talen
 foutmelder
-stopspoeling
 config
 inzagespoor
 verzoekketen
@@ -72,7 +71,6 @@ leverancierpoort
 diensten
 media
 kluis
-meldingenlezen
 rem
 pinslot
 kantoordeur
@@ -119,7 +117,7 @@ zie §5 -- er zijn nog 254 kern-namen die meer dan één domein aanraakt.
 | `office` | 98 | 22 | 3 | 98 |
 | `staff` | 27 | 9 | 1 | 43 |
 | `social` | 76 | 10 | 31 | 71 |
-| `techniek` | 80 | 20 | 1 | 66 |
+| `techniek` | 80 | 20 | 1 | 65 |
 | `zakelijk` | 13 | 2 | 0 | 0 |
 | `wereld` | 15 | 3 | 0 | 0 |
 
@@ -131,7 +129,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3666 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3719 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -139,9 +137,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1682 |
+| kern-namen die routes aanraken | 1684 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 254 |
-| daarvan door precies één domein | 1428 |
+| daarvan door precies één domein | 1430 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -153,7 +151,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(213) auth(130) supplierAuth(66) officeAuth(48) db(40) liveCodename(36) status(32)
+app(214) auth(130) supplierAuth(66) officeAuth(49) db(40) liveCodename(36) status(32)
 accounts(30) schoon(23) boardroomWie(20) codenaamVan(20) managerOnly(19) save(19)
 rtf(19) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth(13)
 crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)

@@ -61,8 +61,10 @@ function shape(action,row,view){
       field('title','Titel','text',''),field('text','Wat wilt u achterlaten?','textarea',''),
       field('observedAt','Wanneer heeft u dit waargenomen?','datetime-local',local(new Date().toISOString())),
       field('validUntil','Geldig tot · verplicht voor actuele waarnemingen','datetime-local',''),
+      field('communityRelease','Deze bijdrage expliciet vrijgeven voor de Living World','checkbox',false),
+      field('attribution','Naam voor bronvermelding bij publieke vrijgave','text',''),
       field('supersedes','Eerdere bijdrage corrigeren','select','',[['','Geen']].concat(view.contributions.filter(function(c){return c.placeId===row.id&&c.status==='accepted';}).map(function(c){return[c.id,c.title];})))];
-    intro='Uw bijdrage gaat eerst naar de beheerder van deze plek. Geef waarneming, interpretatie en onzekerheid duidelijk aan.';
+    intro='Uw bijdrage blijft standaard privé. Alleen met uw afzonderlijke keuze mag de beheerder haar beoordelen en als bronvermelde verbetering in deze Living World gebruiken. AI-training en afgeleide werken blijven uitgesloten.';
   }else if(action==='contribution.review'){
     fields=[field('decision','Beoordeling','select','',[['','Kies een besluit'],['accepted','Goedkeuren'],['rejected','Afwijzen']])];reason('Wat heeft u gecontroleerd?');
   }else if(action==='contribution.adopt'){
@@ -91,6 +93,12 @@ function collect(form,schema,action){
   });
   if(action==='blueprint.create'||action==='blueprint.update'){
     out.steps=[];steps.forEach(function(kind){var v=out['step_'+kind];if(v)out.steps.push({kind:kind,text:v});delete out['step_'+kind];});
+  }else if(action==='contribution.create'){
+    if(out.communityRelease){
+      out.sharing={visibility:'community',purpose:'world-memory',recipients:[],consent:true,returnUpdates:false,
+        release:{attribution:out.attribution,reuse:['read','cite'],aiScopes:[],derivativeScope:'denied'}};
+    }
+    delete out.communityRelease;delete out.attribution;
   }
   return out;
 }

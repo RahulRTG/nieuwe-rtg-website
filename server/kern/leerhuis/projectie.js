@@ -22,7 +22,8 @@
 const leeg = (org) => ({
   id: org, org: null, bestuur: {}, relaties: {}, eenheden: {}, rollen: {}, vaardigheden: {}, kennis: {}, curricula: {},
   personen: {}, trainers: {}, bewijs: {}, beoordelingen: {}, certificaten: {}, beleid: {}, voorstellen: {},
-  scenarios: {}, impacts: [], startplannen: {}, werk: [], sleutels: {}, bezwaren: {}, evc: {}
+  scenarios: {}, impacts: [], startplannen: {}, werk: [], sleutels: {}, bezwaren: {}, evc: {}, loopReceipts: {},
+  educationUses: []
 });
 
 function persoon(st, key) {
@@ -73,6 +74,7 @@ function pas(st, r) {
       break;
     }
     case 'curriculum': st.curricula[d.id] = { ...d, versie: ((st.curricula[d.id] || {}).versie || 0) + 1, stand: 'DRAFT', at: r.at }; break;
+    case 'libraryEducationUse': st.educationUses.push({ ...d, door:r.door, at:r.at }); break;
     case 'curriculumStand': st.curricula[d.id].stand = d.naar; break;
     case 'rolToegewezen': { const p = persoon(st, d.persoon); if (!p.rollen.includes(d.rol)) p.rollen.push(d.rol); break; }
     case 'rolIngetrokken': { const p = persoon(st, d.persoon); p.rollen = p.rollen.filter(x => x !== d.rol); break; }
@@ -107,6 +109,8 @@ function pas(st, r) {
     case 'werk': st.werk.push({ ...d, door: r.door, at: r.at }); break;
     case 'voorstel': st.voorstellen[d.id] = { ...d, stand: 'SUBMITTED', indiener: r.door, at: r.at, historie: [] }; break;
     case 'voorstelStand': { const v = st.voorstellen[d.id]; v.stand = d.naar; v.historie.push({ stand: d.naar, door: r.door, at: r.at, notitie: d.notitie || null }); if (d.kennisVersie) v.kennisVersie = d.kennisVersie; if (d.meting) v.meting = d.meting; break; }
+    case 'loopChangeReceipt': st.loopReceipts[d.receiptId] = { ...d, door: r.door, at: r.at,
+      integrityRef: { auditId: 'leerhuis:' + st.id + ':' + r.nr, hash: r.hash } }; break;
     case 'impact': st.impacts.push({ ...d, door: r.door, at: r.at }); break;
     case 'startplan': st.startplannen[d.persoon] = { ...d, at: r.at }; break;
     case 'bezwaar': st.bezwaren[d.id] = { ...d, stand: 'REVIEW_REQUEST', indiener: r.door, at: r.at }; break;

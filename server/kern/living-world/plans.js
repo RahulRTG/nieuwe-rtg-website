@@ -7,7 +7,7 @@ module.exports = function plans({state,key,data:p,action,at,id,sources}) {
     const row = { id, owner:key, organizer:b.organizer, blueprintId:b.id, blueprintVersion:b.version,
       placeId:b.placeId, revision:1, status:'planning', title:snapshot(b).title,
       date:null, notes:'', preparation:[], consentImpact:p.consentImpact === true,
-      knowledge: selectKnowledge(state,b.placeId,p.knowledgeIds,at),
+      knowledge: selectKnowledge(state,b.placeId,p.knowledgeIds,at,key),
       createdAt:at, updatedAt:at };
     state.plans[id] = row; return row;
   }
@@ -60,7 +60,7 @@ module.exports = function plans({state,key,data:p,action,at,id,sources}) {
     row.preparation = list(p.preparation,12,v => text(v,500,true));
     row.blueprintVersion = b.version;
     row.status = 'planning'; delete row.acceptedVersion;
-    row.knowledge = selectKnowledge(state,row.placeId,p.knowledgeIds,at);
+    row.knowledge = selectKnowledge(state,row.placeId,p.knowledgeIds,at,key);
   }
   if (action === 'plan.request') {
     if (!row.date || row.date <= at) fail('Kies eerst een toekomstig moment.',409);

@@ -1,6 +1,6 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
-const {fixture,spec} = require('./lib/living-world-fixture');
+const {fixture,spec,commonsSharing} = require('./lib/living-world-fixture');
 
 test('volledige lus: video, plan, overdracht, deelname, review, nieuwe versie, volgende persoon en impact',async()=>{
   const f=fixture(),{placeId,blueprintId}=await f.setup();
@@ -11,7 +11,7 @@ test('volledige lus: video, plan, overdracht, deelname, review, nieuwe versie, v
   assert.equal(f.world.view('A').plans.length,0,'een privéconcept is niet al een aanvraag');
   await f.complete(planId);
   const c=await f.command('B','contribution.create',{placeId,planId,kind:'knowledge',title:'Handige voorbereiding',
-    text:'Spreek de ontmoetingsplek vooraf precies af.',observedAt:'2026-10-02T12:00:00.000Z'});
+    text:'Spreek de ontmoetingsplek vooraf precies af.',observedAt:'2026-10-02T12:00:00.000Z',sharing:commonsSharing()});
   assert.equal(f.world.view('C').contributions.length,0,'onbeoordeelde kennis niet als feit publiceren');
   const review=f.row('A','contribution',c.id);
   assert.ok(review.actions.some(a=>a.id==='contribution.review'));
@@ -28,7 +28,7 @@ test('volledige lus: video, plan, overdracht, deelname, review, nieuwe versie, v
   await f.complete(next,'C');
   assert.equal(f.row('B','contribution',c.id).impact.confirmedParticipants,1);
   const returned=await f.command('C','contribution.create',{placeId,planId:next,kind:'knowledge',title:'Verbetering terug',
-    text:'Ook de aankomsttijd gezamenlijk afspreken.',observedAt:f.time()});
+    text:'Ook de aankomsttijd gezamenlijk afspreken.',observedAt:f.time(),sharing:commonsSharing()});
   await f.command('A','contribution.review',{id:returned.id,revision:1,decision:'accepted',reason:'Samen nagekeken.'});
   assert.equal(f.row('B','contribution',c.id).impact.returnedContributions,1);
   assert.equal(f.row('B','contribution',c.id).impact.views,null);
@@ -108,7 +108,7 @@ test('human owner ontvangt storing en herstel vraagt opnieuw een besluit',async(
 test('verlopen condities verdwijnen uit Pulse, correcties blijven in World Memory en zelfreview faalt',async()=>{
   const f=fixture(),{placeId}=await f.setup();
   const c=await f.command('B','contribution.create',{placeId,kind:'condition',title:'Waarneming',
-    text:'Actuele situatie door lid gemeld.',observedAt:'2026-10-01T09:00:00.000Z',validUntil:'2026-10-01T11:00:00.000Z'});
+    text:'Actuele situatie door lid gemeld.',observedAt:'2026-10-01T09:00:00.000Z',validUntil:'2026-10-01T11:00:00.000Z',sharing:commonsSharing()});
   assert.equal((await f.world.execute('B','contribution.review',{id:c.id,revision:1,decision:'accepted',reason:'Eigen oordeel'},'self-review')).status,403);
   await f.command('A','contribution.review',{id:c.id,revision:1,decision:'accepted',reason:'Beoordeeld'});
   assert.equal(f.world.view('C').pulse.length,1);f.clock('2026-10-01T12:00:00.000Z');
@@ -120,7 +120,7 @@ test('verlopen condities verdwijnen uit Pulse, correcties blijven in World Memor
 test('intrekking van impacttoestemming en deelnamebewijs werkt door zonder historische records te wissen',async()=>{
   const f=fixture(),{placeId,blueprintId}=await f.setup();
   const c=await f.command('B','contribution.create',{placeId,kind:'knowledge',title:'Tip',
-    text:'Een voorbereidingstip.',observedAt:'2026-10-01T09:00:00.000Z'});
+    text:'Een voorbereidingstip.',observedAt:'2026-10-01T09:00:00.000Z',sharing:commonsSharing()});
   await f.command('A','contribution.review',{id:c.id,revision:1,decision:'accepted',reason:'Gecontroleerd'});
   const id=await f.preparePlan(blueprintId,'C',{consentImpact:true,knowledgeIds:[c.id]});await f.complete(id,'C');
   assert.equal(f.row('B','contribution',c.id).impact.confirmedParticipants,1);

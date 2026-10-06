@@ -12,12 +12,8 @@
    late binding. Verder alleen de schrijvers (opzet/envelop.js, de kostenhaak,
    kern/dienstidentiteit.js) en de montage; test/verzoekframe.test.js zakt
    zodra er een lezer bij komt voordat dat een besluit IS.
-
-   EN HET FRAME IS DE ENIGE BRON VAN DE KETEN (besluit van 6 oktober 2026). De
-   Trust & Evidence-wortel (kern/bewijsvlak/context.js) maakte eerst een eigen
-   chain-id naast deze correlatie; nu opent de middleware hieronder hem zelf,
-   met als keten de correlatie van dit frame. Het frame leest daar niets van
-   terug -- de afhankelijkheid loopt een kant op.
+   Het frame is ook de ENIGE bron van de keten (6 oktober 2026): het opent de
+   Trust & Evidence-wortel zelf, zie kern/bewijsvlak/context.js.
 
    DE VAKKEN
      correlatie    van de server (lib/correlatie.js), nooit een kop
@@ -72,9 +68,7 @@ function middleware() {
        intern aanroept), en dan zegt het antwoord hem terug aan die aanroeper. */
     const f = nieuw({ soort: 'verzoek', correlatie: req.id, extern: req.externeId, oorzaak: oorzaakVan(req) });
     if (f.oorzaak && typeof res.setHeader === 'function') res.setHeader('X-RTG-Oorzaak', f.oorzaak);
-    /* De Trust & Evidence-wortel is een LEZER van dit frame en geen tweede bron:
-       zijn keten is de correlatie van het frame (kern/bewijsvlak/context.js
-       ketenVan), dus de wortel en elke gebeurtenis erin dragen dezelfde naam. */
+    /* De trust-wortel is een lezer van dit frame: keten = chain_<correlatie>. */
     const tc = trust.maak({ chainId: trust.ketenVan(f.correlatie), requestId: req.id || null, phase: 'request' });
     req.trustContext = tc;
     if (typeof res.setHeader === 'function') res.setHeader('X-RTG-Correlation', tc.chainId);
@@ -88,8 +82,7 @@ function middleware() {
 /* De body-lezer kan de keten breken; zelfde vorm als handeling.hervat(). */
 function hervat() {
   return function verzoekframeHervat(req, res, next) {
-    /* Allebei terug, anders loopt de rest van het verzoek zonder trust-keten en
-       maakt de bewijslaag er buiten het frame om een losse nieuwe. */
+    /* Ook de trust-wortel terug, als zichzelf. */
     const h = vanReq.get(req);
     if (!h || (winkel.getStore() === h.f && trust.huidige() === h.tc)) return next();
     return winkel.run(h.f, () => trust.inContext(h.tc, next));
@@ -177,10 +170,8 @@ function overdraag(fn, opties) { tellers.overgedragen++; return achtergrond('ove
 /* Wat de bus-envelop uit het frame leest -- en niets meer. Een gesloten frame
    levert niets: werk na afloop erft geen verzoekidentiteit (I4). De oorzaak is
    het werk dat dit frame veroorzaakte, en anders het verzoek zelf. */
-/* Een gesloten frame levert GEEN null maar een leeg frame: null betekent "hier
-   is geen frame", en dan valt de envelop terug op een expliciet geopende trust-
-   keten. Die keten is binnen een verzoek een kind van dit frame, dus werk na
-   afloop zou via die omweg de keten van het verzoek alsnog erven. */
+/* Gesloten is leeg en niet null: null zegt "geen frame", en dan erft werk na
+   afloop via de trust-keten (een kind van dit frame) alsnog de verzoekketen. */
 const GESLOTEN = Object.freeze({ correlatie: null, oorzaak: null, actor: null, hoedanigheid: null });
 function voorBus() {
   const f = winkel.getStore();

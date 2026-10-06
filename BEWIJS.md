@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2440 bestanden en 16716 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2440 bestanden en 16717 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2440 |
-| losse beweringen (`test(...)`) | 16716 |
+| losse beweringen (`test(...)`) | 16717 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 309 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2133 bestanden, 16184 beweringen.
+2133 bestanden, 16185 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -155,7 +155,7 @@ toets omvalt.
 | `atelier.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Atelier: het besloten ontwerpbureau van de kantoren. Ontwerpen voor mode en alles wat je aan het lijf draagt, met een AI die het concept uittekent (silhouet, materialen, gedempt palet, verhaal), een tech pack... |
 | `attributie.test.js` | 11 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `auditboek-cli.pg.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `auditboek.pg.test.js` | 18 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `auditboek.pg.test.js` | 19 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `auditopslag-pg.test.js` | 4 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `auditspoor.test.js` | 13 | gezakt op `===->!==#0` | HET API-SPOOR (server/opzet/auditspoor.js): laat elke geslaagde schrijfhandeling een regel na die niemand ongemerkt kan wijzigen? WAT HIER OP HET SPEL STAAT. |
 | `auth-rol.test.js` | 2 | gezakt op `liegpoort /api/` | Auth-scoping over elke leden-route die AAN ZIJN VORM te herkennen is: deze test leest de bron en eist dat een leverancier- EN een kantoor-token 401 krijgen -- nooit 2xx (ongewenste toegang) en nooit 5xx (crash). HIER... |

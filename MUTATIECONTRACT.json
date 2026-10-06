@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-06T14:24:59.815Z",
-  "commit": "9f5fc75d2",
+  "op": "2026-10-06T14:33:58.725Z",
+  "commit": "3cc0cdd64",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -11,21 +11,21 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 5322,
-  "geclassificeerd": 5294,
+  "geclassificeerd": 5297,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3164,
+   "BLOCKED_BY_TEST_FIXTURE": 3167,
    "NOT_APPLICABLE": 1278,
-   "LEGACY_PENDING_CLASSIFICATION": 28,
+   "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 670,
    "INTENTIONALLY_NON_IDEMPOTENT": 182
   },
   "vastgesteldDoorMens": 2182,
-  "afgeleidDoorScript": 3112,
+  "afgeleidDoorScript": 3115,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4381,
    "PUBLIC": 138,
-   "OBJECT_SCOPED": 770,
-   "(niet af te leiden -- vraagt een verklaring)": 17,
+   "OBJECT_SCOPED": 773,
+   "(niet af te leiden -- vraagt een verklaring)": 14,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
@@ -36,7 +36,6 @@
    "niet gemeten": 175
   },
   "voorstellen": {
-   "BLOCKED_BY_TEST_FIXTURE": 3,
    "NOT_APPLICABLE": 1
   },
   "metingVan": "2026-09-29T18:39:11.935Z"
@@ -21252,12 +21251,14 @@
   {
    "mutatieId": "foundation.gezin.inloggen",
    "route": "POST /api/foundation/gezin/inloggen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -21267,10 +21268,10 @@
     "grond": null,
     "hindernis": "Vul naast de gezinscode uw eigen pincode in."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Vul naast de gezinscode uw eigen pincode in.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.keuken.idee",
@@ -21794,12 +21795,14 @@
   {
    "mutatieId": "foundation.gezin.profiel.kies",
    "route": "POST /api/foundation/gezin/profiel/kies",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -21809,10 +21812,10 @@
     "grond": null,
     "hindernis": "Dit profiel bestaat niet meer."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Dit profiel bestaat niet meer.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.profiel.maak",
@@ -22550,12 +22553,14 @@
   {
    "mutatieId": "foundation.les.join",
    "route": "POST /api/foundation/les/join",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -22565,10 +22570,10 @@
     "grond": null,
     "hindernis": "Te veel pogingen. Wacht een paar minuten en probeer het opnieuw."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Te veel pogingen. Wacht een paar minuten en probeer het opnieuw.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.les.leerling.intrekken",

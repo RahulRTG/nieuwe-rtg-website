@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-05T20:46:33.598Z",
-  "commit": "489796f7d",
+  "op": "2026-10-05T14:04:01.061Z",
+  "commit": "b71cd833",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,21 +10,21 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5259,
-  "geclassificeerd": 5234,
+  "totaal": 5261,
+  "geclassificeerd": 5236,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3168,
    "NOT_APPLICABLE": 1263,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 624,
-   "INTENTIONALLY_NON_IDEMPOTENT": 179
+   "PROTECTED": 625,
+   "INTENTIONALLY_NON_IDEMPOTENT": 180
   },
-  "vastgesteldDoorMens": 2118,
+  "vastgesteldDoorMens": 2120,
   "afgeleidDoorScript": 3116,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4330,
    "PUBLIC": 134,
-   "OBJECT_SCOPED": 764,
+   "OBJECT_SCOPED": 766,
    "(niet af te leiden -- vraagt een verklaring)": 15,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4882,
-   "niet gemeten": 111
+   "niet gemeten": 113
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -21941,6 +21941,25 @@
    },
    "bewijs": null,
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.toestemming.gezondheid",
+   "route": "POST /api/foundation/gezin/toestemming/gezondheid",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -91111,6 +91130,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "welzijn.dagboek.toestemming",
+   "route": "POST /api/rtf/welzijn/toestemming",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "gezinsPoort"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtfkantoor.advies",
    "route": "POST /api/rtfkantoor/advies",
    "semantiek": {
@@ -130830,6 +130870,28 @@
     "grond": null,
     "hindernis": "Ongeldige beveiligingshandeling."
    },
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "foundation.gezin.bewaren.veeg",
+   "route": "POST /api/techniek/bewaren/gezinnen",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "techAuth",
+     "eigenaarAlleen"
+    ]
+   },
+   "bewijs": null,
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,

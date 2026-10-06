@@ -16,7 +16,7 @@ module.exports = (kern) => {
     req.gezinslid = sess;
     next();
   }
-  const stuur = (res, r) => r.error ? res.status(r.status).json({ error: r.error }) : res.json(r);
+  const stuur = (res, r) => r.error ? res.status(r.status).json(r.hoe ? { error: r.error, hoe: r.hoe, zelf: r.zelf } : { error: r.error }) : res.json(r);
 
   // vangnet: Express 4 vangt async-fouten niet zelf (zie routes/spellen.js)
   async function veilig(res, werk) {
@@ -32,4 +32,5 @@ module.exports = (kern) => {
 
   app.post('/api/rtf/welzijn/dagboek', gezinsPoort, doe((s) => welzijn.dagboek(s)));
   app.post('/api/rtf/welzijn/stemming', gezinsPoort, doe((s, b) => welzijn.stemming(s, { gevoel: b.gevoel, notitie: b.notitie })));
+  app.post('/api/rtf/welzijn/toestemming', gezinsPoort, doe((s, b) => welzijn.dagboekToestemming(s, { aan: b.aan })));
 };

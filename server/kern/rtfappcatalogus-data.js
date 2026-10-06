@@ -76,6 +76,7 @@ const R = [
   // ---- veilig & gezond ----
   ['veilig-vertrouwd', 'Veilig & Vertrouwd', 'veilig', 'gezin', '/apps/foundation/veilig-vertrouwd.html', 'Uw kring, uw keuzes en hulp wanneer dat nodig is.'],
   ['gezondheid-welzijn', 'Gezondheid & Welzijn', 'veilig', 'gezin', '/apps/foundation/gezondheid-welzijn.html', 'Vandaag, uw eigen ritme en echte zorgcontacten rustig bij elkaar.'],
+  ['gezondheid', 'Gezondheidsmaatje', 'veilig', 'gezin', '/apps/foundation/gezondheid.html', 'Medicijnen, afspraken en groeicurve.'],
   ['privacy', 'Privacy', 'veilig', 'gezin', '/apps/foundation/privacy.html', 'Wat er met jullie gegevens gebeurt, in gewone woorden.'],
   /* De levenspas aan de gezinskant (LEVEN.md par. 2.8). Doelgroep 'gezin' en
      niet 'kind': een ouder heeft hem net zo hard nodig als een kind, want ook

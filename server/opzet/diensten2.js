@@ -304,7 +304,8 @@ function auth(req, res, next) {
         if (uit.nietAfgedwongen) res.append('RTG-Niet-Afgedwongen', 'bezitsbewijs');
         verder();
       })
-      .catch(() => verder());   // een storing in de bewijslaag is geen overtreding
+      /* A-P1-04: een storing in de bewijslaag laat een ZWAAR pad niet door. */
+      .catch(() => res.status(503).json({ error: 'Het bezitsbewijs kon niet worden gecontroleerd; er is niets uitgevoerd.', bezitsbewijs: 'storing' }));
     return;
   }
   return verder();

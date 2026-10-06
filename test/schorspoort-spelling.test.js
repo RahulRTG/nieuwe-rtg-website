@@ -34,6 +34,25 @@
         spelling die bij de geschorste handler hoort krijgt de 503 met de kop
         en de reden; een niet-geschorste route geeft zijn ECHTE status.
 
+   En twee toetsen voor de grens van die reparatie. Een route die op een slash
+   eindigt (vast, als :param, of op de wortel van een mount) komt met een slash
+   EXTRA bij zijn handler, terwijl zijn registersleutel geen slash draagt: die
+   spelling vindt de lezer niet, en dat is zonder een tweede opvatting van het
+   pad niet te verhelpen (de kop van staatVan legt uit waarom). Vandaag bestaat
+   zo'n schrijvende route niet; deze twee houden dat vast.
+
+     4. HET INSTRUMENT KAN UITSLAAN. Het orakel van toets 5 op een kleine
+        router met precies die vormen: het vindt alle drie (en ook een .all()
+        en een :param midden in een segment, die langs een andere weg
+        hetzelfde doen), en wat het een gat noemt is over HTTP met de echte
+        poort ook echt een gat (de handler antwoordt), terwijl alles wat het
+        dicht noemt de 503 krijgt.
+
+     5. DE ECHTE ROUTEKAART. Elke schrijvende laag van de echte app, met zijn
+        pad zoals hij is opgehangen (test/fixtures/schrijflagen.js), wordt
+        opnieuw opgehangen op de echte router; per spelling wordt de ROUTER
+        gevraagd of hij bij de handler komt, en dan moet staatVan hem vinden.
+
    Draai los: node --test test/schorspoort-spelling.test.js */
 'use strict';
 const test = require('node:test');
@@ -42,9 +61,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
+const { execFileSync } = require('child_process');
 const web = require('../server/web');
+const { padNaar } = require('../server/web/routing');
+const vervalstaat = require('../server/lib/vervalstaat');
 const maakSchorspoort = require('../server/middleware/schorspoort');
-const { startServer, stop } = require('./helper');
+const { rauweLagen, SCHRIJFT } = require('./fixtures/schrijflagen');
+const { startServer, stop, vrijePoort } = require('./helper');
 
 const WEIGERING = /Deze handeling is tijdelijk geschorst: het bewijs erachter is gezakt/;
 
@@ -265,4 +288,167 @@ test('3. op een echte server: een geschorste route is met geen spelling van de r
     stop(srv.child);
     try { fs.rmSync(DATA, { recursive: true, force: true }); } catch (e) {}
   }
+});
+
+/* HET ORAKEL VOOR DE GRENS (toets 4 en 5).
+
+   Per schrijvende laag een eigen kleine router met dezelfde mounts en hetzelfde
+   pad als waarmee hij is opgehangen, en een register met precies zijn sleutel:
+   die van _routes(), de vorm die scripts/vertrouwen.js schrijft. Daarna per
+   spelling twee vragen: brengt de ROUTER dit verzoek bij de handler, en zo ja,
+   vindt staatVan het dan ook? De toets beslist dus niet zelf welke vormen
+   gevaarlijk zijn; hij vraagt het de router, net als toets 1.
+
+   Een laag waarbij geen enkele spelling de handler haalt, is ONBEPROEFD en geen
+   geslaagde laag: anders ging het vergelijken over niets. Een :param krijgt een
+   vaste waarde, alleen in het pad (een mount kent geen parameters). Elke laag
+   staat los, dus een eerdere laag die een spelling in de echte app zou
+   wegvangen telt hier niet mee: het orakel ziet eerder te veel dan te weinig. */
+const REG_ORAKEL = path.join(TMP, 'orakel.json');
+function spellingGaten(lagen) {
+  const proeven = [], onbeproefd = [];
+  for (const l of lagen) {
+    const wortel = web.Router();
+    let r = wortel;
+    for (const p of l.voorvoegsels) { const kind = web.Router(); r.use(p, kind); r = kind; }
+    let geraakt = false;
+    r[l.methode === 'ALL' ? 'all' : l.methode.toLowerCase()](l.pad, () => { geraakt = true; });
+    const [k] = wortel._routes('');
+    const route = k.methode + ' ' + k.pad;
+    fs.writeFileSync(REG_ORAKEL, JSON.stringify({ perRoute: { [route]: { staat: 'geschorst', reden: 'orakel' } } }));
+    vervalstaat.vergeet();
+    const vol = l.voorvoegsels.map(p => (p === '/' ? '' : p)).join('') + l.pad.replace(/:([A-Za-z0-9_]+)/g, 'p1');
+    const kaal = vol.replace(/\/+$/, '') || '/';
+    const spellingen = new Set([...vervormingen(vol), ...vervormingen(kaal)].map(([, s]) => s));
+    let ooit = false;
+    for (const s of spellingen) {
+      const pn = padNaar(s);
+      if (!pn.startsWith('/api/')) continue;   // de schorspoort kijkt alleen onder /api/
+      for (const methode of (l.methode === 'ALL' ? [...SCHRIJFT] : [l.methode])) {
+        geraakt = false;
+        wortel._handle({ method: methode, url: s, headers: {} }, {}, () => {});
+        if (!geraakt) continue;
+        ooit = true;
+        const st = vervalstaat.staatVan(methode, pn, { pad: REG_ORAKEL, ttlMs: 3600000 });
+        proeven.push({ methode, pad: s, route, dicht: !!(st && st.staat === 'geschorst') });
+      }
+    }
+    if (!ooit) onbeproefd.push(l.methode + ' ' + l.voorvoegsels.join('') + ' ' + l.pad);
+  }
+  return { proeven, gaten: proeven.filter(p => !p.dicht), onbeproefd };
+}
+
+/* Een router met elke vorm die het orakel hoort te vinden, en de gewone vormen
+   ernaast. De drie bovenste zijn de grens uit de kop van staatVan; .all() en een
+   :param midden in een segment hebben hetzelfde gevolg langs een andere weg. */
+function bouwGrensRouter() {
+  const zeg = (sleutel) => (req, res) => res.json({ handler: sleutel });
+  const wortel = web.Router();
+  const sub = web.Router();
+  sub.post('/', zeg('POST /api/sub'));                          // de wortel van een mount
+  sub.post('/les/maak', zeg('POST /api/sub/les/maak'));
+  wortel.use('/api/sub', sub);
+  wortel.post('/api/t/', zeg('POST /api/t'));                   // vast pad, met een slash opgehangen
+  wortel.put('/api/p/:id/', zeg('PUT /api/p/:id'));             // :param, met een slash opgehangen
+  wortel.post('/api/geld/boek', zeg('POST /api/geld/boek'));
+  wortel.put('/api/gezin/:code/mij', zeg('PUT /api/gezin/:code/mij'));
+  wortel.all('/api/alles', zeg('ALL /api/alles'));              // de sleutel draagt ALL
+  wortel.post('/api/v:versie/x', zeg('POST /api/v:versie/x'));  // :param midden in een segment
+  return wortel;
+}
+
+test('4. het orakel vindt elke vorm van de grens, en wat het een gat noemt is over HTTP ook een gat', async () => {
+  const wortel = bouwGrensRouter();
+  const { lagen, regexp } = rauweLagen(wortel._stack);
+  assert.deepEqual(regexp, []);
+  assert.equal(lagen.length, 8, 'de lezer van de ruwe stapel hoort elke schrijvende laag te vinden, ook die in de mount');
+  const { proeven, gaten, onbeproefd } = spellingGaten(lagen);
+  assert.deepEqual(onbeproefd, [], 'elke laag hoort met minstens een spelling bij zijn handler te komen');
+
+  const open = new Set(gaten.map(g => g.methode + ' ' + g.pad));
+  for (const g of ['POST /api/sub//', 'POST /api/t//', 'PUT /api/p/p1//', 'POST /api/alles', 'DELETE /api/alles/', 'POST /api/vp1/x']) {
+    assert.ok(open.has(g), 'het orakel hoort ' + g + ' als gat te zien; het zag: ' + [...open].join(', '));
+  }
+  for (const route of ['POST /api/sub/les/maak', 'POST /api/geld/boek', 'PUT /api/gezin/:code/mij']) {
+    assert.deepEqual(gaten.filter(g => g.route === route), [], route + ' is met elke spelling dicht, dus geen gat');
+  }
+  const dicht = new Set(proeven.filter(p => p.dicht).map(p => p.methode + ' ' + p.pad));
+  /* /api/t en /api/p/p1 zonder slash horen hier NIET bij: wie met een slash
+     ophangt, wordt zonder slash niet bereikt (de router eist hem dan). */
+  for (const p of ['POST /api/sub', 'POST /api/sub/', 'POST /api/t/', 'PUT /api/p/p1/']) {
+    assert.ok(dicht.has(p), p + ' hoort de router bij de handler te brengen en staatVan hoort hem te vinden');
+  }
+  for (const p of ['POST /api/t', 'PUT /api/p/p1']) {
+    assert.ok(!proeven.some(x => x.methode + ' ' + x.pad === p), p + ' bereikt de handler niet en hoort dus geen proef te zijn');
+  }
+
+  /* DEZELFDE VRAAG OVER HTTP. De echte poort voor de router, en een register
+     waarin elke schrijvende route geschorst is. Wat het orakel dicht noemt,
+     hoort de 503 te geven; wat het een gat noemt, hoort bij DIE handler aan te
+     komen. Zo bewijst de zelfijking dat een gat geen kunstje van het opnieuw
+     ophangen is, en dat een nul in toets 5 dus iets betekent. */
+  const REG_HTTP = path.join(TMP, 'grens.json');
+  const perRoute = {};
+  for (const r of wortel._routes('')) {
+    if (r.methode === 'ALL' || SCHRIJFT.has(r.methode)) perRoute[r.methode + ' ' + r.pad] = { staat: 'geschorst', reden: 'grensproef' };
+  }
+  fs.writeFileSync(REG_HTTP, JSON.stringify({ perRoute }));
+  const app = web();
+  app.use(web.json());
+  app.use(maakSchorspoort({ pad: REG_HTTP, ttlMs: 0 }));
+  app.use(wortel);
+  const srv = await luister(app);
+  const base = 'http://127.0.0.1:' + srv.address().port;
+  try {
+    const fouten = [];
+    for (const p of proeven) {
+      const r = await stuur(base, p.methode, p.pad, {});
+      let handler = null; try { handler = JSON.parse(r.body).handler; } catch (e) {}
+      if (p.dicht && !(r.status === 503 && r.kop === 'geschorst' && WEIGERING.test(r.body))) {
+        fouten.push(p.methode + ' ' + p.pad + ': het orakel zegt dicht, over HTTP ' + r.status + ' ' + r.body.slice(0, 60));
+      } else if (!p.dicht && !(r.status === 200 && handler === p.route)) {
+        fouten.push(p.methode + ' ' + p.pad + ': het orakel zegt gat naar ' + p.route + ', over HTTP ' + r.status + ' ' + r.body.slice(0, 60));
+      }
+    }
+    assert.deepEqual(fouten, [], 'het orakel en de echte poort horen het over elke spelling eens te zijn');
+    assert.ok(proeven.length >= 40, 'de zelfijking hoort over genoeg spellingen te gaan, kreeg ' + proeven.length);
+  } finally { srv.close(); }
+});
+
+test('5. in de echte routekaart komt geen schrijvende route met een andere spelling langs de schorspoort', async () => {
+  /* Het orakel hangt de echte routes op in DIT proces. Hing hier de haak van het
+     routejournaal (server/routelog.js), dan telde elke schrijvende route van het
+     huis als door een toets geraakt: een dekkingsmeting van honderd procent
+     zonder een enkel echt verzoek. Het kindproces krijgt het journaal om
+     dezelfde reden niet mee. */
+  assert.ok(!require.cache[require.resolve('../server/routelog')],
+    'het routejournaal is in dit proces geladen; dan schrijft het orakel nepdekking weg');
+  const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-schrijflagen-data-'));
+  const env = { ...process.env, PORT: String(await vrijePoort()), RTG_DATA_DIR: DATA, SMTP_URL: '', STUN_UIT: '1' };
+  delete env.RTG_ROUTELOG;
+  let tekst;
+  try {
+    tekst = execFileSync(process.execPath, [path.join(__dirname, 'fixtures', 'schrijflagen.js')], {
+      cwd: path.join(__dirname, '..'), env, encoding: 'utf8', timeout: 180000,
+      maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe']
+    });
+  } catch (e) {
+    throw new Error('de lezer van de echte routekaart faalde: ' + String(e.stdout || '').slice(0, 500) +
+      ' ' + String(e.stderr || e.message).slice(-2000));
+  } finally { try { fs.rmSync(DATA, { recursive: true, force: true }); } catch (e) {} }
+  const uit = JSON.parse(tekst);
+
+  /* NIET LEEG: vandaag ruim vijfduizend. Vond de lezer de stapel niet (een
+     andere wortel, een mount die hij niet volgt), dan was nul gaten geen uitslag. */
+  assert.ok(uit.lagen.length > 1000, 'de echte app hoort duizenden schrijvende lagen te hebben, gelezen: ' + uit.lagen.length);
+  assert.ok(uit.lagen.some(l => l.voorvoegsels.length), 'de lezer hoort ook de lagen in een gemounte router te zien');
+  assert.deepEqual(uit.regexp, [], 'een schrijvende route met een RegExp-pad heeft geen sleutel in het register en is voor dit orakel niet te beproeven');
+  const { proeven, gaten, onbeproefd } = spellingGaten(uit.lagen);
+  assert.deepEqual(onbeproefd, [], 'deze lagen komen met geen enkele spelling bij hun handler; het orakel kan er niets over zeggen');
+  assert.ok(proeven.length >= uit.lagen.length * 2, 'per laag horen minstens de exacte vorm en die met een slash de handler te halen');
+  assert.deepEqual(gaten.slice(0, 20).map(g => g.methode + ' ' + g.pad + ' (route ' + g.route + ')'), [],
+    'de router brengt deze spellingen bij een schrijvende handler die de schorspoort niet vindt, dus een schorsing ' +
+    'op die route is ermee te omzeilen (' + gaten.length + ' in totaal). Hang de route op zonder slash aan het eind en ' +
+    'niet op de wortel van een mount, met de methode die hij echt aanneemt in plaats van .all(), en met een :param ' +
+    'als heel segment. Waarom de lezer dit niet zelf oplost: de kop van staatVan in server/lib/vervalstaat.js.');
 });

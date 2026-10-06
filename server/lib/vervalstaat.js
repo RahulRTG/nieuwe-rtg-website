@@ -87,11 +87,26 @@ function laad(pad, ttlMs) {
    slash binnenin of procentcodering brengen een verzoek bij geen handler;
    test/schorspoort-spelling.test.js laat de router dat zelf zeggen.
 
-   EEN GRENS DIE VANDAAG NIETS RAAKT. Een route op de WORTEL van een gemounte
-   router (router.post('/') onder app.use('/api/x', router)) bereikt de router
-   ook als /api/x//, en dat ziet vastePaden() niet: het register kent geen
-   mounts. Gemeten in de echte app op 6 oktober 2026: er is een gemounte
-   router (/api/foundation) en geen enkele schrijvende route op zijn wortel. */
+   EEN GRENS DIE VANDAAG NIETS RAAKT, EN EEN TOETS DIE DAT ZO HOUDT. Een route
+   die op een SLASH eindigt, komt met een slash EXTRA bij zijn handler, en die
+   spelling vindt deze lezer niet. Dat geldt voor elke vorm waarin die slash
+   ontstaat: een vast pad (app.post('/api/t/') bereikt de router ook als
+   /api/t//), een :param-route (app.put('/api/p/:id/'), ook /api/p/1//) en de
+   wortel van een gemounte router (router.post('/') onder app.use('/api/x',
+   router), ook /api/x//). De oorzaak is de registersleutel: leesLagen() in
+   ../web/routing.js haalt de slash weg (/api/t, /api/p/:id, /api/x), de router
+   niet, dus vastePaden() komt hooguit op /api/t/ uit. Hier een slash extra
+   weghalen is geen uitweg: dan sluit de poort ook /api/t// van een route die
+   ZONDER slash is opgehangen, een spelling die de router nergens heen brengt,
+   en dat is de tweede opvatting van het pad waar deze functie juist vanaf is.
+   Wat wel kan is vasthouden dat zo'n route niet bestaat: toets 5 in
+   test/schorspoort-spelling.test.js hangt elke schrijvende laag van de ECHTE
+   router opnieuw op, vraagt de router per spelling of hij bij de handler
+   komt, en zakt zodra deze lezer er dan een niet vindt. Daarmee ziet hij ook
+   een .all()-route (de sleutel draagt ALL, gezocht wordt op de methode van
+   het verzoek) en een :param midden in een segment (segmentPatroon() kent
+   alleen /:). Gemeten op 6 oktober 2026: 5291 schrijvende lagen, van geen
+   enkele vorm een. */
 function staatVan(methode, pad, opties) {
   const o = opties || {};
   const k = laad(o.pad, o.ttlMs);

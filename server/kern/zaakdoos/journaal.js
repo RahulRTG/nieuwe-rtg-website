@@ -61,13 +61,22 @@ function alleenRefs(x) {
 
 /* SLOT 4B: EEN LIJF MET EEN WACHTWOORD GAAT ER NIET IN. Het lijf wordt letterlijk
    nagespeeld, dus schoonmaken kan niet zonder de handeling te veranderen; weigeren
-   is de vorm die het journaal al kent (een te groot lijf). Dit vangt de deur die
-   geen inlog is en toch een RTG-wachtwoord draagt (/api/supplier/staff/join), en
-   elke volgende. Alleen deze twee namen: `code`, `bewijs` en `token` zijn in de
-   zaakkant gewone velden (de bedrijfscode bij een wissel, het bewijs bij een
-   belofte); die staan op een inlogroute, en daar houdt slot 1 ze tegen. Een
-   sleutel telt in elke hoofdlettervorm en op elke diepte, ook in een lijst;
-   toets 5 van test/doos-journaal.test.js houdt elk van die takken apart vast. */
+   is de vorm die het journaal al kent (een te groot lijf). Alleen deze twee namen:
+   `code`, `bewijs` en `token` zijn in de zaakkant gewone velden (de bedrijfscode
+   bij een wissel, het bewijs bij een belofte); die staan op een inlogroute, en
+   daar houdt slot 1 ze tegen. Een sleutel telt in elke hoofdlettervorm en op
+   elke diepte, ook in een lijst.
+
+   DIT SLOT IS DE ACHTERVANG, EN DAAROM BEPROEFT DE TOETS HET OP EEN EIGEN PAD.
+   De deur waarvoor het kwam, /api/supplier/staff/join, staat sinds N29 op
+   INLOG_PADEN en valt dus al bij slot 1 af. Vandaag vraagt geen supplierroute
+   buiten die lijst een wachtwoord: dit slot is er voor de deur die er morgen bij
+   komt, en voor de client die te veel meestuurt. Een toets die het
+   wachtwoordlijf op een inlogpad zet, beproeft slot 1: zo bleven toets 5 en 6
+   van test/doos-journaal.test.js na N29 groen zonder draagtWachtwoord. Nu eisen
+   ze een pad dat slot 1 passeert, toets 7 daar neemt elke spelling op elke
+   diepte die de dieptewacht doorlaat, en toets 2 van
+   test/doos-inlogjournaal.test.js gaat door een echte doos. */
 const WACHTWOORD = Object.freeze(['password', 'wachtwoord']);
 function draagtWachtwoord(lijf) {
   const stapel = [lijf];

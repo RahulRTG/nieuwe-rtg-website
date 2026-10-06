@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-06T13:09:38.668Z",
-    "commit": "66374ec5",
+    "op": "2026-10-06T14:25:32.902Z",
+    "commit": "6597451f9",
     "boomVuil": false,
-    "boomAnders": 8,
+    "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
     "node": "v26.10.0"
   },

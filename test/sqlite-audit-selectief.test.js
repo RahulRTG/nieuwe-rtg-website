@@ -749,11 +749,11 @@ test('betaalde order laat keuken en melding elk uitsluitend hun eigen collectie 
   assert.equal((await betaal(p.actor, { ref: order.ref })).ok, true);
   assert.equal(p.lees('orders')[0].paid, true);
   assert.deepEqual(p.lees('suppliers')[0].recepten, {}, 'echte keuken initialiseert zonder geboekte voorraadregel of eigen save');
-  // Met de mutatietracker van #447 serialiseert een brede save alleen de
-  // collecties die als geraakt zijn aangewezen; 'ander' wordt daardoor een keer
-  // minder gelezen dan bij de volledige scan van vroeger.
-  assert.equal(p.breed(), 2); assert.equal(p.scans(), 2, 'alleen geraakte collecties worden gelezen');
-  assert.equal(p.lees('ander').waarde, 3);
+  // Gerichte saves (#446) bovenop de mutatietracker (#447): keuken en melding
+  // bewaren alleen hun eigen collectie, en de ene brede save leest alleen wat
+  // de tracker als geraakt aanwees -- 'ander' dus alleen bij de fixture.
+  assert.equal(p.breed(), 1); assert.equal(p.scans(), 1, 'alleen de fixture leest de vreemde collectie; keuken en melding blijven gericht');
+  assert.equal(p.lees('ander').waarde, 1, 'een vreemde pending mutatie lift niet mee met keuken of melding');
   assert.deepEqual(p.signalen, ['notify', 'supplier', 'office']);
   assert.equal((await betaal(p.actor, { ref: order.ref })).status, 409);
   assert.equal(p.lees('supplierNotifications').AAA.length, 1, 'retry maakt geen tweede melding');

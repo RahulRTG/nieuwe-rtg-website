@@ -20,6 +20,10 @@ for (const breedte of [390,1440]) test('dagelijks werk vanaf nul en gastakkoord 
       if (!await summary.evaluate(el=>el.parentElement.open)) await summary.click();
     };
     page.setDefaultTimeout(12000);
+    /* Uit #476: wacht na een stap op de stand die erbij hoort, dan is het
+       paneel herbouwd en lees je niet het oude. */
+    const werk=paneel.locator('[data-pr-werk]');
+    const werkStand=async st=>{await werk.locator('.pr-status').filter({hasText:new RegExp('· '+st+'( ·|$)')}).waitFor({state:'attached'});};
     await paneel.getByLabel('Hoe werkt u?').selectOption('stichting');
     await paneel.getByRole('button',{name:'Werkplek bewaren',exact:true}).click();
     await open(paneel.getByText('Aanbod toevoegen · 0 onderdelen',{exact:true}));
@@ -55,6 +59,7 @@ for (const breedte of [390,1440]) test('dagelijks werk vanaf nul en gastakkoord 
     await open(paneel.locator('[data-pr-werk] > summary'));
     await paneel.getByLabel('Wat spreekt u af?').fill('Gratis kookmiddag, materialen inbegrepen');
     await paneel.getByRole('button',{name:'Voorstel maken',exact:true}).click();
+    await werkStand('voorstel');
     assert.equal(await paneel.getByLabel('Wat biedt u aan?').inputValue(),'Volgende activiteit als concept','ander formulier blijft bewaard');
     await paneel.getByLabel('Wat biedt u aan?').fill('');
     page.on('dialog', d=>d.accept());

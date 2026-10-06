@@ -56,7 +56,7 @@
 'use strict';
 
 const { BETALEND, pasVan } = require('../passen');
-const { LOPEND } = require('./contract/vorm');
+const { LOPEND, STATUS } = require('./contract/vorm');
 
 const STAND = {
   NIET_BETALEND: 'NIET_BETALEND',
@@ -86,7 +86,7 @@ const REGEL_VAN = REGELS.reduce((m, r) => (m[r.stand] = r.id, m), {});
    valt daar op de instappas terug, en dat besluit hoort op EEN plek te staan
    (../passen.js). Hier nog een keer beslissen wat een onbekende tier betekent,
    zou de tweede plek zijn. */
-function beoordeel(tier, contract) {
+function beoordeel(tier, contract, nu) {
   const pas = pasVan(tier);
   if (!BETALEND.includes(pas))
     return { stand: STAND.NIET_BETALEND, pas, bezwaar: null, regel: null };
@@ -95,7 +95,12 @@ function beoordeel(tier, contract) {
     return { stand: STAND.GEEN_CONTRACT, pas, regel: REGEL_VAN[STAND.GEEN_CONTRACT],
       bezwaar: 'de pas is ' + pas + ' en er is geen lidmaatschapsafspraak gevonden' };
 
-  if (LOPEND.has(contract.status))
+  /* A-P1-03: een opzegging die zijn einddatum PASSEERDE loopt niet meer, ook als
+     de motor de overgang naar `geeindigd` nog niet schreef. Het oordeel wordt
+     per verzoek gerekend, dus er is geen venster waarin de pas blijft staan. */
+  const verstreken = contract.status === STATUS.OPZEGGEND && contract.eindigtOp &&
+    Number.isFinite(Date.parse(contract.eindigtOp)) && Date.parse(contract.eindigtOp) <= (nu == null ? require('../../lib/klok').nu() : nu);
+  if (LOPEND.has(contract.status) && !verstreken)
     return { stand: STAND.LOOPT, pas, bezwaar: null, regel: null,
       contractId: contract.id || null, status: contract.status };
 
@@ -152,4 +157,15 @@ function weeg(schaduw, oordeel) {
   return { door: w.door !== false, gewogen: true, modus: w.modus, regel: id, oordeel };
 }
 
-module.exports = { STAND, REGELS, beoordeel, weeg };
+/* A-P1-03: WAT WORDT AFGEDWONGEN. Alleen een afspraak die aantoonbaar VOORBIJ is
+   (status geeindigd, of een opzegging voorbij zijn einddatum) zet de sessie op de
+   basislaag. GEEN_CONTRACT blijft `ik weet het niet` en dwingt niets af
+   (ONBEKEND is geen WEIGEREN), en een afspraak in concept of aangeboden is nog
+   niet voorbij. De basislaag is de gratis app: tier 'guest'. */
+const BASIS_TIER = 'guest';
+function afgedwongen(oordeel) {
+  if (!oordeel || oordeel.stand !== STAND.GEEINDIGD) return false;
+  return oordeel.status === STATUS.GEEINDIGD || oordeel.status === STATUS.OPZEGGEND;
+}
+
+module.exports = { STAND, REGELS, BASIS_TIER, beoordeel, afgedwongen, weeg };

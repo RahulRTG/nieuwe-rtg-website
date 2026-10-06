@@ -50,13 +50,17 @@ if (require.main !== module) return;
 const fs = require('fs');
 const path = require('path');
 const { execSync, execFileSync } = require('child_process');
-/* De gemeten invoer voor het stempel (ARCHITECTOPDRACHT.md fase 2); zonder
-   invoerspoor-preload is dit undefined en verandert het stempel niet. */
-const { blok: invoerBlok } = require('./lib/invoerspoor');
 const { alleRoutes } = require('./lib/routes');
 
 const WORTEL = path.join(__dirname, '..');
 const ANDER = 'SCHRIJFANALYSE.json';
+/* De gemeten invoer voor het stempel (ARCHITECTOPDRACHT.md fase 2); zonder
+   invoerspoor-preload is dit undefined en verandert het stempel niet. Hij
+   staat NA de declaraties hierboven: scripts/stillezing.js telt een lezing
+   lexicaal (een registernaam binnen 200 tekens), en tussen de requires en
+   ANDER duwde hij die naam buiten het venster -- het bereik daalde zonder dat
+   er een lezing verdween. */
+const { blok: invoerBlok } = require('./lib/invoerspoor');
 
 function git(args) {
   try { return execFileSync('git', args, { cwd: WORTEL }).toString().trim(); }

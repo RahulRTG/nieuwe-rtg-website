@@ -86,7 +86,7 @@
       "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 14,
-        "kernelModules": 2475,
+        "kernelModules": 2552,
         "mutationContracts": 59,
         "routes": 62,
         "screens": 10,
@@ -140,9 +140,9 @@
       ],
       "blastRadius": {
         "sourceOwners": 5,
-        "kernelModules": 118,
+        "kernelModules": 125,
         "mutationContracts": 290,
-        "routes": 284,
+        "routes": 290,
         "screens": 5,
         "dataSchema": "eerst flowmanifest; geen runtime-opslag",
         "newSharedPrimitive": "geen nieuwe runtimeprimitive; build-time flowdecompositie",
@@ -202,9 +202,9 @@
       ],
       "blastRadius": {
         "sourceOwners": 13,
-        "kernelModules": 122,
+        "kernelModules": 129,
         "mutationContracts": 1060,
-        "routes": 1078,
+        "routes": 1081,
         "screens": 29,
         "dataSchema": "versioned source targets en duurzame events waar zij ontbreken",
         "newSharedPrimitive": "geen",
@@ -317,7 +317,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 8,
-        "kernelModules": 13,
+        "kernelModules": 25,
         "mutationContracts": 93,
         "routes": 95,
         "screens": 8,
@@ -389,7 +389,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 14,
-        "kernelModules": 31,
+        "kernelModules": 40,
         "mutationContracts": 136,
         "routes": 140,
         "screens": 20,
@@ -475,7 +475,7 @@
       "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 32,
-        "kernelModules": 48,
+        "kernelModules": 56,
         "mutationContracts": 527,
         "routes": 531,
         "screens": 43,
@@ -539,7 +539,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 11,
-        "kernelModules": 30,
+        "kernelModules": 42,
         "mutationContracts": 134,
         "routes": 134,
         "screens": 12,
@@ -639,7 +639,7 @@
       ],
       "blastRadius": {
         "sourceOwners": 38,
-        "kernelModules": 117,
+        "kernelModules": 124,
         "mutationContracts": 1116,
         "routes": 1146,
         "screens": 87,
@@ -794,9 +794,9 @@
       ],
       "blastRadius": {
         "sourceOwners": 86,
-        "kernelModules": 2498,
+        "kernelModules": 2576,
         "mutationContracts": 2072,
-        "routes": 2093,
+        "routes": 2094,
         "screens": 97,
         "dataSchema": "geen learning-opslag vóór menselijke/juridische beslissing",
         "newSharedPrimitive": "geen",

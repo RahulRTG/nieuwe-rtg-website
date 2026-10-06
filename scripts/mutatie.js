@@ -531,7 +531,9 @@ const EIGEN_MODULE = new Map([
      toetsbestand zelf. De toewijzingen hieronder noemen de echte source-owned
      mutatiepunten die de toetsen uitoefenen. */
   ['library-sqlite.test.js', ['server/kern/library/index.js']],
+  ['library.pg.test.js', ['server/kern/library/index.js', 'server/kern/library/reader.js']],
   ['loop-fabric-lifecycle.test.js', ['server/bedrijf/loop-source.js', 'server/kern/loop-fabric/index.js']],
+  ['loop-fabric.pg.test.js', ['server/bedrijf/loop-source.js', 'server/kern/loop-fabric/index.js']],
   /* Deze toets gebruikt bewust de gedeelde living-world-fixture. Daardoor staat
      de echte bronrequire een niveau dieper en kan modulesVan() hem niet uit het
      toetsbestand zelf afleiden. De Commons-grendels zitten in actions.js. */

@@ -2,7 +2,7 @@
 
    Een uitbetaling of terugbetaling via een echte provider (Stripe, Mollie,
    Adyen) is standaard DICHT. De stand staat in het gecommitte register
-   UITBETAALGATE.json en niet in een omgevingsvariabele: een beheerder kan hem
+   uitbetaalgate.json en niet in een omgevingsvariabele: een beheerder kan hem
    dus niet per ongeluk aanzetten, en openen is een zichtbare wijziging in
    review. Zonder leesbaar register geldt dicht. Sandbox, simulatie en de
    Magnaat-testrail verplaatsen geen echt geld en vallen hier buiten.
@@ -13,7 +13,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const PAD = path.join(__dirname, '..', '..', 'UITBETAALGATE.json');
+const PAD = path.join(__dirname, 'uitbetaalgate.json');
 
 function stand() {
   try {
@@ -21,7 +21,7 @@ function stand() {
     if (r && r.open === true && r.bewijs) return { open: true };
     return { open: false, reden: (r && r.reden) || 'register zonder reden' };
   } catch (e) {
-    return { open: false, reden: 'register UITBETAALGATE.json onleesbaar: dicht' };
+    return { open: false, reden: 'register uitbetaalgate.json onleesbaar: dicht' };
   }
 }
 

@@ -49,9 +49,14 @@ test('publieke Connection-calls vereisen een echte TURN-keten', () => {
   const zwak=basis(); zwak.TURN_SECRET='kort';
   assert.equal(keur(zwak).fouten.some(x => /TURN-authenticatie/.test(x)), true);
 
+  /* Een vaste TURN_USER/TURN_PASS gaat ongewijzigd naar elke browser en
+     verloopt nooit: een permanente frontendcredential. Publieke productie
+     weigert hem, ook als hij sterk is; alleen TURN_SECRET (TURN REST) telt. */
   const vast=basis(); delete vast.TURN_SECRET;
   vast.TURN_USER='rtg'; vast.TURN_PASS='V8!vast-A3#wachtwoord-B7$relay-C9%2026';
-  assert.equal(keur(vast).fouten.some(x => /TURN/.test(x)), false);
+  assert.equal(keur(vast).fouten.some(x => /vaste TURN_USER\/TURN_PASS is in publieke productie niet toegestaan/.test(x)), true);
+  assert.equal(turn.projecteerTurn(vast, { publiekeProductie:true }).server, null);
+  assert.ok(turn.projecteerTurn(vast, { publiekeProductie:false }).server, 'lokaal blijft de vaste route bruikbaar');
 });
 
 test('publieke TURN-config weigert plaintext, onvolledige, lokale en test-relays', () => {

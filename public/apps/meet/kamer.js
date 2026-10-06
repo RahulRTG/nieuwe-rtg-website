@@ -14,7 +14,7 @@
   var mee = null; // de tekstbaan van het gesprek (shared/meelezen.js)
 
   function haalIce() {
-    return fetch('/api/ice').then(function (r) { return r.json(); })
+    return fetch('/api/ice', { headers: { Authorization: 'Bearer ' + api.t } }).then(function (r) { return r.json(); })
       .then(function (d) { ice = d.iceServers || null; }).catch(function () { ice = null; });
   }
   function sein(naar, kind, payload) {

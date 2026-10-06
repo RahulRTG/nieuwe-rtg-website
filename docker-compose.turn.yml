@@ -1,0 +1,41 @@
+# De TURN-relay van RTG: een APARTE host (turn.<productiedomein>), los van de app.
+#
+# Waarom apart: een relais verbruikt uitgaande bandbreedte en een groot UDP-
+# poortbereik; dat hoort niet op de machine die ook de app en de database
+# draagt, en de app-host draait zelf al STUN op 3478/udp (server/stun.js).
+#
+# Start alleen na `node scripts/turn/maak-config.js ...` (zie docs/turn-server.md):
+# de configuratie met het gedeelde geheim staat op de host in /etc/rtg-turn
+# (0600) en NOOIT in deze repository.
+#
+#   docker compose -f docker-compose.turn.yml up -d
+#
+# network_mode: host is bewust: coturn moet het werkelijke publieke adres en
+# een poortbereik van honderden UDP-poorten zien; Docker-NAT over zo'n bereik
+# kost per pakket een conntrack-ingang en verbergt het echte afzenderadres.
+# De firewall van de host (docs/turn-server.md par. 4) is daarom de grens.
+services:
+  turn:
+    image: coturn/coturn:4.7.0@sha256:a00afb5b4890de4df22bbe70379c6b316685dffee297d53cac1271dcb91fab93
+    network_mode: host
+    restart: unless-stopped
+    command: ["-c", "/etc/coturn/turnserver.conf"]
+    read_only: true
+    tmpfs:
+      - /var/lib/coturn:size=16m
+      - /tmp:size=16m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    volumes:
+      - /etc/rtg-turn/turnserver.conf:/etc/coturn/turnserver.conf:ro
+      - /etc/rtg-turn/tls:/etc/rtg-turn/tls:ro
+    ulimits:
+      nofile: { soft: 65536, hard: 65536 }
+    deploy:
+      resources:
+        limits: { cpus: "2.0", memory: 512m }
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }

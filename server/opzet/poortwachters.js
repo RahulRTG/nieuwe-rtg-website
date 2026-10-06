@@ -120,7 +120,7 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
      de vervalstaat GESCHORST is (VERTROUWEN.json) krijgen een 503 met de
      reden; lezen blijft open, en alleen een geslaagde hermeting heropent.
      Zie de kop van server/middleware/schorspoort.js voor de grenzen. */
-  app.use(require('../middleware/schorspoort')({ log }));
+  app.use(require('../middleware/schorspoort')({ log }), require('../kern/rtc/poort'));
 
   // RTFoundation-app: gratis, open onderwijs voor gezinnen met weinig geld
   // (live schoolbord + leerling-schrift + AI-bijles). Aparte router-module,

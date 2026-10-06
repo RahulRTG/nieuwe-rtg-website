@@ -7,7 +7,7 @@
   function pakMedia(video) { return window.RTGMedia.vraag({ audio: true, video: video ? { facingMode: 'user' } : false }).catch(function () { return null; }); }
   var iceConfig = null;
   // Elke oproep verse ICE-servers (TURN met kort geldige inloggegevens roteert).
-  function haalIce() { return fetch('/api/ice').then(function (r) { return r.json(); }).then(function (d) { iceConfig = d.iceServers || [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }).catch(function () { iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }); }
+  function haalIce() { return fetch(S.base + '/gezin/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: S.code, token: S.token }) }).then(function (r) { return r.json(); }).then(function (d) { iceConfig = d.iceServers || [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }).catch(function () { iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]; return iceConfig; }); }
   function maakPc() {
     var pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls: 'stun:stun.l.google.com:19302' }] });
     call.stream.getTracks().forEach(function (t) { pc.addTrack(t, call.stream); });

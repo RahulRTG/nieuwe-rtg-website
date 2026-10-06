@@ -74,7 +74,7 @@ function ontleedUrl(waarde, { publiekeProductie = false } = {}) {
   const host = m[2].replace(/^\[|\]$/g, '');
   if (net.isIP(host) === 0 && !/^[a-z0-9.-]+$/i.test(host)) return { ok:false, reden:'host-ongeldig' };
   if (publiekeProductie && !openbareHost(host)) return { ok:false, reden:'host-niet-openbaar' };
-  return { ok:true, url, schema, host, poort };
+  return { ok:true, url, schema, host, poort, transport:m[4] ? m[4].toLowerCase() : null };
 }
 
 function ontleedLijst(waarde, opties) {
@@ -143,39 +143,36 @@ function projecteerStun(env, { publiekeProductie = false, requestHost = null } =
   return { urls:lijst.urls, fouten:lijst.fouten };
 }
 
-function sterkGeheim(waarde) {
-  const s = String(waarde || '');
-  if (s.length < 32 || s.length > 512 || /[\s\0-\x1f\x7f]/.test(s) || PLAATSHOUDER.test(s)) return false;
-  if (new Set(s).size < 8) return false;
-  return (s + s).indexOf(s, 1) === s.length;
-}
+const { sterkGeheim, geldigeGebruiker, credentials, ttlVan, actorLabel, tijdelijk,
+  TTL_STANDAARD, TTL_MIN, TTL_MAX } = require('./turn-credential');
 
-function geldigeGebruiker(waarde) {
-  const s = String(waarde || '');
-  return s.length >= 3 && s.length <= 128 && !/[\s\0-\x1f\x7f:]/.test(s) && !PLAATSHOUDER.test(s);
-}
-
-function credentials(env) {
-  const secret = String(env.TURN_SECRET || '');
-  if (sterkGeheim(secret)) return { soort:'tijdelijk', secret };
-  const username = String(env.TURN_USER || ''), credential = String(env.TURN_PASS || '');
-  if (geldigeGebruiker(username) && sterkGeheim(credential))
-    return { soort:'vast', username, credential };
-  return null;
-}
-
-function projecteerTurn(env, { publiekeProductie = false, nu = Date.now } = {}) {
+/* Een vingerafdruk van de relevante TURN-configuratie. Bewijs (de relayproef)
+   geldt alleen zolang deze gelijk blijft: een andere URL-lijst of een ander
+   geheim maakt eerder bewijs ongeldig. Het geheim zit er als HMAC in, niet als
+   hash van zichzelf. */
+function vingerafdruk(env, { publiekeProductie = false } = {}) {
   const lijst = ontleedLijst(env.TURN_URL, { publiekeProductie });
-  const auth = credentials(env);
+  const auth = credentials(env, { publiekeProductie });
+  const sleutel = auth ? (auth.secret || auth.credential) : null;
+  const geheim = sleutel ? crypto.createHmac('sha256', sleutel)
+    .update('rtg-turn-config-vingerafdruk-v1').digest('hex') : 'geen';
+  return crypto.createHash('sha256').update(['rtg-turn-config-v1', [...lijst.urls].sort().join(','),
+    auth ? auth.soort : 'geen', geheim, String(ttlVan(env))].join('\0')).digest('hex');
+}
+
+function projecteerTurn(env, { publiekeProductie = false, nu = Date.now, actor = null } = {}) {
+  const lijst = ontleedLijst(env.TURN_URL, { publiekeProductie });
+  const auth = credentials(env, { publiekeProductie });
   if (!lijst.urls.length || !auth || (publiekeProductie && lijst.fouten.length))
     return { server:null, fouten:lijst.fouten };
   if (auth.soort === 'vast') return { server:{ urls:lijst.urls,
     username:auth.username, credential:auth.credential }, fouten:lijst.fouten };
-  const username = Math.floor(nu() / 1000 + 3600) + ':rtg';
-  const credential = crypto.createHmac('sha1', auth.secret).update(username).digest('base64');
-  return { server:{ urls:lijst.urls, username, credential }, fouten:lijst.fouten };
+  const c = tijdelijk(auth.secret, { actor, ttl:ttlVan(env), nu });
+  return { server:{ urls:lijst.urls, username:c.username, credential:c.credential },
+    verloopt:c.verloopt, fouten:lijst.fouten };
 }
 
 module.exports = { ontleedUrl, ontleedLijst, ontleedStunUrl, ontleedStunLijst,
   openbareHost, ipv4Mapped, sterkGeheim, geldigeGebruiker, credentials,
-  projecteerTurn, projecteerStun };
+  projecteerTurn, projecteerStun, tijdelijk, actorLabel, ttlVan, vingerafdruk,
+  TTL_STANDAARD, TTL_MIN, TTL_MAX };

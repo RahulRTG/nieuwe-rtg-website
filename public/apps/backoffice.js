@@ -489,7 +489,7 @@
   /* Live meekijken bij een SOS: het lid stuurt een WebRTC-aanbod via de office-
      stream ('ontmoeting-signaal'); wij openen het beeld en antwoorden terug. */
   let ontPc = null, ontLiveDate = null, ontIce = null;
-  async function ontHaalIce(){ try { ontIce = (await (await fetch('/api/ice')).json()).iceServers; } catch(e){ ontIce = [{ urls:'stun:stun.l.google.com:19302' }]; } return ontIce; }
+  async function ontHaalIce(){ try { ontIce = (await API.call('/ice', {})).iceServers; } catch(e){ ontIce = [{ urls:'stun:stun.l.google.com:19302' }]; } return ontIce; }
   function ontLiveWacht(dateId, naam){
     ontLiveDate = dateId;
     $('#ontLiveNaam').textContent = '' + naam;

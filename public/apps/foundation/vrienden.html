@@ -992,7 +992,7 @@ let call=null, inkomend=null, iceConfig=null;
 function belSein(toKey, kind, extra){ return soc('/call', Object.assign({ toKey, kind }, extra||{})).catch(()=>{}); }
 // Elke oproep verse ICE-servers halen: een TURN-server met kort geldige
 // inloggegevens werkt dan altijd (die roteren elke keer).
-async function haalIce(){ try{ iceConfig=(await (await fetch('/api/ice')).json()).iceServers; }catch(e){ iceConfig=[{urls:'stun:stun.l.google.com:19302'}]; } return iceConfig; }
+async function haalIce(){ try{ iceConfig=(await lnk('/api/rtf/ice', {})).iceServers; }catch(e){ iceConfig=[{urls:'stun:stun.l.google.com:19302'}]; } return iceConfig; }
 // via shared/media.js: die noemt de echte oorzaak (onveilig adres, kader dat
 // het recht niet doorgeeft, weigering, geen apparaat, bezet) in plaats van een
 // melding die de gebruiker naar een knop stuurt die er niet is.

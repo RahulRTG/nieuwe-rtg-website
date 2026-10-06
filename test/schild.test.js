@@ -66,8 +66,13 @@ test('DDoS-rem: boven het plafond gaat het IP op de banlijst; localhost nooit', 
   for (let i = 0; i < 70; i++) assert.equal((await fetch(BASE + '/api/health')).status, 200);
 });
 
-test('TURN: /api/ice geeft kortlevende inloggegevens met een kloppende HMAC', async () => {
-  const d = await (await fetch(BASE + '/api/ice')).json();
+test('TURN: /api/ice geeft kortlevende inloggegevens met een kloppende HMAC, en alleen aan een sessie', async () => {
+  const anoniem = await fetch(BASE + '/api/ice');
+  assert.equal(anoniem.status, 401, 'zonder sessie geen TURN-credential (anders is het een open relais met een omweg)');
+  assert.equal(JSON.stringify((await anoniem.json()).iceServers).includes('turns:'), false);
+  const login = await (await fetch(BASE + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tier: 'rtg' }) })).json();
+  const d = await (await fetch(BASE + '/api/ice', { headers: { Authorization: 'Bearer ' + login.token } })).json();
   const turn = d.iceServers.find(s => String(s.urls).includes('turns:'));
   assert.ok(turn, 'de TURN-server staat in de lijst');
   for (const server of d.iceServers) {
@@ -75,7 +80,7 @@ test('TURN: /api/ice geeft kortlevende inloggegevens met een kloppende HMAC', as
     assert.equal(server.urls.every(url => typeof url === 'string' && url.length > 0), true,
       'de route projecteert geen lege ICE URL-items');
   }
-  assert.match(turn.username, /^\d+:rtg$/);
+  assert.match(turn.username, /^\d+:[A-Za-z0-9_-]{22}$/, 'verloop plus een ondoorzichtig actorlabel');
   const verloopt = Number(turn.username.split(':')[0]);
   assert.ok(verloopt * 1000 > Date.now() + 30 * 60000, 'minstens een half uur geldig');
   assert.ok(verloopt * 1000 < Date.now() + 2 * 3600000, 'maar niet eeuwig');

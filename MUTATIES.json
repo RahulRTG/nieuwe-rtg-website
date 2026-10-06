@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-06T21:08:38.142Z",
-    "commit": "a808df866",
+    "op": "2026-10-06T23:04:43.091Z",
+    "commit": "1bbb71c57",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -901,7 +901,7 @@
       "staat": "gezakt",
       "module": "server/config/release-trust.js",
       "operator": "voorwaarde-omkeren#0",
-      "gezakt": 14,
+      "gezakt": 15,
       "geprobeerd": 1
     },
     "assets.test.js": {

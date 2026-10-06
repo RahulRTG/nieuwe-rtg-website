@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-10-06T22:31:08.657Z",
-    "commit": "e05fc720c",
-    "boomVuil": true,
+    "op": "2026-10-06T23:04:44.013Z",
+    "commit": "1bbb71c57",
+    "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/bewijsladder.js",
     "node": "v22.22.0"
@@ -19,7 +19,7 @@
       "mechanismen": [
         {
           "doel": "git diff",
-          "lokaal": false,
+          "lokaal": true,
           "keten": [
             "ci.yml"
           ],
@@ -1301,7 +1301,7 @@
       "mechanismen": [
         {
           "doel": "scripts/artefactketen.js",
-          "lokaal": false,
+          "lokaal": true,
           "keten": [
             "release-image.yml"
           ],
@@ -1445,8 +1445,8 @@
     "graadGemeten": 0,
     "graadVermoed": 12,
     "graadOnbekend": 0,
-    "alleenKeten": 25,
-    "vermeldingenAlleenKeten": 26,
+    "alleenKeten": 23,
+    "vermeldingenAlleenKeten": 24,
     "zonderTrede": 0
   }
 }

@@ -91,7 +91,7 @@ De bijbehorende code:
 |---|---|
 | Het gezinsaccount zelf | Art. 6 lid 1 sub b: de dienst die de ouder afneemt |
 | Gegevens van een kind jonger dan 16 | Art. 8: toestemming door de ouder. De ouder legt die vast bij het aanmaken (`bevoegdGezin` + `privacyAkkoord`), en het kind komt uitsluitend via zijn account binnen |
-| Allergieën en welzijnsdagboek | Art. 9 lid 2 sub a: uitdrukkelijke toestemming. `[TE BEOORDELEN: is het vinkje bij het aanmaken uitdrukkelijk genoeg voor art. 9? Voorstel: nee, een eigen toestemming bij het eerste gebruik]` |
+| Gezondheidsgegevens: allergie en medische regel (oppasinfo), medicijnen, medische afspraken, groeimetingen, gevoelsdagboek | Art. 9 lid 2 sub a: uitdrukkelijke toestemming, **apart en bij het eerste gebruik** (besluit van de eigenaar, 5 oktober 2026). Niet het vinkje bij het aanmaken: dat staat tussen andere vinkjes en is daarom niet uitdrukkelijk. Een ouder of de beheerder geeft hem voor het gezin, en daarmee ook voor het dagboek van een kind jonger dan 16 (UAVG art. 5); wie 16 of ouder is geeft hem voor zijn eigen dagboek zelf. Toestemming geven is geen meelezen: het dagboek blijft van het kind. Intrekken kan altijd en wist wat erop rust (`foundation/gezondheidstoestemming.js`, `kern/welzijn.js`). Gegevens van vóór het besluit blijven leesbaar; wat nieuw wordt bewaard vraagt de toestemming |
 | Locatie | Art. 6 lid 1 sub a: toestemming. De gebruiker zet het zelf aan (`/gezin/locatie`) en uit (`/gezin/locatie/stop`) |
 
 ---
@@ -106,12 +106,22 @@ De bijbehorende code:
    **verbetering** van de evenredigheid. De oude deur liet iedereen anoniem een
    "gezin" met kinderprofielen maken. De nieuwe deur bindt elk kind aan een
    ouder van wie RTG het identiteitsbewijs heeft gezien.
-3. **Bewaartermijn.** Er is **geen** termijn voor gezinsgegevens:
-   `server/bewaartermijnen.js` noemt de gezinslaag niet. Wat er wel is: de ouder
-   kan het gezin wissen (`/gezin/wissen`), en het verwijderen van het account
-   neemt het gezin mee (`kern/vergeten.js`, sinds deze ronde).
-   `[TE BESLISSEN: een termijn bij inactiviteit. Voorstel: een gezin zonder
-   ouderlijke sessie gedurende 24 maanden wordt na een aankondiging gewist]`
+3. **Bewaartermijn: 12 maanden ongebruikt, wissen na aankondiging** (besluit
+   van de eigenaar, 5 oktober 2026; `foundation/gezinbewaren.js`). "Gebruikt"
+   is het jongste moment waarop iemand in het gezin een sessie kreeg, of het
+   aanmaken of meenemen. De wacht kondigt dagelijks aan wat kandidaat is; een
+   gezin aan een account krijgt een bericht op dat account. Na 30 dagen kan de
+   eigenaar van RTG het wissen vrijgeven (`/api/techniek/bewaren/gezinnen`,
+   eerst als proef, dan met `WIS` en passkey). Wie tussendoor terugkomt, blijft
+   staan: de wisronde rekent elk gezin opnieuw na. Daarnaast blijft gelden dat de
+   ouder het gezin kan wissen (`/gezin/wissen`) en dat het verwijderen van het
+   account het gezin meeneemt (`kern/vergeten.js`).
+   Twee dingen die het meten opleverde: een **anoniem** gezin heeft geen kanaal
+   voor de aankondiging (geen account en geen contactgegeven, met opzet), dus
+   daar is de aankondiging een stempel op het gezin plus de openbare mededeling.
+   En de gezinscode verloopt na 366 dagen (`kern/bearercode.js`): een anoniem
+   gezin dat een jaar niets doet en geen lopende sessie heeft, kan na dag 366
+   sowieso niet meer binnen. De termijn haalt het dus niets af dat het nog had.
 4. **Twee treden voor de ouder.** Gezin maken kan direct, op een opgegeven
    leeftijd. Alles wat een kind raakt, vraagt een gecontroleerd paspoort. De
    eerste trede verwerkt alleen gegevens van de ouder zelf, dus het risico van
@@ -126,11 +136,12 @@ De bijbehorende code:
 | R-G1 | Een onbevoegde volwassene maakt een "gezin" om in contact te komen met kinderen | Laag | Hoog | Een kind komt alleen binnen na de paspoortcontrole van de eigenaar. Beschermde profielen zijn onvindbaar in de vriendenlaag. Er is geen weg van buiten naar een kind |
 | R-G2 | Een minderjarige geeft zich op als 18+ en maakt een gezin | Middel | Laag | Zonder paspoort kan hij geen kind toevoegen. Hij verwerkt dan alleen zijn eigen gegevens |
 | R-G3 | Een ouder voegt een kind toe dat niet van hem is | Laag | Hoog | RTG controleert de identiteit van de ouder, maar niet de verwantschap. `[TE BEOORDELEN: is de verklaring "ik ben ouder of verzorger" plus een gecontroleerde identiteit voldoende? Dit is de zwakste schakel]` |
-| R-G4 | Gezinsgegevens blijven achter na vertrek | Laag | Middel | Verwijderen gaat mee met het account. Er is geen termijn bij inactiviteit (par. 3.3) |
+| R-G4 | Gezinsgegevens blijven achter na vertrek | Laag | Middel | Verwijderen gaat mee met het account, en een gezin dat 12 maanden ongebruikt is gaat na aankondiging weg (par. 3.3) |
 | R-G5 | Een token lekt via een URL | Middel | Middel | `tokenUit()` accepteert het token ook als `?token=`, en de social-stream zet het in de URL. Daarom blijft die stream hard dicht (`foundation-nog-gesloten.js`). Het token is 128 bits, vervalt, en is in te trekken |
-| R-G6 | Een gestolen toestel van een kind | Middel | Middel | De ouder trekt de sessie in (`/gezin/sessie/intrek`). Een sessie verloopt na 30 dagen |
+| R-G6 | Een gestolen toestel van een kind | Middel | Middel | De ouder trekt de sessie in (`/gezin/sessie/intrek`). Een sessie verloopt na 7 dagen (B19, `gezinstoken.js` `GELDIG_MS`) |
 | R-G7 | De paspoortkeuring wordt ingetrokken, maar de sessie van het kind loopt door | Laag | Middel | `profielVan()` rekent `volwassen()` bij elk verzoek opnieuw. `[TE MAKEN: geen toets dekt dit geval apart; de route die sessies uitgeeft wel]` |
-| R-G8 | Gegevens van een oud, anoniem gezin worden onbereikbaar maar blijven bestaan | Middel | Laag | De beheerder neemt het gezin mee naar zijn account met de gezinscode plus zijn eigen pincode (`/api/rtf/eigen-gezin/koppel`, `foundation/gezinmeenemen.js`); de gegevens blijven en het account wordt de sleutel. Grens: een gezin van vóór B18 heeft nog geen gezinscode van 128 bits, en die maakt de beheerder met een sessie die onder de plicht niet meer opent. `[TE BESLISSEN: wat er met zulke gezinnen gebeurt; wissen na aankondiging is het voorstel]` |
+| R-G8 | Gegevens van een oud, anoniem gezin worden onbereikbaar maar blijven bestaan | Middel | Laag | De beheerder neemt het gezin mee naar zijn account met de gezinscode plus zijn eigen pincode (`/api/rtf/eigen-gezin/koppel`, `foundation/gezinmeenemen.js`); de gegevens blijven en het account wordt de sleutel. Grens: een gezin van vóór B18 heeft nog geen gezinscode van 128 bits, en die maakt de beheerder met een sessie die onder de plicht niet meer opent. Besluit van de eigenaar (5 oktober 2026): **zulke gezinnen gaan weg na een aankondiging** van 30 dagen, ongeacht hoe recent ze gebruikt zijn, want niemand kan er nog bij (`foundation/gezinbewaren.js`, soort `zonder-gezinscode`) |
+| R-G9 | Gezondheidsgegevens worden bewaard op een vinkje dat niemand las | Middel | Hoog | Elke nieuwe allergie, elk medicijn, elke medische afspraak, groeimeting en dagboekregel vraagt een aparte toestemming (par. 2.4); zonder die toestemming weigert de server met 409 en de reden |
 
 ---
 
@@ -145,6 +156,8 @@ De bijbehorende code:
 | R-G4 | Verwijderen van het account wist het gezin; export toont het | `kern/vergeten.js`, `routes/member/privacy.js` | `test/gezinseigenaar.test.js` 7 |
 | R-G4 | Een gratis account heeft recht op inzage en vergetelheid (dat weigerde eerder: `tier === 'guest'`) | `routes/member/privacy.js` | `test/gezinseigenaar.test.js` 7 |
 | R-G8 | Een bestaand gezin meenemen kan alleen de beheerder, met gezinscode en pincode, met een rem per account en per gezin; een gezin krijgt één eigenaar | `foundation/gezinmeenemen.js` | `test/gezinmeenemen.test.js` |
+| R-G9 | Zonder aparte toestemming wordt geen nieuw gezondheidsgegeven bewaard; alleen een ouder of de beheerder geeft hem voor het gezin, vanaf 16 geeft een gezinslid hem voor zijn dagboek zelf; intrekken vraagt `WIS` en wist precies wat erop rust | `foundation/gezondheidstoestemming.js`, `kern/welzijn.js`, `lib/leeftijd.js` `ouderGeeftToestemming` | `test/gezondheidstoestemming.test.js` (met mutaties nagetrokken) |
+| R-G4, R-G8 | Na 12 maanden ongebruikt, of zonder gezinscode en eigenaar: aankondigen, en pas na 30 dagen wissen als de eigenaar van RTG dat vrijgeeft; gebruik heft de aankondiging op | `foundation/gezinbewaren.js`, `routes/techniek/bewaren.js` | `test/gezinbewaren.test.js` (echte servers met een verzette klok; met mutaties nagetrokken) |
 | R-G5, R-G6 | Token van 128 bits, alleen de hash bewaard, met verval, epoch en intrekken | `gezinstoken.js` | `test/gezinstoken.test.js`, `test/gezinssessie.test.js` |
 | R-G5 | De stream met een token in de URL blijft dicht, ook met vrijgave | `foundation-nog-gesloten.js` | `test/foundation-productiepoort.test.js` |
 | alle | Zonder ondertekend dossier blijven de beschermde functies 503 | `foundation-productiepoort.js` | `test/foundation-productiepoort.test.js` |
@@ -173,7 +186,8 @@ De bijbehorende code:
 | Verwerkingsverantwoordelijke | `[naam / rechtspersoon]` |
 | Advies FG of privacyjurist | `[naam, datum, advies]` |
 | Restrisico aanvaardbaar? | `[ja / nee / ja onder voorwaarden]` |
-| Voorafgaande raadpleging AP nodig (art. 36)? | `[ja / nee]` — `VOORSTEL`: nee, mits R-G3 en de art. 9-toestemming zijn afgedekt |
+| Voorafgaande raadpleging AP nodig (art. 36)? | `[ja / nee]` — `VOORSTEL`: nee, mits R-G3 is afgedekt (de art. 9-toestemming staat sinds 5 oktober 2026) |
+| Besluiten van de eigenaar (5 oktober 2026) | Gezinnen van vóór B18: wissen na aankondiging. Bewaartermijn bij niet-gebruik: 12 maanden. Gezondheidsgegevens: aparte toestemming bij het eerste gebruik. Deze besluiten zijn van de eigenaar; het oordeel van de FG of privacyjurist hierboven staat daar los van |
 | Opnieuw te toetsen bij | Een tweede ouder via het account; een eigen account voor 16–17 jaar; een school die het gezin bereikt; een nieuw land |
 | Getekend | `[datum, handtekening]` |
 

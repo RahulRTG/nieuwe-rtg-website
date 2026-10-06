@@ -77,8 +77,9 @@ test('2b. elk doel dat de bron uitgeeft voldoet aan doelGeldig, en de uitgifte w
   loop(wortel);
   assert.ok(gezien.size >= 3, 'de scan vond te weinig doelen: ' + [...gezien].join(','));
   for (const d of gezien) assert.equal(doelGeldig(d), true, 'uitgegeven doel ' + JSON.stringify(d));
-  const tokens = fs.readFileSync(path.join(wortel, 'accounts', 'tokens.js'), 'utf8');
-  assert.match(tokens, /doelGeldig\(purpose\)\)\s*throw/, 'issueActionToken moet een ongeldig doel weigeren');
+  // de uitgifte woont sinds de domeinscheiding (RTG-V1 blocker 1) in actietokens.js
+  const uitgifte = fs.readFileSync(path.join(wortel, 'accounts', 'actietokens.js'), 'utf8');
+  assert.match(uitgifte, /doelGeldig\(purpose\)\)\s*throw/, 'issueActionToken moet een ongeldig doel weigeren');
 });
 
 const post = (base) => async (pad, body, tok) => {

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-06T10:09:42.144Z",
-    "commit": "bb151fc9c",
+    "op": "2026-10-06T10:10:52.027Z",
+    "commit": "fb7bcf56",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 5,
     "instrument": "scripts/gastsplitsing.js",
     "node": "v22.22.0"
   },
@@ -12,10 +12,10 @@
   "uitleg": "Per plek in server/ die op de gast toetst: maakt de code het onderscheid tussen bezoeker en gratis account, en wat zegt de weigering dat er nodig is. account-belofte = de tekst zegt dat een account of profiel volstaat, terwijl de code ook het gratis account weigert.",
   "gemeten": {
     "bestanden": 124,
-    "plekken": 140,
+    "plekken": 139,
     "perSoort": {
       "vertakt": 23,
-      "onderscheidt": 25,
+      "onderscheidt": 24,
       "pas-eis": 11,
       "leden": 80,
       "zonder-tekst": 1
@@ -76,11 +76,6 @@
     },
     {
       "plek": "server/kern/gids.js:16",
-      "soort": "onderscheidt",
-      "zegt": null
-    },
-    {
-      "plek": "server/kern/identiteit/bezitsbewijs.js:123",
       "soort": "onderscheidt",
       "zegt": null
     },
@@ -525,7 +520,7 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/tweefactor.js:22",
+      "plek": "server/routes/member/tweefactor.js:23",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
@@ -710,17 +705,17 @@
       "zegt": "De RTG Wallet is voor leden."
     },
     {
-      "plek": "server/server.js:547",
+      "plek": "server/server.js:543",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/server.js:1258",
+      "plek": "server/server.js:1237",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/server.js:1284",
+      "plek": "server/server.js:1263",
       "soort": "vertakt",
       "zegt": null
     }

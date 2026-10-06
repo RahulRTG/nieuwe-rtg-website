@@ -4,6 +4,7 @@
 
 const publiceerCollectie = require('./collectie-publicatie');
 const { merge3 } = require('./merge');
+const { melder } = require('./botsing'); // C6: een botsing is hoorbaar, ook hier
 
 module.exports = ({ db, verbinding, statements, uitStore, naarStore,
   laatsteJson, toegepast, voorcheck, mutaties }) => function collectieSlotSqlite(sleutel, werk) {
@@ -35,7 +36,7 @@ module.exports = ({ db, verbinding, statements, uitStore, naarStore,
       ? JSON.parse(laatsteJson.get(sleutel)) : (Array.isArray(liveVoor) ? [] : {});
     publicatieBasisJson = JSON.stringify(liveVoor);
     waardeNa = grafsteen ? JSON.parse(jsonVoor)
-      : JSON.parse(JSON.stringify(merge3(cacheBasis, liveVoor, dbBasis)));
+      : JSON.parse(JSON.stringify(merge3(cacheBasis, liveVoor, dbBasis, melder(sleutel))));
     antwoord = werk(waardeNa);
     if (antwoord && typeof antwoord.then === 'function')
       throw new Error('De bewerker van een collectietransactie mag niet asynchroon zijn.');

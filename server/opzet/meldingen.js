@@ -17,9 +17,15 @@ const verraad = require('../lib/verraad');
 
 module.exports = function maakMeldingen(deps) {
   const {
-    DEMO, GIDS_SEED_TIERS, PERSONAS, accounts, bus, crypto, db, eigenaar, 
-    ensureSupplierDefaults, save, sessions, tokenHash, webpush
+    DEMO, GIDS_SEED_TIERS, PERSONAS, accounts, bus, crypto, db, eigenaar,
+    ensureSupplierDefaults, save, sessions, tokenHash, webpush, nextSseId
   } = deps;
+/* DE PASSEN ZIJN DE ENIGE BROADCAST-DOELEN. Een lid-SLEUTEL ('user-<id>') is in
+   productie nooit een van deze waarden; een persoonlijke melding die per ongeluk
+   een pas als bestemming kreeg, mag daarom nooit als tier-broadcast de deur uit.
+   In DEMO valt de sleutel van een persona wél samen met zijn pas (één persona
+   per pas, dus geen cross-member-lek) -- die blijft dus persoonlijk bezorgd. */
+const BROADCAST_TIERS = new Set(['rtg', 'lifestyle', 'business', 'guest']);
 function initRealtime() {
   /* accounts gaat mee omdat de opruiming van testzaken buiten Magnaat Test ook
      het personeel van die zaken uit de identiteitskluis moet halen. */
@@ -33,15 +39,25 @@ function broadcastSync(tiers, scope) {
     envelop: { classificatie: 'intern' } });
 }
 
-// notificeer één tier: opslaan, naar open schermen sturen én web-push
-function notify(tier, note) {
-  return meld(tier, note, save);
+/* notificeer EEN BESTEMMING: opslaan, naar open schermen sturen én web-push.
+   De bestemming is normaal de SLEUTEL van een lid ('user-<id>'); dan is het een
+   persoonlijke melding. Een pas als bestemming is in productie geen geldige
+   persoonlijke bestemming (zie BROADCAST_TIERS) -- wie werkelijk alle leden van
+   een pas wil bereiken, gebruikt notify.broadcast(). */
+function notify(dest, note) {
+  return meld(dest, note, save);
 }
+/* EXPLICIETE BROADCAST naar alle leden van een pas. De enige weg waarlangs een
+   melding in de gedeelde tier-bak terechtkomt met `broadcast: true`, en dus de
+   enige die meldingenVan aan iedereen van die pas toont. Bestaat opzettelijk
+   als aparte functie: een broadcast is een BESLUIT, geen bijwerking van een
+   verkeerd meegegeven bestemming. */
+notify.broadcast = (tier, note) => meld(tier, note, save, { broadcast: true });
 /* Alleen voor callers die hun domeinmutatie al zelf hebben bewaard. De gewone
    ingang behoudt de brede save, zodat bestaande impliciete writes niet vervallen. */
-notify.alleenMelding = (tier, note) => meld(tier, note,
+notify.alleenMelding = (dest, note) => meld(dest, note,
   () => save.sleutels ? save.sleutels(['notifications']) : save());
-function meld(tier, note, bewaar) {
+function meld(dest, note, bewaar, opties) {
   /* DE TWEEDE HELFT VAN DE CRASHGRENS `na-commit-voor-bericht`, en dat er twee
      helften zijn is zelf de vondst. ./meldaan.js draagt dezelfde injectie; de
      eerste ronde zette hem alleen daar, en op /api/supplier/facturen/maak sloeg
@@ -67,18 +83,45 @@ function meld(tier, note, bewaar) {
   if (!note || typeof note !== 'object' || Array.isArray(note))
     throw new TypeError('notify() verwacht een melding als object ({ title, body }), geen ' + (Array.isArray(note) ? 'lijst' : typeof note) + '.');
   const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
+  dest = (dest == null) ? dest : String(dest);
+  if (!dest) return n;   // geen bestemming: niets om te bewaren of te bezorgen
   // meldingsvoorkeuren (kern/ervaring.js): een uitgezette scope wordt niet
   // opgeslagen en niet gepusht; zonder voorkeur staat alles aan
-  const vk = (db.data.meldingVoorkeur || {})[tier];
+  const vk = (db.data.meldingVoorkeur || {})[dest];
   if (n.scope && vk && vk[n.scope] === false) return n;
-  db.data.notifications[tier] = (db.data.notifications[tier] || []);
-  db.data.notifications[tier].unshift(n);
-  db.data.notifications[tier] = db.data.notifications[tier].slice(0, 40);
+
+  const naarTier = BROADCAST_TIERS.has(dest);
+  const broadcast = !!(opties && opties.broadcast) && naarTier;
+
+  /* FAIL-CLOSED: een pas als bestemming ZONDER expliciete broadcast is in
+     productie een persoonlijke melding die per ongeluk naar een pas ging. Hem
+     in de gedeelde tier-bak leggen of per tier uitzenden zou hem aan alle leden
+     van die pas tonen -- precies de lek die blocker 2 sluit. We bewaren en
+     bezorgen hem dan niet (de aanroeper hoort de ledensleutel mee te geven).
+     In DEMO valt de sleutel van een persona samen met zijn pas; daar is het wél
+     de bedoelde persoon en geen gedeelde bak, dus die weg blijft open. */
+  if (naarTier && !broadcast && !DEMO) return n;
+
+  if (broadcast) n.broadcast = true;   // alleen zetten als het er is: geen `broadcast: undefined` in de vorm
+  db.data.notifications[dest] = (db.data.notifications[dest] || []);
+  db.data.notifications[dest].unshift(n);
+  db.data.notifications[dest] = db.data.notifications[dest].slice(0, 40);
   bewaar();
-  // een melding gaat over een lid en draagt zijn tekst mee
-  bus.publish('sse', { doel: 'tier', match: [tier], event: 'notify', data: n,
-    envelop: { classificatie: 'persoonsgegeven' } });
-  sendPush(tier, n);
+
+  if (broadcast) {
+    // bewuste broadcast naar alle leden van een pas
+    bus.publish('sse', { doel: 'tier', match: [dest], event: 'notify', data: n,
+      envelop: { classificatie: 'intern' } });
+    sendPush(dest, n);
+  } else {
+    /* PERSOONLIJK: naar precies één sessiesleutel (in demo valt die samen met de
+       pas). Zelfde weg als sseToCustomer: doel 'key', met een buffer-id. */
+    bus.publish('sse', { doel: 'key', match: dest, event: 'notify', data: n,
+      id: nextSseId ? nextSseId() : undefined, envelop: { classificatie: 'persoonsgegeven' } });
+    try { sendPush(dest, n); } catch (e) { /* push mag een melding niet tegenhouden */ }
+    const m = /^user-(.+)$/.exec(dest);
+    if (m) { try { sendPushToUser(m[1], n); } catch (e) {} }
+  }
   return n;
 }
 

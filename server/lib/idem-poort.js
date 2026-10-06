@@ -85,7 +85,7 @@
 'use strict';
 
 const crypto = require('crypto');
-const verzoekcontext = require('../db/verzoekcontext');
+const { bewaarBijEind } = require('./eindstatus');   // N11: pas bij de eindstatus
 const { VENSTER_MS } = require('./idemsleutels');
 const { isEenmalig } = require('./eenmalig-geheim-routes');
 /* De bewaarkast staat apart: dat is een gegevensstructuur (ring, vervaltijd,
@@ -167,7 +167,7 @@ function maakIdemPoort(opties) {
         if (kast.zet(id, { status, lijf, afdruk }, vensterMs)) rond({ status, lijf });
         else rond(null);
       };
-      if (!verzoekcontext.haakNaCommit(bewaar)) bewaar();
+      bewaarBijEind(res, bewaar);
       return echteJson(lijf);
     };
     /* Een verzoek dat nooit bij res.json komt (crash, stream, afgebroken

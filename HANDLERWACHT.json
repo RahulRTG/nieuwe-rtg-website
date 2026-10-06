@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-06T06:30:09.694Z",
-  "commit": "45e0394bf",
+  "op": "2026-10-06T10:09:20.407Z",
+  "commit": "fb7bcf56",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
@@ -315,13 +315,13 @@
  "perRoute": [
   {
    "sleutel": "POST /api/aanmeld/start",
-   "bestand": "server/routes/aanmeldgesprek.js:59",
+   "bestand": "server/routes/aanmeldgesprek.js:65",
    "staat": "openbaar",
    "reden": "het aanmeldgesprek begint voor er een account is; rem van 40 berichten per minuut per ip"
   },
   {
    "sleutel": "POST /api/aanmeld/zeg",
-   "bestand": "server/routes/aanmeldgesprek.js:66",
+   "bestand": "server/routes/aanmeldgesprek.js:72",
    "staat": "eigenControle"
   },
   {
@@ -360,7 +360,7 @@
   },
   {
    "sleutel": "POST /api/auth/tweede",
-   "bestand": "server/routes/member/tweefactor.js:109",
+   "bestand": "server/routes/member/tweefactor.js:129",
    "staat": "eigenControle"
   },
   {
@@ -4072,7 +4072,7 @@
   },
   {
    "sleutel": "POST /api/techniek/inloggen",
-   "bestand": "server/routes/techniek/inlog.js:29",
+   "bestand": "server/routes/techniek/inlog.js:57",
    "staat": "eigenControle"
   },
   {
@@ -4206,7 +4206,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1412",
+   "bestand": "server/server.js:1391",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

@@ -14,6 +14,37 @@ function keurLokaleBouwstanden(env, fouten, waarschuwingen) {
   if (env.RTG_GEZIN_REM_UIT === '1')
     fouten.push('RTG_GEZIN_REM_UIT=1 in productie: het raden van gezinscodes zou onbeperkt zijn. Zet hem uit.');
 
+  /* RTG_DEV_LINKS zet de herstellink, de verificatielink en de sms-code in het
+     HTTP-antwoord (routes/auth.js, member/herstelkanaal.js, algpin.js), zodat
+     toetsen de stroom kunnen doorlopen. Op een echte server is dat elk account
+     over te nemen met een POST op een willekeurig adres -- precies het gat uit
+     de kop van routes/auth.js. Hier stond hij niet, dus een vergeten vlag kwam
+     zonder melding door de productiekeuring (RTG-V1-RELEASE C4). Via
+     ./openbaar.js geldt dit ook op een openbaar adres zonder NODE_ENV. */
+  if (env.RTG_DEV_LINKS === '1')
+    fouten.push('RTG_DEV_LINKS=1 in productie: herstel- en verificatielinks en sms-codes zouden in het HTTP-antwoord staan, en daarmee is elk account over te nemen. Zet hem uit.');
+
+  /* Meet- en proefstanden die ELK antwoord raken, dezelfde klasse als
+     RTG_DEV_LINKS (de herkeuring van C4). RTG_STAATLOG telt alleen in de twee
+     standen die hem echt aanzetten (staatlog.js begin), zodat RTG_STAATLOG=false
+     geen start breekt met een melding die niet klopt. */
+  if (env.RTG_LIEG)
+    fouten.push('RTG_LIEG staat aan in productie: de gekozen paden geven met opzet een leeg antwoord. Zet hem uit.');
+  if (env.RTG_STAATLOG === '1' || env.RTG_STAATLOG === '2')
+    fouten.push('RTG_STAATLOG staat aan in productie: elk antwoord draagt de omvang van de opslag. Zet hem uit.');
+
+  /* RTG_VERRAAD, RTG_KLOK en RTG_DUURZAAM=uit weigeren zichzelf al, maar alleen
+     bij NODE_ENV=production (lib/verraad.js, lib/klok.js, lib/duurzaam.js). Op
+     een openbaar adres zonder NODE_ENV startte de server dan met een opslag die
+     schrijfacties weggooit of een verzette klok (tweede herkeuring van C4). Hier
+     staan ze, zodat ./openbaar.js ze ook daar hard weigert. */
+  if (String(env.RTG_VERRAAD || '').split(',').some(d => d.trim()))
+    fouten.push('RTG_VERRAAD staat aan in productie: de opslag gooit met opzet schrijfacties weg. Zet hem uit.');
+  if (String(env.RTG_KLOK || '').trim())
+    fouten.push('RTG_KLOK staat aan in productie: een verzette klok raakt sessies, facturen en het auditlog. Zet hem uit.');
+  if (String(env.RTG_DUURZAAM || '').toLowerCase() === 'uit')
+    fouten.push('RTG_DUURZAAM=uit in productie: bevestigd werk zou niet zijn vastgelegd. Zet hem uit.');
+
   for (const naam of ['SMTP_SANDBOX', 'SMS_SANDBOX', 'STRIPE_CONNECT_SANDBOX', 'SEPA_SANDBOX']) {
     if (env[naam] === '1')
       fouten.push(naam + '=1 is uitsluitend lokaal: een contract-sandbox mag productie nooit als een echte integratie laten starten.');

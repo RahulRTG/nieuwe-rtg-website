@@ -183,7 +183,9 @@ function activiteitPoort(p, publiceer) {
    na; daarna verschijnt een vreemde pending mutatie die NIET van het spoor is. */
 function orderAfhandeling(t) {
   const p = proef(t), routes = new Map(), signalen = [];
-  p.db.data.orders = [{ ref: 'BON', supplierCode: 'AAA', customerTier: 'lid', status: 'nieuw', pickup: '42' }];
+  // Een echte order draagt altijd customerKey (= session.key, zie kern/lidacties/bestellen.js);
+  // de afhandeling notificeert sinds de meldingenisolatie (blocker 2) op die sleutel.
+  p.db.data.orders = [{ ref: 'BON', supplierCode: 'AAA', customerTier: 'lid', customerKey: 'lid', status: 'nieuw', pickup: '42' }];
   p.db.data.supplierActivity = {}; p.db.data.notifications = {}; p.save();
   let scans = 0, antwoord;
   Object.defineProperty(p.db.data.ander, 'toJSON', { value() { scans++; return { waarde: this.waarde }; } });

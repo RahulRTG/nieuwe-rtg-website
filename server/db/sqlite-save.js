@@ -9,6 +9,7 @@
    Met `duurzaam` loopt dezelfde save onder FULL-sync (./sqlite-duurzaam.js). */
 const maakSaveplan = require('./sqlite-saveplan');
 const { losVanVerzoek } = require('../lib/losvanverzoek');
+const { melder } = require('./botsing'); // C6: een botsing is hoorbaar
 
 module.exports = ({ db, verbinding, statements, auditMotor, mutaties, voorcheck, merge3,
   uitStore, naarStore, laatsteJson, toegepast, vouwWal }) => {
@@ -81,7 +82,7 @@ module.exports = ({ db, verbinding, statements, auditMotor, mutaties, voorcheck,
         // in plaats van hun wijzigingen te overschrijven.
         if (rij && rij.ver > (toegepast.get(k) || 0)) {
           const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
-          const samen = merge3(base, db.data[k], JSON.parse(uitStore(rij.val)));
+          const samen = merge3(base, db.data[k], JSON.parse(uitStore(rij.val)), melder(k));
           db.data[k] = samen;
           j = JSON.stringify(samen);
           // na een merge is de collectie een ANDER object: de maten van de

@@ -78,7 +78,7 @@ app.post('/api/supplier/huur/status', supplierAuth, (req, res) => {
   h.status = status;
   save();
   logActivity(s.code, req.actor, (status === 'lopend' ? 'gaf ' : status === 'afgerond' ? 'nam in: ' : 'annuleerde ') + (h.autoNaam || h.ref) + ' (' + h.customerCodename + ')');
-  notify(h.customerTier, { icon: '\u{1F697}', title: s.name,
+  notify(h.customerKey, { icon: '\u{1F697}', title: s.name,
     body: status === 'lopend' ? 'Goede reis! De staat is vastgelegd met ' + f.voor.length + ' foto(\u2019s) en ' + h.uitgifte.kmStart + ' km op de teller.'
       : status === 'afgerond' ? 'Ingeleverd. ' + (h.inname.meerkosten > 0 ? 'Meerkosten: \u20AC ' + h.inname.meerkosten + ' (' + h.inname.extraKm + ' extra km, tank).' : 'Geen meerkosten. Uw borg wordt vrijgegeven.') + ' Dank u wel!'
       : 'De huur is geannuleerd.', scope: 'orders' });

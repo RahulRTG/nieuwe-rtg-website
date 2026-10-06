@@ -129,6 +129,7 @@ module.exports = function verzoekketen(deps) {
      grootboeken hebben verderop nog een tweede, interne stop voor taken die
      niet via HTTP lopen. */
   require('./betaalstop')({ app });
+  require('./standbypoort')({ app, db });
 
   /* De liegpoort (./liegpoort.js) doet niets zonder RTG_LIEG. Staat die wel,
      dan laat hij de gekozen endpoints een geldig maar LEEG antwoord geven --

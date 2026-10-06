@@ -1,4 +1,5 @@
 'use strict';
+const { melder } = require('./botsing');
 
 /* Neemt nieuwere collectieversies van andere SQLite-processen over.
 
@@ -56,7 +57,8 @@ function maakPoll(deps) {
         const lokaalOpenstaand = vuil.has(sleutel) ||
           (basis !== undefined && JSON.stringify(db.data[sleutel]) !== basis);
         const waarde = lokaalOpenstaand
-          ? merge3(basis === undefined ? undefined : JSON.parse(basis), db.data[sleutel], JSON.parse(hunJson))
+          ? merge3(basis === undefined ? undefined : JSON.parse(basis), db.data[sleutel], JSON.parse(hunJson),
+            db.writable ? melder(sleutel) : undefined)   // C6: alleen de schrijver meldt een botsing
           : JSON.parse(hunJson);
         voorbereid.push({ sleutel, waarde, hunJson, lokaalOpenstaand, ver: r.ver });
       }

@@ -15,7 +15,13 @@ const { NL2EN } = require('../translate/woordenboek');
 const { legInlogVast } = require('../kern/identiteit/inlogherkomst');
 
 module.exports = (kern) => {
-  const { app, intakeStart, intakeZeg, accounts, stateFor } = kern;
+  const { app, intakeStart, intakeZeg, accounts, stateFor, tweefactor } = kern;
+  /* Zonder inlogpoort kan dit gesprek de tweede factor niet vragen, en dan zou
+     het stil terugvallen op een sessie op alleen de sleutelwoorden. Liever niet
+     starten dan zo openstaan (zelfde regel als ./techniek/inlog.js). */
+  if (!tweefactor || typeof tweefactor.inlogPoort !== 'function') {
+    throw new Error('aanmeldgesprek: zonder tweefactor.inlogPoort kan dit gesprek de tweede factor niet vragen');
+  }
 
   // klein slot per IP: hooguit 40 berichten per minuut (een mens haalt dat niet)
   const tempo = new Map();
@@ -74,6 +80,42 @@ module.exports = (kern) => {
     if (r.inlog && accounts && stateFor) {
       const user = accounts.getUserById(r.inlog.userId);
       if (!user) return res.status(401).json({ error: await naarTaal('Inloggen lukte net niet; probeer het opnieuw.', lang) });
+      /* DEZELFDE POORTEN ALS /api/auth/login (N3 van de V1-audit). Hier werd na
+         de sleutelwoorden meteen een sessie van dertig dagen gemunt, zonder
+         tweede factor en zonder te kijken of het account nog actief is. Met de
+         sleutelwoorden van de eigenaar kwam je zo langs zijn authenticator, en
+         met dat token op de techniekpagina waar N1 de tweede factor juist eist.
+
+         Uit dienst gemeld door de organisatie (SCIM) is dicht, met de tekst van
+         ./auth/inlog.js. De pas-app-controle van die route hoort hier niet: dit
+         verzoek draagt geen pasApp, en zonder pasApp laat pasAppOk elke pas door.
+         Hij houdt een lid in de app van zijn eigen pas en is geen slot. */
+      if (!accounts.isActief(user)) {
+        return res.status(403).json({ error: await naarTaal('Dit account is door uw organisatie op non-actief gezet. Neem contact op met uw beheerder.', lang) });
+      }
+      /* Staat de tweede factor aan, dan komt hier het antwoord van de inlogpoort
+         en geen token: een kort bewijs (doel `inlog2`) dat /api/auth/tweede met
+         een code omruilt, met de gedeelde rem op die code
+         (../kern/identiteit/tweedestap-rem.js). Geen eigen codestap in dit
+         gesprek: elke deur die codes toetst is een plek om die rem te vergeten.
+         De uitleg van de poort zegt "uw wachtwoord klopt", en hier waren het
+         sleutelwoorden; die zin vervangen we, de rest blijft van de poort.
+
+         KANTTEKENING (herkeuring N3, bewust niet gerepareerd). Na de code legt
+         /api/auth/tweede deze inlog vast als 'wachtwoord+totp' (of
+         'wachtwoord+herstelcode'), bron 'auth/tweede': het bewijs zegt niet met
+         welke eerste factor het verdiend is. De vertrouwensstand klopt
+         (tweefactor, kennis+bezit), maar het sessiescherm zegt "wachtwoord en
+         authenticator" terwijl er geen wachtwoord is gebruikt -- wat het MIJN
+         RTG-blok hieronder voor het pad zonder tweede factor juist voorkomt.
+         De eerste factor in het bewijs laten meereizen is een nieuw veld en een
+         besluit van de eigenaar. Toets 8 van test/aanmeldgesprek-tweede.test.js
+         zakt zodra deze alinea niet meer klopt. */
+      const tweedeStap = tweefactor.inlogPoort(user);
+      if (tweedeStap) {
+        const zin = await naarTaal('Je sleutelwoorden kloppen. Typ nu de code uit je authenticator, of een van je herstelcodes.', lang);
+        return res.json({ ...tweedeStap, tekst: zin, uitleg: zin });
+      }
       const token = accounts.issueToken(user.id);
       const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
       /* MIJN RTG blok 1. Dit pad logt in met SLEUTELWOORDEN (zie de sw-stappen in

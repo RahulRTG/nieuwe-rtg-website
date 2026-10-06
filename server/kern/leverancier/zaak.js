@@ -79,11 +79,15 @@ module.exports = (ctx) => {
   }
 
   function salonNaarVolgers(s, tekst) {
-    // volgers krijgen een melding zodra hun zaak iets nieuws plaatst
+    /* Volgers krijgen een melding zodra hun zaak iets nieuws plaatst -- en dat
+       zijn BEKENDE leden, elk met een eigen sleutel. Hier stond `notify(tier)`
+       per pas van een volger, wat de melding aan ALLE leden van die pas gaf
+       (blocker 2). Een volger is een individu: notify op zijn sleutel. */
     const volgers = (s.salon && s.salon.volgers) || [];
-    const tiers = [...new Set(volgers.map(k => (gidsHaal(k) || {}).tier).filter(Boolean))];
-    for (const tier of tiers) notify(tier, { icon: '✦', title: 'De Salon · ' + s.name, body: String(tekst).slice(0, 90), scope: 'salon' });
-    for (const k of volgers) sseToCustomer(k, 'sync', { scope: 'salon' });
+    for (const k of volgers) {
+      notify(k, { icon: '✦', title: 'De Salon · ' + s.name, body: String(tekst).slice(0, 90), scope: 'salon' });
+      sseToCustomer(k, 'sync', { scope: 'salon' });
+    }
   }
 
   /* Kassa-dagoverzicht (Z-rapport). Kamerlasten tellen pas mee als omzet bij het

@@ -101,4 +101,11 @@ test('contract /api/office/state: kern-overzichten en totals-vorm ligt vast', as
 test('contract /api/health antwoordt 200', async () => {
   const r = await fetch(BASE + '/api/health');
   assert.equal(r.status, 200, 'health is 200');
+  /* De poortwachter van het trio leest hier of een server werkelijk leider is
+     (server/trio-afzetten.js leesStand). Zonder het veld valt hij stil terug op
+     zijn eigen boekhouding, en dan wordt een herstarte stand-by weer als actieve
+     genomen (herkeuring C6, ronde 4). */
+  const b = await r.json();
+  assert.equal(typeof b.leider, 'boolean', 'health meldt of dit proces leider is');
+  assert.equal(typeof b.active, 'boolean', 'health meldt of dit proces schrijft');
 });

@@ -5,7 +5,8 @@
       "intakeStart",
       "intakeZeg",
       "sessieregister",
-      "stateFor"
+      "stateFor",
+      "tweefactor"
     ],
     "aanmeldingen": [
       "aanmeldingen"
@@ -2500,7 +2501,8 @@
       "webauthnStapOpOpties",
       "zekeringMag",
       "zwaar",
-      "zwaarbewijs"
+      "zwaarbewijs",
+      "tweefactor"
     ],
     "tenant": [
       "bedrijf",

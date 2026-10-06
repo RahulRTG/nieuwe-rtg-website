@@ -25,7 +25,7 @@ module.exports=function makeServiceLoopSource({leesCollectie,bewerkCollectie,zak
     if(!target||!target.ok)P.fail(target&&target.code||'AUTHORITY_REVOKED',target&&target.error||'De ontvangende werkruimte is niet bevoegd.',target&&target.status||403);
     return {policyId:'service.office-seat+workos.recipient',workspaceCode:target.workspaceCode||workspaceCode};
   }
-  function append(s,event){const prior=s.outbox.at(-1);event.sequence=s.outbox.length+1;event.previousHash=prior&&prior.hash||null;
+  function appendServiceEvent(s,event){const prior=s.outbox.at(-1);event.sequence=s.outbox.length+1;event.previousHash=prior&&prior.hash||null;
     event.hash=P.hash(event);s.outbox.push(event);return event;}
   function issued(observation){
     return eligibility.issue({sourceRef:observation.objectRef,purpose:observation.sharing.purpose,memoryClass:'ORGANIZATIONAL',
@@ -63,7 +63,7 @@ module.exports=function makeServiceLoopSource({leesCollectie,bewerkCollectie,zak
         s.observations[id]={observation:P.clone(observation),source:{caseHash:P.hash(['service-case',caseRow.id]),
           caseVersionHash:P.hash({stand:caseRow.stand,team:caseRow.team,mensVerzoeken:caseRow.mensVerzoeken,
             structure:caseRow.tijdlijn.map(x=>({wat:x.wat,van:x.van||null,naar:x.naar||null,at:x.at}))}),outcome}};
-        const eventId='sve_'+operationKey.slice(0,28);append(s,{id:eventId,type:verificationOf?'service.verification.observed':'service.process.observed',
+        const eventId='sve_'+operationKey.slice(0,28);appendServiceEvent(s,{id:eventId,type:verificationOf?'service.verification.observed':'service.process.observed',
           protocol:P.clone(observation),envelop:envelope.maak({id:eventId,at,kanaal:'service',actor:'service-seat',correlatie:operationId,
             oorzaak:null,classificatie:'intern'})});
         const result={ok:true,observation:P.clone(observation),replay:false};s.operations[operationKey]={fingerprint,result:P.clone(result)};return result;
@@ -80,13 +80,13 @@ module.exports=function makeServiceLoopSource({leesCollectie,bewerkCollectie,zak
         const row=s.observations[ref.id];if(!row||P.refKey(row.observation.objectRef)!==P.refKey(ref))P.fail('SOURCE_MISSING','Deze Service-observatie bestaat niet.',404);
         delete s.observations[ref.id];const observation={...publicObservation(row),status:'withdrawn',sourceActorRef:null,title:'Niet meer beschikbaar',text:'',
           recordedAt:at,review:null,contests:[],verificationOf:null,assessment:null};delete observation.eligibility;
-        s.lifecycles[ref.id]=P.clone(observation);const eventId='svw_'+key.slice(0,28);append(s,{id:eventId,type:'service.observation.withdrawn',
+        s.lifecycles[ref.id]=P.clone(observation);const eventId='svw_'+key.slice(0,28);appendServiceEvent(s,{id:eventId,type:'service.observation.withdrawn',
           protocol:P.clone(observation),envelop:envelope.maak({id:eventId,at,kanaal:'service',actor:'service-seat',correlatie:operationId,
             oorzaak:null,classificatie:'intern'})});
         const result={ok:true,status:'withdrawn',refHash:P.hash(P.refKey(ref)),replay:false};s.operations[key]={fingerprint,result:P.clone(result)};return result;});
     }catch(e){return P.error(e);}
   }
-  function resolveObservation(ref,recipient){
+  function resolveServiceObservation(ref,recipient){
     try{const r=P.objectRef(ref),s=read(),lifecycle=s.lifecycles[r.id];if(lifecycle)P.fail('SOURCE_WITHDRAWN','Deze Service-observatie is ingetrokken.',410);
       const row=s.observations[r.id];if(r.domain!=='service'||r.type!=='process-observation'||!row||P.refKey(row.observation.objectRef)!==P.refKey(r))
         P.fail('SOURCE_MISSING','Deze Service-observatie bestaat niet.',404);
@@ -95,12 +95,13 @@ module.exports=function makeServiceLoopSource({leesCollectie,bewerkCollectie,zak
         P.fail('SOURCE_DENIED','Deze procesobservatie is niet met deze ontvanger gedeeld.',403);
       return {ok:true,observation:o,corrected:false};}catch(e){return P.error(e);}
   }
-  function learningEligibility(ref,recipient,request={}){const resolved=resolveObservation(ref,recipient);if(!resolved.ok)return resolved;
+  function evaluateServiceEligibility(ref,recipient,request={}){const resolved=resolveServiceObservation(ref,recipient);if(!resolved.ok)return resolved;
     return eligibility.evaluate(issued(resolved.observation),{sourceRef:ref,purpose:request.purpose,recipient,use:request.use||'recall'},time());}
-  function protocolEvents(){const s=read();return [...Object.values(s.observations).map(row=>({id:'snapshot-service-'+P.hash(P.refKey(row.observation.objectRef)).slice(0,24),
+  function serviceProtocolEvents(){const s=read();return [...Object.values(s.observations).map(row=>({id:'snapshot-service-'+P.hash(P.refKey(row.observation.objectRef)).slice(0,24),
     type:'service.process.observed',protocol:publicObservation(row)})),...Object.values(s.lifecycles).map(o=>({id:'snapshot-service-life-'+P.hash(P.refKey(o.objectRef)).slice(0,24),
       type:'service.observation.'+o.status,protocol:P.clone(o)}))];}
   const {deliver,deliveryStatus,deliveryStatuses}=makeDelivery({read,tx,time});
-  return {consumerDomain:'workos',reviewCase,withdraw,resolveObservation,learningEligibility,protocolEvents,deliver,
+  return {consumerDomain:'workos',reviewCase,withdraw,resolveObservation:resolveServiceObservation,
+    learningEligibility:evaluateServiceEligibility,protocolEvents:serviceProtocolEvents,deliver,
     deliveryStatus,deliveryStatuses,_read:read};
 };

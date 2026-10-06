@@ -33,7 +33,7 @@ module.exports = function makeReader({ own, bewerkCollectie, store, identities, 
   const reader = (s, actor) => s.readers[actor] || { revision: 0, editions: {} };
   const shelf = (r, workId, editionId) => r.editions[editionId] || { workId, editionId,
     progress: null, bookmarks: {}, highlights: {}, notes: {}, updatedAt: null };
-  function append(s, actor, action, inputHash, result, at, operationId, workId, editionId) {
+  function appendReaderEvent(s, actor, action, inputHash, result, at, operationId, workId, editionId) {
     const previous = s.journal.findLast(e => e.actorRef === actor);
     const eventId = 'libread_' + M.hash([actor, operationId]).slice(0, 32);
     const event = { sequence: s.journal.length + 1, actorRef: actor, workId, editionId, action,
@@ -43,7 +43,7 @@ module.exports = function makeReader({ own, bewerkCollectie, store, identities, 
         classificatie: 'persoonsgegeven' }) };
     event.hash = M.hash(event); s.journal.push(event); return event;
   }
-  function verify(events) {
+  function verifyReaderJournal(events) {
     let previous = null;
     for (const event of events) {
       const { hash, ...body } = event;
@@ -104,7 +104,7 @@ module.exports = function makeReader({ own, bewerkCollectie, store, identities, 
           M.fields(d, ['noteId']); M.get(item.notes, d.noteId); delete item.notes[d.noteId]; result = { id: d.noteId };
         }
         item.updatedAt = at; r.editions[input.editionId] = item; r.revision++; s.readers[actor] = r;
-        const event = append(s, actor, action, M.hash(d), result, at, input.operationId, input.workId, input.editionId);
+        const event = appendReaderEvent(s, actor, action, M.hash(d), result, at, input.operationId, input.workId, input.editionId);
         const out = { ok: true, revision: r.revision, result: M.clone(result), auditRef: event.envelop.id, replay: false };
         s.receipts[receiptKey] = { fingerprint, result: M.clone(out), workId: input.workId, editionId: input.editionId };
         if (Buffer.byteLength(M.canonical(s)) > 10 * 1024 * 1024) M.fail('CAPACITY', 'Uw leesopslag vraagt onderhoud; er is niets verwijderd.', 503);
@@ -126,7 +126,7 @@ module.exports = function makeReader({ own, bewerkCollectie, store, identities, 
       }
       if (kind === 'proof') {
         const events = read().journal.filter(e => e.actorRef === actor && e.editionId === edition.id);
-        return { ok: true, events, integrity: verify(read().journal.filter(e => e.actorRef === actor)),
+        return { ok: true, events, integrity: verifyReaderJournal(read().journal.filter(e => e.actorRef === actor)),
           scope: 'personal-reader-local-hash-chain-not-independent-anchoring' };
       }
       if (kind === 'search') {

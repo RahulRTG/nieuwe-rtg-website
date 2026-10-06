@@ -1,7 +1,7 @@
 'use strict';
 const M = require('./model'), P = require('./policy');
 
-function command(ctx) {
+function studioCommand(ctx) {
   const { w, data: d, action } = ctx;
   if (action !== 'structure.reorder') M.fail('UNKNOWN_ACTION', 'Onbekende studiohandeling.');
   M.fields(d, ['nodeIds']); P.editor(ctx);
@@ -30,4 +30,4 @@ function workspace(w) {
   };
 }
 
-module.exports = { command, workspace };
+module.exports = { command: studioCommand, workspace };

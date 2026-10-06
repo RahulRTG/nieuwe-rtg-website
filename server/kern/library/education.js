@@ -9,7 +9,7 @@ function requirements(w,e,nodeIds,academyOrganization,academyContext,at){
   const agreement=P.agreement(w),missingRights=R.missingEducation(w,e,nodeIds,agreement,academyOrganization,academyContext,at);
   return {agreement,missingRights};
 }
-function command(ctx){
+function educationCommand(ctx){
   const {w,data:d,action,id,at,actor}=ctx;
   if(action==='education.release'){
     M.fields(d,['editionId','nodeIds','academyOrganization','academyContext','citation','attribution']);
@@ -71,4 +71,4 @@ function resolver({read,time}){
     }catch(e){return e.library?{ok:false,status:e.status,code:e.code,error:e.message}:{ok:false,status:503,code:'OUTCOME_UNKNOWN',error:'De bron kon niet worden bevestigd.'};}
   };
 }
-module.exports={command,resolver,ref};
+module.exports={command:educationCommand,resolver,ref};

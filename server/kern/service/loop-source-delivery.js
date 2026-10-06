@@ -37,8 +37,8 @@ module.exports=function makeServiceLoopDelivery({read,tx,time}){
     }
     return {deliveredThrough:cursor,blocked};
   }
-  function deliveryStatus(consumer){const s=read();return D.summary(s.delivery[consumer],s.outbox.length,time(),s.outbox);}
-  function deliveryStatuses(){const s=read();return Object.keys(s.delivery).map(consumer=>
-    ({scopeHash:P.hash('service').slice(0,20),consumer,...deliveryStatus(consumer)}));}
-  return {deliver,deliveryStatus,deliveryStatuses};
+  function serviceDeliveryStatus(consumer){const s=read();return D.summary(s.delivery[consumer],s.outbox.length,time(),s.outbox);}
+  function serviceDeliveryStatuses(){const s=read();return Object.keys(s.delivery).map(consumer=>
+    ({scopeHash:P.hash('service').slice(0,20),consumer,...serviceDeliveryStatus(consumer)}));}
+  return {deliver,deliveryStatus:serviceDeliveryStatus,deliveryStatuses:serviceDeliveryStatuses};
 };

@@ -2,7 +2,7 @@
 
 const P=require('./protocol');
 
-function verify(serviceProof,receipt,{domain,issuer,label}) {
+function verifyServiceReceipt(serviceProof,receipt,{domain,issuer,label}) {
   if (!receipt || receipt.sourceDomain!==domain)
     return {ok:false,code:'SERVICE_PROOF_INVALID',error:'Receipt issuer en brondomein verschillen.'};
   if (!receipt.serviceProof) return {ok:true,mode:'in-process'};
@@ -14,4 +14,4 @@ function verify(serviceProof,receipt,{domain,issuer,label}) {
     : {ok:false,code:'SERVICE_PROOF_INVALID',error:`De ${label}-servicehandtekening klopt niet.`};
 }
 
-module.exports={verify};
+module.exports={verify:verifyServiceReceipt};

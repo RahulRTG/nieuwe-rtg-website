@@ -7,9 +7,9 @@ module.exports=function makeLibraryLoopSource({read,deliver,identities,time,serv
   const observationRef=feedback=>({domain:'library',type:'feedback-observation',id:feedback.id,version:feedback.createdAt});
   const editionRef=(work,edition)=>({domain:'library',type:'edition',id:work.id+':'+edition.id,version:edition.snapshotHash});
   function work(id){const row=read().works[String(id||'')];if(!row)P.fail('SOURCE_MISSING','Dit Library Work bestaat niet meer.',404);return row;}
-  function context(actor,row){return {actor,identities,w:row};}
+  function libraryContext(actor,row){return {actor,identities,w:row};}
   function authorization(actorRef,workId,required=['kennis']) {
-    try {const row=work(workId),ctx=context(actorRef,row);if(!identities.exists(actorRef)||!policy.member(ctx))
+    try {const row=work(workId),ctx=libraryContext(actorRef,row);if(!identities.exists(actorRef)||!policy.member(ctx))
       P.fail('AUTHORITY_REVOKED','De actuele Library-relatie geeft geen toegang.',403);
       if(required.includes('besluit'))policy.editor(ctx);
       return {ok:true,workId:row.id,actorRef,rights:required.slice(),policy:{id:'library.kernel',version:1}};
@@ -61,21 +61,21 @@ module.exports=function makeLibraryLoopSource({read,deliver,identities,time,serv
       .map(f=>({id:'libloop_'+P.hash([event.envelop.id,f.id]).slice(0,28),sequence:event.sequence,at:edition.releasedAt,
         type:'library.change.applied',receipt:receipt(row,f,edition,event),envelop:event.envelop}));
   }
-  function protocolEvents(workId){return read().journal.flatMap(event=>mapped(event,workId));}
+  function libraryProtocolEvents(workId){return read().journal.flatMap(event=>mapped(event,workId));}
   function hasReceipt(workId,ref) {try {const r=P.objectRef(ref);return r.domain==='library'&&r.type==='change-receipt'&&
     protocolEvents(workId).some(event=>event.receipt&&event.receipt.receiptId===r.id&&r.version===1);}catch{return false;}}
   async function deliverScope(workId,consumer,handle,limit=100){
     const scoped=consumer+'.'+P.hash(workId).slice(0,16);
     return deliver(scoped,async event=>{for(const row of mapped(event,workId))await handle(row);},limit);
   }
-  function resolveObservation(ref,recipient) {
+  function resolveLibraryObservation(ref,recipient) {
     try {const r=P.objectRef(ref),row=work(recipient&&recipient.id),feedback=row.feedback[r.id];
       if(r.domain!=='library'||r.type!=='feedback-observation'||!feedback||feedback.createdAt!==r.version)
         P.fail('SOURCE_MISSING','Deze Library-feedback bestaat niet meer.',404);
       return {ok:true,observation:observation(row,feedback),corrected:false};
     } catch(error){return P.error(error);}
   }
-  function learningEligibility(ref,recipient,request={}) {const resolved=resolveObservation(ref,recipient);if(!resolved.ok)return resolved;
+  function evaluateLibraryEligibility(ref,recipient,request={}) {const resolved=resolveLibraryObservation(ref,recipient);if(!resolved.ok)return resolved;
     return E.evaluate(resolved.observation.eligibility,{sourceRef:ref,purpose:request.purpose,recipient,use:request.use||'recall'},time());}
   function artifact(actorRef,workId,ref) {const allowed=authorization(actorRef,workId,['kennis']);if(!allowed.ok)return allowed;
     try {const r=P.objectRef(ref),row=work(workId),prefix=row.id+':';if(r.domain!=='library'||r.type!=='edition'||!r.id.startsWith(prefix))
@@ -85,5 +85,6 @@ module.exports=function makeLibraryLoopSource({read,deliver,identities,time,serv
       const current=released.at(-1).id===edition.id;return {ok:true,artifact:{id:edition.id,contentHash:edition.contentHash},current,
         currentRef:editionRef(row,released.at(-1))};}catch(error){return P.error(error);}}
   function verifyReceipt(value){return serviceReceipt.verify(serviceProof,value,{domain:'library',issuer:'rtg.service.library',label:'Library'});}
-  return {authorization,artifact,resolveObservation,learningEligibility,protocolEvents,deliver:deliverScope,verifyReceipt,hasReceipt};
+  return {authorization,artifact,resolveObservation:resolveLibraryObservation,learningEligibility:evaluateLibraryEligibility,
+    protocolEvents:libraryProtocolEvents,deliver:deliverScope,verifyReceipt,hasReceipt};
 };

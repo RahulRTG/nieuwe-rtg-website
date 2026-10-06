@@ -38,14 +38,14 @@ module.exports=function academyLoopDelivery({P,D,readDelivery,tx,state,leerhuis,
     }
     return {deliveredThrough:current,sourceThrough:maxSource,blocked};
   }
-  function deliveryStatus(org,consumer) {
+  function academyDeliveryStatus(org,consumer) {
     const delivery=state(readDelivery() || {}),row=delivery.organizations[org],events=protocolEvents(org);
     return D.summary(row && row.consumers && row.consumers[consumer],Math.max(0,...events.map(x=>x.sequence)),time(),events);
   }
-  function deliveryStatuses() {
+  function academyDeliveryStatuses() {
     const s=state(readDelivery() || {}),rows=[];
     for (const [org,row] of Object.entries(s.organizations)) for (const consumer of Object.keys(row.consumers || {}))
-      rows.push({scopeHash:P.hash(org).slice(0,20),consumer,...deliveryStatus(org,consumer)});
+      rows.push({scopeHash:P.hash(org).slice(0,20),consumer,...academyDeliveryStatus(org,consumer)});
     return rows;
   }
   async function replayDeadLetter(org,consumer,eventId) {
@@ -55,5 +55,5 @@ module.exports=function academyLoopDelivery({P,D,readDelivery,tx,state,leerhuis,
       const result=D.replay(row.consumers,consumer,eventId,time()); Object.assign(map,s); return {ok:true,...result};
     });
   }
-  return {deliver,deliveryStatus,deliveryStatuses,replayDeadLetter};
+  return {deliver,deliveryStatus:academyDeliveryStatus,deliveryStatuses:academyDeliveryStatuses,replayDeadLetter};
 };

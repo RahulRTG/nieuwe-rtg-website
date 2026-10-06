@@ -23,7 +23,17 @@
      4. een geslaagde inlog leegt nooit de adresemmer (de les van N4): een
         aanvaller met een eigen account zet de grens van 50 per adres niet terug;
      5. en de tegenproef bij 3: een geslaagde inlog leegt de emmer van adres
-        plus account wel, ook voor de andere deur.
+        plus account wel, ook voor de andere deur;
+     6. een dichte emmer van adres plus account zet geen e-mailadres in de
+        opslag. Zijn naam gaat als bron mee in de beveiligingsmelding, en die
+        wordt bewaard. De oude emmer van de werkdeur ('mijn:'+adres) droeg geen
+        inlognaam; de gedeelde droeg hem eerst in klare tekst;
+     7. de werkdeur voedt de noodrem: na 25 gokken op een account staat het
+        adres van de 25e poging in quarantaine, en dat van de 24e niet;
+     8. een account is een emmer, in elke spelling: hoofdletters en witruimte
+        rond de inlognaam geven geen verse gokken, op geen van beide deuren.
+        findByLogin vindt het account in elke spelling, dus de rem hoort dat
+        ook te doen.
 
    Waarom de tijd wordt gemeten en niet alleen de status: het account krijgt met
    opzet een VERTRAGING en geen slot (test/inlogrem.test.js). Een trage machine
@@ -49,7 +59,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { DatabaseSync } = require('node:sqlite');
+const { startServer, stop, wachtOpWaarde } = require('./helper');
 
 const NORA = 'nora@rtg.example', NORA_WW = 'werk';   // zaaiset: twee werkplekken
 const WERK = '/api/supplier/mijn/login', GEWOON = '/api/auth/login';
@@ -57,9 +68,9 @@ const WERK = '/api/supplier/mijn/login', GEWOON = '/api/auth/login';
    vertraging van twee seconden. */
 const VERTRAAGD_MS = 1500;
 
-async function metServer(werk) {
+async function metServer(werk, env) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkrem-'));
-  const srv = await startServer({ env: { RTG_DATA_DIR: dir, SMTP_URL: '', RTG_OWNER_EMAIL: '' } });
+  const srv = await startServer({ env: Object.assign({ RTG_DATA_DIR: dir, SMTP_URL: '', RTG_OWNER_EMAIL: '' }, env || {}) });
   /* Elke poging draagt haar eigen adres. De voordeurketen vertrouwt een hop
      (RTG_PROXY_HOPS, standaard 1), dus dit is wat een botnet doet. */
   const poging = async (pad, ip, login, password) => {
@@ -70,7 +81,7 @@ async function metServer(werk) {
     const body = await r.json().catch(() => ({}));
     return { status: r.status, ms: Date.now() - t, body };
   };
-  try { await werk({ srv, poging }); }
+  try { await werk({ srv, poging, dir }); }
   finally {
     await stop(srv);
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) { /* weg is weg */ }
@@ -201,6 +212,130 @@ test('5. een geslaagde inlog op de ene deur begint de telling van adres plus acc
         const r = await poging(richting.gok, richting.ip, mail, 'nogeens' + i);
         assert.equal(r.status, 401, 'na de geslaagde inlog begint de telling opnieuw (' + richting.gok + ', gok ' + (i + 1) + '): ' + kort(r));
       }
+    }
+  });
+});
+
+/* DE OPSLAG LEZEN ZOALS HIJ ERBIJ LIGT. Twee lezers, en ze vangen elkaars gat
+   af. De rijen van store.db (een rij per collectie) zijn de betrouwbare: een
+   ruwe zoektocht door de bestanden kan een tekst missen die SQLite over twee
+   pagina's verdeelt. De ruwe zoektocht vangt wat buiten die rijen ligt (de
+   WAL, een journaal, een ander bestand in de datamap). */
+function kvRijen(dir) {
+  const bestand = path.join(dir, 'store.db');
+  if (!fs.existsSync(bestand)) return [];
+  const kv = new DatabaseSync(bestand, { readOnly: true });
+  try { return kv.prepare('SELECT key, val FROM kv').all(); } finally { kv.close(); }
+}
+function bruteForceVan(dir, ip) {
+  const rij = kvRijen(dir).find(r => r.key === 'techniek');
+  const lijst = rij ? ((JSON.parse(rij.val) || {}).beveiliging || []) : [];
+  return lijst.filter(m => m.type === 'brute-force' && m.meta && m.meta.aanvaller === ip);
+}
+function bestandenMet(dir, patroon) {
+  const raak = [];
+  for (const naam of fs.readdirSync(dir, { recursive: true })) {
+    let tekst;
+    try { tekst = fs.readFileSync(path.join(dir, naam), 'latin1'); } catch (e) { continue; }   // map, of al weg
+    if (patroon.test(tekst)) raak.push(naam);
+  }
+  return raak;
+}
+
+/* De opslag staat hier vast op SQLite, ook als de omgeving een PostgreSQL-URL
+   meegeeft: de toets leest store.db, en een andere opslag zou hem stil laten
+   wachten op een bestand dat er niet komt. */
+test('6. een dichte emmer van adres plus account zet geen e-mailadres in de opslag', async () => {
+  await metServer(async ({ poging, dir }) => {
+    /* Een adres dat bij geen account hoort: zo kan het alleen via de rem in de
+       opslag komen. Met hoofdletters, want de emmer rekent in kleine letters
+       en de zoektocht hieronder kijkt naar allebei. */
+    const mail = 'Geheim.Adres' + Date.now().toString().slice(-8) + '@Voorbeeld.test';
+    const zoek = new RegExp(mail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    for (const [pad, ip] of [[WERK, '198.51.100.90'], [GEWOON, '198.51.100.91']]) {
+      for (let i = 0; i < 10; i++) assert.equal((await poging(pad, ip, mail, 'fout' + i)).status, 401);
+      /* TEGENPROEF: de emmer is echt dichtgegaan en zijn melding staat in de
+         opslag. Zonder die melding is "geen e-mailadres" ook waar als er niets
+         is gemeld. Gewacht wordt op die TOESTAND, de opslag schrijft na. */
+      const meldingen = await wachtOpWaarde(() => {
+        const m = bruteForceVan(dir, ip);
+        return m.length ? m : null;
+      }, { ms: 15000, wat: 'de brute-force-melding van ' + pad + ' in store.db' });
+      assert.ok(meldingen.some(m => String(m.meta.bron).startsWith('auth:' + ip + ':')),
+        pad + ': het is de emmer van adres plus account die dichtging: ' + JSON.stringify(meldingen.map(m => m.meta)));
+      for (const m of meldingen) {
+        assert.doesNotMatch(JSON.stringify(m), zoek, pad + ': de melding draagt het e-mailadres: ' + JSON.stringify(m));
+      }
+    }
+    const rijen = kvRijen(dir).filter(r => zoek.test(String(r.val))).map(r => r.key);
+    assert.deepEqual(rijen, [], 'geen collectie in store.db draagt het e-mailadres');
+    assert.deepEqual(bestandenMet(dir, zoek), [], 'en geen bestand in de datamap, ook de WAL niet');
+  }, { RTG_STORE: 'sqlite', DATABASE_URL: '', PG_URL: '' });
+});
+
+/* De noodrem hoort te zien wie er op de werkdeur gokt, net als op de gewone
+   inlog: wie hier gokt kent het wachtwoord niet. Een eigen `soort` in
+   noteFailedTry maakt van de melding een waarschuwing zonder noodrem (de vorm
+   van de tweede stap, N4), en dan blijft het adres open. Vreemde adressen, want
+   het schild zet een lokaal adres nooit in quarantaine. */
+test('7. de werkdeur voedt de noodrem: na 25 gokken op een account staat het adres van de 25e in quarantaine', async () => {
+  await metServer(async ({ poging }) => {
+    for (let i = 1; i <= 25; i++) {
+      assert.equal((await poging(WERK, '198.51.100.' + i, NORA, 'fout' + i)).status, 401, 'gok ' + i);
+    }
+    /* De accountemmer ging bij de 25e dicht en meldde brute force met dat adres
+       als aanvaller. Gewacht op de toestand, want de quarantaine wordt
+       vastgelegd; het juiste wachtwoord helpt dat adres dan niet meer. */
+    const dader = await wachtOpWaarde(async () => {
+      const r = await poging(WERK, '198.51.100.25', NORA, NORA_WW);
+      return r.status === 403 ? r : null;
+    }, { ms: 10000, wat: 'quarantaine (403) voor het adres van de 25e gok' });
+    assert.match(String(dader.body.error), /quarantaine/, 'het is de quarantaine: ' + JSON.stringify(dader.body));
+    /* TEGENPROEF: het adres van de 24e staat er niet in, en de eigenaar komt
+       daar met het juiste wachtwoord gewoon binnen. Anders is "403" ook waar
+       als alles dicht zit. */
+    const ander = await poging(WERK, '198.51.100.24', NORA, NORA_WW);
+    assert.equal(ander.status, 200, 'het adres van de 24e gok: ' + JSON.stringify(ander.body).slice(0, 160));
+  });
+});
+
+/* Elke spelling een andere: hoofdletters volgens de bits van n (nooit allemaal
+   klein), en bij een deel witruimte eromheen. findByLogin trimt en vergelijkt
+   in kleine letters (accounts/kluis.js emailHash), dus allemaal hetzelfde
+   account. */
+function spelling(n) {
+  let bit = 0;
+  const s = NORA.replace(/[a-z]/g, c => ((n >> bit++) & 1 ? c.toUpperCase() : c));
+  return ['', ' ', '\t', '  '][n % 4] + s + ['', '', ' ', '\t '][n % 4];
+}
+
+test('8. een account is een emmer, in elke spelling: hoofdletters en witruimte geven geen verse gokken', async () => {
+  await metServer(async ({ poging }) => {
+    /* Adres plus account, vanaf een lokaal adres (zie de kop: dan is de echte
+       429 van de rem te zien en niet de quarantaine). Tien gokken in tien
+       spellingen, om en om op beide deuren. */
+    const A = '127.0.0.1';
+    for (let i = 0; i < 10; i++) {
+      const pad = i % 2 ? GEWOON : WERK;
+      assert.equal((await poging(pad, A, spelling(i + 1), 'fout' + i)).status, 401, pad + ' in spelling ' + JSON.stringify(spelling(i + 1)));
+    }
+    for (const pad of [GEWOON, WERK]) {
+      const r = await poging(pad, A, NORA, NORA_WW);
+      assert.equal(r.status, 429, pad + ': tien gokken in tien spellingen zijn tien gokken op een account: ' + JSON.stringify(r.body).slice(0, 160));
+    }
+
+    /* Het account alleen: die tien tellen al mee, en vijftien gokken in nog
+       vijftien spellingen vanaf vreemde adressen brengen de accountemmer op
+       25. Daarna kost elke volgende gok twee seconden, in welke spelling ook. */
+    for (let i = 0; i < 15; i++) {
+      const pad = i % 2 ? WERK : GEWOON;
+      assert.equal((await poging(pad, '203.0.113.' + (i + 1), spelling(i + 11), 'nogeens' + i)).status, 401);
+    }
+    for (const [n, pad] of [[26, WERK], [27, GEWOON]]) {
+      const r = await poging(pad, '203.0.113.' + n, spelling(n), 'nogmaals');
+      assert.equal(r.status, 401);
+      assert.ok(r.ms >= VERTRAAGD_MS, pad + ' in spelling ' + JSON.stringify(spelling(n))
+        + ' hoort na 25 mislukkingen op dit account vertraagd te zijn (' + r.ms + 'ms)');
     }
   });
 });

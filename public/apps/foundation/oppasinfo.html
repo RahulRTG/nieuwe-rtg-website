@@ -105,6 +105,7 @@
 </div>
 
 <script src="sessie.js"></script>
+<script src="gezondheidstoestemming.js"></script>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
 <script>
@@ -175,7 +176,8 @@ $('#bewaar').onclick = async ()=>{
     const g={}; rij.querySelectorAll('[data-k]').forEach(i=> g[i.dataset.k]=i.value); return g;
   });
   try{
-    const d = await api('/gezin/oppasinfo', { code:s.code, token:s.token, noodcontacten, allergie:$('#eAllergie').value, eten:$('#eEten').value, huisregels:$('#eHuisregels').value });
+    // een nieuwe allergie- of medische regel vraagt apart toestemming (art. 9)
+    const d = await RTFToestemming.metToestemming(() => api('/gezin/oppasinfo', { code:s.code, token:s.token, noodcontacten, allergie:$('#eAllergie').value, eten:$('#eEten').value, huisregels:$('#eHuisregels').value }));
     huidig = d.oppasinfo; render();
     $('#bewerk').style.display='none'; $('#lezen').style.display='block';
   }catch(e){ $('#fout').textContent = e.message; }

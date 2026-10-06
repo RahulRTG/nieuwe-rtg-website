@@ -33,8 +33,12 @@ function sourcesFor(capability) {
   const matched=routeSource.filter(row=>capability.paden.some(prefix=>routeMatches(row.route,prefix)));
   return [...new Set(matched.map(row=>row.bestand))].sort();
 }
-function source(file){if(sourceCache.has(file))return sourceCache.get(file);let value='';
-  try{value=fs.readFileSync(path.join(ROOT,file),'utf8').toLowerCase();}catch{}sourceCache.set(file,value);return value;}
+/* Een bronbestand dat niet te lezen is, is geen leeg bestand: dan meet de
+   registry iets wat er niet staat. Hardop falen (STILLEZING.json). */
+function source(file){if(sourceCache.has(file))return sourceCache.get(file);let value;
+  try{value=fs.readFileSync(path.join(ROOT,file),'utf8').toLowerCase();}
+  catch(e){throw new Error('bron onleesbaar voor de coverage registry: '+file+' ('+(e.code||e.message)+')');}
+  sourceCache.set(file,value);return value;}
 function dependencyClosure(files) {
   const seen=new Set(files),queue=files.slice();
   while(queue.length&&seen.size<5000){const file=queue.shift();for(const dep of dependencies.get(file)||[])

@@ -3,7 +3,7 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-06",
-  "commit": "7d887ef52"
+  "commit": "7df862bea"
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
@@ -19,7 +19,7 @@
   "uitvoerZonderNamen": 2398,
   "zonderUitvoer": 882,
   "requireKanten": 7249,
-  "seconden": 10.4
+  "seconden": 10.3
  },
  "nietGelezen": [
   {

@@ -484,3 +484,21 @@ test('PG-control-bewijs verifieert oorspronkelijke suitebytes en telt uitsluiten
   fs.unlinkSync(path.join(root,'SUITE.json'));
   assert.throws(()=>poort.pgControlBewijs(root,commit,gevraagd),'zonder oorspronkelijke suitebinding geen PASS');
 });
+
+/* FASE 1: een deur die zegt dat hij op bearercode v2 staat, moet dat in zijn
+   eigen bron laten zien. Mutatie: de controle in scripts/codecredentials.js
+   weghalen laat de eerste bewering zakken. */
+test('contractversie 2 vraagt een v2-uitgifte in de eigen bron, en de twee proefdeuren hebben die', () => {
+  const register = JSON.parse(JSON.stringify(poort.lees()));
+  const v2 = register.deuren.filter(d => d.contractversie === 2).map(d => d.id).sort();
+  assert.deepEqual(v2, ['pay.giftcard_value_code', 'pay.tegoedbon', 'workos.workspace_access_tokens']);
+  const deur = register.deuren.find(d => d.id === 'travelos.reisuitnodiging');
+  deur.contractversie = 2;
+  let uit = poort.controleer(register);
+  assert.ok(uit.fouten.some(f => f.includes(deur.id) && f.includes('contractversie 2')), 'een v1-deur die v2 zegt valt op');
+  deur.contractversie = 3;
+  uit = poort.controleer(register);
+  assert.ok(uit.fouten.some(f => f.includes(deur.id) && f.includes('1 of 2')));
+  const eerlijk = JSON.parse(JSON.stringify(poort.lees()));
+  assert.equal(poort.controleer(eerlijk).fouten.some(f => f.includes('contractversie')), false);
+});

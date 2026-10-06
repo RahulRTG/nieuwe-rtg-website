@@ -11,10 +11,14 @@
      NIEUWE sessie per keer, nooit de oude terug) en roteren;
    - op de werkruimte staat alleen een hash met issuer, doel, scope, onderwerp
      (werkruimte, lid, epoch), issued_at en expires_at;
-   - een sessie is geen eenmalige code: max_gebruik staat op 0 = NIET GETELD.
-     Eenmalig gebruik zou elke klik een nieuwe sleutel laten vragen; wat de
-     sessie begrenst is haar vervaltijd (lid 7 dagen, beheer 30), het plafond
-     van MAX_SESSIES per lid, de EPOCH en intrekken/roteren aan de serverkant;
+   - een sessie is geen eenmalige code: sinds bearercode v2 (Fase 1) staat er
+     gebruik 'sessie' in plaats van max_gebruik = 0, zodat onbeperkt gebruik
+     een verklaarde keuze is en niet per ongeluk ontstaat. Wat de sessie
+     begrenst is haar vervaltijd (lid 7 dagen, beheer 30), het plafond van
+     MAX_SESSIES per lid, de EPOCH en intrekken/roteren aan de serverkant;
+   - afgeleid 'perAanroep': er ontstaat uit een sessie niets dat blijft; elke
+     aanroep toetst de epoch opnieuw (reden() hieronder), en een contracthash
+     maakt een overschreven einde of onderwerp dicht;
    - de EPOCH: uit dienst, afgewezen, deprovisioning, bewaring of een import
      hoogt hem op (sluit()), en dan valt elke sessie van dat lid tegelijk weg;
    - zoeken vergelijkt elke hash met timingSafeEqual, zonder vroege uitgang.
@@ -36,11 +40,21 @@ function maak({ nu = () => klok.datum().toISOString() } = {}) {
   const bearer = require('../kern/bearercode')({ crypto: munt, namespace: 'workos.workspace_access_tokens', nu });
   const scope = soort => ['werkos.' + soort];
 
-  function record(soort, w, l, geldigMs) {
+  function record(soort, w, l) {
+    return bearer.maak({ prefix: soort === 'beheer' ? 'WB' : 'WL', issuer: 'rtg.werkos', doel: DOEL[soort],
+      scope: scope(soort), onderwerp: { werkruimte: w.code, lidId: l ? l.id : null, epoch: epoch(w, l) },
+      geldigheid: { duurMs: soort === 'beheer' ? BEHEER_MS : LID_MS }, gebruik: 'sessie', afgeleid: 'perAanroep' });
+  }
+  /* Een oude kale sleutel krijgt een v1-record: zijn hash komt van de sleutel
+     die er AL was, en een v2-record zou die overschrijving terecht als
+     gemanipuleerd zien. Hij blijft v1 tot de houder hem roteert. */
+  function legacyRecord(soort, w, l, raw) {
     const g = bearer.maak({ prefix: soort === 'beheer' ? 'WB' : 'WL', issuer: 'rtg.werkos', doel: DOEL[soort],
       scope: scope(soort), onderwerp: { werkruimte: w.code, lidId: l ? l.id : null, epoch: epoch(w, l) },
-      geldigMs: geldigMs || (soort === 'beheer' ? BEHEER_MS : LID_MS) });
+      geldigMs: soort === 'beheer' ? BEHEER_MS : LID_MS });
     g.toegang.max_gebruik = 0;
+    g.toegang.code_hash = bearer.hash(raw);
+    g.toegang.legacy = 'legacy192';
     return g;
   }
   const epoch = (w, l) => l ? (l.sessieEpoch || 0) : (w.beheerEpoch || 0);
@@ -98,10 +112,7 @@ function maak({ nu = () => klok.datum().toISOString() } = {}) {
     const neem = (w, l, raw, soort) => {
       n++;
       if (productie || typeof raw !== 'string' || !raw) return;
-      const g = record(soort, w, l);
-      g.toegang.code_hash = bearer.hash(raw);
-      g.toegang.legacy = 'legacy192';
-      bewaar(w, l, g.toegang);
+      bewaar(w, l, legacyRecord(soort, w, l, raw).toegang);
     };
     for (const w of Object.values(ws || {})) {
       if (!w || typeof w !== 'object') continue;

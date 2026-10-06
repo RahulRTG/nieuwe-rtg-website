@@ -419,6 +419,18 @@ function controleer(register, root = ROOT) {
     if (!Array.isArray(d.bron) || !d.bron.length) fouten.push(d.id + ': bron ontbreekt');
     else for (const bron of d.bron) if (!fs.existsSync(path.join(root, bron)))
       fouten.push(d.id + ': bronbestand bestaat niet: ' + bron);
+    /* CONTRACTVERSIE (Fase 1, Access/Grant): een deur die zegt dat hij op
+       bearercode v2 staat, moet dat in zijn eigen bron laten zien -- een
+       uitgifte met een expliciete geldigheid en een verklaarde afgeleide
+       toegang. Een register dat v2 zegt terwijl de code nog v1 uitgeeft, is
+       een geruststelling en geen inventaris. Zonder veld blijft het v1. */
+    if (d.contractversie != null) {
+      if (d.contractversie !== 1 && d.contractversie !== 2) fouten.push(d.id + ': contractversie is 1 of 2');
+      else if (d.contractversie === 2 && !(d.bron || []).some(b => !/bearercode/.test(b) && (() => {
+        try { const t = zonderCommentaar(fs.readFileSync(path.join(root, b), 'utf8')); return /geldigheid\s*:/.test(t) && /afgeleid\s*:/.test(t); }
+        catch (e) { return false; }
+      })())) fouten.push(d.id + ': contractversie 2, maar geen bronbestand geeft een geldigheid en een afgeleide toegang mee');
+    }
     if (d.status === 'remaining' && d.release_blocker !== true)
       fouten.push(d.id + ': remaining moet fail-closed een releaseblokkade zijn');
     if (d.status !== 'remaining' && d.release_blocker === true)

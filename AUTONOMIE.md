@@ -317,7 +317,7 @@ De vraag gaat omgekeerd: niet *mag de machine dit?* maar **waarom staat hier een
 mens?** Kan de machine iets veilig, bevoegd, controleerbaar en herstelbaar zelf,
 dan hoort het in beginsel geen mensenwerk te zijn. Het antwoord mag niet elke keer
 opnieuw ter discussie staan, en daarom is het een GESLOTEN lijst
-(`server/kern/mensgrond.js`): fysieke aanwezigheid, oordeel, toestemming, relatie,
+(`scripts/lib/mensgrond.js`): fysieke aanwezigheid, oordeel, toestemming, relatie,
 wettelijke bevoegdheid, tweede persoon, geld, onomkeerbaar en terugweg onbewezen.
 
 Twee invarianten, en ze spiegelen elkaar:
@@ -393,7 +393,7 @@ fysieke aanwezigheid en wettelijke bevoegdheid (de persoonseis en de klasse
 | Independent Critic | **besluit** | de tegenproef krijgt ANDERE invoer (plan, beleid, ruwe cijfers), nooit de redenering; een critic op dezelfde invoer is een stempel (`KANTOORMACHT.md`) |
 | Deterministic Verification | **staat** | `kern/command/transactie-poorten.js`: een controle die niet kon draaien is niet geslaagd |
 | Policy + Streefstand + Mandate | **stap weg + besluit** | `kern/beleidsmotor/` in de schaduw, `kern/stuur/mandaat.js` zonder aanroepers; de streefstand staat sinds 27 september als `kern/streefbeeld.js` (C7), maar als VANGRAIL rond de afgesloten maanden en nog niet als gewenste toekomstige stand (par. 8) |
-| Mensgrond | **staat als meter** (6 oktober) | `server/kern/mensgrond.js` (de gesloten lijst) en `npm run mensgrond`: waarom staat er bij elke handeling een mens (par. 2.9) |
+| Mensgrond | **staat als meter** (6 oktober) | `scripts/lib/mensgrond.js` (de gesloten lijst) en `npm run mensgrond`: waarom staat er bij elke handeling een mens (par. 2.9) |
 | tonen | **staat voor het kantoor** | C2: drie paden |
 | klaarzetten, uitvoeren | **jaren weg** | 7 van de 118 AI-schrijfparen dragen een gemeten gevolg, een beproefde terugweg en een beschermde herhaling (`INTELLIGENTIE.md` par. 6) |
 | Boardroom | **staat** | vraagt een identiteit; de enige plek waar een besluit vandaag een naam heeft |
@@ -555,7 +555,7 @@ we ervan.* Eerst gelezen, toen gebouwd; het meeste staat al.
 | ochtendkaart | `kern/ochtendkaart.js` (`PERSONEEL.md`; stelt niets voor, B4) |
 | uitleg, consequentie, actiestaat | `shared/edge/actiestaat.js`, `shared/adaptief/grammatica.js` (vijf gewichten) |
 | leren als dossier | `kern/carriereledger/`, `kern/connect/leerdossier.js` |
-| mensgronden | `kern/mensgrond.js` + `npm run mensgrond` (par. 2.9) |
+| mensgronden | `scripts/lib/mensgrond.js` + `npm run mensgrond` (par. 2.9) |
 
 ### 8.2 Wat werkelijk ontbreekt
 
@@ -627,7 +627,7 @@ streefbeeld (gewenst: n leden, n gezinnen; ONBEKEND waar geen bron)   M1
   -> bewezen stand uit de bedrijfsmaten (groepspoort: onder de grens geen getal)
   -> kloof per dimensie, met graad en reden
   -> plan.js: welke handelingen de kloof raken
-  -> per stap de mensgrond (kern/mensgrond.js)
+  -> per stap de mensgrond (scripts/lib/mensgrond.js)
        machine: alleen tonen en klaarzetten (C2)
        mens:    een uitnodiging versturen (tweede persoon), een pas toekennen (oordeel)
   -> de mens bevestigt via de bestaande route
@@ -643,7 +643,12 @@ van `scripts/tafelproef.js` (per schakel: handelt A, en ziet B dat?).
 
 ### 8.6 De modulegrens
 
-- `server/kern/mensgrond.js` -- de gesloten lijst en de indeling; geen opslag, geen route.
+- `scripts/lib/mensgrond.js` -- de gesloten lijst en de indeling; geen opslag, geen route.
+  Hij woont in `scripts/` en niet in `server/kern/`, en dat is een uitslag van de
+  keuring en geen voorkeur: een servermodule die nergens in de runtime wordt
+  aangeroepen is een capability zonder caller (`CONTROLPLANE.md`). Hij verhuist naar
+  `server/kern/` op de dag dat de eerste lezer in de runtime er is -- het Human
+  Work-scherm -- en dan als EEN bron, nooit als kopie.
 - `server/kern/streefbeeld.js` -- blijft de enige eigenaar van de streefstand; een
   gewenste stand (M1) wordt een uitbreiding, geen tweede module.
 - Een kloofberekening hoort een LENS te zijn (par. 0): een verklaarde vraag over de
@@ -651,4 +656,4 @@ van `scripts/tafelproef.js` (per schakel: handelt A, en ziet B dat?).
 - Een Human Work-projectie leest de grond, het gewicht (`grammatica.js`) en het
   serveroordeel, en verzint er geen eigen tekst of bevoegdheid bij. Hij wacht op ronde 3
   van `EDGE.md`.
-- `scripts/mensgrond.js` meet; niets in `server/` leest hem (CODE-AI-001).
+- `scripts/mensgrond.js` meet; niets in `server/` leest hem of de lijst (CODE-AI-001).

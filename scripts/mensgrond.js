@@ -12,7 +12,7 @@
      de machine, zonder grond en met poorten  -> machinewerk
      te weinig bewijs                         -> onbekend
 
-   De gesloten lijst gronden en de indeling wonen in server/kern/mensgrond.js. Deze
+   De gesloten lijst gronden en de indeling wonen in scripts/lib/mensgrond.js. Deze
    meter verzint niets: hij legt die lijst naast vier lagen die er al zijn en elk een
    eigen eigenaar hebben -- de effecten (kern/isolatie/effecten.js), de bodem
    (kern/frictie/bodem.js), de mandaatgrammatica (kern/stuur/mandaat.js) en de
@@ -46,7 +46,7 @@ const crypto = require('crypto');
 const { alleRoutes, rolVan } = require('./lib/routes.js');
 const { BEWEZEN_LEZINGEN } = require('./machinedekking.js');
 const { stempel, eisSchoneBoom } = require('./lib/stempel');
-const mensgrond = require('../server/kern/mensgrond.js');
+const mensgrond = require('./lib/mensgrond.js');
 const effectmodel = require('../server/kern/isolatie/effecten.js');
 const { bodemVoorPad } = require('../server/kern/frictie/bodem.js');
 const { speelruimte } = require('../server/kern/stuur/mandaat.js');
@@ -184,7 +184,7 @@ function meet() {
   return {
     soort: 'projectie',
     uitleg: 'Per muterende handeling: staat er een mens, en heeft die een grond uit de gesloten lijst ' +
-      '(server/kern/mensgrond.js)? Menselijk werk zonder grond is automatiseringsschuld, de machine over een ' +
+      '(scripts/lib/mensgrond.js)? Menselijk werk zonder grond is automatiseringsschuld, de machine over een ' +
       'grond heen is een overtreding. Geteld per grond en per uitkomst, nooit als percentage mensenwerk.',
     grens: 'De gronden komen uit effecten (soms vermoed, uit de categorie van een functie), de bodem, ' +
       'NOOIT_AUTONOOM en de herstelregisters. Fysieke aanwezigheid en wettelijke bevoegdheid hebben geen bron ' +
@@ -193,7 +193,7 @@ function meet() {
       'dat register draagt zijn eigen stempel -- loopt het achter, dan is deze poort strenger en nooit losser.',
     stempel: stempel(),
     bronnen: {
-      'server/kern/mensgrond.js': digest('server/kern/mensgrond.js'),
+      'scripts/lib/mensgrond.js': digest('scripts/lib/mensgrond.js'),
       'HERSTELPROEF.json': digest('HERSTELPROEF.json'),
       'HERSTELBESLUIT.json': digest('HERSTELBESLUIT.json'),
       'IDEMPROEF.json': digest('IDEMPROEF.json'),

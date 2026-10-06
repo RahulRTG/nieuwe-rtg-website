@@ -27,12 +27,17 @@
    een relatie, een oordeel) en welk mensenwerk alleen wacht op een meting.
 
    WAAR DE GRONDEN VANDAAN KOMEN. Niet uit de naam van een route maar uit drie lagen die
-   er al zijn en elk een eigen eigenaar hebben: de effecten (kern/isolatie/effecten.js),
+   er al zijn en elk een eigen eigenaar hebben: de effecten (server/kern/isolatie/effecten.js),
    de bodem (kern/frictie/bodem.js) en de paden waar geen mandaat ooit over gaat
    (kern/stuur/mandaat.js NOOIT_AUTONOOM). Deze module verzint dus geen tweede
    classificatie; hij VERTAALT drie bestaande naar een woord. Twee gronden hebben
    vandaag geen enkele bron per route -- fysieke aanwezigheid en wettelijke
    bevoegdheid -- en die staan er dan ook met die reden bij en nooit als nul.
+
+   WAAROM HIJ IN scripts/lib/ WOONT. Hij stond eerst in server/kern/ en de keuring
+   zei terecht dat hij daar nergens wordt aangeroepen: een servermodule zonder lezer
+   in de runtime is een capability zonder caller. Hij verhuist op de dag dat de eerste
+   lezer in de runtime er is (een scherm dat een menselijke stap toont), als EEN bron.
 
    EN HIJ VOERT NIETS UIT. Geen route, geen opslag, geen oordeel over een mens. Een
    meter (scripts/mensgrond.js) legt hem naast de registers; een scherm dat later een
@@ -70,7 +75,7 @@ function grondenVan(feiten) {
   if (f.bodemId && UIT_BODEM[f.bodemId]) zet(UIT_BODEM[f.bodemId], 'bodem ' + f.bodemId);
   if (OORDEEL_OP_NAAM.test(pad)) zet('oordeel', 'naam (vermoed)');
   if (f.rol && UIT_DEUR[f.rol]) zet(UIT_DEUR[f.rol], 'deur ' + f.rol);
-  for (const r of UIT_NOOIT_AUTONOOM) if (r.patroon.test(pad)) zet(r.grond, 'mandaat.js NOOIT_AUTONOOM');
+  for (const r of UIT_NOOIT_AUTONOOM) if (r.grond && r.patroon.test(pad)) zet(r.grond, 'mandaat.js NOOIT_AUTONOOM');
   /* De eigen keuze van een klant. Hij staat in een EIGEN lijst en niet bij de blijvende
      gronden, en dat is precies goed zo: een mandaat dat een lid zelf afgeeft IS zijn
      toestemming, dus deze grond maakt een handeling binnen een mandaat geen overtreding.

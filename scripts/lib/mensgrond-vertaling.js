@@ -72,13 +72,21 @@ const UIT_DEUR = Object.freeze({ boardroom: 'oordeel', techniek: 'oordeel' });
    een besluit nemen. */
 const OORDEEL_OP_NAAM = /\/(vrijgeven|teken|keur|goedkeur|afkeur|beslis|besluit|weiger|bevestig|accepteer|wijs-af|rechten)(\/|$)/;
 
-/* De paden waar geen mandaat ooit over gaat (kern/stuur/mandaat.js), in dezelfde volgorde. */
-const UIT_NOOIT_AUTONOOM = Object.freeze([
-  { patroon: /^\/api\/(bank|pay)\//, grond: 'geld' },
-  { patroon: /^\/api\/supplier\/pay\//, grond: 'geld' },
-  { patroon: /^\/api\/aanmelding\//, grond: 'oordeel' },
-  { patroon: /^\/api\/(auth|account)\//, grond: 'toestemming' }
-]);
+/* DE PADEN WAAR GEEN MANDAAT OOIT OVER GAAT. De lijst zelf is van kern/stuur/mandaat.js
+   en wordt hier GELEZEN, niet overgetypt: twee plekken die hetzelfde moeten beslissen,
+   beslissen na een jaar iets anders (LAT.md regel 4). Hier staat alleen welke grond
+   bij welk patroon hoort; een nieuw patroon in mandaat.js zonder grond hier laat
+   test/mensgrond.test.js zakken in plaats van stil zonder grond te blijven. */
+const { NOOIT_AUTONOOM } = require('../../server/kern/stuur/mandaat.js');
+const GROND_PER_PATROON = Object.freeze({
+  '^\\/api\\/(bank|pay)\\/': 'geld',
+  '^\\/api\\/supplier\\/pay\\/': 'geld',
+  '^\\/api\\/aanmelding\\/': 'oordeel',
+  '^\\/api\\/auth\\/': 'toestemming',
+  '^\\/api\\/account\\/': 'toestemming'
+});
+const UIT_NOOIT_AUTONOOM = Object.freeze(NOOIT_AUTONOOM.map(re =>
+  Object.freeze({ patroon: re, grond: GROND_PER_PATROON[re.source] || null })));
 
 /* WIENS MENS STAAT ER? Dat is de vraag vóór elke grond, en de eerste ronde van de meter
    stelde hem niet: hij noemde `/api/logout` en de instellingen van een zaak

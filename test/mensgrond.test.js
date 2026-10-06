@@ -1,4 +1,4 @@
-/* DE MENSGRONDEN (server/kern/mensgrond.js) en hun meter (scripts/mensgrond.js).
+/* DE MENSGRONDEN (scripts/lib/mensgrond.js) en hun meter (scripts/mensgrond.js).
 
    De lijst beweert iets dat in twee richtingen kan breken, en elke richting is een
    andere schade:
@@ -18,7 +18,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const mg = require('../server/kern/mensgrond');
+const mg = require('../scripts/lib/mensgrond');
 const { meet } = require('../scripts/mensgrond');
 
 const WORTEL = path.join(__dirname, '..');
@@ -30,8 +30,12 @@ test('1. de lijst is gesloten, en elke vertaling wijst naar een grond die bestaa
     'wettelijke-bevoegdheid', 'tweede-persoon', 'geld', 'onomkeerbaar', 'terugweg-onbewezen'],
     'de gesloten lijst mensgronden is veranderd. Een grond erbij of eraf is een besluit (AUTONOMIE.md par. 2.9), geen opruimwerk.');
   for (const g of [...Object.values(mg.UIT_EFFECT), ...Object.values(mg.UIT_BODEM),
-    ...mg.UIT_NOOIT_AUTONOOM.map(r => r.grond), ...Object.values(mg.UIT_DEUR)])
+    ...mg.UIT_NOOIT_AUTONOOM.map(r => r.grond).filter(Boolean), ...Object.values(mg.UIT_DEUR)])
     assert.ok(mg.GRONDEN[g], 'vertaling naar een grond die niet in de lijst staat: ' + g);
+  /* Elk pad waar geen mandaat over gaat, heeft een grond -- gelezen uit mandaat.js zelf. */
+  for (const r of mg.UIT_NOOIT_AUTONOOM)
+    assert.ok(r.grond, 'mandaat.js NOOIT_AUTONOOM heeft een patroon zonder mensgrond: ' + r.patroon.source);
+  assert.equal(mg.UIT_NOOIT_AUTONOOM.length, require('../server/kern/stuur/mandaat').NOOIT_AUTONOOM.length);
   /* BLOCKED is geen grond: wachten op een ander is een toestand (ONBEKEND/UITSTELLEN). */
   assert.ok(!mg.GRONDEN.blocked && !mg.GRONDEN.geblokkeerd && !mg.GRONDEN.wacht,
     'een wachtstand is als mensgrond opgenomen; dat is een toestand van de controlplane, geen reden voor een mens');

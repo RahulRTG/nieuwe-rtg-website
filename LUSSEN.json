@@ -2,10 +2,10 @@
  "soort": "index",
  "uitleg": "De canonieke lusindex: elke cyclische gedraging van server/ en public/ met EEN identiteit, EEN vorm, EEN terminatiegraad en het bewijs dat er al over ligt. De assen staan naast elkaar en worden nooit opgeteld.",
  "stempel": {
-  "op": "2026-10-06T13:27:22.246Z",
-  "commit": "d810ad33",
+  "op": "2026-10-06T14:24:53.549Z",
+  "commit": "d9f7ac647",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/lussen.js",
   "node": "v26.10.0"
  },
@@ -82,11 +82,11 @@
    "rekenlus": 11
   },
   "bereikVerdeling": {
-   "bestandViaGraaf": 4600,
+   "bestandViaGraaf": 4601,
    "routeViaGraaf": 170,
    "route": 179,
    "wekker": 9,
-   "onbekend": 489,
+   "onbekend": 488,
    "opstart": 163,
    "scherm": 1624
   },
@@ -122,7 +122,7 @@
   "indeling": 100,
   "bewijsstand": 100,
   "bewijskracht": 3.84,
-  "bereikbaarOnbekend": 489
+  "bereikbaarOnbekend": 488
  },
  "ratel": {
   "geenUitwegGevonden": 0,
@@ -136,8 +136,8 @@
    "sleutelwoordlussen": 3675
   },
   "test": {
-   "bestanden": 2467,
-   "sleutelwoordlussen": 5491
+   "bestanden": 2468,
+   "sleutelwoordlussen": 5492
   }
  },
  "callbackPerNaam": {
@@ -7730,7 +7730,7 @@
    "as": "callback",
    "bestand": "public/apps/library/app.js",
    "symbool": "loadFeedback",
-   "lijn": 18,
+   "lijn": 21,
    "soort": "map()",
    "begrenzing": "COLLECTIE",
    "begrenzingReden": null,
@@ -195413,8 +195413,8 @@
    "domein": "overig",
    "risico": "laag",
    "risicoOpbouw": [],
-   "bereikbaarheid": "onbekend",
-   "bereikReden": "geen enkele aanroep in de graaf wijst naar dit bestand -- dat kan betekenen dat niets het aanroept, of dat de graaf de aanroep niet oploste",
+   "bereikbaarheid": "bestandViaGraaf",
+   "bereikReden": "de graaf bereikt dit BESTAND maar niet deze functie -- welke functie geraakt wordt, is hier niet vastgesteld",
    "bewijs": "geenRouteGevonden",
    "bewijsGrond": "geen route bereikt dit symbool in de aanroepgraaf -- dat kan betekenen dat hij niet via een route loopt, of dat de graaf de aanroep niet oploste"
   },

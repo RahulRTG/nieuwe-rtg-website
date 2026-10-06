@@ -1,17 +1,17 @@
 {
  "soort": "projectie",
- "uitleg": "Per muterende handeling: staat er een mens, en heeft die een grond uit de gesloten lijst (server/kern/mensgrond.js)? Menselijk werk zonder grond is automatiseringsschuld, de machine over een grond heen is een overtreding. Geteld per grond en per uitkomst, nooit als percentage mensenwerk.",
+ "uitleg": "Per muterende handeling: staat er een mens, en heeft die een grond uit de gesloten lijst (scripts/lib/mensgrond.js)? Menselijk werk zonder grond is automatiseringsschuld, de machine over een grond heen is een overtreding. Geteld per grond en per uitkomst, nooit als percentage mensenwerk.",
  "grens": "De gronden komen uit effecten (soms vermoed, uit de categorie van een functie), de bodem, NOOIT_AUTONOOM en de herstelregisters. Fysieke aanwezigheid en wettelijke bevoegdheid hebben geen bron per route en staan in `ongemeten`, nooit als nul. `machineBereik` is latent: er draait geen mandaat in productie, dus een overtreding is er een in de grammatica. De poort `bewijs` leest VERTROUWEN.json, en dat register draagt zijn eigen stempel -- loopt het achter, dan is deze poort strenger en nooit losser.",
  "stempel": {
-  "op": "2026-10-06T06:44:06.635Z",
-  "commit": "a55c6f96",
+  "op": "2026-10-06T06:52:26.687Z",
+  "commit": "d0376795",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mensgrond.js",
   "node": "v22.22.0"
  },
  "bronnen": {
-  "server/kern/mensgrond.js": "f1f16af372d5a9f3",
+  "scripts/lib/mensgrond.js": "c418382378da2986",
   "HERSTELPROEF.json": "9248c7cd39a3e7bb",
   "HERSTELBESLUIT.json": "13922137d094f1ef",
   "IDEMPROEF.json": "a252ece47b856742",

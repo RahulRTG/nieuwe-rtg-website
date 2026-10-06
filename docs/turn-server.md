@@ -144,6 +144,11 @@ Al het andere dicht, ook naar buiten toe niets extra's nodig.
 | Browserproef | Chromium belt met audio, video en data via het relais (`iceTransportPolicy: 'relay'`), relay-paar aan beide kanten; fout/verlopen/gemanipuleerd verbindt niet | `test/rtc-relay.e2e.js`, `scripts/lib/relaygesprek.js` |
 | Extern machinebewijs | twee verschillende netwerk-AS'en, relay-only, ≥64 KiB beide richtingen, getekend door de externe meetrunner | `connectionRealtime` in `server/config/external-machine-evidence.js` |
 
+Na elke uitrol, met een testaccount waarvan het sessietoken in een bestand staat:
+`npm run turnproef -- --basis=https://<app-domein> --token-bestand=<pad> --uit=turnproef.json`
+(geforceerd relay-gesprek met audio, video en data tegen het live relais, plus een
+gemanipuleerd credential dat niet mag verbinden; uitgang 0 alleen als alles klopt).
+
 Alleen `/api/ice` ophalen, een TCP-connect, een draaiend coturn-proces of een
 schermafbeelding van de Trickle ICE-pagina is **nooit** bewijs.
 

@@ -70,6 +70,35 @@ test('intrekken, roteren en max-use sluiten de oude code server-side', () => {
     soort: 'deelnemer', scope: 'lezen' }).ok, true);
 });
 
+/* Roteren in de codelevenscyclus is VERNIEUWEN: de medewerker kiest termijn en
+   gebruik opnieuw. Volgnummer, geschiedenis en de intrekking komen uit
+   kern/bearercode-keten.js, met de reden van de mens op de oude rij. */
+test('roteren is vernieuwen: nieuwe termijn, oude dicht, rotatie +1, soort vernieuwd', () => {
+  const m = motor();
+  const v = { doel: 'foundation-persoonsportaal', soort: 'vrijwilliger', scope: 'lezen' };
+  const oud = m.cyclus.uitgeven({ prefix: 'RTFV', issuer: 'user-1', doel: v.doel, scope: ['lezen'],
+    onderwerp: { soort: 'vrijwilliger', id: 'v-1' }, geldig_dagen: 2, max_gebruik: 5 });
+  assert.equal(m.cyclus.controleer(oud.code, v).ok, true);
+  m.verder(86400000);
+  const nieuw = m.cyclus.roteer(oud.toegang.id, { prefix: 'RTFV', issuer: 'user-2', reden: 'kwijt',
+    geldig_dagen: 10, max_gebruik: 3 });
+  assert.equal(m.cyclus.controleer(oud.code, v).reden, 'ingetrokken', 'de oude code opent nog iets');
+  assert.equal(m.cyclus.controleer(nieuw.code, v).ok, true, 'de nieuwe code opent niets');
+  const [r1, r2] = m.rijen;
+  assert.equal(r2.rotatie, r1.rotatie + 1);
+  assert.equal(r2.geschiedenis.at(-1).soort, 'vernieuwd');
+  assert.equal(r2.geschiedenis.at(-1).door, 'user-2');
+  assert.equal(r2.geschiedenis.at(-1).einde_was, r1.expires_at);
+  assert.equal(r1.intrekreden, 'kwijt', 'de reden van de mens ging verloren');
+  assert.equal(r1.ingetrokken_door, 'user-2');
+  assert.equal(r1.geroteerd_naar, r2.id);
+  assert.equal(Date.parse(r2.expires_at) - Date.parse(r2.issued_at), 10 * 86400000, 'geen nieuwe termijn');
+  assert.ok(Date.parse(r2.expires_at) > Date.parse(r1.expires_at));
+  assert.equal(r2.max_gebruik, 3);
+  assert.equal(nieuw.toegang.gebruik, 0, 'de teller begon niet opnieuw');
+  assert.equal(m.cyclus.roteer(oud.toegang.id, { issuer: 'user-2' }).status, 409);
+});
+
 test('een mislukte rotatie laat de huidige code en opslag exact intact', () => {
   const m = motor();
   const oud = m.cyclus.uitgeven({ prefix: 'RTFV', issuer: 'user-1',

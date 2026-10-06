@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   const K = window.RTGWerk;
-  if (location.hash.startsWith('#gast=')) return;
+  if (/^#(?:(gast|leverancier)=|betaling-terug$)/.test(location.hash)) return;
   const aansluiten = document.createElement('details'); aansluiten.className = 'praktijk';
   aansluiten.innerHTML = '<summary>Aansluiten bij uw organisatie</summary><form><label>Werkruimtecode van uw organisatie<input name="werkruimte" required maxlength="8" autocomplete="off"></label><label>Uw naam<input name="naam" required maxlength="60" autocomplete="name"></label><button type="submit" class="knop">Toegang aanvragen</button><p role="status"></p></form>';
   document.querySelector('#inlog').append(aansluiten);

@@ -18,6 +18,9 @@ module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs
   notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgMee, zorgContact, keuken,
   ledenvoordeelVoor, facturatie, pay }) => {
 
+  const lidSleutels = ['orders', 'boekingen', 'rides', 'punten'];
+  const lidSave = () => typeof save.bestaande === 'function' ? save.bestaande(lidSleutels) : save();
+
   /* Een betaalde lidtransactie wordt een factuur -- waarom dat er niet was en
      waarom het op EEN plek staat: zie de kop van ./lidacties/factuur.js. */
   const factuurVoorLid = require('./lidacties/factuur').maakFactuurVoorLid(facturatie);
@@ -65,7 +68,7 @@ function koopTicketVoor(session, body) {
     betaalMoment: 'vooraf', status: 'wacht-op-betaling', paid: false, at: new Date().toISOString()
   };
   boekingenVoegToe(ticket);
-  save();
+  lidSave();
   return { ok: true, ticket }; // afrekenen via /api/booking/pay of Rahul
 }
 
@@ -92,7 +95,7 @@ function betaalBoekingVoor(session, body) {
   if (b.status === 'wacht-op-betaling') b.status = 'aangevraagd';
   verdienPunten(session.key, (b.price || 0) - kortingB - voordeelB, b.supplierName);
   openLijnVoor(findSupplier(b.supplierCode), session);
-  save();
+  lidSave();
   // en de factuur, net als bij een bestelling en een rit (zie factuurVoorLid)
   factuurVoorLid({ soort: 'dienst', supplierCode: b.supplierCode, supplierNaam: b.supplierName,
     codenaam: b.customerCodename, ref: b.ref, methode: 'rtg',
@@ -108,7 +111,7 @@ function betaalBoekingVoor(session, body) {
   /* De submodules krijgen `factuurVoorLid` en NIET de facturatiemotor zelf:
      dan is er een plek die weet hoe een lidtransactie een factuur wordt, en
      kan geen van de vier er zijn eigen variant naast zetten. */
-  const ctx = { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan, factuurVoorLid,
+  const ctx = { db, save: lidSave, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan, factuurVoorLid,
     leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
     fooiUit, pasTegoedToe, herstelTegoed, verdienPunten, liveCodename, haversine, pushLive, pay,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgMee, zorgContact, keuken,

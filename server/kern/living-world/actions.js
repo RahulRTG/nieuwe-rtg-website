@@ -26,6 +26,7 @@ const definitions = {
   'plan.connect': ['Reis of community verbinden', 'plan'],
   'contribution.create': ['Iets achterlaten', 'place'],
   'contribution.review': ['Bijdrage beoordelen', 'contribution'],
+  'contribution.contest': ['Bijdrage betwisten', 'contribution'],
   'contribution.withdraw': ['Bijdrage intrekken', 'contribution'],
   'contribution.adopt': ['Verbetering overnemen', 'contribution']
 };
@@ -59,6 +60,8 @@ function allowed(action, row, key, state) {
     case 'contribution.create': return row && row.status === 'published';
     case 'contribution.review': return row && row.owner !== key && row.status === 'pending'
       && own(state.places[row.placeId],key);
+    case 'contribution.contest': return row && ['accepted','superseded'].includes(row.status)
+      && (row.owner === key || own(state.places[row.placeId],key));
     case 'contribution.withdraw': return mine && row.status !== 'withdrawn';
     case 'contribution.adopt': return row && row.status === 'accepted' && row.blueprintId
       && own(state.blueprints[row.blueprintId],key) && !row.adoptedVersion;

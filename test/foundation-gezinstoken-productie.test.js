@@ -25,7 +25,7 @@ const os = require('node:os');
 const path = require('node:path');
 const poort = require('../server/middleware/foundation-productiepoort');
 const { maakGetekendeVrijgave } = require('./foundation-vrijgave-fixture');
-const { startServer, stop, stopNet, keurLidGoed } = require('./helper');
+const { startServer, stop, stopHard, stopNet, keurLidGoed } = require('./helper');
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const ROOT = path.join(__dirname, '..');
@@ -152,6 +152,8 @@ const SLEUTEL = 'd'.repeat(40);
 
 const PROD = { NODE_ENV: 'production', RTG_DEMO: '0', APP_URL: 'https://rtg.voorbeeld.test/',
   SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
+  STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com', STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
+  TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
   RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', OFFICE_CODE: 'GEHEIME-CODE-123',
   OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP', RTG_ISOLATIE_AFDWINGEN: '1', RTG_BETALEN_UIT: '1',
   RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1', RTG_DOOS_SLEUTEL: SLEUTEL };
@@ -165,7 +167,6 @@ const SLEUTELS = { RTG_ENC_KEY: 'k'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64), R
    dat een handler in een nagemaakte app dat doet. */
 test('echte productieserver: de consumers werken op het nieuwe token, een oud kaal token opent niets', async t => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gezinstoken-prod-'));
-  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
   /* Sinds 5 oktober 2026 komt een kind in productie alleen binnen via het
      account van een ouder met een gecontroleerd paspoort (gezinseigenaar.js,
      gezinshulp.js profielVan). Het gezin ontstaat daarom langs die weg; het
@@ -190,7 +191,8 @@ test('echte productieserver: de consumers werken op het nieuwe token, een oud ka
   } finally { await stopNet(eerst.child); }
 
   const { child, base } = await startServer({ env: { ...PROD, ...SLEUTELS, RTG_DATA_DIR: tmp } });
-  t.after(() => stop(child));
+  t.after(() => stopHard(child));   // eerst het proces echt weg, dan pas de map
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
   const post = (pad, body) => fetch(base + pad, { method: 'POST', headers: PROXY,
     body: JSON.stringify(body || { code: 'GEZIN', token: 'x'.repeat(32) }) });
   // de consumers buiten de beschermde-functiepoort: open, en op het nieuwe token

@@ -62,6 +62,7 @@ const ZWARE_ACTIES = Object.freeze([
   'eigenaar-werkbankpad',       // POST /api/office/werkos/bankpad/zet
   'bank.incasso',               // POST /api/office/bank/incasso  (de geldketen, MACHINE.md par. 5a)
   'bank.bevestig',              // POST /api/office/bank/handtekening/bevestig  (tweede handtekening onder geld)
+  'reisbureau.teruggave',       // POST /api/office/reisbureau/teruggave  (een betaalde reis terugbetalen)
   'connection.table.manage',    // POST /api/office/rendezvous/tafel/*
   'connection.safety.report.read', // GET /api/vonk/meldingen en /api/member/rendezvous/meldingen
   'kantoor-binnen',             // POST /api/account/start  (rol kantoor, in productie; kern/kantoor/productiedeur.js)

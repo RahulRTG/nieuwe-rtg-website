@@ -38,14 +38,14 @@
 const klok = require('../../lib/klok');
 const router = require('./router');
 
-/* Wie er zwaar werk mag vragen en wat een AI-aanroeper is, staat in
-   ./machtiging-grenzen.js: pure tabel plus twee voorspellingen, zonder state.
-   Apart omdat dit bestand er anders over de omvangsgrens van keuringsregel 13
-   ging, en omdat een grens die je kunt aanwijzen makkelijker overeind blijft. */
-const { ZWAAR, AI_VOOR, isAi } = require('./machtiging-grenzen');
-/* De stand en de naar-buiten-vorm staan in ./machtiging-vorm.js, om dezelfde
-   reden en op dezelfde naad: geen levensloop, geen opslag. */
+/* Wie er zwaar werk mag vragen en wat een AI-aanroeper is: ./machtiging-grenzen.js,
+   pure tabel zonder state. Apart voor keuringsregel 13, en omdat een grens die
+   je kunt aanwijzen makkelijker overeind blijft. */
+const { ZWAAR, AI_VOOR, isAi, versmalService } = require('./machtiging-grenzen');
+/* Om dezelfde reden apart: de stand en de naar-buiten-vorm (geen levensloop,
+   geen opslag), en het spoor dat VOOR de toegang wordt vastgelegd. */
 const { stand, kortM } = require('./machtiging-vorm');
+const { legSpoorVast } = require('./machtiging-spoor');
 
 const MAX_MINUTEN = 60;
 const STANDAARD_MINUTEN = 20;
@@ -69,7 +69,7 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
      goedgekeurd. Gevonden met een kale meetronde, niet met lezen: in de toets
      verhuisde geen team. Verruimen kan hij niet; het blijft `benodigd()` van
      een echt team, en ./bevestiging.js versmalt er bij het vragen al tegen. */
-  function verleen({ zaakId, mens, doel, capabilities, minuten, reden, binnenTeam } = {}) {
+  async function verleen({ zaakId, mens, doel, capabilities, minuten, reden, binnenTeam, bevestigd } = {}) {
     const z = zaken.vind(zaakId);
     if (!z) return { status: 404, error: 'Zonder zaak is er geen bereik, en zonder bereik geen machtiging.' };
     const w = schoon(mens, 60);
@@ -81,15 +81,8 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
     const mag = router.teVragen(binnenTeam || z.team);
     const gevraagd = (Array.isArray(capabilities) ? capabilities : []).map(c => schoon(c, 60)).filter(Boolean);
     if (!gevraagd.length) return { status: 400, error: 'Zeg wat u nodig heeft. Een machtiging zonder inhoud opent niets.' };
-    let gekregen = gevraagd.filter(c => mag.includes(c));
-    let geweigerd = gevraagd.filter(c => !mag.includes(c));
-    if (isAi(w)) {
-      const zwaarGevraagd = gekregen.filter(c => ZWAAR[c]);
-      if (zwaarGevraagd.length) {
-        gekregen = gekregen.filter(c => !ZWAAR[c]);
-        geweigerd = geweigerd.concat(zwaarGevraagd);
-      }
-    }
+    const { gekregen, geweigerd, onbepaalbaar } = versmalService({ gevraagd, bevestigd, teamMag: mag, mens: w });
+    if (onbepaalbaar) return { status: 409, error: 'Zonder bevestiging van het lid gaat er niets open.', weigering: onbepaalbaar };
     if (!gekregen.length) {
       return { status: 403, error: 'Het team ' + (binnenTeam || z.team) + ' heeft dit niet nodig voor deze zaak. Zet de zaak eerst door naar het team dat het wel mag.', geweigerd };
     }
@@ -107,18 +100,14 @@ module.exports = function maakMachtigingen({ db, save, crypto, zaken, inzagelog 
       at, tot: new Date(Date.parse(at) + duur * 60000).toISOString(), minuten: duur,
       ingetrokken: false, gebruikt: []
     };
+    const spoor = await legSpoorVast(inzagelog, { door: w, over: { id: null, codenaam: z.melder },
+      waarom: 'Servicezaak ' + z.id + ': ' + r, bron: 'service/machtiging' });
+    if (!spoor.ok) return { status: spoor.status, spoor: spoor.reden,
+      error: 'Het journaal kon dit niet vastleggen; er is niets geopend. Probeer het opnieuw.' };
+
     M().unshift(machtiging);
     if (M().length > 20000) M().pop();
     save();
-
-    /* Het BESTAANDE journaal, geen tweede. De zin die eronder komt te staan is
-       eindelijk compleet: wie, wat, en voor welke zaak. */
-    try {
-      if (inzagelog && inzagelog.noteer) {
-        inzagelog.noteer({ door: w, over: { id: null, codenaam: z.melder },
-          waarom: 'Servicezaak ' + z.id + ': ' + r, bron: 'service/machtiging' });
-      }
-    } catch (e) {}
 
     return { ok: true, machtiging: kortM(machtiging), geweigerd,
       let: machtiging.zwaar.length

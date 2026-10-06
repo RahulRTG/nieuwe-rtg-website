@@ -200,15 +200,16 @@ test('7. de geldcollecties zoeken op via de index, niet met een scan', () => {
       bedrag: 4242, omschrijving: 'spion', betaalwijze: 'kaart', at: new Date().toISOString()
     };
     db.data = { orders: [], boekingen: [], directBetalingen: [spion], betaalVerzoeken: [] };
+    const spionInDb = db.data.directBetalingen[0]; // de bewaakte rij zoals db.data hem teruggeeft
     for (let i = 0; i < 100; i++) directBetalingenVoegToe(betaling(i));
 
-    assert.equal(directBetalingMetRef('DP-SPION'), spion, 'de spion staat in de index');
+    assert.equal(directBetalingMetRef('DP-SPION'), spionInDb, 'de spion staat in de index');
     const na = gelezen;
     assert.ok(na > 0, 'de index is echt gebouwd -- anders meet deze toets niets');
 
     for (let i = 100; i < 110; i++) directBetalingenVoegToe(betaling(i));
     assert.equal(directBetalingMetRef('DP105').ref, 'DP105', 'de nieuwe betaling is vindbaar');
-    assert.deepEqual(directBetalingenVanKlant('user-spion'), [spion], 'en de klantlijst klopt nog');
+    assert.deepEqual(directBetalingenVanKlant('user-spion'), [spionInDb], 'en de klantlijst klopt nog');
     assert.equal(gelezen, na,
       'de index werd opnieuw opgebouwd na een nieuwe BETALING (' + (gelezen - na) + ' extra lezingen) -- ' +
       'dan is opzoeken weer O(N) over een geldcollectie, precies het gebrek dat dit bestand zegt te hebben opgelost');

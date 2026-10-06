@@ -122,7 +122,7 @@ module.exports = ({ save, saveDuurzaam }) => {
     if (verraad.sla('sterf-voor-mutatie')) {
       try { process.kill(process.pid, 'SIGKILL'); } catch (e) { process.abort(); }
     }
-    const doos = { open: true, nodig: false, duurzaam };
+    const doos = { open: true, nodig: false, duurzaam, volledig: false, sleutels: new Set() };
     try { return await bijeenContext.run(doos, fn); }
     finally {
       /* Dicht voordat er geflusht wordt: een timer die binnen fn is gezet erft
@@ -133,8 +133,9 @@ module.exports = ({ save, saveDuurzaam }) => {
         doos.committen = true;
         try {
           if (doos.nodig) {
+            const sleutels = doos.volledig ? undefined : [...doos.sleutels];
             if (duurzaam) {
-              const uit = saveDuurzaam();
+              const uit = saveDuurzaam(sleutels);
           /* DE BUNDEL FAALT ALS HIJ NIET BEVESTIGD KON WORDEN, en alleen daar waar
              bevestigen mogelijk is. Zonder dit gooien meldt saveDuurzaam netjes
              dat het misging en gaat de route toch met 200 verder -- precies de
@@ -144,7 +145,8 @@ module.exports = ({ save, saveDuurzaam }) => {
               if (uit.bevestigbaar && !uit.duurzaam) {
                 throw new Error('[duurzaam] de commit is niet vastgelegd: ' + uit.reden);
               }
-            } else save();
+            } else if (sleutels && sleutels.length) save.sleutels(sleutels);
+            else save();
         /* Postgres is write-behind: zonder dit wachten zegt de route "gelukt"
            terwijl het geld nog in een 60ms-timer hangt -- de crashproef mat daar
            echt verlies in. Elders (sqlite synchroon; json/geheugen bewust

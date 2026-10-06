@@ -38,10 +38,16 @@ const snapshot = b => b.versions.find(v => v.version === b.version);
 const activeKnowledge = (c, at, state) => c.status === 'accepted' && (!c.validUntil || c.validUntil > at)
   && (!c.planId || !state || !!(state.plans[c.planId] && state.plans[c.planId].acknowledgedAt
     && state.plans[c.planId].participation && !state.plans[c.planId].participation.revokedAt));
-function selectKnowledge(state, placeId, ids, at) {
+function knowledgeVisible(c, key, state) {
+  const place = state && state.places && state.places[c.placeId];
+  const visibility = c.sharing && c.sharing.visibility || 'private';
+  return c.owner === key || place && place.owner === key || visibility === 'community';
+}
+function selectKnowledge(state, placeId, ids, at, key) {
   return [...new Set(list(ids,50,id=>text(id,80,true)))].map(id=>{
     const c = get(state,'contributions',id);
-    if (c.placeId !== placeId || !activeKnowledge(c,at,state)) fail('Deze kennis is gewijzigd of niet beschikbaar.',409,'KNOWLEDGE_CHANGED');
+    if (c.placeId !== placeId || !activeKnowledge(c,at,state) || !knowledgeVisible(c,key,state))
+      fail('Deze kennis is gewijzigd of niet beschikbaar.',409,'KNOWLEDGE_CHANGED');
     return {id:c.id,revision:c.revision};
   });
 }
@@ -67,7 +73,8 @@ function blueprint(value) {
     }), mediaRef: text(b.mediaRef, 120), remixAllowed: b.remixAllowed === true };
 }
 function empty() {
-  return { places: {}, blueprints: {}, plans: {}, contributions: {}, receipts: {}, history: [] };
+  return { places: {}, blueprints: {}, plans: {}, contributions: {}, receipts: {}, history: [], delivery:{},
+    returnOperations:{},returns:{} };
 }
 module.exports = { clone, hash, fail, text, date, list, get, version, owner, visible, snapshot,
-  activeKnowledge, selectKnowledge, ref, href, STEPS, blueprint, empty };
+  activeKnowledge, knowledgeVisible, selectKnowledge, ref, href, STEPS, blueprint, empty };

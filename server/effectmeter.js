@@ -67,6 +67,7 @@
 'use strict';
 
 const { AsyncLocalStorage } = require('async_hooks');
+const handeling = require('./opzet/handeling');
 
 /* Dezelfde vlag als de opslagmeter (server/staatlog.js). Uit is de stand die je
    krijgt als je niets doet. */
@@ -101,7 +102,7 @@ const winkel = new AsyncLocalStorage();
 function perVerzoek(fn) {
   const bestaand = winkel.getStore();
   if (bestaand) return fn(bestaand);
-  const teller = { opslag: 0, mail: 0, sms: 0 };
+  const teller = { opslag: 0, mail: 0, sms: 0, collecties: new Set(), collectieDekking: 'proxy-v1' };
   return winkel.run(teller, () => fn(teller));
 }
 
@@ -110,12 +111,25 @@ function perVerzoek(fn) {
 function tel(soort, hoeveel) {
   const t = winkel.getStore();
   if (!t || !Object.prototype.hasOwnProperty.call(t, soort)) return;
+  /* Na afloop is de kop al weg: tellen zou een teller ophogen die niemand meer
+     leest. Dat wordt zichtbaar geteld in opzet/handeling.js (I5). */
+  if (handeling.afgelopen()) { handeling.naAfloopMeld('effectmeter', soort); return false; }
   t[soort] += (hoeveel == null ? 1 : Number(hoeveel)) || 0;
+  return true;
 }
 
 /* De teller van DIT verzoek, of null. Voor wie de stand niet als tekst wil maar als
    getallen -- ./effectbon.js leest hem zo, en bouwt er geen tweede naast. */
 function huidig() { return winkel.getStore() || null; }
+
+/* De opslagtracker meldt uitsluitend de top-level collectienaam. Geen rij,
+   sleutel of waarde komt hier binnen. Daardoor kan de effectbon exact zeggen
+   WELKE soort toestand bewoog zonder twee volledige wereldscans per verzoek. */
+function wijziging(feit) {
+  const t = winkel.getStore();
+  if (!t || !t.collecties || !feit || typeof feit.collectie !== 'string') return false;
+  t.collecties.add(feit.collectie); return true;
+}
 
 /* De stand van dit verzoek, als korte tekst voor de kop. Leeg blijft leeg: een
    kop met alleen nullen suggereert een meting waar er geen was. */
@@ -131,38 +145,8 @@ function stand(teller) {
    zegt WAT er in de database veranderde, deze zegt DAT er iets gebeurde -- en
    die twee samenvatten maakt ze allebei onleesbaar. */
 function haak(app) {
-  if (!aan || !app || typeof app.use !== 'function') return false;
-  app.use((req, res, next) => {
-    perVerzoek((teller) => {
-      /* AAN res.end EN NIET AAN res.json.
-
-         Hij hing eerst aan res.json, zoals de opslagmeter. Dat is de gangbare
-         uitgang maar niet de enige: 282 routes die de kale ronde met 200
-         beantwoordde droegen geen kop, want zij antwoorden via res.send, een
-         redirect of een bestand -- en die gaan in server/web/verrijk.js niet
-         langs res.json. Gemeten, niet bedacht: het contractregister moest die
-         282 als ONGEMETEN afwijzen terwijl de meter gewoon had geteld.
-
-         res.end is de ene uitgang waar alle andere doorheen lopen (res.json
-         roept hem aan, res.send ook, een redirect ook). Vandaar hier. */
-      const echt = res.end;
-      res.end = function (...args) {
-        try {
-          if (!res.headersSent) {
-            /* De teller van DIT verzoek, meegegeven en niet opgevraagd. Een
-               antwoord dat uit een andere context wordt verstuurd (een
-               afgehandelde wachtrij, een foutafhandelaar hogerop) zou anders de
-               stand van een ander verzoek dragen, of geen. */
-            res.setHeader('X-RTG-Effect', stand(teller));
-            res.setHeader('X-RTG-Effect-Niet-Gemeten', NIET_GEMETEN.join(','));
-          }
-        } catch (e) { /* een kop die niet meer kan, mag het antwoord niet breken */ }
-        return echt.apply(this, args);
-      };
-      next();
-    });
-  });
-  return true;
+  return require('./effectmeter-http').koppelEffectmeterHttp(app,
+    { aan, perVerzoek, stand, nietGemeten: NIET_GEMETEN });
 }
 
 function begin(vlag) {
@@ -172,5 +156,10 @@ function begin(vlag) {
 
 begin(process.env.RTG_STAATLOG);
 
-module.exports = { haak, tel, stand, begin, perVerzoek, huidig, SOORTEN, NIET_GEMETEN,
+/* Eén waarnemingsweg voor iedere opslagmotor: de tracker zit om db.data en deze
+   teller zit om het verzoek. Registreren aan het eind voorkomt een modulekring
+   tijdens het opstarten van db/state. */
+try { require('./db/mutatietracker').voegWaarnemerToe(wijziging); } catch (e) {}
+
+module.exports = { haak, tel, stand, begin, perVerzoek, huidig, wijziging, SOORTEN, NIET_GEMETEN,
   get aan() { return aan; } };

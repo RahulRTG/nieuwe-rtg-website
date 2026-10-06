@@ -77,7 +77,7 @@ function maakTokens(getUserById) {
     if (!token) return null;
     try {
       const b64 = String(token).split('.')[0];
-      const sid = Buffer.from(b64, 'base64url').toString().split('.')[3];
+      const sid = (require('./tokenvorm').sessieDelen(Buffer.from(b64, 'base64url').toString()) || [])[3];
       return sid && /^[A-Za-z0-9_-]{12}$/.test(sid) ? sid : null;
     } catch (e) { return null; }
   }
@@ -119,12 +119,12 @@ function maakTokens(getUserById) {
          uitgerekend deze deur, waar elk verzoek langskomt, stond nog op de
          kale vergelijking. */
       if (!veiligGelijk(kluis.sign(body), sig)) return null;
-      const [id, exp, uitgegeven, sid] = body.split('.');
-      /* Een sessietoken heeft een NUMERIEKE exp. Defense-in-depth naast de
-         domeinscheiding: een actietoken draagt op die positie zijn purpose
-         ('inlog2'), en Number('inlog2') < Date.now() is false -- die mag er niet
-         doorheen glippen. */
-      if (!Number.isFinite(Number(exp)) || Number(exp) < Date.now()) return null;
+      /* Een sessietoken heeft cijfers op de plek van id, exp en uitgegeven
+         (./tokenvorm.js, audit B-1); een actietoken draagt daar zijn doel. Naast
+         de domeinscheiding van ./actietokens.js (een eigen sleutel per doel) is
+         dit de tweede, onafhankelijke grendel. */
+      const [id, exp, uitgegeven, sid] = require('./tokenvorm').sessieDelen(body) || [];
+      if (!id || !Number.isFinite(Number(exp)) || Number(exp) < Date.now()) return null;
       if (isIngetrokken(token)) return null; // uitgelogd: de handtekening klopt, wij niet meer
       /* En de sessie zelf. Dit is de tweede deur, en hij bestaat omdat de eerste
          het token nodig heeft -- dat heeft alleen de houder. Zonder deze regel

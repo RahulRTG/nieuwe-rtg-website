@@ -18,7 +18,7 @@
 'use strict';
 
 module.exports = ({ bon, crypto }) => {
-  const { transactie, bearer, nieuweToegang, vervalt, verlopen, naarBuiten, iso } = bon;
+  const { transactie, nieuweToegang, roteerToegang, verlopen, naarBuiten, iso } = bon;
   const afdruk = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 
   /* Een nieuwe bon met een verse toegang; de kale code gaat in `doos`. */
@@ -53,12 +53,14 @@ module.exports = ({ bon, crypto }) => {
           error: 'De nieuwe code is al een keer getoond en wordt niet herhaald. Vraag opnieuw een nieuwe code aan.' };
       if (t.status !== 'open') return { status: 409, error: 'Dit tegoed staat niet meer open.' };
       if (verlopen(t)) return { status: 409, error: 'Dit tegoed is verlopen; neem het terug in plaats van een nieuwe code te maken.' };
-      bearer.intrekken(t.toegang, door, 'geroteerd');
+      let g;
+      try { g = roteerToegang(t.toegang, door); } catch (e) {
+        if (e.code === 'geldigheid-ongeldig') return { status: 409, error: 'Dit tegoed is verlopen; neem het terug in plaats van een nieuwe code te maken.' };
+        throw e;
+      }
       t.historie = (Array.isArray(t.historie) ? t.historie : []).concat([{
         code_hash: t.toegang.code_hash, ingetrokken_at: t.toegang.ingetrokken_at, rotatie: t.toegang.rotatie
       }]).slice(-12);
-      const g = nieuweToegang(t.toegang.issuer, t.id, vervalt(t));
-      g.toegang.rotatie = (Number(t.toegang.rotatie) || 1) + 1;
       t.toegang = g.toegang;
       t.legacy96 = false;
       t.laatste_rotatie = { idem_hash: idemHash, at: iso() };

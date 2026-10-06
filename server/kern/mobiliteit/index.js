@@ -50,15 +50,23 @@ function maakMobiliteit(state) {
   const nu = () => new Date().toISOString();
   const id = p => (p || 'mb') + crypto.randomBytes(4).toString('hex');
 
+  const opslag = require('./opslag')({ db });
+  const mobSave = () => {
+    const sleutels = opslag.bestaande();
+    return sleutels.length && typeof save.sleutels === 'function'
+      ? save.sleutels(sleutels)
+      : save();
+  };
+
   /* De gedeelde context. Hij wordt EEN keer bij het opstarten gevuld en aan
      alle deelmodules meegegeven; kruisverwijzingen lopen erover, zodat er geen
      module een andere rechtstreeks hoeft te requiren. De volgorde hieronder is
      gedrag: assets leunt op het register, de opdracht op plekken en het
      register, matching op assets, dispatch op alledrie. */
-  const ctx = { db, save, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes,
+  const ctx = { db, save: mobSave, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes,
     notify, findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan, accounts, afwezigOp };
 
-  ctx.opslag = require('./opslag')({ db: ctx.db });   // de enige db-aanraking; zie ./opslag.js
+  ctx.opslag = opslag;   // de enige db-aanraking; zie ./opslag.js
 
   Object.assign(ctx, require('./register')(ctx));
   Object.assign(ctx, require('./plekken')(ctx));
@@ -106,69 +114,15 @@ function maakMobiliteit(state) {
   ctx.ensureReizen();
   ctx.ensureBeleid();
 
-  /* Wat een reiziger te kiezen heeft, hier, nu. Dit is het antwoord waarmee de
-     app zichzelf opbouwt: welke vervoersvormen staan aan, met welke voertuigen
-     en welke boekingsvorm. Een app die zijn eigen knoppenlijst hardcodeert,
-     loopt binnen een maand uit de pas met het register. */
-  function mobAanbod(waar = {}) {
-    const uit = [];
-    for (const [cat, c] of Object.entries(ctx.CATEGORIEEN)) {
-      const m = ctx.modAan(c.module, waar);
-      if (!m.aan) continue;
-      uit.push({ categorie: cat, naam: c.naam, laag: c.laag, boeking: c.boeking, module: c.module,
-        plaatsen: c.plaatsen, bagage: c.bagage, rolstoel: !!c.rolstoel });
-    }
-    /* Welke ritsoorten er te kiezen zijn. 'charter' is het buitenbeentje: welke
-       module daarvoor moet draaien hangt aan het VOERTUIG (helikopter, vliegtuig
-       of boot) en niet aan de ritsoort. Hier stond eerst de eerste de beste
-       categorie ingevuld, en dan verscheen "charter" in de lijst zodra de gewone
-       taxi aan stond -- een keuze die daarna bij het aanvragen alsnog stukliep.
-       Charter bestaat als er iets op aanvraag te boeken valt, en anders niet. */
-    const soorten = ctx.RITSOORTEN.filter(r => {
-      if (r === 'charter') return uit.some(c => c.boeking === 'aanvraag');
-      const modId = ctx.moduleVoor(r, null);
-      return modId ? ctx.modAan(modId, waar).aan : false;
-    });
-    return { ok: true, waar, categorieen: uit, ritsoorten: soorten,
-      // de drie vormen apart, want ze gedragen zich echt anders in de app
-      direct: uit.filter(c => c.boeking === 'direct'),
-      opAanvraag: uit.filter(c => c.boeking === 'aanvraag'),
-      ervaringen: uit.filter(c => c.boeking === 'ervaring') };
-  }
+  const reiziger = require('./reiziger')({ ctx, schoon });
 
-  /* Het beeld van een reiziger: zijn lopende rit, zijn geschiedenis en zijn
-     favoriete plekken. Bewust een antwoord, want de app toont ze op een
-     scherm en drie losse aanroepen lopen uit de pas. */
-  function mobMijn(session) {
-    const eigen = ctx.opdrachtenVan(session.key);
-    const lopend = eigen.find(o => !['afgerekend', 'geannuleerd', 'voltooid'].includes(o.status)) || null;
-    return { ok: true,
-      lopend: lopend ? Object.assign(ctx.opdrachtBeeld(lopend, true), { positie: lopend.positie || null, mag: ctx.opdrachtVolgende(lopend) }) : null,
-      ritten: eigen.slice(0, 25).map(o => ctx.opdrachtBeeld(o)),
-      favorieten: ctx.favLijst(session).favorieten };
-  }
-
-  /* Een rit aanvragen als lid. De sessie gaat mee zodat 'hier' en een
-     favoriete plek op te lossen zijn, en de pas gaat mee als doelgroep zodat
-     het register per pas kan verschillen. */
-  function mobVraag(session, body = {}) {
-    if (session.tier === 'guest') return { status: 403, error: 'RTG Vervoer is voor leden.' };
-    return ctx.opdrachtMaak({ soort: 'lid', key: session.key, session, groep: session.tier,
-      org: body.namensOrganisatie ? schoon(body.namensOrganisatie, 20) : null,
-      stad: schoon(body.stad, 40) || null }, body);
-  }
-
-  /* Annuleren mag alleen de reiziger zelf (of de dispatcher, via zijn eigen
-     ingang). Zonder deze eigendomscontrole kan iedereen met een ref-nummer de
-     rit van een ander afzeggen. */
-  function mobAnnuleer(session, body = {}) {
-    const o = ctx.opdrachtMet(schoon(body.ref, 30));
-    if (!o) return { status: 404, error: 'Opdracht niet gevonden.' };
-    if (o.reiziger !== session.key) return { status: 403, error: 'Dit is uw rit niet.' };
-    return ctx.opdrachtAnnuleer(o.ref, 'lid', body.reden);
-  }
-
-  return Object.assign({}, ctx, { mobAanbod, mobMijn, mobVraag, mobAnnuleer });
+  /* ctx.save is de gerichte mobiliteitscommit voor de deelmodules. Hij mag
+     nooit als `save` naar de gedeelde kern lekken: kernlaag6 voegt dit
+     antwoord met Object.assign samen en zou dan de algemene opslagfunctie
+     vervangen. Dat liet een WerkOS-route 200 antwoorden terwijl alleen de
+     mobiliteitscollecties waren nagekeken en de werkruimte na SIGKILL weg was.
+     Naar buiten blijft daarom de oorspronkelijke, algemene save zichtbaar. */
+  return Object.assign({}, ctx, reiziger, { save });
 }
 
 module.exports = { maakMobiliteit };

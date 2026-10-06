@@ -55,7 +55,13 @@ module.exports = ({ db, verbinding, statements, merge3, uitStore, naarStore,
         return { status: 409, error: 'Deze economische sleutel hoort al bij een andere boeking.' };
       }
       for (const k of collecties) {
-        const rij = s.lees.get(k) || null;
+        const gevonden = s.lees.get(k) || null;
+        if (gevonden && gevonden.deleted) {
+          kv.exec('ROLLBACK');
+          return { status: 503, code: 'ECONOMISCHE_COLLECTIE_VERWIJDERD',
+            error: 'Een economische projectie is verwijderd; reconciliatie is vereist.' };
+        }
+        const rij = gevonden && !gevonden.deleted ? gevonden : null;
         const liveKopie = kopie(db.data[k] == null ? {} : db.data[k]);
         rijen.set(k, rij); begin.set(k, liveKopie);
         concept[k] = verenig(k, liveKopie, rij);

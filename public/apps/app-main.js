@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'a9ad1479';
+var RTG_BOUW = 'db532206';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4013,6 +4013,7 @@ var RTG_BOUW = 'a9ad1479';
        hernoemde de tegels naar gewone woorden ("Video" in plaats van "Clips"),
        en een tak die daarvoor aftakte kent die keuze nog niet. */
     mediaos:     { naam: 'RTG Media',    url: '/apps/media.html' },
+    library:     { naam: T('app.library', 'LibraryOS'), url: '/apps/library.html' },
     office:      { naam: 'RTDocs',       url: '/apps/office.html' },
     /* werkrol: zie app-main-24a3.js. Alle drie praten alleen met /api/rtgone
        achter officeAuth: zonder kantoorsleutel is de ingang een omleiding. */
@@ -4380,6 +4381,7 @@ var RTG_BOUW = 'a9ad1479';
        contextvraag van WERELDEN.md dat zegt -- wie iets wil ontdekken, leren of
        doorgeven denkt niet dat hij in zijn huishouden of op zijn werk zit. */
       'link:connect',
+      'link:library',
       'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:kwesties', 'link:geven',
       'link:vrienden'] }
   ];

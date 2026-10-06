@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-09-27T17:41:59.831Z",
-  "commit": "84352cb1",
+  "op": "2026-10-04T12:37:58.654Z",
+  "commit": "785176c2",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 0,
   "instrument": "scripts/refundmigratie.js",
-  "node": "v22.22.2"
+  "node": "v22.22.0"
  },
  "soort": "meting",
  "uitleg": "Welke lezer van een betaalstand (`paid`) kan mee naar de tegenboeking. Orders zijn om; rides, tickets en boekingen niet. Dit telt de lezers en wijst ze aan; het VERKLAART ze niet -- een lezer staat op onbekend tot iemand hem met de hand heeft ingedeeld.",
@@ -28,11 +28,11 @@
    "scherm": 0
   },
   "tickets": {
-   "verklaard": 4,
+   "verklaard": 5,
    "onbekend": 5,
    "om": 0,
    "geenWerk": 1,
-   "wacht": 3,
+   "wacht": 4,
    "scherm": 2
   },
   "boekingen": {
@@ -441,6 +441,17 @@
    "gedaan": "filtert op status nieuw/in bereiding en beweegt daarom vanzelf mee"
   },
   {
+   "bestand": "server/routes/supplier/tickets-verkoop.js",
+   "treffers": 1,
+   "laag": "server",
+   "leesbreedte": "venster",
+   "collectie": "tickets",
+   "soort": "grendel",
+   "stand": "wacht",
+   "wat": "de deurverkoop: een herhaling met dezelfde sleutel neemt de vastgehouden plek (`!t.paid`)",
+   "tedoen": "leest `paid` alleen om een eigen, nog onbetaalde vasthouding terug te vinden; gaan tickets om, dan mag een teruggestort kaartje (paid, refunded) daar nooit voor een open vasthouding doorgaan"
+  },
+  {
    "bestand": "server/routes/supplier/verhuur/rit.js",
    "treffers": 1,
    "laag": "server",
@@ -672,13 +683,13 @@
  ],
  "verdwenen": [],
  "telling": {
-  "bestanden": 61,
-  "verklaard": 43,
+  "bestanden": 62,
+  "verklaard": 44,
   "onbekend": 15,
   "verdwenen": 0,
-  "server": 47,
+  "server": 48,
   "scherm": 11,
-  "scherp": 53,
+  "scherp": 54,
   "ruim": 5
  }
 }

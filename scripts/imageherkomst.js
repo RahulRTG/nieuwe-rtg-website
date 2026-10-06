@@ -63,7 +63,8 @@ const UITVOER_BESTANDEN = Object.freeze({
   unit: '.release/ci-suite.json',
   schermen: '.release/ci-schermsuite-bewijs.json',
   pg: '.release/ci-pg-bewijs.json',
-  bron: '.release/bron-release-bewijs.json'
+  bron: '.release/bron-release-bewijs.json',
+  vooraf: '.release/prerelease-workflows.json'
 });
 
 /* ---------------------------------------------------------------------------

@@ -1,23 +1,21 @@
 /* Foundation OS, deel "activiteiten-deur": inschrijven, afmelden en inchecken.
 
-   DIT IS DE OCHTEND ZELF: een rij bij de deur, en het moet in een seconde
-   kloppen. VOL IS EEN WACHTLIJST, GEEN NEE (met de plaats erbij), en AFMELDEN
-   SCHUIFT DE WACHTLIJST OP EN ZEGT WIE. EEN KIND ZONDER TOESTEMMING VAN DE
-   OUDERS KOMT ER NIET IN -- een grendel bij het INCHECKEN, want die toestemming
-   kan tussen inschrijven en de deur alsnog ontbreken. FOTOTOESTEMMING IS EEN
-   APART VELD: nooit afgeleid, zonder invloed op binnenkomen.
+   Een rij bij de deur die in een seconde moet kloppen. VOL IS EEN WACHTLIJST,
+   GEEN NEE (met de plaats), AFMELDEN SCHUIFT OP EN ZEGT WIE. Een kind zonder
+   toestemming van de ouders komt er niet in -- een grendel bij het INCHECKEN,
+   want die kan na het inschrijven alsnog ontbreken. FOTOTOESTEMMING is een
+   apart veld: nooit afgeleid, zonder invloed op binnenkomen.
 
    DE INCHECKCODE IS EEN GEHEIM, GEEN VOLGNUMMER (rtfos.activiteit_incheckcode).
    Hij bewijst een inschrijving aan de deur, ook van een kind. Daarom: 128 bits
    (kern/bearercode.js), op schijf alleen de SHA-256 op de inschrijving, kaal
    alleen in het antwoord op het inschrijven en op een nieuwe code
-   (/api/rtfos/activiteit/incheckcode, dat de vorige intrekt). Issuer, doel en
-   scope, verval aan het eind van de activiteitsdag, max_gebruik 1; afmelden
-   trekt hem in. Inschrijven, nieuwe code, afmelden en inchecken lopen in EEN
-   collectietransactie op `rtfos` (PostgreSQL: advisory lock + FOR UPDATE), dus
-   twee deuren laten een inschrijving een keer binnen en een afmelding wint of
-   verliest van een check-in, nooit allebei. Oude kale codes worden niet
-   gehonoreerd: de stad maakt een nieuwe. */
+   (/api/rtfos/activiteit/incheckcode, roteren of vernieuwen). Issuer, doel,
+   scope, verval aan het eind van de dag, max 1 gebruik; afmelden trekt in.
+   Alles loopt in EEN collectietransactie op `rtfos` (PostgreSQL: advisory lock
+   + FOR UPDATE): twee deuren laten een inschrijving een keer binnen, en een
+   afmelding wint of verliest van een check-in, nooit allebei. Oude kale codes
+   gelden niet: de stad maakt een nieuwe. */
 
 const DOEL = 'activiteit-incheck';
 const SCOPE = Object.freeze(['rtfos.activiteit.incheck']);
@@ -27,8 +25,7 @@ module.exports = (ctx, eigen) => {
   const { beeld, ingeschreven, wachtlijst, schuifOp } = eigen;
   const bearer = require('../bearercode')({ crypto, namespace: 'rtfos.activiteit_incheckcode', nu });
 
-  /* Elke deur-handeling is een transactie op de hele rtfos-collectie; de
-     legacy-codes gaan er bij de eerste keer af. */
+  // Elke deur-handeling: een transactie op rtfos; legacy-codes gaan eraf.
   const transactie = werk => codelevenscyclus.transactie(tx => {
     const staat = tx.staat;
     for (const a of staat.activiteiten || [])
@@ -44,15 +41,16 @@ module.exports = (ctx, eigen) => {
     if (!g.ok) return g;
     return { ok: true, a, w };
   }
-  // Een nieuwe code maakt de vorige ongeldig; hij leeft tot het eind van de activiteitsdag.
+  /* Een code leeft tot het eind van de activiteitsdag. Zelfde einde als de
+     vorige: ROTEREN (kwijt, gelekt); ander (verzet, verlopen): VERNIEUWEN. */
   function geefCode(a, i, door) {
-    const vorig = i.checkin_toegang;
-    if (vorig) bearer.intrekken(vorig, door, 'nieuwe incheckcode');
-    const eind = a.wanneer ? Date.parse(a.wanneer + 'T23:59:59.999Z') : Date.parse(nu()) + 90 * 86400000;
-    const g = bearer.maak({ prefix: 'IN', issuer: 'rtg.rtfos.stad', doel: DOEL, scope: SCOPE,
+    const vorig = i.checkin_toegang, t0 = Date.parse(nu());
+    const eind = a.wanneer ? Date.parse(a.wanneer + 'T23:59:59.999Z') : t0 + 90 * 86400000;
+    const spec = { prefix: 'IN', issuer: 'rtg.rtfos.stad', doel: DOEL, scope: SCOPE,
       onderwerp: { soort: 'activiteit-inschrijving', activiteit: a.id, inschrijving: i.id, stad: a.stad },
-      geldigMs: eind - Date.parse(nu()), maxGebruik: 1 });
-    g.toegang.rotatie = ((vorig && vorig.rotatie) || 0) + 1;
+      geldigheid: eind > t0 + 2e3 ? { verlooptOp: new Date(eind).toISOString() } : { duurMs: 1e3 }, gebruik: { max: 1 }, afgeleid: 'geen' };
+    const g = !vorig ? bearer.maak(spec) : Date.parse(vorig.expires_at) === eind && eind > t0 + 2e3
+      ? bearer.roteer(vorig, { actor: door, prefix: 'IN', afgeleid: 'geen' }) : bearer.vernieuw(vorig, spec, door);
     i.checkin_toegang = g.toegang;
     return g.code;
   }
@@ -134,9 +132,8 @@ module.exports = (ctx, eigen) => {
     });
   }
 
-  /* Inchecken: elke weigering een eigen zin, want aan de deur is "er ging iets
-     mis" onbruikbaar. Het zoeken vergelijkt elke hash van deze activiteit met
-     timingSafeEqual en stopt niet bij een treffer. */
+  /* Elke weigering een eigen zin: aan de deur is "er ging iets mis" onbruikbaar.
+     Zoeken vergelijkt elke hash (timingSafeEqual) en stopt niet bij een treffer. */
   function inchecken(req, id, checkinCode) {
     const gezocht = bearer.hash(String(checkinCode || '').slice(0, 80));
     return transactie(staat => {

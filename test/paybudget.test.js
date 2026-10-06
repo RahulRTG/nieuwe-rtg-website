@@ -126,6 +126,7 @@ test('valt de zaak buiten het beleid, dan blijft dat budget staan', async () => 
 
   const na = (await portefeuille()).posities.find(x => x.rek === anderRek);
   assert.equal(na.saldo, 3000, 'het sportbudget geldt hier niet en is niet aangeraakt');
+  assert.ok(r.body.delen.length > 0, 'de geslaagde betaling heeft een werkelijke financiering');
   assert.ok(r.body.delen.every(d => d.rek !== anderRek), 'het zat niet in de samenstelling');
   assert.equal(await sluit(), true);
 });

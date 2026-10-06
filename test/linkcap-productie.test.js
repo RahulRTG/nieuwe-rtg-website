@@ -15,7 +15,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, stopNet, wachtOpWaarde } = require('./helper');
+const { startServer, stop, stopHard, stopNet, wachtOpWaarde } = require('./helper');
 
 const KYC_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const KEYS = { RTG_ENC_KEY: 'k'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64) };
@@ -40,7 +40,7 @@ async function kassa(base, code) {
 test('twee kassa\'s tegelijk op een code: precies een inning', async t => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-capkas-'));
   const { child, base } = await startServer({ env: { RTG_DATA_DIR: tmp, SMTP_URL: '' } });
-  t.after(() => { stop(child); fs.rmSync(tmp, { recursive: true, force: true }); });
+  t.after(async () => { await stopHard(child); fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); });
   const lid = await nieuwLid(base, 'Race Lid');
   await api(base, '/api/pay/oplaad', { centen: 50000, idem: 'race-op-' + Date.now() }, lid);
   const [k1, k2] = [await kassa(base, 'LUCHT'), await kassa(base, 'KIKUNOI')];
@@ -77,16 +77,18 @@ test('twee kassa\'s tegelijk op een code: precies een inning', async t => {
 
 test('echte productieserver: de grendel link.capability_aanvaarden is eraf', async t => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-capprod-'));
-  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
   const proef = await startServer({ env: { RTG_DATA_DIR: tmp, SMTP_URL: '', ...KEYS } });
   const lid = await nieuwLid(proef.base, 'Productie Lid');
   await stopNet(proef.child);
   const { child, base } = await startServer({ env: { NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: tmp,
     APP_URL: 'https://rtg.voorbeeld.test/', SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
+    STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com', STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
+    TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
     ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg', ...KEYS, RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl',
     OFFICE_CODE: 'GEHEIME-CODE-123', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP', RTG_ISOLATIE_AFDWINGEN: '1',
     RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1' } });
-  t.after(() => stop(child));
+  t.after(() => stopHard(child));   // eerst het proces echt weg, dan pas de map
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
   const r = await api(base, '/api/link/cap/maak', { handeling: 'geld.kassa', maxCenten: 2000 }, lid, PROXY);
   const lijf = await json(r);
   assert.notEqual(lijf.code, 'MONEY_CREDENTIAL_NOT_RELEASED', JSON.stringify(lijf));

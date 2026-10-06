@@ -26,7 +26,12 @@ function namenVan(wijzigingen) {
    reden, dus "8x 5xx op /api/supplier/backoffice" was wel te tellen en niet te
    verklaren. De reden hoort in het log, één regel, met het pad erbij. */
 function meldIntern(req, err) {
-  if (!err || (err.code !== 'PG_SAVE_ONTBREEKT' && err.code !== 'PG_ONGEZOND' && err.code !== 'PG_GEEN_COMMIT')) return;
+  /* Een conflict is voor de client bewust nietszeggend, maar zonder de
+     collectie/pad uit de interne fout is een multi-instance-race niet te
+     onderzoeken: in productie bleef alleen een kale HTTP 409 over. De fout
+     bevat geen waarden, uitsluitend het structurele pad waar twee schrijvers
+     elkaar raakten, en hoort daarom wel in het interne bewijslog. */
+  if (!err || !['PG_SAVE_ONTBREEKT', 'PG_ONGEZOND', 'PG_GEEN_COMMIT', 'PG_REQUEST_CONFLICT'].includes(err.code)) return;
   console.error('[opslagpoort] ' + err.code + ' op ' + (req && req.method) + ' ' + (req && req.path)
     + ': ' + String(err.message || '').slice(0, 300));
 }

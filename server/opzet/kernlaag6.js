@@ -101,7 +101,7 @@ kern.muziekMaak.bestanden = require('../kern/muziek-bestanden')({ db, save, cryp
 Object.assign(kern, kern.muziekSamen);
 Object.assign(kern, require('../kern/muziek-uitgave')({ db, save, crypto, schoon,
   trackMet: kern.muziekTrackMet, codenaamVan: kern.codenaamVan,
-  makersVan: kern.muziekMakersVan, notify,
+  makersVan: kern.muziekMakersVan, notify, sseToOffice,
   // de haak van de Media OS: nieuw werk wekt volgers (zie ./mediaos.js)
   nieuwWerk: (key, soort, titel) => (kern.mediaNieuwWerk ? kern.mediaNieuwWerk(key, soort, titel) : null),
 }));

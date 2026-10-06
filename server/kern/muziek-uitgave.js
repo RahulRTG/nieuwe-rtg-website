@@ -31,7 +31,11 @@ const ONDER = ['codenaam', 'rtg'];
 const ZAAL = 30;                 // wat je in één keer te horen krijgt
 const MAX_REACTIES = 200;
 
-module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, publiekeTrack, notify, nieuwWerk }) => {
+module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, publiekeTrack, notify, sseToOffice, nieuwWerk }) => {
+  // kantoorbaan (backoffice leest 'notify'); notify('kantoor') had geen lezer
+  const kantoorMelding = u => { try { if (sseToOffice) sseToOffice('notify', { icon: 'muziek', title: 'Klankwerk',
+    body: 'Aanvraag om uit te geven onder de RTG-naam ("' + u.naam + '").' }); } catch (e) {} };
+
   const nu = () => new Date().toISOString();
   const rid = () => 'u' + crypto.randomBytes(5).toString('hex');
 
@@ -74,9 +78,7 @@ module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, 
     };
     U().lijst.unshift(u);
     save();
-    if (onder === 'rtg' && notify) {
-      try { notify('kantoor', 'Klankwerk: aanvraag om uit te geven onder de RTG-naam ("' + u.naam + '").'); } catch (e) {}
-    }
+    if (onder === 'rtg') kantoorMelding(u);
     /* Nieuw werk: de Media OS wekt de volgers die MUZIEK van deze maker aan
        hebben staan. Laat gebonden en optioneel -- het Klankwerk hoeft niet te
        weten dat er een laag boven hem hangt, en werkt zonder hem gewoon door. */
@@ -104,7 +106,7 @@ module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, 
     u.rtgAanvraag = 'gevraagd';
     u.rtgReden = '';
     save();
-    if (notify) { try { notify('kantoor', 'Klankwerk: aanvraag om uit te geven onder de RTG-naam ("' + u.naam + '").'); } catch (e) {} }
+    kantoorMelding(u);
     return { status: 200, ok: true, uitgave: publiek(u, sess.key) };
   }
 
@@ -125,9 +127,9 @@ module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, 
     save();
     if (notify) {
       try {
-        notify(u.key, ja
+        notify(u.key, { title: 'Klankwerk', body: ja
           ? 'Uw stuk "' + u.naam + '" komt uit onder de RTG-naam.'
-          : 'Uw stuk "' + u.naam + '" blijft onder uw codenaam staan.' + (u.rtgReden ? ' ' + u.rtgReden : ''));
+          : 'Uw stuk "' + u.naam + '" blijft onder uw codenaam staan.' + (u.rtgReden ? ' ' + u.rtgReden : '') });
       } catch (e) {}
     }
     return { status: 200, ok: true, onder: u.onder, aanvraag: u.rtgAanvraag };

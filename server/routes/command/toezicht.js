@@ -35,8 +35,6 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
   app.post('/api/command/recht/introk', officeAuth, (req, res) => veilig(res, () =>
     command.toegang.trekIn(String(req.body.id || ''), wie(req), req.body.reden)));
 
-  app.post('/api/command/mandaat', officeAuth, (req, res) => veilig(res, () =>
-    command.toegang.mandaat(req.body.van, req.body.aan, req.body.terrein, wie(req), req.body.tot, req.body.reden)));
 
   /* ---------- RTG BIJSTAND, de RTG-kant ----------
 

@@ -36,11 +36,20 @@
    defineProperty eronder; `writable` en `leider` wel. */
 const db = { writable: process.env.RTG_ROL !== 'standby', leider: process.env.RTG_ROL !== 'standby' };
 const verzoekcontext = require('./verzoekcontext');
+const mutatietracker = require('./mutatietracker');
 let ruweData = null;
 function zetRuw(v) {
+  /* Eerst de inhoudswijziging aanwijzen, daarna de begrotingsgrens eromheen.
+     De buitenste begrotingsproxy geeft de marker en alle nested proxies gewoon
+     door. Daardoor blijft er één db.data en geen concurrerend schaduwmodel. */
   let bewaakt = v;
-  try { bewaakt = require('../opzet/begroting').bewaak(v); }
-  catch (e) { bewaakt = v; }
+  try {
+    // Krijgt db.data al een begrotingswikkel, dan gaat de tracker eronder en
+    // houdt de nieuwe buitenste wikkel dezelfde instellingen.
+    const i = require('../opzet/begroting').instelling(v);
+    bewaakt = mutatietracker.bewaak(i ? i.doel : v);
+    bewaakt = require('../opzet/begroting').bewaak(bewaakt, i && { handeling: i.nu, modus: i.modus, grens: i.grens, log: i.log });
+  } catch (e) { bewaakt = mutatietracker.bewaak(v); /* de tracker blijft de minimale wikkel */ }
   ruweData = bewaakt;
 }
 Object.defineProperty(db, 'data', {

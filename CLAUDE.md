@@ -1267,10 +1267,10 @@ KANTOORMACHT.md) maar wie hij IS, hoe hij binnenkomt en wanneer het systeem juis
 niets moet zeggen. Lees die vóór je aan onboarding, personeelsidentiteit,
 werktoewijzing of een kantoormelding werkt. Blok 0 van KANTOORMACHT.md staat er
 inmiddels als meter (`npm run kantoormacht`, `KANTOORMACHT.json`) en die vervangt
-de lexicale getallen van 2 september door gemeten getallen: <!--getal:kantoor.routes-->619<!--/getal-->
-kantoorroutes, waarvan er <!--getal:kantoor.deurEistMens-->194<!--/getal--> een bewezen mens eisen en
-<!--getal:kantoor.deurGedeeld-->425<!--/getal--> achter de gedeelde code hangen — en
-<!--getal:kantoor.anoniem-->358<!--/getal--> zijn er anoniem uitvoerbaar. Let op de graden: de
+de lexicale getallen van 2 september door gemeten getallen: <!--getal:kantoor.routes-->688<!--/getal-->
+kantoorroutes, waarvan er <!--getal:kantoor.deurEistMens-->245<!--/getal--> een bewezen mens eisen en
+<!--getal:kantoor.deurGedeeld-->443<!--/getal--> achter de gedeelde code hangen — en
+<!--getal:kantoor.anoniem-->348<!--/getal--> zijn er anoniem uitvoerbaar. Let op de graden: de
 deur-assen komen uit de ROUTER en zijn hard, `anoniem` is lexicaal en dus een
 ONDERgrens — daarom hangt `npm run kantoormacht:controle` (die alleen mag dalen)
 aan de harde as en niet aan de zachte. De kern in één zin: **een spoor dat eindigt
@@ -1621,7 +1621,7 @@ mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanl
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->131<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->113<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->422<!--/getal-->
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->113<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->424<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -2526,14 +2526,14 @@ het meten: de sluiting van het stuur is klein en precies één module leest van
 schijf -- `VERTROUWEN.json`, een REGISTER. Een register lezen mag, een `.js`
 lezen niet; dát onderscheid is de invariant. De vraag of de 77 registers samen
 één Codewereld vormen is eerst GEMETEN (`npm run codewereld`, `CODEWERELD.json`)
-in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->6119<!--/getal--> van
-<!--getal:codewereld.paden-->6564<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
+in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->6374<!--/getal--> van
+<!--getal:codewereld.paden-->6791<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->23473<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->6083<!--/getal--> require-kanten heen en terug, met de eigen parser
-en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->309<!--/getal--> niet-gelezen bestanden staan er MET reden in
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->26505<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->7249<!--/getal--> require-kanten heen en terug, met de eigen parser
+en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->313<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
 aanroeppositie is geen verwijzing), en iets beweren over welk symbool een route
@@ -2541,22 +2541,22 @@ afhandelt. Twee dingen daar niet wegpoetsen: de brug route -> bestand rustte
 op ÉÉN register, dus de nul tegenspraken erin was `niet vast te stellen` en geen
 groen -- er ligt sinds 3 september een tweede bron naast (`ROUTEBRON.json`, uit de
 ROUTER in plaats van uit de bronboom), de dekking staat op
-<!--getal:codewereld.brugDekkingPct-->95.9<!--/getal-->% en er zijn <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken. Let daarbij op het onderscheid
+<!--getal:codewereld.brugDekkingPct-->94.7<!--/getal-->% en er zijn <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken. Let daarbij op het onderscheid
 dat die meting afdwong: een verschil tussen twee registers van VERSCHILLENDE
 leeftijd is een leeftijdsverschil en geen tegenspraak, en die twee worden nooit
 opgeteld. Verder is het bronbereik voor gedrag
-<!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
+<!--getal:codewereld.bronGedragPct-->78.9<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
 register iets over gedrag, dus een "80-95% zonder bron te beantwoorden" haalt die
 grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
-<!--getal:codewereld.bronServerPct-->60.5<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->42.2<!--/getal-->%: over de schermen wisten de registers
+<!--getal:codewereld.bronServerPct-->90<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->41.3<!--/getal-->%: over de schermen wisten de registers
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
-<!--getal:graaf.kanten-->27314<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
-(<!--getal:graaf.routesMetSymbool-->3159<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
+<!--getal:graaf.kanten-->30271<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
+(<!--getal:graaf.routesMetSymbool-->3309<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
-<!--getal:graaf.opgelostPct-->25.9<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
-`res.json()` of `String()`, en <!--getal:graaf.contextobject-->16017<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
+<!--getal:graaf.opgelostPct-->25.3<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
+`res.json()` of `String()`, en <!--getal:graaf.contextobject-->20432<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
 in server/opzet/ wordt samengesteld. Dat leek statisch onherleidbaar tot
 `CONTEXTPROEF.json` het NAMAT (`npm run contextproef`, een runtime-meting in de
 domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> routes die werk deden reiken er maar
@@ -2564,14 +2564,14 @@ domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> rout
 BEDRADEN worden opgehaald. Het gat is dus grotendeels statisch en niet runtime -- de meting
 keerde de voorspelling om, en dat is precies waarom hij er is. `KERNHERKOMST.json`
 (`npm run kernherkomst`) volgt die aanwijzing en beantwoordt wie welke naam in de
-zak legt: <!--getal:kern.namen-->1246<!--/getal--> namen over <!--getal:kern.vulplekken-->300<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->29<!--/getal--> plekken die
+zak legt: <!--getal:kern.namen-->1338<!--/getal--> namen over <!--getal:kern.vulplekken-->335<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->30<!--/getal--> plekken die
 niet te volgen zijn (elk met een reden, geen daarvan geraden). Dat leverde
-<!--getal:graaf.viaKern-->5942<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.9<!--/getal-->%; de restbak
-van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->416<!--/getal--> aanroepen (0,27%), en
+<!--getal:graaf.viaKern-->4848<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.3<!--/getal-->%; de restbak
+van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->461<!--/getal--> aanroepen (0,27%), en
 daar zat geen raadsel in maar vijf BEKENDE vormen die de meter niet herkende --
 een restbak vol bekende vormen laat je denken dat je code ondoorgrondelijk is
 terwijl je meter te weinig weet. Twee
-dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->4127<!--/getal--> van die kanten wijzen alleen het BESTAND
+dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->2923<!--/getal--> van die kanten wijzen alleen het BESTAND
 aan en niet de functie (een fabriek mag `{ walletVoeg: voeg }` teruggeven, en dan
 is de zaknaam niet de symboolnaam), en een parameter die `save` heet wordt NIET
 op zijn naam als kernnaam herkend maar op zijn functie -- alleen de fabrieken die
@@ -2579,12 +2579,12 @@ het register aanwijst leveren zaknamen. Ten tweede telt CODEWERELD.json sinds
 die dag DRIE dingen apart (structuur, relatie, gedrag), omdat een index die elk
 bestand noemt elke dekkingsvraag triviaal waar maakt: dat gebeurde twee keer op
 rij, en het zag er beide keren uit als vooruitgang. Alleen de gedragsteller
-(<!--getal:codewereld.bronGedragPct-->56.2<!--/getal-->%) is de bovengrens voor een vraag als "klopt het" -- en die kwam
+(<!--getal:codewereld.bronGedragPct-->78.9<!--/getal-->%) is de bovengrens voor een vraag als "klopt het" -- en die kwam
 voor de schermen pas op gang met `SCHERMGEDRAG.json`, dat per scherm SAMENSTELT
 wat de routes eronder al gemeten hadden (schrijft het, welke rol, wat is het
 bewijs waard). Twee dingen daar niet wegpoetsen: het is AFGELEID gedrag, dus
 `schrijft: nee` betekent "verandert niets aan de SERVERKANT" en niet "verandert
-niets"; en de <!--getal:schermgedrag.zonderGrond-->148<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
+niets"; en de <!--getal:schermgedrag.zonderGrond-->153<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
 in maar tellen niet als dekking (`zonderUitspraak`) -- anders stijgt een
 dekkingsgetal doordat er een meter bij komt die zwijgt. Die meter begon
 op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; de aanroepgraaf begon op 587 onbekende
@@ -2667,8 +2667,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->4008<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2780<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->4074<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2690<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele

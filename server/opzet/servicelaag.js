@@ -45,6 +45,10 @@ function hangOp(kern, hulp) {
       hulp.sendPushToUser(id, { title: bericht.titel, body: bericht.tekst, tag: 'service-' + bericht.zaak });
     }
   }));
+  kern.serviceLoopSource = require('../kern/service/loop-source')({db,bewerkCollectie:hulp.bewerkCollectie,
+    zaken:kern.serviceZaken,kwaliteit:kern.serviceKwaliteit,authorize:actorRef=>!!(kern.magBalie&&kern.magBalie(actorRef)),
+    authorizeRecipient:(actorRef,workspaceCode)=>kern.workLoopSource.authorization(actorRef,workspaceCode,['besluit'])});
+  if(kern.loopFabric&&typeof kern.loopFabric.registerSource==='function')kern.loopFabric.registerSource('service',kern.serviceLoopSource);
 
   /* DE MAILINGANG AANZETTEN. kern/mailaanname.js is opgezet voordat deze laag
      bestond en kent `hulp@` daarom pas vanaf hier. Zonder deze regel valt de

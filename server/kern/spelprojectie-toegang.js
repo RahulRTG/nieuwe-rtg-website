@@ -39,30 +39,36 @@ module.exports = ({ crypto, nu }) => {
       if (bearer.zelfdeHash(item.toegang && item.toegang.code_hash, codeHash)) gevonden = true;
     return gevonden;
   };
-  const uniek = (rijen, rij, bearer, veld, historie, opties) => {
+  const uniek = (rijen, rij, bearer, veld, historie, maak) => {
     for (let poging = 0; poging < 8; poging++) {
-      const gemaakt = bearer.maak(opties);
+      const gemaakt = maak();
       if (!bestaat(rijen, gemaakt.toegang.code_hash, veld, historie, bearer)) return gemaakt;
     }
     return null;
   };
 
-  function nieuweKoppeling(rijen, rij, issuer, rotatie) {
-    const gemaakt = uniek(rijen, rij, koppel, 'koppeling', 'koppeling_historie', {
-      prefix: 'GAME', issuer, doel: KOPPEL_DOEL, scope: KOPPEL_SCOPE,
-      onderwerp: { soort: 'spelprojectie', id: rij.id, potje: rij.potje },
-      geldigMs: KOPPEL_MS, maxGebruik: 1
-    });
-    if (gemaakt) gemaakt.toegang.rotatie = Math.max(1, Number(rotatie) || 1);
-    return gemaakt;
+  /* afgeleid 'geen': de schermsessie die uit de koppeling ontstaat is een
+     eigen credential, en die sluit dit domein zelf (intrekActief). */
+  const koppelSpec = (rij, issuer) => ({ prefix: 'GAME', issuer, doel: KOPPEL_DOEL, scope: KOPPEL_SCOPE,
+    onderwerp: { soort: 'spelprojectie', id: rij.id, potje: rij.potje },
+    geldigheid: { duurMs: KOPPEL_MS }, gebruik: { max: 1 }, afgeleid: 'geen' });
+  /* Een nieuwe uitgifte op een bestaande rij is VERNIEUWEN en geen roteren:
+     een speler op naam geeft een verse koppeling van vijftien minuten uit.
+     De eerste uitgever blijft de uitgever; wie nu uitgeeft staat als `door`
+     in de geschiedenis (kern/bearercode-keten.js). */
+  function nieuweKoppeling(rijen, rij, actor) {
+    const oud = rij.koppeling;
+    return uniek(rijen, rij, koppel, 'koppeling', 'koppeling_historie', oud
+      ? () => koppel.vernieuw(oud, koppelSpec(rij, oud.issuer), actor)
+      : () => koppel.maak(koppelSpec(rij, actor)));
   }
 
   function nieuweSessie(rijen, rij) {
-    const gemaakt = uniek(rijen, rij, scherm, 'scherm', 'scherm_historie', {
+    const gemaakt = uniek(rijen, rij, scherm, 'scherm', 'scherm_historie', () => scherm.maak({
       prefix: 'SCREEN', issuer: 'spelprojectie', doel: SCHERM_DOEL,
       scope: SCHERM_SCOPE, onderwerp: { soort: 'spelprojectie', id: rij.id, potje: rij.potje },
       geldigMs: SCHERM_MS, maxGebruik: 1
-    });
+    }));
     /* `gebruik` betekent hier activering, niet iedere read-only poll. De harde
        gebruiksgrens van deze sessie is haar expires_at; polling wordt door de
        HTTP-rem begrensd en veroorzaakt geen opslagwrite om de drie seconden. */

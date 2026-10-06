@@ -73,7 +73,7 @@ test('kascode, tik en de Link-drager zijn open; iedere inning blijft op een plek
   assert.deepEqual(serverAanroepBestanden(/\b(?:pay\.kasInt|kern\.kasInnen)\s*\(/), ['server/kern/pay/kasinnen.js',
     'server/kern/pay/kassacode.js', 'server/routes/festival/verkoop.js', 'server/routes/pay-zaak.js',
     'server/routes/supplier/kassa/afrekenen.js', 'server/routes/supplier/retail.js',
-    'server/routes/supplier/kassa/verkoop.js', 'server/routes/supplier/tickets.js'].sort());
+    'server/routes/supplier/kassa/verkoop.js', 'server/routes/supplier/tickets-verkoop.js'].sort());
   const kassa = fs.readFileSync(path.join(__dirname, '..', 'server/kern/pay/kassa.js'), 'utf8');
   assert.match(kassa, /return claim\.neem\(\{ code, soort: 'kas'/, 'kasInt int alleen langs de claim-saga');
   assert.deepEqual(serverAanroepBestanden(/COL: 'pay(?:Kas|Tik)Toegang'/),

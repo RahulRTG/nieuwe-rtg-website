@@ -1,0 +1,157 @@
+{
+ "stempel": {
+  "op": "2026-10-05T12:33:25.320Z",
+  "commit": "e40699ce4",
+  "boomVuil": false,
+  "boomAnders": 0,
+  "instrument": "scripts/contextdoorgifte.js",
+  "node": "v22.22.0"
+ },
+ "uitleg": "Loopt de identiteit van een verzoek door de zeven async-contexten waar hij hoort, en niet verder? Twaalf invarianten uit het Fase 2-onderzoek (RTG Request Frame), elk apart en zonder totaalcijfer. De ratel mag alleen de goede kant op; zie test/contextdoorgifte.test.js.",
+ "hoe": "npm run contextdoorgifte",
+ "grens": "Alleen statische leden- en zaakroutes die de rolkaart een rol geeft (vandaag allemaal POST, zie noemer.perMethode) met een leeg lijf, geen PostgreSQL- of Redis-stand, alleen timers via de globale timerfuncties. Een lege noemer is niet vast te stellen.",
+ "richting": {
+  "i1AandeelMetCorrelatie": "omhoog",
+  "i2ClientSleutel": "omlaag",
+  "i2ExternFout": "omlaag",
+  "i3CorrelatieOneens": "omlaag",
+  "i4LekPlekken": "omlaag",
+  "i5StilNaSluiten": "omlaag",
+  "i8ActorSleutel": "omlaag",
+  "i9EnterWith": "omlaag",
+  "i11ZonderOorzaak": "omlaag",
+  "i12AbonneeInVerzoek": "omlaag",
+  "i10AuthZonderContext": "omlaag",
+  "i13TweedeIdentiteit": "omlaag",
+  "i14FrameAfwezig": "omlaag",
+  "i14FrameOneens": "omlaag"
+ },
+ "ratel": {
+  "i5StilNaSluiten": 0,
+  "i9EnterWith": 0,
+  "i1AandeelMetCorrelatie": 1,
+  "i3CorrelatieOneens": 0,
+  "i10AuthZonderContext": 0,
+  "i4LekPlekken": 0,
+  "i2ClientSleutel": 0,
+  "i2ExternFout": 0,
+  "i13TweedeIdentiteit": 0,
+  "i14FrameAfwezig": 0,
+  "i14FrameOneens": 0,
+  "i8ActorSleutel": 0,
+  "i12AbonneeInVerzoek": 0,
+  "i11ZonderOorzaak": 0
+ },
+ "gemeten": {
+  "i5": {
+   "perContext": {
+    "handeling": "weigert",
+    "effectmeter": "weigert",
+    "kosten/haak": "meldt",
+    "ai-context": "weigert",
+    "verzoekcontext": "weigert",
+    "verzoekframe": "weigert",
+    "bijeen": "weigert"
+   },
+   "stilNaSluiten": 0,
+   "contexten": 7
+  },
+  "i9": {
+   "enterWith": 0,
+   "waar": []
+  },
+  "i12": {
+   "perTransport": {
+    "in-proces": [],
+    "redis": []
+   },
+   "lekkend": 0
+  },
+  "i1": {
+   "binnenVerzoek": 68,
+   "metVerzoekCorrelatie": 68,
+   "metActor": 3,
+   "actorSleutel": 0,
+   "metSessie": 51,
+   "kanalen": {
+    "rtg:sessies:v1": 26,
+    "sse": 33,
+    "link-rem": 2,
+    "rtg:intrekking:v1": 7
+   },
+   "aandeelMetCorrelatie": 1
+  },
+  "i2": {
+   "proeven": 3,
+   "serverZag": 3,
+   "overgenomen": 0,
+   "botsing": 0,
+   "externFout": 0,
+   "clientSleutel": 0,
+   "antwoordLengtes": [
+    16,
+    16,
+    16
+   ]
+  },
+  "i3": {
+   "authPunten": 3108,
+   "eens": 3108,
+   "oneens": 0
+  },
+  "i11": {
+   "proeven": 1,
+   "buiten": "04f2f959b1931026",
+   "oorzaak": "04f2f959b1931026",
+   "zonderOorzaak": 0
+  },
+  "i4": {
+   "gezetInVerzoek": 0,
+   "gevuurdNaAfloop": 0,
+   "naAfloopMetDrager": 0,
+   "naAfloopMetAiSessie": 0,
+   "plekken": {},
+   "lekPlekken": 0
+  },
+  "i13": {
+   "geidentificeerd": 3114,
+   "herkend": 4,
+   "tweedeIdentiteit": 0,
+   "naSluiten": 0
+  },
+  "i14": {
+   "authPunten": 3108,
+   "metFrame": 3108,
+   "eens": 3108,
+   "oneens": 0,
+   "waarom": {}
+  },
+  "i10": {
+   "authPunten": 3108,
+   "metHandeling": 3108,
+   "metAiContext": 3108,
+   "metEffectteller": 3108,
+   "post": 3108,
+   "postMetAlleDrie": 3108
+  },
+  "noemer": {
+   "verzoeken": 3175,
+   "perMethode": {
+    "POST": 3175
+   },
+   "statussen": {
+    "200": 786,
+    "400": 478,
+    "403": 722,
+    "404": 952,
+    "409": 176,
+    "503": 61
+   },
+   "rollen": [
+    "member",
+    "supplier"
+   ],
+   "sessieHernieuwd": 12
+  }
+ }
+}

@@ -318,11 +318,12 @@
     "site.passen.community": "site/passen/community.html",
     "site.passen.lifestyle-pass": "site/passen/lifestyle-pass.html",
     "site.passen.rtg-pass": "site/passen/rtg-pass.html",
+    "site.techniek": "site/techniek/techniek.html",
     "site.werelden.foundationos": "site/werelden/foundationos.html",
     "site.werelden.livingos": "site/werelden/livingos.html",
     "site.werelden.travelos": "site/werelden/travelos.html",
     "site.werelden.workos": "site/werelden/workos.html",
-    "site.techniek": "site/techniek/techniek.html"
+    "library.werk": "apps/library.html"
   },
   "oordelen": [
     {
@@ -757,6 +758,66 @@
       "stand": "blijft",
       "eigenaar": null,
       "reden": "Videobellen met iemand en bellen met RTG over een zaak; de meeleesbaan (shared/meelezen.js) is al gedeeld (SERVICE.md par. 13)."
+    },
+    {
+      "schermen": [
+        "apps/foundation/beheer.html",
+        "apps/foundation/contact.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "De twee gedeelde paden zijn de basis van de gezinsdeur (/api/foundation en /api/foundation/gezin/ als voorvoegsel in de gedeelde sessieschil), geen handeling. Beheren regelt wie in het gezin hoort, contact gaat over berichten aan de RTFoundation."
+    },
+    {
+      "schermen": [
+        "apps/foundation/beheer.html",
+        "apps/foundation/school.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "De twee gedeelde paden zijn de basis van de gezinsdeur (/api/foundation en /api/foundation/gezin/ als voorvoegsel in de gedeelde sessieschil), geen handeling. Beheren regelt het gezin, school toont de lessen en de klas van een kind."
+    },
+    {
+      "schermen": [
+        "apps/foundation/contact.html",
+        "apps/foundation/school.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "De twee gedeelde paden zijn de basis van de gezinsdeur (/api/foundation en /api/foundation/gezin/ als voorvoegsel in de gedeelde sessieschil), geen handeling. Contact is een bericht aan de RTFoundation, school de lessen en de klas."
+    },
+    {
+      "schermen": [
+        "apps/foundation/bord.html",
+        "apps/foundation/markt.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "De gedeelde paden zijn het eenmalige stroomticket van de gedeelde realtime-laag (B25: de lessleutel verlaat de URL) en het lesvoorvoegsel. Het bord is de docentkant van een les, Koopje de ruilmarkt."
+    },
+    {
+      "schermen": [
+        "apps/foundation/markt.html",
+        "apps/foundation/schrift.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "Zie bord/markt: alleen het stroomticket van de gedeelde realtime-laag (B25). Koopje is de ruilmarkt, het schrift de leerlingkant van een les."
+    },
+    {
+      "schermen": [
+        "apps/leerhuis-werk.html",
+        "apps/leerhuis.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "De gedeelde paden zijn het generieke doe/lees-kanaal van het leerhuis; de handeling staat in het lijf. Mijn leerhuis is de leerling (leerhuis.mijn), aan het werk de trainer, assessor of kenniseigenaar (leerhuis.werk)."
     }
   ],
   "schermen": {
@@ -2644,6 +2705,12 @@
       "doelgroep": "publiek",
       "doel": "Begrijpen wat de RTG Pass (het hele platform) inhoudt en de pas ervaren."
     },
+    "site/techniek/techniek.html": {
+      "capability": "site.techniek",
+      "rol": "eigenaar",
+      "doelgroep": "publiek",
+      "doel": "Begrijpen hoe RTG onder de motorkap werkt (codenamen, kluis, CSP, lokale modellen, meters), met de bestanden erbij en wat nog niet af is."
+    },
     "site/werelden/foundationos.html": {
       "capability": "site.werelden.foundationos",
       "rol": "eigenaar",
@@ -2668,11 +2735,11 @@
       "doelgroep": "publiek",
       "doel": "Begrijpen wat WorkOS voor mijn organisatie kan betekenen aan de hand van een uitgewerkt voorbeeldmoment."
     },
-    "site/techniek/techniek.html": {
-      "capability": "site.techniek",
+    "apps/library.html": {
+      "capability": "library.werk",
       "rol": "eigenaar",
-      "doelgroep": "publiek",
-      "doel": "Begrijpen hoe RTG onder de motorkap werkt (codenamen, kluis, CSP, lokale modellen, meters), met de bestanden erbij en wat nog niet af is."
+      "doelgroep": "lid",
+      "doel": "Een maker werkt in Foundation LibraryOS aan een intellectueel werk: inhoud, bijdragen, afspraken, rechten en een vaste editie, en leest die editie."
     }
   }
 }

@@ -1,0 +1,828 @@
+{
+  "schemaVersion": 1,
+  "kind": "RTG_LOOP_FABRIC_EXECUTION_MATRIX",
+  "sourceOfTruth": false,
+  "warning": "Dit is een preflight- en migratieregister. GO autoriseert alleen de beschreven scope; source domains blijven eigenaar.",
+  "readinessClasses": [
+    "READY_TO_IMPLEMENT",
+    "NEEDS_TECHNICAL_PREREQUISITE",
+    "NEEDS_HUMAN_DECISION",
+    "BLOCKED_BY_SCALE_ARCHITECTURE",
+    "PROHIBITED",
+    "NO_LEARNING_VALUE"
+  ],
+  "goRule": "Default bij twijfel is PHASE. Een batch met technische candidates blijft PHASE totdat afzonderlijke source-flows alle poorten halen.",
+  "sharedPrerequisites": [
+    "source-flowdecompositie per brede capability",
+    "versioned source change target waar afwezig",
+    "durable source event/outbox en recoverybewijs",
+    "actuele authority plus source-issued eligibility per flow",
+    "partitioneringsbesluit vóór high-volume aansluiting"
+  ],
+  "independentBatches": [
+    "B02_WORK_OPERATIONS",
+    "B03_KNOWLEDGE_DEVELOPMENT",
+    "B04_WORLD_ASSET_MEMORY",
+    "B05_SERVICE_OPERATIONS"
+  ],
+  "decisionBoundBatches": [
+    "B07_DISCOVERY_AI_NETWORK",
+    "B08_HUMAN_PROGRAMS",
+    "B09_REGULATED_PRIVATE"
+  ],
+  "scaleBoundBatches": [
+    "B06_HIGH_VOLUME"
+  ],
+  "recommendedOrder": [
+    "B00_FINAL_GUARDS",
+    "B01_PROVEN_CLOSURE",
+    "B02_WORK_OPERATIONS",
+    "B03_KNOWLEDGE_DEVELOPMENT",
+    "B04_WORLD_ASSET_MEMORY",
+    "B05_SERVICE_OPERATIONS",
+    "B06_HIGH_VOLUME",
+    "B07_DISCOVERY_AI_NETWORK",
+    "B08_HUMAN_PROGRAMS",
+    "B09_REGULATED_PRIVATE"
+  ],
+  "batches": [
+    {
+      "id": "B00_FINAL_GUARDS",
+      "name": "Final dispositions en architectuurpoorten",
+      "status": "GO",
+      "domains": [
+        "communication",
+        "files-documents",
+        "health-care",
+        "loop-fabric",
+        "personal-life",
+        "platform"
+      ],
+      "capabilities": [
+        "member-dm",
+        "gedachten",
+        "noodkaart",
+        "loop-fabric",
+        "dom-notities",
+        "dom-asset",
+        "kern-state",
+        "kern-live",
+        "kern-taal",
+        "kern-klok",
+        "kern-gids",
+        "ov-media",
+        "ov-browser",
+        "rtf-samen"
+      ],
+      "readiness": {
+        "READY_TO_IMPLEMENT": 1,
+        "NEEDS_TECHNICAL_PREREQUISITE": 0,
+        "NEEDS_HUMAN_DECISION": 0,
+        "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
+        "PROHIBITED": 5,
+        "NO_LEARNING_VALUE": 8
+      },
+      "decisionDossiers": [],
+      "technicalPrerequisites": [],
+      "blastRadius": {
+        "sourceOwners": 14,
+        "kernelModules": 2552,
+        "mutationContracts": 59,
+        "routes": 62,
+        "screens": 10,
+        "dataSchema": "geen runtimewijziging",
+        "newSharedPrimitive": "geen",
+        "crossDomainDependencies": "geen",
+        "privacyImpact": "bestaande deny- en no-valuepoorten",
+        "authorityImpact": "geen nieuwe authority",
+        "recoveryImpact": "niet van toepassing",
+        "scaleImpact": "geen projectiegroei",
+        "expectedTests": [
+          "coverage-registry",
+          "architecture-gates"
+        ]
+      },
+      "blockers": []
+    },
+    {
+      "id": "B01_PROVEN_CLOSURE",
+      "name": "Bestaande bewezen slices per flow afbakenen",
+      "status": "PHASE",
+      "domains": [
+        "academy",
+        "libraryos",
+        "living-lab",
+        "living-world",
+        "workos"
+      ],
+      "capabilities": [
+        "experience-platform",
+        "leerhuis",
+        "bedrijf",
+        "dom-library",
+        "dom-livinglab"
+      ],
+      "readiness": {
+        "READY_TO_IMPLEMENT": 0,
+        "NEEDS_TECHNICAL_PREREQUISITE": 4,
+        "NEEDS_HUMAN_DECISION": 1,
+        "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
+        "PROHIBITED": 0,
+        "NO_LEARNING_VALUE": 0
+      },
+      "decisionDossiers": [
+        "D10_RESEARCH_PARTICIPATION"
+      ],
+      "technicalPrerequisites": [
+        "P01_VERSIONED_SOURCE_RELEASE",
+        "P02_VERSIONED_WORK_PROCESS_TARGET",
+        "P03_ASSET_INTERVENTION_LIFECYCLE"
+      ],
+      "blastRadius": {
+        "sourceOwners": 5,
+        "kernelModules": 125,
+        "mutationContracts": 290,
+        "routes": 290,
+        "screens": 8,
+        "dataSchema": "eerst flowmanifest; geen runtime-opslag",
+        "newSharedPrimitive": "geen nieuwe runtimeprimitive; build-time flowdecompositie",
+        "crossDomainDependencies": "alleen reeds bewezen refs",
+        "privacyImpact": "persoonlijke en institutionele subflows apart classificeren",
+        "authorityImpact": "bestaande bronauthority per flow bewijzen",
+        "recoveryImpact": "bestaande outbox/replay per bewezen flow",
+        "scaleImpact": "alleen begrensde slices onder 25 MiB",
+        "expectedTests": [
+          "bestaande vier vertical slices",
+          "flow-classification-gate"
+        ]
+      },
+      "blockers": [
+        "flow-granularity",
+        "human-decision",
+        "purpose-scope",
+        "source-contract-per-flow"
+      ]
+    },
+    {
+      "id": "B02_WORK_OPERATIONS",
+      "name": "WorkOS organisatorische processtate",
+      "status": "PHASE",
+      "domains": [
+        "workos"
+      ],
+      "capabilities": [
+        "kantoorpakket",
+        "ondernemersos",
+        "office",
+        "staff",
+        "command-zien",
+        "command-doen",
+        "command-besturen",
+        "zaakregie",
+        "zaakregie-beheer",
+        "dom-werkvloer",
+        "dom-werkplek",
+        "ov-kantoorgesprek",
+        "ov-werkmail"
+      ],
+      "readiness": {
+        "READY_TO_IMPLEMENT": 0,
+        "NEEDS_TECHNICAL_PREREQUISITE": 13,
+        "NEEDS_HUMAN_DECISION": 0,
+        "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
+        "PROHIBITED": 0,
+        "NO_LEARNING_VALUE": 0
+      },
+      "decisionDossiers": [
+        "D06_WORKFORCE_DEVELOPMENT"
+      ],
+      "technicalPrerequisites": [
+        "P02_VERSIONED_WORK_PROCESS_TARGET",
+        "P07_WORKFORCE_PROCESS_SEPARATION"
+      ],
+      "blastRadius": {
+        "sourceOwners": 13,
+        "kernelModules": 129,
+        "mutationContracts": 1060,
+        "routes": 1081,
+        "screens": 29,
+        "dataSchema": "versioned source targets en duurzame events waar zij ontbreken",
+        "newSharedPrimitive": "geen",
+        "crossDomainDependencies": "standaard uit",
+        "privacyImpact": "employee-surveillancegrens per flow",
+        "authorityImpact": "actuele werkrol plus doel",
+        "recoveryImpact": "source-owned outbox vereist",
+        "scaleImpact": "kleine workspace-slice eerst",
+        "expectedTests": [
+          "authority",
+          "tenant isolation",
+          "replay",
+          "recovery"
+        ]
+      },
+      "blockers": [
+        "durable-event",
+        "recovery-proof",
+        "retention-proof",
+        "source-contract",
+        "source-flow",
+        "source-object",
+        "versioned-change-target"
+      ]
+    },
+    {
+      "id": "B03_KNOWLEDGE_DEVELOPMENT",
+      "name": "Library en Academy kennislevenslopen",
+      "status": "PHASE",
+      "domains": [
+        "academy",
+        "libraryos"
+      ],
+      "capabilities": [
+        "dom-boeken",
+        "dom-les",
+        "dom-leerstof",
+        "dom-onderwijs",
+        "ov-krant",
+        "ov-bijles",
+        "rtf-leerpaspoort"
+      ],
+      "readiness": {
+        "READY_TO_IMPLEMENT": 0,
+        "NEEDS_TECHNICAL_PREREQUISITE": 7,
+        "NEEDS_HUMAN_DECISION": 0,
+        "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
+        "PROHIBITED": 0,
+        "NO_LEARNING_VALUE": 0
+      },
+      "decisionDossiers": [],
+      "technicalPrerequisites": [
+        "P01_VERSIONED_SOURCE_RELEASE"
+      ],
+      "blastRadius": {
+        "sourceOwners": 7,
+        "kernelModules": 40,
+        "mutationContracts": 52,
+        "routes": 52,
+        "screens": 9,
+        "dataSchema": "bestaande Edition/kennisversies; adapters per bronflow",
+        "newSharedPrimitive": "geen",
+        "crossDomainDependencies": "Library naar Academy vereist afzonderlijke release",
+        "privacyImpact": "Reader-state en leerlingstate blijven lokaal",
+        "authorityImpact": "publicatie- en curriculumauthority blijven gescheiden",
+        "recoveryImpact": "bronspoor/outbox per domein",
+        "scaleImpact": "begrensde slice eerst",
+        "expectedTests": [
+          "edition immutability",
+          "knowledge laundering",
+          "revocation"
+        ]
+      },
+      "blockers": [
+        "durable-event",
+        "recovery-proof",
+        "source-object",
+        "versioned-change-target"
+      ]
+    },
+    {
+      "id": "B04_WORLD_ASSET_MEMORY",
+      "name": "Living World en LivingOS asset memory",
+      "status": "PHASE",
+      "domains": [
+        "living-world",
+        "livingos"
+      ],
+      "capabilities": [
+        "wereld",
+        "vastgoed",
+        "verzorging",
+        "dom-thuis",
+        "dom-residentie",
+        "dom-plaats",
+        "dom-home",
+        "ov-stad"
+      ],
+      "readiness": {
+        "READY_TO_IMPLEMENT": 0,
+        "NEEDS_TECHNICAL_PREREQUISITE": 8,
+        "NEEDS_HUMAN_DECISION": 0,
+        "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
+        "PROHIBITED": 0,
+        "NO_LEARNING_VALUE": 0
+      },
+      "decisionDossiers": [],
+      "technicalPrerequisites": [
+        "P03_ASSET_INTERVENTION_LIFECYCLE"
+      ],
+      "blastRadius": {
+        "sourceOwners": 8,
+        "kernelModules": 25,
+        "mutationContracts": 93,
+        "routes": 95,
+        "screens": 8,
+        "dataSchema": "LivingOS mist intervention/completion/versioned asset target",
+        "newSharedPrimitive": "geen",
+        "crossDomainDependencies": "bewoner naar asset vereist unlinking",
+        "privacyImpact": "vorige bewoner mag niet meereizen",
+        "authorityImpact": "bewoner, eigenaar, leverancier en assetbeheerder onderscheiden",
+        "recoveryImpact": "source receipt na intervention",
+        "scaleImpact": "objectgebonden slice eerst",
+        "expectedTests": [
+          "resident unlinking",
+          "supplier authority",
+          "recurrence verification"
+        ]
+      },
+      "blockers": [
+        "durable-event",
+        "recovery-proof",
+        "source-object",
+        "versioned-change-target"
+      ]
+    },
+    {
+      "id": "B05_SERVICE_OPERATIONS",
+      "name": "Hospitality, service, document- en fysieke overdrachtsprocessen",
+      "status": "PHASE",
+      "domains": [
+        "files-documents",
+        "hospitality",
+        "physical-commerce",
+        "service-support"
+      ],
+      "capabilities": [
+        "service",
+        "gastos",
+        "supplier-haccp",
+        "supplier-pos",
+        "supplier-salon",
+        "supplier-rooms",
+        "stuur",
+        "dom-doos",
+        "dom-bestanden",
+        "dom-site",
+        "dom-eigendomein",
+        "dom-foutmelder",
+        "kern-memo",
+        "bk-eten"
+      ],
+      "readiness": {
+        "READY_TO_IMPLEMENT": 0,
+        "NEEDS_TECHNICAL_PREREQUISITE": 12,
+        "NEEDS_HUMAN_DECISION": 2,
+        "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
+        "PROHIBITED": 0,
+        "NO_LEARNING_VALUE": 0
+      },
+      "decisionDossiers": [
+        "D05_DOCUMENT_CONTENT",
+        "D14_AI_ASSISTANCE",
+        "D15_SERVICE_IMPROVEMENT"
+      ],
+      "technicalPrerequisites": [
+        "P01_VERSIONED_SOURCE_RELEASE",
+        "P03_ASSET_INTERVENTION_LIFECYCLE",
+        "P04_VERSIONED_SERVICE_PROCEDURE",
+        "P05_REVIEWED_FAILURE_ARTIFACT",
+        "P13_AI_PURPOSE_SCOPE"
+      ],
+      "blastRadius": {
+        "sourceOwners": 14,
+        "kernelModules": 40,
+        "mutationContracts": 136,
+        "routes": 140,
+        "screens": 20,
+        "dataSchema": "versioned process/change target ontbreekt deels",
+        "newSharedPrimitive": "geen",
+        "crossDomainDependencies": "supportinhoud niet automatisch organizational memory",
+        "privacyImpact": "gast-, werknemer- en documentinhoud minimaliseren",
+        "authorityImpact": "procesowner en behandelaar expliciet",
+        "recoveryImpact": "durable source event en receipt vereist",
+        "scaleImpact": "kleine operationele slice eerst",
+        "expectedTests": [
+          "content minimization",
+          "cross-tenant",
+          "dead-letter",
+          "source offline"
+        ]
+      },
+      "blockers": [
+        "durable-event",
+        "human-decision",
+        "memory-class",
+        "purpose-scope",
+        "recovery-proof",
+        "retention-proof",
+        "source-contract",
+        "source-flow",
+        "source-object",
+        "versioned-change-target"
+      ]
+    },
+    {
+      "id": "B06_HIGH_VOLUME",
+      "name": "Commerce, Mobility en Media",
+      "status": "STOP",
+      "domains": [
+        "commerce",
+        "media-culture",
+        "mobility"
+      ],
+      "capabilities": [
+        "bestellen",
+        "verhuur",
+        "charter",
+        "retail",
+        "onderweg",
+        "groothandel",
+        "commerce",
+        "spellen",
+        "podium",
+        "theater",
+        "flits",
+        "ov",
+        "mobiliteit",
+        "mediaos",
+        "clips",
+        "supplier-finance",
+        "supplier-ride",
+        "dom-lucht",
+        "dom-nav",
+        "dom-move",
+        "dom-sport",
+        "dom-muziek",
+        "dom-galerij",
+        "dom-fluister",
+        "dom-verkoop",
+        "dom-facturen",
+        "dom-mall",
+        "dom-appstore",
+        "dom-appstore-uitgever",
+        "bk-ritten",
+        "bk-bezorgen",
+        "ov-suppliers"
+      ],
+      "readiness": {
+        "READY_TO_IMPLEMENT": 0,
+        "NEEDS_TECHNICAL_PREREQUISITE": 0,
+        "NEEDS_HUMAN_DECISION": 0,
+        "BLOCKED_BY_SCALE_ARCHITECTURE": 32,
+        "PROHIBITED": 0,
+        "NO_LEARNING_VALUE": 0
+      },
+      "decisionDossiers": [],
+      "technicalPrerequisites": [],
+      "blastRadius": {
+        "sourceOwners": 32,
+        "kernelModules": 56,
+        "mutationContracts": 527,
+        "routes": 531,
+        "screens": 44,
+        "dataSchema": "geen centrale uitbreiding toegestaan",
+        "newSharedPrimitive": "partitionerings- en querycontract vereist vóór brede aansluiting",
+        "crossDomainDependencies": "uit",
+        "privacyImpact": "transactie- en journeydata niet profileren",
+        "authorityImpact": "brondomein blijft beslissen",
+        "recoveryImpact": "region/partition recovery nog niet bewezen",
+        "scaleImpact": "geblokkeerd door 25 MiB-cap en lineaire recall",
+        "expectedTests": [
+          "partition consistency",
+          "mass revocation",
+          "cross-region replay"
+        ]
+      },
+      "blockers": [
+        "cross-region-recovery",
+        "mass-revocation",
+        "partitioning",
+        "query-model"
+      ]
+    },
+    {
+      "id": "B07_DISCOVERY_AI_NETWORK",
+      "name": "Edge, Saloon en World Network",
+      "status": "PHASE",
+      "domains": [
+        "edge-ai",
+        "saloon",
+        "world-network"
+      ],
+      "capabilities": [
+        "zakelijk",
+        "salon",
+        "socialewereld",
+        "oog",
+        "ghost",
+        "knelpunt",
+        "connect",
+        "dom-genootschap",
+        "kern-rahul",
+        "kern-waardering",
+        "ov-aandacht"
+      ],
+      "readiness": {
+        "READY_TO_IMPLEMENT": 0,
+        "NEEDS_TECHNICAL_PREREQUISITE": 11,
+        "NEEDS_HUMAN_DECISION": 0,
+        "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
+        "PROHIBITED": 0,
+        "NO_LEARNING_VALUE": 0
+      },
+      "decisionDossiers": [
+        "D13_DISCOVERY_COMMONS",
+        "D14_AI_ASSISTANCE"
+      ],
+      "technicalPrerequisites": [
+        "P12_VERSION_BOUND_COMMONS_RELEASE",
+        "P13_AI_PURPOSE_SCOPE"
+      ],
+      "blastRadius": {
+        "sourceOwners": 11,
+        "kernelModules": 42,
+        "mutationContracts": 134,
+        "routes": 134,
+        "screens": 12,
+        "dataSchema": "geen inference- of rankinggeheugen zonder besluit",
+        "newSharedPrimitive": "geen",
+        "crossDomainDependencies": "recommendationcontext vereist expliciet doel",
+        "privacyImpact": "profilering en mensscore verboden",
+        "authorityImpact": "AI kan alleen voorstellen",
+        "recoveryImpact": "geen stille AI-mutaties",
+        "scaleImpact": "ranking/projectie nog onbeslist",
+        "expectedTests": [
+          "AI provenance",
+          "consent withdrawal",
+          "no inferred truth"
+        ]
+      },
+      "blockers": [
+        "recovery-proof",
+        "retention-proof",
+        "source-contract",
+        "source-flow"
+      ]
+    },
+    {
+      "id": "B08_HUMAN_PROGRAMS",
+      "name": "Foundation, Living Lab, Travel, Talent en communities",
+      "status": "PHASE",
+      "domains": [
+        "community-events",
+        "foundationos",
+        "living-lab",
+        "talent",
+        "travelos"
+      ],
+      "capabilities": [
+        "member-werk",
+        "ontmoetingen",
+        "social",
+        "rtf-contacten",
+        "tickets",
+        "levenos",
+        "vonk",
+        "avondos",
+        "arrival",
+        "instantreality",
+        "opvangwijzer",
+        "rugdekking",
+        "carriereledger",
+        "supplier-events",
+        "supplier-apply",
+        "office-school",
+        "foundation",
+        "foundation-school",
+        "werk-rtf",
+        "werving",
+        "vakbewijs",
+        "dom-reisbureau",
+        "dom-agenda",
+        "dom-meet",
+        "dom-metier",
+        "dom-vak",
+        "dom-rtfkantoor",
+        "dom-rtfos",
+        "dom-lab",
+        "dom-livinglab-bewoner",
+        "bk-reizen",
+        "bk-verblijf",
+        "bk-reiswijzer",
+        "bk-tickets",
+        "dom-labfonds",
+        "fs-terrein",
+        "fs-werk",
+        "fs-gast"
+      ],
+      "readiness": {
+        "READY_TO_IMPLEMENT": 0,
+        "NEEDS_TECHNICAL_PREREQUISITE": 30,
+        "NEEDS_HUMAN_DECISION": 8,
+        "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
+        "PROHIBITED": 0,
+        "NO_LEARNING_VALUE": 0
+      },
+      "decisionDossiers": [
+        "D06_WORKFORCE_DEVELOPMENT",
+        "D07_TRAVEL_EXPERIENCE",
+        "D08_FOUNDATION_ASSISTANCE",
+        "D09_CHILD_EDUCATION",
+        "D10_RESEARCH_PARTICIPATION",
+        "D11_COMMUNITY_EVENTS",
+        "D12_DATING"
+      ],
+      "technicalPrerequisites": [
+        "P07_WORKFORCE_PROCESS_SEPARATION",
+        "P09_TRAVEL_STRUCTURAL_LESSON",
+        "P10_FOUNDATION_VOLUNTARY_LESSON",
+        "P11_EVENT_FEEDBACK_RELEASE"
+      ],
+      "blastRadius": {
+        "sourceOwners": 38,
+        "kernelModules": 124,
+        "mutationContracts": 1116,
+        "routes": 1146,
+        "screens": 87,
+        "dataSchema": "pas na product/juridisch besluit",
+        "newSharedPrimitive": "geen",
+        "crossDomainDependencies": "vrijwillige release per overdracht",
+        "privacyImpact": "kwetsbare mensen, reizen, loopbaan en deelname",
+        "authorityImpact": "governance per programma ontbreekt deels",
+        "recoveryImpact": "geen artifact zonder geldige grond",
+        "scaleImpact": "na semantiek opnieuw meten",
+        "expectedTests": [
+          "no-consent-no-disadvantage",
+          "private travel isolation",
+          "voluntary contribution"
+        ]
+      },
+      "blockers": [
+        "human-decision",
+        "lawful-basis",
+        "memory-class",
+        "purpose-scope",
+        "recovery-proof",
+        "retention",
+        "retention-proof",
+        "source-contract",
+        "source-flow"
+      ]
+    },
+    {
+      "id": "B09_REGULATED_PRIVATE",
+      "name": "Identity, Pay, zorg, persoonlijk, communicatie en governance",
+      "status": "PHASE",
+      "domains": [
+        "communication",
+        "governance",
+        "health-care",
+        "identity-organizations",
+        "pay",
+        "personal-life"
+      ],
+      "capabilities": [
+        "member",
+        "member-snaps",
+        "member-connect",
+        "rechterhand",
+        "service-bel",
+        "ondertiteling",
+        "neiging",
+        "privekantoor",
+        "democratie",
+        "democratie-partijen",
+        "contracten",
+        "wbw",
+        "geldwereld",
+        "connectionos",
+        "rtgone",
+        "life",
+        "doelen",
+        "dagmetingen",
+        "gemoed",
+        "gewoonten",
+        "medicijnen",
+        "training",
+        "tijdlijn",
+        "voeding",
+        "vertegenwoordiging",
+        "rust",
+        "supplier",
+        "betalen",
+        "webauthn",
+        "eigenaarherstel",
+        "verificatie",
+        "paspoort",
+        "tenant",
+        "dom-overheid",
+        "dom-gemeente",
+        "dom-care",
+        "dom-beschermdeur",
+        "dom-rtgid",
+        "dom-veiligheid",
+        "dom-kmar",
+        "dom-onboarding",
+        "dom-rekening",
+        "dom-bank-inzicht",
+        "dom-bank-vastelasten",
+        "dom-bank-spaardoel",
+        "dom-bank-rekening-open",
+        "dom-bank-storten",
+        "dom-bank-sepa",
+        "dom-bank-incasso",
+        "dom-bank-passen",
+        "dom-bank-krediet",
+        "dom-bank-zakelijk",
+        "dom-bank-advies",
+        "dom-wallet",
+        "dom-pay-wallet",
+        "dom-pay-tegoed",
+        "dom-pay-tegoed-zaak",
+        "dom-pay-terug",
+        "dom-pay-vooraf",
+        "dom-partner-uitbetaling",
+        "dom-kosten",
+        "tg-inlog",
+        "tg-account",
+        "tg-sso",
+        "tg-pin",
+        "tg-zegel",
+        "tg-link",
+        "tg-gegevens",
+        "tg-aanmeld",
+        "kern-meldingen",
+        "kern-berichten",
+        "kern-comm",
+        "kern-locatie",
+        "gld-munt",
+        "gld-rekening",
+        "gld-splitsen",
+        "gld-cadeau",
+        "gld-punten",
+        "gld-prijzen",
+        "gld-claims",
+        "gld-prijsgarantie",
+        "gld-aitegoed",
+        "ov-zorgprofiel",
+        "ov-spar",
+        "ov-mail-binnen",
+        "dom-samen"
+      ],
+      "readiness": {
+        "READY_TO_IMPLEMENT": 0,
+        "NEEDS_TECHNICAL_PREREQUISITE": 13,
+        "NEEDS_HUMAN_DECISION": 73,
+        "BLOCKED_BY_SCALE_ARCHITECTURE": 0,
+        "PROHIBITED": 0,
+        "NO_LEARNING_VALUE": 0
+      },
+      "decisionDossiers": [
+        "D01_PERSONAL_MEMORY",
+        "D02_LOCATION_CONTEXT",
+        "D03_HEALTH_CONTEXT",
+        "D04_COMMUNICATION_CONTENT",
+        "D16_ACCOUNT_ORGANIZATION",
+        "D17_SECURITY_CREDENTIALS",
+        "D18_IDENTITY_VERIFICATION",
+        "D19_GOVERNANCE",
+        "D20_PAYMENT_OPERATIONS",
+        "D21_FINANCIAL_PROFILING",
+        "D22_COMMERCIAL_CLAIMS"
+      ],
+      "technicalPrerequisites": [
+        "P08_PERSONAL_STRUCTURAL_RELEASE"
+      ],
+      "blastRadius": {
+        "sourceOwners": 86,
+        "kernelModules": 2576,
+        "mutationContracts": 2072,
+        "routes": 2094,
+        "screens": 98,
+        "dataSchema": "geen learning-opslag vóór menselijke/juridische beslissing",
+        "newSharedPrimitive": "geen",
+        "crossDomainDependencies": "standaard verboden",
+        "privacyImpact": "bijzondere, financiële en private inhoud",
+        "authorityImpact": "wettelijke en governancegrond niet uit code afleidbaar",
+        "recoveryImpact": "verwijdering en legal hold conflicten beslissen",
+        "scaleImpact": "niet beoordelen vóór semantiek",
+        "expectedTests": [
+          "purpose limitation",
+          "erasure",
+          "legal hold",
+          "cross-tenant"
+        ]
+      },
+      "blockers": [
+        "human-decision",
+        "lawful-basis",
+        "memory-class",
+        "purpose-scope",
+        "recovery-proof",
+        "retention",
+        "retention-proof",
+        "source-contract",
+        "source-flow"
+      ]
+    }
+  ]
+}

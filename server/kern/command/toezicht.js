@@ -24,7 +24,7 @@
 
 const { NIVEAUS } = require('../frictie');
 
-function maakToezicht({ opslag, save, journaal, beleid }) {
+function maakToezicht({ opslag, save, journaal, beleid, zwaar }) {
   function reg() {
     return opslag.bak('commandAgents');
   }
@@ -100,7 +100,7 @@ function maakToezicht({ opslag, save, journaal, beleid }) {
        Onder de tien zegt een foutpercentage nog niets. */
     const totaal = a.gelukt + a.mislukt;
     if (!a.gestopt && totaal >= 10 && a.mislukt / totaal > 0.5) {
-      a.gestopt = true;
+      a.gestopt = true; a.stopDoor = 'toezicht';
       a.stopReden = 'meer dan de helft van de laatste ' + totaal + ' handelingen mislukte';
       journaal.noteer({ actor: 'toezicht', actie: 'agent stoppen', objectType: 'agent', objectId: naam,
         niveau: NIVEAUS.auto, reden: a.stopReden, na: { gestopt: true, mislukt: a.mislukt, gelukt: a.gelukt } });
@@ -123,7 +123,7 @@ function maakToezicht({ opslag, save, journaal, beleid }) {
   function stop(naam, door, reden) {
     if (!door) return { error: 'Zonder herleidbare actor wordt er geen agent gestopt.', status: 403 };
     const a = agent(naam);
-    a.gestopt = true; a.stopReden = String(reden || 'met de hand gestopt');
+    a.gestopt = true; a.stopReden = String(reden || 'met de hand gestopt'); a.stopDoor = String(door);
     if (save) save();
     journaal.noteer({ actor: door, actie: 'agent stoppen', objectType: 'agent', objectId: naam,
       niveau: NIVEAUS.hand, reden: a.stopReden, na: { gestopt: true } });
@@ -133,8 +133,11 @@ function maakToezicht({ opslag, save, journaal, beleid }) {
   function hervat(naam, door, reden) {
     if (!door) return { error: 'Zonder herleidbare actor wordt er geen agent hervat.', status: 403 };
     const a = agent(naam);
+    // stopte het toezicht hem zelf (te veel mislukt), dan vraagt hervatten het zware recht
+    const f = a.gestopt && a.stopDoor === 'toezicht' && zwaar ? zwaar(door, 'agent-ontgrendelen') : null;
+    if (f) return f;
     const voor = { gestopt: a.gestopt, stopReden: a.stopReden, mislukt: a.mislukt };
-    a.gestopt = false; a.stopReden = null; a.mislukt = 0; a.gelukt = 0;
+    a.gestopt = false; a.stopReden = null; a.stopDoor = null; a.mislukt = 0; a.gelukt = 0;
     if (save) save();
     journaal.noteer({ actor: door, actie: 'agent hervatten', objectType: 'agent', objectId: naam,
       niveau: NIVEAUS.hand, reden: String(reden || 'hervat na beoordeling'), voor, na: { gestopt: false } });

@@ -13,7 +13,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stopHard } = require('./helper');
 const { maakAuthenticator } = require('./webauthn-authenticator');
 
 const APP = 'https://rtg.voorbeeld.test';
@@ -56,13 +56,16 @@ const kantoorOpen = (api, lid, s, n = 1) => metPasskey(api, '/api/account/start'
 
 test('verse productie: de eigenaar machtigt met zijn passkey het eerste kantooraccount op naam', async t => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoor-eerste-'));
-  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
   const { child, base } = await startServer({ env: { NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: tmp,
+    // Productie start alleen met een geldige STUN- en TURN-configuratie (#444).
+    STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com', STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
+    TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
     APP_URL: APP + '/', SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
     ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg', ...KEYS, RTG_OWNER_EMAIL: EIGENAAR,
     RTG_OWNER_BOOTSTRAP: BOOTSTRAP, OFFICE_CODE: CODE, OFFICE_TOTP_SECRET: TOTP, RTG_ISOLATIE_AFDWINGEN: '1',
     RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1' } });
-  t.after(() => stop(child));
+  t.after(() => stopHard(child));   // eerst het proces echt weg, dan pas de map
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
   const api = maakApi(base);
   const reg = (naam, email, extra) => api('/api/auth/register', { name: naam, email, phone: tel(),
     password: 'Geheim123!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg', ...(extra || {}) });

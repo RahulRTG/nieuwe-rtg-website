@@ -740,6 +740,84 @@
       "url": "/apps/foundation/klimaatfonds.html"
     },
     {
+      "label": "Aan makers geven",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
+      "label": "Bladwijzer",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
+      "label": "Feedback",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
+      "label": "Nieuw onderdeel",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
+      "label": "Nieuwe revisie bewaren",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
+      "label": "Notitie bewaren",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
+      "label": "Publicatie",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
+      "label": "Tot hier gelezen",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
+      "label": "Verversen",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
+      "label": "Volgende",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
+      "label": "Vorige",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
+      "label": "Werk beginnen",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
+      "label": "Werken",
+      "app": "LibraryOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/library.html"
+    },
+    {
       "label": "Alleen abonnees",
       "app": "Live",
       "wereld": "LivingOS",

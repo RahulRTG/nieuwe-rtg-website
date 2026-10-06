@@ -1,11 +1,13 @@
 /* Gedeelde levenscyclus voor codes die zonder account een kleine deur openen.
 
-   In PostgreSQL en SQLite loopt iedere beslissing door EEN collectietransactie.
-   Daardoor zijn max-use versus max-use en intrekken versus gebruiken werkelijk
-   geserialiseerd tussen processen. `transactie()` laat de portalen bovendien
+   In PostgreSQL en SQLite loopt iedere beslissing door EEN collectietransactie,
+   dus max-use tegen max-use en intrekken tegen gebruiken zijn geserialiseerd. `transactie()` laat de portalen bovendien
    de code, de koppeling aan de persoon en hun auditregel in diezelfde commit
    zetten. De kale code verlaat alleen de uitgifte; op schijf staat zijn hash. */
 'use strict';
+
+const { vindOpHash } = require('./bearercode');
+const { keten } = require('./bearercode-keten');
 
 const DEFAULT_DAGEN = 90;
 const DEFAULT_MAX_GEBRUIK = 500;
@@ -14,13 +16,15 @@ const MAX_GEBRUIK = 10000;
 
 module.exports = ({ opslag, staat, nu, rid, crypto, save, bewerkCollectie }) => {
   if (typeof opslag !== 'function' || typeof nu !== 'function' || typeof rid !== 'function' ||
-      !crypto || typeof crypto.randomBytes !== 'function' || typeof save !== 'function') {
+      !crypto || typeof crypto.randomBytes !== 'function' || typeof crypto.timingSafeEqual !== 'function' ||
+      typeof save !== 'function') {
     throw new Error('codelevenscyclus mist zijn opslag, klok, generator, crypto of save');
   }
 
   const schoon = v => String(v == null ? '' : v).trim();
   const normaal = v => schoon(v).toUpperCase().slice(0, 80);
   const hash = v => crypto.createHash('sha256').update('rtg-code-v1|' + normaal(v)).digest('hex');
+  const opCode = (rijen, kaleCode) => vindOpHash(crypto, rijen, hash(kaleCode)); // constante tijd (D13)
   const lijst = () => {
     const r = opslag();
     if (!Array.isArray(r)) throw new Error('codelevenscyclus-opslag is geen lijst');
@@ -91,7 +95,7 @@ module.exports = ({ opslag, staat, nu, rid, crypto, save, bewerkCollectie }) => 
     }
 
     function controleer(kaleCode, verwacht, binding) {
-      const r = rijen.find(x => x.code_hash === hash(kaleCode)) || null;
+      const r = opCode(rijen, kaleCode);
       const waarom = reden(r, verwacht || {});
       if (waarom) return fout(waarom);
       /* De onderwerp-koppeling wordt BINNEN hetzelfde slot bekeken en VOOR de
@@ -115,23 +119,23 @@ module.exports = ({ opslag, staat, nu, rid, crypto, save, bewerkCollectie }) => 
       return { ok: true, toegang: publiek(r) };
     }
 
+    /* Vernieuwen: een mens kiest termijn en gebruik opnieuw. Eigen hash, dus
+       geen bearer.vernieuw(), wel dezelfde keten (kern/bearercode-keten.js). */
     function roteer(id, invoer) {
       const oud = rijen.find(x => x.id === String(id || ''));
       if (!oud) return { status: 404, error: 'Deze toegangscode bestaat niet.' };
       if (oud.geroteerd_naar) return { status: 409, error: 'Deze toegangscode is al geroteerd.' };
-      const at = nu();
-      const gemaakt = maak({
-        prefix: invoer && invoer.prefix, issuer: invoer && invoer.issuer,
-        doel: oud.doel, scope: oud.scope, onderwerp: oud.onderwerp,
-        geldig_dagen: invoer && invoer.geldig_dagen,
-        max_gebruik: invoer && invoer.max_gebruik, vervangt_id: oud.id
-      }, at, oud.rotatie + 1, rijen);
+      const at = nu(), i = invoer || {};
+      const gemaakt = maak({ prefix: i.prefix, issuer: i.issuer, doel: oud.doel, scope: oud.scope,
+        onderwerp: oud.onderwerp, geldig_dagen: i.geldig_dagen, max_gebruik: i.max_gebruik,
+        vervangt_id: oud.id }, at, 1, rijen);
       if (!gemaakt.r) return gemaakt;
-      if (!oud.ingetrokken_at) {
-        oud.ingetrokken_at = at;
-        oud.ingetrokken_door = schoon(invoer && invoer.issuer).slice(0, 80) || 'onbekend';
-        oud.intrekreden = schoon(invoer && invoer.reden).slice(0, 200) || 'geroteerd';
-      }
+      keten({ oud, nieuw: { toegang: gemaakt.r }, actor: schoon(i.issuer).slice(0, 80) || 'onbekend',
+        soort: 'vernieuwd', nu: at, intrekken: (o, door) => {
+          if (o.ingetrokken_at) return;
+          Object.assign(o, { ingetrokken_at: at, ingetrokken_door: door,
+            intrekreden: schoon(i.reden).slice(0, 200) || 'vernieuwd' });
+        } });
       oud.geroteerd_naar = gemaakt.r.id;
       rijen.push(gemaakt.r);
       return { ok: true, code: gemaakt.code, toegang: publiek(gemaakt.r), vorige: publiek(oud) };

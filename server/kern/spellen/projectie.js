@@ -100,19 +100,21 @@ module.exports = (ctx) => {
       }
 
       let rij = rijen.find(x => x.potje === potje.id && isActief(x));
-      const geroteerd = !!rij;
-      if (rij) toegang.intrekActief(rij, codenaamVan(mij) || mij, 'Nieuwe schermcode uitgegeven');
-      else {
+      const geroteerd = !!rij, actor = codenaamVan(mij) || mij;
+      if (!rij) {
         rij = { id: 'pj' + crypto.randomBytes(16).toString('hex'), potje: potje.id,
           door: mij, aangemaakt_at: nu(), gesloten_at: null, sluitreden: null,
           koppeling: null, koppeling_historie: [], scherm: null,
           scherm_historie: [], uitgiftes: [], rotatie: 0 };
         rijen.push(rij);
       }
-      rij.door = mij; rij.rotatie = Math.max(0, Number(rij.rotatie) || 0) + 1;
-      rij.laatst_uitgegeven_at = nu();
-      const gemaakt = toegang.nieuweKoppeling(rijen, rij, codenaamVan(mij) || mij, rij.rotatie);
+      /* Eerst de nieuwe koppeling (die de oude intrekt en het volgnummer
+         doortelt), dan het oude scherm dicht en beide naar de historie. */
+      const gemaakt = toegang.nieuweKoppeling(rijen, rij, actor);
       if (!gemaakt) return { status: 503, error: 'Kon geen unieke schermcode maken.' };
+      if (geroteerd) toegang.intrekActief(rij, actor, 'Nieuwe schermcode uitgegeven');
+      rij.door = mij; rij.rotatie = gemaakt.toegang.rotatie;
+      rij.laatst_uitgegeven_at = nu();
       rij.koppeling = gemaakt.toegang;
       rij.uitgiftes.push({ idem_hash: idemHash, fingerprint_hash: vinger, at: nu() });
       if (rij.uitgiftes.length > MAX_UITGIFTES)

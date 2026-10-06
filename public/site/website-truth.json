@@ -9,7 +9,7 @@
     "public/apps/leverancier.html",
     "public/apps/app.html"
   ],
-  "sourceHash": "5096797de12fbb00fe62d32e03348447be763930b2255c7aea7c8efceaf9a4ed",
+  "sourceHash": "22d1303ce75a13547cfc9be265728883885d37fbe439259f8cc5912836217a93",
   "platform": [
     {
       "id": "organisatie",
@@ -25,7 +25,7 @@
         "Kies een module en zie de lijst plus wat aandacht vraagt; koppel eenmalig uw RTG-account voor agenda, postvak en kluis"
       ],
       "note": "Wat u niet mag zien, staat er niet als lege doos; en wat nergens wordt gemeten, staat er met de reden erbij.",
-      "sourceHash": "95c3790f1e483f9b6359c5f642a2f5e94049eb1f9db7387cf4c4c9be860ace73"
+      "sourceHash": "c15f1b9abf0f654960fd0c80791c67b1b42d206fa26aa38bc143c275045a3458"
     },
     {
       "id": "partner",
@@ -40,7 +40,7 @@
         "Stuur uw team aan met rooster en taken"
       ],
       "note": "Kijk elke ochtend één minuut naar het actiecentrum; dan begint de dag zonder verrassingen.",
-      "sourceHash": "82845e252ebad325d1a14400ccd6c6468c7b9d55bf7face0820547c757ffa93d"
+      "sourceHash": "a4314810039f6bba6fe442e92b7fb835e7a40ca6839db7ae6e988be5a04eccd3"
     },
     {
       "id": "gebruiker",
@@ -56,7 +56,7 @@
         "Je ledenpas ligt in je wallet, de tegel rechts onder de klok"
       ],
       "note": "Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.",
-      "sourceHash": "31f56619dccb637ddc58ba6ca773648a9dc9d7b7d2dfee4d46bcfcbd4fd6dbfd"
+      "sourceHash": "b04acd44f673b1e2fb4396d3c7655f2fc089b3f4bb036420532f87db23a2efbc"
     }
   ],
   "worlds": {
@@ -1474,11 +1474,11 @@
       "workspaceRoute": "/apps/werkruimte.html?gebied=foundation",
       "action": "Ga verder",
       "groupCount": 2,
-      "featureCount": 12,
+      "featureCount": 13,
       "groups": [
         {
           "name": "Appschermen",
-          "count": 11,
+          "count": 12,
           "apps": [
             {
               "id": "link:rtfbuurt",
@@ -1532,6 +1532,19 @@
                 "Kijk onderaan wat je hebt gezien, begrepen, geoefend, gemaakt of doorgegeven"
               ],
               "note": "Er zijn geen likes, geen volgers, geen reeksen en geen niveau. Wat je hebt gedaan staat er als lijst per onderwerp en nooit als cijfer, en het wordt met niemand vergeleken -- ook niet verborgen als sorteervolgorde. Wat je bekeek maar niet aanraakte, hoe lang je keek en wanneer je keek, wordt niet vastgelegd; wat je ziet komt van wat je zelf hebt aangegeven. De lijst houdt op: twaalf per keer, en dan is het genoeg. Delen en samenwerken hebben hier nog geen knop, want die bereiken een tweede mens en dat wordt in dit huis klaargezet en nooit automatisch verstuurd."
+            },
+            {
+              "id": "link:library",
+              "name": "LibraryOS",
+              "kind": "link",
+              "route": "/apps/library.html",
+              "summary": "Foundation LibraryOS: samen kennis maken, vastleggen, vrijgeven, lezen en aantoonbaar verbeteren.",
+              "actions": [
+                "Begin een Work en schrijf in stabiele onderdelen met append-only revisies",
+                "Leg samenwerking en rechten expliciet vast voordat u een Edition bevriest",
+                "Lees exact de vrijgegeven editie en geef feedback die naar een nieuwe revisie kan leiden"
+              ],
+              "note": "Een correctie overschrijft nooit stil een oude editie. Persoonlijke leesnotities staan los van het Work; Foundation wordt niet automatisch eigenaar."
             },
             {
               "id": "link:rtfbord",

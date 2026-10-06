@@ -24,7 +24,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop, stopNet, kantoorKoppelBody, wachtOpWaarde } = require('./helper');
+const { startServer, stop, stopHard, stopNet, kantoorKoppelBody, wachtOpWaarde } = require('./helper');
 const { maakAuthenticator } = require('./webauthn-authenticator');
 const { totpCode } = require('../server/kern/totp');
 
@@ -43,11 +43,10 @@ function maakApi(base, extra) {
 
 test('echte productieserver: de kantoorcode opent niets, op naam met een passkey wel', async t => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoordeur-prod-'));
-  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
 
   /* ---- buiten productie: de oude deur werkt nog, en we leggen sessies aan ---- */
   const proef = await startServer({ env: { RTG_DATA_DIR: tmp, SMTP_URL: '', OFFICE_CODE: CODE, ...KEYS } });
-  t.after(() => stop(proef.child));   // ook als een assertie hieronder zakt
+  t.after(() => stopHard(proef.child));   // ook als een assertie hieronder zakt
   const pa = maakApi(proef.base);
   const code = await pa('/api/office/login', { code: CODE });
   assert.equal(code.status, 200, 'buiten productie blijft de gedeelde code werken: ' + JSON.stringify(code.body).slice(0, 120));
@@ -70,9 +69,12 @@ test('echte productieserver: de kantoorcode opent niets, op naam met een passkey
   const { child, base } = await startServer({ env: { NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: tmp,
     APP_URL: APP + '/', SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
     ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg', ...KEYS, RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl',
-    OFFICE_CODE: CODE, OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP', RTG_ISOLATIE_AFDWINGEN: '1',
+    STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com', STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
+    TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
+    RTG_ISOLATIE_AFDWINGEN: '1',
     RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1' } });
-  t.after(() => stop(child));
+  t.after(() => stopHard(child));   // ook deze schrijft in tmp: eerst weg, dan pas de map
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
   const api = maakApi(base, { 'X-Forwarded-Proto': 'https' });
 
   // 2. de juiste code wordt geweigerd, voor er iets vergeleken wordt, met de weg erheen
@@ -139,7 +141,10 @@ const REGEL = /\[start\] OFFICE_CODE en OFFICE_TOTP_SECRET staan gezet maar word
 const PROD = { NODE_ENV: 'production', RTG_DEMO: '0', APP_URL: 'https://rtg.voorbeeld.test/',
   SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
   ...KEYS, RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', RTG_ISOLATIE_AFDWINGEN: '1',
-  RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1' };
+  RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1',
+  // Productie start alleen met een geldige STUN- en TURN-configuratie (#444).
+  STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com', STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
+  TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026' };
 
 /* Start in productie en lees het opstartlog mee. Een lege string overschrijft
    wat er toevallig in de omgeving van de aanroeper staat: "niet gezet". */

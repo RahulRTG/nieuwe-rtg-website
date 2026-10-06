@@ -146,15 +146,16 @@ function keurOpenbareBouwstand(env, bakken) {
       hardeFouten.push('APP_URL wijst naar een openbaar adres (' + stand.host + ') maar de productiekeuring kon niet draaien: '
         + (e && e.message ? e.message : e) + '. Fail-closed: de start wordt afgebroken.');
     }
-    for (const f of productieFouten) {
-      hardeFouten.push('APP_URL wijst naar een openbaar adres (' + stand.host + ') terwijl NODE_ENV niet op "production" staat; '
-        + 'deze productieregel geldt op een publiek adres net zo hard: ' + f);
-    }
-    if (productieFouten.length) {
-      hardeFouten.push(productieFouten.length + ' productieregel(s) blokkeren de start op dit openbare adres. '
-        + 'Zet NODE_ENV=production en los bovenstaande op, of zet APP_URL op het lokale/testadres van deze installatie. '
-        + 'Een publiek adres zonder complete productiebeveiliging start niet.');
-    }
+    /* A-P1-02: een openbare installatie zonder NODE_ENV=production start NIET.
+       Het was een melding; nu is het een harde fout, want zonder die vlag
+       draaien de productiekeuring, de testomgevingsgrendels en de cookieregels
+       niet. 'onbekend' blijft een melding: het adres is dan niet vast te stellen. */
+    hardeFouten.push('APP_URL wijst naar een openbaar adres (' + stand.host + ') terwijl NODE_ENV niet op production staat. '
+      + 'Dan wordt de productiekeuring overgeslagen (' + productieFouten.length + ' regel(s) zouden nu blokkeren). '
+      + 'Zet NODE_ENV=production (alle officiele startpaden doen dat al), of zet APP_URL op een lokaal adres.');
+    /* En zeg erbij WELKE productieregels dit adres nu nog tegenhouden (RTG-V1
+       blocker 3): elk ervan geldt op een publiek adres net zo hard. */
+    for (const f of productieFouten) hardeFouten.push('Op dit openbare adres geldt ook: ' + f);
   }
 
   return stand;

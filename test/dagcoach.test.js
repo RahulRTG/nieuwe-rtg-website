@@ -42,6 +42,7 @@ test('een verse dag verzint niets en zegt zelf dat RTG niet indeelt', async () =
   /* Wat er WEL staat op een verse dag, staat er omdat een laag het aanbiedt:
      de dagmetingen en de check-in. Er staat geen enkel punt met een TIJD, want
      een tijd zou RTG zelf verzonnen moeten hebben. */
+  assert.ok(r.body.punten.some(p => p.bron === 'checkin'), 'de bestaande check-in blijft bereikbaar op een verse dag');
   assert.ok(!r.body.punten.some(p => p.tijd),
     'niets op een tijdstip: RTG plant geen ontbijt en geen wandeling');
   assert.ok(r.body.punten.every(p => ['metingen', 'checkin', 'gewoonten'].includes(p.bron)),

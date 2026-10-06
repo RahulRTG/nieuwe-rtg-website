@@ -97,7 +97,9 @@ module.exports = (ctx) => {
          zien. Zie de uitleg bij `publiek` in ./index.js. */
       id: m.id, met: codenaamVan(m.a === key ? m.b : m.a), at: m.at, status: m.status,
       betrouwbaarheid: niveauVan ? niveauVan(m.a === key ? m.b : m.a) : null,
-      tafel: m.tafel, ikBetaalde: !!m.betaald[key], anderBetaalde: !!m.betaald[m.a === key ? m.b : m.a],
+      tafel: m.tafel, reservering: m.reservationEvidence &&
+        { reference: m.reserveringId || null, ...m.reservationEvidence },
+      ikBetaalde: !!m.betaald[key], anderBetaalde: !!m.betaald[m.a === key ? m.b : m.a],
       berichten: communication ? (communication.status(key, { id: m.id }).messages || []).map(b => ({
         van: b.mine ? codenaamVan(key) : codenaamVan(m.a === key ? m.b : m.a), tekst: b.text || '', at: b.at,
         kind: b.kind, media: b.media

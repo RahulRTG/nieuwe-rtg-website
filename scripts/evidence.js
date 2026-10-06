@@ -92,13 +92,25 @@ function schrijfSamenvatting(plan, resultaat) {
   fs.appendFileSync(pad, regels.join('\n') + '\n');
 }
 
+function planOpties(args = [], env = process.env) {
+  return { forceFull: args.includes('--full') || String(env.RTG_FORCE_FULL || '') === '1' };
+}
+
+function maakPlan(args = [], env = process.env, maker = planner.plan) {
+  return maker(planOpties(args, env));
+}
+
 if (require.main === module) {
   const args = process.argv.slice(2);
   const opdracht = args[0] || 'run';
   try {
     if (opdracht === 'plan') {
       const out = (args.find((a) => a.startsWith('--out=')) || '--out=.evidence/plan.json').slice(6);
-      const p = planner.plan(); planner.schrijfUitvoer(p, out);
+      /* De nachtelijke workflow zet RTG_FORCE_FULL=1. Deze vlag moet de
+         planner bereiken; alleen in de workflowomgeving bestaan is geen
+         afgedwongen volledige ijking. --full maakt dezelfde afspraak lokaal
+         reproduceerbaar. */
+      const p = maakPlan(args, process.env); planner.schrijfUitvoer(p, out);
       const serial = planner.serialiseer(p);
       const gekozen = selectie(serial);
       if (process.env.GITHUB_OUTPUT) {
@@ -136,4 +148,5 @@ if (require.main === module) {
   }
 }
 
-module.exports = { leesPlan, selectie, voerUit, tijdlijn, markdownCel, schrijfSamenvatting };
+module.exports = { leesPlan, selectie, voerUit, tijdlijn, markdownCel, schrijfSamenvatting,
+  planOpties, maakPlan };

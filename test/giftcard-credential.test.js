@@ -58,8 +58,15 @@ test('2. issuer, doel en scope: de code geldt bij EEN zaak voor EEN handeling', 
   assert.equal((await w.inwissel(code, 1, { supplierCode: 'ANDER' })).status, 404, 'een andere zaak kent hem niet');
   t.doel = 'iets-anders';
   assert.equal((await w.inwissel(code, 1)).status, 409);
+  /* Sinds bearercode v2 (Fase 1) draagt de toegang een contracthash: een
+     onderwerp dat na de uitgifte is overschreven, wordt al bij de hash
+     geweigerd (409, `gemanipuleerd`) en komt niet meer tot de vergelijking op
+     de zaak (404). Voor een v1-kaart zonder hash blijft die vergelijking de
+     grendel. Wat hier telt: een onderwerp van een andere zaak opent niets. */
   t.doel = 'cadeaukaart-saldo'; t.onderwerp.supplierCode = 'ANDER';
-  assert.equal((await w.inwissel(code, 1)).status, 404, 'een onderwerp van een andere zaak opent niets');
+  const r = await w.inwissel(code, 1);
+  assert.equal(r.status, 409, 'een overschreven onderwerp opent niets');
+  assert.equal(w.db.data.giftcards[0].saldo, w.db.data.giftcards[0].bedrag, 'en er is niets afgeboekt');
 });
 
 test('3. issued_at en expires_at: na een jaar is de kaart verlopen', async () => {
@@ -165,4 +172,48 @@ test('8. oude 24-bitcodes: gehasht met behoud van waarde, en uit bon en idem-ant
   const voor = JSON.stringify(w.db.data);
   await w.kern.migreer();
   assert.equal(JSON.stringify(w.db.data), voor, 'een tweede ronde verandert niets');
+});
+
+/* FASE 1, PROEF A: de cadeaukaart op bearercode v2. Wat de migratie MOET
+   veranderen en wat niet: een overschreven einde opent niets meer (A3), een
+   v1-kaart wordt bij de rotatie v2 met hetzelfde einde (plan par. 3.4), en de
+   houder van een ingetrokken code krijgt een nieuwe. */
+test('9. bearercode v2: contracthash op een echt record, v1 wordt v2 bij rotatie, intrekken dan roteren', async () => {
+  const w = wereld();
+  const { code, kaart } = await w.koop();
+  const t = w.db.data.giftcards[0].toegang;
+  assert.equal(t.contractversie, 2);
+  assert.match(t.contracthash, /^[a-f0-9]{64}$/);
+  assert.deepEqual([t.afgeleid, t.gebruiksvorm, t.max_gebruik], ['geen', 'teller', 100]);
+
+  // D6: het einde na de uitgifte verlengen maakt de kaart niet bruikbaar maar dicht
+  const echtEinde = t.expires_at;
+  t.expires_at = '2099-01-01T00:00:00.000Z';
+  w.schuif(400 * DAG);
+  assert.equal((await w.inwissel(code, 1)).status, 409, 'een verlengd einde opent niets');
+  assert.equal(w.db.data.giftcards[0].saldo, 100);
+  t.expires_at = echtEinde;
+  assert.equal((await w.inwissel(code, 1)).status, 410, 'teruggezet: gewoon verlopen');
+
+  // een v1-kaart (zoals er nog in de collectie staan) roteert naar v2, einde gelijk
+  const w2 = wereld();
+  const k2 = await w2.koop();
+  const v1 = w2.db.data.giftcards[0].toegang;
+  for (const veld of ['contractversie', 'contracthash', 'afgeleid', 'gebruiksvorm', 'stapOp', 'bron_toegang', 'geschiedenis']) delete v1[veld];
+  assert.equal((await w2.inwissel(k2.code, 5)).kaart.saldo, 95, 'een v1-kaart werkt onder de v1-regels');
+  const vind = g => g.id === k2.kaart.id;
+  const rot = await w2.kern.roteer({ vind, door: 'lid:K', idem: 'v1-naar-v2' });
+  const nieuw = w2.db.data.giftcards[0].toegang;
+  assert.equal(nieuw.contractversie, 2, 'bij de rotatie wordt hij v2');
+  assert.equal(nieuw.expires_at, v1.expires_at, 'met hetzelfde einde');
+  assert.equal(nieuw.gebruik, 1, 'en dezelfde teller');
+  assert.equal((await w2.inwissel(rot.code, 5)).kaart.saldo, 90);
+
+  // gestolen: de zaak trekt in, de houder krijgt een nieuwe code
+  await w2.kern.intrek({ vind, door: 'zaak:ZAAK', reden: 'gestolen' });
+  const vervang = await w2.kern.roteer({ vind, door: 'lid:K', idem: 'na-diefstal' });
+  assert.equal(vervang.ok, true, 'na intrekken kan de houder een nieuwe code krijgen');
+  assert.equal((await w2.inwissel(rot.code, 1)).status, 409, 'de gestolen code blijft dicht');
+  assert.equal((await w2.inwissel(vervang.code, 90)).kaart.saldo, 0);
+  assert.equal(kaart.id.startsWith('GC'), true);
 });

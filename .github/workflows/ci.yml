@@ -33,6 +33,11 @@ on:
   # Zonder deze knop is de enige uitweg dan wachten op de merge eronder, en dat
   # is precies wanneer je de keuring wilt hebben.
   workflow_dispatch:
+    inputs:
+      verwachte_commit:
+        description: 'Volledige commit-SHA die deze handmatige full-run moet bewijzen'
+        required: true
+        type: string
 
 # Geen workflowstap krijgt stilzwijgend schrijfrechten op de repository.
 permissions:
@@ -134,17 +139,27 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ github.sha }}
           persist-credentials: false
           fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
+      # Een handmatige run krijgt een door de aanroeper genoemde SHA. Als main
+      # tussen kiezen en starten verschuift, wordt niet stil de nieuwere commit
+      # bewezen: input, event-SHA en echte checkout moeten alle drie gelijk zijn.
+      - name: De handmatige bron exact binden
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          RTG_EXPECTED_COMMIT: ${{ inputs.verwachte_commit }}
+        run: node scripts/evidence-control.js bind-source
       - run: npm ci
       - name: De goedkope harde poorten
         run: |
           npm run ci-keten
           node scripts/document-fitness.js
+          npm run releaseketenwacht
           npm run check
       - name: Vertrouwde content-addressed main-basis zoeken
         id: basis
@@ -167,7 +182,7 @@ jobs:
         id: plan
         run: npm run evidence:plan -- --out=.evidence/plan.json
         env:
-          RTG_FORCE_FULL: ${{ github.event_name == 'schedule' && '1' || '0' }}
+          RTG_FORCE_FULL: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && '1' || '0' }}
       - name: RTG Evidence Control Plane bouwen en zelf verifiëren
         run: |
           node scripts/evidence-control.js build --plan=.evidence/plan.json --out=.evidence/control.json
@@ -760,7 +775,7 @@ jobs:
       - run: npm ci
       - name: Alleen een door main opgebouwde Chromium-cache herstellen
         id: browser-cache
-        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
@@ -787,7 +802,7 @@ jobs:
           RTG_SNELLE_TOETS: '1'
       - name: Chromium-cache uitsluitend vanaf de vertrouwde hoofdlijn bewaren
         if: success() && steps.browser-cache.outputs.cache-hit != 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
@@ -926,7 +941,7 @@ jobs:
     name: Tests, checks en build
     runs-on: ubuntu-latest
     if: always()
-    needs: [preflight, incremental, test-volledig, norm, security, dependency-review, adversarial, container]
+    needs: [preflight, incremental, test-volledig, keuringen, norm, security, dependency-review, adversarial, container, schermen-oordeel]
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -935,7 +950,7 @@ jobs:
       - name: De gekozen bewijsroute moet groen zijn
         run: node scripts/evidence-gate.js --mode=${{ needs.preflight.outputs.mode }} --incremental=${{ needs.incremental.result }} --full=${{ needs.test-volledig.result }}
       - name: RTG Merge Gate wacht ook op de risicogebonden poorten
-        run: node scripts/evidence-gate.js --mode=merge --route=${{ needs.preflight.outputs.mode }} --risk=${{ needs.preflight.outputs.risk }} --event=${{ github.event_name }} --norm=${{ needs.norm.result }} --security=${{ needs.security.result }} --dependency=${{ needs.dependency-review.result }} --adversarial=${{ needs.adversarial.result }} --container=${{ needs.container.result }}
+        run: node scripts/evidence-gate.js --mode=merge --route=${{ needs.preflight.outputs.mode }} --risk=${{ needs.preflight.outputs.risk }} --event=${{ github.event_name }} --keuringen=${{ needs.keuringen.result }} --norm=${{ needs.norm.result }} --security=${{ needs.security.result }} --dependency=${{ needs.dependency-review.result }} --adversarial=${{ needs.adversarial.result }} --container=${{ needs.container.result }} --schermen=${{ needs.schermen-oordeel.result }}
 
   norm:
     name: De norm, de instroom en de build
@@ -1173,7 +1188,7 @@ jobs:
       - run: npm ci
       - name: Alleen een door main opgebouwde Chromium-cache herstellen
         id: browser-cache
-        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
@@ -1190,7 +1205,7 @@ jobs:
         run: node scripts/browserinstall.js --meting=browsermeting/${{ github.job }}-${{ matrix.deel }}.json
       - name: Eén vertrouwde scherf bewaart de Chromium-cache
         if: success() && steps.browser-cache.outputs.cache-hit != 'true' && matrix.deel == 1 && (github.event_name == 'push' || github.event_name == 'schedule')
-        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
@@ -1263,7 +1278,7 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: Alleen een door main opgebouwde Chromium-cache herstellen
-        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
@@ -1583,7 +1598,7 @@ jobs:
     name: Vertrouwd bewijsboek publiceren
     runs-on: ubuntu-latest
     needs: [preflight, test-volledig, dekking, norm, security, adversarial, container, a11y-oordeel]
-    if: (github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && needs.preflight.outputs.mode == 'full'
+    if: (github.event_name == 'schedule' || ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main')) && needs.preflight.outputs.mode == 'full'
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7

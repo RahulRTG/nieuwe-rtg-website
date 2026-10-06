@@ -142,6 +142,8 @@ test('5. een gast die er al had moeten zijn, staat in "nu"', () => {
   const NU = new Date();
   NU.setSeconds(0, 0);
   const geleden = (m) => new Date(NU.getTime() - m * MINUUT);
+  const lokaleDatum = (d) => String(d.getFullYear()).padStart(4, '0') + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   const horeca = { nu: () => NU.toISOString(), regelSom: () => 0 };
   const schoon = (t, n) => String(t == null ? '' : t).slice(0, n || 80);
   const bronnen = require('../server/kern/horeca/werklijst-bronnen')(
@@ -149,7 +151,9 @@ test('5. een gast die er al had moeten zijn, staat in "nu"', () => {
 
   const aank = geleden(5);
   const h = { arrivals: { A: {
-    id: 'A', datum: aank.toISOString().slice(0, 10),
+    /* Arrival Pass bewaart datum en tijd als een lokaal paar. UTC-datum met
+       lokale tijd mengen verschuift dit paar rond middernacht een dag. */
+    id: 'A', datum: lokaleDatum(aank),
     tijd: String(aank.getHours()).padStart(2, '0') + ':' + String(aank.getMinutes()).padStart(2, '0'),
     personen: 4, tafel: 'Tafel 6', at: geleden(20).toISOString(),
     vervaltAt: new Date(NU.getTime() + 3600000).toISOString(),

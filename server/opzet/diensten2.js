@@ -166,10 +166,7 @@ const contractGezien = new Map();
 function contractStandVoor(sess) {
   if (!sess || !sess.account) return null;   // een demo-persona heeft geen afspraak om te vinden
   const sleutel = sess.key || ('user-' + sess.account.id);
-  const nu = Date.now();
-  const eerder = contractGezien.get(sleutel);
-  if (eerder && nu - eerder.at < CONTRACT_VENSTER) return eerder.oordeel;
-
+  const nu = require('../lib/klok').nu();
   let oordeel = null;
   try {
     const aanm = kernVoorAuth.aanmeldingen;
@@ -180,16 +177,21 @@ function contractStandVoor(sess) {
        bevinding over het lid laten lezen (CONTROLPLANE.md: ONBEKEND is geen
        WEIGEREN). */
     if (!lees || typeof lees.stand !== 'function') return null;
-    oordeel = lidpoort.beoordeel(sess.tier, lees.stand(sess.account.id));
-    /* GEEN SLEUTEL MEE. Zie de kop van kern/commercie/lidpoort.js bij `weeg`: een
-       identiteit in die teller is een lijst leden van wie de pas mogelijk vervalt,
-       zonder bewaartermijn, en het lid kan hem niet kwijt. De sleutel hierboven is
-       alleen de geheugenkaart van dit proces en staat nergens op schijf. */
-    lidpoort.weeg(kernVoorAuth.handhavingSchaduw, oordeel);
+    /* A-P1-03: het OORDEEL wordt bij elk verzoek gerekend (een verlopen contract
+       mag geen tien minuten blijven doorwerken); alleen het WEGEN in de schaduw
+       blijft per venster. Een gratis lid kost geen opzoeking. */
+    oordeel = lidpoort.beoordeel(sess.tier, lees.stand(sess.account.id), nu);
+    const eerder = contractGezien.get(sleutel);
+    if (!(eerder && nu - eerder.at < CONTRACT_VENSTER) && oordeel.stand !== 'NIET_BETALEND') {
+      /* GEEN SLEUTEL MEE. Zie de kop van kern/commercie/lidpoort.js bij `weeg`: een
+         identiteit in die teller is een lijst leden van wie de pas mogelijk vervalt,
+         zonder bewaartermijn, en het lid kan hem niet kwijt. De sleutel hierboven is
+         alleen de geheugenkaart van dit proces en staat nergens op schijf. */
+      lidpoort.weeg(kernVoorAuth.handhavingSchaduw, oordeel);
+      if (contractGezien.size >= CONTRACT_DAK) contractGezien.clear();
+      contractGezien.set(sleutel, { at: nu });
+    }
   } catch (e) { return null; }
-
-  if (contractGezien.size >= CONTRACT_DAK) contractGezien.clear();
-  contractGezien.set(sleutel, { at: nu, oordeel });
   return oordeel;
 }
 
@@ -280,6 +282,13 @@ function auth(req, res, next) {
     const cs = contractStandVoor(sess);
     if (cs) {
       sess.contractStand = cs;
+      /* A-P1-03: een voorbije overeenkomst zet DEZE sessie op de basislaag. Server-
+         side en per verzoek: geen uitlog nodig, en het token zelf verandert niet.
+         req.session wordt een kopie, zodat een gedeeld sessieobject niet muteert. */
+      if (lidpoort.afgedwongen(cs)) {
+        req.session = Object.assign({}, sess, { tier: lidpoort.BASIS_TIER, tierVoorContract: sess.tier, contractGeeindigd: true });
+        res.set('RTG-Contract', 'geeindigd');
+      }
       /* NIET-AFGEDWONGEN STAAT OP HET ANTWOORD, want een regel die niets doet en
          dat niet zegt, is over een half jaar een regel waarvan niemand weet of hij
          aanstaat. `append` en niet `set`: de bezitsbewijstak hieronder zet dezelfde
@@ -304,7 +313,8 @@ function auth(req, res, next) {
         if (uit.nietAfgedwongen) res.append('RTG-Niet-Afgedwongen', 'bezitsbewijs');
         verder();
       })
-      .catch(() => verder());   // een storing in de bewijslaag is geen overtreding
+      /* A-P1-04: een storing in de bewijslaag laat een ZWAAR pad niet door. */
+      .catch(() => res.status(503).json({ error: 'Het bezitsbewijs kon niet worden gecontroleerd; er is niets uitgevoerd.', bezitsbewijs: 'storing' }));
     return;
   }
   return verder();
@@ -318,13 +328,13 @@ function auth(req, res, next) {
   envelop.zet(req, { soort: 'lid', id: sess.key || null, rol: sess.tier || null,
     capability: _fid || null });
   dirTouch(sess);
-  /* WIE DRAAGT DE KOSTEN VAN DIT VERZOEK -- één keer, op het keelgat waar elke
-     leden-route langs moet; verderop vindt alles de eigenaar in de async-context
+  /* WIE DRAAGT DE KOSTEN VAN DIT VERZOEK -- één keer, op het keelgat van elke
+     leden-route; verderop vindt alles de eigenaar in de async-context
      (kern/kosten/haak.js). Het verzoek telt mee, anders leest een gebruiker die
      nooit met de AI praat als kosteloos. */
   const drager = kostenhaak.drager('lid', sess.key);
   kostenhaak.meld('verzoek', 1, { drager, pas: sess.tier });
-  kostenhaak.binnen(drager, next, sess.tier);
+  require('./kritiekspoor').poort(req, res, sess.key, () => kostenhaak.binnen(drager, next, sess.tier, 'sessie'));
   }
 }
 

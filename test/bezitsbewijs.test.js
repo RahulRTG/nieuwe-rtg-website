@@ -155,23 +155,51 @@ test('5b. een ONGEBONDEN sessie komt er in "aanbevolen" langs, en dat wordt geze
 
 test('5c. in "verplicht" komt een ongebonden sessie er niet langs', async () => {
   const { b } = await opzet();
-  const uit = await b.controleer({ sess: los, methode: 'POST', pad: '/api/pay/tik', kop: null, stand: 'verplicht' });
+  const metAccount = Object.assign({}, los, { account: { id: 1 }, tier: 'rtg' });
+  const uit = await b.controleer({ sess: metAccount, methode: 'POST', pad: '/api/pay/tik', kop: null, stand: 'verplicht' });
   assert.equal(uit.stand, 'geweigerd');
   assert.equal(uit.code, 403);
+  assert.match(uit.reden, /Bevestig dit toestel/);
 });
 
-test('5d. een onbekende stand valt terug op schaduw en zegt dat', () => {
+test('5c2. een sessie ZONDER account krijgt geen stil privilege: ook geweigerd, met de weg erheen', async () => {
+  const { b } = await opzet();
+  const uit = await b.controleer({ sess: Object.assign({}, los, { account: null }), methode: 'POST', pad: '/api/pay/tik', kop: null, stand: 'verplicht' });
+  assert.equal(uit.stand, 'geweigerd');
+  assert.equal(uit.code, 403);
+  assert.match(uit.reden, /eigen RTG-account/);
+});
+
+test('5d. een onbekende stand valt terug op de VEILIGE kant (verplicht) en zegt dat', () => {
   const oud = process.env.RTG_BEZITSBEWIJS;
+  const oudEnv = process.env.NODE_ENV;
   try {
     const { maakBezitsbewijs } = require('../server/kern/identiteit/bezitsbewijs');
     const b = maakBezitsbewijs({ db: { data: {} }, save() {}, toestellen: null });
     process.env.RTG_BEZITSBEWIJS = 'verplicth';        // typefout
     const s = b.standNu();
-    assert.equal(s.stand, 'schaduw', 'een typefout hoort geen beveiliging aan of uit te zetten');
+    assert.equal(s.stand, 'verplicht', 'een typefout mag een zwaar pad niet in de schaduw zetten');
     assert.match(s.reden, /onbekende waarde/);
     delete process.env.RTG_BEZITSBEWIJS;
-    assert.equal(b.standNu().stand, 'schaduw');
-  } finally { if (oud === undefined) delete process.env.RTG_BEZITSBEWIJS; else process.env.RTG_BEZITSBEWIJS = oud; }
+    assert.equal(b.standNu().stand, 'verplicht', 'A-P1-04: de standaard is verplicht, ook voor ongebonden sessies');
+    process.env.RTG_BEZITSBEWIJS = 'schaduw';
+    process.env.NODE_ENV = 'test';
+    assert.equal(b.standNu().stand, 'schaduw', 'buiten productie blijft schaduw een bewuste keuze');
+    process.env.NODE_ENV = 'production';
+    assert.equal(b.standNu().stand, 'verplicht', 'in productie telt schaduw niet voor zware paden');
+  } finally {
+    if (oud === undefined) delete process.env.RTG_BEZITSBEWIJS; else process.env.RTG_BEZITSBEWIJS = oud;
+    if (oudEnv === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = oudEnv;
+  }
+});
+
+test('5e. een storing in de verifier laat een zwaar pad NIET door (fail closed)', async () => {
+  const { b } = await opzet();
+  const kapot = { ...gebonden, get sessieContext() { throw new Error('verifier stuk'); } };
+  const uit = await b.controleer({ sess: kapot, methode: 'POST', pad: '/api/pay/tik', kop: 'x.y', stand: 'aanbevolen' });
+  assert.equal(uit.stand, 'geweigerd');
+  assert.equal(uit.code, 503);
+  assert.ok(uit.storing);
 });
 
 /* ---------------------------------------------------------------------------

@@ -93,6 +93,9 @@ function maakBewijstoken({ sleutel, nu, gezien }) {
       scope = String(o.doel);
     }
 
+    const fout = bev.keurGrenzen(o.grenzen);  // onleesbaar: weigeren
+    if (fout.length) return { error: 'Ongeldige grens: ' + fout.join('; ') + '.' };
+
     const claim = {
       v: 1,
       actor: String(o.actor || bevoegdheid.door || ''),
@@ -142,8 +145,9 @@ function maakBewijstoken({ sleutel, nu, gezien }) {
     if (!r.ok) return r;
     const c = r.claim;
 
-    if (g.capability && g.capability !== c.capability)
-      return { error: 'Dit token is voor ' + c.capability + ' en niet voor ' + g.capability + '.' };
+    if (g.capability !== c.capability)  // leeg is dicht
+      return { error: 'Dit token is voor ' + c.capability +
+        (g.capability ? ' en niet voor ' + g.capability : '; zeg waarvoor het gebruikt wordt') + '.' };
 
     /* De grenzen worden met DEZELFDE functie getoetst als een gewone
        bevoegdheid. Zou hier een eigen lezing staan, dan bestaan er twee

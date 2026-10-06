@@ -10,6 +10,7 @@ module.exports = ({ rid, nu, log }) => (w, actor, p, b) => {
   const bron = V.tekst(b.bron,200);
   if (['bevestigd','uitgevoerd','geannuleerd'].includes(b.externeStand) && !bron) return V.fout('Noteer de bevestiging of bewijsreferentie.');
   const oud = b.taakId && V.pak(w.taken,b.taakId);
+  if (oud?.externeAfspraak?.herkomst === 'rtg-aanvraag') return V.fout('Deze opdracht wordt door de leverancier bevestigd. Gebruik de leveranciersbediening.',409);
   if (b.taakId && (!oud || oud.projectId !== p.id || !oud.externeAfspraak)) return V.fout('Dit onderdeel hoort niet bij deze vraag.',404);
   if (!oud && Object.values(w.taken || {}).filter(t=>t.projectId===p.id).length>=100) return V.fout('Maximaal 100 onderdelen per vraag.',429);
   const t = oud || {id:rid(8),projectId:p.id,ouderId:null,wachtOp:[],uren:0,urenlijst:[],prioriteit:'normaal',at:nu()};

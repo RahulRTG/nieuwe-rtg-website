@@ -21,6 +21,15 @@ module.exports = (ctx) => {
 
   function voegSamen(w, rij) {
     const dbBestaat = !!rij && !rij.weg;
+    /* `basisBestaat` zegt dat de collectie in de lokale projectie stond; het
+       zegt niet dat PostgreSQL haar ooit bevestigd heeft. Op een verse
+       multi-instance-start kunnen veilige defaults na de eerste laadronde
+       lokaal ontstaan (bijvoorbeeld de techniekzekeringen), terwijl de kv-rij
+       nog niet bestaat. Alleen een sleutel in `toegepast` bewijst dat een later
+       ontbrekende rij werkelijk verwijderd/drift is. Zonder dit onderscheid
+       kreeg de eerste legitieme vastlegging een 409 en kon een tweede instance
+       niet eens inloggen. */
+    const basisBevestigd = toegepast.has(w.sleutel);
     const basis = w.basisBestaat ? JSON.parse(w.basisJson) : undefined;
     const ons = w.waardeBestaat ? JSON.parse(w.waardeJson) : undefined;
     const hunJson = dbBestaat ? uitStore(rij.val) : null;
@@ -31,12 +40,16 @@ module.exports = (ctx) => {
        stil een gelijktijdige wijziging van een ander proces uitwissen. */
     if (w.basisBestaat && !dbBestaat) {
       if (!w.waardeBestaat) return { bestaat: false, waarde: undefined, dbJson: null };
-      throw fout('PG_REQUEST_CONFLICT', 'De collectie is tijdens dit verzoek verwijderd; opnieuw laden is vereist.');
+      if (!basisBevestigd && !rij)
+        return { bestaat: true, waarde: ons, dbJson: JSON.stringify(ons) };
+      throw fout('PG_REQUEST_CONFLICT', 'De collectie ' + w.sleutel +
+        ' is tijdens dit verzoek verwijderd; opnieuw laden is vereist.');
     }
     if (!w.waardeBestaat) {
       if (!w.basisBestaat) return { bestaat: dbBestaat, waarde: hun, dbJson: hunJson };
       if (JSON.stringify(basis) !== hunJson)
-        throw fout('PG_REQUEST_CONFLICT', 'De collectie veranderde tijdens de verwijdering; opnieuw laden is vereist.');
+        throw fout('PG_REQUEST_CONFLICT', 'De collectie ' + w.sleutel +
+          ' veranderde tijdens de verwijdering; opnieuw laden is vereist.');
       return { bestaat: false, waarde: undefined, dbJson: null };
     }
     if (!dbBestaat && w.basisBestaat)

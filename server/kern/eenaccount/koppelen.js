@@ -2,9 +2,12 @@
 
    Dit is de bewijs-helft: personeel bewijst de zaak-code + eigen PIN, de zaak
    bewijst de bedrijfsinlog, het kantoor bewijst een uitnodiging op naam plus
-   de tweede factor (in productie een eigen passkey, B24). Pas als het bewijs er is, komt de rol aan
-   de sleutelbos. De andere helft -- met die sleutelbos een werk-sessie munten
-   -- staat in ../eenaccount.js.
+   de tweede factor (in productie een eigen passkey, B24; daarbuiten mag de
+   oude test/demo-opstelling nog een losse TOTP vragen). Pas als het bewijs er
+   is, komt de rol aan de sleutelbos. De andere helft -- met die sleutelbos een
+   werk-sessie munten -- staat in ../eenaccount.js; in productie opent die
+   kantoorrol daarna uitsluitend na een verse passkeyceremonie
+   (kantoor/productiedeur.js).
 
    TWEE SLOTEN, EN ALLEEN SAMEN DEUGEN ZE.
 

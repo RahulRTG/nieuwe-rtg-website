@@ -120,6 +120,8 @@ test('de klok stopt terwijl RTG op de melder wacht', async () => {
     await o.p('/api/office/service/stand', { id: z.id, naar: 'wachtOpMelder', notitie: 'adres gevraagd' }, o.balie);
     await o.p('/api/service/bericht', { id: z.id, tekst: 'Kerkstraat 1' }, o.lid);
     const d = await o.p('/api/service/zaak', { id: z.id }, o.lid);
+    assert.ok(d.body.zaak.tijdlijn.some(r => r.wat === 'bericht' && r.van === 'mens' && r.tekst === 'Wat is het bezorgadres?'),
+      'de melder kan het echte bericht van de medewerker teruglezen');
     assert.equal(d.body.zaak.klokken.wachtOpMelder.perioden, 1,
       'de wachtperiode op de melder is niet geteld: ' + JSON.stringify(d.body.zaak.klokken));
     /* En de stand loopt weer zodra de melder antwoordt -- anders blijft een zaak

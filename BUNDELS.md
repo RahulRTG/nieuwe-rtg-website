@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 486 delen, 0 zonder onderwerp.**
+**61 bundels, 487 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9831 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9833 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -213,7 +213,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 116 delen, 9898 regels in de delen
+`public/apps/leverancier/` -- 115 delen, 9836 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -225,7 +225,6 @@ omlaag.
 | `leverancier-04.js` | het chatvenster met een partner |
 | `leverancier-05.js` | aanmelden als medewerker bij een zaak |
 | `leverancier-06.js` | de personeelskiezer: wie ben jij |
-| `leverancier-06a.js` | inloggen met het eigen RTG-account, met de tweede stap, en de app openen |
 | `leverancier-07.js` | een account voor alles: partner kiezen en de staat toepassen |
 | `leverancier-08.js` | de bonnenstatistiek van de kassa |
 | `leverancier-09.js` | de looplijst per station, op tijd gesorteerd |
@@ -334,6 +333,15 @@ omlaag.
 | `leverancier-84a.js` | HET ETEN-WERKBLAD AAN ZIJN KNOPPEN, en de rest van het werkblad zelf |
 | `leverancier-84b.js` | Een algemene reserveringsschakelaar geeft RTG geen toestemming voor een Connection-programma |
 
+## `apps/library/app.js`
+
+`public/apps/library/app/` -- 2 delen, 34 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `app-01.js` | LibraryOS, het scherm: Studio (werken, knooppunten, publiceren, vrijgeven en feedback) |
+| `app-02.js` | LibraryOS, de private Reader: een editie openen en lezen, feedback sturen, en de mobiele weergave |
+
 ## `apps/meldkamer.js`
 
 `public/apps/meldkamer/` -- 4 delen, 480 regels in de delen
@@ -381,7 +389,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 32 delen, 3290 regels in de delen
+`public/apps/personeel/` -- 32 delen, 3252 regels in de delen
 
 | deel | onderwerp |
 |---|---|

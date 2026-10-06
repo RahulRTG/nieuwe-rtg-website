@@ -24,6 +24,7 @@
 const { soort } = require('./soorten');
 const { HUIS } = require('./haak');
 const { metersVan, pasBatchToe, voegTerug } = require('./meterbatch');
+const { losVanVerzoek } = require('../../lib/losvanverzoek');
 
 /* Hoeveel maanden blijven staan. Vierentwintig: genoeg voor een jaarvergelijking
    en voor een correctie op een oude factuur, en niet meer dan dat. */
@@ -133,7 +134,8 @@ module.exports = (ctx) => {
   const spoel = () => spoelAchtergrond();
 
   function planSpoel() {
-    klaarZetter = setTimeout(() => {
+    /* Spoelt de buffer van ALLE dragers: nulcontext (lib/losvanverzoek.js). */
+    klaarZetter = losVanVerzoek(setTimeout, () => {
       klaarZetter = null; try { spoelAchtergrond(); } catch (e) {}
     }, SPOEL_MS);
     if (klaarZetter.unref) klaarZetter.unref();

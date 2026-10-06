@@ -56,8 +56,8 @@ function maak({ crypto, nu = () => klok.datum().toISOString() }) {
     if (!g || !p || !g.code || !p.id) throw new Error('gezinstoken vereist een gezin en een profiel');
     const m = bearer.maak({ prefix: 'GZ', issuer: 'rtg.foundation', doel: DOEL, scope: SCOPE,
       onderwerp: { gezin: String(g.code), profiel: String(p.id), rol: rolVan(p), epoch: epoch(p) },
-      geldigMs: Math.min(Number(geldigMs) || GELDIG_MS, GELDIG_MS) });
-    m.toegang.max_gebruik = 0;
+      geldigheid: { duurMs: Math.min(Number(geldigMs) || GELDIG_MS, GELDIG_MS) }, gebruik: 'sessie',
+      afgeleid: 'perAanroep' });
     const rij = (Array.isArray(p.sessies) ? p.sessies : []).filter(levend);
     rij.push(m.toegang);
     while (rij.length > MAX_SESSIES) rij.shift();

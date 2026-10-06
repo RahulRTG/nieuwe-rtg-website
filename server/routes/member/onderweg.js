@@ -6,6 +6,7 @@ const { wie: envelopWie } = require('../../opzet/envelop');
 module.exports = (kern) => {
   const { app, auth, db, save, findSupplier, notifySupplier, pushLive,
     liveStateFor, liveCodename, haversine, vraagRitVoor, betaalRitVoor, bevestigAankomst } = kern;
+  const liveSave = () => typeof save.sleutels === 'function' ? save.sleutels(['live']) : save();
 
   app.post('/api/live/start', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -26,8 +27,8 @@ module.exports = (kern) => {
       lat: start ? start.lat : null, lng: start ? start.lng : null,
       updatedAt: new Date().toISOString(), startedAt: new Date().toISOString(), arrived: false
     };
-    save();
-    if (dest) notifySupplier(dest.code, { icon: 'gps', title: 'Gast onderweg', body: db.data.live[key].codename + ' is naar u onderweg.' });
+    liveSave();
+    if (dest) (notifySupplier.naOpslag || notifySupplier)(dest.code, { icon: 'gps', title: 'Gast onderweg', body: db.data.live[key].codename + ' is naar u onderweg.' });
     pushLive(key);
     res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
   });
@@ -58,7 +59,7 @@ module.exports = (kern) => {
        PostgreSQL alleen deze collectie commit. Een proceslokale tijdgrendel is
        hier onveilig: gelijktijdige requests werken op geisoleerde kopieen en
        zouden dan wel 200 antwoorden, maar hun positie na het antwoord verliezen. */
-    if (gewijzigd || aangekomen) save();
+    if (gewijzigd || aangekomen) liveSave();
     pushLive(key);
     res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
   });
@@ -73,9 +74,9 @@ module.exports = (kern) => {
     const r = bevestigAankomst(key, 'lid');
     if (r.error) return res.status(r.status).json({ error: r.error });
     if (!r.al) {
-      save();
+      liveSave();
       const dest = findSupplier(r.L.destCode);
-      if (dest) notifySupplier(dest.code, { icon: 'ster', title: 'Gast gearriveerd', body: r.L.codename + ' meldt dat hij bij u is.' });
+      if (dest) (notifySupplier.naOpslag || notifySupplier)(dest.code, { icon: 'ster', title: 'Gast gearriveerd', body: r.L.codename + ' meldt dat hij bij u is.' });
     }
     pushLive(key);
     res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
@@ -88,7 +89,7 @@ module.exports = (kern) => {
        false, en de positie bleef dan zeven dagen staan tot de bewaarveger kwam.
        De taak is voorbij, dus de positie ook; de veger blijft als vangnet voor
        wie nooit op stop drukt. Bestemming en modus blijven: die zijn geen positie. */
-    if (L) { L.active = false; delete L.lat; delete L.lng; save(); pushLive(key); }
+    if (L) { L.active = false; delete L.lat; delete L.lng; liveSave(); pushLive(key); }
     res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
   });
 

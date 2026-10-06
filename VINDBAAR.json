@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-10-05T13:26:51.722Z",
-    "commit": "66db7566",
+    "op": "2026-10-06T16:21:08.210Z",
+    "commit": "04ac125d6",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
-    "node": "v22.22.0"
+    "node": "v26.10.0"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
-  "bestemmingen": 100,
-  "woorden": 1248,
-  "gevonden": 787,
-  "dekking": 0.6306,
+  "bestemmingen": 101,
+  "woorden": 1272,
+  "gevonden": 801,
+  "dekking": 0.6297,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -378,6 +378,24 @@
         "bron",
         "waarmee",
         "helpen"
+      ]
+    },
+    {
+      "naam": "LibraryOS",
+      "url": "/apps/library.html",
+      "woorden": 24,
+      "gevonden": 14,
+      "mist": [
+        "intellectueel",
+        "menselijke",
+        "kennis",
+        "blijvende",
+        "editie",
+        "inhoud",
+        "inhoudelijke",
+        "persoonlijke",
+        "geef",
+        "edities"
       ]
     },
     {

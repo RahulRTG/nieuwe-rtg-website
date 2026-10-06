@@ -57,7 +57,7 @@ module.exports = [
 
   // ---- Werk OS (de werkplek van een organisatie) ----
   { id: 'bedrijf', categorie: 'RTG-Backoffice', naam: 'Werk OS (werkruimtes)', standaard: true, doelgroepen: WERKOS,
-    uitleg: 'De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten. Uit = geen enkele werkruimte of gedeeld gastvoorstel werkt meer.', paden: ['/api/bedrijf', '/api/werk-gast'] },
+    uitleg: 'De werkplek van een organisatie: leden, rollen, startscherm, projecten, kennis, klanten, service, bouw, contracten, IT en besluiten. Uit = geen enkele werkruimte of gedeeld klant- of leveranciersvoorstel werkt meer.', paden: ['/api/bedrijf', '/api/werk-gast', '/api/werk-leverancier'] },
 
   // ---- Betalen & verificatie ----
   { id: 'betalen', categorie: 'Betalen & verificatie', naam: 'Betaalverkeer', standaard: true, doelgroepen: LEDEN_GAST,

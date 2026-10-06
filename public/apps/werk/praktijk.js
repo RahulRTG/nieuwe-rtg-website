@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   const K = window.RTGWerk, UI = window.RTGPraktijkUI;
-  if (location.hash.startsWith('#gast=')) return;
+  if (/^#(?:(gast|leverancier)=|betaling-terug$)/.test(location.hash)) return;
   const paneel = document.createElement('section'); paneel.className = 'praktijk'; paneel.id = 'praktijk';
   paneel.setAttribute('aria-label','Dagelijks werk');
   document.querySelector('#vStart').prepend(paneel);
@@ -16,22 +16,41 @@
     if (r.status >= 400 || r.body.error) throw new Error(r.body.error || 'Opslaan is niet gelukt. Uw invoer blijft staan.');
     return r.body;
   }
-  async function laad() {
-    if (!K.sessie() || bezig) return;
+  const openSleutel = el => el.dataset.prWerk ? 'werk|' + el.dataset.prWerk :
+    [el.closest('[data-pr-werk]')?.dataset.prWerk || '', el.dataset.prOpen].join('|');
+  async function laad(naSchrijven = false) {
+    if (!K.sessie() || (bezig && !naSchrijven)) return;
     const gekozen = K.sessie().werkruimte;
-    if (ruimte !== gekozen) { concepten.clear(); ruimte = gekozen; offset = 0; }
-    const nummer = ++laadNummer;
+    if (ruimte !== gekozen) { concepten.clear(); ruimte = gekozen; offset = 0; paneel.replaceChildren(); stand = null; }
+    const nummer = ++laadNummer; paneel.setAttribute('aria-busy','true');
     try {
       const data = await api('beeld', {offset});
       if (nummer !== laadNummer || K.sessie()?.werkruimte !== gekozen) return;
+      const open = new Map([...paneel.querySelectorAll('details[data-pr-open],details[data-pr-werk]')].map(el => [openSleutel(el),el.open]));
+      const actief = document.activeElement, actiefForm = actief?.closest('form[data-pr]');
+      const focus = actiefForm && paneel.contains(actiefForm) ? { form:formulierSleutel(actiefForm), naam:actief.name,
+        begin:actief.selectionStart, einde:actief.selectionEnd } : null;
       stand = data; paneel.innerHTML = UI.teken(stand);
+      paneel.querySelectorAll('details[data-pr-open],details[data-pr-werk]').forEach(el => {
+        if (open.has(openSleutel(el))) el.open = open.get(openSleutel(el));
+      });
       paneel.querySelectorAll('form[data-pr]').forEach(f => {
         const waarden = concepten.get(formulierSleutel(f)); if (!waarden) return;
         for (const [naam, waarde] of Object.entries(waarden)) { const el = f.elements.namedItem(naam); if (el) el.value = waarde; }
-        let ouder = f.parentElement; while (ouder && ouder !== paneel) { if (ouder.tagName === 'DETAILS') ouder.open = true; ouder = ouder.parentElement; }
+        let ouder = f.parentElement; while (ouder && ouder !== paneel) { if (ouder.tagName === 'DETAILS' && !open.has(openSleutel(ouder))) ouder.open = true; ouder = ouder.parentElement; }
       });
+      if (focus) {
+        const f = [...paneel.querySelectorAll('form[data-pr]')].find(el => formulierSleutel(el) === focus.form);
+        const el = f?.elements.namedItem(focus.naam);
+        if (el) { el.focus({preventScroll:true}); if (focus.begin !== null && el.setSelectionRange) el.setSelectionRange(focus.begin,focus.einde); }
+      }
       paneel.querySelectorAll('[name=bedrag]').forEach(el => el.step = String(10**-(stand.profiel?.decimalen ?? 2)));
-    } catch (err) { paneel.textContent = err.message; }
+    } catch (err) {
+      if (nummer !== laadNummer || K.sessie()?.werkruimte !== gekozen) return;
+      let fout = paneel.querySelector('[data-pr-laadfout]');
+      if (!fout) { fout = document.createElement('p'); fout.dataset.prLaadfout = ''; fout.setAttribute('role','status'); paneel.prepend(fout); }
+      fout.textContent = err.message;
+    } finally { if (nummer === laadNummer) paneel.setAttribute('aria-busy','false'); }
   }
   paneel.addEventListener('submit', async ev => {
     const f = ev.target.closest('form[data-pr]'); if (!f) return;
@@ -39,16 +58,33 @@
     const b = Object.fromEntries(new FormData(f)), soort = f.dataset.pr;
     if ('bedrag' in b) { b.bedragMinor = Math.round(Number(b.bedrag)*10**(stand.profiel?.decimalen ?? 2)); delete b.bedrag; }
     if (soort === 'inrichten') { b.versie = stand.profiel?.versie || 0; b.land = b.land.toUpperCase(); b.valuta = b.valuta.toUpperCase(); }
+    if (['leverancier','betaalverzoek'].includes(soort)) { b.projectId = f.dataset.project; b.versie = stand.werk.find(x => x.id === b.projectId).versie; }
     if (soort === 'stap') { b.projectId = f.dataset.project; b.stap = f.dataset.stap; b.versie = stand.werk.find(x => x.id === b.projectId).versie; }
+    if (soort === 'betaalverzoek') b.aan = b.aan === 'true';
     const afdruk = JSON.stringify(b);
     if (f._afdruk !== afdruk) { f._idem = crypto.randomUUID(); f._afdruk = afdruk; }
     b.idem = f._idem;
-    bezig = true; const knop = f.querySelector('button[type=submit]'); knop.disabled = true;
+    bezig = true; ++laadNummer; paneel.setAttribute('aria-busy','true'); const knop = f.querySelector('button[type=submit]'); knop.disabled = true;
     let uit = f.querySelector('[role=status]'); if (!uit) { uit = document.createElement('p'); uit.setAttribute('role','status'); f.append(uit); }
     uit.textContent = 'Bewaren…';
-    try { await api(soort,b); concepten.delete(formulierSleutel(f)); bezig = false; await laad(); K.meld('Bewaard.'); }
+    try {
+      const r = await api(soort,b); concepten.delete(formulierSleutel(f));
+      /* Na een geslaagde handeling keert de werktafel terug naar het overzicht.
+         Sluit bij werk ook de hele werkkaart, zodat een formulier dat dieper in
+         de kaart stond niet onzichtbaar open blijft. Andere conceptformulieren
+         worden door laad() met hun invoer en open stand hersteld. */
+      const eigenaar = f.closest('details[data-pr-werk]') || f.closest('details[data-pr-open]');
+      if (eigenaar) eigenaar.open = false;
+      await laad(true); K.meld('Bewaard.');
+      if (r.link) {
+        const ontvangst=document.createElement('div'); ontvangst.setAttribute('role','status');
+        const a=document.createElement('a');a.className='pr-link';a.href=r.link;a.textContent=new URL(r.link,location.origin).href;
+        ontvangst.append(document.createTextNode(r.let+' Geldig tot '+new Date(r.verloopt).toLocaleString(document.documentElement.lang||navigator.language)+'. '),a);
+        paneel.prepend(ontvangst);ontvangst.scrollIntoView({block:'center'});
+      }
+    }
     catch (err) { uit.textContent = err.message; }
-    finally { bezig = false; knop.disabled = false; }
+    finally { bezig = false; paneel.setAttribute('aria-busy','false'); knop.disabled = false; }
   });
   paneel.addEventListener('click', async ev => {
     const pagina = ev.target.closest('[data-pr-pagina]');

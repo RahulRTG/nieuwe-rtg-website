@@ -1,4 +1,5 @@
 'use strict';
+const { naAntwoord } = require('../lib/antwoord-einde');
 /* De auditmeting: liet dit verzoek een spoor na?
 
    Een eigen bestand omdat het een eigen onderwerp is -- en omdat
@@ -29,13 +30,7 @@ module.exports = function auditmeting({ app, db }) {
   app.use((req, res, next) => {
     if (!db || !db.data) return next();
     const voor = sporen.standVan(db.data);
-    /* Een bekende luisteraar extra, dus de grens gaat een mee omhoog (zoals in
-       ../lib/eindstatus.js). Met een Idempotency-Key was dit anders de elfde
-       'finish'-luisteraar en gaf elk verzoek in de meetrun een
-       MaxListenersExceededWarning. */
-    const max = typeof res.getMaxListeners === 'function' ? res.getMaxListeners() : 0;
-    if (max > 0 && Number.isFinite(max)) res.setMaxListeners(max + 1);
-    res.on('finish', () => {
+    naAntwoord(res, () => {
       const patroon = req.routePatroon || null;
       if (!patroon) return;
       try { routelog.noteerAudit(req.method, patroon, sporen.gegroeid(voor, sporen.standVan(db.data)), res.statusCode); }

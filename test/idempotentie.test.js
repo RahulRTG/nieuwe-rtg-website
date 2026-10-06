@@ -120,20 +120,28 @@ test('een andere sleutel, of dezelfde sleutel van een andere afzender, draait ec
   assert.equal(telling(), 3, 'dezelfde sleutel van een andere afzender is andermans verzoek, nooit een herhaling');
 }));
 
-test('een 4xx wordt herhaald, een 5xx nooit', () => metApp(async ({ post, telling, zetStatus }) => {
+test('alleen een geslaagd antwoord wordt onthouden: een 4xx en een 5xx draaien bij herhaling opnieuw', () => metApp(async ({ post, telling, zetStatus }) => {
+  /* Besluit van 4 oktober 2026: deze laag volgt lib/idem-poort.js en
+     lib/dubbeltik.js. Een 409 hangt af van de toestand; wie die toestand
+     herstelt en het opnieuw probeert met dezelfde sleutel, hoort de route te
+     bereiken en niet een oude weigering uit de kas. */
   zetStatus(409);
   const een = await post('/api/tel', { idem: 'c1' });
-  const twee = await post('/api/tel', { idem: 'c1' });
   assert.equal(een.status, 409);
-  assert.equal(twee.status, 409);
-  assert.equal(telling(), 1, 'dezelfde vraag, hetzelfde oordeel: de 409 komt uit de kas');
+  zetStatus(200);
+  const twee = await post('/api/tel', { idem: 'c1' });
+  assert.equal(twee.status, 200, 'de toestand is hersteld: de herhaling bereikt de route');
+  assert.equal(telling(), 2);
+  const drie = await post('/api/tel', { idem: 'c1' });
+  assert.equal(drie.status, 200);
+  assert.equal(telling(), 2, 'en het geslaagde antwoord wordt WEL onthouden');
 
   zetStatus(500);
   await post('/api/tel', { idem: 'c2' });
   zetStatus(200);
   const na = await post('/api/tel', { idem: 'c2' });
   assert.equal(na.status, 200, 'een storing wordt niet vastgespijkerd: de herhaling mag opnieuw');
-  assert.equal(telling(), 3);
+  assert.equal(telling(), 4);
 }));
 
 test('idempotentieSleutel werkt net als idem, en niet-tekst telt niet als sleutel', () => metApp(async ({ post, telling }) => {
@@ -150,3 +158,55 @@ test('een route die niet via res.json antwoordt, blijft buiten de kas', () => me
   await post('/api/plat', { idem: 'e1' });
   assert.equal(telling(), 2, 'res.send valt buiten de belofte (de grens staat in de kop van de laag)');
 }));
+
+test('een 200 met ok:false is geen succes en wordt dus niet onthouden', () => metApp(async ({ post, telling }) => {
+  /* De route /api/tel antwoordt altijd met een object zonder `ok`; dit geval
+     zet hem via een eigen app op `ok: false` -- de vorm waarin veel routes in
+     dit huis een weigering met status 200 geven. */
+  const express2 = require('../server/web');
+  const app = express2();
+  app.use(express2.json());
+  app.use(maakIdempotentie());
+  let n = 0;
+  app.post('/api/weiger', (req, res) => { n++; res.json(n === 1 ? { ok: false, error: 'nog niet' } : { ok: true, n }); });
+  const server = await new Promise(z => { const s = app.listen(0, () => z(s)); });
+  try {
+    const url = 'http://127.0.0.1:' + server.address().port + '/api/weiger';
+    const stuur = () => fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idem: 'w1' }) }).then(r => r.json());
+    assert.equal((await stuur()).ok, false);
+    assert.equal((await stuur()).ok, true, 'de herhaling bereikt de route opnieuw');
+    assert.equal(n, 2);
+  } finally { server.close(); }
+  assert.equal(telling(), 0);
+}));
+
+/* DE DRIE LAGEN SAMEN, in de volgorde waarin het huis ze monteert
+   (opzet/lijfpoort.js: idem-poort; opzet/poortwachters.js: dubbeltik en dan
+   deze laag). De val die er zat: een POST met `idem` in het lijf kreeg een 409,
+   de toestand werd hersteld, en de herhaling kreeg 24 uur lang die oude 409
+   terug zonder dat de route draaide. Na het besluit van 4 oktober 2026 volgen
+   alle drie dezelfde regel: alleen een succes wordt onthouden. */
+test('de drie lagen samen: na een herstelde toestand bereikt de herhaling de route', async () => {
+  const express3 = require('../server/web');
+  const { maakDubbeltik } = require('../server/lib/dubbeltik');
+  const app = express3();
+  app.use(express3.json());
+  app.use(require('../server/lib/idem-poort')());
+  app.use(maakDubbeltik({}).middleware());
+  app.use(maakIdempotentie());
+  let saldo = 0, n = 0;
+  app.post('/api/proef/koop', (req, res) => { n++; if (saldo < 10) return res.status(409).json({ error: 'te weinig saldo' }); res.json({ ok: true, n }); });
+  const server = await new Promise(z => { const s = app.listen(0, () => z(s)); });
+  try {
+    const url = 'http://127.0.0.1:' + server.address().port + '/api/proef/koop';
+    const koop = () => fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idem: 'koop-abcdef1' }) });
+    assert.equal((await koop()).status, 409);
+    saldo = 100;
+    const retry = await koop();
+    assert.equal(retry.status, 200, 'de oude 409 komt niet meer uit een kas');
+    assert.equal(n, 2);
+    const nogmaals = await koop();
+    assert.equal(nogmaals.status, 200);
+    assert.equal(n, 2, 'het succes is onthouden: geen derde uitvoering');
+  } finally { server.close(); }
+});

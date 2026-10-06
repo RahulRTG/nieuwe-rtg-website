@@ -185,7 +185,27 @@ const MET_REDEN = {
   '/apps/codewoord.html': 'STAND: Codewoord is een stand van RTG Veilig geworden.',
   '/apps/thuisrust.html': 'STAND: Thuisrust is een stand van RTG Veilig geworden.',
   '/apps/thuiswacht.html': 'STAND: Thuiswacht is een stand van RTG Veilig geworden.',
-  '/apps/berichten.html': 'STAND: de gesprekken wonen in RTG Communication Core (/apps/comm.html).'
+  '/apps/berichten.html': 'STAND: de gesprekken wonen in RTG Communication Core (/apps/comm.html).',
+  /* Gemeten op 5 oktober 2026: zeventien schermen zonder reden, en geen ervan
+     bleek een kapotte ingang. Elf zijn een doorverwijzing geworden (meta-refresh
+     naar de plek waar de functie nu woont), drie hebben een eigen deur. */
+  '/apps/balans.html': 'STAND: Balans is een stand van RTG Geld geworden (geld.html#balans).',
+  '/apps/bank.html': 'STAND: Bank is een stand van RTG Geld geworden (geld.html#bank).',
+  '/apps/labfonds.html': 'STAND: het Lab-fonds is een stand van RTG Geld geworden (geld.html#labfonds).',
+  '/apps/logboek.html': 'STAND: het Logboek is een stand van RTG Geld geworden (geld.html#logboek).',
+  '/apps/mecenaat.html': 'STAND: Mecenaat is een stand van RTG Geld geworden (geld.html#mecenaat).',
+  '/apps/nalatenschap.html': 'STAND: Nalatenschap is een stand van RTG Geld geworden (geld.html#nalatenschap).',
+  '/apps/rtgcode.html': 'STAND: de RTG-code is een stand van RTG Geld geworden (geld.html#rtgcode).',
+  '/apps/wallet.html': 'STAND: Wallet is een stand van RTG Geld geworden (geld.html#wallet).',
+  '/apps/wbw.html': 'STAND: Wie betaalt wat is een stand van RTG Geld geworden (geld.html#wbw).',
+  '/apps/geld-command.html': 'STAND: de oude geldomgeving verwijst door naar RTG Geld (geld.html).',
+  '/apps/kantoorpda.html': 'STAND: de Kantoor-PDA zit in de personeels-app (personeel.html?kantoor=1).',
+  '/apps/zorgbalie.html': 'STAND: de Zorgbalie zit in de personeels-app (personeel.html).',
+  '/apps/toestemming.html': 'STAND: Toestemming is samengevoegd in Wie heeft toegang tot mij (mijn-relaties.html, SCHERMEIGENAAR.json).',
+  '/apps/vandaag.html': 'STAND: Vandaag is samengevoegd in life.html (SCHERMEIGENAAR.json).',
+  '/apps/loopbaanbewijs.html': 'LANDING: een regel uit een loopbaan, geopend met de code die iemand u stuurde; geen account nodig.',
+  '/apps/service-bel.html': 'ROL: bellen met RTG is een dienst van Lifestyle en Business (SERVICE.md par. 13); de knop staat in de hulpla en de meter meet een RTG Pass-lid.',
+  '/apps/foundation/veilig.html': 'ROL: Veilig thuis deelt status en plek BINNEN een gezin; de ingang staat op Veilig & Vertrouwd achter de gezinsdeur, en de meter heeft geen gezinsrol.'
 };
 
 const { laadBrowser } = require('../test/browser');

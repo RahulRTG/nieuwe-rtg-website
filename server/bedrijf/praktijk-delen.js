@@ -11,7 +11,7 @@ module.exports = ({ crypto, rid, nu, log, db, rechtenVan }) => {
       return V.fout('Maak eerst een voorstel.', 409);
     const dagen = b.dagen == null ? 7 : b.dagen;
     if (!Number.isInteger(dagen) || dagen < 1 || dagen > 7) return V.fout('Kies één tot zeven dagen.');
-    for (const d of Object.values(w.praktijkDelen || {})) if (d.projectId === p.id) d.ingetrokken = true;
+    for (const d of Object.values(w.praktijkDelen || {})) if (d.projectId === p.id && d.doel === 'werk.voorstel@1') d.ingetrokken = true;
     if (b.intrekken === true) { log(w, actor, 'praktijk-link-ingetrokken', p.id); return { ok: true }; }
     const id = rid(16), token = crypto.randomBytes(32).toString('base64url');
     const uitgegeven = Date.now();
@@ -46,7 +46,8 @@ module.exports = ({ crypto, rid, nu, log, db, rechtenVan }) => {
     omschrijving: x.omschrijving, voorstel: x.voorstel, bedragMinor: x.bedragMinor, valuta: x.valuta, decimalen: x.decimalen,
     stand: x.stand, datum: x.datum, tijdzone: x.tijdzone, locatie: x.locatie,
     onderdelen: Object.values(w.taken || {}).filter(t => t.projectId === p.id && t.externeAfspraak).map(t => ({
-      titel: t.titel, datum: t.deadline, stand: t.externeAfspraak.stand, herkomst: 'handmatig vastgelegd' })),
+      titel: t.titel, datum: t.deadline, stand: t.externeAfspraak.stand,
+      herkomst: t.externeAfspraak.herkomst === 'rtg-aanvraag' ? 'via RTG aangevraagd' : 'handmatig vastgelegd' })),
     versie: x.versie, verloopt: d.verloopt, magAntwoorden: x.stand === 'voorstel' && d.versie === x.versie });
   function besluit(g, b) {
     const { w, d, p, x } = g;

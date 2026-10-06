@@ -89,7 +89,15 @@ test('Het team om mij heen: een voorstel, de volle nee-lijst, aanvaarden door de
 
       /* 1. Leeg is een mededeling. */
       await page.goto(base + '/apps/vertegenwoordiging.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('#team .leeg, #team .kaart');
+      /* De tijdelijke laadregel is zelf ook `.leeg`. Wachten op alleen die
+         selector maakte de toets afhankelijk van browsersnelheid: onder de
+         volledige schermsuite kon de assertion de fetch nét voor zijn. Wacht
+         daarom op de server-afgeronde betekenis, niet op de presentatiestijl. */
+      await page.waitForFunction(() => {
+        const team = document.querySelector('#team');
+        return !!team && (/er gebeurt niets namens u|staat niemand naast u/i.test(team.textContent || '') ||
+          !!team.querySelector('.kaart'));
+      });
       assert.match(await page.textContent('#team'), /er gebeurt niets namens u|staat niemand naast u/i,
         'een leeg team hoort te zeggen dat er niets namens u gebeurt, niet leeg te blijven');
 

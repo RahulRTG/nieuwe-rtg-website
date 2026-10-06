@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-29T18:27:18.986Z",
-    "commit": "747aa293d",
+    "op": "2026-10-05T10:42:07.167Z",
+    "commit": "68f10da04",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 2,
     "instrument": "scripts/positiestroom.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "graad": "vermoed",
   "hoe": "lexicaal: de noemer is elk bestand in server/ dat een object met lat en lng/lon bouwt (geen vaste getallen) en iets opslaat; de indeling is per stroom verklaard met een citaat dat letterlijk in de bron moet staan; de termijn komt uit het bewaarbeleid, de bewaarveger en de vergeetroute.",

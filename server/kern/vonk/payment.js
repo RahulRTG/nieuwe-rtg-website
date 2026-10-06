@@ -1,7 +1,11 @@
 'use strict';
 
+const trustRuntime = require('../bewijsvlak/runtime');
+const trustExternal = require('../bewijsvlak/v3-external-hook');
+
 module.exports = ({ d, save, nu, geblokkeerd, codenaamVan, pay, reserveerTafel, notify, partnerEligible,
-  PRIJS_CENTEN, RTG_CENTEN }) => async function betaal(key, mid) {
+  PRIJS_CENTEN, RTG_CENTEN }) => {
+async function betaalIntern(key, mid) {
   const m=d().matches.find(x=>x.id===mid&&(x.a===key||x.b===key));
   if(!m)return {status:404,error:'Deze match bestaat niet.'};
   const ander=m.a===key?m.b:m.a;
@@ -58,16 +62,55 @@ module.exports = ({ d, save, nu, geblokkeerd, codenaamVan, pay, reserveerTafel, 
       return {status:409,error:'De verbinding is tijdens het betalen gesloten.'};
     }
     m.betaald[key]=nu();
+    trustRuntime.observe({ capability:'payment.authorize', boundary:'connection:vonk',
+      subjectRef:{domain:'connection',type:'match',id:m.id}, predicate:'payment.commitment.recorded',
+      value:{participant:key===m.a?'a':'b',status:'paid'},
+      evidence:{matchRef:m.id,participant:key===m.a?'a':'b',amountCents:PRIJS_CENTEN},
+      policy:{id:'vonk-policy',version:1,decision:'SHADOW'} });
     if(m.betaald[ander]&&!m.reserveringId&&!m.reservationInFlight){
       m.reservationInFlight=nu();save();let r;
+      const bewijsRef='vonk:'+m.id+':reservation';
+      const commitmentId=null;
+      m.reservationTrust={reservationRef:bewijsRef,commitmentEvidenceId:null};
       try{r=await Promise.resolve(reserveerTafel({key,tier:'rtg'},codenaamVan(m.a)+' & '+codenaamVan(m.b),{
         supplierCode:m.tafel.supplierCode,datum:m.tafel.datum,tijd:m.tafel.tijd,personen:2,
         notitie:'Vonk-date (aanbetaling voldaan)',idempotencyKey:'vonk:'+m.id+':reservation'}));}
       catch(e){r={error:'De reserveringsprovider reageerde niet.'};}
-      delete m.reservationInFlight;m.status=r&&r.ok?'bevestigd':'betaald';m.reserveringId=r&&r.ok?r.reservering.id:null;
-      if(r&&r.ok)for(const wie of [m.a,m.b])try{notify(wie,{icon:'bar',title:'De date staat',body:m.tafel.supplierName+', '+m.tafel.datum+' '+m.tafel.tijd+'. Veel plezier!'});}catch(e){}
+      const heeftReservering=!!(r&&r.ok&&r.reservering&&r.reservering.id);
+      const aangevraagd=heeftReservering&&r.reservering.status==='aangevraagd';
+      delete m.reservationInFlight;m.status=aangevraagd?'reservering-aangevraagd':'reservering-onbekend';
+      m.reserveringId=heeftReservering?r.reservering.id:null;
+      const claim=commitmentId?trustExternal.assess(bewijsRef,[commitmentId],nu()):null;
+      m.reservationEvidence={state:aangevraagd?'PENDING':'UNKNOWN',
+        finality:claim&&claim.claimId?claim.finality:'UNKNOWN',
+        missing:claim&&claim.claimId?claim.completeness.missing.map(x=>x.requirementId):
+          ['domain-commitment','provider-confirmation','operational-outcome']};
+      if(aangevraagd)trustRuntime.observe({capability:'reservation.request',boundary:'connection:vonk',
+        subjectRef:{domain:'hospitality',type:'reservation',id:r.reservering.id},predicate:'vonk.date.reservation_requested',
+        value:{status:'PENDING'},evidence:{matchRef:m.id,reservationRef:r.reservering.id,
+          supplierRef:m.tafel.supplierCode,providerConfirmation:false},
+        policy:{id:'vonk-policy',version:1,decision:'SHADOW'}});
+      if(aangevraagd)for(const wie of [m.a,m.b])try{notify(wie,{icon:'bar',title:'Tafel aangevraagd',
+        body:m.tafel.supplierName+' beslist nog over '+m.tafel.datum+' '+m.tafel.tijd+'.'});}catch(e){}
     }
     return {status:200,ok:true,status2:m.status};
   } catch(e) { return {status:502,error:'De betaling kon niet veilig worden afgerond.'}; }
   finally { delete m.paymentInFlight[key];save(); }
+}
+
+return async function betaal(key, mid) {
+  const timer=trustRuntime.timer({capability:'payment.authorize',boundary:'connection:vonk'});
+  try {
+    const result=await betaalIntern(key,mid),status=Number(result&&result.status)||500;
+    const ok=!!(result&&result.ok&&status<400);
+    timer.finish({outcome:ok?'SUCCEEDED':(status>=500||status===402?'FAILED':'DENIED'),
+      domainOutcome:ok?'PAYMENT_AUTHORIZED':
+        ((result&&result.code)||'PAYMENT_DENIED'),errorClass:ok?null:((result&&result.code)||'HTTP_'+status),
+      measurementKey:ok?'vonk-payment:'+mid+':'+key:null,replay:!!(result&&result.al)});
+    return result;
+  } catch(e) {
+    timer.finish({outcome:'FAILED',domainOutcome:'PAYMENT_FAILED',errorClass:'PAYMENT_EXCEPTION'});
+    throw e;
+  }
+};
 };

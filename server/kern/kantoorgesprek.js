@@ -37,7 +37,10 @@ function maakKantoorgesprek({ OFFICE_CODE, veiligGelijk, totpOk, crypto, remembe
   officeState, logInlog, loginFails, noteFailedTry }) {
   const gesprekken = new Map();    // id -> { veld, at, beurten }
   const nu = () => Date.now();
-  const tweedeFactor = () => !!process.env.OFFICE_TOTP_SECRET;
+  // Alleen de afgeschermde test/demo-codedeur kent de losse TOTP. In
+  // productie sluit codeDicht() deze hele weg en opent alleen een account op
+  // naam met een verse passkeyceremonie.
+  const tweedeFactor = () => !productiedeur.isProductie() && !!process.env.OFFICE_TOTP_SECRET;
 
   function opruimen() {
     for (const [id, g] of gesprekken) if (nu() - g.at > TTL_MS) gesprekken.delete(id);

@@ -62,6 +62,7 @@ const crypto = require('crypto');
 const kluis = require('./kluis');
 const { veiligGelijk } = require('../kern/util');
 const { voorGrens, uitgezet } = require('./sessiegrens');
+const { doelGeldig } = require('./tokenvorm');
 
 /* DE OUDE VORM: EEN TOKEN ZONDER UITGIFTEMOMENT.
 
@@ -94,6 +95,9 @@ function maakActieTokens({ getUserById, strikt, isIngetrokken }) {
   function actieSleutel(purpose) { return kluis.sleutelVoor('actie:' + String(purpose || '')); }
 
   function issueActionToken(userId, purpose, ttlMs) {
+    /* Een doel dat zelf een getal is of een punt bevat, kan voor een tijdveld
+       van een sessietoken doorgaan: nooit uitgeven (./tokenvorm.js). */
+    if (!doelGeldig(purpose)) throw new Error('ongeldig doel voor een actietoken');
     /* De nonce maakt twee uitgiftes in dezelfde ms afzonderlijk intrekbaar. Het
        uitgiftemoment komt van dezelfde klok als dat van een sessietoken. */
     const nu = Date.now();

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2437 bestanden en 16675 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2437 bestanden en 16679 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2437 |
-| losse beweringen (`test(...)`) | 16675 |
+| losse beweringen (`test(...)`) | 16679 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2261 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2130 bestanden, 16143 beweringen.
+2130 bestanden, 16147 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -614,7 +614,7 @@ toets omvalt.
 | `gegevenspoort.test.js` | 4 | gezakt op `liegpoort /api/` | Een gratis account vraagt vier dingen. Pas als er een DERDE PARTIJ bij komt -- een zaak, een koerier -- vraagt Rahul de rest, in een gesprek. |
 | `geheugen.test.js` | 7 | gezakt op `===->!==` | De Memory Engine: van leren-toets-vergeten naar onthouden. De beloftes die hier hard worden gemaakt: - een behaald leerdoel krijgt een herhaalmoment, en dat moment ligt in de toekomst (niet vandaag: dan zou alles... |
 | `geld-conservatie-last.test.js` | 1 | gezakt op `liegpoort /api/` | Geld-conservatie onder GELIJKTIJDIGE, ECHTE schrijfpaden. De beproeving zaait haar activiteit rechtstreeks in de opslag (snel, maar het toetst geen functionele juistheid van de echte betaalroute). |
-| `geld-motorsleutel.test.js` | 8 | -- | DE GELDKETEN TEGEN DE ECHTE RUST-MOTOR: elke motorboeking draagt een economische sleutel, en die sleutel heeft een vorm die de motor aanneemt. Vier fouten, alle vier gevonden met de echte motor en geen van alle met... |
+| `geld-motorsleutel.test.js` | 12 | -- | DE GELDKETEN TEGEN DE ECHTE RUST-MOTOR: elke motorboeking draagt een economische sleutel, en die sleutel heeft een vorm die de motor aanneemt. Vier fouten, alle vier gevonden met de echte motor en geen van alle met... |
 | `geld-rollen-buiten-bank.test.js` | 4 | gezakt op `true->false#0` | DE ROLLENVRAAG BUITEN DE BANK. test/geld-rollen.test.js bewijst dat lid B niet bij de bankrekening van lid A komt. |
 | `geld-rollen-gezin.test.js` | 4 | gezakt op `return-weg#0` | KOMT GEZIN B BIJ HET DOSSIER VAN GEZIN A? De zesde en laatste rollenvraag, en de zwaarste. |
 | `geld-rollen-school.test.js` | 4 | gezakt op `return-weg#0` | KOMT SCHOOL B BIJ DE ADMINISTRATIE VAN SCHOOL A? De vierde rollenvraag. |

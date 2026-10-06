@@ -39,7 +39,7 @@ test('Loop Fabric PostgreSQL: bronchange, receipt en projectie zijn race-, repla
   const isolated=await require('./lib/living-world-pg-database')(url); t.after(isolated.close);
   const {maakPg}=require('../server/pg'),{merge3}=require('../server/db/merge'),kluis=require('../server/kluis');
   const a=maakPg({url:isolated.url,merge3,kluis}),b=maakPg({url:isolated.url,merge3,kluis});
-  const core=(pg,data,afterCommit=false)=>makeWork({db:{data,writable:true},now:()=>at,bewerkCollectie:async(name,fn)=>{
+  const core=(pg,data,afterCommit=false)=>makeWork({leesCollectie:name=>data[name],now:()=>at,bewerkCollectie:async(name,fn)=>{
       const out=await pg.bewerkCollectie(name,data,fn); if(afterCommit) throw new Error('injected after commit'); return out;
     }});
   try {
@@ -72,9 +72,9 @@ test('Loop Fabric PostgreSQL: bronchange, receipt en projectie zijn race-, repla
     const livingWorld={deliver:async()=>({deliveredThrough:0}),protocolEvents:()=>[],
       resolveObservation:()=>({ok:true,observation,corrected:false})};
     const faData=await a.laadAlles(),fbData=await b.laadAlles();
-    const workA=makeWork({db:{data:faData,writable:true},now:()=>at,
+    const workA=makeWork({leesCollectie:name=>faData[name],now:()=>at,
       bewerkCollectie:(name,fn)=>a.bewerkCollectie(name,faData,fn)});
-    const workB=makeWork({db:{data:fbData,writable:true},now:()=>at,
+    const workB=makeWork({leesCollectie:name=>fbData[name],now:()=>at,
       bewerkCollectie:(name,fn)=>b.bewerkCollectie(name,fbData,fn)});
     const fa=makeFabric({db:{data:faData,writable:true},now:()=>at,livingWorld,workSource:workA,
       bewerkCollectie:(name,fn)=>a.bewerkCollectie(name,faData,fn)});
@@ -86,7 +86,7 @@ test('Loop Fabric PostgreSQL: bronchange, receipt en projectie zijn race-, repla
     const conflict=await fb.ingest({...event,type:'workos.change.tampered'});
     assert.equal(conflict.code,'SOURCE_EVENT_CONFLICT');
     const restartedData=await a.laadAlles();
-    const restartedWork=makeWork({db:{data:restartedData,writable:true},now:()=>at,
+    const restartedWork=makeWork({leesCollectie:name=>restartedData[name],now:()=>at,
       bewerkCollectie:(name,fn)=>a.bewerkCollectie(name,restartedData,fn)});
     const restarted=makeFabric({db:{data:restartedData,writable:true},now:()=>at,livingWorld,workSource:restartedWork,
       bewerkCollectie:(name,fn)=>a.bewerkCollectie(name,restartedData,fn)});

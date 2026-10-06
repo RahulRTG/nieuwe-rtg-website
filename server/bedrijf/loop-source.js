@@ -5,9 +5,10 @@ const envelope = require('../kern/envelop');
 const roles = require('./rollen-beleid');
 const eligibility = require('../kern/loop-fabric/learning-eligibility');
 
-module.exports = function makeWorkLoopSource({db,bewerkCollectie,serviceProof,now}) {
+module.exports = function makeWorkLoopSource({leesCollectie,bewerkCollectie,serviceProof,now}) {
   const time=now || (()=>new Date().toISOString());
-  const read=()=>db.data.werkruimtes || {};
+  if (typeof leesCollectie !== 'function') P.fail('STORAGE_UNAVAILABLE','WorkOS Loop vereist de datalaag-leespoort.',503);
+  const read=()=>leesCollectie('werkruimtes') || {};
   const tx=fn=>{
     if (typeof bewerkCollectie !== 'function') P.fail('STORAGE_UNAVAILABLE','WorkOS Loop vereist duurzame collectietransacties.',503);
     return bewerkCollectie('werkruimtes',fn);

@@ -119,6 +119,11 @@ function bewaar(sleutels, auditOp) {
 const bewerkCollectie = require('./collectie-bewerken')({
   store: STORE, postgres, sqlite, db, save
 });
+/* Lezen via dezelfde datalaaggrens als schrijven. Nieuwe domeinadapters hoeven
+   hierdoor niet zelf een rechtstreekse deur naar db.data te openen. De bron
+   blijft de live request-/storeweergave van de datalaag; dit is geen cache of
+   tweede waarheid. */
+const leesCollectie = (sleutel) => db.data[sleutel];
 
 // De tx-veegronde kapt pas na de duurzame grootboek-upsert en doet dat via de
 // autoritatieve collectiepoort; nooit als kale achtergrond-save.
@@ -130,7 +135,7 @@ db.verversVerzoekCollectie = async () => { if (STORE === 'postgres') await postg
 function onExternalChange(cb) { state.setExternCb(cb); }
 
 module.exports = {
-  db, load, save, saveDuurzaam, bijeen, inBundel, bewerkCollectie, economischeBoekingEenmaal, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
+  db, load, save, saveDuurzaam, bijeen, inBundel, bewerkCollectie, leesCollectie, economischeBoekingEenmaal, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
   startPostgres: postgres.startPostgres, flushBijAfsluiten, pgPing: postgres.pgPing,
   opslagKlaar, pgPoolStatus: postgres.pgPoolStatus, postgresSchrijfStand: postgres.schrijfStand,
   postgresVerzoekMiddleware: postgres.verzoekMiddleware, onExternalChange, merge3, schrijfDuurzaam: opslag.schrijfDuurzaam,

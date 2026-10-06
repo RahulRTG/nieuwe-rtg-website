@@ -6,7 +6,7 @@ const serviceReceipt=require('../loop-fabric/service-receipt');
 const eligibility=require('../loop-fabric/learning-eligibility');
 const {heeftBestuur,relatieActief}=require('./oordeel');
 
-module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,serviceProof,now}) {
+module.exports=function makeAcademyLoopSource({leesCollectie,bewerkCollectie,leerhuis,serviceProof,now}) {
   const time=now || (()=>new Date().toISOString());
   const tx=fn=>{
     if (typeof bewerkCollectie!=='function') P.fail('STORAGE_UNAVAILABLE','Leerhuis Loop-delivery vereist duurzame collectietransacties.',503);
@@ -105,7 +105,8 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
         (item.actief ? {domain:'leerhuis',type:'knowledge',id:r.id,version:item.actief} : r)};
     } catch(e) { return P.error(e); }
   }
-  const transport=require('./loop-delivery')({P,D,db,tx,state,leerhuis,protocolEvents,time});
+  if(typeof leesCollectie!=='function')P.fail('STORAGE_UNAVAILABLE','Leerhuis Loop vereist de datalaag-leespoort.',503);
+  const transport=require('./loop-delivery')({P,D,readDelivery:()=>leesCollectie('leerhuisLoopDelivery'),tx,state,leerhuis,protocolEvents,time});
   function verifyReceipt(receipt) {
     return serviceReceipt.verify(serviceProof,receipt,{domain:'leerhuis',issuer:'rtg.service.leerhuis',label:'Leerhuis'});
   }

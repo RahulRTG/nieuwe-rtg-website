@@ -9,9 +9,10 @@ const eligibility=require('../loop-fabric/learning-eligibility');
 const envelope=require('../envelop');
 const makeDelivery=require('./loop-source-delivery');
 
-module.exports=function makeServiceLoopSource({db,bewerkCollectie,zaken,kwaliteit,authorize,authorizeRecipient,now}){
+module.exports=function makeServiceLoopSource({leesCollectie,bewerkCollectie,zaken,kwaliteit,authorize,authorizeRecipient,now}){
   const time=now||(()=>new Date().toISOString()),empty=()=>({schemaVersion:1,operations:{},observations:{},lifecycles:{},outbox:[],delivery:{}});
-  const state=value=>Object.assign(empty(),value||{}),read=()=>state(db.data.serviceLearning);
+  if(typeof leesCollectie!=='function')P.fail('STORAGE_UNAVAILABLE','Service learning vereist de datalaag-leespoort.',503);
+  const state=value=>Object.assign(empty(),value||{}),read=()=>state(leesCollectie('serviceLearning'));
   const tx=fn=>{
     if(typeof bewerkCollectie!=='function')P.fail('STORAGE_UNAVAILABLE','Service learning vereist duurzame collectietransacties.',503);
     return bewerkCollectie('serviceLearning',raw=>{const s=state(raw),out=fn(s);Object.assign(raw,s);return out;});

@@ -51,7 +51,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
 const rtgKlok = require('./lib/klok');
-const { db, load, save, bijeen, inBundel, persistentieStand, bewerkCollectie, economischeBoekingEenmaal, DATA_DIR, STORE, opslagKlaar: opslagMotorKlaar, pgPoolStatus, postgresSchrijfStand, postgresVerzoekMiddleware, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
+const { db, load, save, bijeen, inBundel, persistentieStand, bewerkCollectie, leesCollectie, economischeBoekingEenmaal, DATA_DIR, STORE, opslagKlaar: opslagMotorKlaar, pgPoolStatus, postgresSchrijfStand, postgresVerzoekMiddleware, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsHaalWacht,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
@@ -2323,7 +2323,7 @@ const kern = {
    wel wordt gebruikt, valt bij het opstarten meteen om. */
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
-  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, capGezondheid, bijeen, bewerkCollectie, economischeBoekingEenmaal, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, capGezondheid, bijeen, bewerkCollectie, leesCollectie, economischeBoekingEenmaal, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   broadcastSync, centen: rondEuro, crypto, db, entreeCode, inBundel, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,

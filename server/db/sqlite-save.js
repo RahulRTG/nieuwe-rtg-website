@@ -8,6 +8,7 @@
    trackergeneraties worden pas bevestigd als die commit werkelijk geslaagd is.
    Met `duurzaam` loopt dezelfde save onder FULL-sync (./sqlite-duurzaam.js). */
 const maakSaveplan = require('./sqlite-saveplan');
+const { losVanVerzoek } = require('../lib/losvanverzoek');
 
 module.exports = ({ db, verbinding, statements, auditMotor, mutaties, voorcheck, merge3,
   uitStore, naarStore, laatsteJson, toegepast, vouwWal }) => {
@@ -18,7 +19,10 @@ module.exports = ({ db, verbinding, statements, auditMotor, mutaties, voorcheck,
   let volledigTimer = null;
   function planVolledig() {
     if (volledigTimer || !(VOLLEDIG_MS > 0)) return;
-    volledigTimer = setTimeout(() => {
+    /* De vangrail is van niemand: hij bewaart het werk van ALLE verzoeken en
+       start dus in de nulcontext, niet in die van het verzoek dat hem plande
+       (Fase 2, I4; ../lib/losvanverzoek.js). */
+    volledigTimer = losVanVerzoek(setTimeout, () => {
       volledigTimer = null;
       try { bewaar(false, undefined, [], true); } catch (e) { console.warn('[db] SQLite-vangrail mislukt:', e.message); }
     }, VOLLEDIG_MS);

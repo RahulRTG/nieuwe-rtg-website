@@ -2,13 +2,13 @@
    DE CONTEXTDOORGIFTE MAG ALLEEN DE GOEDE KANT OP (scripts/contextdoorgifte.js,
    CONTEXTDOORGIFTE.json).
 
-   Negen invarianten uit het Fase 2-onderzoek naar een verzoekframe. Wat vandaag
+   Twaalf invarianten uit het Fase 2-onderzoek naar een verzoekframe. Wat vandaag
    rood is staat op zijn huidige stand in `ratel` en mag alleen verbeteren; wat
    groen is mag niet terugvallen. Deze toets houdt drie dingen vast:
 
      1. het register ligt niet onder zijn eigen ratel (een vastgelegde meting
         die slechter is dan de tand, is een register dat loopt achter);
-     2. de twee goedkope invarianten (I5 en I9) worden hier VERS gemeten tegen
+     2. de drie goedkope invarianten (I5, I9 en I12) worden hier VERS gemeten tegen
         de echte modules, dus een context die weer stil "gelukt" zegt na sluiten
         of een enterWith in server/ laat deze toets zakken;
      3. het instrument kan uitslaan (LAT.md regel 10): de indeling herkent een
@@ -36,7 +36,7 @@ test('het register draagt een tand voor elke invariant, en ligt niet onder zijn 
   const fout = m.vergelijk(r.ratel, m.tandenVan(r.gemeten));
   assert.deepStrictEqual(fout, [], 'het register loopt achter op zijn eigen ratel: ' + fout.join('; ') +
     ' -- draai npm run contextdoorgifte en kijk welke invariant terugviel');
-  /* Geen samengesteld cijfer: negen invarianten blijven negen. */
+  /* Geen samengesteld cijfer: twaalf invarianten blijven twaalf. */
   assert.ok(!('totaal' in r.gemeten) && !('score' in r.gemeten), 'een totaalcijfer verbergt welke invariant bewoog');
 });
 
@@ -59,8 +59,19 @@ test('I5 en I9 vers gemeten: geen context zegt na sluiten stil "gelukt", geen en
     'CONTEXTDOORGIFTE.json loopt achter op I5 (' + r.gemeten.i5.stilNaSluiten + ' vastgelegd, ' + stil.length + ' gemeten); draai npm run contextdoorgifte');
 });
 
+test('I12 vers gemeten: een bus-abonnee draait op geen van beide transporten in het verzoek', async () => {
+  const r = register();
+  const i12 = await m.meetI12();
+  assert.ok(i12.lekkend <= r.ratel.i12AbonneeInVerzoek, 'een abonnee ziet de contexten van de publiceerder: ' +
+    JSON.stringify(i12.perTransport) + ' -- server/bus.js hoort hem in de nulcontext te draaien (losVanVerzoek)');
+  assert.deepStrictEqual(Object.keys(i12.perTransport).sort(), ['in-proces', 'redis'], 'beide transporten gemeten');
+  assert.strictEqual(r.gemeten.i12.lekkend, i12.lekkend, 'CONTEXTDOORGIFTE.json loopt achter op I12; draai npm run contextdoorgifte');
+});
+
 test('zelfijking: het instrument slaat uit op bekend-foute invoer', () => {
   assert.ok(m.ijkI5(), 'de I5-indeling herkent een stille schrijver niet');
+  assert.ok(m.ijkI12(), 'I12 ziet een abonnee in het verzoek niet');
+  assert.ok(m.ijkI11(), 'I11 ziet een agent-aanroep zonder (of met een andere) oorzaak niet');
   assert.ok(m.ijkI2(), 'I2 herkent een overgenomen client-id of een botsing niet');
   /* Een proefverzoek dat niet aankwam is geen nul maar niet vast te stellen. */
   assert.strictEqual(m.meetI2(m.I2_KOPPEN.map(k => ({ kop: k, status: 0, antwoordId: null })), []), null);
@@ -86,9 +97,9 @@ test('zelfijking: het instrument slaat uit op bekend-foute invoer', () => {
   const blind = { ijkKlaar: true, ijk: { timers: { gevuurdNaAfloop: 0, naAfloopMetDrager: 0 },
     envelop: { metVerzoekCorrelatie: 0 }, auth: { n: 0, metHandeling: 0, correlatieEens: 0, metFrame: 0, frameOneens: 0 } },
     frameIjk: { tweedeIdentiteit: 0 } };
-  assert.strictEqual(m.ijkServer(blind).length, 7, 'een peiling die niets ziet heet stuk, niet "alles in orde"');
+  assert.strictEqual(m.ijkServer(blind).length, 8, 'een peiling die niets ziet heet stuk, niet "alles in orde"');
   /* Een peiling van voor het verzoekframe (geen frame-velden) is ook blind voor I13 en I14. */
   assert.strictEqual(m.ijkServer({ ijkKlaar: true, ijk: { timers: { gevuurdNaAfloop: 1, naAfloopMetDrager: 1 },
-    envelop: { metVerzoekCorrelatie: 1 }, auth: { n: 2, metHandeling: 1, correlatieEens: 1 } } }).length, 3);
+    envelop: { metVerzoekCorrelatie: 1, actorSleutel: 1 }, auth: { n: 2, metHandeling: 1, correlatieEens: 1 } } }).length, 3);
   assert.ok(m.ijkServer(null).length > 0, 'geen peiling is geen uitslag');
 });

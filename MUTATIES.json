@@ -2002,6 +2002,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "busabonnee.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/verzoekframe.js",
+      "operator": "&&->||#0",
+      "gezakt": 2,
+      "geprobeerd": 11
+    },
     "buurtruil-scherm.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3042,6 +3050,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "dienstdrager.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kosten/haak.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
+    },
     "dienstidentiteit.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3659,6 +3675,14 @@
       "module": "server/kern/envelop.js",
       "operator": "!==->===#0",
       "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "envelopv2.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/envelop.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "envelopvelden.test.js": {

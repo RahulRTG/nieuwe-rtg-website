@@ -88,7 +88,7 @@ function zet(req, gegevens) {
       fout: tekst([e && e.message].concat(fouten).filter(Boolean).join('; '), 240) };
   }
   try { if (req) req.envelop = env; } catch (e) { /* een bevroren req: dan alleen teruggeven */ }
-  frame.uitEnvelop(env);   // gooit nooit; een weigering telt
+  frame.uitEnvelop(env, req);   // gooit nooit; een weigering telt
   return env;
 }
 

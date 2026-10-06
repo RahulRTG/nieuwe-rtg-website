@@ -86,9 +86,11 @@ const DRAGERS = Object.freeze([
     gezetDoor: 'niemand',
     bron: null,
     sleutelbron: null,
-    geenSleutel: 'geen achtergrondtaak meldt zich aan; er is ook geen gedeeld beginpunt waar dat ' +
-      'zou kunnen (de async-context van kern/kosten/haak.js draagt een kostendrager, geen actor).',
-    nietGebouwd: 'er is nog geen plek waar een achtergrondtaak zichzelf als drager aanmeldt. ' +
+    geenSleutel: 'een achtergronddienst meldt zich sinds 5 oktober 2026 WEL aan: kern/dienstidentiteit.js ' +
+      'opent een verzoekframe met actor dienst:<naam> en kostendrager dienst:<naam> (Fase 2, PR 7). Maar ' +
+      'deze laag leest dat frame niet, dus er is bij een lopende taak nog geen sleutel -- en een webhook-' +
+      'verwerker of een losse timer zonder alsDienst draagt er ook geen.',
+    nietGebouwd: 'er is nog geen plek waar een stand per achtergrondtaak staat, en de join leest het frame niet. ' +
       'Hij staat hier omdat hij bestaat, niet omdat hij werkt -- een lege stand die als `normaal` ' +
       'meetelt zou de join stil verzwakken, dus telt hij als een drager ZONDER stand en niet als ' +
       'een drager MET de stand normaal. HET GAT HEEFT EEN MAAT: zie ISOLATIEPROEF.json, ' +

@@ -12,28 +12,23 @@
    Bij Redis ontvangt ook het publicerende proces zijn eigen bericht terug, dus
    we leveren nooit apart lokaal af.
 
-   DE ENVELOP. Sinds 27 augustus 2026 draagt elk bericht dat hier langskomt een
-   `envelop` (kern/envelop.js): id, tijd, versie, actor, correlatie, oorzaak en
-   classificatie. OS.md par. 3 mat waarom dat nodig was -- deze bus VERVOERDE
-   wel, maar er was geen taal: van de tien publicerende plekken droeg er een een
-   `versie`, een een `id`, en geen enkele iets waarmee je twee gebeurtenissen
-   aan elkaar knoopt.
+   DE ENVELOP (kern/envelop.js) staat NAAST het bericht en niet eromheen: een
+   abonnee leest `doel`, `event` en `data` zoals altijd. Een omhullend bericht
+   had elke abonnee tegelijk moeten veranderen, en dat gebeurt half.
 
-   Hij is er NAAST gezet en niet omheen. Een abonnee leest `doel`, `event` en
-   `data` zoals altijd; er komt alleen een sleutel bij. Dat is met opzet: een
-   omhullend bericht ({ envelop, inhoud }) had elke abonnee moeten veranderen,
-   en een verandering die overal tegelijk moet, gebeurt half.
-
-   DE KETEN LOOPT DOOR ZONDER DAT IEMAND HEM DOORGEEFT. Elke abonnee draait
-   binnen de envelop van het bericht dat hij afhandelt, dus publiceert hij zelf
-   iets, dan erft dat de correlatie en krijgt het de binnenkomende gebeurtenis
-   als oorzaak. Publiceren is hier nooit een verzoek waard: gaat het maken van
-   de envelop mis (een actor die een echte naam blijkt), dan gaat het bericht
-   ZONDER envelop de deur uit met een waarschuwing in het log -- zichtbaar, maar
-   nooit ten koste van de levering. */
+   DE KETEN LOOPT DOOR, DE REST NIET. Een abonnee draait binnen de envelop van
+   het bericht dat hij afhandelt (publiceert hij zelf, dan erft dat de keten),
+   en verder in de NULCONTEXT (Fase 2, PR 6, invariant I12): geen handeling,
+   geen verzoekframe, geen kostendrager en geen AI-sessie van de publiceerder.
+   Over Redis was dat al zo; in proces is `emit` synchroon en droeg de abonnee
+   stil de contexten van het verzoek dat publiceerde. Gaat het maken van de
+   envelop mis (een actor die een echte naam blijkt), dan gaat het bericht
+   ZONDER envelop de deur uit met een waarschuwing -- nooit ten koste van de
+   levering. */
 const { EventEmitter } = require('events');
 const envelop = require('./kern/envelop');
 const verzoekcontext = require('./db/verzoekcontext');
+const { losVanVerzoek } = require('./lib/losvanverzoek');
 
 /* Gewone, best-effort projectieberichten gaan in een PG-request pas na COMMIT.
    Verlies vraagt client-resync, niet autorisatie. Kritieke intrekkingen kiezen
@@ -70,8 +65,8 @@ function stempel(kanaal, bericht) {
   return env ? Object.assign({}, bericht, { envelop: env }) : bericht;
 }
 
-/* De abonnee draait binnen de envelop van het bericht dat hij afhandelt. */
-const inKeten = (fn) => (bericht) => envelop.inKeten(bericht && bericht.envelop, () => fn(bericht));
+/* De abonnee: in de nulcontext, binnen de envelop van zijn bericht (I12). */
+const inKeten = (fn) => (bericht) => losVanVerzoek(() => envelop.inKeten(bericht && bericht.envelop, () => fn(bericht)));
 
 function maakBus() {
   const url = process.env.REDIS_URL;

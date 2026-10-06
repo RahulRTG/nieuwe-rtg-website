@@ -61,7 +61,6 @@
    ========================================================================== */
 'use strict';
 
-const crypto = require('crypto');
 const keten = require('./keten');
 const klok = require('./klok');
 const verzoekcontext = require('../db/verzoekcontext');
@@ -71,31 +70,9 @@ const antwoordspoor = require('./antwoordspoor');
 const MAX = 50000;          // ruim genoeg voor een jaar bij dit verkeer, en begrensd
 const SCHRIJFT = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
-/* Velden die niet in de afdruk horen: de idem-sleutel is geen inhoud, en vrije
-   tekst maakt van twee gelijke handelingen twee verschillende. Zelfde lijst en
-   zelfde reden als in lib/idem-poort.js. */
-const BUITEN_AFDRUK = new Set(['idem', 'idempotentieSleutel', 'notitie', 'omschrijving', 'oms', 'toelichting']);
-
-function afdrukVan(body) {
-  if (!body || typeof body !== 'object') return '';
-  const uit = {};
-  for (const k of Object.keys(body).sort()) {
-    if (BUITEN_AFDRUK.has(k)) continue;
-    uit[k] = body[k];
-  }
-  try { return crypto.createHash('sha256').update(JSON.stringify(uit)).digest('hex').slice(0, 16); }
-  catch (e) { return ''; }
-}
-
-/* WIE. Zie de kop: liever 'niemand aan te wijzen' dan een verzonnen naam. */
-function wieVan(req) {
-  const s = req.session;
-  if (s && s.key) return String(s.key).slice(0, 60);
-  const pad = String(req.path || req.url || '');
-  if (pad.startsWith('/api/office') || pad.startsWith('/api/command')) return 'kantoor (gedeelde code)';
-  if (pad.startsWith('/api/supplier') || pad.startsWith('/api/partner')) return 'partner (niet herleid)';
-  return 'anoniem';
-}
+/* De afdruk van een body en WIE er handelt: ./handelingwie.js (geknipt op de
+   10 kB van keuringsregel 13 toen de regel een verzoek-id en release kreeg). */
+const { afdrukVan, wieVan, maakRegel } = require('./handelingwie');
 
 function maakHandelingsspoor({ db, save, nu, max }) {
   const tijd = nu || klok.nu;
@@ -105,16 +82,11 @@ function maakHandelingsspoor({ db, save, nu, max }) {
 
   const rij = () => opslag ? opslag.view() : eigen.bak('handelingLog');
 
-  function noteer({ wie, methode, pad, status, afdruk, grof, stand }) {
-    const regel = {
-      at: grof ? burger.dag(tijd()) : new Date(tijd()).toISOString(),
-      wie: String(wie || 'anoniem').slice(0, 60),
-      methode: String(methode || '').slice(0, 10),
-      pad: String(pad || '').slice(0, 200),
-      status: Number(status) || 0,
-      afdruk: String(afdruk || '')
-    };
-    if (stand) regel.stand = String(stand).slice(0, 20);   // A-P1-05: `toegestaan` = voor de handeling, duurzaam
+  /* De regel zelf, en die van een vroege commit: ./handelingwie.js. */
+  const { regelVan, regelVoorVroegeCommit } = maakRegel(tijd);
+
+  function noteer(opdracht) {
+    const regel = regelVan(opdracht);
     if (opslag) return opslag.append(vorige => keten.schakel(regel, vorige?.hash || null, (Number(vorige?.nr) || 0) + 1), r => Boolean(r?.hash));
     return keten.noteerIn(rij(), regel, grens);
   }
@@ -171,7 +143,7 @@ function maakHandelingsspoor({ db, save, nu, max }) {
          dag (lib/burgerpad.js): de regel blijft, de weg naar de mens niet. */
       const pseudoniem = burger.isBurgerpad(pad);
       noteer({ wie: pseudoniem ? burger.PSEUDONIEM : wieVan(req), methode: req.method,
-        pad, status, afdruk: pseudoniem ? '' : afdrukVan(req.body), grof: pseudoniem });
+        pad, status, afdruk: pseudoniem ? '' : afdrukVan(req.body), grof: pseudoniem, verzoek: req.id });
       if (!opslag) { if (save.sleutels) save.sleutels(['handelingLog']); else save(['handelingLog']); }
     };
     if (!verzoekcontext.haakVoorCommit(schrijf)) {
@@ -180,7 +152,7 @@ function maakHandelingsspoor({ db, save, nu, max }) {
     next();
   }
 
-  return { middleware, noteer, lijst, ketenstand, MAX: grens };
+  return { middleware, noteer, lijst, ketenstand, regelVoorVroegeCommit, MAX: grens };
 }
 
 module.exports = maakHandelingsspoor;

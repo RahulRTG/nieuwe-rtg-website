@@ -59,8 +59,28 @@ function verankerPunt(regels) {
      herschreven het volgnummer van het anker is er nog, maar met een andere
                  hash: de geschiedenis is op dat punt vervangen.
      weg         het anker valt buiten wat er nog is (een begrensd journaal dat
-                 zo ver is doorgeschoven); niet te beoordelen, en dat zeggen we. */
-function verifieerTegenAnker(regels, anker) {
+                 zo ver is doorgeschoven).
+
+   `weg` IS ALLEEN IN ORDE ALS DE BEWARING HET VERKLAART (audit P2-5). Hier stond
+   `ok: true` bij elke verdwenen ankerregel. Dan is de goedkoopste aanval op het
+   anker niet de kop afknippen maar ALLES tot en met de geankerde regel weggooien
+   en een paar nieuwe regels erbij zetten: de kop staat dan hoger dan het anker,
+   de geankerde regel is "uit het journaal geschoven" en de controle zei groen.
+   Een journaal schuift alleen door zijn BEWARING: het is vol (`max`), of de
+   geankerde regel is ouder dan de termijn (`dagen`). Verklaart geen van beide
+   het, dan is er iets weg dat er nog hoorde te staan -- `ok: false`. Wie geen
+   bewaring meegeeft, krijgt dus geen groen: niet te beoordelen is geen in orde. */
+function bewaringVerklaart(l, anker, bewaring) {
+  const b = bewaring || {};
+  if (Number(b.max) > 0 && l.length >= Number(b.max)) return 'het journaal zit aan zijn bovengrens van ' + b.max + ' regels';
+  const at = anker && anker.at ? Date.parse(anker.at) : NaN;
+  const nu = typeof b.nu === 'function' ? b.nu() : (Number(b.nu) || Date.now());
+  if (Number(b.dagen) > 0 && Number.isFinite(at) && nu - at > Number(b.dagen) * 86400000)
+    return 'de geankerde regel is ouder dan de bewaartermijn van ' + b.dagen + ' dagen';
+  return null;
+}
+
+function verifieerTegenAnker(regels, anker, bewaring) {
   const l = Array.isArray(regels) ? regels : [];
   if (!anker || typeof anker.nr !== 'number') return { ok: false, reden: 'geen bruikbaar anker' };
   const kop = verankerPunt(l);
@@ -74,8 +94,12 @@ function verifieerTegenAnker(regels, anker) {
 
   const bijAnker = l.find(r => r && Number(r.nr) === anker.nr);
   if (!bijAnker) {
-    return { ok: true, weg: true,
-      reden: 'regel ' + anker.nr + ' is uit het begrensde journaal geschoven; niet te beoordelen' };
+    const verklaring = bewaringVerklaart(l, anker, bewaring);
+    if (verklaring) return { ok: true, weg: true,
+      reden: 'regel ' + anker.nr + ' is uit het begrensde journaal geschoven: ' + verklaring };
+    return { ok: false, weg: true,
+      reden: 'regel ' + anker.nr + ' is verdwenen terwijl de bewaring dat niet verklaart -- ' +
+        'het journaal is niet vol en de regel is niet ouder dan de termijn' };
   }
   if (bijAnker.hash !== anker.hash) {
     return { ok: false, herschreven: true,
@@ -88,22 +112,23 @@ const CONTROL = {
   control: 'AUDIT-KETEN-VERANKERD',
   wat: 'het wegknippen van de NIEUWSTE auditregels valt op tegen een extern anker',
   eigenaar: 'Security',
-  bewijs: ['test/keten.test.js', 'test/ankerdienst.test.js', 'test/ankerdienst-echt.test.js'],
-  bewijsstuk: 'POST /api/office/anker -- het blok met de kop van elk journaal, plus de tegenproef',
-  dekking: { beproefd: 0, totaal: 5, eenheid: 'auditjournalen met een anker dat BUITEN staat' },
-  /* De noemer is 5 en niet 4: sinds het handelingsspoor erbij kwam zijn er vijf
-     journalen om te ankeren (inzage, inlog, handelingen, onderzoekslab en de
-     boardroom-journalen samen). Een noemer die niet meegroeit, maakt van een gat
-     stilletjes een percentage. */
-  grens: 'DE DIENST DRAAIT, MAAR DE CONTROL IS NIET IN BEDRIJF: het anker staat nergens '  +
-    'buiten. server/lib/ankerdienst.js ' +
-    'verzamelt de kop van elk journaal in een blok en rekent ermee af zodra dat blok wordt ' +
-    'teruggevoerd; de tegenproef is beproefd (vier weggeknipte regels worden betrapt terwijl ' +
-    'de overgebleven keten perfect klopt). Wat ontbreekt is de BESTEMMING: zolang niemand het ' +
-    'blok op een gescheiden plek wegzet, beschermt dit niets tegen kopafknipping. Die bestemming ' +
-    'is met opzet geen taak van deze software -- een anker in dezelfde database is geen anker ' +
-    'maar een tweede regel om te wijzigen. De dienst meldt daarom NIET IN BEDRIJF tot er een ' +
-    'blok wordt teruggevoerd, in plaats van groen omdat de code bestaat.',
+  bewijs: ['test/keten.test.js', 'test/ankerdienst.test.js', 'test/ankerdienst-echt.test.js',
+    'test/ankerketen.test.js', 'test/ankertimer.test.js', 'test/auditspoor-atomair.pg.test.js'],
+  bewijsstuk: 'POST /api/office/anker -- het GETEKENDE blok met de kop van elk journaal, plus de tegenproef',
+  dekking: { beproefd: 0, totaal: 7, eenheid: 'auditjournalen met een anker dat BUITEN staat' },
+  /* De noemer is 7: inzage, inlog, handelingen, onderzoekslab, de
+     boardroom-journalen samen, en sinds audit P1-3c het API-spoor en het
+     besluitjournaal van RTG Command. Een noemer die niet meegroeit, maakt van
+     een gat stilletjes een percentage. */
+  grens: 'DE KETEN IS GEBOUWD, MAAR DE CONTROL IS NIET IN BEDRIJF zolang er geen echte tweede machine ' +
+    'staat. Wat er wel is (audit P1-3): het blok wordt getekend met een Ed25519-sleutel die niet in de ' +
+    'database staat (server/lib/ankerzegel.js), de ankertimer haalt elke ronde eerst het vorige blok terug ' +
+    'en rekent ermee af -- een afwijking laat het alarm afgaan en er gaat dan geen nieuw blok weg -- en ' +
+    'publieke productie start niet zonder RTG_ANKERPOST_URL (server/config/productie-anker.js). ' +
+    'scripts/ankerontvanger.js is een REFERENTIE-ontvanger (alleen bijschrijven, geen teruggang); de ' +
+    'echte bestemming op een andere machine met onveranderlijke opslag is een besluit over de ' +
+    'infrastructuur en staat buiten deze software. Een tweede machine BINNEN RTG ziet vervalsing door een ' +
+    'hand; wie beide machines bestuurt, kan beide koppen afknippen (ankerpost.js punt 5).',
   inBedrijf: false
 };
 

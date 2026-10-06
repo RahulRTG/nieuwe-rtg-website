@@ -40,7 +40,7 @@ test.before(async () => {
     NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: TMP,
     APP_URL: 'https://livegang.voorbeeld.test/',
     SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', OPENAI_API_KEY: 'test-ai-key',
-    ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
+    RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
     RTG_ENC_KEY: 'k'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl',
     // sinds de sleutel-hardening (config fail-fast) eist een productiestart de
     // gedeelde kluis- en tokensleutel; zonder deze weigert de server te starten.

@@ -62,7 +62,27 @@ if (DUURZAAM_UIT) {
    als het is vastgelegd, of een foutantwoord ({status, error}) als de opslag het
    niet kon bevestigen. Die vorm is met opzet: de aanroeper kan hem rechtstreeks
    teruggeven en kan hem niet per ongeluk negeren zoals een boolean. */
-module.exports = function maakVastleggen({ bijeen, save, inBundel, bron }) {
+/* POSTGRESQL BEVESTIGT VIA HET ANTWOORD, EN ALLEEN BINNEN EEN VERZOEK (audit
+   P0-1). Daar heeft PostgreSQL geen teller (db.persistentieStand() is null) en
+   keerde deze functie altijd `null` -- "vastgelegd" -- terug, ook als er niets
+   stond. Binnen een HTTP-verzoek klopt dat ALSNOG, en dat is geen toeval maar
+   de opzet: de werkkopie wordt voor het antwoord in een transactie gecommit
+   (db/postgres-verzoeken.js), een foutstatus commit niets, en de twee vroege
+   commitpaden nemen het spoor van het verzoek in hun eigen transactie mee
+   (db/verzoekspoor.js). Een regel die hier wordt vastgelegd, staat dus samen
+   met elke mutatie van dat verzoek in PostgreSQL -- of geen van beide.
+   BUITEN een verzoek (een timer, een achtergrondtaak) bevestigt niemand iets:
+   save() sluit daar de verkeerspoort en de mutatie landt pas bij het herstel.
+   Dan is `null` een valse bevestiging, en dus weigert hij hier vooraf -- de
+   mutatie draait dan niet. */
+function pgZonderBevestiging(store) {
+  let s = store;
+  if (s === undefined) { try { s = require('../db/opslag').STORE; } catch (e) { s = null; } }
+  if (s !== 'postgres') return false;
+  return !require('../db/verzoekvak').commitVoorAntwoord();
+}
+
+module.exports = function maakVastleggen({ bijeen, save, inBundel, bron, store }) {
   /* Zonder de bundel zou een app terugvallen op de gewone write-behind save() en
      weer 200 zeggen over iets wat de opslag nog niet heeft gedaan. Een
      ontbrekende afhankelijkheid hoort hier luid te zijn: dit is opstarttijd. */
@@ -79,6 +99,11 @@ module.exports = function maakVastleggen({ bijeen, save, inBundel, bron }) {
      halve toestand zien of wegschrijven. */
   const niets = () => {};
   return async function vastleggen(mutatie = niets) {
+    if (!DUURZAAM_UIT && pgZonderBevestiging(store)) {
+      console.warn('[' + naam + '] niet vastgelegd: PostgreSQL kan buiten een verzoek niets bevestigen.');
+      return { status: 503, error: 'Dit is niet vastgelegd; probeer het zo nog een keer.',
+        reden: 'postgres-zonder-verzoekcommit' };
+    }
     /* AL IN EEN BUNDEL? DAN MEEDOEN, NIET ZELF COMMITTEN.
 
        Een notitie met een datum maakt een agenda-afspraak, en allebei die lagen

@@ -138,6 +138,10 @@ module.exports = function lijfpoort(deps) {
   const dbKern = require('../db');
   require('./kritiekspoor').haak({ handelingsspoor: spoor,
     vastleggen: require('../lib/duurzaam')({ bijeen: dbKern.bijeen, save, inBundel: dbKern.inBundel, bron: 'handelingsspoor' }) });
+  /* Een vroege PostgreSQL-commit (collectietransactie, economische boeking)
+     neemt het spoor van het verzoek mee in zijn eigen transactie, plus een
+     regel `vastgelegd` die deze bouwer maakt (db/verzoekspoor.js, audit P0-1). */
+  require('../db/verzoekspoor').haakRegel(spoor.regelVoorVroegeCommit);
   app.use(spoor.middleware);
 
   /* Zaakdoos, lokale modus: elke geslaagde zaak-schrijfactie komt in het

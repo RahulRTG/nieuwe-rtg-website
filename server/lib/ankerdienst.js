@@ -33,42 +33,46 @@
    `stand()` dan ook met zoveel woorden in plaats van groen te tonen.
 
    ------------------------------------------------------------------------
-   DE HANDTEKENING is geen beveiliging tegen een aanvaller die de sleutel heeft;
-   hij bindt de vier koppen aan elkaar, zodat er niet één journaal uit een blok
-   te knippen valt. Wie het blok naar buiten brengt, brengt ze alle vier.
+   DE ZEGEL bindt de koppen aan elkaar, zodat er niet een journaal uit een blok
+   te knippen valt. DE HANDTEKENING (Ed25519, sleutel buiten de database; zie
+   hieronder) bewijst dat het blok van deze installatie komt.
    ========================================================================== */
 'use strict';
+
 
 const crypto = require('crypto');
 const { verankerPunt, verifieerTegenAnker } = require('./keten-anker');
 const klok = require('./klok');
 
-/* De vier journalen, met de weg naar hun regels. Staat er een vijfde op, dan
-   hoort hij HIER erbij -- en de dekking in keten.js CONTROL hoort dan te zakken
-   van 4/4 naar 4/5, want de noemer is het aantal journalen en niet het aantal
-   dat we toevallig hebben aangesloten. */
-const JOURNALEN = {
-  inzageLog: (db) => (db.data && db.data.inzageLog) || [],
-  securityLog: (db) => (db.data && db.data.securityLog) || [],
-  handelingLog: (db) => (db.data && db.data.handelingLog) || [],
-  /* livingLab en de boardroom-journalen staan PER LAB respectievelijk PER LID.
-     Een blok met duizend koppen is geen anker maar een tweede database, dus
-     nemen we hier de gezamenlijke kop: de hash over alle koppen samen. Verdwijnt
-     er in één lid-journaal een regel, dan verandert die gezamenlijke hash. */
-  livingLabAudit: (db) => ((db.data && db.data.livingLab && db.data.livingLab.audit) || [])
-};
+/* Welke journalen, hoe ze als ankerbare rij gelezen worden en hun bewaring:
+   ./ankerjournalen.js. De handtekening: ./ankerzegel.js. */
+const { JOURNALEN, BEWARING, zegelRij } = require('./ankerjournalen');
+const { zaadUit, sleutelpaar, kanoniek, teTekenen, DOEL } = require('./ankerzegel');
 
-function maakAnkerdienst({ db, nu }) {
+function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
   const tijd = nu || klok.nu;
+  const env = omgeving || process.env;
+  const data = () => (db && db.data) || {};
+  let paar = null, paarGezocht = false;
+  /* Laat: het procesgeheim staat pas klaar als de kluis is opgestart. Zolang
+     er geen zaad is, wordt het later opnieuw geprobeerd. */
+  function eigenPaar() {
+    if (paarGezocht) return paar;
+    const zaad = zaadUit(env.RTG_ANKER_SIGN_KEY) ||
+      (typeof sleutel === 'function' ? sleutel(DOEL) : (Buffer.isBuffer(sleutel) ? sleutel : null));
+    if (!zaad) return null;
+    paarGezocht = true; paar = sleutelpaar(zaad);
+    return paar;
+  }
 
   /* De koppen van de per-lid journalen samengevat tot één punt. Zie de uitleg
      bij JOURNALEN: niet duizend ankers, maar één dat over alle duizend gaat. */
   function boardroomPunt() {
     const bak = (db.data && db.data.ledenBoardLog) || {};
     const koppen = [];
-    for (const sleutel of Object.keys(bak).sort()) {
-      const p = verankerPunt(bak[sleutel]);
-      if (p) koppen.push(sleutel + ':' + p.nr + ':' + p.hash);
+    for (const lid of Object.keys(bak).sort()) {
+      const p = verankerPunt(bak[lid]);
+      if (p) koppen.push(lid + ':' + p.nr + ':' + p.hash);
     }
     if (!koppen.length) return null;
     return { nr: koppen.length, hash: crypto.createHash('sha256').update(koppen.join('|')).digest('hex').slice(0, 32),
@@ -79,11 +83,31 @@ function maakAnkerdienst({ db, nu }) {
      het NIET alleen hier, want dan ankert het niets. */
   function blok() {
     const punten = {};
-    for (const [naam, haal] of Object.entries(JOURNALEN)) punten[naam] = verankerPunt(haal(db));
+    for (const [naam, haal] of Object.entries(JOURNALEN)) punten[naam] = verankerPunt(haal(data()));
     punten.ledenBoardLog = boardroomPunt();
     const kaal = { at: new Date(tijd()).toISOString(), punten };
     const zegel = crypto.createHash('sha256').update(JSON.stringify(kaal)).digest('hex').slice(0, 32);
-    return Object.assign({}, kaal, { zegel });
+    const uit = Object.assign({}, kaal, { zegel });
+    const p = eigenPaar();
+    if (p) uit.handtekening = { alg: 'ed25519', sleutelId: p.sleutelId, publiek: p.publiekB64,
+      waarde: crypto.sign(null, teTekenen(uit), p.prive).toString('base64') };
+    return uit;
+  }
+
+  /* Is dit blok door DEZE installatie getekend? `null` als deze dienst geen
+     sleutel heeft (een los toetsstel): dan is er niets te bewijzen, en dat
+     zegt de uitslag ook (`ondertekend: null`). */
+  function handtekeningGeldig(b) {
+    const p = eigenPaar();
+    if (!p) return { geldig: null, reden: 'deze dienst heeft geen ondertekensleutel' };
+    const h = b && b.handtekening;
+    if (!h || h.alg !== 'ed25519' || typeof h.waarde !== 'string')
+      return { geldig: false, reden: 'het blok draagt geen handtekening van deze installatie' };
+    let goed = false;
+    try { goed = crypto.verify(null, teTekenen(b), p.publiek, Buffer.from(h.waarde, 'base64')); }
+    catch (e) { goed = false; }
+    if (!goed) return { geldig: false, reden: 'de handtekening is niet van deze installatie, of het blok is gewijzigd' };
+    return { geldig: true, reden: null };
   }
 
   /* Afrekenen met een eerder naar buiten gebracht blok. Per journaal het
@@ -91,19 +115,24 @@ function maakAnkerdienst({ db, nu }) {
 
      Een journaal dat in het blok stond en nu LEEG is, is geen 'ok' maar precies
      het geval waar dit voor bestaat. verifieerTegenAnker() zegt dat al; deze
-     laag telt het op zonder het weg te middelen. */
+     laag telt het op zonder het weg te middelen.
+
+     EERST DE HANDTEKENING. Een blok dat niet van ons komt, rekent niet af --
+     anders past een vervalser een eigen blok bij zijn herschreven journaal. */
   function reken(eerder) {
     if (!eerder || !eerder.punten) return { ok: false, reden: 'geen bruikbaar blok' };
+    const teken = handtekeningGeldig(eerder);
+    if (teken.geldig === false) return { ok: false, ondertekend: false, reden: teken.reden, blokAt: eerder.at };
     const perJournaal = {};
-    let alles = true, ingekort = [];
+    let alles = true; const ingekort = [];
     for (const [naam, haal] of Object.entries(JOURNALEN)) {
       const anker = eerder.punten[naam];
       if (!anker) { perJournaal[naam] = { ok: true, reden: 'stond niet in het blok' }; continue; }
-      const uit = verifieerTegenAnker(haal(db), anker);
+      const uit = verifieerTegenAnker(haal(data()), anker, Object.assign({ nu: tijd }, BEWARING[naam] || {}));
       perJournaal[naam] = uit;
       if (!uit.ok) { alles = false; if (uit.ingekort) ingekort.push(naam); }
     }
-    return { ok: alles, ingekort, perJournaal, blokAt: eerder.at };
+    return { ok: alles, ondertekend: teken.geldig, ingekort, perJournaal, blokAt: eerder.at };
   }
 
   /* De stand, en hij liegt niet over wat hij bewijst.
@@ -123,7 +152,13 @@ function maakAnkerdienst({ db, nu }) {
     return Object.assign({ inBedrijf: true, blok: nuBlok }, reken(eerder));
   }
 
-  return { blok, reken, stand, JOURNALEN: Object.keys(JOURNALEN).concat('ledenBoardLog') };
+  function publiekeSleutel() {
+    const p = eigenPaar();
+    return p ? { alg: 'ed25519', sleutelId: p.sleutelId, publiek: p.publiekB64 } : null;
+  }
+
+  return { blok, reken, stand, handtekeningGeldig, publiekeSleutel,
+    JOURNALEN: Object.keys(JOURNALEN).concat('ledenBoardLog') };
 }
 
-module.exports = { maakAnkerdienst, JOURNALEN };
+module.exports = { maakAnkerdienst, JOURNALEN, BEWARING, zegelRij, kanoniek };

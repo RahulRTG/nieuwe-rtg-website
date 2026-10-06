@@ -81,6 +81,17 @@ function noteer(opdracht = {}) {
   return r;
 }
 
+/* WELK VERZOEK EN WELKE CODE (audit P2-7), binnen de hash. Het verzoek-id is
+   er alleen als de PostgreSQL-werkkopie het verzoek kent (db/verzoekcontext.js);
+   wat er niet is, staat er niet -- nooit een verzonnen id. */
+function herkomst() {
+  const uit = {};
+  try { const c = require('./db/verzoekcontext').huidige(); if (c && c.req && c.req.id) uit.verzoek = String(c.req.id).slice(0, 40); } catch (e) {}
+  const rel = require('./lib/releaseidentiteit').release();
+  if (rel) uit.release = rel;
+  return uit;
+}
+
 /* DE REGEL ZELF -- EEN BOUWER, TWEE BELOFTES.
 
    noteer() en noteerVast() verschillen in wat ze GARANDEREN en niet in wat ze
@@ -114,6 +125,7 @@ function schrijfRegel({ door, over, waarom, bron, extra } = {}) {
        lezer anders de hardheid van het ene voor het andere aanziet. */
     stand: 'toegestaan',
     vast: false,
+    ...herkomst(),
     ...(extra || {})
   };
   /* DE KETEN SLUIT ALS LAATSTE, en `extra` bestaat precies daarom.
@@ -156,6 +168,7 @@ const lezen = require('./inzagelog-lezen')({
   rij,
   /* Zelfde bewaartermijn en noodrem. */
   bewaardagen: BEWAARDAGEN,
+  max: MAX,
   afgekapt: () => { try { return Number(DB && DB.data && DB.data.inzageLogAfgekapt) || 0; } catch (e) { return 0; } }
 });
 const { lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker } = lezen;

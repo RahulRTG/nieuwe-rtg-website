@@ -114,7 +114,8 @@ function maakAuditspoor(deps) {
             actie: req.method + ' ' + pad,
             niveau: 'api',
             uitslag: String(res.statusCode),
-            reden: 'schrijfhandeling via de API'
+            reden: 'schrijfhandeling via de API',
+            verzoek: pseudoniem ? undefined : req.id
         });
       };
       /* PostgreSQL neemt het spoor mee vóór dezelfde requestcommit. Buiten die

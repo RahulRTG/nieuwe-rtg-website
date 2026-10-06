@@ -4,6 +4,7 @@
 
 const context = require('./verzoekcontext');
 const state = require('./state');
+const verzoekspoor = require('./verzoekspoor');
 
 module.exports = ({ store, db, motor, klaar }) => async function collectieSlotPostgres(sleutel, werk) {
   const pg = motor();
@@ -15,7 +16,11 @@ module.exports = ({ store, db, motor, klaar }) => async function collectieSlotPo
   if (store !== 'postgres' || !pg || !klaar() || !db.writable)
     throw Object.assign(new Error('De gedeelde PostgreSQL-opslag is nog niet schrijfbaar.'),
       { code: 'PG_ONGEZOND' });
-  const uit = await pg.bewerkCollectie(sleutel, state.getRuweData(), werk);
+  /* Het auditspoor van het verzoek gaat mee in DEZE transactie (audit P0-1,
+     ./verzoekspoor.js): geen vastgelegde mutatie zonder haar spoor. */
+  const spoor = verzoekspoor.voorVroegeCommit([sleutel], state.getRuweData());
+  const uit = await pg.bewerkCollectie(sleutel, state.getRuweData(), werk, spoor);
   context.eigenCommit(sleutel);
+  verzoekspoor.naVroegeCommit(spoor);
   return uit;
 };

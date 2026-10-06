@@ -14,6 +14,17 @@
    is VERLEEND). Bevestigt de opslag dat niet, dan gaat de handeling niet door
    (503). Het spoor van het resultaat blijft zoals het was, op 'finish'.
 
+   WAT "DUURZAAM" IN POSTGRESQL BETEKENT (audit P0-1). Daar heeft de opslag geen
+   teller, en de regel kan niet VOOR de handeling op zichzelf vaststaan zonder
+   een eigen commit die niets met de mutatie te maken heeft. De belofte is daar
+   daarom sterker en anders: de regel staat in DEZELFDE transactie als elke
+   mutatie van dit verzoek, of geen van beide staat er. De requestcommit draagt
+   hem (db/postgres-verzoeken.js), en de twee paden die midden in het verzoek
+   committen -- de collectietransactie en de economische boeking -- nemen hem
+   mee in hun eigen transactie (db/verzoekspoor.js). Vroeger deden die twee dat
+   niet: een kascode stond dan vast terwijl deze regel verdween met een
+   mislukte requestcommit.
+
    WELKE HANDELINGEN. Dezelfde lijst als bij het bezitsbewijs (geld, privacy,
    herstelroutes, machtigingen; ../kern/identiteit/bezitspaden.js) plus de
    geldrails van het kantoor, de leverancier en de loonrun. Een lijst met een
@@ -47,7 +58,7 @@ function poort(req, res, wie, volgende) {
   if (!kritiek(pad)) return volgende();
   const { handelingsspoor, vastleggen } = actief;
   Promise.resolve().then(() => vastleggen(() => {
-    handelingsspoor.noteer({ wie: String(wie || 'anoniem'), methode: req.method, pad, status: 0, stand: 'toegestaan' });
+    handelingsspoor.noteer({ wie: String(wie || 'anoniem'), methode: req.method, pad, status: 0, stand: 'toegestaan', verzoek: req.id });
   })).catch(() => ({ status: 503 })).then(uit => {
     if (uit) {
       return res.status(uit.status || 503).json({ error: 'Er is niets uitgevoerd: de handeling kon niet aantoonbaar worden vastgelegd. Probeer het zo opnieuw.',

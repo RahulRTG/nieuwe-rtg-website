@@ -673,11 +673,18 @@ const handelingsspoor = require('./lib/handelingsspoor')({ db, save });
    Deze dienst verzamelt de koppen van alle journalen en rekent af met een blok
    dat wordt teruggevoerd. Hij schrijft zelf niets weg: een anker dat deze
    software op dezelfde schijf zet, is geen anker. Zie ./lib/ankerdienst.js. */
-const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db });
+/* Het blok wordt getekend met een sleutel BUITEN de database: afgeleid uit het
+   procesgeheim (of RTG_ANKER_SIGN_KEY), audit P1-3a. */
+const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db,
+  sleutel: (doel) => (accounts.sleutelVoor ? accounts.sleutelVoor(doel) : null) });
 /* WAAR het blok heen gaat is inmiddels wel besloten: een tweede machine binnen
    RTG (./lib/ankerpost.js). Zonder RTG_ANKERPOST_URL doet die post niets en
    zegt hij dat -- geen bestemming blijft "niet in bedrijf". */
 const ankerpost = require('./lib/ankerpost').maakAnkerpost({ ankerdienst });
+/* DE AUDITWACHT (./lib/auditwacht.js): alle journalen bij het opstarten en
+   daarna periodiek nalopen; een breuk wordt een alarm en geen stille 409
+   (audit P1-4). */
+require('./lib/auditwacht').start({ db });
 
 /* DE LEVERANCIERSPOORT staat in ./opzet/leverancierpoort.js: de twee
    SSE-wegen, de melding aan een zaak, de code-index, de opzoeking, de poort

@@ -42,7 +42,7 @@ const PROD_ENV = {
   STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
   TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
   SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
-  ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
+  RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
   DATABASE_URL: '', REDIS_URL: '', SENTRY_DSN: '', STRIPE_SECRET_KEY: ''
 };
 

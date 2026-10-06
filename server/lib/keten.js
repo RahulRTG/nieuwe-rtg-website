@@ -110,15 +110,32 @@ function hangAan(regels, regel) {
      afgekapt   de oudste regel verwijst naar een voorganger die weggevallen is;
                 normaal bij een begrensd journaal, dus apart gemeld
      zonderKeten hoeveel regels nog helemaal geen hash dragen (oude regels van
-                voor deze voorziening; die veroordelen we niet) */
+                voor deze voorziening; die veroordelen we niet)
+
+   EEN REGEL ZONDER HASH IS ALLEEN OUD ALS HIJ OOK OUDER IS. Hier stond dat elke
+   regel zonder hash als "van voor de keten" telde, waar hij ook stond. Dan was
+   vervalsen gratis: wijzig een regel midden in het spoor, haal zijn `hash`-veld
+   weg, en verifieer() meldde ok -- de regel erboven sloeg de vergelijking over
+   omdat zijn voorganger "nog geen keten" had (audit P1-2). Een regel van voor
+   deze voorziening staat per definitie ONDER de oudste geketende regel; elke
+   hashloze regel daarboven is een gat in de keten en geen erfenis. En de oudste
+   geketende regel die naar een voorganger verwijst die zijn hash kwijt is, is
+   precies dezelfde aanval een plek lager. */
 function verifieer(regels) {
   const l = Array.isArray(regels) ? regels : [];
   const gebroken = [];
   let zonderKeten = 0, afgekapt = false;
+  let oudsteGeketend = -1;
+  for (let i = l.length - 1; i >= 0; i--) if (l[i] && l[i].hash) { oudsteGeketend = i; break; }
 
   for (let i = 0; i < l.length; i++) {
     const r = l[i];
-    if (!r || !r.hash) { zonderKeten++; continue; }
+    if (!r || !r.hash) {
+      if (i < oudsteGeketend) {
+        gebroken.push({ index: i, waarom: 'regel zonder hash BINNEN de keten -- een geketende regel eronder bewijst dat hij er een hoorde te dragen' });
+      } else zonderKeten++;
+      continue;
+    }
 
     /* 1. Klopt de regel met zijn eigen hash? Zo niet, dan is de INHOUD veranderd. */
     if (hashVan(r) !== r.hash) {
@@ -135,7 +152,13 @@ function verifieer(regels) {
       if (r.vorige) afgekapt = true;
       continue;
     }
-    if (!ouder.hash) { continue; }   // de keten begint hier; niets te vergelijken
+    /* De keten begint hier, maar alleen als deze regel dat zelf ook zegt: het
+       begin van een keten verwijst naar niets. Verwijst hij wel ergens naar, dan
+       is de hash van zijn voorganger weggehaald. */
+    if (!ouder.hash) {
+      if (r.vorige) gebroken.push({ index: i, waarom: 'verwijst naar een voorganger die zijn hash kwijt is' });
+      continue;
+    }
     if (r.vorige !== ouder.hash) {
       gebroken.push({ index: i, waarom: 'verwijst niet naar de regel eronder -- er is iets tussenuit of veranderd' });
     }

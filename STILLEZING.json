@@ -3,16 +3,16 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-10-04T16:14:18.801Z",
-  "commit": "587230b4d",
+  "op": "2026-10-06T04:16:01.171Z",
+  "commit": "465d67853",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 2,
   "instrument": "scripts/stillezing.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "gemeten": {
   "server": {
-   "bewijslezingen": 90,
+   "bewijslezingen": 87,
    "metVanger": 9,
    "smeltSamen": 5,
    "zegtHet": 1,
@@ -21,7 +21,7 @@
    "anders": 1
   },
   "scripts": {
-   "bewijslezingen": 565,
+   "bewijslezingen": 556,
    "metVanger": 102,
    "smeltSamen": 61,
    "zegtHet": 14,
@@ -42,7 +42,7 @@
    },
    {
     "bestand": "server/kern/command/slo.js",
-    "regel": 58,
+    "regel": 56,
     "leest": [
      "SLO.json"
     ],
@@ -213,7 +213,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 4928,
+    "regel": 4926,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -221,7 +221,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5417,
+    "regel": 5415,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -229,7 +229,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5683,
+    "regel": 5681,
     "leest": [
      "TEKSTOPPERVLAK.json"
     ],
@@ -237,7 +237,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5859,
+    "regel": 5857,
     "leest": [
      "EERSTEMINUUT.json"
     ],
@@ -245,7 +245,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5871,
+    "regel": 5869,
     "leest": [
      "NORM.json"
     ],
@@ -865,7 +865,7 @@
    },
    {
     "bestand": "scripts/test-runner.js",
-    "regel": 404,
+    "regel": 340,
     "leest": [
      "SUITE.json"
     ],

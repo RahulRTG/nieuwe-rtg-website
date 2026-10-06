@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-05T14:04:08.850Z",
-  "commit": "b71cd833",
+  "op": "2026-10-06T02:48:28.752Z",
+  "commit": "77b3d146",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.0"
  },
@@ -360,7 +360,7 @@
   },
   {
    "sleutel": "POST /api/auth/tweede",
-   "bestand": "server/routes/member/tweefactor.js:109",
+   "bestand": "server/routes/member/tweefactor.js:129",
    "staat": "eigenControle"
   },
   {
@@ -4072,7 +4072,7 @@
   },
   {
    "sleutel": "POST /api/techniek/inloggen",
-   "bestand": "server/routes/techniek/inlog.js:29",
+   "bestand": "server/routes/techniek/inlog.js:57",
    "staat": "eigenControle"
   },
   {
@@ -4206,7 +4206,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1412",
+   "bestand": "server/server.js:1391",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

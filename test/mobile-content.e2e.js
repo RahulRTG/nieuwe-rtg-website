@@ -67,6 +67,45 @@ async function shot(page, name) {
   const out = path.join(__dirname,'../artifacts/mobile-content'); fs.mkdirSync(out,{recursive:true});
   await page.screenshot({path:path.join(out,name+'.png')});
 }
+/* WEBKIT MELDT EEN VERZOEK DAT AFBREEKT OMDAT ZIJN DOCUMENT WORDT VERLATEN
+   (herladen, pagina of context dicht) als clientfout, en in twee vormen:
+   "TypeError: Load failed", en "<adres> due to access control checks." -- dat
+   laatste is WebKits misleidende tekst voor dezelfde afbreking; voor een adres op
+   de EIGEN server bestaat er geen toegangscontrole die kan falen. Chromium meldt
+   geen van beide. Alleen die twee vormen, alleen voor de eigen server, en alleen
+   terwijl de toets zelf weg-navigeert, tellen niet als clientfout; ze worden wel
+   geteld (stand.afgebroken). Buiten dat venster blijven ze een fout, en dan zegt
+   netwerkStand() welk adres het was. */
+const AFGEBROKEN = 'TypeError: Load failed';
+const afgebroken = (m, host) => m === AFGEBROKEN ||
+  (!!host && m.includes(host + '/') && / due to access control checks\.$/.test(m));
+const bak = (errors, stand, host) => ({ push(m) {
+  if (stand.weg && afgebroken(m, host)) stand.afgebroken++; else errors.push(m);
+} });
+const lopend = new WeakMap(), mislukt = new WeakMap();
+function netwerk(p) {
+  const open = new Map(), fout = [];
+  lopend.set(p, open); mislukt.set(p, fout);
+  p.on('request', r => open.set(r, r.url()));
+  p.on('requestfinished', r => open.delete(r));
+  p.on('requestfailed', r => { open.delete(r); fout.push(r.url().replace(srv.base, '') + ' (' + ((r.failure() || {}).errorText || '?') + ')'); });
+}
+function netwerkStand(p) {
+  const open = [...(lopend.get(p) || new Map()).values()].map(u => u.replace(srv.base, ''));
+  return 'hangend: ' + JSON.stringify(open.slice(0, 12)) + '; mislukt: ' + JSON.stringify((mislukt.get(p) || []).slice(0, 12));
+}
+test('de afbreekzeef laat alleen een WebKit-afbreking tijdens het weg-navigeren door', () => {
+  const errors = [], stand = {weg:false, afgebroken:0}, host = '127.0.0.1:4000', b = bak(errors, stand, host);
+  const eigen = 'Fetch API cannot load http://' + host + '/api/ik/beelden due to access control checks.';
+  const vreemd = 'Fetch API cannot load https://elders.test/x due to access control checks.';
+  b.push(AFGEBROKEN); b.push(eigen);
+  assert.deepEqual(errors, [AFGEBROKEN, eigen], 'buiten het venster zijn het gewone clientfouten');
+  stand.weg = true;
+  b.push(AFGEBROKEN); b.push(eigen); b.push(vreemd); b.push('TypeError: iets anders'); b.push(AFGEBROKEN + ' uitgebreid');
+  assert.deepEqual(errors.slice(2), [vreemd, 'TypeError: iets anders', AFGEBROKEN + ' uitgebreid'],
+    'alleen precies die twee vormen, en de tweede alleen voor de eigen server');
+  assert.equal(stand.afgebroken, 2, 'en ze worden geteld, niet weggegooid');
+});
 for (const engine of engines) {
   for (const width of [390,1440]) test(engine+' '+width+': Work, Horeca en Network houden hun inhoud', {skip}, async () => {
     const browser = await pw[engine].launch(engine === 'chromium' ? h.browserOpties(pw) : {});
@@ -108,8 +147,10 @@ for (const engine of engines) {
   for (const delayed of [false,true]) test(engine+': Pass inhoud, tabblad en hervatten'+(delayed?' met late Command':'') , {skip}, async () => {
     const browser = await pw[engine].launch(engine === 'chromium' ? h.browserOpties(pw) : {});
     try {
-      const ctx = await context(browser,390), page = await ctx.newPage(), errors = [];
-      h.letOpFouten(page,errors);
+      const ctx = await context(browser,390), errors = [], stand = {weg:false, afgebroken:0};
+      let page = await ctx.newPage();
+      const volg = (p) => { h.letOpFouten(p, bak(errors, stand, new URL(srv.base).host)); netwerk(p); };
+      volg(page);
       let held = 0;
       const vertraag = async r => {held++;await new Promise(resolve => setTimeout(resolve,1200));await r.continue();};
       if (delayed) await page.route('**/shared/command.js*',vertraag);
@@ -122,28 +163,42 @@ for (const engine of engines) {
       await page.evaluate(() => document.querySelector('.tabbar button[data-tab="home"]').click());
       await page.evaluate(() => RTGCommand.open('/apps/werk.html','Werk OS'));
       await page.waitForSelector('.cmd-pane.actief iframe');
-      /* De late Command is bewezen op de eerste laadbeurt (held > 0). Een
-         onderschepte en doorgelaten aanvraag van een document dat herladen wordt,
-         is in WebKit onbetrouwbaar: soms een interne fout, soms een pagina die
-         nooit ready wordt. Het hervatten wordt daarom zonder onderschepping
-         gemeten, en een gemiste ready-stand zegt welke stand er wel stond. */
-      if (delayed) await page.unroute('**/shared/command.js*',vertraag);
+      /* Het hervatten leest de open bladen uit localStorage (shared/command/geheugen.js);
+         wacht tot die stand er staat in plaats van te hopen dat hij er al is. */
+      await page.waitForFunction(() => /werk\.html/.test(localStorage.getItem('rtg_cmd_bladen') || ''));
+      /* DE LATE COMMAND IS BEWEZEN OP DE EERSTE LAADBEURT (held > 0), en het
+         hervatten wordt gemeten op een pagina waar NOOIT een route op stond.
+         Een pagina die ooit een onderschepte en doorgelaten aanvraag had, herlaadt
+         in WebKit niet betrouwbaar: eerst een interne fout, en na unroute() nog
+         steeds soms een pagina die nooit ready wordt (6 oktober 2026, twee keer op
+         een dag, met nul clientfouten). Routes horen bij de PAGINA en de stand bij
+         de CONTEXT, dus een tweede pagina erft de bladen en niet de onderschepping. */
+      if (delayed) {
+        const verder = await ctx.newPage(); volg(verder);
+        stand.weg = true; await page.close(); stand.weg = false; page = verder;
+        await page.goto(srv.base + '/apps/app.html?pas=rtg', {waitUntil:'domcontentloaded'});
+      }
+      stand.weg = true;
       await page.reload({waitUntil:'domcontentloaded'});
+      stand.weg = false;
       await page.waitForSelector('body[data-rtg-desktop-state="ready"]').catch(async e => {
-        const stand = await page.evaluate(() => document.body.dataset.rtgDesktopState).catch(() => '?');
-        throw new Error('na herladen geen ready-stand maar ' + JSON.stringify(stand) + '; fouten: ' + JSON.stringify(errors) + ' -- ' + e.message);
+        const ds = await page.evaluate(() => document.body.dataset.rtgDesktopState).catch(() => '?');
+        throw new Error('na herladen geen ready-stand maar ' + JSON.stringify(ds) + '; fouten: ' + JSON.stringify(errors) +
+          '; ' + netwerkStand(page) + ' -- ' + e.message);
       });
       const frame = page.frameLocator('.cmd-pane.actief iframe');
       await frame.locator('.wk-briefing h1').waitFor({state:'visible'});
       const bounds = await page.locator('.cmd-pane.actief iframe').boundingBox();
       assert.ok(bounds.height >= 300, 'resumed app needs a usable viewport');
       await shot(page,engine+'-pass-resumed-'+delayed);
+      stand.weg = true;
       await ctx.close();
+      stand.weg = false;
       const guest = await context(browser,390,false), login = await guest.newPage();
-      h.letOpFouten(login,errors);
+      volg(login);
       await open(login,'/apps/app.html?pas=rtg');
       await painted(login,'#gate button:not([hidden])');
-      assert.deepEqual(errors, [], 'no client errors during Pass transitions');
+      assert.deepEqual(errors, [], 'no client errors during Pass transitions; ' + netwerkStand(login));
     } finally { await browser.close(); }
   });
 }

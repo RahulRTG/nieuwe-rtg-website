@@ -65,7 +65,9 @@ function alleenRefs(x) {
    geen inlog is en toch een RTG-wachtwoord draagt (/api/supplier/staff/join), en
    elke volgende. Alleen deze twee namen: `code`, `bewijs` en `token` zijn in de
    zaakkant gewone velden (de bedrijfscode bij een wissel, het bewijs bij een
-   belofte); die staan op een inlogroute, en daar houdt slot 1 ze tegen. */
+   belofte); die staan op een inlogroute, en daar houdt slot 1 ze tegen. Een
+   sleutel telt in elke hoofdlettervorm en op elke diepte, ook in een lijst;
+   toets 5 van test/doos-journaal.test.js houdt elk van die takken apart vast. */
 const WACHTWOORD = Object.freeze(['password', 'wachtwoord']);
 function draagtWachtwoord(lijf) {
   const stapel = [lijf];

@@ -102,6 +102,26 @@ test('5. van het antwoord blijft alleen wat het naspelen leest; een wachtwoordli
     assert.deepEqual(rij[1].res, { invite: { id: 'sinv-1' } }, 'geen kassacode, wel de ref');
     assert.deepEqual(rij[2].res, { order: { ref: 'R-1', pickup: 'P7', regels: [null, { id: 'r2' }] } }, 'de vorm blijft, voor leerRefs');
     assert.ok(rij.every(e => doos.journaalGeldig(e)), 'de ingekorte regels dragen een geldig zegel');
+
+    /* DE TWEEDE VERDEDIGING IN ELKE SPELLING EN OP ELKE DIEPTE. Een plat
+       'password' in kleine letters bewijst alleen die ene vorm: zonder
+       hoofdletterlezing, zonder de Nederlandse naam of zonder af te dalen bleef
+       deze toets groen (herkeuring N27, mutanten M10, M14 en M11). Elk lijf
+       hieronder vangt er precies een, zodat de melding zegt welke tak brak. */
+    const geweigerd = [
+      ['hoofdletters', { bedrijf: 'Sal de Mar', PASSWORD: 'geheim' }],
+      ['de Nederlandse naam', { bedrijf: 'Sal de Mar', wachtwoord: 'geheim' }],
+      ['genest object', { account: { login: 'a@b.c', password: 'geheim' } }],
+      ['in een lijst', { leden: [{ naam: 'A' }, { naam: 'B', password: 'geheim' }] }]
+    ];
+    for (const [vorm, lijf] of geweigerd) {
+      doos.schrijfJournaal('/api/supplier/staff/join', lijf, { ok: true });
+      assert.equal(db.data.doosJournaal.length, 3, 'een wachtwoord als ' + vorm + ' gaat het journaal niet in');
+    }
+    // Tegenproef: het gaat om de SLEUTEL. Het woord als waarde, of een sleutel
+    // die er alleen op lijkt, houdt een gewone handeling niet tegen.
+    doos.schrijfJournaal('/api/supplier/order/notitie', { regels: [{ opmerking: 'wachtwoord van de wifi op de bon' }], passwordHint: 'nee' }, { ok: true });
+    assert.equal(db.data.doosJournaal.length, 4, 'een gewoon lijf, ook genest, gaat er wel in');
   } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
 });
 
@@ -117,7 +137,8 @@ test('6. een regel van voor de reparatie, met een geldig zegel, wordt bij het na
     for (const oud of [
       { seq: 2, pad: '/api/supplier/login/', body: { username: 'rahul', password: 'Imran' }, res: null, at: 2 },
       { seq: 3, pad: '/api/supplier/mijn/login', body: { bewijs: 'b', code: '123456' }, res: null, at: 3 },
-      { seq: 4, pad: '/api/supplier/staff/join', body: { login: 'a@b.c', password: 'geheim' }, res: null, at: 4 }
+      { seq: 4, pad: '/api/supplier/staff/join', body: { login: 'a@b.c', password: 'geheim' }, res: null, at: 4 },
+      { seq: 5, pad: '/api/supplier/staff/join', body: { account: { Wachtwoord: 'geheim' } }, res: null, at: 5 }
     ]) {
       oud.zegel = zegel(oud);
       assert.equal(doos.journaalGeldig(oud), false, oud.pad + ' gaat niet meer naar de cloud');

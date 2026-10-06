@@ -11,7 +11,8 @@ const bewaarwacht = require('../../bewaarwacht');
 const { log } = require('../../log');
 
 module.exports = (tctx) => {
-  const { app, db, save, beveilig, techAuth, eigenaarAlleen, zwaar, sessieSleutel } = tctx;
+  const { app, db, save, beveilig, techAuth, eigenaarAlleen, zwaar, sessieSleutel, kern } = tctx;
+  const gezinBewaren = () => (kern && kern.rtf && kern.rtf.gezinBewaren) || null;
 
   /* Het overzicht dat op het techniekbord komt. Twee getallen tellen echt:
      hoeveel er over zijn termijn is, en hoeveel takken er GEEN termijn hebben.
@@ -25,6 +26,8 @@ module.exports = (tctx) => {
       // twee data weet je niet of een groen bord "het is in orde" betekent of
       // "er heeft al een maand niemand gekeken".
       r.wacht = (db.data.techniek && db.data.techniek.bewaarwacht) || null;
+      // de gezinnen van FoundationOS wonen niet in een eigen tak (foundation/gezinbewaren.js)
+      r.gezinnen = gezinBewaren() ? gezinBewaren().rapport() : null;
       return r;
     } catch (e) { return null; }
   }
@@ -46,6 +49,9 @@ module.exports = (tctx) => {
   const wachtTimer = setInterval(() => {
     try { bewaarwacht.ronde(db, { beveilig, save }); }
     catch (e) { log.warn('bewaarronde-mislukt', { fout: e && e.message }); }
+    // gezinnen: aankondigen mag de machine, wissen niet (zie de route hieronder)
+    try { if (gezinBewaren()) gezinBewaren().kondigAan(); }
+    catch (e) { log.warn('gezinbewaren-mislukt', { fout: e && e.message }); }
   }, RONDE_MS);
   if (wachtTimer.unref) wachtTimer.unref();
 
@@ -80,6 +86,29 @@ module.exports = (tctx) => {
         ? 'Verwijderd. Dit is niet terug te draaien; herstellen kan alleen uit een backup.'
         : 'Dit was een PROEF: er is niets verwijderd. Stuur bevestig: "WIS" mee om het echt te doen.'
     });
+  });
+
+  /* De gezinnen van FoundationOS: dezelfde twee sloten als hierboven. Gewist
+     wordt alleen wat al AANKONDIGING_DAGEN is aangekondigd en bij het nagaan
+     nog steeds ongebruikt is (foundation/gezinbewaren.js). */
+  app.post('/api/techniek/bewaren/gezinnen', techAuth, eigenaarAlleen, async (req, res) => {
+    const gb = gezinBewaren();
+    if (!gb) return res.status(503).json({ error: 'De gezinslaag is niet geladen; er is niets gewist.' });
+    const echt = req.body && req.body.bevestig === 'WIS';
+    if (echt) {
+      const bewijs = await zwaar.eis(req.techUser, 'eigenaar-bewaarveeg', sessieSleutel(req), req,
+        'De echte veegronde van de gezinnen in FoundationOS');
+      if (bewijs.error) return zwaar.stuur(res, bewijs);
+    }
+    const r = gb.veeg({ echt });
+    if (echt && r.gewist) {
+      log.warn('gezinnen-geveegd', { totaal: r.gewist, door: req.techUser && req.techUser.id });
+      if (beveilig) beveilig.meld('gezinnen-geveegd', 'waarschuwing',
+        r.gewist + ' gezin(nen) verwijderd na aankondiging en bewaartermijn.', { bron: 'user:' + (req.techUser && req.techUser.id) });
+    }
+    res.json({ ...r, uitleg: echt
+      ? 'Verwijderd. Dit is niet terug te draaien; herstellen kan alleen uit een backup.'
+      : 'Dit was een PROEF: er is niets verwijderd. Stuur bevestig: "WIS" mee om het echt te doen.' });
   });
 
   return { statusDeel };

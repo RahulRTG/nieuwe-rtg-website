@@ -1569,7 +1569,8 @@
       "wieKijkt",
       "zaakAbonnement",
       "findPartner",
-      "partnerPersoneelscode"
+      "partnerPersoneelscode",
+      "sessiestroom"
     ],
     "onboarding": [
       "eigenaar",
@@ -2452,7 +2453,8 @@
       "zetWerkvenster",
       "zin",
       "zoekZone",
-      "zorgketen"
+      "zorgketen",
+      "sessiestroom"
     ],
     "supplier-deel2": [],
     "synergie": [
@@ -2543,7 +2545,8 @@
       "theaterVideoUpload",
       "theaterZaakMaak",
       "theaterZaakZaal",
-      "theaterZaal"
+      "theaterZaal",
+      "sessiestroom"
     ],
     "thuis": [
       "thuis"

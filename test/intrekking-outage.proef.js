@@ -10,7 +10,7 @@ const os = require('node:os');
 const path = require('node:path');
 const cp = require('node:child_process');
 const { DatabaseSync } = require('node:sqlite');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stroomAdres } = require('./helper');
 
 const REDIS = process.env.REDIS_URL;
 const POSTGRES = process.env.DATABASE_URL;
@@ -33,7 +33,7 @@ async function openStream(base, token) {
   const ac = new AbortController();
   const timer = setTimeout(() => ac.abort(), 5000);
   let r;
-  try { r = await fetch(base + '/api/stream?token=' + encodeURIComponent(token), { signal: ac.signal }); }
+  try { r = await fetch(await stroomAdres(base, '/api/stream', token), { signal: ac.signal }); }
   finally { clearTimeout(timer); }
   assert.equal(r.status, 200);
   const reader = r.body.getReader();

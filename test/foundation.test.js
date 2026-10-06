@@ -9,7 +9,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, stroomAdres } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtf-'));
@@ -640,7 +640,7 @@ test('cross-app bellen: RTG en RTF sturen belsignalen over en weer via het live-
   await raw('/rtf/social/respond', { code: g.code, token: g.token, key: verzoek.key, action: 'accept' });
   const rtgKey = verzoek.key; // handle van het RTG-lid
 
-  const rtgStream = await openStream(BASE + '/api/stream?token=' + encodeURIComponent(rtgTok));
+  const rtgStream = await openStream(await stroomAdres(BASE, '/api/stream', rtgTok));
   const ticket = (await json(await api('/gezin/stroom/ticket', { code: g.code, token: g.token, kanaal: 'sociaal' }))).ticket;
   const rtfStream = await openStream(BASE + '/api/rtf/social/stream?code=' + encodeURIComponent(g.code) + '&ticket=' + encodeURIComponent(ticket));
   try {
@@ -688,7 +688,7 @@ test('realtime herstel: gemiste belsignalen worden opnieuw afgespeeld na herverb
 
   // het lid verbindt (opnieuw) met since=1: de gemiste signalen worden nagestuurd
   const ac = new AbortController();
-  const res = await fetch(BASE + '/api/stream?token=' + encodeURIComponent(rtgTok) + '&since=1', { signal: ac.signal });
+  const res = await fetch(await stroomAdres(BASE, '/api/stream', rtgTok, { extra: '&since=1' }), { signal: ac.signal });
   const reader = res.body.getReader(); const dec = new TextDecoder(); let buf = '', calls = 0;
   const t0 = Date.now();
   while (Date.now() - t0 < 800) {

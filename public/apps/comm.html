@@ -2,6 +2,7 @@
 <html lang="nl" data-rtg-thema="champagne">
 <head>
 <script src="/shared/id.js"></script>
+<script src="/shared/stroom.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Berichten</title>
@@ -728,7 +729,7 @@
      te zien, en dan is het geen gesprek maar een postbus. */
   if (window.EventSource && token) {
     try {
-      var src = new EventSource('/api/stream?token=' + encodeURIComponent(token));
+      var src = RTGStroom.open('/api/stream', { token: token });
       src.addEventListener('comm', function (ev) {
         var d = {}; try { d = JSON.parse(ev.data || '{}'); } catch (e) {}
         if (staat.open && d.gesprekId === staat.open) laadGesprek();

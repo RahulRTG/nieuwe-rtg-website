@@ -64,14 +64,16 @@
     }
     if (s.spelen.soort === 'stream') {
       var f = $('#film');
-      f.src = s.spelen.bron + '?token=' + encodeURIComponent(TOKEN);
+      /* Een kijkticket voor deze video in het adres, nooit de sessie zelf
+         (shared/stroom.js); spelen kan pas als de bron er staat. */
+      RTGStroom.kijk(f, s.spelen.bron, { stroom: 'theater-kijk', id: s.spelen.bron.split('/').pop(), token: TOKEN })
+        .then(function () { f.play().catch(function () {}); });
       f.classList.add('zien');
       document.body.classList.add('media-video-playing');
       /* Dezelfde band als in het Theater en bij een clip: shared/ondertitelband.js.
          Het gaat hier om hetzelfde bestand als in het Theater, dus een kijker die
          daar ondertitels ziet hoort ze hier ook te zien. */
       if (window.RTGOndertitelband) RTGOndertitelband.zet(document.getElementById('filmvlak'), f, s.ondertitels || []);
-      f.play().catch(function () {});
       $('#spTitel').textContent = s.titel;
       $('#spSub').textContent = s.maker.codenaam + ' · origineel beeld uit het Theater';
       return;

@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
 <script src="/shared/id.js"></script>
+<script src="/shared/stroom.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Service · de wachtrij</title>
@@ -498,7 +499,7 @@ let BELMOTOR = null, BELGESPREK = null, BELBRON = null, BELMEE = null;
 
 function belLuister() {
   if (!window.EventSource || BELBRON) return;
-  BELBRON = new EventSource('/api/stream?token=' + encodeURIComponent(TOKEN));
+  BELBRON = RTGStroom.open('/api/stream', { token: TOKEN });
   BELBRON.addEventListener('servicebel', (ev) => {
     let d = null; try { d = JSON.parse(ev.data); } catch (e) { return; }
     if (!d) return;

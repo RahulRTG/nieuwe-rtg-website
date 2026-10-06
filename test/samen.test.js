@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stroomAdres } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -47,7 +47,7 @@ test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SS
   // B luistert op de stroom; A stuurt de kamer naar de Mall
   const events = [];
   let zagHello = false; let eerste = ''; let reden = '';
-  const es = await fetch(base + '/api/stream?token=' + encodeURIComponent(B));
+  const es = await fetch(await stroomAdres(base, '/api/stream', B));
   /* DE VOORWAARDE EERST, en dat is met schade geleerd. /api/stream antwoordt
      401 met een LEGE body, en de rem hieronder 429 met een korte. In beide
      gevallen ziet de lezer meteen `done`, valt de lus eruit en zakte deze toets

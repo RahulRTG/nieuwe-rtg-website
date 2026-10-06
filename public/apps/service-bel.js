@@ -91,7 +91,7 @@ function zetStand(stand) {
    een ander nummer hoort bij iemand anders en wordt genegeerd. */
 function luister() {
   if (!window.EventSource || BRON) return;
-  BRON = new EventSource('/api/stream?token=' + encodeURIComponent(TOKEN));
+  BRON = RTGStroom.open('/api/stream', { token: TOKEN });
   BRON.addEventListener('servicebel', (ev) => {
     let d = null; try { d = JSON.parse(ev.data); } catch (e) { return; }
     if (!d || !GESPREK || d.gesprek !== GESPREK.id) return;

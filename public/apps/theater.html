@@ -2,6 +2,7 @@
 <html lang="nl" data-rtg-thema="bordeaux">
 <head>
 <script src="/shared/id.js"></script>
+<script src="/shared/stroom.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Theater</title>
@@ -644,7 +645,7 @@
   // de realtime lijn: als maker dienen, als kijker ontvangen
   function startSse() {
     if (!window.EventSource || !token) return;
-    const es = new EventSource('/api/stream?token=' + encodeURIComponent(token));
+    const es = RTGStroom.open('/api/stream', { token: token });
     es.addEventListener('theater', async e => {
       const d = JSON.parse(e.data);
       if (d.kind === 'vraag') dienUit(d);
@@ -671,7 +672,8 @@
       kijkThuis(v);
       return;
     }
-    $('#doekVideo').src = '/api/theater/kijk/' + v.id + '?token=' + encodeURIComponent(token);
+    /* Een kijkticket in het adres, nooit de sessie zelf (shared/stroom.js). */
+    RTGStroom.kijk($('#doekVideo'), '/api/theater/kijk/' + v.id, { stroom: 'theater-kijk', id: v.id, token: token });
     /* De ondertitels reizen mee met de kaart uit de zaal (kern/theater/index.js
        videoBeeld), dus ze staan er voordat het beeld begint. De band zelf is de
        gedeelde laag die ook de clips en de Media OS gebruiken. */

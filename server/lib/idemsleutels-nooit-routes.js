@@ -141,4 +141,5 @@ Object.assign(module.exports, require('./idemsleutels-nooit-gezinstoken'));
 Object.assign(module.exports, require('./idemsleutels-nooit-eigengezin'));
 Object.assign(module.exports, require('./idemsleutels-nooit-gezinsdeur'));
 Object.assign(module.exports, require('./idemsleutels-nooit-lesstroom'));
+Object.assign(module.exports, require('./idemsleutels-nooit-sessiestroom'));
 Object.freeze(module.exports);

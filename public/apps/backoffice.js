@@ -133,10 +133,7 @@
       '</div>').join('') : '<div class="empty">'+T('bo.noverify','Geen openstaande verificaties.')+'</div>';
     $('#verify').querySelectorAll('.vrow').forEach(row => {
       const id = Number(row.dataset.id);
-      row.querySelector('[data-doc]').addEventListener('click', e => {
-        $('#docImg').src = '/api/office/doc?token='+encodeURIComponent(API.token)+'&file='+encodeURIComponent(e.target.dataset.doc);
-        $('#docScrim').classList.add('open');
-      });
+      row.querySelector('[data-doc]').addEventListener('click', e => toonDocument(e.target.dataset.doc)); // deel 01a
       row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve',
         row.querySelector('[data-face]').checked, row.querySelector('[data-geb]').value));
       row.querySelector('[data-no]').addEventListener('click', () => decide(id, 'reject', false));
@@ -157,6 +154,27 @@
     try { await call('/office/verify', { userId, decision, faceMatch: !!faceMatch,
       geboortedatum: geboortedatum || undefined }); } catch(e){ alert(e.message); return; }
     loadVerify();
+  }
+  /* ---- backoffice, deel 01a: DE SCAN VAN EEN IDENTITEITSBEWIJS ----
+
+     De scan komt met de sessie in de KOP en niet in het adres: een <img
+     src="/api/office/doc?token=..."> zette de kantoorsessie in serverlogs, de
+     browsergeschiedenis en een Referer (keuringsregel 29b). Nu haalt fetch hem
+     op met Authorization en wordt hij een blob, die bij de volgende scan weer
+     wordt vrijgegeven. Deel van dezelfde genaaide bundel (scripts/bundel.js):
+     dit bestand is geen module en draait binnen dezelfde IIFE als 01 en 01b. */
+  async function toonDocument(file) {
+    const img = $('#docImg');
+    if (img.dataset.blob) { URL.revokeObjectURL(img.dataset.blob); delete img.dataset.blob; }
+    img.removeAttribute('src');
+    $('#docScrim').classList.add('open');
+    try {
+      const r = await fetch('/api/office/doc?file=' + encodeURIComponent(file),
+        { headers: { Authorization: 'Bearer ' + API.token }, cache: 'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      img.dataset.blob = URL.createObjectURL(await r.blob());
+      img.src = img.dataset.blob;
+    } catch (x) { img.alt = T('bo.docmissing', 'Dit document kon niet worden geladen.'); }
   }
   /* ---- backoffice, vervolg van deel 01 ----
      Geknipt op een TOP-NIVEAU grens binnen dezelfde IIFE: de delen worden
@@ -1020,7 +1038,7 @@
 
   function stream(){
     if (!window.EventSource) return;
-    try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
+    try { source = RTGStroom.open('/api/office/stream', { stroom: 'kantoor', token: API.token }); } catch(e){ return; }
     source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadVakbewijzen(); loadConcierge(); laadTafels(); loadIncidenten(); loadSalonNaleving(); loadOntmoetingen(); loadTrust(); });
     source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
     // Salon-ontmoetingen: SOS-alarm en het live camerabeeld (WebRTC-signaal)

@@ -20,7 +20,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stroomAdres } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-podiumhandel-'));
 let srv, base, office;
@@ -39,7 +39,7 @@ function api(pad, body, token) {
 function luister(token) {
   const ac = new AbortController();
   const brokken = [];
-  const klaar = fetch(base + '/api/stream?token=' + token, { signal: ac.signal })
+  const klaar = stroomAdres(base, '/api/stream', token).then(adres => fetch(adres, { signal: ac.signal }))
     .then(async (r) => {
       const lezer = r.body.getReader(); const dec = new TextDecoder();
       for (;;) { const { done, value } = await lezer.read(); if (done) break; brokken.push(dec.decode(value)); }

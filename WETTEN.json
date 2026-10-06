@@ -6,7 +6,7 @@
       "soort": "merk",
       "wet": "Een merkkleur heeft precies een spelling; wat een haar naast een logokleur ligt is een typefout en geen keuze.",
       "bron": {
-        "bestand": "CLAUDE.md",
+        "bestand": "AGENTS.md",
         "anker": "--burgundy:#7F1634"
       },
       "sabotage": {
@@ -210,7 +210,7 @@
       "soort": "toegang",
       "wet": "Elke AI-ingang draagt de toegangsregel of staat met een reden op de lijst: de AI belooft nooit zelf toegang, goedkeuring of een pas.",
       "bron": {
-        "bestand": "CLAUDE.md",
+        "bestand": "AGENTS.md",
         "anker": "de AI mag **nooit** zelf toegang beloven of verlenen"
       },
       "sabotage": {
@@ -235,7 +235,7 @@
       "soort": "toegang",
       "wet": "De AI meldt nooit dat iets al geregeld, geboekt, bevestigd of betaald is; alleen wat zij zelf heeft uitgevoerd en teruggekregen mag zij als gedaan melden.",
       "bron": {
-        "bestand": "CLAUDE.md",
+        "bestand": "AGENTS.md",
         "anker": "nooit claimen dat een boeking daadwerkelijk verwerkt is"
       },
       "sabotage": {
@@ -259,7 +259,7 @@
       "soort": "toegang",
       "wet": "De AI spreekt over de codenaam van een lid en niet over zijn volledige naam; de echte naam blijft in de kluis.",
       "bron": {
-        "bestand": "CLAUDE.md",
+        "bestand": "AGENTS.md",
         "anker": "klantdata draait op codenamen"
       },
       "sabotage": {
@@ -284,7 +284,7 @@
       "soort": "toegang",
       "wet": "Geen enkel endpoint geeft de echte naam of het e-mailadres van een ander lid terug; dat zijn precies de velden die in de kluis blijven.",
       "bron": {
-        "bestand": "CLAUDE.md",
+        "bestand": "AGENTS.md",
         "anker": "echte namen staan in de gescheiden kluis"
       },
       "sabotage": {
@@ -333,7 +333,7 @@
       "soort": "toegang",
       "wet": "Alles wat een prestatie buiten het potje bewaart bestaat alleen voor leden die de 18+-poort halen; onder die grens blijft elk spel speelbaar, er wordt alleen niets bewaard.",
       "bron": {
-        "bestand": "CLAUDE.md",
+        "bestand": "AGENTS.md",
         "anker": "De progressielaag stopt bij 18+"
       },
       "sabotage": {
@@ -1022,7 +1022,7 @@
       "soort": "techniek",
       "wet": "Een cap die een document noemt, bestaat in de code. Een voorbeeld in een tekst is een bewering en geen illustratie: een cap die nergens wordt aangemaakt, stuurt een lezer met vertrouwen de verkeerde kant op.",
       "bron": {
-        "bestand": "CLAUDE.md",
+        "bestand": "DOCUMENTENKAART.md",
         "anker": "Een cap die een document noemt, wordt sindsdien tegen de"
       },
       "sabotage": {

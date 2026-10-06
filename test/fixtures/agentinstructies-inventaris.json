@@ -1,0 +1,646 @@
+{
+ "uitleg": "De blokken van CLAUDE.md zoals die stond op commit ab8f6b76, met per blok de bestemming na het opknippen (ARCHITECTOPDRACHT.md fase 1). De hash is sha256 over het genormaliseerde blok (getalmerktekens leeg, regeleinden zonder spaties), eerste 16 tekens. Met de hand vastgelegd en nooit opnieuw gegenereerd: dit is het bewijs dat er niets verdween, en een bewijs dat zichzelf bijwerkt bewijst niets.",
+ "bron": {
+  "bestand": "CLAUDE.md",
+  "commit": "ab8f6b76",
+  "blokken": 106
+ },
+ "blokken": [
+  {
+   "nr": 1,
+   "bestemming": "CLAUDE.md",
+   "hash": "22aaa6ff947bedbe",
+   "anker": "# Rahul Travel Group — Projectcontext voor Claude Code"
+  },
+  {
+   "nr": 2,
+   "bestemming": "CLAUDE.md",
+   "hash": "768caed536f1adba",
+   "anker": "Dit bestand wordt automatisch gelezen bij elke Claude Code-sessie in deze map."
+  },
+  {
+   "nr": 3,
+   "bestemming": "AGENTS.md",
+   "hash": "6f7551394a3746d3",
+   "anker": "## Wat dit project is"
+  },
+  {
+   "nr": 4,
+   "bestemming": "AGENTS.md",
+   "hash": "1fc66d060711741e",
+   "anker": "Website + ledenportaal + app (PWA) voor Rahul Travel Group (RTG) — een membershi"
+  },
+  {
+   "nr": 5,
+   "bestemming": "AGENTS.md",
+   "hash": "86339c77e0fe1c96",
+   "anker": "**`README.md` is de actuele technische documentatie** (structuur, starten, API-o"
+  },
+  {
+   "nr": 6,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "a37a4f6bbbfc313e",
+   "anker": "**`PLATFORM.md` bevat de super-app-regel** — lees die vóór je apps samenvoegt of"
+  },
+  {
+   "nr": 7,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "0ce5b5f02b9f519f",
+   "anker": "**`SCHERMEIGENAAR.json` zegt per zichtbare functie wie de eigenaar is** — precie"
+  },
+  {
+   "nr": 8,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "4d1e55187c78e3ee",
+   "anker": "**`GELD.md`, `LEVEN.md` en `LIFE.md` zijn de diepte-documenten per wereld.** GEL"
+  },
+  {
+   "nr": 9,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "828e2f7ac5e73d04",
+   "anker": "**`REIZEN.md` is het diepte-document van RTG Reizen** — het Travel OS: niet een "
+  },
+  {
+   "nr": 10,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "eeeb8128562b508f",
+   "anker": "**`AUTHORITY.md` is de RTG Authority Engine** -- van TOEGANG modelleren (\"mag Fi"
+  },
+  {
+   "nr": 11,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "47ec30e2b428d109",
+   "anker": "**`HDI.md` is de laag BOVEN de Foundation** — RTG Human Development Infrastructu"
+  },
+  {
+   "nr": 12,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "860daf5fa23beddf",
+   "anker": "**`SAMENLEVING.md` is de grondwet boven de hele ladder** -- hoe RTG en de RTFoun"
+  },
+  {
+   "nr": 13,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "c9642866724ee68d",
+   "anker": "**`CONNECT.md` is het diepte-document van Foundation Connect** -- het ontdeknetw"
+  },
+  {
+   "nr": 14,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "a80d72292231925d",
+   "anker": "**`VERDER.md` is de lus van FoundationOS** -- werk, leren en de buurt als projec"
+  },
+  {
+   "nr": 15,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "de894cd1cdf6b8a6",
+   "anker": "**`POLITIEK.md` is het masterplan voor DemocratieOS en de partij** -- twee proje"
+  },
+  {
+   "nr": 16,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "75415948e3bbae80",
+   "anker": "**`ONTMOETEN.md` is het diepte-document van de twee datingapps** — Vonk en Rende"
+  },
+  {
+   "nr": 17,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "d5696661f338e40b",
+   "anker": "**`ECONOMIE.md` is de laag erboven** -- RTG Economic Control Plane: de financiël"
+  },
+  {
+   "nr": 18,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "244065c6731a5f96",
+   "anker": "**`KOSTEN.md` is de kostprijskant** -- RTG Kostprijs: wat kost elke gebruiker on"
+  },
+  {
+   "nr": 19,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "1c9d4d109e04fcfa",
+   "anker": "**`GIFT.md` is het besluit vóór de doneerknop** -- die knop bestaat met opzet ni"
+  },
+  {
+   "nr": 20,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "c0608c23cccf41a7",
+   "anker": "**`CARRIERE.md` is de laag BOVEN de rugdekking** -- de mens die waarde opbouwt r"
+  },
+  {
+   "nr": 21,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "1bc618884940cc1f",
+   "anker": "**`RUGDEKKING.md` is het besluit vóór de sponsorknop** -- wat RTG een individuel"
+  },
+  {
+   "nr": 22,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "c05f90e2566710f9",
+   "anker": "**`MENSNETWERK.md` is de grondwet voor menselijke vertegenwoordiging** -- niet w"
+  },
+  {
+   "nr": 23,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "c319d6710d37bd73",
+   "anker": "**Alle drie de grondwetsregels zijn sinds 13 september 2026 TOETSEN en geen zinn"
+  },
+  {
+   "nr": 24,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "bd97625fde194a12",
+   "anker": "**MN-01 en MN-02** (par. 4a en 4b). Ze staan bewust apart, want het zijn twee so"
+  },
+  {
+   "nr": 25,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "4210c6c79b824d49",
+   "anker": "**Zes metingen gaan vooraf, en twee daarvan veranderen het ontwerp.** Het bevoeg"
+  },
+  {
+   "nr": 26,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "36f15f3c21f682a4",
+   "anker": "**En par. 4c is de AI-helft, die par. 4b hardop openliet.** `scripts/aicontext.j"
+  },
+  {
+   "nr": 27,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "0105985c22ba0871",
+   "anker": "Daaruit volgt de vorm van MN-02, en die is anders dan hij eerst was: niet *\"een "
+  },
+  {
+   "nr": 28,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "9957cac0be8d18c3",
+   "anker": "Verder: acht naamsbotsingen, en **de tweede helft is de leerzaamste** -- na `klu"
+  },
+  {
+   "nr": 29,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "6935b5a4b3355ad5",
+   "anker": "**`STAGE.md` is de publieke laag boven de media- en eventdomeinen** -- RTG Stage"
+  },
+  {
+   "nr": 30,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "49f76c2488ddae93",
+   "anker": "**Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijge"
+  },
+  {
+   "nr": 31,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "56f9c1ab4d39202f",
+   "anker": "| Stand | `WALLET_SALDO` | `LID_UITBETALING` | Wat RTG dan is | |---|---|---|---"
+  },
+  {
+   "nr": 32,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "701005df7804d453",
+   "anker": "Saldo dat tegen de nominale waarde inwisselbaar is voor de houder ís elektronisc"
+  },
+  {
+   "nr": 33,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "a9e63740e9bb6801",
+   "anker": "**`CONCERN.md` is het diepte-document van de bedrijvenkant** — RTG Concern, het "
+  },
+  {
+   "nr": 34,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "9127a432fc1eff8d",
+   "anker": "**`PLANNING.md` is de tijd- en capaciteitslaag** -- het voorstel om roosteren ge"
+  },
+  {
+   "nr": 35,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "cfae9447ea34053d",
+   "anker": "**`VRIJHEID.md` is de mens die in dat rooster staat** -- RTG Vrijheid: tijd, rus"
+  },
+  {
+   "nr": 36,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "86b7b3c483d44784",
+   "anker": "**`OFFICE.md` is de richting van RTG Office Next** -- van zes editors naar werk:"
+  },
+  {
+   "nr": 37,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "aa080d57ae81b48f",
+   "anker": "**`ARBEID.md` is het Work Kernel-voorstel, gemeten** -- 48 onderdelen (103 t/m 1"
+  },
+  {
+   "nr": 38,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "5c59ac4a412c061d",
+   "anker": "**`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpi"
+  },
+  {
+   "nr": 39,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "116bfbc18a47b6b7",
+   "anker": "**`PRIJZEN.md` is de commerciële architectuur** — de ladder (gratis, RTG Pass 65"
+  },
+  {
+   "nr": 40,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "2c41e7e1c3a659c1",
+   "anker": "**`CONTROLPLANE.md` is het Economic Control Plane** — de laag die vóór iedere ec"
+  },
+  {
+   "nr": 41,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "9b66613a9a71799a",
+   "anker": "De drie die je het snelst nodig hebt: een bevoegdheid is **geen ja of nee** maar"
+  },
+  {
+   "nr": 42,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "c167b2a8c34bd82a",
+   "anker": "`scripts/capabilityroepers.js` is de meting die dit document eerlijk houdt — hij"
+  },
+  {
+   "nr": 43,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "e448d524e11bff8c",
+   "anker": "**`HORECA.md` is het diepte-document van de horecakant** — RTG Service Choreogra"
+  },
+  {
+   "nr": 44,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "63aee1c5311e2c91",
+   "anker": "**`CONCIERGE.md` is de lus rond een wens** -- gast, case-eigenaar, collega-conci"
+  },
+  {
+   "nr": 45,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "b36970b974614111",
+   "anker": "**`BESTUUR.md` is het besturingsvlak** — de achterkant van RTG niet als backoffi"
+  },
+  {
+   "nr": 46,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "8cf76990493ee0a3",
+   "anker": "**`APPSTORE.md` is het derdenkanaal** — hoe een app van BUITEN dit huis binnenko"
+  },
+  {
+   "nr": 47,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "acccd9ecbe93a948",
+   "anker": "**`COMMERCE.md` is de verkooplaag boven de domeinen** — hoe er één commerce-laag"
+  },
+  {
+   "nr": 48,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "3001e22b10411829",
+   "anker": "**`DEVELOPERCLOUD.md` is de richting boven de App Store** — RTG Developer Cloud:"
+  },
+  {
+   "nr": 49,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "c2c8fd939aec1ef7",
+   "anker": "**`CREATE.md` is de laag bóven de Developer Cloud** — RTG Create: niet één soort"
+  },
+  {
+   "nr": 50,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "8ce60a440d76c165",
+   "anker": "**`OS.md` is de laag ónder de Developer Cloud** — RTG Universal OS: niet \"RTG he"
+  },
+  {
+   "nr": 51,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "6189b94459d4773e",
+   "anker": "Die hernoeming legde meteen bloot waarom hij nodig was: `PLATFORM.md` noemde `ro"
+  },
+  {
+   "nr": 52,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "f257e59f5d7feca7",
+   "anker": "**`MAGNAATLAB.md` is Magnaat als testhal** — de rol bovenop het spel dat `GAMEHA"
+  },
+  {
+   "nr": 53,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "f01507496300dbde",
+   "anker": "**Punt 22 is ook gemeten** (par. 4.6): kunnen twee plekken die elk niets fout do"
+  },
+  {
+   "nr": 54,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "43be1ac6752005fb",
+   "anker": "**`BEWIJSMACHINE.md` is de lat boven de testhal** — niet of Magnaat kan bewijzen"
+  },
+  {
+   "nr": 55,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "b5ce2173da3bb381",
+   "anker": "**`SERVICE.md` is de laag die de hulplijnen orkestreert** -- RTG Service: niet e"
+  },
+  {
+   "nr": 56,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "4b730efdcd8849c3",
+   "anker": "**`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen tege"
+  },
+  {
+   "nr": 57,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "c7637aff8c05382b",
+   "anker": "**`MATERIAAL.md` is de materialenleer** — een luxemerk denkt niet in kleuren maa"
+  },
+  {
+   "nr": 58,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "0eb668f856f9c923",
+   "anker": "**`WERELD.md` beschrijft het beginscherm** — en de harde regel daar is: er is er"
+  },
+  {
+   "nr": 59,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "359b32df643a0773",
+   "anker": "**`WERELDEN.md` is de kaart** — vier werelden, een kern eronder, en de pas die e"
+  },
+  {
+   "nr": 60,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "710bd976436168f5",
+   "anker": "**Wat er precies in elke wereld hangt staat in `WERELDLIJST.md`** — 101 onderdel"
+  },
+  {
+   "nr": 61,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "0d47f368184cef0f",
+   "anker": "**De ladder van de drie passen staat daar ook**, en hij is na te rekenen met `np"
+  },
+  {
+   "nr": 62,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "d1e0f28479e8e774",
+   "anker": "**`ADAPTIEF.md` is de adaptieve interactielaag** — hoe dezelfde capability zich "
+  },
+  {
+   "nr": 63,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "4cbe2ddc7e20c991",
+   "anker": "**`GRAMMATICA.md` is de RTG Mobile Interaction Grammar** — de vaste manier waaro"
+  },
+  {
+   "nr": 64,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "4d88bcc80e8afa28",
+   "anker": "**`EDGE.md` is RTG Edge 3.0** -- één canonieke context-, trust- en actielaag voo"
+  },
+  {
+   "nr": 65,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "b84c9458dff5f581",
+   "anker": "**`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of"
+  },
+  {
+   "nr": 66,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "b85922af576ad7c8",
+   "anker": "**`ONDERHOUD.md` is de onderhoudslaag** — vier wachters voor de grond die zonder"
+  },
+  {
+   "nr": 67,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "f1519dce8e186be7",
+   "anker": "**`BETROUWBAARHEID.md` zegt wanneer een functie BESTAAT** -- en dat is iets ande"
+  },
+  {
+   "nr": 68,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "c43f3e2644e0790e",
+   "anker": "**`TIKKEN.md` zegt hoe diep het huis is** -- hoeveel tikken elke functie van het"
+  },
+  {
+   "nr": 69,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "45685c68d97ffcb4",
+   "anker": "**`TOEGANKELIJK.md` zegt wat een mens met een handicap hier wel en niet kan** — "
+  },
+  {
+   "nr": 70,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "cfc542610077f84d",
+   "anker": "**`FABRIC.md` is het richtingsdocument van de laag BOVEN PROOF** -- de AI Execut"
+  },
+  {
+   "nr": 71,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "62524e4c8e0c09bc",
+   "anker": "**`EXECUTIE.md` is de laag eronder** -- de RTG Execution Plane: niet \"we moeten "
+  },
+  {
+   "nr": 72,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "b08245ed66d1a9d9",
+   "anker": "**Dat mechanisme heeft een valkuil die het zelf een keer heeft opgeleverd**: een"
+  },
+  {
+   "nr": 73,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "0b85ae96ccc3600d",
+   "anker": "**De doodspoormeter** (`scripts/doodspoor.js`, `DOODSPOOR.json`) vraagt of een h"
+  },
+  {
+   "nr": 74,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "78f9835ac23b6091",
+   "anker": "**De TWEEDE keten staat, en die is er om een andere vraag te beantwoorden** (`sc"
+  },
+  {
+   "nr": 75,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "d35f48517f7d507e",
+   "anker": "**Die bevinding werd een besluit en is uitgevoerd: er waren TWEE RITWERELDEN.** "
+  },
+  {
+   "nr": 76,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "481d2607fb414ad0",
+   "anker": "**Het besluit van de eigenaar hief die blokkade op: de VERVOERDER kiest zelf** w"
+  },
+  {
+   "nr": 77,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "47f09a722cdd5a9c",
+   "anker": "**DE DERDE KETEN IS DE TOELATING** (`scripts/toelatingsproef.js`, `npm run toela"
+  },
+  {
+   "nr": 78,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "e722f937da8dad8b",
+   "anker": "**En wat de ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`, `KETENV"
+  },
+  {
+   "nr": 79,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "2c4789f37365a32e",
+   "anker": "En de vijfde keten legde een etiketteringsfout bloot die er al stond: \"alleen ta"
+  },
+  {
+   "nr": 80,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "c7dc088c8794ad47",
+   "anker": "**De vierde keten leverde een REGEL en een METER op** (`MAATSTAF.md` par. 7f, `D"
+  },
+  {
+   "nr": 81,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "a7c0ee6c217ce6b2",
+   "anker": "**En daarboven staat de AANVOER** (`MAATSTAF.md` par. 7g, `server/kern/knelpunt/"
+  },
+  {
+   "nr": 82,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "a4acff35e8316e83",
+   "anker": "**De TWEEDE bron is de eigenlijke proef** (`MAATSTAF.md` par. 7h, `kern/knelpunt"
+  },
+  {
+   "nr": 83,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "6f5ef95fff50a9d2",
+   "anker": "**EN DE EIGENAAR HEEFT STAP 5 GENOMEN** (13 september 2026, `MAATSTAF.md` par. 7"
+  },
+  {
+   "nr": 84,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "0e009f94ca52879b",
+   "anker": "**`INTELLIGENTIE.md` is de laag BOVEN het stuur** -- de RTG Intelligence Layer, "
+  },
+  {
+   "nr": 85,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "6932b12eb2968cbc",
+   "anker": "**`AUTONOMIE.md` is de RTG Autonomy Kernel** -- de organisatorische intelligenti"
+  },
+  {
+   "nr": 86,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "b3dc853a446d11ca",
+   "anker": "**`CODE.md` is de laag waarin RTG naar zijn EIGEN software kijkt** -- de Code In"
+  },
+  {
+   "nr": 87,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "f0ad4636c158b6ce",
+   "anker": "**`TOESTEL.md` is AI op het toestel van het lid** -- rekenen in de browser (WebG"
+  },
+  {
+   "nr": 88,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "36e357556ad53cb4",
+   "anker": "**`MACHINE.md` is de laag die de motoren aan elkaar riemt** -- RTG Execution Phy"
+  },
+  {
+   "nr": 89,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "1b302727e8bd54ec",
+   "anker": "**`LAT.md` is de technische lat** — regels die allemaal uit een fout komen die h"
+  },
+  {
+   "nr": 90,
+   "bestemming": "DOCUMENTENKAART.md",
+   "hash": "7f00105f5c7f47ef",
+   "anker": "**`BEWIJSLUS.md` is het besluit om GEEN laag boven de bewijsmachine te bouwen** "
+  },
+  {
+   "nr": 91,
+   "bestemming": "AGENTS.md",
+   "hash": "4de1afcc02bc9cf8",
+   "anker": "## Structuur en starten (kort)"
+  },
+  {
+   "nr": 92,
+   "bestemming": "AGENTS.md",
+   "hash": "5b9493d723f6da13",
+   "anker": "- `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 22"
+  },
+  {
+   "nr": 93,
+   "bestemming": "AGENTS.md",
+   "hash": "daebd494127aefa5",
+   "anker": "## Geschiedenis"
+  },
+  {
+   "nr": 94,
+   "bestemming": "AGENTS.md",
+   "hash": "f5e25cf6e16d8e20",
+   "anker": "De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/c"
+  },
+  {
+   "nr": 95,
+   "bestemming": "AGENTS.md",
+   "hash": "05e9d0b650fc76f2",
+   "anker": "## Merkregels — ALTIJD toepassen"
+  },
+  {
+   "nr": 96,
+   "bestemming": "AGENTS.md",
+   "hash": "3e4e5e42b97c6593",
+   "anker": "### Kleuren (exact uit het logo, nooit wijzigen zonder expliciete opdracht) ```c"
+  },
+  {
+   "nr": 97,
+   "bestemming": "AGENTS.md",
+   "hash": "d7f8c8f62b10433e",
+   "anker": "**Regel: bordeaux is een accent, nooit een tekstkleur op zwarte achtergrond** (t"
+  },
+  {
+   "nr": 98,
+   "bestemming": "AGENTS.md",
+   "hash": "92bcbb181abbd4a1",
+   "anker": "### Typografie - **Bodoni Moda** voor koppen/display - **Inter** voor functionel"
+  },
+  {
+   "nr": 99,
+   "bestemming": "AGENTS.md",
+   "hash": "cd5e09e3b0553228",
+   "anker": "### Design-principes 1. **Premium, ook aan de onderkant.** RTG Pass is de instap"
+  },
+  {
+   "nr": 100,
+   "bestemming": "AGENTS.md",
+   "hash": "e1c566e6c424ba84",
+   "anker": "### Tone of voice — verschilt per pass, bewust zo - **RTG Pass**: \"old money\" — "
+  },
+  {
+   "nr": 101,
+   "bestemming": "AGENTS.md",
+   "hash": "8081c1981da12355",
+   "anker": "### Toegangs- en AI-regels (gelden ook voor system prompts) - **RTG Pass**: voor"
+  },
+  {
+   "nr": 102,
+   "bestemming": "AGENTS.md",
+   "hash": "76d00a133d74b62a",
+   "anker": "## Wat NIET te doen"
+  },
+  {
+   "nr": 103,
+   "bestemming": "AGENTS.md",
+   "hash": "e412bd71ee4cedeb",
+   "anker": "- **Geen TWEEDE marketingsite ernaast bouwen.** Er is er één, en het is `index.h"
+  },
+  {
+   "nr": 104,
+   "bestemming": "AGENTS.md",
+   "hash": "2c00285c71426bfb",
+   "anker": "## Workflow-voorkeur"
+  },
+  {
+   "nr": 105,
+   "bestemming": "AGENTS.md",
+   "hash": "1ad1d94cd44074bc",
+   "anker": "Bij twijfel over een designkeuze: klein en omkeerbaar voorstellen, niet meteen h"
+  },
+  {
+   "nr": 106,
+   "bestemming": "AGENTS.md",
+   "hash": "5ff92af3fcd0ea5f",
+   "anker": "**Vragen stellen doe je met meerkeuze.** Moet je iets weten, stel dan geen open "
+  }
+ ]
+}

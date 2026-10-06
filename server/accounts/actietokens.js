@@ -14,9 +14,11 @@
    maar EEN opvatting bestaat van wat een token is en wanneer het is ingetrokken.
 
    EN ELK ACTIETOKEN VERVALT BIJ DE SESSIEGRENS, net als een sessie (RTG-V1 N12,
-   besluit van de eigenaar). Een wachtwoordwijziging, een herstel of "alle
-   sessies sluiten" zet `sessies_vanaf`, en dat betekent: wat ik eerder uitgaf,
-   telt niet meer. De herkeuring liet zien wat er gebeurde zolang dit niet gold:
+   besluit van de eigenaar). Wie `sessies_vanaf` zet, en waarom, staat in
+   ./sessiegrens.js; bij een wachtwoordwijziging en een herstel betekent het:
+   wat ik eerder uitgaf, telt niet meer. ("Sluit alle andere sessies" zet de
+   grens niet en raakt een actietoken dus ook niet.) De herkeuring liet zien
+   wat er gebeurde zolang dit niet gold:
    een inlog2- of tech2-bewijs van VOOR een wachtwoordwijziging gaf erna, met een
    geldige code of herstelcode, gewoon een werkend token. Wie het oude wachtwoord
    kende, kwam dus binnen op een bewijs dat hij vlak voor de wijziging had
@@ -29,12 +31,12 @@
      mailwissel         wie zijn wachtwoord wijzigt OMDAT er iemand meekeek,
                         wil niet dat diens openstaande adreswissel nog doorgaat;
      verify-email       de minst gevaarlijke, en toch mee: de link bevestigt
-                        een adres namens het account, en "wat ik eerder uitgaf,
-                        telt niet meer" kent geen uitzondering per doel. Een
-                        nieuwe link vraagt het lid zelf aan (/api/auth/resend).
+                        een adres namens het account, en de grens kent geen
+                        uitzondering per doel. Een nieuwe link vraagt het lid
+                        zelf aan (/api/auth/resend).
 
    De vergelijking zelf staat in ./sessiegrens.js, dezelfde als voor een
-   sessietoken: er is maar EEN opvatting van de grens. */
+   sessietoken: een opvatting van de grens voor sessie- en actietokens. */
 'use strict';
 const crypto = require('crypto');
 const kluis = require('./kluis');

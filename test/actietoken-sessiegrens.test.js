@@ -48,10 +48,12 @@ const DOELEN = { 'inlog2': 5 * 60 * 1000, 'tech2': 5 * 60 * 1000, 'sso-overdrach
   'mailwissel': 24 * 3600 * 1000, 'verify-email': 3 * 86400000 };
 const even = () => new Promise(r => setTimeout(r, 5)); // de grens ligt dan zeker NA de uitgifte
 
-/* Drie wegen die de grens zetten, en alle drie horen hetzelfde te doen. */
+/* Drie functies die de grens zetten, en alle drie horen hetzelfde te doen.
+   zetSessiegrens is de weg van het eigenaarsherstel en van pas naar gast; de
+   knop "sluit alle andere sessies" van het lid zet de grens NIET (deel C). */
 const ZETTERS = {
   wachtwoord: (u) => accounts.setPassword(u.id, 'nieuwGeheim' + u.id),
-  'alle-sessies': (u) => accounts.zetSessiegrens(u.id),
+  zetSessiegrens: (u) => accounts.zetSessiegrens(u.id),
   herstel: (u) => accounts.consumeReset(accounts.createReset(u.id), 'hersteld' + u.id)
 };
 
@@ -141,6 +143,19 @@ test('A. een uitgiftemoment dat geen getal is, telt als moment 0 en niet als "ge
   assert.equal(accounts.verifyActionToken(raar, 'verify-email'), null);
 });
 
+test('A. voorGrens zonder account zegt "niet voor de grens" en gooit niet', () => {
+  /* Beide aanroepers (verifyToken, verifyActionToken) staan in een try/catch
+     die null geeft en geven bij een ontbrekend account toch al null terug, dus
+     daar maakt de afvanging in gedrag niets uit (daarom overleefde de mutant die
+     hem weghaalde). Hij hoort bij de helper zelf: of het account bestaat, beslist
+     de aanroeper, en een aanroeper zonder vangnet kreeg anders een TypeError
+     waar een antwoord hoort. */
+  const { voorGrens } = require('../server/accounts/sessiegrens');
+  assert.equal(voorGrens(null, Date.now()), false);
+  assert.equal(voorGrens(undefined, undefined), false);
+  assert.equal(voorGrens({ sessies_vanaf: 10 }, 5), true, 'tegenproef: met account werkt de grens');
+});
+
 /* ---------------------------------------------------------------------------
    DEEL B -- het scenario uit de herkeuring, tegen een echte server.
 
@@ -207,4 +222,45 @@ test('B. e2e: inlog2- en tech2-bewijs van voor een wachtwoordwijziging geven 401
     stop(srv);
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
   }
+});
+
+/* ---------------------------------------------------------------------------
+   DEEL C -- de lijst zetters in de kop van server/accounts/sessiegrens.js,
+   tegen de bron gehouden.
+
+   De herkeuring vond dat die kop te veel beweerde: hij noemde "alle sessies
+   sluiten" als zetter, terwijl die knop van het lid per sessie-id intrekt en de
+   grens laat staan, en hij liet pas naar gast weg. Een lijst die niemand naast
+   de code legt, loopt er weer van weg. Daarom wordt de lijst hier AFGELEID: wie
+   `sessies_vanaf` in SQL op een waarde zet, en wie accounts.zetSessiegrens
+   aanroept, gelezen ZONDER commentaar (anders telt een uitleg als aanroep). Het
+   blok "WIE DE GRENS ZET" moet precies die bestanden noemen, niet meer en niet
+   minder: een nieuwe zetter zonder regel zakt, een regel zonder zetter ook.
+   ------------------------------------------------------------------------- */
+test('C. de kop van sessiegrens.js noemt precies de bestanden die de grens zetten', () => {
+  const { zonderCommentaar } = require('../scripts/lib/bron');
+  const SERVER = path.join(__dirname, '..', 'server');
+  const zetters = new Set();
+  (function loop(map) {
+    for (const d of fs.readdirSync(map, { withFileTypes: true })) {
+      const p = path.join(map, d.name);
+      if (d.isDirectory()) { if (d.name !== 'data' && d.name !== 'node_modules') loop(p); continue; }
+      if (!d.name.endsWith('.js')) continue;
+      const ruw = fs.readFileSync(p, 'utf8');
+      if (!ruw.includes('sessies_vanaf') && !ruw.includes('zetSessiegrens')) continue;
+      const code = zonderCommentaar(ruw);
+      if (/sessies_vanaf\s*=\s*[?$]/.test(code) || /\.sessies_vanaf\s*=(?!=)/.test(code) ||
+          /\.zetSessiegrens\s*\(/.test(code)) {
+        zetters.add(path.relative(SERVER, p).split(path.sep).join('/'));
+      }
+    }
+  })(SERVER);
+  assert.ok(zetters.size >= 2, 'de afleiding vindt de zetters (anders bewijst gelijkheid niets): ' + [...zetters]);
+
+  const kop = fs.readFileSync(path.join(SERVER, 'accounts', 'sessiegrens.js'), 'utf8');
+  const blok = (kop.match(/WIE DE GRENS ZET\b([\s\S]*?)\n[ \t]*\n/) || [])[1];
+  assert.ok(blok, 'de kop van sessiegrens.js heeft een blok "WIE DE GRENS ZET"');
+  const genoemd = new Set(blok.match(/[a-z][\w-]*(?:\/[\w-]+)*\/[\w-]+\.js/g) || []);
+  assert.deepEqual([...genoemd].sort(), [...zetters].sort(),
+    'het blok WIE DE GRENS ZET noemt andere bestanden dan de bron: pas de kop aan, niet de toets');
 });

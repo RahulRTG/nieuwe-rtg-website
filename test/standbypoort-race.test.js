@@ -151,3 +151,31 @@ test('de herhaling waar de 503 om vraagt, doet het werk opnieuw en krijgt geen b
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+test('een gezonde leider: een POST met Idempotency-Key geeft geen MaxListenersExceededWarning', async () => {
+  /* De herstelronde van N11 hing een extra 'finish'-luisteraar aan elk antwoord.
+     Met een Idempotency-Key staan idem-poort en dubbeltik er allebei, en dan was
+     dat de elfde: een waarschuwing per verzoek op stderr, ook zonder afzetting.
+     Dat lijkt op een lek-melding en zou in productie elke regel bevuilen. */
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-standby-luister-'));
+  const srv = await startServer({ env: { RTG_DATA_DIR: dir } });
+  let stderr = '';
+  srv.child.stderr.on('data', (b) => { stderr += b.toString(); });
+  try {
+    const reg = await (await fetch(srv.base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Luister Proef', email: 'luister@voorbeeld.test', password: 'geheim12', geboortedatum: '1990-01-01' }) })).json();
+    assert.ok(reg.token, 'registratie');
+    /* Een muterende route achter idem-poort EN dubbeltik, met de kop. */
+    for (let i = 1; i <= 3; i++) {
+      const r = await fetch(srv.base + '/api/sleutelwoorden/zet', { method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token, 'Idempotency-Key': 'luister-sleutel-' + i },
+        body: JSON.stringify({ woorden: ['egel', 'fazant', 'gerbil', 'hamster'] }) });
+      assert.equal(r.status, 200, 'zet ' + i);
+    }
+    await wacht(200);
+    assert.doesNotMatch(stderr, /MaxListenersExceededWarning/, 'geen waarschuwing over te veel luisteraars');
+  } finally {
+    await stop(srv);
+    try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
+  }
+});

@@ -55,6 +55,15 @@ function naEindstatus(res, fn) {
   if (typeof vorige === 'function') {
     res.end = function (...a) { const uit = vorige.apply(this, a); beslis(); return uit; };
   }
+  /* EEN BEKENDE LUISTERAAR EXTRA, EN DE GRENS GAAT EVEN MEE OMHOOG. Met een
+     Idempotency-Key staan idem-poort en dubbeltik allebei op res, en dan was dit
+     de elfde 'finish'-luisteraar: een MaxListenersExceededWarning per verzoek,
+     ook op een gezonde leider (herkeuring N11). Geen lek, want het is er precies
+     een per res (WACHT). Een grens van 0 is onbegrensd en blijft dat. */
+  if (typeof res.getMaxListeners === 'function' && typeof res.setMaxListeners === 'function') {
+    const max = res.getMaxListeners();
+    if (max > 0 && Number.isFinite(max)) res.setMaxListeners(max + 1);
+  }
   if (typeof res.prependListener === 'function') res.prependListener('finish', beslis);
   else if (typeof res.on === 'function') res.on('finish', beslis);
 }

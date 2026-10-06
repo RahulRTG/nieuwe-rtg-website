@@ -53,7 +53,9 @@ const { voorGrens } = require('./sessiegrens');
      DICHT voor de inlogbewijzen (inlog2, tech2, sso-overdracht). Ze leven vijf
      minuten of een minuut en zitten in een open tabblad. Weigeren kost op zijn
      hoogst een nieuwe inlog, en een bewijs van een tweede stap waarvan niet
-     vast te stellen is of het van voor of na de grens is, bewijst niets.
+     vast te stellen is of het van voor of na de grens is, bewijst niets. Draaien
+     oude en nieuwe knopen tijdens een uitrol naast elkaar (het trio), dan kan
+     dat in dat venster meer dan een inlog kosten: rol niet gemengd uit.
 
      ALS MOMENT 0 voor de mailboxlinks (verify-email drie dagen, mailwissel een
      etmaal), precies zoals ./tokens.js een sessietoken zonder uitgiftemoment

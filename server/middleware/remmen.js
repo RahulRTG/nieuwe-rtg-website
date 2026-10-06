@@ -98,7 +98,11 @@ function hoofdzekering({ db, accounts, eigenaar }) {
    DEZE LIJST IS NIET ELKE DEUR NAAR EEN SESSIE. Het kantoorgesprek
    (/api/kantoor/gesprek/zeg), de techniekinlog, de passkey-inlog en de
    SSO-wissel staan er niet op, en de vergelijking is letterlijk op req.path.
-   Een deur toevoegen zegt dus niets over of de rest dicht is. */
+   Een deur toevoegen zegt dus niets over of de rest dicht is. En LETTERLIJK
+   betekent ook: de router laat een pad met een slash erachter
+   (/api/auth/login/) bij dezelfde handler komen, en die vergelijkt hier niet
+   gelijk. Dat gold al voor alle paden op deze lijst en staat als eigen
+   bevinding in het auditdocument (herkeuring N3). */
 const INLOG_PADEN = ['/api/login', '/api/auth/login', '/api/auth/register', '/api/auth/forgot',
   '/api/auth/reset', '/api/office/login', '/api/supplier/login', '/api/staff/login', '/api/aanmeld/zeg'];
 function inlogpauzePoort({ db }) {

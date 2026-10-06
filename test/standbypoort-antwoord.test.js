@@ -570,3 +570,52 @@ test('op de eigen HTTP-motor: dezelfde uitkomst, en de dubbeltik blijft daarna b
     await naDe503(app, '/api/proef/herhaal', { kop: { 'Idempotency-Key': 'n11-eigen-kop' } }, 'eigen motor, kop');
   } finally { await app.sluit(); }
 });
+
+/* ----------------------------------------------------------------------------
+   DE EINDSTATUS ZELF (herkeuring N11, ronde twee). De ketentoetsen hierboven
+   zien niet of ELKE laag onthoudt: welke laag ook herhaald:true geeft, de
+   herhaling klopt. Daardoor overleefde een mutant die alleen de eerste aanroeper
+   van naEindstatus bediende (E08). En een extra 'finish'-luisteraar gaf met een
+   Idempotency-Key een MaxListenersExceededWarning per verzoek.
+   -------------------------------------------------------------------------- */
+const { naEindstatus } = require('../server/lib/eindstatus');
+const { EventEmitter } = require('events');
+
+function luisterRes() {
+  const res = new EventEmitter();
+  res.statusCode = 200;
+  res.end = function () { this.emit('finish'); return this; };
+  return res;
+}
+
+test('eindstatus: elke aanroeper krijgt de status die vertrok, ook de tweede en een te late', () => {
+  const res = luisterRes();
+  const gekregen = [];
+  naEindstatus(res, (s) => gekregen.push(['eerste', s]));
+  naEindstatus(res, (s) => gekregen.push(['tweede', s]));
+  naEindstatus(res, (s) => gekregen.push(['derde', s]));
+  res.statusCode = 503;
+  res.end();
+  naEindstatus(res, (s) => gekregen.push(['te laat', s]));
+  assert.deepEqual(gekregen, [['eerste', 503], ['tweede', 503], ['derde', 503], ['te laat', 503]],
+    'elke laag hoort een keer te horen wat er vertrok, niet alleen de eerste');
+});
+
+test('eindstatus: de eigen finish-luisteraar laat de grens van tien niet waarschuwen', async () => {
+  const res = luisterRes();
+  for (let i = 0; i < 10; i++) res.on('finish', () => {});
+  const waarschuwingen = [];
+  const luister = (w) => { if (w && w.name === 'MaxListenersExceededWarning') waarschuwingen.push(w); };
+  process.on('warning', luister);
+  try {
+    naEindstatus(res, () => {});
+    await new Promise(r => setImmediate(r));
+  } finally { process.off('warning', luister); }
+  assert.equal(waarschuwingen.length, 0, 'een bekende luisteraar extra is geen lek en hoort geen waarschuwing te geven');
+  assert.equal(res.listenerCount('finish'), 11);
+
+  const onbegrensd = luisterRes();
+  onbegrensd.setMaxListeners(0);
+  naEindstatus(onbegrensd, () => {});
+  assert.equal(onbegrensd.getMaxListeners(), 0, 'een onbegrensde res blijft onbegrensd');
+});

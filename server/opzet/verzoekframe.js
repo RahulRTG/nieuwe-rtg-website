@@ -13,6 +13,12 @@
    kern/dienstidentiteit.js) en de montage; test/verzoekframe.test.js zakt
    zodra er een lezer bij komt voordat dat een besluit IS.
 
+   EN HET FRAME IS DE ENIGE BRON VAN DE KETEN (besluit van 6 oktober 2026). De
+   Trust & Evidence-wortel (kern/bewijsvlak/context.js) maakte eerst een eigen
+   chain-id naast deze correlatie; nu opent de middleware hieronder hem zelf,
+   met als keten de correlatie van dit frame. Het frame leest daar niets van
+   terug -- de afhankelijkheid loopt een kant op.
+
    DE VAKKEN
      correlatie    van de server (lib/correlatie.js), nooit een kop
      extern        de X-Request-Id van de client, begrensd; alleen voor logs
@@ -34,6 +40,7 @@
 const { AsyncLocalStorage } = require('async_hooks');
 const correlatie = require('../lib/correlatie');
 const envelop = require('../kern/envelop');
+const trust = require('../kern/bewijsvlak/context');
 const haak = require('../kern/kosten/haak');
 const { oorzaakVan } = require('../kern/agentteken');
 const { losVanVerzoek } = require('../lib/losvanverzoek');
@@ -65,19 +72,27 @@ function middleware() {
        intern aanroept), en dan zegt het antwoord hem terug aan die aanroeper. */
     const f = nieuw({ soort: 'verzoek', correlatie: req.id, extern: req.externeId, oorzaak: oorzaakVan(req) });
     if (f.oorzaak && typeof res.setHeader === 'function') res.setHeader('X-RTG-Oorzaak', f.oorzaak);
-    vanReq.set(req, f);
+    /* De Trust & Evidence-wortel is een LEZER van dit frame en geen tweede bron:
+       zijn keten is de correlatie van het frame (kern/bewijsvlak/context.js
+       ketenVan), dus de wortel en elke gebeurtenis erin dragen dezelfde naam. */
+    const tc = trust.maak({ chainId: trust.ketenVan(f.correlatie), requestId: req.id || null, phase: 'request' });
+    req.trustContext = tc;
+    if (typeof res.setHeader === 'function') res.setHeader('X-RTG-Correlation', tc.chainId);
+    vanReq.set(req, { f, tc });
     const dicht = () => sluit(f);
     naAntwoord(res, dicht); res.on('close', dicht);
-    return winkel.run(f, next);
+    return winkel.run(f, () => trust.inContext(tc, next));
   };
 }
 
 /* De body-lezer kan de keten breken; zelfde vorm als handeling.hervat(). */
 function hervat() {
   return function verzoekframeHervat(req, res, next) {
-    const f = vanReq.get(req);
-    if (!f || winkel.getStore() === f) return next();
-    return winkel.run(f, next);
+    /* Allebei terug, anders loopt de rest van het verzoek zonder trust-keten en
+       maakt de bewijslaag er buiten het frame om een losse nieuwe. */
+    const h = vanReq.get(req);
+    if (!h || (winkel.getStore() === h.f && trust.huidige() === h.tc)) return next();
+    return winkel.run(h.f, () => trust.inContext(h.tc, next));
   };
 }
 
@@ -162,9 +177,15 @@ function overdraag(fn, opties) { tellers.overgedragen++; return achtergrond('ove
 /* Wat de bus-envelop uit het frame leest -- en niets meer. Een gesloten frame
    levert niets: werk na afloop erft geen verzoekidentiteit (I4). De oorzaak is
    het werk dat dit frame veroorzaakte, en anders het verzoek zelf. */
+/* Een gesloten frame levert GEEN null maar een leeg frame: null betekent "hier
+   is geen frame", en dan valt de envelop terug op een expliciet geopende trust-
+   keten. Die keten is binnen een verzoek een kind van dit frame, dus werk na
+   afloop zou via die omweg de keten van het verzoek alsnog erven. */
+const GESLOTEN = Object.freeze({ correlatie: null, oorzaak: null, actor: null, hoedanigheid: null });
 function voorBus() {
   const f = winkel.getStore();
-  if (!f || f.stand === 'gesloten') return null;
+  if (!f) return null;
+  if (f.stand === 'gesloten') return GESLOTEN;
   const h = f.hoedanigheid;
   return { correlatie: f.correlatie, oorzaak: f.oorzaak || f.correlatie, actor: f.actor ? f.actor.codenaam : null,
     hoedanigheid: h && h.naam ? { naam: h.naam, grond: h.grond || null } : null };

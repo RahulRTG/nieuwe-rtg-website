@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**61 bundels, 487 delen, 2 zonder onderwerp.**
+**61 bundels, 487 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -335,12 +335,12 @@ omlaag.
 
 ## `apps/library/app.js`
 
-`public/apps/library/app/` -- 2 delen, 29 regels in de delen, waarvan 2 zonder onderwerp
+`public/apps/library/app/` -- 2 delen, 31 regels in de delen
 
 | deel | onderwerp |
 |---|---|
-| `app-01.js` | -- |
-| `app-02.js` | -- |
+| `app-01.js` | LibraryOS, het scherm: Studio (werken, knooppunten, publiceren, vrijgeven en feedback) |
+| `app-02.js` | LibraryOS, de private Reader: een editie openen en lezen, feedback sturen, en de mobiele weergave |
 
 ## `apps/meldkamer.js`
 

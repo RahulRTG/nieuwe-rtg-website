@@ -2,7 +2,7 @@
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
     "op": "2026-10-06",
-    "commit": "2601aa0b9"
+    "commit": "9d3b8c58a"
   },
   "registers": {
     "geteld": 206,
@@ -33,7 +33,7 @@
         "gefaald": 0,
         "gefaaldLijst": [],
         "symbolen": 18725,
-        "seconden": 4.8
+        "seconden": 5
       }
     }
   },
@@ -120,19 +120,19 @@
       },
       {
         "registers": 18,
-        "paden": 171
+        "paden": 172
       },
       {
         "registers": 17,
-        "paden": 258
+        "paden": 257
       },
       {
         "registers": 16,
-        "paden": 279
+        "paden": 281
       },
       {
         "registers": 15,
-        "paden": 116
+        "paden": 114
       },
       {
         "registers": 14,
@@ -851,7 +851,7 @@
       },
       {
         "register": "MUTATIECONTRACT-AFGELEID.json",
-        "paden": 3112
+        "paden": 3115
       },
       {
         "register": "IDOR.json",
@@ -1076,7 +1076,7 @@
       "register": "LOOP-FABRIC-COVERAGE.json",
       "as": "bestand",
       "paden": 434,
-      "bestanden": 3800,
+      "bestanden": 3804,
       "symbolen": 0,
       "paren": 0
     },
@@ -1123,7 +1123,7 @@
     {
       "register": "MUTATIECONTRACT-AFGELEID.json",
       "as": "route",
-      "paden": 3112,
+      "paden": 3115,
       "bestanden": 1,
       "symbolen": 0,
       "paren": 0

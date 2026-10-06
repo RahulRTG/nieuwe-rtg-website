@@ -335,7 +335,7 @@ omlaag.
 
 ## `apps/library/app.js`
 
-`public/apps/library/app/` -- 2 delen, 31 regels in de delen
+`public/apps/library/app/` -- 2 delen, 34 regels in de delen
 
 | deel | onderwerp |
 |---|---|

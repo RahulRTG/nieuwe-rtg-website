@@ -76,18 +76,23 @@ tegengehouden. Ze wordt ook nooit stil opgenomen. Ze krijgt een notitie die
 zegt wat de meter beter maakte en hoe de nieuw zichtbare schuld wordt
 afgebouwd.
 
-**Stand vandaag.** `scripts/normverval.js` kent twee soorten notities:
-`schuld` (met een vervaldatum) en `structureel` (de vorm veranderde, met
-`waarheen`). Een betere meter wordt nu als `structureel` geboekt, zoals bij
-`activeringOndergrens` op 6 oktober ("een beperking van de meter"). Dan is er
-geen afbouwplan verplicht. Er komt een derde soort, `ontdekt`, met drie
-verplichte velden:
+**Stand vandaag (golf A).** `scripts/normverval.js` kent nu drie soorten
+notities: `schuld` (met een vervaldatum), `structureel` (de vorm veranderde, met
+`waarheen`) en `ontdekt`. Tot golf A werd een betere meter als `structureel`
+geboekt, zoals bij `activeringOndergrens` op 6 oktober ("een beperking van de
+meter"), en dan was er geen afbouwplan verplicht. `ontdekt` vraagt:
 
-- `meterwijziging`: wat de meter beter maakte;
-- `afbouw`: het plan om de nieuw zichtbare schuld weg te werken;
-- `vervalt`: de datum waarop het plan moet zijn uitgevoerd.
+- `meterwijziging`: wat de meter beter maakte, met een meetscript dat moet
+  bestaan, zodat de bewering naar een instrument wijst en niet naar een gevoel;
+- `van`, `naar` en `doel`: de blinde stand, wat de meter nu ziet, en waar de
+  afbouw eindigt;
+- `afbouw`: het plan;
+- `vervalt`: de datum. Daarna zakt de poort zolang de meter het doel niet haalt.
 
-Handhaver: nog niemand. Dit is golf A.
+Handhaver: `scripts/normverval.js`, geijkt in `test/normverval.test.js` (drie
+mutaties, alle drie raak). Wat hij niet kan zien: of de stijging echt uit de
+meter komt en niet uit nieuwe code. Dat oordeel blijft bij een mens; de vorm
+dwingt alleen af dat het is opgeschreven, met een instrument en een einde.
 
 **Het eerste voorbeeld staat al in het register (par. 6).** Bij het wegwerken
 van inline stijlen bleek dat een eerdere ronde 188 keer een tweede

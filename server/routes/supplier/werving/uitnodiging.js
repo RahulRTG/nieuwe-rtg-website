@@ -121,7 +121,18 @@ module.exports = ({ kern }) => {
      ja of nee, en er wordt niets geclaimd (N29). Zonder `lid` telt ook een code
      die al geclaimd is: zo kan de aanmeldroute de code toetsen VOORDAT zij het
      account bekijkt. Met `lid` alleen als die claim van dat lid is, precies
-     zoals verbindCode hem hervat (./uitnodiging-claim.js). */
+     zoals verbindCode hem hervat (./uitnodiging-claim.js).
+
+     NIET ALLEEN LEZEN, ook al claimt hij niets. Hij loopt, net als elke andere
+     opzoeking op deze collectie, door transactie() en dus door
+     bewerkCollectie('staffInvites'), zoals ../../../kern/bearercode.js
+     voorschrijft. In PostgreSQL neemt dat het advisory-slot en de rij met FOR
+     UPDATE, in SQLite een schrijfslot (BEGIN IMMEDIATE), voor de duur van de
+     opzoeking; en migreerLegacy kan een oude rij herschrijven. De aanmelding
+     roept hem aan met alleen een bedrijfsnaam, dus ook een anonieme aanroeper
+     neemt dat slot even (R5, gemeld). Een opzoeking buiten de transactie om
+     zou een tweede, minder strikt leespad op deze collectie zijn; dat is een
+     besluit en niet hier genomen. De rem per adres ('join:') begrenst het. */
   const kassacodeHoortBij = (kassacode, supplierCode, lid) => transactie(bron => {
     const inv = vindIn(bron, kassacode);
     if (!inv || inv.supplierCode !== supplierCode) return false;

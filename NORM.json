@@ -165,6 +165,16 @@
   },
   "notities": [
     {
+      "datum": "2026-10-06",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 129,
+      "vervalt": "2027-01-04",
+      "meter": "toetsenNietGemeten 129 -> 130",
+      "reden": "test/releaseketenwacht.test.js (A-P0-01) is met de hand nagetrokken: elke schakel uit het workflow halen en een :latest- of uitrolstap toevoegen laat de wacht zakken (de toets bevat die mutaties zelf).",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
+    },
+    {
       "datum": "2026-09-28",
       "soort": "structureel",
       "sleutel": "kernBreedte",

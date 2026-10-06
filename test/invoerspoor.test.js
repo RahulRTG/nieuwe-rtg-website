@@ -44,6 +44,7 @@ function repo() {
     "const c = fs.existsSync('c.txt');",
     "const vlag = process.env.RTG_FIXTURE_VLAG || '';",
     "if (process.argv.includes('--git-log')) execSync('git log -1 --format=%H');",
+    "if (process.argv.includes('--kopie')) execSync('git log -1', { env: { ...process.env, X: '1' } });",
     "const commit = execSync('git rev-parse --short HEAD').toString().trim();",
     "fs.writeFileSync('uit.json', JSON.stringify({ stempel: { commit, invoer: blok(['uit.json']) }, a, lijst, c, vlag }));",
   ].join('\n'));
@@ -54,7 +55,7 @@ function repo() {
     const env = Object.assign({}, process.env, { RTG_INVOER_WORTEL: d });
     delete env.RTG_FIXTURE_VLAG;
     if (o.vlag) env.RTG_FIXTURE_VLAG = '1';
-    const args = (o.zonderSpoor ? [] : ['-r', PRELOAD]).concat(['gen.js'], o.gitLog ? ['--git-log'] : []);
+    const args = (o.zonderSpoor ? [] : ['-r', PRELOAD]).concat(['gen.js'], o.gitLog ? ['--git-log'] : [], o.kopie ? ['--kopie'] : []);
     const r = spawnSync(process.execPath, args, { cwd: d, env, encoding: 'utf8' });
     assert.strictEqual(r.status, 0, r.stderr);
     return JSON.parse(fs.readFileSync(path.join(d, 'uit.json'), 'utf8')).stempel;
@@ -154,4 +155,14 @@ test('8. zelfijking: met een te smalle invoerlijst zegt de versheid ten onrechte
   smal.invoer.bestanden = smal.invoer.bestanden.filter((p) => p !== 'a.txt');
   assert.strictEqual(r.versheid(smal).stand, 'actueel',
     'de uitslag moet aan de gemeten lijst hangen; anders bewijst deze toets niets');
+});
+
+test('9. wie de hele omgeving kopieert, krijgt een feit in het stempel en geen lijst namen', () => {
+  const r = repo();
+  const s = r.draai({ kopie: true });
+  r.commit('meting');
+  assert.strictEqual(s.invoer.omgevingGekopieerd, true);
+  assert.ok(!s.invoer.omgeving.includes('PATH'), 'de namen van de machine horen niet in het stempel: ' + s.invoer.omgeving.slice(0, 5));
+  assert.match(r.versheid(s).reden, /subproces|buiten het spoor|kopieerde/);
+  assert.strictEqual(r.versheid(s).stand, 'onbekend');
 });

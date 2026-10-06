@@ -132,6 +132,19 @@ omhulSub('fork', (a) => ['node', [a[0]].concat(Array.isArray(a[1]) ? a[1] : [])]
 try {
   const echt = process.env;
   process.env = new Proxy(echt, {
+    /* Wie de omgeving OPSOMT (`{ ...process.env }`, Object.keys), kopieert hem
+       in zijn geheel -- meestal om hem aan een subproces mee te geven. Dat is
+       een feit, geen lijst namen: de namen van alle variabelen van een machine
+       horen niet in een register. De lezingen die er direct op volgen, horen
+       bij die kopie en worden niet los geteld. */
+    ownKeys(doel) {
+      if (!spoor.stil) {
+        spoor.omgevingGekopieerd = true;
+        spoor.stil = (spoor.stil || 0) + 1;
+        process.nextTick(() => { spoor.stil -= 1; });
+      }
+      return Reflect.ownKeys(doel);
+    },
     get(doel, sleutel) {
       if (typeof sleutel === 'string' && !spoor.stil) spoor.omgeving.set(sleutel, spoor.omgeving.get(sleutel) || (doel[sleutel] !== undefined && doel[sleutel] !== ''));
       return doel[sleutel];

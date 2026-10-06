@@ -79,6 +79,7 @@ function blok(uitvoer) {
     bestaat: sorteer(s.bestaat).filter((p) => !bekend.has(p)),
     mappen: Array.from(s.mappen.entries()).filter(([p]) => !uit.has(p)).sort((a, b) => (a[0] < b[0] ? -1 : 1))
       .map(([p, recursief]) => (recursief ? { pad: p, recursief: true } : { pad: p })),
+    omgevingGekopieerd: !!s.omgevingGekopieerd,
     omgeving: Array.from(s.omgeving.entries()).filter(([, gezet]) => gezet).map(([n]) => n).sort(),
     onwaarneembaar: Array.from(s.onwaarneembaar).sort(),
     nodeHoofdversie: Number(process.versions.node.split('.')[0]),
@@ -116,6 +117,7 @@ function invoerVersheid(stempel, opties) {
   if (inv.onwaarneembaar && inv.onwaarneembaar.length) {
     return onbekend('de meting las ook buiten het spoor om: ' + inv.onwaarneembaar.join(', '));
   }
+  if (inv.omgevingGekopieerd) return onbekend('de meting kopieerde de hele omgeving; welke variabelen daarin meetelden is niet na te lopen');
   if (inv.omgeving && inv.omgeving.length) {
     return onbekend('de meting las gezette omgevingsvariabelen (' + inv.omgeving.join(', ') + '); die zijn achteraf niet na te lopen');
   }

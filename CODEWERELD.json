@@ -2,7 +2,7 @@
   "uitleg": "Kan er een canonieke Codewereld bestaan? Gemeten over de registers in de wortel: op welke as staan ze, hoeveel sleutels delen ze, en spreken ze elkaar tegen. Deze meter voegt niets samen en kiest bij tegenspraak geen winnaar.",
   "stempel": {
     "op": "2026-10-06",
-    "commit": "4d1ba639"
+    "commit": "2601aa0b9"
   },
   "registers": {
     "geteld": 206,
@@ -13,15 +13,15 @@
   },
   "assen": {
     "route": {
-      "sleutels": 6793,
+      "sleutels": 6791,
       "registers": 85
     },
     "bestand": {
-      "sleutels": 6268,
+      "sleutels": 6266,
       "registers": 170
     },
     "symbool": {
-      "sleutels": 26358,
+      "sleutels": 26359,
       "registers": 1,
       "reden": null,
       "gereedschapAanwezig": true,
@@ -33,13 +33,13 @@
         "gefaald": 0,
         "gefaaldLijst": [],
         "symbolen": 18725,
-        "seconden": 5.8
+        "seconden": 4.8
       }
     }
   },
   "ruggengraat": {
-    "paden": 6793,
-    "inMeerDanEenRegister": 6382,
+    "paden": 6791,
+    "inMeerDanEenRegister": 6374,
     "pct": 93.9,
     "verdeling": [
       {
@@ -88,11 +88,11 @@
       },
       {
         "registers": 26,
-        "paden": 256
+        "paden": 257
       },
       {
         "registers": 25,
-        "paden": 360
+        "paden": 358
       },
       {
         "registers": 24,
@@ -100,11 +100,11 @@
       },
       {
         "registers": 23,
-        "paden": 1048
+        "paden": 1050
       },
       {
         "registers": 22,
-        "paden": 596
+        "paden": 594
       },
       {
         "registers": 21,
@@ -112,27 +112,27 @@
       },
       {
         "registers": 20,
-        "paden": 306
+        "paden": 310
       },
       {
         "registers": 19,
-        "paden": 226
+        "paden": 222
       },
       {
         "registers": 18,
-        "paden": 170
+        "paden": 171
       },
       {
         "registers": 17,
-        "paden": 257
+        "paden": 258
       },
       {
         "registers": 16,
-        "paden": 277
+        "paden": 279
       },
       {
         "registers": 15,
-        "paden": 119
+        "paden": 116
       },
       {
         "registers": 14,
@@ -140,11 +140,11 @@
       },
       {
         "registers": 13,
-        "paden": 42
+        "paden": 44
       },
       {
         "registers": 12,
-        "paden": 21
+        "paden": 20
       },
       {
         "registers": 11,
@@ -152,19 +152,19 @@
       },
       {
         "registers": 10,
-        "paden": 2
+        "paden": 6
       },
       {
         "registers": 9,
-        "paden": 16
+        "paden": 17
       },
       {
         "registers": 8,
-        "paden": 113
+        "paden": 108
       },
       {
         "registers": 7,
-        "paden": 51
+        "paden": 53
       },
       {
         "registers": 6,
@@ -172,29 +172,29 @@
       },
       {
         "registers": 5,
-        "paden": 47
+        "paden": 46
       },
       {
         "registers": 4,
-        "paden": 92
+        "paden": 90
       },
       {
         "registers": 3,
-        "paden": 389
+        "paden": 386
       },
       {
         "registers": 2,
-        "paden": 437
+        "paden": 432
       },
       {
         "registers": 1,
-        "paden": 411
+        "paden": 417
       }
     ]
   },
   "brug": {
     "uitleg": "paren route -> bestand die BINNEN EEN RIJ van een register staan; alleen daar beweert een register dat die twee bij elkaar horen",
-    "paden": 5771,
+    "paden": 5768,
     "registersDieSpreken": [
       "AANROEPGRAAF.json",
       "DOELGROEPBEREIK.json",
@@ -204,8 +204,8 @@
       "ROUTEBRON.json",
       "SCHRIJFANALYSE.json"
     ],
-    "verschilToetsbaar": 5472,
-    "verschilDekkingPct": 94.8,
+    "verschilToetsbaar": 5461,
+    "verschilDekkingPct": 94.7,
     "verschillen": 42,
     "soortBeslistIn": "ROUTEBRON.json -- daar wordt een verschil ingedeeld als `verouderd` of `tegenspraak`; deze meter telt alleen DAT ze verschillen",
     "verschilReden": null,
@@ -488,25 +488,6 @@
         ]
       },
       {
-        "pad": "/api/doos/update/status",
-        "bestanden": [
-          {
-            "bestand": "server/routes/doos-kloon.js",
-            "volgens": [
-              "AANROEPGRAAF.json",
-              "MACHINEDEKKING.json",
-              "ROUTEBRON.json"
-            ]
-          },
-          {
-            "bestand": "server/routes/doos.js",
-            "volgens": [
-              "SCHRIJFANALYSE.json"
-            ]
-          }
-        ]
-      },
-      {
         "pad": "/api/office/boardroom/toegang",
         "bestanden": [
           {
@@ -674,6 +655,25 @@
             ]
           }
         ]
+      },
+      {
+        "pad": "/api/supplier/ticket/deurverkoop",
+        "bestanden": [
+          {
+            "bestand": "server/routes/supplier/tickets-verkoop.js",
+            "volgens": [
+              "AANROEPGRAAF.json",
+              "ROUTEBRON.json"
+            ]
+          },
+          {
+            "bestand": "server/routes/supplier/tickets.js",
+            "volgens": [
+              "MACHINEDEKKING.json",
+              "SCHRIJFANALYSE.json"
+            ]
+          }
+        ]
       }
     ]
   },
@@ -682,8 +682,8 @@
     "bestanden": 5514,
     "genoemd": 5514,
     "pct": 100,
-    "gedrag": 4273,
-    "gedragPct": 77.5,
+    "gedrag": 4353,
+    "gedragPct": 78.9,
     "relatie": 5514,
     "indexregisters": [
       {
@@ -720,8 +720,8 @@
         "bestanden": 4260,
         "genoemd": 4260,
         "pct": 100,
-        "gedrag": 3755,
-        "gedragPct": 88.1
+        "gedrag": 3835,
+        "gedragPct": 90
       },
       {
         "boom": "public",
@@ -732,30 +732,30 @@
         "gedragPct": 41.3
       }
     ],
-    "serverPct": 88.1,
+    "serverPct": 90,
     "publicPct": 41.3,
     "nooitGenoemdVoorbeeld": [],
     "zonderGedragVoorbeeld": [
-      "server/accounts/actietokens.js",
       "server/accounts/demohash.js",
       "server/accounts/mirror-wachtrij.js",
-      "server/accounts/sessiegrens.js",
       "server/accounts/tokenvorm.js",
       "server/accounts/transactie-volgers.js",
       "server/bedrijf/loop-context.js",
       "server/bedrijf/oplosbaar.js",
       "server/bedrijf/rollen-beleid.js",
       "server/betaal/betaler.js",
-      "server/betaal/providerbewijs.js",
-      "server/betaal/uitbetaling.js",
       "server/betaal-connect.js",
       "server/betaal-sandbox.js",
       "server/bewaarbeleid-eigenregie.js",
       "server/config/connection-realtime-evidence.js",
       "server/config/evidence-runner-trust.js",
-      "server/config/external-machine-evidence.js",
       "server/config/node-versie.js",
-      "server/config/productie-invoer.js"
+      "server/config/productie-invoer.js",
+      "server/config/productie-pin.js",
+      "server/db/audit-projectie.js",
+      "server/db/audit-vorm.js",
+      "server/db/botsing.js",
+      "server/db/collectie-publicatie.js"
     ]
   },
   "noemers": {
@@ -847,7 +847,7 @@
       },
       {
         "register": "AANROEPGRAAF.json",
-        "paden": 3324
+        "paden": 3301
       },
       {
         "register": "MUTATIECONTRACT-AFGELEID.json",
@@ -859,7 +859,7 @@
       },
       {
         "register": "SCHERMFUNCTIE.json",
-        "paden": 1464
+        "paden": 1492
       },
       {
         "register": "SCHERMROUTES.json",
@@ -903,7 +903,7 @@
       },
       {
         "register": "EDGEDEKKING.json",
-        "paden": 315
+        "paden": 316
       },
       {
         "register": "DOELGROEPBEREIK.json",
@@ -931,10 +931,10 @@
     {
       "register": "AANROEPGRAAF.json",
       "as": "bestand",
-      "paden": 3324,
-      "bestanden": 3712,
+      "paden": 3301,
+      "bestanden": 3693,
       "symbolen": 0,
-      "paren": 3333
+      "paren": 3309
     },
     {
       "register": "ROUTEBRON.json",
@@ -949,7 +949,7 @@
       "as": "symbool",
       "paden": 0,
       "bestanden": 5520,
-      "symbolen": 26358,
+      "symbolen": 26359,
       "paren": 0
     },
     {
@@ -1076,7 +1076,7 @@
       "register": "LOOP-FABRIC-COVERAGE.json",
       "as": "bestand",
       "paden": 434,
-      "bestanden": 3682,
+      "bestanden": 3800,
       "symbolen": 0,
       "paren": 0
     },
@@ -1129,18 +1129,18 @@
       "paren": 0
     },
     {
-      "register": "SCHERMFUNCTIE.json",
-      "as": "route",
-      "paden": 1464,
-      "bestanden": 599,
+      "register": "LUSSEN.json",
+      "as": "bestand",
+      "paden": 48,
+      "bestanden": 2246,
       "symbolen": 0,
       "paren": 0
     },
     {
-      "register": "LUSSEN.json",
-      "as": "bestand",
-      "paden": 39,
-      "bestanden": 1886,
+      "register": "SCHERMFUNCTIE.json",
+      "as": "route",
+      "paden": 1492,
+      "bestanden": 599,
       "symbolen": 0,
       "paren": 0
     },
@@ -1172,7 +1172,7 @@
       "register": "ACTIVERING.json",
       "as": "bestand",
       "paden": 0,
-      "bestanden": 1232,
+      "bestanden": 1336,
       "symbolen": 0,
       "paren": 0
     },
@@ -1259,7 +1259,7 @@
     {
       "register": "EDGEDEKKING.json",
       "as": "route",
-      "paden": 315,
+      "paden": 316,
       "bestanden": 1,
       "symbolen": 0,
       "paren": 0

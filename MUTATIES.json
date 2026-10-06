@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-06T13:19:16.012Z",
-    "commit": "f3ac37a4",
+    "op": "2026-10-06T14:34:33.874Z",
+    "commit": "60b3e2d3b",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7591,6 +7591,13 @@
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 23,
       "geprobeerd": 1
+    },
+    "library-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "library-sqlite.test.js": {
       "soort": "puur",

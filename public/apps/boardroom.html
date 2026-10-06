@@ -560,7 +560,9 @@ window.I18N = { en: {
     }).catch(function (e) { zeg(e.message, 'fout'); }).then(function () { b.disabled = false; });
   }
 
-  function tabrij() {
+  var tabrijGebonden = false;
+  function bindTabrij() {
+    if (tabrijGebonden) return;
     var bar = $('boTabs');
     bar.addEventListener('click', function (e) {
       var b = e.target.closest && e.target.closest('.tab');
@@ -572,6 +574,11 @@ window.I18N = { en: {
         $(x.getAttribute('data-paneel')).hidden = !aan;
       });
     });
+    tabrijGebonden = true;
+  }
+  function tabrij() {
+    var bar = $('boTabs');
+    bindTabrij();
     bar.hidden = false;
     /* Dezelfde poort, dezelfde zichtbaarheid: het kostenbord staat achter
        boardroomAuth, dus het hoort te verschijnen op het moment dat de server
@@ -594,6 +601,9 @@ window.I18N = { en: {
       $('kuCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') maakUitnodiging(); });
     });
   }
+  /* Alleen de bediening wordt vroeg gebonden. De tabrij zelf blijft hidden
+     totdat laadRegister de serverpoort aantoonbaar heeft geopend. */
+  bindTabrij();
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 })();

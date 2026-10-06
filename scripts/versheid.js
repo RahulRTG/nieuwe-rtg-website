@@ -227,6 +227,10 @@ const REGISTERS = [
      (test/machinedekking.test.js, via npm run machinedekking:controle): twee
      schulden die alleen mogen dalen, en `volledigeKetens` die alleen mag stijgen. */
   ['MACHINEDEKKING.json', 'npm run machinedekking:vastleggen', 'of de motoren van dit huis bij dezelfde handeling langskomen'],
+  /* DE MENSGRONDEN (AUTONOMIE.md par. 2.9). Hij veroudert met elke nieuwe muterende
+     route en met elke verse ronde van de herstel- en idempotentieproef; zijn tanden
+     zitten op de inhoud (overtreding en onbekend mogen alleen dalen). */
+  ['MENSGROND.json', 'npm run mensgrond:vastleggen', 'waarom er bij elke muterende handeling een mens staat, per grond'],
   /* DE GEVOLGDEKKING (EXECUTIE.md blok 4). Twee assen die nooit worden opgeteld: wat
      de proef zag veranderen, en wat een mens erover heeft verklaard. Hij veroudert op
      twee manieren -- een nieuwe AI-bereikbare route, en een verse idempotentieronde. */
@@ -522,6 +526,7 @@ const REGISTERS = [
   ['SCHERMFUNCTIE.json', 'npm run schermfunctie', 'welke paren schermen dezelfde API-paden aanroepen, en welke schermen doorverwijzen -- de meting onder SCHERMEIGENAAR.json'],
   ['ROUTEBRON.json', 'node scripts/routebron.js --vastleggen', 'de routelijst waar SCHERMROUTES tegen meet -- veroudert hij, dan verzint de dode-padenteller er'],
   ['CONTEXTPROEF.json', 'node scripts/contextproef.js --vastleggen', 'of de async-context blijft staan waar hij moet blijven staan'],
+  ['CONTEXTDOORGIFTE.json', 'npm run contextdoorgifte', 'of de identiteit van een verzoek door de async-contexten loopt waar hij hoort, en niet verder (Fase 2, I1-I10)'],
   ['FAALPROEF.json', 'node scripts/faalproef.js --vastleggen', 'wat er gebeurt als een afhankelijkheid wegvalt'],
   /* LUSSEN.json veroudert sneller dan de meeste registers, want elke lus die
      erbij komt is een lus die er niet in staat. Een verouderde lusindex ziet er

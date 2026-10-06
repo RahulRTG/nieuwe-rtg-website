@@ -26,6 +26,7 @@
    alsnog op, maar dan zonder tijdstip -- en op deze vier families geldt dat als
    een defect. Zie de kop van ./gebeurtenis-lezen.js. */
 const { werkVeld } = require('./gebeurtenis');
+const loopContext = require('./loop-context');
 
 const SOORTEN = ['product', 'investering', 'prijs', 'lancering', 'beveiliging', 'personeel', 'contract', 'overig'];
 
@@ -53,6 +54,17 @@ module.exports = (sctx) => {
         ? req.body.alternatieven.slice(0, 10).map(a => schoon(a, 300)).filter(Boolean) : [],
       adviezen: [], bezwaren: [], stemmen: [], evalueerOp: null,
       at: nu(), door: g.l.naam };
+    if (req.body.loopContext !== undefined) {
+      try {
+        if (!sctx.loopFabric) return res.status(503).json({error:'De broncontext kan nu niet worden bevestigd.',code:'LOOP_FABRIC_UNAVAILABLE'});
+        const actorRef=g.l.rtgKey || 'work-member:'+g.l.id;
+        const checked=sctx.loopFabric.validateDecisionContext(actorRef,g.w.code,req.body.loopContext);
+        if (!checked.ok) return res.status(checked.status).json({error:checked.error,code:checked.code});
+        b.loopContext = loopContext.freeze(req.body.loopContext,b.at);
+        b.loopContext.validation=checked.validation;
+      }
+      catch (e) { if (e.loopFabric) return res.status(e.status).json({error:e.message,code:e.code}); throw e; }
+    }
     B(g.w)[b.id] = b;
     log(g.w, g.l, 'besluit-voorgesteld', b.id, titel);
     save();
@@ -136,6 +148,7 @@ module.exports = (sctx) => {
     if (!gu.ok) return res.status(gu.status).json(gu);
     b.telling = t; b.evalueerOp = aangenomen ? evalueerOp : null;
     b.geslotenAt = nu(); b.geslotenDoor = g.l.naam;
+    if (b.loopContext) b.loopContext.decidedAt = b.geslotenAt;
     log(g.w, g.l, 'besluit-' + b.status, b.id, b.titel + ' (' + t.voor + ' voor, ' + t.tegen + ' tegen)');
     save();
     res.json({ ok: true, besluit: b,

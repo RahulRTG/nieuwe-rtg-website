@@ -57,7 +57,7 @@ module.exports = (kern) => {
     const d = dragerVanVerzoek(req);
     if (!d) return next();
     kostenhaak.meld('verzoek', 1, { drager: d });
-    kostenhaak.binnen(d, next);
+    kostenhaak.binnen(d, next, null, 'lichaam');
   });
 
   const stuur = (res, r) => (r && r.error) ? res.status(r.status || 400).json(r) : res.json(r);

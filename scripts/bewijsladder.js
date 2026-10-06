@@ -69,8 +69,8 @@ const K = { dim: '\x1b[2m', groen: '\x1b[32m', rood: '\x1b[31m', geel: '\x1b[33m
    ========================================================================== */
 const LADDER = [
   { id: 'snel', naam: 'Snelle bewijzen', wat: 'huisregels, statische analyse, geheimen, het contract van de keten zelf',
-    patronen: [/check\.js$/, /ast-scan\.js$/, /document-fitness\.js$/, /geheimen\.js$/, /ci-keten\.js$/, /ci-lokaal\.js$/,
-      /deltapoort\.js$/, /normverval\.js$/, /wetten\.js$/, /getallen\.js$/, /samenhang\.js$/, /keuring\.js$/, /^git diff$/] },
+    patronen: [/check\.js$/, /ast-scan\.js$/, /document-fitness\.js$/, /geheimen\.js$/, /ci-keten\.js$/, /releaseketenwacht\.js$/, /ci-lokaal\.js$/,
+      /deltapoort\.js$/, /normverval\.js$/, /wetten\.js$/, /getallen\.js$/, /samenhang\.js$/, /keuring\.js$/, /codeql-verdict\.js$/, /^git diff$/] },
   { id: 'geraakt', naam: 'Wat kan deze wijziging raken', wat: 'de affected-graaf: welk bewijs moet opnieuw',
     patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /verstrengeling\.js$/, /activering\.js$/,
       /* De Evidence Engine is dezelfde sport op bewijsniveau: basisbewijs
@@ -94,7 +94,7 @@ const LADDER = [
       /heapproef\.js$/, /spreidingsproef\.js$/, /grondwacht\.js$/, /native-rehearsal\.js$/] },
   { id: 'prestatie', naam: 'Prestatiebudgetten', wat: 'de storm, de duurmeting en de gewichten',
     patronen: [/beproeving\.js$/, /prestaties\.js$/, /toetsduur\.js$/, /gewichtdrift\.js$/, /gewichtvoorstel\.js$/,
-      /dekkingsvloer\.js$/, /dekking\.js$/, /performance-debt\.js$/] },
+      /dekkingsvloer\.js$/, /dekking\.js$/, /performance-debt\.js$/, /beproeving-ci-bewijs\.js$/] },
   { id: 'scherm', naam: 'Scherm, toegankelijkheid en browser', wat: 'de schermsuite, de a11y-scan en het oordeel erover',
     patronen: [/e2e\.js$/, /a11y\.js$/, /a11y-oordeel\.js$/, /schermen\.js$/, /schermmutatie\.js$/,
       /desktop-audit\.js$/] },
@@ -103,7 +103,7 @@ const LADDER = [
   { id: 'releasebewijs', naam: 'Releasebewijs', wat: 'de bronboom gehasht, de stuklijst, de herkomst, de poort ervoor',
     patronen: [/release-bewijs\.js$/, /bron-release-bewijs\.js$/, /imageherkomst\.js$/, /release-gate\.js$/, /ci-pg-bewijs\.js$/,
       /build\.js$/, /zekerheid\.js$/, /bewijsmatrix\.js$/, /vertrouwen\.js$/, /versheid\.js$/, /meetronde\.js$/,
-      /envelop\.js$/, /gezag\.js$/, /^npm run afbouw:software$/] },
+      /envelop\.js$/, /gezag\.js$/, /release-workflow-bewijs\.js$/, /^npm run afbouw:software$/] },
   { id: 'kandidaat', naam: 'Onveranderlijke kandidaat', wat: 'het image gebonden aan een digest en een handtekening',
     patronen: [/imageherkomst\.js$/, /promotie-teken\.js$/, /external-release-teken\.js$/, /native-release\.js$/] },
   { id: 'uitrol', naam: 'Staging, canary en productieverificatie', wat: 'de repetitie, de uitrol en de sonde erna',

@@ -36,8 +36,11 @@ const { ontleedDeel, verdeel } = require('./lib/delen');
 const { IJKINGEN } = require('./lib/ijkingen');
 const { ZWAAR } = require('./lib/zwaar');
 const { tapSamenvatting } = require('./lib/schermsuite-bewijs');
+const { prijzen } = require('./lib/duurprijs');
+const { maakBatches, STANDAARD_MAX } = require('./lib/testbatches');
 
 const WORTEL = path.join(__dirname, '..');
+const FOUTRAPPORT = path.join(WORTEL, '.release', 'unit-test-fouten.json');
 /* HET SLOT NIET TWEE KEER PAKKEN. pak() werpt als het bezet is, en dat is
    terecht -- maar een draaier die vanuit een toets wordt aangeroepen (zie
    `--toon` hieronder) draait binnen een run die het slot al heeft. Zelfde
@@ -96,6 +99,14 @@ const gevraagd = Number(process.env.RTG_TEST_CONCURRENCY);
 const concurrency = Number.isInteger(gevraagd) && gevraagd > 0
   ? Math.min(gevraagd, 32)
   : Math.max(2, Math.min(4, os.availableParallelism ? os.availableParallelism() : 4));
+/* Niet alle bestanden in een enkel Node-proces stoppen. Bij bijna tweeduizend
+   bestanden liep de tienminutengrens al terwijl een bestand nog in Nodes eigen
+   wachtrij stond. RTG_TEST_BATCH_FILES verandert alleen de procesgrootte, nooit
+   welke toetsen draaien of hoe lang een draaiende toets mag duren. */
+const batchBestanden = (() => {
+  const n = Number(process.env.RTG_TEST_BATCH_FILES);
+  return Number.isInteger(n) && n > 0 ? Math.min(n, 250) : STANDAARD_MAX;
+})();
 
 let bestanden = fs.readdirSync(TESTMAP).filter(n => n.endsWith('.test.js')).sort();
 if (selectie.length) {
@@ -143,8 +154,13 @@ const BRON = require('./lib/meetbron').bron();
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1',
   NODE_OPTIONS: nodeOpties, RTG_TOETSDUUR: duurpad, RTG_TOETSBRON: BRON };
 const pgSuite = require('./lib/suite-pg');
+/* De incrementele bewijsronde (scripts/evidence.js) geeft een SELECTIE mee, maar
+   draait net als een scherf zonder database; de verplichte PostgreSQL-job in
+   dezelfde CI-run bewijst de PG-lijst. Zonder deze uitzondering zakte een PG-toets
+   die de planner koos op "vereist een database" in plaats van op zijn code. */
+const incrementeel = process.env.RTG_EVIDENCE_MODE === 'incremental';
 const opslagPlan = pgSuite.plan(bestanden, env, !selectie.length && !deel && !zonderIjkingen && !zonderZware,
-  !selectie.length && !!(deel || zonderIjkingen || zonderZware));
+  (!selectie.length && !!(deel || zonderIjkingen || zonderZware)) || incrementeel);
 const lokaleBestanden = opslagPlan.bestanden;
 let pgBron = null;
 
@@ -195,6 +211,8 @@ const TIJDGRENS_IJKING = 40 * 60 * 1000;
 
 let batch = 0;
 const batchBewijzen = [];
+const foutBatches = [];
+const stilleBatches = [];
 function draai(namen, parallel, metVloer, tijdgrens) {
   if (!namen.length) return 0;
   /* --test-force-exit vangt de andere hanger af: alle toetsen zijn klaar, maar
@@ -233,8 +251,18 @@ function draai(namen, parallel, metVloer, tijdgrens) {
     cwd: WORTEL, stdio: 'inherit', timeout: 90 * 60 * 1000,
     env: { ...opslagPlan.env, RTG_TOETSMODUS: metDekking ? 'dekking' : 'normaal' }
   });
+  let tapTekst = '';
   try {
-    batchBewijzen.push(tapSamenvatting(fs.readFileSync(tapPad, 'utf8')));
+    tapTekst = fs.readFileSync(tapPad, 'utf8');
+    const samenvatting = tapSamenvatting(tapTekst);
+    batchBewijzen.push(samenvatting);
+    if ((samenvatting.overgeslagen || 0) > 0 || (samenvatting.todo || 0) > 0) {
+      stilleBatches.push({ bestanden: [...namen],
+        overgeslagen: samenvatting.overgeslagen || 0,
+        todo: samenvatting.todo || 0,
+        overgeslagenTests: samenvatting.overgeslagenTests || [],
+        todoTests: samenvatting.todoTests || [] });
+    }
   } catch (e) {
     batchBewijzen.push(tapSamenvatting(''));
   } finally { try { fs.unlinkSync(tapPad); } catch (e) {} }
@@ -242,13 +270,29 @@ function draai(namen, parallel, metVloer, tijdgrens) {
     console.error('[tests] runnerfout:', r.error.message);
     return 2;
   }
-  return r.status == null ? 2 : r.status;
+  const status = r.status == null ? 2 : r.status;
+  if (status !== 0 && tapTekst) {
+    const regels = tapTekst.split('\n');
+    const fouten = regels.filter(regel => /^\s*not ok \d+ - /.test(regel))
+      .map(regel => regel.trim());
+    foutBatches.push({ bestanden: [...namen], status, fouten });
+    console.error('[tests] rode batch (' + namen.length + ' bestanden):');
+    for (const fout of fouten) console.error('  ' + fout);
+    console.error('[tests] bestanden: ' + namen.join(', '));
+  } else if (status !== 0) {
+    foutBatches.push({ bestanden: [...namen], status, fouten: [], tapOntbreekt: true });
+  }
+  return status;
 }
 
 const gewoon = verdeel(lokaleBestanden.filter(n => !isGeisoleerd(n) &&
   (!zonderZware || selectie.length || !ZWAAR.includes(n))), deel);
 const geïsoleerd = verdeel(lokaleBestanden.filter(n => isGeisoleerd(n) &&
   (!zonderIjkingen || selectie.length || !IJKINGEN.includes(n))), deel);
+const weging = require('./lib/delen').wegingVoor(gewoon);
+const onbekend = prijzen(weging.gewicht, { andere: weging.andere });
+const testBatches = maakBatches(gewoon, { maxBestanden: batchBestanden,
+  gewicht: naam => weging.gewicht.get(naam) || onbekend.prijsVoor(naam) });
 
 /* WAT ZOU JE DOEN? -- `--toon` drukt de indeling af en draait niets.
 
@@ -264,20 +308,28 @@ const geïsoleerd = verdeel(lokaleBestanden.filter(n => isGeisoleerd(n) &&
    er straks apart draait, krijgt hetzelfde antwoord. */
 if (argv.includes('--toon')) {
   console.log(JSON.stringify({ parallel: gewoon, geisoleerd: geïsoleerd, concurrency,
+    batchTelling: testBatches.length, batchGroottes: testBatches.map(b => b.length), batchBestanden,
     dekking: dekkingMap || dekkingVloer, journaal, postgres:opslagPlan.pg,
     postgresUitgesteld:opslagPlan.uitgesteld || [] }, null, 2));
   geefAfbouwSlotVrij();
   process.exit(0);
 }
 leegMaken();
-console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency + ' tegelijk' +
+console.log('[tests] ' + gewoon.length + ' bestanden in ' + testBatches.length +
+  ' begrensde batch(es), maximaal ' + concurrency + ' tegelijk' +
   (dekkingMap ? ' (dekking naar ' + dekkingMap + ')'
     : (dekkingVloer.length ? ' (met dekkingsvloer ' + dekkingVloer.join('/') + ')' : '')));
 if (deel) console.log('[tests] deel ' + deel.nr + ' van ' + deel.totaal);
 if (opslagPlan.uitgesteld?.length) console.log('[tests] ' + opslagPlan.uitgesteld.length + ' PG-bestanden draaien uitsluitend in de verplichte PostgreSQL-job');
 if (zonderIjkingen && !selectie.length) console.log('[tests] zonder de losse ijkingen; die draaien in de CI elk in een eigen job');
 if (zonderZware && !selectie.length) console.log('[tests] zonder de zware toetsen; die draaien in de CI elk in een eigen job, zonder dekking');
-let code = draai(gewoon, concurrency, true);
+let code = 0;
+for (let i = 0; i < testBatches.length; i++) {
+  if (testBatches.length > 1) console.log('[tests] batch ' + (i + 1) + '/' + testBatches.length +
+    ' (' + testBatches[i].length + ' bestanden)');
+  const uit = draai(testBatches[i], concurrency, true);
+  if (uit && !code) code = uit;
+}
 for (const naam of geïsoleerd) {
   console.log('[tests] geïsoleerd: ' + naam);
   const uit = draai([naam], 1, false, IJKINGEN.includes(naam) ? TIJDGRENS_IJKING : TIJDGRENS);
@@ -293,6 +345,23 @@ if (opslagPlan.apart) {
   }
 }
 geefAfbouwSlotVrij();
+
+/* Een lange ronde mag haar diagnose niet alleen in een begrensde terminalbuffer
+   achterlaten. Dit rapport is geen groenbewijs en beïnvloedt de uitslag niet;
+   het bewaart uitsluitend welke batch rood was en welke TAP-regels dat zeiden. */
+try {
+  fs.mkdirSync(path.dirname(FOUTRAPPORT), { recursive: true });
+  fs.writeFileSync(FOUTRAPPORT, JSON.stringify({
+    gemaaktOp: new Date().toISOString(),
+    selectie: selectie.length ? selectie : null,
+    deel: deel || null,
+    rodeBatches: foutBatches,
+    stilleBatches
+  }, null, 2) + '\n');
+} catch (e) {
+  console.error('[tests] kon foutenrapport niet schrijven: ' + e.message);
+  if (code === 0) code = 1;
+}
 
 /* ---- HET STEMPEL VAN DE VOLLE RONDE ----
 

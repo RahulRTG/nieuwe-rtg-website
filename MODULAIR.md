@@ -22,7 +22,7 @@ Dezelfde volgorde als bij `OBJECTMODEL.json` (waar `Asset` sneuvelde) en
 
 `npm run verstrengeling` → `VERSTRENGELING.json`
 
-<!--getal:verstrengeling.randen-->2011<!--/getal--> randen tussen de knopen van dit huis, waarvan er
+<!--getal:verstrengeling.randen-->2218<!--/getal--> randen tussen de knopen van dit huis, waarvan er
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> **onverklaard** zijn. Dat getal moet naar nul, en het
 aantal randen niet: een huis waarin domeinen elkaar nooit nodig hebben, is geen
 huis maar een map met losse programma's.
@@ -47,7 +47,7 @@ kern** — `SEMANTIEK.json` laat zien dat hetzelfde woord op drie plekken nog ge
 gedeelde betekenis is.
 
 Omgekeerd staat er wat er breekt als iets er niet is:
-<!--getal:verstrengeling.uitneembaar-->60<!--/getal--> van de <!--getal:verstrengeling.domeinen-->640<!--/getal--> domeinen sleept géén ander
+<!--getal:verstrengeling.uitneembaar-->62<!--/getal--> van de <!--getal:verstrengeling.domeinen-->700<!--/getal--> domeinen sleept géén ander
 domein mee. Bovenaan de andere kant staat `eigencollectie` met 246: dat is geen
 domein meer maar een verborgen kern, en dat is een besluit (noem het kern) of
 werk (breng de koppelingen terug).
@@ -57,11 +57,11 @@ werk (breng de koppelingen terug).
 `npm run activering` → `ACTIVERING.json`
 
 Per functie uit de catalogus: welke routes, welke bestanden, welke domeinen.
-<!--getal:activering.functies-->221<!--/getal--> functies dragen routes; een doorsnee functie raakt
-<!--getal:activering.mediaan-->34<!--/getal--> knopen.
+<!--getal:activering.functies-->228<!--/getal--> functies dragen routes; een doorsnee functie raakt
+<!--getal:activering.mediaan-->36<!--/getal--> knopen.
 
-**Vier graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->162<!--/getal--> functies
-zijn `gemeten`; <!--getal:activering.ondergrens-->49<!--/getal--> zijn `ondergrens` (er hangt méér aan dan
+**Vier graden, en ze zijn niet uitwisselbaar.** <!--getal:activering.gemeten-->168<!--/getal--> functies
+zijn `gemeten`; <!--getal:activering.ondergrens-->50<!--/getal--> zijn `ondergrens` (er hangt méér aan dan
 hier staat, en nieuwe broninformatie zou helpen); <!--getal:activering.onbepaald-->3<!--/getal--> zijn
 `onbepaald` (de bronnen spreken elkaar tegen — dat vraagt een besluit en geen
 betere meter); en zeven zijn `deels-niet-toe-te-rekenen` (hun route hangt in de

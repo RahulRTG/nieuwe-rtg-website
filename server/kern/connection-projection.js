@@ -37,7 +37,7 @@ const CONTRACTS = Object.freeze({
   [NAMES.VONK_PROFILE_OWNER]: ['codenaam', 'over', 'leeftijd', 'stad', 'interesses', 'betrouwbaarheid', 'kenmerken', 'geslacht', 'zoekt', 'leeftijdMin', 'leeftijdMax', 'maxKm', 'actief', 'afstandActief', 'wensen', 'zicht', 'beschikbaar', 'datewens', 'media'],
   [NAMES.VONK_PROFILE_MEDIA_OWNER]: ['media'],
   [NAMES.VONK_DISCOVERY]: ['codenaam', 'over', 'leeftijd', 'stad', 'interesses', 'betrouwbaarheid', 'kenmerken', 'gemeen', 'waarom', 'media'],
-  [NAMES.VONK_MATCH]: ['id', 'met', 'at', 'status', 'betrouwbaarheid', 'tafel', 'ikBetaalde', 'anderBetaalde', 'berichten', 'kenmerken', 'wanneer', 'media'],
+  [NAMES.VONK_MATCH]: ['id', 'met', 'at', 'status', 'betrouwbaarheid', 'tafel', 'reservering', 'ikBetaalde', 'anderBetaalde', 'berichten', 'kenmerken', 'wanneer', 'media'],
   [NAMES.VONK_CONVERSATION]: ['van', 'tekst', 'kind', 'media', 'at'],
   [NAMES.VONK_MEET]: ['supplierCode', 'supplierName', 'plek', 'middenAfstandKm', 'datum', 'tijd', 'prijsPP', 'rtgDeel', 'soort', 'reisminuten', 'waarom'],
   [NAMES.CONNECTION_COMMUNICATION]: ['scope', 'messages', 'consent', 'call'],
@@ -95,6 +95,8 @@ function connectionProject(name, source) {
 
   if (name === NAMES.VONK_MATCH) {
     if (aanwezig(s.tafel)) uit.tafel = connectionProject(NAMES.VONK_MEET, s.tafel);
+    if (aanwezig(s.reservering)) uit.reservering = alleen(s.reservering,
+      ['reference', 'state', 'finality', 'missing']);
     if (aanwezig(s.berichten)) uit.berichten = s.berichten.map(x => connectionProject(NAMES.VONK_CONVERSATION, x));
   }
   if (name === NAMES.VONK_CONVERSATION && aanwezig(s.media) && s.media) {

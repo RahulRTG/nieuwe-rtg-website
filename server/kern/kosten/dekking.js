@@ -36,7 +36,7 @@ module.exports = (ctx) => {
      geen bedrag van bekend", en dat is een antwoord. */
   function bijdrageVan(pas) {
     if (pas === 'gezin') return { centen: 0, waarom: 'De RTFoundation is gratis voor elk gezin.' };
-    if (pas === 'huis') return { centen: null, waarom: 'Het huis betaalt zichzelf niets.' };
+    if (pas === 'huis' || pas === 'dienst') return { centen: null, waarom: 'Het huis betaalt zichzelf niets; een dienst van RTG is het huis.' };
     if (pas === 'zaak') return { centen: null, waarom: 'Wat een zaak betaalt staat in zijn leverancierscontract; dat bedrag staat niet in deze laag.' };
     if (pas === 'business') return { centen: null, waarom: 'De Business Pass is op maat afgesproken; er is geen maandprijs om mee te rekenen.' };
     const c = maandCentenUit(geldPasprijzen, pas);

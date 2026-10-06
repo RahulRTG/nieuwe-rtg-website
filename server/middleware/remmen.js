@@ -87,9 +87,24 @@ function hoofdzekering({ db, accounts, eigenaar }) {
    pointe van de ladder: een brute force richt zich op de inlog, dus de
    verdediging sluit de inlog -- niet de app. De zekering draagt een 'tot' en
    dooft vanzelf (zekeringGesprongen); de eigenaar kan hem eerder resetten of
-   juist handmatig trekken (dan zonder 'tot'). */
+   juist handmatig trekken (dan zonder 'tot').
+
+   /api/aanmeld/zeg staat erop (N3) omdat dat gesprek langs de sleutelwoorden
+   een sessie of een bewijs voor de tweede stap geeft, en zulke deuren horen
+   hier. De pauze pas bij het munten toetsen zou een orakel zijn: alleen na de
+   JUISTE woorden een 503. /api/aanmeld/start blijft open, want een gesprek
+   beginnen geeft niemand iets.
+
+   DEZE LIJST IS NIET ELKE DEUR NAAR EEN SESSIE. Het kantoorgesprek
+   (/api/kantoor/gesprek/zeg), de techniekinlog, de passkey-inlog en de
+   SSO-wissel staan er niet op, en de vergelijking is letterlijk op req.path.
+   Een deur toevoegen zegt dus niets over of de rest dicht is. En LETTERLIJK
+   betekent ook: de router laat een pad met een slash erachter
+   (/api/auth/login/) bij dezelfde handler komen, en die vergelijkt hier niet
+   gelijk. Dat gold al voor alle paden op deze lijst en staat als eigen
+   bevinding in het auditdocument (herkeuring N3). */
 const INLOG_PADEN = ['/api/login', '/api/auth/login', '/api/auth/register', '/api/auth/forgot',
-  '/api/auth/reset', '/api/office/login', '/api/supplier/login', '/api/staff/login'];
+  '/api/auth/reset', '/api/office/login', '/api/supplier/login', '/api/staff/login', '/api/aanmeld/zeg'];
 function inlogpauzePoort({ db }) {
   const { zekeringGesprongen } = require('../techniek');
   return (req, res, next) => {

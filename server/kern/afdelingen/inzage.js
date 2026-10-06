@@ -12,12 +12,21 @@ module.exports = (ctx) => {
   const { AFDELINGEN, accounts, keyVanCodenaam } = ctx;
   const audit = (wie, wat) => ctx.audit(wie, wat);
 
-  async function naamInzage(kamerId, codenaam, wie) {
+  async function naamInzage(kamerId, codenaam, wie, vereist) {
     const kamer = kamerId === 'boardroom' ? { naam: 'Boardroom', naamInzage: true } : AFDELINGEN[kamerId];
     if (!kamer) return { status: 404, error: 'Deze kamer bestaat niet.' };
     if (!kamer.naamInzage) return { status: 403, error: 'Deze kamer heeft geen inzage in de identiteitskluis. Alleen kamers die klanten bij naam moeten kennen (en de boardroom) mogen dit.' };
     const c = String(codenaam || '').replace(/[<>]/g, '').trim().slice(0, 60);
     if (!c) return { status: 400, error: 'Welke codenaam wilt u opzoeken?' };
+    /* HET ZWARE RECHT. De echte naam achter een codenaam vraagt kluis-inzage op
+       naam (kern/command/toegang.js); zonder die laag gaat er niets open. Ook
+       een geweigerde poging staat in het auditlog. */
+    const f = typeof vereist === 'function' ? vereist(wie, 'kluis-inzage')
+      : { status: 503, error: 'De laag met tijdelijke zware rechten ontbreekt; zonder die laag geen kluis-inzage.' };
+    if (f) {
+      audit(String(wie || kamer.naam).replace(/[<>]/g, '').slice(0, 30), 'Identiteitskluis: GEWEIGERD bij codenaam "' + c + '" (geen kluis-inzage)');
+      return f;
+    }
     const tref = await keyVanCodenaam(c);
     audit(String(wie || kamer.naam).replace(/[<>]/g, '').slice(0, 30),
       'Identiteitskluis: naam opgevraagd bij codenaam "' + c + '" vanuit ' + kamer.naam + (tref ? '' : ' (geen treffer)'));

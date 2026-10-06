@@ -70,6 +70,8 @@ test('een doel met genoeg verkeer en geen fouten is gehaald, met budget over', (
   assert.equal(b.budget.restDeel, 1, 'niets verbruikt, dus het hele budget staat er nog');
   assert.equal(b.budget.op, false);
   assert.equal(st.uitrol.mag, true);
+  assert.equal(st.capabilities.length, 6, 'Command toont ook de zes duurzame capability-SLO\'s');
+  assert.equal(st.tel.capabilities.totaal, 6);
 });
 
 test('te weinig gemeten heet onvoldoende gemeten en niet gehaald', () => {
@@ -108,6 +110,19 @@ test('een onbeoordeeld doel houdt de uitrol niet tegen', () => {
   assert.equal(st.uitrol.mag, true);
   assert.ok(st.uitrol.onbeoordeeld >= 1, 'en het zegt erbij dat er niets beoordeeld is');
   assert.match(st.uitrol.reden, /nog geen doel voldoende gemeten/);
+});
+
+test('een bewezen gezakte capability-SLO houdt de uitrol wel tegen', () => {
+  const runtime = require('../server/kern/bewijsvlak/runtime');
+  const oud = runtime.current;
+  runtime.current = () => ({ registry: { publiek: () => [] }, metrics: { standAll: () => [
+    { capability: 'payment.authorize', oordeel: 'niet gehaald' }
+  ] } });
+  try {
+    const st = maakSlo({ meting: meting() }).stand();
+    assert.equal(st.uitrol.mag, false);
+    assert.match(st.uitrol.reden, /payment\.authorize/);
+  } finally { runtime.current = oud; }
 });
 
 test('een snelheidsdoel geeft een bovengrens en geen verzonnen punt', () => {

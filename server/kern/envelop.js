@@ -1,26 +1,34 @@
 /* DE EVENTENVELOP: de taal waarin dit huis over gebeurtenissen praat.
 
-   WAAROM DIT BESTAAT. OS.md par. 3 mat het zo op: *de bus vervoert, er is geen
-   taal.* server/bus.js levert een bericht netjes af -- in proces of over Redis
-   -- maar wat er in dat bericht staat, verzint elke publicerende plek zelf. Van
-   de zeven plekken die zelf een bericht samenstellen (scripts/envelop.js telt
-   ze) droeg er één een `versie`, één een `id`, en geen enkele iets waarmee je
-   twee gebeurtenissen aan elkaar kunt knopen. Bij een
-   incident is dat het verschil tussen "er ging iets mis" en "dit verzoek raakte
-   deze zaak en veroorzaakte die drie meldingen".
+   WAAROM DIT BESTAAT. OS.md par. 3: *de bus vervoert, er is geen taal.* Van de
+   zeven plekken die zelf een bericht samenstelden (scripts/envelop.js) droeg er
+   een een `versie`, een een `id`, en geen enkele iets waarmee je twee
+   gebeurtenissen aan elkaar knoopt.
 
-   ACHT VELDEN, EN GEEN NEGENDE. De envelop is met opzet gesloten: hij zegt
-   WIE, WANNEER, WAARDOOR en HOE GEVOELIG, en nooit WAT. Zodra er inhoud in een
-   envelop mag, wordt hij binnen een jaar een tweede berichtformaat.
+   NEGEN VELDEN, EN GEEN TIENDE. De envelop is met opzet gesloten: hij zegt
+   WIE, IN WELKE ROL, WANNEER, WAARDOOR en HOE GEVOELIG, en nooit WAT. Zodra er
+   inhoud in een envelop mag, wordt hij binnen een jaar een tweede berichtformaat.
 
      id             deze gebeurtenis, een keer
      at             wanneer, in ISO
-     versie         het formaat van deze envelop
+     versie         het formaat van deze envelop (2; een lezer kent 1 en 2)
      kanaal         waarover hij ging
      actor          WIE het veroorzaakte -- een codenaam, nooit een echte naam
      correlatie     de hele keten waar dit bij hoort
      oorzaak        de gebeurtenis die deze direct veroorzaakte
      classificatie  hoe gevoelig de inhoud is (gesloten lijst)
+     hoedanigheid   IN WELKE ROL de actor handelde: { naam, grond } (v2)
+
+   HET NEGENDE VELD (besluit B3b, 5 oktober 2026). Een naam en een grond
+   (`sessie` of `machtiging:<id>`), en NOOIT de bevoegdheden, het plafond of
+   `wat` -- die blijven van kern/vertegenwoordiging/. De envelop zegt "in welke
+   rol", niet "mocht dat". Hij komt uit het verzoekframe en nooit uit een
+   opgave van de publicerende plek (de bus geeft alleen actor en classificatie
+   door), en zolang het frame er geen kent staat er `onbekend` -- nooit stil een
+   waarde. De uitrol is LEZERS EERST: hoedanigheidVan() leest een v1-envelop
+   (van een proces dat nog niet bij is) als `onbekend`, en een versie die deze
+   code niet kent ook, want een veld uit een toekomstig formaat raden is erger
+   dan het niet weten.
 
    DE ACTOR IS EEN CODENAAM. Dat is geen stijlafspraak maar de kern van de
    privacyopzet van dit huis: klantdata draait op codenamen en echte namen wonen
@@ -31,34 +39,28 @@
    garantie; hij vangt de fout die iemand per ongeluk maakt (`req.body.email`
    doorgeven), niet iemand die het expres wil.
 
-   ONBEKEND IS EEN UITSLAG. Wie niets over de gevoeligheid zegt, krijgt
-   `onbekend` en niet `openbaar`. Dat is dezelfde regel als `niet gemeten` in de
-   dienstmeting en `niet vast te stellen` in BESTUUR.md: een leeg vakje mag nooit
-   de geruststellende waarde krijgen. scripts/envelop.js telt hoeveel er zo de
-   bus over gaan, zodat het getal zichtbaar is in plaats van weggewerkt.
+   ONBEKEND IS EEN UITSLAG. Wie niets over de gevoeligheid (of de rol) zegt,
+   krijgt `onbekend` en niet `openbaar`: een leeg vakje krijgt nooit de
+   geruststellende waarde. scripts/envelop.js telt hoeveel er zo de bus over gaan.
 
    DE KETEN LOOPT VANZELF DOOR. Wie binnen de afhandeling van een gebeurtenis
-   opnieuw publiceert, krijgt automatisch dezelfde `correlatie` en als `oorzaak`
-   de gebeurtenis die hij aan het afhandelen is. Dat gaat via AsyncLocalStorage,
-   net zoals server/db/bijeen.js dat al doet voor de schrijfronde. Zonder die
-   automatiek moet elke publicerende plek de keten met de hand doorgeven, en dan
-   is hij binnen een maand op de helft van de plekken vergeten. */
+   opnieuw publiceert, krijgt via AsyncLocalStorage dezelfde `correlatie` en als
+   `oorzaak` de gebeurtenis die hij afhandelt. Met de hand doorgeven is binnen
+   een maand op de helft van de plekken vergeten. */
 'use strict';
 const { AsyncLocalStorage } = require('async_hooks');
 const crypto = require('crypto');
-/* De tijd komt van de huisklok en niet van het OS. Dat is hier geen detail: een
-   envelop is de enige tijdstempel die een gebeurtenis draagt, en met `new Date()`
-   trekt hij zich van RTG_KLOK niets aan. Dan is geen enkele beproeving op
-   schrikkeldag, zomertijd of een verlopen mandaat te doen OVER de bus -- terwijl
-   dat precies de plek is waar zulke fouten zich verstoppen. scripts/klok.js
-   telde deze regel dan ook als schuld. */
+const trustContext = require('./bewijsvlak/context');
+/* De tijd van de huisklok (RTG_KLOK) en niet van het OS: anders is geen
+   tijdproef over de bus te doen (scripts/klok.js telde dit als schuld). */
 const { datum } = require('../lib/klok');
 
-const VERSIE = 1;
+const VERSIE = 2;
+/* Wat een LEZER aankan. Een v2-proces leest ook v1 (rollende uitrol over Redis). */
+const GELEZEN = Object.freeze([1, 2]);
 
-/* De gesloten lijst. Wie een zesde gevoeligheid nodig heeft, voegt hem HIER
-   toe en nergens anders -- een vrij tekstveld levert "gevoelig-ish" op, en dat
-   is niet te tellen, niet te filteren en niet te verantwoorden. */
+/* De gesloten lijst. Een zesde gevoeligheid komt HIER bij en nergens anders --
+   een vrij tekstveld levert "gevoelig-ish" op, en dat is niet te tellen. */
 const CLASSIFICATIES = {
   openbaar: 'mag iedereen zien',
   intern: 'binnen RTG, niet naar buiten',
@@ -92,6 +94,38 @@ function keurActor(actor) {
   return a;
 }
 
+/* DE HOEDANIGHEID. `onbekend` is een uitslag (zie hierboven) en geen gat. De naam
+   is een woord uit een gesloten lijst (kern/vertegenwoordiging/ en de
+   deursoorten); hier wordt alleen de VORM gekeurd, want deze laag kent geen
+   domein. Alles behalve naam en grond valt er structureel af. */
+const ONBEKEND = Object.freeze({ naam: 'onbekend', grond: null });
+const NAAM = /^[a-z][a-z0-9-]{0,39}$/;
+const GROND = /^(sessie|machtiging:[A-Za-z0-9_-]{1,64})$/;
+function keurHoedanigheid(h) {
+  if (h == null || (typeof h === 'object' && (h.naam == null || h.naam === 'onbekend'))) return ONBEKEND;
+  if (typeof h !== 'object' || Array.isArray(h)) throw new TypeError('envelop: hoedanigheid is { naam, grond }, geen ' + typeof h);
+  if (!NAAM.test(String(h.naam))) throw new Error('envelop: hoedanigheid is een naam uit een gesloten lijst, geen vrije tekst');
+  const grond = h.grond == null ? null : String(h.grond);
+  if (grond !== null && !GROND.test(grond)) throw new Error('envelop: de grond van een hoedanigheid is sessie of machtiging:<id>');
+  return Object.freeze({ naam: String(h.naam), grond });
+}
+const versieBekend = (env) => !!env && GELEZEN.includes(env.versie);
+/* DE LEZER. v1, een onbekende versie, een ontbrekend of onleesbaar veld: onbekend. */
+function hoedanigheidVan(env) {
+  if (!versieBekend(env) || env.versie < 2) return ONBEKEND;
+  try { return keurHoedanigheid(env.hoedanigheid); } catch (e) { return ONBEKEND; }
+}
+
+/* HET VERZOEKFRAME ALS BRON (Fase 2, PR 5). Binnen een verzoek is er geen ouder
+   in de keten, en dan droeg een envelop vroeger geen correlatie en geen actor
+   (0 van 68 gemeten, CONTEXTDOORGIFTE.json I1). Late binding, zoals de meter in
+   kern/kosten/haak.js: deze laag kent opzet/ niet, opzet/verzoekframe.js hangt
+   zich hier zelf in. De bron levert { correlatie, oorzaak, actor, hoedanigheid }
+   of null (geen frame, of een gesloten). Een ouder in de keten gaat altijd voor. */
+let frameBron = null;
+function zetFrameBron(fn) { frameBron = typeof fn === 'function' ? fn : null; }
+function frameNu() { try { return frameBron ? frameBron() || null : null; } catch (e) { return null; } }
+
 /* De envelop van de gebeurtenis die op DIT moment wordt afgehandeld. */
 const huidige = () => keten.getStore() || null;
 
@@ -100,24 +134,32 @@ const huidige = () => keten.getStore() || null;
 function maak(opgave) {
   const o = opgave || {};
   const ouder = huidige();
+  const trust = trustContext.huidige();
+  const fr = ouder ? null : frameNu();
   const classificatie = CLASSIFICATIES[o.classificatie] ? o.classificatie : 'onbekend';
   return Object.freeze({
     id: o.id || nieuwId(),
     at: o.at || datum().toISOString(),
     versie: VERSIE,
     kanaal: o.kanaal || null,
-    actor: keurActor(o.actor != null ? o.actor : (ouder ? ouder.actor : null)),
-    /* De keten: zonder ouder is deze gebeurtenis zelf het begin. */
-    correlatie: o.correlatie || (ouder ? ouder.correlatie : null) || null,
-    oorzaak: o.oorzaak || (ouder ? ouder.id : null) || null,
-    classificatie
+    actor: keurActor(o.actor != null ? o.actor : (ouder ? ouder.actor : (fr ? fr.actor : null))),
+    /* De keten: eerst de ouder, dan het verzoekframe, dan de Trust & Evidence-
+       correlatie; zonder een van drieen is deze gebeurtenis zelf het begin. */
+    correlatie: o.correlatie || (ouder ? ouder.correlatie : null) || (fr ? fr.correlatie : null) || (trust ? trust.chainId : null) || null,
+    oorzaak: o.oorzaak || (ouder ? ouder.id : null) || (fr ? fr.oorzaak : null) || (trust ? trust.stepId : null) || null,
+    classificatie,
+    hoedanigheid: o.hoedanigheid != null ? keurHoedanigheid(o.hoedanigheid)
+      : (ouder ? hoedanigheidVan(ouder) : keurHoedanigheid(fr ? fr.hoedanigheid : null))
   });
 }
 
 /* Alles wat binnen fn gebeurt, hoort bij deze envelop. */
+const tellers = { onbekendeVersie: 0 };
 function inKeten(envelop, fn) {
   if (!envelop) return fn();
-  return keten.run(envelop, fn);
+  /* Een versie die deze code niet kent: de levering gaat voor, maar niet stil. */
+  if (!versieBekend(envelop)) tellers.onbekendeVersie++;
+  return keten.run(envelop, () => trustContext.inContext(trustContext.uitEvent(envelop), fn));
 }
 
 /* De correlatie invullen als hij nog leeg is: de eerste gebeurtenis van een
@@ -128,4 +170,5 @@ function alsStart(envelop) {
   return Object.freeze(Object.assign({}, envelop, { correlatie: envelop.id }));
 }
 
-module.exports = { VERSIE, CLASSIFICATIES, maak, huidige, inKeten, alsStart, keurActor };
+module.exports = { VERSIE, GELEZEN, CLASSIFICATIES, ONBEKEND, maak, huidige, inKeten, alsStart, keurActor,
+  keurHoedanigheid, hoedanigheidVan, versieBekend, zetFrameBron, tellers: () => Object.assign({}, tellers) };

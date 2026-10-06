@@ -53,6 +53,7 @@
    al. Er komt hier dus GEEN tweede schaduwmechanisme naast; dit bestand telt,
    dat bestand beslist. */
 'use strict';
+const { naAntwoord } = require('../../lib/antwoord-einde');
 
 /* Ruim boven de 586 kantoorroutes die vandaag bestaan, en klein genoeg om de
    opslag begrensd te houden als iemand paden verzint. */
@@ -100,7 +101,7 @@ function maakMensdeur({ db, save, bewerkCollectie }) {
     const pad = padVan(req);
     if (!pad.startsWith('/api/')) return;   // geen kantoorpad: niet onze meting
     if (!res || typeof res.on !== 'function') return;
-    res.on('finish', () => {
+    naAntwoord(res, () => {
       try {
         if (res.statusCode >= 400) return;
         spoeler.tik(pad, heeftMens);

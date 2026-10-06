@@ -63,6 +63,13 @@ const BREED = [
      bron van de RTFoundation -- dus hij hoort bij dezelfde kamer als
      `/leerstof` en `/leren` een regel verderop. */
   [/\/api\/connect(?:\/|$)|\/apps\/connect\.html/, 'onderzoek', 'Onderzoek & data'],
+  /* Foundation LibraryOS (LIBRARYOS.md) en de Loop Fabric (RTG-LOOP-FABRIC-*.md)
+     kwamen met #502 binnen zonder regel en stonden met 60 punten op de terugval.
+     LibraryOS is een Foundation-domein (werk, editie, rechten, publicatie), dus
+     dezelfde kamer als de regel hieronder; de Loop Fabric leest de eigen werking
+     terug als waarneming en bewijs, en zijn telling hangt al achter de meetpoort
+     van /metrics. Een andere eigenaar is een besluit, geen terugval. */
+  [/\/(?:api\/library|apps\/library\.html)(?:\/|\s|$)|\/api\/loop(?:\/|\s|$)/, 'onderzoek', 'Onderzoek & data'],
   [/foundation|rtf|labfonds|\/lab\b|\/onderzoek|\/onderwijs|\/leerstof|\/leren|\/meet\b|\/metrics|\/voorspel|\/projectie|\/sonde|\/sat\b/, 'onderzoek', 'Onderzoek & data'],
   [/podium|theater|clips|flits|creatief|\/mediaos|\/muziek|\/sport|\/avond|\/uitgaan|\/boeken|\/galerij/, 'creatief', 'Creatief'],
 

@@ -426,6 +426,9 @@ test('de draaier past de lijst ook echt toe, en niet alleen op papier', () => {
   const plan = JSON.parse(uit);
   assert.deepEqual(plan.parallel, ['kappen.test.js'],
     'een gewone toets hoort in de parallelle groep, en alleen die');
+  assert.equal(plan.batchTelling, 1,
+    'de gewone toets hoort in exact een begrensde procesbatch te staan');
+  assert.deepEqual(plan.batchGroottes, [1]);
   assert.deepEqual(plan.geisoleerd.slice().sort(), ['envelop.test.js', 'gezag.test.js'],
     'de twee bronmuterende toetsen horen apart te draaien; staan ze in de parallelle groep, dan is ' +
     'de splits in scripts/test-runner.js weg en is de hele isolatielijst een dode letter');
@@ -469,6 +472,10 @@ test('de registerpoort draait de bronmuterende toetsen apart', () => {
     'dus niets wordt apart gedraaid');
   assert.match(bron, /!GEISOLEERD\.includes\(n\)/,
     'de gewone toetsen worden niet meer van de geisoleerde gescheiden');
+  assert.match(bron, /require\(['"]\.\/lib\/testbatches['"]\)/,
+    'de registerpoort gebruikt de begrensde procesplanner niet; dan kan wachttijd opnieuw testtijd worden');
+  assert.match(bron, /maakBatches\(samen/,
+    'de registerpoort leest de batchplanner wel maar past hem niet op de gezamenlijke toetsen toe');
 
   /* DE TEGENPROEF. Zonder deze zou de toets ook slagen als er geen enkele
      bronmuterende toets in de poort zat -- en dan bewaakt hij niets. */

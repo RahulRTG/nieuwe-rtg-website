@@ -96,7 +96,7 @@ module.exports = (octx, gedeeld) => {
       (status === 'verified' ? 'Uw identiteit is geverifieerd. U kunt nu in een tik boeken.' :
        'We konden uw document niet goedkeuren. Probeer het opnieuw met een duidelijkere foto.') +
       '\n\nRahul Travel Group');
-    notify(user.tier, { icon: status === 'verified' ? 'pas' : 'meldingen',
+    notify('user-' + user.id, { icon: status === 'verified' ? 'pas' : 'meldingen',
       title: status === 'verified' ? 'Identiteit geverifieerd' : 'Verificatie afgewezen',
       body: status === 'verified' ? 'U kunt nu in één tik boeken.' : 'Probeer een duidelijkere foto van uw document.' });
     res.json({ ok: true, status, pending: pendingVerifications(wieKijkt(req)) });

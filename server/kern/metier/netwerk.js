@@ -60,7 +60,7 @@ module.exports = ({ db, save, codenaamVan, keyVanCodenaam, zijnVrienden, liveCod
       if (lijst.length > PER_PROFIEL) lijst.length = PER_PROFIEL;
     }
     save();
-    try { if (notify) notify(doel, 'Iemand schreef een aanbeveling op je Métier-profiel.'); } catch (e) {}
+    try { if (notify) notify(doel, { title: 'Métier', body: 'Iemand schreef een aanbeveling op je Métier-profiel.' }); } catch (e) {}
     return { ok: true, aanbeveling: publiek(eerder || lijst[0], sess) };
   }
 

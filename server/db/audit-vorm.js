@@ -18,13 +18,15 @@ const pak = (naam, lijst, aantal, rest) => naam === 'handelingLog' ? lijst
   : { ...rest, commandJournaal: lijst, commandJournaalTotaal: aantal };
 const kopie = waarde => JSON.parse(JSON.stringify(waarde));
 const gezien = new WeakMap(), bewaakt = new WeakSet();
+const { NIET_VOLGEN } = require('./mutatietracker');
 function alleenLezen(waarde) {
   const dicht = () => { throw new Error('Auditprojectie is alleen leesbaar; gebruik de journaalpoort.'); };
   function wikkel(v) {
     if (!v || typeof v !== 'object') return v;
     if (bewaakt.has(v)) return v;
     if (gezien.has(v)) return gezien.get(v);
-    const p = new Proxy(v, { get: (o, k) => wikkel(Reflect.get(o, k)),
+    // NIET_VOLGEN: de mutatietracker wikkelt deze projectie niet opnieuw in.
+    const p = new Proxy(v, { get: (o, k) => (k === NIET_VOLGEN ? true : wikkel(Reflect.get(o, k))),
       getOwnPropertyDescriptor(o, k) {
         const d = Reflect.getOwnPropertyDescriptor(o, k);
         return d && Object.hasOwn(d, 'value') ? { ...d, value: wikkel(d.value) } : d;

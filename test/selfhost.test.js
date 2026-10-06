@@ -42,7 +42,6 @@ function veiligeBasis(extra) {
   return Object.assign({
     NODE_ENV: 'production', RTG_ENC_KEY: 'e'.repeat(64), RTG_VAULT_KEY: 'v'.repeat(64),
     RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@voorbeeld.test',
-    OFFICE_CODE: 'KANTOOR-CODE-12', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     DATABASE_URL: 'postgresql://rtg:test@postgres/rtg',
     REDIS_URL: 'redis://redis:6379', RTG_PRIVATE_BETA: '1', RTG_BETALEN_UIT: '1',
     RTG_ISOLATIE_AFDWINGEN: '1', RTG_MEDIA_BACKEND: 's3',
@@ -80,6 +79,8 @@ test('selfhost:init maakt alle Docker-geheimen en overschrijft ze niet stil', ()
     'een private bouwversie gebruikt geen fictieve betaalprovider');
   assert.match(envEerst, /RTG_ISOLATIE_AFDWINGEN=1/,
     'ook een productie-beta mag een persoonlijke isolatiestand niet veinzen');
+  assert.doesNotMatch(envEerst, /^OFFICE_(?:CODE|TOTP_SECRET)=/m,
+    'de productie-installatie maakt geen ongebruikte gedeelde kantoorgeheimen');
   assert.match(envEerst, /RTG_MOTOR_TOKEN=[a-f0-9]{64}/);
   assert.match(envEerst, /^RTG_MOTOR_STATE_KEY_FILE=\/run\/secrets\/rtg-motor-state-key$/m);
   assert.match(motorSleutelEerst, /^k-[a-f0-9]{16}:[a-f0-9]{64}\n$/);

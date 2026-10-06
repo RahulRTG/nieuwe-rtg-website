@@ -1,32 +1,32 @@
-# Release candidate V1 — blocker-matrix en afhankelijkheden
+# Release candidate V1 — besluitlog en afhankelijkheden
 
-*Gemeten, niet aangenomen. Stand: main `c82e3f94` (27 september 2026).
-Bronnen: `npm run productie:status`, `npm run golive`, `npm run release:gate`,
-`npm run check`, `npm test` (op `115ceb85`, 14.591 toetsen), plus
-`scripts/lib/productie-oordeel.js`, `server/config/external-release.js`,
-`server/config/release-trust.js`, `deploy/TRUST.md`, `LIVEGANG.md`,
-`PRODUCTION.md` §6–7, `LAUNCH.md`, `TAKEN.md` §1–3.*
+> **Geen actuele statusbron.** Dit document bewaart de besluiten en historische
+> blockeranalyse achter de releasebouw. Aantallen, commits en metingen in de
+> matrix zijn momentopnamen en mogen nooit een release autoriseren. Alleen de
+> commitgebonden uitvoer van `npm run productie:status`, `npm run live:golive`,
+> `npm run release:gate:productie` en de ondertekende kandidaat-/bewijsbestanden
+> in `.release/` vormen de huidige waarheid. Ontbreekt dat bewijs, dan is de
+> status `UNKNOWN`, niet groen.
 
 Dit document bouwt niets. Het zegt per blokkade wat hem sluit, wie dat kan, en
 waar hij op wacht. Groep **A** is technisch en zelfstandig af te bouwen, **E** is
 een externe partij of een echte host, **B** is een besluit van de eigenaar.
 
-## 0. De meting in vier regels
+## 0. Hoe de actuele stand wordt bepaald
 
-- `productie:status` → **BLOCKED**, 10 blokkades (acht ontbrekende CI-/release-
-  bewijzen, het externe dossier, de getekende kandidaat).
-- `golive` → **26 blokkades**; twee daarvan zijn CODE (`PG_ACCOUNTS_ATOMAIR_ONTBREEKT`
-  en een hard `uitgaandGeconfigureerd: false`), de rest is configuratie,
-  providers en papierwerk.
-- `release:gate` → **zakt op eigen kracht** bij "Bron- en securityregels": de poort
-  pakt het afbouwslot en geeft het niet door aan zijn kinderen, dus
-  `scripts/kaart.js` in `check.js` weigert te meten. Dezelfde poort draait in
-  `release-image.yml` via `afbouw:software`; daar is hij nog nooit aangekomen
-  omdat de sleutelcontrole er eerder stopt.
-- `npm test` → 14.591 toetsen, **0 gezakt, 22 overgeslagen** — alle 22 vragen een
-  echte PostgreSQL/Redis. Met `DATABASE_URL` + `REDIS_URL` is dat een
-  omgevingskwestie en geen codefout; een overgeslagen toets telt voor de
-  release als gezakt (`productie-oordeel.js:18-33`).
+- De volledige releaseworkflow draait op één schone commit en Node 26.
+- Een skip telt niet als bewijs; PostgreSQL-, Redis-, browser- en stagingproeven
+  moeten in de daarvoor bestemde omgeving werkelijk lopen.
+- Host-, provider-, juridisch en menselijk bewijs blijft open totdat de echte
+  bron het ondertekend heeft; code vult die feiten nooit in.
+- Volledige `READY` vereist een werkende inkomende én uitgaande geldrail.
+  `READY_ZONDER_RAIL` is de afzonderlijke, fail-closed beperkte release en mag
+  niet als volledige betaalgereedheid worden gepresenteerd.
+
+De matrix hieronder verklaart waar de poorten vandaan kwamen. Regels die
+inmiddels als **gebouwd** zijn vastgelegd zijn regressiegeschiedenis, geen nog
+openstaand werk. Vraag voor de huidige lijst altijd de genoemde commando's en
+bewijsbestanden op.
 
 ## 1. De matrix
 
@@ -109,7 +109,7 @@ Kolommen: **code** / **extern** / **besluit** = JA/NEE; *bewijs* = wat
 | B27 | **De maximale overlap van een SSO-clientgeheim gaat naar 7 dagen**, en de uitrol levert vooraf een lijst organisaties waarvan het geheim ouder is dan 90 dagen, zodat die eerst roteren | **gebouwd**: `GRENS.maxOverlap` = 7 in `server/sso/clientgeheim.js`, meer geeft 400 `OVERLAP_ONGELDIG` met de reden (niet afgekapt); de lijst is `npm run ssogeheim:ouderdom -- --op <uitroldatum>` (alleen-lezen, toont nooit het geheim, exitcode 0). Toetsen: `test/sso-clientgeheim-b22.test.js`, `test/ssogeheim-ouderdom.test.js`. Deur `identity.sso_client_secret` |
 | B28 | **Gezinnen zonder lopende sessie blijven zoals ze zijn**: geen terugweg naar de oude gezinsdeur en geen herinnering; ze komen binnen via de gezinscode van 128 bits (B18) | **besloten, niets gebouwd** (besluit van de eigenaar, 4 oktober 2026) |
 | B29 | **`OFFICE_CODE` en `OFFICE_TOTP_SECRET` zijn geen productie-eis meer**: het kantoor gaat in productie op naam met een passkey (B10, B23, B24); staan ze toch gezet, dan start de server en meldt hij dat een keer in het log | **gebouwd**: `server/config/productie-identiteit.js`, `server/opzet/startcontrole.js`, `scripts/golive.js`; toetsen `test/kantoordeur-productie.test.js`, `test/productie.test.js` (mutatie: gezakt) |
-| B30 | **Een stroomticket voor gezin en les**: de gezinsstroom (`GS.`) en de lesstroom (`LESST.`) delen een module voor eenmalig claimen, binding, hercontrole, plafond en verloop; de twee voorvoegsels blijven, zodat een ticket van de een nooit de ander opent | **gebouwd**: `server/kern/stroomticket.js`; toetsen `test/stroomticket.test.js` (mutatie: gezakt), `test/gezinsdeur.pg.test.js` en `test/foundation-lesstroom.pg.test.js` tegen echte PostgreSQL en Redis groen |
+| B30 | **Een stroomticket voor gezin en les**: de gezinsstroom (`GS.`) en de lesstroom (`LESST.`) delen een module voor eenmalig claimen, binding, hercontrole, plafond en verloop; de twee voorvoegsels blijven, zodat een ticket van de een nooit de ander opent | **gebouwd**: `server/kern/stroomticket.js`; toetsen `test/stroomticket.test.js` (mutatie: gezakt), `test/gezinsuitnodiging.pg.test.js` en `test/foundation-lescredential.pg.test.js` tegen echte PostgreSQL en Redis groen |
 
 **Nieuw gemeten sinds de matrix:** de codecredentialpoort telt geen 9 maar
 **483** blokkades: de 9 open types, **399** routes die op een toegangscode

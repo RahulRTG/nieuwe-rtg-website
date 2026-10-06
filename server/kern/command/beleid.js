@@ -40,7 +40,7 @@ const START = [
   { id: 'zaak.termijnUren', wat: 'Binnen hoeveel uur een uitzondering een eigenaar en besluit hoort te hebben', waarde: 48, eenheid: 'uur', vierOgen: false }
 ];
 
-function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
+function maakBeleid({ db, save, crypto, journaal, vak, start, opslag, zwaar }) {
   const V = typeof vak === 'function' ? vak : (() => opslag.vak());
   const REGELS = Array.isArray(start) ? start : START;
   /* De opslagvorm van het register staat in ./beleidregister.js. Kern daarvan:
@@ -72,13 +72,16 @@ function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
      hij meteen live. In beide gevallen komt er een journaalregel met de oude en
      de nieuwe waarde erin -- dat is wat "iedere handeling met oude en nieuwe
      toestand" betekent. */
-  function zet(id, nieuweWaarde, door, reden, bereik) {
+  function zet(id, nieuweWaarde, door, reden, bereik, spoed) {
     const b = reg()[String(id)];
     if (!b) return { error: 'Die regel bestaat niet: ' + id, status: 404 };
     if (!door) return { error: 'Zonder herleidbare actor wordt er geen regel gezet.', status: 403 };
     if (!reden || String(reden).trim().length < 4) return { error: 'Een beleidswijziging vraagt een reden.', status: 400 };
     const oud = huidige(b);
-    if (b.vierOgen) {
+    // spoed slaat het tweede paar ogen over, maar alleen met het zware recht
+    const f = b.vierOgen && spoed ? (zwaar ? zwaar(door, 'beleid-spoed') : { status: 403, error: 'Spoed bestaat hier niet.' }) : null;
+    if (f) return f;
+    if (b.vierOgen && !spoed) {
       const v = { id: crypto.randomUUID(), regel: b.id, wat: b.wat, van: oud.waarde, naar: nieuweWaarde,
         bereik: bereik || b.bereik || 'globaal', door: String(door), reden: String(reden), at: nu(), status: 'wacht' };
       voorstellen().push(v);
@@ -91,7 +94,7 @@ function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
     b.versies.push(versie);
     if (bereik) b.bereik = String(bereik);
     if (save) save();
-    journaal.noteer({ actor: door, actie: 'beleid zetten', objectType: 'beleid', objectId: b.id,
+    journaal.noteer({ actor: door, actie: spoed ? 'beleid zetten met spoed' : 'beleid zetten', objectType: 'beleid', objectId: b.id,
       niveau: NIVEAUS.hand, reden, beleid: b.id, voor: { waarde: oud.waarde, versie: oud.v }, na: { waarde: nieuweWaarde, versie: versie.v } });
     return { regel: b.id, waarde: nieuweWaarde, versie: versie.v };
   }

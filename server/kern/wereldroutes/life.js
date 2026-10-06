@@ -42,6 +42,7 @@ module.exports = [
   '/apps/krant.html',
   '/apps/labfonds.html',
   '/apps/leven.html',
+  '/apps/library.html',
   '/apps/life.html',
   '/apps/lifestyle.html',
   '/apps/living-os.html',

@@ -134,8 +134,8 @@ module.exports = function maakDiensten(deps) {
   const {
     broadcastSync, eigenaarAccount, initRealtime, notify, sendPush, sendPushToUser
   } = require('./meldingen')(Object.assign({}, deps, {
-    DEMO, GIDS_SEED_TIERS, PERSONAS, accounts, bus, crypto, db, eigenaar, 
-    ensureSupplierDefaults, save, sessions, tokenHash, webpush
+    DEMO, GIDS_SEED_TIERS, PERSONAS, accounts, bus, crypto, db, eigenaar,
+    ensureSupplierDefaults, save, sessions, tokenHash, webpush, nextSseId
   }));
   /* De diensten en de twee poortwachters staan in ./diensten2.js. De naad is
      nagemeten: achttien namen erdoor, vijftien terug, nul draden -- zie de kop

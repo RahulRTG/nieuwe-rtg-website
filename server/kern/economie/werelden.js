@@ -54,9 +54,9 @@ const WERELDEN = [
   { id: 'commercieel', naam: 'Commercial Economy', dragers: ['zaak'],
     factureerbaar: true,
     grond: 'Een onderneming heeft een leverancierscontract. Verbruik dat daarbuiten valt is doorbelastbaar.' },
-  { id: 'rtg-intern', naam: 'RTG Internal Economy', dragers: ['huis'],
+  { id: 'rtg-intern', naam: 'RTG Internal Economy', dragers: ['huis', 'dienst'],
     factureerbaar: false,
-    grond: 'RTG zelf. Verbruik zonder eigenaar hoort hier, en deze wereld draagt de nota\'s van de infrastructuur.' },
+    grond: 'RTG zelf. Verbruik zonder eigenaar hoort hier, en deze wereld draagt de nota\'s van de infrastructuur. Een achtergronddienst (dienst:<naam>) ook: dat is RTG die voor zichzelf werkt, apart geteld per dienst en nooit aan een gebruiker toegewezen.' },
   { id: 'rtfoundation', naam: 'RTFoundation Economy', dragers: ['gezin', 'lab'],
     factureerbaar: false,
     grond: 'De stichting is een eigen rechtspersoon met een eigen vermogen (kern/rtfos/geld.js). Een gezin krijgt nooit een rekening; de stichting betaalt uit haar eigen begroting. Een lab van het Living Lab hoort hier om dezelfde reden: het is een entiteit van de stichting en niet een gebruiker van RTG.' }

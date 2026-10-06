@@ -183,7 +183,9 @@ function activiteitPoort(p, publiceer) {
    na; daarna verschijnt een vreemde pending mutatie die NIET van het spoor is. */
 function orderAfhandeling(t) {
   const p = proef(t), routes = new Map(), signalen = [];
-  p.db.data.orders = [{ ref: 'BON', supplierCode: 'AAA', customerTier: 'lid', status: 'nieuw', pickup: '42' }];
+  // Een echte order draagt altijd customerKey (= session.key, zie kern/lidacties/bestellen.js);
+  // de afhandeling notificeert sinds de meldingenisolatie (blocker 2) op die sleutel.
+  p.db.data.orders = [{ ref: 'BON', supplierCode: 'AAA', customerTier: 'lid', customerKey: 'lid', status: 'nieuw', pickup: '42' }];
   p.db.data.supplierActivity = {}; p.db.data.notifications = {}; p.save();
   let scans = 0, antwoord;
   Object.defineProperty(p.db.data.ander, 'toJSON', { value() { scans++; return { waarde: this.waarde }; } });
@@ -680,7 +682,9 @@ function aanvraagMetMelding(t, soort, oudeMelding = false) {
   }, save);
   const ctx = { db: p.db, save, crypto: require('node:crypto'),
     schoon: (v, n) => String(v ?? '').slice(0, n), PERSONAS: { rtg: { codename: 'Anna' } },
-    findSupplier: code => code === zaak.code ? zaak : null, ledenPrijs: (_publiek, prijs) => prijs,
+    // Via de levende werkkopie, zoals supplierIndex in productie: een ruwe
+    // fixtureverwijzing zou de mutatietracker van #447 omzeilen.
+    findSupplier: code => code === zaak.code ? p.db.data.suppliers.find(s => s.code === code) : null, ledenPrijs: (_publiek, prijs) => prijs,
     optieAan: (_s, naam) => naam !== 'betaalVooraf', leeftijdVan: () => 35, geborenVan: () => '1991-01-01',
     idGeverifieerd: () => true, pickupCode: () => '42', zorgVoor: () => null, zorgMee: () => null,
     liveCodename: () => 'Anna', haversine: () => null, openLijnVoor() {},
@@ -747,7 +751,10 @@ test('betaalde order laat keuken en melding elk uitsluitend hun eigen collectie 
   assert.equal((await betaal(p.actor, { ref: order.ref })).ok, true);
   assert.equal(p.lees('orders')[0].paid, true);
   assert.deepEqual(p.lees('suppliers')[0].recepten, {}, 'echte keuken initialiseert zonder geboekte voorraadregel of eigen save');
-  assert.equal(p.breed(), 1); assert.equal(p.scans(), 2, 'fixture en betaaldomein; keuken en melding blijven gericht');
+  // Gerichte saves (#446) bovenop de mutatietracker (#447): keuken en melding
+  // bewaren alleen hun eigen collectie, en de ene brede save leest alleen wat
+  // de tracker als geraakt aanwees -- 'ander' dus alleen bij de fixture.
+  assert.equal(p.breed(), 1); assert.equal(p.scans(), 1, 'alleen de fixture leest de vreemde collectie; keuken en melding blijven gericht');
   assert.equal(p.lees('ander').waarde, 1, 'een vreemde pending mutatie lift niet mee met keuken of melding');
   assert.deepEqual(p.signalen, ['notify', 'supplier', 'office']);
   assert.equal((await betaal(p.actor, { ref: order.ref })).status, 409);

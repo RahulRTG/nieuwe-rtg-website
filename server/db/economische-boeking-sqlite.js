@@ -6,6 +6,7 @@
 const { SLEUTEL, vind: heeftRegel, vindBeweging, bewegingGelijk, saldoSamen,
   boekingenSamen } = require('./economische-identiteit');
 const publiceerCollectie = require('./collectie-publicatie');
+const { melder } = require('./botsing'); // C6: een botsing op het geldpad is hoorbaar
 
 module.exports = ({ db, verbinding, statements, merge3, uitStore, naarStore,
   laatsteJson, toegepast, voorcheck }) => {
@@ -29,7 +30,7 @@ module.exports = ({ db, verbinding, statements, merge3, uitStore, naarStore,
     const hunJson = uitStore(rij.val), hun = JSON.parse(hunJson);
     if (!laatsteJson.has(k)) return hun;
     const basisJson = laatsteJson.get(k);
-    return JSON.stringify(lokaal) === basisJson ? hun : merge3(JSON.parse(basisJson), lokaal, hun);
+    return JSON.stringify(lokaal) === basisJson ? hun : merge3(JSON.parse(basisJson), lokaal, hun, melder(k));
   }
 
   return function boekEenmaal(invoer, werk) {
@@ -54,7 +55,13 @@ module.exports = ({ db, verbinding, statements, merge3, uitStore, naarStore,
         return { status: 409, error: 'Deze economische sleutel hoort al bij een andere boeking.' };
       }
       for (const k of collecties) {
-        const rij = s.lees.get(k) || null;
+        const gevonden = s.lees.get(k) || null;
+        if (gevonden && gevonden.deleted) {
+          kv.exec('ROLLBACK');
+          return { status: 503, code: 'ECONOMISCHE_COLLECTIE_VERWIJDERD',
+            error: 'Een economische projectie is verwijderd; reconciliatie is vereist.' };
+        }
+        const rij = gevonden && !gevonden.deleted ? gevonden : null;
         const liveKopie = kopie(db.data[k] == null ? {} : db.data[k]);
         rijen.set(k, rij); begin.set(k, liveKopie);
         concept[k] = verenig(k, liveKopie, rij);

@@ -35,7 +35,9 @@ module.exports = (kern) => {
      bron wordt bij de vraag opgezocht en niet bij het ophangen. */
   const rtfInStad = (key, stad) => !!(kern.rtfos && kern.rtfos.vrijwilligerportaal.account.inStad(key, stad));
   const bronToets = require('../kern/leerhuis/bron').maakBronToets({ accounts, employmentVanPersoon, entiteitVind, rtfInStad });
-  const leerhuis = maakLeerhuis({ db, save, bijeen, inBundel, bronToets });
+  const educationReleaseToets=(releaseRef,academyOrganization,academyContext)=>kern.library.education.resolve({
+    releaseRef,academyOrganization,academyContext});
+  const leerhuis = maakLeerhuis({ db, save, bijeen, inBundel, bronToets, educationReleaseToets });
   /* Alleen de schaduwtellers van B1 LEZEN; de meelezer hangt in opzet/kantoordeur.js. */
   const schaduw = require('../kern/leerhuis/schaduw').maakLeerhuisSchaduw({ db, save });
   /* Dezelfde fabriek als kern.volwassen: de kern wordt niet breder (kernBreedte). */

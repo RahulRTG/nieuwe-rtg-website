@@ -115,8 +115,19 @@ module.exports = ({ db, bewerkCollectie, crypto,
       const rotatie = hoogsteRotatie(b);
       if (!Number.isSafeInteger(Number(verwachteRotatie)) || Number(verwachteRotatie) !== rotatie)
         return { status: 409, error: 'De boarding pass is intussen gewijzigd. Vernieuw Mijn vluchten.' };
+      /* Roteren en niet vernieuwen: de pas geldt tot het einde van de reisdag,
+         en een verse code voor een verloren pas krijgt die dag en niet meer.
+         Ook het gebruik telt door (kern/bearercode-keten.js). Alleen een
+         gemigreerde boeking zonder actuele toegang krijgt een eerste uitgifte. */
+      let gemaakt;
+      try {
+        gemaakt = b.toegang ? t.bearer.roteer(b.toegang, { actor: t.lidHash(key), prefix: 'BP', afgeleid: 'geen' })
+          : t.maakToegang(b, v, 1);
+      } catch (e) {
+        if (e && e.code === 'geldigheid-ongeldig') return { status: 409, error: 'De reisdag is voorbij.' };
+        throw e;
+      }
       bewaarOudeToegang(b, t.lidHash(key), 'boarding pass geroteerd');
-      const gemaakt = t.maakToegang(b, v, rotatie + 1);
       b.toegang = gemaakt.toegang;
       return { status: 200, ok: true, eenmalig: true,
         pass: Object.assign({ code: gemaakt.code, eenmalig: true }, passPubliek(b, v),

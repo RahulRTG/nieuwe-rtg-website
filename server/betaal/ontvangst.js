@@ -3,7 +3,8 @@
    kern/betaalwaarheid. */
 'use strict';
 
-module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, get, set, env, uit, simulatie }) {
+module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, get, set, env, uit, simulatie,
+  markProviderEvidence }) {
   const stripeGehost = stripe && require('./stripe-gehost')(stripe);
   /* De simulatiebank (./synthetisch.js) is de vierde rail en gedraagt zich als
      de andere drie: hij is er of hij is er niet, en als hij er niet is zegt hij
@@ -116,6 +117,9 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
       e.code = 'BETAALRAIL_UIT';
       throw e;
     }
+    if (['stripe', 'mollie', 'adyen'].includes(rail) && typeof markProviderEvidence === 'function')
+      markProviderEvidence(res, rail, ['api', 'create', rail, res.id, res.status].join(':'),
+        rail + '-authenticated-api');
     set(sleutel, res);
     return res;
   }
@@ -123,7 +127,7 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
   /* Opzoeken en terugbetalen wonen in ./naslag.js -- dit bestand gaat over een
      betaling STARTEN. Zie de kop daar voor waarom die snede daar ligt. */
   const { haalBetaling, maakTerugbetaling } = require('./naslag')({
-    crypto, stripe, mollie, adyen, stripeGehost, weigerUit, mollieBedrag });
+    crypto, stripe, mollie, adyen, stripeGehost, weigerUit, mollieBedrag, markProviderEvidence });
 
   return { mogelijkheden, kiesAanbieder, maakBetaling, haalBetaling, maakTerugbetaling };
 };

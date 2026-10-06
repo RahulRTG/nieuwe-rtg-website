@@ -13,15 +13,14 @@
 
    Maar een massamutatie ziet er hier bijna altijd hetzelfde uit: `db.data.X`
    krijgt een filter, een slice of een lege lijst toegewezen. De telling per vorm
-   staat in README.md ("De begroting"), en die is de enige -- hij stond hier ook
-   als tabel en dat zijn twee plekken voor een waarheid (LAT.md regel 4).
+   staat in README.md ("De begroting"), en die is de enige: een tweede tabel hier
+   zou twee plekken voor een waarheid zijn (LAT.md regel 4).
 
-   De set-val kent oude en nieuwe lengte vóór de toekenning. Een ontbrekende
-   collectie aanmaken is geen massaverwijdering; alleen vervanging van een
-   bestaande array valt hieronder.
+   De set-val kent oude en nieuwe lengte vóór de toekenning; alleen vervanging
+   van een bestaande array valt hieronder, een nieuwe collectie niet.
 
    WAT DAT NIET IS: dekking. Deze laag dekt de VORM van een massaverwijdering,
-   niet elke plek waar dit huis rijen kwijtraakt.
+   niet elke plek waar rijen verdwijnen.
 
    WAT ER NIET ONDER VALT, en dat hoort er hard bij: de drie splice-plekken, elke
    wijziging BINNEN een rij, en alles wat via push groeit. Groei is bewust geen
@@ -154,7 +153,7 @@ function bewaak(data, deps) {
   const grens = (deps && Number.isFinite(deps.grens)) ? deps.grens : KRIMPGRENS;
   levensteken(meld, modus, grens);
 
-  const vorm = { nu, modus, grens, doel: data };
+  const vorm = { nu, modus, grens, doel: data, log: deps && deps.log };
   inventaris.registreer(data, data);
 
   const wikkel = new Proxy(data, {
@@ -200,4 +199,4 @@ function stand() {
     laatste: teller.laatste.slice(0, 10) };
 }
 
-module.exports = { bewaak, beoordeel, toetsOpslag, collectieSleutels, rijSleutels, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };
+module.exports = { bewaak, instelling: v => instellingen.get(v), beoordeel, toetsOpslag, collectieSleutels, rijSleutels, stand, BegrotingOverschreden, KRIMPGRENS, STANDAARDGRENS, MODUS };

@@ -35,13 +35,13 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-cmdbestuur-'));
 const CODE = 'KANTOOR-CMDBESTUUR-1';
 let srv, base, office;
 
-const api = (pad, body) => fetch(base + '/api/command/' + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + office },
+const api = (pad, body, token) => fetch(base + '/api/command/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token || office) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
-async function moet(pad, body, wat) {
-  const r = await api(pad, body);
+async function moet(pad, body, wat, token) {
+  const r = await api(pad, body, token);
   assert.equal(r.status, 200, wat + ' -- ' + (r.body.error || r.status));
   return r.body;
 }
@@ -161,40 +161,55 @@ test('8. de rechtengraaf: geven, breken en intrekken zijn alle drie zichtbaar', 
     'de rusttoestand is: geen enkel zwaar recht open');
   const soort = graaf.soorten[0].id;
 
+  /* Een zwaar recht is persoonlijk: de gedeelde kantoorcode geeft er geen en
+     opent de nooddeur niet (KANTOOR.md: een spoor dat eindigt bij een gedeelde
+     code is een alibi). Wat volgt doet de eigenaar op zijn eigen account. */
+  const gedeeldGeef = await api('recht/geef', { recht: soort, aan: 'een collega', minuten: 15,
+    reden: 'de gedeelde code probeert het' });
+  assert.equal(gedeeldGeef.status, 403, 'de gedeelde code gaf een zwaar recht weg');
+  const gedeeldNood = await api('recht/nood', { recht: soort,
+    reden: 'De gedeelde code probeert het glas te breken, en dat mag niet.' });
+  assert.equal(gedeeldNood.status, 403, 'de gedeelde code opende de nooddeur');
+  const eig = await (await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' }) })).json();
+  const naam = eig.token;
+  assert.ok(naam, 'de eigenaar logt in op zijn eigen account');
+
   const gegeven = await moet('recht/geef', { recht: soort, aan: 'een collega', minuten: 15,
-    reden: 'de routetoets geeft het tijdelijk weg' }, 'een recht tijdelijk geven');
+    reden: 'de routetoets geeft het tijdelijk weg' }, 'een recht tijdelijk geven', naam);
   const gid = gegeven.id || (gegeven.recht && gegeven.recht.id);
   assert.ok(gid, 'het gegeven recht heeft een id: ' + JSON.stringify(gegeven).slice(0, 200));
   const metRecht = await moet('rechten', {}, 'de graaf met een open recht');
   assert.ok(metRecht.actief.some(a => a.id === gid), 'het staat in de graaf, van wie en waarom');
-  await moet('recht/introk', { id: gid, reden: 'de routetoets ruimt het meteen op' }, 'intrekken');
+  await moet('recht/introk', { id: gid, reden: 'de routetoets ruimt het meteen op' }, 'intrekken', naam);
 
-  const kaal = await api('recht/nood', { recht: soort, reden: 'kort' });
+  const kaal = await api('recht/nood', { recht: soort, reden: 'kort' }, naam);
   assert.notEqual(kaal.status, 200, 'de nooddeur eist een volledige reden');
 
   const nood = await moet('recht/nood', { recht: soort,
     reden: 'De routetoets breekt het glas om te bewijzen dat dit in het journaal komt.' },
-  'het glas breken');
+  'het glas breken', naam);
   const id = nood.id || (nood.recht && nood.recht.id) || nood.toekenning;
   assert.ok(id, 'de nooddeur geeft een id terug: ' + JSON.stringify(nood).slice(0, 200));
 
   const open = await moet('rechten', {}, 'de graaf na de nooddeur');
   assert.ok(open.nood >= 1, 'de graaf telt de nooddeur apart');
 
-  await moet('recht/introk', { id, reden: 'de routetoets ruimt op' }, 'intrekken');
+  await moet('recht/introk', { id, reden: 'de routetoets ruimt op' }, 'intrekken', naam);
   const dicht = await moet('rechten', {}, 'de graaf na intrekken');
   assert.equal(dicht.actief.filter(a => a.id === id).length, 0, 'het ingetrokken recht is weg');
 });
 
-test('9. een mandaat zonder einddatum is geen mandaat', async () => {
-  const zonder = await api('mandaat', { van: 'a', aan: 'b', terrein: 'command', reden: 'de routetoets' });
-  assert.equal(zonder.status, 400, 'zonder tot-datum wordt het geweigerd');
-  assert.match(String(zonder.body.error || ''), /einddatum|overdracht/i, zonder.body.error);
-
+/* Het command-mandaat is opgeheven (4 oktober 2026, besluit van de eigenaar):
+   het legde een machtiging vast die niemand las, met een `tot` die als tekst
+   werd vergeleken. Mens-namens-mens loopt via kern/vertegenwoordiging, de AI
+   via kern/stuur/mandaat.js. Deze toets houdt vast dat de deur dicht blijft. */
+test('9. het command-mandaat bestaat niet meer', async () => {
   const tot = new Date(Date.now() + 3600 * 1000).toISOString();
-  const met = await moet('mandaat', { van: 'a', aan: 'b', terrein: 'command', tot,
-    reden: 'de routetoets legt een tijdelijk mandaat neer' }, 'een mandaat met einddatum');
-  assert.ok(met && typeof met === 'object', 'het mandaat komt terug');
+  const r = await api('mandaat', { van: 'a', aan: 'b', terrein: 'command', tot, reden: 'de routetoets' });
+  assert.equal(r.status, 404, 'de opgeheven mandaatroute antwoordt weer');
+  const graaf = await moet('rechten', {}, 'de graaf');
+  assert.equal(graaf.mandaten, undefined, 'de graaf draagt weer mandaten');
 });
 
 test('10. het agent-toezicht: stoppen, grenzen zetten en hervatten', async () => {

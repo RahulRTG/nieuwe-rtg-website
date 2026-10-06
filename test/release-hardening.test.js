@@ -170,9 +170,12 @@ test('rollback herstelt app, motor, sentinel, backup en de vorige bewijs-pin', (
 
 test('de imageworkflow publiceert alleen een getekende kandidaat en geen officiële release', () => {
   const bron = lees('.github/workflows/release-image.yml');
+  assert.match(bron, /permissions:[\s\S]*?actions:\s*read[\s\S]*?packages:\s*write/,
+    'commitgebonden workflowbewijs mist leesrecht op de Actions-autoriteit');
   assert.match(bron, /actions\/checkout@[^\n]*\n\s+with:[\s\S]*?fetch-depth: 0\n\s+persist-credentials: false/,
     'historische releaseproeven vereisen de volledige Git-geschiedenis');
   const afbouw = bron.indexOf('npm run afbouw:software');
+  const vooraf = bron.indexOf('node scripts/release-workflow-bewijs.js');
   const gereedschap = bron.indexOf('sudo apt-get install -y -qq libxml2-utils redis-server');
   assert.ok(gereedschap >= 0 && gereedschap < afbouw,
     'de volledige suite vereist xmllint en een eigen redis-server executable, ook naast de servicecontainer');
@@ -184,6 +187,11 @@ test('de imageworkflow publiceert alleen een getekende kandidaat en geen offici�
   const kandidaat = bron.indexOf('docker push "$RTG_CANDIDATE_IMAGE"');
   const teken = bron.indexOf('imageherkomst.js --binden');
   const controle = bron.indexOf('imageherkomst.js --controle');
+  assert.ok(vooraf >= 0 && vooraf < afbouw && vooraf < kandidaat,
+    'voorafgaande workflowbewijzen worden niet vóór afbouw en publicatie geweigerd');
+  assert.match(bron.slice(Math.max(0, vooraf - 350), vooraf + 100),
+    /GITHUB_TOKEN:\s*\$\{\{ github\.token \}\}[\s\S]*RTG_RELEASE_EXPECTED_COMMIT:\s*\$\{\{ github\.sha \}\}/,
+    'de workflowpoort is niet aan GitHub-authoriteit en exact de kandidaatcommit gebonden');
   assert.ok(afbouw >= 0 && afbouw < kandidaat, 'de volledige software-afbouw staat niet vóór het kandidaatimage');
   assert.ok(bootstrap >= 0 && bootstrap < afbouw,
     'de drie signingrollen worden niet vóór de bouw gecontroleerd');
@@ -194,7 +202,8 @@ test('de imageworkflow publiceert alleen een getekende kandidaat en geen offici�
   const bewaar = bron.slice(bron.indexOf('- name: Softwarebewijs bewaren'), bron.indexOf('- name: Bevries CI-uitvoering'));
   assert.match(bewaar, /if: always\(\)/, 'mislukte ronden moeten hun bewijs behouden');
   for (const pad of ['SUITE.json', '.release/pg-bewijs.json', '.release/schermsuite-bewijs.json',
-    '.release/release-gate-bewijs.json', '.release/staging-bewijs.json', '.release/afbouwoordeel.json'])
+    '.release/release-gate-bewijs.json', '.release/staging-bewijs.json', '.release/afbouwoordeel.json',
+    '.release/prerelease-workflows.json'])
     assert.ok(bewaar.includes(pad), 'ontbrekend overdraagbaar softwarebewijs: ' + pad);
   assert.doesNotMatch(bewaar, /\.release\/\*|path: \.release\s*$/, 'geen ongefilterde secretmap uploaden');
   assert.ok(sleutel > afbouw && sleutel < kandidaat,
@@ -211,8 +220,26 @@ test('de imageworkflow publiceert alleen een getekende kandidaat en geen offici�
     'de oude waarschuwingsuitweg voor ongetekende releases bestaat nog');
   assert.match(bron, /ci-suite\.json[\s\S]*ci-schermsuite-bewijs\.json[\s\S]*ci-pg-bewijs\.json/,
     'CI-uitvoering wordt niet als vaste provenance-invoer bewaard');
-  assert.match(lees('scripts/imageherkomst.js'), /uitvoeringHashes[\s\S]*CI-uitvoeringsbewijs/,
+  assert.match(bron, /name:\s*herkomst[\s\S]*\.release\/prerelease-workflows\.json[\s\S]*include-hidden-files:\s*true/,
+    'het commitgebonden prereleasedossier verlaat de build niet met de herkomst');
+  const herkomst = lees('scripts/imageherkomst.js');
+  assert.match(herkomst, /vooraf:\s*'\.release\/prerelease-workflows\.json'/,
+    'BUILD bindt het voorafgaande workflowbewijs niet');
+  assert.match(herkomst, /uitvoeringHashes[\s\S]*CI-uitvoeringsbewijs/,
     'signed provenance bindt unit-, scherm- en PG-bewijs niet');
+});
+
+test('CodeQL levert een exact commitgebonden nul-resultatenartifact aan de releasepoort', () => {
+  const workflow = lees('.github/workflows/codeql.yml');
+  const prerelease = lees('scripts/release-workflow-bewijs.js');
+  assert.match(workflow, /github\/codeql-action\/analyze@[a-f0-9]{40}[\s\S]*output:\s*codeql-results/,
+    'de CodeQL-run bewaart zijn eigen SARIF niet voor beoordeling');
+  assert.match(workflow, /node scripts\/codeql-verdict\.js --dir=codeql-results/,
+    'workflow-success wordt niet van nul echte SARIF-resultaten onderscheiden');
+  assert.match(workflow, /name:\s*codeql-verdict[\s\S]*\.release\/codeql-verdict\.json/,
+    'het commitgebonden CodeQL-verdict wordt niet als bewijsartifact bewaard');
+  assert.match(prerelease, /workflow:'codeql\.yml'[\s\S]*artifacts:Object\.freeze\(\['codeql-verdict'\]\)/,
+    'release-image accepteert nog een CodeQL-run zonder nul-resultatenartifact');
 });
 
 test('live deploy vereist een aparte handmatig ondertekende productiepromotie', () => {

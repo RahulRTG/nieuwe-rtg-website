@@ -27,8 +27,8 @@
    account zijn ECHTE huiskosten; ze op een willekeurig lid boeken zou een
    factuur opleveren voor iets dat dat lid niet heeft gedaan.
 
-   Geen require's in dit bestand, met opzet: server/ai.js hangt eraan en die
-   moet kunnen laden zonder dat de kern bestaat. */
+   Geen require's bovenin dit bestand, met opzet: server/ai.js hangt eraan en
+   die moet kunnen laden zonder dat de kern bestaat. */
 'use strict';
 
 const { AsyncLocalStorage } = require('async_hooks');
@@ -58,7 +58,14 @@ const HUIS = 'huis';
    onderzoek van een andere rechtspersoon, en dat is precies wat ECONOMIE.md
    verbiedt -- niet omdat het geld op is, maar omdat een stichting die haar eigen
    kosten niet kent, ze ook niet kan verantwoorden. */
-const SOORTEN_DRAGER = ['lid', 'zaak', 'gezin', 'lab', 'huis'];
+/* DE ZESDE SINDS 5 OKTOBER 2026: `dienst` (besluit B4b). Een achtergronddienst
+   (kern/dienstidentiteit.js) is geen gebruiker, maar zijn verbruik is ook geen
+   verbruik ZONDER eigenaar: het is van een benoemde dienst van RTG zelf. Hij
+   boekt op `dienst:<naam>`, apart per dienst, in de wereld van het huis
+   (kern/economie/werelden.js) en met de stand van het huis
+   (./beleidkaart.js). Zonder deze soort viel elke nachtronde op `huis`, en dan
+   is "wat kost de bewaarveger" niet te beantwoorden. */
+const SOORTEN_DRAGER = ['lid', 'zaak', 'gezin', 'lab', 'dienst', 'huis'];
 
 function drager(soort, id) {
   const s = String(soort || '').trim();
@@ -78,8 +85,16 @@ function ontleed(d) {
   return SOORTEN_DRAGER.includes(s) && s !== 'huis' ? { soort: s, id: t.slice(k + 1) } : { soort: 'huis', id: HUIS };
 }
 
-/* Draai fn met deze drager als eigenaar van alles wat erin gebeurt. */
-function binnen(d, fn, pas) { return context.run({ drager: d || HUIS, pas: pas || null }, fn); }
+/* Draai fn met deze drager als eigenaar van alles wat erin gebeurt. `herkomst`
+   zegt waar de poort hem vandaan haalde ('sessie' of 'lichaam'); de waarnemer
+   (opzet/verzoekframe.js, late binding zoals de meter) schrijft hem in het
+   verzoekframe. Een waarnemer die gooit, raakt het verzoek niet. */
+let waarnemer = null;
+function zetWaarnemer(fn) { waarnemer = typeof fn === 'function' ? fn : null; }
+function binnen(d, fn, pas, herkomst) {
+  if (waarnemer) { try { waarnemer(d || HUIS, herkomst || null); } catch (e) {} }
+  return context.run({ drager: d || HUIS, pas: pas || null }, fn);
+}
 function wieNu() { const s = context.getStore(); return (s && s.drager) || HUIS; }
 
 /* De late binding. Eén meter, en de tweede aanroep vervangt de eerste in plaats
@@ -95,6 +110,11 @@ function meld(soortId, aantal, opties) {
   if (!sink) return false;
   const o = opties || {};
   const s = context.getStore();
+  /* NA AFLOOP VAN HET VERZOEK (I5) blijft de drager staan -- werk dat dit
+     verzoek in gang zette, is zijn kost -- maar het wordt geteld in plaats van
+     stil geboekt. Lui geladen: de kop van dit bestand belooft dat ai.js het
+     zonder kern kan laden. */
+  try { const h = require('../../opzet/handeling'); if (h.afgelopen()) h.naAfloopMeld('kosten', soortId); } catch (e) {}
   try { return !!sink({ drager: o.drager || wieNu(), soort: soortId, aantal,
     pas: o.pas || (s && s.pas) || null, bron: o.bron || null }); }
   catch (e) { return false; }
@@ -119,5 +139,5 @@ function magUitgeven(d) {
   catch (e) { return { ok: true }; }
 }
 
-module.exports = { binnen, wieNu, drager, ontleed, zetMeter, meterStaat, meld,
+module.exports = { binnen, zetWaarnemer, wieNu, drager, ontleed, zetMeter, meterStaat, meld,
   zetGrenswacht, magUitgeven, HUIS, SOORTEN_DRAGER };

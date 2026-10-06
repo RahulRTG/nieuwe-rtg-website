@@ -568,11 +568,40 @@ function draaiToets(bestand, env, wacht, forceer, logPrefix) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  // Deze proeven laden clientgedrag; een gewijzigde serverrespons raakt hun
+  // beweringen niet (uit #446).
+  // Deze browserproeven beoordelen de keuring, landing en CSP, niet API-inhoud.
+  ['a11y-hermeet.e2e.js', ['scripts/a11y-hermeet.js']],
+  ['csp.e2e.js', ['server/middleware/voordeur.js']],
+  // Deze browserproeven laden clientgedrag of toetsen een keuringsmodule;
+  // een gewijzigde serverrespons raakt hun beweringen niet.
+  ['deelmenuwacht.e2e.js', ['public/shared/deelmenu.js']],
+  ['deelmenuronde.e2e.js', ['public/shared/deelmenu/deelmenu-01.js', 'public/shared/deelmenu/deelmenu-02.js', 'public/shared/deelmenu/deelmenu-03.js']],
   ['praktijk-betalen.e2e.js', ['public/apps/werk/praktijk-betalen.js']],
+  // De deurkassa-race laadt de route via require.resolve met een nagemaakte
+  // kern; de verkoop zelf (eerst de plek, dan het geld) woont in tickets-verkoop.js.
+  ['deurverkoop-race.test.js', ['server/routes/supplier/tickets-verkoop.js']],
+  ['foundation-premium-ui.test.js', ['public/apps/foundation/sw.js', 'public/apps/foundation/premium.js']],
+  ['team-room-voorzijde.test.js', ['public/apps/personeel.html']],
+  ['winkel-voorzijde.test.js', ['public/apps/mall.html']],
+  ['werkos-schil.e2e.js', ['public/shared/werkos.js']],
+  ['rtg-edge-2.e2e.js', ['public/shared/rtg-edge-2.js']],
+  ['storyline-worlds.e2e.js', ['public/site/storyline-world.js']],
+  ['toestel.e2e.js', ['public/shared/toestel/opslag.js', 'public/shared/toestel/rekenaar.js']],
+  ['laatstedrie.e2e.js', ['public/shared/media.js']],
+  ['rtfrust.e2e.js', ['public/apps/foundation/rust.html']],
+  ['identiteitschermen.e2e.js', ['public/apps/rtgid.html', 'public/apps/passkeys.html']],
+  ['juridischeschermen.e2e.js', ['public/apps/juridisch/privacy.html']],
+  ['wereldbreedte.e2e.js', ['public/apps/living-os.html']],
+  ['website-screen-edges.e2e.js', ['public/site/werelden/livingos.html']],
   ['living-world.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sqlite.test.js', ['server/kern/living-world/index.js']],
   ['living-world.pg.test.js', ['server/kern/living-world/index.js']],
+  /* Deze toets gebruikt bewust de gedeelde living-world-fixture. Daardoor staat
+     de echte bronrequire een niveau dieper en kan modulesVan() hem niet uit het
+     toetsbestand zelf afleiden. De Commons-grendels zitten in actions.js. */
+  ['living-world-commons-release.test.js', ['server/kern/living-world/actions.js']],
   // This worker test executes the real source in a VM, not through require.
   ['pass-cache.test.js', ['public/shared/sw-pass-assets.js']],
   ['operationeel-meter.test.js', ['scripts/lib/operationeel/beoordeel.js']],
@@ -618,6 +647,11 @@ const EIGEN_MODULE = new Map([
   ['office-save-atomic.test.js', ['server/kern/office/docs.js']],
   ['office-classificatie-grens.test.js', ['server/kern/office/rechten.js', 'server/kern/office/gezinsdeling.js', 'server/kern/office/samen.js']],
   ['pg-fault-proxy.test.js', ['test/pg-fault-proxy.js']],
+  /* Deze restartproef laadt SQLite uitsluitend in kindprocessen. De statische
+     requirezoeker ziet daardoor geen productmodule, terwijl elk kind exact
+     server/db/sqlite.js gebruikt. Die expliciete koppeling laat de motor de
+     delete-winsgrens in de werkelijk uitgevoerde bron muteren. */
+  ['sqlite-tombstone-restart.test.js', ['server/db/sqlite.js']],
   // This test executes the browser language loader in a VM, not through require.
   ['i18n-dictionary.test.js', ['public/shared/i18n.js']],
   /* De grendel op een openbare Magnaat Test-installatie draait VOOR er ook maar
@@ -647,6 +681,10 @@ const EIGEN_MODULE = new Map([
      de meter zelf; met de hand nagetrokken op vier assen: de schil meetellen,
      dubbelen meetellen, bedekking nooit melden, half bedekt meetellen. */
   ['appwerkt-schil.e2e.js', ['scripts/appwerkt.js']],
+  /* DE GLADDE SCROLL (6 oktober 2026): bedektDoorSchil() uit dezelfde meter
+     tegen een eigen pagina zonder /api/, dus ook hier raakt de liegpoort niets.
+     Met de hand nagetrokken: zonder behavior 'instant' zakt de toets. */
+  ['appwerkt-glad.e2e.js', ['scripts/appwerkt.js']],
   /* De Evidence Engine-toets importeert ook test/helper.js om het gedrag van
      een verbonden browserclient te isoleren. Zonder deze expliciete bron wint
      daardoor de serverheuristiek en krijgt hij een liegende API die niets met
@@ -684,6 +722,11 @@ const EIGEN_MODULE = new Map([
      hem niet. Statisch ziet de motor dan geen module, en toetsenNietGemeten zou
      het schrijven van deze toets bestraffen. */
   ['zwaarstap.test.js', ['public/shared/zwaarstap.js']],
+  /* DE DEURVERKOOP laadt zijn route via een PADVARIABELE (require(ROUTE)) met
+     een nagemaakte kern, zodat twee kopers door elkaar kunnen lopen. Statisch
+     ziet de motor dan geen module. De bron is de route zelf: de vasthouding
+     na de await zetten laat toets 1 zakken. */
+  ['deurverkoop-race.test.js', ['server/routes/supplier/tickets-verkoop.js']],
   /* DE MOMENTPROEF wordt door zijn toets als TEKST gelezen (fs.readFileSync) en
      niet gerequired: de toets bewaakt de VORM van het instrument -- zakt het op
      een open schakel, draagt elke bevinding een reden, staan B en D er allebei --
@@ -1302,7 +1345,6 @@ const GEEN_BRONMUTATIE = new Map([
      document.body.setAttribute -> zetAttribuut laat hem zakken op de
      onafgevangen TypeError, en in apps/app.html src="/shared/meelezen.js" naar
      een bestand dat niet bestaat laat hem zakken op de 404. Beide teruggezet. */
-  ['paginas.e2e.js', 'census over alle pagina\'s in public/ zonder eigen module, en de nulmeting past niet in het budget: met public/shared/basis.js als module kwam de nulmeting terug als te langzaam (0 mutaties geprobeerd). Tweemaal met de hand raak op een groene nulmeting: een TypeError in basis.js (setAttribute -> zetAttribuut) laat hem zakken op de onafgevangen fout, een scriptbron in apps/app.html naar een niet-bestaand bestand op de 404'],
   /* De deelmenuwacht zet /shared/deelmenu.js op een kale pagina die geen /api/
      leest. De motor probeerde drie mutaties in public/shared/deelmenu.js: de
      twee returnwaarden van start() overleefden (die voeden alleen de teller van
@@ -1312,7 +1354,6 @@ const GEEN_BRONMUTATIE = new Map([
      geen operator. Met de hand nagetrokken op 4 oktober 2026: `subtree: false`
      laat toets 1 zakken (de wacht wordt niet wakker, wachtTot loopt af) en
      toets 2 blijft groen. Daarna teruggezet. */
-  ['deelmenuwacht.e2e.js', 'bewaakt de optie subtree: true van de wacht in public/shared/deelmenu.js, en geen operator raakt een objectliteraal; 3 mutaties geprobeerd: twee returnwaarden van start() overleefden, === -> !== in de id-ontdubbeling liet de pagina eindeloos lussen (te langzaam). Handmutatie subtree: true -> false laat toets 1 zakken, toets 2 blijft groen'],
   /* De waarheidstoets leest operationele claims in HTML en letterlijke
      antwoordteksten. De mechanische JS-operatoren raken dat soort leugen niet
      en overleefden 52 irrelevante mutaties. Handmatig een vaste Kyoto-claim
@@ -1536,31 +1577,26 @@ const GEEN_BRONMUTATIE = new Map([
      media.js 34 plekken en geen raakte de weg van een geslaagde stroom. De
      poorten van RTG Eye en het tweede scherm zijn TEKST in de HTML en inline
      script, en een .html haalt node --check niet. */
-  ['laatstedrie.e2e.js', 'overleefde 34 mutaties in public/shared/media.js (diep); de twee poortbeweringen lezen vaste tekst in oog.html en scherm.html, en inline script haalt node --check niet. 2 handmutaties raak: `if (vooraf)` -> `if (!vooraf)` in vraag() (de stroom wordt nooit gevraagd) en beeld.srcObject = null in camera.html laten allebei de zoekerwacht zakken; de token-grendel omdraaien in oog.html en scherm.html bleef groen (oog valt terug op dezelfde personeelstekst via RTGDeur, scherm leest #poort voordat de 401 hem vervangt)'],
   /* a11y-hermeet: de motor raakt in scripts/a11y-hermeet.js alleen de
      wachttijden en de playState-vergelijking van de wacht, en een langere of
      kortere wacht verandert de uitkomst niet. Wat de toets vastlegt is OF er een
      tweede meting komt en wat die teruggeeft. */
-  ['a11y-hermeet.e2e.js', 'overleefde 5 mutaties in scripts/a11y-hermeet.js (diep): wachttijden en de playState-wacht, die de uitkomst niet bepalen. 2 handmutaties raak: de tweede meting overslaan (return res) laat "een grond die er een tel later niet meer is, telt niet" zakken (1 !== 0), en een tweede meting die het contrast leeg teruggeeft laat "en de tweede meting ziet hem nog steeds" zakken (0 !== 1)'],
   /* deelmenuronde: de toets levert de aaneengeplakte DELEN uit
      public/shared/deelmenu/, niet het bundelbestand. Deel 01 en 03 zijn losse
      fragmenten die node --check niet halen, dus de motor kan ze niet muteren;
      deel 02 wel, maar zijn eerste === -> !== maakt een eindeloze lus en dan is
      de uitslag 'te langzaam'. De operatoren van de motor zelf, met de hand op
      deel 03 gezet, zijn wel raak. */
-  ['deelmenuronde.e2e.js', 'de toets bundelt public/shared/deelmenu/deelmenu-0{1,2,3}.js; 01 en 03 zijn fragmenten die node --check niet halen (0 pogingen), 02 gaf na 2 pogingen een eindeloze lus (te langzaam). Twee motoroperatoren met de hand op deelmenu-03.js raak: getal+1 op de balkopruimer (for b = 1) laat toets 2, 3 en 4 zakken, return-weg in geenMenu.open (undefined in plaats van null) laat toets 2 zakken'],
   /* rtg-edge-2: dertig browserproeven over acht routes en twee schermmaten;
      alleen al de nulmeting duurt 251 s (gemeten, los gedraaid) en de motor geeft
      er 240, dus hij komt nooit aan een mutatie toe. Wat hij bewaakt is de vorm
      van de rand (een top-, zij- en onderrand, geen tweede in een kader). */
-  ['rtg-edge-2.e2e.js', 'nulmeting 251 s tegen een motorgrens van 240 s (twee keer te langzaam, 0 pogingen). 2 handmutaties raak, alle 22 toetsen rood: het eerste === -> !== in public/shared/rtg-edge-2.js (de motoroperator zelf) en isEmbedded() in rtg-edge-2-context.js die een topscherm als ingebed leest (self!==top -> self===top) -- dan bouwt geen route zijn rand en zakt de wacht op data-rtg-edge-2-rendered'],
   /* wereldbreedte: de beweringen zijn GEOMETRIE (scrollWidth tegen 390px, de
      rail binnen het venster, een paneel van minstens 120px per knop). De motor
      meldde in living-os.js na 23 pogingen een 'gezakt' op getal+1#4, maar dat is
      een meervoudsvorm die bij nul brongebeurtenissen niets verandert; met de hand
      herhaald bleef hij een keer groen en zakte hij een keer op de railpositie --
      een flake en geen bevestiging, dus die telt hier niet. */
-  ['wereldbreedte.e2e.js', 'geometrie (scrollWidth, railpositie, paneelhoogte), geen rekenend gedrag; 23 mutaties in public/apps/living-os.js, en de ene "gezakt" (getal+1 in een meervoudsvorm) herhaalde niet met de hand. 2 handmutaties raak: min-width 190px op de railknoppen in shared/living-os.css laat de breedtebewering zakken, en de data-view-binding weghalen in living-os.js laat "geen zichtbaar paneel" zakken (intent, decisions, evidence)'],
   /* TWEE SCHERMTOETSEN DIE DE LIEGPOORT OVERLEEFDEN EN WAAR OOK EEN EIGEN MODULE
      NIETS ZEGT (4 oktober 2026). Beide met de motor geprobeerd en daarna met de
      hand beproefd; de regel noemt wat er raak was.
@@ -1575,8 +1611,6 @@ const GEEN_BRONMUTATIE = new Map([
      passkeys.html en in de Balans-stand (public/apps/geld/balansb.js) staan,
      en de AFWEZIGHEID van een reeksteller. Met balansb.js als module overleefde
      hij 13 mutaties, en terecht: geen bronoperator raakt een letterlijke string. */
-  ['rtfrust.e2e.js', 'de logica staat inline in public/apps/foundation/rust.html en de motor muteert geen .html (0 pogingen, node --check weigert hem); 2 handmutaties in dat inline script raak: de fasewissel van 4000 naar 9000 ms laat de toets zakken op het wachten op "Houd vast", en tijdens de minuut een tekst in #stilTekst zetten laat de bewering "het scherm is stil" zakken'],
-  ['identiteitschermen.e2e.js', 'legt tekst en afwezigheid vast, geen rekenend gedrag; overleefde 13 mutaties in public/apps/geld/balansb.js (de Balans-stand). 3 handmutaties raak: "nooit meer gegevens dan gevraagd" uit rtgid.html laat toets 1 zakken, "Geen streaks" uit balansb.js laat toets 2 zakken, en een regel "3 dagen op rij" in balansb.js laat toets 2 zakken op de reeksteller'],
   /* TWEE SCHERMTOETSEN DIE DE LIEGPOORT OVERLEEFDEN (4 oktober 2026), en
      terecht: geen van beide leest een /api/-antwoord.
 
@@ -1595,8 +1629,6 @@ const GEEN_BRONMUTATIE = new Map([
      er is geen module die die tekst maakt. Met de hand nagetrokken, tweemaal
      raak: "Autoriteit Persoonsgegevens" weg uit privacy.html laat de
      klachtrechteis zakken, en "Marriott" in voorwaarden.html de merkregel. */
-  ['csp.e2e.js', 'CSP-kop en browserblokkades; 1 mutatie in voordeur.js overleefd (traag: 210 s tegen een budget van 90 s, dus een schot), het beleid zelf is een tekenreeks; 2 handmutaties raak: unsafe-inline in script-src laat de kopbewering zakken, de stijlstempelaar uit laat 352 blokkades zien'],
-  ['juridischeschermen.e2e.js', 'tekstcontract op vier statische HTML-pagina\'s, geen module maakt die tekst; 2 handmutaties raak: Autoriteit Persoonsgegevens weg uit privacy.html laat de klachtrechteis zakken, Marriott in voorwaarden.html de merkregel'],
 ]);
 
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets

@@ -160,6 +160,14 @@ test('DE RTG-NAAM KOMT ER NOOIT VANZELF ONDER', async () => {
   const u = zaal.body.uitgaven.find(x => x.id === uitgaveId);
   assert.equal(u.naamOnder, 'Rahul Travel Group', 'nu pas staat de RTG-naam eronder');
 
+  /* De maker hoort het, en het bericht IS een bericht: met titel en tekst.
+     Hier kwam een gespreide tekst aan ({0:'U',1:'w',...}) -- een lege melding. */
+  const post = await api('/api/notifications', {}, baas);
+  const melding = (post.body.notifications || []).find(n => n && n.title === 'Klankwerk');
+  assert.ok(melding, 'de maker kreeg een Klankwerk-melding: ' + JSON.stringify(post.body).slice(0, 300));
+  assert.match(melding.body, /komt uit onder de RTG-naam/);
+  assert.ok(!('0' in melding), 'geen gespreide letters');
+
   // afwijzen betekent "niet onder onze naam", niet "weg ermee"
   const nee = await api('/api/office/muziek/beslis', { id: u2.body.uitgave.id, ja: false, reden: 'Nog niet af.' }, kantoor);
   assert.equal(nee.body.onder, 'codenaam');

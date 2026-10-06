@@ -99,6 +99,8 @@ if (!URL) {
     assert.equal(terug.geheim.pin, '1234');
     await a.sluit();
   });
+
+  require('./pg-trust-evidence').registreerTrustEvidencePg({ test, assert, URL, maakPg, merge3 });
 }
 
 // Laadt server/kluis.js met een specifieke sleutel in een verse module-context,

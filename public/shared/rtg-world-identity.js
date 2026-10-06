@@ -68,7 +68,7 @@
       foundation/speeltuin foundation/steun foundation/studie foundation/tellen foundation/toetsen \
       foundation/veilig foundation/veilig-vertrouwd foundation/verhaaltje foundation/verjaardagen foundation/vrienden \
       foundation/wegwijzer foundation/werk foundation/winkel foundation/zakgeld foundation/zorg \
-      connect defensie gemeente gemeenteloket gemeentepda lab lesmaker livinglab overheid overheidspda \
+      connect defensie gemeente gemeenteloket gemeentepda lab lesmaker library livinglab overheid overheidspda \
       rechtbank rijksloket schoolpartner zorgbalie')
   });
 

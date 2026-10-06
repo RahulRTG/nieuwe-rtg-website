@@ -17,7 +17,8 @@ module.exports = ({ app, officeAuth, veilig, wie, command, apiSpoor }) => {
   })));
 
   app.post('/api/command/beleid/zet', officeAuth, (req, res) => veilig(res, () =>
-    command.beleid.zet(String(req.body.id || ''), req.body.waarde, wie(req), req.body.reden, req.body.bereik)));
+    command.beleid.zet(String(req.body.id || ''), req.body.waarde, wie(req), req.body.reden, req.body.bereik,
+      req.body.spoed === true)));
 
   /* Het tweede paar ogen. Dat 'wie' uit de sessie komt is hier niet
      administratief maar functioneel: de kern weigert een goedkeuring van

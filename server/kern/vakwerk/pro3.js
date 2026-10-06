@@ -51,7 +51,7 @@ module.exports = (ctx) => {
       const b = plan(r, d.toISOString().slice(0, 10));
       if (b) {
         acties++;
-        notify(r.customerTier, { icon: 'agenda', title: r.supplierName, body: 'Uw vaste afspraak "' + r.dienstNaam + '" is aangevraagd voor ' + b.wanneer + '. Stoppen of verzetten kan altijd.', scope: 'orders' });
+        notify(r.customerKey, { icon: 'agenda', title: r.supplierName, body: 'Uw vaste afspraak "' + r.dienstNaam + '" is aangevraagd voor ' + b.wanneer + '. Stoppen of verzetten kan altijd.', scope: 'orders' });
         sseToCustomer(r.customerKey || r.customerTier, 'sync', { scope: 'orders' });
       }
     }
@@ -93,7 +93,7 @@ module.exports = (ctx) => {
     if (!r || !r.actief) return { status: 404, error: 'Deze vaste afspraak is niet gevonden of al gestopt.' };
     r.actief = false;
     save();
-    if (wie.code) { notify(r.customerTier, { icon: 'agenda', title: r.supplierName, body: 'Uw vaste afspraak "' + r.dienstNaam + '" is stopgezet.', scope: 'orders' }); sseToCustomer(r.customerKey || r.customerTier, 'sync', { scope: 'orders' }); }
+    if (wie.code) { notify(r.customerKey, { icon: 'agenda', title: r.supplierName, body: 'Uw vaste afspraak "' + r.dienstNaam + '" is stopgezet.', scope: 'orders' }); sseToCustomer(r.customerKey || r.customerTier, 'sync', { scope: 'orders' }); }
     else { notifySupplier(r.supplierCode, { icon: 'agenda', title: 'Vaste afspraak gestopt', body: r.customerCodename + ' stopte "' + r.dienstNaam + '".' }); sseToSupplier(r.supplierCode, 'sync', { scope: 'orders' }); }
     return { status: 200, ok: true };
   }
@@ -121,7 +121,7 @@ module.exports = (ctx) => {
   const wachtVanZaak = code => wachtLees().filter(w => w.supplierCode === code && w.datum >= vandaagStr()).slice(0, 25)
     .map(w => ({ id: w.id, klant: w.codenaam, dienst: w.dienst, datum: w.datum, uitgenodigd: !!w.uitgenodigd }));
   function nodigUit(w, naam) {
-    notify(w.customerTier, { icon: 'agenda', title: naam, body: 'Er is plek vrijgekomen op ' + w.datum + (w.dienst ? ' voor "' + w.dienst + '"' : '') + '. Boeken kan in de Mall, als u dat nog wilt.', scope: 'orders' });
+    notify(w.customerKey, { icon: 'agenda', title: naam, body: 'Er is plek vrijgekomen op ' + w.datum + (w.dienst ? ' voor "' + w.dienst + '"' : '') + '. Boeken kan in de Mall, als u dat nog wilt.', scope: 'orders' });
     sseToCustomer(w.customerKey || w.customerTier, 'sync', { scope: 'orders' });
     w.uitgenodigd = nu();
   }

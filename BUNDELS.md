@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 485 delen, 0 zonder onderwerp.**
+**61 bundels, 487 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9831 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9833 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -333,6 +333,15 @@ omlaag.
 | `leverancier-84a.js` | HET ETEN-WERKBLAD AAN ZIJN KNOPPEN, en de rest van het werkblad zelf |
 | `leverancier-84b.js` | Een algemene reserveringsschakelaar geeft RTG geen toestemming voor een Connection-programma |
 
+## `apps/library/app.js`
+
+`public/apps/library/app/` -- 2 delen, 34 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `app-01.js` | LibraryOS, het scherm: Studio (werken, knooppunten, publiceren, vrijgeven en feedback) |
+| `app-02.js` | LibraryOS, de private Reader: een editie openen en lezen, feedback sturen, en de mobiele weergave |
+
 ## `apps/meldkamer.js`
 
 `public/apps/meldkamer/` -- 4 delen, 480 regels in de delen
@@ -517,7 +526,7 @@ omlaag.
 
 ## `apps/techniek.js`
 
-`public/apps/techniek/` -- 10 delen, 943 regels in de delen
+`public/apps/techniek/` -- 10 delen, 952 regels in de delen
 
 | deel | onderwerp |
 |---|---|

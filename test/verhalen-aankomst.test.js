@@ -5,7 +5,10 @@ const { VERHALEN } = require('../scripts/verhalen');
 const verhaal = VERHALEN.find(v=>v.id === 'onderweg-en-aankomen');
 async function proef(fout) {
   const paden = [];
-  const aankomstAt = '2026-10-05T10:00:00.000Z';
+  // Het verhaal leest de bevestigde aankomst terug en herhaalt de bevestiging
+  // (scripts/verhalen.js); de nagebootste server bewaart haar daarom een keer.
+  const AT = '2026-10-04T10:00:00.000Z';
+  let bewaard = null;
   await verhaal.doe({
     eis: (naam, goed, reden) => assert.ok(goed, naam + ': ' + reden),
     stap: async (naam, methode, pad, token, b) => {
@@ -13,7 +16,8 @@ async function proef(fout) {
       let live;
       if (pad.endsWith('/start')) live = { active:true, dest:{loc:{lat:52,lng:4}} };
       else if (pad.endsWith('/update')) live = { nabij:b.lat === 52, arrived:false };
-      else if (pad.endsWith('/aangekomen') || pad.endsWith('/state')) live = { arrived:true, aankomstDoor:'lid', aankomstAt };
+      else if (pad.endsWith('/aangekomen')) live = { ...(bewaard || (bewaard = { arrived:true, aankomstDoor:'lid', aankomstAt:AT })) };
+      else if (pad.endsWith('/state')) live = { ...bewaard };
       else assert.fail('onverwachte handeling');
       if (fout) fout(pad,b,live);
       return { data:{live} };
@@ -21,8 +25,9 @@ async function proef(fout) {
   }, { ploeg:{gast:{token:'eigen-lid'}},supCode:'ZAAK' });
   return paden;
 }
-test('het aankomstverhaal vraagt een expliciete bevestiging en leest dezelfde waarheid terug',async()=>{
-  assert.deepEqual(await proef(),['/api/live/start','/api/live/update','/api/live/update','/api/live/aangekomen','/api/live/state','/api/live/aangekomen']);
+test('het aankomstverhaal vraagt een expliciete bevestiging na het nabijheidsvoorstel',async()=>{
+  assert.deepEqual(await proef(),['/api/live/start','/api/live/update','/api/live/update','/api/live/aangekomen',
+    '/api/live/state','/api/live/aangekomen']);
 });
 test('het verhaal ontdekt automatische aankomst, verkeerde afstand en een verloren bevestiging',async()=>{
   for (const fout of [

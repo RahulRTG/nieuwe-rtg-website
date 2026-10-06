@@ -39,22 +39,19 @@
      grootste blok in een bestand 103.819 nu tegen 129.702 blind. Een echte
                                   drempel ligt niet tussen die twee.
 
-   Deze kruisproef scheidt wel: 7 bestanden nu tegen 45 bestanden en 239.502
-   kwijtgeraakte tokens onder de kapotte versie. Vier ordes van grootte, en de
-   grens hangt niet aan een drempel die iemand heeft gekozen.
+   Deze kruisproef scheidt wel: de huidige logische bronnen staan op nul
+   ongedekt, terwijl de kapotte versie van 17 augustus 45 bestanden en 239.502
+   kwijtgeraakte tokens opleverde. Vier ordes van grootte, zonder gekozen
+   ratio-drempel.
 
-   WAT ER NU NOG BLIND IS, EN WAAROM DE NORM OP 7 STAAT EN NIET OP 0. Alle zeven
-   zijn dezelfde vorm: commentaar BINNEN een template-literal die over meerdere
-   regels loopt (CSS in een backtick-string, met /* ... *\/ erin -- die
-   backslash staat er niet in de echte bron, want zonder hem sluit dit
-   voorbeeld deze uitleg af; dezelfde streep en dezelfde reden als in de kop
-   van ./bron.js). ./bron.js
-   begrenst een string bewust per regel -- zie zijn eigen kop -- en ziet zo'n
-   template dus niet als string. Wat hij daar weghaalt is in alle zeven gevallen
-   echt commentaar, alleen van een andere taal, dus er gaat vandaag geen code
-   verloren. Het MECHANISME is wel hetzelfde als dat van 17 augustus: een
-   template met een openend /* zonder sluiter erin zou wel degelijk door de
-   echte code heen eten. Zeven is daarom een stand, geen doel.
+   DE LAATSTE DRIE WAREN GEEN DRIE PROGRAMMA'S. Drie delen van
+   shared/werkos.js waren midden in één CSS-template geknipt. Als losse
+   bestanden zijn ze terecht niet te lexen; als programma bestaan ze alleen
+   samengevoegd. Ze als drie lexfouten tellen was dus een fout in de EENHEID
+   van deze meter. Sinds 1 oktober 2026 leest meetBlind() alle bundels uit
+   scripts/bundel.js als hun canonieke, byte-voor-byte samengevoegde bron. De
+   bouwuitvoer wordt niet vertrouwd en losse fragmenten worden niet dubbel
+   geteld. Daarom staat de meter nu inhoudelijk op nul.
 
    DE GRENS VAN DEZE PROEF, HARDOP. Sinds 19 augustus dekt hij ook .html: de
    inline scriptblokken via de lexer, en de MARKUP via de eis dat daar helemaal
@@ -67,20 +64,15 @@
    647 markupregels -- precies het geval dat in de kop van ./bron.js staat als
    "784 regels markup en script".
 
-   WAT ER NOG NIET GEDEKT IS: losse .css-bestanden. En een blindheid die WEL
-   bestaat maar vandaag nergens uitslaat: ./bron.js kent geen HTML, dus een
-   blokcommentaar in markuptekst wordt ook opgegeten (de vorm zelf staat hier
-   niet uitgeschreven: zonder een backslash zou dat voorbeeld deze uitleg
-   afsluiten -- dezelfde streep en dezelfde reden als in de kop van ./bron.js).
-   Geen enkele pagina doet dat
-   nu, dus de meter staat op nul -- maar schrijft iemand zo'n tekst, dan gaat
-   hij boven nul en zakt de ratel. De valstrik staat open en is niet onbewaakt;
-   test/bronblind.test.js legt dat vast.
+   CSS EN MARKUP HEBBEN HUN EIGEN TAALREGEL. Losse .css-bestanden worden met
+   stukkenCss() gelezen: blokcommentaar mag weg, `//` niet. HTML-markup blijft
+   volledig staan, behalve echte CSS-commentaren binnen <style>. De bekende
+   valstrikken staan als tegenproef in test/bronblind.test.js.
 
-   EEN LEXFOUT TELT MEE ALS BLIND. Een bestand dat de lexer niet kan lezen is
-   een bestand waarover deze proef niets zegt, en LAT.md regel 10 is helder over
+   EEN LEXFOUT TELT MEE ALS BLIND. Een logisch programma dat de lexer niet kan
+   lezen is een programma waarover deze proef niets zegt, en LAT.md regel 10 is helder over
    het verschil tussen "in orde" en "ik heb niet gekeken". Vandaag zijn het er
-   nul over 4061 bestanden; wordt het er een, dan hoort iemand te kijken in
+   nul; wordt het er een, dan hoort iemand te kijken in
    plaats van dat het getal gelijk blijft. */
 'use strict';
 const fs = require('fs');
@@ -274,6 +266,67 @@ function bronBestanden(wortel, mappen) {
   return uit.sort();
 }
 
+/* EEN BUNDEL IS EEN PROGRAMMA, OOK ALS DE BRON OP SCHIJF IN DELEN LIGT.
+
+   De eerste versie van deze kruisproef liep elk .js-bestand afzonderlijk na.
+   Dat is voor gewone modules juist, maar niet voor de bundeldelen uit
+   scripts/bundel.js: zo'n deel mag midden in een functie of sjabloon beginnen
+   en eindigen. Drie delen van shared/werkos.js werden daardoor als lexfout
+   geboekt, terwijl hun byte-voor-byte samenvoeging een geldig programma is.
+
+   Alleen de gegenereerde uitvoer lezen zou die valse fout ook verbergen, maar
+   introduceert een ernstiger gat: een achterlopende uitvoer kan groen zijn
+   terwijl de canonieke delen al veranderd zijn. Daarom bouwen we hier de
+   LOGISCHE bron rechtstreeks uit de delen op. De uitgecheckte uitvoer en alle
+   delen verdwijnen uit de gewone lijst en worden vervangen door precies een
+   eenheid met de samengevoegde inhoud. scripts/bundel.js bewaakt elders dat de
+   uitvoer ermee overeenkomt; deze meter hoeft die tweede, andere bewering niet
+   nogmaals te doen.
+
+   `bundels` is injecteerbaar voor de proef. Zonder die invoer gebruiken we
+   uitsluitend in de echte werkboom het centrale bundelregister; een tijdelijke
+   map krijgt nooit per ongeluk de bundels van deze checkout opgelegd. */
+function bronEenheden(wortel, mappen, bundels) {
+  const gewone = new Map(bronBestanden(wortel, mappen).map(vol => [path.resolve(vol), { vol }]));
+  const echteWortel = path.resolve(path.join(__dirname, '..', '..'));
+  let register = bundels;
+  if (register === undefined && path.resolve(wortel) === echteWortel) {
+    try { register = require('../bundel').bundels; } catch (e) { register = null; }
+  }
+  if (!register || !mappen.includes('public')) return [...gewone.values()].sort((a, b) => a.vol.localeCompare(b.vol));
+
+  for (const [uitvoer, deelMap] of Object.entries(register)) {
+    const doel = path.resolve(wortel, 'public', uitvoer);
+    const dir = path.resolve(wortel, 'public', deelMap);
+    let delen;
+    try {
+      delen = fs.readdirSync(dir).filter(n => n.endsWith('.js')).sort().map(n => path.join(dir, n));
+    } catch (e) { continue; }
+    if (!delen.length) continue;
+
+    gewone.delete(doel);
+    for (const deel of delen) gewone.delete(path.resolve(deel));
+    const brokken = [], afdruk = [];
+    let leesfout = false;
+    for (const deel of delen) {
+      try {
+        const st = fs.statSync(deel);
+        brokken.push(fs.readFileSync(deel));
+        afdruk.push(st.mtimeMs + ':' + st.size);
+      } catch (e) { leesfout = true; break; }
+    }
+    /* Een onleesbare bron mag niet door de virtuele eenheid worden verstopt.
+       Laat in dat zeldzame geval de delen in de gewone lijst staan; de normale
+       leesweg beslist dan per bestand wat er werkelijk gezien kon worden. */
+    if (leesfout) {
+      for (const deel of delen) gewone.set(path.resolve(deel), { vol: path.resolve(deel) });
+      continue;
+    }
+    gewone.set(doel, { vol: doel, bron: Buffer.concat(brokken).toString('utf8'), afdruk: afdruk.join('|') });
+  }
+  return [...gewone.values()].sort((a, b) => a.vol.localeCompare(b.vol));
+}
+
 /* De uitslag per bestand blijft binnen dit proces bewaard, op PAD + WIJZIGTIJD +
    OMVANG. Dat is geen snelheidstruc om de meter heen: verandert er een teken in
    een bestand, dan verandert zijn mtime of zijn omvang en wordt hij opnieuw
@@ -295,11 +348,15 @@ function bronBestanden(wortel, mappen) {
    nieuwe `npm run norm` begint leeg en meet alles opnieuw. */
 const TAFEL = new Map();
 
-function meetBlind({ wortel, mappen = ['public', 'server', 'scripts', 'test'], strip } = {}) {
+function meetBlind({ wortel, mappen = ['public', 'server', 'scripts', 'test'], strip, bundels } = {}) {
   const uit = { bestanden: 0, lexfout: 0, blind: 0, tokensKwijt: 0, lijst: [] };
-  for (const vol of bronBestanden(wortel, mappen)) {
+  for (const eenheid of bronEenheden(wortel, mappen, bundels)) {
+    const vol = eenheid.vol;
     let bron, st;
-    try { st = fs.statSync(vol); bron = fs.readFileSync(vol, 'utf8'); } catch (e) { continue; }
+    try {
+      if (eenheid.bron !== undefined) { bron = eenheid.bron; st = { mtimeMs: eenheid.afdruk, size: bron.length }; }
+      else { st = fs.statSync(vol); bron = fs.readFileSync(vol, 'utf8'); }
+    } catch (e) { continue; }
     if (!bron.length) continue;
     uit.bestanden++;
     const sleutel = strip ? null : vol + '|' + st.mtimeMs + '|' + st.size;
@@ -323,4 +380,4 @@ function meetBlind({ wortel, mappen = ['public', 'server', 'scripts', 'test'], s
   return uit;
 }
 
-module.exports = { blindIn, blindInHtml, blindInCss, stukken, stukkenCss, meetBlind, bronBestanden };
+module.exports = { blindIn, blindInHtml, blindInCss, stukken, stukkenCss, meetBlind, bronBestanden, bronEenheden };

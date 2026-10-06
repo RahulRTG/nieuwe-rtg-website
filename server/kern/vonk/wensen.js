@@ -9,8 +9,12 @@
    DRIE GEWICHTEN, EN ALLEEN HET EERSTE FILTERT
 
      verplicht   een uitgesproken tegenstelling haalt de kandidaat weg
-     sterk       weegt zwaar in de volgorde; een botsing staat als open punt
-     mee         weegt licht; een overeenkomst staat als plus
+     sterk       een botsing staat als open punt in de reden
+     mee         een overeenkomst staat als plus in de reden
+
+   Geen van de drie ORDENT iemand: de volgorde van de dagselectie is een daglot
+   (./selectie.js). Een wens die zwaarder telt in een sortering, is een cijfer
+   op een mens (ONTMOETEN.md par. 4.4).
 
    WAAROM "VERPLICHT" ALLEEN OP EEN UITGESPROKEN TEGENSTELLING FILTERT, EN NIET
    OP EEN LEEG VELD. Dit is de beslissing waar deze module om draait, dus hij
@@ -44,10 +48,9 @@
    Anders was de zichtbaarheidskeuze een knop die niets doet -- LAT.md regel 8:
    een controle op vorm is geen controle.
 
-   GEEN CIJFER. `weegt()` bepaalt alleen de VOLGORDE binnen de dagselectie en
-   verlaat deze module niet. Er komt geen percentage, geen match-score en geen
-   oordeel over een mens op het scherm: LIFE.md par. 4.4, en ONTMOETEN.md par.
-   4.4 herhaalt hem voor deze app.
+   GEEN CIJFER, ook niet intern. Hier stond `weegt()`, dat binnen de dagselectie
+   ordende met punten per wens; dat was een verborgen sorteersleutel op mensen
+   en is op 4 oktober 2026 weggehaald (ONTMOETEN.md par. 4.4, LIFE.md par. 4.4).
 
    EEN AS TOEVOEGEN IS EEN REGEL IN `ASSEN` (./assen.js). Geen tweede lijst, geen
    aanpassing in de selectie, geen aanpassing in het scherm -- LAT.md regel 4:
@@ -119,19 +122,6 @@ function botst(ik, ander) {
   return false;
 }
 
-/* ---- de volgorde. Blijft binnen deze module; zie de kop. ---- */
-const PUNT = { verplicht: 6, sterk: 3, mee: 1 };
-function weegt(ik, ander) {
-  const w = ik.wensen || {}, k = ander.kenmerken || {};
-  let som = 0;
-  for (const asId of Object.keys(w)) {
-    const heeft = k[asId];
-    if (heeft == null) continue;
-    const punt = PUNT[w[asId].gewicht] || 0;
-    som += w[asId].in.includes(heeft) ? punt : -punt;
-  }
-  return som;
-}
 
 /* ---- de uitleg: waarom ziet u deze persoon ----
 
@@ -178,4 +168,4 @@ const tabel = () => ({
 });
 
 module.exports = { ASSEN, GEWICHTEN, ZICHT, zetKenmerken, zetWensen, zetZicht, zichtVan,
-  botst, weegt, reden, toonKenmerken, tabel };
+  botst, reden, toonKenmerken, tabel };

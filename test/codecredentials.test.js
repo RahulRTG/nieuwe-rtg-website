@@ -203,7 +203,7 @@ test('het gezinsprofieltoken en de gezinsdeur zelf zijn gemigreerd', () => {
   for (const c of ['geen_sessie_in_url', 'oude_zes_tekencode_opent_niets', 'rem_per_ip_en_per_gezin',
     'stroomticket_eenmalig_en_per_kanaal', 'sessie_zeven_dagen_verlengen_met_passkey'])
     assert.equal(deur.controls[c], true, c);
-  for (const b of ['test/gezinsdeur.test.js', 'test/gezinscode.test.js', 'test/gezinsdeur.pg.test.js'])
+  for (const b of ['test/gezinsdeur.test.js', 'test/gezinscode.test.js', 'test/gezinsuitnodiging.pg.test.js'])
     assert.ok(deur.bewijs.includes(b), b);
   assert.ok(Array.isArray(deur.restrisico) && deur.restrisico.length >= 3, 'wat niet af is, staat er');
   for (const route of ['POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/inloggen',
@@ -483,4 +483,26 @@ test('PG-control-bewijs verifieert oorspronkelijke suitebytes en telt uitsluiten
   fs.writeFileSync(pgPad,bytes);
   fs.unlinkSync(path.join(root,'SUITE.json'));
   assert.throws(()=>poort.pgControlBewijs(root,commit,gevraagd),'zonder oorspronkelijke suitebinding geen PASS');
+});
+
+/* FASE 1: een deur die zegt dat hij op bearercode v2 staat, moet dat in zijn
+   eigen bron laten zien. Mutatie: de controle in scripts/codecredentials.js
+   weghalen laat de eerste bewering zakken. */
+test('contractversie 2 vraagt een v2-uitgifte in de eigen bron, en de twee proefdeuren hebben die', () => {
+  const register = JSON.parse(JSON.stringify(poort.lees()));
+  const v2 = register.deuren.filter(d => d.contractversie === 2).map(d => d.id).sort();
+  assert.deepEqual(v2, ['devices.zaakdoos_sleutel', 'foundation.family_profile_token_buiten_harde_poort',
+    'livingos.invisible_arrival_pass', 'pay.giftcard_value_code', 'pay.tegoedbon', 'workos.workspace_access_tokens']);
+  /* Een deur die nog nergens een v2-uitgifte heeft. De reisuitnodiging was het
+     voorbeeld, maar die geeft sinds het vernieuwen zelf v2 uit (al blijft
+     haar programmalink v1, dus het register zegt nog geen 2). */
+  const deur = register.deuren.find(d => d.id === 'workos.project_proposal_guest_link');
+  deur.contractversie = 2;
+  let uit = poort.controleer(register);
+  assert.ok(uit.fouten.some(f => f.includes(deur.id) && f.includes('contractversie 2')), 'een v1-deur die v2 zegt valt op');
+  deur.contractversie = 3;
+  uit = poort.controleer(register);
+  assert.ok(uit.fouten.some(f => f.includes(deur.id) && f.includes('1 of 2')));
+  const eerlijk = JSON.parse(JSON.stringify(poort.lees()));
+  assert.equal(poort.controleer(eerlijk).fouten.some(f => f.includes('contractversie')), false);
 });

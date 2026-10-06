@@ -14,7 +14,8 @@ app.post('/api/supplier/reservering/beslis', supplierAuth, (req, res) => {
   // na doorzetten beslist alleen een manager (kern/ervaring/tafeluitzondering.js)
   const mag = U.magBeslissen(req.supplier, req.actor, String(req.body.id || ''));
   if (!mag.ok) return res.status(403).json({ error: mag.reden });
-  const r = beslisReservering(req.supplier, String(req.body.id || ''), action);
+  const r = beslisReservering(req.supplier, String(req.body.id || ''), action,
+    { request: req, actor: req.actor });
   if (r.error) return res.status(r.status).json({ error: r.error });
   logActivity(req.supplier.code, req.actor, (action === 'bevestig' ? 'bevestigde' : 'weigerde') + ' de reservering van ' + r.reservering.customerCodename + ' (' + r.reservering.datum + ' ' + r.reservering.tijd + ')');
   res.json(r);

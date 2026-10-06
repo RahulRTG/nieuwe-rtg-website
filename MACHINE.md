@@ -43,6 +43,20 @@ markeert alle routes in een bestand, mist nog steeds de tas). Twee ondergrenzen
 die verschillende dingen missen, geven samen geen bovengrens — dezelfde vorm als
 `KANTOORMACHT.json`.
 
+**Sinds 6 oktober 2026 is er een derde meetweg, `tas`** (`scripts/lib/kerntas.js`,
+besluit van de eigenaar). De samenvoeging van #502 liet de ratel van 2780 naar 2793
+lopen: LibraryOS en de Loop Fabric gebruiken de collectietransactie en de envelop,
+maar via de kern-tas, en die zag geen van beide assen. Een eerste proef die de
+modules achter de tas als TEKST las, zakte naar 1655 -- elk woord telde, commentaar
+inbegrepen -- en een tweede met de deelmodules erbij maakte elke mobiliteitsroute
+atomair omdat een deelmodule dat is. De meetweg die bleef is streng: alleen een naam
+die een fabriek of toewijzing levert (geen `save`, geen hub), alleen de module zelf
+en niet wat zij inlaadt, en een as alleen als die module de BRON van de as requiret
+of de ingespoten collectietransactie in code aanroept. Hij is per module en niet per
+functie, en staat daarom apart: hij wordt nooit bij de andere twee opgeteld. Uitslag:
+2793 -> 2690, waarvan de 33 schrijfroutes van LibraryOS en de Loop Fabric; de tas
+alleen draagt 103 routes (`mutatiesAlleenViaTas`).
+
 **De meter heeft in zijn eerste ronde twee keer zichzelf betrapt, en beide fouten
 horen hier te blijven staan.** Eerst rekende de bestandsas de module mee die een
 gebruikte kern-naam had geleverd. Dat leek de blinde vlek van de require-graaf te
@@ -60,12 +74,12 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->4008<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->4074<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
 |---|---|---|---|
-| bewijsDraagt (proof-carrying) | 1 | <!--getal:machine.bewijsDraagt-->17<!--/getal--> | `kern/commercie/bewijstoken.js` |
+| bewijsDraagt (proof-carrying) | 1 | <!--getal:machine.bewijsDraagt-->20<!--/getal--> | `kern/commercie/bewijstoken.js` |
 | beleid (veiligheidskern) | 0 | 15 | `kern/commercie/veiligheidskern.js` |
 | gevolg (wat raakt dit aan) | 0 | 0 | `kern/stuur/gevolg.js` |
 | bewijsstand (bewezen) | 0 | 0 | `VERTROUWEN.json` |
@@ -79,10 +93,10 @@ aantal routes dat hem raakt (`handler` / `bestand`):
 | assurance (passkey, stap-op) | 2 | 49 | `kern/identiteit/vertrouwen.js` |
 | frictie | 2 | 98 | `kern/frictie/motor.js` |
 | simulatie | 10 | 103 | `kern/command/simulatie.js` |
-| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->203<!--/getal--> | `kern/envelop.js` |
+| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->213<!--/getal--> | `kern/envelop.js` |
 | idempotentie | 13 | 114 | `lib/idem-poort.js` |
 | aiVindbaar | 173 | 173 | `kern/stuur/beleid.js` |
-| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->306<!--/getal--> | `kern/kantoor/kluispoort.js` |
+| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->313<!--/getal--> | `kern/kantoor/kluispoort.js` |
 | herhaling (beschermd) | 1675 | 1675 | `IDEMPROEF.json` |
 
 Vier assen staan als **ongemeten met een reden** en nooit als 0: doelvindbaarheid
@@ -101,8 +115,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2780<!--/getal--> van de
-   <!--getal:machine.muterend-->4008<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2690<!--/getal--> van de
+   <!--getal:machine.muterend-->4074<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 
    **Let op de noemer: die is op 14 september 2026 verschoven, en een ronde van
@@ -209,7 +223,7 @@ vrij, **Situation** let op); die worden hier niet herhaald. Dit zijn de zeven di
 uit de uitvoeringskant komen. `SEMANTIEK.json` meet dat dit huis
 <!--getal:semantiek.namen-->131<!--/getal--> namen in meer dan één domein heeft,
 waarvan <!--getal:semantiek.betekenissen-->113<!--/getal--> met meer dan één
-betekenis (samen <!--getal:semantiek.betekenissenTotaal-->422<!--/getal-->
+betekenis (samen <!--getal:semantiek.betekenissenTotaal-->424<!--/getal-->
 betekenissen).
 
 1. **`envelop`** — bezet en gesloten (zie par. 2).
@@ -459,8 +473,9 @@ Daarna, en in deze volgorde omdat elk de volgende mogelijk maakt:
 
 Het zegt niet dat de zestien motoren goed zijn — alleen dat ze bestaan en dat
 bijna niets erlangs gaat. Het zegt niet dat de assen van `MACHINEDEKKING.json`
-compleet zijn: vier staan als ongemeten met een reden, en de kern-tas-as ontbreekt
-tot iemand hem per FUNCTIE meet in plaats van per module. Het zegt niet dat een
+compleet zijn: vier staan als ongemeten met een reden, en de kern-tas-as staat er
+sinds 6 oktober 2026 per MODULE en nog niet per functie -- een module die op een plek
+een collectietransactie draagt, markeert elke route die een naam uit haar gebruikt. Het zegt niet dat een
 route met drie assen goed is; het zegt dat er geen route met meer is.
 
 En het belangrijkste: geen enkel getal hierboven is met een echte gebruiker

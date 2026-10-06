@@ -321,11 +321,17 @@ test('een bron is https, en een bron die zwijgt blijft als bevinding staan', asy
   assert.equal((await api('/api/office/payroll/bron', { land: 'ES', url: 'tarieven.example' }, gedeeld)).status, 400,
     'en iets dat geen adres is, is geen bron');
 
-  /* Een poort die gegarandeerd dicht is: de helper geeft er een vrij en laat hem
-     meteen weer los. Geen naamserver, geen wachttijd -- de verbinding wordt
-     geweigerd, en dat is precies het geval dat we willen zien. */
+  /* Een intern adres is GEEN bron (RTG-V1-RELEASE C5). Hier stond eerst een
+     dichte poort op 127.0.0.1 als "bron die niet antwoordt" -- en daarmee legde
+     deze toets juist vast dat de server een intern adres mocht ophalen. */
   const dicht = await vrijePoort();
-  const url = 'https://127.0.0.1:' + dicht + '/loontabel-es.json';
+  const intern = await api('/api/office/payroll/bron',
+    { land: 'ES', naam: 'Intern', url: 'https://127.0.0.1:' + dicht + '/loontabel-es.json' }, gedeeld);
+  assert.equal(intern.status, 400, 'een bron op het eigen netwerk hoort geweigerd te worden: ' + uitleg(intern));
+
+  /* De bron die zwijgt staat nu op het open internet, maar in .invalid: die
+     naamruimte bestaat per RFC 6761 nooit, dus de ronde kan hem niet bereiken. */
+  const url = 'https://loontabel.voorbeeld.invalid/loontabel-es.json';
 
   const gezet = await api('/api/office/payroll/bron', { land: 'ES', naam: 'Proefbron', url }, gedeeld);
   assert.equal(gezet.status, 200, uitleg(gezet));

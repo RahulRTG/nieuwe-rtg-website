@@ -198,11 +198,11 @@ test('een AI krijgt alleen de actieve capability; verwijderde namen maken geen m
     const crypto = require('crypto');
     const db = { data: {} };
     const zaken = require('../server/kern/service/zaak')({ db, save: () => {}, crypto });
-    const mach = require('../server/kern/service/machtiging')({ db, save: () => {}, crypto, zaken });
+    const mach = require('../server/kern/service/machtiging')({ db, save: () => {}, crypto, zaken, inzagelog: { noteerVast: async () => ({ ok: true }) } });
     const zz = zaken.open({ melder: 'zaak-X', doelgroep: 'zaak', onderwerp: 'zaak', titel: 'Werkruimte' }).zaak;
 
-    const v = mach.verleen({ zaakId: zz.id, mens: 'ai:onderzoeker',
-      capabilities: ['organisatie.stand', 'identiteit.uitdaging', 'identiteit.openen'],
+    const v = await mach.verleen({ zaakId: zz.id, mens: 'ai:onderzoeker',
+      capabilities: ['organisatie.stand', 'identiteit.uitdaging', 'identiteit.openen'], bevestigd: ['organisatie.stand', 'identiteit.uitdaging', 'identiteit.openen'],
       reden: 'de AI kijkt mee met dit werkruimteprobleem' });
     assert.deepEqual(v.machtiging.capabilities, ['organisatie.stand'],
       'de AI kreeg een capability zonder lezer: ' + JSON.stringify(v.machtiging.capabilities));
@@ -211,8 +211,8 @@ test('een AI krijgt alleen de actieve capability; verwijderde namen maken geen m
 
     /* Een vroegere zware naam kan niet meer tot de ceremonie komen: zonder
        echte lezer ontstaat er helemaal geen machtiging om bij te tekenen. */
-    const vanMens = mach.verleen({ zaakId: zz.id, mens: 'nadia',
-      capabilities: ['identiteit.openen'], reden: 'account recovery aan de balie' });
+    const vanMens = await mach.verleen({ zaakId: zz.id, mens: 'nadia',
+      capabilities: ['identiteit.openen'], bevestigd: ['identiteit.openen'], reden: 'account recovery aan de balie' });
     assert.equal(vanMens.status, 403);
     assert.deepEqual(vanMens.geweigerd, ['identiteit.openen']);
     assert.deepEqual(mach.ZWAAR, {});
@@ -232,7 +232,7 @@ test('de AI-onderzoeker opent pas iets nadat het lid heeft bevestigd, en leent n
   const bewerkCollectie = require('../server/db/collectie-bewerken')({ store: 'json', db, save });
   const zaken = require('../server/kern/service/zaak')({ db, save, crypto });
   const loop = require('../server/kern/service/loop')({ zaken, save });
-  const mach = require('../server/kern/service/machtiging')({ db, save, crypto, zaken });
+  const mach = require('../server/kern/service/machtiging')({ db, save, crypto, zaken, inzagelog: { noteerVast: async () => ({ ok: true }) } });
   const bev = require('../server/kern/service/bevestiging')({ db, save, crypto, zaken, machtigingen: mach, bewerkCollectie });
   const ond = require('../server/kern/service/onderzoeker')({ zaken, loop, machtigingen: mach, bevestiging: bev, save });
 
@@ -267,7 +267,7 @@ test('de AI-onderzoeker opent pas iets nadat het lid heeft bevestigd, en leent n
 
   /* En hij leent niet: een machtiging op naam van een mens opent voor de AI
      niets, ook al draagt hij exact dezelfde capability. */
-  const vanMens = mach.verleen({ zaakId: z.id, mens: 'nadia', capabilities: [cap],
+  const vanMens = await mach.verleen({ zaakId: z.id, mens: 'nadia', capabilities: [cap], bevestigd: [cap],
     reden: 'nadia kijkt zelf naar dit werkruimteprobleem' });
   const geleend = ond.poort(vanMens.machtiging.id, cap, { zaakId: z.id });
   assert.equal(geleend.mag, false, 'de AI leende de machtiging van een mens');

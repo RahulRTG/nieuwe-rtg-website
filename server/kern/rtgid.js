@@ -26,6 +26,7 @@
    Opslag in de eigen collectie rtgid; maakRtgid(state) volgt het vaste kern-patroon. */
 
 const { idVanKey } = require('../lib/lidsleutel');
+const klok = require('../lib/klok');
 
 const KOPPEL_TTL_MS = 2 * 60 * 1000;      // een koppelcode leeft twee minuten
 const SESSIE_TTL_MS = 20 * 60 * 1000;     // een iD-sessie bij een dienst: twintig minuten
@@ -41,8 +42,8 @@ const magVragen = (a) => ATTRIBUTEN.includes(a) || isBewijsAttribuut(a);
 
 function maakRtgid({ db, save, bewerkCollectie, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam, stapOp, passkeysVan, vakbewijsBron }) {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/rtgid', bezit: { rtgid: 'kaart' } });
-  const nu = () => Date.now();
-  const iso = t => new Date(t == null ? Date.now() : t).toISOString();
+  const nu = () => klok.nu();
+  const iso = t => new Date(t == null ? klok.nu() : t).toISOString();
   const hash = t => crypto.createHash('sha256').update(String(t)).digest('hex');
   const vorm = b => {
     if (!Array.isArray(b.koppels)) b.koppels = [];

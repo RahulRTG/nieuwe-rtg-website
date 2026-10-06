@@ -27,11 +27,19 @@ const RUIM = 64 * 1024 * 1024;
 test('ZELFIJKING: console.log gevolgd door process.exit kapt door een pijp WEL af', () => {
   /* Zonder deze ijking bewijzen de toetsen hieronder niets: als dit patroon op
      deze machine niet afkapt, dan zegt "versheid.js kapt niet af" alleen dat de
-     omstandigheden mild waren. Eerst het gebrek aantoonbaar maken. */
+     omstandigheden mild waren. Een grote OS-pijp alleen bleek geen betrouwbare
+     ijking: een snelle lezer kan alle bytes al hebben opgehaald voordat exit()
+     toeslaat. We maken de asynchrone uitgaande write daarom bewust vertraagd.
+     Dat is precies het gevaarlijke toestandspunt, maar nu onafhankelijk van de
+     snelheid en belasting van de machine. */
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-afkap-'));
   const stuk = path.join(map, 'kapt-af.js');
   fs.writeFileSync(stuk,
-    "for (let i = 0; i < 40000; i++) console.log('regel ' + i + ' ' + 'x'.repeat(80));\n" +
+    "const schrijf = process.stdout.write.bind(process.stdout);\n" +
+    "process.stdout.write = function (bytes, enc, klaar) {\n" +
+    "  setTimeout(() => schrijf(bytes, enc, klaar), 100);\n" +
+    "  return false;\n" +
+    "};\n" +
     "console.log('LAATSTE REGEL');\n" +
     "process.exit(1);\n");
   let uitvoer = '';

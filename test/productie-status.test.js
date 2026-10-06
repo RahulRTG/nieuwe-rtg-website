@@ -58,7 +58,8 @@ function groen() {
       inhoudSha256: 'b'.repeat(64) },
     externControle: { ok:true, reden:'ondertekend-bewijs-geldig', commit:COMMIT,
       dossierSha256:'1'.repeat(64), handtekeningSha256:'2'.repeat(64),
-      sleutelSha256:'3'.repeat(64), bewijsBestanden:external.ALLE_CONTROLES.map(controle => ({
+      sleutelSha256:'3'.repeat(64), moneyMode:'LIVE',
+      bewijsBestanden:external.ALLE_CONTROLES.map(controle => ({
         controle, bestand:controle + '.bewijs', sha256:'e'.repeat(64), bytes:123
       })), foundation:{ vrijgave:'GESLOTEN', leeftijdscontrole:'NIET_VRIJGEGEVEN',
         moderatie:'NIET_VRIJGEGEVEN' } },
@@ -308,6 +309,7 @@ function zonderRail() {
   invoer.golive.geld = { betalingenUit: true, releaseZonderRail: true,
     inkomendGeconfigureerd: false, uitgaandGeconfigureerd: false, foundationRekeningGeconfigureerd: true };
   delete invoer.golive.geldMotor;
+  invoer.externControle.moneyMode = 'RAIL_DISABLED';
   return invoer;
 }
 
@@ -315,6 +317,13 @@ test('zonder kaartrail, maar verder alles groen: READY_ZONDER_RAIL en nooit READ
   const uit = beoordeel(zonderRail());
   assert.equal(uit.status, 'READY_ZONDER_RAIL');
   assert.deepEqual(uit.blokkades, []);
+});
+
+test('money-bewijsmodus moet exact overeenkomen met READY of READY_ZONDER_RAIL', () => {
+  const beperktMetLive = zonderRail(); beperktMetLive.externControle.moneyMode = 'LIVE';
+  assert.equal(beoordeel(beperktMetLive).status, 'BLOCKED');
+  const volledigMetUit = groen(); volledigMetUit.externControle.moneyMode = 'RAIL_DISABLED';
+  assert.equal(beoordeel(volledigMetUit).status, 'BLOCKED');
 });
 
 test('de beperkte stand wist geen enkele andere blokkade', () => {

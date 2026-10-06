@@ -65,14 +65,13 @@ module.exports = ({ db, crypto, bewerkCollectie, productie = process.env.NODE_EN
   }
 
   function maakSleutel(soort, les, extra) {
-    const m = bearer.maak({ prefix: PREFIX[soort], issuer: 'rtfoundation-onderwijs', doel: DOEL[soort],
+    return bearer.maak({ prefix: PREFIX[soort], issuer: 'rtfoundation-onderwijs', doel: DOEL[soort],
       scope: SCOPE[soort], onderwerp: Object.assign({ soort: 'foundation-les', les: les.id,
         rol: soort }, extra || {}),
-      geldigMs: Math.max(1000, Date.parse(les.expires_at) - Date.parse(nu())),
-      /* De lescode telt toetredingen; een leraar- of leerlingsleutel is een
-         sessie voor de duur van de les en telt geen verzoeken (negeerGebruik). */
-      maxGebruik: soort === 'lescode' ? MAX_LEERLINGEN : 10000 });
-    return m;
+      geldigheid: { duurMs: Math.max(1000, Date.parse(les.expires_at) - Date.parse(nu())) },
+      /* Bearercode v2. De lescode telt toetredingen; een leraar- of leerlingsleutel
+         is een sessie voor de duur van de les. */
+      gebruik: soort === 'lescode' ? { max: MAX_LEERLINGEN } : 'sessie', afgeleid: 'geen' });
   }
   const kaal = code => String(code == null ? '' : code).replace(/\s+/g, '');
   const dicht = les => !!(les.gesloten_at || !(Date.parse(les.expires_at) > Date.parse(nu())));
@@ -145,7 +144,7 @@ module.exports = ({ db, crypto, bewerkCollectie, productie = process.env.NODE_EN
   }
 
   /* Beheer door de leraar (roteren, intrekken, sluiten): ./toegang-beheer.js. */
-  const beheer = require('./toegang-beheer')({ bearer, transactie, maakSleutel, dicht, kaal, nu,
+  const beheer = require('./toegang-beheer')({ bearer, transactie, dicht, kaal, nu,
     DOEL, SCOPE });
 
   // live-stroom: ./stroomticket.js (B25)

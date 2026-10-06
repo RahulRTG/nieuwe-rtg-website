@@ -1,6 +1,6 @@
 {
   "uitleg": "De servicedoelen van RTG, als gegevens en niet als proza. SLO.md legt uit WAAROM ze zo staan; dit bestand is wat de meter leest (server/kern/command/slo.js) en waaruit de tabel in SLO.md wordt geschreven (scripts/slo.js). Twee plaatsen met dezelfde waarheid gaan uit elkaar lopen, dus staat de waarheid hier en is de tabel daar een afdruk.",
-  "vastgelegd": "2026-08-09",
+  "vastgelegd": "2026-09-30",
   "minimumVerzoeken": 200,
   "minimumDekking": 0.05,
   "doelen": [
@@ -73,6 +73,92 @@
         "routeBegintMet": "/api/pay"
       },
       "waarom": "Wie niet kan betalen houdt een half afgeronde transactie over, en dat kost meer dan een storing."
+    }
+  ],
+  "capabilityProfielen": [
+    {
+      "id": "availability-v1",
+      "version": 1,
+      "availabilityTarget": 99.9,
+      "windowDays": 30,
+      "minimumSamples": 200,
+      "minimumCoverage": 0.05,
+      "freshnessMinutes": 1440,
+      "latency": { "quantile": 0.9, "maxMs": 250 },
+      "legacyAvailability": "beschikbaarheid",
+      "legacyLatency": "snelheid-p90",
+      "legacyDependencies": [],
+      "waarom": "Een capaciteitsvraag moet snel en technisch betrouwbaar antwoorden; vol is een geldige uitkomst en geen storing."
+    },
+    {
+      "id": "experience-v1",
+      "version": 1,
+      "availabilityTarget": 99.9,
+      "windowDays": 30,
+      "minimumSamples": 200,
+      "minimumCoverage": 0.05,
+      "freshnessMinutes": 1440,
+      "latency": { "quantile": 0.9, "maxMs": 250 },
+      "legacyAvailability": "beschikbaarheid",
+      "legacyLatency": "snelheid-p90",
+      "legacyDependencies": [],
+      "waarom": "Een geldige Experience-intentie moet voorspelbaar worden voorbereid of uitgevoerd; een policyweigering telt apart."
+    },
+    {
+      "id": "booking-v1",
+      "version": 1,
+      "availabilityTarget": 99.9,
+      "windowDays": 30,
+      "minimumSamples": 200,
+      "minimumCoverage": 0.05,
+      "freshnessMinutes": 1440,
+      "latency": { "quantile": 0.9, "maxMs": 1000 },
+      "legacyAvailability": "booking-success",
+      "legacyLatency": "snelheid-p90",
+      "legacyDependencies": ["beschikbaarheid"],
+      "waarom": "Een reserveringsmutatie mag wat langer duren dan lezen, maar nooit stil verdwijnen of dubbel ontstaan."
+    },
+    {
+      "id": "payment-v1",
+      "version": 1,
+      "availabilityTarget": 99.95,
+      "windowDays": 30,
+      "minimumSamples": 200,
+      "minimumCoverage": 0.05,
+      "freshnessMinutes": 720,
+      "latency": { "quantile": 0.99, "maxMs": 1000 },
+      "legacyAvailability": "betalen",
+      "legacyLatency": "snelheid-p99",
+      "legacyDependencies": ["beschikbaarheid"],
+      "waarom": "Betalen heeft de strengste beschikbaarheids- en staartlatentie-eis omdat een onduidelijke uitkomst geld kan verdubbelen."
+    },
+    {
+      "id": "fulfillment-v1",
+      "version": 1,
+      "availabilityTarget": 99.9,
+      "windowDays": 30,
+      "minimumSamples": 200,
+      "minimumCoverage": 0.05,
+      "freshnessMinutes": 1440,
+      "latency": { "quantile": 0.9, "maxMs": 500 },
+      "legacyAvailability": "hospitality-fulfillment",
+      "legacyLatency": "snelheid-p90",
+      "legacyDependencies": ["beschikbaarheid"],
+      "waarom": "Dit meet het betrouwbaar vastleggen van fulfilmentstatus, niet hoe lang een diner of reis zelf duurt."
+    },
+    {
+      "id": "outcome-v1",
+      "version": 1,
+      "availabilityTarget": 99.9,
+      "windowDays": 30,
+      "minimumSamples": 200,
+      "minimumCoverage": 0.05,
+      "freshnessMinutes": 4320,
+      "latency": { "quantile": 0.9, "maxMs": 250 },
+      "legacyAvailability": "beschikbaarheid",
+      "legacyLatency": "snelheid-p90",
+      "legacyDependencies": [],
+      "waarom": "Een uitkomst moet betrouwbaar worden vastgelegd; de waarde van de uitkomst blijft een afzonderlijk domeinfeit."
     }
   ],
   "reizen": [

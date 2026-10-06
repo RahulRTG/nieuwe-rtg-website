@@ -131,7 +131,14 @@ module.exports = function lijfpoort(deps) {
 
      Wat wel klopt aan de oude reden: `wie` kan pas worden bepaald nadat de
      auth-poortwachter req.session heeft gezet. Op 'finish' is dat altijd zo. */
-  app.use(require('../lib/handelingsspoor')({ db, save }).middleware);
+  /* A-P1-05: kritieke handelingen krijgen EERST een duurzame regel; lukt dat niet,
+     dan gaat de handeling niet door (opzet/kritiekspoor.js). De auth-poorten roepen hem aan
+     (`kritiekspoor.poort`), want pas daar staat de actor vast. */
+  const spoor = require('../lib/handelingsspoor')({ db, save });
+  const dbKern = require('../db');
+  require('./kritiekspoor').haak({ handelingsspoor: spoor,
+    vastleggen: require('../lib/duurzaam')({ bijeen: dbKern.bijeen, save, inBundel: dbKern.inBundel, bron: 'handelingsspoor' }) });
+  app.use(spoor.middleware);
 
   /* Zaakdoos, lokale modus: elke geslaagde zaak-schrijfactie komt in het
      journaal, zodat hij na herstel van de lijn wordt nagespeeld naar de cloud.

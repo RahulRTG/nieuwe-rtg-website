@@ -1,6 +1,6 @@
 {
   "uitleg": "De veiligheidsboekhouding van de beschermstand. Per noemer geteld, nooit samengesteld: een percentage tussen twee verschillende noemers is fictie.",
-  "gemetenOp": "2026-09-02",
+  "gemetenOp": "2026-10-04",
   "uitslagen": [
     "BEWEZEN_GEBLOKKEERD",
     "BEWEZEN_TOEGESTAAN",
@@ -72,7 +72,7 @@
     {
       "punt": "blinde vlek in de beschermstand",
       "stand": "GEMETEN",
-      "waarom": "0 paden hebben geen functie in de catalogus en geen verklaring waarom niet. De andere 81 zijn de eigenaar-console (bij ontwerp) en de uitgang van deze laag zelf."
+      "waarom": "1 paden hebben geen functie in de catalogus en geen verklaring waarom niet. De andere 100 zijn de eigenaar-console (bij ontwerp) en de uitgang van deze laag zelf."
     },
     {
       "punt": "egress deny-by-default",
@@ -82,7 +82,7 @@
     {
       "punt": "procesisolatie van parsers",
       "stand": "ONBEPAALD_INFRA",
-      "waarom": "45 verwerkers draaien in het hoofdproces."
+      "waarom": "70 verwerkers draaien in het hoofdproces."
     },
     {
       "punt": "bruikbaarheid onder isolatie",
@@ -135,10 +135,10 @@
         "server/functies",
         "server/kern/bestuursroutes.js"
       ],
-      "gevonden": 4655,
-      "BEWEZEN_GEBLOKKEERD": 1137,
-      "BEWEZEN_TOEGESTAAN": 3518,
-      "ONBESLIST": 0,
+      "gevonden": 5148,
+      "BEWEZEN_GEBLOKKEERD": 1194,
+      "BEWEZEN_TOEGESTAAN": 3953,
+      "ONBESLIST": 1,
       "ONBEPAALD_INFRA": 0,
       "noemerachterstand": {
         "wat": "twee bekende gaten in de inventaris; 4655 is niet \"alle paden\"",
@@ -146,31 +146,43 @@
         "berekendePrefix": "routes die met een berekende prefix worden gemonteerd (routes/papieren-deur.js) ziet de statische scanner niet"
       },
       "blindeVlek": {
-        "aantal": 81,
+        "aantal": 101,
         "waarom": "geen functie in de functiecatalogus achter dit pad; de beschermstand deelt hem daarom niet in en laat hem door",
         "eigenaarConsole": {
-          "aantal": 63,
+          "aantal": 81,
           "wat": "bewust buiten de functieschakelaars, met een grond die al bestond: de hand die repareert, de meetlijn die eerlijk moet blijven, en de AVG-knoppen die RTG niet mag uitzetten",
           "bron": "server/kern/bestuursroutes.js: REDENEN (het bestaande register, niet hier overgetypt)",
           "gronden": {
-            "de schakelkast zelf: anders sluit de eigenaar zichzelf buiten": 16,
-            "het techniekbord zelf: de herstelknoppen mogen niet achter een knop": 47
+            "de schakelkast zelf: anders sluit de eigenaar zichzelf buiten": 15,
+            "een schakelaar op zien en opzeggen houdt een lid in een contract dat hij niet meer wil; dat is geen dienst die je uitzet maar de andere kant van een afspraak": 3,
+            "wat RTG van u weet inzien is hetzelfde AVG-recht als /api/inzagekaart": 1,
+            "idem: het kanaal waarmee u zichzelf terugkrijgt hoort niet uitschakelbaar te zijn": 3,
+            "een schakelaar op zelf gast worden houdt een lid vast aan een pas die hij niet meer wil": 1,
+            "de commerciele opt-in is toestemming, en toestemming intrekken is een recht": 4,
+            "een gekaapte sessie zelf kunnen sluiten is een noodrem en geen product": 3,
+            "de toestelbinding is dezelfde eigen beveiliging als /api/toestel/meting hierboven": 4,
+            "uw tweede factor aanzetten is uw eigen beveiliging; een knop waarmee RTG hem uitzet helpt alleen een aanvaller": 5,
+            "het techniekbord zelf: de herstelknoppen mogen niet achter een knop": 38,
+            "toestemming intrekken is een recht en niet uitschakelbaar": 3,
+            "HMAC-beveiligde storingenontvangst blijft bereikbaar wanneer functies uitstaan; de ontvangst heeft een eigen rem en opslagpoort": 1
           },
           "maar": "de beschermstand heeft daarmee geen grip op die console"
         },
         "eigenUitgang": {
-          "aantal": 11,
+          "aantal": 13,
           "paden": [
             "/api/isolatie/mijn",
             "/api/isolatie/mijn/ontsluiting",
             "/api/isolatie/mijn/ontsluiting/afbreken",
             "/api/isolatie/mijn/ontsluiting/commit",
             "/api/isolatie/mijn/ontsluiting/stap",
+            "/api/isolatie/mijn/ontsluiting/stap/opties",
             "/api/isolatie/mijn/zet",
             "/api/techniek/isolatie/ontsluiting",
             "/api/techniek/isolatie/ontsluiting/afbreken",
             "/api/techniek/isolatie/ontsluiting/commit",
             "/api/techniek/isolatie/ontsluiting/stap",
+            "/api/techniek/isolatie/ontsluiting/stap/opties",
             "/api/techniek/isolatie/zet"
           ],
           "wat": "de uitgang van de stand zelf; die valt met opzet niet dicht",
@@ -189,16 +201,17 @@
           "bron": "server/kern/isolatie/openpaden.js: RECHT_VAN_DE_MENS"
         },
         "bewustDicht": {
-          "aantal": 2,
+          "aantal": 1,
           "paden": {
-            "/api/privacy/delete": "onomkeerbaar en breed: de gemeten collecties laten rechten, identiteit, andermans gegevens, koppelingen en de beveiliging zien. Het RECHT blijft bestaan; de UITVOERING wacht tot het account niet meer onder verdenking staat.",
             "/api/toestel/meting": "geen ledenroute maar een toestelsleutel (kern/toestellen.js): een andere deur, geen blinde vlek in deze."
           },
           "wat": "overwogen en met opzet niet opengezet"
         },
         "werklijst": {
-          "aantal": 0,
-          "paden": [],
+          "aantal": 1,
+          "paden": [
+            "/api/command/mandaat"
+          ],
           "wat": "blinde vlekken zonder verklaring; dit is het werk"
         }
       }
@@ -209,10 +222,10 @@
         "server/functies",
         "server/kern/beschermstand-lijst.js"
       ],
-      "gevonden": 205,
+      "gevonden": 226,
       "categorieën": 17,
-      "BEWEZEN_GEBLOKKEERD": 56,
-      "BEWEZEN_TOEGESTAAN": 149,
+      "BEWEZEN_GEBLOKKEERD": 57,
+      "BEWEZEN_TOEGESTAAN": 169,
       "ONBESLIST": 0,
       "ONBEPAALD_INFRA": 0,
       "bevrorenCategorieën": 6,
@@ -254,53 +267,77 @@
       ],
       "perRol": {
         "member": {
-          "gevonden": 1629,
-          "verboden": 1509,
-          "bereikbaar": 120,
+          "gevonden": 1878,
+          "verboden": 1755,
+          "bereikbaar": 123,
           "perNiveau": {
-            "verboden": 1509,
-            "[object Object]": 120
+            "verboden": 1755,
+            "[object Object]": 123
           }
         },
-        "zonder-rol": {
-          "gevonden": 840,
-          "verboden": 840,
+        "openbaar": {
+          "gevonden": 125,
+          "verboden": 125,
           "bereikbaar": 0,
           "perNiveau": {
-            "verboden": 840
+            "verboden": 125
+          }
+        },
+        "eigen-poort": {
+          "gevonden": 10,
+          "verboden": 10,
+          "bereikbaar": 0,
+          "perNiveau": {
+            "verboden": 10
           }
         },
         "office": {
-          "gevonden": 806,
-          "verboden": 806,
+          "gevonden": 836,
+          "verboden": 836,
           "bereikbaar": 0,
           "perNiveau": {
-            "verboden": 806
+            "verboden": 836
           }
         },
         "supplier": {
-          "gevonden": 1213,
-          "verboden": 1160,
+          "gevonden": 1258,
+          "verboden": 1205,
           "bereikbaar": 53,
           "perNiveau": {
-            "verboden": 1160,
+            "verboden": 1205,
             "[object Object]": 53
           }
         },
-        "techniek": {
-          "gevonden": 67,
-          "verboden": 67,
+        "zonder-rol": {
+          "gevonden": 772,
+          "verboden": 772,
           "bereikbaar": 0,
           "perNiveau": {
-            "verboden": 67
+            "verboden": 772
+          }
+        },
+        "techniek": {
+          "gevonden": 58,
+          "verboden": 58,
+          "bereikbaar": 0,
+          "perNiveau": {
+            "verboden": 58
+          }
+        },
+        "kantoor-op-naam": {
+          "gevonden": 81,
+          "verboden": 81,
+          "bereikbaar": 0,
+          "perNiveau": {
+            "verboden": 81
           }
         },
         "boardroom": {
-          "gevonden": 95,
-          "verboden": 95,
+          "gevonden": 124,
+          "verboden": 124,
           "bereikbaar": 0,
           "perNiveau": {
-            "verboden": 95
+            "verboden": 124
           }
         },
         "scim": {
@@ -309,6 +346,14 @@
           "bereikbaar": 0,
           "perNiveau": {
             "verboden": 2
+          }
+        },
+        "omgeving": {
+          "gevonden": 1,
+          "verboden": 1,
+          "bereikbaar": 0,
+          "perNiveau": {
+            "verboden": 1
           }
         },
         "werkplekbaas": {
@@ -323,14 +368,21 @@
       "onderStand": {
         "beschermd": {
           "member": {
-            "bereikbaar": 120,
-            "naFilter": 95,
-            "weggevallen": 25,
+            "bereikbaar": 123,
+            "naFilter": 100,
+            "weggevallen": 23,
             "regels": [
+              "Betalen & verificatie",
               "Geld"
             ]
           },
-          "zonder-rol": {
+          "openbaar": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "eigen-poort": {
             "bereikbaar": 0,
             "naFilter": 0,
             "weggevallen": 0,
@@ -352,7 +404,19 @@
               "Personeel & integraties"
             ]
           },
+          "zonder-rol": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
           "techniek": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "kantoor-op-naam": {
             "bereikbaar": 0,
             "naFilter": 0,
             "weggevallen": 0,
@@ -370,6 +434,12 @@
             "weggevallen": 0,
             "regels": []
           },
+          "omgeving": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
           "werkplekbaas": {
             "bereikbaar": 0,
             "naFilter": 0,
@@ -379,15 +449,22 @@
         },
         "isolatie": {
           "member": {
-            "bereikbaar": 120,
-            "naFilter": 50,
+            "bereikbaar": 123,
+            "naFilter": 53,
             "weggevallen": 70,
             "regels": [
+              "Betalen & verificatie",
               "Geld",
               "NIET_BEWEZEN_LEZER"
             ]
           },
-          "zonder-rol": {
+          "openbaar": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "eigen-poort": {
             "bereikbaar": 0,
             "naFilter": 0,
             "weggevallen": 0,
@@ -410,7 +487,19 @@
               "Personeel & integraties"
             ]
           },
+          "zonder-rol": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
           "techniek": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "kantoor-op-naam": {
             "bereikbaar": 0,
             "naFilter": 0,
             "weggevallen": 0,
@@ -423,6 +512,12 @@
             "regels": []
           },
           "scim": {
+            "bereikbaar": 0,
+            "naFilter": 0,
+            "weggevallen": 0,
+            "regels": []
+          },
+          "omgeving": {
             "bereikbaar": 0,
             "naFilter": 0,
             "weggevallen": 0,
@@ -446,30 +541,29 @@
       ],
       "handhaaft": false,
       "waarom": "CONTROLPLANE.md: een nieuwe handhavingsregel loopt eerst mee zonder te blokkeren. Deze getallen zijn de voorwaarde om hem ooit aan te zetten, niet het bewijs dat het al werkt.",
-      "gevonden": 4655,
+      "gevonden": 5148,
       "effectgraad": {
-        "verklaard": 375,
-        "vermoed": 1701,
-        "onbekend": 2461,
-        "afgeleid": 118
+        "verklaard": 447,
+        "vermoed": 1820,
+        "onbekend": 2778,
+        "afgeleid": 103
       },
-      "eens": 989,
-      "onbekend": 2461,
-      "strenger": 1165,
-      "losser": 40,
+      "eens": 1054,
+      "onbekend": 2778,
+      "strenger": 1275,
+      "losser": 41,
       "geenSom": "strenger, losser en onbekend vragen om drie verschillende dingen en worden nooit opgeteld",
       "blindEnVerzwakkend": {
-        "aantal": 56,
+        "aantal": 46,
         "waarom": "deze paden kent de beschermstand niet (geen functie in de catalogus) terwijl het effectmodel er een gesloten effect in ziet",
         "bijOntwerp": {
-          "aantal": 56,
+          "aantal": 46,
           "wat": "bewust buiten de functieschakelaars, met een grond die al bestond",
           "bron": "server/kern/bestuursroutes.js: REDENEN",
           "gronden": {
             "de schakelkast zelf: anders sluit de eigenaar zichzelf buiten": 1,
-            "zien wie in uw gegevens keek is hetzelfde AVG-recht; een knop die dat dichtzet hoort niet te bestaan": 1,
-            "inzage, export en verwijdering zijn AVG-rechten en niet uitschakelbaar": 2,
-            "het techniekbord zelf: de herstelknoppen mogen niet achter een knop": 52
+            "het techniekbord zelf: de herstelknoppen mogen niet achter een knop": 44,
+            "HMAC-beveiligde storingenontvangst blijft bereikbaar wanneer functies uitstaan; de ontvangst heeft een eigen rem en opslagpoort": 1
           },
           "maar": "de beschermstand heeft daarmee geen grip op die console. Wie hem overneemt, loopt langs deze hele laag heen; daar hangt de ontsluitceremonie van het HUIS aan, en die is er nog niet."
         },
@@ -559,11 +653,10 @@
           ]
         },
         {
-          "pad": "/api/appstore/bonnen",
+          "pad": "/api/appstore/bon",
           "regel": null,
           "effecten": [
-            "IDENTITEIT_WIJZIGEN",
-            "DERDENCODE_UITVOEREN"
+            "IDENTITEIT_WIJZIGEN"
           ],
           "graad": "afgeleid",
           "geraakt": [
@@ -571,14 +664,15 @@
           ]
         },
         {
-          "pad": "/api/appstore/mijn",
+          "pad": "/api/auth/aanmeldkanaal",
           "regel": null,
           "effecten": [
-            "IDENTITEIT_WIJZIGEN",
-            "DERDENCODE_UITVOEREN"
+            "RECHT_VERLENEN",
+            "IDENTITEIT_WIJZIGEN"
           ],
-          "graad": "afgeleid",
+          "graad": "vermoed",
           "geraakt": [
+            "RECHT_VERLENEN",
             "IDENTITEIT_WIJZIGEN"
           ]
         },
@@ -709,30 +803,30 @@
         "server/kern/isolatie/effectcollecties.js",
         "IDEMPROEF.json"
       ],
-      "gevonden": 4655,
+      "gevonden": 5148,
       "graden": {
-        "onbekend": 2461,
-        "vermoed": 1701,
-        "afgeleid": 118,
-        "verklaard": 375
+        "onbekend": 2778,
+        "vermoed": 1820,
+        "afgeleid": 103,
+        "verklaard": 447
       },
       "bronnen": {
-        "geen": 2461,
-        "vermoed": 1701,
-        "afgeleid": 118,
-        "verklaard": 348,
-        "verklaard+afgeleid": 27
+        "geen": 2778,
+        "vermoed": 1820,
+        "afgeleid": 103,
+        "verklaard": 412,
+        "verklaard+afgeleid": 35
       },
-      "collectiesIngedeeld": 80,
+      "collectiesIngedeeld": 84,
       "collectiesGemeten": 236,
       "plafond": {
-        "alsElkeCollectieIsIngedeeld": 639,
-        "danNogOnbekend": 2203,
+        "alsElkeCollectieIsIngedeeld": 512,
+        "danNogOnbekend": 2577,
         "waarom": "de grens ligt bij de PROEF en niet bij de lijst: een pad waar IDEMPROEF.json nooit met succes langskwam, raakt geen enkele collectie. Meer dekking komt van een betere proef, niet van meer namen in het register."
       },
       "ijking": {
-        "paren": 27,
-        "overlappend": 22,
+        "paren": 29,
+        "overlappend": 26,
         "aanvullend": [
           {
             "pad": "/api/member/ai/tegoed",
@@ -753,35 +847,16 @@
             ]
           },
           {
-            "pad": "/api/office/boardroom/ai",
+            "pad": "/api/supplier/rtmail/export",
             "verklaard": [
-              "UITGAANDE_AANROEP"
+              "BULK_UITVOER"
             ],
             "afgeleid": [
               "RECHT_VERLENEN"
             ]
-          },
-          {
-            "pad": "/api/office/techniek/integraties/schakel",
-            "verklaard": [
-              "BEVEILIGING_VERZWAKKEN"
-            ],
-            "afgeleid": [
-              "VERTROUWENSRELATIE_AANGAAN"
-            ]
-          },
-          {
-            "pad": "/api/supplier/facturen/pdf",
-            "verklaard": [
-              "ONVERTROUWDE_BYTES"
-            ],
-            "afgeleid": [
-              "EXTERN_BEREIKEN",
-              "GELD_BEWEGEN"
-            ]
           }
         ],
-        "zonderOverlap": 5,
+        "zonderOverlap": 3,
         "uitslag": "de twee bronnen spreken elkaar niet tegen maar vullen elkaar aan: waar ze niet overlappen, ziet de een iets wat de ander principieel niet kan zien (de proef kijkt in de opslag en niet naar uitgaande aanroepen; de verklaring leest de naam en kent geen collecties). Daarom worden ze OPGETELD en niet gerangschikt."
       },
       "spreiding": {
@@ -790,23 +865,22 @@
         "breed": [
           {
             "collectie": "suppliers",
-            "families": 7,
+            "families": 6,
             "voorbeelden": [
               "/api/foodcourt",
               "/api/groothandel",
               "/api/mall",
-              "/api/staff",
               "/api/supplier",
-              "/api/uitgaan"
+              "/api/uitgaan",
+              "/api/verkoop"
             ]
           },
           {
             "collectie": "onboarding",
-            "families": 5,
+            "families": 4,
             "voorbeelden": [
               "/api/appstore",
               "/api/onboarding",
-              "/api/onderneming",
               "/api/supplier",
               "/api/rtf"
             ]
@@ -826,7 +900,7 @@
         }
       },
       "magHandhaven": false,
-      "waarom": "met 2461 van de 4655 paden zonder profiel kan dit model niet de laag zijn die beslist: het zou over meer dan de helft van het huis moeten raden, en raden in de gesloten richting legt het platform plat terwijl raden in de open richting niets beschermt. De blokkade is GEMETEN en heeft een naam -- de proef, niet het register -- en dat is iets anders dan \"er is nog werk\"."
+      "waarom": "met 2778 van de 5148 paden zonder profiel kan dit model niet de laag zijn die beslist: het zou over meer dan de helft van het huis moeten raden, en raden in de gesloten richting legt het platform plat terwijl raden in de open richting niets beschermt. De blokkade is GEMETEN en heeft een naam -- de proef, niet het register -- en dat is iets anders dan \"er is nog werk\"."
     },
     "leesset": {
       "wat": "wat er onder `isolatie` overblijft, en op welke grond",
@@ -835,36 +909,36 @@
         "IDEMPROEF.json",
         "server/kern/isolatie/effecten.js"
       ],
-      "gevonden": 4655,
-      "BEWEZEN_GEBLOKKEERD": 3382,
-      "BEWEZEN_TOEGESTAAN": 1273,
+      "gevonden": 5148,
+      "BEWEZEN_GEBLOKKEERD": 3769,
+      "BEWEZEN_TOEGESTAAN": 1379,
       "ONBESLIST": 0,
       "ONBEPAALD_INFRA": 0,
       "gronden": {
-        "NIET_BEWEZEN_LEZER": 2446,
+        "NIET_BEWEZEN_LEZER": 2790,
         "Toegang en identiteit": 37,
-        "EFFECT_GESLOTEN": 50,
-        "Geld": 62,
-        "Betalen & verificatie": 19,
-        "Personeel & integraties": 26,
-        "Identiteit en veiligheid": 19,
-        "Partners (leveranciers)": 723
+        "EFFECT_GESLOTEN": 56,
+        "Geld": 58,
+        "Betalen & verificatie": 24,
+        "Personeel & integraties": 34,
+        "Identiteit en veiligheid": 22,
+        "Partners (leveranciers)": 748
       },
       "meting": {
-        "routesInDeProef": 4655,
-        "metSuccesGemeten": 1622,
-        "bewezenLezers": 1280,
-        "nooitMetSuccesGemeten": 3033,
+        "routesInDeProef": 5148,
+        "metSuccesGemeten": 1735,
+        "bewezenLezers": 1389,
+        "nooitMetSuccesGemeten": 3413,
         "ontbreekt": null,
         "kost": "wat nooit met succes is gemeten, gaat onder isolatie dicht. Een deel daarvan zijn onschuldige lezers, dus isolatie is botter dan hij hoeft te zijn. Dat wordt minder naarmate IDEMPROEF.json verder komt, niet naarmate deze module slimmer wordt.",
         "verouderingsrichting": "strenger: een pad dat nog niet in de meting staat, is niet bewezen en gaat dicht"
       },
       "tegenoverBeschermd": {
-        "beschermdLaatDoor": 3518,
-        "isolatieLaatDoor": 1273,
+        "beschermdLaatDoor": 3954,
+        "isolatieLaatDoor": 1379,
         "waarom": "isolatie draagt de eigenschap `beschermd` ook, en sluit daarbovenop alles waarvan het lezerschap niet is bewezen"
       },
-      "prijs": "de meting kwam bij 3033 van de 4655 rol-paden nooit met succes langs. Die gaan onder isolatie dicht, en een deel ervan zijn onschuldige lezers. Isolatie is dus botter dan hij hoeft te zijn; dat wordt minder naarmate IDEMPROEF.json verder komt."
+      "prijs": "de meting kwam bij 3413 van de 5148 rol-paden nooit met succes langs. Die gaan onder isolatie dicht, en een deel ervan zijn onschuldige lezers. Isolatie is dus botter dan hij hoeft te zijn; dat wordt minder naarmate IDEMPROEF.json verder komt."
     },
     "dragers": {
       "wat": "de zes dragers waarop een stand kan staan",
@@ -903,7 +977,7 @@
         "scripts/lib/achtergrond.js"
       ],
       "gevonden": 45,
-      "bestanden": 41,
+      "bestanden": 40,
       "binnenEenContext": 1,
       "contextpunten": [
         "server/opzet/diensten2.js (kosten/haak)"
@@ -1182,13 +1256,19 @@
         "kaartVersmalt": true,
         "poortBijUitvoeren": true,
         "besmettingGeboekt": true,
-        "bijt": false,
-        "wat": "de leiding ligt er: de lus boekt zijn kanalen, de kaart versmalt erop en de poort hangt VOOR de uitvoering. Hij BIJT alleen met RTG_HERKOMST_AFDWINGEN=1; daarzonder telt hij en houdt hij niets tegen (CONTROLPLANE.md: eerst in de schaduw)."
+        "bijt": [],
+        "werelden": [
+          "member",
+          "supplier",
+          "staff",
+          "office"
+        ],
+        "wat": "de leiding ligt er: de lus boekt zijn kanalen, de kaart versmalt erop en de poort hangt VOOR de uitvoering. Hij BIJT per WERELD: RTG_HERKOMST_AFDWINGEN noemt de werelden (of \"1\"/\"alle\"), en waar hij niet genoemd is telt hij en houdt hij niets tegen (CONTROLPLANE.md: eerst in de schaduw, dan wereld voor wereld)."
       },
       "prijsPerRol": {
         "member": {
-          "voor": 120,
-          "na": 36
+          "voor": 123,
+          "na": 37
         },
         "supplier": {
           "voor": 53,
@@ -1208,11 +1288,11 @@
         "server/**/*.js",
         "server/kern/ssrf.js"
       ],
-      "gevonden": 43,
+      "gevonden": 45,
       "BEWEZEN_GEBLOKKEERD": 0,
       "BEWEZEN_TOEGESTAAN": 0,
       "ONBESLIST": 0,
-      "ONBEPAALD_INFRA": 43,
+      "ONBEPAALD_INFRA": 45,
       "appBewijs": "kern/ssrf.js weigert privé- en metadata-adressen voor doelen die een CLIENT aanlevert, en houdt voor web-push een allowlist van pushdiensten aan",
       "infraBewijs": "ONTBREEKT: er is in deze repo geen egress-policy, geen deny-by-default en geen netwerknamespace-bewijs. En let op: hier stond \"PRODUCTION.md belooft een egress-proxy; een belofte is geen meting\" -- dat document noemt egress NERGENS. Er was dus niet eens een belofte, alleen een verwijzing naar een paragraaf die nooit heeft bestaan (dezelfde fout als de cap `rooms` in CLAUDE.md). Er is geen egress-poort, en er is er ook nooit een toegezegd",
       "eindoordeel": "ONBEPAALD_INFRA",
@@ -1248,6 +1328,7 @@
         "rahulrtg.github.io",
         "rahultravelgroup.com",
         "rahultravelgroup.example",
+        "samen.invalid",
         "taxation-customs.ec.europa.eu",
         "trade.ec.europa.eu",
         "www.adyen.com",
@@ -1260,7 +1341,8 @@
         "www.nvwa.nl",
         "www.openstreetmap.org",
         "www.rahultravelgroup.com",
-        "www.sba.gov"
+        "www.sba.gov",
+        "www.sqlite.org"
       ]
     },
     "bestandsverwerkers": {
@@ -1268,19 +1350,24 @@
       "bron": [
         "server/kern/**/*.js"
       ],
-      "gevonden": 45,
+      "gevonden": 70,
       "BEWEZEN_GEBLOKKEERD": 0,
       "BEWEZEN_TOEGESTAAN": 0,
       "ONBESLIST": 0,
-      "ONBEPAALD_INFRA": 45,
+      "ONBEPAALD_INFRA": 70,
       "procesGeisoleerd": 0,
-      "appBewijs": "45 van de 45 importeren geen HTTP-client",
+      "appBewijs": "70 van de 70 importeren geen HTTP-client",
       "infraBewijs": "ONTBREEKT: geen van deze modules draait in een eigen proces met eigen geheugen-, CPU- en tijdgrens. Ze draaien in het hoofdproces van de server",
       "eindoordeel": "ONBEPAALD_INFRA",
       "waarschuwing": "\"importeert geen HTTP-client\" is GEEN bewijs dat een parser geen internet heeft -- alleen dat de code er niet om vraagt. Een geheugenfout in een parser vraagt niets.",
       "modules": [
         {
           "module": "server/kern/bestanden-delen.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/bestanden-metadata.js",
           "eigenProces": false,
           "netwerkclient": false
         },
@@ -1301,6 +1388,11 @@
         },
         {
           "module": "server/kern/bestanden-vergeten.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/bestanden-versiecommit.js",
           "eigenProces": false,
           "netwerkclient": false
         },
@@ -1326,6 +1418,81 @@
         },
         {
           "module": "server/kern/concern/entiteit-beeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/afhankelijkheden.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/beeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/bewijsstand.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/connector.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/doe-bijeenkomst.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/doe.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/eindstanden.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/index.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/koppeling.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/kwestie.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/lid.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/meter.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/partijen.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/voorstellen.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/democratie/wek.js",
           "eigenProces": false,
           "netwerkclient": false
         },
@@ -1370,7 +1537,17 @@
           "netwerkclient": false
         },
         {
+          "module": "server/kern/mediaos/aanwezigheid-beeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
           "module": "server/kern/mobiliteit/kaartje-beeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/muziek-bestanden.js",
           "eigenProces": false,
           "netwerkclient": false
         },
@@ -1401,6 +1578,16 @@
         },
         {
           "module": "server/kern/office/formulier.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/office/gezinsdeling.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/office/rechten.js",
           "eigenProces": false,
           "netwerkclient": false
         },
@@ -1465,6 +1652,11 @@
           "netwerkclient": false
         },
         {
+          "module": "server/kern/presentatie-beelden.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
           "module": "server/kern/rampbeeld/advies.js",
           "eigenProces": false,
           "netwerkclient": false
@@ -1485,12 +1677,27 @@
           "netwerkclient": false
         },
         {
+          "module": "server/kern/streefbeeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
           "module": "server/kern/theater/video.js",
           "eigenProces": false,
           "netwerkclient": false
         },
         {
           "module": "server/kern/uploadquarantaine.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/vrijheid/beeld.js",
+          "eigenProces": false,
+          "netwerkclient": false
+        },
+        {
+          "module": "server/kern/vrijheid/teambeeld.js",
           "eigenProces": false,
           "netwerkclient": false
         },

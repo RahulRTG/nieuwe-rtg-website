@@ -12,6 +12,8 @@
 const https = require('https');
 const http = require('http');
 const { URL } = require('url');
+const retry = require('../kern/bewijsvlak/retry');
+const { hash } = require('../kern/bewijsvlak/canon');
 
 // Eigen keep-alive Agents: houd de TCP/TLS-verbinding naar dezelfde host warm
 // tussen (vaak bursty) calls, zodat een volgende call naar de AI- of betaal-
@@ -46,6 +48,11 @@ function vraag(opties) {
   const maxPogingen = opties.maxRetries != null ? opties.maxRetries : 2;
   const timeout = opties.timeout || 60000;
   let resolve, reject;
+  const operationId = opties.operationId || 'http_' + hash({ url: opties.url,
+    method: opties.method || (opties.json !== undefined || opties.form !== undefined || opties.body != null ? 'POST' : 'GET'),
+    idempotencyKey: opties.idempotencyKey || null });
+  const inputHash = opties.inputHash || hash(opties.json !== undefined ? opties.json
+    : opties.form !== undefined ? opties.form : opties.body == null ? null : String(opties.body));
   const belofte = new Promise((res, rej) => { resolve = res; reject = rej; });
   probeer(0);
   return belofte;
@@ -76,16 +83,32 @@ function vraag(opties) {
       res.on('end', () => {
         const status = res.statusCode;
         const tekst = Buffer.concat(brok).toString('utf8');
-        if ((status === 429 || status >= 500) && poging < maxPogingen) return nogmaals(poging);
+        if ((status === 429 || status >= 500) && poging < maxPogingen) return nogmaals(poging, status);
+        if ((status === 429 || status >= 500)) noteer({ attempt: poging + 1, outcome: 'FAILED',
+          classification: 'RETRYABLE', inputHash, errorCode: status, delayMs: null });
         resolve({ status, headers: res.headers, tekst, json() { return JSON.parse(tekst); } });
       });
     });
-    req.on('error', (e) => { if (poging < maxPogingen) nogmaals(poging); else reject(e); });
+    req.on('error', (e) => {
+      if (poging < maxPogingen) nogmaals(poging, e.code);
+      else { noteer({ attempt: poging + 1, outcome: 'FAILED', classification: retry.classificeer(e),
+        inputHash, errorCode: e.code || null, delayMs: null }); reject(e); }
+    });
     req.setTimeout(timeout, () => req.destroy(Object.assign(new Error('HTTP: tijd verstreken'), { code: 'ETIMEDOUT' })));
     if (data) req.write(data);
     req.end();
   }
-  function nogmaals(poging) { setTimeout(() => probeer(poging + 1), 500 * Math.pow(2, poging)); }
+  function noteer(receipt) {
+    if (typeof opties.onRetryAttempt === 'function') try {
+      opties.onRetryAttempt(Object.freeze({ operationId, idempotencyKey: opties.idempotencyKey || null, ...receipt }));
+    } catch (e) { /* observatie verandert de provideruitkomst niet */ }
+  }
+  function nogmaals(poging, code) {
+    const delayMs = retry.vertraging(operationId, poging + 1, opties.retryPolicy);
+    noteer({ attempt: poging + 1, outcome: 'RETRY_SCHEDULED', classification: 'RETRYABLE',
+      inputHash, errorCode: code || null, delayMs });
+    setTimeout(() => probeer(poging + 1), delayMs);
+  }
 }
 
 module.exports = { vraag, formBody };

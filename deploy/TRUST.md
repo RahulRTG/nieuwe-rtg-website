@@ -1,4 +1,4 @@
-# Release-trust v1: drie bevoegdheden
+# Release-trust v1: drie releasebevoegdheden
 
 Deze policy vervangt de gedeelde build-/evidence-sleutel. De migratie maakt
 geen echte sleutels aan en verleent niemand automatisch releasebevoegdheid.
@@ -14,6 +14,14 @@ DER-gecodeerde publieke sleutels voorkomt dat verschillende PEM-weergaven
 het hergebruik van één sleutel verhullen. Het document kan zijn eigen
 verificatiesleutel niet aanleveren. Signers controleren vóór ondertekening dat
 hun private key bij hun eigen vaste rolanker hoort.
+
+De externe **meetrunner** is bewust geen vierde releasebevoegdheid: hij mag
+alleen waarnemingen attesteren en kan geen dossier goedkeuren of kandidaat
+promoveren. Zijn aparte, versioned publieke ankers staan als
+`deploy/evidence-runner-vN.pub` in de betreffende releasecommit. Zowel de
+bewijsproducent als de latere dossierverifier controleren de oorspronkelijke
+runnerhandtekening; de evidence-signer kan haar niet vervangen. Zie
+[EVIDENCE-RUNNER.md](EVIDENCE-RUNNER.md).
 
 ## Signaturecontract
 

@@ -6,7 +6,7 @@
    uitleg verdient -- hij heeft dit huis een gebroken PostgreSQL-opstelling
    gekost.
 
-   WAT ER MISGING. De eerste versie deed in `res.on('finish')` het voor de hand
+   WAT ER MISGING. De eerste versie deed in een finish-haak het voor de hand
    liggende: db.data muteren en save() roepen. Dat brak de PostgreSQL-opstelling
    volledig -- twee instances op een gedeelde database, en de server werd niet
    meer `ready` (`writeHealthy: false`, elk verzoek 503). Niet af en toe:
@@ -37,6 +37,7 @@
    DEZELFDE functie. Twee kopieen van die rekensom is de vorm waarin een teller
    op het scherm iets anders zegt dan in de opslag. */
 'use strict';
+const { losVanVerzoek } = require('../../lib/losvanverzoek');
 
 /* Hoe lang tikken in RAM mogen blijven. Kort genoeg dat een herstart weinig
    kost, lang genoeg dat een drukke minuut niet honderd schrijfacties wordt. */
@@ -71,7 +72,7 @@ function maakSpoeler({ bak, save, bewerkCollectie, collectie, maxPaden, velden }
 
   function planSpoel() {
     if (klaarZetter) return;
-    klaarZetter = setTimeout(() => {
+    klaarZetter = losVanVerzoek(setTimeout, () => {   // voor alle verzoeken: nulcontext
       klaarZetter = null;
       try { spoel(); } catch (e) { /* een meting houdt nooit iets tegen */ }
     }, SPOEL_MS);

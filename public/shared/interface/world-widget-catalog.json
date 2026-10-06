@@ -3371,6 +3371,24 @@
       "maturity": "L0"
     },
     {
+      "id": "library",
+      "url": "/apps/library.html",
+      "name": "Foundation LibraryOS",
+      "world": "foundation",
+      "worlds": [
+        "foundation"
+      ],
+      "type": "workspace",
+      "icon": "grid",
+      "sections": [
+        "Nieuw intellectueel werk",
+        "Van menselijke kennis naar een blijvende editie",
+        "Inhoud"
+      ],
+      "description": "Van menselijke kennis naar een immutable Edition: schrijven, expliciete afspraken en rechten, rustig lezen, inhoudelijke feedback en een aantoonbare volgende editie.",
+      "maturity": "L0"
+    },
+    {
       "id": "life",
       "url": "/apps/life.html",
       "name": "RTG Life",

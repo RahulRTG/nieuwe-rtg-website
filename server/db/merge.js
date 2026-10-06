@@ -17,15 +17,27 @@ function itemSleutel(it) {
   return null;
 }
 function soort(x) { return Array.isArray(x) ? 'array' : (x && typeof x === 'object' ? 'object' : 'scalar'); }
-function merge3(base, ours, theirs) {
-  if (theirs === undefined) return ours;
-  if (ours === undefined) return theirs;
+/* opBotsing (optioneel): wordt aangeroepen met het pad zodra BEIDE kanten
+   hetzelfde blad anders wijzigden en de onze wint, of de ene kant verwijderde
+   wat de andere wijzigde (dan blijft de wijziging en verdwijnt de verwijdering;
+   de tweede herkeuring van C6). De uitkomst verandert er niet door -- merge3
+   blijft puur -- maar een verloren update is dan niet meer stil. */
+function merge3(base, ours, theirs, opBotsing, pad) {
+  const botst = () => { if (opBotsing) { try { opBotsing(pad || ''); } catch (e) {} } };
+  const dieper = (k) => (pad ? pad + '.' : '') + k;
+  if (theirs === undefined || ours === undefined) {
+    const blijft = theirs === undefined ? ours : theirs;
+    if (base !== undefined && blijft !== undefined && _j(blijft) !== _j(base)) botst();
+    return blijft;
+  }
   if (soort(ours) !== soort(theirs) || (base !== undefined && soort(base) !== soort(ours))) {
+    if (_j(ours) !== _j(base) && _j(theirs) !== _j(base) && _j(ours) !== _j(theirs)) botst();
     return _j(ours) !== _j(base) ? ours : theirs; // structuur veranderde: de gewijzigde kant
   }
   if (soort(ours) === 'scalar') {
     if (_j(ours) === _j(base)) return theirs;
     if (_j(theirs) === _j(base)) return ours;
+    if (_j(ours) !== _j(theirs)) botst();
     return ours; // beide gewijzigd: de onze (laatste schrijver)
   }
   if (soort(ours) === 'object') {
@@ -34,7 +46,7 @@ function merge3(base, ours, theirs) {
       const bo = b[k], oo = ours[k], to = theirs[k];
       if (oo === undefined && bo !== undefined && _j(to) === _j(bo)) continue; // wij verwijderden
       if (to === undefined && bo !== undefined && _j(oo) === _j(bo)) continue; // zij verwijderden
-      const m = merge3(bo, oo, to);
+      const m = merge3(bo, oo, to, opBotsing, dieper(k));
       if (m !== undefined) res[k] = m;
     }
     return res;
@@ -49,13 +61,14 @@ function merge3(base, ours, theirs) {
       const bo = mb.get(k), oo = mo.get(k), to = mt.get(k);
       if (oo === undefined && mb.has(k) && _j(to) === _j(bo)) continue; // wij verwijderden
       if (to === undefined && mb.has(k) && _j(oo) === _j(bo)) continue; // zij verwijderden
-      const m = merge3(bo, oo, to);
+      const m = merge3(bo, oo, to, opBotsing, dieper('[' + k + ']'));
       if (m !== undefined) res.set(k, m);
     }
     return [...res.values()];
   }
   if (_j(ours) === _j(base)) return theirs;
   if (_j(theirs) === _j(base)) return ours;
+  if (_j(ours) !== _j(theirs)) botst();
   return ours;
 }
 module.exports = { merge3, itemSleutel, soort };

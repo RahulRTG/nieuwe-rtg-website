@@ -75,7 +75,20 @@ function procesStart(pid) {
     const stat = fs.readFileSync('/proc/' + pid + '/stat', 'utf8');
     const na = stat.slice(stat.lastIndexOf(')') + 2).split(' ');
     return Number(na[19]) || null;
-  } catch (e) { return null; }
+  } catch (e) {
+    /* macOS heeft geen /proc. `ps lstart` is daar de stabiele identiteit van
+       dezelfde procesinstantie (op seconden nauwkeurig), in tegenstelling tot
+       alleen een PID. Daarmee blijft PID-hergebruik ook op ontwikkel-Macs
+       veilig; `null` is alleen nog de fail-closed uitkomst wanneer het platform
+       werkelijk geen starttijd kan leveren. */
+    try {
+      const begin = execFileSync('ps', ['-o', 'lstart=', '-p', String(pid)], {
+        encoding: 'utf8', env: Object.assign({}, process.env, { LC_ALL: 'C' })
+      }).trim();
+      const tijd = Date.parse(begin);
+      return Number.isFinite(tijd) ? tijd : null;
+    } catch (geenPs) { return null; }
+  }
 }
 /* EEN ZOMBIE IS GEEN LEVEND WERK, en dat onderscheid is hier niet academisch.
 
@@ -529,4 +542,4 @@ function begin({ taak, commit, basis, verwachteUitvoer, poorten, uitExitcode } =
   };
 }
 
-module.exports = { begin, lees, magStarten, magControleren, ruimOp, herstel, diagnose, wezenVan, kringVan, zelfdeProces, procesLeeft, eigenLijn, AFLOOP, STANDEN, TERMINAAL };
+module.exports = { begin, lees, magStarten, magControleren, ruimOp, herstel, diagnose, wezenVan, kringVan, zelfdeProces, procesLeeft, procesStart, eigenLijn, AFLOOP, STANDEN, TERMINAAL };

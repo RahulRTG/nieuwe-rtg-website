@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-06T13:09:39.040Z",
-  "commit": "66374ec5",
+  "op": "2026-10-06T14:26:55.456Z",
+  "commit": "cb15fea35",
   "boomVuil": false,
-  "boomAnders": 9,
+  "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v26.10.0"
  },

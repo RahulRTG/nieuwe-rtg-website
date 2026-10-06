@@ -1,11 +1,11 @@
 /* Supplier-werving: teambeheer, uitnodigingen en aanmelden met een RTG-account. */
 module.exports = (wctx) => {
   const { kern } = wctx;
-  const { DEMO, accounts, app, logActivity, loginFails, noteFailedTry,
-    notifySupplier, schoon, supplierAuth, tooManyTries, werkmail } = kern;
+  const { DEMO, accounts, app, logActivity, notifySupplier, schoon, supplierAuth,
+    werkmail } = kern;
   const uitnodiging = kern.personeelsUitnodiging || require('./uitnodiging')({ kern });
-  const { findSupplierByName, maakInvite, wervingsBasis, wervingsLink, verbindCode,
-    lijstInvites, trekInviteIn, roteerInvite } = uitnodiging;
+  const { maakInvite, wervingsBasis, wervingsLink, lijstInvites, trekInviteIn,
+    roteerInvite } = uitnodiging;
 app.post('/api/supplier/staff/add', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel toevoegen.' });
   // Nieuw personeel gaat via een uitnodiging (kassacode) en een eigen RTG-account;
@@ -106,38 +106,9 @@ app.post('/api/supplier/staff/invites', supplierAuth, async (req, res) => {
   } catch (e) { console.error('[staff-invite] veilige verwerking mislukt'); res.status(503).json({ error: 'De uitnodigingen konden niet veilig worden gelezen.' }); }
 });
 
-// De medewerker meldt zich aan: bedrijfsnaam + kassacode + eigen RTG-inlog.
-app.post('/api/supplier/staff/join', async (req, res) => {
-  const bucket = 'join:' + req.ip;
-  if (tooManyTries(res, bucket)) return;
-  const bedrijf = String(req.body.bedrijf || '').trim();
-  const kassacode = String(req.body.kassacode || '').trim().toUpperCase();
-  const legacyPin = !!(accounts.legacyStaffPinToegestaan && accounts.legacyStaffPinToegestaan());
-  const gekozen = legacyPin ? String(req.body.pin || '').trim() : '';
-  if (!bedrijf || !kassacode) { noteFailedTry(bucket, req.ip); return res.status(400).json({ error: 'Vul de bedrijfsnaam en de kassacode in.' }); }
-  if (gekozen && !/^\d{4}$/.test(gekozen)) return res.status(400).json({ error: 'Een pincode is vier cijfers; laat hem leeg als u er geen wilt.' });
-  const pin = legacyPin ? (gekozen || accounts.makePin()) : null;
-  // 1) bewijs dat u een eigen RTG-account hebt (een betaalde pas is niet nodig)
-  const lid = accounts.findByLogin(req.body.login);
-  if (!lid || (accounts.isActief && !accounts.isActief(lid)) ||
-      !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
-    noteFailedTry(bucket, req.ip);
-    return res.status(401).json({ error: 'Onjuiste RTG-inloggegevens. Meld u aan met uw eigen RTG-account.' });
-  }
-  // 2) het bedrijf moet bestaan en de kassacode moet erbij horen (eenmalig)
-  const s = findSupplierByName(bedrijf);
-  if (!s) { noteFailedTry(bucket, req.ip); return res.status(404).json({ error: 'We kennen geen bedrijf met die naam. Controleer de bedrijfsnaam bij uw werkgever.' }); }
-  // 3) niet dubbel aanmelden bij hetzelfde bedrijf
-  if (accounts.staffByMember(s.code, lid.id)) {
-    return res.status(409).json({ error: 'U bent al aangemeld bij dit bedrijf. Log in met uw persoonlijke RTG-account.' });
-  }
-  loginFails.delete(bucket);
-  let v;
-  try { v = await verbindCode(lid, kassacode, legacyPin ? { pin } : {}, s.code); }
-  catch (e) { console.error('[staff-join] veilige verwerking mislukt'); return res.status(503).json({ error: 'De aanmelding kon niet veilig worden voltooid. Probeer opnieuw.' }); }
-  if (!v || v.error) { noteFailedTry(bucket, req.ip); return res.status(v && v.status || 403).json(v || { error: 'Ongeldige uitnodiging.' }); }
-  res.json({ ok: true, code: s.code, staffId: v.staff.id, name: v.naam, role: v.invite.role });
-});
+// De medewerker meldt zich aan: bedrijfsnaam + kassacode + eigen RTG-inlog. Eigen
+// bestand sinds N29: de volgorde van de toetsen is daar het hele punt.
+require('./personeel-aanmelden')(wctx, uitnodiging);
 
   // de sollicitatiestroom gebruikt dezelfde uitnodiging-helpers
   return uitnodiging;

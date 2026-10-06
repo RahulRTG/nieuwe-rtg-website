@@ -51,7 +51,9 @@ test('alleen een manager kan uitnodigen; een medewerker niet', async () => {
 
 test('zonder geldige uitnodiging kom je er niet in (verkeerde kassacode)', async () => {
   const r = await api('/api/supplier/staff/join', { bedrijf: BEDRIJF, kassacode: 'ZZZZZZ', login: 'nova@x.nl', password: 'geheim123', pin: '2468' });
-  assert.equal(r.status, 403);
+  /* 401 en geen 403 sinds N29: tot bedrijf, kassacode en wachtwoord alle drie
+     kloppen, is elke weigering hetzelfde antwoord (test/staffjoin-orakel.test.js). */
+  assert.equal(r.status, 401);
 });
 
 test('een gratis account (gast, zonder betaalde pas) mag ook werken, met een eigen uitnodiging', async () => {
@@ -59,7 +61,7 @@ test('een gratis account (gast, zonder betaalde pas) mag ook werken, met een eig
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'guest', pasApp: 'rtg' }));
   assert.ok(gast.token, 'de gast is aangemaakt');
   // zonder uitnodiging blijft de deur dicht
-  assert.equal((await api('/api/supplier/staff/join', { bedrijf: BEDRIJF, kassacode: 'XXXXXX', login: 'gast@x.nl', password: 'geheim123', pin: '2468' })).status, 403);
+  assert.equal((await api('/api/supplier/staff/join', { bedrijf: BEDRIJF, kassacode: 'XXXXXX', login: 'gast@x.nl', password: 'geheim123', pin: '2468' })).status, 401);
   // met een eigen kassacode komt het gratis account er wel in: een pas is niet nodig
   const inv = await json(await api('/api/supplier/staff/invite', { name: 'Gast Persoon', func: 'Afwas' }, managerToken));
   const r = await json(await api('/api/supplier/staff/join', { bedrijf: BEDRIJF, kassacode: inv.invite.kassacode, login: 'gast@x.nl', password: 'geheim123', pin: '2468' }));
@@ -96,7 +98,7 @@ test('een kassacode is eenmalig: dezelfde code werkt geen tweede keer', async ()
   await api('/api/auth/register', { name: 'Bram Jansen', email: 'bram@x.nl', phone: '0612345672',
     password: 'geheim123', geboortedatum: '1992-02-02', tier: 'lifestyle', pasApp: 'lifestyle' });
   const r = await api('/api/supplier/staff/join', { bedrijf: BEDRIJF, kassacode: global.__code, login: 'bram@x.nl', password: 'geheim123', pin: '1357' });
-  assert.equal(r.status, 403, 'de kassacode is al gebruikt');
+  assert.equal(r.status, 401, 'de kassacode is al gebruikt');
 });
 
 test('een tweede uitnodiging + Business-lid: ook Business mag werken', async () => {
@@ -138,7 +140,7 @@ test('een open uitnodiging intrekken maakt de kassacode onbruikbaar', async () =
     password: 'geheim123', geboortedatum: '1994-04-04', tier: 'rtg', pasApp: 'rtg' });
   const r = await api('/api/supplier/staff/join', { bedrijf: BEDRIJF, kassacode: inv.invite.kassacode,
     login: 'nieuw@x.nl', password: 'geheim123', pin: '1111' });
-  assert.equal(r.status, 403);
+  assert.equal(r.status, 401);
 });
 
 test('alleen een manager roteert een uitnodiging; retry heronthult geen code', async () => {

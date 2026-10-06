@@ -336,6 +336,7 @@ const PUBLIEK = new Map([
   ['/api/betaal/webhook', 'ondertekend door de betaalprovider; een sessie bestaat hier niet'],
   ['/api/betaal/webhook/mollie', 'Mollie heeft geen RTG-sessie; RTG vertrouwt het id niet en haalt de betaling met de eigen geheime sleutel bij Mollie op'],
   ['/api/munt/webhook', 'idem, met een eigen webhook-secret'],
+  ['/api/betaal/webhook/connect', 'Stripe Connect-meldingen over partnerafrekeningen, ondertekend met een EIGEN geheim (STRIPE_CONNECT_WEBHOOK_SECRET); zonder dat geheim weigert de route met 503'],
   ['/api/cluster/:actie', 'de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet'],
   ['/api/werkmail/bezorg', 'inkomende post van de mailserver, met een eigen venster-rem per minuut'],
   ['/api/mail/binnen', 'de buitenpoort voor echte RFC 5322-post; een vreemde mailserver heeft geen inlog bij ons. Eigen venster-rem per minuut, alles landt in de ONBETROUWDE baan, en de ontvanger komt uit de To-kop en niet uit een parameter (anders was het een open relay)'],

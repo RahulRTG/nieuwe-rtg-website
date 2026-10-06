@@ -13,7 +13,8 @@
 
        paar: 'auth:' + ip + ':' + account
 
-   met als account een vingerafdruk van de inlognaam. Het ACCOUNT zit erin.
+   met als account een vingerafdruk van het account dat findByLogin vond (van
+   de getikte naam als er geen is). Het ACCOUNT zit erin.
    Voor de snelheidsrem is dat juist goed -- anders kan iemand het account van
    een ander op slot zetten door het fout te raden. Maar voor de noodrem stelt
    het de verkeerde vraag: die wil weten HOEVEEL AANVALLERS er zijn, en telde in

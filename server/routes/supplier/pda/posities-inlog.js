@@ -96,14 +96,15 @@ module.exports = (ictx, werk) => {
   app.post('/api/supplier/mijn/login', async (req, res) => {
     if (req.body && req.body.bewijs) return tweedeStap(req, res);
     const login = req.body.login;
-    if (wachtwoordRem.dicht(res, req.ip, login)) return;
+    // eerst opzoeken: de emmers hangen aan het account, niet aan de getikte naam
     const lid = accounts.findByLogin(login);
+    if (wachtwoordRem.dicht(res, req.ip, login, lid)) return;
     if (!lid || (accounts.isActief && !accounts.isActief(lid)) ||
         !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
-      await wachtwoordRem.mis(req.ip, login);   // afwachten: daar zit de vertraging
+      await wachtwoordRem.mis(req.ip, login, lid);   // afwachten: daar zit de vertraging
       return res.status(401).json({ error: ONJUIST });
     }
-    wachtwoordRem.gelukt(req.ip, login);
+    wachtwoordRem.gelukt(req.ip, login, lid);
     // de poort staat VOOR de werkplekken en de sessie: eronder was hij een mededeling
     const tweede = tweefactor.inlogPoort(lid, DOEL);
     if (tweede) return res.json(tweede);

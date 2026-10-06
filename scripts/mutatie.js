@@ -677,6 +677,10 @@ const EIGEN_MODULE = new Map([
      de meter zelf; met de hand nagetrokken op vier assen: de schil meetellen,
      dubbelen meetellen, bedekking nooit melden, half bedekt meetellen. */
   ['appwerkt-schil.e2e.js', ['scripts/appwerkt.js']],
+  /* DE GLADDE SCROLL (6 oktober 2026): bedektDoorSchil() uit dezelfde meter
+     tegen een eigen pagina zonder /api/, dus ook hier raakt de liegpoort niets.
+     Met de hand nagetrokken: zonder behavior 'instant' zakt de toets. */
+  ['appwerkt-glad.e2e.js', ['scripts/appwerkt.js']],
   /* De Evidence Engine-toets importeert ook test/helper.js om het gedrag van
      een verbonden browserclient te isoleren. Zonder deze expliciete bron wint
      daardoor de serverheuristiek en krijgt hij een liegende API die niets met

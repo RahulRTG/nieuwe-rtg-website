@@ -26,19 +26,11 @@
    alsnog op, maar dan zonder tijdstip -- en op deze vier families geldt dat als
    een defect. Zie de kop van ./gebeurtenis-lezen.js. */
 const { werkVeld } = require('./gebeurtenis');
-const loopContext = require('./loop-context');
-
-const SOORTEN = ['product', 'investering', 'prijs', 'lancering', 'beveiliging', 'personeel', 'contract', 'overig'];
+const {decisionContext,DECISION_TYPES:SOORTEN,countVotes:telling}=require('./besluit-loop');
 
 module.exports = (sctx) => {
   const { app, save, schoon, nu, rid, dag, werkPoort, log, eigenVeld } = sctx;
   const B = (w) => { if (!w.besluiten) w.besluiten = {}; return w.besluiten; };
-
-  const telling = (b) => ({
-    voor: b.stemmen.filter(s => s.stem === 'voor').length,
-    tegen: b.stemmen.filter(s => s.stem === 'tegen').length,
-    onthouding: b.stemmen.filter(s => s.stem === 'onthouding').length
-  });
 
   app.post('/api/bedrijf/besluit/maak', (req, res) => {
     const g = werkPoort(req, res, 'besluit'); if (!g) return;
@@ -54,17 +46,9 @@ module.exports = (sctx) => {
         ? req.body.alternatieven.slice(0, 10).map(a => schoon(a, 300)).filter(Boolean) : [],
       adviezen: [], bezwaren: [], stemmen: [], evalueerOp: null,
       at: nu(), door: g.l.naam };
-    if (req.body.loopContext !== undefined) {
-      try {
-        if (!sctx.loopFabric) return res.status(503).json({error:'De broncontext kan nu niet worden bevestigd.',code:'LOOP_FABRIC_UNAVAILABLE'});
-        const actorRef=g.l.rtgKey || 'work-member:'+g.l.id;
-        const checked=sctx.loopFabric.validateDecisionContext(actorRef,g.w.code,req.body.loopContext);
-        if (!checked.ok) return res.status(checked.status).json({error:checked.error,code:checked.code});
-        b.loopContext = loopContext.freeze(req.body.loopContext,b.at);
-        b.loopContext.validation=checked.validation;
-      }
-      catch (e) { if (e.loopFabric) return res.status(e.status).json({error:e.message,code:e.code}); throw e; }
-    }
+    const loop=decisionContext(sctx,g,req.body.loopContext,b.at);
+    if(!loop.ok)return res.status(loop.status).json(loop.body);
+    if(loop.context)b.loopContext=loop.context;
     B(g.w)[b.id] = b;
     log(g.w, g.l, 'besluit-voorgesteld', b.id, titel);
     save();

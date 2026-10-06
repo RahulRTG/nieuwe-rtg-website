@@ -10,31 +10,21 @@ const envelope=require('../envelop');
 const makeDelivery=require('./loop-source-delivery');
 
 module.exports=function makeServiceLoopSource({leesCollectie,bewerkCollectie,zaken,kwaliteit,authorize,authorizeRecipient,now}){
-  const time=now||(()=>new Date().toISOString()),empty=()=>({schemaVersion:1,operations:{},observations:{},lifecycles:{},outbox:[],delivery:{}});
+  const time=now||(()=>new Date().toISOString());
+  const {state,processRef,addDays,appendServiceEvent,issueServiceEligibility,publicObservation}=
+    require('./loop-source-model')(time);
   if(typeof leesCollectie!=='function')P.fail('STORAGE_UNAVAILABLE','Service learning vereist de datalaag-leespoort.',503);
-  const state=value=>Object.assign(empty(),value||{}),read=()=>state(leesCollectie('serviceLearning'));
+  const read=()=>state(leesCollectie('serviceLearning'));
   const tx=fn=>{
     if(typeof bewerkCollectie!=='function')P.fail('STORAGE_UNAVAILABLE','Service learning vereist duurzame collectietransacties.',503);
     return bewerkCollectie('serviceLearning',raw=>{const s=state(raw),out=fn(s);Object.assign(raw,s);return out;});
   };
-  const processRef=id=>({domain:'service',type:'process',id,version:1});
-  const addDays=(iso,days)=>new Date(Date.parse(iso)+days*86400000).toISOString();
   function authority(actorRef,workspaceCode){
     if(typeof authorize!=='function'||authorize(actorRef)!==true)P.fail('AUTHORITY_REVOKED','Een actuele Service-zetel is vereist.',403);
     const target=typeof authorizeRecipient==='function'&&authorizeRecipient(actorRef,workspaceCode);
     if(!target||!target.ok)P.fail(target&&target.code||'AUTHORITY_REVOKED',target&&target.error||'De ontvangende werkruimte is niet bevoegd.',target&&target.status||403);
     return {policyId:'service.office-seat+workos.recipient',workspaceCode:target.workspaceCode||workspaceCode};
   }
-  function appendServiceEvent(s,event){const prior=s.outbox.at(-1);event.sequence=s.outbox.length+1;event.previousHash=prior&&prior.hash||null;
-    event.hash=P.hash(event);s.outbox.push(event);return event;}
-  function issued(observation){
-    return eligibility.issue({sourceRef:observation.objectRef,purpose:observation.sharing.purpose,memoryClass:'ORGANIZATIONAL',
-      audience:observation.sharing.recipients,basis:{type:'ORGANIZATIONAL_PROCESS_METADATA'},
-      allowedFields:['title','text','observedAt','status','assessment'],uses:{decision:true,recall:true,'cross-domain':true,
-        ai:false,aggregate:false,publish:false},issuedAt:observation.recordedAt,validUntil:observation.validUntil,
-      retention:{mode:'EXPIRY',policyId:'service.process-observation.180d.v1'},epistemicType:'SYSTEM_OBSERVED',capabilityId:'service'});
-  }
-  function publicObservation(row){return P.clone(row.observation);}
   async function reviewCase(input){
     try{
       P.fields(input,['actorRef','operationId','caseId','workspaceCode','processId','purpose','verificationOf']);
@@ -59,7 +49,7 @@ module.exports=function makeServiceLoopSource({leesCollectie,bewerkCollectie,zak
           sharing:{visibility:'workspace',purpose:P.text(input.purpose,120),recipients:[{domain:'workos',id:auth.workspaceCode}],consent:false,
             returnUpdates:false},basis:'reviewed-minimal-process-metadata',review:{authorityRef:{policyId:auth.policyId},at},contests:[],
           verificationOf,assessment:verificationOf?(repeated?'not-improved':'improved'):null,validUntil:addDays(at,180)};
-        observation.eligibility=issued(observation);
+        observation.eligibility=issueServiceEligibility(observation);
         s.observations[id]={observation:P.clone(observation),source:{caseHash:P.hash(['service-case',caseRow.id]),
           caseVersionHash:P.hash({stand:caseRow.stand,team:caseRow.team,mensVerzoeken:caseRow.mensVerzoeken,
             structure:caseRow.tijdlijn.map(x=>({wat:x.wat,van:x.van||null,naar:x.naar||null,at:x.at}))}),outcome}};
@@ -96,7 +86,7 @@ module.exports=function makeServiceLoopSource({leesCollectie,bewerkCollectie,zak
       return {ok:true,observation:o,corrected:false};}catch(e){return P.error(e);}
   }
   function evaluateServiceEligibility(ref,recipient,request={}){const resolved=resolveServiceObservation(ref,recipient);if(!resolved.ok)return resolved;
-    return eligibility.evaluate(issued(resolved.observation),{sourceRef:ref,purpose:request.purpose,recipient,use:request.use||'recall'},time());}
+    return eligibility.evaluate(issueServiceEligibility(resolved.observation),{sourceRef:ref,purpose:request.purpose,recipient,use:request.use||'recall'},time());}
   function serviceProtocolEvents(){const s=read();return [...Object.values(s.observations).map(row=>({id:'snapshot-service-'+P.hash(P.refKey(row.observation.objectRef)).slice(0,24),
     type:'service.process.observed',protocol:publicObservation(row)})),...Object.values(s.lifecycles).map(o=>({id:'snapshot-service-life-'+P.hash(P.refKey(o.objectRef)).slice(0,24),
       type:'service.observation.'+o.status,protocol:P.clone(o)}))];}

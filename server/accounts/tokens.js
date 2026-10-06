@@ -7,6 +7,7 @@ const S = require('./state');
 const kluis = require('./kluis');
 const { veiligGelijk } = require('../kern/util');
 const mirror = require('./mirror');
+const { voorGrens } = require('./sessiegrens');
 
 /* DE ENE VORM VAN EEN TOKEN.
 
@@ -30,12 +31,9 @@ const strikt = (t) => (typeof t === 'string' && TOKENVORM.test(t) ? t : null);
 
 function maakTokens(getUserById) {
   /* ---------- staatloze ondertekende tokens ---------- */
-  /* Het token draagt nu ook WANNEER het is uitgegeven. Dat is de enige manier om
-     bij een staatloos token later te kunnen zeggen "alles van voor dit moment
-     telt niet meer" -- en dat is precies wat een wachtwoordwijziging hoort te
-     doen. Een oud token zonder dat derde deel geldt als uitgegeven op moment 0
-     en valt dus af zodra er ooit een grens is gezet; dat is de juiste kant om
-     naar te falen. */
+  /* Het token draagt ook WANNEER het is uitgegeven (deel 3): alleen zo valt bij
+     een staatloos token te zeggen "wat hiervoor kwam, telt niet meer". Hoe de
+     grens dat leest, ook zonder deel 3: ./sessiegrens.js (ook voor actietokens). */
   /* HET VIERDE EN HET VIJFDE DEEL: EEN SESSIE-ID EN EEN APPARAAT.
 
      TWEE TAKKEN CLAIMDEN ALLEBEI PLEK VIER, en dat is opgelost in plaats van
@@ -133,12 +131,11 @@ function maakTokens(getUserById) {
          is "sluit die andere sessie" een knop die niets doet. */
       if (sid && sessieIngetrokken(sid)) return null;
       const u = getUserById(Number(id));
-      /* De grens per account: alles wat voor sessies_vanaf is uitgegeven, geldt
-         niet meer. Een wachtwoordwijziging zet die grens (zie setPassword), en
-         daarmee vliegt elke lopende sessie eruit -- ook de sessie van iemand die
-         het wachtwoord kende en er niet meer bij hoort. Dat was de hele reden
-         voor de wijziging. */
-      if (u && Number(u.sessies_vanaf || 0) > Number(uitgegeven || 0)) return null;
+      /* De grens per account: wat voor sessies_vanaf is uitgegeven, telt niet
+         meer. Een wachtwoordwijziging zet hem (zie setPassword), en dan vliegt
+         elke lopende sessie eruit -- ook die van wie het wachtwoord kende en er
+         niet meer bij hoort. */
+      if (voorGrens(u, uitgegeven)) return null;
       /* De ene plek waar een uitgezet account eruit valt. Zie de toelichting bij
          de kolom in accounts/index.js: staatloze tokens zijn niet allemaal
          terug te halen, een vlag op het account wel. */

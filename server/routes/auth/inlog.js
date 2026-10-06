@@ -10,15 +10,19 @@
    registreren ook de volgorde van afhandelen. De gedeelde stukken (DEMO,
    pasAppOk, PAS_FOUT, isBaas) komen uit routes/auth.js, met de uitleg daar. */
 const { legInlogVast } = require('../../kern/identiteit/inlogherkomst');
+const { maakWachtwoordRem } = require('../../kern/identiteit/wachtwoordrem');
 
 module.exports = (ctx) => {
-  const { accounts, app, crypto, loginFails, noteFailedTry, stateFor, tooManyTries, logInlog,
+  const { accounts, app, loginFails, noteFailedTry, stateFor, tooManyTries, logInlog,
     pasAppOk, isBaas, kern , PAS_FOUT, sessieregister, tweefactor } = ctx;
 
-  /* Eenmalig, niet per verzoek: de emmernaam van een doel wordt gehasht zodat
-     een e-mailadres nooit in het geheugen van de rem of in een
-     beveiligingsmelding belandt. Zelfde vorm als routes/auth/webauthn.js. */
-  const vingerafdruk = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex').slice(0, 24);
+  /* DE REM OP HET WACHTWOORD is gedeeld met de werkplekinlog
+     (/api/supplier/mijn/login, N28): drie emmers op dezelfde namen, dus wat
+     daar gegokt wordt telt hier mee en andersom. Welke emmers, welke grenzen,
+     waarom het account een vertraging krijgt en geen slot, en waarom een
+     geslaagde inlog de adresemmer laat staan: zie de kop van
+     kern/identiteit/wachtwoordrem.js. */
+  const rem = maakWachtwoordRem({ tooManyTries, noteFailedTry, loginFails });
 
   /* De PAS-sessie (/api/login en /api/logout) staat in ./inlog-pas.js -- zie
      de kop daar. Hier aangeroepen zodat de registratievolgorde dezelfde
@@ -27,44 +31,18 @@ module.exports = (ctx) => {
 
 app.post('/api/auth/login', async (req, res) => {
   const login = req.body.login || req.body.email || req.body.username;
-  const sleutel = String(login || '').toLowerCase().trim();
   /* DRIE REMMEN, WANT EEN EMMER OP IP+ACCOUNT REMT MAAR EEN SOORT AANVAL.
-
-     Hier stond alleen de eerste. Die stopt tien gokken van EEN adres op EEN
-     account, en dat is precies wat een aanvaller met meer dan een adres
-     omzeilt: veertig adressen op hetzelfde account zijn veertig verse emmers.
-     Gemeten op de stand van hiervoor: veertig gokken, nul remmen, en het echte
-     wachtwoord werkte daarna nog gewoon.
-
-     De passkey-kant (routes/auth/webauthn.js) deed dit al goed met een bron- en
-     een doelemmer; de wachtwoordkant liep achter. Nu dezelfde vorm, inclusief
-     het hashen van het doel: zo belandt een e-mailadres nooit in het geheugen
-     van de rem of in een beveiligingsmelding -- dat is dezelfde regel als de
-     codenamen elders in dit huis.
-
-     De grenzen lopen uiteen naar de schade die een onterecht slot aanricht.
-     IP+account raakt alleen de aanvaller (10). De bron alleen kan een kantoor
-     achter een NAT-adres treffen, dus die staat ruim (50).
-
-     EN HET DOEL KRIJGT GEEN SLOT MAAR EEN VERTRAGING. Een slot op het account
-     zou een vreemde de macht geven om een lid uit zijn eigen account te houden:
-     vijfentwintig gokken verbranden en de eigenaar staat buiten. Gemeten toen
-     die emmer nog een slot was: na de aanval gaf het JUISTE wachtwoord een 429.
-     Dat is de aanval helpen in plaats van hem stoppen.
-
-     Dus kost elke MISLUKTE poging op een aangevallen account twee seconden, en
-     verandert er voor de eigenaar niets: wie het wachtwoord weet, komt zonder
-     vertraging binnen. Voor de aanvaller zakt het tempo naar een gok per twee
-     seconden per account, boven op de tien per adres en de vijftig per bron. */
-  const bucket = 'auth:' + req.ip + ':' + sleutel.slice(0, 60);
-  const bronBucket = 'auth:bron:' + req.ip;
-  const doelBucket = 'auth:doel:' + vingerafdruk('account:' + sleutel);
-  if (tooManyTries(res, bucket) || tooManyTries(res, bronBucket)) return;
+     Hier stond alleen de emmer op adres plus account, en veertig adressen op
+     een account waren veertig verse emmers: gemeten, veertig gokken en nul
+     remmen. Nu ook een op het adres en een op het account, en die laatste
+     vertraagt en sluit niet. De emmers staan in kern/identiteit/wachtwoordrem.js
+     en de werkplekinlog deelt ze (N28). */
+  if (rem.dicht(res, req.ip, login)) return;
   const user = accounts.findByLogin(login);
   if (!user || !await accounts.verifyPassword(req.body.password, user.password_hash)) {
-    noteFailedTry(bucket, req.ip);
-    noteFailedTry(bronBucket, req.ip, 50);
-    noteFailedTry(doelBucket, req.ip, 25);
+    /* De emmers worden hier meteen gevuld, nog voor het spoor: faalt het spoor,
+       dan telt de poging toch. Afgewacht wordt pas onderaan. */
+    const remming = rem.mis(req.ip, login);
     /* HET SPOOR OP DE HOOFDINGANG. logInlog belooft "elke inlogpoging (gelukt of
        mislukt, op elk kanaal)", maar deze route -- de ECHTE accountingang, waar
        een aanval op echte accounts binnenkomt -- liet 102 van de 106 geslaagde
@@ -89,18 +67,13 @@ app.post('/api/auth/login', async (req, res) => {
        het IP, en dat is ook precies waar credential stuffing aan te zien is:
        veel mislukte accountpogingen van een plek. */
     logInlog('account', false, user ? user.id : null, req);
-    /* EN HIER WORDT DE DOELEMMER OOK ECHT GEVOELD. Deze twee regels waren bij de
-       samenvoeging weggevallen terwijl het vullen van de emmer hierboven bleef
-       staan -- een rem die telt maar niet remt. Het commentaar erboven belooft
-       "een gok per twee seconden per account", en zonder deze wacht was dat een
-       belofte zonder afdwinging: dertig gokken van dertig adressen liepen weer
-       op volle snelheid. test/inlogrem.test.js meet de tijd, niet de status,
-       en die zakte er terecht op. */
-    const doel = loginFails.get(doelBucket);
-    if (doel && doel.until > Date.now()) await new Promise(r => setTimeout(r, 2000));
+    /* EN HIER WORDT DE ACCOUNTEMMER OOK ECHT GEVOELD. Deze wacht was bij een
+       samenvoeging al eens weggevallen terwijl het vullen bleef staan: een rem
+       die telt maar niet remt. test/inlogrem.test.js meet de tijd en zakt dan. */
+    await remming;
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
-  loginFails.delete(bucket); loginFails.delete(bronBucket); loginFails.delete(doelBucket);
+  rem.gelukt(req.ip, login);
   logInlog('lid', true, 'user-' + user.id, req);
   /* DE HASH STIL OPWAARDEREN. Het wachtwoord klopt, dus we hebben de klaartekst
      precies een keer in handen -- het enige moment waarop een hash met oude

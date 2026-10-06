@@ -7,6 +7,8 @@
 const { coord } = require('../kern/util');
 module.exports = (ctx) => {
   const { router, G, save, nu, schoon, encS, decS, sessieVan, gezinVan, profielVan, checkPin } = ctx;
+  // art. 9: apart, bij eerste gebruik (ook voor gasten/gezondheid.js)
+  const toestemming = ctx.gezondheidToestemming = require('./gezondheidstoestemming')(ctx);
 
 /* veilig thuis: een kind (of ieder gezinslid) deelt zijn status en, als het wil,
    zijn locatie met het gezin. Alleen de laatste plek wordt bewaard, en delen
@@ -60,7 +62,7 @@ function oppasinfoPubliek(g) {
 }
 router.get('/gezin/:code/oppasinfo', (req, res) => {
   const s = sessieVan(req, res); if (!s) return;
-  res.json({ oppasinfo: oppasinfoPubliek(s.g), magBewerken: ['beheerder', 'ouder'].includes(s.p.rol) });
+  res.json({ oppasinfo: oppasinfoPubliek(s.g), magBewerken: ['beheerder', 'ouder'].includes(s.p.rol), toestemmingGezondheid: toestemming.heeft(s.g) });
 });
 router.post('/gezin/oppasinfo', (req, res) => {
   const s = sessieVan(req, res); if (!s) return;
@@ -68,9 +70,14 @@ router.post('/gezin/oppasinfo', (req, res) => {
   const noodcontacten = (Array.isArray(req.body.noodcontacten) ? req.body.noodcontacten : []).slice(0, 12)
     .map(c => ({ naam: schoon(c && c.naam, 40), telefoon: schoon(c && c.telefoon, 30), wie: schoon(c && c.wie, 40) }))
     .filter(c => c.naam || c.telefoon);
+  /* Een NIEUWE allergie- of medische regel vraagt de toestemming; wat er al
+     stond en ongewijzigd terugkomt niet, anders blokkeert een oude allergie
+     het bijwerken van de huisregels. */
+  const allergie = schoon(req.body.allergie, 1500);
+  if (allergie && allergie !== decS((s.g.oppasinfo || {}).allergie) && !toestemming.eis(s, res)) return;
   s.g.oppasinfo = {
     noodcontacten: encS(JSON.stringify(noodcontacten)),
-    allergie: encS(schoon(req.body.allergie, 1500)),
+    allergie: encS(allergie),
     eten: encS(schoon(req.body.eten, 1500)),
     huisregels: encS(schoon(req.body.huisregels, 1500)),
     updatedAt: nu(), updatedBy: s.p.naam
@@ -97,6 +104,10 @@ function wisGezin(g) {
   if (ctx.gezinscode) ctx.gezinscode.vergeet(g.code).catch(() => null);
 }
 ctx.wisGezin = wisGezin; // ook voor foundation.js vergeetAccount: een verwijderd ouderaccount
+/* De bewaartermijn (./gezinbewaren.js). Is de gezinscode-laag er niet, dan telt
+   een gezin als MET code: bij twijfel geen kandidaat om te wissen. */
+ctx.gezinBewaren = require('./gezinbewaren')({ G, save, nu, wisGezin, heeftGezinscode: (code) => {
+  try { return !ctx.gezinscode || ctx.gezinscode.publiek(code).stand !== 'geen'; } catch (e) { return true; } } });
 function volwassenen(g) { return Object.values(g.profielen || {}).filter(p => ['beheerder', 'ouder'].includes(p.rol)); }
 async function adultCheck(g, req, res) {
   const p = profielVan(g, req.body && req.body.token);

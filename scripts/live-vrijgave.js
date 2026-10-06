@@ -12,6 +12,9 @@ try {
   if (promotie.kandidaat.image.immutable !== kandidaat.image.immutable ||
       promotie.kandidaat.backup.immutable !== kandidaat.backup.immutable)
     throw new Error('De ondertekende promotie hoort bij een andere kandidaat.');
+  // Het kandidaat moet het digest zijn dat de artefactketen getest EN goedgekeurd heeft.
+  if (!kandidaat.image.digest || !kandidaat.backup.digest) throw new Error('Kandidaat zonder digest.');
+  require('./lib/productie-promotie').eisKetenbesluit(path.join(__dirname, '..'), commit, kandidaat, process.env);
   process.stdout.write([commit, kandidaat.image.immutable, kandidaat.image.id,
     kandidaat.backup.immutable, kandidaat.backup.id,
     kandidaat.image.bewijsBestandSha256].join('\n') + '\n');

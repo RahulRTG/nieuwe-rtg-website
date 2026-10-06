@@ -21,6 +21,7 @@ const { keurMotor } = require('./productie-motor');
 const { keurPin } = require('./productie-pin');
 const { keurIdentiteit } = require('./productie-identiteit');
 const { keurMedia } = require('./productie-media');
+const { keurAuditboek } = require('./productie-auditboek');
 
 function keur(env, fouten, waarschuwingen) {
     keurInvulplekken(env, fouten);
@@ -141,6 +142,8 @@ function keur(env, fouten, waarschuwingen) {
     keurCommunicatie(env, fouten, waarschuwingen, priveBeta);
     // De geldkant (Stripe, munt, RTF-afdracht) staat in ./productie-geld.js
     keurGeld(env, fouten, waarschuwingen);
+    // Het auditboek in PostgreSQL en zijn externe anker (./productie-auditboek.js)
+    keurAuditboek(env, fouten);
 }
 
 module.exports = { keur };

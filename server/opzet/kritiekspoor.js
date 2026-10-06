@@ -30,6 +30,24 @@ const EXTRA = [
   { pad: '/api/office/payroll/run', reden: 'een loonrun verplaatst geld van een werkgever' }
 ];
 const KRITIEK = PADEN.concat(EXTRA);
+
+/* PostgreSQL-modus: naast het handelingsspoor komt een regel in het AUDITBOEK
+   (server/kern/auditboek, onherschrijfbaar en extern verankerd). Zonder
+   PostgreSQL is er geen auditboek en loopt alleen het handelingsspoor, zoals
+   voorheen. De regel zegt `toegestaan` en nooit `uitgevoerd`. Lukt het
+   vastleggen niet, dan gaat de handeling niet door (503) -- hetzelfde contract
+   als hierboven, nu ook voor het boek. De actor komt uit de sessie. */
+const REF = /^[A-Za-z0-9_.:-]{1,128}$/;
+const actorVan = (wie, pad) => ({
+  soort: pad.startsWith('/api/office/') ? 'kantoor' : pad.startsWith('/api/supplier/') ? 'zaak' : 'lid',
+  ref: REF.test(wie) ? wie : 'h:' + require('crypto').createHash('sha256').update(String(wie)).digest('hex').slice(0, 24)
+});
+const boekRegel = (methode, pad, wie) => {
+  const boek = require('../kern/auditboek');
+  if (!boek.actief()) return null;
+  return boek.deelbaar().noteer({ type: 'kritiek.toegestaan', uitkomst: 'toegestaan', actor: actorVan(wie, pad),
+    context: { methode, pad: pad.split('?')[0].replace(/[^A-Za-z0-9_\/.-]/g, '_').slice(0, 255) } });
+};
 const kritiek = (pad) => KRITIEK.find(p => String(pad || '').startsWith(p.pad)) || null;
 
 /* Eén keelgat per deur: de drie auth-poorten roepen `poort()` aan op het punt
@@ -48,7 +66,7 @@ function poort(req, res, wie, volgende) {
   const { handelingsspoor, vastleggen } = actief;
   Promise.resolve().then(() => vastleggen(() => {
     handelingsspoor.noteer({ wie: String(wie || 'anoniem'), methode: req.method, pad, status: 0, stand: 'toegestaan' });
-  })).catch(() => ({ status: 503 })).then(uit => {
+  })).then(uit => uit ? uit : Promise.resolve(boekRegel(req.method, pad, String(wie || 'anoniem'))).then(() => null)).catch(() => ({ status: 503 })).then(uit => {
     if (uit) {
       return res.status(uit.status || 503).json({ error: 'Er is niets uitgevoerd: de handeling kon niet aantoonbaar worden vastgelegd. Probeer het zo opnieuw.',
         spoor: 'niet-vastgelegd' });
@@ -56,4 +74,4 @@ function poort(req, res, wie, volgende) {
     volgende();
   });
 }
-module.exports = { haak, poort, kritiek, KRITIEK };
+module.exports = { haak, poort, kritiek, KRITIEK, actorVan };

@@ -37,6 +37,25 @@ bindt de oorspronkelijke bytes én het domein. Een build-private-key kan
 wiskundig willekeurige bytes tekenen, maar levert geen geldig promotiebesluit
 op: de promotieverifier gebruikt uitsluitend het afzonderlijke promotieanker.
 
+## De vierde sleutel: het auditanker (BEWUST geen release-rol)
+
+Het PostgreSQL-auditboek (`server/kern/auditboek`, [AUDITBOEK.md](../AUDITBOEK.md))
+krijgt zijn bewijskracht van een ondertekend anker buiten de database. Die sleutel
+staat bewust NIET in `ROLES` hierboven: `anchors()` eist precies drie rollen en
+een vierde zou elke releaseverifier laten breken. Het is een eigen, vast anker:
+
+| Rol | Private secret | Publiek verificatieanker | Signature-domein |
+|---|---|---|---|
+| Auditanker | `RTG_AUDIT_ANKER_SIGN_KEY` (alleen de ankerdienst) | `deploy/audit-anker.pub` | `RTG:AUDIT-ANKER:v1` |
+
+De publieke sleutel hoort in de repository (zoals de andere ankers); de private
+sleutel in een secrets manager, uitsluitend voor het proces dat `scripts/auditboek.js
+dienst` draait. **De app mag hem nooit krijgen**: de productiekeuring weigert een
+app met `RTG_AUDIT_ANKER_SIGN_KEY`. Genereer hem zoals de andere rollen (Ed25519,
+PKCS#8-PEM privé, SPKI-PEM publiek). Dit repository maakt hem niet aan en
+verleent niemand automatisch ankerbevoegdheid; zolang `deploy/audit-anker.pub`
+ontbreekt weigert een productiestart op PostgreSQL te starten.
+
 ## Eenmalige bevoegde bootstrap
 
 1. De eigenaar wijst custodians aan voor build, onafhankelijke externe

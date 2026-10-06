@@ -105,7 +105,7 @@ const LADDER = [
       /build\.js$/, /zekerheid\.js$/, /bewijsmatrix\.js$/, /vertrouwen\.js$/, /versheid\.js$/, /meetronde\.js$/,
       /envelop\.js$/, /gezag\.js$/, /release-workflow-bewijs\.js$/, /^npm run afbouw:software$/] },
   { id: 'kandidaat', naam: 'Onveranderlijke kandidaat', wat: 'het image gebonden aan een digest en een handtekening',
-    patronen: [/imageherkomst\.js$/, /promotie-teken\.js$/, /external-release-teken\.js$/, /native-release\.js$/] },
+    patronen: [/imageherkomst\.js$/, /artefactketen\.js$/, /promotie-teken\.js$/, /external-release-teken\.js$/, /native-release\.js$/] },
   { id: 'uitrol', naam: 'Staging, canary en productieverificatie', wat: 'de repetitie, de uitrol en de sonde erna',
     patronen: [/staging-repetitie\.js$/, /uitrol\.js$/, /productie-status\.js$/, /live-vrijgave\.js$/,
       /sonde\.js$/, /publieke-tls-proef\.js$/, /triage\.js$/, /wetwacht\.js$/, /takken\.js$/] }

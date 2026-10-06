@@ -17,6 +17,8 @@ Twee aanroepers, beide met `?.` en een terugval:
 - De hashketen bewijst nog steeds wat er STAAT; de ringgrens kan oudste regels laten afvallen. In SQLite is dat een apart besluit (730 dagen op tijd, `inzagelog-bewaring`); voor de twee sporen hierboven is er in PostgreSQL **geen tijdgebonden bewaring**, alleen de ringgrens.
 - Het kritieke spoor van A-P1-05 (het kritiekspoor uit PR #499) vraagt `vastleggen` (duurzaam, met bevestigde commit) en is dus wél afhankelijk van de PG-commitroute, niet van deze poort.
 
-## Open besluit (niet genomen, niet gebouwd)
+## Besluit (6 oktober 2026): het auditboek is de PostgreSQL-weg voor beveiligings-, release-, promotie-, rollback- en beheergebeurtenissen
 
-Een PG-implementatie van `open()` (rijtabel, append-only, dezelfde `view/append/rewrite`) of bewust de lijstvorm houden en de bewaring uitschrijven. Tot dat besluit staat de stand in `test/auditopslag-pg.test.js` vast: wie de terugval verandert of `open()` voor postgres iets laat teruggeven zonder deze tekst bij te werken, laat die toets zakken.
+Er komt GEEN PG-implementatie van `save.audit.open()`; dat zou een tweede opslagmodel voor dezelfde sporen zijn. In plaats daarvan is er een eigen, gesloten, onherschrijfbare opslag: **`server/kern/auditboek/`, zie [AUDITBOEK.md](AUDITBOEK.md)** -- rijen in PostgreSQL met append-only triggers, een SHA-256-keten, een ondertekend anker BUITEN de database en een bewaartermijn van 730 dagen op tijd. Het kritiekspoor schrijft in PostgreSQL-modus daar ook naartoe en weigert (503) als dat niet lukt.
+
+Wat NIET veranderd is en dus nog steeds geldt: `apiSpoor` en `handelingLog` blijven in PostgreSQL een **lijst met een ringgrens** in de snapshot, **geen tijdgebonden bewaring**, en hun terugval op `null` staat vast in `test/auditopslag-pg.test.js`. Wie wil dat die twee sporen dezelfde garanties krijgen als het auditboek, moet ze er expliciet op aansluiten; dat is niet gebeurd.

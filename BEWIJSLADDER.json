@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-06T14:44:11.816Z",
-    "commit": "0c08c002f",
+    "op": "2026-10-06T23:04:44.013Z",
+    "commit": "1bbb71c57",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/bewijsladder.js",
-    "node": "v26.10.0"
+    "node": "v22.22.0"
   },
   "sporten": [
     {
@@ -1297,8 +1297,23 @@
       "stand": "stap",
       "waarom": "draait aan beide kanten, maar laat geen gestempeld register achter",
       "graad": "vermoed",
-      "graadWaarom": "de zwakste premisse is scripts/imageherkomst.js (vermoed)",
+      "graadWaarom": "de zwakste premisse is scripts/artefactketen.js (vermoed)",
       "mechanismen": [
+        {
+          "doel": "scripts/artefactketen.js",
+          "lokaal": true,
+          "keten": [
+            "release-image.yml"
+          ],
+          "aanleiding": [
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null,
+          "graad": "vermoed"
+        },
         {
           "doel": "scripts/imageherkomst.js",
           "lokaal": false,
@@ -1421,7 +1436,7 @@
   "uitleg": "Welk bewijsmechanisme op welke sport van de bewijsladder staat, afgeleid uit de keten in .github/workflows en uit de scripts zelf. Per sport de stand (staat, een stap weg, bestaat niet) en per mechanisme of het lokaal draait, alleen in de keten, of beide.",
   "grens": "De SPORTEN zijn verklaard en niet gemeten: dat een soort bewijs hier ontbreekt, zegt deze meter niet. Van de mechanismen erop meet hij dat ze DRAAIEN en waar -- niet of het bewijs dat ze leveren goed is, en niet of het genoeg is. `alleenKeten` telt en oordeelt niet: zeven van die mechanismen lezen een artefact uit een andere job en kunnen lokaal per definitie niet draaien. En er staat met opzet geen samengesteld eindoordeel onder deze tabel (KEURING.md par. 5).",
   "telling": {
-    "mechanismen": 79,
+    "mechanismen": 80,
     "sporten": 12,
     "staat": 6,
     "stap": 6,

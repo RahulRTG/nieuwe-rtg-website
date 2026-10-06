@@ -79,7 +79,7 @@ function maakTokens(getUserById) {
     if (!token) return null;
     try {
       const b64 = String(token).split('.')[0];
-      const sid = Buffer.from(b64, 'base64url').toString().split('.')[3];
+      const sid = (require('./tokenvorm').sessieDelen(Buffer.from(b64, 'base64url').toString()) || [])[3];
       return sid && /^[A-Za-z0-9_-]{12}$/.test(sid) ? sid : null;
     } catch (e) { return null; }
   }

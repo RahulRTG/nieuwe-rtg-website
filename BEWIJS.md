@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2333 |
 | losse beweringen (`test(...)`) | 16005 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 248 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2157 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2158 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 2 |
+| niets van beide | 1 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1063,7 +1063,7 @@ toets omvalt.
 | `menselijkebanen.test.js` | 4 | gezakt op `liegpoort /api/` | DE MENSELIJKE BANEN -- kan elk mens in dit huis bij zijn eigen werk? WAAROM DIT ER IS Dit huis kent 60 afdelingen en 157 mensen met een baan: van de kok in KIKUNOI tot de meldkamer van GUARDIA, van de... |
 | `menselijkeuitvoering.test.js` | 11 | gezakt op `===->!==#0` | DE MENSELIJKE UITVOERING ALS PROJECTIE (scripts/menselijkeuitvoering.js). MENSELIJKE_UITVOERING.json is afgeleid bewijs en geen documentatie. |
 | `menselijkverkeer.test.js` | 5 | gezakt op `liegpoort /api/` | HET MENSELIJKE VERKEER -- wat mensen hier met elkaar doen. WAAROM DIT ER NAAST test/menselijkebanen.test.js STAAT Die toets bewijst dat 157 mensen bij hun werk kunnen. |
-| `mensgrond.test.js` | 10 | -- | DE MENSGRONDEN (server/kern/mensgrond.js) en hun meter (scripts/mensgrond.js). De lijst beweert iets dat in twee richtingen kan breken, en elke richting is een andere schade: - een grond die STIL wegvalt, laat de... |
+| `mensgrond.test.js` | 10 | gezakt op `===->!==#0` | DE MENSGRONDEN (scripts/lib/mensgrond.js) en hun meter (scripts/mensgrond.js). De lijst beweert iets dat in twee richtingen kan breken, en elke richting is een andere schade: - een grond die STIL wegvalt, laat de... |
 | `mensmutatie.test.js` | 6 | gezakt op `!==->===#1` | DE TIEN MUTATIES DRIJVEN NIET AF VAN DE BRON (scripts/mensmutatie.js). WAAROM DIT BESTAAT. |
 | `menstaal.test.js` | 13 | gezakt op `&&->||#0` | HET MENSENTAAL-CONTRACT -- klopt het corpus, en dekt de rail het? server/kern/stuur/menstaal.json zegt per menselijke zin wat er MAG gebeuren. |
 | `merge3.property.test.js` | 5 | gezakt op `===->!==#0` | Eigenschap-gedreven (property-based) tests voor merge3, de 3-weg-samenvoeging die het hart is van de multi-writer-opslag. In plaats van een handvol vaste gevallen genereren we duizenden willekeurige situaties en... |

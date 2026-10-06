@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-05T16:29:29.071Z",
-    "commit": "6f75110b",
+    "op": "2026-10-06T06:50:36.447Z",
+    "commit": "0c434208",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -8650,6 +8650,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "mensgrond.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/mensgrond.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "mensmutatie.test.js": {
       "soort": "puur",

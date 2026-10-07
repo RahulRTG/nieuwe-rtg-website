@@ -8,12 +8,12 @@ const countVotes=decision=>({
   onthouding:decision.stemmen.filter(row=>row.stem==='onthouding').length
 });
 
-function decisionContext(sctx,gate,value,at){
+function decisionContext(loopFabric,gate,value,at){
   if(value===undefined)return {ok:true,context:null};
-  if(!sctx.loopFabric)return {ok:false,status:503,body:{error:'De broncontext kan nu niet worden bevestigd.',code:'LOOP_FABRIC_UNAVAILABLE'}};
+  if(!loopFabric)return {ok:false,status:503,body:{error:'De broncontext kan nu niet worden bevestigd.',code:'LOOP_FABRIC_UNAVAILABLE'}};
   try{
     const actorRef=gate.l.rtgKey||'work-member:'+gate.l.id;
-    const checked=sctx.loopFabric.validateDecisionContext(actorRef,gate.w.code,value);
+    const checked=loopFabric.validateDecisionContext(actorRef,gate.w.code,value);
     if(!checked.ok)return {ok:false,status:checked.status,body:{error:checked.error,code:checked.code}};
     const context=loopContext.freeze(value,at);context.validation=checked.validation;
     return {ok:true,context};

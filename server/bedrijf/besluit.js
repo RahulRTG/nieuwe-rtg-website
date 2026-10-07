@@ -29,7 +29,7 @@ const { werkVeld } = require('./gebeurtenis');
 const {decisionContext,DECISION_TYPES:SOORTEN,countVotes:telling}=require('./besluit-loop');
 
 module.exports = (sctx) => {
-  const { app, save, schoon, nu, rid, dag, werkPoort, log, eigenVeld } = sctx;
+  const { app, save, schoon, nu, rid, dag, werkPoort, log, eigenVeld, loopFabric } = sctx;
   const B = (w) => { if (!w.besluiten) w.besluiten = {}; return w.besluiten; };
 
   app.post('/api/bedrijf/besluit/maak', (req, res) => {
@@ -46,7 +46,7 @@ module.exports = (sctx) => {
         ? req.body.alternatieven.slice(0, 10).map(a => schoon(a, 300)).filter(Boolean) : [],
       adviezen: [], bezwaren: [], stemmen: [], evalueerOp: null,
       at: nu(), door: g.l.naam };
-    const loop=decisionContext(sctx,g,req.body.loopContext,b.at);
+    const loop=decisionContext(loopFabric,g,req.body.loopContext,b.at);
     if(!loop.ok)return res.status(loop.status).json(loop.body);
     if(loop.context)b.loopContext=loop.context;
     B(g.w)[b.id] = b;

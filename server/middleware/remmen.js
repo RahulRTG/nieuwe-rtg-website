@@ -79,7 +79,9 @@ function hoofdzekering({ db, accounts, eigenaar, stroom = () => require('../kern
     /* Alleen uit de kop: een sessie in het adres wordt nergens meer aangenomen
        (een live-stroom opent met een stroomticket, kern/sessiestroom.js). */
     const kop = (req.get('authorization') || '').replace(/^Bearer\s+/i, '');
-    if (isBaas(geverifieerd(kop))) return next(); // de eigenaar mag er wel bij
+    let u = null;
+    try { u = kop ? accounts.verifyToken(kop) : null; } catch (e) { u = null; }
+    if (isBaas(u)) return next(); // de eigenaar mag er wel bij
     /* DE STROOM VAN DE EIGENAAR. Een EventSource stuurt geen kop: hij opent met
        `?ticket=`, dat de eigenaar zelf (met zijn sessie in de kop, dus langs
        deze zekering) heeft opgehaald. Hier stond alleen de kop, en de stroom

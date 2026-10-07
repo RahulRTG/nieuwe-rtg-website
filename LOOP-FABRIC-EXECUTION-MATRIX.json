@@ -86,7 +86,7 @@
       "technicalPrerequisites": [],
       "blastRadius": {
         "sourceOwners": 14,
-        "kernelModules": 2552,
+        "kernelModules": 2553,
         "mutationContracts": 59,
         "routes": 62,
         "screens": 10,
@@ -203,7 +203,7 @@
       "blastRadius": {
         "sourceOwners": 13,
         "kernelModules": 129,
-        "mutationContracts": 1060,
+        "mutationContracts": 1066,
         "routes": 1081,
         "screens": 29,
         "dataSchema": "versioned source targets en duurzame events waar zij ontbreken",
@@ -640,7 +640,7 @@
       "blastRadius": {
         "sourceOwners": 38,
         "kernelModules": 124,
-        "mutationContracts": 1116,
+        "mutationContracts": 1117,
         "routes": 1146,
         "screens": 87,
         "dataSchema": "pas na product/juridisch besluit",
@@ -794,8 +794,8 @@
       ],
       "blastRadius": {
         "sourceOwners": 86,
-        "kernelModules": 2576,
-        "mutationContracts": 2072,
+        "kernelModules": 2577,
+        "mutationContracts": 2073,
         "routes": 2094,
         "screens": 98,
         "dataSchema": "geen learning-opslag vóór menselijke/juridische beslissing",

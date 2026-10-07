@@ -3390,6 +3390,7 @@
       "server/kern/bewijsvlak/capabilities.js",
       "server/kern/bewijsvlak/claims.js",
       "server/kern/bewijsvlak/compatibility.js",
+      "server/kern/bewijsvlak/context.js",
       "server/kern/bewijsvlak/contracts.js",
       "server/kern/bewijsvlak/hospitality-chain.js",
       "server/kern/bewijsvlak/ledger.js",

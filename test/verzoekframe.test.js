@@ -22,6 +22,7 @@ const path = require('node:path');
 const { EventEmitter } = require('node:events');
 const { AsyncResource } = require('node:async_hooks');
 const frame = require('../server/opzet/verzoekframe');
+const trust = require('../server/kern/bewijsvlak/context');
 const envelop = require('../server/opzet/envelop');
 const haak = require('../server/kern/kosten/haak');
 
@@ -127,9 +128,26 @@ test('hervat: een context die de body-lezer kwijtraakte, krijgt zijn eigen frame
   const req = { id: 'srv-hervat', externeId: null, headers: {} };
   const res = new EventEmitter();
   frame.middleware()(req, res, () => {});
-  let gezien = null;
-  frame.hervat()(req, res, () => { gezien = frame.huidig(); });
+  let gezien = null, keten = null;
+  frame.hervat()(req, res, () => { gezien = frame.huidig(); keten = trust.huidige(); });
   assert.equal(gezien && gezien.correlatie, 'srv-hervat');
+  assert.equal(keten && keten.chainId, 'chain_srv-hervat', 'ook de trust-keten komt terug, en die volgt het frame');
+  assert.equal(keten, req.trustContext, 'dezelfde wortel, geen nieuwe');
+});
+
+test('de trust-keten is een lezer van het frame: een naam van wortel tot gebeurtenis', () => {
+  const kernEnvelop = require('../server/kern/envelop');
+  const req = { id: 'srv-keten', externeId: null, headers: { 'x-rtg-correlation': 'aanvaller' } };
+  const res = new EventEmitter(), koppen = {};
+  res.setHeader = (k, v) => { koppen[k] = v; };
+  frame.middleware()(req, res, () => {
+    const wortel = trust.huidige();
+    assert.equal(wortel.chainId, 'chain_srv-keten', 'de keten komt uit de correlatie van het frame');
+    assert.equal(koppen['X-RTG-Correlation'], wortel.chainId);
+    const e = kernEnvelop.maak({ kanaal: 'keten-proef', classificatie: 'intern' });
+    kernEnvelop.inKeten(e, () => assert.equal(trust.huidige().chainId, wortel.chainId,
+      'een gebeurtenis binnen het verzoek houdt dezelfde keten (vroeger: een tweede naam)'));
+  });
 });
 
 test('een lezer: de bus-envelop via zetFrameBron; verder niemand in server/ (PR 5)', () => {

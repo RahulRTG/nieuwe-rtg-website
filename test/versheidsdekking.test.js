@@ -166,6 +166,9 @@ const BUITEN = {
   'GEZAGSHANDELINGEN.json': 'een afdruk uit de code, met een eigen toets (test/gezagshandelingen.test.js)',
   'HANDELINGSKLASSE.json': 'een afdruk uit de code, met een eigen toets (test/handelingsklasse.test.js)',
   'WACHTWIJZE.json': 'een afdruk uit de code, met een eigen toets (test/wachtwijze.test.js)',
+  /* scripts/norm.js LEEST hem (loopFabricTijdelijk) en schrijft hem niet; de wacht
+     hieronder ziet alleen het pad. Geschreven door scripts/loop-fabric-coverage.js. */
+  'LOOP-FABRIC-COVERAGE.json': 'een afdruk uit de code, met een eigen toets (test/loop-fabric-coverage.test.js, byte-gelijk met build() en sinds 6 oktober 2026 in registerklopt)',
   /* DEZELFDE GROND ALS EXECUTION_MAP HIERBOVEN, en met opzet niet "hij is nieuw".
      MENSELIJKE_UITVOERING.json draagt geen stempel maar vingerafdrukken van zijn
      bronnen; ouderdom is er niet aan af te lezen en hoeft dat ook niet, want

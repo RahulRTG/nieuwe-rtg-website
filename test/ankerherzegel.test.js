@@ -1,4 +1,3 @@
-'use strict';
 /* DE HERZEGELING: een AVG-wissing legt het externe anker niet meer stil, en
    een vervalsing blijft een alarm (server/lib/ankerherzegel.js).
 
@@ -10,6 +9,7 @@
         over ANDERE regels dan er veranderden -> alarm.
    Plus de fundering: het plan dat de ankerdienst vóór de wissing tekent, is
    byte voor byte wat wisActor daarna werkelijk doet. */
+'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');

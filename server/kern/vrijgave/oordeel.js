@@ -6,26 +6,11 @@
 const reg = require('./register');
 const { ZIN, STATUS } = require('./antwoord');
 
-module.exports = function maakOordeel({ st, bw, pg, isOpenbaar, k, register, schaduw }) {
-  function autorisatie(cap, ctx) {
-    const b = cap.bevoegdheid || {};
-    const delen = [];
-    if (b.vermogen) {
-      if (!k.bevoegd || typeof k.bevoegd.mag !== 'function')
-        return { ok: false, code: 'niet-geautoriseerd', reden: 'bevoegdheidslaag-niet-gekoppeld' };
-      let o;
-      try { o = k.bevoegd.mag(b.vermogen, ctx.land ? { land: ctx.land } : {}); } catch (e) { o = null; }
-      if (!o || o.mag !== true)
-        return { ok: false, code: 'niet-geautoriseerd', reden: 'bevoegdheid:' + b.vermogen + ':' + ((o && o.reden) || 'onbekend') };
-      delen.push('bevoegdheid:' + b.vermogen + ':' + (o.via || 'ja'));
-    }
-    if (b.besluit) {
-      const vast = st.besluit(b.besluit);
-      if (!vast) return { ok: false, code: 'compliance-ontbreekt', reden: 'besluit-ontbreekt:' + b.besluit };
-      delen.push('besluit:' + b.besluit);
-    }
-    return { ok: true, reden: delen.join(',') };
-  }
+module.exports = function maakOordeel({ st, bw, pg, isOpenbaar, k, register, schaduw, lokaal, sandboxMag }) {
+  const isLokaalFn = typeof lokaal === 'function' ? lokaal : () => false;
+  const sandboxMagFn = typeof sandboxMag === 'function' ? sandboxMag : () => !isOpenbaar();
+  /* De autorisatie-as (bevoegdheidslaag en vastgelegde besluiten): ./autorisatie.js. */
+  const autorisatie = require('./autorisatie')({ st, k });
 
   /* Het hart. `diepte` begrenst de afhankelijkheden (het register is kringvrij
      gevalideerd; dit is de vangrail voor een register dat dat niet was). */
@@ -38,32 +23,41 @@ module.exports = function maakOordeel({ st, bw, pg, isOpenbaar, k, register, sch
 
     const redenen = [];
     const s = st.standVan(id);
-    const stand = s.fout ? null : s.stand;
+    /* DE LOKALE STANDAARD (./lokaal.js): niets vastgelegd voor deze capability,
+       en dit is aantoonbaar een lokale ontwikkel- of toetsinstallatie -- dan
+       begint hij op `sandbox`. Wat een mens wel vastlegde, gaat altijd voor. */
+    const isLokaal = (() => { try { return isLokaalFn() === true; } catch (e) { return false; } })();
+    const lokaleStandaard = !s.fout && s.standaard === true && isLokaal;
+    const stand = s.fout ? null : (lokaleStandaard ? 'sandbox' : s.stand);
     const configFout = s.fout || (stand && !cap.standen.includes(stand) ? 'stand ' + stand + ' is voor deze capability niet toegestaan' : null);
 
     const rail = ctx.rail ? String(ctx.rail) : null;
-    const neprail = rail ? reg.NEPRAILS.includes(rail) : false;
+    const neprail = rail ? (reg.NEPRAILS.includes(rail) || (isLokaal && reg.LOKALE_NEPRAILS.includes(rail))) : false;
     let ingeschakeld = false, standReden = null;
     if (configFout) standReden = 'configuratiefout: ' + configFout;
     else if (stand === 'enabled') ingeschakeld = true;
     else if (stand === 'sandbox') {
-      if (isOpenbaar()) standReden = 'sandbox-in-openbare-installatie';
+      let mag; try { mag = sandboxMagFn() === true; } catch (e) { mag = false; }
+      if (!mag) standReden = 'sandbox-niet-toegestaan-in-deze-installatie';
       else if (!neprail) standReden = 'sandbox-alleen-op-neprail';
       else ingeschakeld = true;
     } else standReden = 'stand:' + stand;
+    const sandboxActief = stand === 'sandbox' && ingeschakeld;
 
-    const bewijsOordeel = (stand === 'sandbox' && ingeschakeld)
+    const bewijsOordeel = sandboxActief
       /* Op een neprail beweegt geen echt geld; het externe dossier gaat over
          echte rails en is daar geen voorwaarde. De sandbox draagt dat in zijn
          reden, zodat niemand een sandboxvrijgave voor een echte aanziet. */
       ? { geverifieerd: true, reden: 'sandbox-zonder-echt-geld' }
       : bw.oordeel(cap);
-    const aut = autorisatie(cap, ctx);
+    const aut = autorisatie(cap, ctx, sandboxActief);
 
     // afhankelijkheden: andere capabilities, en de provider van DIT verzoek
     let depsOk = true, depCode = null;
     const deps = cap.afhankelijk.slice();
-    if (cap.provider === 'per-verzoek' && !neprail) {
+    /* Alleen een ACTIEVE sandbox slaat de providervraag over: op `enabled` mag
+       geen `rail` uit het verzoek een laag overslaan (test/vrijgave-rangorde.test.js). */
+    if (cap.provider === 'per-verzoek' && !sandboxActief) {
       const p = ctx.provider || rail;
       if (!p) { depsOk = false; depCode = 'provider-niet-beschikbaar'; redenen.push('provider-onbekend'); }
       else if (!register.vind('geld.provider.' + p)) { depsOk = false; depCode = 'provider-niet-beschikbaar'; redenen.push('provider-niet-in-register:' + p); }
@@ -83,7 +77,9 @@ module.exports = function maakOordeel({ st, bw, pg, isOpenbaar, k, register, sch
         redenen.push('afhankelijk:' + d + ':' + o.code);
       }
     }
-    if (cap.provider && cap.provider !== 'per-verzoek') {
+    if (cap.provider && cap.provider !== 'per-verzoek' && sandboxActief) {
+      redenen.push('provider-' + cap.provider + ':niet-gevraagd-op-neprail');
+    } else if (cap.provider && cap.provider !== 'per-verzoek') {
       let g; try { g = pg(cap.provider); } catch (e) { g = null; }
       if (!g || g.gezond !== true) { depsOk = false; depCode = depCode || 'provider-niet-beschikbaar'; redenen.push('provider-ongezond:' + ((g && g.reden) || 'onbekend')); }
     }
@@ -106,6 +102,7 @@ module.exports = function maakOordeel({ st, bw, pg, isOpenbaar, k, register, sch
       afhankelijkhedenGezond: depsOk,
       actorGerechtigd: gerechtigd,
       stand: stand || null,
+      standBron: s.fout ? null : (lokaleStandaard ? 'lokale-standaard' : (s.standaard ? 'veilige-standaard' : 'vastgelegd')),
       standVersie: s.versie != null ? s.versie : null,
       bewijs: { reden: bewijsOordeel.reden, commit: bewijsOordeel.commit || null, inhoudSha256: bewijsOordeel.inhoudSha256 || null }
     });

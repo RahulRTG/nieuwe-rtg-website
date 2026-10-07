@@ -46,6 +46,7 @@ function groen() {
         sha256:'7'.repeat(64), doelSha256:'8'.repeat(64) },
       alarmering: { ok:true, status:204, doelSha256:'9'.repeat(64) },
       foundation: { aangevraagd:false, vrijgegeven:false, reden:'standaard-gesloten' },
+      vrijgave: { ok:true, modus:'baseline', baseline:'V1', bron:'proef', fouten:[], regels:[] },
       geldMotor: { modus: 'motor', bereikbaar: true, native: ['pay-grootboek', 'bank-grootboek'],
         verwachtGenesis:'g-0123456789abcdef0123456789abcdef',
         duurzaam:{ gereed:true, snapshotGeldig:true, snapshotGeladen:true, versleuteld:true,
@@ -309,6 +310,7 @@ function zonderRail() {
   invoer.golive.geld = { betalingenUit: true, releaseZonderRail: true,
     inkomendGeconfigureerd: false, uitgaandGeconfigureerd: false, foundationRekeningGeconfigureerd: true };
   delete invoer.golive.geldMotor;
+  invoer.golive.vrijgave = { ok:true, modus:'zonder-rail', baseline:'V1', bron:'proef', fouten:[], regels:[] };
   invoer.externControle.moneyMode = 'RAIL_DISABLED';
   return invoer;
 }
@@ -349,4 +351,24 @@ test('de geldstand leidt de beperkte release alleen af uit BEIDE vlaggen', () =>
   assert.equal(stand({ RTG_BETALEN_UIT: '1', RTG_RELEASE_ZONDER_RAIL: '1' }).releaseZonderRail, true);
   assert.equal(stand({ RTG_RELEASE_ZONDER_RAIL: '1' }).releaseZonderRail, false);
   assert.equal(stand({ RTG_BETALEN_UIT: '1' }).releaseZonderRail, false);
+});
+
+/* DE V1-VRIJGAVEBASELINE IN DE RELEASE-UITSPRAAK (scripts/lib/vrijgave-baseline.js).
+   Een go-livebewijs zonder het blok, met een gezakte baseline of met het
+   verkeerde soort oordeel voor de releasestand, maakt de release nooit READY. */
+test('de V1-vrijgavebaseline: ontbreekt het blok, zakt hij, of past de modus niet, dan BLOCKED', () => {
+  const zonderBlok = groen(); delete zonderBlok.golive.vrijgave;
+  assert.equal(beoordeel(zonderBlok).status, 'BLOCKED', 'een go-livebewijs van voor de baseline las als gehaald');
+  const gezakt = groen();
+  gezakt.golive.vrijgave = { ok:false, modus:'baseline', baseline:'V1', bron:'proef',
+    fouten:['geld.inkomend: hoort in de V1-baseline beschikbaar te zijn, maar niet: geverifieerd'], regels:[] };
+  const g = beoordeel(gezakt);
+  assert.equal(g.status, 'BLOCKED');
+  assert.ok(g.blokkades.some(b => /V1-vrijgavebaseline/.test(b)), g.blokkades.join(' | '));
+  const okMaarFouten = groen(); okMaarFouten.golive.vrijgave.fouten = ['een fout'];
+  assert.equal(beoordeel(okMaarFouten).status, 'BLOCKED', 'ok:true met een fout erin opende');
+  const verkeerdeModus = zonderRail(); verkeerdeModus.golive.vrijgave.modus = 'baseline';
+  assert.equal(beoordeel(verkeerdeModus).status, 'BLOCKED', 'een baselineoordeel telde voor een release zonder rail');
+  const volledigMetRailModus = groen(); volledigMetRailModus.golive.vrijgave.modus = 'zonder-rail';
+  assert.equal(beoordeel(volledigMetRailModus).status, 'BLOCKED', 'een zonder-railoordeel telde voor READY');
 });

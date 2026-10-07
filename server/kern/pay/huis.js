@@ -33,7 +33,12 @@ module.exports = ({ schoon, metIdem, betaalMetDekking, boekAsync, rekLid, seintj
       return { ok: true, centen: c, bijgeladen: z.bijgeladen, boeking: b.boeking.id };
     });
   }
-  async function huisUit({ aanCodenaam, centen, oms, idem }) {
+  /* `afwikkeling` (een reden): de aanroeper verklaart dat dit geld TERUG gaat
+     naar een lid -- een correctie op een betaalde factuur (../factuurcorrectie.js)
+     -- en geen nieuwe uitgave van RTG. Een noodstop op het interne saldo laat het
+     dan door (../../lib/idem.js). Een terugkoop of een andere nieuwe uitgave
+     geeft hem niet mee en blijft dus achter de poort. */
+  async function huisUit({ aanCodenaam, centen, oms, idem, afwikkeling }) {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
     const aan = schoon(aanCodenaam, 40);
@@ -44,7 +49,7 @@ module.exports = ({ schoon, metIdem, betaalMetDekking, boekAsync, rekLid, seintj
       if (b.error) return b;
       seintje(aan);
       return { ok: true, centen: c, boeking: b.boeking.id };
-    });
+    }, typeof afwikkeling === 'string' && afwikkeling.trim() ? { afwikkeling: afwikkeling.trim() } : undefined);
   }
   return { huisIn, huisUit };
 };

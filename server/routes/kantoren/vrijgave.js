@@ -26,11 +26,9 @@ const { wie: envelopWie } = require('../../opzet/envelop');
 
 module.exports = (ctx) => {
   const { app, boardroomAuth, veilig, afdelingen, kern, zwaar, boardroomUser } = ctx;
-  const { standaard, keurBijStart } = require('../../kern/vrijgave');
+  const { standaard } = require('../../kern/vrijgave');
   const vrijgave = standaard();
-  /* Een kapot register of standbestand laat een openbare installatie niet
-     starten (zie keurBijStart). */
-  keurBijStart(vrijgave);
+  /* De opstartkeuring (keurBijStart) staat in server/opzet/startcontrole.js. */
 
   /* De late koppeling: de bevoegdheidslaag, de capability-gezondheid en het
      auditlog leven in de kern-tas. Tot dit punt staat de autorisatie-as op

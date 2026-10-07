@@ -9,7 +9,7 @@ const { BESLUITEN } = require('./besluiten');
    zichzelf tegenspreekt (een veilige stand die niet in zijn eigen standenlijst
    staat, een afhankelijkheid naar een id die niet bestaat, een geldregel die
    standaard aan staat) is een fout in de CODE en moet de bouw laten zakken. */
-function valideerRegister(lijst, { vermogens = null, controles = null } = {}) {
+function valideerRegister(lijst, { vermogens = null, controles = null, rails = null } = {}) {
   const fouten = [];
   const ids = new Set();
   for (const c of lijst) {
@@ -41,6 +41,14 @@ function valideerRegister(lijst, { vermogens = null, controles = null } = {}) {
     if (!Array.isArray(c.toetsen) || !c.toetsen.length) w('geen toetsen genoemd');
   }
   for (const c of lijst) for (const a of (c && c.afhankelijk) || []) if (!ids.has(a)) fouten.push(c.id + ': afhankelijkheid ' + a + ' bestaat niet');
+  /* Een echte provider is NOOIT een rail zonder echt geld, lokaal of niet. Wie
+     hem op een van de neplijsten zet, maakt van een sandbox een weg naar echt
+     geld zonder bewijs en zonder besluit. Ook schrijfwijzen die er net naast
+     zitten (Stripe, stripe-connect) tellen. */
+  const { NEPRAILS, LOKALE_NEPRAILS, ECHTE_PROVIDERS } = rails || require('./rails');
+  const norm = x => String(x).toLowerCase().replace(/[^a-z]/g, '');
+  const echt = new Set(ECHTE_PROVIDERS.map(norm));
+  for (const n of NEPRAILS.concat(LOKALE_NEPRAILS)) if (echt.has(norm(n))) fouten.push('neprail ' + n + ' is een echte provider');
   /* Een kring in de afhankelijkheden zou een oordeel opleveren dat nooit
      eindigt -- of, als iemand het afkapt, een dat op volgorde wordt beslist. */
   const OP = new Map(lijst.filter(Boolean).map(c => [c.id, c]));

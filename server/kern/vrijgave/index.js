@@ -41,34 +41,60 @@ const { maakBewijs } = require('./bewijs');
 const { CODES, ZIN, STATUS, providerUitOmgeving } = require('./antwoord');
 
 function maakVrijgave({ env = process.env, stand, bewijs, bevoegd = null, gezondheid = null,
-  providerGezond = null, audit = null, openbaar = null, register = reg } = {}) {
+  providerGezond = null, audit = null, openbaar = null, lokaal = null, sandbox = null, register = reg } = {}) {
   const st = stand || maakStand({ env });
   const bw = bewijs || maakBewijs({});
   const pg = providerGezond || providerUitOmgeving(env);
   const isOpenbaar = typeof openbaar === 'function' ? openbaar
     : () => { try { return require('../../config/openbaar').isOpenbaar(env); } catch (e) { return true; } };
+  /* De lokale regel (./lokaal.js). Beide lezen de OMGEVING, per oordeel opnieuw:
+     een proces dat zijn omgeving niet verandert, krijgt steeds hetzelfde
+     antwoord, en een toets die een productieomgeving nabootst, krijgt het
+     productieantwoord. `openbaar` (als een toets hem meegeeft) telt in beide
+     mee: een installatie die openbaar is, is nooit lokaal. */
+  const L = require('./lokaal');
+  const isLokaal = typeof lokaal === 'function' ? lokaal
+    : () => !isOpenbaar() && L.lokaleInstallatie(env).ja === true;
+  const sandboxMag = typeof sandbox === 'function' ? sandbox
+    : () => !isOpenbaar() && L.sandboxMag(env).ja === true;
   /* Late koppeling: de bevoegdheidslaag en de capability-gezondheid leven in de
      kern-tas en zijn er pas na de montage. Tot dan: onbekend, dus dicht. */
   const k = { bevoegd, gezondheid, audit };
   const schaduw = new Map();   // id -> { zouDoor, zouDicht }
 
-  const { beoordeel, eis, eisHttp } = require('./oordeel')({ st, bw, pg, isOpenbaar, k, register, schaduw });
-  const { zet, besluitVastleggen, besluitIntrekken } = require('./schakelen')({ st, register, isOpenbaar, k });
+  const { beoordeel, eis, eisHttp } = require('./oordeel')({ st, bw, pg, isOpenbaar, k, register, schaduw,
+    lokaal: isLokaal, sandboxMag });
+  const { zet, besluitVastleggen, besluitIntrekken } = require('./schakelen')({ st, register, isOpenbaar, sandboxMag, k });
 
   /* Het beeld voor het kantoor en het standrapport: per capability de assen,
      gevraagd namens een rechthebbende (de actor-as is daar niet van toepassing
      en staat er dan ook als `beschikbaarVoorRechthebbende`). */
   function overzicht(ctx = {}) {
     const l = st.lees();
+    const B = require('./baseline');
     return {
       versie: l.fout ? null : l.staat.versie,
       configuratiefout: l.fout || null,
+      lokaleInstallatie: (() => { try { return isLokaal() === true; } catch (e) { return false; } })(),
+      baseline: { naam: B.NAAM, vastgesteld: B.VASTGESTELD, bron: B.BRON },
       besluiten: Object.keys(reg.BESLUITEN).map(n => ({ besluit: n, uitleg: reg.BESLUITEN[n],
         vastgelegd: !!st.besluit(n) })),
       capabilities: register.REGISTER.map(c => {
         const o = beoordeel(c.id, Object.assign({ recht: true }, ctx));
+        /* Een capability die per verzoek een provider kiest, is zonder provider
+           altijd dicht (`provider-onbekend`). Het overzicht zegt daarom ook per
+           ECHTE provider wat het oordeel zou zijn; de baseline (./baseline.js)
+           leest daaruit "via Stripe" in plaats van een oordeel zonder provider. */
+        const perProvider = c.provider === 'per-verzoek'
+          ? Object.fromEntries(['stripe', 'mollie', 'adyen'].map(p => {
+            const x = beoordeel(c.id, Object.assign({ recht: true }, ctx, { provider: p, rail: p }));
+            return [p, { beschikbaarVoorRechthebbende: x.beschikbaarVoorRechthebbende, geimplementeerd: x.geimplementeerd,
+              geverifieerd: x.geverifieerd, geautoriseerd: x.geautoriseerd, ingeschakeld: x.ingeschakeld,
+              afhankelijkhedenGezond: x.afhankelijkhedenGezond, code: x.code || null, intern: x.intern }];
+          }))
+          : null;
         return Object.assign({ naam: c.naam, eigenaar: c.eigenaar, standen: c.standen }, o,
-          { schaduw: schaduw.get(c.id) || null });
+          { schaduw: schaduw.get(c.id) || null, baseline: B.vanCapability(c.id), perProvider });
       })
     };
   }
@@ -104,9 +130,9 @@ function standaard() { if (!EEN) EEN = maakVrijgave({}); return EEN; }
 
 /* BIJ HET STARTEN: in een openbare installatie is een kapot register of een
    onleesbaar standbestand een weigering om te starten, geen waarschuwing. Elders
-   een waarschuwing -- en de oordelen staan dan toch dicht. Wordt aangeroepen bij
-   de montage van het kantoor (server/routes/kantoren/vrijgave.js); hoort op den
-   duur in server/opzet/startcontrole.js (integratiepunt). */
+   een waarschuwing -- en de oordelen staan dan toch dicht. Wordt aangeroepen in
+   server/opzet/startcontrole.js, in ELKE stand en niet alleen in productie: een
+   kapot register op een ontwikkelmachine hoort net zo goed te klinken. */
 function keurBijStart(v = standaard(), log = console) {
   const r = v.valideer();
   if (r.ok) return r;

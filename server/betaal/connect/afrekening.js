@@ -41,7 +41,6 @@ const { fout } = require('./fout');
 const definitief = e => !!e && Number.isInteger(e.status) && e.status >= 400 && e.status < 500 && e.status !== 409 && e.status !== 429;
 
 function maakConnectAfrekening({ stripe, vrijgave, opslag, boekEffect = null, audit = () => {}, nu = () => Date.now() }) {
-  const lopend = new Map();
   const iso = () => new Date(nu()).toISOString();
   const { boek, effect, zetStand, effectVoorStand } = require('./effect')({ opslag, boekEffect, audit, iso });
 
@@ -51,12 +50,21 @@ function maakConnectAfrekening({ stripe, vrijgave, opslag, boekEffect = null, au
     v.eis('geld.provider.stripe_connect', { actor: { soort: 'systeem' } });
   }
 
-  function aanvragen({ id, partner, account, centen, valuta = 'eur', wie, reden } = {}) {
+  /* ASYNCHROON sinds de grootboekkoppeling het echte grootboek van RTG Pay is:
+     de reservering is een boeking, en die wacht op de opslag (en in de
+     motorstand op de motor). Een aanvraag geeft dus een belofte terug. */
+  /* De vorm van een aanvraag, los gevraagd zodat de route hem kan keuren VOOR
+     hij een tweede handtekening aanvraagt (server/routes/kantoren/connect.js). */
+  function keurAanvraag({ id, account, centen, valuta = 'eur', wie } = {}) {
     if (!S.geldigId(id)) throw fout('Geef een geldig afrekening-id.', 'ONGELDIG', 400);
     if (!/^acct_[A-Za-z0-9]{6,}$/.test(String(account || ''))) throw fout('Geef een verbonden Stripe-account (acct_...).', 'ONGELDIG', 400);
     if (!Number.isSafeInteger(centen) || centen < 1 || centen > 10000000) throw fout('Bedrag in centen, tussen 1 en 10.000.000.', 'ONGELDIG', 400);
     if (!/^[a-z]{3}$/.test(String(valuta))) throw fout('Valuta als drie kleine letters.', 'ONGELDIG', 400);
     if (!/^user-\d+$/.test(String(wie || ''))) throw fout('Een afrekening vraagt een mens op naam.', 'ONGELDIG', 403);
+  }
+
+  async function aanvragen({ id, partner, account, centen, valuta = 'eur', wie, reden, bevestigdDoor = null } = {}) {
+    keurAanvraag({ id, account, centen, valuta, wie });
     const bestaand = opslag.haal(id);
     if (bestaand) {
       /* Hetzelfde id met andere gegevens is NIET dezelfde economische
@@ -68,77 +76,34 @@ function maakConnectAfrekening({ stripe, vrijgave, opslag, boekEffect = null, au
     poort({ recht: true, actor: { soort: 'kantoor', wie } });
     if (!boek()) throw fout('Er is geen grootboekkoppeling voor partnerafrekeningen.', 'GROOTBOEK_NIET_GEKOPPELD', 503);
     const rec = { id, partner: String(partner || ''), account, centen, valuta, stand: 'aangevraagd',
-      aangevraagdDoor: String(wie), reden: String(reden || '').slice(0, 300), op: iso(), pogingen: 0,
+      aangevraagdDoor: String(wie), bevestigdDoor: bevestigdDoor && /^user-\d+$/.test(String(bevestigdDoor)) ? String(bevestigdDoor) : null,
+      reden: String(reden || '').slice(0, 300), op: iso(), pogingen: 0,
       transferId: null, payoutId: null, geschiedenis: [{ op: iso(), van: null, naar: 'aangevraagd', bron: 'kantoor' }] };
     opslag.bewaar(rec);
-    try { effect(rec, 'reservering'); }
+    /* Het record staat duurzaam VOOR de reservering: een reservering zonder
+       record kan na een herstart door niemand worden afgerekend of teruggeboekt.
+       Andersom (record zonder effect) haalt de veeg in, met dezelfde sleutel. */
+    await opslag.vast();
+    try { await effect(rec, 'reservering'); }
     catch (e) {
       /* De reservering is geweigerd (te weinig saldo, of een storing): dan gaat
          er niets naar Stripe. Het record blijft staan als `mislukt`, zodat het
          id niet nog eens met een andere uitkomst kan worden gebruikt. */
-      zetStand(rec, 'mislukt', 'grootboek', String(e && e.message || e).slice(0, 200));
+      await zetStand(rec, 'mislukt', 'grootboek', String(e && e.message || e).slice(0, 200));
+      await opslag.vast();
       throw fout('De reservering van het partnersaldo is geweigerd; er is niets verstuurd.', 'RESERVERING_GEWEIGERD', 409, { nietVerstuurd: true });
     }
+    /* De aanvraag en haar reservering staan vast voordat iemand ze indient. */
+    await opslag.vast();
     try { audit(String(wie), 'Partnerafrekening ' + id + ' aangevraagd: ' + centen + ' ' + valuta + ' naar ' + account); } catch (e) { /* record staat er al */ }
     return { herhaald: false, afrekening: rec };
   }
 
-  /* Indienen bij Stripe, in twee stappen, elk met zijn eigen sleutel. Per id
-     een slot binnen dit proces; tussen processen beschermen de sleutels. */
-  function indienen(id) {
-    if (lopend.has(id)) return lopend.get(id);
-    const werk = (async () => {
-      const rec = opslag.haal(id);
-      if (!rec) throw fout('Onbekende afrekening.', 'ONBEKEND', 404);
-      if (!stripe) throw fout('Stripe Connect is niet geconfigureerd.', 'PROVIDER_NIET_BESCHIKBAAR', 503);
-      if (rec.stand === 'aangevraagd') {
-        poort({ actor: { soort: 'systeem' } });
-        rec.pogingen += 1; rec.laatstePoging = iso(); opslag.bewaar(rec);
-        let t;
-        try {
-          t = await stripe.transfers.create({ amount: rec.centen, currency: rec.valuta, destination: rec.account,
-            transfer_group: 'rtg-' + rec.id, metadata: { afrekening: rec.id } }, { idempotencyKey: S.idemTransfer(rec.id) });
-        } catch (e) {
-          rec.laatsteFout = String(e && e.message || e).slice(0, 200); opslag.bewaar(rec);
-          if (definitief(e)) { zetStand(rec, 'mislukt', 'stripe-transfer', rec.laatsteFout); return rec; }
-          throw fout('Stripe gaf geen uitsluitsel over de transfer; de veeg probeert het met dezelfde sleutel opnieuw.', 'OPNIEUW', 503, { opnieuw: true });
-        }
-        if (!t || !t.id || t.amount !== rec.centen || String(t.currency).toLowerCase() !== rec.valuta || t.destination !== rec.account) {
-          opslag.bevinding({ soort: 'transfer-wijkt-af', afrekening: rec.id, gezien: t ? { id: t.id, amount: t.amount, currency: t.currency, destination: t.destination } : null });
-          throw fout('Het antwoord van Stripe op de transfer klopt niet met de aanvraag; zie de bevindingen.', 'AFWIJKING', 502);
-        }
-        rec.transferId = t.id; opslag.bewaar(rec);
-        zetStand(rec, 'ingediend', 'stripe-transfer');
-      }
-      if (rec.stand === 'ingediend' && !rec.payoutId) {
-        poort({ actor: { soort: 'systeem' } });
-        rec.pogingen += 1; rec.laatstePoging = iso(); opslag.bewaar(rec);
-        let p;
-        try {
-          p = await stripe.payouts.create({ amount: rec.centen, currency: rec.valuta, metadata: { afrekening: rec.id } },
-            { idempotencyKey: S.idemPayout(rec.id), stripeAccount: rec.account });
-        } catch (e) {
-          rec.laatsteFout = String(e && e.message || e).slice(0, 200); opslag.bewaar(rec);
-          if (definitief(e)) { zetStand(rec, 'mislukt', 'stripe-payout', rec.laatsteFout); return rec; }
-          throw fout('Stripe gaf geen uitsluitsel over de payout; de veeg probeert het met dezelfde sleutel opnieuw.', 'OPNIEUW', 503, { opnieuw: true });
-        }
-        if (!p || !p.id || p.amount !== rec.centen) {
-          opslag.bevinding({ soort: 'payout-wijkt-af', afrekening: rec.id, gezien: p ? { id: p.id, amount: p.amount } : null });
-          throw fout('Het antwoord van Stripe op de payout klopt niet met de aanvraag; zie de bevindingen.', 'AFWIJKING', 502);
-        }
-        rec.payoutId = p.id; opslag.bewaar(rec);
-        zetStand(rec, 'onderweg', 'stripe-payout');
-        if (p.status === 'paid') zetStand(rec, 'betaald', 'stripe-payout');
-      }
-      return rec;
-    })();
-    lopend.set(id, werk);
-    const los = () => { lopend.delete(id); };
-    werk.then(los, los);
-    return werk;
-  }
+  /* Indienen bij Stripe (transfer, dan payout, elk met een eigen sleutel):
+     ./indienen.js. */
+  const indienen = require('./indienen')({ stripe, opslag, poort, zetStand, iso, definitief });
 
-  return { aanvragen, indienen, zetStand, effectVoorStand, poort, opslag, stripe, definitief };
+  return { aanvragen, keurAanvraag, indienen, zetStand, effectVoorStand, poort, opslag, stripe, definitief };
 }
 
 module.exports = { maakConnectAfrekening, definitief };

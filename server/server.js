@@ -1758,9 +1758,16 @@ const betaalOpdrachten = require('./kern/betaalopdracht')({
   // herhaling bij de provider nooit een tweede betaling wordt
   railInzenden: async (o) => {
     try {
+      /* De capability van DEZE uitbetaling (server/kern/vrijgave/): een
+         uitbetaling naar een lid, een partner of de RTFoundation zijn financieel
+         drie verschillende handelingen, en server/betaal/uitbetaling.js weigert
+         er een zonder naam. De soort van de opdracht zegt welke het is; een soort
+         zonder capability in het register krijgt er geen, en is dus dicht zodra
+         hij een echte rail zou raken. */
       const uit = await betaal.maakUitbetaling({
         bedrag: o.centen, valuta: o.valuta, iban: o.bestemming, begunstigde: o.begunstigde,
-        referentie: o.ledgerRef, idempotentieSleutel: o.idemSleutel, omschrijving: o.oms
+        referentie: o.ledgerRef, idempotentieSleutel: o.idemSleutel, omschrijving: o.oms,
+        vrijgave: require('./kern/betaalopdracht/vrijgave').capabilityVan(o.soort)
       });
       capGezondheid.meld('money.payout', true);
       return uit;

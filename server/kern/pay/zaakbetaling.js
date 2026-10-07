@@ -132,7 +132,10 @@ module.exports = (ctx) => {
         }
         seintje(lid);
         return { ok: true, terugCenten: c + bij, saldo: saldoVan(rekLid(lid)) };
-      });
+      /* AFWIKKELING en geen nieuw werk: dit geld ging al van dit lid naar deze
+         zaak, en een noodstop op het interne saldo hoort het terug te laten gaan
+         (zie ../../lib/idem.js, `afwikkeling`). */
+      }, { afwikkeling: 'terugbetaling van een zaakbetaling aan het lid dat haar deed' });
   }
 
   return { betaalZaak, terugZaak };

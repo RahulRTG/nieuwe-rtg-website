@@ -19,7 +19,19 @@
    AVAILABLE is hier "beschikbaar voor een rechthebbende": de actor-as hoort bij
    een verzoek en niet bij een rapport. Staat er nee, dan staat de reden erbij.
    Uitgang 2 bij een configuratiefout (onleesbaar of ongeldig standbestand of
-   register): dan is alles dicht, en dat hoort een pijplijn te zien. */
+   register): dan is alles dicht, en dat hoort een pijplijn te zien.
+
+   DE BASELINE-KOLOM (server/kern/vrijgave/baseline.js): per capability wat de
+   eigenaar voor V1 besloot (in-baseline, niet, besluit-open) en of dat in deze
+   stand KLOPT. Een capability die per verzoek een provider kiest, staat in de
+   baseline met de provider waarover hij beloofd is ("in-baseline via stripe"),
+   en de AVAILABLE-kolom toont dan het oordeel OVER die provider.
+
+     npm run vrijgave:stand -- --controle
+         de V1-baseline in de RELEASEconfiguratie (NODE_ENV=production, wat de
+         omgeving ook zegt; scripts/lib/vrijgave-baseline.js): uitgang 1 als een
+         baselinecapability niet beschikbaar is of een capability buiten de
+         baseline open staat. Dezelfde controle als in scripts/golive.js. */
 'use strict';
 const path = require('node:path');
 
@@ -41,16 +53,35 @@ async function haal() {
 }
 
 function tabel(o) {
+  const B = require(path.join(__dirname, '..', 'server', 'kern', 'vrijgave', 'baseline'));
   const ja = b => (b ? 'ja' : 'NEE');
-  const rijen = [['capability', 'IMPLEMENTED', 'VERIFIED', 'AUTHORIZED', 'ENABLED', 'AVAILABLE', 'stand', 'reden als AVAILABLE nee is']];
-  for (const c of o.capabilities) rijen.push([c.id, ja(c.geimplementeerd), ja(c.geverifieerd), ja(c.geautoriseerd),
-    ja(c.ingeschakeld), ja(c.beschikbaarVoorRechthebbende), c.stand || '?',
-    c.beschikbaarVoorRechthebbende ? '' : (c.code + ': ' + c.intern)]);
-  const breed = rijen[0].map((_, i) => Math.max(...rijen.map(r => i === 7 ? 0 : String(r[i]).length)));
-  return rijen.map(r => r.map((x, i) => i === 7 ? x : String(x).padEnd(breed[i])).join('  ')).join('\n');
+  const rijen = [['capability', 'IMPLEMENTED', 'VERIFIED', 'AUTHORIZED', 'ENABLED', 'AVAILABLE', 'stand', 'BASELINE ' + B.NAAM, 'reden als AVAILABLE nee is']];
+  const laatste = rijen[0].length - 1;
+  for (const c of o.capabilities) {
+    const b = B.BASELINE[c.id] || null;
+    /* Voor een per-verzoek-capability in de baseline telt het oordeel OVER de
+       belofte-provider; zonder provider is hij per definitie dicht. */
+    const x = b && b.via && c.perProvider && c.perProvider[b.via] ? c.perProvider[b.via] : c;
+    const open = x.beschikbaarVoorRechthebbende === true;
+    const klopt = !b ? 'ONBEKEND' : (b.soort === 'in-baseline' ? (open ? 'klopt' : 'NIET GEHAALD') : (open ? 'OPEN TERWIJL NIET' : 'klopt'));
+    rijen.push([c.id, ja(x.geimplementeerd), ja(x.geverifieerd), ja(x.geautoriseerd), ja(x.ingeschakeld), ja(open),
+      (c.stand || '?') + (c.standBron === 'lokale-standaard' ? ' (lokaal)' : ''), (b ? b.soort + (b.via ? ' via ' + b.via : '') : '-') + ' (' + klopt + ')',
+      open ? '' : ((x.code || c.code) + ': ' + (x.intern || c.intern))]);
+  }
+  const breed = rijen[0].map((_, i) => Math.max(...rijen.map(r => i === laatste ? 0 : String(r[i]).length)));
+  return rijen.map(r => r.map((x, i) => i === laatste ? x : String(x).padEnd(breed[i])).join('  ')).join('\n');
 }
 
-if (require.main === module) {
+if (require.main === module && process.argv.includes('--controle')) {
+  require('./lib/vrijgave-baseline').beoordeelRelease({ url: arg('--url'), token: arg('--token') }).then(u => {
+    console.log('Vrijgavepoort -- ' + (u.baseline || 'V1') + '-baseline in de releaseconfiguratie; bron: ' + (u.bron || '?'));
+    for (const r of u.regels || []) console.log('  ' + (r.beschikbaar ? 'open ' : 'dicht') + '  ' + r.id.padEnd(30) + ' ' +
+      String(r.baseline) + (r.via ? ' via ' + r.via : '') + (r.ontbrekendeAssen && r.ontbrekendeAssen.length && !r.beschikbaar ? '  ontbreekt: ' + r.ontbrekendeAssen.join(', ') : ''));
+    if (u.ok) { console.log('\nBASELINE GEHAALD.'); return; }
+    console.error('\nBASELINE NIET GEHAALD:\n  ' + u.fouten.join('\n  '));
+    process.exitCode = 1;
+  }).catch(e => { console.error('[vrijgave:stand --controle] ' + e.message); process.exitCode = 1; });
+} else if (require.main === module) {
   haal().then(({ bron, overzicht, validatie }) => {
     console.log('Vrijgavepoort -- bron: ' + bron + ', standversie: ' + (overzicht.versie == null ? '?' : overzicht.versie));
     console.log(tabel(overzicht));

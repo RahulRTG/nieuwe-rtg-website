@@ -21,6 +21,11 @@ module.exports = (kern) => {
     if (!r.error) return res.json(r);
     const uit = { error: r.error };
     for (const k of UITLEG) if (r[k] !== undefined) uit[k] = r[k];
+    /* Een weigering van de vrijgavepoort (server/kern/vrijgave weigering()):
+       de veilige code en de capability, zodat een scherm "tijdelijk uit" van
+       "geen recht" kan onderscheiden. Alleen dan: `code` betekent op deze laag
+       ook de kascode zelf, en die hoort niet in een foutantwoord. */
+    if (r.capability) { uit.code = r.code; uit.capability = r.capability; }
     return res.status(r.status || 400).json(uit);
   };
   const geenGast = (req, res) => {

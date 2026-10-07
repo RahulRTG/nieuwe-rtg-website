@@ -53,9 +53,11 @@ function opbouw({ betaal, spelers, db, motorUrl, betalenUit }) {
     const voegToe = require('../server/kern/pay/loshistorie')(db);
     const haak = { voor: null };
     const { pay } = require('../server/kern/pay')({
-      betaalWaarheid, db, save, bijeen: async (w) => w(),
+      betaalWaarheid, db, save, bijeen: async (w) => w(), vrijgave: require('../scripts/lib/proefvrijgave').proefVrijgave(),
       payBoekingenVoegToe: (rij) => { if (haak.voor) haak.voor(rij); return voegToe(rij); },
-      crypto, betaal: betaal || {},
+      /* De nagemaakte aanbieder van deze proef is een rail zonder echt geld; zo
+         kent de vrijgavepoort hem (server/kern/pay/vrijgavepoort.js). */
+      crypto, betaal: Object.assign({ AANBIEDER: 'simulatie' }, betaal || {}),
       keyVanCodenaam: (c) => (spelers.includes(c) ? { key: 'proef:' + c } : null),
       sseToCustomer: () => {}, schoon: (x) => String(x || ''), betaaldienstKosten: () => 0,
       betaalOpdrachten: { registreerTeruggang() {}, maak: () => ({ id: 'proef' }), dienIn: async () => ({}) }

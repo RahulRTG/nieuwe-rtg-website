@@ -50,7 +50,7 @@ async function motorStatus() {
     async maakUitbetaling() { return { status: 'uitbetaald' }; },
   };
   const { pay } = require('../server/kern/pay')({
-    db, save() {}, crypto, betaal: demoBetaal,
+    db, save() {}, crypto, betaal: demoBetaal, vrijgave: require('./lib/proefvrijgave').proefVrijgave(),
     // eigen db.data: de losse historie, zie server/kern/pay/loshistorie.js
     payBoekingenVoegToe: require('../server/kern/pay/loshistorie')(db),
     betaalOpdrachten: maakOpdrachten(db),
@@ -110,7 +110,7 @@ async function motorStatus() {
   //    spiegel byte-voor-byte gelijk is aan de motor (zoals na een herstart).
   const db2 = { data: {} };
   const { pay: pay2 } = require('../server/kern/pay')({
-    db: db2, save() {}, crypto, betaal: demoBetaal,
+    db: db2, save() {}, crypto, betaal: demoBetaal, vrijgave: require('./lib/proefvrijgave').proefVrijgave(),
     // eigen db.data: de losse historie, zie server/kern/pay/loshistorie.js
     payBoekingenVoegToe: require('../server/kern/pay/loshistorie')(db2),
     betaalOpdrachten: maakOpdrachten(db2),

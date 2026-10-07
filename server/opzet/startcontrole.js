@@ -17,6 +17,13 @@
 'use strict';
 
 module.exports = function startControle({ PRODUCTION, DEMO, accounts, eigenaar }) {
+  /* DE VRIJGAVEPOORT (server/kern/vrijgave/), en die staat VOOR de
+     productiegrens hieronder: een kapot register of een onleesbaar standbestand
+     hoort op elke machine te klinken. Op een openbaar adres is het een weigering
+     om te starten (de fout gaat hier ongevangen omhoog), elders een waarschuwing
+     -- en de oordelen staan dan toch dicht. Stond eerst bij de montage van het
+     kantoor, waar hij pas draaide als die kamer werd opgebouwd. */
+  require('../kern/vrijgave').keurBijStart();
   if (!PRODUCTION) return;
   /* OFFICE_CODE en OFFICE_TOTP_SECRET openen in productie niets (B10, B24;
      geen eis meer sinds 4 oktober 2026). Staan ze toch gezet, dan worden ze

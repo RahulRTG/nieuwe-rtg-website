@@ -56,6 +56,12 @@ const wallet = () => api('pay/overzicht', {}, lid.token).then(r => r.body);
 const sluit = async () => (await (await fetch(base + '/api/pay/gezond')).json()).klopt;
 
 test.before(async () => {
+  /* B3 (server/kern/vrijgave/besluiten.js): terugstorten naar een IBAN is
+     elektronisch geld, en de vrijgavepoort laat het ook in een toetswereld pas
+     door als dat besluit is VASTGELEGD -- hier als feit in de stand van deze
+     datamap, zoals de eigenaar het in de boardroom zou doen. Zonder dit besluit
+     is de handeling dicht; dat bewaakt test/vrijgave-hooks.test.js. */
+  require('../scripts/lib/proefvrijgave').standMetBesluiten(TMP, ['emoney.b3']);
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   /* EEN ECHT, GEVERIFIEERD ACCOUNT en geen demo-sessie, en dat is geen

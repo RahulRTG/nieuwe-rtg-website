@@ -103,6 +103,14 @@ function beoordeel(invoer) {
       'Er is geen productie-uitbetaalrail geconfigureerd.');
     eis(golive.geld && golive.geld.foundationRekeningGeconfigureerd === true,
       'De rekening voor Foundation-settlement ontbreekt.');
+    /* De V1-baseline van de vrijgavepoort (scripts/lib/vrijgave-baseline.js).
+       Expliciet en niet alleen via `blokkers === 0`: een go-livebewijs van voor
+       deze controle draagt het blok niet, en dat mag nooit als "gehaald" lezen. */
+    eis(!!golive.vrijgave && golive.vrijgave.ok === true &&
+      golive.vrijgave.modus === (zonderRail ? 'zonder-rail' : 'baseline') &&
+      Array.isArray(golive.vrijgave.fouten) && golive.vrijgave.fouten.length === 0,
+    zonderRail ? 'De vrijgavepoort bewijst niet dat in een release zonder kaartrail elke geldcapability dicht is.'
+      : 'De V1-vrijgavebaseline is niet gehaald: niet elke baselinecapability is beschikbaar, of een capability buiten de baseline staat open.');
     eis(uitgangen.redisBewijsGeldig(golive.redis),
       'Redis pub/sub en de atomische instancebrede rate limit zijn niet actief bewezen.');
     eis(uitgangen.mediaBewijsGeldig(golive.gedeeldeMedia),

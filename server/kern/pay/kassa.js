@@ -27,7 +27,7 @@ module.exports = (ctx) => {
     scope: ['kassa.afrekenen'], geldigMs: KASCODE_MS, maxGebruik: 1 });
   const kasBoek = require('./kas-boek')(ctx);
   const claim = require('./kas-claim')({ bak, crypto, nu, stelSamen, zorgSaldo, rekPartner,
-    betaalDelen: kasBoek.betaalDelen, weigering: kasBoek.weigering, waarde, schoon });
+    betaalDelen: kasBoek.betaalDelen, weigering: kasBoek.weigering, waarde, schoon, vrijgavePoort: ctx.vrijgavePoort });
   /* ./vooraf.js claimt dezelfde codes en boekt langs dezelfde sleutels: een
      bak, een saga, en niet een tweede exemplaar met een eigen wisvlag. */
   Object.assign(ctx, { kasClaim: claim, kasBoek, kasKosten: null });

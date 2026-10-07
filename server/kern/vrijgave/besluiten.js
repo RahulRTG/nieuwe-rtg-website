@@ -12,4 +12,19 @@ const BESLUITEN = Object.freeze({
   'emoney.b3': 'Extern juridisch besluit (B3): RTG neemt de positie in dat terugstortbaar saldo elektronisch geld is, met de vergunning of partnerconstructie die daarbij hoort.'
 });
 
-module.exports = { BESLUITEN };
+/* WELKE BESLUITEN EEN CONTRACT MET EEN ECHTE PROVIDER ZIJN. Een handelaars- of
+   Connect-overeenkomst gaat over geld dat via DIE provider loopt; op een rail
+   zonder echt geld (een sandbox op een neprail, ./oordeel.js) bestaat die
+   provider niet en is het besluit niet van toepassing. Dat is GEEN versoepeling
+   van de autorisatie: de sandbox zelf bestaat alleen buiten productie en buiten
+   een openbaar adres (./lokaal.js), en de bevoegdheidslaag (`vermogen`) blijft
+   ook in de sandbox gevraagd.
+
+   `emoney.b3` staat er met opzet NIET in. Dat besluit gaat niet over een provider
+   maar over de positie van RTG zelf (terugstortbaar saldo is elektronisch geld),
+   en die positie verandert niet doordat de rail nep is. Zonder B3 blijft de
+   IBAN-uitbetaling van een lid dus ook lokaal dicht. */
+const PROVIDERCONTRACT = Object.freeze(['inkomend.handelaar', 'provider.stripe', 'provider.stripe_connect',
+  'provider.mollie', 'provider.adyen']);
+
+module.exports = { BESLUITEN, PROVIDERCONTRACT };

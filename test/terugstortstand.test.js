@@ -49,6 +49,12 @@ const matrix = () => api('office/bank/bevoegdheid', {}, office).then(r => r.body
 const regel = (m, id) => m.regels.find(x => x.id === id);
 
 test.before(async () => {
+  /* B3 (server/kern/vrijgave/besluiten.js): terugstorten naar een IBAN is
+     elektronisch geld, en de vrijgavepoort laat het ook in een toetswereld pas
+     door als dat besluit is VASTGELEGD -- hier als feit in de stand van deze
+     datamap, zoals de eigenaar het in de boardroom zou doen. Zonder dit besluit
+     is de handeling dicht; dat bewaakt test/vrijgave-hooks.test.js. */
+  require('../scripts/lib/proefvrijgave').standMetBesluiten(TMP, ['emoney.b3']);
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   const d = (await api('auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body;

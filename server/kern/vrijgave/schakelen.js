@@ -6,7 +6,8 @@
 'use strict';
 const reg = require('./register');
 
-module.exports = function maakSchakelen({ st, register, isOpenbaar, k }) {
+module.exports = function maakSchakelen({ st, register, isOpenbaar, sandboxMag, k }) {
+  const sandboxMagFn = typeof sandboxMag === 'function' ? sandboxMag : () => !isOpenbaar();
   /* SCHAKELEN. `stapOmhoog` zegt dat de route de verse passkey al heeft
      gezien; deze module kan dat niet zelf vaststellen en vertrouwt het dus
      alleen voor wat de route hem doorgeeft. Uitzetten vraagt het nooit. */
@@ -21,11 +22,18 @@ module.exports = function maakSchakelen({ st, register, isOpenbaar, k }) {
     const activeert = reg.ACTIVEREND.includes(nieuweStand);
     if (activeert && (cap.geld || cap.beveiliging) && stapOmhoog !== true)
       return { ok: false, status: 401, bevestigingNodig: true, error: 'Aanzetten van geld of veiligheid vraagt een verse passkey.' };
-    if (nieuweStand === 'sandbox' && isOpenbaar())
-      return { ok: false, status: 409, error: 'Een openbare installatie kent geen sandboxstand.' };
+    /* Productie en een openbaar adres kennen geen sandbox (./lokaal.js). Hier
+       geweigerd zodat niemand hem kan ZETTEN; ./oordeel.js weigert hem nog eens
+       als hij er toch staat (een met de hand bewerkt bestand). */
+    if (nieuweStand === 'sandbox' && !sandboxMagFn())
+      return { ok: false, status: 409, error: 'Deze installatie kent geen sandboxstand (productie of openbaar).' };
     const uit = st.muteer(versie, staat => {
+      /* Alleen een VASTGELEGDE gelijke stand is ongewijzigd. Een mens die op een
+         verse installatie uitdrukkelijk `disabled` kiest, legt dat vast: zonder
+         regel geldt lokaal de sandboxstandaard (./lokaal.js), en dan zou zijn
+         uitzetten stil niets doen. */
       const oud = staat.standen[id] ? staat.standen[id].stand : cap.veiligeStand;
-      if (oud === nieuweStand) return { ok: true, ongewijzigd: true, stand: oud };
+      if (staat.standen[id] && oud === nieuweStand) return { ok: true, ongewijzigd: true, stand: oud };
       const op = new Date().toISOString();
       staat.standen[id] = { stand: nieuweStand, wie: String(wie), sinds: op, reden: r.slice(0, 500) };
       staat.geschiedenis.push({ op, id, van: oud, naar: nieuweStand, wie: String(wie), reden: r.slice(0, 500), stapOmhoog: !!stapOmhoog });

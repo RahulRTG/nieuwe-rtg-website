@@ -127,7 +127,9 @@ module.exports = (ctx) => {
         save();
         seintje(codenaam);
         return { ok: true, centen: totaal, delen: gedaan };
-      });
+      /* AFWIKKELING: een teruggave zet geld terug bij het lid dat het eerder
+         betaalde; een noodstop houdt dat niet tegen (../../lib/idem.js). */
+      }, { afwikkeling: 'teruggave aan een lid van wat het eerder betaalde' });
   }
 
   return { verkoop, terugGave };

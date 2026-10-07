@@ -61,9 +61,10 @@ function opslagPoort(opslagKlaar) {
    te doen. */
 function hoofdzekering({ db, accounts, eigenaar, stroom = () => require('../kern/sessiestroom').actief() }) {
   const { zekeringGesprongen } = require('../techniek');
-  const isBaas = (tok) => {
-    try { return !!tok && eigenaar.isEigenaar(accounts, accounts.verifyToken(tok)); } catch (e) { return false; }
-  };
+  /* Is dit token van de eigenaar? Eerst accounts.verifyToken (handtekening,
+     verloop, intrekking), pas daarna telt wie het is. */
+  const geverifieerd = (tok) => { try { return tok ? accounts.verifyToken(tok) : null; } catch (e) { return null; } };
+  const isBaas = (u) => { try { return !!u && eigenaar.isEigenaar(accounts, u); } catch (e) { return false; } };
   const dicht = (req, res, next) => req.path.startsWith('/api/')
     ? res.status(503).json({ error: 'De app is in onderhoud. Probeer het later opnieuw.' }) : next();
   return (req, res, next) => {
@@ -77,7 +78,8 @@ function hoofdzekering({ db, accounts, eigenaar, stroom = () => require('../kern
     if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
     /* Alleen uit de kop: een sessie in het adres wordt nergens meer aangenomen
        (een live-stroom opent met een stroomticket, kern/sessiestroom.js). */
-    if (isBaas((req.get('authorization') || '').replace(/^Bearer\s+/i, ''))) return next(); // de eigenaar mag er wel bij
+    const kop = (req.get('authorization') || '').replace(/^Bearer\s+/i, '');
+    if (isBaas(geverifieerd(kop))) return next(); // de eigenaar mag er wel bij
     /* DE STROOM VAN DE EIGENAAR. Een EventSource stuurt geen kop: hij opent met
        `?ticket=`, dat de eigenaar zelf (met zijn sessie in de kop, dus langs
        deze zekering) heeft opgehaald. Hier stond alleen de kop, en de stroom
@@ -91,7 +93,7 @@ function hoofdzekering({ db, accounts, eigenaar, stroom = () => require('../kern
     const dienst = ticket && p.startsWith('/api/') ? stroom() : null;
     if (!dienst || typeof dienst.kijk !== 'function') return dicht(req, res, next);
     Promise.resolve(dienst.kijk(ticket)).then(uit => {
-      if (uit && isBaas(uit.token)) return next();
+      if (uit && isBaas(geverifieerd(uit.token))) return next();
       dicht(req, res, next);
     }, () => dicht(req, res, next));
   };

@@ -111,8 +111,8 @@ function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
   }
 
   /* DE HERZEGELINGEN van een AVG-wissing: ./ankerherzegelopslag.js. */
-  const { herzegelVoor, herzegelingGeldig, verklaarHerschrijving } = require('./ankerherzegelopslag')
-    .maakHerzegelOpslag({ db, data, tijd, eigenPaar });
+  const herzegelOpslag = require('./ankerherzegelopslag').maakHerzegelOpslag({ db, data, tijd, eigenPaar });
+  const verklaarHerschrijving = herzegelOpslag.verklaarHerschrijving;
 
   /* Afrekenen met een eerder naar buiten gebracht blok. Per journaal het
      oordeel van keten-anker.js; het geheel is pas ok als ze het allemaal zijn.
@@ -169,7 +169,8 @@ function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
     return p ? { alg: 'ed25519', sleutelId: p.sleutelId, publiek: p.publiekB64 } : null;
   }
 
-  return { blok, reken, stand, handtekeningGeldig, publiekeSleutel, herzegelVoor, herzegelingGeldig,
+  return { blok, reken, stand, handtekeningGeldig, publiekeSleutel,
+    herzegelVoor: herzegelOpslag.herzegelVoor, herzegelingGeldig: herzegelOpslag.herzegelingGeldig,
     JOURNALEN: Object.keys(JOURNALEN).concat('ledenBoardLog') };
 }
 

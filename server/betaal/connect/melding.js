@@ -38,16 +38,26 @@ function maakMelding(kern) {
 
   /* Naar een latere stand, eventueel langs de tussenstappen die een gemiste
      melding oversloeg. Nooit door een eindstand heen. */
-  function naar(rec, doel, bron) {
+  async function naar(rec, doel, bron) {
     const m = T.mag(rec.stand, doel);
     if (m.mag) return zetStand(rec, doel, bron);
     const p = T.pad(rec.stand, doel);
     if (!p) return zetStand(rec, doel, bron);    // laat de tabel de bevinding schrijven
-    for (const tussen of p) if (!zetStand(rec, tussen, bron + (tussen === doel ? '' : ' (tussenstap)'))) return false;
+    for (const tussen of p) if (!(await zetStand(rec, tussen, bron + (tussen === doel ? '' : ' (tussenstap)')))) return false;
     return true;
   }
 
-  function verwerk(evt) {
+  /* ASYNCHROON: een stand kan een boeking in het grootboek betekenen, en de
+     melding is pas verwerkt als die boeking EN de stand duurzaam staan
+     (`opslag.vast()`). Pas daarna mag de webhook 200 zeggen; anders stuurt
+     Stripe hem niet opnieuw en is een betaalde afrekening na een herstart weer
+     onderweg. */
+  async function verwerk(evt) {
+    const uit = await verwerkInGeheugen(evt);
+    await opslag.vast();
+    return uit;
+  }
+  async function verwerkInGeheugen(evt) {
     if (!evt || typeof evt.id !== 'string' || typeof evt.type !== 'string') return { genegeerd: 'geen melding' };
     if (opslag.gezien(evt.id)) return { herhaald: true };
     const obj = (evt.data && evt.data.object) || {};
@@ -77,11 +87,11 @@ function maakMelding(kern) {
     if (evt.type.startsWith('payout.')) {
       if (obj.id && !rec.payoutId && rec.transferId) { rec.payoutId = obj.id; opslag.bewaar(rec); }
       const doel = PAYOUT[evt.type] || (evt.type === 'payout.updated' || evt.type === 'payout.created' ? PAYOUT_STATUS[obj.status] : null);
-      if (doel) uit = naar(rec, doel, 'melding:' + evt.type);
+      if (doel) uit = await naar(rec, doel, 'melding:' + evt.type);
     } else if (evt.type === 'transfer.reversed') {
       /* Gedeeltelijk teruggedraaid is iets anders dan teruggedraaid; daar is geen
          stand voor, dus het wordt een bevinding voor een mens. */
-      if (Number(obj.amount_reversed) >= rec.centen || obj.reversed === true) uit = naar(rec, 'teruggedraaid', 'melding:' + evt.type);
+      if (Number(obj.amount_reversed) >= rec.centen || obj.reversed === true) uit = await naar(rec, 'teruggedraaid', 'melding:' + evt.type);
       else opslag.bevinding({ soort: 'gedeeltelijk-teruggedraaid', afrekening: rec.id, eventId: evt.id, teruggedraaid: obj.amount_reversed });
     }
     opslag.markeer(evt.id, rec.id);
@@ -93,7 +103,11 @@ function maakMelding(kern) {
     for (const rec of opslag.alle()) {
       /* Teruggedraaid kan nergens meer heen; mislukt en geannuleerd wel (een
          transfer die nadien wordt teruggedraaid), dus die worden nog bekeken. */
-      if (rec.stand === 'teruggedraaid') { effectVoorStand(rec); continue; }
+      if (rec.stand === 'teruggedraaid') {
+        try { await effectVoorStand(rec); await opslag.vast(); }
+        catch (e) { uit.fouten.push({ afrekening: rec.id, fout: String(e && e.message || e).slice(0, 160) }); }
+        continue;
+      }
       uit.bekeken += 1;
       try {
         if (rec.stand === 'aangevraagd' || (rec.stand === 'ingediend' && !rec.payoutId)) {
@@ -107,60 +121,23 @@ function maakMelding(kern) {
           const doel = p && PAYOUT_STATUS[p.status];
           if (doel && doel !== nu.stand) {
             if (p.amount !== nu.centen) opslag.bevinding({ soort: 'bedrag-wijkt-af', afrekening: nu.id, gezien: p.amount, verwacht: nu.centen, bron: 'veeg' });
-            else naar(nu, doel, 'veeg');
+            else await naar(nu, doel, 'veeg');
           }
         }
         if (nu.transferId && !['teruggedraaid', 'aangevraagd'].includes(nu.stand)) {
           const t = await stripe.transfers.retrieve(nu.transferId);
-          if (t && (t.reversed === true || Number(t.amount_reversed) >= nu.centen)) naar(nu, 'teruggedraaid', 'veeg');
+          if (t && (t.reversed === true || Number(t.amount_reversed) >= nu.centen)) await naar(nu, 'teruggedraaid', 'veeg');
         }
-        effectVoorStand(opslag.haal(rec.id));
+        await effectVoorStand(opslag.haal(rec.id));
+        await opslag.vast();
       } catch (e) { uit.fouten.push({ afrekening: rec.id, fout: String(e && e.message || e).slice(0, 160) }); }
     }
     return uit;
   }
 
-  /* De reconciliatie: per afrekening wat Stripe zegt naast wat RTG vastlegde,
-     en of ieder vereist effect precies een keer in het effectjournaal staat. */
-  async function reconciliatie() {
-    const voor = opslag.bevindingen().length;
-    let gecontroleerd = 0;
-    const effecten = opslag.effecten();
-    const S = require('./sleutel');
-    const heeft = (rec, soort) => !!effecten[S.economisch(rec.id, soort)];
-    for (const rec of opslag.alle()) {
-      gecontroleerd += 1;
-      const b = (soort, extra) => opslag.bevinding(Object.assign({ soort, afrekening: rec.id, bron: 'reconciliatie' }, extra || {}));
-      if (stripe && rec.transferId) {
-        try {
-          const t = await stripe.transfers.retrieve(rec.transferId);
-          if (!t || t.amount !== rec.centen || String(t.currency).toLowerCase() !== rec.valuta || t.destination !== rec.account)
-            b('transfer-wijkt-af', { gezien: t ? { amount: t.amount, currency: t.currency, destination: t.destination } : null });
-          if (t && (t.reversed === true || Number(t.amount_reversed) >= rec.centen) && rec.stand !== 'teruggedraaid')
-            b('stand-wijkt-af', { stripe: 'teruggedraaid', rtg: rec.stand });
-        } catch (e) { b('niet-op-te-halen', { wat: 'transfer', fout: String(e.message || e).slice(0, 120) }); }
-      }
-      if (stripe && rec.payoutId) {
-        try {
-          const p = await stripe.payouts.retrieve(rec.payoutId, { stripeAccount: rec.account });
-          const doel = p && PAYOUT_STATUS[p.status];
-          if (!p || p.amount !== rec.centen) b('payout-wijkt-af', { gezien: p ? { amount: p.amount } : null });
-          else if (doel && doel !== rec.stand && rec.stand !== 'teruggedraaid') b('stand-wijkt-af', { stripe: doel, rtg: rec.stand });
-        } catch (e) { b('niet-op-te-halen', { wat: 'payout', fout: String(e.message || e).slice(0, 120) }); }
-      }
-      // het grootboek: welk effect hoort bij deze stand, en staat het er
-      if (rec.stand !== 'mislukt' || rec.transferId) {
-        if (!heeft(rec, 'reservering')) b('effect-ontbreekt', { effect: 'reservering' });
-      }
-      if (rec.stand === 'betaald' && !heeft(rec, 'afgerekend')) b('effect-ontbreekt', { effect: 'afgerekend' });
-      if (rec.stand === 'teruggedraaid' && heeft(rec, 'reservering') && !heeft(rec, 'teruggeboekt')) b('effect-ontbreekt', { effect: 'teruggeboekt' });
-      if ((rec.stand === 'mislukt' || rec.stand === 'geannuleerd') && !rec.transferId && heeft(rec, 'reservering') && !heeft(rec, 'teruggeboekt'))
-        b('effect-ontbreekt', { effect: 'teruggeboekt' });
-      if (heeft(rec, 'afgerekend') && !['betaald', 'teruggedraaid'].includes(rec.stand)) b('effect-zonder-stand', { effect: 'afgerekend' });
-    }
-    const nieuw = opslag.bevindingen().slice(voor);
-    return { gecontroleerd, nieuweBevindingen: nieuw, sluit: nieuw.length === 0 };
-  }
+  /* De reconciliatie (Stripe naast het grootboek, ieder verschil een
+     bevinding): ./reconciliatie.js. */
+  const reconciliatie = require('./reconciliatie')({ opslag, stripe, PAYOUT_STATUS });
 
   return { verwerk, veeg, reconciliatie };
 }

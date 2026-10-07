@@ -22,7 +22,7 @@
 
 module.exports = function hangConnectWebhook({ app, express, db, save, log, webhookRem, webhookPoort, env = process.env }) {
   app.post('/api/betaal/webhook/connect', webhookRem, webhookPoort,
-    express.raw({ type: '*/*', limit: '256kb' }), (req, res) => {
+    express.raw({ type: '*/*', limit: '256kb' }), async (req, res) => {
       const geheim = env.STRIPE_CONNECT_WEBHOOK_SECRET || '';
       if (!geheim) return res.status(503).json({ error: 'Deze terugmelding is niet ingericht.' });
       let evt;
@@ -35,7 +35,9 @@ module.exports = function hangConnectWebhook({ app, express, db, save, log, webh
       }
       try {
         const connect = require('../betaal/connect').standaard({ db, save });
-        const uit = connect.verwerk(evt);
+        /* Wachten tot de stand EN zijn boeking duurzaam staan
+           (server/betaal/connect/melding.js); pas daarna 200. */
+        const uit = await connect.verwerk(evt);
         log.info('connect-webhook', { type: evt.type, id: evt.id, herhaald: !!uit.herhaald });
         return res.json({ ok: true });
       } catch (e) {

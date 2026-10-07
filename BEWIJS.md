@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2440 bestanden en 16699 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2442 bestanden en 16717 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2440 |
-| losse beweringen (`test(...)`) | 16699 |
+| toetsbestanden | 2442 |
+| losse beweringen (`test(...)`) | 16717 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
-| alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 0 |
+| alleen in de kop *genoemd*, nog niet gemeten | 1 |
+| niets van beide | 1 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2132 bestanden, 16162 beweringen.
+2133 bestanden, 16178 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -972,7 +972,7 @@ toets omvalt.
 | `linkkassa.test.js` | 10 | gezakt op `liegpoort /api/` | DE KASSACODE ALS CAPABILITY (server/kern/pay/kassacode.js) -- de verhuizing van 20 augustus 2026, en de eerste capability die een ZAAK aanvaardt. Wat hier bewezen moet worden: 1. |
 | `linkkoppelingen.test.js` | 9 | gezakt op `liegpoort /api/` | MIJN KOPPELINGEN (server/kern/link/koppelingen.js, cap-beheer.js) -- LINK.md par. 4, stap 6. |
 | `linkkoppelingenui.test.js` | 8 | geen bronmutatie mogelijk | HET SCHERM "MIJN KOPPELINGEN" (public/shared/linkkoppelingen.js) -- LINK.md par. 4, stap 6. |
-| `live-kandidaat.test.js` | 10 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `live-kandidaat.test.js` | 11 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `livegang-pakket.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `livegang.test.js` | 3 | gezakt op `liegpoort /api/` | De livegang: in productie start het platform schoon en op slot. - geen demozaken in de catalogus, geen demopersoneel, geen voorbeeldposts - de demo-inlog is dicht (leden en zaken) - de rate-limiter staat aan |
 | `living-experience.test.js` | 7 | gezakt op `===->!==#0` | De ervaringscompiler wijst kapotte bestemming, toestand, wereld en overdracht af. Ontbrekend, veranderd of overgeslagen bewijs kan nooit groen worden. |
@@ -1428,7 +1428,7 @@ toets omvalt.
 | `presentatie-gezinsbeelden.test.js` | 4 | gezakt op `liegpoort /api/` | DE BEELDKEUZE VAN EEN GEZINSPROFIEL BLIJFT VAN DAT PROFIEL. routes/presentatie-gezinsbeelden.js (#413) laat een gekozen gezinsprofiel eigen foto's kiezen voor zijn schermen. |
 | `presentiemeting.test.js` | 4 | gezakt op `liegpoort /api/` | De presentiebelofte: een les staat binnen dertig seconden. Wat hier hard wordt gemaakt: - het scherm is UITZONDERINGSGESTUURD: iedereen staat op aanwezig en de leraar wijzigt alleen wie er niet is. |
 | `prijsmelding.test.js` | 10 | gezakt op `===->!==#0` | DE LEDENPRIJSGARANTIE: het plafond bestond, de rechtzetting niet. De garantie was voor de helft echt gebouwd -- de ledenprijs wordt server-side afgekapt op de publieke prijs (test/partner.test.js bewaakt dat). |
-| `productie-communicatie.test.js` | 8 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `productie-communicatie.test.js` | 10 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie-failclosed.test.js` | 21 | gezakt op `===->!==#0` | PRODUCTIE FAIL-CLOSED -- regressie voor RTG-V1-RELEASE blocker 3. DE FOUT (bewezen in de audit): vrijwel alle productie-hardening hing aan NODE_ENV==='production'. |
 | `productie-installatie.test.js` | 4 | gezakt op `+->-#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie-motor.test.js` | 8 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1539,6 +1539,7 @@ toets omvalt.
 | `routermeting.test.js` | 21 | gezakt op `===->!==#0` | DE SCHADUWMETING VAN DE INTELLIGENTIEROUTER (server/kern/ai/routermeting.js, EXECUTIE.md blok 8). WAT DEZE TOETS BEWAAKT, en waarom elk stuk. |
 | `routesbron.test.js` | 5 | gezakt op `!==->===#0` | WAAR STAAT DEZE ROUTE? -- de bronverrijking van scripts/lib/routes.js. |
 | `routeversheid.test.js` | 22 | gezakt op `!==->===#0` | HET BEWIJSVERVAL PER ROUTE -- scripts/routeversheid.js en de aansluiting op staatVan() in scripts/vertrouwen.js (PROOF.md par. 2a). |
+| `rtc-relay.test.js` | 13 | genoemd | RTC VIA HET RELAIS -- bewezen tegen een ECHTE coturn, en dicht waar dat niet lukt. Wat deze toets vasthoudt (docs/turn-server.md, kern/rtc/*): 1. |
 | `rtdocs-voorzijde.test.js` | 4 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtf-labfonds-deur.test.js` | 10 | gezakt op `liegpoort /api/` | DE GEZINSDEUR VAN HET LABFONDS -- wie komt er door, en wat doet een TWEEDE aanroep. WAAROM DEZE TOETS BESTAAT. |
 | `rtf-samen-credential.pg.test.js` | 1 | slaat zichzelf over | Echte PostgreSQL-proef voor FoundationOS Samen. Twee onafhankelijke app- instances delen alleen de kamercollectie; uitgifte, capaciteit, gebruik, rotatie en intrekking moeten onder hetzelfde advisory slot serialiseren. |
@@ -2172,7 +2173,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-308 bestanden, 537 beweringen.
+309 bestanden, 539 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2385,6 +2386,7 @@ toets omvalt.
 | `reiswacht.e2e.js` | 2 | gezakt op `liegpoort /api/` | Scherm-toets op DE REISWACHT in /apps/reizen.html (REIZEN.md fase 3). De serverkant staat in test/reiswacht.test.js. |
 | `reizenscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op DE REIS in /apps/reizen.html (REIZEN.md fase 1). WAAROM DIT BESTAND ER IS. |
 | `routedekking.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de routedekking in het RTG Kantoor. De server-kant staat in test/routedekking.test.js; dit gaat over wat een personeelslid ziet. |
+| `rtc-relay.e2e.js` | 2 | -- | EEN ECHT GESPREK VIA HET RELAIS: echte RTG-server, echte coturn, echte Chromium. De server geeft (alleen aan een ingelogd lid) een kortlevend credential uit via /api/ice. |
 | `rtfagenda.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de RTF-gezinsagenda op RTG-niveau: het maandraster met kleur per gezinslid, een punt zetten via het paneel, bewerken, en de verjaardag-snelknop die er een jaarpunt van maakt. |
 | `rtfalbum.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor het gezinsalbum: maandgroepen, het gedeelde hartje met de favorietenfilter, de kijker met pijlen, de terugblik en de jarigenstrook die de verjaardagen-app alleen meeleest. |
 | `rtfcurve.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de eerlijke vergeetcurve op overhoren.html: het blok "Vandaag herhalen" met de dagstapel, goed = later terug, fout = vandaag nog een keer, en de eerlijke lege stand als alles gehad is. |

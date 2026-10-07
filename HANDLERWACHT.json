@@ -1,18 +1,18 @@
 {
  "stempel": {
-  "op": "2026-10-06T23:20:31.724Z",
-  "commit": "19ad915a6",
+  "op": "2026-10-07T00:12:02.465Z",
+  "commit": "64e66cfcf",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 4,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 665,
-  "bewaakt": 567,
-  "openbaarMetReden": 57,
-  "eigenControle": 21,
+  "zonderBewakerslaag": 668,
+  "bewaakt": 568,
+  "openbaarMetReden": 58,
+  "eigenControle": 22,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
   "laat": 0,
@@ -104,15 +104,15 @@
    "aantal": 9
   },
   {
+   "naam": "sessieVan",
+   "aantal": 8
+  },
+  {
    "naam": "samenSess",
    "aantal": 8
   },
   {
    "naam": "praktijkMutatie -> poort",
-   "aantal": 7
-  },
-  {
-   "naam": "sessieVan",
    "aantal": 7
   },
   {
@@ -1240,7 +1240,7 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/bel",
-   "bestand": "server/foundation/berichten.js:88",
+   "bestand": "server/foundation/berichten.js:97",
    "staat": "bewaakt",
    "wacht": "sessieVan"
   },
@@ -1357,6 +1357,12 @@
    "bestand": "server/foundation/gasten/gezondheid.js:136",
    "staat": "bewaakt",
    "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/ice",
+   "bestand": "server/foundation/berichten.js:90",
+   "staat": "bewaakt",
+   "wacht": "sessieVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/inloggen",
@@ -1903,7 +1909,7 @@
   },
   {
    "sleutel": "POST /api/foundation/school/bel",
-   "bestand": "server/school/bellen.js:56",
+   "bestand": "server/school/bellen.js:67",
    "staat": "bewaakt",
    "wacht": "gezinSessie"
   },
@@ -2320,6 +2326,11 @@
    "bestand": "server/school/opvolging.js:40",
    "staat": "bewaakt",
    "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/ice",
+   "bestand": "server/school/bellen.js:56",
+   "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/foundation/school/incident/handel-af",
@@ -3184,6 +3195,12 @@
    "bestand": "server/routes/eigenaarherstel.js:79",
    "staat": "openbaar",
    "reden": "zelfde ceremonie, tweede helft: opnieuw twee delen en de wachttijd moet om zijn"
+  },
+  {
+   "sleutel": "POST /api/ice",
+   "bestand": "server/routes/social.js:93",
+   "staat": "openbaar",
+   "reden": "ijs-servers voor WebRTC: zonder sessie alleen STUN (401, geen gegevens); een kortlevend TURN-credential pas na een geldige Bearer-sessie, met een plafond per actor (kern/rtc/ijs.js)"
   },
   {
    "sleutel": "POST /api/kantoor/gesprek/start",

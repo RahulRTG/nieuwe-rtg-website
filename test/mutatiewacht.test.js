@@ -57,7 +57,16 @@ test('een time-out ruimt ook de kinderen van de testrunner op', async () => {
     const r = require('../scripts/mutatie').draaiToets(bestand, {}, 2000);
     assert.ok(r.tijdout, 'de grens is daadwerkelijk geraakt');
     pid = Number(fs.readFileSync(pidBestand, 'utf8'));
-    const leeft = () => { try { process.kill(pid, 0); return true; } catch (e) { if (e.code === 'ESRCH') return false; throw e; } };
+    /* `process.kill(pid, 0)` slaagt ook op een ZOMBIE: een gedood kleinkind dat
+       aan init is overgedragen en nog niet geoogst. Waar init niet oogst (een
+       container met een eenvoudige PID 1) blijft het zo staan, en dan zag deze
+       toets een aantoonbaar gedood kind eeuwig "leven". Een zombie houdt geen
+       poort, geen bestand en geen geheugen vast -- dezelfde regel als
+       scripts/lib/afbouw-afloop.js, met dezelfde lezer (scripts/lib/procinfo.js). */
+    const leeft = () => {
+      try { process.kill(pid, 0); } catch (e) { if (e.code === 'ESRCH') return false; throw e; }
+      return require('../scripts/lib/procinfo').isZombie(pid) !== true;
+    };
     for (let i = 0; i < 50 && leeft(); i++) await new Promise(k => setTimeout(k, 20));
     assert.equal(leeft(), false, 'de kleinkind-server mag niet achterblijven');
   } finally {

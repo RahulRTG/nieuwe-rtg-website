@@ -76,16 +76,10 @@ test('2. op een getter (Express) blijft req.path met rust', () => {
   assert.equal(req.path, '/apps/app.html', 'de getter leidt het zelf af');
 });
 
-test('3. de openbare voordeur blijft landing; alleen app-ingangen gaan naar het bureaublad', () => {
+test('3. de app-root en alle oude app-ingangen gaan naar dezelfde Account-voordeur', () => {
   const routes = {};
   bureaublad({ get: (pad, fn) => { routes[pad] = fn; } });
-  const voordeur = nepReq('/');
-  let landingDoor = false;
-  routes['/'](voordeur, nepRes(), () => { landingDoor = true; });
-  assert.equal(voordeur.path, '/', 'de openbare voordeur wordt niet de leden-app in getrokken');
-  assert.ok(landingDoor, 'de canonieke landing gaat door naar de nonce-laag');
-
-  for (const ingang of ['/apps', '/apps/bureau.html', '/apps/index.html']) {
+  for (const ingang of ['/', '/apps', '/apps/bureau.html', '/apps/index.html']) {
     const req = nepReq(ingang);
     let door = false;
     routes[ingang](req, nepRes(), () => { door = true; });

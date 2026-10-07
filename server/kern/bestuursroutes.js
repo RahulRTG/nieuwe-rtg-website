@@ -12,6 +12,7 @@ const REDENEN = [
   ['/api/boardroom', 'de schakelkast zelf: anders sluit de eigenaar zichzelf buiten'],
   ['/api/health', 'de gezondheidscheck moet altijd antwoorden voor externe bewaking'],
   ['/api/ready', 'de startsignalering van de load balancer moet altijd antwoorden'],
+  ['/api/rtc/stand', 'de afgeleide TURN-relaystand moet altijd antwoorden voor bewaking en de smoke na uitrol; uitzetten zou bellen niet sluiten maar alleen het zicht erop wegnemen (bellen zelf zet RTG_RTC_UIT dicht)'],
   ['/api/privacy', 'inzage, export en verwijdering zijn AVG-rechten en niet uitschakelbaar'],
   ['/api/toestemming', 'toestemming intrekken is een recht en niet uitschakelbaar'],
   ['/api/inzagekaart', 'zien wie in uw gegevens keek is hetzelfde AVG-recht; een knop die dat dichtzet hoort niet te bestaan'],

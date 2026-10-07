@@ -6,7 +6,7 @@
 
 const crypto = require('node:crypto');
 
-const PLAATSHOUDER = /(?:voorbeeld|example|placeholder|change-?me|your-?(?:domain|host)|vul-?in|dummy|test-?only)/i;
+const { PLAATSHOUDER } = require('./turn-adres');
 
 function sterkGeheim(waarde) {
   const s = String(waarde || '');

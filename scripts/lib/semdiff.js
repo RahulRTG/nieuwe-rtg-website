@@ -171,8 +171,12 @@ function ontleed(ruw) {
 
   return [...bestanden.values()].map((f) => {
     const k = klasseVanBestand(f.pad, f.regels);
-    return { pad: f.pad, soort: soortVan(f.pad), verwijderd: f.verwijderd,
-      klasse: f.regels.length ? k.klasse : (f.cosmetisch ? 'cosmetic' : k.klasse),
+    const soort = soortVan(f.pad);
+    return { pad: f.pad, soort, verwijderd: f.verwijderd,
+      /* Een Markdown-bullet begint met `*`, maar is proza en geen
+         codecommentaar. De commentaarzeef mag een document daarom nooit van
+         `documentatie` naar `cosmetic` terugzetten. */
+      klasse: f.regels.length ? k.klasse : (f.cosmetisch && soort !== 'document' ? 'cosmetic' : k.klasse),
       regels: f.regels.length, cosmetisch: f.cosmetisch, redenen: k.redenen };
   }).sort((x, y) => x.pad.localeCompare(y.pad));
 }

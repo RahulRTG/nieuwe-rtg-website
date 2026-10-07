@@ -1,9 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict');
 async function taal(page,code,name){
-  await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
-  await page.locator('[data-edge-face="all"]').click();
-  await page.locator('[data-edge-smart-language]').click();
+  await page.locator('#teamAccessLanguage').click();
   await page.locator('#rtg-lang-zoek').fill(name);
   await page.locator('#rtg-lang-hint[data-lang="'+code+'"]').click();
   await page.waitForFunction(c=>document.documentElement.lang===c,code);
@@ -16,7 +14,7 @@ async function probe(browser,base,width,screenshot){
   page.on('request',r=>{if(r.url().includes('/api/vertaal/ui'))translations.push(r.postData()||'');if(r.method()==='POST'&&/\/api\/(supplier\/(mijn\/login|staff\/join|login)|auth\/forgot|office\/login)/.test(r.url()))writes.push(r.url());});
   try{
     const response=await page.goto(base+'/apps/personeel.html',{waitUntil:'domcontentloaded'});assert.equal(response.status(),200);
-    await page.waitForSelector('#liUser');await page.waitForSelector('.rtg-adaptive-bar');
+    await page.waitForSelector('#liUser');await page.waitForSelector('#teamAccessLanguage');
     assert.equal(await page.locator('#gateKlok,.rp-mond').count(),0);
     assert.equal(await page.locator('#teamAccessTitle').innerText(),'Welkom bij uw team.');
     assert.equal(await page.locator('#gate').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(57, 9, 25)');
@@ -27,9 +25,8 @@ async function probe(browser,base,width,screenshot){
     assert.equal(await page.locator('label[for=liPass] span').innerText(),'Password');
     assert.equal(await page.locator('#liPass').inputValue(),'private-password-473');
     assert.equal(await page.locator('#liUser').inputValue(),'portal-private@example.test');
-    await page.waitForFunction(()=>document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="worlds"] small')?.textContent==='Worlds');
-    const geometry=await page.evaluate(()=>{const bars=document.querySelectorAll('.rtg-adaptive-bar'),r=bars[0].getBoundingClientRect();return{bars:bars.length,buttons:bars[0].querySelectorAll('button').length,inside:r.left>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,overflow:document.documentElement.scrollWidth>innerWidth+1};});
-    assert.deepEqual(geometry,{bars:1,buttons:5,inside:true,overflow:false});
+    const geometry=await page.evaluate(()=>{const bars=document.querySelectorAll('.rtg-adaptive-bar'),button=document.getElementById('teamAccessLanguage'),r=button.getBoundingClientRect();return{bars:bars.length,visibleBars:[...bars].filter(b=>{const q=b.getBoundingClientRect();return b.getClientRects().length>0&&q.width>0&&q.height>0;}).length,languageVisible:r.width>0&&r.height>0,inside:r.left>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,overflow:document.documentElement.scrollWidth>innerWidth+1};});
+    assert.deepEqual(geometry,{bars:1,visibleBars:0,languageVisible:true,inside:true,overflow:false});
     await page.locator('#liUser').fill('');await page.locator('#liPass').fill('');
     if(screenshot)await page.screenshot({path:screenshot});
     await page.locator('#toJoin').click();

@@ -6,7 +6,7 @@ const serviceReceipt=require('../loop-fabric/service-receipt');
 const eligibility=require('../loop-fabric/learning-eligibility');
 const {heeftBestuur,relatieActief}=require('./oordeel');
 
-module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,serviceProof,now}) {
+module.exports=function makeAcademyLoopSource({leesCollectie,bewerkCollectie,leerhuis,serviceProof,now}) {
   const time=now || (()=>new Date().toISOString());
   const tx=fn=>{
     if (typeof bewerkCollectie!=='function') P.fail('STORAGE_UNAVAILABLE','Leerhuis Loop-delivery vereist duurzame collectietransacties.',503);
@@ -54,7 +54,7 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
       capabilityId:'leerhuis'});
     return out;
   }
-  function protocolEvents(org) {
+  function academyProtocolEvents(org) {
     return leerhuis.spoor(org).slice().reverse().flatMap(row=>{
       const id='lhe_'+P.hash([org,row.nr,row.hash]).slice(0,30);
       if (row.soort==='voorstel') return [{id,sequence:row.nr,type:row.data.verificationOf ?
@@ -70,7 +70,7 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
       return [];
     });
   }
-  function resolveObservation(ref,recipient) {
+  function resolveAcademyObservation(ref,recipient) {
     try {
       const r=P.objectRef(ref),org=String(recipient && recipient.id || ''),st=academy(org);
       if (recipient.domain!=='leerhuis' || r.domain!=='leerhuis' || r.type!=='practice-observation')
@@ -87,8 +87,8 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
       return {ok:true,observation:out,corrected:false};
     } catch(e) { return P.error(e); }
   }
-  function learningEligibility(ref,recipient,request={}) {
-    const resolved=resolveObservation(ref,recipient);if(!resolved.ok)return resolved;
+  function evaluateAcademyEligibility(ref,recipient,request={}) {
+    const resolved=resolveAcademyObservation(ref,recipient);if(!resolved.ok)return resolved;
     return eligibility.evaluate(resolved.observation.eligibility,{sourceRef:ref,purpose:request.purpose,
       recipient,use:request.use||'recall'},time());
   }
@@ -105,9 +105,12 @@ module.exports=function makeAcademyLoopSource({db,bewerkCollectie,leerhuis,servi
         (item.actief ? {domain:'leerhuis',type:'knowledge',id:r.id,version:item.actief} : r)};
     } catch(e) { return P.error(e); }
   }
-  const transport=require('./loop-delivery')({P,D,db,tx,state,leerhuis,protocolEvents,time});
+  if(typeof leesCollectie!=='function')P.fail('STORAGE_UNAVAILABLE','Leerhuis Loop vereist de datalaag-leespoort.',503);
+  const transport=require('./loop-delivery')({P,D,readDelivery:()=>leesCollectie('leerhuisLoopDelivery'),tx,state,leerhuis,
+    protocolEvents:academyProtocolEvents,time});
   function verifyReceipt(receipt) {
     return serviceReceipt.verify(serviceProof,receipt,{domain:'leerhuis',issuer:'rtg.service.leerhuis',label:'Leerhuis'});
   }
-  return {authorization,artifact,resolveObservation,learningEligibility,protocolEvents,...transport,verifyReceipt};
+  return {authorization,artifact,resolveObservation:resolveAcademyObservation,learningEligibility:evaluateAcademyEligibility,
+    protocolEvents:academyProtocolEvents,...transport,verifyReceipt};
 };

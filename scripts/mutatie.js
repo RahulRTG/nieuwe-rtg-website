@@ -598,6 +598,14 @@ const EIGEN_MODULE = new Map([
   ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sqlite.test.js', ['server/kern/living-world/index.js']],
   ['living-world.pg.test.js', ['server/kern/living-world/index.js']],
+  /* Deze twee duurzaamheidstoetsen bereiken de bron via respectievelijk een
+     kindproces en een gedeelde fixture. De requires staan daardoor niet in het
+     toetsbestand zelf. De toewijzingen hieronder noemen de echte source-owned
+     mutatiepunten die de toetsen uitoefenen. */
+  ['library-sqlite.test.js', ['server/kern/library/index.js']],
+  ['library.pg.test.js', ['server/kern/library/index.js', 'server/kern/library/reader.js']],
+  ['loop-fabric-lifecycle.test.js', ['server/bedrijf/loop-source.js', 'server/kern/loop-fabric/index.js']],
+  ['loop-fabric.pg.test.js', ['server/bedrijf/loop-source.js', 'server/kern/loop-fabric/index.js']],
   /* Deze toets gebruikt bewust de gedeelde living-world-fixture. Daardoor staat
      de echte bronrequire een niveau dieper en kan modulesVan() hem niet uit het
      toetsbestand zelf afleiden. De Commons-grendels zitten in actions.js. */

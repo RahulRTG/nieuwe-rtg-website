@@ -1,11 +1,11 @@
 'use strict';
 
-module.exports=function academyLoopDelivery({P,D,db,tx,state,leerhuis,protocolEvents,time}) {
+module.exports=function academyLoopDelivery({P,D,readDelivery,tx,state,leerhuis,protocolEvents,time}) {
   async function deliver(org,consumer,handle,limit=100,options={}) {
     if (!/^[a-z][a-z0-9.-]{1,79}$/.test(consumer) || typeof handle!=='function') throw new Error('Invalid Leerhuis Loop consumer');
     if (limit && typeof limit==='object') { options=limit; limit=100; }
     const events=protocolEvents(org),maxSource=Math.max(0,...leerhuis.spoor(org).map(row=>Number(row.nr)||0));
-    const raw=db.data.leerhuisLoopDelivery || {},delivery=state(raw),cursor=Number(delivery.organizations[org] &&
+    const raw=readDelivery() || {},delivery=state(raw),cursor=Number(delivery.organizations[org] &&
       delivery.organizations[org].consumers && D.checkpoint(delivery.organizations[org].consumers[consumer]).sequence || 0);
     if (!Number.isSafeInteger(cursor) || cursor<0 || cursor>maxSource) P.fail('CHECKPOINT_CORRUPT','Het Leerhuis-checkpoint valt buiten het bronspoor.',503);
     const workerId=options.workerId || 'leerhuis-'+P.hash([process.pid,consumer,time(),Math.random()]).slice(0,16);
@@ -38,14 +38,14 @@ module.exports=function academyLoopDelivery({P,D,db,tx,state,leerhuis,protocolEv
     }
     return {deliveredThrough:current,sourceThrough:maxSource,blocked};
   }
-  function deliveryStatus(org,consumer) {
-    const delivery=state(db.data.leerhuisLoopDelivery || {}),row=delivery.organizations[org],events=protocolEvents(org);
+  function academyDeliveryStatus(org,consumer) {
+    const delivery=state(readDelivery() || {}),row=delivery.organizations[org],events=protocolEvents(org);
     return D.summary(row && row.consumers && row.consumers[consumer],Math.max(0,...events.map(x=>x.sequence)),time(),events);
   }
-  function deliveryStatuses() {
-    const s=state(db.data.leerhuisLoopDelivery || {}),rows=[];
+  function academyDeliveryStatuses() {
+    const s=state(readDelivery() || {}),rows=[];
     for (const [org,row] of Object.entries(s.organizations)) for (const consumer of Object.keys(row.consumers || {}))
-      rows.push({scopeHash:P.hash(org).slice(0,20),consumer,...deliveryStatus(org,consumer)});
+      rows.push({scopeHash:P.hash(org).slice(0,20),consumer,...academyDeliveryStatus(org,consumer)});
     return rows;
   }
   async function replayDeadLetter(org,consumer,eventId) {
@@ -55,5 +55,5 @@ module.exports=function academyLoopDelivery({P,D,db,tx,state,leerhuis,protocolEv
       const result=D.replay(row.consumers,consumer,eventId,time()); Object.assign(map,s); return {ok:true,...result};
     });
   }
-  return {deliver,deliveryStatus,deliveryStatuses,replayDeadLetter};
+  return {deliver,deliveryStatus:academyDeliveryStatus,deliveryStatuses:academyDeliveryStatuses,replayDeadLetter};
 };

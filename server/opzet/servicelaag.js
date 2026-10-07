@@ -45,7 +45,7 @@ function hangOp(kern, hulp) {
       hulp.sendPushToUser(id, { title: bericht.titel, body: bericht.tekst, tag: 'service-' + bericht.zaak });
     }
   }));
-  kern.serviceLoopSource = require('../kern/service/loop-source')({db,bewerkCollectie:hulp.bewerkCollectie,
+  kern.serviceLoopSource = require('../kern/service/loop-source')({leesCollectie:hulp.leesCollectie,bewerkCollectie:hulp.bewerkCollectie,
     zaken:kern.serviceZaken,kwaliteit:kern.serviceKwaliteit,authorize:actorRef=>!!(kern.magBalie&&kern.magBalie(actorRef)),
     authorizeRecipient:(actorRef,workspaceCode)=>kern.workLoopSource.authorization(actorRef,workspaceCode,['besluit'])});
   if(kern.loopFabric&&typeof kern.loopFabric.registerSource==='function')kern.loopFabric.registerSource('service',kern.serviceLoopSource);

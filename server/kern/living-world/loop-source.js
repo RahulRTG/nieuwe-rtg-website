@@ -7,7 +7,7 @@ const delivery = require('../loop-fabric/delivery');
 const eligibility = require('../loop-fabric/learning-eligibility');
 
 module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
-  function learningEligibility(row) {
+  function issueLivingWorldEligibility(row) {
     const share=row.sharing || {visibility:'private',purpose:'personal-contribution-draft',recipients:[],consent:{basis:'none'}};
     if(share.visibility==='private'||share.visibility==='stewards')return null;
     const audience=share.visibility==='community'?[{domain:'living-world',id:'commons'}]:(share.recipients||[]);
@@ -21,7 +21,7 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
   }
   function observationRecord(row) {
     if (!row) return null;
-    const issued=learningEligibility(row);if(!issued)return null;
+    const issued=issueLivingWorldEligibility(row);if(!issued)return null;
     return {objectRef:{domain:'living-world',type:'observation',id:row.id,version:row.revision},
       placeRef:{domain:'living-world',type:'place',id:row.placeId,version:row.placeVersion || null},
       planRef:row.planId ? {domain:'living-world',type:'plan',id:row.planId,version:row.planVersion || null} : null,
@@ -35,7 +35,7 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
       eligibility:issued};
   }
 
-  function resolveObservation(ref,target) {
+  function resolveLivingWorldObservation(ref,target) {
     try {
       const r = protocol.objectRef(ref), s = read();
       if (r.domain !== 'living-world' || r.type !== 'observation') protocol.fail('INVALID_REF','Dit is geen Living World-observatie.');
@@ -59,13 +59,13 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
       if (!row) protocol.fail('SOURCE_MISSING','De eligibility-bron bestaat niet meer.',404);
       while(row.supersededBy&&s.contributions[row.supersededBy])row=s.contributions[row.supersededBy];
       const current={domain:'living-world',type:'observation',id:row.id,version:row.revision};
-      const issued=learningEligibility(row);if(!issued)protocol.fail('LEARNING_NOT_RELEASED','Deze bijdrage is niet voor learning vrijgegeven.',403);
+      const issued=issueLivingWorldEligibility(row);if(!issued)protocol.fail('LEARNING_NOT_RELEASED','Deze bijdrage is niet voor learning vrijgegeven.',403);
       return eligibility.evaluate(issued,{sourceRef:current,purpose:request.purpose,
         recipient:target,use:request.use||'recall'},time());
     } catch(error) { return protocol.error(error); }
   }
 
-  function protocolEvents() {
+  function livingWorldProtocolEvents() {
     const s = read(), byId = new Map(s.history.filter(e=>e.protocol).map(e=>[e.protocol.objectRef.id,e]));
     return Object.values(s.contributions).map(row=>{
       const old = byId.get(row.id);
@@ -112,6 +112,7 @@ module.exports = function makeLivingWorldLoopSource({read,mutate,time}) {
 
   const transport=require('./loop-delivery')({M,protocol,delivery,read,mutate,time});
 
-  return {observationRecord,resolveObservation,learningEligibility:evaluateEligibility,protocolEvents,returnChangeReceipt,
+  return {observationRecord,resolveObservation:resolveLivingWorldObservation,learningEligibility:evaluateEligibility,
+    protocolEvents:livingWorldProtocolEvents,returnChangeReceipt,
     ...transport};
 };

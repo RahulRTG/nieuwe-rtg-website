@@ -38,13 +38,13 @@ module.exports=function livingWorldLoopDelivery({M,protocol,delivery,read,mutate
     }
     return {deliveredThrough:cursor,blocked};
   }
-  function deliveryStatus(consumer) {
+  function livingWorldDeliveryStatus(consumer) {
     const s=read(),events=s.history.map((event,index)=>({...event,sequence:event.sequence || index+1}));
     return delivery.summary(s.delivery[consumer],Math.max(0,...events.map(x=>x.sequence)),time(),events);
   }
-  function deliveryStatuses() {
+  function livingWorldDeliveryStatuses() {
     const s=read(); return Object.keys(s.delivery || {}).map(consumer=>({scopeHash:protocol.hash('living-world').slice(0,20),
-      consumer,...deliveryStatus(consumer)}));
+      consumer,...livingWorldDeliveryStatus(consumer)}));
   }
   async function replayDeadLetter(consumer,eventId) {
     return mutate(current=>{
@@ -52,5 +52,5 @@ module.exports=function livingWorldLoopDelivery({M,protocol,delivery,read,mutate
       Object.assign(current,s); return {ok:true,...result};
     });
   }
-  return {deliver,deliveryStatus,deliveryStatuses,replayDeadLetter};
+  return {deliver,deliveryStatus:livingWorldDeliveryStatus,deliveryStatuses:livingWorldDeliveryStatuses,replayDeadLetter};
 };

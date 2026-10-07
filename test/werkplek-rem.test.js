@@ -36,9 +36,10 @@
         richtingen. findByLogin vindt het account onder al die namen, dus de
         rem hoort dat ook te doen (I1 uit de keuring van ronde 6). En een
         onbekende naam geeft hetzelfde antwoord als een fout wachtwoord;
-     9. de adresemmer voedt de noodrem ook: vijftig gokken op vijftig accounts
-        vanaf een adres zetten dat adres in quarantaine, en een ander adres
-        blijft open (R10 uit de keuring van ronde 6).
+     9. de adresemmer voedt de noodrem ook: vijftig gokken vanaf een adres,
+        op bestaande accounts en op verzonnen namen door elkaar, zetten dat
+        adres in quarantaine, en een ander adres blijft open (R10 uit de
+        keuring van ronde 6). Beide soorten tellen op het adres.
 
    Waarom de tijd wordt gemeten en niet alleen de status: het account krijgt met
    opzet een VERTRAGING en geen slot (test/inlogrem.test.js). Een trage machine
@@ -384,16 +385,44 @@ test('8. een account is een emmer, in elke spelling en onder elke naam: e-mailad
    een waarschuwing zonder noodrem, en dan blijft een adres dat op vijftig
    accounts gokt gewoon open (de rem geeft dan 429, nooit 403).
 
-   Vijftig verschillende namen, om en om op beide deuren: geen enkele emmer van
-   adres plus account en geen accountemmer komt boven een, dus alleen de
-   adresemmer gaat dicht. Een vreemd adres, want het schild zet een lokaal adres
+   BESTAANDE ACCOUNTS EN VERZONNEN NAMEN DOOR ELKAAR. Sinds de rem op het
+   gevonden account sleutelt (I1), loopt een gok op een bestaand account een
+   andere weg dan een gok op een naam die niemand heeft. Credential stuffing
+   gokt op ECHTE accounts, en daar is de grens van 50 per adres voor. Gokte deze
+   toets alleen op verzonnen namen, dan bleef hij groen met een rem die gokken
+   op bestaande accounts niet op het adres telt (zo gemeten in de herkeuring van
+   ronde 6). Dus vijf bestaande accounts (Nora en vier eigen) met elk negen
+   gokken, en vijf verzonnen namen met elk een: 45 plus 5. Geen van beide delen
+   haalt alleen de 50, dus een rem die een van de twee soorten overslaat, zakt
+   hier.
+
+   Negen per account en niet meer: de tiende zet de emmer van adres plus account
+   dicht, en die meldt zelf brute force met dit adres. Dan kwam de quarantaine
+   er ook zonder de adresemmer. Zo blijft ook elke accountemmer onder de 25. Om
+   en om op beide deuren. Een vreemd adres, want het schild zet een lokaal adres
    nooit in quarantaine. */
-test('9. de adresemmer voedt de noodrem: na 50 gokken op 50 accounts vanaf een adres staat dat adres in quarantaine', async () => {
-  await metServer(async ({ poging }) => {
+test('9. de adresemmer voedt de noodrem: 45 gokken op vijf bestaande accounts en 5 op verzonnen namen zetten het adres in quarantaine', async () => {
+  await metServer(async ({ poging, srv }) => {
     const DADER = '198.51.100.99';
-    for (let i = 0; i < 50; i++) {
+    const bestaand = [NORA];
+    for (let k = 0; k < 4; k++) {
+      const mail = 'bestaand' + k + Date.now().toString().slice(-8) + '@voorbeeld.test';
+      const reg = await fetch(srv.base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'Bestaand Proef', email: mail, password: 'eenechtwachtwoord' + k, geboortedatum: '1990-03-03' }) });
+      assert.equal(reg.status, 200, 'het eigen account ' + k + ' bestaat');
+      bestaand.push(mail);
+    }
+    /* Negen rondes met een gok op elk bestaand account, en in de eerste vijf
+       rondes ook een op een eigen verzonnen naam. */
+    const gokken = [];
+    for (let ronde = 0; ronde < 9; ronde++) {
+      gokken.push(...bestaand);
+      if (ronde < 5) gokken.push('verzonnen' + ronde + '@voorbeeld.test');
+    }
+    assert.equal(gokken.length, 50, 'vijftig gokken');
+    for (const [i, wie] of gokken.entries()) {
       const pad = i % 2 ? GEWOON : WERK;
-      const r = await poging(pad, DADER, 'verspreid' + i + '@voorbeeld.test', 'fout' + i);
+      const r = await poging(pad, DADER, wie, 'fout' + i);
       assert.equal(r.status, 401, 'gok ' + (i + 1) + ' op ' + pad + ': ' + r.status + ' ' + JSON.stringify(r.body).slice(0, 120));
     }
     /* De vijftigste sloot de adresemmer en meldde brute force met dit adres

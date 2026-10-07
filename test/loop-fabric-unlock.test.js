@@ -4,7 +4,7 @@ const {build,md,OUT,DOC}=require('../scripts/loop-fabric-unlock');
 
 test('98 technische blockers hebben exact één primaire prerequisite',()=>{
   const r=build();assert.equal(r.prerequisites.expected.length,98);assert.equal(r.prerequisites.complete,true);
-  assert.equal(new Set(r.prerequisites.assigned).size,98);assert.deepEqual(JSON.parse(fs.readFileSync(OUT,'utf8')),r);
+  assert.equal(new Set(r.prerequisites.assigned).size,98);assert.deepEqual(JSON.parse(fs.readFileSync(OUT,'utf8')),r,'LOOP-FABRIC-UNLOCK-ROADMAP.json loopt achter op de code -- draai: npm run loopfabric:unlock');
   assert.equal(fs.readFileSync(DOC,'utf8'),md(r));
   assert.equal(r.prerequisites.rejectedHypotheses[0].id,'P06_VERSIONED_PHYSICAL_HANDOFF');
   assert.equal(r.prerequisites.nodes.find(x=>x.id==='P03_ASSET_INTERVENTION_LIFECYCLE').consumers.includes('dom-doos'),true);

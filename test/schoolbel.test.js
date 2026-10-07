@@ -139,3 +139,19 @@ test('3. de telefoonboom belt in de app: gezin naar gezin, en de takken kennen h
   assert.ok(ov.volgorde.every(n => n.gezinCode), 'ook de leraar ziet per knoop de gezinscode');
 });
 const lr = (klas, pad, body) => api(pad, Object.assign({ klasCode: klas.code, leraarToken: klas.leraarToken }, body || {}));
+
+test('4. ICE-servers voor het schoolkanaal alleen voor de leraar en de ouders van DEZE klas', async () => {
+  const { klas, g: ouder } = await opzet('IJs');
+  const ijs = (lijf) => fetch(BASE + '/api/foundation/school/ice', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lijf) });
+  const leraar = await ijs({ klasCode: klas.code, leraarToken: klas.leraarToken });
+  assert.equal(leraar.status, 200);
+  assert.equal(leraar.headers.get('cache-control'), 'no-store');
+  assert.ok(Array.isArray((await leraar.json()).iceServers));
+  assert.equal((await ijs({ klasCode: klas.code, code: ouder.code, token: ouder.token })).status, 200, 'een ouder van deze klas');
+  assert.equal((await ijs({ klasCode: klas.code, leraarToken: 'nep' })).status, 403, 'een vreemd token');
+  const ander = await opzet('IJs2');
+  assert.equal((await ijs({ klasCode: klas.code, code: ander.g.code, token: ander.g.token })).status, 403,
+    'een ouder van een andere klas');
+  assert.equal((await ijs({ klasCode: 'BESTAATNIET', leraarToken: klas.leraarToken })).status, 404);
+});

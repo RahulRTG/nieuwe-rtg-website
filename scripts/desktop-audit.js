@@ -88,6 +88,13 @@ async function main() {
             if (!vorige || vorige.beeld !== beeld) { window.__rtgAuditStabiel = { beeld, sinds: performance.now() }; return false; }
             return performance.now() - vorige.sinds >= 300;
           }, null, { timeout: 12000 });
+          if (mobile) await page.waitForFunction(() => {
+            const visible = selector => [...document.querySelectorAll(selector)].some(e =>
+              e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden');
+            if (visible('[data-rtg-access]')) return true;
+            if (document.body.dataset.publicPlatform) return visible('.wd-home:not([hidden]) main,.wd-home:not([hidden])>*,.wd-focus:not([hidden])');
+            return visible('.wd-home:not([hidden]) main,.wd-home:not([hidden])>*,.wd-access,.wd-focus:not([hidden])');
+          }, null, { timeout: 6000 });
           row.state = await page.evaluate(() => {
             const b = document.body, css = getComputedStyle(b);
             const rect = s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return { x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom,scroll: getComputedStyle(e).overflowY }; };

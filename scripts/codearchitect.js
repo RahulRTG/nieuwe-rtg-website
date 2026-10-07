@@ -25,7 +25,7 @@ const [opdracht, ...onderwerp] = rest;
 const lezer = A.maakLezer();
 
 const assen = (r) => '[' + r.graad + ' · ' + r.versheid + ' · ' + r.tegenspraak + ']';
-const toon = (w) => (w == null ? '—' : Array.isArray(w) ? (w.length ? w.length + ': ' + w.slice(0, 6).join(', ') + (w.length > 6 ? ', …' : '') : 'geen') : typeof w === 'object' ? JSON.stringify(w) : String(w));
+const toon = (w) => (w == null ? '--' : Array.isArray(w) ? (w.length ? w.length + ': ' + w.slice(0, 6).join(', ') + (w.length > 6 ? ', …' : '') : 'geen') : typeof w === 'object' ? JSON.stringify(w) : String(w));
 function drukRegels(regels) {
   for (const r of regels) {
     console.log('  ' + r.veld.padEnd(30) + ' ' + toon(r.waarde));
@@ -40,7 +40,7 @@ function main() {
     const k = A.kaart(lezer);
     if (json) return console.log(JSON.stringify(k, null, 1)), 0;
     console.log('\nDe structuur staat in ' + k.structuur + '. De Architect leest uit:\n');
-    for (const b of k.bronnen) console.log('  ' + b.register.padEnd(20) + ' graad ' + b.graad.padEnd(8) + ' versheid ' + b.versheid + (b.versheid !== 'actueel' ? ' — ' + b.reden : ''));
+    for (const b of k.bronnen) console.log('  ' + b.register.padEnd(20) + ' graad ' + b.graad.padEnd(8) + ' versheid ' + b.versheid + (b.versheid !== 'actueel' ? ' -- ' + b.reden : ''));
     console.log('');
     drukRegels(k.omvang);
     return 0;
@@ -68,7 +68,7 @@ function main() {
     drukRegels(i.waargenomen);
     console.log('\nKENNISGATEN');
     for (const g of i.kennisgaten) console.log('  - ' + g);
-    console.log('\nTOETSREDUCTIE: niet toegestaan — ' + i.toetsreductie.reden);
+    console.log('\nTOETSREDUCTIE: niet toegestaan -- ' + i.toetsreductie.reden);
     console.log('  (de drie blokken worden nooit opgeteld)');
     return 0;
   }
@@ -77,9 +77,9 @@ function main() {
     if (json) return console.log(JSON.stringify(o, null, 1)), 0;
     console.log('\nWAAR DE KENNIS OVER RTG OPHOUDT' + (onderwerp[0] ? ' (scope: ' + onderwerp[0] + ')' : '') + '\n');
     console.log('  1. graad onbekend: ' + o.graadOnbekend.ontbrekendeBronnen.length + ' verwachte bron(nen) ontbreken');
-    for (const b of o.graadOnbekend.ontbrekendeBronnen) console.log('       ' + b.register + ' — ' + b.reden);
+    for (const b of o.graadOnbekend.ontbrekendeBronnen) console.log('       ' + b.register + ' -- ' + b.reden);
     console.log('  2. versheid: ' + o.versheid.actueel.length + ' actueel, ' + o.versheid['mogelijk-verouderd'].length + ' mogelijk-verouderd, ' + o.versheid.onbekend.length + ' onbekend');
-    for (const x of o.versheid['mogelijk-verouderd']) console.log('       mogelijk-verouderd  ' + x.register + ' — ' + x.reden);
+    for (const x of o.versheid['mogelijk-verouderd']) console.log('       mogelijk-verouderd  ' + x.register + ' -- ' + x.reden);
     console.log('  3. tegenspraak:');
     for (const t of o.tegenspraak) console.log('       ' + t.register + ' ' + t.pad + ': ' + t.aantal + (t.ook ? ' (en ' + JSON.stringify(t.ook) + ')' : ''));
     const s = o.verklaardeSchuld;

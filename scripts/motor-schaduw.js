@@ -23,7 +23,7 @@ function maakJsEngine() {
   };
   const keyVanCodenaam = async (c) => (leden.has(c) ? { key: 'k_' + c } : null);
   // eigen db.data: de losse historie, zie server/kern/pay/loshistorie.js
-  const { pay } = require('../server/kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer: () => {}, schoon, betaaldienstKosten: () => 0,
+  const { pay } = require('../server/kern/pay')({ db, save, crypto, betaal, vrijgave: require('./lib/proefvrijgave').proefVrijgave(), keyVanCodenaam, sseToCustomer: () => {}, schoon, betaaldienstKosten: () => 0,
     payBoekingenVoegToe: require('../server/kern/pay/loshistorie')(db) });
   return { pay, registreer: (c) => leden.add(c), saldi: () => db.data.paySaldi || {} };
 }

@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**61 bundels, 487 delen, 0 zonder onderwerp.**
+**61 bundels, 488 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -120,11 +120,12 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 9 delen, 1145 regels in de delen
+`public/apps/backoffice/` -- 10 delen, 1163 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `backoffice-01.js` | de backoffice: de basis (helpers, taal, elementen) |
+| `backoffice-01a.js` | backoffice, deel 01a: DE SCAN VAN EEN IDENTITEITSBEWIJS |
 | `backoffice-01b.js` | backoffice, vervolg van deel 01 |
 | `backoffice-01c.js` | backoffice, vervolg van deel 01b: DE OFFICIELE BRONWACHT |
 | `backoffice-01d.js` | backoffice, DE VAKBEWIJZEN |
@@ -775,7 +776,7 @@ omlaag.
 
 ## `shared/metgezel.js`
 
-`public/shared/metgezel/` -- 9 delen, 801 regels in de delen
+`public/shared/metgezel/` -- 9 delen, 814 regels in de delen
 
 | deel | onderwerp |
 |---|---|

@@ -46,13 +46,19 @@ const bwSave = (...a) => {
 };
 let providerStatus = proef === 'motor-dekking' ? 'succeeded' : 'processing';
 let providerAanroepen = 0;
+/* AANBIEDER: de naam waarmee de vrijgavepoort deze rail kent
+   (server/kern/pay/vrijgavepoort.js). Dit is een NAGEMAAKTE aanbieder, dus een
+   rail zonder echt geld -- ook al noemen de betalingen die hij teruggeeft zich
+   'stripe' (dat is de vorm die de afhandeling verwacht, geen echte rail). */
 const betaal = {
+  AANBIEDER: 'simulatie',
   maakBetaling: async (o) => { providerAanroepen++; return { id: 'pi_ABC', status: providerStatus, aanbieder: 'stripe',
     bedrag: o.bedrag, valuta: 'eur', referentie: o.referentie }; },
   haalBetaling: async () => ({ id: 'pi_ABC', status: 'succeeded', aanbieder: 'stripe', bedrag: 2500, valuta: 'eur' })
 };
 const betaalWaarheid = require(path.join(SERVER, 'kern/betaalwaarheid'))({ d: () => db.data, save: bwSave, crypto, betaal, log: null });
 const { pay } = require(path.join(SERVER, 'kern/pay'))({ betaalWaarheid, db, save: dbm.save, bijeen: dbm.bijeen,
+  vrijgave: require(path.join(SERVER, '..', 'scripts', 'lib', 'proefvrijgave')).proefVrijgave(),
   economischeBoekingEenmaal: dbm.economischeBoekingEenmaal, payBoekingenVoegToe, crypto, betaal,
   keyVanCodenaam: (c) => (['ALFA', 'BETA'].includes(c) ? { key: 'k:' + c } : null), sseToCustomer: () => {},
   schoon: (x) => String(x || ''), betaaldienstKosten: () => 0,

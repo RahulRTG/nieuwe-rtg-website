@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-06T21:26:38.190Z",
-    "commit": "90b361662",
-    "boomVuil": false,
-    "boomAnders": 4,
+    "op": "2026-10-07T00:06:21.610Z",
+    "commit": "0775f7157",
+    "boomVuil": true,
+    "boomAnders": 0,
     "instrument": "scripts/idemidentiteit.js",
     "node": "v22.22.0"
   },
@@ -291,7 +291,7 @@
     },
     {
       "bestand": "server/kern/pay/huis.js",
-      "regel": 42,
+      "regel": 47,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [

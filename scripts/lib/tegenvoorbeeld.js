@@ -45,7 +45,12 @@ const ONBEKEND = 'Onbekende Uil 99';     // een codenaam die de kluis niet kent
 function maakWereld({ betaal, sabotage, wortel } = {}) {
   const uit = (p) => require(wortel ? require('path').join(wortel, p) : '../../' + p);
   const b = betaal || uit('server/betaal');
-  const keten = uit('server/kern/spellen/magnaat/rtg-keten')({ betaal: b });
+  /* De vrijgavepoort van een proefwereld (./proefvrijgave.js), uit DEZELFDE
+     wortel: een oudere checkout kent hem niet en heeft dan ook geen poort in
+     kern/pay. */
+  let vrijgave;
+  try { vrijgave = uit('scripts/lib/proefvrijgave').proefVrijgave(); } catch (e) { vrijgave = undefined; }
+  const keten = uit('server/kern/spellen/magnaat/rtg-keten')({ betaal: b, vrijgave });
   /* Elk seintje naar een lid, zodat de ijkpunten (./ijkpunten.js, E5) kunnen
      zien of wie iets ontving daarvan hoorde. */
   const seintjes = [];

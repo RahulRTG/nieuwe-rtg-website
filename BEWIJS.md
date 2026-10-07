@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2442 bestanden en 16717 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2442 bestanden en 16718 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2442 |
-| losse beweringen (`test(...)`) | 16717 |
+| losse beweringen (`test(...)`) | 16718 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2133 bestanden, 16178 beweringen.
+2133 bestanden, 16179 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1669,7 +1669,7 @@ toets omvalt.
 | `schoolaanwezig.test.js` | 7 | gezakt op `liegpoort /api/` | De enterprise-laag van RTG School, deel 2: aanwezigheid, verlof, en de veiligheidskant (passen, bezoekers, incidenten, ontruiming, calamiteit). De beloftes die hier hard worden gemaakt: - dezelfde les twee keer... |
 | `schooladvies.test.js` | 6 | gezakt op `&&->||#0` | De adviesgrens: wat dit systeem over het pad van een kind mag zeggen. De beloftes die hier hard worden gemaakt: - er is geen manier om uit deze module een BESLUIT te halen: geen parameter zet besluitDoorMens uit; -... |
 | `schoolbeeld.test.js` | 7 | gezakt op `liegpoort /api/` | De enterprise-laag van RTG School, deel 4: het directiebeeld, de rapporten, de koppelingen en het ouderportaal. De beloftes die hier hard worden gemaakt: - een verzuimwaarschuwing NOEMT ZIJN EIGEN REKENSOM (hoeveel... |
-| `schoolbel.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School, bellen binnen de app: het klas-belkanaal (SSE) en de belsignalen. Ouders bellen de leraar of een boom-tak-gezin; kinderen bewust niet (geen privekanaal leraar-kind). |
+| `schoolbel.test.js` | 4 | gezakt op `liegpoort /api/` | RTF School, bellen binnen de app: het klas-belkanaal (SSE) en de belsignalen. Ouders bellen de leraar of een boom-tak-gezin; kinderen bewust niet (geen privekanaal leraar-kind). |
 | `schooldirectie.test.js` | 1 | gezakt op `liegpoort /api/` | Golf 3: de directie-cockpit van de schoolpartner op kantoren-niveau, met de onderwijsregels leidend. Getoetst: signalen op organisatieniveau (wachtend personeel, klas zonder rooster), de schoolbrede mededeling die in... |
 | `schoolenterprise.test.js` | 7 | gezakt op `liegpoort /api/` | De enterprise-laag van RTG School, deel 1: rollen en rechten, het inzagejournaal, en de leerlingadministratie (aanmelding -> wachtlijst -> plaatsing -> uitschrijving -> overstap). Wat hier bewezen wordt, zijn... |
 | `schoolexcursie.test.js` | 3 | gezakt op `liegpoort /api/` | RTF School, de exclusieve laag: de vrijwillige ouderbijdrage, de excursie met tijdelijke GPS (toestemming vooraf, kijklog voor het gezin, wissen bij de stop) en de telefoonboom. |

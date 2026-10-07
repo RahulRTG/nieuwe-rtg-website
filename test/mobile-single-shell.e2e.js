@@ -24,14 +24,15 @@ test('mobile login has one content surface, without a second title, tabs or desk
     for (const selector of ['.wd-greeting', '.wp-tabs', '.wd-people', '.wd-favorites', '.wd-library', '.wp-atmosphere']) {
       assert.equal(await page.locator(selector).isVisible(), false, selector + ' must not surround the mobile login');
     }
-    assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 1);
+    assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 0,
+      'de canonieke Edge begint pas na de beveiligde toegang');
     assert.equal(await page.locator('.wd-home').isVisible(), true);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
     await page.evaluate(() => document.fonts.ready);
     const title = await page.locator('#gate .access-title').boundingBox();
-    const header = await page.locator('.rtg-edge-top').boundingBox();
-    assert.ok(title && header && title.y >= header.y + header.height,
-      'the login heading starts below the shared brand header');
+    const brand = await page.locator('#gate .access-brand').boundingBox();
+    assert.ok(title && brand && title.y >= brand.y + brand.height,
+      'the login heading starts below the account gateway brand panel');
   } finally { await ctx.close(); }
 });
 test('the four mobile worlds expose their original content and keep it when changing viewport', { skip }, async () => {

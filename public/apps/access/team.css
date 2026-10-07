@@ -17,6 +17,8 @@ body[data-rtg-skin="heritage"] #gate[data-rtg-access="team"][style*="display: no
 #gate[data-rtg-access="team"] .llinks{margin-top:22px;gap:0}
 #gate[data-rtg-access="team"] .lhint{font-size:13px;line-height:1.6;color:#dacbd0}
 #gate[data-rtg-access="team"] .access-secondary{display:inline-flex;align-items:center;min-height:44px}
+#gate[data-rtg-access="team"] .team-access-exit{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:0 0 20px;color:#f4eddc;font-size:13px;line-height:1.4;text-decoration:none;border-bottom:1px solid #ad8792}
+#gate[data-rtg-access="team"] .team-access-exit:focus-visible{outline:2px solid #f4eddc;outline-offset:4px}
 #gate[data-rtg-access="team"] :is(.gbtn,.card){background:#ffffff08;color:#f4eddc;border-color:#ad8792;box-shadow:none}
 #gate[data-rtg-access="team"] :is(.gback,.k,.gbtn span){color:#dacbd0}
 #gate[data-rtg-access="team"] .pinrow{flex-wrap:wrap;gap:12px}

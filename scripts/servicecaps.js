@@ -65,27 +65,42 @@ function roepers(cap) {
   return uit;
 }
 
-const alle = new Map();
-for (const [team, t] of Object.entries(TEAMS)) {
-  for (const c of t.capabilities) {
-    if (!alle.has(c)) alle.set(c, []);
-    alle.get(c).push(team);
+/* DE TELLING ALS FUNCTIE. Dit script draaide alles op het hoogste niveau, en
+   dat was genoeg zolang alleen check.js regel 65 hem als kindproces startte en
+   zijn uitvoer las. Sinds 6 oktober 2026 is "bevoegdheden zonder lezer" de
+   meter `serviceBevoegdheidStil` in NORM.json, en scripts/norm.js moet exact
+   hetzelfde getal tellen -- niet een tweede kopie van deze regels, maar deze
+   functie. De uitvoer en `--controle` hieronder zijn ongewijzigd. */
+function meet() {
+  const alle = new Map();
+  for (const [team, t] of Object.entries(TEAMS)) {
+    for (const c of t.capabilities) {
+      if (!alle.has(c)) alle.set(c, []);
+      alle.get(c).push(team);
+    }
   }
+
+  const rijen = [...alle.entries()].sort().map(([cap, teams]) => ({
+    capability: cap, teams, grond: GROND[cap] || 'ONBEKEND',
+    zwaar: !!ZWAAR[cap], zwaarWat: ZWAAR[cap] || null, roepers: roepers(cap)
+  }));
+
+  /* ALLEEN WAT HET LID BEVESTIGT HOEFT EEN LEZER TE HEBBEN. Wat de ZETEL verleent
+     (`zaak.lezen`) wordt door de gewone kantoorroutes gebruikt en niet door
+     `magNu()` -- daar een lezer voor eisen zou betekenen dat een medewerker de
+     wachtrij pas ziet nadat een lid iets heeft bevestigd, en dan is er niets om te
+     bevestigen. Een bevoegdheid ZONDER grond telt wel mee: die is vergeten, en
+     vergeten is hier geen vrijstelling. */
+  const stil = rijen.filter(r => r.grond !== 'zetel' && !r.roepers.length);
+  const breed = rijen.filter(r => r.teams.length >= 4);
+  const teBevestigen = rijen.filter(r => r.grond !== 'zetel');
+  return { rijen, stil, breed, teBevestigen };
 }
 
-const rijen = [...alle.entries()].sort().map(([cap, teams]) => ({
-  capability: cap, teams, grond: GROND[cap] || 'ONBEKEND',
-  zwaar: !!ZWAAR[cap], zwaarWat: ZWAAR[cap] || null, roepers: roepers(cap)
-}));
+module.exports = { meet };
+if (require.main !== module) return;
 
-/* ALLEEN WAT HET LID BEVESTIGT HOEFT EEN LEZER TE HEBBEN. Wat de ZETEL verleent
-   (`zaak.lezen`) wordt door de gewone kantoorroutes gebruikt en niet door
-   `magNu()` -- daar een lezer voor eisen zou betekenen dat een medewerker de
-   wachtrij pas ziet nadat een lid iets heeft bevestigd, en dan is er niets om te
-   bevestigen. Een bevoegdheid ZONDER grond telt wel mee: die is vergeten, en
-   vergeten is hier geen vrijstelling. */
-const stil = rijen.filter(r => r.grond !== 'zetel' && !r.roepers.length);
-const breed = rijen.filter(r => r.teams.length >= 4);
+const { rijen, stil, breed, teBevestigen } = meet();
 
 console.log('\nSERVICECAPABILITIES -- ' + rijen.length + ' bevoegdheden over ' +
   Object.keys(TEAMS).length + ' teams\n');
@@ -103,7 +118,6 @@ for (const r of rijen) {
   }
 }
 
-const teBevestigen = rijen.filter(r => r.grond !== 'zetel');
 console.log('\n  ' + stil.length + ' van ' + teBevestigen.length +
   ' bevoegdheden die het LID bevestigt, worden NERGENS uitgelezen.');
 if (stil.length) {

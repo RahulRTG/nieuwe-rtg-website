@@ -89,13 +89,19 @@ test('elke capability heeft precies een eigenaar, en die eigenaar draagt haar', 
    Commerce naast de Mall, en vier gedeelde componenten. Dat getal mag alleen
    OMLAAG: een open punt sluiten verlaagt OPEN_MAX met de hand, een nieuw open
    punt erbij laat deze toets zakken tot iemand het besluit neemt om hem te
-   verhogen -- met de reden in de historie. */
-const OPEN_MAX = 8;
+   verhogen -- met de reden in de historie.
+
+   Dat getal staat sinds 6 oktober 2026 in NORM.json (meter `schermeigenaarOpen`)
+   en niet meer als constante hier. De reden in de historie is daarmee een eis
+   en geen gewoonte: een verhoging zonder notitie laat scripts/normbasis.js
+   zakken. De twee kanten van deze toets blijven -- staan er minder open dan de
+   norm, dan zakt hij tot de norm strakker staat (npm run norm:vast). */
+const OPEN_MAX = require('../scripts/lib/normwaarde').normwaarde('schermeigenaarOpen');
 
 test('het aantal open oordelen stijgt niet (OPEN_MAX mag alleen omlaag)', () => {
   const open = REG.oordelen.filter(o => o.stand === 'open').length;
-  assert.ok(open <= OPEN_MAX, open + ' open oordelen, de ratel staat op ' + OPEN_MAX + ': los een punt op in plaats van er een bij te zetten');
-  assert.ok(open >= OPEN_MAX, 'er staan er nog maar ' + open + ' open: zet OPEN_MAX op ' + open + ', anders kan er ongemerkt een bij');
+  assert.ok(open <= OPEN_MAX, open + ' open oordelen, de ratel (NORM.json, schermeigenaarOpen) staat op ' + OPEN_MAX + ': los een punt op in plaats van er een bij te zetten');
+  assert.ok(open >= OPEN_MAX, 'er staan er nog maar ' + open + ' open: zet schermeigenaarOpen in NORM.json op ' + open + ' (npm run norm:vast), anders kan er ongemerkt een bij');
 });
 
 test('elk oordeel is een van de vijf klassen (of geen-dubbel met reden), en open betekent: er staat een vervolg', () => {

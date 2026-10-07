@@ -44,6 +44,7 @@
 const fs = require('fs');
 const path = require('path');
 const { stempel } = require('./lib/stempel');
+const { normwaarde } = require('./lib/normwaarde');
 
 /* Een pad telt pas als ADRES wanneer er een map voor staat die in dit huis
    bestaat. Alles daarbuiten is een verkorte verwijzing. */
@@ -61,10 +62,19 @@ function kandidaten(p) {
     'server/' + p.replace(/^(routes|opzet|middleware|webauthn|lib)\//, '$1/')];
 }
 
-function beoordeel(p) {
+/* DE BRONBOOM IS EEN ARGUMENT. Hier stond `fs.statSync(k)` met een RELATIEF
+   pad, dus de uitslag hing af van de map waarin het proces toevallig draaide:
+   vanuit de wortel klopte hij, vanuit elke andere map was elk adres kapot.
+   Zolang alleen `npm run adressen` hem aanriep viel dat niet op; sinds
+   scripts/norm.js deze telling als ratel meet, kan hij niet van de cwd van de
+   aanroeper afhangen. Zonder `bron` blijft het gedrag zoals het was (de cwd),
+   zodat de zelfijking in test/adressen.test.js -- een document in een
+   tijdelijke map, gehouden tegen de echte bronboom -- niet verandert. */
+function beoordeel(p, bron) {
+  const op = (k) => (bron ? path.join(bron, k) : k);
   for (const k of kandidaten(p)) {
     let st = null;
-    try { st = fs.statSync(k); } catch (e) { continue; }
+    try { st = fs.statSync(op(k)); } catch (e) { continue; }
     if (st.isFile()) return { uitslag: 'klopt', op: k };
   }
   /* Geen bestand -- maar staat er een MAP waar het bestand stond? Dan is de
@@ -72,7 +82,7 @@ function beoordeel(p) {
   for (const k of kandidaten(p)) {
     const zonder = k.replace(/\.js$/, '');
     let st = null;
-    try { st = fs.statSync(zonder); } catch (e) { continue; }
+    try { st = fs.statSync(op(zonder)); } catch (e) { continue; }
     if (st.isDirectory()) return { uitslag: 'opgeknipt', op: zonder + '/' };
   }
   return { uitslag: 'kapot', op: null };
@@ -86,12 +96,18 @@ function beoordeel(p) {
 
    Wat de ratel wel doet is voorkomen dat het getal ONGEMERKT groeit. Hij mag
    alleen omlaag. Wie hem verhoogt, schrijft erbij waarom -- en wie dat zonder
-   uitleg doet, sloopt de ratel in plaats van hem te verzetten. */
-const KAPOT_MAX = 23;
+   uitleg doet, sloopt de ratel in plaats van hem te verzetten.
+
+   DE WAARDE STAAT IN NORM.json (meter `adressenKapot`) en niet meer hier. Hier
+   stond KAPOT_MAX als losse constante (23), en dat was een ratel buiten het register:
+   scripts/normbasis.js zag een verhoging niet en scripts/normverval.js eiste er
+   geen notitie bij. Nu wel -- verhogen kan alleen in NORM.json, met een notitie
+   die de verplaatsing noemt (zie scripts/lib/normwaarde.js). */
+const kapotMax = () => normwaarde('adressenKapot');
 
 const PAD_IN_CODE = /`([A-Za-z0-9_\-\/\.]+\.js)`/g;
 
-function meet(wortel) {
+function meet(wortel, bron) {
   const map = wortel || process.cwd();
   const docs = fs.readdirSync(map).filter(f => f.endsWith('.md')).sort();
   const uit = { klopt: 0, onbeoordeeld: 0, opgeknipt: [], kapot: [] };
@@ -105,7 +121,7 @@ function meet(wortel) {
       if (p.includes('*')) continue;
       if (!WORTELS.some(w => p.startsWith(w))) { uit.onbeoordeeld++; continue; }
 
-      const oordeel = beoordeel(p);
+      const oordeel = beoordeel(p, bron);
       if (oordeel.uitslag === 'klopt') { uit.klopt++; continue; }
 
       /* Eenzelfde fout in eenzelfde document telt een keer: anders weegt een
@@ -172,11 +188,12 @@ if (require.main === module) {
     if (!u.kapot.length && !u.opgeknipt.length)
       console.log('\nElk gewortelde adres in de documenten wijst naar een bestand dat bestaat.');
 
-    if (u.kapot.length > KAPOT_MAX)
+    if (u.kapot.length > kapotMax())
       console.log('\nDE RATEL ZAKT: ' + u.kapot.length + ' kapotte adressen, en de ratel staat ' +
-        'op ' + KAPOT_MAX + '. Repareer het adres, of verzet de ratel MET de reden.');
+        'op ' + kapotMax() + ' (NORM.json, adressenKapot). Repareer het adres, of verzet de ratel ' +
+        'in NORM.json MET een notitie die de verplaatsing noemt.');
   }
-  process.exitCode = (meet().kapot.length > KAPOT_MAX) ? 1 : 0;
+  process.exitCode = (meet().kapot.length > kapotMax()) ? 1 : 0;
 }
 
 module.exports = { WORTELS, kandidaten, beoordeel, meet, register };

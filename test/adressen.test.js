@@ -36,11 +36,13 @@ const { meet, beoordeel } = require('../scripts/adressen');
 
 const WORTEL = path.join(__dirname, '..');
 
-/* De grondwaarde staat in het script zelf en niet hier: twee plekken met
-   dezelfde waarheid is regel 4 van de lat. */
-const KAPOT_MAX = Number(
-  /const KAPOT_MAX = (\d+)/.exec(fs.readFileSync(path.join(WORTEL, 'scripts/adressen.js'), 'utf8'))[1]
-);
+/* De grondwaarde staat in NORM.json (meter `adressenKapot`) en niet hier: twee
+   plekken met dezelfde waarheid is regel 4 van de lat. Hij stond eerst als
+   constante in scripts/adressen.js en werd hier met een regex uit de bron
+   gelezen; sinds de ratels naar NORM.json zijn verhuisd leest de toets hem
+   daar, met dezelfde helper als het script. */
+const { normwaarde } = require('../scripts/lib/normwaarde');
+const KAPOT_MAX = normwaarde('adressenKapot');
 
 function metDocument(inhoud, fn) {
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'adressen-'));
@@ -53,11 +55,11 @@ function metDocument(inhoud, fn) {
 }
 
 test('1. DE RATEL: geen nieuw kapot adres in de documenten', () => {
-  const u = meet(WORTEL);
+  const u = meet(WORTEL, WORTEL);
   assert.ok(u.kapot.length <= KAPOT_MAX,
     'kapotte adressen: ' + u.kapot.length + ', ratel staat op ' + KAPOT_MAX + '. Nieuw: ' +
     u.kapot.map(r => r.doc + ':' + r.regel + ' ' + r.pad).join(', ') +
-    ' -- repareer het adres, of verzet de ratel MET de reden.');
+    ' -- repareer het adres, of verzet de ratel in NORM.json MET een notitie.');
 });
 
 test('2. ZELFIJKING: de meter vindt een verzonnen adres, en laat een echt met rust', () => {
@@ -82,4 +84,19 @@ test('4. OPGEKNIPT is een eigen uitslag en geen KAPOT', () => {
   assert.equal(beoordeel('server/accounts.js').uitslag, 'opgeknipt');
   assert.equal(beoordeel('server/kern/frictie/motor.js').uitslag, 'klopt');
   assert.equal(beoordeel('kern/dit/bestaat/niet.js').uitslag, 'kapot');
+});
+
+test('5. DE BRONBOOM IS EEN ARGUMENT: de uitslag hangt niet aan de map waarin het proces draait', () => {
+  /* scripts/norm.js meet deze ratel (adressenKapot) en wordt niet altijd vanuit
+     de wortel gestart. Met een relatief statSync was elk adres dan kapot. Haal
+     `bron` uit beoordeel() en deze toets zakt. */
+  const vanuitWortel = meet(WORTEL, WORTEL).kapot.length;
+  const was = process.cwd();
+  process.chdir(os.tmpdir());
+  try {
+    assert.equal(beoordeel('server/kern/frictie/motor.js', WORTEL).uitslag, 'klopt');
+    assert.equal(beoordeel('server/accounts.js', WORTEL).uitslag, 'opgeknipt');
+    assert.equal(meet(WORTEL, WORTEL).kapot.length, vanuitWortel,
+      'vanuit een andere map telt de meter hetzelfde als vanuit de wortel');
+  } finally { process.chdir(was); }
 });

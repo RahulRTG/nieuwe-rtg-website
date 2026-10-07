@@ -339,6 +339,7 @@
        niet, dan is er gewoon het oude blok. */
     if (lf && window.RTGPoort && window.RTGPoort.gesprek){
       const doos = document.createElement('div');
+      doos.id = 'gateGesprek';   // de tweede stap zet hem even weg (leverancier-06a.js)
       lf.parentNode.insertBefore(doos, lf);
       lf.style.display = 'none';   // .login-form staat op display:flex, dus [hidden] alleen is niet genoeg
       window.RTGPoort.gesprek(doos, {
@@ -594,6 +595,7 @@
   }
   $('#spPinCancel').addEventListener('click', () => { $('#spPin').classList.remove('open'); pinBuf=''; });
 
+/* inloggen met het eigen RTG-account, met de tweede stap, en de app openen */
   // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
   // opnieuw proberen; de server vergelijkt en bewaart er niets van
   const vraagPositie = () => new Promise(af => {
@@ -603,10 +605,65 @@
       () => af(null), { enableHighAccuracy: true, timeout: 8000 });
   });
 
+  /* DE TWEEDE STAP (N19). Staat de tweede factor van het account aan, dan geeft
+     het wachtwoord alleen een bewijs, en DEZELFDE route ruilt dat met een code
+     om (server/routes/supplier/pda/posities-inlog.js). Het codeveld staat in
+     leverancier.html (#codeForm); de rest van de poort wacht zolang. Geeft een
+     belofte op de werksessie. Terug, een verlopen bewijs of geen werkplek meer
+     wijst af met een fout die `tweede` draagt, zodat de aanroeper de echte reden
+     toont en niet "onjuiste inloggegevens". Een verkeerde code blijft staan. */
+  function vraagCode(d, body){
+    const vorm = $('#codeForm'), veld = $('#liCode'), fout = $('#codeFout');
+    const weg = [$('#loginForm'), document.getElementById('gateGesprek'), $('#gate .enroll-box')].filter(Boolean);
+    const was = weg.map(x => x.style.display);
+    weg.forEach(x => { x.style.display = 'none'; });
+    vorm.hidden = false; fout.textContent = ''; veld.value = '';
+    try { veld.focus(); } catch(e){}
+    return new Promise((af, mis) => {
+      const sluit = (dan) => {
+        vorm.hidden = true; vorm.onsubmit = null; $('#codeTerug').onclick = null;
+        weg.forEach((x, i) => { x.style.display = was[i]; });
+        dan();
+      };
+      const stop = (tekst) => sluit(() => mis(Object.assign(new Error(tekst), { tweede: true })));
+      $('#codeTerug').onclick = () => stop(T('gate.code.terug', 'De inlog is afgebroken. Log opnieuw in.'));
+      vorm.onsubmit = async (e) => {
+        e.preventDefault(); fout.textContent = '';
+        const knop = vorm.querySelector('button[type="submit"]'); knop.disabled = true;
+        try {
+          const r = await API.call('/supplier/mijn/login', { bewijs: d.bewijs, code: veld.value.trim(), bedrijf: (body && body.bedrijf) || '' });
+          knop.disabled = false;
+          sluit(() => af(r));
+        } catch (err) {
+          knop.disabled = false; veld.value = '';
+          // verlopen, of geen werkplek meer: terug naar de inlog, met de reden
+          if (err.status === 401 || err.status === 404) return stop(err.message);
+          fout.textContent = err.message || T('login.failed', 'Inloggen mislukt.');
+          try { veld.focus(); } catch(e2){}
+        }
+      };
+    });
+  }
+
+  /* "DIT WAS UW LAATSTE HERSTELCODE" (N19). Een herstelcode als tweede stap
+     zegt hoeveel er over zijn (`let` in het antwoord), en dat hoort de
+     medewerker te horen, zoals in de personeels-app. Na het inloggen laadt de
+     sectorwissel de pagina vaak opnieuw, en dan is een toast weg voor hij
+     gelezen is: daarom reist het bericht via sessionStorage mee en toont de
+     pagina die de app opent het. Zonder sessionStorage meteen. */
+  const HERSTELBERICHT = 'rtg_sup_herstelbericht';
+  function bewaarBericht(m){ try { sessionStorage.setItem(HERSTELBERICHT, m); } catch(e){ toast(m); } }
+  function toonBericht(){
+    let m = null;
+    try { m = sessionStorage.getItem(HERSTELBERICHT); sessionStorage.removeItem(HERSTELBERICHT); } catch(e){}
+    if (m) toast(m);
+  }
+
   // Productie gebruikt uitsluitend /supplier/mijn/login. Alleen de expliciete
   // Magnaat Test-kiezer mag nog naar de oude /supplier/login.
   async function login(body, legacy, silent){
     if (!API.enabled){ toast(T('sup.needserver','Start de server (npm start) om de leverancier-app te gebruiken.')); return false; }
+    let bericht = null;
     try {
       let d;
       const route = legacy ? '/supplier/login' : '/supplier/mijn/login';
@@ -617,15 +674,18 @@
         if (!pos) throw e1;
         d = await API.call(route, Object.assign({ positie: pos }, body));
       }
+      if (!legacy && d.tweedeFactorNodig) { d = await vraagCode(d, body); bericht = d.let || null; }
       API.token = d.token;
       applyState(d.state);
       if (legacy) koppelAanRtgAccount(body, false); // uitsluitend testmigratie
     } catch(e){
-      if (silent) return false;
-      toast(!legacy ? T('login.bad','Onjuiste RTG-inloggegevens.') : (e.message||T('login.failed','Inloggen mislukt.')));
+      // de tweede stap heeft een eigen reden; de poort en de aanmelding tonen hem zelf
+      if (silent) { if (e.tweede) throw e; return false; }
+      toast(e.tweede ? e.message : !legacy ? T('login.bad','Onjuiste RTG-inloggegevens.') : (e.message||T('login.failed','Inloggen mislukt.')));
       return false;
     }
     try { localStorage.setItem('rtg_sup_token', API.token); } catch(e){}
+    if (bericht) bewaarBericht(bericht);
     // de zaak opent zijn eigen sector-app (behalve midden in een kassa-station)
     if (!pendingStation && naarEigenSector(S)) return true;
     if (pendingStation){
@@ -635,6 +695,7 @@
       try { localStorage.removeItem('rtg_sup_station'); } catch(e){}
       enterApp();
     }
+    toonBericht();
     return true;
   }
 
@@ -674,6 +735,7 @@
       applyState(st);
       let stn = null; try { stn = localStorage.getItem('rtg_sup_station'); } catch(e2){}
       if (stn) enterStation(stn); else enterApp();
+      toonBericht();   // na de sectorwissel: het bericht van de inlog hierboven
     } catch(e){
       API.token = null;
       try { localStorage.removeItem('rtg_sup_token'); } catch(e2){}

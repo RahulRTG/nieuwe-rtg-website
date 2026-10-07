@@ -86,6 +86,10 @@
   /* het aanmeldformulier blijft dicht tot je op "Meld u aan" klikt; de klasse
      .login-form zet display:flex, dus het hidden-attribuut moet dat overrulen */
   .enroll-form[hidden]{display:none;}
+  /* de tweede stap: zelfde vorm als het inlogformulier, en terug is een stille
+     tekstknop met een raakvlak van 44 hoog (TOEGANKELIJK.md) */
+  .code-form[hidden]{display:none;}
+  .login-form button.code-terug{background:none;color:var(--muted);font-weight:400;min-height:44px;text-decoration:underline;}
   .enroll-hint{font-size:0.72rem;color:var(--soft);line-height:1.5;margin-bottom:0.2rem;}
   .enroll-msg{font-size:0.78rem;min-height:1rem;}
   .enroll-msg.err{color:#E8637A;}
@@ -722,6 +726,15 @@
       <input id="liPass" name="password" type="password" placeholder="Uw RTG-wachtwoord" data-i18n-ph="gate.pass" autocomplete="current-password">
       <button type="submit" data-i18n="gate.signin">Inloggen</button>
     </form>
+    <!-- de tweede stap (N19): met de tweede factor aan vraagt de werkplekinlog
+         na het wachtwoord de code; leverancier-06a.js toont dit formulier -->
+    <form class="login-form code-form" id="codeForm" hidden>
+      <p class="enroll-hint" data-i18n="gate.code.hint">Uw wachtwoord klopt. Typ nu de code uit uw authenticator, of een van uw herstelcodes.</p>
+      <input id="liCode" name="code" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="Code uit uw authenticator of herstelcode" data-i18n-ph="gate.code" aria-label="Code van de tweede factor" data-i18n-aria="gate.code.aria">
+      <button type="submit" data-i18n="gate.code.go">Bevestig</button>
+      <div class="enroll-msg err" id="codeFout" role="alert"></div>
+      <button type="button" class="code-terug" id="codeTerug" data-i18n="gate.code.back">Terug naar de inlog</button>
+    </form>
 
     <div class="enroll-box">
       <button type="button" class="enroll-toggle" id="enrollToggle" aria-expanded="false" data-i18n="enr.toggle">Uitgenodigd door uw werkgever? Meld u aan</button>
@@ -1160,6 +1173,9 @@ window.I18N = { en: {
   'gate.rp.groet':'Welcome back.', 'gate.rp.wacht':'One moment, let me check.',
   'gate.rp.wie':'Open your workplace with your personal RTG account. What is your email or username?', 'gate.rp.pass':'Thank you. And your RTG password?',
   'gate.rp.stuur':'Send',
+  'gate.code.hint':'Your password is correct. Now enter the code from your authenticator, or one of your recovery codes.',
+  'gate.code':'Code from your authenticator or a recovery code', 'gate.code.aria':'Second factor code',
+  'gate.code.go':'Confirm', 'gate.code.back':'Back to sign-in', 'gate.code.terug':'Sign-in was cancelled. Please sign in again.',
   'tab.home':'Overview', 'tab.orders':'Orders', 'tab.rides':'Rides', 'tab.menu':'Menu', 'tab.price':'Price', 'tab.location':'Location',
   't.now':'just now', 't.ago':' ago', 't.min':' min', 't.hour':' hour', 't.days':' day(s)',
   'login.bad':'Incorrect username or password.', 'login.failed':'Sign-in failed.',

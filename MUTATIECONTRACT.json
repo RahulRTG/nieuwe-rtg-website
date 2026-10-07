@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-06T14:42:18.180Z",
-  "commit": "317890b90",
+  "op": "2026-10-06T23:20:21.521Z",
+  "commit": "8f957541d",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -13,14 +13,14 @@
   "totaal": 5322,
   "geclassificeerd": 5297,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3167,
+   "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1278,
    "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 670,
-   "INTENTIONALLY_NON_IDEMPOTENT": 182
+   "INTENTIONALLY_NON_IDEMPOTENT": 185
   },
-  "vastgesteldDoorMens": 2182,
-  "afgeleidDoorScript": 3115,
+  "vastgesteldDoorMens": 2185,
+  "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4381,
    "PUBLIC": 138,
@@ -21252,7 +21252,7 @@
    "mutatieId": "foundation.gezin.inloggen",
    "route": "POST /api/foundation/gezin/inloggen",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "nietHerhaalbaar"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -21268,8 +21268,8 @@
     "grond": null,
     "hindernis": "Vul naast de gezinscode uw eigen pincode in."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -21796,7 +21796,7 @@
    "mutatieId": "foundation.gezin.profiel.kies",
    "route": "POST /api/foundation/gezin/profiel/kies",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "nietHerhaalbaar"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -21812,8 +21812,8 @@
     "grond": null,
     "hindernis": "Dit profiel bestaat niet meer."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -22554,7 +22554,7 @@
    "mutatieId": "foundation.les.join",
    "route": "POST /api/foundation/les/join",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "nietHerhaalbaar"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -22570,8 +22570,8 @@
     "grond": null,
     "hindernis": "Te veel pogingen. Wacht een paar minuten en probeer het opnieuw."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

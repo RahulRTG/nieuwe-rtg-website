@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-06T23:24:40.428Z",
-    "commit": "5e88062f7",
+    "op": "2026-10-07T00:06:50.131Z",
+    "commit": "152f23099",
     "boomVuil": false,
     "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
@@ -2321,6 +2321,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "codearchitect.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/codearchitect.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "codecredentials-kortecode.test.js": {
       "soort": "puur",

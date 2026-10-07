@@ -5,6 +5,9 @@
       el('agPasskey').dataset.rtgMeaning='identity.passkey.verify';
       gate.setAttribute('aria-label',T('access.portal.sign_in','Log in'));
       gate.querySelector(".access-brand small").textContent=T("access.portal.secure_access","VEILIGE TOEGANG");
+      el('agBrandLine').textContent=T('access.portal.technology_for_life','Technologie voor het leven.');
+      el('agLanguage').textContent=String(lang() || 'nl').toUpperCase();
+      el('agLanguage').setAttribute('aria-label',T('language.chooser.title','Kies uw taal'));
       gate.querySelector("#agBack").textContent=T("access.portal.back","Terug");
       gate.querySelector("#agPasskey span").textContent=T("access.portal.continue_with_a_passkey","Verder met passkey");
       gate.querySelector(".access-hint").textContent=T("access.portal.you_use_your_device_s_security","U gebruikt de beveiliging van uw apparaat.");
@@ -15,6 +18,9 @@
       gate.querySelector("#agSummary summary").textContent=T("access.portal.review_your_details","Controleer uw gegevens");
       gate.querySelector("#agForgot").textContent=T("access.portal.forgot_your_password","Wachtwoord vergeten");
       gate.querySelector("#agFoundation").textContent=T("access.portal.explore_foundationos_it_is_and_always_will_be_100_free","Ontdek FoundationOS. Dit is en blijft altijd 100% gratis.");
+      el('agProtected').lastChild.textContent=T('access.portal.secure_connection','Beveiligde verbinding');
+      el('agPrivacy').textContent=T('access.portal.privacy','Privacy');
+      el('agHelp').textContent=T('access.portal.help','Hulp');
       if (interests && interests.length) {
         el('agExperience').textContent=T('access.portal.explored','U verkende {worlds}. Dit wordt hier getoond en niet in uw account opgeslagen.').replace('{worlds}',interests.join(', '));
         el('agExperience').hidden=false;

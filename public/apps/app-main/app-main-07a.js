@@ -16,7 +16,9 @@
     onbEl('onbLanguageNotice').hidden=supported && lang()==='nl';
     onbEl('onbLanguageNotice').textContent=supported
       ? T('access.onb.sourceNotice','De overeenkomst hieronder is de Nederlandse brontekst. Geef alleen uw akkoord als u deze begrijpt.')
-      : T('access.onb.languageNotice','Deze overeenkomst is in het Nederlands. De bevestiging is beschikbaar in het Nederlands en Engels. Kies een van deze talen via de Edge Bar.');
+      : T('access.onb.languageNotice','Deze overeenkomst is in het Nederlands. De bevestiging is beschikbaar in het Nederlands en Engels. Kies een van deze talen via de knop Taal.');
+    const languageButton=onbEl('onbLanguage');
+    if(languageButton) languageButton.textContent=String(lang() || 'nl').toUpperCase();
     if(onbStap==='teken') onbEl('onbGo').disabled=onbBezig || !supported;
     return supported;
   }

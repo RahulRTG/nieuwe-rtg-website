@@ -4789,7 +4789,8 @@ console.log('\n58) vaste hoekgrammatica: centrale inhouds-, systeem- en capsulev
     ['public/site/platform-detail.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/site/storyline-stage.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/site/website-truth.css', new Set(['var(--rtg-radius-editorial)'])],
-    ['public/apps/access/portal.css', new Set(['var(--rtg-radius-content)'])], ['public/shared/rtg-simple.css', new Set([
+    ['public/apps/access/portal.css', new Set(['var(--rtg-radius-content)', 'var(--rtg-radius-capsule)'])],
+    ['public/shared/toegang.css', new Set(['var(--rtg-radius-capsule)'])], ['public/shared/rtg-simple.css', new Set([
       'var(--rtg-radius-system)!important'
     ])],
     ['public/shared/interface/second-screen-personal.css', new Set([

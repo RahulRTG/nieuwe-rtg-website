@@ -47,7 +47,7 @@ if(process.argv.includes('--check')){
         formatting:row.formatting,rtl:{actual:row.dir,expected:['ar','he','fa','ur','ps','sd','ug','yi','dv'].includes(row.code)?'rtl':'ltr'},
         switching:{statePreserved:row.view==='register',focusPreserved:row.focus==='agIn'},
         dynamicText:{present:!!row.title.trim(),quality:'NOT_REVIEWED'},
-        edge:{worldsLabel:row.edge,sourceFallback:row.code!=='nl'&&row.code!=='en'},
+        edge:{preAccess:row.edge,sourceFallback:row.code!=='nl'&&row.code!=='en'},
         criticalCopy:{source:['nl','en'].includes(row.code)?row.code:'en',modelGenerated:false,
           fallbackNotice:!['nl','en'].includes(row.code),legalConfirmationEnabled:['nl','en'].includes(row.code)},
         translationReadiness:['nl','en'].includes(row.code)?'CODE_CONTROLLED_SOURCE_COPY':'MODEL_DEPENDENT_WITH_EXPLICIT_CRITICAL_FALLBACK'})),

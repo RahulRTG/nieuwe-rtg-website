@@ -44,14 +44,17 @@ async function main() {
           await page.waitForLoadState('load', { timeout: 12000 });
           await page.waitForSelector('body[data-rtg-desktop-state="ready"],body[data-public-platform]', { timeout: 12000 });
           row.contentReadyMs = Date.now() - started;
+          row.access = await page.evaluate(() => [...document.querySelectorAll('[data-rtg-access]')].some(e =>
+            e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'));
           if (route === '/apps/reisuitnodiging.html') {
             await require('./lib/desktop-guest')(page, row, errors);
           } else {
-          await page.waitForSelector('.rtg-adaptive-bar', { timeout: 12000 });
+          if (!row.access) await page.waitForSelector('.rtg-adaptive-bar', { timeout: 12000 });
           row.edgeReadyMs = Date.now() - started;
           // Verify media the screen actually promises. A public pass uses a
           // gradient and Explore is a product index; neither invents a photo.
-          row.media = await page.evaluate(() => {
+          row.media = row.access ? { kind:'access-portal', required:false,
+            reason:'Account access is intentionally image-free and owns the viewport before authentication.' } : await page.evaluate(() => {
             if (!document.body.dataset.publicPlatform) return { kind:'native-world-media', selector:'.wp-atmosphere img,.wp-photo>img', required:true };
             if (document.querySelector('.pp-feature')) return { kind:'public-story-photo', selector:'.pp-feature-photo', required:true };
             if (document.querySelector('.pp-detail-shell')) {
@@ -69,7 +72,7 @@ async function main() {
           }, row.media.selector, { timeout:12000 });
           // Edge can append styles after DOMContentLoaded; wait for the shared
           // desktop stylesheet to finish applying before measuring its grid.
-          await page.waitForFunction(() => document.body.dataset.rtgShell === 'mobile' || getComputedStyle(document.body).paddingTop === (/^(compact|focus)$/.test(document.body.getAttribute('data-rtg-edge-2-state') || '') ? '0px' : '64px'), null, { timeout: 6000 });
+          if (!row.access) await page.waitForFunction(() => document.body.dataset.rtgShell === 'mobile' || getComputedStyle(document.body).paddingTop === (/^(compact|focus)$/.test(document.body.getAttribute('data-rtg-edge-2-state') || '') ? '0px' : '64px'), null, { timeout: 6000 });
           await page.evaluate(() => document.fonts.ready);
           // Een doorverwijzing of later geladen stylesheet kan alle losse
           // gereed-signalen tussendoor vervangen. Meet één stabiel document;
@@ -85,6 +88,13 @@ async function main() {
             if (!vorige || vorige.beeld !== beeld) { window.__rtgAuditStabiel = { beeld, sinds: performance.now() }; return false; }
             return performance.now() - vorige.sinds >= 300;
           }, null, { timeout: 12000 });
+          if (mobile) await page.waitForFunction(() => {
+            const visible = selector => [...document.querySelectorAll(selector)].some(e =>
+              e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden');
+            if (visible('[data-rtg-access]')) return true;
+            if (document.body.dataset.publicPlatform) return visible('.wd-home:not([hidden]) main,.wd-home:not([hidden])>*,.wd-focus:not([hidden])');
+            return visible('.wd-home:not([hidden]) main,.wd-home:not([hidden])>*,.wd-access,.wd-focus:not([hidden])');
+          }, null, { timeout: 6000 });
           row.state = await page.evaluate(() => {
             const b = document.body, css = getComputedStyle(b);
             const rect = s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return { x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom,scroll: getComputedStyle(e).overflowY }; };
@@ -92,12 +102,14 @@ async function main() {
             const heading = [...document.querySelectorAll('#platform-story-title,.wd-home h1,.wd-access h1,h1')]
               .find(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden');
             return { url: location.pathname, world:b.dataset.rtgWorld, desktop:b.dataset.rtgDesktop, shellMode:b.dataset.rtgShell, layout:b.dataset.rtgLayout, public:b.dataset.publicPlatform,
+              access:[...document.querySelectorAll('[data-rtg-access]')].some(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'),
               mobileDecoration:visible('.wd-shell>.wd-greeting,.wd-shell>.wp-tabs,.wd-shell>.wd-people,.wd-shell>.wd-favorites,.wd-shell>.wd-library,.wd-home>.wp-scene,.wp-domain'),
               nativeContent:visible('.wd-home:not([hidden]) main,.wd-home:not([hidden])>*,.wd-access,.wd-focus:not([hidden])'),
               publicDecoration:visible('.wd-shell>.wd-greeting,.wd-shell>.wp-tabs,.wp-edit-images'),
               publicHeader:rect('.pp-header'),
+              accessRect:rect('[data-rtg-access]'),
               background:css.backgroundColor, editorialVersion:css.getPropertyValue('--rtg-editorial-version').trim(), headingFont:heading&&getComputedStyle(heading).fontFamily, edgeState:b.getAttribute('data-rtg-edge-2-state'), padding:css.padding, pageScroll:scrollY, scheme:css.colorScheme, shells:document.querySelectorAll('.wd-shell').length,
-              edges:document.querySelectorAll('.rtg-adaptive-bar').length,
+              edges:[...document.querySelectorAll('.rtg-adaptive-bar')].filter(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden').length,
               paletteRegions:['.rtg-adaptive-bar','.wk-shell','.hq-shell','.pn-shell','.reisapp'].flatMap(selector => {
                 const el = document.querySelector(selector); if (!el || !el.getBoundingClientRect().height) return [];
                 return [{selector,background:getComputedStyle(el).backgroundColor,material:getComputedStyle(el).getPropertyValue('--edge-bar-bg').trim()}];
@@ -112,8 +124,9 @@ async function main() {
           row.failures = [];
           if (row.clippedContent.length) row.failures.push('clipped-app-content');
           if (row.http !== 200 && route !== '/site/404.html') row.failures.push('http-'+row.http);
-          const expectedTop = s.public ? (mobile ? 76 : 88) : (mobile ? 136 : 88) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
-          if ((!mobile || s.public) && Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
+          const expectedTop = s.access ? 0 : s.public ? (mobile ? 76 : 88) : (mobile ? 136 : 88) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
+          if (!s.access && (!mobile || s.public) && Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
+          if (s.access && (!s.accessRect || s.accessRect.y > 64 || s.accessRect.w < 300 || s.accessRect.h < 600)) row.failures.push('access-portal-not-viewport');
           if (mobile && !s.public) {
             if (s.shellMode !== 'mobile' || s.desktop) row.failures.push('desktop-shell-on-mobile');
             if (s.mobileDecoration) row.failures.push('stacked-mobile-shell');
@@ -125,10 +138,10 @@ async function main() {
             if (!s.publicHeader || Math.abs(s.publicHeader.h-64) > 2) row.failures.push('nonstandard-public-header');
             if (!s.headingFont || !s.headingFont.includes('Bodoni')) row.failures.push('public-editorial-heading-missing');
           }
-          if (s.shells !== 1 || s.edges !== 1) row.failures.push('duplicate-or-missing-frame');
+          if (s.shells !== 1 || s.edges !== (s.access ? 0 : 1)) row.failures.push('duplicate-or-missing-frame');
           if (s.overflow) row.failures.push('horizontal-overflow');
-          if (!s.content || !s.shell || (!mobile && (!s.left || !s.right || s.left.w < 100 || s.right.w < 100))) row.failures.push('missing-column');
-          else if (!mobile) {
+          if (!s.content || !s.shell || (!s.access && !mobile && (!s.left || !s.right || s.left.w < 100 || s.right.w < 100))) row.failures.push('missing-column');
+          else if (!s.access && !mobile) {
             if (Math.abs(s.shell.x-24) > 2 || Math.abs(s.left.w-216) > 2 || Math.abs(s.right.w-280) > 2) row.failures.push('nonstandard-geometry');
             if (s.content.x < s.left.right || s.content.right > s.right.x + 1) row.failures.push('overlapping-columns');
             if (s.content.scroll === 'auto' || s.left.scroll === 'auto' || s.right.scroll === 'auto') row.failures.push('nested-page-scroll');
@@ -137,9 +150,9 @@ async function main() {
           const palettes = {living:'rgb(16, 13, 10)',work:'rgb(16, 24, 23)',travel:'rgb(25, 13, 18)',foundation:'rgb(16, 35, 30)'};
           if(s.editorialVersion !== '20261001')row.failures.push('editorial-system-not-loaded');
           if(s.layout !== 'standard')row.failures.push('legacy-layout');
-          if (s.background !== (s.public ? 'rgb(16, 14, 12)' : palettes[s.world])) row.failures.push('nonstandard-world-palette');
+          if (!s.access && s.background !== (s.public ? 'rgb(16, 14, 12)' : palettes[s.world])) row.failures.push('nonstandard-world-palette');
           const cards = {living:'#201912',work:'#192422',travel:'#29171d',foundation:'#19372d'};
-          if (!s.public) for (const region of s.paletteRegions) {
+          if (!s.public && !s.access) for (const region of s.paletteRegions) {
             const expected = region.selector === '.rtg-adaptive-bar' ? cards[s.world] : palettes[s.world];
             if ((region.selector === '.rtg-adaptive-bar' ? region.material : region.background) !== expected) row.failures.push('nonstandard-inner-palette:'+region.selector);
           }

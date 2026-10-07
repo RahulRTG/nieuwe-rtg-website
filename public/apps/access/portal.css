@@ -1,179 +1,312 @@
-/* The public story and account access share one canvas and the standard Edge. */
-body[data-ios-home][data-rtg-skin="heritage"] #gate[data-rtg-access],
-body[data-ios-home][data-rtg-skin="heritage"] #onbGate{
-  position:relative!important;inset:auto!important;z-index:140;width:100%!important;max-width:none!important;
-  height:auto!important;min-height:0!important;margin:0!important;border:0!important;border-radius:0!important;
-  padding:calc(env(safe-area-inset-top,0px) + 28px) 28px calc(var(--rtg-adaptive-inset,100px) + 42px)!important;
-  overflow:auto;overscroll-behavior:contain;display:block;box-sizing:border-box;
-  background:radial-gradient(ellipse at 90% 85%,var(--rtg-world-card-strong),transparent 68%),var(--rtg-world-bg)!important;
-  color:var(--rtg-world-ink)!important;--txt:var(--rtg-world-ink);--rtg-txt:var(--rtg-world-ink);--muted:var(--rtg-world-muted);--soft:var(--rtg-world-muted);
-  font-family:Inter,sans-serif;scroll-padding-block:24px 140px;
+/* RTG ACCOUNT GATEWAY
+   Eén rustige toegangsshell voor aanmelden, registratie, herstel en onboarding.
+   De Gateway gebruikt dezelfde platformtaal als www; de canonieke Edge begint
+   pas nadat identiteit en onboarding zijn afgerond. */
+:root{
+  --access-paper:#f4f2ec;
+  --access-paper-deep:#e8e5dd;
+  --access-surface:#faf9f5;
+  --access-ink:#11110f;
+  --access-muted:#6a675f;
+  --access-line:rgba(17,17,15,.14);
+  --access-burgundy:#711b36;
+  --access-burgundy-bright:#9f3659;
+  --access-gold:#857007;
+  --access-white:#fffdf8;
+  --access-ease:cubic-bezier(.22,.72,.16,1);
+}
+
+/* Login and onboarding own the complete pre-auth viewport. Shared world and
+   desktop styles are deliberately neutralised here. */
+html body[data-ios-home] #gate[data-rtg-access]:not([style*="display: none"]),
+html body[data-ios-home] #rtgCommand #gate[data-rtg-access]:not([style*="display: none"]){
+  --txt:var(--access-ink);
+  --rtg-txt:var(--access-ink);
+  --muted:var(--access-muted);
+  --soft:var(--access-muted);
+  --rtg-world-ink:var(--access-ink);
+  --rtg-world-muted:var(--access-muted);
+  --rtg-world-bg:var(--access-paper);
+  position:fixed!important;
+  inset:0!important;
+  z-index:10000!important;
+  display:grid!important;
+  grid-template-columns:minmax(330px,.9fr) minmax(430px,1.1fr);
+  width:100%!important;
+  max-width:none!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:auto!important;
+  border:0!important;
+  border-radius:0!important;
+  background:var(--access-paper)!important;
+  color:var(--access-ink)!important;
+  box-shadow:none!important;
+  color-scheme:light;
+  font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body:has(#gate[data-rtg-access]:not([style*="display: none"])),
+body:has(#onbGate:not([hidden])){overflow:hidden!important}
+
+/* The mobile app shell normally contains its world canvas below the compact
+   header. Authentication owns the whole viewport, so it must not inherit that
+   containing block or its 44px offset. */
+body:has(#gate[data-rtg-access]:not([style*="display: none"])) #rtgWorldContent{
+  contain:none!important;
+}
+
+/* The Edge is the authenticated app interface, not an authentication menu. */
+body:has(#gate[data-rtg-access]:not([style*="display: none"])) > :is(.rtg-edge-chrome,.rtg-edge-2-reveal,.rtg-edge-2-edge-reveal),
+body:has(#onbGate:not([hidden])) > :is(.rtg-edge-chrome,.rtg-edge-2-reveal,.rtg-edge-2-edge-reveal){
+  display:none!important;
 }
 #gate[data-rtg-access] [hidden],body #onbGate[hidden]{display:none!important}
-#gate[data-rtg-access]::before,#gate[data-rtg-access]::after{display:none!important}
+#gate[data-rtg-access]::before,#gate[data-rtg-access]::after,
 #gate[data-rtg-access]>.rtg-toegang-signatuur{display:none!important}
-#gate[data-rtg-access] .access-brand,.access-brand{
-  text-align:center;font:400 40px/1 "Bodoni Moda",Georgia,serif;color:var(--rtg-world-ink);margin:0 0 36px;
-}
-.access-brand small{display:block;margin-top:10px;font:500 9px/1.4 Inter,sans-serif;letter-spacing:.28em}
-#gate[data-rtg-access] .access-content{width:min(100%,440px);margin:0 auto;padding:0;background:none;border:0;box-shadow:none}
-#gate[data-rtg-access] .access-title{margin:0 0 24px;color:var(--rtg-world-ink);font:400 clamp(56px,15.5vw,82px)/.98 "Bodoni Moda",Georgia,serif;font-family:"Bodoni Moda",Georgia,serif!important;font-weight:400!important;letter-spacing:-.055em}
-#gate[data-rtg-access] .access-title em{font-weight:400}
-#gate[data-rtg-access] .access-description{font-size:16px;line-height:1.6;margin:0 0 28px;color:var(--rtg-world-muted);max-width:34ch}
-#gate[data-rtg-access] button{font-family:Inter,sans-serif;cursor:pointer;min-height:48px;touch-action:manipulation}
-#gate[data-rtg-access] :is(button,a,input):focus-visible,#onbGate :is(button,input,a):focus-visible{outline:2px solid var(--rtg-world-ink)!important;outline-offset:5px}
-#gate[data-rtg-access] .access-primary,#onbGate #onbGo{
-  display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:56px;padding:14px 18px;
-  border:1px solid var(--rtg-world-ink);border-radius:var(--rtg-radius-content);background:var(--rtg-world-ink);color:var(--rtg-world-bg);font-size:16px;font-weight:600;line-height:1.4;
-}
-#gate[data-rtg-access] .access-primary svg{width:25px;height:28px;fill:none;stroke:currentColor;flex-shrink:0}
-#gate[data-rtg-access] .access-hint{font-size:12px;line-height:1.6;color:var(--rtg-world-muted);margin:10px 0 24px;text-align:center}
-#gate[data-rtg-access] .access-link{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 0;background:none;border:0;border-bottom:1px solid #a27c89;border-radius:0;color:var(--rtg-world-ink);font-size:15px;text-align:start}
-#gate[data-rtg-access] .access-new{margin:24px 0 0;font-size:14px;line-height:1.6}
-#gate[data-rtg-access] .access-new button{display:inline-flex;align-items:center;padding:0 4px;background:none;border:0;color:var(--rtg-world-ink);font-size:inherit;text-decoration:underline;text-underline-offset:4px}
-#gate[data-rtg-access] .ag-experience{margin:16px 0;color:var(--rtg-world-muted);font-size:12px;line-height:1.6}
-#gate[data-rtg-access] .access-progress{font-size:11px;line-height:1.5;letter-spacing:.16em;text-transform:uppercase;color:var(--rtg-world-muted);margin:0 0 20px}
-#gate[data-rtg-access][data-access-view]:not([data-access-view="welcome"]) .access-title{font-size:clamp(36px,9.5vw,52px);line-height:1.1;letter-spacing:-.04em;margin-bottom:16px}
-#gate[data-rtg-access] .access-field{display:block;margin:0 0 20px;font-size:13px;line-height:1.6}
-#gate[data-rtg-access] .access-field input,#onbGate #onbIn{
-  display:block;width:100%;max-width:100%;min-width:0;min-height:56px;box-sizing:border-box;margin:8px 0 0;padding:14px;
-  font:400 16px/1.5 Inter,sans-serif;color:var(--rtg-world-ink);background:#ffffff08;border:1px solid #ad8792;border-radius:var(--rtg-radius-content);
-  text-align:start;color-scheme:dark;box-shadow:none;
-}
-#gate[data-rtg-access] input::placeholder,#onbGate #onbIn::placeholder{color:#c5aeb7;opacity:1}
-#gate[data-rtg-access] input[aria-invalid="true"]{border-color:#ffd0d7}
-#gate[data-rtg-access] .access-secondary{background:none;border:0;color:var(--rtg-world-ink);padding:10px 0;font-size:14px;text-decoration:underline;text-underline-offset:4px}
-#gate[data-rtg-access] .access-back{margin-bottom:18px}
-#gate[data-rtg-access] .access-error{font-size:14px;line-height:1.6;color:#ffd9dd;margin:16px 0}
-#gate[data-rtg-access] .access-error:empty,#gate[data-rtg-access] .access-status:empty{display:none}
-#gate[data-rtg-access] .access-status{font-size:14px;line-height:1.6;margin:16px 0;color:var(--rtg-world-ink)}
-#gate[data-rtg-access] button:disabled,#onbGate button:disabled{opacity:.65;cursor:wait}
-#gate[data-rtg-access] .access-summary{margin:18px 0;color:var(--rtg-world-muted);font-size:13px;line-height:1.8;overflow-wrap:anywhere}
-#gate[data-rtg-access] .access-summary summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
-#gate[data-rtg-access] .access-summary button{display:block;font-size:13px;min-height:44px;padding:4px 0}
-#gate[data-rtg-access] .access-foundation{display:block;color:var(--rtg-world-ink);margin:16px 0;font-size:14px;line-height:1.6;text-underline-offset:4px}
-#onbGate .onb-card{max-width:520px;text-align:start;color:var(--rtg-world-ink);margin:0 auto}
-#onbGate .onb-mond{display:none}
-#onbGate .onb-zin{color:var(--rtg-world-ink);font:400 clamp(30px,7.5vw,42px)/1.25 "Bodoni Moda",Georgia,serif;margin:20px 0;text-wrap:pretty}
-#onbGate .onb-rij{display:flex;flex-wrap:wrap;border:0;margin:0;gap:14px}
-#onbGate .onb-rij #onbIn{flex-basis:100%}
-#onbGate #onbGo{font-family:Inter,sans-serif;cursor:pointer}
-#onbGate .onb-acties button{color:var(--rtg-world-ink);background:none;border:0;border-bottom:1px solid #ad8792;min-height:48px;padding:8px 0;margin:10px 0;font:400 14px/1.5 Inter,sans-serif}
-#onbGate .onb-lees{max-height:38dvh;overflow:auto;padding:18px;margin:16px 0;border:1px solid #ad8792;border-radius:var(--rtg-radius-content);background:#270813;color:var(--rtg-world-ink);font:400 14px/1.7 Inter,sans-serif;white-space:pre-wrap}
-#onbGate .onb-consent{display:flex;align-items:flex-start;gap:12px;margin:20px 0;color:var(--rtg-world-ink);font-size:14px;line-height:1.6}
-#onbGate .onb-consent input{width:24px;height:24px;flex:0 0 24px;accent-color:#b93561;margin:2px 0}
-#onbGate .onb-consent[hidden]{display:none}
-#onbGate .onb-fout{color:#ffd9dd;font-size:14px;line-height:1.6}
-@media(min-width:900px){
-  #gate[data-rtg-access] .access-brand{margin-bottom:46px}
-  #gate[data-rtg-access] .access-content{width:min(100%,480px)}
-}
-@media(max-height:740px){
-  #gate[data-rtg-access] .access-brand{font-size:32px;margin-bottom:24px}
-  #gate[data-rtg-access] .access-title{font-size:56px;margin-bottom:18px}
-  #gate[data-rtg-access] .access-description{margin-bottom:20px}
-}
-@media(prefers-reduced-motion:reduce){#gate[data-rtg-access] *,#onbGate *{animation:none!important;transition:none!important}}
-/* The standard Edge owns navigation and its panels also work before sign-in. */
-body[data-ios-home][data-rtg-skin="heritage"]:has(#gate[data-rtg-access]:not([style*="display: none"])) :is(.rtg-edge-index,.rtg-edge-ai-panel,.rtg-edge-status-panel)[aria-hidden="false"]{display:block!important}
-#onbGate .onb-heading{margin:16px 0;color:var(--rtg-world-ink);font:400 clamp(34px,9vw,48px)/1.08 "Bodoni Moda",Georgia,serif;letter-spacing:-.035em}
-#onbGate .onb-zin{font:400 16px/1.6 Inter,sans-serif;margin:16px 0;min-height:0}
-#onbGate .onb-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 16px;font:400 13px/1.6 Inter,sans-serif}
-#onbGate .onb-links a{display:inline-flex;align-items:center;min-height:44px;color:var(--rtg-world-muted);text-underline-offset:4px}
 
-/* Scripts and longer translations follow the document direction and keep room. */
-#gate[data-rtg-access] :is(.access-title,.access-description,.access-primary),#onbGate :is(.onb-heading,.onb-zin,#onbGo){overflow-wrap:anywhere;hyphens:auto}
+/* Platform panel */
+#gate[data-rtg-access] .access-brand{
+  position:relative;
+  min-height:100dvh;
+  margin:0;
+  padding:clamp(28px,4vw,58px);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  border-inline-end:1px solid var(--access-line);
+  background:
+    radial-gradient(circle at 50% 56%,rgba(133,112,7,.13),transparent 32%),
+    linear-gradient(145deg,var(--access-paper-deep),var(--access-surface));
+  color:var(--access-ink);
+  text-align:start;
+}
+.access-brand-head{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.access-brand-head a{font:400 31px/.9 "Bodoni Moda",Georgia,serif;letter-spacing:-.06em;color:var(--access-ink)}
+.access-language{
+  min-width:40px;height:34px;padding:0 10px;border:1px solid var(--access-line);border-radius:var(--rtg-radius-capsule);
+  background:rgba(250,249,245,.65);color:var(--access-ink);font:650 10px/1 Inter,sans-serif;
+  letter-spacing:.08em;cursor:pointer;transition:border-color .2s,color .2s,background .2s;
+}
+.access-language:hover,.access-language:focus-visible{border-color:var(--access-burgundy);color:var(--access-burgundy);background:var(--access-surface)}
+.access-brand-copy{position:relative;z-index:2;margin-top:clamp(56px,9vh,110px)}
+#gate[data-rtg-access] .access-brand small,.access-brand small{
+  display:block;margin:0;color:var(--access-gold);font:650 10px/1.4 Inter,sans-serif;
+  letter-spacing:.16em;text-transform:uppercase;
+}
+.access-brand-copy p{
+  max-width:520px;margin:20px 0 0;color:var(--access-ink);
+  font:500 clamp(46px,5.4vw,82px)/.9 Inter,ui-sans-serif,sans-serif;
+  letter-spacing:-.07em;text-wrap:balance;
+}
+
+/* One account, shown as a platform relationship instead of a product collage. */
+.access-system{position:relative;flex:1;min-height:360px;margin-top:25px}
+.access-system-ring,.access-system-core,.access-system-node{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+.access-system-ring{display:block;border:1px solid var(--access-line);border-radius:50%}
+.access-system-ring-one{width:min(68%,430px);aspect-ratio:1}
+.access-system-ring-two{width:min(39%,245px);aspect-ratio:1}
+.access-system-core{
+  z-index:2;width:142px;min-height:105px;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:1px solid var(--access-line);background:rgba(250,249,245,.94);box-shadow:0 18px 55px rgba(22,18,11,.08);
+}
+.access-system-core b{font:400 26px/1 "Bodoni Moda",Georgia,serif}
+.access-system-core em,.access-system-node em{margin-top:7px;color:var(--access-muted);font:500 8px/1 Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.access-system-core i{position:absolute;right:10px;top:10px;width:6px;height:6px;border-radius:50%;background:var(--access-gold);box-shadow:0 0 0 6px rgba(133,112,7,.1)}
+.access-system-node{
+  z-index:2;left:auto;top:auto;min-width:112px;padding:13px 16px;transform:none;
+  border:1px solid var(--access-line);background:rgba(250,249,245,.9);box-shadow:0 14px 40px rgba(22,18,11,.06);
+}
+.access-system-node b,.access-system-node em{display:block;font-style:normal}
+.access-system-node b{font:550 12px/1 Inter,sans-serif}
+.access-system-personal{left:50%;top:4%;transform:translateX(-50%)}
+.access-system-travel{right:3%;top:46%;transform:translateY(-50%)}
+.access-system-work{left:50%;bottom:2%;transform:translateX(-50%)}
+.access-system-connect{left:3%;top:46%;transform:translateY(-50%)}
+.access-brand-principles{
+  position:relative;z-index:2;margin:22px 0 0;padding-top:18px;display:flex;flex-wrap:wrap;gap:10px 24px;
+  border-top:1px solid var(--access-line);color:var(--access-muted);font:500 9px/1.4 Inter,sans-serif;
+  letter-spacing:.08em;text-transform:uppercase;
+}
+.access-brand-principles span:first-child{color:var(--access-ink);font-weight:650}
+
+/* Identity panel */
+#gate[data-rtg-access] .access-content{
+  align-self:center;
+  width:min(100%,620px);
+  margin:0 auto;
+  padding:clamp(72px,9vh,130px) clamp(38px,7vw,100px);
+  background:none;border:0;box-shadow:none;
+}
+#gate[data-rtg-access] .access-title{
+  max-width:590px;margin:0 0 24px;color:var(--access-ink);
+  font:500 clamp(54px,6.1vw,92px)/.88 Inter,ui-sans-serif,sans-serif!important;
+  letter-spacing:-.075em;text-wrap:balance;
+}
+#gate[data-rtg-access] .access-title em{
+  display:block;margin-top:8px;color:var(--access-burgundy);
+  font:400 .95em/.9 "Bodoni Moda",Georgia,serif;font-style:normal;
+}
+#gate[data-rtg-access][data-access-view]:not([data-access-view="welcome"]) .access-title{
+  font-size:clamp(39px,4.2vw,62px);line-height:.98;letter-spacing:-.06em;margin-bottom:18px;
+}
+#gate[data-rtg-access] .access-description{
+  max-width:42ch;margin:0 0 32px;color:var(--access-muted);font-size:16px;line-height:1.65;
+}
+#gate[data-rtg-access] button{font-family:Inter,sans-serif;cursor:pointer;min-height:44px;touch-action:manipulation}
+#gate[data-rtg-access] :is(button,a,input):focus-visible,#onbGate :is(button,input,a):focus-visible{
+  outline:2px solid var(--access-burgundy)!important;outline-offset:4px;
+}
+#gate[data-rtg-access] .access-primary,#onbGate #onbGo{
+  display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:52px;padding:13px 21px;
+  border:0;border-radius:var(--rtg-radius-capsule);background:var(--access-burgundy);color:var(--access-white);
+  font-size:14px;font-weight:600;line-height:1.4;box-shadow:none;
+  transition:transform .24s var(--access-ease),background .24s,color .24s;
+}
+#gate[data-rtg-access] .access-primary:hover,#onbGate #onbGo:hover{transform:translateY(-2px);background:var(--access-burgundy-bright)}
+#gate[data-rtg-access] .access-primary:active,#onbGate #onbGo:active{transform:translateY(0)}
+#gate[data-rtg-access] .access-primary svg{width:23px;height:25px;fill:none;stroke:currentColor;flex:none}
+#gate[data-rtg-access] .access-hint{margin:10px 0 26px;color:var(--access-muted);font-size:11px;line-height:1.6;text-align:center}
+#gate[data-rtg-access] .access-link{
+  display:flex;align-items:center;justify-content:space-between;width:100%;min-height:48px;padding:12px 0;
+  border:0;border-top:1px solid var(--access-line);border-bottom:1px solid var(--access-line);border-radius:0;
+  background:none;color:var(--access-ink);font-size:13px;text-align:start;
+}
+#gate[data-rtg-access] .access-new{margin:22px 0 0;color:var(--access-muted);font-size:13px;line-height:1.6}
+#gate[data-rtg-access] .access-new button{display:inline-flex;min-height:0;height:auto;padding:0 3px;border:0;border-radius:0;background:none;color:var(--access-burgundy);font-size:inherit;line-height:inherit;text-decoration:none;border-bottom:1px solid currentColor}
+#gate[data-rtg-access] .ag-experience{margin:15px 0;color:var(--access-muted);font-size:11px;line-height:1.6}
+#gate[data-rtg-access] .access-progress{
+  margin:0 0 18px;color:var(--access-gold);font-size:9px;font-weight:650;line-height:1.5;letter-spacing:.16em;text-transform:uppercase;
+}
+#gate[data-rtg-access] .access-field{display:block;margin:0 0 19px;color:var(--access-ink);font-size:12px;line-height:1.6}
+#gate[data-rtg-access] .access-field input,#onbGate #onbIn{
+  display:block;width:100%;max-width:100%;min-width:0;min-height:56px;box-sizing:border-box;margin:7px 0 0;padding:14px 15px;
+  border:1px solid var(--access-line);border-radius:0;background:var(--access-surface);color:var(--access-ink);
+  font:400 16px/1.5 Inter,sans-serif;text-align:start;color-scheme:light;box-shadow:none;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+#gate[data-rtg-access] input:focus,#onbGate #onbIn:focus{border-color:var(--access-burgundy)!important;box-shadow:inset 0 -2px 0 var(--access-burgundy);outline:0}
+#gate[data-rtg-access] input::placeholder,#onbGate #onbIn::placeholder{color:#918e86;opacity:1}
+#gate[data-rtg-access] input[aria-invalid="true"]{border-color:#a11f45}
+#gate[data-rtg-access] .access-secondary{
+  min-height:42px;padding:9px 0;border:0;background:none;color:var(--access-burgundy);font-size:12px;
+  text-decoration:none;border-bottom:1px solid transparent;
+}
+#gate[data-rtg-access] .access-secondary:hover{border-bottom-color:currentColor}
+#gate[data-rtg-access] .access-back{margin-bottom:20px;color:var(--access-muted)}
+#gate[data-rtg-access] .access-error{margin:15px 0;color:#8c1738;font-size:13px;line-height:1.6}
+#gate[data-rtg-access] .access-error:empty,#gate[data-rtg-access] .access-status:empty{display:none}
+#gate[data-rtg-access] .access-status{margin:15px 0;color:var(--access-ink);font-size:13px;line-height:1.6}
+#gate[data-rtg-access] button:disabled,#onbGate button:disabled{opacity:.55;cursor:wait;transform:none}
+#gate[data-rtg-access] .access-summary{
+  margin:16px 0;color:var(--access-muted);font-size:12px;line-height:1.75;overflow-wrap:anywhere;
+}
+#gate[data-rtg-access] .access-summary summary{cursor:pointer;min-height:42px;display:flex;align-items:center}
+#gate[data-rtg-access] .access-summary button{display:block;min-height:40px;padding:4px 0;font-size:12px}
+#gate[data-rtg-access] .access-foundation{display:block;margin:16px 0;color:var(--access-burgundy);font-size:13px;line-height:1.6;text-underline-offset:4px}
+#gate[data-rtg-access] form#agForm{
+  width:100%!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;color:var(--access-ink)!important;box-shadow:none!important;
+}
+#gate[data-rtg-access] form#agForm .access-field{color:var(--access-ink)!important}
+#gate .access-language-notice,#onbGate .access-language-notice{
+  margin:14px 0;padding-inline-start:12px;border-inline-start:2px solid var(--access-gold);
+  color:var(--access-muted);font:400 12px/1.6 Inter,sans-serif;
+}
+.access-meta{
+  margin-top:clamp(38px,7vh,70px);padding-top:17px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:18px;
+  border-top:1px solid var(--access-line);color:var(--access-muted);font-size:10px;
+}
+.access-meta a:hover{color:var(--access-burgundy)}
+.access-protected{display:flex;align-items:center;gap:8px}
+.access-protected i{width:7px;height:7px;border-radius:50%;background:var(--access-gold);box-shadow:0 0 0 5px rgba(133,112,7,.09)}
+
+/* Onboarding is the same account surface after a session is established. */
+html body[data-ios-home] #onbGate:not([hidden]){
+  position:fixed!important;inset:0!important;z-index:10001!important;display:grid!important;place-items:center;
+  width:100%!important;height:100dvh!important;margin:0!important;padding:clamp(28px,7vw,90px)!important;
+  overflow:auto!important;background:
+    radial-gradient(circle at 16% 90%,rgba(133,112,7,.12),transparent 31%),
+    var(--access-paper)!important;color:var(--access-ink)!important;color-scheme:light;
+}
+#onbGate .onb-card{width:min(100%,760px);max-width:760px;margin:0;text-align:start;color:var(--access-ink)}
+#onbGate .access-brand{
+  margin:0 0 55px;padding-bottom:16px;display:flex;align-items:baseline;justify-content:space-between;
+  border-bottom:1px solid var(--access-line);color:var(--access-ink);font:400 29px/1 "Bodoni Moda",Georgia,serif;
+}
+#onbGate .access-brand small{color:var(--access-gold);font:650 9px/1.4 Inter,sans-serif;letter-spacing:.16em}
+#onbGate .onb-brand-actions{display:flex;align-items:center;gap:18px}
+#onbGate .onb-mond{display:none}
+#onbGate .onb-heading{
+  max-width:700px;margin:0;color:var(--access-ink);font:500 clamp(48px,7vw,84px)/.92 Inter,sans-serif;letter-spacing:-.07em;text-wrap:balance;
+}
+#onbGate .onb-zin{max-width:590px;min-height:0;margin:23px 0;color:var(--access-muted);font:400 16px/1.65 Inter,sans-serif}
+#onbGate .onb-rij{display:flex;flex-wrap:wrap;margin:0;border:0;gap:14px}
+#onbGate .onb-rij #onbIn{flex-basis:100%}
+#onbGate #onbGo{width:auto;min-width:190px;font-family:Inter,sans-serif;cursor:pointer}
+#onbGate .onb-acties{display:grid;gap:0;margin:18px 0}
+#onbGate .onb-acties button{
+  min-height:48px;margin:0;padding:10px 0;border:0;border-bottom:1px solid var(--access-line);
+  background:none;color:var(--access-ink);font:400 13px/1.5 Inter,sans-serif;text-align:start;
+}
+#onbGate .onb-lees{
+  max-height:38dvh;margin:16px 0;padding:20px;overflow:auto;border:1px solid var(--access-line);border-radius:0;
+  background:var(--access-surface);color:var(--access-ink);font:400 13px/1.75 Inter,sans-serif;white-space:pre-wrap;
+}
+#onbGate .onb-consent{display:flex;align-items:flex-start;gap:12px;margin:20px 0;color:var(--access-ink);font-size:13px;line-height:1.6}
+#onbGate .onb-consent input{width:23px;height:23px;flex:0 0 23px;margin:2px 0;accent-color:var(--access-burgundy)}
+#onbGate .onb-consent[hidden]{display:none}
+#onbGate .onb-fout{min-height:20px;color:#8c1738;font-size:13px;line-height:1.6}
+#onbGate .onb-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 16px;font:400 12px/1.6 Inter,sans-serif}
+#onbGate .onb-links a{display:inline-flex;align-items:center;min-height:42px;color:var(--access-muted);text-underline-offset:4px}
+
+/* Longer scripts and right-to-left languages retain the same hierarchy. */
+#gate[data-rtg-access] :is(.access-title,.access-description,.access-primary),
+#onbGate :is(.onb-heading,.onb-zin,#onbGo){overflow-wrap:anywhere;hyphens:auto}
 [dir="rtl"] #gate[data-rtg-access] .access-link>span[aria-hidden="true"]{transform:scaleX(-1)}
 #gate[data-rtg-access] input:is([type="email"],[type="password"]){direction:ltr;text-align:start}
 #gate[data-rtg-access] .access-summary bdi{unicode-bidi:isolate}
 
-#gate .access-language-notice,#onbGate .access-language-notice{font:400 13px/1.6 Inter,sans-serif;color:#e3d1d7;border-inline-start:2px solid #c63565;padding-inline-start:12px;margin:14px 0}
-
-/* The access portal owns the entire signed-out viewport. Later shared world
-   styles must not turn it back into a card inside the desktop workspace. */
-html body[data-ios-home][data-rtg-skin="heritage"] #rtgCommand #gate[data-rtg-access]:not([style*="display: none"]),
-html body[data-ios-home][data-rtg-skin="heritage"] #gate[data-rtg-access]:not([style*="display: none"]){
- --rtg-world-ink:#f4eddc;
- --rtg-world-muted:#dccbd0;
- --rtg-world-bg:#17070d;
- --rtg-world-card-strong:#4e1026;
- --txt:#f4eddc;
- --rtg-txt:#f4eddc;
- --muted:#dccbd0;
- --soft:#dccbd0;
- position:fixed!important;
- inset:0!important;
- z-index:10000!important;
- width:100%!important;
- max-width:none!important;
- height:100dvh!important;
- min-height:100dvh!important;
- margin:0!important;
- border:0!important;
- border-radius:0!important;
- overflow:auto!important;
- background:
-  radial-gradient(70rem 55rem at 8% 100%,rgba(163,46,89,.2),transparent 64%),
-  linear-gradient(135deg,#240710 0%,#390919 52%,#17070d 100%)!important;
- background-color:#faf8f3!important;
- box-shadow:none!important;
-}
-body:has(#gate[data-rtg-access]:not([style*="display: none"])){overflow:hidden!important}
-html body #gate[data-rtg-access] form#agForm{
- width:100%!important;
- margin:0!important;
- padding:0!important;
- border:0!important;
- border-radius:0!important;
- background:transparent!important;
- color:#f4eddc!important;
- box-shadow:none!important;
-}
-html body #gate[data-rtg-access] form#agForm .access-field{color:#f4eddc!important}
-
-@media(min-width:900px){
- html body[data-ios-home][data-rtg-skin="heritage"] #rtgCommand #gate[data-rtg-access]:not([style*="display: none"]),
- html body[data-ios-home][data-rtg-skin="heritage"] #gate[data-rtg-access]:not([style*="display: none"]){
-  display:grid!important;
-  grid-template-columns:minmax(18rem,.8fr) minmax(28rem,1.2fr);
-  align-items:center;
-  gap:clamp(4rem,9vw,11rem);
-  padding:clamp(3rem,7vw,7rem) max(3rem,calc((100vw - 1320px)/2))!important;
- }
- #gate[data-rtg-access] .access-brand{
-  align-self:center;
-  margin:0!important;
-  color:#f4eddc;
-  font-size:clamp(5rem,10vw,10rem);
-  letter-spacing:-.055em;
-  text-align:start;
- }
- #gate[data-rtg-access] .access-brand small{
-  margin-top:1.5rem;
-  padding-top:1.5rem;
-  border-top:1px solid rgba(244,237,220,.28);
-  font-size:.63rem;
-  letter-spacing:.3em;
- }
- #gate[data-rtg-access] .access-content{
-  width:min(100%,510px);
-  margin:0;
-  padding-inline-start:clamp(2rem,5vw,5rem);
-  border-inline-start:1px solid rgba(244,237,220,.24);
- }
- #gate[data-rtg-access] .access-title{
-  font-size:clamp(4.25rem,6.5vw,7rem);
-  line-height:.9;
-  text-wrap:balance;
- }
-}
-
 @media(max-width:899px){
- html body[data-ios-home][data-rtg-skin="heritage"] #rtgCommand #gate[data-rtg-access]:not([style*="display: none"]),
- html body[data-ios-home][data-rtg-skin="heritage"] #gate[data-rtg-access]:not([style*="display: none"]){
-  display:block!important;
-  /* The shared brand header remains visible over this fixed viewport. Its
-     real height and the device safe area both precede the first heading. */
-  padding:calc(var(--edge-top,44px) + env(safe-area-inset-top,0px) + 24px) 24px calc(var(--rtg-adaptive-inset,100px) + env(safe-area-inset-bottom,0px) + 24px)!important;
- }
+  html body[data-ios-home] #gate[data-rtg-access]:not([style*="display: none"]),
+  html body[data-ios-home] #rtgCommand #gate[data-rtg-access]:not([style*="display: none"]){
+    display:block!important;padding:0!important;
+  }
+  #gate[data-rtg-access] .access-brand{
+    display:flex!important;min-height:0;height:172px;padding:calc(env(safe-area-inset-top,0px) + 19px) 24px 22px;
+    border-inline-end:0;border-bottom:1px solid var(--access-line);overflow:visible;
+  }
+  .access-brand-copy{margin-top:34px}
+  .access-brand-copy p{max-width:none;margin-top:9px;font-size:37px;line-height:.92}
+  .access-system,.access-brand-principles{display:none}
+  #gate[data-rtg-access] .access-content{
+    width:100%;max-width:620px;margin:0 auto;padding:54px 24px calc(env(safe-area-inset-bottom,0px) + 46px);
+  }
+  #gate[data-rtg-access] .access-title{font-size:clamp(52px,15.2vw,76px)}
+  #gate[data-rtg-access][data-access-view]:not([data-access-view="welcome"]) .access-title{font-size:clamp(38px,11vw,52px)}
+  .access-meta{margin-top:46px}
+}
+@media(max-width:520px){
+  #gate[data-rtg-access] .access-brand{height:158px}
+  .access-brand-copy{margin-top:27px}
+  .access-brand-copy p{font-size:34px}
+  #gate[data-rtg-access] .access-content{padding-top:46px}
+  #gate[data-rtg-access] .access-description{font-size:15px}
+  .access-meta{grid-template-columns:1fr auto;gap:12px 18px}
+  .access-protected{grid-column:1/-1}
+  html body[data-ios-home] #onbGate:not([hidden]){place-items:start;padding:calc(env(safe-area-inset-top,0px) + 24px) 22px calc(env(safe-area-inset-bottom,0px) + 32px)!important}
+  #onbGate .access-brand{margin-bottom:42px}
+  #onbGate .onb-heading{font-size:clamp(43px,13vw,62px)}
+  #onbGate #onbGo{width:100%}
+}
+@media(max-height:700px) and (min-width:900px){
+  #gate[data-rtg-access] .access-content{padding-block:48px}
+  .access-brand-copy{margin-top:48px}
+  .access-system{min-height:270px}
+  .access-brand-copy p{font-size:54px}
+  .access-meta{margin-top:28px}
+}
+@media(prefers-reduced-motion:reduce){
+  #gate[data-rtg-access] *,#onbGate *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }

@@ -31,7 +31,7 @@
   function signatuur(root) {
     if (root.querySelector(':scope > .rtg-toegang-signatuur')) return;
     var balk = d.createElement('div'); balk.className = 'rtg-toegang-signatuur'; balk.setAttribute('aria-label', 'RTG beveiligde toegang');
-    var id = d.createElement('span'); id.className = 'rtg-toegang-id'; id.textContent = 'RTG ID'; balk.appendChild(id);
+    var id = d.createElement('span'); id.className = 'rtg-toegang-id'; id.textContent = 'RTG Account'; balk.appendChild(id);
     var status = d.createElement('span'); status.className = 'rtg-toegang-status'; status.textContent = 'Beveiligde toegang'; balk.appendChild(status);
     root.insertBefore(balk, root.firstChild);
   }

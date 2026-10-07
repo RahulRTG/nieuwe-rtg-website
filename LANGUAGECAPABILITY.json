@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-06T23:23:57.809Z",
-  "completedAt": "2026-10-06T23:24:20.677Z",
+  "startedAt": "2026-10-07T00:10:59.670Z",
+  "completedAt": "2026-10-07T00:11:17.728Z",
   "node": "v24.18.0",
   "command": "npm run language:proof",
   "testExitCode": 0,
-  "testOutputSha256": "4836cd340f6afae81e3187173bd9746a7aedfa4dc92bfa06fab1f9a992275f12",
+  "testOutputSha256": "307262cf3122f8e6fbeb2b07579214fd22274df1098f78060d9b6d47b782eb2d",
   "sources": {
     "public/apps/access/meaning.js": "268dc805c892ee0e351c14fd2f8d955aa292b556a20af8109bece178559c8bf4",
-    "public/apps/access/portal.css": "5575f01be901faa917a15d866de060e33b0a1fb261767303343d8157d3202524",
-    "public/apps/app.html": "b768be91d099cae3f54ef0349feff92e748a7db4e868593c32fe6ddb82cdc3de",
-    "public/apps/app-main.js": "4bedcb308df6c69985adf4ad10ade3068dfa2d881d446790b1bc48b45f425192",
+    "public/apps/access/portal.css": "c8180105f31526ae104fe27c61bb8c1647ffc49cf917c02cc4cae6349e0a3ce1",
+    "public/apps/app.html": "143ea8b09f0956dc29a64999926f820205ddedd2328ea07d2d38eb8b47223e22",
+    "public/apps/app-main.js": "7a4ccd546c244531cc1e69130bd4f8c0f0fff77981bc7e1580b16946aa950188",
     "public/shared/rtg-edge-2.css": "b9a7bf6db6f2d8109d526ad073f08ec5f769f4cd70b77b02a5d21a495390c05c",
     "public/shared/rtg-adaptive-edge.css": "534bce5e20e126bdc43816410541b39d4b3a1fcb51c9887804a163eb2cf3122f",
     "public/shared/rtg-simple.css": "93a955c26d15e2f1854961ff4fb87f64627b87f239e1d39e8ddbdb0588b7ad6c",
@@ -31,12 +31,12 @@
     "server/translate/cache.js": "51fb8ae3cfe124f8da256f9ef20378990f290a85f24c32c49e59a01fb8a1f32a",
     "server/translate/uitslag.js": "98446b05189312cdda8e60a56685d2f2affad1d226fcc6a3bafad6845c7346dd",
     "server/kern/taalkeuring.js": "0110a0f1fa1e5a23a1676210778a148c3589fe38361197cbe29b73c518c7b271",
-    "server/server.js": "3e200657ff471df8c5305459531b95af766a8fc16bb15302e60e524e838f3f7b",
+    "server/server.js": "aceca40ec062d6046322578adf5bd50577f2ba9cd24a621eaae9e51754f027db",
     "server/lib/ui-vertaling.js": "f0b120a51a1dce2b573bea44b0f59d3879a985d6cbfec243ce4c3a2d76c5b8c7",
     "server/local-ai.js": "05e2de3bf8be5b432cf1af6d7a077471770757c44b519eab126be51d8a485213",
     "server/ai.js": "ba5c8c6e951f8585e33f95b6c17ae4b515e0dd21ab0dd066e5b6d065093a2b4a",
-    "scripts/language-proof.js": "843ea714a1ad2d4015b37fd0a16732c1cd5d7bfb39968a55d9504ccc9485529e",
-    "test/access-language.e2e.js": "4618ce955888d2196998c896227201c0efc9bad352ed20b41745f32657f9cb58",
+    "scripts/language-proof.js": "e753d68ae3e670e83af84d59e7d63554bd56d6e88f6f8659accc34e7aa222639",
+    "test/access-language.e2e.js": "dfde9fb5db28f269e9b079fa66019553aef16a4033a8608152d326a0789767ba",
     "test/i18n-dictionary.test.js": "2002718bc924dfe36bb2cdfba3f29e97b3d364d01b318c285a83be891fcae42b",
     "test/language-foundations.test.js": "ca8bea3d19284ca768e970b990d7698095c65cd217b27924221f40635b6f6b2b",
     "test/onboarding.test.js": "ed42e70414a48fee52d0ca7b55487413c946e174fab73d79ae68613822161138"
@@ -81,7 +81,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -103,7 +103,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Werelden",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": false
       },
       "criticalCopy": {
@@ -128,7 +128,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -150,7 +150,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": false
       },
       "criticalCopy": {
@@ -175,7 +175,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -197,7 +197,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -222,7 +222,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -244,7 +244,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -269,7 +269,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -291,7 +291,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -316,7 +316,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -338,7 +338,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -363,7 +363,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -385,7 +385,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -410,7 +410,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -432,7 +432,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -457,7 +457,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -479,7 +479,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -504,7 +504,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -526,7 +526,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -551,7 +551,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -573,7 +573,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -598,7 +598,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -620,7 +620,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -645,7 +645,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -667,7 +667,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -692,7 +692,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -714,7 +714,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -739,7 +739,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -761,7 +761,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -786,7 +786,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -808,7 +808,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -833,7 +833,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -855,7 +855,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -880,7 +880,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -902,7 +902,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -927,7 +927,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -949,7 +949,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -974,7 +974,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -996,7 +996,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1021,7 +1021,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1043,7 +1043,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1068,7 +1068,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1090,7 +1090,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1115,7 +1115,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1137,7 +1137,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1162,7 +1162,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1184,7 +1184,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1209,7 +1209,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1231,7 +1231,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1256,7 +1256,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1278,7 +1278,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1303,7 +1303,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1325,7 +1325,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1350,7 +1350,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1372,7 +1372,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1397,7 +1397,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1419,7 +1419,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1444,7 +1444,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1466,7 +1466,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1491,7 +1491,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1513,7 +1513,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1538,7 +1538,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1560,7 +1560,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1585,7 +1585,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1607,7 +1607,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1632,7 +1632,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1654,7 +1654,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1679,7 +1679,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1701,7 +1701,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1726,7 +1726,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1748,7 +1748,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1773,7 +1773,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1795,7 +1795,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1820,7 +1820,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1842,7 +1842,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1867,7 +1867,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1889,7 +1889,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1914,7 +1914,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1936,7 +1936,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1961,7 +1961,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -1983,7 +1983,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2008,7 +2008,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2030,7 +2030,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2055,7 +2055,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2077,7 +2077,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2102,7 +2102,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2124,7 +2124,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2149,7 +2149,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2171,7 +2171,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2196,7 +2196,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2218,7 +2218,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2243,7 +2243,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2265,7 +2265,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2290,7 +2290,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2312,7 +2312,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2337,7 +2337,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2359,7 +2359,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2384,7 +2384,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2406,7 +2406,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2431,7 +2431,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2453,7 +2453,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2478,7 +2478,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2500,7 +2500,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2525,7 +2525,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2547,7 +2547,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2572,7 +2572,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2594,7 +2594,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2619,7 +2619,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2641,7 +2641,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2666,7 +2666,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2688,7 +2688,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2713,7 +2713,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2735,7 +2735,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2760,7 +2760,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2782,7 +2782,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2807,7 +2807,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2829,7 +2829,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2854,7 +2854,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2876,7 +2876,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2901,7 +2901,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2923,7 +2923,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2948,7 +2948,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -2970,7 +2970,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2995,7 +2995,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3017,7 +3017,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3042,7 +3042,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3064,7 +3064,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3089,7 +3089,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3111,7 +3111,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3136,7 +3136,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3158,7 +3158,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3183,7 +3183,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3205,7 +3205,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3230,7 +3230,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3252,7 +3252,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3277,7 +3277,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3299,7 +3299,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3324,7 +3324,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3346,7 +3346,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3371,7 +3371,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3393,7 +3393,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3418,7 +3418,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3440,7 +3440,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3465,7 +3465,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3487,7 +3487,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3512,7 +3512,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3534,7 +3534,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3559,7 +3559,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3581,7 +3581,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3606,7 +3606,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3628,7 +3628,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3653,7 +3653,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3675,7 +3675,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3700,7 +3700,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3722,7 +3722,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3747,7 +3747,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3769,7 +3769,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3794,7 +3794,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3816,7 +3816,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3841,7 +3841,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3863,7 +3863,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3888,7 +3888,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3910,7 +3910,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3935,7 +3935,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -3957,7 +3957,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3982,7 +3982,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4004,7 +4004,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4029,7 +4029,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4051,7 +4051,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4076,7 +4076,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4098,7 +4098,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4123,7 +4123,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4145,7 +4145,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4170,7 +4170,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4192,7 +4192,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4217,7 +4217,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4239,7 +4239,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4264,7 +4264,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4286,7 +4286,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4311,7 +4311,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4333,7 +4333,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4358,7 +4358,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4380,7 +4380,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4405,7 +4405,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4427,7 +4427,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4452,7 +4452,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4474,7 +4474,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4499,7 +4499,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4521,7 +4521,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4546,7 +4546,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4568,7 +4568,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4593,7 +4593,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4615,7 +4615,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4640,7 +4640,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4662,7 +4662,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4687,7 +4687,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4709,7 +4709,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4734,7 +4734,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4756,7 +4756,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4781,7 +4781,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4803,7 +4803,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4828,7 +4828,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4850,7 +4850,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4875,7 +4875,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4897,7 +4897,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4922,7 +4922,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4944,7 +4944,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4969,7 +4969,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -4991,7 +4991,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5016,7 +5016,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5038,7 +5038,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5063,7 +5063,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5085,7 +5085,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5110,7 +5110,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5132,7 +5132,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5157,7 +5157,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5179,7 +5179,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5204,7 +5204,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5226,7 +5226,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5251,7 +5251,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5273,7 +5273,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5298,7 +5298,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5320,7 +5320,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5345,7 +5345,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5367,7 +5367,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5392,7 +5392,7 @@
         "nativeKeyboardAndIME": "NOT_MEASURED"
       },
       "fonts": {
-        "family": "\"Bodoni Moda\", Georgia, serif",
+        "family": "Inter, ui-sans-serif, sans-serif",
         "completeGlyphCoverage": "NOT_MEASURED"
       },
       "formatting": {
@@ -5414,7 +5414,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "worldsLabel": "Worlds",
+        "preAccess": "HIDDEN_BEFORE_ACCESS",
         "sourceFallback": true
       },
       "criticalCopy": {

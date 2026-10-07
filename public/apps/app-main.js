@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'db532206';
+var RTG_BOUW = '70026b69';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -570,7 +570,19 @@ var RTG_BOUW = 'db532206';
     gate.dataset.rtgAccess = 'true';
     gate.setAttribute('data-i18n-ignore','');
     gate.innerHTML =
-      '<div class="access-brand" aria-label="RTG">RTG<small>' + 'VEILIGE TOEGANG' + '</small></div>' +
+      '<section class="access-brand" aria-label="RTG">' +
+        '<div class="access-brand-head"><a href="https://www.rahultravelgroup.com/" aria-label="RTG website"><span translate="no">RTG</span></a>' +
+          '<button class="access-language" id="agLanguage" type="button" aria-label="Taal kiezen">NL</button></div>' +
+        '<div class="access-brand-copy"><small>' + 'VEILIGE TOEGANG' + '</small><p id="agBrandLine">Technologie voor het leven.</p></div>' +
+        '<div class="access-system" aria-hidden="true"><i class="access-system-ring access-system-ring-one"></i><i class="access-system-ring access-system-ring-two"></i>' +
+          '<span class="access-system-node access-system-personal"><b>Personal</b><em>Account</em></span>' +
+          '<span class="access-system-node access-system-travel"><b>Travel</b><em>Journey</em></span>' +
+          '<span class="access-system-node access-system-work"><b>Work</b><em>Role</em></span>' +
+          '<span class="access-system-node access-system-connect"><b>Connect</b><em>People</em></span>' +
+          '<span class="access-system-core"><b translate="no">RTG</b><em>Account</em><i></i></span>' +
+        '</div>' +
+        '<p class="access-brand-principles"><span>Account</span><span>Trust</span><span>Human control</span></p>' +
+      '</section>' +
       '<div class="access-content">' +
         '<button class="access-secondary access-back" id="agBack" type="button" hidden>' + 'Terug' + '</button>' +
         '<p class="access-progress" id="agStappen" role="status" aria-live="polite" hidden></p>' +
@@ -600,6 +612,8 @@ var RTG_BOUW = 'db532206';
         '<p class="access-error" id="agError" role="alert"></p>' +
         '<a class="access-foundation" id="agFoundation" href="/apps/foundation/os-publiek.html" hidden>' +
           'Ontdek FoundationOS. Dit is en blijft altijd 100% gratis.' + '</a>' +
+        '<footer class="access-meta"><span class="access-protected" id="agProtected"><i></i>Beveiligde verbinding</span>' +
+          '<a id="agPrivacy" href="/apps/juridisch/privacy.html">Privacy</a><a id="agHelp" href="https://www.rahultravelgroup.com/support/">Hulp</a></footer>' +
       '</div>';
     const el = id => gate.querySelector('#' + id);
     const inp = el('agIn'), form = el('agForm'), title = el('agTitle');
@@ -669,10 +683,10 @@ var RTG_BOUW = 'db532206';
       el('agFoundation').hidden = true;
       el('agGo').textContent = T('access.portal.continue','Ga verder');
       if (view === 'welcome') {
-        title.textContent = T('access.portal.welcome_intro','Welkom in uw');
+        title.textContent = T('access.portal.welcome_intro','Welkom bij');
         title.appendChild(document.createElement('br'));
         const brand = document.createElement('em'); brand.textContent=T('access.portal.brand','RTG.'); title.appendChild(brand);
-        el('agZin').textContent = T('access.portal.one_place_for_life_travel_work_and_opportunity','Eén toegang tot uw leven, reizen, werk en kansen.');
+        el('agZin').textContent = T('access.portal.one_place_for_life_travel_work_and_opportunity','Eén account voor RTG, Connect, Travel en Work.');
       } else if (view === 'register') {
         const s = steps()[step]; title.textContent = s.title; el('agZin').textContent = s.text;
         el('agStappen').textContent = T('access.portal.progress','Stap {step} van 4').replace('{step}',String(step+1));
@@ -724,6 +738,9 @@ var RTG_BOUW = 'db532206';
       el('agPasskey').dataset.rtgMeaning='identity.passkey.verify';
       gate.setAttribute('aria-label',T('access.portal.sign_in','Log in'));
       gate.querySelector(".access-brand small").textContent=T("access.portal.secure_access","VEILIGE TOEGANG");
+      el('agBrandLine').textContent=T('access.portal.technology_for_life','Technologie voor het leven.');
+      el('agLanguage').textContent=String(lang() || 'nl').toUpperCase();
+      el('agLanguage').setAttribute('aria-label',T('language.chooser.title','Kies uw taal'));
       gate.querySelector("#agBack").textContent=T("access.portal.back","Terug");
       gate.querySelector("#agPasskey span").textContent=T("access.portal.continue_with_a_passkey","Verder met passkey");
       gate.querySelector(".access-hint").textContent=T("access.portal.you_use_your_device_s_security","U gebruikt de beveiliging van uw apparaat.");
@@ -734,6 +751,9 @@ var RTG_BOUW = 'db532206';
       gate.querySelector("#agSummary summary").textContent=T("access.portal.review_your_details","Controleer uw gegevens");
       gate.querySelector("#agForgot").textContent=T("access.portal.forgot_your_password","Wachtwoord vergeten");
       gate.querySelector("#agFoundation").textContent=T("access.portal.explore_foundationos_it_is_and_always_will_be_100_free","Ontdek FoundationOS. Dit is en blijft altijd 100% gratis.");
+      el('agProtected').lastChild.textContent=T('access.portal.secure_connection','Beveiligde verbinding');
+      el('agPrivacy').textContent=T('access.portal.privacy','Privacy');
+      el('agHelp').textContent=T('access.portal.help','Hulp');
       if (interests && interests.length) {
         el('agExperience').textContent=T('access.portal.explored','U verkende {worlds}. Dit wordt hier getoond en niet in uw account opgeslagen.').replace('{worlds}',interests.join(', '));
         el('agExperience').hidden=false;
@@ -836,6 +856,7 @@ var RTG_BOUW = 'db532206';
     }
     form.addEventListener('submit',event=>{event.preventDefault();submit();});
     el('agPasskey').addEventListener('click',passkeyLogin);
+    el('agLanguage').addEventListener('click',()=>{ if (window.RTGi18n) RTGi18n.openModal(); });
     el('agAnders').addEventListener('click',()=>render('login',true));
     el('agNieuw').addEventListener('click',()=>{step=0;render('register',true);});
     el('agForgot').addEventListener('click',()=>render('forgot',true));
@@ -1102,7 +1123,9 @@ var RTG_BOUW = 'db532206';
     onbEl('onbLanguageNotice').hidden=supported && lang()==='nl';
     onbEl('onbLanguageNotice').textContent=supported
       ? T('access.onb.sourceNotice','De overeenkomst hieronder is de Nederlandse brontekst. Geef alleen uw akkoord als u deze begrijpt.')
-      : T('access.onb.languageNotice','Deze overeenkomst is in het Nederlands. De bevestiging is beschikbaar in het Nederlands en Engels. Kies een van deze talen via de Edge Bar.');
+      : T('access.onb.languageNotice','Deze overeenkomst is in het Nederlands. De bevestiging is beschikbaar in het Nederlands en Engels. Kies een van deze talen via de knop Taal.');
+    const languageButton=onbEl('onbLanguage');
+    if(languageButton) languageButton.textContent=String(lang() || 'nl').toUpperCase();
     if(onbStap==='teken') onbEl('onbGo').disabled=onbBezig || !supported;
     return supported;
   }
@@ -1303,6 +1326,8 @@ var RTG_BOUW = 'db532206';
     const go = document.getElementById('onbGo'), inp = document.getElementById('onbIn');
     if (go && inp) go.addEventListener('click', function(){ onbInvoer(inp.value); });
     if (inp) inp.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); onbInvoer(inp.value); } });
+    const language = document.getElementById('onbLanguage');
+    if (language) language.addEventListener('click', function(){ if (window.RTGi18n) RTGi18n.openModal(); });
     const kf = document.getElementById('onbKycFile');
     if (kf) kf.addEventListener('change', function(){ const f = kf.files[0]; kf.value = ''; onbPaspoortGekozen(f); });
   })();

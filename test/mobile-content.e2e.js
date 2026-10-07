@@ -197,7 +197,7 @@ for (const engine of engines) {
       const guest = await context(browser,390,false), login = await guest.newPage();
       volg(login);
       await open(login,'/apps/app.html?pas=rtg');
-      await painted(login,'#gate button:not([hidden])');
+      await painted(login,'#gate .access-primary:not([hidden])');
       assert.deepEqual(errors, [], 'no client errors during Pass transitions; ' + netwerkStand(login));
     } finally { await browser.close(); }
   });

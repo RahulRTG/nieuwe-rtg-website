@@ -48,10 +48,10 @@
       el('agFoundation').hidden = true;
       el('agGo').textContent = T('access.portal.continue','Ga verder');
       if (view === 'welcome') {
-        title.textContent = T('access.portal.welcome_intro','Welkom in uw');
+        title.textContent = T('access.portal.welcome_intro','Welkom bij');
         title.appendChild(document.createElement('br'));
         const brand = document.createElement('em'); brand.textContent=T('access.portal.brand','RTG.'); title.appendChild(brand);
-        el('agZin').textContent = T('access.portal.one_place_for_life_travel_work_and_opportunity','Eén toegang tot uw leven, reizen, werk en kansen.');
+        el('agZin').textContent = T('access.portal.one_place_for_life_travel_work_and_opportunity','Eén account voor RTG, Connect, Travel en Work.');
       } else if (view === 'register') {
         const s = steps()[step]; title.textContent = s.title; el('agZin').textContent = s.text;
         el('agStappen').textContent = T('access.portal.progress','Stap {step} van 4').replace('{step}',String(step+1));

@@ -267,7 +267,11 @@ test('5. een geclaimde kassacode die de manager introk, geeft goed en fout wacht
    account en een eigen kassacode zette een aanvaller hem dus terug wanneer hij
    wilde: de les van N4 (kern/identiteit/wachtwoordrem.js, de kop). Hier: negen
    weigeringen, een geslaagde aanmelding, dan de tiende weigering, en daarna is
-   het adres dicht (429), ook voor een aanmelding die verder klopt.
+   het adres dicht (429), ook voor een poging die zonder de rem voorbij stap 3
+   komt. Dat is Olaf met een tweede geldige kassacode en zijn goede wachtwoord:
+   zonder de rem krijgt hij 409 "al aangemeld" (stap 4). Een geldige aanmelding
+   is het dus niet, wel een poging waar elke controle tot en met stap 3 ja op
+   zegt.
 
    VANAF EEN LOKAAL ADRES, zoals in test/werkplek-rem.test.js: gaat de emmer
    dicht, dan meldt hij brute force en zet de noodrem een vreemd adres in

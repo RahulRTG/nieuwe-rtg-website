@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-10-06",
+  "vastgelegd": "2026-10-07",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 50,
@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 15,
     "onbewaakt": 0,
-    "ratelTanden": 167,
+    "ratelTanden": 178,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 2,
     "rolscheidingGaten": 0,
@@ -59,7 +59,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 2128,
+    "testbestanden": 2129,
     "toetsenNietGemeten": 129,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -127,7 +127,7 @@
     "veranderbereikZonderBereik": 530,
     "stilLezing": 5,
     "stilLezingMeters": 61,
-    "stilLezingBereik": 695,
+    "stilLezingBereik": 699,
     "bewijsOnderscheidt": 6,
     "connectDomeinenGemeten": 23,
     "afgeleidZonderEigenaar": 1,
@@ -161,7 +161,18 @@
     "positieNavBlijft": 0,
     "positieNaTaak": 0,
     "positiePassages": 0,
-    "aankomstUitPositie": 0
+    "aankomstUitPositie": 0,
+    "adressenKapot": 23,
+    "mediaOndertitelOpen": 4,
+    "serviceBevoegdheidStil": 0,
+    "rotatieMetDeHand": 15,
+    "uitvoerVoorgedragen": 8,
+    "edgeContextSchuld": 49,
+    "bronscannerGemist": 593,
+    "bronscannerSpook": 4,
+    "meetkeuringGezakt": 0,
+    "refundOnverklaard": 15,
+    "schermeigenaarOpen": 8
   },
   "notities": [
     {
@@ -4273,6 +4284,13 @@
       "meter": "activeringOndergrens 49 -> 50",
       "reden": "Samenvoeging van alle 50 open PR's op integrate/all-open-prs-20261006. De functie democratie (DemocratieOS, al op main) staat nu in ACTIVERING.json omdat dat register opnieuw is gemeten; zijn envelop is een ondergrens omdat de meter `post` als onbekende kernsleutel leest in een routemodule met positionele parameters (routes/democratie/index.js). Een beperking van de meter, geen nieuwe koppeling.",
       "waarheen": "De activeringsmeter routemodules met positionele parameters laten herkennen."
+    },
+    {
+      "datum": "2026-10-06",
+      "soort": "structureel",
+      "meter": "nieuw in NORM.json: adressenKapot 23; mediaOndertitelOpen 4; serviceBevoegdheidStil 0; rotatieMetDeHand 15; uitvoerVoorgedragen 8; edgeContextSchuld 49; bronscannerGemist 593; bronscannerSpook 4 (was 6); meetkeuringGezakt 0; refundOnverklaard 15; schermeigenaarOpen 8; ratelTanden 167 -> 178 (strakker: elf meters erbij)",
+      "reden": "Besluit van de eigenaar: elke schuldratel die als losse constante buiten NORM.json leefde, wordt een geijkte meter in NORM.json, zodat er een inventaris van latten is en scripts/normbasis.js een verhoging zonder notitie tegenhoudt. Het waren er elf: KAPOT_MAX (scripts/adressen.js), OPEN_MAX/STIL_MAX/ROTATIE_MAX (scripts/check.js regels 49, 65 en 75), VOORGEDRAGEN_MAX (scripts/lib/uitvoerproef.js), SCHULD_MAX (test/edgenieuwscherm.test.js), GEMIST_MAX en SPOOK_MAX (test/magnaat-capabilities.test.js), OPEN_MAX (test/meetkeuring.test.js), ONVERKLAARD_MAX (test/refundmigratie.test.js) en OPEN_MAX (test/schermeigenaar.test.js). De waarden zijn exact de constanten van dat moment, op een na: bronscannerSpook stond als constante op 6 terwijl de meting 4 geeft (POST /api/geld/, /api/member/spel/, /api/rtf/spel/ en /api/rtfos/), dus staat hij hier op 4 -- een ratel die twee boven de stand staat, laat twee nieuwe spookroutes ongemerkt door. Geen lat is verlaagd. De aanroepers houden hun eigen bewering en melding en lezen het getal via scripts/lib/normwaarde.js; rotatieMetDeHand en schermeigenaarOpen blijven daar gelijkheidsratels (minder dan de norm zakt ook, tot npm run norm:vast hem strak trekt).",
+      "waarheen": "De waarden staan nu onder meters in NORM.json; elke meter staat in METERS van scripts/norm.js (met dezelfde telling als zijn aanroeper) en heeft een proef in test/meterijk.test.js. De losse constanten bestaan niet meer."
     }
   ],
   "prestatie": {
@@ -4292,10 +4310,10 @@
   },
   "sinds": {
     "keuringOmvang": "2026-09-27",
-    "testbestanden": "2026-10-06",
+    "testbestanden": "2026-10-07",
     "toetsenNietGemeten": "2026-10-06",
     "inlineStijlAttributen": "2026-10-06",
-    "ratelTanden": "2026-10-04",
+    "ratelTanden": "2026-10-06",
     "metingenZonderRatel": "2026-10-04",
     "bewijsAchterstand": "2026-10-06",
     "toetsenOngevoeligPct": "2026-09-05",
@@ -4385,7 +4403,7 @@
     "veranderbereikZonderBereik": "2026-09-16",
     "stilLezing": "2026-09-15",
     "stilLezingMeters": "2026-09-15",
-    "stilLezingBereik": "2026-10-06",
+    "stilLezingBereik": "2026-10-07",
     "bewijsOnderscheidt": "2026-09-23",
     "connectDomeinenGemeten": "2026-09-15",
     "afgeleidZonderEigenaar": "2026-10-04",
@@ -4422,7 +4440,18 @@
     "positiePassages": "2026-09-29",
     "aankomstUitPositie": "2026-09-29",
     "bronBlindeBestanden": "2026-10-04",
-    "zelfpoortendeToetsen": "2026-10-06"
+    "zelfpoortendeToetsen": "2026-10-06",
+    "adressenKapot": "2026-10-06",
+    "mediaOndertitelOpen": "2026-10-06",
+    "serviceBevoegdheidStil": "2026-10-06",
+    "rotatieMetDeHand": "2026-10-06",
+    "uitvoerVoorgedragen": "2026-10-06",
+    "edgeContextSchuld": "2026-10-06",
+    "bronscannerGemist": "2026-10-06",
+    "bronscannerSpook": "2026-10-06",
+    "meetkeuringGezakt": "2026-10-06",
+    "refundOnverklaard": "2026-10-06",
+    "schermeigenaarOpen": "2026-10-06"
   },
   "uitzonderingen": []
 }

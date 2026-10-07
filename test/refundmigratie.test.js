@@ -33,8 +33,12 @@ const M = require('../scripts/refundmigratie');
    met de hand waren nagelopen; wat overblijft leest tickets of boekingen, en
    die collecties zijn nog niet om. Hij mag alleen omlaag: elke lezer die iemand
    indeelt, verlaagt hem. Wie hem verhoogt om een toets groen te krijgen, haalt
-   de reden weg waarom deze kaart bestaat. */
-const ONVERKLAARD_MAX = 15;
+   de reden weg waarom deze kaart bestaat.
+
+   Het getal staat sinds 6 oktober 2026 in NORM.json (meter `refundOnverklaard`)
+   en niet meer als constante hier: zo kan het niet omhoog zonder een notitie
+   die scripts/normbasis.js leest. */
+const ONVERKLAARD_MAX = require('../scripts/lib/normwaarde').normwaarde('refundOnverklaard');
 
 test('0. de kaart raakt haar eigen werk niet kwijt', () => {
   const u = M.meet();
@@ -97,7 +101,7 @@ test('3. de twee lezers die geld OPTELDEN, lezen de terugstorting nu ook', () =>
 test('4. de kaart groeit niet stil: onverklaarde lezers mogen alleen omlaag', () => {
   const u = M.meet();
   assert.ok(u.telling.onbekend <= ONVERKLAARD_MAX,
-    'er staan ' + u.telling.onbekend + ' onverklaarde lezers in de kaart en de ratel staat op ' +
+    'er staan ' + u.telling.onbekend + ' onverklaarde lezers in de kaart en de ratel (NORM.json, refundOnverklaard) staat op ' +
     ONVERKLAARD_MAX + '. Deel de nieuwe in (scripts/refundmigratie.js) in plaats van de ratel te verhogen.');
 });
 

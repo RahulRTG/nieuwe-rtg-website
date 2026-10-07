@@ -204,37 +204,38 @@ test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
    gezin/stroom/ticket, gezin/sessie/verleng en gezin/passkey/weg), alle zes als router.post of
    router.get op dezelfde /api/foundation-router. /api/rtf/gezin/passkey schrijft zijn volle
    adres op en wordt gewoon gezien. */
-const GEMIST_MAX = 593;   // +2 imap/roteer, +4 foundation/les, +2 gezin/sessie, +6 gezinsdeur, +1 les/stroomticket, +1 gezin/toestemming/gezondheid: bekende vorm
-const SPOOK_MAX = 6;      // routes die de bronscanner noemt en de router niet
+/* DE TWEE GETALLEN STAAN SINDS 6 OKTOBER 2026 IN NORM.json (meters
+   `bronscannerGemist` en `bronscannerSpook`) en niet meer als constante hier.
+   De geschiedenis hierboven blijft staan, want die is de reden van het getal.
+   De laatste stand hier was 593 gemist (+2 imap/roteer, +4 foundation/les,
+   +2 gezin/sessie, +6 gezinsdeur, +1 les/stroomticket, +1
+   gezin/toestemming/gezondheid: allemaal de bekende vorm) en 6 spook. Een
+   volgende verhoging staat als notitie in NORM.json -- met dezelfde eis als
+   hierboven: noem de familie, anders kijk je naar iets anders. De telling zelf
+   woont in scripts/lib/bronscannerachterstand.js, zodat scripts/norm.js exact
+   hetzelfde telt. */
+const { normwaarde } = require('../scripts/lib/normwaarde');
+const GEMIST_MAX = normwaarde('bronscannerGemist');
+const SPOOK_MAX = normwaarde('bronscannerSpook');      // routes die de bronscanner noemt en de router niet
 
 test('de bronscanner loopt niet verder achter op de router dan is vastgelegd', () => {
-  const routedekking = require('../server/kern/routedekking');
-  const { execFileSync } = require('child_process');
-  const kaart = JSON.parse(execFileSync(process.execPath,
-    [path.join(root, 'scripts', 'routekaart.js'), '--json'],
-    { cwd: root, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024,
-      stdio: ['ignore', 'pipe', 'ignore'], env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } }));
-  const echt = new Set(routedekking.inventaris(kaart.routes).routes
-    .filter(r => r.pad.startsWith('/api/'))
-    .map(r => r.methode + ' ' + r.pad));
+  const { routerSleutels, achterstand } = require('../scripts/lib/bronscannerachterstand');
+  const echt = routerSleutels(root);
   assert.ok(echt.size > 1000, 'de router geeft zijn routes (' + echt.size + ')');
 
-  const gescand = new Set(bronnen.scanEndpoints(root).map(e => e.sleutel));
-  assert.ok(gescand.size > 1000, 'de bronscanner geeft routes (' + gescand.size + ')');
-
-  const gemist = [...echt].filter(s => !gescand.has(s));
-  const spook = [...gescand].filter(s => !echt.has(s) && !s.includes('/api/test/'));
+  const { gescand, gemist, spook } = achterstand(echt, root);
+  assert.ok(gescand > 1000, 'de bronscanner geeft routes (' + gescand + ')');
 
   /* De bewering staat op de TELLING en niet op een lus over de lijst: een lus
      over een lege verzameling controleert niets (LAT.md regel 9). De namen staan
      alleen in de melding. */
   assert.ok(gemist.length <= GEMIST_MAX,
-    gemist.length + ' routes ziet de bronscanner niet (vastgelegd: ' + GEMIST_MAX + '). ' +
+    gemist.length + ' routes ziet de bronscanner niet (vastgelegd in NORM.json, bronscannerGemist: ' + GEMIST_MAX + '). ' +
     'De eerste tien:\n  ' + gemist.slice(0, 10).join('\n  ') +
     '\n\nOfwel de route staat op een vorm die de regex niet leest (een mount of een ' +
     'voorvoegsel-hulpje), ofwel de bronscanner hoort op scripts/routekaart.js te ' +
     'gaan zoals scripts/lib/routes.js dat al doet.');
   assert.ok(spook.length <= SPOOK_MAX,
-    spook.length + ' routes noemt de bronscanner die de router niet heeft (vastgelegd: ' +
+    spook.length + ' routes noemt de bronscanner die de router niet heeft (vastgelegd in NORM.json, bronscannerSpook: ' +
     SPOOK_MAX + '): ' + spook.slice(0, 10).join(', '));
 });

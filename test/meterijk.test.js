@@ -76,11 +76,22 @@ const norm = require('../scripts/norm.js');
    wachttijd. Bronmutaties die de keuring zelf ijken gebruiken hieronder
    expliciet `meetVolledig`; alle andere metingen delen deze ene nulmeting. */
 let KEURINGSSNAPSHOT = null;
+/* DE LOSSE RATELS KRIJGEN HETZELFDE SNAPSHOT, om dezelfde reden. Hun telling
+   start een server (de bronscanner leest de routekaart) en leest een paar
+   honderd milliseconden bron; dat 120 keer doen voor meters die door geen van
+   die proeven worden aangeraakt, levert geen bewijs en wel tien minuten. Hun
+   EIGEN proeven meten vers, met meetVerseRatels() hieronder. */
+let LOSSERATELS = null;
 function meet() {
+  if (!KEURINGSSNAPSHOT) KEURINGSSNAPSHOT = norm.keuringRapport();
+  if (!LOSSERATELS) LOSSERATELS = norm.losseRatels();
+  return norm.meet({ keuring: KEURINGSSNAPSHOT, losseRatels: LOSSERATELS });
+}
+const meetVolledig = () => norm.meet();
+function meetVerseRatels() {
   if (!KEURINGSSNAPSHOT) KEURINGSSNAPSHOT = norm.keuringRapport();
   return norm.meet({ keuring: KEURINGSSNAPSHOT });
 }
-const meetVolledig = () => norm.meet();
 const deuren = require('../scripts/deuren');
 const VERBOSE = process.env.RTG_METERIJK_VERBOSE === '1';
 const meld = (tekst) => { if (VERBOSE) process.stderr.write('[meterijk] ' + tekst + '\n'); };
@@ -2382,8 +2393,153 @@ const IJKINGEN = {
     proef: (voor) => metVervangenJson('LUSSEN.json',
       (j) => { j.ratel.wekkersAsyncZonderRem = (j.ratel.wekkersAsyncZonderRem || 0) + 5; return j; },
       () => meet().lussenZonderOverlapRem - voor.lussenZonderOverlapRem)
+  },
+  /* DE ELF LOSSE RATELS VAN 6 OKTOBER 2026. Ze leefden als constante buiten
+     NORM.json en zijn binnengehaald als meter (zie de notitie van die dag). Elk
+     krijgt een foute invoer van precies de soort die zijn eigen aanroeper
+     tegenhoudt, en elk wordt VERS gemeten (meetVerseRatels): het snapshot van
+     de andere proeven zou de foute invoer per definitie niet zien.
+
+     "BEWEEGT HIJ" IS HIER TE WEINIG. Elke meter telt een DEEL van iets groters
+     (de kapotte adressen van alle beoordeelde, de open elementen van alle
+     gevonden, de stille bevoegdheden van alle rijen), en een meter die het
+     geheel leest in plaats van het deel beweegt bij een foute invoer OOK. Daarom
+     zet elke proef er een bekende MENGING neer -- iets wat moet meetellen naast
+     iets wat niet mag meetellen -- en eist hij het EXACTE verschil (precies()).
+     Nagetrokken met een mutatie per meter in losseRatels() van scripts/norm.js:
+     elke verkeerde lezing hieronder genoemd laat zijn proef zakken. */
+  adressenKapot: {
+    /* Twee adressen die nergens heen wijzen, een opgeknipt adres en een dat
+       klopt. Alleen de twee tellen; wie `opgeknipt` of `beoordeeld` leest, zakt.
+       zz-ijk-tijdelijk is een gereserveerd voorvoegsel; ruimResten() ruimt een
+       achtergebleven exemplaar op. */
+    proef: (voor) => metTijdelijkBestand('zz-ijk-tijdelijk.md',
+      'Twee verzonnen adressen: `kern/zz-ijk/bestaat/niet.js` en `server/zz-ijk/ook/niet.js`. ' +
+      'Opgeknipt: `server/accounts.js`. Echt: `server/kern/frictie/motor.js`.\n',
+      () => precies(2, meetVerseRatels().adressenKapot - voor.adressenKapot, 'adressenKapot'))
+  },
+  mediaOndertitelOpen: {
+    /* Twee nieuwe elementen, allebei MET een besluit: een `uitzending` zonder
+       weg naar tekst (open) en een stille `spiegel` (geregeld). Alleen de eerste
+       telt; wie alle gevonden elementen telt, zakt. Element en registerregel
+       horen allebei: alleen het element is een klacht ("zonder besluit"), alleen
+       de regel een spookregel, en geen van beide is een open element. */
+    proef: (voor) => metTijdelijkBestand('public/apps/zz-ijk-tijdelijk.html',
+      '<video id="zzijk"></video>\n<video id="zzijkspiegel" muted></video>\n',
+      () => metAanbouw('scripts/lib/ondertitelbesluit.js',
+        "\n/* tijdelijke ijk-aanbouw */\nREGISTER.set('public/apps/zz-ijk-tijdelijk.html#zzijk', ['uitzending', 'tijdelijke ijkuitzending zonder enige weg naar tekst']);\n" +
+        "REGISTER.set('public/apps/zz-ijk-tijdelijk.html#zzijkspiegel', ['spiegel', 'tijdelijke ijkspiegel, stil en zonder geluid']);\n",
+        () => precies(1, meetVerseRatels().mediaOndertitelOpen - voor.mediaOndertitelOpen, 'mediaOndertitelOpen')))
+  },
+  serviceBevoegdheidStil: {
+    /* Drie bevoegdheden erbij: een die het LID bevestigt en die nergens wordt
+       uitgelezen (stil), een die het lid bevestigt en die WEL een magNu()-lezer
+       heeft, en een die de ZETEL al verleent. Alleen de eerste telt; wie alle
+       rijen of alle te bevestigen bevoegdheden telt, zakt. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
+      "/* tijdelijke ijk-aanbouw */\nif (false) { magNu(null, 'zzijk.gelezen'); }\n",
+      () => metAanbouw('server/kern/service/teams.js',
+        "\n/* tijdelijke ijk-aanbouw */\nTEAMS.zzijk = { capabilities: ['zzijk.stil', 'zzijk.gelezen', 'zzijk.zetel'] };\n" +
+        "GROND['zzijk.stil'] = 'bevestiging';\nGROND['zzijk.gelezen'] = 'bevestiging';\nGROND['zzijk.zetel'] = 'zetel';\n",
+        () => precies(1, meetVerseRatels().serviceBevoegdheidStil - voor.serviceBevoegdheidStil, 'serviceBevoegdheidStil')))
+  },
+  rotatieMetDeHand: {
+    /* Twee regels die een rotatie zelf ophogen, in EEN bestand onder server/.
+       De ratel telt PLEKKEN (regels); wie bestanden telt, zakt. Achter
+       if (false): de meter leest tekst, en de regels hoeven nooit te draaien. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
+      '/* tijdelijke ijk-aanbouw */\nif (false) {\n  const x = {};\n  x.rotatie = x.rotatie + 1;\n  x.rotatie = (x.rotatie || 0) + 1;\n}\n',
+      () => precies(2, meetVerseRatels().rotatieMetDeHand - voor.rotatieMetDeHand, 'rotatieMetDeHand'))
+  },
+  uitvoerVoorgedragen: {
+    /* Twee verklaringen erbij: een die door niemand is afgetekend (de schuld) en
+       een die een mens aftekende. Alleen de eerste telt; wie alle verklaringen
+       telt, zakt. */
+    proef: (voor) => metAanbouw('scripts/lib/uitvoerproef.js',
+      "\n/* tijdelijke ijk-aanbouw */\nVERKLAARD['POST /api/zzijk/voorgedragen'] = V('sleutel', 'tijdelijke ijkverklaring', 'scripts/lib/uitvoerproef.js', 'VERKLAARD');\n" +
+      "VERKLAARD['POST /api/zzijk/afgetekend'] = V('sleutel', 'tijdelijke ijkverklaring', 'scripts/lib/uitvoerproef.js', 'VERKLAARD', 'een mens');\n",
+      () => precies(1, meetVerseRatels().uitvoerVoorgedragen - voor.uitvoerVoorgedragen, 'uitvoerVoorgedragen'))
+  },
+  edgeContextSchuld: {
+    /* Twee schermen erbij op de schuldlijst. Aanbouwen achteraan kan hier niet:
+       scripts/edgedekking.js stopt bij het requiren met een vroege return, dus
+       een regel achter het bestand draait nooit. Daarom een vervanging in de
+       lijst zelf, en terug byte voor byte. */
+    proef: (voor) => metVervangenTekst('scripts/edgedekking.js',
+      'const CONTEXT_SCHULD = Object.freeze([',
+      "const CONTEXT_SCHULD = Object.freeze(['/apps/zz-ijk-tijdelijk.html', '/apps/zz-ijk-tijdelijk-2.html', ",
+      () => precies(2, meetVerseRatels().edgeContextSchuld - voor.edgeContextSchuld, 'edgeContextSchuld'))
+  },
+  bronscannerGemist: {
+    /* Drie routes die de router WEL registreert en de bronscanner niet kan zien
+       (hun pad staat in een variabele, en de scanner eist een letterlijk pad dat
+       met /api/ begint), plus een die hij wel ziet. Gemist moet +3 zijn; wie de
+       spooklijst of alle routes leest, zakt. Hij hangt aan klok.js om dezelfde
+       reden als metIjkRoutes(): server/routes wordt niet automatisch geladen, en
+       de opruimtoets kijkt daar naar `_ijkOrig`. */
+    proef: (voor) => metAanbouw('server/routes/klok.js',
+      '\n/* tijdelijke ijk-aanbouw */\nconst _ijkOrig = module.exports;\nmodule.exports = (kern) => {\n  _ijkOrig(kern);\n' +
+      "  const _ijkPad = '/api/zz' + 'ijkgemist/';\n" +
+      '  for (let i = 0; i < 3; i++) kern.app.post(_ijkPad + i, (req, res) => res.json({ ok: true }));\n' +
+      "  kern.app.post('/api/zzijkgezien/a', (req, res) => res.json({ ok: true }));\n};\n",
+      () => precies(3, meetVerseRatels().bronscannerGemist - voor.bronscannerGemist, 'bronscannerGemist'))
+  },
+  bronscannerSpook: {
+    /* Twee letterlijke /api/-routes in een bestand dat niemand laadt: de scanner
+       noemt ze, de router kent ze niet. Een /api/test/-route ernaast telt niet
+       (die bestaat alleen onder NODE_ENV=test). Achter if (false), want ze
+       hoeven nooit te draaien om gelezen te worden. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
+      "/* tijdelijke ijk-aanbouw */\nif (false) {\n  app.get('/api/zzijkspook/a', h);\n  app.post('/api/zzijkspook/b', h);\n  app.get('/api/test/zzijkspook', h);\n}\n",
+      () => precies(2, meetVerseRatels().bronscannerSpook - voor.bronscannerSpook, 'bronscannerSpook'))
+  },
+  meetkeuringGezakt: {
+    /* Een instrument dat een grote uitvoer laat volgen door process.exit(): de
+       regel `pipe` van de meetkeuring. De functie wordt nooit aangeroepen; de
+       keuring leest de bron. Wie `oud` of `ok` leest, zakt. */
+    proef: (voor) => metAanbouw('scripts/uitvoerproef-route.js',
+      '\n/* tijdelijke ijk-aanbouw */\nfunction zzIjkPipe() {\n  console.log(JSON.stringify({ ijk: true }));\n  process.exit(0);\n}\n',
+      () => precies(1, meetVerseRatels().meetkeuringGezakt - voor.meetkeuringGezakt, 'meetkeuringGezakt'))
+  },
+  refundOnverklaard: {
+    /* Een lezer van `paid` naast een order die de refundmigratie niet kent.
+       Wie `verklaard` leest, zakt. */
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk.js',
+      '/* tijdelijke ijk-aanbouw */\nif (false) {\n  const order = {};\n  const betaald = order.paid;\n}\n',
+      () => precies(1, meetVerseRatels().refundOnverklaard - voor.refundOnverklaard, 'refundOnverklaard'))
+  },
+  schermeigenaarOpen: {
+    /* Twee oordelen erbij die open staan, en een dat al besloten is: dat laatste
+       hoort niet mee te tellen. Wie alle oordelen telt, zakt. */
+    proef: (voor) => metVervangenJson('SCHERMEIGENAAR.json', (j) => {
+      const basis = j.oordelen.find(o => o.stand === 'open');
+      j.oordelen.push({ ...basis, stand: 'open' }, { ...basis, stand: 'open' }, { ...basis, stand: 'zz-ijk-besloten' });
+      return j;
+    }, () => precies(2, meetVerseRatels().schermeigenaarOpen - voor.schermeigenaarOpen, 'schermeigenaarOpen'))
   }
 };
+
+/* Het exacte verschil, of een fout met de naam erbij. Een proef die alleen
+   "groter dan nul" eist, laat een meter door die het geheel telt in plaats van
+   het deel -- zie de kop van de elf losse ratels hierboven. */
+function precies(verwacht, verschil, sleutel) {
+  assert.equal(verschil, verwacht, sleutel + ' bewoog ' + verschil + ' op een invoer die hem precies ' +
+    verwacht + ' hoort te laten bewegen: de meter leest iets anders dan het deel dat zijn ratel telt');
+  return verschil;
+}
+
+/* Een stuk tekst in een bestaand bestand tijdelijk vervangen, en daarna byte
+   voor byte terugzetten. Voor de plekken waar aanbouwen achteraan niet werkt
+   (een module met een vroege return). Het oude stuk moet er PRECIES een keer
+   staan: twee keer betekent dat de ijking misschien de verkeerde plek raakt. */
+function metVervangenTekst(relPad, oud, nieuw, doe) {
+  const vol = path.join(WORTEL, relPad);
+  assert.equal(fs.existsSync(vol), true, 'de ijking wijzigt alleen iets dat bestaat: ' + relPad);
+  const tekst = fs.readFileSync(vol, 'utf8');
+  assert.equal(tekst.split(oud).length, 2, relPad + ' draagt "' + oud + '" niet precies een keer');
+  try { fs.writeFileSync(vol, tekst.replace(oud, nieuw)); return doe(); }
+  finally { fs.writeFileSync(vol, tekst); }
+}
 
 /* Een bestaand JSON-register tijdelijk aanpassen en daarna byte voor byte
    terugzetten. metAanbouw() hierboven plakt tekst achter een bestand; dat kan
@@ -2503,7 +2659,7 @@ test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
 test('de ijking ruimt zichzelf op: geen enkel spoor blijft achter', () => {
   for (const naam of ['test/zz-ijk-tijdelijk.test.js', 'test/zz-ijk-tijdelijk.e2e.js',
     'server/kern/zz-ijk-tijdelijk.js', 'public/apps/zz-ijk-tijdelijk.html',
-    'scripts/zz-ijk-tijdelijk.js', 'zz-ijk-tijdelijk.json',
+    'scripts/zz-ijk-tijdelijk.js', 'zz-ijk-tijdelijk.json', 'zz-ijk-tijdelijk.md',
     'server/kern/zz-ijk-tijdelijk-a.js', 'server/kern/zz-ijk-tijdelijk-b.js',
     'server/kern/zz-ijk-tijdelijk-deur.js', 'server/kern/zz-ijk-tijdelijk-schrijf.js',
     'server/kern/zz-ijk-tijdelijk-c.js',
@@ -2534,6 +2690,14 @@ test('de ijking ruimt zichzelf op: geen enkel spoor blijft achter', () => {
   assert.equal(klok.includes(IJKSTAM), false, 'server/routes/klok.js draagt nog ijkroutes');
   const lat = fs.readFileSync(path.join(WORTEL, 'LAT.md'), 'utf8');
   assert.equal(/^### 99\./m.test(lat), false, 'LAT.md draagt nog de tijdelijke ijkregel');
+  /* De aanbouwen van de elf losse ratels (6 oktober 2026), op inhoud. */
+  for (const rel of ['scripts/lib/ondertitelbesluit.js', 'server/kern/service/teams.js',
+    'scripts/lib/uitvoerproef.js', 'scripts/edgedekking.js', 'scripts/uitvoerproef-route.js']) {
+    const bron = fs.readFileSync(path.join(WORTEL, rel), 'utf8');
+    assert.equal(/zz-?ijk/i.test(bron), false, rel + ' draagt nog een ijk-aanbouw');
+  }
+  assert.equal(fs.readFileSync(path.join(WORTEL, 'SCHERMEIGENAAR.json'), 'utf8').includes('zz-ijk'), false,
+    'SCHERMEIGENAAR.json draagt nog een ijkoordeel');
 });
 
 test('elke meter met een norm staat in de registratie', () => {

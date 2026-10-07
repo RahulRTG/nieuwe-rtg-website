@@ -632,6 +632,13 @@ jobs:
       # meet de meter niets meer en hoort hij te vallen, niet stil te dalen.
       - name: De envelop (wat ligt er op tafel als het gezag wordt verleend)
         run: npm run envelop
+      # DE SCHERMEIGENAAR LOOPT NIET ACHTER (ZERO.md, golf A). Deze controle bestond,
+      # duurt acht seconden en stond in geen enkele workflow -- bij de nulmeting van
+      # 6 oktober stond hij rood terwijl ci.yml groen was. Hij leest de API-paden van
+      # elk scherm opnieuw en vergelijkt met SCHERMFUNCTIE.json; test/schermeigenaar
+      # houdt het eigenaarsregister tegen diezelfde meting.
+      - name: De schermfunctie (loopt het register achter op de schermen)
+        run: npm run schermfunctie:controle
       # De PostgreSQL-opslag, -accounts en chaos-test apart, met DATABASE_URL alleen
       # voor deze stap. Serieel (--test-concurrency=1): pg.test.js en chaos delen de
       # kv-tabel en zouden elkaar bij parallel draaien resetten.

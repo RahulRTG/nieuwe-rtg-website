@@ -1011,7 +1011,36 @@ const METERS = [
   { sleutel: 'edgeVeldPresence', richting: 'omhoog', wat: 'schermen die presence aan de Edge publiceren (EDGEDEKKING.json)' },
   { sleutel: 'edgeVeldVoortzetting', richting: 'omhoog', wat: 'schermen die voortzetting aan de Edge publiceren (EDGEDEKKING.json)' },
   { sleutel: 'edgeVeldHoofdactie', richting: 'omhoog', wat: 'schermen die hoofdactie aan de Edge publiceren (EDGEDEKKING.json)' },
-  { sleutel: 'edgeVeldTrust', richting: 'omhoog', wat: 'schermen die trust aan de Edge publiceren (EDGEDEKKING.json)' }
+  { sleutel: 'edgeVeldTrust', richting: 'omhoog', wat: 'schermen die trust aan de Edge publiceren (EDGEDEKKING.json)' },
+  /* DE LOSSE RATELS, BINNENGEHAALD OP 6 OKTOBER 2026.
+
+     Elf ratels leefden als constante buiten dit register: KAPOT_MAX in
+     scripts/adressen.js, OPEN_MAX, STIL_MAX en ROTATIE_MAX in scripts/check.js,
+     VOORGEDRAGEN_MAX in scripts/lib/uitvoerproef.js, en zes in test/. Ze deden
+     wat een ratel doet, maar niets van wat NORM.json bewaakt gold voor hen:
+     scripts/normbasis.js zag een verhoging niet, scripts/normverval.js eiste er
+     geen notitie bij, en npm run norm:vast trok een verbetering niet strak. Of
+     een verhoging een reden kreeg, hing aan wie hem deed.
+
+     Het besluit van de eigenaar: er is EEN inventaris van latten. De aanroeper
+     houdt zijn eigen bewering en melding (daar zegt hij het meest), maar leest
+     het getal via scripts/lib/normwaarde.js uit NORM.json; deze meters tellen
+     met DEZELFDE functie als die aanroeper, zodat er per ratel een telling is en
+     niet twee. Twee ervan zijn GELIJKHEIDSratels (rotatieMetDeHand en
+     schermeigenaarOpen): daar zakt de aanroeper ook als het getal ONDER de norm
+     komt, tot npm run norm:vast hem strak trekt -- anders blijft er ruimte
+     waarin er ongemerkt een bij kan. Hier gedragen ze zich als elke ratel. */
+  { sleutel: 'adressenKapot', richting: 'omlaag', wat: 'bestandsadressen in de documenten in de wortel die nergens heen wijzen (scripts/adressen.js)' },
+  { sleutel: 'mediaOndertitelOpen', richting: 'omlaag', wat: 'media-elementen met een besluit maar zonder weg naar tekst (keuringsregel 49, scripts/lib/ondertitelbesluit.js)' },
+  { sleutel: 'serviceBevoegdheidStil', richting: 'omlaag', wat: 'servicebevoegdheden die het lid bevestigt en die nergens worden uitgelezen (keuringsregel 65, scripts/servicecaps.js)' },
+  { sleutel: 'rotatieMetDeHand', richting: 'omlaag', wat: 'plekken in server/ die een rotatie met de hand ophogen in plaats van bearer.roteer() (keuringsregel 75; gelijkheidsratel)' },
+  { sleutel: 'uitvoerVoorgedragen', richting: 'omlaag', wat: 'uitvoerproef-uitzonderingen op een geheim veld die nog door geen mens zijn afgetekend (scripts/lib/uitvoerproef.js)' },
+  { sleutel: 'edgeContextSchuld', richting: 'omlaag', wat: 'schermen met een eigen hoofdactie die hun Edge-context nog niet zelf publiceren (CONTEXT_SCHULD, scripts/edgedekking.js)' },
+  { sleutel: 'bronscannerGemist', richting: 'omlaag', wat: 'routes die de router kent en de Magnaat-bronscanner niet ziet (scripts/lib/bronscannerachterstand.js)' },
+  { sleutel: 'bronscannerSpook', richting: 'omlaag', wat: 'routes die de Magnaat-bronscanner noemt en de router niet kent (scripts/lib/bronscannerachterstand.js)' },
+  { sleutel: 'meetkeuringGezakt', richting: 'omlaag', wat: 'instrumenten die zich niet aan de regels van de meetkeuring houden, oud register niet meegeteld (scripts/meetkeuring.js)' },
+  { sleutel: 'refundOnverklaard', richting: 'omlaag', wat: 'lezers van `paid` die de refundmigratie nog niet heeft ingedeeld (scripts/refundmigratie.js)' },
+  { sleutel: 'schermeigenaarOpen', richting: 'omlaag', wat: 'oordelen in SCHERMEIGENAAR.json die nog open staan (gelijkheidsratel)' }
 ];
 
 /* De telling zelf, als losse functie met de bestandslijst als invoer -- zodat
@@ -1379,6 +1408,51 @@ function leesRegister(naam, uit) {
   catch (e) { return undefined; }
 }
 
+/* DE LOSSE RATELS METEN, met de functie van hun eigen aanroeper.
+
+   Elke telling hieronder is de telling die de aanroeper zelf doet (het script,
+   de keuringsregel of de toets die de ratel handhaaft); hier wordt niets
+   opnieuw bedacht. Wie van die twee afwijkt, heeft twee waarheden voor een
+   ratel en dat is regel 4 van de lat.
+
+   VERS GELADEN, EN DAT IS DE IJKING EN GEEN ANGST. Vijf tellingen lezen een
+   lijst die in de CODE staat (het ondertitelregister, de teams van RTG Service,
+   de verklaarde uitzonderingen, de contextschuld). test/meterijk.test.js
+   bouwt daar tijdelijk een foute regel aan om te zien dat de meter uitslaat; een
+   module uit de require-cache zou die regel nooit zien, en dan slaat de meter
+   niet uit omdat hij niet KIJKT. Daarom gaan precies die modules eerst uit de
+   cache.
+
+   DIT KOST EEN SERVERSTART (scripts/routekaart.js, voor de bronscanner) en een
+   paar honderd milliseconden bronlezen. Wie meet() tientallen keren aanroept
+   terwijl de bronboom niet wijzigt (de meterijking), meet dit een keer en geeft
+   de uitslag mee als `bronnen.losseRatels` -- dezelfde afspraak als het
+   keuringssnapshot. */
+function vers(...modules) {
+  for (const m of modules) delete require.cache[require.resolve(m)];
+  return require(modules[0]);
+}
+
+function losseRatels() {
+  const bronscanner = require('./lib/bronscannerachterstand');
+  const achter = bronscanner.achterstand(bronscanner.routerSleutels(WORTEL), WORTEL);
+  return {
+    adressenKapot: vers('./adressen').meet(WORTEL, WORTEL).kapot.length,
+    mediaOndertitelOpen: vers('./lib/ondertitelbesluit').meet(WORTEL).open.length,
+    serviceBevoegdheidStil: vers('./servicecaps', '../server/kern/service/teams').meet().stil.length,
+    rotatieMetDeHand: require('./lib/handrotatie').plekken(WORTEL).length,
+    uitvoerVoorgedragen: vers('./lib/uitvoerproef').telVoorgedragen(),
+    edgeContextSchuld: vers('./edgedekking').CONTEXT_SCHULD.length,
+    bronscannerGemist: achter.gemist.length,
+    bronscannerSpook: achter.spook.length,
+    meetkeuringGezakt: require('./meetkeuring').meet().telling.gezakt,
+    refundOnverklaard: require('./refundmigratie').meet().telling.onbekend,
+    /* Uit het register zelf, met dezelfde filter als test/schermeigenaar.test.js.
+       Een onleesbaar register geeft undefined, en dat telt als slechter. */
+    schermeigenaarOpen: leesRegister('SCHERMEIGENAAR.json', (j) => j.oordelen.filter(o => o.stand === 'open').length)
+  };
+}
+
 function keuringRapport() {
   /* DE KEURING GEEFT EXITCODE 1 ZODRA HIJ IETS VINDT, en dat is precies zijn
      werk. execFileSync gooit daar standaard op, dus meet() klapte om op het
@@ -1690,7 +1764,12 @@ function meet(bronnen) {
   const { bewijsCellenBewezen, bewijsAchterstand } = telBewijslaag(
     (naam) => fs.readFileSync(path.join(WORTEL, naam), 'utf8'));
 
+  /* De losse ratels als laatste, NA alles wat kan gooien: een meet() die toch
+     omvalt op een onbruikbaar MUTATIES.json hoeft geen server te starten. */
+  const los = bronnen && bronnen.losseRatels ? bronnen.losseRatels : losseRatels();
+
   return {
+    ...los,
     bewijsCellenBewezen, bewijsAchterstand,
     metersOngeijkt,
     routesNietSchakelbaar,
@@ -2258,6 +2337,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, keuringRapport, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesEdge, leesMeetleer,
+module.exports = { meet, keuringRapport, losseRatels, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesEdge, leesMeetleer,
   PRESTATIEMETERS, leesPrestatie, leesMeting, prestatiePad, bron, PRESTATIEBESTAND, METINGBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

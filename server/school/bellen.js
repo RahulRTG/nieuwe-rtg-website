@@ -51,6 +51,17 @@ module.exports = (sctx) => {
     req.on('close', () => { clearInterval(hart); set.delete(client); });
   });
 
+  /* ICE-servers voor het schoolkanaal: alleen voor de leraar of een ouder van
+     DEZE klas, dezelfde twee poorten als het belsignaal hieronder. */
+  router.post('/school/ice', (req, res) => {
+    const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
+    if (!k) return res.status(404).json({ error: 'Klas niet gevonden.' });
+    const ik = leraarQ(req.body, k) || ouderQ(req.body, k);
+    if (!ik) return res.status(403).json({ error: 'Het belkanaal is voor de leraar en de ouders van deze klas.' });
+    const ijs = require('../kern/rtc/ijs');
+    ijs.stuur(res, ijs.antwoord('school:' + k.code + ':' + ik.wie, { hostname: req.hostname }));
+  });
+
   /* het belsignaal (ring/accept/offer/answer/ice/hangup). Afzender: een ouder
      of de leraar. Doel: 'leraar' of een gezinscode uit dezelfde klas. */
   router.post('/school/bel', (req, res) => {

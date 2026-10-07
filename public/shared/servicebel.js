@@ -48,7 +48,7 @@
 
     async function ijsblokjes() {
       if (ijs) return ijs;
-      try { ijs = (await (await fetch('/api/ice')).json()).iceServers || STUN; }
+      try { ijs = (await (await fetch('/api/ice', { headers: o.token ? { Authorization: 'Bearer ' + o.token } : {} })).json()).iceServers || STUN; }
       catch (e) { ijs = STUN; }
       return ijs;
     }

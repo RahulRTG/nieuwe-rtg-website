@@ -13,7 +13,7 @@
   "measured": {
     "capabilities": 228,
     "routes": 5449,
-    "mutationContracts": 5322,
+    "mutationContracts": 5326,
     "screens": 327
   },
   "classifications": [
@@ -2935,6 +2935,7 @@
       "server/routes/service-zaak.js",
       "server/routes/service.js",
       "server/routes/sleutelwoorden.js",
+      "server/routes/social.js",
       "server/routes/social/gezinnen.js",
       "server/routes/social/gezinnen/pin.js",
       "server/routes/social/gezinnen/toezicht.js",
@@ -3278,6 +3279,7 @@
       "server/config/productie-geld.js",
       "server/config/productie-identiteit.js",
       "server/config/release-trust.js",
+      "server/config/turn.js",
       "server/db/ledengids.js",
       "server/effectbon.js",
       "server/effectmeter.js",
@@ -9299,8 +9301,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 255,
-        "mutationRoutes": 254,
-        "declaredMutationSemantics": 98,
+        "mutationRoutes": 255,
+        "declaredMutationSemantics": 99,
         "sourceFileCount": 23,
         "kernelDependencyCount": 64,
         "screenCount": 28,
@@ -16473,8 +16475,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 367,
-        "mutationRoutes": 339,
-        "declaredMutationSemantics": 138,
+        "mutationRoutes": 341,
+        "declaredMutationSemantics": 140,
         "sourceFileCount": 84,
         "kernelDependencyCount": 90,
         "screenCount": 26,
@@ -16619,8 +16621,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 215,
-        "mutationRoutes": 214,
-        "declaredMutationSemantics": 89,
+        "mutationRoutes": 215,
+        "declaredMutationSemantics": 90,
         "sourceFileCount": 57,
         "kernelDependencyCount": 71,
         "screenCount": 0,
@@ -26563,8 +26565,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 2,
-        "mutationRoutes": 0,
-        "declaredMutationSemantics": 0,
+        "mutationRoutes": 1,
+        "declaredMutationSemantics": 1,
         "sourceFileCount": 2,
         "kernelDependencyCount": 2541,
         "screenCount": 0,

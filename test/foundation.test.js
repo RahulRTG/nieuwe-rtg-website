@@ -443,8 +443,14 @@ test('gezinsagenda en klusjes: plannen samen en sterren verdienen', async () => 
   assert.equal((await fetch(BASE + '/api/foundation/gezin/' + g.code + '/klussen', { headers: { Authorization: 'Bearer ' + gt } })).status, 403);
 });
 
-test('WebRTC: de app krijgt ijs-servers (STUN) voor het bellen', async () => {
-  const d = await json(await fetch(BASE + '/api/ice'));
+test('WebRTC: een gezinslid krijgt ijs-servers (STUN) voor het bellen, een vreemde geen sessie', async () => {
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'IJs', naam: 'Ma', pin: '2020' }));
+  const r = await fetch(BASE + '/api/foundation/gezin/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: g.code, token: g.token }) });
+  assert.equal(r.status, 200);
+  assert.equal((await fetch(BASE + '/api/foundation/gezin/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: g.code, token: 'nep' }) })).status, 403);
+  const d = await json(r);
   assert.ok(Array.isArray(d.iceServers) && d.iceServers.length >= 1, 'er is minstens een ICE-server');
   assert.ok(JSON.stringify(d.iceServers).includes('stun:'), 'STUN staat aan');
 });

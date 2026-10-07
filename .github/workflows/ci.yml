@@ -289,7 +289,13 @@ jobs:
       # los groen zijn. Een aanname over de omgeving is geen omgeving, en die
       # zin gold hier net zo goed.
       - name: libxml2 en Redis voor de onafhankelijke protocolproeven
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils redis-server
+        # coturn: test/rtc-relay.test.js beproeft het TURN-relais tegen een ECHTE
+        # turnserver (geen nagemaakte) en zakt in CI als die ontbreekt. De
+        # systeemdienst gaat meteen uit: de toets start zijn eigen exemplaar op
+        # vrije poorten, en 3478 hoort bij de STUN-server van de app.
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils redis-server coturn
+          sudo systemctl disable --now coturn || true
       # EEN GEZAKTE TOETS MOET TE LEZEN ZIJN, ANDERS IS HET GEEN SIGNAAL.
       # Deze stap zakte een keer met drie rode toetsen, en die namen waren niet
       # meer te achterhalen: node zet "not ok" op de plek waar de toets draaide,
@@ -735,7 +741,13 @@ jobs:
       # (accounts, link, inhoudswacht, postgres-requestcommit). Een aanname
       # over de omgeving is geen omgeving.
       - name: libxml2 en Redis voor de onafhankelijke protocolproeven
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils redis-server
+        # coturn: test/rtc-relay.test.js beproeft het TURN-relais tegen een ECHTE
+        # turnserver (geen nagemaakte) en zakt in CI als die ontbreekt. De
+        # systeemdienst gaat meteen uit: de toets start zijn eigen exemplaar op
+        # vrije poorten, en 3478 hoort bij de STUN-server van de app.
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils redis-server coturn
+          sudo systemctl disable --now coturn || true
       - name: De Rust-motor en de Sentinel bouwen
         working-directory: motor
         run: cargo build --release --locked
@@ -800,7 +812,13 @@ jobs:
       # scherf. De voorbereiding blijft daarom gelijk, ook nu unit en browser
       # op verschillende runners staan.
       - name: libxml2 en Redis voor de onafhankelijke protocolproeven
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils redis-server
+        # coturn: test/rtc-relay.test.js beproeft het TURN-relais tegen een ECHTE
+        # turnserver (geen nagemaakte) en zakt in CI als die ontbreekt. De
+        # systeemdienst gaat meteen uit: de toets start zijn eigen exemplaar op
+        # vrije poorten, en 3478 hoort bij de STUN-server van de app.
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils redis-server coturn
+          sudo systemctl disable --now coturn || true
       - name: De Rust-motor en de Sentinel bouwen
         working-directory: motor
         run: cargo build --release --locked
@@ -1302,6 +1320,12 @@ jobs:
       # vertrouwde hoofdlijn heeft gevuld en schrijven zelf niets terug.
       - name: Playwright + Chromium (uit de lockfile, per fase geklokt)
         run: node scripts/browserinstall.js --meting=browsermeting/${{ github.job }}-${{ matrix.deel }}.json
+      # test/rtc-relay.e2e.js belt in Chromium via een ECHTE coturn; zonder het
+      # pakket zakt die toets in CI. De systeemdienst gaat meteen uit.
+      - name: coturn voor de relaybelproef
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq coturn
+          sudo systemctl disable --now coturn || true
       # RTG_E2E_STRICT=1 zegt: deze omgeving BELOOFT schermtoetsen te draaien.
       # test/browserpoort.e2e.js zakt dan als er geen browser is. Zonder die
       # vlag slaan drieenveertig e2e-bestanden zichzelf stil over als Chromium

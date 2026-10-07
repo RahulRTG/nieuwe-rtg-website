@@ -38,4 +38,9 @@ module.exports = (sctx) => {
   require('./gezinnen/pin')(gctx);
   require('./gezinnen/link')(gctx);
   require('./gezinnen/toezicht')(gctx);
+  /* ICE-servers voor het gezinsbellen in de vriendenlaag: achter dezelfde
+     gezinsPoort, en de actor komt uit het geverifieerde profiel. */
+  const ijs = require('../../kern/rtc/ijs');
+  sctx.kern.app.post('/api/rtf/ice', gezinsPoort, (req, res) =>
+    ijs.stuur(res, ijs.antwoord('gezin:' + req.gezinslid.handle, { hostname: req.hostname })));
 };

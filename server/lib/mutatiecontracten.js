@@ -100,6 +100,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-codedeuren').CONTRACTEN,
   require('./mutatiecontracten-lesfamilie').CONTRACTEN,
   require('./mutatiecontracten-lesstroom').CONTRACTEN,
+  require('./mutatiecontracten-ijs').CONTRACTEN, // TURN-credentials, docs/turn-server.md
   require('./mutatiecontracten-werksleutels').CONTRACTEN,
   require('./mutatiecontracten-machinesleutels').CONTRACTEN,
   require('./mutatiecontracten-ssogeheim').CONTRACTEN,

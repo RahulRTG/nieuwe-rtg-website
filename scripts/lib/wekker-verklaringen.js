@@ -136,5 +136,11 @@ module.exports = [
     reden: 'de IMAP-server geeft een postvak vrij aan een mailprogramma, buiten elke route om. Hier stond eerst `ov-werkmail`, en dat was FOUT: server/imap.js is een leeslaag boven kern/rtmail-vak.js -- hetzelfde postvak dat over HTTP achter /api/member/rtmail zit, en dat valt onder `member`. `ov-werkmail` gaat over de bezorging van interne werkmail (/api/werkmail) en komt hier niet langs. De vergissing kostte niets in gedrag maar wel in meting: hij liet een ingang als lek tellen die dat niet is, want `member` staat vanaf trede 0 aan' },
   { bestand: 'server/stun.js', vertegenwoordigt: 'kern-live',
     voorwaarde: 'altijd, tenzij STUN_UIT=1',
-    reden: 'de eigen STUN-server bedient de ICE-kant van bellen; /api/ice hangt aan kern-live, de UDP-poort aan niets. Hij staat WEL standaard aan -- maar kern-live gaat al op trede 0 open, dus hier loopt de schakelaar niet achter op de deur' }
+    reden: 'de eigen STUN-server bedient de ICE-kant van bellen; /api/ice hangt aan kern-live, de UDP-poort aan niets. Hij staat WEL standaard aan -- maar kern-live gaat al op trede 0 open, dus hier loopt de schakelaar niet achter op de deur' },
+  /* DE TURN-RELAYPROEF (docs/turn-server.md). Twee bestanden, en geen van
+     beide is een tweede weg naar binnen. */
+  { bestand: 'server/kern/rtc/relaystand.js',
+    reden: 'de klok die elke vier minuten de echte TURN-relayproef draait, zodat de relaystand een vers bewijs heeft. Het is een gezondheidsmeting en geen functie: uitzetten opent niets maar laat het bewijs na tien minuten verlopen, en dan staat bellen fail-closed DICHT (dezelfde redenering als de gezondheidscontrole in kern/platformregister/bediening.js). Hij start alleen met een TURN_URL, de timer is unref, en de echte uitknop voor bellen is RTG_RTC_UIT=1, die ELKE laag dichtzet' },
+  { bestand: 'server/kern/rtc/turnclient.js',
+    reden: 'geen luisteraar maar een CLIENT: dgram.createSocket en net/tls.connect openen alleen een UITGAANDE verbinding naar de eigen coturn tijdens een relayproef, en sluiten die in de finally van relayproef.js. Er wordt op geen enkele poort geluisterd en niemand van buiten kan hier iets in gang zetten' }
 ];

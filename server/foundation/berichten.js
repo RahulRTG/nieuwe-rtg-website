@@ -84,6 +84,15 @@ module.exports = (ctx) => {
     res.json({ chats });
   });
 
+  /* ICE-servers voor het gezinsbellen. De sessie komt uit sessieVan (profiel-
+     token van dit gezin); kern/rtc/ijs.js beslist of er een TURN-credential bij
+     mag en geeft hem kortlevend en met een ondoorzichtig actorlabel. */
+  router.post('/gezin/ice', (req, res) => {
+    const s = sessieVan(req, res); if (!s) return;
+    const ijs = require('../kern/rtc/ijs');
+    ijs.stuur(res, ijs.antwoord('gezin:' + s.g.code + ':' + s.p.id, { hostname: req.hostname }));
+  });
+
   // (beeld)bellen: WebRTC-signaal (ring/accept/offer/answer/ice/hangup) doorgeven
   router.post('/gezin/bel', (req, res) => {
     const s = sessieVan(req, res); if (!s) return;

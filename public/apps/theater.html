@@ -572,7 +572,12 @@
     const m = zaal && zaal.mijn;
     thuisIds = m ? (m.videos || []).filter(v => v.bewaring === 'thuis').map(v => v.id) : [];
   }
-  const ijs = [{ urls: 'stun:stun.l.google.com:19302' }];
+  /* ICE-servers uit RTG's eigen uitgifte (geen externe STUN): kortlevende
+     TURN-credentials, dus elke twintig minuten ververst. */
+  let ijs = [];
+  const haalIjs = () => fetch('/api/ice', { headers: { Authorization: 'Bearer ' + token } })
+    .then(r => r.json()).then(d => { ijs = d.iceServers || []; }).catch(() => {});
+  if (token) { haalIjs(); setInterval(haalIjs, 20 * 60 * 1000); }
   const dienPcs = new Map();   // kijkerKey -> RTCPeerConnection (makerkant)
   async function dienUit(d) {
     // een kijker klopt aan: lees het origineel uit het eigen archief en

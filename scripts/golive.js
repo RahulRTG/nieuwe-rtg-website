@@ -33,6 +33,7 @@ const blokkeer = (t) => uit.push(['✗', t, true]);
 const waarschuw = (t) => uit.push(['⚠', t, false]);
 const goed = (t) => uit.push(['✓', t, false]);
 let ownerReadback = null;
+let turnRelay = null;
 
 /* .env.productie inlezen (alleen KEY=waarde-regels; # is commentaar). */
 function leesEnvBestand(pad) {
@@ -93,6 +94,22 @@ function leesEnvBestand(pad) {
   for (const f of r.fouten) blokkeer(f);
   for (const w of r.waarschuwingen) waarschuw(w);
   if (!r.fouten.length) goed('Configuratie: geen blokkerende fouten.');
+  /* HET RELAIS ECHT BEPROEVEN, niet alleen de variabelen. Publieke voice/video
+     vereist TURN (productie-communicatie.js); een geldige TURN_URL en een sterk
+     TURN_SECRET bewijzen alleen dat de configuratie er netjes uitziet. Deze
+     keurtaak draait in het KANDIDAATIMAGE met de echte productieconfig en doet
+     wat een browser doet: twee allocaties met een vers kortlevend credential,
+     permissies, en 64 KiB in beide richtingen door elk geconfigureerd adres.
+     Zakt dat, dan promoveert deze kandidaat niet -- geen waarschuwing. */
+  try {
+    const relaystand = require('../server/kern/rtc/relaystand');
+    const u = await relaystand.proef(env, { timeoutMs: 10000 });
+    turnRelay = { ...relaystand.publiekeUitslag(), configVingerafdruk: relaystand.binding(env).config };
+    if (u.ok) goed('TURN-relais: ' + u.urls.length + ' adres(sen) relayen aantoonbaar 64 KiB in beide richtingen met een kortlevend credential.');
+    else blokkeer('TURN-relais is niet aantoonbaar werkend (' + (u.reden || 'onbekend') + '): publieke voice/video zou niet via 4G, symmetrische NAT en bedrijfsfirewalls komen. Zie docs/turn-server.md.');
+  } catch (e) {
+    blokkeer('TURN-relais kon niet worden beproefd: ' + (e && e.code || 'onbekende fout') + '.');
+  }
   /* Een losse Node-instantie mag voor een afgeschermde proef op SQLite en
      proceslokale tellers draaien. Dat is niet hetzelfde als een B2B2C-
      go-live: geld, intrekking, rate limits en realtime moeten instanceverlies
@@ -364,6 +381,7 @@ function leesEnvBestand(pad) {
     alarmering,
     accounts: accountStand,
     ownerReadback,
+    turnRelay,
     foundation: foundationStand,
     controles: uit.map(([teken, tekst, hard]) => ({ teken, hard: !!hard, tekst: zonderGeheim(tekst) }))
   };

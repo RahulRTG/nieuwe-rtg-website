@@ -29,7 +29,7 @@
   function esc(x){ return String(x == null ? '' : x).replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';'); }
   const zend = (kind, extra) => API.call('/staff/call', Object.assign({ kind, video: true }, extra || {})).catch(() => {});
   async function haalIce(){
-    try { ice = (await (await fetch('/api/ice')).json()).iceServers; }
+    try { ice = (await API.call('/ice', {})).iceServers; }
     catch (e) { ice = [{ urls: 'stun:' + location.hostname + ':3478' }]; }
   }
   async function pakMedia(){

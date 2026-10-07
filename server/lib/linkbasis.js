@@ -42,4 +42,29 @@ function basisUitVerzoek(req, env) {
 const ONTBREEKT = 'APP_URL ontbreekt: deze installatie kent haar eigen adres niet, en een link in een e-mail '
   + 'wordt nooit gebouwd uit een adres dat de aanvrager meestuurt. Zet APP_URL, of open de site via een lokaal adres.';
 
-module.exports = { basisUitVerzoek, lokaleUrl, ONTBREEKT };
+/* DE VASTE BASIS: APP_URL, of anders een ECHTE openbare hostnaam uit
+   RTG_DOMAINS. Hier stond in ../server.js "het eerste element van RTG_DOMAINS"
+   -- maar die variabele draagt meestal CODEdomeinen (`member,social`,
+   ../opzet/routes.js), en dan werd 'https://member' de basis van elke link in
+   een e-mail: een adres dat nergens heen wijst, terwijl de installatie meende
+   haar eigen adres te kennen. Een element telt nu alleen als het een openbare
+   hostnaam is in de zin van ../config/adressoort.js (dezelfde indeling als de
+   productiekeuring, ../config/openbaar.js) -- geen codedomein, geen lokaal of
+   gereserveerd adres. Staat er geen, dan is er geen vaste basis (null), en
+   valt appUrl() terug op wat zonder vaste basis geldt. */
+function vasteBasis(env) {
+  const e = env || process.env;
+  const gezet = String(e.APP_URL || '').trim();
+  if (gezet) return gezet.replace(/\/+$/, '');
+  const { adresSoort } = require('../config/adressoort');
+  for (const ruw of String(e.RTG_DOMAINS || '').split(',')) {
+    const t = ruw.trim();
+    if (!t) continue;
+    let u;
+    try { u = new URL(/^https?:\/\//i.test(t) ? t : 'https://' + t); } catch (x) { continue; }
+    if (adresSoort(u.hostname) === 'openbaar') return 'https://' + u.host.toLowerCase();
+  }
+  return null;
+}
+
+module.exports = { basisUitVerzoek, lokaleUrl, vasteBasis, ONTBREEKT };

@@ -49,9 +49,10 @@ function installatieSoort(env) {
 
      RTG_DOMAINS ook. Die variabele draagt meestal de namen van CODEdomeinen
      (member, social -- server/opzet/routes.js), en die hebben geen punt en
-     blijven dus 'onbekend'. Maar ../server.js leest het eerste element als
-     HOSTNAAM voor de links in een e-mail (APP_URL_VAST), dus staat er een
-     publieke naam in, dan beweert de installatie daarmee dat ze daar woont. */
+     blijven dus 'onbekend'. Maar een openbare naam erin wordt de HOSTNAAM
+     voor de links in een e-mail (../lib/linkbasis.js vasteBasis, met dezelfde
+     adresSoort), dus staat er een publieke naam in, dan beweert de installatie
+     daarmee dat ze daar woont. */
   const lijst = (v) => String(v || '').split(',').map(d => d.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/[/:].*$/, '')).filter(Boolean);
   const opgaven = [
     ...(env && env.RTG_ACME === '1' ? lijst(env.RTG_TLS_DOMAIN).map(h => [h, 'RTG_TLS_DOMAIN (RTG_ACME=1)']) : []),

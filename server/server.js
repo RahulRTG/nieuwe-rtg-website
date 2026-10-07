@@ -144,8 +144,10 @@ process.on('uncaughtException', err => {
    In productie mag dat dus niet meer. De volgorde is nu:
    1. APP_URL, als die gezet is. Dat is het antwoord van de beheerder en die
       wint altijd.
-   2. Anders, in productie: het eerste domein uit RTG_DOMAINS (dat weet de
-      vloot toch al) -- ook uit de omgeving, dus ook niet te sturen.
+   2. Anders: een ECHTE openbare hostnaam uit RTG_DOMAINS -- ook uit de
+      omgeving, dus ook niet te sturen. Niet "het eerste element": die variabele
+      draagt meestal codedomeinen (member, social), en 'https://member' is geen
+      adres (lib/linkbasis.js vasteBasis).
    3. Anders, in productie: WEIGEREN we te gokken. Liever een link naar
       https://localhost die zichtbaar niet werkt dan een link naar een domein
       dat de aanvrager koos. Dat valt op en wordt gerepareerd; het andere niet.
@@ -155,20 +157,14 @@ process.on('uncaughtException', err => {
    De config-controle weigert inmiddels iedere productiestart zonder een vast
    geldig APP_URL; deze terugval blijft alleen extra verdediging voor het geval
    deze helper ooit vóór de configuratiekeuring wordt aangeroepen. */
-const APP_URL_VAST = (() => {
-  const gezet = String(process.env.APP_URL || '').trim();
-  if (gezet) return gezet.replace(/\/+$/, '');
-  const eerste = String(process.env.RTG_DOMAINS || '').split(',')[0].trim();
-  if (eerste) return 'https://' + eerste.replace(/^https?:\/\//, '').replace(/\/+$/, '');
-  return null;
-})();
+const linkbasis = require('./lib/linkbasis');
+const APP_URL_VAST = linkbasis.vasteBasis(process.env);
 /* 4 (vervolg). "Gewoon de header" was buiten productie OOK een server zonder
    NODE_ENV op een publiek adres, en daar schreef een POST /api/auth/forgot met
    `Origin: https://kwaad.example` precies die link in de mail. De kop levert de
    basis nu alleen als de link naar deze machine of het eigen netwerk wijst, of
    in de toetsstand (die alleen op de loopback luistert). Anders: '' -- en dan
    weigert de route die een link wil versturen, met de reden (lib/linkbasis.js). */
-const linkbasis = require('./lib/linkbasis');
 function appUrl(req) {
   if (APP_URL_VAST) return APP_URL_VAST;
   if (PRODUCTION) return 'https://localhost';

@@ -62,7 +62,10 @@ function opstelling() {
   schrijf(root, kandidaat.REL.imageArtifact, manifestBytes);
   schrijf(root, kandidaat.REL.image, manifestBytes);
   const prive = crypto.createPrivateKey(sleutels.prive);
-  const keten = (verwijzing, digest, sbomRel, herkomstRel) => {
+  const kwal = rol => ({ formaat:'rtg-kwalificatie-v1', rol, imageId:APP_ID, backupImageId:BACKUP_ID,
+    inhoudSha256:manifest.inhoudSha256, bestandAantal:manifest.bestandAantal,
+    imageBewijsSha256:'7'.repeat(64), voorSha256:'8'.repeat(64), naSha256:'9'.repeat(64), nietGeleverd:[] });
+  const keten = (verwijzing, digest, sbomRel, herkomstRel, rol) => {
     const sbom = herkomst.maakSbom({ app:{ naam:'rtg', versie:'1' }, image:verwijzing,
       os:[{ naam:'base', versie:'1', arch:'amd64' }], crates:[], npm:{ runtime:[], ontwikkeling:0 },
       node:'v26.0.0', bewijs:manifest, gemaakt:'2026-09-04T12:00:00.000Z',
@@ -72,14 +75,14 @@ function opstelling() {
     const document = herkomst.maakHerkomst({ image:verwijzing, digest, sbomBytes,
       sbomComponenten:sbom.components.length, bewijs:manifest,
       bron:{ commit, boom:bronManifest.boom, werkboomSchoon:true },
-      uitvoering:herkomst.uitvoeringHashes(root),
+      uitvoering:herkomst.uitvoeringHashes(root), kwalificatie:kwal(rol),
       bouw:{ draaier:'github-actions', workflow:'release-image', run:'123' },
       gemaakt:'2026-09-04T12:00:00.000Z' });
     document.handtekening = { algoritme:'ed25519', waarde:herkomst.teken(document, prive) };
     schrijf(root, herkomstRel, JSON.stringify(document) + '\n');
   };
-  keten(APP_REF, APP_DIGEST, kandidaat.REL.sbom, kandidaat.REL.herkomst);
-  keten(BACKUP_REF, BACKUP_DIGEST, kandidaat.REL.backupSbom, kandidaat.REL.backupHerkomst);
+  keten(APP_REF, APP_DIGEST, kandidaat.REL.sbom, kandidaat.REL.herkomst, 'app');
+  keten(BACKUP_REF, BACKUP_DIGEST, kandidaat.REL.backupSbom, kandidaat.REL.backupHerkomst, 'backup');
   const bron = { commit, boomVuil: false, herkomst: 'geverifieerd-imagebewijs',
     inhoudSha256: manifest.inhoudSha256 };
   schrijf(root, kandidaat.REL.pg, JSON.stringify({ formaat: 'rtg-pg-bewijs-v1',

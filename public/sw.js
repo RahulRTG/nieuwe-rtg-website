@@ -14,7 +14,7 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-49273132';
+const CACHE = 'rtg-app-5873184a';
 const SHELL = [
   /* The mandatory desktop standard is available offline too. */
   '/shared/interface/module-sdk.js',
@@ -47,7 +47,7 @@ const SHELL = [
   '/shared/rtg-world-widgets.css',
   '/shared/rtg-desktop-components.css',
   '/shared/rtg-world-palette.css', '/shared/rtg-editorial-system.css',
-'/apps/app.html', '/shared/id.js',
+'/apps/app.html', '/shared/id.js', '/shared/stroom.js',
   '/shared/sw-pass-assets.js', '/shared/pass-cache.js', '/shared/pass-recovery.js', '/shared/pass-recovery.css',
   /* Heritage is één systeemlaag. Een offline start mag niet alleen de HTML
      bewaren en daarna identiteit, materiaal, beweging of lettertypen missen. */

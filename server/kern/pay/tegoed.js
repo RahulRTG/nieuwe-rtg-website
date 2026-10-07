@@ -27,7 +27,7 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { schoon, nu, rekLid, saldoVan, id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid,
+  const { schoon, nu, rekLid, saldoVan, id, metIdem, boekAsync, betaalMetDekking, seintje, bestaatLid,
     MIN_CENTEN, MAX_CENTEN } = ctx;
   const g = require('./tegoed-gedeeld')(ctx);
   const { bon, claim, migratie, uitgifte } = g;
@@ -46,9 +46,9 @@ module.exports = (ctx) => {
     const doos = {};
     const r = await metIdem(idem ? 'tegoedkoop:' + codenaam + ':' + idem : null,
       'tegoedkoop|' + codenaam + '|' + c + '|' + (aan || ''), async () => {
-        const z = await zorgSaldo({ codenaam, centen: c, idem });
+        const { z, b } = await betaalMetDekking({ codenaam, centen: c, idem,
+          boeking: { van: rekLid(codenaam), naar: REK_TEGOED, centen: c, soort: 'tegoed', oms: oms || 'Tegoed gekocht' } });
         if (z.error) return z;
-        const b = await boekAsync({ van: rekLid(codenaam), naar: REK_TEGOED, centen: c, soort: 'tegoed', oms: oms || 'Tegoed gekocht' });
         if (b.error) return b;
         const t = uitgifte.uitgeef({ id: id('TG'), van: codenaam, vanSoort: 'lid', aan, centen: c,
           oms: schoon(oms, 80) || 'Tegoed', at: nu(), boeking: b.boeking.id }, 'lid:' + codenaam, doos);
@@ -80,6 +80,7 @@ module.exports = (ctx) => {
         return null;
       },
       soort: 'verzilver', door: codenaam, naar: rekLid(codenaam), idem,
+      poort: ctx.vrijgavePoort ? ctx.vrijgavePoort.intern : undefined,
       oms: (_s, t) => t.oms || 'Tegoed',
       onbekend: { status: 404, error: 'Deze tegoedcode kennen we niet.' }
     });

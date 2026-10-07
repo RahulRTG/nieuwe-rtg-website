@@ -35,6 +35,7 @@
    De injecteerbare `nu` blijft bestaan -- toetsen zetten hem -- maar de TERUGVAL
    is de klok en niet Date.now(). */
 const klok = require('../../lib/klok');
+const { maakSleutel } = require('../../db/economische-identiteit');
 
 const contractlaag = require('./contract');
 
@@ -55,7 +56,10 @@ function maakRonde({ fees, contracten, tegoed, verrekening, allocatie, boekAsync
     if (typeof boekAsync !== 'function') return { overgeslagen: 'geen boekfunctie' };
     return fees.herkans(async (f) => boekAsync({
       van: 'partner:' + f.supplierCode, naar: 'rtg:betaaldienst', centen: f.centen,
-      soort: 'betaaldienstkosten', oms: 'Betaaldienstkosten, herkansing', ref: f.ref
+      soort: 'betaaldienstkosten', oms: 'Betaaldienstkosten, herkansing', ref: f.ref,
+      /* Op de VORDERING: een ronde die na een crash dezelfde herkansing nog eens
+         probeert, boekt bij het grootboek niets nieuws. */
+      economischeSleutel: maakSleutel('pay-handeling', ['fee-herkans', f.id])
     }));
   }
 

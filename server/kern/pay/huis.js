@@ -5,7 +5,7 @@
    komt. Krijgt zijn gereedschap van ./verzoeken.js, dat het van kern/pay/index.js
    krijgt -- dezelfde vorm als ./tik.js. */
 'use strict';
-module.exports = ({ schoon, metIdem, zorgSaldo, boekAsync, rekLid, seintje, bestaatLid, MIN_CENTEN, MAX_CENTEN }) => {
+module.exports = ({ schoon, metIdem, betaalMetDekking, boekAsync, rekLid, seintje, bestaatLid, MIN_CENTEN, MAX_CENTEN }) => {
   /* ---------- de huisrekening van RTG ----------
      RTG Assets rekent af met "RTG Treasury": servicefees en overnames komen
      binnen, terugkopen en herroepingen gaan eruit. Dat liep via stuur() met de
@@ -25,15 +25,20 @@ module.exports = ({ schoon, metIdem, zorgSaldo, boekAsync, rekLid, seintje, best
     const van = schoon(vanCodenaam, 40);
     if (!van) return { status: 400, error: 'Van wie komt het?' };
     return metIdem(idem ? 'huisin:' + van + ':' + idem : null, 'huisin|' + van + '|' + c, async () => {
-      const z = await zorgSaldo({ codenaam: van, centen: c, idem });
+      const { z, b } = await betaalMetDekking({ codenaam: van, centen: c, idem,
+        boeking: { van: rekLid(van), naar: REK_HUIS, centen: c, soort: 'huis', oms: oms || 'RTG Treasury' } });
       if (z.error) return z;
-      const b = await boekAsync({ van: rekLid(van), naar: REK_HUIS, centen: c, soort: 'huis', oms: oms || 'RTG Treasury' });
       if (b.error) return b;
       seintje(van);
       return { ok: true, centen: c, bijgeladen: z.bijgeladen, boeking: b.boeking.id };
     });
   }
-  async function huisUit({ aanCodenaam, centen, oms, idem }) {
+  /* `afwikkeling` (een reden): de aanroeper verklaart dat dit geld TERUG gaat
+     naar een lid -- een correctie op een betaalde factuur (../factuurcorrectie.js)
+     -- en geen nieuwe uitgave van RTG. Een noodstop op het interne saldo laat het
+     dan door (../../lib/idem.js). Een terugkoop of een andere nieuwe uitgave
+     geeft hem niet mee en blijft dus achter de poort. */
+  async function huisUit({ aanCodenaam, centen, oms, idem, afwikkeling }) {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };
     const aan = schoon(aanCodenaam, 40);
@@ -44,7 +49,7 @@ module.exports = ({ schoon, metIdem, zorgSaldo, boekAsync, rekLid, seintje, best
       if (b.error) return b;
       seintje(aan);
       return { ok: true, centen: c, boeking: b.boeking.id };
-    });
+    }, typeof afwikkeling === 'string' && afwikkeling.trim() ? { afwikkeling: afwikkeling.trim() } : undefined);
   }
   return { huisIn, huisUit };
 };

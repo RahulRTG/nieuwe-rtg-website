@@ -61,6 +61,11 @@ if (kern.pay && kern.pay.koppelBevoegdTerug) kern.pay.koppelBevoegdTerug(id => b
    kantoor een beurs vast die RTG niet kan uitbetalen. Dezelfde late binding en
    dezelfde reden als de terugstorting hierboven. */
 if (kern.rugdekking && kern.rugdekking.koppelBevoegd) kern.rugdekking.koppelBevoegd(id => bevoegd.mag(id));
+/* STRIPE CONNECT AAN HET GROOTBOEK (server/betaal/connect/). Zonder deze regel
+   weigert elke partnerafrekening met GROOTBOEK_NIET_GEKOPPELD; met deze regel
+   boekt elke economische gebeurtenis (reservering, afgerekend, teruggeboekt)
+   hoogstens een keer in RTG Pay, op haar eigen sleutel (kern/pay/vrijgavepoort.js). */
+if (kern.pay) require('../betaal/connect').koppelGrootboek(require('../kern/pay/vrijgavepoort').maakConnectBoeking(kern.pay));
 /* RTG Bank (kern/bank): de eigen bank, gebouwd OP het RTG Pay-grootboek en met
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter

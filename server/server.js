@@ -47,6 +47,8 @@ const accounts = require('./accounts');
 const eigenaar = require('./eigenaar');
 const mail = require('./mail');
 const logboek = require('./log');
+// Elke console-regel van dit proces gaat door de centrale redactie (log-redactie.js).
+require('./log-redactie').bewaakConsole();
 const log = logboek.log;
 const testomgeving = require('./testomgeving');
 const betaal = require('./betaal');
@@ -160,10 +162,17 @@ const APP_URL_VAST = (() => {
   if (eerste) return 'https://' + eerste.replace(/^https?:\/\//, '').replace(/\/+$/, '');
   return null;
 })();
+/* 4 (vervolg). "Gewoon de header" was buiten productie OOK een server zonder
+   NODE_ENV op een publiek adres, en daar schreef een POST /api/auth/forgot met
+   `Origin: https://kwaad.example` precies die link in de mail. De kop levert de
+   basis nu alleen als de link naar deze machine of het eigen netwerk wijst, of
+   in de toetsstand (die alleen op de loopback luistert). Anders: '' -- en dan
+   weigert de route die een link wil versturen, met de reden (lib/linkbasis.js). */
+const linkbasis = require('./lib/linkbasis');
 function appUrl(req) {
   if (APP_URL_VAST) return APP_URL_VAST;
   if (PRODUCTION) return 'https://localhost';
-  return (req && req.headers && req.headers.origin) || (req ? req.protocol + '://' + req.get('host') : '');
+  return linkbasis.basisUitVerzoek(req, process.env);
 }
 
 // Fail-fast: weiger te starten als productie onveilig is ingesteld (demo aan,
@@ -664,11 +673,18 @@ const handelingsspoor = require('./lib/handelingsspoor')({ db, save });
    Deze dienst verzamelt de koppen van alle journalen en rekent af met een blok
    dat wordt teruggevoerd. Hij schrijft zelf niets weg: een anker dat deze
    software op dezelfde schijf zet, is geen anker. Zie ./lib/ankerdienst.js. */
-const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db });
+/* Het blok wordt getekend met een sleutel BUITEN de database: afgeleid uit het
+   procesgeheim (of RTG_ANKER_SIGN_KEY), audit P1-3a. */
+const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db,
+  sleutel: (doel) => (accounts.sleutelVoor ? accounts.sleutelVoor(doel) : null) });
 /* WAAR het blok heen gaat is inmiddels wel besloten: een tweede machine binnen
    RTG (./lib/ankerpost.js). Zonder RTG_ANKERPOST_URL doet die post niets en
    zegt hij dat -- geen bestemming blijft "niet in bedrijf". */
 const ankerpost = require('./lib/ankerpost').maakAnkerpost({ ankerdienst });
+/* DE AUDITWACHT (./lib/auditwacht.js): alle journalen bij het opstarten en
+   daarna periodiek nalopen; een breuk wordt een alarm en geen stille 409
+   (audit P1-4). */
+require('./lib/auditwacht').start({ db });
 
 /* DE LEVERANCIERSPOORT staat in ./opzet/leverancierpoort.js: de twee
    SSE-wegen, de melding aan een zaak, de code-index, de opzoeking, de poort
@@ -1020,46 +1036,11 @@ function leesUploadDataUrl(fname) {
 
 
 
-/* Live-verbinding. EventSource kan geen Authorization-header sturen, dus het
-   token gaat als query-parameter. */
-app.get('/api/stream', (req, res) => {
-  const token = req.query.token;
-  const sess = resolveSession(token);
-  if (!sess) return res.status(401).end();
-  const isolatieRealtime = require('./middleware/isolatiepoort-realtime');
-  const bewaakt = isolatieRealtime.registreer({ res, token, sessie: sess });
-  if (!bewaakt.toegestaan) return res.status(bewaakt.status || 503).json(bewaakt.antwoord);
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache, no-transform',
-    'Connection': 'keep-alive'
-  });
-  /* Open de SSE-handshake nu. De PostgreSQL-antwoordgrens buffert gewone
-     antwoorden tot COMMIT; voor deze read-only stroom is flushHeaders het
-     expliciete teken dat de stream veilig mag beginnen. */
-  if (typeof res.flushHeaders === 'function') res.flushHeaders();
-  res.write('retry: 3000\n\n');
-  const client = { tier: sess.tier, key: sess.key, res };
-  sseClients.push(client);
-  // gemiste persoonlijke events opnieuw afspelen (na een korte verbroken verbinding)
-  const sinds = Number(req.headers['last-event-id'] || req.query.since || 0);
-  if (sinds) speelOpnieuw(res, sess.key, sinds);
-  // onopgehaalde notificaties meteen meesturen -- uit dezelfde twee bakken als
-  // /api/notifications hieronder, anders mist de handshake juist de
-  // persoonlijke berichten
-  const unread = meldingenVan(sess).filter(n => !n.read);
-  sseSend(res, 'hello', { unread });
-  const ping = setInterval(() => {
-    if (!isolatieRealtime.magSchrijven(res)) return clearInterval(ping);
-    res.write(': ping\n\n');
-  }, 25000);
-  req.on('close', () => {
-    clearInterval(ping);
-    isolatieRealtime.vergeet(res);
-    const i = sseClients.indexOf(client);
-    if (i >= 0) sseClients.splice(i, 1);
-  });
-});
+/* Live-verbinding en de ruil van sessie naar stroomticket: ./opzet/stroomtoegang.js.
+   Een sessie staat nooit meer in een adres; meldingenVan komt hieronder pas
+   tot stand en wordt dus pas bij een verzoek gelezen. */
+const { sessiestroom } = require('./opzet/stroomtoegang')({ app, db, crypto, bewerkCollectie, accounts,
+  resolveSession, sseClients, sseSend, speelOpnieuw, meldingenVan: sess => meldingenVan(sess) });
 
 /* Welke bakken een lid ziet en afvinkt: ./opzet/meldingenlezen.js. */
 const { meldingenVan, markeerGelezen } = require('./opzet/meldingenlezen').maakMeldingenLezer((naam) => db.data.notifications[naam]);
@@ -1777,9 +1758,16 @@ const betaalOpdrachten = require('./kern/betaalopdracht')({
   // herhaling bij de provider nooit een tweede betaling wordt
   railInzenden: async (o) => {
     try {
+      /* De capability van DEZE uitbetaling (server/kern/vrijgave/): een
+         uitbetaling naar een lid, een partner of de RTFoundation zijn financieel
+         drie verschillende handelingen, en server/betaal/uitbetaling.js weigert
+         er een zonder naam. De soort van de opdracht zegt welke het is; een soort
+         zonder capability in het register krijgt er geen, en is dus dicht zodra
+         hij een echte rail zou raken. */
       const uit = await betaal.maakUitbetaling({
         bedrag: o.centen, valuta: o.valuta, iban: o.bestemming, begunstigde: o.begunstigde,
-        referentie: o.ledgerRef, idempotentieSleutel: o.idemSleutel, omschrijving: o.oms
+        referentie: o.ledgerRef, idempotentieSleutel: o.idemSleutel, omschrijving: o.oms,
+        vrijgave: require('./kern/betaalopdracht/vrijgave').capabilityVan(o.soort)
       });
       capGezondheid.meld('money.payout', true);
       return uit;
@@ -2214,7 +2202,7 @@ const kern = {
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
   securityLogKeten, handelingsspoor, ankerdienst, ankerpost,
-  zorgContact, klantSalon, salonClaimcode, afhaalcode, tickettoegang,
+  zorgContact, klantSalon, salonClaimcode, afhaalcode, tickettoegang, sessiestroom,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,
   stemmingVoor: stemming.stemmingVoor,

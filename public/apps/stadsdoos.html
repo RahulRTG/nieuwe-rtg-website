@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
 <script src="/shared/id.js"></script>
+<script src="/shared/stroom.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Stadsdoos veld-app</title>
@@ -217,7 +218,7 @@ $('#tDoe').addEventListener('click', async () => {
 let es = null, esT = null;
 function live(){
   if (!window.EventSource || es) return;
-  try { es = new EventSource('/api/office/stream?token=' + encodeURIComponent(TOKEN)); } catch (e) { return; }
+  try { es = RTGStroom.open('/api/office/stream', { stroom: 'kantoor', token: TOKEN }); } catch (e) { return; }
   es.addEventListener('sync', e => {
     let scope = null; try { scope = JSON.parse(e.data).scope; } catch (x) {}
     if (scope !== 'stad' || document.hidden) return;

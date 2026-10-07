@@ -26,7 +26,7 @@
 
 const maakZekering = require('./motorzekering');
 
-module.exports = function maakMotorverbinding({ boekPad, saldiPad, watBoeking, watSaldi }, opties = {}) {
+module.exports = function maakMotorverbinding({ boekPad, saldiPad, bekendPad, watBoeking, watSaldi }, opties = {}) {
   const globaleNoodstop = process.env.RTG_RUST_ALLES_UIT === '1';
   const modus = globaleNoodstop ? 'uit' : String(process.env.RTG_MOTOR_GELD || 'schaduw').toLowerCase();
   const aan = modus === 'motor';
@@ -67,6 +67,19 @@ module.exports = function maakMotorverbinding({ boekPad, saldiPad, watBoeking, w
       }
       return { ok: true, boeking: body.boeking, herhaald: !!body.herhaald,
         saldoVan: body.saldoVan, saldoNaar: body.saldoNaar };
+    },
+
+    /* Kent de motor deze boeking al (alleen lezen, nooit boeken)? `ok` alleen
+       bij een bekende sleutel met dezelfde beweging; onbekend of een storing
+       is GEEN herhaling, en dan blijft de weigering van de aanroeper staan. */
+    async bekend({ van, naar, centen, soort, ref, economischeSleutel }) {
+      if (!aan || !bekendPad || !economischeSleutel) return { onbekend: true };
+      const r = await zekering.verstuur(bekendPad, { van, naar, centen: Math.round(Number(centen)), soort, ref,
+        idem: economischeSleutel });
+      if (r.fout) return r.fout;
+      const { http, body } = r;
+      if (http !== 200 || !body || !body.boeking) return { onbekend: true, status: http };
+      return { ok: true, boeking: body.boeking, herhaald: true, saldoVan: body.saldoVan, saldoNaar: body.saldoNaar };
     },
 
     /* De volledige saldi-stand van de motor (autoriteit), voor de herstart-

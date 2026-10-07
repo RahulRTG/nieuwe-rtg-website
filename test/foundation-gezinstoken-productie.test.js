@@ -151,7 +151,7 @@ const PROXY = { 'Content-Type': 'application/json', 'X-Forwarded-Proto': 'https'
 const SLEUTEL = 'd'.repeat(40);
 
 const PROD = { NODE_ENV: 'production', RTG_DEMO: '0', APP_URL: 'https://rtg.voorbeeld.test/',
-  SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
+  SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
   STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com', STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
   TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
   RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', OFFICE_CODE: 'GEHEIME-CODE-123',

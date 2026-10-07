@@ -2,6 +2,11 @@
 
 const trustRuntime = require('../bewijsvlak/runtime');
 const trustExternal = require('../bewijsvlak/v3-external-hook');
+/* Elk deel van een Vonk-date boekt precies een keer, op een sleutel uit de
+   match, de deelnemer en het deel. Hier stond `'vonk:' + ...` als vrije tekst,
+   en die vorm weigert de motor met 400 (db/economische-identiteit.js). */
+const { maakSleutel } = require('../../db/economische-identiteit');
+const vonkSleutel = deel => maakSleutel('pay-vonk', [deel]);
 
 module.exports = ({ d, save, nu, geblokkeerd, codenaamVan, pay, reserveerTafel, notify, partnerEligible,
   PRIJS_CENTEN, RTG_CENTEN }) => {
@@ -17,9 +22,9 @@ async function betaalIntern(key, mid) {
     if(!m.betaald[wie]||(m.participationRefunded&&m.participationRefunded[wie]))return;
     const naam=codenaamVan(wie);
     await boek({van:'extern:vonk-rtg',naar:'lid:'+naam,centen:RTG_CENTEN,soort:'terug',oms:reden,
-      ref:m.id+':'+wie+':participation-refund-rtg',economischeSleutel:'vonk:'+m.id+':'+wie+':participation-refund-rtg'});
+      ref:m.id+':'+wie+':participation-refund-rtg',economischeSleutel:vonkSleutel(m.id+':'+wie+':participation-refund-rtg')});
     await boek({van:'partner:'+m.tafel.supplierCode,naar:'lid:'+naam,centen:PRIJS_CENTEN-RTG_CENTEN,soort:'terug',oms:reden,
-      ref:m.id+':'+wie+':participation-refund-partner',economischeSleutel:'vonk:'+m.id+':'+wie+':participation-refund-partner'});
+      ref:m.id+':'+wie+':participation-refund-partner',economischeSleutel:vonkSleutel(m.id+':'+wie+':participation-refund-partner')});
     m.participationRefunded=m.participationRefunded||{};m.participationRefunded[wie]=nu();delete m.betaald[wie];
   };
   const sluit=async()=>{
@@ -38,27 +43,27 @@ async function betaalIntern(key, mid) {
   const basis={van:'lid:'+naam,soort:'vonk'};
   try {
     const r1=await boek({...basis,naar:'extern:vonk-rtg',centen:RTG_CENTEN,oms:'Vonk-date, deel RTG',
-      ref:m.id+':'+key+':rtg',economischeSleutel:'vonk:'+m.id+':'+key+':rtg'});
+      ref:m.id+':'+key+':rtg',economischeSleutel:vonkSleutel(m.id+':'+key+':rtg')});
     if(r1&&r1.error)return {status:402,error:r1.error};
     if(!deelname()){
-      await boek({van:'extern:vonk-rtg',naar:'lid:'+naam,centen:RTG_CENTEN,soort:'terug',oms:'Vonk-date vervallen: partner nam deelname in',ref:m.id+':'+key+':participation-race-rtg',economischeSleutel:'vonk:'+m.id+':'+key+':participation-race-rtg'});
+      await boek({van:'extern:vonk-rtg',naar:'lid:'+naam,centen:RTG_CENTEN,soort:'terug',oms:'Vonk-date vervallen: partner nam deelname in',ref:m.id+':'+key+':participation-race-rtg',economischeSleutel:vonkSleutel(m.id+':'+key+':participation-race-rtg')});
       await sluit();return {status:409,code:'PARTNER_NOT_PARTICIPATING',error:'De partner heeft de deelname tijdens het betalen gepauzeerd. De betaling is teruggedraaid.'};
     }
     if(geblokkeerd(key,ander)){
-      await boek({van:'extern:vonk-rtg',naar:'lid:'+naam,centen:RTG_CENTEN,soort:'terug',oms:'Vonk-date geblokkeerd, teruggeboekt',ref:m.id+':'+key+':block-refund',economischeSleutel:'vonk:'+m.id+':'+key+':block-refund'});
+      await boek({van:'extern:vonk-rtg',naar:'lid:'+naam,centen:RTG_CENTEN,soort:'terug',oms:'Vonk-date geblokkeerd, teruggeboekt',ref:m.id+':'+key+':block-refund',economischeSleutel:vonkSleutel(m.id+':'+key+':block-refund')});
       return {status:409,error:'De verbinding is tijdens het betalen gesloten.'};
     }
     const r2=await boek({...basis,naar:'partner:'+m.tafel.supplierCode,centen:PRIJS_CENTEN-RTG_CENTEN,
-      oms:'Vonk-date, aanbetaling zaak',ref:m.id+':'+key+':partner',economischeSleutel:'vonk:'+m.id+':'+key+':partner'});
-    if(r2&&r2.error){await boek({van:'extern:vonk-rtg',naar:'lid:'+naam,centen:RTG_CENTEN,soort:'terug',oms:'Vonk-date niet doorgegaan, teruggeboekt',ref:m.id+':'+key+':refund',economischeSleutel:'vonk:'+m.id+':'+key+':refund'});return {status:402,error:r2.error};}
+      oms:'Vonk-date, aanbetaling zaak',ref:m.id+':'+key+':partner',economischeSleutel:vonkSleutel(m.id+':'+key+':partner')});
+    if(r2&&r2.error){await boek({van:'extern:vonk-rtg',naar:'lid:'+naam,centen:RTG_CENTEN,soort:'terug',oms:'Vonk-date niet doorgegaan, teruggeboekt',ref:m.id+':'+key+':refund',economischeSleutel:vonkSleutel(m.id+':'+key+':refund')});return {status:402,error:r2.error};}
     if(!deelname()){
-      await boek({van:'extern:vonk-rtg',naar:'lid:'+naam,centen:RTG_CENTEN,soort:'terug',oms:'Vonk-date vervallen: partner nam deelname in',ref:m.id+':'+key+':participation-race2-rtg',economischeSleutel:'vonk:'+m.id+':'+key+':participation-race2-rtg'});
-      await boek({van:'partner:'+m.tafel.supplierCode,naar:'lid:'+naam,centen:PRIJS_CENTEN-RTG_CENTEN,soort:'terug',oms:'Vonk-date vervallen: partner nam deelname in',ref:m.id+':'+key+':participation-race2-partner',economischeSleutel:'vonk:'+m.id+':'+key+':participation-race2-partner'});
+      await boek({van:'extern:vonk-rtg',naar:'lid:'+naam,centen:RTG_CENTEN,soort:'terug',oms:'Vonk-date vervallen: partner nam deelname in',ref:m.id+':'+key+':participation-race2-rtg',economischeSleutel:vonkSleutel(m.id+':'+key+':participation-race2-rtg')});
+      await boek({van:'partner:'+m.tafel.supplierCode,naar:'lid:'+naam,centen:PRIJS_CENTEN-RTG_CENTEN,soort:'terug',oms:'Vonk-date vervallen: partner nam deelname in',ref:m.id+':'+key+':participation-race2-partner',economischeSleutel:vonkSleutel(m.id+':'+key+':participation-race2-partner')});
       await sluit();return {status:409,code:'PARTNER_NOT_PARTICIPATING',error:'De partner heeft de deelname tijdens het betalen gepauzeerd. De betaling is teruggedraaid.'};
     }
     if(geblokkeerd(key,ander)){
-      await boek({van:'extern:vonk-rtg',naar:'lid:'+naam,centen:RTG_CENTEN,soort:'terug',oms:'Vonk-date geblokkeerd, teruggeboekt',ref:m.id+':'+key+':block-refund-rtg',economischeSleutel:'vonk:'+m.id+':'+key+':block-refund-rtg'});
-      await boek({van:'partner:'+m.tafel.supplierCode,naar:'lid:'+naam,centen:PRIJS_CENTEN-RTG_CENTEN,soort:'terug',oms:'Vonk-date geblokkeerd, teruggeboekt',ref:m.id+':'+key+':block-refund-partner',economischeSleutel:'vonk:'+m.id+':'+key+':block-refund-partner'});
+      await boek({van:'extern:vonk-rtg',naar:'lid:'+naam,centen:RTG_CENTEN,soort:'terug',oms:'Vonk-date geblokkeerd, teruggeboekt',ref:m.id+':'+key+':block-refund-rtg',economischeSleutel:vonkSleutel(m.id+':'+key+':block-refund-rtg')});
+      await boek({van:'partner:'+m.tafel.supplierCode,naar:'lid:'+naam,centen:PRIJS_CENTEN-RTG_CENTEN,soort:'terug',oms:'Vonk-date geblokkeerd, teruggeboekt',ref:m.id+':'+key+':block-refund-partner',economischeSleutel:vonkSleutel(m.id+':'+key+':block-refund-partner')});
       return {status:409,error:'De verbinding is tijdens het betalen gesloten.'};
     }
     m.betaald[key]=nu();

@@ -9783,7 +9783,7 @@
     // de interne call en het directe bericht draaien op dezelfde stroom
     if (window.TeamCall) TeamCall.init({ API, mij: () => { const a = actor(); return a.staffId ? { staffId: a.staffId, name: a.name } : null; }, T, toast });
     if (window.CollegaChat) CollegaChat.init({ API, mij: () => ({ staffId: actor().staffId, name: actor().name }), T, toast });
-    try { source = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
+    try { source = RTGStroom.open('/api/supplier/stream', { stroom: 'zaak', token: API.token }); } catch(e){ return; }
     source.addEventListener('hello', e => { const d=JSON.parse(e.data); neemNotifs(d.unread); });
     source.addEventListener('buzz', e => { const d=JSON.parse(e.data); showBuzz(d.from); });
     source.addEventListener('alarm', e => { const d=JSON.parse(e.data); showAlarm(d); });

@@ -8,6 +8,7 @@
 'use strict';
 
 const context = require('./verzoekcontext');
+const GEEN_STORING = new Set(['PG_REQUEST_CONFLICT', 'PG_AUDIT_KETEN_GEBROKEN']);
 
 module.exports = function maakVerzoekCommit({ motor, slot, state, gezond, reden, ongezond }) {
   function teCommitten(ctx) {
@@ -24,7 +25,10 @@ module.exports = function maakVerzoekCommit({ motor, slot, state, gezond, reden,
     if (!w.length && !d.length) return { geschreven: 0 };
     try { return await slot(() => p.commitVerzoek(state.getRuweData(), w, d)); }
     catch (e) {
-      if (!e || e.code !== 'PG_REQUEST_CONFLICT') ongezond(e, 'requestcommit');
+      /* Een conflict en een gebroken auditspoor gaan over DIT verzoek en zijn
+         geen opslagstoring: de schrijfpoort voor iedereen dichtzetten zou van een
+         vervalsing in een journaal een volledige storing maken. */
+      if (!e || !GEEN_STORING.has(e.code)) ongezond(e, 'requestcommit');
       throw e;
     }
   }

@@ -377,6 +377,12 @@ async function startEens(opts) {
          een PRODUCTIEtoets dus ook niet: de productiekeuring weigert hem
          (config/productie-lokaal.js), net als RTG_DEMO hieronder. */
       ...(((opts.env || {}).NODE_ENV) === 'production' ? {} : { RTG_DEV_LINKS: '1' }),
+      /* Een toetsserver hoort bij deze machine: de loopback. In de toetsstand
+         dwingt de server dat zelf af (server/config/omgeving.js); voor een toets
+         die NODE_ENV=development meegeeft is dit het bewijs van een lokale
+         installatie dat RTG_DEV_LINKS hierboven vraagt (CONFIG P1-2). Een toets
+         die een ander adres wil, geeft RTG_BIND zelf mee. */
+      RTG_BIND: '127.0.0.1',
       /* De meeste toetsen leunen op de demo-stand (vaste inlog, bekend
          eigenaarsaccount). Op een echte server staat die UIT tenzij iemand hem
          aanzet -- hij stond aan zolang NODE_ENV niet gezet was, en dat zette het
@@ -545,6 +551,26 @@ function postJson(base) {
   return (pad, body, tok) => fetch(base + pad, {
     method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
     body: JSON.stringify(body || {}) }).then(r => r.json());
+}
+
+/* HET ADRES VAN EEN LIVE-STROOM, ZOALS EEN SCHERM HET MAAKT.
+
+   Sinds de sessiestroom (server/kern/sessiestroom.js) staat er geen sessie meer
+   in het adres van /api/stream, de zaak- en kantoorstroom of de theaterdeur:
+   het scherm ruilt zijn sessie (in de kop) eerst voor een stroomticket. Dit
+   hulpje loopt dezelfde weg als shared/stroom.js, zodat een toets niet om de
+   deur heen meet. `opties.stroom` is de soort ('lid' standaard, 'zaak',
+   'kantoor', 'theater-kijk'), `opties.id` het onderwerp, `opties.extra` een
+   querystaart. Gooit met de status als de ruil wordt geweigerd -- een toets die
+   een weigering wil zien, vraagt het ticket zelf. */
+async function stroomAdres(base, pad, tok, opties) {
+  const o = opties || {};
+  const r = await fetch(base + '/api/stroom/ticket', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok },
+    body: JSON.stringify({ stroom: o.stroom || 'lid', id: o.id }) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || !d.ticket) throw Object.assign(new Error('stroomticket geweigerd (HTTP ' + r.status + '): ' + (d.error || '')), { status: r.status });
+  return base + pad + (pad.includes('?') ? '&' : '?') + 'ticket=' + encodeURIComponent(d.ticket) + (o.extra || '');
 }
 
 /* EEN BACKOFFICE-SESSIE MET EEN NAAM ERAAN.
@@ -1273,11 +1299,15 @@ function browserOpties(pw, extra) {
 
 /* De reden om over te slaan, in woorden. Drie gevallen en drie zinnen: geen
    module, wel een module maar geen browser, en niets aan de hand. */
+/* Via test/infra.js: zonder RTG_EIS_INFRA een etiket ([infra:browser]) dat de
+   draaier telt, MET de schakelaar een zakker -- een omgeving die schermtoetsen
+   belooft, laat ze niet stil overslaan. */
 function geenBrowser(pw) {
-  if (!pw) return 'playwright niet beschikbaar in deze omgeving';
+  const { vereist } = require('./infra');
+  if (!pw) return vereist('browser', false, 'playwright niet beschikbaar in deze omgeving');
   if (browserPad(pw) === false) {
-    return 'playwright is er, maar geen enkele chromium start hier -- zet ' +
-      'RTG_BROWSER_PATH of installeer de bouw die playwright vraagt';
+    return vereist('browser', false, 'playwright is er, maar geen enkele chromium start hier -- zet ' +
+      'RTG_BROWSER_PATH of installeer de bouw die playwright vraagt');
   }
   return false;
 }
@@ -1661,7 +1691,7 @@ async function bankDeur(page, naam, opties) {
 
 module.exports = { edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
-  nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
+  nepMediaArgs, opstartGeduld, startServer, stroomAdres, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,
   wachtOpNetstilte, wachtOpVloeiend, wachtOpBestand, klikEnWacht, tekstVan, postJson,
   // testhaken om de strenge poort zelf te kunnen verifieren

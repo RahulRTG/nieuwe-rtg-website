@@ -3,6 +3,7 @@
    Redis en het productiegeheim. Geen lokale Map mag de proef groen maken. */
 'use strict';
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
@@ -23,7 +24,7 @@ function instantie(db, geheim) {
 }
 
 test('levende contactcode roteert en claimt atomair over twee Redis-instanties',
-  { skip: !process.env.REDIS_URL }, async () => {
+  { skip: vereist('redis', !!process.env.REDIS_URL, 'REDIS_URL ontbreekt') }, async () => {
   const oud = process.env.RTG_SECRET_KEY;
   const geheim = crypto.randomBytes(32).toString('hex');
   process.env.RTG_SECRET_KEY = geheim;

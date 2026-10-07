@@ -36,6 +36,11 @@ const { ontleedDeel, verdeel } = require('./lib/delen');
 const { IJKINGEN } = require('./lib/ijkingen');
 const { ZWAAR } = require('./lib/zwaar');
 const { tapSamenvatting } = require('./lib/schermsuite-bewijs');
+/* De infrastructuurpoort (test/infra.js): welke soort ontbrekende infrastructuur
+   deze omgeving EIST (RTG_EIS_INFRA). Bij het laden gelezen, zodat een
+   tikfout in een workflow meteen zakt in plaats van stil niets te eisen. */
+const infraPoort = require('../test/infra');
+const INFRA_GEEIST = infraPoort.eisen();
 const { prijzen } = require('./lib/duurprijs');
 const { maakBatches, STANDAARD_MAX } = require('./lib/testbatches');
 
@@ -213,6 +218,7 @@ let batch = 0;
 const batchBewijzen = [];
 const foutBatches = [];
 const stilleBatches = [];
+const overgeslagenTests = [];
 function draai(namen, parallel, metVloer, tijdgrens) {
   if (!namen.length) return 0;
   /* --test-force-exit vangt de andere hanger af: alle toetsen zijn klaar, maar
@@ -256,6 +262,7 @@ function draai(namen, parallel, metVloer, tijdgrens) {
     tapTekst = fs.readFileSync(tapPad, 'utf8');
     const samenvatting = tapSamenvatting(tapTekst);
     batchBewijzen.push(samenvatting);
+    overgeslagenTests.push(...(samenvatting.overgeslagenTests || []));
     if ((samenvatting.overgeslagen || 0) > 0 || (samenvatting.todo || 0) > 0) {
       stilleBatches.push({ bestanden: [...namen],
         overgeslagen: samenvatting.overgeslagen || 0,
@@ -346,6 +353,25 @@ if (opslagPlan.apart) {
 }
 geefAfbouwSlotVrij();
 
+/* OVERGESLAGEN OMDAT ER IETS ONTBRAK. Altijd genoemd, ook in een losse of
+   gedeelde ronde: een skip die niemand ziet leest als een geslaagde toets. En
+   onder RTG_EIS_INFRA (CI en release) laat een infra-skip van een geeiste
+   soort de ronde zakken -- de vangrail achter test/infra.js, voor een toets
+   die toch met het etiket overslaat in plaats van te zakken. */
+const infraOordeel = infraPoort.infraOordeel(overgeslagenTests);
+const infraOvergeslagen = infraOordeel.infra;
+if (infraOvergeslagen.length) {
+  const geweigerd = infraOordeel.geweigerd;
+  console.log('[tests] ' + infraOvergeslagen.length + ' toets(en) overgeslagen omdat er infrastructuur ontbrak' +
+    (INFRA_GEEIST.size ? ' (RTG_EIS_INFRA eist: ' + [...INFRA_GEEIST].join(', ') + ')' : ' (lokaal toegestaan; zet RTG_EIS_INFRA om dit te laten zakken)') + ':');
+  for (const o of infraOvergeslagen.slice(0, 40)) console.log('  - ' + o.test + ' -- ' + o.reden);
+  if (infraOordeel.zakt) {
+    console.error('[tests] ' + geweigerd.length + ' overgeslagen toets(en) voor infrastructuur die deze omgeving EIST; ' +
+      'dat telt niet als geslaagd.');
+    if (!code) code = 1;
+  }
+}
+
 /* Een lange ronde mag haar diagnose niet alleen in een begrensde terminalbuffer
    achterlaten. Dit rapport is geen groenbewijs en beïnvloedt de uitslag niet;
    het bewaart uitsluitend welke batch rood was en welke TAP-regels dat zeiden. */
@@ -356,7 +382,8 @@ try {
     selectie: selectie.length ? selectie : null,
     deel: deel || null,
     rodeBatches: foutBatches,
-    stilleBatches
+    stilleBatches,
+    infraOvergeslagen
   }, null, 2) + '\n');
 } catch (e) {
   console.error('[tests] kon foutenrapport niet schrijven: ' + e.message);

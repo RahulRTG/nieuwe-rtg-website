@@ -45,7 +45,7 @@
 
   function stream(){
     if (!window.EventSource) return;
-    try { source = new EventSource('/api/office/stream?token='+encodeURIComponent(API.token)); } catch(e){ return; }
+    try { source = RTGStroom.open('/api/office/stream', { stroom: 'kantoor', token: API.token }); } catch(e){ return; }
     source.addEventListener('sync', () => { refresh(); laadTimeline(); loadVerify(); loadVakbewijzen(); loadConcierge(); laadTafels(); loadIncidenten(); loadSalonNaleving(); loadOntmoetingen(); loadTrust(); });
     source.addEventListener('notify', e => { refresh(); const p=$('#prices'); if(p) p.classList.add('flash'); setTimeout(()=>p&&p.classList.remove('flash'),1600); });
     // Salon-ontmoetingen: SOS-alarm en het live camerabeeld (WebRTC-signaal)

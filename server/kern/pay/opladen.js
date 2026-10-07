@@ -5,10 +5,11 @@
    dit deel krijgt de guard (boekAsync) en de helpers mee en verandert
    NIETS aan de boekingsregels. */
 function maakOpladen(basis) {
-  const { betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save,
-    motorklant, geldModus, keyVanCodenaam, plafondFout, betaalWaarheid,
+  const { betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save, vrijgavePoort,
+    motorklant, geldModus, keyVanCodenaam, plafondFout, betaalWaarheid, reserveerSleutel,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP } = basis;
   const { randomUUID } = require('crypto');
+  const { maakSleutel } = require('../../db/economische-identiteit');
 
   /* ---------- opladen (Apple Pay / kaart via de betaal-naad) ---------- */
   async function laadOp({ codenaam, centen, idem, oms, userId, interneStap }) {
@@ -48,7 +49,13 @@ function maakOpladen(basis) {
       if (r && r.afgehandeldAt) return { ok: true, saldo: saldoVan(rekLid(codenaam)), geladen: c, betalingId: w.id };
       return { status: 402, error: 'De betaling wacht op bevestiging.', betalingId: w.id,
         betaalStatus: (r && r.providerStatus) || (uit && uit.betaling && uit.betaling.status) || null };
-    }, interneStap ? null : { geld: 'laadt de wallet op, met transactiekosten op dat moment' });
+    /* `poort`: opladen is een eigen capability (geld.opwaarderen) naast het
+       interne saldo dat de idem-laag al vraagt -- ook als STAP binnen een andere
+       handeling, want dan gaat er evengoed geld van een kaart. De bijschrijving
+       van een oplading die al bevestigd is (oplaadAfronden hieronder) komt hier
+       niet langs en loopt dus door tijdens een noodstop. */
+    }, Object.assign({ poort: vrijgavePoort ? vrijgavePoort.opwaarderen : undefined },
+      interneStap ? {} : { geld: 'laadt de wallet op, met transactiekosten op dat moment' }));
   }
 
   /* HET BIJSCHRIJVEN ZELF, als eigen functie -- want het gebeurt op TWEE
@@ -56,10 +63,17 @@ function maakOpladen(basis) {
      bevestigt, kern/settlement.js). Die tweede weg bestond niet en daar ging
      het geld verloren. Een tweede boekingsregel ernaast zou hetzelfde soort
      fout zijn: twee bronnen die ooit uit de pas lopen. Dus een. */
-  async function oplaadAfronden({ codenaam, centen, oms, ref, economischeSleutel }) {
+  /* EEN KEER PER BETALING: de sleutel komt hier uit het betaling-id (`ref`),
+     dat beide wegen hierheen dragen (./oplaadwaarheid.js en kern/settlement.js).
+     Een herhaling van welke kant ook landt op dezelfde sleutel. Geen id: geen
+     boeking, want dan is er niets om een herhaling aan te herkennen. */
+  async function oplaadAfronden({ codenaam, centen, oms, ref }) {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c <= 0) return { status: 400, error: 'Geen geldig bedrag om bij te schrijven.' };
-    const b = await boekAsync({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref, economischeSleutel });
+    if (ref == null || String(ref) === '')
+      return { status: 400, error: 'Een oplading wordt alleen bijgeschreven op het id van haar betaling.' };
+    const b = await boekAsync({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref,
+      economischeSleutel: maakSleutel('pay-oplaad', [String(ref)]) });
     if (b.error) return b;
     /* DE TRANSACTIEKOSTEN, op het OPLAADMOMENT. Dat is niet toevallig de plek:
        WAARDE.md par. 1 zegt het al met zoveel woorden -- transactiekosten
@@ -93,27 +107,8 @@ function maakOpladen(basis) {
   let bankDekking = null;
   function koppelBank(dekking) { bankDekking = typeof dekking === 'function' ? dekking : null; }
 
-  /* Herstart-reconcile (cutover): bij het opstarten in motor-modus is de motor de
-     autoriteit, dus de JS-spiegel moet zijn saldi uit de motor-snapshot overnemen
-     i.p.v. uit zijn eigen (mogelijk verouderde) snapshot. We halen de volledige
-     saldi-stand op en vervangen db.data.paySaldi ermee. Zo start de spiegel altijd
-     in lockstep met de motor, ook na een crash of nadat de motor los is bijgewerkt.
-     No-op buiten motor-modus. */
-  async function reconcileVanMotor() {
-    if (geldModus !== 'motor') return { ok: true, overgeslagen: true };
-    const r = await motorklant.saldiSnapshot();
-    if (!r || r.error) return { ok: false, error: (r && r.error) || 'Geen saldi van de motor.' };
-    const nieuw = {};
-    for (const k in r.saldi) {
-      if (!Object.prototype.hasOwnProperty.call(r.saldi, k)) continue;
-      const v = Math.round(Number(r.saldi[k]) || 0);
-      if (v !== 0) nieuw[k] = v; // nul-saldi laten we weg (schone spiegel)
-    }
-    d().paySaldi = nieuw;
-    save();
-    let som = 0; for (const k in nieuw) som += nieuw[k];
-    return { ok: true, rekeningen: Object.keys(nieuw).length, som };
-  }
+  /* De herstart-reconcile in motorstand: ./reconcile.js. */
+  const reconcileVanMotor = require('./reconcile')({ geldModus, motorklant, d, save });
 
   /* Het hart van "EEN knop": is er te weinig saldo, dan laadt de wallet zelf
      bij en betaalt door. Eerst via de eigen bank (exact het tekort), anders
@@ -147,7 +142,9 @@ function maakOpladen(basis) {
     try { return !!(await keyVanCodenaam(codenaam)); } catch (e) { return false; }
   }
 
-  return { laadOp, oplaadAfronden, koppelBank, koppelKosten, reconcileVanMotor, zorgSaldo, bestaatLid };
+  // eerst boeken, bij een tekort bijladen en met dezelfde sleutel opnieuw: ./dekking.js
+  const betaalMetDekking = require('./dekking')({ boekAsync, zorgSaldo, reserveerSleutel });
+  return { laadOp, oplaadAfronden, koppelBank, koppelKosten, reconcileVanMotor, zorgSaldo, betaalMetDekking, bestaatLid };
 }
 
 module.exports = { maakOpladen };

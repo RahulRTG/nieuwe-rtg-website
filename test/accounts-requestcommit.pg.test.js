@@ -11,13 +11,14 @@
    Draai via `npm run test:pg` (eigen database per bestand). */
 'use strict';
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
 const URL = process.env.DATABASE_URL || process.env.PG_URL;
-const OVERSLAAN = URL ? false : 'DATABASE_URL ontbreekt; deze proef vereist een echte PostgreSQL';
+const OVERSLAAN = vereist('pg', !!URL, 'DATABASE_URL ontbreekt; deze proef vereist een echte PostgreSQL');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-accountpg-'));
 process.env.RTG_DATA_DIR = TMP;

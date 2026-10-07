@@ -12,6 +12,7 @@
    niet plat gooit. Aan te zetten met ERR_WEBHOOK_URL; zonder blijft alleen de
    eigen in-memory aggregatie draaien (net als voorheen zonder SENTRY_DSN). */
 'use strict';
+const { veiligeFout, veiligeWaarde } = require('./log-redactie');
 const crypto = require('node:crypto');
 const protocol = require('./storingen/protocol');
 const { bezorg } = require('./storingen/bezorg');
@@ -130,11 +131,16 @@ function maakFoutmelder(opts) {
       gezien.set(vf, nu);
       if (gezien.size > 2000) for (const [k, t] of gezien) if (nu - t > venster) gezien.delete(k);
 
+      /* Redactie HIER en niet bij de aanroeper: deze melding verlaat het huis.
+         log.onError geeft al een schone fout mee, maar kern/command/alarm-uitgang
+         roept melden() rechtstreeks aan; een vangnet hoort niet af te hangen van
+         wie er toevallig voor stond. */
+      const schoon = veiligeFout(err);
       post({
         tijd: new Date(nu).toISOString(),
-        fout: (err && err.message) || String(err),
-        stack: (err && err.stack) ? String(err.stack).slice(0, 4000) : undefined,
-        context: ctx || undefined
+        fout: schoon.message,
+        stack: schoon.stack ? String(schoon.stack).slice(0, 4000) : undefined,
+        context: ctx ? veiligeWaarde(ctx) : undefined
       }, 'fout');
     } catch (e) { /* bewust stil: bezorging faalt liever dan de app te raken */ }
   }

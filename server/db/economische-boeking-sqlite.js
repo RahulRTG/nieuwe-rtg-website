@@ -82,11 +82,20 @@ module.exports = ({ db, verbinding, statements, merge3, uitStore, naarStore,
             error: 'De grootboekregel bestaat zonder economische sleutel; herstel is vereist.' };
         }
         const liveRefs = new Map(collecties.map(k => [k, db.data[k]]));
+        const hadLive = new Set(collecties.filter(k => Object.hasOwn(db.data, k)));
         try {
           for (const k of collecties) db.data[k] = concept[k];
           antwoord = werk();
+          /* Wat de bewerker achterlaat IS de projectie, ook als hij de bak
+             verving: een collectie die nog niet bestond, staat hierboven als
+             `{}` klaar, en kern/pay maakt van een grootboek dat geen lijst is
+             een nieuwe lijst. Zonder deze regel committen we de lege kaart en
+             vindt heeftRegel de boeking nergens (eerste oplading ooit). */
+          for (const k of collecties) concept[k] = db.data[k];
         } finally {
-          for (const [k, v] of liveRefs) db.data[k] = v;
+          /* Een collectie die er niet was, komt er ook niet als `undefined`
+             bij: die sleutel bestaat dan wel en de volgende flush valt erover. */
+          for (const [k, v] of liveRefs) { if (hadLive.has(k)) db.data[k] = v; else delete db.data[k]; }
         }
         if (antwoord && typeof antwoord.then === 'function')
           throw new Error('De bewerker van een economische boeking mag niet asynchroon zijn.');

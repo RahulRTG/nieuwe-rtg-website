@@ -42,7 +42,7 @@ module.exports = (ctx) => {
      beveiligingsmaatregel, en een maatregel die je niet kunt vooruitspoelen kun
      je ook niet beproeven. */
   const { rekLid, saldoVan, metIdem, boek, boekAsync, grootboek, waarde, opdrachten,
-    seintje, nu, economischeBoekingEenmaal, geldModus } = ctx;
+    seintje, nu, economischeBoekingEenmaal, geldModus, vrijgavePoort } = ctx;
   const rekening = require('./uitbetaalrekening')(ctx);
   const boekTerugEenmaal = require('../betaalopdracht/terugboeking');
 
@@ -137,7 +137,16 @@ module.exports = (ctx) => {
       return { ok: true, teruggestort: gevraagd, restant: saldoVan(rek),
         naar: rekening.kort(u.iban), opdrachtId: op.id, opdrachtStatus: na.status,
         uitleg: 'Het bedrag is van uw saldo af en staat klaar om verstuurd te worden.' };
-    });
+    /* Een geldhandeling, ook voor de idem-laag: zonder sleutel geen afboeking.
+       De afboeking hierboven draagt dan een economische sleutel uit die idem
+       (../../lib/idem.js volgendeStap), zodat de motor een retry na een crash
+       herkent die de JS-opslag niet meer kent. */
+    /* NAAST de bevoegdheid hierboven en niet in plaats ervan: de bevoegdheid
+       zegt of RTG dit MAG (LID_UITBETALING), de vrijgavepoort of het in deze
+       release AAN staat, bewezen is en een besluit (B3) heeft. Na de herhaling:
+       een terugstorting die al liep, geeft haar antwoord terug. */
+    }, { geld: 'boekt saldo af om het naar de eigen bankrekening te sturen',
+      poort: vrijgavePoort ? vrijgavePoort.lidIbanUitbetaling : undefined });
   }
 
   /* De teruggang: weigert de rail hem definitief, dan komt het geld terug op de

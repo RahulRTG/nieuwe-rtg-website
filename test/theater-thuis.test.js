@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stroomAdres } = require('./helper');
 
 let srv, base, office, maker, kijker, videoId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-thuis-'));
@@ -49,7 +49,7 @@ test('1. een thuis-video bestaat bij ons alleen als titel en affiche, nooit als 
   assert.ok(v, 'de kaart staat in de zaal');
   assert.equal(v.bewaring, 'thuis');
   assert.equal(v.online, false, 'zonder de maker erbij is het werk offline');
-  const kijk = await fetch(base + '/api/theater/kijk/' + videoId + '?token=' + encodeURIComponent(kijker));
+  const kijk = await fetch(await stroomAdres(base, '/api/theater/kijk/' + videoId, kijker, { stroom: 'theater-kijk', id: videoId }));
   assert.equal(kijk.status, 404, 'de server heeft de bytes niet en kan ze dus ook nooit geven');
   const dicht = await api('/api/theater/signaal', { id: videoId, kind: 'vraag' }, kijker);
   assert.equal(dicht.status, 409, 'zonder de maker online is er niets op te vragen');

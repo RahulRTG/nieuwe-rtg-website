@@ -191,7 +191,7 @@
 
     var es = null;
     if (w.EventSource) {
-      es = new EventSource('/api/stream?token=' + encodeURIComponent(token));
+      es = RTGStroom.open('/api/stream', { token: token });
       es.addEventListener('clips', function (e) {
         var d = JSON.parse(e.data);
         if (d.kind === 'vraag') dienUit(d);

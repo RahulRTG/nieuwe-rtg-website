@@ -166,7 +166,10 @@ const ROUTES = new Set([
   /* De gezinsdeur (B18/B19, foundation/gezinsdeur.js): een nieuwe gezinscode, een
      eenmalig stroomticket en een verlengde sessie staan elk alleen in dit antwoord. */
   'POST /api/foundation/gezin/code/roteer', 'POST /api/foundation/gezin/stroom/ticket',
-  'POST /api/foundation/gezin/sessie/verleng'
+  'POST /api/foundation/gezin/sessie/verleng',
+  /* De sessiestroom (kern/sessiestroom.js): een kortlevend stroomticket voor een
+     live-stroom of video, en het belticket van een klas. */
+  'POST /api/stroom/ticket', 'POST /api/foundation/school/belkanaal/ticket'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

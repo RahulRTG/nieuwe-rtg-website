@@ -16,7 +16,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorKoppelBody } = require('./helper');
+const { startServer, stop, kantoorKoppelBody, stroomAdres } = require('./helper');
 
 const CODE = 'INTREK-KANTOOR';
 const mappen = [];
@@ -43,7 +43,7 @@ async function medewerker() {
 /* Een open stroom, en een belofte die afloopt zodra de server hem sluit. */
 async function stroom(token) {
   const ctrl = new AbortController();
-  const r = await fetch(srv.base + '/api/office/stream?token=' + encodeURIComponent(token), { signal: ctrl.signal });
+  const r = await fetch(await stroomAdres(srv.base, '/api/office/stream', token, { stroom: 'kantoor' }), { signal: ctrl.signal });
   assert.equal(r.status, 200, 'de stroom gaat open');
   const lezer = r.body.getReader();
   const dicht = (async () => { try { for (;;) { const { done } = await lezer.read(); if (done) return true; } } catch (e) { return true; } })();

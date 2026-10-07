@@ -225,7 +225,7 @@ test('7. de productiekeuring zegt WAT je mist zonder webhook, en weigert een url
   assert.equal(fout.length, 1, 'een geweigerde url is een FOUT en geen waarschuwing: ' + JSON.stringify(geweigerd.f.slice(0, 3)));
   assert.match(fout[0], /NIETS naar buiten/, 'met wat het gevolg is, niet alleen dat hij is afgekeurd');
 
-  const goed = doe({ ERR_WEBHOOK_URL: 'https://hooks.slack.com/services/abc' });
+  const goed = doe({ RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://hooks.slack.com/services/abc' });
   assert.equal(goed.f.filter(x => /ERR_WEBHOOK_URL/.test(x)).length, 0, 'een geldige url geeft geen fout');
   assert.equal(goed.w.filter(x => /ERR_WEBHOOK_URL/.test(x)).length, 0, 'en ook geen waarschuwing');
 });

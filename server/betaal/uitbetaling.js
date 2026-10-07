@@ -4,7 +4,8 @@ const nietVerstuurd = error => { error.nietVerstuurd = true; return error; };
 
 module.exports = function maakUitbetaalrail(deps) {
   const { betalenUit, haalOp, bewaar, regie, sandbox, stripe, demoBetalen,
-    aanbieder, eisBetaalrail, crypto, uitgaandBewustDicht } = deps;
+    aanbieder, eisBetaalrail, crypto, uitgaandBewustDicht, vrijgave } = deps;
+  const poort = () => vrijgave || require('../kern/vrijgave').standaard();
   return async function startUitbetaling(opdracht) {
     if (betalenUit)
       throw nietVerstuurd(new Error('Betalen staat bewust uitgeschakeld. Er is niets uitbetaald.'));
@@ -28,6 +29,17 @@ module.exports = function maakUitbetaalrail(deps) {
       try { resultaat = sandbox.sepa({ bedrag, valuta, referentie, iban, begunstigde, omschrijving }); }
       catch (error) { throw nietVerstuurd(error); }
     } else if (stripe) {
+      /* De vrijgavepoort eerst, op de capability die de AANROEPER noemt
+         (`opdracht.vrijgave`: een uitbetaling naar een lid, een partner of de
+         RTFoundation zijn financieel drie verschillende handelingen). Noemt hij
+         er geen, dan is het antwoord dicht -- een uitbetaling waarvan niemand
+         zegt wat ze is, hoort niet naar buiten te gaan. Daarna de grendel als
+         bewijsas. En ook als beide open staan blijft deze tak dicht: een IBAN in
+         Stripe-metadata is geen betaalbestemming (hieronder). */
+      try {
+        poort().eis(String((opdracht && opdracht.vrijgave) || 'geld.uitbetaling_zonder_capability'),
+          { actor: { soort: 'systeem' }, provider: 'stripe', rail: 'stripe' });
+      } catch (e) { throw nietVerstuurd(e); }
       require('./uitbetaalgrendel').eisOpen('uitbetaling');
       const uitleg = uitgaandBewustDicht ? ' De installatie staat bewust in deze gesloten stand.' : '';
       const error = new Error('Uitbetaling veilig geblokkeerd: een IBAN in Stripe-metadata is geen echte betaalbestemming. Koppel eerst een gecontroleerde uitbetaalrail.' + uitleg);

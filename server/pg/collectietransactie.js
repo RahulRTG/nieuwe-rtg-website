@@ -22,17 +22,37 @@ const { KANAAL } = require('./schrijflanen');
 const publiceerCollectie = require('../db/collectie-publicatie');
 const { merge3 } = require('../db/merge');
 
-module.exports = (ctx) => {
+module.exports = (ctx, schrijver) => {
   const { pool, uitStore, naarStore, toegepast, laatsteJson,
           laatsteGrootte, laatsteLengte, laatsteCheck } = ctx;
 
-  async function bewerkCollectie(sleutel, dataNu, werk) {
+  /* HET SPOOR GAAT MEE IN DEZE TRANSACTIE (audit P0-1).
+
+     Deze commit valt MIDDEN in een HTTP-verzoek, voor de requestcommit die het
+     auditspoor van dat verzoek draagt. Zonder `spoor` stond de mutatie dus vast
+     terwijl haar spoor nog in de werkkopie zat -- en bij een mislukte
+     requestcommit (of een foutantwoord, dat hem overslaat) verdween. `spoor`
+     zijn de requestwijzigingen van de auditcollecties
+     (db/verzoekspoor.js levert ze); ze landen hier met dezelfde samenvoeging
+     als in de requestcommit (./verzoekschrijf.js) en in DEZELFDE transactie.
+     Faalt het spoor -- een gebroken keten, een conflict, een trigger -- dan
+     rolt de mutatie mee terug. Alleen als de collectie werkelijk verandert,
+     gaat het spoor mee: een bewerker die niets wijzigde, heeft niets
+     vastgelegd waar een regel bij hoort. */
+  async function bewerkCollectie(sleutel, dataNu, werk, spoor) {
     if (!sleutel || typeof werk !== 'function') throw new Error('Collectietransactie vereist een sleutel en bewerker.');
+    const spoorLijst = spoor && schrijver
+      ? schrijver.sorteer((spoor.wijzigingen || []).filter(w => w.sleutel !== sleutel)) : [];
+    if (spoor) spoor.geschreven = false;
     const client = await pool.connect();
-    let waarde, resultaat, jsonVoor, publicatieBasisJson, jsonNa, versie = null;
+    let waarde, resultaat, jsonVoor, publicatieBasisJson, jsonNa, versie = null, spoorPublicaties = [];
     try {
       await client.query('BEGIN');
-      await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [sleutel]);
+      /* Alle sloten in een vaste volgorde, voor er iets gelezen wordt: dezelfde
+         volgorde als de requestcommit, dus geen kruisdeadlock met een verzoek
+         dat hetzelfde spoor en deze collectie samen commit. */
+      for (const k of [...new Set([sleutel, ...spoorLijst.map(w => w.sleutel)])].sort())
+        await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [k]);
       const huidig = await client.query('SELECT val, ver, weg FROM kv WHERE key = $1 FOR UPDATE', [sleutel]);
       /* EEN GRAFSTEEN telt hier als "bestaat niet" en niet als data (TAKEN.md
          4.38). Twee redenen: `val` is dan leeg, dus JSON.parse zou struikelen;
@@ -80,8 +100,10 @@ module.exports = (ctx) => {
           [sleutel, naarStore(jsonNa), versie]
         );
         await client.query('SELECT pg_notify($1, $2)', [KANAAL, sleutel]);
+        if (spoorLijst.length) spoorPublicaties = await schrijver.schrijfIn(client, spoorLijst);
       } else if (huidig.rows.length) versie = Number(huidig.rows[0].ver);
       await client.query('COMMIT');
+      if (spoor && spoorPublicaties.length) spoor.geschreven = true;
     } catch (e) {
       try { await client.query('ROLLBACK'); } catch (x) {}
       throw e;
@@ -93,6 +115,7 @@ module.exports = (ctx) => {
        Publiceer daarom niet met een assignment: voeg de commit samen tegen de
        exacte live-basis van vóór `werk`. laatsteJson blijft afzonderlijk
        de commit-basis, zodat de gewone flush het live verschil nog ziet. */
+    if (spoorPublicaties.length) schrijver.publiceer(dataNu, spoorPublicaties);
     const gepubliceerd = publiceerCollectie({ dataNu, sleutel, basisJson: publicatieBasisJson,
       commitWaarde: waarde, commitJson: jsonNa, versie, toegepast, laatsteJson });
     if (gepubliceerd.cacheBijgewerkt) {

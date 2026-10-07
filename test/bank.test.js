@@ -131,8 +131,8 @@ test.before(async () => {
   opNaam2 = (await api('account/start', { rol: 'kantoor' }, med2.token)).body.token;
   assert.ok(opNaam2, 'en staat ook op naam in de backoffice');
   pk = kantoorPasskey(base);
-  sleutel1 = await pk.zet(med.token);
-  sleutel2 = await pk.zet(med2.token);
+  sleutel1 = await pk.zet(med.token, 'geheim123');
+  sleutel2 = await pk.zet(med2.token, 'geheim123');
 
   /* DE VERGUNNING VASTLEGGEN, en dat is sinds de bevoegdheidslaag geen decor.
      Wat RTG zelf mag hangt niet aan de drie-standen-knop maar aan wat er is

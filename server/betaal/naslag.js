@@ -11,7 +11,11 @@
 'use strict';
 
 module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, weigerUit, mollieBedrag,
-  markProviderEvidence }) {
+  markProviderEvidence, vrijgave }) {
+  /* De vrijgavepoort (server/kern/vrijgave/). Standaard het ene exemplaar per
+     proces; een toets kan een eigen exemplaar meegeven om de volgorde van de
+     twee poorten na te trekken. */
+  const poort = () => vrijgave || require('../kern/vrijgave').standaard();
   /* Wie er betaalde en vanaf welk IBAN: ./betaler.js. Daar staat ook waarom
      alleen Mollie dat geeft, en -- belangrijker -- wat je er NIET mee mag doen:
      een bevestiging zet nooit een uitbetaalbestemming, hij bevestigt er alleen
@@ -58,8 +62,17 @@ module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, 
     const { aanbieder, providerId, bedrag, valuta = 'eur', idempotentieSleutel } = opdracht || {};
     if (!providerId) throw new Error('Een terugbetaling heeft een providerbetaling nodig.');
     if (!Number.isFinite(bedrag) || bedrag <= 0) throw new Error('Terugbetaalbedrag moet positief zijn.');
-    if ((aanbieder === 'mollie' && mollie) || (aanbieder === 'stripe' && stripe) || (aanbieder === 'adyen' && adyen))
+    /* TWEE POORTEN, IN DEZE VOLGORDE, en geen van beide vervangt de ander. De
+       vrijgavepoort weegt de vijf assen van `geld.terugbetaling` en van de
+       provider van DEZE betaling (staat hij aan, mag RTG het, is de provider
+       gezond). De grendel daarna is de bewijsas voor echt geld naar buiten,
+       gecommit en aan de release gebonden. De actor is hier het systeem: wie
+       er om de terugbetaling vroeg en of hij dat mocht, heeft de route al
+       beslist -- deze naad kent geen mensen. */
+    if ((aanbieder === 'mollie' && mollie) || (aanbieder === 'stripe' && stripe) || (aanbieder === 'adyen' && adyen)) {
+      poort().eis('geld.terugbetaling', { actor: { soort: 'systeem' }, provider: aanbieder, rail: aanbieder });
       require('./uitbetaalgrendel').eisOpen('terugbetaling');
+    }
     if (aanbieder === 'mollie' && mollie) {
       const r = await mollie.refunds.create(providerId, { amount: mollieBedrag(bedrag, valuta),
         description: String(opdracht.omschrijving || 'RTG-terugbetaling').slice(0, 255) },

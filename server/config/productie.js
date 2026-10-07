@@ -21,6 +21,7 @@ const { keurMotor } = require('./productie-motor');
 const { keurPin } = require('./productie-pin');
 const { keurIdentiteit } = require('./productie-identiteit');
 const { keurMedia } = require('./productie-media');
+const { keurAnker } = require('./productie-anker');
 
 function keur(env, fouten, waarschuwingen) {
     keurInvulplekken(env, fouten);
@@ -94,6 +95,7 @@ function keur(env, fouten, waarschuwingen) {
        Ze zijn nu blokkerende fouten (punt 2b hierboven) -- twee keer melden zou
        de lijst alleen langer maken zonder iets toe te voegen. */
     keurPin(env, fouten, waarschuwingen);
+    keurAnker(env, fouten, waarschuwingen, priveBeta);   // het externe anker van het auditspoor
     // De database en mediabytes moeten dezelfde schaalgrens delen. Deze poort
     // gebruikt exact dezelfde S3-parser als de runtime; geen tweede, lossere
     // voorstelling van wat een geldige configuratie is.

@@ -41,6 +41,10 @@ const klok = require('../../lib/klok');
    sessies toont die niet meer bestaan -- een scherm dat liegt over hoeveel
    ingangen er open staan is erger dan geen scherm. */
 const REGISTER_TTL_MS = 30 * 24 * 3600 * 1000;
+
+/* De claims die een sessie aan EEN ding vastmaken, met het veld dat dat ding
+   aanwijst. Zie vul(): zo'n anker wordt aangevuld, nooit vervangen. */
+const ANKERS = Object.freeze({ sleutelbinding: 'keyRef', toestel: 'toestelId' });
 const MAX_PER_LID = 100;
 
 function maakSessieregister({ db, save }) {
@@ -85,7 +89,9 @@ function maakSessieregister({ db, save }) {
     const rij = kijk()[sid];
     if (!rij) return { ok: false, reden: 'onbekende sessie' };
     const { context, geweigerd } = ctx.bouw(ruweContext || {});
+
     const afgewezen = [];
+    const schrijf = [];
     for (const [naam, claim] of Object.entries(context)) {
       const oud = rij.context[naam];
       if (oud) {
@@ -93,14 +99,35 @@ function maakSessieregister({ db, save }) {
         const nieuwG = ctx.GRADEN.indexOf(ctx.graadVan(Object.assign({ veld: naam }, claim)).graad);
         if (nieuwG < oudG) { afgewezen.push({ veld: naam, reden: 'zou het bewijs verzwakken; degraderen is nooit stil' }); continue; }
       }
-      rij.context[naam] = claim;
+      schrijf.push([naam, claim]);
     }
+
+    /* EEN ANKER WORDT NIET VERVANGEN (P1-1). De graadtoets hierboven houdt een
+       ZWAKKERE claim tegen, maar een even sterke met een andere sleutel ging
+       erdoor -- en zo bond een gestolen token de sleutel van de dief over die
+       van het lid heen. Een sessie draagt hoogstens EEN sleutel en EEN toestel;
+       wie een ander wil, logt opnieuw in en krijgt een nieuwe sessie. Dezelfde
+       waarde nog een keer mag: dat verandert niets.
+
+       Alles of niets: botst een anker, dan wordt NIETS uit deze aanroep
+       geschreven. Anders zou het toestel van de dief in de sessie staan naast
+       de sleutel van het lid -- een context die over zichzelf liegt. */
+    const botsing = [];
+    for (const [naam, claim] of schrijf) {
+      const veld = ANKERS[naam], oud = rij.context[naam];
+      if (veld && oud && oud[veld] && claim[veld] !== oud[veld])
+        botsing.push({ veld: naam, reden: 'deze sessie is al gebonden; een andere sleutel vraagt een nieuwe inlog' });
+    }
+    if (botsing.length) return { ok: false, reden: 'herbinding', geweigerd: geweigerd.concat(afgewezen, botsing) };
+
+    for (const [naam, claim] of schrijf) rij.context[naam] = claim;
     rij.gezienOp = klok.datum().toISOString();
     bewaar();
     return { ok: true, geweigerd: geweigerd.concat(afgewezen) };
   }
 
   function lees(sid) {
+    if (require('../../lib/verraad').sla('sessieregister-faalt')) throw new Error('verraad: sessieregister-faalt');
     if (!geldigeSid(sid)) return null;
     const rij = kijk()[sid];
     if (!rij) return null;

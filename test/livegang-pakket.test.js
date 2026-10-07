@@ -180,6 +180,7 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
        latere go-live-proeven moeten deze S3- en alarmuitgangen werkelijk
        aanraken voordat een release READY kan worden. */
     fs.appendFileSync(envPad, [
+      'RTG_ANKERPOST_URL=https://anker.voorbeeld.test/',
       'ERR_WEBHOOK_URL=https://alarm.example.test/rtg',
       'RTG_MEDIA_BACKEND=s3',
       'RTG_MEDIA_S3_BUCKET=rtg-productie-media',

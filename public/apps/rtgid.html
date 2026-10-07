@@ -111,6 +111,8 @@
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/passkey.js"></script>
+<script src="/shared/herbevestig.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -135,7 +137,18 @@
      een dichte deur staat, hoort de sleutelmaker ernaast te vinden. */
   async function maakPasskey() {
     if (!('credentials' in navigator)) return zeg('Deze browser kent geen passkeys.');
-    const o = await wapi('registreer/opties');
+    /* Eerst bevestigen dat u het bent (server/kern/identiteit/herbevestiging.js):
+       een passkey is een blijvende sleutel, en een open sessie alleen is geen
+       bewijs dat de mens erachter zit. */
+    let o = await wapi('registreer/opties');
+    if (o.body.herbevestigingNodig && window.RTGHerbevestig) {
+      const b = await RTGHerbevestig.vraag({ wegen: o.body.wegen, actie: o.body.actie, token,
+        passkey: (o.body.wegen || []).indexOf('passkey') >= 0,
+        uitleg: 'Een passkey toevoegen geeft blijvend toegang tot uw account. Vul daarom eerst uw huidige wachtwoord in.' });
+      if (!b) return;
+      if (b.fout) return zeg(b.fout);
+      o = await wapi('registreer/opties', b);
+    }
     if (o.body.error) return zeg(o.body.error);
     const pub = o.body.opties;
     pub.challenge = naarBuf(pub.challenge);

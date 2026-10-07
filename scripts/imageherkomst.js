@@ -55,6 +55,7 @@ const path = require('path');
 const crypto = require('crypto');
 const cp = require('child_process');
 const trust = require('../server/config/release-trust');
+const kwalificatie = require('./lib/kwalificatie');
 
 const WORTEL = path.join(__dirname, '..');
 const STANDAARD_SBOM = '.release/sbom.json';
@@ -276,7 +277,7 @@ function controleerHandtekening(document, handtekening, publiekPem) {
 /* ---------------------------------------------------------------------------
    HET HERKOMSTDOCUMENT.
    ------------------------------------------------------------------------- */
-function maakHerkomst({ image, digest, sbomBytes, sbomComponenten, bewijs, bron, bouw, uitvoering, gemaakt }) {
+function maakHerkomst({ image, digest, sbomBytes, sbomComponenten, bewijs, bron, bouw, uitvoering, kwalificatie: kw, gemaakt }) {
   return {
     formaat: 'rtg-herkomst-v2',
     ondertekenDomein: trust.ROLES.BUILD.domain,
@@ -286,6 +287,7 @@ function maakHerkomst({ image, digest, sbomBytes, sbomComponenten, bewijs, bron,
     releasebewijs: bewijs ? { inhoudSha256: bewijs.inhoudSha256 || null, bestandAantal: bewijs.bestandAantal || null } : null,
     bron: bron || null,
     uitvoering: uitvoering || null,
+    kwalificatie: kw || null,
     bouw: bouw || null
   };
 }
@@ -328,7 +330,7 @@ function controleerHerkomst({ document, sbomBytes, publiekPem, draait }) {
    alleen is niet genoeg. Het document moet exact de gevraagde CI-build,
    registrydigest, schone commit, volledige image-SBOM en release-inhoud binden. */
 function controleerKandidaatHerkomst({ document, sbomBytes, publiekPem, draait,
-  commit, image, bewijsInhoudSha256, uitvoering }) {
+  commit, image, bewijsInhoudSha256, uitvoering, imageId, rol }) {
   const basis = controleerHerkomst({ document, sbomBytes, publiekPem, draait });
   const klachten = [...basis.klachten];
   let sbom = null;
@@ -361,6 +363,10 @@ function controleerKandidaatHerkomst({ document, sbomBytes, publiekPem, draait,
     klachten.push('De signed provenance bindt niet alle bevroren CI-uitvoeringsbewijzen.');
   if (uitvoering && JSON.stringify(vast) !== JSON.stringify(uitvoering))
     klachten.push('Een CI-uitvoeringsbewijs wijkt af van de signed provenance.');
+  /* De tests moeten over DEZE bytes zijn gegaan. Het image-ID is
+     inhoudsgeadresseerd: wie na de tests opnieuw bouwt, krijgt een ander ID. */
+  klachten.push(...kwalificatie.controleer(document && document.kwalificatie,
+    { imageId, inhoudSha256: bewijsInhoudSha256, rol: rol || 'app' }));
   return { ok:klachten.length === 0, klachten };
 }
 
@@ -491,6 +497,7 @@ function doeBinden() {
     bewijs: leesJson(argument('bewijs') || '.release/release-bewijs.json'),
     bron: gitInfo(),
     uitvoering: uitvoeringHashes(),
+    kwalificatie: kwalificatieVoorBinden(),
     bouw: {
       node: process.version,
       workflow: process.env.GITHUB_WORKFLOW || null,
@@ -513,6 +520,14 @@ function doeBinden() {
   console.log('  sbom    ' + document.sbom.sha256 + ' (' + document.sbom.componenten + ' componenten)');
 }
 
+/* Binden zonder groene kwalificatie weigert: er wordt nooit een herkomst
+   getekend voor een image waarvan niet vaststaat dat het getest is. */
+function kwalificatieVoorBinden() {
+  const rol = argument('rol');
+  if (rol !== 'app' && rol !== 'backup') throw new Error('--rol=app|backup is verplicht bij --binden.');
+  return { ...kwalificatie.samenvatting(WORTEL), rol };
+}
+
 function doeControle() {
   const herkomstPad = argument('herkomst') || STANDAARD_HERKOMST;
   const document = leesJson(herkomstPad);
@@ -527,7 +542,8 @@ function doeControle() {
   const r = streng
     ? controleerKandidaatHerkomst({ document, sbomBytes, publiekPem,
       draait:argument('draait'), commit:argument('commit'), image:argument('image'),
-      bewijsInhoudSha256:argument('bewijs-inhoud'), uitvoering:uitvoeringHashes() })
+      bewijsInhoudSha256:argument('bewijs-inhoud'), uitvoering:uitvoeringHashes(),
+      imageId:argument('image-id'), rol:argument('rol') || 'app' })
     : controleerHerkomst({ document, sbomBytes, publiekPem, draait: argument('draait') });
 
   if (!sbomBytes) console.log('LET OP: de stuklijst zelf is niet meegelezen (' + sbomPad + ' ontbreekt); alleen de handtekening is getoetst.');
@@ -549,7 +565,7 @@ function doeControle() {
    stil negeren laat zo'n schijngarantie ontstaan; daarom een gesloten lijst. */
 const VLAGGEN = new Set(['nieuwe-sleutel', 'sleutelcontrole', 'sbom', 'binden', 'controle',
   'eis-image', 'eis-kandidaat', 'bewijs', 'bewijs-inhoud', 'commit', 'digest', 'draait',
-  'herkomst', 'image', 'pakketten', 'uit']);
+  'herkomst', 'image', 'image-id', 'pakketten', 'rol', 'uit']);
 function onbekendeVlaggen(argv) {
   return argv.filter(a => a.startsWith('--')).map(a => a.slice(2).split('=')[0]).filter(n => !VLAGGEN.has(n));
 }

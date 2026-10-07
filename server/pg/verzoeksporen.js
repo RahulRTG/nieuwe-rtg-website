@@ -7,7 +7,6 @@
    verwijdering of gebroken keten blijft dus een hard conflict. */
 'use strict';
 
-const crypto = require('node:crypto');
 const keten = require('../lib/keten');
 
 const HANDELING_MAX = 50000;
@@ -20,11 +19,9 @@ function conflict(tekst) {
   throw e;
 }
 
-function zonder(regel, velden) {
-  const uit = { ...(regel || {}) };
-  for (const veld of velden) delete uit[veld];
-  return uit;
-}
+/* Gebroken keten (eigen code + alarm) en de zegelcontrole: ./spoorketen.js. */
+const { gebroken, commandHash, commandHeel, zonder } = require('./spoorketen');
+
 
 /* handelingLog staat nieuwste-eerst. Een geldige requesttoevoeging is daarom
    een nieuwe kop, gevolgd door een ongewijzigde prefix van de oude lijst (de
@@ -55,8 +52,8 @@ function handelingToevoegingen(basis, variant, naam) {
 }
 
 function mergeHandeling(basis, ons, hun) {
-  if (!keten.verifieer(ons).ok) conflict('De request handelingLog-keten is gebroken.');
-  if (!keten.verifieer(hun).ok) conflict('De actuele handelingLog-keten is gebroken.');
+  if (!keten.verifieer(hun).ok) gebroken('handelingLog', 'database', 'De actuele handelingLog-keten is gebroken.');
+  if (!keten.verifieer(ons).ok) gebroken('handelingLog', 'verzoek', 'De request handelingLog-keten is gebroken.');
   /* Retentie verwijdert uitsluitend de oudste staart. Als de andere kant niet
      veranderde is de volledige geldige variant daarom leidend; via alleen de
      append-merge zou zo'n legitieme snoei stil verloren gaan. */
@@ -69,29 +66,21 @@ function mergeHandeling(basis, ons, hun) {
     return hun;
   }
   const nieuw = handelingToevoegingen(basis, ons, 'handelingLog/request');
-  handelingToevoegingen(basis, hun, 'handelingLog/database');
+  const hunNieuw = handelingToevoegingen(basis, hun, 'handelingLog/database');
   const uit = hun.slice();
+  /* Een al gecommitte regel komt er niet nog een keer bij: een vroege commit
+     (db/verzoekspoor.js) naast de requestcommit van hetzelfde verzoek biedt
+     dezelfde regel aan. Zelfde inhoud (tijd, wie, pad, verzoek-id) is
+     dezelfde gebeurtenis. */
+  const al = new Set(hunNieuw.map(r => json(zonder(r, ['hash', 'vorige', 'nr']))));
   /* `nieuw` staat nieuwste-eerst; hang de oudste toevoeging eerst aan de
      actuele DB-kop om de requestvolgorde te behouden. */
-  for (const regel of nieuw.slice().reverse())
-    keten.noteerIn(uit, zonder(regel, ['hash', 'vorige', 'nr']), HANDELING_MAX);
-  return uit;
-}
-
-function commandHash(regel) {
-  return crypto.createHash('sha256').update(JSON.stringify(regel)).digest('hex').slice(0, 32);
-}
-
-function commandHeel(lijst) {
-  const l = Array.isArray(lijst) ? lijst : [];
-  for (let i = 0; i < l.length; i++) {
-    const r = l[i];
-    if (!r || !r.id || !r.zegel) return false;
-    const kern = zonder(r, ['zegel']);
-    if (commandHash(kern) !== r.zegel) return false;
-    if (i > 0 && r.vorig !== l[i - 1].zegel) return false;
+  for (const regel of nieuw.slice().reverse()) {
+    const kern = zonder(regel, ['hash', 'vorige', 'nr']);
+    if (al.has(json(kern))) continue;
+    keten.noteerIn(uit, kern, HANDELING_MAX);
   }
-  return true;
+  return uit;
 }
 
 /* commandJournaal staat oudste-eerst. Door afkap is de gedeelde basis dus een
@@ -170,8 +159,8 @@ function mergeApiSpoor(basis, ons, hun) {
   const ol = Array.isArray(o.commandJournaal) ? o.commandJournaal : [];
   const hl = Array.isArray(h.commandJournaal) ? h.commandJournaal : [];
   const basisTotaal = Number(b.commandJournaalTotaal || 0);
-  if (!commandHeel(ol)) conflict('De request apiSpoor-keten is gebroken.');
-  if (!commandHeel(hl)) conflict('De actuele apiSpoor-keten is gebroken.');
+  if (!commandHeel(hl)) gebroken('apiSpoor', 'database', 'De actuele apiSpoor-keten is gebroken.');
+  if (!commandHeel(ol)) gebroken('apiSpoor', 'verzoek', 'De request apiSpoor-keten is gebroken.');
   /* AVG-wissing herschrijft en herzegelt bewust de volledige actor-keten. Als
      PostgreSQL sinds de requestbasis niet veranderde mag die bewezen geldige
      herschrijving landen; de append-only concurrentiemerge kan haar per
@@ -189,20 +178,23 @@ function mergeApiSpoor(basis, ons, hun) {
     conflict('apiSpoor bevat een onbekende gelijktijdige wijziging.');
   const nieuw = commandToevoegingen(bl, ol, 'apiSpoor/request');
   const hunNieuw = commandToevoegingen(bl, hl, 'apiSpoor/database');
-  if (!commandHeel(hl)) conflict('De actuele apiSpoor-keten is gebroken.');
   if (Number(o.commandJournaalTotaal || 0) !== basisTotaal + nieuw.length)
     conflict('De teller van apiSpoor/request loopt niet met zijn regels mee.');
   if (Number(h.commandJournaalTotaal || 0) !== basisTotaal + hunNieuw.length)
     conflict('De teller van apiSpoor/database loopt niet met zijn regels mee.');
   const lijst = hl.slice();
+  const al = new Set(hunNieuw.map(r => String(r.id)));   // zie mergeHandeling: geen tweede kopie
+  let erbij = 0;
   for (const regel of nieuw) {
+    if (al.has(String(regel.id))) continue;
+    erbij++;
     const kern = zonder(regel, ['zegel']);
     kern.vorig = lijst.length ? lijst[lijst.length - 1].zegel : null;
     lijst.push({ ...kern, zegel: commandHash(kern) });
   }
   if (lijst.length > API_MAX) lijst.splice(0, lijst.length - API_MAX);
   return { ...h, commandJournaal: lijst,
-    commandJournaalTotaal: Number(h.commandJournaalTotaal || 0) + nieuw.length };
+    commandJournaalTotaal: Number(h.commandJournaalTotaal || 0) + erbij };
 }
 
 function voegSpoorSamen(sleutel, basis, ons, hun) {
@@ -211,4 +203,4 @@ function voegSpoorSamen(sleutel, basis, ons, hun) {
   return null;
 }
 
-module.exports = { voegSpoorSamen, mergeHandeling, mergeApiSpoor };
+module.exports = { voegSpoorSamen, mergeHandeling, mergeApiSpoor, commandHeel };

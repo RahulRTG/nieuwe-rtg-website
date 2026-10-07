@@ -160,6 +160,20 @@ function leesEnvBestand(pad) {
     blokkeer('B2B2C-geld: de centrale Rust-noodstop staat aan terwijl echte geldrails actief zijn.');
   if (geldMotor.vereist && !(env.RTG_MOTOR_GELD_URL || env.RTG_MOTOR_SHADOW))
     blokkeer('B2B2C-geld: de duurzame geldmotor heeft geen bereikbare productie-URL.');
+  /* DE V1-BASELINE VAN DE VRIJGAVEPOORT (server/kern/vrijgave/baseline.js).
+     Wat de eigenaar in V1 aan wil hebben, moet in de RELEASEconfiguratie
+     beschikbaar zijn op ALLE assen, en wat hij erbuiten hield aantoonbaar dicht.
+     Een blokkade per capability, met de assen die ontbreken -- nooit een
+     waarschuwing. Met RTG_VRIJGAVE_URL vraagt hij het aan de draaiende
+     releasekandidaat (met de bevoegdheidslaag); zonder rekent hij hier, en dan
+     staat een capability die op een bevoegdheid rust eerlijk op dicht. */
+  const vrijgaveRelease = await require('./lib/vrijgave-baseline').beoordeelRelease({ env,
+    zonderRail: geldStand.releaseZonderRail === true });
+  if (vrijgaveRelease.ok)
+    goed('Vrijgavepoort (' + vrijgaveRelease.modus + '): ' + (vrijgaveRelease.modus === 'baseline'
+      ? 'elke capability uit de ' + vrijgaveRelease.baseline + '-baseline is beschikbaar en de rest is dicht.'
+      : 'geen enkele geldcapability is beschikbaar.'));
+  else for (const f of vrijgaveRelease.fouten) blokkeer('Vrijgavepoort ' + (vrijgaveRelease.baseline || 'V1') + ': ' + f);
   /* De env-vlag alleen is nooit een juridische of operationele vrijgave. Het
      vaste externe dossier moet dezelfde releasecommit, drie relevante PASS-
      controles en gehashte bewijsverwijzingen dragen. Zonder aanvraag blijven
@@ -365,6 +379,11 @@ function leesEnvBestand(pad) {
     accounts: accountStand,
     ownerReadback,
     foundation: foundationStand,
+    vrijgave: { ok: vrijgaveRelease.ok === true, modus: vrijgaveRelease.modus || null,
+      baseline: vrijgaveRelease.baseline || null, bron: vrijgaveRelease.bron || null,
+      fouten: (vrijgaveRelease.fouten || []).map(zonderGeheim),
+      regels: (vrijgaveRelease.regels || []).map(r => ({ id: r.id, baseline: r.baseline, via: r.via,
+        beschikbaar: r.beschikbaar, ontbrekendeAssen: r.ontbrekendeAssen, code: r.code })) },
     controles: uit.map(([teken, tekst, hard]) => ({ teken, hard: !!hard, tekst: zonderGeheim(tekst) }))
   };
   if (RAPPORT_NAAR_STDOUT) {

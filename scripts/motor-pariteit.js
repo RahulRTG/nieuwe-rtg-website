@@ -27,7 +27,7 @@ function maakJsEngine() {
   const sseToCustomer = () => {};
   const betaaldienstKosten = () => 0;
   const { pay } = require('../server/kern/pay')({
-    db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten,
+    db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, vrijgave: require('./lib/proefvrijgave').proefVrijgave(),
     // eigen db.data: de losse historie, zie server/kern/pay/loshistorie.js
     payBoekingenVoegToe: require('../server/kern/pay/loshistorie')(db),
   });

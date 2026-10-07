@@ -143,7 +143,10 @@ function startOmgeving() {
   fs.mkdirSync(sentinel, { recursive: true, mode: 0o700 });
   const env = {
     ...process.env,
-    NODE_ENV: 'staging', RTG_MAGNAAT_TEST: '1', RTG_BIND: '127.0.0.1',
+    /* 'development' en niet 'staging': de laatste is geen stand die dit huis
+       kent en weigert sinds P1-1 (config) te starten. Hij gedroeg zich al als
+       ontwikkeling, dus dit verandert niets aan wat de repetitie meet. */
+    NODE_ENV: 'development', RTG_MAGNAAT_TEST: '1', RTG_BIND: '127.0.0.1',
     RTG_STORE: 'sqlite', RTG_DATA_DIR: data,
     RTG_ENC_KEY: sleutel, RTG_SECRET_KEY: sleutel, RTG_VAULT_KEY: sleutel,
     PORT: String(poorten.publiek), RTG_TRIO_BASIS: String(poorten.intern + 1),

@@ -13,6 +13,7 @@
    hebben. Draai ze daarom serieel via `npm run test:pg` (of geef elke toets een
    eigen database). */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 
 /* Alleen DATABASE_URL is nodig; de spiegel draait op onze eigen pgwire-client.
@@ -21,7 +22,7 @@ const assert = require('node:assert/strict');
 const URL = process.env.DATABASE_URL || process.env.PG_URL;
 
 if (!URL) {
-  test('pg-accountsspiegel (overgeslagen: geen DATABASE_URL)', { skip: true }, () => {});
+  test('pg-accountsspiegel (overgeslagen: geen DATABASE_URL)', { skip: vereist('pg', false, 'geen DATABASE_URL') }, () => {});
 } else {
   const { maakPgAccounts } = require('../server/pgaccounts');
   const nieuw = () => maakPgAccounts({ url: URL, log: { warn() {} } });

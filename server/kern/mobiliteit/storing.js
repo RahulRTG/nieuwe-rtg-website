@@ -17,6 +17,8 @@ const TERUGGAVE = {
 };
 const STORING_MAX_UREN = 24;      // een venster langer dan een dag is geen storing
 
+const { maakSleutel } = require('../../db/economische-identiteit');
+
 module.exports = (ctx) => {
   const { db, save, id, schoon, nu, pay, findSupplier, notify, logActivity, ensureKaartjes, opslag } = ctx;
 
@@ -99,8 +101,12 @@ module.exports = (ctx) => {
       const doel = Math.round(basis * deel);
       const centen = doel - alGegeven;
       if (centen <= 0) continue;                  // deze reiziger heeft al genoeg terug
+      /* De sleutel hangt aan storing, kaartje en het DOEL: een herverwerking
+         van dezelfde storing boekt niets nieuws, een latere storing met een
+         hoger doel boekt alleen het verschil. */
       const b = await pay.boekAsync({ van: 'partner:' + s.vervoerder, naar: 'lid:' + k.codenaam, centen,
-        soort: 'ovteruggave', oms: 'Teruggave ' + TERUGGAVE[s.soort].naam + ' · ' + s.lijnNaam });
+        soort: 'ovteruggave', oms: 'Teruggave ' + TERUGGAVE[s.soort].naam + ' · ' + s.lijnNaam,
+        ref: s.id + '/' + k.id, economischeSleutel: maakSleutel('pay-handeling', ['ovteruggave', s.id, k.id, doel]) });
       /* Een mislukte boeking slaat DEZE reiziger over en niet de hele ronde --
          maar hij verdwijnt niet. Stil overslaan zou de manager laten denken dat
          iedereen betaald is (LAT.md regel 5); daarom komt hij met reden terug

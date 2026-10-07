@@ -58,7 +58,7 @@ test('productie, via het scherm: uitnodiging koppelen met de eigen passkey en da
     STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com', STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
     TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
     APP_URL: APP + '/', SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
-    ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg', ...KEYS, RTG_OWNER_EMAIL: EIGENAAR,
+    RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg', ...KEYS, RTG_OWNER_EMAIL: EIGENAAR,
     RTG_OWNER_BOOTSTRAP: BOOTSTRAP, OFFICE_CODE: 'GEHEIME-CODE-123', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     RTG_ISOLATIE_AFDWINGEN: '1', RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1' } });
   child = srv.child;
@@ -73,7 +73,7 @@ test('productie, via het scherm: uitnodiging koppelen met de eigen passkey en da
   const eigLid = (await reg('Eigenaar', EIGENAAR, { eigenaarSleutel: BOOTSTRAP })).body.token;
   assert.ok(eigLid, 'eigenaar geregistreerd');
   const eigSleutel = maakAuthenticator(HOST);
-  const ro = await api('/api/webauthn/registreer/opties', {}, eigLid);
+  const ro = await api('/api/webauthn/registreer/opties', { huidig: 'Geheim123!' }, eigLid);
   assert.equal((await api('/api/webauthn/registreer', { antwoord: eigSleutel.registratieAntwoord(ro.body.opties.challenge, APP), naam: 'E' }, eigLid)).status, 200);
   const teken = (b, n) => ({ ceremonie: b.ceremonie, antwoord: eigSleutel.loginAntwoord(b.opties.challenge, APP, n) });
   const st = await api('/api/account/start', { rol: 'kantoor' }, eigLid);

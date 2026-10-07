@@ -879,7 +879,6 @@
       "server/db/tx/ledger.js",
       "server/db/tx/pgachter.js",
       "server/db/tx/sqliteachter.js",
-      "server/db/verzoekcommit.js",
       "server/effectbon.js",
       "server/effectmeter.js",
       "server/foundation/basis.js",
@@ -1915,9 +1914,9 @@
       "server/kern/paspoort.js",
       "server/kern/paspoort/toezicht.js",
       "server/kern/paspoort/verzoeken.js",
-      "server/kern/pay/boeken.js",
       "server/kern/pay/boeking.js",
       "server/kern/pay/budget.js",
+      "server/kern/pay/dekking.js",
       "server/kern/pay/graaf.js",
       "server/kern/pay/huis.js",
       "server/kern/pay/kas-boek.js",
@@ -3953,6 +3952,7 @@
       "server/lib/idemsleutels-stage.js",
       "server/lib/idemsleutels-werelden.js",
       "server/lib/idemsleutels.js",
+      "server/lib/keten-anker.js",
       "server/lib/lokale-taal.js",
       "server/lib/mutatiecontracten-beleidsmotor.js",
       "server/lib/mutatiecontracten-beschermd.js",
@@ -4540,10 +4540,13 @@
       "server/kern/meet.js",
       "server/kern/mobiliteit/plekken.js",
       "server/kern/mobiliteit/register.js",
+      "server/kern/pay/boeking.js",
+      "server/kern/pay/dekking.js",
       "server/kern/pay/index.js",
       "server/kern/pay/kasbak.js",
       "server/kern/pay/loshistorie.js",
       "server/kern/pay/tegoed-claim.js",
+      "server/kern/pay/terug.js",
       "server/kern/platformregister/bediening.js",
       "server/kern/presentatie-beelden.js",
       "server/kern/registerblik/gereedschap.js",
@@ -4602,9 +4605,11 @@
       "server/kern/zorgketen/index.js",
       "server/lib/document-operatiepad.js",
       "server/lib/dubbeltikkast.js",
+      "server/lib/duurzaam.js",
       "server/lib/eenmalig-geheim-routes.js",
       "server/lib/eindstatus.js",
       "server/lib/http.js",
+      "server/lib/idem-handeling.js",
       "server/lib/idem-poort.js",
       "server/lib/idem.js",
       "server/lib/idemsleutels-beelden.js",
@@ -6285,7 +6290,6 @@
       "server/kern/paseis.js",
       "server/kern/paspoort.js",
       "server/kern/pay/bewijs.js",
-      "server/kern/pay/boeken.js",
       "server/kern/pay/boeking.js",
       "server/kern/pay/budget.js",
       "server/kern/pay/index.js",
@@ -6632,7 +6636,6 @@
       "server/lib/duurzaam.js",
       "server/lib/eenmalig-geheim-routes.js",
       "server/lib/eindstatus.js",
-      "server/lib/handelingsspoor.js",
       "server/lib/http2.js",
       "server/lib/idem-kast.js",
       "server/lib/idem-poort.js",
@@ -15223,7 +15226,7 @@
         "mutationRoutes": 1022,
         "declaredMutationSemantics": 315,
         "sourceFileCount": 199,
-        "kernelDependencyCount": 2566,
+        "kernelDependencyCount": 2567,
         "screenCount": 39,
         "sourceFiles": [
           "server/routes/agenda.js",
@@ -15270,7 +15273,7 @@
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js"
         ],
-        "kernelDependenciesOmitted": 2542,
+        "kernelDependenciesOmitted": 2543,
         "screens": [
           "public/apps/belastingkantoor.html",
           "public/apps/chauffeur.html",
@@ -26019,7 +26022,7 @@
         "mutationRoutes": 7,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2540,
+        "kernelDependencyCount": 2541,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/code.js",
@@ -26053,7 +26056,7 @@
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js"
         ],
-        "kernelDependenciesOmitted": 2516,
+        "kernelDependenciesOmitted": 2517,
         "screens": [
           "public/apps/geld.html"
         ],
@@ -26566,7 +26569,7 @@
         "mutationRoutes": 0,
         "declaredMutationSemantics": 0,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 2541,
+        "kernelDependencyCount": 2542,
         "screenCount": 0,
         "sourceFiles": [
           "server/routes/social.js",
@@ -26599,7 +26602,7 @@
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js"
         ],
-        "kernelDependenciesOmitted": 2517,
+        "kernelDependenciesOmitted": 2518,
         "screens": [],
         "screensOmitted": 0,
         "signals": [
@@ -26674,7 +26677,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2541,
+        "kernelDependencyCount": 2542,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/winkel.js",
@@ -26708,7 +26711,7 @@
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js"
         ],
-        "kernelDependenciesOmitted": 2517,
+        "kernelDependenciesOmitted": 2518,
         "screens": [
           "public/apps/app.html"
         ],
@@ -27035,7 +27038,7 @@
         "mutationRoutes": 5,
         "declaredMutationSemantics": 5,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 2540,
+        "kernelDependencyCount": 2541,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/vertaal.js",
@@ -27068,7 +27071,7 @@
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js"
         ],
-        "kernelDependenciesOmitted": 2516,
+        "kernelDependenciesOmitted": 2517,
         "screens": [
           "public/apps/vertaler.html"
         ],

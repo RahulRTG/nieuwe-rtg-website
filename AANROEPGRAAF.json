@@ -3,40 +3,40 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-10-06",
-  "commit": "1e8fa0fb7"
+  "commit": "90b361662"
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
-  "bestanden": 4260,
+  "bestanden": 4261,
   "nietGelezen": 0,
-  "aanroepen": 174511,
-  "kanten": 30271,
-  "kantenLokaal": 19506,
-  "kantenIngevoerd": 2590,
+  "aanroepen": 174577,
+  "kanten": 30289,
+  "kantenLokaal": 19508,
+  "kantenIngevoerd": 2607,
   "kantenLid": 2650,
-  "kantenViaKern": 4848,
+  "kantenViaKern": 4843,
   "kantenModuleAlsFunctie": 105,
-  "kantenLidOpInvoer": 297,
+  "kantenLidOpInvoer": 301,
   "kantenUitFabriek": 275,
-  "kantenViaKernZonderSymbool": 2923,
+  "kantenViaKernZonderSymbool": 2921,
   "kernherkomstGelezen": 1337,
-  "onopgelosteAanroepen": 130328,
-  "onopgelosteNamen": 13372,
+  "onopgelosteAanroepen": 130364,
+  "onopgelosteNamen": 13377,
   "onopgelostNaarSoort": {
-   "ingebouwd": 34630,
+   "ingebouwd": 34664,
    "externeModule": 960,
-   "kader": 12235,
-   "contextobject": 20432,
+   "kader": 12232,
+   "contextobject": 20404,
    "uitgepaktObject": 1646,
-   "lokaleWaarde": 22944,
-   "methodeOpWaarde": 37020,
+   "lokaleWaarde": 22972,
+   "methodeOpWaarde": 37025,
    "overig": 461
   },
   "opgelostPct": 25.3,
   "doelOnbekend": 0,
   "bewaakteVooruitwijzing": 0,
   "doelNietVastTeStellen": 70,
-  "symbolenMetAanroeper": 11749,
+  "symbolenMetAanroeper": 11754,
   "routesMetSymbool": 3309,
   "routeSymboolKanten": 6921
  },
@@ -26820,15 +26820,15 @@
  "onopgelostTop": [
   {
    "naam": "MemberExpression",
-   "aantal": 34227
+   "aantal": 34231
   },
   {
    "naam": "String",
-   "aantal": 8968
+   "aantal": 8977
   },
   {
    "naam": "require",
-   "aantal": 7830
+   "aantal": 7850
   },
   {
    "naam": "app.post",
@@ -26840,11 +26840,11 @@
   },
   {
    "naam": "save",
-   "aantal": 3180
+   "aantal": 3179
   },
   {
    "naam": "CallExpression",
-   "aantal": 2702
+   "aantal": 2703
   },
   {
    "naam": "res.json",
@@ -26856,11 +26856,11 @@
   },
   {
    "naam": "Object.assign",
-   "aantal": 2000
+   "aantal": 2002
   },
   {
    "naam": "Array.isArray",
-   "aantal": 1980
+   "aantal": 1981
   },
   {
    "naam": "Math.round",
@@ -26884,7 +26884,7 @@
   },
   {
    "naam": "Number.isFinite",
-   "aantal": 797
+   "aantal": 796
   },
   {
    "naam": "Math.min",
@@ -26896,7 +26896,7 @@
   },
   {
    "naam": "Object.freeze",
-   "aantal": 598
+   "aantal": 599
   },
   {
    "naam": "crypto.randomBytes",
@@ -26985,11 +26985,11 @@
    "namen": [
     {
      "naam": "String",
-     "aantal": 8968
+     "aantal": 8977
     },
     {
      "naam": "require",
-     "aantal": 7830
+     "aantal": 7850
     },
     {
      "naam": "Number",
@@ -26997,11 +26997,11 @@
     },
     {
      "naam": "Object.assign",
-     "aantal": 2000
+     "aantal": 2002
     },
     {
      "naam": "Array.isArray",
-     "aantal": 1980
+     "aantal": 1981
     },
     {
      "naam": "Math.round",
@@ -27021,7 +27021,7 @@
     },
     {
      "naam": "Number.isFinite",
-     "aantal": 797
+     "aantal": 796
     },
     {
      "naam": "Math.min",
@@ -27033,7 +27033,7 @@
     },
     {
      "naam": "Object.freeze",
-     "aantal": 598
+     "aantal": 599
     },
     {
      "naam": "Date.parse",
@@ -27050,11 +27050,11 @@
    "namen": [
     {
      "naam": "MemberExpression",
-     "aantal": 34214
+     "aantal": 34218
     },
     {
      "naam": "CallExpression",
-     "aantal": 2702
+     "aantal": 2703
     },
     {
      "naam": "ArrowFunctionExpression",
@@ -27083,7 +27083,7 @@
     },
     {
      "naam": "save",
-     "aantal": 314
+     "aantal": 315
     },
     {
      "naam": "eigen.bak",
@@ -27131,7 +27131,7 @@
     },
     {
      "naam": "werk",
-     "aantal": 133
+     "aantal": 132
     },
     {
      "naam": "regels.push",
@@ -27209,7 +27209,7 @@
    "namen": [
     {
      "naam": "save",
-     "aantal": 2809
+     "aantal": 2807
     },
     {
      "naam": "veilig",
@@ -27221,7 +27221,7 @@
     },
     {
      "naam": "d",
-     "aantal": 395
+     "aantal": 385
     },
     {
      "naam": "S",
@@ -38938,7 +38938,7 @@
    "naarBestand": "server/db/economische-identiteit.js",
    "naar": "saldoSamen",
    "hoe": "ingevoerd",
-   "lijn": 123
+   "lijn": 132
   },
   {
    "vanBestand": "server/db/economische-boeking-sqlite.js",
@@ -38946,7 +38946,7 @@
    "naarBestand": "server/db/collectie-publicatie.js",
    "naar": null,
    "hoe": "moduleAlsFunctie",
-   "lijn": 125
+   "lijn": 134
   },
   {
    "vanBestand": "server/db/economische-boeking.js",
@@ -38970,7 +38970,7 @@
    "naarBestand": "server/db/economische-identiteit.js",
    "naar": "normRef",
    "hoe": "lokaal",
-   "lijn": 24
+   "lijn": 56
   },
   {
    "vanBestand": "server/db/economische-identiteit.js",
@@ -38978,7 +38978,7 @@
    "naarBestand": "server/db/economische-identiteit.js",
    "naar": "normRef",
    "hoe": "lokaal",
-   "lijn": 30
+   "lijn": 62
   },
   {
    "vanBestand": "server/db/economische-identiteit.js",
@@ -38986,7 +38986,7 @@
    "naarBestand": "server/db/economische-identiteit.js",
    "naar": "gelijk",
    "hoe": "lokaal",
-   "lijn": 37
+   "lijn": 69
   },
   {
    "vanBestand": "server/db/economische-identiteit.js",
@@ -38994,7 +38994,7 @@
    "naarBestand": "server/db/economische-identiteit.js",
    "naar": "bewegingGelijk",
    "hoe": "lokaal",
-   "lijn": 42
+   "lijn": 74
   },
   {
    "vanBestand": "server/db/economische-identiteit.js",
@@ -39002,7 +39002,7 @@
    "naarBestand": "server/db/economische-identiteit.js",
    "naar": "heeft",
    "hoe": "lokaal",
-   "lijn": 66
+   "lijn": 98
   },
   {
    "vanBestand": "server/db/geheugen-kluis.js",
@@ -57078,11 +57078,27 @@
   },
   {
    "vanBestand": "server/kern/betaalopdracht/terugboeking.js",
-   "van": "(module)",
+   "van": "boekOpSleutel",
    "naarBestand": "server/db/economische-identiteit.js",
    "naar": null,
    "hoe": "lidOpInvoer",
-   "lijn": 27
+   "lijn": 25
+  },
+  {
+   "vanBestand": "server/kern/betaalopdracht/terugboeking.js",
+   "van": "boekTerugEenmaal",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
+   "lijn": 73
+  },
+  {
+   "vanBestand": "server/kern/betaalopdracht/terugboeking.js",
+   "van": "boekTerugEenmaal",
+   "naarBestand": "server/kern/betaalopdracht/terugboeking.js",
+   "naar": "boekOpSleutel",
+   "hoe": "lokaal",
+   "lijn": 89
   },
   {
    "vanBestand": "server/kern/betaalregie.js",
@@ -74078,11 +74094,19 @@
   },
   {
    "vanBestand": "server/kern/commercie/ronde.js",
+   "van": "herkansFees",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 62
+  },
+  {
+   "vanBestand": "server/kern/commercie/ronde.js",
    "van": "draai",
    "naarBestand": "server/kern/commercie/ronde.js",
    "naar": "stap",
    "hoe": "lokaal",
-   "lijn": 128
+   "lijn": 132
   },
   {
    "vanBestand": "server/kern/commercie/routepoort.js",
@@ -74514,7 +74538,7 @@
    "naarBestand": "server/kern/commercie/verrekening.js",
    "naar": "orders",
    "hoe": "lokaal",
-   "lijn": 68
+   "lijn": 69
   },
   {
    "vanBestand": "server/kern/commercie/verrekening.js",
@@ -74522,7 +74546,23 @@
    "naarBestand": "server/kern/commercie/subsidie.js",
    "naar": "keur",
    "hoe": "lid",
-   "lijn": 73
+   "lijn": 74
+  },
+  {
+   "vanBestand": "server/kern/commercie/verrekening.js",
+   "van": "verrekenLedenvoordeel",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 90
+  },
+  {
+   "vanBestand": "server/kern/commercie/verrekening.js",
+   "van": "verrekenPrijsgarantie",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 122
   },
   {
    "vanBestand": "server/kern/commercie/verrekening.js",
@@ -74530,7 +74570,7 @@
    "naarBestand": "server/kern/commercie/verrekening.js",
    "naar": "orders",
    "hoe": "lokaal",
-   "lijn": 154
+   "lijn": 158
   },
   {
    "vanBestand": "server/kern/commercie/voornemen/keuring.js",
@@ -133282,7 +133322,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 37
+   "lijn": 39
   },
   {
    "vanBestand": "server/kern/mobiliteit/abonnement.js",
@@ -133290,7 +133330,7 @@
    "naarBestand": "server/kern/mobiliteit/abonnement.js",
    "naar": "aboVan",
    "hoe": "lokaal",
-   "lijn": 58
+   "lijn": 60
   },
   {
    "vanBestand": "server/kern/mobiliteit/abonnement.js",
@@ -133298,7 +133338,7 @@
    "naarBestand": "server/kern/mobiliteit/abonnement.js",
    "naar": "aboStand",
    "hoe": "lokaal",
-   "lijn": 58
+   "lijn": 60
   },
   {
    "vanBestand": "server/kern/mobiliteit/abonnement.js",
@@ -133306,7 +133346,15 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "id",
    "hoe": "viaKern",
-   "lijn": 80
+   "lijn": 79
+  },
+  {
+   "vanBestand": "server/kern/mobiliteit/abonnement.js",
+   "van": "aboKoop",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 82
   },
   {
    "vanBestand": "server/kern/mobiliteit/abonnement.js",
@@ -133314,7 +133362,7 @@
    "naarBestand": "server/kern/mobiliteit/abonnement.js",
    "naar": "dagenMs",
    "hoe": "lokaal",
-   "lijn": 90
+   "lijn": 98
   },
   {
    "vanBestand": "server/kern/mobiliteit/abonnement.js",
@@ -133322,7 +133370,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 91
+   "lijn": 99
   },
   {
    "vanBestand": "server/kern/mobiliteit/abonnement.js",
@@ -133330,7 +133378,7 @@
    "naarBestand": "server/kern/mobiliteit/abonnement.js",
    "naar": "aboBeeld",
    "hoe": "lokaal",
-   "lijn": 97
+   "lijn": 105
   },
   {
    "vanBestand": "server/kern/mobiliteit/abonnement.js",
@@ -133338,7 +133386,7 @@
    "naarBestand": "server/kern/mobiliteit/abonnement.js",
    "naar": "dagenMs",
    "hoe": "lokaal",
-   "lijn": 112
+   "lijn": 120
   },
   {
    "vanBestand": "server/kern/mobiliteit/abonnement.js",
@@ -133346,7 +133394,7 @@
    "naarBestand": "server/kern/mobiliteit/abonnement.js",
    "naar": "aboStand",
    "hoe": "lokaal",
-   "lijn": 126
+   "lijn": 134
   },
   {
    "vanBestand": "server/kern/mobiliteit/abonnement.js",
@@ -133354,7 +133402,7 @@
    "naarBestand": "server/kern/mobiliteit/abonnement.js",
    "naar": "aboVan",
    "hoe": "lokaal",
-   "lijn": 139
+   "lijn": 147
   },
   {
    "vanBestand": "server/kern/mobiliteit/abonnement.js",
@@ -133362,7 +133410,7 @@
    "naarBestand": "server/kern/mobiliteit/abonnement.js",
    "naar": "aboBeeld",
    "hoe": "lokaal",
-   "lijn": 139
+   "lijn": 147
   },
   {
    "vanBestand": "server/kern/mobiliteit/abonnement.js",
@@ -133370,7 +133418,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 144
+   "lijn": 152
   },
   {
    "vanBestand": "server/kern/mobiliteit/appbrug.js",
@@ -134106,7 +134154,7 @@
    "naarBestand": "server/kern/mobiliteit/kaartje.js",
    "naar": "ensureKaartjes",
    "hoe": "lokaal",
-   "lijn": 40
+   "lijn": 42
   },
   {
    "vanBestand": "server/kern/mobiliteit/kaartje.js",
@@ -134114,7 +134162,7 @@
    "naarBestand": "server/kern/mobiliteit/kaartje.js",
    "naar": "ensureKaartjes",
    "hoe": "lokaal",
-   "lijn": 41
+   "lijn": 43
   },
   {
    "vanBestand": "server/kern/mobiliteit/kaartje.js",
@@ -134122,7 +134170,7 @@
    "naarBestand": "server/kern/mobiliteit/kaartje.js",
    "naar": "ensureKaartjes",
    "hoe": "lokaal",
-   "lijn": 77
+   "lijn": 79
   },
   {
    "vanBestand": "server/kern/mobiliteit/kaartje.js",
@@ -134130,7 +134178,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 78
+   "lijn": 80
   },
   {
    "vanBestand": "server/kern/mobiliteit/kaartje.js",
@@ -134138,7 +134186,7 @@
    "naarBestand": "server/kern/mobiliteit/kaartje.js",
    "naar": "lijnVanZaak",
    "hoe": "lokaal",
-   "lijn": 84
+   "lijn": 86
   },
   {
    "vanBestand": "server/kern/mobiliteit/kaartje.js",
@@ -134146,7 +134194,7 @@
    "naarBestand": "server/kern/mobiliteit/kaartje.js",
    "naar": "halteVan",
    "hoe": "lokaal",
-   "lijn": 100
+   "lijn": 102
   },
   {
    "vanBestand": "server/kern/mobiliteit/kaartje.js",
@@ -134154,7 +134202,7 @@
    "naarBestand": "server/kern/ov/index.js",
    "naar": "ovPrijsVan",
    "hoe": "viaKern",
-   "lijn": 112
+   "lijn": 114
   },
   {
    "vanBestand": "server/kern/mobiliteit/kaartje.js",
@@ -134162,6 +134210,14 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "id",
    "hoe": "viaKern",
+   "lijn": 127
+  },
+  {
+   "vanBestand": "server/kern/mobiliteit/kaartje.js",
+   "van": "kaartKoop",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
    "lijn": 130
   },
   {
@@ -134170,7 +134226,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 139
+   "lijn": 145
   },
   {
    "vanBestand": "server/kern/mobiliteit/kaarttoegang.js",
@@ -135458,7 +135514,7 @@
    "naarBestand": "server/kern/mobiliteit/storing.js",
    "naar": "ensureStoringen",
    "hoe": "lokaal",
-   "lijn": 30
+   "lijn": 32
   },
   {
    "vanBestand": "server/kern/mobiliteit/storing.js",
@@ -135466,7 +135522,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 31
+   "lijn": 33
   },
   {
    "vanBestand": "server/kern/mobiliteit/storing.js",
@@ -135474,7 +135530,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 37
+   "lijn": 39
   },
   {
    "vanBestand": "server/kern/mobiliteit/storing.js",
@@ -135482,7 +135538,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "id",
    "hoe": "viaKern",
-   "lijn": 44
+   "lijn": 46
   },
   {
    "vanBestand": "server/kern/mobiliteit/storing.js",
@@ -135490,7 +135546,7 @@
    "naarBestand": "server/kern/mobiliteit/storing.js",
    "naar": "storingBeeld",
    "hoe": "lokaal",
-   "lijn": 51
+   "lijn": 53
   },
   {
    "vanBestand": "server/kern/mobiliteit/storing.js",
@@ -135498,7 +135554,7 @@
    "naarBestand": "server/kern/mobiliteit/storing.js",
    "naar": "ensureStoringen",
    "hoe": "lokaal",
-   "lijn": 59
+   "lijn": 61
   },
   {
    "vanBestand": "server/kern/mobiliteit/storing.js",
@@ -135506,7 +135562,7 @@
    "naarBestand": "server/kern/mobiliteit/storing.js",
    "naar": "ensureStoringen",
    "hoe": "lokaal",
-   "lijn": 70
+   "lijn": 72
   },
   {
    "vanBestand": "server/kern/mobiliteit/storing.js",
@@ -135514,7 +135570,15 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 72
+   "lijn": 74
+  },
+  {
+   "vanBestand": "server/kern/mobiliteit/storing.js",
+   "van": "storingTeruggave",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 109
   },
   {
    "vanBestand": "server/kern/mobiliteit/storing.js",
@@ -135522,7 +135586,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 112
+   "lijn": 118
   },
   {
    "vanBestand": "server/kern/mobiliteit/storing.js",
@@ -135530,7 +135594,7 @@
    "naarBestand": "server/kern/mobiliteit/storing.js",
    "naar": "storingBeeld",
    "hoe": "lokaal",
-   "lijn": 129
+   "lijn": 135
   },
   {
    "vanBestand": "server/kern/mobiliteit/voortgang.js",
@@ -144418,7 +144482,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 21
+   "lijn": 23
   },
   {
    "vanBestand": "server/kern/ov/reizen.js",
@@ -144426,7 +144490,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 55
+   "lijn": 57
   },
   {
    "vanBestand": "server/kern/ov/reizen.js",
@@ -144434,7 +144498,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 71
+   "lijn": 73
   },
   {
    "vanBestand": "server/kern/ov/reizen.js",
@@ -144442,7 +144506,15 @@
    "naarBestand": "server/kern/ov/index.js",
    "naar": "ovPrijsVan",
    "hoe": "viaKern",
-   "lijn": 72
+   "lijn": 74
+  },
+  {
+   "vanBestand": "server/kern/ov/reizen.js",
+   "van": "checkUit",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 87
   },
   {
    "vanBestand": "server/kern/ov/reizen.js",
@@ -144450,7 +144522,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 86
+   "lijn": 91
   },
   {
    "vanBestand": "server/kern/overheid/belasting.js",
@@ -147061,116 +147133,108 @@
    "lijn": 148
   },
   {
-   "vanBestand": "server/kern/pay/boeken.js",
-   "van": "boek",
-   "naarBestand": "server/kern/mobiliteit/index.js",
-   "naar": "id",
-   "hoe": "viaKern",
-   "lijn": 76
-  },
-  {
-   "vanBestand": "server/kern/pay/boeken.js",
-   "van": "boek",
-   "naarBestand": "server/server.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 76
-  },
-  {
-   "vanBestand": "server/kern/pay/boeken.js",
-   "van": "boek",
-   "naarBestand": "server/kern/mobiliteit/index.js",
-   "naar": "nu",
-   "hoe": "viaKern",
-   "lijn": 76
-  },
-  {
-   "vanBestand": "server/kern/pay/boeken.js",
-   "van": "boek",
-   "naarBestand": "server/kern/pay/boeken.js",
-   "naar": "pasToe",
-   "hoe": "lokaal",
-   "lijn": 77
-  },
-  {
-   "vanBestand": "server/kern/pay/boeken.js",
-   "van": "boekAsync",
-   "naarBestand": "server/kern/pay/boeken.js",
-   "naar": "boek",
-   "hoe": "lokaal",
-   "lijn": 90
-  },
-  {
-   "vanBestand": "server/kern/pay/boeken.js",
-   "van": "boekAsync",
-   "naarBestand": "server/kern/mobiliteit/index.js",
-   "naar": "nu",
-   "hoe": "viaKern",
-   "lijn": 95
-  },
-  {
-   "vanBestand": "server/kern/pay/boeken.js",
-   "van": "boekAsync",
-   "naarBestand": "server/kern/pay/boeken.js",
-   "naar": "pasToe",
-   "hoe": "lokaal",
-   "lijn": 96
-  },
-  {
    "vanBestand": "server/kern/pay/boeking.js",
    "van": "boek",
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "id",
    "hoe": "viaKern",
-   "lijn": 53
-  },
-  {
-   "vanBestand": "server/kern/pay/boeking.js",
-   "van": "boek",
-   "naarBestand": "server/server.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 53
-  },
-  {
-   "vanBestand": "server/kern/pay/boeking.js",
-   "van": "boek",
-   "naarBestand": "server/kern/mobiliteit/index.js",
-   "naar": "nu",
-   "hoe": "viaKern",
-   "lijn": 53
-  },
-  {
-   "vanBestand": "server/kern/pay/boeking.js",
-   "van": "boek",
-   "naarBestand": "server/kern/pay/boeking.js",
-   "naar": "pasToe",
-   "hoe": "lokaal",
-   "lijn": 54
-  },
-  {
-   "vanBestand": "server/kern/pay/boeking.js",
-   "van": "boekAsync",
-   "naarBestand": "server/kern/pay/boeking.js",
-   "naar": "boek",
-   "hoe": "lokaal",
    "lijn": 66
   },
   {
    "vanBestand": "server/kern/pay/boeking.js",
-   "van": "boekAsync",
+   "van": "boek",
+   "naarBestand": "server/server.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 66
+  },
+  {
+   "vanBestand": "server/kern/pay/boeking.js",
+   "van": "boek",
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 73
+   "lijn": 66
+  },
+  {
+   "vanBestand": "server/kern/pay/boeking.js",
+   "van": "boek",
+   "naarBestand": "server/kern/pay/boeking.js",
+   "naar": "pasToe",
+   "hoe": "lokaal",
+   "lijn": 67
+  },
+  {
+   "vanBestand": "server/kern/pay/boeking.js",
+   "van": "sleutelVan",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
+   "lijn": 87
+  },
+  {
+   "vanBestand": "server/kern/pay/boeking.js",
+   "van": "sleutelVan",
+   "naarBestand": "server/kern/pay/boeking.js",
+   "naar": "sleutelFout",
+   "hoe": "lokaal",
+   "lijn": 88
+  },
+  {
+   "vanBestand": "server/kern/pay/boeking.js",
+   "van": "sleutelVan",
+   "naarBestand": "server/lib/idem-handeling.js",
+   "naar": "volgendeStap",
+   "hoe": "ingevoerd",
+   "lijn": 93
+  },
+  {
+   "vanBestand": "server/kern/pay/boeking.js",
+   "van": "sleutelVan",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 97
   },
   {
    "vanBestand": "server/kern/pay/boeking.js",
    "van": "boekAsync",
    "naarBestand": "server/kern/pay/boeking.js",
-   "naar": "pasToe",
+   "naar": "sleutelVan",
    "hoe": "lokaal",
-   "lijn": 83
+   "lijn": 113
+  },
+  {
+   "vanBestand": "server/kern/pay/boeking.js",
+   "van": "boekAsync",
+   "naarBestand": "server/kern/pay/boeking.js",
+   "naar": "boek",
+   "hoe": "lokaal",
+   "lijn": 116
+  },
+  {
+   "vanBestand": "server/kern/pay/boeking.js",
+   "van": "boekAsync",
+   "naarBestand": "server/kern/betaalopdracht/terugboeking.js",
+   "naar": "boekOpSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 117
+  },
+  {
+   "vanBestand": "server/kern/pay/boeking.js",
+   "van": "boekAsync",
+   "naarBestand": "server/kern/mobiliteit/index.js",
+   "naar": "nu",
+   "hoe": "viaKern",
+   "lijn": 136
+  },
+  {
+   "vanBestand": "server/kern/pay/boeking.js",
+   "van": "reserveerSleutel",
+   "naarBestand": "server/kern/pay/boeking.js",
+   "naar": "sleutelVan",
+   "hoe": "lokaal",
+   "lijn": 148
   },
   {
    "vanBestand": "server/kern/pay/budget.js",
@@ -147642,7 +147706,15 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 30
+   "lijn": 35
+  },
+  {
+   "vanBestand": "server/kern/pay/opladen.js",
+   "van": "oplaadAfronden",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 70
   },
   {
    "vanBestand": "server/kern/pay/opladen.js",
@@ -147650,7 +147722,7 @@
    "naarBestand": "server/kern/pay/opladen.js",
    "naar": "laadOp",
    "hoe": "lokaal",
-   "lijn": 141
+   "lijn": 149
   },
   {
    "vanBestand": "server/kern/pay/partner.js",
@@ -147666,7 +147738,7 @@
    "naarBestand": "server/kern/geldregie.js",
    "naar": "betaaldienstKosten",
    "hoe": "viaKern",
-   "lijn": 58
+   "lijn": 57
   },
   {
    "vanBestand": "server/kern/pay/plafond.js",
@@ -148058,7 +148130,7 @@
    "naarBestand": "server/kern/betaalopdracht/terugboeking.js",
    "naar": null,
    "hoe": "moduleAlsFunctie",
-   "lijn": 147
+   "lijn": 151
   },
   {
    "vanBestand": "server/kern/pay/treasury.js",
@@ -148226,7 +148298,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 12
+   "lijn": 14
   },
   {
    "vanBestand": "server/kern/pay/verzoeken.js",
@@ -148234,7 +148306,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 35
+   "lijn": 38
   },
   {
    "vanBestand": "server/kern/pay/verzoeken.js",
@@ -148242,7 +148314,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "id",
    "hoe": "viaKern",
-   "lijn": 52
+   "lijn": 55
   },
   {
    "vanBestand": "server/kern/pay/verzoeken.js",
@@ -148250,7 +148322,15 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 55
+   "lijn": 58
+  },
+  {
+   "vanBestand": "server/kern/pay/verzoeken.js",
+   "van": "verzoekBetaal",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 100
   },
   {
    "vanBestand": "server/kern/pay/verzoeken.js",
@@ -148258,7 +148338,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 100
+   "lijn": 109
   },
   {
    "vanBestand": "server/kern/pay/verzoeken.js",
@@ -148266,7 +148346,7 @@
    "naarBestand": "server/kern/pay/verzoeken.js",
    "naar": "verzoekenVoor",
    "hoe": "lokaal",
-   "lijn": 133
+   "lijn": 142
   },
   {
    "vanBestand": "server/kern/pay/vingerafdruk.js",
@@ -148450,7 +148530,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 107
+   "lijn": 108
   },
   {
    "vanBestand": "server/kern/pay/zaakrekening.js",
@@ -153850,7 +153930,7 @@
    "naarBestand": "server/kern/reisbureau-betaling.js",
    "naar": "bureau",
    "hoe": "lokaal",
-   "lijn": 46
+   "lijn": 47
   },
   {
    "vanBestand": "server/kern/reisbureau-betaling.js",
@@ -153858,7 +153938,7 @@
    "naarBestand": "server/kern/reisbureau-geldrijen.js",
    "naar": "geldrijenVoor",
    "hoe": "ingevoerd",
-   "lijn": 59
+   "lijn": 60
   },
   {
    "vanBestand": "server/kern/reisbureau-betaling.js",
@@ -153866,7 +153946,15 @@
    "naarBestand": "server/kern/reisbureau-betaling.js",
    "naar": "pay",
    "hoe": "lokaal",
-   "lijn": 67
+   "lijn": 68
+  },
+  {
+   "vanBestand": "server/kern/reisbureau-betaling.js",
+   "van": "betaal",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 75
   },
   {
    "vanBestand": "server/kern/reisbureau-betaling.js",
@@ -153874,7 +153962,7 @@
    "naarBestand": "server/kern/reisbureau-betaling.js",
    "naar": "nieuwId",
    "hoe": "lokaal",
-   "lijn": 84
+   "lijn": 87
   },
   {
    "vanBestand": "server/kern/reisbureau-betaling.js",
@@ -153882,7 +153970,7 @@
    "naarBestand": "server/kern/reisbureau-betaling.js",
    "naar": "rijenVan",
    "hoe": "lokaal",
-   "lijn": 129
+   "lijn": 132
   },
   {
    "vanBestand": "server/kern/reisbureau-geldrijen.js",
@@ -182850,7 +182938,7 @@
    "naarBestand": "server/kern/synergie.js",
    "naar": "nu",
    "hoe": "lokaal",
-   "lijn": 13
+   "lijn": 15
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -182858,7 +182946,7 @@
    "naarBestand": "server/kern/synergie.js",
    "naar": "lees",
    "hoe": "lokaal",
-   "lijn": 21
+   "lijn": 23
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -182866,7 +182954,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 25
+   "lijn": 27
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -182874,29 +182962,13 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 37
+   "lijn": 39
   },
   {
    "vanBestand": "server/kern/synergie.js",
    "van": "dealMaak",
    "naarBestand": "server/kern/synergie.js",
    "naar": "id",
-   "hoe": "lokaal",
-   "lijn": 48
-  },
-  {
-   "vanBestand": "server/kern/synergie.js",
-   "van": "dealMaak",
-   "naarBestand": "server/kern/synergie.js",
-   "naar": "nu",
-   "hoe": "lokaal",
-   "lijn": 49
-  },
-  {
-   "vanBestand": "server/kern/synergie.js",
-   "van": "dealMaak",
-   "naarBestand": "server/kern/synergie.js",
-   "naar": "store",
    "hoe": "lokaal",
    "lijn": 50
   },
@@ -182904,17 +182976,33 @@
    "vanBestand": "server/kern/synergie.js",
    "van": "dealMaak",
    "naarBestand": "server/kern/synergie.js",
-   "naar": "zeg",
+   "naar": "nu",
+   "hoe": "lokaal",
+   "lijn": 51
+  },
+  {
+   "vanBestand": "server/kern/synergie.js",
+   "van": "dealMaak",
+   "naarBestand": "server/kern/synergie.js",
+   "naar": "store",
    "hoe": "lokaal",
    "lijn": 52
   },
   {
    "vanBestand": "server/kern/synergie.js",
+   "van": "dealMaak",
+   "naarBestand": "server/kern/synergie.js",
+   "naar": "zeg",
+   "hoe": "lokaal",
+   "lijn": 54
+  },
+  {
+   "vanBestand": "server/kern/synergie.js",
    "van": "dealReageer",
    "naarBestand": "server/kern/synergie.js",
    "naar": "vind",
    "hoe": "lokaal",
-   "lijn": 58
+   "lijn": 60
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -182922,7 +183010,7 @@
    "naarBestand": "server/kern/synergie.js",
    "naar": "doetMee",
    "hoe": "lokaal",
-   "lijn": 59
+   "lijn": 61
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -182930,7 +183018,7 @@
    "naarBestand": "server/kern/synergie.js",
    "naar": "zeg",
    "hoe": "lokaal",
-   "lijn": 65
+   "lijn": 67
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -182938,7 +183026,7 @@
    "naarBestand": "server/kern/synergie.js",
    "naar": "vind",
    "hoe": "lokaal",
-   "lijn": 78
+   "lijn": 80
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -182946,7 +183034,7 @@
    "naarBestand": "server/kern/synergie.js",
    "naar": "doetMee",
    "hoe": "lokaal",
-   "lijn": 79
+   "lijn": 81
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -182954,27 +183042,11 @@
    "naarBestand": "server/kern/synergie.js",
    "naar": "zeg",
    "hoe": "lokaal",
-   "lijn": 82
+   "lijn": 84
   },
   {
    "vanBestand": "server/kern/synergie.js",
    "van": "dealsVoorZaak",
-   "naarBestand": "server/kern/synergie.js",
-   "naar": "lees",
-   "hoe": "lokaal",
-   "lijn": 88
-  },
-  {
-   "vanBestand": "server/kern/synergie.js",
-   "van": "dealsVoorZaak",
-   "naarBestand": "server/kern/synergie.js",
-   "naar": "doetMee",
-   "hoe": "lokaal",
-   "lijn": 88
-  },
-  {
-   "vanBestand": "server/kern/synergie.js",
-   "van": "pakketten",
    "naarBestand": "server/kern/synergie.js",
    "naar": "lees",
    "hoe": "lokaal",
@@ -182982,11 +183054,27 @@
   },
   {
    "vanBestand": "server/kern/synergie.js",
+   "van": "dealsVoorZaak",
+   "naarBestand": "server/kern/synergie.js",
+   "naar": "doetMee",
+   "hoe": "lokaal",
+   "lijn": 90
+  },
+  {
+   "vanBestand": "server/kern/synergie.js",
+   "van": "pakketten",
+   "naarBestand": "server/kern/synergie.js",
+   "naar": "lees",
+   "hoe": "lokaal",
+   "lijn": 92
+  },
+  {
+   "vanBestand": "server/kern/synergie.js",
    "van": "pakketten",
    "naarBestand": "server/kern/synergie.js",
    "naar": "vandaag",
    "hoe": "lokaal",
-   "lijn": 91
+   "lijn": 93
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -182994,7 +183082,7 @@
    "naarBestand": "server/kern/synergie.js",
    "naar": "vind",
    "hoe": "lokaal",
-   "lijn": 99
+   "lijn": 101
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -183002,7 +183090,7 @@
    "naarBestand": "server/kern/synergie.js",
    "naar": "vandaag",
    "hoe": "lokaal",
-   "lijn": 100
+   "lijn": 102
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -183010,15 +183098,7 @@
    "naarBestand": "server/kern/synergie.js",
    "naar": "lees",
    "hoe": "lokaal",
-   "lijn": 103
-  },
-  {
-   "vanBestand": "server/kern/synergie.js",
-   "van": "pakketKoop",
-   "naarBestand": "server/kern/synergie.js",
-   "naar": "store",
-   "hoe": "lokaal",
-   "lijn": 112
+   "lijn": 105
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -183031,10 +183111,26 @@
   {
    "vanBestand": "server/kern/synergie.js",
    "van": "pakketKoop",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 118
+  },
+  {
+   "vanBestand": "server/kern/synergie.js",
+   "van": "pakketKoop",
+   "naarBestand": "server/kern/synergie.js",
+   "naar": "store",
+   "hoe": "lokaal",
+   "lijn": 121
+  },
+  {
+   "vanBestand": "server/kern/synergie.js",
+   "van": "pakketKoop",
    "naarBestand": "server/kern/synergie.js",
    "naar": "nu",
    "hoe": "lokaal",
-   "lijn": 112
+   "lijn": 121
   },
   {
    "vanBestand": "server/kern/synergie.js",
@@ -183042,7 +183138,7 @@
    "naarBestand": "server/kern/synergie.js",
    "naar": "zeg",
    "hoe": "lokaal",
-   "lijn": 114
+   "lijn": 123
   },
   {
    "vanBestand": "server/kern/taalbeleid.js",
@@ -190494,11 +190590,27 @@
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
+   "van": "vonkSleutel",
+   "naarBestand": "server/db/economische-identiteit.js",
+   "naar": "maakSleutel",
+   "hoe": "ingevoerd",
+   "lijn": 9
+  },
+  {
+   "vanBestand": "server/kern/vonk/payment.js",
    "van": "terug",
    "naarBestand": "server/kern/vonk/payment.js",
    "naar": "boek",
    "hoe": "lokaal",
-   "lijn": 19
+   "lijn": 24
+  },
+  {
+   "vanBestand": "server/kern/vonk/payment.js",
+   "van": "terug",
+   "naarBestand": "server/kern/vonk/payment.js",
+   "naar": "vonkSleutel",
+   "hoe": "lokaal",
+   "lijn": 25
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
@@ -190506,7 +190618,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 23
+   "lijn": 28
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
@@ -190514,7 +190626,7 @@
    "naarBestand": "server/kern/vonk/payment.js",
    "naar": "terug",
    "hoe": "lokaal",
-   "lijn": 26
+   "lijn": 31
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
@@ -190522,7 +190634,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 27
+   "lijn": 32
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
@@ -190530,7 +190642,7 @@
    "naarBestand": "server/kern/vonk/payment.js",
    "naar": "deelname",
    "hoe": "lokaal",
-   "lijn": 29
+   "lijn": 34
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
@@ -190538,7 +190650,7 @@
    "naarBestand": "server/kern/vonk/payment.js",
    "naar": "sluit",
    "hoe": "lokaal",
-   "lijn": 30
+   "lijn": 35
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
@@ -190546,7 +190658,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 36
+   "lijn": 41
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
@@ -190554,7 +190666,15 @@
    "naarBestand": "server/kern/vonk/payment.js",
    "naar": "boek",
    "hoe": "lokaal",
-   "lijn": 40
+   "lijn": 45
+  },
+  {
+   "vanBestand": "server/kern/vonk/payment.js",
+   "van": "betaalIntern",
+   "naarBestand": "server/kern/vonk/payment.js",
+   "naar": "vonkSleutel",
+   "hoe": "lokaal",
+   "lijn": 46
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
@@ -190562,7 +190682,7 @@
    "naarBestand": "server/kern/bewijsvlak/runtime.js",
    "naar": "observe",
    "hoe": "lid",
-   "lijn": 65
+   "lijn": 70
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
@@ -190570,7 +190690,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 75
+   "lijn": 80
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
@@ -190578,7 +190698,7 @@
    "naarBestand": "server/kern/bewijsvlak/v3-external-hook.js",
    "naar": "assess",
    "hoe": "lid",
-   "lijn": 83
+   "lijn": 88
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
@@ -190586,7 +190706,7 @@
    "naarBestand": "server/kern/bewijsvlak/runtime.js",
    "naar": "timer",
    "hoe": "lid",
-   "lijn": 102
+   "lijn": 107
   },
   {
    "vanBestand": "server/kern/vonk/payment.js",
@@ -190594,7 +190714,7 @@
    "naarBestand": "server/kern/vonk/payment.js",
    "naar": "betaalIntern",
    "hoe": "lokaal",
-   "lijn": 104
+   "lijn": 109
   },
   {
    "vanBestand": "server/kern/vonk/projecties.js",
@@ -199002,7 +199122,15 @@
    "naarBestand": "server/lib/eindstatus.js",
    "naar": "beslis",
    "hoe": "lokaal",
-   "lijn": 56
+   "lijn": 57
+  },
+  {
+   "vanBestand": "server/lib/eindstatus.js",
+   "van": "naEindstatus",
+   "naarBestand": "server/lib/antwoord-einde.js",
+   "naar": "naAntwoord",
+   "hoe": "ingevoerd",
+   "lijn": 63
   },
   {
    "vanBestand": "server/lib/eindstatus.js",
@@ -199010,7 +199138,7 @@
    "naarBestand": "server/db/verzoekcontext.js",
    "naar": "haakNaCommit",
    "hoe": "lid",
-   "lijn": 78
+   "lijn": 72
   },
   {
    "vanBestand": "server/lib/eindstatus.js",
@@ -199018,7 +199146,7 @@
    "naarBestand": "server/lib/eindstatus.js",
    "naar": "naEindstatus",
    "hoe": "lokaal",
-   "lijn": 80
+   "lijn": 74
   },
   {
    "vanBestand": "server/lib/geo.js",
@@ -199406,35 +199534,43 @@
   },
   {
    "vanBestand": "server/lib/idem.js",
-   "van": "(module)",
+   "van": "maakIdem",
+   "naarBestand": "server/lib/idem-handeling.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
+   "lijn": 109
+  },
+  {
+   "vanBestand": "server/lib/idem.js",
+   "van": "maakIdem",
    "naarBestand": "server/lib/idem.js",
    "naar": "store",
    "hoe": "lokaal",
-   "lijn": 101
+   "lijn": 116
   },
   {
    "vanBestand": "server/lib/idem.js",
-   "van": "(module)",
+   "van": "maakIdem",
    "naarBestand": "server/lib/idem.js",
    "naar": "afdrukStore",
    "hoe": "lokaal",
-   "lijn": 102
+   "lijn": 117
   },
   {
    "vanBestand": "server/lib/idem.js",
-   "van": "(module)",
-   "naarBestand": "server/server.js",
+   "van": "doeWerkEnLegVast",
+   "naarBestand": "server/lib/idem-handeling.js",
    "naar": null,
-   "hoe": "viaKern",
-   "lijn": 144
+   "hoe": "lidOpInvoer",
+   "lijn": 139
   },
   {
    "vanBestand": "server/lib/idem.js",
-   "van": "(module)",
+   "van": "maakIdem",
    "naarBestand": "server/lib/idem.js",
    "naar": "doeWerkEnLegVast",
    "hoe": "lokaal",
-   "lijn": 145
+   "lijn": 160
   },
   {
    "vanBestand": "server/lib/jws.js",
@@ -206130,7 +206266,7 @@
    "naarBestand": "server/lib/correlatie.js",
    "naar": "nieuw",
    "hoe": "lid",
-   "lijn": 51
+   "lijn": 52
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206138,7 +206274,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "nieuw",
    "hoe": "lokaal",
-   "lijn": 58
+   "lijn": 59
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206146,7 +206282,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "nieuw",
    "hoe": "lokaal",
-   "lijn": 65
+   "lijn": 66
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206154,7 +206290,7 @@
    "naarBestand": "server/kern/agentteken.js",
    "naar": "oorzaakVan",
    "hoe": "ingevoerd",
-   "lijn": 65
+   "lijn": 66
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206162,7 +206298,15 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "sluit",
    "hoe": "lokaal",
-   "lijn": 68
+   "lijn": 69
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "middleware",
+   "naarBestand": "server/lib/antwoord-einde.js",
+   "naar": "naAntwoord",
+   "hoe": "ingevoerd",
+   "lijn": 70
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206170,21 +206314,13 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "fout",
    "hoe": "lokaal",
-   "lijn": 84
+   "lijn": 85
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
    "van": "identificeer",
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "schrijfbaar",
-   "hoe": "lokaal",
-   "lijn": 91
-  },
-  {
-   "vanBestand": "server/opzet/verzoekframe.js",
-   "van": "identificeer",
-   "naarBestand": "server/opzet/verzoekframe.js",
-   "naar": "fout",
    "hoe": "lokaal",
    "lijn": 92
   },
@@ -206192,9 +206328,17 @@
    "vanBestand": "server/opzet/verzoekframe.js",
    "van": "identificeer",
    "naarBestand": "server/opzet/verzoekframe.js",
+   "naar": "fout",
+   "hoe": "lokaal",
+   "lijn": 93
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "identificeer",
+   "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "codenaamVan",
    "hoe": "lokaal",
-   "lijn": 94
+   "lijn": 95
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206202,7 +206346,7 @@
    "naarBestand": "server/kern/envelop.js",
    "naar": "keurActor",
    "hoe": "lid",
-   "lijn": 105
+   "lijn": 106
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206210,7 +206354,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "identificeer",
    "hoe": "lokaal",
-   "lijn": 127
+   "lijn": 128
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206218,7 +206362,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "schrijfbaar",
    "hoe": "lokaal",
-   "lijn": 136
+   "lijn": 137
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206226,7 +206370,7 @@
    "naarBestand": "server/kern/kosten/haak.js",
    "naar": "zetWaarnemer",
    "hoe": "lid",
-   "lijn": 141
+   "lijn": 142
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206234,7 +206378,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "zetDrager",
    "hoe": "lokaal",
-   "lijn": 141
+   "lijn": 142
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206242,7 +206386,7 @@
    "naarBestand": "server/lib/losvanverzoek.js",
    "naar": "losVanVerzoek",
    "hoe": "ingevoerd",
-   "lijn": 153
+   "lijn": 154
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206250,7 +206394,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "nieuw",
    "hoe": "lokaal",
-   "lijn": 153
+   "lijn": 154
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206258,7 +206402,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "identificeer",
    "hoe": "lokaal",
-   "lijn": 154
+   "lijn": 155
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206266,7 +206410,7 @@
    "naarBestand": "server/kern/kosten/haak.js",
    "naar": "binnen",
    "hoe": "lid",
-   "lijn": 155
+   "lijn": 156
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206274,7 +206418,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "achtergrond",
    "hoe": "lokaal",
-   "lijn": 159
+   "lijn": 160
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -206282,7 +206426,7 @@
    "naarBestand": "server/kern/envelop.js",
    "naar": "zetFrameBron",
    "hoe": "lid",
-   "lijn": 171
+   "lijn": 172
   },
   {
    "vanBestand": "server/opzet/verzoekketen.js",
@@ -206570,7 +206714,7 @@
    "naarBestand": "server/db/economische-identiteit.js",
    "naar": "saldoSamen",
    "hoe": "ingevoerd",
-   "lijn": 149
+   "lijn": 152
   },
   {
    "vanBestand": "server/pg/economische-boeking.js",
@@ -206578,7 +206722,7 @@
    "naarBestand": "server/db/collectie-publicatie.js",
    "naar": null,
    "hoe": "moduleAlsFunctie",
-   "lijn": 151
+   "lijn": 154
   },
   {
    "vanBestand": "server/pg/economische-boeking.js",
@@ -206586,7 +206730,7 @@
    "naarBestand": "server/pg/economische-boeking.js",
    "naar": "lengte",
    "hoe": "lokaal",
-   "lijn": 156
+   "lijn": 159
   },
   {
    "vanBestand": "server/pg/index.js",

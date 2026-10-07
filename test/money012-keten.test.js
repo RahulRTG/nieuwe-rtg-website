@@ -71,11 +71,13 @@ function maakStoring() {
 function maakWereld(storing) {
   const db = { data: {} };
   const klok = { t: Date.parse('2026-09-24T12:00:00Z') };
-  const w = {};
+  /* De vrijgavepoort van deze proefwereld (scripts/lib/proefvrijgave.js): de
+     stand overleeft de herstart, net als de opslag -- een bestand op schijf. */
+  const w = { vrijgave: require('../scripts/lib/proefvrijgave').proefVrijgave() };
   function bouw() {
     w.betaalWaarheid = require('../server/kern/betaalwaarheid')({ d: () => db.data, save: () => {},
       crypto, betaal: storing, nu: () => new Date(klok.t).toISOString(), log: null });
-    w.pay = require('../server/kern/pay')({ db, save: () => {}, bijeen: async (werk) => werk(),
+    w.pay = require('../server/kern/pay')({ db, save: () => {}, bijeen: async (werk) => werk(), vrijgave: w.vrijgave,
       payBoekingenVoegToe: require('../server/kern/pay/loshistorie')(db), crypto, betaal: storing,
       keyVanCodenaam: (c) => (c === CODENAAM ? 'proef:' + c : null), sseToCustomer: () => {},
       schoon: (x) => String(x || ''), betaaldienstKosten: () => 0,

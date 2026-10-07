@@ -17,12 +17,14 @@
    beide instances claimden, en de proef zakte op "precies een boeking uit de
    escrow" (kreeg 2). Teruggedraaid, daarna groen. */
 'use strict';
+const metDekking = require('./lib/dekking');
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 
 const URL = process.env.DATABASE_URL || process.env.PG_URL;
-const OVERSLAAN = URL ? false : 'DATABASE_URL ontbreekt; deze proef vereist een echte PostgreSQL';
+const OVERSLAAN = vereist('pg', !!URL, 'DATABASE_URL ontbreekt; deze proef vereist een echte PostgreSQL');
 
 test('tegoedbon: claim en escrowboeking zijn atomair over twee PostgreSQL-instances en crash/hervat',
   { skip: OVERSLAAN, timeout: 120000 }, async () => {
@@ -44,7 +46,7 @@ test('tegoedbon: claim en escrowboeking zijn atomair over twee PostgreSQL-instan
         data.payBoekingen.unshift(rij);
         return { ok: true, boeking: rij };
       };
-      return require('../server/kern/pay/tegoed')({
+      return require('../server/kern/pay/tegoed')(metDekking({
         crypto, save() {}, nu: () => nu, d: () => data,
         schoon: (s, m) => String(s == null ? '' : s).slice(0, m),
         rekLid: c => 'lid:' + c, rekPartner: c => 'partner:' + c,
@@ -59,7 +61,7 @@ test('tegoedbon: claim en escrowboeking zijn atomair over twee PostgreSQL-instan
         },
         zorgSaldo: async () => ({ ok: true }), seintje() {}, bestaatLid: async () => true,
         MIN_CENTEN: 1, MAX_CENTEN: 500000
-      });
+      }));
     };
     const lees = async pg => {
       const { rows } = await pg.pool.query(
@@ -76,7 +78,13 @@ test('tegoedbon: claim en escrowboeking zijn atomair over twee PostgreSQL-instan
       await a.schema();
       const oudeBon = (id, code, centen) => ({ id, code, van: 'Koper', vanSoort: 'lid', aan: null,
         centen, oms: 'Oud', status: 'open', at: nu - 1000, vervalt: nu + 86400000, boeking: 'PB0' });
-      await a.flushVoorrang({ paySaldi: { 'extern:tegoed': 5000, 'lid:Koper': -5000 } });
+      /* Een begintoestand die het grootboek zelf ook aanneemt: de koper laadde
+         50 euro op en kocht er tegoed van, dus hij staat op nul en het geld
+         staat in de escrow. Hier stond `'lid:Koper': -5000` -- som nul, maar
+         een lid in het rood, en de sluitcontrole zegt dan terecht "klopt niet".
+         Elke toets die daarna dezelfde database las (tegoedbon-routes), zag
+         een kapot grootboek dat deze opstelling had achtergelaten. */
+      await a.flushVoorrang({ paySaldi: { 'extern:oplaad': -5000, 'extern:tegoed': 5000 } });
       await a.flush({ payBoekingen: [], payTegoed: [oudeBon('TG1', OUD, 3000), oudeBon('TG2', TWEEDE, 2000)] }, true);
       const da = await a.laadAlles(), db = await b.laadAlles();
       const ka = kern(a, da), kb = kern(b, db);

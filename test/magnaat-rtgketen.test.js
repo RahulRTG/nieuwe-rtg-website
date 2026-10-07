@@ -47,7 +47,9 @@ const betaal = require('../server/betaal');
 const maakKeten = require('../server/kern/spellen/magnaat/rtg-keten');
 
 const WORTEL = path.join(__dirname, '..');
-const keten = maakKeten({ betaal, crypto });
+/* De vrijgavepoort van een proefwereld (scripts/lib/proefvrijgave.js): de keten loopt
+   langs de echte poort, met alleen de bevoegdheidslaag ingespoten. */
+const keten = maakKeten({ betaal, crypto, vrijgave: require('../scripts/lib/proefvrijgave').proefVrijgave() });
 
 test('1. de keten draait op de simulatiebank en niet op iets anders', () => {
   assert.equal(betaal.AANBIEDER, 'simulatie',

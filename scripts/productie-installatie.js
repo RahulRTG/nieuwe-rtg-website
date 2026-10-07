@@ -105,7 +105,8 @@ function valideerKeuzes(env) {
     urlFout('DATABASE_URL', env.DATABASE_URL, ['postgres:', 'postgresql:']),
     urlFout('REDIS_URL', env.REDIS_URL, ['redis:', 'rediss:']),
     urlFout('SMTP_URL', env.SMTP_URL, ['smtp:', 'smtps:']),
-    urlFout('ERR_WEBHOOK_URL', env.ERR_WEBHOOK_URL, ['https:'], false)
+    urlFout('ERR_WEBHOOK_URL', env.ERR_WEBHOOK_URL, ['https:'], false),
+    urlFout('RTG_ANKERPOST_URL', env.RTG_ANKERPOST_URL, ['https:'], false)
   ]) if (fout) fouten.push(fout);
   if (env.RTG_BACKUP_DIR && !path.isAbsolute(env.RTG_BACKUP_DIR)) fouten.push('RTG_BACKUP_DIR moet een absoluut pad zijn.');
   if (env.RTG_MOTOR_STATE_KEY_FILE && !path.isAbsolute(env.RTG_MOTOR_STATE_KEY_FILE))
@@ -125,7 +126,7 @@ function samenvatting(env) {
   const namen = [
     'RTG_OWNER_EMAIL', 'APP_URL', 'DATABASE_URL', 'REDIS_URL', 'SMTP_URL',
     'STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'RTG_MEDIA_BACKEND',
-    'RTG_MEDIA_S3_BUCKET', 'RTG_BACKUP_DIR', 'ERR_WEBHOOK_URL', 'RTG_MOTOR_GELD',
+    'RTG_MEDIA_S3_BUCKET', 'RTG_BACKUP_DIR', 'ERR_WEBHOOK_URL', 'RTG_ANKERPOST_URL', 'RTG_MOTOR_GELD',
     'RTG_MOTOR_STATE_KEY_FILE', 'RTG_MOTOR_EXPECT_GENESIS'
   ];
   return namen.map(naam => {
@@ -194,6 +195,7 @@ async function verzamel(huidig) {
   wijzigingen.REDIS_URL = await vraag('Redis-URL', { standaard: zonderPlaceholder(huidig.REDIS_URL) || (compose ? 'redis://redis:6379' : '') });
   wijzigingen.SMTP_URL = await vraag('SMTP-URL (wordt verborgen)', { standaard: zonderPlaceholder(huidig.SMTP_URL), geheim: true });
   wijzigingen.ERR_WEBHOOK_URL = await vraag('HTTPS-webhook voor externe foutalarmering (verplicht voor publieke productie)', { standaard: huidig.ERR_WEBHOOK_URL || '' });
+  wijzigingen.RTG_ANKERPOST_URL = await vraag('HTTPS-adres van de tweede machine voor het auditanker (verplicht voor publieke productie; zie scripts/ankerontvanger.js)', { standaard: huidig.RTG_ANKERPOST_URL || '' });
   wijzigingen.RTG_BACKUP_DIR = await vraag('Absoluut pad naar een tweede backupschijf/mount (optioneel)', { standaard: huidig.RTG_BACKUP_DIR || '' });
 
   const echtGeld = await jaNee('Moeten echte Stripe-betalingen bij livegang actief zijn', !!huidig.STRIPE_SECRET_KEY);

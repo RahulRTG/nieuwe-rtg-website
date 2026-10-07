@@ -102,7 +102,10 @@ function maakFactuurCorrectie({ db, accounts, payVan, fonds, bijeen, log, broadc
         const b = await pay.huisUit({
           aanCodenaam: codenaam, centen,
           oms: 'Correctie RTG factuur ' + inv.id,
-          idem: 'inv-correctie:' + inv.id
+          idem: 'inv-correctie:' + inv.id,
+          /* Geld TERUG naar het lid dat de factuur betaalde: afwikkeling, en dus
+             niet tegen te houden door een noodstop op het interne saldo. */
+          afwikkeling: 'correctie op een betaalde RTG-factuur'
         });
         if (b && b.error) { uit = b; return; }
 

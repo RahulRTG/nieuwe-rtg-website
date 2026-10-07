@@ -62,7 +62,12 @@ const STAND = {
   NIET_BETALEND: 'NIET_BETALEND',
   LOOPT: 'LOOPT',
   GEEINDIGD: 'GEEINDIGD',
-  GEEN_CONTRACT: 'GEEN_CONTRACT'
+  GEEN_CONTRACT: 'GEEN_CONTRACT',
+  /* A-P1-03: de stand kon niet worden GELEZEN (laag weg, opslagfout). Dat is
+     iets anders dan GEEN_CONTRACT -- daar is gezocht en niets gevonden. Hier is
+     niet gezocht, en een betaalde capability gaat dan dicht: een verifier die
+     kapot is, mag niet klinken als een ja. */
+  ONBEKEND: 'ONBEKEND'
 };
 
 /* De twee regels, met per stuk waarom hij apart staat. Geen vrijstelling: een
@@ -163,9 +168,16 @@ function weeg(schaduw, oordeel) {
    (ONBEKEND is geen WEIGEREN), en een afspraak in concept of aangeboden is nog
    niet voorbij. De basislaag is de gratis app: tier 'guest'. */
 const BASIS_TIER = 'guest';
+function onbekend(tier, reden) {
+  const pas = pasVan(tier);
+  if (!BETALEND.includes(pas)) return { stand: STAND.NIET_BETALEND, pas, bezwaar: null, regel: null };
+  return { stand: STAND.ONBEKEND, pas, regel: null, bezwaar: 'de contractstand is onbekend: ' + reden };
+}
+
 function afgedwongen(oordeel) {
+  if (oordeel && oordeel.stand === STAND.ONBEKEND) return true;
   if (!oordeel || oordeel.stand !== STAND.GEEINDIGD) return false;
   return oordeel.status === STATUS.GEEINDIGD || oordeel.status === STATUS.OPZEGGEND;
 }
 
-module.exports = { STAND, REGELS, BASIS_TIER, beoordeel, afgedwongen, weeg };
+module.exports = { STAND, REGELS, BASIS_TIER, beoordeel, afgedwongen, weeg, onbekend };

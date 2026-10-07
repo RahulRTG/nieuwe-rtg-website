@@ -70,8 +70,10 @@ test('zelfstandige apps houden de normale vijf Edge-ankers', () => {
   assert.match(SIMPLE, /grid-template-columns:minmax\(44px,.85fr\) minmax\(44px,.85fr\) 64px minmax\(72px,1.4fr\) minmax\(44px,.85fr\)/);
   assert.match(SIMPLE, /not\(\[data-rtg-edge-appbar="true"\]\)/,
     'de nieuwe actions-stand valt onder de normale Edge en niet onder de oude vervangingsstand');
-  assert.doesNotMatch(ACCESS, /:has\(#(?:gate|onbGate)[^)]*\)\s+\.rtg-adaptive-(?:edge|bar|item)/,
-    'ook de inloglaag mag de normale Edge niet verkleinen of van palet laten wisselen');
+  assert.ok(ACCESS.includes('body:has(#gate[data-rtg-access]:not([style*="display: none"])) > :is(.rtg-edge-chrome'),
+    'de canonieke Edge begint pas na de beveiligde toegang');
+  assert.ok(ACCESS.includes('body:has(#onbGate:not([hidden])) > :is(.rtg-edge-chrome'),
+    'ook onboarding blijft één rustige toegangstaak zonder productnavigatie');
 });
 
 test('ervaringsschermen openen weer met de herkenbare Edge', () => {

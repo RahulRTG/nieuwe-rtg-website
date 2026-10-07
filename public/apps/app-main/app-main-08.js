@@ -180,6 +180,8 @@
     const go = document.getElementById('onbGo'), inp = document.getElementById('onbIn');
     if (go && inp) go.addEventListener('click', function(){ onbInvoer(inp.value); });
     if (inp) inp.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); onbInvoer(inp.value); } });
+    const language = document.getElementById('onbLanguage');
+    if (language) language.addEventListener('click', function(){ if (window.RTGi18n) RTGi18n.openModal(); });
     const kf = document.getElementById('onbKycFile');
     if (kf) kf.addEventListener('change', function(){ const f = kf.files[0]; kf.value = ''; onbPaspoortGekozen(f); });
   })();

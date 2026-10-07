@@ -38,7 +38,12 @@ const BESLUIT = { wie: 'user-1', bron: 'proefdossier-1', sha256: 'a'.repeat(64),
    toets een as om weg te halen. */
 function opstelling(o = {}) {
   const bestand = o.bestand || path.join(map(), 'vrijgave-stand.json');
+  /* `lokaal: () => false`: deze toetsen wegen de assen zoals op een ECHTE
+     installatie. De lokale standaard (server/kern/vrijgave/lokaal.js) heeft
+     eigen toetsen in test/vrijgave-lokaal.test.js; zonder deze regel hing de
+     uitslag hier af van de NODE_ENV van wie de toets draait. */
   const v = maakVrijgave({ stand: maakStand({ bestand, nu: o.nu }), openbaar: o.openbaar || (() => false),
+    lokaal: o.lokaal || (() => false),
     bewijs: o.bewijs || BEWEZEN, bevoegd: o.bevoegd === undefined ? MAG : o.bevoegd,
     providerGezond: o.providerGezond || (() => ({ gezond: true })) });
   if (!o.zonderBesluit) assert.ok(v.besluitVastleggen('provider.stripe', BESLUIT).ok);

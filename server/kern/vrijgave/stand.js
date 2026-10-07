@@ -42,11 +42,10 @@
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
-const { STANDEN, BESLUITEN, vind } = require('./register');
+const { vind } = require('./register');
 
 const TTL_MS = 1000;
 const SLOT_MS = 10000;
-const FORMAAT = 'rtg-vrijgave-stand-v1';
 const SLAAP = new Int32Array(new SharedArrayBuffer(4));
 
 function datamap(env = process.env) {
@@ -55,24 +54,9 @@ function datamap(env = process.env) {
 
 function leeg() { return { formaat: FORMAAT, versie: 0, standen: {}, besluiten: {}, geschiedenis: [] }; }
 
-/* De vorm van het bestand nalopen. Gooit bij iedere afwijking; de lezer zet
-   dat om in een configuratiefout. */
-function keur(obj) {
-  if (!obj || obj.formaat !== FORMAAT) throw new Error('onbekend formaat');
-  if (!Number.isSafeInteger(obj.versie) || obj.versie < 0) throw new Error('versie ongeldig');
-  if (!obj.standen || typeof obj.standen !== 'object' || Array.isArray(obj.standen)) throw new Error('standen ongeldig');
-  for (const [id, s] of Object.entries(obj.standen)) {
-    if (!s || typeof s !== 'object') throw new Error('stand van ' + id + ' ongeldig');
-    if (!STANDEN.includes(s.stand)) throw new Error('onbekende stand "' + s.stand + '" bij ' + id);
-  }
-  if (!obj.besluiten || typeof obj.besluiten !== 'object' || Array.isArray(obj.besluiten)) throw new Error('besluiten ongeldig');
-  for (const [id, b] of Object.entries(obj.besluiten)) {
-    if (!BESLUITEN[id]) throw new Error('onbekend besluit ' + id);
-    if (!b || typeof b.wie !== 'string' || !/^[a-f0-9]{64}$/.test(String(b.sha256 || ''))) throw new Error('besluit ' + id + ' ongeldig');
-  }
-  if (!Array.isArray(obj.geschiedenis)) throw new Error('geschiedenis ongeldig');
-  return obj;
-}
+/* De vorm van het bestand nalopen, en welke velden er mogen staan:
+   ./standkeur.js. */
+const { FORMAAT, VELDEN, keur } = require('./standkeur');
 
 function maakStand({ env = process.env, bestand, nu = () => Date.now() } = {}) {
   const pad = bestand || path.join(datamap(env), 'vrijgave-stand.json');
@@ -175,4 +159,4 @@ function maakStand({ env = process.env, bestand, nu = () => Date.now() } = {}) {
   return { lees, standVan, besluit, muteer, pad, TTL_MS };
 }
 
-module.exports = { maakStand, TTL_MS, FORMAAT, keur, leeg };
+module.exports = { maakStand, TTL_MS, FORMAAT, VELDEN, keur, leeg };

@@ -45,9 +45,9 @@ const STANDEN = Object.freeze(['disabled', 'shadow', 'sandbox', 'enabled', 'susp
    passkey, en schaduw telt daarbij als aanzetten. */
 const ACTIVEREND = Object.freeze(['enabled', 'sandbox', 'shadow']);
 
-/* Rails zonder echt geld. Alleen hierop werkt `sandbox`. De namen zijn die van
-   server/betaal.js (`aanbieder()` en AANBIEDER), niet verzonnen. */
-const NEPRAILS = Object.freeze(['simulatie', 'magnaat-test', 'stripe-connect-sandbox']);
+/* De rails zonder echt geld (NEPRAILS, LOKALE_NEPRAILS) en de echte providers:
+   ./rails.js. */
+const { NEPRAILS, LOKALE_NEPRAILS, ECHTE_PROVIDERS } = require('./rails');
 
 const r = (id, x) => Object.freeze(Object.assign({ id }, x));
 
@@ -167,5 +167,5 @@ const { BESLUITEN } = require('./besluiten');
    register als standaard. */
 const valideerRegister = (lijst = REGISTER, opties) => require('./registerkeur').valideerRegister(lijst, opties);
 
-module.exports = { STANDEN, ACTIVEREND, NEPRAILS, REGISTER, BESLUITEN,
+module.exports = { STANDEN, ACTIVEREND, NEPRAILS, LOKALE_NEPRAILS, ECHTE_PROVIDERS, REGISTER, BESLUITEN,
   valideerRegister, vind };

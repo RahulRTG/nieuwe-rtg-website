@@ -74,7 +74,7 @@ function beoordeel(overzicht) {
   if (!caps) return { ok: false, fouten: ['er is geen vrijgaveoverzicht om te beoordelen'], regels };
   if (overzicht.configuratiefout) fouten.push('configuratiefout in de vrijgavestand: ' + overzicht.configuratiefout);
   const gezien = new Set();
-  const ASSEN = ['geimplementeerd', 'geverifieerd', 'geautoriseerd', 'ingeschakeld', 'afhankelijkhedenGezond'];
+  const vrijgaveAssen = ['geimplementeerd', 'geverifieerd', 'geautoriseerd', 'ingeschakeld', 'afhankelijkhedenGezond'];
   for (const c of caps) {
     gezien.add(c.id);
     const soort = vanCapability(c.id);
@@ -88,7 +88,7 @@ function beoordeel(overzicht) {
       ? !!gekozen && gekozen.beschikbaarVoorRechthebbende === true
       : c.beschikbaarVoorRechthebbende === true || (!!per && Object.values(per).some(x => x && x.beschikbaarVoorRechthebbende === true));
     const bron = gekozen || c;
-    const assen = ASSEN.filter(a => bron[a] !== true);
+    const assen = vrijgaveAssen.filter(a => bron[a] !== true);
     const regel = { id: c.id, baseline: soort, via: b.via || null, beschikbaar: open, ontbrekendeAssen: assen,
       code: bron.code || null, intern: bron.intern || null };
     regels.push(regel);

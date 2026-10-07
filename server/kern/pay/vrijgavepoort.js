@@ -32,14 +32,14 @@ function maakPayVrijgave({ vrijgave, betaal } = {}) {
   /* De rail van een interne boeking: het gesloten grootboek zelf. Alleen op een
      aantoonbaar lokale installatie is dat een rail zonder echt geld
      (../vrijgave/lokaal.js); elders is het het tegoed van echte mensen. */
-  const INTERN = { rail: 'intern', recht: true, actor: { soort: 'route' } };
+  const internCtx = { rail: 'intern', recht: true, actor: { soort: 'route' } };
   /* De rail van een oplading of uitbetaling: de provider die de betaalnaad nu
      gebruikt. Leest hij niets, dan is het `onbekend` -- en dan is de capability
      dicht (geen provider, geen afhankelijkheid). */
   const inkomendeRail = () => String((betaal && betaal.AANBIEDER) || 'onbekend');
 
   function weiger(capability, ctx) {
-    return V.weigering(capability, Object.assign({}, INTERN, ctx || {}), poort());
+    return V.weigering(capability, Object.assign({}, internCtx, ctx || {}), poort());
   }
 
   return {

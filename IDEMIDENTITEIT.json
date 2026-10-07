@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-07T00:06:21.610Z",
-    "commit": "0775f7157",
+    "op": "2026-10-07T00:48:35.623Z",
+    "commit": "fb6e252b1",
     "boomVuil": true,
-    "boomAnders": 0,
+    "boomAnders": 3,
     "instrument": "scripts/idemidentiteit.js",
     "node": "v22.22.0"
   },
@@ -328,8 +328,24 @@
       "uitspraak": "voegtToe"
     },
     {
+      "bestand": "server/kern/pay/partner-uitbetaal.js",
+      "regel": 52,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "supplierCode"
+      ],
+      "afdrukNamen": [
+        "supplierCode"
+      ],
+      "regelTekst": "return metIdem(idem ? 'uit:' + supplierCode + ':' + idem : null, 'uit|' + supplierCode, async () => {",
+      "afdrukExtra": [],
+      "uitspraak": "voegtNietsToe"
+    },
+    {
       "bestand": "server/kern/pay/partner.js",
-      "regel": 50,
+      "regel": 39,
       "soort": "kern",
       "binding": "server/lib/idem.js",
       "sleutelNamen": [
@@ -347,22 +363,6 @@
         "supplierCode"
       ],
       "uitspraak": "voegtToe"
-    },
-    {
-      "bestand": "server/kern/pay/partner.js",
-      "regel": 113,
-      "soort": "kern",
-      "binding": "server/lib/idem.js",
-      "sleutelNamen": [
-        "idem",
-        "supplierCode"
-      ],
-      "afdrukNamen": [
-        "supplierCode"
-      ],
-      "regelTekst": "return metIdem(idem ? 'uit:' + supplierCode + ':' + idem : null, 'uit|' + supplierCode, async () => {",
-      "afdrukExtra": [],
-      "uitspraak": "voegtNietsToe"
     },
     {
       "bestand": "server/kern/pay/tegoed-zaak.js",

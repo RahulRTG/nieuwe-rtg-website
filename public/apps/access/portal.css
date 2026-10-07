@@ -7,11 +7,15 @@
   --access-paper-deep:#e8e5dd;
   --access-surface:#faf9f5;
   --access-ink:#11110f;
-  --access-muted:#6a675f;
+  /* Text tokens must remain readable on the warm radial panel as well as the
+     plain paper surface. The brand gold itself remains available for fills and
+     marks; its darker companion is the accessible text colour. */
+  --access-muted:#57534c;
   --access-line:rgba(17,17,15,.14);
   --access-burgundy:#711b36;
   --access-burgundy-bright:#9f3659;
   --access-gold:#857007;
+  --access-gold-text:#655400;
   --access-white:#fffdf8;
   --access-ease:cubic-bezier(.22,.72,.16,1);
 }
@@ -92,7 +96,7 @@ body:has(#onbGate:not([hidden])) > :is(.rtg-edge-chrome,.rtg-edge-2-reveal,.rtg-
 .access-language:hover,.access-language:focus-visible{border-color:var(--access-burgundy);color:var(--access-burgundy);background:var(--access-surface)}
 .access-brand-copy{position:relative;z-index:2;margin-top:clamp(56px,9vh,110px)}
 #gate[data-rtg-access] .access-brand small,.access-brand small{
-  display:block;margin:0;color:var(--access-gold);font:650 10px/1.4 Inter,sans-serif;
+  display:block;margin:0;color:var(--access-gold-text);font:650 10px/1.4 Inter,sans-serif;
   letter-spacing:.16em;text-transform:uppercase;
 }
 .access-brand-copy p{
@@ -177,7 +181,7 @@ body:has(#onbGate:not([hidden])) > :is(.rtg-edge-chrome,.rtg-edge-2-reveal,.rtg-
 #gate[data-rtg-access] .access-new button{display:inline-flex;min-height:0;height:auto;padding:0 3px;border:0;border-radius:0;background:none;color:var(--access-burgundy);font-size:inherit;line-height:inherit;text-decoration:none;border-bottom:1px solid currentColor}
 #gate[data-rtg-access] .ag-experience{margin:15px 0;color:var(--access-muted);font-size:11px;line-height:1.6}
 #gate[data-rtg-access] .access-progress{
-  margin:0 0 18px;color:var(--access-gold);font-size:9px;font-weight:650;line-height:1.5;letter-spacing:.16em;text-transform:uppercase;
+  margin:0 0 18px;color:var(--access-gold-text);font-size:9px;font-weight:650;line-height:1.5;letter-spacing:.16em;text-transform:uppercase;
 }
 #gate[data-rtg-access] .access-field{display:block;margin:0 0 19px;color:var(--access-ink);font-size:12px;line-height:1.6}
 #gate[data-rtg-access] .access-field input,#onbGate #onbIn{
@@ -235,7 +239,7 @@ html body[data-ios-home] #onbGate:not([hidden]){
   margin:0 0 55px;padding-bottom:16px;display:flex;align-items:baseline;justify-content:space-between;
   border-bottom:1px solid var(--access-line);color:var(--access-ink);font:400 29px/1 "Bodoni Moda",Georgia,serif;
 }
-#onbGate .access-brand small{color:var(--access-gold);font:650 9px/1.4 Inter,sans-serif;letter-spacing:.16em}
+#onbGate .access-brand small{color:var(--access-gold-text);font:650 9px/1.4 Inter,sans-serif;letter-spacing:.16em}
 #onbGate .onb-brand-actions{display:flex;align-items:center;gap:18px}
 #onbGate .onb-mond{display:none}
 #onbGate .onb-heading{
@@ -255,7 +259,7 @@ html body[data-ios-home] #onbGate:not([hidden]){
   background:var(--access-surface);color:var(--access-ink);font:400 13px/1.75 Inter,sans-serif;white-space:pre-wrap;
 }
 #onbGate .onb-consent{display:flex;align-items:flex-start;gap:12px;margin:20px 0;color:var(--access-ink);font-size:13px;line-height:1.6}
-#onbGate .onb-consent input{width:23px;height:23px;flex:0 0 23px;margin:2px 0;accent-color:var(--access-burgundy)}
+#onbGate .onb-consent input{width:24px;height:24px;flex:0 0 24px;margin:2px 0;accent-color:var(--access-burgundy)}
 #onbGate .onb-consent[hidden]{display:none}
 #onbGate .onb-fout{min-height:20px;color:#8c1738;font-size:13px;line-height:1.6}
 #onbGate .onb-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0 0 16px;font:400 12px/1.6 Inter,sans-serif}

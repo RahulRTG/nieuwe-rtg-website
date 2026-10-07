@@ -650,7 +650,7 @@ test('Gedeelde klok: het vak is vierkant, dus de schaduw is rond',
   }
 });
 
-test('Inlogportaal: inhoud en standaard Edge overlappen niet',
+test('Inlogportaal: toegang bezit het venster en houdt de standaard Edge verborgen',
   { skip: geenBrowser(pw) }, async () => {
   const TMP=verseDataDir();
   const {child,base}=await startServer({env:{SMTP_URL:'',RTG_DATA_DIR:TMP}});
@@ -661,15 +661,19 @@ test('Inlogportaal: inhoud en standaard Edge overlappen niet',
       const ctx=await browser.newContext({viewport});
       await ctx.addInitScript(()=>{localStorage.setItem('rtg_lang','nl');localStorage.setItem('rtg_cookieinfo_v1','1');});
       const page=await ctx.newPage(); await page.goto(base+'/apps/app.html');
-      await page.waitForSelector('.rtg-adaptive-bar');
+      await page.waitForSelector('#gate[data-rtg-access]');
       await page.locator('#agNieuw').scrollIntoViewIfNeeded();
       const shape=await page.evaluate(()=>({
         bars:document.querySelectorAll('.rtg-adaptive-bar').length,
+        visibleBars:[...document.querySelectorAll('.rtg-adaptive-bar')].filter(el=>
+          el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').length,
         legacy:document.querySelectorAll('#gate .rtg-ring,#gate .ag-mond').length,
         end:document.querySelector('#agNieuw').getBoundingClientRect().bottom,
-        edge:document.querySelector('.rtg-adaptive-bar').getBoundingClientRect().top
+        gate:document.querySelector('#gate[data-rtg-access]').getBoundingClientRect().bottom,
+        viewport:innerHeight
       }));
-      assert.equal(shape.bars,1); assert.equal(shape.legacy,0); assert.ok(shape.end<shape.edge);
+      assert.equal(shape.bars,1); assert.equal(shape.visibleBars,0); assert.equal(shape.legacy,0);
+      assert.ok(shape.end<=shape.gate&&shape.end<=shape.viewport);
       await ctx.close();
     }
   } finally { if(browser) await browser.close(); stop(child); fs.rmSync(TMP,{recursive:true,force:true}); }

@@ -133,22 +133,22 @@ test('het inlogportaal en de aanmelding werken met de bestaande beveiligde route
   async function ready(page){await page.waitForFunction(()=>!document.getElementById('agGo').disabled);}
   let accountToken;
   try {
-    await t.test('mobiel en desktop tonen de nieuwe compositie met precies één standaard Edge',async()=>{
+    await t.test('mobiel en desktop tonen de pre-auth compositie met de standaard Edge verborgen',async()=>{
       for(const viewport of [{width:320,height:680},{width:390,height:844},{width:1440,height:900}]){
         const c=await context(viewport),p=await open(c);
         const errors=[];letOpFouten(p,errors);
         const geometry=await p.evaluate(()=>{
-          const g=document.getElementById('gate'),bar=document.querySelector('.rtg-adaptive-bar');
-          const b=bar.getBoundingClientRect(),pass=document.getElementById('agPasskey').getBoundingClientRect();
+          const g=document.getElementById('gate'),pass=document.getElementById('agPasskey').getBoundingClientRect();
           return {bars:document.querySelectorAll('.rtg-adaptive-bar').length,
+            visibleBars:[...document.querySelectorAll('.rtg-adaptive-bar')].filter(el=>
+              el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').length,
             overflow:document.documentElement.scrollWidth>innerWidth,
-            edgeInside:b.left>=0&&b.right<=innerWidth&&b.bottom<=innerHeight,
             passHeight:pass.height,clocks:g.querySelectorAll('[data-rtg-klok]').length,
             color:getComputedStyle(g).backgroundColor};
         });
         assert.equal(geometry.bars,1);assert.equal(geometry.overflow,false);
-        assert.equal(geometry.edgeInside,true);assert.ok(geometry.passHeight>=48);assert.equal(geometry.clocks,0);
-        assert.equal(geometry.color,'rgb(250, 248, 243)');
+        assert.equal(geometry.visibleBars,0);assert.ok(geometry.passHeight>=48);assert.equal(geometry.clocks,0);
+        assert.equal(geometry.color,'rgb(244, 242, 236)');
         await p.locator('#agNieuw').click();
         assert.match(await p.locator('#agZin').innerText(),/Vul uw volledige naam in\./);
         assert.equal(await p.locator('#agStappen').innerText(),'STAP 1 VAN 4');

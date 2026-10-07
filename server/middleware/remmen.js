@@ -59,8 +59,13 @@ function opslagPoort(opslagKlaar) {
    verzoeken van de eigenaar met een geldig token: die moet de app bewust
    spanningsloos kunnen maken en er zelf bij blijven om de zekering er weer in
    te doen. */
-function hoofdzekering({ db, accounts, eigenaar }) {
+function hoofdzekering({ db, accounts, eigenaar, stroom = () => require('../kern/sessiestroom').actief() }) {
   const { zekeringGesprongen } = require('../techniek');
+  const isBaas = (tok) => {
+    try { return !!tok && eigenaar.isEigenaar(accounts, accounts.verifyToken(tok)); } catch (e) { return false; }
+  };
+  const dicht = (req, res, next) => req.path.startsWith('/api/')
+    ? res.status(503).json({ error: 'De app is in onderhoud. Probeer het later opnieuw.' }) : next();
   return (req, res, next) => {
     const z = db.data && db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.onderhoud;
     /* zekeringGesprongen laat een tijdgebonden zekering hier vanzelf doven;
@@ -70,15 +75,25 @@ function hoofdzekering({ db, accounts, eigenaar }) {
     if (!zekeringGesprongen(z)) return next(); // normaal: stroom staat erop
     const p = req.path;
     if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
-    try {
-      /* Alleen uit de kop: een sessie in het adres wordt nergens meer aangenomen
-         (een live-stroom opent met een stroomticket, kern/sessiestroom.js). */
-      const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '');
-      const u = tok ? accounts.verifyToken(tok) : null;
-      if (eigenaar.isEigenaar(accounts, u)) return next(); // de eigenaar mag er wel bij
-    } catch (e) {}
-    if (p.startsWith('/api/')) return res.status(503).json({ error: 'De app is in onderhoud. Probeer het later opnieuw.' });
-    next();
+    /* Alleen uit de kop: een sessie in het adres wordt nergens meer aangenomen
+       (een live-stroom opent met een stroomticket, kern/sessiestroom.js). */
+    if (isBaas((req.get('authorization') || '').replace(/^Bearer\s+/i, ''))) return next(); // de eigenaar mag er wel bij
+    /* DE STROOM VAN DE EIGENAAR. Een EventSource stuurt geen kop: hij opent met
+       `?ticket=`, dat de eigenaar zelf (met zijn sessie in de kop, dus langs
+       deze zekering) heeft opgehaald. Hier stond alleen de kop, en de stroom
+       van de eigenaar kreeg in onderhoud 503 sinds de `?token=`-uitweg weg is.
+       De zekering KIJKT naar het ticket zonder het te claimen
+       (sessiestroom.kijk) en stelt dezelfde vraag aan de sessie die erin zit;
+       de deur erachter claimt en toetst het zelf. Een ticket van iemand anders,
+       een verlopen of een gebruikt ticket: dicht. Er komt GEEN sessie uit het
+       adres terug -- `?token=` blijft overal geweigerd. */
+    const ticket = req.query && typeof req.query.ticket === 'string' ? req.query.ticket : '';
+    const dienst = ticket && p.startsWith('/api/') ? stroom() : null;
+    if (!dienst || typeof dienst.kijk !== 'function') return dicht(req, res, next);
+    Promise.resolve(dienst.kijk(ticket)).then(uit => {
+      if (uit && isBaas(uit.token)) return next();
+      dicht(req, res, next);
+    }, () => dicht(req, res, next));
   };
 }
 

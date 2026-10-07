@@ -63,7 +63,8 @@ const aanTafel = (pay) => SPELERS.reduce((n, c) => n + pay.saldoVan(pay.rekLid(c
    scenario kan onderscheiden -- zie de kop van tik() in ./rtg-keten-pomp.js. */
 const regels = (pay) => SPELERS.reduce((n, c) => n + pay.boekingenVan(pay.rekLid(c)).length, 0);
 
-module.exports = function rtgKeten({ betaal, crypto }) {
+/* `vrijgave`: van de aanroeper (scripts/lib/proefvrijgave.js); zonder is hij dicht. */
+module.exports = function rtgKeten({ betaal, crypto, vrijgave }) {
   if (!betaal) throw new Error('rtg-keten heeft de betaalnaad nodig; injecteer server/betaal.');
 
   /* EEN VERSE KETEN. Een lege database, een echte kern/pay eroverheen, en de
@@ -78,6 +79,7 @@ module.exports = function rtgKeten({ betaal, crypto }) {
       crypto: cr, betaal, log: null });
     const { pay } = require('../../pay')({
       betaalWaarheid,
+      vrijgave,
       db,
       /* Als PROPERTY en niet als methode-verkorting: kruisscan (keuringsregel 9)
          leest `save() {}` als een kale verwijzing naar de top-level `save` van een

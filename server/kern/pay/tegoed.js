@@ -80,6 +80,7 @@ module.exports = (ctx) => {
         return null;
       },
       soort: 'verzilver', door: codenaam, naar: rekLid(codenaam), idem,
+      poort: ctx.vrijgavePoort ? ctx.vrijgavePoort.intern : undefined,
       oms: (_s, t) => t.oms || 'Tegoed',
       onbekend: { status: 404, error: 'Deze tegoedcode kennen we niet.' }
     });

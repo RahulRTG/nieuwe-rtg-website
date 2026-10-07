@@ -49,8 +49,13 @@ const { handeling, volgendeStap } = require('./idem-handeling');
    aanroeper geen `geld` verklaarde. RTG Pay zet hem in motorstand: daar draagt
    elke boeking een sleutel, en zonder sleutel van de client is die er niet.
    Hier en niet bij de boeking, want de boeking komt NA zorgSaldo, en dan kan
-   er al geld van een kaart zijn gegaan. */
-function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht }) {
+   er al geld van een kaart zijn gegaan.
+
+   `poort` (optioneel, een functie): de vrijgavepoort voor NIEUW werk -- na de
+   herhaling, voor het werk. Wat dat betekent en waarom juist daar, staat in
+   ./idem-nieuwwerk.js. */
+function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht, poort }) {
+  const poortVoorNieuwWerk = require('./idem-nieuwwerk').maakPoortVoorNieuwWerk(poort);
   function store() {
     if (!d()[naam] || typeof d()[naam] !== 'object') d()[naam] = { _keys: [] };
     if (!Array.isArray(d()[naam]._keys)) d()[naam]._keys = [];
@@ -112,7 +117,11 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht }) {
           'Stuur een `idem` mee en gebruik bij een herhaling dezelfde waarde.',
         waarom: 'elke boeking bij het grootboek draagt een sleutel die een herhaling herkent' };
     }
-    if (!sleutel) return werk();
+    if (!sleutel) {
+      const dicht = poortVoorNieuwWerk(opties);
+      if (dicht) return dicht;
+      return werk();
+    }
     const s = store();
     const a = afdrukStore();
     if (sleutel in s && sleutel !== '_keys') {
@@ -129,6 +138,10 @@ function maakIdem({ d, save, naam, bijeen, duurzaam, sleutelPlicht }) {
       const eerder = await bezig.belofte;
       return (eerder && typeof eerder === 'object') ? Object.assign({}, eerder, { herhaald: true }) : eerder;
     }
+    /* Geen herhaling en geen lopende vlucht: dit is NIEUW werk. Pas hier de
+       vrijgavepoort (zie de kop van maakIdem). */
+    const dicht = poortVoorNieuwWerk(opties);
+    if (dicht) return dicht;
     let klaar;
     inVlucht.set(sleutel, { afdruk: afdruk || '', belofte: new Promise(res => { klaar = res; }) });
     let r = null, fout = null;

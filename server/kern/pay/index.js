@@ -30,7 +30,7 @@
 
 module.exports = (ctxIn) => {
   const { db, save, bijeen, economischeBoekingEenmaal, bewerkCollectie, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon,
-    betaaldienstKosten, betaalOpdrachten, waarde, accounts, payBoekingenVoegToe, betaalWaarheid } = ctxIn;
+    betaaldienstKosten, betaalOpdrachten, waarde, accounts, payBoekingenVoegToe, betaalWaarheid, vrijgave } = ctxIn;
   if (typeof payBoekingenVoegToe !== 'function')
     throw new Error('pay: payBoekingenVoegToe ontbreekt. Zonder die weg landt geen enkele grootboekregel in het transactiegrootboek.');
   const paySave = require('./opslag')({ save });
@@ -53,15 +53,9 @@ module.exports = (ctxIn) => {
   const { betalingenUit, uitFout, schaduw, motorklant, geldModus,
     MIN_CENTEN, MAX_CENTEN, WALLET_MAX, OPLAAD_MIN, AUTOLAAD_STAP, KASCODE_MS, KASCODE_MAX } = require('./stand')();
 
-  /* Idempotentie die een herstart overleeft: dezelfde knop twee keer indrukken
-     (dubbeltik, haperend netwerk, retry) geeft exact hetzelfde antwoord en boekt
-     nooit dubbel -- en dezelfde sleutel met een ANDER verzoek geeft een 409 in
-     plaats van stil het oude antwoord. Zie ../../lib/idem.js. */
-  /* duurzaam: geld is de enige laag waar bevestigen vóór duurzaamheid een belofte
-     is die de opslag nog niet heeft gedaan. Boeking en idem-sleutel zitten al in
-     EEN bundel (zie lib/idem.js); deze vlag maakt die bundel ook duurzaam. */
-  const metIdem = require('../../lib/idem')({ d, save: paySave, naam: 'payIdem', bijeen, duurzaam: true,
-    sleutelPlicht: () => geldModus === 'motor' });
+  /* De idem-laag van RTG Pay (duurzaam, met de vrijgavepoort voor nieuw werk):
+     ./idemlaag.js. */
+  const { metIdem, vrijgavePoort } = require('./idemlaag')({ d, save: paySave, bijeen, geldModus, vrijgave, betaal });
 
   /* De waardepoort (./poort.js): de toets die VOOR elke boeking gaat -- de oude
      saldo-regel als bodem, daarbovenop klasse, beleid, reserveringen en plafond.
@@ -87,7 +81,7 @@ module.exports = (ctxIn) => {
      in ./opladen.js; het krijgt de guard (boekAsync) en de helpers mee en
      raakt de boekingsregels zelf niet aan. */
   const { laadOp, oplaadAfronden, koppelBank, koppelKosten, reconcileVanMotor, zorgSaldo, betaalMetDekking, bestaatLid } = require('./opladen').maakOpladen({
-    betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save: paySave,
+    betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save: paySave, vrijgavePoort,
     motorklant, geldModus, keyVanCodenaam, plafondFout, betaalWaarheid, reserveerSleutel,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP
   });
@@ -102,7 +96,7 @@ module.exports = (ctxIn) => {
   const ctx = {
     db, save: paySave, economischeBoekingEenmaal, bewerkCollectie, crypto, betaal, schoon, nu, d,
     saldi, grootboek, klompjes, saldiKijk, grootboekKijk, klompjesKijk,
-    rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, geldModus, zorgSaldo, betaalMetDekking, seintje, bestaatLid,
+    rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, geldModus, zorgSaldo, betaalMetDekking, seintje, bestaatLid, vrijgavePoort,
     betaaldienstKosten: betaaldienstKosten || (() => 0), waarde, accounts,
     opdrachten: betaalOpdrachten,
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX,
@@ -115,8 +109,9 @@ module.exports = (ctxIn) => {
   /* KASCODE_* staat OP DE API en niet alleen in de ctx: ./kassacode.js leest
      pay.KASCODE_MS voor zijn eigen ttl. Main kent dat bestand niet, dus was het
      undefined en weigerde de linklaag bij het opstarten. */
-  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, koppelKosten, reconcileVanMotor, ledentegoed };
+  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, rekPartner, boekingenVan, koppelBank, koppelKosten, reconcileVanMotor, ledentegoed };
   api.schaduw = schaduwStand;
+  api.vrijgavePoort = vrijgavePoort;   // ook voor de brug uit de RTG Bank (../bank/walletbrug.js)
   // de portefeuille: de waardelaag kent de betekenis, dit grootboek de bedragen
   if (waarde) api.portefeuille = c => waarde.portefeuille(c, saldoVan);
   // late binding voor de eigen geldgrens van het lid (kern/geldbeleid, na pay gemount)

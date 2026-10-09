@@ -95,6 +95,7 @@ body:has(#onbGate:not([hidden])) .rtg-adaptive-edge{display:block!important;poin
   text-align:start;
 }
 .access-brand-head{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.access-brand-actions{display:flex;align-items:center;gap:14px}
 .access-brand-head a{
   display:inline-flex;padding:11px 16px 12px;background:#7f1634;border:1px solid rgba(255,255,255,.16);
   font:600 clamp(20px,2.1vw,29px)/1 "Bodoni Moda",Georgia,serif;letter-spacing:-.035em;color:var(--access-white)
@@ -105,6 +106,12 @@ body:has(#onbGate:not([hidden])) .rtg-adaptive-edge{display:block!important;poin
   letter-spacing:.08em;cursor:pointer;transition:border-color .2s,color .2s,background .2s;
 }
 .access-language:hover,.access-language:focus-visible{border-color:var(--access-burgundy);color:var(--access-burgundy);background:var(--access-surface)}
+.access-menu{
+  width:44px;height:44px;min-height:44px!important;padding:0;border:0;background:transparent;color:currentColor;
+  display:grid;place-content:center;gap:7px;cursor:pointer
+}
+.access-menu i{display:block;width:34px;height:1px;background:currentColor}
+.access-menu:hover,.access-menu:focus-visible{color:var(--access-burgundy)}
 .access-brand-copy{position:relative;z-index:2;margin-top:clamp(56px,9vh,110px)}
 #gate[data-rtg-access] .access-brand small,.access-brand small{
   display:block;margin:0;color:var(--access-gold-text);font:650 10px/1.4 Inter,sans-serif;
@@ -298,6 +305,7 @@ html body[data-ios-home] #onbGate:not([hidden]){
     backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
   }
   .access-brand-head a{padding:8px 11px 9px;font-size:18px}
+  .access-brand-actions{gap:12px;color:var(--access-ink)}
   .access-language{width:44px;height:44px;border-radius:50%;padding:0;background:rgba(250,249,245,.72)}
   .access-brand-copy{margin-top:auto}
   #gate[data-rtg-access] .access-brand small{color:#e2c389}

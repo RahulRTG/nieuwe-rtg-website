@@ -53,7 +53,8 @@
     gate.innerHTML =
       '<section class="access-brand" aria-label="RTG">' +
         '<div class="access-brand-head"><a href="https://www.rahultravelgroup.com/" aria-label="Rahul Travel Group website"><span translate="no">Rahul Travel Group</span></a>' +
-          '<button class="access-language" id="agLanguage" type="button" aria-label="Taal kiezen">NL</button></div>' +
+          '<span class="access-brand-actions"><button class="access-language" id="agLanguage" type="button" aria-label="Taal kiezen">NL</button>' +
+          '<button class="access-menu" id="agMenu" type="button" aria-label="RTG-menu openen"><i></i><i></i></button></span></div>' +
         '<div class="access-brand-copy"><small>' + 'VEILIGE TOEGANG' + '</small><p id="agBrandLine">Technologie voor het leven.</p></div>' +
         '<div class="access-system" aria-hidden="true"><i class="access-system-ring access-system-ring-one"></i><i class="access-system-ring access-system-ring-two"></i>' +
           '<span class="access-system-node access-system-personal"><b>Personal</b><em>Account</em></span>' +

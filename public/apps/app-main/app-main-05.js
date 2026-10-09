@@ -59,6 +59,11 @@
     form.addEventListener('submit',event=>{event.preventDefault();submit();});
     el('agPasskey').addEventListener('click',passkeyLogin);
     el('agLanguage').addEventListener('click',()=>{ if (window.RTGi18n) RTGi18n.openModal(); });
+    el('agMenu').addEventListener('click',()=>{
+      const menu=document.querySelector('.rtg-adaptive-item[data-rtg-adaptive-action="menu"]');
+      if (menu) menu.click();
+      else if (window.RTGAdaptiveEdge) RTGAdaptiveEdge.setState('expanded');
+    });
     el('agAnders').addEventListener('click',()=>render('login',true));
     el('agNieuw').addEventListener('click',()=>{step=0;render('register',true);});
     el('agForgot').addEventListener('click',()=>render('forgot',true));

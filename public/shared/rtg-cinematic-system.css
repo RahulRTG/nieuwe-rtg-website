@@ -410,7 +410,8 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-item[data-rtg-adaptive-action="ai"
 body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!important}
 
 @media(min-width:1000px){
-  body[data-rtg-cinematic="true"][data-rtg-layout="standard"]{
+  body[data-rtg-cinematic="true"][data-rtg-layout="standard"],
+  body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]{
     --edge-top:88px!important;--rtg-header-desktop:88px!important;
     padding-top:88px!important;
   }

@@ -14,7 +14,9 @@
       'world-widget-surfaces', 'world-widget-live', 'world-desktop-cards', 'world-desktop-surface', 'world-presentation',
       'personal-images', 'personal-image-editor', 'world-desktop-home'];
     if (projection) names = ['world-desktop-copy','world-desktop-surface','world-presentation','world-desktop-projection'];
-    var shared = projection ? ['rtg-edge-icons','rtg-adaptive-edge-core','rtg-adaptive-edge-input','rtg-adaptive-edge-surface','rtg-adaptive-edge-controls','rtg-adaptive-edge'] : ['rtg-heritage-registry','rtg-edge-icons','bestand-upload'];
+    var shared = projection ? ['rtg-edge-icons','rtg-adaptive-edge-core','rtg-adaptive-edge-input',
+      'rtg-adaptive-edge-surface','rtg-adaptive-edge-controls','rtg-adaptive-edge-services','rtg-adaptive-edge'] :
+      ['rtg-heritage-registry','rtg-edge-icons','bestand-upload'];
     if (projection) ['rtg-edge-system','rtg-adaptive-edge'].forEach(function(name){var l=d.createElement('link');l.rel='stylesheet';l.href='/shared/'+name+'.css';d.head.appendChild(l);});
     Promise.all(shared.map(function(name){return '/shared/'+name+'.js';}).concat(names.map(function (name) { return '/shared/interface/' + name + '.js'; })).map(function (url) {
       return new Promise(function (resolve, reject) {

@@ -1,0 +1,208 @@
+/* RTG CINEMATIC SYSTEM ----------------------------------------------------
+   Eén volwassen beeldregie voor de volledige app. De fotografie bepaalt de
+   atmosfeer; echte productdata blijft rustig, scherp en volledig bedienbaar. */
+body[data-rtg-cinematic="true"]{
+  --rtg-cinema-photo:url('/images/worlds/heritage/living-heritage-v2.jpg');
+  --rtg-cinema-position:center 42%;
+  --rtg-cinema-veil:linear-gradient(180deg,rgba(16,13,10,.56),rgba(16,13,10,.92) 36rem,var(--rtg-world-bg) 58rem);
+  --rtg-cinema-hairline:color-mix(in srgb,var(--rtg-world-metal) 22%,var(--rtg-world-line));
+  background-color:var(--rtg-world-bg)!important;
+  background-image:linear-gradient(color-mix(in srgb,var(--rtg-world-metal) 2.6%,transparent) 1px,transparent 1px),
+    linear-gradient(90deg,color-mix(in srgb,var(--rtg-world-metal) 2.6%,transparent) 1px,transparent 1px),
+    radial-gradient(58rem 32rem at 82% -8%,color-mix(in srgb,var(--rtg-world-signature) 10%,transparent),transparent 72%)!important;
+  background-size:48px 48px,48px 48px,auto!important;
+  background-position:center,center,center!important;
+  background-repeat:repeat,repeat,no-repeat!important;
+  background-attachment:fixed!important;
+}
+body[data-rtg-cinematic="true"][data-rtg-world="travel"]{
+  --rtg-cinema-photo:url('/images/worlds/heritage/travel-heritage-v2.jpg');
+  --rtg-cinema-position:center 54%;
+  --rtg-cinema-veil:linear-gradient(180deg,rgba(20,8,13,.52),rgba(25,13,18,.93) 36rem,var(--rtg-world-bg) 58rem);
+}
+body[data-rtg-cinematic="true"][data-rtg-world="work"]{
+  --rtg-cinema-photo:url('/images/worlds/heritage/work-heritage-v2.jpg');
+  --rtg-cinema-position:center 48%;
+  --rtg-cinema-veil:linear-gradient(180deg,rgba(8,16,15,.56),rgba(16,24,23,.94) 36rem,var(--rtg-world-bg) 58rem);
+}
+body[data-rtg-cinematic="true"][data-rtg-world="foundation"]{
+  --rtg-cinema-photo:url('/images/worlds/heritage/foundation-heritage-v2.jpg');
+  --rtg-cinema-position:center 46%;
+  --rtg-cinema-veil:linear-gradient(180deg,rgba(8,25,20,.54),rgba(16,35,30,.94) 36rem,var(--rtg-world-bg) 58rem);
+}
+
+/* Native canvassen behouden hun eigen werkelijkheid. Alleen het echte Edge-
+   instrument en de wereldkleur omlijsten camera, kaart, editor en spellen. */
+body[data-rtg-cinematic-kind="immersive"]{
+  background:var(--rtg-world-bg)!important;
+}
+
+body[data-rtg-cinematic="true"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen]
+  [data-rtg-cinematic-root="content"]{
+  position:relative;width:100%;max-width:none;margin:0;padding:0;
+  background:transparent!important;
+}
+
+/* Alleen een bestaande introductie kan fotografische lead worden. Er wordt
+   geen lege hero, tekst of marketingblok aan een functie toegevoegd. */
+body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]{
+  position:relative;isolation:isolate;min-height:clamp(360px,30vw,440px);
+  display:grid;align-content:end;overflow:hidden;padding:clamp(24px,3vw,40px)!important;
+  border:1px solid var(--rtg-cinema-hairline)!important;border-radius:var(--rtg-radius-editorial)!important;
+  background-image:linear-gradient(0deg,rgba(7,6,5,.94),rgba(7,6,5,.20) 72%),var(--rtg-cinema-photo)!important;
+  background-position:center,var(--rtg-cinema-position)!important;background-size:cover!important;
+  box-shadow:none!important;color:#fff7ed!important;
+}
+body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]::after{
+  content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(7,6,5,.34),transparent 60%);
+}
+body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"] :is(h1,h2,h3){
+  max-width:13ch;color:#fff7ed!important;text-shadow:0 2px 28px rgba(0,0,0,.28);
+}
+body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"] :is(p,.sub,.onder,small){
+  max-width:62ch;color:rgba(255,247,237,.78)!important;
+}
+
+/* De diepte zit in materiaal en ruimte, niet in dikke dozen. */
+body[data-rtg-cinematic="true"] [data-rtg-component="OperationalPanel"]{
+  border-color:color-mix(in srgb,var(--rtg-world-line) 76%,transparent)!important;
+  background:color-mix(in srgb,var(--rtg-world-card) 98%,transparent)!important;
+  box-shadow:none!important;
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+body[data-rtg-cinematic="true"] [data-rtg-component="NarrativePanel"]{
+  border-color:var(--rtg-cinema-hairline)!important;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--rtg-world-signature) 16%,transparent),transparent 64%),
+    color-mix(in srgb,var(--rtg-world-card) 94%,transparent)!important;
+}
+body[data-rtg-cinematic="true"] :is([data-rtg-component="ContextStrip"],[data-rtg-component="OperationalPanel"],[data-rtg-component="NarrativePanel"],[data-rtg-component="State"]){
+  border-radius:var(--rtg-radius-editorial)!important;
+}
+body[data-rtg-cinematic="true"] [data-rtg-component="ContextStrip"]{
+  box-shadow:none!important;
+}
+body[data-rtg-cinematic="true"] :is([data-rtg-component="OperationalPanel"],[data-rtg-component="NarrativePanel"],[data-rtg-component="State"]){
+  transition:border-color .28s ease,background-color .28s ease,transform .28s cubic-bezier(.2,.8,.2,1);
+}
+
+/* De echte, functionele Adaptive Edge is het ene systeeminstrument. Deze
+   regels veranderen uitsluitend materiaal en uitlijning; menu, werelden,
+   Connect, media, account en Rahul blijven de bestaande RTG-uitvoering. */
+body[data-rtg-cinematic="true"][data-rtg-adaptive-ready="true"] .rtg-adaptive-edge{
+  --edge-bar-bg:var(--rtg-world-card,#0d0c0a);--edge-bar-copy:var(--rtg-world-ink,#fffaf0);
+  --edge-bar-dim:var(--rtg-world-muted,#bdb3a4);--edge-bar-line:color-mix(in srgb,var(--rtg-world-metal,#ebcc94) 24%,transparent);
+  --edge-bar-accent:var(--rtg-world-metal,#ebcc94);
+  --edge-bar-accent-soft:rgba(235,204,148,.085);
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-bar,
+body[data-rtg-cinematic="true"] .rtg-adaptive-sheet,
+body[data-rtg-cinematic="true"] .rtg-adaptive-surface{
+  border:1px solid var(--edge-bar-line)!important;
+  background:radial-gradient(90% 170% at 50% -95%,color-mix(in srgb,var(--edge-bar-accent) 15%,transparent),transparent 67%),
+    color-mix(in srgb,var(--edge-bar-bg) 94%,transparent)!important;
+  box-shadow:inset 0 1px 0 rgba(255,250,240,.12),0 18px 52px rgba(0,0,0,.26)!important;
+  backdrop-filter:blur(30px) saturate(1.08);-webkit-backdrop-filter:blur(30px) saturate(1.08);
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-bar{border-radius:var(--rtg-radius-capsule)!important}
+body[data-rtg-cinematic="true"] .rtg-adaptive-item[data-rtg-adaptive-action="ai"]{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-item .rtg-adaptive-lips{
+  display:block;width:46px;height:28px;margin:auto;transform:none!important;
+  filter:drop-shadow(0 0 7px rgba(235,204,148,.25));
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-lips path:last-child{
+  stroke:var(--edge-bar-bg);stroke-width:5;stroke-linecap:round;
+}
+
+/* De vaste bovenrand is optisch lichter dan de inhoud, maar blijft een exact
+   onderdeel van het bestaande Edge-casco. */
+body[data-rtg-cinematic="true"] .rtg-edge-top{
+  background:color-mix(in srgb,var(--rtg-world-bg) 76%,transparent)!important;
+  border-bottom:1px solid color-mix(in srgb,var(--rtg-world-metal) 18%,transparent)!important;
+  box-shadow:0 12px 34px rgba(0,0,0,.08);backdrop-filter:blur(26px) saturate(1.08);
+  -webkit-backdrop-filter:blur(26px) saturate(1.08);
+}
+body[data-rtg-cinematic="true"] .rtg-edge-top::after{opacity:.52}
+
+@media(min-width:1000px){
+  body[data-rtg-cinematic="true"][data-rtg-desktop]:not([data-rtg-shell="mobile"]) .wd-shell{
+    box-sizing:border-box!important;width:calc(100% - (var(--rtg-frame-desktop) * 2))!important;
+    max-width:1840px!important;margin:var(--rtg-frame-desktop) auto 120px!important;
+  }
+  body[data-rtg-cinematic="true"] .rtg-edge-top{
+    min-height:var(--rtg-header-desktop)!important;height:var(--rtg-header-desktop)!important;padding:0 40px!important;
+  }
+  body[data-rtg-cinematic="true"][data-rtg-adaptive-ready="true"]{
+    --rtg-adaptive-height:var(--rtg-edge-desktop-height)!important;
+    --rtg-adaptive-gap:var(--rtg-edge-desktop-gap)!important;
+    --rtg-adaptive-inset:calc(var(--rtg-edge-desktop-height) + var(--rtg-edge-desktop-gap))!important;
+  }
+  body[data-rtg-cinematic="true"] .rtg-adaptive-edge{
+    width:min(var(--rtg-edge-desktop-width),calc(100vw - 48px))!important;
+    height:var(--rtg-edge-desktop-height)!important;
+    bottom:var(--rtg-edge-desktop-gap)!important;
+  }
+  body[data-rtg-cinematic="true"] .rtg-adaptive-bar{height:100%!important;padding:5px 7px 9px!important}
+  body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]{min-height:440px}
+}
+
+@media(max-width:999px){
+  body[data-rtg-cinematic="true"]{
+    padding-top:var(--rtg-header-mobile)!important;
+    background-attachment:scroll!important;
+  }
+  body[data-rtg-cinematic="true"] .rtg-edge-top{
+    min-height:var(--rtg-header-mobile)!important;height:var(--rtg-header-mobile)!important;
+    padding:8px var(--rtg-frame-mobile)!important;gap:10px!important;
+  }
+  body[data-rtg-cinematic="true"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen]
+    [data-rtg-cinematic-root="content"]{
+    box-sizing:border-box;width:calc(100% - (var(--rtg-frame-mobile) * 2))!important;
+    max-width:680px!important;margin:12px auto 24px!important;padding:0 0 calc(var(--rtg-adaptive-inset,72px) + 12px)!important;
+    background:transparent!important;
+  }
+  body[data-rtg-cinematic="true"].rtg-stijl[data-world-home][data-rtg-shell="mobile"]
+    :is(main#inhoud,main#hoofd,main#main,main.wd-home)[data-rtg-cinematic-root="content"]{
+    box-sizing:border-box!important;width:calc(100% - (var(--rtg-frame-mobile) * 2))!important;
+    max-width:680px!important;margin:12px auto 24px!important;
+    padding:0 0 calc(var(--rtg-adaptive-inset,72px) + 12px)!important;
+  }
+  body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]{
+    box-sizing:border-box;width:100%!important;max-width:100%!important;
+    min-height:clamp(360px,58svh,500px);margin:0!important;
+    padding:22px 20px!important;border:1px solid var(--rtg-cinema-hairline)!important;border-radius:var(--rtg-radius-editorial)!important;
+    background-image:linear-gradient(0deg,rgba(7,6,5,.95),rgba(7,6,5,.10) 74%),var(--rtg-cinema-photo)!important;
+  }
+  body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"] :is(h1,h2){font-size:clamp(36px,10vw,48px)!important;max-width:17ch}
+  body[data-rtg-cinematic="true"] [data-rtg-component="OperationalPanel"]{backdrop-filter:none;-webkit-backdrop-filter:none}
+  body[data-rtg-cinematic="true"][data-rtg-adaptive-ready="true"]{
+    --rtg-adaptive-height:var(--rtg-edge-mobile-height)!important;
+    --rtg-adaptive-gap:var(--rtg-edge-mobile-gap)!important;
+    --rtg-adaptive-inset:calc(var(--rtg-edge-mobile-height) + var(--rtg-edge-mobile-gap))!important;
+  }
+  body[data-rtg-cinematic="true"] .rtg-adaptive-edge{
+    width:calc(100vw - (var(--rtg-edge-mobile-inset) * 2))!important;
+    max-width:none!important;height:var(--rtg-edge-mobile-height)!important;
+    bottom:var(--rtg-edge-mobile-gap)!important;
+  }
+  body[data-rtg-cinematic="true"] .rtg-adaptive-bar{height:100%!important;padding:5px 4px 9px!important}
+  body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-motion="reading"]{
+    width:min(360px,calc(100vw - 40px))!important;height:56px!important
+  }
+  body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-motion="reading"] .rtg-adaptive-bar{
+    grid-template-columns:repeat(5,minmax(44px,1fr))!important;padding:5px!important
+  }
+  body[data-rtg-cinematic="true"] .rtg-adaptive-edge[data-rtg-adaptive-motion="reading"] .rtg-adaptive-item{
+    display:flex!important;grid-column:auto!important;min-height:44px!important
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  body[data-rtg-cinematic="true"] :is([data-rtg-component="OperationalPanel"],[data-rtg-component="NarrativePanel"],[data-rtg-component="State"]){transition:none}
+}
+@media(forced-colors:active){
+  body[data-rtg-cinematic="true"]{background:Canvas!important}
+  body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]{background:Canvas!important;color:CanvasText!important}
+}

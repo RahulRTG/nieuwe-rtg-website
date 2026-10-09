@@ -43,7 +43,7 @@ test('vier vaste werelden delen één volledige token- en dieptegrammatica', () 
     assert.match(PALETTE, /--rtg-world-photo:none!important;/, wereld + ' mag geen foto wereldwijd herhalen');
   }
   for (const token of ['--rtg-depth-content:', '--rtg-depth-focus:', '--rtg-depth-system:',
-    '--rtg-radius-content:10px', '--rtg-radius-editorial:16px', '--rtg-radius-system:24px', '--rtg-radius-capsule:999px', '--rtg-target:48px']) {
+    '--rtg-radius-content:16px', '--rtg-radius-editorial:16px', '--rtg-radius-system:24px', '--rtg-radius-capsule:999px', '--rtg-target:48px']) {
     assert.ok(TOKENS.includes(token), token + ' ontbreekt');
   }
 });
@@ -119,7 +119,7 @@ test('bestaande echte DOM wordt geadapteerd zonder knoppen of data te kopiëren'
 });
 
 test('Heritage laadt de centrale visuele standaard als laatste laag', () => {
-  assert.equal([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].at(-1)[1], './rtg-editorial-system.css',
+  assert.equal([...TOKENS.matchAll(/@import url\('([^']+)'\);/g)].at(-1)[1], './rtg-cinematic-system.css',
     'last import is shared and project-relative; no query that the CSS bundler would discard');
   assert.equal((TOKENS.match(/rtg-simple\.css/g) || []).length, 1);
   assert.match(WERELDSCHERMEN, /data-rtg-screen-root="content"/);

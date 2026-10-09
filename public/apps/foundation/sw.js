@@ -2,7 +2,7 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-146c48c7';
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-66aa572c';
 const SHELL = [
   /* The mandatory desktop standard is available offline too. */
   '/shared/interface/module-sdk.js',
@@ -92,6 +92,7 @@ const SHELL = [
   '/shared/rtg-world-widgets.css', '/shared/rtg-world-desktop.css',
   '/shared/rtg-desktop-components.css', '/shared/rtg-world-palette.css',
   '/shared/rtg-heritage-adapters.css', '/shared/rtg-heritage-experiences.css', '/shared/rtg-heritage-components.css',
+  '/shared/rtg-cinematic-system.css', '/shared/rtg-cinematic-system.js',
   '/shared/rtg-simple.css', '/shared/rtg-world-screen.css',
   '/shared/rtg-heritage-motion.css', '/shared/rtg-heritage-motion.js',
   '/shared/rtg-continue-key.css', '/shared/rtg-continue-key-core.js',

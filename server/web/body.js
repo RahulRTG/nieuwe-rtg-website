@@ -48,6 +48,22 @@ function typeMatcht(req, type) {
    wordt gemaakt. Kosten: één binding per verzoek met een lichaam. */
 function leesBody(req, limiet, cb0) {
   const cb = AsyncResource.bind(cb0);
+  /* Een Zaakdoos probeert een verzoek eerst bytegelijk naar de cloud te sturen.
+     Als de lijn precies op dat moment wegvalt, is de inkomende Node-stream al
+     gelezen. De proxy bewaart die bytes daarom op het verzoek. Lees ze hier
+     opnieuw door DEZELFDE parser en pas ook hier de routespecifieke limiet toe;
+     zo blijft een lokale terugval veilig, zonder een tweede bron voor JSON- of
+     webhookontleding te maken. */
+  if (Buffer.isBuffer(req._rtgProxyBody)) {
+    const buf = req._rtgProxyBody;
+    delete req._rtgProxyBody;
+    if (buf.length > limiet) {
+      const e = new Error('request entity too large');
+      e.status = 413; e.type = 'entity.too.large';
+      return cb(e);
+    }
+    return cb(null, buf);
+  }
   const brokken = []; let n = 0, klaar = false;
   req.on('data', (c) => {
     if (klaar) return;

@@ -164,6 +164,9 @@ const KAART = [
     ['schrijft', 'zichtbaarheidsstand:s', 'balkstand op body', 'd.body.dataset.rtgAdaptiveState = rt.model.state;'],
     ['beslist', 'zichtbaarheidsstand:b', 'Edge 2 compact wordt peek', "else if (state === 'compact') setState('peek', 'auto');"],
     ['schrijft', 'onderbalk:s', 'klaar-vlag; CSS zet de onderbalk weg', "d.body.dataset.rtgAdaptiveReady = 'true';"]]],
+  ['rtg-adaptive-edge-services.js', 'adaptieve-balk', '', [
+    ['rendert', '-', 'de vijf Edge-schermen zonder domeinbevoegdheid over te nemen', "var MODES = ['rahul', 'connect', 'media', 'account'];"],
+    ['rendert', '-', 'routes blijven gewone RTG-bestemmingen', "panel.appendChild(serviceButton('Open berichten'"]]],
   ['rtg-adaptive-edge-core.js', 'adaptieve-balk', 'zichtbaarheidsstand:b', [
     ['beslist', 'zichtbaarheidsstand:b', 'vier balkstanden', "var STATES = Object.freeze(['peek', 'dock', 'deck', 'expanded']);"]]],
   ['rtg-adaptive-edge-controls.js', 'adaptieve-balk', 'capability-register:bl hoofdactie:s vluchtige-context:l', [

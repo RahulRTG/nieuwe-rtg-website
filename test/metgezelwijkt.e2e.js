@@ -95,6 +95,8 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
        en beide veilige voorbereidingsknoppen blijft bedienen. */
     await page.waitForSelector('.rtg-one [data-one-decision]', { state: 'attached', timeout: 10000 });
     await page.click('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
+    await page.getByRole('button', { name: 'Open beveiligd gesprek' }).click();
+    await page.waitForSelector('[data-build-plan]:visible');
 
     /* HIER STOND EEN VASTGEPINDE DECORTEKST, en dat is precies waarom deze
        twee regels omvielen. De knop schreef vroeger zelf "5 DOMEINEN
@@ -109,7 +111,7 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
        pakket met bronnen heeft geleverd (de beginstand is "2 SERVERBRONNEN").
        Deze toets zakt dus zodra die ronde stilvalt, en niet zodra iemand een
        woord in de koptekst wijzigt. */
-    await page.click('[data-build-plan]');
+    await page.locator('[data-build-plan]:visible').first().click();
     await page.waitForFunction(
       () => /^\d+ CONTROLES$/.test(((document.querySelector('[data-proof-count]') || {}).textContent || '').trim()),
       null, { timeout: 20000 });

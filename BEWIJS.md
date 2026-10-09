@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2440 bestanden en 16700 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2440 bestanden en 16706 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2440 |
-| losse beweringen (`test(...)`) | 16700 |
+| losse beweringen (`test(...)`) | 16706 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2132 bestanden, 16163 beweringen.
+2132 bestanden, 16169 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1574,7 +1574,7 @@ toets omvalt.
 | `rtfwelzijn.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 6 (deel 1): het gevoelsdagboek. Opt-in (de server bewaart alleen wat het kind zelf instuurt), prive per profiel (ook dicht voor gasten), een woord per dag (vandaag herzien mag, gisteren blijft staan), en... |
 | `rtfwelzijn2.test.js` | 3 | gezakt op `liegpoort /api/` | RTF-golf 6 (deel 2): de nieuwe coach-soorten voor de welzijnsapps. Zonder AI-sleutel geeft elke soort zijn EIGEN warme demotekst (de knop werkt dus altijd), een onbekende soort valt veilig terug, en de... |
 | `rtg-a11y.test.js` | 8 | gezakt op `&&->||#0` | DE TOEGANKELIJKHEIDSADAPTER -- leest hij de keuring werkelijk goed uit? scripts/rtg-a11y.js voegt geen regels toe: hij richt de bestaande machinerie (scripts/a11ykeuring.js en scripts/raakvlakkeuring.js) op een... |
-| `rtg-adaptive-edge.test.js` | 10 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rtg-adaptive-edge.test.js` | 15 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-continue-key.test.js` | 10 | gezakt op `===->!==#0` | De Continue Key mag rijk bewegen, maar blijft exact de bestaande primaire Edge-knop. Deze toets bewaakt identiteit, veilige ankers, toetsenbord, langdruk, geometrie, a11y, opslag en motion-koppeling. |
 | `rtg-edge-2-pilots.test.js` | 15 | gezakt op `===->!==#0` | De eerste acht Vandaag-routes sluiten declaratief aan op Edge 2, terwijl het bestaande Edge-casco de enige eigenaar van top, side en bottom blijft. Deze toets bewaakt de routecontexten, de centrale loaderhandshake en... |
 | `rtg-edge-2.test.js` | 14 | gezakt op `===->!==#0` | Edge 2.0 bestuurt het bestaande casco. Deze toets borgt dat er geen tweede balkenstelsel, netwerklaag of onbegrensde contextselectie ontstaat. |
@@ -2055,7 +2055,7 @@ toets omvalt.
 | `wachtwoordkosten.test.js` | 4 | gezakt op `return-weg#0` | De scrypt-kosten en het migratiepad. Waar dit over gaat: de opgeslagen wachtwoordhash droeg vroeger geen enkele parameter (`salt:hash`), en daardoor was de scrypt-kostenfactor niet te verhogen zonder elk bestaand... |
 | `wauw.test.js` | 4 | gezakt op `liegpoort /api/` | De wauw-laag (kern/wauw.js): de dag-stemming (vaste 9+-lijst) en de verjaardagsglans die overal naast de codenaam meereizen (Pulse, Berichten), het Moment van de week in de Pulse-feed en De Terugblik op je sociale week. |
 | `wbw.test.js` | 4 | gezakt op `liegpoort /api/` | Wie betaalt wat: het gedeelde uitgavenlijstje van Salon-vrienden. Uitgaven worden sluitend verdeeld in centen; de balans klopt altijd op nul; wie rood staat betaalt het eigen deel in een tik via RTG Pay (idempotent);... |
-| `web.test.js` | 9 | gezakt op `&&->||#0` | Eigen web-framework (server/web.js), dat express verving. We toetsen de deelverzameling die de server echt gebruikt, tegen een echte http-server: routing + :params + RegExp-pad, middleware-keten + next(err) naar de... |
+| `web.test.js` | 10 | gezakt op `&&->||#0` | Eigen web-framework (server/web.js), dat express verving. We toetsen de deelverzameling die de server echt gebruikt, tegen een echte http-server: routing + :params + RegExp-pad, middleware-keten + next(err) naar de... |
 | `webauthn-ceremonie.test.js` | 1 | gezakt op `liegpoort /api/` | DE HELE PASSKEY-CEREMONIE, OVER DE ECHTE ROUTES. test/webauthn.test.js toetst de randen: rommel eruit, geen enumeratie, poorten dicht, remmen aan. |
 | `webauthn-eigen.test.js` | 6 | gezakt op `!==->===#0` | Eigen WebAuthn-laag (server/webauthn.js), die @simplewebauthn/server verving. We spelen een volledige ceremonie na met een ECHTE EC P-256-sleutel uit node:crypto: bouwen zelf een authenticatorData + attestationObject... |
 | `webauthn.test.js` | 7 | gezakt op `liegpoort /api/` | Passkeys (WebAuthn): de servermechanieken. Dit bestand toetst de RANDEN -- opties-vorm, anti-enumeratie, poorten, remmen en beheer. |

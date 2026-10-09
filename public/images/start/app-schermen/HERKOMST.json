@@ -9,22 +9,22 @@
       "id": "organisatie",
       "route": "/apps/werk.html",
       "file": "organisatie.png",
-      "sourceHash": "c15f1b9abf0f654960fd0c80791c67b1b42d206fa26aa38bc143c275045a3458",
-      "imageHash": "74b04e3c272a1e69318d299160556aa7ac2d59a2778021d2edb9eabc67e91ad6"
+      "sourceHash": "5242a0d928f7b56a4ef3fa804873a13221bb5872a369f7ca531f79f7eb0d470b",
+      "imageHash": "01ecc43ae9b8ed2d2340e2ad216d3acfea273f7d67a6ccbdc5a2f7864e2017e0"
     },
     {
       "id": "partner",
       "route": "/apps/leverancier.html",
       "file": "partner.png",
-      "sourceHash": "dabd397753d124b612fdebbfe612aeebedab6e72305f6827fb4432e27f9ac1be",
-      "imageHash": "4bee6f9afafe10f4925adb30358e293b042ed832fc70bc68d383e84febf5c22d"
+      "sourceHash": "7d077d6b9e169d71b6cdf5bf83df1c972b33dd0486511bdc120a621729aaf67a",
+      "imageHash": "a3e6e891b5c89e2dab2d8f42f902c8f291a357f2f7e284a54d7d00f3bf6aa739"
     },
     {
       "id": "gebruiker",
       "route": "/apps/app.html",
       "file": "gebruiker.png",
-      "sourceHash": "7c948f3e3a2c4963e1370f3c3bc6eccfe8368174c2d46ffbb117ffa64e367885",
-      "imageHash": "69144c097028068ce5480df17ca8b1a607a84c653828491ef54c8be9fb961fa0"
+      "sourceHash": "d61dc5ac4357b707e96b6b2467fdf097f1a8067ac78e17ae2228b37d8e2b625a",
+      "imageHash": "a8e0a6094afb9d1dbb262fe0acef64b2cb5d3d1944add6651050ca32e7ebd01c"
     }
   ]
 }

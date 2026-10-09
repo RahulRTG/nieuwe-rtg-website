@@ -1,7 +1,4 @@
-/* RTG app, service worker: cachet de app-schil zodat de app installeerbaar
-   is en offline opent. API-verkeer gaat altijd naar het netwerk.
-   Pagina's en scripts zijn network-first: een update op de server komt
-   direct door, de cache is alleen het vangnet zonder verbinding. */
+/* RTG app-schil: network-first, met een offline vangnet. */
 /* DE CACHENAAM IS DE VINGERAFDRUK VAN DE SCHIL, en dat is hij nu ook echt:
    sha256 over de bestanden hieronder, eerste acht tekens. Draai
    `npm run swcache` na een wijziging aan de schil; keuringsregel controleert
@@ -14,7 +11,7 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-ea2d6ac7';
+const CACHE = 'rtg-app-734654fd';
 const SHELL = [
   /* The mandatory desktop standard is available offline too. */
   '/shared/interface/module-sdk.js',

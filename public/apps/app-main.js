@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '70026b69';
+var RTG_BOUW = 'ffdbb62d';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -571,8 +571,9 @@ var RTG_BOUW = '70026b69';
     gate.setAttribute('data-i18n-ignore','');
     gate.innerHTML =
       '<section class="access-brand" aria-label="RTG">' +
-        '<div class="access-brand-head"><a href="https://www.rahultravelgroup.com/" aria-label="RTG website"><span translate="no">RTG</span></a>' +
-          '<button class="access-language" id="agLanguage" type="button" aria-label="Taal kiezen">NL</button></div>' +
+        '<div class="access-brand-head"><a href="https://www.rahultravelgroup.com/" aria-label="Rahul Travel Group website"><span translate="no">Rahul Travel Group</span></a>' +
+          '<span class="access-brand-actions"><button class="access-language" id="agLanguage" type="button" aria-label="Taal kiezen">NL</button>' +
+          '<button class="access-menu" id="agMenu" type="button" aria-label="RTG-menu openen"><i></i><i></i></button></span></div>' +
         '<div class="access-brand-copy"><small>' + 'VEILIGE TOEGANG' + '</small><p id="agBrandLine">Technologie voor het leven.</p></div>' +
         '<div class="access-system" aria-hidden="true"><i class="access-system-ring access-system-ring-one"></i><i class="access-system-ring access-system-ring-two"></i>' +
           '<span class="access-system-node access-system-personal"><b>Personal</b><em>Account</em></span>' +
@@ -857,6 +858,11 @@ var RTG_BOUW = '70026b69';
     form.addEventListener('submit',event=>{event.preventDefault();submit();});
     el('agPasskey').addEventListener('click',passkeyLogin);
     el('agLanguage').addEventListener('click',()=>{ if (window.RTGi18n) RTGi18n.openModal(); });
+    el('agMenu').addEventListener('click',()=>{
+      const menu=document.querySelector('.rtg-adaptive-item[data-rtg-adaptive-action="menu"]');
+      if (menu) menu.click();
+      else if (window.RTGAdaptiveEdge) RTGAdaptiveEdge.setState('expanded');
+    });
     el('agAnders').addEventListener('click',()=>render('login',true));
     el('agNieuw').addEventListener('click',()=>{step=0;render('register',true);});
     el('agForgot').addEventListener('click',()=>render('forgot',true));

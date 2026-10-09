@@ -52,7 +52,7 @@
     gate.setAttribute('data-i18n-ignore','');
     gate.innerHTML =
       '<section class="access-brand" aria-label="RTG">' +
-        '<div class="access-brand-head"><a href="https://www.rahultravelgroup.com/" aria-label="RTG website"><span translate="no">RTG</span></a>' +
+        '<div class="access-brand-head"><a href="https://www.rahultravelgroup.com/" aria-label="Rahul Travel Group website"><span translate="no">Rahul Travel Group</span></a>' +
           '<button class="access-language" id="agLanguage" type="button" aria-label="Taal kiezen">NL</button></div>' +
         '<div class="access-brand-copy"><small>' + 'VEILIGE TOEGANG' + '</small><p id="agBrandLine">Technologie voor het leven.</p></div>' +
         '<div class="access-system" aria-hidden="true"><i class="access-system-ring access-system-ring-one"></i><i class="access-system-ring access-system-ring-two"></i>' +

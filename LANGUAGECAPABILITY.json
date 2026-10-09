@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-09T12:15:06.786Z",
-  "completedAt": "2026-10-09T12:15:25.121Z",
+  "startedAt": "2026-10-09T19:53:21.722Z",
+  "completedAt": "2026-10-09T19:53:53.003Z",
   "node": "v24.18.0",
   "command": "npm run language:proof",
   "testExitCode": 0,
-  "testOutputSha256": "199a4bdc15bb095037be6f1dad0a595501e98a26f22a2deeb07d244c49ba172e",
+  "testOutputSha256": "9eb1e6f550f37064f11cdcac18b7b0b84dc7b8de279ed2d209d479cb2d9cef68",
   "sources": {
     "public/apps/access/meaning.js": "268dc805c892ee0e351c14fd2f8d955aa292b556a20af8109bece178559c8bf4",
-    "public/apps/access/portal.css": "c8b769c88a16c1ade32ac22532891fa8234fce16479c77ac410a2c8662a8db35",
+    "public/apps/access/portal.css": "4d193bad4bf78e6e457e8ae0ebae07ad5fac791a832ccd8beccdd99b3d2e3eea",
     "public/apps/app.html": "143ea8b09f0956dc29a64999926f820205ddedd2328ea07d2d38eb8b47223e22",
-    "public/apps/app-main.js": "7a4ccd546c244531cc1e69130bd4f8c0f0fff77981bc7e1580b16946aa950188",
+    "public/apps/app-main.js": "55aa9a10417633d2e67ded9b87f00fd2ce5773c5fadcb5954781c75e578a1783",
     "public/shared/rtg-edge-2.css": "b9a7bf6db6f2d8109d526ad073f08ec5f769f4cd70b77b02a5d21a495390c05c",
-    "public/shared/rtg-adaptive-edge.css": "8e5c6aa68e7815465f482cce5090ed432fb980508577e9acddd5b65da08d28e9",
+    "public/shared/rtg-adaptive-edge.css": "9bec8a1cffe3eec4df9b59ad431c522fd1fd125f1c6547abec1527375e6d25a9",
     "public/shared/rtg-simple.css": "93a955c26d15e2f1854961ff4fb87f64627b87f239e1d39e8ddbdb0588b7ad6c",
     "public/shared/rtg-edge-appbar.js": "142169f650809a60ef2d3824182ff0a7a53c8e064a2abddeb45a4c9e4bcedd44",
     "public/shared/verbinding.js": "d13755da3102050cc29d32972e2442eb8662a70018f7970baf76c4ca153f2825",
@@ -36,7 +36,7 @@
     "server/local-ai.js": "05e2de3bf8be5b432cf1af6d7a077471770757c44b519eab126be51d8a485213",
     "server/ai.js": "ba5c8c6e951f8585e33f95b6c17ae4b515e0dd21ab0dd066e5b6d065093a2b4a",
     "scripts/language-proof.js": "e753d68ae3e670e83af84d59e7d63554bd56d6e88f6f8659accc34e7aa222639",
-    "test/access-language.e2e.js": "dfde9fb5db28f269e9b079fa66019553aef16a4033a8608152d326a0789767ba",
+    "test/access-language.e2e.js": "3d20c4d0591ed0553a8d156eeb7cedd86c8f2084a1b0cf398f4af2770f24f2c5",
     "test/i18n-dictionary.test.js": "2002718bc924dfe36bb2cdfba3f29e97b3d364d01b318c285a83be891fcae42b",
     "test/language-foundations.test.js": "ca8bea3d19284ca768e970b990d7698095c65cd217b27924221f40635b6f6b2b",
     "test/onboarding.test.js": "ed42e70414a48fee52d0ca7b55487413c946e174fab73d79ae68613822161138"
@@ -103,7 +103,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": false
       },
       "criticalCopy": {
@@ -150,7 +150,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": false
       },
       "criticalCopy": {
@@ -197,7 +197,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -244,7 +244,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -291,7 +291,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -338,7 +338,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -385,7 +385,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -432,7 +432,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -479,7 +479,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -526,7 +526,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -573,7 +573,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -620,7 +620,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -667,7 +667,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -714,7 +714,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -761,7 +761,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -808,7 +808,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -855,7 +855,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -902,7 +902,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -949,7 +949,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -996,7 +996,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1043,7 +1043,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1090,7 +1090,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1137,7 +1137,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1184,7 +1184,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1231,7 +1231,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1278,7 +1278,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1325,7 +1325,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1372,7 +1372,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1419,7 +1419,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1466,7 +1466,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1513,7 +1513,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1560,7 +1560,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1607,7 +1607,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1654,7 +1654,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1701,7 +1701,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1748,7 +1748,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1795,7 +1795,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1842,7 +1842,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1889,7 +1889,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1936,7 +1936,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -1983,7 +1983,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2030,7 +2030,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2077,7 +2077,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2124,7 +2124,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2171,7 +2171,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2218,7 +2218,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2265,7 +2265,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2312,7 +2312,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2359,7 +2359,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2406,7 +2406,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2453,7 +2453,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2500,7 +2500,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2547,7 +2547,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2594,7 +2594,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2641,7 +2641,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2688,7 +2688,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2735,7 +2735,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2782,7 +2782,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2829,7 +2829,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2876,7 +2876,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2923,7 +2923,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -2970,7 +2970,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3017,7 +3017,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3064,7 +3064,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3111,7 +3111,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3158,7 +3158,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3205,7 +3205,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3252,7 +3252,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3299,7 +3299,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3346,7 +3346,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3393,7 +3393,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3440,7 +3440,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3487,7 +3487,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3534,7 +3534,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3581,7 +3581,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3628,7 +3628,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3675,7 +3675,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3722,7 +3722,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3769,7 +3769,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3816,7 +3816,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3863,7 +3863,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3910,7 +3910,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -3957,7 +3957,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4004,7 +4004,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4051,7 +4051,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4098,7 +4098,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4145,7 +4145,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4192,7 +4192,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4239,7 +4239,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4286,7 +4286,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4333,7 +4333,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4380,7 +4380,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4427,7 +4427,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4474,7 +4474,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4521,7 +4521,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4568,7 +4568,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4615,7 +4615,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4662,7 +4662,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4709,7 +4709,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4756,7 +4756,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4803,7 +4803,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4850,7 +4850,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4897,7 +4897,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4944,7 +4944,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -4991,7 +4991,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5038,7 +5038,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5085,7 +5085,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5132,7 +5132,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5179,7 +5179,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5226,7 +5226,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5273,7 +5273,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5320,7 +5320,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5367,7 +5367,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {
@@ -5414,7 +5414,7 @@
         "quality": "NOT_REVIEWED"
       },
       "edge": {
-        "preAccess": "HIDDEN_BEFORE_ACCESS",
+        "preAccess": "VISIBLE",
         "sourceFallback": true
       },
       "criticalCopy": {

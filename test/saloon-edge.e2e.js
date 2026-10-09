@@ -112,7 +112,7 @@ test('Saloon houdt Edge bereikbaar bij lezen, bewaren, teruggaan en bronuitval',
     }));
     assert.equal(menu.material, '#201912', 'het menu volgt het warme LivingOS-materiaal');
     assert.notEqual(menu.glass, 'none', 'dezelfde transparante Edge blijft de bedieningslaag');
-    assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 0, 'geen tweede balk naast het werkvlak');
+    assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 1, 'het werkvlak groeit uit de ene bereikbare Edge-balk');
     assert.equal(await page.locator('.rtg-edge-top').isVisible(), true, 'de gedeelde bovenrand blijft bereikbaar');
     await foto('saloon-menu-gebouwd'); await page.keyboard.press('Escape');
     await page.locator('[data-dichtbij]').click();

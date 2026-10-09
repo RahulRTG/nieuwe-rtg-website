@@ -64,11 +64,21 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
     letOpFouten(page, fouten);
     let lagenGetoetst = false;
     const openRahul = async () => {
+      const lokaal = page.locator('.wk-rahul.page:not([hidden])');
+      if (await lokaal.isVisible()) return page.locator('#wkRahulExpand').click();
       const mouth = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]');
-      if (await mouth.isVisible()) return mouth.click();
+      if (await mouth.isVisible()) {
+        await mouth.click();
+        const open = page.getByRole('button', { name: 'Open beveiligd gesprek' });
+        await open.waitFor({ state: 'visible' });
+        return open.click();
+      }
       // De open sheet vervangt de balk. Haar zichtbare mond gebruikt dezelfde
       // uitvoering en moet de oude laag opruimen zonder een tweede navigator.
       await page.locator('.rtg-adaptive-sheet [data-rtg-sheet-action="ai"]').click();
+      const open = page.getByRole('button', { name: 'Open beveiligd gesprek' });
+      await open.waitFor({ state: 'visible' });
+      await open.click();
     };
 
     const vraag = async (token, tekst) => {

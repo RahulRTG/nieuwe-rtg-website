@@ -45,6 +45,10 @@
       rt.sheetCopy.textContent = 'Vraag, begrijp en bereid voor. Uitvoering blijft binnen uw toestemming en bevoegdheid.';
       panel.appendChild(serviceButton('Open beveiligd gesprek', function () {
         api.setState('dock');
+        /* Een app-specifiek gesprek (zoals Work Intelligence) is preciezer
+           dan de algemene metgezel. De zichtbare Edge blijft de ingang, maar
+           draagt het gesprek over aan de eigenaar van deze context. */
+        if (d.querySelector('#wkRahulTab,.wk-rahul') && api.legacy('.rtg-edge-ai')) return;
         if (w.RTGMetgezel && typeof w.RTGMetgezel.rahul === 'function') w.RTGMetgezel.rahul();
         else if (!api.legacy('.rtg-edge-ai')) navigate(rt, api, '/apps/app.html');
       }));

@@ -544,8 +544,8 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
     }), true, 'de vraagbalk van Rahul gaat open achter iets anders in plaats van erboven');
     assert.equal(await page.locator('.rtg-adaptive-sheet-mouth').isVisible(),true,
       'de mond van Rahul blijft zichtbaar in het open vraagvlak');
-    assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),false,
-      'het vraagvlak vervangt de compacte balk: er is maar één schil');
+    assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),true,
+      'het vraagvlak komt uit de Edge terwijl de compacte bediening bereikbaar blijft');
 
     // en we zijn de werktafel niet kwijt: hij roepen is geen navigatie
     assert.match(new URL(page.url()).pathname, /\/apps\/app\.html$/,

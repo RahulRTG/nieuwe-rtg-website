@@ -42,12 +42,39 @@ async function main() {
           const response = await page.goto(srv.base + route, { waitUntil: 'domcontentloaded', timeout: 25000 });
           row.http = response.status();
           await page.waitForLoadState('load', { timeout: 12000 });
-          await page.waitForSelector('body[data-rtg-desktop-state="ready"],body[data-public-platform]', { timeout: 12000 });
+          await page.waitForSelector('body[data-rtg-desktop-state="ready"],body[data-public-platform],body[data-rtg-projectie]', { timeout: 12000 });
           row.contentReadyMs = Date.now() - started;
           row.access = await page.evaluate(() => [...document.querySelectorAll('[data-rtg-access]')].some(e =>
             e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'));
+          row.projection = await page.evaluate(() => document.body.hasAttribute('data-rtg-projectie'));
           if (route === '/apps/reisuitnodiging.html') {
             await require('./lib/desktop-guest')(page, row, errors);
+          } else if (row.projection) {
+            // A shared-room projection is deliberately not a personal app
+            // surface: no account chrome, no Adaptive Edge and no personal
+            // context may leak onto the television. It still has to load the
+            // RTG editorial system, stay within the viewport and expose its
+            // native controls.
+            await page.evaluate(() => document.fonts.ready);
+            row.state = await page.evaluate(() => {
+              const b = document.body, css = getComputedStyle(b);
+              const main = document.querySelector('main');
+              const r = main && main.getBoundingClientRect();
+              return {
+                layout:b.dataset.rtgLayout,
+                editorialVersion:css.getPropertyValue('--rtg-editorial-version').trim(),
+                edges:[...document.querySelectorAll('.rtg-adaptive-bar')].filter(e => e.getClientRects().length).length,
+                content:r ? {x:r.x,y:r.y,w:r.width,h:r.height} : null,
+                overflow:document.documentElement.scrollWidth > innerWidth + 1
+              };
+            });
+            row.failures = [];
+            if (row.http !== 200) row.failures.push('http-'+row.http);
+            if (row.state.editorialVersion !== '20261001') row.failures.push('editorial-system-not-loaded');
+            if (row.state.layout !== 'standard') row.failures.push('legacy-layout');
+            if (row.state.edges) row.failures.push('personal-edge-on-shared-projection');
+            if (!row.state.content || row.state.content.w < 300 || row.state.content.h < 300) row.failures.push('missing-projection-content');
+            if (row.state.overflow) row.failures.push('horizontal-overflow');
           } else {
           if (!row.access) await page.waitForSelector('.rtg-adaptive-bar', { timeout: 12000 });
           row.edgeReadyMs = Date.now() - started;

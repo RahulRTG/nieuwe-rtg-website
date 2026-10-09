@@ -8,6 +8,7 @@ const ROOT = path.join(__dirname, '..');
 const lees = naam => fs.readFileSync(path.join(ROOT, naam), 'utf8');
 const kern = require('../public/shared/rtg-adaptive-edge-core.js');
 const VIEW = lees('public/shared/rtg-adaptive-edge.js');
+const SERVICES = lees('public/shared/rtg-adaptive-edge-services.js');
 const INPUT = lees('public/shared/rtg-adaptive-edge-input.js');
 const CSS = lees('public/shared/rtg-adaptive-edge.css');
 const LOADER = lees('public/shared/rtg-edge-2-loader.js');
@@ -62,8 +63,8 @@ test('één zwevend oppervlak vervangt de oude zichtbare onderrand', () => {
   assert.match(CSS, /backdrop-filter:blur\(24px\) saturate\(1\.3\)/);
   assert.match(CSS, /background:var\(--edge-bar-bg\)/);
   assert.match(CSS, /--edge-bar-accent:var\(--rtg-world-metal,#ebcc94\)/);
-  assert.match(VIEW, /class="rtg-adaptive-lips"/);
-  assert.doesNotMatch(VIEW, /rtg-adaptive-lips[^\n]+(?:circle|ellipse)/);
+  assert.match(SERVICES, /class="rtg-adaptive-lips"/);
+  assert.doesNotMatch(SERVICES, /rtg-adaptive-lips[^\n]+(?:circle|ellipse)/);
   assert.doesNotMatch(VIEW, /rtg-adaptive-caption/);
   assert.match(CSS, /data-rtg-adaptive-state="peek"[^}]*width:136px;height:50px/);
   assert.doesNotMatch(VIEW, /Mandaat gecontroleerd/);
@@ -100,7 +101,7 @@ test('swipe, hold, toetsenbord en haptiek delen dezelfde invoerlaag', () => {
 test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezig', () => {
   const bronnen = ['/shared/rtg-adaptive-edge-loader.js'];
   const adaptieveBronnen = ['/shared/rtg-adaptive-edge.css', '/shared/rtg-adaptive-edge-core.js',
-    '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge-surface.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js',
+    '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge-surface.js', '/shared/rtg-adaptive-edge-services.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js',
     '/shared/adaptief/grammatica.js', '/shared/edge/actiestaat.js', '/shared/edge/blikveld-hoofdactie.js', '/shared/edge/blikveld.js'];
   for (const bron of bronnen) {
     assert.ok(LOADER.includes(bron), bron + ' ontbreekt in de loader');
@@ -123,7 +124,7 @@ test('Adaptive Edge laadt fail-closed na de bestaande Edge en is offline aanwezi
 });
 
 test('alle Adaptive Edge-browsermodules blijven onder de productlimiet', () => {
-  for (const naam of ['rtg-adaptive-edge-loader.js', 'rtg-adaptive-edge-core.js', 'rtg-adaptive-edge-controls.js', 'rtg-adaptive-edge-input.js', 'rtg-adaptive-edge.js', 'rtg-adaptive-edge-signals.js']) {
+  for (const naam of ['rtg-adaptive-edge-loader.js', 'rtg-adaptive-edge-core.js', 'rtg-adaptive-edge-controls.js', 'rtg-adaptive-edge-input.js', 'rtg-adaptive-edge-services.js', 'rtg-adaptive-edge.js', 'rtg-adaptive-edge-signals.js']) {
     assert.ok(fs.statSync(path.join(ROOT, 'public/shared', naam)).size < 10 * 1024, naam + ' is te groot');
   }
 });

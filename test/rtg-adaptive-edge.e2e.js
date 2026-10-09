@@ -168,6 +168,23 @@ test('Adaptive Edge is één tastbare RTG-laag op mobiel en desktop',
           await page.waitForSelector('.rtg-edge-index[aria-hidden="false"]');
           await page.keyboard.press('Escape');
           await page.waitForSelector('.rtg-edge-index[aria-hidden="false"]', { state: 'hidden' });
+          await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]').click();
+          await page.waitForFunction(() => document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState === 'expanded');
+          assert.equal(await page.locator('.rtg-adaptive-modes button').count(), 5,
+            'het Edge-scherm mist een van zijn vijf vaste ingangen');
+          assert.equal(await page.locator('.rtg-adaptive-sheet').isVisible(), true,
+            'de mond opent niet het scherm van dezelfde Edge');
+          await page.locator('.rtg-adaptive-modes [data-rtg-adaptive-mode="connect"]').click();
+          assert.equal(await page.locator('.rtg-adaptive-service').getByRole('button', { name: /Open berichten/ }).count(), 1,
+            'Connect heeft geen werkende weg naar de echte berichten-app');
+          await page.locator('.rtg-adaptive-modes [data-rtg-adaptive-mode="media"]').click();
+          assert.equal(await page.locator('.rtg-adaptive-service').getByRole('button', { name: /Open RTG Media/ }).count(), 1,
+            'Media heeft geen werkende weg naar de echte media-app');
+          await page.locator('.rtg-adaptive-modes [data-rtg-adaptive-mode="account"]').click();
+          assert.equal(await page.locator('.rtg-adaptive-service').getByRole('button', { name: /Open uw account/ }).count(), 1,
+            'Account heeft geen werkende weg naar de echte accountomgeving');
+          await page.keyboard.press('Escape');
+          await page.waitForFunction(() => document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState === 'dock');
           if (maat.width === 390) {
             const veeg = async (dx, dy) => page.evaluate(([x, y]) => {
               const bar = document.querySelector('.rtg-adaptive-bar'), r = bar.getBoundingClientRect();

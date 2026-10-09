@@ -289,11 +289,13 @@ test('a shared projector never loads the signed-in member’s personal desktop w
   const ctx = await context(), page = await ctx.newPage(), reads = [];
   page.on('request', r => { if (/\/api\/(?:comm\/|agenda\/|notities\/|member\/connect)/.test(r.url())) reads.push(r.url()); });
   try {
-    await open(page, '/apps/spelscherm.html');
+    await page.goto(srv.base + '/apps/spelscherm.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('body[data-rtg-desktop][data-rtg-desktop-state="ready"]');
     assert.equal(await page.locator('.wd-shell').count(), 1);
     assert.equal(await page.locator('.wd-widget').count(), 0);
     assert.deepEqual(reads, []);
-    assert.equal(await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="ai"]').isDisabled(), true);
+    assert.equal(await page.locator('.rtg-adaptive-bar').count(), 0,
+      'een gedeelde televisie krijgt geen persoonlijke Edge of accountcontext');
   } finally { await ctx.close(); }
 });
 

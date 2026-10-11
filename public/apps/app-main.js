@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '70026b69';
+var RTG_BOUW = 'f94acb93';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -2375,7 +2375,9 @@ var RTG_BOUW = '70026b69';
      de console welke het was. */
   function vulTab(tab){
     const lijst = LADERS_PER_TAB[tab];
-    if (!lijst || gevuldeTabs[tab]) return;
+    /* Zonder account valt er niets te vullen: niet als gevuld markeren, anders
+       blijft de stand leeg als het account even later wel binnen is. */
+    if (!lijst || gevuldeTabs[tab] || !user) return;
     gevuldeTabs[tab] = true;
     // een gratis gebruiker heeft geen reizen, betalen, AI of assets: die
     // tabbladen staan voor hem verborgen, dus halen we er ook niets voor op.
@@ -2561,6 +2563,21 @@ var RTG_BOUW = '70026b69';
         if (knop && knop.style.display !== 'none') beginTab = b.tab;
       }
     } catch(e){}
+    /* EEN ADRES MET EEN STAND (`#tab=salon`): de sprong en elke ingang buiten
+       deze app sturen een lid zo naar een stand die hier woont. Dat wordt HIER
+       beslist en niet met een klok ernaast: er stond een timer van 600 ms die de
+       knop indrukte, en kwam het account later binnen dan dat, dan viel vulTab
+       om op `user` (null) en bleef de stand leeg -- ook bij een volgende keer
+       openen, want hij stond al als gevuld gemarkeerd. Alleen een knop die er
+       voor deze pas ECHT staat telt; een verborgen stand opent een adres nooit.
+       Het adres wordt een keer gebruikt en daarna weggehaald, zodat een
+       volgende renderAll niet opnieuw naar dezelfde stand springt. */
+    const adres = /^#tab=([a-z]+)$/.exec(location.hash);
+    if (adres){
+      const knop = document.querySelector('.tabbar button[data-tab="' + adres[1] + '"]');
+      if (knop && knop.style.display !== 'none') beginTab = adres[1];
+      try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+    }
     /* De tabbladen achter het beginscherm halen hun gegevens nu pas op als je
        ze opent -- zie LADERS_PER_TAB in ./app-main-12.js voor waarom, en wat
        er gemeten is. Hier blijven alleen de drie laders staan die aan geen
@@ -5458,20 +5475,9 @@ var RTG_BOUW = '70026b69';
     if (t) t.click();
   }, 600);
 
-  /* DEZELFDE AFSPRAAK, MAAR DAN VOOR ELKE STAND. De sprong (shared/sprong.js)
-     staat op elk scherm van het huis, ook op schermen die deze app niet laden.
-     Wil een lid daar naar een stand die IN deze app woont (Betalen, Salon,
-     Zorg), dan kan de sprong die knop niet indrukken -- hij staat er niet.
-     Hij stuurt dan hierheen met de stand in de hash, en wij drukken hem in.
-
-     Alleen een knop die er ECHT is: een stand die uw pas niet opent, staat
-     niet in de tabbalk, en dan gebeurt er niets. Zo kan een adres uit een
-     bericht nooit een tab openen die u niet hoort te hebben. */
-  const stand = /^#tab=(.+)$/.exec(location.hash);
-  if (stand) setTimeout(() => {
-    const t = tabKnop(decodeURIComponent(stand[1]));
-    if (t) t.click();
-  }, 600);
+  /* DEZELFDE AFSPRAAK, MAAR DAN VOOR ELKE STAND (`#tab=...`), staat in
+     renderAll() (./app-main-12a.js): daar is het account er zeker, en daar
+     wordt al gekozen op welke stand de app opent. */
 
   /* ---------- batterij in de statusbalk, zoals op een telefoon ---------- */
   const bat = $('#osBat'), batVul = $('#osBatVul'), batPct = $('#osBatPct');

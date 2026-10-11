@@ -526,7 +526,7 @@ const WETTEN = [
 
 const BESLUITEN = [
   { nr: 'B1', besluit: 'Aggregatie is queryveilig, niet alleen celveilig: vaste views, minimumcel, complementaire onderdrukking, tijdvensters, geen vrije gemeentelijke OLAP over gevoelige dimensies.',
-    ...h('deels', K + 'rtfos/gemeente.js', 'function afleidbaar',
+    ...h('deels', K + 'rtfos/buurtdrempel.js', 'function afleidbaar',
       'Er is een minimumcel, een vaste view (het portaal roept alleen `cijfersVan` aan) en onderdrukking tot geen buurt meer af te leiden is (proef `buurtenQueryveilig`). Tijdvensters ontbreken (vandaag en volgende week kijken is een verschil), en het stadstotaal heeft geen drempel.') },
   { nr: 'B2', besluit: 'Foundation zet financiele handelingen klaar maar wordt geen betaalroute; de organisatie betaalt via haar eigen geld- en arbeidsketen.',
     ...h('deels', K + 'rtfos/gift-betalen.js', 'partnerIn',

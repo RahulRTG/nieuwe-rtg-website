@@ -32,7 +32,7 @@ const fs = require('fs');
 const path = require('path');
 const { start, WORTEL } = require('./lib/wegwerpserver');
 const { alleRoutes, verdeelOpRol } = require('./lib/routes');
-const { maakSleutels, haalSleutels, ONMISBAAR } = require('./lib/proefsleutels');
+const { haalSleutels } = require('./lib/proefsleutels');
 const { plausibelLijf } = require('./lib/rolproef');
 const wm = require('./lib/waarom');
 const { maakPool } = require('./lib/objectpool');
@@ -74,9 +74,9 @@ if (require.main !== module) { module.exports = {}; return; }
   /* De sleutelbos staat in ./lib/proefsleutels.js: zes instrumenten hadden hier
      dezelfde drie rollen staan, en dus alle zes dezelfde blinde vlek voor alles
      achter boardroomAuth en techAuth. */
-  const bos = maakSleutels({ post, officeCode: 'RTG-OFFICE-PROEF' });
+  const bos = await haalSleutels({ post });
   const inlog = bos.inlog;
-  const { tokens, mislukt } = await haalSleutels(bos);
+  const { tokens } = bos;
   /* DE SESSIEWACHT. Deze ronde loopt langs ALLE schrijfroutes, en /api/logout
      hoort daarbij: vanaf dat punt deelde hij routes in op een antwoord dat
      alleen maar "u bent niet ingelogd" was. Zie scripts/lib/sessiewacht.js voor

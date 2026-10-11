@@ -64,8 +64,12 @@ const keuring = require('../scripts/meetkeuring');
    NUL, en dat is de stand die deze keuring drie dagen na zijn geboorte haalde:
    acht bij het schrijven, drie valse alarmen gerepareerd, vier echte fouten
    gedicht, en de laatste (SCHERMLEUGEN zonder stempel) sloot met de
-   RTG_VASTLEGGEN-vlag. Elke nieuwe overtreding is vanaf hier een regressie. */
-const OPEN_MAX = 0;
+   RTG_VASTLEGGEN-vlag. Elke nieuwe overtreding is vanaf hier een regressie.
+
+   Het getal staat sinds 6 oktober 2026 in NORM.json (meter `meetkeuringGezakt`)
+   en niet meer als constante hier: zo gaat een verhoging langs
+   scripts/normbasis.js en kan hij niet zonder notitie. */
+const OPEN_MAX = require('../scripts/lib/normwaarde').normwaarde('meetkeuringGezakt');
 
 test('1. elke regel komt uit een echte fout en is na te trekken', () => {
   assert.ok(keuring.REGELS.length >= 4, 'er zijn regels');
@@ -100,8 +104,8 @@ test('4. het aantal overtredingen mag alleen krimpen', () => {
   const uit = keuring.meet();
   assert.ok(uit.telling.gezakt <= OPEN_MAX,
     'de meetlaag houdt zich op ' + uit.telling.gezakt + ' punten niet aan zijn eigen regels ' +
-    '(was ' + OPEN_MAX + '). Repareer ze, of verlaag OPEN_MAX met de hand en zet in de ' +
-    'commit waarom dat een bewuste keuze is. Open nu: ' +
+    '(ratel in NORM.json, meetkeuringGezakt: ' + OPEN_MAX + '). Repareer ze, of verzet de ratel in ' +
+    'NORM.json met een notitie die zegt waarom dat een bewuste keuze is. Open nu: ' +
     uit.bevindingen.map(b => b.register + '/' + b.regel).join(', '));
 });
 

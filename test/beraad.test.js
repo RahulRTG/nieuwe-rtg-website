@@ -15,7 +15,8 @@
    (h) ai.js samenvatting(): `.slice(0, 2)` op de regels -- toets 10 zakt;
    (i) standen.js: `require('../democratie/eindstanden')` erbij -- toets 11 zakt;
    (j) beleid-lijsten.js: /^\/api\/beraad\/stem$/ op KLEIN.member -- toets 12 zakt;
-   (k) ronde.js stem(): `door` in de tijdlijnregel -- toets 13 zakt. */
+   (k) ronde.js stem(): `door` in de tijdlijnregel -- toets 13 zakt;
+   (l) routes/member/beraad.js: de agentVan-controle uitgezet -- toets 14 zakt. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -265,4 +266,26 @@ test('13. de tijdlijn is een sluitende hashketen, en een stem staat er zonder na
   const stemregels = b.tijdlijn.filter(r => /gestemd|stem-gewijzigd/.test(r.wat));
   assert.equal(stemregels.length, 2);
   for (const r of stemregels) { assert.ok(!('door' in r)); assert.ok(!JSON.stringify(r).match(/voor|tegen/)); }
+});
+
+test('14. de schrijfroutes weigeren zelf een verzoek met het agentkenmerk van Rahul', () => {
+  const agentteken = require('../server/kern/agentteken');
+  const routes = {};
+  const app = { post: (pad, auth, h) => { routes[pad] = h; } };
+  let geroepen = 0;
+  const beraad = new Proxy({}, { get: () => () => { geroepen++; return { ok: true }; } });
+  require('../server/routes/member/beraad')({ app, auth: () => {}, geenGast: () => false, beraad, beraadAI: beraad });
+  const antwoord = () => { const r = { code: 200 }; r.status = (c) => { r.code = c; return r; }; r.json = (b) => { r.body = b; return r; }; return r; };
+  const verzoek = (kop) => ({ session: { key: 'a' }, body: { beraad: 1, keuze: 'voor' },
+    get: (n) => (kop && n.toLowerCase() === agentteken.KOP ? kop : undefined), headers: {} });
+  for (const pad of ['open', 'inbreng', 'voorstel', 'naar-stemmen', 'stem', 'sluit', 'heropen', 'terugkoppeling-gezien']) {
+    const r = antwoord();
+    routes['/api/beraad/' + pad](verzoek(agentteken.kop('rahul')), r);
+    assert.equal(r.code, 403, pad + ' laat Rahul door');
+  }
+  assert.equal(geroepen, 0, 'geen enkele kernfunctie werd aangeroepen');
+  const mens = antwoord();
+  routes['/api/beraad/stem'](verzoek(null), mens);
+  assert.equal(mens.code, 200);
+  assert.equal(geroepen, 1, 'een mens komt er wel door');
 });

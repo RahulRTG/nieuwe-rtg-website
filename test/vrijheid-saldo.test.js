@@ -64,6 +64,11 @@ test('het recht wordt alleen gerekend in het geval dat geen open regel raakt', (
   assert.equal(r.wettelijk, 128, 'vier keer 32 uur, met het proefbeleid');
   assert.equal(r.bron.regel.laag, 'LEGAL_BASELINE');
 
+  /* Een loonsverhoging in een EERDER jaar (een nieuwe versie, zelfde uren)
+     is geen wijziging van de arbeidsduur in dit jaar: het recht blijft te rekenen. */
+  contracten.leg(ORG, '7', { ...vast32, vanaf: '2025-09-01', uurloonCenten: 1700 }, 'manager');
+  assert.equal(bron.verlofrechten(ORG, heelJaar, 2026, proef).wettelijk, 128, 'een oude versie telt niet als wijziging in 2026');
+
   /* Elk ander geval zegt waarom niet, en noemt nooit een getal. */
   const deel = bron.verlofrechten(ORG, { id: '7', inDienst: { van: '2026-06-01', tot: null } }, 2026, proef);
   assert.equal(deel.wettelijk, null); assert.match(deel.waarom.wettelijk, /naar rato/);

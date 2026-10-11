@@ -62,11 +62,17 @@ module.exports = ({ bronnen }) => {
       if (!nrs.length) waarom.push('Er is geen arbeidscontract vastgelegd in de payroll; de arbeidsduur per week is onbekend.');
       else if (nrs.length > 1) waarom.push('Er lopen ' + nrs.length + ' contracten bij deze zaak; hoe die samen het recht vormen is niet vastgesteld.');
       else {
-        const versies = c.geschiedenis(code, mens.id, nrs[0]).filter(v => v.vanaf <= jaarTot && (!v.tot || v.tot >= jaarVan));
-        const v = versies[versies.length - 1] || null;
+        /* Een nieuwe versie VERVANGT de vorige (contracten.js: `tot` is het einde
+           van het contract, niet van de versie). Wat in dit jaar geldt is dus de
+           versie op 1 januari plus wat er in het jaar ingaat -- een loonsverhoging
+           van vorig jaar is geen wijziging van de arbeidsduur in dit jaar. */
+        const begin = c.opDatum(code, mens.id, jaarVan, nrs[0]);
+        const erin = c.geschiedenis(code, mens.id, nrs[0]).filter(x => x.vanaf > jaarVan && x.vanaf <= jaarTot);
+        const v = erin.length ? erin[erin.length - 1] : begin;
+        const anders = (x) => !begin || x.urenPerWeek !== begin.urenPerWeek || x.soort !== begin.soort;
         if (v) bron.contract = { soort: v.soort, urenPerWeek: v.urenPerWeek != null ? v.urenPerWeek : null, vanaf: v.vanaf, tot: v.tot || null };
         if (!v) waarom.push('Geen contractversie geldt in ' + j + '.');
-        else if (versies.length > 1 || v.vanaf > jaarVan || (v.tot && v.tot < jaarTot))
+        else if (!begin || erin.some(anders) || (v.tot && v.tot < jaarTot))
           waarom.push('De arbeidsduur verandert in ' + j + ' of het contract loopt niet het hele jaar; naar rato rekenen is niet vastgesteld.');
         else if (!heeftVasteOmvang(v))
           waarom.push('Een ' + v.soort + '-contract heeft geen vaste arbeidsduur per week; dan hangt het recht aan de gewerkte uren, en die rekenregel is niet vastgesteld.');

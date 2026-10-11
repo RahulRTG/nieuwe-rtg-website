@@ -112,7 +112,7 @@ test('7. de ratel: de bodem mag alleen breder worden', () => {
      er een verhoogt, zet een deel van de bodem achter betaling en hoort dat
      in SAMENLEVING.md uit te schrijven in plaats van hier een getal op te
      hogen. */
-  const GROND = { verdwenen: 0, geenEigenaar: 1, achterBetaling: 1, deelsAchterBetaling: 5 };
+  const GROND = { verdwenen: 0, geenEigenaar: 0, achterBetaling: 1, deelsAchterBetaling: 5 };   // geenEigenaar 1 -> 0 op 11 okt 2026: opnieuw beginnen kreeg een eigenaar
   assert.ok(meting.telling.verdwenen <= GROND.verdwenen, 'SAM-01: een werkwoord verdween achter betaling');
   assert.ok(meting.telling['geen-eigenaar'] <= GROND.geenEigenaar);
   assert.ok(meting.achterBetaling.length <= GROND.achterBetaling,

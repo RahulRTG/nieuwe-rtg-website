@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-29T19:17:14.814Z",
-    "commit": "a9a30b4f4",
+    "op": "2026-10-11T17:20:05.394Z",
+    "commit": "1354a64b",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/onvervreemdbaar.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "uitleg": "De nulmeting van de universele bodem (SAMENLEVING.md par. 11.2): per functie die een werkwoord van de bodem draagt, komt een sessie op de gratis trede langs de deur waar de RTG Pass langskomt? Een werkwoord waarvan elke functie achter betaling zit, is een overtreding van SAM-01.",
   "grens": "Dit meet de DEUR en niet de kamer (een leeg lichaam), en `achter-betaling` heeft de graad vermoed: het leest een verschil tussen de gratis sessie en de RTG Pass als een pasverschil. Daarom staat bij elke route de foutzin die de gratis sessie kreeg. De indeling van functies in werkwoorden is een VERKLARING en geen afleiding, en die is nog door geen mens afgetekend.",
@@ -41,8 +41,8 @@
       "functies": 6
     },
     "opnieuw-beginnen": {
-      "stand": "geen-eigenaar",
-      "functies": 0
+      "stand": "aanwezig",
+      "functies": 1
     }
   },
   "functies": [
@@ -1672,15 +1672,16 @@
           "redenGratis": "Dit verzoek kennen wij niet."
         },
         {
-          "route": "POST /api/service/bevestigingen",
+          "route": "POST /api/service/bevestiging/toon",
           "stand": "open",
-          "gratis": 200,
-          "rtg": 200,
-          "bezoeker": 200,
-          "zonderControle": 200
+          "gratis": 404,
+          "rtg": 404,
+          "bezoeker": 404,
+          "zonderControle": 404,
+          "redenGratis": "Dit verzoek kennen wij niet."
         },
         {
-          "route": "POST /api/service/keuzes",
+          "route": "POST /api/service/bevestigingen",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,
@@ -2062,13 +2063,42 @@
           "redenGratis": "Pakketboeking niet gevonden."
         }
       ]
+    },
+    {
+      "werkwoord": "opnieuw-beginnen",
+      "waarom": "opnieuw beginnen als projectie: account terug, verleden meenemen en achterlaten (SAMENLEVING.md par. 2)",
+      "functie": "tg-account",
+      "naam": "Account en profiel",
+      "paden": [
+        "/api/account/opnieuw"
+      ],
+      "stand": "open",
+      "telling": {
+        "open": 1,
+        "achter-betaling": 0,
+        "ook-rtg-geweigerd": 0,
+        "onbepaald": 0
+      },
+      "zonderAccount": "dicht",
+      "bezoeker": "dicht",
+      "achterPaspoortcontrole": false,
+      "routes": [
+        {
+          "route": "POST /api/account/opnieuw",
+          "stand": "open",
+          "gratis": 200,
+          "rtg": 200,
+          "bezoeker": 403,
+          "zonderControle": 200
+        }
+      ]
     }
   ],
   "overgeslagen": [],
   "telling": {
-    "aanwezig": 6,
+    "aanwezig": 7,
     "verdwenen": 0,
-    "geen-eigenaar": 1,
+    "geen-eigenaar": 0,
     "onbepaald": 0
   },
   "achterBetaling": [

@@ -8,6 +8,7 @@ module.exports = (ctx) => {
   const { db, save, fs, path, nu, st, teller, journaal, naarLokaal,
     CLOUD, SLEUTEL, GEBRUIKER, WACHTWOORD, actief, HOP, KAS_DIR, KAS_MAX_BESTAND, KAS_MAX_STUKS,
     journaalPadOk, journaalZegel, journaalGeldig, JOURNAAL_MAX_BODY } = ctx;
+  const { alleenRefs, draagtWachtwoord } = require('./journaal');
   const bodyHulp = require('../../web/body');
   const PROXY_BODY_MAX = 8 * 1024 * 1024;
   const LEESFOUT = Symbol('zaakdoos-leesfout');
@@ -33,7 +34,6 @@ module.exports = (ctx) => {
       return LEESFOUT;
     }
   }
-  const { alleenRefs, draagtWachtwoord } = require('./journaal');
 
   /* ---------- de randcache: media blijft op het kastje ----------
      Elke Salon-foto die eenmaal via het doorgeefluik langskwam, bewaart de doos

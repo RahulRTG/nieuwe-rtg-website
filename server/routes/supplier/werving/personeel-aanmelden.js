@@ -94,7 +94,8 @@ app.post('/api/supplier/staff/join', async (req, res) => {
   let v;
   try { v = await verbindCode(lid, kassacode, legacyPin ? { pin } : {}, s.code); }
   catch (e) { console.error('[staff-join] veilige verwerking mislukt'); return res.status(503).json({ error: STUK }); }
-  if (!v || v.error) { noteFailedTry(bucket, req.ip); return res.status(v && v.status || 403).json(v || { error: 'Ongeldige uitnodiging.' }); }
+  // N36: alleen de weigering zelf, nooit het hele antwoord van verbindCode.
+  if (!v || v.error) { noteFailedTry(bucket, req.ip); return res.status(v && v.status || 403).json({ error: v && v.error || 'Ongeldige uitnodiging.' }); }
   res.json({ ok: true, code: s.code, staffId: v.staff.id, name: v.naam, role: v.invite.role });
 });
 };

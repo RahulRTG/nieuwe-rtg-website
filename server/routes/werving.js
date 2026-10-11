@@ -84,7 +84,7 @@ module.exports = (kern) => {
     catch (e) { console.error('[werving-verbind] veilige verwerking mislukt'); return res.status(503).json({ error: 'De aanmelding kon niet veilig worden voltooid. Probeer opnieuw.' }); }
     if (!v || v.error) {
       if (!(v && v.hersteld)) noteFailedTry(bucket, req.ip);
-      return res.status(v && v.status || 403).json(v || { error: 'Ongeldige uitnodiging.' });
+      return res.status(v && v.status || 403).json({ error: v && v.error || 'Ongeldige uitnodiging.' }); // N36: geen ruwe rijen
     }
     res.json({ ok: true, code: v.s.code, bedrijf: v.s.name, staffId: v.staff.id,
       name: v.naam, role: v.invite.role, ...(legacyPin && v.pin ? { pin: v.pin } : {}),

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T20:22:41.056Z",
-    "commit": "7b40162cd",
+    "op": "2026-10-11T20:27:56.245Z",
+    "commit": "4366fa980",
     "boomVuil": false,
     "boomAnders": 2,
     "instrument": "scripts/groepvorm.js",

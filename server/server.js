@@ -999,7 +999,7 @@ const webmakerAi = require('./kern/webmaker-ai')({ anthropic, schoon });
 /* Het geheim voor de links: RTG_ENC_KEY, anders een uit het sessiegeheim afgeleide sleutel (dat staat al
    buiten de datamap of in secret.key en is gedeeld tussen servers op dezelfde
    opslag). Lazy: het sessiegeheim bestaat pas na het laden van de kluis. */
-require('./media/toegang').zet({ db, geheim: () => process.env.RTG_ENC_KEY || accounts.sleutelVoor('media-link') });
+require('./media/toegang').zet({ data: () => db.data, geheim: () => process.env.RTG_ENC_KEY || accounts.sleutelVoor('media-link') });
 app.get('/media/:naam', (req, res) => { media.serveer(req, res).catch(() => { if (!res.headersSent) res.status(500).end(); }); });
 app.get('/media/t/:token', (req, res) => { media.serveerLink(req, res).catch(() => { if (!res.headersSent) res.status(404).end(); }); });
 // Eenmalige verhuizing van al bestaande base64-foto's (Salon + snaps) naar de

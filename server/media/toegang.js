@@ -11,7 +11,7 @@
    hem niet. Daarom twee wegen, en de tweede is de standaard:
 
    1. OPENBAAR -- alleen beeld dat op dit moment op een VERKLAARDE openbare plek
-      staat (de gesloten lijst KLASSEN hieronder). Die plek wordt uit de data
+      staat (de gesloten lijst in ./openbare-plekken.js). Die plek wordt uit de data
       afgeleid en niet bij het uploaden opgeslagen: een foto die van de etalage
       wordt gehaald of niet meer is uitgelicht, is binnen VERS_MS niet meer
       openbaar. Een plek die hier niet staat, is niet openbaar -- ook niet als
@@ -56,68 +56,16 @@ const CACHE_PRIVE = 'private, no-store';
 const naamVan = ref => path.basename(String(ref || '').replace(URL_PREFIX, ''));
 const isMediaRef = v => typeof v === 'string' && (v.startsWith(URL_PREFIX) || NAAM.test(v));
 
-/* Een post van de Salon telt alleen als hij er nog staat. */
-const levend = p => p && !p.weg && !p.verborgen && !p.archief;
-function refsVanPost(p, voeg) {
-  voeg(p.photo); voeg(p.visual);
-  for (const m of (Array.isArray(p.media) ? p.media : [])) if (m) voeg(m.src);
-  if (p.folder && Array.isArray(p.folder.fotos)) for (const f of p.folder.fotos) voeg(f);
-}
+const { KLASSEN } = require('./openbare-plekken');
 
-/* DE GESLOTEN LIJST. Elke klasse zegt WAAR openbaar beeld staat en waarom het
-   openbaar is. Een nieuwe openbare plek komt hier bij -- met een reden -- of hij
-   is niet openbaar. Wat hier niet staat, is privé: fail-closed. */
-const KLASSEN = Object.freeze({
-  'zaak-etalage': {
-    waarom: 'Beeld dat een zaak zelf op haar openbare pagina zet: paginafoto\'s, Salon-omslag, kaart, panden, showroom.',
-    vind(data, voeg) {
-      for (const s of data.suppliers || []) {
-        if (!s) continue;
-        for (const f of s.photos || []) voeg(f);
-        if (s.salon) voeg(s.salon.foto);
-        for (const m of s.menu || []) if (m) voeg(m.foto);
-        for (const pand of s.panden || []) for (const f of (pand && pand.fotos) || []) voeg(f);
-        for (const a of ((s.verkoop || {}).showroom) || []) for (const f of (a && a.fotos) || []) voeg(f);
-      }
-    }
-  },
-  'salon-zaak': {
-    waarom: 'Een Salon-post van een zaak voor iedereen: commerciele publicatie, haar eigen Salon-pagina.',
-    vind(data, voeg) {
-      for (const p of data.posts || []) {
-        if (!levend(p) || p.partner !== true) continue;
-        if (!['iedereen', 'salon', undefined, null].includes(p.publiek)) continue;
-        refsVanPost(p, voeg);
-      }
-    }
-  },
-  'salon-uitgelicht': {
-    waarom: 'Een post die RTG heeft uitgelicht EN waarvan het lid toestemming gaf voor gebruik buiten De Salon (promoMag) -- de bron van "Uit De Salon" op sites en in de campagne.',
-    vind(data, voeg) {
-      for (const p of data.posts || []) {
-        if (!levend(p) || p.partner === true) continue;
-        if (p.featured === true && p.promoMag === true) refsVanPost(p, voeg);
-      }
-    }
-  },
-  'website': {
-    waarom: 'De beeldbank van een website (Webmaker of Atelier): beeld dat expres voor een openbare site is geupload.',
-    vind(data, voeg) {
-      const leden = (data.ledenSites || {}).fotos;
-      if (leden && typeof leden === 'object') for (const lijst of Object.values(leden)) for (const f of (Array.isArray(lijst) ? lijst : [])) voeg(f);
-      for (const f of ((data.atelierSites || {}).fotos) || []) voeg(f);
-    }
-  }
-});
-
-let db = null;
+let bron = null;   // () => de levende data; server.js geeft hem mee
 let index = null, gebouwd = 0, vindFouten = 0;
 let sleutel = null;
 let geheimBron = null;
 
 function bouw() {
   const uit = new Map();
-  const data = (db && db.data) || {};
+  const data = (bron && bron()) || {};
   for (const [klasse, k] of Object.entries(KLASSEN)) {
     const voeg = ref => {
       if (typeof ref !== 'string' || !ref.startsWith(URL_PREFIX)) return;
@@ -144,7 +92,7 @@ function misserMag(nu) {
    geworden bestand krijgt dan nog een privélink, en die werkt ook. */
 function openbaarKlasse(naam, zonderHerlezen) {
   naam = naamVan(naam);
-  if (!db || !NAAM.test(naam)) return null;
+  if (!bron || !NAAM.test(naam)) return null;
   const nu = Date.now();
   if (!index || nu - gebouwd > VERS_MS) bouw();
   let k = index.get(naam);
@@ -219,7 +167,7 @@ function inspectie(f) {
 }
 
 function zet(opties) {
-  db = (opties && opties.db) || null;
+  bron = (opties && typeof opties.data === 'function') ? opties.data : null;
   geheimBron = (opties && typeof opties.geheim === 'function') ? opties.geheim : null;
   sleutel = null; index = null; gebouwd = 0;
 }

@@ -197,7 +197,7 @@ test('de klassen: alleen verklaarde plekken, en intrekken werkt', () => {
     ledenSites: { fotos: { 'user-1': ['/media/' + n(9)] }, lijst: [{ blokken: [{ src: '/media/' + n('a') }] }] },
     huurFotos: { R1: { voor: [{ foto: '/media/' + n('b') }], na: [] } }
   };
-  t.zet({ db: { data } });
+  t.zet({ data: () => data });
   const klasse = i => t.openbaarKlasse(n(i));
   assert.equal(klasse(1), 'zaak-etalage');
   assert.equal(klasse(2), 'zaak-etalage');
@@ -214,9 +214,9 @@ test('de klassen: alleen verklaarde plekken, en intrekken werkt', () => {
   assert.equal(data.huurFotos.R1.voor[0].foto, '/media/' + n('b'), 'de opslag zelf wordt niet aangeraakt');
   // intrekken: de uitlichting gaat eraf, en na verversing is het beeld niet meer openbaar
   data.posts[1].featured = false;
-  t.zet({ db: { data } });
+  t.zet({ data: () => data });
   assert.equal(klasse(4), null, 'niet meer uitgelicht = niet meer openbaar');
-  t.zet({ db: null });
+  t.zet({});
   assert.equal(klasse(1), null, 'zonder bron is niets openbaar (fail-closed)');
 });
 

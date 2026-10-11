@@ -126,8 +126,9 @@
        blijft een druk op de knop -- er springt niets vanzelf terug. */
     var weg = function (l) {
       if (!l.drager || l.drager.stand !== 'uitgeklokt') return '';
-      var om = new Date(l.drager.om);
-      return ' · <b>uitgeklokt om ' + esc(isNaN(om) ? '?' : om.toTimeString().slice(0, 5)) +
+      // het tijdstip stuurt de server alleen naar een manager (eigenaarsbesluit 11 oktober 2026)
+      var om = l.drager.om ? new Date(l.drager.om) : null;
+      return ' · <b>uitgeklokt' + (om && !isNaN(om) ? ' om ' + esc(om.toTimeString().slice(0, 5)) : '') +
         '</b>, de tafel staat nog op zijn naam';
     };
     var nWeg = Number(d.dragerWeg) || 0;

@@ -13,9 +13,10 @@
       alleen in de wijkroute;
    2. van wat klokVan teruggeeft leest de afleiding alleen `open` en
       `laatsteUitklok` -- geen uren, geen klokregels;
-   3. wat er naar de Vloer gaat is de STAND (stand, om, reden), nooit het
-      antwoord van klokVan zelf. Dat laatste meet test/horeca-leen-dienst.test.js
-      op een echte server.
+   3. wat er naar de Vloer gaat is de STAND (stand, reden), en het
+      uitkloktijdstip (om) alleen naar een manager -- nooit het antwoord van
+      klokVan zelf. Dat laatste meet test/horeca-leen-dienst.test.js op een
+      echte server.
 
    Draai: node --test test/horeca-klokgrens.test.js */
 'use strict';

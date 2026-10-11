@@ -48,20 +48,20 @@ const feitje = (L, extra) => L.zet('ka', Object.assign(
 
 /* ---------- 1. het besluit, zonder opslag ---------- */
 
-test('1. de regels zijn te beproeven zonder server', () => {
+test('1. de regels zijn te beproeven zonder server', async () => {
   assert.equal(R.toets({ kapitaal: 'vermogen', herkomst: 'zelf', wat: 'NK junior', op: GISTEREN }, NU), null);
   assert.match(R.toets({ kapitaal: 'geluk', herkomst: 'zelf', wat: 'x', op: GISTEREN }, NU), /Kies waar dit bij hoort/);
   assert.match(R.toets({ kapitaal: 'vermogen', herkomst: 'bedacht', wat: 'x', op: GISTEREN }, NU),
     /Een feit zonder herkomst is een half feit/);
 });
 
-test('2. een voornemen is geen prestatie', () => {
+test('2. een voornemen is geen prestatie', async () => {
   const morgen = new Date(NU + 86400000).toISOString().slice(0, 10);
   assert.match(R.toets({ kapitaal: 'vermogen', herkomst: 'zelf', wat: 'wereldkampioen', op: morgen }, NU),
     /NOOIT\.toekomst/);
 });
 
-test('3. een bedrag en een cijfer zijn geen carrierefeit', () => {
+test('3. een bedrag en een cijfer zijn geen carrierefeit', async () => {
   const b = { kapitaal: 'financieel', herkomst: 'zelf', wat: 'contract getekend', op: GISTEREN };
   assert.match(R.toets(Object.assign({ bedragCenten: 100 }, b), NU), /NOOIT\.bedrag/);
   assert.match(R.toets(Object.assign({ bedrag: 1 }, b), NU), /NOOIT\.bedrag/);
@@ -70,7 +70,7 @@ test('3. een bedrag en een cijfer zijn geen carrierefeit', () => {
   assert.equal(R.toets(b, NU), null, 'DAT er een contract was, is wel een feit');
 });
 
-test('4. elke herkomst zegt ook wat zij NIET zegt', () => {
+test('4. elke herkomst zegt ook wat zij NIET zegt', async () => {
   for (const [naam, h] of Object.entries(R.HERKOMST)) {
     assert.ok(h.stelt && h.stelt.length > 20, naam + ' zegt niet wat er wordt vastgesteld');
     assert.ok(h.nietZegt && h.nietZegt.length > 20,
@@ -83,32 +83,32 @@ test('4. elke herkomst zegt ook wat zij NIET zegt', () => {
 
 /* ---------- 2. de reeks ---------- */
 
-test('5. een feit komt binnen als `zelf` en nooit hoger', () => {
+test('5. een feit komt binnen als `zelf` en nooit hoger', async () => {
   const { L } = huis();
-  const r = feitje(L);
+  const r = await feitje(L);
   assert.equal(r.status, 200);
   /* Op het moment van schrijven heeft niemand anders er iets van gezien. Een
      hogere herkomst kan alleen ontstaan doordat een ANDER hem toevoegt. */
   assert.equal(r.regel.herkomst, 'zelf');
-  assert.equal(L.zet('ka', { kapitaal: 'vermogen', wat: 'x y z', op: GISTEREN, herkomst: 'gezien' })
+  assert.equal((await L.zet('ka', { kapitaal: 'vermogen', wat: 'x y z', op: GISTEREN, herkomst: 'gezien' }))
     .regel.herkomst, 'zelf', 'het lid kan zijn eigen regel niet tot `gezien` verklaren');
 });
 
-test('6. een bevestiging gaat op naam, en `zelf` is geen bevestiging', () => {
+test('6. een bevestiging gaat op naam, en `zelf` is geen bevestiging', async () => {
   const { L } = huis();
-  const f = feitje(L).regel.id;
-  assert.equal(L.bevestig('ka', f, { herkomst: 'gezien', door: '' }).status, 403,
+  const f = (await feitje(L)).regel.id;
+  assert.equal((await L.bevestig('ka', f, { herkomst: 'gezien', door: '' })).status, 403,
     'een bevestiging zonder naam is geen bevestiging -- een spoor dat eindigt bij een gedeelde code is een alibi');
-  assert.equal(L.bevestig('ka', f, { herkomst: 'zelf', door: 'iemand' }).status, 400);
-  assert.equal(L.bevestig('ka', 'clbestaatniet', { herkomst: 'gezien', door: 'M. de Vries' }).status, 404);
-  assert.equal(L.bevestig('ka', f, { herkomst: 'gezien', door: 'M. de Vries (RTG)' }).status, 200);
+  assert.equal((await L.bevestig('ka', f, { herkomst: 'zelf', door: 'iemand' })).status, 400);
+  assert.equal((await L.bevestig('ka', 'clbestaatniet', { herkomst: 'gezien', door: 'M. de Vries' })).status, 404);
+  assert.equal((await L.bevestig('ka', f, { herkomst: 'gezien', door: 'M. de Vries (RTG)' })).status, 200);
 });
 
-test('7. intrekken wist niets en eist een reden', () => {
+test('7. intrekken wist niets en eist een reden', async () => {
   const { db, L } = huis();
-  const f = feitje(L).regel.id;
-  assert.equal(L.intrek('ka', f, { reden: '' }).status, 400, 'een intrekking zonder reden laat de lezer raden');
-  assert.equal(L.intrek('ka', f, { reden: 'verkeerd kapitaal gekozen' }).status, 200);
+  const f = (await feitje(L)).regel.id;
+  assert.equal((await L.intrek('ka', f, { reden: '' })).status, 400, 'een intrekking zonder reden laat de lezer raden');
+  assert.equal((await L.intrek('ka', f, { reden: 'verkeerd kapitaal gekozen' })).status, 200);
 
   const rs = db.data.carriereLedger.ka.regels;
   const oud = rs.find(r => r.id === f);
@@ -119,11 +119,11 @@ test('7. intrekken wist niets en eist een reden', () => {
   assert.equal(L.mijn('ka').feiten[0].ingetrokken, true, 'bij het LEZEN hoort hij wel ingetrokken te heten');
 });
 
-test('8. de bevestigingen worden niet samengevat tot een sterkste herkomst', () => {
+test('8. de bevestigingen worden niet samengevat tot een sterkste herkomst', async () => {
   const { L } = huis();
-  const f = feitje(L).regel.id;
-  L.bevestig('ka', f, { herkomst: 'gezien', door: 'M. de Vries (RTG)' });
-  L.bevestig('ka', f, { herkomst: 'bevestigd', door: 'Atletiekunie (J. Bakker)' });
+  const f = (await feitje(L)).regel.id;
+  await L.bevestig('ka', f, { herkomst: 'gezien', door: 'M. de Vries (RTG)' });
+  await L.bevestig('ka', f, { herkomst: 'bevestigd', door: 'Atletiekunie (J. Bakker)' });
   const feit = L.mijn('ka').feiten[0];
   assert.equal(feit.bevestigingen.length, 2, 'twee bronnen zijn twee bevestigingen en geen hoogste');
   assert.deepEqual(feit.bevestigingen.map(b => b.herkomst), ['gezien', 'bevestigd']);
@@ -133,20 +133,20 @@ test('8. de bevestigingen worden niet samengevat tot een sterkste herkomst', () 
   assert.equal(feit.herkomst, undefined, 'er hoort geen samengevatte herkomst op het feit te staan');
 });
 
-test('9. de enige orde is de tijd', () => {
+test('9. de enige orde is de tijd', async () => {
   const { L } = huis();
-  L.zet('ka', { kapitaal: 'publiek', wat: 'uitverkochte zaal', op: '2024-02-02' });
-  L.zet('ka', { kapitaal: 'vermogen', wat: 'NK junior', op: '2022-01-01' });
-  const f = L.zet('ka', { kapitaal: 'netwerk', wat: 'bij club X gaan spelen', op: '2023-03-03' }).regel.id;
+  await L.zet('ka', { kapitaal: 'publiek', wat: 'uitverkochte zaal', op: '2024-02-02' });
+  await L.zet('ka', { kapitaal: 'vermogen', wat: 'NK junior', op: '2022-01-01' });
+  const f = (await L.zet('ka', { kapitaal: 'netwerk', wat: 'bij club X gaan spelen', op: '2023-03-03' })).regel.id;
   /* Drie bevestigingen op de MIDDELSTE: als er ergens op gewicht werd gesorteerd,
      zou die naar voren schuiven. */
-  for (const wie of ['A (RTG)', 'B (RTG)', 'C (RTG)']) L.bevestig('ka', f, { herkomst: 'gezien', door: wie });
+  for (const wie of ['A (RTG)', 'B (RTG)', 'C (RTG)']) await L.bevestig('ka', f, { herkomst: 'gezien', door: wie });
   assert.deepEqual(L.mijn('ka').feiten.map(x => x.op), ['2022-01-01', '2023-03-03', '2024-02-02']);
 });
 
-test('10. zeven voorraden met hun opbouw, en nergens een totaal', () => {
+test('10. zeven voorraden met hun opbouw, en nergens een totaal', async () => {
   const { L } = huis();
-  feitje(L);
+  await feitje(L);
   const m = L.mijn('ka');
   assert.equal(m.voorraden.length, 7, 'de zeven kapitalen uit CARRIERE.md punt 30');
   for (const v of m.voorraden) {
@@ -159,9 +159,9 @@ test('10. zeven voorraden met hun opbouw, en nergens een totaal', () => {
     'CARRIERE.md par. 4.1: geen samengesteld getal over een mens');
 });
 
-test('11. CAR-05: geen getal op een mens in het antwoord', () => {
+test('11. CAR-05: geen getal op een mens in het antwoord', async () => {
   const { L } = huis();
-  feitje(L);
+  await feitje(L);
   const m = L.mijn('ka');
   const fout = mensVrij(m.feiten.map(f => {
     const kaal = Object.assign({}, f); delete kaal.bevestigingen; return kaal;
@@ -170,43 +170,43 @@ test('11. CAR-05: geen getal op een mens in het antwoord', () => {
   assert.deepStrictEqual(grensScan([require('path').join(__dirname, '..', 'server', 'kern', 'carriereledger')]).gevonden, []);
 });
 
-test('12. een dubbelklik verdubbelt geen regel, en een correctie mag wel', () => {
+test('12. een dubbelklik verdubbelt geen regel, en een correctie mag wel', async () => {
   const { L } = huis();
-  const eerste = feitje(L);
+  const eerste = await feitje(L);
   assert.equal(eerste.status, 200);
-  assert.equal(feitje(L).status, 409, 'de dubbeltik-ronde vond hier 0 -> 2; in een ledger blijft die tweede staan');
+  assert.equal((await feitje(L)).status, 409, 'de dubbeltik-ronde vond hier 0 -> 2; in een ledger blijft die tweede staan');
   assert.equal(L.mijn('ka').feiten.length, 1);
 
   /* Wijk ergens van af en het is een ander feit. */
-  assert.equal(L.zet('ka', { kapitaal: 'vermogen', wat: 'Nederlands kampioen junior', op: '2024-06-14' }).status, 200);
+  assert.equal((await L.zet('ka', { kapitaal: 'vermogen', wat: 'Nederlands kampioen junior', op: '2024-06-14' })).status, 200);
 
   /* En een INGETROKKEN regel opnieuw zetten is een correctie en moet kunnen. */
-  L.intrek('ka', eerste.regel.id, { reden: 'verkeerde dag' });
-  assert.equal(feitje(L).status, 200, 'na intrekken is dezelfde regel opnieuw zetten een correctie');
+  await L.intrek('ka', eerste.regel.id, { reden: 'verkeerde dag' });
+  assert.equal((await feitje(L)).status, 200, 'na intrekken is dezelfde regel opnieuw zetten een correctie');
 });
 
-test('13. een dubbele bevestiging is geen hardere bevestiging', () => {
+test('13. een dubbele bevestiging is geen hardere bevestiging', async () => {
   const { L } = huis();
-  const f = feitje(L).regel.id;
+  const f = (await feitje(L)).regel.id;
   const een = { herkomst: 'gezien', door: 'M. de Vries (RTG)', wat: 'uitslagenlijst gezien' };
-  assert.equal(L.bevestig('ka', f, een).status, 200);
-  assert.equal(L.bevestig('ka', f, een).status, 409);
-  assert.equal(L.bevestig('ka', f, Object.assign({}, een, { door: 'K. Jansen (RTG)' })).status, 200,
+  assert.equal((await L.bevestig('ka', f, een)).status, 200);
+  assert.equal((await L.bevestig('ka', f, een)).status, 409);
+  assert.equal((await L.bevestig('ka', f, Object.assign({}, een, { door: 'K. Jansen (RTG)' }))).status, 200,
     'een andere medewerker is een andere bevestiging');
   assert.equal(L.mijn('ka').feiten[0].bevestigingen.length, 2);
 });
 
 /* ---------- 3. een regel bewijzen zonder het dossier te openen ---------- */
 
-test('14. een deelcode toont EEN feit en nooit het ledger', () => {
+test('14. een deelcode toont EEN feit en nooit het ledger', async () => {
   const { L } = huis();
-  const f = feitje(L).regel.id;
-  L.zet('ka', { kapitaal: 'netwerk', wat: 'iets anders dat niemand hoeft te zien', op: '2020-01-01' });
-  L.bevestig('ka', f, { herkomst: 'gezien', door: 'M. de Vries (RTG)' });
+  const f = (await feitje(L)).regel.id;
+  await L.zet('ka', { kapitaal: 'netwerk', wat: 'iets anders dat niemand hoeft te zien', op: '2020-01-01' });
+  await L.bevestig('ka', f, { herkomst: 'gezien', door: 'M. de Vries (RTG)' });
 
-  const d = L.deel('ka', f, { dagen: 7, voor: 'Sponsor X' });
+  const d = await L.deel('ka', f, { dagen: 7, voor: 'Sponsor X' });
   assert.equal(d.status, 200);
-  const t = L.toon(d.code);
+  const t = await L.toon(d.code);
   assert.equal(t.status, 200);
   assert.equal(t.feit.wat, 'Nederlands kampioen junior');
   const vlak = JSON.stringify(t);
@@ -216,10 +216,10 @@ test('14. een deelcode toont EEN feit en nooit het ledger', () => {
   assert.ok(t.voorbehoud.length >= 3, 'wat dit NIET zegt hoort er even groot bij te staan');
 });
 
-test('15. de code zelf staat niet in de opslag', () => {
+test('15. de code zelf staat niet in de opslag', async () => {
   const { db, L } = huis();
-  const f = feitje(L).regel.id;
-  const d = L.deel('ka', f, {});
+  const f = (await feitje(L)).regel.id;
+  const d = await L.deel('ka', f, {});
   const opslag = JSON.stringify(db.data.carriereDelen);
   assert.equal(opslag.includes(d.code), false,
     'wie de opslag leest, kan er geen bewijs mee tonen; alleen de hash hoort er te staan');
@@ -227,33 +227,33 @@ test('15. de code zelf staat niet in de opslag', () => {
     'de kale code gaat precies eenmaal de deur uit');
 });
 
-test('16. een ingetrokken feit wordt getoond als ingetrokken en verdwijnt niet stil', () => {
+test('16. een ingetrokken feit wordt getoond als ingetrokken en verdwijnt niet stil', async () => {
   const { L } = huis();
-  const f = feitje(L).regel.id;
-  const d = L.deel('ka', f, {});
-  L.intrek('ka', f, { reden: 'bij nader inzien de verkeerde titel' });
-  const t = L.toon(d.code);
+  const f = (await feitje(L)).regel.id;
+  const d = await L.deel('ka', f, {});
+  await L.intrek('ka', f, { reden: 'bij nader inzien de verkeerde titel' });
+  const t = await L.toon(d.code);
   assert.equal(t.status, 200, 'stil op 404 gaan laat een sponsor aan een storing denken');
   assert.equal(t.feit.ingetrokken, true);
 });
 
-test('17. een gestopte code doet niets meer, en zegt waarom', () => {
+test('17. een gestopte code doet niets meer, en zegt waarom', async () => {
   const { L } = huis();
-  const f = feitje(L).regel.id;
-  const d = L.deel('ka', f, {});
+  const f = (await feitje(L)).regel.id;
+  const d = await L.deel('ka', f, {});
   const did = L.mijnDelen('ka')[0].id;
-  assert.equal(L.stopDelen('ka', did).status, 200);
-  assert.equal(L.stopDelen('ka', did).status, 409);
-  const t = L.toon(d.code);
+  assert.equal((await L.stopDelen('ka', did)).status, 200);
+  assert.equal((await L.stopDelen('ka', did)).status, 409);
+  const t = await L.toon(d.code);
   assert.equal(t.status, 404);
   assert.equal(t.waarom, 'ingetrokken', 'een weigering zonder reden stuurt iemand op zoek');
-  assert.equal(L.toon('RTGCL.ONZIN').status, 404);
+  assert.equal((await L.toon('RTGCL.ONZIN')).status, 404);
 });
 
-test('18. een deelcode verloopt, en een jaar is het maximum', () => {
+test('18. een deelcode verloopt, en een jaar is het maximum', async () => {
   const { db, L } = huis();
-  const f = feitje(L).regel.id;
-  L.deel('ka', f, { dagen: 4000 });
+  const f = (await feitje(L)).regel.id;
+  await L.deel('ka', f, { dagen: 4000 });
   const rij = db.data.carriereDelen[0];
   const dagen = (Date.parse(rij.expires_at) - Date.parse(rij.issued_at)) / 86400000;
   assert.ok(dagen <= 366, 'LINK.md: alles wat met een oude foto nog iets in gang kan zetten, hoort tijdelijk te zijn');

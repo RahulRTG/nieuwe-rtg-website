@@ -54,7 +54,7 @@ module.exports = (kern) => {
     const wie = managerOf(req, res); if (!wie) return;
     const b = req.body || {};
     const key = await zoek(b, res); if (!key) return;
-    stuur(res, carriereledger.bevestig(key, String(b.id || ''),
+    stuur(res, await carriereledger.bevestig(key, String(b.id || ''),
       { herkomst: 'bevestigd', door: namens(req, wie), wat: b.wat }));
   });
 
@@ -62,7 +62,7 @@ module.exports = (kern) => {
     const wie = managerOf(req, res); if (!wie) return;
     const b = req.body || {};
     const key = await zoek(b, res); if (!key) return;
-    stuur(res, carriereledger.intrek(key, String(b.id || ''),
+    stuur(res, await carriereledger.intrek(key, String(b.id || ''),
       { door: namens(req, wie), reden: b.reden }));
   });
 };

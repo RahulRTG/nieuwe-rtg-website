@@ -144,6 +144,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-tweedehand').CONTRACTEN,
   require('./mutatiecontracten-afstemming').CONTRACTEN,
   require('./mutatiecontracten-wonen').CONTRACTEN,
+  require('./mutatiecontracten-veiligmoment').CONTRACTEN,
   require('./mutatiecontracten-project-room').CONTRACTEN,
   // de zware poort: drie ceremonieloketten, met opzet niet herhaalbaar
   require('./mutatiecontracten-zwaar').CONTRACTEN,

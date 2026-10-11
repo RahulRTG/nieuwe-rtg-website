@@ -54,21 +54,32 @@ module.exports = function maakDeel({ eigen, crypto, schoon, save, bijeen, inBund
     'Er staat met opzet geen cijfer, niveau of vergelijking bij. Die bestaan hier niet.'
   ];
 
-  function deel(key, fid, { dagen, voor } = {}) {
+  /* Bevestigt de opslag een schrijfactie niet (lib/duurzaam.js geeft dan een
+     503), dan gaat de wijziging ook uit het geheugen terug. Anders schrijft de
+     gewone write-behind save() haar later alsnog weg, en was "niet vastgelegd"
+     zelf de onwaarheid (zie schrijfVast() in ./index.js). */
+  const herstel = (fn) => { try { fn(); } catch (e) { /* het geheugen is al zoals het was */ } };
+  function terugzetten(rij, voor) {
+    for (const k of Object.keys(rij)) if (!(k in voor)) delete rij[k];
+    Object.assign(rij, voor);
+  }
+
+  async function deel(key, fid, { dagen, voor } = {}) {
     const f = feit(key, scho(fid, 20));
     if (!f) return { status: 404, error: 'Dit feit staat niet in uw ledger.' };
     const d = Math.max(1, Math.min(Math.round(Number(dagen) || STANDAARD_DAGEN), MAX_DAGEN));
     const { code, toegang } = bc.maak({ prefix: 'RTGCL', issuer: key, doel: 'carriere-regel',
       scope: ['carriere.regel.tonen'], onderwerp: { key, feit: f.id },
       geldigMs: d * DAG, maxGebruik: 10000 });
-    bak().push(Object.assign({ id: 'cd' + crypto.randomBytes(4).toString('hex'),
-      voor: scho(voor, 120) || null }, toegang));
-    vastleggen();
+    const rij = Object.assign({ id: 'cd' + crypto.randomBytes(4).toString('hex'),
+      voor: scho(voor, 120) || null }, toegang);
+    const mis = await vastleggen(() => { bak().push(rij); });
+    if (mis) { herstel(() => { const i = bak().findIndex((x) => x && x.id === rij.id); if (i >= 0) bak().splice(i, 1); }); return mis; }
     /* De kale code gaat precies EEN keer de deur uit. */
     return { status: 200, code, tot: toegang.expires_at, feit: f.id, voor: scho(voor, 120) || null };
   }
 
-  function toon(code) {
+  async function toon(code) {
     const rij = bc.vind(kijk(), scho(code, 120));
     const waarom = bc.reden(rij, { doel: 'carriere-regel', scope: ['carriere.regel.tonen'], negeerGebruik: true });
     if (waarom) {
@@ -78,7 +89,11 @@ module.exports = function maakDeel({ eigen, crypto, schoon, save, bijeen, inBund
     if (!f) return { status: 404, error: 'Deze code doet niets meer.', waarom: 'feit-weg' };
     /* Het tellen gebeurt op de SCHRIJFbak, niet op de rij uit kijk(). */
     const schrijf = bc.vind(bak(), scho(code, 120));
-    if (schrijf) { bc.gebruik(schrijf); vastleggen(); }
+    if (schrijf) {
+      const voor = Object.assign({}, schrijf);
+      const mis = await vastleggen(() => { bc.gebruik(schrijf); });
+      if (mis) { herstel(() => terugzetten(bak().find((x) => x && x.id === voor.id) || schrijf, voor)); return mis; }
+    }
     return { status: 200, mens: naam(rij.onderwerp.key),
       feit: { wat: f.wat, op: f.op, ingetrokken: f.ingetrokken,
         bevestigingen: f.bevestigingen.filter(b => !b.ingetrokken) },
@@ -91,12 +106,13 @@ module.exports = function maakDeel({ eigen, crypto, schoon, save, bijeen, inBund
       gestopt: !!r.ingetrokken_at }));
   }
 
-  function stop(key, did) {
+  async function stop(key, did) {
     const rij = bak().find(r => r.id === scho(did, 20) && r.issuer === key);
     if (!rij) return { status: 404, error: 'Deze deelcode kennen wij niet.' };
     if (rij.ingetrokken_at) return { status: 409, error: 'Deze deelcode is al gestopt.' };
-    bc.intrekken(rij, key, 'gestopt door het lid');
-    vastleggen();
+    const voor = Object.assign({}, rij);
+    const mis = await vastleggen(() => { bc.intrekken(rij, key, 'gestopt door het lid'); });
+    if (mis) { herstel(() => terugzetten(bak().find((x) => x && x.id === voor.id) || rij, voor)); return mis; }
     return { status: 200, gestopt: rij.ingetrokken_at,
       let: 'Wie hem eerder heeft geopend, heeft de regel gelezen. Dat halen wij niet terug.' };
   }

@@ -74,6 +74,23 @@ function maakCarriereLedger(state) {
     return r;
   }
 
+  /* Schrijven en pas dan ja zeggen: de regel komt BINNEN de duurzame bundel
+     erbij en de schrijver wacht op de commit. Bevestigt de opslag niet, dan gaat
+     de regel ook uit het geheugen weg, anders schrijft write-behind hem alsnog
+     (test/carriereledger-duurzaam.test.js). Op id, want binnen de bundel kan het
+     een ander object zijn. Wat de MAX_REGELS-kap tegelijk wegsneed, komt niet terug. */
+  async function schrijfVast(key, regel) {
+    let r = null;
+    const mis = await vastleggen(() => { r = schrijfRegel(key, regel); });
+    if (mis) {
+      const rs = reeks(key);
+      const i = r ? rs.findIndex((x) => x && x.id === r.id) : -1;
+      if (i >= 0) rs.splice(i, 1);
+      return mis;
+    }
+    return { status: 200, regel: r };
+  }
+
   const { feitVan, weggehaald } = require('./projectie');
 
   /* DE DUBBELKLIK-GRENS, en hier weegt hij zwaarder dan elders. Een dubbeltik
@@ -94,11 +111,15 @@ function maakCarriereLedger(state) {
 
   /* ---------- schrijven ---------- */
 
-  /* Een feit zetten doet de mens zelf, en de herkomst is dus altijd `zelf`.
+  /* Hier stond `vastleggen();` zonder await (lib/duurzaam.js is async): het 200
+     ging de deur uit voor de commit (voltooiproef, 11 oktober 2026). Daarom zijn
+     de schrijvers async en lopen ze via schrijfVast().
+
+     Een feit zetten doet de mens zelf, en de herkomst is dus altijd `zelf`.
      Dat is geen beperking maar de waarheid: op het moment van schrijven heeft
      niemand anders er iets van gezien. Een hogere herkomst komt er alleen bij
      doordat een ANDER hem toevoegt. */
-  function zet(key, data) {
+  async function zet(key, data) {
     const d = data || {};
     const voorstel = { kapitaal: scho(d.kapitaal, 20), herkomst: 'zelf',
       wat: scho(d.wat, 300), op: scho(d.op, 10) };
@@ -112,17 +133,15 @@ function maakCarriereLedger(state) {
         'Een ledger kan niets wissen, dus een dubbele regel blijft staan. Is het echt iets anders, ' +
         'schrijf dat er dan bij.' };
     }
-    const r = schrijfRegel(key, Object.assign({ soort: 'feit' }, voorstel,
+    return schrijfVast(key, Object.assign({ soort: 'feit' }, voorstel,
       { toelichting: scho(d.toelichting, 600) || null }));
-    vastleggen();
-    return { status: 200, regel: r };
   }
 
   /* Een bevestiging hangt aan een feit en komt van een ANDER dan de eigenaar.
      `door` moet een naam of een zaak zijn: een bevestiging die op niemand terug
      te voeren is, is geen bevestiging (KANTOORMACHT.md -- een spoor dat eindigt
      bij een gedeelde code is een alibi). */
-  function bevestig(key, fid, { herkomst, door, wat } = {}) {
+  async function bevestig(key, fid, { herkomst, door, wat } = {}) {
     if (!R.HERKOMSTNAMEN.includes(herkomst) || herkomst === 'zelf') {
       return { status: 400, error: 'Een bevestiging is `gezien` of `bevestigd`; `zelf` zet de eigenaar.' };
     }
@@ -139,9 +158,7 @@ function maakCarriereLedger(state) {
       return { status: 409, error: 'Deze bevestiging staat er al, van dezelfde partij en met ' +
         'dezelfde tekst. Twee keer hetzelfde bevestigen maakt een feit niet harder.' };
     }
-    const r = schrijfRegel(key, { soort: 'bevestiging', feit: f, herkomst, door: wie, wat: tekst });
-    vastleggen();
-    return { status: 200, regel: r };
+    return schrijfVast(key, { soort: 'bevestiging', feit: f, herkomst, door: wie, wat: tekst });
   }
 
   /* Terugnemen. Werkt op een feit (de eigenaar) en op een bevestiging (wie hem
@@ -154,7 +171,7 @@ function maakCarriereLedger(state) {
      voorwerp is precies de vorm die SEMANTIEK.json duur maakt. De ROUTE blijft
      wel /intrek heten -- dat is de taal van buiten, en daar is het onderwerp uit
      het pad al duidelijk. */
-  function trekRegelIn(key, rid, { door, reden } = {}) {
+  async function trekRegelIn(key, rid, { door, reden } = {}) {
     const rs = reeks(key);
     const doel = rs.find(r => r.id === scho(rid, 20));
     if (!doel || doel.soort === 'intrekking') return { status: 404, error: 'Deze regel staat niet in dit ledger.' };
@@ -163,9 +180,7 @@ function maakCarriereLedger(state) {
     }
     const w = scho(reden, 300);
     if (!w) return { status: 400, error: 'Schrijf erbij waarom. Een intrekking zonder reden laat de lezer raden wat er niet klopte.' };
-    const r = schrijfRegel(key, { soort: 'intrekking', doel: doel.id, door: scho(door, 120) || 'het lid', reden: w });
-    vastleggen();
-    return { status: 200, regel: r };
+    return schrijfVast(key, { soort: 'intrekking', doel: doel.id, door: scho(door, 120) || 'het lid', reden: w });
   }
 
   const { mijn, feit } = require('./projectie')({ reeksKijk, naam });

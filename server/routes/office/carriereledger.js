@@ -30,7 +30,7 @@ module.exports = (octx, gedeeld) => {
     if (!gevonden || !gevonden.key) {
       return res.status(404).json({ error: 'Deze mens bestaat niet. Vraag om de codenaam zoals die in RTG staat.' });
     }
-    stuur(res, carriereledger.bevestig(gevonden.key, String(b.id || ''),
+    stuur(res, await carriereledger.bevestig(gevonden.key, String(b.id || ''),
       { herkomst: 'gezien', door: wie, wat: b.wat }));
   });
 };

@@ -53,21 +53,21 @@ module.exports = (kern) => {
     stuur(res, carriereledger.mijn(k));
   });
 
-  app.post('/api/carriere/ledger/zet', auth, (req, res) => {
+  app.post('/api/carriere/ledger/zet', auth, async (req, res) => {
     const k = lid(req, res); if (!k) return;
-    stuur(res, carriereledger.zet(k, req.body || {}));
+    stuur(res, await carriereledger.zet(k, req.body || {}));
   });
 
-  app.post('/api/carriere/ledger/intrek', auth, (req, res) => {
+  app.post('/api/carriere/ledger/intrek', auth, async (req, res) => {
     const k = lid(req, res); if (!k) return;
     const b = req.body || {};
-    stuur(res, carriereledger.intrek(k, String(b.id || ''), { door: 'het lid', reden: b.reden }));
+    stuur(res, await carriereledger.intrek(k, String(b.id || ''), { door: 'het lid', reden: b.reden }));
   });
 
-  app.post('/api/carriere/ledger/deel', auth, (req, res) => {
+  app.post('/api/carriere/ledger/deel', auth, async (req, res) => {
     const k = lid(req, res); if (!k) return;
     const b = req.body || {};
-    stuur(res, carriereledger.deel(k, String(b.id || ''), { dagen: b.dagen, voor: b.voor }));
+    stuur(res, await carriereledger.deel(k, String(b.id || ''), { dagen: b.dagen, voor: b.voor }));
   });
 
   app.post('/api/carriere/ledger/delen', auth, (req, res) => {
@@ -75,11 +75,11 @@ module.exports = (kern) => {
     res.json({ status: 200, delen: carriereledger.mijnDelen(k) });
   });
 
-  app.post('/api/carriere/ledger/stopdelen', auth, (req, res) => {
+  app.post('/api/carriere/ledger/stopdelen', auth, async (req, res) => {
     const k = lid(req, res); if (!k) return;
-    stuur(res, carriereledger.stopDelen(k, String((req.body || {}).id || '')));
+    stuur(res, await carriereledger.stopDelen(k, String((req.body || {}).id || '')));
   });
 
-  app.post('/api/carriere/regel/toon', (req, res) =>
-    stuur(res, carriereledger.toon(String((req.body || {}).code || ''))));
+  app.post('/api/carriere/regel/toon', async (req, res) =>
+    stuur(res, await carriereledger.toon(String((req.body || {}).code || ''))));
 };

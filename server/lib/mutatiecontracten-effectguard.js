@@ -29,6 +29,7 @@
     require('./mutatiecontracten-isolatie-lid').CONTRACTEN,
     require('./mutatiecontracten-samenvoeging').CONTRACTEN,
     require('./mutatiecontracten-wonen').CONTRACTEN,
+    require('./mutatiecontracten-veiligmoment').CONTRACTEN,
     require('./mutatiecontracten-lidabonnement').CONTRACTEN,
     require('./mutatiecontracten-afleidrest').CONTRACTEN,
     require('./mutatiecontracten-afleidrest-b').CONTRACTEN,

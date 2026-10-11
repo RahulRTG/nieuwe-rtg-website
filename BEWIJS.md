@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2448 bestanden en 16761 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2447 bestanden en 16759 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2448 |
-| losse beweringen (`test(...)`) | 16761 |
+| toetsbestanden | 2447 |
+| losse beweringen (`test(...)`) | 16759 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2274 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2273 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2140 bestanden, 16224 beweringen.
+2139 bestanden, 16222 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -87,7 +87,7 @@ toets omvalt.
 | `agenda-pro.test.js` | 5 | gezakt op `liegpoort /api/` | De pro-laag van de agenda: herhalingen die goed uitrollen, uitnodigen op codenaam (nooit een echte naam in beeld), ja/nee dat bij de organisator terugkomt, ICS-export met RRULE, en de eerlijke sluitregels. Draai los:... |
 | `agenda.test.js` | 5 | gezakt op `liegpoort /api/` | Tests voor de persoonlijke AI-agenda (kern/agenda.js): leden en leveranciers hebben een eigen agenda; de AI zet gewone taal om naar datum + tijd; de telling voedt de ballon-badge. Draai: npm test |
 | `agent.test.js` | 4 | gezakt op `liegpoort /api/` | De AI-bedrijfsagent: vaste leverancier koppelen, inkoopvoorstellen met goedkeuring door de gemachtigde (pas dan een echte bestelling bij de groothandel), automatisch een voorstel na de MEP-voorspelling, en het... |
-| `agentinstructies.test.js` | 7 | gezakt op `voorwaarde-omkeren#0` | DE AGENTINSTRUCTIES (ARCHITECTOPDRACHT.md, fase 1) CLAUDE.md is opgeknipt: AGENTS.md is de ene bron voor elke agent, CLAUDE.md importeert hem, en de samenvattingen per diepte-document staan woordelijk in... |
+| `agentinstructies.test.js` | 9 | gezakt op `voorwaarde-omkeren#0` | DE AGENTINSTRUCTIES (ARCHITECTOPDRACHT.md, fase 1) CLAUDE.md is opgeknipt: AGENTS.md is de ene bron voor elke agent, CLAUDE.md importeert hem, en de samenvattingen per diepte-document staan woordelijk in... |
 | `ai-budget.test.js` | 12 | gezakt op `===->!==#0` | HET AI-BUDGET PER PERSOON. Er stonden al twee grenzen op de modelkraan en allebei misten ze iets: het huisplafond gaat pas dicht als iemand anders het al heeft leeggetrokken, en de rem per minuut laat een script dat... |
 | `ai-cache.test.js` | 10 | gezakt op `===->!==` | Prompt caching in de Claude-client (server/anthropic.js, verrijkMetCache). De verrijking zet cache_control-markeringen op de juiste blokken, met drempels (een cache-schrijf kost 1,25x; klein werk markeren is verlies)... |
 | `ai-herkomst.test.js` | 3 | gezakt op `===->!==#0` | De herkomst van een antwoord hoort bij de AANROEP, niet bij de keten. Wat hier werd gerepareerd: het label onder een Rahul-antwoord kwam uit de CONFIGURATIE (./ai-stand.js beschikbaarheid), en de keten hield de... |
@@ -2010,7 +2010,6 @@ toets omvalt.
 | `versheidspoort.test.js` | 5 | gezakt op `!==->===#0` | DE VERSHEIDSPOORT -- welk verouderd register houdt de ronde tegen? scripts/versheid.js MELDDE, met een goede reden erbij: een register dat achterloopt op een commit die alleen een typefout repareerde, is geen defect. |
 | `versieadres.test.js` | 11 | gezakt op `===->!==#0` | DE VERSIE VAN HET BESTAND IN HAAR ADRES. Een herhaalbezoek aan /apps/app.html deed 67 verzoeken bij de server, waarvan 62 een 304, en duurde 900 ms terwijl er maar 43 KB over de lijn ging. |
 | `versmallingswetten.test.js` | 12 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `versmaltrap.test.js` | 4 | gezakt op `&&->||#0` | DE TRAP VAN HET VERSMALLEN (KEURING.md par. 8, ARCHITECTOPDRACHT.md fase 8) Fase 8 bouwt niets aan: hij beschrijft de trap. |
 | `verstrengeling.test.js` | 13 | gezakt op `===->!==#0` | DE VERSTRENGELINGSMETER -- en of hij werkelijk iets onderscheidt. scripts/verstrengeling.js beantwoordt de vraag die vóór een binnenpoort komt: welke delen van RTG kunnen elkaar wakker maken, en hoeveel daarvan is... |
 | `vertaal.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Vertaler: een dunne route op de bestaande vertaalmotor. Zonder AI-sleutel vertaalt het huiswoordenboek (nl<->en) en is de app eerlijk over wat niet lukt (vertaald:false), nooit kapot. |
 | `vertaalkast.test.js` | 7 | gezakt op `true->false#0` | De vertaalkast: vertaalde interface die een herstart overleeft. Wat hier hard wordt gemaakt: - een vertaling die een keer is gemaakt, komt na een HERSTART terug zonder model (dat is de hele reden dat de kast... |

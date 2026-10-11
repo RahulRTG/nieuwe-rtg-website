@@ -121,7 +121,13 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
     const b = kijkVan(groepId).find(x => String(x.id) === String(id));
     if (!b) return { error: 'Deze bijeenkomst bestaat niet.' };
     if (b.vanKey !== sess.key && !genootschap.isBeheer(p.gr, sess.key)) return { error: 'Alleen de gastheer of een beheerder last af.' };
-    b.afgelast = { at: nu(), reden: String(reden || '').slice(0, 200).trim() };
+    /* DE EERSTE GELDIGE AFGELASTING BLIJFT LEIDEND (besluit 5, 11 oktober 2026).
+       Een herhaling overschreef reden en tijdstip en stuurde iedereen die ja zei
+       opnieuw "Afgelast". Nu geeft hij hetzelfde antwoord en doet verder niets.
+       De bevoegdheid wordt EERST getoetst: wie niet mag afgelasten, krijgt ook
+       op een al afgelaste bijeenkomst geen ok. */
+    if (b.afgelast) return { ok: true, bijeenkomst: publiek(b, sess) };
+    b.afgelast ={ at: nu(), reden: String(reden || '').slice(0, 200).trim() };
     save();
     for (const k of Object.keys(b.antwoorden)) {
       if (b.antwoorden[k] === 'ja' && k !== sess.key) meld(k, { title: 'Genootschap', body: 'Afgelast: ' + b.wat }, 'afgelast');

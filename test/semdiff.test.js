@@ -77,6 +77,23 @@ test('de ontleding: commentaarregels komen niet in de telling terecht', () => {
     'de woorden stonden alleen in commentaar, dus dit is geen beveiliging');
 });
 
+test('de ontleding: een document met alleen regels die op commentaar LIJKEN, blijft documentatie', () => {
+  /* In Markdown begint vette tekst met `**` en een opsomming met `* `. Het
+     commentaarfilter is voor code, en zag een CLAUDE.md-alinea die met `**`
+     begon als "alleen commentaar gewijzigd" -- de echte tak kreeg toen
+     `cosmetic` op een document. */
+  const r = ontleed([
+    '--- a/LAT.md',
+    '+++ b/LAT.md',
+    '@@ -1,0 +1,2 @@',
+    '+**Een nieuwe regel** -- met een vette opening.',
+    '+* en een opsomming'
+  ].join('\n'));
+  assert.equal(r.length, 1);
+  assert.equal(r[0].soort, 'document');
+  assert.equal(r[0].klasse, 'documentatie', 'een document is proza, ook als zijn regels op commentaar lijken');
+});
+
 test('de ontleding: een VERWIJDERD bestand blijft in de meting staan', () => {
   /* Een verwijdering is voor de impactvraag de lastigste: daarna weet de
      omgekeerde graaf niets meer van dat bestand. Verdwijnt hij ook hier, dan is

@@ -446,6 +446,8 @@
     "overgangsvorm:vast": "node scripts/overgangsvorm.js --vastleggen",
     "aanvoervorm": "node scripts/aanvoervorm.js",
     "aanvoervorm:vast": "node scripts/aanvoervorm.js --vastleggen",
+    "groepvorm": "node scripts/groepvorm.js",
+    "groepvorm:vast": "node scripts/groepvorm.js --vastleggen",
     "kantoormacht": "node scripts/kantoormacht.js",
     "gevolgdekking": "node scripts/gevolgdekking.js",
     "gevolgdekking:vastleggen": "node scripts/gevolgdekking.js --vastleggen",

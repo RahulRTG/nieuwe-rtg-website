@@ -86,6 +86,7 @@ const EIGENAAR = {
   'LIBRARYOS.md': { soort: 'BRON', waarom: 'Handgeschreven ontwerp van LibraryOS (#502); de kernel- en HTTP-toetsen leveren het bewijs.' },
   'LIBRARYOS-RESULTAAT.md': { soort: 'BRON', waarom: 'Handgeschreven opleververslag van LibraryOS (#502).' },
   'GEMEENSCHAP.md': { soort: 'BRON', waarom: 'Handgeschreven richtingsdocument van FoundationOS als Human & Social Infrastructure.' },
+  'GEMEENSCHAP-FASE0.md': { soort: 'BRON', waarom: 'Handgeschreven uitkomst van fase 0 van FoundationOS; de meting eronder is GROEPVORM.json.' },
   'LIBRARYOS-STUDIO-READER.md': { soort: 'BRON', waarom: 'Handgeschreven ontwerp van Studio en de private Reader (#502).' },
   'LIBRARYOS-STUDIO-READER-RESULTAAT.md': { soort: 'BRON', waarom: 'Handgeschreven opleververslag van Studio en Reader (#502).' },
   'RTG-LEARNING-LOOPS-ARCHITECTUURONDERZOEK.md': { soort: 'BRON', waarom: 'Handgeschreven architectuuronderzoek naar de leerlussen (#502).' },

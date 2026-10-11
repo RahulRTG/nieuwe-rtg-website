@@ -323,7 +323,7 @@ async function meet() {
   for (const r of regels) telling[r.status] = (telling[r.status] || 0) + 1;
   return {
     stempel: stempel(),
-    uitleg: 'Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen met de ledenkruis (scripts/lib/ledenkruis.js: het scherm als lid A, nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin) plus IDOR.json, en ROLPROEF.json waar die vers is; gezinsschermen met een kruisproef op de gezinscode. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f en 4i.',
+    uitleg: 'Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen met de ledenkruis (scripts/lib/ledenkruis.js: het scherm als lid A, nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin) plus IDOR.json, en ROLPROEF.json waar die vers is; gezinsschermen met een kruisproef op de gezinscode. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f en 4j.',
     grens: 'leden: ' + GRENS_LID + '; ledenkruis: ' + require('./lib/ledenkruis').GRENS + '. gezinnen: ' + GRENS_GEZIN + '.',
     bronnen: { vervallen: reg.vervallen },
     telling,

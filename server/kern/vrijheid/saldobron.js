@@ -79,6 +79,10 @@ module.exports = ({ bronnen }) => {
       }
     }
 
+    /* Wat er LANGS EEN ANDERE WEG staat dan een besluit met een `bron` (de oude
+       verlofroute, een melding van de leidinggevende). verzuim.zonderBron leest
+       alleen: zo telt Vrijheid vakantie mee die het zelf niet boekte, zonder een
+       tweede register. */
     const vz = k.payrollOS && k.payrollOS.verzuim;
     if (mens && vz && typeof vz.zonderBron === 'function') {
       const ander = vz.zonderBron(code, mens.id, jaarVan, jaarTot).filter(m => m.soort === 'vakantie');

@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-09T12:15:06.786Z",
-  "completedAt": "2026-10-09T12:15:25.121Z",
-  "node": "v24.18.0",
+  "startedAt": "2026-10-11T17:32:59.870Z",
+  "completedAt": "2026-10-11T17:33:46.518Z",
+  "node": "v22.22.0",
   "command": "npm run language:proof",
   "testExitCode": 0,
-  "testOutputSha256": "199a4bdc15bb095037be6f1dad0a595501e98a26f22a2deeb07d244c49ba172e",
+  "testOutputSha256": "3ad2fcf93f03507bf0b2a809c06f63a8b4ac60aae98946f5c9e8f5be90356079",
   "sources": {
     "public/apps/access/meaning.js": "268dc805c892ee0e351c14fd2f8d955aa292b556a20af8109bece178559c8bf4",
     "public/apps/access/portal.css": "c8b769c88a16c1ade32ac22532891fa8234fce16479c77ac410a2c8662a8db35",
-    "public/apps/app.html": "143ea8b09f0956dc29a64999926f820205ddedd2328ea07d2d38eb8b47223e22",
-    "public/apps/app-main.js": "7a4ccd546c244531cc1e69130bd4f8c0f0fff77981bc7e1580b16946aa950188",
+    "public/apps/app.html": "719ae792ad7535f1cf42023f8c2900de006698181826476d604059795fbfbc13",
+    "public/apps/app-main.js": "b105cdd7400a98f4c538b1d57d4d1f671fcdb6d8ae4a013f69c00ad33d33a29f",
     "public/shared/rtg-edge-2.css": "b9a7bf6db6f2d8109d526ad073f08ec5f769f4cd70b77b02a5d21a495390c05c",
     "public/shared/rtg-adaptive-edge.css": "8e5c6aa68e7815465f482cce5090ed432fb980508577e9acddd5b65da08d28e9",
     "public/shared/rtg-simple.css": "93a955c26d15e2f1854961ff4fb87f64627b87f239e1d39e8ddbdb0588b7ad6c",
@@ -43,7 +43,7 @@
   },
   "productionReady114Languages": false,
   "scope": "RTG member account portal and shared language loader; mobile Chromium, synthetic input.",
-  "browser": "153.0.8010.12",
+  "browser": "141.0.7390.37",
   "viewport": {
     "width": 390,
     "height": 844
@@ -2342,9 +2342,9 @@
       },
       "formatting": {
         "number": "12,345.67",
-        "numberLocale": "kk",
-        "date": "2026-09-17",
-        "dateLocale": "kk"
+        "numberLocale": "en-US",
+        "date": "9/17/2026",
+        "dateLocale": "en-US"
       },
       "rtl": {
         "actual": "ltr",
@@ -3282,7 +3282,7 @@
       },
       "formatting": {
         "number": "12,345.67",
-        "numberLocale": "sd",
+        "numberLocale": "en-US",
         "date": "2026-09-17",
         "dateLocale": "sd"
       },

@@ -454,8 +454,11 @@ Dezelfde meter, dezelfde route, drie rondes, op de basiscommit en op de tak
 | waarvan de werktafel zelf | 4 | 3 |
 | structureel dubbele API-verzoeken | 31 (+6 soms) | **19 (+0)** |
 | API-verzoeken | 179 | 164 |
-| JS-heap aan het eind | 13,7 MB | 9,4 MB |
 | terug naar de werktafel vanuit een losse wereld | 4 documenten, 52 verzoeken, 12 dubbel, 3,3 MB JS | **2 documenten, 37 verzoeken, 0 dubbel, 2,9 MB JS** |
+
+De JS-heap aan het eind van de route staat er met opzet niet in: hij liep tussen
+twee metingen op dezelfde commit van 9,4 naar 19,8 MB, dus hij zegt meer over
+wanneer de vuilnisman draaide dan over de code.
 
 Wat er NIET bewoog: de blokkade van de hoofddraad over de hele route (64 tegen
 61 seconde, binnen de ruis), en het opstarten van een blad (31-64 scripts per

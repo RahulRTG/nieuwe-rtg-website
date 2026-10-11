@@ -1,6 +1,6 @@
 # RTG V1 — RELEASE READINESS AUDIT
 
-> **STATUS 11 oktober 2026 — remediatie ronde 1 tot en met 8 uitgevoerd.**
+> **STATUS 11 oktober 2026 — remediatie ronde 1 tot en met 9 uitgevoerd.**
 >
 > - **Ronde 1:** de 2 P0's, de P1 en de kapotte release-gate uit ronde 0 zijn
 >   gerepareerd, met regressietests én een onafhankelijke adversariële
@@ -28,11 +28,15 @@
 >   De herkeuring vond in dezelfde foutklasse een nieuwe P2 die er al was
 >   (N53: de zaakdoos-sleutel van een verwijderde manager blijft werken), een
 >   vermoede P2 (N54, SCIM) en een P3 (N55).
-> - **Verdict nu:** 🟡 CONDITIONAL GO, **86/100**. Wat nog open staat:
->   - de P2's N38, N40, N53 en N54 (besluitpunten in ronde 7 en 8);
+> - **Ronde 9:** N53, N54 (live bevestigd en ernstiger dan vermoed) en N55
+>   zijn FIXED, met toetsen die op de oude code zakken. De herkeuring is op
+>   verzoek van de eigenaar gestopt, dus niet VERIFIED.
+> - **Verdict nu:** 🟡 CONDITIONAL GO, **88/100**. Wat nog open staat:
+>   - de P2's N38 en N40;
+>   - een herkeuring van ronde 9;
 >   - de externe poorten F3–F6.
 >
-> Zie **§REMEDIATIESTATUS** (ronde 1 tot en met 8) direct onder sectie A. De
+> Zie **§REMEDIATIESTATUS** (ronde 1 tot en met 9) direct onder sectie A. De
 > oorspronkelijke ronde-0-bevindingen blijven hieronder staan met hun status
 > (OPEN / FIXED / VERIFIED FIXED).
 
@@ -1312,9 +1316,9 @@ groen" uit ronde 7 klopte voor dit bestand niet. Hersteld in `0c2ab2be`.
 
 | ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
 |---|---|---|---|---|---|---|
-| **N53** | P2 | OPEN, al aanwezig | `server/routes/supplier/doossleutels.js:30`, `server/kern/zaakdoos/sleutels.js:58`, `server/routes/doos-kloon.js:21` | Een manager geeft een zaakdoos-sleutel uit (standaard 180, maximaal 365 dagen, standaard alle scopes inclusief `kloon`). `staff/remove` trekt die niet in. Na zijn verwijdering geeft `GET /api/doos/kloon` met zijn sleutel 200: het zaakrecord, de orders, reserveringen, boekingen en de kassadag. Dezelfde foutklasse als N52: een toegang die iemand uitgaf, overleeft het verlies van zijn bevoegdheid. | Live gezien in herkeuring 1 van ronde 8. | De uitgever staat al op plek in de sleutel (`door: 'zaak:CODE#staffId'`); bij `staff/remove` zijn sleutels intrekken, of bij gebruik eisen dat de uitgever nog een actieve plek is (de vorm van laag 2 van N52). |
-| **N54** | P2 | OPEN, vermoed | `server/accounts/users.js` (zetActief), `server/scim/user-sync.js` | Een account dat via SCIM wordt uitgezet, verliest zijn werksessie, maar `deactivateStaff` en `trekInVoorStaff` lopen niet. Zijn plek blijft dus actief, en daarmee blijven ook zijn open personeelsuitnodigingen geldig (laag 2 van N52 kijkt naar de PLEK, niet naar het account). | Afgeleid uit de code in herkeuring 1 van ronde 8; niet live nagespeeld. | Bij het uitzetten van een account ook zijn personeelsplekken uitzetten, of laag 2 laten eisen dat het account achter de uitgever nog actief is. |
-| **N55** | P3 | OPEN | `server/routes/supplier/werving/personeel.js` `staff/remove` | (1) Een verwijdering trekt nu ook legitieme open aannames van die manager in, ook de link naar "je plek staat klaar" van een RTF-sollicitant. Het antwoord en de log van `staff/remove` noemen het aantal ingetrokken uitnodigingen niet, dus niemand wordt erop gewezen (herstel kan via roteren). (2) Een manager kan vóór zijn verwijdering een tweede eigen account binnenhalen onder een naam die hij zelf kiest. | Herkeuring 1 van ronde 8. | Bij een verwijdering tonen hoeveel uitnodigingen er zijn ingetrokken en welke plekken via uitnodigingen van die plek binnenkwamen. |
+| **N53** | P2 | **FIXED (ronde 9)**, was OPEN, al aanwezig | `server/routes/supplier/doossleutels.js:30`, `server/kern/zaakdoos/sleutels.js:58`, `server/routes/doos-kloon.js:21` | Een manager geeft een zaakdoos-sleutel uit (standaard 180, maximaal 365 dagen, standaard alle scopes inclusief `kloon`). `staff/remove` trekt die niet in. Na zijn verwijdering geeft `GET /api/doos/kloon` met zijn sleutel 200: het zaakrecord, de orders, reserveringen, boekingen en de kassadag. Dezelfde foutklasse als N52: een toegang die iemand uitgaf, overleeft het verlies van zijn bevoegdheid. | Live gezien in herkeuring 1 van ronde 8. | De uitgever staat al op plek in de sleutel (`door: 'zaak:CODE#staffId'`); bij `staff/remove` zijn sleutels intrekken, of bij gebruik eisen dat de uitgever nog een actieve plek is (de vorm van laag 2 van N52). |
+| **N54** | P2 | **FIXED (ronde 9)**, live bevestigd, was vermoed | `server/accounts/users.js` (zetActief), `server/scim/user-sync.js` | Een account dat via SCIM wordt uitgezet, verliest zijn werksessie, maar `deactivateStaff` en `trekInVoorStaff` lopen niet. Zijn plek blijft dus actief, en daarmee blijven ook zijn open personeelsuitnodigingen geldig (laag 2 van N52 kijkt naar de PLEK, niet naar het account). | Afgeleid uit de code in herkeuring 1 van ronde 8; niet live nagespeeld. | Bij het uitzetten van een account ook zijn personeelsplekken uitzetten, of laag 2 laten eisen dat het account achter de uitgever nog actief is. |
+| **N55** | P3 | **FIXED (ronde 9)**, was OPEN | `server/routes/supplier/werving/personeel.js` `staff/remove` | (1) Een verwijdering trekt nu ook legitieme open aannames van die manager in, ook de link naar "je plek staat klaar" van een RTF-sollicitant. Het antwoord en de log van `staff/remove` noemen het aantal ingetrokken uitnodigingen niet, dus niemand wordt erop gewezen (herstel kan via roteren). (2) Een manager kan vóór zijn verwijdering een tweede eigen account binnenhalen onder een naam die hij zelf kiest. | Herkeuring 1 van ronde 8. | Bij een verwijdering tonen hoeveel uitnodigingen er zijn ingetrokken en welke plekken via uitnodigingen van die plek binnenkwamen. |
 
 ### Besluitpunten voor de eigenaar
 
@@ -1345,6 +1349,53 @@ groen" uit ronde 7 klopte voor dit bestand niet. Hersteld in `0c2ab2be`.
 
 N53, N54 en N55 zijn vastgelegd en niet gebouwd: de opdracht was N52. N38, N40
 en N41 tot en met N51 blijven open.
+
+---
+
+## REMEDIATIESTATUS — ronde 9: N53, N54 en N55 (11 oktober 2026)
+
+Branch: `codex/rtg-v1-ronde6-7` (PR #543). Besluit van de eigenaar: N53 met
+twee lagen zoals N52, N54 eerst live nagaan en dan dichten, N55 meenemen.
+
+### Nieuw verdict (code): 🟡 CONDITIONAL GO — Release readiness: 88/100
+
+**Waarom hoger dan 86.** Twee P2's zijn dicht, met toetsen die op de oude code
+zakken en live op een echte server zijn nagespeeld. N54 bleek bij het nagaan
+ernstiger dan vermoed: na SCIM-uit, SCIM-delete of de AVG-wissing claimde een
+vers account de open manageruitnodiging van die manager (200) en kon daarna
+zelf weer managers uitnodigen. Dat is nu op alle drie de wegen dicht.
+
+**Waarom niet hoger.** De onafhankelijke herkeuring van deze ronde is op
+verzoek van de eigenaar gestopt voordat ze klaar was. De statussen hieronder
+zijn daarom FIXED en niet VERIFIED FIXED. N38 en N40 (P2) en de externe poorten
+F3–F6 staan nog open.
+
+**Voorwaarden voor GO:** de externe poorten F3–F6; aanbevolen: een herkeuring
+van ronde 9 en een besluit over N38 en N40.
+
+### Per bevinding — BEFORE / FIX / AFTER / REGRESSIE
+
+| # | Sev | Status | Commits | BEFORE → AFTER | Regressie (zakt vóór, slaagt na) |
+|---|---|---|---|---|---|
+| N53 | P2 | **FIXED** (niet herkeurd) | `4b96294e` | **Vóór:** na `staff/remove` gaf `GET /api/doos/kloon` met de doossleutel van de verwijderde manager 200 met het zaakrecord. **Na:** laag 1: `staff/remove` en `staff/invite/intrek` trekken via `trekAllesIn` ook de sleutels in die deze plek uitgaf (`kern/zaakdoos/sleutels-uitgever.js`). Laag 2: `welke()` weigert een sleutel waarvan de uitgever hier niet meer werkt (`doos-sleutel-uitgever-niet-actief`). Een intrekking wint als stand. Sleutels van het kantoor hangen niet aan een plek en vallen erbuiten. | `test/doossleutel-ontslag.test.js` (4): toets 1 en 2 zakten op de oude code met 200. Laag 2 los, met tegenproeven (kantoorsleutel, rotatie, ingetrokken wint), en een toets op de bedrading. |
+| N54 | P2 | **FIXED** (niet herkeurd), was vermoed | `4b96294e` | **Vóór:** SCIM (PATCH, PUT, DELETE) en `/api/privacy/delete` zetten het account uit en niet de plek. De open manageruitnodiging van die manager werd door een vers account geclaimd (200, manager), en zijn doossleutel bleef werken. **Na:** `accounts.plekWerkt` (`accounts/staff-sessie.js`, hetzelfde oordeel als de werksessie) eist plek EN account. De uitnodiging en de doossleutel lezen allebei die ene functie. Een controle bij het lezen, geen cascade: SCIM weer aan geeft de code terug. | `test/staff-accountuit.test.js` (4): SCIM-uit, SCIM-delete en de AVG-wissing zakten op de oude code; tegenproeven voor heractivering en de codes van de baas. |
+| N55 | P3 | **FIXED** (niet herkeurd) | `4b96294e` | **Vóór:** een verwijdering trok codes in zonder het te zeggen, en de lijst toonde een code van een vertrokken uitgever als "Ingetrokken". **Na:** het antwoord en de log noemen `ingetrokken: {uitnodigingen, doossleutels}`, en het scherm toont "Uitgever werkt hier niet meer · maak een nieuwe code". | Het aantal staat in `test/doossleutel-ontslag.test.js`; het label is niet in een browser beproefd. |
+
+**Bewijs.** Elke laag is met een mutatie nagetrokken en elke mutatie liet een
+toets zakken. De mutatiemotor op de vier toetsbestanden gaf 2281 gezakt en 0
+overleefd. 62 aanpalende toetsbestanden (zaakdoos, werving, SCIM, accounts,
+sessie, privacy) met `RTG_ROUTELOG`: 419 groen, 0 gezakt. Op `b1914737` gehaald:
+`npm run check`, `npm run norm`, de deltapoort tegen main en `document-fitness`;
+`registerklopt` zakt alleen op `bewijskosten` 9 (ondiepe kloon).
+
+**Niet gedaan of niet bewezen.**
+
+- Geen onafhankelijke herkeuring (gestopt).
+- Na de AVG-wissing blijft er een plek op `active=1` staan die naar een gewist
+  account wijst; die kan niets meer, maar staat nog in de teamlijst. Na SCIM-uit
+  staat de manager ook nog in de teamlijst, en zijn werkmail wordt niet
+  ingetrokken. Dat is opruimwerk, geen toegang, en blijft open.
+- PostgreSQL met meerdere instanties is niet beproefd.
 
 ---
 

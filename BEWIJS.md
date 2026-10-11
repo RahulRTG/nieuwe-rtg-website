@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2442 bestanden en 16716 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2444 bestanden en 16728 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2442 |
-| losse beweringen (`test(...)`) | 16716 |
+| toetsbestanden | 2444 |
+| losse beweringen (`test(...)`) | 16728 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2268 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
-| alleen in de kop *genoemd*, nog niet gemeten | 0 |
+| alleen in de kop *genoemd*, nog niet gemeten | 2 |
 | niets van beide | 0 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2134 bestanden, 16179 beweringen.
+2136 bestanden, 16191 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -638,6 +638,8 @@ toets omvalt.
 | `gemeente.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Gemeente (kern/gemeente.js): het civiele systeem als partner-genre. Vier pijlers voor inwoners, gemeente-medewerkers en RTG-partners. |
 | `genootschap-ai-leesweergave.test.js` | 4 | gezakt op `optie-uit#1` | Rahul in het genootschap krijgt een LEESWEERGAVE, nooit de modules zelf. kern/genootschap/ai.js kreeg het hele prikbord, de hele bijeenkomstmodule en het hele genootschap mee -- dus `stem`, `weg`, `plaats`,... |
 | `genootschap-beheer.test.js` | 4 | gezakt op `liegpoort /api/` | HET BEHEER VAN EEN GENOOTSCHAP -- 3 endpoints. Deze drie wees de waargenomen dekkingsmeting aan als nooit aangeroepen: pas-aan, eruit en reactie-weg. |
+| `genootschap-drager-server.test.js` | 6 | genoemd | De drager en de gezinsdeur van het genootschap tegen een ECHTE server (B1, GEMEENSCHAP-FASE0.md par. 4.1). |
+| `genootschap-drager.test.js` | 6 | genoemd | DE DRAGER VAN EEN GENOOTSCHAP (B1, GEMEENSCHAP-FASE0.md par. 4.1) -- de module zonder server: kern/genootschap/drager.js en ./drager-regels.js, op het echte genootschap (kern/genootschap/index.js) met een db in het... |
 | `genootschap-prikbord-lezen.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | Het prikbord LEZEN laat niets achter (kern/genootschap/prikbord.js). `bord()` zette een lege rij neer voor een genootschap zonder prikbord, en elke weg gebruikte hem -- ook lezen, de AI-samenvatting en een stem of... |
 | `genootschap.test.js` | 16 | gezakt op `liegpoort /api/` | Genootschap (kern/genootschap/*, routes/member/genootschap.js): besloten groepen van leden, met prikbord en bijeenkomsten. De toetsen leggen vooral de grenzen vast die dit anders maken dan een groep op een gewoon... |
 | `genrecap.test.js` | 9 | gezakt op `return-weg#1` | DE GENRE-CAP: het woord dat hernoemd is, en de lijst waar hij naar wijst. OS.md par. |

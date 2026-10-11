@@ -18,22 +18,11 @@
    zei. En wie aftekent, komt uit de sessie.
 
    SINDS 11 OKTOBER 2026 LOOPT HIJ DOOR DE GELDKETEN (kern/kantoor/geldketen.js),
-   als tweede handeling naast de incassoronde (MACHINE.md par. 5a). Twee dingen
-   kwamen daarmee mee die er niet waren:
-   - DE PASSKEY, bij aanvragen EN bij tekenen. `bank.afstemming` stond niet als
-     `geld` aangemeld, dus de tweede handtekening ging zonder ceremonie -- terwijl
-     `niet-uitgevoerd` geld terugboekt en het besluit van 25 september 2026 zegt dat
-     een geldhandeling op kantoor niet meer op de terugval doorgaat
-     (./bank-passkey.js). De STAND wordt eerst gekeurd en pas daarna de ceremonie:
-     een weigering op 404/409/400 hoort geen passkey te vragen.
-   - HET VOORNEMEN met besluit, tegenfeit, frictie, envelop en hashketen, zodat het
-     dossier per as zegt wat er gebeurde (/api/office/bank/incasso/dossier leest
-     elk dossier van de baan, ook dit).
-   WAT ER NIET IS: `atomair`. Een terugboeking raakt twee duurzame waarheden (het
-   grootboek en de opdracht) en is EENMAAL-geboekt op een economische sleutel
-   (kern/betaalopdracht/terugboeking.js): hervatbaar, niet alles-of-niets. De klasse
-   `geld-eenmalig` eist atomair, dus deze keten is NIET volledig en het dossier
-   zegt dat -- liever een open as dan een belofte die de opslag niet doet. */
+   naast de incassoronde (MACHINE.md par. 5a), met een PASSKEY bij aanvragen en
+   tekenen (besluit 25 september 2026, ./bank-passkey.js) -- de stand wordt eerst
+   gekeurd. `atomair` staat met opzet open: een terugboeking is eenmaal-geboekt op
+   een economische sleutel en de opdracht volgt in een tweede schrijfactie
+   (kern/betaalopdracht/terugboeking.js). De keten is dus NIET volledig. */
 'use strict';
 
 module.exports = (ctx) => {
@@ -47,9 +36,7 @@ module.exports = (ctx) => {
       const ketenlaag = kern.geldketen;
       if (!ketenlaag) return { status: 503,
         error: 'De geldketen is niet gemount; een afstemming gaat niet buiten de keten om.' };
-      /* Een aanvraag van voor de geldketen draagt geen voornemen. Zij gaat niet stil de
-         oude weg (geld terugboeken zonder besluit, bewijs of spoor), maar weigert met de
-         weg erbij -- dezelfde regel als bij de incassoronde in ./bank-tweedehand.js. */
+      // een aanvraag van voor de geldketen gaat niet stil de oude weg (zie ./bank-tweedehand.js)
       const vid = lijf && lijf.voornemen ? String(lijf.voornemen) : '';
       if (!vid) return { status: 409,
         error: 'Deze aanvraag draagt geen voornemen en is van voor de geldketen. Vraag de ' +
@@ -69,6 +56,11 @@ module.exports = (ctx) => {
             echtheid: 'OVERGENOMEN', wie: { aangevraagdDoor: (wie && wie.aangevraagdDoor) || null,
               bevestigdDoor: bevestiger } });
           if (r && r.error) throw Object.assign(new Error(r.error), { status: r.status });
+          /* Een teruggang die niet lukte is GEEN uitgevoerde afstemming, ook al gaf
+             stemAf geen fout: de opdracht staat dan op MISLUKT met terugboekFout en de
+             streefstand is niet gehaald. Het voornemen staakt, het dossier zegt waarom. */
+          if (r && r.uitkomst === 'NIET_UITGEVOERD' && r.teruggeboekt === false)
+            throw new Error('de opdracht staat op MISLUKT, maar de terugboeking lukte niet; een mens zoekt dit uit');
           return { uitkomst: r && r.uitkomst, id: r && r.id };
         } });
       if (r && r.uitkomst) {
@@ -76,8 +68,7 @@ module.exports = (ctx) => {
           ' (bron: ' + String(lijf.bron || '').slice(0, 80) + ', voornemen ' + vid + ')');
         sync();
       }
-      /* De uitslag van de afstemming blijft naar buiten gaan, met het voornemen erbij:
-         zelfde contract als de incassoronde (de baan komt erbij en niet in plaats van). */
+      // de uitslag blijft naar buiten gaan, met het voornemen erbij (zoals de incasso)
       if (k && k.ok && r) return Object.assign({}, r, { voornemen: k.voornemen });
       return (r && r.error) ? r : k;
     }
@@ -102,16 +93,28 @@ module.exports = (ctx) => {
     if (!ketenlaag) return veilig(res, () => ({ status: 503,
       error: 'De geldketen is niet gemount; een afstemming gaat niet buiten de keten om.' }));
 
-    /* ASSURANCE, gebonden aan deze ene opdracht en zonder terugval. */
-    const sleutel = 'afstemming:' + id;
-    const zw = await zwaar.eis(boardroomUser(req), 'bank.afstemming', sleutel, req,
-      'Een uitbetaling afstemmen', { zonderTerugval: true });
-    if (!zw.ok) return zwaar.stuur(res, zw);
-
+    /* De vooruitblik VOOR de passkey: hij schrijft niets, en hij weigert wat de
+       uitvoering ook zou weigeren (zoals een uitgevoerde betaling zonder referentie). */
     const lijf = { id, uitspraak: b.uitspraak, providerRef: b.providerRef || null,
       centen: b.centen == null ? null : Number(b.centen), valuta: b.valuta || null, bron: String(b.bron).slice(0, 200) };
     const blik = bank.bankOpdrachtAfstemVooruitblik(lijf);
     if (!blik.ok) return veilig(res, () => blik);
+
+    /* ASSURANCE, gebonden aan deze opdracht EN deze uitspraak, zonder terugval. */
+    const zw = await zwaar.eis(boardroomUser(req), 'bank.afstemming', 'afstemming:' + id + ':' + b.uitspraak, req,
+      'Een uitbetaling afstemmen', { zonderTerugval: true });
+    if (!zw.ok) return zwaar.stuur(res, zw);
+
+    /* DE ECONOMISCHE SLEUTEL: de opdracht, de hoeveelste afstemming het is, en de
+       invoer. Twee medewerkers die hetzelfde afschrift overnemen maken hetzelfde
+       voornemen; maar na een VERSCHIL (de opdracht blijft ONBEKEND) is een correctie
+       een NIEUW voornemen -- met alleen de uitspraak in de sleutel kreeg die het oude,
+       al uitgevoerde voornemen terug en zat de opdracht vast (tegenlezing 11 oktober). */
+    const ronde = (o.uitspraken || []).length;
+    const invoer = require('crypto').createHash('sha256')
+      .update([b.uitspraak, lijf.providerRef, lijf.centen, lijf.valuta].map(x => String(x == null ? '' : x)).join('|'))
+      .digest('hex').slice(0, 16);
+    const sleutel = 'afstemming:' + id + ':' + ronde + ':' + invoer;
 
     const klaar = ketenlaag.klaarzet({
       klasse: 'geld-eenmalig', handeling: 'GELD_AFSTEMMEN', pad: '/api/office/bank/opdrachten/afstemming',
@@ -126,16 +129,21 @@ module.exports = (ctx) => {
         reden: blik.grens, over: '/api/office/bank/handtekening/bevestig', effecten: blik.effecten },
       stappen: [{ wat: 'afstemming', doel: id, centen: blik.bedragCenten, gegevens: lijf }],
       totaalCenten: blik.bedragCenten,
-      /* De economische sleutel: de opdracht plus de uitspraak. Twee medewerkers die
-         hetzelfde afschrift overnemen, maken hetzelfde voornemen. */
-      sleutel: sleutel + ':' + b.uitspraak,
-      /* EERLIJK OVER DE UITVOERING: hervatbaar en niet atomair -- zie de kop. */
+      sleutel,
+      /* EERLIJK OVER DE UITVOERING: niet atomair -- zie de kop. */
       uitvoerbelofte: { graad: 'onbekend', uitslag: 'niet alles-of-niets',
         reden: 'kern/betaalopdracht/terugboeking.js boekt de teruggang EENMAAL op een economische sleutel ' +
-          'en de opdracht volgt in een tweede schrijfactie; valt die tweede uit, dan blijft de opdracht op ' +
-          'MISLUKT in de openstaande lijst. Dat is hervatbaar, niet atomair.' },
+          'en de opdracht volgt in een tweede schrijfactie. Valt de terugboeking uit, dan blijft de opdracht ' +
+          'op MISLUKT staan en vraagt het herstel een mens of een melding van de rail; dit pad pakt het niet ' +
+          'zelf weer op. Niet atomair.' },
     });
     if (!klaar.ok) return veilig(res, () => klaar);
+    /* Een voornemen dat al een eindstand heeft, krijgt geen nieuw ticket: dan zou een
+       tweede mens tekenen voor iets dat niet meer uitgevoerd kan worden. */
+    if (['UITGEVOERD', 'GESTAAKT', 'AFGEWEZEN'].includes(klaar.voornemen && klaar.voornemen.stand))
+      return veilig(res, () => ({ status: 409, voornemen: klaar.voornemen,
+        error: 'Over precies deze afstemming is al besloten (' + klaar.voornemen.stand + '). Klopt de invoer niet, ' +
+          'neem dan het afschrift opnieuw over met de juiste gegevens.' }));
 
     veilig(res, () => {
       const vraag = tweedeHand.vraag({ actie: 'bank.afstemming', lijf: Object.assign({}, lijf, { voornemen: klaar.voornemen.id }),

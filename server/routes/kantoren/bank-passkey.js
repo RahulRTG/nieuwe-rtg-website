@@ -10,8 +10,8 @@
    - de incassoronde, gebonden aan zijn grens ('incasso:' + tot). Zonder dit loket
      kon een medewerker MET passkey de ronde nooit starten, terwijl een medewerker
      zonder passkey er op de terugval door kwam (gevonden 25 september 2026);
-   - de afstemming van een onbekende uitbetaling, gebonden aan de opdracht
-     ('afstemming:' + id): bij `niet-uitgevoerd` komt er geld terug op een rekening;
+   - de afstemming van een onbekende uitbetaling, gebonden aan de opdracht en de
+     uitspraak ('afstemming:' + id + ':' + uitspraak): bij `niet-uitgevoerd` komt er geld terug op een rekening;
    - de tweede handtekening, gebonden aan de aanvraag ('handtekening:' + id), en
      alleen voor een handeling die zich bij kern/kantoor/tweedehandtekening.js als
      `geld` heeft aangemeld. Een rood-limiet zetten beweegt geen geld en blijft zo.
@@ -40,11 +40,14 @@ module.exports = (ctx) => {
     return loket(req, res, 'bank.incasso', Number.isFinite(tot) ? 'incasso:' + tot : null);
   });
   /* De afstemming van een onbekende uitbetaling, gebonden aan die ene opdracht
-     ('afstemming:' + id). Zonder dit loket kan een medewerker de ceremonie die
+     en die uitspraak ('afstemming:' + id + ':' + uitspraak). Zonder dit loket kan een medewerker de ceremonie die
      ./bank-afstemming.js eist nooit openen. */
   app.post('/api/office/bank/afstemming/opties', kluisAuth, (req, res) => {
-    const id = String((req.body || {}).id || '');
-    return loket(req, res, 'bank.afstemming', id ? 'afstemming:' + id : null);
+    const id = String((req.body || {}).id || ''), uitspraak = String((req.body || {}).uitspraak || '');
+    /* De uitspraak hoort in de binding: een ceremonie voor `uitgevoerd` (geen geld)
+       mag geen terugboeking dragen. */
+    return loket(req, res, 'bank.afstemming',
+      id && ['uitgevoerd', 'niet-uitgevoerd'].includes(uitspraak) ? 'afstemming:' + id + ':' + uitspraak : null);
   });
   app.post('/api/office/bank/handtekening/opties', kluisAuth, (req, res) => {
     const id = String((req.body || {}).id || '');

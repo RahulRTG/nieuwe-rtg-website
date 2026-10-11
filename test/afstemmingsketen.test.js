@@ -76,7 +76,7 @@ function zetStand(id, stand) {
   } finally { db.close(); }
 }
 
-let lid, iban, opdrachtId, A, B, pk, sleutelA, sleutelB;
+let lid, iban, opdrachtId, opdracht2, A, B, pk, sleutelA, sleutelB;
 
 test.before(async () => {
   srv = await startServer({ env: ENV });
@@ -94,10 +94,15 @@ test.before(async () => {
   assert.equal(uit.status, 200, 'de SEPA-overboeking: ' + JSON.stringify(uit.body).slice(0, 160));
   opdrachtId = uit.body.opdrachtId;
   assert.ok(opdrachtId, 'er is een betaalopdracht');
+  const uit2 = await api('/api/bank/sepa', { iban, centen: 700, naarIban: 'NL91ABNA0417164300',
+    begunstigde: 'Ontvanger', oms: 'Afstemketen twee', idem: 'afst-sepa-2' }, lid);
+  opdracht2 = uit2.body.opdrachtId;
+  assert.ok(opdracht2, 'er is een tweede betaalopdracht');
 
   // de rail zwijgt: herstart op dezelfde data met de opdracht op ONBEKEND
   await stopNet(srv.child);   // netjes: de opslag is dicht voordat hij wordt gelezen
   zetStand(opdrachtId, 'ONBEKEND');
+  zetStand(opdracht2, 'ONBEKEND');
   srv = await startServer({ env: ENV });
   base = srv.base;
 
@@ -123,7 +128,7 @@ test('de afstemming loopt de geldketen: passkey, voornemen, vier ogen, en het ge
   assert.equal(await open(), voorOpen, 'een geweigerde aanvraag liet iets achter om af te tekenen');
 
   // 2. met passkey: een voornemen met dossier, en er beweegt nog niets
-  const cer = await pk.ceremonie(sleutelA, '/api/office/bank/afstemming/opties', { id: opdrachtId }, A.kantoor);
+  const cer = await pk.ceremonie(sleutelA, '/api/office/bank/afstemming/opties', { id: opdrachtId, uitspraak: 'niet-uitgevoerd' }, A.kantoor);
   const r = await api('/api/office/bank/opdrachten/afstemming', { ...LIJF(), ...cer }, A.kantoor);
   assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 240));
   assert.equal(r.body.needsAuth, true, 'de afstemming wacht op een tweede mens');
@@ -157,7 +162,7 @@ test('de afstemming loopt de geldketen: passkey, voornemen, vier ogen, en het ge
     'het geld kwam niet (precies) terug: +' + terug + ' tegen een bovengrens van ' + r.body.vooruitblik.bedragCenten);
 
   // 5. nog een keer kan niet: de opdracht is niet meer ONBEKEND, en er komt niets bij
-  const cer2 = await pk.ceremonie(sleutelA, '/api/office/bank/afstemming/opties', { id: opdrachtId }, A.kantoor);
+  const cer2 = await pk.ceremonie(sleutelA, '/api/office/bank/afstemming/opties', { id: opdrachtId, uitspraak: 'niet-uitgevoerd' }, A.kantoor);
   const nog = await api('/api/office/bank/opdrachten/afstemming', { ...LIJF(), ...cer2 }, A.kantoor);
   assert.equal(nog.status, 409, 'een tweede afstemming werd aangenomen: ' + JSON.stringify(nog.body).slice(0, 160));
   assert.equal((await saldo()) - saldoVoor, terug, 'er kwam een tweede keer geld terug');
@@ -172,4 +177,40 @@ test('de afstemming loopt de geldketen: passkey, voornemen, vier ogen, en het ge
   assert.ok(da.uitvoering && da.uitvoering.graad === 'gemeten', 'de uitvoering ging door de baan');
   assert.ok(da.tweedeMens && da.tweedeMens.uitslag && da.tweedeMens.uitslag !== da.mensbewijs.wie,
     'de tweede mens staat in het dossier en is een ander dan de aanvrager');
+});
+
+/* Een VERSCHIL laat de opdracht op ONBEKEND staan. Daarna moet een correctie met de
+   juiste gegevens nog door kunnen -- dat kon voor de geldketen, en de eerste versie
+   van deze baan sloot het af (dezelfde economische sleutel gaf het oude, al
+   uitgevoerde voornemen terug). */
+test('na een VERSCHIL kan dezelfde opdracht alsnog worden BEVESTIGD, en een ceremonie dekt geen andere uitspraak', async () => {
+  const doe = async (lijf) => {
+    const c = await pk.ceremonie(sleutelA, '/api/office/bank/afstemming/opties', { id: opdracht2, uitspraak: lijf.uitspraak }, A.kantoor);
+    const r = await api('/api/office/bank/opdrachten/afstemming', { id: opdracht2, bron: 'afschrift 11-10', ...lijf, ...c }, A.kantoor);
+    assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
+    const h = await pk.ceremonie(sleutelB, '/api/office/bank/handtekening/opties', { id: r.body.aanvraag.id }, B.kantoor);
+    return { r, ok: await api('/api/office/bank/handtekening/bevestig', { id: r.body.aanvraag.id, ...h }, B.kantoor) };
+  };
+
+  // zonder referentie van de rail weigert de vooruitblik al, VOOR de passkey en zonder ticket
+  const zonderRef = await api('/api/office/bank/opdrachten/afstemming',
+    { id: opdracht2, uitspraak: 'uitgevoerd', centen: 700, valuta: 'eur', bron: 'afschrift' }, A.kantoor);
+  assert.equal(zonderRef.status, 400, 'zonder providerRef: ' + JSON.stringify(zonderRef.body).slice(0, 140));
+
+  // een ceremonie voor `uitgevoerd` draagt geen `niet-uitgevoerd`
+  const cU = await pk.ceremonie(sleutelA, '/api/office/bank/afstemming/opties', { id: opdracht2, uitspraak: 'uitgevoerd' }, A.kantoor);
+  const verkeerd = await api('/api/office/bank/opdrachten/afstemming',
+    { id: opdracht2, uitspraak: 'niet-uitgevoerd', bron: 'afschrift', ...cU }, A.kantoor);
+  assert.ok([400, 401, 403].includes(verkeerd.status), 'een ceremonie voor een andere uitspraak werd aangenomen: ' + verkeerd.status + ' ' + JSON.stringify(verkeerd.body).slice(0, 160));
+
+  // ronde 1: een ander bedrag -- VERSCHIL, er gebeurt niets met het geld
+  const een = await doe({ uitspraak: 'uitgevoerd', centen: 699, valuta: 'eur', providerRef: 'po_proef_1' });
+  assert.equal(een.ok.status, 200, JSON.stringify(een.ok.body).slice(0, 200));
+  assert.equal(een.ok.body.uitkomst, 'VERSCHIL');
+
+  // ronde 2: het juiste bedrag -- een NIEUW voornemen, en BEVESTIGD
+  const twee = await doe({ uitspraak: 'uitgevoerd', centen: 700, valuta: 'eur', providerRef: 'po_proef_1' });
+  assert.notEqual(twee.r.body.voornemen.id, een.r.body.voornemen.id, 'de correctie kreeg het oude voornemen terug');
+  assert.equal(twee.ok.status, 200, 'de correctie liep vast: ' + JSON.stringify(twee.ok.body).slice(0, 200));
+  assert.equal(twee.ok.body.uitkomst, 'BEVESTIGD');
 });

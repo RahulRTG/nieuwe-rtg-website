@@ -99,7 +99,7 @@ module.exports = (ctx) => {
      laatste weet alleen de teruggang (kern/bank/uitgang.js), dus het bedrag is een
      BOVENGRENS en draagt de graad `vermoed`. BEVESTIGD sluit de opdracht af zonder
      geldbeweging binnen het huis, VERSCHIL doet niets met het geld. */
-  function vooruitblik({ id, uitspraak, centen, valuta } = {}) {
+  function vooruitblik({ id, uitspraak, providerRef, centen, valuta } = {}) {
     const o = ctx.vind(id);
     if (!o) return { status: 404, error: 'Die betaalopdracht bestaat niet.' };
     if (!SOORT.has(uitspraak)) return { status: 400, error: 'De uitspraak is "uitgevoerd" of "niet-uitgevoerd".' };
@@ -111,9 +111,16 @@ module.exports = (ctx) => {
         effecten: terug > 0 ? ['GELD_BEWEGEN', 'SCHRIJVEN_ANDERMANS'] : [],
         grens: 'bovengrens: het bedrag van de opdracht plus het tarief; of het tarief terugkomt, beslist de teruggang van deze soort' };
     }
+    /* Zelfde volgorde als stemAf: een uitgevoerde betaling zonder referentie van de
+       rail weigert daar met 400, dus hier ook -- anders voorspelt de vooruitblik een
+       uitkomst die de uitvoering nooit haalt, en loopt de hele baan voor niets. */
+    if (!providerRef) return { status: 400, error: 'Een uitgevoerde betaling heeft een referentie van de rail.' };
     const c = centen == null ? null : Math.round(Number(centen));
     const klopt = c === o.centen && String(valuta || '').toLowerCase() === String(o.valuta || '').toLowerCase();
-    return { ok: true, uitkomst: klopt ? 'BEVESTIGD' : 'VERSCHIL', bedragCenten: 0, naar: null, effecten: [],
+    /* BEVESTIGD beweegt binnen het huis geen geld, maar schrijft wel: de afwikkeling
+       per soort (verwerkAfwikkeling) zet bijvoorbeeld een settlement op bevestigd. */
+    return { ok: true, uitkomst: klopt ? 'BEVESTIGD' : 'VERSCHIL', bedragCenten: 0, naar: null,
+      effecten: klopt ? ['SCHRIJVEN_ANDERMANS'] : [],
       grens: klopt ? 'de opdracht wordt afgewikkeld; er beweegt binnen het huis geen geld'
         : 'een ander bedrag of een andere valuta: er gebeurt niets met het geld, er komt een verschilzaak' };
   }

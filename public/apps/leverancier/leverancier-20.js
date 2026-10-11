@@ -7,7 +7,7 @@
         '<label class="soft-xs">'+T('kt.start','Starttarief (€)')+'</label><input class="st-in" id="ktTa" type="number" step="0.1" value="'+(t2.start||0)+'">'+
         '<label class="soft-xs">'+T('kt.perkm','Per kilometer (€)')+'</label><input class="st-in" id="ktTb" type="number" step="0.1" value="'+(t2.perKm||0)+'">'+
         '<label class="soft-xs">'+T('kt.min','Minimumprijs (€)')+'</label><input class="st-in" id="ktTc" type="number" step="1" value="'+(t2.minimum||0)+'">'+
-        '<button class="bigbtn" id="ktTSave" class="h-mt20">'+T('kt.tsave','Tarief opslaan')+'</button></div></div>';
+        '<button class="bigbtn h-mt20" id="ktTSave">'+T('kt.tsave','Tarief opslaan')+'</button></div></div>';
     }
     if (kantoorSec === 'vandaag'){
       // het slimme vandaag-bord van de dienstverlener (zzp, chef, wellness)
@@ -55,9 +55,9 @@
             '<div class="tkc-who h-mt0">'+T('vk.beschik.s','Leden boeken alleen binnen deze werkdagen en tijden; de app biedt vrije tijdvakken aan op basis van de duur van de dienst.')+'</div>'+
             '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin:0.5rem 0;">'+
             dagNamen.map((d,i)=>'<button class="obtn'+(vakUren.dagen[i]?' primary':'')+'" data-vakdag="'+i+'">'+d+'</button>').join('')+'</div>'+
-            '<div class="row-gap"><label class="soft-xs" style="align-self:center;">'+T('vk.van','Van')+'</label><input class="st-in" id="vakVan" type="time" value="'+vakUren.van+'" class="h-flex1">'+
-            '<label class="soft-xs" style="align-self:center;">'+T('vk.tot','Tot')+'</label><input class="st-in" id="vakTot" type="time" value="'+vakUren.tot+'" class="h-flex1"></div>'+
-            '<button class="bigbtn" id="vakUrenSave" class="h-mt40">'+T('vk.urenopslaan','Beschikbaarheid opslaan')+'</button></div>';
+            '<div class="row-gap"><label class="soft-xs" style="align-self:center;">'+T('vk.van','Van')+'</label><input class="st-in h-flex1" id="vakVan" type="time" value="'+vakUren.van+'">'+
+            '<label class="soft-xs" style="align-self:center;">'+T('vk.tot','Tot')+'</label><input class="st-in h-flex1" id="vakTot" type="time" value="'+vakUren.tot+'"></div>'+
+            '<button class="bigbtn h-mt40" id="vakUrenSave">'+T('vk.urenopslaan','Beschikbaarheid opslaan')+'</button></div>';
         }
         // de genre-bewuste AI-assistent
         html += '<div class="tkc h-volbreed"><h3>'+T('vk.assistent','Meedenken met de assistent')+'</h3>'+
@@ -76,9 +76,9 @@
           : '<div class="tkc-who">'+T('kt.geenaanbod','Nog geen aanbod. Voeg hieronder uw eerste dienst of product toe.')+'</div>')+
         '<div class="st-form"><input class="st-in" id="svNaam" placeholder="'+T('kt.svnaam','Naam, bijv. Personal styling')+'">'+
         '<input class="st-in" id="svDesc" placeholder="'+T('kt.svdesc','Korte omschrijving')+'">'+
-        '<div class="row-gap"><input class="st-in" id="svPrijs" type="number" placeholder="€" class="h-flex1">'+
-        '<input class="st-in" id="svDuur" type="number" placeholder="'+T('kt.svduur','min.')+'" class="h-flex1">'+
-        '<select class="st-in" id="svSoort" class="h-flex1"><option value="dienst">'+T('kt.svdienst','Dienst')+'</option><option value="product">'+T('kt.svproduct','Product')+'</option></select></div>'+
-        '<button class="bigbtn" id="svAdd" class="h-mt20">'+T('kt.svadd','Zet in de RTG-app')+'</button></div>'+
+        '<div class="row-gap"><input class="st-in h-flex1" id="svPrijs" type="number" placeholder="€">'+
+        '<input class="st-in h-flex1" id="svDuur" type="number" placeholder="'+T('kt.svduur','min.')+'">'+
+        '<select class="st-in h-flex1" id="svSoort"><option value="dienst">'+T('kt.svdienst','Dienst')+'</option><option value="product">'+T('kt.svproduct','Product')+'</option></select></div>'+
+        '<button class="bigbtn h-mt20" id="svAdd">'+T('kt.svadd','Zet in de RTG-app')+'</button></div>'+
         '<div class="tkc-who">'+T('kt.svnote','Leden zien dit direct in de app en boeken met datum en tijd; u houdt 100% van de prijs.')+'</div></div>';
     }

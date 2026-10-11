@@ -14,18 +14,18 @@
           '<div class="st-row"><span><b style="color:'+KLASSE[r.klasse][1]+';">'+KLASSE[r.klasse][0]+' '+esc(r.klasse)+'</b> '+esc(r.naam)+'</span>'+
           '<span class="sub">'+r.verkocht+'× · '+T('vr.marge','marge')+' '+geld(r.marge)+' · '+T('vr.winst','winst')+' '+geld(r.brutowinst)+'</span></div>'+
           '<div class="sub">'+esc(r.advies)+'</div></div>').join('')+
-        (mgr?'<button class="bigbtn" id="vrPlan" class="h-mt50">'+T('vr.plan','Vraag het actieplan')+'</button><div id="vrPlanUit"></div>':'')+'</div>';
+        (mgr?'<button class="bigbtn h-mt50" id="vrPlan">'+T('vr.plan','Vraag het actieplan')+'</button><div id="vrPlanUit"></div>':'')+'</div>';
     }
     // het logboek: elke beweging herleidbaar
     if ((d.logboek||[]).length) h += '<div class="card"><div class="tt-h">'+T('vr.log','Laatste bewegingen')+'</div>'+
       d.logboek.slice(0,8).map(l => '<div class="st-row"><span>'+esc(l.artikel)+' <span class="sub">'+esc(l.soort)+' · '+esc(l.oms||'')+' · '+esc(l.wie||'')+'</span></span><b'+(l.delta<0?' style="color:#FF8589;"':' style="color:#69B98B;"')+'>'+(l.delta>0?'+':'')+l.delta+'</b></div>').join('')+'</div>';
     if (mgr) h += '<div class="card"><div class="tt-h">'+T('vr.nieuw','Nieuw item')+'</div>'+
-      '<div class="row-gap h-mt50"><input class="st-in" id="vrNaam" placeholder="'+T('vr.naam','Naam, bijv. Cava brut')+'" class="h-flex2">'+
-      '<input class="st-in" id="vrAantal" type="number" min="0" placeholder="'+T('vr.aantal','aantal')+'" class="h-flex1">'+
-      '<input class="st-in" id="vrMin" type="number" min="0" placeholder="'+T('vr.mindr','min.')+'" class="h-flex1">'+
-      '<input class="st-in" id="vrEenheid" placeholder="'+T('vr.eenheid','eenheid (fles, kg...)')+'" class="h-flex1">'+
-      '<input class="st-in" id="vrKost" type="number" min="0" step="0.01" placeholder="'+T('vr.kostph','€/eenheid')+'" class="h-flex1"></div>'+
-      '<button class="bigbtn" id="vrAdd" class="h-mt50">'+T('vr.voeg','Zet op de lijst')+'</button></div>';
+      '<div class="row-gap h-mt50"><input class="st-in h-flex2" id="vrNaam" placeholder="'+T('vr.naam','Naam, bijv. Cava brut')+'">'+
+      '<input class="st-in h-flex1" id="vrAantal" type="number" min="0" placeholder="'+T('vr.aantal','aantal')+'">'+
+      '<input class="st-in h-flex1" id="vrMin" type="number" min="0" placeholder="'+T('vr.mindr','min.')+'">'+
+      '<input class="st-in h-flex1" id="vrEenheid" placeholder="'+T('vr.eenheid','eenheid (fles, kg...)')+'">'+
+      '<input class="st-in h-flex1" id="vrKost" type="number" min="0" step="0.01" placeholder="'+T('vr.kostph','€/eenheid')+'"></div>'+
+      '<button class="bigbtn h-mt50" id="vrAdd">'+T('vr.voeg','Zet op de lijst')+'</button></div>';
     el.innerHTML = h;
     const doe = async (pad, body) => { try { await API.call(pad, body); renderVoorraad(); } catch(e){ toast(e.message); } };
     // een knop: het advies wordt een echte groothandelsbestelling

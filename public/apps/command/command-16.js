@@ -40,7 +40,7 @@
                 (p.gedaan ? 'ok' : 'onbekend') + '">' + (p.gedaan ? 'gedaan' : 'staat open') + '</span>' +
                 '<div class="meta">' + esc(p.uitleg) + '</div></div>';
             }).join('') +
-            '<div class="crij" class="mt"><button class="knop" data-stweg="' + esc(s2.naam) +
+            '<div class="crij mt"><button class="knop" data-stweg="' + esc(s2.naam) +
             '">Stoppen</button></div></div>';
         }
         document.querySelector('#stUit').innerHTML = u;

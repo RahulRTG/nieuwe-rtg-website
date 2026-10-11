@@ -124,7 +124,7 @@
     // het inkoopadvies: aanvullen tot twee keer het minimum
     if ((d.advies||[]).length) h += '<div class="card" style="border-left:4px solid var(--gold,#A98F1C);"><div class="tt-h">'+T('vr.advies','Inkoopadvies')+'</div>'+
       d.advies.map(a => '<div class="st-row"><span>'+esc(a.naam)+' <span class="sub">'+a.aantal+' '+esc(a.eenheid)+', min '+a.min+'</span></span><b>+ '+a.advies+' '+esc(a.eenheid)+(a.kosten?' <span class="sub">'+geld(a.kosten)+'</span>':'')+'</b></div>').join('')+
-      (mgr?'<button class="bigbtn" id="vrBestel" class="h-mt50">'+T('vr.bestel','Bestel dit advies bij de groothandel')+'</button>':'')+
+      (mgr?'<button class="bigbtn h-mt50" id="vrBestel">'+T('vr.bestel','Bestel dit advies bij de groothandel')+'</button>':'')+
       '<div class="softline h-mt30">'+T('vr.advies.s','Geleverd = automatisch bijgeboekt, met de inkoopprijs als nieuwe kostprijs.')+'</div></div>';
     // de artikelen zelf, met kostprijs en de vloerhandelingen
     h += '<div class="card">'+(vs.length ? vs.map(v =>

@@ -48,7 +48,7 @@
         : '<div class="softline h-mt35">'+esc(w.leeg||'')+'</div>');
       if (w.type === 'knoppen') return kop(esc(w.titel))+'<div class="pos-chips h-mt35">'+
         w.knoppen.map(k => '<span><button class="obtn js-dsnel" data-snel="'+esc(k)+'" style="padding:0.15rem 0.55rem;">'+esc(k)+'</button></span>').join('')+'</div>';
-      if (w.type === 'actie') return kop(esc(w.titel))+'<button class="obtn primary js-dactie" data-tekst="'+esc(w.tekst)+'" class="h-mt35">'+esc(w.knop)+'</button>';
+      if (w.type === 'actie') return kop(esc(w.titel))+'<button class="obtn primary js-dactie h-mt35" data-tekst="'+esc(w.tekst)+'">'+esc(w.knop)+'</button>';
       if (w.type === 'meter') return kop(esc(w.titel))+'<div class="pos-chips h-mt35">'+
         w.opties.map(o => '<span><button class="obtn'+(w.stand&&w.stand.stand===o?' primary':'')+'" data-meter="'+esc(o)+'" style="padding:0.15rem 0.55rem;">'+esc(o)+'</button></span>').join('')+'</div>'+
         (w.stand?'<div class="softline h-mt25">'+T('gy.nu','Nu')+' '+esc(w.stand.stand)+' · '+esc(w.stand.door)+', '+timeAgo(w.stand.at)+'</div>':'');

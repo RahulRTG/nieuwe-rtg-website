@@ -8,7 +8,11 @@ const R = require('./regels');
 
 const DATUM = /^\d{4}-\d{2}-\d{2}$/;
 
-function schoon(t, max) { return String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, max); }
+/* Ontsmetten doet de gedeelde helper (kern/util.js): geen < en >, afknippen,
+   en een object of lijst wordt leeg. Hier wordt eerst getrimd, zodat een spatie
+   voor een datum het laatste teken niet wegknipt. */
+const U = require('../util');
+const schoon = (t, max) => U.schoon(typeof t === 'string' ? t.trim() : t, max);
 
 function toetsDatums(van, tot) {
   for (const [naam, d] of [['begindatum', van], ['einddatum', tot]]) {

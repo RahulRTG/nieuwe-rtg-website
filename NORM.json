@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4541,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1685,
-    "kernGedeeld": 254,
+    "kernBreedte": 1686,
+    "kernGedeeld": 255,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 185,
@@ -4274,6 +4274,24 @@
       "meter": "activeringOndergrens 49 -> 50",
       "reden": "Samenvoeging van alle 50 open PR's op integrate/all-open-prs-20261006. De functie democratie (DemocratieOS, al op main) staat nu in ACTIVERING.json omdat dat register opnieuw is gemeten; zijn envelop is een ondergrens omdat de meter `post` als onbekende kernsleutel leest in een routemodule met positionele parameters (routes/democratie/index.js). Een beperking van de meter, geen nieuwe koppeling.",
       "waarheen": "De activeringsmeter routemodules met positionele parameters laten herkennen."
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1685,
+      "meter": "kernBreedte 1685 -> 1686",
+      "reden": "B1 drager (GEMEENSCHAP-FASE0.md par. 4.1, besluit van de eigenaar om het plan te bouwen). kern.genootschapDrager is een eigen kernmodule op dezelfde genootschapsinstantie; de ledendeur (vragen, losmaken) en het partnerportaal (erkennen) roepen hem aan. Een route die hem zelf zou requiren, maakt een tweede instantie met een eigen greep op de genootschappen.",
+      "waarheen": "server/kern/genootschap/drager.js, GRENZEN.json en test/genootschap-drager-server.test.js tegen een echte server"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 254,
+      "meter": "kernGedeeld 254 -> 255",
+      "reden": "`genootschapDrager` wordt door twee domeinen aangeraakt, en dat hoort zo: de beheerder vraagt en maakt los (member), de partnerstichting erkent langs haar partnercode (rtfos). Twee kopieen van de regel wanneer een vraag op een stichting staat, zouden uit elkaar lopen; een gedeelde naam met een module erachter niet.",
+      "waarheen": "server/kern/genootschap/drager.js en test/genootschap-drager.test.js"
     }
   ],
   "prestatie": {

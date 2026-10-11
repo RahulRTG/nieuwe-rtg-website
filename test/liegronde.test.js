@@ -83,3 +83,18 @@ test('5. het echte register spreekt zichzelf niet tegen', () => {
     if (r.status === 'GEBLOKKEERD_DOOR_DEFECT') assert.ok((r.klachten || []).some((k) => /^zekerheid zonder gegevens/.test(k)), r.functie + ': DEFECT zonder verzonnen zekerheid');
   }
 });
+
+test('6. een nagekeken woord telt niet als defect, maar verdwijnt ook niet; een ander woord blijft een vraag', () => {
+  const L = require('../scripts/liegronde');
+  const k = ['zekerheid zonder gegevens: "Verzonden"', 'zekerheid zonder gegevens: "Betaald"', 'rommel in beeld: NaN'];
+  const n = L.nagekeken('link:rtmail', k);
+  assert.equal(n.nagekeken.length, 1);
+  assert.match(n.nagekeken[0], /^Verzonden: .*MAP/);
+  assert.deepEqual(n.blijft, ['zekerheid zonder gegevens: "Betaald"', 'rommel in beeld: NaN']);
+  /* Op een ander scherm is hetzelfde woord gewoon een vraag. */
+  assert.deepEqual(L.nagekeken('link:pay', k).blijft, k);
+  /* Elke vermelding draagt een reden. */
+  for (const [f, w] of Object.entries(L.NAGEKEKEN)) {
+    for (const [woord, reden] of Object.entries(w)) assert.ok(String(reden).length > 40, f + '/' + woord + ' staat er zonder reden');
+  }
+});

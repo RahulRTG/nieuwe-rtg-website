@@ -69,6 +69,32 @@ const GRENS = 'alleen een LEEG antwoord is beproefd; een backend die iets verkee
    toestand zou verzinnen. */
 const isZekerheid = (k) => /^zekerheid zonder gegevens/.test(k);
 
+/* NAGEKEKEN, EN GEEN LEUGEN -- per onderdeel het zekerheidswoord dat met de
+   hand is nagelopen, met de reden. Zelfde vorm als NAGEKEKEN in
+   scripts/idorproef.js: een DEFECT van deze ronde is een vraag, en een
+   beantwoorde vraag staat hier en niet stil weg. De ijklijn van de detector is
+   het statische bestand ZOALS DE SERVER HET LEVERT, en de server haalt inline
+   scripts eruit (CSP); een woord dat het scherm als vaste tekst in zijn eigen
+   script draagt, ziet de ijking dus niet. Een woord dat hier staat, telt niet
+   als defect maar staat per rij in `nagekeken` -- het verdwijnt niet. Een NIEUW
+   woord op hetzelfde scherm is weer een vraag. */
+const NAGEKEKEN = {
+  'link:rtmail': {
+    Verzonden: 'de naam van een MAP (Postvak in, Archief, Prullenbak, Verzonden) uit de vaste lijst MAPPEN in rtmail.html, ' +
+      'getoond zodra de mappen getekend zijn; het is geen bewering dat er iets verzonden is (nagelopen 11 oktober 2026)'
+  }
+};
+function nagekeken(functie, klachten) {
+  const lijst = NAGEKEKEN[functie] || {};
+  const uit = { blijft: [], nagekeken: [] };
+  for (const k of klachten) {
+    const m = /^zekerheid zonder gegevens: "([^"]+)"/.exec(k);
+    if (m && lijst[m[1]]) uit.nagekeken.push(m[1] + ': ' + lijst[m[1]]);
+    else uit.blijft.push(k);
+  }
+  return uit;
+}
+
 function oordeel(m) {
   const zeker = m.klachten.filter(isZekerheid);
   if (zeker.length) return { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'met een lege backend: ' + zeker[0] };
@@ -114,7 +140,10 @@ async function meetRij(rij, base, contexten) {
     try { await page.close(); } catch (e) {}
   }
   m.gelogen = [...gelogen].sort();
-  return Object.assign(uit, oordeel(m), { gelogen: m.gelogen.length, klachten: m.klachten });
+  const n = nagekeken(rij.functie, m.klachten);
+  m.klachten = n.blijft;
+  return Object.assign(uit, oordeel(m), { gelogen: m.gelogen.length, klachten: m.klachten },
+    n.nagekeken.length ? { nagekeken: n.nagekeken } : {});
 }
 
 async function meet() {
@@ -157,7 +186,7 @@ async function meet() {
   }
 }
 
-module.exports = { oordeel, isZekerheid, SPAAR, DOEL };
+module.exports = { oordeel, isZekerheid, nagekeken, NAGEKEKEN, SPAAR, DOEL };
 
 if (require.main === module) {
   meet().then((u) => {

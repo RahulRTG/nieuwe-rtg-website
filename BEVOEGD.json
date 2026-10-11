@@ -1,20 +1,22 @@
 {
   "stempel": {
-    "op": "2026-09-25T08:51:52.448Z",
-    "commit": "28be5395",
+    "op": "2026-10-11T17:11:58.990Z",
+    "commit": "6fbadf1a",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/bevoegdronde.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "uitleg": "Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen samengesteld uit IDOR.json en ROLPROEF.json, gezinsschermen met een kruisproef op de gezinscode. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f.",
   "grens": "leden: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af. gezinnen: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token.",
   "bronnen": {
-    "vervallen": []
+    "vervallen": [
+      "ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
+    ]
   },
   "telling": {
-    "NIET_GETEST": 103,
-    "BEWEZEN": 9
+    "NIET_GETEST": 102,
+    "BEWEZEN": 12
   },
   "regels": [
     {
@@ -23,18 +25,15 @@
       "ingang": "/apps/arrival.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 3,
-      "open": 3,
-      "reden": "3 van de 3 routes niet gemeten, o.a. /api/arrival/pass staat niet in IDOR.json; /api/arrival/pulse staat niet in IDOR.json; /api/plaats/venster is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:appdossier",
       "app": "App-dossier",
       "ingang": "/apps/appstore-dossier.html",
       "persona": "lid",
-      "status": "BEWEZEN",
-      "routes": 2,
-      "reden": "alle 2 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af"
+      "status": "NIET_GETEST",
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:attenties",
@@ -42,9 +41,7 @@
       "ingang": "/apps/attenties.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 75,
-      "open": 6,
-      "reden": "6 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:balans",
@@ -52,9 +49,7 @@
       "ingang": "/apps/geld.html#balans",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 95,
-      "open": 56,
-      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:bank",
@@ -62,9 +57,7 @@
       "ingang": "/apps/geld.html#bank",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 95,
-      "open": 56,
-      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:berichten",
@@ -72,9 +65,7 @@
       "ingang": "/apps/comm.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 6,
-      "open": 5,
-      "reden": "5 van de 6 routes niet gemeten, o.a. /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:bescherming",
@@ -82,9 +73,7 @@
       "ingang": "/apps/mijn-isolatie.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 2,
-      "reden": "2 van de 7 routes niet gemeten, o.a. /api/isolatie/mijn/ontsluiting is in IDOR.json onbereikbaar; /api/isolatie/mijn/zet is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:browser",
@@ -92,16 +81,25 @@
       "ingang": "/apps/browser.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:buurtruil",
       "app": "Buurtruil",
       "ingang": "/apps/foundation/buurtruil.html",
       "persona": "gezin",
-      "status": "NIET_GETEST",
-      "reden": "het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen",
-      "kruisparen": []
+      "status": "BEWEZEN",
+      "paren": 1,
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "kruisparen": [
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        }
+      ]
     },
     {
       "functie": "link:camera",
@@ -109,9 +107,7 @@
       "ingang": "/apps/camera.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/fluister is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:cellier",
@@ -119,9 +115,7 @@
       "ingang": "/apps/cellier.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 1,
-      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:cercle",
@@ -129,9 +123,7 @@
       "ingang": "/apps/cercle.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 75,
-      "open": 6,
-      "reden": "6 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:clips",
@@ -139,7 +131,7 @@
       "ingang": "/apps/clips.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:commerce",
@@ -147,9 +139,7 @@
       "ingang": "/apps/commerce.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 9,
-      "open": 9,
-      "reden": "9 van de 9 routes niet gemeten, o.a. /api/commerce/aanbod is in IDOR.json onbereikbaar; /api/commerce/etalage is in IDOR.json onbereikbaar; /api/commerce/mand is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:connect",
@@ -157,9 +147,16 @@
       "ingang": "/apps/connect.html",
       "persona": "gezin",
       "status": "BEWEZEN",
-      "paren": 4,
-      "reden": "4 van de 4 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "paren": 5,
+      "reden": "5 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
       "kruisparen": [
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        },
         {
           "verzoek": "POST /api/rtf/connect/ontdek",
           "a": 200,
@@ -204,9 +201,7 @@
       "ingang": "/apps/entourage.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 75,
-      "open": 6,
-      "reden": "6 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:flits",
@@ -214,7 +209,7 @@
       "ingang": "/apps/flits.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:foodcourt",
@@ -222,9 +217,7 @@
       "ingang": "/apps/foodcourt.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 6,
-      "open": 4,
-      "reden": "4 van de 6 routes niet gemeten, o.a. /api/adres/zoek is in IDOR.json onbereikbaar; /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:foundationzorg",
@@ -232,15 +225,43 @@
       "ingang": "/apps/foundation/zorg.html",
       "persona": "gezin",
       "status": "BEWEZEN",
-      "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "paren": 5,
+      "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/SPMST5/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/CUVNSV/gezondheid",
           "a": 200,
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/social/connections",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/agenda/bereik",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/leerling/dag",
+          "a": 403,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "eigenaarWeg"
         }
       ]
     },
@@ -250,9 +271,7 @@
       "ingang": "/apps/garderobe.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 1,
-      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:gegevens",
@@ -260,9 +279,7 @@
       "ingang": "/apps/mijn-gegevens.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 11,
-      "open": 3,
-      "reden": "3 van de 11 routes niet gemeten, o.a. /api/mijn/toestel/introk is in IDOR.json onbereikbaar; /api/rtgid/machtig is in IDOR.json onbereikbaar; /api/webauthn/registreer is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:geldcommand",
@@ -270,18 +287,25 @@
       "ingang": "/apps/geld.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 95,
-      "open": 56,
-      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:geven",
       "app": "Geven",
       "ingang": "/apps/foundation/geven.html",
       "persona": "gezin",
-      "status": "NIET_GETEST",
-      "reden": "het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen",
-      "kruisparen": []
+      "status": "BEWEZEN",
+      "paren": 1,
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "kruisparen": [
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        }
+      ]
     },
     {
       "functie": "link:hangar",
@@ -289,9 +313,7 @@
       "ingang": "/apps/hangar.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 1,
-      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:horeca",
@@ -299,9 +321,7 @@
       "ingang": "/apps/horeca.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 134,
-      "open": 132,
-      "reden": "132 van de 134 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/supplier/horeca/arrival/promise staat niet in IDOR.json; /api/supplier/horeca/arrivals staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:huis",
@@ -309,7 +329,7 @@
       "ingang": "/apps/thuis.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:ik",
@@ -317,9 +337,7 @@
       "ingang": "/apps/ik.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 12,
-      "open": 3,
-      "reden": "3 van de 12 routes niet gemeten, o.a. /api/veiligheid/kring/mail is in IDOR.json onbereikbaar; /api/veiligheid/kring/toevoegen is in IDOR.json onbereikbaar; /api/veiligheid/plek is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:juridisch",
@@ -327,16 +345,25 @@
       "ingang": "/apps/juridisch.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:klimaat",
       "app": "Klimaatfonds",
       "ingang": "/apps/foundation/klimaatfonds.html",
       "persona": "gezin",
-      "status": "NIET_GETEST",
-      "reden": "het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen",
-      "kruisparen": []
+      "status": "BEWEZEN",
+      "paren": 1,
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "kruisparen": [
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        }
+      ]
     },
     {
       "functie": "link:krant",
@@ -344,7 +371,25 @@
       "ingang": "/apps/krant.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
+    },
+    {
+      "functie": "link:kwesties",
+      "app": "Wat speelt er",
+      "ingang": "/apps/foundation/kwesties.html",
+      "persona": "gezin",
+      "status": "BEWEZEN",
+      "paren": 1,
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "kruisparen": [
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        }
+      ]
     },
     {
       "functie": "link:labfonds",
@@ -352,9 +397,7 @@
       "ingang": "/apps/geld.html#labfonds",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 95,
-      "open": 56,
-      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:leven",
@@ -362,9 +405,25 @@
       "ingang": "/apps/leven.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 4,
-      "open": 3,
-      "reden": "3 van de 4 routes niet gemeten, o.a. /api/avond/voorstel is in IDOR.json onbereikbaar; /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
+    },
+    {
+      "functie": "link:library",
+      "app": "LibraryOS",
+      "ingang": "/apps/library.html",
+      "persona": "gezin",
+      "status": "BEWEZEN",
+      "paren": 1,
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "kruisparen": [
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        }
+      ]
     },
     {
       "functie": "link:logboek",
@@ -372,9 +431,7 @@
       "ingang": "/apps/geld.html#logboek",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 95,
-      "open": 56,
-      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:loonstrook",
@@ -382,7 +439,7 @@
       "ingang": "/apps/loonstrook.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:loopbaan",
@@ -390,9 +447,7 @@
       "ingang": "/apps/loopbaan.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 6,
-      "open": 6,
-      "reden": "6 van de 6 routes niet gemeten, o.a. /api/carriere/ledger/deel is in IDOR.json onbereikbaar; /api/carriere/ledger/delen is in IDOR.json onbereikbaar; /api/carriere/ledger/intrek is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:magnaat",
@@ -400,9 +455,7 @@
       "ingang": "/apps/magnaat.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 74,
-      "open": 18,
-      "reden": "18 van de 74 routes niet gemeten, o.a. /api/member/magnaat/economie/analyse is in IDOR.json onbereikbaar; /api/member/magnaat/economie/schok is in IDOR.json onbereikbaar; /api/member/magnaat/economie/volgende-dag is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:maison",
@@ -410,9 +463,7 @@
       "ingang": "/apps/maison.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 1,
-      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:mall",
@@ -420,9 +471,7 @@
       "ingang": "/apps/mall.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 58,
-      "open": 20,
-      "reden": "20 van de 58 routes niet gemeten, o.a. /api/adres/zoek is in IDOR.json onbereikbaar; /api/bieb/ai is in IDOR.json onbereikbaar; /api/booking/request is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:mecenaat",
@@ -430,18 +479,15 @@
       "ingang": "/apps/geld.html#mecenaat",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 95,
-      "open": 56,
-      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:mediaos",
       "app": "RTG Media",
       "ingang": "/apps/media.html",
       "persona": "lid",
-      "status": "BEWEZEN",
-      "routes": 3,
-      "reden": "alle 3 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af"
+      "status": "NIET_GETEST",
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:mijnmall",
@@ -449,9 +495,7 @@
       "ingang": "/apps/mijnmall.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 14,
-      "open": 1,
-      "reden": "1 van de 14 routes niet gemeten, o.a. /api/mall/aanvraag is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:move",
@@ -459,7 +503,7 @@
       "ingang": "/apps/move.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:muziek",
@@ -467,9 +511,7 @@
       "ingang": "/apps/muziek.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/fluister is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:nalatenschap",
@@ -477,9 +519,7 @@
       "ingang": "/apps/geld.html#nalatenschap",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 95,
-      "open": 56,
-      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:navigatie",
@@ -487,9 +527,7 @@
       "ingang": "/apps/navigatie.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/nav/gebied/pakket/*: de registers kennen geen route onder dit voorvoegsel"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:neigingen",
@@ -497,18 +535,15 @@
       "ingang": "/apps/mijn-neigingen.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 17,
-      "open": 4,
-      "reden": "4 van de 17 routes niet gemeten, o.a. /api/mijn/toestel/introk is in IDOR.json onbereikbaar; /api/neiging/antwoord is in IDOR.json onbereikbaar; /api/rtgid/machtig is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:nieuws",
       "app": "Nieuws",
       "ingang": "/apps/nieuws.html",
       "persona": "lid",
-      "status": "BEWEZEN",
-      "routes": 3,
-      "reden": "alle 3 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af"
+      "status": "NIET_GETEST",
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:office",
@@ -516,9 +551,7 @@
       "ingang": "/apps/office.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/supplier/ai staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:onderneming",
@@ -526,9 +559,7 @@
       "ingang": "/apps/onderneming.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/onderneming/rechtsvormen staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:ontdek",
@@ -536,9 +567,7 @@
       "ingang": "/apps/rtg.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 2,
-      "reden": "2 van de 7 routes niet gemeten, o.a. /api/sociaal/lijn is in IDOR.json onbereikbaar; /api/sociaal/wereld is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:ov",
@@ -546,9 +575,7 @@
       "ingang": "/apps/ov.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 2,
-      "open": 2,
-      "reden": "2 van de 2 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:ovroutes",
@@ -556,9 +583,7 @@
       "ingang": "/apps/ovroutes.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 7,
-      "reden": "7 van de 7 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/staff/ov/checkin staat niet in IDOR.json; /api/staff/ov/dienst staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:partnernetwerk",
@@ -566,7 +591,7 @@
       "ingang": "/apps/partner-network.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:passkeys",
@@ -574,7 +599,7 @@
       "ingang": "/apps/passkeys.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:pay",
@@ -582,9 +607,7 @@
       "ingang": "/apps/pay.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/login staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:podium",
@@ -592,9 +615,7 @@
       "ingang": "/apps/podium.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 1,
-      "open": 1,
-      "reden": "1 van de 1 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:post",
@@ -602,9 +623,7 @@
       "ingang": "/apps/mijn-post.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 14,
-      "open": 3,
-      "reden": "3 van de 14 routes niet gemeten, o.a. /api/mijn/toestel/introk is in IDOR.json onbereikbaar; /api/rtgid/machtig is in IDOR.json onbereikbaar; /api/webauthn/registreer is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:projectroom",
@@ -620,9 +639,7 @@
       "ingang": "/apps/pulse.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 15,
-      "open": 1,
-      "reden": "1 van de 15 routes niet gemeten, o.a. /api/member/pulse/volg is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:rechterhand",
@@ -630,9 +647,7 @@
       "ingang": "/apps/lifestyle.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 68,
-      "open": 1,
-      "reden": "1 van de 68 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:reisboek",
@@ -640,9 +655,7 @@
       "ingang": "/apps/reisboek.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 12,
-      "open": 3,
-      "reden": "3 van de 12 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:reizen",
@@ -650,9 +663,7 @@
       "ingang": "/apps/reizen-veilig.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 5,
-      "open": 1,
-      "reden": "1 van de 5 routes niet gemeten, o.a. /api/veiligheid/moment/maak is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:relaties",
@@ -660,9 +671,7 @@
       "ingang": "/apps/mijn-relaties.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 13,
-      "open": 3,
-      "reden": "3 van de 13 routes niet gemeten, o.a. /api/mijn/toestel/introk is in IDOR.json onbereikbaar; /api/rtgid/machtig is in IDOR.json onbereikbaar; /api/webauthn/registreer is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:rendezvous",
@@ -670,9 +679,7 @@
       "ingang": "/apps/rendezvous.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 24,
-      "open": 6,
-      "reden": "6 van de 24 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:residentie",
@@ -680,7 +687,7 @@
       "ingang": "/apps/residentie.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:routedossier",
@@ -696,8 +703,8 @@
       "ingang": "/apps/foundation/bord.html",
       "persona": "gezin",
       "status": "BEWEZEN",
-      "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "paren": 5,
+      "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
       "kruisparen": [
         {
           "verzoek": "POST /api/rtf/toegang",
@@ -705,6 +712,34 @@
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/social/connections",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/agenda/bereik",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/leerling/dag",
+          "a": 403,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "eigenaarWeg"
         }
       ]
     },
@@ -713,18 +748,36 @@
       "app": "RTFoundation in jouw buurt",
       "ingang": "/apps/foundation/os-publiek.html",
       "persona": "gezin",
-      "status": "NIET_GETEST",
-      "reden": "het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen",
-      "kruisparen": []
+      "status": "BEWEZEN",
+      "paren": 1,
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "kruisparen": [
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        }
+      ]
     },
     {
       "functie": "link:rtfportaal",
       "app": "RTFoundation portaal",
       "ingang": "/apps/foundation/os-portaal.html",
       "persona": "gezin",
-      "status": "NIET_GETEST",
-      "reden": "het scherm noemde de gezinscode in geen enkel verzoek; er viel niets te kruisen",
-      "kruisparen": []
+      "status": "BEWEZEN",
+      "paren": 1,
+      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "kruisparen": [
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        }
+      ]
     },
     {
       "functie": "link:rtfschrift",
@@ -732,8 +785,8 @@
       "ingang": "/apps/foundation/schrift.html",
       "persona": "gezin",
       "status": "BEWEZEN",
-      "paren": 1,
-      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "paren": 5,
+      "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
       "kruisparen": [
         {
           "verzoek": "POST /api/rtf/toegang",
@@ -741,6 +794,34 @@
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/social/connections",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/agenda/bereik",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/leerling/dag",
+          "a": 403,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "eigenaarWeg"
         }
       ]
     },
@@ -750,9 +831,7 @@
       "ingang": "/apps/geld.html#rtgcode",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 95,
-      "open": 56,
-      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:rtgone",
@@ -768,9 +847,7 @@
       "ingang": "/apps/rtmail.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 62,
-      "open": 33,
-      "reden": "33 van de 62 routes niet gemeten, o.a. /api/account/start is in IDOR.json onbereikbaar; /api/member/rtmail/afwezig is in IDOR.json onbereikbaar; /api/member/rtmail/antwoord is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:school",
@@ -778,9 +855,7 @@
       "ingang": "/apps/rtgschool.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 5,
-      "open": 4,
-      "reden": "4 van de 5 routes niet gemeten, o.a. /api/bijles/gesprek is in IDOR.json onbereikbaar; /api/bijles/vraag is in IDOR.json onbereikbaar; /api/leerstof/examen is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:sessies",
@@ -788,18 +863,15 @@
       "ingang": "/apps/mijn-sessies.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 14,
-      "open": 4,
-      "reden": "4 van de 14 routes niet gemeten, o.a. /api/mijn/toestel/bind is in IDOR.json onbereikbaar; /api/mijn/toestel/introk is in IDOR.json onbereikbaar; /api/rtgid/machtig is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:sitemaker",
       "app": "Website",
       "ingang": "/apps/sitemaker.html",
       "persona": "lid",
-      "status": "BEWEZEN",
-      "routes": 1,
-      "reden": "alle 1 routes van het scherm gemeten: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af"
+      "status": "NIET_GETEST",
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:sociaal",
@@ -807,9 +879,7 @@
       "ingang": "/apps/sociaal.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 11,
-      "open": 10,
-      "reden": "10 van de 11 routes niet gemeten, o.a. /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:spelavond",
@@ -817,9 +887,7 @@
       "ingang": "/apps/spelscherm.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 2,
-      "open": 2,
-      "reden": "2 van de 2 routes niet gemeten, o.a. /api/projectie/kijk staat niet in IDOR.json; /api/projectie/koppel staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:spelen",
@@ -827,9 +895,7 @@
       "ingang": "/apps/spelen.html?pas=",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 47,
-      "open": 13,
-      "reden": "13 van de 47 routes niet gemeten, o.a. /api/member/spel/arcade-bord is in IDOR.json onbereikbaar; /api/member/spel/arcade-score is in IDOR.json onbereikbaar; /api/member/spel/dag is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:sport",
@@ -837,9 +903,7 @@
       "ingang": "/apps/sport.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 11,
-      "open": 3,
-      "reden": "3 van de 11 routes niet gemeten, o.a. /api/adres/zoek is in IDOR.json onbereikbaar; /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:stad",
@@ -847,7 +911,7 @@
       "ingang": "/apps/stad.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:table",
@@ -855,9 +919,7 @@
       "ingang": "/apps/table.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 70,
-      "open": 1,
-      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:theater",
@@ -865,9 +927,7 @@
       "ingang": "/apps/theater.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 2,
-      "open": 2,
-      "reden": "2 van de 2 routes niet gemeten, o.a. /api/theater/kijk/*: de registers kennen geen route onder dit voorvoegsel; /api/theater/upload/*: de registers kennen geen route onder dit voorvoegsel"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:tweedescherm",
@@ -875,9 +935,7 @@
       "ingang": "/apps/scherm.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 2,
-      "open": 2,
-      "reden": "2 van de 2 routes niet gemeten, o.a. /api/supplier/ai staat niet in IDOR.json; /api/supplier/state staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:uitgaan",
@@ -885,9 +943,7 @@
       "ingang": "/apps/uitgaan.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 6,
-      "open": 3,
-      "reden": "3 van de 6 routes niet gemeten, o.a. /api/event/rsvp is in IDOR.json onbereikbaar; /api/event/rsvp/annuleer is in IDOR.json onbereikbaar; /api/fluister is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:vandaag",
@@ -895,9 +951,7 @@
       "ingang": "/apps/life.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 26,
-      "open": 11,
-      "reden": "11 van de 26 routes niet gemeten, o.a. /api/dag is in IDOR.json onbereikbaar; /api/medicatie is in IDOR.json onbereikbaar; /api/metingen is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:veilig",
@@ -905,9 +959,7 @@
       "ingang": "/apps/veilig.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 21,
-      "open": 6,
-      "reden": "6 van de 21 routes niet gemeten, o.a. /api/veiligheid/alarm is in IDOR.json onbereikbaar; /api/veiligheid/codewoord/zet is in IDOR.json onbereikbaar; /api/veiligheid/kring/mail is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:verificatie",
@@ -915,7 +967,7 @@
       "ingang": "/apps/verificatie.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:vertegenwoordiging",
@@ -923,7 +975,7 @@
       "ingang": "/apps/vertegenwoordiging.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:vluchten",
@@ -931,9 +983,7 @@
       "ingang": "/apps/vluchten.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 2,
-      "reden": "2 van de 7 routes niet gemeten, o.a. /api/member/vluchten/boek is in IDOR.json onbereikbaar; /api/member/vluchten/charter is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:vonk",
@@ -941,9 +991,7 @@
       "ingang": "/apps/vonk.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 5,
-      "open": 5,
-      "reden": "5 van de 5 routes niet gemeten, o.a. /api/sociaal/actielog is in IDOR.json onbereikbaar; /api/sociaal/beleid is in IDOR.json onbereikbaar; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:vooruitzicht",
@@ -951,9 +999,7 @@
       "ingang": "/apps/living-os.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 12,
-      "open": 4,
-      "reden": "4 van de 12 routes niet gemeten, o.a. /api/agenda/bereik is in IDOR.json onbereikbaar; /api/fluister is in IDOR.json onbereikbaar; /api/geld/cockpit is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:vrienden",
@@ -961,8 +1007,8 @@
       "ingang": "/apps/foundation/vrienden.html",
       "persona": "gezin",
       "status": "BEWEZEN",
-      "paren": 8,
-      "reden": "8 van de 8 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
+      "paren": 12,
+      "reden": "10 van de 12 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
       "kruisparen": [
         {
           "verzoek": "POST /api/rtf/toegang",
@@ -972,7 +1018,7 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/foundation/gezin/SPMST5/mij",
+          "verzoek": "GET /api/foundation/gezin/CUVNSV/mij",
           "a": 200,
           "b": 403,
           "anoniem": 403,
@@ -986,7 +1032,14 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "GET /api/rtf/social/stream",
+          "verzoek": "POST /api/foundation/gezin/stroom/ticket",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
           "a": 200,
           "b": 401,
           "anoniem": 401,
@@ -1019,6 +1072,27 @@
           "b": 403,
           "anoniem": 403,
           "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "GET /api/rtf/social/stream",
+          "a": 401,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "eigenaarWeg"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/agenda/bereik",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
+          "verzoek": "POST /api/rtf/leerling/dag",
+          "a": 403,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "eigenaarWeg"
         }
       ]
     },
@@ -1028,9 +1102,7 @@
       "ingang": "/apps/geld.html#wallet",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 95,
-      "open": 56,
-      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:wbw",
@@ -1038,9 +1110,7 @@
       "ingang": "/apps/geld.html#wbw",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 95,
-      "open": 56,
-      "reden": "56 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:wereldlaag",
@@ -1048,7 +1118,7 @@
       "ingang": "/apps/wereld.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:werkos",
@@ -1056,9 +1126,7 @@
       "ingang": "/apps/werk.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 5,
-      "open": 5,
-      "reden": "5 van de 5 routes niet gemeten, o.a. /api/bedrijf/mijn is in IDOR.json onbereikbaar; /api/tenant/bijstand*: de registers kennen geen route onder dit voorvoegsel; /api/tenant/bootstrap staat niet in IDOR.json"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "link:wonen",
@@ -1066,9 +1134,7 @@
       "ingang": "/apps/wonen.html",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "routes": 7,
-      "open": 1,
-      "reden": "1 van de 7 routes niet gemeten, o.a. /api/home/onderhoud/meld is in IDOR.json onbereikbaar"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "os:bellen",
@@ -1076,7 +1142,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "os:rtf",
@@ -1084,7 +1150,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "os:snaps",
@@ -1092,7 +1158,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "os:videobellen",
@@ -1100,7 +1166,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "os:werk",
@@ -1108,7 +1174,7 @@
       "ingang": "(os in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "tab:assets",
@@ -1116,7 +1182,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "tab:bestellen",
@@ -1124,7 +1190,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "tab:betalen",
@@ -1132,7 +1198,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "tab:gezin",
@@ -1140,7 +1206,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "tab:reizen",
@@ -1148,7 +1214,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "tab:salon",
@@ -1156,7 +1222,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "tab:terplaatse",
@@ -1164,7 +1230,7 @@
       "ingang": "(tab in de app, geen eigen adres)",
       "persona": "lid",
       "status": "NIET_GETEST",
-      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp"
+      "reden": "bewijs vervallen: ROLPROEF.json: gemeten op commit 76dbed774, die hier niet meer bestaat"
     },
     {
       "functie": "tab:zorg",

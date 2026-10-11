@@ -147,7 +147,7 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap, nu = Date.now })
     return klaar(sess, p.b, r);
   }
 
-  function heropen(sess, id, invoer) {
+  function heropenBeraad(sess, id, invoer) {
     const p = poort(sess, id); if (p.error) return p;
     if (!p.regie) return geenRegie;
     const v = invoer || {};
@@ -165,6 +165,6 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap, nu = Date.now })
     return { ok: true, beraad: zicht.beraad(p.b, sess.key), mijnRegie: p.regie };
   }
 
-  return { open, inbreng, voorstel, naarStemmen, stem, sluit, heropen, lees, mijn, gezien,
+  return { open, inbreng, voorstel, naarStemmen, stem, sluit, heropen: heropenBeraad, lees, mijn, gezien,
     poort, lijstKijk, huidige: schr.huidige };
 };

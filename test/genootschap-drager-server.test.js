@@ -202,40 +202,41 @@ test('6. de gezinsdeur: dezelfde kern, hetzelfde antwoord, en alleen voor een vo
   await post('/api/genootschap/roep-bijeen', { groep: gr.id, wat: 'Rondje Amelisweerd', datum: '2099-05-05', tijd: '10:00' }, P.beh.token);
   const vreemde = await lid(null, false);
   const fam = await gezin('1985-03-03');
-  const g = (pad, b) => post('/api/rtf/genootschap/' + pad, Object.assign({ code: fam.code, token: fam.token }, b || {}));
+  // het pad staat LETTERLIJK bij elke oproep: de dekkingsmeter van de keuring leest de toetstekst
+  const g = (pad, b) => post(pad, Object.assign({ code: fam.code, token: fam.token }, b || {}));
 
   // ZOEK: als niet-lid, byte voor byte gelijk aan de ledendeur
   const q = { zoek: 'Kromme Rijn ' + teller };
   const alsLid = await post('/api/genootschap/zoek', q, vreemde.token);
-  const alsGezin = await g('zoek', q);
+  const alsGezin = await g('/api/rtf/genootschap/zoek', q);
   assert.equal(alsGezin.status, 200, alsGezin.tekst);
   assert.equal(alsGezin.tekst, alsLid.tekst, 'de gezinsdeur gaf een ander antwoord dan de ledendeur');
 
   // BINNEN met een verzonnen sleutel in het lijf: het lidmaatschap komt op het gezinsprofiel
-  const binnen = await g('binnen', { groep: gr.id, key: P.a.codenaam });
+  const binnen = await g('/api/rtf/genootschap/binnen', { groep: gr.id, key: P.a.codenaam });
   assert.equal(binnen.status, 200, binnen.tekst);
-  assert.equal((await g('binnen', { groep: gr.id })).body.al, true, 'een tweede keer binnen is geen herhaling');
+  assert.equal((await g('/api/rtf/genootschap/binnen', { groep: gr.id })).body.al, true, 'een tweede keer binnen is geen herhaling');
   assert.ok((await post('/api/genootschap/binnen', { groep: gr.id }, vreemde.token)).body.ok);
   const lijst = JSON.parse(await ledenlijst(P.beh, gr.id));
   assert.equal(lijst.length, 3, 'beheerder, gezinslid en lid');
   assert.ok(!lijst.some(l => l.codenaam === P.a.codenaam), 'het lijf maakte P.a lid');
-  assert.equal((await g('mijn')).body.groepen.filter(x => x.id === gr.id).length, 1);
+  assert.equal((await g('/api/rtf/genootschap/mijn')).body.groepen.filter(x => x.id === gr.id).length, 1);
 
   // AGENDA: als lid van dezelfde groep, byte voor byte gelijk
   const agLid = await post('/api/genootschap/agenda', { groep: gr.id }, vreemde.token);
-  const agGezin = await g('agenda', { groep: gr.id });
+  const agGezin = await g('/api/rtf/genootschap/agenda', { groep: gr.id });
   assert.equal(agGezin.status, 200, agGezin.tekst);
   assert.equal(agGezin.body.komt.length, 1);
   assert.equal(agGezin.tekst, agLid.tekst, 'de agenda via de gezinsdeur wijkt af');
-  assert.equal((await g('prikbord', { groep: gr.id })).status, 200);
-  assert.equal((await g('vertrek', { groep: gr.id })).status, 200);
-  assert.equal((await g('vertrek', { groep: gr.id })).status, 400, 'een tweede vertrek is een toestandscontrole');
-  assert.equal((await g('mijn')).body.groepen.filter(x => x.id === gr.id).length, 0);
+  assert.equal((await g('/api/rtf/genootschap/prikbord', { groep: gr.id })).status, 200);
+  assert.equal((await g('/api/rtf/genootschap/vertrek', { groep: gr.id })).status, 200);
+  assert.equal((await g('/api/rtf/genootschap/vertrek', { groep: gr.id })).status, 400, 'een tweede vertrek is een toestandscontrole');
+  assert.equal((await g('/api/rtf/genootschap/mijn')).body.groepen.filter(x => x.id === gr.id).length, 0);
 
   // een gedragen groep: een gezinsprofiel komt er niet in, ook niet zelf
   const gedragen = await groep(P.beh, 'Hardloopclub ' + teller, 'openbaar');
   await post('/api/genootschap/drager/vraag', { groep: gedragen.id, ref: P.een.id }, P.beh.token);
-  const geweigerd = await g('binnen', { groep: gedragen.id });
+  const geweigerd = await g('/api/rtf/genootschap/binnen', { groep: gedragen.id });
   assert.equal(geweigerd.status, 400);
   assert.match(geweigerd.body.error, /gezinsprofielen/);
 

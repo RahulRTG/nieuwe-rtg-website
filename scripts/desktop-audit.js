@@ -104,7 +104,10 @@ async function main() {
             if (body.dataset.rtgShell === 'mobile') return true;
             const cinematic = body.dataset.rtgCinematic === 'true';
             const edgeHidden = /^(compact|focus)$/.test(body.getAttribute('data-rtg-edge-2-state') || '');
-            const expected = cinematic ? (innerWidth < 1000 ? '82px' : '88px') : edgeHidden ? '0px' : '64px';
+            /* In compact en focus geeft de schil de bovenrand terug, ook in de
+               cinematische kamer (rtg-warm-details.css; test/rtg-edge-2.e2e.js eist
+               dat). Alleen met een zichtbare kop staat er 88/82 of 64. */
+            const expected = edgeHidden ? '0px' : cinematic ? (innerWidth < 1000 ? '82px' : '88px') : '64px';
             return getComputedStyle(body).paddingTop === expected;
           }, null, { timeout: 6000 });
           await page.evaluate(() => document.fonts.ready);
@@ -135,7 +138,7 @@ async function main() {
             const visible = s => [...document.querySelectorAll(s)].some(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden');
             const heading = [...document.querySelectorAll('#platform-story-title,.wd-home h1,.wd-access h1,h1')]
               .find(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden');
-            return { url: location.pathname, world:b.dataset.rtgWorld, desktop:b.dataset.rtgDesktop, shellMode:b.dataset.rtgShell, layout:b.dataset.rtgLayout, public:b.dataset.publicPlatform,
+            return { url: location.pathname, world:b.dataset.rtgWorld, palette:b.dataset.rtgPalette, desktop:b.dataset.rtgDesktop, shellMode:b.dataset.rtgShell, layout:b.dataset.rtgLayout, public:b.dataset.publicPlatform,
               cinematic:b.dataset.rtgCinematic === 'true', viewport:innerWidth,
               access:[...document.querySelectorAll('[data-rtg-access]')].some(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'),
               mobileDecoration:visible('.wd-shell>.wd-greeting,.wd-shell>.wp-tabs,.wd-shell>.wd-people,.wd-shell>.wd-favorites,.wd-shell>.wd-library,.wd-home>.wp-scene,.wp-domain'),
@@ -159,7 +162,8 @@ async function main() {
           row.failures = [];
           if (row.clippedContent.length) row.failures.push('clipped-app-content');
           if (row.http !== 200 && route !== '/site/404.html') row.failures.push('http-'+row.http);
-          const expectedTop = s.access ? 0 : s.public ? (mobile ? 76 : 88) : s.cinematic ? (mobile ? 82 : 88) :
+          const expectedTop = s.access ? 0 : s.public ? (mobile ? 76 : 88) :
+            s.cinematic ? (/^(compact|focus)$/.test(s.edgeState || '') ? 0 : (mobile ? 82 : 88)) :
             (mobile ? 136 : 88) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
           if (!s.access && (!mobile || s.public) && Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
           if (s.access && (!s.accessRect || s.accessRect.y > 64 || s.accessRect.w < 300 || s.accessRect.h < 600)) row.failures.push('access-portal-not-viewport');
@@ -195,8 +199,11 @@ async function main() {
           const palettes = {living:'rgb(16, 13, 10)',work:'rgb(16, 24, 23)',travel:'rgb(25, 13, 18)',foundation:'rgb(16, 35, 30)'};
           if(s.editorialVersion !== '20261001')row.failures.push('editorial-system-not-loaded');
           if(s.layout !== 'standard')row.failures.push('legacy-layout');
-          const cinematicCanvas = 'rgb(241, 238, 231)';
-          if (!s.access && s.background !== (s.public ? 'rgb(16, 14, 12)' : s.cinematic ? cinematicCanvas : palettes[s.world])) row.failures.push('nonstandard-world-palette');
+          /* De ivoren kamer draagt per wereld een zweem van haar signatuur (besluit
+             van de eigenaar, public/shared/rtg-cinematic-system.css). Die tint volgt
+             het PALET, met de wereld als terugval -- precies zoals de CSS kiest. */
+          const cinematicCanvas = {living:'rgb(237, 232, 223)',work:'rgb(233, 232, 225)',travel:'rgb(237, 229, 224)',foundation:'rgb(233, 232, 225)'};
+          if (!s.access && s.background !== (s.public ? 'rgb(16, 14, 12)' : s.cinematic ? cinematicCanvas[s.palette || s.world] : palettes[s.world])) row.failures.push('nonstandard-world-palette');
           const cards = {living:'#201912',work:'#192422',travel:'#29171d',foundation:'#19372d'};
           if (!s.public && !s.access) for (const region of s.paletteRegions) {
             /* Product-native workspaces may remain dark islands; the shared

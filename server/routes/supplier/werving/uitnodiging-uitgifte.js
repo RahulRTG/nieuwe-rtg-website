@@ -81,6 +81,17 @@ module.exports = ctx => {
       claimMemberId: inv.claim && inv.claim.memberId || null,
       claimStaffId: inv.claim && inv.claim.staffId || null };
   });
+  /* N36: wie een manager uit het team haalt, kan zich met zijn oude kassacode
+     niet opnieuw aanmelden. Elke uitnodiging die aan die plek is gekoppeld,
+     wordt ingetrokken; de hersteltak in ./uitnodiging-claim.js weigert dan. */
+  const trekInVoorStaff = (supplierCode, staffId, actor) => transactie(bron => {
+    let n = 0;
+    for (const inv of lijstVan(bron, supplierCode)) {
+      if (!inv.claim || Number(inv.claim.staffId) !== Number(staffId)) continue;
+      bearer.intrekken(inv.toegang, actor, 'medewerker uit het team gehaald'); n++;
+    }
+    return { ok: true, ingetrokken: n };
+  });
   const roteerInvite = (supplierCode, id, actor, idem) => transactie(bron => {
     const inv = lijstVan(bron, supplierCode).find(x => x.id === String(id || ''));
     if (!inv) return { status: 404, error: 'Deze uitnodiging bestaat niet (meer).' };
@@ -111,5 +122,5 @@ module.exports = ctx => {
   });
 
   return { maakKassacode: maakPrefix, findSupplierByName, maakInvite,
-    lijstInvites, trekInviteIn, roteerInvite };
+    lijstInvites, trekInviteIn, trekInVoorStaff, roteerInvite };
 };

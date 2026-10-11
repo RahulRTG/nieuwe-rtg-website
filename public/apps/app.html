@@ -33,9 +33,14 @@
    adres meteen goed -- zonder navigatie. Het is een voorschot en geen besluit:
    restoreSession() toetst de pas opnieuw tegen de sessie en stuurt door als
    het geheugen niet meer klopt. Zonder token, met ?verify=, ?reset= of de
-   Magnaat-kopie blijft alles zoals het was. */
+   Magnaat-kopie blijft alles zoals het was. En ALLEEN in het bovenste venster:
+   staat deze pagina als blad in de werktafel (een oude Homealias), dan geeft
+   het blok hieronder haar terug aan de host, en die leest een ?pas= in het
+   adres als een diepe link en herlaadt dan de hele werktafel. Dat ving
+   test/appmenu.e2e.js ("Reizen & Veilig ..."), en niet de meter. */
 (function () {
   try {
+    if (window.self !== window.top) return;
     var q = new URLSearchParams(location.search);
     if (q.has('pas') || q.has('verify') || q.has('reset') || q.has('magnaat')) return;
     if (!localStorage.getItem('rtg_member_token')) return;

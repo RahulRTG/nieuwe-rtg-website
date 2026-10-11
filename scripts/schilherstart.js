@@ -28,6 +28,9 @@
      binnen   in het actieve blad een echte link aantikken (bestaat de link
               niet, dan zegt de stap dat en navigeert hij het blad zelf)
      thuis    Home, zoals de host dat afhandelt: RTGCommand.open('/apps/app.html')
+     los      een wereld als eigen document openen, buiten de werktafel
+     naarhuis vanuit dat document naar het kale /apps/app.html (waar het RTG-merk
+              en de Edge-deur heen wijzen; zie de stap voor waarom dit geen tik is)
 
    WAT HET MEET, PER STAP
 
@@ -117,7 +120,16 @@ const ROUTE = [
   { doe: 'wereld', pad: '/apps/geld.html', naam: 'Geld', waarom: 'Geld rechtstreeks uit de bank' },
   { doe: 'wereld', pad: '/apps/kantoor.html', naam: 'WorkOS', waarom: 'van wereld naar wereld zonder eerst Home' },
   { doe: 'wereld', pad: '/apps/foundation/os-publiek.html', naam: 'FoundationOS', waarom: 'en nog een' },
-  { doe: 'thuis', pad: THUIS, waarom: 'Home' }
+  { doe: 'thuis', pad: THUIS, waarom: 'Home' },
+  /* De tweede weg naar de werktafel, en de enige waar hij als DOCUMENT
+     terugkomt: een wereld die buiten de werktafel open staat -- de TravelOS-app
+     op het beginscherm (manifest start_url /apps/reizen.html) of een link uit
+     een melding -- en dan het RTG-merk aantikken, dat naar de kale
+     /apps/app.html wijst. Zonder deze twee stappen zag de meter de dubbele
+     opstart van de werktafel maar een keer per ronde, en kon hij een reparatie
+     daarvan niet zien. */
+  { doe: 'los', pad: '/apps/reizen.html', waarom: 'een wereld als eigen document: de TravelOS-app op het beginscherm, of een link uit een melding' },
+  { doe: 'naarhuis', pad: THUIS, waarom: 'vanuit die wereld terug naar de werktafel: het kale /apps/app.html waar het RTG-merk, de Edge-deur en ongeveer 190 links naartoe wijzen' }
 ];
 
 const VIEWPORT = { width: 390, height: 844 };
@@ -215,8 +227,24 @@ function inDocument() {
 
 /* De handelingen, uitgevoerd in de pagina zoals een duim ze uitvoert. */
 async function voerUit(page, s) {
-  if (s.doe === 'laad') {
+  if (s.doe === 'los') {
     await page.goto(page.__base + s.pad, { waitUntil: 'load', timeout: 60000 });
+    return { hoe: 'document' };
+  }
+  if (s.doe === 'laad' || s.doe === 'naarhuis') {
+    if (s.doe === 'laad') await page.goto(page.__base + s.pad, { waitUntil: 'load', timeout: 60000 });
+    else {
+      /* GEEN NAGEMAAKTE TIK. Op een losse wereld wijzen drie links naar de kale
+         werktafel (de Edge-deur, een tekstlink en het RTG-merk), maar de
+         Edge-deur ligt onder de adaptieve balk en de Home-knop van die balk
+         opent een paneel in de balk en navigeert niet. Er is dus geen ENE tik
+         die een duim hier altijd doet. Wat wel vaststaat, is waar elk van die
+         links heen gaat: het kale adres, net als de algemene manifest en
+         ongeveer 190 links in public/. Dat adres openen is de stap, en hij zegt
+         dat ook (hoe: adres). */
+      await page.evaluate((pad) => { location.href = pad; }, s.pad);
+      page.__hoe = 'adres';
+    }
     /* De werktafel is pas de werktafel als de sessie hersteld is. Herlaadt hij
        zichzelf onderweg, dan verdwijnt de context waarin we wachten; dat is
        geen fout van de meting maar precies wat ze telt, dus opnieuw wachten. */
@@ -232,7 +260,7 @@ async function voerUit(page, s) {
         if (Date.now() > tot) throw new Error('de werktafel kwam niet tot een actieve sessie: ' + e.message.split('\n')[0]);
       }
     }
-    return { hoe: 'document' };
+    return { hoe: s.doe === 'laad' ? 'document' : page.__hoe };
   }
   if (s.doe === 'wereld' || s.doe === 'thuis') {
     const ok = await page.evaluate((a) => {
@@ -333,7 +361,7 @@ async function stap(page, cdp, s) {
   }
   /* Het actieve blad is het laatste nieuwe kader dat geen host is. */
   const nieuwBlad = echt.filter((d) => !d.buiten).pop();
-  if (s.doe === 'thuis') page.__blad = null;
+  if (s.doe === 'thuis' || s.doe === 'los' || s.doe === 'naarhuis') page.__blad = null;
   else if (nieuwBlad) page.__blad = new URL(nieuwBlad.url).pathname;
 
   let heapMB = null;

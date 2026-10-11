@@ -22,6 +22,7 @@ module.exports = (ctx) => {
     logActivity, supplierState, officeState, magWerken, pinInfo, pinCheck,
     lijst, zelfde, eigenaarKantoor, kantoorVanZetel, afgeleid, nu, persoonsPoort, sessieregister, zwaarVan } = ctx;
   const productiedeur = require('../kantoor/productiedeur');
+  const startspoor = require('./startspoor')({ db, save, logInlog, logActivity });
 
   /* Het lidnummer uit de lidsleutel. De sleutel is 'user-<id>' -- dezelfde vorm
      die kernlaag1, kernlaag7 en kern/wauw.js al lezen. Geen tweede opzoeking in
@@ -149,20 +150,8 @@ module.exports = (ctx) => {
       staffId: actor.staffId, staffRole: actor.role, manager: actor.manager, ...binding };
     rememberSession(token, zSess);
     legContext(zSess, key, 'zaak', s.code);
-    logInlog('zaak', true, s.code + ' · ' + actor.name + ' via RTG-account', req);
-    logActivity(s.code, actor, actor.name + ' logde in met het RTG-account', 'klok-inlog');
-    /* Rahuls welzijnszin: een stille, eenmalige opmerking bij de start --
-       nooit een blokkade, nooit een score, alleen zorg. Diep in de nacht
-       of bij een zoveelste werkstart vandaag mag dat. */
-    let welzijn = null;
-    const uur = klok.datum().getHours();
-    const wm = db.data.accountWelzijn = db.data.accountWelzijn || {};
-    const vandaag = klok.datum().toISOString().slice(0, 10);
-    const wr = wm[key] = (wm[key] && wm[key].dag === vandaag) ? wm[key] : { dag: vandaag, starts: 0 };
-    wr.starts++;
-    save();
-    if (uur >= 23 || uur < 6) welzijn = 'Late dienst; neem morgen bewust je rust.';
-    else if (wr.starts >= 5) welzijn = 'Dit is al je ' + wr.starts + 'e werkstart vandaag; vergeet de pauze niet.';
+    // de logregels en Rahuls welzijnszin: ./startspoor.js
+    const welzijn = startspoor.naStart(s, actor, key, req);
     return { status: 200, ok: true, rol: r.rol, token, state: supplierState(s, actor), ...(welzijn ? { welzijn } : {}) };
   }
 

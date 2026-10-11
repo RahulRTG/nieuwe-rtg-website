@@ -42,10 +42,11 @@
 'use strict';
 
 const KLOKSOORTEN = Object.freeze({
-  'klok-in': 'een medewerker klokte in (routes/staff/dienst-klok.js; kern/beveiliging/pda/patrouille.js, op een post)',
-  'klok-uit': 'een medewerker klokte uit (routes/staff/dienst-klok.js)',
+  'klok-in': 'een medewerker klokte in (routes/staff/dienst-klok.js; kern/beveiliging/pda/patrouille.js, op een post; kern/mobiliteit/cdt.js, op een chauffeurskaart)',
+  'klok-uit': 'een medewerker klokte uit (routes/staff/dienst-klok.js; kern/mobiliteit/cdt.js, van een chauffeurskaart)',
   'klok-correctie': 'een manager boekte uren bij voor een collega (routes/staff/collega.js)',
-  'klok-inlog': 'een medewerker logde in (routes/supplier/toegang.js; kern/eenaccount/starten.js; routes/supplier/pda/posities-inlog.js)'
+  'klok-inlog': 'een medewerker kwam binnen in een werksessie (routes/supplier/toegang.js; kern/eenaccount/startspoor.js; ' +
+    'routes/supplier/pda/posities-inlog.js; kern/werkbijlogin.js; routes/supplier/pda/posities.js, wisselen)'
 });
 
 // de velden van een bewakersdienst die WANNEER zeggen (besluit 1A): alleen voor een manager en de bewaker zelf
@@ -53,7 +54,26 @@ const DIENSTKLOKVELDEN = Object.freeze(['inklokAt', 'uitklokAt', 'plekIn']);
 
 // de vaste teksten van de klokschrijvers van voor het soortveld
 const OUDE_KLOKTEKST = Object.freeze([/^klokte (?:in|uit)(?: op |$)/, /^boekte een klokcorrectie voor /,
-  / logde in(?: met het RTG-account| \(RTG-account\))?$/]);
+  / logde in(?: met het RTG-account| \(RTG-account\))?$/, / kwam binnen met het RTG-account$/,
+  / wisselde (?:van afdeling \(vanuit |naar deze werkplek$)/, /^meldde zich (?:aan|af) op kaart /]);
+
+/* Hoeveel regels per KLASSE in het zaaklogboek blijven staan (opzet/leverancierpoort.js).
+   Een gezamenlijke grens was een zijkanaal: elke beschermde regel drukte een
+   zichtbare regel van de lijst, en een collega telde aan wat er verdween hoeveel
+   er gebeurde dat hij niet mocht zien. Nu heeft elke klasse een eigen grens:
+   de gewone regels samen, de beschermde per medewerker. */
+const LOGBOEK_PER_KLASSE = 80;
+function bewaarLogboek(lijst) {
+  /* De beschermde regels per EIGENAAR (staffId): ook iemands eigen beschermde
+     regel, die hij wel ziet, mag niet verdwijnen doordat een collega veel klokt. */
+  const tel = new Map();
+  return (Array.isArray(lijst) ? lijst : []).filter((r) => {
+    const bak = isKlokregel(r) ? 'b:' + (r && r.staffId != null ? r.staffId : '-') : 'g';
+    const n = (tel.get(bak) || 0) + 1;
+    tel.set(bak, n);
+    return n <= LOGBOEK_PER_KLASSE;
+  });
+}
 
 const isKlokSoort = (soort) => Object.prototype.hasOwnProperty.call(KLOKSOORTEN, soort);
 
@@ -67,6 +87,8 @@ function isKlokregel(regel) {
 
 // alleen een manager; zonder actor is er niemand om het aan te geven
 const magKlokZien = (actor) => !!(actor && actor.manager === true);
+// is dit van de actor zelf? Altijd op staffId en nooit op naam: twee collega's kunnen dezelfde naam dragen
+const isEigen = (actor, staffId) => !!(actor && actor.staffId != null && staffId != null && String(actor.staffId) === String(staffId));
 
 /* Het logboek voor deze actor: de nieuwste `max` regels die hij mag ontvangen,
    en hoeveel dat er in totaal zijn. */
@@ -74,7 +96,7 @@ function logboekVoor(lijst, actor, max) {
   const alle = Array.isArray(lijst) ? lijst : [];
   const n = Number.isFinite(max) && max >= 0 ? max : 40;
   if (magKlokZien(actor)) return { regels: alle.slice(0, n), totaal: alle.length };
-  const eigen = (r) => !!(actor && actor.staffId != null && r && r.staffId != null && String(r.staffId) === String(actor.staffId));
+  const eigen = (r) => !!r && isEigen(actor, r.staffId);
   const zicht = alle.filter((r) => !isKlokregel(r) || eigen(r)).map((r) => ({ who: r.who, text: r.text, at: r.at }));
   return { regels: zicht.slice(0, n), totaal: zicht.length };
 }
@@ -83,10 +105,7 @@ function logboekVoor(lijst, actor, max) {
    (op staffId en nooit op naam). Wie er binnen is, rekent de aanroeper over het
    HELE boek uit -- dat mag iedereen zien. */
 function klokVandaagVoor(entries, actor) {
-  const alle = Array.isArray(entries) ? entries : [];
-  if (magKlokZien(actor)) return alle;
-  if (!actor || actor.staffId == null) return [];
-  return alle.filter((e) => e && String(e.staffId) === String(actor.staffId));
+  return eigenVoor(entries, actor, (e) => e && e.staffId);
 }
 
 /* Een rij die de in- en uitkloktijd van een mens draagt onder eigen velden
@@ -96,10 +115,19 @@ function klokVandaagVoor(entries, actor) {
 function kloktijdenVoor(rij, actor, eigenaarId, velden = DIENSTKLOKVELDEN) {
   if (!rij || typeof rij !== 'object') return rij;
   if (magKlokZien(actor)) return rij;
-  if (actor && actor.staffId != null && eigenaarId != null && String(actor.staffId) === String(eigenaarId)) return rij;
+  if (isEigen(actor, eigenaarId)) return rij;
   const uit = Object.assign({}, rij);
   for (const v of velden) delete uit[v];
   return uit;
+}
+
+/* Een lijst diensten die elk hun eigen begin en eind dragen (de CDT-diensten van
+   een chauffeur): een manager alles, een ander alleen zijn eigen, op staffId.
+   Een dienst zonder staffId (van voor dit veld) gaat alleen naar een manager. */
+function eigenVoor(lijst, actor, eigenaarVan) {
+  const alle = Array.isArray(lijst) ? lijst : [];
+  if (magKlokZien(actor)) return alle;
+  return alle.filter((x) => isEigen(actor, eigenaarVan(x)));
 }
 
 /* Wie er binnen is, in een VOLGORDE die niets over het klokken zegt. Het
@@ -125,4 +153,4 @@ function staatDelen(data, code, actor, vandaag) {
   };
 }
 
-module.exports = { staatDelen, aanwezigVoor, DIENSTKLOKVELDEN, KLOKSOORTEN, OUDE_KLOKTEKST, isKlokSoort, isKlokregel, magKlokZien, logboekVoor, klokVandaagVoor, kloktijdenVoor };
+module.exports = { staatDelen, aanwezigVoor, eigenVoor, isEigen, bewaarLogboek, LOGBOEK_PER_KLASSE, DIENSTKLOKVELDEN, KLOKSOORTEN, OUDE_KLOKTEKST, isKlokSoort, isKlokregel, magKlokZien, logboekVoor, klokVandaagVoor, kloktijdenVoor };

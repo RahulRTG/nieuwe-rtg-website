@@ -113,7 +113,8 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
       if (actor && actor.staffId != null) regel.staffId = actor.staffId;
     }
     list.unshift(regel);
-    db.data.supplierActivity[code] = list.slice(0, 80);
+    // een eigen grens per klasse: een beschermde regel drukt geen zichtbare regel weg (zijkanaal)
+    db.data.supplierActivity[code] = logboekzicht.bewaarLogboek(list);
     bewaar();
     /* een beschermde regel geeft geen signaal aan het hele team -- een signaal
        zonder zichtbare nieuwe regel zou een collega het tijdstip verraden --

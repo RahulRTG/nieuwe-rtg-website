@@ -42,7 +42,8 @@ app.post('/api/staff/klok/correctie', supplierAuth, (req, res) => {
   db.data.klok[req.supplier.code] = lijst.slice(0, 4000);
   save();
   logActivity(req.supplier.code, req.actor, 'boekte een klokcorrectie voor ' + wie.name, 'klok-correctie');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' });
+  // een correctie verandert niemands aanwezigheid: het signaal alleen voor de managers en wie het betreft
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' }, { staffId });
   res.json({ ok: true, ...klokVan(req.supplier.code, staffId) });
 });
 

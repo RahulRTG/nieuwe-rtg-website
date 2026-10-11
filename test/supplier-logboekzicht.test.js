@@ -236,33 +236,56 @@ test('bron: elke klokschrijver markeert zijn regel met een soort uit de gesloten
   assert.deepEqual(Object.keys(zicht.KLOKSOORTEN).sort(), ['klok-correctie', 'klok-in', 'klok-inlog', 'klok-uit']);
 });
 
-test('bron: in een bestand dat het klokboek of een dienstkloktijd SCHRIJFT, draagt elke logregel een soort of een verklaring', () => {
+test('bron: waar een kloktijd ontstaat of een werksessie wordt gemunt, draagt elke logregel een soort of een verklaring', () => {
   /* De toets hierboven vindt een klokschrijver aan zijn TEKST, en ziet dus niet
-     een nieuwe schrijver met nieuwe woorden ("meldde zich af op <post>" bij het
-     uitklokken van een bewaker kwam er zonder soort doorheen -- tegenlezing PR
-     #584). Hier gaat het andersom: waar een kloktijd ontstaat, is elke
-     logActivity een klokregel (met een soort uit KLOKSOORTEN), tenzij hij
-     hieronder met reden staat. */
+     een nieuwe schrijver met nieuwe woorden ("meldde zich af op <post>" kwam er
+     zonder soort doorheen, en "X kwam binnen met het RTG-account" ook -- twee
+     tegenlezingen van PR #584). Deze toets gaat op VORM: in een bestand dat een
+     kloktijd schrijft, een werksessie munt (rememberSession met role
+     'supplier'), of logActivity krijgt van zo'n bestand, is elke logregel een
+     beschermde regel met een soort uit KLOKSOORTEN, tenzij hij hieronder met
+     reden staat. Ook een alias van logActivity (noteerInlog) telt. */
   const GEEN_KLOKREGEL = {
-    'belde een ingeklokte collega (video)': 'een oproep op het moment van bellen; zegt niets over wanneer iemand in- of uitklokte'
+    'belde een ingeklokte collega (video)': 'een oproep op het moment van bellen; zegt niets over wanneer iemand in- of uitklokte',
+    'stelde het werkvenster bij': 'een instelling van de manager, geen moment waarop iemand binnenkwam'
   };
-  const SCHRIJFT = /(inklokAt|uitklokAt)\s*=[^=]|\.out\s*=\s*new Date|db\.data\.klok\[[^\]]+\]\s*=\s*lijst\.slice/;
-  const bestanden = [];
+  const WORTEL = path.join(__dirname, '..');
+  const SCHRIJFT = /(inklokAt|uitklokAt)\s*=[^=]|\.out\s*=\s*new Date|db\.data\.klok\[[^\]]+\]\s*=\s*lijst\.slice|bak\('mobDiensten'\)\.push/;
+  const MUNT = (t) => /rememberSession\(/.test(t) && /role: 'supplier'/.test(t);
+  const zonderCommentaar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+  const alle = [];
   const loop = (map) => {
     for (const n of fs.readdirSync(map)) {
       const f = path.join(map, n);
       if (fs.statSync(f).isDirectory()) loop(f);
-      else if (n.endsWith('.js') && SCHRIJFT.test(fs.readFileSync(f, 'utf8'))) bestanden.push(f);
+      else if (n.endsWith('.js')) alle.push(f);
     }
   };
-  loop(path.join(__dirname, '..', 'server'));
-  const rel = bestanden.map(f => path.relative(path.join(__dirname, '..'), f)).sort();
-  for (const v of ['server/routes/staff/dienst-klok.js', 'server/routes/staff/collega.js', 'server/kern/beveiliging/pda/patrouille.js'])
-    assert.ok(rel.includes(v), 'de klokschrijver ' + v + ' wordt niet meer herkend');
+  loop(path.join(WORTEL, 'server'));
+  const bestanden = new Set();
+  for (const f of alle) {
+    const t = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    if (!SCHRIJFT.test(t) && !MUNT(t)) continue;
+    bestanden.add(f);
+    // een deelmodule die logActivity van dit bestand krijgt, hoort erbij
+    for (const m of t.matchAll(/require\('(\.[^']+)'\)\(\{[^}]*\blogActivity\b/g)) {
+      const kind = path.resolve(path.dirname(f), m[1]) + (m[1].endsWith('.js') ? '' : '.js');
+      if (fs.existsSync(kind)) bestanden.add(kind);
+    }
+  }
+  const rel = [...bestanden].map(f => path.relative(WORTEL, f)).sort();
+  for (const v of ['server/routes/staff/dienst-klok.js', 'server/routes/staff/collega.js', 'server/kern/beveiliging/pda/patrouille.js',
+    'server/kern/mobiliteit/cdt.js', 'server/kern/werkbijlogin.js', 'server/routes/supplier/toegang.js', 'server/routes/supplier/pda/posities.js',
+    'server/routes/supplier/pda/posities-inlog.js', 'server/kern/eenaccount/starten.js', 'server/kern/eenaccount/startspoor.js'])
+    assert.ok(rel.includes(v), 'de klok- of inlogschrijver ' + v + ' wordt niet meer herkend');
   const fout = [];
+  let gezien = 0;
   for (const f of bestanden) {
-    const t = fs.readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
-    for (const m of t.matchAll(/logActivity(?:\.alleenActiviteit)?\(([^;]*)\);/g)) {
+    const t = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    const namen = ['logActivity(?:\\.alleenActiviteit)?', ...[...t.matchAll(/const (\w+)\s*=[^;]*\blogActivity\b[^;]*;/g)].map(m => m[1])];
+    const roep = new RegExp('\\b(?:' + namen.join('|') + ')\\(([^;]*)\\);', 'g');
+    for (const m of t.matchAll(roep)) {
+      gezien++;
       const arg = m[1];
       if (/'klok-(?:[a-z-]+'|' \+ actie)/.test(arg)) continue;
       const tekst = (arg.match(/'([^']+)'/g) || []).map(s => s.slice(1, -1));
@@ -270,7 +293,8 @@ test('bron: in een bestand dat het klokboek of een dienstkloktijd SCHRIJFT, draa
       fout.push(path.relative(process.cwd(), f) + ': ' + m[0].slice(0, 120));
     }
   }
-  assert.deepEqual(fout, [], 'een logregel naast een kloktijd zonder klok-soort valt buiten de filter van logboekzicht.js');
+  assert.ok(gezien >= 12, 'de scan ziet de logregels nog: ' + gezien);
+  assert.deepEqual(fout, [], 'een logregel bij een kloktijd of een werksessie zonder klok-soort valt buiten de filter van logboekzicht.js');
 });
 
 test('f. de Vloer (/spatial) en het golfvoorstel verraden de inklokvolgorde niet', async () => {

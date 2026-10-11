@@ -947,7 +947,13 @@ terugkrijgt op `staffId` en nooit op naam. Er wordt niets minder geschreven --
 logboek en inlogspoor blijven volledig -- alleen minder geleverd, en een
 beschermde regel stuurt zijn `team`-signaal over SSE alleen naar de managers en
 de medewerker zelf (`alleenVoor` in `kern/sse.js`), omdat een signaal zonder
-zichtbare nieuwe regel een collega het tijdstip verraadt. Hij telt
+zichtbare nieuwe regel een collega het tijdstip verraadt. "Zelf" is altijd het
+`staffId` en nooit de naam (twee collega's kunnen dezelfde naam dragen), elke weg
+die een werksessie munt schrijft een `klok-inlog` (ook binnenkomen met het
+RTG-account en wisselen van werkplek), het CDT-bord van een taxibedrijf geeft
+een chauffeur alleen zijn eigen dienst, en het logboek bewaart de beschermde
+regels per medewerker naast de gewone, zodat ze geen zichtbare regel wegdrukken
+(`test/logboekzicht-eigen.test.js`). Hij telt
 hoeveel TAFELS er nog bij iemand staan die al uitklokte. Dat leest de prikklok
 van het personeelsdomein via `klokVan` (`kern/personeel.js`) en verder niets: het
 besluit staat in NORM.json (`kernGedeeld` 254 -> 255) met wie levert, wie leest

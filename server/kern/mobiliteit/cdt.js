@@ -75,11 +75,13 @@ module.exports = (ctx) => {
     const d = { id: id('dn'), vervoerder: supplier.code, chauffeurskaart: kaart,
       voertuig: schoon(body.voertuig, 40) || null,
       start, eind: null, blokken: [{ soort: 'ander', van: start, tot: null }],
-      startSignalen: rust ? [rust] : [], gemeldDoor: schoon(actor, 60) || 'chauffeur' };
+      startSignalen: rust ? [rust] : [], gemeldDoor: schoon(actor && actor.name, 60) || 'chauffeur',
+      // wie zich aanmeldde, op id: alleen hij en een manager zien begin en eind (kern/leverancier/logboekzicht.js)
+      staffId: actor && actor.staffId != null ? actor.staffId : null };
     opslag.bak('mobDiensten').push(d);
     if (opslag.bak('mobDiensten').length > DIENST_MAX) opslag.zetBak('mobDiensten', opslag.bak('mobDiensten').slice(-DIENST_MAX));
     save();
-    logActivity(supplier.code, actor, 'meldde zich aan op kaart ' + kaart);
+    logActivity(supplier.code, actor || { name: 'chauffeur' }, 'meldde zich aan op kaart ' + kaart, 'klok-in');
     return { ok: true, dienst: dienstBeeld(d), signalen: rust ? [rust] : [] };
   }
 
@@ -122,8 +124,8 @@ module.exports = (ctx) => {
     d.som = { arbeidMin: som.arbeidMin, rijMin: som.rijMin, pauzeMin: som.pauzeMin };
     d.signalen = signalen(som, regimeVan(supplier.code));
     save();
-    logActivity(supplier.code, actor, 'meldde zich af op kaart ' + kaart +
-      ' (' + Math.round(som.arbeidMin / 6) / 10 + ' uur arbeid)');
+    logActivity(supplier.code, actor || { name: 'chauffeur' }, 'meldde zich af op kaart ' + kaart +
+      ' (' + Math.round(som.arbeidMin / 6) / 10 + ' uur arbeid)', 'klok-uit');
     return { ok: true, dienst: dienstBeeld(d) };
   }
 
@@ -144,7 +146,7 @@ module.exports = (ctx) => {
     const som = lopend ? tel(d.blokken) : tel(d.blokken, new Date(d.eind).getTime());
     const sig = lopend ? signalen(som, regimeVan(d.vervoerder)) : (d.signalen || []);
     const ritten = rittenVan(d);
-    return { id: d.id, vervoerder: d.vervoerder, chauffeurskaart: d.chauffeurskaart,
+    return { id: d.id, vervoerder: d.vervoerder, chauffeurskaart: d.chauffeurskaart, staffId: d.staffId != null ? d.staffId : null,
       voertuig: d.voertuig, start: d.start, eind: d.eind, lopend,
       huidigeSoort: (d.blokken.find(b => !b.tot) || {}).soort || null,
       arbeidMin: som.arbeidMin, rijMin: som.rijMin, pauzeMin: som.pauzeMin,

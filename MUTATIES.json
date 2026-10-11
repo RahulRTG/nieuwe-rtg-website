@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T12:27:39.337Z",
-    "commit": "90acde006",
+    "op": "2026-10-11T12:30:37.150Z",
+    "commit": "a8806bf97",
     "boomVuil": true,
     "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
@@ -4202,6 +4202,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 30,
       "scherp": "gezakt"
+    },
+    "festival-terreinboom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/util.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
+      "geprobeerd": 3
     },
     "festival-tijdlijn.test.js": {
       "soort": "puur",

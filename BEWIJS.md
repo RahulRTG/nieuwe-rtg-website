@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2440 bestanden en 16706 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2441 bestanden en 16714 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2440 |
-| losse beweringen (`test(...)`) | 16706 |
+| toetsbestanden | 2441 |
+| losse beweringen (`test(...)`) | 16714 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
-| alleen in de kop *genoemd*, nog niet gemeten | 0 |
+| alleen in de kop *genoemd*, nog niet gemeten | 1 |
 | niets van beide | 0 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2132 bestanden, 16169 beweringen.
+2133 bestanden, 16177 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1528,6 +1528,7 @@ toets omvalt.
 | `rollbackbesluit.test.js` | 4 | gezakt op `&&->||#5` | HET BESLUITREGISTER VAN DE ROLLBACK-AS, EN DE GRENDEL EROP. ROLLBACKBESLUIT.json zegt per route waarom een GEWEIGERD verzoek daar toch iets in de opslag mag achterlaten. |
 | `rollenmatrix.test.js` | 9 | gezakt op `liegpoort /api/` | DE ROLLENMATRIX -- drieënveertig endpoints uit acht torens, een vraag. Deze endpoints wees de waargenomen dekkingsmeting als nooit aangeroepen aan. |
 | `rolproef.test.js` | 15 | gezakt op `===->!==#0` | DE ROL-SCHEIDING (scripts/lib/rolproef.js) -- de proef die vraagt of een INGELOGDE met de verkeerde rol binnenkomt, en of de weigering iets lekt. WAAROM DEZE TOETS ER IS. |
+| `romeproef.test.js` | 8 | genoemd | DE ROMEPROEF -- het instrument en zijn register. scripts/romeproef.js loopt de Rome-keten over LivingOS, WorkOS, TravelOS, het geld en de universele bodem van FoundationOS, tegen een wegwerpserver. |
 | `ronde.test.js` | 11 | gezakt op `===->!==#0` | DE COMMERCIELE RONDE: het werk dat wel gebouwd was en nooit werd gedaan. Vier dingen stonden klaar en werden door niemand aangeroepen. |
 | `rooster-verzuim.test.js` | 4 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `routebron.test.js` | 6 | gezakt op `!==->===#0` | DE BRON VAN EEN ROUTE MET EEN SAMENGESTELD PAD. WAT ER MIS WAS. |

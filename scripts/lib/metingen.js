@@ -511,6 +511,7 @@ const REGISTER = {
   'RITPROEF.json': { eigenRatel: 'test/ritproef.test.js' },
   'TOELATINGSPROEF.json': { eigenRatel: 'test/toelatingsproef.test.js' },
   'ADAMPROEF.json': { eigenRatel: 'test/adamproef.test.js' },
+  'ROMEPROEF.json': { eigenRatel: 'test/romeproef.test.js' },
   'DOELGROEPBEREIK.json': { eigenRatel: 'test/doelgroepbereik.test.js' },
   'ONVERVREEMDBAAR.json': { eigenRatel: 'test/onvervreemdbaar.test.js' },
   'AANVOERVORM.json': { eigenRatel: 'test/aanvoer.test.js' },

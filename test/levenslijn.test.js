@@ -35,6 +35,7 @@ const KIND_NAAM = 'Wilhelmina Petronella Vandenbroeke';
 
 const LEEG = {
   paspoortGeboortejaarVan: () => null,
+  lidstandVan: () => ({ leeftijdBron: 'opgegeven' }),
   onderwijs: { FASEN: LADDER, mijn: () => ({ ok: true, fase: null, jaar: 1, historie: [] }) },
   accRollen: () => ({ rollen: [] }),
   metier: { profielVan: () => ({ rollen: [] }) },
@@ -50,6 +51,7 @@ const faseUit = (l, id) => l.fasen.find(f => f.id === id);
    master bezig, een bewezen werkrol, een partner en twee kinderen. */
 const VOL = {
   paspoortGeboortejaarVan: () => 1994,
+  lidstandVan: () => ({ leeftijdBron: 'opgegeven' }),
   onderwijs: { FASEN: LADDER, mijn: () => ({ ok: true,
     fase: { id: 'wo-m', trap: 'wo', naam: 'Universitaire master' }, jaar: 1,
     historie: [
@@ -241,4 +243,28 @@ test('valt de levensgraaf weg, dan blijft de lijn staan en meldt feiten dat', ()
   assert.ok(f.stil.includes('levensgraaf'));
   assert.deepEqual(f.komt, []);
   assert.ok(f.speelt.length >= 1, 'wat er speelt hangt niet aan de termijnen');
+});
+
+/* 10. HET GEBOORTEJAAR ZEGT WAAR HET VANDAAN KOMT (LEVEN.md par. 2.10). Een
+   datum die het lid bij de aanmelding intypte is geen paspoortgegeven; hier
+   stond er altijd "uit uw geverifieerde paspoort" bij, ook bij een lid dat
+   nooit een document liet zien. Alleen als de keurder de datum van het
+   document overnam (`leeftijdBron === 'paspoort'`) mag dat er staan.
+   Mutatie gezien: `gezien` in geboorte.js hard op true gezet -- de eerste
+   bewering zakt. */
+test('het geboortejaar noemt zijn herkomst: paspoort alleen als RTG het document zag', () => {
+  const regel = (over) => faseUit(motor(Object.assign({}, VOL, over)).lijn('user-geb'), 'geboorte').gegevens.join(' | ');
+  const opgegeven = regel({ lidstandVan: () => ({ leeftijdBron: 'opgegeven' }) });
+  assert.match(opgegeven, /^opgegeven: /, 'de bron heet zoals leeftijdBron hem noemt');
+  assert.doesNotMatch(opgegeven, /paspoort/i, 'een opgegeven datum is geen paspoortgegeven');
+  assert.match(opgegeven, /zelf opgaf/);
+  assert.match(regel({ lidstandVan: () => ({ leeftijdBron: 'paspoort' }) }), /^paspoort: geboortejaar 1994 uit uw geverifieerde paspoort$/);
+  /* Ontbreekt de herkomstvraag in de kern (een gebroken bedrading), dan valt
+     de bron NIET stil terug op "opgegeven": hij staat in stil[], zodat het
+     scherm zegt dat het beeld niet compleet is.
+     Mutatie gezien: in geboorte.js de throw vervangen door `return 'opgegeven'`
+     -- stil blijft leeg. */
+  const kapot = motor(Object.assign({}, VOL, { lidstandVan: undefined })).lijn('user-geb');
+  assert.ok(kapot.stil.includes('paspoort'), 'een ontbrekende herkomstvraag is een stille bron, geen opgave');
+  assert.equal(faseUit(kapot, 'geboorte').staat, 'nvt');
 });

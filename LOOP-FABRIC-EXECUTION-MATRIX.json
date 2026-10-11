@@ -89,7 +89,7 @@
         "kernelModules": 2598,
         "mutationContracts": 60,
         "routes": 63,
-        "screens": 10,
+        "screens": 20,
         "dataSchema": "geen runtimewijziging",
         "newSharedPrimitive": "geen",
         "crossDomainDependencies": "geen",

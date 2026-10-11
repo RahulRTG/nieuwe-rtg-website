@@ -15397,7 +15397,7 @@
         "declaredMutationSemantics": 315,
         "sourceFileCount": 201,
         "kernelDependencyCount": 2612,
-        "screenCount": 39,
+        "screenCount": 41,
         "sourceFiles": [
           "server/routes/agenda.js",
           "server/routes/alpine.js",
@@ -15458,7 +15458,7 @@
           "public/apps/horeca-pda.html",
           "public/apps/horeca.html"
         ],
-        "screensOmitted": 27,
+        "screensOmitted": 29,
         "signals": [
           "decision",
           "feedback",
@@ -26766,7 +26766,7 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 2,
         "kernelDependencyCount": 22,
-        "screenCount": 0,
+        "screenCount": 14,
         "sourceFiles": [
           "server/opzet/stroomtoegang.js",
           "server/routes/social.js"
@@ -26797,8 +26797,21 @@
           "server/kern/veilig.js"
         ],
         "kernelDependenciesOmitted": 0,
-        "screens": [],
-        "screensOmitted": 0,
+        "screens": [
+          "public/apps/comm.html",
+          "public/apps/geld.html",
+          "public/apps/gereedschap.html",
+          "public/apps/media.html",
+          "public/apps/meet.html",
+          "public/apps/podium.html",
+          "public/apps/residentie.html",
+          "public/apps/rtg.html",
+          "public/apps/service-bel.html",
+          "public/apps/service.html",
+          "public/apps/sociaal.html",
+          "public/apps/spelen.html"
+        ],
+        "screensOmitted": 2,
         "signals": [
           "decision",
           "feedback",

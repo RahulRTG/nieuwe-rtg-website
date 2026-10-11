@@ -16,11 +16,11 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 const { MACHTIGINGEN } = require('../server/kern/appstore/machtigingen');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-'));
-let srv, base, lid, sup, supVrij, office, tech;
+let srv, base, lid, sup, supVrij, office, tekenaar, tech;
 const ORG = 'O-APPSTORE';
 
 function api(pad, body, token) {
@@ -75,6 +75,9 @@ test.before(async () => {
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
   lid = reg.body.token; assert.ok(lid, 'lid geregistreerd');
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  /* DE TEKENAAR IS EEN MENS OP NAAM: de gedeelde code met een getypte naam
+     tekent geen app meer af (kern/appstore/vierogen.js, 11 oktober 2026). */
+  tekenaar = await kantoorAlsPersoon(base);
   assert.ok(office, 'kantoor ingelogd');
   tech = (await api('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
   assert.ok(tech, 'de eigenaar komt op de technische pagina');
@@ -165,7 +168,7 @@ test('5. door de machine is NIET gepubliceerd', async () => {
 test('6. publiceren kan alleen een mens van RTG, niet de uitgever zelf', async () => {
   assert.equal((await api('/api/appstore/kantoor/besluit', { versieId, besluit: 'gepubliceerd', door: 'Sam' }, sup)).status, 401,
     'een uitgeverstoken komt de keuringsdeur niet door');
-  assert.equal((await api('/api/appstore/kantoor/besluit', { versieId, besluit: 'gepubliceerd' }, office)).status, 400,
+  assert.equal((await api('/api/appstore/kantoor/besluit', { versieId, besluit: 'gepubliceerd' }, tekenaar)).status, 400,
     'een besluit zonder naam is een besluit dat niemand nam');
   const w = await api('/api/appstore/kantoor/wachtrij', {}, office);
   assert.ok(w.body.inzendingen.some(v => v.id === versieId), 'hij staat in de wachtrij');
@@ -179,7 +182,7 @@ test('6. publiceren kan alleen een mens van RTG, niet de uitgever zelf', async (
      raden waarom -- en dan is de poort een muur. */
   assert.equal(w.body.inzendingen.find(v => v.id === versieId).toegankelijk, null,
     'zolang er niets is gekeurd, staat er ook geen uitslag bij de inzending');
-  const zonder = await api('/api/appstore/kantoor/besluit', { versieId, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  const zonder = await api('/api/appstore/kantoor/besluit', { versieId, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar);
   assert.equal(zonder.status, 409, 'en publiceren kan dan niet');
   assert.match(zonder.body.error, /nog niet over deze bundel gedraaid/);
   await api('/api/appstore/kantoor/toegankelijk', { versieId, stand: 'in-orde', fouten: 0 }, office);
@@ -188,7 +191,7 @@ test('6. publiceren kan alleen een mens van RTG, niet de uitgever zelf', async (
   assert.equal(na && na.stand, 'in-orde', 'daarna reist de uitslag mee naar het keuringsscherm');
   assert.equal(na.hash, w.body.inzendingen.find(v => v.id === versieId).hash,
     'en hij hangt aan de bundel waarover hij gaat');
-  const b = await api('/api/appstore/kantoor/besluit', { versieId, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  const b = await api('/api/appstore/kantoor/besluit', { versieId, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar);
   assert.equal(b.status, 200);
   assert.equal(b.body.versie.status, 'gepubliceerd');
   const cat = await api('/api/appstore/catalogus', {}, lid);
@@ -326,7 +329,7 @@ test('11. een geschorste uitgever verliest zijn etalage op hetzelfde moment', as
     bestanden: bundel([{ pad: 'extra.txt', inhoud: 'versie 1.0.1' }]) }, sup);
   assert.equal(r.status, 200, JSON.stringify(r.body.bevindingen || r.body.error || ''));
   await api('/api/appstore/kantoor/toegankelijk', { versieId: r.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
-  assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office)).status, 200);
+  assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar)).status, 200);
   assert.equal((await api('/api/appstore/catalogus', {}, lid)).body.totaal, 1);
 
   const s = await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'geschorst', reden: 'toets: de uitgever bleek onbereikbaar', door: 'Sam van RTG' }, office);
@@ -371,7 +374,7 @@ test('13. de uitgever heeft zijn eigen noodrem, en het lid zijn eigen gum', asyn
     bestanden: bundel([{ pad: 'extra.txt', inhoud: 'versie 1.1.0' }]) }, sup);
   assert.equal(r.status, 200, JSON.stringify(r.body.bevindingen || r.body.error || ''));
   await api('/api/appstore/kantoor/toegankelijk', { versieId: r.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
-  assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office)).status, 200);
+  assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar)).status, 200);
 
   // de uitgever ziet wat een lid straks ziet
   const vb = await api('/api/appstore/uitgever/voorbeeld', { sleutel: 'derden-teller' }, sup);
@@ -419,11 +422,11 @@ test('14. een geweigerde versie laat geen bytes achter, wel het bewijs', async (
 
   assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'geweigerd' }, office)).status, 400,
     'een weigering zonder naam wordt niet aangenomen');
-  assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'geweigerd', reden: 'kort', door: 'Sam van RTG' }, office)).status, 400,
+  assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'geweigerd', reden: 'kort', door: 'Sam van RTG' }, tekenaar)).status, 400,
     'en een weigering zonder deugdelijke reden ook niet');
 
   const w = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'geweigerd',
-    reden: 'de app doet niet wat hij in zijn uitleg belooft', door: 'Sam van RTG' }, office);
+    reden: 'de app doet niet wat hij in zijn uitleg belooft', door: 'Sam van RTG' }, tekenaar);
   assert.equal(w.status, 200);
   assert.equal(fs.existsSync(map), false, 'daarna liggen de bytes er niet meer: niets kan ze nog uitleveren');
   /* Wat het bewijs draagt blijft wel staan -- anders is een weigering achteraf

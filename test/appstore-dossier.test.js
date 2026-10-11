@@ -25,10 +25,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-dossier-'));
-let srv, base, lid, lid2, sup, office, tech, hash;
+let srv, base, lid, lid2, sup, office, tekenaar, tech, hash;
 const ORG = 'O-DOSSIER';
 
 function api(pad, body, token) {
@@ -58,7 +58,7 @@ async function publiceer(over) {
      want deze toetsen gaan over de winkel en niet over de keuring. */
   await api('/api/appstore/kantoor/toegankelijk',
     { versieId: r.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
-  const b = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  const b = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar);
   assert.equal(b.status, 200, JSON.stringify(b.body));
   return r.body.versie;
 }
@@ -71,6 +71,9 @@ test.before(async () => {
   lid2 = (await api('/api/auth/register', { name: 'Ander Lid', email: 'ander@x.nl', phone: '0612345672',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  /* DE TEKENAAR IS EEN MENS OP NAAM: de gedeelde code met een getypte naam
+     tekent geen app meer af (kern/appstore/vierogen.js, 11 oktober 2026). */
+  tekenaar = await kantoorAlsPersoon(base);
   tech = (await api('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
   const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const chef = (roster.staff || []).find(x => x.role === 'manager');
@@ -293,7 +296,7 @@ test('9. een uitgever leest wat de klant leest -- en alleen over zijn eigen app'
     { manifest: manifest({ sleutel: 'andermans-app', naam: 'Andermans app' }), bestanden: bundel() }, sup2);
   assert.equal(ander.status, 200, JSON.stringify(ander.body.fouten || ander.body.bevindingen || ander.body.error || ''));
   await api('/api/appstore/kantoor/toegankelijk', { versieId: ander.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
-  await api('/api/appstore/kantoor/besluit', { versieId: ander.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/besluit', { versieId: ander.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar);
 
   assert.equal((await api('/api/appstore/uitgever/dossier', { sleutel: 'andermans-app' }, sup2)).status, 200,
     'de eigenaar leest hem wel');

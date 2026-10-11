@@ -15,6 +15,8 @@ const inzagelog = require('../../inzagelog');  // spoor bij elke blik in de iden
 const envelop = require('../../opzet/envelop');
 const productiedeur = require('./productiedeur');
 
+const { vanSessie: idHard } = require('./envelopidentiteit');
+
 function maakKantoor({ db, save, bewerkCollectie, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes, publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal }) {
   const metrics = require('./metrics')({ db, accounts, conciergeInbox, beveilig });
   /* De kluispoort staat in ./kluispoort.js: hij is geen variant van officeAuth
@@ -44,7 +46,7 @@ function maakKantoor({ db, save, bewerkCollectie, sessionFor, eigenaar, accounts
       const pd = productiedeur.sessieMag(sess);
       if (!pd.ok) return res.status(pd.status).json(pd.body);
       envelop.zet(req, { soort: 'kantoor', id: sess.lidKey || null,
-        identiteit: sess.lidKey ? 'bewezen' : 'anoniem' });
+        identiteit: idHard(sess) });
       // het handvat van de mens: waarmee een besluit kan zien dat twee
       // handelingen niet van dezelfde persoon zijn (kern/appstore/vierogen.js)
       req.officeKey = sess.lidKey || null;
@@ -57,9 +59,9 @@ function maakKantoor({ db, save, bewerkCollectie, sessionFor, eigenaar, accounts
         const pe = productiedeur.eigenaarDirect();
         if (!pe.ok) return res.status(pe.status).json(pe.body);
         req.eigenaar = true;
-        req.officeKey = 'user-' + u.id;   // zie hierboven
-        envelop.zet(req, { soort: 'eigenaar', id: 'user-' + u.id,
-          identiteit: 'bewezen', gezagBron: 'eigenaar', gezagBaas: true });
+        req.officeKey = 'user-' + u.id;
+        envelop.zet(req, { soort: 'eigenaar', id: 'user-' + u.id, identiteit: idHard(null, true),
+          gezagBron: 'eigenaar', gezagBaas: true });
         try { mensdeur.tel(req, res, true); } catch (e) {}
         return poort(req, res, 'user-' + u.id, next);
       }

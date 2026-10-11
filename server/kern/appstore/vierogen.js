@@ -20,8 +20,9 @@
                   Dit is de harde vergelijking; hij kan alleen ja of nee zeggen
                   als BEIDE kanten er een hebben.
      de naam      wat er op de handtekening staat. Zwakker -- namen zijn te
-                  typen -- maar het is het enige dat werkt wanneer het kantoor
-                  op een gedeelde code binnenkomt.
+                  typen -- en daarom alleen een EXTRA blokkade (dezelfde naam
+                  tekent niet af), nooit een doorlaat: een gedeelde code met een
+                  getypte naam tekent niets af (zie onder).
 
    ZONDER IDENTITEIT GAAT DE DEUR DICHT (AUTHORITY.md B2, besluit van de
    eigenaar, 23 september 2026). Eerst stond hier het omgekeerde: kende de toets
@@ -63,12 +64,21 @@ function toets({ inzender, doorKey, doorNaam }) {
     return { mag: true, graad: 'bewezen',
       reden: 'De inzender en de ondertekenaar zijn twee verschillende mensen, en dat is aan hun inlog vastgesteld.' };
   }
-  if (naamBekend) {
-    return { mag: true, graad: 'opgegeven',
-      reden: 'De namen verschillen. Dat is vastgesteld op wat er is ingetypt en niet op twee inlogs; de scheiding is dus opgegeven en niet bewezen.' };
+  /* EEN GETYPTE NAAM IS GEEN TWEEDE HANDTEKENING (besluit van de eigenaar,
+     11 oktober 2026). Hier stond een tak die doorliet op twee VERSCHILLENDE
+     namen, met graad `opgegeven`: de gedeelde kantoorcode plus een willekeurige
+     naam in `door` publiceerde dan een app. Een opgegeven naam, een bestaande
+     sessie en een bewezen identiteit zijn drie verschillende dingen, en alleen
+     de laatste mag een tweede paar ogen heten. Zonder sleutel aan de kant van
+     wie tekent, gaat de deur dus dicht -- met de weg erheen. De graad blijft
+     staan als BESCHRIJVING van wat er lag, niet als vergunning. Zonder naam EN
+     zonder sleutel valt het hieronder in `geen-identiteit`, ook dicht. */
+  if (naamBekend && !doorKey) {
+    return { mag: false, graad: 'opgegeven', code: 'geen-tweede-mens',
+      reden: 'Een ingetypte naam is geen handtekening: met de gedeelde kantoorcode is niet vast te stellen wie er tekent. Log in op naam met uw eigen RTG-account (kantoorrol) en teken dan af.' };
   }
   return { mag: false, graad: 'onbekend', code: 'geen-identiteit',
-    reden: 'Van de inzender of de ondertekenaar is geen persoon bekend, dus niet vast te stellen of dit twee verschillende mensen zijn. Laat de uitgever opnieuw inzenden met een persoonlijke inlog, en teken af met uw eigen account of uw naam.' };
+    reden: 'Van de inzender of de ondertekenaar is geen persoon bekend, dus niet vast te stellen of dit twee verschillende mensen zijn. Laat de uitgever opnieuw inzenden met een persoonlijke inlog, en teken af met uw eigen account op naam -- een getypte naam is geen handtekening.' };
 }
 
 module.exports = { toets, normNaam };

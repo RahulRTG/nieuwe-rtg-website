@@ -17,7 +17,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
-  wachtOpTekst } = require('./helper');
+  wachtOpTekst, kantoorAlsPersoon } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -154,6 +154,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
     // ---- opzetten: uitgever, app, publicatie, lid ----
     const tech = (await api(base, '/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
     const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+    const tekenaar = await kantoorAlsPersoon(base); // een mens op naam tekent af (vierogen.js)
     const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
     const chef = (roster.staff || []).find(x => x.role === 'manager');
     const sup = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
@@ -175,7 +176,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
     assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
     await api(base, '/api/appstore/kantoor/toegankelijk', { versieId: inz.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
     assert.equal((await api(base, '/api/appstore/kantoor/besluit',
-      { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office)).status, 200);
+      { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar)).status, 200);
 
     /* Het lid verleent er EEN van de twee. Dat is de kern van de toets: de app
        probeert straks allebei, in een echte browser, en krijgt er een. */
@@ -241,6 +242,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
   try {
     const tech = (await api(base, '/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
     const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+    const tekenaar = await kantoorAlsPersoon(base); // een mens op naam tekent af (vierogen.js)
     const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
     const chef = (roster.staff || []).find(x => x.role === 'manager');
     const sup = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
@@ -257,7 +259,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
       bestanden: [{ pad: 'index.html', inhoud: PROEF_HTML }, { pad: 'app.js', inhoud: PROEF_JS }] }, sup);
     assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
     await api(base, '/api/appstore/kantoor/toegankelijk', { versieId: inz.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
-    await api(base, '/api/appstore/kantoor/besluit', { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+    await api(base, '/api/appstore/kantoor/besluit', { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar);
 
     browser = await pw.chromium.launch(browserOpties(pw));
 

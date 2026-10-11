@@ -2,8 +2,8 @@
 
    WAT DIT OPLOST. KANTOOR.md par. 3 en KANTOORMACHT.md par. 0 zeggen hetzelfde:
    een spoor dat eindigt bij een gedeelde code is geen spoor, het is een alibi.
-   `officeAuth` WEET dat al -- hij zet `identiteit: 'bewezen'` of `'anoniem'` op
-   de envelop en legt `req.officeKey` klaar -- en niets doet er iets mee. Dit
+   `officeAuth` WEET dat al -- hij zet `identiteit: 'bewezen'` (passkey),
+   `'opNaam'` (eigen account, geen passkey) of `'anoniem'` op de envelop en legt `req.officeKey` klaar -- en niets doet er iets mee. Dit
    bestand doet er iets mee, en met opzet het minste dat werkt: het TELT.
 
    WAAROM TELLEN EN NIET WEIGEREN. Dat is de huisregel uit CONTROLPLANE.md en

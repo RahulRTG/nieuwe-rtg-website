@@ -27,7 +27,7 @@ const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 const { splitsBruto } = require('../server/kern/fiscaal/digitaal');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-geld-'));
-let srv, base, lid, lidCode, sup, office, tech;
+let srv, base, lid, lidCode, sup, office, tekenaar, tech;
 const ORG = 'O-GELD';
 const PRIJS = 999;
 
@@ -59,7 +59,7 @@ async function publiceer(over) {
      want deze toetsen gaan over de winkel en niet over de keuring. */
   await api('/api/appstore/kantoor/toegankelijk',
     { versieId: r.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
-  const b = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  const b = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar);
   assert.equal(b.status, 200, JSON.stringify(b.body));
   return r.body.versie;
 }
@@ -77,6 +77,9 @@ test.before(async () => {
   lidCode = (await api('/api/pay/overzicht', {}, lid)).body.codenaam;
   assert.ok(lid && lidCode, 'een lid met een wallet');
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  /* DE TEKENAAR IS EEN MENS OP NAAM: de gedeelde code met een getypte naam
+     tekent geen app meer af (kern/appstore/vierogen.js, 11 oktober 2026). */
+  tekenaar = await kantoorAlsPersoon(base);
   tech = (await api('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
   const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const chef = (roster.staff || []).find(x => x.role === 'manager');
@@ -185,12 +188,17 @@ test('6. de afdracht werkt vooruit; een geschreven bon wordt nooit herrekend', a
   const eerste = (await api('/api/appstore/bonnen', {}, lid)).body.bonnen[0];
   assert.equal(eerste.afdrachtProcent, 0);
 
-  assert.equal((await api('/api/appstore/kantoor/afdracht', { procent: 15 }, office)).status, 400, 'zonder naam en reden gaat het niet');
-  const z = await api('/api/appstore/kantoor/afdracht', { procent: 15, reden: 'toets: RTG gaat een deel inhouden', door: 'Sam van RTG' }, office);
+  assert.equal((await api('/api/appstore/kantoor/afdracht', { procent: 15 }, tekenaar)).status, 400, 'zonder naam en reden gaat het niet');
+  /* De gedeelde code met een getypte naam zet geen geldinstelling: een opgegeven
+     naam is geen actor (11 oktober 2026). */
+  const getypt = await api('/api/appstore/kantoor/afdracht', { procent: 15, reden: 'toets: RTG gaat een deel inhouden', door: 'Sam van RTG' }, office);
+  assert.equal(getypt.status, 403, 'de gedeelde code zette de afdracht: ' + JSON.stringify(getypt.body));
+  assert.equal(getypt.body.watNu, 'inloggen-op-naam');
+  const z = await api('/api/appstore/kantoor/afdracht', { procent: 15, reden: 'toets: RTG gaat een deel inhouden', door: 'Sam van RTG' }, tekenaar);
   assert.equal(z.status, 200);
   assert.equal(z.body.afdracht.procent, 15);
   assert.match(z.body.let, /niet herrekend/);
-  assert.equal((await api('/api/appstore/kantoor/afdracht', { procent: 99, reden: 'te veel', door: 'Sam' }, office)).status, 400, 'er zit een bovengrens op');
+  assert.equal((await api('/api/appstore/kantoor/afdracht', { procent: 99, reden: 'te veel', door: 'Sam' }, tekenaar)).status, 400, 'er zit een bovengrens op');
 
   assert.equal((await api('/api/appstore/bonnen', {}, lid)).body.bonnen[0].afdrachtProcent, 0,
     'de bon van gisteren houdt het percentage van gisteren');

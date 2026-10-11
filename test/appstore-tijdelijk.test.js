@@ -17,11 +17,11 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 const { leesTot, isVerlopen } = require('../server/kern/appstore/tijdelijk');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-tijdelijk-'));
-let srv, base, lid, sup, office, tech;
+let srv, base, lid, sup, office, tekenaar, tech;
 const VANDAAG = '2026-08-31T10:00:00Z';
 
 function api(pad, body, token) {
@@ -57,6 +57,9 @@ test.before(async () => {
   lid = (await api('/api/auth/register', { name: 'Tijd Lid', email: 't@x.nl', phone: '0612340009',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  /* DE TEKENAAR IS EEN MENS OP NAAM: de gedeelde code met een getypte naam
+     tekent geen app meer af (kern/appstore/vierogen.js, 11 oktober 2026). */
+  tekenaar = await kantoorAlsPersoon(base);
   tech = (await api('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
   const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const chef = (roster.staff || []).find(x => x.role === 'manager');
@@ -75,7 +78,7 @@ test.before(async () => {
   }, sup);
   assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
   await api('/api/appstore/kantoor/toegankelijk', { versieId: inz.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
-  await api('/api/appstore/kantoor/besluit', { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/besluit', { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar);
 });
 test.after(() => stop(srv));
 

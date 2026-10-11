@@ -13,9 +13,10 @@ module.exports = (kern) => {
   const naam = (req) => String(req.body.door || '').trim().slice(0, 80);
   /* WIE TEKENT ER, als persoon. Een kantoorsessie is een code en niet vanzelf
      een mens; alleen wie met zijn eigen inlog binnenkomt heeft een sleutel
-     (kern/kantoor/index.js zet die op het verzoek). Ontbreekt hij, dan valt de
-     vier-ogenregel terug op de naam en zegt het dossier dat de scheiding is
-     OPGEGEVEN en niet bewezen. */
+     (kern/kantoor/index.js zet die op het verzoek). Ontbreekt hij, dan tekent
+     er niemand af: een getypte `door` is een LABEL op het besluit en nooit de
+     tweede handtekening (kern/appstore/vierogen.js, besluit van 11 oktober
+     2026). De sleutel komt uit de sessie en nooit uit het lijf. */
   const wieKey = (req) => req.officeKey || null;
 
   // de wachtrij: alles wat de machinepoort heeft doorgelaten en op een mens wacht
@@ -85,6 +86,13 @@ module.exports = (kern) => {
   app.post('/api/appstore/kantoor/afdracht', officeAuth, (req, res) => {
     if (!geld()) return geenGeld(res);
     if (req.body.procent == null) return res.json({ afdracht: geld().afdracht(), max: geld().AFDRACHT_MAX });
+    /* ZETTEN VRAAGT EEN MENS OP NAAM (11 oktober 2026). De afdracht bepaalt wat
+       elke uitgever van nu af aan betaalt; hier kon de gedeelde kantoorcode hem
+       zetten met een willekeurige getypte naam eronder. Een opgegeven naam is
+       geen actor: zonder sessiesleutel (`req.officeKey`) gaat er niets door. De
+       naam blijft het LABEL dat uitgevers lezen -- de sleutel hoort in geen
+       antwoord (zie publiekV in kern/appstore/versies.js). Lezen blijft open. */
+    if (!wieKey(req)) return res.status(403).json({ error: 'De afdracht zetten vraagt een kantoorsessie op naam: een getypte naam is geen handtekening onder wat elke uitgever betaalt. Log in met uw eigen RTG-account.', watNu: 'inloggen-op-naam' });
     antwoord(res, geld().afdrachtZet({ procent: req.body.procent, reden: req.body.reden, door: naam(req) }));
   });
 

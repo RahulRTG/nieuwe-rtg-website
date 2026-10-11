@@ -11,11 +11,12 @@
      3. Dezelfde SLEUTEL tekent niet af -- dat is de harde vergelijking.
      4. Dezelfde NAAM tekent ook niet af -- de zachte, voor een gedeelde
         kantoorcode, en die is er juist voor het geval dat hierboven niet werkt.
-     5. Een besluit draagt de GRAAD van de scheiding: bewezen (twee inlogs),
-        opgegeven (twee ingetypte namen) of onbekend. "Twee mensen" is een andere
-        bewering wanneer hij op een inlog rust dan wanneer hij op een tekstveld
-        rust, en het dossier hoort dat verschil te tonen.
-     6. Twee verschillende mensen komen er gewoon door.
+     5. Een besluit draagt de GRAAD van de scheiding, en alleen `bewezen` (twee
+        inlogs) laat door. Een getypte naam is GEEN tweede handtekening
+        (besluit van de eigenaar, 11 oktober 2026): de gedeelde kantoorcode met
+        een andere naam in `door` publiceert niets.
+     6. Twee verschillende mensen OP NAAM komen er gewoon door; dezelfde mens
+        aan beide kanten niet.
 
    Draai los: node --test test/appstore-vierogen.test.js */
 const test = require('node:test');
@@ -23,11 +24,11 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody, keurLidGoed } = require('./helper');
 const vierogen = require('../server/kern/appstore/vierogen');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vierogen-'));
-let srv, base, sup, office, tech, actorNaam;
+let srv, base, sup, office, opNaam, tech, actorNaam;
 
 function api(pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -52,7 +53,16 @@ test('0. de toets zelf: sleutel gaat voor naam, en de graad zegt hoe hard hij is
   assert.equal(zelfdeNaam.code, 'zelfde-naam');
 
   assert.equal(vierogen.toets({ inzender: { id: 'a', naam: 'Sam' }, doorKey: 'b', doorNaam: 'Ada' }).graad, 'bewezen');
-  assert.equal(vierogen.toets({ inzender: { id: null, naam: 'Sam' }, doorKey: null, doorNaam: 'Ada' }).graad, 'opgegeven');
+  /* EEN GETYPTE NAAM TEKENT NIETS AF. De namen verschillen, maar wie tekent
+     heeft geen sleutel: dat is de gedeelde kantoorcode met een woord erbij. */
+  const getypt = vierogen.toets({ inzender: { id: null, naam: 'Sam' }, doorKey: null, doorNaam: 'Ada' });
+  assert.equal(getypt.mag, false, 'een getypte naam telde als tweede handtekening');
+  assert.equal(getypt.graad, 'opgegeven', 'de graad beschrijft wat er lag');
+  assert.equal(getypt.code, 'geen-tweede-mens');
+  assert.match(getypt.reden, /op naam/, 'de weigering zegt hoe het wel kan');
+  const getyptMetInzender = vierogen.toets({ inzender: { id: 'staff:K:9', naam: 'Sam' }, doorKey: null, doorNaam: 'Ada' });
+  assert.equal(getyptMetInzender.mag, false, 'ook met een bekende inzender is een getypte naam geen tweede mens');
+  assert.equal(getyptMetInzender.code, 'geen-tweede-mens');
   const onbekend = vierogen.toets({ inzender: null, doorKey: null, doorNaam: 'Ada' });
   assert.equal(onbekend.graad, 'onbekend');
   assert.equal(onbekend.mag, false, 'zonder identiteit is niet vast te stellen dat het twee mensen zijn: dicht (AUTHORITY.md B2)');
@@ -66,6 +76,8 @@ test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  opNaam = await kantoorAlsPersoon(base);
+  assert.ok(opNaam, 'een kantoormens op naam hoort in te loggen');
   tech = (await api('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
   const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const chef = (roster.staff || []).find(x => x.role === 'manager');
@@ -100,15 +112,25 @@ test('2. dezelfde NAAM tekent niet af', async () => {
   assert.match(r.body.error, /tekent hem niet af/);
 });
 
-test('3. een andere mens komt er wel door, en de graad staat erbij', async () => {
+test('3. de gedeelde code met een getypte naam publiceert NIET; een tweede mens op naam wel', async () => {
   const wachtrij = (await api('/api/appstore/kantoor/wachtrij', {}, office)).body;
   const v = wachtrij.inzendingen.find(x => x.sleutel === 'vierogen-proef');
-  const r = await api('/api/appstore/kantoor/besluit',
+  /* HET LEK: een andere naam typen in `door` was genoeg om met de gedeelde
+     kantoorcode een app live te zetten. */
+  const getypt = await api('/api/appstore/kantoor/besluit',
     { versieId: v.id, besluit: 'gepubliceerd', door: 'Ada van RTG' }, office);
+  assert.equal(getypt.status, 403, 'de gedeelde code plus een getypte naam publiceerde: ' + JSON.stringify(getypt.body));
+  assert.equal(getypt.body.code, 'geen-tweede-mens');
+  assert.match(getypt.body.error, /op naam/, 'de weigering zegt de weg erheen');
+  const nog = (await api('/api/appstore/kantoor/wachtrij', {}, office)).body.inzendingen.find(x => x.id === v.id);
+  assert.ok(nog, 'de inzending staat nog in de wachtrij: er is niets gepubliceerd');
+
+  const r = await api('/api/appstore/kantoor/besluit',
+    { versieId: v.id, besluit: 'gepubliceerd', door: 'Ada van RTG' }, opNaam);
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.equal(r.body.versie.besluit.scheiding.graad, 'opgegeven',
-    'een gedeelde kantoorcode levert geen bewezen scheiding op, en dat hoort er te staan');
-  assert.match(r.body.versie.besluit.scheiding.uitleg, /ingetypt/);
+  assert.equal(r.body.versie.status, 'gepubliceerd');
+  assert.equal(r.body.versie.besluit.scheiding.graad, 'bewezen',
+    'twee inlogs: de scheiding is bewezen en niet opgegeven');
 });
 
 test('4. de wachtrij toont de inzender, zodat de mens die tekent het ZIET', async () => {
@@ -117,4 +139,45 @@ test('4. de wachtrij toont de inzender, zodat de mens die tekent het ZIET', asyn
   const v = wachtrij.inzendingen.find(x => x.sleutel === 'vierogen-proef' && x.versie === '1.1.0');
   assert.ok(v, 'de nieuwe inzending staat in de wachtrij');
   assert.equal(v.inzender.naam, actorNaam, 'wie tekent, ziet van wie hij tekent');
+});
+
+test('5. dezelfde mens aan beide kanten publiceert NIET, ook op naam', async () => {
+  /* Een mens die zowel uitgever (als PERSOON, met zijn ledensleutel) als
+     kantoormedewerker op naam is (dezelfde sleutel). Twee inlogs, een mens:
+     dat is geen tweede paar ogen. */
+  const u = Date.now().toString(36);
+  const email = 'vierogen-' + u + '@voorbeeld.test';
+  const reg = await api('/api/auth/register', { name: 'Vierogen Zelf', email,
+    phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)),
+    password: 'Geheim123!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  assert.ok(reg.body.token, 'geregistreerd: ' + JSON.stringify(reg.body).slice(0, 160));
+  const codenaam = (await api('/api/auth/me', {}, reg.body.token)).body.user.codename;
+  await keurLidGoed(base, reg.body.token, codenaam, '1990-01-01');
+  const lid = (await api('/api/auth/login', { login: email, password: 'Geheim123!', pasApp: 'rtg' })).body.token;
+  assert.ok(lid, 'opnieuw ingelogd na de keuring');
+  const kop = await api('/api/account/koppel', await kantoorKoppelBody(base, lid), lid);
+  assert.equal(kop.status, 200, 'de kantoorrol gekoppeld: ' + JSON.stringify(kop.body).slice(0, 160));
+  const zelfKantoor = (await api('/api/account/start', { rol: 'kantoor' }, lid)).body.token;
+  assert.ok(zelfKantoor, 'dezelfde mens staat op naam in het kantoor');
+
+  const aan = await api('/api/appstore/persoon/aanvraag', { naam: 'Vierogen Zelf', contact: email }, lid);
+  assert.equal(aan.status, 200, 'de aanvraag als persoon: ' + JSON.stringify(aan.body));
+  const org = (await api('/api/appstore/persoon', {}, lid)).body.org;
+  assert.ok(org, 'een persoonlijke uitgeversplek');
+  assert.equal((await api('/api/appstore/kantoor/uitgever', { org, besluit: 'toegelaten', door: 'Sam van RTG' }, office)).status, 200);
+  const inz = await api('/api/appstore/persoon/inzenden', { manifest: Object.assign(manifest('1.0.0'), { sleutel: 'vierogen-zelf' }),
+    bestanden: bundel(3) }, lid);
+  assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
+  await api('/api/appstore/kantoor/toegankelijk', { versieId: inz.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
+
+  const zelf = await api('/api/appstore/kantoor/besluit',
+    { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Iemand anders' }, zelfKantoor);
+  assert.equal(zelf.status, 403, 'dezelfde mens tekende zijn eigen inzending af: ' + JSON.stringify(zelf.body));
+  assert.equal(zelf.body.code, 'zelfde-mens');
+  assert.equal(zelf.body.scheiding, 'bewezen');
+
+  /* En de tegenproef op dezelfde inzending: een ANDERE mens op naam mag wel. */
+  const ander = await api('/api/appstore/kantoor/besluit',
+    { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Ada van RTG' }, opNaam);
+  assert.equal(ander.status, 200, JSON.stringify(ander.body));
 });

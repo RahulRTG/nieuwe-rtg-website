@@ -29,7 +29,7 @@
      Het getal hoort bij de WIJK en niet bij de mens: er komt geen ranglijst op
      medewerkers (HORECA.md, grens 5). De naam staat erbij zodat je weet wie je
      moet aanspreken, en niet om te vergelijken. */
-  function tekenWijken(beeld, mijne, na, voorMij) {
+  function tekenWijken(beeld, mijne, na, voorMij, geleend) {
     $('pWijken').innerHTML = !beeld.length
       ? '<p class="pda-leeg">Er zijn nog geen wijken. Zolang die er niet ' +
         'zijn is elke tafel van iedereen, en dat is precies wat u hierboven ziet.</p>'
@@ -52,7 +52,13 @@
       api('/wijk/neem', { wijkId: b.dataset.wijkneem }).then(na);
     });
     K.bind($('pWijken'), 'wijklaat', function (b) {
-      api('/wijk/laat', { wijkId: b.dataset.wijklaat }).then(na);
+      api('/wijk/laat', { wijkId: b.dataset.wijklaat }).then(function (r) {
+        /* Wie loslaat en nog tafels van een collega draagt, krijgt dat te
+           horen in plaats van de gewone bevestiging; die tafels gaan niet
+           vanzelf mee terug (kern/horeca/wijk-leen.js). */
+        if (r.body && r.body.herinnering) { K.meld(r.body.herinnering); r = { body: {} }; }
+        na(r);
+      });
     });
 
     /* HERVERDELEN GEBEURT NIET HIER. Een wijk overdragen is een aanbod aan een
@@ -65,6 +71,23 @@
        vast scherm te zien is, komt niet aan bij iemand die loopt -- en zolang
        hij niet antwoordt, draagt een collega het nog. Alleen het AANTAL: de
        handeling blijft op de vloer, want daar staat de hele verdeling erbij. */
+    /* WAT IK VAN EEN COLLEGA DRAAG, met de knop om het terug te geven. Een
+       vaste regel en geen melding die na drie seconden weg is: de tafel blijft
+       op mijn naam tot ik hem teruggeef, dus de herinnering ook. */
+    var leen = Array.isArray(geleend) ? geleend : [];
+    if (leen.length) {
+      $('pWijken').insertAdjacentHTML('beforeend', leen.map(function (l) {
+        return '<article class="pda-taak"><div class="pda-kop"><span class="pda-tafel">' + esc(l.tafel) + '</span>' +
+          '<span class="pda-min">geleend</span></div>' +
+          '<p class="pda-som">U draagt deze tafel' + (l.vanNaam ? ' van ' + esc(l.vanNaam) : '') +
+          (l.wijkNaam ? ' uit ' + esc(l.wijkNaam) : '') + '. Hij blijft op uw naam tot u hem teruggeeft.</p>' +
+          '<div class="pda-acties">' + K.knop('Geef terug', { leenterug: l.tafel }) + '</div></article>';
+      }).join(''));
+      K.bind($('pWijken'), 'leenterug', function (b) {
+        api('/wijk/tafel-terug', { tafel: b.dataset.leenterug }).then(na);
+      });
+    }
+
     var n = Number(voorMij) || 0;
     $('pWijken').insertAdjacentHTML('beforeend',
       (n ? '<p class="pda-som"><b>Er ' + (n === 1 ? 'ligt een aanbod' : 'liggen ' + n + ' aanbiedingen') +

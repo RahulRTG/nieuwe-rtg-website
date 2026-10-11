@@ -162,6 +162,7 @@ module.exports = ({ horeca, schoon, verzoeklaag }) => {
       nu, open,
       wijk: opWijk ? 'mijn' : 'alles',
       mijnWijken: (opties && opties.staffId != null) ? wijklaag.mijne(h, opties.staffId).map((w) => w.naam) : [],
+      geleend: wijklaag.leen.herinnering(h, opties && opties.staffId).nogGeleend || [],   // ./wijk-leen.js
       verborgen,
       /* HET WIJKBEELD: hoeveel open werk draagt elke wijk, en wie draagt hem.
          Geteld over ALLE taken van deze modus, ook die de wijklens wegfilterde --

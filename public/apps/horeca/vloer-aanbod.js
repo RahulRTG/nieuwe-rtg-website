@@ -120,15 +120,28 @@
 
     var uit = (d.leningen || []);
     $('vUit').textContent = uit.length;
-    $('vGeleend').innerHTML = uit.length ? uit.map(function (l) {
+    /* IS DE DRAGER ER NOG? Uit het klokboek van de zaak, met drie standen
+       (kern/horeca/wijk-leen.js, drager). Alleen `uitgeklokt` krijgt een zin:
+       `niet-gemeten` is geen "weg", want veel zaken klokken niet. Teruggeven
+       blijft een druk op de knop -- er springt niets vanzelf terug. */
+    var weg = function (l) {
+      if (!l.drager || l.drager.stand !== 'uitgeklokt') return '';
+      var om = new Date(l.drager.om);
+      return ' · <b>uitgeklokt om ' + esc(isNaN(om) ? '?' : om.toTimeString().slice(0, 5)) +
+        '</b>, de tafel staat nog op zijn naam';
+    };
+    var wegZin = d.dragerWeg ? '<p class="v-som"><b>' + d.dragerWeg + (d.dragerWeg === 1 ? ' tafel staat' : ' tafels staan') +
+      ' nog op naam van iemand die al is uitgeklokt.</b> Geef ' + (d.dragerWeg === 1 ? 'hem' : 'ze') +
+      ' terug, of laat de uitlener dat doen.</p>' : '';
+    $('vGeleend').innerHTML = wegZin + (uit.length ? uit.map(function (l) {
       return '<div class="v-leen"><b>' + esc(l.tafel) + '</b><small>' +
         esc(l.naam) + ' draagt hem' + (l.vanNaam ? ', van ' + esc(l.vanNaam) : '') +
-        (l.wijkNaam ? ' uit ' + esc(l.wijkNaam) : '') + ' · ' + l.staat + ' min</small>' +
+        (l.wijkNaam ? ' uit ' + esc(l.wijkNaam) : '') + ' · ' + l.staat + ' min' + weg(l) + '</small>' +
         '<span class="h-flex1"></span>' +
         ((l.naarMij || l.vanMij || d.magIndelen) ? K.knop('Terug', { terug: l.tafel }) : '') +
         '</div>';
     }).join('') : '<p class="v-leeg">Geen enkele tafel staat bij iemand anders. Een halve wijk ' +
-      'overdragen doet u hierboven, bij de wijk die u zelf draagt.</p>';
+      'overdragen doet u hierboven, bij de wijk die u zelf draagt.</p>');
 
     var open = (d.overdrachten || []);
     $('vAanbod').innerHTML = open.length ? open.map(function (o) {

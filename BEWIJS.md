@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2440 bestanden en 16711 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2441 bestanden en 16712 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2440 |
-| losse beweringen (`test(...)`) | 16711 |
+| toetsbestanden | 2441 |
+| losse beweringen (`test(...)`) | 16712 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
-| alleen in de kop *genoemd*, nog niet gemeten | 0 |
+| alleen in de kop *genoemd*, nog niet gemeten | 1 |
 | niets van beide | 0 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -2172,7 +2172,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-308 bestanden, 537 beweringen.
+309 bestanden, 538 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2416,6 +2416,7 @@ toets omvalt.
 | `samendoen-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET DOENETWERK IN EEN ECHTE BROWSER: de kaart "Samen doen" op /apps/foundation/kwesties.html, en wat het kantoor ervan ziet. test/democratie-doe.test.js bewijst de regels op de routes. |
 | `scan-tafel.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test: de tafel-QR-stroom in de leden-app. We loggen als lid in (token in localStorage), openen de app, klikken op de scan-knop en voeren met de hand een tafel-QR-payload in (headless heeft geen camera). |
 | `scanner.e2e.js` | 2 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Scanner: foto's kiezen (de weg die ook zonder camera werkt), de paginastrook, en bewaren als PDF die als gewoon bestand in de Bestanden-kluis belandt (map Scans). De camera zelf valt buiten... |
+| `schermcontext.e2e.js` | 1 | genoemd | AGENDA EN NOTITIES ZEGGEN ZELF WAAR JE BENT (EDGE.md besluit 11). Beide schermen wijzen een eigen hoofdactie aan en stonden daarom op CONTEXT_SCHULD in scripts/edgedekking.js. |
 | `schuif.e2e.js` | 1 | gezakt op `liegpoort /api/` | GEEN SCHERM SCHUIFT ZIJWAARTS. Waarom deze toets bestaat. |
 | `servicebel.e2e.js` | 3 | gezakt op `liegpoort /api/` | BELLEN MET RTG -- de twee schermen. De routes waren al beproefd; deze toetsen gaan over wat een mens ziet en kan. |
 | `servicecockpit.e2e.js` | 8 | gezakt op `liegpoort /api/` | DE SERVICE-COCKPIT. Wat deze toetsen vastleggen is niet dat het scherm laadt, maar wat het WEL en NIET doet: 1. |

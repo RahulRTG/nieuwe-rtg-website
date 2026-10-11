@@ -1,23 +1,32 @@
 /* INVARIANT 7: DE PROVIDERSTATUS KOMT NOOIT UIT WAT DE CLIENT STUURT.
 
-   Een echte server, de echte deuren, en een nagemaakte Stripe op 127.0.0.1 die
-   elke PaymentIntent op `processing` laat staan -- de kaart is dus NIET belast.
-   Daarna probeert de client op elke weg die hij heeft de betaling als betaald te
-   laten gelden:
+   Een echte server, de echte deuren, en een nagemaakte Stripe op 127.0.0.1.
+   De client probeert op elke weg die hij heeft een betaling als betaald te laten
+   gelden:
 
      1. bij het opladen zelf velden meesturen die "betaald" zeggen
         (status, providerStatus, betaald, paid, bedrag, geladen);
      2. "terugkomen na de betaling": dezelfde oplading met dezelfde idem nog
-        eens, nu met die velden;
+        eens, met die velden;
      3. de webhook zelf aanroepen ZONDER handtekening;
      4. de webhook met een VERVALSTE handtekening (een ander geheim);
      5. de webhook met een kapotte handtekening op een geldige tijd.
 
-   Na elke poging staat de wallet op nul en heet de betaling niet betaald.
+   SINDS DE VRIJGAVELAAG (server/kern/vrijgave/) komt stap 1 niet eens meer bij
+   de aanbieder. Een echte providernaam is nooit een neprail, en zonder
+   releasegebonden bewijs staat geld.opwaarderen in deze wereld DICHT: de
+   oplading wordt geweigerd en de nagemaakte Stripe ziet nul PaymentIntents.
+   Dat bewijs valt in een toets niet na te maken -- en dat is de bedoeling:
+   credentials zijn nooit "aan". Wat hier eerst 402 (wacht op de aanbieder) was,
+   is nu 503 van de poort, en de bewering is strenger geworden: er begint niets.
 
-   De TEGENPROEF hoort erbij, anders bewijst nul niets: dezelfde gebeurtenis
-   met de ECHTE handtekening van de aanbieder schrijft precies 25 euro bij.
-   Een instrument dat niet kan uitslaan, is geen instrument. */
+   De TEGENPROEF hoort erbij, anders bewijst een 400 niets: dezelfde gebeurtenis
+   met de ECHTE handtekening van de aanbieder wordt aangenomen (200) -- de
+   weigeringen hierboven zijn dus geen deur die alles weigert. Ze schrijft niets
+   bij, want RTG is die betaling nooit begonnen: een melding van de aanbieder
+   over een betaling die RTG niet kent, maakt geen geld. Dat de ondertekende
+   melding een LOPENDE oplading wel precies een keer bijschrijft, staat in
+   test/oplaadwebhook-crash.test.js (in een proefwereld met een open poort). */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -85,27 +94,31 @@ async function lid() {
 }
 const saldo = async token => (await api('/api/pay/overzicht', {}, token)).body.saldo;
 
-test('de client kan een betaling op geen enkele weg zelf betaald maken; de ondertekende webhook wel', async () => {
+test('de client kan een betaling op geen enkele weg zelf betaald maken; de ondertekende webhook wel aangenomen', async () => {
   const token = await lid();
   const vals = { status: 'betaald', providerStatus: 'succeeded', betaald: true, paid: true,
     payment_status: 'paid', bedrag: 2500, geladen: 2500 };
 
-  // 1. opladen met "betaald"-velden in het verzoek
+  // 1. opladen met "betaald"-velden in het verzoek: de poort weigert, de aanbieder ziet niets
   const op = await api('/api/pay/oplaad', Object.assign({ centen: 2500, idem: 'ps-1' }, vals), token);
-  assert.equal(op.status, 402, 'de aanbieder zegt processing, dus de oplading wacht: ' + JSON.stringify(op.body));
+  assert.equal(op.status, 503, 'een echte rail zonder releasebewijs is dicht: ' + JSON.stringify(op.body));
+  assert.equal(op.body.capability, 'geld.opwaarderen', JSON.stringify(op.body));
   assert.equal(await saldo(token), 0);
 
   // 2. terugkomen na de betaling, met dezelfde idem en dezelfde valse velden
   const terug = await api('/api/pay/oplaad', Object.assign({ centen: 2500, idem: 'ps-1' }, vals), token);
   assert.notEqual(terug.body.ok, true, JSON.stringify(terug.body));
   assert.equal(await saldo(token), 0, 'terugkomen met "betaald" in het verzoek schrijft niets bij');
+  assert.equal(intents.size, 0, 'een geweigerde oplading bereikt de aanbieder nooit');
 
-  // de route geeft het betaling-id niet terug; de enige PaymentIntent is van deze oplading
-  assert.equal(intents.size, 1, 'precies een PaymentIntent, ook na het terugkomen');
-  const intent = [...intents.values()][0];
-  assert.match(String(intent.metadata.referentie), /^BW-/, JSON.stringify(intent));
+  /* Een gebeurtenis zoals de aanbieder hem zou sturen, voor een betaling die
+     RTG nooit begon. Met opzet GEEN referentie in RTG's eigen vorm (BW-...):
+     zo'n melding is mogelijk sneller dan het eigen record en krijgt daarom een
+     5xx zodat de aanbieder het opnieuw probeert (kern/betaalwaarheid). */
+  const intent = { id: 'pi_toets_vreemd', object: 'payment_intent', status: 'succeeded', amount: 2500,
+    amount_received: 2500, currency: 'eur', metadata: { referentie: 'EXTERN-ONBEKEND' } };
   const gebeurtenis = { id: 'evt_ps_' + crypto.randomBytes(4).toString('hex'), type: 'payment_intent.succeeded',
-    data: { object: Object.assign({}, intent, { status: 'succeeded', amount_received: 2500 }) } };
+    data: { object: intent } };
   const ruw = JSON.stringify(gebeurtenis);
 
   // 3. de webhook zonder handtekening
@@ -117,11 +130,9 @@ test('de client kan een betaling op geen enkele weg zelf betaald maken; de onder
   assert.equal((await webhook(ruw, { 'x-rtg-signature': crypto.createHmac('sha256', 'whsec_vervalst').update(ruw).digest('hex') })).status, 400);
   assert.equal(await saldo(token), 0, 'geen enkele niet-ondertekende melding schrijft iets bij');
 
-  // TEGENPROEF: de echte handtekening van de aanbieder
+  // TEGENPROEF: de echte handtekening van de aanbieder wordt aangenomen ...
   const echt = await webhook(ruw, { 'stripe-signature': stripeHandtekening(ruw, GEHEIM) });
   assert.equal(echt.status, 200, JSON.stringify(echt.body));
-  assert.equal(await saldo(token), 2500, 'de ondertekende bevestiging schrijft precies het bedrag bij');
-  // en een herhaling van diezelfde ondertekende melding doet niets meer
-  assert.equal((await webhook(ruw, { 'stripe-signature': stripeHandtekening(ruw, GEHEIM) })).status, 200);
-  assert.equal(await saldo(token), 2500);
+  // ... en maakt geen geld voor een betaling die RTG nooit begon
+  assert.equal(await saldo(token), 0, 'een ondertekende melding over een onbekende betaling schrijft niets bij');
 });

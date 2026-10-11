@@ -15,10 +15,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2441 |
 | losse beweringen (`test(...)`) | 16714 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2267 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
-| alleen in de kop *genoemd*, nog niet gemeten | 1 |
+| alleen in de kop *genoemd*, nog niet gemeten | 0 |
 | niets van beide | 0 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -1528,7 +1528,7 @@ toets omvalt.
 | `rollbackbesluit.test.js` | 4 | gezakt op `&&->||#5` | HET BESLUITREGISTER VAN DE ROLLBACK-AS, EN DE GRENDEL EROP. ROLLBACKBESLUIT.json zegt per route waarom een GEWEIGERD verzoek daar toch iets in de opslag mag achterlaten. |
 | `rollenmatrix.test.js` | 9 | gezakt op `liegpoort /api/` | DE ROLLENMATRIX -- drieënveertig endpoints uit acht torens, een vraag. Deze endpoints wees de waargenomen dekkingsmeting als nooit aangeroepen aan. |
 | `rolproef.test.js` | 15 | gezakt op `===->!==#0` | DE ROL-SCHEIDING (scripts/lib/rolproef.js) -- de proef die vraagt of een INGELOGDE met de verkeerde rol binnenkomt, en of de weigering iets lekt. WAAROM DEZE TOETS ER IS. |
-| `romeproef.test.js` | 8 | genoemd | DE ROMEPROEF -- het instrument en zijn register. scripts/romeproef.js loopt de Rome-keten over LivingOS, WorkOS, TravelOS, het geld en de universele bodem van FoundationOS, tegen een wegwerpserver. |
+| `romeproef.test.js` | 8 | gezakt op `&&->||#0` | DE ROMEPROEF -- het instrument en zijn register. scripts/romeproef.js loopt de Rome-keten over LivingOS, WorkOS, TravelOS, het geld en de universele bodem van FoundationOS, tegen een wegwerpserver. |
 | `ronde.test.js` | 11 | gezakt op `===->!==#0` | DE COMMERCIELE RONDE: het werk dat wel gebouwd was en nooit werd gedaan. Vier dingen stonden klaar en werden door niemand aangeroepen. |
 | `rooster-verzuim.test.js` | 4 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `routebron.test.js` | 6 | gezakt op `!==->===#0` | DE BRON VAN EEN ROUTE MET EEN SAMENGESTELD PAD. WAT ER MIS WAS. |

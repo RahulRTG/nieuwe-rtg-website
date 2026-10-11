@@ -3,7 +3,7 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-10-11",
-  "commit": "93a033829",
+  "commit": "46b327a6c",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -5402,9 +5402,9 @@
  "gemeten": {
   "bestanden": 4419,
   "nietGelezen": 0,
-  "aanroepen": 179228,
-  "kanten": 31111,
-  "kantenLokaal": 19968,
+  "aanroepen": 179230,
+  "kanten": 31112,
+  "kantenLokaal": 19969,
   "kantenIngevoerd": 2762,
   "kantenLid": 2785,
   "kantenViaKern": 4868,
@@ -5413,7 +5413,7 @@
   "kantenUitFabriek": 300,
   "kantenViaKernZonderSymbool": 2932,
   "kernherkomstGelezen": 1345,
-  "onopgelosteAanroepen": 133777,
+  "onopgelosteAanroepen": 133778,
   "onopgelosteNamen": 13764,
   "onopgelostNaarSoort": {
    "ingebouwd": 35816,
@@ -5421,7 +5421,7 @@
    "kader": 12385,
    "contextobject": 20707,
    "uitgepaktObject": 1681,
-   "lokaleWaarde": 23851,
+   "lokaleWaarde": 23852,
    "methodeOpWaarde": 37817,
    "overig": 468
   },
@@ -5429,9 +5429,9 @@
   "doelOnbekend": 0,
   "bewaakteVooruitwijzing": 0,
   "doelNietVastTeStellen": 71,
-  "symbolenMetAanroeper": 12189,
+  "symbolenMetAanroeper": 12190,
   "routesMetSymbool": 3347,
-  "routeSymboolKanten": 7018
+  "routeSymboolKanten": 7019
  },
  "routeNaarSymbool": [
   {
@@ -13782,6 +13782,15 @@
    ]
   },
   {
+   "route": "POST /api/supplier/horeca/missions",
+   "bestand": "server/routes/supplier/pda/vloer-missies.js",
+   "symbolen": [
+    "server/routes/supplier/pda/vloer-missies.js#teamVoor",
+    "server/routes/supplier/pda/vloer-missies.js#liveTeam",
+    "server/routes/supplier/pda/vloer-missies.js#missies"
+   ]
+  },
+  {
    "route": "POST /api/supplier/pr/overzicht",
    "bestand": "server/routes/supplier/prplus.js",
    "symbolen": [
@@ -21639,14 +21648,6 @@
    "symbolen": [
     "server/routes/supplier/pda/posities.js#wisselDoelen",
     "server/server.js#null"
-   ]
-  },
-  {
-   "route": "POST /api/supplier/horeca/missions",
-   "bestand": "server/routes/supplier/pda/vloer-missies.js",
-   "symbolen": [
-    "server/routes/supplier/pda/vloer-missies.js#liveTeam",
-    "server/routes/supplier/pda/vloer-missies.js#missies"
    ]
   },
   {
@@ -263690,9 +263691,17 @@
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
    "van": "route:POST /api/supplier/horeca/missions",
    "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
+   "naar": "teamVoor",
+   "hoe": "lokaal",
+   "lijn": 29
+  },
+  {
+   "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
+   "van": "route:POST /api/supplier/horeca/missions",
+   "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
    "naar": "liveTeam",
    "hoe": "lokaal",
-   "lijn": 20
+   "lijn": 29
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263700,7 +263709,7 @@
    "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
    "naar": "missies",
    "hoe": "lokaal",
-   "lijn": 20
+   "lijn": 29
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263708,7 +263717,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 21
+   "lijn": 30
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263716,7 +263725,7 @@
    "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
    "naar": "liveTeam",
    "hoe": "lokaal",
-   "lijn": 21
+   "lijn": 30
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263724,7 +263733,7 @@
    "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
    "naar": "voorstelVan",
    "hoe": "lokaal",
-   "lijn": 21
+   "lijn": 30
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263732,7 +263741,7 @@
    "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
    "naar": "beste",
    "hoe": "lokaal",
-   "lijn": 21
+   "lijn": 30
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263740,7 +263749,7 @@
    "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
    "naar": "missies",
    "hoe": "lokaal",
-   "lijn": 21
+   "lijn": 30
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263748,7 +263757,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 22
+   "lijn": 31
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263756,7 +263765,7 @@
    "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
    "naar": "liveTeam",
    "hoe": "lokaal",
-   "lijn": 22
+   "lijn": 31
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263764,7 +263773,7 @@
    "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
    "naar": "missies",
    "hoe": "lokaal",
-   "lijn": 22
+   "lijn": 31
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263772,7 +263781,7 @@
    "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
    "naar": "beste",
    "hoe": "lokaal",
-   "lijn": 22
+   "lijn": 31
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263780,7 +263789,7 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "datum",
    "hoe": "lid",
-   "lijn": 22
+   "lijn": 31
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263788,7 +263797,7 @@
    "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
    "naar": "missiePubliek",
    "hoe": "lokaal",
-   "lijn": 22
+   "lijn": 31
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263796,7 +263805,7 @@
    "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
    "naar": "missies",
    "hoe": "lokaal",
-   "lijn": 23
+   "lijn": 32
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263804,7 +263813,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 23
+   "lijn": 32
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263812,7 +263821,7 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "datum",
    "hoe": "lid",
-   "lijn": 23
+   "lijn": 32
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -263820,7 +263829,7 @@
    "naarBestand": "server/routes/supplier/pda/vloer-missies.js",
    "naar": "missiePubliek",
    "hoe": "lokaal",
-   "lijn": 23
+   "lijn": 32
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer.js",

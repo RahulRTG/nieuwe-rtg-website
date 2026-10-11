@@ -110,6 +110,10 @@ kern.genootschapInzicht = require('../kern/genootschap/inzicht')({ db, save, gen
   prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst });
 kern.genootschapUitvoer = require('../kern/genootschap/uitvoer')({ genootschap: kern.genootschap,
   codenaamVan: kern.codenaamVan });
+/* Het verbond (kern/verbond/): een afspraak tussen twee genootschappen. Het
+   krijgt het genootschap om te VRAGEN wie lid of beheerder is, en bezit zelf
+   geen leden (GEMEENSCHAP-FASE0.md par. 4.2). */
+kern.verbond = require('../kern/verbond')({ db, save, notify, genootschap: kern.genootschap });
 /* De Berichten-app: zoeken over alle kanalen, gesprekken vastzetten/stilzetten/
    archiveren, en de drie AI-taken (samenvatten, een antwoord opstellen, de
    afspraken eruit halen). De AI stelt op, de mens verstuurt. */

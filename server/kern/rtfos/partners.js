@@ -20,6 +20,31 @@
 
 const STATUS = ['aangemeld', 'in_toetsing', 'goedgekeurd', 'actief', 'opgeschort', 'beeindigd'];
 const WIE = ['rtf', 'partner', 'samen'];
+
+/* DE VIJF AFSPRAAKVELDEN, en de toets erop. Ze staan hier en nergens anders,
+   want het verbond tussen twee genootschappen (kern/verbond/) legt dezelfde vijf
+   vragen vast met een andere woordenlijst ('a', 'b', 'samen'). Een tweede lijst
+   daar zou de eerste plek zijn waar ze uit elkaar lopen (LAT.md regel 4).
+
+   toetsAfspraken() is PUUR: hij muteert niets en geeft de geldige waarden terug,
+   of de eerste fout. Een leeg veld is "niet meegegeven" en geen fout. Wie hem
+   aanroept beslist zelf wat er met de waarden gebeurt -- en omdat er pas wordt
+   samengevoegd als ALLES klopt, laat een fout bij het derde veld de eerste twee
+   niet half veranderd achter. */
+const AFSPRAAKVELDEN = Object.freeze(['geld', 'vrijwilligers', 'persoonsgegevens', 'aansprakelijk', 'rapportage']);
+const ofLijst = (l) => l.length < 2 ? l.join('') : l.slice(0, -1).join(', ') + ' of ' + l[l.length - 1];
+function toetsAfspraken(invoer, toegestaan) {
+  const woorden = Array.isArray(toegestaan) ? toegestaan : [];
+  const waarden = {};
+  if (!invoer || typeof invoer !== 'object') return { ok: true, waarden };
+  for (const k of AFSPRAAKVELDEN) {
+    const v = String(invoer[k] || '');
+    if (!v) continue;
+    if (!woorden.includes(v)) return { ok: false, veld: k, error: 'Bij "' + k + '" hoort ' + ofLijst(woorden) + '.' };
+    waarden[k] = v;
+  }
+  return { ok: true, waarden };
+}
 const DOCSOORT = ['statuten', 'beleidsplan', 'jaarrekening', 'jaarverslag', 'overeenkomst',
   'verzekering', 'privacyafspraak', 'vog-beleid', 'anbi-beschikking', 'overig'];
 
@@ -89,11 +114,9 @@ module.exports = (ctx) => {
       }
     }
     if (b.afspraken && typeof b.afspraken === 'object') {
-      for (const k of Object.keys(p.afspraken)) {
-        const v = String(b.afspraken[k] || '');
-        if (v && !WIE.includes(v)) return { status: 400, error: 'Bij "' + k + '" hoort rtf, partner of samen.' };
-        if (v) p.afspraken[k] = v;
-      }
+      const t = toetsAfspraken(b.afspraken, WIE);
+      if (!t.ok) return { status: 400, error: t.error };
+      Object.assign(p.afspraken, t.waarden);
     }
     if (Array.isArray(b.bevoegdheden)) p.bevoegdheden = b.bevoegdheden.map(x => schoon(x, 60)).filter(Boolean).slice(0, 20);
     if (Array.isArray(b.bestuurders)) {
@@ -163,4 +186,7 @@ module.exports = (ctx) => {
     portaal: buiten.portaal, vind, vindCode, STATUS, WIE, DOCSOORT };
 };
 module.exports.STATUS = STATUS;
+module.exports.WIE = WIE;
+module.exports.AFSPRAAKVELDEN = AFSPRAAKVELDEN;
+module.exports.toetsAfspraken = toetsAfspraken;
 module.exports.DOCSOORT = DOCSOORT;

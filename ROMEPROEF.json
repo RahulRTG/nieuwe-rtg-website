@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T14:21:08.932Z",
-    "commit": "47db5a54",
+    "op": "2026-10-11T16:02:25.517Z",
+    "commit": "9871c292",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/romeproef.js",
@@ -21,7 +21,7 @@
       "status": 200,
       "ziet": "groep \"Weekend Rome\", rol beheerder",
       "fout": null,
-      "ms": 10
+      "ms": 11
     },
     {
       "nr": 2,
@@ -34,7 +34,7 @@
       "status": 200,
       "ziet": "bij de vriend: uitnodiging true, al lid false",
       "fout": null,
-      "ms": 15
+      "ms": 11
     },
     {
       "nr": 3,
@@ -47,7 +47,7 @@
       "status": 200,
       "ziet": "3 leden, op codenaam",
       "fout": null,
-      "ms": 14
+      "ms": 8
     },
     {
       "nr": 4,
@@ -60,7 +60,7 @@
       "status": 200,
       "ziet": "in de agenda van de vriend: 2 bijeenkomst(en)",
       "fout": null,
-      "ms": 12
+      "ms": 9
     },
     {
       "nr": 5,
@@ -71,9 +71,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "bij de organisator: 1 ja op 2026-11-10, komen: Zilveren Valk 1EB4",
+      "ziet": "bij de organisator: 1 ja op 2026-11-10, komen: Rode Kraanvogel 0315",
       "fout": null,
-      "ms": 32
+      "ms": 21
     },
     {
       "nr": 6,
@@ -86,7 +86,7 @@
       "status": 200,
       "ziet": "2026-11-10: 1 ja / 1 nee; 2026-11-17: 2 ja / 0 nee",
       "fout": null,
-      "ms": 20
+      "ms": 15
     },
     {
       "nr": 7,
@@ -104,7 +104,7 @@
       "status": 200,
       "ziet": "de bijeenkomst bij de organisator draagt geen venster: velden id, wat, waar, datum, tijd, toelichting, gastheer, vanMij, plaatsen, ja, misschien, nee, vol, mijnAntwoord, komen, afgelast",
       "fout": null,
-      "ms": 9
+      "ms": 5
     },
     {
       "nr": 8,
@@ -117,7 +117,7 @@
       "status": 200,
       "ziet": "beste: 2026-11-17 (bron lokale-regels, model: false) -- \"2026-11-17 past op dit moment de meeste leden: 2 ja, 1 misschien en 0 nee. Iedereen heeft geantwoord.\"",
       "fout": null,
-      "ms": 4
+      "ms": 3
     },
     {
       "nr": 9,
@@ -130,7 +130,7 @@
       "status": 200,
       "ziet": "personeelsnummer 185, dienstverband bij Meridiaan BV als Receptie",
       "fout": null,
-      "ms": 136
+      "ms": 122
     },
     {
       "nr": 10,
@@ -148,7 +148,7 @@
       "status": 200,
       "ziet": "verzoek DECLINED (DECLINED, stap RIGHTS_POLICY NIET_NODIG: \"U staat op 2026-11-17 niet (op dat tijdstip) ingeroosterd; er hoeft niets vrij te worden gemaakt en er wordt niets afgeschreven.\"), bij de leidinggevende wachtend: false; stappen: ELIGIBILITY=OK, RIGHTS_POLICY=NIET_NODIG; in dienst: true, verlofsaldo: niet aangesloten (\"Het saldo komt uit uw contract en payroll en is hier niet aangeleverd.\")",
       "fout": null,
-      "ms": 163
+      "ms": 152
     },
     {
       "nr": 11,
@@ -159,9 +159,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "pot \"Rome-1EB4\", doel 45317 centen, stand 0",
+      "ziet": "pot \"Rome-0315\", doel 45317 centen, stand 0",
       "fout": null,
-      "ms": 10
+      "ms": 6
     },
     {
       "nr": 12,
@@ -179,7 +179,7 @@
       "status": 200,
       "ziet": "Rahul antwoordt: \"1 ding wacht op u, 1 voorstel staat klaar.\" op gronden: wacht op u: 1 · ligt bij een ander: 0 | Genootschap · Weekend Rome · Weekend Rome · 2026-11-10 | Genootschap · Weekend Rome · Weekend Rome · 2026-11-17",
       "fout": null,
-      "ms": 12
+      "ms": 8
     },
     {
       "nr": 13,
@@ -197,7 +197,7 @@
       "status": 200,
       "ziet": "advies: Gstaad, alpien weekend -- reden \"Deze reis sluit aan op weekend.\"",
       "fout": null,
-      "ms": 5
+      "ms": 3
     },
     {
       "nr": 14,
@@ -210,7 +210,7 @@
       "status": 200,
       "ziet": "reis R-rome-2026-11-17, 2026-11-17 tot 2026-11-19",
       "fout": null,
-      "ms": 28
+      "ms": 19
     },
     {
       "nr": 15,
@@ -223,7 +223,7 @@
       "status": 200,
       "ziet": "uitnodiging klaar: true, reis zichtbaar voor ja: status 404",
       "fout": null,
-      "ms": 16
+      "ms": 11
     },
     {
       "nr": 16,
@@ -236,7 +236,7 @@
       "status": 200,
       "ziet": "reisgenoot ziet de reis: 200, kenmerk zichtbaar: false, bij de organisator aanvaard: true",
       "fout": null,
-      "ms": 12
+      "ms": 10
     },
     {
       "nr": 17,
@@ -249,7 +249,7 @@
       "status": 200,
       "ziet": "gratis account: 2 kandidaat-weekenden in zijn agenda, de reis zichtbaar als reisgenoot: 200",
       "fout": null,
-      "ms": 142
+      "ms": 154
     },
     {
       "nr": 18,
@@ -265,9 +265,9 @@
       },
       "stand": "openBekend",
       "status": 200,
-      "ziet": "aanvraag RTG-R-EA8472 voor 3 personen; de medereiziger ziet hem: false",
+      "ziet": "aanvraag RTG-R-5F8BCB voor 3 personen; de medereiziger ziet hem: false",
       "fout": null,
-      "ms": 9
+      "ms": 12
     },
     {
       "nr": 19,
@@ -285,7 +285,7 @@
       "status": 200,
       "ziet": "1 voorstel(len) bij de organisator: Laten weten of u komt - Weekend Rome",
       "fout": null,
-      "ms": 6
+      "ms": 7
     }
   ],
   "storingen": [
@@ -311,7 +311,7 @@
       "grens": "menselijke regie",
       "belofte": "Rahul plaatst niets en verandert geen antwoord: de agenda is na de vraag dezelfde",
       "stand": "gehouden",
-      "wat": "voor [[1791728475014,1,0,1],[1791728475018,2,1,0]], na [[1791728475014,1,0,1],[1791728475018,2,1,0]]"
+      "wat": "voor [[1791734552086,1,0,1],[1791734552089,2,1,0]], na [[1791734552086,1,0,1],[1791734552089,2,1,0]]"
     },
     {
       "nr": 4,
@@ -335,7 +335,7 @@
       "grens": "budget",
       "belofte": "zijn pot en zijn bedrag staan nergens bij de organisator, de groep of Rahul -- ook niet vergelijkend",
       "stand": "gehouden",
-      "wat": "gezocht naar \"Rome-1EB4\" en 45317 centen: niets gevonden"
+      "wat": "gezocht naar \"Rome-0315\" en 45317 centen: niets gevonden"
     },
     {
       "nr": 7,
@@ -463,7 +463,7 @@
       "van": "organisator",
       "naar": "vriend",
       "wat": "vraagt de reis aan voor drie; elke medereiziger krijgt zijn eigen deel klaargezet om zelf te bevestigen en te betalen",
-      "gemeten": "aanvraag RTG-R-EA8472 voor 3 personen; de medereiziger ziet hem: false",
+      "gemeten": "aanvraag RTG-R-5F8BCB voor 3 personen; de medereiziger ziet hem: false",
       "soort": "besluit",
       "oorzaak": "Een aanvraag (kern/reisbureau.js boek) draagt `personen` als getal en `customerKey` van een lid: de medereizigers bestaan er niet in. De vriend ziet de aanvraag niet in /api/reisbureau/mijn, en betalen (kern/reisbureau-betaling.js) int de hele reissom op EEN boeking bij de aanvrager. Er is geen weg waarlangs ieder zijn eigen deel bevestigt.",
       "eigenaar": "TravelOS -- server/kern/reisbureau.js en server/kern/reisbureau-betaling.js; de verdeling raakt TRAVELCOMMERCE.md (wie betaalt wat) en GELD.md par. 3",

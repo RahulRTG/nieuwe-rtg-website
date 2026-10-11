@@ -13,13 +13,18 @@
      null met de reden -- en die reden staat er dan ook. Navigeren krijgt de
      OPGELOSTE plek mee (dezelfde overdracht als /apps/move.html), zodat er niets
      opnieuw geraden wordt. */
+  function haakMove(vak){vak.querySelectorAll('[data-move]').forEach(function(b){b.onclick=function(){open('move',innerWidth>760)}})}
   async function volgende(el){var vak=el.querySelector('[data-volgende]');if(!vak)return;
     if(!token()){vak.innerHTML='<div class="rv-lijn gedimd"><time>&ndash;</time><div><b>Log in om uw reis te zien</b></div></div>';return}
     try{var d=await api('/api/move/volgende'),v=d.volgende;
-      if(!v){vak.innerHTML='<div class="rv-lijn gedimd"><time>&ndash;</time><div><b>Geen komend onderdeel met een bekende plek</b><small>'+esc(d.waarom||'')+'</small><a href="/apps/move.html">Haal ik het? &rarr;</a></div></div>';return}
+      /* Zonder echt punt geen navigeerknop: Move levert alleen een moment met een
+         plek, maar het scherm leunt daar niet op. */
+      var p0=v&&v.plek;if(v&&(!p0||!Number.isFinite(p0.lat)||!Number.isFinite(p0.lng)))v=null;
+      if(!v){vak.innerHTML='<div class="rv-lijn gedimd"><time>&ndash;</time><div><b>Geen komend onderdeel met een bekende plek</b><small>'+esc(d.waarom||'')+'</small><button data-move>Haal ik het? &rarr;</button></div></div>';haakMove(vak);return}
       var t=new Date(v.nodigAt),tijd=isNaN(t)?'':t.toLocaleString(taal,{weekday:'short',hour:'2-digit',minute:'2-digit'}),p=v.plek||{};
       var q=new URLSearchParams({naar:p.lat+','+p.lng,label:p.label||v.titel||''});
-      vak.innerHTML='<div class="rv-lijn"><time>'+esc(tijd)+'</time><div><b>'+esc(v.titel||'Uw volgende onderdeel')+'</b><small>'+esc(p.label||'')+'</small><button data-navigeer="'+esc('/apps/navigatie.html?'+q.toString())+'">Navigeer erheen &rarr;</button><a href="/apps/move.html">Haal ik het? &rarr;</a></div></div>';
+      vak.innerHTML='<div class="rv-lijn"><time>'+esc(tijd)+'</time><div><b>'+esc(v.titel||'Uw volgende onderdeel')+'</b><small>'+esc(p.label||'')+'</small><button data-navigeer="'+esc('/apps/navigatie.html?'+q.toString())+'">Navigeer erheen &rarr;</button><button data-move>Haal ik het? &rarr;</button></div></div>';
+      haakMove(vak);
       vak.querySelector('[data-navigeer]').onclick=function(){open('navigatie',innerWidth>760,this.getAttribute('data-navigeer'))};
     }catch(e){vak.innerHTML='<div class="rv-lijn gedimd"><time>&ndash;</time><div><b>Uw volgende moment is nu niet op te halen</b><small>'+esc(e.message)+'</small></div></div>'}}
   function groet(el){var h=el.querySelector('[data-groet]');if(!h)return;var u=new Date().getHours();h.textContent=u<6?'Goedenacht.':u<12?'Goedemorgen.':u<18?'Goedemiddag.':'Goedenavond.'}

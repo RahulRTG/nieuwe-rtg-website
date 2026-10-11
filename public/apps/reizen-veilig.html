@@ -38,7 +38,7 @@
 
   <section class="rv-rahul" id="rvRahul" aria-label="Rahul reisassistent">
     <button class="rv-mond" id="rvMond" aria-label="Rahul openen"><span>◌</span></button>
-    <div class="rv-vraag"><small id="rvContext">Ik bewaak uw reis en breng u waar u moet zijn.</small><input id="rvIn" aria-label="Vraag Rahul" placeholder="Vraag Rahul om een reis, route of veilige aankomst…"></div>
+    <div class="rv-vraag"><small id="rvContext">Vervoer, aankomst en veiligheid op één plek.</small><input id="rvIn" aria-label="Vraag Rahul" placeholder="Vraag Rahul om een reis, route of veilige aankomst…"></div>
     <button class="rv-stuur" id="rvStuur" aria-label="Versturen">→</button>
   </section>
 </div>
@@ -53,7 +53,9 @@
       <div class="rv-suggesties"><button data-action="vervoer">Bereid mijn reis voor</button><button data-circle="maak">Deel mijn aankomst</button><button data-action="veilig">Loop met mij mee</button></div>
     </section>
     <details class="rv-specialisten"><summary>Alle reisspecialisten</summary><div><a href="/apps/reizen.html">Reizen</a><a href="/apps/vluchten.html">Vluchten</a><a href="/apps/ov.html">OV & privévervoer</a><a href="/apps/navigatie.html">Navigatie</a><a href="/apps/flits.html">Verkeer</a><a href="/apps/stad.html">Stad</a><a href="/apps/reisboek.html">Reisboek</a><a href="/apps/hangar.html">Hangar</a><a href="/apps/residentie.html">Residentie</a></div></details>
-    <div class="rv-status"><i></i><span><b>RTG Veilig staat klaar</b><small>Er wordt niets gedeeld zonder uw toestemming.</small></span><button data-action="veilig">Open</button></div>
+    <!-- Geen groene stip en geen "staat klaar": dit scherm meet niet of RTG Veilig
+         iets bewaakt, dus het zegt alleen wat er altijd geldt. -->
+    <div class="rv-status"><span><b>RTG Veilig</b><small>Er wordt niets gedeeld zonder uw toestemming.</small></span><button data-action="veilig">Open</button></div>
     <section class="rv-moment">
       <!-- Het eerstvolgende moment komt uit RTG Move (/api/move/volgende) en
            niet uit deze opmaak. Weet Move het niet, dan staat er waarom, en de

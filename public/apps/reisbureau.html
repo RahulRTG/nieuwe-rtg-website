@@ -195,8 +195,11 @@ async function laad(){
   if (mee.get('wens') && ALLE.length && !$('#adviesIn').value) {
     $('#adviesIn').value = mee.get('wens').slice(0, 200);
     $('#travelAdvice').hidden = false;
+  } else if (mee.get('wens') && !ALLE.length) {
+    /* Een wens die nergens heen kan, verdwijnt niet stil. */
+    meld('Er is nu geen samengestelde reis om uw wens tegen te leggen. Uw wens is niet verstuurd.');
   }
-  if (mee.get('reis') && !laad.geopend && typeof openReis === 'function') { laad.geopend = true; openReis(mee.get('reis')); }
+  if (mee.get('reis') && typeof openReis === 'function') openReis(mee.get('reis'));
   $('#lijst').querySelectorAll('.reis').forEach(b => b.addEventListener('click', () => openReis(b.dataset.id)));
   laadMijn();
 }

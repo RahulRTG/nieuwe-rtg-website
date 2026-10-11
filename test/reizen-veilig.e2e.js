@@ -90,12 +90,24 @@ test('Reizen & Veilig toont het echte volgende moment, het echte aanbod en geeft
       'Navigatie krijgt exact de plek van Move mee: ' + navSrc);
 
     /* 2. HET AANBOD KOMT UIT DE CATALOGUS. */
-    await page.locator('.rv-bank [data-open=reisblad]').click();
+    await page.locator('.rv-bank [data-open=reisblad]').click({ timeout: 15000 });
     const kaarten = page.locator('.rv-pane[data-id=reisblad] [data-reisaanbod] .rv-reiskaart');
     await kaarten.first().waitFor({ timeout: 15000 });
     assert.equal(await kaarten.count(), Math.min(3, catalogus.length), 'een kaart per reis uit de catalogus (hoogstens drie)');
     const titels = await kaarten.locator('h2').allTextContents();
     assert.deepEqual(titels, catalogus.slice(0, 3).map(r => r.titel), 'de titels zijn die van de catalogus, in die volgorde');
+    const prijzen = await kaarten.locator('em').allTextContents();
+    assert.deepEqual(prijzen.map(t => Number(t.replace(/[^0-9]/g, ''))),
+      catalogus.slice(0, 3).filter(r => r.prijs > 0).map(r => Math.round(r.prijs)),
+      'de prijs komt uit de catalogus en niet uit de opmaak: ' + JSON.stringify(prijzen));
+
+    /* 2b. EEN KAART OPENT DIE REIS in het Reisbureau, langs ?reis=. */
+    await kaarten.first().locator('[data-reis]').click();
+    const rbKaart = page.locator('.rv-pane[data-id=reisbureau] iframe');
+    await rbKaart.waitFor({ state: 'attached', timeout: 10000 });
+    assert.equal(new URL(await rbKaart.getAttribute('src'), base).searchParams.get('reis'), catalogus[0].id, 'de reis-id reist mee');
+    await page.frameLocator('.rv-pane[data-id=reisbureau] iframe').locator('#bladNaam')
+      .filter({ hasText: catalogus[0].titel }).waitFor({ timeout: 20000 });
 
     /* 3. DE WENS GAAT MEE NAAR HET REISBUREAU en wordt daar niet verstuurd. */
     await page.locator('.rv-pane[data-id=reisblad] [data-wens] input').fill('rust aan zee');
@@ -103,9 +115,17 @@ test('Reizen & Veilig toont het echte volgende moment, het echte aanbod en geeft
     const rb = page.locator('.rv-pane[data-id=reisbureau] iframe');
     await rb.waitFor({ state: 'attached', timeout: 10000 });
     assert.match(await rb.getAttribute('src'), /reisbureau\.html\?wens=rust(%20|\+)aan(%20|\+)zee/, 'de wens reist mee');
-    const frame = page.frameLocator('.rv-pane[data-id=reisbureau] iframe');
-    await frame.locator('#adviesIn').waitFor({ state: 'visible', timeout: 20000 });
-    assert.equal(await frame.locator('#adviesIn').inputValue(), 'rust aan zee', 'de wens staat ingevuld in het Reisbureau');
+    /* Het paneel stond al open (de kaart hierboven) en laadt opnieuw: er wordt
+       gewacht tot HET NIEUWE document de wens draagt, niet het oude. */
+    await page.waitForFunction(() => {
+      const f = document.querySelector('.rv-pane[data-id=reisbureau] iframe');
+      const doc = f && f.contentDocument;
+      const veld = doc && doc.querySelector('#adviesIn');
+      return !!veld && /wens=/.test(f.contentWindow.location.search) && veld.value === 'rust aan zee'
+        && !doc.querySelector('#travelAdvice').hidden;
+    }, null, { timeout: 20000 });
+    /* Ook niet een tel later: een uitgestelde vraag is net zo goed een vraag. */
+    await page.waitForTimeout(5000);
     assert.deepEqual(adviesVragen, [], 'er is geen advies opgevraagd: drukken doet het lid daar zelf');
 
     assert.deepEqual(fouten, [], 'geen paginafout');
@@ -134,6 +154,10 @@ test('zonder reis zegt Reizen & Veilig waarom er geen volgend moment is, met de 
     const tekst = await page.locator('.rv-pane[data-id=overzicht] [data-volgende]').textContent();
     assert.match(tekst, /geen komend onderdeel/i, 'het zegt dat er niets komt: "' + tekst + '"');
     assert.doesNotMatch(tekst, /navigeer/i, 'en biedt geen route naar een verzonnen plek');
+    assert.equal(await page.locator('.rv-pane[data-id=overzicht] [data-volgende] [data-navigeer]').count(), 0,
+      'er staat ook geen navigeerknop onder een andere naam');
+    await page.locator('.rv-pane[data-id=overzicht] [data-volgende] [data-move]').click();
+    await page.locator('.rv-pane[data-id=move] iframe').waitFor({ state: 'attached', timeout: 10000 });
     assert.deepEqual(fouten, [], 'geen paginafout');
     await ctx.close();
   } finally {

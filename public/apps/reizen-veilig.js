@@ -1,7 +1,7 @@
 (function(){
   'use strict';
   var $=function(s){return document.querySelector(s)}, panes=[],actief=-1,meldAdaptief=function(){};
-  var apps={reisbureau:['Reisbureau','/apps/reisbureau.html'],overzicht:['Vandaag',null],reisblad:['Reizen',null],vervoer:['Gaan','/apps/ov.html'],reizen:['Mijn reizen','/apps/reizen.html'],veilig:['RTG Veilig','/apps/veilig.html#wacht'],navigatie:['Navigatie','/apps/navigatie.html'],instellingen:['Instellingen','/apps/veilig.html#rust']};
+  var apps={reisbureau:['Reisbureau','/apps/reisbureau.html'],move:['Haal ik het?','/apps/move.html'],overzicht:['Vandaag',null],reisblad:['Reizen',null],vervoer:['Gaan','/apps/ov.html'],reizen:['Mijn reizen','/apps/reizen.html'],veilig:['RTG Veilig','/apps/veilig.html#wacht'],navigatie:['Navigatie','/apps/navigatie.html'],instellingen:['Instellingen','/apps/veilig.html#rust']};
   var bank=[['overzicht','Vandaag'],['vervoer','Gaan'],['reisblad','Reizen'],['veilig','RTG Veilig'],['navigatie','Navigatie'],['instellingen','Instellingen']];
   function ingebed(pad){var u=new URL(pad,location.href);u.searchParams.set('embed','1');return u.pathname+u.search+u.hash}
   function commandHost(){
@@ -50,7 +50,7 @@
      reizen-veilig-reis.js; dit bestand geeft ze alleen zijn api, esc en open. */
   function reis(){return window.RTGReisVeiligReis.maak({api:api,esc:esc,open:open,token:token})}
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-  function context(){var id=panes[actief]&&panes[actief].id,z={overzicht:'Ik bewaak uw reis en breng u waar u moet zijn.',vervoer:'Waar wilt u heen? Ik vergelijk de hele reis voor u.',reizen:'Ik zie uw reiswereld. Zal ik controleren wat nog aandacht vraagt?',veilig:'U bepaalt wie wat ziet en tot wanneer.',navigatie:'Ik blijf bij u tot u veilig bent aangekomen.'};$('#rvContext').textContent=z[id]||z.overzicht}
+  function context(){var id=panes[actief]&&panes[actief].id,z={overzicht:'Vervoer, aankomst en veiligheid op één plek.',vervoer:'Waar wilt u heen? Ik vergelijk de hele reis voor u.',reizen:'Ik zie uw reiswereld. Zal ik controleren wat nog aandacht vraagt?',veilig:'U bepaalt wie wat ziet en tot wanneer.',navigatie:'Ik blijf bij u tot u veilig bent aangekomen.'};$('#rvContext').textContent=z[id]||z.overzicht}
   /* IN RTG COMMAND HEEFT DE ONDERBALK EEN EIGENAAR. De zes handelingen van
      deze werkruimte blijven dezelfde open()-aanroepen; de adaptieve brug geeft
      ze alleen door aan de buitenste Command-balk. Daardoor kan de lokale bank

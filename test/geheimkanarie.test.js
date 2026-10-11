@@ -25,6 +25,7 @@ const path = require('node:path');
 const http = require('node:http');
 const { spawn, spawnSync } = require('node:child_process');
 const { kanaries, scan } = require('../scripts/lib/geheimkanarie');
+const { stopNet, wachtOpWaarde } = require('./helper');
 
 const ROOT = path.join(__dirname, '..');
 const K = kanaries();
@@ -38,7 +39,10 @@ function vrijePoort() {
 function ontvanger() {
   const lijven = [];
   const s = http.createServer((req, res) => { let b = ''; req.on('data', d => { b += d; }); req.on('end', () => { lijven.push(JSON.stringify(req.headers) + '\n' + b); res.end('ok'); }); });
-  return new Promise(r => s.listen(0, '127.0.0.1', () => r({ poort: s.address().port, lijven, sluit: () => s.close() })));
+  /* `sluit` wacht tot de laatste verbinding dicht is: daarna is elk lijf dat de
+     server nog VERSTUURDE ook hier binnen. */
+  return new Promise(r => s.listen(0, '127.0.0.1', () => r({ poort: s.address().port, lijven,
+    sluit: () => new Promise(k => s.close(() => k())) })));
 }
 
 async function start(env, { wacht = true } = {}) {
@@ -51,6 +55,7 @@ async function start(env, { wacht = true } = {}) {
   kind.stdout.on('data', d => uit.push(String(d)));
   kind.stderr.on('data', d => uit.push(String(d)));
   const klaar = new Promise(r => kind.on('exit', code => r(code)));
+  const gesloten = new Promise(r => kind.on('close', () => r()));
   const basis = 'http://127.0.0.1:' + poort;
   if (wacht) {
     const tot = Date.now() + 60000;
@@ -60,7 +65,12 @@ async function start(env, { wacht = true } = {}) {
       await new Promise(r => setTimeout(r, 300));
     }
   }
-  return { basis, uit, kind, klaar, stop: async () => { if (kind.exitCode == null) kind.kill('SIGTERM'); await Promise.race([klaar, new Promise(r => setTimeout(r, 5000))]); if (kind.exitCode == null) kind.kill('SIGKILL'); fs.rmSync(data, { recursive: true, force: true }); } };
+  /* UITGESPROKEN: de server netjes stoppen en wachten tot zijn stromen dicht
+     zijn. Pas dan staat alles wat hij ooit naar buiten gaf in `uit`, en kan er
+     niets meer bijkomen. Hier stond eerst een vaste wachttijd per proef -- een
+     gok over wanneer de laatste regel komt (KLOKWACHT.json). */
+  const uitgesproken = async () => { await stopNet(kind); await gesloten; };
+  return { basis, uit, kind, klaar, uitgesproken, stop: async () => { if (kind.exitCode == null) kind.kill('SIGTERM'); await Promise.race([klaar, new Promise(r => setTimeout(r, 5000))]); if (kind.exitCode == null) kind.kill('SIGKILL'); fs.rmSync(data, { recursive: true, force: true }); } };
 }
 
 const KOPPEN = { Authorization: 'Bearer ' + K.verzoek.bearer, Cookie: 'rtg=' + K.verzoek.cookie, 'X-Api-Key': K.verzoek.apikey };
@@ -97,7 +107,7 @@ test('opslag onbereikbaar: de verbindingsfouten noemen nooit het wachtwoord', as
   const antwoorden = [];
   for (const [m, p] of [['GET', '/api/health'], ['POST', '/api/login'], ['GET', '/api/notifications'], ['POST', '/api/pay/terug']])
     antwoorden.push(await roep(s.basis, m, p, LIJF));
-  await new Promise(r => setTimeout(r, 1500));
+  await s.uitgesproken();
   eisSchoon('onbereikbare opslag', [...s.uit, ...antwoorden.map(a => a.tekst + a.koppen)]);
 });
 
@@ -120,7 +130,11 @@ test('gewone start: de hele routetabel met kapotte en vijandige invoer lekt niet
     }
   }));
   assert.ok(antwoorden.length > routes.length * 0.9, 'te weinig routes gaven antwoord: ' + antwoorden.length);
-  await new Promise(r => setTimeout(r, 1000));
+  /* Eerst de server uit (wat hij niet meer verstuurde, heeft het huis niet
+     verlaten), dan de ontvanger dicht (wat wel verstuurd is, staat dan in
+     `lijven`). */
+  await s.uitgesproken();
+  await webhook.sluit();
   eisSchoon('routetabel', [...s.uit, ...antwoorden, ...webhook.lijven]);
 });
 
@@ -143,7 +157,12 @@ test('A-P1-01: FAKE-AUDIT-SECRET in Redis-, database- en provider-URLs komt nerg
   const redis = spawn('redis-server', ['--port', String(redisPoort), '--bind', '127.0.0.1', '--requirepass', 'het-echte-wachtwoord',
     '--save', '', '--appendonly', 'no'], { stdio: 'ignore' });
   t.after(() => redis.kill('SIGKILL'));
-  await new Promise(r => setTimeout(r, 400));
+  /* Wachten tot redis een verbinding AANNEEMT, niet een vaste tijd. */
+  const net = require('node:net');
+  const luistert = () => new Promise(r => { const c = net.connect(redisPoort, '127.0.0.1');
+    c.once('connect', () => { c.destroy(); r(true); }); c.once('error', () => r(false)); });
+  await wachtOpWaarde(async () => redis.exitCode == null && await luistert(), { ms: 15000, wat: 'redis-server die luistert' })
+    .catch(() => {});
   assert.equal(redis.exitCode, null, 'redis-server is vereist voor deze proef en startte niet');
   const s = await start({ REDIS_URL: 'redis://default:' + GEHEIM + '@127.0.0.1:' + redisPoort + '/0',
     DATABASE_URL: 'postgresql://rtg:' + GEHEIM + '@127.0.0.1:1/rtg',
@@ -153,7 +172,10 @@ test('A-P1-01: FAKE-AUDIT-SECRET in Redis-, database- en provider-URLs komt nerg
   const antwoorden = [];
   for (const [m, p] of [['GET', '/api/health'], ['POST', '/api/auth/forgot'], ['POST', '/api/chat'], ['GET', '/api/notifications']])
     antwoorden.push(await roep(s.basis, m, p, '{"email":"a@b.nl","bericht":"hoi"}'));
-  await new Promise(r => setTimeout(r, 2500));
+  /* Wachten tot het AUTH-foutpad geraakt is (dat is de voorwaarde van deze
+     proef), en dan de server stoppen zodat alles wat hij nog zou zeggen er staat. */
+  await wachtOpWaarde(() => /WRONGPASS/.test(s.uit.join('')), { ms: 30000, wat: 'het Redis-AUTH-foutpad' }).catch(() => {});
+  await s.uitgesproken();
   const alles = [...s.uit, ...antwoorden.map(a => a.tekst + a.koppen)].join('\n');
   assert.ok(alles.length > 0, 'de server gaf geen uitvoer; dan is er niets gemeten');
   assert.match(alles, /WRONGPASS/, 'het Redis-AUTH-foutpad werd niet geraakt; dan bewijst deze proef niets over A-P1-01');

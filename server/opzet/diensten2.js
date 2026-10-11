@@ -184,6 +184,21 @@ function contractStandVoor(sess) {
        blijft per venster. Een gratis lid kost geen opzoeking. */
     if (require('../lib/verraad').sla('contractstand-faalt')) throw new Error('verraad: contractstand-faalt');
     oordeel = lidpoort.beoordeel(sess.tier, lees.stand(sess.account.id), nu);
+  } catch (e) {
+    /* Een leesfout bij een betalende pas: onbekend, en dus GEEN betaalde
+       capability (lidpoort.afgedwongen). Een gratis pas verliest niets. */
+    return lidpoort.onbekend(sess.tier, 'de contractstand kon niet worden gelezen');
+  }
+  /* HET WEGEN IS EEN SCHRIJFACTIE EN STAAT BUITEN HET LEZEN. Het stond in
+     dezelfde try als het oordeel, en dan maakte een mislukte schrijfactie van de
+     SCHADUWTELLER (`schaduw.weeg` bewaart) een oordeel "de contractstand kon niet
+     worden gelezen" -- ONBEKEND, en dus de basislaag voor een betalend lid met
+     een kloppende afspraak. Onder een opslagstoring werd zo elk leesverzoek van
+     een betalend lid geweigerd (test/operationeel-herstel.test.js: de Saloon
+     onder `schrijf-faalt`). Een teller die niet bijgewerkt kon worden, zegt niets
+     over de afspraak; hij wordt gemeld en de volgende keer opnieuw geprobeerd
+     (geen `contractGezien`). */
+  try {
     const eerder = contractGezien.get(sleutel);
     if (!(eerder && nu - eerder.at < CONTRACT_VENSTER) && oordeel.stand !== 'NIET_BETALEND') {
       /* GEEN SLEUTEL MEE. Zie de kop van kern/commercie/lidpoort.js bij `weeg`: een
@@ -195,9 +210,7 @@ function contractStandVoor(sess) {
       contractGezien.set(sleutel, { at: nu });
     }
   } catch (e) {
-    /* Een leesfout bij een betalende pas: onbekend, en dus GEEN betaalde
-       capability (lidpoort.afgedwongen). Een gratis pas verliest niets. */
-    return lidpoort.onbekend(sess.tier, 'de contractstand kon niet worden gelezen');
+    console.warn('[contractpoort] de schaduwteller kon niet worden bijgewerkt: ' + (e && e.message || e));
   }
   return oordeel;
 }

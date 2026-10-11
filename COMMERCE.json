@@ -1,15 +1,15 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-10-06",
+  "vastgelegd": "2026-10-07",
   "gemeten": {
-    "bestanden": 2786,
-    "domeinenTotaal": 700,
-    "koopbareVormen": 621,
+    "bestanden": 2797,
+    "domeinenTotaal": 703,
+    "koopbareVormen": 615,
     "koopbareDomeinen": 126,
     "envelopDrempel": 8,
     "envelop": 45,
-    "veldenDomeineigen": 792,
-    "veldenNietEnvelop": 1061,
+    "veldenDomeineigen": 791,
+    "veldenNietEnvelop": 1060,
     "gelijkendeVormparen": 18,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
@@ -17,9 +17,9 @@
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 122,
+    "optellingen": 121,
     "optelDomeinen": 61,
-    "optelCenten": 68,
+    "optelCenten": 67,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 49
@@ -2780,12 +2780,12 @@
     },
     {
       "domein": "kern/pay",
-      "plekken": 6,
+      "plekken": 5,
       "waar": [
         "server/kern/pay/partner.js",
-        "server/kern/pay/samen.js",
         "server/kern/pay/tegoed-zaak.js",
-        "server/kern/pay/tegoed.js"
+        "server/kern/pay/tegoed.js",
+        "server/kern/pay/verkoop.js"
       ]
     },
     {

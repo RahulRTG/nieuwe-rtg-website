@@ -164,7 +164,10 @@ function maak({ db, crypto, bewerkCollectie, zegelSleutel, productie = process.e
     return mag ? { ok: true, token: raw } : { status: 401 };
   }
 
-  actief = { soort, geef, open, soorten: () => [...soorten.keys()], COLLECTIE };
+  /* Kijken zonder te claimen, voor de hoofdzekering: ./sessiestroom-kijk.js. */
+  const kijk = require('./sessiestroom-kijk')({ soorten, transactie, bearer, eigen, geopend });
+
+  actief = { soort, geef, open, kijk, soorten: () => [...soorten.keys()], COLLECTIE };
   return actief;
 }
 

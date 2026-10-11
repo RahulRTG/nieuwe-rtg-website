@@ -24,7 +24,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
-const { startServer, stop, kantoorAlsPersoon, stroomAdres } = require('./helper');
+const { startServer, stop, stopNet, kantoorAlsPersoon, stroomAdres } = require('./helper');
 
 const STUB = path.join(os.tmpdir(), 'rtg-luisteraarlek-stub-' + process.pid + '.js');
 fs.writeFileSync(STUB, "require('http').createServer((q, s) => s.end('ok'))" +
@@ -76,6 +76,9 @@ test('3. een echte server: herhaalde verzoeken met een Idempotency-Key en live-s
   const srv = await startServer({ env: { SMTP_URL: '' } });
   let stderr = '';
   srv.child.stderr.on('data', d => { stderr += d; });
+  /* 'close' en niet 'exit': pas als de stromen dicht zijn staat ALLES wat het
+     proces op stderr zette in `stderr`. */
+  const gesloten = new Promise(r => srv.child.once('close', r));
   const post = (pad, body, tok, extra) => fetch(srv.base + pad, { method: 'POST',
     headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}, extra || {}),
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
@@ -97,7 +100,12 @@ test('3. een echte server: herhaalde verzoeken met een Idempotency-Key en live-s
       await s.body.getReader().read();
       ac.abort();
     }
-    await new Promise(r => setTimeout(r, 300));
+    /* Een waarschuwing komt een tik later op stderr. Hier stond 300 ms
+       wachten -- een gok over WANNEER. Nu: de server netjes stoppen en wachten
+       tot zijn stromen dicht zijn; daarna kan er niets meer bijkomen, en wat er
+       was staat er. */
+    await stopNet(srv.child);
+    await gesloten;
     assert.doesNotMatch(stderr, /MaxListenersExceededWarning/, 'de server meldde een groeiende luisteraar:\n' +
       stderr.split('\n').filter(l => /MaxListeners/.test(l)).slice(0, 3).join('\n'));
   } finally { await stop(srv); }

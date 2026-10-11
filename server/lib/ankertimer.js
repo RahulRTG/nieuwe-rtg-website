@@ -82,11 +82,16 @@ async function eenRonde(ankerpost, log) {
   }
   if (vergelijk.afgerekend) { staat.laatsteVergeleken = at(); auditwacht().wis('anker'); }
 
+  /* Een vergelijking die alleen klopte DANKZIJ een herzegeling (een AVG-wissing
+     sinds het vorige blok), brengt die herzegeling mee naar buiten: dan ligt
+     op de tweede machine niet alleen de nieuwe kop maar ook het getekende
+     waarom. */
   let uit;
-  try { uit = await ankerpost.post(); }
+  const mee = vergelijk.afgerekend && Array.isArray(vergelijk.herzegelingen) ? vergelijk.herzegelingen : [];
+  try { uit = await ankerpost.post(mee.length ? { herzegelingen: mee } : undefined); }
   catch (e) { uit = { ok: false, reden: 'de ankerpost gooide: ' + (e && e.message || e) }; }
   staat.laatste = { at: at(), ok: !!uit.ok, inBedrijf: uit.inBedrijf !== false, vergeleken: !!vergelijk.afgerekend,
-    reden: uit.ok ? null : (uit.reden || 'onbekend') };
+    herzegeld: mee.map(r => r.id), reden: uit.ok ? null : (uit.reden || 'onbekend') };
   if (uit.ok) staat.laatsteGeslaagd = staat.laatste.at;
   else if (log && log.warn) log.warn('[anker] periodieke post mislukt: ' + staat.laatste.reden);
   return staat.laatste;

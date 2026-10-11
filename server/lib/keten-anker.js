@@ -113,7 +113,8 @@ const CONTROL = {
   wat: 'het wegknippen van de NIEUWSTE auditregels valt op tegen een extern anker',
   eigenaar: 'Security',
   bewijs: ['test/keten.test.js', 'test/ankerdienst.test.js', 'test/ankerdienst-echt.test.js',
-    'test/ankerketen.test.js', 'test/ankertimer.test.js', 'test/auditspoor-atomair.pg.test.js'],
+    'test/ankerketen.test.js', 'test/ankertimer.test.js', 'test/auditspoor-atomair.pg.test.js',
+    'test/ankerherzegel.test.js', 'test/ankerherzegel-echt.test.js'],
   bewijsstuk: 'POST /api/office/anker -- het GETEKENDE blok met de kop van elk journaal, plus de tegenproef',
   dekking: { beproefd: 0, totaal: 7, eenheid: 'auditjournalen met een anker dat BUITEN staat' },
   /* De noemer is 7: inzage, inlog, handelingen, onderzoekslab, de
@@ -123,7 +124,8 @@ const CONTROL = {
   grens: 'DE KETEN IS GEBOUWD, MAAR DE CONTROL IS NIET IN BEDRIJF zolang er geen echte tweede machine ' +
     'staat. Wat er wel is (audit P1-3): het blok wordt getekend met een Ed25519-sleutel die niet in de ' +
     'database staat (server/lib/ankerzegel.js), de ankertimer haalt elke ronde eerst het vorige blok terug ' +
-    'en rekent ermee af -- een afwijking laat het alarm afgaan en er gaat dan geen nieuw blok weg -- en ' +
+    'en rekent ermee af -- een afwijking laat het alarm afgaan en er gaat dan geen nieuw blok weg, tenzij een ' +
+    'GETEKENDE herzegeling van een AVG-wissing de herschrijving precies verklaart (server/lib/ankerherzegel.js) -- en ' +
     'publieke productie start niet zonder RTG_ANKERPOST_URL (server/config/productie-anker.js). ' +
     'scripts/ankerontvanger.js is een REFERENTIE-ontvanger (alleen bijschrijven, geen teruggang); de ' +
     'echte bestemming op een andere machine met onveranderlijke opslag is een besluit over de ' +

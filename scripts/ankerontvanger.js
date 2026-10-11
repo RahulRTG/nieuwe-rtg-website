@@ -25,6 +25,12 @@
      4. HET LAATSTE TERUG. GET /anker/laatste geeft het laatst aangenomen blok,
         of 404 als er nog niets ligt -- de ankertimer leest 404 als "eerste
         ronde" en niet als storing.
+     5. EEN HERZEGELING IS GEEN TERUGGANG -- maar alleen met bewijs. Een AVG-
+        wissing herzegelt het API-spoor (server/lib/ankerherzegel.js), zodat
+        een volgnummer een andere hash krijgt. Dat wordt alleen aangenomen als
+        het blok getekende herzegelingen meebrengt (zelfde sleutel als het
+        blok) die precies DIE oude hash naar precies DIE nieuwe voeren. De
+        herzegelingen worden mee bewaard, zodat het waarom hier blijft liggen.
 
    Draai: RTG_ANKER_MAP=/pad/naar/worm PORT=8443 node scripts/ankerontvanger.js
    (achter TLS; de ankerpost weigert http zonder RTG_ANKERPOST_ONVEILIG=1).
@@ -37,6 +43,9 @@ const path = require('path');
 const crypto = require('crypto');
 
 const SPKI_ED25519 = Buffer.from('302a300506032b6570032100', 'hex');
+/* Gelijk aan TEKENDOEL in server/lib/ankerherzegel.js; dit script draait op een
+   andere machine en neemt daarom geen code van het huis over. */
+const HERZEGEL_DOEL = 'rtg-herzegeling-v1\n';
 
 function kanoniek(v) {
   if (Array.isArray(v)) return '[' + v.map(kanoniek).join(',') + ']';
@@ -71,13 +80,36 @@ function maakOntvanger({ map, sleutel, publiek } = {}) {
     } catch (e) { return 'de handtekening is onleesbaar'; }
   }
 
-  function terugGang(oud, nieuw) {
+  /* Punt 5: voeren getekende herzegelingen de oude hash op dit volgnummer naar
+     de nieuwe? Zelfde sleutel als het blok; een record met een andere sleutel
+     of een andere journaalnaam telt niet. */
+  function herzegeldGoed(naam, p, n, herzegelingen, sleutelB64) {
+    const geldig = (herzegelingen || []).filter(r => r && r.journaal === naam && r.handtekening &&
+      r.handtekening.alg === 'ed25519' && r.handtekening.publiek === sleutelB64 && (() => {
+        try {
+          const { handtekening, ...kaal } = r;
+          const pub = crypto.createPublicKey({ key: Buffer.concat([SPKI_ED25519, Buffer.from(sleutelB64, 'base64')]), format: 'der', type: 'spki' });
+          return crypto.verify(null, Buffer.from(HERZEGEL_DOEL + kanoniek(kaal), 'utf8'), pub, Buffer.from(handtekening.waarde, 'base64'));
+        } catch (e) { return false; }
+      })());
+    let hash = p.hash; const gebruikt = new Set();
+    for (;;) {
+      const r = geldig.find(x => !gebruikt.has(x) && (x.regels || []).some(g => Number(g.nr) === Number(p.nr) && g.oud === hash));
+      if (!r) break;
+      gebruikt.add(r);
+      hash = r.regels.find(g => Number(g.nr) === Number(p.nr) && g.oud === hash).nieuw;
+    }
+    return gebruikt.size > 0 && hash === n.hash;
+  }
+
+  function terugGang(oud, nieuw, herzegelingen, sleutelB64) {
     for (const [naam, p] of Object.entries((oud && oud.punten) || {})) {
       if (!p) continue;
       const n = nieuw.punten[naam];
       if (!n) return naam + ' ontbreekt in het nieuwe blok';
       if (Number(n.nr) < Number(p.nr)) return naam + ' gaat terug van ' + p.nr + ' naar ' + n.nr;
-      if (Number(n.nr) === Number(p.nr) && n.hash !== p.hash) return naam + ' heeft op ' + p.nr + ' een andere hash';
+      if (Number(n.nr) === Number(p.nr) && n.hash !== p.hash && !herzegeldGoed(naam, p, n, herzegelingen, sleutelB64))
+        return naam + ' heeft op ' + p.nr + ' een andere hash, en geen getekende herzegeling verklaart dat';
     }
     return null;
   }
@@ -89,9 +121,11 @@ function maakOntvanger({ map, sleutel, publiek } = {}) {
     const pin = vorige && vorige.blok && vorige.blok.handtekening ? vorige.blok.handtekening.publiek : null;
     const fout = handtekeningGoed(blok, pin);
     if (fout) return { status: 400, error: fout };
-    const terug = vorige ? terugGang(vorige.blok, blok) : null;
+    const herzegelingen = Array.isArray(lijf.herzegelingen) ? lijf.herzegelingen : [];
+    const terug = vorige ? terugGang(vorige.blok, blok, herzegelingen, blok.handtekening.publiek) : null;
     if (terug) return { status: 409, error: 'geweigerd, geen teruggang: ' + terug };
     const regel = { ontvangen: new Date().toISOString(), blok };
+    if (herzegelingen.length) regel.herzegelingen = herzegelingen;
     const fd = fs.openSync(bestand, 'a', 0o600);           // ALLEEN bijschrijven
     try { fs.writeSync(fd, JSON.stringify(regel) + '\n'); fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
     return { status: 200, ok: true, nr: alles().length };

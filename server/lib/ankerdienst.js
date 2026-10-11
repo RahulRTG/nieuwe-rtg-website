@@ -110,6 +110,10 @@ function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
     return { geldig: true, reden: null };
   }
 
+  /* DE HERZEGELINGEN van een AVG-wissing: ./ankerherzegelopslag.js. */
+  const herzegelOpslag = require('./ankerherzegelopslag').maakHerzegelOpslag({ db, data, tijd, eigenPaar });
+  const verklaarHerschrijving = herzegelOpslag.verklaarHerschrijving;
+
   /* Afrekenen met een eerder naar buiten gebracht blok. Per journaal het
      oordeel van keten-anker.js; het geheel is pas ok als ze het allemaal zijn.
 
@@ -124,15 +128,23 @@ function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
     const teken = handtekeningGeldig(eerder);
     if (teken.geldig === false) return { ok: false, ondertekend: false, reden: teken.reden, blokAt: eerder.at };
     const perJournaal = {};
-    let alles = true; const ingekort = [];
+    let alles = true; const ingekort = []; const gebruikt = [];
     for (const [naam, haal] of Object.entries(JOURNALEN)) {
       const anker = eerder.punten[naam];
       if (!anker) { perJournaal[naam] = { ok: true, reden: 'stond niet in het blok' }; continue; }
-      const uit = verifieerTegenAnker(haal(data()), anker, Object.assign({ nu: tijd }, BEWARING[naam] || {}));
+      let uit = verifieerTegenAnker(haal(data()), anker, Object.assign({ nu: tijd }, BEWARING[naam] || {}));
+      /* Een herschreven zegelketen is alleen in orde als een GETEKENDE
+         herzegeling hem precies verklaart (./ankerherzegel.js). */
+      const verklaring = verklaarHerschrijving(naam, anker, uit);
+      if (verklaring && verklaring.verklaard) {
+        for (const r of verklaring.gebruikt) if (!gebruikt.includes(r)) gebruikt.push(r);
+        uit = { ok: true, herzegeld: true, wissingen: verklaring.gebruikt.map(r => r.id),
+          reden: 'regel ' + anker.nr + ' is herzegeld door een getekende AVG-wissing die de herschrijving precies verklaart' };
+      } else if (verklaring) uit = Object.assign({}, uit, { herzegeling: verklaring.reden });
       perJournaal[naam] = uit;
       if (!uit.ok) { alles = false; if (uit.ingekort) ingekort.push(naam); }
     }
-    return { ok: alles, ondertekend: teken.geldig, ingekort, perJournaal, blokAt: eerder.at };
+    return { ok: alles, ondertekend: teken.geldig, ingekort, perJournaal, blokAt: eerder.at, herzegelingen: gebruikt };
   }
 
   /* De stand, en hij liegt niet over wat hij bewijst.
@@ -158,6 +170,7 @@ function maakAnkerdienst({ db, nu, sleutel, omgeving }) {
   }
 
   return { blok, reken, stand, handtekeningGeldig, publiekeSleutel,
+    herzegelVoor: herzegelOpslag.herzegelVoor, herzegelingGeldig: herzegelOpslag.herzegelingGeldig,
     JOURNALEN: Object.keys(JOURNALEN).concat('ledenBoardLog') };
 }
 

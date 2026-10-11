@@ -95,10 +95,19 @@ function maakAnkerpost({ ankerdienst, nu, haal, omgeving } = {}) {
     }
   }
 
-  /* Het blok van NU wegbrengen. Alleen bijschrijven (punt 3). */
-  async function post() {
+  /* Het blok van NU wegbrengen. Alleen bijschrijven (punt 3).
+
+     `herzegelingen` gaan MEE als er een AVG-wissing tussen het vorige en dit
+     blok zat (./ankerherzegel.js): de tweede machine bewaart dan niet alleen
+     de nieuwe kop maar ook het getekende bewijs waarom de oude kop een andere
+     zegel kreeg. Zonder dat bewijs zou de ontvanger een teruggang zien. */
+  let laatstGepost = null;
+  async function post({ herzegelingen } = {}) {
     const blok = ankerdienst.blok();
-    const uit = await spreek('anker', { blok, at: new Date(tijd()).toISOString() });
+    const lijf = { blok, at: new Date(tijd()).toISOString() };
+    if (Array.isArray(herzegelingen) && herzegelingen.length) lijf.herzegelingen = herzegelingen;
+    const uit = await spreek('anker', lijf);
+    if (uit.ok) laatstGepost = { zegel: blok.zegel, at: blok.at };
     return Object.assign({ blok }, uit);
   }
 
@@ -130,7 +139,13 @@ function maakAnkerpost({ ankerdienst, nu, haal, omgeving } = {}) {
     };
   }
 
-  return { post, afrekenen, stand, keurBestemming };
+  /* Het laatst door DIT proces weggebrachte blok -- de verwijzing die een
+     herzegeling meekrijgt (`vorigAnker`). Na een herstart is dat null, en dat
+     zegt het record dan ook; de eigenlijke binding aan het anker is de oude
+     zegel per regel, niet dit veld. */
+  const vorigAnker = () => laatstGepost;
+
+  return { post, afrekenen, stand, keurBestemming, vorigAnker };
 }
 
 module.exports = { maakAnkerpost, keurBestemming };

@@ -1,0 +1,153 @@
+{
+  "stempel": {
+    "op": "2026-10-11T15:35:44.727Z",
+    "commit": "015bc5ab",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/conciergeproef.js",
+    "node": "v22.22.0"
+  },
+  "uitleg": "De concierge-lus van De Rechterhand (CONCIERGE.md), gemeten per SCHAKEL (handelt actor A, en merkt actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?): van een wens in een zin tot een gesloten case met een uitkomst, met een vertraging en een herstel onderweg.",
+  "grens": "Een Lifestyle-lid (demo-inlog), het kantoor met de gedeelde code, twee zaken (KIKUNOI, PONTO) en een Business-lid, allemaal over de API. Er komt geen browser aan te pas (dat doet test/conciergelusscherm.e2e.js). De zaak heeft nog GEEN scherm voor zijn opdrachten. Het verval van een aanbod vraagt een verzette klok en staat in test/conciergelus-kern.test.js. De hotelconcierge (B1), het collega-netwerk (B3) en de routekennis (B5) wachten op een besluit en worden niet gelopen.",
+  "schakels": [
+    {
+      "nr": 1,
+      "wat": "het lid vertelt een wens in een zin, en er staat een case met de velden uit die zin",
+      "stand": "gesloten",
+      "detail": "status 200; 20:00 · Amsterdam · geen noten · verrassing"
+    },
+    {
+      "nr": 2,
+      "wat": "dezelfde wens nog eens (zelfde sleutel) is een herhaling en geen tweede case",
+      "stand": "gesloten",
+      "detail": "1 case(s) in de lus"
+    },
+    {
+      "nr": 3,
+      "wat": "het kantoor ziet de case op het bureau, als lus-case",
+      "stand": "gesloten",
+      "detail": "lus true, soort regulier"
+    },
+    {
+      "nr": 4,
+      "wat": "het kantoor pakt hem op; het lid ziet een eigenaar (met de gedeelde code een ROL, geen verzonnen naam)",
+      "stand": "gesloten",
+      "detail": "lid ziet: {\"rol\":\"Lead Rechterhand\",\"naam\":null}"
+    },
+    {
+      "nr": 5,
+      "wat": "een weigering van de gewone route staat in de tijdlijn, en PAS DAARNA wordt de case bijzonder",
+      "stand": "gesloten",
+      "detail": "soort bijzonder"
+    },
+    {
+      "nr": 6,
+      "wat": "de beslisser biedt iets anders aan, en het wordt een termijn vastgehouden",
+      "stand": "gesloten",
+      "detail": "stand vastgehouden"
+    },
+    {
+      "nr": 7,
+      "wat": "buiten het mandaat zet het kantoor NIET vast: het lid krijgt een voorstel met de reden",
+      "stand": "gesloten",
+      "detail": "reden: Wij bereiden het voor en leggen het u ter goedkeuring voor."
+    },
+    {
+      "nr": 8,
+      "wat": "het lid geeft akkoord, het onderdeel staat vast, en pas dan zegt het bericht \"Alles is geregeld\"",
+      "stand": "gesloten",
+      "detail": "het lid leest: Alles is geregeld."
+    },
+    {
+      "nr": 9,
+      "wat": "de zaak ziet zijn onderdeel, \"discreet\" omdat het een verrassing is, en alleen de positieve veldenlijst",
+      "stand": "gesloten",
+      "detail": "velden: caseRef,datum,discreet,duurMin,gelegenheid,onderdeel,personen,stand,van,wat,wensen"
+    },
+    {
+      "nr": 10,
+      "wat": "een vertraging rekent de gevolgen uit en zet per partner een bericht KLAAR",
+      "stand": "gesloten",
+      "detail": "Tafel bij het water: nieuwe tijd 21:45 (was 21:30)."
+    },
+    {
+      "nr": 11,
+      "wat": "pas met alles aangevinkt gaat het weg, de zaak krijgt het, en de nieuwe tijd is de afspraak",
+      "stand": "gesloten",
+      "detail": "zonder vinkjes 409; daarna [{\"id\":\"3d6e1bec\",\"bezorgd\":true}]"
+    },
+    {
+      "nr": 12,
+      "wat": "een onderdeel dat omvalt maakt geen nieuwe case: dezelfde case gaat \"in herstel\"",
+      "stand": "gesloten",
+      "detail": "status in herstel"
+    },
+    {
+      "nr": 13,
+      "wat": "het lid kan tijdens het herstel iets laten weten, in dezelfde case",
+      "stand": "gesloten",
+      "detail": "status 200"
+    },
+    {
+      "nr": 14,
+      "wat": "een alternatief VERVANGT het kapotte onderdeel, en het lid hoort dat het programma is aangepast",
+      "stand": "gesloten",
+      "detail": "via het lid; het lid leest: Wij hebben het programma iets aangepast. Alles is geregeld."
+    },
+    {
+      "nr": 15,
+      "wat": "\"geregeld\" kan alleen als het waar is, en draagt een uitkomst: beloften, herstel, en hoe vaak het lid het opnieuw moest vertellen",
+      "stand": "gesloten",
+      "detail": "{\"beloften\":{\"totaal\":1,\"nagekomen\":1,\"open\":0},\"herstel\":1,\"opnieuwVerteld\":1}"
+    }
+  ],
+  "storingen": [
+    {
+      "nr": 1,
+      "wat": "het bureau kan een lus-case niet om de lus heen een stand geven",
+      "stand": "gehouden",
+      "detail": "status 409: Deze zaak loopt via de concierge-lus; zet de stappen daar."
+    },
+    {
+      "nr": 2,
+      "wat": "het lid kan niet beslissen over een voorstel dat er niet ligt",
+      "stand": "gehouden",
+      "detail": "status 400"
+    },
+    {
+      "nr": 3,
+      "wat": "een ander lid opent deze case niet, ook niet met het juiste id",
+      "stand": "gehouden",
+      "detail": "status 404"
+    },
+    {
+      "nr": 4,
+      "wat": "een tweede zaak ziet niets van een onderdeel dat niet het zijne is",
+      "stand": "gehouden",
+      "detail": "0 onderdeel/onderdelen gezien"
+    },
+    {
+      "nr": 5,
+      "wat": "een lid kan de werkwijze niet zelf zetten: een gewone case blijft gewoon",
+      "stand": "gehouden",
+      "detail": "werkwijze undefined"
+    },
+    {
+      "nr": 6,
+      "wat": "berichten die niet de klaargezette zijn, gaan niet weg",
+      "stand": "gehouden",
+      "detail": "status 409"
+    }
+  ],
+  "telling": {
+    "schakels": 15,
+    "gesloten": 15,
+    "openBekend": 0,
+    "stuk": 0,
+    "storingen": 6,
+    "gehouden": 6,
+    "gebroken": 0
+  },
+  "sluitMetBevinding": true,
+  "sluit": true
+}

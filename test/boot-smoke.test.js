@@ -77,7 +77,7 @@ function boot(port, dataDir) {
   return { kind, uitInfo };
 }
 
-test('de server boot met de publieke landing op root en de OS-poort onder /apps', async () => {
+test('de server boot met dezelfde RTG Account-voordeur op root en onder /apps', async () => {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-boot-'));
   let kind, uitInfo, r, actievePoort;
   try {
@@ -97,13 +97,10 @@ test('de server boot met de publieke landing op root en de OS-poort onder /apps'
     }
     // 1) de root reageert met een echte pagina
     assert.equal(r.status, 200, 'root gaf status ' + r.status + ' i.p.v. 200');
-    // 2) root is de canonieke publieke compositie met alle vier werelden
-    assert.ok(/data-page="rtg-landing"/.test(r.body) &&
-      /Vier werelden[\s\S]*[ÉE]én samenhangend geheel/.test(r.body) &&
-      /LivingOS/.test(r.body) && /TravelOS/.test(r.body) &&
-      /WorkOS/.test(r.body) && /FoundationOS/.test(r.body),
-    'root serveert niet de publieke vier-wereldenlanding');
-    // 3) de eerdere OS-ingang is niet verdwenen maar bewust naar /apps verhuisd
+    // 2) het app-domein opent meteen de product- en accountvoordeur
+    assert.ok(/id="gate"/.test(r.body) && /app-main/.test(r.body),
+      'root serveert niet de RTG Account-voordeur');
+    // 3) het bestaande /apps-pad blijft dezelfde ingang bedienen
     const apps = await haal(actievePoort, '/apps');
     assert.equal(apps.status, 200, '/apps gaf status ' + apps.status + ' i.p.v. 200');
     assert.ok(/id="gate"/.test(apps.body) && /os-lock|os-grid/.test(apps.body),

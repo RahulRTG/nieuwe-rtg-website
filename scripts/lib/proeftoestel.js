@@ -78,8 +78,21 @@ async function bindToestel({ post, token, naam }) {
   return { klaar: { token, toestelId: b.data.toestelId, teken }, reden: null };
 }
 
-/* EEN VERS PROEFLID: registreren als iedereen, en dan binden. */
-async function maakProeflid({ post, naam }) {
+/* EEN VERS PROEFLID: registreren als iedereen, binden, en -- met `basis` --
+   het paspoort laten keuren.
+
+   DE KEURING HOORT BIJ "ECHTE CLIENT", en dat bleek pas in de volle ronde van
+   11 oktober 2026. De bank werkte met het gebonden toestel, maar RTG Pay gaf
+   op stuur, oplaad, tegoed/koop, tik en verzoek/betaal een 403: "RTG Pay vraagt
+   eenmalig je paspoort" (kyc). De demo-pas had die vraag nooit gekregen; een
+   eigen account krijgt hem terecht. De keuring loopt langs de echte weg --
+   upload, selfie, en een kantoormens op naam die goedkeurt (`keurLidGoed` uit
+   test/helper.js, dezelfde die ./gratisaccount.js gebruikt). Er wordt geen
+   `verified`-veld in een database gezet.
+
+   Mislukt de keuring, dan blijft het proeflid bruikbaar voor wat geen paspoort
+   vraagt, en zegt `gekeurd: false` met de reden waarom de rest ongemeten blijft. */
+async function maakProeflid({ post, naam, basis }) {
   const email = 'proeflid-toestel-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '@voorbeeld.test';
   const reg = await post('/api/auth/register', { name: naam || 'Proeflid Toestel', email,
     password: 'geheim12345', geboortedatum: '1988-04-04', tier: 'rtg', pasApp: 'rtg' });
@@ -89,6 +102,13 @@ async function maakProeflid({ post, naam }) {
   if (!t.klaar) return t;
   const user = reg.data.state && reg.data.state.user;
   t.klaar.codenaam = (user && user.codename) || null;
+  t.klaar.gekeurd = false;
+  if (basis) {
+    try {
+      await require('../../test/helper').keurLidGoed(basis, token, t.klaar.codenaam);
+      t.klaar.gekeurd = true;
+    } catch (e) { t.klaar.keurReden = 'paspoortkeuring lukte niet: ' + e.message; }
+  } else t.klaar.keurReden = 'geen keuring gevraagd';
   return t;
 }
 

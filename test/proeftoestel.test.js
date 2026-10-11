@@ -108,6 +108,23 @@ test('6. de passkeymedewerker komt klaar op de productiestand van het bezitsbewi
   assert.deepEqual(m.klaar.routes, ['/api/office/bank/incasso']);
 });
 
+test('8. met `basis` is het paspoort gekeurd en vraagt RTG Pay het niet meer', async () => {
+  const lid = await maakProeflid({ post, naam: 'Toets Vier', basis: base });
+  const ander = await maakProeflid({ post, naam: 'Toets Vijf' });
+  assert.ok(lid.klaar && ander.klaar, 'proefleden: ' + (lid.reden || ander.reden));
+  assert.equal(lid.klaar.gekeurd, true, 'keuring: ' + lid.klaar.keurReden);
+  assert.equal(ander.klaar.gekeurd, false, 'zonder basis geen keuring, en dat staat erbij');
+  const p = metToestellen(post, { toestellen: [lid.klaar, ander.klaar] });
+  /* Het ongekeurde lid strandt op de paspoortvraag -- zo is te zien dat de
+     weigering die de keuring opheft er werkelijk is. */
+  const zonder = await p('/api/pay/oplaad', { centen: 1000, idem: 'proeftoestel-8a' }, ander.klaar.token);
+  assert.equal(zonder.status, 403);
+  assert.equal(zonder.data.kyc, true, JSON.stringify(zonder.data).slice(0, 160));
+  const met = await p('/api/pay/oplaad', { centen: 1000, idem: 'proeftoestel-8b' }, lid.klaar.token);
+  assert.notEqual(met.data.kyc, true, 'het gekeurde lid krijgt de paspoortvraag niet: ' + JSON.stringify(met.data).slice(0, 160));
+  assert.notEqual(met.status, 403, JSON.stringify(met.data).slice(0, 160));
+});
+
 test('7. een toestel dat niet aan DEZE sessie vastzit, levert geen proeflid op', async () => {
   const { bindToestel } = require('../scripts/lib/proeftoestel');
   /* Een server die het toestel wel kent maar de sessie niet kon binden: dan is

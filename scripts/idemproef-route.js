@@ -288,11 +288,12 @@ function wachtOpSchoneBoom() {
      alles zoals het was. Lukt een proeflid niet, dan zegt de ronde dat en meet hij
      zoals vroeger -- eerlijk ongemeten, nooit stil. */
   const { maakProeflid, metToestellen } = require('./lib/proeftoestel');
-  const proeflid = await maakProeflid({ post, naam: 'Proeflid Geld' });
-  const proefander = await maakProeflid({ post, naam: 'Proeflid Ontvanger' });
+  const proeflid = await maakProeflid({ post, naam: 'Proeflid Geld', basis });
+  const proefander = await maakProeflid({ post, naam: 'Proeflid Ontvanger', basis });
   console.log('  proefleden met een gebonden toestel  : ' +
     [['eerste', proeflid], ['tweede', proefander]].map(([n, p]) => n + ' ' +
-      (p.klaar ? 'klaar (' + (p.klaar.codenaam || '?') + ')' : 'NIET -- ' + p.reden)).join(', '));
+      (p.klaar ? 'klaar (' + (p.klaar.codenaam || '?') + (p.klaar.gekeurd ? ', paspoort gekeurd' : ', NIET gekeurd: ' + p.klaar.keurReden) + ')'
+        : 'NIET -- ' + p.reden)).join(', '));
   const postT = metToestellen(post, { toestellen: [proefander.klaar],
     voorLid: { lid: proeflid.klaar, van: () => tokenVoor('member') } });
 
@@ -823,7 +824,9 @@ function wachtOpSchoneBoom() {
       /* Of de zware paden door een echte client met een gebonden toestel zijn
          gedaan, of waarom niet -- zonder dit veld is een ronde ZONDER proeflid
          niet te onderscheiden van een ronde mét. */
-      proeflidToestel: proeflid.klaar && proefander.klaar ? { klaar: true }
+      proeflidToestel: proeflid.klaar && proefander.klaar
+        ? { klaar: true, gekeurd: !!(proeflid.klaar.gekeurd && proefander.klaar.gekeurd),
+          ...(proeflid.klaar.gekeurd && proefander.klaar.gekeurd ? {} : { keurReden: proeflid.klaar.keurReden || proefander.klaar.keurReden }) }
         : { klaar: false, reden: (proeflid.reden || proefander.reden) },
       /* WAT DE PLATFORMLAAG VING, EN WAT DE ROUTE ZELF DOET -- twee getallen,
          want ze gaan niet over hetzelfde. Alle oproepen hierboven dragen `idem`

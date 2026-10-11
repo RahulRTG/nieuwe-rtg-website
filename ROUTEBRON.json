@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-11T20:20:39.605Z",
-  "commit": "484675f0e",
+  "op": "2026-10-11T20:25:53.351Z",
+  "commit": "275cdfd32",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -38358,25 +38358,25 @@
   {
    "route": "POST /api/supplier/horeca/missions",
    "bestand": "server/routes/supplier/pda/vloer-missies.js",
-   "regel": 20,
+   "regel": 29,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/horeca/missions/activeer",
    "bestand": "server/routes/supplier/pda/vloer-missies.js",
-   "regel": 22,
+   "regel": 31,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/horeca/missions/status",
    "bestand": "server/routes/supplier/pda/vloer-missies.js",
-   "regel": 23,
+   "regel": 32,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/horeca/missions/voorstel",
    "bestand": "server/routes/supplier/pda/vloer-missies.js",
-   "regel": 21,
+   "regel": 30,
    "samengesteld": false
   },
   {

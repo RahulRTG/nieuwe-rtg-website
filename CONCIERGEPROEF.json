@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T19:11:11.265Z",
-    "commit": "76a34f5a",
+    "op": "2026-10-11T19:36:54.979Z",
+    "commit": "bf43dd46",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/conciergeproef.js",
@@ -86,7 +86,7 @@
       "nr": 13,
       "wat": "pas met alles aangevinkt gaat het weg, de zaak krijgt het, en de nieuwe tijd is de afspraak",
       "stand": "gesloten",
-      "detail": "zonder vinkjes 409; daarna [{\"id\":\"af826875\",\"bezorgd\":true}]"
+      "detail": "zonder vinkjes 409; daarna [{\"id\":\"14493ec7\",\"bezorgd\":true}]"
     },
     {
       "nr": 14,

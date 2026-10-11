@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T09:47:28.856Z",
-    "commit": "0ff824dd",
+    "op": "2026-10-11T12:46:34.129Z",
+    "commit": "22e9dc10",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3378,6 +3378,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "doossleutel-ontslag.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
       "scherp": "gezakt"
     },
     "doossleutels-register.test.js": {
@@ -15061,6 +15068,13 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "overleefd"
+    },
+    "staff-accountuit.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "staff-inzet-mob.test.js": {
       "soort": "server",

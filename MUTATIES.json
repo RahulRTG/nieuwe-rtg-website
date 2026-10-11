@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-07T00:06:50.131Z",
-    "commit": "152f23099",
+    "op": "2026-10-11T06:23:38.736Z",
+    "commit": "7a2ca6d5e",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
   },
@@ -875,6 +875,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "architectproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/codearchitect.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "arena.test.js": {
       "soort": "server",

@@ -166,7 +166,7 @@ test('een zaak buiten Nederland krijgt de Nederlandse regel niet', () => {
 });
 
 /* ---------------- tegen een echte server ---------------- */
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody } = require('./helper');
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vakantieregel-'));
 let srv, base;
 const api = (pad, body, token) => fetch(base + '/api/' + pad, {
@@ -238,6 +238,17 @@ test('de poort op een echte server: dicht vanaf de start, alleen de eigenaar zet
   assert.ok(!dicht.body.beleidOpen.includes('verlof.wettelijkWekenPerJaar'), 'de wet staat onder het beleid van een Nederlandse zaak');
 
   /* Openen zonder toets: 422. Een niet-eigenaar komt er niet aan (het lid heeft geen kantoor). */
+  /* Boardroomtoegang is niet de eigenaar: een medewerker in de boardroom leest wel, maar opent niet. */
+  const reg = await api('auth/register', { name: 'Regel Mede', email: 'regelmede' + u + '@e.test', password: 'geheim123',
+    geboortedatum: '1985-05-05', pasApp: 'rtg' });
+  assert.equal((await api('account/koppel', await kantoorKoppelBody(base, reg.body.token), reg.body.token)).status, 200);
+  assert.equal((await api('office/boardroom/toegang/geef', { codenaam: reg.body.state.user.codename }, eig)).status, 200);
+  const mede = (await api('account/start', { rol: 'kantoor' }, reg.body.token)).body.token;
+  assert.equal((await api('office/vrijheid/vakantieregel', {}, mede)).status, 200, 'de medewerker komt de boardroom in');
+  const nietEig = await api('office/vrijheid/vakantieregel/stand', { stand: 'open', toets }, mede);
+  assert.equal(nietEig.status, 403, 'boardroomtoegang is niet de eigenaar: ' + JSON.stringify(nietEig.body));
+  assert.equal((await api('office/vrijheid/vakantieregel', {}, eig)).body.open, false);
+
   const zonder = await api('office/vrijheid/vakantieregel/stand', { stand: 'open' }, eig);
   assert.equal(zonder.status, 422, JSON.stringify(zonder.body));
   assert.equal((await api('office/vrijheid/vakantieregel', {}, eig)).body.open, false);

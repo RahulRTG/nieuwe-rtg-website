@@ -326,4 +326,12 @@ test('N52: een open code van een uitgever die niet meer actief is, claimt niets'
   s.staff.push({ id: 52, active: 1, supplier_code: 'ANDERS', member_id: 11, name: 'Elders', role: 'manager' });
   const elders = await s.api.maakInvite(zaak, { name: 'Elders', staffId: 52 }, { naam: 'X', role: 'staff', idem: 'n52-elders' });
   assert.equal(await s.api.zoekInvite(elders.kassacode), null, 'de uitgever hoort niet bij deze zaak');
+
+  // TEGENPROEF: dezelfde zaak in kleine letters is dezelfde zaak
+  s.staff.push({ id: 53, active: 1, supplier_code: 'zaak', member_id: 12, name: 'Klein', role: 'manager' });
+  const klein = await s.api.maakInvite(zaak, { name: 'Klein', staffId: 53 }, { naam: 'Y', role: 'staff', idem: 'n52-klein' });
+  assert.ok(await s.api.zoekInvite(klein.kassacode), 'de zaakcode wordt zonder hoofdletterverschil vergeleken');
+  // TEGENPROEF: zonder bekende uitgever (een rij van voor N52) geldt het oude gedrag
+  const zonder = await s.api.maakInvite(zaak, manager, { naam: 'Z', role: 'staff', idem: 'n52-zonder' });
+  assert.ok(await s.api.zoekInvite(zonder.kassacode), 'een code zonder uitgever valt niet onder deze laag');
 });

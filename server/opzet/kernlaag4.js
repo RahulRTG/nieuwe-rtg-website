@@ -110,6 +110,11 @@ kern.genootschapInzicht = require('../kern/genootschap/inzicht')({ db, save, gen
   prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst });
 kern.genootschapUitvoer = require('../kern/genootschap/uitvoer')({ genootschap: kern.genootschap,
   codenaamVan: kern.codenaamVan });
+/* Het beraad (B3, kern/beraad/): overleggen en besluiten in een genootschap. Het
+   genootschap is de drager; het beraad bezit geen leden. Rahul krijgt ook hier
+   een bevroren leesweergave en nooit de module. */
+kern.beraad = require('../kern/beraad')({ db, save, codenaamVan: kern.codenaamVan, notify, genootschap: kern.genootschap });
+kern.beraadAI = require('../kern/beraad/ai')({ lees: require('../kern/beraad/leesweergave').leesweergave({ beraad: kern.beraad }) });
 /* De Berichten-app: zoeken over alle kanalen, gesprekken vastzetten/stilzetten/
    archiveren, en de drie AI-taken (samenvatten, een antwoord opstellen, de
    afspraken eruit halen). De AI stelt op, de mens verstuurt. */

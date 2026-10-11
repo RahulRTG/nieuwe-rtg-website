@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-07T01:41:53.213Z",
-  "commit": "88661ef0e",
+  "op": "2026-10-11T23:02:46.999Z",
+  "commit": "6bd368cb8",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -365,7 +365,7 @@
   },
   {
    "sleutel": "POST /api/auth/verify-email",
-   "bestand": "server/routes/auth/account.js:85",
+   "bestand": "server/routes/auth/account.js:90",
    "staat": "openbaar",
    "reden": "de bevestigingslink IS de geloofsbrief (verifyActionToken); ongeldig of verlopen geeft 400"
   },

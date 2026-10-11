@@ -85,8 +85,18 @@ module.exports = ({ kern }) => {
   const vindIn = (bron, code) => bearer.vind(
     Object.values(bron).flatMap(x => Array.isArray(x) ? x : []), code,
     inv => inv && inv.toegang && inv.toegang.code_hash);
+  /* N52, tweede laag: een open code van een plek die niet meer actief is, geldt
+     niet meer. Dat vangt een uitgifte die tegelijk met de verwijdering liep (op
+     PostgreSQL zijn intrekken en uitgeven twee transacties) en houdt geen stand
+     bij: de plek zelf is de waarheid, en wie roteert wordt de nieuwe uitgever. */
+  const uitgeverWeg = inv => {
+    if (!inv || inv.claim || inv.uitgever_staff == null) return null;
+    const p = accounts.getStaffByIdAny(Number(inv.uitgever_staff));
+    return p && Number(p.active) === 1 && String(p.supplier_code).toUpperCase() ===
+      String(inv.supplierCode).toUpperCase() ? null : 'uitgever-niet-actief';
+  };
   const geldig = inv => bearer.reden(inv && inv.toegang,
-    { doel: DOEL, scope: SCOPE });
+    { doel: DOEL, scope: SCOPE }) || uitgeverWeg(inv);
   const herstelGeldig = inv => bearer.reden(inv && inv.toegang,
     { doel: DOEL, scope: SCOPE, negeerGebruik: true });
 

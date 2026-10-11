@@ -79,7 +79,7 @@ app.post('/api/supplier/staff/invite/roteer', supplierAuth, async (req, res) => 
     return res.status(503).json({ error: 'Personeelsuitnodigingen zijn tijdelijk niet veilig geconfigureerd.' });
   let inv;
   const idem = String((req.body.idem || (req.get && req.get('Idempotency-Key'))) || '').slice(0, 200);
-  try { inv = await Promise.resolve(roteerInvite(req.supplier.code, req.body.id, req.actor.name, idem)); }
+  try { inv = await Promise.resolve(roteerInvite(req.supplier.code, req.body.id, req.actor.name, idem, req.actor.staffId)); }
   catch (e) { console.error('[staff-invite] veilige verwerking mislukt'); return res.status(503).json({ error: 'De uitnodiging kon niet veilig worden geroteerd.' }); }
   if (!inv || inv.error) return res.status(inv && inv.status || 409).json(inv || { error: 'Rotatie mislukt.' });
   res.json({ ok: true, invite: { id: inv.id, kassacode: inv.kassacode, naam: inv.naam,

@@ -148,7 +148,10 @@ test('4. staff/remove trekt de uitnodiging van precies die plek in', () => {
     { id: 'c', toegang: { n: 'c' } },
     /* een tweede code van hetzelfde lid die half bleef steken: nooit actief,
        dus de hersteltak laat hem door, en de manager ziet hem niet in zijn lijst */
-    { id: 'd', toegang: { n: 'd' }, claim: { staffId: 9, memberId: 70 } }
+    { id: 'd', toegang: { n: 'd' }, claim: { staffId: 9, memberId: 70 } },
+    // N52: een open uitnodiging die plek 7 zelf uitgaf, en een van een collega
+    { id: 'e', toegang: { n: 'e' }, claim: null, uitgever_staff: 7 },
+    { id: 'f', toegang: { n: 'f' }, claim: null, uitgever_staff: 8 }
   ];
   const { trekInVoorStaff } = require('../server/routes/supplier/werving/uitnodiging-uitgifte')({
     db: { data: {} }, crypto: require('crypto'), transactie: fn => fn({}), lijstVan: () => lijst,
@@ -156,9 +159,10 @@ test('4. staff/remove trekt de uitnodiging van precies die plek in', () => {
     bearer: { intrekken: (t, actor, reden) => ingetrokken.push([t.n, actor, reden]) }
   });
   const r = trekInVoorStaff('Z', { id: 7, member_id: 70 }, 'Manager');
-  assert.equal(r.ingetrokken, 2);
-  assert.deepEqual(ingetrokken.map(x => x[0]), ['a', 'd'],
-    'de uitnodiging van plek 7 en de half geclaimde van hetzelfde lid; niet die van een collega en niet een open');
+  assert.equal(r.ingetrokken, 3);
+  assert.deepEqual(ingetrokken.map(x => x[0]), ['a', 'd', 'e'],
+    'de uitnodiging van plek 7, de half geclaimde van hetzelfde lid en de open die hij uitgaf; niet die van een collega');
+  assert.equal(ingetrokken[2][2], 'uitgever uit het team gehaald');
   assert.deepEqual(ingetrokken[0].slice(1), ['Manager', 'medewerker uit het team gehaald']);
 });
 
@@ -176,3 +180,62 @@ for (const pad of ['/api/supplier/staff/remove', '/api/supplier/staff/invite/int
     assert.ok(uit > trek, 'eerst intrekken, dan pas de plek uitzetten: lukt het intrekken niet, dan verandert er niets');
   });
 }
+
+/* N52: een manager die zelf een open uitnodiging uitgaf, kwam daarmee terug
+   nadat een collega hem uit het team haalde. Een open uitnodiging droeg alleen
+   de NAAM van de uitgever, dus staff/remove wist niet welke codes van hem
+   kwamen. Nu legt de uitgifte zijn plek vast en trekt een verwijdering ook zijn
+   open uitnodigingen in; die van een collega blijven staan. */
+test('6. N52: een verwijderde manager komt niet terug met een code die hij zelf uitgaf', async () => {
+  const reg = await api('/api/auth/register', { name: 'Lid Mara', email: 'mara@ontslag.test', password: WW, geboortedatum: '1990-01-01' });
+  assert.ok(reg.body.token, 'registratie: ' + kort(reg));
+  const inv = await api('/api/supplier/staff/invite', { name: 'Ontslag Mara', role: 'manager', func: 'Leiding' }, baas);
+  assert.equal(inv.status, 200, 'uitnodiging als manager: ' + kort(inv));
+  const join = await api('/api/supplier/staff/join', { bedrijf: zaakNaam, kassacode: inv.body.invite.kassacode, login: 'mara@ontslag.test', password: WW });
+  assert.equal(join.status, 200, 'aanmelding: ' + kort(join));
+  const werk = await api('/api/supplier/mijn/login', { login: 'mara@ontslag.test', password: WW });
+  assert.ok(werk.body.token, 'Mara krijgt een werksessie als manager: ' + kort(werk));
+
+  const eigen = await api('/api/supplier/staff/invite', { name: 'Achterdeur', role: 'manager', func: 'Leiding' }, werk.body.token);
+  assert.equal(eigen.status, 200, 'Mara geeft zelf een manageruitnodiging uit: ' + kort(eigen));
+  const collega = await api('/api/supplier/staff/invite', { name: 'Gewoon nieuw', func: 'Bediening' }, baas);
+  assert.equal(collega.status, 200, 'de baas geeft er ook een uit: ' + kort(collega));
+
+  const weg = await api('/api/supplier/staff/remove', { staffId: join.body.staffId }, baas);
+  assert.equal(weg.status, 200, 'de baas haalt Mara uit het team: ' + kort(weg));
+
+  const terug = await api('/api/supplier/staff/join', { bedrijf: zaakNaam, kassacode: eigen.body.invite.kassacode, login: 'mara@ontslag.test', password: WW });
+  assert.equal(terug.status, 401, 'haar eigen code valt af: ' + kort(terug));
+  assert.equal((await api('/api/supplier/mijn/login', { login: 'mara@ontslag.test', password: WW })).status, 404,
+    'en ze heeft geen werkplek meer');
+
+  // TEGENPROEF: de open uitnodiging van de baas blijft gewoon geldig.
+  const lijst = await api('/api/supplier/staff/invites', {}, baas);
+  const open = (lijst.body.invites || []).find(x => x.id === collega.body.invite.id);
+  assert.ok(open, 'de uitnodiging van de baas staat nog in de lijst: ' + kort(lijst));
+  assert.equal(open.status, 'actief', 'en is nog actief: ' + JSON.stringify(open));
+  const mijn = (lijst.body.invites || []).find(x => x.id === eigen.body.invite.id);
+  assert.ok(mijn && mijn.status !== 'actief', 'die van Mara staat ingetrokken: ' + JSON.stringify(mijn));
+});
+
+/* N52, rotatie: wie de code van een collega roteert, krijgt de nieuwe code te
+   zien. Haalt iemand hem daarna weg, dan valt ook die geroteerde code af. */
+test('7. N52: een code die de verwijderde manager roteerde, valt ook af', async () => {
+  const reg = await api('/api/auth/register', { name: 'Lid Joost', email: 'joost@ontslag.test', password: WW, geboortedatum: '1990-01-01' });
+  assert.ok(reg.body.token, 'registratie: ' + kort(reg));
+  const inv = await api('/api/supplier/staff/invite', { name: 'Ontslag Joost', role: 'manager', func: 'Leiding' }, baas);
+  const join = await api('/api/supplier/staff/join', { bedrijf: zaakNaam, kassacode: inv.body.invite.kassacode, login: 'joost@ontslag.test', password: WW });
+  assert.equal(join.status, 200, 'aanmelding: ' + kort(join));
+  const werk = await api('/api/supplier/mijn/login', { login: 'joost@ontslag.test', password: WW });
+  assert.ok(werk.body.token, 'werksessie: ' + kort(werk));
+
+  const vanBaas = await api('/api/supplier/staff/invite', { name: 'Geroteerd', role: 'manager', func: 'Leiding' }, baas);
+  assert.equal(vanBaas.status, 200, kort(vanBaas));
+  const rot = await api('/api/supplier/staff/invite/roteer', { id: vanBaas.body.invite.id }, werk.body.token);
+  assert.equal(rot.status, 200, 'Joost roteert de code van de baas: ' + kort(rot));
+
+  const weg = await api('/api/supplier/staff/remove', { staffId: join.body.staffId }, baas);
+  assert.equal(weg.status, 200, kort(weg));
+  const terug = await api('/api/supplier/staff/join', { bedrijf: zaakNaam, kassacode: rot.body.invite.kassacode, login: 'joost@ontslag.test', password: WW });
+  assert.equal(terug.status, 401, 'de code die hij kreeg bij het roteren valt af: ' + kort(terug));
+});

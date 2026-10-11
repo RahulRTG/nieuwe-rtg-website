@@ -169,8 +169,9 @@ test('uitval na activatie sluit fail-closed en een retry herstelt zonder PIN-rep
   assert.equal(herstel.status, 409);
   assert.equal(herstel.hersteld, true);
   assert.equal(Object.hasOwn(herstel, 'pin'), false, 'een retry onthult het eenmalige geheim niet');
-  assert.equal(herstel.staff.id, claim.staffId);
-  assert.equal(s.staff.filter(x => x.active).length, 1);
+  // N36: het herstel draagt geen ruwe personeelsrij meer; de plek zelf staat wel weer aan
+  assert.equal(Object.hasOwn(herstel, 'staff'), false, 'geen ruwe personeelsrij in het antwoord');
+  assert.deepEqual(s.staff.filter(x => x.active).map(x => x.id), [claim.staffId]);
 });
 
 test('intrekken en roteren maken oude codes server-side nutteloos', async () => {
@@ -292,4 +293,37 @@ test('productie geeft zonder een veilige vaste APP_URL geen uitnodigingsadres ui
     if (oudeUrl == null) delete process.env.APP_URL; else process.env.APP_URL = oudeUrl;
     if (oudeOmgeving == null) delete process.env.NODE_ENV; else process.env.NODE_ENV = oudeOmgeving;
   }
+});
+
+/* N52, tweede laag: een open code van een plek die niet meer actief is, geldt
+   niet meer, ook als de intrekking bij de verwijdering hem miste (op PostgreSQL
+   lopen intrekken en een gelijktijdige uitgifte in twee transacties). Hier
+   gaat de plek uit ZONDER trekInVoorStaff: precies dat racegeval. */
+test('N52: een open code van een uitgever die niet meer actief is, claimt niets', async () => {
+  const s = opstelling();
+  s.staff.push({ id: 50, active: 1, supplier_code: 'ZAAK', member_id: 9, name: 'Mara', role: 'manager' });
+  const baas = { name: 'Mara', staffId: 50 };
+  const vooraf = await s.api.maakInvite(zaak, baas, { naam: 'Achterdeur', role: 'manager', func: 'Leiding', idem: 'n52-een' });
+  assert.ok(await s.api.zoekInvite(vooraf.kassacode), 'TEGENPROEF: zolang de uitgever actief is, geldt de code');
+  assert.equal(await s.api.kassacodeHoortBij(vooraf.kassacode, 'ZAAK'), true);
+
+  s.staff.find(x => x.id === 50).active = 0;      // uit het team, maar niet ingetrokken
+  assert.equal(await s.api.zoekInvite(vooraf.kassacode), null, 'de code wordt niet meer gevonden');
+  assert.equal(await s.api.kassacodeHoortBij(vooraf.kassacode, 'ZAAK'), false);
+  const claim = await s.api.verbindCode(lid(77, 'Mara'), vooraf.kassacode, {}, 'ZAAK');
+  assert.equal(claim.ok, undefined, 'geen plek: ' + JSON.stringify(claim));
+  assert.equal(s.staff.filter(x => x.active).length, 0, 'er is niemand actief geworden');
+  const lijst = await s.api.lijstInvites('ZAAK');
+  assert.equal(lijst.invites.find(x => x.id === vooraf.id).status, 'uitgever-niet-actief',
+    'de manager ziet waarom, en kan hem roteren');
+
+  // wie roteert wordt de uitgever, en dan geldt de code weer
+  s.staff.push({ id: 51, active: 1, supplier_code: 'ZAAK', member_id: 10, name: 'Baas', role: 'manager' });
+  const rot = await s.api.roteerInvite('ZAAK', vooraf.id, 'Baas', 'n52-rot', 51);
+  assert.ok(await s.api.zoekInvite(rot.kassacode), 'na rotatie door een actieve manager geldt de nieuwe code');
+
+  // een plek van een andere zaak telt niet als actieve uitgever
+  s.staff.push({ id: 52, active: 1, supplier_code: 'ANDERS', member_id: 11, name: 'Elders', role: 'manager' });
+  const elders = await s.api.maakInvite(zaak, { name: 'Elders', staffId: 52 }, { naam: 'X', role: 'staff', idem: 'n52-elders' });
+  assert.equal(await s.api.zoekInvite(elders.kassacode), null, 'de uitgever hoort niet bij deze zaak');
 });

@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4541,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1687,
+    "kernBreedte": 1689,
     "kernGedeeld": 255,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -4310,6 +4310,15 @@
       "meter": "kernGedeeld 254 -> 255",
       "reden": "`genootschapDrager` wordt door twee domeinen aangeraakt, en dat hoort zo: de beheerder vraagt en maakt los (member), de partnerstichting erkent langs haar partnercode (rtfos). Twee kopieen van de regel wanneer een vraag op een stichting staat, zouden uit elkaar lopen; een gedeelde naam met een module erachter niet.",
       "waarheen": "server/kern/genootschap/drager.js en test/genootschap-drager.test.js"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1687,
+      "meter": "kernBreedte 1687 -> 1689",
+      "reden": "Samenvoeging van verbond (B2), beraad (B3) en drager (B1) in claude/foundationos-gemeenschapsproef. Elke tak boekte zijn eigen stap vanaf 1685 (verbond +1, beraad +2, drager +1); samen is dat 1689. In deze tak komt er geen kernnaam bij: de gemeenschapsproef raakt de kern alleen over HTTP.",
+      "waarheen": "De drie notities van 11 oktober 2026 (verbond, beraad, drager) met hun eigen regels in GRENZEN.json; scripts/gemeenschapsproef.js loopt alle drie tegen een echte server."
     }
   ],
   "prestatie": {

@@ -108,7 +108,7 @@ test('2. N53: ook staff/invite/intrek (iemand via zijn uitnodiging uit het team)
 test('3. N53 laag 2: een sleutel van een plek die niet meer actief is, opent niets', async () => {
   const crypto = require('crypto');
   const { maakDoosSleutels } = require('../server/kern/zaakdoos/sleutels');
-  const { uitgeverWeg, plekVan } = require('../server/kern/zaakdoos/sleutels-uitgever');
+  const { uitgeverWeg, doosUitgeverPlek } = require('../server/kern/zaakdoos/sleutels-uitgever');
   const plekken = [{ id: 7, active: 1, supplier_code: 'KIKUNOI', member_id: 70 }, { id: 8, active: 1, supplier_code: 'HOSHI' }];
   const leden = { 70: { id: 70, actief: 1 } };
   const accounts = { getStaffByIdAny: id => plekken.find(p => p.id === Number(id)) || null,
@@ -145,8 +145,8 @@ test('3. N53 laag 2: een sleutel van een plek die niet meer actief is, opent nie
   plekken[2].active = 0;
   assert.deepEqual(s.welke('kassa-a', rot.sleutel, 'kloon'), { fout: 'ingetrokken' });
 
-  assert.deepEqual(plekVan('zaak:KIKUNOI#12'), { zaak: 'KIKUNOI', staffId: 12 });
-  assert.equal(plekVan('zaak:KIKUNOI/lid-3'), null, 'een lidsleutel zonder plek valt erbuiten');
+  assert.deepEqual(doosUitgeverPlek('zaak:KIKUNOI#12'), { zaak: 'KIKUNOI', staffId: 12 });
+  assert.equal(doosUitgeverPlek('zaak:KIKUNOI/lid-3'), null, 'een lidsleutel zonder plek valt erbuiten');
 });
 
 /* De bedrading van laag 2: het ene register van de server (kern.doosSleutels)

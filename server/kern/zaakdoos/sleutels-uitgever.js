@@ -14,14 +14,14 @@
 
 const PLEK = /^zaak:([A-Z0-9][A-Z0-9_-]{1,39})#(\d+)$/;
 
-function plekVan(door) {
+function doosUitgeverPlek(door) {
   const m = PLEK.exec(String(door || ''));
   return m ? { zaak: m[1], staffId: Number(m[2]) } : null;
 }
 
 // de plek EN het account erachter (N54): accounts.plekWerkt, het oordeel van de werksessie
 function uitgeverWeg(rij, accounts) {
-  const p = plekVan(rij && rij.uitgegeven_door);
+  const p = doosUitgeverPlek(rij && rij.uitgegeven_door);
   if (!p) return false;
   return !(p.zaak === rij.zaak && accounts.plekWerkt(p.staffId, p.zaak));
 }
@@ -38,4 +38,4 @@ async function trekInVanPlek(register, zaak, staffId, door) {
   return n;
 }
 
-module.exports = { plekVan, uitgeverWeg, trekInVanPlek };
+module.exports = { doosUitgeverPlek, uitgeverWeg, trekInVanPlek };

@@ -1292,6 +1292,33 @@ const VOORZIENINGEN = {
     const f = await zaakSaldo({ post, tokenVoor });
     if (f) return { fout: f };
     return {};
+  },
+  /* EEN VERS BESTAND IN DE EIGEN KLUIS, voor het documentcontract. De ronde van 27
+     september gaf drie keer 404 "Dat bestand staat niet in uw eigen kluis": de route
+     zoekt een `id` met een `expectedVersion`, en de proef had geen van beide. Sinds
+     de Documents-pilot (22 september) staat deze route in VOORSTEL, dus Rahul mag hem
+     klaarzetten -- en een AI-pad zonder gevolgmeting is precies wat
+     scripts/gevolgdekking.js `onbekend` noemt (95 -> 96).
+
+     Het bestand wordt gemaakt langs de GEWONE uploadroute, en de versie wordt
+     gelezen uit `/api/bestanden/mijn` en niet geraden: de route weigert een
+     verouderde versie met 409, en dan meet de proef een toestandscontrole. De
+     `operationId` staat VAST in het lijf, zodat de herhaling met dezelfde sleutel
+     ook dezelfde logische handeling is -- dat is het contract van de route. */
+  '/api/bestanden/actie': async ({ post, tokenVoor }) => {
+    const up = await post('/api/bestanden/upload',
+      { naam: 'proefbestand.txt', dataUrl: 'data:text/plain;base64,cHJvZWY=' }, tokenVoor('member'));
+    const id = up && up.data && up.data.id;
+    if (!id) return { fout: 'bestanden/upload gaf ' + (up && up.status) + ' ' + ((up && up.data && up.data.error) || '') };
+    const lijst = await post('/api/bestanden/mijn', {}, tokenVoor('member'));
+    const f = ((lijst && lijst.data && lijst.data.items) || []).find(x => x && x.id === id);
+    if (!f || f.documentVersion == null) return { fout: 'het nieuwe bestand stond niet met een versie in /api/bestanden/mijn' };
+    /* `strikt`: het contract weigert elk veld dat het niet kent, dus de proef mag
+       hier geen `idem` in het lijf stoppen -- zie de STRIKTE stand in
+       ./idemproef.js. De operationId is van de vorm die het contract eist. */
+    return { strikt: true, capability: 'documents.trash', contractVersion: 1, id,
+      expectedVersion: f.documentVersion,
+      operationId: versSleutel('document').replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 100) };
   }
 };
 

@@ -3,7 +3,14 @@
   "gemeten": {
     "op": "2026-10-06T13:07:35.169Z",
     "commit": "9919f748",
-    "routesToen": 5453
+    "routesToen": 5459,
+    "aangevuld": {
+      "op": "2026-10-11",
+      "commit": "6ae9945a",
+      "routes": ["POST /api/verbond/lees", "POST /api/verbond/mijn", "POST /api/verbond/teken", "POST /api/verbond/voorstel", "POST /api/verbond/wijzig", "POST /api/verbond/zeg-op"],
+      "bron": "routejournaal (RTG_ROUTELOG) van node --test test/verbond-server.test.js",
+      "waarom": "De volle suite is voor deze zes nieuwe routes NIET opnieuw gedraaid; de andere 5453 komen uit de meting van 6 oktober (commit 9919f748). routesToen staat daarom op de routekaart na deze commit. Een volgende npm run dekking:vast vervangt dit blok."
+    }
   },
   "aangeraakt": [
     "DELETE /api/scim/v2/Groups/:id",

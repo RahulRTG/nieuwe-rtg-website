@@ -82,7 +82,18 @@ async function proef(reducedMotion) {
     /* De pageswap-kant moet geladen zijn (basis.js laadt hem), anders meet je
        een pagina die nog bezig is en niet de overgang. */
     await reizen.waitForFunction(() => !!window.RTGHeritageTransition, null, { timeout: 20000 });
-    await reizen.evaluate(() => document.querySelector('a.wh-service[href="/apps/reisboek.html"]').click());
+    /* Een ECHTE tik op een kaart die IN BEELD staat. De eerste versie riep
+       click() aan via JavaScript terwijl de kaart onder de rand van het scherm
+       stond (boven 748 px in een venster van 704 px): zichtbaar volgens
+       checkVisibility, maar buiten het venster, en dan legde de browser de oude
+       kant van de groep onder belasting niet vast -- 6 van 9 keer rood in drie
+       parallelle rondes, en zo ook in CI. Een duim tikt alleen op wat hij ziet,
+       dus de toets schuift hem eerst in beeld en tikt dan met de muis. */
+    const kaart = reizen.locator('a.wh-service[href="/apps/reisboek.html"]');
+    await kaart.waitFor({ state: 'visible', timeout: 20000 });
+    await kaart.scrollIntoViewIfNeeded();
+    await reizen.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    await kaart.click();
     let doel = null;
     for (let i = 0; i < 200 && !doel; i++) {
       doel = page.frames().find((f) => { try { return new URL(f.url()).pathname === '/apps/reisboek.html'; } catch (e) { return false; } });

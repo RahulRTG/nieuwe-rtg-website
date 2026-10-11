@@ -221,9 +221,9 @@ afgehandeld (**World Model** is bezet met zes betekenissen en heet hier
 levensgraaf, **Capability Mesh** half, **Trust Kernel** half, **Intent Engine**
 vrij, **Situation** let op); die worden hier niet herhaald. Dit zijn de zeven die
 uit de uitvoeringskant komen. `SEMANTIEK.json` meet dat dit huis
-<!--getal:semantiek.namen-->131<!--/getal--> namen in meer dan één domein heeft,
-waarvan <!--getal:semantiek.betekenissen-->113<!--/getal--> met meer dan één
-betekenis (samen <!--getal:semantiek.betekenissenTotaal-->424<!--/getal-->
+<!--getal:semantiek.namen-->132<!--/getal--> namen in meer dan één domein heeft,
+waarvan <!--getal:semantiek.betekenissen-->114<!--/getal--> met meer dan één
+betekenis (samen <!--getal:semantiek.betekenissenTotaal-->427<!--/getal-->
 betekenissen).
 
 1. **`envelop`** — bezet en gesloten (zie par. 2).

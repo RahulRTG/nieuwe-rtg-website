@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-11T18:10:20.769Z",
-    "commit": "b77f52962",
+    "op": "2026-10-11T19:55:21.453Z",
+    "commit": "d1c9c087a",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 2,
     "instrument": "scripts/namensvorm.js",
     "node": "v26.10.0"
   },
@@ -602,10 +602,10 @@
   "woordenschat": [
     {
       "woord": "doel",
-      "bestanden": 307,
-      "domeinen": 157,
-      "samengesteld": 197,
-      "samengesteldDomeinen": 92,
+      "bestanden": 314,
+      "domeinen": 160,
+      "samengesteld": 203,
+      "samengesteldDomeinen": 95,
       "stand": "bezet",
       "waar": [
         "bedrijf",
@@ -625,9 +625,9 @@
     },
     {
       "woord": "contract",
-      "bestanden": 74,
-      "domeinen": 22,
-      "samengesteld": 122,
+      "bestanden": 75,
+      "domeinen": 23,
+      "samengesteld": 123,
       "samengesteldDomeinen": 40,
       "stand": "bezet",
       "waar": [
@@ -694,17 +694,17 @@
     },
     {
       "woord": "risico",
-      "bestanden": 53,
-      "domeinen": 22,
-      "samengesteld": 29,
-      "samengesteldDomeinen": 15,
+      "bestanden": 57,
+      "domeinen": 25,
+      "samengesteld": 33,
+      "samengesteldDomeinen": 17,
       "stand": "bezet",
       "waar": [
         "kern/appstore",
         "kern/assets",
         "kern/bedrijfsmaat",
-        "kern/command",
-        "kern/handelingsklasse"
+        "kern/beraad",
+        "kern/command"
       ],
       "vormen": [
         "RISICOLIJST",
@@ -829,9 +829,9 @@
     },
     {
       "woord": "envelop",
-      "bestanden": 30,
+      "bestanden": 31,
       "domeinen": 15,
-      "samengesteld": 20,
+      "samengesteld": 21,
       "samengesteldDomeinen": 13,
       "stand": "bezet",
       "waar": [
@@ -874,6 +874,29 @@
       ]
     },
     {
+      "woord": "gevolg",
+      "bestanden": 13,
+      "domeinen": 10,
+      "samengesteld": 31,
+      "samengesteldDomeinen": 11,
+      "stand": "bezet",
+      "waar": [
+        "kern/beraad",
+        "kern/command",
+        "kern/identiteit",
+        "kern/koppel",
+        "kern/livinglab"
+      ],
+      "vormen": [
+        "GEVOLG_STANDEN",
+        "blindVoorGevolg",
+        "gevolgLaag",
+        "gevolgRegister",
+        "gevolgVan",
+        "gevolgcontract"
+      ]
+    },
+    {
       "woord": "deal",
       "bestanden": 19,
       "domeinen": 12,
@@ -894,29 +917,6 @@
         "dealBeeld",
         "dealBetaal",
         "dealHier"
-      ]
-    },
-    {
-      "woord": "gevolg",
-      "bestanden": 12,
-      "domeinen": 9,
-      "samengesteld": 31,
-      "samengesteldDomeinen": 11,
-      "stand": "bezet",
-      "waar": [
-        "kern/command",
-        "kern/identiteit",
-        "kern/koppel",
-        "kern/livinglab",
-        "kern/mall"
-      ],
-      "vormen": [
-        "GEVOLG_STANDEN",
-        "blindVoorGevolg",
-        "gevolgLaag",
-        "gevolgRegister",
-        "gevolgVan",
-        "gevolgcontract"
       ]
     },
     {
@@ -1177,6 +1177,21 @@
       ]
     },
     {
+      "woord": "mechanism",
+      "bestanden": 2,
+      "domeinen": 2,
+      "samengesteld": 2,
+      "samengesteldDomeinen": 2,
+      "stand": "bezet",
+      "waar": [
+        "kern/bewijsvlak",
+        "kern/namens"
+      ],
+      "vormen": [
+        "mechanisme"
+      ]
+    },
+    {
       "woord": "assurance",
       "bestanden": 3,
       "domeinen": 2,
@@ -1188,21 +1203,6 @@
         "kern/kantoor"
       ],
       "vormen": []
-    },
-    {
-      "woord": "mechanism",
-      "bestanden": 2,
-      "domeinen": 2,
-      "samengesteld": 1,
-      "samengesteldDomeinen": 1,
-      "stand": "bezet",
-      "waar": [
-        "kern/bewijsvlak",
-        "kern/namens"
-      ],
-      "vormen": [
-        "mechanisme"
-      ]
     },
     {
       "woord": "opportunity",

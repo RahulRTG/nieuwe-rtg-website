@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-11T18:10:19.051Z",
-    "commit": "b77f52962",
+    "op": "2026-10-11T19:55:20.205Z",
+    "commit": "d1c9c087a",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/groepvorm.js",
     "node": "v26.10.0"
   },

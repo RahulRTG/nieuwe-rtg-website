@@ -11831,7 +11831,7 @@
         "declaredMutationSemantics": 11,
         "sourceFileCount": 3,
         "kernelDependencyCount": 4,
-        "screenCount": 3,
+        "screenCount": 4,
         "sourceFiles": [
           "server/routes/leven.js",
           "server/routes/levenband.js",
@@ -11848,7 +11848,8 @@
         "screens": [
           "public/apps/foundation/index.html",
           "public/apps/foundation/mijnbanden.html",
-          "public/apps/foundation/veilig-vertrouwd.html"
+          "public/apps/foundation/veilig-vertrouwd.html",
+          "public/apps/leven.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -12183,7 +12184,7 @@
         "declaredMutationSemantics": 43,
         "sourceFileCount": 11,
         "kernelDependencyCount": 1,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/concern.js",
           "server/routes/concern/duiding.js",
@@ -12204,6 +12205,7 @@
         "kernelDependenciesOmitted": 0,
         "screens": [
           "public/apps/concern.html",
+          "public/apps/loopbaan.html",
           "public/apps/onderneming.html"
         ],
         "screensOmitted": 0,
@@ -19604,7 +19606,7 @@
         "declaredMutationSemantics": 7,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/member/winkel.js"
         ],
@@ -19612,7 +19614,8 @@
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
         "screens": [
-          "public/apps/reisbureau.html"
+          "public/apps/reisbureau.html",
+          "public/apps/reizen-veilig.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -20127,7 +20130,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 2,
+        "screenCount": 3,
         "sourceFiles": [
           "server/routes/move.js"
         ],
@@ -20136,7 +20139,8 @@
         "kernelDependenciesOmitted": 0,
         "screens": [
           "public/apps/mall.html",
-          "public/apps/move.html"
+          "public/apps/move.html",
+          "public/apps/reizen-veilig.html"
         ],
         "screensOmitted": 0,
         "signals": [
@@ -28541,7 +28545,7 @@
         "declaredMutationSemantics": 4,
         "sourceFileCount": 4,
         "kernelDependencyCount": 1,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/member/handel/uitjes.js",
           "server/routes/member/kopen/tickets.js",
@@ -28554,6 +28558,7 @@
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
+          "public/apps/leven.html",
           "public/apps/uitgaan.html"
         ],
         "screensOmitted": 0,
@@ -28773,7 +28778,7 @@
         "declaredMutationSemantics": 1,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
-        "screenCount": 1,
+        "screenCount": 2,
         "sourceFiles": [
           "server/routes/member/winkel-bieb.js"
         ],
@@ -28781,7 +28786,8 @@
         "kernelDependencies": [],
         "kernelDependenciesOmitted": 0,
         "screens": [
-          "public/apps/foodcourt.html"
+          "public/apps/foodcourt.html",
+          "public/apps/leven.html"
         ],
         "screensOmitted": 0,
         "signals": [

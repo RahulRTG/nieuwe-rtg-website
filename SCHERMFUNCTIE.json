@@ -3,12 +3,12 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-10-11",
-    "commit": "bc59b6a8e"
+    "commit": "d1c9c087a"
   },
   "bronnen": {
     "schermroutes": {
       "op": "2026-10-11",
-      "commit": "d3ff4536b",
+      "commit": "c186420bb",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,
@@ -19,6 +19,7 @@
           "public/apps/access/meaning.js",
           "public/apps/agenda.html",
           "public/apps/agenda/app.js",
+          "public/apps/agenda/context.js",
           "public/apps/agenda/editorial.js",
           "public/apps/agenda/kalender.js",
           "public/apps/agenda/paneel.js",
@@ -195,6 +196,8 @@
           "public/apps/commerce.html",
           "public/apps/concern-inhaal.js",
           "public/apps/concern.html",
+          "public/apps/concierge-lus-vorm.js",
+          "public/apps/concierge-lus.js",
           "public/apps/concierge.html",
           "public/apps/connect.html",
           "public/apps/decision-room-afweging.js",
@@ -383,6 +386,7 @@
           "public/apps/geld/kosten.js",
           "public/apps/geld/labfonds.js",
           "public/apps/geld/labfondsb.js",
+          "public/apps/geld/lidmaatschap.js",
           "public/apps/geld/logboek.js",
           "public/apps/geld/logboekb.js",
           "public/apps/geld/mecenaat.js",
@@ -490,6 +494,7 @@
           "public/apps/kantoorpda.html",
           "public/apps/kantoren-atelier3d.js",
           "public/apps/kantoren-collectieboek.js",
+          "public/apps/kantoren-reisteruggave.js",
           "public/apps/kantoren-reisuitnodiging.js",
           "public/apps/kantoren-rtgboek.js",
           "public/apps/kantoren-rtgcampagne.js",
@@ -536,6 +541,7 @@
           "public/apps/leerhuis.html",
           "public/apps/leerhuis.js",
           "public/apps/lesmaker.html",
+          "public/apps/leven-panelen.js",
           "public/apps/leven.html",
           "public/apps/leven.js",
           "public/apps/leverancier-aanvragen.html",
@@ -678,6 +684,7 @@
           "public/apps/library/app/app-02.js",
           "public/apps/life-lagen.js",
           "public/apps/life.html",
+          "public/apps/lifestyle-lus.js",
           "public/apps/lifestyle.html",
           "public/apps/living-os-data.js",
           "public/apps/living-os-render.js",
@@ -777,6 +784,7 @@
           "public/apps/notities.html",
           "public/apps/notities/app/app-01.js",
           "public/apps/notities/app/app-02.js",
+          "public/apps/notities/context.js",
           "public/apps/notities/gebaren.js",
           "public/apps/office.html",
           "public/apps/office/adaptief-pres.js",
@@ -902,6 +910,7 @@
           "public/apps/reizen-samen-delen.js",
           "public/apps/reizen-samen-mensen.js",
           "public/apps/reizen-samen.js",
+          "public/apps/reizen-veilig-reis.js",
           "public/apps/reizen-veilig.html",
           "public/apps/reizen-veilig.js",
           "public/apps/reizen.html",
@@ -950,6 +959,7 @@
           "public/apps/rtgschool/leer/leer-03.js",
           "public/apps/rtgschool/leer/leer-04.js",
           "public/apps/rtmail-compose.js",
+          "public/apps/rtmail-instellingen.js",
           "public/apps/rtmail-voorzijde-gesprek.js",
           "public/apps/rtmail-voorzijde-werk.js",
           "public/apps/rtmail-voorzijde.js",
@@ -1188,6 +1198,7 @@
           "public/shared/edge/actiestaat.js",
           "public/shared/edge/blikveld-hoofdactie.js",
           "public/shared/edge/blikveld.js",
+          "public/shared/edge/rahulzicht.js",
           "public/shared/emoji.js",
           "public/shared/experience-actions.js",
           "public/shared/experience-handoff.js",
@@ -2083,7 +2094,7 @@
   "totaal": {
     "schermen": 327,
     "aliassen": 20,
-    "zonderServer": 54,
+    "zonderServer": 53,
     "zonderInkomend": 1,
     "overlapParen": 21,
     "titelbotsingen": 1,
@@ -2472,7 +2483,7 @@
         "/api/push"
       ],
       "zonderServer": false,
-      "inkomend": 201,
+      "inkomend": 202,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/agenda.html",
@@ -3031,12 +3042,13 @@
         "/api/rtgid"
       ],
       "zonderServer": false,
-      "inkomend": 4,
+      "inkomend": 5,
       "inIndex": 1,
       "inkomendVan": [
         "public/apps/lifestyle.html",
         "public/apps/mijn-relaties.html",
         "server/kern/appgids-data/deel7b.js",
+        "server/kern/opnieuwbeginnen.js",
         "server/kern/wereldroutes/instellingen.js"
       ]
     },
@@ -3992,7 +4004,7 @@
         "/api/reserveringen"
       ],
       "zonderServer": false,
-      "inkomend": 17,
+      "inkomend": 18,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-23b.js",
@@ -7303,6 +7315,9 @@
         "/api/metier/rol",
         "/api/metier/rol-weg",
         "/api/metier/zoek",
+        "/api/mijn/abonnement",
+        "/api/mijn/abonnement/opzeggen",
+        "/api/mijn/abonnement/opzegvoorbeeld",
         "/api/pay/graaf",
         "/api/pay/portefeuille",
         "/api/pay/rekening",
@@ -7333,6 +7348,7 @@
         "/api/labfonds",
         "/api/member",
         "/api/metier",
+        "/api/mijn",
         "/api/pay",
         "/api/state",
         "/api/stream",
@@ -8749,7 +8765,7 @@
       "bestand": "public/apps/leven.html",
       "url": "/apps/leven.html",
       "titel": "RTG Leven",
-      "h1": "Wat past bij vanavond?",
+      "h1": "Uw lijn",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [
@@ -8760,12 +8776,20 @@
         }
       ],
       "rollen": [],
-      "schrijft": "nee",
+      "schrijft": "onbekend",
       "schil": [],
-      "paden": [],
+      "paden": [
+        "/api/foodcourt",
+        "/api/leven/cockpit",
+        "/api/uitgaan"
+      ],
       "schilPaden": [],
-      "domeinen": [],
-      "zonderServer": true,
+      "domeinen": [
+        "/api/foodcourt",
+        "/api/leven",
+        "/api/uitgaan"
+      ],
+      "zonderServer": false,
       "inkomend": 7,
       "inIndex": 8,
       "inkomendVan": [
@@ -9279,11 +9303,13 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/carriere/ledger"
+        "/api/carriere/ledger",
+        "/api/concern/mijnwerk"
       ],
       "schilPaden": [],
       "domeinen": [
-        "/api/carriere"
+        "/api/carriere",
+        "/api/concern"
       ],
       "zonderServer": false,
       "inkomend": 3,
@@ -9920,14 +9946,16 @@
       "schrijft": "niet vast te stellen",
       "schil": [],
       "paden": [
-        "/api/mijn/gegevens"
+        "/api/mijn/gegevens",
+        "/api/privacy/opnieuw"
       ],
       "schilPaden": [],
       "domeinen": [
-        "/api/mijn"
+        "/api/mijn",
+        "/api/privacy"
       ],
       "zonderServer": false,
-      "inkomend": 10,
+      "inkomend": 11,
       "inIndex": 4,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -9939,6 +9967,7 @@
         "public/shared/rtg-edge-smart-menu.js",
         "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
         "server/kern/appgids-data/deel12b.js",
+        "server/kern/opnieuwbeginnen.js",
         "server/kern/wereldroutes/instellingen.js"
       ]
     },
@@ -10112,12 +10141,13 @@
         "/api/mijn"
       ],
       "zonderServer": false,
-      "inkomend": 4,
+      "inkomend": 5,
       "inIndex": 4,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/ik.html",
         "server/kern/appgids-data/deel7.js",
+        "server/kern/opnieuwbeginnen.js",
         "server/kern/wereldroutes/instellingen.js"
       ]
     },
@@ -10199,10 +10229,12 @@
         "/api/move"
       ],
       "zonderServer": false,
-      "inkomend": 4,
+      "inkomend": 6,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
+        "public/apps/reizen-veilig-reis.js",
+        "public/apps/reizen-veilig.js",
         "public/apps/reizen.html",
         "public/shared/rtg-edge-2-loader.js",
         "server/kern/appgids-data/deel6b.js"
@@ -10302,12 +10334,13 @@
         "/api/nav"
       ],
       "zonderServer": false,
-      "inkomend": 17,
+      "inkomend": 18,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/hotels-momenten.js",
         "public/apps/move.html",
+        "public/apps/reizen-veilig-reis.js",
         "public/apps/reizen-veilig.html",
         "public/apps/reizen-veilig.js",
         "public/apps/reizen.html",
@@ -10315,8 +10348,7 @@
         "public/apps/rit.html",
         "public/apps/rtg.html",
         "public/apps/sport.html",
-        "public/apps/uitgaan.html",
-        "public/shared/interface/world-presentation.js"
+        "public/apps/uitgaan.html"
       ]
     },
     {
@@ -10575,7 +10607,7 @@
         "/api/ov"
       ],
       "zonderServer": false,
-      "inkomend": 14,
+      "inkomend": 15,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -11391,21 +11423,21 @@
         "/api/reisbureau"
       ],
       "zonderServer": false,
-      "inkomend": 19,
+      "inkomend": 21,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-42.js",
         "public/apps/mall.html",
         "public/apps/media.html",
+        "public/apps/reizen-veilig-reis.js",
+        "public/apps/reizen-veilig.js",
         "public/apps/reizen.html",
         "public/apps/sociaal.html",
         "public/shared/command/console.js",
         "public/shared/experience-intent.js",
         "public/shared/rtg-world-home.js",
         "public/shared/travel-os-config.js",
-        "public/site/werelden/travelos.html",
-        "server/kern/appcatalogus-rijen/deel1.js",
-        "server/kern/appgids-data/deel1.js"
+        "public/site/werelden/travelos.html"
       ]
     },
     {
@@ -11442,7 +11474,7 @@
       "bestand": "public/apps/reizen-veilig.html",
       "url": "/apps/reizen-veilig.html",
       "titel": "RTG Reizen & Veilig",
-      "h1": "Goedemiddag.",
+      "h1": "Welkom.",
       "soort": "scherm",
       "aliasNaar": null,
       "wereld": [
@@ -11456,6 +11488,8 @@
       "schrijft": "onbekend",
       "schil": [],
       "paden": [
+        "/api/move/volgende",
+        "/api/reisbureau",
         "/api/veiligheid/moment",
         "/api/veiligheid/moment/maak",
         "/api/veiligheid/moment/pauze",
@@ -11464,6 +11498,8 @@
       ],
       "schilPaden": [],
       "domeinen": [
+        "/api/move",
+        "/api/reisbureau",
         "/api/veiligheid"
       ],
       "zonderServer": false,
@@ -11526,7 +11562,7 @@
         "/api/reis"
       ],
       "zonderServer": false,
-      "inkomend": 69,
+      "inkomend": 70,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24a2b.js",

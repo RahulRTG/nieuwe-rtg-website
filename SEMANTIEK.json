@@ -1,9 +1,9 @@
 {
-  "catalogi": 1210,
-  "verschillendeNamen": 737,
-  "namenInMeerDomeinen": 131,
-  "woordenMetMeerBetekenissen": 113,
-  "betekenissenTotaal": 424,
+  "catalogi": 1223,
+  "verschillendeNamen": 748,
+  "namenInMeerDomeinen": 132,
+  "woordenMetMeerBetekenissen": 114,
+  "betekenissenTotaal": 427,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 49,
   "dubbelingen": 34,
@@ -427,7 +427,7 @@
     },
     {
       "naam": "STANDEN",
-      "betekenissenVanDitWoord": 19,
+      "betekenissenVanDitWoord": 20,
       "waar": [
         "server/kern/gast/verzoek.js",
         "server/kern/rtfos/ruil.js"
@@ -516,7 +516,7 @@
     },
     {
       "naam": "STANDEN",
-      "betekenissenVanDitWoord": 19,
+      "betekenissenVanDitWoord": 20,
       "waar": [
         "server/kern/avond/voorkeuren.js",
         "server/kern/werkvenster.js"
@@ -543,7 +543,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 271,
+  "dubbelingenZonderNaam": 275,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -1442,8 +1442,8 @@
     },
     {
       "naam": "STANDEN",
-      "domeinen": 21,
-      "betekenissen": 19,
+      "domeinen": 22,
+      "betekenissen": 20,
       "hoogsteOverlap": 0.4,
       "soort": "gemengd",
       "waar": [
@@ -1657,6 +1657,18 @@
             "avond",
             "slaap",
             "werk"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/verbond/regels.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "concept",
+            "getekend-a",
+            "getekend-b",
+            "actief"
           ]
         },
         {
@@ -3721,5 +3733,5 @@
       ]
     }
   ],
-  "bestanden": 4335
+  "bestanden": 4394
 }

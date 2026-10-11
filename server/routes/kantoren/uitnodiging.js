@@ -36,8 +36,17 @@ module.exports = (ctx) => {
       const bewijs = await zwaar.eis(boardroomUser(req), 'eigenaar-kantooruitnodiging',
         zwaar.sessieSleutel(req), req, 'Een uitnodiging voor het kantoor maken', { zonderTerugval: isProductie() });
       if (bewijs.error) return zwaar.stuur(res, bewijs);
-      const r = await bron().maak({ voorKey: t.key, codenaam: t.codename, door: wieDeed(req) });
+      /* De sleutel uit het lijf (`idem`) of de Idempotency-Key-kop. Een herhaling maakt
+         geen tweede uitnodiging en toont de code niet nog eens: 409 met `herhaald`, dus
+         de code die de eigenaar net doorgaf blijft de geldige. */
+      const idem = String((req.body && req.body.idem) || (req.get && req.get('idempotency-key')) || '');
+      const r = await bron().maak({ voorKey: t.key, codenaam: t.codename, door: wieDeed(req), idem });
       if (r.error) return res.status(r.status || 400).json({ error: r.error });
+      if (r.herhaald) {
+        res.set('Cache-Control', 'no-store');
+        return res.status(409).json({ herhaald: true, id: r.id, verloopt: r.verloopt, stand: r.stand, codenaam: t.codename,
+          error: 'Deze uitnodiging is al gemaakt en haar code wordt niet nog eens getoond; zij blijft gelden. Maak een nieuwe als de code kwijt is.' });
+      }
       afdelingen.audit(wieDeed(req), 'Kantooruitnodiging gemaakt voor ' + t.codename +
         (bewijs.bewezen ? ' (passkey bevestigd)' : ' (ZONDER passkey: terugval buiten productie)'));
       res.json(Object.assign({ codenaam: t.codename }, r));

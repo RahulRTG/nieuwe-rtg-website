@@ -47,18 +47,39 @@ function maakUitnodiging({ db, save, crypto, nu, bewerkCollectie }) {
     : u.toegang.ingetrokken_at ? 'ingetrokken' : bearer.reden(u.toegang) === 'verlopen' ? 'verlopen' : 'open';
 
   /* Een nieuwe uitnodiging voor een sleutel; een open uitnodiging voor dezelfde
-     sleutel wordt in dezelfde transactie ingetrokken (dat is de rotatie). */
-  function maak({ voorKey, codenaam, door }) {
+     sleutel wordt in dezelfde transactie ingetrokken (dat is de rotatie).
+
+     MET EEN IDEMPOTENTIESLEUTEL (11 oktober 2026, besluit van de eigenaar): dezelfde
+     uitgever, voor dezelfde sleutel, met dezelfde idempotentiesleutel is een
+     HERHALING en geen tweede uitnodiging. Zonder deze controle trok een retry de
+     uitnodiging in die de eigenaar net had doorgegeven, en kreeg hij een code waarvan
+     hij niet wist dat het de tweede was. De sleutel staat alleen als hash op de rij,
+     in dezelfde collectietransactie als de rotatie (een gelijktijdige dubbeltik ziet
+     hem dus ook), en de herhaling geeft `herhaald` en NOOIT de kale code -- die bestaat
+     alleen als hash. Alleen de LAATSTE uitnodiging voor die sleutel telt: een sleutel
+     van voor een verse uitgifte is daarna een nieuwe opdracht. Zelfde vorm als
+     foundation/gezinscode.js geef(). */
+  const idemHashVan = (voorKey, door, idem) => crypto.createHash('sha256')
+    .update('kantooruitnodiging-idem|' + voorKey + '|' + String(door || '') + '|' + idem).digest('hex');
+  function maak({ voorKey, codenaam, door, idem }) {
     if (!/^user-\d+$/.test(String(voorKey || '')))
       return { status: 400, error: 'Een uitnodiging hangt aan een persoonlijke RTG-inlog.' };
+    const idemWaarde = String(idem == null ? '' : idem).trim().slice(0, 200);
+    const ih = idemWaarde ? idemHashVan(voorKey, door, idemWaarde) : null;
     return transactie(l => {
+      if (ih) {
+        let laatste = null;
+        for (const u of l) if (u && u.voorKey === voorKey) laatste = u;
+        if (laatste && typeof laatste.idem_hash === 'string' && bearer.zelfdeHash(laatste.idem_hash, ih))
+          return { herhaald: true, id: laatste.id, verloopt: laatste.verloopt, stand: stand(laatste) };
+      }
       for (const u of l) if (u.voorKey === voorKey && u.toegang && !u.toegang.ingetrokken_at && u.toegang.gebruik < 1)
         bearer.intrekken(u.toegang, door || 'eigenaar', 'vervangen door een nieuwe uitnodiging');
       const id = 'uitn_' + crypto.randomBytes(8).toString('hex');
       const g = bearer.maak({ prefix: 'KU', issuer: 'rtg.kantoor.eigenaar', doel: DOEL, scope: SCOPE,
         onderwerp: { soort: 'kantooruitnodiging', id, voorKey }, geldigMs: GELDIG_DAGEN * DAG, maxGebruik: 1 });
-      l.push({ id, voorKey, codenaam: codenaam || null, door: door || null, toegang: g.toegang,
-        gemaakt: g.toegang.issued_at, verloopt: g.toegang.expires_at });
+      l.push(Object.assign({ id, voorKey, codenaam: codenaam || null, door: door || null, toegang: g.toegang,
+        gemaakt: g.toegang.issued_at, verloopt: g.toegang.expires_at }, ih ? { idem_hash: ih } : {}));
       if (l.length > 2000) l.splice(0, l.length - 2000);
       return { ok: true, id, code: g.code, verloopt: g.toegang.expires_at,
         let: 'Deze code wordt maar een keer getoond. Geef hem op een veilige manier aan de medewerker.' };

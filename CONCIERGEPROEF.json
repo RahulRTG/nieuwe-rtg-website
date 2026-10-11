@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T15:35:44.727Z",
-    "commit": "015bc5ab",
+    "op": "2026-10-11T16:23:12.706Z",
+    "commit": "db47d8de",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/conciergeproef.js",
@@ -74,7 +74,7 @@
       "nr": 11,
       "wat": "pas met alles aangevinkt gaat het weg, de zaak krijgt het, en de nieuwe tijd is de afspraak",
       "stand": "gesloten",
-      "detail": "zonder vinkjes 409; daarna [{\"id\":\"3d6e1bec\",\"bezorgd\":true}]"
+      "detail": "zonder vinkjes 409; daarna [{\"id\":\"3dc3d3b3\",\"bezorgd\":true}]"
     },
     {
       "nr": 12,
@@ -130,7 +130,7 @@
       "nr": 5,
       "wat": "een lid kan de werkwijze niet zelf zetten: een gewone case blijft gewoon",
       "stand": "gehouden",
-      "detail": "werkwijze undefined"
+      "detail": "status 200, werkwijze undefined"
     },
     {
       "nr": 6,

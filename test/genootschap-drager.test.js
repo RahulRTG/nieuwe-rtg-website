@@ -77,7 +77,7 @@ test('1. de drager is een verwijzing: de bron schrijft nooit naar leden, en draa
 });
 
 // Zakt bij de mutatie: in drager.js erken() de voorwaarde `d.ref !== p.id` weghalen -> P2 erkent de vraag aan P1.
-// Zakt bij de mutatie: in drager-regels.js de erkenning door partner() heen laten (`if (!p.ok)` -> `if (false)`) -> P3 komt door.
+// Zakt bij de mutatie: in drager.js vraag() de weigering van partner() negeren (`if (!p.ok)` -> `if (false)`) -> P3 komt door.
 test('2. alleen de gevraagde, erkende stichting erkent; een niet-erkende wordt geweigerd met de reden', () => {
   const w = wereld();
   const gr = w.genootschap.richtOp(w.sess('lid:beh'), { naam: 'De Wandelclub' }).groep;

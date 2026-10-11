@@ -209,6 +209,7 @@ test('6. de gezinsdeur: dezelfde kern, hetzelfde antwoord, en alleen voor een vo
   // BINNEN met een verzonnen sleutel in het lijf: het lidmaatschap komt op het gezinsprofiel
   const binnen = await g('binnen', { groep: gr.id, key: P.a.codenaam });
   assert.equal(binnen.status, 200, binnen.tekst);
+  assert.equal((await g('binnen', { groep: gr.id })).body.al, true, 'een tweede keer binnen is geen herhaling');
   assert.ok((await post('/api/genootschap/binnen', { groep: gr.id }, vreemde.token)).body.ok);
   const lijst = JSON.parse(await ledenlijst(P.beh, gr.id));
   assert.equal(lijst.length, 3, 'beheerder, gezinslid en lid');
@@ -223,6 +224,7 @@ test('6. de gezinsdeur: dezelfde kern, hetzelfde antwoord, en alleen voor een vo
   assert.equal(agGezin.tekst, agLid.tekst, 'de agenda via de gezinsdeur wijkt af');
   assert.equal((await g('prikbord', { groep: gr.id })).status, 200);
   assert.equal((await g('vertrek', { groep: gr.id })).status, 200);
+  assert.equal((await g('vertrek', { groep: gr.id })).status, 400, 'een tweede vertrek is een toestandscontrole');
   assert.equal((await g('mijn')).body.groepen.filter(x => x.id === gr.id).length, 0);
 
   // een gedragen groep: een gezinsprofiel komt er niet in, ook niet zelf

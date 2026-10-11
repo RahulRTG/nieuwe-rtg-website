@@ -3,7 +3,7 @@
   "gemeten": {
     "op": "2026-10-06T13:07:35.169Z",
     "commit": "9919f748",
-    "routesToen": 5453
+    "routesToen": 5461
   },
   "aangeraakt": [
     "DELETE /api/scim/v2/Groups/:id",
@@ -1249,6 +1249,8 @@
     "POST /api/geld/beleid",
     "POST /api/geld/beleid/weg",
     "POST /api/geld/beleid/zet",
+    "POST /api/geld/budgettoets",
+    "POST /api/geld/budgettoets/sta",
     "POST /api/geld/cockpit",
     "POST /api/geld/grens",
     "POST /api/geld/grens/weg",
@@ -1309,6 +1311,7 @@
     "POST /api/genootschap/rol",
     "POST /api/genootschap/stem",
     "POST /api/genootschap/uitvoer",
+    "POST /api/genootschap/venster",
     "POST /api/genootschap/vertrek",
     "POST /api/genootschap/zoek",
     "POST /api/gewoonten",
@@ -3309,6 +3312,10 @@
     "POST /api/reisbureau/annuleer",
     "POST /api/reisbureau/betaal",
     "POST /api/reisbureau/boek",
+    "POST /api/reisbureau/deelnemers/antwoord",
+    "POST /api/reisbureau/deelnemers/budget",
+    "POST /api/reisbureau/deelnemers/klaarzetten",
+    "POST /api/reisbureau/deelnemers/stand",
     "POST /api/reisbureau/mijn",
     "POST /api/reisbureau/thuis",
     "POST /api/reisbureau/wijzig",
@@ -3942,6 +3949,7 @@
     "POST /api/sociaal/object",
     "POST /api/sociaal/object/pagina",
     "POST /api/sociaal/rahul",
+    "POST /api/sociaal/samenstel",
     "POST /api/sociaal/voorstel/bevestig",
     "POST /api/sociaal/wereld",
     "POST /api/sociaalbeleid",
@@ -5469,5 +5477,19 @@
     "SCHERM /apps/spelen.html living-world.e2e.js nevenverzoek",
     "SCHERM /apps/wereld.html library-studio-reader.e2e.js nevenverzoek",
     "SCHERM /apps/wereld.html living-world.e2e.js nevenverzoek"
-  ]
+  ],
+  "aanvulling": {
+    "op": "2026-10-11",
+    "routes": [
+      "POST /api/geld/budgettoets",
+      "POST /api/geld/budgettoets/sta",
+      "POST /api/genootschap/venster",
+      "POST /api/reisbureau/deelnemers/antwoord",
+      "POST /api/reisbureau/deelnemers/budget",
+      "POST /api/reisbureau/deelnemers/klaarzetten",
+      "POST /api/reisbureau/deelnemers/stand",
+      "POST /api/sociaal/samenstel"
+    ],
+    "bron": "routejournaal (RTG_ROUTELOG) van test/romeschakels.test.js tegen een echte server; de volledige suite (npm run dekking:vast) liep hier niet binnen een uur rond en is NIET opnieuw gedraaid -- de rest van dit bestand is de meting van 9919f748"
+  }
 }

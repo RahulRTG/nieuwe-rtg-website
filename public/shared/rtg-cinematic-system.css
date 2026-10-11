@@ -219,9 +219,9 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:not(
   --rtg-world-card:#faf8f3!important;
   --rtg-world-card-strong:#e8e3d9!important;
   --rtg-world-ink:#11110e!important;
-  --rtg-world-muted:#69645c!important;
+  --rtg-world-muted:#4d4a45!important;
   --rtg-world-line:rgba(33,29,22,.17)!important;
-  --rtg-world-metal:#8a7419!important;
+  --rtg-world-metal:#7f1634!important;
   --rtg-world-action:#7f1634!important;
   --rtg-world-action-ink:#fffaf2!important;
   --rtg-world-schema:light!important;
@@ -247,16 +247,37 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:not(
   background:#f1eee7!important;
   color:#11110e!important;
 }
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world="living"]:not([data-public-platform]){
+/* Op ivoor halen grijs en goud geen 4,5:1 voor kleine tekst: #69645c en het
+   goud #8a7419 zakten op de lichtste lagen naar 4,34 en 3,38. De www-site zet
+   zijn overlines op ivoor daarom in bordeaux, en de onderschriften in het
+   merkgrijs; de app volgt dat hierboven. De oude decoratie van de donkere
+   werelden (lichte strepen en een gouden gloed op de body) hoort niet in een
+   ivoren kamer: die kleurde de grond beige. Een fotoscène houdt een donkere
+   eigen grond, zodat haar lichte tekst ook leesbaar is als de foto niet laadt. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:not([data-public-platform])::before,
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:not([data-public-platform])::after{
+  background:none!important;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wp-scene{
+  background-color:#11100e;color:#f7f1e8;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wp-scene .wp-free{color:#f7f1e8!important}
+/* Een fotohero vervloeit in zijn eigen grond (--wh-bg). Die werd ivoor, en
+   daarmee viel de lichte kop en ondertitel onderin de hero op ivoor weg. Zoals
+   de hero van de www-site blijft hij een donker blok op de ivoren pagina. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wh-photo{--wh-bg:#11100e}
+/* De signatuur volgt het palet, niet de route: een ingebed Work-blad kleurt
+   de schil van Command of het bureau mee, ook al blijft die route Living. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="living"],[data-rtg-world="living"]:not([data-rtg-palette])):not([data-public-platform]){
   --rtg-world-signature:#9b714e!important;
 }
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world="travel"]:not([data-public-platform]){
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="travel"],[data-rtg-world="travel"]:not([data-rtg-palette])):not([data-public-platform]){
   --rtg-world-signature:#9b3152!important;
 }
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world="work"]:not([data-public-platform]){
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="work"],[data-rtg-world="work"]:not([data-rtg-palette])):not([data-public-platform]){
   --rtg-world-signature:#587369!important;
 }
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world="foundation"]:not([data-public-platform]){
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="foundation"],[data-rtg-world="foundation"]:not([data-rtg-palette])):not([data-public-platform]){
   --rtg-world-signature:#557566!important;
 }
 
@@ -415,6 +436,8 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
     --edge-top:88px!important;--rtg-header-desktop:88px!important;
     padding-top:88px!important;
   }
+  /* De kop staat vast; wat in beeld wordt geschoven landt eronder, niet erachter. */
+  html:has(body[data-rtg-cinematic="true"][data-rtg-layout="standard"]){scroll-padding-top:104px}
   body[data-rtg-cinematic="true"] .rtg-edge-top{
     min-height:88px!important;height:88px!important;padding:0 clamp(32px,4vw,72px)!important;
     gap:24px!important;
@@ -458,6 +481,7 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
     --edge-top:82px!important;--rtg-header-mobile:82px!important;
     padding-top:82px!important;
   }
+  html:has(body[data-rtg-cinematic="true"][data-rtg-layout="standard"]){scroll-padding-top:98px}
   body[data-rtg-cinematic="true"] .rtg-edge-top{
     min-height:82px!important;height:82px!important;padding:0 20px!important;gap:14px!important;
   }
@@ -509,7 +533,7 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
     aspect-ratio:auto!important;border:0!important;border-radius:0!important;
   }
   body[data-rtg-cinematic="true"] .wp-scene .wp-photo::after{
-    background:linear-gradient(180deg,rgba(7,6,5,.08) 8%,rgba(7,6,5,.22) 34%,rgba(7,6,5,.68) 66%,rgba(7,6,5,.96) 100%)!important;
+    background:linear-gradient(180deg,rgba(7,6,5,.08) 8%,rgba(7,6,5,.32) 30%,rgba(7,6,5,.78) 56%,rgba(7,6,5,.96) 100%)!important;
   }
   body[data-rtg-cinematic="true"] .wp-scene .wp-heading{
     display:block!important;position:absolute!important;z-index:2!important;

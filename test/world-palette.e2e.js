@@ -1,20 +1,25 @@
 /* Wereldkleuren op het werkelijk geschilderde scherm: een body-token alleen
    mist oude vlakken binnen een iframe en de kleur van zijn buitenste schil.
+   Sinds de www-pariteit (#534) is de grond in elke wereld dezelfde ivoren
+   kamer van de publieke website; de wereld zelf leeft in de signatuurkleur.
    Vergelijkt zelfstandige apps, desktopvensters en Pass-bladen op beide
    breedtes; controleert ook gebiedsnavigatie, terugkeer en de browserrand.
-   De oude desktop-only CSS laat de spelerproef zakken; zonder paletprojectie
-   zakt de Work-buitenrand; pathname zonder query verliest het reisgebied. */
+   Een donkere oude vlakkenlaag laat de grond zakken; een signatuur die aan de
+   route hangt in plaats van aan het palet laat de ingebedde schil zakken;
+   pathname zonder query verliest het reisgebied. */
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path');
 const h = require('./helper');
 const pw = h.laadPlaywright(), skip = h.geenBrowser(pw);
 const engines = ['chromium', ...(process.env.RTG_TEST_WEBKIT === '1' ? ['webkit'] : [])];
+// [grond, vlak, inkt, signatuur]: de grond is www-ivoor, de signatuur is de wereld.
+const ivoor = ['rgb(241, 238, 231)', 'rgb(250, 248, 243)', 'rgb(17, 17, 14)'];
 const colors = {
-  living: ['rgb(16, 13, 10)', 'rgb(32, 25, 18)', 'rgb(247, 240, 229)'],
-  work: ['rgb(16, 24, 23)', 'rgb(25, 36, 34)', 'rgb(243, 240, 231)'],
-  travel: ['rgb(25, 13, 18)', 'rgb(41, 23, 29)', 'rgb(248, 239, 231)'],
-  foundation: ['rgb(16, 35, 30)', 'rgb(25, 55, 45)', 'rgb(247, 241, 229)']
+  living: [...ivoor, '#9b714e'],
+  work: [...ivoor, '#587369'],
+  travel: [...ivoor, '#9b3152'],
+  foundation: [...ivoor, '#557566']
 };
 let srv, token;
 async function post(route, body, auth) {
@@ -35,15 +40,21 @@ async function palette(scope, world, card) {
   // Wait for imported CSS too: the body attributes precede stylesheet loading.
   await scope.waitForFunction(() => !!getComputedStyle(document.body).getPropertyValue('--rtg-world-card').trim());
   // Reduced motion still has a 0.01ms transition; sample the final painted state.
-  await scope.waitForFunction(bg => getComputedStyle(document.body).backgroundColor === bg,colors[world][0],{timeout:3000});
+  await scope.waitForFunction(([bg,sig]) => {
+    const body = getComputedStyle(document.body);
+    return body.backgroundColor === bg && body.getPropertyValue('--rtg-world-signature').trim() === sig;
+  },[colors[world][0],colors[world][3]],{timeout:3000});
   const actual = await scope.evaluate(selector => {
     const body = getComputedStyle(document.body), el = selector && document.querySelector(selector);
     return {body:body.backgroundColor, ink:body.color, card:el && getComputedStyle(el).backgroundColor,
       cardInk:el && getComputedStyle(el).color, palette:document.body.dataset.rtgPalette,
-      token:body.getPropertyValue('--rtg-world-bg'),style:document.body.getAttribute('style'),transition:body.transition};
+      token:body.getPropertyValue('--rtg-world-bg'),signature:body.getPropertyValue('--rtg-world-signature').trim(),
+      style:document.body.getAttribute('style'),transition:body.transition};
   },card);
   assert.equal(actual.body,colors[world][0],world+' body '+JSON.stringify(actual));
   assert.equal(actual.ink,colors[world][2],world+' text');
+  assert.equal(actual.palette,world,world+' palette');
+  assert.equal(actual.signature,colors[world][3],world+' signature');
   if (card) {
     assert.equal(actual.card,colors[world][1],world+' '+card+' surface');
     assert.equal(actual.cardInk,colors[world][2],world+' '+card+' text');

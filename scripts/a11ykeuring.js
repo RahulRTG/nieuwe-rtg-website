@@ -233,7 +233,14 @@ function uitersten(kleuren) {
 
    Alleen een pseudo die het vlak ECHT bedekt telt mee: absoluut gepositioneerd
    met alle vier de zijden op nul. Een waas die maar een hoek raakt, laat de rest
-   van de tekst op de oude grond staan, en dan is de oude grond de eerlijke. */
+   van de tekst op de oude grond staan, en dan is de oude grond de eerlijke.
+
+   EEN FOTO IN ZO'N PSEUDO IS EEN FOTO, GEEN GAT. Hier stond `return null` voor
+   een `url()`-laag, en null betekent bij de aanroeper "geen laag": de meting
+   liep dan gewoon door naar de ouders. Zo werd lichte tekst op de foto van een
+   hero gemeten tegen de ivoren body erachter, 1,02:1, terwijl hij op een donkere
+   foto staat. Bij een element stopt de meting op een foto eerlijk; bij een
+   pseudo die het vlak bedekt hoort dat net zo. Daarvoor dient 'beeld'. */
 function pseudoLagen(el, welke) {
   const s = getComputedStyle(el, welke);
   if (!s || !s.content || s.content === 'none') return null;
@@ -244,7 +251,7 @@ function pseudoLagen(el, welke) {
   if (bi && bi !== 'none') {
     for (const laag of laagStukken(bi)) {
       const st = verloopStops(laag);
-      if (!st) return null;
+      if (!st) return 'beeld';
       uit.push({ kandidaten: uitersten(st), dekt: dektHelemaal(st) });
       if (dektHelemaal(st)) return uit;
     }
@@ -262,6 +269,7 @@ function gronden(el) {
     if (p !== el) {
       for (const welke of ['::after', '::before']) {
         const pl = pseudoLagen(p, welke);
+        if (pl === 'beeld') return null;  // een foto: hier stopt de meting eerlijk
         if (pl) for (const l of pl) { lagen.push(l.kandidaten); if (l.dekt) { dekt = true; break; } }
         if (dekt) break;
       }

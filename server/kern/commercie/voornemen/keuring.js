@@ -42,8 +42,10 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
     if (!beslis) return { status: 503, error: 'Er is geen beslislaag om dit voornemen langs te leggen.' };
 
     const o = opties || {};
+    const ctx = Object.assign({}, o.context || {});
+    if (v.risicogoedkeuring && !ctx.risicogoedkeuring) ctx.risicogoedkeuring = v.risicogoedkeuring;
     const b = beslis({ actor: v.actor, handeling: v.handeling, doel: v.doel,
-      waardeCenten: v.totaalCenten, context: o.context || {} });
+      waardeCenten: v.totaalCenten, context: ctx });
     /* EEN LEEG ANTWOORD IS GEEN ANTWOORD, en dit is geen theoretisch geval.
        ../../opzet/kernlaag3c.js geeft deze laag `(vraag) => (kern.beslis ?
        kern.beslis(vraag) : null)` mee. Die wrapper is ALTIJD een functie, dus de
@@ -55,6 +57,8 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
     if (!b || !b.uitkomst)
       return { status: 503, error: 'De beslislaag gaf geen uitkomst; er wordt niets goedgekeurd.' };
     v.besluit = { uitkomst: b.uitkomst, reden: b.reden, beleid: b.beleid, at: tijd() };
+    if (b.uitzondering) v.besluit.uitzondering = b.uitzondering;
+    if (b.omkeerbaar === false) v.besluit.omkeerbaar = false;
     if (b.bewijstoken) v.bewijstoken = b.bewijstoken;
 
     if (DOOR.has(b.uitkomst)) {
@@ -62,6 +66,15 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
          "tot hier mag het wel", maar een plan van vijf stappen kun je niet voor
          zestig procent uitvoeren zonder te weten welke stappen sneuvelen. Dat is
          een keuze van de aanvrager en niet van deze laag. */
+      /* OMKEERBAAR is "het mag, MITS terug te draaien" -- en dat mits werd hier nooit
+         nagekeken: zo'n voornemen ging gewoon op GEKEURD. Voor een voornemen is het
+         antwoord al bekend, want het domein geeft `omkeerbaar` mee in de context; komt
+         OMKEERBAAR toch terug, dan HEEFT het domein het niet aangetoond. Dan is het een
+         weigering met de reden (eigenaarsbesluit 2B-aangepast, 11 oktober 2026). */
+      if (b.uitkomst === UITKOMST.OMKEERBAAR) {
+        zet(v, P.STAND.AFGEWEZEN, { reden: b.reden });
+        return { status: 200, ok: true, voornemen: publiek(v) };
+      }
       if (b.uitkomst === UITKOMST.BEPERKT) {
         zet(v, P.STAND.AFGEWEZEN, { reden: 'Het plan past niet in zijn geheel (' + b.reden +
           '). Stel een kleiner voornemen op; welke stappen eraf gaan is niet aan het systeem.' });
@@ -98,10 +111,30 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
       return { status: 400, error: 'Een tweede handtekening van dezelfde persoon is er geen.' };
     v.goedgekeurdDoor = wie;
     save();
-    return keur(id, { context: { ...(context || {}), goedgekeurdDoor: wie, bevestigingVers: true, omkeerbaar: true } });
+    /* GEEN `omkeerbaar: true` MEER (eigenaarsbesluit 2B-aangepast, 11 oktober 2026):
+       een tweede handtekening is autorisatie en geen omkeerbaarheid. Of een handeling
+       terug kan, zegt het domein in de context van de aanroeper -- en anders niet. */
+    return keur(id, { context: { ...(context || {}), goedgekeurdDoor: wie, bevestigingVers: true } });
   }
 
-  return { keur, tekenAf };
+  /* DE RISICOGOEDKEURING: een eigen stap, op naam, met reden (../uitzondering.js). Hij
+     KEURT NIET: hij legt vast, en de volgende keuring (na de tweede handtekening) weegt
+     hem mee. Alleen zolang er nog geen besluit is -- een nee wordt geen ja. */
+  function risicoGoedkeur(id, { door, reden }) {
+    const v = vind(id);
+    if (!v) return { status: 404, error: 'Dit voornemen bestaat niet.' };
+    if (v.stand !== P.STAND.OPGESTELD && v.stand !== P.STAND.WACHT)
+      return { status: 409, error: 'Een risicogoedkeuring hoort voor het besluit; dit voornemen staat op ' + v.stand + '.' };
+    const wie = String(door || '').slice(0, 60);
+    const waarom = String(reden || '').trim().slice(0, 400);
+    if (!wie || waarom.length < 10) return { status: 400, error: 'Een risicogoedkeuring draagt een naam en een reden van ten minste tien tekens.' };
+    if (wie === v.actor) return { status: 400, error: 'Wie de handeling aanvraagt, geeft er niet zelf de risicogoedkeuring voor.' };
+    v.risicogoedkeuring = { door: wie, reden: waarom, at: tijd() };
+    save();
+    return { status: 200, ok: true, voornemen: publiek(v) };
+  }
+
+  return { keur, tekenAf, risicoGoedkeur };
 }
 
 module.exports = { maakKeuring };

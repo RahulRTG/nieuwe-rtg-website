@@ -22,7 +22,7 @@ function maakTekenen({ voornemens, vindDossier, leg, noteer, bewaar }) {
     const wie = String(door || '').slice(0, 60);
     if (!wie) return { status: 400, error: 'Wie tekent er af?' };
 
-    const r = voornemens.tekenAf(id, { door: wie, context: { pad: d.pad } });
+    const r = voornemens.tekenAf(id, { door: wie, context: { pad: d.pad, omkeerbaar: d.omkeerbaar === true } });
     const env = envelopLaag.maak({ kanaal: 'office', actor: null, classificatie: 'intern',
       correlatie: d.correlatie, oorzaak: d.envelop });
     if (!r.ok) {
@@ -67,6 +67,14 @@ function maakTekenen({ voornemens, vindDossier, leg, noteer, bewaar }) {
         reden: 'het besluit na de tweede handtekening gaf een bewijstoken mee; de uitvoering levert hem in' });
     bewaar(d);
     noteer(env, 'geldketen.getekend', { voornemen: id, door: wie, stand: r.voornemen && r.voornemen.stand });
+    /* EEN HANDTEKENING DIE OP EEN NEE UITKOMT, IS EEN WEIGERING. Na het aftekenen weegt
+       het beleid opnieuw, en een onomkeerbare handeling boven de omkeerbaarheidsgrens
+       wordt daar AFGEWEZEN (eigenaarsbesluit 2B-aangepast). Dat als 200 teruggeven liet de
+       aanroeper doorlopen naar een uitvoering die toch niet mocht; hier staat de reden. */
+    if (r.voornemen && r.voornemen.stand === 'AFGEWEZEN')
+      return { status: 403, error: 'Na de handtekening is deze handeling afgewezen: ' +
+        ((besluit && besluit.reden) || 'het beleid staat haar niet toe') + ' Er is geen geld bewogen.',
+        voornemen: r.voornemen };
     return r;
   }
 

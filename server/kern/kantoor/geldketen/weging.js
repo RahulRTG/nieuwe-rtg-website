@@ -72,7 +72,7 @@ function maakWeging({ voornemens, tijd, leg, noteer, bewaar, publiek }) {
         opgesteld.voornemen.stand !== 'WACHT';
       const gekeurd = herbruik
         ? { status: 200, ok: true, voornemen: voornemens.publiek(voornemens.vind(vid)), hergebruikt: true }
-        : voornemens.keur(vid, { context: { pad: o.pad, door: mens.naam } });
+        : voornemens.keur(vid, { context: { pad: o.pad, door: mens.naam, omkeerbaar: dossier.omkeerbaar === true } });
       const stand = (gekeurd.voornemen && gekeurd.voornemen.stand) || null;
       const besluit = (gekeurd.voornemen && gekeurd.voornemen.besluit) || null;
       if (!gekeurd.ok) {

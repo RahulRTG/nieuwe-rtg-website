@@ -115,7 +115,7 @@ function maakVoornemens({ db, save, nu, beslis, munt, verbruikToken, veiligheids
     return { status: 200, ok: true, voornemen: publiek(v) };
   }
 
-  const { keur, tekenAf } = maakKeuring({ vind, zet, publiek, save, tijd, beslis });
+  const { keur, tekenAf, risicoGoedkeur } = maakKeuring({ vind, zet, publiek, save, tijd, beslis });
 
   const uitvoering = maakUitvoering({ vind, zet, publiek, save, tijd, verbruikToken, veiligheidskern });
   const voerUit = uitvoering.voerUit;
@@ -132,7 +132,7 @@ function maakVoornemens({ db, save, nu, beslis, munt, verbruikToken, veiligheids
   function publiek(v) {
     return { id: v.id, sleutel: v.sleutel, actor: v.actor, handeling: v.handeling, doel: v.doel,
       stand: v.stand, totaalCenten: v.totaalCenten, reden: v.reden,
-      besluit: v.besluit, goedgekeurdDoor: v.goedgekeurdDoor,
+      besluit: v.besluit, goedgekeurdDoor: v.goedgekeurdDoor, risicogoedkeuring: v.risicogoedkeuring || null,
       /* Het token komt er NIET uit. Wie het voornemen kan lezen, hoeft de sleutel
          tot de uitvoering niet in handen te krijgen. */
       heeftBewijs: !!v.bewijstoken,
@@ -148,7 +148,7 @@ function maakVoornemens({ db, save, nu, beslis, munt, verbruikToken, veiligheids
     return { aantal: r.length, voornemens: r.slice(0, Math.min(200, Math.max(1, limit))).map(publiek) };
   }
 
-  return { stelOp, keur, tekenAf, voerUit, staak, vind, publiek, lijst, halverwege, STAND: P.STAND };
+  return { stelOp, keur, tekenAf, risicoGoedkeur, voerUit, staak, vind, publiek, lijst, halverwege, STAND: P.STAND };
 }
 
 module.exports = { maakVoornemens, STAND: P.STAND };

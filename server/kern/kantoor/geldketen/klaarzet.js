@@ -47,6 +47,9 @@ function maakKlaarzet({ voornemens, frictie, mandaatBron, tijd, leg, noteer, bew
       voornemen: null, keten: null, klasse, handeling: String(o.handeling || ''),
       doel: o.doel == null ? null : String(o.doel).slice(0, 120),
       pad: o.pad || null, envelop: env.id, correlatie: env.correlatie,
+      /* OMKEERBAAR KOMT VAN HET DOMEIN (eigenaarsbesluit 2B-aangepast): alleen een
+         uitdrukkelijke `true` telt, en een handtekening verandert het nooit. */
+      omkeerbaar: o.omkeerbaar === true,
       door: mens.naam, at: tijd(), assen: []
     };
 

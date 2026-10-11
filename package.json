@@ -516,6 +516,8 @@
     "lusproef:vast": "node scripts/lusproef.js --vastleggen",
     "voltooiproef": "node scripts/voltooiproef.js",
     "voltooiproef:vast": "node scripts/voltooiproef.js --vastleggen",
+    "conciergeproef": "node scripts/conciergeproef.js",
+    "conciergeproef:vast": "node scripts/conciergeproef.js --vastleggen",
     "liegronde": "node scripts/liegronde.js",
     "liegronde:vast": "node scripts/liegronde.js --vastleggen",
     "bevoegdronde": "node scripts/bevoegdronde.js",

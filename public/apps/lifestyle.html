@@ -158,6 +158,7 @@
 
 <script src="/shared/deur.js"></script>
 <script src="/shared/uitvoer.js"></script>
+<script src="/apps/lifestyle-lus.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -337,7 +338,11 @@ const SOORT_UITLEG = {
 async function vZaken(){
   let d, del; try{ [d, del] = await Promise.all([api('zaken'), api('delegatie')]); }catch(e){ return fout(e); }
   const doms = del.domeinen.map(x=>'<option value="'+esc(x.domein)+'">'+esc(x.naam)+'</option>').join('');
-  let h = '<div class="kaart"><h2>Een zaak aanleggen</h2><div class="sub">Zegt u wat er moet gebeuren. Wij bepalen wie het oppakt.</div>'
+  /* De concierge-lus (apps/lifestyle-lus.js): een wens in een zin bovenaan, en
+     bij een zaak uit de lus een knop naar het voorstel. Geen tweede scherm. */
+  const LUS = window.RTGLusLid;
+  let h = (LUS ? LUS.intakeKaart() : '')
+    + '<div class="kaart"><h2>Een zaak aanleggen</h2><div class="sub">Zegt u wat er moet gebeuren. Wij bepalen wie het oppakt.</div>'
     + '<label class="lbl">Wat wilt u geregeld hebben</label><input class="veld" id="zT" placeholder="Diner voor twaalf, zaterdag, bij ons thuis">'
     + '<label class="lbl">Toelichting</label><textarea class="veld" id="zW" placeholder="Alles wat wij moeten weten."></textarea>'
     + '<div class="rij"><div><label class="lbl">Soort</label><select class="veld" id="zS">'
@@ -356,6 +361,7 @@ async function vZaken(){
         + (z.bedragCenten? ' · '+euro(z.bedragCenten):'')
         + (z.besloten? ' · <span class="goud">besloten, blijft bij u</span>':'')
         + '<br>'+esc(laatste.notitie||'')+'</div>'
+        + (LUS ? LUS.regel(z) : '')
         + (z.beslissing.nodig ? '<div class="knoprij">'
             + '<button class="knop klein js-ja" data-id="'+esc(z.id)+'">Akkoord</button>'
             + '<button class="knop klein stil js-nee" data-id="'+esc(z.id)+'">Afzien</button></div>' : '')
@@ -364,6 +370,7 @@ async function vZaken(){
   P(h);
   zetUit('Zaken', ['Titel','Soort','Domein','Status','Bedrag'], d.zaken.map(z=>[z.titel,z.soort,z.domein,z.status,z.bedragCenten/100]));
 
+  if(LUS) LUS.bind(vZaken);
   const toonUitleg = () => { $('#zU').textContent = SOORT_UITLEG[$('#zS').value] || ''; };
   $('#zS').onchange = toonUitleg; toonUitleg();
   $('#zK').onclick = async () => {

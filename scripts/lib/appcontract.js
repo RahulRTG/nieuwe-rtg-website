@@ -119,6 +119,21 @@ const CONTRACT = {
       instrument: 'scripts/lusproef.js',
       waarom: 'de lusproef loopt de ontdeklus van CONNECT.md over /api/connect/*, de routes die /apps/connect.html zelf aanroept, met twee leden; de gezinsdeur /api/rtf/connect (dezelfde motor) loopt hij niet'
     }
+  },
+  /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
+     scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
+     (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies
+     de lid-routes die de conciergeproef loopt. De proef dekt de lus en niet het
+     hele Privékantoor (woning, kring, bezit, mandaat lopen hier niet mee); dat
+     staat in `waarom` in plaats van weggelaten. */
+  'link:rechterhand': {
+    belofte: 'een lid vertelt een wens in een zin, De Rechterhand regelt hem, en het lid beslist alleen over een concreet voorstel buiten zijn mandaat',
+    voltooibaar: {
+      soort: 'ketenproef',
+      register: 'CONCIERGEPROEF.json',
+      instrument: 'scripts/conciergeproef.js',
+      waarom: 'de conciergeproef loopt de lus van CONCIERGE.md over /api/member/bureau/lus/*, de routes die het tabblad Zaken van /apps/lifestyle.html aanroept, met het kantoor en twee zaken ernaast; de andere tabbladen van het Privékantoor loopt hij niet'
+    }
   }
 };
 

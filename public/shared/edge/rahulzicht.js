@@ -33,6 +33,11 @@
    "de server kijkt dat zelf op, of het bestaat niet"), en een documenttitel
    naar een model sturen die de server niet eens leest, is een lek zonder nut.
 
+   ZONDER BLIKVELD ZIET RAHUL WAT HIJ VOORHEEN ZAG. Het blikveld laadt lui met
+   de adaptieve Edge (rtg-adaptive-edge-loader.js); wie vraagt voordat die er
+   is, krijgt de oude DOM-context van de helper. Dat is een terugval en geen
+   fout: hier wordt dan niets beweerd dat niet gezien is.
+
    Levert window.RTGEdgeRahulzicht, en in node module.exports. */
 (function (root, fabriek) {
   'use strict';

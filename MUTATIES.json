@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T06:42:12.717Z",
-    "commit": "3b449a279",
+    "op": "2026-10-11T08:14:18.414Z",
+    "commit": "02adbb7ee",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2297,6 +2297,13 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "clientafbreking.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "clipdeler.e2e.js": {
       "soort": "server",
@@ -6988,14 +6995,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "keuringreden.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/repository-snapshot.js",
-      "operator": "getal+1#0",
-      "gezakt": 7,
-      "geprobeerd": 3
     },
     "keuringsindex.test.js": {
       "soort": "puur",

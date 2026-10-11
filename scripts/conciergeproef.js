@@ -278,8 +278,11 @@ async function proef(basis) {
   const nogBijZaak = ((((await post('/api/supplier/state', {}, zaak)).body || {}).state || {}).reserveringen || []).find(x => x.id === rid) || {};
   schakel('de manager biedt 21:15 aan, twaalf minuten vastgehouden; het lid ziet de nieuwe tijd en de termijn, en de zaak houdt hem in beeld',
     r.status === 200 && lidZiet.status === 'tegenvoorstel' && lidZiet.tijd === '21:15' && lidZiet.gevraagdeTijd === '20:00' &&
-      Date.parse((lidZiet.tegenvoorstel || {}).geldigTot) > Date.now() && nogBijZaak.status === 'tegenvoorstel',
-    'lid ziet ' + lidZiet.status + ' om ' + lidZiet.tijd + '; zaak ziet ' + nogBijZaak.status);
+      Date.parse((lidZiet.tegenvoorstel || {}).geldigTot) > Date.now() && nogBijZaak.status === 'tegenvoorstel' &&
+      // regel 4 van tafeluitzondering.js: de gast weet niet WIE besloot -- ook niet in het antwoord van de server
+      !('doorgezet' in lidZiet) && !('door' in (lidZiet.tegenvoorstel || {})),
+    'lid ziet ' + lidZiet.status + ' om ' + lidZiet.tijd + '; zaak ziet ' + nogBijZaak.status +
+      ('doorgezet' in lidZiet || 'door' in (lidZiet.tegenvoorstel || {}) ? '; het lid krijgt WIE besloot mee: ' + JSON.stringify({ doorgezet: lidZiet.doorgezet, door: (lidZiet.tegenvoorstel || {}).door }) : ''));
   r = await post('/api/reservering/tegenvoorstel', { id: rid, akkoord: true }, lid);
   const vast = ((((await post('/api/supplier/state', {}, zaak)).body || {}).state || {}).reserveringen || []).find(x => x.id === rid) || {};
   schakel('het lid zegt ja; de tafel staat bevestigd op 21:15, ook bij de zaak',

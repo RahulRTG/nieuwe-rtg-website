@@ -52,18 +52,32 @@ app.post('/api/reserveer', auth, (req, res) => {
   if (zorgR) { r.reservering.zorg = zorgR; save(); }
   res.json(r);
 });
-app.post('/api/reserveringen/mijn', auth, (req, res) => res.json({ reserveringen: mijnReserveringen(req.session.key) }));
+/* Wat de GAST van zijn reservering krijgt. Regel 4 van
+   kern/ervaring/tafeluitzondering.js: hij ziet een nieuwe tijd en een termijn,
+   niet WIE het besloot. De opslag draagt wel `doorgezet` (met de naam van de
+   medewerker en zijn reden) en `tegenvoorstel.door`; die zijn voor de zaak en
+   gaan hier niet mee -- het scherm liet ze weg, het antwoord van de server niet. */
+const voorGast = (r) => {
+  if (!r || typeof r !== 'object') return r;
+  const uit = Object.assign({}, r);
+  delete uit.doorgezet;
+  // het tegenvoorstel op een POSITIEVE lijst: een nieuw veld erop gaat niet vanzelf mee
+  if (r.tegenvoorstel) uit.tegenvoorstel = { tijd: r.tegenvoorstel.tijd, geldigTot: r.tegenvoorstel.geldigTot, op: r.tegenvoorstel.op };
+  return uit;
+};
+const metGast = (r) => (r && r.reservering ? Object.assign({}, r, { reservering: voorGast(r.reservering) }) : r);
+app.post('/api/reserveringen/mijn', auth, (req, res) => res.json({ reserveringen: mijnReserveringen(req.session.key).map(voorGast) }));
 app.post('/api/reservering/annuleer', auth, (req, res) => {
   const r = annuleerReservering(req.session.key, String(req.body.id || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json(r);
+  res.json(metGast(r));
 });
 // de gast antwoordt op een tegenvoorstel van de zaak (kern/ervaring/tafeluitzondering.js)
 app.post('/api/reservering/tegenvoorstel', auth, (req, res) => {
   if (gegevensStop(req, res, 'reservering')) return;
   const r = U.antwoord(req.session.key, String(req.body.id || ''), req.body.akkoord === true);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json(r);
+  res.json(metGast(r));
 });
 
 // annuleren door het lid: bestelling, rit of boeking (incl. tickets)

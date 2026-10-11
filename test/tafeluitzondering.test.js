@@ -54,7 +54,10 @@ test('een zaak biedt een andere tijd aan, zet een aanvraag door, en alleen een m
   assert.equal(tv2.status, 409);
   const mijn = (await roep('/reserveringen/mijn', {}, lid)).d.reserveringen.find(x => x.id === rid);
   assert.equal(mijn.tijd, '21:15');
-  assert.equal(mijn.tegenvoorstel.door, 'medewerker', 'wie het deed staat bij de zaak, niet als label naar de gast');
+  // regel 4: wie het deed staat bij de ZAAK; het antwoord aan de gast draagt het niet
+  assert.ok(mijn.tegenvoorstel && !('door' in mijn.tegenvoorstel) && !('doorgezet' in mijn), 'de gast krijgt niet mee wie besloot: ' + JSON.stringify(mijn));
+  const bijZaak = ((await roep('/supplier/state', {}, mwTok)).d.state.reserveringen || []).find(x => x.id === rid);
+  assert.equal(bijZaak.tegenvoorstel.door, 'medewerker', 'wie het deed staat bij de zaak');
   const ja = await roep('/reservering/tegenvoorstel', { id: rid, akkoord: true }, lid);
   assert.equal(ja.d.reservering.status, 'bevestigd');
   // binnen het venster geeft de poort het eerste antwoord terug, daarna weigert de handler
@@ -75,7 +78,8 @@ test('een zaak biedt een andere tijd aan, zet een aanvraag door, en alleen een m
   assert.equal((await roep('/supplier/reservering/beslis', { id: rid2, action: 'weiger' }, manTok)).status, 200, 'een nee blijft een nee');
   const na = (await roep('/reserveringen/mijn', {}, lid)).d.reserveringen.find(x => x.id === rid2);
   assert.equal(na.status, 'geweigerd');
-  assert.equal(na.doorgezet.reden, 'jubileum, graag een uitzondering');
+  // het doorzetten (de reden en de naam van de medewerker) blijft bij de zaak; de gast hoort alleen het nee
+  assert.ok(!('doorgezet' in na), 'de gast krijgt het doorzetten niet mee: ' + JSON.stringify(na.doorgezet));
   assert.equal((await roep('/reservering/tegenvoorstel', { id: rid2, akkoord: true }, null)).status, 401);
 });
 

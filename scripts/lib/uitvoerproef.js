@@ -215,8 +215,25 @@ const VERKLAARD = {
     'server/kern/toestellen.js', 'Wat bewaard wordt is een sha256-afdruk')
 };
 
-/* De ratel. Gaat alleen omlaag, en de weg omlaag is een mens die aftekent. */
-const VOORGEDRAGEN_MAX = 8;
+/* De ratel. Gaat alleen omlaag, en de weg omlaag is een mens die aftekent.
+
+   DE WAARDE STAAT SINDS 6 OKTOBER 2026 IN NORM.json (meter
+   `uitvoerVoorgedragen`) en niet meer als constante hier: zo gaat een verhoging
+   langs scripts/normbasis.js en kan hij niet zonder notitie. De export
+   VOORGEDRAGEN_MAX blijft bestaan voor wie hem leest (scripts/uitvoerproef-route.js
+   en test/uitvoerproef.test.js), maar zijn getal komt uit NORM.json -- en pas
+   op het moment dat iemand hem LEEST (een getter onderaan). Bij het laden
+   lezen zou scripts/norm.js deze module niet eens kunnen laden om de meter te
+   tellen zolang de ratel nog niet in NORM.json staat, en dan kan hij er ook
+   nooit in komen. */
+const { normwaarde } = require('./normwaarde');
+
+/* Hoeveel verklaringen staan op voorgedragen en zijn dus nog door geen mens
+   afgetekend? Dezelfde telling voor de toets en voor scripts/norm.js, zodat er
+   een getal is en niet twee. */
+function telVoorgedragen() {
+  return Object.keys(VERKLAARD).filter(s => verklaringStand(s) === 'voorgedragen').length;
+}
 
 /* Is dit een verklaarde combinatie van route en veld? Geeft de reden terug, of
    null. De veldnaam komt uit de melding ("geheim veld (sleutel)"). */
@@ -313,4 +330,7 @@ async function draaiUitvoerproef({ post, routes, tokenVoor, lijfVoor, kanaries, 
 
 module.exports = { weegUitvoer, draaiUitvoerproef, maakKanaries, kanarieLijst,
   lijktGeheim, geheimVeld, GEHEIMWOORDEN, GEHEIMMERKER, VERKLAARD, verklaringVoor,
-  verklaringStand, VOORGEDRAGEN_MAX };
+  verklaringStand, telVoorgedragen };
+Object.defineProperty(module.exports, 'VOORGEDRAGEN_MAX', {
+  enumerable: true, get: () => normwaarde('uitvoerVoorgedragen')
+});

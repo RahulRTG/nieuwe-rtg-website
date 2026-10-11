@@ -3,17 +3,17 @@
  "uitleg": "Per handeling: hoeveel van de eigen machinerie raakt hij? Zestien motoren die ieder apart gemeten zijn, hier voor het eerst naast elkaar op DEZELFDE route.",
  "grens": "Twee assen die verschillende dingen missen, nooit opgeteld: `handler` is lexicaal binnen de tekst van de handler (mist een hulpfunctie en de kern-tas) en `bestand` rekent het routebestand plus zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op \"idempotent\". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. Sinds 6 oktober 2026 een derde meetweg, `tas` (scripts/lib/kerntas.js): de module die een fabriek of toewijzing in de kern-tas legt, telt een as alleen als zij of een directe require de BRON van die as inlaadt (structureel, geen woord), plus de ingespoten collectietransactie als aanroep. Ook `tas` wordt nooit bij de andere twee opgeteld. De assen uit EXECUTION_MAP.json zijn gelezen en niet hier geteld.",
  "stempel": {
-  "op": "2026-10-06T16:10:21.095Z",
-  "commit": "b301d4755",
+  "op": "2026-10-11T09:47:20.209Z",
+  "commit": "0c2ab2be",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 5,
   "instrument": "scripts/machinedekking.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "bronnen": {
   "EXECUTION_MAP.json": "fda3b30e2b205171",
   "KERNHERKOMST.json": "a5792ef81699ac84",
-  "MUTATIECONTRACT.json": "014cc7174c17f18e",
+  "MUTATIECONTRACT.json": "9a9117d9de7c3f9f",
   "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
   "kernherkomstStempel": {
    "op": "2026-10-06",
@@ -276,7 +276,7 @@
    },
    "idempotentie": {
     "handler": 25,
-    "bestand": 273,
+    "bestand": 272,
     "tas": 0
    },
    "atomair": {
@@ -480,7 +480,7 @@
     "zakLezers": 0,
     "lezers": [],
     "routesHandler": 25,
-    "routesBestand": 273,
+    "routesBestand": 272,
     "tokens": 5,
     "graad": "vermoed"
    },
@@ -32856,7 +32856,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/mijn/login",
-   "bestand": "server/routes/supplier/pda/posities.js",
+   "bestand": "server/routes/supplier/pda/posities-inlog.js",
    "onder": [],
    "boven": [],
    "tas": []
@@ -34820,10 +34820,9 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/staff/join",
-   "bestand": "server/routes/supplier/werving/personeel.js",
+   "bestand": "server/routes/supplier/werving/personeel-aanmelden.js",
    "onder": [],
    "boven": [
-    "idempotentie",
     "atomair"
    ],
    "tas": [

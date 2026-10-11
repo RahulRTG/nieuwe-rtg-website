@@ -30,10 +30,16 @@
         inlognaam; de gedeelde droeg hem eerst in klare tekst;
      7. de werkdeur voedt de noodrem: na 25 gokken op een account staat het
         adres van de 25e poging in quarantaine, en dat van de 24e niet;
-     8. een account is een emmer, in elke spelling: hoofdletters en witruimte
-        rond de inlognaam geven geen verse gokken, op geen van beide deuren.
-        findByLogin vindt het account in elke spelling, dus de rem hoort dat
-        ook te doen.
+     8. een account is een emmer, in elke spelling en onder elke naam:
+        hoofdletters, witruimte en de gebruikersnaam naast het e-mailadres
+        geven geen verse gokken, op geen van beide deuren en in beide
+        richtingen. findByLogin vindt het account onder al die namen, dus de
+        rem hoort dat ook te doen (I1 uit de keuring van ronde 6). En een
+        onbekende naam geeft hetzelfde antwoord als een fout wachtwoord;
+     9. de adresemmer voedt de noodrem ook: vijftig gokken vanaf een adres,
+        op bestaande accounts en op verzonnen namen door elkaar, zetten dat
+        adres in quarantaine, en een ander adres blijft open (R10 uit de
+        keuring van ronde 6). Beide soorten tellen op het adres.
 
    Waarom de tijd wordt gemeten en niet alleen de status: het account krijgt met
    opzet een VERTRAGING en geen slot (test/inlogrem.test.js). Een trage machine
@@ -299,43 +305,139 @@ test('7. de werkdeur voedt de noodrem: na 25 gokken op een account staat het adr
   });
 });
 
-/* Elke spelling een andere: hoofdletters volgens de bits van n (nooit allemaal
-   klein), en bij een deel witruimte eromheen. findByLogin trimt en vergelijkt
-   in kleine letters (accounts/kluis.js emailHash), dus allemaal hetzelfde
-   account. */
-function spelling(n) {
+/* Elke spelling een andere: hoofdletters volgens de bits van n, en bij een
+   deel witruimte eromheen. findByLogin trimt en vergelijkt
+   in kleine letters (accounts/kluis.js emailHash, accounts/users.js
+   lower(username)), dus allemaal hetzelfde account. */
+function spellingVan(naam, n) {
   let bit = 0;
-  const s = NORA.replace(/[a-z]/g, c => ((n >> bit++) & 1 ? c.toUpperCase() : c));
+  const s = naam.replace(/[a-z]/g, c => ((n >> bit++) & 1 ? c.toUpperCase() : c));
   return ['', ' ', '\t', '  '][n % 4] + s + ['', '', ' ', '\t '][n % 4];
 }
+const spelling = n => spellingVan(NORA, n);
+/* Nora's gebruikersnaam. findByLogin vindt haar account op haar e-mailadres EN
+   hierop, dus ook dit zijn gokken op hetzelfde account (I1). */
+const NORA_NAAM = 'nora';
+const naam = n => spellingVan(NORA_NAAM, n);
 
-test('8. een account is een emmer, in elke spelling: hoofdletters en witruimte geven geen verse gokken', async () => {
+test('8. een account is een emmer, in elke spelling en onder elke naam: e-mailadres en gebruikersnaam geven geen verse gokken', async () => {
   await metServer(async ({ poging }) => {
-    /* Adres plus account, vanaf een lokaal adres (zie de kop: dan is de echte
-       429 van de rem te zien en niet de quarantaine). Tien gokken in tien
-       spellingen, om en om op beide deuren. */
-    const A = '127.0.0.1';
-    for (let i = 0; i < 10; i++) {
-      const pad = i % 2 ? GEWOON : WERK;
-      assert.equal((await poging(pad, A, spelling(i + 1), 'fout' + i)).status, 401, pad + ' in spelling ' + JSON.stringify(spelling(i + 1)));
-    }
-    for (const pad of [GEWOON, WERK]) {
-      const r = await poging(pad, A, NORA, NORA_WW);
-      assert.equal(r.status, 429, pad + ': tien gokken in tien spellingen zijn tien gokken op een account: ' + JSON.stringify(r.body).slice(0, 160));
+    const kort = (r) => r.status + ' ' + JSON.stringify(r.body).slice(0, 160);
+    /* Adres plus account, vanaf lokale adressen (zie de kop: dan is de echte
+       429 van de rem te zien en niet de quarantaine), om en om op beide deuren,
+       in BEIDE richtingen. Na tien gokken hoort het juiste wachtwoord onder
+       BEIDE namen op BEIDE deuren 429 te geven. */
+    const richtingen = [
+      // negen op het e-mailadres, de tiende op de gebruikersnaam
+      { ip: '127.0.0.1', eerst: spelling, dan: naam },
+      // negen op de gebruikersnaam, de tiende op het e-mailadres
+      { ip: '::1', eerst: naam, dan: spelling }
+    ];
+    for (const [r, richting] of richtingen.entries()) {
+      for (let i = 0; i < 9; i++) {
+        const pad = i % 2 ? GEWOON : WERK;
+        const wie = richting.eerst(i + 1 + 10 * r);
+        assert.equal((await poging(pad, richting.ip, wie, 'fout' + i)).status, 401, pad + ' als ' + JSON.stringify(wie));
+      }
+      const tiende = richting.dan(10 + 10 * r);
+      assert.equal((await poging(GEWOON, richting.ip, tiende, 'fout9')).status, 401, 'de tiende gok zelf is nog 401');
+      for (const pad of [GEWOON, WERK]) {
+        for (const wie of [NORA, NORA_NAAM]) {
+          const uit = await poging(pad, richting.ip, wie, NORA_WW);
+          assert.equal(uit.status, 429, pad + ' als ' + wie + ' vanaf ' + richting.ip
+            + ': tien gokken onder twee namen zijn tien gokken op een account: ' + kort(uit));
+        }
+      }
     }
 
-    /* Het account alleen: die tien tellen al mee, en vijftien gokken in nog
-       vijftien spellingen vanaf vreemde adressen brengen de accountemmer op
-       25. Daarna kost elke volgende gok twee seconden, in welke spelling ook. */
-    for (let i = 0; i < 15; i++) {
+    /* Het account alleen: die twintig tellen al mee, en vijf gokken onder
+       beide namen vanaf vreemde adressen brengen de accountemmer op 25. Daarna
+       kost elke volgende gok twee seconden, onder elke naam en op elke deur.
+       Met een emmer per naam kwam geen van beide aan de 25. */
+    for (let i = 0; i < 5; i++) {
       const pad = i % 2 ? WERK : GEWOON;
-      assert.equal((await poging(pad, '203.0.113.' + (i + 1), spelling(i + 11), 'nogeens' + i)).status, 401);
+      const wie = i % 2 ? naam(i + 30) : spelling(i + 30);
+      assert.equal((await poging(pad, '203.0.113.' + (i + 1), wie, 'nogeens' + i)).status, 401);
     }
-    for (const [n, pad] of [[26, WERK], [27, GEWOON]]) {
-      const r = await poging(pad, '203.0.113.' + n, spelling(n), 'nogmaals');
+    const daarna = [[WERK, naam(40)], [GEWOON, spelling(41)], [WERK, spelling(42)], [GEWOON, naam(43)]];
+    for (const [n, [pad, wie]] of daarna.entries()) {
+      const r = await poging(pad, '203.0.113.' + (50 + n), wie, 'nogmaals');
       assert.equal(r.status, 401);
-      assert.ok(r.ms >= VERTRAAGD_MS, pad + ' in spelling ' + JSON.stringify(spelling(n))
+      assert.ok(r.ms >= VERTRAAGD_MS, pad + ' als ' + JSON.stringify(wie)
         + ' hoort na 25 mislukkingen op dit account vertraagd te zijn (' + r.ms + 'ms)');
     }
+
+    /* Een ONBEKENDE naam verraadt zich niet: zelfde status en zelfde tekst als
+       een fout wachtwoord op een bestaand account. De duur mag verschillen
+       (Nora's account ligt hier onder vuur); dat is bekend en staat apart. */
+    for (const [n, pad] of [WERK, GEWOON].entries()) {
+      const bekend = await poging(pad, '198.51.100.' + (70 + n), NORA_NAAM, 'fout');
+      const onbekend = await poging(pad, '198.51.100.' + (80 + n), 'niemand' + n + '@voorbeeld.test', 'fout');
+      assert.equal(onbekend.status + ' ' + JSON.stringify(onbekend.body), bekend.status + ' ' + JSON.stringify(bekend.body),
+        pad + ': een onbekende naam geeft hetzelfde antwoord als een fout wachtwoord');
+    }
+  });
+});
+
+/* DE ADRESEMMER VOEDT DE NOODREM (R10 uit de keuring van ronde 6). Toets 7
+   houdt dat vast voor de accountemmer; voor de emmer op het adres alleen (50)
+   deed niets dat. Een eigen `soort` in die noteFailedTry maakt van de melding
+   een waarschuwing zonder noodrem, en dan blijft een adres dat op vijftig
+   accounts gokt gewoon open (de rem geeft dan 429, nooit 403).
+
+   BESTAANDE ACCOUNTS EN VERZONNEN NAMEN DOOR ELKAAR. Sinds de rem op het
+   gevonden account sleutelt (I1), loopt een gok op een bestaand account een
+   andere weg dan een gok op een naam die niemand heeft. Credential stuffing
+   gokt op ECHTE accounts, en daar is de grens van 50 per adres voor. Gokte deze
+   toets alleen op verzonnen namen, dan bleef hij groen met een rem die gokken
+   op bestaande accounts niet op het adres telt (zo gemeten in de herkeuring van
+   ronde 6). Dus vijf bestaande accounts (Nora en vier eigen) met elk negen
+   gokken, en vijf verzonnen namen met elk een: 45 plus 5. Geen van beide delen
+   haalt alleen de 50, dus een rem die een van de twee soorten overslaat, zakt
+   hier.
+
+   Negen per account en niet meer: de tiende zet de emmer van adres plus account
+   dicht, en die meldt zelf brute force met dit adres. Dan kwam de quarantaine
+   er ook zonder de adresemmer. Zo blijft ook elke accountemmer onder de 25. Om
+   en om op beide deuren. Een vreemd adres, want het schild zet een lokaal adres
+   nooit in quarantaine. */
+test('9. de adresemmer voedt de noodrem: 45 gokken op vijf bestaande accounts en 5 op verzonnen namen zetten het adres in quarantaine', async () => {
+  await metServer(async ({ poging, srv }) => {
+    const DADER = '198.51.100.99';
+    const bestaand = [NORA];
+    for (let k = 0; k < 4; k++) {
+      const mail = 'bestaand' + k + Date.now().toString().slice(-8) + '@voorbeeld.test';
+      const reg = await fetch(srv.base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'Bestaand Proef', email: mail, password: 'eenechtwachtwoord' + k, geboortedatum: '1990-03-03' }) });
+      assert.equal(reg.status, 200, 'het eigen account ' + k + ' bestaat');
+      bestaand.push(mail);
+    }
+    /* Negen rondes met een gok op elk bestaand account, en in de eerste vijf
+       rondes ook een op een eigen verzonnen naam. */
+    const gokken = [];
+    for (let ronde = 0; ronde < 9; ronde++) {
+      gokken.push(...bestaand);
+      if (ronde < 5) gokken.push('verzonnen' + ronde + '@voorbeeld.test');
+    }
+    assert.equal(gokken.length, 50, 'vijftig gokken');
+    for (const [i, wie] of gokken.entries()) {
+      const pad = i % 2 ? GEWOON : WERK;
+      const r = await poging(pad, DADER, wie, 'fout' + i);
+      assert.equal(r.status, 401, 'gok ' + (i + 1) + ' op ' + pad + ': ' + r.status + ' ' + JSON.stringify(r.body).slice(0, 120));
+    }
+    /* De vijftigste sloot de adresemmer en meldde brute force met dit adres
+       als aanvaller. Gewacht op de toestand: de quarantaine wordt vastgelegd,
+       en het juiste wachtwoord helpt dit adres dan op geen van beide deuren. */
+    for (const pad of [WERK, GEWOON]) {
+      const dader = await wachtOpWaarde(async () => {
+        const r = await poging(pad, DADER, NORA, NORA_WW);
+        return r.status === 403 ? r : null;
+      }, { ms: 10000, wat: 'quarantaine (403) voor ' + DADER + ' op ' + pad });
+      assert.match(String(dader.body.error), /quarantaine/, pad + ': het is de quarantaine: ' + JSON.stringify(dader.body));
+    }
+    /* TEGENPROEF: een ander adres staat er niet in, en Nora komt daar met het
+       juiste wachtwoord gewoon binnen; de echte status. */
+    const ander = await poging(WERK, '198.51.100.98', NORA, NORA_WW);
+    assert.equal(ander.status, 200, 'een ander adres blijft open: ' + JSON.stringify(ander.body).slice(0, 160));
   });
 });

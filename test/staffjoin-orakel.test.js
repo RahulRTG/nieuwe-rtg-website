@@ -17,9 +17,10 @@
    het pad staat in INLOG_PADEN.
 
    Elke toets met een eigen lid, zodat ze niet van elkaars volgorde afhangen.
-   Toets 5 laat de inlogpauze springen en staat daarom als laatste. Elk verzoek
+   Toets 7 laat de inlogpauze springen en staat daarom als laatste. Elk verzoek
    komt van een eigen adres, zodat de rem per adres en de quarantaine van De
-   Wacht niet meten wat hier niet getoetst wordt.
+   Wacht niet meten wat hier niet getoetst wordt. Behalve in toets 6, die juist
+   de rem per adres meet.
 
    Draai los: node --test test/staffjoin-orakel.test.js
    ========================================================================== */
@@ -34,6 +35,7 @@ const { zwaarApi } = require('./zwaarpasskey');
 const NORA = 'nora@rtg.example', NORA_WW = 'werk';
 const EIGENAAR = 'roellie.i@gmail.com', EIGENAAR_WW = 'Imran';
 const WW = 'geheim12';
+const VERA_NAAM = 'vera.orakel';
 const PAUZE = /Inloggen is enkele minuten gepauzeerd/;
 /* Ruim boven een gewoon antwoord en ruim onder de twee seconden van de
    accountemmer, zoals in test/inlogrem.test.js. */
@@ -65,14 +67,15 @@ async function managerVan(code) {
   return { token: ml.body.token, naam: roster.body.supplier.name };
 }
 let uitnodigingen = 0;
-async function kassacode(zaak) {
+async function uitnodiging(zaak) {
   // een eigen naam per uitnodiging: dezelfde naam geeft de zaak niet twee keer uit
   const inv = await api('/api/supplier/staff/invite', { name: 'Proef ' + (++uitnodigingen) + ' Orakel', func: 'Bediening' }, zaak.token);
   assert.equal(inv.status, 200, 'uitnodiging: ' + kort(inv));
-  return inv.body.invite.kassacode;
+  return inv.body.invite;
 }
-async function lid(email) {
-  const reg = await api('/api/auth/register', { name: 'Lid ' + email.split('@')[0], email, password: WW, geboortedatum: '1990-01-01' });
+const kassacode = async (zaak) => (await uitnodiging(zaak)).kassacode;
+async function lid(email, username) {
+  const reg = await api('/api/auth/register', { name: 'Lid ' + email.split('@')[0], email, username, password: WW, geboortedatum: '1990-01-01' });
   assert.ok(reg.body.token, 'registratie van ' + email + ': ' + kort(reg));
   return email;
 }
@@ -84,8 +87,11 @@ test.before(async () => {
   ponto = await managerVan('PONTO');
   zaakNaam = kikunoi.naam;
   // vooraf, want de registratie gaat dicht zodra de noodrem drie bronnen telt
-  for (const e of ['eva@orakel.test', 'ruben@orakel.test', 'vera@orakel.test', 'wout@orakel.test',
-    'xander@orakel.test', 'tom@orakel.test', 'pim@orakel.test', 'uit@joinorg.test']) await lid(e);
+  for (const e of ['eva@orakel.test', 'ruben@orakel.test', 'wout@orakel.test',
+    'xander@orakel.test', 'tom@orakel.test', 'pim@orakel.test', 'uit@joinorg.test',
+    'iris@orakel.test', 'olaf@orakel.test']) await lid(e);
+  // Vera ook met een gebruikersnaam: toets 3 gokt onder allebei
+  await lid('vera@orakel.test', VERA_NAAM);
 });
 test.after(async () => {
   await stop(srv);
@@ -160,15 +166,17 @@ test('3. een gok op het wachtwoord telt in de accountemmer van de gewone inlog',
      ligt de grens van de aanmelding op die van /api/auth/login (25), en niet
      ergens anders.
 
-     EN IN DRIE SPELLINGEN. De inlog legt het adres in kleine letters en zonder
-     spaties in de emmer. Doet de aanmelding dat anders, dan krijgt elke
-     spelling een eigen emmer en telt een aanval in hoofdletters nergens mee.
-     De 25e gok heeft daarom een afwijkende spelling, en de inlog hieronder
-     meet op de kleine letters. */
-  const SPELLING = ['  Vera@Orakel.Test ', VERA, VERA.toUpperCase()];
+     EN IN VIJF SPELLINGEN, ONDER TWEE NAMEN. De emmer hangt aan het ACCOUNT
+     dat findByLogin vindt, en dat vindt Vera op haar e-mailadres en op haar
+     gebruikersnaam, in elke spelling. Hing de emmer aan de getikte tekst, dan
+     kreeg elke naam en elke spelling een eigen emmer en telde een aanval in
+     hoofdletters of onder de gebruikersnaam nergens mee (I1). De 25e gok
+     gebruikt daarom de gebruikersnaam, en de inlog hieronder meet op het
+     e-mailadres in kleine letters. */
+  const SPELLING = ['  Vera@Orakel.Test ', VERA, 'VERA.ORAKEL', VERA.toUpperCase(), ' ' + VERA_NAAM + ' '];
   const duur = [];
   for (let i = 0; i < 25; i++) {
-    const r = await join(zaakNaam, code, SPELLING[i % 3], 'gok' + i);
+    const r = await join(zaakNaam, code, SPELLING[i % SPELLING.length], 'gok' + i);
     assert.equal(r.status, 401, 'gok ' + i + ': ' + kort(r));
     duur.push(r.ms);
   }
@@ -231,6 +239,69 @@ test('4. een account dat zijn organisatie uit dienst meldde, koppelt zich niet',
   assert.equal(tom.status, 200, 'dezelfde code werkt voor een actief lid: ' + kort(tom));
 });
 
+/* EEN INGETROKKEN CODE DIE AL GECLAIMD WAS, IS GEEN ORAKEL (M16 uit de keuring
+   van ronde 6). kassacodeHoortBij laat een geclaimde code in stap 1 door, maar
+   alleen zolang hij nog geldig is: daar staat `herstelGeldig`. Zonder die
+   toets kwam een ingetrokken code door stap 1, en dan gaf het goede
+   wachtwoord in stap 3 een ander antwoord dan een fout wachtwoord in stap 2. */
+test('5. een geclaimde kassacode die de manager introk, geeft goed en fout wachtwoord hetzelfde antwoord', async () => {
+  const IRIS = 'iris@orakel.test';
+  const inv = await uitnodiging(kikunoi);
+  // TEGENPROEF vooraf: de code werkte, de echte status
+  const eerst = await join(zaakNaam, inv.kassacode, IRIS, WW);
+  assert.equal(eerst.status, 200, 'Iris wisselt de code in: ' + kort(eerst));
+  const intrek = await api('/api/supplier/staff/invite/intrek', { id: inv.id, reden: 'proef M16' }, kikunoi.token);
+  assert.equal(intrek.status, 200, 'de manager trekt de geclaimde code in: ' + kort(intrek));
+
+  const verzonnen = await join(zaakNaam, 'RTG-VERZONNEN', IRIS, WW);
+  assert.equal(verzonnen.status, 401, 'een verzonnen code: ' + kort(verzonnen));
+  for (const [naam, r] of [['goed wachtwoord', await join(zaakNaam, inv.kassacode, IRIS, WW)],
+    ['fout wachtwoord', await join(zaakNaam, inv.kassacode, IRIS, 'fout')]]) {
+    assert.equal(r.status + ' ' + r.tekst, verzonnen.status + ' ' + verzonnen.tekst,
+      naam + ' met de ingetrokken code hoort exact hetzelfde te antwoorden als een verzonnen code (kreeg ' + kort(r) + ')');
+  }
+});
+
+/* DE REM PER ADRES OP DE AANMELDING (I7 uit de keuring van ronde 6). Een
+   geslaagde aanmelding leegde de adresemmer ('join:'+adres). Met een eigen
+   account en een eigen kassacode zette een aanvaller hem dus terug wanneer hij
+   wilde: de les van N4 (kern/identiteit/wachtwoordrem.js, de kop). Hier: negen
+   weigeringen, een geslaagde aanmelding, dan de tiende weigering, en daarna is
+   het adres dicht (429), ook voor een poging die zonder de rem voorbij stap 3
+   komt. Dat is Olaf met een tweede geldige kassacode en zijn goede wachtwoord:
+   zonder de rem krijgt hij 409 "al aangemeld" (stap 4). Een geldige aanmelding
+   is het dus niet, wel een poging waar elke controle tot en met stap 3 ja op
+   zegt.
+
+   VANAF EEN LOKAAL ADRES, zoals in test/werkplek-rem.test.js: gaat de emmer
+   dicht, dan meldt hij brute force en zet de noodrem een vreemd adres in
+   quarantaine (403 voor alles). Die 403 zou een ontbrekende rem toedekken; het
+   schild laat lokale adressen door, dus hier is de echte 429 te zien. */
+test('6. een geslaagde aanmelding zet de rem per adres niet terug', async () => {
+  const OLAF = 'olaf@orakel.test';
+  const vanAdres = async (ip, body) => {
+    const r = await fetch(srv.base + '/api/supplier/staff/join', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip }, body: JSON.stringify(body) });
+    return { status: r.status, tekst: await r.text() };
+  };
+  const L = '127.0.0.1';
+  const eigen = await kassacode(kikunoi), nogEen = await kassacode(kikunoi);
+  for (let i = 0; i < 9; i++) {
+    const r = await vanAdres(L, { bedrijf: zaakNaam, kassacode: 'RTG-VERZONNEN-' + i, login: OLAF, password: WW });
+    assert.equal(r.status, 401, 'weigering ' + (i + 1) + ': ' + r.status + ' ' + r.tekst.slice(0, 120));
+  }
+  const gelukt = await vanAdres(L, { bedrijf: zaakNaam, kassacode: eigen, login: OLAF, password: WW });
+  assert.equal(gelukt.status, 200, 'de eigen aanmelding slaagt: ' + gelukt.status + ' ' + gelukt.tekst.slice(0, 120));
+  const tiende = await vanAdres(L, { bedrijf: zaakNaam, kassacode: 'RTG-VERZONNEN-9', login: OLAF, password: WW });
+  assert.equal(tiende.status, 401, 'de tiende weigering zelf is nog 401: ' + tiende.status);
+  const dicht = await vanAdres(L, { bedrijf: zaakNaam, kassacode: nogEen, login: OLAF, password: WW });
+  assert.equal(dicht.status, 429, 'na tien weigeringen vanaf dit adres is het dicht, ook als er tussendoor een '
+    + 'aanmelding slaagde: ' + dicht.status + ' ' + dicht.tekst.slice(0, 120));
+  // TEGENPROEF: een ander adres is niet dicht; de echte status van een weigering
+  const ander = await vanAdres('::1', { bedrijf: zaakNaam, kassacode: 'RTG-VERZONNEN', login: OLAF, password: WW });
+  assert.equal(ander.status, 401, 'een ander adres krijgt de gewone weigering: ' + ander.status + ' ' + ander.tekst.slice(0, 120));
+});
+
 /* De pauze laten springen zoals een echte aanval: zes bronnen, elk elf mislukte
    pogingen op een eigen naam (zie test/inlogpauze-spelling.test.js). */
 async function laatPauzeSpringen() {
@@ -245,7 +316,7 @@ async function laatPauzeSpringen() {
   assert.equal(proef.status, 503, 'de pauze hoort na zes bronnen gesprongen te zijn: ' + kort(proef));
 }
 
-test('5. de inlogpauze geldt ook voor de aanmelding (laatste toets: de pauze blijft staan)', async () => {
+test('7. de inlogpauze geldt ook voor de aanmelding (laatste toets: de pauze blijft staan)', async () => {
   const code = await kassacode(kikunoi);
   await laatPauzeSpringen();
   for (const pad of ['/api/supplier/staff/join', '/api/supplier/staff/join/']) {

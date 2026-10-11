@@ -36,13 +36,14 @@ app.post('/api/auth/login', async (req, res) => {
      een account waren veertig verse emmers: gemeten, veertig gokken en nul
      remmen. Nu ook een op het adres en een op het account, en die laatste
      vertraagt en sluit niet. De emmers staan in kern/identiteit/wachtwoordrem.js
-     en de werkplekinlog deelt ze (N28). */
-  if (rem.dicht(res, req.ip, login)) return;
+     en de werkplekinlog deelt ze (N28). Eerst opzoeken: de emmers hangen aan
+     het account en niet aan de getikte naam (I1, zie de kop daar). */
   const user = accounts.findByLogin(login);
+  if (rem.dicht(res, req.ip, login, user)) return;
   if (!user || !await accounts.verifyPassword(req.body.password, user.password_hash)) {
     /* De emmers worden hier meteen gevuld, nog voor het spoor: faalt het spoor,
        dan telt de poging toch. Afgewacht wordt pas onderaan. */
-    const remming = rem.mis(req.ip, login);
+    const remming = rem.mis(req.ip, login, user);
     /* HET SPOOR OP DE HOOFDINGANG. logInlog belooft "elke inlogpoging (gelukt of
        mislukt, op elk kanaal)", maar deze route -- de ECHTE accountingang, waar
        een aanval op echte accounts binnenkomt -- liet 102 van de 106 geslaagde
@@ -73,7 +74,7 @@ app.post('/api/auth/login', async (req, res) => {
     await remming;
     return res.status(401).json({ error: 'Onjuiste inloggegevens.' });
   }
-  rem.gelukt(req.ip, login);
+  rem.gelukt(req.ip, login, user);
   logInlog('lid', true, 'user-' + user.id, req);
   /* DE HASH STIL OPWAARDEREN. Het wachtwoord klopt, dus we hebben de klaartekst
      precies een keer in handen -- het enige moment waarop een hash met oude

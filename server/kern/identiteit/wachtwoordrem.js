@@ -17,11 +17,9 @@
    want daar is niet elke weigering een gok: zonder geldige kassacode wordt het
    wachtwoord niet eens getoetst, en zo'n poging hoort de 50 per adres van de
    gewone inlog niet op te maken. Een fout wachtwoord met een geldige code telt
-   wel op het account, en daar geldt ook de vertraging. Die aanmelding bouwde de
-   emmernaam eerst zelf na (een eigen sha256 op dezelfde vorm); bij het
-   samenvoegen van N28 en N29 kwam dat hier, want een nagebouwde emmernaam loopt
-   uit de pas zodra hier een naam verandert, en dat is al eens gebeurd (de emmer
-   van adres plus account, hieronder).
+   wel op het account, en daar geldt ook de vertraging. De emmernaam komt van
+   hier en wordt daar niet nagebouwd: een tweede bouwer loopt uit de pas zodra
+   hier iets verandert.
 
    DE TECHNIEKINLOG STAAT HIER NOG BUITEN, dus de rem geldt niet overal.
    /api/techniek/inloggen remt met een eigen emmer 'tech:'; wat daar gegokt
@@ -36,21 +34,36 @@
        vreemde de macht om een lid uit zijn eigen account te houden. Wie het
        wachtwoord weet, komt dus zonder wachten binnen (test/inlogrem.test.js).
 
-   HET ACCOUNT STAAT GEHASHT IN ELKE EMMERNAAM DIE HET DRAAGT, in die van het
-   account en in die van adres plus account. Een emmer die dichtgaat, meldt zijn
-   naam als bron van een beveiligingsmelding (noteFailedTry in ../../server.js),
-   en die melding wordt bewaard; het vergeten van een account (../vergeten.js)
-   raakt haar niet. De emmer van adres plus account droeg de inlognaam eerst in
-   klare tekst, terwijl deze kop al beloofde dat dat niet kon: na tien foute
-   gokken stond "brute-force|auth:<adres>:<e-mailadres>" in de opslag. Op de
-   werkdeur was dat nieuw, want haar oude emmer 'mijn:'+adres droeg geen
-   inlognaam. Een e-mailadres hoort niet in een spoor, net zo min als een echte
-   naam naast een codenaam. test/werkplek-rem.test.js zoekt het in de datamap.
+   EEN ACCOUNT, EEN SLEUTEL. De emmers van het account hangen aan het ACCOUNT
+   dat findByLogin vond, en niet aan de ingetikte inlognaam. findByLogin vindt
+   een account op zijn e-mailadres EN op zijn gebruikersnaam, in elke spelling;
+   hing de emmer aan de tekst, dan had een account met allebei twee stellen
+   emmers, en remde 25 keer mis op het e-mailadres een gok op de
+   gebruikersnaam niet (I1 uit de keuring van ronde 6, ook bij de eigenaar en
+   bij Nora). Elke deur zoekt dus EERST het account op en geeft het mee, ook als
+   het er niet is (null). Alleen bij een onbekende naam hangt de emmer aan de
+   genormaliseerde tekst. Vergeet een deur het mee te geven, dan gooit de rem
+   een fout in plaats van stil terug te vallen op de tekst.
+
+   GEEN E-MAILADRES EN GEEN ID IN KLARE TEKST in een emmernaam, alleen een
+   vingerafdruk: over de id als het account bestaat, anders over de tekst. Een
+   emmer die dichtgaat, meldt zijn naam als bron van een beveiligingsmelding
+   (noteFailedTry in ../../server.js), en die melding wordt bewaard; het
+   vergeten van een account (../vergeten.js) raakt haar niet. Een e-mailadres
+   hoort niet in een spoor, net zo min als een echte naam naast een codenaam.
+   test/werkplek-rem.test.js zoekt het in de datamap. De twee vormen van
+   vingerafdruk zien er hetzelfde uit, dus de naam zegt ook niet of het account
+   bestaat. Het antwoord evenmin: status en tekst zijn bij een onbekende naam
+   dezelfde (alleen de duur kan verschillen; dat staat apart).
 
    DE NOODREM. Elke emmer die dichtgaat meldt zich via noteFailedTry als brute
    force, met het adres als aanvaller (../../server.js). Hier geen eigen soort:
    wie hier gokt, kent het wachtwoord niet, en dat is precies wat de noodrem moet
-   zien (anders dan bij de tweede stap, N4).
+   zien (anders dan bij de tweede stap, N4). Bij de adresemmer en die van adres
+   plus account is dat adres ook de gokker. Bij de accountemmer is het het adres
+   van wie de 25e misser doet, en dat kan de eigenaar van het account zelf zijn
+   die zich vertypt; dan staat zijn adres in quarantaine. Dat is zo gelaten: de
+   rem kan aan een misser niet zien van wie hij komt.
 
    EEN GESLAAGDE INLOG LEEGT ALLEEN WAT OVER DIT ACCOUNT GAAT: de emmer van adres
    plus account en die van het account. Nooit die van het adres. Een geslaagde
@@ -59,6 +72,8 @@
    eigen account de grens van 50 per adres terug wanneer hij wilde, en gokte hij
    vanaf een adres onbeperkt op de accounts van anderen. Dat is de les van N4
    (./tweedestap-rem.js); de adresemmer loopt vanzelf af (../../opzet/onderhoud.js).
+   De aanmelding van personeel houdt zich met haar eigen adresemmer aan dezelfde
+   regel (I7).
 
    Deze module houdt zelf geen staat: alles staat in de gedeelde `loginFails`.
    Elke deur bouwt haar eigen exemplaar uit de drie bestaande kernfuncties, en
@@ -68,53 +83,60 @@ const crypto = require('crypto');
 
 const VERTRAGING_MS = 2000;
 const vingerafdruk = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex').slice(0, 24);
-/* EEN ACCOUNT, EEN SLEUTEL. findByLogin vindt het account ook als de inlognaam
-   andere hoofdletters of witruimte draagt; elke spelling hoort dus in dezelfde
-   emmers, anders is elke spelling een verse rij gokken. */
-const accountSleutel = login => vingerafdruk('account:' + String(login || '').toLowerCase().trim());
+/* De sleutel van het account; zie EEN ACCOUNT, EEN SLEUTEL in de kop. `lid` is
+   wat findByLogin gaf: een account, of null bij een onbekende naam. Alleen dan
+   telt de tekst, in kleine letters en zonder witruimte eromheen, want zo zoekt
+   findByLogin ook. */
+function accountSleutel(login, lid) {
+  if (lid === undefined) throw new Error('wachtwoordrem: geef het account van findByLogin mee (null als er geen is)');
+  if (lid && lid.id != null) return vingerafdruk('id:' + lid.id);
+  return vingerafdruk('account:' + String(login || '').toLowerCase().trim());
+}
 
 function maakWachtwoordRem({ tooManyTries, noteFailedTry, loginFails }) {
-  const emmers = (ip, login) => {
-    const account = accountSleutel(login);
+  const emmers = (ip, login, lid) => {
+    const account = accountSleutel(login, lid);
     return { paar: 'auth:' + ip + ':' + account, bron: 'auth:bron:' + ip,
       doel: 'auth:doel:' + account };
   };
-  const doelVan = login => emmers('', login).doel;
+  const doelVan = (login, lid) => emmers('', login, lid).doel;
   /* DE ACCOUNTEMMER LOS, voor een deur die haar adres zelf remt (de aanmelding
      van personeel, zie de kop). mis() en gelukt() hieronder lopen hier ook
      langs, zodat naam, grens en wachttijd op een plek staan. */
   const account = {
-    gok(ip, login) { noteFailedTry(doelVan(login), ip, 25); },
+    gok(ip, login, lid) { noteFailedTry(doelVan(login, lid), ip, 25); },
     /* Wacht zolang het account onder vuur ligt. Een deur mag dit bij ELKE
        weigering aanroepen en niet alleen bij een fout wachtwoord: anders verraadt
        een snel antwoord dat het wachtwoord klopte (N29). */
-    async wacht(login) {
-      const doel = loginFails.get(doelVan(login));
+    async wacht(login, lid) {
+      const doel = loginFails.get(doelVan(login, lid));
       if (doel && doel.until > Date.now()) await new Promise(r => setTimeout(r, VERTRAGING_MS));
     },
-    gelukt(login) { loginFails.delete(doelVan(login)); }
+    gelukt(login, lid) { loginFails.delete(doelVan(login, lid)); }
   };
   return {
     /* true als de emmer van adres plus account of die van het adres dicht is;
        dan is het 429-antwoord al gestuurd. De accountemmer remt hier niet. */
-    dicht(res, ip, login) {
-      const e = emmers(ip, login);
+    dicht(res, ip, login, lid) {
+      const e = emmers(ip, login, lid);
       return tooManyTries(res, e.paar) || tooManyTries(res, e.bron);
     },
-    /* Een mislukte poging. De drie emmers worden METEEN gevuld, nog voor de
-       eerste await: een deur die de belofte vergeet af te wachten, verliest dan
-       de vertraging maar nooit de telling. Wacht de deur wel (en dat hoort),
-       dan kost een mislukte poging op een aangevallen account twee seconden. */
-    async mis(ip, login) {
-      const e = emmers(ip, login);
+    /* Een mislukte poging. Het tellen gebeurt synchroon, voordat mis() zijn
+       belofte teruggeeft; alleen het wachten daarna is asynchroon. Een deur die
+       de belofte vergeet af te wachten, verliest dus de vertraging maar nooit
+       de telling. Dat gaat over de volgorde binnen EEN verzoek, en zegt niets
+       over gelijktijdige verzoeken: wat al langs dicht() was, wordt hier niet
+       meer tegengehouden. */
+    async mis(ip, login, lid) {
+      const e = emmers(ip, login, lid);
       noteFailedTry(e.paar, ip);
       noteFailedTry(e.bron, ip, 50);
-      account.gok(ip, login);
-      await account.wacht(login);
+      account.gok(ip, login, lid);
+      await account.wacht(login, lid);
     },
-    gelukt(ip, login) {
-      loginFails.delete(emmers(ip, login).paar);
-      account.gelukt(login);   // nooit de adresemmer; zie de kop
+    gelukt(ip, login, lid) {
+      loginFails.delete(emmers(ip, login, lid).paar);
+      account.gelukt(login, lid);   // nooit de adresemmer; zie de kop
     },
     account
   };

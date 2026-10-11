@@ -258,7 +258,7 @@ test('C. e2e: SCIM zet het account uit tussen stap een en twee, /api/auth/tweede
     // de eigenaar koppelt een organisatie met een domein en haalt een SCIM-sleutel
     const eig = await vraag('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
     assert.ok(eig.body.token, 'de eigenaar logt in: ' + JSON.stringify(eig.body).slice(0, 160));
-    const zw = await zwaarApi((p, b, t) => vraag(p, b, t), srv.base, eig.body.token);
+    const zw = await zwaarApi((p, b, t) => vraag(p, b, t), srv.base, eig.body.token, 'Imran');
     const sso = await zw('/api/techniek/sso', { org: 'n20org', naam: 'Uitdienst BV', issuer: 'https://login.n20-idp.test',
       clientId: 'rtg-n20', clientSecret: 'n20-geheim', domeinen: ['n20-org.test'], actief: true }, eig.body.token);
     assert.equal(sso.status, 200, 'SSO-koppeling: ' + JSON.stringify(sso.body).slice(0, 200));

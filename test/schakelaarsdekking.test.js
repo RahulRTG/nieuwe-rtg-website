@@ -229,7 +229,14 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      kern/platformregister/bediening.js; test/platformregister.test.js was groen
      voordat dit getal werd verzet. `onverklaard <= 10` beweegt niet mee: de route
      telde daar mee (11) en is nu verklaard. */
-  assert.ok(zonder.length <= 153,
+  /* 153 -> 154: OPNIEUW BEGINNEN (#580, SAMENLEVING.md). POST /api/privacy/opnieuw
+     staat naast /api/privacy/delete, /export en /inzage: een lid dat zijn sporen
+     wil wissen en opnieuw wil beginnen, oefent een recht uit, en een schakelaar
+     erop houdt hem vast aan een verleden dat hij kwijt wil. Hij valt onder de
+     bestaande reden van /api/privacy in kern/bestuursroutes.js ("AVG-rechten en
+     niet uitschakelbaar"). Kwam in de samenvoeging van #542 boven op #521 en #523,
+     die elk hun eigen stap al zetten. `onverklaard <= 10` beweegt niet mee. */
+  assert.ok(zonder.length <= 154,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');

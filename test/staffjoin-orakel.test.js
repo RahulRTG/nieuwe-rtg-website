@@ -214,7 +214,7 @@ test('4. een account dat zijn organisatie uit dienst meldde, koppelt zich niet',
   // de eigenaar koppelt een organisatie met een domein en haalt een SCIM-sleutel
   const eig = await api('/api/auth/login', { login: EIGENAAR, password: EIGENAAR_WW, pasApp: 'business' });
   assert.ok(eig.body.token, 'de eigenaar logt in: ' + kort(eig));
-  const zw = await zwaarApi((p, b, t) => api(p, b, t), srv.base, eig.body.token);
+  const zw = await zwaarApi((p, b, t) => api(p, b, t), srv.base, eig.body.token, EIGENAAR_WW);
   const sso = await zw('/api/techniek/sso', { org: 'joinorg', naam: 'Join BV', issuer: 'https://login.joinorg-idp.test',
     clientId: 'rtg-join', clientSecret: 'join-geheim', domeinen: ['joinorg.test'], actief: true }, eig.body.token);
   assert.equal(sso.status, 200, 'SSO-koppeling: ' + kort(sso));

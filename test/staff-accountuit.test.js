@@ -62,7 +62,7 @@ test.before(async () => {
   const o = await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
   assert.ok(o.body.token, 'eigenaar: ' + kort(o));
   eigenaar = o.body.token;
-  const zw = await zwaarApi(api, srv.base, eigenaar);
+  const zw = await zwaarApi(api, srv.base, eigenaar, 'Imran');
   const zet = await zw('/api/techniek/sso', { org: 'klantx', naam: 'Klant X BV',
     issuer: 'https://login.klantx-idp.test', clientId: 'rtg-klantx', clientSecret: 'geheim-x',
     domeinen: ['klantx.nl'], actief: true }, eigenaar);

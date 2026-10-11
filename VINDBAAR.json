@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-10-06T23:20:51.649Z",
-    "commit": "19b73fb9d",
+    "op": "2026-10-11T21:35:48.198Z",
+    "commit": "fcb7c48d4",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
-    "node": "v22.22.0"
+    "node": "v26.10.0"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 101,
-  "woorden": 1272,
-  "gevonden": 801,
-  "dekking": 0.6297,
+  "woorden": 1261,
+  "gevonden": 791,
+  "dekking": 0.6273,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -198,8 +198,8 @@
     {
       "naam": "Mall",
       "url": "/apps/mall.html",
-      "woorden": 45,
-      "gevonden": 29,
+      "woorden": 44,
+      "gevonden": 28,
       "mist": [
         "gevonden",
         "complete",
@@ -327,6 +327,25 @@
       ]
     },
     {
+      "naam": "Mijn loopbaan",
+      "url": "/apps/loopbaan.html",
+      "woorden": 18,
+      "gevonden": 7,
+      "mist": [
+        "reeks",
+        "zeven",
+        "voorraden",
+        "werkte",
+        "meenemen",
+        "gedeeld",
+        "leren",
+        "ingetrokken",
+        "voorbij",
+        "afgelopen",
+        "downloaden"
+      ]
+    },
+    {
       "naam": "Overzicht",
       "url": "/apps/rtg.html",
       "woorden": 55,
@@ -418,8 +437,8 @@
     {
       "naam": "Logeren bij leden",
       "url": "/apps/thuis.html",
-      "woorden": 20,
-      "gevonden": 12,
+      "woorden": 19,
+      "gevonden": 11,
       "mist": [
         "regels",
         "reviews",
@@ -464,6 +483,22 @@
       ]
     },
     {
+      "naam": "RTDocs",
+      "url": "/apps/office.html",
+      "woorden": 28,
+      "gevonden": 20,
+      "mist": [
+        "daarna",
+        "gedeeld",
+        "samenwerken",
+        "versiegeschiedenis",
+        "leest",
+        "exporteren",
+        "intussen",
+        "nieuwere"
+      ]
+    },
+    {
       "naam": "Commerce",
       "url": "/apps/commerce.html",
       "woorden": 13,
@@ -476,21 +511,6 @@
         "tekoop",
         "length",
         "aanbiedernaam"
-      ]
-    },
-    {
-      "naam": "RTDocs",
-      "url": "/apps/office.html",
-      "woorden": 27,
-      "gevonden": 20,
-      "mist": [
-        "daarna",
-        "gedeeld",
-        "samenwerken",
-        "versiegeschiedenis",
-        "leest",
-        "intussen",
-        "nieuwere"
       ]
     },
     {
@@ -536,20 +556,6 @@
       ]
     },
     {
-      "naam": "Mijn loopbaan",
-      "url": "/apps/loopbaan.html",
-      "woorden": 13,
-      "gevonden": 7,
-      "mist": [
-        "reeks",
-        "zeven",
-        "voorraden",
-        "gedeeld",
-        "leren",
-        "ingetrokken"
-      ]
-    },
-    {
       "naam": "RTG One",
       "url": "/apps/rtgone.html",
       "woorden": 28,
@@ -566,8 +572,8 @@
     {
       "naam": "RTMail",
       "url": "/apps/rtmail.html",
-      "woorden": 21,
-      "gevonden": 15,
+      "woorden": 22,
+      "gevonden": 16,
       "mist": [
         "daarna",
         "externe",
@@ -603,20 +609,6 @@
         "toestel",
         "loggen",
         "vluchtlogboek"
-      ]
-    },
-    {
-      "naam": "Reizen & Veilig",
-      "url": "/apps/reizen-veilig.html",
-      "woorden": 12,
-      "gevonden": 6,
-      "mist": [
-        "ibiza",
-        "jetset",
-        "week",
-        "gstaad",
-        "alpien",
-        "weekend"
       ]
     },
     {
@@ -658,19 +650,6 @@
         "vragen",
         "elke",
         "geldt"
-      ]
-    },
-    {
-      "naam": "Mijn leven",
-      "url": "/apps/leven.html",
-      "woorden": 14,
-      "gevonden": 9,
-      "mist": [
-        "noire",
-        "salon",
-        "chef",
-        "residence",
-        "selectie"
       ]
     },
     {
@@ -790,6 +769,17 @@
         "poort",
         "kanalen",
         "kijkers"
+      ]
+    },
+    {
+      "naam": "Mijn leven",
+      "url": "/apps/leven.html",
+      "woorden": 5,
+      "gevonden": 2,
+      "mist": [
+        "onderweg",
+        "bestellen",
+        "verblijf"
       ]
     },
     {
@@ -1027,6 +1017,15 @@
       ]
     },
     {
+      "naam": "Reizen & Veilig",
+      "url": "/apps/reizen-veilig.html",
+      "woorden": 6,
+      "gevonden": 5,
+      "mist": [
+        "welkom"
+      ]
+    },
+    {
       "naam": "Routedossier",
       "url": "/apps/routedossier.html",
       "woorden": 4,
@@ -1177,8 +1176,8 @@
     {
       "naam": "Wonen",
       "url": "/apps/wonen.html",
-      "woorden": 5,
-      "gevonden": 5,
+      "woorden": 4,
+      "gevonden": 4,
       "mist": []
     },
     {

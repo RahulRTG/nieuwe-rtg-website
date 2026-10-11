@@ -1298,6 +1298,12 @@
       "url": "/apps/loopbaan.html"
     },
     {
+      "label": "Mijn loopbaan downloaden",
+      "app": "Mijn loopbaan",
+      "wereld": "WorkOS",
+      "url": "/apps/loopbaan.html"
+    },
+    {
       "label": "Stoppen",
       "app": "Mijn loopbaan",
       "wereld": "WorkOS",
@@ -2697,6 +2703,12 @@
     },
     {
       "label": "Iemand erbij",
+      "app": "RTMail",
+      "wereld": "WorkOS",
+      "url": "/apps/rtmail.html"
+    },
+    {
+      "label": "Instellingen",
       "app": "RTMail",
       "wereld": "WorkOS",
       "url": "/apps/rtmail.html"

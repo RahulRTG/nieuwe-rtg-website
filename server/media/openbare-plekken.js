@@ -45,10 +45,19 @@ const KLASSEN = Object.freeze({
   },
   'salon-uitgelicht': {
     waarom: 'Een post die RTG heeft uitgelicht EN waarvan het lid toestemming gaf voor gebruik buiten De Salon (promoMag) -- de bron van "Uit De Salon" op sites en in de campagne.',
+    /* Uit de LOPENDE uitlichtingen (kern/salon/uitlichten.js) en niet uit
+       `p.featured`: dat veld is een projectie die niet meebeweegt als een
+       looptijd `tot` verstrijkt. Verval is berekend, dus hier ook. En alleen een
+       post die het lid al aan heel De Salon liet zien ("salon"/"iedereen"): een
+       uitlichting maakt een post "vrienden" of "alleen ik" nooit openbaar. */
     vind(data, voeg) {
+      const nu = new Date().toISOString();
+      const lopend = new Set((Array.isArray(data.salonUitlicht) ? data.salonUitlicht : [])
+        .filter(r => r && !r.ingetrokken && (!r.tot || r.tot > nu)).map(r => String(r.post)));
+      if (!lopend.size) return;
       for (const p of data.posts || []) {
-        if (!levend(p) || p.partner === true) continue;
-        if (p.featured === true && p.promoMag === true) refsVanPost(p, voeg);
+        if (!levend(p) || p.partner === true || !lopend.has(String(p.id))) continue;
+        if (p.promoMag === true && ['salon', 'iedereen', undefined, null].includes(p.publiek)) refsVanPost(p, voeg);
       }
     }
   },

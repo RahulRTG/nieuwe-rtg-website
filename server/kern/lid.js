@@ -18,6 +18,8 @@ function maakLid(deps) {
   // opgebouwd, dus server.js vult deps.zijnVrienden later in. Zonder die functie
   // (bijv. losse module-test) telt niemand als vriend.
   const zijnVriendenVan = (a, b) => { try { return typeof deps.zijnVrienden === 'function' ? !!deps.zijnVrienden(a, b) : false; } catch (e) { return false; } };
+  let _leespoort = null;
+  const salonLeespoort = () => _leespoort || (_leespoort = require('./salon/zichtbaarheid')({ db, findSupplier, zijnVrienden: zijnVriendenVan }));
   const { hasContact, addContact, canEngage, engageError, registerContact } =
     require('./lid/contact')({ db, PERSONAS });
   const { facturenVoor, reisVoor, eersteBijdrageFactuur } = require('./lid/facturen')({ i18n, deps });
@@ -79,7 +81,12 @@ function maakLid(deps) {
       return zijnVriendenVan(sess.key, p.authorKey);
     };
     const kijker = { volgt: volgtAuteur, bevriend: bevriendMet };
-    const posts = db.data.posts.filter(p => salonviraal.toonInSalon(p, kijker)).map(p => {
+    /* DEZELFDE LEESPOORT ALS DE SALON ZELF (kern/salon/zichtbaarheid.js). Hier
+       stond alleen toonInSalon(), en dat kent de publiekskeuze niet: een vriend
+       zag een post "alleen ik" van zijn vriend in /api/state, tekst en foto --
+       en sinds AUTHORITY.md B4 met een werkende beeldlink erbij. magLezen kijkt
+       ook naar weg, verborgen, archief en de eigen verborgen-lijst. */
+    const posts = db.data.posts.filter(p => salonLeespoort().magLezen(sess, p)).map(p => {
       const sup = p.partnerCode ? findSupplier(p.partnerCode) : null;
       const claim = p.deal && salonClaimcode ? salonClaimcode.vindVanLid(p, sess.key) : null;
       return {

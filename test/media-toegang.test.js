@@ -188,11 +188,20 @@ test('de klassen: alleen verklaarde plekken, en intrekken werkt', () => {
     suppliers: [{ photos: ['/media/' + n(1)], menu: [{ foto: '/media/' + n(2) }] }],
     posts: [
       { partner: true, publiek: 'iedereen', photo: '/media/' + n(3) },
-      { featured: true, promoMag: true, media: [{ src: '/media/' + n(4) }] },
-      { featured: true, promoMag: false, photo: '/media/' + n(5) },        // geen toestemming: privé
+      { id: 4, featured: true, promoMag: true, media: [{ src: '/media/' + n(4) }] },
+      { id: 5, featured: true, promoMag: false, photo: '/media/' + n(5) },        // geen toestemming: privé
       { publiek: 'alleenik', photo: '/media/' + n(6) },
       { partner: true, publiek: 'volgers', photo: '/media/' + n(7) },     // zaak, maar alleen volgers
-      { partner: true, verborgen: true, photo: '/media/' + n(8) }         // verborgen: weg
+      { partner: true, verborgen: true, photo: '/media/' + n(8) },        // verborgen: weg
+      { id: 12, featured: true, promoMag: true, photo: '/media/' + n('c') },   // looptijd verstreken
+      { id: 13, featured: true, promoMag: true, publiek: 'vrienden', photo: '/media/' + n('d') }, // uitgelicht, maar voor vrienden
+      { id: 14, featured: true, promoMag: true, photo: '/media/' + n('e') }    // featured, maar geen lopende uitlichting
+    ],
+    salonUitlicht: [
+      { post: '4', tot: null, ingetrokken: null },
+      { post: '5', tot: null, ingetrokken: null },
+      { post: '12', tot: '2020-01-01T00:00:00.000Z', ingetrokken: null },
+      { post: '13', tot: null, ingetrokken: null }
     ],
     ledenSites: { fotos: { 'user-1': ['/media/' + n(9)] }, lijst: [{ blokken: [{ src: '/media/' + n('a') }] }] },
     huurFotos: { R1: { voor: [{ foto: '/media/' + n('b') }], na: [] } }
@@ -204,7 +213,7 @@ test('de klassen: alleen verklaarde plekken, en intrekken werkt', () => {
   assert.equal(klasse(3), 'salon-zaak');
   assert.equal(klasse(4), 'salon-uitgelicht');
   assert.equal(klasse(9), 'website');
-  for (const i of [5, 6, 7, 8, 'a', 'b']) assert.equal(klasse(i), null, 'niet openbaar: ' + i);
+  for (const i of [5, 6, 7, 8, 'a', 'b', 'c', 'd', 'e']) assert.equal(klasse(i), null, 'niet openbaar: ' + i);
   assert.ok(t.toon('/media/' + n(6)).startsWith('/media/t/'), 'privé wordt een link');
   assert.equal(t.toon('/media/' + n(1)), '/media/' + n(1), 'openbaar blijft de kale URL');
   assert.equal(t.toon('prive-' + n(1)), null, 'een prive-bestand krijgt via deze weg nooit een link');
@@ -212,8 +221,8 @@ test('de klassen: alleen verklaarde plekken, en intrekken werkt', () => {
   const insp = t.inspectie(data.huurFotos.R1);
   assert.ok(insp.voor[0].foto.startsWith('/media/t/'), 'een inspectiefoto is nooit openbaar');
   assert.equal(data.huurFotos.R1.voor[0].foto, '/media/' + n('b'), 'de opslag zelf wordt niet aangeraakt');
-  // intrekken: de uitlichting gaat eraf, en na verversing is het beeld niet meer openbaar
-  data.posts[1].featured = false;
+  // intrekken: de uitlichting wordt ingetrokken, en na verversing is het beeld niet meer openbaar
+  data.salonUitlicht[0].ingetrokken = { door: 'x', reden: 'y', at: '2026-10-11T00:00:00.000Z' };
   t.zet({ data: () => data });
   assert.equal(klasse(4), null, 'niet meer uitgelicht = niet meer openbaar');
   t.zet({});
@@ -223,4 +232,94 @@ test('de klassen: alleen verklaarde plekken, en intrekken werkt', () => {
 test('een ondertekende link belandt nooit leesbaar in een verzoeklog', () => {
   const { padVorm } = require('../server/kern/journaalvorm');
   assert.equal(padVorm('/media/t/' + 'Ab_-'.repeat(20)), '/media/t/:ticket');
+});
+
+/* ---- de tweede ronde (tegenlezing op PR #587) ---- */
+
+async function vrienden(A, B) {
+  const mijA = (await api('/api/member/connections', {}, A)).body;
+  const mijB = (await api('/api/member/connections', {}, B)).body;
+  await api('/api/member/connect', { key: mijB.me }, A);
+  await api('/api/member/connect/respond', { key: mijA.me, action: 'accept' }, B);
+}
+
+test('B1: een vriend ziet een post "alleen ik" niet in /api/state, en krijgt er geen link voor', async () => {
+  const A = await lid(), B = await lid();
+  await vrienden(A, B);
+  const tekst = 'geheim moment ' + Date.now();
+  const p = await api('/api/salon/plaats', { tekst, media: [{ beeld: PNG, alt: 'x' }], publiek: 'alleenik' }, A);
+  assert.equal(p.status, 200, p.body.error);
+  const naam = naamUitLink(p.body.post.media[0].src);
+  const controle = await api('/api/salon/plaats', { tekst: 'voor vrienden ' + Date.now(), media: [{ beeld: PNG, alt: 'x' }], publiek: 'vrienden' }, A);
+  assert.equal(controle.status, 200, controle.body.error);
+  const st = await api('/api/state', {}, B);
+  assert.equal(st.status, 200);
+  const posts = (st.body.state && st.body.state.posts) || [];
+  assert.ok(posts.some(x => x.id === controle.body.post.id), 'controle: de vriendenpost staat er wel (anders bewijst dit niets)');
+  assert.ok(!posts.some(x => x.text === tekst), 'de post "alleen ik" staat niet in de staat van de vriend');
+  for (const x of posts.filter(x => x.photo && x.photo.startsWith('/media/t/')))
+    assert.notEqual(naamUitLink(x.photo), naam, 'en er is geen link naar zijn foto');
+});
+
+test('een DM kan geen post delen die de afzender niet mag lezen', async () => {
+  const A = await lid(), B = await lid(), C = await lid();
+  await vrienden(A, B);
+  const prive = await api('/api/salon/plaats', { tekst: 'van C, alleen ik', media: [{ beeld: PNG, alt: 'x' }], publiek: 'alleenik' }, C);
+  const eigen = await api('/api/salon/plaats', { tekst: 'van A voor iedereen' }, A);
+  const mijB = (await api('/api/member/connections', {}, B)).body.me;
+  const zonder = await api('/api/member/dm/send', { toKey: mijB, postId: prive.body.post.id }, A);
+  assert.equal(zonder.status, 400, 'zonder tekst en zonder leesbare post is er niets te versturen');
+  const met = await api('/api/member/dm/send', { toKey: mijB, postId: eigen.body.post.id }, A);
+  assert.equal(met.status, 200, 'controle: een post die A mag lezen deelt hij wel');
+});
+
+test('M3: een zaak ziet van een gast alleen wat die aan heel De Salon liet zien', async () => {
+  const zaak = (await api('/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
+  const A = await lid();
+  const geheim = 'gastgeheim ' + Date.now(), open = 'gastopen ' + Date.now();
+  await api('/api/salon/plaats', { tekst: geheim, publiek: 'alleenik' }, A);
+  await api('/api/salon/plaats', { tekst: open, publiek: 'salon' }, A);
+  const chat = await api('/api/partner/chat/send', { supplierCode: 'KIKUNOI', text: 'Hallo' }, A);
+  assert.equal(chat.status, 200, chat.body.error);
+  const st = await api('/api/supplier/state', {}, zaak);
+  const mij = (await api('/api/member/connections', {}, A)).body.me;
+  const lijn = ((st.body.state && st.body.state.guestChats) || []).find(c => String(c.key).includes(mij));
+  assert.ok(lijn, 'de zaak heeft een lijn met deze gast');
+  const r = await api('/api/supplier/klant/salon', { key: lijn.key }, zaak);
+  assert.equal(r.status, 200, r.body.error);
+  const teksten = (r.body.posts || []).map(x => x.text);
+  assert.ok(teksten.includes(open), 'controle: de post voor heel De Salon staat er');
+  assert.ok(!teksten.includes(geheim), 'de post "alleen ik" niet');
+});
+
+test('M4: een menu neemt geen vreemde /media-naam over, wel de eigen foto', async () => {
+  const zaak = (await api('/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
+  const A = await lid();
+  const p = await api('/api/salon/plaats', { tekst: 'x', media: [{ beeld: PNG, alt: 'x' }], publiek: 'alleenik' }, A);
+  const vreemd = '/media/' + naamUitLink(p.body.post.media[0].src);
+  const voor = ((await api('/api/supplier/state', {}, zaak)).body.state || {}).menu || [];
+  assert.ok(voor.length, 'de zaak heeft een kaart');
+  const met = await api('/api/supplier/menu/foto', { id: voor[0].id, foto: PNG }, zaak);
+  assert.equal(met.status, 200, met.body.error);
+  const menu = voor.map((m, i) => Object.assign({}, m, { foto: i === 0 ? met.body.foto : vreemd }));
+  const r = await api('/api/supplier/menu', { menu }, zaak);
+  assert.equal(r.status, 200, r.body.error);
+  const na = ((await api('/api/supplier/state', {}, zaak)).body.state || {}).menu || [];
+  assert.equal(na[0].foto, met.body.foto, 'de eigen foto blijft staan');
+  assert.ok(!na.some(m => m.foto === vreemd), 'de vreemde naam is gevallen');
+  await alsOnbestaand(vreemd, 'anoniem na de poging');
+});
+
+test('beide servicewerkers cachen /media niet en ruimen oud mediabeeld op', () => {
+  for (const f of ['public/sw.js', 'public/apps/foundation/sw.js']) {
+    const bron = fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
+    assert.match(bron, /url\.pathname\.startsWith\('\/media\/'\)\) return;/, f + ': /media gaat langs de schil heen');
+    assert.match(bron, /\.filter\(r => r\.url\.includes\('\/media\/'\)\)\.map\(r => c\.delete\(r\)\)/, f + ': oud mediabeeld gaat eruit bij activering');
+  }
+});
+
+test('het banlog van het schild schrijft een medialink gemaskeerd', () => {
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'server/kern/schild.js'), 'latin1');
+  assert.ok(!/doel\.slice\(/.test(bron), 'geen ruw doel meer in het banlog');
+  assert.match(bron, /padVorm\(doel\)/);
 });

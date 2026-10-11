@@ -9,6 +9,7 @@ module.exports = (ctx) => {
     CLOUD, SLEUTEL, GEBRUIKER, WACHTWOORD, actief, HOP, KAS_DIR, KAS_MAX_BESTAND, KAS_MAX_STUKS,
     journaalPadOk, journaalZegel, journaalGeldig, JOURNAAL_MAX_BODY } = ctx;
   const bodyHulp = require('../../web/body');
+  const { OPENBAAR_MS } = require('../../media/toegang');
   const PROXY_BODY_MAX = 8 * 1024 * 1024;
   const LEESFOUT = Symbol('zaakdoos-leesfout');
 
@@ -63,7 +64,11 @@ module.exports = (ctx) => {
   function kasLees(url) {
     try {
       if (!fs.existsSync(path.join(KAS_DIR, kasNaam(url) + '.pub'))) return null;
-      const buf = fs.readFileSync(path.join(KAS_DIR, kasNaam(url) + '.bin'));
+      /* Niet langer dan de cloud het openbaar liet cachen: een foto die van de
+         etalage is gehaald, hoort ook van het kastje te verdwijnen. */
+      const bin = path.join(KAS_DIR, kasNaam(url) + '.bin');
+      if (Date.now() - fs.statSync(bin).mtimeMs > OPENBAAR_MS) return null;
+      const buf = fs.readFileSync(bin);
       let type = 'application/octet-stream';
       try { type = fs.readFileSync(path.join(KAS_DIR, kasNaam(url) + '.typ'), 'utf8'); } catch (e) {}
       return { buf, type };

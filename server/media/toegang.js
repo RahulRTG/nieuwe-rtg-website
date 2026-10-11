@@ -50,7 +50,8 @@ const LINK_PREFIX = '/media/t/';
 /* Openbaar mag een uur in een gedeelde cache. Niet een jaar en niet immutable:
    een zaak die een foto van haar kaart haalt, of een post die niet meer is
    uitgelicht, hoort binnen afzienbare tijd ook uit caches te verdwijnen. */
-const CACHE_OPENBAAR = 'public, max-age=3600';
+const OPENBAAR_MS = 3600 * 1000;
+const CACHE_OPENBAAR = 'public, max-age=' + (OPENBAAR_MS / 1000);
 const CACHE_PRIVE = 'private, no-store';
 
 const naamVan = ref => path.basename(String(ref || '').replace(URL_PREFIX, ''));
@@ -172,6 +173,6 @@ function zet(opties) {
   sleutel = null; index = null; gebouwd = 0;
 }
 
-module.exports = { KLASSEN, LINK_MS, VERS_MS, CACHE_OPENBAAR, CACHE_PRIVE, NAAM, LINK_PREFIX,
+module.exports = { KLASSEN, LINK_MS, VERS_MS, OPENBAAR_MS, CACHE_OPENBAAR, CACHE_PRIVE, NAAM, LINK_PREFIX,
   stand: () => ({ vindFouten, openbaar: index ? index.size : 0 }),
   zet, toon, inspectie, openbaarKlasse, leesLink, teken, naamVan, isMediaRef };

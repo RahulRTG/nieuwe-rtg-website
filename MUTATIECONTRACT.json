@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-07T00:24:39.279Z",
-  "commit": "13c2f5069",
+  "op": "2026-10-11T11:46:02.826Z",
+  "commit": "42db475de",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -13,14 +13,14 @@
   "totaal": 5331,
   "geclassificeerd": 5306,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3167,
+   "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1280,
    "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 675,
-   "INTENTIONALLY_NON_IDEMPOTENT": 184
+   "INTENTIONALLY_NON_IDEMPOTENT": 187
   },
-  "vastgesteldDoorMens": 2191,
-  "afgeleidDoorScript": 3115,
+  "vastgesteldDoorMens": 2194,
+  "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4387,
    "PUBLIC": 139,
@@ -21285,7 +21285,7 @@
    "mutatieId": "foundation.gezin.inloggen",
    "route": "POST /api/foundation/gezin/inloggen",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "nietHerhaalbaar"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -21301,8 +21301,8 @@
     "grond": null,
     "hindernis": "Vul naast de gezinscode uw eigen pincode in."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -21829,7 +21829,7 @@
    "mutatieId": "foundation.gezin.profiel.kies",
    "route": "POST /api/foundation/gezin/profiel/kies",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "nietHerhaalbaar"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -21845,8 +21845,8 @@
     "grond": null,
     "hindernis": "Dit profiel bestaat niet meer."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -22587,7 +22587,7 @@
    "mutatieId": "foundation.les.join",
    "route": "POST /api/foundation/les/join",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "nietHerhaalbaar"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -22603,8 +22603,8 @@
     "grond": null,
     "hindernis": "Te veel pogingen. Wacht een paar minuten en probeer het opnieuw."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -62991,7 +62991,7 @@
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -63012,7 +63012,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -63033,7 +63033,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -74101,7 +74101,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -74122,7 +74122,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -74143,7 +74143,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,

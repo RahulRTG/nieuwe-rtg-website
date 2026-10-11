@@ -12,7 +12,7 @@
                drukke avond toch nooit. */
 'use strict';
 
-const logboekzicht = require('../../../kern/leverancier/logboekzicht');
+const { magKlokZien } = require('../../../kern/leverancier/logboekzicht');
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, managerOnly, logActivity, sseToSupplier, horeca, klokVan } = kern;
   const { H, Hlees } = horeca;
@@ -57,8 +57,7 @@ module.exports = (kern) => {
     // de prikklok van de zaak, alleen gelezen via klokVan (kern/horeca/wijk-leen.js, drager)
     const klokVoor = typeof klokVan === 'function' ? (staffId) => klokVan(req.supplier.code, staffId) : null;
     const leningen = wijk.leen.lijst(h, klokVoor).map((l) => Object.assign({}, l, {
-      // de stand voor iedereen, het tijdstip alleen voor een manager (besluit 11 okt 2026)
-      drager: l.drager && !logboekzicht.magKlokZien(req.actor) ? { stand: l.drager.stand, reden: l.drager.reden } : l.drager,
+      drager: l.drager && !magKlokZien(req.actor) ? { stand: l.drager.stand, reden: l.drager.reden } : l.drager,
       vanMij: !!(l.vanId != null && String(l.vanId) === String(ik.staffId)),
       naarMij: String(l.staffId) === String(ik.staffId)
     }));

@@ -1,0 +1,305 @@
+{
+  "stempel": {
+    "op": "2026-10-11T13:38:47.288Z",
+    "commit": "0553e288",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/voltooiproef.js",
+    "node": "v22.22.0"
+  },
+  "uitleg": "Bewijs 3 (voltooibaar), 5 (persistent) en 7 (herstelbaar) uit BETROUWBAARHEID.md, per onderdeel uit MAPPEN, in de gecontroleerde testwereld: wegwerpdata, postvanger en sms-sandbox, een nette herstart en een crash op dezelfde datamap, en een lezer van de opslag buiten de server om.",
+  "hoe": "npm run voltooiproef:vast",
+  "testwereld": {
+    "mail": "postvanger (server/post-vanger.js): alleen met RTG_POSTVANGER=1, nooit in productie, nooit naast SMTP_URL of MAIL_DIRECT",
+    "sms": "sms-sandbox (server/sms-sandbox.js): alleen met SMS_SANDBOX=1, nooit in productie; beide choke points (sendSms en send(\"sms:...\")) lopen erdoor",
+    "betalen": "simulatiebank (server/betaal/synthetisch.js) bestaat; geen van de scenario's hieronder betaalt",
+    "opslag": "eigen RTG_DATA_DIR per scenario, gelezen met node:sqlite readOnly",
+    "storing": "SIGTERM (deploy) en SIGKILL (stroomstoring) op dezelfde datamap; een afgebroken verzoek met AbortController"
+  },
+  "apps": {
+    "link:post": {
+      "scenario": "scripts/lib/voltooi/post.js",
+      "ingang": "/apps/mijn-post.html",
+      "persona": "lid",
+      "belofte": "een lid geeft en trekt zelf toestemming in voor commerciele post, alles staat uit tot hij het aanzet, en de geschiedenis bewijst wanneer en waar -- ook na een herstart of een crash",
+      "grens": "De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf. Er is geen tweede actor die de toestemming leest: commercieel.mag() heeft vandaag geen aanroeper, dus of een verzender zich aan de stand houdt is niet gemeten. Er is geen Redis of PostgreSQL in de wereld.",
+      "herstarts": {
+        "netjes": 1,
+        "crash": 2
+      },
+      "afgebroken": null,
+      "post": {
+        "gevangen": 1,
+        "naarBuiten": 0,
+        "onderwerpen": [
+          "mail: Bevestig uw e-mailadres bij Rahul Travel Group"
+        ]
+      },
+      "voltooibaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "een nieuw lid begint met alles uit: afwezigheid is geen toestemming",
+            "stand": "gesloten",
+            "ziet": "4 soorten, 0 aan, 4 die nooit uit kunnen",
+            "ms": 13
+          },
+          {
+            "nr": 2,
+            "wat": "het lid geeft toestemming voor aanbiedingen per e-mail en sms, met herkomst",
+            "stand": "gesloten",
+            "ziet": "aan=true, kanalen email+sms, via scherm:voltooiproef",
+            "ms": 16
+          },
+          {
+            "nr": 3,
+            "wat": "het lid beperkt het tot e-mail; de geschiedenis zegt gegeven en daarna gewijzigd",
+            "stand": "gesloten",
+            "ziet": "geschiedenis: gewijzigd, gegeven",
+            "ms": 26
+          },
+          {
+            "nr": 4,
+            "wat": "afmelden in een handeling: alles uit, en de intrekking staat erbij",
+            "stand": "gesloten",
+            "ziet": "2 uitgezet, 0 nog aan, 2 intrekkingen in de geschiedenis",
+            "ms": 31
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 4,
+          "gesloten": 4,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "persistent": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "na een nette herstart staat de gegeven toestemming er nog, met hetzelfde tijdstip en dezelfde herkomst",
+            "stand": "gesloten",
+            "ziet": "voor: 2026-10-11T13:38:52.152Z via scherm:voltooiproef; na: 2026-10-11T13:38:52.152Z via scherm:voltooiproef",
+            "ms": 40
+          },
+          {
+            "nr": 2,
+            "wat": "een nieuwe sessie (een andere browser) leest exact dezelfde geschiedenis",
+            "stand": "gesloten",
+            "ziet": "geschiedenis byte voor byte gelijk (6 regels)",
+            "ms": 123
+          },
+          {
+            "nr": 3,
+            "wat": "de toestemming staat in de opslag zelf (store.db, gelezen buiten de server om)",
+            "stand": "gesloten",
+            "ziet": "1 lid met deze toestemming in de kv-opslag, gegeven 2026-10-11T13:38:52.152Z",
+            "ms": 2
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 3,
+          "gesloten": 3,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "herstelbaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "dubbelklik: dezelfde keuze twee keer is een gebeurtenis, niet twee",
+            "stand": "gesloten",
+            "ziet": "geschiedenis 6 -> 7",
+            "ms": 24
+          },
+          {
+            "nr": 2,
+            "wat": "een afgebroken verzoek en daarna opnieuw: de juiste stand, een regel in de geschiedenis",
+            "stand": "gesloten",
+            "ziet": "afgebroken (client gaf op), opnieuw 200, geschiedenis 7 -> 8",
+            "ms": 333
+          },
+          {
+            "nr": 3,
+            "wat": "een crash direct na het afmelden: wat ingetrokken heette, blijft ingetrokken",
+            "stand": "gesloten",
+            "ziet": "afmelden 200 (3 uit), na SIGKILL en herstart 0 aan, laatste regel ingetrokken",
+            "ms": 4633
+          },
+          {
+            "nr": 4,
+            "wat": "een crash direct na het geven: wat gegeven heette, staat er nog",
+            "stand": "gesloten",
+            "ziet": "geven 200, na SIGKILL: aan=true via push",
+            "ms": 4614
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 4,
+          "gesloten": 4,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      }
+    },
+    "link:sessies": {
+      "scenario": "scripts/lib/voltooi/sessies.js",
+      "ingang": "/apps/mijn-sessies.html",
+      "persona": "lid",
+      "belofte": "een lid ziet waar het is ingelogd en sluit een ander toestel op afstand -- en dat toestel blijft buiten, ook na een herstart of een crash",
+      "grens": "De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf: dat de knoppen dit ook doen, is bewijs 2 (bedienbaar). Er is geen Redis of PostgreSQL in de wereld; de intrekking is gemeten op de SQLite-opslag van een enkel proces. Een toestel intrekken (/api/mijn/toestel/introk) en \"sluit alle andere\" zijn andere handelingen en hier niet gelopen.",
+      "herstarts": {
+        "netjes": 1,
+        "crash": 1
+      },
+      "afgebroken": null,
+      "post": {
+        "gevangen": 1,
+        "naarBuiten": 0,
+        "onderwerpen": [
+          "mail: Bevestig uw e-mailadres bij Rahul Travel Group"
+        ]
+      },
+      "voltooibaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "een tweede toestel logt in, en het lid ziet het in zijn lijst",
+            "stand": "gesloten",
+            "ziet": "2 sessies, huidige NSRLudgz18R8",
+            "ms": 131
+          },
+          {
+            "nr": 2,
+            "wat": "het lid bevestigt zijn toestel met een sleutel (uitdaging, handtekening)",
+            "stand": "gesloten",
+            "ziet": "binden 200, sleutelbinding bewezen",
+            "ms": 33
+          },
+          {
+            "nr": 3,
+            "wat": "het lid sluit het andere toestel op afstand, met een bezitsbewijs",
+            "stand": "gesloten",
+            "ziet": "status 200, ingetrokken_tokens 0 -> 1",
+            "ms": 33
+          },
+          {
+            "nr": 4,
+            "wat": "het gesloten toestel merkt het: zijn token wordt geweigerd",
+            "stand": "gesloten",
+            "ziet": "het andere toestel krijgt 401",
+            "ms": 11
+          },
+          {
+            "nr": 5,
+            "wat": "het lid ziet het andere toestel niet meer, en werkt zelf gewoon door",
+            "stand": "gesloten",
+            "ziet": "lijst: NSRLudgz18R8",
+            "ms": 8
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 5,
+          "gesloten": 5,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "persistent": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "na een nette herstart blijft het gesloten toestel buiten",
+            "stand": "gesloten",
+            "ziet": "het andere toestel krijgt 401 na de herstart",
+            "ms": 9
+          },
+          {
+            "nr": 2,
+            "wat": "na de herstart werkt de sessie van het lid nog, en de lijst is dezelfde",
+            "stand": "gesloten",
+            "ziet": "lijst: NSRLudgz18R8",
+            "ms": 14
+          },
+          {
+            "nr": 3,
+            "wat": "een nieuwe sessie (een andere browser) ziet hetzelfde",
+            "stand": "gesloten",
+            "ziet": "lijst in de nieuwe sessie: 2 sessies, de gesloten er niet bij",
+            "ms": 186
+          },
+          {
+            "nr": 4,
+            "wat": "de intrekking staat in de opslag zelf (rtg.db, gelezen buiten de server om)",
+            "stand": "gesloten",
+            "ziet": "ingetrokken_tokens 1 voor de herstart, 1 erna",
+            "ms": 1
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 4,
+          "gesloten": 4,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "herstelbaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "dubbelklik: dezelfde sessie nog eens sluiten geeft een nette weigering en verandert niets",
+            "stand": "gesloten",
+            "ziet": "tweede keer 404 (Die sessie kennen wij niet.), andere toestel 401, lid 200",
+            "ms": 25
+          },
+          {
+            "nr": 2,
+            "wat": "een netwerkherhaling met hetzelfde bewijs doet niets twee keer",
+            "stand": "gesloten",
+            "ziet": "eerste 200, herhaling 401 (Dit bezitsbewijs is al gebruikt.), toestel 401",
+            "ms": 214
+          },
+          {
+            "nr": 3,
+            "wat": "een afgebroken sluitverzoek laat geen halve stand na, en opnieuw proberen maakt het af",
+            "stand": "gesloten",
+            "ziet": "afgebroken (client gaf op), opnieuw 404, toestel 401",
+            "ms": 452
+          },
+          {
+            "nr": 4,
+            "wat": "een crash direct na de bevestiging: wat gesloten heette, blijft gesloten",
+            "stand": "gesloten",
+            "ziet": "sluiten 200, na SIGKILL en herstart: toestel 401, lid 200",
+            "ms": 4736
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 4,
+          "gesloten": 4,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      }
+    }
+  },
+  "telling": {
+    "apps": 2,
+    "bewijzenGesloten": 6,
+    "bewijzenOpen": 0
+  },
+  "sluit": true
+}

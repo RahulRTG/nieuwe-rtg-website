@@ -11,7 +11,7 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-e13d8465';
+const CACHE = 'rtg-app-ed952297';
 const SHELL = [
   /* The mandatory desktop standard is available offline too. */
   '/shared/interface/module-sdk.js',
@@ -72,7 +72,7 @@ const SHELL = [
   '/shared/rtg-edge-2.js', '/shared/rtg-edge-2.css',
   '/shared/experience-handoff.js', '/shared/rtg-adaptive-edge-loader.js', '/shared/rtg-adaptive-edge-core.js', '/shared/rtg-adaptive-edge-controls.js', '/shared/rtg-adaptive-edge-input.js', '/shared/rtg-adaptive-edge-surface.js', '/apps/muziek-edge.js', '/shared/rtg-edge-pages.js', '/shared/rtg-communication-surface.css', '/shared/rtg-communication-surface.js', '/shared/adaptief/grammatica.js',
   '/shared/rtg-adaptive-edge-services.js', '/shared/rtg-adaptive-edge.js', '/shared/rtg-adaptive-edge-signals.js', '/shared/rtg-adaptive-edge.css',
-  '/shared/edge/actiestaat.js', '/shared/edge/blikveld-hoofdactie.js', '/shared/edge/blikveld.js', '/shared/edge/rahulzicht.js',
+  '/shared/edge/actiestaat.js', '/shared/edge/blikveld-hoofdactie.js', '/shared/edge/blikveld.js',
   '/images/worlds/heritage/living-heritage-v2.jpg',
   '/images/worlds/heritage/travel-heritage-v2.jpg',
   '/images/worlds/heritage/work-heritage-v2.jpg',

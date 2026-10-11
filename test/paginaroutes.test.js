@@ -7,7 +7,7 @@
    `.filter(p => p.startsWith('/api/'))`). Deze zeven routes waren daardoor niet
    ONGEDEKT -- ze bestonden niet voor het cijfer:
 
-     GET /                     de openbare merkvoordeur
+     GET /                     de openbare merkvoordeur (de app op app.*)
      GET /apps                 de leden-homescreen
      GET /apps/bureau.html     dezelfde homescreen
      GET /apps/index.html      dezelfde homescreen
@@ -92,6 +92,40 @@ test('de voordeur: / is de goedgekeurde landing, zonder omleiding', async () => 
   assert.match(head.headers.get('content-security-policy') || '', /'nonce-/,
     'ook HEAD valt niet terug naar een zwakkere CSP');
   assert.equal(await head.text(), '', 'HEAD stuurt terecht geen documentbody');
+});
+
+/* fetch laat de Host-kop niet zetten, dus het app-domein gaat via http. Een
+   echt domein komt achter de TLS-proxy binnen; zonder X-Forwarded-Proto stuurt
+   opzet/httpspoort.js het terecht met een 301 naar https. */
+const haalOpHost = (pad, host, method = 'GET') => new Promise((klaar, faal) => {
+  const u = new URL(base);
+  const req = require('http').request({ host: u.hostname, port: u.port, path: pad, method,
+    headers: { host, 'x-forwarded-proto': 'https' } }, res => {
+    let tekst = '';
+    res.setEncoding('utf8');
+    res.on('data', d => { tekst += d; });
+    res.on('end', () => klaar({ status: res.statusCode, type: res.headers['content-type'] || '',
+      csp: res.headers['content-security-policy'] || '', tekst }));
+  });
+  req.on('error', faal);
+  req.end();
+});
+
+test('het app-domein: / opent daar meteen de app, zonder omleiding', async () => {
+  const d = await haalOpHost('/', 'app.rahultravelgroup.com');
+  assert.ok(d.status !== 301 && d.status !== 302, 'geen omleiding (status ' + d.status + ')');
+  isHomescreen(d, 'GET / op app.');
+  assert.match(d.tekst, /id="gate"/, 'de korte app-link opent de RTG Account-voordeur');
+  assert.doesNotMatch(d.tekst, /data-page="rtg-landing"/, 'op het app-domein geen landing');
+  assert.match(d.csp, /'nonce-/, 'de app-root krijgt de nonce-CSP van de app');
+
+  const head = await haalOpHost('/', 'app.rahultravelgroup.com', 'HEAD');
+  assert.equal(head.status, 200, 'HEAD ziet dezelfde app-root');
+  assert.match(head.csp, /'nonce-/, 'ook HEAD op de app-root valt niet terug naar een zwakkere CSP');
+  assert.equal(head.tekst, '', 'HEAD stuurt geen body');
+
+  const hoofd = await haalOpHost('/', 'www.rahultravelgroup.com');
+  assert.match(hoofd.tekst, /data-page="rtg-landing"/, 'op het hoofddomein blijft / de landing');
 });
 
 test('de drie oude bureaubladpaden komen allemaal op diezelfde homescreen uit', async () => {

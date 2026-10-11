@@ -56,6 +56,26 @@ test('de raadstafel: rtf/samen-uitslagen wel, besloten RTG-werk nooit', async ()
   assert.equal(raad.partner.stad, 'Rotterdam');
 });
 
+/* DE STEMMER KOMT UIT DE SESSIE, NOOIT UIT HET VERZOEK (AUTHORITY.md P0b).
+   De RTG-stem nam `req.body.naam` als stemmer, en een stem is uniek per NAAM.
+   Wie de kantoorcode had, kon dus zo vaak stemmen als hij namen verzon en de
+   uitslag van een gedeeld besluit kantelen (GEMEENSCHAP-FASE0.md par. 6,
+   gebrek 5). De partnerkant deed het al goed: zijn naam komt uit het
+   partnerdossier.
+
+   MUTATIE GEZIEN ZAKKEN: in routes/rtfkantoor/index.js `req.body.naam ||` terug
+   voor boardroomWie(req) -- de uitslag wordt dan 'RTG 0-3'. */
+test('de RTG-stem draagt de stemmer uit de sessie: verzonnen namen geven geen extra stemmen', async () => {
+  const b = await json(await api('/api/rtf/partner/besluit-start', { code: raadcode, projectId, voorstel: 'De filterkennis ook naar Delft brengen.' }));
+  const bid = b.besluit.id;
+  for (const naam of ['Verzonnen Een', 'Verzonnen Twee', 'Verzonnen Drie'])
+    await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam, voor: false }, office);
+  await api('/api/rtf/partner/stem', { code: raadcode, besluitId: bid, voor: true });
+  const dicht = await json(await api('/api/rtf/partner/besluit-sluit', { code: raadcode, besluitId: bid }));
+  assert.equal(dicht.besluit.uitslag, 'RTG 0-1, partners 1-0', 'een gedeelde kantoorcode is een stem, hoeveel namen er ook meekomen');
+  assert.ok(!JSON.stringify(dicht.besluit.stemmen).includes('Verzonnen'), 'een naam uit het verzoek komt niet in het stemregister');
+});
+
 test('samen beslissen: het besluit valt pas als beide kanten gestemd hebben', async () => {
   const b = await json(await api('/api/rtf/partner/besluit-start', { code: raadcode, projectId, voorstel: 'De filterkennis delen met heel Rotterdam.' }));
   assert.equal(b.besluit.status, 'open');

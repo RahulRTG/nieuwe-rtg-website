@@ -319,3 +319,71 @@ test('13. over de echte server: contract voorbij -> basislaag, zonder opnieuw in
   const later = await api('/api/mijn/abonnement', {}, login.token);
   assert.equal(later.kop.get('rtg-contract'), 'geeindigd', 'de server zet dit verzoek op de basislaag');
 });
+
+/* ---- A-P1-03, zoals de audit hem stelt: DEZELFDE bestaande bearer, de afspraak
+        is voorbij, en een betaalde capability rechtstreeks via de API. Niet
+        opnieuw inloggen -- dat bewijst alleen dat een NIEUWE sessie klopt. ---- */
+
+const BETAALD = '/api/vak/offerte/vraag';   // weigert de basislaag met "Alleen voor leden."
+const isBetaaldGeweigerd = r => r.status === 403 && /Alleen voor leden/.test(String(r.body.error || ''));
+
+async function lidMetContract(pas = 'rtg') {
+  const office = await kantoorAlsPersoon(base, api);
+  const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const email = u + '@x.nl';
+  const reg = (await api('/api/auth/register', { name: 'Bestaand ' + u, email,
+    phone: '06' + u.replace(/\D/g, '').padEnd(8, '2').slice(0, 8),
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: pas, pasApp: pas })).body;
+  const aanvraag = (await api('/api/aanmelding/aanvraag', { pas, naam: 'Bestaand ' + u, contact: email }, reg.token)).body;
+  assert.equal((await api('/api/aanmelding/beslis', { id: aanvraag.aanmelding.id, besluit: 'geaccepteerd' }, office)).status, 200);
+  const login = (await api('/api/auth/login', { login: email, password: 'geheim123', pasApp: pas })).body;
+  const eig = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
+  return { token: login.token, accountId: reg.state.user.id, office, eig, email };
+}
+
+test('14. dezelfde bearer na een verstreken afspraak: de betaalde capability weigert, zonder nieuwe login', async () => {
+  const lid = await lidMetContract();
+  const voor = await api(BETAALD, {}, lid.token);
+  assert.ok(!isBetaaldGeweigerd(voor), 'met een lopende afspraak is de capability open: ' + JSON.stringify(voor.body));
+  assert.equal((await api('/api/mijn/abonnement/opzeggen', {}, lid.token)).status, 200);
+  stop(srv);
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_KLOK: '+400d' } }); base = srv.base;
+  const na = await api(BETAALD, {}, lid.token);   // DEZELFDE token, niet opnieuw ingelogd
+  assert.ok(isBetaaldGeweigerd(na), 'een voorbije afspraak hield de betaalde capability open: ' + na.status + ' ' + JSON.stringify(na.body));
+  assert.equal(na.kop.get('rtg-contract'), 'geeindigd');
+  stop(srv);
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } }); base = srv.base;
+});
+
+test('15. het kantoor zet een pas naar gast: dezelfde bearer opent daarna niets betaalds meer', async () => {
+  const lid = await lidMetContract();
+  assert.ok(!isBetaaldGeweigerd(await api(BETAALD, {}, lid.token)));
+  const r = await api('/api/office/pas/gast', { accountId: lid.accountId, reden: 'proef intrekking A-P1-03' }, lid.eig);
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  const na = await api(BETAALD, {}, lid.token);
+  assert.ok(na.status === 401 || isBetaaldGeweigerd(na), 'na intrekking bleef de bestaande sessie betaald werk doen: ' + na.status);
+});
+
+test('16. een kapotte contractstand is geen ja: de betaalde capability gaat dicht, de gratis app blijft', async () => {
+  const lid = await lidMetContract();
+  assert.ok(!isBetaaldGeweigerd(await api(BETAALD, {}, lid.token)));
+  stop(srv);
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_VERRAAD: 'contractstand-faalt' } }); base = srv.base;
+  try {
+    const na = await api(BETAALD, {}, lid.token);
+    assert.ok(isBetaaldGeweigerd(na), 'een storing in de contractpoort liet betaald werk door: ' + na.status + ' ' + JSON.stringify(na.body));
+    assert.equal(na.kop.get('rtg-contract'), 'onbekend');
+    const gratis = await api('/api/mijn/abonnement', {}, lid.token);
+    assert.equal(gratis.status, 200, 'de gratis app hoort te blijven werken');
+  } finally {
+    stop(srv);
+    srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } }); base = srv.base;
+  }
+});
+
+test('17. eenheden: ONBEKEND dwingt af bij een betalende pas en raakt een gratis pas niet', () => {
+  assert.equal(poort.afgedwongen(poort.onbekend('rtg', 'x')), true);
+  assert.equal(poort.afgedwongen(poort.onbekend('business', 'x')), true);
+  assert.equal(poort.afgedwongen(poort.onbekend('guest', 'x')), false);
+  assert.notEqual(poort.onbekend('rtg', 'x').stand, poort.STAND.GEEN_CONTRACT, 'niet gelezen is iets anders dan niets gevonden');
+});

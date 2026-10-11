@@ -196,6 +196,38 @@ test('een bijeenkomst: ja, misschien en nee, en vol is vol', async () => {
   assert.ok(nu.ok, nu.error);
 });
 
+/* DE UITNODIGING KOMT AAN, en dat is gemeten bij de ONTVANGER en niet bij de
+   afzender. Hier stond `notify(l.key, naam + ': ' + wat)` -- een tekst --
+   en notify() weigert een tekst (opzet/meldingen.js, besluit 4 oktober 2026).
+   De TypeError viel in een lege catch, dus de bijeenkomst stond er en
+   niemand hoorde ervan (GEMEENSCHAP-FASE0.md par. 6, gebrek 1). De route gaf
+   200 en elke toets die alleen naar de afzender keek stond groen.
+
+   MUTATIE GEZIEN ZAKKEN: de melding in kern/genootschap/bijeenkomst.js terug
+   naar een tekst -- b krijgt dan geen melding. */
+test('een bijeenkomst: de uitnodiging komt aan bij de andere leden, een keer', async () => {
+  const a = await lid(), b = await lid();
+  const g = await json(await raw('/genootschap/richt-op', { naam: 'De Uitnodigclub', soort: 'openbaar' }, a.token));
+  await raw('/genootschap/binnen', { groep: g.groep.id }, b.token);
+  const telVoor = (await json(await raw('/notifications', {}, b.token))).notifications.length;
+  const eigenVoor = (await json(await raw('/notifications', {}, a.token))).notifications.length;
+
+  const bij = await json(await raw('/genootschap/roep-bijeen', { groep: g.groep.id, wat: 'Zomerborrel',
+    datum: morgen() }, a.token));
+  assert.ok(bij.ok, bij.error);
+
+  const na = (await json(await raw('/notifications', {}, b.token))).notifications;
+  assert.equal(na.length, telVoor + 1, 'het andere lid krijgt precies een uitnodiging');
+  const n = na.find(x => /Zomerborrel/.test(String(x.body || '')));
+  assert.ok(n, 'de uitnodiging noemt de gelegenheid');
+  assert.equal(typeof n.title, 'string');
+  assert.ok(n.title.length > 0, 'de melding heeft een titel');
+  assert.ok(!('0' in n), 'geen tekst die in losse letters is gespreid');
+
+  const eigen = (await json(await raw('/notifications', {}, a.token))).notifications.length;
+  assert.equal(eigen, eigenVoor, 'wie bijeenroept, nodigt zichzelf niet uit');
+});
+
 test('afgelasten kan alleen door de gastheer of een beheerder', async () => {
   const a = await lid(), b = await lid();
   const g = await json(await raw('/genootschap/richt-op', { naam: 'De Zondagclub', soort: 'openbaar' }, a.token));
@@ -212,6 +244,42 @@ test('afgelasten kan alleen door de gastheer of een beheerder', async () => {
 
   const na = await json(await raw('/genootschap/antwoord', { groep: g.groep.id, id: bij.bijeenkomst.id, antwoord: 'ja' }, b.token));
   assert.ok(na.error, 'op een afgelaste bijeenkomst antwoord je niet meer');
+});
+
+/* DE EERSTE GELDIGE AFGELASTING BLIJFT LEIDEND (besluit 5 van de eigenaar, 11
+   oktober 2026). Een tweede verzoek overschreef de reden en het tijdstip en
+   stuurde iedereen die ja had gezegd OPNIEUW "Afgelast". Nu is een herhaling
+   idempotent: zelfde antwoord, geen tweede melding, de eerste registratie blijft.
+
+   MUTATIE GEZIEN ZAKKEN: de vroege terugkeer bij `b.afgelast` in
+   kern/genootschap/bijeenkomst.js weghalen -- de reden wordt dan "Ziek" en b
+   krijgt twee meldingen. */
+test('twee keer afgelasten: de eerste blijft staan, en er gaat geen tweede melding uit', async () => {
+  const a = await lid(), b = await lid();
+  const g = await json(await raw('/genootschap/richt-op', { naam: 'De Dubbelclub', soort: 'openbaar' }, a.token));
+  await raw('/genootschap/binnen', { groep: g.groep.id }, b.token);
+  const bij = await json(await raw('/genootschap/roep-bijeen', { groep: g.groep.id, wat: 'Fietstocht', datum: morgen() }, a.token));
+  await raw('/genootschap/antwoord', { groep: g.groep.id, id: bij.bijeenkomst.id, antwoord: 'ja' }, b.token);
+  const afgelastVan = async () => (await json(await raw('/notifications', {}, b.token))).notifications
+    .filter(n => /Afgelast: Fietstocht/.test(String(n.body || ''))).length;
+
+  const een = await json(await raw('/genootschap/afgelast', { groep: g.groep.id, id: bij.bijeenkomst.id, reden: 'Storm' }, a.token));
+  assert.ok(een.ok, een.error);
+  const eerste = een.bijeenkomst.afgelast;
+  assert.equal(eerste.reden, 'Storm');
+  assert.equal(await afgelastVan(), 1);
+
+  const twee = await json(await raw('/genootschap/afgelast', { groep: g.groep.id, id: bij.bijeenkomst.id, reden: 'Ziek' }, a.token));
+  assert.ok(twee.ok, 'een herhaald verzoek is geen fout maar geeft hetzelfde antwoord');
+  assert.deepEqual(twee.bijeenkomst.afgelast, eerste, 'de eerste afgelasting blijft leidend, met reden en tijd');
+  assert.equal(await afgelastVan(), 1, 'een herhaling stuurt geen tweede melding');
+
+  // de idempotentie komt NA de bevoegdheid: wie niet mag, krijgt ook nu geen ok
+  const derde = await lid();
+  const vreemd = await json(await raw('/genootschap/afgelast', { groep: g.groep.id, id: bij.bijeenkomst.id }, derde.token));
+  assert.ok(vreemd.error && !vreemd.ok, 'een niet-lid krijgt op een afgelaste bijeenkomst geen ok');
+  const lidZonderRecht = await json(await raw('/genootschap/afgelast', { groep: g.groep.id, id: bij.bijeenkomst.id }, b.token));
+  assert.ok(lidZonderRecht.error && !lidZonderRecht.ok, 'een gewoon lid dat niet de gastheer is, ook niet');
 });
 
 test('mijn agenda bundelt de bijeenkomsten uit al mijn genootschappen', async () => {

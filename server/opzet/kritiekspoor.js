@@ -14,6 +14,17 @@
    is VERLEEND). Bevestigt de opslag dat niet, dan gaat de handeling niet door
    (503). Het spoor van het resultaat blijft zoals het was, op 'finish'.
 
+   WAT "DUURZAAM" IN POSTGRESQL BETEKENT (audit P0-1). Daar heeft de opslag geen
+   teller, en de regel kan niet VOOR de handeling op zichzelf vaststaan zonder
+   een eigen commit die niets met de mutatie te maken heeft. De belofte is daar
+   daarom sterker en anders: de regel staat in DEZELFDE transactie als elke
+   mutatie van dit verzoek, of geen van beide staat er. De requestcommit draagt
+   hem (db/postgres-verzoeken.js), en de twee paden die midden in het verzoek
+   committen -- de collectietransactie en de economische boeking -- nemen hem
+   mee in hun eigen transactie (db/verzoekspoor.js). Vroeger deden die twee dat
+   niet: een kascode stond dan vast terwijl deze regel verdween met een
+   mislukte requestcommit.
+
    WELKE HANDELINGEN. Dezelfde lijst als bij het bezitsbewijs (geld, privacy,
    herstelroutes, machtigingen; ../kern/identiteit/bezitspaden.js) plus de
    geldrails van het kantoor, de leverancier en de loonrun. Een lijst met een
@@ -30,6 +41,24 @@ const EXTRA = [
   { pad: '/api/office/payroll/run', reden: 'een loonrun verplaatst geld van een werkgever' }
 ];
 const KRITIEK = PADEN.concat(EXTRA);
+
+/* PostgreSQL-modus: naast het handelingsspoor komt een regel in het AUDITBOEK
+   (server/kern/auditboek, onherschrijfbaar en extern verankerd). Zonder
+   PostgreSQL is er geen auditboek en loopt alleen het handelingsspoor, zoals
+   voorheen. De regel zegt `toegestaan` en nooit `uitgevoerd`. Lukt het
+   vastleggen niet, dan gaat de handeling niet door (503) -- hetzelfde contract
+   als hierboven, nu ook voor het boek. De actor komt uit de sessie. */
+const REF = /^[A-Za-z0-9_.:-]{1,128}$/;
+const actorVan = (wie, pad) => ({
+  soort: pad.startsWith('/api/office/') ? 'kantoor' : pad.startsWith('/api/supplier/') ? 'zaak' : 'lid',
+  ref: REF.test(wie) ? wie : 'h:' + require('crypto').createHash('sha256').update(String(wie)).digest('hex').slice(0, 24)
+});
+const boekRegel = (methode, pad, wie) => {
+  const boek = require('../kern/auditboek');
+  if (!boek.actief()) return null;
+  return boek.deelbaar().noteer({ type: 'kritiek.toegestaan', uitkomst: 'toegestaan', actor: actorVan(wie, pad),
+    context: { methode, pad: pad.split('?')[0].replace(/[^A-Za-z0-9_\/.-]/g, '_').slice(0, 255) } });
+};
 const kritiek = (pad) => KRITIEK.find(p => String(pad || '').startsWith(p.pad)) || null;
 
 /* Eén keelgat per deur: de drie auth-poorten roepen `poort()` aan op het punt
@@ -47,8 +76,8 @@ function poort(req, res, wie, volgende) {
   if (!kritiek(pad)) return volgende();
   const { handelingsspoor, vastleggen } = actief;
   Promise.resolve().then(() => vastleggen(() => {
-    handelingsspoor.noteer({ wie: String(wie || 'anoniem'), methode: req.method, pad, status: 0, stand: 'toegestaan' });
-  })).catch(() => ({ status: 503 })).then(uit => {
+    handelingsspoor.noteer({ wie: String(wie || 'anoniem'), methode: req.method, pad, status: 0, stand: 'toegestaan', verzoek: req.id });
+  })).then(uit => uit ? uit : Promise.resolve(boekRegel(req.method, pad, String(wie || 'anoniem'))).then(() => null)).catch(() => ({ status: 503 })).then(uit => {
     if (uit) {
       return res.status(uit.status || 503).json({ error: 'Er is niets uitgevoerd: de handeling kon niet aantoonbaar worden vastgelegd. Probeer het zo opnieuw.',
         spoor: 'niet-vastgelegd' });
@@ -56,4 +85,4 @@ function poort(req, res, wie, volgende) {
     volgende();
   });
 }
-module.exports = { haak, poort, kritiek, KRITIEK };
+module.exports = { haak, poort, kritiek, KRITIEK, actorVan };

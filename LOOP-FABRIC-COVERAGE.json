@@ -12,8 +12,8 @@
   },
   "measured": {
     "capabilities": 228,
-    "routes": 5449,
-    "mutationContracts": 5322,
+    "routes": 5463,
+    "mutationContracts": 5335,
     "screens": 327
   },
   "classifications": [
@@ -42,11 +42,11 @@
   },
   "semanticSurfaces": {
     "evidenceLevel": "STATIC_SOURCE_CANDIDATE_NOT_LEARNING_PROOF",
-    "kernelFiles": 2674,
+    "kernelFiles": 2720,
     "kernelGroups": [
       {
         "group": "_root",
-        "files": 580
+        "files": 584
       },
       {
         "group": "aanmeldingen",
@@ -93,6 +93,10 @@
         "files": 3
       },
       {
+        "group": "auditboek",
+        "files": 9
+      },
+      {
         "group": "autoverkoop",
         "files": 2
       },
@@ -130,7 +134,7 @@
       },
       {
         "group": "betaalopdracht",
-        "files": 6
+        "files": 7
       },
       {
         "group": "betaalwaarheid",
@@ -290,7 +294,7 @@
       },
       {
         "group": "genootschap",
-        "files": 7
+        "files": 8
       },
       {
         "group": "groothandel",
@@ -330,7 +334,7 @@
       },
       {
         "group": "identiteit",
-        "files": 23
+        "files": 26
       },
       {
         "group": "initdata",
@@ -410,7 +414,7 @@
       },
       {
         "group": "library",
-        "files": 14
+        "files": 15
       },
       {
         "group": "lid",
@@ -546,7 +550,7 @@
       },
       {
         "group": "pay",
-        "files": 45
+        "files": 49
       },
       {
         "group": "payroll",
@@ -621,6 +625,10 @@
         "files": 4
       },
       {
+        "group": "rtc",
+        "files": 6
+      },
+      {
         "group": "rtfos",
         "files": 65
       },
@@ -634,7 +642,7 @@
       },
       {
         "group": "service",
-        "files": 27
+        "files": 28
       },
       {
         "group": "sociaal",
@@ -721,6 +729,10 @@
         "files": 2
       },
       {
+        "group": "vrijgave",
+        "files": 14
+      },
+      {
         "group": "vrijheid",
         "files": 27
       },
@@ -750,7 +762,7 @@
       },
       {
         "group": "zaakdoos",
-        "files": 9
+        "files": 11
       },
       {
         "group": "zelfzorg",
@@ -785,6 +797,7 @@
       "server/bedrijf/aansluiting.js",
       "server/bedrijf/beeld-consolidatie.js",
       "server/bedrijf/beeld.js",
+      "server/bedrijf/besluit-loop.js",
       "server/bedrijf/besluit.js",
       "server/bedrijf/besluitlijst.js",
       "server/bedrijf/bouw.js",
@@ -809,6 +822,7 @@
       "server/bedrijf/loop-change.js",
       "server/bedrijf/loop-source-change.js",
       "server/bedrijf/loop-source-lifecycle.js",
+      "server/bedrijf/loop-source-model.js",
       "server/bedrijf/loop-source-transport.js",
       "server/bedrijf/loop-source.js",
       "server/bedrijf/mijn.js",
@@ -844,6 +858,14 @@
       "server/bedrijf/wieis.js",
       "server/betaal-regie.js",
       "server/betaal.js",
+      "server/betaal/connect/afrekening.js",
+      "server/betaal/connect/effect.js",
+      "server/betaal/connect/fout.js",
+      "server/betaal/connect/index.js",
+      "server/betaal/connect/indienen.js",
+      "server/betaal/connect/melding.js",
+      "server/betaal/connect/reconciliatie.js",
+      "server/betaal/connect/toestand.js",
       "server/betaal/naslag.js",
       "server/betaal/providerbewijs.js",
       "server/betaal/stripe-gehost.js",
@@ -853,6 +875,7 @@
       "server/bus.js",
       "server/config/external-machine-evidence.js",
       "server/config/external-release.js",
+      "server/config/omgeving.js",
       "server/config/openbaar.js",
       "server/config/productie-geld.js",
       "server/config/productie-motor.js",
@@ -879,7 +902,7 @@
       "server/db/tx/ledger.js",
       "server/db/tx/pgachter.js",
       "server/db/tx/sqliteachter.js",
-      "server/db/verzoekcommit.js",
+      "server/db/verzoekspoor.js",
       "server/effectbon.js",
       "server/effectmeter.js",
       "server/foundation/basis.js",
@@ -991,6 +1014,8 @@
       "server/kern/atelier/bank.js",
       "server/kern/atelier/index.js",
       "server/kern/atelierweb.js",
+      "server/kern/auditboek/anker.js",
+      "server/kern/auditboek/ankersink.js",
       "server/kern/automatisering.js",
       "server/kern/autoverkoop.js",
       "server/kern/autoverkoop/deal.js",
@@ -1470,6 +1495,7 @@
       "server/kern/identiteit/bezitsstand.js",
       "server/kern/identiteit/commercieel.js",
       "server/kern/identiteit/doelpoort.js",
+      "server/kern/identiteit/herbevestiging.js",
       "server/kern/identiteit/sessiecontext.js",
       "server/kern/identiteit/sessieregister.js",
       "server/kern/identiteit/tweefactor.js",
@@ -1915,9 +1941,9 @@
       "server/kern/paspoort.js",
       "server/kern/paspoort/toezicht.js",
       "server/kern/paspoort/verzoeken.js",
-      "server/kern/pay/boeken.js",
       "server/kern/pay/boeking.js",
       "server/kern/pay/budget.js",
+      "server/kern/pay/dekking.js",
       "server/kern/pay/graaf.js",
       "server/kern/pay/huis.js",
       "server/kern/pay/kas-boek.js",
@@ -1945,6 +1971,7 @@
       "server/kern/pay/verzoeken.js",
       "server/kern/pay/vooraf.js",
       "server/kern/pay/vraagcode.js",
+      "server/kern/pay/vrijgavepoort.js",
       "server/kern/pay/zaakbetaling.js",
       "server/kern/pay/zaakrekening.js",
       "server/kern/payroll.js",
@@ -2060,6 +2087,9 @@
       "server/kern/retail/klant.js",
       "server/kern/retail/vloer.js",
       "server/kern/rijksbieb.js",
+      "server/kern/rtc/ijs.js",
+      "server/kern/rtc/poort.js",
+      "server/kern/rtc/relaystand.js",
       "server/kern/rtfbieb.js",
       "server/kern/rtfclubs.js",
       "server/kern/rtfkantoor-advies.js",
@@ -2171,6 +2201,7 @@
       "server/kern/service/klok.js",
       "server/kern/service/kwaliteit.js",
       "server/kern/service/loop-source-delivery.js",
+      "server/kern/service/loop-source-model.js",
       "server/kern/service/loop-source.js",
       "server/kern/service/loop.js",
       "server/kern/service/machtiging-spoor.js",
@@ -2185,6 +2216,7 @@
       "server/kern/service/zaak.js",
       "server/kern/ses-ontvangst.js",
       "server/kern/sessies.js",
+      "server/kern/sessiestroom.js",
       "server/kern/settlement.js",
       "server/kern/sleutelwoorden-uitdaging.js",
       "server/kern/sleutelwoorden.js",
@@ -2419,6 +2451,16 @@
       "server/kern/vracht-handelingen.js",
       "server/kern/vracht-toegang.js",
       "server/kern/vracht.js",
+      "server/kern/vrijgave/antwoord.js",
+      "server/kern/vrijgave/bewijs.js",
+      "server/kern/vrijgave/index.js",
+      "server/kern/vrijgave/lokaal.js",
+      "server/kern/vrijgave/oordeel.js",
+      "server/kern/vrijgave/register.js",
+      "server/kern/vrijgave/registerkeur.js",
+      "server/kern/vrijgave/schakelen.js",
+      "server/kern/vrijgave/stand.js",
+      "server/kern/vrijgave/standkeur.js",
       "server/kern/vrijheid/aanbod.js",
       "server/kern/vrijheid/alternatief.js",
       "server/kern/vrijheid/beeld.js",
@@ -2455,6 +2497,7 @@
       "server/kern/wbw.js",
       "server/kern/webauthn-actie.js",
       "server/kern/webauthn-beheer.js",
+      "server/kern/webauthn-registratie.js",
       "server/kern/webauthn-stapop.js",
       "server/kern/webauthn.js",
       "server/kern/webdomein.js",
@@ -2495,6 +2538,7 @@
       "server/kern/zaakdoos/netwerk.js",
       "server/kern/zaakdoos/proxy.js",
       "server/kern/zaakdoos/sleutels-schaduw.js",
+      "server/kern/zaakdoos/sleutels-uitgever.js",
       "server/kern/zaakdoos/sleutels.js",
       "server/kern/zaakdoos/synchronisatie.js",
       "server/kern/zelfzorg/beschermen.js",
@@ -2507,6 +2551,7 @@
       "server/kern/zwaarbewijs.js",
       "server/lib/acme.js",
       "server/lib/ankerdienst.js",
+      "server/lib/ankerherzegel.js",
       "server/lib/ankerpost.js",
       "server/lib/ankertimer.js",
       "server/lib/browser-page.js",
@@ -2514,6 +2559,7 @@
       "server/lib/dubbeltikkast.js",
       "server/lib/eindstatus.js",
       "server/lib/handelingsspoor.js",
+      "server/lib/handelingwie.js",
       "server/lib/http.js",
       "server/lib/http1-res.js",
       "server/lib/idem-kast.js",
@@ -2560,6 +2606,7 @@
       "server/lib/mutatiecontracten-hindernis.js",
       "server/lib/mutatiecontracten-horeca-correctie.js",
       "server/lib/mutatiecontracten-horecabon.js",
+      "server/lib/mutatiecontracten-ijs.js",
       "server/lib/mutatiecontracten-inhaal.js",
       "server/lib/mutatiecontracten-kaleronde-b.js",
       "server/lib/mutatiecontracten-kaleronde.js",
@@ -2580,6 +2627,7 @@
       "server/lib/mutatiecontracten-service.js",
       "server/lib/mutatiecontracten-ssogeheim.js",
       "server/lib/mutatiecontracten-voorstelintrek.js",
+      "server/lib/mutatiecontracten-vrijgave.js",
       "server/lib/mutatiecontracten-wonen.js",
       "server/lib/sqlite-gelijktijdigheid.js",
       "server/lib/tls-acme.js",
@@ -2612,6 +2660,7 @@
       "server/middleware/legacy-codeportaal-productiepoort.js",
       "server/middleware/malwarescan.js",
       "server/middleware/money-credential-productiepoort.js",
+      "server/middleware/remmen.js",
       "server/middleware/scriptbundel.js",
       "server/middleware/simulatiebrug-productiepoort.js",
       "server/middleware/stijlbundel.js",
@@ -2627,6 +2676,8 @@
       "server/opzet/begroting.js",
       "server/opzet/begrotingsgrenzen.js",
       "server/opzet/bewaarveger.js",
+      "server/opzet/connectwebhook.js",
+      "server/opzet/contractstand.js",
       "server/opzet/diensten2.js",
       "server/opzet/kaartwebhooks.js",
       "server/opzet/kantoordeur.js",
@@ -2639,7 +2690,9 @@
       "server/opzet/standbypoort.js",
       "server/opzet/start.js",
       "server/opzet/storingenwebhook.js",
+      "server/opzet/stroomtoegang.js",
       "server/opzet/trust-bewijs.js",
+      "server/opzet/verzoekframe-winkel.js",
       "server/opzet/verzoekframe.js",
       "server/opzet/webhooks.js",
       "server/papieren/index.js",
@@ -2661,7 +2714,6 @@
       "server/routes/auth/account.js",
       "server/routes/auth/herstel.js",
       "server/routes/auth/inlog-pas.js",
-      "server/routes/auth/inlog.js",
       "server/routes/auth/verificatie.js",
       "server/routes/auth/webauthn.js",
       "server/routes/avond.js",
@@ -2742,6 +2794,7 @@
       "server/routes/kantoren/bank.js",
       "server/routes/kantoren/beleidsafdwingen.js",
       "server/routes/kantoren/betaalproviders.js",
+      "server/routes/kantoren/connect.js",
       "server/routes/kantoren/doossleutels.js",
       "server/routes/kantoren/geld.js",
       "server/routes/kantoren/geld/capgezondheid.js",
@@ -2759,6 +2812,7 @@
       "server/routes/kantoren/stad.js",
       "server/routes/kantoren/techniek.js",
       "server/routes/kantoren/uitnodiging.js",
+      "server/routes/kantoren/vrijgave.js",
       "server/routes/kantoren/weefsel.js",
       "server/routes/kantoren/weefsel3.js",
       "server/routes/kantoren/werkbetaling.js",
@@ -2935,6 +2989,7 @@
       "server/routes/service-zaak.js",
       "server/routes/service.js",
       "server/routes/sleutelwoorden.js",
+      "server/routes/social.js",
       "server/routes/social/gezinnen.js",
       "server/routes/social/gezinnen/pin.js",
       "server/routes/social/gezinnen/toezicht.js",
@@ -3045,6 +3100,7 @@
       "server/routes/supplier/orders/keukenlijn.js",
       "server/routes/supplier/paspoort.js",
       "server/routes/supplier/pda/netwerk.js",
+      "server/routes/supplier/pda/posities-inlog.js",
       "server/routes/supplier/pda/posities.js",
       "server/routes/supplier/pda/vloer-missies.js",
       "server/routes/supplier/pda/vloer.js",
@@ -3076,6 +3132,7 @@
       "server/routes/supplier/vervoer.js",
       "server/routes/supplier/vooruit.js",
       "server/routes/supplier/wensen.js",
+      "server/routes/supplier/werving/personeel-aanmelden.js",
       "server/routes/supplier/werving/personeel.js",
       "server/routes/supplier/werving/sollchat.js",
       "server/routes/supplier/werving/sollicitaties.js",
@@ -3247,6 +3304,7 @@
       "server/accounts/wachtwoord.js",
       "server/ai-kort.js",
       "server/ai-live-twin.js",
+      "server/bedrijf/besluit-loop.js",
       "server/bedrijf/besluit.js",
       "server/bedrijf/besluitlijst.js",
       "server/bedrijf/entiteitbetaling.js",
@@ -3260,6 +3318,7 @@
       "server/bedrijf/leden.js",
       "server/bedrijf/loop-change.js",
       "server/bedrijf/loop-source-change.js",
+      "server/bedrijf/loop-source-model.js",
       "server/bedrijf/praktijk-delen.js",
       "server/bedrijf/praktijk-gast.js",
       "server/bedrijf/praktijk-leverancier-routes.js",
@@ -3274,10 +3333,15 @@
       "server/bewaarbeleid-vervoer.js",
       "server/bewaartermijnen.js",
       "server/bewaarveger.js",
+      "server/config/omgeving.js",
+      "server/config/productie-anker.js",
       "server/config/productie-geld.js",
       "server/config/productie-identiteit.js",
       "server/config/release-trust.js",
+      "server/config/turn-credential.js",
+      "server/config/turn.js",
       "server/db/ledengids.js",
+      "server/db/verzoekspoor.js",
       "server/effectbon.js",
       "server/effectmeter.js",
       "server/foundation/accountplicht.js",
@@ -3519,6 +3583,7 @@
       "server/kern/gastzorg-profiel.js",
       "server/kern/gemeente/index.js",
       "server/kern/gemeente/vergunningen.js",
+      "server/kern/genootschap/bijeenkomst.js",
       "server/kern/gids.js",
       "server/kern/handelingsklasse/risico.js",
       "server/kern/handlerpoorten/buiten-routes.js",
@@ -3741,6 +3806,7 @@
       "server/kern/pay/stand.js",
       "server/kern/pay/tegoed.js",
       "server/kern/pay/terug.js",
+      "server/kern/pay/vrijgavepoort.js",
       "server/kern/payroll/inplanbaar.js",
       "server/kern/payroll/opslag.js",
       "server/kern/payroll/verzuim.js",
@@ -3767,6 +3833,8 @@
       "server/kern/reiswereld-bronnen-rtg.js",
       "server/kern/rendezvous-concierge.js",
       "server/kern/reservering/providerbewijs.js",
+      "server/kern/rtc/poort.js",
+      "server/kern/rtc/turnclient.js",
       "server/kern/rtfos/basis.js",
       "server/kern/rtfos/berichten.js",
       "server/kern/rtfos/bestuur-notulen.js",
@@ -3801,12 +3869,14 @@
       "server/kern/schooladvies.js",
       "server/kern/service/gesprek-lijn.js",
       "server/kern/service/gesprek.js",
+      "server/kern/service/loop-source-model.js",
       "server/kern/service/machtiging-spoor.js",
       "server/kern/service/mens.js",
       "server/kern/service/onderzoeker.js",
       "server/kern/service/post.js",
       "server/kern/service/prioriteit.js",
       "server/kern/service/router.js",
+      "server/kern/sessiestroom.js",
       "server/kern/sociaal.js",
       "server/kern/sociaal/snaps.js",
       "server/kern/sociaal/vrienden/contact.js",
@@ -3879,6 +3949,15 @@
       "server/kern/verzorging/opvangleden.js",
       "server/kern/vonk/payment.js",
       "server/kern/vonk/selectie.js",
+      "server/kern/vrijgave/autorisatie.js",
+      "server/kern/vrijgave/baseline.js",
+      "server/kern/vrijgave/besluiten.js",
+      "server/kern/vrijgave/index.js",
+      "server/kern/vrijgave/register.js",
+      "server/kern/vrijgave/registerkeur.js",
+      "server/kern/vrijgave/schakelen.js",
+      "server/kern/vrijgave/stand.js",
+      "server/kern/vrijgave/standkeur.js",
       "server/kern/vrijheid/alternatief.js",
       "server/kern/vrijheid/besluit.js",
       "server/kern/vrijheid/herstel.js",
@@ -3898,6 +3977,7 @@
       "server/kern/waarde/index.js",
       "server/kern/waarde/klassen.js",
       "server/kern/wacht/raadkamer.js",
+      "server/kern/webauthn-acties.js",
       "server/kern/webdomein.js",
       "server/kern/webmaker-plan.js",
       "server/kern/webmaker-publiceren.js",
@@ -3921,6 +4001,7 @@
       "server/kern/zwaarbewijs.js",
       "server/lib/ankerdienst.js",
       "server/lib/ankerpost.js",
+      "server/lib/auditwacht.js",
       "server/lib/burgerpad.js",
       "server/lib/correlatie.js",
       "server/lib/eenmalig-geheim-routes.js",
@@ -3950,9 +4031,12 @@
       "server/lib/idemsleutels-restbak.js",
       "server/lib/idemsleutels-rtflabfonds.js",
       "server/lib/idemsleutels-stage.js",
+      "server/lib/idemsleutels-vrijgave.js",
       "server/lib/idemsleutels-werelden.js",
       "server/lib/idemsleutels.js",
+      "server/lib/keten-anker.js",
       "server/lib/lokale-taal.js",
+      "server/lib/luisteradres.js",
       "server/lib/mutatiecontracten-beleidsmotor.js",
       "server/lib/mutatiecontracten-beschermd.js",
       "server/lib/mutatiecontracten-beschermzaak-deur.js",
@@ -3964,6 +4048,7 @@
       "server/lib/mutatiecontracten-effectguard.js",
       "server/lib/mutatiecontracten-geld-b.js",
       "server/lib/mutatiecontracten-geldgrens.js",
+      "server/lib/mutatiecontracten-gezinsdeur.js",
       "server/lib/mutatiecontracten-isolatie.js",
       "server/lib/mutatiecontracten-kaleronde.js",
       "server/lib/mutatiecontracten-kantoorstuur.js",
@@ -3988,6 +4073,7 @@
       "server/lib/mutatiecontracten-tweedehandeling.js",
       "server/lib/mutatiecontracten-vertegenwoordiging.js",
       "server/lib/mutatiecontracten-voorstelintrek.js",
+      "server/lib/mutatiecontracten-vrijgave.js",
       "server/lib/mutatiecontracten-vrijheid.js",
       "server/lib/mutatiecontracten-wachtrij.js",
       "server/lib/mutatiecontracten-werkbetaling.js",
@@ -4083,6 +4169,7 @@
       "server/routes/kantoren/reisteruggave.js",
       "server/routes/kantoren/reizen.js",
       "server/routes/kantoren/uitnodiging.js",
+      "server/routes/kantoren/vrijgave.js",
       "server/routes/kantoren/weefsel3.js",
       "server/routes/knelpunt.js",
       "server/routes/kosten-kantoor.js",
@@ -4156,12 +4243,15 @@
       "server/routes/supplier/kassa/afrekenen.js",
       "server/routes/supplier/kassa/innen.js",
       "server/routes/supplier/onderneming.js",
+      "server/routes/supplier/pda/posities-inlog.js",
       "server/routes/supplier/retail.js",
       "server/routes/supplier/toegang.js",
       "server/routes/supplier/verkoopweg.js",
+      "server/routes/supplier/werving/personeel-aanmelden.js",
       "server/routes/supplier/werving/sollchat.js",
       "server/routes/supplier/werving/sollicitaties.js",
       "server/routes/supplier/werving/uitnodiging-na.js",
+      "server/routes/supplier/werving/uitnodiging.js",
       "server/routes/techniek/functie.js",
       "server/routes/techniek/inlog.js",
       "server/routes/techniek/isolatie.js",
@@ -4200,10 +4290,13 @@
       "server/webpush.js"
     ],
     "feedbackComplaintCandidates": [
+      "server/betaal/connect/melding.js",
+      "server/betaal/connect/reconciliatie.js",
       "server/functies/register/cat-domeinen4.js",
       "server/kern/appcatalogus-rijen/deel1b.js",
       "server/kern/appgids-data/deel10b.js",
       "server/kern/appgids-data/deel9.js",
+      "server/kern/auditboek/gebeurtenissen.js",
       "server/kern/bank/zakelijk.js",
       "server/kern/bankpositie.js",
       "server/kern/bankregie/index.js",
@@ -4279,6 +4372,7 @@
       "server/kern/namens/verklaring.js",
       "server/kern/overheid/btwtoezicht.js",
       "server/kern/overheid/naheffing.js",
+      "server/kern/pay/huis.js",
       "server/kern/pay/uitbetaalrekening.js",
       "server/kern/payroll/aangifte.js",
       "server/kern/payroll/contracten.js",
@@ -4307,6 +4401,7 @@
       "server/kern/wereldkern.js",
       "server/kern/zorgketen/keten.js",
       "server/lib/correlatie.js",
+      "server/lib/idem-nieuwwerk.js",
       "server/lib/idemsleutels-basis.js",
       "server/lib/idemsleutels-carriere.js",
       "server/lib/idemsleutels-geld.js",
@@ -4375,9 +4470,12 @@
       "server/accounts/users.js",
       "server/backupstand.js",
       "server/bedrijf/gevolg.js",
+      "server/bedrijf/loop-source-model.js",
       "server/bedrijf/loop-source-transport.js",
       "server/bedrijf/werkruimte.js",
+      "server/betaal/connect/sleutel.js",
       "server/bus.js",
+      "server/config/openbaar.js",
       "server/config/productie-communicatie.js",
       "server/config/productie-identiteit.js",
       "server/config/productie-lokaal.js",
@@ -4407,6 +4505,7 @@
       "server/db/verzoekcontext.js",
       "server/effectmeter.js",
       "server/foundation/berichten.js",
+      "server/foundation/gezinscode.js",
       "server/foundation/onderwijs/les.js",
       "server/functies/register/cat-apps2.js",
       "server/functies/register/cat-partners.js",
@@ -4415,6 +4514,12 @@
       "server/kern/algpin-herstel.js",
       "server/kern/algpin.js",
       "server/kern/arrivalpas.js",
+      "server/kern/auditboek/anker.js",
+      "server/kern/auditboek/bewaring.js",
+      "server/kern/auditboek/gebeurtenissen.js",
+      "server/kern/auditboek/schema.js",
+      "server/kern/auditboek/schrijver.js",
+      "server/kern/auditboek/verifieer.js",
       "server/kern/bank/overboeken.js",
       "server/kern/bankregie/nood.js",
       "server/kern/bestanden-delen.js",
@@ -4490,6 +4595,7 @@
       "server/kern/frictie/motor.js",
       "server/kern/gast/betalen.js",
       "server/kern/genootschap/bijeenkomst.js",
+      "server/kern/genootschap/prikbord.js",
       "server/kern/handelingsklasse.js",
       "server/kern/handelingsklasse/omkeerbaar.js",
       "server/kern/herstelquorum.js",
@@ -4505,6 +4611,7 @@
       "server/kern/intreksignaal.js",
       "server/kern/isolatie/ceremonie-eisen.js",
       "server/kern/isolatie/kantoorbank.js",
+      "server/kern/kantoor/uitnodiging.js",
       "server/kern/kappen.js",
       "server/kern/ledenbalie-pseudoniem.js",
       "server/kern/ledenbalie-zaken.js",
@@ -4538,10 +4645,13 @@
       "server/kern/meet.js",
       "server/kern/mobiliteit/plekken.js",
       "server/kern/mobiliteit/register.js",
-      "server/kern/pay/index.js",
+      "server/kern/pay/boeking.js",
+      "server/kern/pay/dekking.js",
+      "server/kern/pay/idemlaag.js",
       "server/kern/pay/kasbak.js",
       "server/kern/pay/loshistorie.js",
       "server/kern/pay/tegoed-claim.js",
+      "server/kern/pay/terug.js",
       "server/kern/platformregister/bediening.js",
       "server/kern/presentatie-beelden.js",
       "server/kern/registerblik/gereedschap.js",
@@ -4549,6 +4659,7 @@
       "server/kern/rtgid.js",
       "server/kern/rtmail-inst.js",
       "server/kern/service/loop-source-delivery.js",
+      "server/kern/service/loop-source-model.js",
       "server/kern/service/zaak.js",
       "server/kern/sessies.js",
       "server/kern/settlement.js",
@@ -4580,6 +4691,7 @@
       "server/kern/trainingsschema.js",
       "server/kern/vracht-handelingen.js",
       "server/kern/vracht-toegang.js",
+      "server/kern/vrijgave/stand.js",
       "server/kern/vrijheid/aanbod.js",
       "server/kern/vrijheid/beleid.js",
       "server/kern/vrijheid/herstel.js",
@@ -4594,14 +4706,17 @@
       "server/kern/zaakcommand/index.js",
       "server/kern/zaakcommand/runbooks.js",
       "server/kern/zaakdoos/index.js",
+      "server/kern/zaakdoos/journaal.js",
       "server/kern/zaakdoos/synchronisatie.js",
       "server/kern/zelfzorg/repareren.js",
       "server/kern/zorgketen/index.js",
       "server/lib/document-operatiepad.js",
       "server/lib/dubbeltikkast.js",
+      "server/lib/duurzaam.js",
       "server/lib/eenmalig-geheim-routes.js",
       "server/lib/eindstatus.js",
       "server/lib/http.js",
+      "server/lib/idem-handeling.js",
       "server/lib/idem-poort.js",
       "server/lib/idem.js",
       "server/lib/idemsleutels-beelden.js",
@@ -4616,6 +4731,8 @@
       "server/lib/idemsleutels-salon.js",
       "server/lib/idemsleutels-weerbaarheid.js",
       "server/lib/idemsleutels.js",
+      "server/lib/linkbasis.js",
+      "server/lib/mutatiecontracten-beleidsmotor.js",
       "server/lib/mutatiecontracten-conciergelus.js",
       "server/lib/mutatiecontracten-credential.js",
       "server/lib/mutatiecontracten-document.js",
@@ -4648,6 +4765,7 @@
       "server/migraties/lijst.js",
       "server/opzet/backup-lijst.js",
       "server/opzet/backup.js",
+      "server/opzet/contractstand.js",
       "server/opzet/geldwegen.js",
       "server/opzet/hulplaag.js",
       "server/opzet/kaartwebhooks.js",
@@ -4660,6 +4778,7 @@
       "server/opzet/standbypoort.js",
       "server/opzet/start.js",
       "server/opzet/storingenwebhook.js",
+      "server/opzet/stroomtoegang.js",
       "server/opzet/webhooks.js",
       "server/papieren/vragen.js",
       "server/pg/collectietransactie.js",
@@ -4961,6 +5080,7 @@
       "server/kern/gemeente/meldingen.js",
       "server/kern/genootschap/ai.js",
       "server/kern/genootschap/index.js",
+      "server/kern/genootschap/leesweergave.js",
       "server/kern/genootschap/prikbord.js",
       "server/kern/ghost.js",
       "server/kern/groothandel.js",
@@ -5042,6 +5162,7 @@
       "server/kern/library/loop-source.js",
       "server/kern/library/policy.js",
       "server/kern/library/publication.js",
+      "server/kern/library/reader-state.js",
       "server/kern/library/reader.js",
       "server/kern/library/rights.js",
       "server/kern/library/studio.js",
@@ -5319,6 +5440,7 @@
       "server/kern/werkplek-kantoren-onderbouw.js",
       "server/kern/werkplek.js",
       "server/kern/werkvenster.js",
+      "server/kern/zaakdoos/journaal.js",
       "server/kern/zaakdoos/kloon.js",
       "server/kern/zelfzorg/index.js",
       "server/kern/zorgniveau.js",
@@ -5615,8 +5737,12 @@
       "server/bedrijf/taak.js",
       "server/bedrijf/werkruimte.js",
       "server/betaal.js",
+      "server/betaal/connect/afrekening.js",
+      "server/betaal/connect/index.js",
+      "server/betaal/connect/indienen.js",
       "server/betaal/naslag.js",
       "server/betaal/synthetisch.js",
+      "server/betaal/uitbetaling.js",
       "server/beveiliging-noodrem.js",
       "server/beveiliging.js",
       "server/bewaarveger.js",
@@ -5627,6 +5753,7 @@
       "server/config/productie-lokaal.js",
       "server/config/productie-opslag.js",
       "server/config/productie.js",
+      "server/config/turn-credential.js",
       "server/config/turn.js",
       "server/db/bijeen.js",
       "server/db/collectie-postgres.js",
@@ -5647,6 +5774,7 @@
       "server/foundation/accountplicht.js",
       "server/foundation/basis.js",
       "server/foundation/gasten/gezinsagenda.js",
+      "server/foundation/gezinscode.js",
       "server/foundation/gezinsdeur.js",
       "server/foundation/gezinseigenaar.js",
       "server/foundation/gezinsstroom.js",
@@ -6022,12 +6150,15 @@
       "server/kern/identiteit/doelen.js",
       "server/kern/identiteit/doelpoort.js",
       "server/kern/identiteit/gegevenskaart.js",
+      "server/kern/identiteit/herbevestiging.js",
       "server/kern/identiteit/inlogherkomst.js",
+      "server/kern/identiteit/lopend.js",
       "server/kern/identiteit/sessiecontext.js",
       "server/kern/identiteit/sessievelden.js",
       "server/kern/identiteit/tweedestap-rem.js",
       "server/kern/identiteit/tweefactor.js",
       "server/kern/identiteit/vertrouwen.js",
+      "server/kern/identiteit/wachtwoordrem.js",
       "server/kern/incidentcontrole.js",
       "server/kern/initdata/deel1-basis.js",
       "server/kern/initdata/deel10-zaken.js",
@@ -6284,24 +6415,29 @@
       "server/kern/paseis.js",
       "server/kern/paspoort.js",
       "server/kern/pay/bewijs.js",
-      "server/kern/pay/boeken.js",
       "server/kern/pay/boeking.js",
       "server/kern/pay/budget.js",
+      "server/kern/pay/huis.js",
+      "server/kern/pay/idemlaag.js",
       "server/kern/pay/index.js",
       "server/kern/pay/kasbak.js",
       "server/kern/pay/kassa.js",
       "server/kern/pay/kassacode.js",
-      "server/kern/pay/partner.js",
+      "server/kern/pay/opladen.js",
+      "server/kern/pay/partner-uitbetaal.js",
       "server/kern/pay/poort.js",
       "server/kern/pay/samen.js",
       "server/kern/pay/tegoed-bon.js",
+      "server/kern/pay/tegoed-claim.js",
       "server/kern/pay/tegoed-gedeeld.js",
       "server/kern/pay/tegoed-migratie.js",
       "server/kern/pay/tegoed-uitgifte.js",
       "server/kern/pay/tegoed-zaak.js",
       "server/kern/pay/tegoed.js",
+      "server/kern/pay/terug.js",
       "server/kern/pay/tik.js",
       "server/kern/pay/vraagcode.js",
+      "server/kern/pay/vrijgavepoort.js",
       "server/kern/payroll/aangifte.js",
       "server/kern/payroll/dekking-bronnen.js",
       "server/kern/payroll/identiteit.js",
@@ -6346,6 +6482,11 @@
       "server/kern/rendezvous.js",
       "server/kern/retail.js",
       "server/kern/routedekking.js",
+      "server/kern/rtc/ijs.js",
+      "server/kern/rtc/poort.js",
+      "server/kern/rtc/relayproef.js",
+      "server/kern/rtc/stunbericht.js",
+      "server/kern/rtc/turnclient.js",
       "server/kern/rtfappcatalogus-data.js",
       "server/kern/rtfkantoor-data.js",
       "server/kern/rtfos/activiteiten-beheer.js",
@@ -6434,6 +6575,8 @@
       "server/kern/service/onderzoeker.js",
       "server/kern/service/router.js",
       "server/kern/ses-ontvangst.js",
+      "server/kern/sessiestroom-kijk.js",
+      "server/kern/sessiestroom.js",
       "server/kern/sleutelwoorden-uitdaging.js",
       "server/kern/sleutelwoorden.js",
       "server/kern/sociaal.js",
@@ -6580,6 +6723,9 @@
       "server/kern/voorspel/rekenen.js",
       "server/kern/vracht-handelingen.js",
       "server/kern/vracht-toegang.js",
+      "server/kern/vrijgave/baseline.js",
+      "server/kern/vrijgave/index.js",
+      "server/kern/vrijgave/register.js",
       "server/kern/vrijheid/aanbod.js",
       "server/kern/vrijheid/beeld.js",
       "server/kern/vrijheid/besluit.js",
@@ -6621,20 +6767,24 @@
       "server/kern/werkvormen.js",
       "server/kern/winkelcatalogus.js",
       "server/kern/zaakdoos/index.js",
+      "server/kern/zaakdoos/journaal.js",
       "server/kern/zaakdoos/proxy.js",
+      "server/kern/zaakdoos/sleutels-uitgever.js",
       "server/kern/zaakdoos/sleutels.js",
       "server/kern/zelfzorg/index.js",
       "server/kern/zwaarbewijs.js",
       "server/lib/acme.js",
+      "server/lib/ankerjournalen.js",
       "server/lib/antwoord-einde.js",
       "server/lib/browser-page.js",
       "server/lib/browser.js",
       "server/lib/duurzaam.js",
       "server/lib/eenmalig-geheim-routes.js",
       "server/lib/eindstatus.js",
-      "server/lib/handelingsspoor.js",
+      "server/lib/handelingwie.js",
       "server/lib/http2.js",
       "server/lib/idem-kast.js",
+      "server/lib/idem-nieuwwerk.js",
       "server/lib/idem-poort.js",
       "server/lib/idem-sleutelbepaling.js",
       "server/lib/idem.js",
@@ -6667,9 +6817,11 @@
       "server/lib/idemsleutels-reisherkomst.js",
       "server/lib/idemsleutels-reisteruggave.js",
       "server/lib/idemsleutels-restbak.js",
+      "server/lib/idemsleutels-rtc.js",
       "server/lib/idemsleutels-rtflabfonds.js",
       "server/lib/idemsleutels-salon.js",
       "server/lib/idemsleutels-stage.js",
+      "server/lib/idemsleutels-vrijgave.js",
       "server/lib/idemsleutels-weerbaarheid.js",
       "server/lib/idemsleutels.js",
       "server/lib/leeftijd.js",
@@ -6702,6 +6854,7 @@
       "server/lib/mutatiecontracten-herstel.js",
       "server/lib/mutatiecontracten-hindernis.js",
       "server/lib/mutatiecontracten-horecabon.js",
+      "server/lib/mutatiecontracten-ijs.js",
       "server/lib/mutatiecontracten-inhaal.js",
       "server/lib/mutatiecontracten-isolatie.js",
       "server/lib/mutatiecontracten-kaleronde-b.js",
@@ -6728,6 +6881,7 @@
       "server/lib/mutatiecontracten-rugdekking.js",
       "server/lib/mutatiecontracten-schaduwtelling.js",
       "server/lib/mutatiecontracten-service-zaak.js",
+      "server/lib/mutatiecontracten-sessiestroom.js",
       "server/lib/mutatiecontracten-staffgemoed.js",
       "server/lib/mutatiecontracten-storingen.js",
       "server/lib/mutatiecontracten-tegoedbon.js",
@@ -6737,6 +6891,7 @@
       "server/lib/mutatiecontracten-vakschema.js",
       "server/lib/mutatiecontracten-vertegenwoordiging.js",
       "server/lib/mutatiecontracten-voorstelintrek.js",
+      "server/lib/mutatiecontracten-vrijgave.js",
       "server/lib/mutatiecontracten-vrijheid.js",
       "server/lib/mutatiecontracten-wachtrij.js",
       "server/lib/mutatiecontracten-werkbetaling.js",
@@ -6746,7 +6901,9 @@
       "server/lib/rtgjson.js",
       "server/lib/tls-acme.js",
       "server/lib/tls.js",
+      "server/lib/verraad-catalogus.js",
       "server/lib/verraadfase.js",
+      "server/lib/vervalstaat.js",
       "server/local-ai-poort.js",
       "server/local-ai.js",
       "server/log-redactie.js",
@@ -6820,7 +6977,9 @@
       "server/opzet/schildwacht.js",
       "server/opzet/standbypoort-antwoord.js",
       "server/opzet/start.js",
+      "server/opzet/stroomtoegang.js",
       "server/opzet/veiligadres.js",
+      "server/opzet/verzoekframe-winkel.js",
       "server/opzet/verzoekframe.js",
       "server/opzet/verzoekketen.js",
       "server/papieren/vragen.js",
@@ -6900,6 +7059,7 @@
       "server/routes/kantoren/bank-rekeningen.js",
       "server/routes/kantoren/bank-tweedehand.js",
       "server/routes/kantoren/beleidsafdwingen.js",
+      "server/routes/kantoren/connect.js",
       "server/routes/kantoren/geld.js",
       "server/routes/kantoren/geld/commercie.js",
       "server/routes/kantoren/index.js",
@@ -6957,6 +7117,7 @@
       "server/routes/member/salon.js",
       "server/routes/member/salonapp.js",
       "server/routes/member/terplaatse.js",
+      "server/routes/member/toestellen.js",
       "server/routes/member/tweefactor.js",
       "server/routes/member/voertuigen/charter.js",
       "server/routes/member/voertuigen/huur.js",
@@ -6982,6 +7143,7 @@
       "server/routes/office/veiligheid.js",
       "server/routes/office/verificaties.js",
       "server/routes/office/voogdij.js",
+      "server/routes/office/werk.js",
       "server/routes/onboarding.js",
       "server/routes/overheid-bieb.js",
       "server/routes/overheid.js",
@@ -7084,10 +7246,12 @@
       "server/routes/supplier/kassa/premium.js",
       "server/routes/supplier/modebezorg.js",
       "server/routes/supplier/paspoort.js",
+      "server/routes/supplier/pda/posities-inlog.js",
       "server/routes/supplier/poort.js",
       "server/routes/supplier/retail.js",
       "server/routes/supplier/retour.js",
       "server/routes/supplier/salon/publiceren.js",
+      "server/routes/supplier/stroom.js",
       "server/routes/supplier/tafels-team.js",
       "server/routes/supplier/tickets-deur.js",
       "server/routes/supplier/tickets-verkoop.js",
@@ -7544,7 +7708,7 @@
         "mutationRoutes": 471,
         "declaredMutationSemantics": 171,
         "sourceFileCount": 42,
-        "kernelDependencyCount": 126,
+        "kernelDependencyCount": 133,
         "screenCount": 26,
         "sourceFiles": [
           "server/routes/borden.js",
@@ -7591,7 +7755,7 @@
           "server/kern/bewijsvlak/ledger.js",
           "server/kern/bewijsvlak/metrics-rollup.js"
         ],
-        "kernelDependenciesOmitted": 102,
+        "kernelDependenciesOmitted": 109,
         "screens": [
           "public/apps/app.html",
           "public/apps/attenties.html",
@@ -8092,7 +8256,7 @@
         "mutationRoutes": 97,
         "declaredMutationSemantics": 25,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 46,
+        "kernelDependencyCount": 50,
         "screenCount": 11,
         "sourceFiles": [
           "server/routes/member/rechterhand.js",
@@ -8126,7 +8290,7 @@
           "server/kern/bewijsvlak/v3-authorities.js",
           "server/kern/bewijsvlak/v3-authority-contracts.js"
         ],
-        "kernelDependenciesOmitted": 22,
+        "kernelDependenciesOmitted": 26,
         "screens": [
           "public/apps/attenties.html",
           "public/apps/cellier.html",
@@ -9298,11 +9462,11 @@
         "/api/rtf"
       ],
       "behaviourEvidence": {
-        "routeCount": 255,
-        "mutationRoutes": 254,
-        "declaredMutationSemantics": 98,
-        "sourceFileCount": 23,
-        "kernelDependencyCount": 64,
+        "routeCount": 256,
+        "mutationRoutes": 255,
+        "declaredMutationSemantics": 99,
+        "sourceFileCount": 24,
+        "kernelDependencyCount": 69,
         "screenCount": 28,
         "sourceFiles": [
           "server/routes/baby.js",
@@ -9322,7 +9486,7 @@
           "server/routes/rtfleerling.js",
           "server/routes/rtfschool.js"
         ],
-        "sourceFilesOmitted": 7,
+        "sourceFilesOmitted": 8,
         "kernelDependencies": [
           "server/kern/agentteken.js",
           "server/kern/bewijsvlak/canon.js",
@@ -9349,7 +9513,7 @@
           "server/kern/leerstof-dag.js",
           "server/kern/leerstof-data/aardrijkskunde.js"
         ],
-        "kernelDependenciesOmitted": 40,
+        "kernelDependenciesOmitted": 45,
         "screens": [
           "public/apps/connect.html",
           "public/apps/foundation/arena.html",
@@ -10945,7 +11109,8 @@
         ],
         "screensOmitted": 0,
         "signals": [
-          "decision"
+          "decision",
+          "ai"
         ]
       },
       "classification": "NOT_YET_LOOP_CAPABLE",
@@ -12041,7 +12206,7 @@
         "mutationRoutes": 14,
         "declaredMutationSemantics": 5,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 2,
+        "kernelDependencyCount": 6,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/vonk.js"
@@ -12049,7 +12214,11 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
           "server/kern/connection-policy.js",
-          "server/kern/connection-state-vonk.js"
+          "server/kern/connection-state-vonk.js",
+          "server/kern/rtc/relayproef.js",
+          "server/kern/rtc/relaystand.js",
+          "server/kern/rtc/stunbericht.js",
+          "server/kern/rtc/turnclient.js"
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
@@ -12135,7 +12304,7 @@
         "mutationRoutes": 22,
         "declaredMutationSemantics": 22,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 2,
+        "kernelDependencyCount": 6,
         "screenCount": 0,
         "sourceFiles": [
           "server/routes/member/rendezvous-connection.js",
@@ -12144,7 +12313,11 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
           "server/kern/connection-policy.js",
-          "server/kern/connection-state-vonk.js"
+          "server/kern/connection-state-vonk.js",
+          "server/kern/rtc/relayproef.js",
+          "server/kern/rtc/relaystand.js",
+          "server/kern/rtc/stunbericht.js",
+          "server/kern/rtc/turnclient.js"
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [],
@@ -15222,8 +15395,8 @@
         "routeCount": 1023,
         "mutationRoutes": 1022,
         "declaredMutationSemantics": 315,
-        "sourceFileCount": 199,
-        "kernelDependencyCount": 2566,
+        "sourceFileCount": 201,
+        "kernelDependencyCount": 2612,
         "screenCount": 39,
         "sourceFiles": [
           "server/routes/agenda.js",
@@ -15243,11 +15416,12 @@
           "server/routes/kantoorpakket.js",
           "server/routes/kosten.js"
         ],
-        "sourceFilesOmitted": 183,
+        "sourceFilesOmitted": 185,
         "kernelDependencies": [
           "server/bedrijf/aansluiting.js",
           "server/bedrijf/beeld-consolidatie.js",
           "server/bedrijf/beeld.js",
+          "server/bedrijf/besluit-loop.js",
           "server/bedrijf/besluit.js",
           "server/bedrijf/besluitlijst.js",
           "server/bedrijf/bouw.js",
@@ -15267,10 +15441,9 @@
           "server/bedrijf/herkomst.js",
           "server/bedrijf/index.js",
           "server/bedrijf/indienst.js",
-          "server/bedrijf/inzicht-graaf.js",
-          "server/bedrijf/inzicht.js"
+          "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2542,
+        "kernelDependenciesOmitted": 2588,
         "screens": [
           "public/apps/belastingkantoor.html",
           "public/apps/chauffeur.html",
@@ -16212,11 +16385,11 @@
         "/api/office"
       ],
       "behaviourEvidence": {
-        "routeCount": 674,
-        "mutationRoutes": 654,
-        "declaredMutationSemantics": 379,
-        "sourceFileCount": 108,
-        "kernelDependencyCount": 121,
+        "routeCount": 680,
+        "mutationRoutes": 660,
+        "declaredMutationSemantics": 385,
+        "sourceFileCount": 110,
+        "kernelDependencyCount": 141,
         "screenCount": 21,
         "sourceFiles": [
           "server/routes/atelierweb.js",
@@ -16236,7 +16409,7 @@
           "server/routes/kantoren/bank-incasso.js",
           "server/routes/kantoren/bank-passkey.js"
         ],
-        "sourceFilesOmitted": 92,
+        "sourceFilesOmitted": 94,
         "kernelDependencies": [
           "server/kern/agentteken.js",
           "server/kern/ai/contextpakket.js",
@@ -16263,7 +16436,7 @@
           "server/kern/appstore/vierogen.js",
           "server/kern/bank/eigendom.js"
         ],
-        "kernelDependenciesOmitted": 97,
+        "kernelDependenciesOmitted": 117,
         "screens": [
           "public/apps/backoffice.html",
           "public/apps/boardroom.html",
@@ -16472,11 +16645,11 @@
         "/api/foundation"
       ],
       "behaviourEvidence": {
-        "routeCount": 367,
-        "mutationRoutes": 339,
-        "declaredMutationSemantics": 138,
+        "routeCount": 370,
+        "mutationRoutes": 342,
+        "declaredMutationSemantics": 141,
         "sourceFileCount": 84,
-        "kernelDependencyCount": 90,
+        "kernelDependencyCount": 98,
         "screenCount": 26,
         "sourceFiles": [
           "server/foundation.js",
@@ -16523,7 +16696,7 @@
           "server/kern/journaalverhuizing.js",
           "server/kern/journaalvorm.js"
         ],
-        "kernelDependenciesOmitted": 66,
+        "kernelDependenciesOmitted": 74,
         "screens": [
           "public/apps/app.html",
           "public/apps/foundation/babyboek.html",
@@ -16618,11 +16791,11 @@
         "/api/foundation/school"
       ],
       "behaviourEvidence": {
-        "routeCount": 215,
-        "mutationRoutes": 214,
-        "declaredMutationSemantics": 89,
+        "routeCount": 217,
+        "mutationRoutes": 216,
+        "declaredMutationSemantics": 91,
         "sourceFileCount": 57,
-        "kernelDependencyCount": 71,
+        "kernelDependencyCount": 84,
         "screenCount": 0,
         "sourceFiles": [
           "server/school/aandacht.js",
@@ -16645,6 +16818,9 @@
         "sourceFilesOmitted": 41,
         "kernelDependencies": [
           "server/kern/ai/contextpakket.js",
+          "server/kern/bearercode-keten.js",
+          "server/kern/bearercode-v2.js",
+          "server/kern/bearercode.js",
           "server/kern/belasting.js",
           "server/kern/betekenis.js",
           "server/kern/bewijsvlak/canon.js",
@@ -16653,6 +16829,7 @@
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/geld/eenheid.js",
+          "server/kern/intreksignaal.js",
           "server/kern/journaalverhuizing.js",
           "server/kern/journaalvorm.js",
           "server/kern/koppelvlak-kaart-eduapi.js",
@@ -16663,13 +16840,9 @@
           "server/kern/leerstof-bibliotheek.js",
           "server/kern/leerstof-dag.js",
           "server/kern/leerstof-data/aardrijkskunde.js",
-          "server/kern/leerstof-data/geschiedenis.js",
-          "server/kern/leerstof-data/natuur.js",
-          "server/kern/leerstof-data/rekenen-g12.js",
-          "server/kern/leerstof-data/rekenen-g34.js",
-          "server/kern/leerstof-data/rekenen-g56.js"
+          "server/kern/leerstof-data/geschiedenis.js"
         ],
-        "kernelDependenciesOmitted": 47,
+        "kernelDependenciesOmitted": 60,
         "screens": [],
         "screensOmitted": 0,
         "signals": [
@@ -16859,7 +17032,7 @@
         "mutationRoutes": 136,
         "declaredMutationSemantics": 68,
         "sourceFileCount": 47,
-        "kernelDependencyCount": 82,
+        "kernelDependencyCount": 83,
         "screenCount": 1,
         "sourceFiles": [
           "server/bedrijf/aansluiting.js",
@@ -16884,6 +17057,7 @@
           "server/bedrijf/aansluiting.js",
           "server/bedrijf/beeld-consolidatie.js",
           "server/bedrijf/beeld.js",
+          "server/bedrijf/besluit-loop.js",
           "server/bedrijf/besluit.js",
           "server/bedrijf/besluitlijst.js",
           "server/bedrijf/bouw.js",
@@ -16903,10 +17077,9 @@
           "server/bedrijf/indienst.js",
           "server/bedrijf/inzicht-graaf.js",
           "server/bedrijf/inzicht.js",
-          "server/bedrijf/it.js",
-          "server/bedrijf/kennis.js"
+          "server/bedrijf/it.js"
         ],
-        "kernelDependenciesOmitted": 58,
+        "kernelDependenciesOmitted": 59,
         "screens": [
           "public/apps/werk.html"
         ],
@@ -17004,13 +17177,14 @@
         "/api/pay"
       ],
       "behaviourEvidence": {
-        "routeCount": 32,
-        "mutationRoutes": 31,
-        "declaredMutationSemantics": 22,
-        "sourceFileCount": 7,
-        "kernelDependencyCount": 20,
+        "routeCount": 33,
+        "mutationRoutes": 32,
+        "declaredMutationSemantics": 23,
+        "sourceFileCount": 8,
+        "kernelDependencyCount": 39,
         "screenCount": 2,
         "sourceFiles": [
+          "server/opzet/connectwebhook.js",
           "server/opzet/kaartwebhooks.js",
           "server/routes/member/betalen.js",
           "server/routes/member/kopen.js",
@@ -17022,8 +17196,12 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
           "server/kern/agentteken.js",
+          "server/kern/ai/contextpakket.js",
+          "server/kern/bevoegdheid/lijst-afhankelijk.js",
+          "server/kern/bevoegdheid/lijst.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/bewijsvlak/retry.js",
           "server/kern/bezorgvolg.js",
           "server/kern/dienstidentiteit.js",
           "server/kern/doorgeefjournaal.js",
@@ -17039,10 +17217,10 @@
           "server/kern/muziek-instrumenten.js",
           "server/kern/muziek-stijlen.js",
           "server/kern/servicekosten.js",
-          "server/kern/util.js",
-          "server/kern/werkvormen.js"
+          "server/kern/ssrf.js",
+          "server/kern/util.js"
         ],
-        "kernelDependenciesOmitted": 0,
+        "kernelDependenciesOmitted": 15,
         "screens": [
           "public/apps/geld.html",
           "public/apps/isolatie.html"
@@ -17131,7 +17309,7 @@
         "mutationRoutes": 7,
         "declaredMutationSemantics": 2,
         "sourceFileCount": 1,
-        "kernelDependencyCount": 6,
+        "kernelDependencyCount": 7,
         "screenCount": 3,
         "sourceFiles": [
           "server/routes/auth/webauthn.js"
@@ -17140,6 +17318,7 @@
         "kernelDependencies": [
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
+          "server/kern/identiteit/herbevestiging.js",
           "server/kern/identiteit/inlogherkomst.js",
           "server/kern/isolatie/apparaatsleutel.js",
           "server/kern/journaalverhuizing.js",
@@ -18496,6 +18675,7 @@
           "booking",
           "transaction",
           "failure",
+          "version",
           "event",
           "ai"
         ]
@@ -19524,7 +19704,7 @@
         "mutationRoutes": 11,
         "declaredMutationSemantics": 5,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 3,
+        "kernelDependencyCount": 11,
         "screenCount": 4,
         "sourceFiles": [
           "server/routes/agenda.js",
@@ -19534,7 +19714,15 @@
         "kernelDependencies": [
           "server/kern/agenda-idempotentie.js",
           "server/kern/agenda-opslag.js",
-          "server/kern/agenda.js"
+          "server/kern/agenda.js",
+          "server/kern/doorgeefjournaal.js",
+          "server/kern/eigencollectie.js",
+          "server/kern/journaalverhuizing.js",
+          "server/kern/journaalvorm.js",
+          "server/kern/kosten/soorten.js",
+          "server/kern/muziek-instrumenten.js",
+          "server/kern/muziek-stijlen.js",
+          "server/kern/werkvormen.js"
         ],
         "kernelDependenciesOmitted": 0,
         "screens": [
@@ -19545,9 +19733,12 @@
         ],
         "screensOmitted": 0,
         "signals": [
+          "decision",
           "feedback",
           "booking",
+          "transaction",
           "failure",
+          "version",
           "event",
           "ai"
         ]
@@ -19561,8 +19752,12 @@
         "observations": [
           "SOURCE_OWNED_ONLY"
         ],
-        "expectations": [],
-        "decisions": [],
+        "expectations": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
+        "decisions": [
+          "SOURCE_EVENT_CANDIDATE"
+        ],
         "claimsContests": [
           "SOURCE_EVENT_CANDIDATE"
         ],
@@ -25618,7 +25813,7 @@
         "mutationRoutes": 14,
         "declaredMutationSemantics": 6,
         "sourceFileCount": 6,
-        "kernelDependencyCount": 7,
+        "kernelDependencyCount": 10,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/auth/account.js",
@@ -25632,7 +25827,10 @@
         "kernelDependencies": [
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
+          "server/kern/identiteit/herbevestiging.js",
           "server/kern/identiteit/inlogherkomst.js",
+          "server/kern/identiteit/lopend.js",
+          "server/kern/identiteit/wachtwoordrem.js",
           "server/kern/isolatie/apparaatsleutel.js",
           "server/kern/journaalverhuizing.js",
           "server/kern/journaalvorm.js",
@@ -25948,6 +26146,7 @@
         "screensOmitted": 0,
         "signals": [
           "failure",
+          "event",
           "ai"
         ]
       },
@@ -26019,7 +26218,7 @@
         "mutationRoutes": 7,
         "declaredMutationSemantics": 4,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2540,
+        "kernelDependencyCount": 2584,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/code.js",
@@ -26031,6 +26230,7 @@
           "server/bedrijf/aansluiting.js",
           "server/bedrijf/beeld-consolidatie.js",
           "server/bedrijf/beeld.js",
+          "server/bedrijf/besluit-loop.js",
           "server/bedrijf/besluit.js",
           "server/bedrijf/besluitlijst.js",
           "server/bedrijf/bouw.js",
@@ -26050,10 +26250,9 @@
           "server/bedrijf/herkomst.js",
           "server/bedrijf/index.js",
           "server/bedrijf/indienst.js",
-          "server/bedrijf/inzicht-graaf.js",
-          "server/bedrijf/inzicht.js"
+          "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2516,
+        "kernelDependenciesOmitted": 2560,
         "screens": [
           "public/apps/geld.html"
         ],
@@ -26455,7 +26654,7 @@
         "mutationRoutes": 13,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 121,
+        "kernelDependencyCount": 128,
         "screenCount": 2,
         "sourceFiles": [
           "server/routes/ik.js",
@@ -26489,7 +26688,7 @@
           "server/kern/bewijsvlak/ledger.js",
           "server/kern/bewijsvlak/metrics-rollup.js"
         ],
-        "kernelDependenciesOmitted": 97,
+        "kernelDependenciesOmitted": 104,
         "screens": [
           "public/apps/geld.html",
           "public/apps/ik.html"
@@ -26562,44 +26761,42 @@
         "/api/ice"
       ],
       "behaviourEvidence": {
-        "routeCount": 2,
-        "mutationRoutes": 0,
-        "declaredMutationSemantics": 0,
+        "routeCount": 3,
+        "mutationRoutes": 1,
+        "declaredMutationSemantics": 1,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 2541,
+        "kernelDependencyCount": 22,
         "screenCount": 0,
         "sourceFiles": [
-          "server/routes/social.js",
-          "server/server.js"
+          "server/opzet/stroomtoegang.js",
+          "server/routes/social.js"
         ],
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
-          "server/bedrijf/aansluiting.js",
-          "server/bedrijf/beeld-consolidatie.js",
-          "server/bedrijf/beeld.js",
-          "server/bedrijf/besluit.js",
-          "server/bedrijf/besluitlijst.js",
-          "server/bedrijf/bouw.js",
-          "server/bedrijf/contract.js",
-          "server/bedrijf/contractklok.js",
-          "server/bedrijf/deuren.js",
-          "server/bedrijf/entiteitbetaling.js",
-          "server/bedrijf/gebeurtenis-lezen.js",
-          "server/bedrijf/gebeurtenis-veld.js",
-          "server/bedrijf/gebeurtenis.js",
-          "server/bedrijf/geheugen.js",
-          "server/bedrijf/geheugenlezen.js",
-          "server/bedrijf/gevolg.js",
-          "server/bedrijf/gezondheid.js",
-          "server/bedrijf/handeling-lijst.js",
-          "server/bedrijf/handeling.js",
-          "server/bedrijf/herkomst.js",
-          "server/bedrijf/index.js",
-          "server/bedrijf/indienst.js",
-          "server/bedrijf/inzicht-graaf.js",
-          "server/bedrijf/inzicht.js"
+          "server/kern/bearercode-keten.js",
+          "server/kern/bearercode-v2.js",
+          "server/kern/bearercode.js",
+          "server/kern/eigencollectie.js",
+          "server/kern/intreksignaal.js",
+          "server/kern/isolatie/dragers.js",
+          "server/kern/isolatie/handhaving.js",
+          "server/kern/isolatie/sessiedragers.js",
+          "server/kern/rtc/ijs.js",
+          "server/kern/rtc/relayproef.js",
+          "server/kern/rtc/relaystand.js",
+          "server/kern/rtc/stunbericht.js",
+          "server/kern/rtc/turnclient.js",
+          "server/kern/sessies.js",
+          "server/kern/sessiestroom-kijk.js",
+          "server/kern/sessiestroom.js",
+          "server/kern/sociaal/pin-clusterrem.js",
+          "server/kern/sociaal/pin-formaat.js",
+          "server/kern/stroomticket.js",
+          "server/kern/taalkeuring.js",
+          "server/kern/util.js",
+          "server/kern/veilig.js"
         ],
-        "kernelDependenciesOmitted": 2517,
+        "kernelDependenciesOmitted": 0,
         "screens": [],
         "screensOmitted": 0,
         "signals": [
@@ -26674,7 +26871,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 3,
         "sourceFileCount": 3,
-        "kernelDependencyCount": 2541,
+        "kernelDependencyCount": 2585,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/member/winkel.js",
@@ -26686,6 +26883,7 @@
           "server/bedrijf/aansluiting.js",
           "server/bedrijf/beeld-consolidatie.js",
           "server/bedrijf/beeld.js",
+          "server/bedrijf/besluit-loop.js",
           "server/bedrijf/besluit.js",
           "server/bedrijf/besluitlijst.js",
           "server/bedrijf/bouw.js",
@@ -26705,10 +26903,9 @@
           "server/bedrijf/herkomst.js",
           "server/bedrijf/index.js",
           "server/bedrijf/indienst.js",
-          "server/bedrijf/inzicht-graaf.js",
-          "server/bedrijf/inzicht.js"
+          "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2517,
+        "kernelDependenciesOmitted": 2561,
         "screens": [
           "public/apps/app.html"
         ],
@@ -27035,7 +27232,7 @@
         "mutationRoutes": 5,
         "declaredMutationSemantics": 5,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 2540,
+        "kernelDependencyCount": 2584,
         "screenCount": 1,
         "sourceFiles": [
           "server/routes/vertaal.js",
@@ -27046,6 +27243,7 @@
           "server/bedrijf/aansluiting.js",
           "server/bedrijf/beeld-consolidatie.js",
           "server/bedrijf/beeld.js",
+          "server/bedrijf/besluit-loop.js",
           "server/bedrijf/besluit.js",
           "server/bedrijf/besluitlijst.js",
           "server/bedrijf/bouw.js",
@@ -27065,10 +27263,9 @@
           "server/bedrijf/herkomst.js",
           "server/bedrijf/index.js",
           "server/bedrijf/indienst.js",
-          "server/bedrijf/inzicht-graaf.js",
-          "server/bedrijf/inzicht.js"
+          "server/bedrijf/inzicht-graaf.js"
         ],
-        "kernelDependenciesOmitted": 2516,
+        "kernelDependenciesOmitted": 2560,
         "screens": [
           "public/apps/vertaler.html"
         ],
@@ -28546,7 +28743,7 @@
         "mutationRoutes": 4,
         "declaredMutationSemantics": 2,
         "sourceFileCount": 2,
-        "kernelDependencyCount": 16,
+        "kernelDependencyCount": 43,
         "screenCount": 0,
         "sourceFiles": [
           "server/opzet/webhooks.js",
@@ -28555,23 +28752,31 @@
         "sourceFilesOmitted": 0,
         "kernelDependencies": [
           "server/kern/agentteken.js",
+          "server/kern/ai/contextpakket.js",
+          "server/kern/bearercode-keten.js",
+          "server/kern/bearercode-v2.js",
+          "server/kern/bearercode.js",
           "server/kern/betaalwaarheid/inkomend.js",
+          "server/kern/bevoegdheid/lijst-afhankelijk.js",
+          "server/kern/bevoegdheid/lijst.js",
           "server/kern/bewijsvlak/canon.js",
           "server/kern/bewijsvlak/context.js",
+          "server/kern/bewijsvlak/retry.js",
           "server/kern/dienstidentiteit.js",
           "server/kern/doorgeefjournaal.js",
           "server/kern/eigencollectie.js",
           "server/kern/envelop.js",
+          "server/kern/intreksignaal.js",
           "server/kern/journaalverhuizing.js",
           "server/kern/journaalvorm.js",
           "server/kern/kosten/haak.js",
           "server/kern/kosten/soorten.js",
           "server/kern/muziek-instrumenten.js",
           "server/kern/muziek-stijlen.js",
-          "server/kern/util.js",
-          "server/kern/werkvormen.js"
+          "server/kern/sessies.js",
+          "server/kern/sessiestroom-kijk.js"
         ],
-        "kernelDependenciesOmitted": 0,
+        "kernelDependenciesOmitted": 19,
         "screens": [],
         "screensOmitted": 0,
         "signals": [

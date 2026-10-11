@@ -22,6 +22,13 @@ const { db, save } = kern;
    waarheid over de clearingmodus opleveren. */
 const { fonds, betaal, log } = hulp;
 
+/* STRIPE CONNECT AAN HET GROOTBOEK (server/betaal/connect/). Een naad tussen Connect en Pay, dus hier
+   en niet in kernlaag4b (die liep over de 10 kB). Zonder deze regel
+   weigert elke partnerafrekening met GROOTBOEK_NIET_GEKOPPELD; met deze regel
+   boekt elke economische gebeurtenis (reservering, afgerekend, teruggeboekt)
+   hoogstens een keer in RTG Pay, op haar eigen sleutel (kern/pay/vrijgavepoort.js). */
+if (kern.pay) require('../betaal/connect').koppelGrootboek(require('../kern/pay/vrijgavepoort').maakConnectBoeking(kern.pay));
+
 /* Cutover-reconcile: draait de wallet in motor-modus (RTG_MOTOR_GELD=motor), dan
    is de Rust-motor de autoriteit -- neem bij het opstarten de saldi-spiegel over
    uit de motor-snapshot, zodat we altijd in lockstep starten (ook na een crash of

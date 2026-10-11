@@ -672,7 +672,7 @@ const GETALLEN = {
 /* De documenten die merktekens mogen dragen. Bewust een lijst en geen glob over
    alles: een generator die elk .md-bestand mag herschrijven, herschrijft op een
    dag ook iets dat niemand had bedoeld. */
-const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
+const DOCUMENTEN = ['DOCUMENTENKAART.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
   'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md', 'ONDERNEMEN.md',
   'KEURING.md', 'VERANDERING.md', 'PLANNING.md', 'OFFICE.md', 'EDGE.md', 'AUTONOMIE.md', 'VERDER.md'];

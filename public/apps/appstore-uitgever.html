@@ -250,9 +250,9 @@ function tekenAanvraag(){
   return '<div class="kaart"><h2>Word uitgever</h2>'+
     '<p class="sub">Je zaak hangt onder een organisatie; die organisatie wordt de uitgever. Een mens van RTG laat je toe - dat is geen formaliteit, want vanaf dat moment staat er een aanspreekbare partij achter elke app die je publiceert.</p>'+
     '<div class="rij"><div class="breed"><label class="vlak" for="uNaam">Naam waaronder je publiceert</label>'+
-      '<input class="veld" id="uNaam" class="vol" maxlength="120" value="'+esc((STAND.uitgever && STAND.uitgever.naam) || STAND.organisatie || '')+'"></div>'+
+      '<input class="veld vol" id="uNaam" maxlength="120" value="'+esc((STAND.uitgever && STAND.uitgever.naam) || STAND.organisatie || '')+'"></div>'+
       '<div class="breed"><label class="vlak" for="uContact">Contact voor RTG</label>'+
-      '<input class="veld" id="uContact" class="vol" maxlength="160" placeholder="ontwikkelaars@jouwbedrijf.nl" value="'+esc((STAND.uitgever && STAND.uitgever.contact) || '')+'"></div></div>'+
+      '<input class="veld vol" id="uContact" maxlength="160" placeholder="ontwikkelaars@jouwbedrijf.nl" value="'+esc((STAND.uitgever && STAND.uitgever.contact) || '')+'"></div></div>'+
     '<div class="rij"><button class="knop" id="uVraag">'+(STAND.uitgever ? 'Bijwerken' : 'Uitgeversplek aanvragen')+'</button>'+
       (STAND.uitgever ? '<span class="st wacht">'+esc(STAND.uitgever.status)+'</span>' : '')+
       (STAND.uitgever && STAND.uitgever.reden ? '<span class="sub">'+esc(STAND.uitgever.reden)+'</span>' : '')+'</div></div>';
@@ -269,7 +269,7 @@ function tekenInzenden(){
         '<span class="klein"><b class="blok">'+esc(x.id)+'</b>'+
         '<span class="gedempt">'+esc(x.geeft)+'</span><br>'+
         '<span class="zacht"><b class="goud">Nooit:</b> '+esc(x.nooit)+'</span></span></label>'+
-      '<select class="veld" data-doel="'+esc(x.id)+'" class="doeluitleg" aria-label="Waarvoor '+esc(x.id)+'">'+
+      '<select class="veld doeluitleg" data-doel="'+esc(x.id)+'" aria-label="Waarvoor '+esc(x.id)+'">'+
         x.doelen.map(d => '<option value="'+esc(d.id)+'">'+esc(d.id)+' &mdash; '+esc(d.uitleg)+'</option>').join('')+
       '</select>'+
     '</div>').join('');
@@ -279,30 +279,30 @@ function tekenInzenden(){
   return '<div class="kaart"><h2>Een versie inzenden</h2>'+
     '<p class="sub">Alles wat je app nodig heeft zit in je eigen map: geen CDN, geen externe fonts, geen netwerk. In de cel heeft je app geen verbinding; wat je van RTG nodig hebt, vraag je met <code>RTG.roep(...)</code>. Dat script wordt er automatisch in gezet.</p>'+
     '<div class="grid2 mt-l">'+
-      '<div><label class="vlak" for="mSleutel">Sleutel (vast)</label><input class="veld" id="mSleutel" class="vol" maxlength="40" placeholder="mijn-app"></div>'+
-      '<div><label class="vlak" for="mNaam">Naam</label><input class="veld" id="mNaam" class="vol" maxlength="60"></div>'+
-      '<div><label class="vlak" for="mVersie">Versie</label><input class="veld" id="mVersie" class="vol" maxlength="14" placeholder="1.0.0"></div>'+
-      '<div><label class="vlak" for="mCategorie">Categorie</label><select class="veld" id="mCategorie" class="vol">'+
+      '<div><label class="vlak" for="mSleutel">Sleutel (vast)</label><input class="veld vol" id="mSleutel" maxlength="40" placeholder="mijn-app"></div>'+
+      '<div><label class="vlak" for="mNaam">Naam</label><input class="veld vol" id="mNaam" maxlength="60"></div>'+
+      '<div><label class="vlak" for="mVersie">Versie</label><input class="veld vol" id="mVersie" maxlength="14" placeholder="1.0.0"></div>'+
+      '<div><label class="vlak" for="mCategorie">Categorie</label><select class="veld vol" id="mCategorie">'+
         ['sociaal','reizen','eten','media','geld','spelen','leven','veiligheid'].map(c => '<option>'+c+'</option>').join('')+'</select></div>'+
-      '<div><label class="vlak" for="mStart">Startbestand</label><input class="veld" id="mStart" class="vol" maxlength="80" placeholder="index.html"></div>'+
+      '<div><label class="vlak" for="mStart">Startbestand</label><input class="veld vol" id="mStart" maxlength="80" placeholder="index.html"></div>'+
       /* EEN PERSOON PUBLICEERT GRATIS (besluit 27 augustus 2026). Het veld staat
          er dan wel, maar op nul en dicht -- en met de reden ernaast. Zou het
          gewoon openstaan, dan typt iemand een prijs, bouwt een bundel en hoort
          pas bij het inzenden dat het nooit kon. De server blijft de poort
          (kern/appstore/uitgevers.js: magPrijsVragen); dit is het venster erop. */
       '<div><label class="vlak" for="mPrijs">Prijs in euro (0 = gratis)</label>'+
-        '<input class="veld" id="mPrijs" class="vol" inputmode="decimal" placeholder="0,00" value="'+(DEUR==='persoon'?'0':'')+'"'+
+        '<input class="veld vol" id="mPrijs" inputmode="decimal" placeholder="0,00" value="'+(DEUR==='persoon'?'0':'')+'"'+
         (DEUR==='persoon'?' readonly':'')+'></div>'+
     '</div>'+
     '<p class="sub mt-s">'+(DEUR === 'persoon'
       ? 'Als geverifieerd persoon publiceer je gratis. Een betaalde app vraagt een rechtspersoon: daar hangen de btw, de afdracht en een aanspreekbare partij aan. Wil je geld vragen, vraag dan een uitgeversplek aan vanuit een zaak.'
       : 'Een betaalde app wordt in de winkel gekocht, nooit in de app zelf. RTG int bij het lid, draagt de btw af in het land van dat lid, houdt de afdracht in en schrijft de rest bij op de RTG Pay-rekening van je zaak. Wat een lid betaalt, ziet hij als bon voordat hij drukt.')+'</p>'+
     '<div class="mt-m"><label class="vlak" for="mUitleg">Uitleg (20-260 tekens, dit leest een lid vóór hij iets geeft)</label>'+
-      '<textarea class="veld" id="mUitleg" class="vol-tekst" maxlength="260"></textarea></div>'+
+      '<textarea class="veld vol-tekst" id="mUitleg" maxlength="260"></textarea></div>'+
     '<div class="mt-l"><span class="vlak">Wat je vraagt</span>'+m+'</div>'+
     '<div class="mt-l"><label class="vlak" for="mMap">Je bundel (kies de map van je app)</label>'+
-      '<input class="veld" type="file" id="mMap" webkitdirectory directory multiple class="vol">'+
-      '<p class="sub" id="bundelStand" class="mt-xs">Nog geen map gekozen.</p>'+
+      '<input class="veld vol" type="file" id="mMap" webkitdirectory directory multiple>'+
+      '<p class="sub mt-xs" id="bundelStand">Nog geen map gekozen.</p>'+
       '<p class="sub">Budget: '+b.bestanden+' bestanden, '+Math.round(b.totaal/1024)+' kB totaal, '+Math.round(b.script/1024)+' kB scriptcode, '+Math.round(b.stijl/1024)+' kB stijl. Het budget is een poort en geen meter achteraf: te zwaar komt er niet in.</p></div>'+
     '<div class="rij"><button class="knop stil" id="bProef">Proefkeuring</button><button class="knop" id="bIn">Inzenden</button></div>'+
     '<div id="uitslag" class="mt-m"></div></div>'+
@@ -338,7 +338,7 @@ function tekenApps(){
                   '<button class="knop stil aDos" data-s="'+esc(a.sleutel)+'" aria-expanded="false">Wat de klant leest</button>'+
                   '<button class="knop stil aTrek" data-s="'+esc(a.sleutel)+'">Intrekken</button>'
                 : '<span class="st nee">niet live</span>')+'</div>'+
-      '<div class="uDos" data-s="'+esc(a.sleutel)+'" hidden class="mt-s"></div>'+
+      '<div class="uDos mt-s" data-s="'+esc(a.sleutel)+'" hidden></div>'+
       (a.ingetrokken ? '<p class="sub">Ingetrokken door '+esc(a.ingetrokken.door)+(a.ingetrokken.reden ? ': '+esc(a.ingetrokken.reden) : '')+'</p>' : '')+
       '<table><tr><th>versie</th><th>prijs</th><th>stand</th><th>hash</th><th>ingezonden</th><th>besluit</th></tr>'+
       a.versies.map(v => '<tr><td>'+esc(v.versie)+'</td><td>'+(v.prijsCenten ? eur(v.prijsCenten) : 'gratis')+'</td><td>'+esc(v.status)+'</td><td><code>'+esc(v.hash.slice(0,12))+'</code></td>'+

@@ -30,6 +30,12 @@ test('config: onveilige productie geeft blokkerende fouten', () => {
 });
 
 test('config: veilige productie is foutloos', () => {
+  /* Sinds het auditboek hoort bij PostgreSQL-productie een extern anker: twee
+     bestemmingen en een publieke ankersleutel (server/config/productie-auditboek.js).
+     De sleutel wordt hier gemaakt; alleen de aanwezigheid van een PEM wordt gekeurd. */
+  const map = require('node:fs').mkdtempSync(require('node:path').join(require('node:os').tmpdir(), 'rtg-prod-'));
+  const pubBestand = require('node:path').join(map, 'audit-anker.pub');
+  require('node:fs').writeFileSync(pubBestand, require('node:crypto').generateKeyPairSync('ed25519').publicKey.export({ type: 'spki', format: 'pem' }));
   const r = config.valideer({ NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64),
     APP_URL: 'https://x', DATABASE_URL: 'postgresql://postgres/rtg', RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
     /* STRIPE_WEBHOOK_SECRET hoort hier sinds de poortwacht-ronde bij: een
@@ -43,7 +49,7 @@ test('config: veilige productie is foutloos', () => {
        op ERR_WEBHOOK_URL. Een "veilige productie" die SENTRY_DSN zet en
        ERR_WEBHOOK_URL niet, heeft in werkelijkheid GEEN externe alarmering --
        en deze toets zei dat dat foutloos was. */
-    REDIS_URL: 'r', ERR_WEBHOOK_URL: 'https://haak.voorbeeld.test/rtg', SMTP_URL: 'm',
+    REDIS_URL: 'r', RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', RTG_ANKERPOST_SLEUTEL: 'anker-sleutel', ERR_WEBHOOK_URL: 'https://haak.voorbeeld.test/rtg', SMTP_URL: 'm',
     MAIL_PROVIDER_DKIM: '1', OPENAI_API_KEY: 'test-ai-key',
     STRIPE_SECRET_KEY: 'k', STRIPE_WEBHOOK_SECRET: 'whsec_k',
     RTG_MOTOR_GELD: 'motor', RTG_MOTOR_GELD_URL: 'http://motor:3100',
@@ -57,8 +63,9 @@ test('config: veilige productie is foutloos', () => {
     TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
     RTG_HERSTEL_SMS_UIT_BEWUST: '1', STRIPE_UITGAAND_UIT_BEWUST: '1',
     RTG_ISOLATIE_AFDWINGEN: '1',
+    RTG_AUDIT_ANKER_DIRS: '/srv/anker-a,/srv/anker-b', RTG_AUDIT_ANKER_PUBLIC_KEY_FILE: pubBestand,
     RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl' });
-  assert.equal(r.fouten.length, 0);
+  assert.equal(r.fouten.length, 0, JSON.stringify(r.fouten));
   assert.equal(r.waarschuwingen.length, 0, 'geen enkele waarschuwing: ' + JSON.stringify(r.waarschuwingen));
 });
 

@@ -53,18 +53,24 @@ const CONTRACTEN = {
   },
   /* De kantooruitnodiging (AUTHORITY.md fase 2) woont hier mee: dezelfde laag,
      de kantoordeur op naam. */
+  /* Tot 11 oktober 2026 INTENTIONALLY_NON_IDEMPOTENT: een tweede oproep is een tweede
+     uitnodiging, en dat blijft zo ZONDER sleutel. Maar een retry met DEZELFDE sleutel
+     trok ook de uitnodiging in die de eigenaar net had doorgegeven. Besluit van de
+     eigenaar: idempotent maken, in de vorm van foundation/gezinscode.js geef(). */
   'POST /api/office/kantoor/uitnodiging': {
     mutatieId: 'office.kantoor.uitnodiging',
     herkomst: 'mens',
-    semantiek: { klasse: 'nietHerhaalbaar' },
+    semantiek: { klasse: 'sleutelVereist' },
     toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'INTENTIONALLY_NON_IDEMPOTENT',
-    waarom: 'een tweede oproep is een tweede uitnodiging: een nieuwe code, en de vorige van dezelfde mens vervalt',
-    bewijs: { gemeten: 'tegen een draaiende server (test/kantooruitnodiging.test.js): twee oproepen gaven twee ' +
-      'codes, en de eerste koppelde daarna niet meer (401)', op: '2026-09-23' },
-    nagekeken: 'met de hand, 2026-09-23: server/kern/kantoor/uitnodiging.js maak() trekt de open uitnodiging van ' +
-      'dezelfde sleutel in en zet een nieuwe met een eigen hash',
-    afgetekend: { door: 'Claude Code, handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-23' }
+    stand: 'PROTECTED',
+    bewijs: { gemeten: 'tegen een draaiende server (test/kantooruitnodiging-idem.test.js): dezelfde sleutel twee ' +
+      'keer geeft 409 met herhaald, zonder kale code, en er staat een open uitnodiging; een verse sleutel maakt wel ' +
+      'een nieuwe en trekt de vorige in; dezelfde sleutel voor een andere mens is geen herhaling', op: '2026-10-11' },
+    nagekeken: 'Claude, 2026-10-11: maak() bindt uitgever, ontvanger en idem-hash in dezelfde collectietransactie ' +
+      'als de uitgifte, en vergelijkt alleen met de laatste uitnodiging voor die ontvanger; de herhaling toont de ' +
+      'code niet opnieuw (hij bestaat alleen als hash) en de generieke antwoordcaches blijven uitgesloten ' +
+      '(lib/eenmalig-geheim-routes.js).',
+    afgetekend: { door: 'Claude, uitnodiging.js en de route gelezen en de herhaling op een echte server beproefd', op: '2026-10-11' }
   },
   'POST /api/office/kantoor/uitnodigingen': {
     mutatieId: 'office.kantoor.uitnodigingen',

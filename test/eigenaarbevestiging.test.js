@@ -137,7 +137,7 @@ test('1. de ratel staat open zolang er geen passkey is', async () => {
 });
 
 test('2. met een passkey wordt dezelfde handeling hard', async () => {
-  const opties = await api('/api/webauthn/registreer/opties', {}, lid);
+  const opties = await api('/api/webauthn/registreer/opties', { huidig: 'Imran' }, lid);
   assert.equal(opties.status, 200, JSON.stringify(opties.body).slice(0, 160));
   const reg = await api('/api/webauthn/registreer',
     { antwoord: sleutel.registratieAntwoord(opties.body.opties.challenge, origin),

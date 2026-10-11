@@ -149,3 +149,58 @@ test('een voorziening zonder haar voorwaarde geeft een fout en geen half onderwe
   const zonderCodenaam = await VOORZIENINGEN['/api/pay/verzoek/intrek']({ post, tokenVoor, w: {} });
   assert.match(zonderCodenaam.fout, /codenaam/);
 });
+
+/* EEN STRIKT LIJF -- voor een route met een gesloten contract. kern/document-capability.js
+   weigert elk onbekend veld met 400, dus zodra de proef er `idem` in stopt, meet hij
+   alleen zijn eigen weigering. Een voorziening met `strikt: true` stuurt haar lijf
+   ONGEWIJZIGD, en de sleutel reist in de kop. Drie dingen mogen daarbij niet
+   sneuvelen: geen proefveld in het lijf, de sleutel wel in de kop, en de marker
+   `strikt` zelf nooit naar de route. */
+test('een strikt lijf gaat ongewijzigd en de sleutel reist in de kop', async () => {
+  const gezien = [];
+  const post = async (pad, lijf, tok, koppen) => {
+    gezien.push({ pad, lijf, koppen: koppen || {} });
+    return { status: 200, data: { ok: true } };
+  };
+  const uit = await draai({ post,
+    voorzieningVoor: (pad) => pad === '/api/proef/opmaak'
+      ? async () => ({ strikt: true, id: 'vers', operationId: 'op-1234567890abcdef' }) : null });
+  const gemeten = gezien.filter(g => g.pad === '/api/proef/opmaak' && g.koppen['Idempotency-Key']);
+  assert.ok(gemeten.length >= 3, 'A, B en C horen te draaien met een sleutel in de kop');
+  for (const g of gemeten) {
+    assert.deepEqual(Object.keys(g.lijf).sort(), ['id', 'operationId'],
+      'een strikt lijf draagt alleen wat de voorziening leverde');
+  }
+  assert.equal(new Set(gemeten.map(g => g.koppen['Idempotency-Key'])).size >= 2, true,
+    'de verse sleutel hoort ook bij een strikt lijf anders te zijn');
+  const v = uit.perRoute['POST /api/proef/opmaak'].voorziening;
+  assert.equal(v.stand, 'gelukt');
+  assert.equal(v.strikt, true);
+});
+
+test('de documentvoorziening verklaart een strikt lijf in de vorm van het contract', () => {
+  assert.equal(typeof voorzieningVoor('/api/bestanden/actie'), 'function');
+});
+
+/* DE TWEE GEZINSROUTES DIE HUN SESSIE OPMAKEN, KRIJGEN EEN EIGEN SESSIE (11 oktober
+   2026). gezin/sessie/intrek trok de ene sessie van de wereld in, en daarna gaf elke
+   gezinsroute 403. De voorziening moet dus een VERSE sessie leveren, langs de gewone
+   inlogdeur met de sessie van de wereld als drager -- en nooit die sessie zelf, want
+   dan is er niets gerepareerd. */
+test('gezin/sessie/intrek en /roteer krijgen een verse sessie en nooit die van de wereld', async () => {
+  const w = { gezinCode: 'GZ1', gezinToken: 'tok-wereld' };
+  for (const pad of ['/api/foundation/gezin/sessie/intrek', '/api/foundation/gezin/sessie/roteer']) {
+    const { post, gezien } = nepServer(p => p === '/api/foundation/gezin/inloggen'
+      ? { status: 200, data: { token: 'tok-vers' } } : null);
+    const v = await VOORZIENINGEN[pad]({ post, tokenVoor: () => 'tok', w });
+    assert.deepStrictEqual(v, { token: 'tok-vers' }, pad + ': het lijf krijgt de verse sessie');
+    assert.notStrictEqual(v.token, w.gezinToken, pad + ': nooit de sessie van de wereld');
+    assert.strictEqual(gezien.length, 1);
+    assert.strictEqual(gezien[0].pad, '/api/foundation/gezin/inloggen');
+    assert.deepStrictEqual(gezien[0].lijf, { code: 'GZ1', token: 'tok-wereld', pin: '1234' });
+    const zonder = await VOORZIENINGEN[pad]({ post, tokenVoor: () => 'tok', w: {} });
+    assert.match(zonder.fout, /geen gezinssessie/);
+    const weigert = await VOORZIENINGEN[pad]({ post: async () => ({ status: 403, data: { error: 'nee' } }), tokenVoor: () => 'tok', w });
+    assert.match(weigert.fout, /gezin\/inloggen gaf 403 nee/, pad + ': een geweigerde inlog is een fout en geen lege sessie');
+  }
+});

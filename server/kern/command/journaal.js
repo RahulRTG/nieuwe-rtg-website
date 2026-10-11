@@ -84,6 +84,11 @@ function maakJournaal({ db, save, crypto, vak, opslag, auditOpslag }) {
       na: beknopt(regel.na),
       vorig: vorige ? vorige.zegel : null
     };
+    /* Audit P2-7: het verzoek en de release staan IN de regel en dus onder de
+       zegel. Alleen wat bekend is; nooit een verzonnen waarde. */
+    if (regel.verzoek) kern.verzoek = String(regel.verzoek).slice(0, 40);
+    const release = require('../../lib/releaseidentiteit').release();
+    if (release) kern.release = release;
     if (auditOpslag && !werkVak) return auditOpslag.append(top => {
       const waarde = { ...kern, vorig: top?.zegel || null }; waarde.zegel = hash(waarde); return waarde;
     });

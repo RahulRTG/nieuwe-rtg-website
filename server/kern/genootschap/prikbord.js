@@ -18,10 +18,22 @@ module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) 
   const PAGINA = 20;
   const nu = () => new Date().toISOString();
 
+  /* bord SCHEPT: hij zet een lege rij neer voor een genootschap zonder prikbord.
+     Dat hoort alleen op de weg die een bericht PLAATST. Op elke andere weg --
+     lezen, de AI-regels, een stem of reactie op een bericht dat niet bestaat --
+     is het een schrijfactie die niemand vroeg, en die met de volgende save()
+     meekomt. Dezelfde splitsing als lijstVan/kijkVan in ./bijeenkomst.js, waar
+     de staatproef hem al als gezakte ROLLBACK ving (GEMEENSCHAP-FASE0.md par. 6,
+     gebrek 7). */
   const bord = (id) => {
     const g = genootschap.S();
     if (!Array.isArray(g.prikbord[id])) g.prikbord[id] = [];
     return g.prikbord[id];
+  };
+  // kijken zonder scheppen -- voor alles wat alleen opzoekt of toont
+  const kijk = (id) => {
+    const g = genootschap.S();
+    return Array.isArray(g.prikbord[id]) ? g.prikbord[id] : [];
   };
 
   function nieuwId(lijst) {
@@ -69,7 +81,7 @@ module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) 
   function weg(sess, groepId, id) {
     const p = poort(sess, groepId);
     if (p.error) return p;
-    const lijst = bord(groepId);
+    const lijst = kijk(groepId);
     const i = lijst.findIndex(b => String(b.id) === String(id));
     if (i < 0) return { error: 'Dit bericht staat niet op het prikbord.' };
     const eigen = lijst[i].vanKey === sess.key;
@@ -82,7 +94,7 @@ module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) 
   function reageer(sess, groepId, id, tekst) {
     const p = poort(sess, groepId);
     if (p.error) return p;
-    const b = bord(groepId).find(x => String(x.id) === String(id));
+    const b = kijk(groepId).find(x => String(x.id) === String(id));
     if (!b) return { error: 'Dit bericht staat niet op het prikbord.' };
     const t = String(tekst || '').trim().slice(0, REACTIE_MAX);
     if (!t) return { error: 'Schrijf eerst iets.' };
@@ -97,7 +109,7 @@ module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) 
   function reactieWeg(sess, groepId, id, reactieId) {
     const p = poort(sess, groepId);
     if (p.error) return p;
-    const b = bord(groepId).find(x => String(x.id) === String(id));
+    const b = kijk(groepId).find(x => String(x.id) === String(id));
     if (!b) return { error: 'Dit bericht staat niet op het prikbord.' };
     const i = (b.reacties || []).findIndex(r => String(r.id) === String(reactieId));
     if (i < 0) return { error: 'Deze reactie bestaat niet.' };
@@ -113,7 +125,7 @@ module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) 
   function stem(sess, groepId, id, keuze) {
     const p = poort(sess, groepId);
     if (p.error) return p;
-    const b = bord(groepId).find(x => String(x.id) === String(id));
+    const b = kijk(groepId).find(x => String(x.id) === String(id));
     if (!b || !b.peiling) return { error: 'Hier is geen peiling.' };
     const i = Number(keuze);
     if (!Number.isInteger(i) || i < 0 || i >= b.peiling.keuzes.length) return { error: 'Deze keuze bestaat niet.' };
@@ -149,7 +161,7 @@ module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) 
     const p = poort(sess, groepId);
     if (p.error) return p;
     const o = opties || {};
-    let lijst = bord(groepId);
+    let lijst = kijk(groepId);
     const totaal = lijst.length;
     if (o.na != null) {
       const i = lijst.findIndex(b => String(b.id) === String(o.na));
@@ -165,7 +177,7 @@ module.exports = ({ db, save, codenaamVan, liveCodename, notify, genootschap }) 
   }
 
   // Ruwe tekst van het prikbord, voor de AI-samenvatting (kern/genootschap/ai.js).
-  const regels = (groepId, hoeveel) => bord(groepId).slice(0, hoeveel || 60)
+  const regels = (groepId, hoeveel) => kijk(groepId).slice(0, hoeveel || 60)
     .map(b => codenaamVan(b.vanKey) + ': ' + b.tekst +
       ((b.reacties || []).length ? ' [' + b.reacties.length + ' reacties]' : ''));
 

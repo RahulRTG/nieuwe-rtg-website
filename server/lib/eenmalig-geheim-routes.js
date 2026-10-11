@@ -158,6 +158,12 @@ const ROUTES = new Set([
   'POST /api/foundation/les/maak', 'POST /api/foundation/les/join', 'POST /api/foundation/les/code/roteer',
   // B25: het eenmalige stroomticket (foundation/onderwijs/stroomticket.js)
   'POST /api/foundation/les/stroomticket',
+  /* Kortlevende TURN-credentials (kern/rtc/ijs.js): elke oproep een nieuw
+     geheim en een tel in het plafond per actor. */
+  'POST /api/ice',
+  'POST /api/rtf/ice',
+  'POST /api/foundation/gezin/ice',
+  'POST /api/foundation/school/ice',
   /* Het gezinsprofieltoken (B17, foundation/gezinstoken.js): elk van deze
      antwoorden draagt een VERSE gezinssessie die daarna alleen als hash bestaat. */
   'POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/inloggen',
@@ -166,7 +172,10 @@ const ROUTES = new Set([
   /* De gezinsdeur (B18/B19, foundation/gezinsdeur.js): een nieuwe gezinscode, een
      eenmalig stroomticket en een verlengde sessie staan elk alleen in dit antwoord. */
   'POST /api/foundation/gezin/code/roteer', 'POST /api/foundation/gezin/stroom/ticket',
-  'POST /api/foundation/gezin/sessie/verleng'
+  'POST /api/foundation/gezin/sessie/verleng',
+  /* De sessiestroom (kern/sessiestroom.js): een kortlevend stroomticket voor een
+     live-stroom of video, en het belticket van een klas. */
+  'POST /api/stroom/ticket', 'POST /api/foundation/school/belkanaal/ticket'
 ]);
 
 const isEenmalig = (methode, pad) => ROUTES.has(

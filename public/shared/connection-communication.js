@@ -59,7 +59,7 @@
         recorder.ondataavailable=function(x){if(x.data.size)chunks.push(x.data);};recorder.onstop=function(){var blob=new Blob(chunks,{type:'audio/webm'});try{recordStream.getTracks().forEach(function(t){t.stop();});}catch(x){}recordStream=null;button.textContent='Spraak opnemen';upload(blob,'voice');};recorder.start();button.textContent='Stop en verstuur';}).catch(fail);
     }
     function getMedia(type) { return w.RTGMedia.vraag({audio:true,video:type==='video'}).then(function(s){local=s;return s;}); }
-    function makePeer(type) { return fetch('/api/ice').then(function(r){return r.json();}).catch(function(){return {iceServers:[]};}).then(function(cfg){
+    function makePeer(type) { return fetch('/api/ice',{headers:{Authorization:'Bearer '+token}}).then(function(r){return r.json();}).catch(function(){return {iceServers:[]};}).then(function(cfg){
       pc=new RTCPeerConnection({iceServers:cfg.iceServers||[]});local.getTracks().forEach(function(t){pc.addTrack(t,local);});
       pc.ontrack=function(e){var v=host.querySelector('[data-cc-remote]');if(v)v.srcObject=e.streams[0];};
       pc.onicecandidate=function(e){if(e.candidate)request('call/signal',{callId:callId,kind:'ice',payload:e.candidate}).catch(fail);};

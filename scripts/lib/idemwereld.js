@@ -59,8 +59,26 @@
    voorbeeld-IBAN uit de ISO-documentatie, geen rekening van iemand. */
 const BUITEN_IBAN = 'NL91ABNA0417164300';
 
-async function zetWereldKlaar({ post, tokens, datamap }) {
+async function zetWereldKlaar({ post, tokens, datamap, geldlid, tweedeLid }) {
   const w = {};
+  /* WIE DE GELDWERELD BEZIT -- `geldlid` en `tweedeLid`, allebei optioneel.
+
+     De bank, RTG Pay en de wallet zijn ZWARE paden: de poort
+     (server/kern/identiteit/bezitsbewijs.js) eist daar een eigen account met een
+     gebonden toestel. De demo-pas in `tokens.member` kan dat per definitie niet,
+     en kreeg sinds A-P1-04 op /api/bank/akkoord een 403 -- dan is er geen
+     rekening, en meet geen enkele bankroute nog iets. De idempotentieproef geeft
+     daarom twee PROEFLEDEN mee (./proeftoestel.js): echte accounts met een
+     gebonden toestel, waarvan de post van de proef elk zwaar verzoek ondertekent.
+
+     `geldlid` is het token van het eerste lid; de schil in ./proeftoestel.js
+     zet het demo-token op een zwaar pad toch al om naar dit lid, maar de wereld
+     zegt het hier HARDOP, ook voor de ene leesroute die niet zwaar is en wel bij
+     de geldwereld hoort (de openstaande factuur uit /api/state: die moet van
+     hetzelfde lid zijn als wie /api/pay/saldo betaalt). `tweedeLid` vervangt de
+     tweede demo-inlog. Zonder beide gedraagt deze wereld zich exact als
+     hiervoor -- de andere proeven die hem gebruiken merken niets. */
+  const lid = geldlid || tokens.member;
   /* HET LOGBOEK VAN DE OPBOUW -- want een keten die faalt, faalde tot vandaag
      STIL. `stil()` slikt elke fout in (dat is zijn taak: een wereld die niet
      compleet is, mag de proef niet tegenhouden), en dus leverde een gebroken
@@ -95,26 +113,26 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
   await stil('/api/office/bank/leden', { aan: true }, tokens.office);
 
   /* 2. AKKOORD = de eerste rekening, met een echte IBAN. */
-  w.iban = veld(await stil('/api/bank/akkoord', {}, tokens.member), 'rekening', 'iban');
+  w.iban = veld(await stil('/api/bank/akkoord', {}, lid), 'rekening', 'iban');
 
   /* 3. EEN TWEEDE LID, want geld sturen vraagt een ontvanger die niet jezelf is,
         en een klompje betalen vraagt iemand die het gestuurd heeft. */
-  const ander = (await stil('/api/login', { tier: 'lifestyle' })).data;
+  const ander = tweedeLid ? { token: tweedeLid } : (await stil('/api/login', { tier: 'lifestyle' })).data;
   if (ander && ander.token) {
     w.anderToken = ander.token;
     w.iban2 = veld(await stil('/api/bank/akkoord', {}, ander.token), 'rekening', 'iban');
     w.cn2 = veld(await stil('/api/pay/overzicht', {}, ander.token), 'codenaam');
   }
-  w.cn1 = veld(await stil('/api/pay/overzicht', {}, tokens.member), 'codenaam');
+  w.cn1 = veld(await stil('/api/pay/overzicht', {}, lid), 'codenaam');
 
   /* 4. SALDO. Zonder geld op de rekening geven de wallet-routes 402 en strandt
         elke boeking op "onvoldoende saldo" -- dan is er weer geen werk. */
-  if (w.iban) await stil('/api/bank/storten', { iban: w.iban, centen: 500000, route: 'ideal' }, tokens.member);
+  if (w.iban) await stil('/api/bank/storten', { iban: w.iban, centen: 500000, route: 'ideal' }, lid);
 
   /* 5. EEN SPAARREKENING (een spaardoel hoort bij een spaarrekening) en EEN PAS
         (vier pas-routes wachtten op een pas die bestaat). */
-  w.spaarIban = veld(await stil('/api/bank/rekening/open', { soort: 'spaar', naam: 'Proefspaarpot' }, tokens.member), 'rekening', 'iban');
-  if (w.iban) w.pasId = veld(await stil('/api/bank/pas/uitgeven', { iban: w.iban, soort: 'debit', naam: 'Proefpas' }, tokens.member), 'pas', 'id');
+  w.spaarIban = veld(await stil('/api/bank/rekening/open', { soort: 'spaar', naam: 'Proefspaarpot' }, lid), 'rekening', 'iban');
+  if (w.iban) w.pasId = veld(await stil('/api/bank/pas/uitgeven', { iban: w.iban, soort: 'debit', naam: 'Proefpas' }, lid), 'pas', 'id');
 
   /* 6. TWEE VASTE BETALINGEN -- en let op de `idem`, want die ontbrak en dat kostte twee
         metingen.
@@ -147,10 +165,10 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
   if (w.iban && w.iban2) {
     w.terugkerendId = veld(await stil('/api/bank/terugkerend/zet',
       { vanIban: w.iban, naarIban: w.iban2, centen: 100, interval: 'maand', oms: 'proefreeks',
-        idem: 'wereld-tk-maand' }, tokens.member), 'terugkerend', 'id');
+        idem: 'wereld-tk-maand' }, lid), 'terugkerend', 'id');
     w.incassoReeksId = veld(await stil('/api/bank/terugkerend/zet',
       { vanIban: w.iban, naarIban: w.iban2, centen: 100, interval: 'week', oms: 'proefincasso',
-        idem: 'wereld-tk-week' }, tokens.member), 'terugkerend', 'id');
+        idem: 'wereld-tk-week' }, lid), 'terugkerend', 'id');
     if (w.incassoReeksId) w.incassoTot = Date.now() + 8 * 24 * 60 * 60 * 1000;
   }
 
@@ -163,11 +181,11 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
     w.verzoekAanMij = eersteId(await stil('/api/pay/verzoek', { aan: [w.cn1], totaalCenten: 500, oms: 'proefklompje' }, w.anderToken));
   }
   if (w.cn2) {
-    w.verzoekVanMij = eersteId(await stil('/api/pay/verzoek', { aan: [w.cn2], totaalCenten: 500, oms: 'proefklompje' }, tokens.member));
+    w.verzoekVanMij = eersteId(await stil('/api/pay/verzoek', { aan: [w.cn2], totaalCenten: 500, oms: 'proefklompje' }, lid));
   }
 
   /* 8. EEN KASCODE om te innen (eenmalig bruikbaar; een verrijking, geen garantie). */
-  const kas = await stil('/api/pay/kascode', { centen: 100 }, tokens.member);
+  const kas = await stil('/api/pay/kascode', { centen: 100 }, lid);
   w.code = (kas.data && (kas.data.code || (kas.data.kascode && kas.data.kascode.code))) || null;
 
   /* 9. GEEN TIKCODE IN DE WERELD -- die staat als VOORZIENING bij VOORZIENINGEN
@@ -192,7 +210,7 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
   /* 10. EEN OPENSTAANDE FACTUUR van het lid zelf, voor `pay/saldo`. Die maken we
          niet: de demostand heeft er een, en we zoeken hem op. Een factuur
          verzinnen zou de proef een eigen boekhouding geven. */
-  const staat = await stil('/api/state', {}, tokens.member);
+  const staat = await stil('/api/state', {}, lid);
   const facturen = (staat.data && staat.data.state && staat.data.state.invoices) || [];
   const open = facturen.find(f => f && f.status === 'open');
   w.factuurId = (open && open.id) || null;
@@ -1209,6 +1227,30 @@ const VOORZIENINGEN = {
     uit['/api/rtf/labfonds/beslis'] = versGezinsVoorstel;
     return uit;
   })(),
+  /* EEN VERSE GEZINSSESSIE VOOR DE TWEE ROUTES DIE HAAR OPMAKEN (11 oktober 2026).
+     `gezin/sessie/intrek` meldt de sessie in het lijf af en `gezin/sessie/roteer`
+     ruilt haar in -- en dat lijf droeg de ENE sessie van de wereld. Gemeten met een
+     peiling over foundation/gezin/: tot en met sessie/intrek deed elke gezinsroute
+     werk, daarna gaf ELKE gezinsroute 403 "Log opnieuw in bij je gezin." In de volle
+     ronde stonden daardoor 108 Foundation- en RTF-routes ongemeten, en niet om hun
+     eigen gedrag maar om dat van een route die alfabetisch eerder kwam.
+
+     Dus krijgen deze twee een EIGEN sessie, langs de gewone inlogdeur: dezelfde
+     gezinssessie plus de pincode van de beheerder levert een tweede sessie voor
+     hetzelfde profiel (foundation/gezinstoegang.js, "bij wisselen"). Niet met de
+     gezinscode: `gezin/code/roteer` komt alfabetisch eerder en vervangt die. Zonder
+     profielId sluit intrek alleen de sessie die hij krijgt, dus de wereld houdt de
+     hare. */
+  ...(() => {
+    const verseGezinssessie = async ({ post, w }) => {
+      if (!w.gezinCode || !w.gezinToken) return { fout: 'geen gezinssessie in de wereld' };
+      const r = await post('/api/foundation/gezin/inloggen', { code: w.gezinCode, token: w.gezinToken, pin: '1234' });
+      const token = r && r.data && r.data.token;
+      return token ? { token } : { fout: 'gezin/inloggen gaf ' + (r && r.status) + ' ' + ((r && r.data && r.data.error) || '') };
+    };
+    return { '/api/foundation/gezin/sessie/intrek': verseGezinssessie,
+      '/api/foundation/gezin/sessie/roteer': verseGezinssessie };
+  })(),
   /* Een vers klompje VAN mij, want de ijkoproep trekt het vorige in. */
   '/api/pay/verzoek/intrek': async ({ post, tokenVoor, w }) => {
     if (!w.cn2) return { fout: 'geen tweede codenaam in de wereld' };
@@ -1292,6 +1334,33 @@ const VOORZIENINGEN = {
     const f = await zaakSaldo({ post, tokenVoor });
     if (f) return { fout: f };
     return {};
+  },
+  /* EEN VERS BESTAND IN DE EIGEN KLUIS, voor het documentcontract. De ronde van 27
+     september gaf drie keer 404 "Dat bestand staat niet in uw eigen kluis": de route
+     zoekt een `id` met een `expectedVersion`, en de proef had geen van beide. Sinds
+     de Documents-pilot (22 september) staat deze route in VOORSTEL, dus Rahul mag hem
+     klaarzetten -- en een AI-pad zonder gevolgmeting is precies wat
+     scripts/gevolgdekking.js `onbekend` noemt (95 -> 96).
+
+     Het bestand wordt gemaakt langs de GEWONE uploadroute, en de versie wordt
+     gelezen uit `/api/bestanden/mijn` en niet geraden: de route weigert een
+     verouderde versie met 409, en dan meet de proef een toestandscontrole. De
+     `operationId` staat VAST in het lijf, zodat de herhaling met dezelfde sleutel
+     ook dezelfde logische handeling is -- dat is het contract van de route. */
+  '/api/bestanden/actie': async ({ post, tokenVoor }) => {
+    const up = await post('/api/bestanden/upload',
+      { naam: 'proefbestand.txt', dataUrl: 'data:text/plain;base64,cHJvZWY=' }, tokenVoor('member'));
+    const id = up && up.data && up.data.id;
+    if (!id) return { fout: 'bestanden/upload gaf ' + (up && up.status) + ' ' + ((up && up.data && up.data.error) || '') };
+    const lijst = await post('/api/bestanden/mijn', {}, tokenVoor('member'));
+    const f = ((lijst && lijst.data && lijst.data.items) || []).find(x => x && x.id === id);
+    if (!f || f.documentVersion == null) return { fout: 'het nieuwe bestand stond niet met een versie in /api/bestanden/mijn' };
+    /* `strikt`: het contract weigert elk veld dat het niet kent, dus de proef mag
+       hier geen `idem` in het lijf stoppen -- zie de STRIKTE stand in
+       ./idemproef.js. De operationId is van de vorm die het contract eist. */
+    return { strikt: true, capability: 'documents.trash', contractVersion: 1, id,
+      expectedVersion: f.documentVersion,
+      operationId: versSleutel('document').replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 100) };
   }
 };
 

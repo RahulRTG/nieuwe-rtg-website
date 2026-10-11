@@ -85,6 +85,8 @@ const EIGENAAR = {
     waarom: 'npm run trust:manifest schrijft het; keuringsregel 74 (scripts/check.js) eist dat het bij de uitvoerbare kern hoort.' },
   'LIBRARYOS.md': { soort: 'BRON', waarom: 'Handgeschreven ontwerp van LibraryOS (#502); de kernel- en HTTP-toetsen leveren het bewijs.' },
   'LIBRARYOS-RESULTAAT.md': { soort: 'BRON', waarom: 'Handgeschreven opleververslag van LibraryOS (#502).' },
+  'GEMEENSCHAP.md': { soort: 'BRON', waarom: 'Handgeschreven richtingsdocument van FoundationOS als Human & Social Infrastructure.' },
+  'GEMEENSCHAP-FASE0.md': { soort: 'BRON', waarom: 'Handgeschreven uitkomst van fase 0 van FoundationOS; de meting eronder is GROEPVORM.json.' },
   'LIBRARYOS-STUDIO-READER.md': { soort: 'BRON', waarom: 'Handgeschreven ontwerp van Studio en de private Reader (#502).' },
   'LIBRARYOS-STUDIO-READER-RESULTAAT.md': { soort: 'BRON', waarom: 'Handgeschreven opleververslag van Studio en Reader (#502).' },
   'RTG-LEARNING-LOOPS-ARCHITECTUURONDERZOEK.md': { soort: 'BRON', waarom: 'Handgeschreven architectuuronderzoek naar de leerlussen (#502).' },
@@ -160,6 +162,12 @@ const EIGENAAR = {
     waarom: 'Handmatig geschreven ontwerpstandaard (de ene desktopindeling); scripts/desktop-audit.js meet de schermen ertegen, er is geen generator die het schrijft.' },
   'BEWIJSLUS.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (de terugweg van productie naar bewijs); de namen en bronverwijzingen erin zijn met de hand gemeten, er is geen generator die het schrijft.' },
+  'AGENTS.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven projectregels voor elke agent (Codex leest dit rechtstreeks, Claude Code via CLAUDE.md); de blokken komen woordelijk uit de oude CLAUDE.md en test/agentinstructies.test.js houdt vast dat er geen verdween, er is geen generator die het schrijft.' },
+  'CLAUDE.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven ingang voor Claude Code die AGENTS.md importeert; sinds ARCHITECTOPDRACHT.md fase 1 draagt hij geen getalmerktekens meer (die staan in DOCUMENTENKAART.md), er is geen generator die het schrijft.' },
+  'ARCHITECTOPDRACHT.md': { soort: 'BRON',
+    waarom: 'Handmatig geschreven uitvoeringsopdracht voor de Architect (CODE.md par. 8, besluiten 5 en 6); de getallen erin zijn met de hand gemeten op 6 oktober 2026, er is geen generator die het schrijft.' },
   'NAVIGATIE.md': { soort: 'BRON',
     waarom: 'Handmatig geschreven richtingsdocument (de plaats-these boven PLAATS.md en KAARTEN.md); de bronverwijzingen en de nulmeting van par. 6.2 zijn met de hand in de code gelezen, er is geen generator die het schrijft.' },
   /* De nulmeting van de universele bodem (SAMENLEVING.md par. 11). De meting is
@@ -174,6 +182,9 @@ const EIGENAAR = {
     waarom: 'Handmatig geschreven grondwet (de universele bodem en SAM-01 t/m 07); de meetgetallen erin komen uit ONVERVREEMDBAAR.json en zijn met de hand overgenomen, er is geen generator die het schrijft.' },
   'LANGUAGE-AUDIT.md': { soort: 'BRON',
     waarom: 'Handmatig beoordeelde bevindingen en resterende taalgrenzen; geen automatisch gegenereerd register.' },
+  'ZERO.md': { soort: 'BRON',
+    waarom: 'de grondwet van het Zero-Debt-programma: besluiten en de ontleding van golf 0, met de hand geschreven; ' +
+      'de getallen erin zijn een gedateerde nulmeting en geen register' },
   /* De aanleiding zelf. Er is geen schrijvend script: de lijst wordt met de hand
      onderhouden en mag alleen krimpen. */
   /* De consolidatieronde van 23 september 2026: de meting (welke schermen
@@ -189,6 +200,9 @@ const EIGENAAR = {
       'het workflow waar het over gaat' },
   'AUDITOPSLAG.md': { handmatig: true, lezer: 'test/auditopslag-pg.test.js',
     waarom: 'legt de PG-stand van de auditopslag vast (A-P1-05); een besluit en geen meting, en de toets leest het document' },
+  'AUDITBOEK.md': { handmatig: true, lezer: 'test/auditboek.pg.test.js',
+    waarom: 'legt het PostgreSQL-auditboek en zijn externe verankering vast; een besluit en geen meting, en de toets ' +
+      'eist dat elk gebeurtenistype van de gesloten lijst in het document staat' },
   'BEREIK.json': { handmatig: true, lezer: 'test/bereikbaar.test.js',
     waarom: 'schuldlijst van schermen zonder klikroute; wordt met de hand bijgehouden en mag alleen krimpen. ' +
       'Precies daarom kon een nieuw script hem stil overschrijven zonder dat een schrijverscan iets zag.' },

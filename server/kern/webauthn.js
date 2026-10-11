@@ -44,43 +44,12 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     return ceremonies.pak(sleutel);
   }
 
-  /* ---- registreren: een nieuwe passkey aan het eigen account hangen ---- */
-  async function regOpties(user, hostnaam) {
-    const opties = await generateRegistrationOptions({
-      rpName: RP_NAAM, rpID: hostnaam,
-      userID: new TextEncoder().encode('rtg-' + user.id),
-      userName: user.codename || ('lid-' + user.id),       // nooit de echte naam in de authenticator
-      attestationType: 'none',
-      excludeCredentials: credsVan(user.id).map(c => ({ id: c.id, transports: c.transports })),
-      // `required` maakt dit een vindbare passkey. Daardoor kan het toestel
-      // het account aanwijzen en hoeft RTG niet eerst om een e-mailadres te
-      // vragen. Biometrie blijft volledig op het toestel.
-      authenticatorSelection: { residentKey: 'required', userVerification: 'required' }
-    });
-    zetChallenge('reg:' + user.id, opties.challenge);
-    return { status: 200, opties };
-  }
-  async function regMaak(user, antwoord, naam, origin, hostnaam) {
-    const aanvraag = pakChallenge('reg:' + user.id);
-    const challenge = aanvraag && aanvraag.challenge;
-    if (!challenge) return { status: 400, error: 'De aanvraag is verlopen; probeer het opnieuw.' };
-    if (credsVan(user.id).length >= SLEUTELS_MAX) return { status: 409, error: 'Tot ' + SLEUTELS_MAX + ' passkeys per account.' };
-    let uit;
-    try {
-      uit = await verifyRegistrationResponse({ response: antwoord, expectedChallenge: challenge,
-        expectedOrigin: origin, expectedRPID: hostnaam, requireUserVerification: true });
-    } catch (e) { return { status: 400, error: 'Geen geldige passkey: ' + e.message }; }
-    if (!uit.verified) return { status: 400, error: 'De passkey kon niet worden geverifieerd.' };
-    const c = uit.registrationInfo.credential;
-    const rij = lijsten()[user.id] = lijsten()[user.id] || [];
-    if (index().has(c.id)) return { status: 409, error: 'Deze passkey staat er al.' };
-    rij.push({ id: c.id, publicKey: b64(c.publicKey), counter: c.counter || 0,
-      transports: c.transports || [], apparaat: uit.registrationInfo.credentialDeviceType,
-      naam: schoon(naam, 40) || 'Passkey', at: new Date().toISOString() });
-    index().set(c.id, String(user.id));
-    save();
-    return { status: 200, ok: true, sleutels: publiekeLijst(user) };
-  }
+  /* Registreren (een nieuwe passkey aan het eigen account) staat in
+     ./webauthn-registratie.js; daar staat ook waarom elke uitdaging een DOEL
+     draagt. `publiekeLijst` gaat mee als getter: hij wordt hieronder pas gemaakt. */
+  const { regOpties, regMaak } = require('./webauthn-registratie')({
+    generateRegistrationOptions, verifyRegistrationResponse, credsVan, zetChallenge, pakChallenge,
+    lijsten, index, b64, save, schoon, SLEUTELS_MAX, RP_NAAM, publiekeLijst: u => publiekeLijst(u) });
 
   /* ---- inloggen met een passkey ---- */
   const loginNaam = login => String(login || '').trim().toLowerCase();

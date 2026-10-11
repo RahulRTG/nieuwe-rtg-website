@@ -22,11 +22,14 @@ const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Je helpt bij e
   'afspraken die niet in de aangeleverde gegevens staan.';
 const geenAI = { ok: false, status: 503, reden: 'De AI is nu niet bereikbaar. Probeer het zo nog eens.' };
 
-module.exports = ({ anthropic, genootschap, prikbord, bijeenkomst }) => {
+/* `lees` is de leesweergave uit ./leesweergave.js: vier leesfuncties, bevroren.
+   Deze module krijgt de domeinmodules zelf met opzet niet, zodat er geen
+   schrijffunctie binnen bereik ligt van code die met een model praat. */
+module.exports = ({ anthropic, lees }) => {
 
   async function aankondiging(sess, groepId, steekwoorden) {
-    const gr = genootschap.groepMet(groepId);
-    if (!gr || !genootschap.isLid(gr, sess.key)) return { ok: false, status: 403, reden: 'Je bent hier geen lid van.' };
+    const gr = lees.groepMet(groepId);
+    if (!gr || !lees.isLid(gr, sess.key)) return { ok: false, status: 403, reden: 'Je bent hier geen lid van.' };
     const w = String(steekwoorden || '').slice(0, 300).trim();
     if (!w) return { ok: false, reden: 'Geef me eerst een paar woorden om mee te werken.' };
     const t = await tekst(anthropic, TOON + ' Schrijf EEN aankondiging voor het prikbord, hooguit vier zinnen. ' +
@@ -37,9 +40,9 @@ module.exports = ({ anthropic, genootschap, prikbord, bijeenkomst }) => {
   }
 
   async function prikbordSamen(sess, groepId) {
-    const gr = genootschap.groepMet(groepId);
-    if (!gr || !genootschap.isLid(gr, sess.key)) return { ok: false, status: 403, reden: 'Je bent hier geen lid van.' };
-    const regels = prikbord.regels(groepId, 60);
+    const gr = lees.groepMet(groepId);
+    if (!gr || !lees.isLid(gr, sess.key)) return { ok: false, status: 403, reden: 'Je bent hier geen lid van.' };
+    const regels = lees.regels(groepId, 60);
     const t = regels.length
       ? lokaalSamenvatten(regels.join('\n'), { maxZinnen: 5, maxTekens: 900 })
       : 'Er staat nog niets op het prikbord.';
@@ -49,9 +52,9 @@ module.exports = ({ anthropic, genootschap, prikbord, bijeenkomst }) => {
   /* Welke dag past de meesten? Zowel de rekensom als de feitelijke formulering
      blijft lokaal: een model maakt tellen niet betrouwbaarder. */
   async function datumRaad(sess, groepId) {
-    const gr = genootschap.groepMet(groepId);
-    if (!gr || !genootschap.isLid(gr, sess.key)) return { ok: false, status: 403, reden: 'Je bent hier geen lid van.' };
-    const a = bijeenkomst.agenda(sess, groepId);
+    const gr = lees.groepMet(groepId);
+    if (!gr || !lees.isLid(gr, sess.key)) return { ok: false, status: 403, reden: 'Je bent hier geen lid van.' };
+    const a = lees.agenda(sess, groepId);
     if (a.error) return { ok: false, reden: a.error };
     const leden = (gr.leden || []).length;
     const gemeten = (a.komt || []).map(b => ({

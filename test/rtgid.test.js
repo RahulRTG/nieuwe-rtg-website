@@ -60,7 +60,7 @@ async function keurGoed(token, codenaam, documentDatum) {
    heeft. */
 async function passkeyVoor(token, naam) {
   const a = maakAuthenticator(rpID);
-  const o = await api('/api/webauthn/registreer/opties', {}, token);
+  const o = await api('/api/webauthn/registreer/opties', { huidig: 'geheim123' }, token);
   assert.equal(o.status, 200);
   const r = await api('/api/webauthn/registreer',
     { antwoord: a.registratieAntwoord(o.body.opties.challenge, origin), naam: naam || 'Toetssleutel' }, token);

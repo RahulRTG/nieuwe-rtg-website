@@ -59,7 +59,10 @@ module.exports = (ctx) => {
       if (in_.error) { await boekAsync({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
       seintje(c);
       return { ok: true, saldoCenten: saldoVan(iban) };
-    }, internDek ? null : { geld: 'verplaatst saldo van een rekening naar de wallet' });
+    /* Geld de wallet IN is nieuw werk op het interne saldo van RTG Pay: dezelfde
+       vrijgavepoort als daar (kern/pay/vrijgavepoort.js), na de herhaling. */
+    }, Object.assign({ poort: pay && pay.vrijgavePoort ? pay.vrijgavePoort.intern : undefined },
+      internDek ? {} : { geld: 'verplaatst saldo van een rekening naar de wallet' }));
   }
 
   /* De wallet-dekking: RTG Pay komt saldo tekort en vraagt de eigen bank om

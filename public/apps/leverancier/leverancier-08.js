@@ -54,7 +54,7 @@
     const l = overschotLijst();
     return '<div class="tkc st-hulp h-volbreed"><h3>'+T('over.h','Op de pas over')+'</h3>'+
       '<div class="tkc-who">'+T('over.deck','Te veel gemaakt? Meld het hier; elk scherm telt het van de maaklijst af en de coach zegt: gebruik eerst wat er ligt.')+'</div>'+
-      '<div class="row-gap"><select class="st-in" id="ovGerecht" class="h-flex2">'+
+      '<div class="row-gap"><select class="st-in h-flex2" id="ovGerecht">'+
         (state.menu||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')+'</select>'+
       '<input class="st-in" id="ovAantal" type="number" inputmode="numeric" min="1" value="1" style="flex:0 0 4.5rem;">'+
       '<button class="tkc-start" id="ovBij" style="flex:1;border-radius:0;">'+T('over.is','Is over')+'</button></div>'+

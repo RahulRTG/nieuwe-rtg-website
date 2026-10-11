@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-06T19:38:21.948Z",
-    "commit": "f3816ac97",
+    "op": "2026-10-11T15:08:20.384Z",
+    "commit": "b14909280",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/gastsplitsing.js",
-    "node": "v22.22.0"
+    "node": "v26.10.0"
   },
   "graad": "vermoed",
   "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
@@ -14,11 +14,10 @@
     "bestanden": 125,
     "plekken": 140,
     "perSoort": {
-      "vertakt": 23,
+      "vertakt": 24,
       "onderscheidt": 25,
       "pas-eis": 11,
-      "leden": 80,
-      "zonder-tekst": 1
+      "leden": 80
     },
     "tegenspraak": 0
   },
@@ -80,7 +79,7 @@
       "zegt": null
     },
     {
-      "plek": "server/kern/identiteit/bezitsbewijs.js:123",
+      "plek": "server/kern/identiteit/bezitsbewijs.js:131",
       "soort": "onderscheidt",
       "zegt": null
     },
@@ -150,7 +149,7 @@
       "zegt": "Een aanvraag klaarzetten kan met een lidmaatschap."
     },
     {
-      "plek": "server/opzet/diensten2.js:265",
+      "plek": "server/opzet/diensten2.js:240",
       "soort": "onderscheidt",
       "zegt": null
     },
@@ -520,7 +519,7 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/toestellen.js:22",
+      "plek": "server/routes/member/toestellen.js:30",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },
@@ -620,12 +619,12 @@
       "zegt": "RTG OV is voor leden."
     },
     {
-      "plek": "server/routes/pay.js:27",
+      "plek": "server/routes/pay.js:32",
       "soort": "leden",
       "zegt": "RTG Pay is voor leden."
     },
     {
-      "plek": "server/routes/pay.js:34",
+      "plek": "server/routes/pay.js:39",
       "soort": "onderscheidt",
       "zegt": null
     },
@@ -670,8 +669,8 @@
       "zegt": "Het Theater is voor leden."
     },
     {
-      "plek": "server/routes/theater.js:94",
-      "soort": "zonder-tekst",
+      "plek": "server/routes/theater.js:103",
+      "soort": "vertakt",
       "zegt": null
     },
     {
@@ -710,17 +709,17 @@
       "zegt": "De RTG Wallet is voor leden."
     },
     {
-      "plek": "server/server.js:526",
+      "plek": "server/server.js:531",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/server.js:1221",
+      "plek": "server/server.js:1198",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/server.js:1247",
+      "plek": "server/server.js:1224",
       "soort": "vertakt",
       "zegt": null
     }

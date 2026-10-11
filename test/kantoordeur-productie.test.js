@@ -68,7 +68,7 @@ test('echte productieserver: de kantoorcode opent niets, op naam met een passkey
   /* ---- dezelfde opslag in productie ---- */
   const { child, base } = await startServer({ env: { NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: tmp,
     APP_URL: APP + '/', SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
-    ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg', ...KEYS, RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl',
+    RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg', ...KEYS, RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl',
     STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com', STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
     TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
     RTG_ISOLATIE_AFDWINGEN: '1',
@@ -96,6 +96,8 @@ test('echte productieserver: de kantoorcode opent niets, op naam met een passkey
   const stroom = await fetch(base + '/api/office/stream?token=' + oudeCodeSessie, { headers: { 'X-Forwarded-Proto': 'https' } });
   assert.equal(stroom.status, 401, 'ook niet via een query-token');
   await stroom.body?.cancel().catch(() => {});
+  const ruil = await api('/api/stroom/ticket', { stroom: 'kantoor' }, oudeCodeSessie);
+  assert.equal(ruil.status, 401, 'en ook geen stroomticket: de ruil stelt dezelfde vraag als de deur');
 
   // 4. op naam, maar het account heeft geen passkey: dicht met de weg erheen
   const zonder = await api('/api/account/start', { rol: 'kantoor' }, lid);
@@ -105,7 +107,7 @@ test('echte productieserver: de kantoorcode opent niets, op naam met een passkey
 
   // 5. een passkey op het eigen account, en dan de ceremonie aan de kantoordeur
   const sleutel = maakAuthenticator(new URL(APP).hostname);
-  const ro = await api('/api/webauthn/registreer/opties', {}, lid);
+  const ro = await api('/api/webauthn/registreer/opties', { huidig: 'Geheim123!' }, lid);
   assert.equal(ro.status, 200, 'registratieopties: ' + JSON.stringify(ro.body).slice(0, 160));
   const rr = await api('/api/webauthn/registreer', { antwoord: sleutel.registratieAntwoord(ro.body.opties.challenge, APP),
     naam: 'Toestel kantoor' }, lid);
@@ -139,7 +141,7 @@ const TOTP = 'JBSWY3DPEHPK3PXP';
 const REGEL = /\[start\] OFFICE_CODE en OFFICE_TOTP_SECRET staan gezet maar worden in productie genegeerd \(B10\/B24\)/g;
 
 const PROD = { NODE_ENV: 'production', RTG_DEMO: '0', APP_URL: 'https://rtg.voorbeeld.test/',
-  SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
+  SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587', RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg',
   ...KEYS, RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl', RTG_ISOLATIE_AFDWINGEN: '1',
   RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1',
   // Productie start alleen met een geldige STUN- en TURN-configuratie (#444).

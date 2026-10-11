@@ -70,9 +70,11 @@ const K = { dim: '\x1b[2m', groen: '\x1b[32m', rood: '\x1b[31m', geel: '\x1b[33m
 const LADDER = [
   { id: 'snel', naam: 'Snelle bewijzen', wat: 'huisregels, statische analyse, geheimen, het contract van de keten zelf',
     patronen: [/check\.js$/, /ast-scan\.js$/, /document-fitness\.js$/, /geheimen\.js$/, /ci-keten\.js$/, /releaseketenwacht\.js$/, /ci-lokaal\.js$/,
-      /deltapoort\.js$/, /normverval\.js$/, /wetten\.js$/, /getallen\.js$/, /samenhang\.js$/, /keuring\.js$/, /codeql-verdict\.js$/, /^git diff$/] },
+      /deltapoort\.js$/, /normverval\.js$/, /wetten\.js$/, /getallen\.js$/, /samenhang\.js$/, /keuring\.js$/, /codeql-verdict\.js$/, /^git diff$/,
+      /* register tegen code, statisch en in seconden (ZERO.md golf A) */
+      /schermfunctie\.js$/] },
   { id: 'geraakt', naam: 'Wat kan deze wijziging raken', wat: 'de affected-graaf: welk bewijs moet opnieuw',
-    patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /verstrengeling\.js$/, /activering\.js$/,
+    patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /toetsroutes\.js$/, /verstrengeling\.js$/, /activering\.js$/,
       /* De Evidence Engine is dezelfde sport op bewijsniveau: basisbewijs
          vinden, impact classificeren, geselecteerd herbewijzen en fail-closed
          het eindoordeel vellen. Eén familiepatroon voorkomt een nieuwe restbak
@@ -105,7 +107,11 @@ const LADDER = [
       /build\.js$/, /zekerheid\.js$/, /bewijsmatrix\.js$/, /vertrouwen\.js$/, /versheid\.js$/, /meetronde\.js$/,
       /envelop\.js$/, /gezag\.js$/, /release-workflow-bewijs\.js$/, /^npm run afbouw:software$/] },
   { id: 'kandidaat', naam: 'Onveranderlijke kandidaat', wat: 'het image gebonden aan een digest en een handtekening',
-    patronen: [/imageherkomst\.js$/, /promotie-teken\.js$/, /external-release-teken\.js$/, /native-release\.js$/] },
+    /* kwalificatie.js: de releasekwalificatie test de BYTES van het image en
+       legt het image-ID vast; de toetsen draaien op wat uit het image komt, en
+       het gepubliceerde image moet hetzelfde ID hebben (release-image.yml). */
+    patronen: [/imageherkomst\.js$/, /artefactketen\.js$/, /promotie-teken\.js$/, /external-release-teken\.js$/, /native-release\.js$/,
+      /kwalificatie\.js$/] },
   { id: 'uitrol', naam: 'Staging, canary en productieverificatie', wat: 'de repetitie, de uitrol en de sonde erna',
     patronen: [/staging-repetitie\.js$/, /uitrol\.js$/, /productie-status\.js$/, /live-vrijgave\.js$/,
       /sonde\.js$/, /publieke-tls-proef\.js$/, /triage\.js$/, /wetwacht\.js$/, /takken\.js$/] }

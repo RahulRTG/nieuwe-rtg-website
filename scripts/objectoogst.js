@@ -39,7 +39,7 @@
    ========================================================================== */
 'use strict';
 const { start } = require('./lib/wegwerpserver');
-const { maakSleutels, haalSleutels, ROLLEN } = require('./lib/proefsleutels');
+const { haalSleutels, ROLLEN } = require('./lib/proefsleutels');
 const { bouwLijfsleutels } = require('./lib/lijfsleutels');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel, verdeelOpRol } = require('./lib/routes');
@@ -59,8 +59,7 @@ const tak = (p, d) => p.split('/').slice(0, d + 1).join('/');
       return { status: r.status, data: d };
     } catch (e) { return { status: 0, data: null }; }
   };
-  const bos = maakSleutels({ post, officeCode: 'RTG-OFFICE-PROEF' });
-  const { tokens } = await haalSleutels(bos);
+  const { tokens } = await haalSleutels({ post });
   const lij = await bouwLijfsleutels({ post, tokens, datamap: s.datamap, doosSleutel: DOOS });
   await post('/api/office/bank/leden', { aan: true }, tokens.office);
 

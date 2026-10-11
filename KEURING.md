@@ -623,3 +623,70 @@ stap, het is een richting.
 **En geen samengesteld eindoordeel.** Par. 5 geldt onverkort: er komt geen
 `PROVEN` boven deze tabel. `npm run bewijsladder` toont daarom twaalf standen en
 telt ze op tot een zin met drie getallen, niet tot een cijfer.
+
+## 8. De trap: hoe het recht om te versmallen wordt verdiend, en hoe het vervalt
+
+De hoofdregel bovenaan zegt dat versmalling een recht is dat per effect
+verdiend wordt. Deze paragraaf schrijft uit hoe dat gaat, als een trap van vier
+treden (`ARCHITECTOPDRACHT.md` fase 8). **Er wordt hier niets aangezet.** Elke
+trede is een apart besluit van de eigenaar, per domein; deze paragraaf zegt
+alleen wat er voor dat besluit gemeten moet zijn en wat het recht weer
+wegneemt.
+
+**Wat hier NIET onder valt.** Het hergebruik in `scripts/plan.js` (REUSED) is
+geen versmalling. Daar draait een toets niet opnieuw omdat al zijn invoer
+byte voor byte gelijk is aan een vertrouwde groene ronde
+(`PROOF-INCREMENTAL.md`): dat is een bewijs dat al geleverd is. De trap
+hieronder gaat over iets anders, namelijk een toets overslaan terwijl zijn invoer WEL
+veranderde, omdat een voorspelling zegt dat hij er niet toe doet. Daar zit
+het risico, en daarom moet dat recht verdiend worden.
+
+**Stand: trede 0.**
+
+| Trede | Mag | Voorwaarde, als meting | Wie het meet |
+|---|---|---|---|
+| 0 | meten, niets overslaan | vandaag | `codearchitect impact` zegt bij elke wijziging `toetsreductie: niet toegestaan` |
+| 1 | een selectie **voorstellen**, die naast de volle ronde wordt vergeleken | `TOETSROUTES.json` vastgelegd met een vol venster (5 rondes), in elke ronde `kantenZonderEigenaar` 0, en de schaduwmeters van par. 4 punt 3 lopen mee | `scripts/toetsroutes.js`, en een schaduwvergelijker die nog niet bestaat |
+| 2 | beperkt versmallen binnen **één** domein | de **mutatieproef**: een vaste set mutaties in de gewijzigde bestanden van dat domein wordt door de gekozen set gevangen, zonder er één te missen; en trede 1 heeft in dat domein over een periode nul gemiste relevante toetsen | `scripts/mutatie.js` (de operatoren en `MUTATIES.json`), per domein afgebakend met `GRENZEN.json` |
+| 3 | adaptief draaien | trede 2 houdt stand over een periode die de eigenaar bij het besluit vastlegt | dezelfde meters, over die periode |
+
+**Intrekken gaat vanzelf, toekennen nooit.** Het recht vervalt direct, en de
+volle ronde draait, zodra een van deze dingen waar is. Daar komt geen besluit
+aan te pas:
+
+- de gekozen set mist één mutatie uit de vaste set;
+- een relatie waar de selectie op leunt, is `mogelijk-verouderd` (de versheid
+  in `scripts/toetsroutes.js`: een toets, servercode, scherm of pakket
+  veranderde na de laatste ronde);
+- een ronde had kanten zonder eigenaar, zodat niet vast te stellen is welke
+  toets een route raakte;
+- de impact is onvolledig: een gewijzigd pad staat buiten de graaf (de wet
+  `keuring-ontbrekende-meting-is-streng`, uitgeschreven door
+  `scripts/lib/keuringreden.js`);
+- de bewijsmachine zelf veranderde (`bewijsmachine-gewijzigd` in
+  `scripts/plan.js`).
+
+Toekennen vraagt altijd een besluit. Een meter die vindt dat het tijd is,
+mag dat zeggen (`codearchitect context` doet dat al in de schaduw), maar
+mag het recht niet zelf nemen. Een agent al helemaal niet (`CODE.md` par. 8,
+besluit 6 punt 4).
+
+**Wat er voor trede 1 nog ontbreekt.** Op het moment van schrijven:
+
+- **`TOETSROUTES.json` staat niet in de repository.** CI stelt hem per ronde
+  samen, maar er is nog geen enkele vastgelegd. Dat is 0 van de 5 rondes. Tot
+  dat er is, kan geen enkele relatie `actueel` zijn en is elke selectie een
+  gok.
+- **De schaduwvergelijker bestaat niet.** De drie meters van par. 4 punt 3 zijn
+  hiervoor nodig: een gezakte relevante toets die niet gepland was (moet nul
+  zijn), de recall over waargenomen kanten, en het aandeel beslissingen dat
+  niet te verklaren viel.
+- **De vaste mutatieset per domein is niet afgebakend.** De mutatiemotor meet
+  per toets en niet per domein. Trede 2 vraagt een set die bij het besluit
+  wordt vastgelegd, zodat hij niet achteraf bij de uitslag kan worden
+  aangepast.
+
+`test/versmaltrap.test.js` houdt twee dingen vast: elk instrument dat deze
+paragraaf noemt, bestaat; en de stand is trede 0, wat betekent dat geen
+selectie- of uitvoeringscode de Architect of de toetsroutekaart leest om iets
+over te slaan.

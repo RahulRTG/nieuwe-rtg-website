@@ -30,7 +30,7 @@
   var bron = null;
   function luister() {
     if (bron || !window.EventSource || !token) return;
-    try { bron = new EventSource('/api/stream?token=' + encodeURIComponent(token)); } catch (e) { return; }
+    try { bron = RTGStroom.open('/api/stream', { token: token }); } catch (e) { return; }
     bron.addEventListener('meet', function (e) {
       var d; try { d = JSON.parse(e.data || '{}'); } catch (err) { return; }
       if (window.RTGMeetKamer) window.RTGMeetKamer.opSein(d);
@@ -110,9 +110,11 @@
     api('kom', toegang).then(function (r) {
       if (r.body.error) return meld(r.body.error);
       luister();
-      window.RTGMeetKamer.start({ api: function (pad, body) {
+      var kamerApi = function (pad, body) {
         return api(pad, body).then(function (x) { if (x.body.error) throw new Error(x.body.error); return x.body; });
-      }, meld: meld, kamer: r.body.kamer, deelcode: deelcode || null, ik: r.body.ik, opWeg: laad });
+      };
+      kamerApi.t = token; // kamer.js haalt er de ICE-servers mee op (TURN alleen met een sessie)
+      window.RTGMeetKamer.start({ api: kamerApi, meld: meld, kamer: r.body.kamer, deelcode: deelcode || null, ik: r.body.ik, opWeg: laad });
     });
   }
 

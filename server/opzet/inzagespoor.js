@@ -40,7 +40,20 @@ module.exports = function sluitInzagespoorAan({ db, save, bijeen, inBundel, pers
      aan te tonen (zie db/bijeen.js: er wordt alleen gegooid als bevestigen
      MOGELIJK was en toch mislukte). De regel draagt dan `vast: false` met de
      reden erbij, in plaats van een bevestiging die niemand heeft gegeven. */
+  /* En in PostgreSQL-modus BINNEN een verzoek wel: daar staat de regel alleen in
+     PostgreSQL als de transactie slaagt die ook het antwoord draagt -- de
+     requestcommit, of een vroege commit die het spoor meeneemt
+     (db/verzoekspoor.js). Een opgeslagen regel met `vast: true` is daar dus
+     waar; hier stond `vast: false` op elke inzage terwijl de regel en de
+     inzage samen vaststonden of samen niet (audit P0-1). Buiten een verzoek
+     weigert lib/duurzaam.js al vooraf. */
+  const verzoekBevestigt = () => {
+    try {
+      return require('../db/opslag').STORE === 'postgres' &&
+        require('../db/verzoekvak').commitVoorAntwoord();
+    } catch (e) { return false; }
+  };
   require('../inzagelog').zet(db, save, vastleggen,
-    () => (typeof persistentieStand === 'function' ? persistentieStand() !== null : true));
+    () => (typeof persistentieStand === 'function' ? persistentieStand() !== null : true) || verzoekBevestigt());
   return vastleggen;
 };

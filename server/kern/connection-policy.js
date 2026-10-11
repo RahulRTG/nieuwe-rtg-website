@@ -19,6 +19,14 @@
 'use strict';
 
 const CONTRACT = require('./connection-policy.json');
+const relaystand = require('./rtc/relaystand');
+
+/* PROVIDER READINESS wordt hier GELEZEN, nooit uit `state` overgenomen: wie
+   beslis() aanroept (een route, een productkern, een tenant) kan dus niet
+   meegeven dat het relais gereed is. Elke provider heeft precies een lezer. */
+const PROVIDERS = Object.freeze({
+  'rtc-relay': () => relaystand.stand()
+});
 
 const REDENEN = Object.freeze({
   PRODUCT_UNKNOWN: 'Dit Connection-product bestaat niet.',
@@ -30,8 +38,16 @@ const REDENEN = Object.freeze({
   IDENTITY_REQUIRED: 'Verifieer eerst uw identiteit.',
   AGE_REQUIRED: 'Deze functie is uitsluitend voor geverifieerde leden van 18 jaar en ouder.',
   BLOCKED: 'Dit contact is geblokkeerd.',
-  RAHUL_DENY: 'Rahul heeft hier niet meer rechten dan het lid.'
+  RAHUL_DENY: 'Rahul heeft hier niet meer rechten dan het lid.',
+  KILL_SWITCH: 'Deze functie staat tijdelijk uit.',
+  PROVIDER_NOT_READY: 'Bellen is nu niet beschikbaar: de verbinding via het RTG-relais is niet aantoonbaar gereed.'
 });
+
+/* Een onbekende provider of een lezer die gooit is NIET gereed. */
+function leesProvider(naam) {
+  const lezer = PROVIDERS[naam];
+  try { return lezer ? lezer() : null; } catch (e) { return null; }
+}
 
 function connectionWeiger(code, extra) {
   return { allow: false, code, reden: REDENEN[code], ...(extra || {}) };
@@ -56,6 +72,9 @@ function connectionBeslis({ actor, product, capability, state, _delegated }) {
   const c = CONTRACT.capabilities[capability];
   if (!c) return connectionWeiger('CAPABILITY_UNKNOWN');
   if (!c.implemented) return connectionWeiger('NOT_IMPLEMENTED');
+  const providerStand = c.provider ? leesProvider(c.provider) : null;
+  if (providerStand && providerStand.reden === 'RTC_KILL_SWITCH')
+    return connectionWeiger('KILL_SWITCH', { provider: c.provider });
   const actors = p.capabilities[capability];
   if (!actors) return connectionWeiger('PRODUCT_DENY');
   const s = state && typeof state === 'object' ? state : {};
@@ -67,11 +86,19 @@ function connectionBeslis({ actor, product, capability, state, _delegated }) {
 
   if (!actors.includes(actor)) return connectionWeiger('ACTOR_DENY');
   const projection = projectieVan(p, capability, actor, c);
-  if (actor === 'office') return { allow: true, code: 'ALLOW', domainState: c.domainState.slice(), projection };
 
-  if (!pasOpen(p, s.pass)) return connectionWeiger('PASS_REQUIRED');
-  if (!s.verified) return connectionWeiger('IDENTITY_REQUIRED');
-  if (!s.adult) return connectionWeiger('AGE_REQUIRED');
+  /* Kwalificatie (pas, identiteit, leeftijd) gaat voor providergereedheid,
+     en providergereedheid geldt voor ELKE actor, ook het kantoor: een relais
+     dat niet werkt, werkt voor niemand. Elke stap kan alleen weigeren. */
+  if (actor !== 'office') {
+    if (!pasOpen(p, s.pass)) return connectionWeiger('PASS_REQUIRED');
+    if (!s.verified) return connectionWeiger('IDENTITY_REQUIRED');
+    if (!s.adult) return connectionWeiger('AGE_REQUIRED');
+  }
+  if (c.provider && (!providerStand || providerStand.beschikbaar !== true))
+    return connectionWeiger('PROVIDER_NOT_READY', { provider: c.provider,
+      oorzaak: providerStand ? providerStand.reden : 'PROVIDER_ONBEKEND' });
+  if (actor === 'office') return { allow: true, code: 'ALLOW', domainState: c.domainState.slice(), projection };
 
   /* Rahul krijgt eerst zijn expliciete productregel en daarna exact dezelfde
      voordeurbeslissing als het lid. `_delegated` voorkomt recursie en is niet

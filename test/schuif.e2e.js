@@ -27,6 +27,7 @@
    Draait alleen waar Playwright beschikbaar is; anders overgeslagen.
    Draai: npm run e2e */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const { startServer, stop, laadPlaywright, wachtOpRust } = require('./helper');
 const fs = require('fs');
@@ -49,7 +50,7 @@ function foundationSchermen() {
   return fs.readdirSync(map).filter((f) => f.endsWith('.html')).map((f) => f.replace(/\.html$/, '')).sort();
 }
 
-test('geen enkel Foundation-scherm schuift zijwaarts op een telefoon', { skip: !pw && 'Playwright niet beschikbaar' }, async () => {
+test('geen enkel Foundation-scherm schuift zijwaarts op een telefoon', { skip: vereist('browser', !!pw, 'Playwright niet beschikbaar') }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;

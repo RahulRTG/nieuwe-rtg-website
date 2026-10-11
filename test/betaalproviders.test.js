@@ -91,6 +91,7 @@ test('ook een interne taak kan het pay-grootboek in de uit-stand niet bewegen', 
       dienIn: async () => ({ status: 'nooit' }) };
     const { pay } = require('../server/kern/pay')({
       db, save() {}, bijeen: async werk => werk(), crypto, betaal: {},
+      vrijgave: require('../scripts/lib/proefvrijgave').proefVrijgave(),
       keyVanCodenaam: () => null, sseToCustomer() {}, schoon: x => String(x || ''),
       betaaldienstKosten: () => 0, betaalOpdrachten: opdrachten,
       // eigen db.data: de losse historie, zie server/kern/pay/loshistorie.js

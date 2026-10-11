@@ -83,6 +83,8 @@ module.exports = function betaalBuiten(ctx) {
     if (bestaandSlot) return res.status(bestaandSlot.status).json(bestaandSlot);
     const open = horeca.openstaand(rek);
     if (open <= 0) return res.status(409).json({ error: 'Er staat niets meer open.', code: 'niets-open' });
+    // terug- en webhookadres komen nooit uit een kop van de aanvrager (lib/linkbasis.js)
+    if (!appUrl(req)) return res.status(503).json({ error: require('../../lib/linkbasis').ONTBREEKT, code: 'app-url-ontbreekt' });
     let w;
     try {
       w = betaalWaarheid.maak({ actor: handle, idem: String(b.idem || ''),

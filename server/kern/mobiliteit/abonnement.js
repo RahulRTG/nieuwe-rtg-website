@@ -23,6 +23,8 @@
 
 const PERIODE_MAX = 366;
 
+const { maakSleutel } = require('../../db/economische-identiteit');
+
 module.exports = (ctx) => {
   const { db, save, crypto, id, schoon, nu, codenaamVan, pay, findSupplier,
     modAan, overeenkomstVoor, magVerkopen, notify, ensureKaartjes, kaartenVan, opslag } = ctx;
@@ -71,13 +73,19 @@ module.exports = (ctx) => {
         idem: body.idem ? 'abolaad:' + schoon(body.idem, 60) : undefined });
       if (l.error) return { status: l.status || 402, error: l.error };
     }
+    /* De aankoop krijgt haar id VOOR de boeking, en de sleutel hangt eraan:
+       met een idem van de client is een herhaling dezelfde aankoop, zonder is
+       elke aankoop er een (zoals altijd), nu met een sleutel die de motor kent. */
+    const aankoopId = id('ab');
     const b = await pay.boekAsync({ van: rek, naar: 'partner:' + zaak.code, centen: prijs, soort: 'ovabo',
-      oms: 'Abonnement ' + zaak.name + ' · ' + dagen + ' dagen' });
+      oms: 'Abonnement ' + zaak.name + ' · ' + dagen + ' dagen', ref: aankoopId,
+      economischeSleutel: maakSleutel('pay-handeling', body.idem
+        ? ['ovabo', codenaam, schoon(body.idem, 60)] : ['ovabo', aankoopId]) });
     if (b.error) return { status: b.status || 400, error: b.error };
 
     const start = new Date();
     const a = {
-      id: id('ab'),
+      id: aankoopId,
       key: session.key, codenaam,
       vervoerder: zaak.code, vervoerderNaam: zaak.name,
       product: 'abonnement',

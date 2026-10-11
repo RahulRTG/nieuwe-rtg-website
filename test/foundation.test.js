@@ -9,7 +9,7 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, stroomAdres } = require('./helper');
 
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtf-'));
@@ -443,8 +443,14 @@ test('gezinsagenda en klusjes: plannen samen en sterren verdienen', async () => 
   assert.equal((await fetch(BASE + '/api/foundation/gezin/' + g.code + '/klussen', { headers: { Authorization: 'Bearer ' + gt } })).status, 403);
 });
 
-test('WebRTC: de app krijgt ijs-servers (STUN) voor het bellen', async () => {
-  const d = await json(await fetch(BASE + '/api/ice'));
+test('WebRTC: een gezinslid krijgt ijs-servers (STUN) voor het bellen, een vreemde geen sessie', async () => {
+  const g = await json(await api('/gezin/maak', { gezinsnaam: 'IJs', naam: 'Ma', pin: '2020' }));
+  const r = await fetch(BASE + '/api/foundation/gezin/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: g.code, token: g.token }) });
+  assert.equal(r.status, 200);
+  assert.equal((await fetch(BASE + '/api/foundation/gezin/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: g.code, token: 'nep' }) })).status, 403);
+  const d = await json(r);
   assert.ok(Array.isArray(d.iceServers) && d.iceServers.length >= 1, 'er is minstens een ICE-server');
   assert.ok(JSON.stringify(d.iceServers).includes('stun:'), 'STUN staat aan');
 });
@@ -640,7 +646,7 @@ test('cross-app bellen: RTG en RTF sturen belsignalen over en weer via het live-
   await raw('/rtf/social/respond', { code: g.code, token: g.token, key: verzoek.key, action: 'accept' });
   const rtgKey = verzoek.key; // handle van het RTG-lid
 
-  const rtgStream = await openStream(BASE + '/api/stream?token=' + encodeURIComponent(rtgTok));
+  const rtgStream = await openStream(await stroomAdres(BASE, '/api/stream', rtgTok));
   const ticket = (await json(await api('/gezin/stroom/ticket', { code: g.code, token: g.token, kanaal: 'sociaal' }))).ticket;
   const rtfStream = await openStream(BASE + '/api/rtf/social/stream?code=' + encodeURIComponent(g.code) + '&ticket=' + encodeURIComponent(ticket));
   try {
@@ -688,7 +694,7 @@ test('realtime herstel: gemiste belsignalen worden opnieuw afgespeeld na herverb
 
   // het lid verbindt (opnieuw) met since=1: de gemiste signalen worden nagestuurd
   const ac = new AbortController();
-  const res = await fetch(BASE + '/api/stream?token=' + encodeURIComponent(rtgTok) + '&since=1', { signal: ac.signal });
+  const res = await fetch(await stroomAdres(BASE, '/api/stream', rtgTok, { extra: '&since=1' }), { signal: ac.signal });
   const reader = res.body.getReader(); const dec = new TextDecoder(); let buf = '', calls = 0;
   const t0 = Date.now();
   while (Date.now() - t0 < 800) {

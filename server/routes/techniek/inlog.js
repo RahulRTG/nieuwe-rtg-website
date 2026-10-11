@@ -32,11 +32,24 @@
    andersom ruilt deze deur geen gewoon inlogbewijs om. De rem op de code is
    die van ../../kern/identiteit/tweedestap-rem.js, gedeeld met de andere deuren.
 
+   EN EEN UITGEZET ACCOUNT KRIJGT HIER NIETS (N31 van de V1-audit, besluit van
+   de eigenaar). Stap een keek niet naar `actief`: een account dat de
+   organisatie uit dienst had gemeld (SCIM) kreeg na het juiste wachtwoord een
+   tech2-bewijs, of zonder tweede factor meteen een techniektoken. Sinds N20
+   telt zo'n bewijs bij het eerste gebruik niet meer, maar de deur had het dan
+   al uitgegeven. Nu weigert stap een met het antwoord van een fout wachtwoord,
+   om dezelfde reden als bij een account zonder recht: anders zegt het verschil
+   dat het wachtwoord klopte. Het telt mee in de rem, en de echte reden gaat
+   naar het veiligheidsbord. "Uitgezet" is accounts.isActief, dus de ene
+   opvatting uit ../../accounts/sessiegrens.js en geen eigen vergelijking.
+
    Afgesplitst uit routes/techniek.js toen die de 10 KB passeerde. */
 module.exports = (tctx) => {
   const { app, accounts, beveilig, magInzien, isEigenaar, tooManyTries, noteFailedTry, loginFails, kern } = tctx;
   const tweefactor = kern && kern.tweefactor, rem = tweefactor && tweefactor.rem;
   if (!tweefactor || !rem) throw new Error('techniek/inlog: zonder tweefactor en zijn rem kan deze deur de tweede factor niet vragen');
+  // zonder deze vraag zou een uitgezet account hier stil weer binnenkomen
+  if (typeof accounts.isActief !== 'function') throw new Error('techniek/inlog: zonder accounts.isActief kan deze deur een uitgezet account niet weigeren');
   const sessie = (user) => ({ token: accounts.issueToken(user.id, 1), eigenaar: isEigenaar(user), naam: accounts.realNameOf(user) });
 
   /* De tweede stap: bewijs uit stap een plus een code. */
@@ -66,6 +79,18 @@ module.exports = (tctx) => {
       if (beveilig) beveilig.meld('tech-login-mislukt', 'waarschuwing',
         'Mislukte inlogpoging op de technische pagina (login: ' + String(req.body.login || '').slice(0, 40) + ').',
         { bron: req.ip });
+      return zelfde();
+    }
+    /* UIT DIENST GEMELD: dicht, met het antwoord van een fout wachtwoord. Voor
+       de toegangslijst, want het gaat over het account en niet over deze
+       pagina. Ook dit telt mee voor de rem, en het bord krijgt de echte reden
+       op de identiteitssleutel, net als hieronder. Kritiek: iemand heeft het
+       juiste wachtwoord van een account dat uit dienst is. */
+    if (!accounts.isActief(user)) {
+      noteFailedTry(bucket, req.ip);
+      if (beveilig) beveilig.meld('tech-login-uitgezet', 'kritiek',
+        'Account user-' + user.id + ' logde correct in maar staat op non-actief (uit dienst gemeld door de organisatie).',
+        { bron: 'user:' + user.id });
       return zelfde();
     }
     if (!magInzien(user)) {

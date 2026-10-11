@@ -46,6 +46,7 @@
    ========================================================================== */
 /* LET OP -- deze toets vraagt de database VOOR ZICHZELF (zie leden-gids-pg). */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
@@ -53,7 +54,7 @@ const path = require('path');
 const { startServer, stop, stopNet } = require('./helper');
 
 const HEEFT_PG = !!(process.env.DATABASE_URL || process.env.PG_URL);
-const OVERSLAAN = HEEFT_PG ? false : 'geen DATABASE_URL: de duurzaamheid van de opslaglaag is alleen in Postgres-modus te toetsen';
+const OVERSLAAN = vereist('pg', !!HEEFT_PG, 'geen DATABASE_URL: de duurzaamheid van de opslaglaag is alleen in Postgres-modus te toetsen');
 const KYC_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
 function api(base, pad, body, token) {

@@ -607,7 +607,9 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        pasToe() aanwijst, met bestandsnaam erbij. Bij de knip zijn de
        bestandsnaam en de handhaverlijst meeverhuisd naar boeken.js en is de
        regel zelf letterlijk gelijk gebleven -- anders wijst de wet naar een
-       verplaatste regel en toetst ze niets meer. */
+       verplaatste regel en toetst ze niets meer. Die schrijfweg woont inmiddels
+       in ./boeking.js; boeken.js was een dode kopie met een sleutelloze
+       boekAsync en is op 6 oktober 2026 verwijderd. */
     /* DERTIEN REGELS STONDEN HIER EN ZIJN ER WEER AF, en ze stonden er te lang.
        De communicatiekern en wat eraan vastzit (comm/index, comm/wie, de twee
        comm-deuren, auth, vergeten), de zes van de werkplaats-ronde
@@ -875,6 +877,52 @@ console.log('\n15) id\'s in de client uit de CSPRNG, niet uit de klok of Math.ra
     }
   });
   if (!mist) ok(pag + ' pagina\'s die RTGId gebruiken laden shared/id.js (zonder defer)');
+}
+
+/* 15b) wie RTGStroom gebruikt, laadt shared/stroom.js -- zonder defer.
+
+   Dezelfde vorm als de tweede helft van regel 15, om dezelfde reden. Sinds een
+   live-stroom en een <video> geen sessie meer in het adres dragen (POST
+   /api/stroom/ticket, server/kern/sessiestroom.js), opent elk scherm zijn
+   stroom via RTGStroom. Ontbreekt de helper op een pagina, dan geeft
+   `RTGStroom.open` een ReferenceError die in een try wordt opgevangen -- en dan
+   is de stroom er gewoon niet, zonder melding. Dat is het stille gat dat deze
+   regel dichthoudt. De metgezel laadt hem zelf pas als hij een stroom opent
+   (hij staat op bijna elk scherm en opent er bijna nooit een); die roept
+   RTGStroom daarom nooit rechtstreeks aan en valt hier niet onder. */
+console.log('\n15b) wie RTGStroom gebruikt, laadt shared/stroom.js (zonder defer)');
+{
+  const gebruikers = new Set();
+  loop(path.join(ROOT, 'public'), /\.(js|html)$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/') || rel === 'public/shared/stroom.js') return;
+    if (/\bRTGStroom\.\w+\s*\(/.test(fs.readFileSync(f, 'utf8'))) gebruikers.add(rel.replace(/^public\//, ''));
+  });
+  let mist = 0, pag = 0;
+  loop(path.join(ROOT, 'public'), /\.html$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/')) return;
+    const bron = fs.readFileSync(f, 'utf8');
+    const eigen = rel.replace(/^public\//, '');
+    const map = path.posix.dirname(eigen);
+    let nodig = gebruikers.has(eigen);
+    for (const m of bron.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)) {
+      const src = m[1].split('?')[0];
+      const doel = src.startsWith('/') ? src.slice(1) : path.posix.normalize(path.posix.join(map, src));
+      if (gebruikers.has(doel)) nodig = true;
+    }
+    if (!nodig) return;
+    pag++;
+    if (!/<script[^>]*\ssrc="\/shared\/stroom\.js"/.test(bron)) {
+      mist++;
+      fout('RTGStroom zonder /shared/stroom.js: ' + rel + ' -- laad hem in (zonder defer, vooraan)');
+    } else if (/<script[^>]*\ssrc="\/shared\/stroom\.js"[^>]*\s(defer|async)/.test(bron)) {
+      mist++;
+      fout('stroom.js met defer/async: ' + rel + ' -- dan is RTGStroom er niet als het scherm zijn stroom opent');
+    }
+  });
+  if (!gebruikers.size) fout('geen enkel scherm gebruikt RTGStroom -- dan meet deze regel niets (keuringsregel 15b)');
+  else if (!mist) ok(pag + ' pagina\'s die RTGStroom gebruiken laden shared/stroom.js (zonder defer)');
 }
 
 /* 16) een pad met een DERDE PARTIJ gaat langs de gegevenspoort.
@@ -2021,47 +2069,24 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
   const { PUBLIEK, POORTWACHT } = require('./lib/publiek');
 
   let gaten = 0, viaMw = 0, viaBinnen = 0, totaal = 0;
-  /* DE STAART NIET MEE-MATCHEN. Hier stond ([\s\S]{0,800}) in het patroon zelf,
-     en dat CONSUMEERT die 800 tekens: exec() zoekt daarna verder voorbij de
-     staart en slaat elke route over die er binnen valt. Uitkomst: 709 van de
-     ~1900 routes bekeken, en netjes "alles in orde" gemeld. Een regel die een
-     fractie ziet en volledigheid suggereert is precies wat deze regel moet
-     tegenhouden -- gevonden doordat een mutatie NIET beet (LAT.md regel 2). */
-  const RE = /app\.(get|post|put|delete|patch)\(\s*['"](\/api\/[^'"]*)['"]\s*,/g;
+  /* HET OORDEEL PER ROUTE staat in ./lib/poortoordeel.js, met de uitleg over
+     het patroon, het venster en de kale 401 erbij: zo kan een toets het op
+     een paar regels bron nagaan (test/poortoordeel.test.js) zonder deze hele
+     keuring te draaien. Hier blijven het lezen, de tellers en de melding. */
+  const { beoordeelBron } = require('./lib/poortoordeel');
   const gezien = new Set();        // publieke paden die de lijst echt nodig hadden
   const bestaat = new Set();       // alle /api-paden die we tegenkwamen
   loop(path.join(ROOT, 'server'), /\.js$/, f => {
     const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
-    let m;
-    while ((m = RE.exec(bron))) {
+    for (const r of beoordeelBron(bron, { poortMw: POORT_MW, poortBinnen: POORT_BINNEN, publiek: PUBLIEK })) {
       totaal++;
-      const pad = m[2];
-      /* HET VENSTER STOPT BIJ DE VOLGENDE ROUTE. Zonder die knip keek deze
-         regel 800 tekens vooruit en liep daarmee de BUURMAN in: een route zonder
-         poort werd goedgekeurd omdat de route eronder ergens een 401 teruggaf.
-         Precies dat gebeurde bij /api/aanmeld/start, en het kwam pas aan het
-         licht doordat een `await` van zes tekens de 401 van de buurman net
-         buiten het venster duwde -- een groene regel die aan een toevallige
-         tekstafstand hing. Valse goedkeuring is bij deze regel de gevaarlijke
-         richting; een venster dat over de grens kijkt is er een bron van. */
-      const ruw = bron.slice(m.index + m[0].length, m.index + m[0].length + 800);
-      const volgende = ruw.search(/app\.(get|post|put|delete|patch)\(\s*['"]/);
-      const staart = volgende > 0 ? ruw.slice(0, volgende) : ruw;
-      bestaat.add(pad);
-      const knip = staart.search(/=>|function\s*\(/);
-      const voor = knip > 0 ? staart.slice(0, knip) : staart.slice(0, 80);
-      if ([...voor.matchAll(/([A-Za-z_$][\w$]*)/g)].some(x => POORT_MW.has(x[1]))) { viaMw++; continue; }
-      /* EERST TE SLIM GEWEEST. Hier stond ook een heuristiek op "staat er
-         idToken/token/sleutel/code in het lijf" als bewijs van een poort. Dat
-         keurde meteen een handvol routes goed die alleen een BEDRIJFSCODE uit
-         de body lezen -- en dat is geen geloofsbrief. Valse goedkeuring is de
-         gevaarlijke richting bij deze regel: een gemiste melding is stil.
-         Routes die hun bewijs echt in het lijf dragen (RTG iD met een idToken)
-         staan nu bij naam op de publieke lijst, met die reden erbij. */
-      if (POORT_BINNEN.test(staart) || /\b(401|403)\b/.test(staart)) { viaBinnen++; continue; }
-      if (PUBLIEK.has(pad)) { gezien.add(pad); continue; }
+      bestaat.add(r.pad);
+      if (r.gezien) gezien.add(r.pad);
+      if (r.soort === 'poortwachter') { viaMw++; continue; }
+      if (r.soort === 'binnen' || r.soort === 'kaal') { viaBinnen++; continue; }
+      if (r.soort === 'publiek') continue;
       gaten++;
-      fout(path.relative(ROOT, f) + ': ' + pad + ' heeft geen poort en staat niet op de publieke lijst' +
+      fout(path.relative(ROOT, f) + ': ' + r.pad + ' heeft geen poort en staat niet op de publieke lijst' +
         ' -- zet er een poortwachter voor, of neem hem met een REDEN op in PUBLIEK (check.js regel 28)');
     }
   });
@@ -2201,7 +2226,11 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
     .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
     .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
   const KOP = /req\.get\(\s*['"]authorization['"]\s*\)|req\.headers\s*\[\s*['"]authorization['"]\s*\]|req\.headers\.authorization/i;
-  const VERIFIER = /\b(verifyToken|resolveSession|sessionFor|veiligGelijk|verifyActionToken|magAi|scimSleutelOk|apiSleutelOk|magMeten|vanSleutel|accounts\.\w+)\s*\(/;
+  /* `officeQueryMag`/`officeQueryOpNaam` (routes/office.js) zijn sessionFor en
+     verifyToken achter een naam; `sessiestroom.geef` (kern/sessiestroom.js) geeft
+     pas een stroomticket nadat de deur van de gevraagde soort het token heeft
+     goedgekeurd -- dezelfde vraag als die deur stelt. */
+  const VERIFIER = /\b(verifyToken|resolveSession|sessionFor|veiligGelijk|verifyActionToken|magAi|scimSleutelOk|apiSleutelOk|magMeten|vanSleutel|officeQueryMag|officeQueryOpNaam|sessiestroom\.geef|accounts\.\w+)\s*\(/;
   const VENSTER = 12;   // regels waarbinnen de verificatie moet volgen
   /* Plekken die de kop bewust lezen zonder te verifieren. Vandaag leeg, en dat
      hoort zo te blijven: wie hier iets toevoegt legt uit waarom betasten hier
@@ -2282,6 +2311,59 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
   });
   if (!los) ok(gekeurd + ' plekken lezen de Authorization-kop, en elk daarvan verifieert het token (' +
     MAG_BETASTEN.size + ' benoemd als uitzondering)');
+}
+
+/* 29b) een sessie of bearer staat nooit in een adres.
+
+   Een adres staat in proxy- en serverlogs, in de browsergeschiedenis en in een
+   Referer. Toch reisde de volledige sessie (dertig dagen geldig) als ?token=
+   naar vijf deuren -- /api/stream, de zaak- en kantoorstroom, de theaterdeur en
+   de paspoortscan -- en lazen drie middlewares hem als terugval uit de query.
+   Een live-stroom of <video> opent nu met een stroomticket (POST
+   /api/stroom/ticket, server/kern/sessiestroom.js), een <img> haalt zijn bestand
+   met fetch en de kop.
+
+   Twee helften, en ze vangen elk een andere kant:
+   - SERVER: geen enkele module leest een token uit req.query (`req.query.token`,
+     `req.query.leraarToken`, `req.query['token']`, of uitgepakt uit req.query).
+     Alleen de AANWEZIGHEIDSvraag mag (`req.query.token !== undefined`): die
+     bestaat juist om zo'n verzoek met 401 te weigeren.
+   - SCHERMEN: geen enkele bron in public/ bouwt een adres met `?token=` of
+     `&token=` (of een ander ...Token=). Een fragment (`#...`) gaat niet naar de
+     server en telt niet. Commentaar telt niet -- een toelichting is geen adres.
+   Een stroomticket (`?ticket=`) is precies de uitweg en valt er dus buiten. */
+console.log('\n29b) een sessie of bearer staat nooit in een adres');
+{
+  const zonder = (t) => String(t).replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1')
+    .replace(/<!--[\s\S]*?-->/g, ' ');
+  const NAAM = '(?:token|[A-Za-z]+Token|bearer|sessie)';
+  const LEES = new RegExp('req\\.query(?:\\.' + NAAM + '\\b|\\[\\s*[\'"]' + NAAM + '[\'"]\\s*\\])(?!\\s*[!=]==\\s*undefined)', 'g');
+  const UITGEPAKT = new RegExp('\\{[^{}]*\\b' + NAAM + '\\b[^{}]*\\}\\s*=\\s*req\\.query\\b', 'g');
+  const ADRES = new RegExp('[\'"`][^\'"`\\n#]*[?&]' + NAAM + '=', 'g');
+  let server = 0, scherm = 0, bekeken = 0;
+  loop(path.join(ROOT, 'server'), /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    const bron = zonder(fs.readFileSync(f, 'utf8'));
+    bekeken++;
+    for (const re of [LEES, UITGEPAKT]) for (const m of bron.matchAll(re)) {
+      server++;
+      fout(rel + ' leest een token uit het adres (' + m[0].slice(0, 60) + ') -- een sessie hoort in de kop ' +
+        'Authorization; een stroom opent met een stroomticket (server/kern/sessiestroom.js)');
+    }
+  });
+  const bundel = new Set(Object.keys(require('./bundel').bundels).map(k => 'public/' + k));
+  loop(path.join(ROOT, 'public'), /\.(js|html)$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/') || bundel.has(rel)) return;   // bundeluitvoer = de som van zijn delen
+    const bron = zonder(fs.readFileSync(f, 'utf8'));
+    bekeken++;
+    for (const m of bron.matchAll(ADRES)) {
+      scherm++;
+      fout(rel + ' zet een token in een adres (' + m[0].slice(0, 60) + ') -- gebruik RTGStroom.open, ' +
+        'RTGStroom.kijk of fetch met de kop Authorization (shared/stroom.js)');
+    }
+  });
+  if (!server && !scherm) ok(bekeken + ' bestanden bekeken: geen token uit req.query, geen token in een adres');
 }
 
 /* 30) een schermtoets luistert naar paginafouten via het gedeelde hulpje.
@@ -3433,7 +3515,8 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
     ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],
     ['server/opzet/lijfpoort.js', 'bouwt de duurzame vastlegger voor het kritiekspoor: een geldhandeling, privacyexport of machtiging gaat pas door als de regel `toegestaan` aantoonbaar staat (A-P1-05)'],
-    ['server/kern/pay/index.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed'],
+    ['server/kern/pay/idemlaag.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed (de idem-laag van RTG Pay; stond op kern/pay/index.js tot die op 7 oktober 2026 is geknipt -- VERPLAATST, niet gegroeid)'],
+    ['server/betaal/connect/index.js', 'geld naar een partner: een afrekening staat duurzaam op schijf VOOR Stripe wordt aangeroepen, en een Connect-melding krijgt pas 200 als haar stand en boeking vaststaan -- anders weet de veeg na een herstart niet wat er al vertrok (7 oktober 2026)'],
     ['server/kern/economie/runtime/index.js', 'economische waarheid: intent, ledger en evidence worden vóór bevestiging als één bundel vastgelegd'],
     ['server/kern/fonds.js', 'fondsallocatie: een bevestigde verdeling mag niet na een herstart verdwijnen'],
     ['server/kern/factuurcorrectie.js', 'geld terug naar een lid: de terugboeking en de correctieregel horen als een duurzame commit op schijf, net als de heenweg in kern/factuursaldo.js -- een lid dat "terugbetaald" leest terwijl de opslag het nog niet heeft, is precies de halve uitkomst waar de factuurproef voor is gebouwd'],
@@ -3648,7 +3731,7 @@ console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
    op, en na drie loze alarmen zet iemand de poort uit. Dat is exact het patroon
    van de vals-alarmronde in scripts/lib/rolproef.js.
 
-   DUS EEN REGISTER, ZOALS PUBLIEK IN REGEL 28. Elk element staat hieronder bij
+   DUS EEN REGISTER, ZOALS PUBLIEK IN REGEL 28. Elk element staat in scripts/lib/ondertitelbesluit.js bij
    naam, met een soort en een reden. Komt er een element bij, dan zakt deze regel
    tot iemand het besluit opschrijft. Dat is het doel: niet dat er overal
    ondertitels zijn, maar dat over elk element iemand heeft nagedacht, en dat je
@@ -3717,21 +3800,11 @@ console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
    keer -- dezelfde afspraak als regel 13 en 19. */
 console.log('\n49) elk media-element draagt een besluit over ondertiteling');
 {
-  /* De soorten. `open` betekent: hier hoort iets en het is er niet. `stil` en
-     `anker` zijn de twee dingen die machinaal na te kijken zijn. */
-  const SOORTEN = {
-    spiegel:     { open: false, stil: true },   // je eigen beeld, zichtbaar, zonder geluid
-    werktuig:    { open: false, stil: true },   // beeld als invoer of rekenmiddel
-    ondertiteld: { open: false, anker: true },  // opgenomen inhoud MET een weg naar tekst
-    muziek:      { open: false },               // muziekspoor, met zichtbare titel; geen gesproken programma
-    /* LIVE, TWEERICHTING. Draagt altijd een tekstbaan waarin deelnemers
-       meeschrijven (`baan`). Draagt hij DAARNAAST een spraakanker, dan is er ook
-       automatische ondertiteling en telt hij niet meer als open -- zie `SPRAAK`
-       hieronder voor wat dat anker moet bewijzen. */
-    gesprek:     { open: true, baan: true },    // live, tweerichting -- MOET een tekstbaan dragen
-    uitzending:  { open: true },                // live, eenrichting
-    onbedekt:    { open: true }                 // opgenomen inhoud ZONDER weg naar tekst
-  };
+  /* De telling woont in scripts/lib/ondertitelbesluit.js, zodat scripts/norm.js
+     (meter `mediaOndertitelOpen`) exact hetzelfde getal telt als deze regel. */
+  const ondertitels = require('./lib/ondertitelbesluit').meet(ROOT);
+  const { gevonden, open } = ondertitels;
+  const klachten = ondertitels.klachten.slice();
   /* De ratel. Gemeten op 17 augustus 2026: eerst 11 open van 30, toen 9 nadat het
      Theater een ondertitelspoor kreeg (kern/ondertitels.js, gedeeld met de
      clip-kant), en nu 8 van 29 -- het spraakbericht in de teamchat bleek DOOD
@@ -3789,204 +3862,20 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      zonder tekstweg en maakte die schuld dezelfde dag af: lokale automatische
      transcriptie of handmatige tijdregels vóór plaatsing, plus de gedeelde
      band in de feed. Alleen werkelijk stille video mag zonder regels door. */
-  const OPEN_MAX = 4;
-  /* De band woonde als private functie IN de clipdeler; sinds het Theater en de
-     Media OS dezelfde cue-lijst tonen staat hij als gedeelde laag in
-     shared/ondertitelband.js. Deze regel merkte die verhuizing zelf op: het
-     oude anker (toonOndertitels in clipdeler-01.js) viel weg en twee elementen
-     zakten. Dat is precies waar een anker voor is. */
-  const CLIPBAND = ['public/shared/ondertitelband.js', 'RTGOndertitelband'];
-  /* HET SPRAAKANKER. Een vierde veld op een gespreksregel: het bestand waarin
-     DIT scherm de luisteraar aansluit, en de naam die daar moet staan. Een
-     gedeelde constante zou hier niet werken -- die zou het bestand tegen
-     zichzelf houden en altijd slagen; het punt is juist dat elk SCHERM hem
-     aanroept. Haalt iemand die aansluiting weg, dan telt dat gesprek weer als
-     open en zakt de ratel.
-
-     Twee dingen worden er BOVENDIEN nagekeken, en die staan er omdat de
-     voorziening aan een ingerichte modelserver hangt en dus stil kan wegvallen:
-     de gedeelde luisteraar moet bestaan, en de baan moet de UITLEG dragen voor
-     het geval hij niet kan. Een ondertitelknop die niets doet is erger dan geen
-     knop -- die laat iemand aan een gesprek beginnen in de veronderstelling dat
-     hij het kan volgen. */
-  /* HET ANKER WIJST NAAR DE PAGINA DIE DE MODULE LAADT, en niet naar het
-     bestand dat de naam noemt. Dat verschil is hier echt gebleken: het
-     meelees-anker keek of de AANROEPER `RTGMeelezen` noemt, en dat deed
-     teamcall-01.js keurig -- terwijl personeel.html en leverancier.html
-     `/shared/meelezen.js` nergens laadden. `if (w.RTGMeelezen)` was daar dus
-     altijd onwaar en de tekstbaan verscheen stil niet, met een register dat hem
-     wel claimde. Een anker op een aanroep bewijst een intentie; een anker op de
-     scripttag bewijst dat het er staat. */
-  const SPRAAKMODULE = 'public/shared/meeluister.js';
-  /* De uitleg-voor-als-het-niet-kan woont bij de KNOP en niet bij de baan, want
-     hij zegt iets over deze voorziening. Deze regel merkte die verhuizing zelf
-     op toen de knop van meelezen.js naar meeluister.js ging -- precies waarvoor
-     een anker bestaat. */
-  const SPRAAKEERLIJK = ['public/shared/meeluister.js', 'meelees-geenauto'];
-  const REGISTER = new Map([
-    ['public/shared/connection-communication-view.js#1', ['ondertiteld', 'een spraakbericht wordt uitsluitend geplaatst met het zichtbare, door de afzender geschreven transcript er direct naast', ['public/shared/connection-communication-view.js', 'connection-transcript']]],
-    ['public/shared/connection-communication-view.js#2', ['gesprek', 'het beeld en geluid van de andere deelnemer in een besloten Connection-gesprek, met dezelfde meelees- en lokale ondertitelbaan', ['public/shared/connection-communication.js', 'RTGMeelezen'], ['public/apps/vonk.html', 'meeluister.js']]],
-    ['public/shared/connection-communication-view.js#3', ['spiegel', 'het eigen stille beeld in de hoek van een besloten Connection-gesprek']],
-    ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden', ['public/apps/app-main.js', 'RTGMeelezen'], ['public/apps/app.html', 'meeluister.js']]],
-    ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
-    ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij. Er loopt WEL een tekstbaan mee (#ontLiveTekst): het toestel van het lid zet zijn eigen stem om naar tekst en stuurt de regels langs hetzelfde seinkanaal, zonder tweede tik -- de toestemming voor beeld en geluid staat al in het veiligheidscontract. Blijft OPEN: het hangt aan een browser die de Web Speech API heeft, en dat is geen ondertiteling waar je op kunt rekenen', ['public/apps/backoffice.js', 'ontLiveTekst']]],
-    ['public/apps/camera.html#beeld', ['spiegel', 'de camera-app: je eigen beeld om een foto te maken, zonder geluid']],
-    ['public/apps/clips.html#studioDoek', ['spiegel', 'het opnamedoek van de clipstudio: je eigen beeld voordat de opname loopt']],
-    ['public/apps/clips.html#js1', ['ondertiteld', 'de clip in de feed; de gedeelde clipdeler zet de ondertitelband van de maker eroverheen', CLIPBAND]],
-    ['public/apps/clips.html#js2', ['werktuig', 'een onzichtbaar element dat het eerste frame als affiche uitleest']],
-    /* BELLEN MET RTG (SERVICE.md par. 13): binnen de app, dus zonder telefoonnet.
-       Beide kanten dragen dezelfde meeleesbaan uit shared/meelezen.js -- een
-       live gesprek zonder weg naar tekst sluit een dove deelnemer uit, en dat
-       geldt bij een HULPlijn het hardst: wie niet kan bellen, houdt dan geen
-       kanaal over waar de anderen er wel een bij kregen. */
-    ['public/apps/service-bel.js#vExtern', ['gesprek', 'bellen met RTG Service: het beeld en geluid van de medewerker', ['public/apps/service-bel.js', 'RTGMeelezen'], ['public/apps/service-bel.html', 'meeluister.js']]],
-    ['public/apps/service-bel.js#vLokaal', ['spiegel', 'je eigen beeld tijdens dat gesprek; stil, want jezelf terughoren is een echo']],
-    ['public/apps/service.html#bExtern', ['gesprek', 'de cockpit neemt op: het beeld en geluid van de beller', ['public/apps/service.html', 'RTGMeelezen'], ['public/apps/service.html', 'meeluister.js']]],
-    ['public/apps/service.html#bLokaal', ['spiegel', 'het eigen beeld van de medewerker in dat gesprek']],
-    ['public/apps/foundation/gezin-rt/gezin-rt-03.js#grt-remote', ['gesprek', 'het gezinsgesprek van RTFoundation: het beeld van de ander', ['public/apps/foundation/gezin-rt.js', 'RTGMeelezen'], ['public/apps/foundation/contact.html', 'meeluister.js']]],
-    ['public/apps/foundation/gezin-rt/gezin-rt-03.js#grt-local', ['spiegel', 'je eigen beeld in dat gezinsgesprek']],
-    ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander', ['public/apps/foundation/vrienden.html', 'RTGMeelezen'], ['public/apps/foundation/vrienden.html', 'meeluister.js']]],
-    ['public/apps/foundation/vrienden.html#belLocal', ['spiegel', 'je eigen beeld tijdens dat bellen']],
-    ['public/apps/geld/rtgcodeb.js#rcCam', ['werktuig', 'de camera leest een RTG-code; shared/media.js vraagt bij een camera nooit geluid']],
-    ['public/apps/media.html#film', ['ondertiteld', 'een opgenomen film uit het Theater; de kaart uit kern/mediaos draagt de cue-lijst mee en de gedeelde band toont hem', ['server/kern/mediaos/catalogus.js', 'ondertitels']]],
-    ['public/apps/media.html#clipfilm', ['ondertiteld', 'een clip speelt hier via dezelfde clipdeler, met dezelfde ondertitelband', CLIPBAND]],
-    ['public/apps/media.html#proVideo', ['ondertiteld', 'de lokale bronvideo van Studio Pro; handmatige tijdregels of het lokale spraakmodel worden als ondertitel in de gerenderde master ingebakken', ['public/apps/media/studio-pro-engine.js', 'cueOp']]],
-    ['public/apps/media.html#proMuziek', ['muziek', 'de optionele lokale muzieklaag van Studio Pro; de maker kiest het bestand en ziet naam, mixsterkte en rechtenwaarschuwing in de werkbank']],
-    ['public/apps/muziek.html#eigenAudio', ['muziek', 'een door een lid gedeeld muzieknummer; dit vak accepteert uitsluitend muziekformaten en toont titel, maker, speelstand en voortgang als zichtbare bediening, niet een gesproken programma zonder tekstweg']],
-    ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted', ['public/apps/meet/kamer.js', 'RTGMeelezen'], ['public/apps/meet.html', 'meeluister.js']]],
-    ['public/apps/memo/app.js#1', ['ondertiteld', 'een eigen spraakmemo; het toestel maakt er een transcript bij dat in de lijst staat en samen te vatten is', ['public/apps/memo/app.js', 'transcript']]],
-    ['public/apps/oog.html#cam', ['werktuig', 'het oog schouwt een voertuig of werkvloer: beeldanalyse, geen geluid']],
-    ['public/apps/saloon/kaart.js#js1', ['ondertiteld', 'Saloon speelt dezelfde video met de cue-lijst van de bron en de gedeelde ondertitelband', ['public/apps/saloon/kaart.js', 'RTGOndertitelband.zet']]],
-    ['public/apps/salon.html#1', ['ondertiteld', 'een korte video in de Salon-feed; de maker maakt lokale automatische of handmatige tijdregels vóór plaatsing en de speler toont dezelfde cue-lijst', ['public/apps/salon.html', 'zetSalonOndertitels']]],
-    ['public/apps/salon.html#2', ['spiegel', 'het stille voorbeeld van de eigen gekozen video voordat het lid de Salon-post plaatst']],
-    ['public/apps/salon.html#3', ['werktuig', 'een stille videominiatuur in het profielraster die alleen als ingang naar de volledige post dient']],
-    ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand. Er loopt WEL een tekstbaan mee: de kanaalchat (#chatKijk, aria-live), waarin de uitzender meeschrijft of zijn eigen spraak laat omzetten met de knop Live tekst (#studioSpraak) -- geen ondertiteling waar je op kunt rekenen, wel een weg naar tekst', ['public/apps/podium.html', 'studioSpraak']]],
-    ['public/apps/podium.html#studioVideo', ['spiegel', 'het eigen beeld van de uitzender, voor en tijdens het uitzenden']],
-    ['public/apps/scanner.html#beeld', ['werktuig', 'de documentscanner leest papier: beeld als invoer']],
-    ['public/apps/theater.html#doekVideo', ['ondertiteld', 'de bioscoop van het Theater: de maker schrijft de ondertitels bij zijn eigen video, en de kijker krijgt ze mee met de zaal', ['server/kern/theater/video.js', 'videoOndertitels']]],
-    ['public/apps/theater.html#vVoorbeeld', ['spiegel', 'de voorvertoning van je eigen upload, stil, voordat je hem publiceert']],
-    ['public/apps/theater.html#js1', ['werktuig', 'een onzichtbaar element dat het eerste frame als affiche uitleest']],
-    ['public/shared/paspoortscan.js#pscanVid', ['werktuig', 'de paspoortscan leest de MRZ-regels van een document']],
-    ['public/shared/scanknop.js#js1', ['werktuig', 'de gedeelde scanknop: hetzelfde leesinstrument, in een eigen venster']],
-    ['public/shared/scanner.js#js1', ['werktuig', 'het reserve-element van de scanner zelf, als de aanroeper er geen meegeeft']],
-    ['public/shared/schoolbel.js#sbelAudio', ['gesprek', 'het schoolgesprek is een live audiogesprek: wie opneemt hoort de ander rechtstreeks', ['public/shared/schoolbel.js', 'RTGMeelezen']]],
-    ['public/shared/teamcall/teamcall-01.js#1', ['spiegel', 'de teamcall van het personeel: je eigen tegel, stil, want je eigen stem terughoren is een echo']],
-    ['public/shared/teamcall/teamcall-01.js#2', ['gesprek', 'de teamcall van het personeel: de tegel van een collega, met diens stem erbij', ['public/shared/teamcall/teamcall-01.js', 'RTGMeelezen']]]
-  ]);
-
-  const bundelPaden = new Set(Object.keys(BUNDELLIJST).map(k => 'public/' + k));
-  const gevonden = new Map();
-  loop(path.join(ROOT, 'public'), /\.(html|js)$/, (f) => {
-    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
-    if (bundelPaden.has(rel)) return;
-    const bron = kaalBron(f);
-    let m, n = 0, jsN = 0;
-    const tag = /<(video|audio)(\s[^>]*)?>/gi;
-    while ((m = tag.exec(bron))) {
-      n++;
-      const id = (String(m[2] || '').match(/\bid=["']?([A-Za-z0-9_-]+)/) || [])[1];
-      gevonden.set(rel + '#' + (id || n), { stil: /\bmuted\b/.test(m[0]) });
-    }
-    /* In JS gemaakte elementen. `muted` staat daar niet in de tag maar in de
-       regels eronder, dus kijken we in een venster van 300 tekens erna. */
-    const inJs = /(?:createElement\(\s*["'](video|audio)["']\s*\)|new\s+Audio\s*\()/g;
-    while ((m = inJs.exec(bron))) {
-      jsN++;
-      const venster = bron.slice(m.index, m.index + 300);
-      gevonden.set(rel + '#js' + jsN, { stil: /\bmuted\b/.test(venster) });
-    }
-  });
-
-  const klachten = [];
-  for (const [sleutel, el] of gevonden) {
-    const post = REGISTER.get(sleutel);
-    if (!post) {
-      klachten.push(sleutel + ' is een media-element zonder besluit -- zet hem in REGISTER met een soort en een reden (check.js regel 49)');
-      continue;
-    }
-    const soort = SOORTEN[post[0]];
-    if (!soort) { klachten.push(sleutel + ' staat als soort "' + post[0] + '", en die soort bestaat niet'); continue; }
-    if (!post[1] || post[1].length < 25) klachten.push(sleutel + ' heeft geen reden die iets zegt');
-    if (soort.stil && !el.stil) {
-      klachten.push(sleutel + ' staat als ' + post[0] + ' (stil) maar is niet meer muted -- of er komt geluid uit, of de reden klopt niet meer');
-    }
-    if (soort.anker || soort.baan) {
-      /* Twee ankers met dezelfde tand. Bij ONDERTITELD wijst hij naar de band
-         die de cues toont; bij een GESPREK naar de tekstbaan waarin deelnemers
-         meeschrijven (shared/meelezen.js). In allebei de gevallen geldt: wie
-         zegt dat er een weg naar tekst is, noemt WAAR -- en haalt iemand die
-         weg, dan zakt deze regel ook al is aan het scherm zelf niets veranderd. */
-      const wat = soort.baan ? 'draagt een tekstbaan' : 'staat als ondertiteld';
-      const [bestand, naam] = post[2] || [];
-      if (!bestand || !naam) klachten.push(sleutel + ' ' + wat + ' maar noemt niet waar dat geregeld is');
-      else if (!fs.existsSync(path.join(ROOT, bestand))) klachten.push(sleutel + ': het anker ' + bestand + ' bestaat niet meer');
-      else if (!fs.readFileSync(path.join(ROOT, bestand), 'utf8').includes(naam)) {
-        klachten.push(sleutel + ': ' + bestand + ' draagt "' + naam + '" niet meer -- de weg naar tekst is eruit gehaald');
-      }
-    }
-  }
-  /* DE TWEE GEDEELDE DELEN WAAR ELK SPRAAKANKER OP LEUNT. Ze staan hier en niet
-     per element: een aansluiting per scherm zonder de gedeelde luisteraar is een
-     aanroep in het niets, en zonder de eerlijke uitleg in de baan is de knop bij
-     een huis zonder modelserver een lege belofte. Zakt een van beide, dan zakt
-     hij voor alle acht tegelijk -- en dat is juist wat je wilt weten. */
-  if ([...gevonden.keys()].some(k => (REGISTER.get(k) || [])[3])) {
-    if (!fs.existsSync(path.join(ROOT, SPRAAKMODULE))) {
-      klachten.push('check.js regel 49: ' + SPRAAKMODULE + ' is weg, maar er zijn gesprekken die zeggen dat zij automatisch ondertitelen');
-    }
-    const [eb, en] = SPRAAKEERLIJK;
-    if (!fs.existsSync(path.join(ROOT, eb)) || !fs.readFileSync(path.join(ROOT, eb), 'utf8').includes(en)) {
-      klachten.push('check.js regel 49: ' + eb + ' draagt "' + en + '" niet meer -- een huis zonder spraakmodel krijgt dan een knop zonder uitleg');
-    }
-  }
-
-  /* Een register dat namen bevat die niet meer bestaan, groeit stil vol en leest
-     als dekking die er niet is -- dezelfde controle als bij regel 28 en 47. */
-  for (const sleutel of REGISTER.keys()) {
-    if (!gevonden.has(sleutel)) klachten.push('check.js regel 49: ' + sleutel + ' staat in het register maar bestaat niet (meer) als media-element');
-  }
-
-  /* WAT ER OPEN STAAT. Een `gesprek` met een geldig SPRAAKANKER heeft een
-     automatische weg naar tekst en telt niet mee -- dat is precies de schuld die
-     de ratelnotitie hierboven beschrijft. Een anker dat NIET klopt telt wel mee,
-     en dan gaat het getal omhoog en zakt de ratel: dat is de bedoeling, want dan
-     is de weg eruit gehaald zonder dat iemand het zei. */
-  const spraakOk = (k) => {
-    const a = (REGISTER.get(k) || [])[3];
-    if (!a) return false;
-    const [bestand, naam] = a;
-    if (!bestand || !naam) return false;
-    const pad = path.join(ROOT, bestand);
-    return fs.existsSync(pad) && fs.readFileSync(pad, 'utf8').includes(naam);
-  };
-  const open = [...gevonden.keys()].filter(k => REGISTER.has(k) &&
-    (SOORTEN[REGISTER.get(k)[0]] || {}).open && !spraakOk(k));
+  /* DE WAARDE STAAT SINDS 6 OKTOBER 2026 IN NORM.json (meter
+     `mediaOndertitelOpen`) en niet meer hier als constante. De geschiedenis
+     hierboven blijft staan, want die is de reden van het getal; een volgende
+     verzetting staat als notitie in NORM.json, en scripts/normbasis.js laat een
+     verhoging zonder notitie zakken. */
+  const OPEN_MAX = require('./lib/normwaarde').normwaarde('mediaOndertitelOpen');
   if (open.length > OPEN_MAX) {
-    klachten.push(open.length + ' open media-elementen terwijl OPEN_MAX op ' + OPEN_MAX + ' staat: ' + open.join(', '));
+    klachten.push(open.length + ' open media-elementen terwijl de ratel (NORM.json, mediaOndertitelOpen) op ' + OPEN_MAX + ' staat: ' + open.join(', '));
   }
 
   if (klachten.length) klachten.forEach(fout);
   else {
-    /* DE TELLING VOLGT DE UITKOMST EN NIET DE TABEL. Zolang een gesprek open
-       stond, was "8 gesprek" hetzelfde getal als "8 open". Sinds een gesprek met
-       een spraakanker niet meer open telt, zijn dat twee verschillende dingen --
-       en een regel die de tabel opsomt naast een getal dat de uitkomst telt,
-       leest als onzin ("9 van die 2"). Hier wordt dus geteld wat er werkelijk
-       uit `spraakOk` komt. */
-    const perUitkomst = {};
-    for (const k of gevonden.keys()) {
-      const soort = REGISTER.get(k)[0];
-      const s = (SOORTEN[soort] || {}).open && spraakOk(k) ? 'gesprek met ondertiteling' : soort;
-      perUitkomst[s] = (perUitkomst[s] || 0) + 1;
-    }
+    const { perUitkomst, metBaan, metSpraak } = ondertitels;
     const noem = (lijst) => lijst.filter(s => perUitkomst[s]).map(s => perUitkomst[s] + ' ' + s).join(', ');
-    /* Wat er WEL is, telt apart en wordt nooit met "geregeld" op een hoop
-       gegooid. Meelezen is GEEN ondertiteling: daar zet niemand spraak om, en
-       dat een deelnemer MEETYPT is een andere belofte dan dat het gesprek
-       ondertiteld wordt. */
-    const metBaan = [...gevonden.keys()].filter(k => REGISTER.has(k) &&
-      ((SOORTEN[REGISTER.get(k)[0]] || {}).baan || ((SOORTEN[REGISTER.get(k)[0]] || {}).open && (REGISTER.get(k)[2] || []).length)));
-    const metSpraak = [...gevonden.keys()].filter(spraakOk);
     ok(gevonden.size + ' media-elementen, elk met een besluit en een reden: ' +
       (gevonden.size - open.length) + ' geregeld (' +
       noem(['spiegel', 'werktuig', 'muziek', 'ondertiteld', 'gesprek met ondertiteling']) + '), ' +
@@ -5459,7 +5348,12 @@ console.log('\n64) het mutatiecontractregister loopt niet achter op de code');
    ========================================================================== */
 console.log('\n65) elke servicebevoegdheid die het lid bevestigt, wordt ergens uitgelezen');
 {
-  const STIL_MAX = 0;
+  /* De nulgrens staat sinds 6 oktober 2026 in NORM.json (meter
+     `serviceBevoegdheidStil`) en niet meer als constante hier. Hij blijft nul;
+     wat er veranderde is dat een verhoging nu langs scripts/normbasis.js moet,
+     met een notitie die hem noemt. scripts/norm.js telt hetzelfde getal met de
+     functie meet() uit scripts/servicecaps.js. */
+  const STIL_MAX = require('./lib/normwaarde').normwaarde('serviceBevoegdheidStil');
   try {
     const uit = cp.execFileSync(process.execPath, [path.join(ROOT, 'scripts', 'servicecaps.js')],
       { cwd: ROOT, encoding: 'utf8', timeout: 120000, maxBuffer: 16 * 1024 * 1024 });
@@ -5468,12 +5362,12 @@ console.log('\n65) elke servicebevoegdheid die het lid bevestigt, wordt ergens u
     else {
       const stil = Number(m[1]), totaal = Number(m[2]);
       if (stil > STIL_MAX) {
-        fout(stil + ' servicebevoegdheden zonder lezer terwijl de ratel op ' + STIL_MAX + ' staat. ' +
+        fout(stil + ' servicebevoegdheden zonder lezer terwijl de ratel (NORM.json, serviceBevoegdheidStil) op ' + STIL_MAX + ' staat. ' +
           'Bouw er een poort bij (magNu), of haal hem uit de tabel: een bevoegdheid die niets opent, ' +
           'laat een lid iets bevestigen dat nergens wordt afgedwongen.');
       } else {
         ok((totaal - stil) + ' van ' + totaal + ' bevoegdheden die het lid bevestigt worden uitgelezen, ' +
-          stil + ' zonder lezer (harde nulgrens)');
+          stil + ' zonder lezer (ratel op ' + STIL_MAX + ' in NORM.json)');
       }
     }
   } catch (e) { fout('de servicecap-meting kon niet draaien: ' + e.message); }
@@ -5998,33 +5892,75 @@ console.log('\n75) roteren met de hand neemt niet toe');
   /* 12 -> 15 op 5 oktober 2026, en dat is geen achteruitgang: twaalf plekken
      zijn omgezet naar bearer.roteer()/vernieuw(), en de meter las tegelijk
      zonder spaties en zag daardoor vijftien plekken die er al stonden
-     (afhaalcode, arrivalpas, ov, tickets, rtgid-koppel, ...). Vanaf hier alleen omlaag. */
-  const ROTATIE_MAX = 15;
-  /* Gelezen ZONDER spaties: `(u.toegang.rotatie||1)+1` ontsnapte aan de eerste
-     vorm van deze regel, die alleen de gespatieerde schrijfwijze kende. De twee
-     alternatieven beginnen met een ander teken, anders kan een reeks `)||0)`
-     op twee manieren gelezen worden en loopt de regex exponentieel vast (CodeQL). */
-  const vorm = { test: r => /rotatie(?:\|\|[01]\)|\))*\+1(?!\d)/.test(r.replace(/\s+/g, '')) };
-  const plekken = [];
-  const loop = (d) => {
-    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-      const q = path.join(d, e.name);
-      if (e.isDirectory()) { if (!['data', 'node_modules'].includes(e.name)) loop(q); continue; }
-      if (!e.name.endsWith('.js') || /^bearercode/.test(e.name)) continue;
-      fs.readFileSync(q, 'utf8').split('\n').forEach((r, i) => {
-        if (vorm.test(r)) plekken.push(path.relative(ROOT, q) + ':' + (i + 1));
-      });
-    }
-  };
-  loop(path.join(ROOT, 'server'));
+     (afhaalcode, arrivalpas, ov, tickets, rtgid-koppel, ...). Vanaf hier alleen omlaag.
+
+     SINDS 6 OKTOBER 2026 STAAT HET GETAL IN NORM.json (meter `rotatieMetDeHand`)
+     en de telling in scripts/lib/handrotatie.js, zodat scripts/norm.js hetzelfde
+     telt. De twee kanten van deze regel blijven: meer dan de norm zakt, en
+     minder dan de norm zakt OOK, tot de norm strakker staat (npm run norm:vast)
+     -- anders blijft er ruimte waarin er ongemerkt een bij kan. */
+  const ROTATIE_MAX = require('./lib/normwaarde').normwaarde('rotatieMetDeHand');
+  const plekken = require('./lib/handrotatie').plekken(ROOT);
   if (plekken.length > ROTATIE_MAX) {
-    fout(plekken.length + ' plekken roteren met de hand terwijl de ratel op ' + ROTATIE_MAX + ' staat. ' +
+    fout(plekken.length + ' plekken roteren met de hand terwijl de ratel (NORM.json, rotatieMetDeHand) op ' + ROTATIE_MAX + ' staat. ' +
       'Gebruik bearer.roteer() (kern/bearercode-v2.js): ' + plekken.join(', '));
   } else if (plekken.length < ROTATIE_MAX) {
-    fout('nog ' + plekken.length + ' plekken roteren met de hand; zet ROTATIE_MAX in scripts/check.js op ' +
-      plekken.length + ' zodat de winst blijft staan');
+    fout('nog ' + plekken.length + ' plekken roteren met de hand; zet rotatieMetDeHand in NORM.json op ' +
+      plekken.length + ' (npm run norm:vast) zodat de winst blijft staan');
   } else {
     ok(plekken.length + ' plekken roteren nog met de hand (ratel, alleen omlaag)');
+  }
+}
+
+/* ============================================================================
+   76) GEEN ELEMENT MET TWEE CLASS-ATTRIBUTEN
+
+   WAAR DIT UIT KOMT. Op 6 oktober 2026 stonden er 188 elementen met twee
+   class-attributen in 38 bronbestanden onder public/, het merendeel van de vorm
+
+     '<input class="st-in" id="kMbN" placeholder="..." class="h-flex2">'
+
+   Een browser leest van een dubbel attribuut alleen het EERSTE. Alles wat een
+   eerdere ronde uit `style="..."` naar een hulpklasse had verhuisd
+   (rtg-hulpklassen.css, zie regel 37) kwam daardoor niet aan: velden zonder
+   hun flex-verdeling, knoppen zonder hun marge, formuliervelden in de App
+   Store die niet de volle breedte namen. Geen consolefout, geen rode toets --
+   elke regel hierboven keek naar de klasse of naar het blad, en geen enkele
+   naar de vraag of de browser het attribuut ook LEEST.
+
+   Hoe ze erin kwamen is niet meer na te gaan (de historie van die regels
+   begint bij een samengevoegde commit), en dat maakt de poort belangrijker,
+   niet minder: de beide omzetters die nu bestaan (scripts/inlinestijl-omzet.js
+   en scripts/hulpklassen-omzet.js) voegen bij een bestaande class samen, maar
+   de volgende hand of het volgende script hoeft dat niet te doen.
+
+   De vraag zelf woont in scripts/lib/dubbeleklasse.js, die ook HTML leest die
+   in JavaScript wordt samengesteld (strings met `+`, templates met `${}`).
+   Hij meet de BRON: de delen van een bundel en niet de bundel, want regel 12
+   houdt vast dat de bundel byte voor byte hun som is. Het doel is nul, en nul
+   is hier geen ratel maar een harde grens: er is geen enkele reden om op een
+   element twee class-attributen te zetten. */
+console.log('\n76) geen element draagt twee class-attributen (de browser leest alleen het eerste)');
+{
+  const { meet, bronbestanden } = require('./lib/dubbeleklasse');
+  const gemeten = bronbestanden(ROOT).length;
+  const treffers = meet(ROOT);
+  const bestanden = Object.keys(treffers);
+  if (!gemeten) {
+    fout('geen enkel bronbestand gevonden om te meten; dan zegt deze regel niets');
+  } else if (bestanden.length) {
+    let n = 0;
+    for (const f of bestanden) {
+      for (const t of treffers[f]) {
+        n++;
+        fout(f + ':' + t.regel + ':' + t.kolom + ' <' + t.tag + '> draagt ' + t.aantal +
+          ' class-attributen: ' + t.fragment +
+          '\n    de browser leest alleen het eerste -- voeg ze samen tot een class="..."');
+      }
+    }
+    console.error('  ' + n + ' element(en) in ' + bestanden.length + ' bestand(en); doel is nul');
+  } else {
+    ok(gemeten + ' bronbestanden gemeten, geen enkel element met meer dan een class-attribuut');
   }
 }
 

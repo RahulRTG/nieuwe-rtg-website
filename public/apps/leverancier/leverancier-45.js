@@ -43,14 +43,14 @@
     h += '<div class="st-sec h-mt100">'+T('gb.zalen','Vergaderzalen')+'</div>'+
       '<div style="border:1px solid var(--line);border-radius:0;padding:0.8rem;">'+
       '<div class="row-gap"><select id="gbZaal" class="st-in h-flex2">'+d.zalen.map(z=>'<option value="'+z.id+'">'+esc(z.naam)+' · vd '+z.verdieping+' · '+z.capaciteit+'p · '+eur(z.uurprijs)+'/u</option>').join('')+'</select>'+
-      '<input id="gbHuurder" class="st-in" placeholder="'+T('gb.huurder','Huurder')+'" maxlength="60" class="h-flex2"></div>'+
-      '<div class="row-gap h-mt40"><input id="gbDatum" class="st-in" type="date" class="h-flex1"><input id="gbVan" class="st-in" type="time" class="h-flex1"><input id="gbTot" class="st-in" type="time" class="h-flex1">'+
+      '<input id="gbHuurder" class="st-in h-flex2" placeholder="'+T('gb.huurder','Huurder')+'" maxlength="60"></div>'+
+      '<div class="row-gap h-mt40"><input id="gbDatum" class="st-in h-flex1" type="date"><input id="gbVan" class="st-in h-flex1" type="time"><input id="gbTot" class="st-in h-flex1" type="time">'+
       '<button id="gbBoek" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gb.boek','Boek')+'</button></div>'+
       ((d.boekingen||[]).length ? d.boekingen.slice(0,8).map(b=>'<div class="sub h-mt35">'+esc(b.datum)+' '+esc(b.van)+' tot '+esc(b.tot)+' · '+esc(b.zaal)+' · '+esc(b.huurder)+' · '+eur(b.prijs)+' <button data-gbzweg="'+b.id+'" style="background:none;border:none;color:var(--soft);cursor:pointer;">✕</button></div>').join('') : '<p class="sub h-mt40">'+T('gb.geenboek','Nog geen boekingen.')+'</p>')+'</div>';
 
     // receptie: de bezoekersstroom
     h += '<div class="st-sec h-mt100">'+T('gb.receptie','Receptie · bezoekers')+'</div>'+
-      '<div class="row-gap"><input id="gbBezNaam" class="st-in" placeholder="'+T('gb.bez.naam','Naam bezoeker')+'" maxlength="60" class="h-flex2"><input id="gbBezVoor" class="st-in" placeholder="'+T('gb.bez.voor','Voor welke huurder')+'" maxlength="60" class="h-flex2"><button id="gbBezMeld" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gb.bez.meld','Aanmelden')+'</button></div>';
+      '<div class="row-gap"><input id="gbBezNaam" class="st-in h-flex2" placeholder="'+T('gb.bez.naam','Naam bezoeker')+'" maxlength="60"><input id="gbBezVoor" class="st-in h-flex2" placeholder="'+T('gb.bez.voor','Voor welke huurder')+'" maxlength="60"><button id="gbBezMeld" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gb.bez.meld','Aanmelden')+'</button></div>';
     h += (d.bezoekers||[]).slice(0,8).map(b=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<b style="flex:1;font-size:0.85rem;">'+esc(b.naam)+'</b><span class="sub">'+esc(b.voorWie)+' · '+esc(b.status)+(b.badge?' · '+esc(b.badge):'')+'</span>'+
       (b.status==='verwacht'?gbKnop('data-gbbin', b.id, T('gb.bez.binnen','Binnen'), true):b.status==='binnen'?gbKnop('data-gbweg', b.id, T('gb.bez.weg','Vertrokken')):'')+'</div>').join('') || '<p class="sub">'+T('gb.bez.geen','Nog geen bezoekers aangemeld.')+'</p>';
@@ -65,11 +65,11 @@
 
     // valet + de jetset-laag
     h += '<div class="st-sec h-mt100">'+T('gb.jetset','Valet en de jetset-diensten')+'</div>'+
-      '<div class="row-gap"><input id="gbValetWie" class="st-in" placeholder="'+T('gb.valet.wie','Valet: voor wie?')+'" maxlength="60" class="h-flex2"><button id="gbValet" style="flex:1;background:none;border:1px solid var(--line);border-radius:0;padding:0.45rem;color:var(--txt);font-family:inherit;">'+T('gb.valet.vraag','Wagen voorrijden')+'</button></div>';
+      '<div class="row-gap"><input id="gbValetWie" class="st-in h-flex2" placeholder="'+T('gb.valet.wie','Valet: voor wie?')+'" maxlength="60"><button id="gbValet" style="flex:1;background:none;border:1px solid var(--line);border-radius:0;padding:0.45rem;color:var(--txt);font-family:inherit;">'+T('gb.valet.vraag','Wagen voorrijden')+'</button></div>';
     h += (d.valet||[]).filter(v=>v.status!=='klaar').map(v=>'<div class="sub" style="padding:0.3rem 0;">'+esc(v.wie)+' · '+esc(v.wagen)+' · '+esc(v.status)+' '+
       (v.status==='gevraagd'?gbKnop('data-gbvv', v.id, T('gb.valet.voor','Voorgereden'), true):gbKnop('data-gbvk', v.id, T('gb.valet.klaar','Klaar'), true))+'</div>').join('');
     h += '<div class="row-gap h-mt50"><select id="gbJSoort" class="st-in h-flex1">'+Object.keys(GB_JET).map(s=>'<option value="'+s+'">'+GB_JET[s]+'</option>').join('')+'</select>'+
-      '<input id="gbJVoor" class="st-in" placeholder="'+T('gb.j.voor','Voor wie')+'" maxlength="60" class="h-flex1"><input id="gbJWens" class="st-in" placeholder="'+T('gb.j.wens','De wens (bijv. wagen naar Schiphol om 16:00)')+'" maxlength="160" style="flex:3;"><button id="gbJVraag" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gb.j.vraag','Vraag aan')+'</button></div>';
+      '<input id="gbJVoor" class="st-in h-flex1" placeholder="'+T('gb.j.voor','Voor wie')+'" maxlength="60"><input id="gbJWens" class="st-in" placeholder="'+T('gb.j.wens','De wens (bijv. wagen naar Schiphol om 16:00)')+'" maxlength="160" style="flex:3;"><button id="gbJVraag" style="flex:1;background:var(--gold);color:#000;border:none;border-radius:0;padding:0.45rem;font-weight:600;font-family:inherit;">'+T('gb.j.vraag','Vraag aan')+'</button></div>';
     h += (d.jetset||[]).map(j=>'<div style="border:1px solid '+(j.status==='afgerond'?'var(--line)':'var(--gold)')+';border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+GB_JET[j.soort]+' · '+esc(j.voorWie)+'</b><span class="sub">'+esc(j.status)+'</span></div>'+
       '<div class="sub">'+esc(j.wens)+' · '+esc(j.moment)+(j.notitie?' · '+esc(j.notitie):'')+'</div>'+

@@ -22,6 +22,14 @@
    - HERCONTROLE bij openen: de aanroeper zegt of de sessie of sleutel onder
      het ticket nog leeft; zo niet, dan opent een een seconde oud ticket niets.
 
+   EEN UITZONDERING OP EENMALIG, en alleen een die de soort zelf aanvraagt:
+   `maxGebruik` boven 1. Een <video> kan geen kop sturen en vraagt hetzelfde
+   adres meerdere keren op (Range-verzoeken bij laden en spoelen); een eenmalig
+   ticket breekt het afspelen na het eerste stuk. Zo'n ticket blijft dan staan
+   tot zijn teller op is of zijn korte geldigheid verloopt, en elke claim telt
+   mee IN dezelfde transactie. Zonder die optie verandert er niets: 1 blijft de
+   standaard en de claim haalt het ticket meteen weg (kern/sessiestroom.js).
+
    Wat hier NIET ligt: de opslagvorm (de aanroeper geeft `lees`/`schrijf` op
    zijn eigen collectie), de transactie zelf (de aanroeper weet of hij in
    productie mag terugvallen), het voorvoegsel, de geldigheid, de antwoorden
@@ -31,7 +39,7 @@
 const MAX_GELDIG_MS = 5 * 60000;
 
 module.exports = ({ bearer, nu, transactie, lees, schrijf, prefix, issuer, doel, scope, geldigMs,
-  maxOpen, bijVol = 'weiger', groep = null }) => {
+  maxOpen, bijVol = 'weiger', groep = null, maxGebruik = 1 }) => {
   if (!bearer || typeof bearer.maak !== 'function' || typeof bearer.vind !== 'function' ||
       typeof bearer.reden !== 'function') throw new Error('stroomticket vereist kern/bearercode.js');
   if (typeof transactie !== 'function' || typeof lees !== 'function' || typeof schrijf !== 'function')
@@ -39,6 +47,8 @@ module.exports = ({ bearer, nu, transactie, lees, schrijf, prefix, issuer, doel,
   if (!(geldigMs > 0 && geldigMs <= MAX_GELDIG_MS)) throw new Error('stroomticket: geldigheid hoort kort te zijn');
   if (!(Number.isSafeInteger(maxOpen) && maxOpen > 0)) throw new Error('stroomticket vereist een plafond');
   if (bijVol !== 'weiger' && bijVol !== 'oudste') throw new Error('stroomticket: bijVol is weiger of oudste');
+  if (!(Number.isSafeInteger(maxGebruik) && maxGebruik >= 1 && maxGebruik <= 1000))
+    throw new Error('stroomticket: maxGebruik is een geheel getal van 1 tot 1000');
   const SCOPE = [].concat(scope || []);
   const levend = t => !!t && !t.ingetrokken_at && Date.parse(t.expires_at) > Date.parse(nu());
   const vorm = new RegExp('^' + String(prefix).replace(/[^A-Z0-9_-]/gi, '') + '\\.[0-9A-F]{32}$');
@@ -62,7 +72,7 @@ module.exports = ({ bearer, nu, transactie, lees, schrijf, prefix, issuer, doel,
         schrijf(staat, sleutel, rij);
         return { vol: true };
       }
-      const m = bearer.maak({ prefix, issuer, doel, scope: SCOPE, onderwerp: v.onderwerp, geldigMs, maxGebruik: 1 });
+      const m = bearer.maak({ prefix, issuer, doel, scope: SCOPE, onderwerp: v.onderwerp, geldigMs, maxGebruik });
       rij.push(m.toegang);
       if (bijVol === 'oudste') while (rij.filter(hoort).length > maxOpen) rij.splice(rij.findIndex(hoort), 1);
       schrijf(staat, sleutel, rij);
@@ -84,9 +94,14 @@ module.exports = ({ bearer, nu, transactie, lees, schrijf, prefix, issuer, doel,
       const rij = Array.isArray(huidig) ? huidig : [];
       const kaal = String(raw == null ? '' : raw).trim();
       const t = kaal ? bearer.vind(rij, kaal) : null;
-      schrijf(staat, sleutel, rij.filter(x => x !== t && levend(x)));
+      /* De reden wordt gelezen VOOR het gebruik geteld wordt: anders heet de
+         laatste toegestane opening ten onrechte 'opgebruikt'. Een ticket dat
+         nog uses over heeft blijft staan (alleen met maxGebruik > 1). */
+      const r = t ? bearer.reden(t, { doel, scope: SCOPE }) : 'onbekend';
+      if (t && !r) bearer.gebruik(t);
+      const houd = !!t && !r && t.gebruik < t.max_gebruik;
+      schrijf(staat, sleutel, rij.filter(x => (x !== t || houd) && levend(x)));
       if (!t) return { ok: false, reden: 'onbekend' };
-      const r = bearer.reden(t, { doel, scope: SCOPE });
       if (r) return { ok: false, reden: r };
       const o = t.onderwerp || {};
       for (const [k, w] of Object.entries(v.binding || {}))

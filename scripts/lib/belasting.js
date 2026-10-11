@@ -25,34 +25,26 @@ const http = require('http');
 const { execFileSync } = require('child_process');
 
 /* ---------- CPU ----------
-   /proc/<pid>/stat velden 14 en 15 zijn utime en stime in klok-ticks. Het
-   verschil over een venster, gedeeld door de verstreken tijd, is het
-   CPU-gebruik van het proces. Boven de 100% betekent: meer dan een kern (Node
-   heeft naast de lus ook een threadpool voor bestands- en crypto-werk). */
-let CLK = 100;
-try { CLK = Number(execFileSync('getconf', ['CLK_TCK'], { encoding: 'utf8' }).trim()) || 100; } catch (e) { /* 100 */ }
-
-function cpuTicks(pid) {
-  try {
-    const s = fs.readFileSync('/proc/' + pid + '/stat', 'utf8');
-    // de naam tussen haakjes kan spaties bevatten; knip er daarom vanaf de sluithaak
-    const na = s.slice(s.lastIndexOf(')') + 2).split(' ');
-    return Number(na[11]) + Number(na[12]);   // utime, stime (0-gebaseerd na de knip)
-  } catch (e) { return null; }
-}
+   De verbruikte rekentijd (gebruiker + systeem) van het proces: het verschil
+   over een venster, gedeeld door de verstreken tijd, is het CPU-gebruik. Boven
+   de 100% betekent: meer dan een kern (Node heeft naast de lus ook een
+   threadpool voor bestands- en crypto-werk). De lezing staat in ./procinfo.js:
+   /proc op Linux, `ps time` elders -- hier stond alleen /proc, en op macOS gaf
+   deze meter dan stil niets. */
+const { cpuSeconden } = require('./procinfo');
 
 function cpuMeter(pid) {
   let t0 = null, tick0 = null, piek = 0, som = 0, n = 0;
   return {
-    start() { t0 = Date.now(); tick0 = cpuTicks(pid); piek = 0; som = 0; n = 0; },
+    start() { t0 = Date.now(); tick0 = cpuSeconden(pid); piek = 0; som = 0; n = 0; },
     /* Tussentijds bemonsteren: elke aanroep meet het venster sinds de vorige.
        Zo komt er ook een PIEK uit en niet alleen een gemiddelde -- een server die
        gemiddeld 40% doet maar drie keer op 400% piekt, is een ander verhaal. */
     monster() {
       if (t0 == null || tick0 == null) return null;
-      const t1 = Date.now(), tick1 = cpuTicks(pid);
+      const t1 = Date.now(), tick1 = cpuSeconden(pid);
       if (tick1 == null || t1 <= t0) return null;
-      const p = ((tick1 - tick0) / CLK) / ((t1 - t0) / 1000) * 100;
+      const p = (tick1 - tick0) / ((t1 - t0) / 1000) * 100;
       t0 = t1; tick0 = tick1;
       if (p > piek) piek = p;
       som += p; n++;

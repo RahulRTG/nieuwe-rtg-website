@@ -54,6 +54,10 @@
 function gereedschapsomgeving({ poort, datamap }, eigen) {
   const env = Object.assign({}, process.env, {
     PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
+    /* Een meetserver is van deze machine en van niemand anders: alleen de
+       loopback. Dat is ook wat RTG_DEV_LINKS (contextdoorgifte) als bewijs van
+       een lokale installatie vraagt (server/config/omgeving.js). */
+    RTG_BIND: '127.0.0.1',
     /* DE SCHORSPOORT STAAT UIT OP EEN MEETSERVER, en dat is geen versoepeling
        maar de reparatie van een lus die zichzelf dichttrok.
 
@@ -125,9 +129,19 @@ async function wachtTotOp(basis, msMax, pad) {
   return false;
 }
 
+/* De servers die nog niet zijn opgeruimd, en de ENE exit-haak die ze bij het
+   afsluiten alsnog opruimt. Een instrument dat halverwege afbreekt hoort geen
+   server en geen datamap achter te laten; daarvoor is een haak genoeg. */
+const lopend = new Set();
+let gehaakt = false;
+function haakAanExit() {
+  if (gehaakt) return;
+  gehaakt = true;
+  process.on('exit', () => { for (const klaar of [...lopend]) klaar(); });
+}
+
 /* Start er een en geef terug hoe je hem bereikt en hoe je hem opruimt. De
-   opruiming hangt OOK aan process.on('exit') -- een instrument dat halverwege
-   afbreekt hoort geen server en geen datamap achter te laten. */
+   opruiming hangt OOK aan de exit-haak hierboven. */
 async function start(opties) {
   const o = opties || {};
   /* Een VASTE poort als de aanroeper er een noemt: de geheugen-beproevingen
@@ -148,7 +162,10 @@ async function start(opties) {
      --expose-gc en een gc-hook om de heap te kunnen lezen. `logFd`: een
      bestaande file descriptor waar stdout/stderr heen gaan (de beproeving
      leest daar de GC-regels uit); anders een eigen server.log bij o.log. */
-  const nodeArgs = [...(o.nodeArgs || []), path.join(WORTEL, 'server', 'server.js')];
+  /* `programma`: standaard de echte server. Alleen test/luisteraarlek.test.js
+     geeft hier een klein stubprogramma mee: wie de opruiming van deze module
+     zelf beproeft, hoeft er geen twaalf volle servers voor te booten. */
+  const nodeArgs = [...(o.nodeArgs || []), o.programma || path.join(WORTEL, 'server', 'server.js')];
   const uit = o.logFd !== undefined ? o.logFd
     : (o.log ? fs.openSync(path.join(datamap, 'server.log'), 'a') : 'ignore');
   const kind = spawn(process.execPath, nodeArgs, {
@@ -157,11 +174,23 @@ async function start(opties) {
     env: gereedschapsomgeving({ poort, datamap }, o.env)
   });
 
+  /* EEN OPRUIMHAAK PER PROCES, NIET PER SERVER. Hier stond process.on('exit',
+     klaar) bij ELKE start, en klaar() haalde hem nooit weg: een instrument dat
+     elf wegwerpservers na elkaar start (en elk netjes opruimt) had er elf aan
+     `exit` hangen en kreeg een MaxListenersExceededWarning -- het teken van een
+     echt lek, want elke haak hield zijn kindproces en datamap in leven tot het
+     einde. Nu staat er een haak (zie `lopend` hieronder) en meldt elke server
+     zich af zodra hij is opgeruimd. */
+  let opgeruimd = false;
   const klaar = () => {
+    if (opgeruimd) return;
+    opgeruimd = true;
+    lopend.delete(klaar);
     try { kind.kill('SIGKILL'); } catch (e) {}
     if (eigenMap) { try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} }
   };
-  process.on('exit', klaar);
+  lopend.add(klaar);
+  haakAanExit();
 
   /* Sommige instrumenten saboteren de START bewust (ketenronde en
      verraadronde geven een kapot zegel of een verraden seed mee) en willen

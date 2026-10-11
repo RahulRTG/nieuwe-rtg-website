@@ -275,7 +275,7 @@ const REGISTERS = [
      hoort hier te staan of buiten met een reden (test/versheidsdekking). */
   ['LAATSPOOR.json', 'node scripts/laatspoor.js', 'schrijfroutes die de opslag aanraken voordat ze de invoer keuren'],
   ['IDOR.json', 'node scripts/idorproef.js', 'of het object van een ander te openen is'],
-  ['ROLRONDE.json', 'node scripts/rolronde.js', 'welke rol waar binnenkomt, gevraagd aan een echte server'],
+  ['ROLRONDE.json', 'node -r ./scripts/lib/invoerspoor-preload.js scripts/rolronde.js', 'welke rol waar binnenkomt, gevraagd aan een echte server'],
   ['GLUURRONDE.json', 'node scripts/gluurronde.js', 'de horizontale scheiding tussen twee leden'],
   ['VERRAAD.json', 'node scripts/verraadronde.js', 'wat een verraden seed of zegel doet'],
   ['INHOUDSKAART.json', 'node scripts/inhoudskaart.js', 'wat elke route werkelijk teruggeeft'],
@@ -451,6 +451,7 @@ const REGISTERS = [
   ['DOELGROEPBEREIK.json', 'npm run doelgroepbereik:vast', 'of de VERKLAARDE doelgroep van een functie zijn eigen paden werkelijk kan bereiken'],
   ['ONVERVREEMDBAAR.json', 'npm run onvervreemdbaar:vast', 'of een werkwoord van de universele bodem voor een gratis account achter betaling verdwijnt (SAMENLEVING.md SAM-01)'],
   ['AANVOERVORM.json', 'npm run aanvoervorm:vast', 'of de vijf terreinen van de aanvoer een VORM delen -- de vraag onder het aanvoercontract'],
+  ['GROEPVORM.json', 'npm run groepvorm:vast', 'of de groepsmodellen van GEMEENSCHAP.md een VORM delen -- de vraag onder de architectuur van FoundationOS'],
 
   /* De ketenbereikmeting hoort bij deze groep en niet bij de gouden ketens: die
      meten of een keten SLUIT, deze meet of de keten door een mensenzin wordt
@@ -518,13 +519,13 @@ const REGISTERS = [
      een verouderde basislijn. */
   ['TEKSTOPPERVLAK.json', 'npm run tekstoppervlak', 'waar gebruikerszichtbare tekst ontstaat, en de basislijn van keuringsregel 68'],
   ['APPWERKT.json', 'npm run appwerkt', 'welke apps werkelijk werken, en de defecten die de meter vond'],
-  ['AANROEPGRAAF.json', 'node scripts/aanroepgraaf.js --vastleggen', 'wie wie aanroept in server/ en scripts/'],
+  ['AANROEPGRAAF.json', 'node -r ./scripts/lib/invoerspoor-preload.js scripts/aanroepgraaf.js --vastleggen', 'wie wie aanroept in server/ en scripts/'],
   ['KERNHERKOMST.json', 'node scripts/kernherkomst.js --vastleggen', 'waar een kernnaam vandaan komt en wie hem doorgeeft'],
-  ['SYMBOLEN.json', 'node scripts/symbolen.js --vastleggen', 'welke functies waar wonen'],
+  ['SYMBOLEN.json', 'node -r ./scripts/lib/invoerspoor-preload.js scripts/symbolen.js --vastleggen', 'welke functies waar wonen'],
   ['SCHERMGEDRAG.json', 'node scripts/schermgedrag.js --vastleggen', 'wat een scherm werkelijk doet, gelezen uit zijn eigen script'],
-  ['SCHERMROUTES.json', 'node scripts/schermroutes.js --vastleggen', 'welk bestand in public/ welk API-pad noemt, en welke daarvan dood zijn'],
+  ['SCHERMROUTES.json', 'node -r ./scripts/lib/invoerspoor-preload.js scripts/schermroutes.js --vastleggen', 'welk bestand in public/ welk API-pad noemt, en welke daarvan dood zijn'],
   ['SCHERMFUNCTIE.json', 'npm run schermfunctie', 'welke paren schermen dezelfde API-paden aanroepen, en welke schermen doorverwijzen -- de meting onder SCHERMEIGENAAR.json'],
-  ['ROUTEBRON.json', 'node scripts/routebron.js --vastleggen', 'de routelijst waar SCHERMROUTES tegen meet -- veroudert hij, dan verzint de dode-padenteller er'],
+  ['ROUTEBRON.json', 'node -r ./scripts/lib/invoerspoor-preload.js scripts/routebron.js --vastleggen', 'de routelijst waar SCHERMROUTES tegen meet -- veroudert hij, dan verzint de dode-padenteller er'],
   ['CONTEXTPROEF.json', 'node scripts/contextproef.js --vastleggen', 'of de async-context blijft staan waar hij moet blijven staan'],
   ['CONTEXTDOORGIFTE.json', 'npm run contextdoorgifte', 'of de identiteit van een verzoek door de async-contexten loopt waar hij hoort, en niet verder (Fase 2, I1-I10)'],
   ['FAALPROEF.json', 'node scripts/faalproef.js --vastleggen', 'wat er gebeurt als een afhankelijkheid wegvalt'],

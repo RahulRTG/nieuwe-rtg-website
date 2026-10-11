@@ -2,14 +2,14 @@
  "soort": "index",
  "uitleg": "Welke module heeft welke naam op het contextobject gezet. Drie vormen: het basisobject, een directe toewijzing, en Object.assign met een fabriek -- die laatste gelezen uit het laatste letterlijke return-object van die fabriek.",
  "stempel": {
-  "op": "2026-10-06",
-  "commit": "34b19a5c7"
+  "op": "2026-10-11",
+  "commit": "05b1f2929"
  },
  "grens": "Er wordt niet geraden. Een samenvoeging die niet te volgen is levert geen naam maar een regel in `onopgelost`, met de reden. Een herkomst die je naar de verkeerde module wijst is erger dan geen herkomst.",
  "gemeten": {
-  "namen": 1338,
-  "vulplekken": 335,
-  "basisNamen": 467,
+  "namen": 1341,
+  "vulplekken": 337,
+  "basisNamen": 468,
   "namenMetMeerdereHerkomsten": 1,
   "onopgelost": 30
  },
@@ -206,7 +206,7 @@
   },
   {
    "bestand": "server/server.js",
-   "lijn": 2184,
+   "lijn": 2168,
    "vorm": "basis",
    "reden": "een spread in het basisobject"
   }
@@ -8575,6 +8575,15 @@
    ]
   },
   {
+   "naam": "release",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/command/journaal.js",
+     "hoe": "toewijzing"
+    }
+   ]
+  },
+  {
    "naam": "releaseDrop",
    "herkomsten": [
     {
@@ -9886,6 +9895,15 @@
   },
   {
    "naam": "sessieregister",
+   "herkomsten": [
+    {
+     "bestand": "server/server.js",
+     "hoe": "basisobject"
+    }
+   ]
+  },
+  {
+   "naam": "sessiestroom",
    "herkomsten": [
     {
      "bestand": "server/server.js",
@@ -11762,6 +11780,15 @@
     {
      "bestand": "server/server.js",
      "hoe": "basisobject"
+    }
+   ]
+  },
+  {
+   "naam": "verzoek",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/command/journaal.js",
+     "hoe": "toewijzing"
     }
    ]
   },

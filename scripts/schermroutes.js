@@ -64,6 +64,9 @@ if (require.main !== module) return;
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+/* De gemeten invoer voor het stempel (ARCHITECTOPDRACHT.md fase 2); zonder
+   invoerspoor-preload is dit undefined en verandert het stempel niet. */
+const { blok: invoerBlok } = require('./lib/invoerspoor');
 const { lex } = require('./ast/lexer');
 
 const WORTEL = path.join(__dirname, '..');
@@ -235,7 +238,7 @@ const uit = {
      dekkingsvraag triviaal waar, dus scripts/codewereld.js telt hem apart. */
   soort: 'index',
   uitleg: 'Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is "dit bestand noemt dit pad" -- niet "roept het aan".',
-  stempel: { op: new Date().toISOString().slice(0, 10), commit },
+  stempel: { op: new Date().toISOString().slice(0, 10), commit, invoer: invoerBlok(['SCHERMROUTES.json']) },
   grens: 'Een voorvoegsel uit een sjabloon met een gat is GEEN route en wordt nooit tegen de routelijst gelegd. Exacte paden wel: een exact pad dat niet bestaat, is een dood pad.',
   gemetenTegen: bekend ? { register: 'ROUTEBRON.json', stempel: routebronStempel, bekendePaden: bekend.size }
     : { register: null, reden: 'ROUTEBRON.json ontbreekt; er is dus niets dood verklaard' },

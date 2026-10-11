@@ -99,7 +99,7 @@ test('3. echte server: zetten en roteren vragen een verse passkey, zonder terugv
     assert.equal((await api('/api/techniek/sso/geheim', { org: 'b22klant', clientSecret: 'eerste' }, eig)).status, 403);
     assert.equal((await stand()).geheimGezet, false);
 
-    const zw = await zwaarApi(api, srv.base, eig);
+    const zw = await zwaarApi(api, srv.base, eig, 'Imran');
     const zonder = await api('/api/techniek/sso/geheim', { org: 'b22klant', clientSecret: 'eerste' }, eig);
     assert.equal(zonder.status, 401);
     assert.equal(zonder.body.bevestigingNodig, true);

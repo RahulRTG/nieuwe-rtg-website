@@ -183,6 +183,9 @@ module.exports = function maakPostgresVerzoeken(o) {
               throw Object.assign(new Error('Een voor-commithaak muteerde zonder save(): ' + namenVan(stil2)),
                 { code: 'PG_SAVE_ONTBREEKT' });
             if (commits.teCommitten(ctx)) await commits.commit(ctx);
+            /* Het spoor van dit verzoek staat vast; een vroege commit uit een
+               na-commiteffect hoeft het niet meer mee te nemen (db/verzoekspoor.js). */
+            ctx.verzoekGecommit = true;
             context.draaiNaCommit(ctx);
           }
           context.sluit(ctx);

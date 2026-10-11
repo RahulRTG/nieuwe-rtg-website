@@ -5,9 +5,9 @@
 
     // een nieuwe dag aannemen
     h += '<div class="st-sec h-mt100">'+T('wd.nieuw','Nieuwe dag aannemen')+'</div>'+
-      '<div class="row-gap"><input id="wdKlant" class="st-in" placeholder="'+T('wd.klant','Voor wie (bijv. Sophie en Milan)')+'" maxlength="60" class="h-flex2"><select id="wdSoort" class="st-in h-flex1"><option value="bruiloft">bruiloft</option><option value="prive-event">prive-event</option></select>'+
+      '<div class="row-gap"><input id="wdKlant" class="st-in h-flex2" placeholder="'+T('wd.klant','Voor wie (bijv. Sophie en Milan)')+'" maxlength="60"><select id="wdSoort" class="st-in h-flex1"><option value="bruiloft">bruiloft</option><option value="prive-event">prive-event</option></select>'+
       '<select id="wdLoc" class="st-in h-flex2">'+d.locaties.map(l=>'<option value="'+escAttr(l)+'">'+esc(l)+'</option>').join('')+'</select></div>'+
-      '<div class="row-gap h-mt40"><input id="wdDatum" class="st-in" type="date" class="h-flex1"><input id="wdGasten" class="st-in" type="number" min="2" placeholder="'+T('wd.gasten','gasten')+'" class="h-flex1"><input id="wdBudget" class="st-in" type="number" min="0" placeholder="'+T('wd.budget','budget')+'" class="h-flex1">'+
+      '<div class="row-gap h-mt40"><input id="wdDatum" class="st-in h-flex1" type="date"><input id="wdGasten" class="st-in h-flex1" type="number" min="2" placeholder="'+T('wd.gasten','gasten')+'"><input id="wdBudget" class="st-in h-flex1" type="number" min="0" placeholder="'+T('wd.budget','budget')+'">'+
       '<button id="wdMaak" style="flex:1;'+PL_GOUD+'">'+T('wd.aannemen','Neem aan')+'</button></div>';
 
     // de draaiboeken zelf
@@ -49,8 +49,8 @@
 
     // een dossier openen
     h += '<div class="st-sec h-mt100">'+T('lx.dossiers','Dossiers')+'</div>'+
-      '<div class="row-gap"><input id="lxKlant" class="st-in" placeholder="'+T('lx.klant','Client')+'" maxlength="60" class="h-flex1"><select id="lxVak" class="st-in h-flex1"><option value="advocaat">advocaat</option><option value="notaris">notaris</option><option value="fiscalist">fiscalist</option></select>'+
-      '<input id="lxOms" class="st-in" placeholder="'+T('lx.oms','Waar gaat het over (kort)')+'" maxlength="160" class="h-flex2"><button id="lxMaak" style="flex:1;'+PL_GOUD+'">'+T('lx.open','Open dossier')+'</button></div>';
+      '<div class="row-gap"><input id="lxKlant" class="st-in h-flex1" placeholder="'+T('lx.klant','Client')+'" maxlength="60"><select id="lxVak" class="st-in h-flex1"><option value="advocaat">advocaat</option><option value="notaris">notaris</option><option value="fiscalist">fiscalist</option></select>'+
+      '<input id="lxOms" class="st-in h-flex2" placeholder="'+T('lx.oms','Waar gaat het over (kort)')+'" maxlength="160"><button id="lxMaak" style="flex:1;'+PL_GOUD+'">'+T('lx.open','Open dossier')+'</button></div>';
     h += (d.dossiers||[]).map(x=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 4.5rem;">'+esc(x.id)+'</span><b style="flex:1;font-size:0.82rem;">'+esc(x.klant)+' · '+esc(x.omschrijving)+'</b><span class="sub">'+esc(x.vak)+' · '+esc(x.status)+'</span>'+
       (x.status!=='afgerond'?plKnop('data-lxaf', x.id, T('lx.afgerond','Afgerond')):'')+'</div>').join('');
@@ -59,7 +59,7 @@
     h += '<div class="st-sec h-mt100">'+T('lx.agenda','Afspraak plannen')+'</div>'+
       '<div class="row-gap"><select id="lxAdv" class="st-in h-flex2">'+d.adviseurs.map(a=>'<option value="'+a.id+'">'+esc(a.naam)+' ('+esc(a.vak)+')</option>').join('')+'</select>'+
       '<select id="lxDos" class="st-in h-flex1">'+(d.dossiers||[]).map(x=>'<option value="'+x.id+'">'+esc(x.id)+' · '+esc(x.klant)+'</option>').join('')+'</select>'+
-      '<input id="lxDatum" class="st-in" type="date" class="h-flex1"><input id="lxTijd" class="st-in" type="time" class="h-flex1">'+
+      '<input id="lxDatum" class="st-in h-flex1" type="date"><input id="lxTijd" class="st-in h-flex1" type="time">'+
       '<button id="lxBoek" style="flex:1;'+PL_GOUD+'">'+T('lx.boek','Plan')+'</button></div>';
     h += (d.afspraken||[]).slice(0,8).map(f=>'<div class="sub" style="padding:0.3rem 0;">'+esc(f.datum)+' '+esc(f.tijd)+' · '+esc(f.adviseur)+' · '+esc(f.dossier)+' · '+esc(f.klant)+'</div>').join('');
     h += '<p class="sub h-mt50">'+esc(d.regel||'')+'</p>';

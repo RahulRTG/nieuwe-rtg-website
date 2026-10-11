@@ -27,10 +27,18 @@ const CONTRACTEN = {
     { klasse: 'OBJECT_SCOPED', objectVeld: 'gezinscode', uitleg: 'de 128-bit gezinscode, het profiel-id en de eigen profielpincode begrenzen de toegang' },
     'Profielkeuze geeft een nieuwe gezinssessie voor exact dit profiel. Een antwoordcache zou een sessiegeheim heronthullen; de route staat daarom in lib/eenmalig-geheim-routes.js.',
     'test/gezinsdeur.test.js en test/gezinssessie.test.js: alleen de juiste gezinscode, profielkeuze en pincode geven een sessie en iedere nieuwe inlog geeft een ander token'),
-  'POST /api/foundation/gezin/code/roteer': NIEUW('foundation.gezinscode.roteren', BEHEERDER,
-    'Elke oproep maakt een nieuwe 128-bit gezinscode en vervangt de vorige; een herhaling die de vorige ' +
-    'teruggaf zou een vervangen code heronthullen. De route staat in lib/eenmalig-geheim-routes.js.',
-    'test/gezinsdeur.test.js: na roteren opent de vorige gezinscode niets, een kind krijgt 403'),
+  /* Tot 7 oktober 2026 NIEUW: de volle idemronde vond dat een herhaling met dezelfde
+     sleutel een TWEEDE keer roteerde, waardoor de net gedeelde code dood was. Besluit
+     van de eigenaar: idempotent maken, in de vorm van kern/meet.js meetCode. */
+  'POST /api/foundation/gezin/code/roteer': { mutatieId: 'foundation.gezinscode.roteren', herkomst: 'mens',
+    semantiek: { klasse: 'sleutelVereist' }, toegang: BEHEERDER, stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/gezinscode-roteer-idem.test.js: dezelfde sleutel twee keer geeft 409 met herhaald, ' +
+      'zonder kale code, en de eerste nieuwe code blijft de enige die opent; een verse sleutel roteert wel, ' +
+      'en de vorige code opent daarna niets', op: '2026-10-11' },
+    nagekeken: 'Claude, 2026-10-11: gezinscode.geef bindt beheerder, adres en idem-hash in dezelfde ' +
+      'collectietransactie als de rotatie; de herhaling toont de code niet opnieuw (hij bestaat alleen als hash) ' +
+      'en de generieke antwoordcaches blijven uitgesloten (lib/eenmalig-geheim-routes.js).',
+    afgetekend: { door: 'Claude, gezinscode.js en gezinsdeur.js gelezen en de herhaling op een echte server beproefd', op: '2026-10-11' } },
   'POST /api/foundation/gezin/code/intrek': STAND('foundation.gezinscode.intrekken', BEHEERDER,
     'test/gezinsdeur.test.js: na intrekken opent de gezinscode niets, een tweede keer zegt ingetrokken 0 niet als fout'),
   'POST /api/foundation/gezin/stroom/ticket': NIEUW('foundation.gezinsstroom.ticket', GEZIN,

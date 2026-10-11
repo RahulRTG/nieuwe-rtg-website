@@ -22,7 +22,7 @@
  },
  "telling": {
   "creatie": 45,
-  "beschermd": 16,
+  "beschermd": 17,
   "berekening": 70,
   "instelling": 27,
   "code-maker": 8,
@@ -606,6 +606,10 @@
   "/api/supplier/rtmail/imap/sleutel": {
    "klasse": "code-maker",
    "reden": "Zelfde route aan de zaakkant als /api/member/rtmail/imap/sleutel: een verse apparaatsleutel per oproep, INTENTIONALLY_NON_IDEMPOTENT in het mutatiecontract en eenmalig-geheim in server/lib/eenmalig-geheim-routes.js. Besloten door de eigenaar op 29 september 2026."
+  },
+  "/api/foundation/gezin/code/roteer": {
+   "klasse": "beschermd",
+   "reden": "De volle idemronde van 7 oktober 2026 vond dat een herhaling met dezelfde sleutel de gezinscode een TWEEDE keer roteerde, waardoor de code die de beheerder net had gedeeld meteen niets meer opende. Sinds 11 oktober bindt foundation/gezinscode.js de sleutel als hash aan de rotatie, in dezelfde collectietransactie: dezelfde sleutel geeft 409 met herhaald en geen tweede code (de kale code wordt nooit heronthuld), een verse sleutel roteert wel."
   }
  }
 }

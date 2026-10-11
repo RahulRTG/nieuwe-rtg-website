@@ -22,6 +22,7 @@
 /* LET OP -- deze toets maakt en dropt een EIGEN database (naam met achtervoegsel
    -wacht) en raakt de database uit DATABASE_URL alleen om die aan te maken. */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
@@ -29,7 +30,7 @@ const path = require('path');
 const { startServer, stop, stopNet } = require('./helper');
 
 const BRON = process.env.DATABASE_URL || process.env.PG_URL || '';
-const OVERSLAAN = BRON ? false : 'geen DATABASE_URL: het wachten op Postgres bestaat alleen in de Postgres-stand';
+const OVERSLAAN = vereist('pg', !!BRON, 'geen DATABASE_URL: het wachten op Postgres bestaat alleen in de Postgres-stand');
 const wacht = ms => new Promise(r => setTimeout(r, ms));
 
 test('een onbereikbare database bij de start is tijdelijk, geen dode instance',

@@ -5,7 +5,7 @@
    daarna, en dat is de gevaarlijkere: WIE laten we hiermee binnen, en met welke
    rechten.
 
-   DRIE REGELS DIE HIER NIET TE OMZEILEN ZIJN
+   VIER REGELS DIE HIER NIET TE OMZEILEN ZIJN
 
    1. SSO GEEFT NOOIT EEN BETAALDE PAS. De merkregel is dat Lifestyle en Business
       uitsluitend na een MENSELIJK besluit worden verleend. Een inlog via de
@@ -20,6 +20,10 @@
 
    3. HET DOMEIN MOET BIJ DE KOPPELING HOREN. Zie koppelingen.js: zonder die
       controle kan de provider van klant A een adres van klant B claimen.
+
+   4. UIT DIENST GEMELD IS DICHT. Een account dat de organisatie via SCIM op
+      non-actief zette, komt ook met een geldig token niet binnen; zie
+      weigerUitgezet hieronder.
 
    WAT DE KOPPELING WEL KAN, EN WAT DAT BETEKENT
 
@@ -38,6 +42,7 @@
 const crypto = require('crypto');
 const S = require('../accounts/state');
 const accountDuurzaamheid = require('../accounts/duurzaamheid');
+const { uitgezet } = require('../accounts/sessiegrens');
 const koppelingen = require('./koppelingen');
 
 function zorgTabel(db) {
@@ -86,6 +91,24 @@ function identiteitenVan(org) {
    e-mail) de aangewezen route; die bewijst tenminste dat hij bij het adres kan. */
 function onbruikbaarWachtwoord() { return crypto.randomBytes(32).toString('base64'); }
 
+/* UIT DIENST GEMELD IS OOK VIA DE PROVIDER DICHT (N31 van de V1-audit).
+
+   De provider van de klant kan iemand nog aanmelden terwijl dezelfde
+   organisatie hem via SCIM bij ons al uit dienst meldde: twee systemen, twee
+   momenten. Hier werd zo'n account gewoon teruggegeven, en binnen() draaide
+   dan de tenantbrug, schreef de inlog als geslaagd in het spoor en gaf een
+   overdrachtsbewijs uit (dat sinds N20 bij het eerste gebruik niet meer telt).
+   Nu gooit aanmelden(), en dat is de weigervorm die de twee routes al kennen:
+   401 met een tekst die niets verklapt, de reden in het logboek, en
+   logInlog('sso', false). Het staat HIER en niet in binnen(), omdat legVast
+   hieronder al schrijft: een koppeling of een "laatste inlog" op een account
+   dat uit dienst is, is een inlog die er niet geweest is. "Uitgezet" is de ene
+   opvatting uit ../accounts/sessiegrens.js, op het account zelf gelezen, zodat
+   ook een dubbelganger van `accounts` hem niet kan overslaan. */
+function weigerUitgezet(u) {
+  if (uitgezet(u)) throw new Error('Dit account staat op non-actief (uit dienst gemeld door de organisatie).');
+}
+
 /* De hoofdingang. `accounts` komt binnen als parameter zodat tests er een
    eenvoudige dubbelganger voor kunnen zetten. */
 async function aanmelden(accounts, koppeling, claims) {
@@ -112,7 +135,7 @@ async function aanmelden(accounts, koppeling, claims) {
   const bekend = vindIdentiteit(koppeling.org, subject);
   if (bekend) {
     const u = accounts.getUserById(bekend.user_id);
-    if (u) { legVast(koppeling.org, subject, u.id); return { user: u, nieuw: false, gekoppeld: false }; }
+    if (u) { weigerUitgezet(u); legVast(koppeling.org, subject, u.id); return { user: u, nieuw: false, gekoppeld: false }; }
     // het account is verwijderd (AVG-vergetelheid); de oude verwijzing mag weg
     S.huidigeDb().prepare('DELETE FROM sso_identiteiten WHERE org = ? AND subject = ?').run(koppeling.org, subject);
   }
@@ -121,6 +144,7 @@ async function aanmelden(accounts, koppeling, claims) {
      De pas van dat account blijft staan -- SSO verandert nooit iemands pas. */
   const bestaand = accounts.findByLogin(email);
   if (bestaand) {
+    weigerUitgezet(bestaand);
     legVast(koppeling.org, subject, bestaand.id);
     return { user: bestaand, nieuw: false, gekoppeld: true };
   }

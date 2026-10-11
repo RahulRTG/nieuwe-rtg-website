@@ -12,19 +12,19 @@
 
     // een passant binnenmelden: de eerste passende plaats
     h += '<div class="st-sec h-mt100">'+T('mr.passant','Passant binnenmelden')+'</div>'+
-      '<div class="row-gap"><input id="mrBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" class="h-flex2"><input id="mrEig" class="st-in" placeholder="'+T('mr.eig','Eigenaar')+'" maxlength="60" class="h-flex2">'+
+      '<div class="row-gap"><input id="mrBoot" class="st-in h-flex2" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60"><input id="mrEig" class="st-in h-flex2" placeholder="'+T('mr.eig','Eigenaar')+'" maxlength="60">'+
       '<input id="mrLen" class="st-in" type="number" step="0.5" min="1" placeholder="m" style="flex:0 0 4.5rem;"><input id="mrNacht" class="st-in" type="number" min="1" value="1" style="flex:0 0 4.5rem;">'+
       '<button id="mrMeld" style="flex:1;'+goud+'">'+T('mr.meld','Wijs plaats toe')+'</button></div>';
 
     // de brandstofsteiger
     h += '<div class="st-sec h-mt100">'+T('mr.brandstof','De brandstofsteiger')+'</div>'+
-      '<div class="row-gap"><input id="mrBBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" class="h-flex2"><select id="mrBSoort" class="st-in h-flex1"><option value="diesel">diesel</option><option value="benzine">benzine</option></select>'+
-      '<input id="mrBLiters" class="st-in" type="number" min="1" placeholder="liters" class="h-flex1"><button id="mrBVraag" style="flex:1;'+goud+'">'+T('mr.tank','Meld aan')+'</button></div>';
+      '<div class="row-gap"><input id="mrBBoot" class="st-in h-flex2" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60"><select id="mrBSoort" class="st-in h-flex1"><option value="diesel">diesel</option><option value="benzine">benzine</option></select>'+
+      '<input id="mrBLiters" class="st-in h-flex1" type="number" min="1" placeholder="liters"><button id="mrBVraag" style="flex:1;'+goud+'">'+T('mr.tank','Meld aan')+'</button></div>';
     h += (d.brandstof||[]).filter(b=>b.status==='gevraagd').map(b=>'<div class="sub" style="padding:0.3rem 0;">'+esc(b.boot)+' · '+esc(b.soort)+' · '+b.liters+' l '+knop('data-mrbk', b.id, T('mr.getankt','Getankt'), true)+'</div>').join('');
 
     // service en de hellingbaan
     h += '<div class="st-sec h-mt100">'+T('mr.service','Service en de helling')+'</div>'+
-      '<div class="row-gap"><input id="mrSBoot" class="st-in" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60" class="h-flex2"><select id="mrSSoort" class="st-in h-flex1">'+Object.keys(MR_SVC).map(s=>'<option value="'+s+'">'+MR_SVC[s]+'</option>').join('')+'</select>'+
+      '<div class="row-gap"><input id="mrSBoot" class="st-in h-flex2" placeholder="'+T('mr.boot','Naam boot')+'" maxlength="60"><select id="mrSSoort" class="st-in h-flex1">'+Object.keys(MR_SVC).map(s=>'<option value="'+s+'">'+MR_SVC[s]+'</option>').join('')+'</select>'+
       '<input id="mrSWens" class="st-in" placeholder="'+T('mr.wens','Wat moet er gebeuren?')+'" maxlength="160" style="flex:3;"><button id="mrSVraag" style="flex:1;'+goud+'">'+T('mr.tank','Meld aan')+'</button></div>';
     h += (d.service||[]).filter(s=>s.status!=='klaar').map(s=>'<div style="display:flex;gap:0.5rem;align-items:center;border-bottom:1px solid var(--line);padding:0.35rem 0;">'+
       '<span class="sub" style="flex:0 0 7rem;">'+MR_SVC[s.soort]+'</span><b style="flex:1;font-size:0.82rem;">'+esc(s.boot)+' · '+esc(s.wens)+'</b><span class="sub">'+esc(s.status)+'</span>'+
@@ -33,7 +33,7 @@
     // de marina-concierge: de jetset op het water
     h += '<div class="st-sec h-mt100">'+T('mr.concierge','De marina-concierge')+'</div>'+
       '<div class="row-gap"><select id="mrCSoort" class="st-in h-flex1">'+Object.keys(MR_CON).map(s=>'<option value="'+s+'">'+MR_CON[s]+'</option>').join('')+'</select>'+
-      '<input id="mrCVoor" class="st-in" placeholder="'+T('mr.voor','Voor wie')+'" maxlength="60" class="h-flex1"><input id="mrCWens" class="st-in" placeholder="'+T('mr.cwens','De wens (bijv. tender om 12:00 naar de baai)')+'" maxlength="160" style="flex:3;">'+
+      '<input id="mrCVoor" class="st-in h-flex1" placeholder="'+T('mr.voor','Voor wie')+'" maxlength="60"><input id="mrCWens" class="st-in" placeholder="'+T('mr.cwens','De wens (bijv. tender om 12:00 naar de baai)')+'" maxlength="160" style="flex:3;">'+
       '<button id="mrCVraag" style="flex:1;'+goud+'">'+T('mr.vraag','Vraag aan')+'</button></div>';
     h += (d.concierge||[]).map(c=>'<div style="border:1px solid '+(c.status==='afgerond'?'var(--line)':'var(--gold)')+';border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+MR_CON[c.soort]+' · '+esc(c.voorWie)+'</b><span class="sub">'+esc(c.status)+'</span></div>'+

@@ -14,6 +14,8 @@ app.post('/api/office/partner/decide', boardroomAuth, async (req, res) => {
   if (!a) return res.status(404).json({ error: 'Aanvraag niet gevonden.' });
   if (a.status !== 'nieuw') return res.status(409).json({ error: 'Deze aanvraag is al behandeld.' });
   if (req.body.action === 'goedkeuren') {
+    // de welkomstmail draagt een link; zonder vaste basis eerst niets goedkeuren (lib/linkbasis.js)
+    if (!appUrl(req)) return res.status(503).json({ error: require('../../lib/linkbasis').ONTBREEKT, code: 'app-url-ontbreekt' });
     // de toegangseis geldt ook hier: een partnerplek vraag je aan ALS LID, met
     // welke pas dan ook. Zonder ledenbewijs bij de aanvraag gaat er geen
     // bedrijfscode de deur uit. `businessPass` staat er nog voor aanvragen van

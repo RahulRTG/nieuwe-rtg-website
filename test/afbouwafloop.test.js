@@ -214,14 +214,18 @@ test('6. klaar() weigert een niet-terminale stand', () => {
    check.js als stap). De proef bewijst beide kanten: de eigen ouder telt, een
    levend maar vreemd proces niet, en een PID met een andere starttijd evenmin. */
 test('eigenLijn: alleen een levende voorouder met dezelfde starttijd', () => {
-  const fsx = require('fs');
   const cpx = require('child_process');
   const afloopMod = require('../scripts/lib/afbouw-afloop');
+  /* De starttijd uit de productcode zelf (scripts/lib/procinfo.js: /proc op
+     Linux, `ps` elders), en niet uit een eigen /proc-lezing. Hier stond een
+     `return` als /proc ontbrak: dan sloeg deze toets zich op macOS stil over en
+     telde hij als geslaagd. Nu draait hij op elk platform met een `ps`, en
+     zakt hij hard als het platform geen starttijd kan leveren. */
   const start = pid => {
-    const s = fsx.readFileSync('/proc/' + pid + '/stat', 'utf8');
-    return Number(s.slice(s.lastIndexOf(')') + 2).split(' ')[19]);
+    const s = afloopMod.procesStart(pid);
+    assert.ok(Number.isFinite(s), 'het platform levert een starttijd voor ' + pid + ' (zonder die is eigenLijn altijd nee)');
+    return s;
   };
-  if (!fsx.existsSync('/proc/self/stat')) return; // zonder /proc is het antwoord altijd nee
   const ouder = { wortel: { pid: process.ppid, start: start(process.ppid) } };
   assert.equal(afloopMod.eigenLijn(ouder), true, 'de eigen ouder is eigen lijn');
   assert.equal(afloopMod.eigenLijn({ wortel: { pid: process.pid, start: start(process.pid) } }), true, 'het eigen proces ook');

@@ -1,8 +1,9 @@
 /* GELD LANGS EEN KASCODE (kern/pay/kas-boek.js): de boekingen onder een claim,
    elk met een eigen economische sleutel.
 
-   ./samen.js boekt een betaling in delen (een maaltijdbudget, dan de eigen
-   wallet) en draait bij een weigering terug. Dat klopt binnen EEN proces, maar
+   Een betaling in delen (een maaltijdbudget, dan de eigen wallet; de
+   samenstelling komt uit ./samen.js) werd vroeger in een lus geboekt die bij
+   een weigering terugdraaide. Dat klopt binnen EEN proces, maar
    een crash halverwege, of een tweede instance die dezelfde claim hervat, zou
    de delen nog een keer boeken. Hier daarom drie regels:
 

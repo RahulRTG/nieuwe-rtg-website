@@ -64,6 +64,9 @@ module.exports = function hangWebhooksOp(deps) {
 
   require('./kaartwebhooks')({ app, express, db, save, log, betaal, betaalWaarheid,
     webhookRem, webhookPoort, settleFactuur, opdrachtenVan });
+  /* De Connect-webhook voor partnerafrekeningen: een eigen adres en geheim
+     naast de platformwebhook hierboven (zie de kop van ./connectwebhook.js). */
+  require('./connectwebhook')({ app, express, db, save, log, webhookRem, webhookPoort });
 
   /* Munt-webhook: de munt-aanbieder bevestigt hier dat de munten binnen zijn en
      omgezet naar euro. Net als de betaal-webhook: ruwe body, handtekening over de

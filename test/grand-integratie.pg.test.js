@@ -30,17 +30,16 @@
    hebben. Draai ze daarom serieel via `npm run test:pg` (of geef elke toets een
    eigen database). */
 const test = require('node:test');
+const { vereistAlle } = require('./infra');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stopNet } = require('./helper');
+const { startServer, stop, stopNet, stroomAdres } = require('./helper');
 
 const HEEFT_PG = !!(process.env.DATABASE_URL || process.env.PG_URL);
 const HEEFT_REDIS = !!process.env.REDIS_URL;
-const OVERSLAAN = (HEEFT_PG && HEEFT_REDIS)
-  ? false
-  : 'vereist DATABASE_URL EN REDIS_URL (twee instances + gedeelde bus)';
+const OVERSLAAN = vereistAlle([['pg', !!HEEFT_PG], ['redis', !!HEEFT_REDIS]], 'vereist DATABASE_URL EN REDIS_URL (twee instances + gedeelde bus)');
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -221,11 +220,11 @@ test('GRAND: twee instances op gedeelde Postgres + Redis, volledige gelijktijdig
     await api(A.base, '/api/supplier/menu', { menu: [
       { id: 'ramen', name: 'Tonkotsu Ramen', price: 22, cat: 'Warm', station: 'keuken', sectie: 'warm' }
     ] }, supA.token);
-    const supStream = await openSSE(B.base + '/api/supplier/stream?token=' + encodeURIComponent(supB.token));
+    const supStream = await openSSE(await stroomAdres(B.base, '/api/supplier/stream', supB.token, { stroom: 'zaak' }));
     streams.push(supStream);
 
     const koper = leden[0]; // op A geregistreerd
-    const koperStream = await openSSE(A.base + '/api/stream?token=' + encodeURIComponent(koper.token));
+    const koperStream = await openSSE(await stroomAdres(A.base, '/api/stream', koper.token));
     streams.push(koperStream);
 
     let orderRef = null;
@@ -337,7 +336,7 @@ test('GRAND: twee instances op gedeelde Postgres + Redis, volledige gelijktijdig
       assert.equal(resp.status, 200, 'Y accepteert de connectie');
 
       // Y opent zijn live-kanaal; X belt (WebRTC-ring). De server is enkel signalering.
-      const yStream = await openSSE(A.base + '/api/stream?token=' + encodeURIComponent(Y.token));
+      const yStream = await openSSE(await stroomAdres(A.base, '/api/stream', Y.token));
       streams.push(yStream);
       /* WACHTEN OP `hello`, en niet 150 ms gokken. /api/stream zet de client in
          sseClients en stuurt daarna meteen een `hello` (server.js). Dat event is

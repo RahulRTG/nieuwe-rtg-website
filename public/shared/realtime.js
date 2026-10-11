@@ -43,7 +43,7 @@
 
     _connect(){
       if (!window.EventSource) return;
-      try { this.source = new EventSource('/api/stream?token=' + encodeURIComponent(this.token)); }
+      try { this.source = RTGStroom.open('/api/stream', { token: this.token }); }
       catch (e) { return; }
       this.source.addEventListener('sync', e => {
         const d = JSON.parse(e.data);

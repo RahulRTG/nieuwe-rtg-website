@@ -125,9 +125,17 @@ async function gezond(url, seconden) {
   /* ---------- 3. en dan de echte server, met de echte CMD ----------
      Zonder node_modules: nul runtime-dependencies betekent dat dit kan. */
   docker(['rm', '-f', NAAM]); // een restant van een afgebroken ronde
+  /* RTG_LOKAAL_NETWERK=BEVESTIGD: sinds A-P1-02 (server/lib/luisteradres.js)
+     luistert een ontwikkelserver zonder bewijs van een lokaal netwerk alleen op
+     de loopback -- en de loopback BINNEN de container is voor de poortkoppeling
+     van docker onbereikbaar, dus kwam /api/health nooit. Het netwerk is hier
+     aantoonbaar lokaal: de poort staat alleen op 127.0.0.1 van deze machine
+     (-p hieronder). Dat is de bevestiging die de regel vraagt, geen uitzondering
+     erop. */
   const run = docker(['run', '-d', '--name', NAAM,
     '-v', WORTEL + ':/app', '-w', '/app',
     '-e', 'RTG_DATA_DIR=/tmp/rtgproef', '-e', 'SMTP_URL=', '-e', 'PORT=3000',
+    '-e', 'RTG_LOKAAL_NETWERK=BEVESTIGD',
     '-p', '127.0.0.1:' + POORT + ':3000',
     image, ...cmd]);
   if (run.status !== 0) klaar(1, '  docker run mislukte:\n' + (run.stderr || '').trim());

@@ -44,7 +44,7 @@
          alsnog als bon langs. Ze stonden tot deze ronde tussen de ontvangsten,
          waardoor de som het dubbele van de lade was (TAKEN.md 4.59). */
       Object.entries(r.openstaandGezet||{}).map(([w, b2]) => '<div class="st-row"><span class="sub">'+T('pos.z.open','Openstaand gezet')+' '+esc(methodLabel(w))+'</span><span class="sub">'+eur(b2)+'</span></div>').join('')+
-      '<button class="bigbtn" id="zCsv" class="h-mt50">'+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
+      '<button class="bigbtn h-mt50" id="zCsv">'+T('pos.z.csv','Boekhoudexport (CSV)')+'</button>'+
       '<div class="softline h-mt30">'+T('pos.z.s','Journaalregels per btw-categorie en betaalwijze; in te lezen in Exact, Twinfield of Excel.')+'</div></div>';
     const k = el.querySelector('#zCsv');
     if (k) k.addEventListener('click', () => { API.download('/supplier/dagrapport.csv', { datum: r.datum }, 'dagrapport-' + r.datum + '.csv').catch(() => {}); });

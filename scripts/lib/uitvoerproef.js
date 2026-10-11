@@ -197,7 +197,7 @@ const VERKLAARD = {
     'server/routes/rtmail-schrijf.js', 'De sleutel zelf is maar EEN keer te zien'),
   'POST /api/office/anker': V('hash',
     'de ankerpunten van de auditketens: de hash IS het bewijsmiddel, niet het geheim',
-    'server/lib/ankerdienst.js', 'de hash over alle koppen samen'),
+    'server/lib/ankerjournalen.js', 'de hash over alle koppen samen'),
   'POST /api/office/handelingen': V('hash',
     'het handelingsspoor met zijn ketenhashes; zonder die hash valt de keten niet na te rekenen',
     'server/routes/office/toegang.js', 'een filter mag nooit bepalen of het bewijs klopt'),
@@ -206,7 +206,7 @@ const VERKLAARD = {
     'server/routes/office/toegang.js', 'een auditlog zonder zichtbare ketenstand vraagt van de'),
   'POST /api/office/anker/post': V('hash',
     'de broer van /api/office/anker: dezelfde ankerpunten, dezelfde grond -- de hash IS het bewijsmiddel',
-    'server/lib/ankerdienst.js', 'de hash over alle koppen samen'),
+    'server/lib/ankerjournalen.js', 'de hash over alle koppen samen'),
   'POST /api/privacy/export': V('hash',
     'de AVG-uitvoer van het lid over zichzelf. De hashes zijn KETENhashes: het handelingsspoor bewaart de body niet en alleen een hash, en de ketenstand gaat mee zodat de betrokkene kan NAREKENEN of er aan zijn spoor is gesleuteld in plaats van ons te moeten geloven',
     'server/routes/member/privacy.js', 'vraagt van de betrokkene dat hij ons gelooft'),
@@ -215,8 +215,25 @@ const VERKLAARD = {
     'server/kern/toestellen.js', 'Wat bewaard wordt is een sha256-afdruk')
 };
 
-/* De ratel. Gaat alleen omlaag, en de weg omlaag is een mens die aftekent. */
-const VOORGEDRAGEN_MAX = 8;
+/* De ratel. Gaat alleen omlaag, en de weg omlaag is een mens die aftekent.
+
+   DE WAARDE STAAT SINDS 6 OKTOBER 2026 IN NORM.json (meter
+   `uitvoerVoorgedragen`) en niet meer als constante hier: zo gaat een verhoging
+   langs scripts/normbasis.js en kan hij niet zonder notitie. De export
+   VOORGEDRAGEN_MAX blijft bestaan voor wie hem leest (scripts/uitvoerproef-route.js
+   en test/uitvoerproef.test.js), maar zijn getal komt uit NORM.json -- en pas
+   op het moment dat iemand hem LEEST (een getter onderaan). Bij het laden
+   lezen zou scripts/norm.js deze module niet eens kunnen laden om de meter te
+   tellen zolang de ratel nog niet in NORM.json staat, en dan kan hij er ook
+   nooit in komen. */
+const { normwaarde } = require('./normwaarde');
+
+/* Hoeveel verklaringen staan op voorgedragen en zijn dus nog door geen mens
+   afgetekend? Dezelfde telling voor de toets en voor scripts/norm.js, zodat er
+   een getal is en niet twee. */
+function telVoorgedragen() {
+  return Object.keys(VERKLAARD).filter(s => verklaringStand(s) === 'voorgedragen').length;
+}
 
 /* Is dit een verklaarde combinatie van route en veld? Geeft de reden terug, of
    null. De veldnaam komt uit de melding ("geheim veld (sleutel)"). */
@@ -313,4 +330,7 @@ async function draaiUitvoerproef({ post, routes, tokenVoor, lijfVoor, kanaries, 
 
 module.exports = { weegUitvoer, draaiUitvoerproef, maakKanaries, kanarieLijst,
   lijktGeheim, geheimVeld, GEHEIMWOORDEN, GEHEIMMERKER, VERKLAARD, verklaringVoor,
-  verklaringStand, VOORGEDRAGEN_MAX };
+  verklaringStand, telVoorgedragen };
+Object.defineProperty(module.exports, 'VOORGEDRAGEN_MAX', {
+  enumerable: true, get: () => normwaarde('uitvoerVoorgedragen')
+});

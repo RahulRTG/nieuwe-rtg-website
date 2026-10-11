@@ -1,24 +1,31 @@
 {
   "stempel": {
-    "op": "2026-09-16T06:45:18.524Z",
-    "commit": "b10def58",
+    "op": "2026-10-06T21:08:15.582Z",
+    "commit": "652d2180",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/herbouwproef.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "uitleg": "Per afgeleid artefact: draai zijn generator-eigenaar uit AFGELEID.json, en komt er hetzelfde uit? Wat herbouwbaar is, is bij een samenvoeging een HERBOUWPLICHT en geen handmatig conflict.",
   "grens": "gelijk en alleenStempel worden nooit opgeteld tot een cijfer over determinisme: een stempel HOORT te bewegen. nietGedraaid is geen oordeel over het artefact maar over deze machine, en nietGeschreven is de besturingsproef -- zonder die stand leest elke leesloze opdracht als een perfecte reproductie.",
   "gemeten": {
-    "beproefd": 18,
+    "beproefd": 20,
     "gelijk": 5,
     "alleenStempel": 9,
     "verschilt": 0,
     "nietGeschreven": 1,
-    "nietGedraaid": 3,
+    "nietGedraaid": 5,
     "herbouwbaar": 14
   },
   "artefacten": [
+    {
+      "naam": "AGENTS.md",
+      "soort": "BRON",
+      "eigenaar": null,
+      "uitslag": "nietGedraaid",
+      "reden": "soort BRON: in zijn geheel herbouwen bestaat niet"
+    },
     {
       "naam": "ARCHITECTUUR.md",
       "soort": "AFGELEID",
@@ -57,10 +64,10 @@
     },
     {
       "naam": "CLAUDE.md",
-      "soort": "FRAGMENTEN",
-      "eigenaar": "scripts/getallen.js",
+      "soort": "BRON",
+      "eigenaar": null,
       "uitslag": "nietGedraaid",
-      "reden": "soort FRAGMENTEN: in zijn geheel herbouwen bestaat niet"
+      "reden": "soort BRON: in zijn geheel herbouwen bestaat niet"
     },
     {
       "naam": "COMMERCE.json",
@@ -89,6 +96,13 @@
       "duurMs": 180099,
       "kringWeg": true,
       "reden": "over de wachttijd van 180s heen"
+    },
+    {
+      "naam": "DOCUMENTENKAART.md",
+      "soort": "FRAGMENTEN",
+      "eigenaar": "scripts/getallen.js",
+      "uitslag": "nietGedraaid",
+      "reden": "soort FRAGMENTEN: in zijn geheel herbouwen bestaat niet"
     },
     {
       "naam": "FUNCTIES.md",

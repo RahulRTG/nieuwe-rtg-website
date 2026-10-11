@@ -8,6 +8,7 @@ module.exports = (ctx) => {
   const { db, save, fs, path, nu, st, teller, journaal, naarLokaal,
     CLOUD, SLEUTEL, GEBRUIKER, WACHTWOORD, actief, HOP, KAS_DIR, KAS_MAX_BESTAND, KAS_MAX_STUKS,
     journaalPadOk, journaalZegel, journaalGeldig, JOURNAAL_MAX_BODY } = ctx;
+  const { alleenRefs, draagtWachtwoord } = require('./journaal');
   const bodyHulp = require('../../web/body');
   const PROXY_BODY_MAX = 8 * 1024 * 1024;
   const LEESFOUT = Symbol('zaakdoos-leesfout');
@@ -122,13 +123,17 @@ module.exports = (ctx) => {
      ertussen -- ze lopen over de lijn en duren lang. */
   const { haalKloon, speelNa } = require('./synchronisatie')(ctx);
 
+  /* Wat er in een regel mag, beslist ./journaal.js: het pad (nooit een inlog),
+     geen wachtwoord in het lijf, en van het antwoord alleen wat het naspelen
+     leest. Een geweigerd wachtwoordlijf zegt dat hardop, met alleen het pad. */
   function schrijfJournaal(pad, body, resBody) {
     if (!journaalPadOk(pad)) return; // alleen zaak-schrijfacties in het journaal
     const b = body || {};
     try { if (JSON.stringify(b).length > JOURNAAL_MAX_BODY) return; } catch (e) { return; } // geen onzin-body
+    if (draagtWachtwoord(b)) { console.warn('[doos] niet gejournald (wachtwoord in het lijf): ' + pad); return; }
     const rij = journaal();
     if (!Number.isInteger(db.data.doosSeq)) db.data.doosSeq = 0;
-    const e = { seq: ++db.data.doosSeq, pad, body: b, res: resBody || null, at: Date.now() };
+    const e = { seq: ++db.data.doosSeq, pad, body: b, res: alleenRefs(resBody), at: Date.now() };
     e.zegel = journaalZegel(e);
     rij.push(e);
     if (rij.length > 5000) rij.shift(); // vangnet; een dienst komt hier nooit

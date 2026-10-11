@@ -36,7 +36,8 @@ const assert = require('node:assert/strict');
    een verse, echte kern/pay. De betaalnaad is hier een lege stub, want er wordt
    niets via een bank opgeladen -- het saldo komt uit oplaadAfronden(), dezelfde
    boekingsregel die een bevestigde oplading gebruikt. */
-const keten = require('../server/kern/spellen/magnaat/rtg-keten')({ betaal: {} });
+const keten = require('../server/kern/spellen/magnaat/rtg-keten')({ betaal: {},
+  vrijgave: require('../scripts/lib/proefvrijgave').proefVrijgave() });
 
 async function opzet() {
   const { db, pay } = keten.opstelling();

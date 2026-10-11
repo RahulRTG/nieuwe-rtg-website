@@ -2005,7 +2005,7 @@ var RTG_BOUW = 'ffdbb62d';
   }
   let iceConfig = null;
   // Elke oproep verse ICE-servers (TURN met kort geldige inloggegevens roteert).
-  async function haalIce(){ try { iceConfig = (await (await fetch('/api/ice')).json()).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
+  async function haalIce(){ try { iceConfig = (await API.call('/ice', {})).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
   function maakPc(){
     const pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls:'stun:stun.l.google.com:19302' }] });
     call.stream.getTracks().forEach(t => pc.addTrack(t, call.stream));

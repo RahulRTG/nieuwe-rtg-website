@@ -9,16 +9,20 @@
    (gebonden aan DEZELFDE sessie) en opnieuw sturen.
 
    Gebruik:
-     const zw = await zwaarApi(api, base, lidToken);  // zet een passkey op dat account
+     const zw = await zwaarApi(api, base, lidToken, wachtwoord);  // zet een passkey op dat account
      await zw('/api/techniek/sso', body, token);       // de ceremonie gaat vanzelf mee
    `api(pad, body, token, ...)` moet { status, body } teruggeven. */
 'use strict';
 const { maakAuthenticator } = require('./webauthn-authenticator');
 
-async function zwaarApi(api, base, lidToken) {
+async function zwaarApi(api, base, lidToken, wachtwoord) {
+  /* Een eerste passkey vraagt het huidige wachtwoord (P1-2,
+     routes/auth/webauthn.js). Zonder dat is dit geen toets van de route maar
+     van een gat dat er niet meer is. */
+  if (!wachtwoord) throw new Error('zwaarApi: geef het wachtwoord van dit account mee; een passkey toevoegen vraagt het.');
   const origin = new URL(base).origin;
   const sleutel = maakAuthenticator(new URL(base).hostname);
-  const o = await api('/api/webauthn/registreer/opties', {}, lidToken);
+  const o = await api('/api/webauthn/registreer/opties', { huidig: wachtwoord }, lidToken);
   if (o.status !== 200) throw new Error('registratieopties: ' + JSON.stringify(o.body).slice(0, 160));
   const r = await api('/api/webauthn/registreer',
     { antwoord: sleutel.registratieAntwoord(o.body.opties.challenge, origin), naam: 'Toestel eigenaar' }, lidToken);

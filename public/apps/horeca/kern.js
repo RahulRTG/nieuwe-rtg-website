@@ -122,7 +122,7 @@
       // de trage terugval staat er ALTIJD, ook als de stroom het straks doet
       setInterval(function () { if (!K._live) K._roep('terugval'); }, 15000);
       if (!window.EventSource) return;
-      try { K._es = new EventSource('/api/supplier/stream?token=' + encodeURIComponent(TOKEN)); }
+      try { K._es = RTGStroom.open('/api/supplier/stream', { stroom: 'zaak', token: TOKEN }); }
       catch (e) { return; }
       K._es.addEventListener('hello', function () { K._live = true; });
       K._es.addEventListener('sync', function (e) {

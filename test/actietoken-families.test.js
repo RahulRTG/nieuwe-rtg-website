@@ -90,8 +90,11 @@ const post = (base) => async (pad, body, tok) => {
   });
   return { status: r.status };
 };
+/* Alleen de kop: een token in het adres wordt sinds de sessiestroom overal
+   geweigerd, en een toets die hem toch meestuurt meet die weigering in plaats
+   van het actietoken. */
 const get = (base) => async (pad, tok) => {
-  const r = await fetch(base + pad + (pad.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(tok || ''), {
+  const r = await fetch(base + pad, {
     headers: tok ? { Authorization: 'Bearer ' + tok } : {}
   });
   return { status: r.status };
@@ -121,8 +124,10 @@ test('3. een echt actietoken opent geen enkele beschermde deur', async () => {
       ['POST /api/auth/me', await p('/api/auth/me', {}, actie)],
       ['POST /api/auth/resend', await p('/api/auth/resend', {}, actie)],
       ['POST /api/auth/logout-all', await p('/api/auth/logout-all', {}, actie)],
-      ['GET /api/office/doc (query-token)', await g('/api/office/doc?id=1', actie)],
-      ['GET /api/office/stream (query-token)', await g('/api/office/stream', actie)]
+      ['GET /api/office/doc (kop)', await g('/api/office/doc?file=x', actie)],
+      ['GET /api/office/stream', await g('/api/office/stream', actie)],
+      ['POST /api/stroom/ticket (lid)', await p('/api/stroom/ticket', { stroom: 'lid' }, actie)],
+      ['POST /api/stroom/ticket (kantoor)', await p('/api/stroom/ticket', { stroom: 'kantoor' }, actie)]
     ]) {
       assert.ok(res.status === 401 || res.status === 403 || res.status === 404,
         naam + ': een actietoken gaf ' + res.status + ' en hoort geen sessie te zijn');

@@ -34,6 +34,17 @@ Nieuw bovenop de tabel hierboven: `scripts/lib/artefactketen.js` (CLI `scripts/a
 
 Fail-closed: een ontbrekende, beschadigde, gemanipuleerde of niet te verifiëren keten laat elke poort weigeren; `voegToe` schrijft pas na volledige controle van de nieuwe keten. Bewijs: `test/artefactketen.test.js` (negatieve en aanvalstoetsen) en `test/releaseketenwacht.test.js` (mutaties van workflow en promotiepad).
 
+## Eén keten: kwalificatie en promotieboek zitten erin (11 oktober 2026)
+
+Besluit van de eigenaar: er is **één releaseketen**, en dat is de artefactketen hierboven. De V1-hardening (PR #523) bracht twee dingen mee die er eerst als een eigen keten naast stonden; ze zijn nu een stap BINNEN die keten en een LEZER ervan.
+
+| Onderdeel | Plaats in de keten | Wat het toevoegt |
+|---|---|---|
+| kwalificatie (`scripts/kwalificatie.js`) | vóór `artefactketen.js gebouwd` | het image wordt één keer gebouwd, de afbouw draait op de bytes uit dát image (voor en na byte voor byte gelijk), precies dat image wordt gepubliceerd, en de getekende herkomst draagt de kwalificatie. De herkomstcontrole eist het gekwalificeerde image-ID (`--rol=app/backup --image-id=`) voordat het digest in de keten komt |
+| promotieboek (`scripts/promotieboek.js`) | lezer van de keten, in `live.sh` NA de ketenpoort | bewaart bij een uitrol de ondertekende promotie en de herkomst-met-kwalificatie onder het image-ID, alleen als de keten dat image als ACTIEF gepromoveerd kent, en verwijst naar dat ketenrecord. Bij een rollback beslist `artefactketen.js eis-rollback`; het boek leest dezelfde keten en eist daarnaast dat de kwalificatie van exact dat doel bewaard is |
+
+Het promotieboek beslist niets zonder de keten: een image dat de keten niet als gepromoveerd kent, of een archief dat naar een ander record wijst, is nee -- ook als het archief zelf klopt. De wacht (`npm run releaseketenwacht`) eist de volgorde kwalificatie → herkomstcontrole met image-ID → `artefactketen.js gebouwd`, en dat het promotieboek de keten leest voor dezelfde omgeving.
+
 ## Wat NIET bewezen is (met reden)
 
 1. **Een echte CI-run.** De nieuwe stappen in `release-image.yml` zijn in deze omgeving niet uitgevoerd: er is geen Docker-daemon. De digest-test is bewezen tegen een nep-`docker`; dat het echt werkt met GHCR is niet bewezen. Eerste echte run is de proef.

@@ -125,4 +125,6 @@ module.exports = (kern) => {
   require('./magnaat-leren')(ctx);
   require('./reizen')(ctx);       // de reisbalie: het aanbod en de aanvragen
   require('./reisteruggave')(ctx);
+  require('./vrijgave')(ctx);     // de schakelkast van de vrijgavepoort (kern/vrijgave)
+  require('./connect')(ctx);      // partnerafrekeningen over Stripe Connect (betaal/connect)
 };

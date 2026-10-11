@@ -85,8 +85,8 @@ test('een medewerker met passkey start de incassoronde met een ceremonie, en de 
 
   // A en B zetten elk een passkey op hun eigen account: sinds 25 september 2026
   // vragen BEIDE handtekeningen onder een geldhandeling er een (bank-passkey.js)
-  const sleutelA = await pk.zet(a.lid);
-  const sleutelB = await pk.zet(b.lid);
+  const sleutelA = await pk.zet(a.lid, 'Geheim123!');
+  const sleutelB = await pk.zet(b.lid, 'Geheim123!');
 
   // een vaste betaling die aan de beurt is, zodat de ronde iets te innen heeft
   const betaler = await lidMetRekening('Betaler');
@@ -163,7 +163,7 @@ test('zonder passkey: geen incassoronde en geen tweede handtekening onder geld, 
 
   // een geldaanvraag van iemand MET passkey, die een medewerker zonder niet mag aftekenen
   const e = await medewerker(5);
-  const sleutelE = await pk.zet(e.lid);
+  const sleutelE = await pk.zet(e.lid, 'Geheim123!');
   const betaler = await lidMetRekening('Betaler twee');
   const ontvanger = await lidMetRekening('Ontvanger twee');
   await api('/api/bank/storten', { iban: betaler.iban, centen: 500, idem: 'kp-stort2-' + Date.now() }, betaler.token);

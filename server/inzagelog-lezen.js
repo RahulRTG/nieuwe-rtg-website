@@ -28,7 +28,7 @@ const { nu } = require('./lib/klok');
 /* `rij` is een FUNCTIE en geen array: het journaal wordt onderweg aangevuld, en
    een eenmalig meegegeven array zou een momentopname van het opstartmoment
    zijn. */
-module.exports = ({ rij, bewaardagen, afgekapt }) => {
+module.exports = ({ rij, bewaardagen, afgekapt, max }) => {
   /* De termijn komt van de SCHRIJFKANT mee en staat hier niet als getal. Twee
      plekken die weten hoe lang dit huis bewaart, lopen uiteen zodra er een
      verandert, en dan vertelt het scherm iets anders dan de opslag doet
@@ -91,7 +91,9 @@ module.exports = ({ rij, bewaardagen, afgekapt }) => {
      anker()      maak de momentopname die weggezet moet worden (buiten dit huis).
      tegenAnker() reken af met een anker dat eerder is weggezet. */
   function anker() { return verankerPunt(rij()); }
-  function tegenAnker(a) { return verifieerTegenAnker(rij(), a); }
+  /* De bewaring gaat mee: een geankerde regel die verdween is alleen in orde als
+     de termijn of de noodrem het verklaart (lib/keten-anker.js). */
+  function tegenAnker(a) { return verifieerTegenAnker(rij(), a, { dagen: DAGEN, max, nu }); }
 
   function samenvatting() {
     const l = rij();

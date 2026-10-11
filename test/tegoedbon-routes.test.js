@@ -119,12 +119,20 @@ test('de zaak roteert en trekt in als manager; een medewerker niet', async () =>
   const login = await fetch(base + '/api/supplier/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username: 'rahul', password: 'Imran' }) }).then(r => r.json());
   const tok = login.token, supCode = login.state.supplier.code;
+  /* De zaak is de SEED-zaak en geen verse: in json-stand begint elke run met
+     een lege map, maar tegen PostgreSQL blijft haar idem-geheugen tussen runs
+     staan. Een vaste sleutel als 'bon3-zet' gaf een tweede run dan terecht het
+     EERSTE antwoord terug (met een code die al getoond was, dus 409 op het
+     roteren). Het gedrag klopt; de toets hoort per run eigen sleutels te
+     dragen, zoals lid() dat al doet met een verse codenaam. */
+  const run = Date.now().toString(36) + '-' + process.pid;
+  const s = k => 'bon3-' + k + '-' + run;
   const klant = await lid();
   await api('/api/pay/oplaad', { centen: 20000, idem: 'bon3-klant' }, klant.token);
   const kas = await api('/api/pay/kascode', { maxCenten: 20000 }, klant.token);
-  assert.equal((await api('/api/supplier/pay/in', { code: kas.body.code, centen: 15000, idem: 'bon3-in' }, tok)).status, 200);
+  assert.equal((await api('/api/supplier/pay/in', { code: kas.body.code, centen: 15000, idem: s('in') }, tok)).status, 200);
 
-  const zet = await api('/api/supplier/pay/tegoed/zet', { centen: 3000, idem: 'bon3-zet' }, tok);
+  const zet = await api('/api/supplier/pay/tegoed/zet', { centen: 3000, idem: s('zet') }, tok);
   assert.equal(zet.status, 200, JSON.stringify(zet.body).slice(0, 200));
   assert.equal(zet.kop.get('cache-control'), 'no-store');
   const ov = await api('/api/supplier/pay/tegoed', {}, tok);
@@ -133,13 +141,13 @@ test('de zaak roteert en trekt in als manager; een medewerker niet', async () =>
   const roster = await api('/api/supplier/roster', { code: supCode });
   const staf = (roster.body.staff || []).find(x => x.role !== 'manager');
   const stafTok = (await api('/api/supplier/login', { code: supCode, staffId: staf.id, pin: '5678' })).body.token;
-  assert.equal((await api('/api/supplier/pay/tegoed/roteer', { id: zet.body.tegoed.id, idem: 's' }, stafTok)).status, 403,
+  assert.equal((await api('/api/supplier/pay/tegoed/roteer', { id: zet.body.tegoed.id, idem: s('staf') }, stafTok)).status, 403,
     'een medewerker roteert niet');
-  const rot = await api('/api/supplier/pay/tegoed/roteer', { id: zet.body.tegoed.id, idem: 'm' }, tok);
+  const rot = await api('/api/supplier/pay/tegoed/roteer', { id: zet.body.tegoed.id, idem: s('m') }, tok);
   assert.equal(rot.status, 200, JSON.stringify(rot.body).slice(0, 200));
   assert.match(rot.body.tegoed.code, /^TG(-[0-9A-F]{4}){8}$/);
   const voor = (await api('/api/supplier/pay/tegoed', {}, tok)).body.openCenten;
-  const intrek = await api('/api/supplier/pay/tegoed/terug', { id: zet.body.tegoed.id, intrekken: true, idem: 'mi' }, tok);
+  const intrek = await api('/api/supplier/pay/tegoed/terug', { id: zet.body.tegoed.id, intrekken: true, idem: s('mi') }, tok);
   assert.equal(intrek.status, 200, JSON.stringify(intrek.body).slice(0, 200));
   assert.equal((await api('/api/supplier/pay/tegoed', {}, tok)).body.openCenten, voor - 3000);
   assert.equal((await fetch(base + '/api/pay/gezond').then(r => r.json())).klopt, true);

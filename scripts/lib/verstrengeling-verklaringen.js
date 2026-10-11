@@ -43,6 +43,15 @@ module.exports = [
      domein. */
   { van: 'domein:foundation', naar: 'domein:stroomticket', soort: 'GEDEELDE_PRIMITIEF',
     reden: 'gezinsstroom en lesstroom openen hun live-stroom met hetzelfde eenmalige, kortlevende ticket uit kern/stroomticket.js; twee kopieen zouden twee definities van eenmalig worden' },
+  /* DE SESSIESTROOM (6 oktober 2026). Lid, zaak, kantoor, theater en het
+     schoolbelkanaal openden hun EventSource met de volledige sessie in het
+     adres. kern/sessiestroom.js ruilt die sessie (in de kop) voor een ticket uit
+     dezelfde mechaniek als de gezins- en lesstroom; het voegt alleen de
+     verzegelde sessie en de hercontrole per soort toe. */
+  { van: 'domein:sessiestroom', naar: 'domein:stroomticket', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'de sessiestroomtickets zijn exemplaren van kern/stroomticket.js (uitgifte, eenmalige claim, binding, plafond); een eigen kopie zou een tweede definitie van eenmalig worden' },
+  { van: 'domein:school', naar: 'domein:sessiestroom', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'het klas-belkanaal ruilt het gezins- of leraartoken voor hetzelfde sessiestroomticket als lid, zaak en kantoor, met klas en gezin als binding; de vragen wie er mag bellen blijven in server/school/bellen.js' },
   { van: 'domein:pasgeschiedenis', naar: 'domein:eigentransactie', soort: 'GEDEELDE_PRIMITIEF',
     reden: 'de pasovergang schrijft via kern/eigentransactie.js in een eigen collectietransactie, zodat gelijktijdige registraties niet in de requestcommit botsen' },
   { van: 'domein:aanwezigheid', naar: 'domein:eigentransactie', soort: 'GEDEELDE_PRIMITIEF',

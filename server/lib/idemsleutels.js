@@ -173,6 +173,7 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-eigengezin').SLEUTELS,
   require('./idemsleutels-toestemming').SLEUTELS,
   require('./idemsleutels-reisteruggave').SLEUTELS,
+  require('./idemsleutels-vrijgave').SLEUTELS,
   require('./idemsleutels-horecateruggave').SLEUTELS,
   /* De TURN-uitgifte: elk antwoord is een vers geheim. Zie de kop daar. */
   require('./idemsleutels-rtc').SLEUTELS);

@@ -37,7 +37,7 @@ const tel = () => '06' + String(10000000 + Math.floor(Math.random() * 8e7));
 
 async function zetPasskey(api, lid, naam) {
   const sleutel = maakAuthenticator(HOST);
-  const ro = await api('/api/webauthn/registreer/opties', {}, lid);
+  const ro = await api('/api/webauthn/registreer/opties', { huidig: 'Geheim123!' }, lid);
   assert.equal(ro.status, 200, kort(ro.body));
   const rr = await api('/api/webauthn/registreer', { antwoord: sleutel.registratieAntwoord(ro.body.opties.challenge, APP), naam }, lid);
   assert.equal(rr.status, 200, kort(rr.body));
@@ -61,7 +61,7 @@ test('verse productie: de eigenaar machtigt met zijn passkey het eerste kantoora
     STUN_PUBLIC_HOST: 'stun.rahultravelgroup.com', STUN_URL: 'stun:stun.rahultravelgroup.com:3478',
     TURN_URL: 'turns:turn.rahultravelgroup.com:5349', TURN_SECRET: 'T9!relay-A7#tijdelijk-B4$geheim-C8%2026',
     APP_URL: APP + '/', SMTP_URL: 'smtp://rtg:test@mail.voorbeeld.test:587',
-    ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg', ...KEYS, RTG_OWNER_EMAIL: EIGENAAR,
+    RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://alarm.voorbeeld.test/rtg', ...KEYS, RTG_OWNER_EMAIL: EIGENAAR,
     RTG_OWNER_BOOTSTRAP: BOOTSTRAP, OFFICE_CODE: CODE, OFFICE_TOTP_SECRET: TOTP, RTG_ISOLATIE_AFDWINGEN: '1',
     RTG_BETALEN_UIT: '1', RTG_AI_UIT: '1', RTG_HERSTEL_SMS_UIT_BEWUST: '1' } });
   t.after(() => stopHard(child));   // eerst het proces echt weg, dan pas de map

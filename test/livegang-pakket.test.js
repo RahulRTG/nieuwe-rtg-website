@@ -186,6 +186,7 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
     const ankerPub = path.join(tmp, 'audit-anker.pub');
     fs.writeFileSync(ankerPub, require('node:crypto').generateKeyPairSync('ed25519').publicKey.export({ type: 'spki', format: 'pem' }));
     fs.appendFileSync(envPad, [
+      'RTG_ANKERPOST_URL=https://anker.voorbeeld.test/',
       'ERR_WEBHOOK_URL=https://alarm.example.test/rtg',
       'RTG_AUDIT_ANKER_DIRS=/srv/anker-a,/srv/anker-b',
       'RTG_AUDIT_ANKER_PUBLIC_KEY_FILE=' + ankerPub,

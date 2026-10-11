@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, elevateTier } = require('./helper');
+const { startServer, stop, elevateTier, stroomAdres } = require('./helper');
 
 /* De inlog zet de code eerst op HOOFDLETTERS voor hij hem vergelijkt, dus een
    proefcode met kleine letters erin komt er nooit door. */
@@ -39,7 +39,14 @@ function post(pad, body, token) {
     body: JSON.stringify(body || {})
   }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
-function haal(pad) { return fetch(base + pad).then(async r => ({ status: r.status, tekst: await r.text().catch(() => '') })); }
+function haal(pad, tok) { return fetch(base + pad, tok ? { headers: { Authorization: 'Bearer ' + tok } } : {})
+  .then(async r => ({ status: r.status, tekst: await r.text().catch(() => '') })); }
+/* De ruil van sessie naar stroomticket, met de status: een weigering is hier de uitkomst. */
+async function ruil(stroom, tok) {
+  const r = await fetch(base + '/api/stroom/ticket', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ stroom }) });
+  return { status: r.status, ticket: ((await r.json().catch(() => ({}))) || {}).ticket };
+}
 
 let kantoor, lid, lidId, eigenaar;
 const ko = (pad, body) => post(pad.startsWith('/api/') ? pad : '/api/office/' + pad, body, kantoor);
@@ -244,35 +251,48 @@ test('6. de concierge-inbox: lezen, antwoorden en een seintje', async () => {
   }
 });
 
-test('7. de twee routes met hun token in de URL zijn even streng als de rest', async () => {
-  // de live stroom: alleen met een echt kantoortoken
-  assert.equal((await haal('/api/office/stream')).status, 401, 'geen token, geen stroom');
+test('7. de twee routes die vroeger hun token in de URL droegen zijn even streng als de rest', async () => {
+  /* Sinds de sessiestroom staat er geen sessie meer in deze adressen: de stroom
+     opent met een eenmalig stroomticket, de scan komt met de kop. Een token in
+     de query wordt geweigerd -- OOK een geldig kantoortoken, anders blijft het
+     lek open voor elke client die de oude vorm nog stuurt. */
+  assert.equal((await haal('/api/office/stream')).status, 401, 'geen ticket, geen stroom');
   assert.equal((await haal('/api/office/stream?token=verzonnen')).status, 401);
   assert.equal((await haal('/api/office/stream?token=' + encodeURIComponent(lid))).status, 401,
-    'een LEDENtoken opent de kantoorstroom niet -- ook al staat het in de URL');
+    'een LEDENtoken opent de kantoorstroom niet');
+  assert.equal((await haal('/api/office/stream?token=' + encodeURIComponent(kantoor))).status, 401,
+    'een GELDIG kantoortoken in de URL wordt geweigerd: een sessie hoort niet in een adres');
+  assert.equal((await ruil('kantoor', lid)).status, 401, 'een lid krijgt geen kantoorticket');
+  const ledenTicket = await ruil('lid', lid);
+  assert.equal(ledenTicket.status, 200);
+  assert.equal((await haal('/api/office/stream?ticket=' + encodeURIComponent(ledenTicket.ticket))).status, 401,
+    'een ticket van een andere soort opent de kantoorstroom niet');
 
-  // de documentdownload: zelfde deur, plus een padtraversal die doodloopt
+  // de documentdownload: de sessie in de KOP, plus een padtraversal die doodloopt
   assert.equal((await haal('/api/office/doc?file=paspoort.jpg')).status, 401, 'eerst de deur, dan pas het bestand');
-  assert.equal((await haal('/api/office/doc?file=x&token=' + encodeURIComponent(lid))).status, 401);
+  assert.equal((await haal('/api/office/doc?file=x', lid)).status, 401);
+  assert.equal((await haal('/api/office/doc?token=' + encodeURIComponent(eigenaar) + '&file=x')).status, 401,
+    'het token van de eigenaar in de URL telt niet: alleen de kop');
   /* Een identiteitsbewijs is op naam, zoals de lijst waar de link uit komt: de
      gedeelde code krijgt 403 (AUTHORITY.md fase 1, gevonden door de A3-meting).
      De traversal wordt daarom met de eigenaar geproefd, want achter een 403
      bewijst hij niets. */
-  assert.equal((await haal('/api/office/doc?file=paspoort.jpg&token=' + encodeURIComponent(kantoor))).status, 403,
+  assert.equal((await haal('/api/office/doc?file=paspoort.jpg', kantoor)).status, 403,
     'de gedeelde code opent geen identiteitsbewijs');
-  const traversal = await haal('/api/office/doc?token=' + encodeURIComponent(eigenaar) +
-    '&file=' + encodeURIComponent('../../server/data/secret.key'));
+  const traversal = await haal('/api/office/doc?file=' + encodeURIComponent('../../server/data/secret.key'), eigenaar);
   assert.equal(traversal.status, 404, 'een pad omhoog wordt een basename, en die bestaat niet');
   assert.ok(!/BEGIN|-----/.test(traversal.tekst), 'en er komt zeker geen sleutel terug');
-  assert.equal((await haal('/api/office/doc?token=' + encodeURIComponent(eigenaar))).status, 404,
+  assert.equal((await haal('/api/office/doc', eigenaar)).status, 404,
     'zonder bestandsnaam valt er niets te downloaden');
 
-  // met een geldig kantoortoken gaat de stroom wel open (en meteen weer dicht)
+  // met een geldig kantoorticket gaat de stroom wel open (en meteen weer dicht)
   const ctrl = new AbortController();
-  const r = await fetch(base + '/api/office/stream?token=' + encodeURIComponent(kantoor), { signal: ctrl.signal });
+  const adres = await stroomAdres(base, '/api/office/stream', kantoor, { stroom: 'kantoor' });
+  const r = await fetch(adres, { signal: ctrl.signal });
   assert.equal(r.status, 200);
   assert.match(r.headers.get('content-type') || '', /text\/event-stream/);
   ctrl.abort();
+  assert.equal((await haal(adres.slice(base.length))).status, 401, 'en hetzelfde ticket opent hem geen tweede keer');
 });
 
 test('8. de losse deuren: naleving, reisbureau, opvang, kampen en de lastafworp', async () => {

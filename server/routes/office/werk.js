@@ -84,9 +84,16 @@ app.post('/api/office/incident/beslis', officeAuth, (req, res) => {
 
 app.get('/api/office/doc', (req, res) => {
   /* Op naam, zoals de lijst waar deze link uit komt (/api/office/verifications,
-     kluisAuth): gevonden door de A3-meting van de beleidsmotor. */
-  if (!officeQueryMag(req.query.token)) return res.status(401).end();
-  if (!officeQueryOpNaam(req.query.token)) return res.status(403).end();
+     kluisAuth): gevonden door de A3-meting van de beleidsmotor.
+     DE SESSIE KOMT UIT DE KOP, nooit meer uit het adres. Het scherm haalt de
+     scan met fetch (Authorization: Bearer) en toont hem als blob; een
+     <img src="...?token="> zette de kantoorsessie in logs en geschiedenis. Een
+     ?token= wordt geweigerd, ook als hij geldig is. */
+  const kop = req.get('authorization') || '';
+  const tok = req.query.token !== undefined ? '' : (kop.startsWith('Bearer ') ? kop.slice(7).trim() : '');
+  if (!officeQueryMag(tok)) return res.status(401).end();
+  if (!officeQueryOpNaam(tok)) return res.status(403).end();
+  res.set('Cache-Control', 'no-store');
   const file = path.basename(String(req.query.file || '')); // geen padtraversal
   const full = path.join(UPLOAD_DIR, file);
   if (!file || !full.startsWith(UPLOAD_DIR) || !fs.existsSync(full)) return res.status(404).end();

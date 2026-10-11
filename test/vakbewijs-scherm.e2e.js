@@ -22,6 +22,7 @@
    ========================================================================== */
 'use strict';
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const { startServer, letOpFouten, wachtOpRust, volgVerzoeken, browserOpties, pasAppAdres } = require('./helper');
 const fs = require('fs');
@@ -83,7 +84,7 @@ async function open(base, token) {
 }
 
 test('de banner vraagt om het stuk dat het werk vraagt, en alleen daar',
-  { skip: KANDIDATEN.length ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: vereist('browser', KANDIDATEN.length > 0, 'geen browser beschikbaar in deze omgeving') }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vakscherm-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -176,7 +177,7 @@ test('de banner vraagt om het stuk dat het werk vraagt, en alleen daar',
 });
 
 test('het kantoor ziet de stapel, met de codenaam en niet de echte naam',
-  { skip: KANDIDATEN.length ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: vereist('browser', KANDIDATEN.length > 0, 'geen browser beschikbaar in deze omgeving') }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vakkantoor-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;

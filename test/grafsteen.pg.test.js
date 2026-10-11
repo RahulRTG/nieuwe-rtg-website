@@ -21,12 +21,13 @@
    Draait alleen met DATABASE_URL. Vraagt de database VOOR ZICHZELF (drop kv),
    dus serieel via `npm run test:pg`. */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 
 const URL = process.env.DATABASE_URL || process.env.PG_URL;
 
 if (!URL) {
-  test('grafsteen (overgeslagen: geen DATABASE_URL)', { skip: true }, () => {});
+  test('grafsteen (overgeslagen: geen DATABASE_URL)', { skip: vereist('pg', false, 'geen DATABASE_URL') }, () => {});
 } else {
   const { merge3 } = require('../server/db');
   const { maakPg } = require('../server/pg');

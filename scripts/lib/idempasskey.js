@@ -73,7 +73,7 @@ async function bouwPasskeyMedewerker({ post, basis, boardroom }) {
 
   /* De passkey op zijn EIGEN account, zoals een medewerker dat doet. */
   const sleutel = maakAuthenticator(new URL(basis).hostname);
-  const o = await getekend('/api/webauthn/registreer/opties', {}, lidTok);
+  const o = await getekend('/api/webauthn/registreer/opties', { huidig: 'geheim123' }, lidTok);
   const uitdaging = o && o.data && o.data.opties && o.data.opties.challenge;
   if (!uitdaging) return { klaar: null, reden: 'geen registratieopties (' + (o && o.status) + ')' };
   const r = await getekend('/api/webauthn/registreer',

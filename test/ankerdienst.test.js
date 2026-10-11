@@ -131,3 +131,100 @@ test('alle vier de journalen plus de boardroom zitten in het blok', () => {
     assert.ok(naam in b.punten, naam + ' hoort in het blok te staan, anders ankert hij niets');
   }
 });
+
+/* ---------------------------------------------------------------------------
+   AUDIT P1-3: een GETEKEND anker, een VOLLEDIGE herschrijving, en de
+   zegelketens van het API-spoor en het besluitjournaal.
+   ------------------------------------------------------------------------- */
+const crypto = require('crypto');
+const ZAAD = Buffer.alloc(32, 7);
+function getekend(zaad) {
+  const db = { data: { inzageLog: [], securityLog: [], handelingLog: [], livingLab: { audit: [] }, ledenBoardLog: {},
+    apiSpoor: { commandJournaal: [], commandJournaalTotaal: 0 } } };
+  const dienst = maakAnkerdienst({ db, sleutel: () => zaad || ZAAD, omgeving: {} });
+  return { db, dienst };
+}
+
+test('P1-3a: het blok is getekend met een sleutel die NIET in de database staat, en een vervalst blok rekent niet af', () => {
+  const o = getekend();
+  vul(o.db.data.handelingLog, 5, 'h');
+  const b = o.dienst.blok();
+  assert.equal(b.handtekening && b.handtekening.alg, 'ed25519');
+  const db = JSON.stringify(o.db.data);
+  assert.ok(!db.includes(ZAAD.toString('hex')) && !db.includes(ZAAD.toString('base64')), 'geen sleutelmateriaal in de database');
+  assert.ok(!JSON.stringify(b).includes(ZAAD.toString('base64')), 'en ook niet in het blok');
+  assert.equal(o.dienst.reken(b).ok, true);
+  assert.equal(o.dienst.reken(b).ondertekend, true);
+  /* Wie het blok bijstelt en de zegel opnieuw uitrekent -- dat kon vroeger -- breekt de handtekening. */
+  const vals = JSON.parse(JSON.stringify(b));
+  vals.punten.handelingLog.nr = 2;
+  const { handtekening, zegel, ...kaal } = vals;
+  vals.zegel = crypto.createHash('sha256').update(JSON.stringify(kaal)).digest('hex').slice(0, 32);
+  const r = o.dienst.reken(vals);
+  assert.equal(r.ok, false); assert.equal(r.ondertekend, false);
+  /* Een blok van een andere sleutel (met zijn eigen publieke sleutel erin) telt evenmin. */
+  const ander = getekend(Buffer.alloc(32, 9));
+  vul(ander.db.data.handelingLog, 5, 'h');
+  assert.equal(o.dienst.reken(ander.dienst.blok()).ondertekend, false);
+  /* Zonder handtekening: niet van ons. */
+  const { handtekening: _weg, ...ongetekend } = b;
+  assert.equal(o.dienst.reken(ongetekend).ok, false);
+});
+
+test('P1-3a: RTG_ANKER_SIGN_KEY wint van de afgeleide sleutel', () => {
+  const db = { data: { handelingLog: [] } };
+  vul(db.data.handelingLog, 2, 'h');
+  const a = maakAnkerdienst({ db, sleutel: () => ZAAD, omgeving: { RTG_ANKER_SIGN_KEY: Buffer.alloc(32, 3).toString('hex') } });
+  const b = maakAnkerdienst({ db, sleutel: () => Buffer.alloc(32, 3), omgeving: {} });
+  assert.equal(a.publiekeSleutel().sleutelId, b.publiekeSleutel().sleutelId);
+  assert.equal(b.reken(a.blok()).ondertekend, true);
+});
+
+test('een VOLLEDIGE herschrijving met geldige hashes valt lokaal niet op, maar tegen het externe anker wel', () => {
+  const o = getekend();
+  vul(o.db.data.handelingLog, 10, 'h');
+  const buiten = o.dienst.blok();
+  /* Alles opnieuw uitrekenen, met een regel aangepast: elke hash klopt weer. */
+  const oud = o.db.data.handelingLog.slice().reverse();
+  const nieuw = [];
+  for (const r of oud) {
+    const { hash, vorige, nr, ...kern } = r;
+    if (kern.wat === 'h3') kern.wat = 'een nettere werkelijkheid';
+    keten.noteerIn(nieuw, kern, 1000);
+  }
+  o.db.data.handelingLog = nieuw;
+  assert.equal(keten.verifieer(nieuw).ok, true, 'lokaal kloppend -- daarom bestaat het anker');
+  const uit = o.dienst.reken(buiten);
+  assert.equal(uit.ok, false, 'tegen het anker valt het op');
+  assert.equal(uit.perJournaal.handelingLog.herschreven, true);
+  /* En alles tot en met de geankerde regel weggooien plus nieuwe regels erbij (P2-5). */
+  const o2 = getekend();
+  vul(o2.db.data.handelingLog, 10, 'h');
+  const b2 = o2.dienst.blok();
+  vul(o2.db.data.handelingLog, 3, 'nieuw');
+  o2.db.data.handelingLog.length = 3;
+  const u2 = o2.dienst.reken(b2);
+  assert.equal(u2.ok, false, 'het journaal is niet vol, dus de bewaring verklaart het niet');
+  assert.equal(u2.perJournaal.handelingLog.weg, true);
+});
+
+test('P1-3c: het API-spoor staat in het blok, en kopafknipping of herzegelen valt op', () => {
+  const o = getekend();
+  const j = require('../server/kern/command/journaal').maakJournaal({ db: o.db, save: () => {}, crypto,
+    vak: () => o.db.data.apiSpoor });
+  for (let i = 0; i < 8; i++) j.noteer({ actor: 'a', actie: 'POST /x' + i });
+  const buiten = o.dienst.blok();
+  assert.equal(buiten.punten.apiSpoor.nr, 8);
+  assert.equal(o.dienst.reken(buiten).ok, true);
+  j.noteer({ actor: 'a', actie: 'daarna' });
+  assert.equal(o.dienst.reken(buiten).ok, true, 'doorgroeien is geen afknipping');
+  const bewaard = JSON.parse(JSON.stringify(o.db.data.apiSpoor));
+  /* De kop eraf, teller mee omlaag: lager dan het anker. */
+  o.db.data.apiSpoor.commandJournaal.splice(-3); o.db.data.apiSpoor.commandJournaalTotaal -= 3;
+  assert.equal(j.controleer().heel, true, 'de zegelketen zelf klopt nog');
+  assert.equal(o.dienst.reken(buiten).perJournaal.apiSpoor.ingekort, true);
+  /* De kop eraf, teller laten staan: de geankerde regel krijgt een andere zegel. */
+  o.db.data.apiSpoor = JSON.parse(JSON.stringify(bewaard));
+  o.db.data.apiSpoor.commandJournaal.splice(-3);
+  assert.equal(o.dienst.reken(buiten).ok, false);
+});

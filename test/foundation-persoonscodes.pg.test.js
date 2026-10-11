@@ -5,11 +5,12 @@
 'use strict';
 
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 
 const URL = process.env.DATABASE_URL || process.env.PG_URL;
-const OVERSLAAN = URL ? false : 'DATABASE_URL ontbreekt; deze proef vereist een echte PostgreSQL';
+const OVERSLAAN = vereist('pg', !!URL, 'DATABASE_URL ontbreekt; deze proef vereist een echte PostgreSQL');
 
 test('Foundation-persoonscode is één multi-instance collectietransactie',
   { skip: OVERSLAAN }, async () => {

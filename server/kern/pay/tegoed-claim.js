@@ -39,7 +39,11 @@ module.exports = ({ bon, crypto, boekEenmaal }) => {
 
   /* `vind(bron)` levert de bon of null; `mag(t)` levert een weigering of
      null. Beide draaien BINNEN het slot, dus wat ze zien is de waarheid. */
-  async function neem({ vind, mag, soort, door, naar, oms, idem, onbekend }) {
+  /* `poort` (optioneel): de vrijgavepoort voor een NIEUWE claim (verzilveren is
+     nieuw geld naar een nieuwe houder). Na de herhaling en na een hervatting;
+     terugnemen en intrekken geven hem niet mee, want dat is geld dat terug gaat
+     naar wie het kocht. */
+  async function neem({ vind, mag, soort, door, naar, oms, idem, onbekend, poort }) {
     const idemHash = idem ? afdruk('pay-tegoed-claim|' + soort + '|' + door + '|' + idem) : null;
     const stap1 = await transactie(bron => {
       const t = vind(bron);
@@ -50,6 +54,8 @@ module.exports = ({ bon, crypto, boekEenmaal }) => {
         return { klaar: kopie(t) };
       const f = mag(t);
       if (f) return { fout: f };
+      const dicht = typeof poort === 'function' ? poort() : null;
+      if (dicht) return { fout: dicht };
       t.status = 'claimend';
       t.claim = { id: 'C' + crypto.randomBytes(8).toString('hex'), soort, door, naar,
         idem_hash: idemHash, at: iso() };

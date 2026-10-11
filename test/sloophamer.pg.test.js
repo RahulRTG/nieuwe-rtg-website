@@ -26,6 +26,7 @@
    hebben. Draai ze daarom serieel via `npm run test:pg` (of geef elke toets een
    eigen database). */
 const test = require('node:test');
+const { vereistAlle } = require('./infra');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
@@ -35,8 +36,7 @@ const { startServer, stop } = require('./helper');
 
 const HEEFT_PG = !!(process.env.DATABASE_URL || process.env.PG_URL);
 const HEEFT_REDIS = !!process.env.REDIS_URL;
-const OVERSLAAN = (HEEFT_PG && HEEFT_REDIS) ? false
-  : 'vereist DATABASE_URL EN REDIS_URL (twee instances + gedeelde bus)';
+const OVERSLAAN = vereistAlle([['pg', !!HEEFT_PG], ['redis', !!HEEFT_REDIS]], 'vereist DATABASE_URL EN REDIS_URL (twee instances + gedeelde bus)');
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const jitter = () => Math.random() * 120;

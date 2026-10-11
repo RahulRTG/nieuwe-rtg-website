@@ -152,7 +152,7 @@
   function luister() {
     if (!window.EventSource || !token) return;
     try {
-      var bron = new EventSource('/api/stream?token=' + encodeURIComponent(token));
+      var bron = RTGStroom.open('/api/stream', { token: token });
       bron.addEventListener('klok', function (e) {
         var d; try { d = JSON.parse(e.data || '{}'); } catch (err) { return; }
         alarm(d);

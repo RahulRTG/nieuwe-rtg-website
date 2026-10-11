@@ -27,6 +27,16 @@
     wauwS.src = '/shared/wauw.js'; wauwS.defer = true;
     document.head.appendChild(wauwS);
   }
+  /* DE STROOM (shared/stroom.js): pas geladen als deze laag een live-stroom
+     opent, en dat doet hij op bijna geen scherm. Sindsdien staat de sessie
+     nooit meer in het adres van zo'n stroom. Een script erbij, net als de
+     wauw-laag hierboven, in plaats van bijna driehonderd pagina's aanpassen. */
+  function metStroom(doe) {
+    if (window.RTGStroom) return doe(window.RTGStroom);
+    var s = document.querySelector('script[src="/shared/stroom.js"]');
+    if (!s) { s = document.createElement('script'); s.src = '/shared/stroom.js'; document.head.appendChild(s); }
+    s.addEventListener('load', function () { if (window.RTGStroom) doe(window.RTGStroom); }, { once: true });
+  }
   var memTok = null, supTok = null;
   try { memTok = localStorage.getItem('rtg_member_token'); } catch (e) {}
   try { supTok = localStorage.getItem('rtg_sup_token'); } catch (e) {}

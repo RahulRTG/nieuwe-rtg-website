@@ -87,7 +87,14 @@ function maakToestellen({ db, save }) {
   }
 
   /* ---- binden: de handtekening controleren ---- */
-  async function bind(lidKey, jwkRuw, handtekeningB64, naam) {
+  /* `voor({ toestelId, bindingId })` -- optioneel -- draait NA de controle van
+     de handtekening en VOOR het toestel wordt opgeschreven, zonder await
+     ertussen. Geeft hij { weiger }, dan wordt er niets opgeschreven en komt
+     { geweigerd: true, ... } terug. Zo bindt de route de SESSIE en registreert
+     hij het TOESTEL in een stap: twee gelijktijdige eerste bindingen konden
+     anders allebei hun toestel op het account zetten terwijl de sessiebinding
+     er maar een aannam (test/toestelbinding-race.test.js). */
+  async function bind(lidKey, jwkRuw, handtekeningB64, naam, { voor } = {}) {
     if (!lidKey) return { error: 'Geen sessie.' };
     const jwk = schoneJwk(jwkRuw);
     if (!jwk) return { error: 'Die sleutel herkennen wij niet als een P-256 publieke sleutel.' };
@@ -112,6 +119,14 @@ function maakToestellen({ db, save }) {
       return { error: 'Dit toestel heeft u eerder ingetrokken. Neem het bewust opnieuw op als u het weer wilt vertrouwen.',
         ingetrokken: true, toestelId };
     }
+    /* De bindingId hoort bij dit BEWIJS en niet bij het toestel: hij zegt "deze
+       handtekening, op dit moment". Zo kan een sessie later laten zien met welk
+       bewijs zij gebonden werd, en niet alleen aan welk toestel. */
+    const bindingId = createHash('sha256').update(toestelId + '|' + nonce).digest('hex').slice(0, 32);
+    if (typeof voor === 'function') {
+      const v = voor({ toestelId, bindingId }) || {};
+      if (v.weiger) return Object.assign({ geweigerd: true, toestelId }, v);
+    }
     bak()[k] = {
       lidKey: String(lidKey), toestelId, jwk,
       naam: schoneNaam(naam) || (bestaand && bestaand.naam) || null,
@@ -121,10 +136,6 @@ function maakToestellen({ db, save }) {
     };
     ruim(lidKey, k);
     save();
-    /* De bindingId hoort bij dit BEWIJS en niet bij het toestel: hij zegt "deze
-       handtekening, op dit moment". Zo kan een sessie later laten zien met welk
-       bewijs zij gebonden werd, en niet alleen aan welk toestel. */
-    const bindingId = createHash('sha256').update(toestelId + '|' + nonce).digest('hex').slice(0, 32);
     return { ok: true, toestelId, bindingId, nieuw: !bestaand, naam: bak()[k].naam };
   }
 

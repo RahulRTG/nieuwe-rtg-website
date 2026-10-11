@@ -30,7 +30,7 @@ const { spawnSync } = require('node:child_process');
 const trust = require('../server/config/release-trust');
 
 const BRON = path.join(__dirname, '..');
-const STARTPUNTEN = ['scripts/imageherkomst.js', 'scripts/bron-release-bewijs.js',
+const STARTPUNTEN = ['scripts/imageherkomst.js', 'scripts/kwalificatie.js', 'scripts/bron-release-bewijs.js',
   'scripts/release-bewijs.js', 'scripts/lib/productie-vrijgave.js'];
 const DATA = ['package.json', 'package-lock.json', 'motor/Cargo.lock', '.nvmrc'];
 
@@ -77,7 +77,7 @@ function opstelling(t) {
     fs.mkdirSync(path.dirname(doel), { recursive: true });
     fs.copyFileSync(path.join(BRON, rel), doel);
   }
-  fs.writeFileSync(path.join(root, '.gitignore'), '.release/\n');
+  fs.writeFileSync(path.join(root, '.gitignore'), '.release/\n/rtg-motor\n/rtg-sentinel\npublic/dist/\n');
   // drie verschillende rollen, zoals de bootstrap ze vraagt; alleen de publieke helften gaan in de boom
   const rollen = {};
   for (const [naam, rol] of Object.entries(trust.ROLES)) {
@@ -118,23 +118,39 @@ test('generale repetitie: de signingstappen van release-image.yml lopen als proc
     fs.writeFileSync(path.join(root, '.release', f), JSON.stringify({ repetitie: f }) + '\n');
   stap('bronbewijs', ['scripts/bron-release-bewijs.js']);
 
-  // "Het releasebewijs UIT het image halen": zonder docker maakt dezelfde functie het in een
-  // nagebootste imagemap, met de twee binaries op de plek waar het image ze heeft
-  const imageMap = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-signing-image-'));
-  t.after(() => fs.rmSync(imageMap, { recursive: true, force: true }));
-  // dezelfde minimale imagevorm als test/live-kandidaat.test.js
-  for (const [rel, inhoud] of Object.entries({ 'package.json': '{"name":"rtg","version":"1"}',
-    'package-lock.json': '{}', 'server/app.js': 'module.exports=1', 'public/dist/app.js': 'bouw',
-    'scripts/start.js': 'start', 'motor/src/lib.rs': 'pub fn x(){}', 'motor/Cargo.toml': '[package]',
-    'motor/Cargo.lock': '', 'rtg-motor': 'motor', 'rtg-sentinel': 'sentinel', 'BEGROTING.json': '{"grens":1}' })) {
-    fs.mkdirSync(path.dirname(path.join(imageMap, rel)), { recursive: true });
-    fs.writeFileSync(path.join(imageMap, rel), inhoud);
+  // "Het releasebewijs UIT het image halen" en de kwalificatie: zonder docker
+  // staan de runtimebytes van het image (binaries, frontend) al in de werkboom,
+  // en het inhoudsbewijs is uit precies die werkboom gemaakt. De kwalificatie
+  // loopt als PROCES, voor en na, en een gewijzigd runtimebestand laat haar zakken.
+  for (const [rel, inhoud] of Object.entries({ 'public/dist/app.js': 'bouw', 'rtg-motor': 'motor', 'rtg-sentinel': 'sentinel' })) {
+    fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
+    fs.writeFileSync(path.join(root, rel), inhoud);
   }
-  const manifest = run(root, ['-e', "process.stdout.write(JSON.stringify(require('./scripts/release-bewijs').maakManifest(process.argv[1])))", imageMap],
+  const manifest = run(root, ['-e', "process.stdout.write(JSON.stringify(require('./scripts/release-bewijs').maakManifest(process.argv[1])))", root],
     { RTG_RELEASE_COMMIT: commit });
   assert.equal(manifest.status, 0, manifest.stderr);
   fs.writeFileSync(path.join(root, '.release', 'image-release-bewijs.json'), manifest.stdout + '\n');
   const inhoud = JSON.parse(manifest.stdout).inhoudSha256;
+  const APP_ID = 'sha256:' + 'c3'.repeat(32), BACKUP_ID = 'sha256:' + 'd4'.repeat(32);
+  const kw = require(path.join(root, 'scripts', 'lib', 'kwalificatie.js'));
+  const imageRecord = { formaat: 'rtg-kwalificatie-v1-image', image, imageId: APP_ID, commit,
+    bewijsSha256: kw.sha256(Buffer.from(manifest.stdout + '\n')), inhoudSha256: inhoud,
+    backup, backupImageId: BACKUP_ID, backupScripts: {}, gepubliceerdImageId: null, gepubliceerdBackupImageId: null };
+  kw.schrijfJson(root, kw.REL.image, imageRecord);
+  stap('kwalificatie voor', ['scripts/kwalificatie.js', '--controle', '--fase=voor']);
+  // een stap die runtime-invoer verandert, laat de na-meting zakken
+  fs.appendFileSync(path.join(root, 'scripts/release-bewijs.js'), '\n// gewijzigd\n');
+  assert.notEqual(run(root, ['scripts/kwalificatie.js', '--controle', '--fase=na']).status, 0,
+    'een gewijzigd runtimebestand bleef gekwalificeerd');
+  spawnSync('git', ['checkout', 'scripts/release-bewijs.js'], { cwd: root });
+  stap('kwalificatie na', ['scripts/kwalificatie.js', '--controle', '--fase=na']);
+  // zonder bewijs dat het gepubliceerde image het geteste is, wordt er niet getekend
+  const zonderPublicatie = run(root, ['scripts/imageherkomst.js', '--binden', '--rol=app', '--image=' + image, '--digest=' + DIGEST,
+    '--bewijs=.release/image-release-bewijs.json', '--sbom=.release/sbom.json', '--uit=.release/herkomst.json'],
+  { ...bouwSleutel, ...CI });
+  assert.notEqual(zonderPublicatie.status, 0, 'herkomst getekend zonder gepubliceerd = getest');
+  // "--gepubliceerd" vraagt docker; hier legt de repetitie dezelfde ID's vast
+  kw.schrijfJson(root, kw.REL.image, { ...imageRecord, gepubliceerdImageId: APP_ID, gepubliceerdBackupImageId: BACKUP_ID });
 
   // "Stuklijst (SBOM) uit het gepubliceerde image" -- met --eis-image, dus een bron-stuklijst zakt
   fs.writeFileSync(path.join(root, '.release', 'pakketten.txt'), 'base-files\t13\tamd64\nlibc6\t2.36\tamd64\n');
@@ -143,19 +159,27 @@ test('generale repetitie: de signingstappen van release-image.yml lopen als proc
       '--bewijs=.release/image-release-bewijs.json', '--uit=.release/' + uit, '--eis-image']);
 
   // "Herkomst binden aan het digest en tekenen"
-  for (const [img, dg, sbom, uit] of [[image, DIGEST, 'sbom.json', 'herkomst.json'],
-    [backup, BACKUP_DIGEST, 'sbom-backup.json', 'herkomst-backup.json']])
-    stap('binden', ['scripts/imageherkomst.js', '--binden', '--image=' + img, '--digest=' + dg,
+  for (const [img, dg, sbom, uit, rol] of [[image, DIGEST, 'sbom.json', 'herkomst.json', 'app'],
+    [backup, BACKUP_DIGEST, 'sbom-backup.json', 'herkomst-backup.json', 'backup']])
+    stap('binden', ['scripts/imageherkomst.js', '--binden', '--rol=' + rol, '--image=' + img, '--digest=' + dg,
       '--bewijs=.release/image-release-bewijs.json', '--sbom=.release/' + sbom, '--uit=.release/' + uit],
     { ...bouwSleutel, ...CI });
 
   // "Controleer de eigen publicatie"
   const controle = (img, dg, sbom, herkomst, extra = {}) => run(root, ['scripts/imageherkomst.js', '--controle',
     '--eis-kandidaat', '--herkomst=.release/' + herkomst, '--sbom=.release/' + sbom, '--image=' + img,
-    '--draait=' + (extra.draait || dg), '--commit=' + commit, '--bewijs-inhoud=' + inhoud]);
+    '--draait=' + (extra.draait || dg), '--commit=' + commit, '--bewijs-inhoud=' + inhoud,
+    '--rol=' + (extra.rol || 'app'), '--image-id=' + (extra.id || APP_ID)]);
   for (const r of [controle(image, DIGEST, 'sbom.json', 'herkomst.json'),
-    controle(backup, BACKUP_DIGEST, 'sbom-backup.json', 'herkomst-backup.json')])
+    controle(backup, BACKUP_DIGEST, 'sbom-backup.json', 'herkomst-backup.json', { rol: 'backup', id: BACKUP_ID })])
     assert.equal(r.status, 0, 'controle faalde:\n' + r.stdout + r.stderr);
+  // een opnieuw gebouwd image (ander ID) of de verkeerde rol is geen kandidaat
+  assert.notEqual(controle(image, DIGEST, 'sbom.json', 'herkomst.json', { id: 'sha256:' + 'e5'.repeat(32) }).status, 0,
+    'een ander image-ID ging door als gekwalificeerd');
+  assert.notEqual(controle(image, DIGEST, 'sbom.json', 'herkomst.json', { id: BACKUP_ID }).status, 0,
+    'het backup-ID ging door als app-kwalificatie');
+  assert.notEqual(controle(image, DIGEST, 'sbom.json', 'herkomst.json', { rol: 'backup', id: BACKUP_ID }).status, 0,
+    'de app-herkomst ging door als backup');
 
   // de handtekening hoort bij het BUILD-anker en bij niets anders
   const doc = JSON.parse(fs.readFileSync(path.join(root, '.release', 'herkomst.json'), 'utf8'));

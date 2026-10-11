@@ -43,6 +43,8 @@ module.exports = [
     'een verdeler die niet meer te vragen is of hij mag sturen, stuurt naar een server die nog niet klaar is'],
   ['/api/cluster', 'Clusterbediening', 'Het samenspel tussen meerdere servers.',
     'infrastructuur, geen ledenfunctie'],
+  ['/api/stroom/ticket', 'Stroomticket', 'Ruilt de sessie in de kop voor een kort, eenmalig ticket waarmee een live-stroom opent.',
+    'het loket opent zelf niets en elke stroomdeur erachter heeft haar eigen schakelaar; een knop hier zet alle stromen tegelijk dicht, ook die van kantoor en eigenaar'],
   ['/api/sat', 'Satellietverbinding', 'De noodverbinding buiten het gewone net om.',
     'een noodweg hoort niet af te hangen van een schakelaar op het bord'],
   ['/api/toestel', 'Toestelregistratie', 'Welk apparaat is dit, en mag het meedoen.',

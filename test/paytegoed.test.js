@@ -21,6 +21,7 @@
    regel 2); de geziene mutatie staat per toets in het commentaar.
 
    Draai los: node --experimental-sqlite --test test/paytegoed.test.js */
+const metDekking = require('./lib/dekking');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
@@ -277,7 +278,7 @@ test('een tegoed verloopt, en dan gaat het terug naar de koper en niet naar RTG'
     grootboek: () => [], geldModus: 'schaduw',
     MIN_CENTEN: 1, MAX_CENTEN: 500000
   };
-  const tegoed = require('../server/kern/pay/tegoed')(ctx);
+  const tegoed = require('../server/kern/pay/tegoed')(metDekking(ctx));
 
   const koop = await tegoed.tegoedKoop({ codenaam: 'Koper', centen: 4000, oms: 'Cadeau' });
   assert.equal(koop.ok, true);

@@ -100,49 +100,8 @@ function hangAan(regels, regel) {
   return schakel(regel, nieuwste ? nieuwste.hash : null, nieuwste ? (Number(nieuwste.nr) || 0) + 1 : 1);
 }
 
-/* De hele keten nalopen. `regels` staat NIEUWSTE EERST -- dat is hoe het
-   inzagejournaal hem bewaart (unshift), en een verifieerder die stilletijk een
-   andere volgorde aanneemt, keurt alles goed.
-
-   Geeft terug:
-     ok         niets mis
-     gebroken   [{index, waarom}] -- hier klopt het niet meer
-     afgekapt   de oudste regel verwijst naar een voorganger die weggevallen is;
-                normaal bij een begrensd journaal, dus apart gemeld
-     zonderKeten hoeveel regels nog helemaal geen hash dragen (oude regels van
-                voor deze voorziening; die veroordelen we niet) */
-function verifieer(regels) {
-  const l = Array.isArray(regels) ? regels : [];
-  const gebroken = [];
-  let zonderKeten = 0, afgekapt = false;
-
-  for (let i = 0; i < l.length; i++) {
-    const r = l[i];
-    if (!r || !r.hash) { zonderKeten++; continue; }
-
-    /* 1. Klopt de regel met zijn eigen hash? Zo niet, dan is de INHOUD veranderd. */
-    if (hashVan(r) !== r.hash) {
-      gebroken.push({ index: i, waarom: 'de inhoud van deze regel klopt niet met zijn hash' });
-      continue;
-    }
-
-    /* 2. Klopt de verwijzing naar de voorganger? De voorganger van regel i staat
-       op i+1: de lijst loopt van nieuw naar oud. */
-    const ouder = l[i + 1];
-    if (!ouder) {
-      /* De oudste die er nog is. Verwijst hij naar een voorganger, dan is die
-         weggevallen -- de afkap, geen breuk. */
-      if (r.vorige) afgekapt = true;
-      continue;
-    }
-    if (!ouder.hash) { continue; }   // de keten begint hier; niets te vergelijken
-    if (r.vorige !== ouder.hash) {
-      gebroken.push({ index: i, waarom: 'verwijst niet naar de regel eronder -- er is iets tussenuit of veranderd' });
-    }
-  }
-
-  return { ok: gebroken.length === 0, gebroken, afgekapt, zonderKeten, geteld: l.length };
-}
+/* Een keten nalopen: ./keten-verifieer.js. */
+const verifieer = require('./keten-verifieer')(hashVan);
 
 /* EEN REGEL BIJSCHRIJVEN IN EEN BEGRENSD JOURNAAL, in één handeling.
 

@@ -176,7 +176,8 @@ async function boot() {
   child.on('exit', (c, s) => { gestopt = { code: c, signal: s }; });
 }
 function stop() { return new Promise(r => { if (!child) return r(); child.removeAllListeners('exit'); child.on('exit', () => r()); try { child.kill('SIGKILL'); } catch (e) {} child = null; }); }
-function rssMB() { try { const m = fs.readFileSync('/proc/' + child.pid + '/status', 'utf8').match(/VmRSS:\s+(\d+) kB/); return m ? Math.round(m[1] / 1024) : null; } catch (e) { return null; } }
+// /proc op Linux, `ps rss` elders (./lib/procinfo.js); null alleen als geen van beide iets zegt
+function rssMB() { const kb = child ? require('./lib/procinfo').rssKB(child.pid) : null; return kb == null ? null : Math.round(kb / 1024); }
 /* Meet het serverproces van binnenuit: heap-na-GC (het lek) en de piek van de
    event-loop-stilstand (de rem). De loopmeting hoort bij de EERSTE dump: die
    dekt de ronde die net voorbij is, de twee dumps erna dekken alleen de

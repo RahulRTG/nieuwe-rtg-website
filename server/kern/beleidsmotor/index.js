@@ -41,8 +41,10 @@ const DAG = 86400000;
    zakt als een verklaring naar een route wijst die niet bestaat. */
 const VERKLAARD_OPEN = Object.freeze({
   'POST /api/office/login': 'de inlog zelf: wie hier komt, heeft nog geen sessie',
-  'GET /api/office/stream': 'de live-stroom; het token komt als query binnen en wordt daar gecontroleerd (officeQueryMag)',
-  'GET /api/office/doc': 'een paspoortscan in een <img>: het token komt als query binnen en moet op naam zijn (officeQueryOpNaam)'
+  'GET /api/office/stream': 'de live-stroom; hij opent met een eenmalig stroomticket (kern/sessiestroom.js) en de sessie ' +
+    'daarachter wordt in de handler gecontroleerd (officeQueryMag) -- een token in de query wordt geweigerd',
+  'GET /api/office/doc': 'een paspoortscan die het scherm met fetch ophaalt: de sessie komt uit de kop en moet op naam zijn ' +
+    '(officeQueryOpNaam) -- een token in de query wordt geweigerd'
 });
 
 function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron, kamersVan, nu }) {

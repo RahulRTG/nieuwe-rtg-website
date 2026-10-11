@@ -40,6 +40,7 @@ module.exports = (kern) => {
        sleutel die nergens heen kan zou een werkende link voor niets vervangen. */
     const adres = accounts.emailOf(req.session.account);
     if (!adres) return res.status(400).json({ error: 'Er staat geen e-mailadres bij dit account; herstellen kan dan niet per mail.' });
+    if (!appUrl(req)) return res.status(503).json({ error: require('../lib/linkbasis').ONTBREEKT, code: 'app-url-ontbreekt' });
     let r;
     try { r = await pinHerstelStart(req.session.key); }
     catch (e) { console.error('[algpin] herstel', e && e.message); return res.status(503).json({ error: 'Herstellen lukt nu niet. Probeer het zo opnieuw.' }); }

@@ -6,7 +6,7 @@ const { valideer } = require('../server/config');
 const basis = { NODE_ENV: 'production', RTG_ENC_KEY: 'e'.repeat(64),
   RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
   RTG_OWNER_EMAIL: 'eigenaar@voorbeeld.nl', DATABASE_URL: 'postgresql://db',
-  REDIS_URL: 'redis://cache', RTG_MEDIA_BACKEND: 's3', ERR_WEBHOOK_URL: 'https://alarm.example',
+  REDIS_URL: 'redis://cache', RTG_MEDIA_BACKEND: 's3', RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://alarm.example',
   OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP', SMTP_URL: 'smtp://mail', OPENAI_API_KEY: 'ai',
   RTF_IBAN: 'NL11FOUND0000000001' };
 

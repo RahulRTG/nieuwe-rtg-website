@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stroomAdres } = require('./helper');
 
 let srv, base, office, maker, kijker, videoId;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-theater-'));
@@ -79,18 +79,22 @@ test('3. de zaal is chronologisch en eerlijk over data; kijken is range-streamin
   assert.ok(v, 'de video staat in de zaal');
   assert.ok(v.mb > 0, 'elke video toont vooraf zijn grootte');
   assert.ok(/hercomprimeren niets/.test(zaal.body.kwaliteit), 'de kwaliteitsbelofte staat er eerlijk in');
-  // het token gaat als query mee (een video-element kan geen headers sturen)
+  /* Een video-element kan geen kop sturen: het scherm ruilt zijn sessie voor
+     een KIJKTICKET voor deze video, en alleen dat ticket staat in het adres. */
   const login = await fetch(base + '/api/theater/kijk/' + videoId);
-  assert.equal(login.status, 401, 'kijken kan alleen met een geldige sessie');
-  const tok = encodeURIComponent(kijker);
-  const stuk = await fetch(base + '/api/theater/kijk/' + videoId + '?token=' + tok, { headers: { Range: 'bytes=0-3' } });
+  assert.equal(login.status, 401, 'kijken kan alleen met een geldig kijkticket');
+  assert.equal((await fetch(base + '/api/theater/kijk/' + videoId + '?token=' + encodeURIComponent(kijker))).status, 401,
+    'een geldige sessie in de URL wordt geweigerd: een sessie hoort niet in een adres');
+  const adres = await stroomAdres(base, '/api/theater/kijk/' + videoId, kijker, { stroom: 'theater-kijk', id: videoId });
+  const stuk = await fetch(adres, { headers: { Range: 'bytes=0-3' } });
   assert.equal(stuk.status, 206, 'een Range-verzoek krijgt precies dat stuk (206)');
   const bytes = Buffer.from(await stuk.arrayBuffer());
   assert.deepEqual([...bytes], [0x1a, 0x45, 0xdf, 0xa3], 'byte voor byte het origineel');
   assert.equal(stuk.headers.get('content-range'), 'bytes 0-3/' + WEBM.length);
-  const staart = await fetch(base + '/api/theater/kijk/' + videoId + '?token=' + tok, { headers: { Range: 'bytes=-9' } });
+  // hetzelfde kijkticket draagt de volgende Range-verzoeken (laden, spoelen)
+  const staart = await fetch(adres, { headers: { Range: 'bytes=-9' } });
   assert.equal(Buffer.from(await staart.arrayBuffer()).toString(), 'RTGSTAART', 'ook de staart komt exact terug');
-  const alles = await fetch(base + '/api/theater/kijk/' + videoId + '?token=' + tok);
+  const alles = await fetch(adres);
   assert.equal(alles.status, 200);
   assert.equal(Number(alles.headers.get('content-length')), WEBM.length, 'geen byte hercomprimeerd of verloren');
 });
@@ -158,7 +162,7 @@ test('5. verwijderen haalt ook de bytes weg (maker zelf of kantoor)', async () =
   assert.equal(vreemd.status, 403, 'een kijker verwijdert andermans werk niet');
   const weg = await api('/api/office/theater/verwijder', { id: videoId }, office);
   assert.equal(weg.status, 200);
-  const kijk = await fetch(base + '/api/theater/kijk/' + videoId + '?token=' + encodeURIComponent(kijker));
+  const kijk = await fetch(await stroomAdres(base, '/api/theater/kijk/' + videoId, kijker, { stroom: 'theater-kijk', id: videoId }));
   assert.equal(kijk.status, 404, 'de stream is weg');
   assert.ok(!fs.readdirSync(path.join(TMP, 'theater')).some(f => f.startsWith(videoId)), 'het bestand is echt van de schijf');
 });

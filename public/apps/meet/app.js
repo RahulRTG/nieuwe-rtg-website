@@ -30,7 +30,7 @@
   var bron = null;
   function luister() {
     if (bron || !window.EventSource || !token) return;
-    try { bron = new EventSource('/api/stream?token=' + encodeURIComponent(token)); } catch (e) { return; }
+    try { bron = RTGStroom.open('/api/stream', { token: token }); } catch (e) { return; }
     bron.addEventListener('meet', function (e) {
       var d; try { d = JSON.parse(e.data || '{}'); } catch (err) { return; }
       if (window.RTGMeetKamer) window.RTGMeetKamer.opSein(d);

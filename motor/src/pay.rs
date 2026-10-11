@@ -581,6 +581,43 @@ impl State {
         r
     }
 
+    /* KENT DE MOTOR DEZE BOEKING AL? Alleen lezen, nooit boeken.
+
+       De JS-kant toetst saldo en beleid VOOR de motor (de waardepoort), en na
+       een crash tussen de motorbevestiging en de JS-commit staat de spiegel al
+       op het afgeboekte saldo. Een retry met dezelfde sleutel ziet dan "te
+       weinig saldo" en zou de kaart opnieuw belasten -- terwijl de boeking
+       allang bestaat. Daarom vraagt de JS-kant bij een weigering eerst dit:
+       bestaat de sleutel, met dezelfde afdruk, dan is dit een HERHALING en
+       komt het eerste antwoord terug. 404 als hij onbekend is, 409 bij een
+       andere afdruk, en dezelfde 503-herstelstanden als met_economisch. */
+    pub fn boek_guard_bekend(&self, van: &str, naar: &str, centen: i64, soort: &str,
+                             ref_: Option<&str>, idem: Option<&str>) -> Resp {
+        let sleutel = match idem { Some(i) => format!("pay:{}", i), None => return err(400, "Een economische sleutel is verplicht.") };
+        if !economische_sleutel_geldig(&sleutel) {
+            return err(400, "De economische sleutel heeft geen vaste hashvorm.");
+        }
+        let bewaard = match self.economisch.get(&sleutel) { Some(b) => b, None => return err(404, "Deze economische sleutel is onbekend.") };
+        let oud = match self.economisch_afdruk.get(&sleutel) {
+            Some(v) => v,
+            None => return err(503, "De economische sleutel mist zijn afdruk; herstel is vereist."),
+        };
+        let afdruk = economische_afdruk("pay", van, naar, centen, soort, ref_.unwrap_or(""));
+        if !crate::aead::ct_eq(oud.as_bytes(), afdruk.as_bytes()) {
+            return err(409, "Deze economische sleutel hoort al bij een andere boeking.");
+        }
+        let mut body = bewaard.clone();
+        let goed = body.get("boeking").map(|j| boeking_gelijk(&self.grb, j) &&
+            boeking_is(j, van, naar, centen, soort, ref_)).unwrap_or(false);
+        if !goed {
+            return err(503, "De economische sleutel bestaat, maar zijn payboekregel ontbreekt; herstel is vereist.");
+        }
+        body.set("herhaald", Json::Bool(true));
+        body.set("saldoVan", Json::Num(self.grb.saldo_van(van) as f64));
+        body.set("saldoNaar", Json::Num(self.grb.saldo_van(naar) as f64));
+        Resp { status: 200, body }
+    }
+
     // ---------- schaduw-modus: rauwe boeking van de autoritaire JS-engine ----------
     pub fn spiegel_boek(&mut self, van: &str, naar: &str, centen: i64, soort: &str, oms: &str, ref_: Option<String>) -> Resp {
         if centen <= 0 || van.is_empty() || naar.is_empty() || van == naar {
@@ -832,16 +869,23 @@ fn boeking_is(boeking: &Json, van: &str, naar: &str, centen: i64,
         boeking.str_at("ref") == ref_
 }
 
-/* Drie soorten economische sleutel, gelijk aan SLEUTEL in
-   server/db/economische-identiteit.js: een teruggeboekte uitbetaling
-   (`payout-terug:`), geld dat een tegoedbon uit de escrow haalt
-   (`pay-tegoed:`) en een deel onder een kascode-claim (`pay-kas:`).
-   Daarachter altijd een SHA-256 en nooit vrije tekst. */
+/* De soorten economische sleutel, LETTERLIJK gelijk aan SOORTEN in
+   server/db/economische-identiteit.js (waar ook staat wat elke soort is).
+   Daarachter altijd een SHA-256 en nooit vrije tekst. Deze ene lijst geldt voor
+   een nieuwe boeking (met_economisch) EN voor het inlezen van een snapshot
+   (herstel), zodat de motor nooit een sleutel bewaart die hij na een herstart
+   zou weigeren. test/geld-motorsleutel.test.js legt de JS-lijst tegen deze
+   binary; een soort die alleen aan een kant staat, laat hem zakken. */
+pub const ECONOMISCHE_SOORTEN: [&str; 9] = ["payout-terug", "pay-tegoed", "pay-kas", "pay-oplaad",
+    "pay-vonk", "pay-klompje", "pay-handeling", "pay-stap", "pay-uitbetaling"];
+
 fn economische_sleutel_geldig(sleutel: &str) -> bool {
-    let rest = sleutel.strip_prefix("pay:").or_else(|| sleutel.strip_prefix("bank:"));
-    let hash = match rest.and_then(|r| r.strip_prefix("payout-terug:")
-        .or_else(|| r.strip_prefix("pay-tegoed:"))
-        .or_else(|| r.strip_prefix("pay-kas:"))) {
+    let rest = match sleutel.strip_prefix("pay:").or_else(|| sleutel.strip_prefix("bank:")) {
+        Some(r) => r,
+        None => return false,
+    };
+    let hash = match ECONOMISCHE_SOORTEN.iter()
+        .find_map(|soort| rest.strip_prefix(soort).and_then(|r| r.strip_prefix(':'))) {
         Some(v) => v,
         None => return false,
     };
@@ -1251,6 +1295,49 @@ mod tests {
             "alle velden, niet alleen het id, vormen de projectie-identiteit");
         assert!(State::new().laad_gevalideerd(&s.snapshot()).is_err(),
             "snapshotdrift mag niet als geldwaarheid starten");
+    }
+
+    #[test]
+    fn bekend_leest_alleen_en_herkent_een_herhaling() {
+        let k = "pay-stap:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let mut s = State::new();
+        assert_eq!(s.boek_guard_bekend("extern:oplaad", "lid:K", 300, "oplaad", Some("r"), Some(k)).status, 404);
+        assert_eq!(s.boek_guard_eenmaal("extern:oplaad", "lid:K", 300, "oplaad", "x", Some("r".into()), Some(k)).status, 200);
+        let b = s.boek_guard_bekend("extern:oplaad", "lid:K", 300, "oplaad", Some("r"), Some(k));
+        assert_eq!(b.status, 200);
+        assert_eq!(b.body.bool_at("herhaald"), true);
+        assert_eq!(b.body.i64_at("saldoNaar"), Some(300));
+        assert_eq!(s.boek_guard_bekend("extern:oplaad", "lid:K", 301, "oplaad", Some("r"), Some(k)).status, 409);
+        assert_eq!(s.boek_guard_bekend("extern:oplaad", "lid:K", 300, "oplaad", Some("r"), Some("vrij")).status, 400);
+        assert_eq!(s.grb.saldo_van("lid:K"), 300, "bekend boekt nooit");
+    }
+
+    /* Een bevestigde kaartbetaling stuurde `pay-oplaad:BW-<hex>` en de motor
+       kende die soort niet: 400, en de oplading bleef voor altijd
+       onbijgeschreven. Elke soort uit de gedeelde lijst boekt nu precies een
+       keer, overleeft een snapshot, en een niet-gehashte waarde blijft 400. */
+    #[test]
+    fn elke_economische_soort_boekt_eenmaal_en_overleeft_een_snapshot() {
+        let hash = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let mut s = State::new();
+        for (i, soort) in ECONOMISCHE_SOORTEN.iter().enumerate() {
+            let sleutel = format!("{}:{}", soort, hash);
+            let r = format!("ref-{}", i);
+            assert_eq!(s.boek_guard_eenmaal("extern:oplaad", "lid:C", 100, "oplaad", "x",
+                Some(r.clone()), Some(&sleutel)).status, 200, "{}", soort);
+            let twee = s.boek_guard_eenmaal("extern:oplaad", "lid:C", 100, "oplaad", "x",
+                Some(r), Some(&sleutel));
+            assert_eq!(twee.body.bool_at("herhaald"), true, "{}", soort);
+        }
+        assert_eq!(s.grb.saldo_van("lid:C"), 100 * ECONOMISCHE_SOORTEN.len() as i64);
+        assert!(State::new().laad_gevalideerd(&s.snapshot()).is_ok(),
+            "een sleutel die de motor aannam, moet hij na een herstart ook weer inlezen");
+        for fout in ["pay-oplaad:BW-0E110F5CC2524185F291", "pay-oplaad:0123456789ABCDEF0123456789abcdef0123456789abcdef0123456789abcdef",
+                     "pay-oplaad", "pay-oplaadx:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"] {
+            assert_eq!(s.boek_guard_eenmaal("extern:oplaad", "lid:C", 1, "oplaad", "x",
+                Some("f".into()), Some(fout)).status, 400, "{}", fout);
+        }
+        assert_eq!(s.grb.saldo_van("lid:C"), 100 * ECONOMISCHE_SOORTEN.len() as i64);
     }
 }
 

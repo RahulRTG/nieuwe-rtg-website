@@ -8,6 +8,11 @@
 <link rel="icon" href="/icons/personeel.svg">
 <meta name="robots" content="noindex">
 <meta http-equiv="refresh" content="0;url=/apps/personeel.html?kantoor=1">
+<!-- De meta-refresh gaat pas NA het laden, en de personeels-app is zwaar: wie
+     de pagina na "load" leest (een browser, een keuring) leest dan een
+     document dat halverwege verdwijnt. Dit script stuurt al tijdens het lezen
+     door; de meta-refresh blijft voor een browser zonder JavaScript. -->
+<script>location.replace('/apps/personeel.html?kantoor=1');</script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   body{background:#0C0C0B;color:#F4F1EC;font-family:'Inter',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100dvh;margin:0;text-align:center;padding:1.5rem;}

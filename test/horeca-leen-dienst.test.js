@@ -84,7 +84,14 @@ test('2. ingeklokt, dan uitgeklokt -- en de tafel blijft op zijn naam', async ()
   assert.equal(d.leningen.length, 1, 'uitklokken geeft niets vanzelf terug');
   assert.equal(d.leningen[0].naam, naamB, 'de tafel staat nog op naam van wie hem leende');
   assert.equal(d.leningen[0].drager.stand, 'uitgeklokt');
-  assert.ok(Date.parse(d.leningen[0].drager.om), 'met het tijdstip erbij');
+  /* Eigenaarsbesluit 11 oktober 2026: de STAND ziet iedereen, het tijdstip
+     alleen een manager -- en het wordt aan de bron weggelaten. */
+  const m = await wijken(M);
+  assert.equal(m.leningen[0].drager.stand, 'uitgeklokt');
+  const om = m.leningen[0].drager.om;
+  assert.ok(Date.parse(om), 'een manager ziet het tijdstip wel');
+  assert.equal(d.leningen[0].drager.om, undefined, 'een collega zonder managerrol krijgt geen uitkloktijdstip');
+  assert.ok(!JSON.stringify(d).includes(om), 'en ook nergens anders in zijn antwoord');
   assert.equal(d.dragerWeg, 1, 'en de vloer telt het als tafel, niet als mens');
   /* Besluit 1A: de Vloer krijgt de STAND, nooit wat klokVan teruggeeft -- geen
      uren van een collega, geen klokregels (test/horeca-klokgrens.test.js). */

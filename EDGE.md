@@ -719,7 +719,7 @@ nooit op "de functie staat erin".
 |---|---|---|
 | 0 — fundament | de kaart, het ene leespad, herkomst per waarde, het actiecontract, de dekkingsmeter en de ratels | **staat** (dit document) |
 | 1 — fundament verbreden | de dode kanalen gesloten of verwijderd, het tweede register alleen licht (uitvoering langs `RTGGewicht.voer`), elke hoofdactie in een blad zichtbaar voor de schil; en onderweg een antwoord op "wat weegt dit" en de gebaardrempels op een plek | **staat** (par. 11): 17 dode kanalen naar 0, dubbele eigenaars 12 naar 11; het tweede register is LICHT en nog niet LEEG (ronde 2) |
-| 2 — context | volgens besluit K-reikwijdte: een REGEL met een schuldlijst en geen belofte over elk scherm. De wereld telt nooit als "zelf" en moet kloppen met `MAPPEN`; een scherm met een eigen hoofdactie publiceert zijn context zelf, of staat op `CONTEXT_SCHULD` (die alleen krimpt). `RTGWorkspaceContext` leest het blikveld; het tweede register is weg; het open document en bestand zijn een object | **staat** (par. 11): het tweede register is weg en de API kan niet stil terugkomen; context door het scherm zelf 1 naar 11 van 280 schermen; de schuldlijst staat op 49 van 51 (Bestanden en Comm gingen eraf); object alleen na openen (2 schermen, met reden verklaard); activiteit op 0. De dubbele eigenaars staan op 12, want het samenvoegen van de twee contextmodellen is na ronde 2 (besluit K-casco) |
+| 2 — context | volgens besluit K-reikwijdte: een REGEL met een schuldlijst en geen belofte over elk scherm. De wereld telt nooit als "zelf" en moet kloppen met `MAPPEN`; een scherm met een eigen hoofdactie publiceert zijn context zelf, of staat op `CONTEXT_SCHULD` (die alleen krimpt). `RTGWorkspaceContext` leest het blikveld; het tweede register is weg; het open document en bestand zijn een object | **staat** (par. 11): het tweede register is weg en de API kan niet stil terugkomen; context door het scherm zelf 1 naar 11 van 280 schermen; de schuldlijst staat op 47 van 51 (Bestanden en Comm gingen eraf, en in golf 3 Agenda en Notities); object alleen na openen (2 schermen, met reden verklaard); activiteit op 0. De dubbele eigenaars staan op 12, want het samenvoegen van de twee contextmodellen is na ronde 2 (besluit K-casco) |
 | 3 — actie en trust | het eerste serveroordeel per principal en capability, één vorm voor "waarom niet", de voorgrondresolver, gewicht afgedwongen in `RTGAdaptief.doe` | een stap weg, deels besluit |
 | 4 — voortzetting en realtime | voortzetting als contract (besluit 1), presence met echte producenten, een task stack | een stap weg; de servervariant vraagt een besluit |
 | 5 — Rahul | Rahul leest het blikveld en `waarom.js`, stelt handelingen voor uit het register, en beslist niets | een stap weg na ronde 3 |
@@ -832,7 +832,7 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
   scherm met een eigen hoofdactie spreekt zijn context zelf of staat op
   `CONTEXT_SCHULD` in `scripts/edgedekking.js`, en die lijst mag alleen
   krimpen (`test/edgenieuwscherm.test.js`). Bestanden publiceert nu ook zonder
-  open bestand, en de lijst staat op 49;
+  open bestand, en de lijst staat op 49; in golf 3 gingen Agenda en Notities eraf (47), en hun titel is precies wat Rahul in de schil leest (`edge/rahulzicht.js`);
 - **een gebrek dat alleen het samenvoegen liet zien.** Het sociaal-spoor zette
   `adaptief/register.js` op negen schermen terwijl het object-spoor tegelijk
   de vorm afsplitste naar `adaptief/vorm.js`; `register.js` stopt stil zonder

@@ -3,7 +3,7 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-10-11",
-  "commit": "5a932d6c2",
+  "commit": "831f06de1",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -3203,6 +3203,7 @@
     "server/lib/idemsleutels-nooit-lid.js",
     "server/lib/idemsleutels-nooit-linkcap.js",
     "server/lib/idemsleutels-nooit-machinesleutels.js",
+    "server/lib/idemsleutels-nooit-recent.js",
     "server/lib/idemsleutels-nooit-routes.js",
     "server/lib/idemsleutels-nooit-sessies.js",
     "server/lib/idemsleutels-nooit-sessiestroom.js",
@@ -3216,6 +3217,7 @@
     "server/lib/idemsleutels-personeel.js",
     "server/lib/idemsleutels-praktijk.js",
     "server/lib/idemsleutels-proefronde.js",
+    "server/lib/idemsleutels-recent.js",
     "server/lib/idemsleutels-reisherkomst.js",
     "server/lib/idemsleutels-reisteruggave.js",
     "server/lib/idemsleutels-restbak.js",
@@ -5398,9 +5400,9 @@
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
-  "bestanden": 4417,
+  "bestanden": 4419,
   "nietGelezen": 0,
-  "aanroepen": 179236,
+  "aanroepen": 179228,
   "kanten": 31111,
   "kantenLokaal": 19968,
   "kantenIngevoerd": 2762,
@@ -5411,10 +5413,10 @@
   "kantenUitFabriek": 300,
   "kantenViaKernZonderSymbool": 2932,
   "kernherkomstGelezen": 1345,
-  "onopgelosteAanroepen": 133785,
+  "onopgelosteAanroepen": 133777,
   "onopgelosteNamen": 13764,
   "onopgelostNaarSoort": {
-   "ingebouwd": 35824,
+   "ingebouwd": 35816,
    "externeModule": 1052,
    "kader": 12385,
    "contextobject": 20707,
@@ -32544,7 +32546,7 @@
   },
   {
    "naam": "require",
-   "aantal": 8236
+   "aantal": 8238
   },
   {
    "naam": "app.post",
@@ -32572,7 +32574,7 @@
   },
   {
    "naam": "Object.assign",
-   "aantal": 2079
+   "aantal": 2069
   },
   {
    "naam": "Array.isArray",
@@ -32705,7 +32707,7 @@
     },
     {
      "naam": "require",
-     "aantal": 8236
+     "aantal": 8238
     },
     {
      "naam": "Number",
@@ -32713,7 +32715,7 @@
     },
     {
      "naam": "Object.assign",
-     "aantal": 2079
+     "aantal": 2069
     },
     {
      "naam": "Array.isArray",
@@ -220650,7 +220652,7 @@
    "naarBestand": "server/server.js",
    "naar": "appUrl",
    "hoe": "viaKern",
-   "lijn": 61
+   "lijn": 54
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220658,7 +220660,7 @@
    "naarBestand": "server/routes/auth/herstel.js",
    "naar": "herstelSmsDicht",
    "hoe": "lokaal",
-   "lijn": 70
+   "lijn": 63
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220666,7 +220668,7 @@
    "naarBestand": "server/routes/auth/herstel.js",
    "naar": "herstel2fa",
    "hoe": "lokaal",
-   "lijn": 95
+   "lijn": 88
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220674,7 +220676,7 @@
    "naarBestand": "server/routes/auth/herstel.js",
    "naar": "codeHash",
    "hoe": "lokaal",
-   "lijn": 95
+   "lijn": 88
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220682,7 +220684,7 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "nu",
    "hoe": "lid",
-   "lijn": 95
+   "lijn": 88
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220690,7 +220692,7 @@
    "naarBestand": "server/routes/auth/herstel.js",
    "naar": "herstelStart",
    "hoe": "lokaal",
-   "lijn": 107
+   "lijn": 100
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220698,7 +220700,7 @@
    "naarBestand": "server/server.js",
    "naar": "appUrl",
    "hoe": "viaKern",
-   "lijn": 118
+   "lijn": 110
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220706,7 +220708,7 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "nu",
    "hoe": "lid",
-   "lijn": 119
+   "lijn": 111
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220714,7 +220716,7 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "nu",
    "hoe": "lid",
-   "lijn": 121
+   "lijn": 113
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220722,7 +220724,7 @@
    "naarBestand": "server/routes/auth/herstel.js",
    "naar": "herstelStart",
    "hoe": "lokaal",
-   "lijn": 128
+   "lijn": 120
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220730,7 +220732,7 @@
    "naarBestand": "server/routes/auth/herstel.js",
    "naar": "antwoord",
    "hoe": "lokaal",
-   "lijn": 138
+   "lijn": 130
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220738,7 +220740,7 @@
    "naarBestand": "server/routes/auth/herstel.js",
    "naar": "herstel2fa",
    "hoe": "lokaal",
-   "lijn": 149
+   "lijn": 141
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220746,7 +220748,7 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "nu",
    "hoe": "lid",
-   "lijn": 150
+   "lijn": 142
   },
   {
    "vanBestand": "server/routes/auth/herstel.js",
@@ -220754,7 +220756,7 @@
    "naarBestand": "server/routes/auth/herstel.js",
    "naar": "codeHash",
    "hoe": "lokaal",
-   "lijn": 156
+   "lijn": 148
   },
   {
    "vanBestand": "server/routes/auth/inlog-pas.js",

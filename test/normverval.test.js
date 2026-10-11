@@ -141,6 +141,63 @@ test('een meter die HELEMAAL uit NORM.json verdwijnt, is de stilste verlaging va
 
 /* ==================== 2. DE VORM VAN DE NOTITIE ==================== */
 
+/* ==================== 1b. ONTDEKT: een betere meter is geen slechtere code ====================
+   ZERO.md par. 3. Een stijging die komt doordat de meter meer ziet, wordt niet
+   tegengehouden -- maar ook niet stil opgenomen. De notitie moet een bestaand
+   meetscript noemen, een afbouwdoel en een datum dragen, en na die datum het doel
+   gehaald hebben. */
+const ontdekt = (over) => Object.assign({ datum: '2026-05-01', meter: 'keuringTeGroot 10 -> 14',
+  reden: 'de meter telt nu ook de bundeldelen', soort: 'ontdekt', sleutel: 'keuringTeGroot',
+  van: 10, naar: 14, doel: 12, meterwijziging: 'scripts/keuring.js leest nu ook de bundeldelen',
+  afbouw: 'twee modules knippen langs de naden in check.js regel 13', vervalt: '2026-12-01' }, over || {});
+
+test('ontdekt: een complete notitie dekt een stijging af, en de poort blijft open', () => {
+  metRepo(h => {
+    const basis = commitGrond(h);
+    fs.mkdirSync(path.join(h.map, 'scripts'), { recursive: true });
+    fs.writeFileSync(path.join(h.map, 'scripts', 'keuring.js'), '// meter\n');
+    h.schrijfNorm(grond({ meters: { keuringTeGroot: 14 }, notities: [ontdekt()] }));
+    const r = h.draai('2026-06-01', '--basis', basis);
+    assert.equal(r.code, 0, r.uit);
+    assert.match(r.uit, /afbouw naar 12 tot 2026-12-01/);
+  });
+});
+
+test('ontdekt: zonder bestaand meetscript, zonder afbouw of zonder doel zakt hij', () => {
+  metRepo(h => {
+    const basis = commitGrond(h);
+    const met = (over) => {
+      h.schrijfNorm(grond({ meters: { keuringTeGroot: 14 }, notities: [ontdekt(over)] }));
+      return h.draai('2026-06-01', '--basis', basis);
+    };
+    /* scripts/keuring.js bestaat in deze wegwerprepo NIET: een bewering over een
+       meter die er niet is, wijst naar niets. */
+    assert.match(met().uit, /bestaat niet/);
+    fs.mkdirSync(path.join(h.map, 'scripts'), { recursive: true });
+    fs.writeFileSync(path.join(h.map, 'scripts', 'keuring.js'), '// meter\n');
+    assert.match(met({ meterwijziging: 'de meter is beter' }).uit, /welk meetscript/);
+    assert.match(met({ afbouw: '' }).uit, /zonder afbouwplan/);
+    assert.match(met({ doel: undefined }).uit, /zonder getal in "doel"/);
+    assert.match(met({ vervalt: undefined }).uit, /zonder vervaldatum/);
+  });
+});
+
+test('ontdekt: na de datum moet het doel gehaald zijn, anders zakt hij', () => {
+  metRepo(h => {
+    const basis = commitGrond(h);
+    fs.mkdirSync(path.join(h.map, 'scripts'), { recursive: true });
+    fs.writeFileSync(path.join(h.map, 'scripts', 'keuring.js'), '// meter\n');
+    h.schrijfNorm(grond({ meters: { keuringTeGroot: 14 }, notities: [ontdekt({ vervalt: '2026-05-31' })] }));
+    const open = h.draai('2026-06-01', '--basis', basis);
+    assert.equal(open.code, 1, open.uit);
+    assert.match(open.uit, /afbouw van ontdekte schuld is verlopen/);
+    h.schrijfNorm(grond({ meters: { keuringTeGroot: 12 }, notities: [ontdekt({ vervalt: '2026-05-31' })] }));
+    const af = h.draai('2026-06-01', '--basis', basis);
+    assert.equal(af.code, 0, af.uit);
+    assert.match(af.uit, /is afgebouwd/);
+  });
+});
+
 test('een notitie onder de eis zonder soort laat hem zakken; met soort niet', () => {
   metRepo(h => {
     const basis = commitGrond(h);

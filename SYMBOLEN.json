@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-11",
-  "commit": "e92a27c8d",
-  "seconden": 9.9,
+  "commit": "5670df7a3",
+  "seconden": 9.7,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -4475,6 +4475,7 @@
     "server/lib/idemsleutels-nooit-lid.js",
     "server/lib/idemsleutels-nooit-linkcap.js",
     "server/lib/idemsleutels-nooit-machinesleutels.js",
+    "server/lib/idemsleutels-nooit-recent.js",
     "server/lib/idemsleutels-nooit-routes.js",
     "server/lib/idemsleutels-nooit-sessies.js",
     "server/lib/idemsleutels-nooit-sessiestroom.js",
@@ -4488,6 +4489,7 @@
     "server/lib/idemsleutels-personeel.js",
     "server/lib/idemsleutels-praktijk.js",
     "server/lib/idemsleutels-proefronde.js",
+    "server/lib/idemsleutels-recent.js",
     "server/lib/idemsleutels-reisherkomst.js",
     "server/lib/idemsleutels-reisteruggave.js",
     "server/lib/idemsleutels-restbak.js",
@@ -7164,18 +7166,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5688,
-  "gelezen": 5374,
+  "bestandenGezien": 5690,
+  "gelezen": 5376,
   "nietGelezen": 314,
   "waarvanBundeldeel": 314,
   "waarvanParsefout": 0,
   "symbolen": 27177,
-  "bestandenMetUitvoer": 4477,
-  "uitvoerMetNamen": 2024,
+  "bestandenMetUitvoer": 4479,
+  "uitvoerMetNamen": 2025,
   "uitvoerOnvolledig": 5,
-  "uitvoerZonderNamen": 2448,
+  "uitvoerZonderNamen": 2449,
   "zonderUitvoer": 897,
-  "requireKanten": 7613
+  "requireKanten": 7615
  },
  "nietGelezen": [
   {
@@ -169163,7 +169165,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels.js"
+    "server/lib/idemsleutels-recent.js"
    ]
   },
   {
@@ -169193,7 +169195,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels.js"
+    "server/lib/idemsleutels-recent.js"
    ]
   },
   {
@@ -169281,7 +169283,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels.js"
+    "server/lib/idemsleutels-recent.js"
    ]
   },
   {
@@ -169331,7 +169333,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels.js"
+    "server/lib/idemsleutels-recent.js"
    ]
   },
   {
@@ -169422,7 +169424,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels.js"
+    "server/lib/idemsleutels-recent.js"
    ]
   },
   {
@@ -169452,7 +169454,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels.js"
+    "server/lib/idemsleutels-recent.js"
    ]
   },
   {
@@ -169551,7 +169553,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
+    "server/lib/idemsleutels-nooit-recent.js"
    ]
   },
   {
@@ -169564,7 +169566,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
+    "server/lib/idemsleutels-nooit-recent.js"
    ]
   },
   {
@@ -169577,7 +169579,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
+    "server/lib/idemsleutels-nooit-recent.js"
    ]
   },
   {
@@ -169616,7 +169618,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
+    "server/lib/idemsleutels-nooit-recent.js"
    ]
   },
   {
@@ -169646,7 +169648,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
+    "server/lib/idemsleutels-nooit-recent.js"
    ]
   },
   {
@@ -169659,7 +169661,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
+    "server/lib/idemsleutels-nooit-recent.js"
    ]
   },
   {
@@ -169685,7 +169687,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
+    "server/lib/idemsleutels-nooit-recent.js"
    ]
   },
   {
@@ -169698,7 +169700,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
+    "server/lib/idemsleutels-nooit-recent.js"
    ]
   },
   {
@@ -169724,7 +169726,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
+    "server/lib/idemsleutels-nooit-recent.js"
    ]
   },
   {
@@ -169735,6 +169737,33 @@
     "namen": null
    },
    "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/lib/idemsleutels-nooit-recent.js"
+   ]
+  },
+  {
+   "bestand": "server/lib/idemsleutels-nooit-recent.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "anders",
+    "namen": null
+   },
+   "requires": [
+    "server/lib/idemsleutels-nooit-codedeuren.js",
+    "server/lib/idemsleutels-nooit-codes.js",
+    "server/lib/idemsleutels-nooit-connect.js",
+    "server/lib/idemsleutels-nooit-eigengezin.js",
+    "server/lib/idemsleutels-nooit-gezinsdeur.js",
+    "server/lib/idemsleutels-nooit-gezinstoken.js",
+    "server/lib/idemsleutels-nooit-lesfamilie.js",
+    "server/lib/idemsleutels-nooit-lesstroom.js",
+    "server/lib/idemsleutels-nooit-linkcap.js",
+    "server/lib/idemsleutels-nooit-machinesleutels.js",
+    "server/lib/idemsleutels-nooit-sessies.js",
+    "server/lib/idemsleutels-nooit-sessiestroom.js",
+    "server/lib/idemsleutels-nooit-ssogeheim.js"
+   ],
    "extern": [],
    "gebruiktDoor": [
     "server/lib/idemsleutels-nooit-routes.js"
@@ -169749,23 +169778,11 @@
    },
    "requires": [
     "server/lib/idemsleutels-nooit-carriere.js",
-    "server/lib/idemsleutels-nooit-codedeuren.js",
-    "server/lib/idemsleutels-nooit-codes.js",
-    "server/lib/idemsleutels-nooit-connect.js",
     "server/lib/idemsleutels-nooit-democratie.js",
-    "server/lib/idemsleutels-nooit-eigengezin.js",
     "server/lib/idemsleutels-nooit-gemeenschap.js",
-    "server/lib/idemsleutels-nooit-gezinsdeur.js",
-    "server/lib/idemsleutels-nooit-gezinstoken.js",
     "server/lib/idemsleutels-nooit-ledger.js",
-    "server/lib/idemsleutels-nooit-lesfamilie.js",
-    "server/lib/idemsleutels-nooit-lesstroom.js",
     "server/lib/idemsleutels-nooit-lid.js",
-    "server/lib/idemsleutels-nooit-linkcap.js",
-    "server/lib/idemsleutels-nooit-machinesleutels.js",
-    "server/lib/idemsleutels-nooit-sessies.js",
-    "server/lib/idemsleutels-nooit-sessiestroom.js",
-    "server/lib/idemsleutels-nooit-ssogeheim.js",
+    "server/lib/idemsleutels-nooit-recent.js",
     "server/lib/idemsleutels-nooit-vakschema.js"
    ],
    "extern": [],
@@ -169783,7 +169800,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
+    "server/lib/idemsleutels-nooit-recent.js"
    ]
   },
   {
@@ -169796,7 +169813,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
+    "server/lib/idemsleutels-nooit-recent.js"
    ]
   },
   {
@@ -169809,7 +169826,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels-nooit-routes.js"
+    "server/lib/idemsleutels-nooit-recent.js"
    ]
   },
   {
@@ -169883,7 +169900,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels.js"
+    "server/lib/idemsleutels-recent.js"
    ]
   },
   {
@@ -169947,6 +169964,33 @@
    ]
   },
   {
+   "bestand": "server/lib/idemsleutels-recent.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "SLEUTELS"
+    ]
+   },
+   "requires": [
+    "server/lib/idemsleutels-conciergelus.js",
+    "server/lib/idemsleutels-connection-final.js",
+    "server/lib/idemsleutels-eigengezin.js",
+    "server/lib/idemsleutels-horecateruggave.js",
+    "server/lib/idemsleutels-leerhuis.js",
+    "server/lib/idemsleutels-loop-fabric.js",
+    "server/lib/idemsleutels-officeformaten.js",
+    "server/lib/idemsleutels-reisteruggave.js",
+    "server/lib/idemsleutels-rtc.js",
+    "server/lib/idemsleutels-toestemming.js",
+    "server/lib/idemsleutels-vrijgave.js"
+   ],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/lib/idemsleutels.js"
+   ]
+  },
+  {
    "bestand": "server/lib/idemsleutels-reisherkomst.js",
    "symbolen": [],
    "uitvoer": {
@@ -169973,7 +170017,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels.js"
+    "server/lib/idemsleutels-recent.js"
    ]
   },
   {
@@ -170001,7 +170045,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels.js"
+    "server/lib/idemsleutels-recent.js"
    ]
   },
   {
@@ -170076,7 +170120,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels.js"
+    "server/lib/idemsleutels-recent.js"
    ]
   },
   {
@@ -170121,7 +170165,7 @@
    "requires": [],
    "extern": [],
    "gebruiktDoor": [
-    "server/lib/idemsleutels.js"
+    "server/lib/idemsleutels-recent.js"
    ]
   },
   {
@@ -170181,46 +170225,36 @@
     "server/lib/idemsleutels-bundel.js",
     "server/lib/idemsleutels-carriere.js",
     "server/lib/idemsleutels-commerce.js",
-    "server/lib/idemsleutels-conciergelus.js",
     "server/lib/idemsleutels-connect.js",
-    "server/lib/idemsleutels-connection-final.js",
     "server/lib/idemsleutels-democratie.js",
     "server/lib/idemsleutels-document.js",
     "server/lib/idemsleutels-eigenaar.js",
-    "server/lib/idemsleutels-eigengezin.js",
     "server/lib/idemsleutels-geld.js",
     "server/lib/idemsleutels-gemeenschap.js",
-    "server/lib/idemsleutels-horecateruggave.js",
     "server/lib/idemsleutels-isolatie.js",
     "server/lib/idemsleutels-kaarten.js",
     "server/lib/idemsleutels-kaleronde-b.js",
     "server/lib/idemsleutels-kaleronde.js",
     "server/lib/idemsleutels-kosten.js",
-    "server/lib/idemsleutels-leerhuis.js",
     "server/lib/idemsleutels-lidabonnement.js",
-    "server/lib/idemsleutels-loop-fabric.js",
     "server/lib/idemsleutels-magnaatleven.js",
     "server/lib/idemsleutels-media.js",
     "server/lib/idemsleutels-move.js",
     "server/lib/idemsleutels-neiging.js",
     "server/lib/idemsleutels-nooit.js",
     "server/lib/idemsleutels-objectronde.js",
-    "server/lib/idemsleutels-officeformaten.js",
     "server/lib/idemsleutels-ondernemerslus.js",
     "server/lib/idemsleutels-personeel.js",
     "server/lib/idemsleutels-praktijk.js",
     "server/lib/idemsleutels-proefronde.js",
+    "server/lib/idemsleutels-recent.js",
     "server/lib/idemsleutels-reisherkomst.js",
-    "server/lib/idemsleutels-reisteruggave.js",
     "server/lib/idemsleutels-restbak.js",
-    "server/lib/idemsleutels-rtc.js",
     "server/lib/idemsleutels-rtflabfonds.js",
     "server/lib/idemsleutels-rtgid.js",
     "server/lib/idemsleutels-salon.js",
     "server/lib/idemsleutels-stage.js",
-    "server/lib/idemsleutels-toestemming.js",
     "server/lib/idemsleutels-vracht.js",
-    "server/lib/idemsleutels-vrijgave.js",
     "server/lib/idemsleutels-weerbaarheid.js",
     "server/lib/idemsleutels-werelden.js"
    ],
@@ -184544,19 +184578,19 @@
     {
      "naam": "herstelSmsDicht",
      "soort": "functie",
-     "lijn": 55,
+     "lijn": 48,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "herstelStart",
      "soort": "functie",
-     "lijn": 58,
+     "lijn": 51,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "antwoord",
      "soort": "pijl",
-     "lijn": 120,
+     "lijn": 112,
      "geexporteerd": "onbekend"
     }
    ],

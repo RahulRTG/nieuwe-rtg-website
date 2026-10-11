@@ -274,14 +274,14 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-pla
    1. EEN ECHT DONKER VLAK KRIJGT DONKERE TOKENS. Een fotohero, een fotoscène
       en de fotografische lead blijven donker, zoals de hero van de www-site.
       Wie daarin de wereldtokens leest, krijgt hier de lichte waarden terug. */
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.wh-photo,.wp-scene,[data-rtg-cinematic-lead="true"]){
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.wh-photo,.wp-scene,[data-rtg-cinematic-lead="true"],#rtg-cookie){
   --rtg-world-ink:#f7f1e8;--rtg-world-muted:#d8cfc2;--rtg-world-metal:#e2c389;--rtg-world-line:rgba(247,241,232,.2);
 }
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wh-photo :is(p,span,small,.wh-free),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wh-free *{color:var(--rtg-world-ink)!important}
 /* De lead verloor zijn foto en zijn donkere waas: `background:#faf8f3` voor het
    OperationalPanel hieronder is een shorthand met hetzelfde gewicht en kwam
    later, en wiste daarmee ook background-image. */
-body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"][data-rtg-cinematic-lead]{
+body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]:not(#rtg-geen-lead){
   background-color:#11100e!important;
   background-image:linear-gradient(0deg,rgba(7,6,5,.94),rgba(7,6,5,.20) 72%),var(--rtg-cinema-photo)!important;
 }
@@ -289,7 +289,11 @@ body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"][data-rtg-cinema
       donkere grond maar lazen hun tekst uit de wereldtokens: donkere inkt op
       een donker vlak, tot 1,01:1. De www-site kent geen donkere panelen. */
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]){--rtg-card:var(--rtg-world-card)!important;--rtg-oppervlak:var(--rtg-world-card)!important;--rv-bg:var(--rtg-world-bg)!important}
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tos-service-strip,.rtgplek,.rb-leeg,.rv-reiszoek button,.rail,.side,#balk,.topnav,.top,.school-boven,#rtg-cookie,header.kop){
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tos-service-strip,.rtgplek,.rb-leeg,.rv-reiszoek button,.rail,.side,#balk,.topnav,.top,.school-boven,header.kop,#apparaten,#paginabar):not([data-rtg-cinematic-lead="true"]),
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(header.kop,.rtgplek) :is(a,button):not(.rtg-edge-mark),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) header.ios-nav .knop{
+  background:var(--rtg-world-card-strong)!important;color:var(--rtg-world-ink)!important;border-color:var(--rtg-world-line)!important;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tos-service-strip,.rtgplek,.rb-leeg,.rv-reiszoek button,.rail,.side,#balk,.topnav,.top,.school-boven,header.kop,#apparaten,#paginabar):not([data-rtg-cinematic-lead="true"]){
   background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;border-color:var(--rtg-world-line)!important;
 }
 /* 3. OUDE LICHTE APP-KLEUREN VOLGEN DE WERELD. Lichte inkt en licht goud voor
@@ -298,21 +302,25 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-pla
   --rtf-gold-soft:var(--rtg-world-metal)!important;--stay-ink:var(--rtg-world-ink)!important;
   --anchor-gold:var(--rtg-world-metal)!important;--anchor-ivory:var(--rtg-world-ink)!important;
   --campus-gold:var(--rtg-world-metal)!important;--ios-label:var(--rtg-world-ink)!important;
+  --tos-wine-licht:#9e1c40!important;
 }
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.verblijfkop,.vliegkop) :is(small,b),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.moveStop,#interpret,#enrollToggle,.private-kicker,.campus-kicker),
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wk-stage :is(.ey,.wk-ey),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-settings-intro .rtg-settings-kicker,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .pn-intent>div b{color:var(--rtg-world-metal)!important}
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.hq-rail,.fx-kaart,.pn-intent>div,.lo-panel>header) :is(i,span),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-settings-intro p,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wk-stage form .knop{color:var(--rtg-world-muted)!important}
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.rtg-settings-shell,.rtg-settings-intro h2,.living-example-head span,.living-example-copy span,.buurtknop.rand){color:var(--rtg-world-ink)!important}
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) [data-rtg-toegang-hoofd] :is(span,small){color:inherit!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wk-stage :is(.ey,.wk-ey),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.verblijfkop,.vliegkop,.travel-os) .tab.aan,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) header.kop small,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .lo-worlds button,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .pn-intent :is(b,button),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) #transferForm span,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-settings-intro .rtg-settings-kicker,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .pn-intent>div b{color:var(--rtg-world-metal)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.hq-rail,.fx-kaart,.pn-intent>div,.lo-panel>header,.rv-reiskaart,.lo-worldhead) :is(i,span,a,summary,small,p,.k),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.merkkop .onder,.wereldvoet span,#vWelkom>.hero span,.travel-os .tab,.rv-pane button,#transferForm label,#dagzin,.pionrond,header.ios-nav small,.workos-has-bottom span),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-settings-intro p,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wk-stage form .knop{color:var(--rtg-world-muted)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.rtg-settings-shell,.rtg-settings-intro h2,.buurtknop.rand,#ritTitel,#vluchtTitel,#verblijfTitel,#privateRoomsTitle,#gereedTeller,header.ios-nav .rtg-rahul-tab,#pModi button,#badge3d,#liveBadge),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-edge-top .rtg-edge-mark{color:var(--rtg-world-ink)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) [data-rtg-toegang-hoofd] :is(span,small,em){color:inherit!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-suite-page p{color:var(--rtg-world-muted)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-suite-page a{color:var(--rtg-world-metal)!important}
 /* 4. SIGNAALKLEUREN IN HUN DONKERE VARIANT. Rood en groen stonden in hun
       lichte variant voor een donkere grond; op ivoor is het merkbordeaux voor
       rood en het rosthemagroen voor groen. */
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.knop.rood,#status,i.nee,#melding){color:#9e1c40!important}
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tref .vrij,.school-zij b,.pn-intent>div em){color:#2f7256!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tref .vrij,.school-zij b,.pn-intent em,#loWorldLabel){color:#2f7256!important}
 /* 5. EEN GOUDEN KNOP WORDT BORDEAUX, DUS ZIJN LETTER WORDT LICHT. --gold volgt
       het metaal, en dat is op ivoor bordeaux; de zwarte letter die bij goud
       hoorde, haalt daarop 2,2:1. */
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.kg-rij button,#btn-zet,#rkToetsen .gelijk,.verstuur,#verstuur,.speler .afspeel,#idStart,button.chip.aan,#n-maak){color:#fffaf2!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.kg-rij button,#btn-zet,#rkToetsen .gelijk,.verstuur,#verstuur,.speler .afspeel,#idStart,button.chip.aan,#n-maak,#kaGo,.knop.p){color:#fffaf2!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(#kaGo,.knop.p,#idStart) *{color:inherit!important}
 /* De signatuur volgt het palet, niet de route: een ingebed Work-blad kleurt
    de schil van Command of het bureau mee, ook al blijft die route Living. */
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="living"],[data-rtg-world="living"]:not([data-rtg-palette])):not([data-public-platform]){

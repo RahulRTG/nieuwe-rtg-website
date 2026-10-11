@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2446 |
 | losse beweringen (`test(...)`) | 16746 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2269 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2272 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 3 |
+| niets van beide | 0 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -207,7 +207,7 @@ toets omvalt.
 | `beleidsmotor-exporten.test.js` | 3 | gezakt op `liegpoort /api/` | LEZEN IS NIET EXPORTEREN (AUTHORITY.md fase 6). Drie dingen die niet mogen sneuvelen: 1. |
 | `beleidsmotor-review.test.js` | 3 | gezakt op `liegpoort /api/` | DE TOEGANGSREVIEW (AUTHORITY.md fase 8). Vijf dingen die niet mogen sneuvelen: 1. |
 | `beleidsmotor-slapend.test.js` | 3 | gezakt op `false->true#0` | SLAPENDE RECHTEN (AUTHORITY.md fase 8, besluit van 23 september 2026). Vier dingen die niet mogen sneuvelen: 1. |
-| `beleidsmotor-uitvoerbak.test.js` | 5 | -- | DE UITVOERTELLERS VAN DE BELEIDSMOTOR, NAAST DE DEURTELLERS (11 oktober 2026). Een tegenlezing vond drie dingen in kern/beleidsmotor/: 1. |
+| `beleidsmotor-uitvoerbak.test.js` | 5 | gezakt op `voorwaarde-omkeren#0` | DE UITVOERTELLERS VAN DE BELEIDSMOTOR, NAAST DE DEURTELLERS (11 oktober 2026). Een tegenlezing vond drie dingen in kern/beleidsmotor/: 1. |
 | `beleidsmotor-werkwoorden.test.js` | 4 | gezakt op `liegpoort /api/` | DE BOARDROOM ALS WERKRUIMTE, DE KAMERS APART (AUTHORITY.md fase 4, schaduw). Vier dingen die niet mogen sneuvelen: 1. |
 | `beleidsmotor.test.js` | 7 | gezakt op `liegpoort /api/` | DE BELEIDSMOTOR IN DE SCHADUW (AUTHORITY.md fase 1, besluiten A1 en A3). Vier dingen die niet mogen sneuvelen: 1. |
 | `belofte.test.js` | 4 | gezakt op `!==->===#0` | Het belofteregister (scripts/belofte.js + BELOFTE.json): elke toezegging draagt haar dekking, en die dekking moet er echt zijn. Deze toets bewijst dat de meter de drie standen goed uit elkaar houdt -- en vooral dat... |
@@ -489,7 +489,7 @@ toets omvalt.
 | `eigenpoort.test.js` | 5 | gezakt op `&&->||#0` | DE POORT IN DE HANDLER IS IETS ANDERS DAN OPENBAAR. WAT ER MIS GING, en het was mijn eigen keuze. |
 | `eindpoort.test.js` | 5 | gezakt op `&&->||#5` | WAT AF IS, BLIJFT AF -- de eindpoort op de bakken die op nul staan. De eigenaar wil uiteindelijk een build die alleen groen wordt als ELKE bak van scripts/onbewezen.js op nul staat. |
 | `entiteitrekening.test.js` | 2 | gezakt op `liegpoort /api/` | DE RTG-REKENING OP NAAM VAN EEN ENTITEIT (kern/bank/entiteit.js), en de uitgave uit het Werk OS die ervan betaalt (bedrijf/entiteitbetaling.js). Besluit van de eigenaar, 24 september 2026. |
-| `envelop-kantooridentiteit.test.js` | 4 | -- | DE ENVELOP ZEGT NIET `bewezen` OVER EEN WACHTWOORDSESSIE (11 oktober 2026). Een opgegeven naam, een bestaande sessie en een bewezen identiteit zijn drie dingen (besluit van de eigenaar). |
+| `envelop-kantooridentiteit.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | DE ENVELOP ZEGT NIET `bewezen` OVER EEN WACHTWOORDSESSIE (11 oktober 2026). Een opgegeven naam, een bestaande sessie en een bewezen identiteit zijn drie dingen (besluit van de eigenaar). |
 | `envelop.test.js` | 13 | gezakt op `!==->===#0` | DE EVENTENVELOP: de taal op de bus. OS.md par. |
 | `envelopv2.test.js` | 6 | gezakt op `===->!==#0` | ENVELOP v2 -- de bus leest het verzoekframe (Fase 2, PR 5; besluit B3b). Vier dingen worden hier vastgehouden, en elk zakt op een eigen mutatie: 1. |
 | `envelopvelden.test.js` | 8 | gezakt op `===->!==#0` | DE VELDEN VAN DE ENVELOP (scripts/envelopvelden.js + ENVELOP.json). WAAROM DEZE TOETS ER IS. |
@@ -842,7 +842,7 @@ toets omvalt.
 | `kantoorhuis.test.js` | 2 | gezakt op `liegpoort /api/` | WELKE ENTITEIT IS RTG, EN WERKT DEZE KANTOORMENS DAAR? (besluit B1, PERSONEEL.md par. |
 | `kantoorintrekking.test.js` | 5 | gezakt op `liegpoort /api/` | INTREKKEN SLUIT WAT AL OPENSTAAT (AUTHORITY.md fase 3). Vijf dingen die niet mogen sneuvelen: 1. |
 | `kantoorkamer.test.js` | 3 | gezakt op `&&->||#0` | WELKE KAMER EEN ROUTE KRIJGT -- EN OF DE REGEL DIE DAT ZEGT OOK VUURT. server/kern/magnaat-kantoorregels/ wijst elke route een kantoorkamer toe met een lijst regels die op VOLGORDE wordt afgelopen: de eerste die... |
-| `kantoormacht-actor.test.js` | 4 | -- | DE ACTOR-AS VAN scripts/kantoormacht.js KIJKT NIET MEER BLIND (11 oktober 2026). Een tegenlezing vond twee routes die een getypte naam als actor gebruikten terwijl de meter `actorUitVerzoek: 0` publiceerde: de... |
+| `kantoormacht-actor.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | DE ACTOR-AS VAN scripts/kantoormacht.js KIJKT NIET MEER BLIND (11 oktober 2026). Een tegenlezing vond twee routes die een getypte naam als actor gebruikten terwijl de meter `actorUitVerzoek: 0` publiceerde: de... |
 | `kantoormacht.test.js` | 11 | gezakt op `getal+1#0` | DE KANTOORMACHT-METER (scripts/kantoormacht.js). KANTOORMACHT.md par. |
 | `kantoorpakket-alle.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Office voor het hele ecosysteem: leden (alle passen), elke leverancier en partner (team-drive per zaak), de eigen RTG-kantoren (kantoor-drive) en RTF-leden (per gezinsprofiel, met delen binnen het gezin). Bewaakt... |
 | `kantoorroutes.test.js` | 3 | gezakt op `!==->===#0` | De kantoorroutes: officeAuth laat door, de handeling vraagt wie er zit. |

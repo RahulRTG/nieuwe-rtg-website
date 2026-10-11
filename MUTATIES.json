@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T06:08:26.331Z",
-    "commit": "49a0508d",
+    "op": "2026-10-11T18:44:55.553Z",
+    "commit": "634001181",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5011,12 +5011,28 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "genootschap-ai-leesweergave.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/genootschap/ai.js",
+      "operator": "optie-uit#1",
+      "gezakt": 1,
+      "geprobeerd": 8
+    },
     "genootschap-beheer.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "genootschap-prikbord-lezen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/genootschap/prikbord.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "genootschap.e2e.js": {
       "soort": "server",

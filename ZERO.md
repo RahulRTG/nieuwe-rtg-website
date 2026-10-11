@@ -76,18 +76,23 @@ tegengehouden. Ze wordt ook nooit stil opgenomen. Ze krijgt een notitie die
 zegt wat de meter beter maakte en hoe de nieuw zichtbare schuld wordt
 afgebouwd.
 
-**Stand vandaag.** `scripts/normverval.js` kent twee soorten notities:
-`schuld` (met een vervaldatum) en `structureel` (de vorm veranderde, met
-`waarheen`). Een betere meter wordt nu als `structureel` geboekt, zoals bij
-`activeringOndergrens` op 6 oktober ("een beperking van de meter"). Dan is er
-geen afbouwplan verplicht. Er komt een derde soort, `ontdekt`, met drie
-verplichte velden:
+**Stand vandaag (golf A).** `scripts/normverval.js` kent nu drie soorten
+notities: `schuld` (met een vervaldatum), `structureel` (de vorm veranderde, met
+`waarheen`) en `ontdekt`. Tot golf A werd een betere meter als `structureel`
+geboekt, zoals bij `activeringOndergrens` op 6 oktober ("een beperking van de
+meter"), en dan was er geen afbouwplan verplicht. `ontdekt` vraagt:
 
-- `meterwijziging`: wat de meter beter maakte;
-- `afbouw`: het plan om de nieuw zichtbare schuld weg te werken;
-- `vervalt`: de datum waarop het plan moet zijn uitgevoerd.
+- `meterwijziging`: wat de meter beter maakte, met een meetscript dat moet
+  bestaan, zodat de bewering naar een instrument wijst en niet naar een gevoel;
+- `van`, `naar` en `doel`: de blinde stand, wat de meter nu ziet, en waar de
+  afbouw eindigt;
+- `afbouw`: het plan;
+- `vervalt`: de datum. Daarna zakt de poort zolang de meter het doel niet haalt.
 
-Handhaver: nog niemand. Dit is golf A.
+Handhaver: `scripts/normverval.js`, geijkt in `test/normverval.test.js` (drie
+mutaties, alle drie raak). Wat hij niet kan zien: of de stijging echt uit de
+meter komt en niet uit nieuwe code. Dat oordeel blijft bij een mens; de vorm
+dwingt alleen af dat het is opgeschreven, met een instrument en een einde.
 
 **Het eerste voorbeeld staat al in het register (par. 6).** Bij het wegwerken
 van inline stijlen bleek dat een eerdere ronde 188 keer een tweede
@@ -192,7 +197,12 @@ een meter af te leiden is.
 | Vondst | Klasse | Waarom het hier staat |
 |---|---|---|
 | 188 dubbele `class`-attributen in 38 bronbestanden | ontdekt, DEFECT | Er is geen meter en geen poort. De reparatie herstelt zichtbare opmaak en vraagt daarom een eigen PR met schermcontrole. |
-| `versheid`, `gevolgdekking:controle`, `schermfunctie:controle` en `tikken:controle` rood op HEAD | DRIFT | Geen van de vier draait in ci.yml, dus een groene CI zei er niets over. |
+| `gevolgdekking:controle` rood | DEBT, nieuw ingevoerd; het instrument is gerepareerd, het register nog niet | `/api/bestanden/actie` staat sinds 22 september in de AI-voorstellijst (besluit van de eigenaar, de Documents-pilot), maar de idempotentieproef kreeg hem nooit aan het werk. Weghalen zou dat besluit terugdraaien, dus is de proef gerepareerd: een voorziening maakt een vers bestand, en een STRIKT lijf laat het gesloten contract heel (`scripts/lib/idemproef.js`). Een peiling meet hem nu als `beschermd`. Het register volgt pas uit een volle ronde, en die is hier niet over te nemen -- zie de volgende regel. Het tik-contract is in golf A gerepareerd. |
+| De proefwereld opent geen bankrekening meer | ontdekt, DRIFT van het instrument | Een volle idempotentieronde op 7 oktober (commit e09a9617) zette 155 routes van `beschermd` terug naar `ongemeten`. De oorzaak: `/api/bank/akkoord` staat in `server/kern/identiteit/bezitsbewijs.js` op `verplicht`, en de proefwereld werkt met demotokens zonder eigen account en zonder toestelsleutel (403: "een eigen RTG-account met een bevestigd toestel"). Dezelfde opstelling draait in de wekelijkse ronde, dus die levert dezelfde terugval. Het register is daarom NIET overgenomen: een slechtere meting door een blinder instrument is geen verbeterde waarheid. Afbouwplan: de proefwereld een lid met een eigen account en een gebonden toestelsleutel geven dat zijn verzoeken ondertekent, net zoals `scripts/lib/idempasskey.js` dat voor de passkeymedewerker doet (die zakt om dezelfde reden: geen registratieopties, 403). |
+| `/api/foundation/gezin/code/roteer` onbeschermd zonder besluit | ontdekt, DEBT | Dezelfde ronde vond een herhaling die het werk opnieuw doet, op een route van 4 oktober (B18/B19). `IDEMBESLUIT.json` kent hem niet. Of roteren twee keer mag, is een besluit, en geen reden om de meting weg te laten. |
+| `versheid` rood op HEAD | DRIFT, en een correctie op de nulmeting | Hij draait al als poort in `ronde.yml`, direct na de meetronde die de poortregisters in dezelfde job opnieuw meet. In ci.yml zou hij per constructie rood staan. Of de ronde zijn registers vastlegt, is een besluit van de eigenaar (kop van `scripts/versheid.js`). |
+| `schermfunctie:controle` rood | gerepareerd in golf A | Register opnieuw gemeten, en de controle staat nu in ci.yml (8 seconden). |
+| `tikken:controle` rood | **onjuist in de nulmeting** | Het ingecheckte `TIKKEN.json` had al nul schermen zonder reden, en een verse meting op deze tak ook (276 van 316 binnen vijf tikken). Het rood kwam uit de meetomgeving van de nulmeting en niet uit de code. Hij hoort niet in ci.yml: een meting duurt ruim twintig minuten in een echte browser. |
 | CI-stap "nieuwe routes komen met een toets" uitgecommentarieerd sinds 27 augustus | DEBT | De eigen hersteldatum is verlopen, en de oorzaak (de server van main hangt in een worktree) is niet onderzocht. |
 | De screenshots `gebruiker.png` en `organisatie.png` zijn niet deterministisch | DRIFT | Bij een ongewijzigde bron veranderen de bytes, dus elke `websitebeelden` levert een schijnwijziging op. |
 

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T08:45:34.605Z",
-    "commit": "07fbad24a",
+    "op": "2026-10-11T13:17:54.371Z",
+    "commit": "84431ad91",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -16458,6 +16458,21 @@
     "verblijven-voorzijde.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "verbond-server.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "verbond.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/keten.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "verdiepende-appflows.test.js": {
       "soort": "puur",

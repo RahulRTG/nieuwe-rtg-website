@@ -19,15 +19,16 @@ module.exports = (kern) => {
   const { app, auth, supplierAuth, officeAuth, rtf, werkplek, boardroomWie, boardroomBaas, office } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json(r) : res.json(r);
 
+  /* EERST DE DEUREN, DAN DE ROUTES. Elke ingang heeft zijn eigen deur (wie ben
+     je, welke drive), en die staan hier bij elkaar boven de tien routes. Zo
+     toont elke route alleen wat zij zelf leest; de gezinsdeur leest een code en
+     een profieltoken, en die hoort niet in het venster van de ledenroute
+     (scripts/codecredentials.js leest dat venster). */
   // de zaak: de team-drive op de leverancierscode
   const supDoe = fn => async (req, res) => stuur(res, await fn('sup:' + req.supplier.code, req.body || {}));
-  app.post('/api/supplier/kantoorpakket/exporteer', supplierAuth, supDoe((key, b) => office.exporteer(key, b.id, b)));
-  app.post('/api/supplier/kantoorpakket/importeer', supplierAuth, supDoe((key, b) => office.importeer(key, b)));
 
   // de RTG-kantoren: de gedeelde kantoor-drive
   const kantoorDoe = fn => async (req, res) => stuur(res, await fn('rtg:kantoor', req.body || {}));
-  app.post('/api/office/kantoorpakket/exporteer', officeAuth, kantoorDoe((key, b) => office.exporteer(key, b.id, b)));
-  app.post('/api/office/kantoorpakket/importeer', officeAuth, kantoorDoe((key, b) => office.importeer(key, b)));
 
   // leden: op het eigen account; de gratis gast-app heeft geen Office
   function geenGast(req, res, next) {
@@ -35,8 +36,6 @@ module.exports = (kern) => {
     next();
   }
   const lidDoe = fn => async (req, res) => stuur(res, await fn(req.session.key, req.body || {}));
-  app.post('/api/kantoorpakket/exporteer', auth, geenGast, lidDoe((key, b) => office.exporteer(key, b.id, b)));
-  app.post('/api/kantoorpakket/importeer', auth, geenGast, lidDoe((key, b) => office.importeer(key, b)));
 
   /* Het RTF-gezin: elk profiel een eigen map, met de kring van het gezin. Een
      oppas of familielid leest mee en mag dus ook downloaden wat hij al ziet;
@@ -55,8 +54,6 @@ module.exports = (kern) => {
     if (schrijf && s.gast) return res.status(403).json({ error: 'Als oppas of familielid lees je mee; maken en bewerken doet het gezin zelf.' });
     stuur(res, await fn(s, req.body || {}));
   };
-  app.post('/api/rtf/kantoorpakket/exporteer', rtfPoort, rtfDoe((s, b) => office.exporteer(s.key, b.id, b, s.kring)));
-  app.post('/api/rtf/kantoorpakket/importeer', rtfPoort, rtfDoe((s, b) => office.importeer(s.key, b, s.kring), true));
 
   // de werkplekken: elk huis zijn eigen kantoordrive, collega's delen de kring
   function huisPoort(req, res, next) {
@@ -69,6 +66,16 @@ module.exports = (kern) => {
     next();
   }
   const huisDoe = fn => async (req, res) => stuur(res, await fn(req.officeFormaatDrive, req.body || {}));
+
+  // de tien routes: per ingang exporteren en inlezen, alle tien via de kern
+  app.post('/api/supplier/kantoorpakket/exporteer', supplierAuth, supDoe((key, b) => office.exporteer(key, b.id, b)));
+  app.post('/api/supplier/kantoorpakket/importeer', supplierAuth, supDoe((key, b) => office.importeer(key, b)));
+  app.post('/api/office/kantoorpakket/exporteer', officeAuth, kantoorDoe((key, b) => office.exporteer(key, b.id, b)));
+  app.post('/api/office/kantoorpakket/importeer', officeAuth, kantoorDoe((key, b) => office.importeer(key, b)));
+  app.post('/api/kantoorpakket/exporteer', auth, geenGast, lidDoe((key, b) => office.exporteer(key, b.id, b)));
+  app.post('/api/kantoorpakket/importeer', auth, geenGast, lidDoe((key, b) => office.importeer(key, b)));
+  app.post('/api/rtf/kantoorpakket/exporteer', rtfPoort, rtfDoe((s, b) => office.exporteer(s.key, b.id, b, s.kring)));
+  app.post('/api/rtf/kantoorpakket/importeer', rtfPoort, rtfDoe((s, b) => office.importeer(s.key, b, s.kring), true));
   app.post('/api/werkplek/kantoorpakket/exporteer', huisPoort, huisDoe((s, b) => office.exporteer(s.key, b.id, b, s.kring)));
   app.post('/api/werkplek/kantoorpakket/importeer', huisPoort, huisDoe((s, b) => office.importeer(s.key, b, s.kring)));
 };

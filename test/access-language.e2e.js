@@ -36,44 +36,22 @@ test('alle toegangsschermen bewegen mee zonder invoer, voortgang of akkoord te v
       assert.deepEqual(codes,TALEN.map(t=>t.code));await offline.close();
     });
     await t.test('welkom, alle vier vragen en foutmeldingen volgen Nederlands en Engels',async()=>{
-      // The actual Edge route must remain usable when the portal hides the top bar.
-      await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
-      await page.locator('[data-edge-face="all"]').click();
-      await page.locator('[data-edge-smart-language]').click();
+      // Access has its own small language route. The authenticated Edge stays
+      // outside the identity flow and becomes available only after onboarding.
+      await page.locator('#agLanguage').click();
       await page.locator('#rtg-lang-zoek').fill('English');
       await page.locator('#rtg-lang-hint[data-lang="en"]').click();
       assert.equal(await page.locator('#rtg-lang-modal').isVisible(),false);
-      assert.equal(await page.locator('.rtg-edge-index').getAttribute('aria-hidden'),'true');
+      assert.equal(await page.locator('.rtg-edge-chrome').evaluate(el=>getComputedStyle(el).display),'none');
+      assert.equal(await page.locator('#agLanguage').innerText(),'EN');
       assert.match(await page.locator('#agTitle').innerText(),/Welcome/);
       assert.equal(await page.locator('#agNieuw').innerText(),'Create your RTG');
       await page.waitForFunction(()=>!!window.RTGNet);
       await page.evaluate(()=>RTGNet.satelliet.zetStand('aan'));
       assert.equal(await page.locator('#rtg-sat-tekst').innerText(),'Slow connection: data-saving mode is on');
-      const notification=await page.locator('#rtg-sat-balkje').boundingBox();
-      const edge=await page.locator('.rtg-adaptive-bar').boundingBox();
-      assert.ok(notification.y+notification.height<=edge.y,'connection notice must leave Edge controls accessible');
       await page.evaluate(()=>RTGNet.satelliet.zetStand('uit'));
-      await page.waitForFunction(()=>document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="worlds"] small')?.textContent==='Worlds');
-      assert.equal(await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="context"]').getAttribute('aria-label'),'Actions for this screen');
-      await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
-      await page.waitForFunction(()=>document.querySelector('.rtg-edge-preferences-open')?.textContent==='Controls and display');
-      assert.match(await page.locator('.rtg-edge-find input').getAttribute('placeholder'),/^Search \d+ features$/);
-      await page.waitForFunction(()=>document.querySelector('.rtg-edge-face-tabs [data-edge-face="here"]')?.textContent==='Here');
-      await page.waitForFunction(()=>document.querySelector('.rtg-edge-face-here')?.textContent.includes('Recently visited'));
-      assert.match(await page.locator('.rtg-edge-face-here').innerText(),/Recently visited/);
-      await page.locator('.rtg-edge-face-tabs [data-edge-face="all"]').click();
-      await page.locator('[data-edge-smart-search]').click();
-      await page.locator('.rtg-edge-find input').fill('Calendar');
-      const visible=page.locator('.rtg-edge-group:not([hidden]) a:not([hidden])');
-      // On LivingOS, use a known local entry; matching follows visible translated text.
-      await page.locator('.rtg-edge-find input').fill('Overview');
-      assert.equal(await visible.count(),1);
       await change('nl');
-      assert.equal(await page.locator('.rtg-edge-find input').inputValue(),'Overview');
-      assert.equal(await page.locator('.rtg-edge-index').getAttribute('aria-hidden'),'false');
-      await page.keyboard.press('Escape');
-      await change('nl');
-      await page.waitForFunction(()=>document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="worlds"] small')?.textContent==='Werelden');
+      assert.equal(await page.locator('#agLanguage').innerText(),'NL');
       await page.locator('#agNieuw').click();
       await page.locator('#agIn').fill('Léa Taalproef');
       await change('en');assert.equal(await page.locator('#agIn').inputValue(),'Léa Taalproef');
@@ -94,13 +72,13 @@ test('alle toegangsschermen bewegen mee zonder invoer, voortgang of akkoord te v
         const input=language.naam+' / Élodie 李明 سارة';
         await page.locator('#agIn').fill(input);
         await change(language.code);
-        await page.waitForFunction(code=>document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="worlds"] small')?.textContent===(code==='nl'?'Werelden':'Worlds'),language.code);
+        await page.waitForFunction(code=>document.documentElement.lang===code,language.code);
         const measured=await page.evaluate(code=>{
           const input=document.getElementById('agIn'),title=document.getElementById('agTitle');
           const number=new Intl.NumberFormat(code),date=new Intl.DateTimeFormat(code,{timeZone:'UTC'});
           return {code,lang:document.documentElement.lang,dir:getComputedStyle(document.documentElement).direction,
             input:input.value,focus:document.activeElement.id,view:document.getElementById('gate').dataset.accessView,
-            edge:document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="worlds"] small').textContent,
+            edge:getComputedStyle(document.querySelector('.rtg-edge-chrome')).display==='none'?'HIDDEN_BEFORE_ACCESS':'VISIBLE',
             title:title.textContent,overflow:document.documentElement.scrollWidth>innerWidth,
             formatting:{number:number.format(12345.67),numberLocale:number.resolvedOptions().locale,
               date:date.format(new Date('2026-09-17T00:00:00Z')),dateLocale:date.resolvedOptions().locale},

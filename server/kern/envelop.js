@@ -143,10 +143,14 @@ function maak(opgave) {
     versie: VERSIE,
     kanaal: o.kanaal || null,
     actor: keurActor(o.actor != null ? o.actor : (ouder ? ouder.actor : (fr ? fr.actor : null))),
-    /* De keten: eerst de ouder, dan het verzoekframe, dan de Trust & Evidence-
-       correlatie; zonder een van drieen is deze gebeurtenis zelf het begin. */
-    correlatie: o.correlatie || (ouder ? ouder.correlatie : null) || (fr ? fr.correlatie : null) || (trust ? trust.chainId : null) || null,
-    oorzaak: o.oorzaak || (ouder ? ouder.id : null) || (fr ? fr.oorzaak : null) || (trust ? trust.stepId : null) || null,
+    /* De keten: eerst de ouder, anders het verzoekframe. Is er een frame, dan
+       beslist ALLEEN het frame, ook als het gesloten is (dan leeg): de
+       Trust & Evidence-keten is binnen een verzoek een lezer van datzelfde frame
+       (besluit van 6 oktober 2026) en geen tweede bron. Alleen waar geen frame
+       is -- een expliciet geopende servicehop -- telt die keten; zonder een van
+       beide is deze gebeurtenis zelf het begin. */
+    correlatie: o.correlatie || (ouder ? ouder.correlatie : (fr ? fr.correlatie : (trust ? trust.chainId : null))) || null,
+    oorzaak: o.oorzaak || (ouder ? ouder.id : (fr ? fr.oorzaak : (trust ? trust.stepId : null))) || null,
     classificatie,
     hoedanigheid: o.hoedanigheid != null ? keurHoedanigheid(o.hoedanigheid)
       : (ouder ? hoedanigheidVan(ouder) : keurHoedanigheid(fr ? fr.hoedanigheid : null))

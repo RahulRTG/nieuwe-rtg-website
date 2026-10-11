@@ -75,7 +75,7 @@ function md(data){
   lines.push('','Geen van deze schaalblockers is gebruikt om een centrale store, grotere in-memory map of distributed runtime te bouwen.','',
     '## Implementatiebesluit','',
     'De productbesluiten verplaatsen capabilities naar technische prerequisites, niet rechtstreeks naar GO. Iedere flow blijft dicht totdat zijn broncontract en verticale bewijsslice groen zijn.','',
-    'De begrensde proofs voor D23, D15, D11, D13 en D01 zijn uitgevoerd. Brede capabilityfamilies worden daardoor niet automatisch GO: iedere nieuwe source owner moet dezelfde stoppoorten zelfstandig bewijzen.','');
+    'De begrensde proofs voor D23, D15, D11, D13 en D01 zijn uitgevoerd. Brede capabilityfamilies worden daardoor niet automatisch GO: iedere nieuwe source owner moet dezelfde stoppoorten zelfstandig bewijzen.');
   return lines.join('\n')+'\n';
 }
 function main(){const data=build(),json=JSON.stringify(data,null,2)+'\n',doc=md(data);if(process.argv.includes('--controle')){

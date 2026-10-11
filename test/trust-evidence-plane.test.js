@@ -10,15 +10,20 @@ const envelop = require('../server/kern/envelop');
 const ref = (type, id) => ({ domain: 'hospitality', type, id });
 
 test('correlation context gebruikt nooit de onbewezen publieke correlation header', () => {
-  const mw = context.middleware();
+  /* De verzoekwortel opent sinds 6 oktober 2026 het verzoekframe; deze module
+     maakt er zelf geen meer (een bron, zie de kop van bewijsvlak/context.js). */
+  const { EventEmitter } = require('node:events');
+  const mw = require('../server/opzet/verzoekframe').middleware();
   const req = { id: 'request-1', headers: { 'x-rtg-correlation': 'aanvaller' } };
   const koppen = {};
-  const res = { set: (k, v) => { koppen[k] = v; } };
+  const res = Object.assign(new EventEmitter(), { setHeader: (k, v) => { koppen[k] = v; } });
   mw(req, res, () => {
     assert.equal(context.huidige().requestId, 'request-1');
     assert.notEqual(context.huidige().chainId, 'aanvaller');
+    assert.equal(context.huidige().chainId, context.ketenVan('request-1'), 'de keten volgt de correlatie van de server');
     assert.equal(req.trustContext.chainId, koppen['X-RTG-Correlation']);
   });
+  assert.equal(typeof context.middleware, 'undefined', 'geen tweede bron van de verzoekwortel');
 });
 
 test('request, event en gevolg houden één keten en expliciete causaliteit', () => {

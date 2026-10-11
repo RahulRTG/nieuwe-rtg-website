@@ -7,7 +7,7 @@ const S = require('./state');
 const kluis = require('./kluis');
 const { veiligGelijk } = require('../kern/util');
 const mirror = require('./mirror');
-const { voorGrens } = require('./sessiegrens');
+const { voorGrens, uitgezet } = require('./sessiegrens');
 
 /* DE ENE VORM VAN EEN TOKEN.
 
@@ -136,10 +136,9 @@ function maakTokens(getUserById) {
          elke lopende sessie eruit -- ook die van wie het wachtwoord kende en er
          niet meer bij hoort. */
       if (voorGrens(u, uitgegeven)) return null;
-      /* De ene plek waar een uitgezet account eruit valt. Zie de toelichting bij
-         de kolom in accounts/index.js: staatloze tokens zijn niet allemaal
-         terug te halen, een vlag op het account wel. */
-      if (u && u.actief === 0) return null;
+      /* Een uitgezet account valt eruit. Wat "uitgezet" is, en waarom een
+         vlag: ./sessiegrens.js, dezelfde vraag als voor een actietoken. */
+      if (uitgezet(u)) return null;
       return u;
     } catch (e) { return null; }
   }

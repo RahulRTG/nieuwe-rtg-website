@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const {build,OUT}=require('../scripts/loop-fabric-source-flows');
 
 test('bronflows hebben een volledige stoppoort en reproduceerbaar register',()=>{
-  const registry=build(),disk=JSON.parse(fs.readFileSync(OUT,'utf8'));assert.deepEqual(disk,registry);
+  const registry=build(),disk=JSON.parse(fs.readFileSync(OUT,'utf8'));assert.deepEqual(disk,registry,'LOOP-FABRIC-SOURCE-FLOWS.json loopt achter op de code -- draai: npm run loopfabric:flows');
   assert.deepEqual(registry.summary,{GO:8,PHASE:8,STOP:8});
   assert.equal(registry.scope,'SOURCE_OWNED_FLOWS');
   assert.deepEqual(registry.originalBatchCapabilities,['bedrijf','dom-library','dom-livinglab','experience-platform','leerhuis']);

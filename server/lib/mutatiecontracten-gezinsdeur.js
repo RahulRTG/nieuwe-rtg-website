@@ -19,6 +19,14 @@ const STAND = (mutatieId, toegang, gemeten) => ({ mutatieId, herkomst: 'mens',
   semantiek: { klasse: 'idempotent' }, toegang, stand: 'PROTECTED', bewijs: { gemeten, op: OP }, afgetekend: AF });
 
 const CONTRACTEN = {
+  'POST /api/foundation/gezin/inloggen': NIEUW('foundation.gezin.inloggen',
+    { klasse: 'OBJECT_SCOPED', objectVeld: 'gezinscode', uitleg: 'de 128-bit gezinscode plus de profielpincode begrenzen de toegang en zowel adres als gezin hebben een pogingenrem' },
+    'Een geldige inlog geeft een nieuwe gezinssessie voor dit apparaat. Een antwoordcache zou een eerder sessiegeheim opnieuw tonen; de route staat daarom in lib/eenmalig-geheim-routes.js.',
+    'test/gezinsdeur.test.js: een geldige pincode geeft een verse sessie, verkeerde codes en pincodes falen dicht en de rem is per adres en gezin begrensd'),
+  'POST /api/foundation/gezin/profiel/kies': NIEUW('foundation.gezin.profiel.kies',
+    { klasse: 'OBJECT_SCOPED', objectVeld: 'gezinscode', uitleg: 'de 128-bit gezinscode, het profiel-id en de eigen profielpincode begrenzen de toegang' },
+    'Profielkeuze geeft een nieuwe gezinssessie voor exact dit profiel. Een antwoordcache zou een sessiegeheim heronthullen; de route staat daarom in lib/eenmalig-geheim-routes.js.',
+    'test/gezinsdeur.test.js en test/gezinssessie.test.js: alleen de juiste gezinscode, profielkeuze en pincode geven een sessie en iedere nieuwe inlog geeft een ander token'),
   'POST /api/foundation/gezin/code/roteer': NIEUW('foundation.gezinscode.roteren', BEHEERDER,
     'Elke oproep maakt een nieuwe 128-bit gezinscode en vervangt de vorige; een herhaling die de vorige ' +
     'teruggaf zou een vervangen code heronthullen. De route staat in lib/eenmalig-geheim-routes.js.',

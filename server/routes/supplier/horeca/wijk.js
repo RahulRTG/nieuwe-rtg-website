@@ -144,11 +144,13 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/horeca/wijk/laat', supplierAuth, (req, res) => {
     const h = Hlees(req.supplier.code);
-    const uit = wijk.laat(h, req.body.wijkId, wieVan(req));
+    const ik = wieVan(req);
+    const uit = wijk.laat(h, req.body.wijkId, ik);
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     save();
     logActivity(req.supplier.code, req.actor, 'liet een wijk los');
     duw(req.supplier.code);
-    res.json(uit);
+    // wie loslaat en nog tafels van een collega draagt, hoort dat (wijk-leen.js)
+    res.json(Object.assign({}, uit, wijk.leen.herinnering(h, ik.staffId)));
   });
 };

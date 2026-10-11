@@ -104,5 +104,21 @@ module.exports = ({ horeca, schoon }) => {
       .sort((a, b) => b.staat - a.staat);
   }
 
-  return { van, zet, neemOver, terug, lijst, naarMij, vanMij, MAXLEEN };
+  /* WIE ZIJN WIJK LOSLAAT, GAAT MEESTAL NAAR HUIS -- en kan dan nog tafels van
+     een collega dragen. Die gaan NIET mee terug: loslaten gaat over de wijk, en
+     een leen eindigt doordat iemand hem teruggeeft. Wat wel gebeurt is dat het
+     antwoord het ZEGT, op het moment dat de mens nog een PDA in zijn hand
+     heeft. Draagt hij niets, dan komt er niets bij. */
+  function herinnering(h, staffId) {
+    const nog = staffId == null ? [] : naarMij(h, staffId);
+    if (!nog.length) return {};
+    const eenUitlener = nog[0].vanNaam && nog.every((l) => l.vanNaam === nog[0].vanNaam);
+    return {
+      nogGeleend: nog.map((l) => ({ tafel: l.tafel, vanNaam: l.vanNaam, wijkNaam: l.wijkNaam })),
+      herinnering: 'U draagt nog ' + (nog.length === 1 ? 'tafel ' : 'de tafels ') +
+        nog.map((l) => l.tafel).join(', ') + (eenUitlener ? ' van ' + nog[0].vanNaam : '') +
+        '. Die blijven op uw naam tot u ze teruggeeft.' };
+  }
+
+  return { van, zet, neemOver, terug, lijst, naarMij, vanMij, herinnering, MAXLEEN };
 };

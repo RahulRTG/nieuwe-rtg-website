@@ -162,10 +162,17 @@ test('4. staff/remove trekt de uitnodiging van precies die plek in', () => {
   assert.deepEqual(ingetrokken[0].slice(1), ['Manager', 'medewerker uit het team gehaald']);
 });
 
-test('5. de route roept de intrekking aan voordat de plek uit gaat', () => {
-  const bron = fs.readFileSync(path.join(__dirname, '../server/routes/supplier/werving/personeel.js'), 'utf8');
-  const route = bron.slice(bron.indexOf("'/api/supplier/staff/remove'"));
-  const trek = route.indexOf('trekInVoorStaff('), uit = route.indexOf('deactivateStaff(');
-  assert.ok(trek > 0, 'staff/remove roept trekInVoorStaff aan');
-  assert.ok(trek < uit, 'eerst intrekken, dan pas de plek uitzetten: lukt het intrekken niet, dan verandert er niets');
-});
+/* Twee routes halen iemand uit het team: staff/remove en het intrekken van een
+   geclaimde uitnodiging. De tweede liet een half geclaimde tweede code van
+   hetzelfde lid staan (herkeuring 2 van ronde 7, live gezien). Beide moeten
+   dus eerst trekInVoorStaff aanroepen en pas daarna de plek uitzetten. */
+for (const pad of ['/api/supplier/staff/remove', '/api/supplier/staff/invite/intrek']) {
+  test('5. ' + pad + ' trekt in voordat de plek uit gaat', () => {
+    const bron = fs.readFileSync(path.join(__dirname, '../server/routes/supplier/werving/personeel.js'), 'utf8');
+    const begin = bron.indexOf("'" + pad + "'");
+    const route = bron.slice(begin, bron.indexOf('app.post(', begin + 10));
+    const trek = route.indexOf('trekInVoorStaff('), uit = route.indexOf('deactivateStaff(');
+    assert.ok(trek > 0, pad + ' roept trekInVoorStaff aan');
+    assert.ok(uit > trek, 'eerst intrekken, dan pas de plek uitzetten: lukt het intrekken niet, dan verandert er niets');
+  });
+}

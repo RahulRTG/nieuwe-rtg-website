@@ -24,6 +24,27 @@
     if (/^[a-z0-9][a-z0-9-]{1,31}$/.test(c)) window.__RTG_CAMPAGNE = c;
   } catch (e) {}
 })();
+/* De pas van deze werktafel. Bijna elk scherm linkt terug naar de kale
+   /apps/app.html. Zonder ?pas= startte de werktafel dan VOLLEDIG op (170
+   scripts plus /api/state), ontdekte de pas van het lid en herlaadde zich met
+   location.replace(?pas=...): twee keer opstarten bij elke terugkeer
+   (SCHILHERSTART.json). Hier, voor het eerste script dat het adres leest, zet
+   een ingelogd lid wiens pas de server eerder bevestigde (app-main-03.js) het
+   adres meteen goed -- zonder navigatie. Het is een voorschot en geen besluit:
+   restoreSession() toetst de pas opnieuw tegen de sessie en stuurt door als
+   het geheugen niet meer klopt. Zonder token, met ?verify=, ?reset= of de
+   Magnaat-kopie blijft alles zoals het was. */
+(function () {
+  try {
+    var q = new URLSearchParams(location.search);
+    if (q.has('pas') || q.has('verify') || q.has('reset') || q.has('magnaat')) return;
+    if (!localStorage.getItem('rtg_member_token')) return;
+    var pas = localStorage.getItem('rtg_werktafel_pas');
+    if (pas !== 'rtg' && pas !== 'lifestyle' && pas !== 'business') return;
+    q.set('pas', pas);
+    history.replaceState(history.state, '', location.pathname + '?' + q.toString() + location.hash);
+  } catch (e) {}
+})();
 </script>
 <!-- De bouwstempel. npm run build zet hier en in app-main.js hetzelfde getal;
      wijken ze af, dan draait er nieuwe html naast een oud script (of andersom)

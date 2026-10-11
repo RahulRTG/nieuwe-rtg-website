@@ -80,7 +80,10 @@ test('1. na staff/remove geeft de oude kassacode geen plek, geen sessie en geen 
     'na het ontslag geen werkplek');
 
   const opnieuw = await api('/api/supplier/staff/join', { bedrijf: zaakNaam, kassacode: m.kassacode, login: m.email, password: WW });
-  assert.notEqual(opnieuw.status, 200, 'opnieuw aanmelden lukt niet: ' + kort(opnieuw));
+  /* 401 en geen 403: met de uitnodiging ingetrokken valt de code al bij de
+     eerste stap af. Een 403 betekent dat alleen de hersteltak hem tegenhield,
+     en dan is de intrekking bij staff/remove weggevallen (herkeuring, M1). */
+  assert.equal(opnieuw.status, 401, 'opnieuw aanmelden valt af bij de kassacode: ' + kort(opnieuw));
   assert.notEqual(opnieuw.body.hersteld, true, 'geen herstel: ' + kort(opnieuw));
   for (const k of VERBODEN) assert.equal(k in opnieuw.body, false, 'het antwoord draagt geen ' + k + ': ' + kort(opnieuw));
   assert.doesNotMatch(opnieuw.tekst, /pin_hash|supplier_code|s2\$/, 'geen ruwe rij in de tekst');
@@ -142,17 +145,21 @@ test('4. staff/remove trekt de uitnodiging van precies die plek in', () => {
   const lijst = [
     { id: 'a', toegang: { n: 'a' }, claim: { staffId: 7 } },
     { id: 'b', toegang: { n: 'b' }, claim: { staffId: 8 } },
-    { id: 'c', toegang: { n: 'c' } }
+    { id: 'c', toegang: { n: 'c' } },
+    /* een tweede code van hetzelfde lid die half bleef steken: nooit actief,
+       dus de hersteltak laat hem door, en de manager ziet hem niet in zijn lijst */
+    { id: 'd', toegang: { n: 'd' }, claim: { staffId: 9, memberId: 70 } }
   ];
   const { trekInVoorStaff } = require('../server/routes/supplier/werving/uitnodiging-uitgifte')({
     db: { data: {} }, crypto: require('crypto'), transactie: fn => fn({}), lijstVan: () => lijst,
     publiek: x => x, geldig: () => null, idemHash: x => x, doel: 'd', scope: 's', dagen: 30, dubbeltikMs: 0,
     bearer: { intrekken: (t, actor, reden) => ingetrokken.push([t.n, actor, reden]) }
   });
-  const r = trekInVoorStaff('Z', 7, 'Manager');
-  assert.equal(r.ingetrokken, 1);
-  assert.deepEqual(ingetrokken, [['a', 'Manager', 'medewerker uit het team gehaald']],
-    'alleen de uitnodiging van plek 7, niet die van een collega en niet een open uitnodiging');
+  const r = trekInVoorStaff('Z', { id: 7, member_id: 70 }, 'Manager');
+  assert.equal(r.ingetrokken, 2);
+  assert.deepEqual(ingetrokken.map(x => x[0]), ['a', 'd'],
+    'de uitnodiging van plek 7 en de half geclaimde van hetzelfde lid; niet die van een collega en niet een open');
+  assert.deepEqual(ingetrokken[0].slice(1), ['Manager', 'medewerker uit het team gehaald']);
 });
 
 test('5. de route roept de intrekking aan voordat de plek uit gaat', () => {

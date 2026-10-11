@@ -60,3 +60,28 @@ test('4. TEGENPROEF: na een geslaagde inlog is de plek terug, dus wie na elkaar 
       'inlog ' + (i + 1) + ' na elkaar vanaf hetzelfde adres');
   }
 });
+
+test('5. de adresemmer (50) houdt een golf over veel accounts tegen', async () => {
+  const golf = await Promise.all(Array.from({ length: 70 },
+    (_, i) => post('/api/auth/login', { login: 'golf' + i + '@nergens.test', password: 'fout' }, '198.20.5.5')));
+  const t = telling(golf);
+  assert.ok((t[401] || 0) <= 50, 'hooguit vijftig gokken per adres, kreeg ' + JSON.stringify(t));
+  // de rest krijgt 429, of 403 zodra de noodrem het adres in quarantaine zet
+  assert.equal((t[429] || 0) + (t[403] || 0), 70 - (t[401] || 0), 'de rest wordt geweigerd, kreeg ' + JSON.stringify(t));
+  assert.ok((t[401] || 0) < 70);
+});
+
+test('6. een plek die nooit wordt teruggegeven, vervalt (een fout in een deur zet niets blijvend dicht)', () => {
+  const lopend = require('../server/kern/identiteit/lopend');
+  const echt = Date.now;
+  let nu = echt();
+  Date.now = () => nu;
+  try {
+    lopend.neem('proef:verval');
+    assert.equal(lopend.aantal('proef:verval'), 1);
+    nu += lopend.VENSTER_MS - 1000;
+    assert.equal(lopend.aantal('proef:verval'), 1, 'binnen het venster telt hij nog');
+    nu += 2000;
+    assert.equal(lopend.aantal('proef:verval'), 0, 'na het venster is de plek terug');
+  } finally { Date.now = echt; }
+});

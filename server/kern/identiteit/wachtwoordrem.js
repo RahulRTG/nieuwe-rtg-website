@@ -78,7 +78,9 @@
    De aanmelding van personeel houdt zich met haar eigen adresemmer aan dezelfde
    regel (I7).
 
-   Deze module houdt zelf geen staat: alles staat in de gedeelde `loginFails`.
+   Tellers in `loginFails`, lopende pogingen in ./lopend.js (N39). Prijs op een
+   gedeeld adres: ook een juiste inlog bezet even een plek, dus na veel
+   tikfouten kan een golf juiste inlogs een losse 429 krijgen (geen slot).
    Elke deur bouwt haar eigen exemplaar uit de drie bestaande kernfuncties, en
    twee exemplaren zien dus dezelfde emmers. Geen nieuwe naam in de kern. */
 'use strict';

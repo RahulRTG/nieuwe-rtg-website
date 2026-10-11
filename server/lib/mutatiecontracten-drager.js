@@ -23,7 +23,7 @@ const LID = { klasse: 'AUTHENTICATED', deur: 'auth' };
 const GROEP = LID;
 const GEZIN = { klasse: 'OBJECT_SCOPED', objectVeld: 'code',
   uitleg: 'het gezin uit `code`, en alleen met het `token` dat bij DAT gezin hoort (rtf.verifieerProfiel via ' +
-    'gezinsPoort); daarbinnen alleen een gezinslid van 18 of ouder, anders 403 met de reden' };
+    'gezinsPoort); daarbinnen alleen een gezinslid van 18 of ouder (zonder geboortedatum: beheerder of ouder), anders 403 met de reden' };
 const PARTNERCODE = { klasse: 'PUBLIC', deur: 'geen sessie; de partnercode in het lijf is de geloofsbrief (vindCode), met ipRem en codeRem',
   waarom: 'een partnerstichting heeft geen RTG-account en hoort er geen te krijgen (routes/rtfos/portalen.js); ' +
     'de code bepaalt de stichting, en partners.erkend() laat alleen een landelijk goedgekeurde of actieve stichting door. ' +

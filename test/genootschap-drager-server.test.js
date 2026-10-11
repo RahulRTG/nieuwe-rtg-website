@@ -192,6 +192,7 @@ test('5. losmaken mag altijd, de groep blijft, en daarna is er voor de partner n
 // Zakt bij de mutatie: in routes/member/genootschap-gezin.js `{ key: g.handle }` -> `{ key: req.body.key || g.handle }` -> het gezinslid treedt binnen als iemand anders, zakt.
 // Zakt bij de mutatie: in genootschap-gezin.js /zoek `genootschap.zoek(sess, lijf(req))` -> `genootschap.zoek(sess, {})` -> het antwoord wijkt af van de ledendeur, zakt.
 // Zakt bij de mutatie: de leeftijdstoets in alsGezinslid weghalen -> het zestienjarige gezinslid komt binnen, zakt.
+// Zakt bij de mutatie: in teJong `!VOLWASSEN_ROL.includes(...)` -> `false` -> het gezinslid zonder geboortedatum komt binnen, zakt.
 test('6. de gezinsdeur: dezelfde kern, hetzelfde antwoord, en alleen voor een volwassen gezinslid', async () => {
   const gr = await groep(P.beh, 'Wandelclub Kromme Rijn ' + teller, 'openbaar');
   await post('/api/genootschap/roep-bijeen', { groep: gr.id, wat: 'Rondje Amelisweerd', datum: '2099-05-05', tijd: '10:00' }, P.beh.token);
@@ -234,12 +235,23 @@ test('6. de gezinsdeur: dezelfde kern, hetzelfde antwoord, en alleen voor een vo
   assert.equal(geweigerd.status, 400);
   assert.match(geweigerd.body.error, /gezinsprofielen/);
 
-  // minderjarig of zonder leeftijd: dicht, met de reden; zonder profiel: dicht
-  for (const geboren of ['2010-02-02', null]) {
-    const j = await gezin(geboren);
-    const r = await post('/api/rtf/genootschap/zoek', { code: j.code, token: j.token, zoek: 'x' });
-    assert.equal(r.status, 403, geboren + ': ' + r.tekst);
+  // minderjarig, een kind, of zonder leeftijd in een rol die niet volwassen is: dicht, met de reden
+  const jongeOuder = await gezin('2010-02-02');
+  const sessies = [{ wie: 'zestien', code: jongeOuder.code, token: jongeOuder.token }];
+  for (const rol of ['kind', 'gezinslid']) {
+    const m = await post('/api/foundation/gezin/profiel/maak', { code: fam.code, token: fam.token, naam: 'Een ' + rol, rol });
+    assert.equal(m.status, 200, m.tekst);
+    const k = await post('/api/foundation/gezin/profiel/kies', { code: fam.code, token: fam.token, profielId: m.body.profiel.id });
+    assert.ok(k.body.token, k.tekst);
+    sessies.push({ wie: rol, code: fam.code, token: k.body.token });
+  }
+  for (const s of sessies) {
+    const r = await post('/api/rtf/genootschap/zoek', { code: s.code, token: s.token, zoek: 'x' });
+    assert.equal(r.status, 403, s.wie + ': ' + r.tekst);
     assert.equal(r.body.wacht, 'G5');
   }
+  // en een beheerder zonder geboortedatum is volwassen naar zijn rol
+  const zonder = await gezin(null);
+  assert.equal((await post('/api/rtf/genootschap/zoek', { code: zonder.code, token: zonder.token, zoek: 'x' })).status, 200);
   assert.equal((await post('/api/rtf/genootschap/mijn', { code: fam.code, token: 'nep' })).status, 403);
 });

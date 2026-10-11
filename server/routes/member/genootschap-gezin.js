@@ -13,8 +13,8 @@
    WIE ER NIET DOOR KAN, EN WAAROM.
    - een gast-profiel: gezinsPoort houdt hem tegen (hij heeft geen codenaam om
      een lidmaatschap aan te hangen);
-   - een BESCHERMD profiel, en ieder gezinslid van wie het gezin geen leeftijd
-     van 18 of ouder heeft opgegeven: een genootschap is een gemeenschap met
+   - een BESCHERMD profiel, een gezinslid jonger dan 18, en een gezinslid zonder
+     geboortedatum dat geen beheerder of ouder is: een genootschap is een gemeenschap met
      volwassenen buiten het gezin, en de bescherming die dat voor kinderen vraagt
      (G5, par. 5.3) is er nog niet. Besluit 3 van de eigenaar (geen een-op-een
      tussen volwassene en minderjarige buiten het gezin) wijst dezelfde kant op.
@@ -40,12 +40,19 @@ module.exports = (kern) => {
   const lijf = (req) => { const { code, token, ...rest } = req.body || {}; return rest; };
 
   /* De leeftijd komt uit het PROFIEL dat rtf.verifieerProfiel teruggeeft, niet
-     uit het verzoek. Geen geboortedatum telt als jonger: bij twijfel de
-     strengere weg (zelfde regel als lib/leeftijd.js ouderGeeftToestemming). */
+     uit het verzoek. Zonder geboortedatum beslist de ROL: beheerder en ouder
+     zijn de volwassen rollen van een gezin (foundation/gezin.js), elke andere
+     rol telt dan als jonger -- bij twijfel de strengere weg, zoals
+     lib/leeftijd.js ouderGeeftToestemming. */
+  const VOLWASSEN_ROL = ['beheerder', 'ouder'];
+  const teJong = (g) => {
+    if (!g || g.beschermd || g.kind) return true;
+    const lft = leeftijdVan(g.p && g.p.geboren);
+    return lft == null ? !VOLWASSEN_ROL.includes(g.p && g.p.rol) : lft < 18;
+  };
   const alsGezinslid = (werk) => (req, res) => {
     const g = req.gezinslid;
-    const lft = leeftijdVan(g && g.p && g.p.geboren);
-    if (!g || g.beschermd || g.kind || lft == null || lft < 18) return res.status(403).json({ error: REDEN_JONG, wacht: 'G5' });
+    if (teJong(g)) return res.status(403).json({ error: REDEN_JONG, wacht: 'G5' });
     try { werk(req, res, { key: g.handle }); } catch (e) { fout(res, e); }
   };
 

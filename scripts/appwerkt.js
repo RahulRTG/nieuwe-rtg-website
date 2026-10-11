@@ -838,22 +838,11 @@ function metInventaris(oud, blok) {
   return uit;
 }
 
-/* Het oordeel over het blok, zonder browser. Rot en fouten laten zakken; een
-   blok dat achterloopt op de documenten ook, met de weg om het bij te werken. */
+/* Het oordeel over het blok, zonder browser. Het woont in
+   scripts/lib/toezegklassen.js (oordeel), zodat npm run check regel 76 dezelfde
+   vraag stelt zonder deze meter te laden; hier blijft de oude naam bestaan. */
 function inventarisOordeel(opgeslagen, vers) {
-  const bezwaren = [];
-  for (const r of vers.rot) bezwaren.push('ROT: ' + r.document + ' -- "' + r.citaat.slice(0, 70) + '" (' + r.reden + ')');
-  for (const f of vers.fouten) bezwaren.push('FOUT: ' + f);
-  for (const it of vers.items) {
-    if (!Object.prototype.hasOwnProperty.call(toezegklassen.KLASSEN, it.klasse)) bezwaren.push('KLASSE buiten de vier: ' + it.document + ':' + it.regel + ' ' + it.klasse);
-    if (!it.citaat) bezwaren.push('ZONDER CITAAT: ' + it.document + ':' + it.regel);
-  }
-  if (!opgeslagen) bezwaren.push('APPWERKT.json draagt geen blok toezegklassen -- draai node scripts/appwerkt.js --inventaris');
-  else if (JSON.stringify(opgeslagen) !== JSON.stringify(vers)) {
-    bezwaren.push('het blok toezegklassen loopt achter op de documenten (vingerafdruk ' +
-      (opgeslagen.bron && opgeslagen.bron.vingerafdruk) + ' tegen ' + vers.bron.vingerafdruk + ') -- draai node scripts/appwerkt.js --inventaris');
-  }
-  return bezwaren;
+  return toezegklassen.oordeel(opgeslagen, vers);
 }
 
 /* DE WACHT: dit script schrijft APPWERKT.json en start daarom niet bij het
@@ -888,7 +877,9 @@ if (require.main === module) (async () => {
     const bezwaren = inventarisOordeel(null, vers).filter((b) => !b.startsWith('APPWERKT.json draagt'));
     fs.writeFileSync(DOEL, JSON.stringify(metInventaris(oud, vers), null, 1) + '\n');
     log('APPWERKT.json: blok toezegklassen bijgewerkt ' + JSON.stringify(vers.telling) +
-      ' (niet geteld: ' + vers.nietGeteld.prozaMarkeringen + ' in lopende tekst, ' + vers.nietGeteld.standOnbekend + ' andere standwaarden)');
+      ', soort ' + JSON.stringify(vers.soortTelling) + ' plus ' + vers.onbepaald + ' onbepaald, ' + vers.beslotenElders + ' besloten elders' +
+      ' (niet geteld: ' + vers.nietGeteld.prozaMarkeringen + ' in lopende tekst, ' + vers.nietGeteld.standOnbekend + ' andere standwaarden, ' +
+      vers.nietGeteld.legenda + ' legendarijen)');
     if (bezwaren.length) { for (const b of bezwaren) console.error('NIET OK: ' + b); process.exit(1); }
     process.exit(0);
   }

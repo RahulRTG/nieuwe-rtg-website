@@ -213,7 +213,7 @@ Het meeste bestaat al, en bijna nooit onder de voorgestelde naam.
 | 18 | shadow execution | **staat** | `kern/pay/schaduw.js`, `kern/stuur/frictieschaduw.js`, `kern/commercie/schaduw.js`, `scripts/motor-schaduw.js` |
 | 19 | canary + terugrol | **staat** | met de waarschuwing uit `KANTOORMACHT.md`: een percentage is bij drie medewerkers niet streng maar zinloos |
 | 20 | één trace-identiteit | **besluit** | `kern/envelop.js` draagt `correlatie` en `oorzaak` — maar is **gesloten op acht velden**; een `changeId` erbij is een versiesprong, geen toevoeging |
-| 21 | cryptografisch bewijsboek / SLSA | **besluit** | `lib/keten.js` + `lib/keten-anker.js` staan; wat ontbreekt is een BESLUIT (een anker in dezelfde database is geen anker), en release-provenance ontbreekt echt |
+| 21 | cryptografisch bewijsboek / SLSA | besloten (anker: 3 september 2026, `MAATSTAF.md` par. 7b) | `lib/keten.js` + `lib/keten-anker.js` staan; het anker is besloten (een tweede machine binnen RTG, `lib/ankerpost.js`; een anker in dezelfde database is geen anker), en release-provenance ontbreekt echt |
 | 22 | hermetic proof workers | **stap** | `scripts/lib/stempel.js` levert de reproduceerbaarheidsvraag al; de isolatie niet |
 | 23 | AI als onderzoeker | **staat** | dit is al doctrine: `CODE-AI-001` in `test/codegrens.test.js` — de runtime-AI komt nooit aan de bron, de meters bedienen niets |
 | 24 | adversarial builder/breaker | **stap** | de deterministische helft staat (`sabotage.js`, `aanval.js`); de AI-helft niet |

@@ -262,7 +262,7 @@ Vijf keuzes die het model dragen, elk met een bestaand voorbeeld:
 | 10 | scheiding van taken | drie conflicten GEMELD in `scope.js`, niet afgedwongen | een stap weg |
 | 11 | vier ogen op beleid | twee handelingen; `vierogen.js` faalt open | een stap weg (en een reparatie, par. 6) |
 | 12 | boardroom geen superrol | boardroom = ~100 routes in één keer | een stap weg |
-| 13 | eigenaar geen dagelijkse superuser | de eigenaar komt via de envelop overal door | vraagt een besluit (A2) |
+| 13 | eigenaar geen dagelijkse superuser | de eigenaar komt via de envelop overal door | een stap weg (besloten: A2, 23 september 2026, par. 7; telt in de schaduw, par. 5a-bis) |
 | 14 | just-in-time rechten | `command/toegang.js`: vier rechten met een maximum in minuten | staat in Command, een stap weg elders |
 | 15 | delegatie | `vertegenwoordiging/` (mens-namens-mens), bijstand | staat; vakantiedelegatie is een stap weg |
 | 16 | noodtoegang | reden, een uur, journaal in `command/toegang.js` | staat in Command |
@@ -289,7 +289,7 @@ Vijf keuzes die het model dragen, elk met een bestaand voorbeeld:
 | 37 | beleidssimulator | Command-simulatie in de schaduw | een stap weg |
 | 38 | schaduwbeleid | `commercie/schaduw.js` met rijpheidseis | **staat** |
 | 39 | rolpakketten | 14 vaste rollen in WorkOS | staat |
-| 40 | eigen rollen | niet mogelijk | vraagt een besluit (A4) |
+| 40 | eigen rollen | niet mogelijk | besloten (A4, 23 september 2026, par. 7): alleen als bundel van bestaande werkwoorden, met een rechtensimulatie vooraf; niet gebouwd |
 | 41 | organisatie-eenheden met overerving | dekkingsladder in `scope.js`, geen overerving van rechten | een stap weg |
 | 42 | grenzen tussen bedrijven | tenant en concern | staat |
 | 43 | franchise-isolatie | alleen documenten (`SOEVEREIN.md`) | jaren weg |
@@ -931,7 +931,7 @@ aanbieders niet, want die houden geen zetel.
 | B3 | de kantoor- en leveranciersstream toetsten alleen bij het openen | bij elk bericht de sessie en de rechten opnieuw | **staat** (23 september 2026; par. 5b) |
 | B4 | `/media/:naam` zonder toegangscontrole, een jaar `public` gecachet | eerst meten wat er staat; privémateriaal achter een korte, ondertekende link | vraagt een besluit |
 | B5 | `employment.js` verwees naar een `offboarding.js` die niet bestaat | de verwijzing eerlijk maken | **staat** (verwijst nu naar `verandering-eigendom.js`) |
-| B6 | de auditketen is niet extern verankerd | `server/lib/keten-anker.js` in bedrijf nemen | vraagt een besluit (waar) |
+| B6 | de auditketen is niet extern verankerd | `server/lib/keten-anker.js` in bedrijf nemen | besloten (3 september 2026, `MAATSTAF.md` par. 7b): een tweede machine binnen RTG, `server/lib/ankerpost.js`; in bedrijf met `RTG_ANKERPOST_URL`. Een partij buiten het huis is een tweede besluit, en dat is niet genomen |
 | B7 | `/api/office/doc` leverde paspoortscans aan de gedeelde code | op naam, zoals de lijst | **staat** (23 september 2026; gevonden door de A3-meting, par. 5a) |
 
 ---

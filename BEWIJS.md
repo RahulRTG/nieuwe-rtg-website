@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2441 bestanden en 16717 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2441 bestanden en 16725 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2441 |
-| losse beweringen (`test(...)`) | 16717 |
+| losse beweringen (`test(...)`) | 16725 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2267 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2133 bestanden, 16180 beweringen.
+2133 bestanden, 16188 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1926,7 +1926,7 @@ toets omvalt.
 | `toestellen.test.js` | 6 | gezakt op `liegpoort /api/` | Gekoppelde toestellen (kern/toestellen.js): de tweede herkomst. Het zwaartepunt van deze toets is niet dat het werkt, maar dat de sleutel SMAL is. |
 | `toetsduur-opruim.test.js` | 6 | gezakt op `!==->===#0` | WANNEER MAG EEN GEWICHT ZONDER MODUS WEG? `onbekend` is de bak voor metingen van voor de modi: echt gemeten, maar niemand weet meer onder welke omstandigheden. |
 | `toetskeuring.test.js` | 7 | gezakt op `liegpoort /api/` | De toets als meetinstrument: keuring vooraf, spiegel achteraf. De beloftes die hier hard worden gemaakt: - de keuring BOUWT NIET. |
-| `toezegklassen.test.js` | 11 | gezakt op `voorwaarde-omkeren#0` | DE TOEZEGKLASSEN (AFBOUWPROGRAMMA.md, scripts/lib/toezegklassen.js). Twee dingen mogen niet stil gebeuren, en deze toets zakt op allebei: 1 een citaat in TOEZEGKLASSEN.json staat niet meer letterlijk in zijn document... |
+| `toezegklassen.test.js` | 19 | gezakt op `voorwaarde-omkeren#0` | DE TOEZEGKLASSEN (AFBOUWPROGRAMMA.md, scripts/lib/toezegklassen.js). Twee dingen mogen niet stil gebeuren, en deze toets zakt op allebei: 1 een citaat in TOEZEGKLASSEN.json staat niet meer letterlijk in zijn document... |
 | `token-domeinscheiding.test.js` | 11 | gezakt op `liegpoort /api/` | TOKEN-DOMEINSCHEIDING -- regressie voor RTG-V1-RELEASE blocker 1. DE FOUT (bewezen in de audit): `verifyToken` onderscheidde een SESSIEtoken (body `id.exp.uitgegeven.sid`) niet van een ACTIEtoken (body... |
 | `training.test.js` | 9 | gezakt op `liegpoort /api/` | Training & tips in de PDA: micro-learning voor het personeel. 1) De zuivere tip-bibliotheek is rol-bewust en zonder dubbelingen. |
 | `trainingsschema.test.js` | 10 | gezakt op `liegpoort /api/` | Het trainingsschema (kern/trainingsschema.js). dezelfde reden: RTG schrijft geen trainingsschema voor. |

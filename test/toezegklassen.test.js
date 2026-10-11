@@ -151,3 +151,109 @@ test('11. alleen het blok bijwerken laat elk ander veld van APPWERKT.json staan'
   assert.deepEqual(nieuw.stempel, oud.stempel);
   assert.deepEqual(nieuw.regels, oud.regels);
 });
+
+/* ---------------------------------------------------------------------------
+   RONDE 2 (11 oktober 2026, AFBOUWPROGRAMMA.md par. 6a, 7a en bijlage A).
+   --------------------------------------------------------------------------- */
+const as2 = require('../scripts/lib/toezegsoort');
+
+test('12. een legenda is geen onderdeel; een tabel met een betekeniskolom en de stand achteraan wel', () => {
+  const d = tk.leesDocument('X.md', [
+    '| bak | betekenis |', '|---|---|', '| **staat** | het draait |', '| **vraagt een besluit** | het kan, maar |', '',
+    '| dimensie | betekenis | stand |', '|---|---|---|', '| **werkrol** | wat iemand doet | staat |'
+  ].join('\n'));
+  assert.equal(d.legenda, 2);
+  assert.deepEqual(d.items.map((i) => [i.regel, i.onderdeel, i.klasse]), [[8, 'werkrol', 'toegezegd']]);
+});
+
+test('13. een rij die zichzelf afwijst is geen toezegging, en een voorwaarde blijft toegezegd', () => {
+  const d = tk.leesDocument('X.md', [
+    '| # | punt | stand | wat |', '|---|---|---|---|',
+    '| 50 | Edge als runtime surface | jaren weg | Als engine of autoriteit komt hij er niet: dat botst met grens 1. |',
+    '| 17 | record → replay | **jaren** | vraagt productie, en botst met de bewaartermijnen |',
+    '| 116 | één design runtime | een stap weg | voeden, niet bouwen; er komt geen zevende |'
+  ].join('\n'));
+  assert.deepEqual(d.items.map((i) => [i.regel, i.klasse]), [[3, 'afgewezen-met-grens'], [4, 'afgewezen-met-grens'], [5, 'toegezegd']]);
+  assert.ok(/komt hij er niet/.test(d.items[0].reden), 'de reden is de zin met de afwijzing');
+  /* En op de echte documenten: precies de twee rijen die de opdracht noemde. */
+  const echt = INV.items.filter((i) => /\+afwijzing$/.test(i.herkomst)).map((i) => i.document);
+  assert.deepEqual(echt.sort(), ['EDGE.md', 'VERANDERING.md']);
+});
+
+test('14. de soort is gesloten, onbepaald staat apart en wordt nooit opgeteld', () => {
+  assert.deepEqual(Object.keys(as2.SOORTEN).sort(), ['eis', 'functie', 'integratie', 'product']);
+  assert.equal(as2.soortVan('Elke weigering is verklaarbaar').soort, 'eis');
+  assert.equal(as2.soortVan('wens → case').soort, 'integratie');
+  assert.equal(as2.soortVan('21 Work deck').soort, 'product');
+  assert.equal(as2.soortVan('Proof Cache').soort, 'functie');
+  assert.equal(as2.soortVan('Brug scherm → route').soort, 'onbepaald', 'twee regels die elkaar tegenspreken zijn onbepaald, nooit een keuze');
+  assert.equal(as2.soortVan('employment.js verwees naar een bestand').soort, 'onbepaald');
+  assert.equal(as2.soortVan('Wanbetaling is een standenmachine').soort, 'onbepaald');
+  for (const it of INV.items) assert.ok(it.soortGrond, it.document + ':' + it.regel + ' heeft geen soortGrond');
+  const soorten = Object.values(INV.soortTelling).reduce((a, b) => a + b, 0);
+  assert.equal(soorten + INV.onbepaald, INV.items.length);
+  assert.equal(INV.onbepaald, INV.items.filter((i) => i.soort === 'onbepaald').length);
+  assert.ok(!('onbepaald' in INV.soortTelling), 'onbepaald hoort niet tussen de soorten te staan');
+});
+
+test('15. besloten elders: de bron moet letterlijk staan, en besloten is geen vijfde klasse', () => {
+  const ok = (bron) => [{ document: 'A.md', citaat: '| een ding | **staat** |', onderdeel: 'een ding', klasse: 'toegezegd',
+    reden: 'het besluit staat in B.md', besloten: bron }];
+  const dir = wegwerp(ok({ document: 'B.md', citaat: 'Besluit 1 is genomen: bouwen.', datum: '2026-10-11' }));
+  fs.writeFileSync(path.join(dir, 'B.md'), '# B\n\nBesluit 1 is genomen: bouwen.\n');
+  let inv = tk.inventaris(dir);
+  assert.equal(inv.beslotenElders, 1);
+  assert.equal(inv.items[0].besloten.regel, 3);
+  assert.deepEqual(Object.keys(inv.telling).sort(), Object.keys(tk.KLASSEN).sort());
+  fs.writeFileSync(path.join(dir, 'B.md'), '# B\n\nHet besluit is weer open.\n');
+  inv = tk.inventaris(dir);
+  assert.equal(inv.rot.length, 1, 'een besluit zonder vindbare bron is een bewering en telt niet');
+  assert.ok(inv.rot[0].reden.startsWith('de BRON'));
+  const fout = wegwerp([{ document: 'A.md', citaat: '| een ding | **staat** |', onderdeel: 'een ding', klasse: 'vraagt-besluit',
+    reden: 'tegelijk open en besloten', voorwaarde: 'iets dat vervuld moet zijn', besloten: { document: 'A.md', citaat: '| een ding | **staat** |', datum: '2026-10-11' } }]);
+  assert.ok(tk.inventaris(fout).fouten.some((f) => f.includes('besloten en tegelijk vraagt-besluit')));
+});
+
+test('16. de vingerafdruk ziet afdrukken en levende getallen niet, een echt document wel', () => {
+  const dir = wegwerp([]);
+  fs.writeFileSync(path.join(dir, 'BEWIJS.md'), '# afdruk\n');
+  fs.writeFileSync(path.join(dir, 'R.md'), '# Rapport\n\n_Automatisch geschreven door een script. Niet met de hand bijwerken._\n');
+  const a = tk.inventaris(dir);
+  assert.deepEqual(a.bron.afdrukkenUitgesloten, ['BEWIJS.md', 'R.md']);
+  fs.writeFileSync(path.join(dir, 'BEWIJS.md'), '# afdruk, opnieuw geschreven\n');
+  fs.writeFileSync(path.join(dir, 'R.md'), '# Rapport\n\n_Automatisch geschreven door een script. Niet met de hand bijwerken._\n\nnieuw\n');
+  fs.appendFileSync(path.join(dir, 'A.md'), '\nTotaal <!--getal:x.y-->12<!--/getal--> stuks.\n');
+  const b = tk.inventaris(dir);
+  fs.writeFileSync(path.join(dir, 'A.md'), fs.readFileSync(path.join(dir, 'A.md'), 'utf8').replace('-->12<', '-->13<'));
+  assert.equal(tk.inventaris(dir).bron.vingerafdruk, b.bron.vingerafdruk, 'een levend getal mag het blok niet laten verouderen');
+  assert.notEqual(b.bron.vingerafdruk, a.bron.vingerafdruk, 'een echt document moet het blok wel laten verouderen');
+  fs.writeFileSync(path.join(dir, 'BEWIJS.md'), '# nog een afdruk\n');
+  assert.equal(tk.inventaris(dir).bron.vingerafdruk, b.bron.vingerafdruk, 'een afdruk mag het blok niet laten verouderen');
+});
+
+test('17. elk open besluit staat in bijlage A, onder zijn document en onderdeel', () => {
+  const tekst = fs.readFileSync(path.join(WORTEL, 'AFBOUWPROGRAMMA.md'), 'utf8');
+  const i = tekst.indexOf('## Bijlage A.');
+  assert.ok(i > 0, 'AFBOUWPROGRAMMA.md heeft geen bijlage A');
+  const bijlage = tekst.slice(i);
+  const mist = INV.items.filter((it) => it.klasse === 'vraagt-besluit')
+    .filter((it) => !bijlage.includes(it.document + ': ' + it.onderdeel)).map((it) => it.document + ': ' + it.onderdeel);
+  assert.deepEqual(mist, [], 'een open besluit staat niet in de bijlage voor de eigenaar');
+});
+
+test('18. de voorzieningen bestaan, en een rij zonder verwijzing krijgt er geen', () => {
+  assert.deepEqual(as2.voorzieningenVan('zie `server/kern/stuur/mandaat.js` en `lib/keten.js`, plus de ritproef'),
+    ['kern/stuur', 'keten:ritproef', 'lib/keten']);
+  assert.deepEqual(as2.voorzieningenVan('| een ding | **staat** | niets genoemd |'), []);
+  const weg = INV.voorzieningen.groepen.filter((g) => !g.bestaat).map((g) => g.voorziening);
+  assert.deepEqual(weg, [], 'een rij noemt een voorziening die niet in de boom staat');
+  assert.equal(INV.voorzieningen.metVoorziening + INV.voorzieningen.zonderVoorziening, INV.items.length);
+});
+
+test('19. npm run check stelt de versheidsvraag zelf (regel 76), met dezelfde functie, en het blok is vers', () => {
+  const bron = fs.readFileSync(path.join(WORTEL, 'scripts', 'check.js'), 'utf8');
+  assert.ok(/76\) de inventaris van toezeggingen/.test(bron) && /tk\.oordeel\(reg\.toezegklassen, vers\)/.test(bron),
+    'scripts/check.js hoort regel 76 te dragen en toezegklassen.oordeel aan te roepen');
+  const reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'APPWERKT.json'), 'utf8'));
+  assert.deepEqual(tk.oordeel(reg.toezegklassen, INV), [], 'het blok loopt achter -- draai npm run appwerkt:inventaris');
+});

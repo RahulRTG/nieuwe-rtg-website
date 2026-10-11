@@ -131,4 +131,4 @@ if (require.main === module) {
     overgeslagen.length + ' afdrukken overgeslagen.');
 }
 
-module.exports = { knip, bouw, AFDRUKKEN };
+module.exports = { knip, bouw, AFDRUKKEN, AFDRUKKOP };

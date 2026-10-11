@@ -56,6 +56,13 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+/* Soort, afwijzing in de rij en voorziening: de tweede en derde as (ronde 2). */
+const as2 = require('./toezegsoort');
+/* De afdrukken (BEWIJS.md, FUNCTIES.md, ...) hebben EEN lijst in dit huis, die van
+   de kennisindex; hier wordt hij gebruikt en niet overgetypt. Een afdruk wordt
+   uit een register geschreven, draagt geen eigen toezegging en hoort dus niet in
+   de vingerafdruk: anders veroudert dit blok bij elke registerronde vanzelf. */
+const { AFDRUKKEN, AFDRUKKOP } = require('../kennisindex');
 
 const WORTEL = path.join(__dirname, '..', '..');
 const BESLUITBESTAND = 'TOEZEGKLASSEN.json';
@@ -107,8 +114,8 @@ const MARKERING = /\*\*(staat|een stap weg|vraagt een besluit|een besluit vraagt
 function leesDocument(naam, tekst) {
   const regels = tekst.split('\n');
   const items = [];
-  let proza = 0, standOnbekend = 0;
-  let inCode = false, kop = null, standKol = -1;
+  let proza = 0, standOnbekend = 0, legenda = 0;
+  let inCode = false, kop = null, standKol = -1, isLegenda = false, sectie = null;
   for (let i = 0; i < regels.length; i++) {
     const r = regels[i];
     if (/^\s*```/.test(r)) { inCode = !inCode; kop = null; continue; }
@@ -118,6 +125,9 @@ function leesDocument(naam, tekst) {
       if (!kop) {
         kop = cellen;
         standKol = cellen.findIndex((c) => /^(stand|status|staat)$/i.test(celKaal(c)));
+        /* Een LEGENDA verklaart de standen zelf ("| **vraagt een besluit** | het
+           kan, maar ..."): de tweede kolom is een betekenis en geen onderdeel. */
+        isLegenda = cellen.some((c) => /^(betekenis|wat het betekent|betekent|wat dat betekent)$/i.test(celKaal(c)));
         continue;
       }
       if (cellen.length && cellen.every((c) => /^:?-{2,}:?$/.test(c) || c === '')) continue;
@@ -133,6 +143,10 @@ function leesDocument(naam, tekst) {
           .filter((x) => x && x[1]);
         if (treffers.length === 1) [standCel, stand] = treffers[0];
       }
+      /* Een legenda zet de stand VOORAAN en verklaart hem in de kolom erna; een
+         gewone tabel met een kolom "betekenis" (BENOEMING.md par. 2) zet hem
+         achteraan en is een echte lijst onderdelen. */
+      if (stand && isLegenda && standCel === 0) { legenda++; continue; }
       if (stand) {
         /* Een eerste kolom met alleen een nummer ("103", "U40", "B4") is geen
            onderdeel maar een kenmerk: dan draagt het onderdeel beide. */
@@ -141,35 +155,78 @@ function leesDocument(naam, tekst) {
         const onderdeel = overig.length > 1 && isKenmerk(overig[0])
           ? (overig[0] + ' ' + overig[1]).slice(0, 160) : (overig[0] || '');
         if (onderdeel) {
-          items.push({ document: naam, regel: i + 1, citaat: r.trim(), onderdeel, stand,
-            klasse: STAND_NAAR_KLASSE[stand], herkomst: 'tabel' });
+          items.push(metAfwijzing({ document: naam, regel: i + 1, citaat: r.trim(), onderdeel, stand,
+            klasse: STAND_NAAR_KLASSE[stand], herkomst: 'tabel', sectie }));
           continue;
         }
       }
       if (MARKERING.test(r)) proza++;
       continue;
     }
-    kop = null; standKol = -1;
+    kop = null; standKol = -1; isLegenda = false;
     const k = /^#{1,6}\s+(.*?)\s+[\u2014\u2013-]{1,2}\s+\*\*([^*]+)\*\*/.exec(r);
+    if (/^#{1,6}\s/.test(r)) sectie = celKaal(r.replace(/^#{1,6}\s+/, ''));
     if (k) {
       const stand = normaliseerStand(k[2]);
       if (stand) {
-        items.push({ document: naam, regel: i + 1, citaat: r.trim(),
+        items.push(metAfwijzing({ document: naam, regel: i + 1, citaat: r.trim(),
           onderdeel: celKaal(k[1].replace(/^\d+[a-z]?(\.\d+)*\.?\s+/i, '')),
-          stand, klasse: STAND_NAAR_KLASSE[stand], herkomst: 'kop' });
+          stand, klasse: STAND_NAAR_KLASSE[stand], herkomst: 'kop', sectie }));
         continue;
       }
     }
     if (MARKERING.test(r)) proza++;
   }
-  return { items, proza, standOnbekend };
+  return { items, proza, standOnbekend, legenda };
+}
+
+/* Een toegezegde rij die in dezelfde cel zegt dat het onderdeel er NIET komt, is
+   geen toezegging (scripts/lib/toezegsoort.js, punt 1). De zin met de afwijzing
+   wordt de reden; de stand van het document blijft erbij staan. */
+function metAfwijzing(it) {
+  if (it.klasse !== 'toegezegd') return it;
+  const m = as2.AFWIJZING.exec(it.citaat);
+  if (!m) return it;
+  const zin = it.citaat.split(/\s*\|\s*|(?<=[.;:])\s+/).find((z) => as2.AFWIJZING.test(z)) || m[0];
+  return Object.assign(it, { klasse: 'afgewezen-met-grens', herkomst: it.herkomst + '+afwijzing',
+    reden: 'de rij wijst het onderdeel zelf af: "' + zin.trim().slice(0, 200) + '"' });
+}
+
+/* De dichtstbijzijnde kop boven een regel (voor items uit het besluitbestand). */
+function sectieBoven(tekst, regel) {
+  const r = tekst.split('\n');
+  for (let i = regel - 1; i >= 0; i--) if (/^#{1,6}\s/.test(r[i])) return celKaal(r[i].replace(/^#{1,6}\s+/, ''));
+  return null;
+}
+
+function isAfdruk(naam, tekst) {
+  return AFDRUKKEN.has(naam) || AFDRUKKOP.test(String(tekst).slice(0, 600));
 }
 
 function documentNamen(wortel) {
   return fs.readdirSync(wortel).filter((n) => n.endsWith('.md')).sort();
 }
 
-/* Het besluitbestand: valideren en elk citaat in zijn document terugvinden. */
+
+/* Een citaat letterlijk op een regel van een document terugvinden: regelnummer
+   (1-gebaseerd) of 0 als het er niet (meer) staat. */
+function vind(teksten, document, citaat) {
+  const tekst = teksten[document];
+  if (tekst === undefined) return { regel: 0, reden: 'het document bestaat niet' };
+  const i = tekst.split('\n').findIndex((r) => r.includes(citaat));
+  return i < 0 ? { regel: 0, reden: 'het citaat staat niet (meer) letterlijk in het document' } : { regel: i + 1 };
+}
+
+/* Het besluitbestand: valideren en elk citaat in zijn document terugvinden.
+
+   BESLOTEN ELDERS (besluit B4, 11 oktober 2026). Een document kan een onderdeel
+   als "vraagt een besluit" markeren terwijl dat besluit in een ANDER document of
+   een latere paragraaf al genomen is. Zo'n item draagt `besloten`: het document
+   en het letterlijke citaat waar het besluit staat, plus de datum. Ook dat
+   citaat moet er letterlijk staan; is het weg, dan is het item rot -- een besluit
+   zonder vindbare bron is een bewering. De klasse is wat het besluit OPLEVERT
+   (toegezegd, of afgewezen-met-grens), want "besloten" is geen vijfde klasse
+   maar een herkomst. */
 function leesBesluiten(wortel, teksten) {
   const pad = path.join(wortel, BESLUITBESTAND);
   const bron = JSON.parse(fs.readFileSync(pad, 'utf8'));
@@ -184,41 +241,68 @@ function leesBesluiten(wortel, teksten) {
     if ((b.klasse === 'vraagt-besluit' || b.klasse === 'extern') && !(b.voorwaarde && b.voorwaarde.length > 10)) {
       fouten.push(wie + ' -- geblokkeerd zonder voorwaarde: wat moet aantoonbaar vervuld zijn?'); continue;
     }
+    if (b.soort !== undefined && !Object.prototype.hasOwnProperty.call(as2.SOORTEN, b.soort)) {
+      fouten.push(wie + ' -- soort "' + b.soort + '" valt buiten de vier'); continue;
+    }
+    if (b.besloten !== undefined) {
+      const bs = b.besloten;
+      if (!bs || typeof bs.document !== 'string' || typeof bs.citaat !== 'string' || bs.citaat.trim().length < 12 || !/^\d{4}-\d{2}-\d{2}$/.test(bs.datum || '')) {
+        fouten.push(wie + ' -- besloten zonder document, citaat (minstens twaalf tekens) of datum (JJJJ-MM-DD)'); continue;
+      }
+      if (b.klasse === 'vraagt-besluit') { fouten.push(wie + ' -- besloten en tegelijk vraagt-besluit: kies wat het besluit oplevert'); continue; }
+      if (!(b.reden && b.reden.length > 10)) { fouten.push(wie + ' -- besloten zonder reden'); continue; }
+    }
     const sleutel = b.document + '|' + b.citaat;
     if (gezien.has(sleutel)) { fouten.push(wie + ' -- dubbel'); continue; }
     gezien.add(sleutel);
-    const tekst = teksten[b.document];
-    const regel = tekst === undefined ? -1 : tekst.split('\n').findIndex((r) => r.includes(b.citaat));
-    if (regel < 0) {
-      rot.push({ document: b.document, citaat: b.citaat, klasse: b.klasse, onderdeel: b.onderdeel,
-        reden: tekst === undefined ? 'het document bestaat niet' : 'het citaat staat niet (meer) letterlijk in het document' });
+    const plek = vind(teksten, b.document, b.citaat);
+    if (!plek.regel) {
+      rot.push({ document: b.document, citaat: b.citaat, klasse: b.klasse, onderdeel: b.onderdeel, reden: plek.reden });
       continue;
     }
-    items.push({ document: b.document, regel: regel + 1, citaat: b.citaat, onderdeel: b.onderdeel,
+    let besloten = null;
+    if (b.besloten) {
+      const bp = vind(teksten, b.besloten.document, b.besloten.citaat);
+      if (!bp.regel) {
+        rot.push({ document: b.besloten.document, citaat: b.besloten.citaat, klasse: b.klasse, onderdeel: b.onderdeel,
+          reden: 'de BRON van het besluit: ' + bp.reden });
+        continue;
+      }
+      besloten = { document: b.besloten.document, regel: bp.regel, citaat: b.besloten.citaat, datum: b.besloten.datum };
+    }
+    items.push({ document: b.document, regel: plek.regel, citaat: b.citaat, onderdeel: b.onderdeel,
       stand: null, klasse: b.klasse, herkomst: 'besluitbestand', reden: b.reden || null,
-      voorwaarde: b.voorwaarde || null, eigenaar: b.eigenaar || null });
+      voorwaarde: b.voorwaarde || null, eigenaar: b.eigenaar || null, besloten,
+      soortHand: b.soort || null, sectie: sectieBoven(teksten[b.document], plek.regel) });
   }
   return { fouten, rot, items };
 }
 
+const nul = () => Object.fromEntries(Object.keys(KLASSEN).map((k) => [k, 0]));
+
 function inventaris(wortel = WORTEL) {
-  const namen = documentNamen(wortel);
+  const namen = [], afdrukken = [];
   const teksten = {};
   const hash = crypto.createHash('sha256');
-  for (const n of namen) {
-    teksten[n] = fs.readFileSync(path.join(wortel, n), 'utf8');
+  for (const n of documentNamen(wortel)) {
+    const tekst = fs.readFileSync(path.join(wortel, n), 'utf8');
+    /* Een besluitcitaat mag ook naar een afdruk wijzen; daarom staat de tekst
+       wel klaar, maar een afdruk wordt niet gelezen en niet gehasht. */
+    teksten[n] = tekst;
+    if (isAfdruk(n, tekst)) { afdrukken.push(n); continue; }
+    namen.push(n);
     /* Een levend getal (<!--getal:..-->) telt niet mee in de vingerafdruk: dat
        is een uitkomst van een register (ook van dit blok zelf, via
        scripts/getallen.js), en meetellen maakte het blok na elke
        getallenronde vanzelf verouderd. */
-    hash.update(n + '\0' + teksten[n].replace(/(<!--getal:[a-zA-Z0-9._-]+-->)[\s\S]*?<!--\/getal-->/g, '$1') + '\0');
+    hash.update(n + '\0' + tekst.replace(/(<!--getal:[a-zA-Z0-9._-]+-->)[\s\S]*?<!--\/getal-->/g, '$1') + '\0');
   }
   hash.update(fs.readFileSync(path.join(wortel, BESLUITBESTAND), 'utf8'));
-  let proza = 0, standOnbekend = 0;
+  let proza = 0, standOnbekend = 0, legenda = 0;
   const gelezen = [];
   for (const n of namen) {
     const d = leesDocument(n, teksten[n]);
-    gelezen.push(...d.items); proza += d.proza; standOnbekend += d.standOnbekend;
+    gelezen.push(...d.items); proza += d.proza; standOnbekend += d.standOnbekend; legenda += d.legenda;
   }
   const besluiten = leesBesluiten(wortel, teksten);
   /* Het besluitbestand wint op dezelfde regel: een mens heeft daar geoordeeld. */
@@ -227,47 +311,107 @@ function inventaris(wortel = WORTEL) {
   for (const b of besluiten.items) {
     const g = opRegel.get(b.document + ':' + b.regel);
     if (g) Object.assign(g, { klasse: b.klasse, herkomst: 'tabel+besluitbestand', reden: b.reden,
-      voorwaarde: b.voorwaarde, eigenaar: b.eigenaar, onderdeel: b.onderdeel || g.onderdeel });
+      voorwaarde: b.voorwaarde, eigenaar: b.eigenaar, besloten: b.besloten, soortHand: b.soortHand,
+      onderdeel: b.onderdeel || g.onderdeel });
     else items.push(b);
   }
   items.sort((a, b) => a.document.localeCompare(b.document) || a.regel - b.regel);
 
-  const telling = Object.fromEntries(Object.keys(KLASSEN).map((k) => [k, 0]));
+  /* De tweede en derde as. */
+  const voorz = new Map();
+  for (const it of items) {
+    const s = it.soortHand ? { soort: it.soortHand, soortGrond: 'met de hand in ' + BESLUITBESTAND }
+      : as2.soortVan(it.onderdeel, it.sectie);
+    it.soort = s.soort; it.soortGrond = s.soortGrond;
+    it.voorzieningen = as2.voorzieningenVan(it.citaat);
+    delete it.soortHand; delete it.sectie;
+    if (!it.besloten) delete it.besloten;
+    for (const v of it.voorzieningen) {
+      if (!voorz.has(v)) voorz.set(v, { voorziening: v, bestaat: as2.voorzieningBestaat(wortel, v), items: 0, perKlasse: nul() });
+      const g = voorz.get(v); g.items++; g.perKlasse[it.klasse]++;
+    }
+  }
+
+  const telling = nul();
   const perStand = {};
   const perDocument = {};
+  const perSoort = Object.fromEntries([...Object.keys(as2.SOORTEN), 'onbepaald'].map((s) => [s, nul()]));
   for (const it of items) {
     telling[it.klasse]++;
+    perSoort[it.soort][it.klasse]++;
     if (it.stand) perStand[it.stand] = (perStand[it.stand] || 0) + 1;
-    perDocument[it.document] = perDocument[it.document] || Object.fromEntries(Object.keys(KLASSEN).map((k) => [k, 0]));
+    perDocument[it.document] = perDocument[it.document] || nul();
     perDocument[it.document][it.klasse]++;
   }
+  const som = (o) => Object.values(o).reduce((a, b) => a + b, 0);
+  const soortTelling = Object.fromEntries(Object.keys(as2.SOORTEN).map((s) => [s, som(perSoort[s])]));
+  const groepen = [...voorz.values()].sort((a, b) => b.items - a.items || a.voorziening.localeCompare(b.voorziening));
   const kort = (it) => ({ document: it.document, regel: it.regel, onderdeel: it.onderdeel, citaat: it.citaat,
     reden: it.reden || null, voorwaarde: it.voorwaarde || null, eigenaar: it.eigenaar || null });
   return {
     uitleg: 'De toezeggingen uit de documenten in de wortel, in vier gesloten klassen (AFBOUWPROGRAMMA.md). ' +
       'Markeringen in tabellen en koppen worden deterministisch gelezen; afgewezen en extern zijn een oordeel en staan in ' +
-      BESLUITBESTAND + ', met een citaat dat letterlijk in de bron moet staan. Een rot citaat telt niet mee en laat de toets zakken.',
-    hoe: 'node scripts/appwerkt.js --inventaris  (--inventaris --controle zakt als het blok achterloopt, een citaat rot is of een klasse buiten de vier valt)',
+      BESLUITBESTAND + ', met een citaat dat letterlijk in de bron moet staan. Een rot citaat telt niet mee en laat de toets zakken. ' +
+      'Daarnaast twee assen: SOORT (product, functie, integratie, eis, of onbepaald met reden) en VOORZIENING (de module of keten die de rij zelf noemt).',
+    hoe: 'node scripts/appwerkt.js --inventaris  (--inventaris --controle zakt als het blok achterloopt, een citaat rot is of een klasse buiten de vier valt; ' +
+      'npm run check regel 76 stelt dezelfde vraag)',
     grens: 'Deze inventaris zegt in welke KLASSE een onderdeel valt, niet of het werkt. "toegezegd" met stand "staat" is een bewering van het document; ' +
       'bewezen is het pas via de acht bewijzen (de regels in dit register) of een ketenproef. Markeringen in lopende tekst worden niet gelezen, ' +
-      'omdat niet af te lezen is over welk onderdeel ze gaan: zie nietGeteld.',
+      'omdat niet af te lezen is over welk onderdeel ze gaan: zie nietGeteld. De soort is lexicaal en dus een indeling met een regel, geen oordeel.',
     klassen: KLASSEN,
     standNaarKlasse: STAND_NAAR_KLASSE,
-    bron: { documenten: namen.length, besluitbestand: BESLUITBESTAND, vingerafdruk: hash.digest('hex').slice(0, 16) },
+    soorten: as2.SOORTEN,
+    bron: { documenten: namen.length, afdrukkenUitgesloten: afdrukken, besluitbestand: BESLUITBESTAND,
+      vingerafdruk: hash.digest('hex').slice(0, 16) },
     telling,
+    soortTelling,
+    onbepaald: som(perSoort.onbepaald),
+    perSoort,
+    beslotenElders: items.filter((i) => i.besloten).length,
+    afgewezenInRij: items.filter((i) => /\+afwijzing$/.test(i.herkomst)).length,
     perStand,
-    nietGeteld: { prozaMarkeringen: proza, standOnbekend,
-      uitleg: 'prozaMarkeringen: een vetgedrukte stand in lopende tekst of een tabelrij zonder onderdeel; standOnbekend: een cel in een stand-kolom die geen van de vier standen is (bv. "gedekt", "proven", "half"). Beide worden niet geraden.' },
+    nietGeteld: { prozaMarkeringen: proza, standOnbekend, legenda,
+      uitleg: 'prozaMarkeringen: een vetgedrukte stand in lopende tekst of een tabelrij zonder onderdeel; standOnbekend: een cel in een stand-kolom die geen van de vier standen is (bv. "gedekt", "proven", "half", "besloten"); legenda: een rij in een tabel die de standen zelf verklaart. Geen van drie wordt geraden.' },
+    voorzieningen: {
+      uitleg: 'Per voorziening (module of keten die de rij zelf tussen backticks noemt) hoeveel onderdelen eraan hangen. Een rij kan meer dan een voorziening noemen; ' +
+        'zonderVoorziening telt de rijen die er geen noemen -- die krijgen er geen geraden. bestaat: de voorziening is in server/ of scripts/ gevonden.',
+      metVoorziening: items.filter((i) => i.voorzieningen.length).length,
+      zonderVoorziening: items.filter((i) => !i.voorzieningen.length).length,
+      aantal: groepen.length,
+      groepen
+    },
     perDocument,
     geblokkeerd: {
       'vraagt-besluit': items.filter((i) => i.klasse === 'vraagt-besluit').map(kort),
       extern: items.filter((i) => i.klasse === 'extern').map(kort)
     },
     afgewezen: items.filter((i) => i.klasse === 'afgewezen-met-grens').map(kort),
+    besloten: items.filter((i) => i.besloten).map((i) => Object.assign(kort(i), { klasse: i.klasse, besloten: i.besloten })),
     rot: besluiten.rot,
     fouten: besluiten.fouten,
     items
   };
 }
 
-module.exports = { KLASSEN, STAND_NAAR_KLASSE, BESLUITBESTAND, normaliseerStand, leesDocument, leesBesluiten, inventaris };
+/* Het oordeel over het blok, zonder browser. Rot en fouten laten zakken; een
+   blok dat achterloopt op de documenten ook, met de weg om het bij te werken.
+   Woont hier en niet in appwerkt.js, zodat npm run check (regel 76) dezelfde
+   vraag stelt zonder de browsermeter te laden. */
+function oordeel(opgeslagen, vers) {
+  const bezwaren = [];
+  for (const r of vers.rot) bezwaren.push('ROT: ' + r.document + ' -- "' + r.citaat.slice(0, 70) + '" (' + r.reden + ')');
+  for (const f of vers.fouten) bezwaren.push('FOUT: ' + f);
+  for (const it of vers.items) {
+    if (!Object.prototype.hasOwnProperty.call(KLASSEN, it.klasse)) bezwaren.push('KLASSE buiten de vier: ' + it.document + ':' + it.regel + ' ' + it.klasse);
+    if (!it.citaat) bezwaren.push('ZONDER CITAAT: ' + it.document + ':' + it.regel);
+    if (it.soort !== 'onbepaald' && !Object.prototype.hasOwnProperty.call(as2.SOORTEN, it.soort)) bezwaren.push('SOORT buiten de vier: ' + it.document + ':' + it.regel + ' ' + it.soort);
+  }
+  if (!opgeslagen) bezwaren.push('APPWERKT.json draagt geen blok toezegklassen -- draai node scripts/appwerkt.js --inventaris');
+  else if (JSON.stringify(opgeslagen) !== JSON.stringify(vers)) {
+    bezwaren.push('het blok toezegklassen loopt achter op de documenten (vingerafdruk ' +
+      (opgeslagen.bron && opgeslagen.bron.vingerafdruk) + ' tegen ' + vers.bron.vingerafdruk + ') -- draai npm run appwerkt:inventaris');
+  }
+  return bezwaren;
+}
+
+module.exports = { KLASSEN, STAND_NAAR_KLASSE, BESLUITBESTAND, normaliseerStand, leesDocument, leesBesluiten, inventaris, oordeel, isAfdruk };

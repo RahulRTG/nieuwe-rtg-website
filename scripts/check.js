@@ -6028,6 +6028,30 @@ console.log('\n75) roteren met de hand neemt niet toe');
   }
 }
 
+/* ============================================================================
+   76) DE INVENTARIS VAN TOEZEGGINGEN LOOPT NIET ACHTER (AFBOUWPROGRAMMA.md).
+
+   `npm run appwerkt:inventaris:controle` bestond, maar hing nergens aan: een
+   controle die alleen draait als iemand eraan denkt, bewaakt niets (zelfde les
+   als scripts/registerklopt.js). Hier stelt de keuring dezelfde vraag, met
+   dezelfde functie (`oordeel` in scripts/lib/toezegklassen.js) en zonder de
+   browsermeter te laden: het blok in APPWERKT.json hoort bij de documenten van
+   deze boom, geen citaat is rot, geen klasse of soort valt buiten de lijst. De
+   vingerafdruk slaat afdrukken (BEWIJS.md, FUNCTIES.md, ...) en levende getallen
+   over, dus een registerronde laat deze regel niet vanzelf zakken. Kost een
+   halve seconde. */
+console.log('\n76) de inventaris van toezeggingen loopt niet achter op de documenten');
+try {
+  const tk = require('./lib/toezegklassen');
+  const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'APPWERKT.json'), 'utf8'));
+  const vers = tk.inventaris(ROOT);
+  const bezwaren = tk.oordeel(reg.toezegklassen, vers);
+  if (bezwaren.length) for (const b of bezwaren) fout(b);
+  else ok('toezegklassen ' + JSON.stringify(vers.telling) + ', ' + vers.beslotenElders + ' besloten elders, 0 rot');
+} catch (e) {
+  fout('de inventaris van toezeggingen kon niet worden gelezen (' + e.message + '); dan stelt deze regel niets vast');
+}
+
 /* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.
 
    Op 13 september 2026 heb ik twee keer op een dag "de gate is groen" gezegd op

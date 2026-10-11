@@ -303,7 +303,7 @@ aangesloten bronnen verhogen de kwaliteit; meer bezoekers niet (P-05).
 | ingang, mogelijkheden, openingstijden | **vraagt een besluit** | geen veld voor ingang of parkeren; geen algemeen veld voor openingstijden (`s.openingstijden` wordt gelezen in `server/kern/onderneming/mallprofiel.js:61` en nergens geschreven) |
 | actuele plaatsfeiten | **een stap weg** | de bronnen bestaan (par. 0), maar er is geen plek waar ze samenkomen als feiten over een plaats |
 | navigatie wordt beter | **jaren weg als lus** | de navigatie leest van een zaak alleen `loc` en `type` |
-| doorgave | **vraagt een besluit** | par. 4, schakel 13 |
+| doorgave | **een stap weg** (besloten: N5, par. 15.0) | par. 4, schakel 13 |
 | domein bevestigt | **staat** per domein | reservering, betaling, levering bevestigen elk hun eigen stand |
 | kennis wordt betrouwbaarder | **jaren weg** | er is niets dat een bevestigde doorgave terugleest als bewijs voor de plaats |
 

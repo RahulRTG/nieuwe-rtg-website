@@ -305,7 +305,7 @@ te lang duurt wordt op een dag uitgezet.
 
 ---
 
-## 9. Bewijs: de keten bestaat, het anker niet — **vraagt een besluit**
+## 9. Bewijs: de keten bestaat, het anker niet — besloten (3 september 2026)
 
 Dit is de grootste correctie op het voorstel, en het scheelt werk.
 
@@ -327,6 +327,14 @@ besluit van de eigenaar met een prijs, geen sprint. Tot dat besluit is genomen
 bewijst de keten dat er niet PER ONGELUK iets is verschoven; niet dat een
 vastberaden beheerder is tegengehouden. Die twee mogen op geen enkel scherm
 hetzelfde heten.
+
+**Correctie (11 oktober 2026, `AFBOUWPROGRAMMA.md` besluit B4).** Dit besluit
+was al genomen toen deze paragraaf werd geschreven: *"Dat besluit is genomen (3
+september 2026, eigenaar): een tweede machine binnen RTG"* (`MAATSTAF.md` par.
+7b), uitgevoerd als `server/lib/ankerpost.js`. Van de drie opties hierboven is
+het dus het gescheiden systeem geworden. Wat open blijft is een TWEEDE besluit,
+een partij buiten het huis: een tweede machine binnen RTG houdt één hand tegen,
+niet RTG als geheel.
 
 Geen blockchain. De kop van `keten.js` legt uit waarom dat het probleem niet
 oplost dat hier speelt.
@@ -454,7 +462,7 @@ Niet één herschrijving. Elke stap is los waardevol en los terug te draaien.
 | 13 | de plek waar het lid zijn afspraken ziet | vraagt eerst een naam (par. 11) |
 | 14 | clausules en een semantische diff | open |
 | 15 | de gebeurtenissen naar finance, CRM, kantoor en AI | open |
-| 16 | het anker naar buiten | vraagt een besluit (par. 9) |
+| 16 | het anker naar buiten | besloten (par. 9: een tweede machine binnen RTG, 3 september 2026) |
 
 ### 14.1 Wat stap 2 opleverde, en wat hij NIET deed
 

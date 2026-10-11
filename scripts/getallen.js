@@ -680,6 +680,18 @@ const GETALLEN = {
     wat: 'onderdelen in de klasse extern' },
   'toezeg.proza': { bron: 'APPWERKT.json', veld: 'toezegklassen.nietGeteld.prozaMarkeringen',
     wat: 'standmarkeringen in lopende tekst die niet gelezen worden' },
+  /* Ronde 2 (11 oktober 2026): de soort-as, besloten-elders en de voorzieningen. */
+  'toezeg.product': { bron: 'APPWERKT.json', veld: 'toezegklassen.soortTelling.product', wat: 'onderdelen van de soort product' },
+  'toezeg.functie': { bron: 'APPWERKT.json', veld: 'toezegklassen.soortTelling.functie', wat: 'onderdelen van de soort functie' },
+  'toezeg.integratie': { bron: 'APPWERKT.json', veld: 'toezegklassen.soortTelling.integratie', wat: 'onderdelen van de soort integratie' },
+  'toezeg.eis': { bron: 'APPWERKT.json', veld: 'toezegklassen.soortTelling.eis', wat: 'onderdelen van de soort eis (gedrag, grens, garantie)' },
+  'toezeg.onbepaald': { bron: 'APPWERKT.json', veld: 'toezegklassen.onbepaald', wat: 'onderdelen zonder vaststelbare soort (apart, nooit opgeteld)' },
+  'toezeg.beslotenElders': { bron: 'APPWERKT.json', veld: 'toezegklassen.beslotenElders', wat: 'markeringen die elders al besloten zijn, met bron' },
+  'toezeg.afgewezenInRij': { bron: 'APPWERKT.json', veld: 'toezegklassen.afgewezenInRij', wat: 'rijen die zichzelf afwijzen' },
+  'toezeg.legenda': { bron: 'APPWERKT.json', veld: 'toezegklassen.nietGeteld.legenda', wat: 'legendarijen die de standen verklaren' },
+  'toezeg.voorzieningen': { bron: 'APPWERKT.json', veld: 'toezegklassen.voorzieningen.aantal', wat: 'verschillende voorzieningen die de rijen zelf noemen' },
+  'toezeg.metVoorziening': { bron: 'APPWERKT.json', veld: 'toezegklassen.voorzieningen.metVoorziening', wat: 'onderdelen die een voorziening noemen' },
+  'toezeg.zonderVoorziening': { bron: 'APPWERKT.json', veld: 'toezegklassen.voorzieningen.zonderVoorziening', wat: 'onderdelen die geen voorziening noemen' },
   'toezeg.onderdelen': { bron: 'APPWERKT.json', veld: 'gemeten.onderdelen',
     wat: 'onderdelen uit MAPPEN die APPWERKT vandaag meet (de registerbasis, niet het eindaantal)' },
 };

@@ -703,7 +703,7 @@ dan het vorige:
 | 0 | een register | **staat** (77 registers) |
 | 1 | de graaf (aanroepers, routes, capabilities) | **een stap weg** |
 | 2 | AST / symbool | **een stap weg** (parser bewezen, as leeg) |
-| 3 | een bronfragment via een broker | **vraagt een besluit** |
+| 3 | een bronfragment via een broker | besloten (par. 7, besluit 3: alleen naar een lokaal model); de broker is niet gebouwd |
 | 4 | een experiment in de zandbak | **jaren weg** |
 
 Niveau 3 loopt nooit langs het bestandssysteem maar langs een **broker** die het

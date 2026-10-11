@@ -30,6 +30,11 @@ function controleer(wortel = ROOT) {
   for (const onderdeel of ['access-title', 'agPasskey', 'agAnders', 'agNieuw', 'agForm', 'agError']) {
     if (!ledenPoort.includes(onderdeel)) fouten.push('de officiële ledeningang mist ' + onderdeel);
   }
+  for (const onderdeel of ['access-brand', 'access-system', 'agLanguage', 'access-meta']) {
+    if (!ledenPoort.includes(onderdeel)) fouten.push('de officiële AuthShell mist ' + onderdeel);
+  }
+  if (!/body:has\(#gate\[data-rtg-access\]/.test(fs.readFileSync(path.join(wortel, 'public', 'apps', 'access', 'portal.css'), 'utf8')))
+    fouten.push('de Edge blijft zichtbaar vóór de beveiligde toegang');
   if (!ledenStart.includes("addEventListener('click',passkeyLogin)") || /setTimeout\s*\([^;]*passkeyLogin/.test(ledenStart))
     fouten.push('de ledeningang opent biometrie zonder bewuste handeling');
 

@@ -1,14 +1,7 @@
 'use strict';
-const M = require('./model'), P = require('./policy'), envelope = require('../envelop');
+const M = require('./model'), P = require('./policy');
 const klok = require('../../lib/klok');
-
-function empty() { return { schemaVersion: 1, readers: {}, receipts: {}, journal: [] }; }
-function state(raw) {
-  if (!Object.keys(raw).length) return empty();
-  if (raw.schemaVersion !== 1 || !raw.readers || !raw.receipts || !Array.isArray(raw.journal))
-    M.fail('SCHEMA_UNAVAILABLE', 'De persoonlijke leesopslag heeft een onbekende versie.', 503);
-  return M.clone(raw);
-}
+const {readerState:state,appendReaderEvent,verifyReaderJournal}=require('./reader-state');
 
 module.exports = function makeReader({ own, bewerkCollectie, store, identities, libraryRead, now }) {
   const time = now || (() => klok.datum().toISOString());
@@ -33,25 +26,6 @@ module.exports = function makeReader({ own, bewerkCollectie, store, identities, 
   const reader = (s, actor) => s.readers[actor] || { revision: 0, editions: {} };
   const shelf = (r, workId, editionId) => r.editions[editionId] || { workId, editionId,
     progress: null, bookmarks: {}, highlights: {}, notes: {}, updatedAt: null };
-  function append(s, actor, action, inputHash, result, at, operationId, workId, editionId) {
-    const previous = s.journal.findLast(e => e.actorRef === actor);
-    const eventId = 'libread_' + M.hash([actor, operationId]).slice(0, 32);
-    const event = { sequence: s.journal.length + 1, actorRef: actor, workId, editionId, action,
-      type: 'library.reader.' + action, inputHash, result: M.clone(result), previousHash: previous?.hash || null,
-      at, envelop: envelope.maak({ id: eventId, at, kanaal: 'library-reader', actor,
-        correlatie: previous?.envelop.correlatie || eventId, oorzaak: previous?.envelop.id || null,
-        classificatie: 'persoonsgegeven' }) };
-    event.hash = M.hash(event); s.journal.push(event); return event;
-  }
-  function verify(events) {
-    let previous = null;
-    for (const event of events) {
-      const { hash, ...body } = event;
-      if (body.previousHash !== previous || M.hash(body) !== hash) return false;
-      previous = hash;
-    }
-    return true;
-  }
   async function execute(actor, action, input, authority) {
     try {
       M.fields(input, ['operationId', 'workId', 'editionId', 'expectedRevision', 'data']);
@@ -104,7 +78,7 @@ module.exports = function makeReader({ own, bewerkCollectie, store, identities, 
           M.fields(d, ['noteId']); M.get(item.notes, d.noteId); delete item.notes[d.noteId]; result = { id: d.noteId };
         }
         item.updatedAt = at; r.editions[input.editionId] = item; r.revision++; s.readers[actor] = r;
-        const event = append(s, actor, action, M.hash(d), result, at, input.operationId, input.workId, input.editionId);
+        const event = appendReaderEvent(s, actor, action, M.hash(d), result, at, input.operationId, input.workId, input.editionId);
         const out = { ok: true, revision: r.revision, result: M.clone(result), auditRef: event.envelop.id, replay: false };
         s.receipts[receiptKey] = { fingerprint, result: M.clone(out), workId: input.workId, editionId: input.editionId };
         if (Buffer.byteLength(M.canonical(s)) > 10 * 1024 * 1024) M.fail('CAPACITY', 'Uw leesopslag vraagt onderhoud; er is niets verwijderd.', 503);
@@ -126,7 +100,7 @@ module.exports = function makeReader({ own, bewerkCollectie, store, identities, 
       }
       if (kind === 'proof') {
         const events = read().journal.filter(e => e.actorRef === actor && e.editionId === edition.id);
-        return { ok: true, events, integrity: verify(read().journal.filter(e => e.actorRef === actor)),
+        return { ok: true, events, integrity: verifyReaderJournal(read().journal.filter(e => e.actorRef === actor)),
           scope: 'personal-reader-local-hash-chain-not-independent-anchoring' };
       }
       if (kind === 'search') {

@@ -143,7 +143,7 @@ db.verversVerzoekCollectie = async () => { if (STORE === 'postgres') await postg
 function onExternalChange(cb) { state.setExternCb(cb); }
 
 module.exports = {
-  db, load, save, saveDuurzaam, bijeen, inBundel, bewerkCollectie, economischeBoekingEenmaal, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
+  db, load, save, saveDuurzaam, bijeen, inBundel, bewerkCollectie, leesCollectie: sleutel => db.data[sleutel], economischeBoekingEenmaal, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
   startPostgres: postgres.startPostgres, flushBijAfsluiten, pgPing: postgres.pgPing,
   opslagKlaar, pgPoolStatus: postgres.pgPoolStatus, postgresSchrijfStand: postgres.schrijfStand,
   postgresVerzoekMiddleware: postgres.verzoekMiddleware, onExternalChange, merge3, schrijfDuurzaam: opslag.schrijfDuurzaam,

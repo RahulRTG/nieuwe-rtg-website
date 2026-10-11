@@ -209,8 +209,11 @@ test('mutatie: een geverifieerde stand wordt dicht zodra de onderliggende proef 
   const env2 = { TURN_URL: 'turn:127.0.0.1:' + tijdelijk.poort + '?transport=udp', TURN_SECRET: GEHEIM };
   assert.equal((await relaystand.proef(env2)).ok, true);
   assert.equal(relaystand.stand(env2).geverifieerd, true);
+  // wacht op de toestand (het proces is weg), niet op de klok
+  const weg = tijdelijk.kind.exitCode !== null || tijdelijk.kind.signalCode !== null
+    ? Promise.resolve() : new Promise(r => tijdelijk.kind.once('exit', r));
   tijdelijk.kind.kill('SIGKILL');
-  await new Promise(r => setTimeout(r, 200));
+  await weg;
   const u = await relaystand.proef(env2, { timeoutMs: 1500 });
   assert.equal(u.ok, false);
   assert.equal(relaystand.stand(env2).geverifieerd, false, 'geen opgeslagen BESCHIKBAAR om te corrigeren');

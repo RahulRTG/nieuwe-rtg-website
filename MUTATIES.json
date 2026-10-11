@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T21:06:18.826Z",
-    "commit": "06870641a",
+    "op": "2026-10-11T22:55:10.268Z",
+    "commit": "f73689380",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1336,6 +1336,14 @@
       "operator": "false->true#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "beleidsmotor-uitvoerbak.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kantoor/mensdeur-spoel.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "beleidsmotor-werkwoorden.test.js": {
       "soort": "server",
@@ -3790,6 +3798,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "envelop-kantooridentiteit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/envelop.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "envelop.test.js": {
       "soort": "puur",
@@ -6735,6 +6751,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "kantoormacht-actor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/kantoormacht.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "kantoormacht.test.js": {
       "soort": "puur",

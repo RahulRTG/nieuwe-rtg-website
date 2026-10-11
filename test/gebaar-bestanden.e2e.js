@@ -56,6 +56,18 @@ async function wachtTot(lees, klopt, wat, grens = 8000) {
 }
 
 
+/* DE RIJ OP ZIJN NAAM EN NIET OP ZIJN PLEK. Wordt de eerste poging van veegDoor
+   een langdruk (de race van 520 ms hierboven), dan veegt hij een tweede keer, en
+   zonder kiezer kiest die tweede poging de rij die NU op de oude coordinaten
+   staat. Was de lijst intussen opnieuw getekend, dan ging die veeg over het
+   ANDERE bestand: de server zette Contract-2026.txt in de prullenbak terwijl deze
+   proef op Paspoort-scan.txt wachtte, en zakte na 8000 ms op
+   {"weg":false,"ster":false} -- ongeveer een op de zes rondes, ook op main.
+   Gevonden met een spoor IN de pagina (fetch en pointer-gebeurtenissen), want
+   een luisteraar aan de Node-kant verschoof de timing genoeg om hem te laten
+   verdwijnen. Een rij draagt zijn bestand in data-open; dat is de identiteit. */
+const rijKiezer = async (rij) => '#lijst .item[data-open="' + await rij.getAttribute('data-open') + '"]';
+
 test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gb-best-'));
@@ -105,7 +117,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
        laatste letter er geschaafd uit. Daarom staat .gb-lade op content-box. */
     const eerste = page.locator('#lijst .item').first();
     const d0 = await eerste.boundingBox();
-    await veegDoor(page, d0, { afstand: -112, stappen: 16 });
+    await veegDoor(page, d0, { afstand: -112, stappen: 16, kiezer: await rijKiezer(eerste) });
     /* Wachten tot de lade ER IS, niet tot het scherm stil is. wachtOpRust telt
        stilte, en vlak na een veeg is het nog stil omdat de lade nog moet
        opengaan -- dan meet de regel hieronder een lade die er niet staat. */
@@ -148,7 +160,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     // 1. doorvegen zet het bestand er ECHT in -- gemeten aan de server, niet aan het scherm
     const rij = page.locator('#lijst .item').first();
     const naam = (await rij.locator('b').textContent()).trim();
-    await veegDoor(page, await rij.boundingBox());
+    await veegDoor(page, await rij.boundingBox(), { kiezer: await rijKiezer(rij) });
     await wachtTot(() => staatVan(naam), (s) => s && s.weg,
       'doorvegen hoort ' + naam + ' bij de server in de prullenbak te zetten');
     assert.match(await page.locator('.gb-terug').textContent(), new RegExp(naam.slice(0, 8), 'i'),
@@ -165,7 +177,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     const naam2 = (await weer.locator('b').textContent()).trim();
     const d2 = await weer.boundingBox();
     assert.ok(d2, 'het teruggezette bestand hoort weer een meetbare regel te zijn');
-    await veegDoor(page, d2, { startFractie: 0.15, afstand: 176, stappen: 16 });
+    await veegDoor(page, d2, { startFractie: 0.15, afstand: 176, stappen: 16, kiezer: await rijKiezer(weer) });
     assert.deepEqual(await page.evaluate(() =>
       [...document.querySelectorAll('#lijst .gb-lade .gb-doe > span')].map((s) => s.textContent)),
       ['Ster', 'Overnemen'], 'naar rechts horen de ster en overnemen te liggen');
@@ -177,7 +189,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     }));
     const derde = page.locator('#lijst .item').first();
     const naam3 = (await derde.locator('b').textContent()).trim();
-    await veegDoor(page, await derde.boundingBox());
+    await veegDoor(page, await derde.boundingBox(), { kiezer: await rijKiezer(derde) });
     await page.waitForFunction(() => {
       const t = document.querySelector('.gb-terug');
       return t && /niet bereikbaar/i.test(t.textContent);

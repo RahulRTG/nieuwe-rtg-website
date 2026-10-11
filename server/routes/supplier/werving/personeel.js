@@ -63,8 +63,12 @@ app.post('/api/supplier/staff/invite/intrek', supplierAuth, async (req, res) => 
   const staff = r.claimStaffId != null && accounts.getStaffByIdAny
     ? accounts.getStaffByIdAny(r.claimStaffId)
     : (r.claimMemberId != null ? accounts.staffByMember(req.supplier.code, r.claimMemberId) : null);
-  if (staff && String(staff.supplier_code || '').toUpperCase() === req.supplier.code)
+  if (staff && String(staff.supplier_code || '').toUpperCase() === req.supplier.code) {
+    // N36: ook hier uit het team, dus ook een half geclaimde tweede code van dit lid
+    try { await Promise.resolve(uitnodiging.trekInVoorStaff(req.supplier.code, staff, req.actor.name)); }
+    catch (e) { console.error('[staff-invite] veilige verwerking mislukt'); return res.status(503).json({ error: 'De uitnodiging kon niet veilig worden ingetrokken.' }); }
     accounts.deactivateStaff(staff.id);
+  }
   logActivity(req.supplier.code, req.actor, req.actor.name + ' trok een uitnodiging in');
   res.json({ ok: true });
 });

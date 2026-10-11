@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2447 |
 | losse beweringen (`test(...)`) | 16756 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2271 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2273 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 2 |
+| niets van beide | 0 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -995,7 +995,7 @@ toets omvalt.
 | `livinglab-uitleen.test.js` | 8 | gezakt op `liegpoort /api/` | APPARATUUR BUITEN HET LAB -- uitlenen met een keten die niemand herschrijft. Wat deze toets vastlegt: 1. |
 | `livinglab-vraagbesluit.test.js` | 7 | gezakt op `liegpoort /api/` | HET BESLUIT OVER EEN BUURTVRAAG -- ook "nee" is een antwoord. Wat deze toets vastlegt: 1. |
 | `livinglab.test.js` | 20 | gezakt op `liegpoort /api/` | Het RTF Living Lab: de onderzoekscyclus met haar poorten, de ethieklaag, de bewijsmotor, de scheiding van onderzoeksdata, de apparatuurpoort en de pijplijn naar echte verandering. Draai los: node --test... |
-| `logboekzicht-eigen.test.js` | 6 | -- | KLOKGRENS, DERDE RONDE: "de medewerker zelf" op id, en de kanalen die de tweede tegenlezing van PR #584 vond. Eigenaarsbesluiten van 11 oktober 2026: klok-, inlog- en plekIn-tijden ziet alleen de manager en de... |
+| `logboekzicht-eigen.test.js` | 6 | gezakt op `liegpoort /api/` | KLOKGRENS, DERDE RONDE: "de medewerker zelf" op id, en de kanalen die de tweede tegenlezing van PR #584 vond. Eigenaarsbesluiten van 11 oktober 2026: klok-, inlog- en plekIn-tijden ziet alleen de manager en de... |
 | `loghygiene.test.js` | 6 | gezakt op `&&->||#0` | LOGHYGIENE -- lekt er een naam, e-mailadres of token via de logs? Een systeem kan zijn database keurig versleutelen en toch alle identiteiten weggeven, omdat ze in platte tekst in de logs staan. |
 | `logstroom.test.js` | 4 | gezakt op `<=-><#0` | DE LOGSTROOM (techniekcontrole LOG-01, server/techniek.js). Node kiest zijn stdout-stroom op wat eraan hangt, en dat bepaalt of de log de server ophoudt: een PIJP (systemd, docker, `\| logger`) -> Socket, schrijft... |
 | `lokaal-eerst.test.js` | 8 | gezakt op `return-weg#0` | Bewijst de grens tussen lokaal taalwerk en generatief werk. Een beschikbare provider mag niet vanzelf worden aangeroepen voor taken die de code zelf controleerbaar kan uitvoeren. |
@@ -1385,7 +1385,7 @@ toets omvalt.
 | `persistentiestand.test.js` | 3 | geen module gevonden | DE PERSISTENTIESTAND (server/db/persistentieStand) -- het enige getal waarmee een aanroeper kan vaststellen dat zijn schrijfactie de SCHIJF heeft gehaald. WAAROM DIT ER LOS STAAT, en waarom de geldroute hem nog NIET... |
 | `personeelsuitnodiging-montage.test.js` | 2 | gezakt op `!==->===#0` | De personeelsuitnodiging (workos.personeelsuitnodiging) belooft een atomaire claim, en die bestaat alleen in een collectietransactie. Werving en supplier maakten elk een eigen instantie met alleen `kern`, en kern... |
 | `personeelsuitnodiging.pg.test.js` | 1 | slaat zichzelf over | Echte productie-topologieproef voor workos.personeelsuitnodiging: twee onafhankelijke kerninstances delen dezelfde PostgreSQL en racen om dezelfde eenmalige personeelscode. Precies EEN lid krijgt een personeelsplek,... |
-| `personeelzicht.test.js` | 4 | -- | PERSONEELSZICHT: de keukenlijn, ziekmeldingen, de online-stip en sollicitaties -- eigenaarsbesluiten A1, B1 en C1 (11 oktober 2026, PR #584). Een regel, een plek (server/kern/leverancier/personeelzicht.js, met de... |
+| `personeelzicht.test.js` | 4 | gezakt op `liegpoort /api/` | PERSONEELSZICHT: de keukenlijn, ziekmeldingen, de online-stip en sollicitaties -- eigenaarsbesluiten A1, B1 en C1 (11 oktober 2026, PR #584). Een regel, een plek (server/kern/leverancier/personeelzicht.js, met de... |
 | `persoonseis.test.js` | 10 | gezakt op `===->!==#0` | DE PERSOONSEIS: DE ZAAK WERD GECONTROLEERD, DE MENS NIET. WAAROM DIT BESTAAT Acht genres hielden de ZAAK tegen tot een medewerker een vergunning had gezien (kern/aanmeldingen/bewijs.js). |
 | `persoonsroutes.test.js` | 5 | gezakt op `!==->===#0` | De persoonsroutes: deuren die een medewerker vragen en niet een bedrijf. |
 | `pestgrens.test.js` | 4 | gezakt op `===->!==#0` | De pestgrens van Rahul: drie waarschuwingen bij pesten, daarna een vurig slotantwoord (waarin hij zegt dat hij hier zelf geen behoefte aan had) en 24 uur weg; na die 24 uur opent alleen een oprecht excuus de deur, en... |

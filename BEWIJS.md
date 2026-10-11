@@ -15,10 +15,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2441 |
 | losse beweringen (`test(...)`) | 16716 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2267 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
-| alleen in de kop *genoemd*, nog niet gemeten | 1 |
+| alleen in de kop *genoemd*, nog niet gemeten | 0 |
 | niets van beide | 0 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -69,7 +69,7 @@ toets omvalt.
 | `adamproef.test.js` | 10 | gezakt op `===->!==#0` | DE ADAMPROEF -- de vierde keten, en de strengste eis aan een bevinding. scripts/adamproef.js legt een keten af rond een zeventienjarige zonder RTG-account: van een doel naar een mogelijkheid die hij zelf ziet. |
 | `adaptief.test.js` | 13 | gezakt op `!==->===#0` | DE ADAPTIEVE LAAG, machinaal gehandhaafd. De regels staan in ADAPTIEF.md. |
 | `adaptiefdelen.test.js` | 3 | geen bronmutatie mogelijk | HET REGISTER IN DELEN: elk scherm dat register.js laadt, laadt ook wat het register nodig heeft, en in de goede volgorde. shared/adaptief/register.js stond op 33 bytes van de grens van 10 KB (scripts/ check.js regel 13). |
-| `adaptiefdoe.test.js` | 5 | genoemd | RTGAdaptief.doe() DWINGT HET GEWICHT AF -- EDGE.md ronde 3. Tot hier keek doe() alleen of een handeling VERHINDERD was, niet wat hij WOOG (EDGE.md par. |
+| `adaptiefdoe.test.js` | 5 | gezakt op `!==->===#0` | RTGAdaptief.doe() DWINGT HET GEWICHT AF -- EDGE.md ronde 3. Tot hier keek doe() alleen of een handeling VERHINDERD was, niet wat hij WOOG (EDGE.md par. |
 | `administratie.test.js` | 3 | gezakt op `liegpoort /api/` | DE ADMINISTRATIE -- boekhouding, belasting, en de AI in de keuken. WAAROM DIT ER IS Dit zijn de schermen waar niemand naar kijkt tot het misgaat, en dan gaat het meteen over geld of over iemands gezondheid. |
 | `adresopzoek.test.js` | 19 | gezakt op `liegpoort /api/` | DE ADRESOPZOEKER -- postcode en huisnummer erin, de rest eruit. WAT HIER BEWEZEN WORDT, EN WAAROM JUIST DAT 1. |
 | `adressen.test.js` | 4 | al rood | DE ADRESRATEL (scripts/adressen.js). Vijf documenten wezen naar een risicomotor onder kern/command/ die per geval hand/assist/auto uitrekent. |

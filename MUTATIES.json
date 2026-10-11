@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-06T16:44:21.467Z",
-    "commit": "c69fddd70",
+    "op": "2026-10-11T18:33:44.108Z",
+    "commit": "b0d238ce",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v26.10.0"
+    "node": "v22.22.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -269,6 +269,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "leest scripttags in HTML en geen module; de operatoren raken geen scripttag. Met de hand nagetrokken: vorm.js weg op reizen-veilig (zakt, en appmenu.e2e.js op de context van reizen-veilig), vorm.js na register.js op app (zakt), de objectpoort na rtg-schil.js in werkruimte (zakt, en werkruimte-objecten.e2e.js)"
+    },
+    "adaptiefdoe.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/adaptief/grammatica.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 4
     },
     "administratie.test.js": {
       "soort": "server",

@@ -61,13 +61,27 @@ test('1. van het personeelsdomein gebruikt de horecakant alleen klokVan, en alle
     'eigenaarsbesluit 1A staat alleen klokVan toe, en alleen voor de dragerstand op de Vloer');
 });
 
-test('2. de afleiding leest uit klokVan alleen open en laatsteUit', () => {
-  const t = code(lees('server/kern/horeca/wijk-leen.js'));
-  const lijf = (t.match(/function drager\(l, klok\) \{([\s\S]*?)\n  \}/) || [])[1];
-  assert.ok(lijf, 'drager(l, klok) staat niet meer in kern/horeca/wijk-leen.js');
-  const velden = [...new Set([...lijf.matchAll(/\bklok\.([A-Za-z_]+)/g)].map((m) => m[1]))].sort();
-  assert.deepEqual(velden, ['laatsteUit', 'open'],
-    'de dragerstand leest meer uit de prikklok dan het besluit toestaat: ' + velden.join(', '));
+test('2. de afleiding leest uit klokVan alleen open en laatsteUit, en geeft de juiste stand', () => {
+  /* Op de LOOPTIJD gemeten en niet op de bron: een Proxy over het echte antwoord
+     van klokVan legt vast welke velden de afleiding werkelijk aanraakt. Naast
+     elke lezing staat de stand die eruit hoort te komen, zodat een afleiding die
+     minder leest maar verkeerd beslist hier ook zakt. */
+  const leen = require('../server/kern/horeca/wijk-leen')({ horeca: { nu: () => new Date().toISOString() }, schoon: (t) => String(t) });
+  const boek = [];
+  const { klokVan } = require('../server/kern/personeel').maakPersoneel({ db: { data: { klok: { Z: boek }, trustLine: [] } }, accounts: {}, afwezigOp: () => null });
+  const gelezen = new Set();
+  const bespied = (o) => new Proxy(o, { get(d, k) { if (typeof k === 'string') gelezen.add(k); return d[k]; } });
+  const l = { staffId: '7', naam: 'Bram', at: '2026-10-11T20:00:00.000Z' };
+  const geval = (regels, verwacht) => {
+    boek.length = 0; boek.push(...regels);
+    assert.equal(leen.drager(l, bespied(klokVan('Z', '7'))).stand, verwacht, JSON.stringify(regels));
+  };
+  geval([{ staffId: 7, in: '2026-10-11T18:00:00.000Z', out: null }], 'ingeklokt');
+  geval([{ staffId: 7, in: '2026-10-11T18:00:00.000Z', out: '2026-10-11T23:00:00.000Z' }], 'uitgeklokt');
+  geval([{ staffId: 7, in: '2026-10-11T17:00:00.000Z', out: '2026-10-11T19:00:00.000Z' }], 'niet-gemeten');
+  geval([], 'niet-gemeten');
+  assert.deepEqual([...gelezen].sort(), ['laatsteUit', 'open'],
+    'de dragerstand leest meer uit de prikklok dan besluit 1A toestaat: ' + [...gelezen].join(', '));
 });
 
 test('3. binnen het hele supplierdomein leest alleen de wijkroute klokVan', () => {

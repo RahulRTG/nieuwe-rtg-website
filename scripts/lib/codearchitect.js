@@ -368,14 +368,14 @@ function poorten() {
   try {
     return require('../ci-lokaal').plan().map((g) => ({ naam: g.naam, job: g.gat.jobnaam, stap: g.gat.stap,
       schrijftReden: /evidence(?:\.js)? plan|evidence:plan/.test(g.gat.opdracht || '') }));
-  } catch (e) { return null; }
+  } catch (e) { return { reden: 'de keten is niet af te leiden (scripts/ci-lokaal.js): ' + e.message }; }
 }
 
 function waarom(lezer, onderwerp) {
   const plan = lezer.laad(PLAN);
   const wat = String(onderwerp || '').trim();
   const lijst = poorten();
-  const uit = { onderwerp: wat || 'poorten', poorten: lijst === null ? { reden: 'de keten is niet af te leiden (scripts/ci-lokaal.js)' } : lijst };
+  const uit = { onderwerp: wat || 'poorten', poorten: lijst };
   if (!wat || wat === 'poorten') return uit;
   if (plan.ontbreekt) {
     return { ...uit, gevonden: false, regels: [regel(lezer, { veld: 'afgegane regels', waarde: null, register: PLAN, pad: 'redenen.regels' })] };
@@ -388,7 +388,7 @@ function waarom(lezer, onderwerp) {
     (r.gemeten && (r.gemeten.code === wat || r.gemeten.pad === wat));
   const gekozen = red.regels.filter(past);
   if (!gekozen.length) {
-    const bekend = lijst && lijst.find((g) => g.naam === wat || g.stap === wat);
+    const bekend = Array.isArray(lijst) && lijst.find((g) => g.naam === wat || g.stap === wat);
     return { ...uit, gevonden: false, reden: bekend
       ? 'deze poort schrijft nog geen reden uit; alleen de bewijsroute doet dat (ARCHITECTOPDRACHT.md fase 6)'
       : 'geen afgegane regel, besluit, wet of pad met deze naam in ' + PLAN };

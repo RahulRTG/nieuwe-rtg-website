@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-06T22:06:04.788Z",
-  "commit": "ca4686b8",
+  "op": "2026-10-11T06:07:51.698Z",
+  "commit": "64a4f4c51",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -14,8 +14,6 @@
     "scripts/lib/bewakers.js",
     "scripts/lib/bron.js",
     "scripts/lib/eigenpoort.js",
-    "scripts/lib/invoerspoor-preload.js",
-    "scripts/lib/invoerspoor.js",
     "scripts/lib/publiek.js",
     "scripts/lib/routes.js",
     "scripts/routebron.js",
@@ -62,6 +60,7 @@
     "server/bedrijf/aansluiting.js",
     "server/bedrijf/beeld-consolidatie.js",
     "server/bedrijf/beeld.js",
+    "server/bedrijf/besluit-loop.js",
     "server/bedrijf/besluit.js",
     "server/bedrijf/besluitlijst.js",
     "server/bedrijf/bouw.js",
@@ -93,6 +92,7 @@
     "server/bedrijf/loop-context.js",
     "server/bedrijf/loop-source-change.js",
     "server/bedrijf/loop-source-lifecycle.js",
+    "server/bedrijf/loop-source-model.js",
     "server/bedrijf/loop-source-transport.js",
     "server/bedrijf/loop-source.js",
     "server/bedrijf/mijn.js",
@@ -1569,6 +1569,7 @@
     "server/kern/library/model.js",
     "server/kern/library/policy.js",
     "server/kern/library/publication.js",
+    "server/kern/library/reader-state.js",
     "server/kern/library/reader.js",
     "server/kern/library/rights.js",
     "server/kern/library/studio.js",
@@ -2464,6 +2465,7 @@
     "server/kern/service/klok.js",
     "server/kern/service/kwaliteit.js",
     "server/kern/service/loop-source-delivery.js",
+    "server/kern/service/loop-source-model.js",
     "server/kern/service/loop-source.js",
     "server/kern/service/loop.js",
     "server/kern/service/machtiging-grenzen.js",
@@ -3443,6 +3445,7 @@
     "server/opzet/theater.js",
     "server/opzet/trust-bewijs.js",
     "server/opzet/veiligadres.js",
+    "server/opzet/verzoekframe-winkel.js",
     "server/opzet/verzoekframe.js",
     "server/opzet/verzoekketen.js",
     "server/opzet/webhook-payout.js",
@@ -4003,6 +4006,7 @@
     "server/routes/supplier/paspoort.js",
     "server/routes/supplier/pda.js",
     "server/routes/supplier/pda/netwerk.js",
+    "server/routes/supplier/pda/posities-inlog.js",
     "server/routes/supplier/pda/posities.js",
     "server/routes/supplier/pda/vloer-missies.js",
     "server/routes/supplier/pda/vloer.js",
@@ -5497,9 +5501,9 @@
   "routerRoutesMetBestand": 5449,
   "bronRoutesMetBestand": 4441,
   "beideKennen": 4121,
-  "gelijk": 4083,
-  "verschillend": 38,
-  "waarvanVerouderd": 38,
+  "gelijk": 4082,
+  "verschillend": 39,
+  "waarvanVerouderd": 39,
   "waarvanTegenspraak": 0,
   "waarvanNietVastTeStellen": 0,
   "alleenRouter": 1328,
@@ -5945,6 +5949,19 @@
    "gewijzigdNaStempel": {
     "server/routes/supplier/horeca/rekeninglezen.js": true,
     "server/routes/supplier/horeca/rekening.js": true
+   },
+   "soort": "verouderd",
+   "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
+  },
+  {
+   "route": "POST /api/supplier/mijn/login",
+   "volgensRouter": "server/routes/supplier/pda/posities-inlog.js",
+   "volgensBron": "server/routes/supplier/pda/posities.js",
+   "routerRegel": 86,
+   "samengesteldPad": false,
+   "gewijzigdNaStempel": {
+    "server/routes/supplier/pda/posities-inlog.js": true,
+    "server/routes/supplier/pda/posities.js": true
    },
    "soort": "verouderd",
    "reden": "een van de bestanden is gewijzigd na het stempel van SCHRIJFANALYSE.json (4075884d); dit vergelijkt twee momenten"
@@ -12471,7 +12488,7 @@
   {
    "route": "POST /api/bedrijf/besluit/advies",
    "bestand": "server/bedrijf/besluit.js",
-   "regel": 75,
+   "regel": 59,
    "samengesteld": false
   },
   {
@@ -12489,7 +12506,7 @@
   {
    "route": "POST /api/bedrijf/besluit/maak",
    "bestand": "server/bedrijf/besluit.js",
-   "regel": 43,
+   "regel": 35,
    "samengesteld": false
   },
   {
@@ -12507,19 +12524,19 @@
   {
    "route": "POST /api/bedrijf/besluit/sluit",
    "bestand": "server/bedrijf/besluit.js",
-   "regel": 122,
+   "regel": 106,
    "samengesteld": false
   },
   {
    "route": "POST /api/bedrijf/besluit/stem",
    "bestand": "server/bedrijf/besluit.js",
-   "regel": 104,
+   "regel": 88,
    "samengesteld": false
   },
   {
    "route": "POST /api/bedrijf/besluit/stemronde",
    "bestand": "server/bedrijf/besluit.js",
-   "regel": 89,
+   "regel": 73,
    "samengesteld": false
   },
   {
@@ -38996,14 +39013,14 @@
   },
   {
    "route": "POST /api/supplier/mijn/login",
-   "bestand": "server/routes/supplier/pda/posities.js",
-   "regel": 106,
+   "bestand": "server/routes/supplier/pda/posities-inlog.js",
+   "regel": 86,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/mijn/opties",
    "bestand": "server/routes/supplier/pda/posities.js",
-   "regel": 135,
+   "regel": 113,
    "samengesteld": false
   },
   {
@@ -39015,7 +39032,7 @@
   {
    "route": "POST /api/supplier/mijn/wissel",
    "bestand": "server/routes/supplier/pda/posities.js",
-   "regel": 141,
+   "regel": 119,
    "samengesteld": false
   },
   {

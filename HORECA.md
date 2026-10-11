@@ -924,7 +924,16 @@ ziet per geleende tafel of de drager er nog is, in drie standen (`ingeklokt`,
 klok-tijdstip ziet alleen een manager, en de server stuurt het een ander niet
 mee -- één regel voor in- én uitklokken (eigenaarsbesluit 11 oktober 2026): een
 collega ziet de stand, aanwezig of niet, en het tijdstip wordt aan de bron
-weggelaten, ook bij het team in `/api/supplier/horeca/missions`. Hij telt
+weggelaten, ook bij het team in `/api/supplier/horeca/missions`. Dezelfde
+bestaande grens geldt voor het zaaklogboek en de klokregels zelf: wie aanwezig is
+mag iedereen zien, in- en uitkloktijden en klokregels van collega's alleen een
+manager. Waar dat wordt beslist staat op één plek,
+`server/kern/leverancier/logboekzicht.js` -- `/api/supplier/state` (logboek en
+klokregels van vandaag), de logboekroute, het beveiligingsrooster, de Vloer en de
+vloeropdrachten gaan er alle vijf langs. Klokschrijvers markeren hun regel met een
+soort uit een gesloten lijst (oudere regels worden herkend aan hun vaste tekst),
+en er wordt gefilterd vóór het afkappen op 40, zodat aantal en volgorde niets
+verraden (`test/supplier-logboekzicht.test.js`). Hij telt
 hoeveel TAFELS er nog bij iemand staan die al uitklokte. Dat leest de prikklok
 van het personeelsdomein via `klokVan` (`kern/personeel.js`) en verder niets: het
 besluit staat in NORM.json (`kernGedeeld` 254 -> 255) met wie levert, wie leest

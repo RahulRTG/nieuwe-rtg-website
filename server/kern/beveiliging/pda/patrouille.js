@@ -68,7 +68,7 @@ module.exports = (ctx) => {
     const plek = plekBijPost(s, d);
     if (plek) d.plekIn = plek;
     save();
-    logActivity(s.code, { name: d.guardNaam || 'Bewaker' }, 'klokte in op ' + ((postVan(s, d.postId) || {}).naam || 'post'));
+    logActivity(s.code, { name: d.guardNaam || 'Bewaker' }, 'klokte in op ' + ((postVan(s, d.postId) || {}).naam || 'post'), 'klok-in');
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });
     return { status: 200, ok: true, dienst: dienstPubliek(s, d) };
   }

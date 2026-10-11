@@ -21,6 +21,7 @@
 
 const envelop = require('./envelop');
 const kostenhaak = require('../kern/kosten/haak');
+const logboekzicht = require('../kern/leverancier/logboekzicht');
 
 module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
   grootSupplierSync, busGeef, kernGeef, markeerHospitalityRequest }) => {
@@ -99,18 +100,22 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
   const persoonsPoort = require('./persoonspoort')({ kern, DEMO });
 
   // Legt vast wie wat deed binnen het bedrijf; live zichtbaar in de team-tab.
-  function noteerActiviteit(code, actor, text, bewaar) {
+  // `soort` markeert een klokregel; wie hem mag ontvangen beslist ../kern/leverancier/logboekzicht.js
+  function noteerActiviteit(code, actor, text, bewaar, soort) {
+    if (soort != null && !logboekzicht.isKlokSoort(soort)) throw new Error('Onbekende logboeksoort: ' + soort);
     const list = db.data.supplierActivity[code] = (db.data.supplierActivity[code] || []);
-    list.unshift({ who: actor ? actor.name : 'Beheer', text, at: new Date().toISOString() });
+    const regel = { who: actor ? actor.name : 'Beheer', text, at: new Date().toISOString() };
+    if (soort != null) regel.soort = soort;
+    list.unshift(regel);
     db.data.supplierActivity[code] = list.slice(0, 80);
     bewaar();
     sseToSupplier(code, 'sync', { scope: 'team' });
   }
-  const logActivity = (code, actor, text) => noteerActiviteit(code, actor, text, save);
+  const logActivity = (code, actor, text, soort) => noteerActiviteit(code, actor, text, save, soort);
   // Alleen voor een caller die zijn andere mutaties al zelf heeft bewaard.
   // Gewone activiteit bewaart ook de bestaande impliciete domeinmutaties mee.
-  logActivity.alleenActiviteit = (code, actor, text) => noteerActiviteit(code, actor, text,
-    () => typeof save.sleutels === 'function' ? save.sleutels(['supplierActivity']) : save());
+  logActivity.alleenActiviteit = (code, actor, text, soort) => noteerActiviteit(code, actor, text,
+    () => typeof save.sleutels === 'function' ? save.sleutels(['supplierActivity']) : save(), soort);
 
   return { sseToSupplier, sseToOffice, notifySupplier, supplierIndex,
     findSupplier, supplierAuth, persoonsPoort, logActivity };

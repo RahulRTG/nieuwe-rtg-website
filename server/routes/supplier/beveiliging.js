@@ -3,6 +3,7 @@
    posten en handelt inzetaanvragen en incidenten af. De bewaker gebruikt de PDA
    (op staffId): eigen diensten, inklokken op post, patrouillerondes, incidenten
    melden en de SOS-noodknop. Draait op kern/beveiliging. */
+const logboekzicht = require('../../kern/leverancier/logboekzicht');
 module.exports = (kern) => {
   const { app, express, supplierAuth, managerOnly, bevIsBeveiliging, bevCommand, bevZetFunctie,
           bevZetPost, bevVerwijderPost, bevBudget, bevZetBudget, bevRooster, bevZetDienst,
@@ -58,7 +59,12 @@ module.exports = (kern) => {
   /* ---- rooster ---- */
   app.post('/api/supplier/beveiliging/rooster', supplierAuth, (req, res) => {
     if (!eisBeveiliging(req, res)) return;
-    res.json(bevRooster(req.supplier, req.body && req.body.van, req.body && req.body.dagen));
+    const r = bevRooster(req.supplier, req.body && req.body.van, req.body && req.body.dagen);
+    /* Het rooster ziet iedereen; de in- en uitkloktijden van een collega alleen
+       een manager (kern/leverancier/logboekzicht.js, besluit 11 oktober 2026). */
+    for (const dag of (r && r.dagen) || []) for (const p of dag.posten || []) for (const sh of p.shifts || [])
+      sh.bezet = (sh.bezet || []).map((d) => logboekzicht.kloktijdenVoor(d, req.actor, d.guardId, ['inklokAt', 'uitklokAt']));
+    res.json(r);
   });
   app.post('/api/supplier/beveiliging/dienst', supplierAuth, (req, res) => {
     if (!eisBeveiliging(req, res) || !managerOnly(req, res)) return;

@@ -3,6 +3,7 @@
    Verbatim afgesplitst uit routes/supplier.js; alleen de routes, de helpers
    komen via het kern-object binnen. */
 const { coord } = require('../../kern/util');
+const logboekzicht = require('../../kern/leverancier/logboekzicht');
 module.exports = (kern) => {
   const { TABLE_STATUSES, accounts, app, broadcastSync, crypto, db, logActivity, managerOnly,
           notifySupplier, payrollOS, save, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth } = kern;
@@ -138,7 +139,9 @@ app.post('/api/supplier/activity', supplierAuth, (req, res) => {
      duidelijk: de aanroeper wil zoveel mogelijk. */
   const gevraagd = Number(req.body && req.body.aantal);
   const n = Number.isFinite(gevraagd) && gevraagd >= 1 ? Math.min(gevraagd, 80) : 40;
-  res.json({ ok: true, activity: lijst.slice(0, n), totaal: lijst.length });
+  // managerOnly hierboven laat alles door; toch dezelfde bron als /state, zodat er een regel is
+  const zicht = logboekzicht.logboekVoor(lijst, req.actor, n);
+  res.json({ ok: true, activity: zicht.regels, totaal: zicht.totaal });
 });
 
 };

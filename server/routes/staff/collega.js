@@ -41,7 +41,7 @@ app.post('/api/staff/klok/correctie', supplierAuth, (req, res) => {
   lijst.unshift({ id: crypto.randomBytes(4).toString('hex'), staffId, name: wie.name, in: inAt.toISOString(), out: uitAt.toISOString(), correctie: req.actor.name });
   db.data.klok[req.supplier.code] = lijst.slice(0, 4000);
   save();
-  logActivity(req.supplier.code, req.actor, 'boekte een klokcorrectie voor ' + wie.name);
+  logActivity(req.supplier.code, req.actor, 'boekte een klokcorrectie voor ' + wie.name, 'klok-correctie');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' });
   res.json({ ok: true, ...klokVan(req.supplier.code, staffId) });
 });

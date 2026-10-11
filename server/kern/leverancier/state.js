@@ -1,6 +1,7 @@
 /* De volledige zaak-status voor de leverancier-app. */
 const GS = require('../geschikt');
 const ConnectionPartner = require('../connection-partner');
+const logboekzicht = require('./logboekzicht');
 module.exports = (ctx) => {
   const { db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer, logActivity,
     findSupplier, connectedSupplierCodes, guestsFor, gidsHaal, etaMinutes, haversine, accounts, werkgeverSollicitatie,
@@ -10,6 +11,7 @@ module.exports = (ctx) => {
   const { modulesVoor: pdaModules } = require('../pda/modules');
   const talentMatches = require('./talent')(db);
   function supplierState(s, actor) {
+    const kijker = actor || { name: 'Beheer', role: 'manager', manager: true };
     const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
     const vandaag = new Date().toISOString().slice(0, 10);
     const ORDER_KLAAR = { 'geserveerd': 1, 'geweigerd': 1, 'terugbetaald': 1, 'bezorgd': 1, 'opgehaald': 1 };
@@ -124,10 +126,8 @@ module.exports = (ctx) => {
          hoort bij de arbodienst; hier gaat alleen mee DAT hij er niet is. */
       verlof: (db.data.verlof[s.code] || []).slice(0, 30).map(v =>
         v.soort === 'ziek' && v.reden ? Object.assign({}, v, { reden: '' }) : v),
-      klok: (() => {
-        const entries = (db.data.klok[s.code] || []).filter(e => e.in.slice(0, 10) === vandaag).slice(0, 60);
-        return { vandaag: entries, binnen: [...new Set(entries.filter(e => !e.out).map(e => e.name))] };
-      })(),
+      // klok + activity: wat deze actor mag ontvangen (./logboekzicht.js)
+      ...logboekzicht.staatDelen(db.data, s.code, kijker, vandaag),
       guests: guestsFor(s.code).slice(0, 30),
       prices: db.data.supplierPrices.filter(p => p.supplierCode === s.code).slice(0, 20),
       notifications: db.data.supplierNotifications[s.code] || [],
@@ -145,9 +145,8 @@ module.exports = (ctx) => {
         if (s.dailyMeps[morgen]) out[morgen] = s.dailyMeps[morgen];
         return out;
       })(),
-      activity: (db.data.supplierActivity[s.code] || []).slice(0, 40),
       team: (db.data.supplierTeam[s.code] || []).slice(-60),
-      actor: actor || { name: 'Beheer', role: 'manager', manager: true }
+      actor: kijker
     };
   }
 

@@ -15983,6 +15983,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "toetsroutes.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/toetsroutes.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "token-domeinscheiding.test.js": {
       "soort": "server",
       "staat": "gezakt",

@@ -156,6 +156,12 @@ const BUITEN = {
   'GEZAGSNOEMER.json': 'een afdruk uit de code, met een eigen toets (test/gezagsnoemer.test.js)',
   'HERSTEL.json': 'een afdruk uit de code op grond van NAMEN; de echte meting staat in HERSTELPROEF.json, en die valt wel onder versheid',
   'TOETSDUUR.json': 'schrijft bij elke testronde mee, net als SUITEDUUR hierboven; geen eigen ronde die kan verouderen',
+  /* Een waarneming van een ronde op een commit, geen meting van de boom. De
+     stempelregel van scripts/versheid.js (register ouder dan zijn bron) is hier
+     te zwak: dit register is al mogelijk-verouderd zodra een toets, servercode,
+     scherm of pakket na de ronde verandert. Die strengere regel staat in
+     versheid() van scripts/toetsroutes.js (ARCHITECTOPDRACHT.md fase 3). */
+  'TOETSROUTES.json': 'een waarneming per ronde met een eigen, strengere versheidsregel: versheid() in scripts/toetsroutes.js, bewaakt door test/toetsroutes.test.js',
   /* DE VIER VAN DEZE TAK. Alle vier zijn ze een AFDRUK UIT DE CODE en geen
      meting van gedrag: ze zijn opnieuw te maken uit de bron, en of ze
      achterlopen zegt hun eigen toets al -- die byte voor byte hercompileert.

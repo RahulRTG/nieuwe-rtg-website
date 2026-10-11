@@ -72,7 +72,7 @@ const LADDER = [
     patronen: [/check\.js$/, /ast-scan\.js$/, /document-fitness\.js$/, /geheimen\.js$/, /ci-keten\.js$/, /releaseketenwacht\.js$/, /ci-lokaal\.js$/,
       /deltapoort\.js$/, /normverval\.js$/, /wetten\.js$/, /getallen\.js$/, /samenhang\.js$/, /keuring\.js$/, /codeql-verdict\.js$/, /^git diff$/] },
   { id: 'geraakt', naam: 'Wat kan deze wijziging raken', wat: 'de affected-graaf: welk bewijs moet opnieuw',
-    patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /verstrengeling\.js$/, /activering\.js$/,
+    patronen: [/impactbereik\.js$/, /veranderbereik\.js$/, /attributie\.js$/, /toetsroutes\.js$/, /verstrengeling\.js$/, /activering\.js$/,
       /* De Evidence Engine is dezelfde sport op bewijsniveau: basisbewijs
          vinden, impact classificeren, geselecteerd herbewijzen en fail-closed
          het eindoordeel vellen. Eén familiepatroon voorkomt een nieuwe restbak

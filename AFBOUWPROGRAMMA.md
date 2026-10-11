@@ -291,6 +291,66 @@ relevante ernstige kwetsbaarheden, met een vastgelegde uitzonderingsprocedure,
 reproduceerbare uitslagen en een controle op verouderde kwetsbaarheidsinformatie.
 Faalt de scanner, dan faalt de poort: hij wordt nooit stil overgeslagen.
 
+## 3e. Open besluiten, portie 3 (11 oktober 2026)
+
+**21 — Bewijs-efficiëntie (A48; VERANDERING.md correcties A en D). Nee, voorlopig.**
+Geen nieuwe bewijscache, bewijsmotor, bewijsbudget of efficiëntieratio. De
+bestaande incrementele CI-route blijft. Herbeoordeling zodra er genoeg volledig
+bewezen routes zijn om betrouwbaarheid en werkelijke kosten te meten.
+
+**22 — Economie (A15; KOSTEN.md, PRIJZEN.md).** Bandbreedtes pas nadat de
+trefzekerheid over drie afgesloten maanden is bewezen. Prijsintelligentie mag
+adviseren en nooit zelfstandig prijzen wijzigen. Geen individuele
+prijsdiscriminatie op betalingsbereidheid. Geen nieuwe economische identiteiten
+zonder aantoonbare noodzaak. De belofte van transparante nettoprijzen blijft.
+
+**23 — Product en contract (A26; par. 3c besluit 4, MAATSTAF.md par. 7e).** Elk
+onderdeel in `MAPPEN` is één productmeeteenheid voor APPWERKT. Contracten blijven
+domeinspecifiek; geen universeel productcontract. Productmeeteenheid,
+onderliggende functionaliteit en juridische contractverplichting blijven
+onderscheiden.
+
+**24 — Terugval van de relay-boom (A43; STAGE.md).** Eerst gebouwd en getest,
+inclusief capaciteit, uitval, herstel en de gevolgen voor bestaande kijkers. Tot
+dan blijft de verkoop van uitzendingstickets geblokkeerd.
+
+**25 — Keuring van partnerproducten (A46; APPSTORE.md, de machinepoort keurt nooit
+zelf goed).** Een automatische voorkeuring en daarna verplichte menselijke
+goedkeuring door RTG. Partners publiceren niets ongekeurd. Elke goedkeuring,
+afwijzing en wijziging laat een controleerbaar spoor na; een materiële wijziging
+vraagt een nieuwe keuring.
+
+**26 — Interne talentmarkt (A2; ARBEID.md par. 4).** Beperkt tot de eigen
+juridische entiteit. Een kandidaatstelling is alleen zichtbaar voor bevoegde
+betrokkenen bij de werving; de huidige leidinggevende krijgt niet vanzelf toegang.
+Eerst worden de bestaande privacyproblemen uit ARBEID.md hersteld.
+
+**27 — Parallelle migraties (A9; het patroon van het schaduwgrootboek).** De
+bestaande bron blijft leidend totdat de nieuwe bron per soort aantoonbaar dezelfde
+correcte resultaten levert. Omschakelen alleen na een afzonderlijk besluit per
+soort, met bewijs en een veilige terugval.
+
+**28 — Overdracht naar een ander apparaat (A16; LINK.md).** Uitsluitend via een
+eenmalige, kortlevende RTG-code, veilig gekoppeld aan de bedoelde sessie en
+ontvanger, één keer bruikbaar en daarna of na verloop ongeldig. De server bewaart
+geen inhoudelijke voortzetting; tijdelijke technische gegevens alleen voor zover
+nodig om de code veilig te valideren en misbruik te voorkomen.
+
+**29 — Kennisdeling tussen conciërges (A13; CONCIERGE.md CON-08).** Eerst tussen
+bevoegde RTG-conciërges, zonder gastgegevens, verrassingen of herleidbare
+persoonlijke informatie. Een netwerk met externe conciërges of zaken vraagt een
+afzonderlijk besluit met eigen bevoegdheids- en privacygrenzen.
+
+**30 — Verborgen dwangmodus (A22; HDI.md, heel of niet). Nee, voorlopig.** Eerst een
+dreigingsmodel door deskundigen op het gebied van huiselijk geweld en digitale
+veiligheid. Daarna pas het besluit of een werkelijk veilige implementatie mogelijk
+is. Geen gedeeltelijke implementatie die een onterecht gevoel van veiligheid geeft.
+
+**Volgorde (eigenaar, 11 oktober 2026).** 1. bestaande privacy- en
+autorisatieproblemen oplossen; 2. rode CI diagnosticeren en herstellen; 3. lopende
+PR's groen en conflictvrij; 4. menselijke merges voorbereiden; 5. daarna de
+goedgekeurde functionele afbouw hervatten. Geen nieuwe grote cloudsessies tot dan.
+
 ## 4. De vier werkstromen
 
 | werkstroom | wat | werkterrein |

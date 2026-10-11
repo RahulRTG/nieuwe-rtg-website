@@ -16,9 +16,7 @@ const mandaatLaag = require('../../stuur/mandaat');
 const gevolgLaag = require('../../stuur/gevolg');
 const { KLASSEN } = require('./klassen');
 const { gevolgpoort } = require('./gevolgpoort');
-const geldomkeer = require('../../commercie/geldomkeer');
-const risico = require('../../commercie/risicouitzondering');
-const { BELEID } = require('../../commercie/besluit');
+const { omkeerpoort } = require('./omkeerpoort');
 
 function maakKlaarzet({ voornemens, frictie, mandaatBron, tijd, leg, noteer, bewaar, publiek, onomkeerbaarGrendel }) {
   const weeg = require('./weging').maakWeging({ voornemens, tijd, leg, noteer, bewaar, publiek });
@@ -43,20 +41,9 @@ function maakKlaarzet({ voornemens, frictie, mandaatBron, tijd, leg, noteer, bew
     if (!o.assurance || o.assurance.ok !== true)
       return { status: 401, error: 'De zekerheid over wie dit doet is niet vastgesteld; bevestig deze handeling eerst.' };
 
-    /* BOVEN DE OMKEERBAARHEIDSGRENS EN NIET OMKEERBAAR: METEEN NEE, met de reden. Zonder
-       deze regel zette de baan het voornemen klaar, vroeg een tweede mens om met zijn
-       passkey te tekenen, en kwam de weigering pas daarna -- een ticket en een ceremonie
-       voor een uitkomst die vooraf vaststond. Het getal komt uit ./besluit.js en de
-       grendel uit ./risicouitzondering.js, zodat er geen tweede regel ontstaat: staat de
-       uitzonderingsprocedure open, dan gaat het wel door naar het besluit (dat dan de
-       risicogoedkeuring eist). */
-    const omkeer = geldomkeer.voor(o.handeling);
-    if (Number(o.totaalCenten) >= BELEID.omkeerbaarBovenCenten && !omkeer.omkeerbaar &&
-        !risico.stand(onomkeerbaarGrendel).open)
-      return { status: 403, onomkeerbaar: omkeer,
-        error: 'Vanaf ' + (BELEID.omkeerbaarBovenCenten / 100).toFixed(0) + ' euro gaat een geldhandeling alleen door als zij ' +
-          'terug te draaien is, en deze is dat niet: ' + omkeer.reden + ' ' + risico.stand(onomkeerbaarGrendel).reden +
-          ' Er is niets klaargezet en er beweegt geen geld.' };
+    /* Boven de omkeerbaarheidsgrens en niet omkeerbaar: meteen nee (./omkeerpoort.js). */
+    const { omkeer, nee } = omkeerpoort(o, onomkeerbaarGrendel);
+    if (nee) return nee;
 
     const env = envelopLaag.alsStart(envelopLaag.maak({
       kanaal: 'office', actor: mens.sleutel || null, classificatie: 'intern' }));

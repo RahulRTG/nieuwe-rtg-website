@@ -48,6 +48,10 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
     const ctx = Object.assign({}, o.context || {});
     delete ctx.risicogoedkeuring;
     if (v.risicogoedkeuring) ctx.risicogoedkeuring = v.risicogoedkeuring;
+    /* En `omkeerbaar` komt uit de TABEL (../geldomkeer.js) en nooit van de aanroeper:
+       een context met `omkeerbaar: true` opende anders de grens voor elke handeling,
+       ook voor een teruggave. Onbekend is dicht. */
+    ctx.omkeerbaar = require('../geldomkeer').voor(v.handeling).omkeerbaar === true;
     const b = beslis({ actor: v.actor, handeling: v.handeling, doel: v.doel,
       waardeCenten: v.totaalCenten, context: ctx });
     /* EEN LEEG ANTWOORD IS GEEN ANTWOORD, en dit is geen theoretisch geval.

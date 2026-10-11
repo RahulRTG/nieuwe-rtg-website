@@ -39,14 +39,14 @@ const RAILS = Object.freeze({
     wat: 'een boeking tussen twee posities in het grootboek van RTG Pay',
     mechanisme: 'tegenboeking binnen het huis', soort: 'compensatie',
     wie: 'RTG, maar alleen over geld op een EIGEN positie (rtg:*); geld op een lid- of partnerpositie is van die partij',
-    termijn: null, termijnReden: 'geen termijn in de code; wel moet het saldo er nog staan (boekAsync weigert anders)',
-    grond: 'server/kern/pay/boeking.js#pasToe: debet en credit in een keer, een nieuwe boeking in omgekeerde richting is de enige weg terug',
+    termijn: null, termijnReden: 'geen termijn in de code; wel moet het saldo er nog staan (kern/pay/boeking.js#boekAsync weigert anders)',
+    grond: 'server/kern/pay/boeking.js#pasToe: debet en credit in een keer; er is geen storno, alleen een nieuwe boeking in omgekeerde richting',
   }),
   'rtg-bank-intern': Object.freeze({
     wat: 'een boeking tussen twee rekeningen in RTG Bank',
     mechanisme: 'terugvordering bij de begunstigde', soort: 'compensatie',
-    wie: 'de begunstigde: het geld staat op zijn rekening (of buiten het huis als isExtern)',
-    termijn: null, termijnReden: 'er is geen storno- of terugboekfunctie in server/kern/bank/',
+    wie: 'de begunstigde: het geld staat op zijn rekening bij RTG Bank (kern/bank/incasso.js#zet eist rekMeta(naarIban))',
+    termijn: null, termijnReden: 'er is geen storno van een interne boeking in server/kern/bank/; de teruggang in kern/bank/uitgang.js gaat over een uitbetaling die de BANK terugstuurt',
     grond: 'server/kern/bank/incasso.js#ronde boekt van t.vanIban naar t.naarIban via boekAsync',
   }),
   'sepa-uit': Object.freeze({
@@ -54,7 +54,8 @@ const RAILS = Object.freeze({
     mechanisme: 'terugvordering via de bank (recall), met instemming van de begunstigde', soort: 'geen-herstel',
     wie: 'de begunstigde en zijn bank, niet RTG',
     termijn: null, termijnReden: 'de code kent geen recall; een verstuurde opdracht wordt alleen afgestemd (routes/kantoren/bank-afstemming.js)',
-    grond: 'server/betaal/uitbetaling.js#startUitbetaling: eenmaal verstuurd is er geen weg terug in de code',
+    grond: 'server/betaal/uitbetaling.js#startUitbetaling: RTG kan een verstuurde opdracht niet terughalen; een teruggang ' +
+      '(betaalopdracht/terugboeking.js) komt alleen als de BANK het geld terugstuurt, en dat start RTG niet zelf',
   }),
   'kaart-provider': Object.freeze({
     wat: 'een betaling via een kaart- of betaalprovider',
@@ -77,13 +78,20 @@ const RAILS = Object.freeze({
 const HANDELINGEN = Object.freeze({
   GELD_TERUGGEVEN: Object.freeze({
     wat: 'de teruggave van een betaalde reis', rail: 'rtg-pay-intern', naar: 'lid',
-    grond: 'server/kern/reisbureau-teruggave.js#uitvoeren: terugGave van rtg:reisbureau naar het betaaladres van het lid (rekLid)',
+    grond: 'server/kern/reisbureau-teruggave.js#uitvoeren -> kern/pay/verkoop.js#terugGave: van rtg:reisbureau naar het betaaladres van het lid (rekLid)',
   }),
   GELD_INNEN: Object.freeze({
     wat: 'de incassoronde: vaste betalingen van leden innen', rail: 'rtg-bank-intern', naar: 'klant',
-    grond: 'server/kern/bank/incasso.js#ronde: van de rekening van het lid naar de begunstigde van zijn vaste betaling',
+    grond: 'server/kern/bank/incasso.js#ronde: van de rekening van het lid naar de begunstigde van zijn vaste betaling; een ' +
+      'eigen positie van RTG kan geen begunstigde zijn (rekMeta in #zet, en kern/bank rekent rtg: tot extern)',
   }),
 });
+
+/* DE AFLEIDREGEL, los zodat zij ook in haar ja-tak te toetsen is: vandaag geeft geen
+   handeling uit de tabel `true`, en een tak die nooit loopt is anders dode code. */
+function afleid(h, r) {
+  return !!h && !!r && h.naar === 'rtg' && r.mechanisme === 'tegenboeking binnen het huis';
+}
 
 /* Is deze handeling terug te draaien? Altijd met de reden, en alleen `true` als de
    afleidregel in de kop het zegt. Een onbekende handeling of rail is `false`. */
@@ -94,7 +102,7 @@ function voor(handeling) {
   const r = RAILS[h.rail];
   if (!r) return { omkeerbaar: false, soort: 'geen-herstel', mechanisme: null, rail: h.rail,
     reden: 'De rail "' + h.rail + '" staat niet in de tabel; onbekend is niet omkeerbaar.' };
-  const omkeerbaar = h.naar === 'rtg' && r.mechanisme === 'tegenboeking binnen het huis';
+  const omkeerbaar = afleid(h, r);
   return { omkeerbaar, soort: r.soort, mechanisme: r.mechanisme, rail: h.rail, naar: h.naar, wie: r.wie,
     termijn: r.termijn, grond: [h.grond, r.grond],
     reden: omkeerbaar
@@ -103,4 +111,4 @@ function voor(handeling) {
         '; ongedaan maken is ' + r.mechanisme + ' en dat beslist ' + r.wie.split(',')[0] + ', niet RTG alleen.' };
 }
 
-module.exports = { voor, RAILS, HANDELINGEN, SOORTEN };
+module.exports = { voor, afleid, RAILS, HANDELINGEN, SOORTEN };

@@ -164,3 +164,26 @@ test('een risicogoedkeuring hoort voor het besluit en draagt naam en reden', () 
   ketenlaag.tekenAf({ id, door: 'bert' });
   assert.equal(voornemens.risicoGoedkeur(id, { door: 'carla', reden: 'Te laat, er is al besloten.' }).status, 409);
 });
+
+test('de afleidregel heeft een ja-tak: een tegenboeking naar een eigen positie van RTG is omkeerbaar (compensatie)', () => {
+  assert.equal(geldomkeer.afleid({ naar: 'rtg' }, geldomkeer.RAILS['rtg-pay-intern']), true);
+  assert.equal(geldomkeer.RAILS['rtg-pay-intern'].soort, 'compensatie', 'een tegenboeking is nooit exact');
+  assert.equal(geldomkeer.afleid({ naar: 'lid' }, geldomkeer.RAILS['rtg-pay-intern']), false);
+  assert.equal(geldomkeer.afleid({ naar: 'rtg' }, geldomkeer.RAILS['sepa-uit']), false);
+});
+
+test('de keuring negeert omkeerbaar uit de context: de tabel beslist, ook buiten de geldketen', () => {
+  const { voornemens } = huis({ grendel: OPEN });
+  const o = voornemens.stelOp({ actor: 'ans', handeling: 'GELD_TERUGGEVEN', doel: 'teruggave', sleutel: 'ctx:1',
+    stappen: [{ wat: 'teruggave', doel: 'R1', centen: GROOT }] });
+  voornemens.keur(o.voornemen.id, { context: { omkeerbaar: true } });
+  const t = voornemens.tekenAf(o.voornemen.id, { door: 'bert', context: { omkeerbaar: true } });
+  assert.equal(t.voornemen.stand, 'AFGEWEZEN', JSON.stringify(t.voornemen.besluit));
+  assert.equal(t.voornemen.besluit.uitkomst, UITKOMST.OMKEERBAAR);
+});
+
+test('de vroege weigering rekent het totaal uit de stappen, niet uit wat de aanroeper opgeeft', () => {
+  const { ketenlaag } = huis();
+  const r = ketenlaag.klaarzet(opgave({ totaalCenten: 100, sleutel: 'incasso:laag' }));
+  assert.equal(r.status, 403, JSON.stringify(r));
+});

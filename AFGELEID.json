@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-11T08:15:29.206Z",
-  "commit": "3bc0d8b0",
+  "op": "2026-10-11T05:56:47.201Z",
+  "commit": "9b6c77b9",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.0"
  },
  "gemeten": {
-  "artefacten": 374,
+  "artefacten": 373,
   "bron": 41,
-  "afgeleid": 200,
+  "afgeleid": 199,
   "fragmenten": 27,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 1,
-  "metEigenaar": 227,
-  "afgeleidEigenaarHard": 199,
+  "metEigenaar": 226,
+  "afgeleidEigenaarHard": 198,
   "afgeleidGrendelt": 28,
-  "metStempel": 123,
+  "metStempel": 122,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -1389,18 +1389,6 @@
    "botsingVerklaard": null
   },
   {
-   "naam": "GEMEENSCHAP-FASE0.md",
-   "soort": "BRON",
-   "eigenaar": null,
-   "graad": null,
-   "schrijvers": [],
-   "stempelInstrument": null,
-   "stempelAnders": false,
-   "versheidOpdracht": null,
-   "grendelt": null,
-   "botsingVerklaard": null
-  },
-  {
    "naam": "GEVOLGDEKKING.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/gevolgdekking.js",
@@ -1534,20 +1522,6 @@
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": false,
-   "botsingVerklaard": null
-  },
-  {
-   "naam": "GROEPVORM.json",
-   "soort": "AFGELEID",
-   "eigenaar": "scripts/groepvorm.js",
-   "graad": "stempel",
-   "schrijvers": [
-    "scripts/groepvorm.js"
-   ],
-   "stempelInstrument": "scripts/groepvorm.js",
-   "stempelAnders": false,
-   "versheidOpdracht": "npm run groepvorm:vast",
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -4893,6 +4867,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run zaakwig:vast",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ZERO.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   }
  ]

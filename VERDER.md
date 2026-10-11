@@ -312,7 +312,7 @@ register.
 | 13 | Aandacht is geen impact. | gehandhaafd | `connect/portfolio.js`: `bereikt` komt er niet in |
 | 14 | Geen mens of buurt krijgt een waardescore. | deels | `scripts/lib/cijferopmens.js` (CAR-05) voor een mens; niets voor een buurt |
 | 15 | Het systeem leert van overgangen, niet van surveillance. | gehandhaafd | `connect/horizon.js` `GEEN_SIGNAAL` |
-| 16 | Wie een probleem kan oplossen, krijgt minimaal noodzakelijke informatie. | deels | `rtfos/gemeente.js` `K = 5` met complementaire onderdrukking; tijdvensters ontbreken (par. 6) |
+| 16 | Wie een probleem kan oplossen, krijgt minimaal noodzakelijke informatie. | deels | `rtfos/gemeente.js` `K = 5` met onderdrukking tot niets meer af te leiden is; tijdvensters ontbreken (par. 6) |
 | 17 | Iedere materiële aanbeveling heeft herkomst. | deels | `knelpunt/aanvoer.js` eist `herkomst`; daarbuiten niets |
 | 18 | Teruggeven blijft vrijwillig. | document | niemand |
 | 19 | Vergeten moet mogelijk blijven. | eigenaarbesluit | B7 |
@@ -330,7 +330,7 @@ harde eisen gemaakt.
 
 | # | Besluit | Stand |
 |---|---|---|
-| B1 | **Aggregatie is queryveilig, niet alleen celveilig.** Vaste views, minimumcel, complementaire onderdrukking en tijdvensters, en geen vrije gemeentelijke OLAP over gevoelige dimensies. | deels: minimumcel, vaste view en complementaire onderdrukking staan (11 okt 2026); tijdvensters niet (par. 6) |
+| B1 | **Aggregatie is queryveilig, niet alleen celveilig.** Vaste views, minimumcel, complementaire onderdrukking en tijdvensters, en geen vrije gemeentelijke OLAP over gevoelige dimensies. | deels: minimumcel, vaste view en onderdrukking tot niets meer af te leiden is staan (11 okt 2026); tijdvensters en een drempel op stadsniveau niet (par. 6) |
 | B2 | **Foundation zet financiële handelingen klaar, maar wordt geen betaalroute.** De organisatie betaalt via haar eigen geld- en arbeidsketen. | deels: een gift komt binnen over RTG Pay (`gift-betalen.js`, `partnerIn`); er is geen pad waarlangs de Foundation een mens betaalt, en dat moet zo blijven |
 | B3 | **Werk, leren, vrijwillig, oefenen en helpen zijn afdwingbare standen, geen labels.** Oefenen vraagt begrenzing, begeleiding en een einde, en misclassificatie eindigt fail-closed in WEIGER. | te-bouwen: er zijn twee van de vijf (vrijwilliger, dienstverband), zonder regel ertussen |
 | B4 | **Geen funnelmetriek op menselijke ontwikkeling.** Bezoeker → deelnemer → mentor mag als vorm worden gemeten (deze meter doet dat), maar nooit als conversie van mensen. | document |
@@ -386,20 +386,39 @@ het, met twee niet). Het voorbeeld dat `gemeente.js` zelf in zijn kop gebruikt o
 de drempel uit te leggen (*"In de Zeewijk zijn twee mensen geholpen met
 schuldhulp"*), kwam er zo alsnog uit. Dat was **B1** in één regel code.
 
-**Gerepareerd op 11 oktober 2026** (golf 3), en niet op de manier die hier eerst
-stond. "Laat het aantal weg" is geen reparatie: het portaal toont ook het
-TOTAAL aan hulpvragen, en totaal min de genoemde buurten is weer die ene buurt.
-`buurten()` doet daarom complementaire onderdrukking: valt er precies één buurt
-onder de drempel, dan gaat de kleinste buurt BOVEN de drempel mee in de groep
-("overige buurten (2)"), zodat er nooit een groep van één buurt ontstaat. Is er
-geen tweede buurt, dan staat er geen aantal bij de groep (`aantal: null`, met
-`onderdrukt` als reden, en op het scherm "niet getoond"). De proef
-`buurtenQueryveilig` toetst sindsdien BEIDE aanvallen (de groep van één en het
-verschil met het totaal) en de toets bewijst dat hij de oude vorm nog als lek
-herkent. **Restrisico, benoemd en niet weggepoetst:** heeft een stad maar één
-buurt met hulpvragen, dan gaat het stadstotaal over die ene buurt. Dat is een
-stadsgetal; tijdvensters (B1, tweede helft) ontbreken nog -- wie het portaal
-vandaag en volgende week opent, ziet het verschil.
+**Gerepareerd op 11 oktober 2026** (golf 3), en in twee rondes, want de eerste
+was te smal. "Laat het aantal weg" is geen reparatie: het portaal toont ook het
+TOTAAL, en totaal min de genoemde buurten is weer die ene buurt. De eerste ronde
+nam daarom de kleinste buurt boven de drempel mee in de groep -- en de
+onafhankelijke tegenlezing vond meteen drie manieren om er toch doorheen te
+rekenen: **grenzen** (de meegenomen buurt ligt tussen 5 en het kleinste genoemde
+aantal, dus `{1, 5, 12}` gaf een groep van 6 en daarmee exact 1 en 5), **uiterste
+sommen** (twee buurten met samen 2 zijn er allebei 1) en **schrijfwijzen**
+("Zeewijk" en "zeewijk" telden als twee buurten). De proef zag geen van drieën,
+omdat hij vormen opsomde.
+
+Wat er nu staat: `buurten()` rekent per verborgen buurt uit welk bereik een
+gemeente met maximale kennis nog openhoudt, en voegt de volgende kleinste buurt
+toe zolang er een buurt is met maar EEN mogelijke waarde; lukt dat niet, dan
+staat er geen aantal (`aantal: null` met `onderdrukt` als reden, op het scherm
+"niet getoond"). Labels worden op hoofdletters en spaties samengevoegd. De proef
+`buurtenQueryveilig` somt geen vormen meer op maar **valt aan zoals een gemeente
+dat zou doen**: zij weet welke buurten hulpvragen hebben, ziet het beeld plus het
+totaal, draait zelf `buurten()` op elke mogelijke invulling en kijkt of een
+verborgen buurt maar één waarde overhoudt. Over een veeg van 714 steden (een tot
+vier buurten, een tot negen hulpvragen) is dat **nul keer** een buurtgetal; de
+oude functie lekt in dezelfde aanval wel, dus de proef kan uitslaan. Twee
+mutaties zijn nagetrokken: zonder de bereikcontrole en zonder de
+schrijfwijzenormalisatie zakt de toets.
+
+**Restrisico, benoemd en niet weggepoetst.** (1) In negen van die 714 steden zit
+ELKE buurt onder de drempel; dan staat er geen buurtgetal, maar het stadstotaal
+zelf verraadt het (twee buurten met samen 8 zijn er allebei 4). Dat is een
+drempel op STADSniveau, en het totaal en de telling per soort hebben er geen --
+een besluit, geen bouwtaak. (2) Een tikfout ("Zeewyk") maakt van een buurt er
+twee; daartegen helpt alleen een vaste buurtenlijst per stad (`casus.js` slaat
+de wijk als vrije tekst op). (3) Tijdvensters (B1, tweede helft) ontbreken: wie
+het portaal vandaag en volgende week opent, ziet het verschil.
 
 ## 7. Wat de meting verder vond
 
@@ -408,7 +427,7 @@ graad erbij.
 
 | # | Bevinding | Waar | Graad |
 |---|---|---|---|
-| V1 | Een kleine buurt lekte haar exacte aantal naar de gemeente (par. 6). **Dicht sinds 11 oktober 2026** met complementaire onderdrukking. | `rtfos/gemeente.js` `buurten()` | **bewezen**: gedraaid, en de reparatie ook |
+| V1 | Een kleine buurt lekte haar exacte aantal naar de gemeente (par. 6). **Gerepareerd op 11 oktober 2026** voor buurtgetallen; het restrisico op stadsniveau, tikfouten en tijdvensters staan in par. 6. | `rtfos/gemeente.js` `buurten()` | **gemeten**: een aanvallende veeg over 714 steden, met twee mutaties nagetrokken |
 | V2 | `sluitbaar` in de klassen van RTG Service heeft **geen enkele lezer**. Het commentaar ernaast verwijst naar een `sluit()` in `zaak.js` die niet bestaat, dus een klacht die "niet sluitbaar" is, kan gewoon op klaar. | `service/klassen.js` | **gemeten**: nul lezers |
 | V3 | Het besluit "gestopt" in het Living Lab neemt de naam van de beslisser uit het **verzoek** (`b.door`) en niet uit de sessie, terwijl de sessie wel wordt meegegeven. AUTHORITY.md: de actor van een auditregel komt uit de sessie. | `livinglab/cyclus.js` `besluitZet` | **gemeten** |
 | V4 | Niets toetst dat wie een vakbewijs aftekent niet de betrokkene zelf is. | `vakbewijs-aftekenen.js` | **vermoed**: vraagt een kantoormens met een eigen vakbewijs |
@@ -466,7 +485,7 @@ gedeelde vorm hield niet, dus er wordt geen primitief gebouwd. De families hield
 ook niet, dus er wordt ook geen familieprimitief gebouwd. De kandidaten voor de
 eerste implementatieronde zijn allemaal klein, en de keuze is aan de eigenaar:
 
-1. ~~**V1 dichten**~~ (B1, één functie) -- **gedaan** op 11 oktober 2026, zie par. 6.
+1. ~~**V1 dichten**~~ (B1, één functie) -- **gedaan** voor buurtgetallen op 11 oktober 2026; het restrisico staat in par. 6.
 2. **De les na een gestopte poging** (par. 3). Die sluit de mislukkingslus en
    verandert niets aan wat er al staat.
 3. **Wet 3 een handhaver geven**: een toets die elke weigering zonder reden laat

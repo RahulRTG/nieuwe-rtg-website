@@ -85,31 +85,60 @@ module.exports = (ctx, eigen) => {
      staat er WEL bij: "overige buurten: 7" is informatie, stilzwijgend weglaten
      zou de gemeente een onvolledig beeld geven zonder dat ze het weet.
 
-     CELVEILIG IS NIET QUERYVEILIG (VERDER.md par. 6, besluit B1). Valt er
-     precies EEN buurt onder de drempel, dan is "overige buurten (1)" die ene
-     buurt -- de gemeente kent haar eigen buurten en ziet welke ontbreekt -- en
-     dan stond haar exacte aantal hier, onder de drempel die het moest
-     verbergen. Het aantal alleen weglaten helpt niet: het portaal toont ook het
-     totaal, en totaal min de genoemde buurten is weer die ene buurt. Daarom
-     COMPLEMENTAIRE ONDERDRUKKING: de kleinste buurt boven de drempel gaat mee in
-     de groep, zodat er nooit een groep van een buurt ontstaat. Is er geen buurt
-     om mee samen te voegen, dan staat er geen aantal (null) met de reden erbij;
-     dat het stadstotaal dan over die ene buurt gaat, is een stadsgetal en staat
-     als restrisico in VERDER.md. */
+     CELVEILIG IS NIET QUERYVEILIG (VERDER.md par. 6, besluit B1). Het portaal
+     toont ook het TOTAAL, dus de som van wat er niet genoemd wordt is altijd
+     uit te rekenen. De vraag is dus niet "staat er een klein getal" maar "is
+     het aantal van een verborgen buurt AF TE LEIDEN". Drie vormen die alle drie
+     gedraaid zijn (golf 3, tegenlezing):
+       - een groep van een buurt: haar aantal is de groep;
+       - een uiterste som: twee buurten met samen 2 zijn er allebei 1;
+       - grenzen: een buurt die meegaat om een kleine buurt te dekken ligt
+         tussen K en het kleinste genoemde aantal, dus {1, 5, 12} geeft een groep
+         van 6 en daarmee 1 en 5.
+     Daarom rekent deze functie per verborgen buurt het bereik uit dat een
+     gemeente met maximale kennis (zij weet welke buurten klein zijn en welke
+     zijn meegenomen) nog openhoudt, en voegt zij de volgende kleinste buurt
+     toe zolang er een buurt is met maar EEN mogelijke waarde. Lukt dat niet
+     meer, dan staat er geen aantal (null) met de reden. Labels worden op hun
+     schrijfwijze samengevoegd (hoofdletters, spaties): "Zeewijk" en "zeewijk"
+     zijn een buurt en mogen niet als twee buurten een groep vormen. Een
+     tikfout ("Zeewyk") vangt dat niet; daarvoor is een vaste buurtenlijst per
+     stad nodig, en dat is een besluit (VERDER.md par. 6). */
+  const sleutel = w => String(w).trim().toLowerCase().replace(/\s+/g, ' ');
+  /* Het bereik van lid i bij som S: wat de anderen samen minimaal en maximaal
+     kunnen dragen, bepaalt wat er voor i overblijft. */
+  function afleidbaar(leden, S) {
+    const lo = leden.reduce((a, l) => a + l.lo, 0), hi = leden.reduce((a, l) => a + l.hi, 0);
+    return leden.some(l => Math.min(l.hi, S - (lo - l.lo)) - Math.max(l.lo, S - (hi - l.hi)) < 1);
+  }
   function buurten(perWijk) {
-    const groot = [], klein = [];
-    for (const [wijk, n] of Object.entries(perWijk || {})) (n >= K ? groot : klein).push({ wijk, aantal: n });
-    groot.sort((a, b) => b.aantal - a.aantal || (a.wijk < b.wijk ? -1 : 1));
-    let complementair = false;
-    if (klein.length === 1 && groot.length) { klein.push(groot.pop()); complementair = true; }
-    const uit = groot.slice();
-    if (klein.length) {
-      const enkel = klein.length === 1;
-      uit.push({ wijk: 'overige buurten (' + klein.length + ')', buurten: klein.length,
-        aantal: enkel ? null : klein.reduce((a, r) => a + r.aantal, 0), samengevoegd: true,
-        ...(complementair ? { complementair: 'een buurt boven de drempel is meegenomen, anders was dit het aantal van precies een buurt' } : {}),
-        ...(enkel ? { onderdrukt: 'er is geen tweede buurt om mee samen te voegen; een aantal hier zou het aantal van precies een buurt zijn' } : {}) });
+    const per = new Map();
+    for (const [wijk, n] of Object.entries(perWijk || {})) {
+      const k = sleutel(wijk);
+      if (!k) continue;
+      const r = per.get(k) || { wijk: String(wijk).trim(), aantal: 0 };
+      r.aantal += Number(n) || 0;
+      per.set(k, r);
     }
+    const groot = [], klein = [];
+    for (const r of per.values()) (r.aantal >= K ? groot : klein).push(r);
+    groot.sort((a, b) => b.aantal - a.aantal || (a.wijk < b.wijk ? -1 : 1));
+    if (!klein.length) return groot;
+    const groep = klein.map(r => ({ aantal: r.aantal, lo: 1, hi: K - 1 }));
+    let meegenomen = 0;
+    const veilig = () => {
+      if (groep.length < 2) return false;
+      const U = groot.length ? groot[groot.length - 1].aantal : Infinity;
+      for (const l of groep) if (l.mee) l.hi = U;
+      return !afleidbaar(groep, groep.reduce((a, l) => a + l.aantal, 0));
+    };
+    while (!veilig() && groot.length) { groep.push({ aantal: groot.pop().aantal, lo: K, hi: Infinity, mee: true }); meegenomen++; }
+    const ok = veilig();
+    const uit = groot.slice();
+    uit.push({ wijk: 'overige buurten (' + groep.length + ')', buurten: groep.length,
+      aantal: ok ? groep.reduce((a, l) => a + l.aantal, 0) : null, samengevoegd: true,
+      ...(meegenomen ? { complementair: meegenomen + ' buurt(en) boven de drempel meegenomen, anders was het aantal van een buurt af te leiden' } : {}),
+      ...(ok ? {} : { onderdrukt: 'ook na samenvoegen zou het aantal van een buurt af te leiden zijn; daarom staat hier geen getal' }) });
     return uit;
   }
 

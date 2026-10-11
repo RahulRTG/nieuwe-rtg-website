@@ -72,17 +72,20 @@ test('6. de mutatieproef: zonder bewijs of bevoegdheid slaagt een universele mot
   assert.equal(M.universeleMotor(['actor', 'bewijs'], { actor: 1 }).ok, false);
 });
 
-test('7. queryveiligheid: EEN kleine buurt lekt niet meer, ook niet via het totaal', () => {
+test('7. queryveiligheid: geen verborgen buurt is af te leiden, ook niet voor wie het algoritme kent', () => {
   const q = u.proeven.buurtenQueryveilig;
-  assert.equal(q.lekt, false, 'V1 is dicht: geen groep van een buurt, en totaal min de genoemde buurten is nooit een buurt');
-  assert.equal(q.besturing, true);
+  assert.equal(q.lekt, false, 'V1: een buurt onder de drempel is af te leiden: ' +
+    JSON.stringify(q.gevallen.filter(g => g.lekt.length)) + ' ' + JSON.stringify(q.veeg.lekMetGetal.slice(0, 3)));
+  assert.equal(q.besturing, true, 'de aanval moet de oude buurten() laten lekken, anders kan deze proef niet uitslaan');
+  assert.equal(q.veeg.steden, 714);
+  assert.deepEqual(q.veeg.lekMetGetal, []);
+  // het restrisico is benoemd en begrensd: alleen steden waar ELKE buurt onder de drempel zit
+  assert.ok(q.veeg.alleenStadstotaal <= 9, 'meer steden waar het stadstotaal een buurt verraadt: ' + q.veeg.alleenStadstotaal);
   assert.equal(q.restrisico.aantalGetoond, false, 'zonder tweede buurt staat er geen aantal bij de groep');
-  // de proef zelf moet kunnen uitslaan: de oude buurten() lekte
-  const oud = (perWijk) => { const uit = []; let k = 0, n = 0;
-    for (const [w, a] of Object.entries(perWijk)) { if (a >= 5) uit.push({ wijk: w, aantal: a }); else { k += a; n++; } }
-    if (n) uit.push({ wijk: 'overige buurten (' + n + ')', buurten: n, aantal: k, samengevoegd: true }); return uit; };
-  const rijen = oud({ Zeewijk: 3, Centrum: 10, Noord: 12 });
-  assert.equal(rijen.some(r => r.samengevoegd && r.buurten === 1 && r.aantal !== null), true, 'besturing: de oude vorm moet als lek herkend worden');
+  // een schrijfwijze is geen tweede buurt: "Zeewijk" en "zeewijk" mogen samen geen groep vormen
+  const gem = require('../server/kern/rtfos/gemeente.js')({}, { cijfersVan() {} });
+  const groep = gem.buurten({ Zeewijk: 3, ' zeewijk ': 1, Centrum: 10, Noord: 12 }).find(r => r.samengevoegd);
+  assert.notEqual(groep.aantal, 4, 'twee schrijfwijzen van de Zeewijk vormden samen een groep met haar exacte aantal');
 });
 
 test('8. elke overgang met een drager draagt alle veertien dimensies, en elke zonder drager een reden', () => {

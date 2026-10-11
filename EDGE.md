@@ -686,7 +686,7 @@ een andere naam of in één domein, en het werk is aansluiten en niet uitvinden.
 | 33 | Identity awareness | stap weg | 2 | De vorm bestaat (`setIdentity`), niets vult hem. Alleen waar de context de identiteit al rechtmatig toont (besluit 2). |
 | 34 | Role switching | stap weg | 3 | Besloten (besluit 9): eerst hoedanigheid in sessie en envelop, dan pas een wisselaar; nooit alleen een label (MN-02). |
 | 35 | Confidentiality indicator | staat | 3 | Strikt zet delen uit met reden en bron, en `mag()` weigert; niet alleen een grijze knop. |
-| 36 | Rahul context button | stap weg | 5 | "Wat kan hier" en "waarom niet" bestaan deterministisch; Rahul leest het blikveld nog niet, en alleen via een positieve veldenlijst (AI-CONTEXT-01). |
+| 36 | Rahul context button | stap weg | 5 | "Wat kan hier" en "waarom niet" bestaan deterministisch. Rahul LEEST het blikveld sinds golf 3 (`edge/rahulzicht.js`): wereld, de titel die het scherm zelf zei en een verwijzing (soort en id), via een positieve veldenlijst (AI-CONTEXT-01) met elk ander veld in `NIET_MEE` met reden; de server saneert het tot PASS zonder weggegooide sleutel (`test/rahulzicht.e2e.js`). Een contextknop die er handelingen uit voorstelt, ontbreekt nog. |
 | 37 | Rahul lens | jaren weg | 5 | Vraagt per domein een afwijkingscontract, een positieve veldenlijst naar een model en een gemeten trefzekerheid; geen van drie bestaat buiten de loonstrook. |
 | 38 | Explain this | stap weg | 1 | Lang drukken legt uit voor elke handeling uit het register; niet voor het tweede register en de geoogste paginaknoppen. |
 | 39 | Why this? | stap weg | 5 | De vorm bestaat in de mixer van Connect (grond en dektNiet, geen score); de Edge heeft nog geen aanbevelingen. |

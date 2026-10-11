@@ -10,11 +10,23 @@
     var actief = document.querySelector('[data-wk].actief,.rv-bank .actief,.lo-rail .actief,.pn-rail .actief,.po-rail .actief,nav .actief');
     var keuze = document.querySelector('select:focus,select option:checked,[aria-selected="true"]');
     var titel = document.title.replace(/^RTG\s*/i, '');
-    return {
+    var c = {
       app: titel || 'RTG',
       deel: actief ? actief.textContent.trim() : 'Actieve pagina',
       selectie: keuze ? keuze.textContent.trim() : ''
     };
+    /* WAT HET BLIKVELD ZAG, GAAT VOOR WAT DE DOM VAN DIT DOCUMENT ZEGT -- en
+       alleen de velden die shared/edge/rahulzicht.js toelaat. In de schil is
+       dit document de schil zelf; het open blad, zijn wereld en zijn object
+       weet alleen het blikveld. Veld voor veld overgenomen, nooit gespreid
+       (AI-CONTEXT-01). Zonder blikveld blijft alles zoals het was. */
+    var Z = window.RTGEdgeRahulzicht, z = Z && Z.lees ? Z.lees(window) : null;
+    if (z && z.context) {
+      if (z.context.wereld) c.wereld = z.context.wereld;
+      if (z.context.deel) c.deel = z.context.deel;
+      if (z.context.verwijzingen) c.verwijzingen = z.context.verwijzingen;
+    }
+    return c;
   }
   function suggesties(c) {
     var bron = c.app + c.deel;

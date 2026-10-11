@@ -735,6 +735,11 @@ const EIGEN_MODULE = new Map([
      statisch ziet de motor geen module. Bevestigd door de motor, en dat is hier
      de voorwaarde: met deze regel muteert hij de ketenmodule en zakt de toets. */
   ['artefact-image.test.js', ['scripts/lib/artefactketen.js']],
+  /* DE LEESWEERGAVE VAN RAHUL IN HET GENOOTSCHAP: de toets requiret ook
+     scripts/lib/bron.js (om commentaar te strippen), en zonder deze regel
+     muteerde de motor dat hulpje in plaats van de code onder toets. Het bewijs
+     hoort te gaan over de weergave en de AI-laag zelf. */
+  ['genootschap-ai-leesweergave.test.js', ['server/kern/genootschap/leesweergave.js', 'server/kern/genootschap/ai.js']],
   /* DE DEURVERKOOP laadt zijn route via een PADVARIABELE (require(ROUTE)) met
      een nagemaakte kern, zodat twee kopers door elkaar kunnen lopen. Statisch
      ziet de motor dan geen module. De bron is de route zelf: de vasthouding

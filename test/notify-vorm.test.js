@@ -55,8 +55,23 @@ function bronnen(map, uit = []) {
   return uit;
 }
 
+/* EEN TEKST HOEFT NIET MET EEN AANHALINGSTEKEN TE BEGINNEN. Het eerste patroon
+   zag alleen `notify(x, 'tekst')`; `notify(l.key, gr.naam + ': ' + wat)` begint
+   met een naam en liep er dwars doorheen -- en precies die aanroep liet elke
+   uitnodiging voor een genootschapsbijeenkomst stil verdwijnen
+   (GEMEENSCHAP-FASE0.md par. 6, gebrek 1). Daarom kijkt de scan nu naar het
+   hele tweede argument: begint het met een aanhalingsteken, of plakt het een
+   tekst aan iets vast, dan is het een tekst. */
+function isTekstArgument(code) {
+  const m = code.match(/\bnotify(?:\.alleenMelding)?\(\s*[^,()]+,\s*([^;]*)/);
+  if (!m) return false;
+  const arg = m[1].trim();
+  if (arg.startsWith('{')) return false;
+  return /^['"`]/.test(arg) || /\+\s*['"`]|['"`]\s*\+/.test(arg) || /^String\(/.test(arg);
+}
+
 test('3. geen enkele aanroep geeft notify() nog een tekst, of schrijft in de bak "kantoor"', () => {
-  const tekst = /\bnotify\(\s*[^,()]+,\s*['"`]/;
+  const tekst = { test: isTekstArgument };
   const kantoor = /\bnotify\(\s*['"]kantoor['"]/;
   const fouten = [];
   for (const p of bronnen(path.join(__dirname, '..', 'server'))) {
@@ -73,8 +88,14 @@ test('3. geen enkele aanroep geeft notify() nog een tekst, of schrijft in de bak
 /* EN DE METER KAN UITSLAAN: zonder deze controle zou toets 3 groen staan op
    een patroon dat niets vindt. */
 test('4. de bronscan vindt de oude vorm wel als hij er staat', () => {
-  const tekst = /\bnotify\(\s*[^,()]+,\s*['"`]/;
+  const tekst = { test: isTekstArgument };
   assert.ok(tekst.test("notify(doel, 'Iemand schreef een aanbeveling.')"));
   assert.ok(tekst.test('notify(k, `Afgelast: ${wat}`)'));
+  assert.ok(tekst.test("notify(l.key, p.gr.naam + ': ' + wat + ' op ' + datum);"),
+    'een tekst die met een naam begint en aan elkaar wordt geplakt, is ook een tekst');
+  assert.ok(tekst.test("notify(k, String(bericht));"));
   assert.ok(!tekst.test("notify(doel, { title: 'Métier', body: 'x' })"));
+  assert.ok(!tekst.test("notify(doel, { title: 'Genootschap', body: naam + ': ' + wat })"),
+    'een object met een samengestelde body is goed');
+  assert.ok(!tekst.test('notify(doel, melding);'), 'een variabele is geen tekst');
 });

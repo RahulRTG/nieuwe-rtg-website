@@ -372,6 +372,7 @@ const REGISTER = {
      schuld die op nul hoort te staan en negen veldtanden die alleen omhoog
      mogen. De vergelijking per scherm zit daarnaast in edgedekking.js zelf. */
   'EDGEKAART.json': { meter: ['edgeDubbeleEigenaars', 'rtgDodeKanalen'] },
+  'SCHILHERSTART.json': { meter: ['schilHerstarts', 'schilDubbeleVerzoeken'] },
   'EDGEDEKKING.json': { meter: ['edgeGeblokkeerdZonderWaarom', 'edgeVeldIdentiteit', 'edgeVeldWereld', 'edgeVeldContext',
     'edgeVeldObject', 'edgeVeldActiviteit', 'edgeVeldPresence', 'edgeVeldVoortzetting', 'edgeVeldHoofdactie', 'edgeVeldTrust'] },
   'MEETLEER.json': { meter: ['meetleerBlind'] },

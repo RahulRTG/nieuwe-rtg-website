@@ -89,6 +89,14 @@
     return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
   }
 
+  /* EEN KEER METEN WAS TE VROEG (11 oktober 2026). Dit bestand draaide zodra de
+     tab bestond, en dat is voor de pariteitslaag van rtg-cinematic-system.js het
+     data-rtg-cinematic-attribuut op body zet. Op dat moment is de balk nog
+     donker; daarna maakt de www-laag hem ivoor. De tab hield zijn lichte inkt
+     (#F2EEE8 op #E1DDD3, 1,2:1 in meldkamer en merken), want een inline
+     !important wint van elke regel in een stijlblad. Dus kiest hij opnieuw
+     zodra body een attribuut krijgt dat de grond verandert. */
+  function kies() {
   var ouder = tab.parentElement || tab;
   var grond = grondVan(ouder);
   var licht;                                      // IS DE GROND LICHT?
@@ -127,4 +135,25 @@
   tab.style.setProperty('color', woord, 'important');
   var sub = tab.querySelector('small');
   if (sub) sub.style.setProperty('color', zacht, 'important');
+  }
+  /* De eerste keuze wacht op `load`: rtg-cinematic-system.js zet zijn
+     attributen bij DOMContentLoaded, dus na load staat de grond waarop de tab
+     echt komt te hangen. Wie op de inline kleur wacht (test/neiging-scherm),
+     wacht daarmee op de echte inkt en niet op een tussenstand. */
+  function waak() {
+    kies();
+    if (!w.MutationObserver || !d.body) return;
+    var wacht = false;
+    var kijker = new MutationObserver(function () {
+      if (wacht) return;
+      wacht = true;
+      (w.requestAnimationFrame || w.setTimeout)(function () { wacht = false; kies(); });
+    });
+    var wat = { attributes: true, attributeFilter: ['data-rtg-cinematic', 'data-rtg-cinematic-ready',
+      'data-rtg-world', 'data-rtg-palette', 'data-rtg-layout', 'data-rtg-skin', 'data-rtg-thema', 'data-pas-thema', 'class'] };
+    kijker.observe(d.body, wat);
+    kijker.observe(d.documentElement, wat);
+  }
+  if (d.readyState === 'complete') waak();
+  else w.addEventListener('load', waak, { once: true });
 })(window, document);

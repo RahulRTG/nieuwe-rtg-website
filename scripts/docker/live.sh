@@ -11,8 +11,11 @@ ROLLBACK_STATE="$ROOT/.rtg-live-rollback"
 COMPOSE="docker compose --env-file $LIVE_ENV -f $ROOT/docker-compose.yml -f $ROOT/docker-compose.live.yml"
 
 gebruik() {
-  echo "Gebruik: scripts/docker/live.sh check|deploy|owner|golive|status|probe|backup|rollback|restore <timestamp>"
+  echo "Gebruik: scripts/docker/live.sh check|deploy|owner|golive|status|probe|backup|rollback sha256:<digest>|restore <timestamp>"
 }
+# De omgeving waarvoor de artefactketen (scripts/artefactketen.js) een besluit draagt.
+OMGEVING="${RTG_OMGEVING:-productie}"
+case "$OMGEVING" in staging|pilot|productie) ;; *) echo "[live] RTG_OMGEVING moet staging, pilot of productie zijn" >&2; exit 78;; esac
 
 [ -r "$LIVE_ENV" ] || {
   echo "[live] $LIVE_ENV ontbreekt; kopieer deploy/live.env.example en vul de externe back-upmap in" >&2
@@ -121,6 +124,12 @@ case "$opdracht" in
     if [ -n "$backup_id" ]; then vorig_backup="$(docker inspect --format='{{.Image}}' "$backup_id" 2>/dev/null || true)"; fi
     vorige_pin=""
     if [ -n "$vorig" ]; then
+      # Alleen een artefact dat de keten kent (gebouwd, getest, goedgekeurd) is een
+      # geldig rollbackdoel. Een onbewezen draaiend image wordt NIET overschreven:
+      # er zou niets zijn om op terug te vallen.
+      node scripts/artefactketen.js eis-actief --image-id="$vorig" --omgeving="$OMGEVING" || {
+        echo "[live] het draaiende image is geen goedgekeurd artefact in de artefactketen; uitrol geweigerd" >&2; exit 65;
+      }
       [ -n "$vorig_backup" ] || { echo "[live] bestaande release mist een immutable backupimage; uitrol geweigerd" >&2; exit 65; }
       vorige_pin="$(docker run --rm --entrypoint sha256sum "$vorig" /app/release-bewijs.json 2>/dev/null | awk '{print $1}')"
       geldige_rollbackset "$vorig" "$vorig_backup" "$vorige_pin" || {
@@ -149,6 +158,9 @@ case "$opdracht" in
     if [ "$start_status" -eq 0 ] && wacht_ready && probe_lokaal; then
       printf '%s\n%s\n%s\n' "$kandidaat_id" "$kandidaat_backup_id" "$bewijs_pin" > "$STATE"
       echo "[live] klaar: $kandidaat ($kandidaat_id) op $APP_URL"
+      node scripts/artefactketen.js noteer-uitgevoerd --soort=promotie --omgeving="$OMGEVING" --auditboek || {
+        echo "[live] WAARSCHUWING-ALS-FOUT: de uitrol is gewisseld maar de uitgevoerd-regel kon niet in het auditboek; herstel dit vóór de volgende stap" >&2; exit 70;
+      }
     else
       echo "[live] nieuwe release werd niet ready" >&2
       if [ -n "$vorig" ]; then
@@ -470,10 +482,29 @@ case "$opdracht" in
     compose run --rm -e RTG_BACKUP_ONCE=1 backup
     ;;
   rollback)
-    [ -r "$ROLLBACK_STATE" ] || { echo "[live] geen bewezen rollbackset beschikbaar" >&2; exit 66; }
-    IMAGE="$(sed -n '1p' "$ROLLBACK_STATE")"
-    BACKUP_IMAGE="$(sed -n '2p' "$ROLLBACK_STATE")"
-    RTG_RELEASE_BEWIJS_SHA256="$(sed -n '3p' "$ROLLBACK_STATE")"
+    # Terugdraaien benoemt een EERDER GOEDGEKEURD DIGEST. Een tag, branch, commit of
+    # "de vorige" is geen artefact en kan ongemerkt een herbouw betekenen.
+    cd "$ROOT"
+    doel="${2:-}"
+    case "$doel" in sha256:*) ;; *)
+      echo "[live] rollback benoemt een digest (sha256:...), geen tag, branch of commit" >&2; exit 64;; esac
+    besluit="$(node scripts/artefactketen.js eis-rollback --naar="$doel" --omgeving="$OMGEVING")" || {
+      echo "[live] geen ondertekend terugdraaibesluit naar dit goedgekeurde digest" >&2; exit 65;
+    }
+    doel_backup_digest="$(printf '%s\n' "$besluit" | sed -n '2p')"
+    doel_image_id="$(printf '%s\n' "$besluit" | sed -n '3p')"
+    doel_backup_id="$(printf '%s\n' "$besluit" | sed -n '4p')"
+    # Geen pull op naam en geen build: het doel moet LOKAAL staan met exact het
+    # goedgekeurde image-id en het digest uit het besluit.
+    docker image inspect --format='{{.Id}} {{json .RepoDigests}}' "$doel_image_id" 2>/dev/null | grep -q "^$doel_image_id .*@$doel" || {
+      echo "[live] het lokale image heeft niet het goedgekeurde id en digest; rollback geweigerd" >&2; exit 65;
+    }
+    docker image inspect --format='{{.Id}} {{json .RepoDigests}}' "$doel_backup_id" 2>/dev/null | grep -q "^$doel_backup_id .*@$doel_backup_digest" || {
+      echo "[live] het lokale backupimage heeft niet het goedgekeurde id en digest; rollback geweigerd" >&2; exit 65;
+    }
+    IMAGE="$doel_image_id"
+    BACKUP_IMAGE="$doel_backup_id"
+    RTG_RELEASE_BEWIJS_SHA256="$(docker run --rm --entrypoint sha256sum "$IMAGE" /app/release-bewijs.json 2>/dev/null | awk '{print $1}')"
     export RTG_RELEASE_BEWIJS_SHA256
     geldige_rollbackset "$IMAGE" "$BACKUP_IMAGE" "$RTG_RELEASE_BEWIJS_SHA256" || {
       echo "[live] rollbackset of zijn bewijs-pin is beschadigd" >&2; exit 65;
@@ -481,7 +512,10 @@ case "$opdracht" in
     compose up -d --no-build motor app sentinel backup
     wacht_ready && probe_lokaal
     printf '%s\n%s\n%s\n' "$IMAGE" "$BACKUP_IMAGE" "$RTG_RELEASE_BEWIJS_SHA256" > "$STATE"
-    echo "[live] volledige immutable rollbackset actief"
+    echo "[live] volledige immutable rollbackset actief: $doel"
+    node scripts/artefactketen.js noteer-uitgevoerd --soort=rollback --omgeving="$OMGEVING" --auditboek || {
+      echo "[live] de rollback is uitgevoerd maar de uitgevoerd-regel kon niet in het auditboek; herstel dit eerst" >&2; exit 70;
+    }
     ;;
   restore)
     stamp="${2:-}"

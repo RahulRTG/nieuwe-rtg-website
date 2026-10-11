@@ -179,8 +179,16 @@ test('live:init maakt stil een valide lokale-eerst en betalingen-uit configurati
        zelf. Geef de fixture daarom expliciete niet-geheime testdoelen; de
        latere go-live-proeven moeten deze S3- en alarmuitgangen werkelijk
        aanraken voordat een release READY kan worden. */
+    /* Het auditboek eist in PostgreSQL-productie twee externe ankerbestemmingen en
+       een publieke ankersleutel (server/config/productie-auditboek.js): ook dat
+       zijn uitgangen die de eigenaar levert, dus de fixture geeft er testdoelen aan.
+       De sleutel is een wegwerpexemplaar; alleen het bestaan van een PEM wordt gekeurd. */
+    const ankerPub = path.join(tmp, 'audit-anker.pub');
+    fs.writeFileSync(ankerPub, require('node:crypto').generateKeyPairSync('ed25519').publicKey.export({ type: 'spki', format: 'pem' }));
     fs.appendFileSync(envPad, [
       'ERR_WEBHOOK_URL=https://alarm.example.test/rtg',
+      'RTG_AUDIT_ANKER_DIRS=/srv/anker-a,/srv/anker-b',
+      'RTG_AUDIT_ANKER_PUBLIC_KEY_FILE=' + ankerPub,
       'RTG_MEDIA_BACKEND=s3',
       'RTG_MEDIA_S3_BUCKET=rtg-productie-media',
       'RTG_MEDIA_S3_KEY=fixture-access-key',

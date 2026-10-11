@@ -24,9 +24,20 @@ const config = require('../server/config');
 const openbaar = require('../server/config/openbaar');
 const productiedeur = require('../server/kern/kantoor/productiedeur');
 
+/* Sinds het auditboek eist PostgreSQL-productie een extern anker (twee bestemmingen en
+   een publieke ankersleutel, server/config/productie-auditboek.js). Alleen de
+   aanwezigheid van een PEM wordt gekeurd; deze sleutel is een wegwerpexemplaar. */
+const AUDIT_ANKER = (() => {
+  const fs = require('node:fs'); const os = require('node:os'); const p = require('node:path');
+  const pub = p.join(fs.mkdtempSync(p.join(os.tmpdir(), 'rtg-anker-')), 'audit-anker.pub');
+  fs.writeFileSync(pub, require('node:crypto').generateKeyPairSync('ed25519').publicKey.export({ type: 'spki', format: 'pem' }));
+  return { RTG_AUDIT_ANKER_DIRS: '/srv/anker-a,/srv/anker-b', RTG_AUDIT_ANKER_PUBLIC_KEY_FILE: pub };
+})();
+
 /* Een volledige, veilige productieconfiguratie (zelfde opsomming als
    test/productie.test.js: "hoe veilig eruitziet"). */
 const VEILIG = {
+  ...AUDIT_ANKER,
   NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64),
   APP_URL: 'https://x', DATABASE_URL: 'postgresql://postgres/rtg',
   RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),

@@ -950,6 +950,8 @@
       if (r.body.error) { toonTrouw([], r.body.error); return zeg(r.body.error); }
       laadNeer(bytesVan(r.body.bestand), r.body.naam, r.body.mime);
       toonTrouw(r.body.trouw, 'Alles kwam mee. Classificatie in het bestand: ' + r.body.label + '.');
+    }).catch(function () {
+      toonTrouw([], 'Er kwam geen verbinding met de server; er is niets geëxporteerd.');
     });
   }
   $('#exportBtn').addEventListener('click', function () {
@@ -996,7 +998,7 @@
         $('#formaatScrim').classList.add('open');
         laadLijst();
         openen(r.body.id);
-      });
+      }).catch(function () { zeg('Er kwam geen verbinding met de server; er is niets ingelezen.'); });
     };
     lezer.readAsDataURL(f);
   });

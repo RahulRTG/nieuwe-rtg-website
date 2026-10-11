@@ -153,10 +153,40 @@ test('5. een kapot of vreemd bestand wordt geweigerd met een reden en maakt niet
 
 test('6. een bord gaat eruit als CSV (de oude export gaf een lege webpagina)', async () => {
   const m = await api('/api/kantoorpakket/maak', { soort: 'bord', titel: 'Planning' }, lidA);
-  await api('/api/kantoorpakket/bewaar', { id: m.body.id, inhoud: { lijsten: [{ id: 'l1', titel: 'Doen', kaarten: [{ id: 'k1', titel: 'Offerte', wie: 'Jan' }] }] } }, lidA);
+  await api('/api/kantoorpakket/bewaar', { id: m.body.id, inhoud: { lijsten: [{ id: 'l1', titel: 'Doen', kaarten: [{ id: 'k1', titel: 'Offerte', wie: 'Jan' }, { id: 'k2', titel: '=HYPERLINK("http://x")' }] }] } }, lidA);
   const r = await api('/api/kantoorpakket/exporteer', { id: m.body.id, formaat: 'csv' }, lidA);
   assert.equal(r.status, 200);
-  assert.match(Buffer.from(r.body.bestand, 'base64').toString(), /"Doen","Offerte","","geen","Jan","","nee"/);
+  const csv = Buffer.from(r.body.bestand, 'base64').toString();
+  assert.match(csv, /"Doen","Offerte","","geen","Jan","","nee"/);
+  assert.match(csv, /"'=HYPERLINK\(""http:\/\/x""\)"/, 'een formule in een kaart wordt tekst, geen opdracht voor het rekenprogramma');
+});
+
+test('6b. een presentatie (TXT) en een schets (SVG) dragen de classificatie ook', async () => {
+  const p = await api('/api/kantoorpakket/maak', { soort: 'presentatie', titel: 'Deck' }, lidA);
+  await api('/api/kantoorpakket/beheer', { id: p.body.id, classificatie: 'strikt' }, lidA);
+  const txt = await api('/api/kantoorpakket/exporteer', { id: p.body.id, formaat: 'txt' }, lidA);
+  assert.equal(txt.status, 200);
+  assert.match(Buffer.from(txt.body.bestand, 'base64').toString(), /^Classificatie: Strikt\n/);
+  const sch = await api('/api/kantoorpakket/maak', { soort: 'schets', titel: 'Plan' }, lidA);
+  await api('/api/kantoorpakket/beheer', { id: sch.body.id, classificatie: 'vertrouwelijk' }, lidA);
+  const svg = await api('/api/kantoorpakket/exporteer', { id: sch.body.id, formaat: 'svg',
+    svg: '<?xml version="1.0"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="5" height="5"/></svg>' }, lidA);
+  assert.equal(svg.status, 200);
+  assert.match(Buffer.from(svg.body.bestand, 'base64').toString(), /<desc>Classificatie: Vertrouwelijk<\/desc>/);
+  const geenSvg = await api('/api/kantoorpakket/exporteer', { id: sch.body.id, formaat: 'svg', svg: '<html>' }, lidA);
+  assert.equal(geenSvg.status, 400, 'zonder tekening geen bestand');
+});
+
+test('6c. zestig exports duwen een classificatiewijziging niet uit het spoor (eigen ring)', async () => {
+  const m = await api('/api/kantoorpakket/maak', { soort: 'blad', titel: 'Druk gelezen' }, lidA);
+  await api('/api/kantoorpakket/beheer', { id: m.body.id, classificatie: 'vertrouwelijk' }, lidA);
+  for (let i = 0; i < 65; i++) await api('/api/kantoorpakket/exporteer', { id: m.body.id, formaat: 'csv' }, lidA);
+  await api('/api/kantoorpakket/beheer', { id: m.body.id, classificatie: 'intern' }, lidA);
+  for (let i = 0; i < 65; i++) await api('/api/kantoorpakket/exporteer', { id: m.body.id, formaat: 'csv' }, lidA);
+  const spoor = (await api('/api/kantoorpakket/open', { id: m.body.id }, lidA)).body.werkstroom.audit;
+  const beheer = spoor.filter(a => a.actie === 'documentbeheer-gewijzigd').map(a => a.classificatie);
+  assert.deepEqual(beheer, ['intern', 'vertrouwelijk'], 'beide classificatiewijzigingen staan er nog');
+  assert.equal(spoor.filter(a => a.actie === 'geexporteerd').length, 5, 'en de laatste vijf exports ernaast');
 });
 
 test('7. de andere vier ingangen: zaak, kantoor, gezin en werkplek exporteren en lezen in', async () => {

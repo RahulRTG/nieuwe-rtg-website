@@ -7,10 +7,13 @@
    zoekt; de zichtbare markering (koptekst) zet elk formaat zelf. */
 'use strict';
 
-// tekens die XML 1.0 niet toestaat gaan eruit; de rest wordt ontsnapt
+/* Tekens die XML 1.0 niet toestaat gaan eruit; de rest wordt ontsnapt. De
+   u-vlag en de bovenste reeks zijn geen detail: zonder ziet de expressie een
+   emoji als twee losse halve tekens en gooit ze weg, en dan wordt een formule
+   die een emoji plakt stil een andere formule (gevonden door de tegenlezing). */
 function xmlEsc(t) {
   return String(t == null ? '' : t)
-    .replace(/[^\x09\x0A\x0D\x20-퟿-�]/g, '')
+    .replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/gu, '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 

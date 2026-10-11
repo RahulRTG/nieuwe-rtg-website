@@ -7,25 +7,27 @@
 
    Paden voluit, zelfde reden als in de andere kantoorpakket-bestanden: de
    schakelkast ziet alleen wat er letterlijk staat (scripts/check.js regel 45).
-   Beide routes nemen een ruim lijf aan: een XLSX of een SVG reist mee. */
+   Er staat bewust geen eigen lijfgrens bij: de algemene lijfparser
+   (server/opzet/lijfpoort.js) leest het lijf al voor deze route, dus een
+   strengere grens hier zou niets doen. De echte grenzen staan in de kern
+   (MAX_XLSX en MAX_SVG in kern/office/formaten.js), met een nette weigering. */
 'use strict';
 
 const envelop = require('../opzet/envelop');
 
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, officeAuth, express, rtf, werkplek, boardroomWie, boardroomBaas, office } = kern;
+  const { app, auth, supplierAuth, officeAuth, rtf, werkplek, boardroomWie, boardroomBaas, office } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json(r) : res.json(r);
-  const ruim = express.json({ limit: '600kb' });
 
   // de zaak: de team-drive op de leverancierscode
   const supDoe = fn => async (req, res) => stuur(res, await fn('sup:' + req.supplier.code, req.body || {}));
-  app.post('/api/supplier/kantoorpakket/exporteer', ruim, supplierAuth, supDoe((key, b) => office.exporteer(key, b.id, b)));
-  app.post('/api/supplier/kantoorpakket/importeer', ruim, supplierAuth, supDoe((key, b) => office.importeer(key, b)));
+  app.post('/api/supplier/kantoorpakket/exporteer', supplierAuth, supDoe((key, b) => office.exporteer(key, b.id, b)));
+  app.post('/api/supplier/kantoorpakket/importeer', supplierAuth, supDoe((key, b) => office.importeer(key, b)));
 
   // de RTG-kantoren: de gedeelde kantoor-drive
   const kantoorDoe = fn => async (req, res) => stuur(res, await fn('rtg:kantoor', req.body || {}));
-  app.post('/api/office/kantoorpakket/exporteer', ruim, officeAuth, kantoorDoe((key, b) => office.exporteer(key, b.id, b)));
-  app.post('/api/office/kantoorpakket/importeer', ruim, officeAuth, kantoorDoe((key, b) => office.importeer(key, b)));
+  app.post('/api/office/kantoorpakket/exporteer', officeAuth, kantoorDoe((key, b) => office.exporteer(key, b.id, b)));
+  app.post('/api/office/kantoorpakket/importeer', officeAuth, kantoorDoe((key, b) => office.importeer(key, b)));
 
   // leden: op het eigen account; de gratis gast-app heeft geen Office
   function geenGast(req, res, next) {
@@ -33,8 +35,8 @@ module.exports = (kern) => {
     next();
   }
   const lidDoe = fn => async (req, res) => stuur(res, await fn(req.session.key, req.body || {}));
-  app.post('/api/kantoorpakket/exporteer', ruim, auth, geenGast, lidDoe((key, b) => office.exporteer(key, b.id, b)));
-  app.post('/api/kantoorpakket/importeer', ruim, auth, geenGast, lidDoe((key, b) => office.importeer(key, b)));
+  app.post('/api/kantoorpakket/exporteer', auth, geenGast, lidDoe((key, b) => office.exporteer(key, b.id, b)));
+  app.post('/api/kantoorpakket/importeer', auth, geenGast, lidDoe((key, b) => office.importeer(key, b)));
 
   /* Het RTF-gezin: elk profiel een eigen map, met de kring van het gezin. Een
      oppas of familielid leest mee en mag dus ook downloaden wat hij al ziet;
@@ -53,8 +55,8 @@ module.exports = (kern) => {
     if (schrijf && s.gast) return res.status(403).json({ error: 'Als oppas of familielid lees je mee; maken en bewerken doet het gezin zelf.' });
     stuur(res, await fn(s, req.body || {}));
   };
-  app.post('/api/rtf/kantoorpakket/exporteer', ruim, rtfPoort, rtfDoe((s, b) => office.exporteer(s.key, b.id, b, s.kring)));
-  app.post('/api/rtf/kantoorpakket/importeer', ruim, rtfPoort, rtfDoe((s, b) => office.importeer(s.key, b, s.kring), true));
+  app.post('/api/rtf/kantoorpakket/exporteer', rtfPoort, rtfDoe((s, b) => office.exporteer(s.key, b.id, b, s.kring)));
+  app.post('/api/rtf/kantoorpakket/importeer', rtfPoort, rtfDoe((s, b) => office.importeer(s.key, b, s.kring), true));
 
   // de werkplekken: elk huis zijn eigen kantoordrive, collega's delen de kring
   function huisPoort(req, res, next) {
@@ -67,6 +69,6 @@ module.exports = (kern) => {
     next();
   }
   const huisDoe = fn => async (req, res) => stuur(res, await fn(req.officeFormaatDrive, req.body || {}));
-  app.post('/api/werkplek/kantoorpakket/exporteer', ruim, huisPoort, huisDoe((s, b) => office.exporteer(s.key, b.id, b, s.kring)));
-  app.post('/api/werkplek/kantoorpakket/importeer', ruim, huisPoort, huisDoe((s, b) => office.importeer(s.key, b, s.kring)));
+  app.post('/api/werkplek/kantoorpakket/exporteer', huisPoort, huisDoe((s, b) => office.exporteer(s.key, b.id, b, s.kring)));
+  app.post('/api/werkplek/kantoorpakket/importeer', huisPoort, huisDoe((s, b) => office.importeer(s.key, b, s.kring)));
 };

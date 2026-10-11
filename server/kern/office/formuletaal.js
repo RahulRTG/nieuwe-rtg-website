@@ -13,7 +13,17 @@
      twee verschillende sommen;
    - TEKST/TEXT: de opmaakcodes verschillen per taal van Excel zelf;
    - wat alleen hier bestaat (BTW) of hier anders telt (STDEVA telt in Excel
-     tekst als nul, hier niet).
+     tekst als nul, hier niet);
+   - zoeken: VERT.ZOEKEN, HORIZ.ZOEKEN en VERGELIJKEN zoeken hier altijd
+     exact, Excel standaard bij benadering (shared/rekenfuncties3.js zegt dat
+     zelf);
+   - tekst uit getallen: `&`, TEKST.SAMENVOEGEN, LINKS, LENGTE en hun familie
+     maken van 1,5 hier "1,5" en in Excel "1,5" of "1.5" naar gelang de taal
+     van Excel -- dat is per definitie niet zeker hetzelfde;
+   - SOM.ALS en verwanten met een * of ? in het criterium: Excel leest dat als
+     joker, deze motor niet.
+   De tegenlezing van 11 oktober 2026 vond de laatste drie; ze stonden eerst
+   in de tabel.
    Liever een eerlijke waarde dan een formule die er hetzelfde uitziet en iets
    anders uitrekent. */
 'use strict';
@@ -28,15 +38,38 @@ const NL_EN = {
   GROOTSTE: 'LARGE', KLEINSTE: 'SMALL', 'SOM.ALS': 'SUMIF', 'AANTAL.ALS': 'COUNTIF',
   'GEMIDDELDE.ALS': 'AVERAGEIF', 'GEM.ALS': 'AVERAGEIF', SOMPRODUCT: 'SUMPRODUCT',
   ALS: 'IF', EN: 'AND', OF: 'OR', NIET: 'NOT', 'ALS.FOUT': 'IFERROR', ISFOUT: 'ISERROR',
-  ISLEEG: 'ISBLANK', ISGETAL: 'ISNUMBER', ISTEKST: 'ISTEXT', BET: 'PMT', TW: 'FV', HW: 'PV',
-  'TEKST.SAMENVOEGEN': 'CONCATENATE', LINKS: 'LEFT', RECHTS: 'RIGHT', DEEL: 'MID', LENGTE: 'LEN',
-  HOOFDLETTERS: 'UPPER', 'KLEINE.LETTERS': 'LOWER', BEGINLETTERS: 'PROPER', 'SPATIES.WISSEN': 'TRIM',
-  VERVANGEN: 'SUBSTITUTE', 'VIND.SPEC': 'FIND', 'VIND.ALLES': 'SEARCH', WAARDE: 'VALUE',
-  'VERT.ZOEKEN': 'VLOOKUP', 'HORIZ.ZOEKEN': 'HLOOKUP', VERGELIJKEN: 'MATCH'
+  ISLEEG: 'ISBLANK', ISGETAL: 'ISNUMBER', ISTEKST: 'ISTEXT', BET: 'PMT', TW: 'FV', HW: 'PV'
 };
+// criteriumfuncties: alleen zonder joker in een tekstargument
+const CRITERIUM = new Set(['SUMIF', 'COUNTIF', 'AVERAGEIF']);
 // functies die in beide programma's dezelfde naam hebben
 const ZELFDE = ['PRODUCT', 'ABS', 'EXP', 'LN', 'LOG', 'PI', 'MIN', 'MAX', 'STDEV', 'INDEX'];
 const EXCEL = new Set([...Object.values(NL_EN), ...ZELFDE, 'STDEV.S']);
+// functies die Excel alleen met een voorvoegsel in het bestand herkent
+const XLFN = { 'STDEV.S': '_xlfn.STDEV.S' };
+
+/* Wat in BEIDE richtingen een formule tot "niet zeker hetzelfde" maakt, los
+   van de functienamen: tekst plakken en een joker in een criterium. */
+function nietZeker(t, naamVan) {
+  if (t.some(x => x.s === '&')) return 'tekst plakken (&) hangt in Excel af van de taalinstelling';
+  /* Het criterium (het tweede argument) moet een LETTERLIJKE waarde zonder joker
+     zijn. Uit een cel kan het later alsnog een * dragen, en dat zie je hier niet. */
+  for (let i = 0; i < t.length; i++) {
+    if (t[i].s !== 'naam' || !CRITERIUM.has(naamVan(t[i].v))) continue;
+    let diepte = 0, arg = 0;
+    for (let j = i + 1; j < t.length; j++) {
+      const x = t[j];
+      if (x.s === '(') { diepte++; continue; }
+      if (x.s === ')') { if (--diepte === 0) break; continue; }
+      if (diepte === 1 && x.s === ';') { arg++; continue; }
+      if (diepte === 1 && arg === 1) {
+        if (x.s !== 'tekst' && x.s !== 'getal') return 'het criterium komt niet letterlijk uit de formule, en Excel leest * en ? als joker';
+        if (x.s === 'tekst' && /[*?~]/.test(x.v)) return 'een * of ? in het criterium is in Excel een joker';
+      }
+    }
+  }
+  return null;
+}
 
 const zeg = (fout) => ({ fout });
 
@@ -45,6 +78,8 @@ const zeg = (fout) => ({ fout });
 function naarExcel(f) {
   const t = LEZER.knip(String(f || '').replace(/^=/, ''));
   if (!t || !LEZER.ontleed(t)) return zeg('de formule is ongeldig');
+  const bezwaar = nietZeker(t, n => NL_EN[n] || n);
+  if (bezwaar) return zeg(bezwaar);
   let uit = '';
   for (let i = 0; i < t.length; i++) {
     const x = t[i];
@@ -56,7 +91,7 @@ function naarExcel(f) {
     else if (x.s === 'naam') {
       const en = NL_EN[x.v] || (EXCEL.has(x.v) ? x.v : null);
       if (!en) return zeg('functie ' + x.v + ' rekent in Excel niet zeker hetzelfde');
-      uit += en;
+      uit += XLFN[en] || en;
     } else if (x.s === ';') uit += ',';
     else uit += x.s;
   }
@@ -74,6 +109,8 @@ function vanExcel(f) {
   }
   const t = LEZER.knip(omgezet);
   if (!t || !LEZER.ontleed(t)) return zeg('de formule kon niet worden gelezen');
+  const bezwaar = nietZeker(t, n => n);
+  if (bezwaar) return zeg(bezwaar);
   for (let i = 0; i < t.length; i++) {
     if (t[i].s === 'blad') return zeg('verwijst naar een ander werkblad');
     if (t[i].s === 'naam' && !EXCEL.has(t[i].v)) return zeg('functie ' + t[i].v + ' rekent hier niet zeker hetzelfde');

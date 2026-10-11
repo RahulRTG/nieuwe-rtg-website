@@ -16,6 +16,8 @@
 'use strict';
 
 const { lees } = require('./zip');
+// een werkblad is tekst; 4 MB uitgepakt per onderdeel is ruim voor 500 x 60 cellen
+const GRENS_XLSX = { perBestand: 4 * 1024 * 1024, totaal: 12 * 1024 * 1024, aantal: 200 };
 const { vanExcel, kolNaam } = require('./formuletaal');
 const { EPOCH } = require('./xlsx-schrijf');
 
@@ -26,17 +28,54 @@ const uitXml = t => String(t).replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos);/
   return { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" }[e.toLowerCase()];
 });
 const attr = (tag, naam) => { const m = new RegExp('\\s' + naam + '="([^"]*)"').exec(tag); return m ? uitXml(m[1]) : null; };
-const teksten = xml => (String(xml).replace(/<rPh\b[\s\S]*?<\/rPh>/g, '').match(/<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/g) || [])
-  .map(t => uitXml(t.replace(/^<t(?:\s[^>]*)?>|<\/t>$/g, ''))).join('');
+/* ELEMENTEN ZOEKEN IN EEN DOORLOOP. Hier stond een reguliere expressie met een
+   luie staart (`<c ...>` tot de eerstvolgende `</c>`); een werkblad vol `<c>`
+   zonder sluittag liet elke treffer tot het einde van het bestand doorlezen --
+   kwadratisch, en met een paar kB ingepakt legde het de server minutenlang
+   stil (gevonden door de tegenlezing). Deze scanner loopt met indexOf altijd
+   vooruit, en een element zonder sluittag beeindigt de lezing in plaats van de
+   rest opnieuw te doorzoeken. */
+function blokken(xml, tag) {
+  const uit = [], s = String(xml || ''), open = '<' + tag, dicht = '</' + tag + '>';
+  let i = 0;
+  for (;;) {
+    let a = s.indexOf(open, i);
+    while (a >= 0 && /[A-Za-z0-9:_-]/.test(s.charAt(a + open.length))) a = s.indexOf(open, a + 1);
+    if (a < 0) break;
+    const eindKop = s.indexOf('>', a);
+    if (eindKop < 0) break;
+    const kop = s.slice(a, eindKop + 1);
+    if (kop.endsWith('/>')) { uit.push({ kop, binnen: '' }); i = eindKop + 1; continue; }
+    const b = s.indexOf(dicht, eindKop + 1);
+    if (b < 0) break;
+    uit.push({ kop, binnen: s.slice(eindKop + 1, b) });
+    i = b + dicht.length;
+  }
+  return uit;
+}
+// de tekst van een cel of gedeelde tekst; fonetische hulptekst (<rPh>) hoort er niet bij
+const teksten = xml => {
+  const s = String(xml || '');
+  let schoon = '', i = 0;
+  for (;;) {
+    const a = s.indexOf('<rPh', i);
+    if (a < 0) { schoon += s.slice(i); break; }
+    schoon += s.slice(i, a);
+    const b = s.indexOf('</rPh>', a);
+    if (b < 0) break;
+    i = b + 6;
+  }
+  return blokken(schoon, 't').map(x => uitXml(x.binnen)).join('');
+};
 const kolIndex = s => { let n = 0; for (const c of s) n = n * 26 + (c.charCodeAt(0) - 64); return n - 1; };
 
 function opmaakSoorten(stijlXml) {
   if (!stijlXml) return [];
   const eigen = {};
   for (const m of stijlXml.matchAll(/<numFmt\b[^>]*>/g)) eigen[attr(m[0], 'numFmtId')] = attr(m[0], 'formatCode') || '';
-  const fonts = ((/<fonts\b[\s\S]*?<\/fonts>/.exec(stijlXml) || [''])[0].match(/<font\b[\s\S]*?(?:<\/font>|\/>)/g) || [])
-    .map(f => /<b\/>|<b val="(1|true)"\/>/.test(f));
-  const xfs = ((/<cellXfs\b[\s\S]*?<\/cellXfs>/.exec(stijlXml) || [''])[0].match(/<xf\b[^>]*>/g) || []);
+  const fonts = blokken((blokken(stijlXml, 'fonts')[0] || {}).binnen, 'font')
+    .map(f => /<b\/>|<b val="(1|true)"\/>/.test(f.binnen));
+  const xfs = blokken((blokken(stijlXml, 'cellXfs')[0] || {}).binnen, 'xf').map(x => x.kop);
   return xfs.map(xf => {
     const id = +(attr(xf, 'numFmtId') || 0);
     const code = (eigen[id] || '').replace(/"[^"]*"|\[[^\]]*\]/g, m => /€|EUR/.test(m) ? '€' : '');
@@ -49,7 +88,7 @@ function opmaakSoorten(stijlXml) {
 }
 
 function leesXlsx(buf) {
-  const delen = lees(buf);
+  const delen = lees(buf, GRENS_XLSX);
   const tekst = naam => delen[naam] ? delen[naam].toString('utf8') : null;
   const werkboek = tekst('xl/workbook.xml');
   if (!werkboek) { const e = new Error('Dit is geen XLSX: er zit geen werkboek in.'); e.zipFout = true; throw e; }
@@ -63,7 +102,7 @@ function leesXlsx(buf) {
   const blad = tekst(pad);
   if (!blad) { const e = new Error('Het eerste werkblad ontbreekt in dit bestand.'); e.zipFout = true; throw e; }
 
-  const gedeeld = ((tekst('xl/sharedStrings.xml') || '').match(/<si\b[\s\S]*?<\/si>/g) || []).map(teksten);
+  const gedeeld = blokken(tekst('xl/sharedStrings.xml'), 'si').map(x => teksten(x.binnen));
   const soorten = opmaakSoorten(tekst('xl/styles.xml'));
   const trouw = {};
   const noteer = (wat, cel) => { const t = trouw[wat] = trouw[wat] || { wat, aantal: 0, cellen: [] }; t.aantal++; if (cel && t.cellen.length < 10) t.cellen.push(cel); };
@@ -74,13 +113,14 @@ function leesXlsx(buf) {
 
   const cellen = {}, opmaak = {};
   let rijen = 1, kolommen = 1, n = 0;
-  for (const m of blad.matchAll(/<c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g)) {
-    const kop = '<c' + m[1] + '>', binnen = m[2] || '';
+  for (const { kop, binnen } of blokken(blad, 'c')) {
     const ref = attr(kop, 'r');
     const r = /^([A-Z]{1,3})(\d+)$/.exec(ref || '');
     if (!r) continue;
-    const vMatch = /<v>([\s\S]*?)<\/v>/.exec(binnen);
-    const fMatch = /<f\b([^>]*)>([\s\S]*?)<\/f>|<f\b([^>]*)\/>/.exec(binnen);
+    const v = blokken(binnen, 'v')[0];
+    const fBlok = blokken(binnen, 'f')[0];
+    const vMatch = v ? [null, v.binnen] : null;
+    const fMatch = fBlok ? [null, fBlok.kop, fBlok.binnen] : null;
     const t = attr(kop, 't');
     let waarde = vMatch ? uitXml(vMatch[1]) : null;
     if (t === 's') waarde = gedeeld[+waarde] != null ? gedeeld[+waarde] : '';

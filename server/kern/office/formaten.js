@@ -37,15 +37,21 @@ const MIME = {
 };
 const INDELING = { titel: 'Titelblad', punten: 'Punten', twee: 'Twee kolommen', citaat: 'Citaat', cijfer: 'Cijfer' };
 const MAX_SVG = 500000;
+const MAX_UITGAAND = 60;   // exportregels per document, in een eigen ring
 const MAX_XLSX = 420000;   // in bytes, na base64: past onder de ruime grens van de bewaarroute
 
 const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const csvVeld = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+/* Een veld dat met = + - @ begint, voert een rekenprogramma uit als formule
+   (=HYPERLINK(...) in een kaarttitel). Een apostrof ervoor maakt het tekst. */
+const csvVeld = v => {
+  const s = String(v == null ? '' : v);
+  return '"' + (/^[=+\-@\t\r]/.test(s) ? "'" + s : s).replace(/"/g, '""') + '"';
+};
 const bestandsnaam = (titel, label, ext) => (String(titel || 'document').replace(/[\\/:*?"<>|\u0000-\u001f]/g, ' ').trim().slice(0, 100) || 'document') +
   (label !== 'Intern' ? ' (' + label + ')' : '') + '.' + ext;
 
 module.exports = ({ save, schoon }, basis) => {
-  const { docMet, magLezen, schrijfAudit, schoonInhoud, grootteVan } = basis;
+  const { docMet, magLezen, naamVan, schrijfAudit, schoonInhoud, grootteVan } = basis;
 
   function bouw(d, formaat, data, label) {
     const inh = d.inhoud || {};
@@ -99,14 +105,17 @@ module.exports = ({ save, schoon }, basis) => {
         ? 'Dit document gaat eruit als ' + kan.map(f => f.toUpperCase()).join(' of ') + '.'
         : 'Een formulier exporteert u als uitslag; dat doet de beheerder bij Uitslag.' };
     }
-    const uit = poort(d, 'export');
-    if (!uit.mag) return { status: 403, code: uit.code, error: uit.reden };
-    const r = bouw(d, formaat, data, uit.label);
+    const oordeel = poort(d, 'export');
+    if (!oordeel.mag) return { status: 403, code: oordeel.code, error: oordeel.reden };
+    const r = bouw(d, formaat, data, oordeel.label);
     if (r.fout) return { status: 400, error: r.fout };
-    schrijfAudit(d, key, 'geexporteerd', { formaat, classificatie: uit.classificatie });
+    // eigen ring, zodat exports het beheerspoor nooit verdringen (zie spoorVan in ./basis.js)
+    if (!Array.isArray(d.uitgaand)) d.uitgaand = [];
+    d.uitgaand.unshift({ om: new Date().toISOString(), door: naamVan(key), actie: 'geexporteerd', formaat, classificatie: oordeel.classificatie });
+    if (d.uitgaand.length > MAX_UITGAAND) d.uitgaand.length = MAX_UITGAAND;
     save();
-    return { status: 200, naam: bestandsnaam(d.titel, uit.label, formaat), mime: MIME[formaat], formaat,
-      classificatie: uit.classificatie, label: uit.label, bytes: r.buffer.length,
+    return { status: 200, naam: bestandsnaam(d.titel, oordeel.label, formaat), mime: MIME[formaat], formaat,
+      classificatie: oordeel.classificatie, label: oordeel.label, bytes: r.buffer.length,
       bestand: r.buffer.toString('base64'), trouw: r.trouw };
   }
 

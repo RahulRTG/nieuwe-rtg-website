@@ -38,7 +38,8 @@ const UITGANGEN = Object.freeze({
   meelezen: { strikt: 'dicht', wat: 'openen door iemand anders dan de eigenaar, ook bij oude opslag met een deling naast strikt' },
   model: { strikt: 'dicht', wat: 'documenttekst naar een taalmodel (lokaal of extern: server/ai.js valt bij storing door naar extern)' },
   export: { strikt: 'markering', wat: 'een bestand downloaden (HTML, CSV, XLSX, DOCX, TXT)' },
-  spiegel: { strikt: 'markering', wat: 'de titel van een eigen document in de lijst van Bestanden' }
+  spiegel: { strikt: 'markering', wat: 'de titel van een eigen document in de lijst van Bestanden' },
+  lijst: { strikt: 'markering', wat: 'de drive-lijst en het geopende document, voor wie het al mag lezen' }
 });
 
 const WEIGER = {

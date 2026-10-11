@@ -67,7 +67,8 @@ function lees(buf, grens) {
   const aantal = buf.readUInt16LE(e + 10);
   if (aantal > g.aantal) throw fout('Er zitten te veel onderdelen in dit bestand.');
   let p = buf.readUInt32LE(e + 16);
-  const uit = {};
+  // geen prototype: een onderdeel dat `__proto__` heet, blijft een gewone sleutel
+  const uit = Object.create(null);
   let totaal = 0;
   for (let k = 0; k < aantal; k++) {
     if (p + 46 > buf.length || buf.readUInt32LE(p) !== 0x02014b50) throw fout('De inhoudsopgave van dit bestand is beschadigd.');

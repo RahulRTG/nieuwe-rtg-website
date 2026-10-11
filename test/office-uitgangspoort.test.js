@@ -43,11 +43,24 @@ test('een onbekende uitgang gooit; een document zonder of met onzin-classificati
   assert.ok(Object.keys(UITGANGEN).every(u => ['dicht', 'markering'].includes(UITGANGEN[u].strikt)));
 });
 
-test('buiten de poort en de beheerplek leest niets in server/ de classificatie van een Office-document', () => {
+test('buiten de poort en de beheerplek leest niets de classificatie van een Office-document', () => {
   const ROOT = path.join(__dirname, '..', 'server');
   const MAG = new Set(['kern/office/uitgangspoort.js', 'kern/office/samen.js']);
-  // de drie vormen waarin een uitgang de classificatie zelf leest
-  const VORM = [/beheer\s*\.\s*classificatie/, /beheer\s*&&[^;\n]*\.classificatie/, /classificatie\s*[!=]==?\s*'strikt'/];
+  /* WELKE BESTANDEN: alles onder kern/office en de kantoorpakket-routes, en elk
+     bestand elders dat de documenten aanraakt (officeDocs) of de Office-kern
+     laadt. De tegenlezing van 11 oktober 2026 vond dat de eerste versie van deze
+     toets drie tekstvormen kende en dat `(d.beheer || {}).classificatie`,
+     `d['beheer']['classificatie']` en `classificatieVan(d) === 'strikt'` er
+     allemaal langs kwamen. Daarom nu in de breedte: */
+  const VORM = [
+    [/classificatieVan/, 'classificatieVan buiten de poort'],
+    [/['"`]strikt['"`]/, 'de stand strikt als letterlijke tekst'],
+    [/beheer(?!\s*:\s*\{)[^\n]{0,60}classificatie/, 'beheer ... classificatie'],
+    [/classificatie[^\n]{0,60}beheer\b(?!\s*:)/, 'classificatie ... beheer'],
+    [/(?:\.|\[\s*['"`])classificatie\b/, 'een veld classificatie lezen']
+  ];
+  // het oordeel van de poort zelf lezen mag: rechtstreeks, of uit een variabele die `oordeel` heet
+  const UITZONDERING = /(?:poort|Uitgang)\([^)]*\)\.classificatie|\boordeel\.classificatie/g;
   const fout = [];
   (function loop(map) {
     for (const naam of fs.readdirSync(map, { withFileTypes: true })) {
@@ -57,12 +70,31 @@ test('buiten de poort en de beheerplek leest niets in server/ de classificatie v
       const rel = path.relative(ROOT, vol).split(path.sep).join('/');
       if (MAG.has(rel)) continue;
       const bron = fs.readFileSync(vol, 'utf8');
+      const inBereik = rel.startsWith('kern/office/') || rel.startsWith('routes/kantoorpakket') ||
+        /officeDocs|['"`](?:\.\.?\/)+(?:kern\/)?office(?:\/|['"`])/.test(bron);
+      if (!inBereik) continue;
       bron.split('\n').forEach((regel, i) => {
         if (/^\s*(\/\/|\*|\/\*)/.test(regel)) return;   // commentaar is een belofte, geen lezing
-        if (VORM.some(re => re.test(regel))) fout.push(rel + ':' + (i + 1) + '  ' + regel.trim());
+        const code = regel.replace(UITZONDERING, '');
+        for (const [re, wat] of VORM) if (re.test(code)) { fout.push(rel + ':' + (i + 1) + ' (' + wat + ')  ' + regel.trim()); break; }
       });
     }
   })(ROOT);
   assert.deepEqual(fout, [], 'deze plekken lezen de classificatie zelf in plaats van via ' +
     'kern/office/uitgangspoort.js -- zet de uitgang in UITGANGEN en vraag poort(d, uitgang):\n' + fout.join('\n'));
+});
+
+test('de dwang ziet de omwegen die de tegenlezing vond', () => {
+  // dezelfde regels als hierboven, op de drie vormen die de eerste versie miste
+  const vormen = ["if ((d.beheer || {}).classificatie === 'strikt') return x;",
+    "const c = d['beheer']['classificatie'];", "if (classificatieVan(d) === 'strikt') return x;",
+    "const { classificatie } = d.beheer;"];
+  const VORM = [/classificatieVan/, /['"`]strikt['"`]/, /beheer(?!\s*:\s*\{)[^\n]{0,60}classificatie/,
+    /classificatie[^\n]{0,60}beheer\b(?!\s*:)/, /(?:\.|\[\s*['"`])classificatie\b/];
+  for (const v of vormen) assert.ok(VORM.some(re => re.test(v)), 'gezien: ' + v);
+  // en de aanmaak van een document en het oordeel van de poort blijven toegestaan
+  const UITZONDERING = /(?:poort|Uitgang)\([^)]*\)\.classificatie|\boordeel\.classificatie/g;
+  for (const v of ["beheer: { classificatie: 'intern', bewaartermijn: '7jaar' },", "classificatie: poort(d, 'lijst').classificatie,"]) {
+    assert.ok(!VORM.some(re => re.test(v.replace(UITZONDERING, ''))), 'toegestaan: ' + v);
+  }
 });

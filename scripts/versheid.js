@@ -138,6 +138,8 @@ const REGISTERS = [
   ['HERBOUWPROEF.json', 'npm run herbouwproef:vast', 'of het draaien van die eigenaar hetzelfde artefact oplevert -- een herbouwplicht in plaats van een handmatig samenvoegconflict'],
   ['IDEMIDENTITEIT.json', 'npm run idemidentiteit', 'waaraan twee aanroepen hetzelfde verzoek heten (MUTATIECONTRACT.md par. 6e)'],
   ['LAATSTE_METING.json', 'npm run beproeving', 'de laatste stormproef, ook wanneer hij zakt'],
+  ['ROMEPROEF.json', 'npm run romeproef:vast', 'of de Rome-keten door alle vier de werelden loopt zonder dat een domein in een ander schrijft'],
+  ['SCHILHERSTART.json', 'npm run schilherstart', 'hoeveel van de schil bij een tik opnieuw opstart (WERKRUIMTE.md par. 12)'],
   ['HEAPPROEF.json', 'npm run heapproef', 'geheugengedrag onder herhaalde verzoeken'],
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],
   ['SCHERMLEUGEN.json', 'node --test test/liegend-scherm.e2e.js', 'of een scherm iets toont dat er niet is'],

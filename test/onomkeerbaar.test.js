@@ -23,17 +23,17 @@ const uitz = require('../server/kern/commercie/risicouitzondering');
 const geldomkeer = require('../server/kern/commercie/geldomkeer');
 const bewijs = require('../server/kern/commercie/bewijstoken');
 
-function huis({ grendel } = {}) {
+function huis() {
   const bakken = {};
   const bak = (naam) => (bakken[naam] = bakken[naam] || []);
   const token = bewijs.maakBewijstoken({ sleutel: Buffer.from('01234567890123456789012345678901'),
     gezien: bewijs.geheugenGezien() });
-  const beslisser = maakBeslis({ munt: token.munt, onomkeerbaarGrendel: grendel });
+  const beslisser = maakBeslis({ munt: token.munt });
   const voornemens = maakVoornemens({ db: { data: {} }, save: () => {}, verbruikToken: token.verbruik,
     beslis: (v) => beslisser.beslis(v) });
   const frictie = require('../server/kern/frictie').maakRisico({
     beleid: { getal: (n, s) => s, waarde: (n, s) => s } });
-  return { ketenlaag: maakGeldketen({ voornemens, frictie, bak, onomkeerbaarGrendel: grendel }), voornemens };
+  return { ketenlaag: maakGeldketen({ voornemens, frictie, bak }), voornemens };
 }
 
 const GROOT = BELEID.omkeerbaarBovenCenten + 50000;   // 3.000 euro
@@ -48,15 +48,20 @@ const opgave = (extra) => Object.assign({
   uitvoerbelofte: { graad: 'gemeten', uitslag: 'hervatbaar per post', reden: 'per post' },
 }, extra || {});
 
-const OPEN = () => ({ open: true });
+/* De teruggave: niet omkeerbaar en NIET toegelaten tot de uitzonderingsprocedure. */
+const terug = (extra) => opgave(Object.assign({ klasse: 'geld-eenmalig', handeling: 'GELD_TERUGGEVEN',
+  pad: '/api/office/reisbureau/teruggave', doel: 'teruggave groot', sleutel: 'teruggave:groot',
+  stappen: [{ wat: 'teruggave', doel: 'R1', centen: GROOT, gegevens: { id: 'RTG1' } }],
+  uitvoerbelofte: { graad: 'gemeten', uitslag: 'atomair: een boeking', reden: 'een deel' } }, extra || {}));
+const RG = { door: 'user-3', naam: 'carla', reden: 'Met de bank afgestemd, risico gedragen.' };
 
-test('b. boven de grens en niet omkeerbaar: meteen geweigerd bij het klaarzetten, met reden en weg, en er staat niets klaar', () => {
+test('b. boven de grens, niet omkeerbaar en niet toegelaten: meteen geweigerd bij het klaarzetten, met reden en weg', () => {
   const { ketenlaag, voornemens } = huis();
-  const r = ketenlaag.klaarzet(opgave());
+  const r = ketenlaag.klaarzet(terug());
   assert.equal(r.status, 403, JSON.stringify(r));
   assert.match(r.error, /terug te draaien/);
-  assert.match(r.error, /klant van RTG Bank/, 'de reden komt uit de tabel (waar het geld landt)');
-  assert.match(r.error, /staat dicht/, 'de weg: de uitzonderingsprocedure en dat zij dicht staat');
+  assert.match(r.error, /een lid/, 'de reden komt uit de tabel (waar het geld landt)');
+  assert.match(r.error, /staat voor deze handeling dicht/, 'de weg: de uitzonderingsprocedure en dat zij dicht staat');
   assert.doesNotMatch(r.error, /splits|buiten het systeem/, 'de weg moedigt geen opknippen of geld buiten het spoor aan');
   assert.equal(voornemens.lijst({ limit: 10 }).aantal, 0, 'er is toch een voornemen opgesteld');
   assert.equal(ketenlaag.lijst({}).aantal, 0, 'er is toch een dossier aangelegd');
@@ -64,12 +69,12 @@ test('b. boven de grens en niet omkeerbaar: meteen geweigerd bij het klaarzetten
 
 test('b. een aanroeper kan omkeerbaar niet zelf aanzetten: de tabel beslist', () => {
   const { ketenlaag } = huis();
-  const r = ketenlaag.klaarzet(opgave({ omkeerbaar: true, sleutel: 'incasso:zelf' }));
+  const r = ketenlaag.klaarzet(terug({ omkeerbaar: true, sleutel: 'teruggave:zelf' }));
   assert.equal(r.status, 403, JSON.stringify(r));
 });
 
-test('a. een tweede handtekening maakt een onomkeerbare handeling niet omkeerbaar (grendel open, geen risicogoedkeuring)', async () => {
-  const { ketenlaag, voornemens } = huis({ grendel: OPEN });
+test('a. een tweede handtekening maakt een onomkeerbare handeling niet omkeerbaar (incasso boven de grens, zonder risicogoedkeuring)', async () => {
+  const { ketenlaag, voornemens } = huis();
   const klaar = ketenlaag.klaarzet(opgave());
   assert.equal(klaar.voornemen.stand, 'WACHT', JSON.stringify(klaar));
   assert.equal(klaar.dossier.omkeerbaarheid.omkeerbaar, false);
@@ -85,36 +90,42 @@ test('a. een tweede handtekening maakt een onomkeerbare handeling niet omkeerbaa
   assert.equal(geraakt, false, 'er is geld bewogen na een weigering');
 });
 
-test('c. de uitzonderingsprocedure weigert zolang de grendel dicht is, ook met een geldige risicogoedkeuring', () => {
-  assert.equal(uitz.stand().open, false, 'zonder grendel hoort de procedure dicht te staan');
+test('c. voor elke handeling buiten de toelating blijft de procedure dicht, ook met een geldige risicogoedkeuring', () => {
+  assert.equal(uitz.stand('GELD_TERUGGEVEN').open, false, 'de teruggave hoort dicht te staan (besluit 2C)');
+  assert.equal(uitz.stand('IETS_ANDERS').open, false);
+  assert.equal(uitz.stand('GELD_INNEN').open, true, 'de incassoronde is toegelaten (besluit 2C)');
   const b = maakBesluit({ zoekBevoegdheid: () => ({ capability: 'X', scope: '*', grenzen: {}, keten: [] }) });
-  const r = b.beslis({ actor: 'ans', handeling: 'X', waardeCenten: GROOT,
+  const r = b.beslis({ actor: 'ans', handeling: 'GELD_TERUGGEVEN', waardeCenten: GROOT,
     context: { goedgekeurdDoor: 'bert', bevestigingVers: true, risicogoedkeuring: { door: 'carla', reden: 'Met de bank afgestemd, risico gedragen.' } } });
   assert.equal(r.uitkomst, UITKOMST.OMKEERBAAR);
-  assert.match(r.reden, /staat dicht/);
+  assert.match(r.reden, /staat voor deze handeling dicht/);
   assert.equal(r.omkeerbaar, false);
 });
 
-test('d. met de grendel open (alleen hier) gaat het door met een risicogoedkeuring, en het blijft onomkeerbaar', async () => {
-  const { ketenlaag, voornemens } = huis({ grendel: OPEN });
+test('d. een incassoronde boven de grens gaat door met een risicogoedkeuring, en het dossier zegt onomkeerbaar + uitzondering', async () => {
+  const { ketenlaag, voornemens } = huis();
   const klaar = ketenlaag.klaarzet(opgave({ sleutel: 'incasso:d' }));
   const id = klaar.voornemen.id;
-  assert.equal(voornemens.risicoGoedkeur(id, { door: 'carla', reden: 'Met de bank afgestemd, risico gedragen.' }).status, 200);
+  assert.equal(ketenlaag.risicoGoedkeur(Object.assign({ id }, RG)).status, 200);
   const t = ketenlaag.tekenAf({ id, door: 'bert' });
   assert.ok(t.ok, JSON.stringify(t));
+  const as = ketenlaag.dossier(id).dossier.assen.find(a => a.as === 'omkeerbaarheid');
+  assert.equal(as && as.uitslag, 'onomkeerbaar, uitzondering met risicogoedkeuring', JSON.stringify(as));
+  assert.strictEqual(as.omkeerbaar, false);
+  assert.equal(as.bron, 'eigenaarsbesluit 2C, 11 oktober 2026');
   const v = voornemens.vind(id);
   assert.equal(v.stand, 'GEKEURD');
   assert.equal(v.besluit.uitkomst, UITKOMST.TOESTAAN);
   assert.equal(v.besluit.omkeerbaar, false, 'een uitzondering beweert nooit dat het terug kan');
   assert.equal(v.besluit.uitzondering.soort, 'onomkeerbaar, uitzondering met risicogoedkeuring');
-  assert.match(v.besluit.reden, /Onomkeerbaar, uitzondering met risicogoedkeuring van carla/);
+  assert.match(v.besluit.reden, /Onomkeerbaar, uitzondering met risicogoedkeuring van carla \(eigenaarsbesluit 2C/);
 });
 
 test('d. wie de tweede handtekening zet, geeft niet ook de risicogoedkeuring; en de context kan hem niet inschuiven', () => {
-  const { ketenlaag, voornemens } = huis({ grendel: OPEN });
+  const { ketenlaag, voornemens } = huis();
   const klaar = ketenlaag.klaarzet(opgave({ sleutel: 'incasso:dubbel' }));
   const id = klaar.voornemen.id;
-  voornemens.risicoGoedkeur(id, { door: 'bert', reden: 'Ik teken en ik draag het risico.' });
+  voornemens.risicoGoedkeur(id, { door: 'bert', naam: 'bert', reden: 'Ik teken en ik draag het risico.' });
   assert.equal(ketenlaag.tekenAf({ id, door: 'bert' }).status, 403);
 
   const k2 = ketenlaag.klaarzet(opgave({ sleutel: 'incasso:context' }));
@@ -124,7 +135,7 @@ test('d. wie de tweede handtekening zet, geeft niet ook de risicogoedkeuring; en
 });
 
 test('een voornemen van voor het besluit boven de grens, zonder gewogen omkeerbaarheid, wordt bij uitvoeren gestaakt', async () => {
-  const { voornemens } = huis({ grendel: OPEN });
+  const { voornemens } = huis();
   const o = voornemens.stelOp({ actor: 'ans', handeling: 'GELD_INNEN', doel: 'oud', sleutel: 'oud:1',
     stappen: [{ wat: 'incassoronde', doel: 'oud', centen: GROOT }] });
   const v = voornemens.vind(o.voornemen.id);
@@ -156,7 +167,7 @@ test('de tabel: elke handeling op een bekende rail, alleen woorden van de herste
 });
 
 test('een risicogoedkeuring hoort voor het besluit en draagt naam en reden', () => {
-  const { ketenlaag, voornemens } = huis({ grendel: OPEN });
+  const { ketenlaag, voornemens } = huis();
   const klaar = ketenlaag.klaarzet(opgave({ sleutel: 'incasso:rg' }));
   const id = klaar.voornemen.id;
   assert.equal(voornemens.risicoGoedkeur(id, { door: 'carla', reden: 'kort' }).status, 400);
@@ -173,7 +184,7 @@ test('de afleidregel heeft een ja-tak: een tegenboeking naar een eigen positie v
 });
 
 test('de keuring negeert omkeerbaar uit de context: de tabel beslist, ook buiten de geldketen', () => {
-  const { voornemens } = huis({ grendel: OPEN });
+  const { voornemens } = huis();
   const o = voornemens.stelOp({ actor: 'ans', handeling: 'GELD_TERUGGEVEN', doel: 'teruggave', sleutel: 'ctx:1',
     stappen: [{ wat: 'teruggave', doel: 'R1', centen: GROOT }] });
   voornemens.keur(o.voornemen.id, { context: { omkeerbaar: true } });
@@ -184,6 +195,42 @@ test('de keuring negeert omkeerbaar uit de context: de tabel beslist, ook buiten
 
 test('de vroege weigering rekent het totaal uit de stappen, niet uit wat de aanroeper opgeeft', () => {
   const { ketenlaag } = huis();
-  const r = ketenlaag.klaarzet(opgave({ totaalCenten: 100, sleutel: 'incasso:laag' }));
+  const r = ketenlaag.klaarzet(terug({ totaalCenten: 100, sleutel: 'teruggave:laag' }));
   assert.equal(r.status, 403, JSON.stringify(r));
+});
+
+test('2C: een risicogoedkeuring geldt voor precies EEN ronde; een kopie op de volgende opent niets', () => {
+  const { ketenlaag, voornemens } = huis();
+  const een = ketenlaag.klaarzet(opgave({ sleutel: 'incasso:ronde1' }));
+  assert.equal(ketenlaag.risicoGoedkeur(Object.assign({ id: een.voornemen.id }, RG)).status, 200);
+  const twee = ketenlaag.klaarzet(opgave({ sleutel: 'incasso:ronde2', doel: 'ronde 2' }));
+  // dezelfde goedkeuring overgezet op de tweede ronde, zoals het in de opslag zou kunnen belanden
+  voornemens.vind(twee.voornemen.id).risicogoedkeuring = Object.assign({}, voornemens.vind(een.voornemen.id).risicogoedkeuring);
+  const t = ketenlaag.tekenAf({ id: twee.voornemen.id, door: 'bert' });
+  assert.equal(t.status, 403, 'een goedkeuring van een andere ronde werd hergebruikt: ' + JSON.stringify(t));
+  // en een tweede goedkeuring op dezelfde ronde kan niet
+  assert.equal(ketenlaag.risicoGoedkeur(Object.assign({ id: een.voornemen.id }, RG, { door: 'user-9' })).status, 409);
+});
+
+test('2C: de aanvrager geeft zijn eigen risicogoedkeuring niet, ook niet met een andere naam (sleutel)', () => {
+  const { ketenlaag } = huis();
+  const k = ketenlaag.klaarzet(opgave({ sleutel: 'incasso:eigen' }));
+  const r = ketenlaag.risicoGoedkeur({ id: k.voornemen.id, door: 'user-1', naam: 'iemand anders', reden: 'Mijn eigen ronde, mijn eigen risico.' });
+  assert.equal(r.status, 403, JSON.stringify(r));
+});
+
+test('2C: een teruggave boven de grens met een "goedkeuring" blijft geweigerd', () => {
+  const { ketenlaag, voornemens } = huis();
+  assert.equal(ketenlaag.klaarzet(terug({ sleutel: 'teruggave:2c' })).status, 403);
+  // ook rechtstreeks in de voornemenlaag, zonder de vroege poort
+  const o = voornemens.stelOp({ actor: 'ans', handeling: 'GELD_TERUGGEVEN', doel: 't', sleutel: 'teruggave:direct',
+    stappen: [{ wat: 'teruggave', doel: 'R1', centen: GROOT }] });
+  voornemens.keur(o.voornemen.id, { context: {} });
+  const rg = voornemens.risicoGoedkeur(o.voornemen.id, { door: 'user-3', naam: 'carla', reden: 'Toch maar doen, risico gedragen.' });
+  assert.equal(rg.status, 409, JSON.stringify(rg));
+  assert.match(rg.error, /alleen de incassoronde/);
+  const b = maakBesluit({ zoekBevoegdheid: () => ({ capability: 'X', scope: '*', grenzen: {}, keten: [] }) });
+  const r = b.beslis({ actor: 'ans', handeling: 'GELD_TERUGGEVEN', waardeCenten: GROOT,
+    context: { goedgekeurdDoor: 'bert', bevestigingVers: true, risicogoedkeuring: RG } });
+  assert.equal(r.uitkomst, UITKOMST.OMKEERBAAR);
 });

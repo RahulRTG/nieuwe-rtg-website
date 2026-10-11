@@ -62,6 +62,12 @@ function maakTekenen({ voornemens, vindDossier, leg, noteer, bewaar }) {
        boven de duizend euro heette niet rond om een as die WEL gelopen was. Gevonden door
        de tweede keten (de reisteruggave, 11 oktober 2026): de incassoronde in de proef
        bleef onder de grens en zag het nooit. Zonder token blijft de as wat hij was. */
+    /* Ging het door via de uitzonderingsprocedure (eigenaarsbesluit 2C), dan zegt het
+       dossier dat hardop -- en nooit dat de handeling terug kan. */
+    if (besluit && besluit.uitzondering)
+      leg(d, 'omkeerbaarheid', { graad: 'gemeten', uitslag: besluit.uitzondering.soort, omkeerbaar: false,
+        door: besluit.uitzondering.naam || besluit.uitzondering.door, bron: besluit.uitzondering.bron,
+        reden: besluit.uitzondering.reden });
     if (r.voornemen && r.voornemen.heeftBewijs)
       leg(d, 'bewijsDraagt', { graad: 'gemeten', uitslag: 'token bij het voornemen',
         reden: 'het besluit na de tweede handtekening gaf een bewijstoken mee; de uitvoering levert hem in' });

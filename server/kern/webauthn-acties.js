@@ -63,6 +63,7 @@ const ZWARE_ACTIES = Object.freeze([
   'bank.incasso',               // POST /api/office/bank/incasso  (de geldketen, MACHINE.md par. 5a)
   'bank.bevestig',              // POST /api/office/bank/handtekening/bevestig  (tweede handtekening onder geld)
   'bank.afstemming',            // POST /api/office/bank/opdrachten/afstemming  (een onbekende uitbetaling afstemmen; kan geld terugboeken)
+  'bank.incasso.risico',        // POST /api/office/bank/incasso/risico  (risicogoedkeuring boven de omkeerbaarheidsgrens, besluit 2C)
   'reisbureau.teruggave',       // POST /api/office/reisbureau/teruggave  (een betaalde reis terugbetalen)
   'connection.table.manage',    // POST /api/office/rendezvous/tafel/*
   'connection.safety.report.read', // GET /api/vonk/meldingen en /api/member/rendezvous/meldingen

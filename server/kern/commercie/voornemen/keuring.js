@@ -42,15 +42,11 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
     if (!beslis) return { status: 503, error: 'Er is geen beslislaag om dit voornemen langs te leggen.' };
 
     const o = opties || {};
-    /* De risicogoedkeuring komt ALLEEN uit het voornemen: wie hem via de context
-       meegeeft, ontloopt de eisen van risicoGoedkeur (voor het besluit, op naam, met
-       reden). Wat de aanroeper stuurt, wordt dus vervangen. */
+    /* De risicogoedkeuring komt alleen uit DIT voornemen (niet uit de context, niet van
+       een andere ronde: besluit 2C), en omkeerbaar alleen uit de tabel. */
     const ctx = Object.assign({}, o.context || {});
     delete ctx.risicogoedkeuring;
-    if (v.risicogoedkeuring) ctx.risicogoedkeuring = v.risicogoedkeuring;
-    /* En `omkeerbaar` komt uit de TABEL (../geldomkeer.js) en nooit van de aanroeper:
-       een context met `omkeerbaar: true` opende anders de grens voor elke handeling,
-       ook voor een teruggave. Onbekend is dicht. */
+    if (v.risicogoedkeuring && v.risicogoedkeuring.voornemen === v.id) ctx.risicogoedkeuring = v.risicogoedkeuring;
     ctx.omkeerbaar = require('../geldomkeer').voor(v.handeling).omkeerbaar === true;
     const b = beslis({ actor: v.actor, handeling: v.handeling, doel: v.doel,
       waardeCenten: v.totaalCenten, context: ctx });
@@ -116,7 +112,7 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
     if (!v) return { status: 404, error: 'Dit voornemen bestaat niet.' };
     if (v.stand !== P.STAND.WACHT)
       return { status: 409, error: 'Alleen een wachtend voornemen wordt afgetekend; deze staat op ' + v.stand + '.' };
-    const wie = String(door || '').slice(0, 60);
+    const wie = String(door || '').slice(0, 80);
     if (!wie) return { status: 400, error: 'Wie tekent er af?' };
     if (wie === v.actor)
       return { status: 400, error: 'Een tweede handtekening van dezelfde persoon is er geen.' };
@@ -130,18 +126,23 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
 
   /* DE RISICOGOEDKEURING: een eigen stap, op naam, met reden (../uitzondering.js). Hij
      KEURT NIET: hij legt vast, en de volgende keuring (na de tweede handtekening) weegt
-     hem mee. Alleen zolang er nog geen besluit is -- een nee wordt geen ja. Er is met
-     opzet geen route naar: de grendel staat dicht (../risicouitzondering.js). */
-  function risicoGoedkeur(id, { door, reden }) {
+     hem mee. Alleen zolang er nog geen besluit is -- een nee wordt geen ja -- en alleen
+     voor een handeling die ../risicouitzondering.js toelaat (2C: de incassoronde). */
+  function risicoGoedkeur(id, { door, naam, reden }) {
     const v = vind(id);
     if (!v) return { status: 404, error: 'Dit voornemen bestaat niet.' };
+    const t = require('../risicouitzondering').stand(v.handeling);
+    if (!t.open) return { status: 409, error: t.reden };
     if (v.stand !== P.STAND.OPGESTELD && v.stand !== P.STAND.WACHT)
       return { status: 409, error: 'Een risicogoedkeuring hoort voor het besluit; dit voornemen staat op ' + v.stand + '.' };
     const wie = String(door || '').slice(0, 60);
     const waarom = String(reden || '').trim().slice(0, 400);
     if (!wie || waarom.length < 10) return { status: 400, error: 'Een risicogoedkeuring draagt een naam en een reden van ten minste tien tekens.' };
-    if (wie === v.actor) return { status: 400, error: 'Wie de handeling aanvraagt, geeft er niet zelf de risicogoedkeuring voor.' };
-    v.risicogoedkeuring = { door: wie, reden: waarom, at: tijd() };
+    if (wie === v.actor || (naam && String(naam) === v.actor))
+      return { status: 400, error: 'Wie de handeling aanvraagt, geeft er niet zelf de risicogoedkeuring voor.' };
+    if (v.risicogoedkeuring) return { status: 409, error: 'Voor dit voornemen is de risicogoedkeuring al gegeven.' };
+    v.risicogoedkeuring = { door: wie, naam: naam ? String(naam).slice(0, 80) : null, reden: waarom,
+      voornemen: v.id, bron: t.bron, at: tijd() };
     save();
     return { status: 200, ok: true, voornemen: publiek(v) };
   }

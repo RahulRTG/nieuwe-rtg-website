@@ -78,7 +78,7 @@ const BELEID = {
 
 /* De kern. `zoekBevoegdheid` komt van de aanroeper: deze module weet niet waar
    bevoegdheden wonen, en dat hoort ze ook niet te weten. */
-function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt, onomkeerbaarGrendel }) {
+function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt }) {
   const tijd = nu || klok.nu;
   const B = { ...BELEID, ...(beleid || {}) };
 
@@ -140,17 +140,12 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt, onomkeerb
         reden: zelf ? 'De aanvrager keurt zijn eigen handeling niet goed; er tekent een ander mee.'
           : 'Vanaf ' + bev.euro(B.goedkeuringBovenCenten) + ' tekent er een tweede persoon mee.' };
 
-    /* Omkeerbaar komt uit de handeling, nooit uit een handtekening (eigenaarsbesluit
-       2B-aangepast); de enige uitzondering staat in ./risicouitzondering.js. */
-    let viaUitzondering = null;
+    let via = null;
     if (bedrag >= B.omkeerbaarBovenCenten && ctx.omkeerbaar !== true) {
-      const u = require('./risicouitzondering').toets({ grendel: onomkeerbaarGrendel, risico: ctx.risicogoedkeuring,
-        actor, goedgekeurdDoor: ctx.goedgekeurdDoor });
-      if (!u.ok)
-        return { ...basis, uitkomst: UITKOMST.OMKEERBAAR, bewijs, omkeerbaar: false,
-          reden: 'Vanaf ' + bev.euro(B.omkeerbaarBovenCenten) + ' alleen als de handeling terug te draaien is, en deze is ' +
-            'dat niet. ' + u.reden };
-      viaUitzondering = u.uitzondering;
+      const u = require('./risicouitzondering').toets({ handeling, risico: ctx.risicogoedkeuring,
+        actor, goedgekeurdDoor: ctx.goedgekeurdDoor, grens: bev.euro(B.omkeerbaarBovenCenten) });
+      if (!u.ok) return { ...basis, uitkomst: UITKOMST.OMKEERBAAR, bewijs, omkeerbaar: false, reden: u.reden };
+      via = u.uitzondering;
     }
 
     if (bedrag >= B.extraBewijsBovenCenten && ctx.bevestigingVers !== true)
@@ -166,10 +161,8 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt, onomkeerb
        `munt` komt van de aanroeper en is optioneel. Zonder is dit gewoon het
        besluit zoals het altijd al was -- niet een besluit dat stilzwijgend
        zwakker is. */
-    const uit = { ...basis, uitkomst: UITKOMST.TOESTAAN, bewijs, reden: viaUitzondering
-      ? 'Onomkeerbaar, uitzondering met risicogoedkeuring van ' + viaUitzondering.door + '.'
-      : 'Binnen de bevoegdheid en het beleid.' };
-    if (viaUitzondering) { uit.uitzondering = viaUitzondering; uit.omkeerbaar = false; }
+    const uit = { ...basis, uitkomst: UITKOMST.TOESTAAN, bewijs, reden: via ? via.zin : 'Binnen de bevoegdheid en het beleid.' };
+    if (via) { uit.uitzondering = via; uit.omkeerbaar = false; }
     if (munt) {
       const t = munt(b, { actor: basis.actor, doel: basis.doel, waardeCenten: bedrag,
         beleid: B.versie, eenmalig: raaktWaarde });

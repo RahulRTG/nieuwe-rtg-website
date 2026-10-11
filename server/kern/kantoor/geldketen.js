@@ -62,7 +62,7 @@ const { KLASSEN, KETENS } = require('./geldketen/klassen');
 const MAX_JOURNAAL = 20000;
 const MAX_DOSSIERS = 5000;
 
-function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron, onomkeerbaarGrendel }) {
+function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron }) {
   const tijd = nu || klok.nu;
 
   /* De twee bakken: het JOURNAAL is een hashketen (lib/keten.js) en de DOSSIERS
@@ -75,7 +75,7 @@ function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron, onomkeerbaar
 
   /* De eerste helft van de baan staat apart: zie ./geldketen/klaarzet.js. */
   const klaarzet = require('./geldketen/klaarzet').maakKlaarzet({
-    voornemens, frictie, mandaatBron, tijd, leg, noteer, bewaar, publiek, onomkeerbaarGrendel });
+    voornemens, frictie, mandaatBron, tijd, leg, noteer, bewaar, publiek });
   /* DE TWEEDE MENS staat apart: zie ./geldketen/tekenen.js. */
   const tekenAf = require('./geldketen/tekenen').maakTekenen({ voornemens, vindDossier, leg, noteer, bewaar });
 
@@ -121,7 +121,29 @@ function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron, onomkeerbaar
     return r;
   }
 
-  return { klaarzet, tekenAf, uitvoer, dossier, lijst, voorspellingVan,
+  /* DE RISICOGOEDKEURING (eigenaarsbesluit 2C): een eigen menselijke stap, voor de tweede
+     handtekening, en alleen voor een handeling die kern/commercie/risicouitzondering.js
+     toelaat. Het voornemen weegt haar; hier komt zij in het dossier en de hashketen. Wie
+     de handeling aanvroeg, geeft haar niet: dat wordt op de SLEUTEL vergeleken, want de
+     naam alleen is een zwakkere vergelijking waar een harde bestaat. */
+  function risicoGoedkeur({ id, door, naam, reden }) {
+    const d = vindDossier(id);
+    if (!d) return { status: 404, error: 'Er is geen geldketen met dit voornemen.' };
+    if (door && d.doorSleutel && String(door) === String(d.doorSleutel))
+      return { status: 403, error: 'Wie de handeling aanvroeg, geeft er niet zelf de risicogoedkeuring voor.' };
+    const r = voornemens.risicoGoedkeur(id, { door, naam, reden });
+    if (!r.ok) return r;
+    const env = envelopLaag.maak({ kanaal: 'office', actor: null, classificatie: 'intern',
+      correlatie: d.correlatie, oorzaak: d.envelop });
+    leg(d, 'risicogoedkeuring', { graad: 'gemeten', uitslag: naam || door, omkeerbaar: false,
+      bron: r.voornemen.risicogoedkeuring && r.voornemen.risicogoedkeuring.bron,
+      reden: String(reden || '').slice(0, 400) });
+    bewaar(d);
+    noteer(env, 'geldketen.risicogoedkeuring', { voornemen: id, door: naam || door });
+    return { status: 200, ok: true, voornemen: r.voornemen, dossier: publiek(d), aanvrager: d.doorSleutel || null };
+  }
+
+  return { klaarzet, tekenAf, uitvoer, risicoGoedkeur, dossier, lijst, voorspellingVan,
     journaalTop: boeken.top, journaalVerifieer: boeken.verifieer, KLASSEN, KETENS };
 }
 

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-11T19:55:05.305Z",
-  "commit": "3e905915e",
+  "op": "2026-10-11T20:07:15.214Z",
+  "commit": "e8b551efc",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
@@ -338,7 +338,7 @@
   },
   {
    "sleutel": "POST /api/auth/forgot",
-   "bestand": "server/routes/auth/herstel.js:115",
+   "bestand": "server/routes/auth/herstel.js:108",
    "staat": "openbaar",
    "reden": "wachtwoord vergeten: wie buitengesloten is heeft geen token"
   },
@@ -355,7 +355,7 @@
   },
   {
    "sleutel": "POST /api/auth/reset",
-   "bestand": "server/routes/auth/herstel.js:140",
+   "bestand": "server/routes/auth/herstel.js:132",
    "staat": "eigenControle"
   },
   {

@@ -18116,6 +18116,84 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "ratelbronnen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/normwaarde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "rondepr.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/werkstroom.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "rtc-relay.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "rtc-relay.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "turn-inrichting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/turn/maak-config.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "artefact-image.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/artefactketen.js",
+      "operator": "voorwaarde-omkeren#3",
+      "gezakt": 1,
+      "geprobeerd": 26
+    },
+    "artefactketen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/release-trust.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 15,
+      "geprobeerd": 1
+    },
+    "auditboek-cli.pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/productie-auditboek.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "auditboek.pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/auditboek/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 15,
+      "geprobeerd": 5
+    },
+    "kritiekspoor-auditboek.pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/auditboek/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 4,
+      "geprobeerd": 4
     }
   }
 }

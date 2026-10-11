@@ -274,8 +274,31 @@ function wachtOpSchoneBoom() {
      eerst een echte wereld (rekening, saldo, pas, vaste betaling, twee klompjes)
      en levert per geldroute het lijf met de veldnamen van DIE route. Waarom per
      route, en waarom de kredietroutes NIET worden opengebroken, staat daar. */
+  /* TWEE PROEFLEDEN MET EEN GEBONDEN TOESTEL -- ./lib/proeftoestel.js.
+
+     De bank, RTG Pay, de wallet en de andere ZWARE paden vragen sinds A-P1-04 een
+     eigen account met een toestel dat bij elk verzoek zijn sleutel aantoont. De
+     demo-pas in `member` kan niet binden, en de ronde van 7 oktober 2026 zag
+     daardoor 155 bankroutes terugvallen van `beschermd` naar `ongemeten` -- de
+     wereld kreeg op /api/bank/akkoord een 403 en had geen rekening meer.
+
+     De poort blijft zoals hij in productie staat. Wat verandert is de CLIENT:
+     `postT` ondertekent elk zwaar verzoek zoals de browser dat doet, en zet op een
+     zwaar pad de ledenrol om naar het eerste proeflid. Op elk ander pad blijft
+     alles zoals het was. Lukt een proeflid niet, dan zegt de ronde dat en meet hij
+     zoals vroeger -- eerlijk ongemeten, nooit stil. */
+  const { maakProeflid, metToestellen } = require('./lib/proeftoestel');
+  const proeflid = await maakProeflid({ post, naam: 'Proeflid Geld' });
+  const proefander = await maakProeflid({ post, naam: 'Proeflid Ontvanger' });
+  console.log('  proefleden met een gebonden toestel  : ' +
+    [['eerste', proeflid], ['tweede', proefander]].map(([n, p]) => n + ' ' +
+      (p.klaar ? 'klaar (' + (p.klaar.codenaam || '?') + ')' : 'NIET -- ' + p.reden)).join(', '));
+  const postT = metToestellen(post, { toestellen: [proefander.klaar],
+    voorLid: { lid: proeflid.klaar, van: () => tokenVoor('member') } });
+
   const { zetWereldKlaar, voorzieningVoor } = require('./lib/idemwereld');
-  const { wereld, extra, perRoute: geldLijven, perVoorvoegsel, gemist } = await zetWereldKlaar({ post, tokens, datamap: server.datamap });
+  const { wereld, extra, perRoute: geldLijven, perVoorvoegsel, gemist } = await zetWereldKlaar({ post: postT, tokens,
+    datamap: server.datamap, geldlid: proeflid.klaar && proeflid.klaar.token, tweedeLid: proefander.klaar && proefander.klaar.token });
 
   /* De voorvoegselregels: binnen /api/foundation/ betekent `code` de gezinscode
      en nergens anders. Zie de kop van ./lib/idemwereld.js voor waarom dit geen
@@ -362,12 +385,22 @@ function wachtOpSchoneBoom() {
        Dat mag niet gebeuren en KOSTEN.md zegt dat ook -- de meter is de enige
        schrijver. */
     ruis.add('kosten');
+    /* LANGS `postT`, EN DAT IS GEEN DETAIL. /api/pay/overzicht is een ZWAAR pad:
+       met de kale post kreeg de ijking sinds A-P1-04 een 403 en ijkte zij een
+       weigering in plaats van een lezing. Langs de getekende post ijkt zij wat een
+       echte client teweegbrengt -- en daar hoort het spoor van de POORT bij: elk
+       bezitsbewijs legt zijn jti vast tegen herhaling
+       (server/kern/identiteit/bezitsbewijs.js, `bezitsbewijzen`). Dat is de
+       boekhouding van de deur over het verzoek zelf, net als `kosten`, en de
+       ijking vindt hem zonder dat hij hier bij naam staat. Gemeten in de peiling
+       van 11 oktober 2026: zonder deze regel droeg elke getekende leesroute "+1 in
+       bezitsbewijzen" en heette onbeschermd. */
     for (const pad of IJKROUTES) {
-      const eerste = await post(pad, {}, tokens.member);
+      const eerste = await postT(pad, {}, tokens.member);
       let stand = eerste.staat || null;
       if (stand == null) continue;
       for (let i = 0; i < 6; i++) {
-        const nu = await post(pad, {}, tokens.member);
+        const nu = await postT(pad, {}, tokens.member);
         if (nu.staat == null) break;
         for (const k of Object.keys(staatlog.verschil(stand, nu.staat))) ruis.add(k);
         stand = nu.staat;
@@ -420,7 +453,7 @@ function wachtOpSchoneBoom() {
       const stil = async (ms) => new Promise(r => setTimeout(r, ms));
       const voor = ijkStand;
       await stil(12000);
-      const na = await post(IJKROUTES[0], {}, tokens.member);
+      const na = await postT(IJKROUTES[0], {}, tokens.member);
       if (na.staat != null) {
         const stilleRuis = Object.keys(staatlog.verschil(voor, na.staat, ruis));
         for (const k of stilleRuis) ruis.add(k);
@@ -587,7 +620,7 @@ function wachtOpSchoneBoom() {
   console.log('  passkeymedewerker                    : ' +
     (passkey.klaar ? 'klaar voor ' + passkey.klaar.routes.join(', ') : 'NIET -- ' + passkey.reden));
 
-  const uit = await draaiIdemproef({ post: metPasskey(post, passkey.klaar), routes, tokenVoor, hernieuw, naInlog, wacht,
+  const uit = await draaiIdemproef({ post: metPasskey(postT, passkey.klaar), routes, tokenVoor, hernieuw, naInlog, wacht,
     lijfVoor: (r) => {
       const vv = voorvoegselVan(r.pad);
       return { ...plausibelLijf(r.pad), ...extra, ...(vv ? schoonLijf(vv.lijf) : {}), ...(geldLijven[r.pad] || {}) };
@@ -787,6 +820,11 @@ function wachtOpSchoneBoom() {
       lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),
       /* Welke routes door de passkeymedewerker zijn gedaan, of waarom niet. */
       passkeyMedewerker: passkey.klaar ? { routes: passkey.klaar.routes } : { routes: [], reden: passkey.reden },
+      /* Of de zware paden door een echte client met een gebonden toestel zijn
+         gedaan, of waarom niet -- zonder dit veld is een ronde ZONDER proeflid
+         niet te onderscheiden van een ronde mét. */
+      proeflidToestel: proeflid.klaar && proefander.klaar ? { klaar: true }
+        : { klaar: false, reden: (proeflid.reden || proefander.reden) },
       /* WAT DE PLATFORMLAAG VING, EN WAT DE ROUTE ZELF DOET -- twee getallen,
          want ze gaan niet over hetzelfde. Alle oproepen hierboven dragen `idem`
          in het lijf, en server/middleware/idempotentie.js is precies daarop

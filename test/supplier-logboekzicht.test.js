@@ -145,6 +145,20 @@ test('e. het beveiligingsrooster: inkloktijd voor de manager en de bewaker zelf,
   assert.ok(!('inklokAt' in c.x) && !('uitklokAt' in c.x), 'een collega krijgt de tijden niet');
   assert.ok(!c.tekst.includes(m.x.inklokAt), 'ook niet via een ander veld');
 
+  /* het commandocentrum (opDienst) draagt dezelfde dienst: zonder managerOnly,
+     dus dezelfde bron. Gevonden door de tegenlezing van PR #584: een collega
+     kreeg hier het inkloktijdstip terwijl het rooster het al wegliet. */
+  const cmd = async (tok) => {
+    const r = await api(V, '/api/supplier/beveiliging/command', {}, tok);
+    assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
+    return { x: (r.body.opDienst || []).find(y => y.id === d.id), tekst: JSON.stringify(r.body) };
+  };
+  assert.equal((await cmd(tokVM)).x.inklokAt, m.x.inklokAt, 'de manager ziet het op het commandocentrum');
+  assert.equal((await cmd(tokG0)).x.inklokAt, m.x.inklokAt, 'de bewaker zelf ook');
+  const cc = await cmd(tokG1);
+  assert.equal(cc.x.status, 'ingeklokt', 'wie er op dienst is, mag een collega zien');
+  assert.ok(!('inklokAt' in cc.x) && !cc.tekst.includes(m.x.inklokAt), 'het commandocentrum geeft een collega de inkloktijd niet');
+
   // en de logregel van die inklok ("klokte in op <post>") gaat ook alleen naar de manager
   const isPost = (r) => /^klokte in op /.test(r.text);
   assert.ok((await state(V, tokVM)).activity.some(r => isPost(r) && r.soort === 'klok-in'));
@@ -170,6 +184,13 @@ test('bron: de klokregel wordt herkend aan soort EN aan de vaste tekst van voor 
   assert.equal(zicht.logboekVoor(lijst, { manager: true }, 40).totaal, 50);
   assert.equal(zicht.logboekVoor(lijst, undefined, 40).totaal, 5, 'zonder actor geen manager');
   assert.deepEqual(zicht.klokVandaagVoor([{ staffId: 3 }, { staffId: 4 }], { manager: false, staffId: '3' }), [{ staffId: 3 }]);
+  // wie er binnen is: voor een collega op naam, niet in boekvolgorde (nieuwste inklok eerst)
+  const boek = [{ id: 9, name: 'Zoe' }, { id: 4, name: 'Anna' }, { id: 7, name: 'Mila' }];
+  assert.deepEqual(zicht.aanwezigVoor(boek, { manager: false }).map(x => x.name), ['Anna', 'Mila', 'Zoe']);
+  assert.deepEqual(zicht.aanwezigVoor(['Zoe', 'Anna'], undefined, (n) => n), ['Anna', 'Zoe']);
+  assert.deepEqual(zicht.aanwezigVoor(boek, { manager: true }), boek, 'een manager houdt de boekvolgorde');
+  assert.deepEqual(zicht.staatDelen({ klok: { Z: [{ name: 'Zoe', in: '2026-10-11T09:00Z' }, { name: 'Anna', in: '2026-10-11T08:00Z' }] } }, 'Z', { manager: false }, '2026-10-11').klok.binnen,
+    ['Anna', 'Zoe'], 'de lijst aanwezigen op /state verraadt de inklokvolgorde niet');
 });
 
 test('bron: elke klokschrijver markeert zijn regel met een soort uit de gesloten lijst', () => {
@@ -195,4 +216,41 @@ test('bron: elke klokschrijver markeert zijn regel met een soort uit de gesloten
     assert.ok(zicht.isKlokSoort(s[1]), 'onbekende soort ' + s[1]);
   }
   assert.deepEqual(Object.keys(zicht.KLOKSOORTEN).sort(), ['klok-correctie', 'klok-in', 'klok-uit']);
+});
+
+test('bron: in een bestand dat het klokboek of een dienstkloktijd SCHRIJFT, draagt elke logregel een soort of een verklaring', () => {
+  /* De toets hierboven vindt een klokschrijver aan zijn TEKST, en ziet dus niet
+     een nieuwe schrijver met nieuwe woorden ("meldde zich af op <post>" bij het
+     uitklokken van een bewaker kwam er zonder soort doorheen -- tegenlezing PR
+     #584). Hier gaat het andersom: waar een kloktijd ontstaat, is elke
+     logActivity een klokregel (met een soort uit KLOKSOORTEN), tenzij hij
+     hieronder met reden staat. */
+  const GEEN_KLOKREGEL = {
+    'belde een ingeklokte collega (video)': 'een oproep op het moment van bellen; zegt niets over wanneer iemand in- of uitklokte'
+  };
+  const SCHRIJFT = /(inklokAt|uitklokAt)\s*=[^=]|\.out\s*=\s*new Date|db\.data\.klok\[[^\]]+\]\s*=\s*lijst\.slice/;
+  const bestanden = [];
+  const loop = (map) => {
+    for (const n of fs.readdirSync(map)) {
+      const f = path.join(map, n);
+      if (fs.statSync(f).isDirectory()) loop(f);
+      else if (n.endsWith('.js') && SCHRIJFT.test(fs.readFileSync(f, 'utf8'))) bestanden.push(f);
+    }
+  };
+  loop(path.join(__dirname, '..', 'server'));
+  const rel = bestanden.map(f => path.relative(path.join(__dirname, '..'), f)).sort();
+  for (const v of ['server/routes/staff/dienst-klok.js', 'server/routes/staff/collega.js', 'server/kern/beveiliging/pda/patrouille.js'])
+    assert.ok(rel.includes(v), 'de klokschrijver ' + v + ' wordt niet meer herkend');
+  const fout = [];
+  for (const f of bestanden) {
+    const t = fs.readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    for (const m of t.matchAll(/logActivity(?:\.alleenActiviteit)?\(([^;]*)\);/g)) {
+      const arg = m[1];
+      if (/'klok-(?:[a-z-]+'|' \+ actie)/.test(arg)) continue;
+      const tekst = (arg.match(/'([^']+)'/g) || []).map(s => s.slice(1, -1));
+      if (tekst.some(s => GEEN_KLOKREGEL[s])) continue;
+      fout.push(path.relative(process.cwd(), f) + ': ' + m[0].slice(0, 120));
+    }
+  }
+  assert.deepEqual(fout, [], 'een logregel naast een kloktijd zonder klok-soort valt buiten de filter van logboekzicht.js');
 });

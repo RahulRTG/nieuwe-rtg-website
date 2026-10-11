@@ -22,7 +22,13 @@ module.exports = (kern) => {
   /* ---- commandocentrum ---- */
   app.post('/api/supplier/beveiliging/command', supplierAuth, (req, res) => {
     if (!eisBeveiliging(req, res)) return;
-    res.json(Object.assign(bevCommand(req.supplier), { shifts: BEVEILIGING_SHIFTS, ernsten: BEVEILIGING_ERNST }));
+    const c = bevCommand(req.supplier);
+    /* Wie er op dienst is ziet iedereen; de in- en uitkloktijden van een collega
+       alleen een manager -- dezelfde bron als het rooster hieronder
+       (kern/leverancier/logboekzicht.js, besluit 11 oktober 2026). */
+    if (c && Array.isArray(c.opDienst))
+      c.opDienst = c.opDienst.map((d) => logboekzicht.kloktijdenVoor(d, req.actor, d.guardId, ['inklokAt', 'uitklokAt']));
+    res.json(Object.assign(c, { shifts: BEVEILIGING_SHIFTS, ernsten: BEVEILIGING_ERNST }));
   });
   app.post('/api/supplier/beveiliging/functie', supplierAuth, (req, res) => {
     if (!eisBeveiliging(req, res) || !managerOnly(req, res)) return;

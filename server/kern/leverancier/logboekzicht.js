@@ -80,15 +80,27 @@ function kloktijdenVoor(rij, actor, eigenaarId, velden) {
   return uit;
 }
 
+/* Wie er binnen is, in een VOLGORDE die niets over het klokken zegt. Het
+   klokboek staat nieuwste-eerst, dus een lijst aanwezigen in boekvolgorde
+   vertelt een collega wie het laatst inklokte (tegenlezing PR #584). Een
+   manager houdt de boekvolgorde; een ander krijgt ze op naam. */
+function aanwezigVoor(lijst, actor, naamVan) {
+  const alle = Array.isArray(lijst) ? lijst : [];
+  if (magKlokZien(actor)) return alle;
+  const nv = typeof naamVan === 'function' ? naamVan : (x) => x && x.name;
+  return alle.slice().sort((a, b) => String(nv(a) || '').localeCompare(String(nv(b) || ''), 'nl') ||
+    String((a && a.id) || '').localeCompare(String((b && b.id) || '')));
+}
+
 /* De twee delen van /api/supplier/state (kern/leverancier/state.js) die hier
    over gaan: wie er binnen is (voor iedereen) met de klokregels van vandaag, en
    de nieuwste 40 logboekregels -- allebei voor DEZE actor. */
 function staatDelen(data, code, actor, vandaag) {
   const entries = ((data.klok || {})[code] || []).filter(e => e && String(e.in).slice(0, 10) === vandaag).slice(0, 60);
   return {
-    klok: { vandaag: klokVandaagVoor(entries, actor), binnen: [...new Set(entries.filter(e => !e.out).map(e => e.name))] },
+    klok: { vandaag: klokVandaagVoor(entries, actor), binnen: aanwezigVoor([...new Set(entries.filter(e => !e.out).map(e => e.name))], actor, (n) => n) },
     activity: logboekVoor((data.supplierActivity || {})[code], actor, 40).regels
   };
 }
 
-module.exports = { staatDelen, KLOKSOORTEN, OUDE_KLOKTEKST, isKlokSoort, isKlokregel, magKlokZien, logboekVoor, klokVandaagVoor, kloktijdenVoor };
+module.exports = { staatDelen, aanwezigVoor, KLOKSOORTEN, OUDE_KLOKTEKST, isKlokSoort, isKlokregel, magKlokZien, logboekVoor, klokVandaagVoor, kloktijdenVoor };

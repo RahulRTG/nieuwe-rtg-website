@@ -127,7 +127,8 @@ module.exports = (ctx) => {
       verlof: (db.data.verlof[s.code] || []).slice(0, 30).map(v =>
         v.soort === 'ziek' && v.reden ? Object.assign({}, v, { reden: '' }) : v),
       // klok + activity: wat deze actor mag ontvangen (./logboekzicht.js)
-      ...logboekzicht.staatDelen(db.data, s.code, kijker, vandaag),
+      // de ECHTE actor en niet de terugval hieronder: zonder actor geen manager (fail-closed)
+      ...logboekzicht.staatDelen(db.data, s.code, actor, vandaag),
       guests: guestsFor(s.code).slice(0, 30),
       prices: db.data.supplierPrices.filter(p => p.supplierCode === s.code).slice(0, 20),
       notifications: db.data.supplierNotifications[s.code] || [],

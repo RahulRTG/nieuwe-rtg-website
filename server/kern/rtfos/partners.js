@@ -161,7 +161,7 @@ module.exports = (ctx) => {
   const buiten = require('./partners-portaal')(ctx, { vind, vindCode, verlopen, partnerBeeld, kantoorBeeld });
 
   return { lijst, maak, zet, status, documentMaak, beoordeel: buiten.beoordeel,
-    portaal: buiten.portaal, vind, vindCode, STATUS, WIE, DOCSOORT };
+    portaal: buiten.portaal, erkend: buiten.erkend, vind, vindCode, STATUS, WIE, DOCSOORT };
 };
 module.exports.STATUS = STATUS;
 module.exports.WIE = WIE;

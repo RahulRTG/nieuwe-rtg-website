@@ -27,7 +27,7 @@
    veilig omdat de code het dossier bepaalt en niet de vraagsteller. */
 const rem = require('../../rem');
 
-module.exports = ({ app, rtfos, veilig }) => {
+module.exports = ({ app, rtfos, veilig, genootschapDrager }) => {
   const codeVan = req => String((req.body && req.body.code) || '').trim().slice(0, 40).toUpperCase();
   const ipRem = rem({ windowMs: 60000, limit: 20, key: req => 'rtfoscode-ip|' + String(req.ip) });
   const codeRem = rem({ windowMs: 60000, limit: 60, key: req => 'rtfoscode|' + codeVan(req) });
@@ -35,6 +35,15 @@ module.exports = ({ app, rtfos, veilig }) => {
   // de lokale stichting: het eigen dossier, de eigen afspraken, de eigen projecten
   app.post('/api/rtfos/portaal/partner', ipRem, codeRem, (req, res) =>
     veilig(res, () => rtfos.partners.portaal(codeVan(req))));
+
+  /* de genootschappen die de stichting vroegen haar DRAGER te zijn (B1,
+     GEMEENSCHAP-FASE0.md par. 4.1): naam en stand, nooit leden of een aantal --
+     en erkennen, alleen een vraag die op deze stichting staat. Of de stichting
+     erkend is, beslist het partnerregister (partners.erkend). */
+  app.post('/api/rtfos/portaal/partner/genootschap', ipRem, codeRem, (req, res) =>
+    veilig(res, () => genootschapDrager.voorPartner(codeVan(req))));
+  app.post('/api/rtfos/portaal/partner/genootschap/erken', ipRem, codeRem, (req, res) =>
+    veilig(res, () => genootschapDrager.erken(codeVan(req), (req.body || {}).groep)));
 
   // de gemeente: uitsluitend getelde cijfers, nooit een dossier (kern/rtfos/gemeente.js)
   app.post('/api/rtfos/portaal/gemeente', ipRem, codeRem, (req, res) =>

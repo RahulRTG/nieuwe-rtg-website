@@ -223,6 +223,8 @@ const PUBLIEK = new Map([
      gemeentekant geeft per constructie alleen getelde cijfers terug, nooit
      een casus of een naam (kern/rtfos/gemeente.js). */
   ['/api/rtfos/portaal/partner', 'de partnercode is de geloofsbrief (vindCode); alleen het eigen partnerdossier'],
+  ['/api/rtfos/portaal/partner/genootschap', 'idem, plus partners.erkend(): alleen genootschappen die DEZE stichting vroegen, met naam en stand -- geen leden en geen aantal (B1 drager)'],
+  ['/api/rtfos/portaal/partner/genootschap/erken', 'idem: erkent alleen een dragervraag die op deze stichting staat; voor elke andere partner bestaat de vraag niet (404)'],
   ['/api/rtfos/portaal/gemeente', 'de gemeentecode is de geloofsbrief; uitsluitend geaggregeerde cijfers van die ene stad'],
   ['/api/rtfos/portaal/ondernemer', 'de bedrijfscode is de geloofsbrief; alleen het eigen aanbod en waar het heen ging'],
 

@@ -7,4 +7,5 @@
 
 module.exports = Object.freeze(Object.assign({},
   require('./idemsleutels-nooit-verbond'),
-  require('./idemsleutels-nooit-beraad')));
+  require('./idemsleutels-nooit-beraad'),
+  require('./idemsleutels-nooit-drager')));

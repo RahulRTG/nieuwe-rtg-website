@@ -69,12 +69,13 @@ module.exports = [
   // ---------- cultuur, sport en gezelschap ----------
   { id: 'dom-library', categorie: 'Cultuur en gezelschap', naam: 'Foundation LibraryOS kernel', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Besloten werken, afspraken, rechten en editiegebonden vrijgave; geen publieke catalogus of verkoop.', paden: ['/api/library'] },
-  /* Het beraad (B3) hangt ONDER het genootschap en niet in een eigen functie:
-     het genootschap is zijn drager, en een bord dat het genootschap sluit maar
-     het beraad laat draaien, zet de ene helft uit en de andere niet. */
-  { id: 'dom-genootschap', categorie: 'Cultuur en gezelschap', naam: 'Het Genootschap', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'Het besloten genootschap: kringen, bijeenkomsten, beheer, het beraad en verbonden tussen twee genootschappen.',
-    paden: ['/api/genootschap', '/api/verbond', '/api/beraad'] },
+  /* Het beraad (B3) en de gezinsdeur (B1) hangen ONDER het genootschap en niet in
+     een eigen functie (GEMEENSCHAP-FASE0.md par. 2 regel 3): het genootschap is hun
+     drager, en een bord dat het genootschap sluit maar de rest laat draaien, zet de
+     ene helft uit en de andere niet. */
+  { id: 'dom-genootschap', categorie: 'Cultuur en gezelschap', naam: 'Het Genootschap', standaard: true, doelgroepen: LEDEN_RTF,
+    uitleg: 'Het besloten genootschap: kringen, bijeenkomsten, beheer, het beraad, verbonden tussen twee genootschappen en een organisatie als drager.',
+    paden: ['/api/genootschap', '/api/verbond', '/api/beraad', '/api/rtf/genootschap'] },
   { id: 'dom-sport', categorie: 'Cultuur en gezelschap', naam: 'Sport', standaard: true, doelgroepen: ZAAK,
     uitleg: 'Sportprogramma\'s, teams en wedstrijden.', paden: ['/api/sport'] },
   { id: 'dom-muziek', categorie: 'Cultuur en gezelschap', naam: 'Muziek', standaard: true, doelgroepen: LEDEN_RTF,

@@ -1024,6 +1024,7 @@
       "genootschap",
       "genootschapAI",
       "genootschapBeheer",
+      "genootschapDrager",
       "genootschapInzicht",
       "genootschapUitvoer",
       "getChat",
@@ -1749,6 +1750,7 @@
     ],
     "rtfos": [
       "boardroomAuth",
+      "genootschapDrager",
       "rtfos"
     ],
     "rtfschool": [

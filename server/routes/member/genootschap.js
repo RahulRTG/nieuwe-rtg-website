@@ -8,7 +8,7 @@
 const { veiligeFout } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, auth, geenGast, genootschap, genootschapBeheer, prikbord, bijeenkomst, genootschapAI,
-    genootschapInzicht, genootschapUitvoer } = kern;
+    genootschapInzicht, genootschapUitvoer, genootschapDrager } = kern;
   // veiligeFout: laat de melding staan, haalt er alleen ons bestandssysteem uit
   const fout = (res, e) => res.status(400).json({ error: veiligeFout(e) });
   const uit = (res, r) => r && r.error ? res.status(400).json(r) : res.json(r);
@@ -59,6 +59,21 @@ module.exports = (kern) => {
   app.post('/api/genootschap/eruit', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     try { uit(res, await genootschapBeheer.zetUit(req.session, id(req), req.body.wie)); } catch (e) { fout(res, e); }
+  });
+
+  /* ---- de drager (B1): een organisatie draagt het genootschap, als verwijzing ----
+     Vragen en losmaken doet een beheerder met zijn eigen sessie; erkennen doet de
+     organisatie langs haar eigen deur (routes/rtfos/portalen.js). De actor komt
+     uit de sessie, nooit uit het lijf. */
+  const metStatus = (res, r) => r && r.error ? res.status(r.status || 400).json(r) : res.json(r);
+  app.post('/api/genootschap/drager/vraag', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { metStatus(res, genootschapDrager.vraag(req.session, id(req), req.body || {})); } catch (e) { fout(res, e); }
+  });
+
+  app.post('/api/genootschap/drager/los', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { metStatus(res, genootschapDrager.los(req.session, id(req))); } catch (e) { fout(res, e); }
   });
 
   // ---- het prikbord ----

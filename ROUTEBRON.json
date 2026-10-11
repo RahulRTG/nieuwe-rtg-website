@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-11T19:53:12.488Z",
-  "commit": "9a14633f8",
+  "op": "2026-10-11T20:05:29.077Z",
+  "commit": "bf33a1cb0",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -3205,6 +3205,7 @@
     "server/lib/idemsleutels-nooit-lid.js",
     "server/lib/idemsleutels-nooit-linkcap.js",
     "server/lib/idemsleutels-nooit-machinesleutels.js",
+    "server/lib/idemsleutels-nooit-recent.js",
     "server/lib/idemsleutels-nooit-routes.js",
     "server/lib/idemsleutels-nooit-sessies.js",
     "server/lib/idemsleutels-nooit-sessiestroom.js",
@@ -3218,6 +3219,7 @@
     "server/lib/idemsleutels-personeel.js",
     "server/lib/idemsleutels-praktijk.js",
     "server/lib/idemsleutels-proefronde.js",
+    "server/lib/idemsleutels-recent.js",
     "server/lib/idemsleutels-reisherkomst.js",
     "server/lib/idemsleutels-reisteruggave.js",
     "server/lib/idemsleutels-restbak.js",
@@ -12388,7 +12390,7 @@
   {
    "route": "POST /api/auth/forgot",
    "bestand": "server/routes/auth/herstel.js",
-   "regel": 115,
+   "regel": 108,
    "samengesteld": false
   },
   {
@@ -12406,7 +12408,7 @@
   {
    "route": "POST /api/auth/password",
    "bestand": "server/routes/auth/herstel.js",
-   "regel": 178,
+   "regel": 170,
    "samengesteld": false
   },
   {
@@ -12424,7 +12426,7 @@
   {
    "route": "POST /api/auth/reset",
    "bestand": "server/routes/auth/herstel.js",
-   "regel": 140,
+   "regel": 132,
    "samengesteld": false
   },
   {

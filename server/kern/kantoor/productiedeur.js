@@ -129,40 +129,9 @@ async function startBewijs({ zwaarVan, accounts, key, req, env, actie, omschrijv
   return r;
 }
 
-/* WIE STAAT ER INDIVIDUEEL ACHTER DEZE SESSIE, EN HOE HARD (besluit 3, stap a).
-
-   Vier antwoorden, en ze worden nooit samengevoegd:
-     passkey        kantoorsessie op naam MET een passkeyceremonie aan de deur
-                    -- een bewezen individu (methode cryptografisch, graad
-                    bewezen; kern/identiteit/sessievelden.js METHODEN).
-     opNaam         kantoorsessie op een eigen account, zonder passkey aan de
-                    deur: er hangt een individu aan, maar de deur heeft hem
-                    niet met een sleutel gezien (graad gemeten: een inlog die
-                    wij waarnamen, niet een handtekening die wij controleerden).
-     eigenaarToken  het kale lid-token van de eigenaar (buiten productie; in
-                    productie weigert eigenaarDirect() hem). Een individu, maar
-                    de deur weet niet waarmee dat token ontstond.
-     gedeeld        de gedeelde kantoorcode: GEEN individu. Een gedeelde code
-                    geldt nooit als bewijs van een individuele uitvoerder.
-   `bewezen` is alleen waar voor `passkey`, en dat is de eis van ENFORCE_EXECUTE.
-   Er gaat geen naam en geen sleutel uit deze functie: alleen de soort. */
-const IDENTITEIT = Object.freeze({
-  passkey: { individueel: true, bewezen: true, graad: 'bewezen',
-    uitleg: 'Op naam, en aan de deur met een passkey bewezen.' },
-  opNaam: { individueel: true, bewezen: false, graad: 'gemeten',
-    uitleg: 'Op naam (eigen RTG-account), maar zonder passkey aan de deur.' },
-  eigenaarToken: { individueel: true, bewezen: false, graad: 'gemeten',
-    uitleg: 'Het eigen lid-token van de eigenaar; de deur zag geen passkey.' },
-  gedeeld: { individueel: false, bewezen: false, graad: 'onbekend',
-    uitleg: 'De gedeelde kantoorcode: geen individu, en dus nooit een individuele uitvoerder.' }
-});
-function identiteitVan(sess, { eigenaarToken } = {}) {
-  let via;
-  if (sess && sess.role === 'office') via = !sess.lidKey ? 'gedeeld' : (bewijsGeldig(sess.kantoorBewijs) ? 'passkey' : 'opNaam');
-  else if (eigenaarToken) via = 'eigenaarToken';
-  else return null;
-  return Object.assign({ via }, IDENTITEIT[via]);
-}
-
-module.exports = { ACTIE, KOPPEL_ACTIE, CODE_DICHT, WEG, IDENTITEIT, isProductie, codeDicht, bewijsGeldig, sessieMag,
-  eigenaarDirect, startBewijs, identiteitVan };
+/* Wie er individueel achter een kantoorsessie staat, en hoe hard: ./identiteit.js
+   (besluit 3a). Hier opnieuw uitgegeven, zodat er een ingang blijft. */
+module.exports = { ACTIE, KOPPEL_ACTIE, CODE_DICHT, WEG, isProductie, codeDicht, bewijsGeldig, sessieMag,
+  eigenaarDirect, startBewijs };
+const { IDENTITEIT, identiteitVan } = require('./identiteit');
+Object.assign(module.exports, { IDENTITEIT, identiteitVan });

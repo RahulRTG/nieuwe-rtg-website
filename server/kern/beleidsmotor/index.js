@@ -26,12 +26,11 @@
    pad komt van buiten en zou de opslag laten groeien. */
 'use strict';
 
-const { kan, DEUREN, FEITEN, UITKOMST, STAPOP_DEUREN } = require('./regels');
+const { kan, perDeur, DEUREN, UITKOMST, STAPOP_DEUREN } = require('./regels');
 const { maakFeiten } = require('./feiten');
 const { werkwoordVan, kamerTelling, EXPORTEN } = require('./werkwoorden');
 const uitvoeren = require('./uitvoeren');
 
-/* + de vier soorten van ENFORCE_EXECUTE (./uitvoeren.js) */
 const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop', 'gebruik'].concat(uitvoeren.SOORTEN);
 const MAX_SLEUTELS = 2400;   // ~600 kantoorroutes maal hoogstens vier deuren
 const VOORBEELDEN = 20;
@@ -127,10 +126,8 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
     next();
   }
 
-  /* BESLUIT 3b: ENFORCE_EXECUTE in de schaduw; zie ./uitvoeren.js voor waarom
-     de teller IN de poortwikkel hangt en niet op een voorvoegsel. */
-  const uit = uitvoeren.maakUitvoeren({ tikVeld: (k, v) => spoeler.tikVeld(k, v), naAfloop: (q, r, w) => naAfloop(q, r, w) });
-  const telUitvoer = (req, res, feiten) => uit.telBijBinnenkomst(req, res, feiten);
+  // besluit 3b: ENFORCE_EXECUTE in de schaduw (./uitvoeren.js)
+  const telUitvoer = uitvoeren.maakUitvoeren({ tikVeld: (k, v) => spoeler.tikVeld(k, v), naAfloop }).telBijBinnenkomst;
 
   /* EEN LUISTERAAR PER VERZOEK, op 'close': een kantoorroute draagt al tien
      finish-luisteraars van andere lagen, en de elfde gaf een MaxListeners-
@@ -153,21 +150,9 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
     beeld: spoeler.projecteer(JSON.parse(JSON.stringify(kijk() || {}))),
     dagen: Math.floor((tijd() - sinds) / DAG), sinds, oneens: oneensVoorbeelden, verklaardOpen: VERKLAARD_OPEN });
 
-  /* WAAROM (AUTHORITY.md fase 8, het eerste stuk): per deur het besluit over
-     DEZE aanroeper, met de opbouw. Alleen over jezelf -- een vraag over een
-     ander is een rechtensimulator, en die hoort achter de boardroom met een
-     reden (een volgende stap). Er staan geen feiten in het antwoord die de
-     aanroeper niet al over zichzelf weet. */
-  function waarom(req) {
-    const f = feitenVan(req);
-    return Object.keys(DEUREN).map(deur => {
-      const b = kan(f, deur);
-      return { deur, uitleg: DEUREN[deur].uitleg, uitkomst: b.uitkomst, reden: b.reden,
-        opbouw: b.opbouw.map(o => ({ eis: o.eis.map(n => FEITEN[n] || n), gehaald: o.gehaald, onbekend: o.onbekend })) };
-    });
-  }
-
-  /* BESLUIT 3a/b, over DEZE aanroeper (./uitvoeren.js). */
+  /* WAAROM (AUTHORITY.md fase 8) en, sinds besluit 3, WIE: alleen over DEZE
+     aanroeper -- zie ./regels.js (perDeur) en ./uitvoeren.js (overMij). */
+  const waarom = (req) => perDeur(feitenVan(req));
   const identiteit = (req) => uitvoeren.overMij(feitenVan(req));
 
   return { kan: (req, deur) => kan(feitenVan(req), deur), waarom, identiteit, bewaak, meelezer, stand, afdwingen,

@@ -104,4 +104,16 @@ function kanMet(feiten, d, deur) {
   return { uitkomst: UITKOMST.TOESTAAN, deur, opbouw, reden: 'Elke eis van ' + d.uitleg + ' is gehaald.' };
 }
 
-module.exports = { kan, kanMet, DEUREN, SCHADUWREGELS, FEITEN, UITKOMST, STAPOP_DEUREN };
+/* WAAROM (AUTHORITY.md fase 8, het eerste stuk): per deur het besluit over
+   DEZE aanroeper, met de opbouw. Alleen over jezelf -- een vraag over een ander
+   is een rechtensimulator, en die hoort achter de boardroom met een reden. Er
+   staan geen feiten in het antwoord die de aanroeper niet al over zichzelf weet. */
+const inWoorden = (b) => b.opbouw.map(o => ({ eis: o.eis.map(n => FEITEN[n] || n), gehaald: o.gehaald, onbekend: o.onbekend }));
+function perDeur(f) {
+  return Object.keys(DEUREN).map(deur => {
+    const b = kan(f, deur);
+    return { deur, uitleg: DEUREN[deur].uitleg, uitkomst: b.uitkomst, reden: b.reden, opbouw: inWoorden(b) };
+  });
+}
+
+module.exports = { kan, kanMet, perDeur, inWoorden, DEUREN, SCHADUWREGELS, FEITEN, UITKOMST, STAPOP_DEUREN };

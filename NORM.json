@@ -29,7 +29,7 @@
     "inlineStijlAttributen": 4515,
     "kernBreedsteBestand": 71,
     "kernBreedte": 1685,
-    "kernGedeeld": 254,
+    "kernGedeeld": 255,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 50,
     "keuringDubbeling": 177,
@@ -176,6 +176,15 @@
     "loopFabricTijdelijk": 168
   },
   "notities": [
+    {
+      "datum": "2026-10-11",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 254,
+      "meter": "kernGedeeld 254 -> 255",
+      "reden": "Besluit 3 van de eigenaar (11 oktober 2026), AUTHORITY.md P0b. In de paniekkamer zei de kantoorsessie zelf of zij als 'boardroom' of als 'paniekkamer' sprak (req.body.wie), dus de gedeelde kantoorcode kon in de discussie onder een voorstel spreken alsof de boardroom het zei. De spreker komt nu uit de sessie: wie een boardroomzetel heeft (kern.magBoardroom), spreekt als boardroom. Het domein kantoren leest daarom magBoardroom, dat al door de beleidsmotor en de hulplaag werd gelezen; die regel nabouwen uit boardroomLijst plus een eigenaarscontrole zou een tweede definitie van 'mag de boardroom in' zijn (LAT.md regel 4).",
+      "waarheen": "GRENZEN.json (kantoren draagt magBoardroom) en test/kantoordeur-uitvoeren.test.js toets 5 tegen een echte server"
+    },
     {
       "datum": "2026-10-06",
       "soort": "schuld",

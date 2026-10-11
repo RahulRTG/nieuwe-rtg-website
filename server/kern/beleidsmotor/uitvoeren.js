@@ -37,7 +37,7 @@ const VOORVOEGSEL = 'uitvoer ';
 /* Het mutatiecontract-register lui laden: het is groot en de motor moet ook
    zonder kunnen meten (dan is elke niet-GET `ongeclassificeerd`). */
 let contracten = null;
-function contractVan(sleutel) {
+function mutatieContract(sleutel) {
   if (contracten === null) {
     try { contracten = require('../../lib/mutatiecontracten').CONTRACTEN || {}; } catch (e) { contracten = {}; }
   }
@@ -45,10 +45,10 @@ function contractVan(sleutel) {
 }
 
 /* Is deze route uitvoerend, en in welke klasse? `null` = lezend, telt niet. */
-function klasseVan(methode, patroon) {
+function uitvoerKlasse(methode, patroon) {
   const m = String(methode || 'GET').toUpperCase();
   if (LEZEND.has(m)) return null;
-  const c = contractVan(m + ' ' + patroon);
+  const c = mutatieContract(m + ' ' + patroon);
   if (c && c.stand === 'NOT_APPLICABLE') return null;
   return c && c.stand ? c.stand : 'ongeclassificeerd';
 }
@@ -73,7 +73,7 @@ function maakUitvoeren({ tikVeld, naAfloop }) {
   function tel(req, statusCode, identiteit) {
     if (!req || !req.routePatroon || statusCode >= 400) return;
     if (!req.beleidsPoorten || !req.beleidsPoorten.length) return;   // geen kantoordeur: A3 telt dat al
-    const klasse = klasseVan(req.method, req.routePatroon);
+    const klasse = uitvoerKlasse(req.method, req.routePatroon);
     if (!klasse) return;
     const via = identiteit && identiteit.via;
     if (!SOORTEN.includes(via)) return;
@@ -125,11 +125,10 @@ function lees(rijen) {
 /* Over DEZE aanroeper: welke soort identiteit draagt zijn sessie, en wat zou
    ENFORCE_EXECUTE over hem besluiten. Geen naam, geen sleutel. */
 function overMij(f) {
-  const { kanMet, SCHADUWREGELS, FEITEN } = require('./regels');
+  const { kanMet, SCHADUWREGELS, inWoorden } = require('./regels');
   const b = kanMet(f, SCHADUWREGELS.ENFORCE_EXECUTE, 'ENFORCE_EXECUTE');
   return { identiteit: (f && f.identiteit) || null,
-    uitvoeren: { regel: 'ENFORCE_EXECUTE', stand: 'schaduw', uitkomst: b.uitkomst, reden: b.reden,
-      opbouw: b.opbouw.map(o => ({ eis: o.eis.map(n => FEITEN[n] || n), gehaald: o.gehaald, onbekend: o.onbekend })) } };
+    uitvoeren: { regel: 'ENFORCE_EXECUTE', stand: 'schaduw', uitkomst: b.uitkomst, reden: b.reden, opbouw: inWoorden(b) } };
 }
 
-module.exports = { maakUitvoeren, lees, klasseVan, overMij, SOORTEN, VOORVOEGSEL };
+module.exports = { maakUitvoeren, lees, uitvoerKlasse, overMij, SOORTEN, VOORVOEGSEL };

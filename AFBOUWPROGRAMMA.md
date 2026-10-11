@@ -159,6 +159,75 @@ ongeveer tien naar de eigenaar, geordend op afhankelijkheden en op hoeveel
 ontwikkelwerk ze blokkeren. Per vraag: de bestaande huisregel, de opties, de
 gevolgen en een aanbeveling. Er worden geen besluiten verzonnen.
 
+## 3c. Open besluiten, portie 1 (11 oktober 2026)
+
+De eerste tien vragen uit bijlage A, door de eigenaar beslist. Tussen haakjes het
+bijlagenummer en de huisregel waar het besluit op rust.
+
+**1 — Herkomst afdwingen (A6; CONTROLPLANE.md, een nieuwe handhaving loopt eerst
+mee).** Eerst schaduwmetingen, daarna gefaseerd afdwingen per wereld en per
+capability, pas wanneer de benodigde paden aantoonbaar werken en de bestaande
+veiligheidscontroles slagen. Onbewezen herkomst wordt nooit stilzwijgend als
+bewezen behandeld.
+
+**2 — Privémateriaal achter `/media/:naam` (A10; par. 3b, de server verstrekt niet
+wat iemand niet mag ontvangen). Hoge prioriteit.** Direct onderzoeken wat er
+toegankelijk is. Privébestanden alleen na autorisatie op de server, eventueel via
+kort geldige ondertekende links. Ook publieke caches, oude links, exports en
+indirecte toegang nalopen; blootgestelde toegang waar mogelijk intrekken en
+beoordelen of eerdere blootstelling een privacy-incident is. Nieuwe privébestanden
+worden nooit opnieuw publiek.
+
+**3 — `ENFORCE_EXECUTE` aan de kantoordeur (A24; KANTOOR.md, een spoor dat eindigt
+bij een gedeelde code is een alibi).** Eerst individuele passkey-identificatie aan
+de deur, dan schaduwmetingen, dan gecontroleerd afdwingen. Een gedeelde
+kantoorcode geldt nooit als bewijs van een individuele uitvoerder. Risicovolle
+uitvoerende handelingen worden beperkt zolang identiteit en bevoegdheid niet
+bewezen kunnen worden.
+
+**4 — Wat een belofte is (A12; BETROUWBAARHEID.md par. 1).** Elk geregistreerd
+onderdeel in `MAPPEN` telt voorlopig als één meeteenheid voor de acht bewijzen. De
+onderliggende functies, eisen en integraties blijven afzonderlijk traceerbaar.
+Samenvoegen of verwijderen van een meeteenheid vraagt een expliciet besluit met
+onderbouwing.
+
+**5 — Publiceren namens een maker (A41; MENSNETWERK.md MN-01, en de gesloten lijst
+van `kern/vertegenwoordiging/`).** Toegestaan via een expliciete, beperkte en
+intrekbare machtiging. Een tiende bevoegdheid komt er alleen als de bestaande
+negen dit niet correct kunnen uitdrukken. De machtiging is gebonden aan de maker,
+de vertegenwoordiger, de toegestane publicatiehandeling en eventuele inhoudelijke
+beperkingen. Geen standaardtoegang, geen onbeperkte publicatierechten, geen
+verdere delegatie zonder afzonderlijke bevoegdheid. Elke publicatie laat een
+controleerbaar spoor na.
+
+**6 — Adres van een zaak op de kaart (A33; NAVIGATIE.md P-03).** Standaard het
+openbare vestigingsadres wanneer dat bedoeld is als bezoeklocatie. Bij
+thuiswerkende zzp'ers, thuiszorg, mobiele diensten en andere aanbieders met een
+werkgebied wordt nooit automatisch een privé- of woonadres gepubliceerd; daar
+geldt het werkgebied of een afzonderlijk goedgekeurde publieke locatie.
+
+**7 — Zoeken zonder netwerk (A36; NAVIGATIE.md B5).** Een adres- en plaatsindex in
+het offline kaartpakket, beheersbaar met regionale downloads, versies en updates.
+Offline zoeken vraagt geen netwerkverbinding.
+
+**8 — Samen schrijven in Office (A38; `check.js` regel 14, nul externe
+runtime-afhankelijkheden).** Eerst het eigen documentmodel en de vereiste
+samenwerkingssemantiek. Daarna onderzoeken of een eigen CRDT-implementatie
+verantwoord is. Niet meteen een volledige CRDT-engine bouwen. De nul-afhankelijkhedenregel
+blijft gelden tenzij de eigenaar afzonderlijk een uitzondering goedkeurt.
+
+**9 — Giftvormen (A21; GIFT.md besluit 2).** Eenmalig, ongeoormerkt is de eerste
+vorm. Er wordt niets geactiveerd voordat de ontvangende rechtspersoon, de
+geldbestemming, de juridische voorwaarden en een eventueel vereiste ANBI-status
+zijn vastgesteld. Geen fiscale toezegging zonder bevestigde status.
+
+**10 — Vergeten en gedeelde kennis (A50; VERDER.md B7, en de AVG).** Persoonsgegevens
+en herleidbare informatie worden verwijderd wanneer daar een geldige grond voor is;
+algemene, werkelijk geanonimiseerde kennis mag blijven. Alleen de naam verwijderen
+is niet genoeg: ook indirecte herkenbaarheid, combinaties van gegevens en
+herkomstinformatie worden getoetst. Is de kennis nog herleidbaar en is er geen
+geldige grond voor behoud, dan gaat ook die weg.
+
 ## 4. De vier werkstromen
 
 | werkstroom | wat | werkterrein |

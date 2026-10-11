@@ -117,14 +117,8 @@
      milliseconden. De elementen dragen data-rtg-klok / data-rtg-datum. */
   if (window.RTGKlok) RTGKlok.alles();
 
-  /* Een app (zoals Balans) kan met #ai terugverwijzen naar de Rahul-chat:
-     na het opstarten openen we dan meteen de AI-tab. */
-  if (location.hash === '#ai') setTimeout(() => {
-    const t = tabKnop('ai');
-    if (t) t.click();
-  }, 600);
-
-  /* DEZELFDE AFSPRAAK, MAAR DAN VOOR ELKE STAND (`#tab=...`), staat in
+  /* Een app (zoals Balans) die met #ai naar de Rahul-chat terugverwijst, en
+     elke stand met `#tab=...`: dat staat in
      renderAll() (./app-main-12a.js): daar is het account er zeker, en daar
      wordt al gekozen op welke stand de app opent. */
 

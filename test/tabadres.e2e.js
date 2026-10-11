@@ -27,6 +27,12 @@ const os = require('os');
 const path = require('path');
 const { startServer, stopNet, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
+/* `#ai` is dezelfde afspraak in kort (Balans verwijst zo naar de Rahul-chat)
+   en hing aan dezelfde timer; hij staat in de rij met de andere standen.
+   Mutatie gezien: `ai` uit het adrespatroon in renderAll() gehaald -- het
+   adres blijft staan en de toets zakt. De `!user`-wacht in vulTab heeft geen
+   eigen bewaker meer: er is geen weg meer die een stand vóór het account
+   opent, en hij blijft staan als vangnet voor een volgende. */
 const pw = laadPlaywright();
 
 test('#tab=<stand> opent de stand ook als het account laat binnenkomt, en nooit een verborgen stand',
@@ -63,13 +69,13 @@ test('#tab=<stand> opent de stand ook als het account laat binnenkomt, en nooit 
       const page = await ctx.newPage();
       const fouten = [];
       letOpFouten(page, fouten);
-      await page.goto(base + '/apps/app.html#tab=' + stand, { waitUntil: 'domcontentloaded' });
+      await page.goto(base + '/apps/app.html#' + (stand === 'ai' ? 'ai' : 'tab=' + stand), { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => !!document.querySelector('.view.active'), null, { timeout: 20000 });
       await page.waitForTimeout(2500);
       const beeld = await page.evaluate((s) => {
         const knop = document.querySelector('.tabbar button[data-tab="' + s + '"]');
         return {
-          actief: (document.querySelector('.view.active') || {}).dataset.view || null,
+          actief: document.querySelector('.view.active') ? document.querySelector('.view.active').dataset.view : null,
           zichtbaar: !!knop && knop.style.display !== 'none',
           hash: location.hash
         };
@@ -79,7 +85,7 @@ test('#tab=<stand> opent de stand ook als het account laat binnenkomt, en nooit 
     };
 
     const geopend = [];
-    for (const stand of ['salon', 'assets', 'bestellen', 'betalen', 'gezin']) {
+    for (const stand of ['salon', 'assets', 'bestellen', 'betalen', 'gezin', 'ai']) {
       const { beeld, fouten } = await open(stand);
       assert.deepEqual(fouten, [], stand + ': geen JavaScript-fout bij het openen via het adres');
       assert.equal(beeld.hash, '', stand + ': het adres is verbruikt');
@@ -93,8 +99,8 @@ test('#tab=<stand> opent de stand ook als het account laat binnenkomt, en nooit 
       }
     }
     /* De toets moet iets openen om iets te bewijzen: een RTG Pass-lid ziet
-       Salon, Assets, Bestellen en Betalen. */
-    assert.ok(['salon', 'assets', 'bestellen', 'betalen'].every((s) => geopend.includes(s)),
+       Salon, Assets, Bestellen, Betalen en de AI. */
+    assert.ok(['salon', 'assets', 'bestellen', 'betalen', 'ai'].every((s) => geopend.includes(s)),
       'de vier standen van een RTG Pass-lid gaan open via hun adres (geopend: ' + geopend.join(', ') + ')');
   } finally {
     if (browser) await browser.close().catch(() => {});

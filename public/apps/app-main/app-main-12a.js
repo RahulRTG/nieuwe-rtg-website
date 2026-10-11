@@ -111,19 +111,16 @@
         if (knop && knop.style.display !== 'none') beginTab = b.tab;
       }
     } catch(e){}
-    /* EEN ADRES MET EEN STAND (`#tab=salon`): de sprong en elke ingang buiten
-       deze app sturen een lid zo naar een stand die hier woont. Dat wordt HIER
-       beslist en niet met een klok ernaast: er stond een timer van 600 ms die de
-       knop indrukte, en kwam het account later binnen dan dat, dan viel vulTab
-       om op `user` (null) en bleef de stand leeg -- ook bij een volgende keer
-       openen, want hij stond al als gevuld gemarkeerd. Alleen een knop die er
-       voor deze pas ECHT staat telt; een verborgen stand opent een adres nooit.
-       Het adres wordt een keer gebruikt en daarna weggehaald, zodat een
-       volgende renderAll niet opnieuw naar dezelfde stand springt. */
-    const adres = /^#tab=([a-z]+)$/.exec(location.hash);
+    /* EEN ADRES MET EEN STAND (`#tab=salon`, of kort `#ai`): de sprong en
+       andere schermen sturen een lid zo naar een stand van deze app. Hier, en
+       niet met een timer ernaast: die drukte de knop soms vóór het account er
+       was, en dan bleef de stand leeg. Alleen een knop die de pas toont telt;
+       het adres wordt een keer gebruikt. */
+    const adres = /^#(?:tab=([a-z]+)|(ai))$/.exec(location.hash);
     if (adres){
-      const knop = document.querySelector('.tabbar button[data-tab="' + adres[1] + '"]');
-      if (knop && knop.style.display !== 'none') beginTab = adres[1];
+      const stand = adres[1] || adres[2];
+      const knop = document.querySelector('.tabbar button[data-tab="' + stand + '"]');
+      if (knop && knop.style.display !== 'none') beginTab = stand;
       try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
     }
     /* De tabbladen achter het beginscherm halen hun gegevens nu pas op als je

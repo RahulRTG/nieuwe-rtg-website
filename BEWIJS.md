@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2440 bestanden en 16711 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2441 bestanden en 16715 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2440 |
-| losse beweringen (`test(...)`) | 16711 |
+| toetsbestanden | 2441 |
+| losse beweringen (`test(...)`) | 16715 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 0 |
+| niets van beide | 1 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2132 bestanden, 16174 beweringen.
+2133 bestanden, 16178 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -420,6 +420,7 @@ toets omvalt.
 | `dienst-vervalt.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `dienstdrager.test.js` | 6 | gezakt op `===->!==#0` | ACHTERGRONDWERK: EEN EIGEN FRAME, EEN EIGEN DRAGER, EN DE KETEN VAN RAHUL (Fase 2, PR 7; besluiten B4b en B6a, invariant I11). 1. |
 | `dienstidentiteit.test.js` | 6 | gezakt op `getal+1#0` | DIENSTEN EN TOESTELLEN MET EEN EIGEN IDENTITEIT (AUTHORITY.md fase 7). Vier dingen die niet mogen sneuvelen: 1. |
+| `dienstverband-sleutel.test.js` | 4 | -- | EEN MENS, TWEE SCHRIJFWIJZEN IN HET DIENSTVERBAND (kern/concern/employment.js, `wie()`; ARBEID.md par. 7a: employment is de waarheid). |
 | `directpay.test.js` | 9 | gezakt op `liegpoort /api/` | Rechtstreeks betalen van klant naar leverancier, met Face ID, via de AI en de Salon. Het lid betaalt zelf of rekent een betaalverzoek van de partner af; het geld gaat rechtstreeks naar de leverancier (ontvangst-teller). |
 | `divergentie.test.js` | 6 | gezakt op `===->!==#0` | DE EERSTE DIVERGENTIE (scripts/lib/divergentie.js, BEWIJSLUS.md par. 4). |
 | `doctrine.test.js` | 8 | gezakt op `===->!==#0` | DE DOCTRINECOMPILER ZELF -- kan hij zakken? scripts/doctrine.js telt harde uitspraken in de doctrine-documenten. |

@@ -42,13 +42,16 @@ const SOORTEN = {
 const DATUM = /^\d{4}-\d{2}-\d{2}$/;
 
 module.exports = (ctx) => {
-  const { db, save, crypto, schoon, entiteitVind, vestigingVind, tijdVandaag, opslag } = ctx;
+  const { db, save, crypto, schoon, entiteitVind, vestigingVind, tijdVandaag, opslag, codenaamVan } = ctx;
 
   const nu = () => new Date().toISOString();
 
   const bak = () => opslag.tak('employments');
 
   const vind = (id) => bak()[String(id || '')] || null;
+
+  /* Een ledensleutel leest ook zijn codenaam: zie ./employment-wie.js. */
+  const wie = require('./employment-wie')(codenaamVan);
 
   /* Loopt dit dienstverband op deze dag? Precies het venster van
      server/bedrijf/rollen.js en van ./tijd.js: van en tot inclusief. Drie
@@ -88,7 +91,8 @@ module.exports = (ctx) => {
     /* Dezelfde persoon twee keer bij dezelfde entiteit in dezelfde rol op
        hetzelfde moment is geen tweede baan maar een dubbele invoer. Een tweede
        rol bij dezelfde werkgever mag wel -- dat komt echt voor. */
-    const dubbel = Object.values(bak()).find(x => x.persoon === persoon && x.entiteit === ent.id
+    const zelfde = wie(persoon);
+    const dubbel = Object.values(bak()).find(x => zelfde.has(x.persoon) && x.entiteit === ent.id
       && x.rol === rol && x.soort === soort && !x.tot);
     if (dubbel) return { status: 409, error: 'Deze persoon heeft deze rol hier al.', employment: beeld(dubbel) };
 
@@ -163,9 +167,12 @@ module.exports = (ctx) => {
       bestaatEntiteit: !!ent };
   }
 
-  const vanPersoon = (persoon, ookOud) => Object.values(bak())
-    .filter(e => e.persoon === persoon && (ookOud || loopt(e, tijdVandaag())))
-    .map(beeld);
+  const vanPersoon = (persoon, ookOud) => {
+    const zelfde = wie(persoon);
+    return Object.values(bak())
+      .filter(e => zelfde.has(e.persoon) && (ookOud || loopt(e, tijdVandaag())))
+      .map(beeld);
+  };
 
   const vanEntiteit = (entiteitId, ookOud) => Object.values(bak())
     .filter(e => e.entiteit === entiteitId && (ookOud || loopt(e, tijdVandaag())))

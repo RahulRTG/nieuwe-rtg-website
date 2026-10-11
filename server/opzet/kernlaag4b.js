@@ -194,7 +194,9 @@ Object.assign(kern, require('../kern/onderneming/rechtsvormwacht')({ db, save })
    er ooit een entiteit bestaat. */
 Object.assign(kern, require('../kern/concern')({ db, save, crypto, schoon, findSupplier, bewerkCollectie,
   // Discovery leest de onderneming van de aanvrager (./voorstel.js)
-  ondernemingVind: kern.ondernemingVind }));
+  ondernemingVind: kern.ondernemingVind,
+  // het dienstverband leest een ledensleutel ook als codenaam (employment.js, wie())
+  codenaamVan: (x) => kern.codenaamVan(x) }));
 kern.rechtsvormwacht.herstelOverlay();
 const rvTimer = setInterval(() => { kern.rechtsvormwacht.check().catch(() => {}); },
   Number(process.env.RECHTSVORM_CHECK_MS || 86400000));

@@ -132,6 +132,17 @@ const METERS = [
      verklaring weghalen laat hem stijgen -- dat laatste hoort te ratelen, want
      een reden die niet meer klopt hoort niet stil te verdwijnen. */
   { sleutel: 'verstrengelingOnverklaard', richting: 'omlaag', wat: 'requires tussen twee delen van RTG die niemand heeft verklaard' },
+  /* DE TIJDELIJKE LOOP FABRIC-DEKKING (LOOP-FABRIC-COVERAGE.json), besluit van de
+     eigenaar van 6 oktober 2026. Een capability die PARTIALLY_LOOP_CAPABLE of
+     NOT_YET_LOOP_CAPABLE heet, is een tijdelijke stand: hij is ingedeeld, maar
+     de lus is er nog niet rond. Dat getal mag alleen omlaag. Wat NIET meetelt:
+     HUMAN_REVIEW_REQUIRED, NO_LEARNING_VALUE en PROHIBITED_FROM_LEARNING -- dat
+     zijn oordelen en geen achterstand, en een capability die van "nog niet" naar
+     "verboden te leren" schuift, wordt hier dus niet als vooruitgang gezien maar
+     zichtbaar in het register zelf. Of het register vers is, bewaakt
+     registerklopt (test/loop-fabric-coverage.test.js); deze meter leest het
+     vastgelegde bestand, zoals bij ACTIVERING.json. */
+  { sleutel: 'loopFabricTijdelijk', richting: 'omlaag', wat: 'capabilities die de Loop Fabric nog als PARTIALLY of NOT_YET loop-capable telt' },
   /* DE FUNCTIES WAARVAN DE ENVELOP EEN ONDERGRENS IS (ACTIVERING.json).
 
      Van 204 functies is er van 31 te zeggen wat er wakker wordt als je hem
@@ -1258,6 +1269,18 @@ function telSkips(bestanden, lees) {
    Hij WERPT bij een ontbrekend of stuk bestand. Nul teruggeven zou hier "van
    elke functie is de envelop gemeten" betekenen, en dat is het tegenovergestelde
    van wat een ontbrekende meting zegt. */
+const LOOP_TIJDELIJK = Object.freeze(['PARTIALLY_LOOP_CAPABLE', 'NOT_YET_LOOP_CAPABLE']);
+function leesLoopFabric(pad) {
+  let r;
+  try { r = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error('LOOP-FABRIC-COVERAGE.json ontbreekt of is niet te lezen (' + e.message + '); draai npm run loopfabric:coverage'); }
+  /* Geen capabilities is geen nul: dat zou "alles is rond" betekenen. */
+  if (!r || !Array.isArray(r.capabilities) || !r.capabilities.length) {
+    throw new Error('LOOP-FABRIC-COVERAGE.json draagt geen capabilities; een meter zonder invoer is geen meter');
+  }
+  return r.capabilities.filter(c => LOOP_TIJDELIJK.includes(c.classification)).length;
+}
+
 function leesActivering(pad, veld) {
   let rauw;
   try { rauw = fs.readFileSync(pad, 'utf8'); }
@@ -1598,6 +1621,7 @@ function meet(bronnen) {
      meter waarom dit er niet vers wordt gemeten. Ontbreekt het bestand, dan
      zakt de meter in plaats van stil nul te melden -- nul zou hier "alles is
      gemeten" betekenen en dat is het tegenovergestelde van onbekend. */
+  const loopFabricTijdelijk = leesLoopFabric(path.join(WORTEL, 'LOOP-FABRIC-COVERAGE.json'));
   const activeringOndergrens = leesActivering(path.join(WORTEL, 'ACTIVERING.json'));
   const activeringOnbepaald = leesActivering(path.join(WORTEL, 'ACTIVERING.json'), 'onbepaald');
   const activeringZonderReden = leesActivering(path.join(WORTEL, 'ACTIVERING.json'), 'zonderReden');
@@ -1695,6 +1719,7 @@ function meet(bronnen) {
     metersOngeijkt,
     routesNietSchakelbaar,
     verstrengelingOnverklaard,
+    loopFabricTijdelijk,
     activeringOndergrens,
     activeringOnbepaald,
     activeringZonderReden,
@@ -2258,6 +2283,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, keuringRapport, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesEdge, leesMeetleer,
+module.exports = { meet, keuringRapport, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesLoopFabric, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesEdge, leesMeetleer,
   PRESTATIEMETERS, leesPrestatie, leesMeting, prestatiePad, bron, PRESTATIEBESTAND, METINGBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

@@ -56,30 +56,18 @@ const { CONTRACTEN } = require(path.join(WORTEL, 'server/lib/mutatiecontracten')
    was dat het REGISTER het zei -- en dat is precies wat toets 3 bedoelt met
    "wie er een oplost, haalt hem eraf".
 
-   GEGROEID OP 29 SEPTEMBER 2026 (samenvoeging #426): /api/foundation/les/join.
-   #403 maakte de lescode een credential; meedoen is sindsdien een CLAIM op de
-   `lescode` in het lijf, en dat is het veld dat de les aanwijst. De route kreeg
-   met opzet nog geen menselijk contract (server/lib/mutatiecontracten-lesfamilie.js
-   zegt waarom: hij staat als afgeleid contract in MUTATIECONTRACT-AFGELEID.json,
-   en een route mag niet in beide lijsten staan). Zodra dat contract er is, met
-   `objectVeld: 'lescode'`, valt hij hier vanzelf af (toets 3).
-
-   GEGROEID OP 4 OKTOBER 2026 (#448, besluit B18): /api/foundation/gezin/inloggen
-   en /profiel/kies. Dezelfde vorm als les/join: sinds de gezinscode een 128-bit
-   credential is, wijst niet meer het veld `code` het gezin aan maar een CLAIM op
-   de `gezinscode` in het lijf (foundation/gezinstoegang.js, dragerVan). Beide staan
-   als afgeleid contract in MUTATIECONTRACT-AFGELEID.json; met een menselijk
-   contract (`objectVeld: 'gezinscode'`) vallen ze hier vanzelf af. */
+   GEKROMPEN OP 6 OKTOBER 2026: /api/foundation/les/join,
+   /api/foundation/gezin/inloggen en /profiel/kies eraf. Hun menselijke
+   credentialcontracten noemen nu respectievelijk `lescode` en `gezinscode` als
+   objectveld; de afgeleide BLOCKED_BY_TEST_FIXTURE-regels waren geen blijvende
+   uitspraak over hun bedoeling. */
 const NOG_ZONDER = [
   'POST /api/aanmeld/zeg',
   'POST /api/auth/reset',
-  'POST /api/foundation/gezin/inloggen',
-  'POST /api/foundation/gezin/profiel/kies',
   'POST /api/foundation/gezin/uitnodiging/accepteer',
   'POST /api/foundation/gezin/uitnodiging/bekijk',
   'POST /api/foundation/gezin/uitnodiging/intrek',
   'POST /api/foundation/gezin/uitnodiging/maak',
-  'POST /api/foundation/les/join',
   'POST /api/foundation/mail/lees',
   'POST /api/foundation/mail/stuur',
   'POST /api/foundation/school/personeel/inlog/accepteer',

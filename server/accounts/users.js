@@ -8,6 +8,7 @@ const S = require('./state');
 const kluis = require('./kluis');
 const gebonden = require('./gebonden'); // kluis, gebonden aan (kolom, rij-id)
 const mirror = require('./mirror');
+const { uitgezet } = require('./sessiegrens');
 
 /* createUser is asynchroon (scrypt in de threadpool); createUserSync bestaat
    voor het opstart-seed en tests, waar blokkeren geen kwaad kan. */
@@ -219,7 +220,9 @@ function zetActief(id, aan) {
   mirror.markUser(id);
   return getUserById(id);
 }
-const isActief = (u) => !!u && u.actief !== 0;
+// wat "uitgezet" is, staat binnen server/accounts/ op een plek: ook de tokens
+// lezen het daar (wie het erbuiten zelf vergelijkt: ./sessiegrens.js)
+const isActief = (u) => !!u && !uitgezet(u);
 
 /* Het schrijven zelf, los van waar de hash vandaan komt. Twee kopieen van deze
    UPDATE lopen uiteen zodra de sessiegrens verandert (LAT.md regel 4). */

@@ -330,8 +330,8 @@ test('een appblad heeft één scrollbaan en één Edge', { skip: geenBrowser(pw)
       };
     });
     assert.equal(voor.lokaleBalk, 'none', 'de ingebedde app tekent nog een tweede Edge');
-    assert.ok(parseFloat(voor.inhoudRuimte) < 80,
-      'het werkblad reserveert nog de lege hoogte van zijn verborgen balk: ' + voor.inhoudRuimte);
+    assert.ok(parseFloat(voor.inhoudRuimte) <= 84,
+      'het werkblad reserveert meer dan de ene veilige Edge-inzet: ' + voor.inhoudRuimte);
 
     await page.evaluate(() => {
       window.scrollTo(0, 0);

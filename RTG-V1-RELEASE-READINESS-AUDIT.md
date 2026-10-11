@@ -1,6 +1,6 @@
 # RTG V1 — RELEASE READINESS AUDIT
 
-> **STATUS 6 oktober 2026 — remediatie ronde 1 tot en met 4 uitgevoerd.**
+> **STATUS 6 oktober 2026 — remediatie ronde 1 tot en met 5 uitgevoerd.**
 >
 > - **Ronde 1:** de 2 P0's, de P1 en de kapotte release-gate uit ronde 0 zijn
 >   gerepareerd, met regressietests én een onafhankelijke adversariële
@@ -14,12 +14,14 @@
 > - **Ronde 4:** N3, N11 en N12 zijn VERIFIED FIXED, na een herkeuring per
 >   bevinding en een gezamenlijke eindkeuring. Er staat geen P0 of P1 meer open
 >   in de code.
-> - **Verdict nu:** 🟡 CONDITIONAL GO, **84/100**. Wat nog open staat:
+> - **Ronde 5:** N19 en N18 (de twee P2's uit ronde 4) en N20 zijn VERIFIED
+>   FIXED, en N21 is bewust zo gelaten.
+> - **Verdict nu:** 🟡 CONDITIONAL GO, **86/100**. Wat nog open staat:
 >   - de externe poorten F3–F6;
->   - een besluit over twee P2's die er al waren: N19 (een werksessie zonder
->     tweede factor) en N18 (een slash omzeilt de inlogpauze).
+>   - aanbevolen: een besluit over N26. Dat is een P2 die er al was: de
+>     schorspoort is met een slash te omzeilen.
 >
-> Zie **§REMEDIATIESTATUS** (ronde 1 tot en met 4) direct onder sectie A. De
+> Zie **§REMEDIATIESTATUS** (ronde 1 tot en met 5) direct onder sectie A. De
 > oorspronkelijke ronde-0-bevindingen blijven hieronder staan met hun status
 > (OPEN / FIXED / VERIFIED FIXED).
 
@@ -648,10 +650,10 @@ las hun rapporten na.
 
 | ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
 |---|---|---|---|---|---|---|
-| **N18** | P2 | OPEN, al aanwezig | `server/middleware/remmen.js` `inlogpauzePoort` | De inlogpauze vergelijkt `req.path` letterlijk, maar de router laat een pad met een slash erachter bij dezelfde handler komen. Tijdens een gesprongen pauze gaf `/api/auth/login/` 200, en `/api/aanmeld/zeg/` een token. Dat geldt voor alle negen paden in `INLOG_PADEN`. | Zelf gezien door herkeuring 2 van N3, op de basis en op de fix. | Zie besluitpunt 2. |
-| **N19** | P2 | OPEN, al aanwezig | `server/routes/supplier/pda/posities.js:106` (`POST /api/supplier/mijn/login`) | Een lid met de tweede factor aan krijgt op alleen e-mail en wachtwoord een werksessie die aan zijn account hangt, zonder `tweefactor.inlogPoort`. Het pad staat ook niet in `INLOG_PADEN`. | Zelf gezien in de eindkeuring: `/api/auth/login` gaf een bewijs, `/api/supplier/mijn/login` gaf een token, en `/api/supplier/state` gaf daarmee 200. Op de basis precies zo. | Zie besluitpunt 1. |
-| **N20** | P3 | OPEN, al aanwezig | `server/accounts/actietokens.js` `verifyActionToken` | Een actietoken controleert `actief === 0` niet. Bij een uitgezet account geven alle vijf de doelen de gebruiker terug, terwijl een sessietoken daar null geeft. | Zelf gezien door de herkeuringen van N12. | Zie besluitpunt 3. |
-| **N21** | P3 | OPEN, al aanwezig | `server/routes/member/sessies.js` (sluit-overige) | "Sluit alle andere sessies" trekt per sessie in en verzet `sessies_vanaf` niet. Een openstaande mailwissel of een inlogbewijs blijft dus geldig; voor het inlogbewijs blijft wel een code nodig. | Zelf gezien in de herkeuring van N12 en in de eindkeuring. | Zie besluitpunt 3. |
+| **N18** | P2 | VERIFIED FIXED (ronde 5) | `server/middleware/remmen.js` `inlogpauzePoort` | De inlogpauze vergelijkt `req.path` letterlijk, maar de router laat een pad met een slash erachter bij dezelfde handler komen. Tijdens een gesprongen pauze gaf `/api/auth/login/` 200, en `/api/aanmeld/zeg/` een token. Dat geldt voor alle negen paden in `INLOG_PADEN`. | Zelf gezien door herkeuring 2 van N3, op de basis en op de fix. | Zie besluitpunt 2. |
+| **N19** | P2 | VERIFIED FIXED (ronde 5) | `server/routes/supplier/pda/posities.js:106` (`POST /api/supplier/mijn/login`) | Een lid met de tweede factor aan krijgt op alleen e-mail en wachtwoord een werksessie die aan zijn account hangt, zonder `tweefactor.inlogPoort`. Het pad staat ook niet in `INLOG_PADEN`. | Zelf gezien in de eindkeuring: `/api/auth/login` gaf een bewijs, `/api/supplier/mijn/login` gaf een token, en `/api/supplier/state` gaf daarmee 200. Op de basis precies zo. | Zie besluitpunt 1. |
+| **N20** | P3 | VERIFIED FIXED (ronde 5) | `server/accounts/actietokens.js` `verifyActionToken` | Een actietoken controleert `actief === 0` niet. Bij een uitgezet account geven alle vijf de doelen de gebruiker terug, terwijl een sessietoken daar null geeft. | Zelf gezien door de herkeuringen van N12. | Zie besluitpunt 3. |
+| **N21** | P3 | Bewust zo (ronde 5) | `server/routes/member/sessies.js` (sluit-overige) | "Sluit alle andere sessies" trekt per sessie in en verzet `sessies_vanaf` niet. Een openstaande mailwissel of een inlogbewijs blijft dus geldig; voor het inlogbewijs blijft wel een code nodig. | Zelf gezien in de herkeuring van N12 en in de eindkeuring. | Zie besluitpunt 3. |
 | **N22** | Info | OPEN, al aanwezig | kantoorroutes `/api/office/*` met `Idempotency-Key` | 12 'finish'-luisteraars bij een grens van 11: een `MaxListenersExceededWarning` per verzoek, ook in productie. Op de basis waren het 11 bij een grens van 10, dus de marge is gelijk gebleven. | Zelf gezien in de eindkeuring, op vier kantoorroutes. | Uitzoeken welke laag de negende luisteraar hangt; een `close`-luisteraar volstaat daar mogelijk. |
 | **N23** | Info | OPEN, al aanwezig | `server/accounts/herstel.js` tegenover `tokens.js` en `actietokens.js` | De grens wordt gezet met `lib/klok` (te verzetten met `RTG_KLOK`), de uitgifte met `Date.now()`. Onder een verzette klok vallen tokens verkeerd. In productie weigert `RTG_KLOK`. | Zelf gezien in de eindkeuring. | Beide met dezelfde klok. |
 | **N24** | P3 | OPEN, al aanwezig | `server/routes/aanmeldgesprek.js`, `server/kern/sleutelwoorden-uitdaging.js` | Het gesprek schrijft niets in het inlogspoor (`logInlog`), ook geen geweigerde poging. Daarnaast zegt het na de eerste twee woorden alleen "ik hoor je ... terug" als die twee goed waren. Wie gokt, weet dus vóór het derde woord of de eerste twee klopten. | Alleen in de code gelezen, door herkeuring 2 van N3. | Het spoor aansluiten. De echo pas na alle woorden geven. |
@@ -718,6 +720,189 @@ las hun rapporten na.
 N18 tot en met N25 zijn vastgelegd en niet gerepareerd. Ze bestonden al vóór
 deze branch of vallen buiten de drie besluiten, en horen eerst een besluit te
 krijgen.
+
+---
+
+## REMEDIATIESTATUS — ronde 5: N19, N18 en N20 (6 oktober 2026)
+
+Branch: `codex/rtg-v1-release-blockers` (PR #487). De eigenaar besliste over de
+drie besluitpunten van ronde 4, telkens met de aanbevolen keuze:
+
+- **N19:** (a), de werkplek-inlog krijgt dezelfde tweede stap als de gewone
+  inlog;
+- **N18:** (a), het pad normaliseren voordat de inlogpauze de lijst raadpleegt;
+- **N20/N21:** (a), alleen N20 dicht. N21 blijft bewust zoals het is (zie
+  "Bewust zo").
+
+De werkwijze is die van ronde 4, in één workflow:
+
+1. per bevinding een implementer;
+2. een andere agent herkeurt adversarieel;
+3. hooguit twee herstelrondes;
+4. een samenvoeger zet de drie branches op één branch;
+5. drie nieuwe keurders doen samen een eindkeuring: alle deuren naar een
+   sessie, een brede regressie, en N18/N20 tot op de bodem;
+6. een volledigheidscriticus leest alles na.
+
+### Nieuw verdict (code): 🟡 CONDITIONAL GO — Release readiness: 86/100
+
+**Waarom hoger dan 84.**
+
+- **De twee P2's uit ronde 4 zijn dicht en bewezen.**
+  - N19: een lid met tweede factor komt via de werkplek-inlog niet meer op
+    alleen het wachtwoord binnen. Dat is live nagespeeld, ook in een echte
+    browser in de personeels- en de leveranciersapp.
+  - N18: de inlogpauze ziet elke spelling van een inlogpad die de router bij een
+    handler laat uitkomen.
+- **N20 is dicht**, en alle drie de eindkeurders zeggen GROEN.
+
+**Waarom niet hoger.**
+
+- **De eindkeuring vond een nieuwe P2 die er al was (N26).** De schorspoort
+  zoekt een geschorste route letterlijk op. Met een slash erachter is een
+  geschorste schrijfroute dus gewoon uit te voeren: dezelfde fout als N18, in een
+  andere poort.
+- Daarnaast een reeks P3's die er ook al waren (N27 tot en met N32).
+- De externe poorten F3–F6 staan nog open.
+
+**Voorwaarden voor GO:**
+
+- de externe poorten F3–F6;
+- **aanbevolen: een besluit over N26.**
+
+### Per bevinding — BEFORE / FIX / AFTER / REGRESSIE
+
+| # | Sev | Status | Commits | BEFORE → AFTER | Regressie (zakt vóór, slaagt na) |
+|---|---|---|---|---|---|
+| N19 | P2 | **VERIFIED FIXED** | `768efa42`, `fe241ea8`, `a950bd67`, `6840de27`, `d1577121`, `9cd07004` | **Vóór:** `/api/supplier/mijn/login` gaf een lid met tweede factor op alleen e-mail en wachtwoord een werksessie die aan zijn account hangt, en het pad viel buiten de inlogpauze. **Na:** de inlog woont in `server/routes/supplier/pda/posities-inlog.js`. Met de tweede factor aan komt er een bewijs met een eigen doel (`werk2`, 5 minuten) en geen werksessie. Dezelfde route ruilt `{ bewijs, code }` om, met de gedeelde rem. Of het lid nog actief is, wordt vóór de code opnieuw gelezen; de werkplekken pas ná de code, zodat niemand op alleen het wachtwoord hoort of het account ergens werkt. Het pad staat in `INLOG_PADEN`. De personeels- en de leveranciersapp vragen de code. Het codeveld neemt ook een herstelcode met letters (geen cijfertoetsenbord). | `test/werkplek-tweede.test.js` (13): op de basis zakten er 11 van de 12 eerste toetsen. Daarnaast `test/werkplek-tweede.e2e.js` (4, echte browser). 13 servermutanten en 5 clientmutanten zijn gedood, en M16 (het slot pas na de codetoets) sinds `d1577121`. |
+| N18 | P2 | **VERIFIED FIXED** | `5aba1f42`, `100b1337`, `d1577121` | **Vóór:** de inlogpauze vergelijkt `req.path` letterlijk. `/api/auth/login/` (met slash) gaf tijdens een gesprongen pauze 200, en `/api/aanmeld/zeg/` een token. **Na:** `isInlogPad()` leest het pad met `vastePaden()` uit `server/web/routeindex.js`, dezelfde opvatting als de router: elke spelling die bij een inloghandler uitkomt, valt onder de pauze. | `test/inlogpauze-spelling.test.js`: per inlogpad minstens vier spellingen tijdens een echte pauze. De tegenproef eist de echte status van een niet-inlogpad (200 en 401), en niet alleen "geen 503". |
+| N20 | P3 | **VERIFIED FIXED** | `d1c1700b`, `b55a74ba`, `d1577121` | **Vóór:** `verifyActionToken` gaf bij een uitgezet account (actief 0) voor alle doelen de gebruiker terug. **Na:** `uitgezet()` in `server/accounts/sessiegrens.js` is de ene opvatting van "uitgezet", gelezen door `verifyToken`, `verifyActionToken` en `isActief`. Een bewaker eist dat er in `server/accounts/` geen tweede staat, ook geen ontkenning `!u.actief`. | `test/actietoken-uitgezet.test.js` (17): elk doel, in de oude en de nieuwe vorm, met en zonder sessiegrens. Daarnaast een e2e-toets waarin SCIM het account tussen stap een en twee uitzet. |
+
+### Herkeuringsverloop
+
+- **N18.**
+  - Herkeuring 1: VERIFIED FIXED. Eén zin in het commentaar zei te veel; hersteld
+    in `100b1337`.
+  - Herkeuring 2: VERIFIED FIXED. Een tegenproef die alleen "geen 503" eiste;
+    hersteld in `d1577121`. Daarnaast vond deze herkeuring N26 (P2, al aanwezig).
+- **N20.**
+  - Herkeuring 1: VERIFIED FIXED, met twee punten:
+    - een toetsgat voor de oude vorm en de sessiegrens;
+    - een kop die breder sprak dan de bron.
+
+    Beide hersteld in `b55a74ba`.
+  - Herkeuring 2: VERIFIED FIXED. De bewaker zag `!u.actief` niet (M16);
+    hersteld in `d1577121`.
+- **N19.**
+  - Herkeuring 1: FIXED_MET_KANTTEKENING.
+    - **P2 binnen het besluit:** de branch brak `npm run build`, de regel
+      websitewaarheid en `test/website-truth.test.js`. Het partnerscherm had een
+      nieuwe bronhash; hersteld in `6840de27`.
+    - Toetsgaten: `rem.gelukt` en drie clientpaden.
+    - De leveranciersapp gooide de melding "laatste herstelcode" weg.
+
+    Hersteld in `a950bd67`.
+  - Herkeuring 2: VERIFIED FIXED.
+    - M16 (het slot pas na de codetoets); hersteld in `d1577121`.
+    - Het codeveld droeg `inputmode="numeric"` terwijl een herstelcode letters
+      bevat. Dat gold ook voor het codeveld van de techniekpagina uit ronde 3;
+      hersteld in `9cd07004`.
+- **Samenvoegen.** Eén conflict, in code: de lijst `INLOG_PADEN`, waar N19 een
+  pad toevoegde en N18 er drie regels onder zette. Opgelost als pure vereniging,
+  en door mij nagelopen.
+- **Eindkeuring op `6840de27`:**
+  - **deuren: GROEN.** Alle deuren naar een sessie zijn langsgelopen. N19 is
+    end-to-end nagespeeld met en zonder tweede factor, met een
+    wachtwoordwijziging en een uitgezet account tussen stap een en twee, en
+    tijdens de pauze.
+  - **n18-n20: GROEN.** De spellingen van een inlogpad tijdens de pauze, en alle
+    28 bestanden met actietokens of SCIM: 284/286. De twee rode zijn omgeving.
+  - **regressie: GROEN.** De hele suite met `RTG_ROUTELOG`: 16.135 toetsen. Wat
+    zakte, waren achterlopende registers (die zijn sindsdien herijkt) en de
+    omgeving: `bewijskosten`, en de Rust-motor ontbreekt.
+  - **criticus: GROEN**, op voorwaarde dat de registers opnieuw gemeten worden.
+    Dat is gebeurd, inclusief `BUNDELS.md` (`a9778fdd`).
+
+  De herstelcommits na de eindkeuring (`d1577121`, `9cd07004`) zijn met mutaties
+  en de browsertoets nagetrokken, maar **niet meer onafhankelijk herkeurd**. De
+  CI moet ze bevestigen.
+
+### Bewust zo
+
+- **N21:** "sluit alle andere sessies" laat openstaande actietokens staan.
+  - De knop gaat over sessies.
+  - Een inlogbewijs vraagt daarna nog steeds een code.
+  - Een wachtwoordwijziging of een herstel zet wél de grens, en die laten alles
+    vervallen.
+  - Wie wil dat ook links vervallen, wijzigt zijn wachtwoord.
+- **N19:** tijdens een gesprongen inlogpauze wacht ook stap twee van de
+  werkplek-inlog, want die loopt over hetzelfde pad. Stap twee van
+  `/api/auth/tweede` gaat wel door: dat is een eigen pad met een eigen rem.
+- **N19:** met de tweede factor aan worden de werkplekken pas na de code
+  opgezocht. Een lid zonder werkplek verbruikt dus een code voordat hij hoort
+  dat er geen werkplek is. Dat is de prijs van niets prijsgeven op alleen het
+  wachtwoord.
+
+### Nieuwe bevindingen (OPEN)
+
+| ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
+|---|---|---|---|---|---|---|
+| **N26** | P2 | OPEN, al aanwezig | `server/lib/vervalstaat.js` `staatVan` (letterlijke opzoeking) | De schorspoort zoekt `methode + pad` letterlijk op. De router brengt `/x/` bij dezelfde handler, dus een geschorste schrijfroute is met een slash erachter gewoon uit te voeren. Dezelfde fout als N18, in de poort die bewijsschuld afdwingt. | Zelf gezien door herkeuring 2 van N18. | Zie besluitpunt 1. |
+| **N27** | P3 | OPEN, al aanwezig (plausibel) | `server/opzet/lijfpoort.js:142`, `server/kern/zaakdoos` `journaalPadOk` | De zaakdoos sluit in de lokale modus alleen `/api/supplier/login` letterlijk uit van het naspeeljournaal. `/api/supplier/login/` en `/api/supplier/mijn/login` komen er wel in, met het lijf (wachtwoord, bewijs plus code) en een werktoken in het antwoord. | Alleen in de code gelezen, door twee keurders. | De uitsluiting via `vastePaden()` en voor elke inlogroute. |
+| **N28** | P3 | OPEN, al aanwezig | `server/routes/supplier/pda/posities-inlog.js` stap een | Stap een remt alleen per adres. Er is geen emmer per account zoals bij `/api/auth/login`: 30 foute wachtwoorden vanaf 30 adressen op één account werden niet geremd. | Zelf gezien in de eindkeuring. | Dezelfde drie emmers als de gewone inlog, via een gedeelde hulp. |
+| **N29** | P3 | OPEN, al aanwezig | `server/routes/supplier/werving/personeel.js` `/api/supplier/staff/join` | Een wachtwoordorakel. Het wachtwoord wordt vóór de bedrijfsnaam en de kassacode getoetst, dus een goed wachtwoord geeft 404 en een fout 401. Het pad valt buiten de inlogpauze en remt alleen per adres. | Zelf gezien in de eindkeuring. | De volgorde omdraaien, en het pad op `INLOG_PADEN`. |
+| **N30** | P3 | OPEN, al aanwezig | `server/routes/supplier/pda/posities.js` `staffSessie` | Een werksessie uit de werkplek-inlog komt niet in het sessieregister van het lid ("Mijn sessies"), en er wordt geen `logInlog` geschreven. | Zelf gezien in de eindkeuring. | `legInlogVast` zoals de werkplekken bij `/api/auth/login`. |
+| **N31** | P3 | OPEN, al aanwezig | `server/routes/techniek/inlog.js` stap een, `server/sso/binnenkomst.js` `binnen()` | Stap een geeft een uitgezet account nog een bewijs of een overdracht. Sinds N20 vervalt die bij het eerste gebruik, maar SSO draait de tenantbrug al en logt een geslaagde inlog. | Zelf gezien (techniek); SSO alleen gelezen. | `isActief` in stap een, en in `aanmelden()` van SSO. |
+| **N32** | P3 | OPEN, al aanwezig | `server/middleware/remmen.js` `remOpDeDeur` | `req.path.endsWith('/stream')` slaat de algemene rem over, ook voor een `:param`-route waarvan het laatste segment toevallig `stream` heet. | Alleen in de code gelezen. | Op de route en niet op de pathnaam beslissen. |
+| **N33** | Info | OPEN | `public/apps/personeel/personeel-03b.js` | Twee clientpaden hebben geen toets: de melding over de laatste herstelcode, en de kantoorzin na een 404. | Herkeuring 2 van N19 (mutanten C3/C5). | Een browsertoets per pad. |
+| **N34** | Info | OPEN, al aanwezig (plausibel) | `/api/auth/tweede`, `posities-inlog.js`, `techniek/inlog.js` | Tussen `verifyActionToken` en `trekInActie` zit een venster. Twee gelijktijdige verzoeken met hetzelfde bewijs en dezelfde TOTP-code kunnen allebei slagen. | Alleen in de code gelezen. | Eén keer, voor alle deuren tegelijk: het bewijs intrekken vóór de codetoets, of een slot per bewijs. |
+| **N35** | Info | OPEN | `server/accounts/users.js` | 17.932 bytes, boven de grens. De deltapoort laat het door dankzij een NORM-uitzondering die op 15 oktober 2026 vervalt. | Herkeuring 1 van N20. | Afsplitsen vóór 15 oktober. |
+
+### Besluitpunten voor de eigenaar
+
+1. **N26 (P2): de schorspoort is met een slash te omzeilen.**
+   - **(a) Aanbevolen:** `staatVan` zoekt het pad op met `vastePaden()`, net als
+     de inlogpauze sinds N18. Met een toets op een echte server: een geschorste
+     route geeft ook met een slash erachter zijn weigering.
+   - (b) Zo laten.
+2. **N27–N31 (P3): de werkplek- en aanmeldkant.**
+   - **(a) Aanbevolen:** in één ronde N27 (journaal), N28 (emmers), N29 (orakel)
+     en N31 (uitgezet in stap een). N30 en N32–N35 blijven in het document.
+   - (b) Alleen N27 en N28: de twee die een wachtwoord raken.
+   - (c) Zo laten.
+
+### Testbewijs (PASS / FAIL / INFRA / NIET GEVERIFIEERD)
+
+- **PASS: de regressiesuites van ronde 5.**
+
+  | Suite | Uitslag |
+  |---|---|
+  | `werkplek-tweede` | 13/13 |
+  | `werkplek-tweede.e2e` | 4/4, echte browser |
+  | `inlogpauze-spelling` | 2/2 |
+  | `actietoken-uitgezet` | 17/17 |
+
+  Alles ook met `RTG_ROUTELOG`.
+- **PASS: in de eindkeuring.** 35 aanpalende servertoetsbestanden: 288/288.
+  Zes e2e-toetsen rond de werkplek: 24/24. De hele suite met `RTG_ROUTELOG`:
+  16.135 toetsen, met alleen registers en omgeving rood.
+- **PASS: de statische poorten.** `npm run check`, `npm run norm` en de
+  deltapoort zijn gehaald (de norm nadat de mutatiemotor ook langs
+  `werkplek-tweede.e2e.js` ging), `klokwacht` 6/6, en `registerklopt` op
+  `bewijskosten` 9 na.
+- **INFRA:** `bewijskosten` 9 (ondiepe kloon); magnaat-capabilities en sentinel
+  zonder de Rust-motor.
+- **NIET GEVERIFIEERD:**
+  - de CI op de laatste head;
+  - `npm run ci:lokaal` op Node 26, zoals `.nvmrc` voorschrijft;
+  - de PostgreSQL-stand met meerdere knopen van `werk2`;
+  - de toegankelijkheid van de codestap (het formulier staat standaard op
+    `hidden`, dus de vaste scan ziet het niet).
+
+### Wat deze ronde NIET heeft gedaan (bewust)
+
+N26 tot en met N35 zijn vastgelegd en niet gerepareerd. Ze bestonden al vóór
+deze branch of vallen buiten de besluiten.
 
 ---
 

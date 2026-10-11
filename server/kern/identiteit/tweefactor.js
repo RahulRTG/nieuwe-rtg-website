@@ -157,12 +157,14 @@ function maakTweefactor({ accounts }) {
      hangt niets aan vast wat een lid mag, en het verloopt in vijf minuten.
 
      Dit hoort hier omdat een route niet hoort te weten HOE zo'n bewijs wordt
-     gemaakt; hij hoort alleen te weten dat hij nog niet klaar is. */
-  function inlogPoort(user) {
+     gemaakt; hij hoort alleen te weten dat hij nog niet klaar is. Het DOEL
+     zegt welke deur het bewijs omruilt: 'inlog2', of 'werk2' voor de
+     werkplekinlog (N19). Het ene opent de andere deur niet. */
+  function inlogPoort(user, doel) {
     const s = standVan(user);
     if (!s.aan) return null;
     return { tweedeFactorNodig: true,
-      bewijs: accounts.issueActionToken(user.id, 'inlog2', 5 * 60 * 1000),
+      bewijs: accounts.issueActionToken(user.id, doel || 'inlog2', 5 * 60 * 1000),
       herstelcodesOver: s.herstelcodesOver,
       uitleg: 'Uw wachtwoord klopt. Typ nu de code uit uw authenticator, of een van uw herstelcodes.' };
   }

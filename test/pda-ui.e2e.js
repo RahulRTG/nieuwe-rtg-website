@@ -203,7 +203,7 @@ test('PDA in de browser: een gast vraagt aandacht, het personeel ziet het op Van
 });
 
 const {probe}=require('./lib/team-access-probe');
-test('team portal: shared canvas, Edge language control and intact drafts on every access route',{skip:geenBrowser(pw),timeout:180000},async()=>{
+test('team portal: shared canvas, local language control and intact drafts on every access route',{skip:geenBrowser(pw),timeout:180000},async()=>{
   const srv=await startServer({env:{SMTP_URL:'',RTG_AI_UIT:'1'}});const browser=await pw.chromium.launch(browserOpties(pw));
   try{for(const width of [320,390,1440])await probe(browser,srv.base,width,process.env.RTG_TEAM_SCREENSHOTS?process.env.RTG_TEAM_SCREENSHOTS+'/team-local-'+width+'.png':null);
     const page=await browser.newPage();

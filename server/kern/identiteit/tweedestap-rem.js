@@ -1,12 +1,13 @@
 /* DE REM OP EEN CODE VAN DE TWEEDE FACTOR -- een plek voor elke deur die er een
    toetst.
 
-   Vier deuren toetsen zo'n code: de tweede inlogstap (/api/auth/tweede),
+   Vijf deuren toetsen zo'n code: de tweede inlogstap (/api/auth/tweede),
    uitzetten (/api/mijn/tweefactor/uit), nieuwe herstelcodes
-   (/api/mijn/tweefactor/codes) en de inlog van de techniekpagina
-   (/api/techniek/inloggen). Ze delen DEZE emmers. Had elke deur een eigen emmer,
-   dan gaf elke deur opnieuw tien gokken (RTG-V1-RELEASE C3 en de herkeuringen
-   daarvan).
+   (/api/mijn/tweefactor/codes), de inlog van de techniekpagina
+   (/api/techniek/inloggen) en de werkplekinlog van een lid
+   (/api/supplier/mijn/login, N19). Ze delen DEZE emmers. Had elke deur een
+   eigen emmer, dan gaf elke deur opnieuw tien gokken (RTG-V1-RELEASE C3 en de
+   herkeuringen daarvan).
 
    Twee emmers, zoals bij de wachtwoordinlog: een per ACCOUNT (10) en een per
    BRON (50). De accountemmer hangt niet aan het bewijs: wie het wachtwoord kent,

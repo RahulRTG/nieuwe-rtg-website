@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T22:55:10.268Z",
-    "commit": "f73689380",
+    "op": "2026-10-11T23:49:15.001Z",
+    "commit": "8c56ee955",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -15698,6 +15698,14 @@
       "operator": "false->true#0",
       "gezakt": 3,
       "geprobeerd": 2
+    },
+    "tenant-ondertekenaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/techniek/tenant.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "tenant.test.js": {
       "soort": "puur",

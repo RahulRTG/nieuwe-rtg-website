@@ -244,7 +244,7 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:not(
   --edge-bar-accent:#e2c389!important;
   --edge-bar-metal:#e2c389!important;
   color-scheme:light!important;
-  background:#f1eee7!important;
+  background:var(--rtg-p-ivoor,#f1eee7)!important;
   color:#11110e!important;
 }
 /* Op ivoor halen grijs en goud geen 4,5:1 voor kleine tekst: #69645c en het
@@ -292,6 +292,12 @@ body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]:not(#rtg-geen-l
   background-color:#11100e!important;
   background-image:linear-gradient(0deg,rgba(7,6,5,.94),rgba(7,6,5,.20) 72%),var(--rtg-cinema-photo)!important;
 }
+/* Een fotohero blijft een donker beeld: het wereldpalet geeft `.onthaal-beeld`
+   met een shorthand het ivoren vlak, en dan stond de lichte tekst op de foto op
+   ivoor zodra het beeld nog laadde of niet dekte. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.wh-photo,.wp-photo):not(#rtg-geen-foto){
+  background-color:#11100e!important;
+}
 /* 2. EEN OUD DONKER VLAK WORDT EEN IVOREN KAMER. Deze vlakken zetten hun eigen
       donkere grond maar lazen hun tekst uit de wereldtokens: donkere inkt op
       een donker vlak, tot 1,01:1. De www-site kent geen donkere panelen. */
@@ -303,10 +309,11 @@ body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]:not(#rtg-geen-l
       terug. */
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]){
   --rtg-p-inkt:var(--rtg-world-ink);--rtg-p-zacht:var(--rtg-world-muted);--rtg-p-metaal:var(--rtg-world-metal);
-  --rtg-p-rood:#9e1c40;--rtg-p-groen:#2f7256;
+  --rtg-p-rood:#9e1c40;--rtg-p-groen:#2f7256;--rtg-p-vlak:var(--rtg-world-card);
+  --rtg-p-ivoor:var(--rtg-world-bg);--rtg-p-papier:var(--rtg-world-card);
 }
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.wh-photo,.wp-scene,[data-rtg-cinematic-lead="true"],#rtg-cookie){
-  --rtg-p-inkt:#f7f1e8;--rtg-p-zacht:#d8cfc2;--rtg-p-metaal:#e2c389;--rtg-p-rood:#e7a8b8;--rtg-p-groen:#9fd6b8;
+  --rtg-p-inkt:#f7f1e8;--rtg-p-zacht:#d8cfc2;--rtg-p-metaal:#e2c389;--rtg-p-rood:#e7a8b8;--rtg-p-groen:#9fd6b8;--rtg-p-vlak:#11100e;
 }
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]){--rtg-card:var(--rtg-world-card)!important;--rtg-oppervlak:var(--rtg-world-card)!important;--rv-bg:var(--rtg-world-bg)!important}
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tos-service-strip,.rtgplek,.rb-leeg,.rv-reiszoek button,.rail,.side,#balk,.topnav,.top,.school-boven,header.kop,#apparaten,#paginabar,nav.lagen,article.mise,.v-wijk.los,.leeg):not([data-rtg-cinematic-lead="true"]),
@@ -341,19 +348,28 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-pla
       hoorde, haalt daarop 2,2:1. */
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.kg-rij button,#btn-zet,#rkToetsen .gelijk,.verstuur,#verstuur,.speler .afspeel,#idStart,button.chip.aan,#n-maak,#kaGo,#prBegin .knop.p,#zegGo,#startTrialTop){color:#fffaf2!important}
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(#kaGo,#prBegin .knop.p,#idStart) *{color:inherit!important}
-/* De signatuur volgt het palet, niet de route: een ingebed Work-blad kleurt
+/* De signatuur volgt het palet, niet de route, en de grond draagt er heel
+   subtiel (5%, vlak 2,5%) de kleur van die wereld in mee: een ingebed Work-blad kleurt
    de schil van Command of het bureau mee, ook al blijft die route Living. */
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="living"],[data-rtg-world="living"]:not([data-rtg-palette])):not([data-public-platform]){
   --rtg-world-signature:#9b714e!important;
+  --rtg-world-bg:#ede8df!important;--rtg-world-ground:#ede8df!important;
+  --rtg-world-card:#f8f5ef!important;--rtg-world-card-strong:#e4ddd2!important;
 }
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="travel"],[data-rtg-world="travel"]:not([data-rtg-palette])):not([data-public-platform]){
   --rtg-world-signature:#9b3152!important;
+  --rtg-world-bg:#ede5e0!important;--rtg-world-ground:#ede5e0!important;
+  --rtg-world-card:#f8f3ef!important;--rtg-world-card-strong:#e4dad2!important;
 }
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="work"],[data-rtg-world="work"]:not([data-rtg-palette])):not([data-public-platform]){
   --rtg-world-signature:#587369!important;
+  --rtg-world-bg:#e9e8e1!important;--rtg-world-ground:#e9e8e1!important;
+  --rtg-world-card:#f6f5f0!important;--rtg-world-card-strong:#e1ddd3!important;
 }
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="foundation"],[data-rtg-world="foundation"]:not([data-rtg-palette])):not([data-public-platform]){
   --rtg-world-signature:#557566!important;
+  --rtg-world-bg:#e9e8e1!important;--rtg-world-ground:#e9e8e1!important;
+  --rtg-world-card:#f6f5ef!important;--rtg-world-card-strong:#e1ddd3!important;
 }
 
 /* De officiële lock-up staat in het bestaande Edge-DOM. Alleen de vorm
@@ -402,14 +418,14 @@ body[data-rtg-cinematic="true"] :is(
   box-shadow:none!important;
 }
 body[data-rtg-cinematic="true"] [data-rtg-component="OperationalPanel"]{
-  background:#faf8f3!important;border-color:rgba(33,29,22,.15)!important;
+  background:var(--rtg-p-papier,#faf8f3)!important;border-color:rgba(33,29,22,.15)!important;
 }
 body[data-rtg-cinematic="true"] [data-rtg-component="NarrativePanel"]{
   background:linear-gradient(135deg,color-mix(in srgb,var(--rtg-world-signature) 8%,#faf8f3),#faf8f3 68%)!important;
   border-color:rgba(33,29,22,.15)!important;
 }
 body[data-rtg-cinematic="true"] :is(input,select,textarea):not([data-rtg-own-surface]){
-  background:#faf8f3!important;color:#171411!important;border-color:rgba(33,29,22,.24)!important;
+  background:var(--rtg-p-papier,#faf8f3)!important;color:#171411!important;border-color:rgba(33,29,22,.24)!important;
 }
 body[data-rtg-cinematic="true"] :is(input,textarea)::placeholder{color:#7b746b!important}
 
@@ -420,7 +436,7 @@ body[data-rtg-cinematic="true"] #inlog[data-rtg-toegang]{
   position:relative;isolation:isolate;overflow:hidden;min-height:clamp(560px,62vh,700px);
   padding:clamp(44px,5vw,72px) clamp(38px,4vw,64px) clamp(44px,5vw,72px) calc(44% + clamp(38px,4vw,64px))!important;
   border:1px solid rgba(33,29,22,.16)!important;border-radius:0!important;
-  background:#faf8f3!important;color:#171411!important;
+  background:var(--rtg-p-papier,#faf8f3)!important;color:#171411!important;
 }
 body[data-rtg-cinematic="true"] #inlog[data-rtg-toegang]::before{
   content:"";position:absolute;z-index:-1;inset:0 auto 0 0;width:44%;
@@ -441,7 +457,7 @@ body[data-rtg-cinematic="true"] #inlog[data-rtg-toegang] .rtg-toegang-signatuur{
 /* LivingOS Outcome is een volwaardig productscherm. Zijn oude Command-huid
    gebruikte 6-9px tekst en harde zwarte panelen; de structuur en handelingen
    blijven, maar het materiaal wordt dezelfde rustige appkamer als de rest. */
-body[data-rtg-cinematic="true"] :is(.lo-shell,.lo-main,.lo-stage){background:#f1eee7!important;color:#171411!important}
+body[data-rtg-cinematic="true"] :is(.lo-shell,.lo-main,.lo-stage){background:var(--rtg-p-ivoor,#f1eee7)!important;color:#171411!important}
 body[data-rtg-cinematic="true"] .lo-top{
   background:#f4f0e9!important;border-color:rgba(33,29,22,.15)!important;color:#171411!important;
 }
@@ -467,11 +483,11 @@ body[data-rtg-cinematic="true"] :is(.lo-understood>div,.lo-timeline article,.lo-
   border-color:rgba(33,29,22,.12)!important;
 }
 body[data-rtg-cinematic="true"] :is(.lo-worldhead,.lo-compress,.lo-proof){
-  border-color:rgba(127,22,52,.20)!important;background:#faf8f3!important;color:#171411!important;
+  border-color:rgba(127,22,52,.20)!important;background:var(--rtg-p-papier,#faf8f3)!important;color:#171411!important;
 }
 body[data-rtg-cinematic="true"] .lo-capital{background:rgba(33,29,22,.12)!important}
 body[data-rtg-cinematic="true"] .lo-capital div,
-body[data-rtg-cinematic="true"] .lo-delta>div span{background:#faf8f3!important}
+body[data-rtg-cinematic="true"] .lo-delta>div span{background:var(--rtg-p-papier,#faf8f3)!important}
 body[data-rtg-cinematic="true"] :is(
   .lo-understood p,.lo-timeline small,.lo-timeline em,.lo-node small,.lo-decision>p,
   .lo-decision aside p,.lo-permissions>p small,.lo-status small,.lo-status em,.lo-delta>p,.lo-proof small
@@ -480,11 +496,11 @@ body[data-rtg-cinematic="true"] :is(.lo-worldhead h2,.lo-worldhead strong,.lo-ti
 body[data-rtg-cinematic="true"] .lo-worldtabs button{
   min-height:44px;border-color:rgba(33,29,22,.16)!important;color:#625d55!important;background:transparent!important;
 }
-body[data-rtg-cinematic="true"] .lo-worldtabs button.actief{border-color:#8a7419!important;color:#171411!important;background:#faf8f3!important}
+body[data-rtg-cinematic="true"] .lo-worldtabs button.actief{border-color:#8a7419!important;color:#171411!important;background:var(--rtg-p-papier,#faf8f3)!important}
 
 /* Het wereldportaal vult zijn echte werkvlak. Dit voorkomt het 52px-hoge
    iframe waardoor LivingOS op mobiel als een lege ivoorkleurige pagina leek. */
-body[data-rtg-cinematic="true"] .rv-app{background:#f1eee7!important}
+body[data-rtg-cinematic="true"] .rv-app{background:var(--rtg-p-ivoor,#f1eee7)!important}
 body[data-rtg-cinematic="true"] .rv-werk{min-height:calc(100dvh - var(--edge-top,82px) - var(--rtg-adaptive-inset,82px))!important}
 body[data-rtg-cinematic="true"] .rv-panes,
 body[data-rtg-cinematic="true"] .rv-pane,
@@ -660,7 +676,7 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
   body[data-rtg-cinematic="true"] .wp-tabs button[aria-expanded="true"]{border-bottom-color:#7f1634!important}
   body[data-rtg-cinematic="true"] .wd-access{
     width:100%!important;margin:0!important;padding:44px 24px 52px!important;border:0!important;border-radius:0!important;
-    background:#f1eee7!important;color:#171411!important;
+    background:var(--rtg-p-ivoor,#f1eee7)!important;color:#171411!important;
   }
   body[data-rtg-cinematic="true"] .rtg-adaptive-edge{
     width:calc(100vw - 24px)!important;max-width:620px!important;

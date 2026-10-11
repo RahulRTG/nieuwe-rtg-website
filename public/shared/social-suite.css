@@ -103,7 +103,7 @@ body.rtg-suite-page::after{
 .rtg-suiteperson{display:flex;align-items:center;gap:.8rem;margin-left:2rem;padding-left:1.5rem;border-left:1px solid rgba(255,255,255,.1);color:inherit;text-decoration:none;}
 .rtg-suiteperson-copy{font:600 .66rem/1 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;}
 .rtg-suiteperson-seal{display:grid;place-items:center;width:32px;height:32px;border:1px solid rgba(255,255,255,.22);border-radius:50%;
-  color:#dac891;background:#272821;font:500 .88rem/1 "Bodoni Moda",Georgia,serif;}
+  color:var(--rtg-p-metaal,#dac891);background:var(--rtg-p-vlak,#272821);font:500 .88rem/1 "Bodoni Moda",Georgia,serif;}
 .rtg-suitenav{box-sizing:border-box;position:fixed;z-index:79;top:var(--suite-top);right:0;left:0;height:var(--suite-nav);display:flex;
   justify-content:center;background:rgba(246,244,239,.96);border-bottom:1px solid var(--suite-line);backdrop-filter:blur(18px);}
 .rtg-suitenav-link{position:relative;display:flex;align-items:center;gap:.65rem;min-width:132px;padding:0 1.4rem;color:#625f57;
@@ -240,7 +240,7 @@ body.rtg-social-circles main#main>.kaart{height:100%;margin:0!important;padding:
 body.rtg-social-circles main#main>.kaart:first-of-type:last-of-type{grid-column:1/-1;}
 body.rtg-social-circles main#main>.ios-groot+.kaart{grid-column:1/-1;}
 body.rtg-social-circles main#main>.leeg{grid-column:1/-1;background:var(--suite-paper);}
-body.rtg-social-circles .aibalk{left:50%!important;width:min(760px,calc(100% - 2rem))!important;transform:translateX(-50%);background:rgba(20,21,19,.96)!important;border:1px solid rgba(255,255,255,.1)!important;padding:.55rem!important;}
+body.rtg-social-circles .aibalk{left:50%!important;width:min(760px,calc(100% - 2rem))!important;transform:translateX(-50%);background:var(--rtg-p-vlak,rgba(20,21,19,.96))!important;border:1px solid rgba(255,255,255,.1)!important;padding:.55rem!important;}
 
 /* Pulse: finite editorial feed, met een duidelijke schrijf- en leeskolom. */
 body.rtg-social-pulse>header .negen{margin-left:auto!important;border-radius:0!important;}
@@ -311,7 +311,7 @@ body.rtg-social-private-hub{background:var(--suite-ink)!important;}
   .rtg-suitestate,.rtg-suiteperson-copy{display:none;}
   .rtg-suiteperson{margin-left:auto;padding-left:.8rem;border-left:0;}
   .rtg-suiteperson-seal{width:34px;height:34px;}
-  .rtg-suitenav{top:auto;bottom:0;height:var(--suite-nav);padding-bottom:env(safe-area-inset-bottom,0px);justify-content:stretch;border-top:1px solid rgba(255,255,255,.1);border-bottom:0;background:rgba(20,21,19,.98);}
+  .rtg-suitenav{top:auto;bottom:0;height:var(--suite-nav);padding-bottom:env(safe-area-inset-bottom,0px);justify-content:stretch;border-top:1px solid rgba(255,255,255,.1);border-bottom:0;background:var(--rtg-p-vlak,rgba(20,21,19,.98));}
   .rtg-suitenav-link{flex:1;min-width:0;justify-content:center;padding:0 .2rem;color:rgba(244,241,233,.54);font-size:.54rem;letter-spacing:.07em;}
   .rtg-suitenav-link::after{top:0;right:22%;bottom:auto;left:22%;}
   .rtg-suitenav-link[aria-current="page"]{color:var(--rtg-p-metaal,#f3ecda);}
@@ -386,8 +386,8 @@ body.rtg-suite-page{
   --suite-gold:#ae9250;
   --suite-wine:#6e263d;
 }
-.rtg-suitebar{background:#171815;border-bottom-color:rgba(205,184,121,.22);backdrop-filter:none;}
-.rtg-suiteperson-seal{border-color:rgba(205,184,121,.38);border-radius:0;background:#292923;color:#e2ca8a;}
+.rtg-suitebar{background:var(--rtg-p-vlak,#171815);border-bottom-color:rgba(205,184,121,.22);backdrop-filter:none;}
+.rtg-suiteperson-seal{border-color:rgba(205,184,121,.38);border-radius:0;background:var(--rtg-p-vlak,#292923);color:var(--rtg-p-metaal,#e2ca8a);}
 .rtg-suitenav{background:#eee9dd;border-bottom-color:rgba(45,39,28,.18);backdrop-filter:none;}
 .rtg-suitenav-link{border-inline-start:1px solid rgba(45,39,28,.075);}
 .rtg-suitenav-link:last-child{border-inline-end:1px solid rgba(45,39,28,.075);}
@@ -401,7 +401,7 @@ body.rtg-suite-page{
 
 /* Berichten wordt een correspondentie-kamer: donkere inbox, warm leesvlak en
    één vaste actierail in plaats van losse pictogramkaarten. */
-body.rtg-social-messages .comm{background:#171815;}
+body.rtg-social-messages .comm{background:var(--rtg-p-vlak,#171815);}
 body.rtg-social-messages .lijst{background:linear-gradient(165deg,#20211e 0%,#181916 72%,#2d2023 140%)!important;border-right-color:rgba(205,184,121,.2)!important;color:#eee8dc;}
 body.rtg-social-messages .lijst-kop{padding:2rem 1.45rem .95rem!important;border-bottom:1px solid rgba(255,255,255,.08);}
 body.rtg-social-messages .lijst-kop h1{color:var(--rtg-p-metaal,#f3ede1);}
@@ -421,7 +421,7 @@ body.rtg-social-messages .laden button[aria-current="true"]{color:var(--rtg-p-me
 body.rtg-social-messages .gsp{min-height:76px;padding:.9rem 1.2rem;border-bottom-color:rgba(255,255,255,.08)!important;color:var(--rtg-p-metaal,#eae4d8);}
 body.rtg-social-messages .gsp:hover{background:rgba(255,255,255,.035);}
 body.rtg-social-messages .gsp[aria-current="true"]{box-shadow:inset 2px 0 #cdb879;background:rgba(205,184,121,.105);}
-body.rtg-social-messages .gsp .rond{border-radius:0;border-color:rgba(205,184,121,.25);background:#2d2d27;color:#dfca91;}
+body.rtg-social-messages .gsp .rond{border-radius:0;border-color:rgba(205,184,121,.25);background:var(--rtg-p-vlak,#2d2d27);color:var(--rtg-p-metaal,#dfca91);}
 body.rtg-social-messages .gsp .stip{border-color:#20211e;}
 body.rtg-social-messages .gsp .mid span,body.rtg-social-messages .gsp time{color:#939088;}
 body.rtg-social-messages .draad{position:relative;background:#eee8dc!important;}
@@ -439,10 +439,10 @@ body.rtg-social-messages .bubbels{position:relative;z-index:1;background:linear-
 body.rtg-social-messages[data-pane="lijst"] .bubbels::before{content:"Private correspondence";align-self:center;width:min(540px,70%);margin:auto 0 0;padding:1.8rem 1rem 1rem;border-top:1px solid rgba(82,69,40,.2);color:rgba(63,54,36,.36);font:500 clamp(1.5rem,2.6vw,2.5rem)/1 "Bodoni Moda",Georgia,serif;letter-spacing:.1em;text-align:center;text-transform:uppercase;}
 body.rtg-social-messages[data-pane="lijst"] .bubbels::after{content:"Alleen zichtbaar binnen uw eigen kring";align-self:center;width:min(540px,70%);margin:0 0 auto;padding:0 1rem 1.8rem;border-bottom:1px solid rgba(82,69,40,.2);color:rgba(63,54,36,.44);font:600 .58rem/1.4 Inter,system-ui,sans-serif;letter-spacing:.15em;text-align:center;text-transform:uppercase;}
 /* Message bubble geometry belongs to rtg-communication-surface.css. */
-body.rtg-social-messages .invoer{position:relative;z-index:1;padding:1rem 1.25rem 1.05rem!important;border-top-color:rgba(45,39,28,.18)!important;background:#1c1d1a!important;color:#eee8dc;}
+body.rtg-social-messages .invoer{position:relative;z-index:1;padding:1rem 1.25rem 1.05rem!important;border-top-color:rgba(45,39,28,.18)!important;background:var(--rtg-p-vlak,#1c1d1a)!important;color:var(--rtg-p-metaal,#eee8dc);}
 body.rtg-social-messages .invoerrij textarea{border-color:rgba(255,255,255,.12)!important;background:rgba(0,0,0,.22)!important;color:#f3ede1!important;}
 body.rtg-social-messages .invoerrij textarea::placeholder{color:#949189;}
-body.rtg-social-messages .stuurknop{border:1px solid rgba(205,184,121,.4)!important;background:#2b2b25!important;}
+body.rtg-social-messages .stuurknop{border:1px solid rgba(205,184,121,.4)!important;background:var(--rtg-p-vlak,#2b2b25)!important;}
 body.rtg-social-messages .stuurknop svg{stroke:#e2ca8a;}
 body.rtg-social-messages .hulprij button{border-color:rgba(255,255,255,.12)!important;color:rgba(243,237,225,.58)!important;background:transparent!important;}
 body.rtg-social-messages .wetregel{color:rgba(243,237,225,.34);}
@@ -452,7 +452,7 @@ body.rtg-social-messages .wetregel{color:rgba(243,237,225,.34);}
    acties zitten aan het eind van de rij, nooit als los zwevend element. */
 body.rtg-social-circles>header{background:#eee9dd!important;border-bottom-color:rgba(45,39,28,.18)!important;}
 body.rtg-social-circles>header.ios-nav{gap:0!important;box-shadow:none!important;}
-body.rtg-social-circles>header.ios-nav>#osMenuBtn{align-self:stretch;width:58px!important;height:auto!important;margin:0!important;border:0!important;border-right:1px solid rgba(45,39,28,.13)!important;border-radius:0!important;background:#20211e!important;color:#d7c58f!important;box-shadow:none!important;}
+body.rtg-social-circles>header.ios-nav>#osMenuBtn{align-self:stretch;width:58px!important;height:auto!important;margin:0!important;border:0!important;border-right:1px solid rgba(45,39,28,.13)!important;border-radius:0!important;background:var(--rtg-p-vlak,#20211e)!important;color:var(--rtg-p-metaal,#d7c58f)!important;box-shadow:none!important;}
 body.rtg-social-circles>header .tabs>button{border-right:1px solid rgba(45,39,28,.09)!important;}
 body.rtg-social-circles>header .tabs>button{margin:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;}
 body.rtg-social-circles>header .tabs>button:hover{background:#e7e0d2!important;}
@@ -460,12 +460,12 @@ body.rtg-social-circles>header .rtg-rahul-tab{align-self:stretch!important;min-w
 body.rtg-social-circles main#main{margin-top:1.7rem!important;background:rgba(45,39,28,.16);}
 body.rtg-social-circles main#main>.rtguitvoer-knop{
   grid-column:1/-1;justify-self:stretch;width:100%!important;min-height:52px!important;margin:0!important;
-  padding:0 1.4rem!important;border:0!important;border-radius:0!important;background:#20211e!important;color:#ddca95!important;
+  padding:0 1.4rem!important;border:0!important;border-radius:0!important;background:var(--rtg-p-vlak,#20211e)!important;color:var(--rtg-p-metaal,#ddca95)!important;
   text-align:right!important;text-decoration:none!important;text-transform:uppercase;font-size:.61rem!important;letter-spacing:.15em!important;
 }
 body.rtg-social-circles main#main>.kaart{padding:0 1.55rem 1.55rem!important;background:#f2ecdf!important;}
 body.rtg-social-circles main#main>.kaart::before{display:none;}
-body.rtg-social-circles main#main>.kaart>h2{margin:0 -1.55rem 1rem;padding:1.25rem 1.55rem;border-bottom:1px solid rgba(205,184,121,.22);background:#20211e;color:#f3ede1;font:500 1.5rem/1 "Bodoni Moda",Georgia,serif;}
+body.rtg-social-circles main#main>.kaart>h2{margin:0 -1.55rem 1rem;padding:1.25rem 1.55rem;border-bottom:1px solid rgba(205,184,121,.22);background:var(--rtg-p-vlak,#20211e);color:var(--rtg-p-metaal,#f3ede1);font:500 1.5rem/1 "Bodoni Moda",Georgia,serif;}
 body.rtg-social-circles .rij{min-height:78px;align-items:center;padding:.85rem 0;border-bottom-color:rgba(45,39,28,.14);}
 body.rtg-social-circles .rij b{color:#26251f;font-size:.95rem;}
 body.rtg-social-circles .rij small{color:#7b7569;}
@@ -483,11 +483,11 @@ body.rtg-social-circles .aibalk input{border-color:rgba(255,255,255,.12)!importa
 .private-room:hover{background:linear-gradient(160deg,rgba(174,146,80,.08),rgba(110,38,61,.05));}
 
 @media(max-width:760px){
-  .rtg-suitenav{background:rgba(20,21,19,.99);}
+  .rtg-suitenav{background:var(--rtg-p-vlak,rgba(20,21,19,.99));}
   .rtg-suitenav-link{border-inline-start:0;}
   .rtg-suitehero{min-height:245px;background-position:60% center;}
   body.rtg-social-messages .lijst-kop{padding:1.35rem 1.15rem .85rem!important;}
-  body.rtg-social-messages .comm{background:#20211e;}
+  body.rtg-social-messages .comm{background:var(--rtg-p-vlak,#20211e);}
   body.rtg-social-messages .draad-kop{min-height:68px!important;padding-left:1rem!important;}
   body.rtg-social-messages .kopknop{width:48px!important;min-height:68px!important;}
   body.rtg-social-messages .invoer{padding: .8rem .85rem calc(env(safe-area-inset-bottom,0px) + .8rem)!important;}

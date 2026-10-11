@@ -13,13 +13,13 @@ const fs = require('node:fs'), path = require('node:path');
 const h = require('./helper');
 const pw = h.laadPlaywright(), skip = h.geenBrowser(pw);
 const engines = ['chromium', ...(process.env.RTG_TEST_WEBKIT === '1' ? ['webkit'] : [])];
-// [grond, vlak, inkt, signatuur]: de grond is www-ivoor, de signatuur is de wereld.
-const ivoor = ['rgb(241, 238, 231)', 'rgb(250, 248, 243)', 'rgb(17, 17, 14)'];
+// [grond, vlak, inkt, signatuur]: de grond is www-ivoor met een zweem van de wereld.
+const inkt = 'rgb(17, 17, 14)';
 const colors = {
-  living: [...ivoor, '#9b714e'],
-  work: [...ivoor, '#587369'],
-  travel: [...ivoor, '#9b3152'],
-  foundation: [...ivoor, '#557566']
+  living: ['rgb(237, 232, 223)', 'rgb(248, 245, 239)', inkt, '#9b714e'],
+  work: ['rgb(233, 232, 225)', 'rgb(246, 245, 240)', inkt, '#587369'],
+  travel: ['rgb(237, 229, 224)', 'rgb(248, 243, 239)', inkt, '#9b3152'],
+  foundation: ['rgb(233, 232, 225)', 'rgb(246, 245, 239)', inkt, '#557566']
 };
 let srv, token;
 async function post(route, body, auth) {
@@ -102,7 +102,9 @@ for (const engine of engines) for (const width of [390,1440]) {
       }
       await page.goto(srv.base+'/apps/app.html?pas=rtg'); await ready(page);
       await page.waitForSelector('.cmd-leeg');
-      for (const [route,world,card] of [['werk','work','#inlog'],['reizen','travel','.wh-service'],['foundation/os-publiek','foundation','.onthaal-beeld'],['muziek','living','.speler']]) {
+      // Het onthaal van Foundation is een fotohero (donker beeld, lichte tekst),
+      // geen ivoren vlak; daar toetst deze proef alleen grond, inkt en signatuur.
+      for (const [route,world,card] of [['werk','work','#inlog'],['reizen','travel','.wh-service'],['foundation/os-publiek','foundation',null],['muziek','living','.speler']]) {
         await page.evaluate(route => RTGCommand.open('/apps/'+route+'.html',route),route);
         const frame = await activeFrame(page,'.cmd-pane.actief iframe');
         await page.waitForFunction(world => document.body.getAttribute('data-rtg-blad-wereld') === world,world);

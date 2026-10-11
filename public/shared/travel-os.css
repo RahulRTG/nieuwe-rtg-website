@@ -51,7 +51,7 @@ body.travel-os{
      hun eigen kop, hun eigen scenefoto en hun eigen ritme -- het materiaal
      eronder is gedeeld, zodat je in dezelfde wereld blijft als je van Vandaag
      naar Vluchten loopt. Zwart blijft over voor de diepte onder de kaarten. */
-  background-color:#2E0713;
+  background-color:var(--rtg-p-vlak,#2E0713);
   background-image:linear-gradient(168deg,#7F1634 0%,#4A0C1E 44%,#2E0713 100%);
   background-attachment:fixed;
   --bg:var(--tos-onyx);
@@ -144,7 +144,7 @@ body.travel-os[data-travelos-scene="residence"]{--tos-scene:none}
   margin:0 auto clamp(1rem,2.2vw,1.8rem);
   border:1px solid var(--tos-line);
   border-top:0;
-  background:rgba(12,14,14,.95);
+  background:var(--rtg-p-vlak,rgba(12,14,14,.95));
 }
 .tos-service-step{min-height:84px;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:.85rem;padding:1rem 1.15rem;border-left:1px solid var(--tos-line)}
 .tos-service-step:first-child{border-left:0}
@@ -170,7 +170,7 @@ body.travel-os :focus-visible{outline:2px solid var(--tos-wine-licht) !important
   grid-template-columns:1fr auto 1fr;
   align-items:center;
   border-bottom:1px solid var(--tos-wine);
-  background:rgba(26,5,12,.94);
+  background:var(--rtg-p-vlak,rgba(26,5,12,.94));
   backdrop-filter:blur(20px);
 }
 .tos-mark{
@@ -213,7 +213,7 @@ body.travel-os :focus-visible{outline:2px solid var(--tos-wine-licht) !important
   align-content:start;
   padding:1.2rem .4rem;
   border-right:1px solid #491122;
-  background:#180409;
+  background:var(--rtg-p-vlak,#180409);
 }
 .tos-nav a{
   position:relative;
@@ -241,7 +241,7 @@ body.travel-os > .kop{
   margin:0 !important;
   padding:1rem clamp(1.1rem,4vw,2.25rem) !important;
   border-bottom:1px solid var(--tos-line) !important;
-  background:rgba(13,15,15,.95) !important;
+  background:var(--rtg-p-vlak,rgba(13,15,15,.95)) !important;
   backdrop-filter:blur(16px) !important;
 }
 body.travel-os > header h1,
@@ -264,7 +264,7 @@ body.travel-os main :where(p,.meta,.sub,.sec,.leeg){line-height:1.6}
 body.travel-os :where(.kaart,.card,.resto,.reis,.stat,.pass,.kamer){
   border:1px solid var(--tos-line) !important;
   border-radius:0!important;
-  background:rgba(17,19,19,.92) !important;
+  background:var(--rtg-p-vlak,rgba(17,19,19,.92)) !important;
   box-shadow:0 20px 60px rgba(0,0,0,.16) !important;
 }
 body.travel-os .inlog{
@@ -295,13 +295,13 @@ body.travel-os #main>.leeg{
   border:1px solid var(--tos-line);
   border-left:3px solid var(--tos-wine-bright);
   padding:1.5rem!important;
-  background:rgba(17,19,19,.94);
+  background:var(--rtg-p-vlak,rgba(17,19,19,.94));
   color:var(--tos-muted)!important;
   text-align:left!important;
 }
 body.travel-os #inhoud > .item{border:1px solid var(--tos-line) !important;border-radius:0!important;background:var(--tos-graphite) !important}
 body.travel-os :where(.resto,.reis,.tstl){transition:border-color .18s,background-color .18s !important}
-body.travel-os :where(.resto,.reis,.tstl):hover{transform:none !important;border-color:#741f35 !important;background:#2a0711 !important}
+body.travel-os :where(.resto,.reis,.tstl):hover{transform:none !important;border-color:#741f35 !important;background:var(--rtg-p-vlak,#2a0711) !important}
 body.travel-os .moveHero{
   border:1px solid #4f1324 !important;
   border-left:3px solid var(--tos-wine-bright) !important;
@@ -321,16 +321,16 @@ body.travel-os :where(input,select,.veld){
   min-height:46px;
   border-color:#521426 !important;
   border-radius:0!important;
-  background:#20060d !important;
+  background:var(--rtg-p-vlak,#20060d) !important;
   color:var(--tos-ivory) !important;
 }
-body.travel-os :where(textarea,.rtg-veld){border:1px solid #521426!important;border-radius:0!important;background:#20060d!important;color:var(--tos-ivory)!important}
+body.travel-os :where(textarea,.rtg-veld){border:1px solid #521426!important;border-radius:0!important;background:var(--rtg-p-vlak,#20060d)!important;color:var(--tos-ivory)!important}
 body.travel-os :where(.kaart,.card,.item,.reis,.tstl,.pass,.stat,.kpi,.panel,.paneel){backdrop-filter:blur(12px)}
 body.travel-os :where(.kaart,.card,.item,.reis,.tstl,.pass,.stat,.kpi,.panel,.paneel) h2,
 body.travel-os :where(.kaart,.card,.item,.reis,.tstl,.pass,.stat,.kpi,.panel,.paneel) h3{color:var(--tos-ivory)!important}
 body.travel-os :where(.kaart,.card,.item,.reis,.tstl,.pass,.stat,.kpi,.panel,.paneel) :where(.meta,.sub,small){color:var(--tos-muted)}
 body.travel-os :where(.rtg-knop,.knop.vol,.knop.prim){min-height:46px;border:0!important;border-radius:0!important;background:linear-gradient(90deg,#74102f,#a61040)!important;color:#fff!important;font-weight:750!important;text-decoration:none}
-body.travel-os :where(.rtg-rij,.rij-item){border-color:var(--tos-line)!important;border-radius:0!important;background:rgba(17,19,19,.94)!important}
+body.travel-os :where(.rtg-rij,.rij-item){border-color:var(--tos-line)!important;border-radius:0!important;background:var(--rtg-p-vlak,rgba(17,19,19,.94))!important}
 body.travel-os :where(.knop,button.knop){
   min-height:44px;
   border:0 !important;
@@ -342,7 +342,7 @@ body.travel-os :where(.knop,button.knop){
 }
 body.travel-os :where(.knop.stil,.terug,.meldknop){
   border:1px solid #551527 !important;
-  background:#23060e !important;
+  background:var(--rtg-p-vlak,#23060e) !important;
   color:var(--tos-ivory) !important;
   border-radius:0!important;
 }
@@ -378,7 +378,7 @@ body.travel-os .blad{
   bottom:0 !important;
   background:var(--tos-onyx) !important;
 }
-body.travel-os .blad-kop{top:0 !important;border-radius:0 !important;background:rgba(13,15,15,.96) !important}
+body.travel-os .blad-kop{top:0 !important;border-radius:0 !important;background:var(--rtg-p-vlak,rgba(13,15,15,.96)) !important}
 body.travel-os #rtg-cookie{
   left:50% !important;
   right:auto !important;
@@ -390,7 +390,7 @@ body.travel-os #rtg-cookie{
   padding:.7rem .85rem !important;
   border:1px solid #551527 !important;
   border-radius:0!important;
-  background:rgba(17,19,19,.98) !important;
+  background:var(--rtg-p-vlak,rgba(17,19,19,.98)) !important;
   color:var(--tos-muted) !important;
   box-shadow:0 12px 36px rgba(0,0,0,.5) !important;
   font-size:.67rem !important;
@@ -403,12 +403,12 @@ body.travel-os .rtgplek{
   bottom:calc(var(--tos-bottom) + env(safe-area-inset-bottom,0px) + 4.5rem) !important;
   border:1px solid #551527 !important;
   border-radius:0!important;
-  background:rgba(17,19,19,.98) !important;
+  background:var(--rtg-p-vlak,rgba(17,19,19,.98)) !important;
   box-shadow:0 18px 55px rgba(0,0,0,.55) !important;
 }
 body.travel-os .rtgplek button{border-radius:0!important}
 body.travel-os .rtgplek .ja{background:linear-gradient(90deg,#74102f,#a61040) !important;color:#fff !important}
-body.travel-os .rtgplek .nee{border:1px solid var(--tos-line) !important;background:#23060e !important;color:var(--tos-muted) !important}
+body.travel-os .rtgplek .nee{border:1px solid var(--tos-line) !important;background:var(--rtg-p-vlak,#23060e) !important;color:var(--tos-muted) !important}
 
 .tos-security{
   width:min(92vw,480px);
@@ -425,7 +425,7 @@ body.travel-os .rtgplek .nee{border:1px solid var(--tos-line) !important;backgro
 .tos-security-head{display:flex;align-items:start;justify-content:space-between;gap:1rem;padding-bottom:1.1rem;border-bottom:1px solid var(--tos-line)}
 .tos-security-head small{display:block;color:var(--tos-green);font-size:.58rem;font-weight:700;letter-spacing:.18em}
 .tos-security-head h2{margin:.35rem 0 0;font:750 1.45rem/1.1 Inter,system-ui,sans-serif;letter-spacing:-.035em}
-.tos-security-close{width:44px;height:44px;border:1px solid var(--tos-line);background:#2c0812;color:var(--tos-ivory);font-size:1.4rem;cursor:pointer}
+.tos-security-close{width:44px;height:44px;border:1px solid var(--tos-line);background:var(--rtg-p-vlak,#2c0812);color:var(--tos-ivory);font-size:1.4rem;cursor:pointer}
 .tos-security ul{list-style:none;margin:0;padding:0}
 .tos-security li{display:grid;grid-template-columns:24px 1fr;gap:.7rem;padding:1rem 0;border-bottom:1px solid var(--tos-line);font-size:.82rem;line-height:1.45}
 .tos-security li b{color:var(--tos-green)}
@@ -438,7 +438,7 @@ body.travel-os-map main > .kop{top:var(--tos-top) !important;left:var(--tos-rail
 body.travel-os-map .zoekwrap{top:calc(var(--tos-top) + 3.7rem) !important;left:calc(var(--tos-rail) + 1rem) !important}
 body.travel-os-map .lagen{right:1rem}
 body.travel-os-map .legenda{left:calc(var(--tos-rail) + 1rem)}
-body.travel-os-map .paneel{left:var(--tos-rail) !important;bottom:0 !important;border-radius:0 !important;background:rgba(17,19,19,.97) !important}
+body.travel-os-map .paneel{left:var(--tos-rail) !important;bottom:0 !important;border-radius:0 !important;background:var(--rtg-p-vlak,rgba(17,19,19,.97)) !important}
 body.travel-os-map .poort{top:var(--tos-top) !important;left:var(--tos-rail) !important}
 body.travel-os-map .poort .kaartje{border-radius:0!important;background:var(--tos-graphite) !important;box-shadow:none !important}
 body.travel-os-map .poort a{border-radius:0!important;background:linear-gradient(90deg,#74102f,#a61040) !important;color:#fff !important}
@@ -448,7 +448,7 @@ body.travel-os-ops{
   --tos-rail:0px;
   padding-top:calc(var(--tos-top) + 54px)!important;
   padding-left:0!important;
-  background:#180409!important;
+  background:var(--rtg-p-vlak,#180409)!important;
 }
 body.travel-os-ops .tos-atmosphere{left:0;top:calc(var(--tos-top) + 54px);opacity:.34;background-image:linear-gradient(180deg,rgba(8,10,11,.16),#180409 36rem),linear-gradient(90deg,rgba(8,10,11,.92),rgba(8,10,11,.25)),var(--tos-scene)}
 .tos-opsnav{
@@ -462,23 +462,23 @@ body.travel-os-ops .tos-atmosphere{left:0;top:calc(var(--tos-top) + 54px);opacit
   align-items:stretch;
   justify-content:center;
   border-bottom:1px solid var(--tos-line);
-  background:rgba(11,13,14,.97);
+  background:var(--rtg-p-vlak,rgba(11,13,14,.97));
   backdrop-filter:blur(18px);
 }
 .tos-opsnav a{display:flex;align-items:center;padding:0 clamp(.75rem,3vw,1.6rem);border-bottom:2px solid transparent;color:var(--tos-muted);font-size:.62rem;font-weight:720;letter-spacing:.12em;text-decoration:none;text-transform:uppercase}
 .tos-opsnav a[aria-current="page"]{border-bottom-color:var(--tos-wine-bright);color:var(--tos-ivory)}
-body.travel-os-ops > header:not(.tos-topbar),body.travel-os-ops > .kop{top:calc(var(--tos-top) + 54px)!important;background:rgba(10,12,13,.92)!important}
+body.travel-os-ops > header:not(.tos-topbar),body.travel-os-ops > .kop{top:calc(var(--tos-top) + 54px)!important;background:var(--rtg-p-vlak,rgba(10,12,13,.92))!important}
 body.travel-os-ops[data-travelos-module="mobility-control"] > header:not(.tos-topbar){display:none!important}
 body.travel-os-ops .tos-module-hero--compact{min-height:260px;align-items:flex-end;margin-top:clamp(1rem,2vw,1.6rem);background-image:linear-gradient(90deg,rgba(4,6,7,.96),rgba(4,6,7,.7) 50%,rgba(4,6,7,.08)),linear-gradient(0deg,rgba(4,6,7,.92),transparent 62%),var(--tos-scene)}
 body.travel-os-ops .tos-module-hero--compact h2{font-size:clamp(2.4rem,5vw,4.4rem)}
-body.travel-os-ops > main{position:relative;z-index:2;width:min(calc(100% - clamp(2rem,6vw,5rem)),1180px)!important;max-width:1180px!important;margin:0 auto 3rem!important;padding:clamp(1rem,2.5vw,2rem)!important;border:1px solid var(--tos-line);background:rgba(9,11,12,.78)}
+body.travel-os-ops > main{position:relative;z-index:2;width:min(calc(100% - clamp(2rem,6vw,5rem)),1180px)!important;max-width:1180px!important;margin:0 auto 3rem!important;padding:clamp(1rem,2.5vw,2rem)!important;border:1px solid var(--tos-line);background:var(--rtg-p-vlak,rgba(9,11,12,.78))}
 body.travel-os-ops :where(.login,.inlog){max-width:620px!important;min-height:240px;margin:0 auto!important;text-align:left!important}
 body.travel-os-ops :where(.login,.inlog)::before{content:"PERSOONLIJKE WERKSESSIE";display:block;margin-bottom:.7rem;color:var(--tos-green);font-size:.58rem;font-weight:750;letter-spacing:.18em}
 body.travel-os-ops .panel{background:linear-gradient(145deg,rgba(20,24,28,.97),rgba(13,16,18,.97))!important}
 body.travel-os-ops .grid{gap:.7rem!important}
 
 /* Een uitnodiging is een gastdeur: luxe, veilig en zonder ledennavigatie. */
-body.travel-os-guest{--tos-rail:0px;padding-left:0!important;padding-bottom:3rem!important;background:#170409!important}
+body.travel-os-guest{--tos-rail:0px;padding-left:0!important;padding-bottom:3rem!important;background:var(--rtg-p-vlak,#170409)!important}
 body.travel-os-guest .tos-atmosphere{left:0;opacity:.66;background-image:linear-gradient(180deg,rgba(26,5,12,.16),#170409 48rem),linear-gradient(90deg,rgba(26,5,12,.84),rgba(26,5,12,.18)),var(--tos-scene)}
 body.travel-os-guest .tos-module-hero--guest{min-height:470px;margin-bottom:0;background-position:center 46%}
 body.travel-os-guest > main{
@@ -490,7 +490,7 @@ body.travel-os-guest > main{
   padding:clamp(1.4rem,4vw,2.4rem)!important;
   border:1px solid rgba(194,58,94,.3);
   border-top:3px solid var(--tos-wine-bright);
-  background:rgba(14,16,16,.97);
+  background:var(--rtg-p-vlak,rgba(14,16,16,.97));
   box-shadow:0 32px 90px rgba(0,0,0,.52);
 }
 /* 0,72rem is geen grote tekst: bordeaux haalt hier 3,69:1. */
@@ -517,8 +517,8 @@ body.travel-os-immersive .kop{top:var(--tos-top)!important;padding-inline:clamp(
 body.travel-os-immersive #poort .inlog{width:min(92vw,520px);min-height:260px;margin:28vh auto 0!important;text-align:left!important}
 body.travel-os-immersive #poort .inlog::before{content:"03 / TRAVEL OS · DE RÉSIDENCE"}
 body.travel-os-immersive:has(#poort .inlog) #wereld{opacity:.12}
-body.travel-os-immersive .laag{padding-top:calc(var(--tos-top) + 4rem)!important;background:rgba(24,4,10,.84)!important}
-body.travel-os-immersive .paneel{border-color:rgba(194,58,94,.32)!important;background:rgba(15,17,17,.97)!important;box-shadow:0 28px 90px rgba(0,0,0,.45)!important}
+body.travel-os-immersive .laag{padding-top:calc(var(--tos-top) + 4rem)!important;background:var(--rtg-p-vlak,rgba(24,4,10,.84))!important}
+body.travel-os-immersive .paneel{border-color:rgba(194,58,94,.32)!important;background:var(--rtg-p-vlak,rgba(15,17,17,.97))!important;box-shadow:0 28px 90px rgba(0,0,0,.45)!important}
 
 @media(max-width:939px){
   :root{--tos-top:72px;--tos-rail:0px;--tos-bottom:78px}
@@ -542,7 +542,7 @@ body.travel-os-immersive .paneel{border-color:rgba(194,58,94,.32)!important;back
     grid-template-rows:1fr;
     border-top:1px solid #491122;
     border-right:0;
-    background:rgba(26,5,12,.97);
+    background:var(--rtg-p-vlak,rgba(26,5,12,.97));
     backdrop-filter:blur(22px);
   }
   .tos-atmosphere{top:calc(var(--tos-top) + env(safe-area-inset-top,0px));left:0;bottom:calc(var(--tos-bottom) + env(safe-area-inset-bottom,0px));background-size:cover,cover,auto 32rem;background-position:center,center,62% top}

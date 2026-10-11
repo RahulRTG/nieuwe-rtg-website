@@ -947,8 +947,9 @@ const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 
 /* Mediastore: Salon-foto's en snaps staan als losse (versleutelde) bestanden op
    schijf, niet als base64 in db.data. Zo blijft het werkgeheugen en elke snapshot
-   klein, hoeveel er ook gepost wordt. De publieke Salon-foto's worden via de
-   /media-route uitgeserveerd; snaps komen alleen eenmalig als data-URL terug. */
+   klein, hoeveel er ook gepost wordt. Openbaar beeld gaat via /media/:naam,
+   privébeeld via een ondertekende link (hieronder); snaps komen alleen eenmalig
+   als data-URL terug. */
 const media = require('./media').maakMedia({ dir: DATA_DIR });
 /* RTG Webmaker (kern/webmaker.js): de eigen site van een lid. Staat hier en
    niet eerder omdat hij de mediastore nodig heeft: een foto die uit de
@@ -992,7 +993,15 @@ const webplatform = require('./kern/webplatform')({ db, team: webmakerTeam });
 const webplatformTaal = require('./kern/webplatform-taal')({ vertaler: require('./translate') });
 // AI in de Website-maker: past een ontwerp aan op een opdracht; bewaart niets zelf
 const webmakerAi = require('./kern/webmaker-ai')({ anthropic, schoon });
+/* /media is fail-closed (server/media/toegang.js, AUTHORITY.md B4): /media/:naam
+   alleen voor beeld op een verklaarde openbare plek, al het andere via een kort
+   geldige ondertekende link die een domeinroute na haar eigen poort zet. */
+/* Het geheim voor de links: RTG_ENC_KEY, anders een uit het sessiegeheim afgeleide sleutel (dat staat al
+   buiten de datamap of in secret.key en is gedeeld tussen servers op dezelfde
+   opslag). Lazy: het sessiegeheim bestaat pas na het laden van de kluis. */
+require('./media/toegang').zet({ db, geheim: () => process.env.RTG_ENC_KEY || accounts.sleutelVoor('media-link') });
 app.get('/media/:naam', (req, res) => { media.serveer(req, res).catch(() => { if (!res.headersSent) res.status(500).end(); }); });
+app.get('/media/t/:token', (req, res) => { media.serveerLink(req, res).catch(() => { if (!res.headersSent) res.status(404).end(); }); });
 // Eenmalige verhuizing van al bestaande base64-foto's (Salon + snaps) naar de
 // mediastore, zodat ook oude data het geheugen niet meer belast. Alleen de
 // schrijver migreert; idempotent, dus veilig bij elke start. Async (kan naar S3).

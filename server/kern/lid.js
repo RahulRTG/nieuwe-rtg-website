@@ -9,6 +9,7 @@
 
 const salonviraal = require('./salonviraal');
 const lidmaatschap = require('./lidmaatschap');
+const { toon } = require('../media/toegang');
 
 function maakLid(deps) {
   const { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan,
@@ -83,7 +84,7 @@ function maakLid(deps) {
       const claim = p.deal && salonClaimcode ? salonClaimcode.vindVanLid(p, sess.key) : null;
       return {
         id: p.id, author: p.author, tier: p.tier, place: p.place, visual: p.visual, at: p.at || null,
-        photo: p.photo || null, partner: !!p.partner,
+        photo: toon(p.photo) || null, partner: !!p.partner,
         reden: salonviraal.reden(p, kijker),
         text: p.text, lang: p.lang || 'nl', reward: p.reward, featured: !!p.featured,
         likes: p.baseLikes + Object.keys(p.likedBy).length,

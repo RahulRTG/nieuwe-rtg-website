@@ -1,6 +1,9 @@
 /* Sociale laag (deelmodule): de RTG-ledenkant: zoeken en verbinden op
    codenaam, DM en (video)bellen. Snaps en 24-uurs verhalen staan in
    ./snaps.js. Gemount vanuit routes/social.js op de gedeelde kern. */
+const toegang = require('../../media/toegang');
+const alleenOpenbaar = ref => (ref && toegang.isMediaRef(ref) && toegang.openbaarKlasse(ref)) ? '/media/' + toegang.naamVan(ref) : null;
+
 module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
   const { app, auth, geenGast, db, socialZoek, socialVerbind, socialAntwoord, socialIntrek,
@@ -114,7 +117,12 @@ app.post('/api/member/dm/send', auth, async (req, res) => {
   let postDeel = null;
   if (req.body.postId != null) {
     const p = db.data.posts.find(x => x.id === Number(req.body.postId));
-    if (p) postDeel = { id: p.id, author: p.author, place: p.place, text: String(p.text || '').slice(0, 120), photo: p.photo || null };
+    /* Delen kan alleen wat de afzender zelf mag lezen (de Salon-leespoort), en
+       de foto reist alleen mee als hij openbaar is: een ondertekende link zou
+       in het gesprek verlopen, en een kale /media-naam van een privébeeld is
+       precies het lek dat AUTHORITY.md B4 dichtzette. */
+    const magLezen = kern.salon && typeof kern.salon.magLezen === 'function' ? kern.salon.magLezen(req.session, p) : false;
+    if (p && magLezen) postDeel = { id: p.id, author: p.author, place: p.place, text: String(p.text || '').slice(0, 120), photo: alleenOpenbaar(p.photo) };
   }
   /* Een gedeeld mediastuk (uit de Media OS-tak) reist NET ALS een gedeelde
      post als bijlage mee -- maar sinds de DM's in de communicatiekern wonen,

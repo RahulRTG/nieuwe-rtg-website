@@ -426,6 +426,80 @@ doelbinding, gegevenscategorieën, toegang, bewaartermijnen en menselijke contro
 Geen scores op mensen en geen verborgen persoonsprofielen. Bestaande rechtmatige
 beveiligingsmaatregelen (zoals de rem in `pin-deur.js`) blijven werken.
 
+## 3g. Open besluiten, portie 5 (11 oktober 2026)
+
+De eigenaar nam alle acht aanbevelingen over. Een pijl (A→B) betekent dat de
+tweede stap pas mag plaatsvinden nadat de genoemde voorwaarden zijn BEWEZEN; het
+is geen toestemming om die stap nu te activeren. De besluiten zijn inhoudelijk
+genomen; dat betekent niet dat de functionaliteit al gebouwd of geactiveerd is.
+Daarmee zijn de 48 genummerde vragen uit de vijf porties behandeld; voorwaardelijke
+besluiten, juridische toetsen en externe afhankelijkheden blijven afzonderlijk
+open.
+
+**41 — Externe AI per werksoort (A7; AI lokaal-eerst en `RTG_EXTERNE_AI_UIT`,
+CODE.md besluit 3, SERVICE.md par. 13d, OFFICE.md classificatie, INT-01). Optie
+B.** Eén verklaarde lijst werksoorten waarvoor externe AI verboden is, beginnend
+met eigen code, de stem van een lid en strikte documenten. Beleid mag externe
+verwerking uitsluitend verder beperken: nooit een verbod versoepelen en nooit een
+bevoegdheid creëren. Eerst in de schaduw, met een meting welke bestaande routes
+geraakt zouden worden. De harde uitschakelaar blijft leidend.
+
+**42 — Lenzen en onafhankelijke tegenproef (A11; AUTONOMIE.md "lenzen, geen
+breinen", KANTOORMACHT.md: een Critic op dezelfde invoer is een stempel). Optie
+A.** Beide worden afdwingbare vormen. Een lens heeft geen eigen opslag en is geen
+afzonderlijk AI-brein. De tegenproef krijgt het plan, de relevante feiten en het
+beleid, nooit de interne redenering van de planner. Regressietoetsen laten een
+overtreding aantoonbaar zakken.
+
+**43 — Doe, Samen en Maak (A14; BETROUWBAARHEID.md par. 6, CONNECT.md). A, later
+B.** Nu geen drie nieuwe tabbladen; het blijven werkwoorden binnen de bestaande
+ontdekkingservaring. Een eigen ingang verschijnt later uitsluitend wanneer de
+connectlus-meter werkende functionaliteit erachter meet. Geen lege navigatie of
+schijnfunctionaliteit.
+
+**44 — Shadow Worker (A23; KANTOOR.md: een spoor dat eindigt bij een gedeelde code
+is een alibi, AUTONOMIE.md C2, OFFICE.md par. 6.2). A, daarna afzonderlijk B.** Nu
+niet. Eerst een bewezen individuele medewerkersidentiteit en de uitkomst van de
+schaduwmeting van `ENFORCE_EXECUTE` (par. 3c besluit 3). Daarna mag een apart
+voorstel komen voor een uitsluitend lezende proceslens die per processtap meet en
+nooit per medewerker. Geen personeelsscores, verborgen medewerkersprofielen of
+zelfstandige uitvoering.
+
+**45 — Intent-gebaseerd beheer (A31; INT-01, `kern/stuur/mandaat.js`: een mandaat
+versmalt alleen, besluit 35). A, daarna B.** Eerst de uitkomst van de
+doelbindingsmetingen. Daarna een compiler die een menselijke intentie vertaalt
+naar bestaande toestemmingen en beperkingen en uitsluitend versmalt. Vóór
+activering ziet de gebruiker exact wat beperkt wordt en wat blijft, en hij
+bevestigt elke wijziging.
+
+**46 — INSTANT-label (A40; `claims.poort()`, BESTUUR.md: vervallen bewijs is geen
+bewijs). A, daarna B.** Het label komt uitsluitend uit een reproduceerbare meting,
+met meetwijze, datum en geldigheid, en verdwijnt zodra het bewijs vervalt. Een
+uitgever kent het nooit zelf toe. Zolang de meetinfrastructuur niet bestaat, wordt
+geen label getoond.
+
+**47 — Event capsule (A42; bewaring op tijd, `deel` is een poort, P-05, de
+vergetelheidsbezem). Optie A.** Versleuteling met de sleutel bij de bezoeker; RTG
+bewaart alleen versleutelde inhoud en de minimaal noodzakelijke technische
+gegevens. Standaardtermijn twaalf maanden; daarna wordt de capsule verwijderd,
+tenzij de bezoeker vóór het verlopen uitdrukkelijk verlengt. Verlenging is nooit
+automatisch. Vóór gebruik staat er dat verlies van de sleutel definitief verlies
+van toegang kan betekenen. Eerst een veilige herstel- of sleuteloverdrachtsweg die
+binnen deze grenzen blijft, zo mogelijk op de herstelproef van besluit 38.
+Metadata en toegangspatronen mogen alsnog geen bewegingsgeschiedenis vormen.
+
+**48 — `changeId` en envelopversie (A49; `kern/envelop.js` is gesloten op acht
+velden, EDGE.md par. 8, CARRIERE.md). A, eventueel B.** Nu geen negende veld.
+Eerst onderzoeken of `correlatie` en `oorzaak` volstaan om een wijziging
+betrouwbaar te herleiden. Blijkt dat onvoldoende, dan één gezamenlijke overgang
+naar envelop v2 met `changeId` én hoedanigheid, alleen met compatibiliteitstoetsen,
+ketenbewijs en een expliciet migratiebesluit. Geen losse, ongecoördineerde
+versiesprongen.
+
+**Vervolg (eigenaar, 11 oktober 2026).** De besluitvorming is rond; de volgende
+fase is mergen, integreren en bewijzen, en daarna grootschalig afbouwen binnen de
+genomen besluiten. Geen nieuwe cloudsessies zolang de integratie loopt.
+
 ## 4. De vier werkstromen
 
 | werkstroom | wat | werkterrein |

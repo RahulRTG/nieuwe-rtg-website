@@ -66,10 +66,10 @@ body.nav-route .intelligence-dock{opacity:0;transform:translateX(18px);pointer-e
 .profile-row{display:grid;grid-template-columns:repeat(5,1fr);margin:.8rem 0;border:1px solid var(--nav-line);}
 .profile-row button{min-height:42px;border:0;border-left:1px solid var(--nav-line);background:transparent;color:var(--soft);font:inherit;font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;}
 .profile-row button:first-child{border-left:0;}
-.profile-row button[aria-pressed="true"]{background:var(--nav-gold);color:#111;}
+.profile-row button[aria-pressed="true"]{background:var(--nav-gold);color:var(--rtg-p-op-metaal,#111);}
 .route-insight{position:relative;padding:.85rem .9rem .85rem 1rem;background:linear-gradient(100deg,rgba(165,13,50,.24),rgba(215,181,109,.06));border-left:2px solid var(--nav-gold);}
 .route-insight strong{display:block;font-family:"Bodoni Moda",serif;font-size:1.05rem;font-weight:500;margin:.2rem 0;}
-.route-insight p{font-size:.72rem;color:rgba(255,255,255,.72);line-height:1.45;}
+.route-insight p{font-size:.72rem;color:var(--rtg-p-zacht,rgba(255,255,255,.72));line-height:1.45;}
 .intel-metrics{display:grid;grid-template-columns:repeat(4,1fr);margin:.75rem 0;border-top:1px solid var(--nav-line);border-left:1px solid var(--nav-line);}
 .intel-metrics div{padding:.6rem .45rem;border-right:1px solid var(--nav-line);border-bottom:1px solid var(--nav-line);min-width:0;}
 .intel-metrics b{display:block;font-size:.8rem;color:var(--nav-cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -126,3 +126,17 @@ body.nav-route .intelligence-dock{opacity:0;transform:translateX(18px);pointer-e
   .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 1rem)}
 }
 @media(max-width:390px){.profile-row button{font-size:.48rem;letter-spacing:.02em}.route-hero{align-items:start}.route-hero .samenv b{font-size:2.35rem}}
+/* Het glas boven de kaart is een donker vlak, ook in de ivoren www-kamer: de kaart
+   bezit haar eigen materiaal (rtg-cinematic-system.css). De pariteitslaag zette
+   --nav-gold en de wereldinkt op body naar bordeaux en bijna-zwart, en die erfden
+   tot in deze panelen: #11110e op het glas haalde 1,9:1. Hier krijgen ze de
+   lichte waarden van de donkere groep terug. */
+:is(.zoek,.intelligence-dock){
+  --rtg-world-ink:#f7f1e8;--rtg-world-muted:#d8cfc2;--rtg-world-metal:#e2c389;--rtg-world-line:rgba(247,241,232,.2);
+  --rtg-p-inkt:#f7f1e8;--rtg-p-zacht:#d8cfc2;--rtg-p-metaal:#e2c389;--rtg-p-op-metaal:#11100e;--nav-gold:#e2c389;--tos-ivory:#f1ede5;
+  --tos-muted:#d8cfc2;--tos-lees:#e2c389;--rtg-muted:#d8cfc2;--rtg-soft:#d8cfc2;--rtg-txt:#f7f1e8;--muted:#d8cfc2;--soft:#d8cfc2;--zacht:#d8cfc2;
+}
+/* Het routepaneel is het omgekeerde geval: zijn vlak leest --rtg-p-vlak en is in
+   de www-kamer ivoor, dus volgen zijn eigen inkten (room, groen, goud) daar de
+   --rtg-p-tokens. Buiten de pariteitslaag bestaan die niet en geldt de oude kleur. */
+.paneel{--nav-cream:var(--rtg-p-inkt,#f3eee4);--nav-green:var(--rtg-p-groen,#63d692);--nav-gold:var(--rtg-p-metaal,#d7b56d)}

@@ -243,6 +243,10 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:not(
   --edge-bar-line:rgba(226,195,137,.24)!important;
   --edge-bar-accent:#e2c389!important;
   --edge-bar-metal:#e2c389!important;
+  /* De leeskleuren voor een signaal. Travel zet ze voor zijn donkere kamer licht
+     (#96d7b3, rtg-world-palette.css), en dat groen haalde op ivoor 1,4:1. In de
+     ivoren kamer gelden de groen en het bordeaux van het lichte thema. */
+  --rtg-leesgroen:#2e6b4e!important;--rtg-leesrood:#9e1c40!important;
   color-scheme:light!important;
   background:var(--rtg-p-ivoor,#f1eee7)!important;
   color:#11110e!important;
@@ -276,6 +280,28 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-pla
       Wie daarin de wereldtokens leest, krijgt hier de lichte waarden terug. */
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.wh-photo,.wp-scene,[data-rtg-cinematic-lead="true"],#rtg-cookie){
   --rtg-world-ink:#f7f1e8;--rtg-world-muted:#d8cfc2;--rtg-world-metal:#e2c389;--rtg-world-line:rgba(247,241,232,.2);
+  /* Ook het VLAK hoort bij de donkere groep. Een lege-staatkaart of een
+     tegel in de lead (`.leeg`, `.lv-grid button`, `.fh-leeg`) las zijn grond
+     uit --rtg-world-card en werd ivoor, terwijl zijn tekst de lichte inkt van
+     de lead erfde: licht op licht, 1,03:1. In een donker vlak blijft een kaart
+     donker, zoals een kaart op de foto van de www-hero. */
+  --rtg-world-card:#1b1915;--rtg-world-card-strong:#24211c;
+  /* De stekkers uit rtg-heritage.css (--rtg-card, --zacht, --rtg-oppervlak ...)
+     worden op body uitgerekend en erven daarna als VASTE waarde: een `.sec` of
+     `.kaart` in een lead las dan het ivoren oppervlak van de kamer onder de
+     lichte inkt van de lead. Hier opnieuw verbonden, zodat ze in een donker
+     vlak de donkere tokens lezen. Effen, want de keuring leest geen color-mix. */
+  --rtg-card:var(--rtg-world-card);--rtg-card2:var(--rtg-world-card-strong);
+  --rtg-oppervlak:var(--rtg-world-card);--rtg-oppervlak-2:var(--rtg-world-card-strong);
+  --rtg-txt:var(--rtg-world-ink);--rtg-muted:var(--rtg-world-muted);--rtg-soft:var(--rtg-world-muted);
+  --rtg-line:var(--rtg-world-line);--rtg-leeszacht:var(--rtg-world-muted);
+  --card:var(--rtg-world-card);--card2:var(--rtg-world-card-strong);
+  --panel:var(--rtg-world-card);--panel2:var(--rtg-world-card-strong);
+  --paneel:var(--rtg-world-card);--paneel2:var(--rtg-world-card-strong);
+  --txt:var(--rtg-world-ink);--text:var(--rtg-world-ink);--ink:var(--rtg-world-ink);
+  --muted:var(--rtg-world-muted);--soft:var(--rtg-world-muted);--zacht:var(--rtg-world-muted);
+  --line:var(--rtg-world-line);--line2:var(--rtg-world-line);--lijn:var(--rtg-world-line);
+  --rtg-leesgroen:#9fd6b8;--rtg-leesrood:#e7a8b8;
 }
 /* :not(#...) tilt de weging boven die van rtg-world-palette.css, dat met
    evenveel klassen en later geladen de kaart onder de lead legde. */
@@ -306,14 +332,15 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-pla
       kleur. Die staat nu als var(--rtg-p-*, oude kleur): buiten deze laag
       bestaat --rtg-p-* niet en geldt exact de oude kleur, hier volgt hij de
       wereld. In een echt donker vlak krijgt hij hieronder zijn lichte waarde
-      terug. */
+      terug. --rtg-p-op-metaal is de letter OP een metalen vlak: licht op het
+      bordeaux van de ivoren kamer, donker op het goud van een donker vlak. */
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]){
   --rtg-p-inkt:var(--rtg-world-ink);--rtg-p-zacht:var(--rtg-world-muted);--rtg-p-metaal:var(--rtg-world-metal);
-  --rtg-p-rood:#9e1c40;--rtg-p-groen:#2f7256;--rtg-p-vlak:var(--rtg-world-card);
+  --rtg-p-rood:#9e1c40;--rtg-p-op-metaal:#fffaf2;--rtg-p-groen:#2f7256;--rtg-p-vlak:var(--rtg-world-card);
   --rtg-p-ivoor:var(--rtg-world-bg);--rtg-p-papier:var(--rtg-world-card);
 }
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.wh-photo,.wp-scene,[data-rtg-cinematic-lead="true"],#rtg-cookie){
-  --rtg-p-inkt:#f7f1e8;--rtg-p-zacht:#d8cfc2;--rtg-p-metaal:#e2c389;--rtg-p-rood:#e7a8b8;--rtg-p-groen:#9fd6b8;--rtg-p-vlak:#11100e;
+  --rtg-p-inkt:#f7f1e8;--rtg-p-zacht:#d8cfc2;--rtg-p-metaal:#e2c389;--rtg-p-rood:#e7a8b8;--rtg-p-op-metaal:#11100e;--rtg-p-groen:#9fd6b8;--rtg-p-vlak:#11100e;
 }
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]){--rtg-card:var(--rtg-world-card)!important;--rtg-oppervlak:var(--rtg-world-card)!important;--rv-bg:var(--rtg-world-bg)!important}
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tos-service-strip,.rtgplek,.rb-leeg,.rv-reiszoek button,.rail,.side,#balk,.topnav,.top,.school-boven,header.kop,#apparaten,#paginabar,nav.lagen,article.mise,.v-wijk.los,.leeg):not([data-rtg-cinematic-lead="true"]),
@@ -330,6 +357,17 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-pla
   --anchor-gold:var(--rtg-world-metal)!important;--anchor-ivory:var(--rtg-world-ink)!important;
   --campus-gold:var(--rtg-world-metal)!important;--ios-label:var(--rtg-world-ink)!important;
   --tos-wine-licht:#9e1c40!important;--nav-gold:var(--rtg-world-metal)!important;
+  /* Vluchten en verblijven dragen eigen inkt voor hun nachtblauwe kamer; hun
+     kaarten lezen via --tos-graphite al het ivoren vlak, hun eigen vlakken
+     (--flight-card, --stay-card) volgen hier mee: anders stond de inkt van de
+     kamer (#11110e) op nachtblauw #071b29. */
+  --flight-ink:var(--rtg-world-ink)!important;--flight-soft:var(--rtg-world-muted)!important;
+  --flight-bg:var(--rtg-world-bg)!important;--flight-card:var(--rtg-world-card)!important;--flight-card2:var(--rtg-world-card-strong)!important;
+  --flight-gold:var(--rtg-world-metal)!important;--stay-gold:var(--rtg-world-metal)!important;
+  --rit-bg:var(--rtg-world-bg)!important;--rit-card:var(--rtg-world-card)!important;--rit-card2:var(--rtg-world-card-strong)!important;
+  --rit-ivory:var(--rtg-world-ink)!important;--rit-soft:var(--rtg-world-muted)!important;--rit-gold:var(--rtg-world-metal)!important;
+  --stay-soft:var(--rtg-world-muted)!important;
+  --stay-bg:var(--rtg-world-bg)!important;--stay-card:var(--rtg-world-card)!important;--stay-card2:var(--rtg-world-card-strong)!important;
 }
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.verblijfkop,.vliegkop) :is(small,b),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.moveStop,#interpret,#enrollToggle,.private-kicker,.campus-kicker),
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wk-stage :is(.ey,.wk-ey),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.verblijfkop,.vliegkop) .tab.aan,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).travel-os .tab.aan,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) header.kop small,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .lo-worlds button,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .pn-intent :is(b,button),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(#transferForm,#zoekForm,.inlog) :is(span,b,a),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tos-service-step>span,.rahulsnel button,.kompaslabel,.lo-timeline time,.rv-reiskaart em,.rb-leeg :is(span,a)),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-settings-intro .rtg-settings-kicker,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .pn-intent>div b{color:var(--rtg-world-metal)!important}
@@ -337,7 +375,10 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-pla
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.rtg-settings-shell,.rtg-settings-intro h2,.buurtknop.rand,#ritTitel,#vluchtTitel,#verblijfTitel,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).travel-os h2,.rb-leeg p,#hmTitel,.kaart>.kop,.kaart>div>button:not([class]),#privateRoomsTitle,#gereedTeller,header.ios-nav .rtg-rahul-tab,#pModi button,#badge3d,#liveBadge),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-edge-top .rtg-edge-mark{color:var(--rtg-world-ink)!important}
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) [data-rtg-toegang-hoofd] :is(span,small,em){color:inherit!important}
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).rtg-suite-page :is(p,.private-room-number){color:var(--rtg-world-muted)!important}
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).rtg-suite-page a{color:var(--rtg-world-metal)!important}
+/* Een link die zijn eigen vlak schildert (de springlink op het actievlak, een
+   knop als link) houdt zijn eigen letter: bordeaux op het bordeaux van de
+   springlink haalde 1:1, en op de gouden datingknop 2,6:1. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).rtg-suite-page a:not(.skip):not([class*="button"]):not(.knop){color:var(--rtg-world-metal)!important}
 /* 4. SIGNAALKLEUREN IN HUN DONKERE VARIANT. Rood en groen stonden in hun
       lichte variant voor een donkere grond; op ivoor is het merkbordeaux voor
       rood en het rosthemagroen voor groen. */
@@ -347,6 +388,10 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-pla
       het metaal, en dat is op ivoor bordeaux; de zwarte letter die bij goud
       hoorde, haalt daarop 2,2:1. */
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.kg-rij button,#btn-zet,#rkToetsen .gelijk,.verstuur,#verstuur,.speler .afspeel,#idStart,button.chip.aan,#n-maak,#kaGo,#prBegin .knop.p,#zegGo,#startTrialTop){color:#fffaf2!important}
+/* De lichte letter hoort bij het bordeaux vlak, dus waar een scherm het actieve
+   chipje zonder vlak tekent (uitgaan, foodcourt: `background:none`), krijgt het
+   dat vlak hier mee. Anders stond #fffaf2 op ivoor. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) button.chip.aan:not(#rtg-geen-chip){background:var(--rtg-world-action)!important;border-color:var(--rtg-world-action)!important}
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(#kaGo,#prBegin .knop.p,#idStart) *{color:inherit!important}
 /* De signatuur volgt het palet, niet de route, en de grond draagt er heel
    subtiel (5%, vlak 2,5%) de kleur van die wereld in mee: een ingebed Work-blad kleurt

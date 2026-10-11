@@ -211,10 +211,10 @@ body.rtg-social-messages .invoer{background:#f6f4ef!important;padding:.8rem 1.25
 body.rtg-social-messages .invoerrij textarea{border-radius:0!important;}
 body.rtg-social-messages .stuurknop{width:44px!important;height:44px!important;border-radius:0!important;background:var(--suite-ink)!important;color:#fff!important;}
 body.rtg-social-messages .hulprij button{min-height:36px!important;border-radius:0!important;}
-.rtg-message-context{display:none;min-width:0;padding:2rem 1.65rem;color:#eae6dc;background:linear-gradient(155deg,#1c1d1a 0%,#24251f 58%,#492d35 140%);overflow:auto;}
+.rtg-message-context{display:none;min-width:0;padding:2rem 1.65rem;color:var(--rtg-p-inkt,#eae6dc);background:var(--rtg-p-papier,linear-gradient(155deg,#1c1d1a 0%,#24251f 58%,#492d35 140%));overflow:auto;}
 .rtg-message-context .rtg-context-eyebrow{display:block;color:var(--rtg-p-metaal,#bea765);font:600 .56rem/1 Inter,system-ui,sans-serif;letter-spacing:.19em;text-transform:uppercase;}
 .rtg-message-context h2{margin:1rem 0 .8rem;font:500 1.8rem/1.08 "Bodoni Moda",Georgia,serif;}
-.rtg-message-context>p{color:rgba(234,230,220,.6);font-size:.78rem;line-height:1.7;}
+.rtg-message-context>p{color:var(--rtg-p-zacht,rgba(234,230,220,.6));font-size:.78rem;line-height:1.7;}
 .rtg-context-register{margin:2rem 0 0;}
 .rtg-context-register div{display:flex;justify-content:space-between;gap:1rem;padding:.85rem 0;border-top:1px solid rgba(255,255,255,.1);}
 .rtg-context-register dt{color:var(--rtg-p-zacht,#A4A19A);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;}
@@ -300,7 +300,7 @@ body.rtg-social-private-hub{background:var(--suite-ink)!important;}
 .private-room p{min-height:3.8em;color:rgba(239,235,225,.5);font-size:.7rem;line-height:1.6;}
 .private-room-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.08);color:var(--rtg-p-metaal,#c9b57f);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;}
 .private-support{box-sizing:border-box;display:flex;align-items:center;gap:1.2rem;width:min(1440px,100%);margin:0 auto;padding:1.5rem 2rem 5rem;border-right:1px solid rgba(255,255,255,.09);border-left:1px solid rgba(255,255,255,.09);}
-.private-support>span{margin-right:auto;color:#888680;font-size:.59rem;letter-spacing:.13em;text-transform:uppercase;}
+.private-support>span{margin-right:auto;color:var(--rtg-p-zacht,#888680);font-size:.59rem;letter-spacing:.13em;text-transform:uppercase;}
 .private-support a{min-height:44px;display:flex;align-items:center;color:rgba(239,235,225,.65);font-size:.68rem;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.14);}
 
 @media(max-width:900px){
@@ -446,7 +446,7 @@ body.rtg-social-messages .stuurknop{border:1px solid rgba(205,184,121,.4)!import
 body.rtg-social-messages .stuurknop svg{stroke:#e2ca8a;}
 body.rtg-social-messages .hulprij button{border-color:rgba(255,255,255,.12)!important;color:rgba(243,237,225,.58)!important;background:transparent!important;}
 body.rtg-social-messages .wetregel{color:rgba(243,237,225,.34);}
-.rtg-message-context{border-left:1px solid rgba(205,184,121,.18);background:linear-gradient(155deg,#171815 0%,#23231f 58%,#492a33 145%);}
+.rtg-message-context{border-left:1px solid rgba(205,184,121,.18);background:var(--rtg-p-papier,linear-gradient(155deg,#171815 0%,#23231f 58%,#492a33 145%));}
 
 /* Kringen is een ledenregister. Een kaart krijgt een formele titelband en de
    acties zitten aan het eind van de rij, nooit als los zwevend element. */

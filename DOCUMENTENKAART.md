@@ -1,0 +1,2778 @@
+# Documentenkaart — wat elk diepte-document is en wanneer je het leest
+
+Deze samenvattingen stonden tot 6 oktober 2026 in `CLAUDE.md` en zijn woordelijk hierheen verplaatst (ARCHITECTOPDRACHT.md, fase 1), zodat ze niet meer bij elke sessie laden. `test/agentinstructies.test.js` houdt vast dat er geen blok verdween; de getallen tussen de merktekens houdt `npm run getallen` bij.
+
+**`PLATFORM.md` bevat de super-app-regel** — lees die vóór je apps samenvoegt of
+een nieuwe app aanmaakt. In één zin: super apps vervangen geen domeinsoftware,
+ze orkestreren die; alleen apps die dezelfde kern, data én workflow dupliceren
+mogen samensmelten. De toetsvraag is niet "kan dit in een super-app?" maar "is
+dit een zelfstandige capability, of een tweede ingang naar dezelfde?". Daar
+staat ook **het wereldpatroon**: samenvoegen is stap een, niet de bedoeling —
+een wereld is pas af als hij zijn onderwerp begrijpt (graaf, beleid, cockpit,
+gegronde Rahul, actielog).
+
+**`SCHERMEIGENAAR.json` zegt per zichtbare functie wie de eigenaar is** — precies
+één scherm per capability; andere schermen mogen haar tonen of openen maar
+bouwen haar niet opnieuw. Het kwam uit de consolidatieronde van 23 september
+2026, die niet op bestanden vergeleek (geen enkel scherm was byte voor byte
+gelijk) maar op wat erachter zit: `npm run schermfunctie` legt elk paar schermen
+naast elkaar op de API-paden die ze aanroepen. Zo vond hij twee dagproducten
+(`vandaag.html` toonde verzonnen momenten naast `life.html`), een tweede
+avond-samensteller in `leven.js` en een tweede beslisweg in RTG One naast
+Decision Room. `test/schermeigenaar.test.js` houdt het register tegen een VERSE
+meting: een nieuw scherm op dezelfde routes als een bestaand scherm zakt tot het
+een oordeel heeft (vijf klassen plus `geen-dubbel` met reden), een alias krijgt
+geen klikbare link binnen het huis, en binnen een wereld draagt geen menu-item de
+naam van een ander. Acht oordelen staan `open` met een vervolg (ratel `OPEN_MAX`,
+alleen omlaag) — de grootste is Pulse naast De Salon. De gezinsagenda is al
+samengevoegd: hij draait op dezelfde motor als de ledenagenda
+(`kern/agenda.js`, sleutel `gezin:<code>`) en zijn scherm is een schil voor de
+gezinssessie, met de oppas als meelezer. De toegangsschermen zijn al samengevoegd: "Wie heeft toegang tot
+mij" (`mijn-relaties.html`) is het ene scherm, `toestemming.html` een
+doorverwijzing, en RTG iD houdt alleen inloggen bij een dienst en machtigen.
+
+**`GELD.md`, `LEVEN.md` en `LIFE.md` zijn de diepte-documenten per wereld.** GELD.md
+maakt van RTG Geld een financieel besturingssysteem; de harde grens daar is
+dat geld het huis nooit vanzelf verlaat. LEVEN.md maakt van RTFoundation een
+Life OS dat een mens vanaf de geboorte begeleidt — lees vóór je daaraan werkt
+vooral paragraaf 2, de grenzen: een kind is geen profiel, nooit sturen maar
+openen, en de bijdrage-spiegel is nooit vergelijkend. Waar een functie botst
+met een grens, vervalt de functie. LIFE.md maakt van RTG Sociaal een Life OS:
+niet een sociaal netwerk maar het leven tússen mensen, waarbij een lid geen app
+opent maar een levensmoment. Het werkwoord daar is **samenstellen en klaarzetten
+— bevestigen doet de mens**: alles wat een tweede persoon bereikt (uitnodiging,
+bericht, boeking, betaling) wordt nooit automatisch. Lees ook daar paragraaf 4,
+de grenzen: een relatie is geen trechter, en er komt geen score op het leven
+tussen mensen.
+
+**`REIZEN.md` is het diepte-document van RTG Reizen** — het Travel OS: niet een
+reisbureau met een boekingssite, maar een wereld die reizen beheert, ook de reis
+die RTG niet verkocht heeft. Het werkwoord daar is **vóór zijn**: opmerken en
+klaarzetten voordat de reiziger het merkt, en uitvoeren alleen waar het domein
+dat al mocht. De zin die het ontwerp stuurt: het maakt niet uit waar een
+onderdeel vandaan komt, het maakt wel uit dat RTG dat weet — vandaar dat elk
+reisonderdeel een **soort** (wat de reiziger ziet) én een **herkomst** (wat het
+systeem weet) draagt. Lees vóór je hieraan werkt vooral paragraaf 2.1 en de
+grenzen: de Reis bezit geen boeking maar een verwijzing, een voornemen en een
+bewijs; een wachter zonder bron zegt dat hij niet kijkt; een ingelezen waarde
+wordt nooit stilletjes verbeterd, en de barcode blijft van de uitgever.
+**`TRAVELCOMMERCE.md` is de handelskant daarvan** — RTG Travel Commerce &
+Agency OS: niet de wereld die de REIZIGER ziet (dat blijft REIZEN.md) maar wie
+een reis bedenkt, verkoopt, inkoopt, uitvoert, ondersteunt en betaalt. Een
+richtingsdocument zoals PLATFORM.md en ECONOMIE.md: per onderdeel **staat**,
+**een stap weg**, **vraagt een besluit** of **jaren weg**. De kern in één zin:
+zes partijen kijken naar dezelfde reis en geen van hen ziet hetzelfde — er is
+één werkelijkheid en er zijn zes projecties. Lees die vóór je een reisbureau,
+een marge of een leverancierscijfer bouwt. Het belangrijkste dat het document
+tegenhoudt is een `journeys`-tabel: een reis die mensen, geld, documenten én
+reserveringen BEZIT is de `Asset`-fout opnieuw, en de meting staat er
+(`KETENVORM.json`: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
+<!--getal:ketenvorm.actorenTotaal-->33<!--/getal--> gedeelde actoren over vier
+ketens). De vorm die wél werkt is die van `kern/levensgraaf/graaf.js` — een
+PROJECTIE met vijf etiketten, hier plus de **herkomst** als zesde. Zeven grenzen
+bovenop die van REIZEN.md, waarvan de drie scherpste: geld wordt klaargezet en
+een mens voert uit, een gevolg dat niemand gemeten heeft heet `onbekend` (en de
+onbekende helft staat even groot op het scherm), en een reisbureau is een KLANT
+en geen afdeling van RTG — RTG's eigen balie is kantoormacht, een extern bureau
+is een zaak met een genre, en dat **genre bestaat vandaag niet** (74 genres, wel
+`hotel` en `vervoer`). Par. 9 is de meting die het document eerlijk houdt: de
+hele eigen reisketen is een keer echt gelopen, en vond vier dingen die geen
+enkele toets zag — er is geen weg om een verkochte reis te betalen, "bevestigd"
+was een eindstation voor lid én kantoor, het lid kreeg geen bericht, en wat we
+verkopen is één regel in plaats van een samengestelde reis. **De middelste twee
+zijn gerepareerd** (par. 9a, 10 september 2026): `kern/reisbureau-nazorg.js` +
+`-wijziging.js` maken de uitvoerlus rond, met drie regels die niet mogen
+sneuvelen — een wijziging is een VERZOEK dat een mens van het kantoor toepast
+(het lid schrijft zijn eigen bevestiging niet om), **afzeggen is een andere stand
+dan intrekken** (`afgezegd` was rond en gaat alsnog niet door, `geannuleerd` was
+nooit iets — wie die twee samenvoegt kan bij een geschil niet meer zien of er
+iets is beloofd), en een afzegging **verplaatst geen geld** maar schrijft
+`geld.stand = nietGeregeld` mét de reden. Daaronder zat een reparatie die groter
+was dan reizen: `notify()` schrijft op TIER en een persoonlijk bericht hoort op
+de SLEUTEL van het lid, terwijl `/api/notifications` alleen die eerste bak las —
+een persoonlijk bericht verdween dus bij de eerste herlaadbeurt (ook dat van een
+aangenomen sollicitant). `opzet/meldaan.js` heeft nu twee wegen uit één
+schrijver. En let op de vondst die een bestaande toets afdwong: een **afgewezen**
+reisaanvraag hoort juist op de tijdlijn te blijven staan, want `reisoplosser.js`
+hangt aan dat signaal om alternatieven te zoeken — alleen `geannuleerd` en
+`afgezegd` vallen weg.
+**`KAARTEN.md` is de kaartlaag onder de navigatie** — hoe RTG elk land en elke
+stad kan aanbieden terwijl een lid zelf kiest welke kaarten hij wil hebben. Lees
+die vóór je aan navigatie, kaartdekking of een gebied werkt. Drie standen die
+nooit een vinkje mogen worden (**aangeboden**, **gebouwd**, **gekozen**):
+*aangeboden is geen dekking*, en een gekozen gebied dat nog niet gebouwd is is
+een VERZOEK — dat is de weg "via ons". Vier grenzen die niet mogen sneuvelen: de
+**licentie is een grendel en geen veld** (ODbL eist naamsvermelding, en zonder
+vermelding laadt de motor het pakket niet), een **bron-id is geen bestandsnaam**
+(vertalen doet de indexschrijver, en bij een botsing vallen beide gebieden af —
+een winnaar op sorteervolgorde laat een lid een pakket downloaden dat over een
+ander gebied gaat), een **rechthoek is geen grens** (`gebiedkeuze.js` beslist op
+verklaarde omvatting, want "het kleinste vak wint" liet Maastricht op België
+uitkomen), en de laag mag **alleen toevoegen** — zonder gebiedsindex gedraagt de
+navigatie zich exact als hiervoor. De scherpste vondst staat in par. 6: *"hier is
+geen gebied" is niet "hier is geen motor"*. Een gebied dat aangeboden was maar
+niet gebouwd, viel door naar het demonstratieraster, en een lid in Parijs kreeg
+een route van 1583 km met een echte reistijd eronder. Par. 5a hoort daarbij: de
+**naamsvermelding staat op het scherm en niet alleen in een poort** -- een
+vermelding die niemand ziet, is geen vermelding -- en de badge kreeg twee
+standen extra, want met een gebouwd OSM-pakket onder de voeten stond er
+"Demonstratienet" boven een echte kaart. Wat er niet is, staat er
+met de reden: de OSM-bouwer en het pakket op het TOESTEL (stap 2), plus waarom
+het OPHALEN van de index hier niet te bewijzen is (de proxy weigert de bron met
+een 403, dus het ontleden is beproefd en het ophalen niet — graad `vermoed`).
+**`NAVIGATIE.md` is de plaats-these** — een richtingsdocument boven PLAATS.md en
+KAARTEN.md: *een kaart vertelt waar iets is; RTG Plaats helpt een bedoeling op
+een plaats slagen, terwijl de positie van de mens zoveel mogelijk op diens
+toestel blijft.* Lees die vóór je aan navigatie, reistijd, aankomst of een
+plaatsgegeven van een zaak werkt. De omkering: een plaats wordt rijker uit haar
+operationele BRONNEN (kassa, reservering, partner-event), nooit uit het
+bewegingsspoor van haar bezoekers (P-05, sinds 29 september 2026 hard, par. 15.0). Zes grondwetsregels (P-01 t/m P-06), een restaurantketen
+als eerste proef met een storingsmatrix, en het **dubbelbewijs**: kunnen én
+aantoonbaar niet hoeven weten, en die twee worden nooit opgeteld. Het heet met
+opzet een these en geen categorie tot de poort van par. 13 groen staat. Let op
+de nulmeting in par. 6.2: bij lezing staat geen van de vijf
+terughoudendheidstellers op nul, en de scherpste vondst zit in de plaatslaag
+zelf — tijdens een naderingsvenster komt elke passage langs een zaak onder een
+codenaam 90 dagen in `plaatsLog`. De eerste stap is daarom geen functie maar
+twee metingen (`plaatsvorm` en `positiestroom`; de tweede staat sinds 29 september,
+`npm run positiestroom`: 35 stromen, 20 zonder termijn, 20 buiten de
+vergeetroute; vijftien besluiten genomen en uitgevoerd (N12-N15), de negentien
+onbegrensde worden per stroom beslist), en de tellers worden een
+permanente meter: groen betekent dat de code aantoonbaar geen verboden
+bewegingsspoor maakt, niet dat het beleid dat zegt. Aankomst wordt nooit uit een
+opgeslagen positie bewezen. Dat is geen pleidooi voor minder GPS (N11): tijdens
+een taak mag alles wat goede navigatie vraagt, en de grens gaat over wat er na
+de taak van de mens overblijft -- huidige positie en een begrensd venster wel,
+een bewegingsgeschiedenis niet. Namen: in dit huis is een `spoor` het AUDITspoor
+(`stilspoor`, `spoorvorm`), dus posities heten een bewegingsspoor; `bereik` en
+`overdracht` zijn bezet (de ETA-dienst heet `reistijd`, de overgang `doorgave`),
+en "World" botst met WERELDEN.md.
+**`FOUNDATION.md` is het diepte-document van de RTFoundation als platform** —
+Personal & Civic Operating System, op drie niveaus tegelijk: individu,
+professional, organisatie. Het doet LEVEN.md niet over (dat blijft gelden en gaat
+over de mens zelf) maar voegt de civiele helft toe: zaken over meerdere
+instanties, documenten die iets van iemand vragen, processen met een
+doorlooptijd, en het bewijs eronder. Lees vóór je hieraan werkt vooral
+paragraaf 2, het werkwoord: **de Foundation opent en zet klaar — bevestigen doet
+de mens**, en uitvoeren richting een instantie doet zij nooit zelf. Er is bewust
+geen `EXECUTE_LOW_RISK`: wie bouwt weet niet in wiens leven hij staat, en een
+grens die per geval anders had gemoeten is geen grens. Paragraaf 5 heeft zeven
+eigen grenzen bovenop die van LEVEN.md; de scherpste twee zijn dat een
+eligibility-motor alleen mag tóevoegen (nooit "dit is niets voor jou") en dat de
+meeteenheid van een capaciteitsmotor de taak is en nooit de mens. Paragraaf 7
+zet vijftig voorgestelde onderdelen op een rij met per stuk of hij al bestaat en
+welke grens hem eerlijk houdt.
+**`BENOEMING.md` is RTFoundation Roles & Governance 2.0** -- wie binnen de
+Foundation iets mag doen, sinds wanneer, waarom, en hoe dat ophoudt. Lees die vóór
+je aan zetels, bestuursrollen, quorum of Foundation-rechten werkt. Het is een
+verbouwing en geen nieuwbouw: `kern/rtfos/basis.js` heeft al rollen, rechten per
+rol en een uitgavegrens, en een tweede rollenlaag ernaast zou de
+`VERMOGENS`-fout zijn. De meting vond twee dingen die eerst moeten: **elke
+RTFOS-route hangt achter de RTG-kantoordeur**, dus een projectleider moet de
+gedeelde backoffice-code krijgen om zijn eigen stad te openen, en **intrekken
+sluit vandaag geen enkele sessie**. Vijf dimensies die niet meer in één titel
+samenvallen (band, stemzetel, werkrol, casusinzage, uitgavegrens), een
+benoeming waarvan de stand BEREKEND wordt, vereisten die bij een recht horen en
+een filter zijn en geen ontslag, en een migratie die voor elke persoon de
+effectieve rechten byte voor byte vergelijkt. Let op de namen: `mandaat`,
+`machtiging`, `bevoegdheid`, `geschorst` en `termijn` zijn bezet — het heet
+`uitgavegrens`, `opgeschort` en `zittingsduur`.
+
+**`AUTHORITY.md` is de RTG Authority Engine** -- van TOEGANG modelleren ("mag
+Finance in") naar BEVOEGDHEID ("mag namens RTG Nederland tot € 25.000 klaarzetten,
+niet uitvoeren, tot 31 december, boven € 10.000 met een verse passkey"). Lees die
+vóór je een poort, rol, recht, tekengrens of auditregel toevoegt. `BENOEMING.md`
+is er het Foundation-profiel van. De meting: er is geen beslispunt maar er zijn
+er zeven, geen afdwingpunt maar zestien poortfuncties plus 26 gezagsfuncties in
+handlers, en geen lidmaatschap maar elf losse opslagplaatsen met vier
+levenscycli. Twee regels die er als eerste uit kwamen en die overal gelden:
+**de actor van een auditregel komt uit de sessie en nooit uit het verzoek** (P0b
+vond zeven plekken, twee door een toets beschermd), en **de motor VERVANGT de
+vijf gezagsvocabulaires in plaats van er een zesde naast te zetten** (INT-01).
+Eén grammatica, geen tabel met alle rechten: het domein bezit zijn werkwoorden.
+**De vijf besluiten A1–A5 zijn genomen (23 september 2026)** en fase 1 staat in de
+SCHADUW: `server/kern/beleidsmotor/` kent de vier kantoordeuren als gegevens, velt
+naast elke poort een eigen besluit en telt eens/oneens (A1), en telt elke
+kantoorroute die zonder bekende poort afliep (A3) -- zonder iets tegen te houden.
+Die A3-meting vond meteen dat `/api/office/doc` paspoortscans aan de gedeelde code
+gaf; dat is nu op naam. Namen: `benoeming`, `orggraaf` en `tekengrens` zijn vrij,
+`beleidsmotor` is nu in gebruik;
+`policy`, `capability`, `machtiging`, `lidmaatschap` en `delegatie` zijn bezet.
+
+**`HDI.md` is de laag BOVEN de Foundation** — RTG Human Development
+Infrastructure, als richtingsdocument met per onderdeel of het **staat**, **een
+stap weg** is, **een besluit vraagt** of **jaren weg** is (zoals PLATFORM.md en
+ECONOMIE.md). Lees die vóór je aan kwetsbare doelgroepen, veiligheidszaken of
+ontwikkeltrajecten werkt. De missie: *niemand mag uit beeld verdwijnen omdat
+zorg, gemeente, corporatie, werkgever, politie, onderwijs en stichting ieder maar
+één stukje van die persoon zien.* De fundamentele eenheid schuift van de casus
+naar de mens — **en precies daarom mag die mens nergens als rij bestaan**: par.
+5.1 is de grens waar het hele project op staat of valt, en de uitweg is de vorm
+die `kern/levensgraaf/graaf.js` al gevonden heeft (een PROJECTIE, geen tweede
+database, met `deel` als poort en niet als etiket). Er komt dus geen
+`humans`-tabel, en geen route die "alles over deze mens" teruggeeft zonder dat de
+mens zelf die aanroep doet. Par. 1 is de meting die het document eerlijk houdt:
+van de acht voorgestelde lagen staan er vijf al onder een andere naam
+(`kern/levensgraaf/` is de development graph, `kern/livinglab/graden.js` de
+causale motor met drie plafonds waarvan het laagste wint, `kern/rtfos/gemeente.js`
+de outcomes ledger die telt zonder te lezen) — dus het werk is aansluiten en niet
+uitvinden. Par. 2 houdt vier namen tegen die al bezet zijn (**capability** is
+platformvermogen in OS.md, **wallet** is geld in WAARDE.md, en `NIVEAUS` en
+`FASEN` dragen er al 9 en 8 betekenissen). Vier grenzen die niet mogen sneuvelen:
+veiligheidsgegevens zijn een andere DATAKLASSE en geen gevoeliger veld (geen
+partnerkoppeling, geen adresveld, geen export, geen standaard bewaartermijn), de
+meeteenheid is nooit de mens (een voortgangsmaat mag over een cohort en nooit per
+persoon, ook niet intern als sorteersleutel), een solver toont altijd meer dan
+één pad en zegt nooit "dit is niets voor jou", en **duress mode wordt heel of
+niet gebouwd** — een webapp kan de app-switcher, de notificaties en de
+browsergeschiedenis niet garanderen, dus wat er niet verborgen kan worden staat
+er hardop bij. De Personal AI Advocate wacht op een getal en niet op een gevoel:
+`VERTROUWEN.json` staat op 0 bewezen en 4180 verzwakt, dus hij komt er eerst als
+LEZER op `levensgraaf/termijnen.js`. Par. 7 zet de volgorde vast, en de eerste
+twee regels (uitstapknop, hulpwijzer verbreden) kosten samen twee dagen en doen
+meer voor de mens uit de missie dan de acht eronder.
+
+**`SAMENLEVING.md` is de grondwet boven de hele ladder** -- hoe RTG en de
+RTFoundation elke plek in de samenleving bedienen met één infrastructuur en
+verschillende routes voor betalen, uitvoeren, beschermen en deelnemen. Lees die
+vóór je een trede, een Foundation-functie of een poort op identiteit toevoegt.
+De kern: er is een **universele bodem** die achter geen enkele betaling
+verdwijnt (leren, ontwikkelen, oriënteren, verbinden, rust, hulp vinden, opnieuw
+beginnen), en RTG modelleert *mens → huidige behoefte → passende mogelijkheid*
+en nooit *mens → klasse → product* -- een positie is een toestand, de pas zegt
+niets over de mens, en er komt nergens een maatschappelijke score. **Identiteit
+begrenst handelingen, niet het mens-zijn.** Let op de namen: `bodem` is bezet
+door de prijsondergrens in `kern/pasladder.js` (in code heet het
+`onvervreemdbaar`, de RTF-functie Toegang `insluiting` en Gemeenschap
+`samenkomst` -- `nabijheid` was de eerste keus en bleek bezet). **De nulmeting
+staat** (`npm run onvervreemdbaar`, `ONVERVREEMDBAAR.json`): voor een gratis
+account is elk werkwoord aanwezig en *opnieuw beginnen* heeft geen eigenaar. Een
+gemeenteafspraak, aangifte en zorgintake zaten achter de pas en staan sinds
+besluit 4c open voor een gratis account NA een paspoortcontrole
+(`server/kern/onvervreemdbaar.js`, dat `idGeverifieerd()` hergebruikt en een
+betaalde pas niets nieuws oplegt); de meter meet daarom een GECONTROLEERD gratis
+account. Let op de meetfout die eraan voorafging:
+`tier === 'guest'` is TWEE mensen -- een bezoeker zonder account (die `geenGast()`
+weigert) en een Community-lid met account -- en de demo-inlog `gast` is alleen
+de eerste. Wie "gratis" meet, registreert een account: daarvoor is er
+`scripts/lib/gratisaccount.js`, en de doelgroepmeter draagt `gast` sindsdien in
+twee vormen (bezoeker en gratis account, SAMENLEVING.md par. 11.3).
+
+**`CONNECT.md` is het diepte-document van Foundation Connect** -- het
+ontdeknetwerk van FoundationOS, op het scherm **Ontdekken**. In een zin: *je komt
+omdat het leuk is, je blijft omdat je nieuwsgierig wordt, en je gaat weg met iets
+wat je hebt geleerd, gemaakt, gedaan of betekend.* Lees die vóór je iets bouwt
+waarmee een mens hier iets ontdekt, leert, maakt of doorgeeft. De dragende
+bewering van het voorstel -- dat vrijwel iedere functie in dezelfde lus
+terechtkomt (ontdek, begrijp, doe, maak, deel, verbind, help, groei) -- is eerst
+**gemeten** en niet aangenomen (`npm run connectlus`, `CONNECTLUS.json`, op de
+lezer van `scripts/objectmodel.js`), want dat is exact de vorm waarin `Asset`,
+`Koopbaar`, `Moment`, `Career` en `Manier` alle vijf al sneuvelden. Uitslag over
+<!--getal:connectlus.domeinen-->23<!--/getal--> ontdekkingsdomeinen: **0 van 8 werkwoorden in álle domeinen** (ook `maak`
+niet, 21/23), **2 van 23** domeinen maken de lus rond -- en dat zijn precies de
+twee grootste, dus ze halen het door hun OMVANG en niet door hun vorm -- en **<!--getal:connectlus.combinaties-->22<!--/getal-->
+verschillende combinaties over evenveel domeinen**. De vorm eronder is even streng: <!--getal:connectlus.inAlle-->0<!--/getal-->
+van 496 velden in alle domeinen, 0 in zelfs maar de helft, **<!--getal:connectlus.domeineigenPct-->87.9<!--/getal-->% in precies
+één** (platformbreed 71%), dus de ontdekkingsdomeinen zijn MÍNDER verwant dan een
+willekeurige doorsnede van dit huis. Er komt dus geen `Ontdekking`-objecttype en
+geen contenttabel; wat overleeft is een **verklaring van werkwoorden**
+(`COMMERCE.md`'s `Koopbaar`) plus een **projectie met etiketten**
+(`kern/levensgraaf/graaf.js`). **Het getal dat het product stuurt is
+`begrijp`: <!--getal:connectlus.begrijp-->5<!--/getal--> van 23**, het zeldzaamste werkwoord van het huis -- de stap waar de
+lus op draait bestaat hier bijna nergens, en dat is de naad die deze laag vult in
+plaats van een tweede feed te bouwen. Vier dingen die je nergens anders moet
+herhalen. **De mixer verdeelt PLEKKEN en geen punten**: acht motoren dingen om
+een plek, de horizon van de mens verdeelt ze, en er wordt niets gewogen of
+gesorteerd -- zodra elke motor een getal levert en de hoogste wint, is er weer
+één algoritme met een gewichtenvector die niemand kan lezen; elke plek draagt
+daarom zijn reden in WOORDEN, en vijf motoren melden hardop dat ze niet kijken
+(`KAARTEN.md` par. 6). **Het leerdossier is een ledger en nooit een niveau**: de
+tien treden zijn geen trap waar iemand OP staat, de hoogste wordt afgeleid per
+ONDERWERP en nergens opgeteld (een getal over alle onderwerpen ÍS een niveau), en
+elke regel draagt een graad die volgt uit WIE hem schrijft -- `toegepast` is
+`vermoed`, `gemaakt` `gemeten`, en `gebruikt` en `doorgegeven` zijn `bewezen`
+omdat alleen een ANDER ze kan zetten. Dat is meteen de reden dat hij onder de 18 mag bestaan: de vier
+voorwaarden van het besluit van 14 september staan er als code en niet als
+belofte, en valt er één weg dan geldt `progressieMag` weer. **De naklank heeft
+zes soorten en met opzet geen totaal** -- `signalen` was trouwens bezet (13
+plekken in 8 domeinen) en `weerklank` ook (KANTOOR.md), vandaar de naam. En **de
+kringladder gaat niet de kant op die hij lijkt te gaan**: de trap van een KRING
+is BEREIK en die van een RELATIE NABIJHEID, dus wie dichtbij staat ziet wat
+verder reikt -- met `kijker >= doel` kon een gezinslid het publieke werk van zijn
+eigen kind niet zien. **Besluit 2 is genomen (15 september 2026) en de lus is rond**:
+`npm run lusproef` staat op 17 schakels en 10 storingen, alle gesloten. De regel
+die dat ontwerp stuurt is **Connect mag auteurschap CONSUMEREN, niet zelf
+uitvinden** -- en die komt uit een LEK en niet uit voorzichtigheid: de eerste
+versie liet de aanroeper zeggen wie de maker was, waarmee iedereen een regel met
+bewijskracht in andermans dossier kon schrijven. De uitweg stond er al:
+`kern/mediaos/wekken.js` heeft een haak `nieuwWerk(makerKey, soort, titel)` die
+vijf domeinen aanroepen met een echte ledensleutel op het moment dat het werk er
+is, en `kern/mediaos/werkherkomst.js` legt dat daar vast -- VOOR het wekken, want
+een maker zonder volgers maakt evengoed iets. Connect leest het en krijgt er
+precies EEN ding uit (`makerVanWerk(id)`); er is met opzet geen functie die alle
+werken van iedereen teruggeeft, want dat zou een publieke makerslijst zijn.
+**Daarbij zijn de vijf overdrachtstreden uit elkaar getrokken** -- gemaakt,
+aangeboden, bereikt, gebruikt, doorgegeven -- want als een trede die vijf
+samenvat, zijn publiceren en betekenen hetzelfde ding. De regel eronder is de
+scherpste van deze laag: **wij tellen geen aandacht als ontwikkeling.** `bereikt`
+draagt daarom `aanspraak: 'geen'` en staat WEL in het dossier en NOOIT in het
+portfolio (dat je werk ergens aankwam is bereik, en bereik is aandacht), en
+`mooi` is de enige naklank zonder trede -- juist omdat hij het vaakst gegeven
+wordt. Alle vijf zijn `eenmalig`: deze ladder legt OVERGANGEN vast en nooit
+VOLUMES, dus vier mensen met vier verschillende naklanken leveren samen EEN regel
+`gebruikt` op, en niemand kan andermans dossier laten groeien door te blijven
+drukken. De zes vragen per bewijsstuk (`stelt`, `nietZegt`, `doorWie`, `graad`,
+`werkwoord`, `herkomst`) gebruiken met opzet de woorden van
+`kern/carriereledger/regels.js` en geen tweede vocabulaire.
+
+**`VERDER.md` is de lus van FoundationOS** -- werk, leren en de buurt als
+projecties op één lus (wereld -> mogelijkheid -> overgang -> ... -> overdragen
+-> lokaal aanpassen -> terugvloeien), met als belofte *wie na jou komt, begint
+verder*. Lees die vóór je iets bouwt dat een mens van de ene toestand naar de
+andere brengt of dat kennis tussen mensen en plekken laat reizen. De dragende
+vraag, is er één `Overgang` onder dat alles, is eerst **gemeten** en niet
+aangenomen (`npm run overgangsvorm`, `OVERGANGSVORM.json`), en de eigenaar vroeg de
+meter het idee kapot te proberen te krijgen. Uitslag over
+<!--getal:overgangsvorm.metDrager-->14<!--/getal--> overgangen met een drager en
+veertien dimensies: **geen universele overgang**. Er zijn
+<!--getal:overgangsvorm.dilemmas-->7<!--/getal--> dimensies die ergens een poort zijn en
+elders afwezig, en geen van de voorgestelde families is dilemmavrij, ook de
+groepen niet die de data zelf vormt. Wat overal staat is
+<!--getal:overgangsvorm.kern-->4<!--/getal--> dimensies (naar, actor, actie,
+blokkade): *iemand doet iets, er is een nieuwe stand, en een weigering zegt
+waarom*. Er komt dus geen `Overgang`-object maar een verklaring van werkwoorden,
+en de domeinpoorten (bewijs, kennis, bevestiging, privacy) blijven waar ze staan.
+Drie dingen daar niet wegpoetsen. **Elke stand draagt een citaat dat letterlijk
+in de CODE moet staan**: commentaar telt niet (dat is een belofte), een weigerzin
+wel, en een rot citaat telt als afwezig zodat het de kern nooit kan verhogen.
+**De mutatieproef is gedraaid en niet uitgerekend**: een universele motor die
+alleen de kern kent, laat een blauwdruk zonder gemeten indicator, een
+huiswerkklas zonder VOG en een koppeling zonder recht door waar de echte drager
+weigert. En **`gestopt` is nooit een blauwdrukbron** (dat staat en is gedraaid),
+maar een gestopte buurtpoging laat vandaag ook geen les achter: een mislukking is
+eerst een WAARNEMING en pas na gronding kennis. De twintig wetten en acht
+ontwerpbesluiten staan er met per regel wie hem handhaaft. B7 (vergeten tegenover
+aangenomen collectieve kennis) is een eigenaarbesluit. Par. 7 zet acht
+bevindingen op een rij die niet zijn gerepareerd. De scherpste daarvan: de
+gemeente ziet het exacte aantal hulpvragen van een buurt zodra die als enige
+onder de drempel van vijf valt, want "overige buurten (1)" is één buurt, en de
+gemeente weet welke. Celveilig is niet queryveilig.
+
+**`POLITIEK.md` is het masterplan voor DemocratieOS en de partij** -- twee
+projecten die bewust uit elkaar worden gehouden: DemocratieOS (werknaam) is
+partijneutrale burgerinfrastructuur in FoundationOS voor burgers, organisaties,
+overheden en alle partijen, en een toekomstige partij van de eigenaar is daarop
+een gewone deelnemer, als klant en met exact dezelfde rechten. Dat moet
+technisch gelden, ook als de oprichter RTG bezit. Twee proeven houden het
+eerlijk: P1 (de partij verdwijnt en DemocratieOS draait door) is machinaal te
+bewijzen, P2 (de oprichter verdwijnt uit RTG en de partij draait door) maar half
+-- de rest staat in statuten en contracten, en dat staat er liever dan een groen
+vinkje. Dertien grondwetsregels (DO-01 t/m DO-13) met per regel wie hem vandaag
+handhaaft (meestal niemand), een lus van twaalf stappen waarvan bijna elke stap
+al in een ander domein staat (`livinglab/vraagbesluit.js` IS al *Niemand kwijt*
+voor een domein), en een kwestie die niets bezit en alleen verwijst. Let op de
+namen: `zaak` en `tafel` zijn ernstig bezet (de kern heet `kwestie`),
+**`toezegging` is een financiele belofte van het mecenaat** in de geldgraaf (de
+politieke heet `politiekeToezegging`), en `partij` is een contractpartij of een
+potje (`politiekePartij`). De scherpste regels: er is geen overtuigings-API en
+dat is geen promptfilter maar een capability die niet bestaat, volgorde is ook
+een rangorde (dus nooit alfabetisch of op zetels), en een toets beschermt tegen
+vergissingen en niet tegen de eigenaar -- de echte bescherming van de grondwet
+zit in statuten, een extern verankerd wijzigingslog en review die ook voor
+beheerders geldt. Wetgeving (Wfpp, de aanstaande Wpp) komt er als
+`POLITICAL_LAW_PROFILE_NL` in, met per waarde rechtsgrond, toepassingsbereik,
+bron, geldig-vanaf en laatst-gecontroleerd -- nooit als constante. **Fase A is
+gesloten (25 september 2026)**: DemocratieOS krijgt een eigen rechtspersoon (de
+RTFoundation is initiatiefnemer, geen bestuurder), de grondwet heeft drie
+wijzigingsniveaus (NORMAAL, BESCHERMD, GRONDWET met wachttijd en extern anker) en
+een noodprocedure die alleen mag UITZETTEN en nooit een partijprivilege mag
+maken, en er is een derde proef (P3: RTG verdwijnt) die vandaag niet haalbaar is
+en daarom vanaf de eerste regel een eigen map met verklaarde afhankelijkheden
+eist. Fase B bouwt alleen kwestie -> eindstand -> terugkoppeling -> NIEMAND_KWIJT
+en kent geen partij; fase C probeert dat kapot te maken met drie synthetische
+partijen (Noord, Midden, Zuid). Pas als B en C groen zijn, komt er een echte
+partij aan de runtime -- en dat is niet die van de oprichter.
+
+**`ONTMOETEN.md` is het diepte-document van de twee datingapps** — Vonk en
+Rendez-vous, en vooral waarom het er twee zijn en geen drie. In één zin: **Vonk
+zoekt de juiste mensen, Rendez-vous maakt de juiste ontmoeting** — bij Vonk is de
+match het product, bij Rendez-vous de ontmoeting. De toetsvraag bij elke nieuwe
+functie is dus: maakt dit het vínden beter of het ontmóéten? Lees vóór je aan
+daten, matchen of introduceren werkt vooral paragraaf 4, de grenzen: de software
+port nooit aan tot een volgende stap (de knop mag, de aansporing niet), een
+introductie leunt nooit op een derde, aanwezigheid is zelf opgegeven en nooit
+afgeleid uit RTG Travel, en er komt geen cijfer op een mens — ook niet intern als
+sorteersleutel. De poort (18+ met geverifieerd paspoort) staat op één plek,
+`server/kern/ontmoetpoort.js`, en wordt door beide apps gedeeld; de pas-eis is
+iets anders en blijft op de route. Par. 4 van `LIFE.md` staat er onverkort boven.
+**`TOKEN.md` gaat over de geldvorm zelf** — wat een eigen betaaltoken hier mag
+zijn. De kern in één zin: RTG heeft er al een, hij heet RTG Pay, en de vraag is
+niet of we er een bouwen maar of we hem uit het gesloten circuit halen. Dat is
+namelijk de grens tussen een besluit (`WALLET_SALDO` in
+`kern/bevoegdheid/lijst.js`: gesloten circuit, harde plafonds, niet uitbetaald
+aan het lid) en een vergunning (`GELD_UITGEVEN`, en daar staat geen partnerrail
+naast). Lees vóór je aan tegoed, punten of munten werkt vooral paragraaf 5 en 7:
+wat er bewust niet komt (een eigen chain, crypto eruit, een koers, tegoed dat
+verjaart ten gunste van RTG) en de drie besluiten die openstaan — waarvan de
+eerste, de bank-uitgang, vóór de leden-bank opengaat genomen moet worden en
+niet erna.
+**`WAARDE.md` is de laag onder het geld** — RTG Value: niet wat één lid met zijn
+geld doet (dat is GELD.md) maar wat waarde binnen RTG zélf is. De kern in één
+zin: elke euro, elk tegoed en elk budget weet wie het bezit, waarvoor het
+gebruikt mag worden, wie het mag verplaatsen en welk bewijs daarvoor bestaat.
+Lees die vóór je aan saldo, tegoeden, vouchers, budgetten of uitbetalen werkt.
+Zes waardeklassen met elk een **grond** (`kern/waarde/klassen.js`), drie
+beleidslagen van hard naar zacht (`kern/waarde/policy.js`), en één poort waar
+elke betaling langs gaat (`kern/pay/poort.js`). Twee manieren waarop geld
+vaststaat en ze zijn met opzet niet hetzelfde: een **reservering** is iemand
+anders die uw geld vasthoudt en die vervalt (`kern/waarde/reserve.js`), een
+**oormerk** is u die uw eigen geld apart zet en dat blijft
+(`kern/waarde/oormerk.js`). Verder: budgetten van een werkgever of gemeente als
+eigen positie, slim betalen uit meerdere potjes waarbij het meest beperkte potje
+eerst opgaat, een eigen geldgrens die wél weigert (`kern/geldbeleid/grens.js`),
+treasury voor ondernemers, een terugstorting naar de eigen bankrekening
+(`kern/pay/terug.js`), en een bewijsbord dat drie standen kent en géén groen
+(`kern/pay/bewijs.js`). Vier grenzen die niet mogen sneuvelen: er komt geen
+tweede boekhouding bij, **uitbetaalbaar hangt altijd aan een bevoegdheid en
+nooit aan een boolean** (elke uitbetaalbare klasse noemt haar
+`uitbetaalVermogen`), het plafond per wallet is een grond en geen instelling, en
+de AI beweegt geen geld. Waarom "voucher" het verkeerde woord was, staat in
+paragraaf 1: transactiekosten verdwijnen niet, ze verhuizen naar het
+oplaadmoment — en dát is het echte voordeel.
+
+**`ECONOMIE.md` is de laag erboven** -- RTG Economic Control Plane: de financiële
+intelligentielaag van het hele ecosysteem, als richtingsdocument met per onderdeel
+of het **staat**, **een stap weg** is, **een besluit vraagt** of **jaren weg** is
+(zoals PLATFORM.md en DEVELOPERCLOUD.md). Lees die vóór je aan doorbelasten,
+werelden of financiële voorspellingen werkt. De kern in één zin: **de RTFoundation
+is geen kostenpost van RTG die je over gebruikers uitsmeert, maar een eigen
+rechtspersoon met een eigen vermogen** -- en dat wordt afgedwongen en niet
+beloofd. Vier economische werelden (`consument`, `commercieel`, `rtg-intern`,
+`rtfoundation`) waarvan de wereld een eigenschap is van de IDENTITEIT en niet van
+de transactie, met een **firewall** ertussen die standaard weigert
+(`kern/economie/firewall.js`): een relatie tussen twee werelden bestaat alleen met
+een grondslag én een plafond, het register is standaard leeg, en een weigering
+zegt altijd hoe het wel kan. De nota's van de infrastructuur gaan daarom eerst
+over de vier werelden en pas daarna binnen elke wereld over haar eigen gebruikers.
+Er is een tweede poort die geen relatie kan openen: een rekening landt bij de
+ENTITEIT van een wereld, nooit bij een gebruiker ervan -- RTG mag de stichting
+factureren, nooit een gezin. Wat er nog niet is (economische graaf, provenance tot
+de providerfactuur, periode sluiten, forecast, cost routing) staat in ECONOMIE.md
+mét de reden en de stand, niet als lege functie.
+
+**`KOSTEN.md` is de kostprijskant** -- RTG Kostprijs: wat kost elke gebruiker ons,
+en wie betaalt dat. WAARDE.md gaat over waarde die BINNEN RTG beweegt; dit gaat
+over het geld dat het huis er zelf aan uitgeeft. Lees die vóór je aan tarieven,
+verbruik, doorbelasten of "wat kost een gratis account" werkt. De kern in één zin:
+**elke euro die dit huis uitgeeft krijgt een eigenaar, of de eerlijke mededeling
+dat hij er geen heeft.** Negen kostensoorten (`kern/kosten/soorten.js`) waarvan er
+zeven per gebruiker meetbaar zijn en twee niet; stroom en serverhuur worden
+verdeeld uit de echte nota met de sleutel erbij en dragen daarom altijd de graad
+`vermoed` -- het plafond volgt uit de meetweg en staat níét per regel, want die
+tweede plek werd door de toerekening genegeerd. De meter houdt tellers en geen
+journaal (een gedragslogboek per lid is voor een factuur niet nodig), de drager
+komt uit de async-context die de poort zet (`kern/kosten/haak.js`), en de AI-meter
+hangt op de enige plek waar élke modelaanroep langskomt (`server/ai.js`). Drie
+grenzen die niet mogen sneuvelen: er staat nooit een getal waar er geen is (geen
+tarief of nota = een REDEN, geen nul), deze laag kent geen namen (sessiesleutel,
+zaakcode, gezinscode -- nooit de kluis), en de machine zet klaar terwijl een mens
+uit de boardroom vrijgeeft. Wie wat betaalt staat in `kern/kosten/beleidkaart.js`:
+vier standen, met **RTG Lite en Business Lite er al in en `bestaatNog: false`
+erbij**, en met `gezin` en `huis` als beloften die géén schakelaar zijn -- de
+RTFoundation blijft gratis voor elk gezin, dat gezin ziet alleen wát het kost
+(`/api/foundation/kosten`, alleen de beheerder, en het antwoord opent met de
+belofte en niet met het bedrag). **Vier lezers, vier schermen, een antwoord**:
+een lid ziet het in RTG Geld (stand *Kosten*), een zaak op
+`/apps/zaakkosten.html`, het kantoor op `/apps/kosten.html` -- die drie op
+dezelfde gedeelde vormtaal (`public/shared/kostenbeeld.js`), zodat "vermoed" op
+het scherm van het lid hetzelfde betekent en er hetzelfde uitziet als op het bord
+waar een mens besluit hem de rekening te sturen. Het vierde is het gezin, in het
+beheerscherm van de RTFoundation: eigen route, eigen toon, en het opent met de
+belofte in plaats van met het bedrag. **Alle negen soorten hebben nu een teller of een
+verdeling**: AI en verzoeken via de poorten, berichten via mail én sms (twee
+choke points, want er komt een aanroeper rechtstreeks langs `sendSms`), opslag als
+STAND die je peilt in plaats van optelt (`kern/kosten/meterstand.js` -- wie een
+stand als stroom telt, laat de rekening van wie niets doet het hardst groeien), en
+transactiekosten op het oplaadmoment. Daarbovenop: de herkomstketen tot de
+leveranciersfactuur (`kern/kosten/herkomst.js`, en die eindigt eerlijk bij "zo is
+hij overgenomen door een mens"), de maandafsluiting waarin een maand pas dichtgaat
+als elk verschil een verklaring draagt en een maand **in onderzoek** nooit naar een
+rekening gaat (`kern/kosten/periode.js`), een vooruitblik waarvan de bandbreedte
+pas verschijnt als de trefzekerheid over drie afgesloten maanden GEMETEN is
+(`kern/kosten/vooruitblik.js`), en een verbruiksgrens die de AI-weg werkelijk
+dichtzet terwijl de rest van de app in de regelgestuurde werkmodus doorloopt
+(`kern/kosten/grens.js`; twee sloten, de strengste wint, en `geen-grens` is een
+andere stand dan `ruim`).
+
+**`GIFT.md` is het besluit vóór de doneerknop** -- die knop bestaat met opzet
+niet (`kern/rtfos/donateur.js`: geen doneerknop en geen incasso, geld aannemen
+loopt via RTG Pay en de bank). Lees hem vóór je iets bouwt waarmee de stichting
+geld aanneemt. De verantwoording ERNA is af en streng: het donateursportaal op
+een eigen code, een giftbewijs dat weigert waar het geen gift is (sponsoring,
+tegenprestatie, goederen), en een herkomstcontrole die boven de tienduizend euro
+het geld stil zet in plaats van te waarschuwen. Wat ontbreekt zijn drie
+BESLUITEN, niet drie functies: waar het geld landt (er is geen codenaam of
+positie van de RTFoundation om aan te betalen), welke giftvormen opengaan
+(eenmalig, geoormerkt, periodiek -- en periodiek heet alleen zo met een
+overeenkomst van vijf jaar), en of de stichting zelf een ANBI is. Dat laatste is
+gemodelleerd maar niet aangesloten: `kern/foundationregistratie*.js` en
+`kern/rtfos/partners.js` leggen ANBI en RSIN vast van PARTNERstichtingen, en de
+giftlaag leest die status nul keer -- terwijl er wel een giftbewijs uitgaat. De
+vorm die eruit volgt is die van de terugstortstand hieronder: een schakelaar in
+de boardroom die zelf de juridische positie IS, standaard dicht, en een route
+die dan weigert mét de reden.
+
+**`CARRIERE.md` is de laag BOVEN de rugdekking** -- de mens die waarde opbouwt
+rond zijn talent, naam, prestaties, publiek en loopbaan. Lees die vóór je iets
+bouwt voor een sporter, artiest, maker, model of acteur wiens talent zijn inkomen
+is. De kern in één zin: **de carrièrelus is echt, maar zij is geen object -- zij
+is een verklaring van werkwoorden over domeinen die aantoonbaar niets delen.**
+Dat is geen formulering maar een meetuitslag: `npm run carrierevorm`
+(`CARRIEREVORM.json`) draait op de lezer van `scripts/objectmodel.js` -- een
+tweede parser zou de vergelijking met de Asset-meting waardeloos maken -- en
+vindt over 162 vormen in 15 talentdomeinen **0 velden in alle domeinen**, **0 in
+zelfs maar de helft**, en **88,2% in precies één domein** (platformbreed is dat
+71%, dus de talentdomeinen zijn mínder verwant dan een willekeurige doorsnede).
+De meter is een mutatie aangedaan en bewoog: tot `atelier`+`studio` versmald
+slaat hij om naar 8 van de 10 velden gedeeld. Een `Career`-objecttype is daarmee
+niet gerechtvaardigd; de uitweg is die van `COMMERCE.md` (`Koopbaar` werd een
+verklaring van werkwoorden) met de scheidslijn van `OS.md` eronder -- een
+wedstrijd, een set en een casting zijn domeinvermogen, maar *namens iemand
+onderhandelen* en *een bewijs tonen zonder het dossier te openen* zijn
+platformvermogen. Vijf dingen die het ontwerp corrigeren en die je nergens anders
+moet herhalen. **Een Career Score botst met de scherpste grens die dit huis
+heeft** -- KANTOORMACHT.md, HDI.md, ONTMOETEN.md en INT-04 zeggen alle vier dat
+de meeteenheid nooit de mens is, ook niet intern als sorteersleutel; de vorm die
+overleeft is het **Career Ledger** (chronologisch, per regel bewijsbaar), en die
+grens heeft vandaag vier documenten en **nul** handhavers. **Een fanladder
+(bekijkt → volgt → ... → ambassadeur) is een trechter** en botst met LIFE.md par.
+4: wat iemand heeft gedaan is een feit, waar hij "staat" is een oordeel. **Een
+merk zoekt geen mensen maar schrijft een programma** -- een zoekopdracht op
+leeftijd, geslacht en afgeleide geldzorgen over minderjarigen is het product dat
+niet mag bestaan (FOUNDATION.md par. 5: een eligibility-motor mag alleen
+tóevoegen). **Twee namen zijn bezet**: "RTG Human" botst met HDI.md (juist het
+document waar de `humans`-tabelgrens vandaan komt) en `HUMAN_DEVELOPMENT` met
+hetzelfde -- `CAREER_GRANT` botst met niets en past op de bestaande conventie.
+En de **zes vragen per handeling** vallen naast `kern/envelop.js` in tweeën:
+wie/waardoor/hoe-gevoelig staan er, geld en doel horen er nooit in (de envelop
+zegt met opzet nooit WAT), maar hoedanigheid, namens-wie en mandaat horen bij de
+familie van `actor` -- en dat is een versiesprong op een envelop die gesloten is
+op acht velden, geen toevoeging. **Nummer 5 en 6 van par. 6 staan inmiddels** (`server/kern/vertegenwoordiging/`, scherm `/apps/vertegenwoordiging.html`, acht routes): de machtiging mens-namens-mens, met de grammatica letterlijk uit `kern/stuur/mandaat.js` en zeven regels in code -- versmallen is een doorsnede, leeg is dicht, de lijst is gesloten (negen bevoegdheden met een grond, zeven dingen in NOOIT waaronder delegatie), verval is berekend, aanvaarden doet de client, de eigen grens van de client raakt ook wat AL loopt, en een GEWEIGERDE poging laat een spoor na. Alle zeven met een mutatie nagetrokken. Twee dingen daar niet wegpoetsen: de poort is `volwassen()` en dus **A3**, zodat er vandaag geen machtiging kan worden afgegeven voordat RTG het identiteitsbewijs heeft gezien (met opzet -- maar wie deze laag uitrolt, rolt de verificatie mee uit), en de achttien unittoetsen stonden GROEN terwijl `voorstel()` kapot was omdat `keyVanCodenaam` **async is en een object geeft** -- de fixture hield zich aan de vorm die de code aannam in plaats van aan die van `kern/gids.js`, en alleen de e2e-toets tegen een echte server vond het. Par. 3 is de eerlijke inventaris: het meeste van
+het voorstel bestaat al (selectieve deling met herkomst in `rtgid-claims.js`,
+bijstand, de projectievorm, de ketting in de envelop), en par. 5 verheft zes
+regels tot doctrine met per regel wie hem handhaaft -- bij drie van de zes is dat
+vandaag niemand. De uitstaptoets van par. 5 is machinaal te maken en hoort dat te
+worden: **lock-in door kwaliteit mag, lock-in door gijzeling zakt.**
+
+**`RUGDEKKING.md` is het besluit vóór de sponsorknop** -- wat RTG een
+individuele sporter, artiest of maker biedt, en waarom dat geen sponsoring
+heet. Lees die vóór je iets bouwt waarmee RTG geld, middelen of zichtbaarheid
+naar een MENS beweegt die van zijn talent leeft (clubs zijn `kern/sportclub/`,
+festivals `kern/festival/`, en de filantropie van een lid is
+`kern/rechterhand/mecenaat.js` -- dit gaat over de persoon zelf). De kern in één
+zin: een sponsor koopt zichtbaarheid en is weg zodra de zichtbaarheid weg is,
+terwijl RTG het huis draagt waarin een talent zijn leven, zijn onderneming en
+zijn geld beheert -- dus de toetsvraag is niet "kunnen wij deze sporter
+betalen?" maar **"wat houdt deze mens over als wij morgen stoppen met
+betalen?"** De meting is streng en verklaart de hele richting: van de 74 genres
+zitten er **3** in de sector `sports` (allemaal een CLUB) en **0** bij een
+individuele sporter of artiest, en van de zes waardeklassen is er **geen enkele**
+waarin RTG geld dat van RTG is uitkeert aan een mens -- `LOYALTY` zegt met
+zoveel woorden niet uitbetaalbaar, en `PARTNER_SETTLEMENT` gaat naar een zaak.
+Drie dingen die de opzet corrigeren en die je nergens anders moet herhalen. Het
+woord **sponsor is al bezet en juridisch geladen**: `kern/rtfos/herkomst.js`
+grendel 2 maakt van een gift met tegenprestatie automatisch sponsoring (ander
+regime, een factuur), dus de constructie "de stichting betaalt de sporters, het
+merk plukt de zichtbaarheid" is exact wat `kern/economie/firewall.js` weigert --
+en vóór allebei staat de blokkade uit GIFT.md, want de RTFoundation heeft geen
+positie om aan te betalen. **De grootste ontbrekende steen is niet geld maar de
+ZAAKWAARNEMER**: er zijn drie vormen van namens-iemand-handelen (bijstand,
+servicemachtiging, AI-mandaat) en nul waarin een mens commercieel namens een
+mens handelt -- terwijl de grammatica ervoor al ligt (een mandaat VERSMALT
+bestaand vermogen en verleent er nooit, leeg is dicht, verval is een berekende
+toestand), en dat is het enige in dit document dat geen concurrent heeft. En
+**topsportbegeleiding botst met `kern/zorgniveau.js`**: dat is per definitie het
+professionele niveau, waar RTG de weg mag wijzen en niet de inhoud mag geven --
+de uitweg is de professional IN het systeem zetten (`persoonseis.js`,
+`vakbewijs.js`) en niet een uitzondering op de grens. Acht grenzen in par. 5,
+waarvan de drie scherpste: een sporter onder de achttien is geen merk (geen
+zichtbaarheidsverplichting, geen ranglijst van jeugdtalenten), **rugdekking
+koopt geen stem** (wie geld ontvangt is niet verplicht iets te zeggen -- staat
+er wél iets tegenover, dan is het sponsoring en gaat er een factuur uit), en de
+betaler leest de gezondheid nooit. Er komt géén vijfde wereld: een toptalent
+staat in LivingOS, WorkOS, TravelOS en FoundationOS tegelijk, en par. 7 zet de
+vier besluiten van de eigenaar op een rij.
+
+**`MENSNETWERK.md` is de grondwet voor menselijke vertegenwoordiging** -- niet
+wat een talent IS (`CARRIERE.md`) en niet hoe het geld heet dat naar hem gaat
+(`RUGDEKKING.md`), maar wie iets mag DOEN namens een mens, wie iets over hem mag
+WETEN, en wie VERDIENT aan welke keuze. Lees die vóór je een aanmeldweg, een
+vertegenwoordigingsmodel of een RTG-managementdienst bouwt. De kern in één zin:
+**geen organisatorische relatie met RTG kan menselijke toestemming vervangen,
+verruimen, doorgeven of reconstrueren.** De keten is met opzet omgedraaid -- van
+*mens → waarde → talentstatus → management* naar *mens → behoefte → relaties →
+expliciete bevoegdheden → dienst → bewijs* -- want een mens hoeft niet door RTG
+beoordeeld te worden om binnen te komen. Drie grondwetsregels, en ze staan vóór
+de dienst die ze moet beteugelen: **MN-01 geen bevoegdheidsvoordeel** (tien
+bewijsgevallen, met als aanvalsproef dat de eigenaar van RTG zelf manager wordt
+van een testtalent en zonder machtiging niets kan), **MN-02 scheiding van
+hoedanigheden** en **MN-03 geen commercieel voordeel** (de AI zegt erbij dat RTG
+aan één van de opties verdient).
+
+**Alle drie de grondwetsregels zijn sinds 13 september 2026 TOETSEN en geen
+zinnen** (par. 4a, 4b, 4c, 4e) -- en de derde op een andere manier dan de eerste
+twee. **MN-03 heeft vandaag geen ONDERWERP, en dat is gemeten**: de
+partnervergoeding over omzet is een invariant op nul (geen instelling, geen
+boardroomknop) en RTG is zelf geen hoedanigheid (negen rollen, allemaal een mens;
+"RTG Management" komt nul keer voor). Beveelt de AI dus een partner aan, dan is er
+geen belang om te melden -- niet omdat het verzwegen wordt, maar omdat het er niet
+is. `test/mn03-commercieelvoordeel.test.js` bewaakt daarom niet de openbaarmaking
+maar die twee AANNAMES, en zakt zodra een ervan verschuift; de foutmelding zegt
+erbij dat de toets dan niet moet worden aangepast maar VERVANGEN door een proef op
+het keuzepad. **Een keuzepad bouwen met een vierde optie die niet bestaat, is het
+product verzinnen om de regel te kunnen toetsen** -- dezelfde grond waarop
+AI-CONTEXT-02 bewust geen handhaver heeft.
+
+**MN-01 en MN-02** (par. 4a en 4b). Ze staan bewust apart, want het zijn twee soorten regels: MN-01 gaat over
+BEVOEGDHEID en is structureel te meten (de aanvalsproef: de EIGENAAR van RTG
+krijgt op dezelfde machtiging 404 waar de gemachtigde 200 krijgt -- zelfde
+object, zelfde actie, andere actor), MN-02 over KENNIS. Bij die tweede is de
+verkeerde formulering verleidelijk: *"een medewerker mag niet meer weten"* is
+aantoonbaar onwaar én soms gewenst, want de ledenbalie is een legitieme kennisweg
+met reden, journaal en melding. De regel is **niet-overdraagbaarheid**, en de
+proef heeft daarom een TEGENproef: de kantoorweg moet 200 blijven geven, anders
+is de goedkoopste implementatie "blokkeer alles voor managers" en staat de toets
+groen terwijl het product stuk is. Eén mens, twee sessies, en de managercontext
+wordt vóór én na de kantoorinzage byte voor byte vergeleken.
+**En let op de poort die eruit volgde:** `npm run registerklopt` draait de
+negentien toetsen die een register tegen een VERSE meting houden. Die zijn geen
+van alle onderdeel van `npm run check`, en dat kostte een rode CI terwijl lokaal
+*Alles in orde* stond -- *een register dat door een toets wordt bewaakt, is niet
+gedekt door een groene keuring tenzij die toets onderdeel is van die keuring.*
+Het is een VIERDE begrip naast `versheid` (is de meting van een recente commit),
+`meterijk` (ziet de meter een foute invoer) en `check` (de statische regels).
+
+**Zes metingen gaan vooraf, en twee daarvan veranderen het ontwerp.** Het
+bevoegdheidsvoordeel is al dicht en niet beloofd: er is geen kantoorweg naar een
+machtiging, en `routes/vertegenwoordiging.js` kan per definitie niet bij
+`kluisAuth`. Maar **het journaal faalt open, en niemand heeft dat gekozen**:
+`server/inzagelog.js` geeft `noteer()` een uitslag terug die **geen van de 42
+aanroepende bestanden leest**, het wegschrijven zit in een lege `catch`, en
+zonder database schrijft hij in een weggegooide array en meldt succes. De inzage
+gaat dus door als het spoor niet geschreven wordt -- dezelfde stille faalvorm als
+`res.append` in AFSPRAAK.md. Daarbij is het journaal een ringbuffer (MAX 5000,
+oudste valt eraf) met wél een hashketen eronder: wat er staat is onvervalsbaar,
+maar een keten bewijst niet dat er niets ontbreekt. De reparatie hoort op ÉÉN
+plek (`kern/kantoor/kluispoort.js`) en niet in 42 -- *geen aantoonbaar journaal,
+geen inzage* -- en dat is besluit 5. **Daar hoort een tweede invariant bij, en
+zonder die tweede is de eerste een schijnoplossing**: "geregistreerd" mag niet
+betekenen dat `noteer()` geen fout gooide maar dat de COMMIT geslaagd is, want
+`save()` in `server/db/index.js` zet binnen een bundel alleen een vlag en
+markeert in PostgreSQL-modus uitsluitend dat de responsepoort vóór het antwoord
+één autoritatieve commit moet doen -- succesvol terugkeren betekent daar dus niet
+dat er iets staat. Anders verschuift het probleem van een genegeerde uitzondering
+naar een VALSE BEVESTIGING, en die is erger want hij ziet eruit als bewijs. En
+dat is beproefbaar zonder iets nieuws te bouwen: `server/lib/verraad.js` kent
+`schrijf-verloren` ("keert NORMAAL terug zonder iets te bewaren") en
+`schrijf-faalt` ("een aanroeper die dat stil wegvangt, meldt succes over niets"),
+acht toetsbestanden gebruiken ze, tien raken het inzagejournaal, en de doorsnede
+is **nul** -- de toets bij besluit 5 is dus niet "werkt de poort" maar *weigert de
+poort onder `schrijf-verloren`*. De ringbuffer was een APART besluit (6) en is
+genomen: een hashketen bewijst de integriteit van wat er STAAT en zegt niets over
+wat eraf viel, dus integriteit en retentie zijn twee eigenschappen en de ene
+wordt makkelijk voor de andere aangezien. `server/inzagelog-bewaring.js` bewaart
+daarom op TIJD en niet op aantal -- 730 dagen, want het journaal is het bewijs
+OVER toegang en hoort de gegevens waarover het gaat te overleven -- en `MAX` is
+een NOODREM geworden die, als hij bijt, dat TELT en hardop zegt. Verjaren en
+afgekapt worden gaan nooit op een hoop: het eerste is de termijn die werkt, het
+tweede de belofte die breekt. De belofte reist mee met het antwoord tot aan het
+scherm: de inzagekaart draagt `bewaring` PER BRON (`null` waar deze laag de
+termijn van een andere laag niet kent -- een getal over vier bronnen zou de
+langste of de kortste tot waarheid maken) en zet een tekort van de noodrem in
+`nietZichtbaar`, tussen de rest van wat die kaart niet kan tonen. En besluit 7 is genomen: *een belofte over
+een spoor is pas een regel als het spoor kan weigeren* is **regel 13 van
+`LAT.md`** -- niet de twaalfde, want die was al bezet (*een meting die niet heeft
+gedraaid is geen slechte uitslag*), en dat is precies de soort verwarring waar
+LAT-regel 4 over gaat. De vorm is niet uniek voor het journaal en is nu GEMETEN
+in plaats van geschat (`npm run stilspoor`, `STILSPOOR.json`): van de 1841
+`catch`-blokken in `server/` zijn er 674 volledig leeg, met daarbinnen 18
+SPOOR-schrijvers en 24 OPSLAG-schrijvers waarvan het falen wordt opgegeten. Dat
+getal wijkt af van de eerdere schatting van 468 en hoort daar ook niet mee
+vergeleken te worden: deze meter leest het lijf GEBALANCEERD (dus ook over
+meerdere regels) en telt een lijf met alleen een toelichting als leeg -- een
+commentaar maakt een smoring niet minder stil. Het is een vorm en geen
+aanklacht: `server/log.js` smoort `noteerFout` omdat een logger die zelf gooit de
+oorspronkelijke fout maskeert, en `kern/envelop.js` zegt dat de LEVERING
+voorgaat. Vandaar drie ratels die niet hetzelfde doen -- `stilSpoor` en
+`stilleOpslag` alleen omlaag, `stilSpoorAanroepen` alleen omhoog, want een schuld
+die daalt doordat het instrument blind wordt is de gevaarlijkste vorm van
+vooruitgang -- en een besluitregister ernaast dat nooit van de telling
+aftrekt. **Par. 0.7 keert de volgorde om, en corrigeert
+dit document zelf.** Het duurzame primitief bestaat al en is bewust schaars
+(`db/duurzaam.js`: synchroon met fsync, keert pas terug als de opslag bevestigt,
+met `check.js` regel 47 op zijn AANROEPERSLIJST) -- en deze laag staat er al op:
+`vertegenwoordiging`, `rugdekking` en het carrièreledger zijn duurzaam, het
+inzagejournaal niet. De klasse-meting bestaat ook al (`FAALPROEF.json`,
+`scripts/faalproef.js`: per route, contract afgeleid uit een gemeten effectprofiel
+en pas daarna beproefd met beide verraadstanden). En de plek die eerst genoemd
+werd, klopte niet: `kluispoort.js` is een IDENTITEITSpoort die vóór de route
+draait en het onderwerp van de inzage niet kent -- het contract hoort bij het
+journaal en de leesweg, niet bij de deur ervoor. **Besluit 5 is inmiddels genomen
+en gebouwd** (13 september 2026, par. 0.6a en besluit 5): `inzagelog.noteerVast()`
+levert een uitslag, `kern/ledenbalie-inzage.js` houdt de inzage tegen als het
+spoor niet vaststaat, en onder beide verraadstanden komt er geen dossier, geen
+trefferlijst en geen herstelbericht meer uit. Vier dingen daar niet wegpoetsen.
+**Plaats een garantie waar alle informatie voor die garantie samenkomt, niet zo
+vroeg mogelijk in de keten** -- de kluispoort kent de MENS en niet het onderwerp,
+het journaal kent het onderwerp en niet wat er getoond zou worden. Het journaal
+zegt **`toegestaan` en nooit `geleverd`**: de regel wordt geschreven vóór het
+dossier wordt samengesteld, dus hij legt vast dat inzage is VERLEEND -- zou er
+`ingezien` staan, dan liegt het spoor bij elke mislukte lezing, en in het
+voordeel van het huis. De sleutelbos van de proeven had **één** kantoormens (de
+eigenaar, die overal doorkomt) en heeft er nu twee, `kantoor-a` en `kantoor-b`,
+waarmee het **vier-ogenprincipe voor het eerst is beproefd**: A tekent zijn eigen
+uitgifte → 409, B tekent → 200. En `balieAuth` stond in de bewakerskaart als
+*verfijner* terwijl hij de rol `office` in zijn GEHEEL weigert -- daaruit volgt
+een regel die breder geldt: **een verfijner boven een rol die geen mens
+vaststelt, is een indelingsfout**. Twee registers spraken elkaar daarover tegen
+(`kantoormacht.js` zette hem al in `EIST_MENS`) en de goedkoopste bepaalde wat er
+beproefd kon worden. Het getal is daarmee ook leesbaar geworden: van de 578
+kantoorroutes is **41 bewezen, 1 gezakt, 132 niet-mutatief, 33 voorziening, 55
+onzeker en 316 niet-bereikt** -- vijf dingen heetten `ongemeten`, waarvan er twee
+een EIGENSCHAP zijn (een leesroute heeft geen bevestiging om te breken) en alleen
+`niet-bereikt` omlaag hoort. En let op de leerzaamste bevinding van de
+opruimronde: **een register dat niet is hergedraaid, is een bewering over het
+verleden** -- zeven van de negen "gezakte" routes waren al gerepareerd door
+`kern/kantoorwissen.js` en alleen het ingecheckte bestand wist het niet. De twee
+die echt overbleven zijn dicht, en `/api/bank/akkoord` draagt de les: die stond
+**al** op de duurzaamheidslijst van regel 47 terwijl het AKKOORD zelf er niet
+onder viel -- **een regel op een afdwinglijst noemt een ROUTE en niet een
+handeling**.
+
+**En par. 4c is de AI-helft, die par. 4b hardop openliet.**
+`scripts/aicontext.js` (`AICONTEXT.json`) meet eerst waar Rahul zijn ledencontext
+samenstelt (`aiSystemPrompt` in `kern/ai/prompt.js`): **twaalf invoeren -- 3 op
+het LID, 2 op de PAS, 4 op het HUIS, 3 vaste tekst**. De uitslag die het ontwerp
+stuurt is dat **de muur een VELDSELECTIE is en geen grens**: de ledenstaat draagt
+25 velden, 9 daarvan worden door een KANTOORroute geschreven (`bewaarVerzoek`
+voorop, en die draagt de echte naam van de medewerker uit de kluis), en de
+samensteller leest er twee -- `trip` en `invoices`. De doorsnede is leeg, maar de
+andere drieëntwintig liggen in hetzelfde object, één `...md` verwijderd van een
+tekst die woordelijk naar een modelaanbieder gaat. De architectuur hoeft dus niet
+om; de veldselectie had een handhaver nodig, en die is er nu. **De waarneming is
+de prompt zelf**: hij staat op geen enkel scherm, dus de proef zet een
+nep-modelserver op `127.0.0.1` met `LOCAL_AI_URL` ernaartoe en vangt hem op zoals
+het model hem krijgt. Drie dingen daar niet wegpoetsen. **De dragende toets is de
+GELIJKHEID en niet de woordenlijst** -- een afgeleide regel ("dit lid woont in
+dezelfde regio als het laatst geopende dossier") draagt geen enkele waarde, en
+van de vijf mutaties is dat precies de ene die alleen dáár op zakt. **Een
+gelijkheidstoets heeft een blinde vlek die eruitziet als succes**: met een cache
+op `key` bleef de hele proef groen, dus staat er nu een BESTURINGSPROEF naast die
+iets verandert dat wél hoort door te komen -- *een instrument dat niet kan
+uitslaan, is geen instrument*. En de meting vond onderweg een echt gebrek dat
+niets met contaminatie te maken had: de regel die het lid NOEMT las
+`PERSONAS[tier]`, de DEMO-rij per pas, dus **elk echt RTG-Pass-lid werd aan het
+model voorgesteld als "Amberen Vos, lid sinds Maart 2026"** terwijl zijn eigen
+codenaam iets anders was. Dezelfde fout als de demo-reis twee regels hoger in
+hetzelfde bestand, blijven staan omdat de context nergens te zien is; de
+reparatie neemt **twee velden op naam** over en nooit een spread, want
+`publicUser()` draagt ook `full` en dat is de echte naam.
+**`BEWIJSMACHINE.md` par. 6a is de les erboven, en hij geldt huisbreed: een proef
+kan een geldige uitslag geven en toch het verkeerde experiment zijn uitgevoerd.**
+Vier keer in een week, elke keer met een keurig groen vinkje: `isServerToets`
+herkende één spelling van `require('./helper')`, de wacht daarop las zijn eigen
+commentaar, de veldinventaris telde op de naam `st` het halve huis mee, en een
+marker die woordelijk in Rahuls karakterportret staat wees een lek aan dat er
+niet was. Een bewijs draagt dus niet alleen zijn uitslag maar ook zijn
+**indeling** en zijn **foutmodel**, en die twee zijn zelf aantoonbaar of ze zijn
+niet waar. Twee goedkope helften hebben een eigen meter gekregen
+(`npm run meterklasse`, `METERKLASSE.json`), en **de eerste telling had de
+verkeerde noemer -- zelf een voorbeeld van de regel**: "195 scripts lezen bron, 19
+scheiden commentaar" leest als 176 fouten, terwijl het merendeel bestanden telt en
+nooit een regel commentaar raakt. De klasse die ertoe doet is **73 scripts die
+SEMANTIEK afleiden uit de VORM van de code**, waarvan er 13 scheiden en 60 niet.
+De tweede helft is groter dan proceshygiëne: van de **79 generatoren die stempelen
+(en dus repo-waarheid claimen) grendelen er 12 op een schone boom**, en **0
+grendelen zonder te stempelen**. Die 67 zijn geen foutenlijst -- worktree-lokale
+uitvoer hoort de grendel juist niet te hebben -- maar daarmee is
+`registersUitVuileBoom` geen incidentklasse meer maar een **systematisch ongedekt
+contract**: bij 67 artefacten kan niemand zeggen of "repo-waarheid" expliciet zo
+bedoeld is. Wat er moet komen is geen regel voor alle 79 maar een VERKLARING per
+generator, en dat besluit staat open.
+**En par. 4d is de grondwet die uit die ronde volgt -- AI-CONTEXT-01 t/m 06**, met
+per regel wie hem handhaaft en waar dat niemand is. De dragende is de eerste:
+**een AI-context wordt opgebouwd uit een POSITIEVE lijst velden, nooit uit een
+object waar daarna gevoelige velden uit worden gehaald.** Dat gaat over RICHTING
+en niet over stijl: bij `{ ...md }` gevolgd door `delete` passeert elk NIEUW veld
+de grens vanzelf, bij `{ trip: md.trip }` blijft elk nieuw veld buiten tot iemand
+het er bewust bij zet. `test/aicontext-allowlist.test.js` handhaaft dat met drie
+eisen tegelijk (de gelezen velden zijn gelijk aan een verklaarde `LEDENVELDEN`,
+de ledenstaat wordt nergens in zijn geheel gekopieerd, en er wordt nergens iets
+uit een context VERWIJDERD), en de lijst is met opzet een VERKLARING en geen
+serialisatie -- er wordt niet overheen gelopen, want dan was hij zelf de generieke
+serializer waar de regel voor waarschuwt. AI-CONTEXT-02 (hoedanigheid in de
+cachesleutel) heeft vandaag **geen handhaver** en dat staat er liever dan een
+schijnbewaker: er is geen cache, en wat er wel is, is de besturingsproef die
+omvalt zodra iemand er een bouwt zonder.
+
+Daaruit volgt de vorm van MN-02, en die is anders dan hij eerst was: niet *"een
+RTG-manager ziet hetzelfde als een externe"* (dat sneuvelt, want `kern/ledenbalie.js`
+is een LEGITIEME kennisweg met reden, journaal en melding), maar **geen
+bevoegdheid of kennis uit hoedanigheid A mag stilzwijgend worden gebruikt in
+hoedanigheid B**. Zeven proeven, waarvan de laatste drie de moeilijke zijn:
+terugkeer naar de managercontext neemt niets mee, de AI-context krijgt het ook
+niet als VERBORGEN context, en export, rapport en cache besmetten elkaar niet --
+je kunt namelijk perfect afgeschermde routes hebben terwijl een contextbouwer
+twee werelden alsnog samenvoegt. En het systeem wisselt **nooit vanzelf** van
+context: dat is een beveiligingsgrens en geen sierfunctie. **De hoedanigheid is
+trouwens veel groter dan deze laag**: het woord komt in `server/` voor in vier
+bestanden en alle vier in `kern/vertegenwoordiging/`, terwijl `kern/envelop.js`
+wél `actor` draagt en géén hoedanigheid -- dus dit is de eerste plek waar de
+regel hard bewezen kan worden, en wat hier wordt vastgelegd wordt later
+platformbreed geciteerd.
+
+Verder: acht naamsbotsingen, en **de tweede helft is de leerzaamste** -- na
+`kluis` (192 bestanden), `paspoort` (139), `wallet` (87) en `firewall` (26) zijn
+ook de vier VERVANGENDE namen gemeten, en drie daarvan zijn óók bezet:
+`loopbaanbewijs` is al een scherm, `herkomst` heeft zeven eigen modules, en
+**`bewijsmap` bestaat al als precies deze functie** (`kern/rtgid-bewijs.js` +
+`/apps/bewijsmap.html`), waarvan de kop zegt dat HDI.md die naam koos omdat
+`wallet` bezet was. Alleen `rechtenregister` is vrij; een codenaam en een
+schermnaam hoeven niet hetzelfde te zijn. Drie correcties die niet mogen
+verwateren: een **talentladder**, een **bijdragegrafiek per persoon** en een
+**netwerkwaarde in euro's per mens** zijn alle drie een cijfer op een mens
+(CAR-05) -- de uitweg is meten één niveau omhoog verplaatsen, **RTG meet wat een
+PROGRAMMA oplevert en nooit wat een mens waard is**; er komt **geen `economisch
+persoon` en geen vijfde wereld** (CAR-01 is één van vier losse vragen en blijft
+dicht tot het juridische besluit genomen kan worden); en **pods botsen met de
+NOOIT-lijst**, dus een team is een **mandaatconstellatie** van losse machtigingen
+die de cliënt per stuk aanvinkt, waarbij een lead een specialist alleen kan
+VOORSTELLEN. Par. 7 zet drie poorten vóór het besluit en daarna een **vierde
+ketenproef** in de vorm van `tafelproef.js`: twaalf schakels van zelf beheerd tot
+vertrek, plus tien storingen waarvan de laatste geen hypothese meer is. Par. 9 is
+de nazoekronde die `CARRIERE.md` par. 3 eiste: WebAuthn L3 (25 augustus 2026) en
+C2PA 2.4 (april 2026) bevestigd, de OpenID4VCI-datum klopte niet (26 februari
+2026), en **herkomst is een signaal en geen bewijs** -- nooit een groen "deze foto
+is echt", en *"dit bestand draagt herkomst"* en *"RTG heeft dit op datum X
+ontvangen"* worden nooit vermengd.
+
+**`STAGE.md` is de publieke laag boven de media- en eventdomeinen** -- RTG
+Stage: de publieke en sociale projectie van een mens, organisatie, werk of
+gebeurtenis. Niet een app naast Podium, Theater, Clips, Klankwerk, Salon,
+Festival en Sportclub, maar de laag die ze samen laat leven. Lees die vóór je
+iets bouwt waarmee een maker zijn publiek bereikt of een fan bij een optreden
+komt. De dragende bewering van de opzet -- *`Moment` wordt de fundamentele
+eenheid over acht domeinen* -- is eerst **gemeten** (`npm run stagevorm`,
+`STAGEVORM.json`, op de lezer van `scripts/objectmodel.js`) in plaats van
+aangenomen, want dat is exact de vorm waarin `Asset` en de carrierelus allebei
+al sneuvelden. De uitslag is streng: over 10 publieke domeinen staan er **0** van
+136 velden in álle domeinen, **0** in zelfs maar de helft, en **89%** in precies
+één -- de publieke domeinen zijn dus mínder verwant dan een willekeurige
+doorsnede van dit huis (71%). De meter is een mutatie aangedaan en bewoog:
+versmald tot `clips`+`theater` slaat hij om naar 5 gedeelde velden. Een
+`Moment`-OBJECT is daarmee niet gerechtvaardigd; de vorm die overleeft is de
+**projectie** van `kern/levensgraaf/graaf.js`, hier met zes etiketten
+(onderwerp, soort, bron, wanneer, deel, vermogens) waarvan `deel` een POORT is
+en geen etiket. Zeven correcties die je nergens anders moet herhalen, waarvan de
+vier scherpste: **`moment` is bezet en zesvoudig** (7 plekken in 6 domeinen, en
+de gevaarlijkste is `kern/socialegraaf/bronnen.js` -- een PRIVATE
+levensgebeurtenis onder dezelfde naam als een PUBLIEK moment is de
+`VERMOGENS`-botsing op de centrale naam van een hele laag); **de momentmotor
+bestaat al** en heet `kern/mediaos/wekken.js` (vier soorten, en 5 van de 11
+publieke domeinen roepen de haak `nieuwWerk()` aan -- het werk is aansluiten en
+niet uitvinden); **ManagementOS bestaat en heet `kern/vertegenwoordiging/`**
+(machtiging, de permission-diff in `simulatie.js`, het jeugdbestuur in
+`jeugd.js`) maar zijn bevoegdhedenlijst is met opzet GESLOTEN op negen en
+`publiceren` staat er niet bij -- dus "een manager mag publiceren zonder het
+wachtwoord" is een BESLUIT en geen bouwtaak; en **de relay-boom heeft geen
+terugval** (`herstelBoom()` herkoppelt alleen wezen), wat de voorwaarde is vóór
+er een kaartje verkocht wordt voor een uitzending. Acht grenzen in par. 5,
+waarvan de twee die het verst reiken: er komt **geen fanladder** (wat iemand
+heeft gedaan is een feit, waar hij "staat" is een oordeel) en **de meeteenheid
+is de gebeurtenis en nooit de mens** -- die regel staat vandaag in vier
+documenten met nul handhavers, en Stage is de eerste laag die er een kan
+krijgen. Par. 6 is de `momentproef`: de vierde ketenproef, en de eerste die over
+een PROJECTIE gaat in plaats van over een levering -- hij eindigt niet bij een
+geleverde dienst maar bij iemand die iets WEET. Tien schakels (zeven gesloten,
+drie `openBekend`), dertien storingen gehouden, en daarnaast vier
+ARCHITECTUURbeweringen, want een keten die sluit terwijl de projectie ondertussen
+een tweede waarheid is geworden heeft niets bewezen. Drie dingen daar niet
+wegpoetsen. De twee open schakels zijn ELKAARS spiegelbeeld en allebei een
+besluit van de eigenaar: de fan kan een aanwezigheid niet VINDEN (geen enkele
+route somt ze op -- Discovery), en hij kan na de wek niets DOEN (een melding is
+in dit huis een wek en geen link, en er is geen ledenroute om een festivalkaart
+te kopen -- de Fan Inbox). De derde is de vierde aanleiding zelf: de wedstrijd
+van een sportclub is wel GETELD door `wekdekking.js` maar niet GELOPEN, want de
+zaaiset heeft geen zaak van het type `sportclub` en geen route maakt er een --
+geteld is niet gelopen. En bewering **B is met een mutatie nagetrokken en bleef
+groen**: een volgersteller die vanuit de volgroute werd TERUGGESCHREVEN in de
+producten van het festival haalt het antwoord van de bron nooit, want dat wordt
+gevormd. Daarom staat er een bewering **D** naast die de BRON van de laag leest
+(welke `db.data`-collecties raakt Stage aan), en die vangt hem wel. Zwart-doos en
+bron zijn hier geen keuze maar twee helften. De proef vond zelf ook een defect
+dat geen enkele toets zag: de publieke aanwezigheid van een zaak droeg de naam
+van het FESTIVAL, dus een tweede festival hernoemde de aanwezigheid van het
+eerste en een volger zag een andere naam in zijn lijst zonder iets te hebben
+gedaan. De naam van het festival hoort in de TITEL van het moment; de naam van de
+aanwezigheid gaat over wie er spreekt (`kern/festival/index.js`, `dragerNaam`).
+
+**Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
+is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
+schakelaar *ís* de juridische positie — geen twee dingen die toevallig
+samenhangen. `WALLET_SALDO` is daarom geen vaste soort maar **afhankelijk**, met
+twee uitgeschreven gezichten in `kern/bevoegdheid/lijst.js`:
+
+| Stand | `WALLET_SALDO` | `LID_UITBETALING` | Wat RTG dan is |
+|---|---|---|---|
+| `gesloten` | besluit, met grond | bestaat niet | beperkt netwerk, geen vergunning |
+| `open` (standaard) | rail, e-geldinstelling | rail, sepa | uitgever van elektronisch geld |
+
+Saldo dat tegen de nominale waarde inwisselbaar is voor de houder ís elektronisch
+geld; dat valt niet weg te schrijven. Bouw hier dus nooit een pad omheen dat de
+belofte aan leden verandert zonder dat de bevoegdheidsvraag meebeweegt — dan is
+de knop een manier om om de vergunningplicht heen te komen. Ontbreekt de stand,
+dan geldt per vermogen het strengste gezicht, en dat is niet voor allebei
+hetzelfde.
+
+**`CONCERN.md` is het diepte-document van de bedrijvenkant** — RTG Concern,
+het Company Launch & Workforce OS: van bedrijfsnaam of idee naar een ingericht
+concern, en daarna mensen er moeiteloos in laten werken. Lees vóór je aan
+bedrijven, vestigingen, rollen of personeel werkt vooral de paragraaf *De
+grenzen*: de AI is hier geen juridische autoriteit (elk juridisch gegeven heeft
+een bron én een geschiedenis), een werknemer koopt nooit een pas om te mogen
+werken, en toegang verlenen gebeurt waar de rol woont — er komt geen derde
+rechtenmodel bij. De kern in één zin: **één bedrijf is niet één KvK**, dus
+concern, entiteit, registratie, vestiging, merk en operating unit zijn zes
+begrippen en geen zes velden.
+
+**`PLANNING.md` is de tijd- en capaciteitslaag** -- het voorstel om roosteren geen
+personeelsfunctie te laten zijn maar een universele motor, met als basiseenheid
+`resource + tijd + plaats + activiteit + capaciteit + regels`. Lees die vóór je
+aan een rooster, een dienst, bezetting of beschikbaarheid werkt. De dragende
+bewering is eerst **gemeten** en niet aangenomen (`npm run planvorm`,
+`PLANVORM.json`, op de lezer van `scripts/objectmodel.js`), want dat is exact de
+vorm waarin `Asset`, `Koopbaar`, `Career`, `Moment` en `Manier` alle vijf al
+sneuvelden. Uitslag over <!--getal:planvorm.domeinen-->7<!--/getal-->
+plandomeinen: **<!--getal:planvorm.inAlle-->0<!--/getal--> van
+<!--getal:planvorm.velden-->269<!--/getal--> velden in álle domeinen**,
+<!--getal:planvorm.domeineigenPct-->91.8<!--/getal-->% in precies één
+(platformbreed 70,4%, dus de plandomeinen zijn MÍNDER verwant dan een
+willekeurige doorsnede), en op de lus-as
+<!--getal:planvorm.lusRond-->0<!--/getal--> van zeven domeinen die de keten rond
+maken met <!--getal:planvorm.combinaties-->7<!--/getal--> verschillende
+combinaties. Er komt dus **geen `resources`- en geen `roosters`-tabel**; wat
+overleeft is een verklaring van werkwoorden boven een projectie, waarbij de grond
+rekent en niets bezit. **Het getal dat het product stuurt is `reistijd`:
+<!--getal:planvorm.reistijd-->0<!--/getal--> van zeven** -- geen enkel
+plandomein definieert transitietijd, en dat is het enige dat een zzp'er, een
+schoonmaakteam, een taxi en een beveiliger delen. Vier dingen die je nergens
+anders moet herhalen. **`plan`, `beschikbaarheid`, `simulatie` en `SOORTEN` zijn
+bezet** -- `kern/stuur/plan.js` gaat over capabilities en niet over tijd,
+`kern/beschikbaar.js` is dating-beschikbaarheid die met zoveel woorden GEEN
+kalender is, en `SOORTEN` draagt 49 betekenissen over 51 domeinen. **`mandaat` is
+geen botsing maar een geschenk**: `kern/stuur/mandaat.js` heeft de grammatica al
+(*een mandaat verleent nooit vermogen, het versmalt alleen*), dus er komt geen
+tweede. **De optimizer heeft al een verklaarde lege plek**: `kern/ai/router.js`
+routeert `rooster`, `inplannen` en `bezetting` naar de techniek `optimalisatie`
+en zegt erbij dat er geen constraint solver is. En de scherpste grens: **een mens
+is geen resource** -- een optimizer die op geschiktheid rangschikt maakt een
+cijfer op een mens (CAR-05), en de uitweg staat al in
+`kern/beveiliging/rooster/aanvragen.js`: sorteren op de minste uren, dus op wat
+iemand TOEKOMT en nooit op wat hij waard is. Par. 6 zet per onderdeel of het
+staat, een stap weg is, een besluit vraagt of jaren weg is. Wat bovenaan par. 7
+stond is sinds 27 september gedaan: **de twee autoplanners en het weekrooster
+lezen verzuim** (`kern/payroll/inplanbaar.js`) en plannen automatisch alleen wie
+er volledig is -- deels inzetbaar plant een mens in, en het teamrooster zegt DAT
+iemand afwezig is en nooit waarom. Sinds 29 september lezen ook OV, festival en
+taxi het; bij de laatste twee hing een dienst en een voertuig eerst aan een vrije
+naam, en die kregen daarom een koppeling aan een teamlid. De school heeft een
+eigen verlofregister en hangt er met opzet niet aan.
+
+**`VRIJHEID.md` is de mens die in dat rooster staat** -- RTG Vrijheid: tijd,
+rust, vrijheid en eerlijkheid voor wie bij RTG of een zaak werkt, in
+`server/kern/vrijheid/`. De vraag is niet "waarom zouden we dit toestaan?" maar
+**"is er een concrete reden waarom dit niet kan?"** -- en is die er, dan krijgt
+de mens hem in een zin en eerst een alternatief. Lees die vóór je aan verlof,
+een vrije dag, eerder naar huis of een eerlijke verdeling werkt. Drie dingen die
+niet mogen sneuvelen: **de tijdcategorieën zijn hard gescheiden** (een RTG Day,
+verjaardagvrijheid en eerder naar huis hebben geen of een eigen teller, en er
+bestaat geen functie die de ene van het saldo van de andere afschrijft);
+**WORK_COMPLETE is nooit een lege takenlijst** (een kritieke verantwoordelijkheid
+die alleen de houder zelf afvinkte is UNKNOWN, anders wordt vrijheid een race);
+en **een geweigerd verzoek is een capaciteitsvraag en geen gedragsvraag** --
+blokkeert PAYMENT_L3 steeds de vrijdagmiddag, dan is de uitkomst een tweede
+bevoegde en geen strengere regel. Wat de eigenaar besloot staat in
+`server/kern/vrijheid/rtgbeleid.js` (27 september 2026: tien RTG Days, en een
+verjaardag op een vrije dag schuift naar de vorige werkdag), nog zonder
+juridische toets; wat niet besloten is (nachtdienst, schrikkeldag, drempels)
+staat met opzet OPEN en de motor zegt dan UNKNOWN of BLOCKED met de reden. `server/kern/vrijheid/lus.js` is de
+PEOPLE_TIME_LOOP_COMPLETENESS_CHECK en staat op BLOCKED: de motor is bewezen op
+een teambeeld, de routes en twee schermen staan (Mijn tijd in de personeelsapp,
+Tijd van het team in het Kantoor), en een toegekende hele vrije dag staat via
+het verzuimregister op de loonstrook en vrij in het rooster, maar de bron van dat
+teambeeld en het vakantiesaldo zijn nog niet aangesloten.
+
+**`OFFICE.md` is de richting van RTG Office Next** -- van zes editors naar
+werk: alles wat een bedrijf van Microsoft 365 of Google Workspace verwacht,
+maar documenten, data, processen en AI als één systeem. Een richtingsdocument
+met per onderdeel **staat**, **een stap weg**, **vraagt een besluit** of **jaren
+weg**, over de 26 punten van de eigenaar. Het dragende punt, een universeel
+`RTGObject`, is eerst **gemeten** (`npm run officevorm`, `OFFICEVORM.json`):
+<!--getal:officevorm.inAlle-->0<!--/getal--> van <!--getal:officevorm.velden-->144<!--/getal--> velden in alle <!--getal:officevorm.domeinen-->11<!--/getal--> objectdomeinen,
+<!--getal:officevorm.domeineigenPct-->95.1<!--/getal-->% in precies één. Er komt dus geen objecttype maar een **blok dat
+verwijst** (de view uit `CREATE.md` par. 3) met de gedeelde kop als envelop. Het
+grootste gat is geen functie: **een tekstdocument heeft hier geen model, het IS
+HTML** (`execCommand` op `inhoud.tekst`), en wijzigingen bijhouden, live samen
+schrijven en DOCX zonder verlies rusten alle drie op een model. Lees vóór je aan
+Office werkt vooral par. 4: samenvoegen geldt voor inhoud en nooit voor een
+stand, en classificatie reist mee naar elke uitgang -- de AI-schrijfhulp stuurde
+een strikt document gewoon naar een model (dicht sinds 23 september 2026). Par.
+6-9 brengen de punten 27-150 terug tot **vijftien platformen** met een
+afhankelijkheidsgraaf en een bouwvolgorde; lees par. 6.2 vóór je een van die
+punten bouwt, want daar staan de botsingen met besluiten die al genomen zijn
+(geen zesde gezagsladder voor AI-risico, het commandoveld wacht op de twee
+getallen van `EXECUTIE.md` blok 9, en procesanalyse gaat per stap en nooit per
+mens).
+
+**`ARBEID.md` is het Work Kernel-voorstel, gemeten** -- 48 onderdelen (103 t/m
+150) plus vijftien primitives, met Talent & Hiring als beoogde eerste verticaal.
+Lees die vóór je aan werving, talent, een interne markt of een "kernel" boven het
+Werk OS begint. De vormmeting (ad hoc, graad `vermoed`, op de lezer van
+`scripts/objectmodel.js`) vindt **0 van 309 velden in alle 18 werkdomeinen** en
+88,3% in precies één, dus er komt **geen Work Kernel als OBJECTMODEL**: van de
+vijftien primitives zijn er negen platformvermogen dat al draait (verwijzen, niet
+herbouwen), vijf domeinvermogen waar een gedeeld type de `Asset`-fout is
+(Capability, Opportunity, Relationship, Work, Agreement), en Workflow staat al op
+jaren weg. De echte vondst is een **naad en geen ontbrekende primitive**: er zijn
+**drie werkrelatiemodellen die elkaar niet lezen** (`staffId` aan een zaak,
+`employment` aan een entiteit, het werkruimtelid), dezelfde vorm als de twee
+ritwerelden -- welk model de waarheid is, is een besluit. En Talent & Hiring als
+verticaal stuit eerst op een weigering in code: `server/kern/wereld/lijsten.js`
+haalde `werving.suite` eruit omdat *een half aangezette wervingslaag gevaarlijker
+is dan een afwezige*. Par. 4 somt dertien fouten op die deze meting vond in de
+bestaande werklaag, waarvan vijf een mens raakten en op 23 september zijn gerepareerd: de Foundation-herkomst
+lekt via een ONTBREKEND veld (en `scripts/adamproef.js` schakel 8 is daar blind
+voor), "open voor werk" komt in het log van de huidige werkgever, payroll sorteert
+kandidaten op een score, `public/apps/foundation/werk.html` belooft *geen
+verborgen matchscore* boven een match die op 72 begint, en de beveiligingsplanner
+toetst rust niet over middernacht. De andere acht zijn diezelfde dag ook dicht
+(par. 4): een werkgeversinzage zonder vaststaand spoor weigert, werving staat in
+het Consent Center, een ongeijkt zekerheidscijfer stuurt de voorspeller niet
+meer, de AI-kostenmeter boekt het model dat antwoordde en laat lokaal verbruik
+buiten tarief en grens, en de Edge-balk toont een verboden actie MET haar reden
+in plaats van haar weg te laten. Te weinig rust bij een mens blijft met opzet
+een waarschuwing. **De eigenaar koos dezelfde dag** (par. 7a): `employment` aan
+een entiteit is de waarheid, de keten van vacature tot loon wordt rond gemaakt
+voordat `werving.suite` opengaat, en Métier is de bron van vaardigheden. Dat
+laatste is gebeurd: `werving.suite` staat sinds 23 september weer bij Business,
+als BESCHRIJVEND vermogen en niet als poort op de pas -- de keten wordt bij de
+zaak gepoort, een werknemer koopt nooit een pas, en assessments zitten er met
+opzet niet in. De
+Adamproef loopt sindsdien door tot de loonstrook en is rond: 18 van 18 schakels,
+10 van 10 storingen. De drie breuken die hij vond zijn dicht: een aanname wordt
+een dienstverband bij de entiteit van de zaak (`kern/concern/aanname.js`, een
+brug die een kant op loopt en geen werkgever raadt), een gezinslid neemt zijn
+plek zelf in (de uitnodiging reist mee met zijn sollicitatie, alleen hij ziet
+haar, en hij claimt met een eigen account -- mag vanaf vijftien), en de loonrun
+wordt gemeten bij een Nederlandse zaak in plaats van het land van Café Brisa te
+vervalsen. En de loonrun leest het dienstverband: wie een strook krijgt zonder
+lopend dienstverband bij de entiteit van de zaak, wordt een bevinding
+(`loon_zonder_dienstverband`, ernst `midden` -- zichtbaar, niet blokkerend, want
+de aannames van voor de brug hebben er nog geen). Die worden ingehaald met een
+VOORSTEL en een keuze van de eigenaar (scherm in RTG Concern; `/inhaal` toont en
+leest, `/inhaal/bevestig` legt vast -- een route die allebei deed kreeg van de
+idem-poort een oud voorstel terug): een
+dienstverband op iemands naam is een verklaring van een werkgever, en die wordt
+niet in bulk voor hem afgelegd. Let op de meetfout die daarbij
+bovenkwam: het antwoord van
+`/api/office/payroll/run/open` is een samenvatting zonder stroken, dus wie
+daarin naar loonregels zoekt meet altijd nul.
+
+**`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
+was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG
+PIN), waarachter het platform per context tijdelijke, begrensde bevoegdheden
+uitgeeft. De kern in één zin: **een code zegt wie of wat, nooit wat er mag** —
+dat wordt bij het scannen berekend uit wie er scant, waar hij staat en wat hij
+al mocht. Lees vóór je een QR, een scanner of een koppelweg bouwt vooral
+paragraaf 3, de grenzen: de intentielijst toont wat DEZE scanner mag vragen en
+nooit wat de ander heeft (anders is het menu zelf een profieluitdraai), een scan
+bewijst geen mens, een sticker is geen bron van gezag, en alles wat met een oude
+foto nog iets in gang kan zetten hoort tijdelijk te zijn. Er komt geen tweede
+scanner, geen tweede parser en geen tweede rem naast de huisbrede uit
+`server/kern/sociaal/pin-deur.js`.
+**`COMMERCIE.md` is de Commercial Core** — het commerciële subsysteem onder de
+prijslijst, in `server/kern/commercie/`: catalogus (`../pasladder.js`), pricing
+(`../pasprijs.js`), contract, verbruik (`tegoed.js`), vergoedingen, subsidie,
+fee, allocatie, btw en claims. Drie prijsmechanismen (free, fixed, contract) en
+het onderscheid dat alles bij elkaar houdt: **catalogusprijs ≠ contractprijs ≠
+factuurbedrag**. Vijf regels die er hard staan: de partnervergoeding over omzet
+is **nul** en dat is geen instelling; een **bodem is geen prijs** en mag nooit op
+een factuur belanden; het ledenvoordeel heeft **vier** bedragen met de invariant
+`lid + RTG === bruto === zaak`; een **prijswijziging raakt geen lopend contract**;
+en er ontstaan **nooit ongemerkt** variabele kosten (AI boven het tegoed vraagt
+altijd een keuze vooraf, en automatisch aanvullen vraagt een maandmaximum).
+`claims.poort()` is de release-gate: een bewering die zich AFGEDWONGEN noemt
+zonder toets, komt er niet door. Lees COMMERCIE.md als je aan de structuur werkt,
+PRIJZEN.md als je een bedrag zoekt.
+
+**`PRIJZEN.md` is de commerciële architectuur** — de ladder (gratis, RTG Pass
+65, Business Lite 150, Business vanaf 5.000, Lifestyle vanaf 20.000) en de
+prijsformule waar alles aan hangt: **prijs = toegang + verbruik +
+verantwoordelijkheid**. Lees die vóór je aan een prijs, een bundel of een
+factuurregel werkt. De harde regel daar: **een bodem is geen prijs** — een
+ondergrens weigert invoer en toont "vanaf", en mag nooit op een factuur belanden
+(dat is de € 9.075-fout uit `kern/pasprijs.js`, met een nieuw getal). De ladder
+staat op één plek, `kern/pasladder.js`; `test/pasladder.test.js` handhaaft de vier
+regels die machinaal te handhaven zijn. Paragraaf 4 is de eerlijke lijst open
+gaten — waaronder drie plekken waar de code iets anders doet dan de
+partnervoorwaarden beloven.
+
+**`CONTROLPLANE.md` is het Economic Control Plane** — de laag die vóór iedere
+economische handeling bepaalt of zij mag, en achteraf kan bewijzen waarom. Lees
+die met COMMERCIE.md ernaast: dat beschrijft wat iets kost, dit wie iets mag.
+Vier regels dragen het geheel, en alle vier komen ze uit een fout die hier echt
+is gemaakt: **geen belofte zonder afdwingbare capability, geen capability zonder
+caller, geen bevoegdheid zonder oorsprong, geen economische actie zonder bewijs.**
+
+De drie die je het snelst nodig hebt: een bevoegdheid is **geen ja of nee** maar
+vier dimensies (wat, waar, hoeveel, wanneer) en **delegatie kan alleen
+versmallen** — structureel, niet als vuistregel. Een besluit kent **acht
+uitkomsten** en "nee" is er maar één van; `ONBEKEND` is met opzet géén synoniem
+van `WEIGEREN`, want een storing hoort niet te klinken als een overtreding. En
+een nieuwe handhavingsregel **loopt eerst mee** zonder te blokkeren: je kunt niet
+afdwingen wat nooit in de schaduw heeft gelopen (`schaduw.js`).
+
+`scripts/capabilityroepers.js` is de meting die dit document eerlijk houdt — hij telt
+per capability of er ergens een caller is, en hij vond er vijf die er geen
+hadden. Draai hem vóór je een capability toevoegt. Paragraaf 6.1 is de eerlijke
+lijst van wat er nog openstaat.
+**`AFSPRAAK.md` is de laag die die vier aan elkaar knoopt** — RTG Agreement
+Fabric, als richtingsdocument met per onderdeel of het **staat**, **een stap weg**
+is, **een besluit vraagt** of **jaren weg** is. Lees die vóór je iets bouwt
+waarmee iemand met of via RTG een afspraak maakt: een abonnement, een akkoord op
+voorwaarden, een betaalmandaat, een ondertekening. De kernregel: *domeinen houden
+hun eigen betekenis; RTG deelt alleen bewijs, identiteit, levenscyclus, rechten en
+opvolging.* De eerste opdracht is daarom **bedraden en niet bouwen**, en dat volgt
+uit één gemeten getal: `kern/commercie/contract.js` ÍS een volwaardige
+overeenkomstmotor (acht standen, een expliciete overgangstabel, een bevroren
+prijs, dertien toetsen) en er zijn **0** lezers van die stand buiten de module
+zelf — de pas van een lid hangt aan `sess.tier`, die één aanroeper heeft
+(`accounts.setTier`, het menselijke besluit) en daarna nooit meer beweegt. Een
+opgezegd contract laat de pas dus staan. Drie dingen die het voorstel corrigeren
+en die je nergens anders moet herhalen: **het woord `envelop` is bezet**
+(`kern/envelop.js` is de GEBEURTENISenvelop en zegt met opzet nooit WAT — een
+tweede die juist wél over prijs en voorwaarden gaat, is de `VERMOGENS`-botsing op
+de centrale naam van de laag), er komt **geen zesde uitkomst- of zekerheidsladder**
+(`GEZAGSNOEMER.json` heeft 5 schalen en 21 treden op 4 noemertreden,
+`CONTROLPLANE.md` acht uitkomsten, en `kern/identiteit/vertrouwen.js` vijf
+assurance-standen met de regel *een conclusie is nooit harder dan haar zachtste
+premisse* — dus geen L1–L4), en er hoeft **geen transparency log gebouwd** te
+worden: `lib/keten.js` plus `lib/keten-anker.js` staan en zijn beproefd, en wat
+ontbreekt is een BESLUIT — een anker in dezelfde database is geen anker. Par. 3 is
+de scherpste meting: **31 tekenwegen** (lexicaal, dus een ONDERgrens) waarvan
+**1** een cryptografisch bewijs vastlegt, en het risico is niet het aantal maar
+dat de andere dertig hun eigen definitie van "getekend" mogen hebben. Par. 7.1 is
+het gat dat niemand zag: het **akkoord met de voorwaarden staat in geen van beide
+lijsten** van `consent-register.js` — niet als gedekte laag en niet als
+verklaarde uitzondering — want `test/consent-dekking.test.js` kent één vorm
+(`{ key, status: 'actief' }`) en de onderteken-rij heeft een andere. Acht grenzen,
+waarvan de twee scherpste: **de prijs van het product en de prijs van de
+verplichting zijn twee dingen** en alleen het eerste beweegt (die fout is op 11
+september uit `kern/lid/facturen.js` gehaald: het lid las 99 op een factuur van
+65 die hij zelf had getekend), en **rechten hangen per capability en nooit per
+account** — na opzegging blijven facturen en bewijsstukken, want account-breed
+afsluiten maakt van een opzegging een straf. Let op twee namen die al bezet zijn
+vóór je een scherm bouwt: *Mijn afspraken* betekent in de leden-app al BOEKINGEN,
+en `mandaat` en `machtiging` dragen allebei al een andere betekenis.
+**Stap 3 staat** (11 september 2026): `kern/commercie/lidpoort.js` leest de
+contractstand in `auth()` en houdt NIEMAND tegen. Het getal dat dat opende: 46
+bestanden met een ledenroute toetsen de pas van een lid, 45 vragen `tier ===
+'guest'` (*is dit überhaupt een lid*), één vraagt naar een specifieke betalende
+pas, en **nul** vragen of de overeenkomst nog loopt. Twee dingen daar niet
+samenvoegen: **`GEEN_CONTRACT` is geen `GEEINDIGD`** — de meeste betalende leden
+kregen hun pas van vóór de contractmotor, dus "ik vind geen afspraak" betekent *ik
+weet het niet* en niet *er is niets afgesproken* (`ONBEKEND` is geen `WEIGEREN`),
+en opgeteld meldt de schaduw dat vrijwel élk lid tegengehouden zou worden, wat als
+ruis leest — daarom twee schaduwregels, want *een afgelopen afspraak afdwingen* en
+*elk lid zonder vastgelegde afspraak buitensluiten* zijn twee besluiten. En de
+weging gaat **per lid en niet per verzoek**: de vraag is hoeveel LEDEN een pas
+zonder lopende afspraak hebben, en per verzoek tellen laat wie het hardst klikt het
+getal bepalen — met als keerzijde dat die teller niet vergelijkbaar is met die van
+de abonnementspoort, die wél per verzoek telt. **En er gaat geen IDENTITEIT in die
+teller**: de eerste versie gaf de sessiesleutel mee als voorbeeld, en wat daar dan
+ontstaat is een lijst leden van wie de pas mogelijk vervalt — zonder bewaartermijn,
+en het lid kon hem niet kwijt (`schaduwregels` hield tot dan alleen zaakcodes, dus de
+vergetelheidsbezem kwam er nooit langs). Niet de tak vrijgesteld en niet de bezem
+verbreed, maar de identiteit niet opgeslagen: het product is een getal, en de STAND
+is wat een mens nodig heeft om te besluiten.
+**En let op een vondst die veel breder geldt dan afspraken:
+`server/web/verrijk.js` is een EIGEN Express-achtige schil en geen Express.**
+`res.set` zit erin, `res.append` zat er niet — en een methode die die schil niet
+heeft, faalt STIL: binnen een `try/catch` (en `auth()` heeft er een, want een
+storing in de bewijslaag mag geen overtreding worden) verdwijnt de TypeError
+volledig en blijft de kop gewoon leeg. De regel liep, de meting liep, en het
+antwoord zei er niets over. Controleer dus of een `res.`-methode daar bestaat
+voordat je hem gebruikt; `append` staat er nu wel, één keer naast `set`, omdat
+`RTG-Niet-Afgedwongen` sinds deze stap door twee lagen wordt gezet en `set` de
+eerste weggooit.
+**`KANTOORMACHT.md` is de kantoorkant daarvan** — niet wat een LID mag (dat is
+CONTROLPLANE.md) maar wat een MEDEWERKER van RTG mag, en tot waar zijn macht
+reikt. Lees die vóór je een kantoorscherm, een backofficeroute of een
+"adminfunctie" bouwt. De kern is een omkering: het uitgangspunt *bouw geen
+almachtige SUPER_ADMIN* is juist en het is een verkeerde tijd — die is er al.
+Eén gedeelde `OFFICE_CODE`, één rol `office`, **26 kamers achter één sleutel** en
+**548 muterende kantoorroutes** waarvan er 37 een reden vragen, 99 een spoor
+nalaten, 10 allebei en **0** een tweede paar ogen kennen (lexicaal gemeten, graad
+`vermoed`). De eerste functie van de laag is dus niet macht toevoegen maar
+bestaande macht uit elkaar halen. **Bijna elk onderdeel bestaat al en hangt
+alleen niet aan de kantoordeur**: `commercie/voornemen.js` ÍS het execution plan
+(vijf harde regels, waaronder dat een goedgekeurd plan niet meer kan veranderen
+en dat een nee geen ja wordt door het nog eens te vragen), `commercie/rechten.js`
+ÍS de machtskaart (nominaal náást effectief, en met opzet uitsluitend lezend),
+`kern/envelop.js` draagt met `correlatie` en `oorzaak` de causale auditketen, en
+`command/simulatie.js` heet letterlijk de digitale tweeling. Vier dingen die de
+uitwerking corrigeren en die je nergens anders moet herhalen: **de
+afdwingladder gaat andersom** (`ENFORCE_EXECUTE` vóór `ENFORCE_READ` — lezen
+raakt élk scherm voor de kleinste risicoreductie, en de gevaarlijkste lezing is
+al door `kluispoort.js` afgedwongen); **de 26 kamers zijn werkkamers en geen
+machtsdomeinen** — 18 zijn bruikbaar, `kantine` en zeven productkamers (atelier,
+studio, hardware, architect, reisbureau, regering, opvang) niet, en van de vier
+kamers die het model nodig heeft bestaat alleen RISICO nergens: VEILIGHEID,
+OPERATIES en BESTUUR zijn bestaande macht zónder kamerdeur; **canary op een
+percentage is bij drie medewerkers niet streng maar zinloos** (de verdeling is
+deterministisch op de persoon, dus kantoorbeleid rolt per KAMER uit); en **een
+Critic op dezelfde invoer als de Planner is een stempel** — de tegenspraak ziet
+het plan en het beleid, nooit de redenering erachter. Wat werkelijk vanaf nul
+begint zijn drie dingen: er is **geen enkele risicomodule**, er is **geen
+historische toestand** van entiteiten (tijdreizen botst bovendien met de eigen
+bewaartermijnen), en er is **geen gegevensklasse per VELD** — zonder die derde
+wordt het samengestelde klantbeeld een met de hand onderhouden lijst blokken die
+binnen een jaar uit de code loopt. De AI is blok 9 en niet uit voorzichtigheid
+maar uit rekenkunde: `kern/stuur/beleid.js` kent 0 `/api/office`-paden en
+`VERTROUWEN.json` staat op 0 bewezen, dus de bewijspoort waar dat idee op leunt
+houdt vandaag niets tegen; 9a (alleen lezen) kan wel vooruit, want `tonen` is de
+laagste gezagstrede. Twee grenzen die niet mogen sneuvelen: **een score op een
+mens draagt altijd zijn opbouw** en wordt nooit een sorteersleutel — niet op
+klanten en niet op medewerkers — en **een versmalling die het gevraagde vermogen
+verbergt is een gebrek en geen veiligheid**, dus dekking gaat vóór compactheid,
+precies zoals bij `npm run resolverbereik`.
+**`KANTOOR.md` is de mens in die kamer** — niet wat een medewerker MAG (dat is
+KANTOORMACHT.md) maar wie hij IS, hoe hij binnenkomt en wanneer het systeem juist
+niets moet zeggen. Lees die vóór je aan onboarding, personeelsidentiteit,
+werktoewijzing of een kantoormelding werkt. Blok 0 van KANTOORMACHT.md staat er
+inmiddels als meter (`npm run kantoormacht`, `KANTOORMACHT.json`) en die vervangt
+de lexicale getallen van 2 september door gemeten getallen: <!--getal:kantoor.routes-->688<!--/getal-->
+kantoorroutes, waarvan er <!--getal:kantoor.deurEistMens-->245<!--/getal--> een bewezen mens eisen en
+<!--getal:kantoor.deurGedeeld-->443<!--/getal--> achter de gedeelde code hangen — en
+<!--getal:kantoor.anoniem-->348<!--/getal--> zijn er anoniem uitvoerbaar. Let op de graden: de
+deur-assen komen uit de ROUTER en zijn hard, `anoniem` is lexicaal en dus een
+ONDERgrens — daarom hangt `npm run kantoormacht:controle` (die alleen mag dalen)
+aan de harde as en niet aan de zachte. De kern in één zin: **een spoor dat eindigt
+bij een gedeelde code is geen spoor, het is een alibi** — en de poort die dat
+oplost bestaat al (`kern/kantoor/kluispoort.js`), hij hangt alleen aan 8 van de
+585 routes. Drie dingen die de uitwerking corrigeren: **`Pulse` is bezet** (21
+bestanden, een sociale feed — de gebeurtenismotor heet daarom `weerklank`), een
+**vooruitblik draagt geen `confidence`-percentage** zolang de trefzekerheid niet
+over drie afgesloten perioden is gemeten (INT-04 en de vorm van
+`kern/kosten/vooruitblik.js`), en **`AUTONOOM-BEWEZEN` wordt geen vijfde
+bewijsgraad** maar een checklist van elf uitslagen — de graden blijven vier. Wat
+er al staat en dus niet gebouwd hoeft te worden is het meeste:
+`kern/concern/employment.js` IS de Person→Employment-fundering (op codenaam),
+`server/webauthn/` staat maar hangt niet aan de kantoordeur, en de
+verantwoordelijkheidsgraaf hoort een PROJECTIE te zijn in de vorm van
+`kern/levensgraaf/graaf.js` — er komt geen `humans`-tabel, dezelfde grens als
+HDI.md par. 5.1. Par. 13 is de eerlijke stand: van de tien wetten hebben er zes
+vandaag geen handhaver.
+**`PERSONEEL.md` is wat die mens ERVAART** — niet een HR-lus maar een
+belevingslus: *RTG behandelt iedere medewerker alsof zijn werkdag speciaal voor
+hem is voorbereid, ook degene die de kantine draait.* Lees die vóór je een
+personeelsscherm, een ochtendkaart of een aanbod van Fluister bouwt. De toets:
+de kaart van de kantine en die van de eigenaar zijn HETZELFDE onderdeel, en
+**status ≠ aandacht** (niemand ziet meer omdat hij hoger staat; stilte is
+volgorde en nooit weglating). De meting die de volgorde stuurt: het personeel van
+een ZAAK heeft het meeste al (Team Room, `/api/staff/*`: klok, verlof,
+ziekmelden zonder reden-veld, Fluister voor de vloer met een geheugen dat de
+werkgever nooit ziet), terwijl RTG's eigen kantoor er niets van heeft -- dus er
+komt geen tweede personeelsportaal maar **RTG wordt de eerste klant van zijn
+eigen WorkOS** (besluit B1, genomen op 27 september 2026: ja, helemaal). De eerste stap
+staat in de schaduw: de eigenaar wijst in de boardroom aan welke entiteit RTG
+IS (`kern/kantoor/huis.js`), en de toegangsreview rekent per kantoorhouder uit
+of er een dienstverband loopt -- uitgerekend en niet opgeslagen, want een
+dienstverband eindigt op een datum. Afdwingen is een volgend besluit. "Staff Concierge", "Passport" en "Mijn RTG" zijn
+bezet; de concierge bestaat al en heet Fluister, het paspoort is een lezing van
+`kern/carriereledger/`. De drie andere besluiten zijn op 28 september genomen: een
+vrije verjaardag is een RECHT voor iedereen (standaard uit, zelf aanzetten),
+het loopbaanbewijs heet op het scherm **Mijn loopbaan**, en Fluister biedt
+**alleen op vraag** aan -- de ochtendkaart toont dus wat er staat en stelt niets
+voor. Die kaart staat (`kern/ochtendkaart.js`, `/api/staff/ochtend`, bovenaan
+Vandaag in de personeelsapp): "Alles staat voor je klaar" alleen als elke regel
+GEMETEN is, een afwezige collega is een aantal en nooit een naam, en een
+levering heeft geen tijd omdat een order er geen draagt. De kaart en de planners lezen dezelfde regel (`kern/payroll/inplanbaar.js`); een mens die toch een afwezige inplant wordt niet tegengehouden maar ziet het erbij (`verzuimWaarschuwing`, `verzuimBijVaststellen`). En geen score op een mens, geen "waarschijnlijk" zonder
+meting, en alles wat een tweede persoon bereikt (een ruil, ook voor een
+verjaardag) bevestigt een mens.
+**`MUTATIECONTRACT.md` is de laag ernaast** — niet wie iets mag (dat is
+CONTROLPLANE.md) maar wat een TWEEDE aanroep doet, en hoe hard dit huis dat weet.
+Lees die vóór je een schrijfroute toevoegt of aan idempotentie werkt. De kern in
+één zin: **100% geclassificeerd, 100% meetbaar waar technisch zinvol, 0%
+schijnzekerheid — niet 100% idempotent.** Een route die met opzet een tweede
+handeling uitvoert is KLAAR zodra dat vaststaat en bewezen is; wie dat omdraait,
+verbouwt de architectuur om een percentage. Vijf assen met elk precies één huis
+(semantiek → `kern/mutatie.js`, duplicaatgedrag → `lib/idemsleutels.js`, bewijs →
+`IDEMPROEF.json`, en toegang + stand → `kern/mutatiecontract/klassen.js`), zes standen
+waarvan er maar één naar nul moet (`LEGACY_PENDING_CLASSIFICATION`), en zes
+toegangsklassen zodat "geen rol" ophoudt een restpost te zijn. Drie dingen die
+niet mogen sneuvelen: **een stand wordt nooit afgeleid uit bewijs** (het bewijs
+draagt een voorstel, een mens draagt het besluit), elke stand die toestemming
+geeft om níéts te doen eist een meting én een reden, en een herhaling die wordt
+GEWEIGERD is een toestandscontrole en geen idempotentie. `MUTATIEINVENTARIS.json`
+legt eerst de vijf inventarissen naast elkaar — er liepen vier getallen rond die
+alle vier "het aantal routes" heetten — want een percentage tussen twee
+verschillende noemers is fictie.
+**`TENANT.md` is de buitenkant van de bedrijvenkant** — hoe een partner het
+Werk OS onder zijn eigen naam gebruikt zonder dat er een tweede platform
+ontstaat. Lees die vóór je aan white-label, SSO-inrichting of "enterprise"
+werkt. De kern in vier regels: **`org` IS de klant** (de juridische,
+beveiligings- en contractgrens), een werkruimtecode is een productinstantie
+daarbinnen, een leverancierscode is een relatie en nooit een identiteit, en er
+komt geen vijfde begrip bij. Drie grenzen die niet mogen sneuvelen: het merk
+van een klant geldt binnen zijn eigen blok (de RTG-schil verft niet mee), de
+herkomstregel is in geen enkele modus uit te zetten (wiens software je
+personeelsdossier bewaart is een AVG-vraag, geen merkvraag), en een
+enterprisebewering op een scherm heeft een bron — daarom weigert de modus
+`sovereign` mét de reden in plaats van te bestaan als knop. Levenscyclus,
+uitgang, contract, quota, bewijspoort, de commandobalk met een actiebon, de
+gevolgsimulatie en SAML staan er inmiddels; wat er nog steeds níét is, staat in
+het antwoord van de server als `nietGebouwd` mét de reden en niet als lege
+waarde. Dezelfde regel geldt in het klein overal in deze laag: `nietAfgedwongen`
+in het contract, `nietGerekend` in een gevolgsimulatie, en een geweigerde modus
+die zegt waarom.
+
+**`HORECA.md` is het diepte-document van de horecakant** — RTG Service
+Choreography OS. In één zin: **een kassa registreert wat besteld is; RTG
+regisseert wat er nú moet gebeuren om de hele tafel op het juiste moment een
+goede ervaring te geven.** Eén servicestroom met zes werkstanden (TAFEL, PDA
+SERVICE, VLOER, VUUR, BAR, REGIE) op één gedeelde werkelijkheid — en de PDA is
+daarvan de belangrijkste, niet de kleinste. Lees vóór je aan een horecascherm of
+de keukenlaag werkt vooral de paragraaf *De grenzen*: generatieve AI bepaalt
+nooit of iets veilig is om te eten, een gast is een codenaam (geen labels als
+"grote spender"), er komt geen ranglijst op medewerkers, het systeem vinkt niets
+zelf af, en wat niet gemeten is wordt niet als getal getoond. Daar staat ook wat
+er al staat en dus NIET opnieuw gebouwd moet worden — de rekening is al één
+waarheid over alle kanalen, en het ontbrekende scharnier is de **stoel**.
+
+**`CONCIERGE.md` is de lus rond een wens** -- gast, case-eigenaar,
+collega-conciërge, partner, zijn beslisser en uitvoerders rond één case, waarbij
+de gast het één keer vertelt en ieder alleen zijn stukje ziet. Lees die vóór je
+iets aan De Rechterhand, het Privékantoor of een conciërgewachtrij verandert.
+De meting die hem stuurt: er zijn vijf conciërge-ingangen (`kern/lifestyle`,
+`kern/bureau/cases*`, `rendezvous-concierge`, de hoteldorpafdeling en
+`mall/concierge`), en het meeste van de lus staat al. Mandaat, tijdlijn die bij
+vertraging meeschuift en verstoringen met gevolgen bestaan. Wat ontbreekt: een
+houdbaar aanbod van een partner, doorzetten naar zijn beslisser, een
+deelnemersweergave per rol, en een netwerk van collega's. Dat laatste vraagt
+eerst een besluit. De scherpste nieuwe grens is CON-08: **een verrassing is een
+privacystand en geen notitie**. Eén melding naar de partner en de case is
+mislukt. **Stap 0 tot en met 8 staan in de server** (par. 0a, 30 september 2026):
+`kern/bureau/lus*.js` als tweede werkwijze (`voorstel`) op dezelfde cases, het
+oude verzoek van De Rechterhand als schil erover (`kern/lifestyle/verzoek.js`),
+en een tegenvoorstel met vasthoudtermijn plus doorzetten naar een manager op de
+tafelreservering (`kern/ervaring/tafeluitzondering.js`). Er zijn nog **geen
+schermen** voor, dus voor een mens bestaat de functie nog niet.
+
+**`BESTUUR.md` is het besturingsvlak** — de achterkant van RTG niet als
+backoffice maar als één laag waarin een mens ziet wat er draait, of het gezond
+is, en **hoe hard dat bewijs is**. Lees die vóór je aan een bestuursscherm, een
+meter of een herstelknop werkt. De kern in één zin: *een cockpit die niet kan
+zakken, is een dashboard.* Daaruit volgt de huisregel die overal geldt waar dit
+huis iets beweert: elke bewering draagt een **bewijsgraad** (onbekend, vermoed,
+gemeten, bewezen) met een datum, `niet vast te stellen` is een eersteklas uitslag
+naast in orde en storing, en **vervallen bewijs is geen bewijs**. Twee grenzen
+die niet mogen sneuvelen: de laag die iets toont, meet het niet (anders zeggen
+twee schermen op een dag iets anders over hetzelfde), en toegang van RTG tot de
+omgeving van een klant is een **uitnodiging en geen recht** — geen permanent
+`admin = true`, ook niet voor ons eigen kantoor. Wat er wel en niet staat, staat
+er gemeten bij; wat er nog niet is, staat er mét de grens waarbinnen het gebouwd
+moet worden.
+
+**`APPSTORE.md` is het derdenkanaal** — hoe een app van BUITEN dit huis
+binnenkomt. Lees die vóór je aan de App Store, aan een uitgever of aan de cel
+werkt. De kern in één zin: **een App Store is geen etalage maar een poort met een
+cel erachter.** Zes begrippen (uitgever, app, versie, manifest, keuring,
+machtiging) en zes grenzen, waarvan er drie niet mogen sneuvelen: derdencode
+draait nooit op de RTG-herkomst (een naamloze cel zonder netwerk, en geen vlag
+die dat uitzet), de machinepoort keurt nooit goed (hij laat alleen door naar een
+mens van RTG, en nooit naar de uitgever zelf), en een machtiging die een lid niet
+heeft VERLEEND bestaat niet — het manifest vraagt, het lid geeft. Er zijn er drie,
+en alle drie worden ze uitgevoerd; wat er niet is, staat er met de reden. **Een
+app mag geld kosten** (besluit van de eigenaar): de prijs staat in het manifest
+en gaat dus door dezelfde keuring, kopen gebeurt in de WINKEL en nooit in de app
+(GELD.md par. 3: alles wat een derde raakt is maximaal klaarzetten), de btw hoort
+in het land van het LID en wordt nooit geraden, de afdracht van RTG staat op 0%
+tot de eigenaar hem zet en werkt alleen vooruit, en een ingetrokken gekochte app
+laat een teruggaveRECHT achter dat een mens afhandelt — grens 5 blijft absoluut.
+Er komt geen tweede geldstroom: alles loopt over RTG Pay. **De
+verantwoordingskant staat er ook**: het inkoopdossier (wie is de leverancier, wat
+draait er, wat krijgt de app nooit, waar blijven de gegevens, wat vond de poort,
+hoe werkt de uitgang) met per bewering een bron in de code, de tijdlijn van het
+lid (wat gaf ik, wanneer nam ik het terug — groeit aan, wordt nooit herschreven,
+en de sleutel komt uit de sessie), en de controleronde die eruit haalt wat niet
+meer byte voor byte klopt met wat een mens aftekende. Twee dingen daar niet
+wegpoetsen: het dossier staat bij het LID en niet achter een kantoorpoort, en het
+blok "wat dit dossier NIET zegt" staat er even groot bij — een leverancierspak
+dat overal ja zegt is niets waard. Het dossier heeft drie lezers en dus drie
+ingangen (kaart in de Mall, `/apps/appstore-dossier.html` als adres dat je
+doorstuurt, en "wat de klant leest" op het uitgeversbureau) maar blijft één
+bron. Diezelfde pagina zonder app is het **kanaaldossier**: wat voor élke app
+hier geldt, met de zes machtigingen die met opzet niet bestaan — die vraag stelt
+een inkoper maar één keer, en dat kan alleen omdat elke app op dezelfde cel
+draait.
+
+**`COMMERCE.md` is de verkooplaag boven de domeinen** — hoe er één commerce-laag
+op de bestaande fiscale, waarde-, voorraad- en fulfilmentinfrastructuur komt te
+staan zonder dat er een tweede orderwaarheid ontstaat. Lees die vóór je aan een
+winkel, een mand, een afrekening of een retour werkt. De dragende bewering van het
+voorstel — één `Koopbaar`-protocol met acht werkwoorden over dertien soorten
+verkoopbare dingen — is er eerst **gemeten** (`scripts/commerce.js`,
+`COMMERCE.json`) in plaats van aangenomen, want dat is exact de vorm waarin `Asset`
+al een keer sneuvelde. De uitslag is streng: 437 koopbare vormen in 100 domeinen,
+**0 domeinen die alle acht werkwoorden uitvoeren**, **0 werkwoorden die in álle
+koopbare domeinen staan**, en 43 verschillende combinaties. Eén protocol met 42
+invullingen is geen protocol; `Koopbaar` wordt daarom een **verklaring van
+werkwoorden** en geen interface van verplichte methodes — het model daarvoor is
+`kern/appstore/machtigingen.js`, het enige bestand met een doel én een grens. Wat
+er wél gevonden is zijn twee echte gedeelde vormen, allebei tussen precies twee
+domeinen: het artikel met varianten (mall ↔ retail) en de bestelregel (gast ↔
+horeca). Drie dingen om niet te laten sneuvelen: **één mand is niet één
+bevestiging** (`kern/mall/bestellingen.js` weigert "betaal alles" met reden, en
+dat is een grens en geen gat), er komt geen tweede betaalweg langs
+`kern/pay/poort.js`, en Webmaker krijgt géén commerce-logica. En let op par. 3
+vóór je begint: het woord **`Kanaal` is al bezet** — `SEMANTIEK.json` heeft
+`KANALEN` in de top als botsing (4 domeinen, 4 betekenissen, overlap 0,10), dus
+het nieuwe kernbegrip hernoemt eerst of wijkt uit. Het duurste gat wàs `retour`: 6 van de 100
+domeinen kenden iets dat erop lijkt en geen ervan was een goederenretour. Dat gat
+is gevuld -- `kern/commerce/retour*.js` plus `routes/supplier/retour.js`: zes
+gronden, vijf standen die elk zeggen wélke partij ze zet, een bevroren bedrag en
+btw-tarief, en een geldbesluit dat wordt KLAARGEZET en nooit uitgevoerd.
+**De laag staat inmiddels** (`server/kern/commerce/`, acht bestanden, gemonteerd in
+`opzet/kernlaag2b.js`, scherm `/apps/commerce.html`): werkwoorden, koopbaar, graaf,
+mand en een afrekening per verkoper, draaiend op 100 koopbaren uit de seed. Twee
+dingen die echte data blootlegde en die je nergens anders moet herhalen: `bedrag`
+in `kern/mall/aanbod.js` staat in EURO'S en niet in centen, en `vanaf` is een VLAG
+en geen bedrag -- op een vanaf-prijs wordt niet afgerekend.
+
+**`DEVELOPERCLOUD.md` is de richting boven de App Store** — RTG Developer Cloud:
+een ontwikkelaar bouwt hier in dagen wat elders maanden kost, omdat hij auth,
+billing, compliance, hosting, permissies, observability en enterprise-controls
+niet zelf hoeft te bouwen. Lees die vóór je aan een SDK, een objectmodel of een
+ontwikkelaarsvoorziening begint. Het is een richtingsdocument zoals PLATFORM.md:
+per onderdeel staat er of het **staat**, **een stap weg** is, **een besluit
+vraagt** of **jaren weg** is — zodat niemand die vier voor elkaar aanziet. De
+belangrijkste zin staat in paragraaf 2: **een universeel objectmodel moet worden
+GEVONDEN in de domeinen, niet eroverheen verklaard** — dat is precies de fout die
+de oude super-app-regel al een keer heeft voorkomen. **Die meting is gedaan**
+(`scripts/objectmodel.js`, `OBJECTMODEL.json`) en de uitkomst is streng: 71% van
+de velden hoort bij precies één domein, en **`Asset` bestaat niet** — tafel,
+kamer, podium en leaseauto delen niets buiten hun verpakking. Wat er wél uitkwam
+zijn vier kandidaten, waarvan er één de drempel haalt: een **ontwerpopdracht**,
+gedeeld door architect, atelier, hardwarelab en studio. Voeg geen type toe dat
+niet uit die meting komt.
+
+**`CREATE.md` is de laag bóven de Developer Cloud** — RTG Create: niet één soort
+ontwikkelaar maar de hele ladder van amateur tot enterprise, over de vier
+makersroutes die dit huis al heeft (Website-maker, Website Platform, App Store,
+tenant). Lees die vóór je iets aan een maker, een projectbegrip of een
+publicatiestroom verandert. Alles hangt aan één zin: **Create verenigt
+vindbaarheid, identiteit, publiceren, bewijs en de makerservaring — nooit
+domeinbetekenis zonder gemeten overlap.** Create maakt de ervaring uniform, niet
+de implementatie; de formule is *gedeelde ingang, zelfstandig domein*. Daaruit
+volgt de grondwet CREATE-01 t/m 07 in par. 1, met bij elke regel wie hem
+handhaaft en waar dat nog niemand is. De toetsvraag van PLATFORM.md par. 0b
+beslist per maker of samenvoegen mag, en waar het antwoord niet vaststaat wordt
+het **gemeten** zoals `scripts/objectmodel.js` dat deed — niet aangenomen.
+Website-maker en Website-studio delen aantoonbaar een kern; Lesmaker en
+Clips-studio delen alleen een woord. Let in par. 3 op de bloktaal: de naad loopt
+niet tussen consument en zakelijk maar tussen **inhoud (12), view (`zaakdata`) en
+handeling (`formulier`)** — een blok dat iets DOET is precies waar machtigingen
+aan hangen, en een indeling in consument/zakelijk had die vraag nooit gesteld.
+Par. 9 staat er even groot bij: drie dingen die makkelijk voor bestaand worden
+aangezien en het niet zijn — **Magnaat is een leerspel voor mensen en hoort niet
+in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
+ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
+App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
+zie par. 9.2), en er is geen kostenvlak. En
+par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4376<!--/getal--> routes met een rol
+zijn er <!--getal:idem.beoordeeld-->1739<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3409<!--/getal--> ongemeten (`IDEMPROEF.json`,
+levend getal — `npm run getallen` houdt het bij),
+maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
+`UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
+
+**`OS.md` is de laag ónder de Developer Cloud** — RTG Universal OS: niet "RTG
+heeft veel operating layers" maar "RTG is één besturingssysteem van
+gestandaardiseerde capabilities". Lees die vóór je een capability, een woordenlijst
+met rechten of een nieuwe laag toevoegt. De eerste wet van de opzet — *Everything
+is a Capability* — is er eerst **gemeten** in plaats van aangenomen
+(`scripts/capabilityroepers.js`, `CAPABILITEIT.json`), en de uitkomst is streng: er is
+geen capabilitylaag in deze code, er zijn er **<!--getal:capabiliteit.lijsten-->21<!--/getal-->** met <!--getal:capabiliteit.leden-->248<!--/getal--> leden,
+91% van de leden woont in precies één lijst en geen twee lijsten lijken op elkaar. Twee bestanden dragen
+allebei een `VERMOGENS` met nul gedeelde leden — de les van het gedeelde
+routevoorvoegsel, nu op een woord. Daaruit volgt de grens die het document
+toevoegt aan de opzet: één grammatica mag over het **platformvermogen**
+(`betalen`, `binnenkomen`, `SEPA_UIT` — allemaal "mag deze aanroep, en doet hij
+het?"), en nooit over het **domeinvermogen** (`bookings`, `rides`, `menu` — wat voor
+zaak is dit), want dat is dezelfde fout als `Asset`. Het contract van punt 7 bestaat al en staat in het kleinste hoekje van
+het huis: `kern/appstore/machtigingen.js` draagt als enige een doel én een grens.
+**De eventenvelop staat** (27 augustus 2026): `kern/envelop.js` geeft elk bericht
+op de bus acht velden — id, tijd, versie, kanaal, actor, correlatie, oorzaak,
+classificatie — en de keten loopt vanzelf door, zodat een gevolg-gebeurtenis weet
+waardoor zij ontstond. Drie grenzen daar: **de actor is een codenaam** (de envelop
+weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
+netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
+niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
+houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
+staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1739<!--/getal--> beproefde muterende routes zijn er
+<!--getal:idem.beschermd-->1734<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
+**Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
+lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
+par. 2 heet nu **genre-cap** (domeinvermogen), en *capability* blijft over voor de
+herbruikbare bedrijfsfunctie (platformvermogen). `scripts/lagen.js` leidt de
+lagenmodellen af uit de documenten zelf en `test/genrecap.test.js` zakt zodra twee
+modellen weer een naam delen of een citatie achterloopt op zijn bron. Wat níét
+opgelost is: er liggen nog steeds twee lagenmodellen en de opzet stelt een derde
+voor. Die keuze staat nog open; alleen de naambotsing is weg.
+
+Die hernoeming legde meteen bloot waarom hij nodig was: `PLATFORM.md` noemde
+`rooms` als voorbeeld-cap, en **die cap bestaat niet** — geen van de 73 genres
+draagt hem en `kern/werkvormen.js` maakt hem nergens aan. `kern/fiscaal/tarief.js`
+besliste er wel op of een verkoop 'logies' is, dus die tak was dood en een
+verblijfszaak rekende te veel btw (appartement NL 21% in plaats van 9%, hotel DE
+19% in plaats van 7%). De tak keek de hele tijd groen omdat een toets hem met
+verzonnen invoer voedde. Een cap die een document noemt, wordt sindsdien tegen de
+code gehouden.
+
+**`MAGNAATLAB.md` is Magnaat als testhal** — de rol bovenop het spel dat
+`GAMEHALL.md` beschrijft: de simulatieomgeving waarin een capability bewijst dat
+hij werkt vóór productie. Lees die vóór je Magnaat aan RTG koppelt of een
+simulatiewereld toevoegt. Ook hier is de dragende bewering eerst **gemeten**
+(`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 66 modules en
+121 requires, en raakt daarmee **4 van 576 kerndomeinen** aan — 1%. Als testhal
+bewijst Magnaat vandaag vrijwel niets over RTG, en niet omdat hij RTG heeft
+nagebouwd: van de 20 paren met hetzelfde onderwerp deelt er **geen enkele** een
+vorm. Het
+probleem is afwezigheid, niet dubbeling — er hoeft dus niets te worden
+afgebroken. Veertien van de vijftig punten staan al (chaos, aanvalsbatterij,
+tenant-isolatie, doelschending, canary met automatische terugrol, shadow
+execution op echt verkeer, de bewijsmatrix), maar ze draaien allemaal tegen de
+echte server met testdata en geen van hen in een wereld. De pijp tussen spel en
+platform bestaat trouwens wel en loopt de verkeerde kant op: `magnaat-capabilities.js`
+leest RTG's echte routes en maakt er gameplay van, mét risicoclassificatie — wat
+ontbreekt is de retourrichting. **De scherpste bevinding
+staat in par. 3:** `kern/pay/poort.js` kent geen enkele demo-, test- of spelstand,
+en dat is precies waarom Magnaat er niet bij kan — een spelbank moet geld uit
+niets maken. De uitweg is dus géén vlag in de poort maar een vierde provider naast
+de bestaande demo-provider in `server/betaal.js`; de regel die daaruit volgt is
+**een simulatie-adapter vervangt de rail, nooit de poort**. **Die rail staat**
+(27 augustus 2026): `server/betaal/synthetisch.js`, en de poort is er geen letter
+voor veranderd. Wat hij toevoegt boven de demo is dat hij **stuk kan** — vier
+afloopen (`betaald`, `geweigerd`, `traag`, `terugboeking`), reproduceerbaar
+gekozen uit de idempotentiesleutel. Drie grendels, alle drie fail-closed en elk
+met de reden erbij: alleen met `RTG_SIMULATIEBANK=1`, nooit naast een échte
+provider, nooit in productie. En geen knop in de productieweg: geen enkele
+HTTP-route geeft een scenario door, want dan kan iemand een betaling laten slagen
+die niet geslaagd is. **En Magnaat rijdt er inmiddels op**:
+`kern/spellen/magnaat/rtg-keten.js` stelt de geldpompvraag aan RTG Pay
+(`npm run magnaat:pomp:rtg`) — vijf perverse volgordes, exact nul verschil, en de
+idempotentie gemeten (twintig aangeboden tikken, veertig grootboekregels). Het
+bereik van de simulatielaag ging daarmee van 1 naar 2 kernmodules (vers gemeten
+op 10 september 2026: 5 kernmodules in 4 van 576 domeinen); het percentage blijft
+1% en dat is geen tegenvaller maar te grof gemeten — één capability is geen
+percentage. Het is een **proefstuk en geen koppeling**: geen
+speelbeurt komt langs RTG Pay, en `test/magnaat-rtgketen.test.js` zakt zodra een
+spelmodule `kern/pay` laadt. Twee dingen om niet
+te laten sneuvelen: een Magnaat-PASS is bewijs en geen vergunning (wat het huis
+buiten Magnaat niet toestaat, staat een groene simulatie niet toe), en scores
+mogen op apps en capabilities maar niet op mensen. En er staan al **twee**
+synthetische werelden (Magnaat en `kern/hospitality-universe/`) die elkaar
+aanroepen — die vraag hoort beantwoord vóór er een derde bij komt.
+
+**Punt 22 is ook gemeten** (par. 4.6): kunnen twee plekken die elk niets fout doen
+samen een codenaam terugvoeren naar een mens? `scripts/afleidbaar.js` leest elk
+objectliteraal in `server/` als een stel velden dat samen reist, en maakt daar een
+graaf van; de afstand van `codenaam` naar een harde identificator ís de bevinding.
+Zes staan er **rechtstreeks** naast een codenaam, twee op twee stappen, en het
+**bsn nergens**. Het handwerk erna verwierp de helft — twee treffers zijn de
+identiteitskluis zelf (waar de koppeling hóórt, met een auditregel), twee zijn
+verklaarbare valse treffers, één zit achter een vlag, en één verdient een besluit:
+codenaam plus bezorgadres blijft staan in de operationele data zonder
+bewaartermijn. De meter meet **structuur en geen bevoegdheid** — een lid dat naar
+zijn eigen gegevens kijkt ziet er hetzelfde uit, en een pad door een knooppunt als
+`code` is vrijwel zeker geen koppeling. Zulke paden worden apart gemeld en niet
+weggelaten.
+
+**`BEWIJSMACHINE.md` is de lat boven de testhal** — niet of Magnaat kan bewijzen
+dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
+mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
+of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
+van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->131<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->113<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->424<!--/getal-->
+betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
+dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
+dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
+dubbeling draagt per definitie twee namen. Botsing en dubbeling vragen het
+tegenovergestelde: hernoemen tegenover samenvoegen. **Twee onafhankelijke
+metingen wijzen naar dezelfde vier domeinen** (`architect`, `atelier`,
+`hardwarelab`, `studio`): `OBJECTMODEL.json` via gedeelde vormen, `SEMANTIEK.json`
+via `PALET` en `STATUS` op vier plekken. Dat is het sterkste bewijs voor een
+gedeeld type dat hier te krijgen is. **De eerste reparatie is gedaan:** de vraag
+"welke passen bestaan er" stond op vier plekken (twee met een identieke `pasVan`)
+en woont nu in `server/kern/passen.js`, met `BETALEND` afgeleid in plaats van
+overgetypt — zelfde patroon als `kern/pasprijs.js`. Drie mutaties raak, en de
+meter bewoog mee: 111 → 101 (en staat nu op 106: deze tak zette er zelf
+code bij, en de meter telt de hele boom). De 78 zijn geen foutenlijst
+maar een prijskaart: ze zeggen wat één capability-grammatica (`OS.md`) gaat
+kosten en waar hij het eerst schuurt. **Drie dingen die dit huis al heeft besloten
+en die de opzet raakt:** een enkel `READY` boven een bewijs-scorecard is precies
+wat LAT-regel 11 en `check.js` regel 48 verbieden (bewijsgroen is geen
+go-live-groen, en `scripts/zekerheid.js` bestaat juist omdat losse eerlijke
+getallen samen een gevaarlijk gevoel geven); één samengesteld entropiecijfer
+verbergt welke van de 31 geratelde meters bewoog; en een register dat naast de
+code leeft, wordt binnen een jaar zelf de 78ste botsing — het hoort te worden
+afgeleid, met bron én handhaver zoals `WETTEN.json`. Wat er nagemeten **niet** is:
+release-provenance (geen SLSA, geen SBOM, geen build-attestatie) en een zoeker
+die zelf tegenvoorbeelden genereert — `scripts/sabotage.js` overtreedt elke wet
+één keer met opzet, en dat is iets anders dan zoeken.
+
+**`SERVICE.md` is de laag die de hulplijnen orkestreert** -- RTG Service: niet
+een vijfde klantenservice naast de vier die er al waren (de AI van de RTG Pass,
+de menselijke concierge, de ledenbalie en RTG Bijstand), maar de
+GEMEENSCHAPPELIJKE ENVELOP eromheen. Lees die voor je iets bouwt waarmee een
+gebruiker om hulp vraagt of waarmee een medewerker in het dossier van iemand
+anders kijkt. Die vier blijven bepalen wat iets BETEKENT -- een klacht blijft van
+`kern/ledenbalie-zaken.js` -- en Service bepaalt wie eraan werkt, sinds wanneer,
+met welke bevoegdheid en wat de melder ziet. Het fundamentele object is daarom
+een **Zaak met een tijdlijn** en geen ticket met een status: stand, eigenaar,
+prioriteit en de vier klokken zijn er allemaal uit AF TE LEIDEN, en
+`kern/service/loop.js` is de enige module die die tijdlijn schrijft. Drie dingen
+die niet mogen sneuvelen: **een zaak weet waarover het gaat en opent niets** (het
+veld `betrokken` is een soort plus een code, en `verwijzing()` gooit al het
+andere weg -- gegevens vragen een machtiging, en die vraagt een bevestiging van
+het lid), **een machtiging kan alleen versmallen** (de doorsnede met wat het team
+nodig heeft, met verval als BEREKENDE toestand en een tweede handtekening onder
+zwaar werk -- de vorm van `kern/command/bijstand.js`, met de zaak als bereik), en
+**"ik wil een mens" is een contract en geen beleefdheid**. Dat laatste herstelt
+een echt gebrek: `kern/ai.js` zette voor de RTG Pass hard `needsConcierge = false`,
+en dat klopte als merkregel (de RTG Pass krijgt De Rechterhand niet) maar liet
+een lid nergens bij een MENS uitkomen terwijl de ledenbalie hem gewoon helpt.
+`kern/service/mens.js` haalt die twee uit elkaar -- De Rechterhand is
+UITVOERING en blijft gekocht, een mens bij een probleem is een ONDERGRENS voor
+elk lid met een account -- en `test/servicemens.test.js` houdt per pas vast dat
+hij die zelf kan aanvragen. De vaste steuncode van de balie is vervangen door een
+**bevestiging** (het lid ziet wie, waarvoor en wat er opengaat, en drukt zelf),
+met de code als terugval: zes cijfers, vijf minuten, een keer, aan die ene zaak
+gebonden. Par. 5 heeft vier klokken waarvan de vierde -- wacht op de melder --
+van de andere drie wordt AFGETROKKEN, want zonder hem meet je de melder. Par. 7
+is de schaalwinst: twintig meldingen die hetzelfde zeggen worden een VERMOEDEN
+(geen tweede incident -- dat blijft van `kern/command/incident.js`, en het
+nummer komt daarvandaan), een mens bevestigt, en daarna is het EEN oplossing en
+twintig melders die vanzelf worden bijgewerkt -- maar **een hersteld incident
+sluit geen zaken**, want dat de storing weg is bewijst niet dat het probleem van
+dit lid weg is. Par. 8: de persoonlijke stand zegt NOOIT "alles werkt"
+(beschikbaarheid wordt niet per lid gemeten) en houdt uit elkaar wat een storing
+IS en wat Service erover heeft GEMELD. Par. 9: foutsignalen op vingerafdruk,
+waarbij `gebruikers` op `null` staat MET de reden -- de foutingang is zonder
+inlog en kent geen mensen om te tellen. Par. 13c is RTMail als INGANG: post aan `hulp@` wordt een zaak, met de melder
+uit de identiteitskluis -- een besluit van de eigenaar met een prijs die
+uitgeschreven staat, want de mailingang wordt daarmee een LEESWEG NAAR DE KLUIS
+en draagt dus reden en journaalregel. De scherpste vraag daar is niet de kluis
+maar de AFZENDER: `From:` is door iedereen te typen, dus de kluis wordt pas
+bevraagd als DKIM of DMARC hem bevestigt (SPF alleen niet -- die spreekt over de
+envelop en niet over de From die wij opzoeken). Zonder stempel geen zaak, mét de
+reden en nooit stil. Par. 13 is bellen naar RTG BINNEN de app (geen
+provider, geen nummer, en de zaak ligt ernaast open): een dienst van Lifestyle en
+Business, terwijl EEN MENS dat nadrukkelijk niet is -- die ondergrens uit par. 3
+blijft voor elk account gelden, en de weigering om te bellen zegt er de weg naar
+een mens bij. Beide kanten dragen een MEELEESBAAN (`shared/meelezen.js`), want een
+live gesprek zonder weg naar tekst sluit een dove deelnemer uit -- en dat gesprek
+heeft de ratel `OPEN_MAX` in `scripts/check.js` van 8 naar 10 gezet. Die mag
+volgens zijn eigen regel alleen omlaag; de verhoging staat daar dus
+UITGESCHREVEN, met de reden en met het adres van wat hem weer omlaag brengt (een
+lokaal spraakmodel via LOCAL_AI_URL). Wie een ratel omzeilt zonder het te zeggen,
+sloopt de ratel zelf.
+Par. 13d is het ondertitelen: `kern/spraaktekst.js` zet spraak om met een LOKAAL
+model en wijkt NOOIT uit naar buiten -- een tekstantwoord bij de derde aanbieder
+is net zo goed, de stem van een lid niet. Iedereen ondertitelt ZICHZELF (de
+spreker beslist over zijn eigen stem, en niemand ondertitelt een ander achter zijn
+rug), de knop hangt in de meeleesbaan zelf zodat alle acht gesprekken hem tegelijk
+kregen, en de ratel van keuringsregel 49 ging daarmee van 10 naar 4 -- en die 4 is met opzet geen 2: de ondertiteldeur hangt aan een LEDENsessie, dus bij de teamcall en het schoolgesprek (personeels- en partnersessie) verschijnt de knop soms wel en soms niet, en een register mag geen "soms" als "ja" tellen. Twee van de vier zijn
+UITZENDINGEN: eenrichting, dus zichzelf ondertitelen helpt de kijker niets. Par.
+13e is de capability-telling (`scripts/servicecaps.js`), en die vond eerst geen
+ontbrekende poort maar een bevoegdheid die er niet in hoorde: **`zaak.lezen` hangt
+aan de ZETEL en niet aan een bevestiging** -- het lid las bij elk verzoek "opent:
+zaak.lezen" en gaf dus toestemming voor iets dat de medewerker al mocht. Elke
+bevoegdheid draagt nu een GROND, en 8 van de 9 die het lid bevestigt hebben nog
+geen lezer: ratel 65, mag alleen omlaag.
+Par. 12 is de kwaliteitsmaat, en die is met opzet geen
+afhandeltijd: gemeten wordt hoeveel problemen zijn opgelost ZONDER dat de melder
+zijn verhaal opnieuw hoefde te doen -- en wat er NIET gemeten wordt (tevredenheid,
+afhandeltijd per medewerker, een samengesteld rapportcijfer) staat mét de reden
+in het antwoord zelf, want een leeg vak wordt gevuld met iemands eigen indruk.
+Par. 11 is de ingang voor een ZAAK, die er
+niet was: een leverancier kon RTG nergens iets melden -- er stond wel een zin over
+een vaste contactpersoon, maar geen kanaal. Het systeem vraagt daar niet wie er
+meldt (de zaakcode komt uit de sessie), de doelgroep wordt door de ROUTE gezet en
+niet uit het lichaam gelezen, en een zaak krijgt een MENS en niet De Rechterhand
+-- welke tabel geldt leest `loop.mensVraag()` uit de DOELGROEP van de zaak.
+De AI heeft er drie rollen en maar
+een ervan kan iets OPENEN: die vraagt langs dezelfde weg als een medewerker
+(`kern/service/onderzoeker.js`) en het lid ziet dat er een MACHINE vraagt --
+afgeleid uit het voorvoegsel `ai:`, dat niemand zelf kan zetten. Vier grenzen
+eromheen: de AI vraagt niet uit zichzelf (het zijn routes van een mens, want een
+machine die overal standaard om toegang vraagt maakt van de bevestigingsknop een
+reflex), krijgt nooit zwaar werk (dat vraagt een tweede MENS, en die
+handtekening kan hij niet zetten), leent nooit een machtiging die op naam van een
+mens staat, en opent niets voordat het lid heeft gedrukt. Dat is meteen de eerste
+plek waar `magNu()` een AANROEPER heeft -- tot dan legde de machtiging toestemming
+vast maar opende zij niets, voor een mens net zo min als voor een AI. Par. 10 is de cockpit
+(`/apps/service.html`): zaakgericht en met opzet ZONDER ledenzoeker -- vrije
+inzage blijft bij de ledenbalie, met een reden en een journaalregel -- en alles
+wat het bord beweert draagt een "waarom?", inclusief wat er NIET is gewogen. Het
+bord stelt geen oorzaak vast en zegt dat er ook bij. En par. 13 staat er even
+groot bij: de kale meetronde over de zevenentwintig routes vond VIER fouten die
+geen enkele toets zag en die er bij het LEZEN alle vier prima uitzagen --
+waaronder twee dubbelklikken die twintig melders twee keer hetzelfde stuurden.
+Twee vondsten uit de browsertoets horen daar los bij, want ze gelden voor ELK
+scherm: een functie `open()` op het hoogste niveau van een klassiek script
+overschaduwt `window.open` die de gedeelde schil gebruikt, en die schil laadt met
+`defer` en verbouwt de header -- schrijf je als eerste in `#titel`, dan sloopt de
+TypeError je hele werkblad voordat het gevuld is, en dat ziet eruit als een
+willekeurige flake.
+
+**`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
+tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
+rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur
+als betekenis, en de eigen componenten (Signal Rail, Reference, Action Line,
+Context Pane, Command Palette). In één zin: **van veraf classy, van dichtbij
+extreem krachtig.** Lees die vóór je aan een scherm begint; `test/ontwerp.test.js`
+handhaaft wat machinaal te handhaven is.
+
+**`MATERIAAL.md` is de materialenleer** — een luxemerk denkt niet in kleuren
+maar in materialen en licht. Vijf materialen met elk een basis, een glans en een
+rand: Pearl (gepolijst keramiek, warm en nooit blauw), Gold (geborsteld
+champagnegoud, mat), Onyx (pianolak, nooit egaal), Bordeaux (fluweel, absorbeert
+licht) en Royal (satijn, als enige koel). Plus de twee letterrollen. Kies een
+materiaal, geen kleur; `test/materiaal.test.js` meet of het er nog een is.
+
+**`WERELD.md` beschrijft het beginscherm** — en de harde regel daar is: er is er
+één, en dat is de werktafel van RTG Command. Inloggen, je laatste werkblad
+sluiten en op Home drukken komen alle drie op dezelfde lege keuze uit. De klok
+was hier ooit de kern, met de werelden als merken op een bezel eromheen; die is
+weg (17 augustus 2026), en het springboard eronder is hem gevolgd. Het horloge
+staat nu alleen nog op het inlogscherm. De werelden staan bovenaan de bank, hun
+onderdelen op hun eigen huis, en de enige lijst werelden blijft `MAPPEN` in
+app-main. Rahul woont in de schilbalk zelf: zijn mond staat rechts in de balk
+"Kies een wereld", en een tik maakt van diezelfde balk een vraagveld
+(`shared/command/praat.js`) — geen paneel dat erover komt. Het bedieningspaneel
+(met uitloggen) staat in de voet van die bank. De schil van `apps/app.html`
+bestaat nog als **la** voor die panelen, niet als scherm. Lees ook wat er bewust NIET staat (een verzonnen statusstrook, een
+voorgekookt werkblad) vóór je er iets bij zet.
+
+**`WERELDEN.md` is de kaart** — vier werelden, een kern eronder, en de pas die er
+dwars op staat. **LivingOS** (mijn dagelijks leven), **WorkOS** (mijn werk en
+organisaties), **TravelOS** (mijn reizen) en **FoundationOS** (RTFoundation en
+haar maatschappelijke werk), met de domeinen een niveau lager. Het document trekt
+vier begrippen uit elkaar die steeds door elkaar liepen: **World** (waar ben ik),
+**Capability** (wat kan het systeem), **Access** (wat mag ik) en **Pass** (waar
+betaal ik voor) — *Core ondersteunt Worlds, Worlds organiseren Experiences,
+Access bepaalt wat zichtbaar is, Passes bepalen commerciële rechten.* Bij twijfel
+is er één vraag: **in welke context denkt de mens dat hij zich bevindt wanneer hij
+dit gebruikt?** Daaruit volgt dat de bouwer van een capability niet bepaalt in
+welke wereld hij hoort — RTFoundation mag eigenaar zijn van iets dat in LivingOS
+verschijnt. Twee harde regels: **een wereld draagt nooit de naam van een pas, ook
+niet de stam ervan** (`LifeOS` sneuvelde daarop tegenover Lifestyle Pass), en
+**RTG Core is geen wereld** — 24 functies zitten in élke doelgroep en reizen met
+de mens mee. `test/wereldregister.test.js` houdt het register fail-closed en
+vergelijkt de kaart met de code, zodat een document dat niet meer klopt de bouw
+laat zakken in plaats van stil verkeerd te blijven staan.
+
+**Wat er precies in elke wereld hangt staat in `WERELDLIJST.md`** — 101
+onderdelen met hun adres, geschreven uit `MAPPEN` met `npm run wereldlijst` en
+bewaakt door regel 50 van `scripts/check.js`. Wat daar bewust NIET in staat is de
+laag ertussen: welke onderdelen samen "het huishouden" of "zorg en gezin" heten
+staat nergens in de code, en dat is een ontwerpbesluit en geen afleiding.
+
+**De ladder van de drie passen staat daar ook**, en hij is na te rekenen met
+`npm run groepen` (dat schrijft `GROEPEN.md` uit de bron): **RTG Pass** is het
+hele platform voor één mens (140 functies), **Lifestyle** is hetzelfde platform
+maar er doet iemand het vóór je (143, met De Rechterhand, RTG Zakelijk en het
+Privékantoor als verschil — je koopt uitvoering, geen functies), en **Business**
+krijgt daarbovenop een hele wereld (157, waarvan twaalf van de veertien
+exclusieve functies WorkOS zijn). Lifestyle is een strikte deelverzameling van
+Business; er is geen enkele functie die alleen Lifestyle heeft, en dat is een
+vorm en geen gat. **Waar de prijs aan hangt is wel besloten en staat in
+WERELDEN.md:** RTG betaalt voor het platform, Lifestyle voor **uitvoering** (er
+doet iemand het vóór je) en Business voor **schaal** (per organisatie, per
+vestiging, per medewerker). Niet op functies — drie functies verschil dragen geen
+factor driehonderd, en functies weghalen bij RTG Pass botst met "premium, ook aan
+de onderkant". Het bedrag zelf staat nergens in de code.
+
+**`ADAPTIEF.md` is de adaptieve interactielaag** — hoe dezelfde capability zich
+gedraagt op bureau, tablet, telefoon en stem. In één zin: **bureau toont veel
+context tegelijk, telefoon toont één duidelijke taak met zijn handelingen binnen
+bereik, en de capability zelf verandert niet — alleen zijn vorm.** Geen mobiele
+versie en geen responsive-ronde: een capability declareert per vorm zijn
+presentatie (werkbalk, contextmenu, selectiebalk, lade, paneel, taakmodus), en de
+harde grens is dat **verbergen niet bestaat** — een handeling die op bureau
+bestaat en op telefoon geen vorm heeft, is een gebrek en laat de toets zakken.
+De schilbalk onderin is het eerste instrument: zijn middenzone draagt de werelden,
+de bladacties of de selectieacties, met links altijd de bank en rechts altijd
+Rahul. Lees die vóór je iets mobiel "even responsive" maakt.
+
+**`GRAMMATICA.md` is de RTG Mobile Interaction Grammar** — de vaste manier waarop
+álle RTG-software op een telefoon reageert, in zeven zinnen: *ik wil iets doen →
+mijn duim vindt het onderaan; ik wil meer → ik trek de interface naar me toe; ik
+selecteer iets → RTG begrijpt mijn context; ik wil weten wat er gebeurt → RTG toont
+de toestand zonder mij te storen; ik doe iets gevoeligs → RTG vertraagt precies
+genoeg; ik maak een fout → ik kan bijna altijd terug; ik wissel van RTG-product →
+de bediening voelt bekend.* Vijf gebaren met elk één betekenis (tik doet, lang
+drukken legt uit, omhoog trekken geeft meer, selectie verandert de acties, de orb
+stelt voor), vijf gewichten van `licht` tot `plechtig`, en drie grenzen die niet
+mogen sneuvelen: **ongedaan vóór bevestigen** (twintig "weet u het zeker?"-vragen
+leren mensen op ja drukken), **een verhindering draagt altijd een reden** (er komt
+geen grijze knop zonder uitleg bij), en **de orb stelt voor maar beslist nooit** —
+wat er gebeurt loopt langs capability, verhindering en gewicht, en `plechtig` wordt
+door een mens afgemaakt. Lees die vóór je een handeling toevoegt aan een scherm.
+
+**`EDGE.md` is RTG Edge 3.0** -- één canonieke context-, trust- en actielaag
+voor heel RTG, opgebouwd uit bestaande primitives. Lees die vóór je iets aan de
+balk onderin, de adaptieve Edge, het casco of de handelingen van een scherm
+verandert. De kern in twee zinnen: **de Edge bezit de werkelijkheid niet, hij
+krijgt er een blikveld op**, en **de Edge presenteert bevoegdheid, hij verleent
+haar nooit** -- dus geen derde contextmodel, geen `edge.canPay()` en geen
+Edge-state die naar een domein terugschrijft. Ronde 0 bouwde geen
+productintelligentie maar een meetbare fundering: `npm run edgekaart`
+(`EDGEKAART.json`: per bestand wie schrijft, beslist en leest, elk met een citaat
+dat letterlijk in de bron moet staan) vond 12 verantwoordelijkheden met meer dan
+één eigenaar (twee capabilityregisters, twee contextmodellen, vier plekken die de
+wereld vaststellen, vijf standmachines). Na ronde 1 waren het er 11, want de
+gebaardrempels kregen een eigenaar; de kaart van ronde 2 ziet meer (vijf
+producenten van het tweede register, en dat `gebaar.js` zelf over zijn drempels
+beslist) en telt er nu <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal--> --
+een meter die stijgt omdat hij beter kijkt, en dus een uitgeschreven besluit in
+NORM.json en geen achteruitgang. Daarnaast vond ronde 0
+17 dode kanalen, waaronder precies de vijf signalen waar de adaptieve Edge naar
+luisterde en die geen scherm verstuurde -- ronde 1 sloot ze alle 17 (zestien
+weggehaald, een aangesloten; er is geen zender bij verzonnen), en de kaart staat
+nu op <!--getal:edgekaart.dodeKanalen-->0<!--/getal--> dode tegenover
+<!--getal:edgekaart.levendeKanalen-->17<!--/getal--> levende kanalen. Het **Edge
+Blikveld** (`shared/edge/blikveld.js`) is het ene leespad: elke waarde draagt
+herkomst, gezag en sinds, een leeg veld draagt zijn reden, en `autoritatief` is
+voorbehouden aan de server -- die er vandaag niet is, dus staat `bevoegdheid` op
+`null` met die reden. `shared/edge/actiestaat.js` zet een handeling in een van
+vier standen (AFWEZIG, GEBLOKKEERD, BESCHIKBAAR, LOPEND); alleen een oordeel met
+`bron: 'server'` telt, GEBLOKKEERD draagt altijd een reden, de bevestiging volgt
+de vlaggen van de GEWICHT-tabel en het werkelijke gewicht komt uit
+`grammatica.effectief()` -- dezelfde regel die `gewicht.js` bij het uitvoeren
+gebruikt. **Gewicht is geen voorrang**: gewicht is de zwaarte van een handeling
+en blijft de enige gewichtsschaal, voorrang (wat nu zichtbaar moet zijn) wordt
+een deterministische volgorde zonder score, en `VOORRANG` is als identifier al
+bezet in `server/pg/sync.js`. `npm run edgedekking` meet in een echte browser
+per scherm wat het aan de Edge vertelt, per veld en met opzet zonder samengesteld
+percentage; een nieuw scherm krijgt het harde contract
+(`test/edgenieuwscherm.test.js`), een bestaand scherm mag niet achteruit. Vijf
+gebreken zijn in dezelfde ronde gerepareerd omdat ze bereikbaar waren of de
+verkeerde kant op faalden, en het zwaarste was een dode knop: de lader van de
+adaptieve Edge bracht de balkknoppen mee maar niet de gewichtlaag, dus op een los
+scherm met een register (Office) deed een `bewust`-handeling in het Edge-blad
+niets. Verder voerde de Second Screen handelingen uit langs het gewicht heen, en
+faalden de orb en `bewust` zonder lade open waar de balk en `zwaar` dichtgingen,
+en gold "compensatie is nooit Ongedaan maken" alleen bij het tonen en niet in de
+uitvoerder.
+**Een ingang die een handeling kan uitvoeren, gaat altijd langs
+`RTGGewicht.voer`** -- ook als hij alleen een id kent (`voerId`). De tweede ronde
+besluiten staan in par. 8 van EDGE.md: urgentie krijgt geen eigen schaal maar is
+de voorgrondtrede, voortzetting wordt eerst lokaal afgemaakt, een verzoek loopt
+via het domein en niet via een eigen verzoekobject, eerst de hoedanigheid in
+sessie en envelop en dan pas een rolwisselaar, het werkdeck gaat over het open
+werkstuk, en **een nieuw scherm met een eigen hoofdactie publiceert zijn context
+zelf** (`contractNieuw`).
+**Ronde 1 staat** (EDGE.md par. 10 en 11): de dode kanalen zijn gesloten, het
+tweede register kent alleen licht en voert uit langs `RTGGewicht.voer` (LEEG is
+ronde 2), "wat weegt dit" heeft een antwoord (`effectief()`; zonder grammatica
+blijft een gewicht staan en gaat zwaar dicht), de gebaardrempels staan op een plek
+(`DREMPELS` in `grammatica.js`; zonder tabel is een gebaar uit, nooit een kopie),
+en de schil leest de hoofdactie van het ACTIEVE blad (`edge/blikveld-hoofdactie.js`).
+
+**`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
+pages, it is a movable operational space. Surfaces met een gouden greep rond een
+centrale console, en Context Linking dat alleen een verwijzing rondstuurt.
+
+**`ONDERHOUD.md` is de onderhoudslaag** — vier wachters voor de grond die
+zonder commit verschuift (runtime, browser, live-site, wet) en de herstellus
+die van elk rood licht een fix-issue met diagnose maakt. De twee vaste grenzen
+daar: mergen blijft mensenwerk (met als enige, gesloten uitzondering de
+Dependabot-klassen in `automerge.yml`), en de wetwacht meldt alleen — het
+juridische oordeel blijft bij een mens.
+
+**`BETROUWBAARHEID.md` zegt wanneer een functie BESTAAT** -- en dat is iets
+anders dan of het scherm laadt. De definitie: *een functie bestaat pas als een
+echte gebruiker haar volledige bedoeling kan voltooien, de uitkomst correct wordt
+opgeslagen, fouten begrijpelijk worden afgehandeld, rechten kloppen en dezelfde
+stroom na storing, refresh en herhaling betrouwbaar blijft werken.* Lees die vóór
+je zegt dat iets werkt. De meeteenheid is een **belofte en geen scherm** --
+Navigatie is niet een HTML-bestand maar *breng mij van hier naar mijn bestemming*
+-- dus wordt er geteld per onderdeel uit `MAPPEN`, met de persona aan wie de
+wereld het toont. Acht bewijzen (bereikbaar, bedienbaar, voltooibaar,
+waarheidsgetrouw, persistent, bevoegd, herstelbaar, menselijk), waarvan er
+vandaag drie gemeten worden door `npm run appwerkt` (`APPWERKT.json`); de andere
+vijf staan er per rij bij als `GEEN_FIXTURE` **met de reden**, want een bewijs dat
+je weglaat leest als een bewijs dat je haalt. De standen zijn gesloten en
+"waarschijnlijk goed" zit er niet bij: BEWEZEN, GEBLOKKEERD_DOOR_DEFECT,
+GEBLOKKEERD_DOOR_CONFIG, GEEN_FIXTURE, NIET_GETEST -- en de stand van een rij is
+de STRENGSTE van haar bewijzen. Het verschil tussen DEFECT en CONFIG wordt niet
+geraden maar gelezen uit wat de server zelf zegt (een `hoe` bij de weigering).
+Par. 4 is het grootste ontbrekende stuk: een gecontroleerde testwereld waarin
+betalen, versturen en verwijderen ECHT mogen -- en de regel daarboven staat al in
+MAGNAATLAB.md (*een simulatie-adapter vervangt de rail, nooit de poort*). Par. 6
+staat er even groot bij: vier stille defecten uit één middag handmatig kijken, die
+geen enkele bestaande toets zag -- waaronder een ingang in LivingOS naar een
+scherm met een andere deur. **Een zichtbare ingang naar een onbereikbare functie
+is een productdefect, ook als elke regel code klopt**; daarom gaat bewijs 1 over
+een persona en niet over een URL.
+
+**`TIKKEN.md` zegt hoe diep het huis is** -- hoeveel tikken elke functie van het
+beginscherm af ligt, gemeten met `scripts/tikken.js` in een echte browser op
+telefoonformaat en niet geschat. De belofte staat er in twee helften, en de
+tweede is even hard als de eerste: **elke functie van een lid ligt binnen vijf
+tikken, en elk scherm dat er niet ligt draagt een uitgeschreven reden** (ROL,
+LANDING of STAND, in `MET_REDEN`). Een belofte "alle schermen" zou het huis
+dwingen een meldkamer op het beginscherm van een lid te zetten -- daarom meet de
+meter per ROL (lid, zaak, kantoor), elk met een echte sessie, en telt de kortste
+weg van de mens die er hoort te komen. Een rol die niet ingelogd kon worden laat
+de controle zakken: niet gemeten mag nooit als "in orde" langskomen. Lees die vóór je
+een scherm toevoegt of een menu verandert. Twee dingen daar niet wegpoetsen: de
+meter telt alleen ECHTE bestemmingen (een knop die zijn adres alleen in
+JavaScript kent, bestaat niet voor hem -- daarom is hij niet met een belofte op
+te poetsen, en daarom draagt elke rij van de sprong zijn `data-url`), en de korte
+weg zelf, `shared/sprong.js`, verzint geen bestemmingen: zijn lijst wordt
+AFGELEID uit `MAPPEN` door `scripts/sprongindex.js`. Er komt geen tweede lijst
+apps bij en geen tweede spotlight naast die van de leden-app. De sprong toont ook
+HANDELINGEN: die van dit scherm komen uit `RTGAppMenu.functies()` (dezelfde lijst
+als het app-menu, geen kopie), die van andere apps uit
+`shared/handelingindex.json` -- gelezen uit de knoppen van de schermen zelf, en
+een tik brengt je ERHEEN zonder iets uit te voeren. Of dat werkt is niet beweerd
+maar gemeten: `scripts/vindbaar.js` (`VINDBAAR.json`) vraagt of je een functie
+terugvindt met het woord dat erop staat, en die stond op 21% voordat de
+handelingen erin zaten.
+
+**`TOEGANKELIJK.md` zegt wat een mens met een handicap hier wel en niet kan** — per soort barrière, met de meting erbij en met de dingen die geen poort ooit ziet. Lees die vóór je iets aan een scherm verandert. De harde poorten (contrast en structuur op nul in beide staten, de springlink, het ondertitelregister, en elk raakvlak minstens 24x24 op telefoonformaat) staan erin met wat ze tegenhouden; daaronder staat per mens waar het ophoudt. De belangrijkste zin is de laatste: er is nog nooit iemand met een handicap door dit huis gelopen, dus alles wat daar staat is gemeten met een browser en niet met een mens.
+**`PROOF.md` is het diepte-document van de vertrouwenslaag** (werknaam RTG
+ProofOS): vertrouwen als levende uitkomst in plaats van instelling. De
+hoofdregel staat in paragraaf 0 en is mechanisch: **altijd voor de 100%, nooit
+minder** -- bewijs mag alleen groeien en schuld alleen krimpen (normtanden
+`bewijsCellenBewezen` en `bewijsAchterstand`), en elke afwijking heeft een naam,
+een reden en een sluitweg in BEWIJSSCHULD.json. Lees vooral paragraaf 9, de
+grenzen: bewijs is nooit een verhaal, degraderen is nooit stil, en niemand zet
+een vervalstaat met de hand op bewezen. `scripts/vertrouwen.js` meet de
+vervalstaten per route.
+
+**`FABRIC.md` is het richtingsdocument van de laag BOVEN PROOF** -- de AI
+Execution Fabric: van software bedienen naar een doel uitspreken. De zin die de
+architectuur draagt: **een onbewezen handeling staat niet in de lijst waaruit de
+AI kiest** (proof-aware routing; de bewijspoort in `server/kern/stuur/beleid.js`
+laat een geschorste capability uit `toegestanePaden` vallen). Lees vooral
+paragraaf 5, de grenzen: de AI kan nooit meer dan de persoon die hem iets vraagt,
+geld verlaat het huis nooit vanzelf, wat een tweede persoon bereikt bevestigt een
+mens, en autonomie wordt gepromoveerd en nooit geslopen.
+
+**`EXECUTIE.md` is de laag eronder** -- de RTG Execution Plane: niet "we moeten
+een veilige AI-executielaag ontwerpen" maar "we hebben meerdere volwassen
+executiemechanismen die nog niet als een platformwaarheid functioneren". Lees die
+voor je iets bouwt dat bepaalt of een handeling mag, hoeveel bevestiging hij
+vraagt, of hij te herhalen is of hoe hij terugdraait. De kern in een zin: **een
+scherm, een automatisering, de commandbalk, een AI-agent, een externe aanroep en
+een geplande taak leveren allemaal intentie -- alleen de execution plane
+veroorzaakt effecten.** Het opent met de gezagsvraag: `kern/frictie/motor.js`
+rekent per geval uit of iets `hand`, `assist` of `auto` mag (met de score-opbouw
+erbij, want een cijfer zonder opbouw is een orakel), terwijl `kern/stuur/beleid.js`
+er naast staat met 21 patronen `direct` en 27 `voorstel`, vast per route en
+ongeacht bedrag. **Het zijn er trouwens vijf en geen twee** -- `scripts/gezag.js`
+registreert vijf gezagsvocabulaires plus 22 losse niveaunamen -- en ze botsen
+vandaag NERGENS: van de 120/40/16 AI-bedienbare paden is er geen enkele een
+Command-route. Dat is geen geruststelling maar een tijdvenster, want PLAN heeft
+die kruising nodig. De eerste opdracht is daarom semantische consolidatie en geen
+featurewerk. Vijf van de zeven "grote sprongen" blijken al gebouwd, alleen voor
+de ops-cockpit: voor- en nacontrole (`command/transactie-poorten.js`, waar *een
+controle die niet kon draaien niet geslaagd is* en de verificatie POSITIEF
+nakijkt), de transactie met terugweg, de zandbak die uit de zaaiset draait en
+niet uit productie, de simulatie met haar aannames in de uitslag, en het
+ketenspoor van `kern/envelop.js`. Echt ontbrekend zijn er vier: **PLAN als
+object**, de capability-compiler, het mandaat, en de optimizer zelf. Zes grenzen
+bovenop die van FABRIC.md, waarvan de drie scherpste: een **mandaat verleent
+nooit vermogen** maar versmalt alleen bestaand bewezen vermogen (de speelruimte
+is een doorsnede en geen optelsom), **voorbereiden, verplichten en betalen zijn
+drie gebeurtenissen** die er als een knop uitzien terwijl GELD.md erboven staat,
+en de **executiekaart is een projectie en nooit een bron** -- wie hem met de hand
+kan bijwerken heeft de 22e capabilitylijst gemaakt. Let op par. 5 voor je een
+volgorde kiest: `VERTROUWEN.json` staat op **0 bewezen, 0 geschorst en 4180
+verzwakt** -- maar dat register draagt het stempel van 20 augustus en zijn acht
+bronnen zijn op andere commits gemeten, dus `--vastleggen` weigert terecht; VERS
+gerekend is het 1 bewezen (sinds de reparatie in CODE.md par. 0.9), 44 GESCHORST
+en 4786 verzwakt. Wie het register citeert zonder zijn stempel te lezen, citeert
+20 augustus. De bewijspoort houdt vandaag niets tegen en de regel "onbekende
+uitvoeringssemantiek krijgt nooit maximale autonomie" zet nu ALLES op het
+minimum -- die hoort dus eerst in de schaduw te lopen. De stuurmaat is niet
+"wanneer hebben we Mijn AI" maar **wanneer kan RTG een volledige keten
+bewijzen**; par. 7 zet er een van vier routes klaar, met per route gemeten wat
+er nog aan ontbreekt en waarom (twee zijn ongemeten omdat de proef geen
+gekoppelde groothandel had, niet omdat ze riskant zijn). **Blok 0 staat**
+(`server/kern/stuur/resolver.js`): de tool `kaart` geeft niet langer alles wat
+een rol mag maar de paden die DEZE opdracht raken -- **het succescriterium is DEKKING en
+niet compactheid** -- liever veertien relevante paden dan drie waarvan de juiste
+ontbreekt. Daarom twee meters en met opzet geen samengesteld cijfer
+(`npm run resolver`, over 27 zinnen in negen taalvormen): versmalling 89% kleiner
+(werkveld 8,8 paden) en **dekking 100%**, en het script eindigt met een foutcode
+zodra die dekking zakt. De dekkingsmeter verdiende zich meteen terug met drie
+gemiste vermogens, waaronder een zin met twee typefouten die naar EEN pad
+versmalde dat er niets mee te maken had -- daaruit volgt de regel *dun bewijs is
+geen bewijs*: raakt maar een woord iets terwijl de vraag er drie draagt, dan gaat
+de volledige lijst terug. **Blok 2 staat als MEETLAAG en niet als beslisser**
+(`scripts/gezagsnoemer.js`, `npm run gezagsnoemer`): een vier-tredige noemer
+(`geen` / `tonen` / `klaarzetten` / `uitvoeren`) waarin alle vijf schalen worden
+verklaard -- 16 treden evident met een citaat dat letterlijk in de bron moet
+staan, 3 aangenomen en 1 ONBEPAALD. Die laatste is de scherpste: `direct` in de
+AI-allowlist betekent "lezen OF een kleine omkeerbare handeling", en dat zijn twee
+noemertreden in een woord. De noemer beslist met opzet niets en woont daarom in
+`scripts/`; `test/gezagsnoemer.test.js` zakt zodra iets uit `server/` hem
+importeert, want dan is hij de zesde gezagsschaal in plaats van de laag
+eroverheen. **De vier besluiten zijn genomen (31 augustus 2026)** en de noemer staat op 18
+evident, 3 besloten, 0 open. Drie ervan hebben dezelfde vorm: wat de machine mag
+is een vraag, hoe ver hij mag gaan is een tweede -- `autonoom` en `begrensd`
+blijven daarom eigenschappen (van het mandaat, van de uitvoering) en worden geen
+trede. De vierde is in code uitgevoerd: **`direct` is gesplitst in `lezen` en
+`klein`** (`kern/stuur/beleid.js`), en dat legde vijf routes bloot die in de
+lezen-lijst stonden en aantoonbaar schrijven -- mediaos/stuur en /volg,
+leerstof/oefen en /antwoord, en bijles/vraag. De splitsing verplaatst geen
+bevoegdheid: `lezen` + `klein` is exact de oude `direct`, en
+`test/stuur-niveaus.test.js` houdt dat vast met de oude lijst er letterlijk in
+overgeschreven. **De dekking van de resolver wordt inmiddels GEGENEREERD gemeten**
+(`npm run resolverbereik`): een vraag per toegestaan pad in zeven vervormingen --
+1232 proeven, dekking 100%, en het corpus groeit mee met het platform in plaats
+van met de pen van wie het opschreef. Dat vond meteen 17 verborgen vermogens: de
+afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/betaal
+viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
+willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
+**En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3409<!--/getal--> randen,
+<!--getal:verstrengeling.onverklaard-->0<!--/getal--> onverklaard — en dát getal moet naar nul, niet het
+aantal randen), de activering per functie, de deltapoort die er niets bij laat
+komen, de tredeproef over alle zeven treden van LAUNCH.md (0 lekken), en de
+wekkers (<!--getal:wekkers.onverklaard-->0<!--/getal--> die geen enkele functie raken). Drie dingen daar
+niet wegpoetsen: **een knoop is laag + domein en nooit domein alleen** (zonder de
+laag lijkt een ingang die zijn eigen domein aanroept de zwaarste verstrengeling
+van het huis), **de require-graaf ziet de kern-tas niet** (de meeste
+route-bestanden hebben nul requires en krijgen hun domein via `(kern) => ...`),
+en de tredeproef geeft **twee uitslagen die nooit worden opgeteld** — zuiver
+(compleet, bewijst de bedrading niet) en beproefd (bewijst de bedrading, kan niet
+compleet zijn). Dat verschil vond meteen een webhook die 200 gaf terwijl zijn
+functie uit stond.
+
+**Dat mechanisme heeft een valkuil die het zelf een keer heeft opgeleverd**: een
+merkteken ZONDER sluittag slokt het
+eerstvolgende getal in het document op, en dat is precies een keer gebeurd), en
+`test/getallen.test.js` zakt zodra een document iets anders beweert dan zijn
+register -- inclusief een zelfijking die een met opzet verkeerd getal moet vinden.
+Nul merktekens is daar geen "in orde" maar een gezakte meter. **Blok 1 staat**: `EXECUTION_MAP.json`
+(`npm run executionmap`) is een PROJECTIE van 3282 routes -- bereikbaarheid uit
+`beleid.js`, gezagstrede uit de noemer, bewijs uit `VERTROUWEN.json`,
+herhaalbaarheid uit `IDEMPROEF.json` -- met risico, herstel en kosten als
+`ONBEPAALD` MET REDEN, want die zijn statisch niet af te leiden. Drie
+handhavingen, alle drie zakken ze: met de hand gewijzigd is rood (byte voor byte
+hercompileren), een generator die iets anders doet zonder bronwijziging is
+hetzelfde rood, en waar twee bronnen elkaar tegenspreken staat `ONBEPAALD` en
+nooit stil een winnaar. Die derde was meteen nodig: `IDEMPROEF.json` sprak
+zichzelf 28 keer tegen over dezelfde route (`beschermd` naast `ongemeten`). **Die
+staan sinds 19 september 2026 op nul**, en niet doordat er iets is gladgestreken:
+het register was sinds 14 september niet meer gedraaid, en een verse meting plus
+twintig besluiten erbij haalden de tegenspraak weg. De regel blijft staan -- een
+tegenspraak die terugkomt hoort weer `ONBEPAALD` te worden en geen winnaar te
+krijgen. **Blok 5 is half een vondst en half een negatief.** De
+HERHALING-kant bestond al: `IDEMBESLUIT.json` verklaart 148 routes in zeven
+klassen (met het eerlijke `tebeslissen`), dus die is GEKOPPELD aan de kaart in
+plaats van nagebouwd -- meting en besluit staan er naast elkaar en de toets
+bewaakt dat het besluit de meting niet wegdrukt. De HERSTEL-kant is gemeten
+(`npm run herstel`, `HERSTEL.json`) en de uitkomst is dat hij NIET af te leiden
+is: van 3282 routes hebben er 74 een kandidaat-tegenhanger op grond van hun naam
+(2,4%), 4 zijn dubbelzinnig en 0 waren er bevestigd. Niets komt boven de graad
+`vermoed` uit een naam, want /agenda/bewaar is geen omkering van /verwijder. Wat
+herstel nodig had bleek geen verklaringsregister maar een PROEF, en die staat er:
+`scripts/herstelproef.js` VOERT het paar uit (heen, kijken, terug, kijken) en
+vergelijkt de INHOUD van de opslag -- over 90 paren: 13 `exact`, 30
+`compensatie`, 1 `geen-herstel`, **0 niet beproefd** en 46 die een WERELD vragen
+die de proef niet opzet (een zaak met de werkvorm journalistiek, een ingericht landpakket, een
+salon), elk met wat er zou moeten bestaan erbij. Elk paar draagt dus een uitslag.
+`scripts/lib/herstelwereld.js` is daarvoor wat `idemwereld.js` voor de
+idempotentieproef is: de tegenhanger is de voorbereiding, het lijf staat per
+route, een voorziening laat het onderwerp langs de gewone route ontstaan, en de
+wereld gaat eenmalig aan. Hij draait drie sessies en haalt de rol uit
+IDEMPROEF.json, want wie /api/supplier/ ziet en daaruit leverancier afleidt zit
+er bij elke uitzondering naast. Alleen over die 42 mag een
+scherm of een bon iets over een terugweg zeggen, en dan met de SOORT erbij: een
+creditnota wist geen factuur, dus `exact` en `compensatie` worden nooit
+samengeteld. Twee dingen daar niet wegpoetsen: `nietBeproefd` is met opzet geen
+`geen-herstel` (een tekort van de proef is geen oordeel over het paar), en zonder
+de OPWARMRONDE bestaat de collectie nog niet en heet elk paar `compensatie` --
+een hoogste graad die niemand kan halen is geen graad. Drie dingen die daar stil verkeerd gingen en die je nergens anders
+moet herhalen: een verdict is een BESCHULDIGING (`geen-herstel` zegt dat een
+route liegt, dus dat oordeel wordt niet geveld als de sleutel uit het laatste
+element van een lijst is GERADEN), wachten op stilte is niet wachten op de
+schrijver (twee gelijke metingen vlak na een oproep zijn allebei van VOOR de
+schrijfronde, dus wordt er gewacht tot het beeld VERANDERT), en de proef
+beinvloedt zichzelf -- wat in de volle ronde niet lukt draait nog een keer alleen
+op een eigen server, en lukt het dan wel dan draagt de uitslag `ordeAfhankelijk`.
+Die opwarmronde heeft ook
+een prijs, en die staat in de uitslag: een EENMALIG gevolg (een kostenregel bij de
+eerste aanmaak) valt erin en wordt niet gemeten, dus `exact` betekent hier exact
+bij een TWEEDE en volgende uitvoering. De proef beproeft daarom ook de al
+bevestigde paren -- doet hij dat niet, dan verdwijnt een bevestiging bij de
+volgende ronde uit het register, en een bevestiging die zichzelf opheft is erger
+dan geen. Let ook op de tegenspraakregel
+die er bijna verkeerd in kwam: `code-maker` naast een gemeten `beschermd` is GEEN
+bug, want de proef kent `beschermd` pas toe als de VERSE sleutel iets anders gaf. **Blok 3 staat** (`server/kern/stuur/plan.js`, gereedschap `plan`):
+het model levert doel + stappen, de compiler weegt ze en geeft een uitvoerbaar
+plan of een afwijzing MET bezwaren -- inclusief hoeveel bevestigingen het plan
+vooraf gaat vragen en welke. Vier regels houden hem klein en alle vier zakken ze
+op een mutatie: **PLAN voert niets uit** (getoetst op de BRON: geen fetch, geen
+stuurRoep), **PLAN bezit niets** (het oordeel is exact `beleidVoor()`), **de
+autoriteit komt LIVE en nooit uit EXECUTION_MAP.json** (een bouwartefact kan een
+commit achterlopen; de toets verandert de kaart en eist dat het oordeel niet
+meebeweegt), en **een verboden stap laat het hele plan zakken** in plaats van
+stil te worden overgeslagen. Wat PLAN met opzet NIET doet is de uitkomst van een
+stap doorgeven aan de volgende: zodra hij over gegevens gaat in plaats van over
+bevoegdheid, is hij niet meer klein. **Blok 4 staat half**: `kern/stuur/gevolg.js` hangt
+NAAST het plan en zegt uit een echte meting welke collecties de stappen
+aanraakten (`opslag` in IDEMPROEF.json -- 331 routes, 196 collecties). Drie
+graden, en over de 176 bereikbare paden zijn dat er 36 `gemeten`, 44
+`geen-effect-gemeten` en **96 `onbekend`**. Die laatste twee mogen NOOIT door
+elkaar lopen: "de proef kwam er niet bij" is iets anders dan "er gebeurt niets",
+en een plan dat "raakt niets aan" zegt terwijl niemand keek is een geruststelling
+zonder grond. Wat er NIET staat is een echte droogloop: het plan wordt niet in de
+zandbak uitgevoerd, er wordt een eerdere meting op geprojecteerd. **Blok 8 staat in de
+SCHADUW** (`kern/ai/router.js`): vijf technieken in volgorde -- regels,
+algoritme, optimalisatie, voorspelling, ai -- met een register van motoren die
+aantoonbaar bestaan en een uitslag die altijd een techniek EN een reden draagt.
+De vondst die het opende: de volgorde staat vandaag OMGEKEERD, want
+`demoantwoorden.js` levert al regelantwoorden maar staat in `kern/ai.js` NA het
+model. De router beslist daarom niets: hij meet hoe vaak een goedkopere techniek
+het gedekt zou hebben, en pas met dat getal is omdraaien een besluit in plaats
+van een gok (een matig regelantwoord dat een goed modelantwoord verdringt, merkt
+niemand). Hij wijst alleen naar motoren die laden, en de ontbrekende techniek
+staat er hardop bij: er is GEEN constraint solver -- kern/agent.js roostert op
+weekdagfactoren, en dat is een heuristiek. **Blok 6 staat als GRAMMATICA**
+(`kern/stuur/mandaat.js`): een mandaat verleent nooit vermogen maar VERSMALT
+bestaand vermogen, dus de speelruimte is een doorsnede die structureel niets kan
+toevoegen. Drie dingen daar niet wegpoetsen: **leeg is dicht** (geen mandaat
+betekent niets zelfstandig, niet alles), **een mandaat hoogt geen niveau op**
+(wat `voorstel` is blijft een mens vragen), en **geld en het pasbesluit blijven
+mensenwerk** hoeveel er ook in staat. Blok 7 is met opzet HALF: de speelruimte is
+de waarheid die een Mijn AI-scherm zou tonen, maar het scherm zelf komt er pas
+als de bewijsschuld gesloten is -- anders toont het een macht die het systeem niet
+kan definiëren. Blok 9 (commandbalk) is om dezelfde reden bewust niet gebouwd:
+0 bewezen routes en 96 van 176 onbekende gevolgen dragen geen balk die het hele
+huis in gewone taal bedient. Hij verandert geen bevoegdheid en kan dat ook niet
+(hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
+uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
+padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet
+wegpoetsen: een versmalling die het GEVRAAGDE vermogen verbergt is de gevaarlijkste
+faalvorm van deze laag (vandaar dat `kaart` met `alles: true` de versmalling altijd
+overslaat), en een brug als `taxi -> ride` wordt getoetst tegen de echte routes --
+`taxi -> rit` wees nergens heen en werd door die toets gevonden.
+
+**De doodspoormeter** (`scripts/doodspoor.js`, `DOODSPOOR.json`) vraagt of een
+handeling ergens AANKOMT: van de gemeten bronroutes staan er
+<!--getal:doodspoor.open-->130<!--/getal--> open. Dat is een triagelijst en
+geen beschuldiging (drie betekenissen lopen erin door elkaar, par. 3.3), en
+daarom een meting en nog geen poort. **De eerste gouden keten staat**
+(`scripts/tafelproef.js`, `npm run tafelproef`): de horecaketen van het openen
+van een rekening tot de afrekening, gemeten per SCHAKEL (handelt actor A, en
+ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?).
+Negen schakels gesloten, vijf storingen gehouden, en één open schakel geeft
+foutcode 1 -- dit is een proef en geen triagelijst. Drie dingen die geen losse
+routetoets kon zien: schakel 5 is een handoff die nergens beschreven stond (vóór
+`gang/vrij` staat de bestelling NIET op het keukenbord, dus het werk wacht bij de
+zaal, en beide routes zijn `supplier` dus doodspoor.js ziet hem niet), schakel 6
+laat zien dat de stoel tot op de keukenbon staat (de kok ziet voor wie hij
+kookt), en schakel 9 verried een fout in de proef zelf -- hij toetste twee velden
+uit het antwoord van de ZAAK terwijl deze proef juist de ONTVANGER meet, stond
+daardoor op groen en had nooit kunnen zakken. Wat de gast na het afrekenen
+werkelijk ziet is 401 `sessie-weg` met "Scan de QR opnieuw", en dat is een grens
+en geen gat. **En het bouwen van die keten legde een dood spoor bloot dat er
+jaren stond**: wie een regel van de rekening haalde waar de keuken al aan
+begonnen was, kreeg *"Haal hem eraf via derving, met een reden"* -- en die
+derving bestaat alleen in de KASSA (`/api/supplier/kassa/derving`, losse items,
+geen rekening). Je werd naar een deur gestuurd die er niet was; de enige
+uitwegen waren korting op de HELE bon of de hele rekening oninbaar boeken. De
+reparatie is **`kern/horeca/correctie.js`**, en vier dingen liggen daar vast: de
+regel BLIJFT staan en telt nul via `regelSom` in `kern/horeca.js` (één plek, dus
+splitsen, samenvoegen en de verdeling per stoel bewegen mee en `controleerSom()`
+blijft kloppen), grond én reden zijn allebei verplicht (vijf gronden, elk met wie
+het meldt), geld wordt KLAARGEZET en nooit verplaatst (is er al betaald, dan
+ontstaat een teruggaveRECHT met `uitgevoerd: false`; een mens voert het uit langs
+kern/pay), en een negatief `openstaand` blijft staan omdat het exact spiegelt met
+de openstaande teruggaven -- afkappen op nul zou het bedrag stil laten
+verdwijnen. Waarom dit geen `kern/commerce/retour.js` is: die laag is voor een
+koper die goederen terugstuurt naar een verkoper, met verzendstanden en een
+`orderRef` naar een vreemd domein; een gast aan tafel stuurt niets terug en de
+medewerker die corrigeert IS de verkoper. Wat de keten nog steeds NIET bewijst
+staat er even groot bij: het is de tafel-keten (bezorging, hotel en club hebben
+eigen naden), er komt geen browser aan te pas, en dat het geld werkelijk
+terugkomt loopt langs kern/pay en is met opzet niet gemeten. Pas uit zo'n keten
+volgen de status-, actor- en uitkomstcontracten -- niet andersom.
+
+**De TWEEDE keten staat, en die is er om een andere vraag te beantwoorden**
+(`scripts/ritproef.js`, `npm run ritproef`): is er een GEDEELDE VORM, of is elke
+keten zijn eigen ding? Daarom de rit en niet de bezorging -- bezorging deelt de
+rekening, de kaart en de keuken met de tafel, dus dan meet je hetzelfde nog een
+keer. Zeven schakels sluiten, zes storingen houden hun belofte, en de ritketen
+doet vier dingen ANDERS dan de tafel: eerst betalen dan leveren (`assign`
+weigert een onbetaalde rit), standen die alleen vooruit mogen, de naam van de
+werker gaat WEL naar de klant (je stapt bij iemand in de auto) en de klant heet
+een codenaam. **Eén schakel staat open, met een uitgeschreven reden** -- de
+nieuwe stand `openBekend`, in de vorm van `MET_REDEN` uit `scripts/tikken.js`:
+zonder die uitweg heeft een proef die iets echts vindt maar twee uitgangen,
+altijd zakken of de bevinding wegpoetsen. De proef meldt daarom `sluit` en
+`sluitMetBevinding` apart en nooit één cijfer.
+
+**Die bevinding werd een besluit en is uitgevoerd: er waren TWEE RITWERELDEN.** `db.data.rides` (de
+lidkant: `/api/ride/request`, `supplier/ride/*`, zes standen uit
+`kern/vervoer.js`) en `db.data.mobOpdrachten` (het dispatchcentrum:
+`/api/supplier/mob/*`, tien standen uit `kern/mobiliteit/keten.js`, met matching
+en overboeken) -- met **nul verwijzingen in beide richtingen**. Vier standen
+delen ze letterlijk, twee betekenen hetzelfde onder een andere naam
+(`aan-boord`/`ingestapt`, `afgerond`/`voltooid`), en één woord botst echt:
+`rijdt` is in de ene wereld een verouderde naam voor `aan-boord` en in de andere
+een eigen stand ná `ingestapt`. Pijnlijk detail: `kern/mobiliteit/dispatch.js`
+belooft in zijn kop dat een telefoonboeking "dezelfde keten" krijgt als een
+app-rit -- en het is juist de APP-rit die het dispatchbord nooit haalt. De eigenaar heeft besloten dat de OPDRACHT de waarheid is, en
+`kern/mobiliteit/appbrug.js` legt de brug: een app-rit wordt ook een
+vervoersopdracht en verschijnt op het dispatchbord. Vier dingen liggen daar
+vast. Een mislukte opdracht BREEKT DE RIT NIET (een bestemming die alleen een
+tekst is kan `kern/mobiliteit/plekken.js` niet oplossen; dan blijft de rit staan
+met de reden erbij -- een besluit uitvoeren mag geen aanvragen weigeren die het
+gisteren nog deed). De ritketen is GROVER, dus de brug loopt een PAD:
+`aangevraagd` naar `geaccepteerd` is in de opdrachtwereld drie gebeurtenissen,
+en het pad gaat nooit via `incident` of `geannuleerd` -- dat zou een gebeurtenis
+verzinnen die niet plaatsvond. De standen worden VERTAALD en niet overgetypt
+(toets 4 zakt zodra een ritstand naar `rijdt` vertaalt). En de brug loopt ÉÉN
+KANT OP: twee lijsten die elkaar bijwerken hebben geen waarheid meer. **De migratie is in kaart en staat stil op EEN besluit**
+(`scripts/ritmigratie.js`): van de <!--getal:ritmigratie.bestanden-->23<!--/getal-->
+plekken die `db.data.rides` noemen lezen er <!--getal:ritmigratie.stand-->7<!--/getal-->
+de lopende rit, tellen <!--getal:ritmigratie.historie-->10<!--/getal--> historie af,
+schrijven er 2 en noemen er 3 hem alleen in commentaar. De kaart bewees haar nut
+binnen het uur: de eerste versie zei "zeven kunnen nu om", maar een rit ZONDER
+opdracht valt dan uit beeld -- en dan ziet een lid zijn eigen taxi niet meer in
+`/api/live/state`. Dat is een regressie, geen migratie, en de kaart ging op nul.
+
+**Het besluit van de eigenaar hief die blokkade op: de VERVOERDER kiest zelf**
+welke soort ritten hij aanneemt -- `rittenMetDoel` en `rittenZonderDoel`, twee
+booleans in `ZAAK_OPTIES` (`kern/leverancier.js`), want "beide aan of een uit"
+IS twee booleans en dat register draagt er al. Neemt hij ritten zonder
+bestemming aan, dan krijgt zo'n rit een opdracht met een bestemming die
+expliciet `onbekend` heet (`{ onbekend: true }` in `kern/mobiliteit/plekken.js`):
+geen afstand, geen vaste prijs, wel een plek op het dispatchbord. Neemt hij hem
+niet aan, dan weigert `kern/lidacties/ritten.js` met de reden en de weg
+eromheen. Zo of zo heeft elke rit die BESTAAT voortaan een opdracht. Stand nu:
+<!--getal:ritmigratie.kanNu-->7<!--/getal--> lezers kunnen om (de stand-lezers),
+daarna <!--getal:ritmigratie.daarna-->12<!--/getal--> (historie, dan de
+schrijvers). **De losse chauffeur is geen bijzonder geval**: hij is een zaak met
+een persoon erin, meldt zich aan op eigen naam en wijst zichzelf de rit toe met
+`self: true` -- wie met het BEDRIJFSaccount inlogt heeft geen `staffId` en kan
+dat niet, en dat is de grens en geen gebrek. Wat overblijft is een restrisico en
+geen blokkade: `opdrachtMaak` kan per geval weigeren, en dan draagt de rit
+`opdrachtReden` -- elke lezer die omgaat moet zo'n rit afvangen en hem nooit
+stil uit de lijst laten vallen.
+De domeingrens (`GRENZEN.json`) hield de brug trouwens tegen tot iemand hem op
+de lijst zette, precies zoals bedoeld.
+
+**DE DERDE KETEN IS DE TOELATING** (`scripts/toelatingsproef.js`,
+`npm run toelatingsproef`): van een aanvraag zonder account naar een toegelaten
+zaak in een gereguleerd genre -- bewijs indienen, aftekenen op naam, besluit,
+zaak, herkeuring. Twee ketens dragen geen contract (twee punten liggen altijd op
+een lijn), dus hij is met opzet maximaal ANDERS: de klant is geen lid, er zit een
+KANTOOR in, het gaat over een document met een houdbaarheid, en de uitkomst is
+TOEGANG in plaats van een geleverde dienst. Zeven schakels sluiten, zeven
+storingen houden hun belofte. **Het bouwen legde een grens bloot die nergens
+stond**: aftekenen en beslissen eisen een naam, en `boardroomWie()` geeft die
+alleen als er een lid-account achter het kantoortoken hangt -- wie met de
+GEDEELDE kantoorcode inlogt, kan de keten niet afmaken. Dat is een grens en geen
+gat, en hij zit nu in de meting (storing 1 en 7) in plaats van eromheen.
+
+**En wat de ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`,
+`KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
+module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.
+Uitkomst over zeven ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
+van <!--getal:ketenvorm.actorenTotaal-->33<!--/getal--> actoren gedeeld
+(gast/zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur tegenover
+aanvrager/kantoor/keurder/dossier/tijd tegenover gezin/Adam/werkgever/mens tegenover fan/festival/publieke wereld) en
+<!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van
+<!--getal:ketenvorm.themasTotaal-->10<!--/getal--> beloftethema's in ALLE vier.
+Die twee gaan allebei over de MACHINE en niet over het domein: mag dit twee
+keer, en zegt een weigering waarom. **Een status-, actor- of
+uitkomstcontract over domeinen heen is daarmee niet gerechtvaardigd**, en dat is
+een antwoord op MAATSTAF.md U40/U41 en geen uitstel; wat er wel onder ligt is de
+grens die OS.md trekt tussen platformvermogen en domeinvermogen, nu met bewijs
+uit vier onafhankelijke ketens. Let bij het lezen op een eerlijkheid die in de
+bron staat: de themalijst is TWEE keer uitgebreid -- bij de derde keten vielen
+zes van de zeven beloften erbuiten, bij de vierde alle negen, en de uitslag zakte
+daardoor even naar 0 gedeelde thema's terwijl die keten herhaling en weigering
+met een reden gewoon toetst. Drie patronen erbij (elk generaliserend voorbij de
+zin die hem aanleiding gaf) bracht hem terug op 2 -- dus die twee overleven een
+vierde, totaal andere keten. De actoren zijn nooit aangeraakt, en die staan op
+nul.
+
+En de vijfde keten legde een etiketteringsfout bloot die er
+al stond: "alleen tafel" betekende *niet in alle ketens* in plaats van *in
+precies deze*, dus een actor die twee ketens delen stond twee keer als "alleen".
+De beloftenkant was daar al voor gerepareerd, de actorenkant niet. Er is nu een
+middenbak (`kantoor`, `lid` en `zaak` staan in meer dan een keten, in geen enkele
+in alle vier) -- en het KOPGETAL bewoog daar niet van: gedeeld blijft "in alle
+ketens", en dat is nul.
+
+**De vierde keten leverde een REGEL en een METER op** (`MAATSTAF.md` par. 7f,
+`DOELGROEPBEREIK.json`, `npm run doelgroepbereik`). De regel geldt breder dan
+ketens en heeft twee helften die elkaar spiegelen: **een bericht is pas bezorgd
+als er een bewezen LEESpad bestaat, en een capability is pas beschikbaar als de
+verklaarde doelgroep een bewezen TOEGANGSpad heeft.** De eerste helft staat in
+code (`kern/ontvanger.js`: elke weg heeft een lezer, en dat is gemeten -- een
+melding naar `db.data.notifications` voor een gezinslid zag er goed uit en had
+NUL lezers), de tweede in een meter die per cel (functie x doelgroep) vraagt of
+de VERKLAARDE doelgroep zijn eigen paden opent met een echte sessie. Uitslag:
+1736 cellen, 578 waar, **33 registerleugens** over tien functies en 132 keer
+binnen zonder verklaring -- en die twee worden nooit opgeteld, want een leugen is
+een defect en de andere richting een triagelijst. Drie dingen daar niet
+wegpoetsen. `dicht` betekent precies een ding (de sessie maakte geen enkel
+verschil met anoniem) en alles daartussen heet `onbepaald` -- elke 403 als dichte
+deur lezen verzon 144 leugens, elke afwijkende weigering als "binnen" lezen
+verzon honderden gaten. De meter **beantwoordt geen productvraag**: een doelgroep
+die niet is verklaard en niet binnenkomt heet `correct-afgesloten`, ook als
+iemand vindt dat hij erbij zou moeten kunnen. En de naam `bereikbaar` was al
+bezet -- `test/bereikbaar.test.js` bewaakt BEREIK.json, de schuldlijst van
+SCHERMEN die je niet kunt aantikken, en die toets is tijdens het bouwen
+overschreven zonder dat een enkele toets het zag; de ratel `metingenZonderRatel`
+sprong van 50 naar 51 en wees het aan.
+
+**En daarboven staat de AANVOER** (`MAATSTAF.md` par. 7g,
+`server/kern/knelpunt/aanvoer*.js`, `AANVOERVORM.json`). De openingenkaart wijst
+per terrein EEN deur aan; de aanvoer is wat erachter staat. Of daar een gedeeld
+objecttype onder kan, is eerst GEMETEN en niet verklaard -- zelfde reden als bij
+`Asset`, met de lezer van `scripts/objectmodel.js` zodat de getallen naast elkaar
+te leggen zijn, en over TWEE domeinlijsten zodat de uitslag niet op de lijst
+drijft (de les van `carrierevorm.js`, die op een versmalling omsloeg van 0 naar
+8). Ruim: **0 velden in alle vijf terreinen**, 93,8% in precies een. Smal: 0 in
+alle, 100% in precies een, en geen enkel PAAR deelt iets. Dus geen `Manier`-type
+maar een PROJECTIE met vijf verplichte etiketten (`terrein`, `wat`, `ingang`,
+`dektNiet`, `herkomst`) plus `beschikbaarheid` die `null` blijft tenzij een bron
+hem noemt. Drie dingen daar niet wegpoetsen. **De laag krijgt de mens niet, en
+dat staat in de handtekening**: `vondsten()` neemt een randvoorwaarde en verder
+niets, waardoor een geschiktheidstoets hier structureel niet KAN in plaats van
+verboden is -- een vondst die toch een gegeven over de mens draagt wordt
+GEWEIGERD met het veld erbij. Het woord **`manier` was al bezet in ditzelfde
+domein** (`kern/knelpunt/index.js`: een WEG naar het doel, met een eigen stand),
+dus heet het een vondst -- gemeten vrij, vier kernbestanden noemen het woord en
+nul als veldnaam. En **een lege bron is geen stille lijst**: vacatures zijn
+aangesloten (`aanvoer-werk.js`, zonder enige filtering op de mens -- wat een
+vacature EIST staat zichtbaar in `wat` en wordt nooit toegepast), en de drie
+fouten die dat opleverde waren geen van drieën met lezen te zien -- een lus over
+een veld dat niet bestaat, een `const { openVacatures } = kern` die op
+montagemoment `undefined` bevriest, en zaadgegevens met NUL open vacatures. De
+elf contracttoetsen zagen er geen enkele van; twee toetsen tegen een echte server
+wel.
+
+**De TWEEDE bron is de eigenlijke proef** (`MAATSTAF.md` par. 7h,
+`kern/knelpunt/aanvoer-opleiding.js`): een contract dat op EEN bron past is geen
+contract maar een adapter met een mooie naam. Leerstof is daarom niet gekozen
+omdat het nuttig is maar omdat het maximaal ANDERS is -- geen lijst (2 x
+1.000.000 procedureel, niets opgeslagen), geen aanbieder, geen eis, geen
+schaarste. Uitslag: **het contract paste zonder een letter te veranderen**, en
+toets 14 houdt dat vast op de scherpste manier die er is -- de contractlaag mag
+in CODE geen enkele domeinnaam kennen (geen `vacature`, `leerpad`, `beroep`,
+`openVacatures`, `beroepenbieb`); in de UITLEG mag het woord wel. Waar het wel
+anders moest zit in de BRON: de eerste 25 van twee miljoen zijn geen vondsten
+maar willekeur met een net randje, dus er wordt gezocht -- en het zoekwoord komt
+uit de RANDVOORWAARDE en nergens anders. Noemt die geen vak, dan levert de bron
+NIETS met de reden erbij, want een verzonnen beroep is een verzonnen advies. Twee
+dingen daar niet wegpoetsen: die beperking is echt en niet tijdelijk, en de prijs
+staat opgeschreven in plaats van weggewerkt -- `kernGedeeld` 235 -> 236 omdat het
+domein `knelpunt` nu `beroepenbieb` mag lezen, als BESLUIT met reden in NORM.json
+(een aanvoerlaag is per definitie een lezer, dus een bron aansluiten IS koppeling
+toevoegen; rechtstreeks requiren zou een tweede instantie met een eigen db-greep
+maken en dat is duurder). Twee punten liggen altijd op een lijn: pas een DERDE
+bron die geen van beide vormen deelt, zet de projectie boven twijfel.
+
+**EN DE EIGENAAR HEEFT STAP 5 GENOMEN** (13 september 2026, `MAATSTAF.md` par.
+7i): de RTFoundation mag de knelpuntmotor gebruiken -- met opzet SMAL. Een gezin
+mag zijn eigen vraag laten beantwoorden met vondsten, en dat is iets anders dan
+"de foundation mag bij `/api/knelpunt/*`". Er komt EEN deur bij op EEN functie
+(`/api/rtf/knelpunt`) en `auth` wordt niet verzwakt; beide deuren roepen dezelfde
+`beantwoord()` aan, zodat een gezin nooit een ander antwoord kan krijgen dan een
+lid (gemeten: byte voor byte gelijk). Drie grenzen, alle drie in CODE: de sessie
+opent de deur en gaat nergens heen (de handtekening `vondsten(voorwaarde)` maakt
+een profiel structureel onmogelijk), **een vondst is geen recht** -- dat Adam een
+vacature ziet zegt niets over of hij mag solliciteren, en die vraag blijft bij de
+sollicitatielaag die de leeftijd uit het PROFIEL leest -- en er wordt niets
+gerangschikt. **Het pad hoort BIJ die functie en niet in een eigen**: zonder
+`/api/rtf/knelpunt` in `paden` valt de gezinsdeur onder `rtf-contacten` en zet
+het bord de ene helft van de functie uit en de andere niet, exact de
+`social`-fout. En de meter bewijst het besluit in plaats van het te geloven:
+`knelpunt x foundation` ging van `correct-afgesloten` naar **`waar`** zonder dat
+de 33 leugens bewogen -- het besluit is een PRODUCTvraag, of de deur daarna
+opengaat een METING. De keten stond toen op 12 schakels, 11 gesloten; schakel 12 is de
+belofte dat een Foundation-profiel vanuit EEN doel echte werk- EN leermogelijkheden
+bereikt zonder dat een bron wordt verzonnen, gladgestreken of als advies vermomd.
+**Schakel 4 blijft open met een SMALLERE reden**, en dat is met opzet: er is nu
+aanvoer, maar die levert vondsten bij een RANDVOORWAARDE en geen wegen bij een
+kaal DOEL -- wie "ik wil weer aan het werk" intikt bedenkt de manieren nog steeds
+zelf. Een bevinding wegpoetsen omdat er iets naast is komen staan, maakt kwijt
+wat er nog echt ontbreekt.
+
+**`INTELLIGENTIE.md` is de laag BOVEN het stuur** -- de RTG Intelligence Layer,
+als richtingsdocument met per onderdeel of het **staat**, **een stap weg** is,
+**een besluit vraagt** of **jaren weg** is. Lees die voor je iets bouwt waarmee
+de AI uit zichzelf iets opmerkt, voorbereidt of aandacht vraagt. De lat in een
+zin: *Worlds orchestrate. Domains own. Policies authorize. Runtimes execute.
+Evidence proves. Intelligence anticipates* -- en dat laatste werkwoord ontbreekt
+vandaag. De keten gaat van `mens -> opdracht -> uitvoering` naar
+`wereld verandert -> merken -> voorspellen -> klaarzetten -> handelen of vragen
+-> controleren -> leren`, waarbij de gebruiker soms niets typt. Zeven bouwstenen
+bestaan al onder een andere naam (par. 1.3: `gevolg.js` is de effectgraaf,
+`command/transactie-poorten.js` de verifier waar *een controle die niet kon
+draaien niet geslaagd is*, `service/loop.js` het open-lus-geheugen), dus het werk
+is aansluiten en niet uitvinden. **Zeven regels die niet mogen sneuvelen**, en
+vier ervan corrigeren een voorstel dat op het eerste gezicht klopt: er komt
+**geen zesde gezagsvocabulaire** (INT-01 -- het initiatiefniveau bestaat al en
+heet `kern/stuur/mandaat.js`, dat nul productie-aanroepers heeft; `autonoom` en
+`begrensd` zijn sinds 31 augustus EIGENSCHAPPEN en geen trede), het **wereldmodel
+wordt gemeten en niet verklaard** (INT-02 -- `OBJECTMODEL.json` zegt 71%
+domeineigen en `KETENVORM.json` 0 van 19 gedeelde actoren, dus een typemodel
+eroverheen is de `Asset`-fout; de uitweg is de projectievorm van
+`kern/levensgraaf/graaf.js`), het **Mensmodel hangt aan de codenaam** met een
+bewaartermijn en een `deel`-poort (INT-03 -- `scripts/afleidbaar.js` vond al
+codenaam plus bezorgadres zonder termijn, en episodisch geheugen ernaast maakt
+dat pad korter), en de **aandachtmotor geeft een besluit met zijn opbouw en nooit
+een samengesteld cijfer** (INT-04 -- `confidence` en `novelty` zijn vandaag niet
+meetbaar, en vermenigvuldigen met een verzonnen getal is erger dan het weglaten).
+Par. 3.5 draagt het duurste getal: **van de 115 AI-schrijfpaden hebben er 91 geen
+bekende terugweg**, dus de formule uit punt 11 (autonomie = impact x onzekerheid
+x reversibility) is voor 79% niet uit te rekenen -- en `HERSTELPROEF.json` toont
+dat het instrument bestaat en er 46 werelden ontbreken, geen motor. Dat getal
+KAN niet schuiven: die 91 hebben geen tegenhanger om te beproeven (`HERSTEL.json`
+leidt kandidaten af uit de NAAM van een route), dus er is niets gedraaid dat
+anders had kunnen uitvallen. **Par. 3.5a is wel verplichte kost voordat je de
+herstelproef gebruikt**: het ingecheckte `HERSTELPROEF.json` reproduceert niet op
+een andere machine (twee rondes op ongewijzigde main zijn onderling identiek maar
+wijken allebei met dezelfde vijf paren af, dus de juiste nulstand is een VERSE
+ronde op de basisbranch), en alle negentig paren delen EEN wegwerpserver -- dus
+elke wijziging die ergens schrijft verschuift wat `exact` betekent voor latere
+paren. `exact` is daar een BROZE graad; `wereldOntbreekt` wordt beslist voordat
+er een server draait en kan nooit schuiven. De maatstaf
+in par. 6 is daarom niet "wanneer heeft RTG een Intelligence Layer" maar
+**wanneer kan RTG van een zelfstandige handeling vooraf zeggen wat er verandert,
+achteraf bewijzen dat het gebeurd is, en hem terugdraaien als het misging** --
+vandaag zijn dat **7 van de 118 schrijfparen**, met naam en toenaam. Let op de
+bouwvolgorde in par. 4: er staat een **Fase 0** voor Know, want Fase E is
+gedefinieerd op getallen die nog niet bestaan, en twee van de meest waardevolle
+stappen zijn geen bouwwerk maar een besluit (`mandaat.js` een aanroeper geven, en
+`RTG_HERKOMST_AFDWINGEN` omzetten -- die prijs is gemeten: een lid gaat van 120
+naar 36 paden, een zaak van 53 naar 9).
+
+**`AUTONOMIE.md` is de RTG Autonomy Kernel** -- de organisatorische intelligentie
+BOVEN de bestaande motoren: RTG bestuurt zichzelf binnen een door mensen
+vastgestelde constitutie. De machine krijgt initiatief, niet vanzelf gezag. Lees
+die vóór je iets bouwt dat over RTG als ONDERNEMING rekent (omzet, cohorten,
+churn, cash, marge). Twee constitutionele besluiten van 25 september 2026: **C1**
+-- een waarnemend brein is niet een portemonnee (RTG en de RTFoundation samen
+waargenomen, elke maat draagt precies een economische wereld, de firewall blijft)
+-- en **C2** -- het kantoor is een AI-rol uitsluitend op tonen, op naam, met drie
+gemeten leespaden en geen bevestigroute. De fundering is gemeten en niet
+verklaard: `npm run bedrijfsmaat` (`BEDRIJFSMAAT.json`, catalogus in
+`server/kern/bedrijfsmaat/`) houdt per maat vier elementen tegen de code --
+bron, definitie, projectie, bewijs -- met vier gatsoorten en een
+afhankelijkheidsgraaf; <!--getal:bedrijfsmaat.bestaat-->59<!--/getal--> van <!--getal:bedrijfsmaat.maten-->67<!--/getal--> maten bestaan en
+<!--getal:bedrijfsmaat.ketensGegrond-->6<!--/getal--> van zes ketens is gegrond. Drie dingen die niet mogen sneuvelen: **lenzen,
+geen breinen** (geen eigen opslag per lens), **de groepspoort staat aan de bron
+van een maat** (`bedrijfsmaat/poort.js`: onder de grens geen waarde, geen nul en
+geen aantal, ook op het kantoorscherm; werklijsten per persoon blijven voor een
+mens op naam en komen niet op het stuur), en **autonome actie alleen als geen
+dimensie van de streefstand buiten haar tolerantie verslechtert** -- geen gewogen
+som. De definities (nieuw lid, cohort, activatie, churn, retentie, omzet,
+brutomarge) staan met een versie in `bedrijfsmaat/definities.js`.
+
+**`CODE.md` is de laag waarin RTG naar zijn EIGEN software kijkt** -- de Code
+Intelligence Plane, als richtingsdocument met per onderdeel of het **staat**,
+**een stap weg** is, **een besluit vraagt** of **jaren weg** is. Lees die vóór je
+de interne AI iets over de eigen code laat zeggen. De kern in één zin: **de
+runtime-AI bestuurt RTG en komt nooit aan de bron; de meters lezen de bron en
+bedienen niets** -- en die scheiding bestaat vandaag gratis, dus geef hem niet
+weg. Dat is `CODE-AI-001`, en hij staat niet in een document maar in
+`test/codegrens.test.js`, want een document houdt niemand tegen die morgen
+`readFileSync` schrijft. De grens is scherper dan "geen fs" en dat bleek pas bij
+het meten: de sluiting van het stuur is klein en precies één module leest van
+schijf -- `VERTROUWEN.json`, een REGISTER. Een register lezen mag, een `.js`
+lezen niet; dát onderscheid is de invariant. De vraag of de 77 registers samen
+één Codewereld vormen is eerst GEMETEN (`npm run codewereld`, `CODEWERELD.json`)
+in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.ruggengraat-->6374<!--/getal--> van
+<!--getal:codewereld.paden-->6791<!--/getal--> paden staan in meer dan één register, dus er IS een ruggengraat, maar hij
+loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
+functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
+`symbol`-veld belooft iets wat geen enkele meter vult. Die as is
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->26505<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->7249<!--/getal--> require-kanten heen en terug, met de eigen parser
+en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->313<!--/getal--> niet-gelezen bestanden staan er MET reden in
+(bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
+onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
+aanroeppositie is geen verwijzing), en iets beweren over welk symbool een route
+afhandelt. Twee dingen daar niet wegpoetsen: de brug route -> bestand rustte
+op ÉÉN register, dus de nul tegenspraken erin was `niet vast te stellen` en geen
+groen -- er ligt sinds 3 september een tweede bron naast (`ROUTEBRON.json`, uit de
+ROUTER in plaats van uit de bronboom), de dekking staat op
+<!--getal:codewereld.brugDekkingPct-->94.7<!--/getal-->% en er zijn <!--getal:routebron.tegenspraak-->0<!--/getal--> echte tegenspraken. Let daarbij op het onderscheid
+dat die meting afdwong: een verschil tussen twee registers van VERSCHILLENDE
+leeftijd is een leeftijdsverschil en geen tegenspraak, en die twee worden nooit
+opgeteld. Verder is het bronbereik voor gedrag
+<!--getal:codewereld.bronGedragPct-->78.9<!--/getal-->% -- over de meerderheid van de bronbestanden zegt geen enkel
+register iets over gedrag, dus een "80-95% zonder bron te beantwoorden" haalt die
+grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
+<!--getal:codewereld.bronServerPct-->90<!--/getal-->% en `public/` <!--getal:codewereld.bronPublicPct-->41.3<!--/getal-->%: over de schermen wisten de registers
+vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
+public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
+De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
+<!--getal:graaf.kanten-->30271<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
+(<!--getal:graaf.routesMetSymbool-->3309<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
+functie uit registers alleen. Let daar op twee dingen. Ten eerste is
+<!--getal:graaf.opgelostPct-->25.3<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
+`res.json()` of `String()`, en <!--getal:graaf.contextobject-->20432<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
+in server/opzet/ wordt samengesteld. Dat leek statisch onherleidbaar tot
+`CONTEXTPROEF.json` het NAMAT (`npm run contextproef`, een runtime-meting in de
+domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> routes die werk deden reiken er maar
+<!--getal:context.metSpoor-->213<!--/getal--> TIJDENS het verzoek naar de kern, tegenover <!--getal:context.bedrading-->2222<!--/getal--> namen die bij het
+BEDRADEN worden opgehaald. Het gat is dus grotendeels statisch en niet runtime -- de meting
+keerde de voorspelling om, en dat is precies waarom hij er is. `KERNHERKOMST.json`
+(`npm run kernherkomst`) volgt die aanwijzing en beantwoordt wie welke naam in de
+zak legt: <!--getal:kern.namen-->1338<!--/getal--> namen over <!--getal:kern.vulplekken-->335<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->30<!--/getal--> plekken die
+niet te volgen zijn (elk met een reden, geen daarvan geraden). Dat leverde
+<!--getal:graaf.viaKern-->4848<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.3<!--/getal-->%; de restbak
+van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->461<!--/getal--> aanroepen (0,27%), en
+daar zat geen raadsel in maar vijf BEKENDE vormen die de meter niet herkende --
+een restbak vol bekende vormen laat je denken dat je code ondoorgrondelijk is
+terwijl je meter te weinig weet. Twee
+dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->2923<!--/getal--> van die kanten wijzen alleen het BESTAND
+aan en niet de functie (een fabriek mag `{ walletVoeg: voeg }` teruggeven, en dan
+is de zaknaam niet de symboolnaam), en een parameter die `save` heet wordt NIET
+op zijn naam als kernnaam herkend maar op zijn functie -- alleen de fabrieken die
+het register aanwijst leveren zaknamen. Ten tweede telt CODEWERELD.json sinds
+die dag DRIE dingen apart (structuur, relatie, gedrag), omdat een index die elk
+bestand noemt elke dekkingsvraag triviaal waar maakt: dat gebeurde twee keer op
+rij, en het zag er beide keren uit als vooruitgang. Alleen de gedragsteller
+(<!--getal:codewereld.bronGedragPct-->78.9<!--/getal-->%) is de bovengrens voor een vraag als "klopt het" -- en die kwam
+voor de schermen pas op gang met `SCHERMGEDRAG.json`, dat per scherm SAMENSTELT
+wat de routes eronder al gemeten hadden (schrijft het, welke rol, wat is het
+bewijs waard). Twee dingen daar niet wegpoetsen: het is AFGELEID gedrag, dus
+`schrijft: nee` betekent "verandert niets aan de SERVERKANT" en niet "verandert
+niets"; en de <!--getal:schermgedrag.zonderGrond-->153<!--/getal--> schermen waarover het niets kan zeggen staan er MET reden
+in maar tellen niet als dekking (`zonderUitspraak`) -- anders stijgt een
+dekkingsgetal doordat er een meter bij komt die zwijgt. Die meter begon
+op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; de aanroepgraaf begon op 587 onbekende
+doelen en eindigde op <!--getal:graaf.doelOnbekend-->0<!--/getal-->, en in beide gevallen zat de fout in de METER en niet
+in de code. Dat laatste nul is sinds 20 september 2026 een ANDER nul: er staat een derde
+soort naast, `bewaakteVooruitwijzing` (<!--getal:graaf.bewaakteVooruitwijzing-->0<!--/getal-->), voor een aanroep naar een integratie die
+met opzet nog niet gebouwd is en waar het bestand ZELF afbreekt als de andere kant
+ontbreekt -- `server/accounts/transactie.js` toetst op regel 102 of
+`verzoekcontext.registreerDeelnemer` bestaat en gooit anders
+`PG_ACCOUNTS_DEELNEMER_ONTBREEKT`. Dat was een gedeclareerd gat en geen vergissing,
+en het was twee weken onzichtbaar omdat het register van 3 september ouder was dan
+de code van 6 september. Op 27 september 2026 is het gesloten: accountmutaties
+zijn in productie een deelnemer aan de PostgreSQL-requestcommit
+(`server/db/deelnemers.js`), dus de aanroep lost op en de teller staat op nul. De ratel blijft op nul staan en blijft bijten: haal de
+wacht weg, of laat hem alleen waarschuwen, en de aanroep valt terug in
+`doelOnbekend`. Wat ertussen zat zijn regels die overal gelden -- een pad kan VERDERGAAN (`'/api/agenda/' + id`),
+een pad kan een GEGEVEN zijn in plaats van een doel (in een `.replace()`), en
+vindbaar zijn is niet hetzelfde als BESTAAN (een route zonder vindbaar bestand
+bestaat gewoon; die laatste staat in de kop van `scripts/lib/routes.js` als
+gemaakte fout, en werd hier prompt herhaald). De regel die het geheel draagt: **AI mag betekenis voorstellen, alleen
+deterministische systemen mogen waarheid vaststellen** -- een modelbevinding
+wordt dus nooit een register. **De vier besluiten zijn genomen (3 september
+2026)** en staan in par. 7: de symboolas is gebouwd, er komt een read-only
+Architect maar pas na de twee gaten die hem blind zouden houden, een bronfragment
+gaat alleen naar een LOKAAL model (`LOCAL_AI_URL` -- eigen code verlaat het huis
+niet), en een gegenereerde meter wordt door een mens afgetekend en promoveert tot
+die tijd niets. Let bij het lezen op de gesplitste teller: toen de symboolas erbij
+kwam sprong het bronbereik naar 100%, want een index noemt elk bestand. Structuur
+(welke functies wonen hier) en gedrag (schrijft het, is het bewezen) staan daarom
+apart, en alleen die tweede zegt nog iets.
+
+**`TOESTEL.md` is AI op het toestel van het lid** -- rekenen in de browser
+(WebGPU, WASM, later WebNN, of het model dat de browser meebrengt) als derde
+plaats naast de eigen modelserver van RTG en een externe aanbieder. Lees die
+vóór je een model naar de browser brengt. De kern: **geen model is
+infrastructuur, een taakcontract is infrastructuur** -- Rahul vraagt
+`spraak.naartekst` onder voorwaarden, en de techniek eronder mag wisselen.
+Drie dingen die niet mogen sneuvelen: **de server beweert nooit `toestel`**
+(hij ziet het per definitie niet; `test/ai-herkomst.test.js`), **het toestel
+levert inhoud en nooit een handeling** (het heet daarom toestelREKENlaag en
+geen execution layer -- dat woord is van EXECUTIE.md), en de rekencel draait
+met `connect-src 'none'`, zodat "dit toestel nooit verlaten" een grens van de
+browser is en geen belofte van onze code. `op-dit-apparaat` betekende de
+server van RTG en werd aan het lid getoond als "deze Mac"; het heet nu
+`rtg-server`. Het label onder een antwoord komt sindsdien uit wat er bij DAT
+verzoek gebeurde (`ai-stand.js` `uitgevoerd()`), niet uit de configuratie. **De machine staat sinds dezelfde dag** (par. 10):
+zes poorten die uitsluiten en kosten die als enige kiest, een manifest dat als
+grendel werkt (sleutel, handtekening, hash, licentie, contract; de sleutellijst
+is met opzet LEEG tot er een echte sleutel bij een mens ligt), en een cel als
+`<iframe sandbox="allow-scripts" allow="">` op `/toestel/cel`. Twee dingen daar
+niet wegpoetsen: de ONNX-runtime is een ondertekend ARTEFACT en geen
+afhankelijkheid (keuringsregel 14), en het celscript woont op `/toestel/cel.js`
+omdat de cel geen origin heeft en het huis elk statisch bestand `same-origin`
+geeft -- alleen de echte browser vond dat. **`spraak.naartekst` loopt**
+(par. 11, 27 september 2026): Whisper in de cel, 11 s spraak in 6,3 s op
+WASM, woordfout 0 op een opname, en het spectrogram gelijk aan dat van
+transformers tot op float32 (`test/fixtures/whisper-mel-toon.json` is een
+ONAFHANKELIJKE referentie, geen afdruk van onze eigen code). De gemeten bytes
+kwamen van een anonieme npm-kopie omdat Hugging Face geweigerd wordt, en zijn
+daarom met opzet NIET ondertekend: eerst de hashes naast de bron leggen.
+**`tekst.vector` loopt ook** (par. 12), zonder nieuwe uitvoerder, en het meten
+vond twee regels: in een BATCH hangt de vector van een tekst af van zijn buren
+(het gekwantiseerde model schaalt over de hele invoer), dus elke tekst krijgt
+een eigen run; en twee runtimes geven op dezelfde bytes een andere vector
+(cosinus 0,993), dus een vector draagt een VINGERAFDRUK en wordt alleen naast
+een vector met dezelfde vingerafdruk gelegd. **In het Nederlands is gemeten**
+(par. 13): whisper-tiny haalt 88,5% woordfout op een Nederlandse set tegen 58% in
+het Engels met dezelfde synthetische stem, en de meting vond een lus die tot het
+plafond doorrekende -- de cel stopt nu en meldt `herhaling`. Zoeken met MiniLM
+wint op omschrijvingen van een woordtelling (0,38 tegen 0,13 treffer@1) en
+verliest op letterlijke vragen; samenvoegen (RRF) is gemeten en niet overgenomen.
+De zoekindex hangt NAAST de bestaande Toestelkluis (par. 14), een index per
+vingerafdruk, en de kluis blijft de waarheid.
+
+**`MACHINE.md` is de laag die de motoren aan elkaar riemt** -- RTG Execution
+Physics (de uitvoeringskant van hetzelfde voorstel waarvan RUNTIME.md de
+werkelijkheidskant is), als richtingsdocument met per onderdeel of het **staat**, **een stap
+weg** is, **een besluit vraagt** of **jaren weg** is. Lees die vóór je een
+zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
+motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
+gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
+legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
+bestaande meter deed: van de <!--getal:machine.muterend-->4074<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2690<!--/getal--> geen
+enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
+geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
+geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele
+handeling die de keten heeft gelopen. Twee assen per motor die **nooit worden
+opgeteld** (handlertekst en routebestand: twee ondergrenzen die verschillende
+dingen missen), en de meter heeft zichzelf twee keer betrapt op dezelfde fout van
+twee kanten: een hub in de kern-tas zette 4162 routes op "idempotent", en
+`/api/notifications` scoorde tien assen omdat die route zelf in `server/server.js`
+woont (143 requires). Vandaar de hubgrens en de
+<!--getal:machine.hubRoutes-->14<!--/getal--> routes waarvoor de bestandsas met
+naam en toenaam onbruikbaar is verklaard. **De eerste keten is rond** (par. 5a):
+`/api/office/bank/incasso` -> `handtekening/bevestig` -> `incasso/dossier`, vijftien
+verplichte assen voor haar klasse en alle vijftien gelopen, met
+`kern/kantoor/geldketen.js` als BAAN en niet als zeventiende motor. Daarom een
+vierde teller die de andere kant op gaat: `volledigeKetens` staat op
+<!--getal:machine.volledigeKetens-->1<!--/getal--> (zestien verplichte assen,
+alle zestien gelopen) en mag alleen STIJGEN (de twee
+andere zijn schulden en mogen alleen dalen) -- haal er één as uit en hij zakt naar
+nul met de naam van die as erbij. Twee handelingsklassen, en het verschil is
+precies één as: bij `geld-eenmalig` is `atomair` verplicht, bij `geld-reeks` met
+opzet NIET, want alles-of-niets is daar de verkeerde garantie (dat één lid te weinig
+saldo heeft mag de inning bij de andere negenennegentig niet tegenhouden) en
+`hervatbaar` komt ervoor in de plaats. Zes dingen die het bouwen blootlegde en die
+geen bestaande toets zag: **de beslislaag was nooit gemount** (`zoekBevoegdheid`
+werd nergens gevuld, dus de keuring van een voornemen kwam nooit tot een besluit),
+**de 503 die de keuring belooft kwam nooit** (de meegegeven wrapper is altijd een
+functie, dus `if (!beslis)` sloeg niet aan en de laag las `uitkomst` uit `null` --
+een TypeError waar een nette weigering hoorde), **de frictie-as was stil leeg** (de
+bedrading gaf de MODULE mee in plaats van een motor; een module heeft geen
+`beoordeel`), **de graad van een as is niet de graad van zijn getal** (de
+bovengrens van een incasso-vooruitblik maakte de keten onhaalbaar tot die twee
+werden gescheiden), **een herhaalde aanvraag struikelde over zijn eigen
+idempotentie** (hetzelfde voornemen ging opnieuw langs de keuring en kreeg 409), en
+het zwaarste: **`uitvoering` stond niet in de verplichte assen**, dus de uitvoering
+kon buiten de keten om lopen terwijl het dossier er rond uitzag -- gevonden met een
+mutatie, want geen enkele toets zakte. Die twee laatste zijn door de e2e-proef
+gevonden en niet door een unittoets: `test/tweedehandtekening.test.js` toets 6
+verplaatst met twee kantoormensen op naam echt geld door de hele baan, en het
+dossier blijft daar eerlijk op **niet rond** staan omdat die medewerkers geen
+passkey hebben (de as `assurance` staat op `vermoed`, met de reden erbij). Let ook op wat dezelfde commit met de meter deed: een handvol
+woorden in één routebestand liet `tegenfeit` van 28 naar 54 springen op de
+bestandsas terwijl er één handeling bijkwam -- lees op de handleras, en gebruik de
+bestandsas alleen om te zien waar iets in de buurt hangt. Zeven begrippen uit het
+voorstel zijn al bezet en dat is de goedkoopste paragraaf van het document: **`envelop` is
+gesloten op acht velden en zegt met opzet nooit WAT** (dus het uitvoerkapsel
+verwijst ernaar en heet niet zo), **`doel` draagt al twee betekenissen** over 28
+modules (een levensdoel en de AVG-doelbinding -- een planner-doel heet
+`streefstand`), een **samengesteld integratiecijfer** (`15/15`, een
+confidence-percentage) is precies wat BEWIJSMACHINE.md en INT-04 verbieden,
+**assurance is een trede en geen kommagetal** (de samenstelling is een MINIMUM,
+niet een gewogen gemiddelde), en `EXPERIMENTAL -> TRUSTED -> DEGRADED` zou de
+**zesde gezagsladder** zijn -- de drie die er al zijn (bewijsgraden,
+vervalstaten, schaduwmodi) dekken het samen. Wat er jaren weg is, staat er met
+het getal dat het blokkeert: een planner op `gevolg.js` heeft 96 van 176 paden
+`onbekend`, en een promotiesysteem boven
+<!--getal:vertrouwen.bewezen-->0<!--/getal--> bewezen routes promoveert niets.
+
+**`LAT.md` is de technische lat** — regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). En regel 13 vóór je pusht: **"mijn gebruikelijke controles" is niet "het oordeel van de keten"** — een CI-job die als EEN release-oordeel geldt heeft meer poorten dan iemand onthoudt, en `npm run ci:lokaal` draait ze allemaal omdat hij ze AFLEIDT uit `.github/workflows` in plaats van ze over te typen. Een handlijst poorten is een tweede waarheid naast ci.yml en loopt uit elkaar. En regel 17 komt uit een fout van twee keer op een dag: **een poort bewijst alleen zijn eigen bereik** — `check`, `norm` en de deltapoort stonden groen terwijl CI terecht rood bleef, want routedekking en de afdrukregel liggen daarbuiten. Zeg dus nooit "de gate is groen" maar welke poort groen staat, en wat er nog niet bevestigd is. Daar hangt de routeregel aan: een nagemaakte app bewijst het handlergedrag en niet de montage of de deur, dus **geen nieuwe HTTP-route zonder minstens één treffer op een echte server in een gewone CI-toets**. LAT.md gaat over de code, CLAUDE.md over het merk.
+
+**`BEWIJSLUS.md` is het besluit om GEEN laag boven de bewijsmachine te bouwen**
+-- de heenweg (veranderbereik, Evidence DAG, bewijsmatrix, release-bewijs,
+Sentinel, canary) staat, de terugweg van productie naar bewijs ontbreekt. Lees
+die vóór je iets bouwt dat fouten zoekt, reproduceert of verklaart. Er komen
+vier bouwstenen en niet meer: een zoekende tegenstander (eerst op
+`geld-conservatie`, zonder model, en hij oordeelt nooit zelf), de eerste
+divergentie, het herhaalpakket en immuniteit. Let op de namen: `Sentinel`,
+`capsule`, `replay` (betekent hier idempotentie), `naspelen` en `bewijskaart`
+zijn bezet, en L0-L3 en een achtstandige statusruimte zouden een zesde ladder
+zijn. De goedkoopste vondst: `/api/pay/gezond` bestond en de sonde las hem
+niet, dus het grootboek meldde zijn stand aan een bewaking die niet keek. Dat
+is de eerste stap die staat: de reis `grootboek` in `SLO.json`, en de triage
+duidt een 500 daarop als `geld` -- niet als routefout, en nooit als reden om
+terug te rollen. De tweede stap legde een eigen vergissing bloot: het
+"vertrouwensdossier" bestond al als het **routedossier** in het kantoor, dus het
+is AANGEVULD en niet opnieuw gebouwd -- met de vervalstaat, de plek in de code
+en een blok *wat dit dossier niet weet* (tegenvoorbeeld, mutatie per route,
+productie). Zoek dus eerst of een scherm iets al toont voordat je een tweede
+bouwt. De derde stap is de zoeker zelf (`npm run tegenvoorbeeld`): reeksen over
+waarden, volgorde, gelijktijdigheid en storing tegen een echte `kern/pay`, met
+krimpen, en hij oordeelt alleen met regels die al in de code staan. Bij zijn
+eerste ronde vond hij dat een verzoek (`verzoekBetaal`) twee keer betaald wordt
+als het twee keer tegelijk met verschillende sleutels binnenkomt -- terwijl de
+sluitcontrole groen blijft. Let daarbij op dat hij TELT hoe vaak elke soort
+handeling slaagde: "niets gevonden" over handelingen die allemaal geweigerd
+werden is geen uitslag, en de eerste versie leverde precies dat. Die vondst is
+gerepareerd (BEWIJSLUS.md par. 6a: een slot per verzoek en de stand opnieuw
+gecontroleerd binnen het werk), en het verkleinde tegenvoorbeeld is de blijvende
+toets (`test/verzoekbetaal-race.test.js`). Let op de grens van zo'n vondst: over
+HTTP in de toetsopstelling kwam de dubbele betaling NIET door, omdat het werk
+daar nergens op echte I/O wacht; op het productiepad (Rust-motor, echte
+provider) wel. Een vondst van de zoeker gaat over de CODE; welke omgeving hem
+bereikt is een aparte vraag. De vierde stap is de **eerste divergentie**
+(`scripts/lib/divergentie.js`, par. 4a): elk verkleind tegenvoorbeeld loopt nog
+een keer langs negen ijkpunten (E0 intentie tot E8 uitkomst), en de uitslag zegt
+waar het voor het EERST onwaar werd. Op de echte race wijst hij E3 aan (het
+besluit, waar de reparatie zit) terwijl de wet het pas bij E4 (de opslag) zag.
+Drie dingen daar niet wegpoetsen: elk ijkpunt is een VERBOD uit de code en geen
+tweede model van RTG Pay; er worden EFFECTEN geteld en geen ok-antwoorden (een
+herhaling met een sleutel die al slaagde krijgt `ok` zonder iets te doen, en de
+eerste versie meldde daarom op 27 van de 40 gezonde reeksen een afwijking); en
+E6 staat voor RTG Pay altijd op `niet-waargenomen`, want kern/pay zet geen
+gebeurtenis in een envelop. Het spoor staat NAAST de envelop en alleen in de
+testwereld. Het bouwen vond ook een fixturefout: `rtg-keten.js` gaf
+`keyVanCodenaam` een kale tekst waar `kern/gids.js` een object geeft, dus
+`seintje()` ging in de proefwereld nooit af. De vijfde stap is het
+**herhaalpakket** (`npm run herhaalpakket`, par. 5a): een tegenvoorbeeld als
+object, met rollen in plaats van codenamen (een grendel weigert anders), een lege
+begintoestand in plaats van een database, en een `voorbehoud` voor wat niet
+deterministisch is. De **herhaalmatrix** speelt hetzelfde pakket na op meerdere
+commits, elk in een eigen worktree, en liet meteen zien dat main de dubbele
+betaling nog heeft -- de reparatie staat op de tak van PR #380. Een kolom die niet
+kon draaien is `niet vast te stellen` en nooit `houdt`; een andere wet is
+`breekt-anders` en nooit `breekt`.

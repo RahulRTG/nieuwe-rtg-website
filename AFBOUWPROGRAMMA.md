@@ -109,6 +109,56 @@ besloten zijn, met de bron erbij; alleen werkelijk onbesliste punten gaan opnieu
 naar de eigenaar; agents verzinnen geen beleidsbesluiten. Uitgevoerd in par. 7a
 en bijlage A.
 
+## 3b. Besluiten tijdens de integratie (11 oktober 2026)
+
+Genomen tijdens het groen maken van ronde 1 en golf 3. Ook deze staan hier zoals
+ze zijn genomen.
+
+**1A — Klokinformatie op de horeca-Vloer.** De Vloer mag de klokinformatie uit
+het personeelsdomein lezen (`kernGedeeld` +1, vastgelegd in `NORM.json` met
+reden, eigenaar en begrenzing). Alleen de noodzakelijke klokinformatie wordt
+gedeeld.
+
+**Klokprivacy (een bestaande grens, geen uitzondering).** Iedere medewerker mag
+zien WIE er aanwezig is, niet WANNEER een collega in- of uitklokt. Het in- en
+uitkloktijdstip en de klokregels in het logboek gaan uitsluitend naar een
+manager. Dat geldt voor elke route en elk kanaal (ook realtime, foutmeldingen,
+aantallen, paginering en volgorde), en wordt bij de bron gefilterd: één functie,
+geen eigen regel per route.
+
+**De huisregel daaronder.** Informatie die iemand niet mag ontvangen, verstrekt
+de server die persoon niet. Verbergen op het scherm is geen bescherming.
+
+**2B — Autorisatie is geen omkeerbaarheid.** Een tweede handtekening veroorzaakt
+nooit `omkeerbaar: true`; dat zijn twee verschillende veiligheidsvoorwaarden. De
+grens van € 2.500 blijft: daarboven alleen wat aantoonbaar omkeerbaar is. Of iets
+omkeerbaar is, wordt per handeling en per betaalrail aangetoond in één gesloten
+tabel met een grond per regel; onbekend telt als niet omkeerbaar. Er komt een
+uitzonderingsprocedure voor aantoonbaar onomkeerbare transacties, met een aparte
+risicogoedkeuring, die nooit beweert dat de transactie terug kan. Zij staat
+standaard dicht.
+
+**2C — De incassoronde.** De grens van € 2.500 geldt over het TOTAAL van de
+ronde. De uitzonderingsprocedure wordt uitsluitend voor incassorondes
+vrijgegeven: per ronde een risicogoedkeuring op naam, door een ander dan de
+aanvrager, niet herbruikbaar. Het dossier blijft *onomkeerbaar* zeggen. Voor alle
+andere handelingen, ook de teruggave, blijft de grendel dicht.
+
+**3A — Teruggaven onder € 1.000.** Het besluit van 4 oktober blijft: één bevoegd
+mens op naam met een passkey, zonder verplichte tweede medewerker. Alle overige
+controles blijven gelden.
+
+**4A — Het juridisch toetsingsdossier voor de vakantieregel.** Een volledig
+dossier met wetsartikelen, codeverwijzingen, aannames, grensgevallen en
+voorbeeldberekeningen. De productiepoort blijft gesloten tot een bevoegde
+menselijke beoordelaar de toets heeft afgerond en de vrijgave volgens de
+bestaande procedure is goedgekeurd.
+
+**5A — De open besluiten.** De resterende vragen van bijlage A gaan in porties van
+ongeveer tien naar de eigenaar, geordend op afhankelijkheden en op hoeveel
+ontwikkelwerk ze blokkeren. Per vraag: de bestaande huisregel, de opties, de
+gevolgen en een aanbeveling. Er worden geen besluiten verzonnen.
+
 ## 4. De vier werkstromen
 
 | werkstroom | wat | werkterrein |

@@ -540,7 +540,7 @@
       "blastRadius": {
         "sourceOwners": 11,
         "kernelModules": 42,
-        "mutationContracts": 134,
+        "mutationContracts": 145,
         "routes": 134,
         "screens": 12,
         "dataSchema": "geen inference- of rankinggeheugen zonder besluit",

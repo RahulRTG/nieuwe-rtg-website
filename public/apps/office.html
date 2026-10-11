@@ -331,6 +331,10 @@
      die dubbele chrome weg; zelfstandig blijft RTG Office ongewijzigd. */
   html[data-rtg-oppervlak="1"] .kop{display:none !important;}
   html[data-rtg-oppervlak="1"] body{padding-bottom:0;}
+/* De formaatkeuze van exporteren (#582): klassen en geen inline stijl. */
+#formaatKeuze{display:flex;flex-wrap:wrap;gap:.5rem}
+#formaatTrouw{margin:.75rem 0 0;padding-left:1.1rem}
+.formaat-voet{display:flex;gap:.5rem;margin-top:.75rem}
 </style>
 <link href="/apps/office/enterprise.css?v=enterprise3" rel="stylesheet">
 <link href="/apps/office/presentation-enterprise.css?v=enterprise1" rel="stylesheet">
@@ -603,9 +607,9 @@
   <div class="paneel">
     <h3 id="formaatKop">Exporteren</h3>
     <p class="stil" id="formaatUitleg">Het bestand draagt de classificatie van dit document, en het documentspoor noteert de export.</p>
-    <div id="formaatKeuze" style="display:flex;flex-wrap:wrap;gap:.5rem;"></div>
-    <ul id="formaatTrouw" class="stil" style="margin:.75rem 0 0;padding-left:1.1rem;"></ul>
-    <div style="display:flex;gap:.5rem;margin-top:.75rem;">
+    <div id="formaatKeuze"></div>
+    <ul id="formaatTrouw" class="stil"></ul>
+    <div class="formaat-voet">
       <button class="knop" id="formaatDicht" type="button">Sluit</button>
     </div>
   </div>

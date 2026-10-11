@@ -79,6 +79,13 @@ module.exports = [
      geen passkey had, en was hij daarna dicht (23 september 2026: drie routes). */
   { van: 'domein:zwaarbewijs', naar: 'domein:webauthn-acties', soort: 'BELEID',
     reden: 'de zware poort weigert een actienaam die niet in de gesloten lijst ZWARE_ACTIES staat, zodat een route met een onbekende naam meteen zakt in plaats van pas als de eigenaar een passkey heeft' },
+  /* DE BESTANDENSPIEGEL IS EEN UITGANG (#582, OFFICE.md par. 4 grens 4). Een
+     Office-document dat in de bestandenkluis gespiegeld wordt, draagt zijn
+     classificatie mee, en die leest maar een plek: kern/office/uitgangspoort.js.
+     Een eigen `classificatie === 'strikt'` in bestanden.js zou de vijfde kopie zijn
+     waar die poort juist voor bestaat. */
+  { van: 'domein:bestanden', naar: 'domein:office', soort: 'BELEID',
+    reden: 'de spiegel van een Office-document naar de bestandenkluis vraagt zijn classificatie aan de uitgangspoort van kern/office, zodat die op een plek wordt gelezen; bestanden raakt geen Office-opslag aan' },
   { van: 'domein:bestanden', naar: 'domein:document-capability', soort: 'DOMEINRELATIE',
     reden: 'De persoonlijke bestandenkluis delegeert trash/restore aan haar eigen versiegebonden lifecyclecontract; UI, Edge Bar, API en bevestigde Rahul-aanvragen krijgen zo dezelfde eigenaarcontrole en transactie.' },
   /* DE KEURING ONDER DE VERTAALMOTOR. server/translate/ levert vertalingen en

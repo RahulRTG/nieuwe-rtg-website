@@ -39,19 +39,12 @@ const HERSTEL_SMS_BEWUST_UIT = process.env.RTG_HERSTEL_SMS_UIT_BEWUST === '1';
 
 /* HET HERSTEL IN GANG ZETTEN -- als eigen functie, niet alleen als route.
 
-   Deze stroom stond volledig binnen de route. Dat werkte, tot er een TWEEDE
-   plek kwam die hem nodig heeft: de ledenbalie, waar een medewerker een lid
-   helpt dat er niet meer in komt. Die had de stroom moeten nabouwen, en dan
-   heb je twee waarheden over hoe een herstel werkt -- precies de vorm waar
-   vandaag de helft van de fouten vandaan kwam.
-
-   Dus een functie, en de route roept hem aan. De balie straks ook. Wie de regels
-   verandert, verandert ze voor allebei. */
-/* EEN plek voor de vraag "geeft het herstel met telefoon nu een link uit?".
-   herstelStart weigert erop, en het overzicht Opnieuw beginnen
-   (kern/opnieuwbeginnen.js) leest hem om niet een tweestapsweg te beloven die
-   in productie dicht staat. Twee kopieen van deze voorwaarde zouden uit elkaar
-   lopen zodra er een sms-kanaal komt. */
+   Een TWEEDE plek heeft hem nodig: de ledenbalie, waar een medewerker een lid
+   helpt dat er niet meer in komt. Nabouwen geeft twee waarheden over hoe een
+   herstel werkt. Dus een functie, en route en balie roepen hem aan: wie de
+   regels verandert, verandert ze voor allebei. */
+/* EEN plek voor "geeft het herstel met telefoon nu een link uit?": herstelStart en
+   kern/opnieuwbeginnen.js lezen hem; twee kopieen lopen uiteen bij een sms-kanaal. */
 function herstelSmsDicht() { return !!PRODUCTION && (HERSTEL_SMS_BEWUST_UIT || !mail.smsConfigured); }
 kern.herstelSmsDicht = herstelSmsDicht;
 
@@ -114,7 +107,6 @@ kern.herstelStart = (u, req) => {
 
 app.post('/api/auth/forgot', (req, res) => {
   // geen vaste basis, geen herstelmail (lib/linkbasis.js); hangt niet aan het account
-
   if (!appUrl(req)) return res.status(503).json({ error: ONTBREEKT, code: 'app-url-ontbreekt' });
   const begon = rtgKlok.nu();
   const antwoord = (lijf) => {

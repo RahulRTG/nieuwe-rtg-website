@@ -219,3 +219,28 @@ test('7. de andere vier ingangen: zaak, kantoor, gezin en werkplek exporteren en
     assert.ok([401, 403].includes((await api(basis + 'exporteer', { id: inn.body.id, formaat: 'xlsx', bedrijf: extra.bedrijf })).status), basis + ' zonder sessie');
   }
 });
+
+/* DE TIEN DEUREN BIJ NAAM. De lus hierboven loopt de ingangen langs met een
+   samengesteld pad; deze toets noemt de acht die niet van het lid zijn letterlijk,
+   zodat een ingang die uit de montage valt hier zakt op een 404 in plaats van
+   ongemerkt uit de lus te verdwijnen. Zonder sessie weigert elke deur, en nooit
+   met "bestaat niet". */
+test('de acht ingangen buiten het lid zijn gemonteerd en weigeren zonder sessie', async () => {
+  for (const pad of [
+    '/api/supplier/kantoorpakket/exporteer', '/api/supplier/kantoorpakket/importeer',
+    '/api/office/kantoorpakket/exporteer', '/api/office/kantoorpakket/importeer',
+    '/api/rtf/kantoorpakket/exporteer', '/api/rtf/kantoorpakket/importeer',
+    '/api/werkplek/kantoorpakket/exporteer', '/api/werkplek/kantoorpakket/importeer',
+  ]) {
+    const r = await api(pad, { formaat: 'csv' });
+    /* De werkplekdeur vraagt eerst WELK bedrijf, en een onbekend bedrijf is een 404
+       met die reden -- iets anders dan een route die niet bestaat. */
+    if (pad.startsWith('/api/werkplek/')) {
+      assert.equal(r.status, 404, pad + ' zonder bedrijf gaf ' + r.status);
+      assert.match(String(r.body && r.body.error), /bedrijf kennen we niet/, pad + ' hoort gemonteerd te zijn');
+      continue;
+    }
+    assert.notEqual(r.status, 404, pad + ' hoort gemonteerd te zijn');
+    assert.ok([401, 403].includes(r.status), pad + ' zonder sessie gaf ' + r.status);
+  }
+});

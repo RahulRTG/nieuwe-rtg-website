@@ -355,8 +355,12 @@
       <div id="kReisOpen"><div class="leeg">Laden...</div></div>
 
       <h4 class="rzKop">Reizen die rond zijn</h4>
-      <p class="stil rzUitleg">Een bevestigde reis kan alsnog niet doorgaan. Afzeggen kan alleen met een reden, en die reden leest het lid. Let op: een afzegging <b>verplaatst geen geld</b> -- er loopt geen betaling voor een reis van het reisbureau, dus een aanbetaling, een terugbetaling of annuleringskosten handelt u zelf af.</p>
+      <p class="stil rzUitleg">Een bevestigde reis kan alsnog niet doorgaan. Afzeggen kan alleen met een reden, en die reden leest het lid. Let op: een afzegging <b>verplaatst zelf geen geld</b>. Was de reis via RTG betaald, dan zet de afzegging een teruggave klaar die hieronder op een besluit wacht; was hij niet via RTG betaald, dan handelt u het geld zelf af.</p>
       <div id="kReisRond"><div class="leeg">Laden...</div></div>
+
+      <h4 class="rzKop">Teruggaven</h4>
+      <p class="stil rzUitleg">Een afgezegde betaalde reis laat een recht op teruggave achter. Uitvoeren doet u met uw passkey; vanaf € 1.000 tekent daarna een tweede mens bij RTG Bank, en pas dan beweegt het geld. Afwijzen kan alleen met een reden, en die blijft bij het recht staan. Er gebeurt hier niets vanzelf.</p>
+      <div id="kReisTerug"><div class="leeg">Laden...</div></div>
 
       <section id="reisPlanner"></section>
       <h4 style="margin:1.2rem 0 .4rem;">Een reis klaarzetten voor een klant</h4>
@@ -1141,6 +1145,7 @@
 <script src="/shared/passkey.js"></script>
 <script src="/shared/zwaarstap.js"></script>
 <script src="/apps/kantoren-reisuitnodiging.js"></script>
+<script src="/apps/kantoren-reisteruggave.js"></script>
 <script src="/apps/reisprogramma-velden.js"></script>
 <script src="/apps/reisprogramma-weergave.js"></script>
 <script src="/apps/reisprogramma-editor.js"></script>
@@ -1415,9 +1420,14 @@ async function laadReisbalie(){
   });
   haak(rond, 'button[data-afzeg]', async (b) => {
     const veld = rond.querySelector('input[data-abericht="'+b.dataset.afzeg+'"]');
-    await api('reisbureau/afzeggen', { ref: b.dataset.afzeg, reden: veld ? veld.value : '' });
-    meld('Afgezegd. Het lid krijgt bericht -- het geld handelt u zelf af.');
+    const r = await api('reisbureau/afzeggen', { ref: b.dataset.afzeg, reden: veld ? veld.value : '' });
+    const geld = (r && r.aanvraag && r.aanvraag.geld) || {};
+    meld(geld.stand === 'teruggaveKlaargezet'
+      ? 'Afgezegd. Het lid krijgt bericht, en de teruggave staat hieronder klaar voor een besluit.'
+      : 'Afgezegd. Het lid krijgt bericht -- deze reis was niet via RTG betaald, het geld handelt u zelf af.');
   });
+  // de teruggaven: een eigen blok met eigen knoppen (kantoren-reisteruggave.js)
+  RTGReisTeruggave({ api, kaal, meld, esc, wortel: $('#kReisTerug') }).laad();
 }
 
 let KLAAR_BEDRAAD=false;
@@ -2989,7 +2999,14 @@ function bankRenderTweedeHand(rij){
     '<button class="knop stil" data-tekenen="' + esc(a.id) + '">Ik ben iemand anders: bevestig</button>' +
     '<button class="knop stil bk-th-weg" data-intrek="' + esc(a.id) + '">Intrekken</button></div>').join('');
   el.querySelectorAll('[data-tekenen]').forEach(b => b.addEventListener('click', async () => {
-    try { const d = await api('bank/handtekening/bevestig', { id: b.dataset.tekenen });
+    /* NIET via api(): onder een GELDhandeling vraagt de server ook de passkey van deze
+       tweede mens (routes/kantoren/bank-passkey.js), en dat is een 401 die api() als
+       "uitgelogd" leest. Gebonden aan het loket van DEZE aanvraag. */
+    try { const r = await window.RTGZwaar.metVinger(
+        extra => kaal('bank/handtekening/bevestig', Object.assign({ id: b.dataset.tekenen }, extra)),
+        () => kaal('bank/handtekening/opties', { id: b.dataset.tekenen }).then(x => x.body));
+      if (r.status >= 400) throw new Error((r.body && r.body.error) || 'De handtekening ging niet door.');
+      const d = r.body;
       meld('Getekend en uitgevoerd: ' + (d.wat || d.handeling || 'gedaan') + '.'); bankVervers(); }
     catch (e) { meld(e.message); }
   }));

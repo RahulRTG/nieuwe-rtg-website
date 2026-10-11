@@ -78,7 +78,7 @@ const BELEID = {
 
 /* De kern. `zoekBevoegdheid` komt van de aanroeper: deze module weet niet waar
    bevoegdheden wonen, en dat hoort ze ook niet te weten. */
-function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt }) {
+function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt, onomkeerbaarGrendel }) {
   const tijd = nu || klok.nu;
   const B = { ...BELEID, ...(beleid || {}) };
 
@@ -87,7 +87,7 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt }) {
     const bedrag = Math.round(Number(waardeCenten) || 0);
     const raaktWaarde = bedrag > 0;
     const basis = { actor: actor || null, handeling, doel: doel == null ? null : String(doel),
-      waardeCenten: bedrag, beleid: B.versie, at: tijd() };
+      waardeCenten: bedrag, beleid: B.versie, omkeerbaarBovenCenten: B.omkeerbaarBovenCenten, at: tijd() };
 
     if (!handeling) return { ...basis, uitkomst: UITKOMST.ONBEKEND, reden: 'Er is geen handeling opgegeven.' };
 
@@ -140,9 +140,18 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt }) {
         reden: zelf ? 'De aanvrager keurt zijn eigen handeling niet goed; er tekent een ander mee.'
           : 'Vanaf ' + bev.euro(B.goedkeuringBovenCenten) + ' tekent er een tweede persoon mee.' };
 
-    if (bedrag >= B.omkeerbaarBovenCenten && ctx.omkeerbaar !== true)
-      return { ...basis, uitkomst: UITKOMST.OMKEERBAAR, bewijs,
-        reden: 'Vanaf ' + bev.euro(B.omkeerbaarBovenCenten) + ' alleen als de handeling terug te draaien is.' };
+    /* Omkeerbaar komt uit de handeling, nooit uit een handtekening (eigenaarsbesluit
+       2B-aangepast); de enige uitzondering staat in ./risicouitzondering.js. */
+    let viaUitzondering = null;
+    if (bedrag >= B.omkeerbaarBovenCenten && ctx.omkeerbaar !== true) {
+      const u = require('./risicouitzondering').toets({ grendel: onomkeerbaarGrendel, risico: ctx.risicogoedkeuring,
+        actor, goedgekeurdDoor: ctx.goedgekeurdDoor });
+      if (!u.ok)
+        return { ...basis, uitkomst: UITKOMST.OMKEERBAAR, bewijs, omkeerbaar: false,
+          reden: 'Vanaf ' + bev.euro(B.omkeerbaarBovenCenten) + ' alleen als de handeling terug te draaien is, en deze is ' +
+            'dat niet. ' + u.reden };
+      viaUitzondering = u.uitzondering;
+    }
 
     if (bedrag >= B.extraBewijsBovenCenten && ctx.bevestigingVers !== true)
       return { ...basis, uitkomst: UITKOMST.EXTRA_BEWIJS, bewijs,
@@ -157,7 +166,10 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt }) {
        `munt` komt van de aanroeper en is optioneel. Zonder is dit gewoon het
        besluit zoals het altijd al was -- niet een besluit dat stilzwijgend
        zwakker is. */
-    const uit = { ...basis, uitkomst: UITKOMST.TOESTAAN, bewijs, reden: 'Binnen de bevoegdheid en het beleid.' };
+    const uit = { ...basis, uitkomst: UITKOMST.TOESTAAN, bewijs, reden: viaUitzondering
+      ? 'Onomkeerbaar, uitzondering met risicogoedkeuring van ' + viaUitzondering.door + '.'
+      : 'Binnen de bevoegdheid en het beleid.' };
+    if (viaUitzondering) { uit.uitzondering = viaUitzondering; uit.omkeerbaar = false; }
     if (munt) {
       const t = munt(b, { actor: basis.actor, doel: basis.doel, waardeCenten: bedrag,
         beleid: B.versie, eenmalig: raaktWaarde });

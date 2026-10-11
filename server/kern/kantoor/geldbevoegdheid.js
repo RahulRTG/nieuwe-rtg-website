@@ -62,6 +62,20 @@ const LIJST = Object.freeze({
       'handtekening kern/bank/incasso.js#ronde. Deze regel schrijft die bestaande bevoegdheid op; ' +
       'hij breidt hem niet uit.',
   }),
+  /* De teruggave van een betaalde reis, en ALLEEN het pad vanaf de vier-ogengrens:
+     daar loopt hij door de geldketen (routes/kantoren/reisteruggave.js). Onder die
+     grens voert een mens op naam hem zelf uit, met passkey -- dat is het besluit
+     van de eigenaar van 4 oktober 2026 en deze regel verandert daar niets aan. */
+  GELD_TERUGGEVEN: Object.freeze({
+    wat: 'een teruggaverecht van een betaalde reis uitvoeren: de reissom terug naar het betaaladres',
+    rol: 'kantoor-op-naam',
+    scope: '*',
+    grenzen: Object.freeze({}),
+    grond: 'POST /api/office/reisbureau/teruggave staat achter kluisAuth, eist een passkey zonder ' +
+      'terugval en gaat vanaf duizend euro via de tweede handtekening naar ' +
+      'kern/reisbureau-teruggave.js#uitvoeren. Deze regel schrijft die bestaande bevoegdheid op; ' +
+      'hij breidt hem niet uit.',
+  }),
 });
 
 /* De bevoegdheidsbron voor besluit.js. Geeft `null` als de handeling niet in de
@@ -82,9 +96,12 @@ function maakZoeker({ nu } = {}) {
 /* De beslislaag zoals `kern.beslis` hem verwacht: een functie die een vraag
    beantwoordt met een uitkomst, een reden en -- als er een sleutel is -- een
    bewijstoken om mee te dragen. `munt` komt van de bewijstokenlaag. */
-function maakBeslis({ munt, dagverbruik, beleid, nu } = {}) {
+/* `onomkeerbaarGrendel` is de grendel van ../commercie/risicouitzondering.js. Hij wordt hier met
+   opzet NIET gevuld: zonder grendel staat de procedure dicht, en openen is een
+   afzonderlijk besluit van de eigenaar (2B-aangepast, 11 oktober 2026). */
+function maakBeslis({ munt, dagverbruik, beleid, nu, onomkeerbaarGrendel } = {}) {
   const { beslis, UITKOMST, DOOR } = maakBesluit({
-    zoekBevoegdheid: maakZoeker({ nu }), dagverbruik, beleid, nu, munt });
+    zoekBevoegdheid: maakZoeker({ nu }), dagverbruik, beleid, nu, munt, onomkeerbaarGrendel });
   return { beslis, UITKOMST, DOOR, LIJST };
 }
 

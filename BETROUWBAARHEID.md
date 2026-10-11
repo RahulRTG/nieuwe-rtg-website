@@ -44,18 +44,19 @@ blijven.
 | # | bewijs | de vraag | stand |
 |---|---|---|---|
 | 1 | **bereikbaar** | vindt de gebruiker de functie vanaf de plek waar RTG haar presenteert? | **staat** (`APPWERKT.json`) |
-| 2 | **bedienbaar** | doen de knoppen, tabs, velden, uploads en gebaren iets, zonder te breken? | **knoppen wel, de rest niet** — 83 van 112 onderdelen bewezen op hun eigen knoppen (de schil telt niet mee, par. 4g); formulieren, uploads, toetsenbord en gebaren worden niet gemeten |
-| 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een bron voor vier onderdelen** — twee ketenproeven (par. 4a) en twee scenario's van de voltooiproef (par. 4h); of een bron telt, beslist zijn versheid; de rest mist een scenario |
-| 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **staat, voor een leeg antwoord** (`LIEGRONDE.json`, per onderdeel; zie par. 4e) |
-| 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **staat voor twee onderdelen** (`VOLTOOIPROEF.json`, par. 4h): nette herstart, nieuwe sessie, en de opslag zelf |
-| 6 | **bevoegd** | kan een andere rol, een ander gezin of een ander bedrijf hier niets? | **gemeten voor leden en gezinnen** (`BEVOEGD.json`, par. 4f): ledenschermen bakenen af op de sessie en worden samengesteld uit `IDOR.json` en `ROLPROEF.json`, gezinsschermen krijgen een kruisproef op de gezinscode; zaak en kantoor hebben nog geen proef |
-| 7 | **herstelbaar** | overleeft de functie uitval, time-out, dubbelklik en een afgebroken verzoek? | **staat voor twee onderdelen** (`VOLTOOIPROEF.json`, par. 4h): dubbelklik, herhaling, afgebroken verzoek en een crash na de bevestiging; uitval van Redis of PostgreSQL nog niet |
-| 8 | **menselijk** | krijgt de gebruiker nooit een kale 500, TypeError, lege pagina of dode knop? | **half** — kale fouten worden gezien, de bruikbaarheid van een melding niet |
+| 2 | **bedienbaar** | doen de knoppen, tabs, velden, uploads en gebaren iets, zonder te breken? | **knoppen wel, de rest niet** — 93 van 114 onderdelen bewezen op hun eigen knoppen op 11 oktober 2026 (de schil telt niet mee, par. 4g); formulieren, uploads, toetsenbord en gebaren worden niet gemeten |
+| 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een bron voor acht onderdelen** — twee ketenproeven (par. 4a) en zes scenario's van de voltooiproef (par. 4h); of een bron telt, beslist zijn versheid; de rest mist een scenario |
+| 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **staat, voor een leeg antwoord** (`LIEGRONDE.json`, per onderdeel; zie par. 4e) — 96 van 114 BEWEZEN op 11 oktober 2026; de andere 18 hebben geen eigen adres, staan achter een deur of vallen om |
+| 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **staat voor zes onderdelen** (`VOLTOOIPROEF.json`, par. 4h): nette herstart, nieuwe sessie, en de opslag zelf |
+| 6 | **bevoegd** | kan een andere rol, een ander gezin of een ander bedrijf hier niets? | **gezinnen gemeten, leden geblokkeerd** (`BEVOEGD.json`, par. 4f): de twaalf gezinsschermen krijgen een kruisproef op de gezinscode en zijn BEWEZEN; ledenschermen worden samengesteld uit `IDOR.json` (vers) en `ROLPROEF.json`, en dat tweede is op 11 oktober 2026 niet te hermeten (par. 4f, slot); zaak en kantoor hebben nog geen proef |
+| 7 | **herstelbaar** | overleeft de functie uitval, time-out, dubbelklik en een afgebroken verzoek? | **staat voor vier onderdelen, en zakt bij twee** (`VOLTOOIPROEF.json`, par. 4h): dubbelklik, herhaling, afgebroken verzoek en een crash na de bevestiging; bij Mijn loopbaan en Reizen & Veilig vond de proef een echt gebrek; uitval van Redis of PostgreSQL nog niet |
+| 8 | **menselijk** | krijgt de gebruiker nooit een kale 500, TypeError, lege pagina of dode knop? | **staat, als ondergrens** (par. 4i): geen kale fout, elke weigering met haar zin in beeld, geen kale techniek in beeld, geen naamloze eigen knop; of een melding een WEG biedt, meet hij niet |
 
-Bewijs 1, 2 en 8 worden vandaag gemeten door `npm run appwerkt`. De andere vijf
-staan in `APPWERKT.json` per rij met de stand `GEEN_FIXTURE` **en de reden**. Ze
-weglaten zou erger zijn dan ze op rood zetten: een ontbrekend bewijs leest als een
-gehaald bewijs.
+Bewijs 1, 2 en 8 worden gemeten door `npm run appwerkt`; 4 en 6 komen uit de
+liegronde en de bevoegdronde, 3, 5 en 7 uit de voltooiproef of een ketenproef. Wat
+geen bron heeft, staat in `APPWERKT.json` per rij met `GEEN_FIXTURE` of
+`NIET_GETEST` **en de reden**. Weglaten zou erger zijn dan op rood zetten: een
+ontbrekend bewijs leest als een gehaald bewijs.
 
 ## 3. De standen zijn gesloten
 
@@ -408,6 +409,28 @@ Toetsen: `test/liegronde.test.js` (het oordeel, de samenstelling, en de samenhan
 het echte register). Drie handmutaties laten hem zakken: elke klacht als defect
 tellen, de versheid overslaan, en nul gelogen antwoorden als bewezen tellen.
 
+**Hermeten op 11 oktober 2026 (ronde 2): 96 van 114 BEWEZEN, 0 defect.** Het
+register stond sinds 25 september op een commit met ruim tweeduizend gewijzigde
+codebestanden ertussen, dus bewijs 4 stond in `APPWERKT.json` voor alle rijen op
+NIET_GETEST -- niet omdat er iets stuk was, maar omdat vervallen bewijs geen bewijs
+is. "Uitbreiden" bleek daarom geen nieuw ontwerp maar hermeten over alle 114 rijen
+(twee meer dan in september). Wat er niet BEWEZEN is, heeft een reden die de
+liegpoort niet kan wegnemen: elf rijen zonder eigen adres (een stand of kiezer in
+de ledenapp), drie achter een gezinsdeur, en twee schermen die op het kale antwoord
+`undefined` in beeld zetten (Magnaat, Rendez-vous) -- dat is robuustheid en geen
+leugen, dus NIET_GETEST.
+
+De eerste hermeting meldde RTMail als DEFECT op het woord "Verzonden". Dat is de
+naam van een MAP. De ijking zag hem niet omdat de server de inline scripts uit het
+statische bestand haalt, dus de vaste mapnamen staan niet in de ijklijn. Er is
+daarom een `NAGEKEKEN` per onderdeel bijgekomen in de vorm van die van
+`scripts/idorproef.js`: een woord dat een mens heeft nagelopen telt niet als
+defect, staat per rij in `nagekeken`, en een nieuw woord op hetzelfde scherm is
+weer een vraag (`test/liegronde.test.js` toets 6). Een liegende tik is met opzet
+NIET toegevoegd: na een tik antwoordt de liegpoort `{ok:true}`, en een scherm dat
+dan "Opgeslagen" zegt, zegt wat de backend beweerde -- dat zou valse defecten
+opleveren in plaats van een bredere meting.
+
 ## 4f. Bevoegd aan de schermkant: eerst gemeten of er iets te kruisen valt
 
 Rij 6 van de tabel zegt dat de routekant van *bevoegd* staat (`IDOR.json`,
@@ -480,6 +503,33 @@ BEWEZEN, 0 defect**. Bij de meeste ledenschermen staat minstens een route op
 en een route die niet gekruist is, is niet gemeten. Wat die rijen omhoog brengt
 is dus IDOR laten reiken tot die routes (een wereld waarin A daar iets bezit),
 niet de regel versoepelen.
+
+**Hermeten op 11 oktober 2026 (ronde 2): 12 gezinsschermen BEWEZEN, de
+ledenschermen geblokkeerd.** `IDOR.json` is vers gemeten (1959 routes, 698
+gescheiden, 0 doorbraak, 0 lek; de drie nieuwe kandidaten -- aanmeldkanaal en twee
+Magnaat-stadroutes -- zijn met de hand nagelopen en staan met hun reden in
+`NAGEKEKEN`). De kruisproef op de gezinscode loopt nu over alle twaalf
+gezinsschermen met een eigen adres, en elk heeft minstens een paar waarin A
+binnenkwam en B met A's code en een anonieme bezoeker werden geweigerd.
+
+`ROLPROEF.json` is NIET te hermeten, en de proef weigert dat terecht. De rolproef
+ijkt zijn vingerafdruk door een lid zijn eigen saldo te laten opladen en te kijken
+of de vingerafdruk beweegt; ziet hij dat niet, dan zegt hij "DE METER IS BLIND" en
+schrijft hij niets. Sinds de toestelbinding vraagt `/api/pay` een eigen account
+met een gebonden toestel (een bezitsbewijs per verzoek) en voor opladen ook een
+gecontroleerd paspoort. Het ijklid van de rolproef is een demo-inlog en heeft geen
+van beide, dus `/api/pay/overzicht` geeft 403 en het saldo is `null`. De uitweg is
+een ijklid met een gebonden toestel en een paspoort dat door een kantoormens op
+naam is goedgekeurd, en dat is een verbouwing van de rolproef en geen hermeting.
+Tot die er is, zijn alle ledenschermen NIET_GETEST op bewijs 6 met de reden
+"ROLPROEF.json vervallen" -- de regel om alleen met twee verse registers BEWEZEN te
+zeggen, is niet versoepeld.
+
+Onderweg bleek nog iets: een letterlijke require in een COMMENTAAR van
+`scripts/appwerkt.js` maakte de sluiting van appwerkt, liegronde en bevoegdronde
+onbekend (`sluiting()` leest lexicaal), waardoor elke wijziging onder `scripts/`
+`LIEGRONDE.json` en `BEVOEGD.json` liet vervallen. Het commentaar is herschreven en
+`test/liegronde.test.js` toets 7 houdt de sluiting bekend.
 
 ## 4g. Bedienbaar meet het scherm en niet de schil — en vond vier bedekte knoppen
 
@@ -610,6 +660,48 @@ niet (dan las een meetscript de sleutel van de kluis), en bewijst op schijf alle
 dat precies één rij veranderde en dat de klare tekst er niet in staat. Dat de
 inhoud klopt, bewijzen de route na de herstart en de nieuwe sessie. De ratel in
 `test/voltooiproef.test.js` ging van 6 naar 16.
+
+## 4i. Menselijk als ondergrens — bewijs 8 zonder oordeel
+
+**Staat** (11 oktober 2026, ronde 2 van het afbouwprogramma). Tot nu toe werd
+bewijs 8 AFGELEID: zag `appwerkt` een kale JS-fout of een 500, dan was het DEFECT,
+en anders NIET_GETEST "afgeleid: geen kale fout gezien". Daarmee stond het op alle
+rijen op NIET_GETEST, want niets zien is geen bewijs. De vraag "is een melding
+bruikbaar" is een oordeel, en dat oordeel velt deze laag niet. Wat wel kan, is een
+**ondergrens** die een machine nagaat zonder te beoordelen of een tekst prettig
+leest (`scripts/lib/kalefout.js`):
+
+1. geen kale JS-fout en geen 5xx bij laden of bedienen;
+2. een weigering MET een zin staat op het scherm (dat bestond al, par. 5 stap 1);
+3. geen kale techniek in beeld, na het laden en na elke tik: een stacktrace, een
+   foutklasse (`TypeError`), een JS-foutzin, een rauw JSON-antwoord, een kale
+   netwerkmelding, een kale HTTP-status, of rommel (`undefined`, `NaN`,
+   `[object Object]`, `null`). Geijkt tegen de zichtbare TEKST van het statische
+   bestand, zodat een uitleg die zo'n woord gebruikt niet telt;
+4. elke eigen knop heeft een toegankelijke naam (tekst, `aria-label`,
+   `aria-labelledby` of `title`) -- zonder naam zegt een schermlezer alleen "knop".
+   Een element met `visibility:hidden` telt niet mee: dat bestaat voor een
+   schermlezer niet;
+5. en de proef heeft genoeg gezien: alleen als bewijs 2 BEWEZEN is, is bewijs 8
+   BEWEZEN. Wat de proef niet aantikte, is niet gezien.
+
+**Wat het niet meet, staat in elke BEWEZEN-reden:** of een melding een WEG biedt
+(wat kan ik nu doen) en of de taal begrijpelijk is -- dat beoordeelt een mens;
+toetsenbordbediening, schermlezergedrag en contrast (contrast en structuur zijn
+harde poorten van `npm run a11y` en worden hier niet herhaald); de telefoonkant;
+en het belangrijkste: **er is nog nooit een mens met een handicap door dit huis
+gelopen** (`TOEGANKELIJK.md`). Alles hier is gemeten met een browser.
+
+Uitslag bij de vastgelegde ronde: **93 van 114 BEWEZEN, 0 defect** -- precies de
+rijen waar bewijs 2 BEWEZEN is; de 21 andere zijn NIET_GETEST om dezelfde reden als
+bewijs 2. Een ronde eerder op vrijwel dezelfde code waren het er 95: bewijs 2 wiebelt
+op een handvol schermen waar de proef net wel of net niet de helft raakt, en bewijs
+8 wiebelt daarom mee. Dat is een eigenschap van bewijs 2 en geen nieuwe. De eerste proefronde vond op zes schermen "drie naamloze knoppen" die
+het niet waren: knoppen van de gedeelde widgetlaag met `visibility:hidden`,
+waarvan `innerText` leeg is. Dat was de meter, en die telt ze nu niet meer.
+`test/kalefout.test.js` beproeft het oordeel zonder browser; drie mutaties (de
+ijking weg, de NIET_GETEST-grendel weg, het strippen van scripts uit de ijklijn
+weg) laten hem zakken.
 
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 
@@ -818,15 +910,22 @@ verkeerde persoon toont, wel.
    gehaald, is elke uitbreiding van bewijs 2 bouwen op zand. *Een stap weg.*
 2. **Bewijs 2 afmaken** (formulieren, uploads, toetsenbord, mobiel). Geen nieuwe
    infrastructuur nodig. *Een stap weg, na 1.*
-3. **Bewijs 4 verbreden.** De liegpoort bestaat (`RTG_LIEG`) en draait over zes
-   schermen. Hem over alle onderdelen halen kost rekentijd, geen ontwerp.
-   *Een stap weg.*
-4. **De testwereld bouwen** (par. 4), en daarmee bewijs 3, 5 en 7 openen. *Besloten
-   en begonnen* (11 oktober 2026, par. 4h): de adapters voor mail en sms staan, en
-   twee onderdelen dragen alle drie de bewijzen. Wat volgt is per onderdeel een
-   scenario, en voor bellen een besluit over WebRTC-testidentiteiten.
-5. **Bewijs 6 naar de schermkant.** De routekant is gemeten; wat een scherm doet
-   met een sessie van iemand anders niet. *Een stap weg, na 4.*
+3. **Bewijs 4 verbreden.** *Staat* (par. 4e): de liegronde loopt over elk onderdeel
+   met een eigen adres, en is op 11 oktober 2026 vers gemeten (96 van 114).
+   Wat overblijft is geen rekentijd maar een vorm: alleen een LEEG antwoord wordt
+   beproefd, niet een verkeerd antwoord.
+4. **De testwereld bouwen** (par. 4), en daarmee bewijs 3, 5 en 7 openen.
+   *Besloten (11 oktober 2026) en in uitvoering* (par. 4h): de adapters voor mail en
+   sms staan, en zes onderdelen uit vijf werelden dragen een scenario. Wat volgt is
+   per onderdeel een scenario, de twee vondsten van ronde 2 repareren (in
+   `server/`), en voor bellen een besluit over WebRTC-testidentiteiten.
+5. **Bewijs 6 naar de schermkant.** *Half* (par. 4f): voor gezinsschermen loopt de
+   kruisproef met de sessie van een ander gezin, en alle twaalf zijn BEWEZEN. Voor
+   ledenschermen is de schermkant gemeten en leeg (ze noemen geen object bij id),
+   dus de routekant beslist -- en die staat stil op de rolproef, die eerst een
+   ijklid met een gebonden toestel en een paspoort moet krijgen. *Een stap weg.*
+5a. **Bewijs 8 als ondergrens.** *Staat* (par. 4i). Wat een mens moet beoordelen
+   -- biedt een melding een weg -- blijft buiten de machine.
 6. **De acht bewijzen aan `BELOFTE.json` koppelen**, zodat de uitspraak niet per
    ingang maar per belofte gedaan kan worden. *Vraagt een besluit* — welke ingangen
    samen één belofte vormen, staat nergens in de code, en dat verzinnen levert een
@@ -839,12 +938,21 @@ Niet *"292 schermen laden"*, maar iets in deze vorm — met per getal een regist
 dat hem draagt:
 
     N/N onderdelen bereikbaar voor hun eigen persona
-    N/N gebruikershandelingen bedienbaar zonder fout   (nu: 439 van 3407)
+    N/N gebruikershandelingen bedienbaar zonder fout
     N/N primaire stromen end-to-end voltooid
     0 schermen die meer beweren dan de backend heeft bewezen
     0 onbewezen kritieke mutaties
     0 autorisatielekken
     0 kale fouten die de gebruiker bereiken
 
-Vandaag is alleen de eerste regel te vullen, en de tweede voor een achtste. Dat is geen
-tegenvaller: het is de eerste keer dat de vraag überhaupt een noemer heeft.
+**De stand op 11 oktober 2026 (ronde 2, `APPWERKT.json`):** bereikbaar 99 van 114;
+bedienbaar 93 van 114 rijen (2186 van 2605 eigen knoppen aangetikt); voltooid 8
+onderdelen met een bron, waarvan 6 BEWEZEN; 0 schermen die bij een leeg antwoord
+een zekerheid verzinnen, over 96 schermen; autorisatie: 0 lek over 12
+gezinsschermen en 1959 IDOR-routes, maar de ledenschermen zijn op bewijs 6 niet
+gemeten; 0 kale fouten over 93 schermen die de ondergrens van bewijs 8 halen.
+**Geen enkele rij staat op alle acht BEWEZEN.** De dichtstbijzijnde zijn de vier
+ledenonderdelen met een voltooiscenario dat sluit (Post van RTG, Waar ben ik
+aanwezig, Wie ben ik, Wonen): zeven van acht, en het achtste is bewijs 6, dat op de
+rolproef wacht. De gezinsschermen hebben bewijs 6 wel en een scenario niet. Dat is
+de eerlijke vorm van de uitspraak: per bewijs een noemer, en per rij de strengste.

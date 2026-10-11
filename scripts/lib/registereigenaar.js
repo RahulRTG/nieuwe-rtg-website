@@ -60,6 +60,15 @@ const EIGENAAR = {
      ze daardoor alle achttien op ONBESLIST. De schrijvers zijn hier niet
      geraden: elk script staat als `writeFileSync` op dit bestand in zijn bron,
      en de --controle-stand ervan houdt het register tegen een verse meting. */
+  /* Vier registers uit de samenvoeging van #542, elk met zijn eigen meter. */
+  'GEMEENSCHAPSPROEF.json': { schrijver: 'scripts/gemeenschapsproef.js',
+    waarom: 'De gemeenschapsproef van FoundationOS (#558): npm run gemeenschapsproef:vast meet de keten en legt hem vast.' },
+  'GROEPVORM.json': { schrijver: 'scripts/groepvorm.js',
+    waarom: 'Een afdruk van de groepsvormen uit de code; npm run groepvorm:vast herschrijft hem.' },
+  'ROMEPROEF.json': { schrijver: 'scripts/romeproef.js',
+    waarom: 'De Rome-keten door alle vier de werelden (#561); npm run romeproef:vast meet en legt vast.' },
+  'SCHILHERSTART.json': { schrijver: 'scripts/schilherstart.js',
+    waarom: 'Hoeveel van de schil bij een tik opnieuw opstart (#586, WERKRUIMTE.md par. 12); gemeten in een browser.' },
   'LOOP-FABRIC-COVERAGE.json': { schrijver: 'scripts/loop-fabric-coverage.js',
     waarom: 'npm run loopfabric:coverage schrijft het; test/loop-fabric-coverage.test.js eist dat het reproduceerbaar is.' },
   'LOOP-FABRIC-EXECUTION-MATRIX.json': { schrijver: 'scripts/loop-fabric-execution.js',
@@ -83,7 +92,7 @@ const EIGENAAR = {
     waarom: 'npm run contextdoorgifte schrijft het (met de ratel onder `ratel`); test/contextdoorgifte-server.test.js houdt een deelronde ertegen.' },
   'TRUST_EVIDENCE_PLANE.json': { schrijver: 'scripts/trust-evidence-plane.js',
     waarom: 'npm run trust:manifest schrijft het; keuringsregel 74 (scripts/check.js) eist dat het bij de uitvoerbare kern hoort.' },
-  'TOEZEGKLASSEN.json': { soort: 'BRON', waarom: 'Handgeschreven besluitbestand onder de inventaris van AFBOUWPROGRAMMA.md (#559); elk citaat moet letterlijk in zijn document staan en test/toezegklassen.test.js bewaakt dat.' },
+  'TOEZEGKLASSEN.json': { handmatig: true, lezer: 'test/toezegklassen.test.js', waarom: 'Handgeschreven besluitbestand onder de inventaris van AFBOUWPROGRAMMA.md (#559); elk citaat moet letterlijk in zijn document staan en test/toezegklassen.test.js bewaakt dat.' },
   'ONTWERPSTANDAARD-METING.md': { soort: 'BRON', waarom: 'Handgeschreven meetverslag van website tegenover app (#585), op een genoemde commit; verandert geen code.' },
   'LIBRARYOS.md': { soort: 'BRON', waarom: 'Handgeschreven ontwerp van LibraryOS (#502); de kernel- en HTTP-toetsen leveren het bewijs.' },
   'LIBRARYOS-RESULTAAT.md': { soort: 'BRON', waarom: 'Handgeschreven opleververslag van LibraryOS (#502).' },

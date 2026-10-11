@@ -138,7 +138,7 @@ test('2. een stichting die de RTFoundation niet erkende, kan niet dragen en ziet
   assert.equal((await post('/api/rtfos/portaal/partner/genootschap', { code: 'RTFP-VERZONNEN' })).status, 404);
 });
 
-// Zakt bij de mutatie: in opzet/kernlaag4.js `toelating: ...` weghalen -> de minderjarige wordt uitgenodigd, zakt.
+// Zakt bij de mutatie: in opzet/kernlaag4-gemeenschap.js `toelating: ...` weghalen -> de minderjarige wordt uitgenodigd, zakt.
 // Zakt bij de mutatie: in drager.js vraag() de lus over `gr.leden` met beschermdeReden weghalen -> de vraag gaat door, zakt.
 // Zakt bij de mutatie: in index.js nodigUit de echte reden teruggeven in plaats van de neutrale -> de beheerder leert iets over de persoon, zakt.
 test('3. een minderjarige gaat niet door een ander een gedragen genootschap in, en een groep met een minderjarige wacht', async () => {

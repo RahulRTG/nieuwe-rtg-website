@@ -13,7 +13,7 @@
     "browserpoortToetsen": 426,
     "carriereDomeinenGemeten": 15,
     "dbDeuren": 540,
-    "dbDeurenSchrijvend": 275,
+    "dbDeurenSchrijvend": 276,
     "dekkingPct": 83,
     "dekkingWaargenomenPct": 100,
     "delenZonderOnderwerp": 0,
@@ -28,12 +28,12 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4541,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1685,
-    "kernGedeeld": 254,
+    "kernBreedte": 1686,
+    "kernGedeeld": 255,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 185,
-    "keuringOmvang": 343,
+    "keuringOmvang": 353,
     "keuringScheef": 14,
     "keuringStuk": 0,
     "keuringTeGroot": 12,
@@ -165,6 +165,43 @@
     "loopFabricTijdelijk": 168
   },
   "notities": [
+    {
+      "datum": "2026-10-11",
+      "soort": "structureel",
+      "sleutel": "dbDeurenSchrijvend",
+      "van": 275,
+      "meter": "dbDeurenSchrijvend 275 -> 276",
+      "reden": "server/betaal/connect/opslag.js is de eigenaar van de collectie met Stripe Connect-afrekeningen en schrijft daarin via lib/duurzaam (keuringsregel 47: vastgelegd VOOR elke aanroep naar Stripe). Een omweg via een generieke db-helper zou de duurzaamheidsgarantie verliezen die de crashproef vasthoudt.",
+      "waarheen": "test/connect-afrekening.test.js (crash na versturen, twee processen tegelijk)"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 254,
+      "meter": "kernGedeeld 254 -> 255",
+      "reden": "Dezelfde naam als kernBreedte hierboven: sessiestroom is met opzet gedeeld door drie domeinen, want het ruilloket is een plek en de soorten zijn van de domeinen die de deur bezitten.",
+      "waarheen": "test/stroom-rolscheiding.test.js houdt vast dat elke rol alleen zijn eigen soort krijgt"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1685,
+      "meter": "kernBreedte 1685 -> 1686",
+      "reden": "De kernnaam sessiestroom (server/kern/sessiestroom.js, stroomtickets in plaats van sessies in een adres, P2 van de V1-hardening) wordt door de domeinen office, supplier en theater gelezen: elk registreert daar zijn EIGEN stroomsoort met zijn eigen toets op de sessie. Een route die de module zelf zou requiren, maakt een tweede ticketopslag met een eigen greep op de database.",
+      "waarheen": "GRENZEN.json draagt de naam; test/sessiestroom.test.js en test/stroom-rolscheiding.test.js tegen een echte server"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 343,
+      "vervalt": "2027-01-09",
+      "meter": "keuringOmvang 343 -> 353",
+      "reden": "De V1-hardening (PR #523) zette zestien serverbestanden in de band 9,4-10 kB en haalde er drie uit (kern/pay/partner.js, kern/webauthn.js, lib/keten.js): beleidsmotor/index, factuurcorrectie, identiteit/sessieregister, identiteit/toestellen, pay/opladen, pay/terug, pay/verzoeken, sessiestroom, vrijgave/oordeel, vrijgave/register, zwaarbewijs, lib/ankerdienst, lib/idem, opzet/luister, routes/member/toestellen, routes/theater. Geen ervan staat over de grens (de deltapoort houdt dat hard tegen); ze vlak voor een release opknippen raakt de geld- en identiteitspaden die net met mutaties zijn nagetrokken.",
+      "waarheen": "Per bestand op zijn natuurlijke naad knippen na de RC-bevriezing, te beginnen bij vrijgave/oordeel.js en pay/verzoeken.js (het dichtst bij de grens)."
+    },
     {
       "datum": "2026-10-06",
       "soort": "schuld",

@@ -78,6 +78,9 @@ test('de gelukkige weg: transfer, payout met Stripe-Account, betaald; effecten p
   const po = nep.payouts.get(rec.payoutId); po.status = 'paid';
   await c.verwerk(nep.gebeurtenis('payout.paid', po, 'acct_partner1'));
   assert.equal(c.opslag.haal('afr-gelukkig-1').stand, 'betaald');
+  /* De lijst die het kantoor leest (lijst() -> opslag.alle()) is hier GEVULD: de
+     tegenproef van de lege lijst na een geweigerde aanvraag in vrijgave-routes. */
+  assert.equal(c.lijst().afrekeningen.filter(a => a.id === 'afr-gelukkig-1').length, 1);
   assert.equal(grootboek.get(S.economisch('afr-gelukkig-1', 'afgerekend')).centen, 2500);
   assert.equal(boekingen.filter(b => b.afrekening === 'afr-gelukkig-1').length, 2, 'reservering en afgerekend, verder niets');
 });

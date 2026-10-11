@@ -3,10 +3,10 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-11T20:28:09.482Z",
-  "commit": "4366fa980",
+  "op": "2026-10-11T22:22:58.488Z",
+  "commit": "edd3af8cf",
   "boomVuil": false,
-  "boomAnders": 6,
+  "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v26.10.0"
  },
@@ -1490,7 +1490,7 @@
    "naam": "GEMEENSCHAPSPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/gemeenschapsproef.js",
-   "graad": "stempel",
+   "graad": "verklaard",
    "schrijvers": [
     "scripts/gemeenschapsproef.js"
    ],
@@ -1641,7 +1641,7 @@
    "naam": "GROEPVORM.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/groepvorm.js",
-   "graad": "stempel",
+   "graad": "verklaard",
    "schrijvers": [
     "scripts/groepvorm.js"
    ],
@@ -3731,13 +3731,13 @@
    "naam": "ROMEPROEF.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/romeproef.js",
-   "graad": "stempel",
+   "graad": "verklaard",
    "schrijvers": [
     "scripts/romeproef.js"
    ],
    "stempelInstrument": "scripts/romeproef.js",
    "stempelAnders": false,
-   "versheidOpdracht": null,
+   "versheidOpdracht": "npm run romeproef:vast",
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -4069,13 +4069,13 @@
    "naam": "SCHILHERSTART.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/schilherstart.js",
-   "graad": "stempel",
+   "graad": "verklaard",
    "schrijvers": [
     "scripts/schilherstart.js"
    ],
    "stempelInstrument": "scripts/schilherstart.js",
    "stempelAnders": false,
-   "versheidOpdracht": null,
+   "versheidOpdracht": "npm run schilherstart",
    "grendelt": false,
    "botsingVerklaard": null
   },

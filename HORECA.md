@@ -925,7 +925,8 @@ hoeveel TAFELS er nog bij iemand staan die al uitklokte. Dat leest de prikklok
 van het personeelsdomein via `klokVan` (`kern/personeel.js`) en verder niets: het
 besluit staat in NORM.json (`kernGedeeld` 254 -> 255) met wie levert, wie leest
 en de begrenzing, en `test/horeca-klokgrens.test.js` zakt zodra de horecakant
-meer uit dat domein haalt dan `open` en `laatsteUit`. Uitklokken in de
+meer uit dat domein haalt dan `open` en `laatsteUitklok`, of op een nieuwe
+plek het klokboek rechtstreeks leest (drie oudere lezingen staan er als ratel). Uitklokken in de
 personeelsapp zegt het nog niet; dat is de koppeling in de andere richting en
 valt buiten dit besluit.
 

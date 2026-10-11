@@ -121,7 +121,7 @@ module.exports = ({ horeca, schoon }) => {
        kwam; dan zou een uitklok van gisteren "weg" melden. */
     const sinds = Date.parse(l.at);
     if (!Number.isFinite(sinds)) return { stand: 'niet-gemeten', reden: 'Deze leen heeft geen leesbaar tijdstip.' };
-    if (klok.laatsteUit && Date.parse(klok.laatsteUit) >= sinds) return { stand: 'uitgeklokt', om: klok.laatsteUit };
+    if (klok.laatsteUitklok && Date.parse(klok.laatsteUitklok) >= sinds) return { stand: 'uitgeklokt', om: klok.laatsteUitklok };
     return { stand: 'niet-gemeten',
       reden: 'Er staat geen klokregel van na het uitlenen; of ' + (l.naam || 'de drager') + ' er nog is, weet het systeem niet.' };
   }

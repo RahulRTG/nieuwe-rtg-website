@@ -88,7 +88,12 @@ test('2. ingeklokt, dan uitgeklokt -- en de tafel blijft op zijn naam', async ()
   assert.equal(d.dragerWeg, 1, 'en de vloer telt het als tafel, niet als mens');
   /* Besluit 1A: de Vloer krijgt de STAND, nooit wat klokVan teruggeeft -- geen
      uren van een collega, geen klokregels (test/horeca-klokgrens.test.js). */
-  for (const l of d.leningen) assert.deepEqual(Object.keys(l.drager).filter((k) => !['stand', 'om', 'reden'].includes(k)), []);
+  for (const l of d.leningen) {
+    assert.deepEqual(Object.keys(l.drager).filter((k) => !['stand', 'om', 'reden'].includes(k)), []);
+    // en de leen zelf draagt niets bij dat erbij is gekomen (geen klokantwoord ernaast)
+    assert.deepEqual(Object.keys(l).filter((k) => !['tafel', 'staffId', 'naam', 'at', 'vanId', 'vanNaam',
+      'wijkId', 'wijkNaam', 'staat', 'drager', 'vanMij', 'naarMij'].includes(k)), []);
+  }
 
   // weer inklokken haalt de waarschuwing weg
   await B('/api/staff/clock', {});

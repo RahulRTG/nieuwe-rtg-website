@@ -12,7 +12,7 @@
       trustVan, scheduleFor) gebruikt de horecakant alleen klokVan, en die
       alleen in de wijkroute;
    2. van wat klokVan teruggeeft leest de afleiding alleen `open` en
-      `laatsteUit` -- geen uren, geen klokregels;
+      `laatsteUitklok` -- geen uren, geen klokregels;
    3. wat er naar de Vloer gaat is de STAND (stand, om, reden), nooit het
       antwoord van klokVan zelf. Dat laatste meet test/horeca-leen-dienst.test.js
       op een echte server.
@@ -61,7 +61,7 @@ test('1. van het personeelsdomein gebruikt de horecakant alleen klokVan, en alle
     'eigenaarsbesluit 1A staat alleen klokVan toe, en alleen voor de dragerstand op de Vloer');
 });
 
-test('2. de afleiding leest uit klokVan alleen open en laatsteUit, en geeft de juiste stand', () => {
+test('2. de afleiding leest uit klokVan alleen open en laatsteUitklok, en geeft de juiste stand', () => {
   /* Op de LOOPTIJD gemeten en niet op de bron: een Proxy over het echte antwoord
      van klokVan legt vast welke velden de afleiding werkelijk aanraakt. Naast
      elke lezing staat de stand die eruit hoort te komen, zodat een afleiding die
@@ -80,7 +80,7 @@ test('2. de afleiding leest uit klokVan alleen open en laatsteUit, en geeft de j
   geval([{ staffId: 7, in: '2026-10-11T18:00:00.000Z', out: '2026-10-11T23:00:00.000Z' }], 'uitgeklokt');
   geval([{ staffId: 7, in: '2026-10-11T17:00:00.000Z', out: '2026-10-11T19:00:00.000Z' }], 'niet-gemeten');
   geval([], 'niet-gemeten');
-  assert.deepEqual([...gelezen].sort(), ['laatsteUit', 'open'],
+  assert.deepEqual([...gelezen].sort(), ['laatsteUitklok', 'open'],
     'de dragerstand leest meer uit de prikklok dan besluit 1A toestaat: ' + [...gelezen].join(', '));
 });
 
@@ -101,4 +101,40 @@ test('3. binnen het hele supplierdomein leest alleen de wijkroute klokVan', () =
   };
   loop('server/routes/supplier');
   assert.deepEqual(uit, ['server/routes/supplier/horeca/wijk.js']);
+});
+
+test('4. de horecakant leest het klokboek niet op een NIEUWE plek rechtstreeks', () => {
+  /* Drie plekken lazen db.data.klok al voordat besluit 1A er was (de wie-is-er-
+     lijsten van Invisible Arrival, Spatial Command en de vloermissies). Die
+     staan hier als BESTAAND en zijn een ratel: de lijst mag korter worden,
+     nooit langer. Een nieuwe lezing -- rechtstreeks, met een opgebouwde naam
+     (`'klok' + ...`) of via kern[...] -- hoort langs klokVan en het besluit. */
+  const BESTAAND = ['server/routes/supplier/horeca/invisible-arrival.js',
+    'server/routes/supplier/horeca/spatial-command.js', 'server/routes/supplier/pda/vloer-missies.js'];
+  const uit = [];
+  const loop = (map) => {
+    for (const n of fs.readdirSync(path.join(WORTEL, map))) {
+      const r = path.join(map, n);
+      if (fs.statSync(path.join(WORTEL, r)).isDirectory()) loop(r);
+      else if (n.endsWith('.js') && /data\.klok\b|['"]klok['"]\s*\+|\bkern\[/.test(code(lees(r)))) uit.push(r);
+    }
+  };
+  for (const m of ['server/routes/supplier/horeca', 'server/kern/horeca', 'server/routes/supplier/pda']) loop(m);
+  for (const f of ['server/routes/supplier/horeca.js', 'server/kern/horeca.js'])
+    if (/data\.klok\b|['"]klok['"]\s*\+|\bkern\[/.test(code(lees(f)))) uit.push(f);
+  assert.deepEqual(uit.filter((f) => !BESTAAND.includes(f)), [],
+    'een nieuwe rechtstreekse lezing van het klokboek aan de horecakant, buiten besluit 1A om');
+});
+
+test('5. klokVan zet geen veld dat een bestaande lezer al anders gebruikt', () => {
+  /* routes/staff/collega.js spreidt klokVan() over zijn eigen rij heen. Een veld
+     uit klokVan met dezelfde naam als een van die van de rij overschrijft dus
+     stil wat het kantoorscherm toont -- de tegenlezing vond precies dat met
+     `laatsteUit` (een manager zag "uit gisteren" bij wie nu binnen is). */
+  const boek = [{ staffId: 1, in: '2026-10-11T08:00:00.000Z', out: null }];
+  const { klokVan } = require('../server/kern/personeel').maakPersoneel({ db: { data: { klok: { Z: boek }, trustLine: [] } }, accounts: {}, afwezigOp: () => null });
+  const rij = (code(lees('server/routes/staff/collega.js')).match(/return \{([\s\S]*?)\.\.\.klokVan\(/) || [])[1];
+  assert.ok(rij, 'routes/staff/collega.js spreidt klokVan() niet meer zoals deze toets aanneemt');
+  const eigen = [...rij.matchAll(/\b([A-Za-z]+)\s*:/g)].map((m) => m[1]);
+  assert.deepEqual(Object.keys(klokVan('Z', 1)).filter((k) => eigen.includes(k)), []);
 });

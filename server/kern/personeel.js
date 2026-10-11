@@ -24,8 +24,10 @@ function maakPersoneel({ db, accounts, afwezigOp }) {
       open: !!mijn.find(e => !e.out),
       /* de laatste uitklok, zodat de horecavloer kan zien of de drager van een
          geleende tafel al weg is (kern/horeca/wijk-leen.js) zonder zelf in het
-         klokboek te lezen */
-      laatsteUit: uit.length ? uit[uit.length - 1] : null,
+         klokboek te lezen. NIET `laatsteUit`: routes/staff/collega.js zet dat
+         veld al en spreidt dit antwoord eroverheen, en daar betekent het de
+         uitklok van de NIEUWSTE regel (null = nu binnen). */
+      laatsteUitklok: uit.length ? uit[uit.length - 1] : null,
       vandaagUren: urenVan(mijn.filter(e => e.in.slice(0, 10) === vandaag).reduce((s, e) => s + duur(e), 0)),
       weekUren: urenVan(mijn.filter(e => e.in.slice(0, 10) >= week).reduce((s, e) => s + duur(e), 0))
     };

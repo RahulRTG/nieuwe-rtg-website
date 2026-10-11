@@ -2,17 +2,17 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-10-06",
-    "commit": "f53a1fe1e"
+    "op": "2026-10-11",
+    "commit": "fa62153d"
   },
   "bronnen": {
     "schermroutes": {
       "op": "2026-10-06",
-      "commit": "5674039a3"
+      "commit": "bc7e30bd2"
     },
     "schermgedrag": {
       "op": "2026-10-06",
-      "commit": "ce0a96a57"
+      "commit": "643c390ff"
     }
   },
   "ruis": [
@@ -92,6 +92,10 @@
     },
     {
       "script": "public/shared/rtg-adaptive-edge-input.js",
+      "schermen": 10
+    },
+    {
+      "script": "public/shared/rtg-adaptive-edge-services.js",
       "schermen": 10
     },
     {
@@ -529,7 +533,7 @@
         "/api/push"
       ],
       "zonderServer": false,
-      "inkomend": 199,
+      "inkomend": 201,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/agenda.html",
@@ -1490,7 +1494,7 @@
         "/api/comm"
       ],
       "zonderServer": false,
-      "inkomend": 30,
+      "inkomend": 31,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -6164,12 +6168,13 @@
         "/api/rahul"
       ],
       "zonderServer": false,
-      "inkomend": 8,
+      "inkomend": 9,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
         "public/shared/command/catalog.js",
         "public/shared/interface/second-screen-personal.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/workos-premium.js",
         "server/kern/appcatalogus-rijen/deel2.js",
         "server/kern/appgids-data/deel7.js",
@@ -6304,9 +6309,10 @@
       "schilPaden": [],
       "domeinen": [],
       "zonderServer": true,
-      "inkomend": 12,
-      "inIndex": 1,
+      "inkomend": 13,
+      "inIndex": 2,
       "inkomendVan": [
+        "public/apps/app-main/app-main-04.js",
         "public/apps/app.html",
         "public/apps/foundation/privacy.html",
         "public/apps/juridisch.html",
@@ -6317,8 +6323,7 @@
         "public/shared/interface/second-screen-personal.js",
         "public/shared/social-intelligence-deck.js",
         "public/site/platform-app.js",
-        "server/kern/appgids-data/deel3.js",
-        "server/kern/wereldroutes/instellingen.js"
+        "server/kern/appgids-data/deel3.js"
       ]
     },
     {
@@ -7015,10 +7020,11 @@
         "/api/library"
       ],
       "zonderServer": false,
-      "inkomend": 3,
-      "inIndex": 4,
+      "inkomend": 4,
+      "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
+        "public/apps/foundation/os-publiek.html",
         "server/kern/appcatalogus-rijen/deel1b.js",
         "server/kern/appgids-data/deel9.js"
       ]
@@ -7752,7 +7758,7 @@
         "/api/ondertiteling"
       ],
       "zonderServer": false,
-      "inkomend": 15,
+      "inkomend": 16,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -7764,9 +7770,9 @@
         "public/shared/clipdeler.js",
         "public/shared/clipdeler/clipdeler-01.js",
         "public/shared/rosapps.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/split.js",
-        "server/kern/appcatalogus-rijen/deel1b.js",
-        "server/kern/appgids-data/deel6.js"
+        "server/kern/appcatalogus-rijen/deel1b.js"
       ]
     },
     {
@@ -7967,13 +7973,14 @@
         "/api/mijn"
       ],
       "zonderServer": false,
-      "inkomend": 9,
+      "inkomend": 10,
       "inIndex": 4,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/ik.html",
         "public/apps/muziek.html",
         "public/shared/interface/second-screen-modules.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/rtg-edge-preferences.js",
         "public/shared/rtg-edge-smart-menu.js",
         "public/shared/rtg-edge-smart-menu/rtg-edge-smart-menu-01.js",
@@ -8279,7 +8286,7 @@
         "/api/samen"
       ],
       "zonderServer": false,
-      "inkomend": 8,
+      "inkomend": 9,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -8288,6 +8295,7 @@
         "public/apps/media.html",
         "public/apps/rtg.html",
         "public/shared/rosapps.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "server/kern/appcatalogus-rijen/deel1b.js",
         "server/kern/appgids-data/deel6.js"
       ]
@@ -11162,7 +11170,7 @@
         "/api/veiligheid"
       ],
       "zonderServer": false,
-      "inkomend": 19,
+      "inkomend": 20,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-24.js",
@@ -11548,7 +11556,7 @@
         "/api/wereld"
       ],
       "zonderServer": false,
-      "inkomend": 10,
+      "inkomend": 11,
       "inIndex": 8,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
@@ -11556,6 +11564,7 @@
         "public/apps/rtg.html",
         "public/shared/command.js",
         "public/shared/interface/world-presentation.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/sw.js",
         "server/kern/appgids-data/deel1.js",
         "server/kern/lidmaatschap.js",
@@ -11957,6 +11966,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
@@ -11997,6 +12007,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
@@ -12037,6 +12048,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
@@ -12077,6 +12089,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
@@ -12117,6 +12130,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
@@ -12157,6 +12171,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
@@ -12191,6 +12206,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
@@ -12230,6 +12246,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
@@ -12269,6 +12286,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",
@@ -12308,6 +12326,7 @@
         "public/shared/adaptief/grammatica.js",
         "public/shared/rtg-adaptive-edge-input.js",
         "public/shared/rtg-adaptive-edge-controls.js",
+        "public/shared/rtg-adaptive-edge-services.js",
         "public/shared/rtg-adaptive-edge.js",
         "public/site/start/experience-core.js",
         "public/site/storyline-stage.js",

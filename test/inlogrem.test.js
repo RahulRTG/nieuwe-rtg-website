@@ -100,8 +100,8 @@ test('een verspreide aanval op een account wordt vertraagd, en nooit met een slo
    die antwoordt met 403. Dat is geen regressie maar precies wat beide kanten
    apart bedoelden en geen van beide alleen kon: de ladder wilde "een adres
    isoleren, geen etiket", en pas sinds de melding het aanvallende ADRES draagt
-   (in plaats van de emmer, waar de inlognaam in zit) is er een adres om te
-   isoleren.
+   (in plaats van de emmer, waar een vingerafdruk van het account in zit) is
+   er een adres om te isoleren.
 
    De bewering blijft dus wat hij was -- wie blijft gokken wordt gestopt -- maar
    hij noemt beide manieren waarop dat mag gebeuren. Haalt iemand allebei de

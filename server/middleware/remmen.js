@@ -99,6 +99,18 @@ function hoofdzekering({ db, accounts, eigenaar }) {
    van een lid geeft een werksessie of een bewijs voor de tweede stap, en de
    tweede stap loopt over hetzelfde pad. Tijdens de pauze wacht die dus ook.
 
+   /api/supplier/staff/join staat erop (N29) hoewel hij geen sessie geeft: hij
+   toetst wel een RTG-wachtwoord, en een aanval die de inlog dicht vindt, hoort
+   niet naar een deur ernaast te kunnen uitwijken. Zie de kop van
+   ../routes/supplier/werving/personeel-aanmelden.js.
+
+   DEZE LIJST HEEFT TWEE LEZERS. Naast de pauze hieronder leest
+   ../kern/zaakdoos/journaal.js hem (journaalPadOk, via isInlogPad): een pad
+   op deze lijst komt nooit in het naspeeljournaal van de Zaakdoos. Wie een pad
+   weghaalt voor de pauze, haalt het dus ook uit de journaaluitsluiting, en dan
+   ligt zijn lijf weer onversleuteld op het kastje; slot 4B daar vangt alleen
+   een wachtwoordveld, geen code of bewijs.
+
    DEZE LIJST IS NIET ELKE DEUR NAAR EEN SESSIE. Het kantoorgesprek
    (/api/kantoor/gesprek/zeg), de techniekinlog, de passkey-inlog en de
    SSO-wissel staan er niet op. Een deur toevoegen zegt dus niets over of de
@@ -124,7 +136,7 @@ function hoofdzekering({ db, accounts, eigenaar }) {
    dat van de router, en draait de pauze op een echte server. */
 const INLOG_PADEN = ['/api/login', '/api/auth/login', '/api/auth/register', '/api/auth/forgot',
   '/api/auth/reset', '/api/office/login', '/api/supplier/login', '/api/staff/login', '/api/aanmeld/zeg',
-  '/api/supplier/mijn/login'];
+  '/api/supplier/mijn/login', '/api/supplier/staff/join'];
 const INLOG_SET = new Set(INLOG_PADEN);
 const { vastePaden } = require('../web/routeindex');
 function isInlogPad(pad) { return vastePaden(String(pad || '')).some(p => INLOG_SET.has(p)); }

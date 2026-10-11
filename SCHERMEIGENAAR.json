@@ -818,6 +818,16 @@
       "stand": "blijft",
       "eigenaar": null,
       "reden": "De gedeelde paden zijn het generieke doe/lees-kanaal van het leerhuis; de handeling staat in het lijf. Mijn leerhuis is de leerling (leerhuis.mijn), aan het werk de trainer, assessor of kenniseigenaar (leerhuis.werk)."
+    },
+    {
+      "schermen": [
+        "apps/kantoren.html",
+        "apps/stadsdoos.html"
+      ],
+      "klasse": "geen-dubbel",
+      "stand": "blijft",
+      "eigenaar": null,
+      "reden": "De gedeelde paden zijn de generieke kantoorschil (het /api/office/-voorvoegsel van de api-helper en de kantoorstroom); kantoren beheert vestigingen, de Stadsdoos is een veldapparaat dat zich aanmeldt en een hartslag stuurt."
     }
   ],
   "schermen": {

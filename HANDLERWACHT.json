@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-07T01:41:53.213Z",
-  "commit": "88661ef0e",
+  "op": "2026-10-11T06:08:33.221Z",
+  "commit": "cb266735",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -344,7 +344,7 @@
   },
   {
    "sleutel": "POST /api/auth/login",
-   "bestand": "server/routes/auth/inlog.js:28",
+   "bestand": "server/routes/auth/inlog.js:32",
    "staat": "openbaar",
    "reden": "dit IS de deur: wie inlogt heeft nog geen sessie; drie remmen, een vertraging bij een belaagd account en het beveiligingsjournaal beschermen hem"
   },
@@ -1138,7 +1138,7 @@
   },
   {
    "sleutel": "POST /api/cluster/:actie",
-   "bestand": "server/server.js:885",
+   "bestand": "server/server.js:887",
    "staat": "openbaar",
    "reden": "de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet"
   },
@@ -4092,7 +4092,7 @@
   },
   {
    "sleutel": "POST /api/supplier/mijn/login",
-   "bestand": "server/routes/supplier/pda/posities-inlog.js:86",
+   "bestand": "server/routes/supplier/pda/posities-inlog.js:96",
    "staat": "eigenControle"
   },
   {
@@ -4102,13 +4102,13 @@
   },
   {
    "sleutel": "POST /api/supplier/staff/join",
-   "bestand": "server/routes/supplier/werving/personeel.js:110",
+   "bestand": "server/routes/supplier/werving/personeel-aanmelden.js:51",
    "staat": "openbaar",
    "reden": "personeel meldt zich aan met een uitnodigingscode"
   },
   {
    "sleutel": "POST /api/techniek/inloggen",
-   "bestand": "server/routes/techniek/inlog.js:57",
+   "bestand": "server/routes/techniek/inlog.js:70",
    "staat": "eigenControle"
   },
   {
@@ -4266,7 +4266,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1375",
+   "bestand": "server/server.js:1377",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

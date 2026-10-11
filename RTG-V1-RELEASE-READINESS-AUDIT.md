@@ -1,6 +1,6 @@
 # RTG V1 — RELEASE READINESS AUDIT
 
-> **STATUS 11 oktober 2026 — remediatie ronde 1 tot en met 6 uitgevoerd.**
+> **STATUS 11 oktober 2026 — remediatie ronde 1 tot en met 7 uitgevoerd.**
 >
 > - **Ronde 1:** de 2 P0's, de P1 en de kapotte release-gate uit ronde 0 zijn
 >   gerepareerd, met regressietests én een onafhankelijke adversariële
@@ -21,14 +21,14 @@
 >   een medewerker die uit het team is gehaald, zet zichzelf met zijn oude
 >   kassacode weer actief, en het antwoord daarop bevat de ruwe personeelsrij en
 >   het zaakrecord. Daarnaast vier P2's die er al waren (N37 tot en met N40).
-> - **Verdict nu:** 🔴 NO-GO voor de personeels- en werkplekfunctie zolang N36
->   openstaat; voor de rest van de code 🟡 CONDITIONAL GO. **82/100.** Wat nog
->   open staat:
->   - **N36 (P1): een besluit van de eigenaar;**
->   - de P2's N37–N40 (besluitpunten in ronde 6);
+> - **Ronde 7:** N36 (de P1) is dicht. N37 en N39 zijn VERIFIED FIXED. Een
+>   tweede herkeuring vond nog een P2 die er al was (N52): een verwijderde
+>   manager komt terug met een code die hij zelf uitgaf.
+> - **Verdict nu:** 🟡 CONDITIONAL GO, **86/100**. Wat nog open staat:
+>   - de P2's N38, N40 en N52 (besluitpunten in ronde 7);
 >   - de externe poorten F3–F6.
 >
-> Zie **§REMEDIATIESTATUS** (ronde 1 tot en met 6) direct onder sectie A. De
+> Zie **§REMEDIATIESTATUS** (ronde 1 tot en met 7) direct onder sectie A. De
 > oorspronkelijke ronde-0-bevindingen blijven hieronder staan met hun status
 > (OPEN / FIXED / VERIFIED FIXED).
 
@@ -1023,10 +1023,10 @@ achteruitgang door deze branch.
 
 | ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
 |---|---|---|---|---|---|---|
-| **N36** | **P1** | OPEN, al aanwezig | `server/routes/supplier/werving/uitnodiging-claim.js` `verbindCode` (tak `claimStatus 'voltooid'`), `personeel-aanmelden.js` | Een medewerker die een manager met `staff/remove` uit het team haalde, meldt zich met zijn oude kassacode opnieuw aan. Dat kan tot 30 dagen na de uitgifte, ook via `/api/werving/verbind`. Daarna is hij weer actief: werksessie, `supplier/state` 200, en de oude pincode werkt weer. Er komt geen regel in het activiteitenlog. Het 409-antwoord stuurt bovendien het hele object terug: de ruwe personeelsrij (met `pin_hash`; in Magnaat Test een echte scrypt-hash van een viercijferige pincode, in productie de marker), het ruwe zaakrecord en de uitnodiging. | Live nagespeeld op `bf4ff3ed` en `bbdcfda8`, met dezelfde uitkomst. Als tegenproef geeft intrekken van de uitnodiging wel een weigering. | Zie besluitpunt 1. |
-| **N37** | P2 | OPEN, al aanwezig | `server/opzet/betaalstop.js` `isBetaalactie`, `externRegel` | Dezelfde klasse als N18 en N26. Met `RTG_BETALEN_UIT=1` komt een betaalroute met een slash erachter langs de stop: `POST /api/supplier/giftcard/sell/` maakte een cadeaukaart met saldo, en `horeca/betaal/` zette een rekening op betaald. | Live gezien door drie keurders. | `vastePaden()` in beide functies, met een spellingtoets zoals die van N26. |
+| **N36** | **P1** | **FIXED (ronde 7)**, rest in N52 | `server/routes/supplier/werving/uitnodiging-claim.js` `verbindCode` (tak `claimStatus 'voltooid'`), `personeel-aanmelden.js` | Een medewerker die een manager met `staff/remove` uit het team haalde, meldt zich met zijn oude kassacode opnieuw aan. Dat kan tot 30 dagen na de uitgifte, ook via `/api/werving/verbind`. Daarna is hij weer actief: werksessie, `supplier/state` 200, en de oude pincode werkt weer. Er komt geen regel in het activiteitenlog. Het 409-antwoord stuurt bovendien het hele object terug: de ruwe personeelsrij (met `pin_hash`; in Magnaat Test een echte scrypt-hash van een viercijferige pincode, in productie de marker), het ruwe zaakrecord en de uitnodiging. | Live nagespeeld op `bf4ff3ed` en `bbdcfda8`, met dezelfde uitkomst. Als tegenproef geeft intrekken van de uitnodiging wel een weigering. | Zie besluitpunt 1. |
+| **N37** | P2 | **VERIFIED FIXED (ronde 7)** | `server/opzet/betaalstop.js` `isBetaalactie`, `externRegel` | Dezelfde klasse als N18 en N26. Met `RTG_BETALEN_UIT=1` komt een betaalroute met een slash erachter langs de stop: `POST /api/supplier/giftcard/sell/` maakte een cadeaukaart met saldo, en `horeca/betaal/` zette een rekening op betaald. | Live gezien door drie keurders. | `vastePaden()` in beide functies, met een spellingtoets zoals die van N26. |
 | **N38** | P2 | OPEN, al aanwezig | `server/opzet/lijfpoort.js` (journaalhaak) en `server/middleware/compressie.js` `jsonGzip` | In de lokale modus verdwijnt een schrijfactie stil uit het naspeeljournaal zodra de client compressie vraagt en het antwoord 1024 bytes of groter is. Een browser vraagt altijd compressie. Na herstel wint de kloon, en is de handeling weg. | Zelf gezien: 25 browserschrijfacties, 13 niet in het journaal. | De journaalhaak na `jsonGzip` en de dubbeltik hangen, met keuringsregel 55 erover. |
-| **N39** | P2 | OPEN, al aanwezig | `server/kern/identiteit/wachtwoordrem.js` (en daarvoor elke inlogroute) | De rem kijkt vóór de wachtwoordtoets of een emmer dicht is, en telt pas erna. Gelijktijdige pogingen gaan dus allemaal langs elke grens: 100 tegelijk op één account gaven 100 keer 401 en geen 429, op beide deuren. | Zelf gezien, op oud en nieuw gelijk. | De poging vóór de await tellen (en terugboeken bij succes), met een toets die N gelijktijdige verzoeken stuurt. |
+| **N39** | P2 | **VERIFIED FIXED (ronde 7)** | `server/kern/identiteit/wachtwoordrem.js` (en daarvoor elke inlogroute) | De rem kijkt vóór de wachtwoordtoets of een emmer dicht is, en telt pas erna. Gelijktijdige pogingen gaan dus allemaal langs elke grens: 100 tegelijk op één account gaven 100 keer 401 en geen 429, op beide deuren. | Zelf gezien, op oud en nieuw gelijk. | De poging vóór de await tellen (en terugboeken bij succes), met een toets die N gelijktijdige verzoeken stuurt. |
 | **N40** | P2 | OPEN, al aanwezig | `server/routes/techniek/inlog.js` | De techniekinlog (de eigenaar en de techniektoegang) deelt de wachtwoordrem niet. Een spelling met witruimte geeft tien verse gokken per adres, het pad valt buiten de inlogpauze, en het e-mailadres staat in klare tekst in de emmernaam en in de melding. | Zelf gezien. | Aansluiten op `maakWachtwoordRem`, het pad in `INLOG_PADEN`, en de naam hashen. |
 | **N41** | P3 | OPEN, al aanwezig | `server/opzet/webhooks.js`, `kaartwebhooks.js`, `storingenwebhook.js` | Vijf schrijfroutes uit het register hangen vóór de schorspoort: `/api/betaal/webhook` met `/mollie` en `/adyen`, `/api/munt/webhook` en `/api/webhooks/storingen`. Een schorsing werkt daar in geen enkele spelling. | Zelf gezien. | Kiezen: de poort ervoor hangen, of deze vijf uitdrukkelijk buiten de schorsing verklaren. |
 | **N42** | P3 | OPEN, al aanwezig, nu ook op de werkdeur | `wachtwoordrem.js` met de noodrem | De accountemmer meldt brute force met het adres van wie de 25e misser doet. Dat kan de eigenaar van het account zijn, die dan een uur quarantaine krijgt. | Zelf gezien. | De accountemmer met een eigen soort laten melden. |
@@ -1084,6 +1084,139 @@ achteruitgang door deze branch.
 N36 tot en met N51 zijn vastgelegd en niet gerepareerd. Ze bestonden al vóór
 deze branch, of het zijn gevolgen die een besluit vragen. N30 en N32–N35 blijven
 open zoals in ronde 5.
+
+---
+
+
+## REMEDIATIESTATUS — ronde 7: N36, N37 en N39 (11 oktober 2026)
+
+Branch: `codex/rtg-v1-release-blockers` (PR #487). De eigenaar koos uit de
+besluitpunten van ronde 6 telkens de aanbevolen optie:
+
+- **N36:** (a), helemaal dicht;
+- **N37–N40:** (a), eerst N37 en N39;
+- **plek:** in PR #487.
+
+Zelf gebouwd, met per bevinding een toets die op de oude code zakt. Daarna een
+onafhankelijke adversariële herkeuring van alle drie. De omzeiling die die
+vond, is gerepareerd en opnieuw herkeurd (zie Herkeuringsverloop).
+
+### Nieuw verdict (code): 🟡 CONDITIONAL GO — Release readiness: 86/100
+
+**Waarom hoger dan 82.**
+
+- **De P1 uit ronde 6 is dicht.** Een verwijderde medewerker komt niet meer
+  terug met een oude kassacode, ook niet via een tweede, half geclaimde code.
+  Een herstel stuurt geen ruwe rijen meer mee.
+- **Twee van de vier P2's zijn dicht.** De betaalstop leest het pad zoals de
+  router (N37), en een golf gelijktijdige gokken gaat niet meer langs de
+  wachtwoordrem (N39). Beide zijn live nagespeeld: op de oude code open, op de
+  nieuwe dicht.
+
+**Waarom niet hoger.**
+
+- **De tweede herkeuring vond een P2 die er al was (N52):** een verwijderde
+  manager meldt zich opnieuw aan met een open uitnodiging die hij zelf uitgaf.
+- **N38 en N40 (P2) staan nog open.** N38: gzip-antwoorden ontbreken in het
+  doosjournaal. N40: de techniekinlog valt buiten de gedeelde rem.
+- **De P3's N41 tot en met N51.**
+- **De externe poorten F3–F6.**
+
+**Voorwaarden voor GO:**
+
+- de externe poorten F3–F6;
+- aanbevolen: een besluit over N52, N38 en N40.
+
+### Per bevinding — BEFORE / FIX / AFTER / REGRESSIE
+
+| # | Sev | Status | Commits | BEFORE → AFTER | Regressie (zakt vóór, slaagt na) |
+|---|---|---|---|---|---|
+| N36 | P1 | **FIXED**, herkeuring 2: FIXED_MET_KANTTEKENING (zie N52) | `2a20818e`, `8c2251a6`, `9ea98710`, en de intrekroute in de laatste commit van deze ronde | **Vóór:** na `staff/remove` meldde een medewerker zich met zijn oude kassacode opnieuw aan: een 409 "veilig hersteld" met de ruwe personeelsrij (`pin_hash`), het zaakrecord en de uitnodiging, en daarna een werksessie. **Na:** drie lagen. `staff/remove` trekt elke geclaimde uitnodiging van die zaak in die aan de plek of aan dat lid hangt, en doet dat vóór de plek uitgaat (lukt het niet, dan 503 en verandert er niets). De hersteltak weigert een plek die al eens actief was en nu uit staat; dat vangt ook een verwijdering van vóór de fix. Geen route en ook `verbindCode` zelf stuurt nog een ruwe rij terug. | `test/staff-ontslag.test.js` (5): op de oude code zakken er 2. Toets 1 eist de 401 van de intrekking zelf, zodat de hersteltak hem niet verbergt. Toets 4 neemt ook de half geclaimde tweede code. |
+| N37 | P2 | **VERIFIED FIXED** | `111540f6` | **Vóór:** met `RTG_BETALEN_UIT=1` maakte `POST /api/supplier/giftcard/sell/` een cadeaukaart, en `horeca/bon/maak/` een bon. **Na:** `isBetaalactie` en `externRegel` toetsen elke kandidaat van `vastePaden()`, net als N18 en N26. Extern afrekenen blijft ook met een slash erachter werken. | `test/betaalstop-spelling.test.js` (3): op de oude code zakken er 3. Herkeuring: M10 en M11 gedood; acht andere spellingen bereiken geen handler. |
+| N39 | P2 | **VERIFIED FIXED** (kanttekening bewust zo) | `b3cbab0f`, `9ea98710` | **Vóór:** honderd gelijktijdige gokken vanaf een adres gaven honderd keer 401, op `/api/auth/login` en op de werkplekinlog. **Na:** een poging telt vanaf `dicht()` (`server/kern/identiteit/lopend.js`) en geeft haar plek terug bij mis of gelukt. Een plek die nooit terugkomt, vervalt na 30 s. Live: 10 keer 401 en 90 keer 429. | `test/rem-gelijktijdig.test.js` (6): de emmer van adres plus account, de adresemmer bij een golf over veel accounts, het verval, en twee tegenproeven. |
+
+### Herkeuringsverloop
+
+- **Herkeuring 1, op `b3cbab0f`:**
+  - **N37:** VERIFIED FIXED.
+  - **N39:** FIXED_MET_KANTTEKENING.
+    - Twee toetsgaten: de adresemmer bij een golf (M15/M16) en het verval
+      (M18). Beide zijn nu getoetst.
+    - Een kop die "geen staat" zei. Hersteld.
+    - **De kanttekening:** op een gedeeld adres houdt ook een juiste inlog
+      tijdens de toets een plek in de adresemmer bezet. Na 45 tikfouten van
+      collega's kregen 5 van 10 gelijktijdige juiste inlogs een 429. Er volgt
+      geen slot, en het staat nu in de kop. Dat is de prijs van een rem die een
+      golf tegenhoudt: **bewust zo**.
+  - **N36:** NIET_GEFIXT, door een omzeiling die de herkeurder live zag.
+    1. Twee uitnodigingen voor hetzelfde lid worden gelijktijdig geclaimd.
+    2. De ene blijft "voltooid" staan met een plek die nooit actief was.
+    3. Na de verwijdering van de andere plek herstelde die code de plek alsnog.
+
+    De manager ziet geclaimde codes niet in zijn lijst, dus dit was een
+    verborgen weg terug. Er was ook een toetsgat: de intrekking in de route had
+    geen eigen toets (M1). Beide zijn gerepareerd in `9ea98710`.
+- **Herkeuring 2, van N36 op `1ee54d6d`: FIXED_MET_KANTTEKENING.** Live gezien:
+  - het gewone scenario en het scenario met twee codes zijn dicht;
+  - opnieuw aannemen met een nieuwe uitnodiging werkt;
+  - een lid bij twee zaken houdt zijn andere plek;
+  - het antwoord bevat geen ruwe rijen.
+
+  9 van de 13 mutanten zijn gedood. Twee wegen terug bleven open, en allebei
+  bestonden ze al:
+  - **B1:** `staff/invite/intrek` haalt iemand ook uit het team, maar trok de
+    half geclaimde tweede code niet in. **Gerepareerd** in de laatste commit
+    van deze ronde: beide routes roepen eerst `trekInVoorStaff` aan, en toets 5
+    houdt dat per route vast (hij zakt op de oude route). Deze reparatie is met
+    mutatie en toets nagetrokken, maar **niet meer onafhankelijk herkeurd**.
+  - **B2:** een verwijderde manager meldt zich opnieuw aan met een open
+    uitnodiging die hij zelf uitgaf, en is weer manager. Dat vraagt een nieuw
+    veld (wie een code uitgaf), en is daarom vastgelegd als **N52**.
+
+  Overlevende mutanten:
+  - M6 en M7: de routes sturen het antwoord weer in zijn geheel terug. Na de
+    reparatie in `verbindCode` lekt er niets meer, maar de filter in de route
+    heeft geen eigen bewaker.
+  - M10: een mislukte intrekking toch doorlaten. Er is geen toets met
+    foutinjectie.
+  - M11: de wacht `member_id != null` weghalen. Raakt alleen oude claims.
+
+  Ze staan bij N51.
+
+### Nieuwe bevindingen (OPEN)
+
+| ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
+|---|---|---|---|---|---|---|
+| **N52** | P2 | OPEN, al aanwezig | `server/routes/supplier/werving/uitnodiging-uitgifte.js` `maakInvite`, `trekInVoorStaff` | Een manager maakt een open uitnodiging met de rol manager en wordt daarna door een andere manager verwijderd. Met die eigen code meldt hij zich opnieuw aan en is hij weer manager. Een open uitnodiging draagt alleen de naam van de uitgever, dus bij een verwijdering is niet te zien welke codes van hem kwamen. Ze staan wel in de lijst van de andere manager. | Live gezien in herkeuring 2 van ronde 7, op oud en nieuw gelijk. | Bij `maakInvite` de plek van de uitgever vastleggen, en bij een verwijdering ook zijn open uitnodigingen intrekken. |
+
+### Besluitpunten voor de eigenaar
+
+1. **N52 (P2): een verwijderde manager komt terug met een code die hij zelf
+   uitgaf.**
+   - **(a) Aanbevolen:** de uitgever vastleggen en zijn open uitnodigingen bij
+     een verwijdering intrekken, met een e2e-toets.
+   - (b) Alleen in de lijst van de manager tonen wie de code uitgaf.
+2. **N38 en N40 (P2).**
+   - **(a) Aanbevolen:** N40 eerst. De techniekinlog van de eigenaar valt
+     buiten de gedeelde rem.
+   - (b) Allebei.
+   - (c) Alleen vastleggen.
+
+### Testbewijs (PASS / FAIL / INFRA / NIET GEVERIFIEERD)
+
+- **PASS:**
+  - De drie nieuwe toetsbestanden.
+  - De aanpalende inlog- en betaaltoetsen, met `RTG_ROUTELOG`. De herkeurder
+    draaide 14 bestanden en alles was groen.
+  - De mutatiemotor is langs de drie nieuwe toetsbestanden geweest.
+  - `npm run check`, `npm run norm` en de deltapoort tegen main.
+- **NIET GEVERIFIEERD:**
+  - een volledige regressie op deze stand (de CI levert hem);
+  - de PostgreSQL-stand.
+
+### Wat deze ronde NIET heeft gedaan (bewust)
+
+N38 en N40 (P2) en N41 tot en met N51 blijven open, zoals de eigenaar koos.
 
 ---
 

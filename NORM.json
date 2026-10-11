@@ -183,7 +183,7 @@
       "van": 129,
       "vervalt": "2027-01-09",
       "meter": "toetsenNietGemeten 129 -> 130",
-      "reden": "test/registratie-dicht.test.js is nieuw (besluit van de eigenaar: openbare registratie dicht tot #587 bewezen is). Met de hand nagetrokken met twee mutaties: registratie.eisOpen() uit createUser in server/accounts/users.js gehaald (toets 1 zakt) en z.tot = null uit de spring-tak van server/routes/techniek/knoppen.js gehaald (toets 4 zakt). De mutatiemotor is er nog niet langs geweest.",
+      "reden": "test/registratie-dicht.test.js is nieuw (besluit van de eigenaar: openbare registratie dicht tot #587 bewezen is). Met de hand nagetrokken met twee mutaties: registratie.eisOpen() uit createUser in server/accounts/index.js gehaald (toets 1 zakt) en z.tot = null uit de spring-tak van server/routes/techniek/knoppen.js gehaald (toets 4 zakt). De mutatiemotor is er nog niet langs geweest.",
       "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee."
     },
     {

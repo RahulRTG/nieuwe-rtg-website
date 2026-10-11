@@ -9,7 +9,7 @@
    WAAROM HIER EN NIET OP DE ROUTE. Er zijn drie wegen die een rij in `users`
    maken: /api/auth/register, de SSO-binnenkomst (een eerste aanmelding op een
    gekoppeld domein maakt het account erbij) en SCIM. Ze lopen alle drie door
-   createUser in ./users.js, dus een grendel daar dekt ook de weg die morgen
+   createUser van de accountgevel (./index.js), dus een grendel daar dekt ook de weg die morgen
    wordt bijgebouwd. De zekering `registratie` op het techniekbord (en de
    noodrem die hem een uur trekt) staat alleen op /api/auth/register; die blijft
    zoals hij was.

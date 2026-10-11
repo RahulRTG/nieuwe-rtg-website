@@ -148,7 +148,12 @@ const api = {
   registratieDicht: () => registratie.dicht(),
   registratieUitleg: registratie.UITLEG,
   ...users,
-  ...staff
+  ...staff,
+  /* De grendel op nieuwe accounts staat in de GEVEL en niet in ./users.js: alle
+     drie de wegen (registreren, de eerste SSO-aanmelding, SCIM) komen hier
+     langs, en hij gooit voor schrijfUser iets raakt. */
+  createUser: async (g) => { registratie.eisOpen(); return users.createUser(g); },
+  createUserSync: (g) => { registratie.eisOpen(); return users.createUserSync(g); }
 };
 
 /* De sessiecontrole hoort bij de identiteitskluis. Aanroepers gaan via deze

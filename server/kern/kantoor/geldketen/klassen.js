@@ -105,6 +105,27 @@ const KETENS = Object.freeze([
       '/api/office/bank/incasso/dossier',          // wat er per as gebeurde, te lezen door een mens
     ]),
   }),
+  /* DE TWEEDE KETEN, EN DE EERSTE VAN DE ANDERE KLASSE (11 oktober 2026). Een
+     teruggave van een reis is EEN geldbeweging -- een deel, van rtg:reisbureau naar
+     het betaaladres op de bon -- dus `atomair` is hier verplicht en `hervatbaar` niet.
+
+     ZE DEKT HET VIER-OGENPAD EN NIET MEER, en dat staat hier omdat het anders een
+     belofte is die de code niet houdt. Onder de duizend euro voert een mens op naam de
+     teruggave zelf uit (besluit van de eigenaar, 4 oktober 2026); daar is geen tweede
+     mens, en een baan die een verplichte as niet kan halen, hoort er niet omheen te
+     liggen alsof ze het wel doet. Wie dat pad ook door de keten wil, neemt eerst een
+     besluit over de tweede mens -- dat is geen bouwtaak. */
+  Object.freeze({
+    naam: 'reisteruggave',
+    klasse: 'geld-eenmalig',
+    wat: 'een teruggaverecht van een betaalde reis uitvoeren, vanaf de vier-ogengrens',
+    handeling: 'GELD_TERUGGEVEN',
+    routes: Object.freeze([
+      '/api/office/reisbureau/teruggave',          // klaarzetten: de hele baan tot het besluit
+      '/api/office/bank/handtekening/bevestig',    // de tweede mens, en daarna de uitvoering
+      '/api/office/bank/incasso/dossier',          // het dossier is per voornemen, niet per handeling
+    ]),
+  }),
 ]);
 
 module.exports = { KLASSEN, KETENS };

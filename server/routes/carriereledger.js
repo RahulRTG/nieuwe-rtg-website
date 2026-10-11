@@ -53,6 +53,14 @@ module.exports = (kern) => {
     stuur(res, carriereledger.mijn(k));
   });
 
+  /* Het hele eigen ledger om mee te nemen (kern/carriereledger/projectie.js,
+     afschrift). Alleen het EIGEN ledger: de sleutel komt uit de sessie en het
+     verzoek kan geen ander aanwijzen. */
+  app.post('/api/carriere/ledger/afschrift', auth, (req, res) => {
+    const k = lid(req, res); if (!k) return;
+    stuur(res, carriereledger.afschrift(k));
+  });
+
   app.post('/api/carriere/ledger/zet', auth, (req, res) => {
     const k = lid(req, res); if (!k) return;
     stuur(res, carriereledger.zet(k, req.body || {}));

@@ -168,11 +168,11 @@ function maakCarriereLedger(state) {
     return { status: 200, regel: r };
   }
 
-  const { mijn, feit } = require('./projectie')({ reeksKijk, naam });
+  const { mijn, feit, afschrift } = require('./projectie')({ reeksKijk, naam });
 
   const delen = require('./deel')({ eigen, crypto, schoon: scho, save, bijeen, inBundel, feit, naam });
 
-  return { zet, bevestig, intrek: trekRegelIn, mijn, feit, naam,
+  return { zet, bevestig, intrek: trekRegelIn, mijn, feit, naam, afschrift,
     deel: delen.deel, toon: delen.toon, mijnDelen: delen.mijnDelen, stopDelen: delen.stop };
 }
 

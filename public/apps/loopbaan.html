@@ -106,6 +106,21 @@
   </section>
 
   <section>
+    <h2>Waar ik werk en werkte</h2>
+    <p class="uitleg">Uw dienstverbanden zoals uw werkgevers ze in RTG Concern hebben vastgelegd: bij wie,
+      in welke rol, van wanneer tot wanneer. Een dienstverband dat eindigde blijft hier staan - het is uw
+      loopbaan, niet die van de werkgever. Er wordt niets geteld of beoordeeld.</p>
+    <div id="werk"><p class="leeg">Bezig met laden.</p></div>
+  </section>
+  <section>
+    <h2>Meenemen</h2>
+    <p class="uitleg">Uw hele loopbaanreeks als bestand, om te bewaren of mee te nemen als u ergens anders
+      verdergaat. Met elke bevestiging, elke intrekking en de reden erbij. Het bestand is <b>niet
+      ondertekend</b>: buiten RTG bewijst het uit zichzelf niets, en dat staat er ook in. Wie een regel wil
+      nakijken, krijgt van u een deelcode voor die ene regel.</p>
+    <p class="rij"><button class="knop" id="meeneem" type="button">Mijn loopbaan downloaden</button></p>
+  </section>
+  <section>
     <h2>Wat ik heb gedeeld</h2>
     <p class="uitleg">Elke code opent één regel en niets anders. U ziet hoe vaak hij is geopend en u
       kunt hem stoppen - wat iemand al gelezen heeft, halen wij niet terug.</p>
@@ -197,6 +212,37 @@ async function tekenDelen(){
     : '<p class="leeg">U hebt nog niets gedeeld.</p>';
 }
 
+function werkRij(w, voorbij){
+  const wanneer = voorbij ? esc(w.van)+' tot '+esc(w.tot) : (w.tot ? esc(w.van)+' tot '+esc(w.tot) : 'sinds '+esc(w.van));
+  return '<div class="kaart'+(voorbij?' weg':'')+'"><h3>'+esc(w.rol)+
+    (voorbij?'<span class="stand">afgelopen</span>':'')+'</h3>'+
+    '<p class="meta">'+esc(w.bedrijf||'een werkgever die niet meer bestaat')+(w.plaats?' &middot; '+esc(w.plaats):'')+
+    ' &middot; '+esc(w.soort)+'</p><p class="meta"><span class="dag">'+wanneer+'</span></p></div>';
+}
+async function tekenWerk(){
+  try{
+    const r=await fetch('/api/concern/mijnwerk',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:'{}'});
+    const w=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(w.error||'Uw dienstverbanden konden niet worden geladen.');
+    /* Zonder beide lijsten geen "nog geen dienstverband": dat zou beweren dat er niets is. */
+    if(!(Array.isArray(w.werkplekken)&&Array.isArray(w.eerder))) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.');
+    $('#werk').innerHTML = (w.werkplekken.length||w.eerder.length)
+      ? w.werkplekken.map(x=>werkRij(x,false)).join('')+w.eerder.map(x=>werkRij(x,true)).join('')
+      : '<p class="leeg">Er staat nog geen dienstverband op uw naam. Een werkgever legt dat vast in RTG Concern; werken kost u niets.</p>';
+  }catch(e){ $('#werk').innerHTML='<p class="leeg">'+esc(e.message)+'</p>'; }
+}
+
+$('#meeneem').addEventListener('click', async ()=>{
+  try{
+    const a=await api('/afschrift');
+    if(!(a&&Array.isArray(a.feiten)&&a.vorm)) throw new Error('Het afschrift was onvolledig; er is niets gedownload.');
+    const url=URL.createObjectURL(new Blob([JSON.stringify(a,null,2)],{type:'application/json'}));
+    const l=document.createElement('a'); l.href=url; l.download='mijn-loopbaan-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(l); l.click(); l.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+    meld('Uw loopbaan staat in het bestand: '+a.feiten.length+(a.feiten.length===1?' regel.':' regels.'));
+  }catch(e){ meld(e.message); }
+});
+
 async function laad(){
   try{ MIJN = await api('/mijn'); /* Zonder reeks geen "Uw loopbaan begint hier" -- dat zou beweren dat er niets is (LIEGRONDE.json). */ if(!(MIJN && Array.isArray(MIJN.feiten) && Array.isArray(MIJN.voorraden) && MIJN.kapitalen && typeof MIJN.kapitalen === 'object' && MIJN.nooit && typeof MIJN.nooit === 'object')) throw new Error('Het antwoord was onvolledig, dus dit kon niet worden geladen.'); teken(); await tekenDelen(); }
   catch(e){ $('#reeks').innerHTML='<p class="leeg">'+esc(e.message)+'</p>'; }
@@ -236,6 +282,7 @@ $('#deelja').addEventListener('click', async ()=>{
   }catch(e){ meld(e.message); }
 });
 laad();
+tekenWerk();
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

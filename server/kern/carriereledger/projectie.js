@@ -68,7 +68,43 @@ module.exports = function maakProjectie({ reeksKijk, naam }) {
     return f || null;
   }
 
-  return { mijn, feit };
+  /* HET AFSCHRIFT -- "het gaat mee" (PERSONEEL.md par. 8, CARRIERE.md: lock-in
+     door kwaliteit mag, lock-in door gijzeling zakt). Het hele ledger in EEN
+     antwoord dat een mens kan bewaren en meenemen, ook als hij RTG verlaat.
+
+     Twee verschillen met /mijn, en allebei met opzet. Een intrekking draagt hier
+     haar REDEN en wie hem gaf: wie het afschrift buiten RTG leest, kan niet
+     doorvragen waarom een regel er nog staat. En er staat bij wat dit afschrift
+     NIET is -- het is niet ondertekend, dus het bewijst buiten RTG niets uit
+     zichzelf; nakijken gaat per regel met een deelcode (./deel.js). Een
+     afschrift dat zich als bewijs voordoet, is erger dan geen afschrift.
+
+     Er komt geen samenvatting bij (geen aantal jaren, geen totaal per
+     kapitaal): de reeks IS het afschrift, en een getal over een mens kan
+     niemand navertellen (CAR-05). Deelcodes staan er niet in: die bestaan bij
+     ons alleen als afdruk, en een code is een sleutel en geen feit. */
+  function afschrift(key) {
+    const rs = reeksKijk(key);
+    const trek = new Map(rs.filter(r => r.soort === 'intrekking')
+      .map(r => [r.doel, { door: r.door || null, reden: r.reden || null, at: r.at }]));
+    const feiten = bouw(rs).map(f => Object.assign({}, f,
+      { intrekking: trek.get(f.id) || null,
+        bevestigingen: f.bevestigingen.map(b => Object.assign({}, b, { intrekking: trek.get(b.id) || null })) }));
+    /* Geen tijdstempel van het maken: het afschrift is een LEZING, en twee keer
+       vragen hoort hetzelfde te geven (het mutatiecontract noemt hem lezend). De
+       regels dragen hun eigen tijd; de bestandsnaam krijgt de datum op het
+       toestel. */
+    return { status: 200, vorm: 'rtg-loopbaan-afschrift/1',
+      mens: naam(key), feiten, herkomst: R.HERKOMST, kapitalen: R.KAPITALEN, nooit: R.NOOIT,
+      nietZegt: [
+        'Dit afschrift is niet ondertekend. Buiten RTG bewijst het uit zichzelf niets; een lezer kijkt een regel na met een deelcode die u per regel maakt.',
+        'Een bevestiging zegt wat zij zegt en niet meer: per bevestiging staat erbij wat zij wel en niet vaststelt.',
+        'Wat hier niet staat, is niet gebeurd volgens dit ledger -- niet volgens de wereld. Het ledger bevat alleen wat u of een ander erin heeft gezet.',
+        'Een ingetrokken regel is niet gewist: hij staat er met de reden. Zo kan niemand zien dat er iets ontbreekt waar het niet ontbreekt.'
+      ] };
+  }
+
+  return { mijn, feit, afschrift };
 };
 
 module.exports.feitVan = feitVan;

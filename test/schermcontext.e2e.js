@@ -10,9 +10,13 @@
       met herkomst `blad` -- en dat is precies wat Rahul daar leest.
    3. GEEN KNOP VERZONNEN: het scherm publiceert geen handelingen, dus het
       blikveld meldt er ook geen die van dit scherm komen.
+   4. IN EEN ANDERE TAAL volgt de context de vertaalde titel: die komt pas na
+      het laden, en een context die maar een keer sprak bleef op "RTG Agenda"
+      staan onder een tab "RTG Calendar" (gevonden door de tegenlezing).
+      Mutatie: laat context.js de titel niet volgen; 4 zakt.
 
    DE MUTATIES, nagetrokken: haal context.js uit agenda.html (1 zakt: herkomst
-   `document`), of brug.js (2 zakt: de schil blijft op de titel van de schil).
+   `edge-casco`), of brug.js (2 zakt: de schil blijft op de titel van de schil).
 
    Draait alleen waar Playwright beschikbaar is; anders overgeslagen. */
 const test = require('node:test');
@@ -82,6 +86,21 @@ test('agenda en notities publiceren hun context zelf, los en als blad in de schi
     const blad = page.frames().find((f) => /\/apps\/agenda\.html/.test(f.url()));
     const kop = await blad.evaluate(() => document.title);
     assert.equal(s.context.waarde.titel, kop, 'de schil ziet de naam van het agendablad');
+    // 4) In het Engels volgt de context de vertaalde titel.
+    const en = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
+      serviceWorkers: 'block', locale: 'en-US' });
+    const p2 = await en.newPage();
+    letOpFouten(p2, fouten);
+    await p2.addInitScript((t) => {
+      localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.setItem('rtg_lang', 'en');
+    }, token);
+    await p2.goto(srv.base + '/apps/agenda.html', { waitUntil: 'load', timeout: 45000 });
+    await p2.waitForFunction(() => !!window.RTGEdgeBlikveld && document.title !== 'RTG Agenda', null, { timeout: 20000 });
+    await p2.waitForFunction(() => (RTGEdgeBlikveld.lees().velden.context.waarde || {}).titel === document.title,
+      null, { timeout: 10000 }).catch(() => {});
+    const tal = await p2.evaluate(() => ({ titel: RTGEdgeBlikveld.lees().velden.context.waarde.titel, doc: document.title }));
+    assert.equal(tal.titel, tal.doc, 'de context volgt de vertaalde titel: ' + JSON.stringify(tal));
+    await en.close();
     assert.deepEqual(fouten, []);
   } finally {
     await browser.close();

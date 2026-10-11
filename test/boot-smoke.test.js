@@ -19,9 +19,9 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 
-function haal(port, pad) {
+function haal(port, pad, headers) {
   return new Promise((resolve, reject) => {
-    const req = http.get({ host: '127.0.0.1', port, path: pad, timeout: 4000 }, res => {
+    const req = http.get({ host: '127.0.0.1', port, path: pad, timeout: 4000, headers }, res => {
       let body = '';
       res.on('data', d => (body += d));
       res.on('end', () => resolve({ status: res.statusCode, body }));
@@ -77,7 +77,7 @@ function boot(port, dataDir) {
   return { kind, uitInfo };
 }
 
-test('de server boot met de publieke landing op root en de OS-poort onder /apps', async () => {
+test('de server boot met de publieke landing op root, de app op app.* en de OS-poort onder /apps', async () => {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-boot-'));
   let kind, uitInfo, r, actievePoort;
   try {
@@ -108,7 +108,14 @@ test('de server boot met de publieke landing op root en de OS-poort onder /apps'
     assert.equal(apps.status, 200, '/apps gaf status ' + apps.status + ' i.p.v. 200');
     assert.ok(/id="gate"/.test(apps.body) && /os-lock|os-grid/.test(apps.body),
       '/apps serveert niet de OS-poort (klokscherm)');
-    // 4) geen fatale uitzondering onderweg
+    // 4) alleen op het app-domein opent / meteen de app
+    //    (een echt domein komt achter de TLS-proxy binnen, vandaar de proto-kop)
+    const appRoot = await haal(actievePoort, '/', { host: 'app.rahultravelgroup.com', 'x-forwarded-proto': 'https' });
+    assert.equal(appRoot.status, 200, 'app-root gaf status ' + appRoot.status);
+    assert.ok(/id="gate"/.test(appRoot.body) && /app-main/.test(appRoot.body) &&
+      !/data-page="rtg-landing"/.test(appRoot.body),
+    'de root van het app-domein serveert niet de RTG Account-voordeur');
+    // 5) geen fatale uitzondering onderweg
     assert.equal(uitInfo.fataal, false, 'server logde een fatale fout:\n' + uitInfo.log.slice(-1500));
   } finally {
     kind.kill('SIGKILL');

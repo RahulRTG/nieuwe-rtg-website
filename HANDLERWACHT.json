@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-11T06:10:02.319Z",
-  "commit": "9b9ca8901",
+  "op": "2026-10-11T11:54:42.036Z",
+  "commit": "cc9c789d4",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v22.22.0"
+  "node": "v26.10.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {

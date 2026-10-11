@@ -108,7 +108,6 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-beschermzaak').CONTRACTEN,
   require('./mutatiecontracten-neiging').CONTRACTEN,
   require('./mutatiecontracten-knelpunt').CONTRACTEN,
-  // de drager van een genootschap en zijn gezinsdeur (B1, GEMEENSCHAP-FASE0.md par. 4.1)
   require('./mutatiecontracten-drager').CONTRACTEN,
   require('./mutatiecontracten-connectdelen').CONTRACTEN,
   /* De naleesronde van 13 september 2026 -- zie de kop van het eerste bestand. */

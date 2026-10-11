@@ -38,6 +38,10 @@
      blijft een nieuwe notitie met een eigen reden en datum; zij kan de oude
      niet verlengen. Zo wordt een schuld geind in plaats van vergeten.
 
+     ONTDEKT -- de meter ziet nu bestaande schuld die hij eerst miste. Geen
+     regressie maar een betere waarheid; daarom geen rood, wel een notitie met
+     het meetscript, de nieuwe stand, een afbouwdoel en een datum (ZERO.md par. 3).
+
    WAAROM DE REGEL EEN BEGINDATUM HEEFT. De 62 bestaande notities zijn het
    register van dit huis en niet mijn werk om achteraf in te delen; ze zijn
    geschreven voordat deze twee velden bestonden. `vervalregel.vanaf` in
@@ -224,9 +228,10 @@ function main() {
 
   for (const n of onderEis) {
     const naam = (n.datum || '?') + ' "' + String(n.meter || '?').slice(0, 60) + '"';
-    if (n.soort !== 'structureel' && n.soort !== 'schuld') {
-      fouten.push({ wat: naam, bericht: 'heeft geen soort ("structureel" of "schuld")',
-        hulp: 'structureel = het gemetene veranderde van vorm; schuld = we konden het even niet' });
+    if (n.soort !== 'structureel' && n.soort !== 'schuld' && n.soort !== 'ontdekt') {
+      fouten.push({ wat: naam, bericht: 'heeft geen soort ("structureel", "schuld" of "ontdekt")',
+        hulp: 'structureel = het gemetene veranderde van vorm; schuld = we konden het even niet; ' +
+          'ontdekt = de meter ziet nu bestaande schuld die hij eerst miste' });
       continue;
     }
     if (n.soort === 'structureel' && !String(n.waarheen || '').trim()) {
@@ -248,6 +253,51 @@ function main() {
       if (aflossing.aanwezig && !aflossing.geldig)
         fouten.push({ wat: naam, bericht: 'beweert aflossing maar die is niet geldig: ' + aflossing.reden,
           hulp: 'leg de gemeten verbetering vast; een verklaring zonder voldoende getal betaalt geen schuld' });
+    }
+  }
+
+  /* ---------- 1b. ONTDEKT: een betere meter, geen slechtere code (ZERO.md par. 3) ----------
+
+     Een meter die meer gaat zien, laat zijn getal stijgen terwijl de code niet
+     slechter werd. Wie dat tegenhoudt, maakt beter meten duur -- en dan wordt er
+     niet beter gemeten. Wie het stil opneemt, laat de nieuw zichtbare schuld
+     staan alsof ze er altijd mocht zijn. Daarom een eigen soort, en die is NIET
+     losser dan `schuld`: hij vraagt WAT de meter beter maakte (een meetscript dat
+     bestaat, zodat de bewering naar een instrument wijst en niet naar een gevoel),
+     waar de nieuwe stand ligt, waar de afbouw naartoe gaat, en wanneer.
+
+     Wat dit NIET vangt: of de stijging echt uit de meter komt en niet uit nieuwe
+     code. Dat oordeel blijft bij een mens; deze vorm dwingt alleen dat het
+     oordeel is opgeschreven met een instrument en een einddatum erbij. */
+  for (const n of onderEis) {
+    if (n.soort !== 'ontdekt') continue;
+    const naam = (n.datum || '?') + ' "' + String(n.meter || '?').slice(0, 60) + '"';
+    if (!n.sleutel || !richting.has(n.sleutel))
+      fouten.push({ wat: naam, bericht: 'is ontdekte schuld zonder bekende meter in het veld "sleutel"' });
+    for (const veld of ['van', 'naar', 'doel'])
+      if (typeof n[veld] !== 'number')
+        fouten.push({ wat: naam, bericht: 'is ontdekte schuld zonder getal in "' + veld + '"',
+          hulp: 'van = de stand van de blinde meter, naar = wat hij nu ziet, doel = waar de afbouw eindigt' });
+    const instrument = String(n.meterwijziging || '').match(/scripts\/[\w./-]+\.js/);
+    if (!instrument)
+      fouten.push({ wat: naam, bericht: 'zegt niet welk meetscript beter ging kijken (veld "meterwijziging")',
+        hulp: 'noem het script, bijvoorbeeld scripts/stilspoor.js, en wat het nu ziet dat het eerst miste' });
+    else if (!fs.existsSync(path.join(WORTEL, instrument[0])))
+      fouten.push({ wat: naam, bericht: 'noemt ' + instrument[0] + ' als meter, en dat bestand bestaat niet' });
+    if (!String(n.afbouw || '').trim())
+      fouten.push({ wat: naam, bericht: 'is ontdekte schuld zonder afbouwplan (veld "afbouw")',
+        hulp: 'ontdekken zonder plan is de schuld alsnog stil opnemen' });
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(n.vervalt || '')))
+      fouten.push({ wat: naam, bericht: 'is ontdekte schuld zonder vervaldatum voor de afbouw' });
+    else if (String(n.vervalt) < VANDAAG && richting.has(n.sleutel) && typeof n.doel === 'number') {
+      const nu = meterstand(norm, n.sleutel);
+      if (nu === undefined || slechter(richting.get(n.sleutel), nu, n.doel))
+        fouten.push({ wat: n.sleutel, bericht: 'de afbouw van ontdekte schuld is verlopen op ' + n.vervalt +
+          ': de meter staat op ' + nu + ' en hoort op ' + n.doel + ' te staan',
+          hulp: 'bouw af, of neem een nieuw besluit met een nieuwe reden en een nieuwe datum' });
+      else meldingen.push('ontdekte schuld op ' + n.sleutel + ' is afgebouwd (' + nu + ', doel ' + n.doel + '); de notitie mag weg');
+    } else if (typeof n.doel === 'number') {
+      meldingen.push('ontdekte schuld op ' + n.sleutel + ': afbouw naar ' + n.doel + ' tot ' + n.vervalt);
     }
   }
 
@@ -331,7 +381,8 @@ function main() {
         const gedekt = onderEis.some(n => genoemdeMeters(n, bekend).includes(sleutel));
         if (gedekt) { meldingen.push('lat op ' + sleutel + ' verzet van ' + waarde + ' naar ' + nu[sleutel] + ', met notitie'); continue; }
         fouten.push({ wat: sleutel, bericht: 'de lat is met de hand verlaagd van ' + waarde + ' naar ' + nu[sleutel] + ' zonder notitie',
-          hulp: 'zet er een notitie bij met datum, meter, reden en soort ("structureel" met waarheen, of "schuld" met sleutel, van en vervalt)' });
+          hulp: 'zet er een notitie bij met datum, meter, reden en soort ("structureel" met waarheen, "schuld" met sleutel, van en vervalt, ' +
+            'of "ontdekt" met sleutel, van, naar, doel, meterwijziging, afbouw en vervalt)' });
       }
     }
   }

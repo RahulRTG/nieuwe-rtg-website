@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-10-11T21:35:48.198Z",
-    "commit": "fcb7c48d4",
-    "boomVuil": false,
+    "op": "2026-10-11T22:28:52.574Z",
+    "commit": "15540fe1e",
+    "boomVuil": true,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
     "node": "v26.10.0"
@@ -12,8 +12,8 @@
   "drempel": 3,
   "bestemmingen": 101,
   "woorden": 1261,
-  "gevonden": 791,
-  "dekking": 0.6273,
+  "gevonden": 794,
+  "dekking": 0.6297,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -327,25 +327,6 @@
       ]
     },
     {
-      "naam": "Mijn loopbaan",
-      "url": "/apps/loopbaan.html",
-      "woorden": 18,
-      "gevonden": 7,
-      "mist": [
-        "reeks",
-        "zeven",
-        "voorraden",
-        "werkte",
-        "meenemen",
-        "gedeeld",
-        "leren",
-        "ingetrokken",
-        "voorbij",
-        "afgelopen",
-        "downloaden"
-      ]
-    },
-    {
       "naam": "Overzicht",
       "url": "/apps/rtg.html",
       "woorden": 55,
@@ -364,6 +345,24 @@
       ]
     },
     {
+      "naam": "Mijn loopbaan",
+      "url": "/apps/loopbaan.html",
+      "woorden": 18,
+      "gevonden": 8,
+      "mist": [
+        "reeks",
+        "zeven",
+        "voorraden",
+        "werkte",
+        "meenemen",
+        "gedeeld",
+        "leren",
+        "ingetrokken",
+        "voorbij",
+        "afgelopen"
+      ]
+    },
+    {
       "naam": "Partner Network",
       "url": "/apps/partner-network.html",
       "woorden": 22,
@@ -379,24 +378,6 @@
         "volgens",
         "kyoto",
         "consortium"
-      ]
-    },
-    {
-      "naam": "RTG Werk OS",
-      "url": "/apps/werk.html",
-      "woorden": 24,
-      "gevonden": 14,
-      "mist": [
-        "vraagt",
-        "besluiten",
-        "menselijke",
-        "autoriteit",
-        "welkom",
-        "meesterschap",
-        "organisatie",
-        "bron",
-        "waarmee",
-        "helpen"
       ]
     },
     {
@@ -432,6 +413,23 @@
         "ritme",
         "nemen",
         "vertellen"
+      ]
+    },
+    {
+      "naam": "RTG Werk OS",
+      "url": "/apps/werk.html",
+      "woorden": 24,
+      "gevonden": 15,
+      "mist": [
+        "vraagt",
+        "besluiten",
+        "menselijke",
+        "autoriteit",
+        "meesterschap",
+        "organisatie",
+        "bron",
+        "waarmee",
+        "helpen"
       ]
     },
     {
@@ -1017,15 +1015,6 @@
       ]
     },
     {
-      "naam": "Reizen & Veilig",
-      "url": "/apps/reizen-veilig.html",
-      "woorden": 6,
-      "gevonden": 5,
-      "mist": [
-        "welkom"
-      ]
-    },
-    {
       "naam": "Routedossier",
       "url": "/apps/routedossier.html",
       "woorden": 4,
@@ -1220,6 +1209,13 @@
       "url": "/apps/arrival.html",
       "woorden": 9,
       "gevonden": 9,
+      "mist": []
+    },
+    {
+      "naam": "Reizen & Veilig",
+      "url": "/apps/reizen-veilig.html",
+      "woorden": 6,
+      "gevonden": 6,
       "mist": []
     },
     {

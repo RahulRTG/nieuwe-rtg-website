@@ -672,6 +672,14 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
     width:100%!important;max-width:none!important;margin:0 0 calc(110px + env(safe-area-inset-bottom,0px))!important;
     gap:0!important;padding:0!important;
   }
+  /* De scene is de mobiele kop (#534; besluit van de eigenaar, 11 oktober 2026): het
+     BEELD van de oude fotokop eronder zou een tweede kop zijn, dus dat wijkt -- foto,
+     label, titel en bijschrift. Wat er aan inhoud in staat (de bevestigde reis, de
+     status, de knop) blijft staan. Alleen waar de scene er echt staat. */
+  body[data-rtg-cinematic="true"][data-rtg-shell="mobile"] .wd-home:has(>.wp-scene) .wh-photo{
+    min-height:0!important;height:auto!important;background:none!important;
+  }
+  body[data-rtg-cinematic="true"][data-rtg-shell="mobile"] .wd-home:has(>.wp-scene) .wh-photo>:is(img,h1,.wh-eyebrow,.wh-photo-copy,.wh-caption,.wh-foundation-label,.wh-free,.buurtey){display:none!important}
   body[data-rtg-cinematic="true"][data-rtg-shell="mobile"] .wd-home>.wp-scene{
     display:block!important;width:100%!important;min-height:clamp(520px,72svh,720px)!important;
     overflow:hidden!important;border:0!important;border-radius:0!important;background:#11100e!important;

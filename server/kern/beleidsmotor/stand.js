@@ -34,7 +34,7 @@ function kleineAantallen(u) {
 
 /* Drie bakken en geen percentage, en de rijpheid per deur apart: een deur die
    rijp is en nul keer oneens, kan verhuizen; de rest niet. */
-const stand = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) {
+const stand = function stand({ beeld, dagen, sinds, oneens, verklaardOpen, kleinBinnen }) {
   const perDeur = {};
   const zonderPoort = [];
   const stapop = [];
@@ -104,7 +104,7 @@ const stand = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) {
         .map(s => [s, gebruik['kamer ' + k + ' ' + s] || 0])) })),
     /* BESLUIT 3b: ENFORCE_EXECUTE in de schaduw -- welke uitvoerende routes
        bij afdwingen zouden zakken, per klasse. Telt alleen (./uitvoeren.js). */
-    uitvoeren: uitvoeren.lees(uitvoerRijen),
+    uitvoeren: kleinBinnen ? kleineAantallen(uitvoeren.lees(uitvoerRijen)) : uitvoeren.lees(uitvoerRijen),
     /* FASE 6: lezen is niet exporteren. Hoe vaak een bestand het huis verliet. */
     exporten: Object.keys(EXPORTEN).map(r => Object.assign({ route: r }, EXPORTEN[r], { geleverd: gebruik['export ' + r] || 0 }))
   };

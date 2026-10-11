@@ -43,11 +43,6 @@
    server/routes/uitgifte.js), en juist daar wordt met vier ogen ondertekend.
    Zolang dat zo is hoort het zichtbaar te zijn in plaats van weggemiddeld.
 
-   `bewezen` HEEFT TWEE STRENGHEDEN (11 oktober 2026). Aan de kantoordeur
-   alleen met een passkey; op naam zonder passkey is `opNaam`
-   (kern/kantoor/envelopidentiteit.js). Aan de andere deuren en in de afleiding
-   hieronder nog "er hangt een persoon aan". Gelijktrekken is een besluit.
-
    DEZE MODULE GOOIT NOOIT. Een poortwachter die omvalt op zijn eigen boekhouding
    is erger dan een ontbrekende envelop; bij twijfel komt er een envelop met
    `identiteit: 'onbekend'` en gaat het verzoek gewoon door. Wat hij niet doet is
@@ -70,7 +65,6 @@ const SOORTEN = Object.freeze([
   'werkplek'    // iemand met een sleutel van een werkplek-bedrijf
 ]);
 
-/* `opNaam`: een individu op een eigen sessie, niet met een sleutel bewezen (zie hierboven). */
 const IDENTITEITEN = Object.freeze(['bewezen', 'opNaam', 'anoniem', 'onbekend']);
 
 const tekst = (v, max) => {

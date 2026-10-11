@@ -10,7 +10,13 @@
      gedeeld                   -> anoniem  (de gedeelde code is geen individu)
      iets anders               -> onbekend
 
-   Er komt geen veld bij in de envelop; alleen de WAARDE is eerlijk. */
+   Er komt geen veld bij in de envelop; alleen de WAARDE is eerlijk.
+
+   `bewezen` HEEFT DAARMEE TWEE STRENGHEDEN in server/opzet/envelop.js: aan de
+   kantoordeur alleen met een passkey, aan de andere deuren (lid, tiener,
+   techniek, gezinslid) en in de afleiding uit een id nog "er hangt een persoon
+   aan". Die deuren gelijktrekken verandert de betekenis voor elke ledensessie,
+   en is daarom een besluit van de eigenaar en geen reparatie. */
 'use strict';
 
 function envelopIdentiteit(id) {

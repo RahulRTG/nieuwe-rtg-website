@@ -110,7 +110,11 @@ function gedeeld(proef, ingang) {
 }
 
 /* ---- 2 en 3. VERS, EN DE UITKOMST ---------------------------------------- */
-function ketenUitslag(register, { lees = leesStandaard, versheid } = {}) {
+/* `deel`: een register dat meer dan een keten draagt (VOLTOOIPROEF.json heeft
+   per onderdeel per bewijs een eigen rij schakels) wijst hiermee aan WELKE.
+   Het stempel blijft dat van het hele register; de rest komt uit het deel. Een
+   deel dat er niet staat is NIET_GETEST -- dan is dit onderdeel niet gemeten. */
+function ketenUitslag(register, { lees = leesStandaard, versheid, deel = null } = {}) {
   const tekst = lees(register);
   if (tekst === null) return { status: 'NIET_GETEST', reden: register + ' bestaat niet: deze proef is nooit vastgelegd', bewijs: null };
   let reg;
@@ -126,6 +130,14 @@ function ketenUitslag(register, { lees = leesStandaard, versheid } = {}) {
   const bewijs = { register, op: st && st.op ? st.op : (typeof st === 'string' ? st : null),
     commit: st && st.commit ? st.commit : null, instrument: st && st.instrument ? st.instrument : null };
   if (!v.vers) return { status: 'NIET_GETEST', reden: 'bewijs vervallen: ' + v.reden, bewijs };
+  if (deel) {
+    const gekozen = deel.reduce((o, k) => (o && typeof o === 'object' ? o[k] : undefined), reg);
+    if (!gekozen || typeof gekozen !== 'object') {
+      return { status: 'NIET_GETEST', reden: register + ' kent ' + deel.join('/') + ' niet: dit onderdeel is in die ronde niet gemeten', bewijs };
+    }
+    bewijs.deel = deel.join('/');
+    reg = gekozen;
+  }
 
   const t = reg.telling || {};
   const schakels = Array.isArray(reg.schakels) ? reg.schakels : [];
@@ -199,7 +211,10 @@ function bewijsVoor(functie, naam, ingang, opties = {}) {
       reden: 'het contract noemt ' + bron.instrument + ', maar die proef raakt geen enkele route die ' + ingang +
         ' aanroept; de koppeling haalt de meting niet en telt daarom niet' };
   }
-  const uit = ketenUitslag(bron.register, { lees, versheid: opties.versheid || require('./stempel').versheid });
+  /* Een voltooiproef draagt per onderdeel per bewijs een eigen keten
+     (scripts/voltooiproef.js); een ketenproef is als geheel een keten. */
+  const deel = bron.soort === 'voltooiproef' ? ['apps', functie, naam] : null;
+  const uit = ketenUitslag(bron.register, { lees, versheid: opties.versheid || require('./stempel').versheid, deel });
   uit.bron = { soort: bron.soort, instrument: bron.instrument, belofte: c.belofte, gedeeldeRoutes: raak.length };
   return uit;
 }

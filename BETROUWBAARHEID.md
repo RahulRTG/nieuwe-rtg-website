@@ -45,11 +45,11 @@ blijven.
 |---|---|---|---|
 | 1 | **bereikbaar** | vindt de gebruiker de functie vanaf de plek waar RTG haar presenteert? | **staat** (`APPWERKT.json`) |
 | 2 | **bedienbaar** | doen de knoppen, tabs, velden, uploads en gebaren iets, zonder te breken? | **knoppen wel, de rest niet** — 83 van 112 onderdelen bewezen op hun eigen knoppen (de schil telt niet mee, par. 4g); formulieren, uploads, toetsenbord en gebaren worden niet gemeten |
-| 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een stap weg** (vraagt de testwereld uit par. 4) |
+| 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een bron voor vier onderdelen** — twee ketenproeven (par. 4a) en twee scenario's van de voltooiproef (par. 4h); of een bron telt, beslist zijn versheid; de rest mist een scenario |
 | 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **staat, voor een leeg antwoord** (`LIEGRONDE.json`, per onderdeel; zie par. 4e) |
-| 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **een stap weg** |
+| 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **staat voor twee onderdelen** (`VOLTOOIPROEF.json`, par. 4h): nette herstart, nieuwe sessie, en de opslag zelf |
 | 6 | **bevoegd** | kan een andere rol, een ander gezin of een ander bedrijf hier niets? | **gemeten voor leden en gezinnen** (`BEVOEGD.json`, par. 4f): ledenschermen bakenen af op de sessie en worden samengesteld uit `IDOR.json` en `ROLPROEF.json`, gezinsschermen krijgen een kruisproef op de gezinscode; zaak en kantoor hebben nog geen proef |
-| 7 | **herstelbaar** | overleeft de functie uitval, time-out, dubbelklik en een afgebroken verzoek? | **een stap weg** (`HERSTELPROEF.json`, `chaos.js`, `aanval.js` bestaan al) |
+| 7 | **herstelbaar** | overleeft de functie uitval, time-out, dubbelklik en een afgebroken verzoek? | **staat voor twee onderdelen** (`VOLTOOIPROEF.json`, par. 4h): dubbelklik, herhaling, afgebroken verzoek en een crash na de bevestiging; uitval van Redis of PostgreSQL nog niet |
 | 8 | **menselijk** | krijgt de gebruiker nooit een kale 500, TypeError, lege pagina of dode knop? | **half** — kale fouten worden gezien, de bruikbaarheid van een melding niet |
 
 Bewijs 1, 2 en 8 worden vandaag gemeten door `npm run appwerkt`. De andere vijf
@@ -105,7 +105,8 @@ De huidige proef raakt met opzet niets aan dat onomkeerbaar is: betalen,
 verwijderen, versturen, uitloggen. Elke rij noemt wat hij daarom oversloeg. Dat is
 eerlijk en het laat precies het duurste risico ongemeten.
 
-**Vraagt een besluit.** De uitweg is geen vlag in de productiecode — die regel
+**Het besluit is genomen (11 oktober 2026): de testwereld wordt gebouwd** — zie
+par. 4h voor wat er sindsdien staat. De uitweg is geen vlag in de productiecode — die regel
 staat al vast in `MAGNAATLAB.md`: *een simulatie-adapter vervangt de rail, nooit
 de poort*. `kern/pay/poort.js` kent geen enkele demo-stand en dat moet zo blijven.
 De testwereld bestaat daarom uit adapters náást de echte, elk met een grendel die
@@ -114,8 +115,8 @@ fail-closed is:
 | wat | hoe | stand |
 |---|---|---|
 | betalen | vierde provider naast de demo-provider | **staat**: `server/betaal/synthetisch.js`, achter `RTG_SIMULATIEBANK=1`, nooit naast een echte provider, nooit in productie |
-| mail | sink-mailbox | **een stap weg**: `SMTP_URL=''` en `server/data/outbox/` bestaan al |
-| sms | test-adapter | **een stap weg**: `sendSms` in `server/mail.js` en `server/mail-lokaal.js` — twee choke points, niet één (`KOSTEN.md` telt ze zo) |
+| mail | sink-mailbox | **staat** (11 oktober 2026): de postvanger, `server/post-vanger.js`, achter `RTG_POSTVANGER=1`, nooit in productie, nooit naast `SMTP_URL` of `MAIL_DIRECT`; de proef leest hem met `scripts/lib/postvanger.js` en weigert te meten als er post naar buiten kan |
+| sms | test-adapter | **staat** (11 oktober 2026): `server/sms-sandbox.js` achter `SMS_SANDBOX=1`, nooit in productie, met de grendel in elke weigering; beide choke points (`sendSms` en `send('sms:...')`) lopen erdoor (`test/testwereld-adapters.test.js`) |
 | verwijderen | wegwerpdata | **staat**: elke proef draait al op een eigen `RTG_DATA_DIR` |
 | boekingen | synthetische leveranciers | **staat**: de seed levert ze (`KIKUNOI`) |
 | ritten | gesimuleerde voertuigen | **half**: `kern/mobiliteit/` heeft de standen, geen simulator |
@@ -541,6 +542,43 @@ met eigen knoppen stopt de proef bij een deel te vroeg (Leven 1/9): een tik
 verandert de weergave, de andere knoppen verdwijnen, en de proef noemt dat
 klaar. Dat is een tekort van de meter en geen bevinding over het scherm.
 
+## 4h. De voltooiproef — bewijs 3, 5 en 7 per onderdeel
+
+**Staat** (11 oktober 2026, besluit van de eigenaar: de testwereld bouwen).
+`scripts/voltooiproef.js` loopt per onderdeel uit `MAPPEN` een scenario af
+(`scripts/lib/voltooi/<naam>.js`) op een wegwerpserver met de postvanger en de
+sms-sandbox, en schrijft `VOLTOOIPROEF.json`. Hij levert drie bewijzen, en precies
+de drie die een ketenproef niet mag (par. 4a):
+
+- **voltooibaar**: de hele bedoeling, tot en met wat de ontvanger ziet;
+- **persistent**: een nette herstart (SIGTERM) op dezelfde datamap, een nieuwe
+  sessie die hetzelfde leest, en de uitkomst gelezen UIT HET BESTAND, met een
+  eigen verbinding die alleen leest — "de route geeft na de herstart het juiste
+  antwoord" en "het staat op schijf" zijn twee beweringen;
+- **herstelbaar**: dubbelklik, een herhaald verzoek, een verzoek dat de client
+  halverwege opgeeft, en een crash (SIGKILL) direct na de bevestiging.
+
+Twee onderdelen hebben een scenario: **Waar ben ik aanwezig** (een ander toestel
+op afstand sluiten, met een echte sleutel voor het bezitsbewijs) en **Post van
+RTG** (toestemming voor commerciële post geven, wijzigen en intrekken). Beide
+sluiten op alle drie. De proef is met een mutatie nagetrokken: zonder `save()` in
+`kern/identiteit/commercieel.js` zakken de twee crashschakels en blijft de nette
+herstart groen (een deploy spoelt de opslag, een stroomstoring niet — daarom zijn
+het twee bewijzen), en zonder de intrekking in `routes/member/sessies.js` zakken
+zeven schakels over alle drie.
+
+Wat dit niet bewijst, en dat staat per onderdeel onder `grens`: er komt geen
+browser aan te pas (dat is bewijs 2), er is geen Redis of PostgreSQL die wegvalt,
+en de postvanger bewijst wat het huis wilde versturen en dat het nergens heen
+ging — niet dat het aankwam. Bij Post van RTG staat er een gat dat de proef vond
+en niet verzon: `commercieel.mag()` heeft geen aanroeper, dus of een verzender
+zich aan de toestemming houdt, is niet te meten.
+
+Een onderdeel zonder scenario houdt `GEEN_FIXTURE`, en de reden zegt nu wat er
+ontbreekt: een scenario (de testwereld staat), een eigen adres (een stand of tab
+in de app), of een adapter (`TESTWERELD_ONTBREEKT` in
+`scripts/lib/appcontract.js`: bellen en videobellen, WebRTC).
+
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 
 `npm run appwerkt` schrijft `APPWERKT.json`: per onderdeel uit `MAPPEN`, met de
@@ -751,8 +789,10 @@ verkeerde persoon toont, wel.
 3. **Bewijs 4 verbreden.** De liegpoort bestaat (`RTG_LIEG`) en draait over zes
    schermen. Hem over alle onderdelen halen kost rekentijd, geen ontwerp.
    *Een stap weg.*
-4. **De testwereld bouwen** (par. 4), en daarmee bewijs 3, 5 en 7 openen. Dit is
-   het grote stuk en het enige dat een besluit vraagt. *Vraagt een besluit.*
+4. **De testwereld bouwen** (par. 4), en daarmee bewijs 3, 5 en 7 openen. *Besloten
+   en begonnen* (11 oktober 2026, par. 4h): de adapters voor mail en sms staan, en
+   twee onderdelen dragen alle drie de bewijzen. Wat volgt is per onderdeel een
+   scenario, en voor bellen een besluit over WebRTC-testidentiteiten.
 5. **Bewijs 6 naar de schermkant.** De routekant is gemeten; wat een scherm doet
    met een sessie van iemand anders niet. *Een stap weg, na 4.*
 6. **De acht bewijzen aan `BELOFTE.json` koppelen**, zodat de uitspraak niet per

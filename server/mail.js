@@ -52,6 +52,7 @@ const CONFIGURED = !!transporter;
    erin (dit bestand, de eigen bezorging en de SMS-kant), dus hij is geen
    detail van een van die drie. */
 const { toOutbox } = require('./mail-outbox')({ FROM });
+const vanger = require('./post-vanger');
 
 /* De SMS-kant en de sandbox-zekering staan in ./mail-lokaal.js. Daar woont ook
    de STAND van de twee sandboxen: die werd hier op vier plekken gelezen en op
@@ -115,6 +116,7 @@ function sendNu(to, subject, text, opties) {
   };
   const isMail = /@/.test(String(to));
   if (!isMail) return sendSmsNu(String(to).replace(/^sms:/i, ''), subject, text);
+  if (vanger.aan) { try { toOutbox(to, subject, text, opties); journaal(true, 'vanger'); } catch (e) { journaal(false, 'vanger', e.message); } return; }
   if (transporter && (!SMTP_SANDBOX || kanalen.smtpAan())) {
     transporter.sendMail({ from: opties && opties.from || FROM,
       envelopeFrom: opties && opties.envelopeFrom || FROM,
@@ -168,6 +170,6 @@ module.exports = {
   providerDkim: PROVIDER_DKIM && CONFIGURED,
   liveConfigured: (CONFIGURED && !SMTP_SANDBOX) || DIRECT,
   sandboxConfigured: CONFIGURED && SMTP_SANDBOX,
-  smsConfigured: false, smsSandboxConfigured: smsSandbox.enabled,
+  smsConfigured: false, smsSandboxConfigured: smsSandbox.enabled, postvanger: vanger.aan,
   smsMode: smsSandbox.mode, direct: DIRECT, bouwBericht, zetSandbox, sandboxStand
 };

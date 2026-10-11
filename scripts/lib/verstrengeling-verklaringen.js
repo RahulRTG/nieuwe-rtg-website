@@ -410,6 +410,8 @@ module.exports = [
     reden: 'mail.js r.50: de transporter van de mail; een onderwerp over meerdere bestanden' },
   { van: 'motor:mail', naar: 'motor:smtp-direct', soort: 'DOMEINRELATIE',
     reden: 'zelfde bestand: de tweede bezorgweg, zonder relay' },
+  { van: 'motor:mail', naar: 'motor:post-vanger', soort: 'DOMEINRELATIE',
+    reden: 'mail.js leest of de postvanger van de testwereld aan staat (BETROUWBAARHEID.md par. 4): de vanger is de laatste meter van de bezorging, niet een eigen domein' },
   { van: 'motor:papieren', naar: 'motor:bewaarveger', soort: 'DOMEINRELATIE',
     reden: 'papieren/huidig.js r.15 leest STANDAARD: welke termijn standaard geldt staat bij de veger die hem uitvoert' },
   { van: 'motor:pg', naar: 'motor:pgwire', soort: 'EIGEN_DATA',

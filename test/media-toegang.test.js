@@ -141,7 +141,9 @@ test('babyboekje: de gezinsfoto is een privélink, de kale naam is dicht', async
   assert.equal(r.cc, 'private, no-store');
 });
 
-test('een vervalste of verlopen link opent niets', async () => {
+// De route die deze toetsen bewijzen, letterlijk: de deltapoort zoekt hem op naam.
+const LINKROUTE = 'GET /media/t/:token';
+test(LINKROUTE + ': een vervalste of verlopen link opent niets', async () => {
   const A = await lid();
   const p = await api('/api/salon/plaats', { tekst: 'test', media: [{ beeld: PNG, alt: 'x' }], publiek: 'alleenik' }, A);
   const src = p.body.post.media[0].src;
@@ -327,5 +329,3 @@ test('het banlog van het schild schrijft een medialink gemaskeerd', () => {
   assert.equal(logDoel('/api/x'), '/api/x');
 });
 
-/* De route die deze toets bewijst, letterlijk (de deltapoort zoekt hem op naam):
-   GET /media/t/:token -- de ondertekende privélink. */

@@ -362,7 +362,7 @@ functionaliteit, de noodzakelijke wijzigingen en een gefaseerd implementatieplan
 
 ### Fase 3 -- het verbond (B2)
 
-- `kern/verbond.js` (naam na 0.2) hergebruikt de afspraakvelden en de
+- een nieuwe module `verbond.js` (nog te bouwen, naam na 0.2) hergebruikt de afspraakvelden en de
   tekenvorm van `rtfos/partners.js` en heeft geen eigen opslag van leden.
 - Een gezamenlijk project = `rtfos/projecten*.js` met twee eigenaren.
 - Toetsen: G4 als aanvalsproef. Een beheerder van gemeenschap A vraagt de leden van
@@ -381,7 +381,7 @@ functionaliteit, de noodzakelijke wijzigingen en een gefaseerd implementatieplan
 
 ### Fase 5 -- mensen die iets aanbieden (B4)
 
-- `kern/knelpunt/aanvoer-mentor.js` als derde, maximaal andere bron: mensen in
+- een nieuwe aanvoerbron `aanvoer-mentor.js` (nog te bouwen) als derde, maximaal andere bron: mensen in
   plaats van een lijst of een generator. Dit is meteen de proef die
   `MAATSTAF.md` par. 7h vraagt: past het contract van `aanvoer.js` zonder één
   letter te veranderen?

@@ -85,6 +85,7 @@ const EIGENAAR = {
     waarom: 'npm run trust:manifest schrijft het; keuringsregel 74 (scripts/check.js) eist dat het bij de uitvoerbare kern hoort.' },
   'LIBRARYOS.md': { soort: 'BRON', waarom: 'Handgeschreven ontwerp van LibraryOS (#502); de kernel- en HTTP-toetsen leveren het bewijs.' },
   'LIBRARYOS-RESULTAAT.md': { soort: 'BRON', waarom: 'Handgeschreven opleververslag van LibraryOS (#502).' },
+  'GEMEENSCHAP.md': { soort: 'BRON', waarom: 'Handgeschreven richtingsdocument van FoundationOS als Human & Social Infrastructure.' },
   'LIBRARYOS-STUDIO-READER.md': { soort: 'BRON', waarom: 'Handgeschreven ontwerp van Studio en de private Reader (#502).' },
   'LIBRARYOS-STUDIO-READER-RESULTAAT.md': { soort: 'BRON', waarom: 'Handgeschreven opleververslag van Studio en Reader (#502).' },
   'RTG-LEARNING-LOOPS-ARCHITECTUURONDERZOEK.md': { soort: 'BRON', waarom: 'Handgeschreven architectuuronderzoek naar de leerlussen (#502).' },

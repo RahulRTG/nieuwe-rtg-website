@@ -6996,6 +6996,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "keuringreden.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/repository-snapshot.js",
+      "operator": "getal+1#0",
+      "gezakt": 7,
+      "geprobeerd": 3
+    },
     "keuringsindex.test.js": {
       "soort": "puur",
       "staat": "gezakt",

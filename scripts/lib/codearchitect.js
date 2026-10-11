@@ -30,6 +30,7 @@ const path = require('path');
 const { invoerVersheid } = require('./invoerspoor');
 
 const WORTEL = path.join(__dirname, '..', '..');
+const PLAN = '.evidence/plan.json';
 
 /* De graad die een registerWAARDE draagt, per register, met de reden. Dit is de
    enige plek waar de Architect iets verklaart, en het is een verklaring over
@@ -44,6 +45,10 @@ const GRAAD = {
   'WETTEN.json': ['vermoed', 'een wet is een besluit van een mens met een handhaver; dat hij geldt is geen meting'],
   'BEWIJSSCHULD.json': ['vermoed', 'verklaarde schuld: een mens schreef op wat er niet bewezen is'],
   'TOETSROUTES.json': ['gemeten', 'waargenomen in het routejournaal van echte rondes (scripts/toetsroutes.js)'],
+  /* Geen register in de repository maar het bewijsplan van deze boom, door
+     `npm run evidence:plan` gemaakt (scripts/plan.js). `why` leest hier de
+     afgegane regels uit (fase 6). Ontbreekt hij, dan is er nog geen plan. */
+  [PLAN]: ['gemeten', 'het bewijsplan van deze boom (scripts/plan.js); een lokaal artefact, opnieuw te maken met npm run evidence:plan'],
 };
 
 function maakLezer(opties) {
@@ -353,6 +358,53 @@ function onbekenden(lezer, scope) {
   };
 }
 
+/* ---------------------------------------------------------------- waarom */
+
+/* Waarom besloot een poort zo? Alleen de bewijsroute schrijft vandaag zijn
+   regels uit (scripts/plan.js, fase 6); de andere poorten uit de keten worden
+   genoemd met de reden dat ze dat nog niet doen. Geen poort wordt hier
+   nagespeeld: dit leest wat de poort zelf opschreef. */
+function poorten() {
+  try {
+    return require('../ci-lokaal').plan().map((g) => ({ naam: g.naam, job: g.gat.jobnaam, stap: g.gat.stap,
+      schrijftReden: /evidence(?:\.js)? plan|evidence:plan/.test(g.gat.opdracht || '') }));
+  } catch (e) { return { reden: 'de keten is niet af te leiden (scripts/ci-lokaal.js): ' + e.message }; }
+}
+
+function waarom(lezer, onderwerp) {
+  const plan = lezer.laad(PLAN);
+  const wat = String(onderwerp || '').trim();
+  const lijst = poorten();
+  const uit = { onderwerp: wat || 'poorten', poorten: lijst };
+  if (!wat || wat === 'poorten') return uit;
+  if (plan.ontbreekt) {
+    return { ...uit, gevonden: false, regels: [regel(lezer, { veld: 'afgegane regels', waarde: null, register: PLAN, pad: 'redenen.regels' })] };
+  }
+  const red = plan.data.redenen;
+  if (!red) return { ...uit, gevonden: false, reden: PLAN + ' is van voor fase 6: het draagt geen afgegane regels. Maak het opnieuw met npm run evidence:plan.' };
+  /* Een onderwerp is `keuring` (alles), een besluitcode, een wet-ID of een
+     gewijzigd pad. */
+  const past = (r) => wat === 'keuring' || r.wet === wat || r.regel === wat ||
+    (r.gemeten && (r.gemeten.code === wat || r.gemeten.pad === wat));
+  const gekozen = red.regels.filter(past);
+  if (!gekozen.length) {
+    const bekend = Array.isArray(lijst) && lijst.find((g) => g.naam === wat || g.stap === wat);
+    return { ...uit, gevonden: false, reden: bekend
+      ? 'deze poort schrijft nog geen reden uit; alleen de bewijsroute doet dat (ARCHITECTOPDRACHT.md fase 6)'
+      : 'geen afgegane regel, besluit, wet of pad met deze naam in ' + PLAN };
+  }
+  const regels = gekozen.map((r) => {
+    const sleutel = r.regel === 'vorm' ? '[gemeten.pad=' + r.gemeten.pad + ']' : '[regel=' + r.regel + ']';
+    return regel(lezer, { veld: (r.wet || 'geen wet') + ' / ' + r.regel, waarde: r, register: PLAN, pad: 'redenen.regels' + sleutel,
+      toelichting: 'graad van de meting: ' + r.graad + (r.klasse ? '; dwingt ' + r.klasse + ' af' : '') + (r.bron ? '; bron: ' + r.bron : '') });
+  });
+  regels.push(regel(lezer, { veld: 'klasse van de keuring', waarde: red.klasse, register: PLAN, pad: 'redenen.klasse',
+    tegenspraak: red.klopt && red.klopt.ja ? 'geen-gevonden' : 'gevonden',
+    toelichting: red.klopt && red.klopt.ja ? 'de strengste van de afgegane regels' : 'de narekening noemt ' + (red.klopt && red.klopt.strengste) }));
+  regels.push(regel(lezer, { veld: 'bereik', waarde: red.bereik, register: PLAN, pad: 'redenen.bereik' }));
+  return { ...uit, gevonden: true, regels };
+}
+
 /* ---------------------------------------------------------------- kaart */
 
 /* Geen tweede kaart: de structurele kaart is ARCHITECTUUR.md (scripts/kaart.js).
@@ -374,4 +426,4 @@ function kaart(lezer) {
   };
 }
 
-module.exports = { maakLezer, vind, uitleg, impact, onbekenden, kaart, volg, regel, GRAAD, WORTEL };
+module.exports = { maakLezer, vind, uitleg, impact, onbekenden, kaart, waarom, poorten, volg, regel, GRAAD, WORTEL, PLAN };

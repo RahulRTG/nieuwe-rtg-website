@@ -1211,6 +1211,58 @@
       "draagt": [
         "scripts/lib/cijferopmens.js"
       ]
+    },
+    {
+      "id": "keuring-zwaarste-regel-wint",
+      "soort": "techniek",
+      "wet": "De zwaarte van een keuring is de strengste van de regels die afgingen; een verklaarde lagere zwaarte (een document, een woord in een diff) wint nooit van een gemeten hogere.",
+      "bron": {
+        "bestand": "ARCHITECTOPDRACHT.md",
+        "anker": "**De MAX-regel.**"
+      },
+      "sabotage": {
+        "wat": "laat de klasseladder de LICHTSTE klasse kiezen in plaats van de zwaarste",
+        "bestand": "scripts/lib/semdiff.js",
+        "zoek": "return ia >= ib ? a : b;",
+        "zet": "return ia >= ib ? b : a;",
+        "wachters": [
+          "test:test/keuringreden.test.js"
+        ]
+      },
+      "bewaaktDoor": [
+        "test/keuringreden.test.js",
+        "test/semdiff.test.js"
+      ],
+      "draagt": [
+        "scripts/lib/semdiff.js",
+        "scripts/lib/keuringreden.js"
+      ]
+    },
+    {
+      "id": "keuring-ontbrekende-meting-is-streng",
+      "soort": "techniek",
+      "wet": "Een ontbrekend gegeven geeft de strengste keuring: een gewijzigd pad dat de impactgraaf niet kan begrenzen maakt de keuring zwaarder en nooit lichter.",
+      "bron": {
+        "bestand": "PROOF-INCREMENTAL.md",
+        "anker": "Wat het systeem niet kan bewijzen als irrelevant, behandelt het als"
+      },
+      "sabotage": {
+        "wat": "laat een onvolledige impactverzameling cosmetisch keuren in plaats van als security",
+        "bestand": "scripts/lib/risico.js",
+        "zoek": "return { klasse: 'security', ondergrens",
+        "zet": "return { klasse: 'cosmetic', ondergrens",
+        "wachters": [
+          "test:test/keuringreden.test.js"
+        ]
+      },
+      "bewaaktDoor": [
+        "test/keuringreden.test.js",
+        "test/risico.test.js"
+      ],
+      "draagt": [
+        "scripts/lib/risico.js",
+        "scripts/lib/keuringreden.js"
+      ]
     }
   ]
 }

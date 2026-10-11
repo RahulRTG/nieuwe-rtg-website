@@ -1480,11 +1480,11 @@
     "type": "home",
     "icon": "house",
     "sections": [
-      "Maison Noire",
-      "Salon Privé",
-      "Chef aan huis"
+      "Mijn lijn",
+      "Ontdekken",
+      "Uw avond"
     ],
-    "intro": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+    "intro": "Uw levenslijn, en wat er vanavond kan.",
     "shared": false
   },
   "/apps/foundation/os-veld.html": {

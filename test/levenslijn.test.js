@@ -242,3 +242,21 @@ test('valt de levensgraaf weg, dan blijft de lijn staan en meldt feiten dat', ()
   assert.deepEqual(f.komt, []);
   assert.ok(f.speelt.length >= 1, 'wat er speelt hangt niet aan de termijnen');
 });
+
+/* 10. HET GEBOORTEJAAR ZEGT WAAR HET VANDAAN KOMT (LEVEN.md par. 2.10). Een
+   datum die het lid bij de aanmelding intypte is geen paspoortgegeven; hier
+   stond er altijd "uit uw geverifieerde paspoort" bij, ook bij een lid dat
+   nooit een document liet zien. Alleen als de keurder de datum van het
+   document overnam (`geborenBron === 'paspoort'`) mag dat er staan; weet de
+   kern het niet, dan geldt de voorzichtige lezing.
+   Mutatie gezien: `gezien` in aanwijzingen.js hard op true gezet -- de eerste
+   en derde bewering zakken. */
+test('het geboortejaar noemt zijn herkomst: paspoort alleen als RTG het document zag', () => {
+  const regel = (over) => faseUit(motor(Object.assign({}, VOL, over)).lijn('user-geb'), 'geboorte').gegevens.join(' | ');
+  const opgegeven = regel({ paspoortGeboortebronVan: () => 'opgegeven' });
+  assert.doesNotMatch(opgegeven, /paspoort/i, 'een opgegeven datum is geen paspoortgegeven');
+  assert.match(opgegeven, /zelf opgaf/);
+  assert.match(regel({ paspoortGeboortebronVan: () => 'paspoort' }), /^paspoort: geboortejaar 1994 uit uw geverifieerde paspoort$/);
+  // geen bron bekend (oude kern, of de vraag faalt stil): nooit "geverifieerd"
+  assert.doesNotMatch(regel({}), /geverifieerd/);
+});

@@ -42,7 +42,7 @@
    index.js zet, bouwt een poort. */
 const FASEN = [
   { id: 'geboorte', naam: 'Geboorte', groepen: ['mini'],
-    toelichting: 'Waar de lijn begint. Het jaar komt uit het paspoort dat u zelf heeft laten verifieren.' },
+    toelichting: 'Waar de lijn begint. Het jaar komt uit uw ledendossier; de regel eronder zegt of RTG het van uw paspoort heeft overgenomen of dat u het zelf opgaf.' },
   { id: 'opvang', naam: 'Opvang', groepen: ['mini'],
     toelichting: 'De eerste jaren buitenshuis. RTG heeft hier vandaag geen gegevens over; er staat dus niets.' },
   { id: 'basisschool', naam: 'Basisschool', groepen: ['kind'],

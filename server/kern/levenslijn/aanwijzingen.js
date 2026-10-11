@@ -32,7 +32,7 @@ const TRAP_FASE = { po: 'basisschool', vo: 'middelbaar', mbo: 'studie', hbo: 'st
 
 module.exports = ({ kern }) => {
 
-  /* ---- GEBOORTE: het jaar uit het geverifieerde paspoort ----
+  /* ---- GEBOORTE: het jaar uit het ledendossier, met zijn herkomst ----
      Alleen het JAAR, en dat komt zo uit kern/paspoort.js: die module gaat over
      paspoorten en geeft precies dit ene getal terug. Hier staat dus geen
      kennis over waar het ledendossier ligt of hoe een sleutel eruitziet --
@@ -42,8 +42,15 @@ module.exports = ({ kern }) => {
   function geboorte(key) {
     const jaar = geldigJaar(kern.paspoortGeboortejaarVan(key));
     if (jaar === null) return [];
-    return [aanwijzing({ fase: 'geboorte', staat: 'geweest', vanaf: jaar, bron: 'paspoort',
-      wat: 'geboortejaar ' + jaar + ' uit uw geverifieerde paspoort' })];
+    /* De herkomst erbij (par. 2.10): een zelf getypte datum is geen
+       paspoortgegeven. Onbekend leest als opgegeven. */
+    const gezien = typeof kern.paspoortGeboortebronVan === 'function'
+      && kern.paspoortGeboortebronVan(key) === 'paspoort';
+    return [aanwijzing({ fase: 'geboorte', staat: 'geweest', vanaf: jaar,
+      bron: gezien ? 'paspoort' : 'aanmelding',
+      wat: gezien
+        ? 'geboortejaar ' + jaar + ' uit uw geverifieerde paspoort'
+        : 'geboortejaar ' + jaar + ' zoals u het zelf opgaf; RTG heeft het nog niet naast een document gelegd' })];
   }
 
   /* ---- ONDERWIJS: het leerpaspoort (kern/onderwijs.js) ----

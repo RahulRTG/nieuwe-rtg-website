@@ -29,6 +29,7 @@
    maakPaspoort(state) volgt het vaste kern-patroon. */
 
 const { idVanKey } = require('../lib/lidsleutel');
+const { bronVan } = require('./betrouwbaarheid');
 
 const NIVEAUS = ['bevestiging', 'idkaart', 'paspoort'];
 const VIEW_TTL_MS = 10 * 60 * 1000;     // een goedgekeurde inzage is 10 minuten geldig
@@ -106,6 +107,17 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
     if (!/^\d{4}-\d{2}-\d{2}$/.test(geboren)) return null;
     return Number(geboren.slice(0, 4));
   }
+  /* WAAR DAT JAAR OP RUST: 'paspoort' als de keurder de datum van het document
+     heeft overgenomen, 'opgegeven' als hij nog is zoals het lid hem bij de
+     aanmelding intypte -- dezelfde twee standen als `leeftijdBron` in
+     kern/rtgid-claims.js, uit dezelfde functie (kern/betrouwbaarheid.js). Zonder
+     deze vraag zei de levenslijn "uit uw geverifieerde paspoort" over een datum
+     die niemand had gezien: een eigen opgave die zich als feit voordoet. */
+  function geboortebronVan(key) {
+    const u = accountVanKey(key);
+    if (!u) return null;
+    return bronVan(memberState(u) || {});
+  }
   function log(entry) {
     lijsten();
     db.data.paspoortLog.unshift({ id: id(), at: nu(), ...entry });
@@ -179,7 +191,7 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
     NIVEAUS, mijnStatus, vraag, beslis, trekIn, bekijk,
     dienIncidentIn, beoordeelIncident, mijnVerzoeken, partnerVerzoeken,
     incidentenVoorOffice, vervalOpschonen, paspoortVervaldatumVan: vervaldatumVan,
-    paspoortGeboortejaarVan: geboortejaarVan
+    paspoortGeboortejaarVan: geboortejaarVan, paspoortGeboortebronVan: geboortebronVan
   };
 }
 

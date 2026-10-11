@@ -1876,7 +1876,7 @@ const {
      een ternary, en die viel dus stil terug op null -- de paspoortknoop van de
      levensgraaf is daardoor nooit gebouwd. Een belofte in commentaar is een
      belofte in code (LAT.md regel 6), en dit is de plek waar hij waar wordt. */
-  paspoortVervaldatumVan, paspoortGeboortejaarVan
+  paspoortVervaldatumVan, paspoortGeboortejaarVan, paspoortGeboortebronVan
 } = maakPaspoort({
   db, save, crypto, accounts, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, leesUploadDataUrl, leeftijdVan, gidsHaal
@@ -2280,7 +2280,7 @@ const kern = {
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
   paspoortPartner, paspoortIncidenten,
-  paspoortVervaldatumVan, paspoortGeboortejaarVan
+  paspoortVervaldatumVan, paspoortGeboortejaarVan, paspoortGeboortebronVan
 };
 
 /* Centrale injecties voor de kernlagen; ontbrekende helpers laten de server

@@ -3,8 +3,8 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-11T08:52:36.636Z",
-  "commit": "0b84a91d9",
+  "op": "2026-10-11T05:56:47.201Z",
+  "commit": "9b6c77b9",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
@@ -1379,18 +1379,6 @@
   {
    "naam": "GELDLAT.md",
    "soort": "ONBESLIST",
-   "eigenaar": null,
-   "graad": null,
-   "schrijvers": [],
-   "stempelInstrument": null,
-   "stempelAnders": false,
-   "versheidOpdracht": null,
-   "grendelt": null,
-   "botsingVerklaard": null
-  },
-  {
-   "naam": "GEMEENSCHAP.md",
-   "soort": "BRON",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],
@@ -4879,6 +4867,18 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run zaakwig:vast",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ZERO.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   }
  ]

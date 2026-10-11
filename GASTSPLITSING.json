@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-11T16:08:19.785Z",
-    "commit": "f4fc6beb",
+    "op": "2026-10-11T18:22:44.772Z",
+    "commit": "981adb2b",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 5,
     "instrument": "scripts/gastsplitsing.js",
     "node": "v22.22.0"
   },

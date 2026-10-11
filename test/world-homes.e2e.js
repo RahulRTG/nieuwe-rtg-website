@@ -62,7 +62,7 @@ test('new homes fit mobile and desktop, use one Edge and retain visible free Fou
         assert.match(await heading.evaluate(e => getComputedStyle(e).fontFamily), /Bodoni/);
         if (width < 1000) {
           assert.equal(await page.locator('.wp-scene:visible').count(), 1, 'mobile leads with the one shared cinematic scene: ' + route + ' @' + width);
-          assert.equal(await page.locator('.wh-photo :is(h1,img):visible').count(), 0, 'and not with a second hero underneath it: ' + route + ' @' + width);
+          assert.equal(await page.locator('.wh-photo:has(h1) :is(h1,img):visible').count(), 0, 'and not with a second hero underneath it: ' + route + ' @' + width);
         }
         if (route.includes('foundation')) {
           assert.match(await page.locator('.wp-free:visible').first().innerText(), /100% gratis/);

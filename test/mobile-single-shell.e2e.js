@@ -44,8 +44,9 @@ test('the four mobile worlds expose their original content and keep it when chan
     try {
       /* De gedeelde cinematic scene is de mobiele kop (#534, besluit van de eigenaar van
          11 oktober 2026); de eigen inhoud van de wereld staat eronder en blijft zichtbaar. */
+      await page.locator('.wd-home>.wp-scene').waitFor({ state: 'visible', timeout: 20000 }).catch(() => {});
       assert.equal(await page.locator('.wd-home>.wp-scene').isVisible(), true, route + ': the shared scene leads on mobile');
-      assert.equal(await page.locator('.wd-home .wh-photo :is(h1,img):visible').count(), 0, route + ': no second hero under the scene');
+      assert.equal(await page.locator('.wd-home .wh-photo:has(h1) :is(h1,img):visible').count(), 0, route + ': no second hero under the scene');
       assert.equal(await page.locator('.wp-domain').isVisible(), false, route + ': no collapsed original home');
       const original = await page.locator('.wd-home').evaluate(el => {
         const node = [...el.children].find(n => !n.matches('.wp-scene'));

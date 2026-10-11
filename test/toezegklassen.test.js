@@ -212,6 +212,12 @@ test('15. besloten elders: de bron moet letterlijk staan, en besloten is geen vi
   const fout = wegwerp([{ document: 'A.md', citaat: '| een ding | **staat** |', onderdeel: 'een ding', klasse: 'vraagt-besluit',
     reden: 'tegelijk open en besloten', voorwaarde: 'iets dat vervuld moet zijn', besloten: { document: 'A.md', citaat: '| een ding | **staat** |', datum: '2026-10-11' } }]);
   assert.ok(tk.inventaris(fout).fouten.some((f) => f.includes('besloten en tegelijk vraagt-besluit')));
+  /* Een markering die zichzelf als besluitbron citeert, is een herschreven rij
+     en geen besluit (tegenlezer ronde 2). */
+  const kring = wegwerp(ok({ document: 'A.md', citaat: '| een ding | **staat** |', datum: '2026-10-11' }));
+  const ki = tk.inventaris(kring);
+  assert.equal(ki.beslotenElders, 0);
+  assert.ok(ki.fouten.some((f) => f.includes('eigen regel van de markering')));
 });
 
 test('16. de vingerafdruk ziet afdrukken en levende getallen niet, een echt document wel', () => {

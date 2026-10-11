@@ -268,6 +268,12 @@ function leesBesluiten(wortel, teksten) {
           reden: 'de BRON van het besluit: ' + bp.reden });
         continue;
       }
+      /* Een markering is nooit haar eigen besluitbron: wie de gecorrigeerde rij
+         zelf citeert ("besloten (...)"), heeft alleen de rij herschreven. */
+      if (b.besloten.document === b.document && bp.regel === plek.regel) {
+        fouten.push(wie + ' -- besloten met als bron de eigen regel van de markering: een besluit staat elders');
+        continue;
+      }
       besloten = { document: b.besloten.document, regel: bp.regel, citaat: b.besloten.citaat, datum: b.besloten.datum };
     }
     items.push({ document: b.document, regel: plek.regel, citaat: b.citaat, onderdeel: b.onderdeel,

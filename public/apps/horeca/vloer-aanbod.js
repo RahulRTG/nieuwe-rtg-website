@@ -120,30 +120,15 @@
 
     var uit = (d.leningen || []);
     $('vUit').textContent = uit.length;
-    /* IS DE DRAGER ER NOG? Uit het klokboek van de zaak, met drie standen
-       (kern/horeca/wijk-leen.js, drager). Alleen `uitgeklokt` krijgt een zin:
-       `niet-gemeten` is geen "weg", want veel zaken klokken niet. Teruggeven
-       blijft een druk op de knop -- er springt niets vanzelf terug. */
-    var weg = function (l) {
-      if (!l.drager || l.drager.stand !== 'uitgeklokt') return '';
-      var om = new Date(l.drager.om);
-      return ' · <b>uitgeklokt om ' + esc(isNaN(om) ? '?' : om.toTimeString().slice(0, 5)) +
-        '</b>, de tafel staat nog op zijn naam';
-    };
-    var nWeg = Number(d.dragerWeg) || 0;
-    var wegZin = nWeg ? '<p class="v-som"><b>' + nWeg + (nWeg === 1 ? ' tafel staat' : ' tafels staan') +
-      ' nog op naam van iemand die al is uitgeklokt.</b> ' +
-      (d.magIndelen ? 'U kunt ' + (nWeg === 1 ? 'hem' : 'ze') + ' hieronder teruggeven.'
-        : 'Teruggeven doet de uitlener of een manager.') + '</p>' : '';
-    $('vGeleend').innerHTML = wegZin + (uit.length ? uit.map(function (l) {
+    $('vGeleend').innerHTML = uit.length ? uit.map(function (l) {
       return '<div class="v-leen"><b>' + esc(l.tafel) + '</b><small>' +
         esc(l.naam) + ' draagt hem' + (l.vanNaam ? ', van ' + esc(l.vanNaam) : '') +
-        (l.wijkNaam ? ' uit ' + esc(l.wijkNaam) : '') + ' · ' + l.staat + ' min' + weg(l) + '</small>' +
+        (l.wijkNaam ? ' uit ' + esc(l.wijkNaam) : '') + ' · ' + l.staat + ' min</small>' +
         '<span class="h-flex1"></span>' +
         ((l.naarMij || l.vanMij || d.magIndelen) ? K.knop('Terug', { terug: l.tafel }) : '') +
         '</div>';
     }).join('') : '<p class="v-leeg">Geen enkele tafel staat bij iemand anders. Een halve wijk ' +
-      'overdragen doet u hierboven, bij de wijk die u zelf draagt.</p>');
+      'overdragen doet u hierboven, bij de wijk die u zelf draagt.</p>';
 
     var open = (d.overdrachten || []);
     $('vAanbod').innerHTML = open.length ? open.map(function (o) {

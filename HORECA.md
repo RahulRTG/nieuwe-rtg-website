@@ -913,21 +913,18 @@ eerlijkste zin die dit document over zichzelf kan zeggen.
 **Wat de vloer nog niet kan.** De twee dingen die hier op 24 augustus 2026
 stonden — weigeren, en een halve wijk overdragen — zijn allebei af (punt 7
 hierboven). Wat er daarna lag — een leen kende **geen einde van de dienst** — is
-op 11 oktober 2026 gedicht, en met opzet NIET door de tafel vanzelf terug te
-laten springen: een leen eindigt nog steeds doordat iemand hem teruggeeft
-(`kern/horeca/wijk-leen.js`). Wat erbij kwam is dat het einde van de dienst
-GELEZEN wordt uit het klokboek dat de zaak al had (`/api/staff/clock`), zonder
-tweede register voor "wie is er". Elke leen op de Vloer draagt de stand van zijn
-drager in drie standen — `ingeklokt`, `uitgeklokt` (na het uitlenen, en niet
-weer in) en `niet-gemeten` — want veel zaken klokken niet, en "niemand klokte"
-is geen "hij is weg". De Vloer telt hoeveel TAFELS er bij iemand staan die al
-uitklokte (een aantal tafels, nooit een lijst mensen: grens 5). De PDA van de
-drager toont wat hij van een collega draagt als vaste regel met een knop om het
-terug te geven, en wie zijn wijk loslaat terwijl hij nog geleende tafels draagt,
-krijgt dat te horen. Bewezen in `test/horeca-leen-dienst.test.js`, met mutaties
-op de drie standen. Wat het NIET doet: uitklokken in de personeelsapp zegt het
-nog niet, want de prikklok is een ander domein dan de horecalaag en die grens
-(`GRENZEN.json`) wordt niet stil verbreed.
+op 11 oktober 2026 half gedicht, en met opzet NIET door de tafel vanzelf terug
+te laten springen: een leen eindigt nog steeds doordat iemand hem teruggeeft
+(`kern/horeca/wijk-leen.js`). De PDA van de drager toont wat hij van een collega
+draagt als vaste regel met een knop om het terug te geven, en wie zijn wijk
+loslaat terwijl hij nog geleende tafels draagt, krijgt dat te horen (bewezen in
+`test/horeca-leen-dienst.test.js`). De andere helft — dat de Vloer ziet dat de
+drager al **uitgeklokt** is — is gebouwd maar staat op een eigen tak
+(`claude/golf3-10a-horeca-leen-klok`): hij leest de prikklok via `klokVan` uit
+`kern/personeel.js`, en dat maakt de horecakant een tweede domein op die naam.
+Dat verhoogt de ratel `kernGedeeld` met een, en een ratel gaat alleen omhoog
+met een besluit in NORM.json. Ook uitklokken in de personeelsapp zegt het nog
+niet, om dezelfde reden in de andere richting.
 
 ## De echte wauw
 

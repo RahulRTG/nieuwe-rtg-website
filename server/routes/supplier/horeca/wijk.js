@@ -13,7 +13,7 @@
 'use strict';
 
 module.exports = (kern) => {
-  const { app, db, save, schoon, supplierAuth, managerOnly, logActivity, sseToSupplier, horeca } = kern;
+  const { app, save, schoon, supplierAuth, managerOnly, logActivity, sseToSupplier, horeca } = kern;
   const { H, Hlees } = horeca;
   const wijk = require('../../../kern/horeca/wijk')({ horeca, schoon });
   /* Het wijkbeeld (hoeveel open werk draagt elke wijk) komt uit de WERKLIJST en
@@ -53,9 +53,7 @@ module.exports = (kern) => {
       vanMij: String(o.vanId) === String(ik.staffId),
       voorMij: String(o.naarId) === String(ik.staffId)
     }));
-    // het klokboek van de zaak, alleen gelezen (kern/horeca/wijk-leen.js, drager)
-    const klokBoek = ((db.data && db.data.klok) || {})[req.supplier.code];
-    const leningen = wijk.leen.lijst(h, Array.isArray(klokBoek) ? klokBoek : null).map((l) => Object.assign({}, l, {
+    const leningen = wijk.leen.lijst(h).map((l) => Object.assign({}, l, {
       vanMij: !!(l.vanId != null && String(l.vanId) === String(ik.staffId)),
       naarMij: String(l.staffId) === String(ik.staffId)
     }));
@@ -68,8 +66,6 @@ module.exports = (kern) => {
          mist een bericht dat zichzelf opruimt (wijk-antwoord.js regel 2). */
       antwoorden: over.antwoorden(h, ik.staffId),
       leningen,
-      // een AANTAL tafels en geen lijst mensen: een teller per mens is een ranglijst (grens 5)
-      dragerWeg: leningen.filter((l) => l.drager && l.drager.stand === 'uitgeklokt').length,
       /* De ploeg, zodat een aanbod een naam kan krijgen. Geen rollen en geen
          telling per mens -- alleen wie er is (grens 5). */
       ploeg: (function () {

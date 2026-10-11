@@ -255,10 +255,17 @@ let fotoNaam; // een Salon-foto op de cloud, voor de randcache
 const FOTO = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
 
 test('de randcache: een foto die over de lijn kwam, blijft op de doos', async () => {
-  // een foto rechtstreeks in de cloudmediastore leggen (zonder RTG_ENC_KEY onversleuteld)
-  fotoNaam = require('node:crypto').randomBytes(16).toString('hex') + '.png';
-  fs.mkdirSync(path.join(TMP_CLOUD, 'media'), { recursive: true });
-  fs.writeFileSync(path.join(TMP_CLOUD, 'media', fotoNaam), FOTO);
+  /* Een OPENBARE foto: de zaak zet hem op haar eigen pagina. Een los bestand in
+     de mediastore is sinds AUTHORITY.md B4 privé en komt niet via /media/:naam
+     (server/media/toegang.js) -- en dus ook niet op het kastje. */
+  const zaak = await api(cloudBase(), '/api/supplier/login', { username: 'rahul', password: 'Imran' });
+  assert.equal(zaak.status, 200, 'de zaak logt in op de cloud');
+  const add = await api(cloudBase(), '/api/supplier/photo/add', { image: 'data:image/png;base64,' + FOTO.toString('base64') }, zaak.body.token);
+  assert.equal(add.status, 200, 'de foto staat op de pagina van de zaak');
+  const naam = fs.readdirSync(path.join(TMP_CLOUD, 'media')).filter(n => /^[0-9a-f]{32}\.png$/.test(n))
+    .map(n => ({ n, t: fs.statSync(path.join(TMP_CLOUD, 'media', n)).mtimeMs })).sort((a, b) => b.t - a.t)[0];
+  fotoNaam = naam && naam.n;
+  assert.ok(fotoNaam, 'de foto staat in de cloudmediastore');
   const r = await fetch(doos.base + '/media/' + fotoNaam);
   assert.equal(r.status, 200, 'online komt de foto via het doorgeefluik');
   assert.equal(Buffer.compare(Buffer.from(await r.arrayBuffer()), FOTO), 0, 'byte voor byte dezelfde foto');

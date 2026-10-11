@@ -92,16 +92,28 @@ const EXTERN_AFREKENEN = [
     wijze: b => (['rtgpay', 'contant', 'rtg'].includes(b.method) ? b.method : 'contant') }
 ];
 const EXTERNE_WIJZEN = Object.freeze(['contant', 'pin', 'rekening']);
+/* N37: WAT "DIT PAD" IS, BESLIST DE ROUTER. De patronen hieronder eindigen op
+   een $, terwijl de router een pad met een slash erachter bij dezelfde handler
+   brengt: POST /api/supplier/giftcard/sell/ maakte met de stop aan een
+   cadeaukaart met saldo. Daarom wordt elke kandidaat getoetst die vastePaden()
+   uit ../web/routeindex.js geeft, net als de inlogpauze (N18) en de
+   schorspoort (N26). Geen eigen normalisatie: die valt ruimer of krapper uit
+   dan de router. Beide functies lezen het zo, anders wordt horeca/betaal/ een
+   betaalactie zonder de uitzondering voor extern afrekenen. */
+const { vastePaden } = require('../web/routeindex');
+const kandidaten = pad => vastePaden(String(pad || '').split('?')[0]);
 function externRegel(pad) {
-  const schoonPad = String(pad || '').split('?')[0];
-  return EXTERN_AFREKENEN.find(r => r.pad.test(schoonPad)) || null;
+  for (const p of kandidaten(pad)) {
+    const r = EXTERN_AFREKENEN.find(x => x.pad.test(p));
+    if (r) return r;
+  }
+  return null;
 }
 function isExternAfrekenen(pad) { return !!externRegel(pad); }
 
 function isBetaalactie(methode, pad) {
   if (!MUTEREND.has(String(methode || '').toUpperCase())) return false;
-  const schoonPad = String(pad || '').split('?')[0];
-  return HELE_BETAALDOMEINEN.some(re => re.test(schoonPad)) || GELDACTIES.some(re => re.test(schoonPad));
+  return kandidaten(pad).some(p => HELE_BETAALDOMEINEN.some(re => re.test(p)) || GELDACTIES.some(re => re.test(p)));
 }
 
 function antwoord(res) {

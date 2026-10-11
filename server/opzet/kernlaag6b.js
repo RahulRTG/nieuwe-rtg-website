@@ -67,7 +67,8 @@ kern.arrivalpas = require('../kern/arrivalpas')({ db, bewerkCollectie: hulp.bewe
    roteren en intrekken in een collectietransactie; de vloot, het kantoor en de
    manager van de zaak delen dit ene register. */
 kern.doosSleutels = require('../kern/zaakdoos/sleutels').doosSleutelsVan({ db, save: hulp.save,
-  bewerkCollectie: hulp.bewerkCollectie, crypto });
+  bewerkCollectie: hulp.bewerkCollectie, crypto,
+  uitgeverWeg: r => require('../kern/zaakdoos/sleutels-uitgever').uitgeverWeg(r, kern.accounts) });
 /* De personeelsuitnodiging (routes/supplier/werving/uitnodiging.js): EEN
    instantie met de collectietransactie. Werving en supplier maakten er elk een
    eigen met alleen `kern`, en kern draagt bewerkCollectie niet -- dus de claim

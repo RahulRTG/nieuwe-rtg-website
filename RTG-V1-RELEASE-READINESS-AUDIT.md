@@ -1,6 +1,6 @@
 # RTG V1 — RELEASE READINESS AUDIT
 
-> **STATUS 6 oktober 2026 — remediatie ronde 1 tot en met 5 uitgevoerd.**
+> **STATUS 11 oktober 2026 — remediatie ronde 1 tot en met 9 uitgevoerd.**
 >
 > - **Ronde 1:** de 2 P0's, de P1 en de kapotte release-gate uit ronde 0 zijn
 >   gerepareerd, met regressietests én een onafhankelijke adversariële
@@ -16,12 +16,27 @@
 >   in de code.
 > - **Ronde 5:** N19 en N18 (de twee P2's uit ronde 4) en N20 zijn VERIFIED
 >   FIXED, en N21 is bewust zo gelaten.
-> - **Verdict nu:** 🟡 CONDITIONAL GO, **86/100**. Wat nog open staat:
->   - de externe poorten F3–F6;
->   - aanbevolen: een besluit over N26. Dat is een P2 die er al was: de
->     schorspoort is met een slash te omzeilen.
+> - **Ronde 6 (en herstel 6b):** N26, N27, N28, N29 en N31 zijn VERIFIED
+>   FIXED. De dieper gaande herkeuring vond wel een **P1 die er al was (N36)**:
+>   een medewerker die uit het team is gehaald, zet zichzelf met zijn oude
+>   kassacode weer actief, en het antwoord daarop bevat de ruwe personeelsrij en
+>   het zaakrecord. Daarnaast vier P2's die er al waren (N37 tot en met N40).
+> - **Ronde 7:** N36 (de P1) is dicht. N37 en N39 zijn VERIFIED FIXED. Een
+>   tweede herkeuring vond nog een P2 die er al was (N52): een verwijderde
+>   manager komt terug met een code die hij zelf uitgaf.
+> - **Ronde 8:** N52 is VERIFIED FIXED, met twee lagen en twee herkeuringen.
+>   De herkeuring vond in dezelfde foutklasse een nieuwe P2 die er al was
+>   (N53: de zaakdoos-sleutel van een verwijderde manager blijft werken), een
+>   vermoede P2 (N54, SCIM) en een P3 (N55).
+> - **Ronde 9:** N53, N54 (live bevestigd en ernstiger dan vermoed) en N55
+>   zijn FIXED, met toetsen die op de oude code zakken. De herkeuring is op
+>   verzoek van de eigenaar gestopt, dus niet VERIFIED.
+> - **Verdict nu:** 🟡 CONDITIONAL GO, **88/100**. Wat nog open staat:
+>   - de P2's N38 en N40;
+>   - een herkeuring van ronde 9;
+>   - de externe poorten F3–F6.
 >
-> Zie **§REMEDIATIESTATUS** (ronde 1 tot en met 5) direct onder sectie A. De
+> Zie **§REMEDIATIESTATUS** (ronde 1 tot en met 9) direct onder sectie A. De
 > oorspronkelijke ronde-0-bevindingen blijven hieronder staan met hun status
 > (OPEN / FIXED / VERIFIED FIXED).
 
@@ -847,12 +862,12 @@ De werkwijze is die van ronde 4, in één workflow:
 
 | ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
 |---|---|---|---|---|---|---|
-| **N26** | P2 | OPEN, al aanwezig | `server/lib/vervalstaat.js` `staatVan` (letterlijke opzoeking) | De schorspoort zoekt `methode + pad` letterlijk op. De router brengt `/x/` bij dezelfde handler, dus een geschorste schrijfroute is met een slash erachter gewoon uit te voeren. Dezelfde fout als N18, in de poort die bewijsschuld afdwingt. | Zelf gezien door herkeuring 2 van N18. | Zie besluitpunt 1. |
-| **N27** | P3 | OPEN, al aanwezig (plausibel) | `server/opzet/lijfpoort.js:142`, `server/kern/zaakdoos` `journaalPadOk` | De zaakdoos sluit in de lokale modus alleen `/api/supplier/login` letterlijk uit van het naspeeljournaal. `/api/supplier/login/` en `/api/supplier/mijn/login` komen er wel in, met het lijf (wachtwoord, bewijs plus code) en een werktoken in het antwoord. | Alleen in de code gelezen, door twee keurders. | De uitsluiting via `vastePaden()` en voor elke inlogroute. |
-| **N28** | P3 | OPEN, al aanwezig | `server/routes/supplier/pda/posities-inlog.js` stap een | Stap een remt alleen per adres. Er is geen emmer per account zoals bij `/api/auth/login`: 30 foute wachtwoorden vanaf 30 adressen op één account werden niet geremd. | Zelf gezien in de eindkeuring. | Dezelfde drie emmers als de gewone inlog, via een gedeelde hulp. |
-| **N29** | P3 | OPEN, al aanwezig | `server/routes/supplier/werving/personeel.js` `/api/supplier/staff/join` | Een wachtwoordorakel. Het wachtwoord wordt vóór de bedrijfsnaam en de kassacode getoetst, dus een goed wachtwoord geeft 404 en een fout 401. Het pad valt buiten de inlogpauze en remt alleen per adres. | Zelf gezien in de eindkeuring. | De volgorde omdraaien, en het pad op `INLOG_PADEN`. |
+| **N26** | P2 | **VERIFIED FIXED (ronde 6)** | `server/lib/vervalstaat.js` `staatVan` (letterlijke opzoeking) | De schorspoort zoekt `methode + pad` letterlijk op. De router brengt `/x/` bij dezelfde handler, dus een geschorste schrijfroute is met een slash erachter gewoon uit te voeren. Dezelfde fout als N18, in de poort die bewijsschuld afdwingt. | Zelf gezien door herkeuring 2 van N18. | Zie besluitpunt 1. |
+| **N27** | P3 | **VERIFIED FIXED (ronde 6)** | `server/opzet/lijfpoort.js:142`, `server/kern/zaakdoos` `journaalPadOk` | De zaakdoos sluit in de lokale modus alleen `/api/supplier/login` letterlijk uit van het naspeeljournaal. `/api/supplier/login/` en `/api/supplier/mijn/login` komen er wel in, met het lijf (wachtwoord, bewijs plus code) en een werktoken in het antwoord. | Alleen in de code gelezen, door twee keurders. | De uitsluiting via `vastePaden()` en voor elke inlogroute. |
+| **N28** | P3 | **VERIFIED FIXED (ronde 6)** | `server/routes/supplier/pda/posities-inlog.js` stap een | Stap een remt alleen per adres. Er is geen emmer per account zoals bij `/api/auth/login`: 30 foute wachtwoorden vanaf 30 adressen op één account werden niet geremd. | Zelf gezien in de eindkeuring. | Dezelfde drie emmers als de gewone inlog, via een gedeelde hulp. |
+| **N29** | P3 | **VERIFIED FIXED (ronde 6)** | `server/routes/supplier/werving/personeel.js` `/api/supplier/staff/join` | Een wachtwoordorakel. Het wachtwoord wordt vóór de bedrijfsnaam en de kassacode getoetst, dus een goed wachtwoord geeft 404 en een fout 401. Het pad valt buiten de inlogpauze en remt alleen per adres. | Zelf gezien in de eindkeuring. | De volgorde omdraaien, en het pad op `INLOG_PADEN`. |
 | **N30** | P3 | OPEN, al aanwezig | `server/routes/supplier/pda/posities.js` `staffSessie` | Een werksessie uit de werkplek-inlog komt niet in het sessieregister van het lid ("Mijn sessies"), en er wordt geen `logInlog` geschreven. | Zelf gezien in de eindkeuring. | `legInlogVast` zoals de werkplekken bij `/api/auth/login`. |
-| **N31** | P3 | OPEN, al aanwezig | `server/routes/techniek/inlog.js` stap een, `server/sso/binnenkomst.js` `binnen()` | Stap een geeft een uitgezet account nog een bewijs of een overdracht. Sinds N20 vervalt die bij het eerste gebruik, maar SSO draait de tenantbrug al en logt een geslaagde inlog. | Zelf gezien (techniek); SSO alleen gelezen. | `isActief` in stap een, en in `aanmelden()` van SSO. |
+| **N31** | P3 | **VERIFIED FIXED (ronde 6)** | `server/routes/techniek/inlog.js` stap een, `server/sso/binnenkomst.js` `binnen()` | Stap een geeft een uitgezet account nog een bewijs of een overdracht. Sinds N20 vervalt die bij het eerste gebruik, maar SSO draait de tenantbrug al en logt een geslaagde inlog. | Zelf gezien (techniek); SSO alleen gelezen. | `isActief` in stap een, en in `aanmelden()` van SSO. |
 | **N32** | P3 | OPEN, al aanwezig | `server/middleware/remmen.js` `remOpDeDeur` | `req.path.endsWith('/stream')` slaat de algemene rem over, ook voor een `:param`-route waarvan het laatste segment toevallig `stream` heet. | Alleen in de code gelezen. | Op de route en niet op de pathnaam beslissen. |
 | **N33** | Info | OPEN | `public/apps/personeel/personeel-03b.js` | Twee clientpaden hebben geen toets: de melding over de laatste herstelcode, en de kantoorzin na een 404. | Herkeuring 2 van N19 (mutanten C3/C5). | Een browsertoets per pad. |
 | **N34** | Info | OPEN, al aanwezig (plausibel) | `/api/auth/tweede`, `posities-inlog.js`, `techniek/inlog.js` | Tussen `verifyActionToken` en `trekInActie` zit een venster. Twee gelijktijdige verzoeken met hetzelfde bewijs en dezelfde TOTP-code kunnen allebei slagen. | Alleen in de code gelezen. | Eén keer, voor alle deuren tegelijk: het bewijs intrekken vóór de codetoets, of een slot per bewijs. |
@@ -905,6 +920,486 @@ N26 tot en met N35 zijn vastgelegd en niet gerepareerd. Ze bestonden al vóór
 deze branch of vallen buiten de besluiten.
 
 ---
+
+## REMEDIATIESTATUS — ronde 6: N26, N27, N28, N29 en N31 (6 tot en met 11 oktober 2026)
+
+Branch: `codex/rtg-v1-release-blockers` (PR #487). De eigenaar koos uit de
+besluitpunten van ronde 5 telkens de aanbevolen optie:
+
+- **N26:** (a), de schorspoort zoekt het pad op met `vastePaden()`;
+- **N27–N31:** (a), N27, N28, N29 en N31 in één ronde. N30 en N32–N35 blijven
+  in het document.
+
+De werkwijze is die van ronde 5, met één ronde erbij:
+
+1. per bevinding een implementer, een andere agent die adversarieel herkeurt,
+   en hooguit twee herstelrondes;
+2. een samenvoeger, en een eindkeuring door drie keurders plus een criticus;
+3. **die eindkeuring gaf ROOD** door fouten die de ronde zelf maakte (zie
+   hieronder). Daarom volgde **herstelronde 6b**: drie clusters, elk opnieuw
+   onafhankelijk herkeurd, plus een live bevestiging van de twee zwaarste
+   nieuwe bevindingen.
+
+### Nieuw verdict (code): 🔴 NO-GO voor de personeelsfunctie, verder 🟡 CONDITIONAL GO — Release readiness: 82/100
+
+**Waarom lager dan 86**, terwijl er vijf bevindingen dicht zijn: de score volgt
+het bewijs en niet de hoeveelheid werk. De herkeuring van N29 en de bevestiging
+in 6b vonden een **P1 die er al was** (N36), live nagespeeld op de oude en op de
+nieuwe code. Daarnaast vier P2's die er al waren (N37 tot en met N40), alle vier
+zelf gezien. Dat is nieuw bewijs over een minder klaar product, niet een
+achteruitgang door deze branch.
+
+**Wat er wel beter is:**
+
+- de schorspoort (N26, P2) houdt elke spelling tegen die de router bij een
+  geschorste handler brengt: 73.612 verzoeken, alle schrijfroutes geschorst,
+  geen enkele schrijvende handler bereikt (op vijf webhooks na, zie N41);
+- het doosjournaal neemt geen inlog en geen wachtwoordlijf meer op (N27);
+- de werkplekinlog en de personeelsaanmelding tellen in dezelfde accountemmer
+  als de gewone inlog, gesleuteld op het ACCOUNT en niet op de getikte naam
+  (N28, met 6b);
+- `staff/join` is geen wachtwoordorakel meer en valt onder de inlogpauze (N29);
+- een uitgezet account krijgt bij techniek en SSO niets meer (N31).
+
+**Voorwaarden voor GO:**
+
+- **een besluit over N36 (P1), en de reparatie ervan;**
+- besluiten over N37–N40 (P2);
+- de externe poorten F3–F6.
+
+### Per bevinding — BEFORE / FIX / AFTER / REGRESSIE
+
+| # | Sev | Status | Commits | BEFORE → AFTER | Regressie (zakt vóór, slaagt na) |
+|---|---|---|---|---|---|
+| N26 | P2 | **VERIFIED FIXED** | `50ab12a2`, `f035bb37`, `ce5ba2fd` | **Vóór:** `staatVan` zocht `methode + pad` letterlijk op. `POST /api/foundation/les/maak/` maakte een les terwijl de route geschorst was. **Na:** `staatVan` leest het pad met `vastePaden()`, dus precies zoals de router, en een `:param`-patroon wordt op dezelfde kandidaten gematcht. Een melding gaat één keer per registersleutel, niet per spelling. | `test/schorspoort-spelling.test.js` (5): de echte router is het orakel, over twintig vervormingen per route. 6 + 18 mutanten gedood. De bekende grens (een schrijfroute op de wortel van een gemounte router, of een route die zelf op een slash eindigt) bestaat vandaag niet, en toets 5 zakt zodra er een komt. |
+| N27 | P3 | **VERIFIED FIXED** | `f4243e25`, `ab527c7b`, `9fd979e4`, `0dfbb365`, `857e031e`, `7b395e2e`, `f5ca3ee2` | **Vóór:** in de lokale modus kwamen `/api/supplier/login/` en `/api/supplier/mijn/login` met wachtwoord, code en werktoken in het naspeeljournaal. Live nagespeeld met een echte doos. **Na:** `kern/zaakdoos/journaal.js` beslist: geen inlogpad (via `INLOG_PADEN` en `vastePaden()`), geen lijf met een wachtwoordveld op welke diepte ook, en van het antwoord alleen de verwijzingen die het naspelen leest. | `test/doos-inlogjournaal.test.js` en `test/doos-journaal.test.js`. In 6b kreeg slot 4B weer een werkende toets: na N29 viel de oude proef al bij het pad af. Ook de refvertaling na het inkorten is nu vastgelegd (M16–M18 gedood). |
+| N28 | P3 | **VERIFIED FIXED** | `049d20c5`, `cc3caeef`, `bbdcfda8`, `178fc1a5`, `37afc825`, `f98fcc4b`, `48379b2d`, `ec65ab02` | **Vóór:** stap een van de werkplekinlog remde alleen per adres: 30 gokken vanaf 30 adressen op één account werden niet geremd. **Na:** `kern/identiteit/wachtwoordrem.js` is de gedeelde rem van `/api/auth/login`, de werkdeur en `staff/join`. Drie emmers, gesloten vóór de wachtwoordtoets, met een vingerafdruk van het ACCOUNT (6b: e-mailadres en gebruikersnaam waren eerst twee emmers). | `test/werkplek-rem.test.js` (onder meer 30 adressen op één account, beide deuren in beide richtingen, gebruikersnaam naast e-mail, en de adresemmer die de noodrem voedt). |
+| N29 | P3 | **VERIFIED FIXED** | `2d920a1c`, `9ca51a12`, `bbdcfda8`, `a1db2018`, `980b184e`, `c6bd8be5` | **Vóór:** `staff/join` toetste het wachtwoord vóór de bedrijfsnaam en de kassacode: een juist wachtwoord gaf 404, een fout 401. **Na:** eerst de kassacode (alleen voor wie haar claimde), dan pas het wachtwoord, en tot alle drie kloppen één en hetzelfde 401-antwoord. Het pad staat in `INLOG_PADEN`, telt in de accountemmer, en een geslaagde aanmelding leegt de adresemmer niet meer (de les van N4). | `test/staffjoin-orakel.test.js`, ook met een ingetrokken geclaimde code (M16). |
+| N31 | P3 | **VERIFIED FIXED** | `20900aca` | **Vóór:** een uitgezet account kreeg in stap een van techniek een `tech2`-bewijs, en via SSO een overdracht, met de tenantbrug en een geslaagde inlog in het log. **Na:** techniek weigert met de tekst van een fout wachtwoord en meldt het op het veiligheidsbord; SSO weigert vóór de tenantbrug en logt `logInlog('sso', false)`. | `test/stapeen-uitgezet.test.js` (6; op de basis zakken er 6, niet 5 zoals het commitbericht zegt). 16 mutanten gedood. |
+
+**Zijwijzigingen** (veroorzaakt door deze ronde, en elk met een eigen toets):
+
+- `944b8c13` en `7ec6951c`: keuringsregel 28 telt een kale 401 nog steeds als
+  gesloten, maar laat een uitzondering met een reden op de publieke lijst
+  staan. Gemeten met een namaak van de regel: op 4786 routes is geen enkel
+  oordeel over een gat veranderd. Alleen de opruimeis voor `/api/auth/login`
+  verviel. Het oordeel per route staat nu in `scripts/lib/poortoordeel.js`, met
+  `test/poortoordeel.test.js`.
+- `ce5ba2fd`: het commentaar van N26 schreef zijn voorbeelden als aanroep met
+  een `/api`-pad. De scanner van de Magnaat-capabilities leest commentaar mee,
+  telde vier spookroutes, en vijf toetsen zakten. De zinnen staan nu in woorden.
+- `d1b1aa8c`: N28 maakte de handler van `/api/auth/login` korter, waardoor de
+  credentialcensus het wachtwoordveld nu wel zag (op de basis was dat een vals
+  negatief). De route is ingedeeld bij de centrale inlogdeur in
+  `CODECREDENTIALS.json`.
+
+### Herkeuringsverloop
+
+- **N26:** herkeuring 1 en 2 VERIFIED FIXED. De tweede herkeuring vond twee
+  dingen buiten het besluit: N37 en N41.
+- **N27:** herkeuring 1 en 2 VERIFIED FIXED. N38 is buiten het besluit gemeld.
+- **N28:** herkeuring 1 en 2 FIXED_MET_KANTTEKENING. Open binnen het besluit
+  bleven de emmers per getikte naam (I1) en een toetsgat op de adresemmer (R10).
+  Beide zijn in 6b gerepareerd.
+- **N29:** herkeuring 1 VERIFIED FIXED, herkeuring 2 FIXED_MET_KANTTEKENING
+  (toetsgat M16). Gerepareerd in 6b. Deze herkeuring vond ook N36.
+- **N31:** herkeuring 1 VERIFIED FIXED.
+- **Eindkeuring op `bbdcfda8`: ROOD.**
+  - Inlogdeuren: GROEN_MET_KANTTEKENING.
+  - Poorten en journaal: GROEN.
+  - Regressie: **ROOD**, door 7 toetsen die deze branch zelf brak: de vijf
+    spookroutes uit commentaar en twee in de credentialcensus.
+  - Criticus: **ROOD**. Hij voegde daaraan toe dat slot 4B na de samenvoeging
+    geen werkende toets meer had, en dat een paar beweringen in commentaar en
+    commits niet klopten.
+- **Herstelronde 6b**, elk cluster onafhankelijk herkeurd:
+  - **A (meters):** IN_ORDE_MET_KANTTEKENING;
+  - **B (doosjournaal):** IN_ORDE_MET_KANTTEKENING;
+  - **C (rem en aanmelding):** eerst NIET_IN_ORDE, na herstel
+    IN_ORDE_MET_KANTTEKENING.
+
+  Het enige punt dat binnen de opdracht openbleef was een kop die te veel
+  beloofde. Die is hersteld in `ec65ab02`, en daarbij ook de omgekeerde zin in
+  de kop van `poortoordeel.js`.
+- **Niet meer gedraaid:** de samenvoeger en de regressiekeurder van 6b. De
+  workflow stopte daar op een gebruikslimiet. Het samenvoegen en de gerichte
+  toetsen op de samengevoegde stand heb ik zelf gedaan (zie Testbewijs). Een
+  tweede volledige regressie door een andere agent is er niet; de CI moet hem
+  leveren.
+
+### Nieuwe bevindingen (OPEN)
+
+| ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
+|---|---|---|---|---|---|---|
+| **N36** | **P1** | **FIXED (ronde 7)**, rest in N52 (VERIFIED FIXED in ronde 8) | `server/routes/supplier/werving/uitnodiging-claim.js` `verbindCode` (tak `claimStatus 'voltooid'`), `personeel-aanmelden.js` | Een medewerker die een manager met `staff/remove` uit het team haalde, meldt zich met zijn oude kassacode opnieuw aan. Dat kan tot 30 dagen na de uitgifte, ook via `/api/werving/verbind`. Daarna is hij weer actief: werksessie, `supplier/state` 200, en de oude pincode werkt weer. Er komt geen regel in het activiteitenlog. Het 409-antwoord stuurt bovendien het hele object terug: de ruwe personeelsrij (met `pin_hash`; in Magnaat Test een echte scrypt-hash van een viercijferige pincode, in productie de marker), het ruwe zaakrecord en de uitnodiging. | Live nagespeeld op `bf4ff3ed` en `bbdcfda8`, met dezelfde uitkomst. Als tegenproef geeft intrekken van de uitnodiging wel een weigering. | Zie besluitpunt 1. |
+| **N37** | P2 | **VERIFIED FIXED (ronde 7)** | `server/opzet/betaalstop.js` `isBetaalactie`, `externRegel` | Dezelfde klasse als N18 en N26. Met `RTG_BETALEN_UIT=1` komt een betaalroute met een slash erachter langs de stop: `POST /api/supplier/giftcard/sell/` maakte een cadeaukaart met saldo, en `horeca/betaal/` zette een rekening op betaald. | Live gezien door drie keurders. | `vastePaden()` in beide functies, met een spellingtoets zoals die van N26. |
+| **N38** | P2 | OPEN, al aanwezig | `server/opzet/lijfpoort.js` (journaalhaak) en `server/middleware/compressie.js` `jsonGzip` | In de lokale modus verdwijnt een schrijfactie stil uit het naspeeljournaal zodra de client compressie vraagt en het antwoord 1024 bytes of groter is. Een browser vraagt altijd compressie. Na herstel wint de kloon, en is de handeling weg. | Zelf gezien: 25 browserschrijfacties, 13 niet in het journaal. | De journaalhaak na `jsonGzip` en de dubbeltik hangen, met keuringsregel 55 erover. |
+| **N39** | P2 | **VERIFIED FIXED (ronde 7)** | `server/kern/identiteit/wachtwoordrem.js` (en daarvoor elke inlogroute) | De rem kijkt vóór de wachtwoordtoets of een emmer dicht is, en telt pas erna. Gelijktijdige pogingen gaan dus allemaal langs elke grens: 100 tegelijk op één account gaven 100 keer 401 en geen 429, op beide deuren. | Zelf gezien, op oud en nieuw gelijk. | De poging vóór de await tellen (en terugboeken bij succes), met een toets die N gelijktijdige verzoeken stuurt. |
+| **N40** | P2 | OPEN, al aanwezig | `server/routes/techniek/inlog.js` | De techniekinlog (de eigenaar en de techniektoegang) deelt de wachtwoordrem niet. Een spelling met witruimte geeft tien verse gokken per adres, het pad valt buiten de inlogpauze, en het e-mailadres staat in klare tekst in de emmernaam en in de melding. | Zelf gezien. | Aansluiten op `maakWachtwoordRem`, het pad in `INLOG_PADEN`, en de naam hashen. |
+| **N41** | P3 | OPEN, al aanwezig | `server/opzet/webhooks.js`, `kaartwebhooks.js`, `storingenwebhook.js` | Vijf schrijfroutes uit het register hangen vóór de schorspoort: `/api/betaal/webhook` met `/mollie` en `/adyen`, `/api/munt/webhook` en `/api/webhooks/storingen`. Een schorsing werkt daar in geen enkele spelling. | Zelf gezien. | Kiezen: de poort ervoor hangen, of deze vijf uitdrukkelijk buiten de schorsing verklaren. |
+| **N42** | P3 | OPEN, al aanwezig, nu ook op de werkdeur | `wachtwoordrem.js` met de noodrem | De accountemmer meldt brute force met het adres van wie de 25e misser doet. Dat kan de eigenaar van het account zijn, die dan een uur quarantaine krijgt. | Zelf gezien. | De accountemmer met een eigen soort laten melden. |
+| **N43** | P3 | OPEN, al aanwezig | `/api/auth/password`, `tweefactor/begin`, `/codes`, `/uit`, `herstelkanaal/tele` | Wie een sessie heeft, kan hier het huidige wachtwoord onbeperkt raden. | Zelf gezien. | Via `account.gok` en `account.wacht` van de gedeelde rem. |
+| **N44** | P3 | OPEN, al aanwezig | `server/routes/auth/inlog.js` | Een uitgezet account geeft met het goede wachtwoord 403 en met een fout 401. Dat verraadt het wachtwoord, en vóór die 403 staat er al een geslaagde inlog in het spoor. | Zelf gezien. | `isActief` vóór `rem.gelukt` en `logInlog`. |
+| **N45** | P3 | OPEN, al aanwezig | stap een van techniek, `/api/auth/login` en de werkdeur | `isActief` kijkt naar het account zoals het was vóór de wachtwoordhash. Zet SCIM het tijdens die hash uit, dan komt er nog een bewijs of token uit. Dat vervalt bij het eerste gebruik (N20). | Zelf gezien (20 van 24). | Het account na de hash opnieuw lezen, op alle deuren tegelijk. |
+| **N46** | P3 | OPEN, door ronde 6b | `wachtwoordrem.js`, de emmer van adres plus account | Gevolg van I1. Wie een gebruikersnaam kent, kan na tien missers op een e-mailadres aan de 429 zien of dat adres bij hetzelfde account hoort. | Zelf gezien. | De emmer van adres plus account op de getikte naam laten, en alleen de accountemmer op het account. |
+| **N47** | P3 | OPEN, al aanwezig | `personeel-aanmelden.js` | Bij een lid met tweede factor koppelt `join` het account op alleen het wachtwoord aan een zaak. Het geeft daarbij de echte naam terug, en een dienstverband ontstaat. Er komt geen sessie bij. | Zelf gezien. | Hoort bij een besluit over koppelen zonder tweede factor. |
+| **N48** | P3 | OPEN, door ronde 6 | `uitnodiging.js` `kassacodeHoortBij` | Een anonieme aanroeper met alleen een bedrijfsnaam neemt bij elke aanmelding het schrijfslot op `staffInvites`. Begrensd door de rem per adres en door de inlogpauze. Het commentaar zegt dit nu eerlijk. | Gelezen en in SQLite gezien; niet gemeten onder PostgreSQL. | Een alleen-lezende opzoeking. |
+| **N49** | P3 | OPEN, door ronde 6 | `wachtwoordrem.js`, de adresemmer (50) | De adresemmer is nu gedeeld door de ledeninlog en de werkplekinlog, en een geslaagde inlog leegt hem niet. Op een gedeeld adres (de wifi van een restaurant) tellen missers van gasten mee voor de werkplekinlog van het personeel. | Gelezen; de beschikbaarheid is niet gemeten. | Een glijdend venster voor de adresemmer, als het in de praktijk knelt. |
+| **N50** | Info | OPEN | `kern/zaakdoos/journaal.js` slot 4B | Een aanmelding van personeel in de lokale modus geeft 200 maar wordt nooit nagespeeld. Dat staat nu uitgeschreven. Het is een productvraag of hij daar beter kan weigeren. | Zelf gezien. | Besluit, geen bouwwerk. |
+| **N51** | Info | OPEN | `test/poortoordeel.test.js`, `test/doos-journaal.test.js`, `test/staffjoin-orakel.test.js`, `wachtwoordrem.js` | Vier mutanten overleven: de afnemerskant van regel 28 (M12/M13), de null-wacht in `draagtWachtwoord` (M26), de wacht in stap 1 van join (MQ), en de wacht in `accountSleutel` (MP). | Zelf gezien door de keurders. | Een toets per mutant. |
+
+### Besluitpunten voor de eigenaar
+
+1. **N36 (P1): een medewerker die uit het team is gehaald, zet zichzelf weer
+   actief.**
+   - **(a) Aanbevolen:**
+     - `staff/remove` trekt ook de uitnodiging in;
+     - de hersteltak weigert een plek die een manager uitzette;
+     - de route stuurt nooit het hele object terug, alleen `{ error }`;
+     - toets: verwijderen, opnieuw aanmelden, en de werkplekinlog geeft 404.
+   - (b) Alleen het lek in het 409-antwoord dichten; het herstel blijft zoals
+     het is.
+2. **N37–N40 (P2).**
+   - **(a) Aanbevolen:** N37 en N39 eerst. N37 is dezelfde fout als N18 en N26,
+     in de betaalstop. N39 maakt elke rem per poging omzeilbaar.
+   - (b) Alle vier in één ronde.
+   - (c) Alleen vastleggen.
+
+### Testbewijs (PASS / FAIL / INFRA / NIET GEVERIFIEERD)
+
+- **PASS: de regressietoetsen van ronde 6.** Op de basis zakten ze, op de
+  reparatie slagen ze; alles ook met `RTG_ROUTELOG`. Het gaat om
+  `schorspoort-spelling`, `doos-inlogjournaal`, `doos-journaal`, `werkplek-rem`,
+  `staffjoin-orakel`, `stapeen-uitgezet` en `poortoordeel`.
+- **PASS: in de eindkeuring van ronde 6.** De hele suite met `RTG_ROUTELOG`:
+  16.150 toetsen. Zakten: 7 door de branch (gerepareerd in 6b), 3 achterlopende
+  registers en 4 door de omgeving.
+- **PASS: na het samenvoegen met de PR-branch en main.** Zie de uitslag van de
+  gerichte suite in de PR-tekst.
+- **INFRA:**
+  - `magnaat-capabilities` :95 en :130 en `sentinel` :55, zonder de Rust-motor;
+  - `bewijskosten`, in een ondiepe kloon;
+  - `meterijk`, dat na 1500 s een time-out gaf.
+- **NIET GEVERIFIEERD:**
+  - een tweede volledige regressie door een andere agent op de samengevoegde
+    stand (de CI levert hem);
+  - de PostgreSQL-stand van `kassacodeHoortBij` (N48);
+  - OIDC eind-tot-eind; SAML is wel beproefd;
+  - `npm run ci:lokaal` op Node 26.
+
+### Wat deze ronde NIET heeft gedaan (bewust)
+
+N36 tot en met N51 zijn vastgelegd en niet gerepareerd. Ze bestonden al vóór
+deze branch, of het zijn gevolgen die een besluit vragen. N30 en N32–N35 blijven
+open zoals in ronde 5.
+
+---
+
+
+## REMEDIATIESTATUS — ronde 7: N36, N37 en N39 (11 oktober 2026)
+
+Branch: `codex/rtg-v1-release-blockers` (PR #487). De eigenaar koos uit de
+besluitpunten van ronde 6 telkens de aanbevolen optie:
+
+- **N36:** (a), helemaal dicht;
+- **N37–N40:** (a), eerst N37 en N39;
+- **plek:** in PR #487.
+
+Zelf gebouwd, met per bevinding een toets die op de oude code zakt. Daarna een
+onafhankelijke adversariële herkeuring van alle drie. De omzeiling die die
+vond, is gerepareerd en opnieuw herkeurd (zie Herkeuringsverloop).
+
+### Nieuw verdict (code): 🟡 CONDITIONAL GO — Release readiness: 86/100
+
+**Waarom hoger dan 82.**
+
+- **De P1 uit ronde 6 is dicht.** Een verwijderde medewerker komt niet meer
+  terug met een oude kassacode, ook niet via een tweede, half geclaimde code.
+  Een herstel stuurt geen ruwe rijen meer mee.
+- **Twee van de vier P2's zijn dicht.** De betaalstop leest het pad zoals de
+  router (N37), en een golf gelijktijdige gokken gaat niet meer langs de
+  wachtwoordrem (N39). Beide zijn live nagespeeld: op de oude code open, op de
+  nieuwe dicht.
+
+**Waarom niet hoger.**
+
+- **De tweede herkeuring vond een P2 die er al was (N52):** een verwijderde
+  manager meldt zich opnieuw aan met een open uitnodiging die hij zelf uitgaf.
+- **N38 en N40 (P2) staan nog open.** N38: gzip-antwoorden ontbreken in het
+  doosjournaal. N40: de techniekinlog valt buiten de gedeelde rem.
+- **De P3's N41 tot en met N51.**
+- **De externe poorten F3–F6.**
+
+**Voorwaarden voor GO:**
+
+- de externe poorten F3–F6;
+- aanbevolen: een besluit over N52, N38 en N40.
+
+### Per bevinding — BEFORE / FIX / AFTER / REGRESSIE
+
+| # | Sev | Status | Commits | BEFORE → AFTER | Regressie (zakt vóór, slaagt na) |
+|---|---|---|---|---|---|
+| N36 | P1 | **FIXED**, herkeuring 2: FIXED_MET_KANTTEKENING (zie N52, VERIFIED FIXED in ronde 8) | `2a20818e`, `8c2251a6`, `9ea98710`, en de intrekroute in de laatste commit van deze ronde | **Vóór:** na `staff/remove` meldde een medewerker zich met zijn oude kassacode opnieuw aan: een 409 "veilig hersteld" met de ruwe personeelsrij (`pin_hash`), het zaakrecord en de uitnodiging, en daarna een werksessie. **Na:** drie lagen. `staff/remove` trekt elke geclaimde uitnodiging van die zaak in die aan de plek of aan dat lid hangt, en doet dat vóór de plek uitgaat (lukt het niet, dan 503 en verandert er niets). De hersteltak weigert een plek die al eens actief was en nu uit staat; dat vangt ook een verwijdering van vóór de fix. Geen route en ook `verbindCode` zelf stuurt nog een ruwe rij terug. | `test/staff-ontslag.test.js` (5): op de oude code zakken er 2. Toets 1 eist de 401 van de intrekking zelf, zodat de hersteltak hem niet verbergt. Toets 4 neemt ook de half geclaimde tweede code. |
+| N37 | P2 | **VERIFIED FIXED** | `111540f6` | **Vóór:** met `RTG_BETALEN_UIT=1` maakte `POST /api/supplier/giftcard/sell/` een cadeaukaart, en `horeca/bon/maak/` een bon. **Na:** `isBetaalactie` en `externRegel` toetsen elke kandidaat van `vastePaden()`, net als N18 en N26. Extern afrekenen blijft ook met een slash erachter werken. | `test/betaalstop-spelling.test.js` (3): op de oude code zakken er 3. Herkeuring: M10 en M11 gedood; acht andere spellingen bereiken geen handler. |
+| N39 | P2 | **VERIFIED FIXED** (kanttekening bewust zo) | `b3cbab0f`, `9ea98710` | **Vóór:** honderd gelijktijdige gokken vanaf een adres gaven honderd keer 401, op `/api/auth/login` en op de werkplekinlog. **Na:** een poging telt vanaf `dicht()` (`server/kern/identiteit/lopend.js`) en geeft haar plek terug bij mis of gelukt. Een plek die nooit terugkomt, vervalt na 30 s. Live: 10 keer 401 en 90 keer 429. | `test/rem-gelijktijdig.test.js` (6): de emmer van adres plus account, de adresemmer bij een golf over veel accounts, het verval, en twee tegenproeven. |
+
+### Herkeuringsverloop
+
+- **Herkeuring 1, op `b3cbab0f`:**
+  - **N37:** VERIFIED FIXED.
+  - **N39:** FIXED_MET_KANTTEKENING.
+    - Twee toetsgaten: de adresemmer bij een golf (M15/M16) en het verval
+      (M18). Beide zijn nu getoetst.
+    - Een kop die "geen staat" zei. Hersteld.
+    - **De kanttekening:** op een gedeeld adres houdt ook een juiste inlog
+      tijdens de toets een plek in de adresemmer bezet. Na 45 tikfouten van
+      collega's kregen 5 van 10 gelijktijdige juiste inlogs een 429. Er volgt
+      geen slot, en het staat nu in de kop. Dat is de prijs van een rem die een
+      golf tegenhoudt: **bewust zo**.
+  - **N36:** NIET_GEFIXT, door een omzeiling die de herkeurder live zag.
+    1. Twee uitnodigingen voor hetzelfde lid worden gelijktijdig geclaimd.
+    2. De ene blijft "voltooid" staan met een plek die nooit actief was.
+    3. Na de verwijdering van de andere plek herstelde die code de plek alsnog.
+
+    De manager ziet geclaimde codes niet in zijn lijst, dus dit was een
+    verborgen weg terug. Er was ook een toetsgat: de intrekking in de route had
+    geen eigen toets (M1). Beide zijn gerepareerd in `9ea98710`.
+- **Herkeuring 2, van N36 op `1ee54d6d`: FIXED_MET_KANTTEKENING.** Live gezien:
+  - het gewone scenario en het scenario met twee codes zijn dicht;
+  - opnieuw aannemen met een nieuwe uitnodiging werkt;
+  - een lid bij twee zaken houdt zijn andere plek;
+  - het antwoord bevat geen ruwe rijen.
+
+  9 van de 13 mutanten zijn gedood. Twee wegen terug bleven open, en allebei
+  bestonden ze al:
+  - **B1:** `staff/invite/intrek` haalt iemand ook uit het team, maar trok de
+    half geclaimde tweede code niet in. **Gerepareerd** in de laatste commit
+    van deze ronde: beide routes roepen eerst `trekInVoorStaff` aan, en toets 5
+    houdt dat per route vast (hij zakt op de oude route). Deze reparatie is met
+    mutatie en toets nagetrokken, maar **niet meer onafhankelijk herkeurd**.
+  - **B2:** een verwijderde manager meldt zich opnieuw aan met een open
+    uitnodiging die hij zelf uitgaf, en is weer manager. Dat vraagt een nieuw
+    veld (wie een code uitgaf), en is daarom vastgelegd als **N52**.
+
+  Overlevende mutanten:
+  - M6 en M7: de routes sturen het antwoord weer in zijn geheel terug. Na de
+    reparatie in `verbindCode` lekt er niets meer, maar de filter in de route
+    heeft geen eigen bewaker.
+  - M10: een mislukte intrekking toch doorlaten. Er is geen toets met
+    foutinjectie.
+  - M11: de wacht `member_id != null` weghalen. Raakt alleen oude claims.
+
+  Ze staan bij N51.
+
+### Nieuwe bevindingen (OPEN)
+
+| ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
+|---|---|---|---|---|---|---|
+| **N52** | P2 | **VERIFIED FIXED (ronde 8)**, was OPEN, al aanwezig | `server/routes/supplier/werving/uitnodiging-uitgifte.js` `maakInvite`, `trekInVoorStaff` | Een manager maakt een open uitnodiging met de rol manager en wordt daarna door een andere manager verwijderd. Met die eigen code meldt hij zich opnieuw aan en is hij weer manager. Een open uitnodiging draagt alleen de naam van de uitgever, dus bij een verwijdering is niet te zien welke codes van hem kwamen. Ze staan wel in de lijst van de andere manager. | Live gezien in herkeuring 2 van ronde 7, op oud en nieuw gelijk. | Bij `maakInvite` de plek van de uitgever vastleggen, en bij een verwijdering ook zijn open uitnodigingen intrekken. |
+
+### Besluitpunten voor de eigenaar
+
+1. **N52 (P2): een verwijderde manager komt terug met een code die hij zelf
+   uitgaf.**
+   - **(a) Aanbevolen:** de uitgever vastleggen en zijn open uitnodigingen bij
+     een verwijdering intrekken, met een e2e-toets.
+   - (b) Alleen in de lijst van de manager tonen wie de code uitgaf.
+2. **N38 en N40 (P2).**
+   - **(a) Aanbevolen:** N40 eerst. De techniekinlog van de eigenaar valt
+     buiten de gedeelde rem.
+   - (b) Allebei.
+   - (c) Alleen vastleggen.
+
+### Testbewijs (PASS / FAIL / INFRA / NIET GEVERIFIEERD)
+
+- **PASS:**
+  - De drie nieuwe toetsbestanden.
+  - De aanpalende inlog- en betaaltoetsen, met `RTG_ROUTELOG`. De herkeurder
+    draaide 14 bestanden en alles was groen.
+  - De mutatiemotor is langs de drie nieuwe toetsbestanden geweest.
+  - `npm run check`, `npm run norm` en de deltapoort tegen main.
+- **NIET GEVERIFIEERD:**
+  - een volledige regressie op deze stand (de CI levert hem);
+  - de PostgreSQL-stand.
+
+### Wat deze ronde NIET heeft gedaan (bewust)
+
+N38 en N40 (P2) en N41 tot en met N51 blijven open, zoals de eigenaar koos.
+
+---
+
+## REMEDIATIESTATUS — ronde 8: N52 (11 oktober 2026)
+
+Branch: `codex/rtg-v1-ronde6-7` (PR #543; PR #487 is gemerged). De eigenaar
+vroeg N52 ook op te pakken; gekozen is besluitpunt 1(a) uit ronde 7: de
+uitgever vastleggen en zijn open uitnodigingen bij een verwijdering intrekken,
+met een e2e-toets.
+
+### Nieuw verdict (code): 🟡 CONDITIONAL GO — Release readiness: 86/100
+
+**Waarom niet hoger dan 86.** Er is een P2 dicht (N52), maar de herkeuring vond
+in dezelfde foutklasse een nieuwe P2 die er al was en die live is bevestigd
+(N53, de zaakdoos-sleutel van een verwijderde manager). Een gedichte P2 tegen
+een nieuw bevestigde P2 geeft geen nieuw bewijs voor een hogere score.
+
+**Wel nieuw bewijs, de andere kant op:** een eigen toets uit ronde 7 stond rood.
+`test/wervingcode-lifecycle.test.js` las nog `staff.id` uit het 409-antwoord,
+dat sinds N36 bewust geen ruwe rij meer draagt. De CI had hem op `317c7dbf` nog
+niet gedraaid (alle jobs stonden in de wachtrij), dus de bewering "aanpalend
+groen" uit ronde 7 klopte voor dit bestand niet. Hersteld in `0c2ab2be`.
+
+**Voorwaarden voor GO:**
+
+- de externe poorten F3–F6;
+- aanbevolen: een besluit over N53, N38 en N40.
+
+### Per bevinding — BEFORE / FIX / AFTER / REGRESSIE
+
+| # | Sev | Status | Commits | BEFORE → AFTER | Regressie (zakt vóór, slaagt na) |
+|---|---|---|---|---|---|
+| N52 | P2 | **VERIFIED FIXED** (laag 2 met kanttekening) | `0c2ab2be`, `4972c4c5` | **Vóór:** een manager gaf een open uitnodiging met de rol manager uit, werd door een collega verwijderd, en meldde zich met die eigen code opnieuw aan als manager. Een open uitnodiging droeg alleen de NAAM van de uitgever. **Na:** twee lagen. (1) `maakInvite` legt de plek van de uitgever vast (`uitgever_staff`); na een rotatie is dat de plek van wie roteerde, want alleen die kent de nieuwe code. `trekInVoorStaff` (`staff/remove` en `staff/invite/intrek`) trekt ook de open uitnodigingen van die plek in; die van collega's blijven staan. (2) `geldig()` weigert een open code waarvan de uitgever geen actieve plek bij deze zaak meer heeft (`uitgever-niet-actief`, zichtbaar in de lijst van de manager, die hem kan roteren). Laag 2 vangt een uitgifte die op PostgreSQL tegelijk met de verwijdering liep, want intrekken en uitgeven zijn daar twee transacties. | `test/staff-ontslag.test.js` toets 6 en 7 (e2e, zelf uitgegeven en zelf geroteerd: op de oude code `200` met een nieuwe managerplek, na de fix `401`) met tegenproef (de open code van de baas blijft `actief`); toets 4 met de open uitnodigingen. `test/wervingcode-lifecycle.test.js` laatste toets voor laag 2 (de plek gaat uit zonder intrekking, precies het racegeval). Mutaties: elk van de zes stukken fix eruit laat een toets zakken; de mutatiemotor gaf 2279 gezakt, 0 overleefd. |
+
+**Wat de fix bewust niet dekt.**
+
+- Een open uitnodiging van vóór deze wijziging heeft geen `uitgever_staff`. Een
+  code die een nu verwijderde manager vóór de uitrol uitgaf, blijft geldig tot
+  zij verloopt (maximaal 30 dagen). Zij is niet slechter af dan voorheen, en
+  staat in de lijst van de andere manager, die haar kan intrekken.
+- Een code die het bedrijfsaccount uitgaf of roteerde, heeft geen plek als
+  uitgever. Buiten Magnaat Test bestaat zo'n sessie niet
+  (`accounts/staff-sessie.js` weigert een leverancierssessie zonder personeelsplek).
+
+### Herkeuringsverloop
+
+- **Herkeuring 1, op de werkboom vóór `0c2ab2be`: FIXED met restpunten.**
+  - Zonder de fix live gereproduceerd (toets 6 en 7: `expected 401, actual 200`).
+  - Weerlegd, live: aannemen via een sollicitatie, de idempotente herhaling (er
+    staat geen kassacode in een 409), rotatie door een collega of het
+    bedrijfsaccount, de eigen plek ontkoppelen.
+  - Weerlegd uit de code: een sessie zonder `staffId` in productie, een
+    rolwijziging (die route bestaat niet), andere aanroepers van
+    `deactivateStaff`, en een verborgen halve claim van een tweede account.
+  - **Restpunt, vermoed op PostgreSQL:** een gelijktijdige uitgifte tijdens de
+    verwijdering laat een open code staan. **Gedicht met laag 2.**
+  - **Bevestigd, buiten N52 (ontwerpgrens):** een manager die vóór zijn
+    verwijdering een manageruitnodiging op een TWEEDE eigen account claimt,
+    houdt die tweede plek. Die staat zichtbaar in de teamlijst, maar onder de
+    naam die hij zelf koos. Zie N55.
+- **Herkeuring 2, van laag 2 op `bf99087a`: FIXED met kanttekening.**
+
+  - **Dekking bevestigd:** elke weg die een open code claimt of herkent,
+    gaat langs `geldig()`, en `beginClaim` is daarbij de atomaire poort. Live
+    houdt laag 2 alleen al stand: met laag 1 uit blijven toets 6 en 7 groen,
+    met beide lagen uit zakken ze.
+  - **Niets legitiems breekt:** een half voltooide claim valt erbuiten (die
+    gebruikt `herstelGeldig`), een rij zonder uitgever houdt het oude gedrag,
+    en een rotatie door een actieve manager koppelt een oude rij alsnog aan
+    zijn plek.
+  - **Mutaties:** laag weg, zaakcontrole weg, actiefcontrole weg en rotatie
+    zonder uitgever zakken allemaal. Twee toetsgaten (hoofdletters, en een
+    uitnodiging zonder uitgever) bewaakte de N52-toets niet rechtstreeks;
+    beide zijn erbij gezet en zakken nu op hun mutatie.
+  - **Kanttekening 1, PostgreSQL (vermoed, niet gemeten):** een tweede
+    instantie ziet een verwijdering pas na de NOTIFY-pull. In dat venster
+    telt de plek daar nog als actief. Dezelfde vertraging geldt voor de
+    huisbrede staffpoort (`controleerStaffSessie`), dus laag 2 is niet
+    zwakker dan de deur zelf. `personeelsuitnodiging.pg` geeft uit zonder
+    `staffId` en beproeft laag 2 dus niet.
+  - **Kanttekening 2, het scherm:** de lijst toont `uitgever-niet-actief` als
+    "Ingetrokken · code verborgen", met de knop "Nieuwe code". Dat werkt,
+    maar de code is formeel niet ingetrokken. Zie N55.
+  - **Buiten de opdracht gemeld:** een code die vóór de verwijdering al met
+    een TWEEDE account van dezelfde manager is geclaimd, valt buiten beide
+    lagen (N55).
+
+### Nieuwe bevindingen (OPEN)
+
+| ID | Sev | Status | Waar | Probleem | Bewijs | Voorstel |
+|---|---|---|---|---|---|---|
+| **N53** | P2 | **FIXED (ronde 9)**, was OPEN, al aanwezig | `server/routes/supplier/doossleutels.js:30`, `server/kern/zaakdoos/sleutels.js:58`, `server/routes/doos-kloon.js:21` | Een manager geeft een zaakdoos-sleutel uit (standaard 180, maximaal 365 dagen, standaard alle scopes inclusief `kloon`). `staff/remove` trekt die niet in. Na zijn verwijdering geeft `GET /api/doos/kloon` met zijn sleutel 200: het zaakrecord, de orders, reserveringen, boekingen en de kassadag. Dezelfde foutklasse als N52: een toegang die iemand uitgaf, overleeft het verlies van zijn bevoegdheid. | Live gezien in herkeuring 1 van ronde 8. | De uitgever staat al op plek in de sleutel (`door: 'zaak:CODE#staffId'`); bij `staff/remove` zijn sleutels intrekken, of bij gebruik eisen dat de uitgever nog een actieve plek is (de vorm van laag 2 van N52). |
+| **N54** | P2 | **FIXED (ronde 9)**, live bevestigd, was vermoed | `server/accounts/users.js` (zetActief), `server/scim/user-sync.js` | Een account dat via SCIM wordt uitgezet, verliest zijn werksessie, maar `deactivateStaff` en `trekInVoorStaff` lopen niet. Zijn plek blijft dus actief, en daarmee blijven ook zijn open personeelsuitnodigingen geldig (laag 2 van N52 kijkt naar de PLEK, niet naar het account). | Afgeleid uit de code in herkeuring 1 van ronde 8; niet live nagespeeld. | Bij het uitzetten van een account ook zijn personeelsplekken uitzetten, of laag 2 laten eisen dat het account achter de uitgever nog actief is. |
+| **N55** | P3 | **FIXED (ronde 9)**, was OPEN | `server/routes/supplier/werving/personeel.js` `staff/remove` | (1) Een verwijdering trekt nu ook legitieme open aannames van die manager in, ook de link naar "je plek staat klaar" van een RTF-sollicitant. Het antwoord en de log van `staff/remove` noemen het aantal ingetrokken uitnodigingen niet, dus niemand wordt erop gewezen (herstel kan via roteren). (2) Een manager kan vóór zijn verwijdering een tweede eigen account binnenhalen onder een naam die hij zelf kiest. | Herkeuring 1 van ronde 8. | Bij een verwijdering tonen hoeveel uitnodigingen er zijn ingetrokken en welke plekken via uitnodigingen van die plek binnenkwamen. |
+
+### Besluitpunten voor de eigenaar
+
+1. **N53 (P2): de zaakdoos-sleutel van een verwijderde manager blijft werken.**
+   - **(a) Aanbevolen:** dezelfde twee lagen als N52 (intrekken bij de
+     verwijdering, en bij gebruik eisen dat de uitgever nog actief is), met
+     een e2e-toets op `/api/doos/kloon`.
+   - (b) Alleen intrekken bij de verwijdering.
+2. **N54 (P2, vermoed):** eerst live nagaan, dan dichten in dezelfde ronde als N53.
+3. **N38 en N40 (P2):** zoals in ronde 7.
+
+### Testbewijs (PASS / FAIL / INFRA / NIET GEVERIFIEERD)
+
+- **PASS:**
+  - `test/staff-ontslag.test.js` (8) en `test/wervingcode-lifecycle.test.js` (11, waarvan de N52-toets met twee tegenproeven).
+  - De aanpalende werving-, uitnodigings- en inlogtoetsen met `RTG_ROUTELOG`:
+    29 bestanden, 189/189 groen, met beide lagen erin.
+  - De mutatiemotor op beide bestanden: 0 overleefd.
+  - Op `bf99087a`: `npm run check` ("Alles in orde"), `npm run norm`, de
+    deltapoort tegen main en `document-fitness`. `registerklopt` zakt alleen
+    op `bewijskosten` 9, omdat de kloon ondiep is.
+- **NIET GEVERIFIEERD:**
+  - de PostgreSQL-stand van laag 2 (hier draait geen PostgreSQL; de race zelf
+    is niet nagespeeld, alleen het gevolg ervan);
+  - een volledige regressie op deze stand (de CI levert hem).
+
+### Wat deze ronde NIET heeft gedaan (bewust)
+
+N53, N54 en N55 zijn vastgelegd en niet gebouwd: de opdracht was N52. N38, N40
+en N41 tot en met N51 blijven open.
+
+---
+
+## REMEDIATIESTATUS — ronde 9: N53, N54 en N55 (11 oktober 2026)
+
+Branch: `codex/rtg-v1-ronde6-7` (PR #543). Besluit van de eigenaar: N53 met
+twee lagen zoals N52, N54 eerst live nagaan en dan dichten, N55 meenemen.
+
+### Nieuw verdict (code): 🟡 CONDITIONAL GO — Release readiness: 88/100
+
+**Waarom hoger dan 86.** Twee P2's zijn dicht, met toetsen die op de oude code
+zakken en live op een echte server zijn nagespeeld. N54 bleek bij het nagaan
+ernstiger dan vermoed: na SCIM-uit, SCIM-delete of de AVG-wissing claimde een
+vers account de open manageruitnodiging van die manager (200) en kon daarna
+zelf weer managers uitnodigen. Dat is nu op alle drie de wegen dicht.
+
+**Waarom niet hoger.** De onafhankelijke herkeuring van deze ronde is op
+verzoek van de eigenaar gestopt voordat ze klaar was. De statussen hieronder
+zijn daarom FIXED en niet VERIFIED FIXED. N38 en N40 (P2) en de externe poorten
+F3–F6 staan nog open.
+
+**Voorwaarden voor GO:** de externe poorten F3–F6; aanbevolen: een herkeuring
+van ronde 9 en een besluit over N38 en N40.
+
+### Per bevinding — BEFORE / FIX / AFTER / REGRESSIE
+
+| # | Sev | Status | Commits | BEFORE → AFTER | Regressie (zakt vóór, slaagt na) |
+|---|---|---|---|---|---|
+| N53 | P2 | **FIXED** (niet herkeurd) | `4b96294e` | **Vóór:** na `staff/remove` gaf `GET /api/doos/kloon` met de doossleutel van de verwijderde manager 200 met het zaakrecord. **Na:** laag 1: `staff/remove` en `staff/invite/intrek` trekken via `trekAllesIn` ook de sleutels in die deze plek uitgaf (`kern/zaakdoos/sleutels-uitgever.js`). Laag 2: `welke()` weigert een sleutel waarvan de uitgever hier niet meer werkt (`doos-sleutel-uitgever-niet-actief`). Een intrekking wint als stand. Sleutels van het kantoor hangen niet aan een plek en vallen erbuiten. | `test/doossleutel-ontslag.test.js` (4): toets 1 en 2 zakten op de oude code met 200. Laag 2 los, met tegenproeven (kantoorsleutel, rotatie, ingetrokken wint), en een toets op de bedrading. |
+| N54 | P2 | **FIXED** (niet herkeurd), was vermoed | `4b96294e` | **Vóór:** SCIM (PATCH, PUT, DELETE) en `/api/privacy/delete` zetten het account uit en niet de plek. De open manageruitnodiging van die manager werd door een vers account geclaimd (200, manager), en zijn doossleutel bleef werken. **Na:** `accounts.plekWerkt` (`accounts/staff-sessie.js`, hetzelfde oordeel als de werksessie) eist plek EN account. De uitnodiging en de doossleutel lezen allebei die ene functie. Een controle bij het lezen, geen cascade: SCIM weer aan geeft de code terug. | `test/staff-accountuit.test.js` (4): SCIM-uit, SCIM-delete en de AVG-wissing zakten op de oude code; tegenproeven voor heractivering en de codes van de baas. |
+| N55 | P3 | **FIXED** (niet herkeurd) | `4b96294e` | **Vóór:** een verwijdering trok codes in zonder het te zeggen, en de lijst toonde een code van een vertrokken uitgever als "Ingetrokken". **Na:** het antwoord en de log noemen `ingetrokken: {uitnodigingen, doossleutels}`, en het scherm toont "Uitgever werkt hier niet meer · maak een nieuwe code". | Het aantal staat in `test/doossleutel-ontslag.test.js`; het label is niet in een browser beproefd. |
+
+**Bewijs.** Elke laag is met een mutatie nagetrokken en elke mutatie liet een
+toets zakken. De mutatiemotor op de vier toetsbestanden gaf 2281 gezakt en 0
+overleefd. 62 aanpalende toetsbestanden (zaakdoos, werving, SCIM, accounts,
+sessie, privacy) met `RTG_ROUTELOG`: 419 groen, 0 gezakt. Op `b1914737` gehaald:
+`npm run check`, `npm run norm`, de deltapoort tegen main en `document-fitness`;
+`registerklopt` zakt alleen op `bewijskosten` 9 (ondiepe kloon).
+
+**Niet gedaan of niet bewezen.**
+
+- Geen onafhankelijke herkeuring (gestopt).
+- Na de AVG-wissing blijft er een plek op `active=1` staan die naar een gewist
+  account wijst; die kan niets meer, maar staat nog in de teamlijst. Na SCIM-uit
+  staat de manager ook nog in de teamlijst, en zijn werkmail wordt niet
+  ingetrokken. Dat is opruimwerk, geen toegang, en blijft open.
+- PostgreSQL met meerdere instanties is niet beproefd.
+
+---
+
+
 
 ## B. V1 RELEASE BLOCKERS (P0/P1)
 

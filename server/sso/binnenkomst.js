@@ -132,9 +132,12 @@ function brug(kern, k, user, claims) {
 }
 
 /* Van gecontroleerde claims naar de terugreis naar de app. Gooit door als de
-   aanmelding zelf niet mag (verkeerd domein, adres niet bevestigd); de
-   aanroeper vertaalt dat naar een antwoord dat een buitenstaander niets
-   verklapt over onze inrichting. */
+   aanmelding zelf niet mag (verkeerd domein, adres niet bevestigd, account uit
+   dienst gemeld); de aanroeper vertaalt dat naar een antwoord dat een
+   buitenstaander niets verklapt over onze inrichting. Daarom staat aanmelden
+   VOOR de brug en de logregel "gelukt": een account dat de organisatie via
+   SCIM uitzette, krijgt geen groepen en geen geslaagde inlog in het spoor
+   (N31; de weigering zelf staat in ./index.js). */
 async function binnen(kern, koppeling, claims, req, res, terug, soort) {
   const { accounts, logInlog } = kern;
   const { user, nieuw, gekoppeld } = await sso.aanmelden(accounts, koppeling, claims);

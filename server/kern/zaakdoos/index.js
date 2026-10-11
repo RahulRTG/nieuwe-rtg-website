@@ -22,7 +22,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 
 module.exports = ({ db, save, log, dataDir }) => {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/zaakdoos', bezit: { doosJournaal: 'lijst' } });
@@ -64,40 +63,16 @@ module.exports = ({ db, save, log, dataDir }) => {
   }
 
   /* ---------- journaal-beveiliging ----------
-     Het journaal wordt na herstel nagespeeld naar de cloud met de inlog van de
-     doos. Dat maakt het de gevoeligste plek: een gemanipuleerd journaal op
-     schijf zou anders vervalste acties met de doos-rechten kunnen doorzetten.
-     Drie sloten:
-     1. Padbeleid: alleen zaak-schrijfacties (/api/supplier/...), nooit inloggen,
-        streams, de doos zelf, de eigenaarskast of accounts.
-     2. Integriteit: over de canonieke inhoud (seq, pad, body, res, tijd) staat
-        een HMAC-zegel met een serversleutel die alleen op de doos leeft
-        (dooszegel.key, 0600, in .gitignore). Volgnummers (seq) maken herordenen
-        of knippen zichtbaar.
-     3. Verse controle bij het naspelen: elke regel wordt timingvast geverifieerd;
-        een ongeldige of gemanipuleerde regel wordt overgeslagen, nooit gespeeld. */
+     Wat er in het naspeeljournaal mag (padbeleid, zegel, verse controle en geen
+     geheim in een regel) staat in ./journaal.js. Hier alleen de sleutel van het
+     zegel, want die hoort bij de datamap van deze doos. */
   const JOURNAAL_MAX_BODY = 64 * 1024; // een zaak-schrijfactie is nooit groter
   const zegelPad = path.join(dataDir || '.', 'dooszegel.key');
-  let zegelKey;
   // lezen, of als eerste publiceren: nooit half, nooit twee sleutels (server/lib/sleutelbestand.js)
-  zegelKey = require('../../lib/sleutelbestand').sleutel(zegelPad, 32);
-
-  function journaalPadOk(pad) {
-    if (typeof pad !== 'string' || !pad.startsWith('/api/supplier/')) return false;
-    if (pad === '/api/supplier/login' || pad.startsWith('/api/supplier/stream')) return false;
-    if (pad.includes('..') || /[\s?#]/.test(pad)) return false;
-    return true;
-  }
-  function journaalZegel(e) {
-    const payload = JSON.stringify({ seq: e.seq, pad: e.pad, body: e.body || {}, res: e.res || null, at: e.at });
-    return crypto.createHmac('sha256', zegelKey).update(payload).digest('base64url');
-  }
-  function journaalGeldig(e) {
-    if (!e || !journaalPadOk(e.pad) || typeof e.seq !== 'number' || typeof e.zegel !== 'string') return false;
-    const eigen = journaalZegel(e);
-    const a = Buffer.from(String(e.zegel)); const b = Buffer.from(eigen);
-    return a.length === b.length && crypto.timingSafeEqual(a, b);
-  }
+  const zegelKey = require('../../lib/sleutelbestand').sleutel(zegelPad, 32);
+  const journaalRegels = require('./journaal');
+  const { journaalPadOk } = journaalRegels;
+  const { journaalZegel, journaalGeldig } = journaalRegels.metZegel(zegelKey);
   function naarLokaal(reden) {
     if (st.modus !== 'lokaal') {
       st.modus = 'lokaal';

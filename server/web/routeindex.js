@@ -60,10 +60,12 @@ function samenvoegen(a, b) {
    router ook niet.
 
    Een poort die op een lijst vaste paden beslist, leest via deze functie (de
-   inlogpauze in ../middleware/remmen.js). Anders heeft hij een tweede opvatting
-   van "dit pad" naast die van de router, en dat was precies het gat: de pauze
-   vergeleek letterlijk, de router liet /api/auth/login/ bij dezelfde handler
-   komen (N18 in de V1-audit). */
+   inlogpauze in ../middleware/remmen.js, en sinds N26 de schorspoort via
+   ../lib/vervalstaat.js, die er ook :param-patronen op matcht: hun RegExp in
+   ./routing.js eindigt op \/? en laat dus precies dezelfde ene slash toe).
+   Anders heeft hij een tweede opvatting van "dit pad" naast die van de
+   router, en dat was precies het gat: de pauze vergeleek letterlijk, de router
+   liet /api/auth/login/ bij dezelfde handler komen (N18 in de V1-audit). */
 function vastePaden(pn) {
   return pn.length > 1 && pn.charCodeAt(pn.length - 1) === 47 ? [pn, pn.slice(0, -1)] : [pn];
 }

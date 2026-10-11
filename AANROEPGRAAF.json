@@ -3,7 +3,7 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-10-11",
-  "commit": "46b327a6c",
+  "commit": "258c3fbbe",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -3225,6 +3225,7 @@
     "server/lib/idemsleutels-rtflabfonds.js",
     "server/lib/idemsleutels-rtgid.js",
     "server/lib/idemsleutels-salon.js",
+    "server/lib/idemsleutels-samenvoeging.js",
     "server/lib/idemsleutels-stage.js",
     "server/lib/idemsleutels-toestemming.js",
     "server/lib/idemsleutels-verbond.js",
@@ -5400,9 +5401,9 @@
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
-  "bestanden": 4419,
+  "bestanden": 4420,
   "nietGelezen": 0,
-  "aanroepen": 179230,
+  "aanroepen": 179231,
   "kanten": 31112,
   "kantenLokaal": 19969,
   "kantenIngevoerd": 2762,
@@ -5413,10 +5414,10 @@
   "kantenUitFabriek": 300,
   "kantenViaKernZonderSymbool": 2932,
   "kernherkomstGelezen": 1345,
-  "onopgelosteAanroepen": 133778,
+  "onopgelosteAanroepen": 133779,
   "onopgelosteNamen": 13764,
   "onopgelostNaarSoort": {
-   "ingebouwd": 35816,
+   "ingebouwd": 35817,
    "externeModule": 1052,
    "kader": 12385,
    "contextobject": 20707,
@@ -32547,7 +32548,7 @@
   },
   {
    "naam": "require",
-   "aantal": 8238
+   "aantal": 8239
   },
   {
    "naam": "app.post",
@@ -32708,7 +32709,7 @@
     },
     {
      "naam": "require",
-     "aantal": 8238
+     "aantal": 8239
     },
     {
      "naam": "Number",

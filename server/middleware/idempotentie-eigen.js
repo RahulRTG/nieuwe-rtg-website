@@ -36,7 +36,10 @@ const EIGEN = [
   '/api/appstore/koop',
   '/api/appstore/kantoor/teruggave',
   // de horecateruggave leest haar eigen sleutel en beslist zelf over een herhaling
-  '/api/supplier/horeca/teruggave'
+  '/api/supplier/horeca/teruggave',
+  /* de kantooruitnodiging bindt haar sleutel aan de uitgifte (kern/kantoor/uitnodiging.js)
+     en geeft bij een herhaling 409 zonder code; een bewaard antwoord zou de code heronthullen */
+  '/api/office/kantoor/uitnodiging'
 ];
 
 const doetHetZelf = pad => EIGEN.some(p => pad.startsWith(p));

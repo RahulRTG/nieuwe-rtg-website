@@ -168,7 +168,7 @@
     "rotatieMetDeHand": 15,
     "uitvoerVoorgedragen": 8,
     "edgeContextSchuld": 49,
-    "bronscannerGemist": 593,
+    "bronscannerGemist": 595,
     "bronscannerSpook": 4,
     "meetkeuringGezakt": 0,
     "refundOnverklaard": 15,
@@ -4292,6 +4292,13 @@
       "meter": "nieuw in NORM.json: adressenKapot 23; mediaOndertitelOpen 4; serviceBevoegdheidStil 0; rotatieMetDeHand 15; uitvoerVoorgedragen 8; edgeContextSchuld 49; bronscannerGemist 593; bronscannerSpook 4 (was 6); meetkeuringGezakt 0; refundOnverklaard 15; schermeigenaarOpen 8; ratelTanden 167 -> 178 (strakker: elf meters erbij)",
       "reden": "Besluit van de eigenaar: elke schuldratel die als losse constante buiten NORM.json leefde, wordt een geijkte meter in NORM.json, zodat er een inventaris van latten is en scripts/normbasis.js een verhoging zonder notitie tegenhoudt. Het waren er elf: KAPOT_MAX (scripts/adressen.js), OPEN_MAX/STIL_MAX/ROTATIE_MAX (scripts/check.js regels 49, 65 en 75), VOORGEDRAGEN_MAX (scripts/lib/uitvoerproef.js), SCHULD_MAX (test/edgenieuwscherm.test.js), GEMIST_MAX en SPOOK_MAX (test/magnaat-capabilities.test.js), OPEN_MAX (test/meetkeuring.test.js), ONVERKLAARD_MAX (test/refundmigratie.test.js) en OPEN_MAX (test/schermeigenaar.test.js). De waarden zijn exact de constanten van dat moment, op een na: bronscannerSpook stond als constante op 6 terwijl de meting 4 geeft (POST /api/geld/, /api/member/spel/, /api/rtf/spel/ en /api/rtfos/), dus staat hij hier op 4 -- een ratel die twee boven de stand staat, laat twee nieuwe spookroutes ongemerkt door. Geen lat is verlaagd. De aanroepers houden hun eigen bewering en melding en lezen het getal via scripts/lib/normwaarde.js; rotatieMetDeHand en schermeigenaarOpen blijven daar gelijkheidsratels (minder dan de norm zakt ook, tot npm run norm:vast hem strak trekt).",
       "waarheen": "De waarden staan nu onder meters in NORM.json; elke meter staat in METERS van scripts/norm.js (met dezelfde telling als zijn aanroeper) en heeft een proef in test/meterijk.test.js. De losse constanten bestaan niet meer."
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "structureel",
+      "meter": "bronscannerGemist 593 -> 595 (losser, met reden)",
+      "reden": "#521 (self-hosted TURN) zet de ICE-uitgifte achter een sessie en voegt daarvoor POST /api/foundation/gezin/ice en POST /api/foundation/school/ice toe. Beide hangen op de /api/foundation-router, en dat is precies de familie die de bronscanner van de Capability Graph niet ziet (zie de geschiedenis in test/magnaat-capabilities.test.js: gezinsdeur, gezin/sessie, les/stroomticket). Op de tak van #521 stond de lat in de toets zelf op 595; sinds #518 woont hij in NORM.json, dus de verhoging staat hier. De router kent beide routes, routedekking telt ze, en de spooklat (4) beweegt niet.",
+      "waarheen": "de bronscanner herbaseren op de router; dat hangt aan het Rust-pariteitsbesluit dat al bij de oorspronkelijke ratel staat (notitie van 2026-08-17)"
     }
   ],
   "prestatie": {

@@ -1227,6 +1227,30 @@ const VOORZIENINGEN = {
     uit['/api/rtf/labfonds/beslis'] = versGezinsVoorstel;
     return uit;
   })(),
+  /* EEN VERSE GEZINSSESSIE VOOR DE TWEE ROUTES DIE HAAR OPMAKEN (11 oktober 2026).
+     `gezin/sessie/intrek` meldt de sessie in het lijf af en `gezin/sessie/roteer`
+     ruilt haar in -- en dat lijf droeg de ENE sessie van de wereld. Gemeten met een
+     peiling over foundation/gezin/: tot en met sessie/intrek deed elke gezinsroute
+     werk, daarna gaf ELKE gezinsroute 403 "Log opnieuw in bij je gezin." In de volle
+     ronde stonden daardoor 108 Foundation- en RTF-routes ongemeten, en niet om hun
+     eigen gedrag maar om dat van een route die alfabetisch eerder kwam.
+
+     Dus krijgen deze twee een EIGEN sessie, langs de gewone inlogdeur: dezelfde
+     gezinssessie plus de pincode van de beheerder levert een tweede sessie voor
+     hetzelfde profiel (foundation/gezinstoegang.js, "bij wisselen"). Niet met de
+     gezinscode: `gezin/code/roteer` komt alfabetisch eerder en vervangt die. Zonder
+     profielId sluit intrek alleen de sessie die hij krijgt, dus de wereld houdt de
+     hare. */
+  ...(() => {
+    const verseGezinssessie = async ({ post, w }) => {
+      if (!w.gezinCode || !w.gezinToken) return { fout: 'geen gezinssessie in de wereld' };
+      const r = await post('/api/foundation/gezin/inloggen', { code: w.gezinCode, token: w.gezinToken, pin: '1234' });
+      const token = r && r.data && r.data.token;
+      return token ? { token } : { fout: 'gezin/inloggen gaf ' + (r && r.status) + ' ' + ((r && r.data && r.data.error) || '') };
+    };
+    return { '/api/foundation/gezin/sessie/intrek': verseGezinssessie,
+      '/api/foundation/gezin/sessie/roteer': verseGezinssessie };
+  })(),
   /* Een vers klompje VAN mij, want de ijkoproep trekt het vorige in. */
   '/api/pay/verzoek/intrek': async ({ post, tokenVoor, w }) => {
     if (!w.cn2) return { fout: 'geen tweede codenaam in de wereld' };

@@ -98,6 +98,23 @@
                                             het register kent (ratel: alleen omlaag)
      node scripts/appwerkt.js --filter=nav  alleen onderdelen waarvan het adres
                                             dit fragment bevat
+     node scripts/appwerkt.js --inventaris  werkt ALLEEN het blok `toezegklassen`
+                                            bij, zonder browser (zie hieronder)
+     node scripts/appwerkt.js --inventaris --controle
+                                            zakt als dat blok achterloopt, een
+                                            citaat rot is of een klasse buiten
+                                            de vier valt
+
+   HET BLOK `toezegklassen` (11 oktober 2026, AFBOUWPROGRAMMA.md). Het
+   eigenaarsbesluit zegt dat alles wat RTG heeft TOEGEZEGD wordt afgebouwd en
+   bewezen, en niet alles wat ooit in een document stond. Welk onderdeel in welke
+   van de vier klassen valt (toegezegd, afgewezen-met-grens, vraagt-besluit,
+   extern) staat daarom HIER, in hetzelfde register als de bewijzen -- er komt
+   geen tweede completion-register naast. De inventaris wordt gelezen door
+   scripts/lib/toezegklassen.js uit de documenten en TOEZEGKLASSEN.json, en hij
+   wordt bij een volle meting gewoon meegeschreven. `--inventaris` bestaat omdat
+   een browserronde over alle onderdelen te zwaar is om alleen een document-
+   wijziging bij te werken; hij laat elk ander veld byte voor byte staan.
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -111,11 +128,15 @@ const { stempel } = require('./lib/stempel');
 const { stelSamen } = require('./lib/bewijsbron');
 const { CONTRACT, ZONDER_APP } = require('./lib/appcontract');
 const { beoordeel: beoordeelBestemming, personaAfwijking } = require('./lib/bestemming');
+/* De inventaris van toezeggingen (AFBOUWPROGRAMMA.md): een blok in dit register,
+   geen eigen register. */
+const toezegklassen = require('./lib/toezegklassen');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'APPWERKT.json');
 const controle = process.argv.includes('--controle');
 const stil = process.argv.includes('--stil');
+const alleenInventaris = process.argv.includes('--inventaris');
 const filter = (process.argv.find((a) => a.startsWith('--filter=')) || '').slice(9);
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 6);
 /* Hoogstens zoveel tikken per scherm. Het oordeel eist dat de proef minstens
@@ -798,8 +819,41 @@ function bouw(meting) {
       && r.bewijzen.bereikbaar.status === 'NIET_GETEST'
       && /er staat een deur/.test(r.bewijzen.bereikbaar.reden || ''))
       .map((r) => ({ app: r.app, wereld: r.wereld, ingang: r.ingang, reden: r.bewijzen.bereikbaar.reden })),
+    toezegklassen: toezegklassen.inventaris(),
     regels: meting.regels
   };
+}
+
+/* Alleen het inventarisblok vervangen: elk ander veld blijft zoals de laatste
+   browsermeting het schreef, inclusief zijn stempel. De sleutelvolgorde blijft
+   die van bouw(), zodat een volle meting daarna geen schijnverschil geeft. */
+function metInventaris(oud, blok) {
+  const uit = {};
+  for (const [k, v] of Object.entries(oud)) {
+    if (k === 'toezegklassen') continue;
+    if (k === 'regels') uit.toezegklassen = blok;
+    uit[k] = v;
+  }
+  if (!('toezegklassen' in uit)) uit.toezegklassen = blok;
+  return uit;
+}
+
+/* Het oordeel over het blok, zonder browser. Rot en fouten laten zakken; een
+   blok dat achterloopt op de documenten ook, met de weg om het bij te werken. */
+function inventarisOordeel(opgeslagen, vers) {
+  const bezwaren = [];
+  for (const r of vers.rot) bezwaren.push('ROT: ' + r.document + ' -- "' + r.citaat.slice(0, 70) + '" (' + r.reden + ')');
+  for (const f of vers.fouten) bezwaren.push('FOUT: ' + f);
+  for (const it of vers.items) {
+    if (!Object.prototype.hasOwnProperty.call(toezegklassen.KLASSEN, it.klasse)) bezwaren.push('KLASSE buiten de vier: ' + it.document + ':' + it.regel + ' ' + it.klasse);
+    if (!it.citaat) bezwaren.push('ZONDER CITAAT: ' + it.document + ':' + it.regel);
+  }
+  if (!opgeslagen) bezwaren.push('APPWERKT.json draagt geen blok toezegklassen -- draai node scripts/appwerkt.js --inventaris');
+  else if (JSON.stringify(opgeslagen) !== JSON.stringify(vers)) {
+    bezwaren.push('het blok toezegklassen loopt achter op de documenten (vingerafdruk ' +
+      (opgeslagen.bron && opgeslagen.bron.vingerafdruk) + ' tegen ' + vers.bron.vingerafdruk + ') -- draai node scripts/appwerkt.js --inventaris');
+  }
+  return bezwaren;
 }
 
 /* DE WACHT: dit script schrijft APPWERKT.json en start daarom niet bij het
@@ -818,9 +872,26 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { onderschepper, weigerZin, rijen, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN };
+module.exports = { onderschepper, weigerZin, rijen, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN,
+  metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {
+  if (alleenInventaris) {
+    const oud = JSON.parse(fs.readFileSync(DOEL, 'utf8'));
+    const vers = toezegklassen.inventaris();
+    if (controle) {
+      const bezwaren = inventarisOordeel(oud.toezegklassen, vers);
+      if (bezwaren.length) { for (const b of bezwaren) console.error('NIET OK: ' + b); process.exit(1); }
+      console.log('OK: toezegklassen ' + JSON.stringify(vers.telling) + ' over ' + vers.bron.documenten + ' documenten, 0 rot.');
+      process.exit(0);
+    }
+    const bezwaren = inventarisOordeel(null, vers).filter((b) => !b.startsWith('APPWERKT.json draagt'));
+    fs.writeFileSync(DOEL, JSON.stringify(metInventaris(oud, vers), null, 1) + '\n');
+    log('APPWERKT.json: blok toezegklassen bijgewerkt ' + JSON.stringify(vers.telling) +
+      ' (niet geteld: ' + vers.nietGeteld.prozaMarkeringen + ' in lopende tekst, ' + vers.nietGeteld.standOnbekend + ' andere standwaarden)');
+    if (bezwaren.length) { for (const b of bezwaren) console.error('NIET OK: ' + b); process.exit(1); }
+    process.exit(0);
+  }
   /* Een gefilterde ronde vergelijken met het VOLLEDIGE register telt appels bij
      peren: minder rijen geeft altijd minder defecten, dus de ratel zou altijd
      groen zeggen. Dat is precies het soort stille geruststelling waar dit

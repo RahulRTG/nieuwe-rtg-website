@@ -34,6 +34,8 @@ const SLEUTELS = {
       'challenge is een herbruikbare challenge' },
   'POST /api/office/bank/incasso/opties': { nietIdempotent: true,
     waarom: 'de ceremonie voor de incassoronde, gebonden aan zijn grens; een herhaalde challenge is een herbruikbare challenge' },
+  'POST /api/office/bank/afstemming/opties': { nietIdempotent: true,
+    waarom: 'de ceremonie voor de afstemming van een onbekende uitbetaling, gebonden aan die opdracht; een herhaalde challenge is een herbruikbare challenge' },
   'POST /api/office/bank/handtekening/opties': { nietIdempotent: true,
     waarom: 'de ceremonie voor de tweede handtekening, gebonden aan die aanvraag; een herhaalde challenge is een herbruikbare challenge' },
   'POST /api/webauthn/bevestig/opties': { nietIdempotent: true,

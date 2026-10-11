@@ -124,6 +124,24 @@ const KETENS = Object.freeze([
       '/api/office/reisbureau/teruggave',          // klaarzetten: de hele baan tot het besluit
       '/api/office/bank/handtekening/bevestig',    // de tweede mens, en daarna de uitvoering
       '/api/office/bank/incasso/dossier',          // het dossier is per voornemen, niet per handeling
+  /* DE DERDE KETEN (11 oktober 2026, naast de reisteruggave): een ONBEKENDE uitbetaling afstemmen op een
+     afschriftregel. Een geldbeweging (bij `niet-uitgevoerd` komt het geld terug), dus
+     `geld-eenmalig` -- en daarmee verplicht `atomair`. Die as is met opzet OPEN: de
+     terugboeking is eenmaal-geboekt op een economische sleutel en de opdracht volgt in
+     een tweede schrijfactie (kern/betaalopdracht/terugboeking.js). Dat is hervatbaar en
+     niet alles-of-niets, en de route zegt dat in zijn uitvoerbelofte. Deze keten telt
+     dus NIET mee in VOLLEDIGE_KETENS tot de uitvoering werkelijk atomair is -- een
+     declaratie die hem rond liet lijken, zou de enige teller die alleen mag stijgen
+     laten liegen. Het dossier staat op dezelfde leesroute als dat van de incasso. */
+  Object.freeze({
+    naam: 'afstemming',
+    klasse: 'geld-eenmalig',
+    wat: 'een uitbetaling met onbekende uitkomst afstemmen op een afschriftregel',
+    handeling: 'GELD_AFSTEMMEN',
+    routes: Object.freeze([
+      '/api/office/bank/opdrachten/afstemming',    // klaarzetten: passkey, voornemen, besluit
+      '/api/office/bank/handtekening/bevestig',    // de tweede mens, en daarna de uitvoering
+      '/api/office/bank/incasso/dossier',          // het dossier van elke baan, ook dit
     ]),
   }),
 ]);

@@ -62,6 +62,20 @@ const CONTRACTEN = {
     afgetekend: { door: 'Claude, handler en toets gelezen op 25 september 2026; niet door een mens nagelezen',
       op: '2026-09-25' }
   },
+  'POST /api/office/bank/afstemming/opties': {
+    mutatieId: 'zwaar.opties.afstemming',
+    herkomst: 'mens',
+    semantiek: { klasse: 'nietHerhaalbaar' },
+    toegang: { klasse: 'AUTHENTICATED', deur: 'kluisAuth' },
+    stand: 'INTENTIONALLY_NON_IDEMPOTENT',
+    waarom: 'de ceremonie voor de afstemming van een onbekende uitbetaling, gebonden aan die ene opdracht; ' +
+      'zonder dit loket kan de passkey die de afstemmingsroute eist niet worden gezet. Een verse uitdaging ' +
+      'per aanroep, om dezelfde reden als de andere loketten.',
+    bewijs: { gemeten: 'test/afstemmingsketen.test.js: de hele baan met een softwarepasskey, en zonder ' +
+      'ceremonie wordt de aanvraag geweigerd', op: '2026-10-11' },
+    afgetekend: { door: 'Claude, handler en toets gelezen op 11 oktober 2026; niet door een mens nagelezen',
+      op: '2026-10-11' }
+  },
   'POST /api/office/bank/handtekening/opties': {
     mutatieId: 'zwaar.opties.handtekening',
     herkomst: 'mens',

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T17:10:43.213Z",
-    "commit": "e8b3277d",
+    "op": "2026-10-11T18:03:29.047Z",
+    "commit": "170a819a",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/overgangsvorm.js",
@@ -1928,7 +1928,7 @@
         "nr": "B1",
         "besluit": "Aggregatie is queryveilig, niet alleen celveilig: vaste views, minimumcel, complementaire onderdrukking, tijdvensters, geen vrije gemeentelijke OLAP over gevoelige dimensies.",
         "stand": "deels",
-        "bestand": "server/kern/rtfos/gemeente.js",
+        "bestand": "server/kern/rtfos/buurtdrempel.js",
         "citaat": "function afleidbaar",
         "reden": "Er is een minimumcel, een vaste view (het portaal roept alleen `cijfersVan` aan) en onderdrukking tot geen buurt meer af te leiden is (proef `buurtenQueryveilig`). Tijdvensters ontbreken (vandaag en volgende week kijken is een verschil), en het stadstotaal heeft geen drempel."
       },

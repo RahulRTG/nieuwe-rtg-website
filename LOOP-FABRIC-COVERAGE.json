@@ -3775,7 +3775,6 @@
       "server/kern/rtfos/deelnemerportaal.js",
       "server/kern/rtfos/geld-uitgaven.js",
       "server/kern/rtfos/geld.js",
-      "server/kern/rtfos/gemeente.js",
       "server/kern/rtfos/gift-machtiging.js",
       "server/kern/rtfos/gift-periodiek.js",
       "server/kern/rtfos/gift.js",

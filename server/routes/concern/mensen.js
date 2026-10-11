@@ -19,8 +19,8 @@ module.exports = (kern, hulp) => {
   const { mijn, stuur, nietGevonden } = hulp;
 
   /* ---- wat IK zelf heb ----
-     Geen entiteit-eis: dit gaat over de aanvrager zelf. De codenaam komt uit de
-     sessie, dus niemand leest andermans werkplekken. */
+     Geen entiteit-eis: dit gaat over de aanvrager zelf. De ledensleutel komt uit
+     de sessie, dus niemand leest andermans werkplekken. */
   app.post('/api/concern/mijnwerk', auth, (req, res) => {
     res.json(werkOverzicht(req.session.key));
   });
@@ -160,7 +160,7 @@ module.exports = (kern, hulp) => {
        omheen, en dat is precies verkeerd: scopeMag() draagt zijn eigen `ok`, en
        een tweede eromheen maakt van "mag niet" een geslaagd antwoord. */
     res.json(scopeMag(String(b.persoon || ''), String(b.recht || ''), doel,
-      { kwalificatie: b.kwalificatie || null }));
+      { kwalificatie: b.kwalificatie || null, binnen: e.id }));
   });
 
   app.post('/api/concern/functiescheiding', auth, (req, res) => {

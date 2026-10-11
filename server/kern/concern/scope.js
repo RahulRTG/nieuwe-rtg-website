@@ -97,7 +97,13 @@ module.exports = (ctx) => {
     if (!rechtBestaat(recht)) {
       return { ok: false, reden: 'onbekend-recht', uitleg: 'Dit recht kennen we niet: ' + recht };
     }
-    const emps = employmentVanPersoon(persoon, false);
+    /* `binnen`: alleen de werkrelaties bij DEZE entiteit. De route zet hem op
+       de entiteit van wie vraagt; zonder hem las een eigenaar via `bijna` de
+       rollen en dienstverbanden van een mens bij ANDERE werkgevers -- en sinds
+       een ledensleutel ook zijn codenaam leest (./employment-wie.js), met een
+       opeenvolgende sleutel als zoekterm. */
+    const binnen = (opties || {}).binnen || null;
+    const emps = employmentVanPersoon(persoon, false).filter(x => !binnen || x.entiteit === binnen);
     if (!emps.length) {
       return { ok: false, reden: 'geen-werkrelatie',
         uitleg: 'Deze persoon heeft hier geen lopend dienstverband of mandaat.' };

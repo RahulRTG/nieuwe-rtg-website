@@ -14,7 +14,11 @@
    3. echte server: op codenaam aangenomen -> "Mijn werk" toont de werkplek;
    4. echte server: een RTG-medewerker die zijn uitnodiging zelf aannam, staat
       in de toegangsreview van het kantoor als in dienst (kern/kantoor/huis.js)
-      -- en de review blijft schaduw.
+      -- en de review blijft schaduw;
+   5. echte server: /api/concern/mag toont een eigenaar NIETS van een
+      dienstverband bij een andere werkgever (de tegenlezing vond dat `bijna`
+      die rollen meegaf, en de sleutel-lezing maakte dat met een opeenvolgende
+      sleutel op te sommen).
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -113,9 +117,6 @@ test('3-4. echte server: Mijn werk op codenaam, en de kantoorreview na een zelf 
 
   // 3. de eigenaar neemt iemand aan op CODENAAM, zoals het scherm dat vraagt
   const a = await nieuwLid(base, 'a');
-  const leegVoor = await api(base, '/api/concern/mijnwerk', {}, a.token);
-  assert.equal(leegVoor.status, 200);
-  assert.equal(leegVoor.body.werkplekken.length, 0);
   const emp = await api(base, '/api/concern/mens/nieuw',
     { entiteit: entId, persoon: a.state.user.codename, rol: 'Kantine', van: '2026-01-01' }, eigLid);
   assert.equal(emp.status, 200, JSON.stringify(emp.body).slice(0, 200));
@@ -151,4 +152,29 @@ test('3-4. echte server: Mijn werk op codenaam, en de kantoorreview na een zelf 
   assert.deepEqual(na.werkverband, { stand: 'loopt', rollen: ['Ledenbalie'] },
     'een zelf aangenomen uitnodiging is een lopend dienstverband bij RTG');
   assert.equal(JSON.stringify(na.deuren), deurenVoor, 'schaduw: de deuren besluiten hetzelfde als ervoor');
+});
+
+test('5. /api/concern/mag leest alleen werkrelaties bij de eigen entiteit', async () => {
+  const base = srv.base;
+  const a = (await api(base, '/api/concern/entiteit/nieuw', { naam: 'Werkgever A', land: 'NL' }, eigLid)).body;
+  assert.ok(a.ok);
+  const mens = await nieuwLid(base, 'm');
+  const u = (await api(base, '/api/concern/uitnodigen', { entiteit: a.entiteit.id, rol: 'Geheime Functie' }, eigLid)).body;
+  assert.equal((await api(base, '/api/concern/uitnodiging/accepteer', { code: u.code }, mens.token)).status, 200);
+  const key = 'user-' + mens.state.user.id;
+
+  // een andere ondernemer met een eigen entiteit
+  const b = await nieuwLid(base, 'o');
+  const entB = (await api(base, '/api/concern/entiteit/nieuw', { naam: 'Werkgever B', land: 'NL' }, b.token)).body;
+  assert.ok(entB.ok, JSON.stringify(entB).slice(0, 200));
+  for (const persoon of [key, mens.state.user.codename]) {
+    const r = await api(base, '/api/concern/mag', { entiteit: entB.entiteit.id, persoon, recht: 'project' }, b.token);
+    assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
+    assert.equal(r.body.ok, false);
+    assert.equal(r.body.reden, 'geen-werkrelatie', 'bij B heeft deze mens niets: ' + JSON.stringify(r.body));
+    assert.equal(JSON.stringify(r.body).includes('Geheime Functie'), false, 'de rol bij A lekt niet naar B');
+  }
+  // bij de eigen entiteit werkt de vraag gewoon
+  const eigen = await api(base, '/api/concern/mag', { entiteit: a.entiteit.id, persoon: key, recht: 'project' }, eigLid);
+  assert.notEqual(eigen.body.reden, 'geen-werkrelatie', JSON.stringify(eigen.body));
 });

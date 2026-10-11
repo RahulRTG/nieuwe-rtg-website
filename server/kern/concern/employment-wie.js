@@ -17,7 +17,15 @@
    die wordt niet in bulk voor hem omgezet (ARBEID.md par. 7a). Andersom
    (van codenaam naar sleutel) loopt hier niet: die opzoeking is in deze
    laag niet synchroon te krijgen, dus een lezer die een codenaam heeft, krijgt
-   precies die. Wie de sleutel heeft, vraagt op de sleutel. */
+   precies die. Wie de sleutel heeft, vraagt op de sleutel.
+
+   EN DE HEENWEG IS NIET ONVOORWAARDELIJK. codenaamVan leest de synchrone gids
+   (kern/sociaal.js); in PostgreSQL-stand geeft die bij een koude cache de
+   sleutel zelf terug terwijl het lid bestaat. Dan valt de codenaamhelft stil
+   weg en gedraagt deze lezing zich als voor de reparatie -- een gemiste
+   treffer, nooit een treffer bij een ander. kern/kantoor/huis.js vangt dat af
+   met `onbekend`; "Mijn werk", de loonruntoets en de dubbelcontrole doen dat
+   niet. Dat is een bekend restgat en geen garantie die hier wordt beloofd. */
 'use strict';
 
 module.exports = (codenaamVan) => {

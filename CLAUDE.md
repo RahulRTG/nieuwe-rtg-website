@@ -1911,7 +1911,15 @@ en de schil leest de hoofdactie van het ACTIEVE blad (`edge/blikveld-hoofdactie.
 
 **`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
 pages, it is a movable operational space. Surfaces met een gouden greep rond een
-centrale console, en Context Linking dat alleen een verwijzing rondstuurt.
+centrale console, en Context Linking dat alleen een verwijzing rondstuurt. Par. 12 legt het **architectuurdoel** vast: één permanente
+schil, en dat is de werktafel (RTG Command) -- geen vierde host naast de
+werktafel, de Spatial Shell en de Workspace Runtime. `npm run schilherstart`
+(`SCHILHERSTART.json`, ratel `schilHerstarts` en `schilDubbeleVerzoeken`) loopt
+de weg die een duim neemt en telt per tik de nieuwe documenten; de vondst die
+de richting bepaalt is dat de schil al blijft staan, maar dat elk BLAD zijn hele
+stapel opnieuw opstart. Het doel is geen toestemming voor een grote verhuizing:
+de volgende trede is een wereld als Living Module op één route (TravelOS), met
+acceptatiecriteria en een terugval.
 
 **`ONDERHOUD.md` is de onderhoudslaag** — vier wachters voor de grond die
 zonder commit verschuift (runtime, browser, live-site, wet) en de herstellus

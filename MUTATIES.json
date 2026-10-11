@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T06:08:26.331Z",
-    "commit": "49a0508d",
+    "op": "2026-10-11T18:51:30.437Z",
+    "commit": "3e344bdc",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9544,6 +9544,22 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
+    },
+    "move-gevolg-adressen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/move/gevolg.js",
+      "operator": "route-doel-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "move-gevolg.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/move.html",
+      "operator": "html-bron-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "move-keten.test.js": {
       "soort": "server",

@@ -9,20 +9,21 @@
    vaststond. Het getal komt uit kern/commercie/besluit.js, de omkeerbaarheid uit
    kern/commercie/geldomkeer.js en de grendel uit kern/commercie/risicouitzondering.js:
    er ontstaat geen tweede regel. Staat de uitzonderingsprocedure open, dan gaat het wel
-   door naar het besluit, dat dan de risicogoedkeuring eist. */
+   door naar het besluit, dat dan de risicogoedkeuring eist -- en dat is sinds
+   eigenaarsbesluit 2C alleen de incassoronde. */
 'use strict';
 
 const geldomkeer = require('../../commercie/geldomkeer');
 const risico = require('../../commercie/risicouitzondering');
 const { BELEID } = require('../../commercie/besluit');
 
-function omkeerpoort(o, grendel) {
+function omkeerpoort(o) {
   const omkeer = geldomkeer.voor(o.handeling);
   /* Het totaal uit de STAPPEN, zoals het voornemen het rekent -- een opgegeven totaal
      dat lager is of ontbreekt, mag deze vroege weigering niet ontlopen. */
   const uitStappen = (Array.isArray(o.stappen) ? o.stappen : []).reduce((n, x) => n + (Number(x && x.centen) || 0), 0);
   const totaal = Math.max(uitStappen, Number(o.totaalCenten) || 0);
-  const g = risico.stand(grendel);
+  const g = risico.stand(o.handeling);
   if (totaal < BELEID.omkeerbaarBovenCenten || omkeer.omkeerbaar || g.open) return { omkeer, nee: null };
   return { omkeer, nee: { status: 403, onomkeerbaar: omkeer,
     error: 'Vanaf ' + (BELEID.omkeerbaarBovenCenten / 100).toFixed(0) + ' euro gaat een geldhandeling alleen door als zij ' +

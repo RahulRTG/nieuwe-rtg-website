@@ -96,12 +96,9 @@ function maakZoeker({ nu } = {}) {
 /* De beslislaag zoals `kern.beslis` hem verwacht: een functie die een vraag
    beantwoordt met een uitkomst, een reden en -- als er een sleutel is -- een
    bewijstoken om mee te dragen. `munt` komt van de bewijstokenlaag. */
-/* `onomkeerbaarGrendel` is de grendel van ../commercie/risicouitzondering.js. Hij wordt hier met
-   opzet NIET gevuld: zonder grendel staat de procedure dicht, en openen is een
-   afzonderlijk besluit van de eigenaar (2B-aangepast, 11 oktober 2026). */
-function maakBeslis({ munt, dagverbruik, beleid, nu, onomkeerbaarGrendel } = {}) {
+function maakBeslis({ munt, dagverbruik, beleid, nu } = {}) {
   const { beslis, UITKOMST, DOOR } = maakBesluit({
-    zoekBevoegdheid: maakZoeker({ nu }), dagverbruik, beleid, nu, munt, onomkeerbaarGrendel });
+    zoekBevoegdheid: maakZoeker({ nu }), dagverbruik, beleid, nu, munt });
   return { beslis, UITKOMST, DOOR, LIJST };
 }
 

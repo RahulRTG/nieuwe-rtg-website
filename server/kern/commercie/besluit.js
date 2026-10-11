@@ -78,7 +78,7 @@ const BELEID = {
 
 /* De kern. `zoekBevoegdheid` komt van de aanroeper: deze module weet niet waar
    bevoegdheden wonen, en dat hoort ze ook niet te weten. */
-function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt, onomkeerbaarGrendel }) {
+function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt }) {
   const tijd = nu || klok.nu;
   const B = { ...BELEID, ...(beleid || {}) };
 
@@ -144,7 +144,7 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt, onomkeerb
        2B-aangepast); de enige uitzondering staat in ./risicouitzondering.js. */
     let viaUitzondering = null;
     if (bedrag >= B.omkeerbaarBovenCenten && ctx.omkeerbaar !== true) {
-      const u = require('./risicouitzondering').toets({ grendel: onomkeerbaarGrendel, risico: ctx.risicogoedkeuring,
+      const u = require('./risicouitzondering').toets({ handeling, risico: ctx.risicogoedkeuring,
         actor, goedgekeurdDoor: ctx.goedgekeurdDoor });
       if (!u.ok)
         return { ...basis, uitkomst: UITKOMST.OMKEERBAAR, bewijs, omkeerbaar: false,
@@ -167,7 +167,8 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt, onomkeerb
        besluit zoals het altijd al was -- niet een besluit dat stilzwijgend
        zwakker is. */
     const uit = { ...basis, uitkomst: UITKOMST.TOESTAAN, bewijs, reden: viaUitzondering
-      ? 'Onomkeerbaar, uitzondering met risicogoedkeuring van ' + viaUitzondering.door + '.'
+      ? 'Onomkeerbaar, uitzondering met risicogoedkeuring van ' + (viaUitzondering.naam || viaUitzondering.door) +
+        ' (' + viaUitzondering.bron + ').'
       : 'Binnen de bevoegdheid en het beleid.' };
     if (viaUitzondering) { uit.uitzondering = viaUitzondering; uit.omkeerbaar = false; }
     if (munt) {

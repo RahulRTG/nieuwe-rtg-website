@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2444 bestanden en 16745 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2444 bestanden en 16749 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2444 |
-| losse beweringen (`test(...)`) | 16745 |
+| losse beweringen (`test(...)`) | 16749 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 305 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2270 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2135 bestanden, 16207 beweringen.
+2135 bestanden, 16211 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1289,7 +1289,7 @@ toets omvalt.
 | `onderzoeker.test.js` | 4 | gezakt op `liegpoort /api/` | De Onderzoeker: de tweede AI van het RTG Kantoor. De RTG AI bouwt hem met zijn meelees-kennis als leerstof; daarna doet hij agentisch onderzoek (plan, bronnen, analyse, rapport) en adviseert hij alleen. |
 | `onderzoekslab.test.js` | 4 | gezakt op `liegpoort /api/` | Het RTG Onderzoekslab: projecten in negen velden met de vaste fase-keten (idee > onderzoek > prototype > proef > uitrol), de menselijke veiligheids- en ethiektoets als poort naar de proef, de harde weigering van... |
 | `onnozel.test.js` | 11 | gezakt op `liegpoort /api/` | Het onnozele-gedrag-harnas: invoer die je niet verwacht maar wel krijgt, omdat echte mensen echte mensen zijn. Emoji in schrijfvakken, lege spaties, kilometerslange teksten, datums die niet bestaan, bedragen die... |
-| `onomkeerbaar.test.js` | 12 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `onomkeerbaar.test.js` | 15 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ontmoeting-leeg.test.js` | 1 | gezakt op `liegpoort /api/` | Regressie: de chaos-soak (scripts/mega65-storm.js) vond dat /api/office/ontmoeting/signaal een 500 gaf zodra het de EERSTE aanraking met de ontmoetingen was. Oorzaak: db.data.ontmoetDates wordt lui aangemaakt... |
 | `ontmoeting.test.js` | 8 | gezakt op `liegpoort /api/` | Salon-ontmoetingen: twee wederzijdse connecties die vlakbij elkaar zijn zetten de functie zelf aan, krijgen een voorstel, kiezen een activiteit (bij verschil wint de vrouw, anders de rustigste), tekenen een... |
 | `ontvanger.test.js` | 9 | gezakt op `===->!==#0` | DE ONTVANGEROPLOSSING -- wie krijgt een bericht, en wat als niemand het kreeg. server/kern/ontvanger.js vervangt `if (!a.key) return;` in kern/werk.js. |
@@ -1947,7 +1947,7 @@ toets omvalt.
 | `trust-evidence-source-retention.test.js` | 6 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `trust-evidence-v2-migration.test.js` | 6 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `tweede-rem.test.js` | 8 | gezakt op `liegpoort /api/` | DE POGINGENREM OP DE TWEEDE INLOGSTAP -- regressie voor RTG-V1-RELEASE C3. DE FOUT: /api/auth/tweede controleerde de TOTP-code zonder enige rem. |
-| `tweedehandtekening.test.js` | 11 | gezakt op `liegpoort /api/` | EEN TWEEDE MENS ONDER TWEE BANKHANDELINGEN. `scripts/overleving.js` had één rij die met zoveel woorden `nee` zei: *een medewerker handelt te kwader trouw, in zijn eentje.* De grond was gemeten -- een medewerker op... |
+| `tweedehandtekening.test.js` | 12 | gezakt op `liegpoort /api/` | EEN TWEEDE MENS ONDER TWEE BANKHANDELINGEN. `scripts/overleving.js` had één rij die met zoveel woorden `nee` zei: *een medewerker handelt te kwader trouw, in zijn eentje.* De grond was gemeten -- een medewerker op... |
 | `tweefactor.test.js` | 18 | gezakt op `===->!==#0` | DE TWEEDE FACTOR VOOR LEDEN. DE BEWERING DIE ERTOE DOET staat in toets 6: TOTP is GEEN passkey. |
 | `txgeld.test.js` | 7 | gezakt op `true->false#0` | DE TWEE GELDCOLLECTIES IN HET GROOTBOEK. directBetalingen en betaalVerzoeken werden bijgehouden met db.data.X.unshift(item); db.data.X = db.data.X.slice(0, N); Dat is precies waar boeking 50.001 aan verdween (zie... |
 | `txindex.test.js` | 4 | gezakt op `return-weg#0` | Transactie-index: bewijs dat de O(1)-helpers exact hetzelfde antwoorden als de naieve scans die ze vervangen, ook na mutaties, vervanging van de array (archief/venster/pg-sync) en schrijven BUITEN de helpers om... |

@@ -23,6 +23,9 @@ module.exports = (ctx) => {
   const { app, kluisAuth, veilig, kern, naam, tweedeHand, zwaar, boardroomUser } = ctx;
   const bank = kern.bank;
 
+  /* De risicogoedkeuring van een ronde boven de grens: ./bank-incasso-risico.js. */
+  const risico = require('./bank-incasso-risico')(ctx);
+
   /* ------------------------------------------------------------------------
      DE INCASSORONDE -- de GOUDEN WEG van dit huis (MACHINE.md).
 
@@ -107,6 +110,10 @@ module.exports = (ctx) => {
           'weinig saldo heeft, mag de inning bij de anderen niet tegenhouden.' },
     });
     if (!klaar.ok) { veilig(res, () => klaar); return; }
+
+    /* Boven de omkeerbaarheidsgrens eerst een risicogoedkeuring (./bank-incasso-risico.js). */
+    const wacht = risico.wacht(klaar, blik);
+    if (wacht) { veilig(res, () => wacht); return; }
 
     /* En dan pas de deur van de tweede mens. De aanvraag draagt het voornemen mee,
        zodat de bevestiging weet welke baan zij afmaakt.

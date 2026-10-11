@@ -395,3 +395,59 @@ test('11. een aanvraag zonder geregistreerde uitvoerder ontstaat niet', () => {
     'er kan een aanvraag ontstaan voor een handeling die niemand kan uitvoeren; die blijft dan ' +
     'staan tot hij verloopt en is niet te bevestigen');
 });
+
+/* EIGENAARSBESLUIT 2C (11 oktober 2026): een incassoronde boven de omkeerbaarheidsgrens
+   is niet terug te draaien en gaat alleen door met een RISICOGOEDKEURING van een derde
+   mens op naam, voor precies die ronde. Drie mensen, drie vragen: A vraagt aan, C draagt
+   het risico, B tekent bevoegd -- en het dossier zegt daarna onomkeerbaar + uitzondering. */
+test('12. een incassoronde boven de grens: eerst een risicogoedkeuring van een ander, dan pas de tweede mens', async () => {
+  const eenC = await medewerker(3);
+  const sleutelC = await pk.zet(medewerker.lid);
+  const u3 = (Date.now() + 3331).toString(36);
+  const lid3 = (await api('/api/auth/register', { name: 'Verhuurder', email: 'vh' + u3 + '@voorbeeld.test',
+    phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
+    geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const naarIban = (await api('/api/bank/akkoord', {}, lid3)).body.rekening.iban;
+  const vast = await api('/api/bank/terugkerend/zet', { vanIban: iban, naarIban, centen: 300000, interval: 'maand',
+    oms: 'Huur (proef 2C)', idem: 'proef-2c-' + u3 }, lid);
+  assert.equal(vast.status, 200, JSON.stringify(vast.body).slice(0, 160));
+  const tot = Date.now() + 62 * 86400000;
+
+  const inc = () => pk.ceremonie(sleutelA, '/api/office/bank/incasso/opties', { tot }, eenA);
+  const r = await api('/api/office/bank/incasso', { tot, ...(await inc()) }, eenA);
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
+  assert.equal(r.body.wachtOpRisico, true, 'boven de grens ging de ronde zonder risicogoedkeuring naar een tweede mens');
+  assert.equal(r.body.aanvraag, undefined, 'er is al een deurticket voor een ronde zonder risicogoedkeuring');
+  const vid = r.body.voornemen.id;
+  assert.ok(r.body.voornemen.totaalCenten >= 250000, 'de ronde ligt niet boven de grens: ' + r.body.voornemen.totaalCenten);
+
+  const risico = (sl, wie, extra) => pk.ceremonie(sl, '/api/office/bank/incasso/risico/opties', { voornemen: vid }, wie)
+    .then(c => api('/api/office/bank/incasso/risico', Object.assign({ voornemen: vid, ...c }, extra), wie));
+  // zonder reden niet, en de aanvrager zelf niet
+  assert.equal((await risico(sleutelC, eenC, { reden: 'kort' })).status, 400);
+  const zelf = await risico(sleutelA, eenA, { reden: 'Mijn eigen ronde, mijn eigen risico.' });
+  assert.equal(zelf.status, 403, JSON.stringify(zelf.body).slice(0, 160));
+  // de gedeelde kantoorcode komt er niet in
+  assert.equal((await api('/api/office/bank/incasso/risico', { voornemen: vid, reden: 'De gedeelde code probeert het.' }, gedeeld)).status, 403);
+
+  const ok = await risico(sleutelC, eenC, { reden: 'Huur van tien leden, met de verhuurder afgestemd.' });
+  assert.equal(ok.status, 200, JSON.stringify(ok.body).slice(0, 200));
+  assert.equal(ok.body.needsAuth, true, 'na de risicogoedkeuring hoort er een deurticket voor de tweede mens te staan');
+  const th = ok.body.aanvraag.id;
+  assert.equal((await risico(sleutelC, eenC, { reden: 'Nog een keer goedkeuren.' })).status, 409, 'een tweede goedkeuring op dezelfde ronde');
+
+  // de aanvrager tekent zijn eigen ronde niet af: het ticket staat op ZIJN naam
+  const hand = (sl, wie) => pk.ceremonie(sl, '/api/office/bank/handtekening/opties', { id: th }, wie);
+  assert.equal((await api('/api/office/bank/handtekening/bevestig', { id: th, ...(await hand(sleutelA, eenA)) }, eenA)).status, 403);
+  const b = await api('/api/office/bank/handtekening/bevestig', { id: th, ...(await hand(sleutelB, eenB)) }, eenB);
+  assert.equal(b.status, 200, JSON.stringify(b.body).slice(0, 200));
+  assert.equal(b.body.voornemen && b.body.voornemen.stand, 'UITGEVOERD', JSON.stringify(b.body.voornemen).slice(0, 200));
+  assert.strictEqual(b.body.voornemen.besluit.omkeerbaar, false, 'na een uitzondering heet de ronde omkeerbaar');
+
+  const dos = (await api('/api/office/bank/incasso/dossier', { voornemen: vid }, eenB)).body.dossier;
+  const as = (n) => dos.assen.find(x => x.as === n) || {};
+  assert.equal(as('omkeerbaarheid').uitslag, 'onomkeerbaar, uitzondering met risicogoedkeuring');
+  assert.strictEqual(as('omkeerbaarheid').omkeerbaar, false);
+  assert.equal(as('omkeerbaarheid').bron, 'eigenaarsbesluit 2C, 11 oktober 2026');
+  assert.equal(as('risicogoedkeuring').graad, 'gemeten');
+});

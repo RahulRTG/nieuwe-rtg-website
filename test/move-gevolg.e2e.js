@@ -55,9 +55,17 @@ test('Move rekent een gekozen uitloop door en zet een voorstel klaar zonder iets
     const base = srv.base;
     const tok = await proeflid(base);
     const d = morgen();
-    // training 10:00-11:00 bij de ene zaak, massage 11:15 bij de andere (MOVE.md par. 5)
+    /* Drie soorten overgang in een reis, zodat het scherm ze moet ONDERSCHEIDEN:
+       training 10:00-11:00 en massage 11:15 (krap, wordt door uitloop
+       onhaalbaar), massage naar een charter om 14:00 (ruim, blijft ruim), en de
+       charter naar een training om 17:00 -- na een vlucht weet niemand wanneer
+       je het vliegveld uit bent, dus die overgang is NIET TE BEPALEN. */
     await boek(base, tok, 'KAITO', 's1', d, '10:00');
     await boek(base, tok, 'SERENA', 'w1', d, '11:15');
+    const ch = await post(base, '/api/member/vluchten/charter',
+      { soort: 'privejet', bestemming: 'Parijs Le Bourget', datum: d, tijd: '14:00' }, tok);
+    assert.equal(ch.status, 200, 'charter: ' + JSON.stringify(ch.data));
+    await boek(base, tok, 'KAITO', 's1', d, '17:00');
 
     /* De route zelf, met een onderdeel dat niet in de reis staat: een
        weigering met een zin, geen 500. */
@@ -90,16 +98,30 @@ test('Move rekent een gekozen uitloop door en zet een voorstel klaar zonder iets
     assert.equal(verstuurd.minuten, 45, 'de minuten komen uit de keuze van de reiziger');
 
     await page.waitForSelector('.gevolg li', { timeout: 10000 });
-    const kop = (await page.locator('.gevolg .kop').first().textContent()).trim();
-    assert.match(kop, /45 minuten uitloop raakt 1 overgang/i, 'de kop zegt wat de uitloop raakt: "' + kop + '"');
-    const geraakt = page.locator('.gevolg li[data-geraakt="ja"]');
-    assert.equal(await geraakt.count(), 1, 'precies een overgang wordt geraakt');
+    const gevolg = page.locator('.gevolg').first();
+    const kop = (await gevolg.locator('.kop').textContent()).trim();
+    assert.match(kop, /45 minuten uitloop raakt 1 overgang\./i, 'de kop telt wat de uitloop RAAKT, niet alle regels: "' + kop + '"');
+    assert.match(kop, /1 overgang niet te bepalen/i, 'en zegt hardop wat Move niet kan wegen: "' + kop + '"');
+    assert.equal(await gevolg.locator(':scope > ul > li').count(), 3, 'een regel per overgang na de verstoring');
+    const geraakt = gevolg.locator(':scope > ul > li[data-geraakt="ja"]');
+    assert.equal(await geraakt.count(), 1, 'precies een van de drie wordt geraakt');
     const tekst = (await geraakt.first().textContent()).trim();
     assert.match(tekst, /massage/i, 'het geraakte onderdeel is waar je naartoe gaat: "' + tekst + '"');
-    assert.match(tekst, /onhaalbaar/i, 'en het wordt onhaalbaar: "' + tekst + '"');
+    assert.match(tekst, /krap \u2192 onhaalbaar/i, 'en het wordt onhaalbaar: "' + tekst + '"');
     assert.match(tekst, /niets verzet/i, 'het scherm zegt dat er niets verzet is: "' + tekst + '"');
+    const onbekend = (await gevolg.locator(':scope > ul > li').nth(2).textContent()).trim();
+    assert.match(onbekend, /niet te bepalen \u2192 niet te bepalen/i, 'onbekend blijft onbekend op het scherm: "' + onbekend + '"');
+    assert.doesNotMatch(onbekend, /ruim|geen gevolg/i, 'en wordt nooit een geruststelling: "' + onbekend + '"');
     const href = await geraakt.first().locator('a').getAttribute('href');
-    assert.equal(href, '/apps/portaal.html', 'het voorstel wijst naar de app waar het echte werk hoort');
+    assert.equal(href, '/apps/reizen.html#reizen', 'het voorstel wijst naar de plek waar de afspraak staat');
+    /* EN DIE PLEK BESTAAT EN TOONT HEM. Hier stond /apps/portaal.html, en deze
+       toets keurde die link goed terwijl hij 404 gaf: een adres vergelijken is
+       geen adres volgen. Nu wordt hij gevolgd, tot de afspraak er staat. */
+    const ander = await ctx.newPage();
+    const r404 = await ander.goto(base + href, { waitUntil: 'domcontentloaded' });
+    assert.equal(r404.status(), 200, 'de bestemming bestaat');
+    await ander.waitForFunction(() => /massage/i.test(document.body.innerText || ''), null, { timeout: 20000 });
+    await ander.close();
 
     /* HERSTEL: valt de server weg, dan geen kale fout maar een zin, en de knop
        komt terug zodat de reiziger het opnieuw kan proberen. */

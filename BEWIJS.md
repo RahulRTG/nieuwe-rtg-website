@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2441 bestanden en 16712 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2442 bestanden en 16714 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2441 |
-| losse beweringen (`test(...)`) | 16712 |
+| toetsbestanden | 2442 |
+| losse beweringen (`test(...)`) | 16714 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2268 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 1 |
+| niets van beide | 0 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2132 bestanden, 16174 beweringen.
+2133 bestanden, 16176 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1168,6 +1168,7 @@ toets omvalt.
 | `motor-vingerafdruk.test.js` | 4 | gezakt op `!==->===#0` | De saldi-vingerafdruk (drift-detector): borgt dat de JS-berekening BYTE-VOOR- BYTE gelijk is aan de Rust-motor (motor/src/pay.rs::vingerafdruk), zodat de schaduw-drift-detector per-rekening-drift vangt die de... |
 | `motorverbinding.test.js` | 7 | gezakt op `===->!==#0` | De gedeelde motorverbinding op het GELDPAD, in de AAN-stand. Waarom dit bestand er is. |
 | `motorzekering.test.js` | 6 | gezakt op `!==->===#0` | DE ZEKERING OP HET GELDPAD. server/kern/motorverbinding.js had drie beschermingen niet die server/kern/magnaat-motorklant.js tegen dezelfde motor wel heeft: een foutenteller met afkoelperiode, een grens op... |
+| `move-gevolg-adressen.test.js` | 2 | gezakt op `route-doel-weg#0` | ELK ADRES DAT MOVE OF DE REISWERELD AAN EEN LID GEEFT, BESTAAT. `kern/move/gevolg.js` wees een voorstel naar /apps/vervoer.html, /apps/reserveren.html en /apps/portaal.html, en de reiswereld een partnerboeking naar... |
 | `move-keten.test.js` | 6 | gezakt op `liegpoort /api/` | RTG MOVE, DE VOLLE KETEN -- van twee echte boekingen naar een oordeel. test/move.test.js toetst de rekenkern puur. |
 | `move.test.js` | 18 | gezakt op `===->!==#0` | RTG MOVE (server/kern/move/) -- de naad tussen twee reisonderdelen. Getoetst als PURE motor: ./naad, ./haalbaar en ./gevolg krijgen hun rekenaars ingespoten, dus er komt geen server en geen browser aan te pas. |
 | `moveproef.test.js` | 10 | gezakt op `regex-alternatief-weg#1` | DE MOVEPROEF -- het instrument, niet de keten. scripts/moveproef.js opent RTG Move in een echte browser en meet BETROUWBAARHEID.md bewijs 1: kan een LID hier werkelijk bij? |
@@ -2343,7 +2344,7 @@ toets omvalt.
 | `mobile-content.e2e.js` | 3 | gezakt op `liegpoort /api/` | Content must be painted and reachable inside the common frame. Checking only the outer .wd-home missed a 58px Work viewport inside a 400px box. |
 | `mobile-single-shell.e2e.js` | 8 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `mobiliteitscherm.e2e.js` | 5 | gezakt op `liegpoort /api/` | Scherm-toets op het Mobility OS: leggen de twee schermen de weg werkelijk af? WAAROM DEZE TOETS BESTAAT test/mobiliteit.test.js bewijst dat de API klopt. |
-| `move-gevolg.e2e.js` | 1 | -- | RTG MOVE: WAT ALS HET UITLOOPT -- de tweede vraag van Move op het scherm. `/api/move/gevolg` bestond, was getoetst (test/move-keten.test.js toets 3) en had GEEN scherm: geen enkel bestand in public/ riep hem aan. |
+| `move-gevolg.e2e.js` | 1 | gezakt op `html-bron-weg#0` | RTG MOVE: WAT ALS HET UITLOOPT -- de tweede vraag van Move op het scherm. `/api/move/gevolg` bestond, was getoetst (test/move-keten.test.js toets 3) en had GEEN scherm: geen enkel bestand in public/ riep hem aan. |
 | `move.e2e.js` | 2 | gezakt op `liegpoort /api/` | RTG MOVE IN EEN ECHTE BROWSER -- de eigen weg van dit scherm. scripts/moveproef.js meet dezelfde keten als PROEF en schrijft MOVEPROEF.json; dat is een instrument en geen toets. |
 | `muziek-bestanden.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermbewijs voor Mijn muziek: kiezen op het toestel, terugzien in RTG Sound en bedienen met precies dezelfde vaste speler als de live stations. |
 | `navigatiekaarten.e2e.js` | 8 | gezakt op `liegpoort /api/` | DE KAARTEN OP HET SCHERM (apps/navigatie.html, paneel "Kaarten"). test/navigatie-index.test.js en test/navigatiegebiednet.test.js bewijzen dat de catalogus, de licentiepoort en de motor per gebied kloppen. |

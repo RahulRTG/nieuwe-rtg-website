@@ -254,9 +254,9 @@
     return kaart;
   }
 
-  const UITKOMSTWOORD = { RUIM: 'ruim', KRAP: 'krap', ONHAALBAAR: 'onhaalbaar',
-    NIET_TE_BEPALEN: 'niet te bepalen', GEEN_BEWEGING: 'geen beweging' };
-  const woord = u => UITKOMSTWOORD[u] || 'niet te bepalen';
+  /* Het woord komt uit de uitkomst zelf, zoals bij de badge van een naad. Geen
+     uitkomst is "niet te bepalen" en nooit een gunstig woord. */
+  const woord = u => u ? String(u).replace(/_/g, ' ').toLowerCase() : 'niet te bepalen';
 
   /* Wat als dit onderdeel uitloopt? Een vraag per overgang, op het onderdeel
      waar je VANDAAN komt -- dat is het onderdeel dat later klaar is. */
@@ -304,9 +304,16 @@
     }
     const d = r.body || {};
     const regels = Array.isArray(d.regels) ? d.regels : [];
-    bak.appendChild(el('div', 'kop', d.geraakt
-      ? minuten + ' minuten uitloop raakt ' + d.geraakt + (d.geraakt === 1 ? ' overgang' : ' overgangen') + '.'
-      : 'Met ' + minuten + ' minuten uitloop wordt geen overgang krapper.'));
+    /* ONBEKEND IS GEEN "GEEN GEVOLG". Een overgang die Move niet kan bepalen,
+       telt nooit als geraakt; zonder deze telling zei de kop "wordt geen
+       overgang krapper" over een reis waarvan Move de helft niet kon wegen. */
+    const onbekend = regels.filter(g => g.na === 'NIET_TE_BEPALEN').length;
+    const meervoud = n => n === 1 ? ' overgang' : ' overgangen';
+    bak.appendChild(el('div', 'kop', (d.geraakt
+      ? minuten + ' minuten uitloop raakt ' + d.geraakt + meervoud(d.geraakt) + '.'
+      : onbekend ? 'Move ziet geen overgang die krapper wordt, maar kan er niet alles van wegen.'
+        : 'Met ' + minuten + ' minuten uitloop wordt geen overgang krapper.') +
+      (onbekend ? ' ' + onbekend + meervoud(onbekend) + ' niet te bepalen.' : '')));
     bak.appendChild(el('div', '', 'Uw reis: ' + woord(d.oordeelVoor) + ' \u2192 ' + woord(d.oordeelNa) +
       (Number.isFinite(d.dekking) ? ' (Move kon ' + d.dekking + '% wegen)' : '')));
     const ul = el('ul');
@@ -318,10 +325,15 @@
       /* HET VOORSTEL, NOOIT DE UITVOERING. De link brengt u naar de app waar
          het echte werk hoort; daar bevestigt u zelf. */
       if (g.voorstel && g.voorstel.app) {
-        const a = el('a', '', 'Voorstel: ' + g.voorstel.wat + ' (in de app)');
+        li.appendChild(el('div', '', 'Voorstel: ' + g.voorstel.wat + '.'));
+        const a = el('a', '', 'Open waar dit onderdeel staat');
         a.href = g.voorstel.app;
         li.appendChild(a);
-        li.appendChild(el('div', '', 'Er is niets verzet; dat bevestigt ' + (g.voorstel.bevestigt || 'een mens') + '.'));
+        /* De zin volgt het VELD dat het zegt, en niet de aanname dat Move nooit
+           iets uitvoert. */
+        if (g.voorstel.uitgevoerd === false) {
+          li.appendChild(el('div', '', 'Er is niets verzet; dat bevestigt ' + (g.voorstel.bevestigt || 'een mens') + '.'));
+        }
       }
       if (g.zonderWeg) li.appendChild(el('div', '', g.zonderWeg));
       ul.appendChild(li);

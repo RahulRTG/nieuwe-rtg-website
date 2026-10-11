@@ -102,8 +102,10 @@ kern.prikbord = require('../kern/genootschap/prikbord')({ db, save, codenaamVan:
   liveCodename, notify, genootschap: kern.genootschap });
 kern.bijeenkomst = require('../kern/genootschap/bijeenkomst')({ db, save, codenaamVan: kern.codenaamVan,
   notify, genootschap: kern.genootschap });
-kern.genootschapAI = require('../kern/genootschap/ai')({ anthropic, genootschap: kern.genootschap,
-  prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst });
+// de AI-laag krijgt een bevroren leesweergave, nooit de modules met hun schrijffuncties
+const { leesweergave } = require('../kern/genootschap/leesweergave');
+kern.genootschapAI = require('../kern/genootschap/ai')({ anthropic,
+  lees: leesweergave({ genootschap: kern.genootschap, prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst }) });
 kern.genootschapInzicht = require('../kern/genootschap/inzicht')({ db, save, genootschap: kern.genootschap,
   prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst });
 kern.genootschapUitvoer = require('../kern/genootschap/uitvoer')({ genootschap: kern.genootschap,

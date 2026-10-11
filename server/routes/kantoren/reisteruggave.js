@@ -75,7 +75,36 @@ module.exports = (ctx) => {
       /* DE BAAN TOT HET BESLUIT (kern/kantoor/geldketen.js). De economische sleutel is
          het RECHT en niet iets van de client: twee medewerkers die allebei drukken,
          krijgen hetzelfde voornemen. */
-      const klaar = ketenlaag.klaarzet({
+      /* EEN OPEN AANVRAAG IS GENOEG. Een tweede knopdruk opende een tweede aanvraag op
+         hetzelfde voornemen; die tweede handtekening ging nergens meer over. */
+      const al = (tweedeHand.open().aanvragen || []).find(a => a.actie === 'reisbureau.teruggave' && a.onderwerp === id);
+      if (al) return veilig(res, () => ({ status: 409,
+        error: 'Voor deze teruggave staat al een aanvraag voor een tweede mens open (' + al.id + '). Die tekent een collega bij RTG Bank, of u trekt hem daar in.' }));
+      /* EEN NIEUWE POGING NA EEN MISLUKTE UITVOERING. Liep de uitvoering vast (de
+         betaallaag gaf een fout, de kas was te krap), dan staat het voornemen op GESTAAKT
+         en het recht nog open. Met dezelfde sleutel kwam dan steeds dat gestaakte voornemen
+         terug en zat de teruggave voorgoed vast. Een nieuwe poging krijgt daarom een sleutel
+         die het gestaakte voornemen noemt -- nog steeds idempotent: twee keer drukken na
+         dezelfde mislukking is dezelfde nieuwe poging. Een AFGEWEZEN voornemen krijgt geen
+         nieuwe poging: een nee wordt geen ja door het nog eens te vragen. */
+      let sleutel = 'teruggave:' + id, klaar = null;
+      for (let poging = 0; poging < 20; poging++) {
+        klaar = zetKlaar(sleutel);
+        if (klaar.eindstand && klaar.voornemen && klaar.voornemen.stand === 'GESTAAKT') {
+          sleutel = 'teruggave:' + id + ':na:' + klaar.voornemen.id;
+          continue;
+        }
+        break;
+      }
+      if (!klaar.ok) return veilig(res, () => klaar);
+      return veilig(res, () => {
+        const vraag = tweedeHand.vraag({ actie: 'reisbureau.teruggave', lijf: { id, voornemen: klaar.voornemen.id },
+          onderwerp: id, door: req.officeKey });
+        return vraag.ok ? { ...vraag, voornemen: klaar.voornemen, dossier: klaar.dossier } : vraag;
+      });
+    }
+    function zetKlaar(sleutel) {
+      return kern.geldketen.klaarzet({
         klasse: 'geld-eenmalig', handeling: 'GELD_TERUGGEVEN', pad: '/api/office/reisbureau/teruggave',
         doel: 'teruggave ' + recht.id + ' van reis ' + recht.ref,
         mens: { naam: naam(req), sleutel: req.officeKey },
@@ -90,19 +119,13 @@ module.exports = (ctx) => {
           over: '/api/office/bank/handtekening/bevestig', effecten: ['GELD_BEWEGEN', 'SCHRIJVEN_ANDERMANS'] },
         stappen: [{ wat: 'teruggave', doel: recht.ref, centen: recht.centen, gegevens: { id } }],
         totaalCenten: recht.centen,
-        sleutel: 'teruggave:' + id,
+        sleutel,
         /* DE BELOFTE VAN DE UITVOERING, en voor deze klasse is dat ATOMAIR. */
         uitvoerbelofte: { graad: 'gemeten', uitslag: 'atomair: een boeking',
           reden: 'kern/reisbureau-teruggave.js#uitvoeren geeft kern/pay#terugGave precies EEN deel ' +
             '(rtg:reisbureau, partner nul), en een boeking past debet en credit in een keer toe ' +
             '(kern/pay/boeking.js#pasToe) of weigert zonder iets te veranderen. Een herhaling na een storing ' +
             'tussen boeking en markering boekt niet nog eens: de idem-sleutel is het id van het recht.' },
-      });
-      if (!klaar.ok) return veilig(res, () => klaar);
-      return veilig(res, () => {
-        const vraag = tweedeHand.vraag({ actie: 'reisbureau.teruggave', lijf: { id, voornemen: klaar.voornemen.id },
-          onderwerp: id, door: req.officeKey });
-        return vraag.ok ? { ...vraag, voornemen: klaar.voornemen, dossier: klaar.dossier } : vraag;
       });
     }
     const r = await rb().teruggaveUitvoeren({ id, door: req.officeKey });

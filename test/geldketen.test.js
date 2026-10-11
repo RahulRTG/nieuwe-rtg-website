@@ -356,3 +356,45 @@ test('14. de keten onthoudt WELK verzoek uitvoerde, en geeft zijn voorspelling t
   assert.equal(ketenlaag.voorspellingVan('verzoek-2'), null);
   assert.equal(ketenlaag.voorspellingVan(''), null);
 });
+
+test('15. boven de grens: na de handtekening draagt het voornemen bewijs, en een tweede ronde laat het dossier staan', async () => {
+  const { ketenlaag } = huis();
+  const klaar = ketenlaag.klaarzet(OPGAVE({ totaalCenten: 150000, sleutel: 'incasso:15',
+    stappen: [{ wat: 'incassoronde', doel: 'tot 15', centen: 150000, gegevens: { tot: 15 } }] }));
+  assert.equal(klaar.voornemen.stand, 'WACHT');
+  const id = klaar.voornemen.id;
+  assert.ok(ketenlaag.tekenAf({ id, door: 'bert' }).ok);
+  const r = await ketenlaag.uitvoer({ id, door: 'bert', doe: async () => ({ ok: true, uitgevoerd: 1 }) });
+  assert.ok(r.ok, JSON.stringify(r));
+  const voor = ketenlaag.dossier(id).dossier;
+  const as = (d, n) => d.assen.find(a => a.as === n);
+  /* De herkeuring na de handtekening munt het token; die as stond hier op onbekend. */
+  assert.equal(as(voor, 'bewijsDraagt').graad, 'gemeten', JSON.stringify(as(voor, 'bewijsDraagt')));
+  assert.deepEqual(voor.open, [], voor.open.join(', '));
+
+  /* Een tweede handtekening en uitvoering op hetzelfde, al uitgevoerde voornemen: geen
+     geld, en het dossier van de eerste uitvoering wordt niet herschreven. */
+  let geraakt = false;
+  const t2 = ketenlaag.tekenAf({ id, door: 'carla' });
+  assert.equal(t2.status, 409, JSON.stringify(t2));
+  const r2 = await ketenlaag.uitvoer({ id, door: 'carla', doe: async () => { geraakt = true; return { ok: true }; } });
+  assert.equal(r2.status, 409, JSON.stringify(r2));
+  assert.equal(geraakt, false);
+  const na = ketenlaag.dossier(id).dossier;
+  assert.deepEqual(na.assen, voor.assen, 'het dossier van een uitgevoerd voornemen is herschreven');
+});
+
+test('16. een voornemen in een eindstand wordt niet opnieuw klaargezet, en er blijft niets achter', async () => {
+  const { ketenlaag, voornemens } = huis();
+  const klaar = ketenlaag.klaarzet(OPGAVE({ sleutel: 'incasso:16' }));
+  assert.equal(klaar.voornemen.stand, 'GEKEURD');
+  const r = await ketenlaag.uitvoer({ id: klaar.voornemen.id, door: 'bert', doe: async () => { throw new Error('kas te krap'); } });
+  assert.ok(r.status >= 400);
+  assert.equal(voornemens.vind(klaar.voornemen.id).stand, 'GESTAAKT');
+  const aantal = ketenlaag.lijst({ limit: 100 }).aantal;
+  const nogEens = ketenlaag.klaarzet(OPGAVE({ sleutel: 'incasso:16' }));
+  assert.equal(nogEens.status, 409, JSON.stringify(nogEens));
+  assert.equal(nogEens.eindstand, true);
+  assert.equal(nogEens.voornemen.stand, 'GESTAAKT', 'de aanroeper hoort de stand te krijgen om zelf te beslissen');
+  assert.equal(ketenlaag.lijst({ limit: 100 }).aantal, aantal, 'er is een dossier bijgezet voor een voornemen dat niet meer kan lopen');
+});

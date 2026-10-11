@@ -89,6 +89,11 @@ function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron }) {
     const d = vindDossier(id);
     if (!d) return { status: 404, error: 'Er is geen geldketen met dit voornemen.' };
     if (typeof doe !== 'function') return { status: 400, error: 'Er is geen uitvoerder meegegeven.' };
+    /* Een voornemen dat al UITGEVOERD of GESTAAKT staat, wordt niet uitgevoerd -- en dan
+       hoort het dossier van die eerdere uitvoering niet overschreven te worden. */
+    const v = voornemens.vind ? voornemens.vind(id) : null;
+    if (v && (v.stand === 'UITGEVOERD' || v.stand === 'GESTAAKT' || v.stand === 'AFGEWEZEN'))
+      return { status: 409, error: 'Dit voornemen staat al op ' + v.stand + ' en wordt niet uitgevoerd.' };
 
     /* WELK VERZOEK DEZE UITVOERING DEED, en dat is een id en geen identiteit. Het is de
        enige brug tussen deze keten en de effectbon van server/effectbon.js: die bon wordt

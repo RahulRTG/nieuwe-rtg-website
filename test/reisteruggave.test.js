@@ -108,6 +108,11 @@ test('1. afzeggen na betalen zet een recht klaar; vanaf duizend euro tekent een 
   assert.equal(aanvraag.body.needsAuth, true, 'boven duizend euro ging het zonder tweede mens');
   assert.equal(await saldo(), naBetalen, 'er bewoog geld voordat de tweede mens tekende');
   const th = aanvraag.body.aanvraag.id;
+  // een tweede druk terwijl de aanvraag openstaat, opent er geen tweede
+  const cA1 = await pk.ceremonie(sleutelA, '/api/office/reisbureau/teruggave/opties', { id }, a.kantoor);
+  const dubbel = await api('/api/office/reisbureau/teruggave', { id, besluit: 'uitvoeren', ...cA1 }, a.kantoor);
+  assert.equal(dubbel.status, 409, JSON.stringify(dubbel.body).slice(0, 200));
+  assert.ok(String(dubbel.body.error).includes(th), 'de weigering noemt de open aanvraag: ' + JSON.stringify(dubbel.body).slice(0, 300));
 
   // A tekent zijn eigen aanvraag niet af
   const zelf = await pk.ceremonie(sleutelA, '/api/office/bank/handtekening/opties', { id: th }, a.kantoor);
@@ -154,7 +159,7 @@ test('1. afzeggen na betalen zet een recht klaar; vanaf duizend euro tekent een 
 
 /* ---------------------------------------- de route met een nagemaakte context */
 
-function opstelling(centen, { zonderKeten = false, domeinWeigert = false } = {}) {
+function opstelling(centen, { zonderKeten = false, domeinWeigert = false, openAanvragen = [], gestaakt = [], afgewezen = [] } = {}) {
   const routes = {}, audit = [], uitgevoerd = [], vragen = [], klaargezet = [], uitgevoerdKeten = [];
   const recht = { id: 'RTG1', ref: 'R1', centen };
   let uitvoerder = null;
@@ -162,7 +167,14 @@ function opstelling(centen, { zonderKeten = false, domeinWeigert = false } = {})
      raakt: klaarzetten geeft een voornemen, en uitvoeren ROEPT `doe` aan en zet een
      gegooide fout om in een gestaakt voornemen. De echte baan staat in toets 1. */
   const geldketen = {
-    klaarzet: (o) => { klaargezet.push(o); return { ok: true, status: 200, voornemen: { id: 'V1' }, dossier: {} }; },
+    /* Een sleutel uit `gestaakt` of `afgewezen` geeft het voornemen in die eindstand terug,
+       zoals geldketen/weging.js doet; elke andere sleutel krijgt V<n>. */
+    klaarzet: (o) => {
+      klaargezet.push(o);
+      if (gestaakt.includes(o.sleutel)) return { status: 409, eindstand: true, voornemen: { id: 'VS' + klaargezet.length, stand: 'GESTAAKT' } };
+      if (afgewezen.includes(o.sleutel)) return { status: 409, eindstand: true, error: 'afgewezen', voornemen: { id: 'VA', stand: 'AFGEWEZEN' } };
+      return { ok: true, status: 200, voornemen: { id: 'V' + klaargezet.length }, dossier: {} };
+    },
     tekenAf: () => ({ status: 200, ok: true }),
     uitvoer: async ({ doe }) => {
       try { await doe({ gegevens: { id: 'RTG1' } }); return { ok: true, voornemen: { stand: 'UITGEVOERD' } }; }
@@ -175,7 +187,8 @@ function opstelling(centen, { zonderKeten = false, domeinWeigert = false } = {})
     veilig: (res, f) => { const r = f(); return res.status(r.status || 200).json(r); },
     zwaar: { eis: async (u, actie, binding, req) => (req.body.ceremonie ? { ok: true } : { ok: false, status: 401 }),
       stuur: (res, zw) => res.status(zw.status).json({ bevestigingNodig: true }), opties: async () => ({}) },
-    tweedeHand: { registreer(n, u) { uitvoerder = u; }, vraag: (v) => { vragen.push(v); return { ok: true, needsAuth: true }; } },
+    tweedeHand: { registreer(n, u) { uitvoerder = u; }, vraag: (v) => { vragen.push(v); return { ok: true, needsAuth: true }; },
+      open: () => ({ ok: true, aanvragen: openAanvragen }) },
     kern: { geldketen: zonderKeten ? null : geldketen, reisbetaling: {
       teruggaveVan: id => (id === 'RTG1' ? recht : null),
       teruggaveUitvoeren: async (v) => {
@@ -217,6 +230,28 @@ test('3. precies duizend euro gaat al naar een tweede mens, en langs de geldkete
   assert.equal(k.totaalCenten, 100000);
   assert.equal(k.sleutel, 'teruggave:RTG1', 'de economische sleutel hoort bij het recht en niet bij de client');
   assert.equal(k.mens.sleutel, 'medewerker-a');
+});
+
+test('3e. staat er al een aanvraag open voor dit recht, dan komt er geen tweede', async () => {
+  const o = opstelling(100000, { openAanvragen: [{ id: 'TH1', actie: 'reisbureau.teruggave', onderwerp: 'RTG1' }] });
+  const r = await o.roep({ id: 'RTG1', besluit: 'uitvoeren', ceremonie: 'x' });
+  assert.equal(r.status, 409, JSON.stringify(r.body));
+  assert.equal(o.vragen.length, 0);
+  assert.equal(o.klaargezet.length, 0, 'er is een voornemen klaargezet terwijl er al een aanvraag openstaat');
+});
+
+test('3f. na een gestaakte uitvoering krijgt een nieuwe poging een nieuw voornemen; na een afwijzing niet', async () => {
+  const o = opstelling(100000, { gestaakt: ['teruggave:RTG1'] });
+  const r = await o.roep({ id: 'RTG1', besluit: 'uitvoeren', ceremonie: 'x' });
+  assert.equal(r.body.needsAuth, true, JSON.stringify(r.body));
+  assert.equal(o.klaargezet[1].sleutel, 'teruggave:RTG1:na:VS1', 'de nieuwe poging noemt het gestaakte voornemen');
+  assert.deepEqual(o.vragen[0].lijf, { id: 'RTG1', voornemen: 'V2' });
+
+  const n = opstelling(100000, { afgewezen: ['teruggave:RTG1'] });
+  const nee = await n.roep({ id: 'RTG1', besluit: 'uitvoeren', ceremonie: 'x' });
+  assert.equal(nee.status, 409, JSON.stringify(nee.body));
+  assert.equal(n.vragen.length, 0, 'een nee werd een ja door het nog eens te vragen');
+  assert.equal(n.klaargezet.length, 1);
 });
 
 test('3b. zonder geldketen gaat het vier-ogenpad dicht, en eronder niet', async () => {

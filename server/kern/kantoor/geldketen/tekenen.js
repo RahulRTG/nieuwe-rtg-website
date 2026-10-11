@@ -34,6 +34,11 @@ function maakTekenen({ voornemens, vindDossier, leg, noteer, bewaar }) {
          staat hier voor ons. Die as als `onbekend` wegschrijven zou de keten
          onterecht open laten staan -- en de mens die tekende uit het dossier
          wissen. Elke ANDERE weigering blijft wel een gat. */
+      /* ALLEEN bij GEKEURD. Staat het voornemen al op UITGEVOERD of GESTAAKT (een tweede
+         aanvraag op hetzelfde voornemen), dan gaat deze handtekening nergens over: het
+         dossier blijft dan ongemoeid in plaats van een onware reden te krijgen. */
+      const stand = voornemens.vind && voornemens.vind(id) ? voornemens.vind(id).stand : null;
+      if (r.status === 409 && stand && stand !== 'GEKEURD') return r;
       const geenTekenNodig = r.status === 409;
       leg(d, 'tweedeMens', geenTekenNodig
         ? { graad: 'gemeten', uitslag: wie,

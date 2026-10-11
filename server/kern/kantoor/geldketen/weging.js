@@ -15,6 +15,8 @@
 const envelopLaag = require('../../envelop');
 const { KLASSEN } = require('./klassen');
 
+const EINDSTAND = new Set(['GESTAAKT', 'AFGEWEZEN', 'UITGEVOERD']);
+
 function maakWeging({ voornemens, tijd, leg, noteer, bewaar, publiek }) {
   /* De aanroeper in ./klaarzet.js heeft de assen al gevuld en geeft het dossier,
      de envelop, de klasse en de MENS mee. Die laatste staat er apart bij en wordt
@@ -27,6 +29,15 @@ function maakWeging({ voornemens, tijd, leg, noteer, bewaar, publiek }) {
       const opgesteld = voornemens.stelOp({ actor: mens.naam, handeling: o.handeling,
         doel: dossier.doel, stappen: o.stappen, sleutel: o.sleutel });
       if (!opgesteld.ok) return opgesteld;
+      /* EEN VOORNEMEN IN EEN EINDSTAND OPENT GEEN NIEUWE BAAN. Dezelfde sleutel geeft
+         hetzelfde voornemen terug, ook als het al GESTAAKT, AFGEWEZEN of UITGEVOERD is --
+         en dan zette deze baan er een nieuw dossier naast en ging de aanroeper door naar
+         een tweede mens die een voornemen tekende dat nooit meer kon lopen. Gevonden bij
+         de tegenlezing van de reisteruggave (11 oktober 2026). Er wordt hier niets
+         bewaard: de aanroeper krijgt de stand en beslist zelf (een nee wordt geen ja). */
+      if (opgesteld.hergebruikt && EINDSTAND.has(opgesteld.voornemen.stand))
+        return { status: 409, eindstand: true, voornemen: opgesteld.voornemen,
+          error: 'Dit voornemen staat al op ' + opgesteld.voornemen.stand + '; het wordt niet opnieuw klaargezet.' };
       const vid = opgesteld.voornemen.id;
       dossier.voornemen = vid;
       leg(dossier, 'voornemen', { graad: 'gemeten', uitslag: opgesteld.voornemen.stand,

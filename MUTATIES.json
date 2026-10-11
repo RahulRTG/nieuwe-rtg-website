@@ -403,6 +403,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "agentinstructies.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/agentinstructies.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "ai-budget.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6453,6 +6461,14 @@
         "scripts/lib/invoerproef.js"
       ],
       "posities": 1
+    },
+    "invoerspoor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/invoerspoor.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 9,
+      "geprobeerd": 1
     },
     "inzagebewaring.test.js": {
       "soort": "puur",
@@ -15966,6 +15982,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "toetsroutes.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/toetsroutes.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "token-domeinscheiding.test.js": {
       "soort": "server",

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T16:12:52.197Z",
-    "commit": "a650db65",
+    "op": "2026-10-11T17:04:28.094Z",
+    "commit": "1d66bae0",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/voltooiproef.js",
@@ -17,6 +17,279 @@
     "storing": "SIGTERM (deploy) en SIGKILL (stroomstoring) op dezelfde datamap; een afgebroken verzoek met AbortController"
   },
   "apps": {
+    "link:ik": {
+      "scenario": "scripts/lib/voltooi/ik.js",
+      "ingang": "/apps/ik.html",
+      "persona": "lid",
+      "belofte": "een lid zegt zelf hoe het aangesproken wil worden en hoe elk scherm zich hoort te gedragen, en dat geldt op elk scherm en op elk toestel -- ook na een herstart of een crash",
+      "grens": "De proef loopt over de routes die het scherm aanroept en de gedeelde leesroute van het profiel, niet door het scherm zelf; of shared/basis.js het profiel ook UITVOERT, is niet gemeten. De kluiskolom wordt niet ontsleuteld: dat de waarde klopt, bewijst de route; dat hij op schijf veranderde en versleuteld is, bewijst de opslag. Fase, omgang en geloof zijn niet beproefd. Er is geen Redis of PostgreSQL in de wereld.",
+      "herstarts": {
+        "netjes": 1,
+        "crash": 1
+      },
+      "afgebroken": null,
+      "omgeving": null,
+      "post": {
+        "gevangen": 1,
+        "naarBuiten": 0,
+        "onderwerpen": [
+          "mail: Bevestig uw e-mailadres bij Rahul Travel Group"
+        ]
+      },
+      "voltooibaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "een nieuw lid heeft geen voornaamwoord en het standaardprofiel",
+            "stand": "gesloten",
+            "ziet": "voornaamwoord \"\", tekst normaal, contrast normaal",
+            "ms": 21
+          },
+          {
+            "nr": 2,
+            "wat": "het lid zet zijn voornaamwoord en aanhef in eigen woorden",
+            "stand": "gesloten",
+            "ziet": "\"hen/die 2pg5h\", \"Beste 2pg5h\"",
+            "ms": 43
+          },
+          {
+            "nr": 3,
+            "wat": "het lid zet groot en hoog contrast; elk ander scherm leest dat via de gedeelde leesroute",
+            "stand": "gesloten",
+            "ziet": "zet 200; leesroute: tekst groot, contrast hoog, beweging normaal",
+            "ms": 13
+          },
+          {
+            "nr": 4,
+            "wat": "een onbekende keuze wordt nooit opgeslagen, en de andere instellingen blijven staan",
+            "stand": "gesloten",
+            "ziet": "status 200, tekst normaal, contrast hoog",
+            "ms": 25
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 4,
+          "gesloten": 4,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "persistent": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "na een nette herstart staan voornaamwoord, aanhef en profiel er nog",
+            "stand": "gesloten",
+            "ziet": "beeld byte voor byte gelijk",
+            "ms": 64
+          },
+          {
+            "nr": 2,
+            "wat": "een nieuwe sessie (een andere browser) krijgt hetzelfde profiel",
+            "stand": "gesloten",
+            "ziet": "\"hen/die 2pg5h\", tekst groter, beweging stil",
+            "ms": 184
+          },
+          {
+            "nr": 3,
+            "wat": "in de kluis (rtg.db, buiten de server om) veranderde precies een rij, versleuteld en zonder de klare tekst",
+            "stand": "gesloten",
+            "ziet": "1 rij(en) veranderd sinds voor de handeling, klare tekst niet te vinden",
+            "ms": 1
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 3,
+          "gesloten": 3,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "herstelbaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "dubbelklik: dezelfde keuze twee keer geeft dezelfde stand",
+            "stand": "gesloten",
+            "ziet": "200/200, tekst groter, links streep",
+            "ms": 18
+          },
+          {
+            "nr": 2,
+            "wat": "een afgebroken verzoek en daarna opnieuw: de nieuwe stand, de rest onaangetast",
+            "stand": "gesloten",
+            "ziet": "afgebroken (client gaf op), opnieuw 200, \"zij/haar 2pk9f\", aanhef bleef \"Beste 2pg5h\"",
+            "ms": 339
+          },
+          {
+            "nr": 3,
+            "wat": "een crash direct na het zetten: de keuze staat er nog",
+            "stand": "gesloten",
+            "ziet": "zet 200, na SIGKILL contrast normaal, tekst groter",
+            "ms": 5426
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 3,
+          "gesloten": 3,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      }
+    },
+    "link:loopbaan": {
+      "scenario": "scripts/lib/voltooi/loopbaan.js",
+      "ingang": "/apps/loopbaan.html",
+      "persona": "lid",
+      "belofte": "een lid schrijft zijn loopbaan zelf op als reeks die niets wist, deelt een regel met een buitenstaander zonder account en stopt dat delen weer -- ook na een herstart of een crash",
+      "grens": "De proef loopt over de routes die het scherm aanroept plus de leesroute van de buitenstaander, niet door het scherm zelf. Bevestigen door een ander (kantoor, club) zit er niet in: alleen herkomst `zelf` is beproefd. Er is geen Redis of PostgreSQL in de wereld.",
+      "herstarts": {
+        "netjes": 1,
+        "crash": 2
+      },
+      "afgebroken": null,
+      "omgeving": null,
+      "post": {
+        "gevangen": 1,
+        "naarBuiten": 0,
+        "onderwerpen": [
+          "mail: Bevestig uw e-mailadres bij Rahul Travel Group"
+        ]
+      },
+      "voltooibaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "een nieuw lid begint met een leeg ledger, en de zeven kapitalen staan er zonder totaal",
+            "stand": "gesloten",
+            "ziet": "0 feiten, 7 kapitalen",
+            "ms": 36
+          },
+          {
+            "nr": 2,
+            "wat": "een feit met een bedrag wordt geweigerd, met de reden erbij",
+            "stand": "gesloten",
+            "ziet": "400: NOOIT.bedrag: een som geld; die woont in WAARDE.md en kern/rugdekking, nooit hie",
+            "ms": 19
+          },
+          {
+            "nr": 3,
+            "wat": "het lid schrijft een feit op; het staat in de reeks met de dag waarop het gebeurde",
+            "stand": "gesloten",
+            "ziet": "vermogen, 2020-06-30, ingetrokken=false",
+            "ms": 24
+          },
+          {
+            "nr": 4,
+            "wat": "het lid deelt die ene regel; een buitenstaander zonder account leest precies die regel en het voorbehoud",
+            "stand": "gesloten",
+            "ziet": "deel 200, ontvanger 200 ziet \"Diploma hotelschool mv42ptd3kerp\", gebruikt 1x",
+            "ms": 51
+          },
+          {
+            "nr": 5,
+            "wat": "het lid stopt het delen; de buitenstaander krijgt niets meer",
+            "stand": "gesloten",
+            "ziet": "stop 200, ontvanger daarna 404",
+            "ms": 13
+          },
+          {
+            "nr": 6,
+            "wat": "intrekken vraagt een reden, en de regel blijft leesbaar als ingetrokken",
+            "stand": "gesloten",
+            "ziet": "zonder reden 400, met reden 200; regel staat er, ingetrokken=true",
+            "ms": 16
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 6,
+          "gesloten": 6,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "persistent": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "na een nette herstart is de reeks byte voor byte dezelfde, intrekking inbegrepen",
+            "stand": "gesloten",
+            "ziet": "reeks gelijk (2 feiten)",
+            "ms": 20
+          },
+          {
+            "nr": 2,
+            "wat": "een nieuwe sessie (een andere browser) leest dezelfde reeks",
+            "stand": "gesloten",
+            "ziet": "reeks gelijk",
+            "ms": 117
+          },
+          {
+            "nr": 3,
+            "wat": "de regels staan in de opslag zelf (store.db, gelezen buiten de server om)",
+            "stand": "gesloten",
+            "ziet": "1 reeks met deze regel, 1 intrekking erin",
+            "ms": 1
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 3,
+          "gesloten": 3,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "herstelbaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "dubbelklik: hetzelfde feit twee keer wordt een regel, en de tweede keer zegt waarom",
+            "stand": "gesloten",
+            "ziet": "eerste 200, tweede 409, 1 regel(s)",
+            "ms": 17
+          },
+          {
+            "nr": 2,
+            "wat": "een afgebroken verzoek en daarna opnieuw: precies een regel",
+            "stand": "gesloten",
+            "ziet": "afgebroken (status 200), opnieuw 409, 1 regel(s)",
+            "ms": 316
+          },
+          {
+            "nr": 3,
+            "wat": "een crash direct na het opschrijven: wat er stond, staat er nog",
+            "stand": "open",
+            "ziet": "zet 200, na SIGKILL WEG",
+            "ms": 5219
+          },
+          {
+            "nr": 4,
+            "wat": "een crash direct na het intrekken: ingetrokken blijft ingetrokken",
+            "stand": "open",
+            "ziet": "intrek 404, na SIGKILL ingetrokken=null",
+            "ms": 5196
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 4,
+          "gesloten": 2,
+          "open": 2,
+          "stuk": 0
+        },
+        "sluit": false
+      }
+    },
     "link:post": {
       "scenario": "scripts/lib/voltooi/post.js",
       "ingang": "/apps/mijn-post.html",
@@ -28,6 +301,7 @@
         "crash": 2
       },
       "afgebroken": null,
+      "omgeving": null,
       "post": {
         "gevangen": 1,
         "naarBuiten": 0,
@@ -42,28 +316,28 @@
             "wat": "een nieuw lid begint met alles uit: afwezigheid is geen toestemming",
             "stand": "gesloten",
             "ziet": "4 soorten, 0 aan, 4 die nooit uit kunnen",
-            "ms": 13
+            "ms": 16
           },
           {
             "nr": 2,
             "wat": "het lid geeft toestemming voor aanbiedingen per e-mail en sms, met herkomst",
             "stand": "gesloten",
             "ziet": "aan=true, kanalen email+sms, via scherm:voltooiproef",
-            "ms": 15
+            "ms": 13
           },
           {
             "nr": 3,
             "wat": "het lid beperkt het tot e-mail; de geschiedenis zegt gegeven en daarna gewijzigd",
             "stand": "gesloten",
             "ziet": "geschiedenis: gewijzigd, gegeven",
-            "ms": 11
+            "ms": 10
           },
           {
             "nr": 4,
             "wat": "afmelden in een handeling: alles uit, en de intrekking staat erbij",
             "stand": "gesloten",
             "ziet": "2 uitgezet, 0 nog aan, 2 intrekkingen in de geschiedenis",
-            "ms": 23
+            "ms": 25
           }
         ],
         "storingen": [],
@@ -81,22 +355,22 @@
             "nr": 1,
             "wat": "na een nette herstart staat de gegeven toestemming er nog, met hetzelfde tijdstip en dezelfde herkomst",
             "stand": "gesloten",
-            "ziet": "voor: 2026-10-11T16:12:57.055Z via scherm:voltooiproef; na: 2026-10-11T16:12:57.055Z via scherm:voltooiproef",
-            "ms": 19
+            "ziet": "voor: 2026-10-11T17:05:11.419Z via scherm:voltooiproef; na: 2026-10-11T17:05:11.419Z via scherm:voltooiproef",
+            "ms": 21
           },
           {
             "nr": 2,
             "wat": "een nieuwe sessie (een andere browser) leest exact dezelfde geschiedenis",
             "stand": "gesloten",
             "ziet": "geschiedenis byte voor byte gelijk (6 regels)",
-            "ms": 120
+            "ms": 128
           },
           {
             "nr": 3,
             "wat": "de toestemming staat in de opslag zelf (store.db, gelezen buiten de server om)",
             "stand": "gesloten",
-            "ziet": "1 lid met deze toestemming in de kv-opslag, gegeven 2026-10-11T16:12:57.055Z",
-            "ms": 2
+            "ziet": "1 lid met deze toestemming in de kv-opslag, gegeven 2026-10-11T17:05:11.419Z",
+            "ms": 1
           }
         ],
         "storingen": [],
@@ -115,28 +389,28 @@
             "wat": "dubbelklik: dezelfde keuze twee keer is een gebeurtenis, niet twee",
             "stand": "gesloten",
             "ziet": "geschiedenis 6 -> 7",
-            "ms": 20
+            "ms": 23
           },
           {
             "nr": 2,
             "wat": "een afgebroken verzoek en daarna opnieuw: de juiste stand, een regel in de geschiedenis",
             "stand": "gesloten",
             "ziet": "afgebroken (client gaf op), opnieuw 200, geschiedenis 7 -> 8",
-            "ms": 327
+            "ms": 325
           },
           {
             "nr": 3,
             "wat": "een crash direct na het afmelden: wat ingetrokken heette, blijft ingetrokken",
             "stand": "gesloten",
             "ziet": "afmelden 200 (3 uit), na SIGKILL en herstart 0 aan, laatste regel ingetrokken",
-            "ms": 4623
+            "ms": 4614
           },
           {
             "nr": 4,
             "wat": "een crash direct na het geven: wat gegeven heette, staat er nog",
             "stand": "gesloten",
             "ziet": "geven 200, na SIGKILL: aan=true via push",
-            "ms": 4605
+            "ms": 4346
           }
         ],
         "storingen": [],
@@ -147,6 +421,162 @@
           "stuk": 0
         },
         "sluit": true
+      }
+    },
+    "link:reizen": {
+      "scenario": "scripts/lib/voltooi/reizen.js",
+      "ingang": "/apps/reizen-veilig.html",
+      "persona": "lid",
+      "belofte": "een lid deelt een reis tijdelijk met wie het zelf kiest, een zaak ziet hooguit voortgang en nooit een plek, en pauzeren en stoppen werken meteen -- ook na een herstart of een crash",
+      "grens": "De proef loopt over de routes die het scherm aanroept en de leesroute van de zaak, niet door het scherm zelf. Een contact als ontvanger (met exacte plek) zit er niet in, net zo min als het vanzelf verlopen op de eindtijd. De zaak is KIKUNOI uit de zaaiset. Er is geen Redis of PostgreSQL in de wereld.",
+      "herstarts": {
+        "netjes": 1,
+        "crash": 2
+      },
+      "afgebroken": null,
+      "omgeving": {
+        "RTG_MAGNAAT_TEST": "1"
+      },
+      "post": {
+        "gevangen": 1,
+        "naarBuiten": 0,
+        "onderwerpen": [
+          "mail: Bevestig uw e-mailadres bij Rahul Travel Group"
+        ]
+      },
+      "voltooibaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "een Live Circle zonder ontvanger wordt geweigerd, met de reden erbij",
+            "stand": "gesloten",
+            "ziet": "400: Kies minstens één verbonden persoon of betrokken bedrijf.",
+            "ms": 11
+          },
+          {
+            "nr": 2,
+            "wat": "het lid deelt zijn reis met de zaak, en vraagt exacte plek: de zaak krijgt hooguit voortgang",
+            "stand": "gesloten",
+            "ziet": "maak 200, niveau voor de zaak: voortgang",
+            "ms": 6
+          },
+          {
+            "nr": 3,
+            "wat": "de zaak ziet de aankomst, op codenaam en zonder plek",
+            "stand": "gesloten",
+            "ziet": "1 aankomst, status gepland, eigenaar Blauwe Fenix 09D1, plek niet meegestuurd",
+            "ms": 6
+          },
+          {
+            "nr": 4,
+            "wat": "het lid zet \"onderweg\" met een aankomsttijd; de zaak ziet het",
+            "stand": "gesloten",
+            "ziet": "zaak ziet onderweg 19:45",
+            "ms": 11
+          },
+          {
+            "nr": 5,
+            "wat": "pauze: de zaak ziet niets meer; hervatten: weer wel",
+            "stand": "gesloten",
+            "ziet": "tijdens pauze 0, na hervatten 1",
+            "ms": 14
+          },
+          {
+            "nr": 6,
+            "wat": "stop: de zaak ziet niets meer, en het lid ook niet",
+            "stand": "gesloten",
+            "ziet": "stop 200, zaak 0, lid 0",
+            "ms": 8
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 6,
+          "gesloten": 6,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "persistent": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "na een nette herstart staat het lopende moment er nog, met dezelfde stand",
+            "stand": "gesloten",
+            "ziet": "momenten byte voor byte gelijk",
+            "ms": 18
+          },
+          {
+            "nr": 2,
+            "wat": "een nieuwe sessie van het lid en een nieuwe sessie van de zaak zien hetzelfde",
+            "stand": "gesloten",
+            "ziet": "lid: vertraagd, zaak: vertraagd 21:10",
+            "ms": 302
+          },
+          {
+            "nr": 3,
+            "wat": "het moment staat in de opslag zelf (store.db, gelezen buiten de server om), het gestopte ook",
+            "stand": "gesloten",
+            "ziet": "1 lopend, 1 gestopt in de kv-opslag",
+            "ms": 0
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 3,
+          "gesloten": 3,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "herstelbaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "dubbelklik op Pauze: een stand, en de zaak ziet niets",
+            "stand": "gesloten",
+            "ziet": "200/200, gepauzeerd=true, zaak ziet 0",
+            "ms": 30
+          },
+          {
+            "nr": 2,
+            "wat": "dubbelklik op Deel live: hetzelfde formulier twee keer is een Live Circle, niet twee",
+            "stand": "open",
+            "ziet": "200/200, lid heeft er 2, zaak ziet er 2",
+            "ms": 24
+          },
+          {
+            "nr": 3,
+            "wat": "een afgebroken stop en daarna opnieuw: gestopt, en de zaak ziet niets",
+            "stand": "gesloten",
+            "ziet": "afgebroken (status 200), opnieuw 200, zaak ziet 0",
+            "ms": 312
+          },
+          {
+            "nr": 4,
+            "wat": "een crash direct na het delen: de zaak ziet de aankomst nog",
+            "stand": "gesloten",
+            "ziet": "maak 200, na SIGKILL ziet de zaak 1",
+            "ms": 4796
+          },
+          {
+            "nr": 5,
+            "wat": "een crash direct na stop: gestopt blijft gestopt, de zaak ziet niets",
+            "stand": "gesloten",
+            "ziet": "stop 200, na SIGKILL ziet de zaak 0",
+            "ms": 4724
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 5,
+          "gesloten": 4,
+          "open": 1,
+          "stuk": 0
+        },
+        "sluit": false
       }
     },
     "link:sessies": {
@@ -160,6 +590,7 @@
         "crash": 1
       },
       "afgebroken": null,
+      "omgeving": null,
       "post": {
         "gevangen": 1,
         "naarBuiten": 0,
@@ -173,22 +604,22 @@
             "nr": 1,
             "wat": "een tweede toestel logt in, en het lid ziet het in zijn lijst",
             "stand": "gesloten",
-            "ziet": "2 sessies, huidige x5OTkDrN15mC",
-            "ms": 174
+            "ziet": "2 sessies, huidige 4RJBPmD3q7sI",
+            "ms": 170
           },
           {
             "nr": 2,
             "wat": "het lid bevestigt zijn toestel met een sleutel (uitdaging, handtekening)",
             "stand": "gesloten",
             "ziet": "binden 200, sleutelbinding bewezen",
-            "ms": 39
+            "ms": 28
           },
           {
             "nr": 3,
             "wat": "het lid sluit het andere toestel op afstand, met een bezitsbewijs",
             "stand": "gesloten",
             "ziet": "status 200, ingetrokken_tokens 0 -> 1",
-            "ms": 22
+            "ms": 21
           },
           {
             "nr": 4,
@@ -201,8 +632,8 @@
             "nr": 5,
             "wat": "het lid ziet het andere toestel niet meer, en werkt zelf gewoon door",
             "stand": "gesloten",
-            "ziet": "lijst: x5OTkDrN15mC",
-            "ms": 5
+            "ziet": "lijst: 4RJBPmD3q7sI",
+            "ms": 7
           }
         ],
         "storingen": [],
@@ -221,21 +652,21 @@
             "wat": "na een nette herstart blijft het gesloten toestel buiten",
             "stand": "gesloten",
             "ziet": "het andere toestel krijgt 401 na de herstart",
-            "ms": 14
+            "ms": 15
           },
           {
             "nr": 2,
             "wat": "na de herstart werkt de sessie van het lid nog, en de lijst is dezelfde",
             "stand": "gesloten",
-            "ziet": "lijst: x5OTkDrN15mC",
-            "ms": 20
+            "ziet": "lijst: 4RJBPmD3q7sI",
+            "ms": 42
           },
           {
             "nr": 3,
             "wat": "een nieuwe sessie (een andere browser) ziet hetzelfde",
             "stand": "gesloten",
             "ziet": "lijst in de nieuwe sessie: 2 sessies, de gesloten er niet bij",
-            "ms": 155
+            "ms": 122
           },
           {
             "nr": 4,
@@ -261,28 +692,168 @@
             "wat": "dubbelklik: dezelfde sessie nog eens sluiten geeft een nette weigering en verandert niets",
             "stand": "gesloten",
             "ziet": "tweede keer 404 (Die sessie kennen wij niet.), andere toestel 401, lid 200",
-            "ms": 28
+            "ms": 23
           },
           {
             "nr": 2,
             "wat": "een netwerkherhaling met hetzelfde bewijs doet niets twee keer",
             "stand": "gesloten",
             "ziet": "eerste 200, herhaling 401 (Dit bezitsbewijs is al gebruikt.), toestel 401",
-            "ms": 143
+            "ms": 134
           },
           {
             "nr": 3,
             "wat": "een afgebroken sluitverzoek laat geen halve stand na, en opnieuw proberen maakt het af",
             "stand": "gesloten",
             "ziet": "afgebroken (client gaf op), opnieuw 404, toestel 401",
-            "ms": 459
+            "ms": 463
           },
           {
             "nr": 4,
             "wat": "een crash direct na de bevestiging: wat gesloten heette, blijft gesloten",
             "stand": "gesloten",
             "ziet": "sluiten 200, na SIGKILL en herstart: toestel 401, lid 200",
-            "ms": 4763
+            "ms": 4803
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 4,
+          "gesloten": 4,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      }
+    },
+    "link:wonen": {
+      "scenario": "scripts/lib/voltooi/wonen.js",
+      "ingang": "/apps/wonen.html",
+      "persona": "lid",
+      "belofte": "een lid meldt zelf wat er thuis stuk is, ziet het als gemeld (nooit als ingepland zonder vakman), annuleert het, en de historie blijft staan -- ook na een herstart of een crash",
+      "grens": "De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf. Er is geen tweede partij: toewijzing aan een vakman bestaat vandaag niet (kern/woningonderhoud.js), dus de ontvanger is het lid op een ander toestel. De bestanden en de woningkaart van hetzelfde scherm zijn niet beproefd. Er is geen Redis of PostgreSQL in de wereld.",
+      "herstarts": {
+        "netjes": 1,
+        "crash": 2
+      },
+      "afgebroken": null,
+      "omgeving": null,
+      "post": {
+        "gevangen": 1,
+        "naarBuiten": 0,
+        "onderwerpen": [
+          "mail: Bevestig uw e-mailadres bij Rahul Travel Group"
+        ]
+      },
+      "voltooibaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "een nieuw lid heeft geen meldingen",
+            "stand": "gesloten",
+            "ziet": "0 meldingen",
+            "ms": 13
+          },
+          {
+            "nr": 2,
+            "wat": "een melding zonder plek wordt geweigerd, met de reden erbij",
+            "stand": "gesloten",
+            "ziet": "400: Kies of beschrijf de plek in huis.",
+            "ms": 8
+          },
+          {
+            "nr": 3,
+            "wat": "het lid meldt wat er stuk is; de melding staat er als gemeld en niet als ingepland",
+            "stand": "gesloten",
+            "ziet": "gemeld, hoog, keuken",
+            "ms": 8
+          },
+          {
+            "nr": 4,
+            "wat": "het lid ziet dezelfde melding op een ander toestel",
+            "stand": "gesloten",
+            "ziet": "zelfde id, gemeld",
+            "ms": 144
+          },
+          {
+            "nr": 5,
+            "wat": "het lid annuleert; de melding blijft als historie staan",
+            "stand": "gesloten",
+            "ziet": "annuleer 200, staat er als geannuleerd",
+            "ms": 8
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 5,
+          "gesloten": 5,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "persistent": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "na een nette herstart staan dezelfde meldingen er, met dezelfde stand en hetzelfde tijdstip",
+            "stand": "gesloten",
+            "ziet": "lijst gelijk (2 meldingen)",
+            "ms": 42
+          },
+          {
+            "nr": 2,
+            "wat": "een nieuwe sessie leest dezelfde meldingen",
+            "stand": "gesloten",
+            "ziet": "lijst gelijk",
+            "ms": 169
+          },
+          {
+            "nr": 3,
+            "wat": "de meldingen staan in de opslag zelf (store.db, gelezen buiten de server om)",
+            "stand": "gesloten",
+            "ziet": "1 lid met deze melding, geannuleerde melding ook bewaard",
+            "ms": 1
+          }
+        ],
+        "storingen": [],
+        "telling": {
+          "schakels": 3,
+          "gesloten": 3,
+          "open": 0,
+          "stuk": 0
+        },
+        "sluit": true
+      },
+      "herstelbaar": {
+        "schakels": [
+          {
+            "nr": 1,
+            "wat": "dubbelklik: dezelfde melding twee keer is een melding, niet twee",
+            "stand": "gesloten",
+            "ziet": "statussen 200/200, 1 melding(en)",
+            "ms": 16
+          },
+          {
+            "nr": 2,
+            "wat": "een afgebroken verzoek en daarna opnieuw: precies een melding",
+            "stand": "gesloten",
+            "ziet": "afgebroken (client gaf op), opnieuw 200, 1 melding(en)",
+            "ms": 313
+          },
+          {
+            "nr": 3,
+            "wat": "een crash direct na het melden: de melding staat er nog",
+            "stand": "gesloten",
+            "ziet": "meld 200, na SIGKILL gemeld",
+            "ms": 5169
+          },
+          {
+            "nr": 4,
+            "wat": "een crash direct na het annuleren: geannuleerd blijft geannuleerd",
+            "stand": "gesloten",
+            "ziet": "annuleer 200, na SIGKILL geannuleerd",
+            "ms": 4921
           }
         ],
         "storingen": [],
@@ -297,9 +868,9 @@
     }
   },
   "telling": {
-    "apps": 2,
-    "bewijzenGesloten": 6,
-    "bewijzenOpen": 0
+    "apps": 6,
+    "bewijzenGesloten": 16,
+    "bewijzenOpen": 2
   },
-  "sluit": true
+  "sluit": false
 }

@@ -118,7 +118,14 @@ const NAGEKEKEN = {
   'POST /api/meet/maak': 'meet.meetMaak(req.session.key, ...) maakt een NIEUWE vergadering voor B; het id uit het lijf wijst niets aan',
   'POST /api/mijn/post/zet': 'commercieel.zet(req.session.key, soort, kanalen) zet B\'s EIGEN posttoestemming per soort; een soort is een categorie en geen object',
   'POST /api/opvang/vraag': 'de code is de openbare code van een opvang; de aanvraag komt op B\'s eigen codenaam (opvangwijzerVraag(sess, codenaam, ...))',
-  'POST /api/samen/maak': 'samen.maak(req.session.key, codenaam) leest het lijf niet en maakt een NIEUWE kamer voor B'
+  'POST /api/samen/maak': 'samen.maak(req.session.key, codenaam) leest het lijf niet en maakt een NIEUWE kamer voor B',
+
+  /* DE VIERDE OOGST (11 oktober 2026, verse meting voor de bevoegdronde): drie
+     nieuwe kandidaten, met de hand nagelopen in de code; alle drie B die iets
+     van B doet. */
+  'POST /api/auth/aanmeldkanaal': 'leest alleen req.session.account en het veld kanaal; een id uit het lijf wordt nergens gelezen, en de vraag sluit op B\'s EIGEN account (md.aanmeldkanaalOpen)',
+  'POST /api/member/magnaat/stad/maak': 'stad.maak(req.session.key, b) maakt een NIEUWE stad met een eigen code() voor B; een code uit het lijf wordt genegeerd (binnenkomen met een code is /stad/doe)',
+  'POST /api/member/magnaat/stad/verlaat': 'stad.verlaat(req.session.key) zoekt mijnStad(key) op de sessie; de code uit het lijf wordt niet gelezen, B verlaat alleen zijn EIGEN stad'
 };
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;

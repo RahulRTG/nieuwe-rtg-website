@@ -28,10 +28,11 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const REGISTER = 'VOLTOOIPROEF.json';
 const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
-/* DE RATEL: zoveel bewijzen staan op 11 oktober 2026 gesloten (twee
-   onderdelen, drie bewijzen). Alleen omhoog; wie hem verlaagt, schrijft erbij
-   waarom. */
-const GESLOTEN_MINIMUM = 6;
+/* DE RATEL: zoveel bewijzen staan gesloten. 11 oktober 2026: 6 (twee
+   onderdelen, drie bewijzen); dezelfde dag, ronde 2: 16 (zes onderdelen; bij
+   Mijn loopbaan en Reizen & Veilig staat herstelbaar OPEN, met een echte vondst
+   in de schakels). Alleen omhoog; wie hem verlaagt, schrijft erbij waarom. */
+const GESLOTEN_MINIMUM = 16;
 
 const lees = (rel) => fs.readFileSync(path.join(WORTEL, rel), 'utf8');
 

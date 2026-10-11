@@ -25,8 +25,8 @@
    leggen, stuurt niets.
 
    DE AS IS HET TERREIN EN NIET DE MODULE. De vraag is niet of twee bestanden op
-   elkaar lijken maar of WERK, OPLEIDING, OPVANG, VERVOER en WONEN een vorm
-   delen -- dat zijn de vijf terreinen van openingen-kaart.js, en dus de vijf
+   elkaar lijken maar of WERK, OPLEIDING, OPVANG, VERVOER, WONEN en ONDERNEMEN een vorm
+   delen -- dat zijn de zes terreinen van openingen-kaart.js, en dus de zes
    die een aanvoercontract zou moeten dragen. Een terrein dat uit drie modules
    bestaat, telt als EEN terrein; anders bepaalt het aantal bestanden de
    uitslag.
@@ -47,7 +47,7 @@ const { stempel } = require('./lib/stempel');
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'AANVOERVORM.json');
 
-/* De vijf terreinen met de modules die hun aanbod dragen. De lijst staat HIER
+/* De zes terreinen met de modules die hun aanbod dragen. De lijst staat HIER
    en niet in een document, want een lijst in een document loopt achter op de
    code zodra iemand een module hernoemt.
 
@@ -76,7 +76,9 @@ const RUIM = {
   opleiding: /^server\/(kern\/(beroepenbieb|leerstof|onderwijs)|school)/,
   opvang: /^server\/kern\/verzorging\/opvang/,
   vervoer: /^server\/kern\/(vervoer|mobiliteit)/,
-  wonen: /^server\/(kern\/(vastgoed|makelaar|wonen|woning)|routes\/member\/handel\/vastgoed)/
+  wonen: /^server\/(kern\/(vastgoed|makelaar|wonen|woning)|routes\/member\/handel\/vastgoed)/,
+  /* Het zesde terrein (11 oktober 2026): het hele Ondernemers-OS. */
+  ondernemen: /^server\/(kern\/(onderneming|concern)\/|routes\/member\/onderneming)/
 };
 
 /* SMAL: de module die openingen-kaart.js per terrein als `bron` noemt, en verder
@@ -87,7 +89,8 @@ const SMAL = {
   opleiding: /^server\/kern\/beroepenbieb\//,
   opvang: /^server\/kern\/verzorging\/opvang/,
   vervoer: /^server\/kern\/vervoer\.js$/,
-  wonen: /^server\/routes\/member\/handel\/vastgoed\.js$/
+  wonen: /^server\/routes\/member\/handel\/vastgoed\.js$/,
+  ondernemen: /^server\/kern\/onderneming\/(rechtsvorm|plan)/
 };
 
 function terreinVan(lijst, module) {
@@ -143,7 +146,7 @@ function ronde(g, envelop, lijst) {
   paren.sort((x, y) => y.overlap - x.overlap);
 
   return {
-    uitleg: 'Delen de vijf terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de ' +
+    uitleg: 'Delen de zes terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de ' +
       'lezer van scripts/objectmodel.js -- dezelfde als bij de Asset- en Koopbaar-metingen, want een ' +
       'tweede parser maakt de vergelijking waardeloos. De as is het TERREIN en niet de module.',
     grens: 'Dit meet de vorm van de DATA en niet of aanvoer als proces bestaat -- dat is de vraag van ' +
@@ -189,7 +192,7 @@ function meet() {
 
   return {
     stempel: stempel(),
-    uitleg: 'Delen de vijf terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de ' +
+    uitleg: 'Delen de zes terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de ' +
       'lezer van scripts/objectmodel.js -- dezelfde als bij de Asset- en Koopbaar-metingen, want een ' +
       'tweede parser maakt de vergelijking waardeloos. De as is het TERREIN en niet de module, en er ' +
       'wordt over TWEE domeinlijsten gemeten (ruim en smal) zodat de uitslag niet op de lijst drijft.',

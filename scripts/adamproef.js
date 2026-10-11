@@ -532,8 +532,16 @@ async function loop(basis, uit) {
       const { MENSVELDEN } = require('../server/kern/knelpunt/aanvoer');
       const lek = v.filter(x => MENSVELDEN.some(m => Object.prototype.hasOwnProperty.call(x, m)));
       /* Gladgestreken betekent hier: een bron die afkapt zonder te zeggen
-         hoeveel hij vond. Een bron die alles toont mag getoond === gevonden. */
-      const stil = geleverd.filter(g => g.gevonden === null);
+         hoeveel hij vond. Een bron die alles toont mag getoond === gevonden.
+
+         EN EEN BRON DIE NIETS TOONT KAPT NIETS AF. Dit stond op `gevonden ===
+         null` alleen, en dat bleef goed zolang elke bron hier iets leverde. Op
+         11 oktober 2026 kwam de ondernemersbron erbij, die bij een knelpunt
+         buiten zijn terrein -- deze vraag gaat over een diploma -- een lege
+         lijst geeft (0/null), en de schakel zakte met "ZWIJGT" over een bron
+         die niets had weggelaten. Hij staat dan ook in `vondstenBronLeeg`, met
+         de reden; stil is hij niet. */
+      const stil = geleverd.filter(g => g.gevonden === null && g.getoond > 0);
       return {
         klopt: terreinen.length >= 2 && vormen.length === 1 && !lek.length && !stil.length,
         wat: terreinen.join(' + ') + '; ' + v.length + ' vondsten in ' + vormen.length + ' vorm; ' +
@@ -777,6 +785,42 @@ async function loop(basis, uit) {
           (nogEens.data && nogEens.data.herhaald ? ' (door de idem-poort als herhaling herkend)' : '')) };
     });
 
+  /* 19 -- ADAM WIL EEN EIGEN BEDRIJF (11 oktober 2026). De vraag uit de opzet
+     *"een scholier die een onderneming wil starten, kan tegelijk onderwijs- en
+     ondernemersmogelijkheden ontdekken"*, gemeten in plaats van beloofd. Tot
+     die dag leverde dit kale doel werk-, opleiding- en opvangwegen en geen
+     enkele ondernemersweg: kern/onderneming/ bestond, de kaart kende het
+     terrein niet.
+
+     VIER EISEN, en de laatste twee zijn de eigenlijke winst. Er is een
+     ondernemersweg; er is niets weggelaten omdat het doel er niet naar klonk;
+     de ingang van de kaart (de voorlichting) gaat voor hem open zonder
+     account; en de zin die de PLAN-vondst over hem zegt -- "vanuit de
+     gezinsingang dicht" -- is WAAR: met zijn gezinstoken gaat die deur dicht.
+     Een vondst die beweert dat een deur dicht zit, moet je kunnen natrekken.
+
+     WAT DEZE SCHAKEL MET OPZET NIET MEET: of Adam als zeventienjarige een
+     onderneming MAG beginnen. Dat is een juridische vraag en geen vraag van
+     deze laag -- een vondst is geen recht (routes/knelpunt.js, grens 2). */
+  await stap(
+    schakel(19, 'Adam', 'knelpuntmotor', 'noemt alleen een ondernemersdoel; de ondernemersweg staat ertussen en zegt eerlijk welke deur voor hem dicht is'),
+    () => P('/api/rtf/knelpunt', { code: w.code, token: w.adam.token, doel: 'ik wil een eigen bedrijf beginnen' }),
+    async r => {
+      const m = (r.data && r.data.manieren) || [];
+      const ids = m.map(x => x.id);
+      const weg = m.find(x => x.id === 'via-ondernemen');
+      const nietsWeg = ['via-werk', 'via-opleiding', 'via-opvang'].every(id => ids.includes(id));
+      const geenValsOpen = m.length > 0 && m.every(x => x.stand !== 'open');
+      const voorlichting = await fetch(basis + '/api/onderneming/rechtsvormen').catch(() => null);
+      const plan = await P('/api/onderneming/nieuw', { naam: 'Adams idee' }, w.adam.token);
+      const planDicht = plan.status === 401 || plan.status === 403;
+      return { klopt: !!weg && nietsWeg && geenValsOpen && !!voorlichting && voorlichting.status === 200 && planDicht,
+        wat: m.length + ' wegen (' + ids.join(', ') + ')' + (weg ? '' : ', ZONDER ondernemersweg') +
+          (nietsWeg ? '' : ', een weg weggelaten') + (geenValsOpen ? '' : ', een weg heet "open"') +
+          '; voorlichting zonder account: ' + (voorlichting ? voorlichting.status : 0) +
+          '; het plan met zijn gezinstoken: ' + plan.status + (planDicht ? ' (dicht, zoals de vondst zegt)' : ' -- de vondst zegt dicht') };
+    });
+
   return { w, S, M, vacId };
 }
 
@@ -950,7 +994,8 @@ async function meet() {
       'contract -> dienstverband -> loonrun). Vanaf schakel 14 loopt een volwassen lid door waar Adam niet ' +
       'verder kan; goedkeuren en uitbetalen van de loonrun zijn met opzet niet gelopen. De andere ' +
       'terreinen van kern/knelpunt/openingen-kaart.js (opleiding, opvang, vervoer, wonen) hebben eigen naden ' +
-      'en zijn hier niet gelopen. Er komt geen browser aan te pas en geen AI: wat Rahul van dit alles zou ' +
+      'en zijn hier niet gelopen; van `ondernemen` meet schakel 19 alleen de weg en zijn twee deuren, niet ' +
+      'het oprichten zelf. Er komt geen browser aan te pas en geen AI: wat Rahul van dit alles zou ' +
       'MAKEN is niet gemeten, alleen wat de routes eronder doen. Adam is een gezinsprofiel en geen echt ' +
       'kind; deze proef zegt niets over of de mens dit ook zo beleeft.',
     schakels: [], storingen: [], wereld: null

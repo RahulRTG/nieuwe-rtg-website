@@ -53,7 +53,7 @@
    `SOORTEN`: dat woord draagt in deze code al 45 betekenissen over 47 domeinen
    (SEMANTIEK.json, de ergste botsing van het huis), en er komt er geen 46e bij
    voor iets wat prima een eigen naam kan hebben. */
-const TERREINEN = ['werk', 'opleiding', 'opvang', 'vervoer', 'wonen'];
+const TERREINEN = ['werk', 'opleiding', 'opvang', 'vervoer', 'wonen', 'ondernemen'];
 
 /* De woorden waarmee een randvoorwaarde op een terrein wordt gelegd. BEWUST
    DOM, en dat is dezelfde keuze als in kern/stadsweefsel/kansen.js: *"BEWUST
@@ -65,7 +65,12 @@ const WOORDEN = {
   opleiding: ['opleiding', 'diploma', 'cursus', 'leren', 'studie', 'school', 'bevoegdheid', 'certificaat'],
   opvang: ['opvang', 'kinderopvang', 'kind', 'kinderen', 'oppas', 'bso'],
   vervoer: ['vervoer', 'reizen', 'auto', 'ov', 'fiets', 'rijbewijs', 'afstand'],
-  wonen: ['wonen', 'woning', 'huis', 'huur', 'woonruimte', 'adres', 'onderdak']
+  wonen: ['wonen', 'woning', 'huis', 'huur', 'woonruimte', 'adres', 'onderdak'],
+  /* `ondernem` en niet `ondernemen`: dat ene stuk vangt ondernemer, onderneming
+     en ondernemingsplan. `zaak` staat er met opzet NIET in -- het staat in
+     "oorzaak", "zaakwaarnemer" en "een zaak die mij aanneemt", en een
+     werkzoekende die "een zaak" schrijft bedoelt een werkgever. */
+  ondernemen: ['ondernem', 'bedrijf', 'kvk', 'rechtsvorm', 'eenmanszaak', 'zzp', 'eigen zaak']
 };
 
 const KAART = {
@@ -109,6 +114,43 @@ const KAART = {
       'code niet -- geen enkele treffer. Wie hier "wonen" leest als "wij kunnen u aan een woning ' +
       'helpen", leest iets wat er niet staat.',
     bron: 'routes/member/handel/vastgoed.js'
+  },
+  /* HET ZESDE TERREIN (11 oktober 2026), en het is er gekomen omdat de vraag
+     "ik wil een eigen bedrijf beginnen" bij een kaal doel werk-, opleiding- en
+     opvangwegen opleverde en geen enkele ondernemersweg -- terwijl
+     kern/onderneming/ (45 modules) precies dat pad draagt.
+
+     DE INGANG IS DE VOORLICHTING EN NIET HET PLAN, en dat is een keuze over WIE
+     erbij kan. `GET /api/onderneming/rechtsvormen` staat zonder inlog open
+     (routes/member/onderneming.js: *"wat een B.V. van een stichting
+     onderscheidt hoort iemand te kunnen lezen voordat hij een account heeft"*),
+     dus hij gaat ook open voor een gezin dat via /api/rtf/knelpunt vraagt. De
+     verkenning en het plan zitten achter `auth`; die staan als vondst in
+     ./aanvoer-ondernemen.js, MET de zin dat ze een RTG-account vragen.
+
+     WAT ER NIET IS, IS GEZOCHT EN NIET AANGENOMEN. Op 11 oktober 2026 zijn
+     financiering, regelgeving en samenwerking nagezocht. Regelgeving IS er:
+     de verplichtingen per rechtsvorm staan in kern/onderneming/rechtsvorm-nl.js.
+     Financiering niet: geen lening, krediet, subsidie of investeerder buiten
+     het spel Magnaat -- en een spelbank is geen financiering. Samenwerking ook
+     niet: kern/rtfos/ondernemers.js is wat een BEDRIJF de RTFoundation biedt,
+     met een kantoorcode, en geen plek waar een ondernemer een andere vindt.
+     Dat staat hieronder in `dektNiet`, want dat is de zin die een lezer anders
+     zelf invult. */
+  ondernemen: {
+    stand: 'bron', ingang: '/api/onderneming/rechtsvormen',
+    wat: 'De rechtsvormen met wat er per vorm bij hoort: aansprakelijkheid, verplichtingen en de ' +
+      'oprichtingsstappen. Met een RTG-account daarbij een verkenning met stress test en een ' +
+      'ondernemingsplan dat u zelf vastlegt.',
+    dektNiet: 'Dit is voorlichting en uw eigen rekenwerk, geen advies welke vorm bij u past: een ' +
+      'rechtsvorm wordt hier opgegeven en nooit afgeleid. Inschrijven bij de KvK, de notaris en de ' +
+      'belastingdienst doet u zelf; RTG dient niets namens u in. Financiering (een lening, krediet, ' +
+      'subsidie of investeerder) bestaat in deze code niet, en ook geen plek waar u andere ' +
+      'ondernemers, een eerste klant of een samenwerkingspartner vindt: de eerste-klantstap meet hoe ' +
+      'klaar uw zaak staat en de pijplijn volgt offertes die al binnenkomen, maar geen van beide ' +
+      'zoekt klanten voor u.',
+    bron: 'kern/onderneming/rechtsvorm.js (voorlichting, zonder inlog); de verkenning en het plan in ' +
+      'kern/onderneming/ achter een RTG-account.'
   }
 };
 

@@ -263,7 +263,10 @@ test('9. elke ingang die de kaart noemt bestaat echt', () => {
   for (const t of KAART.TERREINEN) {
     const k = KAART.KAART[t];
     if (k.stand !== 'bron') continue;
-    const regel = new RegExp("app\\.post\\(\\s*'" + k.ingang.replace(/\//g, '\\/') + "'\\s*,");
+    /* `get` OF `post`: de ingang van `ondernemen` is de voorlichting, en die is
+       met opzet een open GET (routes/member/onderneming.js). Alleen `post`
+       eisen zou die terechte deur als dood pad aanwijzen. */
+    const regel = new RegExp("app\\.(get|post)\\(\\s*'" + k.ingang.replace(/\//g, '\\/') + "'\\s*,");
     assert.ok(regel.test(bron),
       'de kaart noemt ' + k.ingang + ' als ingang van ' + t + ', maar die route staat niet in server/');
   }

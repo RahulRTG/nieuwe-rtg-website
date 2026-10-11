@@ -3,12 +3,12 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-10-11T11:02:45.525Z",
-  "commit": "8952dd9d6",
+  "op": "2026-10-11T11:54:52.249Z",
+  "commit": "eb86deb6a",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/stillezing.js",
-  "node": "v22.22.0"
+  "node": "v26.10.0"
  },
  "gemeten": {
   "server": {
@@ -21,7 +21,7 @@
    "anders": 1
   },
   "scripts": {
-   "bewijslezingen": 606,
+   "bewijslezingen": 610,
    "metVanger": 105,
    "smeltSamen": 61,
    "zegtHet": 15,
@@ -148,7 +148,7 @@
    },
    {
     "bestand": "scripts/bewijsladder.js",
-    "regel": 387,
+    "regel": 389,
     "leest": [
      "BEWIJSLADDER.json",
      "LADDER.json"
@@ -213,7 +213,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 4932,
+    "regel": 4738,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -221,7 +221,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5421,
+    "regel": 5227,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -229,7 +229,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5687,
+    "regel": 5498,
     "leest": [
      "TEKSTOPPERVLAK.json"
     ],
@@ -237,7 +237,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5863,
+    "regel": 5674,
     "leest": [
      "EERSTEMINUUT.json"
     ],
@@ -245,7 +245,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5875,
+    "regel": 5686,
     "leest": [
      "NORM.json"
     ],
@@ -818,7 +818,7 @@
    },
    {
     "bestand": "scripts/rolronde.js",
-    "regel": 291,
+    "regel": 296,
     "leest": [
      "NORM.json"
     ],

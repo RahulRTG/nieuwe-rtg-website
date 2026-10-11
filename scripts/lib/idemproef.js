@@ -326,6 +326,7 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
        ernaast in het register. Een voorziening die stil een half onderwerp
        achterlaat is erger dan geen. */
     let voorziening = null;
+    let striktLijf = false;
     const maakVoorziening = voorzieningVoor ? voorzieningVoor(r.pad) : null;
     if (maakVoorziening) {
       try {
@@ -350,6 +351,16 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
           : post;
         const v = await maakVoorziening({ post: postHerijkend, tokenVoor, rol: pas, w: wereld || {} });
         if (v && v.fout) voorziening = { stand: 'mislukt', reden: String(v.fout) };
+        /* EEN STRIKT LIJF. Een route met een gesloten contract (kern/document-capability.js
+           weigert elk onbekend veld met 400) kan niet worden gemeten met een lijf waar de
+           proef zelf `idem` en een plausibel lijf in stopt: dan meet hij alleen zijn eigen
+           400. Zo'n voorziening levert `strikt: true` en dan gaat haar lijf ONGEWIJZIGD naar
+           de route, en reist de sleutel in de kop `Idempotency-Key` -- de weg die
+           server/lib/idemsleutels.js ook kent. De marker zelf gaat nooit mee. */
+        else if (v && typeof v === 'object' && v.strikt === true) {
+          const { strikt, ...velden } = v; lijf = velden; striktLijf = true;
+          voorziening = { stand: 'gelukt', velden: Object.keys(velden), strikt: true };
+        }
         else if (v && typeof v === 'object') { lijf = { ...lijf, ...v }; voorziening = { stand: 'gelukt', velden: Object.keys(v) }; }
         else voorziening = { stand: 'mislukt', reden: 'de voorziening gaf niets terug' };
       } catch (e) { voorziening = { stand: 'mislukt', reden: 'de voorziening viel om: ' + e.message }; }
@@ -361,8 +372,12 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
     let inlogOnderweg = null;
     let inlogNamen = null;
 
+    /* De oproep MET sleutel: in het lijf, of bij een strikt lijf in de kop. */
+    const metSleutel = (sleutel) => striktLijf
+      ? post(r.pad, { ...lijf }, tokenVoor(pas), { 'Idempotency-Key': sleutel })
+      : post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(pas));
     const doe = async (sleutel) => {
-      let st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(pas));
+      let st = await metSleutel(sleutel);
       gedaan++;
       /* Een dood token maakt van elke volgende route een 401, en dan meldt de
          ronde "niets gemeten" over honderden routes zonder dat iets klaagt --
@@ -417,7 +432,7 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
               inlogOnderweg = [...new Set([...(inlogOnderweg || []), ...namen])];
             }
           }
-          st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(pas));
+          st = await metSleutel(sleutel);
           gedaan++;
         }
       }

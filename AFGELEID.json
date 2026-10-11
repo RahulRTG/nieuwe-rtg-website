@@ -3,12 +3,12 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-06T21:23:33.869Z",
-  "commit": "e918cbf71",
+  "op": "2026-10-11T11:46:09.046Z",
+  "commit": "5fbde5e5f",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
-  "node": "v22.22.0"
+  "node": "v26.10.0"
  },
  "gemeten": {
   "artefacten": 372,
@@ -21,7 +21,7 @@
   "metEigenaar": 226,
   "afgeleidEigenaarHard": 198,
   "afgeleidGrendelt": 28,
-  "metStempel": 122,
+  "metStempel": 123,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -4625,11 +4625,11 @@
    "naam": "WAAROM.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/waarom.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/waarom.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/waarom.js",
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/waarom.js --vastleggen",
    "grendelt": false,

@@ -32,7 +32,7 @@ const fs = require('fs');
 const path = require('path');
 const { start, WORTEL } = require('./lib/wegwerpserver');
 const { alleRoutes, verdeelOpRol } = require('./lib/routes');
-const { haalSleutels } = require('./lib/proefsleutels');
+const { haalSleutels, LEGE_SLEUTELS } = require('./lib/proefsleutels');
 const { plausibelLijf } = require('./lib/rolproef');
 const wm = require('./lib/waarom');
 const { maakPool } = require('./lib/objectpool');
@@ -86,7 +86,10 @@ if (require.main !== module) { module.exports = {}; return; }
     zet: (t) => { tokens[rol] = t; }
   }])) });
   const roep = (pad, lijf, rol) => wacht.roep(pad, lijf, rol, tokens[rol]);
-  const mist = Object.keys(inlog).filter(r => !tokens[r]);
+  /* De lege sleutels (openbaar, omgeving, eigen-poort) hebben met opzet geen
+     token: dat is de juiste invoer voor routes die zelf hun deur bewaken, en
+     geen mislukte inlog (scripts/lib/proefsleutels.js). */
+  const mist = Object.keys(inlog).filter(r => !tokens[r] && !LEGE_SLEUTELS.includes(r));
   if (mist.length) { console.error('geen token voor: ' + mist.join(', ')); server.klaar(); process.exitCode = 2; return; }
 
   const verdeling = verdeelOpRol(kandidaten, Object.keys(tokens));

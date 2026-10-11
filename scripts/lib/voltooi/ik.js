@@ -125,11 +125,35 @@ async function loop(w, stap) {
    terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf. */
 async function zaai(w) {
   const lid = await nieuwLid(w, 'kikk');
-  const VNW = 'zij/haar ' + merk() + 'kr', AANHEF = 'Geachte ' + merk() + 'kr';
-  await w.post(ZET, { voornaamwoord: VNW, aanhef: AANHEF }, lid.token);
-  await w.post(TOEG_ZET, { tekst: 'groot', contrast: 'hoog' }, lid.token);
-  return { lid, merktekens: [VNW, AANHEF], lezers: [{ pad: IK }, { pad: TOEG }],
-    handelingen: [{ pad: ZET, lijf: { voornaamwoord: 'hen/die ' + merk() + 'kr' } }, { pad: TOEG_ZET, lijf: { beweging: 'stil' } }] };
+  const A = lid.token;
+  const VNW = 'zij/haar ' + merk() + 'kr', AANHEF = 'Geachte ' + merk() + 'kr', EIGEN = 'Eigen traditie ' + merk();
+  await w.post(ZET, { voornaamwoord: VNW, aanhef: AANHEF }, A);
+  await w.post(TOEG_ZET, { tekst: 'groot', contrast: 'hoog' }, A);
+  await w.post('/api/ik/geloof', { tradities: [], eigen: EIGEN, feestdagen: true }, A);
+  /* De veiligheidskring van hetzelfde scherm (shared/veiligheid.js): alleen met
+     echte connecties, dus twee maten die A eerst in de Salon verbindt. */
+  const sleutel = async (tok) => ((await w.post('/api/member/connections', {}, tok)).data || {}).me;
+  const verbind = async (maat) => {
+    const m = { token: (await nieuwLid(w, 'kmaat')).token };
+    m.key = await sleutel(m.token);
+    await w.post('/api/member/connect', { key: m.key }, A);
+    await w.post('/api/member/connect/respond', { key: await sleutel(A), action: 'accept' }, m.token);
+    return m;
+  };
+  const maat = await verbind(), tweede = await verbind();
+  const ADRES = 'kring' + merk() + '@voorbeeld.nl';
+  await w.post('/api/veiligheid/kring/toevoegen', { handle: maat.key }, A);
+  await w.post('/api/veiligheid/kring/mail', { adres: ADRES }, A);
+  return { lid, merktekens: [VNW, AANHEF, EIGEN, ADRES],
+    lezers: [{ pad: IK }, { pad: TOEG }, { pad: '/api/veiligheid/kring' }, { pad: '/api/ik/vandaag', lijf: { lat: 52.37, lon: 4.9 } },
+      { pad: '/api/rahul/stemming' }],
+    handelingen: [{ pad: ZET, lijf: { voornaamwoord: 'hen/die ' + merk() + 'kr' } }, { pad: TOEG_ZET, lijf: { beweging: 'stil' } },
+      { pad: '/api/ik/geloof', lijf: { tradities: [], eigen: EIGEN + ' (bijgewerkt)', feestdagen: false } },
+      { pad: '/api/veiligheid/kring/aanpassen', lijf: { handle: maat.key, locatie: false } },
+      { pad: '/api/veiligheid/kring/toevoegen', lijf: { handle: tweede.key } },
+      { pad: '/api/veiligheid/kring/mail', lijf: { adres: ADRES, weg: true } },
+      { pad: '/api/veiligheid/plek', lijf: { lat: 52.37, lon: 4.9, accu: 20 } },
+      { pad: '/api/veiligheid/kring/verwijderen', lijf: { handle: maat.key } }] };
 }
 
 module.exports = {

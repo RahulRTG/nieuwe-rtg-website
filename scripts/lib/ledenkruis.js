@@ -31,7 +31,7 @@
    groen staan. Daarom zaait een scenario uit scripts/lib/voltooi/ eerst iets
    dat alleen van A is (een tekst die A zelf schreef, de ids van zijn sessies)
    en noemt het merkteken. Zonder zaai zijn de merktekens alleen A's identiteit
-   (codenaam, nummer, e-mail, telefoon, sessie-id), en dan telt een rij alleen
+   (nummer, e-mail, telefoon, sessie-id; de codenaam niet, zie identiteit()), en dan telt een rij alleen
    als een route VAN HET SCHERM ZELF (niet de gedeelde schil) er een droeg.
 
    WAT DIT NIET BEWIJST, en dat staat in elke uitslag: wat het scherm bij het
@@ -154,7 +154,11 @@ function sidVan(token) {
 async function identiteit(w, token) {
   const s = await w.post('/api/state', {}, token);
   const u = (s.data && s.data.state && s.data.state.user) || {};
-  return [u.codename, u.number, u.email, u.phone, sidVan(token)].filter((x) => x && String(x).length >= 6).map(String);
+  /* GEEN codenaam. Die is in dit huis het pseudoniem dat een ander lid met opzet
+     mag zien (de Residence, De Salon); de eerste volle ronde meldde daarop een
+     "lek" in /api/residentie/betreed dat de aanwezigheid in een gedeelde zaal
+     was. Nummer, e-mail, telefoon en sessie-id zijn wel van A alleen. */
+  return [u.number, u.email, u.phone, sidVan(token)].filter((x) => x && String(x).length >= 6).map(String);
 }
 
 /* Een rij meten. `zaai` (optioneel, uit een scenario) geeft { lid, merktekens,

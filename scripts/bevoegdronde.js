@@ -108,7 +108,7 @@ const IDOR_GEBROKEN = new Set(['doorbraak', 'lek']);
 /* Het oordeel over een pad: gebroken, gemeten of open -- met de reden. Een
    schrijfroute (ROLPROEF kent hem) moet in BEIDE registers staan: IDOR zegt of
    een ander lid erbij kan, ROLPROEF of een andere rol het kan. */
-function padOordeel(pad, reg, { zonderRol = false } = {}) {
+function padOordeel(pad, reg, { zonderRol = false, gekruist = null } = {}) {
   const i = reg.idor.get(pad) || [];
   const r = zonderRol ? [] : (reg.rol.get(pad) || []);
   const breuk = i.find((x) => IDOR_GEBROKEN.has(x.staat));
@@ -116,6 +116,11 @@ function padOordeel(pad, reg, { zonderRol = false } = {}) {
   const open = r.find((x) => x.acl !== 'dicht' || x.privacy !== 'schoon');
   if (open) return { stand: 'gebroken', reden: pad + ' staat in ROLPROEF.json met acl ' + open.acl + ' en privacy ' + open.privacy };
   const idorGemeten = i.some((x) => IDOR_GEMETEN.has(x.staat));
+  /* Waar IDOR geen id van A vond om te verwisselen (`onbereikbaar`), heeft de
+     ledenkruis het verzoek van A zelf -- met A's ids erin -- door een ander lid
+     laten naspelen. Voor een route die op de sessie afbakent IS dat het
+     IDOR-experiment; een breuk in IDOR blijft hierboven altijd voorgaan. */
+  if (!idorGemeten && gekruist && gekruist.has(pad)) return { stand: 'gemeten', door: 'ledenkruis' };
   if (!idorGemeten) return { stand: 'open', reden: pad + (i.length ? ' is in IDOR.json ' + i.map((x) => x.staat).join('/') : ' staat niet in IDOR.json') };
   return { stand: 'gemeten' };
 }
@@ -133,6 +138,11 @@ function ledenOordeel(rij, reg, { schermroutes, lees, kruis } = {}) {
   const andereWeg = reg.vervallen.filter((v) => !v.startsWith('ROLPROEF.json'));
   if (andereWeg.length || (rolWeg.length && !kruis)) return { status: 'NIET_GETEST', reden: 'bewijs vervallen: ' + reg.vervallen.join('; ') };
   const zonderRol = rolWeg.length > 0;
+  /* Een lek of een aangetaste stand uit de kruis is een defect, ook als het
+     scherm volgens SCHERMROUTES.json zelf geen route aanroept: het verzoek is
+     in de browser gedaan. */
+  if (kruis && kruis.status === 'GEBLOKKEERD_DOOR_DEFECT') return { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'ledenkruis: ' + kruis.reden };
+  const gekruist = kruis && kruis.status === 'BEWEZEN' ? new Set(kruis.gekruist || []) : null;
   const ing = ingangRoutes(rij.ingang, { schermroutes, lees });
   if (!ing) return { status: 'NIET_GETEST', reden: 'geen eigen adres: een stand of kiezer binnen de ledenapp' };
   const paden = [...ing.exact];
@@ -147,10 +157,9 @@ function ledenOordeel(rij, reg, { schermroutes, lees, kruis } = {}) {
   if (!paden.length) return { status: 'NIET_GETEST', reden: 'het scherm roept zelf geen route aan; er is niets te kruisen' };
   const uniek = [...new Set(paden)].sort();
   const oordelen = uniek.map((p) => (p.endsWith('*')
-    ? { stand: 'open', reden: p + ': de registers kennen geen route onder dit voorvoegsel' } : padOordeel(p, reg, { zonderRol })));
+    ? { stand: 'open', reden: p + ': de registers kennen geen route onder dit voorvoegsel' } : padOordeel(p, reg, { zonderRol, gekruist })));
   const gebroken = oordelen.filter((o) => o.stand === 'gebroken');
   if (gebroken.length) return { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: gebroken[0].reden, routes: paden.length };
-  if (kruis && kruis.status === 'GEBLOKKEERD_DOOR_DEFECT') return { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'ledenkruis: ' + kruis.reden, routes: paden.length };
   const open = oordelen.filter((o) => o.stand === 'open');
   if (open.length) {
     return { status: 'NIET_GETEST', routes: paden.length, open: open.length,
@@ -159,7 +168,6 @@ function ledenOordeel(rij, reg, { schermroutes, lees, kruis } = {}) {
   if (!kruis) return { status: 'BEWEZEN', routes: paden.length, reden: 'alle ' + paden.length + ' routes van het scherm gemeten: ' + GRENS_LID };
   if (kruis.status !== 'BEWEZEN') return { status: 'NIET_GETEST', routes: paden.length, reden: 'ledenkruis: ' + kruis.reden };
   if (zonderRol) {
-    const gekruist = new Set(kruis.gekruist || []);
     const niet = uniek.filter((p) => reg.rol.has(p) && !gekruist.has(p));
     if (niet.length) {
       return { status: 'NIET_GETEST', routes: paden.length,
@@ -167,7 +175,7 @@ function ledenOordeel(rij, reg, { schermroutes, lees, kruis } = {}) {
     }
   }
   return { status: 'BEWEZEN', routes: paden.length,
-    reden: 'alle ' + paden.length + ' routes in IDOR.json gemeten' + (zonderRol ? ' en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet)' : ' en in ROLPROEF.json dicht') +
+    reden: 'alle ' + paden.length + ' routes gemeten (' + oordelen.filter((o) => o.door === 'ledenkruis').length + ' waar IDOR geen id vond, door de ledenkruis met A\'s eigen verzoek)' + (zonderRol ? ' en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet)' : ' en in ROLPROEF.json dicht') +
       '; ledenkruis: ' + kruis.reden };
 }
 

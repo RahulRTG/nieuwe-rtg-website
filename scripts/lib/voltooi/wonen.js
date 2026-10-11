@@ -130,8 +130,20 @@ async function zaai(w) {
   const TITEL = 'Kraan kruisproef ' + merk();
   await w.post(MELD, { titel: TITEL, plek: 'keuken', urgentie: 'hoog' }, lid.token);
   const m = met(await w.post(LIJST, {}, lid.token), TITEL)[0];
-  return { lid, merktekens: [TITEL], lezers: [{ pad: LIJST }],
-    handelingen: [{ pad: ANNULEER, lijf: { id: m && m.id } }, { pad: MELD, lijf: { titel: 'CV kruisproef ' + merk(), plek: 'zolder', urgentie: 'normaal' } }] };
+  /* Het woningdossier van hetzelfde scherm (public/apps/wonen.js): een map en een
+     document. Een ander die A's map hernoemt of een nieuwe versie over A's
+     document zet, tast A's stand aan; dat leest de kruis terug. */
+  const DOSSIER = 'Woningdossier kruisproef ' + merk();
+  const STUK = 'energielabel-' + merk() + '.txt';
+  const tekst = (t) => 'data:text/plain;base64,' + Buffer.from(t).toString('base64');
+  const map = await w.post('/api/bestanden/map', { naam: DOSSIER }, lid.token);
+  const mapId = map.data && map.data.id;
+  const stuk = await w.post('/api/bestanden/upload', { naam: STUK, map: mapId, dataUrl: tekst('label A') }, lid.token);
+  const stukId = stuk.data && stuk.data.id;
+  return { lid, merktekens: [TITEL, DOSSIER, STUK], lezers: [{ pad: LIJST }, { pad: '/api/bestanden/mijn' }],
+    handelingen: [{ pad: ANNULEER, lijf: { id: m && m.id } }, { pad: MELD, lijf: { titel: 'CV kruisproef ' + merk(), plek: 'zolder', urgentie: 'normaal' } },
+      { pad: '/api/bestanden/map', lijf: { id: mapId, naam: DOSSIER + ' (bijgewerkt)' } },
+      { pad: '/api/bestanden/upload', lijf: { id: stukId, dataUrl: tekst('label A, tweede versie') } }] };
 }
 
 module.exports = {

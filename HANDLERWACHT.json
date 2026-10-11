@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-11T07:17:15.526Z",
-  "commit": "216d2c6b",
+  "op": "2026-10-11T08:41:35.087Z",
+  "commit": "fef2dee6",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.0"
  },
@@ -4102,7 +4102,7 @@
   },
   {
    "sleutel": "POST /api/supplier/staff/join",
-   "bestand": "server/routes/supplier/werving/personeel-aanmelden.js:51",
+   "bestand": "server/routes/supplier/werving/personeel-aanmelden.js:56",
    "staat": "openbaar",
    "reden": "personeel meldt zich aan met een uitnodigingscode"
   },

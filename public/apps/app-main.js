@@ -2388,7 +2388,9 @@ var RTG_BOUW = '4807b187';
      de console welke het was. */
   function vulTab(tab){
     const lijst = LADERS_PER_TAB[tab];
-    if (!lijst || gevuldeTabs[tab]) return;
+    /* Zonder account valt er niets te vullen: niet als gevuld markeren, anders
+       blijft de stand leeg als het account even later wel binnen is. */
+    if (!lijst || gevuldeTabs[tab] || !user) return;
     gevuldeTabs[tab] = true;
     // een gratis gebruiker heeft geen reizen, betalen, AI of assets: die
     // tabbladen staan voor hem verborgen, dus halen we er ook niets voor op.
@@ -2574,6 +2576,18 @@ var RTG_BOUW = '4807b187';
         if (knop && knop.style.display !== 'none') beginTab = b.tab;
       }
     } catch(e){}
+    /* EEN ADRES MET EEN STAND (`#tab=salon`, of kort `#ai`): de sprong en
+       andere schermen sturen een lid zo naar een stand van deze app. Hier, en
+       niet met een timer ernaast: die drukte de knop soms vóór het account er
+       was, en dan bleef de stand leeg. Alleen een knop die de pas toont telt;
+       het adres wordt een keer gebruikt. */
+    const adres = /^#(?:tab=([a-z]+)|(ai))$/.exec(location.hash);
+    if (adres){
+      const stand = adres[1] || adres[2];
+      const knop = document.querySelector('.tabbar button[data-tab="' + stand + '"]');
+      if (knop && knop.style.display !== 'none') beginTab = stand;
+      try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+    }
     /* De tabbladen achter het beginscherm halen hun gegevens nu pas op als je
        ze opent -- zie LADERS_PER_TAB in ./app-main-12.js voor waarom, en wat
        er gemeten is. Hier blijven alleen de drie laders staan die aan geen
@@ -5464,27 +5478,10 @@ var RTG_BOUW = '4807b187';
      milliseconden. De elementen dragen data-rtg-klok / data-rtg-datum. */
   if (window.RTGKlok) RTGKlok.alles();
 
-  /* Een app (zoals Balans) kan met #ai terugverwijzen naar de Rahul-chat:
-     na het opstarten openen we dan meteen de AI-tab. */
-  if (location.hash === '#ai') setTimeout(() => {
-    const t = tabKnop('ai');
-    if (t) t.click();
-  }, 600);
-
-  /* DEZELFDE AFSPRAAK, MAAR DAN VOOR ELKE STAND. De sprong (shared/sprong.js)
-     staat op elk scherm van het huis, ook op schermen die deze app niet laden.
-     Wil een lid daar naar een stand die IN deze app woont (Betalen, Salon,
-     Zorg), dan kan de sprong die knop niet indrukken -- hij staat er niet.
-     Hij stuurt dan hierheen met de stand in de hash, en wij drukken hem in.
-
-     Alleen een knop die er ECHT is: een stand die uw pas niet opent, staat
-     niet in de tabbalk, en dan gebeurt er niets. Zo kan een adres uit een
-     bericht nooit een tab openen die u niet hoort te hebben. */
-  const stand = /^#tab=(.+)$/.exec(location.hash);
-  if (stand) setTimeout(() => {
-    const t = tabKnop(decodeURIComponent(stand[1]));
-    if (t) t.click();
-  }, 600);
+  /* Een app (zoals Balans) die met #ai naar de Rahul-chat terugverwijst, en
+     elke stand met `#tab=...`: dat staat in
+     renderAll() (./app-main-12a.js): daar is het account er zeker, en daar
+     wordt al gekozen op welke stand de app opent. */
 
   /* ---------- batterij in de statusbalk, zoals op een telefoon ---------- */
   const bat = $('#osBat'), batVul = $('#osBatVul'), batPct = $('#osBatPct');

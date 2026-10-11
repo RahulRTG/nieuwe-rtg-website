@@ -118,7 +118,8 @@
     }
     /* Een tab of os-app woont IN de leden-app. Staat die om ons heen, dan
        drukken we zijn eigen knop in (een tweede weg zou twee waarheden geven);
-       anders met de stand in de hash, en app-main opent hem daar (28.js). */
+       anders met de stand in de hash, en app-main opent hem daar
+       (renderAll in app-main-12a.js). */
     var knop = d.querySelector('.tabbar button[data-tab="' + rij.sleutel + '"]');
     if (rij.soort === 'tab' && knop) { knop.click(); return; }
     location.href = '/apps/app.html#' + (rij.soort === 'tab' ? 'tab=' : 'os=') + encodeURIComponent(rij.sleutel);

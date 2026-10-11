@@ -81,13 +81,18 @@ module.exports = ctx => {
       claimMemberId: inv.claim && inv.claim.memberId || null,
       claimStaffId: inv.claim && inv.claim.staffId || null };
   });
-  /* N36: wie een manager uit het team haalt, kan zich met zijn oude kassacode
-     niet opnieuw aanmelden. Elke uitnodiging die aan die plek is gekoppeld,
-     wordt ingetrokken; de hersteltak in ./uitnodiging-claim.js weigert dan. */
-  const trekInVoorStaff = (supplierCode, staffId, actor) => transactie(bron => {
+  /* N36: wie een manager uit het team haalt, kan zich met een oude kassacode
+     niet opnieuw aanmelden. Ingetrokken wordt elke geclaimde uitnodiging van
+     die zaak die aan die plek OF aan dat lid hangt: een tweede code die half
+     bleef steken (nooit actief, dus de hersteltak in ./uitnodiging-claim.js
+     laat hem door) is anders een verborgen weg terug, want de manager ziet
+     geclaimde uitnodigingen niet in zijn lijst (herkeuring ronde 7). */
+  const trekInVoorStaff = (supplierCode, staff, actor) => transactie(bron => {
     let n = 0;
     for (const inv of lijstVan(bron, supplierCode)) {
-      if (!inv.claim || Number(inv.claim.staffId) !== Number(staffId)) continue;
+      const c = inv.claim;
+      if (!c || (Number(c.staffId) !== Number(staff.id) &&
+        !(staff.member_id != null && Number(c.memberId) === Number(staff.member_id)))) continue;
       bearer.intrekken(inv.toegang, actor, 'medewerker uit het team gehaald'); n++;
     }
     return { ok: true, ingetrokken: n };

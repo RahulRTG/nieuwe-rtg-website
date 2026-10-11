@@ -24,7 +24,7 @@ app.post('/api/supplier/staff/remove', supplierAuth, async (req, res) => {
   const st = accounts.getStaffById(Number(req.body.staffId));
   if (st && String(st.supplier_code).toUpperCase() === req.supplier.code) {
     // N36: eerst de uitnodiging intrekken; lukt dat niet, dan verandert er niets.
-    try { await Promise.resolve(uitnodiging.trekInVoorStaff(req.supplier.code, st.id, req.actor.name)); }
+    try { await Promise.resolve(uitnodiging.trekInVoorStaff(req.supplier.code, st, req.actor.name)); }
     catch (e) { console.error('[staff-remove] veilige verwerking mislukt'); return res.status(503).json({ error: 'De medewerker kon niet veilig worden verwijderd.' }); }
     accounts.deactivateStaff(st.id);
     // Uit dienst trekt ook de persoonlijke werkmail meteen in.

@@ -99,6 +99,21 @@ test('Mijn loopbaan en het deelbewijs: van een leeg ledger naar een regel die ee
       assert.equal(deel.status, 200);
       assert.ok(deel.body.code, 'er komt een code terug');
 
+      /* 4b. Meenemen: de knop levert het HELE eigen ledger als bestand, met het
+         voorbehoud erin -- en "Waar ik werk" zegt eerlijk dat er nog niets staat. */
+      await page.waitForFunction(() => !/Bezig met laden/.test(document.querySelector('#werk').textContent));
+      assert.match(await page.textContent('#werk'), /nog geen dienstverband/i,
+        'zonder dienstverband zegt het scherm dat, en blijft het niet leeg');
+      const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#meeneem')]);
+      assert.match(dl.suggestedFilename(), /^mijn-loopbaan-\d{4}-\d{2}-\d{2}\.json$/);
+      const bestand = JSON.parse(fs.readFileSync(await dl.path(), 'utf8'));
+      assert.equal(bestand.vorm, 'rtg-loopbaan-afschrift/1');
+      assert.deepEqual(bestand.feiten.map(f => f.wat).sort(),
+        ['Iets dat een vreemde niet hoeft te zien', 'Nederlands kampioen junior'],
+        'het afschrift is het hele eigen ledger, niet een regel');
+      assert.ok(bestand.nietZegt.some(z => /niet ondertekend/i.test(z)),
+        'het bestand zegt zelf dat het geen ondertekend bewijs is');
+
       /* 5. En nu de andere kant: een browser ZONDER token, zoals een bond hem
          opent. Een eigen context, want een gedeelde zou de sessie van het lid
          meenemen en dan bewijst dit scherm niets. */

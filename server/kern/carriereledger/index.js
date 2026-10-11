@@ -27,7 +27,7 @@
 
 const R = require('./regels');
 
-const MAX_REGELS = 500;
+const { MAX_REGELS } = R;
 
 function maakCarriereLedger(state) {
   const { db, save, bijeen, inBundel, crypto, schoon, codenaamVan } = state;
@@ -74,23 +74,9 @@ function maakCarriereLedger(state) {
     return r;
   }
 
-  const { feitVan, weggehaald } = require('./projectie');
+  /* alGezet: de dubbelklik-grens, een LEZING van de reeks -- zie ./projectie.js. */
+  const { feitVan, alGezet } = require('./projectie');
 
-  /* DE DUBBELKLIK-GRENS, en hier weegt hij zwaarder dan elders. Een dubbeltik
-     op een agenda geeft rommel die je weghaalt; in een LEDGER kan een regel
-     alleen worden ingetrokken en nooit verdwijnen -- dus een tweede identieke
-     regel vervuilt voorgoed, en juist op de plek die een mens naar buiten
-     toont. De dubbeltik-ronde vond ze allebei (zet: 0 -> 2, bevestig: 0 -> 2).
-
-     Dit is een TOESTANDSCONTROLE en geen duplicaatlaag (MUTATIECONTRACT.md par.
-     5o): wat vaststaat is dat er geen tweede IDENTIEKE regel kan ontstaan. Wijk
-     ergens van af -- een ander woord, een andere dag -- en het is een ander feit
-     dat gewoon doorgaat. Een ingetrokken regel telt niet mee: die opnieuw zetten
-     is een correctie en moet kunnen. */
-  function alGezet(rs, gelijk) {
-    const weg = weggehaald(rs);
-    return rs.some(r => !weg.has(r.id) && gelijk(r));
-  }
 
   /* ---------- schrijven ---------- */
 
@@ -122,7 +108,7 @@ function maakCarriereLedger(state) {
      `door` moet een naam of een zaak zijn: een bevestiging die op niemand terug
      te voeren is, is geen bevestiging (KANTOORMACHT.md -- een spoor dat eindigt
      bij een gedeelde code is een alibi). */
-  function bevestig(key, fid, { herkomst, door, wat } = {}) {
+  function bevestig(key, fid, { herkomst, door, wat, zaak } = {}) {
     if (!R.HERKOMSTNAMEN.includes(herkomst) || herkomst === 'zelf') {
       return { status: 400, error: 'Een bevestiging is `gezien` of `bevestigd`; `zelf` zet de eigenaar.' };
     }
@@ -139,7 +125,8 @@ function maakCarriereLedger(state) {
       return { status: 409, error: 'Deze bevestiging staat er al, van dezelfde partij en met ' +
         'dezelfde tekst. Twee keer hetzelfde bevestigen maakt een feit niet harder.' };
     }
-    const r = schrijfRegel(key, { soort: 'bevestiging', feit: f, herkomst, door: wie, wat: tekst });
+    const r = schrijfRegel(key, { soort: 'bevestiging', feit: f, herkomst, door: wie, wat: tekst,
+      zaak: scho(zaak, 40) || undefined });
     vastleggen();
     return { status: 200, regel: r };
   }
@@ -154,10 +141,12 @@ function maakCarriereLedger(state) {
      voorwerp is precies de vorm die SEMANTIEK.json duur maakt. De ROUTE blijft
      wel /intrek heten -- dat is de taal van buiten, en daar is het onderwerp uit
      het pad al duidelijk. */
-  function trekRegelIn(key, rid, { door, reden } = {}) {
+  function trekRegelIn(key, rid, { door, reden, van } = {}) {
     const rs = reeks(key);
     const doel = rs.find(r => r.id === scho(rid, 20));
     if (!doel || doel.soort === 'intrekking') return { status: 404, error: 'Deze regel staat niet in dit ledger.' };
+    const nee = R.magTerug(doel, van);
+    if (nee) return { status: 403, error: nee };
     if (rs.some(r => r.soort === 'intrekking' && r.doel === doel.id)) {
       return { status: 409, error: 'Deze regel is al ingetrokken.' };
     }
@@ -168,11 +157,11 @@ function maakCarriereLedger(state) {
     return { status: 200, regel: r };
   }
 
-  const { mijn, feit } = require('./projectie')({ reeksKijk, naam });
+  const { mijn, feit, afschrift } = require('./projectie')({ reeksKijk, naam });
 
   const delen = require('./deel')({ eigen, crypto, schoon: scho, save, bijeen, inBundel, feit, naam });
 
-  return { zet, bevestig, intrek: trekRegelIn, mijn, feit, naam,
+  return { zet, bevestig, intrek: trekRegelIn, mijn, feit, naam, afschrift,
     deel: delen.deel, toon: delen.toon, mijnDelen: delen.mijnDelen, stopDelen: delen.stop };
 }
 

@@ -25,7 +25,24 @@ const R = require('./regels');
 const feitVan = (rs, fid) => rs.find(r => r.id === fid && r.soort === 'feit') || null;
 const weggehaald = (rs) => new Set(rs.filter(r => r.soort === 'intrekking').map(r => r.doel));
 
+/* DE DUBBELKLIK-GRENS, en hier weegt hij zwaarder dan elders. Een dubbeltik
+   op een agenda geeft rommel die je weghaalt; in een LEDGER kan een regel
+   alleen worden ingetrokken en nooit verdwijnen -- dus een tweede identieke
+   regel vervuilt voorgoed, en juist op de plek die een mens naar buiten
+   toont. De dubbeltik-ronde vond ze allebei (zet: 0 -> 2, bevestig: 0 -> 2).
+
+   Dit is een TOESTANDSCONTROLE en geen duplicaatlaag (MUTATIECONTRACT.md par.
+   5o): wat vaststaat is dat er geen tweede IDENTIEKE regel kan ontstaan. Wijk
+   ergens van af -- een ander woord, een andere dag -- en het is een ander feit
+   dat gewoon doorgaat. Een ingetrokken regel telt niet mee: die opnieuw zetten
+   is een correctie en moet kunnen. */
+function alGezet(rs, gelijk) {
+  const weg = weggehaald(rs);
+  return rs.some(r => !weg.has(r.id) && gelijk(r));
+}
+
 module.exports = function maakProjectie({ reeksKijk, naam }) {
+  const max = R.MAX_REGELS;
   /* De projectie. Feiten op tijd, elk met zijn bevestigingen eronder en met
      `ingetrokken` AFGELEID -- niet opgeslagen, want dan zou een intrekking de
      oorspronkelijke regel herschrijven. */
@@ -68,8 +85,53 @@ module.exports = function maakProjectie({ reeksKijk, naam }) {
     return f || null;
   }
 
-  return { mijn, feit };
+  /* HET AFSCHRIFT -- "het gaat mee" (PERSONEEL.md par. 8, CARRIERE.md: lock-in
+     door kwaliteit mag, lock-in door gijzeling zakt). Het hele ledger in EEN
+     antwoord dat een mens kan bewaren en meenemen, ook als hij RTG verlaat.
+
+     Twee verschillen met /mijn, en allebei met opzet. Een intrekking draagt hier
+     haar REDEN en wie hem gaf: wie het afschrift buiten RTG leest, kan niet
+     doorvragen waarom een regel er nog staat. En er staat bij wat dit afschrift
+     NIET is -- het is niet ondertekend, dus het bewijst buiten RTG niets uit
+     zichzelf; nakijken gaat per regel met een deelcode (./deel.js). Een
+     afschrift dat zich als bewijs voordoet, is erger dan geen afschrift.
+
+     Er komt geen samenvatting bij (geen aantal jaren, geen totaal per
+     kapitaal): de reeks IS het afschrift, en een getal over een mens kan
+     niemand navertellen (CAR-05). Deelcodes staan er niet in: die bestaan bij
+     ons alleen als afdruk, en een code is een sleutel en geen feit. */
+  function afschrift(key) {
+    const rs = reeksKijk(key);
+    const trek = new Map(rs.filter(r => r.soort === 'intrekking')
+      .map(r => [r.doel, { door: r.door || null, reden: r.reden || null, at: r.at }]));
+    const feiten = bouw(rs).map(f => Object.assign({}, f,
+      { intrekking: trek.get(f.id) || null,
+        bevestigingen: f.bevestigingen.map(b => Object.assign({}, b, { intrekking: trek.get(b.id) || null })) }));
+    /* Geen tijdstempel van het maken: het afschrift is een LEZING, en twee keer
+       vragen hoort hetzelfde te geven (het mutatiecontract noemt hem lezend). De
+       regels dragen hun eigen tijd; de bestandsnaam krijgt de datum op het
+       toestel. */
+    /* De reeks kapt bij `max` regels aan de voorkant (./index.js, schrijfRegel),
+       en houdt alleen de eerste vast. Een ledger dat die grens raakte, kan dus
+       regels missen -- ook een intrekking, en dan staat een ingetrokken feit hier
+       als niet ingetrokken. Of dat GEBEURD is, weet deze lezing niet; wel of het
+       KAN. Dat staat erin in plaats van dat de zinnen hieronder het verzwijgen. */
+    const misschienAfgekapt = !!max && rs.length >= max;
+    return { status: 200, vorm: 'rtg-loopbaan-afschrift/1',
+      mens: naam(key), feiten, misschienAfgekapt, herkomst: R.HERKOMST, kapitalen: R.KAPITALEN, nooit: R.NOOIT,
+      nietZegt: [
+        'Dit afschrift is niet ondertekend. Buiten RTG bewijst het uit zichzelf niets; een lezer kijkt een regel na met een deelcode die u per regel maakt.',
+        'Een bevestiging zegt wat zij zegt en niet meer: per bevestiging staat erbij wat zij wel en niet vaststelt.',
+        'Wat hier niet staat, is niet gebeurd volgens dit ledger -- niet volgens de wereld. Het ledger bevat alleen wat u of een ander erin heeft gezet.',
+        'Een ingetrokken regel is niet gewist: hij staat er met de reden.',
+        'Een ledger bewaart hoogstens ' + max + ' regels en houdt daarboven alleen de eerste vast. Staat ' +
+          '`misschienAfgekapt` op waar, dan kunnen oudere regels ontbreken -- ook een intrekking.'
+      ] };
+  }
+
+  return { mijn, feit, afschrift };
 };
 
 module.exports.feitVan = feitVan;
 module.exports.weggehaald = weggehaald;
+module.exports.alGezet = alGezet;

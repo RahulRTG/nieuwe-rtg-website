@@ -115,4 +115,24 @@ function toets(regel, nu) {
   return null;
 }
 
-module.exports = { KAPITALEN, HERKOMST, NOOIT, KAPITAALNAMEN, HERKOMSTNAMEN, toets, dagGeldig };
+/* `van` zegt WIE terugneemt, en daarmee wat: het lid zijn eigen feit, een
+   zaak alleen haar eigen bevestiging (op zaakcode; een bevestiging van voor
+   die code werd opgeslagen, op de zaaknaam). Zonder `van` kon een zaak die
+   een regel-id kende het feit van het lid intrekken -- en het afschrift toont
+   dan die zaak als degene die het deed. */
+function magTerug(doel, van) {
+  if (!van) return null;
+  if (van.lid) return doel.soort === 'feit' ? null : 'Een bevestiging neemt alleen terug wie hem gaf.';
+  if ('zaak' in van) {
+    const eigen = doel.soort === 'bevestiging' && (doel.zaak ? !!van.zaak && doel.zaak === van.zaak
+      : !!van.zaakNaam && String(doel.door || '').startsWith(van.zaakNaam + ' ('));
+    return eigen ? null : 'Een zaak neemt alleen haar eigen bevestiging terug.';
+  }
+  return null;
+}
+
+/* Hoeveel regels een ledger bewaart; daarboven kapt ./index.js aan de voorkant
+   en houdt hij de eerste vast. ./projectie.js zegt dat in het afschrift. */
+const MAX_REGELS = 500;
+
+module.exports = { KAPITALEN, HERKOMST, NOOIT, KAPITAALNAMEN, HERKOMSTNAMEN, toets, dagGeldig, magTerug, MAX_REGELS };

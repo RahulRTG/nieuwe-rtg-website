@@ -85,6 +85,15 @@ const TIK = Object.freeze({
           'idem-sleutel; een geweigerde betaling geeft haar gebruik terug',
         reden: 'kern/pay/tik.js claimt het gebruik in de collectietransactie VOOR stuur; beproefd in ' +
           'test/kascode-tik-vooraf.test.js, nog niet door de idempotentieproef gemeten' },
+      /* Dit afgeleide gevolg stond er niet, en dat bleef onzichtbaar tot de twee onjuiste
+         claims hierboven weggingen: daarna stond de soort `afgeleid` leeg en zakte dit
+         contract van VOLLEDIG naar GEDEELTELIJK (scripts/gevolgdekking.js, 8 -> 7). Het is
+         geen nieuw gedrag: tikBetaal betaalt via `stuur` in kern/pay/verzoeken.js, en die
+         roept `seintje(aan)` aan -- hetzelfde gevolg dat ./register-pay-stuur.js al draagt. */
+      { soort: 'afgeleid', graad: 'vermoed',
+        wat: 'de getikte ontvanger ziet in zijn app dat er iets veranderd is, zonder te zien wat',
+        reden: 'tikBetaal roept `stuur` aan (kern/pay/verzoeken.js) en die doet `seintje(aan)` na de ' +
+          'boeking: via SSE alleen `{scope:\'pay\'}` naar zijn sessie, de inhoud haalt zijn app zelf op' },
       { soort: 'buiten', graad: 'vermoed',
         wat: 'is er te weinig saldo, dan wordt er eerst bijgeladen langs de betaalaanbieder',
         uitkomsten: ['niet bijgeladen', 'bijgeladen', 'bijladen mislukt'],

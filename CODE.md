@@ -872,3 +872,53 @@ wat een register waard is:
 - Twee keer op rij sprong een dekkingsgetal omhoog zonder dat er iets bij kwam,
   doordat een index alles noemt. Een dekkingspercentage is pas een meting als
   vaststaat wat er NIET onder valt.
+
+---
+
+## 8. De besluiten van 6 oktober 2026
+
+Twee vragen kwamen uit de opzet voor de Architect, en de eigenaar heeft ze
+beantwoord. De uitvoering staat als gefaseerde opdracht in `ARCHITECTOPDRACHT.md`.
+
+**5. Dit ís de Architect van §2 en §7, en geen nieuw subsysteem.** Geen
+"Engineering Intelligence" (die naam botst bovendien met `INTELLIGENTIE.md`),
+geen eigen opslag en geen tweede waarheid. De Architect is de alleen-lezende
+projectie over de registers, wetten en metingen die er al zijn. Elke uitspraak
+die hij doet verwijst naar het register waar hij vandaan komt; een uitspraak
+zonder bron doet hij niet. Grens 4 van §6 geldt onverkort: wie de Architect met
+de hand kan bijwerken, heeft een tweede routelijst gemaakt.
+
+**6. Broncode naar een ontwikkelagent mag, onder een eigen grens.** Besluit 3
+blijft ongewijzigd staan voor alles wat in de RUNTIME zit: de Architect als
+product en elke product-AI krijgen een bronfragment alleen via een lokaal model.
+Voor ontwikkelgereedschap (Claude Code, Codex en dergelijke) geldt een aparte
+grens, en die heeft vijf delen:
+
+1. **Een mens start het.** Nooit automatisch vanuit de runtime, een geplande
+   taak, een webhook of een andere AI.
+2. **Alleen bron.** Geen productiegegevens, geen `.env`, geen sleutels uit
+   `server/data/`, geen uitvoer van een draaiende productieserver.
+3. **Een bewering van een agent is geen bewijs.** Wat hij zegt over veiligheid,
+   dekking of correctheid telt nergens mee tot een deterministische poort het
+   heeft vastgesteld (grens 3 van §6).
+4. **Een besluit van een agent is geen gezag.** Hij merget niet, releaset niet,
+   zet geen poort uit en verlaagt geen ratel. De poorten blijven beslissen.
+5. **Deze grens is geen weg naar de runtime.** De ontwikkelagent is niet de
+   Builder van §2 (die blijft jaren weg), en niets wat voor ontwikkelgereedschap
+   mag, mag daardoor ook voor de Operator of de Architect.
+
+```
+RTG RUNTIME                          RTG ONTWIKKELING
+  Operator    CODE-AI-001,             ontwikkelagent
+              nooit de bron              door een mens gestart
+  Architect   alleen lezen;              geselecteerde bron naar een
+              bronfragment alleen        gekozen agent toegestaan
+              naar een lokaal model      bewering = geen bewijs
+                                         besluit  = geen gezag
+                                         de poorten beslissen
+```
+
+Het onderscheid hoort in code te staan en niet alleen hier:
+`test/codegrens.test.js` houdt de runtime van de bron weg, en de opdracht voegt
+een toets toe die zakt zodra iets onder `server/` de ontwikkelgereedschappen van
+de Architect laadt.

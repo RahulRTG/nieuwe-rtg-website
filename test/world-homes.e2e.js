@@ -59,7 +59,7 @@ test('new homes fit mobile and desktop, use one Edge and retain visible free Fou
         const heading = page.locator(width < 1000 ? '.wh-photo h1:visible' : '.wp-heading h2:visible').first();
         assert.match(await heading.evaluate(e => getComputedStyle(e).fontFamily), /Bodoni/);
         if (width < 1000) {
-          assert.equal(await page.locator('.wp-scene:visible').count(), 0, 'mobile retains its original home, without another scene');
+          assert.equal(await page.locator('.wp-scene:visible').count(), 0, 'mobile retains its original home, without another scene: ' + route + ' @' + width);
           assert.equal(await page.locator('.wh-photo h1:visible').count(), 1, 'one original editorial hero');
         }
         if (route.includes('foundation')) {

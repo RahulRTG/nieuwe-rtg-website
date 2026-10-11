@@ -73,7 +73,7 @@ een marge of een leverancierscijfer bouwt. Het belangrijkste dat het document
 tegenhoudt is een `journeys`-tabel: een reis die mensen, geld, documenten én
 reserveringen BEZIT is de `Asset`-fout opnieuw, en de meting staat er
 (`KETENVORM.json`: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-<!--getal:ketenvorm.actorenTotaal-->33<!--/getal--> gedeelde actoren over vier
+<!--getal:ketenvorm.actorenTotaal-->39<!--/getal--> gedeelde actoren over vier
 ketens). De vorm die wél werkt is die van `kern/levensgraaf/graaf.js` — een
 PROJECTIE met vijf etiketten, hier plus de **herkomst** als zesde. Zeven grenzen
 bovenop die van REIZEN.md, waarvan de drie scherpste: geld wordt klaargezet en
@@ -1621,7 +1621,7 @@ mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanl
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->131<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->113<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->424<!--/getal-->
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->113<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->425<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -2317,7 +2317,7 @@ gat, en hij zit nu in de meting (storing 1 en 7) in plaats van eromheen.
 `KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
 module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.
 Uitkomst over zeven ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
-van <!--getal:ketenvorm.actorenTotaal-->33<!--/getal--> actoren gedeeld
+van <!--getal:ketenvorm.actorenTotaal-->39<!--/getal--> actoren gedeeld
 (gast/zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur tegenover
 aanvrager/kantoor/keurder/dossier/tijd tegenover gezin/Adam/werkgever/mens tegenover fan/festival/publieke wereld) en
 <!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van

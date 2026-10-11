@@ -223,7 +223,7 @@ vrij, **Situation** let op); die worden hier niet herhaald. Dit zijn de zeven di
 uit de uitvoeringskant komen. `SEMANTIEK.json` meet dat dit huis
 <!--getal:semantiek.namen-->131<!--/getal--> namen in meer dan één domein heeft,
 waarvan <!--getal:semantiek.betekenissen-->113<!--/getal--> met meer dan één
-betekenis (samen <!--getal:semantiek.betekenissenTotaal-->424<!--/getal-->
+betekenis (samen <!--getal:semantiek.betekenissenTotaal-->425<!--/getal-->
 betekenissen).
 
 1. **`envelop`** — bezet en gesloten (zie par. 2).
@@ -338,7 +338,7 @@ betekenissen).
 - **Routes als bijproduct.** Kan pas als de capability-laag is **afgeleid**;
   `OBJECTMODEL.json` (71% van de velden hoort bij één domein) en
   `KETENVORM.json` (<!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-  <!--getal:ketenvorm.actorenTotaal-->33<!--/getal--> gedeelde actoren over drie
+  <!--getal:ketenvorm.actorenTotaal-->39<!--/getal--> gedeelde actoren over drie
   ketens) zeggen dat een model eroverheen de `Asset`-fout is.
 
 ---

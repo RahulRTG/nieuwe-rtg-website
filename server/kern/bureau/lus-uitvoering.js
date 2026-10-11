@@ -152,5 +152,30 @@ module.exports = (ctx) => {
     return { status: 200, opdrachten: uit };
   }
 
-  return { lusOnderdeel, lusBevestig, lusVertraging, lusVerstuur, lusKapot, lusAfsluitbaar, lusUitkomst, lusKantoor, lusVoorZaak };
+  /* De zaak bevestigt ZIJN onderdeel. De zaakcode komt uit de sessie; de zaak
+     noemt alleen de case-verwijzing en het onderdeel uit zijn eigen opdrachten.
+     Een onderdeel dat niet van deze zaak is, een besloten of ingetrokken case
+     en een onbekend id geven hetzelfde antwoord: een zaak leert hier niets over
+     een case die hij niet hoort te zien (CON-02). Een omgevallen onderdeel
+     bevestigt hij niet terug -- dat vervangt het kantoor met een alternatief. */
+  function lusZaakBevestig(code, caseRef, onderdeelId) {
+    const nietHier = { status: 404, error: 'Deze opdracht staat niet bij uw zaak.' };
+    if (!code || !caseRef || !onderdeelId) return nietHier;
+    for (const [key, l] of Object.entries(levens.alleLezend())) {
+      if (!(l.cases || []).some(x => x.id === caseRef)) continue;
+      const { c, fout } = vind(key, caseRef);
+      if (fout || c.besloten || c.status === 'ingetrokken') return nietHier;
+      const o = actief(c).find(x => x.id === onderdeelId && x.deelnemer && x.deelnemer.code === code);
+      if (!o) return nietHier;
+      if (o.stand === 'kapot') return { status: 409, error: 'Dit onderdeel is omgevallen; het kantoor zet een alternatief vast.' };
+      if (o.stand === 'bevestigd') return { status: 200, ok: true, stand: o.stand }; // dubbeltik
+      o.stand = 'bevestigd';
+      stap(c, c.status, 'Bevestigd door de zaak: ' + o.wat + '.', 'zaak');
+      save();
+      return { status: 200, ok: true, stand: o.stand };
+    }
+    return nietHier;
+  }
+
+  return { lusOnderdeel, lusBevestig, lusVertraging, lusVerstuur, lusKapot, lusAfsluitbaar, lusUitkomst, lusKantoor, lusVoorZaak, lusZaakBevestig };
 };

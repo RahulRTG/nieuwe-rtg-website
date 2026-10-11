@@ -62,9 +62,9 @@ module.exports = (ctx) => {
       } : null,
       photos: s.photos || [],
       pos: posDay(s.code),
-      // tafelreserveringen: open aanvragen bovenaan, daarna komende bevestigde
+      // open aanvragen bovenaan; een tegenvoorstel houdt een tafel vast en hoort erbij
       reserveringen: (db.data.reserveringen || [])
-        .filter(r => r.supplierCode === s.code && ['aangevraagd', 'bevestigd'].includes(r.status) && r.datum >= vandaag)
+        .filter(r => r.supplierCode === s.code && ['aangevraagd', 'tegenvoorstel', 'bevestigd'].includes(r.status) && r.datum >= vandaag)
         .sort((a, b) => (a.status === b.status ? (a.datum + a.tijd).localeCompare(b.datum + b.tijd) : a.status === 'aangevraagd' ? -1 : 1))
         .slice(0, 40),
       // reviews: het lopende gemiddelde plus de recentste beoordelingen

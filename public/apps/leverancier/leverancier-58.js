@@ -87,6 +87,7 @@
       '<button class="obtn primary h-mt80" data-goto="price">'+T('sup.newprice','Nieuwe prijs doorgeven')+'</button></div>';
     if (has('menu')) extra += '<div class="card"><div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+T('sup.menu','Menukaart')+'</div><div style="margin-top:0.5rem;font-size:0.85rem;color:var(--muted);">'+(state.menu||[]).length+' '+T('sup.dishesvisible','gerechten zichtbaar voor gasten.')+'</div><button class="obtn h-mt80" data-goto="menu">'+T('sup.viewmenu','Bekijk menu')+'</button></div>';
     $('#homeExtra').innerHTML = extra;
+    if (window.RTGZaakLus) RTGZaakLus.teken({ API, toast, esc: escT }); // apps/leverancier-lus.js
     document.querySelectorAll('#content [data-goto]').forEach(b => b.addEventListener('click', ()=>openTab(b.dataset.goto)));
   }
 

@@ -2,9 +2,9 @@
    MUTATIECONTRACT -- de concierge-lus (kern/bureau/lus*.js, CONCIERGE.md).
 
    Deel van server/lib/mutatiecontracten.js; zie de kop daar voor de vorm.
-   Negentien routes: zestien van de lus zelf (vijf aan de kant van het lid,
-   tien aan de kant van het kantoor en een voor de zaak die een onderdeel
-   levert), plus drie op de tafelreservering: tegenvoorstel, doorzetten en het
+   Twintig routes: zeventien van de lus zelf (vijf aan de kant van het lid,
+   tien aan de kant van het kantoor en twee voor de zaak die een onderdeel
+   levert: zijn opdrachten lezen en zijn onderdeel bevestigen), plus drie op de tafelreservering: tegenvoorstel, doorzetten en het
    antwoord van de gast (onderaan, gemeten in test/tafeluitzondering.test.js).
 
    ================== HOE HET GEMETEN IS ==================
@@ -117,7 +117,10 @@ const CONTRACTEN = Object.assign({},
 
   LEEST('POST /api/supplier/concierge/opdrachten', 'bureau.lus.zaak', { klasse: 'AUTHENTICATED',
     uitleg: 'de zaakcode komt uit de sessie (supplierAuth), nooit uit het lijf' },
-  'lusVoorZaak() over levens.alleLezend() en lus-regels.deelnemerBeeld, een positieve lijst velden')
+  'lusVoorZaak() over levens.alleLezend() en lus-regels.deelnemerBeeld, een positieve lijst velden'),
+  BESCHERMD('POST /api/supplier/concierge/bevestig', 'bureau.lus.zaakbevestig', { klasse: 'OBJECT_SCOPED', objectVeld: 'caseRef',
+    uitleg: 'een onderdeel van DEZE zaak (de code komt uit de sessie) in de case uit `caseRef`; een onderdeel van een andere zaak geeft 404' },
+  'Al bevestigd: geen tweede regel; een andere zaak krijgt 404 en de stand beweegt niet.')
 );
 
 /* Tussen ja en nee bij een tafelaanvraag (kern/ervaring/tafeluitzondering.js):

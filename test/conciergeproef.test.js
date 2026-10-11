@@ -1,5 +1,7 @@
-/* DE CONCIERGEPROEF EN ZIJN REGISTER -- sinds 11 oktober 2026 een bron van
-   bewijs voor APPWERKT (het Privékantoor, link:rechterhand).
+/* DE CONCIERGEPROEF EN ZIJN REGISTER -- een ketenproef over de concierge-lus en
+   de tafeluitzondering. Ronde 1 liet hem voltooibaar leveren voor het hele
+   Privékantoor (link:rechterhand); de tegenlezing wees erop dat hij alleen de
+   lus loopt, en sindsdien staat hij in ZONDER_APP (toets 5).
 
    scripts/conciergeproef.js loopt de concierge-lus af (CONCIERGE.md) tegen een
    wegwerpserver en schrijft met `npm run conciergeproef:vast` CONCIERGEPROEF.json.
@@ -47,7 +49,7 @@ test('3. het echte register is bruikbaar als bewijs en spreekt zichzelf niet teg
   /* De grens hoort in het register zelf te staan: wat de proef NIET loopt,
      leest anders als iets wat hij wel bewees. */
   assert.match(reg.grens, /geen browser/);
-  assert.match(reg.grens, /GEEN scherm/);
+  assert.match(reg.grens, /NIET de rest van het Privekantoor/);
 });
 
 test('4. de lezer van APPWERKT leest het echte register als een gesloten keten', () => {
@@ -56,15 +58,29 @@ test('4. de lezer van APPWERKT leest het echte register als een gesloten keten',
   assert.equal(u.status, 'BEWEZEN', REGISTER + ' leest als ' + u.status + ': ' + u.reden);
 });
 
-test('5. het contract wijst het Privékantoor aan, en de proef raakt de routes van zijn scherm', () => {
-  const { CONTRACT } = require('../scripts/lib/appcontract');
-  const c = CONTRACT['link:rechterhand'];
-  assert.ok(c && c.voltooibaar && c.voltooibaar.register === REGISTER, 'link:rechterhand leest dit register niet');
-  /* De koppeling die scripts/lib/bewijsbron.js eist: de proef raakt de
-     lid-routes die het tabblad Zaken (apps/lifestyle-lus.js) aanroept. */
+test('5. het contract beweert alleen wat gelopen is: geen voltooibaar voor het hele Privékantoor', () => {
+  const { CONTRACT, ZONDER_APP } = require('../scripts/lib/appcontract');
+  /* De proef loopt de lus en de tafeluitzondering, niet woning, kring, bezit of
+     mandaat. Een keten die een deelbelofte bewijst levert geen voltooibaar voor
+     de hele app (dezelfde grond als MOMENTPROEF). Wie link:rechterhand weer aan
+     dit register hangt, laat deze toets zakken. */
+  for (const [functie, c] of Object.entries(CONTRACT)) {
+    for (const [naam, b] of Object.entries(c)) {
+      if (naam === 'belofte') continue;
+      assert.notEqual(b.register, REGISTER, functie + ' leest ' + REGISTER + ' als ' + naam + ', maar de proef loopt alleen de lus');
+    }
+  }
+  const z = ZONDER_APP.find(x => x.register === REGISTER);
+  assert.ok(z && /deelbelofte/.test(z.reden) && z.nodig, REGISTER + ' staat niet met reden in ZONDER_APP');
+  /* Wat hij WEL loopt, moet ook echt in de bron staan: de lid-routes van het
+     tabblad Zaken, de verrassing, de zaakroutes en de tafeluitzondering. */
   const scherm = fs.readFileSync(path.join(WORTEL, 'public', 'apps', 'lifestyle-lus.js'), 'utf8');
-  for (const pad of ['lus/intake', 'lus/zaak', 'lus/beslis', 'lus/toelichting']) {
+  for (const pad of ['lus/intake', 'lus/zaak', 'lus/beslis', 'lus/toelichting', 'lus/verrassing']) {
     assert.ok(scherm.includes("'" + pad + "'"), 'het scherm roept ' + pad + ' niet aan');
     assert.ok(bron.includes('/api/member/bureau/' + pad), 'de proef loopt ' + pad + ' niet');
+  }
+  for (const pad of ['/api/supplier/concierge/opdrachten', '/api/supplier/concierge/bevestig',
+    '/api/supplier/reservering/doorzetten', '/api/supplier/reservering/tegenvoorstel', '/api/reservering/tegenvoorstel']) {
+    assert.ok(bron.includes("'" + pad + "'"), 'de proef loopt ' + pad + ' niet');
   }
 });

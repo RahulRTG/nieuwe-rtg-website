@@ -77,5 +77,5 @@ module.exports = (m) => ({
   /* De zaak die een onderdeel levert ziet ALLEEN zijn eigen onderdelen, via een
      positieve lijst velden (lus-regels.js deelnemerBeeld). Een eigen naam, zodat
      de leveranciersroute nooit bij de balie of het dossier van een lid kan. */
-  bureauZaak: { opdrachten: m.lusUit.lusVoorZaak }
+  bureauZaak: { opdrachten: m.lusUit.lusVoorZaak, bevestig: m.lusUit.lusZaakBevestig }
 });

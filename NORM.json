@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 2133,
-    "toetsenNietGemeten": 131,
+    "toetsenNietGemeten": 132,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -165,6 +165,16 @@
     "loopFabricTijdelijk": 168
   },
   "notities": [
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 131,
+      "vervalt": "2027-01-09",
+      "meter": "toetsenNietGemeten 131 -> 132",
+      "reden": "Een nieuwe schermtoets voor de tweede ronde van de concierge-lus (CONCIERGE.md par. 0a): test/conciergezaakscherm.e2e.js. Met de hand nagetrokken: public/apps/lifestyle-lus.js laten meesturen verrassing: false bij een uitgevinkt vakje laat hem zakken op het lijf van het verzoek. De bijbehorende proef is ook gemuteerd: kern/leverancier/state.js zonder de stand tegenvoorstel laat conciergeproef schakel 19 zakken, en lusZaakBevestig zonder zaakcode-toets laat test/conciergelus-dubbel.test.js zakken.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt hem mee; voor de schermtoets hoort er een regel bij in de lijst van scripts/mutatie.js, bevestigd door de motor."
+    },
     {
       "datum": "2026-10-11",
       "soort": "schuld",

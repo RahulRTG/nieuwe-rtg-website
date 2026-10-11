@@ -13,4 +13,12 @@ module.exports = (kern) => {
     try { res.json(Z.opdrachten(req.supplier.code)); }
     catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
+  /* De zaak bevestigt zijn eigen onderdeel (CONCIERGE.md par. 2.7). Wie het
+     deed komt in het activiteitenlog van de zaak; in de case staat "de zaak". */
+  app.post('/api/supplier/concierge/bevestig', supplierAuth, (req, res) => {
+    const r = Z.bevestig(req.supplier.code, String(req.body.caseRef || ''), String(req.body.onderdeel || ''));
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    if (kern.logActivity) kern.logActivity(req.supplier.code, req.actor, 'bevestigde een onderdeel voor De Rechterhand');
+    res.json({ ok: true, stand: r.stand });
+  });
 };

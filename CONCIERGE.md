@@ -1,6 +1,6 @@
 # RTG Concierge — de lus rond een wens
 
-Status: richtingsdocument, 30 september 2026; stap 0 tot en met 8 staan sinds dezelfde dag in de server (par. 0a). Net als `PLATFORM.md`,
+Status: richtingsdocument, 30 september 2026; stap 0 tot en met 8 staan sinds dezelfde dag in de server (par. 0a), en sinds 11 oktober 2026 ook op een scherm voor lid, kantoor en zaak. Net als `PLATFORM.md`,
 `ECONOMIE.md` en `INTELLIGENTIE.md` staat er bij elk onderdeel een van vier
 standen: **staat**, **een stap weg**, **vraagt een besluit** of **jaren weg**.
 Zo ziet niemand de vier voor elkaar aan.
@@ -112,22 +112,54 @@ gedeelde kantoorcode**: de Rendez-vous-routes eisen een kantoormens op naam en
 weigeren met 403, en een `Promise.all` trok die ene weigering het hele scherm
 mee. Elke sectie laadt nu apart en een geweigerde sectie staat er met de reden
 van de server. En de **conciergeproef staat** (`npm run conciergeproef`,
-`CONCIERGEPROEF.json`): vijftien schakels en zes storingen, met een mutatie
-nagetrokken (een verrassing die niet als `discreet` meereist, en een kiesknop
-die het mandaat negeert, laten allebei een schakel zakken). Hij levert via
-`scripts/lib/appcontract.js` het bewijs `voltooibaar` voor het Privékantoor in
-APPWERKT; dat het scherm hem bedient, toetst `test/conciergelusscherm.e2e.js`
-in een echte browser.
+`CONCIERGEPROEF.json`): sinds de tweede ronde twintig schakels en zeven
+storingen, met mutaties nagetrokken (een verrassing die niet als `discreet`
+meereist, een kiesknop die het mandaat negeert, en een zaak die een tegenvoorstel
+niet meer in beeld heeft, laten elk een schakel zakken). Dat de schermen hem
+bedienen, toetsen `test/conciergelusscherm.e2e.js` (lid en kantoor) en
+`test/conciergezaakscherm.e2e.js` (de zaak, de tafel en het lid aan tafel) in
+een echte browser.
+
+**Sinds de tweede ronde (11 oktober 2026) staan ook de twee open stukken**,
+weer op schermen die al eigenaar waren:
+
+| wie | waar | wat hij kan |
+|---|---|---|
+| de zaak die een onderdeel levert | `apps/leverancier.html`, op Vandaag (`apps/leverancier-lus.js`, eigenaar `zaak.beheer`) | zijn opdrachten zien in de positieve veldenlijst van `deelnemerBeeld` (geen codenaam, geen andere leverancier), zien DAT iets discreet is, en zijn eigen onderdeel bevestigen (`/api/supplier/concierge/bevestig`: de zaakcode komt uit de sessie, een onderdeel van een andere zaak geeft 404, in de case staat "Bevestigd door de zaak") |
+| de zaak aan tafel | dezelfde app, de reserveringen (`leverancier-59.js`/`-60.js`) | een andere tijd aanbieden met een vasthoudtermijn, een aanvraag doorzetten met een reden; daarna heeft een medewerker geen Bevestig meer en ziet hij "een manager beslist" |
+| het lid aan tafel | `apps/foodcourt.html` (`apps/foodcourt-tegenvoorstel.js`, eigenaar `horeca.reserveren`) | het tegenvoorstel zien met de gevraagde tijd en de termijn, niet wie het besloot, en ja of nee zeggen; een verlopen voorstel krijgt geen ja-knop en wordt door de server geweigerd |
+
+Wat het bouwen blootlegde: **een tegenvoorstel verdween uit beeld bij de zaak
+zelf.** `kern/leverancier/state.js` gaf de zaak alleen `aangevraagd` en
+`bevestigd`, dus zodra een medewerker 21:15 had aangeboden, stond die
+vastgehouden tafel nergens meer in zijn app. Hij hoort er nu bij; de
+conciergeproef zakt op schakel 19 als hij weer wegvalt (met een mutatie
+nagetrokken).
+
+En drie punten uit de tegenlezing van ronde 1:
+
+- **De verrassingsroute wordt gelopen.** De conciergeproef zet de verrassing
+  uit en weer aan, en kijkt of de zaak `discreet` volgt.
+- **"Nooit `verrassing: false` meesturen" heeft een zakkende toets.**
+  `test/conciergezaakscherm.e2e.js` laat een verrassing uit de ZIN komen met
+  het vinkje uit, leest het lijf dat de browser verstuurt, en de stand die de
+  server ervan maakte. Een scherm dat `false` meestuurt laat hem zakken (met een
+  mutatie nagetrokken).
+- **De conciergeproef levert geen `voltooibaar` meer voor het hele
+  Privékantoor.** Hij loopt de lus en de tafeluitzondering, niet woning, kring,
+  bezit of mandaat. Hij staat daarom in `ZONDER_APP` van
+  `scripts/lib/appcontract.js`, met de reden en wat er nodig is; de grens in het
+  register zegt hetzelfde.
 
 **Wat er NIET staat**, en dat is evenveel:
 
-- **Geen scherm voor de ZAAK.** Een restaurant of bloemist die een onderdeel
-  levert, ziet zijn opdrachten alleen langs `/api/supplier/concierge/opdrachten`;
-  de leverancier-app heeft er nog geen tabblad voor. Een bericht bij een
-  vertraging komt wel aan (als melding), de lijst niet.
-- **Geen scherm voor de tafeluitzondering** (`kern/ervaring/tafeluitzondering.js`:
-  tegenvoorstel en doorzetten naar de manager). Die hangt aan de
-  reserveringsroutes van de zaak en niet aan deze lus.
+- **De zaak kan een onderdeel niet afzeggen of een tegenvoorstel doen** binnen
+  de lus. Ze kan bevestigen; omvallen en vervangen blijft bij het kantoor
+  (`lusKapot`), en een andere tijd loopt langs de tafeluitzondering, niet langs
+  de case.
+- **De tafeluitzondering en de lus kennen elkaar niet.** Een tegenvoorstel op
+  een tafel wordt geen aanbod in een case; het kantoor zet het daar met de hand
+  in. Ze aan elkaar knopen is een nieuwe brug en hoort een eigen besluit.
 - **De routekaart (2.5)** is niet gebouwd; het kantoor noemt een route nog zelf.
 - **Het collega-netwerk (2.6)** en **de kennis over routes (2.16)** wachten op
   B3 en B5.

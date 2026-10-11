@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2442 bestanden en 16717 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2443 bestanden en 16718 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2442 |
-| losse beweringen (`test(...)`) | 16717 |
+| toetsbestanden | 2443 |
+| losse beweringen (`test(...)`) | 16718 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 2 |
+| niets van beide | 3 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -363,7 +363,7 @@ toets omvalt.
 | `conciergelus-kern.test.js` | 4 | gezakt op `===->!==#0` | De concierge-lus op kernniveau, met een klok die je kunt verzetten. Het verval van een aanbod hangt aan de tijd, en een toets die daarvoor een minuut wacht wordt de eerste die iemand overslaat -- dus staat de klok... |
 | `conciergelus-regels.test.js` | 9 | gezakt op `===->!==#0` | De regels van de concierge-lus zonder server (kern/bureau/lus-regels.js en lus-intake.js). Elke toets hoort te zakken als zijn regel sneuvelt; bij de dragende regels staat de mutatie erbij die hem laat zakken. |
 | `conciergelus.test.js` | 3 | gezakt op `liegpoort /api/` | De concierge-lus tegen een echte server (CONCIERGE.md). Een lid vertelt een wens in een zin; het kantoor zoekt, de gewone route weigert, een manager biedt iets anders aan dat twaalf minuten wordt vastgehouden, het... |
-| `conciergeproef.test.js` | 5 | -- | DE CONCIERGEPROEF EN ZIJN REGISTER -- sinds 11 oktober 2026 een bron van bewijs voor APPWERKT (het Privékantoor, link:rechterhand). scripts/conciergeproef.js loopt de concierge-lus af (CONCIERGE.md) tegen een... |
+| `conciergeproef.test.js` | 5 | -- | DE CONCIERGEPROEF EN ZIJN REGISTER -- een ketenproef over de concierge-lus en de tafeluitzondering. Ronde 1 liet hem voltooibaar leveren voor het hele Privékantoor (link:rechterhand); de tegenlezing wees erop dat hij... |
 | `connect.test.js` | 38 | gezakt op `false->true#0` | FOUNDATION CONNECT -- de grenzen die geen ketenproef van buitenaf kan zien. scripts/lusproef.js loopt de lus over een echte server: vijftien schakels en tien storingen. |
 | `connection-constitution.test.js` | 7 | gezakt op `===->!==#0` | Constitutionele tests voor Connection OS. Zij komen boven op de bestaande 58 producttests en vervangen er geen. |
 | `connection-cross-product.test.js` | 1 | gezakt op `liegpoort /api/` | Bewijst dat veiligheid geen productgrens kent. Dit is een aparte suite boven de 58 bevroren producttests, zodat hun baseline zelf ongewijzigd blijft. |
@@ -2173,7 +2173,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-309 bestanden, 538 beweringen.
+310 bestanden, 539 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2219,6 +2219,7 @@ toets omvalt.
 | `concern-routes.e2e.js` | 3 | gezakt op `liegpoort /api/` | RTG CONCERN: DE DEUR. test/concern.test.js toetst de kern zonder server. |
 | `concern-scherm.e2e.js` | 2 | gezakt op `liegpoort /api/` | HET SCHERM VAN RTG CONCERN IN EEN ECHTE BROWSER: van naam tot entiteit met bron. WAAROM DEZE TOETS BESTAAT test/concern.test.js toetst de kern, test/concern-routes.e2e.js de deur -- allebei zonder browser. |
 | `conciergelusscherm.e2e.js` | 1 | -- | DE CONCIERGE-LUS DOOR HET SCHERM (CONCIERGE.md par. 0a) De lus stond sinds 30 september 2026 in de server, met toetsen tegen een echte server (test/conciergelus*.test.js), en had GEEN scherm. |
+| `conciergezaakscherm.e2e.js` | 1 | -- | DE ZAAK IN DE CONCIERGE-LUS, EN TUSSEN JA EN NEE AAN TAFEL -- door het scherm (CONCIERGE.md par. 0a, 2.7-2.9) Ronde 1 bouwde de schermen voor het lid en het kantoor. |
 | `connect-gezinsdeur.e2e.js` | 1 | gezakt op `liegpoort /api/` | ONTDEKKEN VOOR EEN GEZIN -- het scherm neemt de gezinsdeur, niet de ledendeur. Op 24 september 2026 toonde /apps/connect.html een gezinslid in FoundationOS "Niet ingelogd.": het scherm riep alleen /api/connect/* aan... |
 | `connect-routes.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE TWEEENTWINTIG ROUTES VAN FOUNDATION CONNECT, tegen een echte server. test/connect.test.js beproeft de MODULES; deze toets beproeft de weg ernaartoe. |
 | `connect-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | ONTDEKKEN (/apps/connect.html) IN EEN ECHTE BROWSER. test/connect.test.js beproeft de MODULES, test/connect-routes.e2e.js de DEUREN. |

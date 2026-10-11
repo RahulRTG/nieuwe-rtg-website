@@ -34,11 +34,14 @@
 
   const RES_PILL = { aangevraagd:'nieuw', bevestigd:'bereiding', aangekomen:'klaar' };
   function resStatusTekst(st){
-    return st==='aangevraagd'?T('res.st.nieuw','nieuw'):st==='bevestigd'?T('res.bevestigd','bevestigd'):st==='aangekomen'?T('res.st.er','aan tafel'):st==='no-show'?'no-show':st==='afgerond'?T('res.st.weg','vertrokken'):st;
+    return st==='aangevraagd'?T('res.st.nieuw','nieuw'):st==='bevestigd'?T('res.bevestigd','bevestigd'):st==='aangekomen'?T('res.st.er','aan tafel'):st==='no-show'?'no-show':st==='afgerond'?T('res.st.weg','vertrokken'):st==='tegenvoorstel'?T('res.st.tv','andere tijd aangeboden'):st;
   }
   function resRij(r, vandaag){
     const knoppen = [];
-    if (r.status === 'aangevraagd') knoppen.push('<button class="obtn primary js-resok">'+T('res.ok','Bevestig')+'</button>','<button class="obtn warn js-resnee">'+T('sup.reject','Weiger')+'</button>');
+    // tussen ja en nee (kern/ervaring/tafeluitzondering.js): een andere tijd, of doorzetten naar een manager
+    const alleenManager = r.doorgezet && !actor().manager;
+    if (r.status === 'aangevraagd' && !alleenManager) knoppen.push('<button class="obtn primary js-resok">'+T('res.ok','Bevestig')+'</button>','<button class="obtn js-restv">'+T('res.tv','Andere tijd')+'</button>','<button class="obtn warn js-resnee">'+T('sup.reject','Weiger')+'</button>');
+    if (r.status === 'aangevraagd' && !r.doorgezet) knoppen.push('<button class="obtn js-resdoor">'+T('res.door','Zet door')+'</button>');
     if (r.status === 'bevestigd'){
       knoppen.push('<button class="obtn js-restafel">'+(r.tafel?esc(r.tafel):T('res.tafel','Tafel'))+'</button>');
       if (vandaag) knoppen.push('<button class="obtn primary js-reser">'+T('res.er','Gast is er')+'</button>','<button class="obtn warn js-resno">'+T('res.noshow','No-show')+'</button>');
@@ -47,14 +50,14 @@
     return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.5rem;font-size:0.82rem;flex-wrap:wrap;" data-res="'+r.id+'">'+
       '<span><b>'+r.tijd+'</b> · <b class="cn">'+esc(r.customerCodename)+'</b> · '+r.personen+'p'+
         (r.tafel?' ·  '+esc(r.tafel):'')+(r.notitie?' ·  '+esc(r.notitie):'')+(vandaag?'':' · '+r.datum)+
-        (r.zorg?'<span style="display:block;color:#E2B93B;">'+esc(zorgTekst(r.zorg))+'</span>':'')+'</span>'+
+        (r.zorg?'<span style="display:block;color:#E2B93B;">'+esc(zorgTekst(r.zorg))+'</span>':'')+(window.RTGTafelUitz ? RTGTafelUitz.tekst(r, { T, esc }) : '')+'</span>'+
       (knoppen.length ? '<span style="display:flex;gap:0.4rem;flex-shrink:0;">'+knoppen.join('')+'</span>'
         : '<span class="pill '+(RES_PILL[r.status]||'klaar')+'" style="flex-shrink:0;">'+resStatusTekst(r.status)+'</span>')+'</div>';
   }
   async function renderReserveringen(){
     const wrap = $('#resWrap');
     if (!wrap) return;
-    const later = (state.reserveringen || []).filter(r => r.datum > new Date().toISOString().slice(0,10) && ['aangevraagd','bevestigd'].includes(r.status));
+    const later = (state.reserveringen || []).filter(r => r.datum > new Date().toISOString().slice(0,10) && ['aangevraagd','tegenvoorstel','bevestigd'].includes(r.status));
     let plan = null;
     try { plan = await API.call('/supplier/tafelplan', {}); } catch(e){ plan = { reserveringen: [], tafels: [], verwachtePersonen: 0, openAanvragen: 0, zonderTafel: 0 }; }
     if (!plan.reserveringen.length && !later.length && !plan.tafels.length){ wrap.innerHTML = ''; return; }

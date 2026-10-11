@@ -96,21 +96,6 @@ const CONTRACT = {
       instrument: 'scripts/lusproef.js',
       waarom: 'de lusproef loopt de ontdeklus van CONNECT.md over /api/connect/*, de routes die /apps/connect.html zelf aanroept, met twee leden; de gezinsdeur /api/rtf/connect (dezelfde motor) loopt hij niet'
     }
-  },
-  /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
-     scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
-     (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies
-     de lid-routes die de conciergeproef loopt. De proef dekt de lus en niet het
-     hele Privékantoor (woning, kring, bezit, mandaat lopen hier niet mee); dat
-     staat in `waarom` in plaats van weggelaten. */
-  'link:rechterhand': {
-    belofte: 'een lid vertelt een wens in een zin, De Rechterhand regelt hem, en het lid beslist alleen over een concreet voorstel buiten zijn mandaat',
-    voltooibaar: {
-      soort: 'ketenproef',
-      register: 'CONCIERGEPROEF.json',
-      instrument: 'scripts/conciergeproef.js',
-      waarom: 'de conciergeproef loopt de lus van CONCIERGE.md over /api/member/bureau/lus/*, de routes die het tabblad Zaken van /apps/lifestyle.html aanroept, met het kantoor en twee zaken ernaast; de andere tabbladen van het Privékantoor loopt hij niet'
-    }
   }
 };
 
@@ -127,6 +112,15 @@ const ZONDER_APP = [
   { register: 'MOMENTPROEF.json', instrument: 'scripts/momentproef.js',
     reden: 'raakt RTG Media (/api/mediaos/aanwezig/*), maar alleen de deelbelofte volgen en gewekt worden -- niet wat RTG Media als geheel belooft',
     nodig: 'een tweede bron voor de kernbelofte van RTG Media, of een splitsing van die app in MAPPEN' },
+  /* Het Privékantoor (11 oktober 2026). Ronde 1 liet de conciergeproef hier
+     voltooibaar leveren voor link:rechterhand, omdat hij de lid-routes van het
+     tabblad Zaken loopt. De tegenlezing wees erop dat dat te veel beweert: de
+     proef loopt de LUS, en het Privékantoor belooft meer (woning, kring, bezit,
+     mandaat). Een keten die een deelbelofte bewijst, levert geen voltooibaar
+     voor de hele app -- dezelfde grond als MOMENTPROEF hierboven. */
+  { register: 'CONCIERGEPROEF.json', instrument: 'scripts/conciergeproef.js',
+    reden: 'loopt de concierge-lus over /api/member/bureau/lus/* (het tabblad Zaken van /apps/lifestyle.html), met kantoor en zaak ernaast -- een deelbelofte van het Privékantoor; woning, kring, bezit en mandaat loopt hij niet',
+    nodig: 'een bron voor de kernbelofte van het Privékantoor als geheel, of een eigen ingang in MAPPEN voor de Zaken van De Rechterhand' },
   { register: 'TOELATINGSPROEF.json', instrument: 'scripts/toelatingsproef.js',
     reden: 'de klant is geen lid en de keten loopt over kantoor en aanmeldbalie; MAPPEN kent alleen lid- en gezinswerelden',
     nodig: 'niets aan de keten -- dit bewijs hoort bij een zaak- of kantoorregister, niet bij APPWERKT' },

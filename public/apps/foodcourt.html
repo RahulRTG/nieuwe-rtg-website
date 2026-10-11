@@ -115,6 +115,7 @@
     <button type="button" class="terug" id="intentForget">Nieuwe avond</button>
     <p id="intentStatus" role="status">U bepaalt of datum, gezelschap en zoekkeuzes tijdelijk meegaan.</p>
   </section>
+  <section id="tvLijst" aria-label="Een andere tijd aangeboden" aria-live="polite"></section>
   <h2 class="night-title">Voor u gevonden</h2>
   <div class="chips" id="keukens"></div>
   <div class="lijst" id="lijst"></div>
@@ -304,5 +305,6 @@ if (TOKEN) RTGDinnerIntent.init(TOKEN,contextLees,contextZet).then(laad);
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
 <script src="/apps/eten-uitgaan-voorzijde.js"></script>
+<script src="/apps/foodcourt-tegenvoorstel.js"></script>
 </body>
 </html>

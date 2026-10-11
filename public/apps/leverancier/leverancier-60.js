@@ -42,6 +42,7 @@
       const id = el.dataset.res;
       const ok = el.querySelector('.js-resok'); if (ok) ok.addEventListener('click', () => doe('/supplier/reservering/beslis', { id, action:'bevestig' }, ''+T('res.oktoast','Reservering bevestigd; de gast hoort het meteen.')));
       const nee = el.querySelector('.js-resnee'); if (nee) nee.addEventListener('click', () => doe('/supplier/reservering/beslis', { id, action:'weiger' }, T('res.neetoast','Reservering geweigerd.')));
+      if (window.RTGTafelUitz) RTGTafelUitz.bind(el, id, doe, T);
       const tf = el.querySelector('.js-restafel'); if (tf) tf.addEventListener('click', () => {
         const namen = plan.tafels.map(t => t.name);
         const keuze = window.prompt(T('res.tafelp','Welke tafel?')+' ('+namen.join(', ')+')');

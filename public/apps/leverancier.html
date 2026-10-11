@@ -113,6 +113,9 @@
   .view .sub{margin-top:0.35rem;font-size:0.82rem;color:var(--muted);}
 
   .card{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem 1.2rem;margin-top:0.9rem;}
+  /* de concierge-lus en de tafeluitzondering (apps/leverancier-lus.js, -tafeluitzondering.js) */
+  .lus-kop{display:flex;justify-content:space-between;align-items:center;gap:0.6rem;flex-wrap:wrap;}
+  .res-uitz{display:block;}
   .stat{display:flex;gap:0.8rem;margin-top:0.9rem;}
   .stat .b{flex:1;background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;}
   .stat .b .l{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
@@ -787,6 +790,7 @@
         <p class="sub" id="homeSub"></p>
         <div class="stat" id="homeStat"></div>
         <div id="homeExtra"></div>
+        <div id="lusOpdrachten"></div>
       </div>
       <div class="view" data-view="orders">
         <h2 data-i18n="sup.v.orders">Bestellingen</h2>
@@ -1147,6 +1151,8 @@
 <script src="/apps/leverancier-pr.js"></script>
 <script src="/apps/leverancier-pr-dossier.js"></script>
 <script src="/apps/leverancier-kamer.js"></script>
+<script src="/apps/leverancier-lus.js"></script>
+<script src="/apps/leverancier-tafeluitzondering.js"></script>
 <script src="/apps/leverancier-gebouwplus.js"></script>
 <script src="/apps/leverancier-gebouwrapport.js"></script>
 <script src="/apps/leverancier-gebouwpand.js"></script>

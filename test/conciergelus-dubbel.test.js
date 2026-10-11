@@ -78,6 +78,20 @@ test('elke schrijfroute van de lus laat na twee gelijke aanroepen de stand van e
   assert.equal(bb.status, 400, 'beslis: er ligt geen tweede voorstel (geen dedup: het lijf noemt het voorstel niet)');
   const { a: on } = await tweeKeer('onderdeel', k('/office/bureau/lus/onderdeel', { wat: 'Chauffeur', zaak: 'TRANSIT', van: '19:30', duurMin: 20 }));
   await tweeKeer('bevestig', k('/office/bureau/lus/bevestig', { onderdeel: on.d.onderdeel.id }));
+  // de zaak bevestigt ZIJN onderdeel: twee keer is een keer, en een andere zaak bereikt het niet
+  const zaakTok = async (code) => {
+    const ro = (await roep('/supplier/roster', { code })).d.staff || [];
+    const man = ro.find(x => x.role === 'manager') || ro[0];
+    return (await roep('/supplier/login', { code, staffId: man && man.id, pin: '1234' })).d.token;
+  };
+  const { a: taart } = await tweeKeer('onderdeel voor de zaak', k('/office/bureau/lus/onderdeel', { wat: 'Taart', zaak: 'KIKUNOI', van: '21:30', duurMin: 10 }));
+  const zaakLijf = { caseRef: id, onderdeel: taart.d.onderdeel.id };
+  const vreemd = await roep('/supplier/concierge/bevestig', zaakLijf, await zaakTok('PONTO'));
+  assert.equal(vreemd.status, 404, 'een andere zaak bevestigt dit onderdeel niet: ' + JSON.stringify(vreemd.d));
+  const kiku = await zaakTok('KIKUNOI');
+  await tweeKeer('zaak bevestigt', () => roep('/supplier/concierge/bevestig', zaakLijf, kiku));
+  assert.ok((await roep('/office/bureau/lus', { key, id }, kant)).d.zaak.onderdelen.some(o => o.wat === 'Taart' && o.stand === 'bevestigd'),
+    'na de zaak staat het onderdeel bevestigd');
   const { a: vt } = await tweeKeer('vertraging', k('/office/bureau/lus/vertraging', { onderdeel: on.d.onderdeel.id, minuten: 15 }));
   const gezien = vt.d.klaar.berichten.map(m => m.id);
   const { b: vs } = await tweeKeer('verstuur', k('/office/bureau/lus/verstuur', { klaar: vt.d.klaar.id, gezien }));

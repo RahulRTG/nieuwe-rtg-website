@@ -15,7 +15,7 @@
 
    DE REST IS `zelfdeVerzoek`, en de routes zijn daar ZELF ook tegen bestand:
    de handlers herkennen een herhaling (neem, weigering, aanbod, onderdeel,
-   bevestig, vertraging, kapot, doorzetten) of weigeren hem op de toestand
+   bevestig door kantoor of zaak, vertraging, kapot, doorzetten) of weigeren hem op de toestand
    (kies, verstuur, het antwoord op een tegenvoorstel). Binnen
    het venster krijgt een woordelijk gelijke herhaling dus het eerste antwoord
    terug (200, `herhaald: true`); daarbuiten, of met een ander lijf, draait de
@@ -44,6 +44,7 @@ const SLEUTELS = {
   'POST /api/office/bureau/lus/vertraging': ZELFDE,
   'POST /api/office/bureau/lus/verstuur': ZELFDE,
   'POST /api/office/bureau/lus/kapot': ZELFDE,
+  'POST /api/supplier/concierge/bevestig': ZELFDE,
   'POST /api/supplier/reservering/tegenvoorstel': ZELFDE,
   'POST /api/supplier/reservering/doorzetten': ZELFDE,
   'POST /api/reservering/tegenvoorstel': ZELFDE

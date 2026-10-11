@@ -2020,57 +2020,24 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
   const { PUBLIEK, POORTWACHT } = require('./lib/publiek');
 
   let gaten = 0, viaMw = 0, viaBinnen = 0, totaal = 0;
-  /* DE STAART NIET MEE-MATCHEN. Hier stond ([\s\S]{0,800}) in het patroon zelf,
-     en dat CONSUMEERT die 800 tekens: exec() zoekt daarna verder voorbij de
-     staart en slaat elke route over die er binnen valt. Uitkomst: 709 van de
-     ~1900 routes bekeken, en netjes "alles in orde" gemeld. Een regel die een
-     fractie ziet en volledigheid suggereert is precies wat deze regel moet
-     tegenhouden -- gevonden doordat een mutatie NIET beet (LAT.md regel 2). */
-  const RE = /app\.(get|post|put|delete|patch)\(\s*['"](\/api\/[^'"]*)['"]\s*,/g;
+  /* HET OORDEEL PER ROUTE staat in ./lib/poortoordeel.js, met de uitleg over
+     het patroon, het venster en de kale 401 erbij: zo kan een toets het op
+     een paar regels bron nagaan (test/poortoordeel.test.js) zonder deze hele
+     keuring te draaien. Hier blijven het lezen, de tellers en de melding. */
+  const { beoordeelBron } = require('./lib/poortoordeel');
   const gezien = new Set();        // publieke paden die de lijst echt nodig hadden
   const bestaat = new Set();       // alle /api-paden die we tegenkwamen
   loop(path.join(ROOT, 'server'), /\.js$/, f => {
     const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
-    let m;
-    while ((m = RE.exec(bron))) {
+    for (const r of beoordeelBron(bron, { poortMw: POORT_MW, poortBinnen: POORT_BINNEN, publiek: PUBLIEK })) {
       totaal++;
-      const pad = m[2];
-      /* HET VENSTER STOPT BIJ DE VOLGENDE ROUTE. Zonder die knip keek deze
-         regel 800 tekens vooruit en liep daarmee de BUURMAN in: een route zonder
-         poort werd goedgekeurd omdat de route eronder ergens een 401 teruggaf.
-         Precies dat gebeurde bij /api/aanmeld/start, en het kwam pas aan het
-         licht doordat een `await` van zes tekens de 401 van de buurman net
-         buiten het venster duwde -- een groene regel die aan een toevallige
-         tekstafstand hing. Valse goedkeuring is bij deze regel de gevaarlijke
-         richting; een venster dat over de grens kijkt is er een bron van. */
-      const ruw = bron.slice(m.index + m[0].length, m.index + m[0].length + 800);
-      const volgende = ruw.search(/app\.(get|post|put|delete|patch)\(\s*['"]/);
-      const staart = volgende > 0 ? ruw.slice(0, volgende) : ruw;
-      bestaat.add(pad);
-      const knip = staart.search(/=>|function\s*\(/);
-      const voor = knip > 0 ? staart.slice(0, knip) : staart.slice(0, 80);
-      if ([...voor.matchAll(/([A-Za-z_$][\w$]*)/g)].some(x => POORT_MW.has(x[1]))) { viaMw++; continue; }
-      /* EERST TE SLIM GEWEEST. Hier stond ook een heuristiek op "staat er
-         idToken/token/sleutel/code in het lijf" als bewijs van een poort. Dat
-         keurde meteen een handvol routes goed die alleen een BEDRIJFSCODE uit
-         de body lezen -- en dat is geen geloofsbrief. Valse goedkeuring is de
-         gevaarlijke richting bij deze regel: een gemiste melding is stil.
-         Routes die hun bewijs echt in het lijf dragen (RTG iD met een idToken)
-         staan nu bij naam op de publieke lijst, met die reden erbij. */
-      if (POORT_BINNEN.test(staart)) { viaBinnen++; continue; }
-      /* EEN KALE 401 OF 403 IS EEN TEKSTAFSTAND EN GEEN POORT. Hij telt hier
-         als gesloten, maar hij maakt een uitzondering met een reden niet
-         overbodig. /api/auth/login flipte daar drie keer op: zijn 401 schoof
-         het venster in of uit zodra de handler korter of langer werd (de laatste
-         keer toen de wachtwoordrem naar kern/identiteit/wachtwoordrem.js
-         verhuisde, N28), terwijl er niets veranderde aan wie er binnenkomt.
-         ./lib/publiek.js zegt daar zelf: de naam blijft staan. De opruimcontrole
-         hieronder geldt dus alleen voor een echte poort (een poortwachter of
-         POORT_BINNEN). */
-      if (/\b(401|403)\b/.test(staart)) { viaBinnen++; if (PUBLIEK.has(pad)) gezien.add(pad); continue; }
-      if (PUBLIEK.has(pad)) { gezien.add(pad); continue; }
+      bestaat.add(r.pad);
+      if (r.gezien) gezien.add(r.pad);
+      if (r.soort === 'poortwachter') { viaMw++; continue; }
+      if (r.soort === 'binnen' || r.soort === 'kaal') { viaBinnen++; continue; }
+      if (r.soort === 'publiek') continue;
       gaten++;
-      fout(path.relative(ROOT, f) + ': ' + pad + ' heeft geen poort en staat niet op de publieke lijst' +
+      fout(path.relative(ROOT, f) + ': ' + r.pad + ' heeft geen poort en staat niet op de publieke lijst' +
         ' -- zet er een poortwachter voor, of neem hem met een REDEN op in PUBLIEK (check.js regel 28)');
     }
   });

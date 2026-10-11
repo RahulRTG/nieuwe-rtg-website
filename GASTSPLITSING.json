@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-11T13:45:04.618Z",
-    "commit": "e8725bcb7",
+    "op": "2026-10-11T15:08:20.384Z",
+    "commit": "b14909280",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 1,
     "instrument": "scripts/gastsplitsing.js",
     "node": "v26.10.0"
   },
@@ -149,7 +149,7 @@
       "zegt": "Een aanvraag klaarzetten kan met een lidmaatschap."
     },
     {
-      "plek": "server/opzet/diensten2.js:295",
+      "plek": "server/opzet/diensten2.js:240",
       "soort": "onderscheidt",
       "zegt": null
     },

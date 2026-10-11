@@ -876,6 +876,14 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "architectproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/codearchitect.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "arena.test.js": {
       "soort": "server",
       "staat": "gezakt",

@@ -91,7 +91,10 @@ test('een bevestigde, bekende afzender krijgt een zaak op kanaal mail', () => {
   assert.ok(r.zaak, JSON.stringify(r));
   assert.equal(r.zaak.kanaal, 'mail');
   const z = zaken.dossier(r.zaak.id).zaak;
-  assert.equal(z.melder, 'Zilverreiger', 'de melder is geen codenaam maar: ' + z.melder);
+  /* De melder is de LEDENSLEUTEL, want daarop ziet het lid zijn eigen zaken in
+     de app en komen antwoorden in zijn meldingen (kern/service/melderpost.js).
+     Met de codenaam erin was deze zaak voor de melder zelf onvindbaar. */
+  assert.equal(z.melder, 'user-7', 'de melder is niet de ledensleutel maar: ' + z.melder);
 
   /* HET BERICHT IS EEN VERWIJZING EN NOOIT DE INHOUD. Soort plus code, en al het
      andere gooit zaak.js weg -- de grens uit par. 2 van SERVICE.md. */

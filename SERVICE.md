@@ -577,13 +577,14 @@ draagt daarom nu een **grond** (`zetel` of `bevestiging`, `kern/service/teams.js
 en `router.teVragen()` is wat een scherm aan het lid mag voorleggen. Een naam
 zonder grond valt weg in plaats van door.
 
-Wat er **open** blijft staat er even groot bij: **acht van de negen** bevoegdheden
-die het lid bevestigt, hebben nog geen lezer. Dat is de eerlijke stand — deze laag
-is jong, en elke poort is een besluit over wat een medewerker werkelijk te zien
-krijgt. Wat er niet meer kan is dat het getal ONGEMERKT groeit: regel 65 van
-`scripts/check.js` is een ratel op acht, en een negende stille bevoegdheid laat de
-keuring zakken. De keuze is dan: er een lezer bij bouwen, of hem niet aan het lid
-voorleggen.
+Wat er **open** bleef stond er even groot bij: **acht van de negen** bevoegdheden
+die het lid bevestigde, hadden geen lezer. Op 4 september 2026 is gekozen voor de
+tweede uitweg: die acht zijn uit de tabel en de UI gehaald, en alleen
+`organisatie.stand` (met een echte lezer) wordt nog aan het lid voorgelegd. Regel
+65 van `scripts/check.js` staat daardoor op een harde nulgrens (`npm run
+servicecaps`: 0 van 1 zonder lezer, gemeten 11 oktober 2026). Een nieuwe
+bevoegdheid komt er alleen bij mét een lezer in dezelfde wijziging -- en elke
+poort is een besluit over wat een medewerker werkelijk te zien krijgt.
 
 ## 13f. Het kanalenbord: welke deur staat er open?
 
@@ -633,6 +634,31 @@ werd gekeken. Er staat nu een **positieve controle** omheen: de proef eist eerst
 dat een gewone schrijfactie de peiling wél ziet bewegen. Diezelfde toets wachtte
 op de klok in plaats van op een toestand; dat is nu een latere schrijfactie zien
 landen, wat pas echt bewijst dat de ronde voorbij is.
+
+## 13h. Een antwoord dat nergens aankwam
+
+Bij elk antwoord van een medewerker meldt `kern/service/loop.js` de melder. Tot
+11 oktober 2026 ging die melding alleen als PUSH naar een lidaccount, en dat liet
+drie melders stil vallen: een **zaak** (`zaak-<code>`, de ingang van par. 11) had
+geen account en hoorde dus nooit dat RTG antwoordde; een melder die er per **mail**
+kwam stond op zijn codenaam en had evenmin een account-id; en een lid **zonder
+pushabonnement** had na een herlaadbeurt niets in zijn meldingen, want de push
+schreef niets in de lijst. Daar kwam bij dat de melding `titel` en `tekst` droeg
+terwijl de lezer `title` en `body` toont.
+
+Dezelfde regel als in `kern/ontvanger.js`: **een bericht is pas bezorgd als er een
+lezer bestaat** (MAATSTAF.md par. 7f). `kern/service/melderpost.js` brengt het
+daarom naar de bak die bij de soort melder gelezen wordt -- `meldLid()` voor een
+lid (lijst, live en push uit een schrijver, `opzet/meldaan.js`),
+`notifySupplier()` voor een zaak, en voor een oude codenaam eerst terug naar de
+sleutel via de gids, alleen bij precies een treffer. Hij geeft altijd een uitslag
+en zegt het als het niet lukt. En de mailingang zet de melder sindsdien op de
+LEDENSLEUTEL en niet op de codenaam (`kern/service/post.js`), want op die sleutel
+toont de app een lid zijn eigen zaken: een zaak die per mail ontstond, was voor
+wie hem meldde onvindbaar. Zaken van voor die datum houden hun codenaam; hun
+melding komt aan via de gids, in de app-lijst staan ze niet. Bewijs:
+`test/servicemelder.test.js` leest de bak via de eigen route en sessie van de
+melder, ook voor een ander lid en een andere zaak.
 
 ## 14. Wat er staat, en wat er niet staat
 

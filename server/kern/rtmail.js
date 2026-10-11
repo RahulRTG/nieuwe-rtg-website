@@ -44,8 +44,20 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
 
   // De geverifieerde serverroute zet `bron`; de client bepaalt dit vertrouwen niet.
   function bezorg({ van, naar, onderwerp, tekst, soort, bron, antwoordOp } = {}, bewaar = save) {
-    const naarA = normAdres(naar);
-    if (!naarA) return { error: 'Geen geldig ontvang-adres.' };
+    const opgegeven = normAdres(naar);
+    if (!opgegeven) return { error: 'Geen geldig ontvang-adres.' };
+    /* EEN ALIAS IS EEN TWEEDE ADRES VOOR HETZELFDE POSTVAK. De oplosser (gezet
+       door opzet/postlaag.js) zegt naar welk postvak hij wijst; zonder oplosser,
+       of als hij niets weet, gaat het bericht naar het opgegeven adres zoals
+       altijd. Het opgegeven adres blijft bewaard in `viaAlias`, zodat de
+       ontvanger ziet langs welke deur het binnenkwam. */
+    let naarA = opgegeven, viaAlias = null;
+    if (adresOplosser) {
+      let doel = null;
+      try { doel = adresOplosser(opgegeven); } catch (e) { console.warn('[rtmail] aliasoplossing mislukt:', e && e.message); }
+      const echt = doel ? normAdres(doel) : '';
+      if (echt && !zelfdeBus(echt, opgegeven)) { naarA = echt; viaAlias = opgegeven; }
+    }
     const vanA = normAdres(van) || SYSTEEM;
     const b = schoonBron(bron, vanA);
     const tekstK = kap(tekst, 8000);
@@ -64,6 +76,7 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
       at: klokDatum().toISOString(),
       gelezen: false
     };
+    if (viaAlias) msg.viaAlias = viaAlias;
     const s = store();
     /* De DRAAD (het gesprek). Een antwoord erft de draad van het bericht waarop
        het antwoordt; een nieuw bericht begint zijn eigen draad met zijn eigen
@@ -95,6 +108,8 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
 
   let naBezorging = null;
   const zetNaBezorging = (fn) => { naBezorging = typeof fn === 'function' ? fn : null; };
+  let adresOplosser = null;
+  const zetAdresOplosser = (fn) => { adresOplosser = typeof fn === 'function' ? fn : null; };
   const stuur = input => bezorg(input);
 
   // De rail voor de automatiseringen: het platform stuurt vanuit "rtg@rtmail"
@@ -117,7 +132,7 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
     vertrouwd:stuk ? false : (m.vertrouwd != null ? !!m.vertrouwd : (m.van === SYSTEEM)),
     links:stuk ? { externeLinks:[], aantal:0, gevaarlijk:true } : (m.links || scanLinks(m.tekst)),
     bijlagen: [],
-    draad: m.draad || m.id, antwoordOp: m.antwoordOp || null,
+    draad: m.draad || m.id, antwoordOp: m.antwoordOp || null, viaAlias: m.viaAlias || null,
     workflow: Array.isArray(m.workflow) ? m.workflow.slice(-20) : [],
     at: m.at, gelezen: !!m.gelezen, veiligheid:veilig
   }); };
@@ -170,7 +185,7 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
 
   return { SYSTEEM, VERTROUWDE_BRONNEN, normAdres, scanLinks, stuur, systeemStuur, postvak, verzonden, ongelezen, lees, workflow,
     publiek:pub, herzegel, controleerIntegriteit:veiligheid.controleer,
-    zetNaBezorging,
+    zetNaBezorging, zetAdresOplosser,
     // de adreslaag doorgeven, zodat routes en tests er maar een bron voor hebben
     DOMEINEN: adresLaag.DOMEINEN, adresVoor: adresLaag.adresVoor, ontleed: adresLaag.ontleed,
     soortVoor: adresLaag.soortVoor, zelfdeBus };

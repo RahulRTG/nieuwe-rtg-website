@@ -37,8 +37,13 @@
 
    Afgesplitst uit ./personeel.js, dat in de band onder de grens stond. */
 const { maakWachtwoordRem } = require('../../../kern/identiteit/wachtwoordrem');
-module.exports = (wctx, uitnodiging) => {
+module.exports = (wctx, gegeven) => {
   const { kern } = wctx;
+  /* Hetzelfde exemplaar als ./personeel.js, dat het meegeeft. De require staat
+     erbij zodat deze module zelf zegt waar haar transactie vandaan komt: de
+     aanmelding loopt via verbindCode door de collectietransactie van
+     ./uitnodiging.js, en scripts/machinedekking.js leest dat per bestand. */
+  const uitnodiging = gegeven || kern.personeelsUitnodiging || require('./uitnodiging')({ kern });
   const { accounts, app, loginFails, noteFailedTry, tooManyTries } = kern;
   /* kassacodeHoortBij wordt via `uitnodiging.` gelezen en niet uitgepakt: het is
      geen naam uit de kern, en uitgepakt telt scripts/grenzen.js hem wel zo. */

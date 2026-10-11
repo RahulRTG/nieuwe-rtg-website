@@ -109,8 +109,8 @@ test.before(async () => {
   A = await medewerker(2);
   B = await medewerker(3);
   pk = kantoorPasskey(base);
-  sleutelA = await pk.zet(A.lid);
-  sleutelB = await pk.zet(B.lid);
+  sleutelA = await pk.zet(A.lid, 'Geheim123!');   // een passkey toevoegen vraagt het wachtwoord (P1-2, #523)
+  sleutelB = await pk.zet(B.lid, 'Geheim123!');
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 

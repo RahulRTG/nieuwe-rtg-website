@@ -35,9 +35,9 @@ const BANK_BEVESTIG = Object.freeze({
           'want de tweede mens kan geen script zijn' },
       { soort: 'afgeleid', graad: 'vermoed',
         wat: 'de aangevraagde geldhandeling wordt uitgevoerd, met het lijf dat bij de AANVRAAG is bevroren',
-        uitkomsten: ['bank.afstemming', 'bank.incasso', 'bank.rood', 'reisbureau.teruggave'],
-        reden: 'uitvoerders.get(a.actie) -- een gesloten set van vier geregistreerde handelingen ' +
-          '(routes/kantoren/bank-tweedehand.js, bank-afstemming.js en reisteruggave.js). Wat elk ' +
+        uitkomsten: ['bank.afstemming', 'bank.incasso', 'bank.rood', 'connect.afrekening', 'reisbureau.teruggave'],
+        reden: 'uitvoerders.get(a.actie) -- een gesloten set van vijf geregistreerde handelingen ' +
+          '(routes/kantoren/bank-tweedehand.js, bank-afstemming.js, connect.js en reisteruggave.js). Wat elk ' +
           'daarvan veroorzaakt, staat in HUN contract en niet in dit; deze route bezit dat gevolg niet' },
       { soort: 'afgeleid', graad: 'vermoed',
         wat: 'er komt een auditregel bij op naam van de bevestiger, met de aanvrager erin',

@@ -1,18 +1,18 @@
 {
  "stempel": {
-  "op": "2026-10-07T01:41:53.213Z",
-  "commit": "88661ef0e",
+  "op": "2026-10-11T07:56:47.727Z",
+  "commit": "2290de535",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v24.18.0"
+  "node": "v26.10.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 665,
+  "zonderBewakerslaag": 667,
   "bewaakt": 567,
   "openbaarMetReden": 57,
-  "eigenControle": 21,
+  "eigenControle": 23,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
   "laat": 0,
@@ -338,7 +338,7 @@
   },
   {
    "sleutel": "POST /api/auth/forgot",
-   "bestand": "server/routes/auth/herstel.js:104",
+   "bestand": "server/routes/auth/herstel.js:107",
    "staat": "openbaar",
    "reden": "wachtwoord vergeten: wie buitengesloten is heeft geen token"
   },
@@ -350,12 +350,12 @@
   },
   {
    "sleutel": "POST /api/auth/register",
-   "bestand": "server/routes/auth/account.js:11",
+   "bestand": "server/routes/auth/account.js:12",
    "staat": "sleutelDoorgegeven"
   },
   {
    "sleutel": "POST /api/auth/reset",
-   "bestand": "server/routes/auth/herstel.js:126",
+   "bestand": "server/routes/auth/herstel.js:132",
    "staat": "eigenControle"
   },
   {
@@ -365,7 +365,7 @@
   },
   {
    "sleutel": "POST /api/auth/verify-email",
-   "bestand": "server/routes/auth/account.js:85",
+   "bestand": "server/routes/auth/account.js:89",
    "staat": "openbaar",
    "reden": "de bevestigingslink IS de geloofsbrief (verifyActionToken); ongeldig of verlopen geeft 400"
   },
@@ -1138,7 +1138,7 @@
   },
   {
    "sleutel": "POST /api/cluster/:actie",
-   "bestand": "server/server.js:885",
+   "bestand": "server/server.js:897",
    "staat": "openbaar",
    "reden": "de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet"
   },
@@ -1903,7 +1903,7 @@
   },
   {
    "sleutel": "POST /api/foundation/school/bel",
-   "bestand": "server/school/bellen.js:56",
+   "bestand": "server/school/bellen.js:99",
    "staat": "bewaakt",
    "wacht": "gezinSessie"
   },
@@ -1918,6 +1918,11 @@
    "bestand": "server/school/belasting.js:67",
    "staat": "bewaakt",
    "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/belkanaal/ticket",
+   "bestand": "server/school/bellen.js:64",
+   "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/foundation/school/bericht/controleer",
@@ -3165,12 +3170,12 @@
   },
   {
    "sleutel": "POST /api/herstel/eigenaar/passkey",
-   "bestand": "server/routes/eigenaarherstel.js:103",
+   "bestand": "server/routes/eigenaarherstel.js:108",
    "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/herstel/eigenaar/passkey/opties",
-   "bestand": "server/routes/eigenaarherstel.js:95",
+   "bestand": "server/routes/eigenaarherstel.js:100",
    "staat": "eigenControle"
   },
   {
@@ -3289,7 +3294,7 @@
   },
   {
    "sleutel": "POST /api/mijn/herstelkanaal/email/bevestig",
-   "bestand": "server/routes/member/herstelkanaal.js:137",
+   "bestand": "server/routes/member/herstelkanaal.js:138",
    "staat": "openbaar",
    "reden": "de bevestigingslink IS de geloofsbrief (verifyActionToken, doel mailwissel); komt uit de mailbox van het nieuwe adres en heeft dus geen sessie"
   },
@@ -3301,7 +3306,7 @@
   },
   {
    "sleutel": "POST /api/office/login",
-   "bestand": "server/routes/office/toegang.js:9",
+   "bestand": "server/routes/office/toegang.js:12",
    "staat": "eigenControle"
   },
   {
@@ -3338,7 +3343,7 @@
   },
   {
    "sleutel": "POST /api/pin/herstel",
-   "bestand": "server/routes/algpin.js:55",
+   "bestand": "server/routes/algpin.js:56",
    "staat": "openbaar",
    "reden": "pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset"
   },
@@ -4080,6 +4085,11 @@
    "staat": "eigenControle"
   },
   {
+   "sleutel": "POST /api/stroom/ticket",
+   "bestand": "server/opzet/stroomtoegang.js:27",
+   "staat": "eigenControle"
+  },
+  {
    "sleutel": "POST /api/supplier/apply",
    "bestand": "server/routes/supplier/werving/sollicitaties.js:14",
    "staat": "openbaar",
@@ -4202,13 +4212,13 @@
   },
   {
    "sleutel": "POST /api/webauthn/login",
-   "bestand": "server/routes/auth/webauthn.js:71",
+   "bestand": "server/routes/auth/webauthn.js:103",
    "staat": "openbaar",
    "reden": "de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig"
   },
   {
    "sleutel": "POST /api/webauthn/opties",
-   "bestand": "server/routes/auth/webauthn.js:64",
+   "bestand": "server/routes/auth/webauthn.js:96",
    "staat": "openbaar",
    "reden": "de uitdaging moet er zijn VOOR je hem kunt beantwoorden; het bewijs volgt bij /login"
   },
@@ -4266,7 +4276,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1375",
+   "bestand": "server/server.js:1352",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

@@ -402,7 +402,7 @@ test('11. een aanvraag zonder geregistreerde uitvoerder ontstaat niet', () => {
    het risico, B tekent bevoegd -- en het dossier zegt daarna onomkeerbaar + uitzondering. */
 test('12. een incassoronde boven de grens: eerst een risicogoedkeuring van een ander, dan pas de tweede mens', async () => {
   const eenC = await medewerker(3);
-  const sleutelC = await pk.zet(medewerker.lid);
+  const sleutelC = await pk.zet(medewerker.lid, 'Geheim123!');   // een passkey toevoegen vraagt het wachtwoord (P1-2, #523)
   const u3 = (Date.now() + 3331).toString(36);
   const lid3 = (await api('/api/auth/register', { name: 'Verhuurder', email: 'vh' + u3 + '@voorbeeld.test',
     phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',

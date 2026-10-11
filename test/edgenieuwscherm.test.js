@@ -109,8 +109,12 @@ test('de basislijn en de schermen lopen niet uit elkaar', () => {
 
 /* De schuldlijst mag alleen krimpen: dit getal gaat omlaag bij elke portie, en
    nooit omhoog. Een scherm dat er weer bij moet, is een achteruitgang en geen
-   aanpassing van dit getal. */
-const SCHULD_MAX = 49;
+   aanpassing van dit getal.
+
+   Het getal staat sinds 6 oktober 2026 in NORM.json (meter `edgeContextSchuld`)
+   en niet meer als constante hier: zo kan het niet omhoog zonder notitie
+   (scripts/normbasis.js), en trekt npm run norm:vast een krimp strak. */
+const SCHULD_MAX = require('../scripts/lib/normwaarde').normwaarde('edgeContextSchuld');
 
 test('elk bestaand scherm met een eigen hoofdactie spreekt zijn context zelf, of staat op de schuldlijst', () => {
   const reg = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
@@ -118,7 +122,7 @@ test('elk bestaand scherm met een eigen hoofdactie spreekt zijn context zelf, of
 });
 
 test('de schuldlijst groeit niet, en kan zakken', () => {
-  assert.ok(CONTEXT_SCHULD.length <= SCHULD_MAX, 'CONTEXT_SCHULD groeide van ' + SCHULD_MAX + ' naar ' + CONTEXT_SCHULD.length);
+  assert.ok(CONTEXT_SCHULD.length <= SCHULD_MAX, 'CONTEXT_SCHULD groeide van ' + SCHULD_MAX + ' (NORM.json, edgeContextSchuld) naar ' + CONTEXT_SCHULD.length);
   assert.equal(new Set(CONTEXT_SCHULD).size, CONTEXT_SCHULD.length, 'een scherm staat twee keer op de lijst');
   const reg = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
   const kopie = JSON.parse(JSON.stringify(reg));

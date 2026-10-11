@@ -246,7 +246,6 @@ function contractNieuw(reg, opSchijf) {
    Bestanden is de eerste portie, en Comm spreekt zelf sinds het sociaal-spoor
    (stap 16). */
 const CONTEXT_SCHULD = Object.freeze([
-  '/apps/agenda.html',
   '/apps/avond.html',
   '/apps/belastingkantoor.html',
   '/apps/browser.html',
@@ -277,7 +276,6 @@ const CONTEXT_SCHULD = Object.freeze([
   '/apps/media.html',
   '/apps/mijnmall.html',
   '/apps/muziek.html',
-  '/apps/notities.html',
   '/apps/onderneming.html',
   '/apps/ov.html',
   '/apps/overheidspda.html',

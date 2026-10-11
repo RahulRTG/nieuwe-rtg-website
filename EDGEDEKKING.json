@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-06T14:40:32.269Z",
-    "commit": "116c7294f",
+    "op": "2026-10-11T18:13:05.276Z",
+    "commit": "e5b7388e",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/edgedekking.js",
-    "node": "v26.10.0"
+    "node": "v22.22.0"
   },
   "uitleg": "Per scherm onder public/apps: welke velden van het Edge-contract het scherm publiceert, gemeten in een echte browser via window.RTGEdgeBlikveld.lees(), als vers lid met een RTG Pass en getekende overeenkomst, op 390x844 (touch), elk scherm in een eigen lege browsercontext. 'ja' = er staat een waarde (lees herkomst erbij: context valt terug op de documenttitel); 'nvt' = de body verklaart met data-rtg-edge-nvt-<veld>=reden dat het veld hier niet bestaat; 'na-openen' = de body verklaart met data-rtg-edge-na-openen-<veld>=reden dat het pas na openen ontstaat (telt nooit als ja); een reden per veld, en zonder reden of met beide verklaringen 'nee'. De redenen staan per scherm in redenen. zelf telt alleen de herkomsten uit ZELF in scripts/edgedekking.js. De stand bij binnenkomst: er wordt niets aangeklikt. Waarden worden niet bewaard, alleen of er een is (de redenen zijn wat het scherm in zijn eigen HTML verklaart, geen sessiewaarden). geen-blikveld draagt de eerste ontbrekende schakel van de laadketen, in de pagina nagelezen. Wat in de volle ronde (vier tegelijk) geen blikveld had, niet tot rust kwam of een veld verloor, is daarna los herhaald en die uitslag telt; eersteRonde zegt wat de volle ronde zag als dat anders was. gebreken in de telling = op hoeveel schermen.",
   "sessie": "lid",
@@ -347,7 +347,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -12988,7 +12988,7 @@
       },
       "herkomst": {
         "identiteit": "geen",
-        "wereld": "pagina",
+        "wereld": "route",
         "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
@@ -15281,7 +15281,7 @@
       "herkomst": {
         "identiteit": "geen",
         "wereld": "route",
-        "context": "edge-casco",
+        "context": "scherm",
         "object": "geen",
         "activiteit": "geen",
         "presence": "geen",
@@ -21217,7 +21217,7 @@
       },
       "context": {
         "ja": 285,
-        "zelf": 15,
+        "zelf": 17,
         "nee": 0,
         "nvt": 0,
         "na-openen": 0,

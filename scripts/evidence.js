@@ -89,6 +89,17 @@ function schrijfSamenvatting(plan, resultaat) {
     '| Geselecteerd | ' + resultaat.unit.length + ' unit · ' + resultaat.e2e.length + ' browser |',
     ''
   ];
+  /* De afgegane regels (ARCHITECTOPDRACHT.md fase 6): welke wet, wat er
+     gemeten werd en met welke graad. `npm run codearchitect -- why keuring`
+     leest hetzelfde uit .evidence/plan.json. */
+  if (plan.redenen && plan.redenen.regels) {
+    regels.push('| Wet | Regel | Klasse | Graad | Gemeten |', '|---|---|---|---|---|');
+    for (const r of plan.redenen.regels) {
+      regels.push('| ' + markdownCel(r.wet || 'geen wet (' + r.bron + ')') + ' | ' + markdownCel(r.regel) + ' | ' +
+        markdownCel(r.klasse || '') + ' | ' + markdownCel(r.graad) + ' | ' + markdownCel(JSON.stringify(r.gemeten).slice(0, 200)) + ' |');
+    }
+    regels.push('');
+  }
   fs.appendFileSync(pad, regels.join('\n') + '\n');
 }
 

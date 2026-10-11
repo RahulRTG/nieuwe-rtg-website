@@ -6,6 +6,7 @@
      npm run codearchitect -- explain <route | bestand | domein | wet-ID | symbool>
      npm run codearchitect -- impact <bestand> [<bestand> ...]
      npm run codearchitect -- unknowns [scope]
+     npm run codearchitect -- why [poorten | keuring | besluitcode | wet-ID | pad]
 
    Met --json krijgt een agent dezelfde regels als data. Elke regel draagt een
    waarde, graad, versheid, tegenspraak en herkomst (register + pad); een leeg
@@ -88,7 +89,24 @@ function main() {
     console.log('\n  Vier bakken die vier dingen meten; er is met opzet geen totaal.');
     return 0;
   }
-  console.error('gebruik: codearchitect map | explain <ding> | impact <bestand...> | unknowns [scope]  [--json]');
+  if (opdracht === 'why') {
+    const w = A.waarom(lezer, onderwerp.join(' '));
+    if (json) return console.log(JSON.stringify(w, null, 1)), w.gevonden === false ? 1 : 0;
+    if (!w.regels) {
+      if (w.reden) { console.log('\n' + w.reden); return 1; }
+      const p = w.poorten;
+      if (!Array.isArray(p)) { console.log('\n' + p.reden); return 1; }
+      console.log('\nDE POORTEN VAN DE KETEN (' + p.length + ', afgeleid door scripts/ci-lokaal.js)\n');
+      for (const g of p) console.log('  ' + (g.schrijftReden ? 'schrijft reden  ' : 'nog geen reden  ') + g.job + ' / ' + g.stap);
+      console.log('\n  why keuring toont de afgegane regels van de bewijsroute.');
+      return 0;
+    }
+    if (w.reden) console.log('\n' + w.reden);
+    console.log('\nWAAROM: ' + w.onderwerp + '\n');
+    drukRegels(w.regels);
+    return w.gevonden ? 0 : 1;
+  }
+  console.error('gebruik: codearchitect map | explain <ding> | impact <bestand...> | unknowns [scope] | why [poort]  [--json]');
   return 2;
 }
 

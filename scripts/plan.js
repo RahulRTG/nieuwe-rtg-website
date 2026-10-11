@@ -19,6 +19,7 @@ const evidenceDag = require('./lib/evidence-dag');
 const semdiff = require('./lib/semdiff');
 const risico = require('./lib/risico');
 const bb = require('./lib/bewijsboek');
+const keuringreden = require('./lib/keuringreden');
 
 const WORTEL = path.join(__dirname, '..');
 const MAPPEN = snapshotModule.STANDAARDMAPPEN;
@@ -115,13 +116,16 @@ function plan(opties) {
     reden: 'deze ronde kalibreert het selectieve bewijs tegen de volledige werkelijkheid' }
     : modusbesluit(impact, telling, boek, bewijsMachineGewijzigd);
   const baan = risicobaan(oordeel.klasse);
+  /* Welke regels er afgingen, uitgeschreven (ARCHITECTOPDRACHT.md fase 6).
+     Dit besluit niets; het maakt het besluit hierboven navolgbaar. */
+  const redenen = keuringreden.redenen({ wijziging, impact, oordeel, besluit, mode: besluit.mode, telling, gewijzigd });
   return { formaat: 'rtg-evidence-plan-v2', gemaakt: new Date(nu).toISOString(),
     basis: wijziging.basis, snapshot: { rootHash: snapshot.rootHash,
       bestanden: snapshot.aantalBestanden, duurMs: Math.round(snapshot.duurMs) },
     wijziging, gewijzigd, ondergrens, impact, oordeel, bewijsMachineGewijzigd, omgeving: volledigOmgeving,
     boek: { versie: boek.versie || 1, ongeldig: boek.ongeldig || null,
       bewijzen: Object.keys(boek.bewijzen || {}).length },
-    telling, mode: besluit.mode, besluit, baan, gedwongenVolledig: !!o.forceFull, toetsen };
+    telling, mode: besluit.mode, besluit, baan, gedwongenVolledig: !!o.forceFull, redenen, toetsen };
 }
 
 function commit() {
@@ -175,7 +179,7 @@ function serialiseer(p) {
     geraakt: p.impact.geraakt.size, impactTelling: p.impact.telling,
     omgeving: { hash: p.omgeving.hash, dekking: p.omgeving.dekking,
       ongemeten: p.omgeving.ongemeten }, boek: p.boek, mode: p.mode,
-    besluit: p.besluit, baan: p.baan, gedwongenVolledig: p.gedwongenVolledig,
+    besluit: p.besluit, baan: p.baan, gedwongenVolledig: p.gedwongenVolledig, redenen: p.redenen,
     impactClaims: [...p.impact.geraakt].map(([pad, staat]) => ({ pad, ...staat })),
     telling: p.telling,
     reused: p.toetsen.filter((t) => t.status === 'REUSED').map((t) => t.toets),
@@ -192,6 +196,12 @@ function toon(p, alles) {
   console.log('  bewijs    ' + p.telling.REUSED + ' REUSED · ' + p.telling.REPROVE +
     ' REPROVE · ' + p.telling.UNKNOWN + ' UNKNOWN');
   console.log('  route     ' + p.baan + ' · ' + p.besluit.code + ': ' + p.besluit.reden);
+  if (p.redenen) {
+    console.log('\n  AFGEGANE REGELS (de strengste wint' + (p.redenen.klopt.ja ? '' : '; NAREKENING WIJKT AF: ' + p.redenen.klopt.strengste) + ')');
+    for (const r of p.redenen.regels) {
+      console.log('    ' + (r.wet || '(geen wet: ' + r.bron + ')') + '  ' + r.regel + (r.klasse ? ' -> ' + r.klasse : '') + '  [' + r.graad + ']  ' + JSON.stringify(r.gemeten).slice(0, 120));
+    }
+  }
   for (const status of ['UNKNOWN', 'REPROVE', 'REUSED']) {
     const rij = p.toetsen.filter((t) => t.status === status);
     if (!rij.length) continue;

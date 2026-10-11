@@ -500,6 +500,87 @@ versiesprongen.
 fase is mergen, integreren en bewijzen, en daarna grootschalig afbouwen binnen de
 genomen besluiten. Geen nieuwe cloudsessies zolang de integratie loopt.
 
+## 3h. Besluiten tijdens de integratie, deel 2 (11 oktober 2026)
+
+**Volgorde en WIP.** Ronde 1 gaat voor, in de volgorde #559 → #560 → #563 → #561 →
+#562 → #566 → #570, één PR tegelijk en altijd door een mens gemerged. Na elke merge:
+main controleren, afhankelijke takken bijwerken, gegenereerde documenten opnieuw
+maken met hun eigen commando, regressietoetsen draaien. Direct daarna komt de
+beveiligingstak `claude/afbouw3-kantoordeur-passkey` (na onafhankelijke tegenlezing
+en herstel van blokkerende bevindingen), daarna de rest van golf 3. Niet-kritieke
+reparaties van golf 3 wachten tot ronde 1 geïntegreerd is; aantoonbare ernstige
+beveiligingsproblemen niet. WIP-limiet: zes actieve implementatie-PR's en vier in
+review (startwaarden). Geen nieuwe ontwikkelgolf en geen cloudsessies zolang de
+achterstand er is.
+
+**Review (tijdelijk optie B).** De repository heeft één medewerker, en die is op
+GitHub ook de auteur van elke PR. Reviewdossiers bereiden de menselijke review
+voor; vereist de branchbescherming een afzonderlijke goedkeurende reviewer, dan
+blijft die eis staan -- geen administratieve bypass en geen versoepeling
+(ONDERHOUD.md: mergen is mensenwerk). Een tweede bevoegde reviewer toevoegen is de
+structurele oplossing. AI-tegenlezingen vervangen geen menselijke goedkeuring.
+
+**CI (besluit 1A).** Een draft-PR krijgt de statische en beveiligingspoorten,
+inclusief de relevante adversariële toetsen; de volledige keten start bij Ready for
+review en moet op de actuele commit slagen. Alle verplichte checks blijven
+verplicht, er komt geen fictieve check bij en er verdwijnt geen controle. De
+wijziging gaat in #559 als de verplichte checks zijn vastgesteld en de volledige
+huidige keten op #559 slaagt. Of "up to date before merging" aan staat, is nog niet
+vastgesteld; die instelling wordt niet gewijzigd zonder afzonderlijk besluit.
+
+**Gegenereerde bestanden (A, voorwaardelijk).** Een conflict in een bestand dat
+`AFGELEID.json` als afgeleid indeelt, mag worden opgelost door deterministische
+hergeneratie uit de gezaghebbende bron. Geen automatisch inhoudelijk
+conflictbesluit, geen verlies van handmatig vastgelegde besluiten (NORM.json is
+geen afgeleid bestand), geen bronwijziging om een conflict te omzeilen, de
+hergeneratie moet reproduceerbaar zijn, en check, norm en de relevante toetsen
+draaien daarna opnieuw. Bij een afwijking of een onduidelijk conflict stopt de
+automatisering en beslist een mens (HERBOUWPROEF.json beschrijft de herbouw).
+
+**Managerbevoegdheden.** Volgorde 1 → 4 → 3 → 2, pas na ronde 1. (1) Een regressietoets
+dat een gedeelde zaaksessie buiten de testomgeving geen managerrechten krijgt, de
+standaardwaarden "Beheer"/manager ongevaarlijk, een onveranderlijke actorverwijzing
+(`staffId`/`lidKey`) in `logActivity` naast de leesbare naam, en een schaduwteller
+die de circa 295 managerroutes indeelt naar risico en benodigde bevestiging --
+met als eerste prioriteit het toekennen van managerrechten door een manager. (4) De
+negen schermen zonder persoonlijke inlog gaan op de bestaande persoonlijke
+authenticatie; een werkende inlog is geen toegang, en de gedeelde pincode komt niet
+terug. (3) Eerst persoonlijke passkeys voor medewerkers met een bewezen
+herstelprocedure, dan in de schaduw meten, en pas na een activeringscontrole een
+verse persoonsgebonden bevestiging voor uitbetalen, terugbetalen, rekeninggegevens,
+managers aanmaken, loonruns, klokcorrecties en identiteitsopvragingen. Een passkey
+bewijst wie handelt en niet dat die persoon bevoegd is: transactieregels,
+risicogrenzen en een vereiste tweede goedkeuring blijven gelden. (2) Daarna gaan de
+circa 115 toetsen en scripts op persoonlijke identiteitspaden, met negatieve toetsen
+die bewijzen dat de oude gedeelde toegang in productie geweigerd wordt
+(BEWIJSMACHINE.md par. 6a). Bestaande harde grenzen worden nooit omzeild.
+
+**Identiteit.** Een opgegeven naam, een bestaande sessie en een bewezen identiteit
+zijn drie dingen. Geen route behandelt een door de gebruiker aangeleverde naam als
+bewezen actor (AUTHORITY.md P0b), en de envelop presenteert een sessie op naam
+zonder passkey niet als bewezen. Een tweede handtekening (appstore-keuring) komt van
+een afzonderlijke, aantoonbaar bevoegde persoon; een getypte naam telt nooit. Geen
+algemene `ENFORCE_EXECUTE` voordat de schaduwmetingen en routeclassificaties rond zijn.
+
+**Privacy op de werkvloer (#584).** Klok-, inlog-, post- en keukenlijntijden van een
+collega ziet alleen de manager en de medewerker zelf; collega's zien alleen
+aanwezigheid. Een ziekmelding toont collega's alleen "afwezig"; ook een manager krijgt
+alleen de functioneel noodzakelijke verzuiminformatie en geen medische details. De
+online-status verschijnt alleen binnen een toegestane, actieve communicatiecontext,
+zonder tijdstippen of geschiedenis, en staat los van werkpostaanwezigheid. Alles
+server-side, op een stabiele actoridentiteit, zonder lek via paginering, aantallen,
+volgorde, realtime of alternatieve routes. Na ronde 1 volgt een uitsluitend lezende
+inventaris van gevoelige velden per route als begin van gegevensklassen per veld,
+aansluitend op de Authority-architectuur en zonder concurrerende beleidsmotor
+(KANTOORMACHT.md: er is geen gegevensklasse per veld).
+
+**Engineering Acceleration.** De nulmeting (scratchpad, 11 oktober 2026) vond als
+grootste vertragingen: ingehaalde runs (57% van de runnertijd), wachten op een
+runner, conflicten in gegenereerde bestanden (83% van de merges op claude-takken),
+één reviewer, en lange of wisselvallige jobs. Werkregel: één gevalideerde push per
+PR. Wekelijks gemeten: PR's gemerged, tijd tot merge, CI-wachttijd tegen
+uitvoertijd, bewezen producten, gesloten ketens en ontsnapte defecten.
+
 ## 4. De vier werkstromen
 
 | werkstroom | wat | werkterrein |

@@ -101,6 +101,16 @@
   .samen b{color:var(--txt);font-weight:600;}
   .leeg{color:var(--muted);font-size:.9rem;padding:1.5rem 0;}
   .stuk{border:1px solid var(--burgundy);border-radius:0;padding:.7rem .9rem;color:var(--burgundy);font-size:.84rem;margin-bottom:1rem;}
+  .z-onder{margin-bottom:1rem !important;}
+  .z-rechts{margin-left:auto !important;}
+  .meter .n .van{font-size:.8rem !important;color:var(--soft) !important;}
+  h3.kop-lijst{font-size:.95rem !important;margin:.4rem 0 .7rem !important;}
+  h3.kop-lijst.verder{margin-top:1.6rem !important;}
+  h3.kop-lijst .n{color:var(--soft) !important;font-family:Inter,sans-serif !important;font-size:.72rem !important;}
+  .z-boven{margin-top:.8rem !important;}
+  .acties input.ref{min-width:13rem !important;}
+  .acties input.bedrag{width:8rem !important;}
+  .retourvorm input.breed{width:100% !important;margin-top:.4rem !important;}
   #melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.2rem;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9;}
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
@@ -134,7 +144,7 @@
 
   <section id="etalage-sec">
     <div class="kop"><h2>Etalage van een verkoper</h2><span class="n">te koop, en wat er niet bij staat</span></div>
-    <div style="margin-bottom:1rem;"><select id="kies" aria-label="Verkoper"><option>Laden…</option></select></div>
+    <div class="z-onder"><select id="kies" aria-label="Verkoper"><option>Laden…</option></select></div>
     <div id="etalage"></div>
   </section>
 
@@ -145,7 +155,7 @@
 
   <section id="mand-sec">
     <div class="kop"><h2>De mand</h2><span class="n">een afrekening per verkoper</span>
-      <button class="knop" id="leeg" type="button" style="margin-left:auto;">Leegmaken</button></div>
+      <button class="knop z-rechts" id="leeg" type="button">Leegmaken</button></div>
     <div id="mand"></div>
   </section>
 </main>
@@ -224,9 +234,10 @@ function tekenMeting(r){
   $('#meters').innerHTML = VERM.map(v => {
     const pct = n ? Math.round(tel[v]/n*100) : 0;
     return '<div class="meter"><div class="v">'+esc(VERM_LABEL[v])+'</div>'+
-      '<div class="n">'+tel[v]+' <span style="font-size:.8rem;color:var(--soft);">van '+n+'</span></div>'+
-      '<div class="bar"><i style="width:'+pct+'%"></i></div></div>';
+      '<div class="n">'+tel[v]+' <span class="van">van '+n+'</span></div>'+
+      '<div class="bar"><i data-pct="'+pct+'"></i></div></div>';
   }).join('');
+  $('#meters').querySelectorAll('.bar i[data-pct]').forEach(i => { i.style.width = i.dataset.pct + '%'; });
 }
 
 function vulKiezer(){
@@ -262,7 +273,7 @@ async function tekenEtalage(code){
     if (aanvraag !== etalageAanvraag) return;
     const teKoop = r.teKoop || [], niet = r.nietTeKoop || [];
     let h = '';
-    h += '<h3 style="font-size:.95rem;margin:.4rem 0 .7rem;">Te koop <span class="n" style="color:var(--soft);font-family:Inter,sans-serif;font-size:.72rem;">'+teKoop.length+'</span></h3>';
+    h += '<h3 class="kop-lijst">Te koop <span class="n">'+teKoop.length+'</span></h3>';
     h += teKoop.length ? teKoop.map(k =>
       '<div class="rij"><h3>'+esc(k.titel)+'</h3>'+
       /* "VANAF" HOORT ERBIJ TE STAAN. Zonder dat woord leest 520,00 als de prijs,
@@ -288,7 +299,7 @@ async function tekenEtalage(code){
       '</div><div class="retourvorm" hidden></div></div>').join('')
       : '<p class="leeg">Bij deze verkoper staat nu niets te koop.</p>';
 
-    h += '<h3 style="font-size:.95rem;margin:1.6rem 0 .7rem;">Staat er niet bij <span class="n" style="color:var(--soft);font-family:Inter,sans-serif;font-size:.72rem;">'+niet.length+'</span></h3>';
+    h += '<h3 class="kop-lijst verder">Staat er niet bij <span class="n">'+niet.length+'</span></h3>';
     h += niet.length ? niet.map(k => {
       /* Twee heel verschillende gevallen, en ze krijgen een andere kleur: iets
          waar de ondernemer iets aan kan doen (bordeaux) tegenover iets dat
@@ -398,7 +409,7 @@ function toonMand(m){
      verschillende partijen met verschillende bevestigingen. */
   h += '<div class="samen"><b>'+euroC(m.toonTotaalCenten)+'</b> in totaal, maar dat is een optelsom om te tonen, geen bedrag dat je in één keer bevestigt.' +
     (m.samenReden ? ' ' + esc(m.samenReden) : '') + '</div>';
-  if (m.genegeerd) h += '<div class="stuk" style="margin-top:.8rem;">'+esc(m.genegeerd)+'</div>';
+  if (m.genegeerd) h += '<div class="stuk z-boven">'+esc(m.genegeerd)+'</div>';
   if ((m.geweigerd||[]).length) h += geweigerdBlok(m.geweigerd);
   el.innerHTML = h;
 
@@ -464,11 +475,11 @@ function retourVorm(knop, id){
   if (!el.hidden) { el.hidden = true; el.innerHTML = ''; return; }
   el.hidden = false;
   el.innerHTML =
-    '<div class="acties"><input placeholder="Bestelkenmerk van de verkoper" data-veld="ref" style="min-width:13rem;">' +
+    '<div class="acties"><input placeholder="Bestelkenmerk van de verkoper" data-veld="ref" class="ref">' +
     '<select data-veld="grond">' + GRONDEN.map(g => '<option value="'+g[0]+'">'+esc(g[1])+'</option>').join('') + '</select>' +
-    '<input placeholder="Bedrag in euro" data-veld="bedrag" style="width:8rem;">' +
+    '<input placeholder="Bedrag in euro" data-veld="bedrag" class="bedrag">' +
     '<button class="knop" data-veld="doe">Aanvragen</button></div>' +
-    '<input placeholder="Toelichting (mag leeg)" data-veld="tel" style="width:100%;margin-top:.4rem;">';
+    '<input placeholder="Toelichting (mag leeg)" data-veld="tel" class="breed">';
   el.querySelector('[data-veld="doe"]').onclick = async () => {
     const v = (w) => { const e = el.querySelector('[data-veld="'+w+'"]'); return e ? e.value : ''; };
     const euro = v('bedrag');
@@ -531,7 +542,7 @@ async function tekenRetouren(){
 }
 
 function geweigerdBlok(g){
-  return '<div class="samen" style="margin-top:.8rem;"><b>Niet meegerekend</b><br>' +
+  return '<div class="samen z-boven"><b>Niet meegerekend</b><br>' +
     g.map(x => esc(x.titel || x.koopbaarId) + ': ' + esc(x.reden)).join('<br>') + '</div>';
 }
 </script>

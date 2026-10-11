@@ -665,12 +665,12 @@ jobs:
           export RTG_TOETSBRON="$(node -p 'require("./scripts/lib/meetbron").bron()')"
           node scripts/pgtoetsen.js
         env:
+          REDIS_URL: redis://localhost:6379
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
           # RTG_EIS_INFRA (test/infra.js): wat deze job installeert, EIST hij ook. Ontbreekt
           # het toch, dan zakt de toets in plaats van zich stil over te slaan -- een
           # overgeslagen toets telt in CI niet als geslaagd.
           RTG_EIS_INFRA: pg,redis
-          REDIS_URL: redis://localhost:6379
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
           RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
           RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
           NODE_OPTIONS: --require "${{ github.workspace }}/test/toetsnaam.js"

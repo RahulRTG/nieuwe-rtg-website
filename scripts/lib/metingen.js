@@ -519,6 +519,9 @@ const REGISTER = {
      via scripts/lib/appcontract.js. De toets houdt het woordgebruik vast dat
      scripts/lib/bewijsbron.js leest, en dat de telling de rijen niet overstemt. */
   'LUSPROEF.json': { eigenRatel: 'test/lusproef.test.js' },
+  /* CONCIERGEPROEF.json (sinds 11 oktober 2026) levert voltooibaar voor het
+     Privékantoor, in dezelfde vorm en met dezelfde soort toets als de lusproef. */
+  'CONCIERGEPROEF.json': { eigenRatel: 'test/conciergeproef.test.js' },
   /* LIEGRONDE.json (sinds 24 september 2026) levert waarheidsgetrouw voor elke
      rij van APPWERKT.json. De toets houdt vast dat een BEWEZEN rij iets gelogen
      kreeg en dat een DEFECT een verzonnen zekerheid draagt. */

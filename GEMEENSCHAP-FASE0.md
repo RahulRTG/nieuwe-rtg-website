@@ -400,7 +400,7 @@ Nummer 1, 2 en 4 horen opgelost te zijn **vóór** de keten wordt gebouwd (fase 
 
 ## 7. De samenwerkingsketen: ontwerp en toetsstrategie
 
-`scripts/gemeenschapsproef.js` (nog te bouwen, na goedkeuring), in de vorm van de
+Een nieuwe proef `gemeenschapsproef.js` (nog te bouwen, na goedkeuring), in de vorm van de
 bestaande ketenproeven: een wegwerpserver (`scripts/lib/wegwerpserver.js`), eigen
 hulpjes zonder gedeelde ketenmodule (`test/adamproef.test.js` toets 8), en de
 uitslag van `scripts/adamproef.js` (r. 215-250): schakels `gesloten`/`open`/
@@ -448,7 +448,7 @@ Elke storing meet het EFFECT (een telling voor en na), niet alleen de status
 5. **Rahul probeert te stemmen** -- `/api/member/doe` op de stemroute wordt
    geweigerd (`beleidVoor` → `verboden`), de stemtelling blijft gelijk; de route
    weigert zelf ook als `agentteken.agentVan(req)` iets geeft; een broncontrole
-   eist dat `kern/beraad/ai.js` geen `stem(` of `weg(` bevat.
+   eist dat de AI-module van het beraad geen `stem(` of `weg(` bevat.
 6. **herhaling** -- een dubbele tik op stemmen, tekenen en besluiten geeft geen
    tweede effect.
 7. **weigering met reden** -- de weg die een weigering noemt, bestaat (200).
@@ -480,7 +480,7 @@ eindstand laten overschrijven, terugkoppelen op tier in plaats van sleutel, en e
 Registratie na goedkeuring: `package.json`, `KETENS` in `scripts/ketenvorm.js`,
 `scripts/lib/metingen.js`, `scripts/versheid.js`, een ratel
 `gemeenschapOpenBekend` (omlaag) in `scripts/norm.js`, en
-`test/gemeenschapsproef.test.js`.
+een eigen toetsbestand `gemeenschapsproef.test.js`.
 
 ---
 
@@ -591,7 +591,7 @@ Elke fase vraagt een akkoord van de eigenaar en raakt pas dan productie.
 
 | fase | wat | hangt af van | toets |
 |---|---|---|---|
-| **1a** | herstel gebrek 1, 2, 4, 7, 8 (bijeenkomst-melding, leeftijdspoort, leesweergave voor de AI, lezen zonder schrijven, afgelasten); `lib/bijeenkomstregels.js` voor de gedeelde regels van beide bijeenkomstmodules | besluit 5 | elk met een mutatie; equivalentietoets van de twee bijeenkomstmodules |
+| **1a** | herstel gebrek 1, 2, 4, 7, 8 (bijeenkomst-melding, leeftijdspoort, leesweergave voor de AI, lezen zonder schrijven, afgelasten); een nieuwe pure module `bijeenkomstregels.js` voor de gedeelde regels van beide bijeenkomstmodules | besluit 5 | elk met een mutatie; equivalentietoets van de twee bijeenkomstmodules |
 | **1b** | het onderdeel **Gemeenschap** op FoundationOS, dat het genootschap, rtfos-activiteiten, buurtruil, vrijwilligersportaal en kwesties opent | -- | wereldregister, tikken, doelgroepbereik |
 | **2** | **B1 drager**: `draagOrg`, erkenning per organisatiepoort, gezinsdeur, register naar `LEDEN_RTF` | fase 1a, besluit 3 | par. 4.1 en de toetsen van B1; schakel 1-2 sluiten |
 | **3** | **B2 verbond** | fase 2, vraag 7 | schakel 3-4, storing 2, 4, 9 |

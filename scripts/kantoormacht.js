@@ -207,7 +207,49 @@ function klasseVan(methode, pad) {
   if (c && c.stand === 'NOT_APPLICABLE') return null;
   return c && c.stand ? c.stand : 'ongeclassificeerd';
 }
-const ACTOR_UIT_VERZOEK = /\b(?:req\.body|body|b)\.(door|wie|ondertekenaar|tekenaar|keurder|beoordelaar|actor|goedgekeurdDoor|medewerker)\b/;
+const ACTOR_UIT_VERZOEK = /\b(?:req\.body|body|b)\.(door|wie|naam|ondertekenaar|tekenaar|keurder|beoordelaar|actor|goedgekeurdDoor|medewerker)\b/;
+/* `naam` STAAT ERIN SINDS 11 OKTOBER 2026, en dat kwam uit een tegenlezing: de
+   stadsraadstem las `req.body.naam || boardroomWie(req)` en de meter zag het
+   niet, omdat `naam` niet in de lijst stond. Maar `naam` is ook de naam van
+   een DING (een club, een kamer, een product). Die valse treffers staan hier
+   per route met de reden -- weglaten zou de treffer onzichtbaar maken, en een
+   lijst zonder reden is een vrijbrief. */
+const NAAM_GEEN_ACTOR = new Map([
+  ['POST /api/command/agent/hervat', 'naam = de AGENT die hervat; de actor is wie(req)'],
+  ['POST /api/command/agent/rechten', 'naam = de AGENT wiens grenzen worden gezet; de actor is wie(req)'],
+  ['POST /api/command/agent/stop', 'naam = de AGENT die stopt; de actor is wie(req)'],
+  ['POST /api/command/apipoort/sleutel', 'naam = de naam van de SLEUTEL; door komt uit wie(req)'],
+  ['POST /api/command/overname/lees', 'naam = de naam van de ingelezen set; de actor is wie(req)'],
+  ['POST /api/command/stad', 'naam = de STAD waarvan de stand wordt gelezen'],
+  ['POST /api/command/stad/start', 'naam = de STAD die start'],
+  ['POST /api/command/stad/stop', 'naam = de STAD die stopt; de actor is wie(req)'],
+  ['POST /api/command/zandbak/kwaliteit', 'naam = de ZANDBAK'],
+  ['POST /api/command/zandbak/maak', 'naam = de ZANDBAK; door komt uit wie(req)'],
+  ['POST /api/command/zandbak/runbook', 'naam = de ZANDBAK'],
+  ['POST /api/command/zandbak/weg', 'naam = de ZANDBAK; de actor is wie(req)'],
+  ['POST /api/command/zandbak/zoek', 'naam = de ZANDBAK'],
+  ['POST /api/office/architect/portfolio', 'naam = het PORTFOLIO-item'],
+  ['POST /api/office/hardware/productblad', 'naam = het PRODUCT'],
+  ['POST /api/office/leerhuis/open', 'naam = de naam van het geopende ITEM; de eigenaar komt uit de sessie'],
+  ['POST /api/office/payroll/bron', 'naam = de naam van de BRON; de actor is wie(req)'],
+  ['POST /api/office/payroll/component', 'naam = de naam van het looncomponent'],
+  ['POST /api/office/rtgcampagne/maak', 'naam = de CAMPAGNE; wie komt uit boardroomWie(req)'],
+  ['POST /api/office/techniek/integraties/verantwoordelijke', 'naam = de AANGEWEZEN verantwoordelijke (het onderwerp), niet wie aanwijst'],
+  ['POST /api/rtfkantoor/club/programma', 'naam = het PROGRAMMA'],
+]);
+/* DE BLINDE VLEK, nu benoemd: een handler die het HELE lijf aan de kern geeft
+   (`f(id, req.body)`, `{ ...b }`) laat de kern beslissen welk veld de actor is.
+   Dan ziet deze snede niets -- zo stond de lab-veiligheidstoets (`b.door` in
+   kern/onderzoekslab.js) buiten beeld. Zulke routes zijn ONBEPAALD: geen
+   treffer en ook geen schone route. */
+const LIJF_DOOR = /[(,]\s*(?:req\.body|b)(?:\s*\|\|\s*\{\s*\})?\s*[,)]|\.\.\.\s*(?:req\.body|b)\b/;
+function actorVan(blok, route) {
+  const a = ACTOR_UIT_VERZOEK.exec(blok);
+  const naamVals = a && a[1] === 'naam' && NAAM_GEEN_ACTOR.has(route);
+  const treffer = a && !naamVals ? a[0] : null;
+  const onbepaald = !treffer && LIJF_DOOR.test(blok) ? 'lijf-naar-kern' : null;
+  return { treffer, onbepaald };
+}
 const { zonderCommentaar } = require('./lib/bron');
 function handlerBlok(bron, r) {
   if (!bron || !r.regel) return '';
@@ -305,9 +347,9 @@ function meet() {
     const klasse = klasseVan(r.methode, r.pad);
     if (!klasse) continue;
     const blok = handlerBlok(lees(r.bestand), r);
-    const a = ACTOR_UIT_VERZOEK.exec(blok);
+    const a = actorVan(blok, r.methode + ' ' + r.pad);
     uitvoerend.push({ methode: r.methode, pad: r.pad, klasse, deurGedeeld: !heeftMens(r),
-      actorUitVerzoek: a ? a[0] : null });
+      actorUitVerzoek: a.treffer, actorOnbepaald: a.onbepaald });
   }
   const perKlasse = {};
   for (const u of uitvoerend) {
@@ -328,8 +370,9 @@ function meet() {
   for (const r of buiten) {
     const klasse = klasseVan(r.methode, r.pad);
     if (!klasse) continue;
-    const a = ACTOR_UIT_VERZOEK.exec(handlerBlok(lees(r.bestand), r));
-    buitenUit.push({ methode: r.methode, pad: r.pad, klasse, deurGedeeld: !heeftMens(r), actorUitVerzoek: a ? a[0] : null });
+    const a = actorVan(handlerBlok(lees(r.bestand), r), r.methode + ' ' + r.pad);
+    buitenUit.push({ methode: r.methode, pad: r.pad, klasse, deurGedeeld: !heeftMens(r),
+      actorUitVerzoek: a.treffer, actorOnbepaald: a.onbepaald });
   }
   const voorvoegsel = (pad) => pad.split('/').slice(0, 3).join('/');
   const buitenPer = {};
@@ -423,7 +466,16 @@ function meet() {
       perKlasse,
       actorUitVerzoek: actorLijst.length,
       actorUitVerzoekBijGedeeldeDeur: actorLijst.filter(u => u.deurGedeeld).length,
-      graden: { routes: 'gemeten', deurGedeeld: 'gemeten', deurEistMens: 'gemeten', actorUitVerzoek: 'vermoed' },
+      /* Een nul hier is GEEN schone uitslag: de snede is lexicaal (een
+         ondergrens) en ziet niet wat een kernfunctie uit een doorgegeven lijf
+         haalt. Daarom staan de onbepaalde routes ernaast, en zegt `lezing` dat. */
+      actorOnbepaald: uitvoerend.filter(u => u.actorOnbepaald).length,
+      actorLezing: 'ondergrens: een treffer is vermoed, nul treffers is NIET schoon zolang er onbepaalde routes zijn ' +
+        '(handler geeft het hele lijf door aan de kern)',
+      graden: { routes: 'gemeten', deurGedeeld: 'gemeten', deurEistMens: 'gemeten', actorUitVerzoek: 'vermoed',
+        actorOnbepaald: 'onbepaald' },
+      actorOnbepaaldLijst: uitvoerend.filter(u => u.actorOnbepaald).map(u => ({ route: u.methode + ' ' + u.pad,
+        klasse: u.klasse, deur: u.deurGedeeld ? 'gedeeld' : 'eist-mens', waarom: u.actorOnbepaald })),
       actorLijst: actorLijst.map(u => ({ route: u.methode + ' ' + u.pad, klasse: u.klasse,
         deur: u.deurGedeeld ? 'gedeeld' : 'eist-mens', treffer: u.actorUitVerzoek })),
       buitenKantoorpad: {
@@ -434,7 +486,9 @@ function meet() {
         deurGedeeld: buitenUit.filter(u => u.deurGedeeld).length,
         perVoorvoegsel: buitenPer,
         actorUitVerzoek: buitenUit.filter(u => u.actorUitVerzoek).map(u => ({ route: u.methode + ' ' + u.pad,
-          klasse: u.klasse, deur: u.deurGedeeld ? 'gedeeld' : 'eist-mens', treffer: u.actorUitVerzoek }))
+          klasse: u.klasse, deur: u.deurGedeeld ? 'gedeeld' : 'eist-mens', treffer: u.actorUitVerzoek })),
+        actorOnbepaald: buitenUit.filter(u => u.actorOnbepaald).map(u => ({ route: u.methode + ' ' + u.pad,
+          klasse: u.klasse, deur: u.deurGedeeld ? 'gedeeld' : 'eist-mens', waarom: u.actorOnbepaald }))
       }
     },
     graden: {
@@ -511,10 +565,12 @@ function toon(u) {
     for (const [k, v] of Object.entries(x.perKlasse))
       console.log('      ' + k.padEnd(30) + String(v.routes).padStart(4) + '   gedeeld ' + v.deurGedeeld);
     console.log('    actor uit het verzoek    ' + x.actorUitVerzoek + '   vermoed (' +
-      x.actorUitVerzoekBijGedeeldeDeur + ' achter een gedeelde deur)');
+      x.actorUitVerzoekBijGedeeldeDeur + ' achter een gedeelde deur); ONBEPAALD ' + x.actorOnbepaald +
+      ' (lijf naar de kern) -- een nul is een ondergrens, geen schone uitslag');
     const b = x.buitenKantoorpad;
     console.log('    buiten het kantoorpad    ' + b.uitvoerend + ' uitvoerend achter een kantoordeur, ' +
-      b.deurGedeeld + ' gedeeld; actor uit het verzoek ' + b.actorUitVerzoek.length + '   vermoed');
+      b.deurGedeeld + ' gedeeld; actor uit het verzoek ' + b.actorUitVerzoek.length + '   vermoed, onbepaald ' +
+      b.actorOnbepaald.length);
   }
   console.log('\n  de machinerie -- bestaat, hangt hij aan de kantoordeur?');
   for (const [naam, m] of Object.entries(u.machinerie)) {
@@ -566,4 +622,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { meet, EIST_MENS, KANTOORPAD };
+module.exports = { meet, EIST_MENS, KANTOORPAD, actorVan, NAAM_GEEN_ACTOR };

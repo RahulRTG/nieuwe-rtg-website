@@ -22,8 +22,8 @@
 const { keur } = require('../veilig');
 
 module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify, zijnVrienden, toelating }) => {
-  // de drager (./drager-regels.js) mag zeggen wie NIET in een gedragen groep komt
-  const weiger = (gr, key) => (typeof toelating === 'function' ? toelating(gr, key) : null);
+  // ./drager-regels.js zegt wie NIET in een gedragen groep komt
+  const weiger = (gr, key, ander) => (typeof toelating === 'function' ? toelating(gr, key, ander) : null);
   const NAAM_MAX = 70, OVER_MAX = 600, REGELS_MAX = 800;
   const MAX_PER_LID = 60;          // genootschappen waar je in kunt zitten
   const MAX_LEDEN = 500;
@@ -116,7 +116,7 @@ module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify,
     if (!doel) return { error: 'Dit lid ken ik niet.' };
     if (isLid(gr, doel)) return { error: 'Dit lid zit er al in.' };
     if ((gr.leden || []).length >= MAX_LEDEN) return { error: 'Dit genootschap is vol.' };
-    const w = weiger(gr, doel); if (w) return { error: w };
+    const w = weiger(gr, doel, true); if (w) return { error: w };
     if (!gr.uitnodigingen.includes(doel)) gr.uitnodigingen.push(doel);
     save();
     try { if (notify) notify(doel, { title: 'Genootschap', body: 'Je bent uitgenodigd voor een genootschap: ' + gr.naam }); } catch (e) {}

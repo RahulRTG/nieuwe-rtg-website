@@ -140,6 +140,7 @@ test('2. een stichting die de RTFoundation niet erkende, kan niet dragen en ziet
 
 // Zakt bij de mutatie: in opzet/kernlaag4.js `toelating: ...` weghalen -> de minderjarige wordt uitgenodigd, zakt.
 // Zakt bij de mutatie: in drager.js vraag() de lus over `gr.leden` met beschermdeReden weghalen -> de vraag gaat door, zakt.
+// Zakt bij de mutatie: in index.js nodigUit de echte reden teruggeven in plaats van de neutrale -> de beheerder leert iets over de persoon, zakt.
 test('3. een minderjarige gaat niet door een ander een gedragen genootschap in, en een groep met een minderjarige wacht', async () => {
   const jong = await lid('2009-09-09');            // zeventien, paspoort gekeurd
   const ongekeurd = await lid('1980-01-01', false); // volwassen op papier, niet gezien
@@ -148,13 +149,16 @@ test('3. een minderjarige gaat niet door een ander een gedragen genootschap in, 
   const wacht = await post('/api/genootschap/drager/vraag', { groep: gr.id, ref: P.een.id }, P.beh.token);
   assert.equal(wacht.status, 409);
   assert.equal(wacht.body.wacht, 'G5');
+  assert.doesNotMatch(wacht.body.error, /18|minderjarig|gezien|geverifieerd/i, 'de beheerder hoort iets over een lid');
   assert.equal((await post('/api/genootschap/vertrek', { groep: gr.id }, jong.token)).status, 200);
 
   assert.equal((await post('/api/genootschap/drager/vraag', { groep: gr.id, ref: P.een.id }, P.beh.token)).status, 200);
   for (const w of [jong, ongekeurd]) {
     const nu = await post('/api/genootschap/nodig-uit', { groep: gr.id, wie: w.codenaam }, P.beh.token);
     assert.equal(nu.status, 400);
-    assert.match(nu.body.error, /18 jaar of ouder/, w.codenaam + ' ' + (w === jong ? 'jong' : 'ongekeurd'));
+    // neutraal naar de beheerder: niets over leeftijd of verificatie van deze persoon
+    assert.match(nu.body.error, /kan niet worden toegevoegd/, w.codenaam);
+    assert.doesNotMatch(nu.body.error, /18|minderjarig|gezien|geverifieerd/i, 'de weigering verraadt iets over ' + w.codenaam);
     const zelf = await post('/api/genootschap/binnen', { groep: gr.id }, w.token);
     assert.match(String(zelf.body.error), /18 jaar of ouder/);
   }

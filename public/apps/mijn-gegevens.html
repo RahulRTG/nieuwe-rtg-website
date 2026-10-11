@@ -80,6 +80,7 @@
   .grens{border:1px solid var(--line);padding:0.85rem 1rem;margin:0.6rem 0;font-size:0.8rem;line-height:1.6;}
   .grens b{font-weight:600;}
   .grens span{color:var(--soft);display:block;margin-top:0.2rem;}
+  .grens a{color:var(--txt);text-decoration:underline;text-underline-offset:3px;display:inline-block;min-height:24px;line-height:24px;}
   .let{border:1px solid var(--line);border-left:3px solid var(--gold);background:var(--card2);
     padding:0.85rem 1rem;margin:0.9rem 0;font-size:0.8rem;line-height:1.6;}
   details summary{cursor:pointer;font-size:0.74rem;color:var(--soft);padding:0.6rem 0;min-height:24px;
@@ -107,6 +108,7 @@
   <div id="telling"></div>
   <div id="lijst"></div>
   <div id="opheffen"></div>
+  <div id="opnieuw"></div>
   <div id="grenzen"></div>
 </main>
 <script>
@@ -261,6 +263,48 @@
     }
   }
 
+  /* OPNIEUW BEGINNEN (SAMENLEVING.md par. 2, kern/opnieuwbeginnen.js). Hier en
+     niet op een eigen scherm: het is een projectie over wat deze kaart en het
+     bedieningspaneel al hebben, en een tweede scherm met dezelfde vraag zou
+     een tweede ingang naar dezelfde zijn. Wat er na wissen blijft, staat
+     hierboven en wordt niet herhaald -- de server leest het van dezelfde kaart. */
+  function toonOpnieuw(b) {
+    const el = $('#opnieuw'); el.textContent = '';
+    el.appendChild(tekst(maak('h2'), b.wat));
+    el.appendChild(tekst(maak('p', 'stil'), b.uitleg));
+    for (const o of b.onderdelen) {
+      if (o.stand === 'nietGebouwd') {
+        const l = maak('div', 'let');
+        l.appendChild(tekst(maak('b'), o.wat));
+        l.appendChild(maak('br'));
+        l.appendChild(document.createTextNode('Bestaat nog niet. ' + o.reden));
+        el.appendChild(l);
+        continue;
+      }
+      const d = maak('div', 'grens');
+      d.appendChild(tekst(maak('b'), o.wat));
+      if (o.jouwStand && o.jouwStand.lezing) d.appendChild(tekst(maak('span'), o.jouwStand.lezing));
+      for (const i of [o.ingang, ...(o.ingangen || [])].filter(x => x && x.scherm !== location.pathname)) {
+        const s = maak('span');
+        const a = tekst(maak('a'), i.waar || i.wat);
+        a.href = i.scherm;
+        s.appendChild(a);
+        if (i.waar && i.wat) s.appendChild(document.createTextNode(' \u2014 ' + i.wat));
+        d.appendChild(s);
+      }
+      if (o.blijftStaan) d.appendChild(tekst(maak('span'), 'Wat er na wissen blijft, staat hierboven onder "Als u uw account opheft".'));
+      if (o.dektNiet) d.appendChild(tekst(maak('span'), o.dektNiet));
+      el.appendChild(d);
+    }
+    for (const n of b.nietGedaan || []) el.appendChild(tekst(maak('p', 'stil'), n));
+  }
+
+  async function laadOpnieuw() {
+    const r = await api('/api/account/opnieuw', {});
+    if (r.status !== 200 || !Array.isArray(r.body.onderdelen)) return;   // de kaart zelf meldt al waarom
+    toonOpnieuw(r.body);
+  }
+
   async function laad() {
     const r = await api('/api/mijn/gegevens', {});
     if (r.status === 401) { $('#uitleg').textContent = 'Log in om dit te zien.'; return; }
@@ -272,6 +316,7 @@
       $('#uitleg').textContent = 'Het antwoord was onvolledig, dus dit kon niet worden geladen.'; return;
     }
     toon(k);
+    await laadOpnieuw();
   }
 
   laad();

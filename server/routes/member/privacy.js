@@ -5,11 +5,16 @@
    Gemount vanuit routes/member.js. */
 const inzagelog = require('../../inzagelog');
 const maakVergeten = require('../../kern/vergeten');
+const { maakOpnieuwBeginnen } = require('../../kern/opnieuwbeginnen');
 
 module.exports = (kern) => {
   const { app, auth, db, stateFor, myApplications, ordersVanKlant, commGast, handelingsspoor } = kern;
   const { lidBoard, lidBoardLog, lidBoardLogKeten } = kern.lidboard;
   const { wisLid } = maakVergeten(kern);
+  /* De gegevenskaart wordt later op de kern gezet (opzet/aanbouw4.js); daarom
+     bij het verzoek gelezen en niet bij het monteren. */
+  const opnieuw = maakOpnieuwBeginnen({ accounts: kern.accounts,
+    naOpheffen: (key, account) => kern.gegevenskaart.kaartVan(key, account).naOpheffen });
 
   /* Inzage en vergetelheid (AVG art. 15 en 17) gelden voor IEDER account, ook
      een gratis account (tier 'guest' MET account). Hier stond `tier === 'guest'`,
@@ -121,5 +126,17 @@ module.exports = (kern) => {
        deur uit gaat: het spoor schrijft dan "gewist". */
     req.session = { key: 'gewist', tier: req.session.tier };
     res.json({ ok: true });
+  });
+
+  /* OPNIEUW BEGINNEN (SAMENLEVING.md par. 2, kern/opnieuwbeginnen.js): een
+     projectie over export, wissen en herstel, die zelf niets bewaart of doet.
+     Het pad hangt onder /api/account en niet onder /api/privacy: dit is een
+     onderdeel van het eigen account en hoort onder de functie `tg-account`,
+     terwijl /api/privacy met opzet in geen enkele kast staat. Open voor ieder
+     account, ook het gratis account; de bezoeker zonder account heeft niets
+     om opnieuw mee te beginnen. */
+  app.post('/api/account/opnieuw', auth, (req, res) => {
+    if (zonderAccount(req)) return res.status(403).json({ error: 'Alleen voor wie een account heeft. Een gratis account maken kan altijd.' });
+    res.json(opnieuw.beeld(req.session.account, req.session.key));
   });
 };

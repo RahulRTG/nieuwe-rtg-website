@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2447 bestanden en 16757 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2446 bestanden en 16751 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2447 |
-| losse beweringen (`test(...)`) | 16757 |
+| toetsbestanden | 2446 |
+| losse beweringen (`test(...)`) | 16751 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2273 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2272 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2139 bestanden, 16220 beweringen.
+2138 bestanden, 16214 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -87,7 +87,7 @@ toets omvalt.
 | `agenda-pro.test.js` | 5 | gezakt op `liegpoort /api/` | De pro-laag van de agenda: herhalingen die goed uitrollen, uitnodigen op codenaam (nooit een echte naam in beeld), ja/nee dat bij de organisator terugkomt, ICS-export met RRULE, en de eerlijke sluitregels. Draai los:... |
 | `agenda.test.js` | 5 | gezakt op `liegpoort /api/` | Tests voor de persoonlijke AI-agenda (kern/agenda.js): leden en leveranciers hebben een eigen agenda; de AI zet gewone taal om naar datum + tijd; de telling voedt de ballon-badge. Draai: npm test |
 | `agent.test.js` | 4 | gezakt op `liegpoort /api/` | De AI-bedrijfsagent: vaste leverancier koppelen, inkoopvoorstellen met goedkeuring door de gemachtigde (pas dan een echte bestelling bij de groothandel), automatisch een voorstel na de MEP-voorspelling, en het... |
-| `agentinstructies.test.js` | 7 | gezakt op `voorwaarde-omkeren#0` | DE AGENTINSTRUCTIES (ARCHITECTOPDRACHT.md, fase 1) CLAUDE.md is opgeknipt: AGENTS.md is de ene bron voor elke agent, CLAUDE.md importeert hem, en de samenvattingen per diepte-document staan woordelijk in... |
+| `agentinstructies.test.js` | 9 | gezakt op `voorwaarde-omkeren#0` | DE AGENTINSTRUCTIES (ARCHITECTOPDRACHT.md, fase 1) CLAUDE.md is opgeknipt: AGENTS.md is de ene bron voor elke agent, CLAUDE.md importeert hem, en de samenvattingen per diepte-document staan woordelijk in... |
 | `ai-budget.test.js` | 12 | gezakt op `===->!==#0` | HET AI-BUDGET PER PERSOON. Er stonden al twee grenzen op de modelkraan en allebei misten ze iets: het huisplafond gaat pas dicht als iemand anders het al heeft leeggetrokken, en de rem per minuut laat een script dat... |
 | `ai-cache.test.js` | 10 | gezakt op `===->!==` | Prompt caching in de Claude-client (server/anthropic.js, verrijkMetCache). De verrijking zet cache_control-markeringen op de juiste blokken, met drempels (een cache-schrijf kost 1,25x; klein werk markeren is verlies)... |
 | `ai-herkomst.test.js` | 3 | gezakt op `===->!==#0` | De herkomst van een antwoord hoort bij de AANROEP, niet bij de keten. Wat hier werd gerepareerd: het label onder een Rahul-antwoord kwam uit de CONFIGURATIE (./ai-stand.js beschikbaarheid), en de keten hield de... |
@@ -145,7 +145,6 @@ toets omvalt.
 | `appwerkt-onderschepper.test.js` | 5 | gezakt op `===->!==#8` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `archief.test.js` | 5 | gezakt op `liegpoort /api/` | De archiefkast: afgeronde tickets ouder dan een afgesloten kwartaal verhuizen naar append-only maandbestanden. De levende kast blijft klein, maar niets raakt zoek: de backoffice-totalen tellen het archief mee en de... |
 | `architect.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Architectenbureau: het huizen-ontwerpbureau van de kantoren (villa's, penthouses, landgoederen, chalets, paviljoens). Een AI tekent het concept uit (typologie, constructie, materialen, gedempt palet,... |
-| `architectcontext.test.js` | 8 | gezakt op `voorwaarde-omkeren#0` | DE CONTEXT VAN DE ARCHITECT EN ZIJN VOLDOENDHEID (ARCHITECTOPDRACHT.md fase 7) Het stop/go-bewijs van fase 7, als toetsen: - over vijf ijktaken een uitslag per taak, gelijk aan de vastgelegde in... |
 | `architectproef.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | DE ARCHITECTPROEF (ARCHITECTOPDRACHT.md fase 5) Het stop/go-bewijs van fase 5, als toetsen: - twintig vragen, tien per domein, elk met een uitslag; - geen enkel antwoord zonder herkomst; - elke mislukte vraag draagt... |
 | `arena.test.js` | 6 | gezakt op `liegpoort /api/` | Integratietests voor De Arena (tieners): het klasgenoten-uitnodigingspad (beschermde tieners zijn onvindbaar via de zoeker, de klas is de bevestigde kring), het Flitsduel (tien dezelfde sommen, buiten de beurt,... |
 | `arrival-security.test.js` | 3 | gezakt op `===->!==#5` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

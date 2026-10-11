@@ -64,8 +64,12 @@ const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
    bestand in de map dat hier niet staat, laat de proef weigeren in plaats van
    stil niet mee te tellen. */
 const SCENARIOS = {
+  'ik.js': require('./lib/voltooi/ik'),
+  'loopbaan.js': require('./lib/voltooi/loopbaan'),
   'post.js': require('./lib/voltooi/post'),
-  'sessies.js': require('./lib/voltooi/sessies')
+  'reizen.js': require('./lib/voltooi/reizen'),
+  'sessies.js': require('./lib/voltooi/sessies'),
+  'wonen.js': require('./lib/voltooi/wonen')
 };
 
 function scenarios(alleen) {
@@ -94,14 +98,18 @@ async function meetScenario(sc) {
       boek[bewijs].push({ nr, wat, stand: 'stuk', fout: String(e && e.message || e).slice(0, 300), ms: Date.now() - t0 });
     }
   };
-  const w = await maakWereld(path.basename(sc.bestand, '.js'));
+  /* Een scenario mag een EXTRA omgeving vragen voor zijn wereld (reizen.js: de
+     synthetische zaak met een manager-PIN bestaat alleen in de Magnaat-
+     testomgeving). Dat staat dan in het register, zodat zichtbaar blijft in
+     welke wereld er gemeten is; de postvanger-grendel gaat er altijd overheen. */
+  const w = await maakWereld(path.basename(sc.bestand, '.js'), sc.omgeving || null);
   let afgebroken = null;
   try { await sc.loop(w, stap); }
   catch (e) { afgebroken = String(e && e.message || e).slice(0, 300); }
   const post = w.berichten();
   w.klaar();
   const uit = { scenario: sc.bestand, ingang: sc.ingang, persona: sc.persona, belofte: sc.belofte, grens: sc.grens,
-    herstarts: w.herstarts, afgebroken,
+    herstarts: w.herstarts, afgebroken, omgeving: sc.omgeving || null,
     /* Wat de postvanger ving. Geen inhoud en geen adres: de soort, het onderwerp
        en hoeveel. Dat er iets ligt, bewijst dat het huis het wilde versturen;
        dat het nergens heen ging, bewijst de grendel. */

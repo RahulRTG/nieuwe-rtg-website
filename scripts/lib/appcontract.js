@@ -95,6 +95,21 @@ const CONTRACT = {
   'link:post': Object.assign({
     belofte: 'een lid geeft en trekt zelf toestemming in voor commerciele post, alles staat uit tot hij het aanzet, en de geschiedenis bewijst wanneer en waar'
   }, voltooi('post', 'het scenario loopt /api/mijn/post, /zet, /alles-uit en /geschiedenis, de routes die /apps/mijn-post.html zelf aanroept')),
+  /* Ronde 2 van het afbouwprogramma (11 oktober 2026): vier onderdelen uit vier
+     verschillende werelden die alleen een scenario misten, elk op routes die hun
+     scherm zelf aanroept. */
+  'link:ik': Object.assign({
+    belofte: 'een lid zegt zelf hoe het aangesproken wil worden en hoe elk scherm zich hoort te gedragen, op elk scherm en elk toestel'
+  }, voltooi('ik', 'het scenario loopt /api/ik, /api/ik/zet en /api/ik/toegankelijk/zet, de routes die /apps/ik.html zelf aanroept, plus de gedeelde leesroute van het profiel')),
+  'link:loopbaan': Object.assign({
+    belofte: 'een lid schrijft zijn loopbaan als reeks die niets wist, en deelt een regel met een buitenstaander zonder account tot hij dat stopt'
+  }, voltooi('loopbaan', 'het scenario loopt /api/carriere/ledger/* (mijn, zet, intrek, deel, delen, stopdelen), de routes die /apps/loopbaan.html zelf aanroept, plus de leesroute van de buitenstaander')),
+  'link:wonen': Object.assign({
+    belofte: 'een lid meldt zelf wat er thuis stuk is, ziet het als gemeld en nooit als ingepland, en de historie blijft staan'
+  }, voltooi('wonen', 'het scenario loopt /api/home/onderhoud, /meld en /annuleer, de routes die /apps/wonen.html zelf aanroept; de bestanden en de woningkaart van hetzelfde scherm niet')),
+  'link:reizen': Object.assign({
+    belofte: 'een lid deelt een reis tijdelijk met wie het zelf kiest, een zaak ziet hooguit voortgang en nooit een plek, en pauzeren en stoppen werken meteen'
+  }, voltooi('reizen', 'het scenario loopt /api/veiligheid/moment/* (maak, status, pauze, stop), de routes die /apps/reizen-veilig.html zelf aanroept, plus de leesroute van de zaak')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {

@@ -35,7 +35,12 @@
 
      1 bereikbaar   -- opent de ingang voor de persona aan wie hij wordt getoond?
      2 bedienbaar   -- doen de knoppen iets, zonder te breken?
-     8 menselijk    -- geen kale TypeError, 500 of knop die stil niets doet.
+     8 menselijk    -- een ONDERGRENS sinds 11 oktober 2026 (./lib/kalefout.js):
+                       geen kale JS-fout of 5xx, elke weigering met haar zin in
+                       beeld, geen kale techniek in beeld na laden en na elke tik,
+                       en geen eigen knop zonder toegankelijke naam -- en alleen
+                       BEWEZEN als de bediening zelf beproefd is. Of een melding
+                       een WEG biedt, meet hij niet, en dat staat in de reden.
 
    SAMENSTELLEN (24 september 2026). Een bewijs mag ook uit een proef komen die
    al bestaat -- een gesloten ketenproef, of een ronde die elke rij meet (de
@@ -114,6 +119,8 @@ const { stempel } = require('./lib/stempel');
 const { stelSamen } = require('./lib/bewijsbron');
 const { CONTRACT, ZONDER_APP, TESTWERELD_ONTBREEKT } = require('./lib/appcontract');
 const { beoordeel: beoordeelBestemming, personaAfwijking } = require('./lib/bestemming');
+/* Bewijs 8 als ondergrens die zonder oordeel te meten is. */
+const { kaleKlachten, menselijkOordeel } = require('./lib/kalefout');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'APPWERKT.json');
@@ -206,9 +213,12 @@ const testwereldReden = (r, bewijs) => {
 };
 const ONGEMETEN = {
   voltooibaar: (r) => GEEN_FIXTURE(testwereldReden(r, 'dat loopt de hele bedoeling af tot en met wat de ontvanger ziet')),
-  waarheidsgetrouw: () => GEEN_FIXTURE('vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes'),
+  /* Deze twee worden altijd vervangen door de ronde uit ALGEMEEN
+     (scripts/lib/appcontract.js); de tekst staat er voor het geval dat die bron
+     ooit wegvalt. */
+  waarheidsgetrouw: () => GEEN_FIXTURE('vraagt de liegronde (scripts/liegronde.js, LIEGRONDE.json)'),
   persistent: (r) => GEEN_FIXTURE(testwereldReden(r, 'dat herstart netjes op dezelfde datamap en leest de uitkomst in een nieuwe sessie en in de opslag')),
-  bevoegd: () => GEEN_FIXTURE('vraagt de kruisproef met vreemde rollen, gezinnen en bedrijven; de routekant staat in IDOR.json en ROLPROEF.json, de schermkant niet'),
+  bevoegd: () => GEEN_FIXTURE('vraagt de bevoegdronde (scripts/bevoegdronde.js, BEVOEGD.json)'),
   herstelbaar: (r) => GEEN_FIXTURE(testwereldReden(r, 'dat beproeft dubbelklik, een herhaald en een afgebroken verzoek en een crash direct na de bevestiging (uitval van Redis of PostgreSQL zit er nog niet in)'))
 };
 
@@ -434,12 +444,16 @@ async function meetRij(rij, base, persoonlijk, rollen) {
   } else {
     r.bewijzen.bedienbaar = { status: 'BEWEZEN', reden: uitsplitsing, bewijs: null };
   }
-  /* Bewijs 8 wordt AFGELEID en niet apart gemeten, en dat staat er zo bij: een
-     kale TypeError of 500 is nooit menselijk, en verder kan deze proef niet
-     beoordelen of een foutmelding bruikbaar was. */
-  r.bewijzen.menselijk = stuk.length || eersteBezoek.crash.length
-    ? { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'een kale JS-fout of 500 bereikt de gebruiker: ' + (eersteBezoek.crash[0] || stuk[0]), bewijs: null }
-    : { status: 'NIET_GETEST', reden: 'afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7', bewijs: null };
+  /* Bewijs 8 is een ONDERGRENS (./lib/kalefout.js): geen kale fout, elke
+     weigering met haar zin in beeld, geen kale techniek, geen naamloze eigen
+     knop -- en alleen als de bediening zelf beproefd is. Of een melding een
+     WEG biedt, beoordeelt deze proef niet, en dat staat in de reden. */
+  r.kaal = bediening.kaal;
+  r.naamloos = bediening.naamloos;
+  const m8 = menselijkOordeel({ stuk, laadCrash: eersteBezoek.crash, kaal: bediening.kaal, naamloos: bediening.naamloos,
+    bedienbaar: r.bewijzen.bedienbaar.status, eigenKnoppen: bediening.gevonden });
+  r.bewijzen.menselijk = { status: m8.status, reden: m8.reden,
+    bewijs: (bediening.kaal.length || bediening.naamloos.length) ? bediening.kaal.concat(bediening.naamloos).slice(0, 5).join(' | ') : null };
 
   vulOngemeten(r);
   return r;
@@ -519,6 +533,17 @@ async function bedien(ctx, base, pad) {
   let laatste = null;
   let geklikt = 0, gevonden = 0, schil = 0;
   const overgeslagen = [], nietKlikbaar = [], onderschept = [], instrument = [];
+  /* Bewijs 8: kale techniek in beeld (na laden en na elke tik) en eigen knoppen
+     zonder toegankelijke naam. De ijklijn is de zichtbare tekst van het
+     statische bestand (./lib/kalefout.js). */
+  const kaal = new Set();
+  let naamloos = [];
+  const statisch = await fetch(base + pad).then((r) => (r.ok ? r.text() : '')).catch(() => '');
+  const kijkKaal = async (na) => {
+    let tekst = '';
+    try { tekst = await page.evaluate(() => (document.body ? document.body.innerText : '')); } catch (e) { return; }
+    for (const k of kaleKlachten({ tekst, statisch })) kaal.add(k + (na ? ' na "' + na + '"' : ' bij het laden'));
+  };
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(2200);
@@ -531,6 +556,8 @@ async function bedien(ctx, base, pad) {
       null, { timeout: 8000 }).catch(() => {});
     await page.waitForTimeout(400);
     bedekt.push(...await bedektDoorSchil(page));
+    await kijkKaal(null);
+    naamloos = await naamlozeKnoppen(page);
     luister(page, base, { crash, config, serverfout, rem, weigering });   // pas NA het laden: laadfouten horen bij bewijs 1
     /* Welke tik de taal van de persona verandert: een vertaalverzoek naar een
        andere taal dan nl na een tik, met de knop erbij. */
@@ -575,6 +602,7 @@ async function bedien(ctx, base, pad) {
            echt -- en dat is wel een bevinding. */
         await page.keyboard.press('Escape').catch(() => {});
         await page.waitForTimeout(250);
+        await kijkKaal(laatste);
       } catch (e) {
         /* De reden van een time-out staat in de LOG van Playwright ("intercepts
            pointer events", "element is not visible"), niet in de boodschap.
@@ -598,7 +626,43 @@ async function bedien(ctx, base, pad) {
   }
   await beoordeelWeigeringen(page, weigering, gezegd, serverfout);
   await page.close();
-  return { geklikt, gevonden, schil, bedekt, overgeslagen, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel };
+  return { geklikt, gevonden, schil, bedekt, overgeslagen, nietKlikbaar, onderschept, instrument, crash, config, serverfout, rem, gezegd, taalWissel,
+    kaal: [...kaal], naamloos };
+}
+
+/* EIS 4 VAN BEWIJS 8: een eigen knop zonder toegankelijke naam. Dezelfde
+   afbakening als kijkRonde (eigen knoppen, zonder de schil en de taalkeuze),
+   maar ZONDER de filter op href/data-url: een link-knop zonder naam is voor een
+   schermlezer net zo stom. De naam is wat een schermlezer zou voorlezen:
+   zichtbare tekst, aria-label, aria-labelledby (met een bestaand doel) of title. */
+async function naamlozeKnoppen(page) {
+  try {
+    return await page.evaluate(() => {
+      const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
+        if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
+        const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
+      const SCHIL = '.rtg-edge-chrome, .rnd-toets';
+      /* Een element met visibility:hidden heeft een maat maar bestaat niet voor
+         een schermlezer (en innerText is er leeg): niet meetellen. De naam komt
+         uit textContent, zoals de naamberekening van een schermlezer. */
+      const getoond = (el) => getComputedStyle(el).visibility !== 'hidden';
+      const naam = (el) => {
+        if ((el.textContent || '').trim()) return true;
+        if ((el.getAttribute('aria-label') || '').trim()) return true;
+        if ((el.getAttribute('title') || '').trim()) return true;
+        const lb = (el.getAttribute('aria-labelledby') || '').split(/\s+/).filter(Boolean);
+        if (lb.some((id) => { const d = document.getElementById(id); return d && (d.textContent || '').trim(); })) return true;
+        const img = el.querySelector('img[alt]');
+        if (img && img.getAttribute('alt').trim()) return true;
+        return false;
+      };
+      return Array.from(document.querySelectorAll('button,[role=button]'))
+        .filter(zie).filter(getoond).filter((el) => !el.closest(SCHIL) && !el.closest('#rtg-lang-modal'))
+        .filter((el) => !naam(el))
+        .map((el) => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + Array.from(el.classList).slice(0, 2).map((c) => '.' + c).join(''))
+        .slice(0, 10);
+    });
+  } catch (e) { return []; }
 }
 
 /* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
@@ -761,7 +825,7 @@ function bouw(meting) {
   }
   const defecten = meting.regels.filter((r) => r.status === 'GEBLOKKEERD_DOOR_DEFECT');
   return {
-    uitleg: 'Doet de functie het? Per onderdeel uit MAPPEN, met de persona aan wie de wereld hem toont, gemeten in een echte browser met een echte sessie. Drie van de acht bewijzen uit BETROUWBAARHEID.md worden hier gemeten; de andere vijf staan er met de reden waarom ze nog niet te meten zijn.',
+    uitleg: 'Doet de functie het? Per onderdeel uit MAPPEN, met de persona aan wie de wereld hem toont, gemeten in een echte browser met een echte sessie. Bereikbaar, bedienbaar en menselijk (als ondergrens, scripts/lib/kalefout.js) worden hier gemeten; waarheidsgetrouw en bevoegd komen uit de liegronde en de bevoegdronde, voltooibaar, persistent en herstelbaar uit de voltooiproef of een ketenproef. Wat geen bron heeft, staat er met de reden.',
     hoe: 'node scripts/appwerkt.js  (--controle zakt als het aantal defecten groeit)',
     grens: 'Een BEWEZEN rij betekent: de ingang opent voor zijn persona en de bediening breekt niet. Het betekent NIET dat de functie werkt -- daarvoor zijn de vijf bewijzen nodig die hier GEEN_FIXTURE zijn. Er worden geen formulieren ingevuld en geen onomkeerbare knoppen aangetikt; die staan per rij in `overgeslagen`. ' +
       'EN: een groot deel van wat er zichtbaar staat is niet aan te tikken -- er ligt iets overheen, of het is weg op het moment van tikken. Raakt de proef minder dan de helft van een scherm, dan is die rij NIET_GETEST en geen BEWEZEN; zie knoppenNietKlikbaar en schermenGrotendeelsOngemeten.',

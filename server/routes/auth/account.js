@@ -11,7 +11,11 @@ module.exports = (actx) => {
 app.post('/api/auth/register', async (req, res) => {
   // Registratie-zekering (een noodrem-trede dooft vanzelf; zie techniek.js).
   const zReg = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.registratie;
-  if (require('../../techniek').zekeringGesprongen(zReg)) return res.status(503).json({ error: 'Registreren is tijdelijk uitgeschakeld.' });
+  if (require('../../techniek').zekeringGesprongen(zReg)) return res.status(503).json({ error: 'Registreren is tijdelijk uitgeschakeld.', code: 'REGISTRATIE_DICHT', reden: 'zekering' });
+  /* Het blijvende besluit van de eigenaar (RTG_REGISTRATIE_DICHT, zie
+     accounts/registratie.js). createUser weigert zelf ook; hier staat hij
+     vooraan zodat er niets gekeurd of geteld wordt voor de weigering. */
+  if (accounts.registratieDicht()) return res.status(503).json({ error: accounts.registratieUitleg, code: 'REGISTRATIE_DICHT', reden: 'besluit' });
   /* De poortcontrole staat in ./aanmeldcontrole.js: wat mag er binnenkomen en
      met welke pas. Die geeft een fout terug of de schoongemaakte velden; hier
      blijft staan wat we met een GOEDGEKEURDE aanmelding doen. */
@@ -22,6 +26,7 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     user = await accounts.createUser({ email, username: req.body.username || null, password, tier, realName: name, phone: telefoon });
   } catch (e) {
+    if (e && e.code === 'REGISTRATIE_DICHT') return res.status(503).json({ error: e.message, code: e.code, reden: 'besluit' });
     return res.status(409).json({ error: 'Dit account bestaat al.' });
   }
   try {

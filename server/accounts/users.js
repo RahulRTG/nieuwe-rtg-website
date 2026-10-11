@@ -9,13 +9,16 @@ const kluis = require('./kluis');
 const gebonden = require('./gebonden'); // kluis, gebonden aan (kolom, rij-id)
 const mirror = require('./mirror');
 const { uitgezet } = require('./sessiegrens');
+const registratie = require('./registratie'); // RTG_REGISTRATIE_DICHT: zie daar
 
 /* createUser is asynchroon (scrypt in de threadpool); createUserSync bestaat
    voor het opstart-seed en tests, waar blokkeren geen kwaad kan. */
 async function createUser(gegevens) {
+  registratie.eisOpen();
   return schrijfUser(gegevens, await kluis.hashPassword(gegevens.password));
 }
 function createUserSync(gegevens) {
+  registratie.eisOpen();
   return schrijfUser(gegevens, kluis.hashPasswordSync(gegevens.password));
 }
 /* Alleen voor de demo-seed; waarom dat mag en waarom het buiten de demostand

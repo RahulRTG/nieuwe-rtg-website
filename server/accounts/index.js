@@ -29,6 +29,7 @@ const migraties = require('../migraties');
 const kluis = require('./kluis');
 const mirror = require('./mirror');
 const users = require('./users');
+const registratie = require('./registratie');
 const staff = require('./staff');
 const staffSessie = require('./staff-sessie');
 const actiebewijs = require('./actiebewijs');
@@ -142,6 +143,10 @@ const api = {
      binnenwerk van de identiteitskluis rechtstreeks hoeft te importeren. */
   hashActiebewijs: actiebewijs.hash,
   kloptActiebewijs: actiebewijs.klopt,
+  /* Of RTG_REGISTRATIE_DICHT aan staat (./registratie.js); de registratieroute
+     weigert daarop al voor ze iets keurt. */
+  registratieDicht: () => registratie.dicht(),
+  registratieUitleg: registratie.UITLEG,
   ...users,
   ...staff
 };

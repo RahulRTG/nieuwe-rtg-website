@@ -49,8 +49,12 @@ module.exports = ({ app, kern, accounts, staat, save, log, beveilig, techAuth, e
     const zid = String(req.body.id || '');
     const z = Object.prototype.hasOwnProperty.call(t.zekeringen, zid) ? t.zekeringen[zid] : null;
     if (!z) return res.status(404).json({ error: 'Onbekende zekering.' });
-    if (req.body.actie === 'reset') { z.aan = true; z.reden = null; z.sindsGesprongen = null; }
-    else if (req.body.actie === 'spring') { z.aan = false; z.reden = String(req.body.reden || 'handmatig uitgeschakeld').slice(0, 120); z.sindsGesprongen = Date.now(); }
+    /* `tot` gaat bij BEIDE handelingen weg. Een handmatige zekering heeft geen
+       einde (techniek.js zekeringGesprongen); bleef het einde van een eerdere
+       noodrem staan, dan doofde een met de hand getrokken zekering alsnog
+       vanzelf op dat oude tijdstip -- of meteen, als het al voorbij was. */
+    if (req.body.actie === 'reset') { z.aan = true; z.reden = null; z.sindsGesprongen = null; z.tot = null; }
+    else if (req.body.actie === 'spring') { z.aan = false; z.reden = String(req.body.reden || 'handmatig uitgeschakeld').slice(0, 120); z.sindsGesprongen = Date.now(); z.tot = null; }
     else return res.status(400).json({ error: 'Actie moet reset of spring zijn.' });
     save();
     res.json({ ok: true, id: zid, aan: z.aan });

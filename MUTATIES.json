@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T18:00:05.012Z",
-    "commit": "bf16f6f6",
+    "op": "2026-10-11T06:08:26.331Z",
+    "commit": "49a0508d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9545,22 +9545,6 @@
       "gezakt": 2,
       "geprobeerd": 2
     },
-    "move-gevolg-adressen.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/move/gevolg.js",
-      "operator": "route-doel-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 2
-    },
-    "move-gevolg.e2e.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "public/apps/move.html",
-      "operator": "html-bron-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
     "move-keten.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -11997,6 +11981,14 @@
       "staat": "geen bronmutatie mogelijk",
       "reden": "overleefde 42 mutaties in public/shared/randen.js en rahul-mond.js. Hij toetst of PAGINA'S de bladen laden en dat er geen zwevende knop terugsluipt -- structuur van de markup, niet gedrag van de module"
     },
+    "ratelbronnen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/normwaarde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "rechtbank.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -12582,6 +12574,14 @@
       "module": "server/kern/commercie/ronde.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rondepr.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/werkstroom.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "rooster-verzuim.test.js": {

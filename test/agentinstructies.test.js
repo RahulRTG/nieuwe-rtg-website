@@ -109,3 +109,29 @@ test('7. de wetten die naar deze bestanden wijzen, vinden hun anker', () => {
     assert.ok(tekst(w.bron.bestand).includes(w.bron.anker), w.id + ': anker niet gevonden in ' + w.bron.bestand);
   }
 });
+
+test('8. de nulmeting is reproduceerbaar uit git, en een onbekende commit is null en geen oude waarde', () => {
+  /* Dezelfde maat, nu tegen HEAD gelezen in plaats van de werkboom: op een
+     schone boom zijn ze gelijk. Een commit die niet bestaat, geeft null. */
+  const werk = L.meet();
+  const head = L.meet('HEAD');
+  assert.equal(head.ref, 'HEAD');
+  assert.deepEqual(head.claude.bestanden, werk.claude.bestanden);
+  assert.ok(head.codex.bytes > 0);
+  assert.equal(L.lees('CLAUDE.md', 'bestaat-niet-0000000'), null);
+  const leeg = L.meet('bestaat-niet-0000000');
+  assert.deepEqual(leeg.claude.ontbreekt, ['CLAUDE.md']);
+  assert.deepEqual(leeg.codex.ontbreekt, ['AGENTS.md']);
+  assert.equal(leeg.codex.bytes, 0, 'een ontbrekend bestand telt als ontbrekend, niet als oude tekst');
+});
+
+test('9. een blok met een getalmerkteken telt als hetzelfde blok, wat er ook tussen staat', () => {
+  const a = 'Er zijn <!--getal:x.y-->12<!--/getal--> wetten.  ';
+  const b = 'Er zijn <!--getal:x.y-->53<!--/getal--> wetten.';
+  assert.equal(L.hash(a), L.hash(b));
+  assert.notEqual(L.hash(a), L.hash('Er zijn 53 wetten.'));
+  assert.deepEqual(L.blokken('een\r\n\r\ntwee\n  \ndrie  \n'), ['een', 'twee', 'drie']);
+  const inv = { blokken: [{ hash: L.hash('twee'), bestemming: 'zz-bestaat-niet.md' }] };
+  assert.equal(L.ontbrekend(inv).length, 1, 'een bestemming die niet bestaat, mist elk blok');
+  assert.equal(L.ontbrekend(inv, { 'zz-bestaat-niet.md': 'een\n\ntwee' }).length, 0);
+});

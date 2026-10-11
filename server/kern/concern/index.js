@@ -43,7 +43,9 @@ module.exports = (ctx) => {
   Object.assign(k, require('./entiteit')(k));
   Object.assign(k, require('./vestiging')(k));
   Object.assign(k, require('./graaf')(k));
-  Object.assign(k, require('./employment')(k));
+  /* codenaamVan gaat ALLEEN naar het dienstverband: daar leest hij een
+     ledensleutel ook als codenaam (zie `wie()` in ./employment.js). */
+  Object.assign(k, require('./employment')(Object.assign({}, k, { codenaamVan: ctx.codenaamVan })));
   Object.assign(k, require('./scope')(k));
   /* De collectietransactie gaat ALLEEN naar de uitnodiging, en niet in `k`:
      `k` wordt aan het eind op de kern gezet, en dan reikte elk ander domein er

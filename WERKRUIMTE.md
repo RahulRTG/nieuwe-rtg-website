@@ -505,6 +505,21 @@ Werkwijze: controleerbare PR's, niets wordt zelfstandig gemerged, en er wordt
 gerapporteerd met meetbare uitkomsten en afwijkingen **voordat** een tweede
 wereld migreert.
 
+**Hoe de PR's beoordeeld worden** (de eigenaar, dezelfde dag), en dit is de lat
+en geen wens:
+
+- *Een licht blad*: een laag gaat niet weg alleen omdat het eerste beeld gelijk
+  blijft. Interacties, toegankelijkheid, rechten, de Edge-context naar de host
+  en herstel na een fout moeten blijven werken -- een laag over gebaren of
+  toetsenbord ziet een schermafdruk per definitie niet.
+- *TravelOS*: dezelfde projectie (`shared/rtg-world-home.js`) gebruiken bewijst
+  niet dat de functionaliteit gelijk is. Navigatie, diepe links,
+  terugnavigatie, het verlopen van de sessie en bediening op een telefoon worden
+  apart beproefd; de zeven criteria van 12.4 blijven leidend.
+- *De visuele standaard*: de website is de referentie voor de IDENTITEIT, niet
+  voor de hoeveelheid inhoud. Een wereld wordt niet voller om op de website te
+  lijken; de bediening mag verschillen, en de Edge vangt de complexiteit op.
+
 ### 12.7 Wat dit voorstel met opzet NIET doet
 
 - Geen 313 schermen tegelijk verhuizen. Per wereld, per route, met een meter.

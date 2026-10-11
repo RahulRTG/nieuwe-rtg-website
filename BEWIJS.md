@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2524 bestanden en 17250 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2525 bestanden en 17251 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2524 |
-| losse beweringen (`test(...)`) | 17250 |
+| toetsbestanden | 2525 |
+| losse beweringen (`test(...)`) | 17251 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 330 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2345 |
 | **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 1 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 178 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 0 |
+| niets van beide | 1 |
 
 Van die overlevers kregen er **1** minder dan 8 mutaties aangeboden. Dat is geen
 uitspraak over de toets maar over de motor: zijn module draagt bijna geen construct dat
@@ -2258,7 +2258,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-310 bestanden, 540 beweringen.
+311 bestanden, 541 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2308,6 +2308,7 @@ toets omvalt.
 | `connect-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | ONTDEKKEN (/apps/connect.html) IN EEN ECHTE BROWSER. test/connect.test.js beproeft de MODULES, test/connect-routes.e2e.js de DEUREN. |
 | `contactpin.e2e.js` | 4 | gezakt op `liegpoort /api/` | DE CONTACTPIN OP HET SCHERM (apps/app.html, sociale balk in De Salon). test/contactpin.test.js bewijst dat de kern en de routes kloppen. |
 | `contrastcontext.e2e.js` | 2 | gezakt op `>=->>#0` | DRAAGT EEN CONTRASTMELDING GENOEG OM HEM TE KUNNEN REPAREREN? Deze toets bestaat door een rode CI die achteraf niet meer te herleiden was. |
+| `contrastfoto.e2e.js` | 1 | -- | EEN FOTO IN EEN PSEUDO-ELEMENT STOPT DE CONTRASTMETING, NET ALS BIJ EEN ELEMENT. De hero's van de werelden leggen hun foto in `::before` en een waas in `::after`, met de tekst erboven. |
 | `control-uniqueness.e2e.js` | 1 | gezakt op `liegpoort /api/` | Equivalent controls converge by action identity, never by translated text. |
 | `csp.e2e.js` | 1 | geen bronmutatie mogelijk | DE CSP ZOALS EEN BROWSER HEM ERVAART. Een Content-Security-Policy is de enige beveiliging in dit huis die je niet kunt aantonen door de code te lezen. |
 | `daily-rooms.e2e.js` | 1 | gezakt op `liegpoort /api/` | Approved daily rooms, proven with a real empty account and real mutations. Failed reads and empty searches are distinct. |
@@ -2567,7 +2568,7 @@ toets omvalt.
 | `world-desktop.e2e.js` | 14 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `world-function-controls.e2e.js` | 5 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `world-homes.e2e.js` | 5 | gezakt op `liegpoort /api/` | Approved homes must retain real data, language state and the shared Edge. AI is off: built-in copy must still work and photos must never invent trips. |
-| `world-palette.e2e.js` | 1 | gezakt op `===->!==#0` | Wereldkleuren op het werkelijk geschilderde scherm: een body-token alleen mist oude vlakken binnen een iframe en de kleur van zijn buitenste schil. Vergelijkt zelfstandige apps, desktopvensters en Pass-bladen op... |
+| `world-palette.e2e.js` | 1 | gezakt op `===->!==#0` | Wereldkleuren op het werkelijk geschilderde scherm: een body-token alleen mist oude vlakken binnen een iframe en de kleur van zijn buitenste schil. Sinds de www-pariteit (#534) is de grond in elke wereld dezelfde... |
 | `zaakpay.e2e.js` | 2 | gezakt op `liegpoort /api/` | Schermtoets voor RTG Pay aan de ZAAKKANT (public/apps/zaakpay.html). Dit scherm bestond niet. |
 | `zaakregie.e2e.js` | 2 | gezakt op `liegpoort /api/` | Schermtoets voor de Regie van de zaak: hetzelfde scherm hangt in de zaak-app (leverancier.html, breed) en in de personeels-PDA (personeel.html, duimstand), en beide moeten opkomen zonder onopgevangen JS-fouten.... |
 | `zaal.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de hele keten van deze ronde: een LIED laten neerzetten met een eigen zin erin, het samen produceren, uitgeven, en het in DE ZAAL horen. De zwaarste bewering die hier op het scherm getoetst wordt: de... |

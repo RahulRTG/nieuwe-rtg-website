@@ -170,3 +170,31 @@ test('6. de drager wordt uit de prikklok gelezen: wie uitklokte VOOR de leen is 
   zet({ staffId: 7, in: '2026-10-10T17:00:00.000Z', out: '2026-10-10T23:00:00.000Z' });
   assert.equal(leen.drager({ staffId: '7', naam: 'Bram' }, kv('7')).stand, 'niet-gemeten');
 });
+
+test('7. de missies op de Vloer: een collega ziet de stand, alleen een manager het inkloktijdstip', async () => {
+  /* Eigenaarsbesluit 11 oktober 2026, de inklokkant van test 2: een regel voor
+     in- en uitklokken. /api/supplier/horeca/missions toont wie er ingeklokt
+     is; het tijdstip waarop wordt aan de bron weggelaten voor wie geen manager
+     is (routes/supplier/pda/vloer-missies.js, teamVoor). */
+  const inn = await B('/api/staff/clock', {});
+  assert.equal(inn.body.actie, 'in', JSON.stringify(inn.body));
+  try {
+    const m = (await M('/api/supplier/horeca/missions', {})).body;
+    const bm = (m.team || []).find((x) => String(x.id) === idB);
+    assert.ok(bm, 'de ingeklokte collega staat in het team: ' + JSON.stringify(m.team));
+    assert.equal(bm.stand, 'ingeklokt');
+    const sinds = bm.sinds;
+    assert.ok(Date.parse(sinds), 'een manager ziet het inkloktijdstip wel');
+
+    const a = (await A('/api/supplier/horeca/missions', {})).body;
+    assert.equal(a.manager, false, 'de proef draait echt als niet-manager');
+    const ba = (a.team || []).find((x) => String(x.id) === idB);
+    assert.ok(ba, 'een collega ziet WIE er ingeklokt is');
+    assert.equal(ba.stand, 'ingeklokt', 'en de stand');
+    assert.deepEqual(Object.keys(ba).filter((k) => !['id', 'name', 'func', 'stand'].includes(k)), [],
+      'een collega zonder managerrol krijgt alleen de stand, geen tijdstip');
+    assert.ok(!JSON.stringify(a).includes(sinds), 'en het tijdstip staat nergens anders in zijn antwoord');
+  } finally {
+    await B('/api/staff/clock', {});
+  }
+});

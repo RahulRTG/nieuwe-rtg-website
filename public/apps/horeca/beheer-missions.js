@@ -7,7 +7,7 @@
   function laad(){api('',{}).then(teken).catch(function(e){K.meld(e.message)})}
   function teken(d){
     $('hmLive').textContent=(d.team||[]).length;
-    $('hmTeam').innerHTML=(d.team||[]).map(function(x){var n=(d.missies||[]).filter(function(m){return String(m.voorId)===String(x.id)&&/nieuw|bezig/.test(m.status)}).length;return '<div class="hm-person"><i></i><span><b>'+esc(x.name)+'</b><small>'+esc(x.func)+' · sinds '+new Date(x.sinds).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})+'</small></span><span class="hm-load">'+n+' actief</span></div>'}).join('')||'<p class="hm-empty">Nog niemand ingeklokt. Rahul wijst daarom niets toe.</p>';
+    $('hmTeam').innerHTML=(d.team||[]).map(function(x){var n=(d.missies||[]).filter(function(m){return String(m.voorId)===String(x.id)&&/nieuw|bezig/.test(m.status)}).length;return '<div class="hm-person"><i></i><span><b>'+esc(x.name)+'</b><small>'+esc(x.func)+(x.sinds?' · sinds '+new Date(x.sinds).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}):' · ingeklokt')+'</small></span><span class="hm-load">'+n+' actief</span></div>'}).join('')||'<p class="hm-empty">Nog niemand ingeklokt. Rahul wijst daarom niets toe.</p>';
     var actief=(d.missies||[]).filter(function(m){return !/klaar|geannuleerd/.test(m.status)});
     $('hmMissies').innerHTML=actief.map(function(m){return '<article class="hm-mission" data-prio="'+esc(m.prioriteit)+'"><i></i><span><b>'+esc(m.titel)+'</b><small>'+esc(m.sectie)+' · '+esc(m.voorNaam)+' · '+esc(m.status)+(m.hulp?' · HULP GEVRAAGD':'')+'</small></span><span class="hm-load">'+m.minuten+' min</span></article>'}).join('')||'<p class="hm-empty">Geen actieve missies. De vloer is bij.</p>';
   }

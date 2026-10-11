@@ -81,20 +81,8 @@ module.exports = (ctx, eigen) => {
     return { ok: true, gemeente: beeld(rij) };
   }
 
-  /* Buurten samenvoegen onder de drempel. Het aantal samengevoegde buurten
-     staat er WEL bij: "overige buurten: 7" is informatie, stilzwijgend weglaten
-     zou de gemeente een onvolledig beeld geven zonder dat ze het weet. */
-  function buurten(perWijk) {
-    const uit = [];
-    let klein = 0, buurtenKlein = 0;
-    for (const [wijk, n] of Object.entries(perWijk || {})) {
-      if (n >= K) uit.push({ wijk, aantal: n });
-      else { klein += n; buurtenKlein++; }
-    }
-    uit.sort((a, b) => b.aantal - a.aantal);
-    if (buurtenKlein) uit.push({ wijk: 'overige buurten (' + buurtenKlein + ')', aantal: klein, samengevoegd: true });
-    return uit;
-  }
+  /* Buurten samenvoegen onder de drempel, queryveilig: zie ./buurtdrempel.js. */
+  const buurten = require('./buurtdrempel')(K);
 
   /* Het portaal op de gemeentecode. Alles wat hier teruggaat is geteld; er komt
      geen enkel dossier, geen naam en geen hulpvraagtekst langs. */

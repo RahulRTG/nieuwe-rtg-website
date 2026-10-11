@@ -408,6 +408,11 @@ test('het gemeentenportaal toont getelde cijfers en nooit een persoon', async ()
   const buurten = portaal.body.bereik.buurten;
   assert.equal(buurten.some(b => b.wijk === 'Schalkwijk'), false, 'een buurt met een enkele hulpvraag werd apart genoemd');
   assert.ok(buurten.some(b => b.samengevoegd), 'de samengevoegde buurten staan er niet bij');
+  // queryveilig en niet alleen celveilig (VERDER.md par. 6, V1): nooit een
+  // groep van EEN buurt met een aantal -- ook niet langs het totaal
+  for (const b of buurten.filter(x => x.samengevoegd)) {
+    assert.ok(b.buurten >= 2 || b.aantal === null, 'een groep van een buurt droeg haar exacte aantal: ' + JSON.stringify(b));
+  }
 
   // een onbekende code geeft niets, en zeker geen andere stad
   const onzin = await post('/api/rtfos/portaal/gemeente', { code: 'RTFG-ZZZZZZZ' });

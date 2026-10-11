@@ -25,6 +25,10 @@
   var ABO = null;
 
   function esc(s) { return w.Geld.esc(s); }
+  /* DE STEM VAN DE PAS (CLAUDE.md): "je" bij de RTG Pass, "u" bij Lifestyle en
+     Business. De serverteksten volgen `stem` al; de eigen zinnen hier ook, anders
+     staat "Uw opzegging" boven "Wil je later terug?". */
+  function z(je, u) { return ABO && ABO.stem === 'u' ? u : je; }
   function bedrag(euro) { return euro == null ? null : w.Geld.euro(Math.round(Number(euro) * 100)); }
   function dag(iso) { return iso ? w.Geld.datum(iso) : null; }
   var VERLENGING = {
@@ -55,7 +59,6 @@
         rij('Minimumtermijn', esc(a.minimumMaanden) + ' maanden' +
           (a.eindeVerbintenis ? ', tot ' + esc(dag(a.eindeVerbintenis)) : '')) +
         rij('Opzegtermijn', esc(a.opzegMaanden) + (a.opzegMaanden === 1 ? ' maand' : ' maanden')) +
-        (a.eindigtOp ? rij('Loopt tot', esc(dag(a.eindigtOp))) : '') +
         (volg ? rij('Volgende termijn', esc(dag(volg.vervalt)) + (volg.bedrag != null ? ', ' + esc(bedrag(volg.bedrag)) : '')) : '') +
         rij('Termijnen nog te gaan', esc(a.termijnenTeGaan)) +
         '<p class="stil h-mt40">' + esc(VERLENGING[a.verlenging] || '') + '</p>' +
@@ -64,7 +67,7 @@
         ? '<h2>Opzeggen</h2><div class="kaart" id="lmOpzeg">' +
             '<p class="stil">Lees eerst wat opzeggen doet. Dat verandert nog niets.</p>' +
             '<div class="h-mt60"><button class="knop" id="lmVoorbeeld" type="button">Wat gebeurt er als ik opzeg?</button></div>' +
-            '<div id="lmGevolg"></div>' +
+            '<div id="lmGevolg" aria-live="polite"></div>' +
           '</div>'
         : '');
   }
@@ -112,9 +115,14 @@
       var r = await w.Geld.api('/api/mijn/abonnement/opzeggen');
       await laad();
       var uit = $('#lmUitslag');
-      if (uit) uit.innerHTML = '<div class="kaart"><p>Opgezegd. Het lidmaatschap loopt tot ' + esc(r.eindigtOpTekst) + '.</p>' +
-        (r.terug ? '<p class="stil">' + esc(r.terug) + '</p>' : '') + '</div>';
-      w.Geld.melding('Uw opzegging is vastgelegd.');
+      if (uit) {
+        uit.innerHTML = '<div class="kaart" tabindex="-1" id="lmUitslagKaart"><p>Opgezegd. Het lidmaatschap loopt tot ' +
+          esc(r.eindigtOpTekst) + '.</p>' + (r.terug ? '<p class="stil">' + esc(r.terug) + '</p>' : '') + '</div>';
+        /* De knop die de focus had, is weg na het hertekenen; de focus gaat naar de uitslag. */
+        var kaart = d.getElementById('lmUitslagKaart');
+        if (kaart && kaart.focus) kaart.focus();
+      }
+      w.Geld.melding(z('Je opzegging is vastgelegd.', 'Uw opzegging is vastgelegd.'));
     } catch (e) {
       knop.disabled = false;
       w.Geld.melding(e.message);
@@ -143,14 +151,14 @@
   V.standen.push({
     id: 'lidmaatschap',
     naam: 'Lidmaatschap',
-    uitleg: 'Wat u met RTG heeft afgesproken: uw pas, het bedrag, de termijnen, en zelf opzeggen.',
+    uitleg: 'Wat er met RTG is afgesproken: de pas, het bedrag, de termijnen, en zelf opzeggen.',
     html:
       '<div id="lmWrap">' +
         '<div id="lmUitslag"></div>' +
         '<div id="lmHoofd"><p class="stil">Laden...</p></div>' +
         '<h2>Wat hier niet kan</h2>' +
-        '<div class="kaart"><p class="stil">Verlengen tegen een nieuwe prijs is een afspraak met RTG en geen knop: ' +
-          'de afgesproken prijs verandert alleen bij een verlenging die het kantoor met u maakt.</p></div>' +
+        '<div class="kaart"><p class="stil">Verlengen staat hier niet: de afgesproken prijs verandert alleen bij een ' +
+          'verlenging die het kantoor van RTG vastlegt, en niet met een knop in deze app.</p></div>' +
       '</div>',
     start: function () {
       ABO = null;

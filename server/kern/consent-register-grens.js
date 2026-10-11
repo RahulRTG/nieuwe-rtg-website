@@ -34,13 +34,15 @@ const NIET_GEDEKT = [
   /* HET AKKOORD MET DE VOORWAARDEN, GEVONDEN IN AFSPRAAK.md par. 7.1. Het stond
      in geen van beide lijsten, en de dekkingstoets kon het niet vinden: hij zocht
      `{ key, status: 'actief' }` en de onderteken-rij in kern/onboarding/lid.js is
-     `{ versie, naam, at, hash }`. Het is geen toestemming voor gegevensgebruik
-     maar een OVEREENKOMST -- vandaar hier en niet in LAGEN -- en een lezer hoort
+     `{ versie, naam, at, hash }`. Elk account tekent haar, ook een gratis account
+     en een RTF-gezin, en er zijn scopes per zaak. Het is geen toestemming voor
+     gegevensgebruik maar een OVEREENKOMST -- vandaar hier en niet in LAGEN -- en een lezer hoort
      te weten waar hij haar wel vindt. test/consent-dekking.test.js kent die vorm
      nu ook, zodat een tweede tekenweg met dezelfde vorm er niet stil langs gaat. */
-  { naam: 'De lidmaatschapsovereenkomst die u bij uw aanmelding ondertekende',
-    reden: 'Dat is een overeenkomst en geen toestemming voor gegevensgebruik: u trekt haar niet in, u zegt haar op. ' +
-      'Wat u afsprak en de weg om op te zeggen staan in RTG Geld, onder Lidmaatschap.' },
+  { naam: 'De lidmaatschaps- en reisovereenkomst die u bij uw aanmelding ondertekende',
+    reden: 'Dat is een overeenkomst en geen toestemming voor gegevensgebruik, dus er valt hier niets in te trekken: ' +
+      'ze geldt zolang uw account bestaat. Heeft u een betaald lidmaatschap, dan zegt u dat op in RTG Geld, onder Lidmaatschap. ' +
+      'Het eigen contract van een zaak waar u voor werkt, tekent u bij die zaak en staat daar.' },
   { naam: 'Wat een zaak van een boeking weet',
     reden: 'Dat hoort bij de boeking en verdwijnt met de boeking; het is geen losse toestemming.' }
 ];

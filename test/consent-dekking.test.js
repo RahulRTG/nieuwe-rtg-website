@@ -156,7 +156,7 @@ test('elke overdracht van persoonsgegevens aan een derde in routes/ staat verkla
    ondergrens) en deze vorm is er een van. Een tekenweg die geen versie of hash
    vastlegt, valt erbuiten -- het net is kleiner geworden, niet dicht. */
 const ONDERTEKENING = {
-  'onboarding/lid.js': { nietGedekt: 'De lidmaatschapsovereenkomst die u bij uw aanmelding ondertekende' }
+  'onboarding/lid.js': { nietGedekt: 'De lidmaatschaps- en reisovereenkomst die u bij uw aanmelding ondertekende' }
 };
 function heeftOndertekenvorm(bron) {
   const zonderUitleg = bron.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/[^\n]*/g, '$1');

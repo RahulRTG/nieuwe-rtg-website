@@ -289,8 +289,12 @@ reparatie van een bestaande meter.
 **Het gat zelf is dicht (11 oktober 2026), de releasepoort nog niet.** Het akkoord
 staat nu bij het niet-gedekte van het Consent Center
 (`kern/consent-register-grens.js`), met de reden: het is een overeenkomst en geen
-toestemming voor gegevensgebruik, dus je trekt haar niet in maar zegt haar op -- en
-dat kan het lid nu zelf, in RTG Geld onder *Lidmaatschap* (par. 14.1).
+toestemming voor gegevensgebruik, en ze geldt zolang het account bestaat. Let op
+dat dit NIET hetzelfde object is als het commerciele contract: de onboarding-
+overeenkomst tekent elk account (ook een gratis account en een RTF-gezin), het
+contract ontstaat pas na aanvraag en besluit. Een betaald lidmaatschap zegt het lid
+nu zelf op in RTG Geld onder *Lidmaatschap* (par. 14.1); de getekende versie en
+datum van de onboarding-overeenkomst staan daar niet.
 `test/consent-dekking.test.js` kent een derde vorm, de ondertekening met versie en
 hash, en zakt zodra een module in `server/kern/` die vorm heeft zonder verklaring.
 Wat dat NIET is: stap 6. Een tekenweg zonder versie of hash valt nog steeds buiten

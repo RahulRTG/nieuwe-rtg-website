@@ -69,6 +69,9 @@ async function pagina(browser, base, token) {
   const page = await ctx.newPage();
   const fouten = [];
   letOpFouten(page, fouten);
+  /* letOpFouten vangt alleen paginafouten; een CSP-schending of een mislukte
+     fetch komt als console.error en hoort hier ook te zakken. */
+  page.on('console', (m) => { if (m.type() === 'error') fouten.push('console: ' + m.text()); });
   await page.goto(base + '/apps/geld.html#lidmaatschap', { waitUntil: 'domcontentloaded' });
   return { page, fouten };
 }
@@ -96,12 +99,25 @@ test('RTG Geld, stand Lidmaatschap: zien, lezen wat opzeggen doet, opzeggen, en 
     assert.equal(await stand(page), 'ACTIEF');
     const tekst = await page.locator('#lmBeeld').innerText();
     assert.match(tekst, /RTG Pass/i, 'de naam van de pas staat erbij: ' + tekst.slice(0, 200));
+    /* Het bedrag in de juiste eenheid: de server geeft euro's, het scherm toont het
+       als euro's -- een factor honderd verkeerd zakt hier. */
+    const vooraf = await api(base, '/api/mijn/abonnement', {}, lid.token);
+    const mb = vooraf.body.abonnement.maandBedrag;
+    if (mb != null) {
+      const verwacht = Number(mb).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      assert.ok(tekst.includes(verwacht), 'het maandbedrag ' + verwacht + ' staat in beeld: ' + tekst.slice(0, 300));
+    } else assert.match(tekst, /geen bedrag afgesproken/);
 
-    // 2. lezen wat opzeggen doet -- en dat verandert niets
+    // 2. lezen wat opzeggen doet -- en dat verandert niets; "Niet opzeggen" sluit het weer
+    await page.click('#lmVoorbeeld');
+    await page.waitForSelector('#lmLaat', { timeout: 10000 });
+    await page.click('#lmLaat');
+    assert.equal(await page.locator('#lmGevolgTekst').count(), 0, '"Niet opzeggen" sluit het gevolg');
     await page.click('#lmVoorbeeld');
     await page.waitForSelector('#lmGevolgTekst', { timeout: 10000 });
-    assert.match(await page.locator('#lmGevolgTekst').innerText(), /Wat blijft/i,
-      'wat er blijft staat erbij, niet alleen wat er weggaat');
+    const gevolg = await page.locator('#lmGevolgTekst').innerText();
+    assert.match(gevolg, /facturen en bewijsstukken blijven/i,
+      'wat er blijft (de zin van de server) staat erbij, niet alleen wat er weggaat: ' + gevolg.slice(0, 200));
     const tussen = await api(base, '/api/mijn/abonnement', {}, lid.token);
     assert.equal(tussen.body.abonnement.stand, 'ACTIEF', 'het voorbeeld heeft niets opgezegd');
 
@@ -143,8 +159,10 @@ test('RTG Geld, stand Lidmaatschap: zonder afspraak de reden van de server en ge
       const v = document.getElementById('lmHoofd');
       return !!v && !/Laden/.test(v.innerText || '');
     }, null, { wat: 'het antwoord van de server' });
-    assert.match(await page.locator('#lmHoofd').innerText(), /geen lidmaatschapsafspraak/i,
-      'de zin van de server staat er, geen leeg vlak');
+    /* Op het stuk dat ALLEEN de server zegt -- de terugvalzin van het scherm zegt
+       ook "geen lidmaatschapsafspraak", en dan bewees deze regel niets. */
+    assert.match(await page.locator('#lmHoofd').innerText(), /Vraag de ledenbalie/i,
+      'de zin van de server staat er, met de weg erbij');
     assert.equal(await page.locator('#lmVoorbeeld').count(), 0, 'zonder afspraak geen opzegknop');
     assert.deepEqual(fouten.filter((f) => !/favicon/i.test(f)), [], 'geen consolefouten');
   } finally {

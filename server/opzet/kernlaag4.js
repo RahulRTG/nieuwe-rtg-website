@@ -90,27 +90,13 @@ kern.metierNetwerk = require('../kern/metier/netwerk')({ db, save, codenaamVan: 
 kern.metierAI = require('../kern/metier/ai')({ anthropic, metier: kern.metier, netwerk: kern.metierNetwerk });
 kern.metierLoon = require('../kern/metier/loon')({ db });
 
-/* Genootschap (kern/genootschap/): besloten groepen van leden, met een prikbord
-   en bijeenkomsten. Een EIGEN app en geen verbouwing van Cercle of Rendez-vous;
-   waarom staat in de kop van kern/genootschap/index.js. De AI-laag krijgt een
-   bevroren leesweergave, nooit de modules met hun schrijffuncties. */
-kern.genootschap = require('../kern/genootschap')({ db, save, codenaamVan: kern.codenaamVan,
-  keyVanCodenaam, liveCodename, notify, zijnVrienden: kern.zijnVrienden });
-kern.genootschapBeheer = require('../kern/genootschap/beheer')({ save, codenaamVan: kern.codenaamVan,
-  keyVanCodenaam, genootschap: kern.genootschap });
-kern.prikbord = require('../kern/genootschap/prikbord')({ db, save, codenaamVan: kern.codenaamVan,
-  liveCodename, notify, genootschap: kern.genootschap });
-kern.bijeenkomst = require('../kern/genootschap/bijeenkomst')({ db, save, codenaamVan: kern.codenaamVan,
-  notify, genootschap: kern.genootschap });
-const { leesweergave } = require('../kern/genootschap/leesweergave');
-kern.genootschapAI = require('../kern/genootschap/ai')({ anthropic,
-  lees: leesweergave({ genootschap: kern.genootschap, prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst }) });
-kern.genootschapInzicht = require('../kern/genootschap/inzicht')({ db, save, genootschap: kern.genootschap,
-  prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst });
-kern.genootschapUitvoer = require('../kern/genootschap/uitvoer')({ genootschap: kern.genootschap,
-  codenaamVan: kern.codenaamVan });
-/* De Berichten-app: zoeken over alle kanalen, gesprekken vastzetten en
-   archiveren, en drie AI-taken. De AI stelt op, de mens verstuurt. */
+/* Genootschap en wat erop draait (de gemeenschapslaag) staat in
+   ./kernlaag4-gemeenschap.js, en wordt HIER aangeroepen: na Metier, voor de
+   Berichten-app -- dezelfde plek als waar het stond. */
+require('./kernlaag4-gemeenschap')(kern, hulp);
+/* De Berichten-app: zoeken over alle kanalen, gesprekken vastzetten/stilzetten/
+   archiveren, en de drie AI-taken (samenvatten, een antwoord opstellen, de
+   afspraken eruit halen). De AI stelt op, de mens verstuurt. */
 kern.berichten = require('../kern/berichten')({ db, save, bijeen, inBundel, socialConnecties: kern.socialConnecties,
   dmSleutel: kern.dmSleutel, codenaamVan: kern.codenaamVan, rtmail, overheid: kern.overheid, anthropic,
   // de brug wordt hieronder pas gezet; vandaar bij gebruik ophalen

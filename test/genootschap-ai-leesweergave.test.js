@@ -10,7 +10,7 @@
 
    MUTATIES GEZIEN ZAKKEN: (a) in leesweergave.js `stem: prikbord.stem` erbij --
    toets 1 zakt; (b) in ai.js de parameter `prikbord` terug en
-   `prikbord.stem(...)` aanroepen -- toets 3 zakt; (c) in kernlaag4.js weer
+   `prikbord.stem(...)` aanroepen -- toets 3 zakt; (c) in kernlaag4-gemeenschap.js weer
    `prikbord: kern.prikbord` meegeven -- toets 4 zakt. */
 'use strict';
 const test = require('node:test');
@@ -64,7 +64,7 @@ test('3. kern/genootschap/ai.js noemt de domeinobjecten niet', () => {
 });
 
 test('4. de montage geeft de AI-laag de leesweergave en niet de modules', () => {
-  const bron = zonderCommentaar(fs.readFileSync(path.join(WORTEL, 'server/opzet/kernlaag4.js'), 'utf8'));
+  const bron = zonderCommentaar(fs.readFileSync(path.join(WORTEL, 'server/opzet/kernlaag4-gemeenschap.js'), 'utf8'));
   const i = bron.indexOf("require('../kern/genootschap/ai')");
   assert.ok(i >= 0, 'de AI-laag van het genootschap wordt niet meer gemonteerd waar deze toets hem zoekt');
   const aanroep = bron.slice(i, bron.indexOf(');', i));

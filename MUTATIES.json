@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-06T20:34:44.411Z",
-    "commit": "d5648c66",
+    "op": "2026-10-11T07:59:47.693Z",
+    "commit": "715745a73",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -402,14 +402,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
-    },
-    "agentinstructies.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/agentinstructies.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 2,
-      "geprobeerd": 1
     },
     "ai-budget.test.js": {
       "soort": "puur",
@@ -2289,6 +2281,13 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "clientafbreking.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "clipdeler.e2e.js": {
       "soort": "server",

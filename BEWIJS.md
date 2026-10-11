@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2442 bestanden en 16716 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2440 bestanden en 16711 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2442 |
-| losse beweringen (`test(...)`) | 16716 |
+| toetsbestanden | 2440 |
+| losse beweringen (`test(...)`) | 16711 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2268 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2134 bestanden, 16179 beweringen.
+2132 bestanden, 16174 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -135,7 +135,7 @@ toets omvalt.
 | `appstore-identifiers.test.js` | 3 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `appstore-lab-toestemming-routes.test.js` | 15 | gezakt op `liegpoort /api/` | ACHT ROUTES UIT DE SAMENVOEGING DIE NOOIT OVER DE DRAAD ZIJN GEGAAN. De contextbrug (kern/appstore/context.js), de firewall (kern/consent-relaties.js) en de fondsschakel (kern/labfonds/onderzoek.js) hebben alle drie... |
 | `appstore-meting.test.js` | 10 | gezakt op `!==->===#0` | CIJFERS OVER EEN APP -- en of er werkelijk geen mens in zit. Besloten op 27 augustus 2026: privacyarme tellingen per dag. |
-| `appstore-persoon.test.js` | 12 | gezakt op `liegpoort /api/` | DE GEVERIFIEERDE PERSOON ALS UITGEVER -- en de grens die eraan hangt. Besloten op 27 augustus 2026: een geverifieerd persoon mag publiceren, maar alleen GRATIS. |
+| `appstore-persoon.test.js` | 13 | gezakt op `liegpoort /api/` | DE GEVERIFIEERDE PERSOON ALS UITGEVER -- en de grens die eraan hangt. Besloten op 27 augustus 2026: een geverifieerd persoon mag publiceren, maar alleen GRATIS. |
 | `appstore-tijdelijk.test.js` | 7 | gezakt op `liegpoort /api/` | EEN TIJDELIJKE CEL -- een app die er staat tot een datum die het LID koos. Wat deze toets vastlegt: 1. |
 | `appstore-toegankelijk.test.js` | 12 | gezakt op `===->!==#0` | DE TOEGANKELIJKHEIDSPOORT -- houdt hij werkelijk tegen? Besloten op 27 augustus 2026: de keuring blokkeert vanaf nu alles, ook een update van een app die vandaag live is. |
 | `appstore-vierogen.test.js` | 5 | gezakt op `liegpoort /api/` | DE VIER-OGENREGEL OP DE MENS -- wie inzendt, tekent niet af. Grens 2 stond op de ORGANISATIE, en dat is genoeg zolang de uitgever een externe partij is: die heeft geen kantoorinlog. |
@@ -404,7 +404,7 @@ toets omvalt.
 | `defensie.test.js` | 7 | gezakt op `liegpoort /api/` | De defensie-toren: paraatheid, materieel en onderhoud, bevoorrading, de oefenagenda en de staf-AI. Uitdrukkelijk logistiek en organisatie: de AI weigert alles wat richting wapeninzet of doelbestrijding gaat. |
 | `dekking.test.js` | 2 | gezakt op `===->!==#0` | DE DEKKINGSMETER LEEST ALLE JOURNALEN, NIET EEN (scripts/dekking.js). WAAROM DEZE TOETS ER IS. |
 | `delen.test.js` | 31 | gezakt op `===->!==#0` | DE SUITE IN DELEN, EN DE VLOER DAAROVERHEEN. Sinds de CI de unit-suite en de schermtoetsen over vier runners verdeelt, hangen er twee nieuwe manieren aan waarop deze keten stil minder kan gaan toetsen dan hij belooft: 1. |
-| `deltapoort.test.js` | 23 | gezakt op `===->!==#0` | DE IJKING VAN DE DELTAPOORT -- regel 2 van de lat, op de poort zelf. scripts/deltapoort.js houdt nieuw werk aan de norm. |
+| `deltapoort.test.js` | 25 | gezakt op `===->!==#0` | DE IJKING VAN DE DELTAPOORT -- regel 2 van de lat, op de poort zelf. scripts/deltapoort.js houdt nieuw werk aan de norm. |
 | `democratie-aanval.test.js` | 3 | gezakt op `liegpoort /api/` | DEMOCRATIEOS FASE C -- de aanvalsfase (POLITIEK.md par. 18.2). |
 | `democratie-afhankelijk.test.js` | 6 | gezakt op `===->!==#0` | UNDECLARED_RTG_DEPENDENCY = 0 -- proef P3 wordt meetbaar (POLITIEK.md par. 1.1). |
 | `democratie-doe.test.js` | 10 | gezakt op `liegpoort /api/` | HET DOENETWERK -- een actie die bij de burger begint (POLITIEK.md par. 6, release-trein stap 4). |
@@ -636,10 +636,8 @@ toets omvalt.
 | `geldwereld.test.js` | 8 | gezakt op `!==->===#0` | RTG Geld, de samenhanglaag. Zelfde beloftes als de andere werelden -- bezit niets, verzint niets, meldt stille bronnen -- plus de regel die alleen hier geldt: DEZE LAAG TELT NIETS ZELF OP. |
 | `geloofbieb.test.js` | 7 | gezakt op `liegpoort /api/` | De Geloof & Wijsheid-Bibliotheek: een ECHTE, leesbare kern over alle religies en levensbeschouwingen, als gelijken naast elkaar, altijd gratis (cadeau van de RTFoundation), met de leeftijdspoort van het profiel. Elk... |
 | `gemeente.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Gemeente (kern/gemeente.js): het civiele systeem als partner-genre. Vier pijlers voor inwoners, gemeente-medewerkers en RTG-partners. |
-| `genootschap-ai-leesweergave.test.js` | 4 | gezakt op `optie-uit#1` | Rahul in het genootschap krijgt een LEESWEERGAVE, nooit de modules zelf. kern/genootschap/ai.js kreeg het hele prikbord, de hele bijeenkomstmodule en het hele genootschap mee -- dus `stem`, `weg`, `plaats`,... |
 | `genootschap-beheer.test.js` | 4 | gezakt op `liegpoort /api/` | HET BEHEER VAN EEN GENOOTSCHAP -- 3 endpoints. Deze drie wees de waargenomen dekkingsmeting aan als nooit aangeroepen: pas-aan, eruit en reactie-weg. |
-| `genootschap-prikbord-lezen.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | Het prikbord LEZEN laat niets achter (kern/genootschap/prikbord.js). `bord()` zette een lege rij neer voor een genootschap zonder prikbord, en elke weg gebruikte hem -- ook lezen, de AI-samenvatting en een stem of... |
-| `genootschap.test.js` | 16 | gezakt op `liegpoort /api/` | Genootschap (kern/genootschap/*, routes/member/genootschap.js): besloten groepen van leden, met prikbord en bijeenkomsten. De toetsen leggen vooral de grenzen vast die dit anders maken dan een groep op een gewoon... |
+| `genootschap.test.js` | 14 | gezakt op `liegpoort /api/` | Genootschap (kern/genootschap/*, routes/member/genootschap.js): besloten groepen van leden, met prikbord en bijeenkomsten. De toetsen leggen vooral de grenzen vast die dit anders maken dan een groep op een gewoon... |
 | `genrecap.test.js` | 9 | gezakt op `return-weg#1` | DE GENRE-CAP: het woord dat hernoemd is, en de lijst waar hij naar wijst. OS.md par. |
 | `genredekking.test.js` | 4 | gezakt op `===->!==#0` | EEN GENRE MAG ALLEEN OPEN STAAN ALS ZIJN GEREEDSCHAP ER IS. WAAROM DIT BESTAAT Het register kende ooit 31 aanvraagbare genres. |
 | `genreplan.test.js` | 7 | gezakt op `liegpoort /api/` | Genrepols 2: het draaiboek van vandaag en de week vooruit voor de acht dunnere genres. Bewaakt dat /api/supplier/puls/plan een geprioriteerd, afvinkbaar draaiboek uit de eigen genre-motor haalt (met "dit eerst"-... |
@@ -1224,7 +1222,7 @@ toets omvalt.
 | `noodrem-bron.test.js` | 3 | gezakt op `===->!==#0` | EEN AANVALLER MAG HET HELE HUIS NIET KUNNEN SLUITEN. server/beveiliging.js draagt een automatische noodrem, en die is een LADDER: elke bron met een brute-force-alarm gaat individueel in quarantaine, vanaf drie... |
 | `normbasis.test.js` | 7 | gezakt op `===->!==#0` | DE HANDHAVER OP DE BASISLIJN VAN DE NORM. scripts/normbasis.js legt NORM.json van deze tak naast die van main en weigert een meter die LOSSER staat zonder reden. |
 | `normprestatie.test.js` | 9 | gezakt op `expliciete bronmutatie` | DE PRESTATIELAT (scripts/norm.js + BEPROEVING.json). De ratel bewaakte tot nu toe alleen statische meters: dekking, keuring, dependencies. |
-| `normverval.test.js` | 21 | gezakt op `===->!==#0` | DE IJKING VAN HET VERVAL -- regel 2 van de lat, op de bewaker van de ratel. scripts/normverval.js bewaakt de enige plek waar de lat omlaag kan: de hand. |
+| `normverval.test.js` | 22 | gezakt op `===->!==#0` | DE IJKING VAN HET VERVAL -- regel 2 van de lat, op de bewaker van de ratel. scripts/normverval.js bewaakt de enige plek waar de lat omlaag kan: de hand. |
 | `notify-vorm.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `notities.test.js` | 3 | gezakt op `liegpoort /api/` | Notities & Taken: het bord, samen werken op codenaam, en de herinnering die een gekoppelde agenda-afspraak wordt (een wekkerlaag, niet drie). |
 | `notitiesduurzaam.test.js` | 11 | gezakt op `liegpoort /api/` | HET BORD BEVESTIGT NIET WAT DE OPSLAG NOG NIET HEEFT. De ketenronde weerlegde een belofte die niemand had opgeschreven: een notitie werd met 200 bevestigd en was na een herstart weg (KETENS.json, keten NOTITIE,... |
@@ -1700,7 +1698,7 @@ toets omvalt.
 | `securitylog-keten.test.js` | 7 | gezakt op `liegpoort /api/` | HET INLOG-AUDITLOG AAN DE HASHKETEN. Waarom juist dit log. |
 | `selfhost.test.js` | 5 | gezakt op `===->!==#0` | De self-hosted voordeur: geheimen mogen niet in Compose lekken, een private beta mag nooit publiek worden, en het installatiecommando mag bestaande sleutels niet stil vervangen. |
 | `semantiek.test.js` | 11 | gezakt op `getal+1#0` | HET SEMANTISCH REGISTER -- en of hij werkelijk iets onderscheidt. scripts/semantiek.js beantwoordt de vraag uit BEWIJSMACHINE.md par. |
-| `semdiff.test.js` | 15 | gezakt op `true->false#0` | HET REGRESSIECORPUS VAN DE SEMANTISCHE DIFF. Deze laag levert de ONDERGRENS waarmee scripts/lib/risico.js verder rekent. |
+| `semdiff.test.js` | 16 | gezakt op `true->false#0` | HET REGRESSIECORPUS VAN DE SEMANTISCHE DIFF. Deze laag levert de ONDERGRENS waarmee scripts/lib/risico.js verder rekent. |
 | `sentinel.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `server.test.js` | 9 | gezakt op `liegpoort /api/` | Integratietests: een echte server draaien in een geisoleerde datamap en de kernflows over HTTP uitoefenen. Dit bewaakt precies de plekken waar geld en wet aan hangen: de fiscale rekenmachine, de leeftijdslaag, De... |
 | `service-bevestigingscode.test.js` | 9 | gezakt op `liegpoort /api/` | De terugvalcode van een supportbevestiging (service.balie_bevestigingscode), control voor control. De code BLIJFT zes cijfers -- een lid leest hem aan de telefoon voor -- en is daarom een verklaarde korte menscode:... |
@@ -1808,7 +1806,7 @@ toets omvalt.
 | `stadsdoossleutel.test.js` | 5 | gezakt op `liegpoort /api/` | De apparaatsleutel van de Stadsdoos als gemigreerde credential (CODECREDENTIALS.json, devices.stadsdoos_sleutel; kern/stad/doossleutel.js). Wat hier moet kunnen zakken: 1. |
 | `stadshardware.test.js` | 8 | gezakt op `liegpoort /api/` | DE STADSDOOS ALS PRODUCT, DE NOODBEDIENING EN HET SOCIAAL DOMEIN. Drie lagen die alle drie over hetzelfde gaan: wat er gebeurt als de werkelijkheid niet meewerkt. |
 | `stadskansen.test.js` | 6 | gezakt op `liegpoort /api/` | DE STEDELIJKE KANSENLAAG: onderwijs, werk en de lokale economie. Het punt van deze laag is dat hij bijna niets zelf bijhoudt: vacatures komen uit kern/werk, bedrijven uit de partnerlijst, beroepen uit de... |
-| `stadsraad.test.js` | 4 | gezakt op `liegpoort /api/` | De Stadsraad: per stad EEN invloedrijke partner (foundation/club/instelling) die met een eigen raadcode het gezamenlijke foundation-kantoor in mag en daar SAMEN met RTG-personeel beslist over de lab-uitslagen.... |
+| `stadsraad.test.js` | 3 | gezakt op `liegpoort /api/` | De Stadsraad: per stad EEN invloedrijke partner (foundation/club/instelling) die met een eigen raadcode het gezamenlijke foundation-kantoor in mag en daar SAMEN met RTG-personeel beslist over de lab-uitslagen.... |
 | `stadstart.test.js` | 6 | gezakt op `===->!==#0` | Stadsstart (kern/command/stadstart.js): een stad inrichten, en eerlijk zeggen wat een knop niet kan. WAT DEZE TOETS VOORAL BEWAAKT is dat een MISLUKTE weefselbouw niet als groen wordt gemeld. |
 | `stadsweefsel-steden.test.js` | 8 | gezakt op `!==->===#0` | Het stadsweefsel draagt meer dan één stad (kern/stadsweefsel/steden.js). DE BOOM HAD ALTIJD AL EEN STAD-NIVEAU ALS WORTEL, dus meerdere wortels pasten er in. |
 | `stadsweefsel.test.js` | 12 | gezakt op `liegpoort /api/` | HET STADSWEEFSEL: de laag die van losse stadssystemen een stad maakt. Getest, en per toets is de bewering met een MUTATIE nagetrokken (de lat, regel 2). |

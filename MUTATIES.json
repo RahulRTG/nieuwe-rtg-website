@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-10-11T12:24:38.216Z",
-    "commit": "d86da5073",
-    "boomVuil": false,
+    "op": "2026-10-11T12:27:39.337Z",
+    "commit": "90acde006",
+    "boomVuil": true,
     "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
@@ -4171,6 +4171,14 @@
       "operator": "!==->===#0",
       "gezakt": 17,
       "geprobeerd": 2
+    },
+    "festival-kalender.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/util.js",
+      "operator": "!==->===#0",
+      "gezakt": 5,
+      "geprobeerd": 3
     },
     "festival-partner.test.js": {
       "soort": "puur",

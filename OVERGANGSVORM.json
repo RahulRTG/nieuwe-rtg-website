@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-30T06:58:34.697Z",
-    "commit": "e7da7900",
+    "op": "2026-10-11T16:57:53.653Z",
+    "commit": "f7536a89",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/overgangsvorm.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "uitleg": "Is er EEN overgang onder werk, leren, bevoegdheid, buurtinitiatieven, kennis en blauwdrukken? Zestien overgangen tegen veertien dimensies, met een citaat per cel dat letterlijk in de code moet staan, plus proeven op de echte modules. De vraag staat in VERDER.md par. 2; de eigenaar vroeg deze meter het idee kapot te proberen te krijgen.",
   "grens": "DE INDELING IS EEN OORDEEL: het citaat bewijst dat de code er staat, niet dat hij deze dimensie IS. Daarom staat de lexicale as ernaast en wordt elke onenigheid gemeld in plaats van beslecht. De vormas leest alleen expliciete velden (de blinde vlek van scripts/objectmodel.js) en een drager die in twee overgangen staat, deelt zijn velden met zichzelf. De proeven draaien de echte modules met een verzonnen context: ze bewijzen dat een poort dichtgaat en een besturing opengaat, niet dat de route eromheen hetzelfde doet. Een overgang zonder drager telt niet mee in de noemer.",
@@ -1475,9 +1475,9 @@
     "zonderVorm": [
       "bevoegd"
     ],
-    "velden": 92,
+    "velden": 99,
     "inAlleOvergangen": [],
-    "inEenOvergangPct": 47.8,
+    "inEenOvergangPct": 44.4,
     "gedeeldeDragers": [
       {
         "paar": [
@@ -1597,20 +1597,18 @@
       "tenOnrechte": 1
     },
     "buurtenQueryveilig": {
-      "wat": "De gemeente ziet hulpvragen per buurt; buurten onder 5 worden samengevoegd. Wat als er precies een onder de drempel valt?",
+      "wat": "De gemeente ziet hulpvragen per buurt en het totaal; buurten onder 5 worden samengevoegd. Wat als er precies een onder de drempel valt?",
       "eenKleineBuurt": [
         {
           "wijk": "Noord",
           "aantal": 12
         },
         {
-          "wijk": "Centrum",
-          "aantal": 10
-        },
-        {
-          "wijk": "overige buurten (1)",
-          "aantal": 3,
-          "samengevoegd": true
+          "wijk": "overige buurten (2)",
+          "buurten": 2,
+          "aantal": 13,
+          "samengevoegd": true,
+          "complementair": "een buurt boven de drempel is meegenomen, anders was dit het aantal van precies een buurt"
         }
       ],
       "tweeKleineBuurten": [
@@ -1620,13 +1618,27 @@
         },
         {
           "wijk": "overige buurten (2)",
+          "buurten": 2,
           "aantal": 5,
           "samengevoegd": true
         }
       ],
-      "lekt": true,
+      "enigeBuurt": [
+        {
+          "wijk": "overige buurten (1)",
+          "buurten": 1,
+          "aantal": null,
+          "samengevoegd": true,
+          "onderdrukt": "er is geen tweede buurt om mee samen te voegen; een aantal hier zou het aantal van precies een buurt zijn"
+        }
+      ],
+      "lekt": false,
       "besturing": true,
-      "lezing": "De gemeente kent haar eigen buurten. Staat er \"overige buurten (1)\", dan weet zij welke buurt ontbreekt -- en ziet zij haar exacte aantal, onder de drempel die het moest verbergen. Dat is celveilig en niet queryveilig."
+      "restrisico": {
+        "aantalGetoond": false,
+        "lezing": "Heeft een stad maar EEN buurt met hulpvragen en ligt die onder de drempel, dan staat er geen aantal bij de groep -- maar het stadstotaal gaat dan over die ene buurt. Dat is een stadsgetal en geen buurtgetal; het is niet weggepoetst maar benoemd."
+      },
+      "lezing": "De gemeente kent haar eigen buurten. Stond er \"overige buurten (1)\", dan wist zij welke buurt ontbrak en zag zij haar exacte aantal -- en het aantal weglaten hielp niet, want totaal min de genoemde buurten is hetzelfde getal. Complementaire onderdrukking neemt daarom de kleinste buurt boven de drempel mee in de groep."
     }
   },
   "wetten": {
@@ -1637,8 +1649,8 @@
       "eigenaarbesluit": 1
     },
     "besluiten": {
-      "te-bouwen": 3,
-      "deels": 2,
+      "deels": 3,
+      "te-bouwen": 2,
       "document": 2,
       "eigenaarbesluit": 1
     },
@@ -1771,7 +1783,7 @@
         "stand": "deels",
         "bestand": "server/kern/rtfos/gemeente.js",
         "citaat": "const K = 5",
-        "reden": "Celveilig, niet queryveilig: als precies een buurt onder de drempel valt, staat haar exacte aantal onder \"overige buurten (1)\" (proef `buurtenQueryveilig`)."
+        "reden": "Een minimumcel met complementaire onderdrukking: een groep van een buurt bestaat niet meer (proef `buurtenQueryveilig`). Tijdvensters ontbreken nog."
       },
       {
         "nr": 17,
@@ -1808,10 +1820,10 @@
       {
         "nr": "B1",
         "besluit": "Aggregatie is queryveilig, niet alleen celveilig: vaste views, minimumcel, complementaire onderdrukking, tijdvensters, geen vrije gemeentelijke OLAP over gevoelige dimensies.",
-        "stand": "te-bouwen",
+        "stand": "deels",
         "bestand": "server/kern/rtfos/gemeente.js",
-        "citaat": "const K = 5",
-        "reden": "Er is een minimumcel en een vaste view (het portaal roept alleen `cijfersVan` aan). Complementaire onderdrukking en tijdvensters ontbreken; zie proef `buurtenQueryveilig`."
+        "citaat": "complementair",
+        "reden": "Er is een minimumcel, een vaste view (het portaal roept alleen `cijfersVan` aan) en complementaire onderdrukking (proef `buurtenQueryveilig`). Tijdvensters ontbreken: een gemeente die het portaal vandaag en volgende week opent, ziet het verschil."
       },
       {
         "nr": "B2",

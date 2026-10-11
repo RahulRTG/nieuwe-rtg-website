@@ -95,9 +95,62 @@ node scripts/turn/maak-config.js \
   --cert=/etc/rtg-turn/tls/fullchain.pem --sleutel=/etc/rtg-turn/tls/privkey.pem \
   --uit=/etc/rtg-turn/turnserver.conf
 
-# 4. starten (coturn 4.7.0, vastgepind op digest)
+# 4. leesbaar maken voor coturn: de image draait als nobody:nogroup (65534)
+sudo chgrp 65534 /etc/rtg-turn/turnserver.conf && sudo chmod 0640 /etc/rtg-turn/turnserver.conf
+sudo chgrp -R 65534 /etc/rtg-turn/tls && sudo chmod 0750 /etc/rtg-turn/tls && sudo chmod 0640 /etc/rtg-turn/tls/privkey.pem
+
+# 5. starten (coturn 4.7.0, vastgepind op digest)
 docker compose -f docker-compose.turn.yml up -d
 ```
+
+### 2a. Een VPS in een opdracht (de blijvende plek)
+
+`scripts/turn/vps.js` doet stap 1-5 hierboven bij Hetzner Cloud: een openbaar
+IPv4-adres, een firewall (par. 4, plus 80/tcp voor het certificaat), en een
+Ubuntu-server met de cloud-init van `scripts/turn/cloudinit.js`. Die wacht tot
+de DNS naar het eigen adres wijst, haalt dan zelf een certificaat en start
+coturn. Het geheim wordt lokaal gemaakt, alleen naar `--geheim-uit` geschreven
+(0600) en nooit afgedrukt. Het staat wel in de user-data van de hoster; wie
+dat niet wil, roteert na de eerste start (par. 3).
+
+```
+# droge run: niets naar Hetzner, alleen wat er zou gebeuren
+node scripts/turn/vps.js --domein=turn.<domein> --email=<adres> --geheim-uit=$HOME/rtg-turn-secret
+# echt (token alleen uit de omgeving, rechten Read & Write, liefst een apart project)
+HCLOUD_TOKEN=... node scripts/turn/vps.js --domein=turn.<domein> --email=<adres> \
+  --geheim-uit=$HOME/rtg-turn-secret --beheer-ip=<jouw IPv4> --uitvoeren
+# DNS-record "DNS only" (TURN gaat niet door de Cloudflare-proxy)
+CLOUDFLARE_API_TOKEN=... node scripts/turn/dns.js --naam=turn.<domein> --ip=<adres> --uitvoeren
+```
+
+Draai dit op een machine die `api.hetzner.cloud` en `api.cloudflare.com` mag
+bereiken. Zonder `--beheer-ip` staat SSH dicht.
+
+### 2b. Tijdelijk op de Mac mini
+
+Zolang de app op de Mac mini achter een Cloudflare Tunnel draait: de tunnel
+draagt alleen webverkeer, dus TURN moet rechtstreeks binnenkomen.
+`scripts/mac/turn.sh` installeert coturn en certbot via Homebrew, haalt een
+certificaat via DNS-01 (Cloudflare, dus geen poort 80 nodig), schrijft de
+configuratie met dezelfde generator (met `extern-ip=<openbaar>/<thuisnet>`) en
+zet coturn als LaunchDaemon onder gebruiker `nobody`.
+
+```
+export CLOUDFLARE_API_TOKEN=...
+sudo -E scripts/mac/turn.sh --domein=turn.<domein> --email=<adres>
+```
+
+Voorwaarden en prijs, hardop:
+- een **echt openbaar IPv4-adres**; achter CGNAT stopt het script;
+- in de router doorsturen naar de Mac: 3478 udp+tcp, 5349 tcp, 49160-49999 udp,
+  en de Mac een vast adres in het thuisnet;
+- je **thuisadres wordt openbaar** via `turn.<domein>` (de app zelf blijft achter de tunnel);
+- de STUN-server van de app gebruikt ook 3478/udp; het script stopt en zegt dan
+  `STUN_UIT=1` en `STUN_URL=stun:turn.<domein>:3478` te zetten (coturn beantwoordt STUN);
+- verandert je thuisadres, dan klopt de configuratie niet meer en gaat bellen
+  dicht tot je het script opnieuw draait. Dat is fail-closed en de bedoeling.
+
+Verhuizen naar de VPS is daarna alleen een andere `TURN_URL`/`TURN_SECRET`.
 
 Wat de gegenereerde configuratie afdwingt: `use-auth-secret` (geen
 allocatie zonder geldig credential: geen open relais), `denied-peer-ip` over

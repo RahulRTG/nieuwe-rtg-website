@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-07T01:24:33.721Z",
-    "commit": "a1758d368",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-10-11T08:21:06.347Z",
+    "commit": "6b816f1de",
+    "boomVuil": true,
+    "boomAnders": 5,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
   },
@@ -16109,6 +16109,14 @@
       "operator": "return-weg#0",
       "gezakt": 4,
       "geprobeerd": 2
+    },
+    "turn-inrichting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/turn/maak-config.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "tweede-rem.test.js": {
       "soort": "server",

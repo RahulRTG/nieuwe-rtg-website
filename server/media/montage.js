@@ -9,8 +9,8 @@
    sessiegeheim bestaat pas na het laden van de kluis. */
 'use strict';
 
-module.exports = function monteerMedia({ app, media, db, accounts }) {
-  require('./toegang').zet({ data: () => db.data,
+module.exports = function monteerMedia({ app, media, data, accounts }) {
+  require('./toegang').zet({ data,
     geheim: () => process.env.RTG_ENC_KEY || accounts.sleutelVoor('media-link') });
   app.get('/media/:naam', (req, res) => { media.serveer(req, res).catch(() => { if (!res.headersSent) res.status(500).end(); }); });
   app.get('/media/t/:token', (req, res) => { media.serveerLink(req, res).catch(() => { if (!res.headersSent) res.status(404).end(); }); });

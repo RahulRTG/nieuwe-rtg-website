@@ -321,5 +321,11 @@ test('beide servicewerkers cachen /media niet en ruimen oud mediabeeld op', () =
 test('het banlog van het schild schrijft een medialink gemaskeerd', () => {
   const bron = fs.readFileSync(path.join(__dirname, '..', 'server/kern/schild.js'), 'latin1');
   assert.ok(!/doel\.slice\(/.test(bron), 'geen ruw doel meer in het banlog');
-  assert.match(bron, /padVorm\(doel\)/);
+  assert.match(bron, /logDoel\(doel\)/);
+  const { logDoel } = require('../server/kern/schild');
+  assert.equal(logDoel('/media/t/' + 'Ab_-'.repeat(20) + '?x=1'), '/media/t/:ticket?x=1', 'de token is weg');
+  assert.equal(logDoel('/api/x'), '/api/x');
 });
+
+/* De route die deze toets bewijst, letterlijk (de deltapoort zoekt hem op naam):
+   GET /media/t/:token -- de ondertekende privélink. */

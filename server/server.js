@@ -992,7 +992,7 @@ const webplatform = require('./kern/webplatform')({ db, team: webmakerTeam });
 const webplatformTaal = require('./kern/webplatform-taal')({ vertaler: require('./translate') });
 // AI in de Website-maker: past een ontwerp aan op een opdracht; bewaart niets zelf
 const webmakerAi = require('./kern/webmaker-ai')({ anthropic, schoon });
-require('./media/montage')({ app, media, db, accounts });   // /media: fail-closed, zie daar
+require('./media/montage')({ app, media, data: () => db.data, accounts });   // /media: fail-closed, zie daar
 // Eenmalige verhuizing van al bestaande base64-foto's (Salon + snaps) naar de
 // mediastore, zodat ook oude data het geheugen niet meer belast. Alleen de
 // schrijver migreert; idempotent, dus veilig bij elke start. Async (kan naar S3).

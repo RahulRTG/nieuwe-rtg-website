@@ -45,10 +45,13 @@
    register maakt het NIET_GETEST.
 
    De andere vijf (voltooibaar, waarheidsgetrouw, persistent, bevoegd,
-   herstelbaar) vragen verder een testwereld waarin betalen, versturen en verwijderen
-   ECHT mogen -- met sandboxprovider, sink-mailbox en wegwerpdata. Die bestaat
-   nog niet, en daarom staan ze hier als GEEN_FIXTURE met de reden. Ze staan er
-   WEL, want een bewijs dat je weglaat ziet eruit als een bewijs dat je haalt.
+   herstelbaar) komen uit een andere proef of staan op GEEN_FIXTURE met de
+   reden. Voor voltooibaar, persistent en herstelbaar is er sinds 11 oktober 2026
+   een testwereld (scripts/voltooiproef.js: wegwerpdata, postvanger, sms-sandbox,
+   een herstart en een crash); een onderdeel zonder scenario daarin houdt
+   GEEN_FIXTURE, en de reden zegt of het een scenario of een adapter mist. Ze
+   staan er WEL, want een bewijs dat je weglaat ziet eruit als een bewijs dat je
+   haalt.
 
    DE STANDEN ZIJN GESLOTEN, en "waarschijnlijk goed" zit er niet bij:
 
@@ -109,7 +112,7 @@ const { stempel } = require('./lib/stempel');
 /* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
    een bewijs mag leveren, de bewijsbron of hij dat op deze code verdient. */
 const { stelSamen } = require('./lib/bewijsbron');
-const { CONTRACT, ZONDER_APP } = require('./lib/appcontract');
+const { CONTRACT, ZONDER_APP, TESTWERELD_ONTBREEKT } = require('./lib/appcontract');
 const { beoordeel: beoordeelBestemming, personaAfwijking } = require('./lib/bestemming');
 
 const WORTEL = path.join(__dirname, '..');
@@ -186,12 +189,25 @@ function rijen() {
 
 /* ---- de vijf bewijzen die een testwereld nodig hebben ---- */
 const GEEN_FIXTURE = (wat) => ({ status: 'GEEN_FIXTURE', reden: wat, bewijs: null });
+/* Bewijs 3, 5 en 7 hebben sinds 11 oktober 2026 een testwereld
+   (scripts/voltooiproef.js: wegwerpdata, postvanger, sms-sandbox, simulatiebank,
+   een nette herstart en een crash op dezelfde datamap). Wat een onderdeel dan
+   nog mist, is zijn SCENARIO in scripts/lib/voltooi/ -- of, bij een handvol,
+   een adapter die er niet is. Dat tweede staat per onderdeel in
+   TESTWERELD_ONTBREEKT (scripts/lib/appcontract.js), zodat de reden zegt WELKE
+   adapter ontbreekt in plaats van "vraagt een testwereld". */
+const testwereldReden = (r, bewijs) => {
+  const mist = TESTWERELD_ONTBREEKT[r.functie];
+  if (mist) return 'de testwereld mist hiervoor een adapter: ' + mist;
+  if (r.soort !== 'link') return 'geen eigen adres: een scenario kan pas aan deze ingang hangen als hij een scherm heeft waarvan SCHERMROUTES.json de routes kent';
+  return 'de testwereld staat (scripts/voltooiproef.js), maar er is nog geen scenario voor deze ingang in scripts/lib/voltooi/; ' + bewijs;
+};
 const ONGEMETEN = {
-  voltooibaar: () => GEEN_FIXTURE('vraagt een testwereld waarin de hele stroom mag worden afgemaakt (sandboxprovider, sink-mailbox, wegwerpdata); zie BETROUWBAARHEID.md par. 4'),
+  voltooibaar: (r) => GEEN_FIXTURE(testwereldReden(r, 'dat loopt de hele bedoeling af tot en met wat de ontvanger ziet')),
   waarheidsgetrouw: () => GEEN_FIXTURE('vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes'),
-  persistent: () => GEEN_FIXTURE('vraagt een tweede sessie en een herstart op dezelfde data'),
+  persistent: (r) => GEEN_FIXTURE(testwereldReden(r, 'dat herstart netjes op dezelfde datamap en leest de uitkomst in een nieuwe sessie en in de opslag')),
   bevoegd: () => GEEN_FIXTURE('vraagt de kruisproef met vreemde rollen, gezinnen en bedrijven; de routekant staat in IDOR.json en ROLPROEF.json, de schermkant niet'),
-  herstelbaar: () => GEEN_FIXTURE('vraagt uitval van Redis/PostgreSQL, providertimeouts en een afgebroken verzoek midden in een mutatie')
+  herstelbaar: (r) => GEEN_FIXTURE(testwereldReden(r, 'dat beproeft dubbelklik, een herhaald en een afgebroken verzoek en een crash direct na de bevestiging (uitval van Redis of PostgreSQL zit er nog niet in)'))
 };
 
 /* ---- de meting ---- */
@@ -428,7 +444,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
 }
 
 function vulOngemeten(r) {
-  for (const [naam, maak] of Object.entries(ONGEMETEN)) r.bewijzen[naam] = maak();
+  for (const [naam, maak] of Object.entries(ONGEMETEN)) r.bewijzen[naam] = maak(r);
   /* Pas NA de standaard: een contract kan een GEEN_FIXTURE alleen vervangen
      door wat een bron verdiend heeft. Niet genoemd = blijft staan. */
   r.samengesteld = stelSamen(r);
@@ -782,7 +798,7 @@ function bouw(meting) {
        gesloten ketens (nog) voor geen enkele app tellen. Die tweede lijst staat
        er even groot bij: weglaten leest als "nog niet aan toegekomen". */
     samenstelling: {
-      uitleg: 'Een bewijs mag uit een bestaande proef komen als scripts/lib/appcontract.js die bron noemt, de proef routes raakt die de ingang aanroept, en het register vers is (versheid() in scripts/lib/stempel.js). Een ketenproef levert alleen voltooibaar; een ronde uit ALGEMEEN levert per rij alleen het bewijs waarvoor hij staat.',
+      uitleg: 'Een bewijs mag uit een bestaande proef komen als scripts/lib/appcontract.js die bron noemt, de proef routes raakt die de ingang aanroept, en het register vers is (versheid() in scripts/lib/stempel.js). Een ketenproef levert alleen voltooibaar; de voltooiproef (VOLTOOIPROEF.json) levert voltooibaar, persistent en herstelbaar, per onderdeel met een eigen scenario; een ronde uit ALGEMEEN levert per rij alleen het bewijs waarvoor hij staat.',
       koppelingen: meting.regels.filter((r) => (r.samengesteld || []).length).map((r) => ({
         app: r.app, functie: r.functie,
         bewijzen: Object.fromEntries(r.samengesteld.map((n) => [n, { status: r.bewijzen[n].status,

@@ -169,3 +169,23 @@ test('8. stelSamen raakt alleen wat het contract noemt', () => {
   assert.deepEqual(B.stelSamen(r, { contract: {}, algemeen: {} }), []);
   assert.equal(r.bewijzen.voltooibaar.status, 'GEEN_FIXTURE');
 });
+
+test('9. een voltooiproef levert precies drie bewijzen, en een ontbrekend deel is niet gemeten', () => {
+  assert.deepEqual(BRONSOORTEN.voltooiproef, ['voltooibaar', 'persistent', 'herstelbaar'],
+    'een voltooiproef herstart en laat crashen, en leest geen scherm en kruist geen rol');
+  const vals = { 'link:x': { belofte: 'een belofte die lang genoeg is om te tellen', bevoegd: { soort: 'voltooiproef', register: 'X.json', instrument: 'scripts/x.js' } } };
+  assert.throws(() => B.bewijsVoor('link:x', 'bevoegd', '/apps/x.html', { contract: vals }), /mag geen bevoegd/);
+  const reg = { stempel: STEMPEL, apps: { 'link:x': { persistent: { schakels: [{ nr: 1, stand: 'gesloten', wat: 'a' }], storingen: [], telling: {}, sluit: true } } } };
+  const dichtDeel = B.ketenUitslag('X.json', { lees: registerMet(reg), versheid: VERS, deel: ['apps', 'link:x', 'persistent'] });
+  assert.equal(dichtDeel.status, 'BEWEZEN');
+  const weg = B.ketenUitslag('X.json', { lees: registerMet(reg), versheid: VERS, deel: ['apps', 'link:x', 'herstelbaar'] });
+  assert.equal(weg.status, 'NIET_GETEST', 'een bewijs dat de ronde niet mat, is niet gemeten en nooit bewezen');
+  const ander = B.ketenUitslag('X.json', { lees: registerMet(reg), versheid: VERS, deel: ['apps', 'link:y', 'persistent'] });
+  assert.equal(ander.status, 'NIET_GETEST', 'het deel van een ander onderdeel telt niet');
+  /* Zonder deel leest de lezer het hele register als een keten: daar staan geen
+     schakels, dus dat is NIET_GETEST en geen stille BEWEZEN. */
+  assert.equal(B.ketenUitslag('X.json', { lees: registerMet(reg), versheid: VERS }).status, 'NIET_GETEST');
+  /* En een open schakel in het deel is DEFECT, zoals bij elke keten. */
+  reg.apps['link:x'].persistent.schakels.push({ nr: 2, stand: 'open', wat: 'na de herstart weg' });
+  assert.equal(B.ketenUitslag('X.json', { lees: registerMet(reg), versheid: VERS, deel: ['apps', 'link:x', 'persistent'] }).status, 'GEBLOKKEERD_DOOR_DEFECT');
+});

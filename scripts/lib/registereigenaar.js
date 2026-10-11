@@ -113,6 +113,8 @@ const EIGENAAR = {
      staat hier en niet alleen in de detectie. */
   'LUSPROEF.json': { schrijver: 'scripts/lusproef.js',
     waarom: 'lusproef.js --vastleggen schrijft het na een volledige keten tegen een wegwerpserver; APPWERKT leest het als bron voor voltooibaar van Ontdekken (scripts/lib/appcontract.js).' },
+  'VOLTOOIPROEF.json': { schrijver: 'scripts/voltooiproef.js',
+    waarom: 'voltooiproef.js --vastleggen schrijft het na alle scenario\'s in de testwereld (wegwerpdata, postvanger, herstart en crash); APPWERKT leest het als bron voor voltooibaar, persistent en herstelbaar (scripts/lib/appcontract.js).' },
   'LIEGRONDE.json': { schrijver: 'scripts/liegronde.js',
     waarom: 'liegronde.js --vastleggen schrijft het na een browserronde met de liegpoort over elke rij van MAPPEN; APPWERKT leest het als bron voor waarheidsgetrouw (ALGEMEEN in scripts/lib/appcontract.js).' },
   'BEVOEGD.json': { schrijver: 'scripts/bevoegdronde.js',

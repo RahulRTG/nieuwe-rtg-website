@@ -523,6 +523,11 @@ const REGISTER = {
      rij van APPWERKT.json. De toets houdt vast dat een BEWEZEN rij iets gelogen
      kreeg en dat een DEFECT een verzonnen zekerheid draagt. */
   'LIEGRONDE.json': { eigenRatel: 'test/liegronde.test.js' },
+  /* VOLTOOIPROEF.json (sinds 11 oktober 2026) levert voltooibaar, persistent en
+     herstelbaar per onderdeel met een scenario. De toets houdt vast dat het
+     register zichzelf niet tegenspreekt, dat de bewijsbron het leest zoals het
+     zichzelf noemt, en dat het aantal gesloten bewijzen niet daalt. */
+  'VOLTOOIPROEF.json': { eigenRatel: 'test/voltooiproef.test.js' },
   /* BEVOEGD.json (sinds 25 september 2026) levert bevoegd voor elke rij van
      APPWERKT.json. De toets houdt vast dat een ledenscherm alleen BEWEZEN is als
      ELKE route gemeten is, en dat een gezinspaar zonder A binnen niets bewijst. */

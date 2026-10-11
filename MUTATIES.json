@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T06:08:26.331Z",
-    "commit": "49a0508d",
+    "op": "2026-10-11T19:14:17.647Z",
+    "commit": "f38f8df4",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4843,6 +4843,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "geld-lidmaatschap.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
       "scherp": "gezakt"
     },
     "geld-rollen-buiten-bank.test.js": {

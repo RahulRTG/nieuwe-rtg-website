@@ -412,8 +412,11 @@ body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .vandaagras
 }
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .volgendblok{
   border:1px solid var(--rtg-v-line)!important;background:color-mix(in srgb,var(--rtg-v-card) 86%,transparent)!important;
-  backdrop-filter:blur(16px)
+  backdrop-filter:blur(16px);color:var(--rtg-v-ink)!important
 }
+/* De grond hierboven is de kaart van het dashboard; de lichte tekst uit
+   rtg-worlds-2026.css hoorde bij de oude bordeauxkaart en verdween erop (1.01:1). */
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .volgendblok :is(.micro,.routekort,.vluchtregel){color:var(--rtg-v-muted)!important}
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .strook{
   grid-column:1;grid-row:3;margin:0!important;padding:1rem!important;
   border:1px solid var(--rtg-v-line)!important;background:var(--rtg-v-card)!important

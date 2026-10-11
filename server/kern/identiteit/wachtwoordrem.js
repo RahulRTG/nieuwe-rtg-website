@@ -84,7 +84,9 @@
 'use strict';
 const crypto = require('crypto');
 
+const lopend = require('./lopend');   // N39: een poging telt vanaf dicht()
 const VERTRAGING_MS = 2000;
+const TE_VEEL = 'Te veel pogingen. Probeer het over een paar minuten opnieuw.';
 const vingerafdruk = waarde => crypto.createHash('sha256').update(String(waarde || '')).digest('hex').slice(0, 24);
 /* De sleutel van het account; zie EEN ACCOUNT, EEN SLEUTEL in de kop. `lid` is
    wat findByLogin gaf: een account, of null bij een onbekende naam. Alleen dan
@@ -122,23 +124,29 @@ function maakWachtwoordRem({ tooManyTries, noteFailedTry, loginFails }) {
        dan is het 429-antwoord al gestuurd. De accountemmer remt hier niet. */
     dicht(res, ip, login, lid) {
       const e = emmers(ip, login, lid);
-      return tooManyTries(res, e.paar) || tooManyTries(res, e.bron);
+      if (tooManyTries(res, e.paar) || tooManyTries(res, e.bron)) return true;
+      // N39: wat al loopt telt mee, anders gaat een golf tegelijk langs de grens
+      const vol = (k, grens) => ((loginFails.get(k) || {}).n || 0) + lopend.aantal(k) >= grens;
+      if (vol(e.paar, 10) || vol(e.bron, 50)) { res.status(429).json({ error: TE_VEEL }); return true; }
+      lopend.neem(e.paar); lopend.neem(e.bron);
+      return false;
     },
     /* Een mislukte poging. Het tellen gebeurt synchroon, voordat mis() zijn
        belofte teruggeeft; alleen het wachten daarna is asynchroon. Een deur die
        de belofte vergeet af te wachten, verliest dus de vertraging maar nooit
-       de telling. Dat gaat over de volgorde binnen EEN verzoek, en zegt niets
-       over gelijktijdige verzoeken: wat al langs dicht() was, wordt hier niet
-       meer tegengehouden. */
+       de telling. Gelijktijdige verzoeken houdt dicht() tegen (./lopend.js). */
     async mis(ip, login, lid) {
       const e = emmers(ip, login, lid);
+      lopend.geef(e.paar); lopend.geef(e.bron);
       noteFailedTry(e.paar, ip);
       noteFailedTry(e.bron, ip, 50);
       account.gok(ip, login, lid);
       await account.wacht(login, lid);
     },
     gelukt(ip, login, lid) {
-      loginFails.delete(emmers(ip, login, lid).paar);
+      const e = emmers(ip, login, lid);
+      lopend.geef(e.paar); lopend.geef(e.bron);
+      loginFails.delete(e.paar);
       account.gelukt(login, lid);   // nooit de adresemmer; zie de kop
     },
     account

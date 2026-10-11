@@ -103,6 +103,8 @@
   // Inloggen met het RTG-account en landen op de juiste bedrijfspagina.
   async function mijnLogin(login, password, bedrijf){
     const d = await API.call('/supplier/mijn/login', { login, password, bedrijf: bedrijf || '' });
+    // met de tweede factor aan eerst de code (personeel-03b.js, stapCode)
+    if (d.tweedeFactorNodig) return stapCode(d, bedrijf);
     await landMijn(d);
   }
 

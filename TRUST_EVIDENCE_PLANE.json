@@ -358,7 +358,7 @@
     }
   ],
   "integration": {
-    "allHttpRequests": "server/opzet/verzoekketen.js",
+    "allHttpRequests": "server/opzet/verzoekframe.js",
     "allBusEvents": "server/kern/envelop.js",
     "experienceBroker": "server/kern/experience/broker.js",
     "hospitalityBooking": "server/kern/ervaring/tafels.js",
@@ -380,7 +380,7 @@
   },
   "modules": {
     "canon.js": "17109112893ee8757ae64d2c55c21381805a8012a88c5e1356c18a475fb76350",
-    "context.js": "6dafd79e8468e08de3d353521c0e168b983d8dd99f300917827161396040eb20",
+    "context.js": "8591f62d51b39477de96c83c60d07ed3e0f3fbac50a30d067fe5e889fcbc2e88",
     "contract.js": "97d65662095ec50716ef3f4029ea1bccbe0cca30585225d80ebbd6c9a9ce7a95",
     "ledger.js": "0bb7269544f5de7d38b0d628980fdb71197cff25fb6b61142dab4bc03ac8857f",
     "claims.js": "9e74ce48e67da4678c01bd4892c5aa2bc4a83cd72e211a6191287eba30e19afd",

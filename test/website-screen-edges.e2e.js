@@ -102,7 +102,7 @@ test('publieke website houdt tekst, inhoud en Edge binnen alle schermranden',
             'Edge houdt een tastbare zijmarge op ' + viewport.width);
           await bar.getByRole('button', { name: 'Werelden', exact: true }).click();
           const paneel = await page.locator('.rtg-adaptive-sheet').boundingBox();
-          assert.equal(await bar.isVisible(),false,'the expanded surface replaces the compact bar');
+          assert.equal(await bar.isVisible(),true,'the expanded screen grows from the still-reachable Edge bar');
           assert.ok(paneel.x >= vak.x - 1 && paneel.x + paneel.width <= vak.x + vak.width + 1,
             'wereldpaneel blijft binnen de Edge op ' + viewport.width);
           assert.ok(paneel.y >= -1 && paneel.y + paneel.height <= viewport.height - 5,

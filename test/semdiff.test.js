@@ -164,6 +164,19 @@ test('witruimte en commentaar tellen niet mee', () => {
   assert.notEqual(k.klasse, 'security');
 });
 
+test('Markdown-bullets blijven documentatie en worden geen codecommentaar', () => {
+  const r = ontleed([
+    '--- a/NOTITIES.md',
+    '+++ b/NOTITIES.md',
+    '@@ -1 +1 @@',
+    '-* oude afspraak',
+    '+* nieuwe afspraak'
+  ].join('\n'));
+  assert.equal(r.length, 1);
+  assert.equal(r[0].soort, 'document');
+  assert.equal(r[0].klasse, 'documentatie');
+});
+
 test('de echte tak: de meting draagt soort, klasse en verwijderingen', () => {
   /* DE METING ZELF, tegen de echte geschiedenis. Zonder dit kan deze
      classificator stilletjes veranderen in iets dat overal hetzelfde etiket op

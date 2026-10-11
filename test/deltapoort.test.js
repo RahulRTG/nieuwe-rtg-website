@@ -89,6 +89,21 @@ test('zelfpoortende-toets: een nieuwe skip slaat uit, ook in de vorm test.skip()
   assert.equal(r.keur('test/x.test.js', null, "test('a', f)").length, 0);
 });
 
+test('zelfpoortende-toets: een bestand in de PostgreSQL-draaier is gedekt, een bestand ernaast niet', () => {
+  /* De draaier (scripts/pgtoetsen.js) zakt op elke skip, dus daar is de skip
+     de lokale helft van een toets die elders volledig draait. Maar alleen voor
+     bestanden die ECHT op de lijst staan: hetzelfde bestand met een andere naam
+     moet nog steeds uitslaan, anders is de vrijstelling een gat. */
+  const r = regel('zelfpoortende-toets');
+  const { TOETSEN } = require('../scripts/lib/pg-toetslijst');
+  const opLijst = TOETSEN.find(p => p.endsWith('.pg.test.js'));
+  assert.ok(opLijst, 'de PostgreSQL-lijst bevat geen enkel .pg.test.js meer');
+  const skip = "test('a', { skip: !process.env.DATABASE_URL }, f)";
+  assert.equal(r.keur(opLijst, null, skip).length, 0, 'een nieuw bestand op de lijst is gedekt door de draaier');
+  assert.equal(r.keur('test/niet-op-de-lijst.pg.test.js', null, skip).length, 1,
+    'een .pg-toets die niet op de lijst staat draait nergens en moet uitslaan');
+});
+
 test('zelfpoortende-toets telt geen skip die alleen in commentaar of in een string staat', () => {
   /* Dit is geen bijzaak. In norm.js is precies deze fout DRIE keer gemaakt:
      een teller die de rauwe tekst las, telde de uitleg over skips mee als

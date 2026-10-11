@@ -288,6 +288,15 @@ function main() {
     else if (String(u.vervalt) < VANDAAG)
       fouten.push({ wat: naam, bericht: 'is verlopen op ' + u.vervalt,
         hulp: 'de deltapoort telt hem niet meer mee; haal hem weg of verantwoord hem opnieuw' });
+    /* EEN UITZONDERING OP EEN BESTAND DAT ER NIET IS, BELOOFT DEKKING DIE ER
+       NIET IS. Er stonden er twee (test/foundation-lesstroom.pg.test.js en
+       test/gezinsdeur.pg.test.js) en geen enkele poort zag het: de deltapoort
+       kijkt alleen naar bestanden in de wijziging, en een bestand dat niet
+       bestaat zit daar nooit in. check.js regel 13 telt zulke spoken al in zijn
+       eigen lijsten; dit is dezelfde controle voor deze lijst. */
+    if (u.pad && !fs.existsSync(path.join(WORTEL, u.pad)))
+      fouten.push({ wat: naam, bericht: 'het bestand bestaat niet',
+        hulp: 'haal de uitzondering weg; hij dekt niets af en houdt zijn reden levend alsof hij ergens over gaat' });
   }
 
   /* ---------- 4. is de lat sinds de basis met de hand verlaagd? ---------- */

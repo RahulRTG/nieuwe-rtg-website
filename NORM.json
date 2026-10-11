@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4541,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1685,
+    "kernBreedte": 1686,
     "kernGedeeld": 254,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -4683,6 +4683,15 @@
       "pad": "test/gezinsdeur.pg.test.js",
       "vervalt": "2026-10-15",
       "reden": "de raceproef voor de gezinsdeur (B18: hetzelfde eenmalige stroomticket tegelijk op twee instances, twaalf gelijktijdige claims van dezelfde gezinscode, en een rotatie op A tegen de oude code op B) vereist echte PostgreSQL- en Redis-diensten; hij staat verplicht in scripts/lib/pg-toetslijst.js en draait in CI met die diensten, terwijl hij lokaal zonder die infrastructuur expliciet overslaat"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1685,
+      "meter": "kernBreedte 1685 -> 1686",
+      "reden": "B2 verbond (GEMEENSCHAP-FASE0.md par. 4.2, besluit van de eigenaar om het plan te bouwen). kern.verbond is een eigen kernmodule die zijn collectie verbonden bezit; B3 beraad en de gemeenschapsproef lezen dezelfde instantie, en een route die hem zelf zou requiren maakt een tweede instantie met een eigen greep op de database.",
+      "waarheen": "GRENZEN.json (member draagt verbond) en test/verbond-server.test.js tegen een echte server"
     }
   ]
 }

@@ -328,6 +328,19 @@ test('end-to-end: /api/ice alleen voor een sessie, kortlevend, HMAC klopt, en de
   assert.ok(verloopt > Date.now() + 25 * 60000 && verloopt < Date.now() + 31 * 60000, 'TURN_CREDENTIAL_TTL=1800 telt');
   assert.equal(relay.credential, crypto.createHmac('sha1', GEHEIM).update(relay.username).digest('base64'));
   assert.equal(JSON.stringify(d).includes(GEHEIM), false, 'het permanente geheim verlaat de server nooit');
+  // POST /api/ice (de weg van API.call in de schermen) is dezelfde poort: zonder sessie
+  // 401 zonder TURN, met sessie een vers credential -- en een ANDER dan het vorige,
+  // want een uitgifte wordt nooit teruggespeeld.
+  const postAnoniem = await fetch(base + '/api/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  assert.equal(postAnoniem.status, 401);
+  assert.equal(JSON.stringify((await postAnoniem.json()).iceServers).includes('turn:'), false);
+  const postMet = await fetch(base + '/api/ice', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + login.token }, body: '{}' });
+  assert.equal(postMet.status, 200);
+  assert.equal(postMet.headers.get('cache-control'), 'no-store');
+  const postRelay = (await postMet.json()).iceServers.find(s => s.urls.some(u => u.startsWith('turn:')));
+  assert.ok(postRelay, 'TURN via POST voor een ingelogd lid');
+  assert.equal(postRelay.credential, crypto.createHmac('sha1', GEHEIM).update(postRelay.username).digest('base64'));
 
   // de runtimeproef van de server zelf
   let stand = null;

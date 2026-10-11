@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9864 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9868 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -856,7 +856,7 @@ omlaag.
 
 ## `shared/sprong.js`
 
-`public/shared/sprong/` -- 3 delen, 326 regels in de delen
+`public/shared/sprong/` -- 3 delen, 327 regels in de delen
 
 | deel | onderwerp |
 |---|---|

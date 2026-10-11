@@ -2,12 +2,12 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-11T20:25:53.351Z",
-  "commit": "275cdfd32",
+  "op": "2026-10-11T22:20:18.924Z",
+  "commit": "9d3f219df",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
-   "boomVuil": false,
+   "boomVuil": true,
    "ongecommitteInvoer": [],
    "bestanden": [
     "SCHRIJFANALYSE.json",
@@ -3227,6 +3227,7 @@
     "server/lib/idemsleutels-rtflabfonds.js",
     "server/lib/idemsleutels-rtgid.js",
     "server/lib/idemsleutels-salon.js",
+    "server/lib/idemsleutels-samenvoeging.js",
     "server/lib/idemsleutels-stage.js",
     "server/lib/idemsleutels-toestemming.js",
     "server/lib/idemsleutels-verbond.js",
@@ -4445,6 +4446,7 @@
     "server/betaal/connect",
     "server/betaal/uitbetaalgate.json",
     "server/config",
+    "server/data",
     "server/db",
     "server/db/tx",
     "server/foundation",

@@ -94,7 +94,7 @@ test('agenda en notities publiceren hun context zelf, los en als blad in de schi
     await p2.addInitScript((t) => {
       localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.setItem('rtg_lang', 'en');
     }, token);
-    await p2.goto(srv.base + '/apps/agenda.html', { waitUntil: 'load', timeout: 45000 });
+    await p2.goto(srv.base + '/apps/agenda.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await p2.waitForFunction(() => !!window.RTGEdgeBlikveld && document.title !== 'RTG Agenda', null, { timeout: 20000 });
     await p2.waitForFunction(() => (RTGEdgeBlikveld.lees().velden.context.waarde || {}).titel === document.title,
       null, { timeout: 10000 }).catch(() => {});

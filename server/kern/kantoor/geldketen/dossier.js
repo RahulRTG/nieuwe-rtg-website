@@ -27,6 +27,7 @@ function maakDossierlaag({ dossiers, vindDossier }) {
     return {
       voornemen: d.voornemen, klasse: d.klasse, handeling: d.handeling, doel: d.doel, pad: d.pad,
       door: d.door, at: d.at, envelop: d.envelop, correlatie: d.correlatie, keten: d.keten,
+      omkeerbaarheid: d.omkeerbaarheid || null,
       assen: d.assen.slice().sort((a, b) => a.as.localeCompare(b.as)),
       verplicht: eis, open,
       rond: open.length === 0,

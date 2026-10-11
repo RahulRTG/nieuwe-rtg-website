@@ -62,7 +62,7 @@ const { KLASSEN, KETENS } = require('./geldketen/klassen');
 const MAX_JOURNAAL = 20000;
 const MAX_DOSSIERS = 5000;
 
-function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron }) {
+function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron, onomkeerbaarGrendel }) {
   const tijd = nu || klok.nu;
 
   /* De twee bakken: het JOURNAAL is een hashketen (lib/keten.js) en de DOSSIERS
@@ -75,7 +75,7 @@ function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron }) {
 
   /* De eerste helft van de baan staat apart: zie ./geldketen/klaarzet.js. */
   const klaarzet = require('./geldketen/klaarzet').maakKlaarzet({
-    voornemens, frictie, mandaatBron, tijd, leg, noteer, bewaar, publiek });
+    voornemens, frictie, mandaatBron, tijd, leg, noteer, bewaar, publiek, onomkeerbaarGrendel });
   /* DE TWEEDE MENS staat apart: zie ./geldketen/tekenen.js. */
   const tekenAf = require('./geldketen/tekenen').maakTekenen({ voornemens, vindDossier, leg, noteer, bewaar });
 

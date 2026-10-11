@@ -230,9 +230,10 @@ test('3. precies duizend euro gaat al naar een tweede mens, en langs de geldkete
   assert.equal(k.totaalCenten, 100000);
   assert.equal(k.sleutel, 'teruggave:RTG1', 'de economische sleutel hoort bij het recht en niet bij de client');
   assert.equal(k.mens.sleutel, 'medewerker-a');
-  /* Een teruggave is niet terug te draaien, en dat zegt het DOMEIN -- een tweede
-     handtekening verandert dat niet (eigenaarsbesluit 2B-aangepast, 11 oktober 2026). */
-  assert.strictEqual(k.omkeerbaar, false);
+  /* Of een teruggave terug kan, zegt kern/commercie/geldomkeer.js en NIET de route
+     (eigenaarsbesluit 2B-aangepast): een route die het meegeeft, kan het ook verkeerd
+     meegeven. */
+  assert.ok(!('omkeerbaar' in k), 'de route zet zelf omkeerbaar');
 });
 
 test('3e. staat er al een aanvraag open voor dit recht, dan komt er geen tweede', async () => {

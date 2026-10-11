@@ -16,8 +16,11 @@ const mandaatLaag = require('../../stuur/mandaat');
 const gevolgLaag = require('../../stuur/gevolg');
 const { KLASSEN } = require('./klassen');
 const { gevolgpoort } = require('./gevolgpoort');
+const geldomkeer = require('../../commercie/geldomkeer');
+const risico = require('../../commercie/risicouitzondering');
+const { BELEID } = require('../../commercie/besluit');
 
-function maakKlaarzet({ voornemens, frictie, mandaatBron, tijd, leg, noteer, bewaar, publiek }) {
+function maakKlaarzet({ voornemens, frictie, mandaatBron, tijd, leg, noteer, bewaar, publiek, onomkeerbaarGrendel }) {
   const weeg = require('./weging').maakWeging({ voornemens, tijd, leg, noteer, bewaar, publiek });
 
   function klaarzet(opgave) {
@@ -40,6 +43,21 @@ function maakKlaarzet({ voornemens, frictie, mandaatBron, tijd, leg, noteer, bew
     if (!o.assurance || o.assurance.ok !== true)
       return { status: 401, error: 'De zekerheid over wie dit doet is niet vastgesteld; bevestig deze handeling eerst.' };
 
+    /* BOVEN DE OMKEERBAARHEIDSGRENS EN NIET OMKEERBAAR: METEEN NEE, met de reden. Zonder
+       deze regel zette de baan het voornemen klaar, vroeg een tweede mens om met zijn
+       passkey te tekenen, en kwam de weigering pas daarna -- een ticket en een ceremonie
+       voor een uitkomst die vooraf vaststond. Het getal komt uit ./besluit.js en de
+       grendel uit ./risicouitzondering.js, zodat er geen tweede regel ontstaat: staat de
+       uitzonderingsprocedure open, dan gaat het wel door naar het besluit (dat dan de
+       risicogoedkeuring eist). */
+    const omkeer = geldomkeer.voor(o.handeling);
+    if (Number(o.totaalCenten) >= BELEID.omkeerbaarBovenCenten && !omkeer.omkeerbaar &&
+        !risico.stand(onomkeerbaarGrendel).open)
+      return { status: 403, onomkeerbaar: omkeer,
+        error: 'Vanaf ' + (BELEID.omkeerbaarBovenCenten / 100).toFixed(0) + ' euro gaat een geldhandeling alleen door als zij ' +
+          'terug te draaien is, en deze is dat niet: ' + omkeer.reden + ' ' + risico.stand(onomkeerbaarGrendel).reden +
+          ' Er is niets klaargezet en er beweegt geen geld.' };
+
     const env = envelopLaag.alsStart(envelopLaag.maak({
       kanaal: 'office', actor: mens.sleutel || null, classificatie: 'intern' }));
 
@@ -47,9 +65,10 @@ function maakKlaarzet({ voornemens, frictie, mandaatBron, tijd, leg, noteer, bew
       voornemen: null, keten: null, klasse, handeling: String(o.handeling || ''),
       doel: o.doel == null ? null : String(o.doel).slice(0, 120),
       pad: o.pad || null, envelop: env.id, correlatie: env.correlatie,
-      /* OMKEERBAAR KOMT VAN HET DOMEIN (eigenaarsbesluit 2B-aangepast): alleen een
-         uitdrukkelijke `true` telt, en een handtekening verandert het nooit. */
-      omkeerbaar: o.omkeerbaar === true,
+      /* OMKEERBAAR KOMT UIT DE TABEL (eigenaarsbesluit 2B-aangepast): per handeling en
+         rail afgeleid in kern/commercie/geldomkeer.js, en de aanroeper kan het niet
+         overschrijven. Een handtekening verandert het nooit. */
+      omkeerbaar: omkeer.omkeerbaar === true, omkeerbaarheid: omkeer,
       door: mens.naam, at: tijd(), assen: []
     };
 

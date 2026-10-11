@@ -28,6 +28,7 @@
 'use strict';
 
 const P = require('./plan');
+const { BELEID } = require('../besluit');
 
 function maakUitvoering({ vind, zet, publiek, save, tijd, verbruikToken, veiligheidskern }) {
 
@@ -46,6 +47,18 @@ function maakUitvoering({ vind, zet, publiek, save, tijd, verbruikToken, veiligh
       return { status: 409, error: v.reden, voornemen: publiek(v) };
     }
     if (typeof doe !== 'function') return { status: 400, error: 'Er is geen uitvoerder meegegeven.' };
+
+    /* BOVEN DE OMKEERBAARHEIDSGRENS ALLEEN MET EEN BESLUIT DAT DAT GEWOGEN HEEFT
+       (eigenaarsbesluit 2B-aangepast, 11 oktober 2026). Een voornemen dat van voor die
+       dag op GEKEURD staat, werd na zijn handtekening gekeurd met een `omkeerbaar: true`
+       die niemand had aangetoond -- en zou anders gewoon worden uitgevoerd. */
+    const grens = v.besluit && Number.isFinite(v.besluit.omkeerbaarBovenCenten)
+      ? v.besluit.omkeerbaarBovenCenten : BELEID.omkeerbaarBovenCenten;
+    if (v.totaalCenten >= grens && !(v.besluit && (v.besluit.omkeerbaar === true || v.besluit.uitzondering))) {
+      zet(v, P.STAND.GESTAAKT, { reden: 'Dit voornemen ligt boven de omkeerbaarheidsgrens en het besluit heeft niet ' +
+        'gewogen dat het terug te draaien is. Het is gestaakt; stel het opnieuw op, dan weegt het beleid het opnieuw.' });
+      return { status: 409, error: v.reden, voornemen: publiek(v) };
+    }
 
     for (const s of v.stappen) {
       if (s.gedaan) continue;

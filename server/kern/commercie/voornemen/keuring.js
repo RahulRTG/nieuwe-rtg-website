@@ -42,8 +42,12 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
     if (!beslis) return { status: 503, error: 'Er is geen beslislaag om dit voornemen langs te leggen.' };
 
     const o = opties || {};
+    /* De risicogoedkeuring komt ALLEEN uit het voornemen: wie hem via de context
+       meegeeft, ontloopt de eisen van risicoGoedkeur (voor het besluit, op naam, met
+       reden). Wat de aanroeper stuurt, wordt dus vervangen. */
     const ctx = Object.assign({}, o.context || {});
-    if (v.risicogoedkeuring && !ctx.risicogoedkeuring) ctx.risicogoedkeuring = v.risicogoedkeuring;
+    delete ctx.risicogoedkeuring;
+    if (v.risicogoedkeuring) ctx.risicogoedkeuring = v.risicogoedkeuring;
     const b = beslis({ actor: v.actor, handeling: v.handeling, doel: v.doel,
       waardeCenten: v.totaalCenten, context: ctx });
     /* EEN LEEG ANTWOORD IS GEEN ANTWOORD, en dit is geen theoretisch geval.
@@ -58,7 +62,10 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
       return { status: 503, error: 'De beslislaag gaf geen uitkomst; er wordt niets goedgekeurd.' };
     v.besluit = { uitkomst: b.uitkomst, reden: b.reden, beleid: b.beleid, at: tijd() };
     if (b.uitzondering) v.besluit.uitzondering = b.uitzondering;
-    if (b.omkeerbaar === false) v.besluit.omkeerbaar = false;
+    /* Wat er over omkeerbaarheid is gewogen, staat bij het besluit: de uitvoering kijkt
+       er nog een keer naar (een voornemen van voor 2B-aangepast droeg nooit `true`). */
+    v.besluit.omkeerbaar = ctx.omkeerbaar === true;
+    if (Number.isFinite(b.omkeerbaarBovenCenten)) v.besluit.omkeerbaarBovenCenten = b.omkeerbaarBovenCenten;
     if (b.bewijstoken) v.bewijstoken = b.bewijstoken;
 
     if (DOOR.has(b.uitkomst)) {
@@ -119,7 +126,8 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
 
   /* DE RISICOGOEDKEURING: een eigen stap, op naam, met reden (../uitzondering.js). Hij
      KEURT NIET: hij legt vast, en de volgende keuring (na de tweede handtekening) weegt
-     hem mee. Alleen zolang er nog geen besluit is -- een nee wordt geen ja. */
+     hem mee. Alleen zolang er nog geen besluit is -- een nee wordt geen ja. Er is met
+     opzet geen route naar: de grendel staat dicht (../risicouitzondering.js). */
   function risicoGoedkeur(id, { door, reden }) {
     const v = vind(id);
     if (!v) return { status: 404, error: 'Dit voornemen bestaat niet.' };

@@ -78,7 +78,7 @@ const BELEID = {
 
 /* De kern. `zoekBevoegdheid` komt van de aanroeper: deze module weet niet waar
    bevoegdheden wonen, en dat hoort ze ook niet te weten. */
-function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt, uitzondering }) {
+function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt, onomkeerbaarGrendel }) {
   const tijd = nu || klok.nu;
   const B = { ...BELEID, ...(beleid || {}) };
 
@@ -87,7 +87,7 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt, uitzonder
     const bedrag = Math.round(Number(waardeCenten) || 0);
     const raaktWaarde = bedrag > 0;
     const basis = { actor: actor || null, handeling, doel: doel == null ? null : String(doel),
-      waardeCenten: bedrag, beleid: B.versie, at: tijd() };
+      waardeCenten: bedrag, beleid: B.versie, omkeerbaarBovenCenten: B.omkeerbaarBovenCenten, at: tijd() };
 
     if (!handeling) return { ...basis, uitkomst: UITKOMST.ONBEKEND, reden: 'Er is geen handeling opgegeven.' };
 
@@ -140,16 +140,12 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt, uitzonder
         reden: zelf ? 'De aanvrager keurt zijn eigen handeling niet goed; er tekent een ander mee.'
           : 'Vanaf ' + bev.euro(B.goedkeuringBovenCenten) + ' tekent er een tweede persoon mee.' };
 
-    /* OMKEERBAAR KOMT UIT DE HANDELING EN NOOIT UIT EEN HANDTEKENING (eigenaarsbesluit
-       2B-aangepast, 11 oktober 2026). Autorisatie en omkeerbaarheid zijn twee
-       veiligheidsvoorwaarden; een tweede mens maakt een onomkeerbare handeling niet
-       terug te draaien. Wat hier onomkeerbaar is en boven de grens ligt, gaat alleen door
-       via de UITZONDERINGSPROCEDURE (./uitzondering.js): een aparte risicogoedkeuring op
-       naam, met reden, achter een grendel die standaard dicht staat. Ook dan blijft de
-       handeling onomkeerbaar -- de uitslag zegt dat, en beweert nooit het omgekeerde. */
+    /* Omkeerbaar komt uit de handeling, nooit uit een handtekening (eigenaarsbesluit
+       2B-aangepast); de enige uitzondering staat in ./risicouitzondering.js. */
     let viaUitzondering = null;
     if (bedrag >= B.omkeerbaarBovenCenten && ctx.omkeerbaar !== true) {
-      const u = require('./uitzondering').toets({ grendel: uitzondering, risico: ctx.risicogoedkeuring, actor });
+      const u = require('./risicouitzondering').toets({ grendel: onomkeerbaarGrendel, risico: ctx.risicogoedkeuring,
+        actor, goedgekeurdDoor: ctx.goedgekeurdDoor });
       if (!u.ok)
         return { ...basis, uitkomst: UITKOMST.OMKEERBAAR, bewijs, omkeerbaar: false,
           reden: 'Vanaf ' + bev.euro(B.omkeerbaarBovenCenten) + ' alleen als de handeling terug te draaien is, en deze is ' +

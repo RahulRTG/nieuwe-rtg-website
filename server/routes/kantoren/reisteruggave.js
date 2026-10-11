@@ -120,10 +120,7 @@ module.exports = (ctx) => {
         stappen: [{ wat: 'teruggave', doel: recht.ref, centen: recht.centen, gegevens: { id } }],
         totaalCenten: recht.centen,
         sleutel,
-        /* EEN TERUGGAVE IS NIET OMKEERBAAR: het geld staat daarna bij het lid. Boven de
-           omkeerbaarheidsgrens wordt zij dus afgewezen, tenzij via de uitzonderings-
-           procedure -- en die staat dicht (eigenaarsbesluit 2B-aangepast). */
-        omkeerbaar: false,
+        /* Of een teruggave omkeerbaar is, zegt kern/commercie/geldomkeer.js -- niet deze route. */
         /* DE BELOFTE VAN DE UITVOERING, en voor deze klasse is dat ATOMAIR. */
         uitvoerbelofte: { graad: 'gemeten', uitslag: 'atomair: een boeking',
           reden: 'kern/reisbureau-teruggave.js#uitvoeren geeft kern/pay#terugGave precies EEN deel ' +

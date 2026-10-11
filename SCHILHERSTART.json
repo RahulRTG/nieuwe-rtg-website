@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T17:32:35.783Z",
-    "commit": "321a475c",
+    "op": "2026-10-11T18:43:33.022Z",
+    "commit": "1eb83968",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/schilherstart.js",
@@ -133,11 +133,11 @@
       ],
       "dubbelSoms": [],
       "ms": {
-        "load": 23982,
-        "edge": 10598
+        "load": 23752,
+        "edge": 11170
       },
-      "hoofddraadBlokkeertMs": 14400,
-      "heapMB": 7.8,
+      "hoofddraadBlokkeertMs": 12758,
+      "heapMB": 7.2,
       "nietTotRust": 3,
       "fouten": []
     },
@@ -164,11 +164,11 @@
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 3723,
+        "load": 4165,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 2560,
-      "heapMB": 9.8,
+      "hoofddraadBlokkeertMs": 2871,
+      "heapMB": 10.6,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -195,11 +195,11 @@
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 2033,
+        "load": 2431,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 2060,
-      "heapMB": 9.5,
+      "hoofddraadBlokkeertMs": 2072,
+      "heapMB": 10,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -227,8 +227,8 @@
         "load": null,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 1115,
-      "heapMB": 8,
+      "hoofddraadBlokkeertMs": 1064,
+      "heapMB": 8.2,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -255,11 +255,11 @@
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 4580,
+        "load": 3814,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 3972,
-      "heapMB": 9.1,
+      "hoofddraadBlokkeertMs": 3271,
+      "heapMB": 8.9,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -286,11 +286,11 @@
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 2362,
+        "load": 2918,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 2437,
-      "heapMB": 9.3,
+      "hoofddraadBlokkeertMs": 2361,
+      "heapMB": 10.1,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -318,8 +318,8 @@
         "load": null,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 1053,
-      "heapMB": 9.5,
+      "hoofddraadBlokkeertMs": 992,
+      "heapMB": 8.7,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -346,11 +346,11 @@
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 2852,
+        "load": 2673,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 2869,
-      "heapMB": 10.4,
+      "hoofddraadBlokkeertMs": 2463,
+      "heapMB": 10.1,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -377,11 +377,11 @@
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 3606,
+        "load": 2902,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 3271,
-      "heapMB": 10.7,
+      "hoofddraadBlokkeertMs": 2544,
+      "heapMB": 10.6,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -408,11 +408,11 @@
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": 3481,
+        "load": 3098,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 3348,
-      "heapMB": 11.4,
+      "hoofddraadBlokkeertMs": 2934,
+      "heapMB": 10.8,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -440,8 +440,8 @@
         "load": null,
         "edge": null
       },
-      "hoofddraadBlokkeertMs": 1141,
-      "heapMB": 11.3,
+      "hoofddraadBlokkeertMs": 917,
+      "heapMB": 10.9,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -470,11 +470,11 @@
       ],
       "dubbelSoms": [],
       "ms": {
-        "load": 10839,
-        "edge": 2823
+        "load": 9990,
+        "edge": 2548
       },
-      "hoofddraadBlokkeertMs": 7008,
-      "heapMB": 13,
+      "hoofddraadBlokkeertMs": 6232,
+      "heapMB": 13.5,
       "nietTotRust": 0,
       "fouten": []
     },
@@ -498,15 +498,15 @@
       "schillen": 1,
       "scripts": 184,
       "jsKB": 2696,
-      "api": 35,
+      "api": 33,
       "dubbel": [],
       "dubbelSoms": [],
       "ms": {
-        "load": null,
-        "edge": 6204
+        "load": 13728,
+        "edge": 5644
       },
-      "hoofddraadBlokkeertMs": 11766,
-      "heapMB": 19.8,
+      "hoofddraadBlokkeertMs": 10261,
+      "heapMB": 12.8,
       "nietTotRust": 0,
       "fouten": []
     }
@@ -524,9 +524,9 @@
     "scriptsNaEerste": 618,
     "jsKB": 10869,
     "jsKBNaEerste": 8451,
-    "api": 162,
-    "hoofddraadBlokkeertMs": 57000,
-    "heapMBEind": 19.8,
+    "api": 160,
+    "hoofddraadBlokkeertMs": 50740,
+    "heapMBEind": 12.8,
     "nietTotRust": 3,
     "fouten": 0
   }

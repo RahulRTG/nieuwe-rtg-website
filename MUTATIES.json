@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T06:08:26.331Z",
-    "commit": "49a0508d",
+    "op": "2026-10-11T19:08:10.475Z",
+    "commit": "f9988efa",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -374,6 +374,13 @@
         "server/lib/idemsleutels-afleidrest.js"
       ],
       "posities": 1
+    },
+    "afstemmingsketen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "agenda-pro.test.js": {
       "soort": "server",

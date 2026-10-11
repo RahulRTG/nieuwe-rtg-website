@@ -1829,6 +1829,14 @@ const IJKINGEN = {
       (j) => { j.telling.openBekend = (j.telling.openBekend || 0) + 2; return j; },
       () => meet().momentOpenBekend - voor.momentOpenBekend)
   },
+  /* Dezelfde tand voor de samenwerkingsketen (GEMEENSCHAPSPROEF.json, 11
+     oktober 2026), met een ander getal (3) zodat een meter die de twee
+     registers verwisselt hier opvalt. */
+  gemeenschapOpenBekend: {
+    proef: (voor) => metVervangenJson('GEMEENSCHAPSPROEF.json',
+      (j) => { j.telling.openBekend = (j.telling.openBekend || 0) + 3; return j; },
+      () => meet().gemeenschapOpenBekend - voor.gemeenschapOpenBekend)
+  },
   /* DE DRIE TANDEN VAN IDEMIDENTITEIT.json (14 september 2026,
      MUTATIECONTRACT.md par. 6e). Elk veld een eigen verstoring, met een eigen
      getal: zou de meter twee sleutels verwisselen, dan valt dat hier op omdat

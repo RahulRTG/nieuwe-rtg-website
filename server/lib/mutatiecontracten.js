@@ -39,10 +39,8 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-beelden').CONTRACTEN,
   require('./mutatiecontracten-document').CONTRACTEN,
   require('./mutatiecontracten-storingen').CONTRACTEN,
-  /* Opgesplitst omdat scripts/check.js een bestandsgrens kent en die terecht
-     aansloeg: een lijst die naar duizenden regels groeit, hoort niet in een
-     bestand dat ook nog de vorm en de regels uitlegt. Zelfde vorm als
-     ./idemsleutels.js. */
+  /* Opgesplitst om de bestandsgrens van scripts/check.js: een lijst die naar
+     duizenden regels groeit, hoort niet bij de uitleg. Zie ./idemsleutels.js. */
   require('./mutatiecontracten-beschermd').CONTRACTEN,
   require('./mutatiecontracten-leest').CONTRACTEN,
   require('./mutatiecontracten-connection').CONTRACTEN,

@@ -2661,8 +2661,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->4074<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2690<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->4078<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2694<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele
@@ -2721,6 +2721,8 @@ het getal dat het blokkeert: een planner op `gevolg.js` heeft 96 van 176 paden
 <!--getal:vertrouwen.bewezen-->0<!--/getal--> bewezen routes promoveert niets.
 
 **`LAT.md` is de technische lat** — regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). En regel 13 vóór je pusht: **"mijn gebruikelijke controles" is niet "het oordeel van de keten"** — een CI-job die als EEN release-oordeel geldt heeft meer poorten dan iemand onthoudt, en `npm run ci:lokaal` draait ze allemaal omdat hij ze AFLEIDT uit `.github/workflows` in plaats van ze over te typen. Een handlijst poorten is een tweede waarheid naast ci.yml en loopt uit elkaar. En regel 17 komt uit een fout van twee keer op een dag: **een poort bewijst alleen zijn eigen bereik** — `check`, `norm` en de deltapoort stonden groen terwijl CI terecht rood bleef, want routedekking en de afdrukregel liggen daarbuiten. Zeg dus nooit "de gate is groen" maar welke poort groen staat, en wat er nog niet bevestigd is. Daar hangt de routeregel aan: een nagemaakte app bewijst het handlergedrag en niet de montage of de deur, dus **geen nieuwe HTTP-route zonder minstens één treffer op een echte server in een gewone CI-toets**. LAT.md gaat over de code, CLAUDE.md over het merk.
+
+**`ZERO.md` is het Zero-Debt-programma** -- wanneer RTG "nul" mag zeggen. Vier eigenschappen die niet worden opgeteld (ZERO-DEBT, ZERO-DRIFT, ZERO-SILENT-FAILURE en ZERO-UNOWNED-UNKNOWN: een UNKNOWN mag bestaan, een UNKNOWN zonder eigenaar niet), een ratel per klasse en nooit per totaal, en het onderscheid dat de prikkel goed houdt: **nieuw geïntroduceerde schuld is een regressie, nieuw ontdekte bestaande schuld is een verbeterde waarheid** en wordt geregistreerd met een afbouwplan in plaats van tegengehouden. Een nulclaim draagt negen velden (wat, scope, meter, dekking, versheid, handhaving, ijking, commit, onbekend); zonder die negen is het een indruk. Elke uitzondering wordt ontleed tot de poort beter is, niet alleen verwijderd -- golf 0 vond zo dat een uitzondering in NORM.json na het mergen van haar PR niets meer beschermt (de deltapoort kijkt naar het VERSCHIL) en dat 29 van de 31 `zelfpoortende-toets`-uitzonderingen een regel waren die zijn eigen voorgeschreven oplossing, de PostgreSQL-draaier, niet herkende.
 
 **`BEWIJSLUS.md` is het besluit om GEEN laag boven de bewijsmachine te bouwen**
 -- de heenweg (veranderbereik, Evidence DAG, bewijsmatrix, release-bewijs,

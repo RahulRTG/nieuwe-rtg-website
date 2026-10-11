@@ -85,6 +85,7 @@ Per diepte-document staat de samenvatting woordelijk in `DOCUMENTENKAART.md`; da
 - `TOESTEL.md` is AI op het toestel van het lid
 - `MACHINE.md` is de laag die de motoren aan elkaar riemt
 - `LAT.md` is de technische lat
+- `ZERO.md` is het Zero-Debt-programma
 - `BEWIJSLUS.md` is het besluit om GEEN laag boven de bewijsmachine te bouwen
 
 ## Structuur en starten (kort)

@@ -76,7 +76,14 @@ const KETENS = [
      (financeVoor) -- twee soorten die de eerste vier geen van alle hadden.
      Blijven de actoren ook met hem erbij op nul, dan is dat het sterkste
      negatief dat hier te halen is. */
-  { naam: 'omzet', register: 'OMZETPROEF.json', domein: 'fiscaal', proef: 'scripts/omzetproef.js' }
+  { naam: 'omzet', register: 'OMZETPROEF.json', domein: 'fiscaal', proef: 'scripts/omzetproef.js' },
+  /* De achtste, en de eerste waarin GROEPEN handelen in plaats van een klant en
+     een zaak: twee genootschappen die samen iets afspreken zonder elkaars leden
+     te zien, een stichting die alleen langs haar eigen deur kijkt, en Rahul als
+     actor. Zijn uitkomst is een BESLUIT met een terugkoppeling. Hij is
+     toegevoegd zonder een letter aan de themalijst of de actoren te veranderen:
+     wat hij deelt, is wat hij deelt. */
+  { naam: 'gemeenschap', register: 'GEMEENSCHAPSPROEF.json', domein: 'genootschap', proef: 'scripts/gemeenschapsproef.js' }
 ];
 
 /* De woorden waarop een belofte wordt ingedeeld. Een gesloten lijst, want een

@@ -10,6 +10,15 @@ module.exports = [
      boardroom-Rahul RTG's eigen registers lezen via kern/registerblik/ in plaats
      van het uit zijn hoofd te moeten weten. De rand loopt een kant op: de
      registerblik kent de afdelingen niet, en leest alleen registers bij naam. */
+  /* HET VERBOND DEELT DE AFSPRAAKVELDEN VAN DE PARTNERSTICHTING. kern/verbond/
+     legt dezelfde vijf vragen vast (geld, vrijwilligers, persoonsgegevens,
+     aansprakelijk, rapportage) als kern/rtfos/partners.js, met een andere
+     woordenlijst. Een tweede lijst zou de eerste plek zijn waar ze uit elkaar
+     lopen (GEMEENSCHAP-FASE0.md par. 4.2: hergebruik, geen kopie). De rand
+     leest alleen twee pure exports; het verbond kent geen partner en de
+     partner kent geen verbond. */
+  { van: 'domein:verbond', naar: 'domein:rtfos', soort: 'DOMEINRELATIE',
+    reden: 'het verbond gebruikt AFSPRAAKVELDEN en de pure toetsAfspraken() van rtfos/partners.js, zodat de vijf afspraakvragen op een plek staan; geen opslag en geen partner wordt aangeraakt' },
   { van: 'domein:afdelingen', naar: 'domein:registerblik', soort: 'DOMEINRELATIE',
     reden: 'het boardroomadvies vraagt de registerblik wat de registers over productie, bewijs en routes zeggen; de registerblik leest alleen, en kent de afdelingen niet' },
   { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'ORKESTRATIE',

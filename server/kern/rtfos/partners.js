@@ -20,6 +20,9 @@
 
 const STATUS = ['aangemeld', 'in_toetsing', 'goedgekeurd', 'actief', 'opgeschort', 'beeindigd'];
 const WIE = ['rtf', 'partner', 'samen'];
+
+// De vijf afspraakvelden en hun toets wonen in ./afspraken.js; het verbond leest ze via hier.
+const { AFSPRAAKVELDEN, toetsAfspraken } = require('./afspraken');
 const DOCSOORT = ['statuten', 'beleidsplan', 'jaarrekening', 'jaarverslag', 'overeenkomst',
   'verzekering', 'privacyafspraak', 'vog-beleid', 'anbi-beschikking', 'overig'];
 
@@ -89,11 +92,9 @@ module.exports = (ctx) => {
       }
     }
     if (b.afspraken && typeof b.afspraken === 'object') {
-      for (const k of Object.keys(p.afspraken)) {
-        const v = String(b.afspraken[k] || '');
-        if (v && !WIE.includes(v)) return { status: 400, error: 'Bij "' + k + '" hoort rtf, partner of samen.' };
-        if (v) p.afspraken[k] = v;
-      }
+      const t = toetsAfspraken(b.afspraken, WIE);
+      if (!t.ok) return { status: 400, error: t.error };
+      Object.assign(p.afspraken, t.waarden);
     }
     if (Array.isArray(b.bevoegdheden)) p.bevoegdheden = b.bevoegdheden.map(x => schoon(x, 60)).filter(Boolean).slice(0, 20);
     if (Array.isArray(b.bestuurders)) {
@@ -163,4 +164,7 @@ module.exports = (ctx) => {
     portaal: buiten.portaal, vind, vindCode, STATUS, WIE, DOCSOORT };
 };
 module.exports.STATUS = STATUS;
+module.exports.WIE = WIE;
+module.exports.AFSPRAAKVELDEN = AFSPRAAKVELDEN;
+module.exports.toetsAfspraken = toetsAfspraken;
 module.exports.DOCSOORT = DOCSOORT;

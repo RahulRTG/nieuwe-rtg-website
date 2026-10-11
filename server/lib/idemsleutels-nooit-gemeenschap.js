@@ -5,4 +5,5 @@
    vlak onder de omvanggrens. */
 'use strict';
 
-module.exports = Object.freeze(Object.assign({}));
+module.exports = Object.freeze(Object.assign({},
+  require('./idemsleutels-nooit-verbond')));

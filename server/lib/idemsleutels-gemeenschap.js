@@ -7,6 +7,7 @@
    Een deelbestand per laag houdt ook parallelle takken uit elkaars lijst. */
 'use strict';
 
-const SLEUTELS = Object.assign({});
+const SLEUTELS = Object.assign({},
+  require('./idemsleutels-verbond').SLEUTELS);
 
 module.exports = { SLEUTELS };

@@ -5,7 +5,7 @@ module.exports = (wctx) => {
     werkmail } = kern;
   const uitnodiging = kern.personeelsUitnodiging || require('./uitnodiging')({ kern });
   const { maakInvite, wervingsBasis, wervingsLink, lijstInvites, trekInviteIn,
-    trekInVoorStaff, roteerInvite } = uitnodiging;
+    roteerInvite } = uitnodiging;
 app.post('/api/supplier/staff/add', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel toevoegen.' });
   // Nieuw personeel gaat via een uitnodiging (kassacode) en een eigen RTG-account;
@@ -24,7 +24,7 @@ app.post('/api/supplier/staff/remove', supplierAuth, async (req, res) => {
   const st = accounts.getStaffById(Number(req.body.staffId));
   if (st && String(st.supplier_code).toUpperCase() === req.supplier.code) {
     // N36: eerst de uitnodiging intrekken; lukt dat niet, dan verandert er niets.
-    try { await Promise.resolve(trekInVoorStaff(req.supplier.code, st.id, req.actor.name)); }
+    try { await Promise.resolve(uitnodiging.trekInVoorStaff(req.supplier.code, st.id, req.actor.name)); }
     catch (e) { console.error('[staff-remove] veilige verwerking mislukt'); return res.status(503).json({ error: 'De medewerker kon niet veilig worden verwijderd.' }); }
     accounts.deactivateStaff(st.id);
     // Uit dienst trekt ook de persoonlijke werkmail meteen in.

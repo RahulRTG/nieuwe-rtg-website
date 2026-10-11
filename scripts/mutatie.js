@@ -1387,6 +1387,11 @@ const GEEN_BRONMUTATIE = new Map([
      foutklasse is wel echt nageproefd: een tijdelijke 200vw-dashboardbreedte
      liet de 320/390/desktopmatrix zakken (13 toetsen, geen skip of time-out). */
   ['world-dashboard.e2e.js', 'browsermatrix; handmutatie naar 200vw liet de echte wereldviewporttoets zakken'],
+  /* De geheimkanarie meet LEKKEN en geen antwoordinhoud (#523): een liegende /api/
+     lekt geen kanarie, dus de liegpoort overleeft hem terecht. Met de hand
+     nagetrokken op 11 oktober 2026: scan() in scripts/lib/geheimkanarie.js die altijd
+     [] teruggeeft, liet de toets zakken op zijn eigen uitslaande meter. Teruggezet. */
+  ['geheimkanarie.test.js', 'lekscanner; een blinde scan() liet de toets zakken op de eigen ijking'],
   /* Deze twee toetsen bewaken CSS-contracten. De mutatiemotor kan alleen JS
      syntactisch keuren en zou een CSS-bestand daarom ten onrechte als
      onmeetbaar afwijzen. Met de hand nageproefd: --edge-top van 44px naar 40px

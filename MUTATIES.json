@@ -11989,6 +11989,14 @@
       "staat": "geen bronmutatie mogelijk",
       "reden": "overleefde 42 mutaties in public/shared/randen.js en rahul-mond.js. Hij toetst of PAGINA'S de bladen laden en dat er geen zwevende knop terugsluipt -- structuur van de markup, niet gedrag van de module"
     },
+    "ratelbronnen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/normwaarde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "rechtbank.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -12574,6 +12582,14 @@
       "module": "server/kern/commercie/ronde.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rondepr.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/werkstroom.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "rooster-verzuim.test.js": {

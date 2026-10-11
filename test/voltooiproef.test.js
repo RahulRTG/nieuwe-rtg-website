@@ -71,6 +71,12 @@ test('2. elk scenario hoort bij een onderdeel uit MAPPEN, en het contract en de 
       assert.ok(raak.length >= 2, sc.functie + ': het scenario raakt ' + raak.length + ' routes van ' + sc.ingang);
     }
   }
+  /* De versheid van het register ziet alleen wat het instrument letterlijk
+     inleest; een scenario buiten die sluiting kan veranderen zonder dat zijn
+     BEWEZEN vervalt. */
+  const sl = require('../scripts/lib/stempel').sluiting('scripts/voltooiproef.js');
+  assert.ok(sl, 'de sluiting van scripts/voltooiproef.js is onbekend');
+  for (const sc of lijst) assert.ok(sl.has(sc.bestand), sc.bestand + ' valt buiten de sluiting: een wijziging erin laat VOLTOOIPROEF.json vers');
   for (const [f, c] of Object.entries(CONTRACT)) {
     for (const b of Object.keys(c)) {
       if (c[b] && c[b].soort === 'voltooiproef') assert.ok(fs.existsSync(path.join(WORTEL, c[b].instrument)), f + ': ' + c[b].instrument + ' bestaat niet');

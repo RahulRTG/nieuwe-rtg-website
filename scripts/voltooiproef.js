@@ -55,10 +55,27 @@ const DOEL = path.join(WORTEL, 'VOLTOOIPROEF.json');
 const MAP = path.join(__dirname, 'lib', 'voltooi');
 const BEWIJZEN = ['voltooibaar', 'persistent', 'herstelbaar'];
 
+/* DE SCENARIO'S STAAN HIER LETTERLIJK, en niet als een require over een
+   mapinhoud. De versheid van VOLTOOIPROEF.json rekent alleen wijzigingen mee in
+   wat dit instrument via een LETTERLIJKE require bereikt (sluiting() in
+   ./lib/stempel.js); een berekende require ziet die niet. Met readdirSync +
+   require(path.join(...)) bleef het register daardoor "vers" -- en de rij
+   BEWEZEN -- terwijl het scenario dat het bewijs leverde was veranderd. Een
+   bestand in de map dat hier niet staat, laat de proef weigeren in plaats van
+   stil niet mee te tellen. */
+const SCENARIOS = {
+  'post.js': require('./lib/voltooi/post'),
+  'sessies.js': require('./lib/voltooi/sessies')
+};
+
 function scenarios(alleen) {
-  return fs.readdirSync(MAP).filter((n) => n.endsWith('.js')).sort()
+  const inMap = fs.readdirSync(MAP).filter((n) => n.endsWith('.js')).sort();
+  const vergeten = inMap.filter((n) => !SCENARIOS[n]);
+  if (vergeten.length) throw new Error('scenario(s) in scripts/lib/voltooi/ die niet in SCENARIOS staan: ' + vergeten.join(', ') +
+    ' -- zet ze er met een letterlijke require bij, anders ziet de versheid een wijziging erin niet');
+  return Object.keys(SCENARIOS).sort()
     .filter((n) => !alleen || n === alleen + '.js')
-    .map((n) => Object.assign({ bestand: 'scripts/lib/voltooi/' + n }, require(path.join(MAP, n))));
+    .map((n) => Object.assign({ bestand: 'scripts/lib/voltooi/' + n }, SCENARIOS[n]));
 }
 
 async function meetScenario(sc) {

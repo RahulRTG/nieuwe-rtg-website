@@ -63,8 +63,8 @@ doen en weten als één laag (punt 12 en 44), dus worden ze ook samen gemeten.
 
 **As 1 — de vorm.** Over de mechanismen die iets opslaan:
 <!--getal:namens.inAlle-->0<!--/getal--> van
-<!--getal:namens.velden-->50<!--/getal--> velden staan in álle mechanismen, 0 in
-zelfs maar de helft, en <!--getal:namens.eigenPct-->92<!--/getal-->% in precies één.
+<!--getal:namens.velden-->49<!--/getal--> velden staan in álle mechanismen, 0 in
+zelfs maar de helft, en <!--getal:namens.eigenPct-->91.8<!--/getal-->% in precies één.
 Ruim gemeten: 0 van 73, en 93,2% in precies één.
 
 **En die as is met opzet niet de dragende.** Er zijn maar tien bewaarde vormen
@@ -90,8 +90,8 @@ handelen, spoor:
 | `fiscaal-mandaat` | 3/7 | 3/7 | aanvaarden, versmallen, handelen, spoor |
 | `sepa-machtiging` | 0/7 | 3/7 | verlenen, versmallen, handelen, spoor |
 
-Gemiddeld <!--getal:namens.gemiddeldOpNaam-->3<!--/getal--> op naam en
-<!--getal:namens.gemiddeldOpSynoniem-->4.6<!--/getal--> op synoniem, van de zeven.
+Gemiddeld <!--getal:namens.gemiddeldOpNaam-->3.1<!--/getal--> op naam en
+<!--getal:namens.gemiddeldOpSynoniem-->4.7<!--/getal--> op synoniem, van de zeven.
 **<!--getal:namens.werkwoordenInAlle-->0<!--/getal--> werkwoorden staan onder dezelfde
 naam in alle zeven mechanismen.** Precies één mechanisme voert de hele
 grammatica: `kern/vertegenwoordiging/`.

@@ -12,8 +12,8 @@
     "bronBlindeBestanden": 0,
     "browserpoortToetsen": 430,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 536,
-    "dbDeurenSchrijvend": 275,
+    "dbDeuren": 539,
+    "dbDeurenSchrijvend": 276,
     "dekkingPct": 84,
     "dekkingWaargenomenPct": 100,
     "delenZonderOnderwerp": 0,
@@ -32,8 +32,8 @@
     "kernGedeeld": 255,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 50,
-    "keuringDubbeling": 177,
-    "keuringOmvang": 339,
+    "keuringDubbeling": 181,
+    "keuringOmvang": 351,
     "keuringScheef": 14,
     "keuringStuk": 0,
     "keuringTeGroot": 12,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 2134,
-    "toetsenNietGemeten": 129,
+    "toetsenNietGemeten": 134,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -168,7 +168,7 @@
     "rotatieMetDeHand": 15,
     "uitvoerVoorgedragen": 8,
     "edgeContextSchuld": 49,
-    "bronscannerGemist": 595,
+    "bronscannerGemist": 596,
     "bronscannerSpook": 4,
     "meetkeuringGezakt": 0,
     "refundOnverklaard": 15,
@@ -220,8 +220,8 @@
       "van": 343,
       "vervalt": "2027-01-09",
       "meter": "keuringOmvang 343 -> 353",
-      "reden": "De V1-hardening (PR #523) zette zestien serverbestanden in de band 9,4-10 kB en haalde er drie uit (kern/pay/partner.js, kern/webauthn.js, lib/keten.js): beleidsmotor/index, factuurcorrectie, identiteit/sessieregister, identiteit/toestellen, pay/opladen, pay/terug, pay/verzoeken, sessiestroom, vrijgave/oordeel, vrijgave/register, zwaarbewijs, lib/ankerdienst, lib/idem, opzet/luister, routes/member/toestellen, routes/theater. Geen ervan staat over de grens (de deltapoort houdt dat hard tegen); ze vlak voor een release opknippen raakt de geld- en identiteitspaden die net met mutaties zijn nagetrokken.",
-      "waarheen": "Per bestand op zijn natuurlijke naad knippen na de RC-bevriezing, te beginnen bij vrijgave/oordeel.js en pay/verzoeken.js (het dichtst bij de grens)."
+      "reden": "Opgeteld over de laatste integratieronde komen twaalf bestanden tussen 9 en 10 kB terecht, het merendeel uit #523 (onder meer vrijgave/oordeel.js, vrijgave/register.js, vrijgave/index.js, identiteit/wachtwoordrem.js, sessiestroom.js, scripts/extern-bewijs-stripe-connect.js, lib/ankerdienst.js, middleware/remmen.js, routes/member/toestellen.js, routes/auth/webauthn.js). #523 verklaarde zelf 343 -> 353 op een oudere main; op deze basis is het 339 -> 351. Geen bestand staat over de grens (de deltapoort houdt dat tegen en is groen).",
+      "waarheen": "de vrijgavelaag en de identiteitsbestanden bij hun volgende wijziging op een naad knippen"
     },
     {
       "datum": "2026-10-06",
@@ -4376,6 +4376,66 @@
       "meter": "zelfpoortendeToetsen 46 -> 48",
       "reden": "test/auditspoor-atomair.pg.test.js (audit P0-1/P1-4) heeft twee toetsen die een echte PostgreSQL vereisen: een trigger die alleen de auditschrijf laat falen, tegen een echte server en tegen de PG-laag. Lokaal tegen PostgreSQL 16 gedraaid en groen (scripts/pgtoetsen.js: 43 van 43 bestanden). Hij staat in scripts/lib/pg-toetslijst.js en als uitzondering in deze norm.",
       "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL."
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 339,
+      "vervalt": "2027-01-09",
+      "meter": "keuringOmvang 339 -> 351",
+      "reden": "Opgeteld over de laatste integratieronde komen twaalf bestanden tussen 9 en 10 kB terecht, het merendeel uit #523 (onder meer vrijgave/oordeel.js, vrijgave/register.js, vrijgave/index.js, identiteit/wachtwoordrem.js, sessiestroom.js, scripts/extern-bewijs-stripe-connect.js, lib/ankerdienst.js, middleware/remmen.js, routes/member/toestellen.js, routes/auth/webauthn.js). #523 verklaarde zelf 343 -> 353 op een oudere main; op deze basis is het 339 -> 351. Geen bestand staat over de grens (de deltapoort houdt dat tegen en is groen).",
+      "waarheen": "de vrijgavelaag en de identiteitsbestanden bij hun volgende wijziging op een naad knippen"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "keuringDubbeling",
+      "van": 177,
+      "vervalt": "2027-01-09",
+      "meter": "keuringDubbeling 177 -> 181",
+      "reden": "De vrijgavelaag van #523 (server/kern/vrijgave/index.js, stand.js, bewijs.js) definieert overzicht, besluit, oordeel, standVan en koppel, namen die al in meer dan twee kernmodules stonden; overzicht komt daarnaast ook uit kantoor/uitnodiging.js, pay/verzoeken.js en zaakdoos/sleutels.js van de tweede ronde. Gemeten door de dubbelingslijst van scripts/keuring.js op de kop van #542 naast die van deze samenvoeging te leggen.",
+      "waarheen": "de vrijgavelaag bij zijn volgende wijziging namen geven die zeggen waarover ze gaan (vrijgaveOordeel, vrijgaveStand)"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 536,
+      "vervalt": "2027-01-09",
+      "meter": "dbDeuren 536 -> 539",
+      "reden": "#523 voegt server/betaal/connect/opslag.js, server/kern/pay/reconcile.js, server/kern/vrijgave/stand.js, server/lib/ankerherzegelopslag.js en server/lib/auditwacht.js toe; die laatste staat al met reden in de notitie van 2026-10-06. Alle vijf lezen of schrijven een eigen collectie op db.data, zoals elke kernmodule.",
+      "waarheen": "de opslag van connect en vrijgave achter een eigen accessor in server/db/ zetten"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "dbDeurenSchrijvend",
+      "van": 275,
+      "vervalt": "2027-01-09",
+      "meter": "dbDeurenSchrijvend 275 -> 276",
+      "reden": "Zie de notitie bij dbDeuren: connect/opslag.js en vrijgave/stand.js schrijven. #523 verklaarde 275 -> 276 zelf.",
+      "waarheen": "zelfde als dbDeuren"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 129,
+      "vervalt": "2027-01-09",
+      "meter": "toetsenNietGemeten 129 -> 134",
+      "reden": "Nieuwe toetsbestanden uit #523 en de tweede ronde die de mutatiemotor nog niet heeft gemeten. #523 verklaarde zelf 129 -> 137 (notitie van 2026-10-06); na de samenvoeging is het gemeten 134.",
+      "waarheen": "npm run mutatie over de nieuwe toetsen draaien en MUTATIES.json vastleggen"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "bronscannerGemist",
+      "van": 595,
+      "vervalt": "2027-01-09",
+      "meter": "bronscannerGemist 595 -> 596",
+      "reden": "POST /api/foundation/school/belkanaal/ticket (#523, commit be127cdc1: geen sessie meer in het adres van een stroom) hangt op de /api/foundation-router, de familie die de bronscanner van de Capability Graph niet ziet -- zelfde vorm als de notitie van 2026-10-11 bij #521. Gemeten door de gemist-lijst van scripts/lib/bronscannerachterstand.js op de kop van #542 naast die van deze samenvoeging te leggen: dit is de enige nieuwe. De router en routedekking kennen hem.",
+      "waarheen": "de bronscanner herbaseren op de router (zie de notitie van 2026-10-11)"
     }
   ],
   "prestatie": {

@@ -594,6 +594,9 @@ const EIGEN_MODULE = new Map([
   ['juridischeschermen.e2e.js', ['public/apps/juridisch/privacy.html']],
   ['wereldbreedte.e2e.js', ['public/apps/living-os.html']],
   ['website-screen-edges.e2e.js', ['public/site/werelden/livingos.html']],
+  /* Reizen & Veilig: het moment uit Move en het aanbod uit de catalogus wonen
+     in reizen-veilig-reis.js (11 oktober 2026). */
+  ['reizen-veilig.e2e.js', ['public/apps/reizen-veilig-reis.js']],
   ['living-world.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sqlite.test.js', ['server/kern/living-world/index.js']],

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-06T19:38:21.948Z",
-    "commit": "f3816ac97",
+    "op": "2026-10-11T18:52:13.398Z",
+    "commit": "dde8f108",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/gastsplitsing.js",
     "node": "v22.22.0"
   },
@@ -11,13 +11,13 @@
   "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",
   "uitleg": "Per plek in server/ die op de gast toetst: maakt de code het onderscheid tussen bezoeker en gratis account, en wat zegt de weigering dat er nodig is. account-belofte = de tekst zegt dat een account of profiel volstaat, terwijl de code ook het gratis account weigert.",
   "gemeten": {
-    "bestanden": 125,
-    "plekken": 140,
+    "bestanden": 126,
+    "plekken": 141,
     "perSoort": {
       "vertakt": 23,
       "onderscheidt": 25,
       "pas-eis": 11,
-      "leden": 80,
+      "leden": 81,
       "zonder-tekst": 1
     },
     "tegenspraak": 0
@@ -253,6 +253,11 @@
       "plek": "server/routes/inzagekaart.js:8",
       "soort": "leden",
       "zegt": "Een inzagekaart hoort bij een ledendossier; gasten hebben er geen."
+    },
+    {
+      "plek": "server/routes/kantoorpakket-formaten.js:35",
+      "soort": "leden",
+      "zegt": "RTG Office is voor leden."
     },
     {
       "plek": "server/routes/kantoorpakket-samen.js:25",

@@ -13,7 +13,7 @@
   "measured": {
     "capabilities": 228,
     "routes": 5449,
-    "mutationContracts": 5322,
+    "mutationContracts": 5332,
     "screens": 327
   },
   "classifications": [
@@ -6239,6 +6239,10 @@
       "server/kern/objectlaag/event.js",
       "server/kern/objectlaag/eventwereld.js",
       "server/kern/objectlaag/persoon.js",
+      "server/kern/office/delen.js",
+      "server/kern/office/docs.js",
+      "server/kern/office/gezinsdeling.js",
+      "server/kern/office/rechten.js",
       "server/kern/office/workflow.js",
       "server/kern/ogen.js",
       "server/kern/onboarding.js",
@@ -9299,8 +9303,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 255,
-        "mutationRoutes": 254,
-        "declaredMutationSemantics": 98,
+        "mutationRoutes": 256,
+        "declaredMutationSemantics": 100,
         "sourceFileCount": 23,
         "kernelDependencyCount": 64,
         "screenCount": 28,
@@ -11795,8 +11799,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 17,
-        "mutationRoutes": 17,
-        "declaredMutationSemantics": 9,
+        "mutationRoutes": 19,
+        "declaredMutationSemantics": 11,
         "sourceFileCount": 2,
         "kernelDependencyCount": 13,
         "screenCount": 1,
@@ -15220,8 +15224,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 1023,
-        "mutationRoutes": 1022,
-        "declaredMutationSemantics": 315,
+        "mutationRoutes": 1024,
+        "declaredMutationSemantics": 317,
         "sourceFileCount": 199,
         "kernelDependencyCount": 2566,
         "screenCount": 39,
@@ -16213,8 +16217,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 674,
-        "mutationRoutes": 654,
-        "declaredMutationSemantics": 379,
+        "mutationRoutes": 656,
+        "declaredMutationSemantics": 381,
         "sourceFileCount": 108,
         "kernelDependencyCount": 121,
         "screenCount": 21,
@@ -20893,8 +20897,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 82,
-        "mutationRoutes": 82,
-        "declaredMutationSemantics": 28,
+        "mutationRoutes": 84,
+        "declaredMutationSemantics": 30,
         "sourceFileCount": 5,
         "kernelDependencyCount": 13,
         "screenCount": 2,

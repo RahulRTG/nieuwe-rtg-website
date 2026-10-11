@@ -19,13 +19,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5463 |
-| servermodules (`server/**/*.js`) | 4277 |
+| servermodules (`server/**/*.js`) | 4278 |
 | routebestanden (`server/routes/**`) | 647 |
 | kernmodules (`server/kern/**`) | 2685 |
 | schermen (`public/**/*.html`) | 327 |
 | gedeelde browsermodules (`public/shared/*.js`) | 427 |
-| toetsbestanden (`test/*.test.js`) | 2134 |
-| schermtoetsen (`test/*.e2e.js`) | 308 |
+| toetsbestanden (`test/*.test.js`) | 2135 |
+| schermtoetsen (`test/*.e2e.js`) | 309 |
 
 ## 2. De weg van een verzoek
 
@@ -156,7 +156,7 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 ```
 app(215) auth(131) supplierAuth(67) officeAuth(50) db(40) liveCodename(36) status(32)
 accounts(30) schoon(23) boardroomWie(21) codenaamVan(20) rtf(20) managerOnly(19)
-save(19) express(15) tooManyTries(14) geenGast(14) findSupplier(13) boardroomAuth(13)
+save(19) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth(13)
 crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)
 payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)
 logActivity(8) mail(7) naamAuth(7) sseToSupplier(7) onboarding(6) notifySupplier(6)

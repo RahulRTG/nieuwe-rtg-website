@@ -250,6 +250,7 @@
     "resolverbereik": "node scripts/resolverbereik.js",
     "codewereld": "node scripts/codewereld.js",
     "codearchitect": "node scripts/codearchitect.js",
+    "architectproef": "node scripts/architectproef.js",
     "symbolen": "node -r ./scripts/lib/invoerspoor-preload.js scripts/symbolen.js",
     "lussen": "node scripts/lussen.js",
     "lussen:controle": "node scripts/lussen.js --controle",

@@ -1,0 +1,316 @@
+{
+  "stempel": {
+    "op": "2026-10-11T15:30:17.356Z",
+    "commit": "d0b17fb63",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/gemeenschapsproef.js",
+    "node": "v22.22.0"
+  },
+  "uitleg": "De samenwerkingsketen van FoundationOS: drager, verbond, beraad, besluit, bijeenkomst, terugkoppeling (GEMEENSCHAP-FASE0.md par. 7). Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat langs zijn eigen route?) en per STORING (houdt de keten zijn belofte als het misgaat?). Zie de kop van scripts/gemeenschapsproef.js.",
+  "grens": "Twee genootschappen en een stichting op een wegwerpserver, geen browser. Het beraad hangt aan een genootschap en niet aan het verbond (het beraad kent vandaag alleen die drager). Rahul is gemeten als lezer (samenvatting) en als geweigerde stemmer via het stuur; het tweede slot in de route (het agentkenmerk) is van buitenaf niet te vervalsen en daarom hier niet beproefd. Gezinsprofielen en de partnerkant buiten de erkenning zijn niet gelopen.",
+  "schakels": [
+    {
+      "nr": 1,
+      "van": "beheerder",
+      "naar": "lid",
+      "wat": "een openbaar genootschap oprichten, en een ander lid vindt het in zoek",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "gevonden: true, 1 lid",
+      "fout": null,
+      "ms": 14
+    },
+    {
+      "nr": 2,
+      "van": "lid",
+      "naar": "beheerder",
+      "wat": "vijf leden treden binnen, en de beheerder ziet ze in de ledenlijst",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "alle vijf in de ledenlijst: true",
+      "fout": null,
+      "ms": 21
+    },
+    {
+      "nr": 3,
+      "van": "beheerder",
+      "naar": "stichting",
+      "wat": "een erkende stichting als drager vragen, en de stichting ziet de vraag zonder ledencodenamen",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "stand: gevraagd, codenaam in het partnerantwoord: false",
+      "fout": null,
+      "ms": 8
+    },
+    {
+      "nr": 4,
+      "van": "stichting",
+      "naar": "lid",
+      "wat": "de stichting erkent het genootschap, en een lid ziet de drager als verwijzing",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "drager: {\"soort\":\"rtfpartner\",\"stand\":\"erkend\"}",
+      "fout": null,
+      "ms": 9
+    },
+    {
+      "nr": 5,
+      "van": "beheerder",
+      "naar": "tweede-beheerder",
+      "wat": "een verbond voorstellen, en de andere beheerder krijgt het een keer en leest het concept",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "meldingen +1, stand: concept",
+      "fout": null,
+      "ms": 13
+    },
+    {
+      "nr": 6,
+      "van": "tweede-beheerder",
+      "naar": "beheerder",
+      "wat": "beide kanten tekenen, en beide zien hetzelfde actieve verbond",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "stand actief, verschilt: niets",
+      "fout": null,
+      "ms": 31
+    },
+    {
+      "nr": 7,
+      "van": "beheerder",
+      "naar": "tweede-lid",
+      "wat": "de leden van beide kanten zien het actieve verbond, zonder codenamen van de andere kant",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "B ziet: actief, A ziet: actief, codenaam van de andere kant: false",
+      "fout": null,
+      "ms": 7
+    },
+    {
+      "nr": 8,
+      "van": "beheerder",
+      "naar": "lid",
+      "wat": "een beraad openen in het genootschap, en een lid ziet de vraag",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "in beraad/mijn: true",
+      "fout": null,
+      "ms": 9
+    },
+    {
+      "nr": 9,
+      "van": "lid",
+      "naar": "deelnemer",
+      "wat": "twee leden brengen iets in, en een derde lid ziet beide met hun codenaam",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "2 inbreng zichtbaar",
+      "fout": null,
+      "ms": 11
+    },
+    {
+      "nr": 10,
+      "van": "rahul",
+      "naar": "lid",
+      "wat": "Rahul vat samen, met bij elke regel de inbreng als bron",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "2 regels, elke inbreng gedekt: true",
+      "fout": null,
+      "ms": 8
+    },
+    {
+      "nr": 11,
+      "van": "beheerder",
+      "naar": "deelnemer",
+      "wat": "een voorstel naar stemmen brengen, en elk lid stemt zelf zonder tussenstand",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "stand stemmen, eigen stem voor, tussenstand null",
+      "fout": null,
+      "ms": 50
+    },
+    {
+      "nr": 12,
+      "van": "beheerder",
+      "naar": "lid",
+      "wat": "het beraad sluiten, en elk lid ziet de eindstand en de aantallen",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "eindstand aangenomen, 4 voor / 1 tegen / 1 onthouding",
+      "fout": null,
+      "ms": 20
+    },
+    {
+      "nr": 13,
+      "van": "beheerder",
+      "naar": "lid",
+      "wat": "uit het besluit een bijeenkomst bijeenroepen; elk ander lid krijgt de uitnodiging precies een keer",
+      "bekend": null,
+      "naad": "menselijk: een bijeenkomst kent geen veld dat naar een besluit wijst en een besluit roept niemand bijeen; de beheerder doet die stap zelf (LIFE.md: samenstellen en klaarzetten, bevestigen doet de mens)",
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "uitnodigingen per lid: 1,1,1,1,1, in de agenda: true",
+      "fout": null,
+      "ms": 23
+    },
+    {
+      "nr": 14,
+      "van": "beheerder",
+      "naar": "deelnemer",
+      "wat": "de terugkoppeling bereikt elke deelnemer precies een keer, en gezien is een trede",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "berichten per deelnemer: 1,1,1,1,1,1, niet-deelnemer: 0, trede: gezien",
+      "fout": null,
+      "ms": 34
+    },
+    {
+      "nr": 15,
+      "van": "lid",
+      "naar": "lid",
+      "wat": "zijn eigen inbreng en het besluit meenemen in de uitvoer van het genootschap",
+      "bekend": "De meeneemuitvoer (kern/genootschap/uitvoer.js mijn) kent prikbord, peilingen en bijeenkomsten maar het beraad nog niet: B3 is na de uitvoer gebouwd en niet in die uitvoer opgenomen. Wat een lid inbracht en het besluit waaraan hij meedeed, gaan bij vertrek dus niet mee. Een uitvoer die het beraad leest is een koppeling tussen twee kernmodules, en dat is een besluit (GEMEENSCHAP-FASE0.md par. 7.2 schakel 11, \"deels nu\") en geen reparatie in deze proef.",
+      "stand": "openBekend",
+      "status": 200,
+      "ziet": "eigen inbreng mee: false, besluit mee: false",
+      "fout": null,
+      "ms": 5
+    }
+  ],
+  "storingen": [
+    {
+      "naam": "een buitenstaander vraagt een verbond en een beraad op",
+      "belofte": "krijgt 404 zoals bij een verzonnen id, en zijn inbreng laat geen regel achter",
+      "stand": "gehouden",
+      "wat": "verbond 404, beraad 404, inbreng 404"
+    },
+    {
+      "naam": "de ene kant tekent voor de andere, of een gewoon lid tekent",
+      "belofte": "de kant komt uit de sessie: de tweede beheerder tekent alleen voor zijn eigen kant, en een gewoon lid wordt geweigerd zonder dat er een teken bijkomt",
+      "stand": "gehouden",
+      "wat": "tekens {\"a\":null,\"b\":true}, lid tekent: 404, kant a daarna: null"
+    },
+    {
+      "naam": "de tekst van een getekend verbond verandert",
+      "belofte": "zet beide handtekeningen terug en het verbond terug naar concept; tekenen geldt voor een tekst, niet voor een id",
+      "stand": "gehouden",
+      "wat": "voor: actief, na: concept {\"a\":null,\"b\":null}"
+    },
+    {
+      "naam": "na een opzegging opnieuw tekenen of wijzigen",
+      "belofte": "weigert met 409 en de reden dat het verbond is opgezegd, terwijl het verbond leesbaar blijft",
+      "stand": "gehouden",
+      "wat": "teken/wijzig: 409/409, lezen: 200"
+    },
+    {
+      "naam": "stemmen voordat het voorstel naar stemmen is gebracht",
+      "belofte": "weigert met een reden, en er staat daarna geen stem",
+      "stand": "gehouden",
+      "wat": "status 409, eigen stem daarna: null"
+    },
+    {
+      "naam": "Rahul probeert via het stuur te stemmen namens een lid",
+      "belofte": "wordt geweigerd en laat geen stem achter: in een beraad handelt een mens zelf",
+      "stand": "gehouden",
+      "wat": "stuur: 403 Deze actie staat niet op de expliciete AI-allowlist voor member., stem daarna: null"
+    },
+    {
+      "naam": "een uitslag lezen tijdens het stemmen, en bij minder dan vijf stemmers",
+      "belofte": "toont geen telling tijdens het stemmen, en daarna alleen de eindstand met de reden, nooit een aantal",
+      "stand": "gehouden",
+      "wat": "tijdens: null, na: {\"getoond\":false,\"reden\":\"te-kleine-groep\"}"
+    },
+    {
+      "naam": "het beraad een tweede keer sluiten",
+      "belofte": "geeft hetzelfde antwoord en geen tweede bericht: twee keer sluiten is een keer besluiten",
+      "stand": "gehouden",
+      "wat": "status 200, berichten voor 2,2,1,1,1 na 2,2,1,1,1"
+    },
+    {
+      "naam": "het beraad heropenen na het besluit",
+      "belofte": "opent een nieuwe ronde; de eindstand en de aantallen van de eerste ronde veranderen nooit",
+      "stand": "gehouden",
+      "wat": "status 200, rondes 2, eerste eindstand aangenomen"
+    },
+    {
+      "naam": "een bijeenkomst twee keer afgelasten",
+      "belofte": "de eerste afgelasting blijft leidend: geen tweede bericht, en de reden wordt niet overschreven",
+      "stand": "gehouden",
+      "wat": "reden na de tweede: Regen voorspeld., berichten +1"
+    },
+    {
+      "naam": "een inbreng met een andere actor in het lijf",
+      "belofte": "de actor komt uit de sessie: de regel staat op naam van wie hem stuurde, nooit op een meegestuurde naam",
+      "stand": "gehouden",
+      "wat": "status 200, staat op: het eigen lid"
+    },
+    {
+      "naam": "een minderjarige probeert een gedragen genootschap in te gaan",
+      "belofte": "wordt geweigerd met de leeftijdsgrens erbij, zelf en via een uitnodiging, en de ledenlijst blijft gelijk",
+      "stand": "gehouden",
+      "wat": "zelf 400, uitnodiging 400, ledenlijst gelijk: true"
+    },
+    {
+      "naam": "een tweede ja op een bijeenkomst met een plaats",
+      "belofte": "wordt geweigerd met de reden dat het vol is; na een nee komt de plaats vrij",
+      "stand": "gehouden",
+      "wat": "eerste 200, tweede 400, na een nee 200"
+    }
+  ],
+  "wereld": {
+    "leden": "echte accounts via /api/auth/register; de leden van het gedragen genootschap met een paspoort langs de echte keuring (test/helper.js keurLidGoed)",
+    "stichting": "een stichting in het partnerregister, door het kantoor op naam erkend (in_toetsing -> goedgekeurd)",
+    "genootschap": "een openbaar genootschap met zes gekeurde volwassen leden",
+    "tweede": "een besloten genootschap met een eigen beheerder en een lid (geen drager)"
+  },
+  "ids": {
+    "genootschap": 1791732625411,
+    "tweede": 1791732625462,
+    "verbond": "vb0650fb1fe6d44f20",
+    "beraad": 1791732625530,
+    "bijeenkomst": 1791732625644
+  },
+  "telling": {
+    "schakels": 15,
+    "gesloten": 14,
+    "open": 0,
+    "openBekend": 1,
+    "stuk": 0,
+    "storingen": 13,
+    "gehouden": 13,
+    "gebroken": 0
+  },
+  "sluit": false,
+  "sluitMetBevinding": true,
+  "bevindingen": [
+    {
+      "schakel": 15,
+      "van": "lid",
+      "naar": "lid",
+      "wat": "zijn eigen inbreng en het besluit meenemen in de uitvoer van het genootschap",
+      "gemeten": "eigen inbreng mee: false, besluit mee: false",
+      "reden": "De meeneemuitvoer (kern/genootschap/uitvoer.js mijn) kent prikbord, peilingen en bijeenkomsten maar het beraad nog niet: B3 is na de uitvoer gebouwd en niet in die uitvoer opgenomen. Wat een lid inbracht en het besluit waaraan hij meedeed, gaan bij vertrek dus niet mee. Een uitvoer die het beraad leest is een koppeling tussen twee kernmodules, en dat is een besluit (GEMEENSCHAP-FASE0.md par. 7.2 schakel 11, \"deels nu\") en geen reparatie in deze proef."
+    }
+  ],
+  "naden": [
+    {
+      "schakel": 13,
+      "naad": "menselijk: een bijeenkomst kent geen veld dat naar een besluit wijst en een besluit roept niemand bijeen; de beheerder doet die stap zelf (LIFE.md: samenstellen en klaarzetten, bevestigen doet de mens)"
+    }
+  ]
+}

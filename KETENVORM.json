@@ -1,5 +1,5 @@
 {
-  "stempel": "2026-09-29",
+  "stempel": "2026-10-11",
   "uitleg": "Wat drie onafhankelijk geschreven ketenproeven werkelijk delen, geteld uit hun registers. De vorm is per definitie gelijk (beide proeven zijn zo geschreven) en zegt dus niets; de actoren en de beloften zeggen wel iets. Zie de kop van scripts/ketenvorm.js.",
   "grens": "Drie ketens is een kleine steekproef, en ze zijn door dezelfde hand geschreven -- gedeelde beloften kunnen dus ook gedeelde gewoonte zijn. Een derde keten van een andere hand zou dat scheiden. De thema-indeling gebruikt een gesloten woordenlijst; wat er niet in past staat in nietIngedeeld en verdwijnt niet.",
   "ketens": [
@@ -65,6 +65,15 @@
       "storingen": 9,
       "sluit": false,
       "bevindingen": 1
+    },
+    {
+      "naam": "gemeenschap",
+      "domein": "genootschap",
+      "proef": "scripts/gemeenschapsproef.js",
+      "schakels": 15,
+      "storingen": 13,
+      "sluit": false,
+      "bevindingen": 1
     }
   ],
   "vorm": {
@@ -89,7 +98,8 @@
     },
     "apart": {
       "schakel": [
-        "bekend"
+        "bekend",
+        "naad"
       ],
       "storing": []
     },
@@ -152,6 +162,15 @@
         "fiscus",
         "lid",
         "zaak"
+      ],
+      "gemeenschap": [
+        "beheerder",
+        "deelnemer",
+        "lid",
+        "rahul",
+        "stichting",
+        "tweede-beheerder",
+        "tweede-lid"
       ]
     },
     "gedeeld": [],
@@ -204,6 +223,14 @@
         "betaalrail",
         "boekhouding",
         "fiscus"
+      ],
+      "gemeenschap": [
+        "beheerder",
+        "deelnemer",
+        "rahul",
+        "stichting",
+        "tweede-beheerder",
+        "tweede-lid"
       ]
     }
   },
@@ -250,6 +277,13 @@
         "herhaling",
         "onbekendObject",
         "weigeringMetReden"
+      ],
+      "gemeenschap": [
+        "herhaling",
+        "nietsKlaarZonderGrond",
+        "onbekendObject",
+        "volgorde",
+        "weigeringMetReden"
       ]
     },
     "gedeeld": [
@@ -265,11 +299,11 @@
       "bereikbareWeg": 1,
       "dubbelObject": 1,
       "geldKlaargezet": 1,
-      "herhaling": 7,
-      "onbekendObject": 4,
-      "volgorde": 2,
-      "weigeringMetReden": 7,
-      "nietsKlaarZonderGrond": 3,
+      "herhaling": 8,
+      "onbekendObject": 5,
+      "volgorde": 3,
+      "weigeringMetReden": 8,
+      "nietsKlaarZonderGrond": 4,
       "geslotenLijst": 1,
       "handelingMetNaam": 1
     },
@@ -287,7 +321,8 @@
       "adam": [],
       "moment": [],
       "zaaklive": [],
-      "omzet": []
+      "omzet": [],
+      "gemeenschap": []
     },
     "nietIngedeeld": [
       {
@@ -439,17 +474,32 @@
         "keten": "omzet",
         "storing": "de boeken opvragen zonder zaaksessie",
         "belofte": "wordt geweigerd"
+      },
+      {
+        "keten": "gemeenschap",
+        "storing": "de tekst van een getekend verbond verandert",
+        "belofte": "zet beide handtekeningen terug en het verbond terug naar concept; tekenen geldt voor een tekst, niet voor een id"
+      },
+      {
+        "keten": "gemeenschap",
+        "storing": "het beraad heropenen na het besluit",
+        "belofte": "opent een nieuwe ronde; de eindstand en de aantallen van de eerste ronde veranderen nooit"
+      },
+      {
+        "keten": "gemeenschap",
+        "storing": "een inbreng met een andere actor in het lijf",
+        "belofte": "de actor komt uit de sessie: de regel staat op naam van wie hem stuurde, nooit op een meegestuurde naam"
       }
     ],
     "let": "\"gedeeld\" is in ALLE ketens; \"bijna\" in meer dan een maar niet in alle. Dat onderscheid staat er omdat een vondst anders verdwijnt zodra er een keten bijkomt die hem niet heeft."
   },
   "telling": {
     "actorenGedeeld": 0,
-    "ketens": 7,
-    "actorenTotaal": 33,
+    "ketens": 8,
+    "actorenTotaal": 39,
     "themasGedeeld": 2,
     "themasBijna": 3,
     "themasTotaal": 10,
-    "nietIngedeeld": 30
+    "nietIngedeeld": 33
   }
 }

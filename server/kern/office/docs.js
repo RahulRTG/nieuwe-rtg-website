@@ -2,6 +2,7 @@
    een sjabloon), openen met rechten, bewaren met versiegeschiedenis en
    verwijderen door de eigenaar. */
 
+const { classificatieVan } = require('./uitgangspoort');
 const { SOORTEN, MAX_DOCS, MAX_BYTES, MAX_TITEL, MAX_VERSIES, SJABLONEN } = require('./basis');
 
 module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
@@ -23,7 +24,7 @@ module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
       gedeeld: (d.gedeeldMet || []).length + (d.bewerkers || []).length, fase: faseVan(d),
       laatstDoor: d.laatstDoor || naamVan(d.key),
       omvang: omvangVan(d), openActies: (d.opmerkingen || []).filter(o => !o.opgelost).length,
-      classificatie: (d.beheer && d.beheer.classificatie) || 'intern',
+      classificatie: classificatieVan(d),
       herzienOp: (d.beheer && d.beheer.herzienOp) || '', tags: (d.beheer && d.beheer.tags) || [] });
     return { status: 200, docs: eigen.map(d => kop(d, true)), gedeeld: gedeeld.map(d => kop(d, false)),
       max: MAX_DOCS,
@@ -110,7 +111,7 @@ module.exports = ({ db, save, schoon, sseToCustomer }, basis) => {
       delingen: ikEigenaar ? (d.bewerkers || []).map(k => ({ codenaam: naamVan(k), naam: naamVan(k), rechten: 'bewerken' }))
         .concat((d.gedeeldMet || []).map(k => ({ codenaam: naamVan(k), naam: naamVan(k), rechten: 'lezen' }))) : undefined,
       samenwerken: { openActies: (d.opmerkingen || []).filter(o => !o.opgelost).length,
-        classificatie: (d.beheer && d.beheer.classificatie) || 'intern',
+        classificatie: classificatieVan(d),
         herzienOp: (d.beheer && d.beheer.herzienOp) || '' },
       werkstroom: { fase: faseVan(d), laatstDoor: d.laatstDoor || naamVan(d.key),
         audit: ikEigenaar ? (d.audit || []).slice(0, 20) : undefined } };

@@ -1,4 +1,6 @@
 /* Alleen de maker wijzigt de gezinsdeling; classificatie begrenst ieder nieuw recht. */
+const { poort } = require('./uitgangspoort');
+
 module.exports = ({ save }, { docMet, nu, naamVan, schrijfAudit }) => {
   /* ---- delen met de eigen kring (het RTF-gezin): uit, meelezen of samen schrijven ---- */
   function kringDeel(key, did, stand) {
@@ -7,8 +9,8 @@ module.exports = ({ save }, { docMet, nu, naamVan, schrijfAudit }) => {
     if (d.key !== key) return { status: 403, error: 'Alleen de maker deelt met het gezin.' };
     if (!d.kring) return { status: 400, error: 'Dit document hoort niet bij een gezin.' };
     if (![null, '', 'uit', 'lezen', 'bewerken'].includes(stand)) return { status: 400, error: 'Kies uit, lezen of bewerken.' };
-    if ((stand === 'lezen' || stand === 'bewerken') && d.beheer && d.beheer.classificatie === 'strikt')
-      return { status: 409, error: 'Een strikt document kan niet worden gedeeld. Pas eerst de classificatie aan.' };
+    const uit = poort(d, 'gezin');
+    if ((stand === 'lezen' || stand === 'bewerken') && !uit.mag) return { status: 409, code: uit.code, error: uit.reden };
     d.kringDeel = (stand === 'lezen' || stand === 'bewerken') ? stand : null;
     d.gewijzigd = nu();
     d.laatstDoor = naamVan(key);

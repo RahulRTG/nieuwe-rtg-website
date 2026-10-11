@@ -1,30 +1,30 @@
 {
  "stempel": {
-  "op": "2026-10-06T23:20:21.521Z",
-  "commit": "8f957541d",
-  "boomVuil": false,
+  "op": "2026-10-11T17:12:10.459Z",
+  "commit": "81b91c78",
+  "boomVuil": true,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5322,
-  "geclassificeerd": 5297,
+  "totaal": 5332,
+  "geclassificeerd": 5307,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1278,
    "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 670,
-   "INTENTIONALLY_NON_IDEMPOTENT": 185
+   "INTENTIONALLY_NON_IDEMPOTENT": 195
   },
-  "vastgesteldDoorMens": 2185,
+  "vastgesteldDoorMens": 2195,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4381,
+   "AUTHENTICATED": 4387,
    "PUBLIC": 138,
-   "OBJECT_SCOPED": 773,
+   "OBJECT_SCOPED": 777,
    "(niet af te leiden -- vraagt een verklaring)": 14,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 175
+   "niet gemeten": 185
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -33538,6 +33538,28 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "kantoorpakket.exporteer",
+   "route": "POST /api/kantoorpakket/exporteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth",
+     "geenGast"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "kantoorpakket.fase",
    "route": "POST /api/kantoorpakket/fase",
    "semantiek": {
@@ -33562,6 +33584,28 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "kantoorpakket.importeer",
+   "route": "POST /api/kantoorpakket/importeer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth",
+     "geenGast"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -65172,6 +65216,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "office.kantoorpakket.exporteer",
+   "route": "POST /api/office/kantoorpakket/exporteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "office.kantoorpakket.fase",
    "route": "POST /api/office/kantoorpakket/fase",
    "semantiek": {
@@ -65195,6 +65260,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.kantoorpakket.importeer",
+   "route": "POST /api/office/kantoorpakket/importeer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -87117,6 +87203,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtf.kantoorpakket.exporteer",
+   "route": "POST /api/rtf/kantoorpakket/exporteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "rtfPoort"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "rtf.kantoorpakket.fase",
    "route": "POST /api/rtf/kantoorpakket/fase",
    "semantiek": {
@@ -87167,6 +87274,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtf.kantoorpakket.importeer",
+   "route": "POST /api/rtf/kantoorpakket/importeer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "rtfPoort"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -117177,6 +117305,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "supplier.kantoorpakket.exporteer",
+   "route": "POST /api/supplier/kantoorpakket/exporteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "supplier.kantoorpakket.fase",
    "route": "POST /api/supplier/kantoorpakket/fase",
    "semantiek": {
@@ -117200,6 +117349,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.kantoorpakket.importeer",
+   "route": "POST /api/supplier/kantoorpakket/importeer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -140612,6 +140782,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "werkplek.kantoorpakket.exporteer",
+   "route": "POST /api/werkplek/kantoorpakket/exporteer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "huisPoort"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "werkplek.kantoorpakket.fase",
    "route": "POST /api/werkplek/kantoorpakket/fase",
    "semantiek": {
@@ -140635,6 +140826,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "werkplek.kantoorpakket.importeer",
+   "route": "POST /api/werkplek/kantoorpakket/importeer",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "huisPoort"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

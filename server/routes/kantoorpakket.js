@@ -100,4 +100,6 @@ module.exports = (kern) => {
      bij een ingang. */
   require('./kantoorpakket-huis')(kern, { stuur, ruim });
   require('./kantoorpakket-samen')(kern);
+  // in en uit (DOCX, XLSX, ...) langs de classificatiepoort
+  require('./kantoorpakket-formaten')(kern);
 };

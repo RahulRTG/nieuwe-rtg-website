@@ -7,7 +7,8 @@
    personeelsvolgsysteem. */
 'use strict';
 
-const CLASSIFICATIES = ['intern', 'vertrouwelijk', 'strikt'];
+// de lijst woont bij de uitgangspoort; hier is de plek waar de eigenaar haar ZET
+const { CLASSIFICATIES, classificatieVan } = require('./uitgangspoort');
 const BEWAARTERMIJNEN = ['geen', '1jaar', '3jaar', '7jaar', 'permanent'];
 const MAX_OPMERKINGEN = 200;
 const MAX_TAGS = 8;
@@ -21,7 +22,7 @@ module.exports = ({ save, schoon, sseToCustomer }, basis) => {
   const beheerVan = d => {
     const b = d.beheer && typeof d.beheer === 'object' ? d.beheer : {};
     return {
-      classificatie: CLASSIFICATIES.includes(b.classificatie) ? b.classificatie : 'intern',
+      classificatie: classificatieVan(d),
       bewaartermijn: BEWAARTERMIJNEN.includes(b.bewaartermijn) ? b.bewaartermijn : '7jaar',
       herzienOp: datum(b.herzienOp),
       tags: (Array.isArray(b.tags) ? b.tags : []).slice(0, MAX_TAGS)

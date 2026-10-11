@@ -29,7 +29,8 @@
     gedeeld: 'Gedeeld', 'deling-ingetrokken': 'Deling ingetrokken',
     'opmerking-toegevoegd': 'Opmerking toegevoegd', 'opmerking-opgelost': 'Actie opgelost',
     'opmerking-heropend': 'Actie heropend', 'opmerking-verwijderd': 'Opmerking verwijderd',
-    'documentbeheer-gewijzigd': 'Documentbeleid gewijzigd' };
+    'documentbeheer-gewijzigd': 'Documentbeleid gewijzigd', geexporteerd: 'Geëxporteerd',
+    ingelezen: 'Ingelezen uit XLSX' };
 
   var PAR = new URLSearchParams(location.search);
   var WERK = PAR.get('werk') || '';

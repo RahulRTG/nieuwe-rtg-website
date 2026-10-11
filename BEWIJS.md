@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2440 bestanden en 16711 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2442 bestanden en 16721 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2440 |
-| losse beweringen (`test(...)`) | 16711 |
+| toetsbestanden | 2442 |
+| losse beweringen (`test(...)`) | 16721 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
-| alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 0 |
+| alleen in de kop *genoemd*, nog niet gemeten | 1 |
+| niets van beide | 1 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2132 bestanden, 16174 beweringen.
+2134 bestanden, 16184 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1241,9 +1241,11 @@ toets omvalt.
 | `office-blad.test.js` | 6 | gezakt op `true->false#0` | De rekenmotor van RTG Office. Deze draait in de browser, dus we laden het bestand hier los in en rekenen erop -- zonder server, zonder scherm. |
 | `office-classificatie-grens.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `office-enterprise.test.js` | 6 | gezakt op `liegpoort /api/` | De enterprisegrens van RTG Office. Bewijst drie dingen die bij echt samenwerken niet stil fout mogen gaan: een oud venster overschrijft nooit een nieuwere versie, goedkeuren blijft een menselijke eigenaarsbeslissing,... |
+| `office-formaten.test.js` | 7 | genoemd | RTG Office in en uit, op een echte server (OFFICE.md punt 23, par. 9 fase 1 en 2; LAT: elke nieuwe route minstens een treffer op een echte server). |
 | `office-payroll-dekking.test.js` | 11 | gezakt op `liegpoort /api/` | NEGENTIEN KANTOORDEUREN DIE NOOIT WERDEN GEOPEND. De dekkingsmeter telt welke endpoints de suite tijdens een run echt aanroept. |
 | `office-save-atomic.test.js` | 1 | gezakt op `!==->===#1` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `office-tweede-helft.test.js` | 10 | gezakt op `liegpoort /api/` | De kantoordeur, tweede helft. De RTG-kant van de ontwerptak is er net zo aan toe als de RTF-kant was: alles wat MAAKT en LEEST staat in de tests, alles wat WIJZIGT en WEGGOOIT niet. |
+| `office-uitgangspoort.test.js` | 3 | -- | RTG Office: EEN uitgangspoort voor classificatie (OFFICE.md par. 4 grens 4, par. |
 | `office.test.js` | 12 | gezakt op `liegpoort /api/` | RTG Office: het eigen kantoorpakket. Tekstdocumenten en rekenbladen op het account (op elk toestel terug), alleen-lezen delen op codenaam (nooit op echte naam), en per-lid/per-document begrenzingen. |
 | `officebord.test.js` | 2 | gezakt op `liegpoort /api/` | Het bord (Trello) als kantoortool in RTG Office. Getoetst: een lid maakt een bord, bewaart lijsten met kaarten en leest ze terug (de sanitizer klemt labels en datums); de zaak heeft hetzelfde bord als team-drive; en... |
 | `ogen.test.js` | 5 | gezakt op `===->!==#0` | DE OGENREGEL OP EEN PLEK. "Dezelfde ogen tellen niet dubbel" stond in vier formuleringen in huis en werd op vijf plekken gebruikt: de documentenuitgifte, de naheffingsaanslag, het bezwaar, het dwangbevel en de... |

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T08:45:34.605Z",
-    "commit": "07fbad24a",
+    "op": "2026-10-11T15:02:28.930Z",
+    "commit": "4d8744eb4",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5025,6 +5025,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "genootschap-drager-server.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "genootschap-drager.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/genootschap/drager-regels.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "genootschap-prikbord-lezen.test.js": {
       "soort": "puur",

@@ -313,3 +313,172 @@ Klein en omkeerbaar, en elke stap levert op zichzelf iets op.
 
 Stap 2 en 3 zijn de voorwaarde voor de rest: zolang een surface geen shell-gedrag
 erft, bouwt elke app zijn eigen desktop en zijn we terug bij twintig stijlen.
+
+---
+
+## 12. De permanente schil
+
+> **Een lid mag bij gewone navigatie niet merken dat hij tussen afzonderlijke
+> RTG-producten beweegt. De applicatie blijft bestaan; alleen context en inhoud
+> veranderen.**
+
+Dat is het architectuurdoel (besluit van de eigenaar, 11 oktober 2026), en het
+is met opzet een DOEL en geen toestemming voor een grote verhuizing. Een
+permanente schil is hier geen prestatietruc: ook als vooruitladen een tik snel
+laat LIJKEN, start bij elke documentnavigatie de stapel eronder opnieuw op
+-- de sessie, de gedeelde lagen, het geheugen van het scherm. Daarom staat het
+doel hier los van de vraag of de snelle verbeteringen "genoeg" zijn.
+
+### 12.1 Wat er gemeten is, en wat dat over de vorm zegt
+
+`npm run schilherstart` (`SCHILHERSTART.json`) loopt de weg die een duim neemt:
+werktafel, een wereld uit de bank, een onderdeel binnen die wereld, Home, en
+zo door alle vier de werelden. Per handeling telt hij nieuwe documenten (in de
+werktafel zelf en in een blad), hoeveel Edge-balken er tegelijk in beeld
+staan, scripts, KB JavaScript, API-verzoeken en de blokkade van de hoofddraad.
+De eerste versie liep van adres naar adres met `page.goto`; dat is niet wat
+een lid doet, en het verschil bleek de hele vraag.
+
+Drie uitkomsten, en elk ervan stuurt het voorstel:
+
+1. **De werktafel IS al een permanente schil.** Een wereld openen zet hem als
+   blad (iframe) in de werktafel (`shared/command/werktafel.js`, `toon()`); de
+   buitenste schil blijft staan, en er staat nooit meer dan één Edge-balk in
+   beeld. Het gevoel "elk scherm is een eigen app" komt dus niet van twee
+   schillen naast elkaar.
+2. **Maar elk blad start zijn hele stapel opnieuw.** Elke tik op een wereld of
+   een onderdeel is een nieuw document met 31 tot 64 scripts en 0,6 tot 0,8 MB
+   JavaScript, en onder een vier keer vertraagde CPU blokkeert dat de
+   hoofddraad 2 tot 3,5 seconde (graad `vermoed`). **27 scripts (362 KB) zijn in
+   elk blad dezelfde** -- de gedeelde laag, ruim de helft van wat een blad laadt
+   -- en een deel daarvan is schilcode die de host al draagt: de centrale
+   navigatie (`ios.js`, 36 KB), de sprong (`sprong.js`), de Continue Key,
+   `randen.js`. Welk deel in een blad aantoonbaar niets doet, is per laag vast te
+   stellen en nog niet vastgesteld (trede 1 hieronder).
+3. **Het ophalen is niet de rem; het uitvoeren is dat.** De scripts komen na
+   de eerste keer uit de cache van de service worker: **0 bytes over het
+   netwerk** bij een warm blad. Vooraf laden heeft dus niets meer te winnen en
+   is niet toegepast. Bundelen is anders: de scripts komen parallel door de
+   service worker, elk tot ~300 ms, en het laatste komt binnen op 570-644 ms van
+   een document dat op 659-889 ms klaar is (zonder CPU-vertraging). Het ophalen
+   via de service worker zit dus op het kritieke pad, en de 27 gedeelde scripts
+   tot één samenvoegen kan dat pad korter maken -- een vermoeden, en daarom een
+   proef met een voor- en nameting voordat het gebouwd wordt.
+
+### 12.2 Er zijn al drie hosts, en er komt geen vierde
+
+| host | waar | hoe een scherm erin komt |
+|---|---|---|
+| **RTG Command-werktafel** | `apps/app.html`, `shared/command/` | blad = iframe, max. twee, met kind-naar-host-overdracht (`RTGCommand.uitKind`) |
+| **Spatial Shell** | `apps/werkruimte.html`, `shared/rtg-schil/` | surface = iframe met greep, docken en zoomstanden |
+| **Workspace Runtime** | het Second Screen op de werktafel, `shared/interface/` | Living Module zonder iframe, via `RTGWorkspaceModuleHost`, met een bevroren capabilitycontext en een scriptbudget per stand |
+
+De permanente schil is de **werktafel**. Hij is het enige beginscherm
+(WERELD.md), hij draagt de sessie en de Edge, en hij doet het al op elke
+breedte. De Spatial Shell blijft de desktopvorm van dezelfde gedachte; de
+Workspace Runtime is de manier waarop inhoud ZONDER eigen document in die
+schil komt. Een vierde host is precies de `VERMOGENS`-fout van OS.md, en die
+wordt hier vooraf uitgesloten.
+
+### 12.3 De migratie, in vier treden
+
+Elke trede is los terug te draaien, en geen trede raakt een grens van een
+domein: een scherm houdt zijn eigen verzoeken, rechten en bevestigingen.
+
+| trede | wat er verandert | stand |
+|---|---|---|
+| **0. De host herstart niet meer** | een kale `/apps/app.html` laadt een keer in plaats van twee (app.html, "de pas van deze werktafel"), en een teruggezet blad laadt op een telefoon pas als het in beeld komt (`shared/command/geheugen.js`, `hervat`) | **staat** (11 oktober 2026) |
+| **1. Een licht blad** | een scherm dat weet dat het in de werktafel staat (`rtg-in-frame`), laadt de schilcode niet die alleen de host draagt | een stap weg: eerst per laag vaststellen of hij in een blad iets doet |
+| **2. Een wereld als module** | een wereld komt als Living Module in de werktafel in plaats van als iframe-document | een besluit, en eerst op een route (12.4) |
+| **3. Een schil, alle werelden** | de iframe-weg wordt de terugval en niet de regel | jaren weg in de zin van PLATFORM.md: per wereld, nooit in een keer |
+
+### 12.4 De eerste beperkte route: TravelOS, "Uw reis"
+
+Waarom deze: er bestaat al een Living Module `travel`
+(`shared/interface/modules/travel.js`, rijpheid L4) met een verklaard budget
+van 40 KB in `peek` en 150 KB in `panel`, en hij leest zijn dossier langs de
+bestaande ledenroute. Het werk is dus aansluiten en niet uitvinden.
+
+**Wat de proef doet.** Een tik op TravelOS in de bank opent de module in de
+werktafel in de stand `workspace`, in plaats van `reizen.html` als blad. Alle
+andere onderdelen van TravelOS blijven bladen.
+
+**Acceptatiecriteria** -- elk ervan door een meter en niet door een indruk:
+
+1. `schilherstart` telt voor de stap "wereld TravelOS" **0 nieuwe documenten**
+   en de schil blijft staan (één Edge-balk).
+2. De stap laadt **niet meer dan 150 KB** JavaScript (het budget dat de module
+   zelf verklaart), tegenover 668 KB als blad.
+3. Wat de module toont is gelijk aan wat `reizen.html` toont voor hetzelfde
+   lid: dezelfde reis, dezelfde open punten, geen voorbeeldreis. Een toets legt
+   de twee naast elkaar.
+4. **Geen bevoegdheid verschuift.** De module krijgt alleen de bevroren
+   capabilitycontext van de runtime; geen sessietoken, geen kantoorweg. Een
+   handeling die geld of een tweede persoon raakt, gaat langs dezelfde
+   bevestiging als in het blad (GELD.md, LIFE.md, GRAMMATICA.md).
+5. `SCHERMEIGENAAR.json` krijgt een oordeel: de module is een tweede INGANG
+   naar dezelfde capability, en `reizen.html` blijft eigenaar. Zonder dat
+   oordeel zakt `test/schermeigenaar.test.js` -- terecht.
+6. Het geheugen groeit niet: de heap na een rondgang van tien wisselingen ligt
+   binnen 10% van die na een (de module ruimt op bij `onUnmount`).
+7. Toegankelijkheid zakt niet: de a11y-poorten voor de werktafel blijven op
+   nul, en de module heeft een kop, een landmark en een focusvolgorde.
+
+**Terugval.** Een vlag per route in de bank: valt de module om (een fout in
+`create` of `mount`, die de host al opvangt), dan opent hetzelfde adres als
+blad. Een kapotte module mag een lid nooit zonder TravelOS laten.
+
+**Risico's, met wie ze draagt.**
+
+- *Isolatie.* Een iframe vangt een fout van een scherm af; een module deelt
+  het document. De host heeft een foutgrens per module, maar een module die
+  het globale bereik vervuilt, raakt de werktafel. Tegenmaat: modules krijgen
+  alleen hun eigen surface, en de proef eist nul paginafouten over de route.
+- *Een tweede scherm voor dezelfde capability.* Dat is de fout waar
+  SCHERMEIGENAAR.json voor bestaat. Daarom criterium 5, en daarom tonen en
+  openen en nooit zelf bouwen.
+- *CSS van een wereld in de host.* Een blad heeft eigen stijlen; een module
+  niet. De module gebruikt de vormtaal van de host (ONTWERP.md, HERITAGE.md),
+  en een wereldspecifieke stijl gaat niet mee.
+- *Diepe links.* Een adres als `/apps/reizen.html#reizen` moet blijven werken;
+  dat blijft een blad.
+
+### 12.5 Wat de eerste fase opleverde, gemeten
+
+Dezelfde meter, dezelfde route, drie rondes, op de basiscommit en op de tak
+(11 oktober 2026; tellingen `gemeten`, tijden `vermoed`):
+
+| | voor | na |
+|---|---|---|
+| herstarts over de route | 13 | **11** |
+| waarvan de werktafel zelf | 4 | 3 |
+| structureel dubbele API-verzoeken | 31 (+6 soms) | **19 (+0)** |
+| API-verzoeken | 179 | 164 |
+| terug naar de werktafel vanuit een losse wereld | 4 documenten, 52 verzoeken, 12 dubbel, 3,3 MB JS | **2 documenten, 37 verzoeken, 0 dubbel, 2,9 MB JS** |
+
+De JS-heap aan het eind van de route staat er met opzet niet in: hij liep tussen
+twee metingen op dezelfde commit van 9,4 naar 19,8 MB, dus hij zegt meer over
+wanneer de vuilnisman draaide dan over de code.
+
+Wat er NIET bewoog: de blokkade van de hoofddraad over de hele route (64 tegen
+61 seconde, binnen de ruis), en het opstarten van een blad (31-64 scripts per
+tik). Dat laatste is wat trede 1 en 2 aanpakken. De resterende 19 dubbele
+verzoeken: 18 in de allereerste lading van de werktafel op een vers toestel
+(de pas is daar nog nergens bekend, dus een herlading blijft daar de weg), en
+een op `reizen.html`, waar de redactionele wereldlaag
+(`world-widget-data.js`) `/api/reis/reizen` naast het scherm zelf leest.
+
+Daarnaast staat er een eerste gedeelde-elementovergang: de kaart "Uw
+reisboek" in TravelOS wordt de kop van het reisboek, op het bestaande
+`pageswap`-mechanisme van `shared/rtg-heritage-transition.js` en het
+structurele bewegingstoken (`test/gedeeld-element.e2e.js` kijkt in een blad
+van de werktafel naar wat de browser werkelijk animeert).
+
+### 12.6 Wat dit voorstel met opzet NIET doet
+
+- Geen 313 schermen tegelijk verhuizen. Per wereld, per route, met een meter.
+- Geen tweede router of single-page-framework naast de werktafel.
+- Geen optimistische uitvoering: een module toont "aangevraagd" waar het blad
+  "aangevraagd" toont. Sneller voelen mag nooit iets beweren wat niet waar is.
+- Animatie verbergt geen traagheid. Een gedeelde-elementovergang komt NA de
+  meting, op een stap die al snel is.

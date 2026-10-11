@@ -725,12 +725,24 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
        -- en dat is een toets die op zijn eigen wachtvoorwaarde struikelt in
        plaats van op de code die hij meet. */
     await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-pane.actief', { timeout: 20000 });
+    /* Terugzetten en laden zijn twee dingen (shared/command/geheugen.js,
+       hervat): beide bladen komen terug, maar op een telefoon krijgt alleen het
+       blad dat in beeld staat zijn adres. Het andere draagt het in data-src tot
+       het gekozen wordt -- SCHILHERSTART.json zag hier twee volledige
+       documenten laden voor een scherm waarvan je de helft niet zag. */
     const hervat = await page.evaluate(() => ({
-      bladen: [...document.querySelectorAll('.cmd-panes iframe')].map((f) => f.getAttribute('src')),
+      bladen: [...document.querySelectorAll('.cmd-panes iframe')].map((f) => f.getAttribute('src') || f.dataset.src || null),
+      geladen: [...document.querySelectorAll('.cmd-panes iframe')].map((f) => f.getAttribute('src')),
       leeg: !!document.querySelector('.cmd-leeg')
     }));
     assert.deepEqual(hervat.bladen, ['/apps/geld-command.html', '/apps/media.html'],
       'de inlogroute zet de onthouden werkbladen niet terug');
+    assert.deepEqual(hervat.geladen, [null, '/apps/media.html'],
+      'op een telefoon laadt alleen het blad dat in beeld staat');
+    /* En het verborgen blad laadt zodra het gekozen wordt. */
+    await page.evaluate(() => document.querySelectorAll('.cmd-tabs .cmd-tab')[0].click());
+    await page.waitForFunction(() => document.querySelectorAll('.cmd-panes iframe')[0].getAttribute('src') === '/apps/geld-command.html',
+      null, { timeout: 10000 });
     assert.equal(hervat.leeg, false, 'de lege keuze blijft staan terwijl er bladen zijn');
 
     /* EN DE WEG TERUG NAAR EEN SCHONE TAFEL MOET BLIJVEN BESTAAN. Zonder deze

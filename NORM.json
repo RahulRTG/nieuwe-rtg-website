@@ -10,7 +10,7 @@
     "bewijsAlleenKeten": 23,
     "bewijsCellenBewezen": 28249,
     "bronBlindeBestanden": 0,
-    "browserpoortToetsen": 430,
+    "browserpoortToetsen": 433,
     "carriereDomeinenGemeten": 15,
     "dbDeuren": 539,
     "dbDeurenSchrijvend": 276,
@@ -19,7 +19,7 @@
     "delenZonderOnderwerp": 0,
     "dependencies": 0,
     "devPakketten": 1,
-    "e2eBestanden": 308,
+    "e2eBestanden": 310,
     "endpointsNooitAangeraakt": 0,
     "endpointsZonderTest": 854,
     "faalproefGezakt": 0,
@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 9,
     "onbewaakt": 0,
-    "ratelTanden": 179,
+    "ratelTanden": 181,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 2,
     "rolscheidingGaten": 0,
@@ -173,7 +173,9 @@
     "meetkeuringGezakt": 0,
     "refundOnverklaard": 15,
     "schermeigenaarOpen": 8,
-    "loopFabricTijdelijk": 168
+    "loopFabricTijdelijk": 168,
+    "schilHerstarts": 11,
+    "schilDubbeleVerzoeken": 19
   },
   "notities": [
     {
@@ -4596,7 +4598,9 @@
     "bronscannerSpook": "2026-10-06",
     "meetkeuringGezakt": "2026-10-06",
     "refundOnverklaard": "2026-10-06",
-    "schermeigenaarOpen": "2026-10-06"
+    "schermeigenaarOpen": "2026-10-06",
+    "schilHerstarts": "2026-10-11",
+    "schilDubbeleVerzoeken": "2026-10-11"
   },
   "uitzonderingen": []
 }

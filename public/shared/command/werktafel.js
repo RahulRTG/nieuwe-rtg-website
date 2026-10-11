@@ -18,13 +18,8 @@
       root.querySelector('[data-cmd=settings]').onclick=function(){consoleLaag.toonBlad(3,true)};
       if(stand!=='gesloten')hervat();
       }
-    /* Terug waar je gebleven was. Waarom dit MAG en de lege tafel niet meer de
-       enige stand is: shared/command/geheugen.js, met de twee wegen die wel
-       leeg blijven uitkomen. Staat er niets, dan blijft de lege keuze staan die
-       bouw() net heeft neergezet. */
-    function hervat(){if(!w.RTGCommandGeheugen)return;var g=w.RTGCommandGeheugen.lees();if(!g)return;
-      g.bladen.forEach(function(b){toon(b.url,b.titel)});
-      if(panes.length)select(Math.min(g.actief,panes.length-1))}
+    /* Terug waar je gebleven was: shared/command/geheugen.js. */
+    function hervat(){if(w.RTGCommandGeheugen)w.RTGCommandGeheugen.hervat({toon:toon,select:select,aantal:function(){return panes.length}})}
     /* Afbreken staat op EEN plek. Het stond in de matchMedia-luisteraar en liet
        `actief` en `consoleLaag` wijzen naar DOM die net weg was. */
     function sloop(){if(!root)return;poort.terug();if(bank&&bank.stop)bank.stop();if(praatLaag)praatLaag.stop();if(balkLaag)balkLaag.stop();balkLaag=null;root.remove();root=null;panes=[];actief=-1;consoleLaag=null;praatLaag=null;d.body.classList.remove('rtg-command');if(w.RTGAdaptiefBrugSync)w.RTGAdaptiefBrugSync();}
@@ -32,11 +27,12 @@
     function openNaast(a,kant){if(!a)return null;for(var i=0;i<panes.length;i++)if(panes[i].url===a[1]){select(i);return panes[i]}if(panes.length>=2){var weg=actief===0?1:0;verwijder(weg)}var p=toon(a[1],a[0]);if(p&&kant==='links'&&panes.length===2){panes.splice(panes.indexOf(p),1);panes.unshift(p);root.querySelector('.cmd-panes').insertBefore(p.el,root.querySelector('.cmd-panes').firstChild);actief=0;sync()}return p}
     /* toon() gaat ervan uit dat het MAG: de grendel staat in shared/command.js
        en wordt daar een keer gesteld. */
-    function toon(url,titel){bouw();if(w.RTG_MAGNAAT_URL)url=w.RTG_MAGNAAT_URL(url);if(!root||!url)return null;for(var i=0;i<panes.length;i++)if(panes[i].url===url){select(i);return panes[i]}
-      if(panes.length>=2)verwijder(actief>=0?actief:0);var p={url:url,titel:titelVan(url,titel)},el=d.createElement('section');el.className='cmd-pane';var f=d.createElement('iframe');f.title=p.titel;f.src=url;if(w.RTGMedia)w.RTGMedia.kader(f);el.appendChild(f);root.querySelector('.cmd-panes').appendChild(el);p.el=el;p.frame=f;panes.push(p);f.addEventListener('load',function(){haakScroll(p);});select(panes.length-1);sync();return p}
+    function toon(url,titel,later){bouw();if(w.RTG_MAGNAAT_URL)url=w.RTG_MAGNAAT_URL(url);if(!root||!url)return null;for(var i=0;i<panes.length;i++)if(panes[i].url===url){select(i);return panes[i]}
+      if(panes.length>=2)verwijder(actief>=0?actief:0);var p={url:url,titel:titelVan(url,titel)},el=d.createElement('section');el.className='cmd-pane';var f=d.createElement('iframe');f.title=p.titel;if(later)f.dataset.src=url;else f.src=url;if(w.RTGMedia)w.RTGMedia.kader(f);el.appendChild(f);root.querySelector('.cmd-panes').appendChild(el);p.el=el;p.frame=f;panes.push(p);f.addEventListener('load',function(){haakScroll(p);});later||select(panes.length-1);sync();return p}
     function verwijder(i){var p=panes[i];if(!p)return;p.el.remove();panes.splice(i,1);actief=Math.min(panes.length-1,Math.max(0,i-1))}
     function sluit(i){var p=panes[i];if(!p)return;p.el.classList.add('sluit');setTimeout(function(){var nu=panes.indexOf(p);if(nu<0)return;verwijder(nu);sync()},220)}
-    function select(i){actief=i;sync();if(consoleLaag)consoleLaag.intro()}
+    function laad(p){var f=p&&p.frame;if(f&&!f.src&&f.dataset.src)f.src=f.dataset.src}
+    function select(i){actief=i;laad(panes[i]);sync();if(consoleLaag)consoleLaag.intro()}
     /* Ging op index, en verwijderen gebeurt pas na de animatie: met twee bladen
        sloot sluit(0) twee keer hetzelfde en bleef het tweede staan. */
     function sluitAlles(){panes.slice().forEach(function(p){var i=panes.indexOf(p);if(i>=0)sluit(i)})}
@@ -77,7 +73,7 @@
        een telefoon staat er een blad in beeld, dus valt er niets te verdelen.
        De inline `flex` van het slepen gaat hier ook weg, anders draagt een blad
        zijn desktopbreedte mee naar een smal venster. */
-    function verdeler(){var breed=o.breed();w.RTGCommandVerdeler(root.querySelector('.cmd-panes'),panes,breed);
+    function verdeler(){var breed=o.breed();if(breed)panes.forEach(laad);w.RTGCommandVerdeler(root.querySelector('.cmd-panes'),panes,breed);
       panes.forEach(function(p){if(p.haak&&p.haak.vorm)p.haak.vorm(breed)})}
     function vervang(p,url){var oud=p.frame,f=d.createElement('iframe');f.title=p.titel;f.src=url;if(w.RTGMedia)w.RTGMedia.kader(f);p.frame=f;p.haak=null;oud.replaceWith(f);f.addEventListener('load',function(){haakScroll(p)})}
     // App-shell blijft host: kale Home opent Second Screen, een deep-link de host.

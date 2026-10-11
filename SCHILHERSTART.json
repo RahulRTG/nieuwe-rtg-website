@@ -1,0 +1,533 @@
+{
+  "stempel": {
+    "op": "2026-10-11T18:43:33.022Z",
+    "commit": "1eb83968",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/schilherstart.js",
+    "node": "v22.22.0"
+  },
+  "uitleg": "Per handeling van een vaste ledenroute over de werktafel (RTG Command) en de vier werelden: hoeveel nieuwe documenten de handeling kostte (buiten = de werktafel zelf, blad = een iframe-blad), hoeveel Edge-balken er daarna tegelijk in beeld stonden, hoeveel scripts en KB JavaScript de nieuwe documenten liepen, hoeveel API-verzoeken en welke dubbel gingen in hetzelfde kader, en hoe lang tot load en tot de Edge-balk van het nieuwe document. Vers lid met RTG Pass en getekende overeenkomst, 390x844 touch, CPU 4x vertraagd, service worker aan, na een opwarmronde die niet telt. Per stap de mediaan over de rondes; dubbel = in ELKE ronde dubbel, dubbelSoms = in sommige. herstarts telt elk document behalve het allereerste van de werktafel.",
+  "graden": {
+    "documenten": "gemeten -- een nieuwe performance.timeOrigin in een kader na framenavigated (navigatie binnen een document telt niet)",
+    "schillen": "gemeten -- zichtbare .rtg-edge-chrome per kader na de stap",
+    "tellingen": "gemeten -- resource timing en onderschepte verzoeken",
+    "tijden": "vermoed -- Chromium op deze machine met CPU 4x vertraagd, geen echt toestel",
+    "hoofddraad": "vermoed -- som van blockingDuration van Long Animation Frames (terugval: longtask - 50 ms)"
+  },
+  "route": [
+    {
+      "doe": "laad",
+      "pad": "/apps/app.html",
+      "waarom": "de werktafel als document: na inloggen, of een kale /apps/app.html van buiten"
+    },
+    {
+      "doe": "wereld",
+      "pad": "/apps/rtg.html",
+      "naam": "LivingOS",
+      "waarom": "een wereld openen vanuit de bank"
+    },
+    {
+      "doe": "binnen",
+      "pad": "/apps/life.html",
+      "waarom": "een onderdeel binnen LivingOS (Vandaag)"
+    },
+    {
+      "doe": "thuis",
+      "pad": "/apps/app.html",
+      "waarom": "Home"
+    },
+    {
+      "doe": "wereld",
+      "pad": "/apps/reizen.html",
+      "naam": "TravelOS",
+      "waarom": "een tweede wereld vanuit de bank"
+    },
+    {
+      "doe": "binnen",
+      "pad": "/apps/reisboek.html",
+      "waarom": "een onderdeel binnen TravelOS (Reisboek): de kaart die de gedeeld-elementproef draagt"
+    },
+    {
+      "doe": "thuis",
+      "pad": "/apps/app.html",
+      "waarom": "Home"
+    },
+    {
+      "doe": "wereld",
+      "pad": "/apps/geld.html",
+      "naam": "Geld",
+      "waarom": "Geld rechtstreeks uit de bank"
+    },
+    {
+      "doe": "wereld",
+      "pad": "/apps/kantoor.html",
+      "naam": "WorkOS",
+      "waarom": "van wereld naar wereld zonder eerst Home"
+    },
+    {
+      "doe": "wereld",
+      "pad": "/apps/foundation/os-publiek.html",
+      "naam": "FoundationOS",
+      "waarom": "en nog een"
+    },
+    {
+      "doe": "thuis",
+      "pad": "/apps/app.html",
+      "waarom": "Home"
+    },
+    {
+      "doe": "los",
+      "pad": "/apps/reizen.html",
+      "waarom": "een wereld als eigen document: de TravelOS-app op het beginscherm, of een link uit een melding"
+    },
+    {
+      "doe": "naarhuis",
+      "pad": "/apps/app.html",
+      "waarom": "vanuit die wereld terug naar de werktafel: het kale /apps/app.html waar het RTG-merk, de Edge-deur en ongeveer 190 links naartoe wijzen"
+    }
+  ],
+  "rondes": 3,
+  "cpuVertraging": 4,
+  "stappen": [
+    {
+      "doe": "laad",
+      "pad": "/apps/app.html",
+      "waarom": "de werktafel als document: na inloggen, of een kale /apps/app.html van buiten",
+      "hoe": [
+        "document"
+      ],
+      "documentAdressen": [
+        "buiten /apps/app.html",
+        "buiten /apps/app.html?pas=rtg"
+      ],
+      "buiten": 2,
+      "blad": 0,
+      "documentenSpreiding": [
+        2,
+        2
+      ],
+      "schillen": 1,
+      "scripts": 174,
+      "jsKB": 2418,
+      "api": 56,
+      "dubbel": [
+        "buiten GET /api/doos/status",
+        "buiten GET /api/health",
+        "buiten GET /api/ready",
+        "buiten POST /api/account/rollen",
+        "buiten POST /api/agenda/bereik",
+        "buiten POST /api/auth/me",
+        "buiten POST /api/bank/overzicht",
+        "buiten POST /api/chat/history",
+        "buiten POST /api/comm/inbox",
+        "buiten POST /api/ik/beelden",
+        "buiten POST /api/ik/toegankelijk",
+        "buiten POST /api/ik/workspace",
+        "buiten POST /api/member/apps",
+        "buiten POST /api/member/boardroom",
+        "buiten POST /api/notities/mijn",
+        "buiten POST /api/plaats/dienst",
+        "buiten POST /api/state",
+        "buiten POST /api/talen"
+      ],
+      "dubbelSoms": [],
+      "ms": {
+        "load": 23752,
+        "edge": 11170
+      },
+      "hoofddraadBlokkeertMs": 12758,
+      "heapMB": 7.2,
+      "nietTotRust": 3,
+      "fouten": []
+    },
+    {
+      "doe": "wereld",
+      "pad": "/apps/rtg.html",
+      "waarom": "een wereld openen vanuit de bank",
+      "hoe": [
+        "RTGCommand.open"
+      ],
+      "documentAdressen": [
+        "blad /apps/rtg.html"
+      ],
+      "buiten": 0,
+      "blad": 1,
+      "documentenSpreiding": [
+        1,
+        1
+      ],
+      "schillen": 1,
+      "scripts": 49,
+      "jsKB": 603,
+      "api": 9,
+      "dubbel": [],
+      "dubbelSoms": [],
+      "ms": {
+        "load": 4165,
+        "edge": null
+      },
+      "hoofddraadBlokkeertMs": 2871,
+      "heapMB": 10.6,
+      "nietTotRust": 0,
+      "fouten": []
+    },
+    {
+      "doe": "binnen",
+      "pad": "/apps/life.html",
+      "waarom": "een onderdeel binnen LivingOS (Vandaag)",
+      "hoe": [
+        "link"
+      ],
+      "documentAdressen": [
+        "blad /apps/life.html"
+      ],
+      "buiten": 0,
+      "blad": 1,
+      "documentenSpreiding": [
+        1,
+        1
+      ],
+      "schillen": 1,
+      "scripts": 31,
+      "jsKB": 580,
+      "api": 11,
+      "dubbel": [],
+      "dubbelSoms": [],
+      "ms": {
+        "load": 2431,
+        "edge": null
+      },
+      "hoofddraadBlokkeertMs": 2072,
+      "heapMB": 10,
+      "nietTotRust": 0,
+      "fouten": []
+    },
+    {
+      "doe": "thuis",
+      "pad": "/apps/app.html",
+      "waarom": "Home",
+      "hoe": [
+        "RTGCommand.open"
+      ],
+      "documentAdressen": [],
+      "buiten": 0,
+      "blad": 0,
+      "documentenSpreiding": [
+        0,
+        0
+      ],
+      "schillen": 1,
+      "scripts": 0,
+      "jsKB": 0,
+      "api": 5,
+      "dubbel": [],
+      "dubbelSoms": [],
+      "ms": {
+        "load": null,
+        "edge": null
+      },
+      "hoofddraadBlokkeertMs": 1064,
+      "heapMB": 8.2,
+      "nietTotRust": 0,
+      "fouten": []
+    },
+    {
+      "doe": "wereld",
+      "pad": "/apps/reizen.html",
+      "waarom": "een tweede wereld vanuit de bank",
+      "hoe": [
+        "RTGCommand.open"
+      ],
+      "documentAdressen": [
+        "blad /apps/reizen.html"
+      ],
+      "buiten": 0,
+      "blad": 1,
+      "documentenSpreiding": [
+        1,
+        1
+      ],
+      "schillen": 1,
+      "scripts": 49,
+      "jsKB": 669,
+      "api": 9,
+      "dubbel": [],
+      "dubbelSoms": [],
+      "ms": {
+        "load": 3814,
+        "edge": null
+      },
+      "hoofddraadBlokkeertMs": 3271,
+      "heapMB": 8.9,
+      "nietTotRust": 0,
+      "fouten": []
+    },
+    {
+      "doe": "binnen",
+      "pad": "/apps/reisboek.html",
+      "waarom": "een onderdeel binnen TravelOS (Reisboek): de kaart die de gedeeld-elementproef draagt",
+      "hoe": [
+        "link"
+      ],
+      "documentAdressen": [
+        "blad /apps/reisboek.html"
+      ],
+      "buiten": 0,
+      "blad": 1,
+      "documentenSpreiding": [
+        1,
+        1
+      ],
+      "schillen": 1,
+      "scripts": 35,
+      "jsKB": 601,
+      "api": 5,
+      "dubbel": [],
+      "dubbelSoms": [],
+      "ms": {
+        "load": 2918,
+        "edge": null
+      },
+      "hoofddraadBlokkeertMs": 2361,
+      "heapMB": 10.1,
+      "nietTotRust": 0,
+      "fouten": []
+    },
+    {
+      "doe": "thuis",
+      "pad": "/apps/app.html",
+      "waarom": "Home",
+      "hoe": [
+        "RTGCommand.open"
+      ],
+      "documentAdressen": [],
+      "buiten": 0,
+      "blad": 0,
+      "documentenSpreiding": [
+        0,
+        0
+      ],
+      "schillen": 1,
+      "scripts": 0,
+      "jsKB": 0,
+      "api": 0,
+      "dubbel": [],
+      "dubbelSoms": [],
+      "ms": {
+        "load": null,
+        "edge": null
+      },
+      "hoofddraadBlokkeertMs": 992,
+      "heapMB": 8.7,
+      "nietTotRust": 0,
+      "fouten": []
+    },
+    {
+      "doe": "wereld",
+      "pad": "/apps/geld.html",
+      "waarom": "Geld rechtstreeks uit de bank",
+      "hoe": [
+        "RTGCommand.open"
+      ],
+      "documentAdressen": [
+        "blad /apps/geld.html"
+      ],
+      "buiten": 0,
+      "blad": 1,
+      "documentenSpreiding": [
+        1,
+        1
+      ],
+      "schillen": 1,
+      "scripts": 64,
+      "jsKB": 838,
+      "api": 3,
+      "dubbel": [],
+      "dubbelSoms": [],
+      "ms": {
+        "load": 2673,
+        "edge": null
+      },
+      "hoofddraadBlokkeertMs": 2463,
+      "heapMB": 10.1,
+      "nietTotRust": 0,
+      "fouten": []
+    },
+    {
+      "doe": "wereld",
+      "pad": "/apps/kantoor.html",
+      "waarom": "van wereld naar wereld zonder eerst Home",
+      "hoe": [
+        "RTGCommand.open"
+      ],
+      "documentAdressen": [
+        "blad /apps/kantoor.html"
+      ],
+      "buiten": 0,
+      "blad": 1,
+      "documentenSpreiding": [
+        1,
+        1
+      ],
+      "schillen": 1,
+      "scripts": 47,
+      "jsKB": 654,
+      "api": 5,
+      "dubbel": [],
+      "dubbelSoms": [],
+      "ms": {
+        "load": 2902,
+        "edge": null
+      },
+      "hoofddraadBlokkeertMs": 2544,
+      "heapMB": 10.6,
+      "nietTotRust": 0,
+      "fouten": []
+    },
+    {
+      "doe": "wereld",
+      "pad": "/apps/foundation/os-publiek.html",
+      "waarom": "en nog een",
+      "hoe": [
+        "RTGCommand.open"
+      ],
+      "documentAdressen": [
+        "blad /apps/foundation/os-publiek.html"
+      ],
+      "buiten": 0,
+      "blad": 1,
+      "documentenSpreiding": [
+        1,
+        1
+      ],
+      "schillen": 1,
+      "scripts": 38,
+      "jsKB": 614,
+      "api": 5,
+      "dubbel": [],
+      "dubbelSoms": [],
+      "ms": {
+        "load": 3098,
+        "edge": null
+      },
+      "hoofddraadBlokkeertMs": 2934,
+      "heapMB": 10.8,
+      "nietTotRust": 0,
+      "fouten": []
+    },
+    {
+      "doe": "thuis",
+      "pad": "/apps/app.html",
+      "waarom": "Home",
+      "hoe": [
+        "RTGCommand.open"
+      ],
+      "documentAdressen": [],
+      "buiten": 0,
+      "blad": 0,
+      "documentenSpreiding": [
+        0,
+        0
+      ],
+      "schillen": 1,
+      "scripts": 0,
+      "jsKB": 0,
+      "api": 0,
+      "dubbel": [],
+      "dubbelSoms": [],
+      "ms": {
+        "load": null,
+        "edge": null
+      },
+      "hoofddraadBlokkeertMs": 917,
+      "heapMB": 10.9,
+      "nietTotRust": 0,
+      "fouten": []
+    },
+    {
+      "doe": "los",
+      "pad": "/apps/reizen.html",
+      "waarom": "een wereld als eigen document: de TravelOS-app op het beginscherm, of een link uit een melding",
+      "hoe": [
+        "document"
+      ],
+      "documentAdressen": [
+        "buiten /apps/reizen.html"
+      ],
+      "buiten": 1,
+      "blad": 0,
+      "documentenSpreiding": [
+        1,
+        1
+      ],
+      "schillen": 1,
+      "scripts": 121,
+      "jsKB": 1196,
+      "api": 19,
+      "dubbel": [
+        "buiten POST /api/reis/reizen"
+      ],
+      "dubbelSoms": [],
+      "ms": {
+        "load": 9990,
+        "edge": 2548
+      },
+      "hoofddraadBlokkeertMs": 6232,
+      "heapMB": 13.5,
+      "nietTotRust": 0,
+      "fouten": []
+    },
+    {
+      "doe": "naarhuis",
+      "pad": "/apps/app.html",
+      "waarom": "vanuit die wereld terug naar de werktafel: het kale /apps/app.html waar het RTG-merk, de Edge-deur en ongeveer 190 links naartoe wijzen",
+      "hoe": [
+        "adres"
+      ],
+      "documentAdressen": [
+        "buiten /apps/app.html",
+        "blad /apps/foundation/os-publiek.html"
+      ],
+      "buiten": 1,
+      "blad": 1,
+      "documentenSpreiding": [
+        2,
+        2
+      ],
+      "schillen": 1,
+      "scripts": 184,
+      "jsKB": 2696,
+      "api": 33,
+      "dubbel": [],
+      "dubbelSoms": [],
+      "ms": {
+        "load": 13728,
+        "edge": 5644
+      },
+      "hoofddraadBlokkeertMs": 10261,
+      "heapMB": 12.8,
+      "nietTotRust": 0,
+      "fouten": []
+    }
+  ],
+  "telling": {
+    "stappen": 13,
+    "herstarts": 11,
+    "hostHerladen": 3,
+    "bladHerstarts": 8,
+    "zelfherladingen": 2,
+    "stappenMetTweeSchillen": 0,
+    "dubbeleVerzoeken": 19,
+    "dubbeleVerzoekenSoms": 0,
+    "scripts": 792,
+    "scriptsNaEerste": 618,
+    "jsKB": 10869,
+    "jsKBNaEerste": 8451,
+    "api": 160,
+    "hoofddraadBlokkeertMs": 50740,
+    "heapMBEind": 12.8,
+    "nietTotRust": 3,
+    "fouten": 0
+  }
+}

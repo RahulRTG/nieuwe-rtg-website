@@ -51,3 +51,14 @@ body{ -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
 @media (prefers-reduced-motion: reduce){
   ::view-transition-old(root), ::view-transition-new(root){ animation:none; }
 }
+/* Een gedeeld element tussen twee pagina's (shared/rtg-heritage-transition.js,
+   pageswap): het doel draagt zijn naam hier VAST, omdat de nieuwe pagina hem bij
+   haar eerste beeld al moet hebben. De bron krijgt dezelfde naam pas bij vertrek,
+   en alleen de link die werkelijk naar dit doel gaat. Duur en curve komen van
+   het structurele bewegingstoken (shared/rtg-heritage-motion.css): een kaart die een
+   scherm wordt is een structurele overgang, geen kleine. */
+[data-rtg-gedeeld-doel="reisboek"]{ view-transition-name:rtg-gedeeld-reisboek; }
+::view-transition-group(rtg-gedeeld-reisboek){ animation-duration:var(--rtg-time-structural,340ms); animation-timing-function:var(--rtg-ease-structural,ease); }
+@media (prefers-reduced-motion: reduce){
+  ::view-transition-group(rtg-gedeeld-reisboek), ::view-transition-old(rtg-gedeeld-reisboek), ::view-transition-new(rtg-gedeeld-reisboek){ animation:none; }
+}

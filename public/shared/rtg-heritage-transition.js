@@ -49,6 +49,21 @@
       function reset() { portal.style.viewTransitionName = ''; if (hero) hero.style.viewTransitionName = ''; }
       event.viewTransition.finished.then(reset, reset);
     }
+    /* EEN GEDEELD ELEMENT tussen twee schermen, zonder op een permanente schil
+       te wachten (WERKRUIMTE.md par. 12). Een link met data-rtg-gedeeld="x"
+       krijgt bij vertrek de naam rtg-gedeeld-x; het doel op de volgende pagina
+       draagt diezelfde naam VAST in rtg-uniform.css, zodat hij er bij het eerste
+       beeld al is -- een naam die pas na een script verschijnt, mist de overgang.
+       Alleen de link die naar het doeladres wijst krijgt de naam: twee
+       elementen met dezelfde naam laten de browser de hele overgang overslaan. */
+    var bron = Array.from(d.querySelectorAll('a[data-rtg-gedeeld][href]')).find(function (a) {
+      return /^[a-z0-9-]+$/.test(a.getAttribute('data-rtg-gedeeld')) && new URL(a.href, w.location.href).pathname === to;
+    });
+    if (bron) {
+      bron.style.viewTransitionName = 'rtg-gedeeld-' + bron.getAttribute('data-rtg-gedeeld');
+      var los = function () { bron.style.viewTransitionName = ''; };
+      event.viewTransition.finished.then(los, los);
+    }
   });
   w.RTGHeritageTransition = { run: run, allowed: allowed };
 }(window, document));

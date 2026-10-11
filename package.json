@@ -469,6 +469,7 @@
     "edgekaart": "node scripts/edgekaart.js",
     "edgekaart:controle": "node scripts/edgekaart.js --controle",
     "edgedekking": "node scripts/edgedekking.js",
+    "schilherstart": "node scripts/schilherstart.js",
     "edgedekking:naloop": "node scripts/edgedekking.js --naloop",
     "kantoormacht:vast": "node scripts/kantoormacht.js --vastleggen",
     "kantoormacht:controle": "node scripts/kantoormacht.js --controle",

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-14T15:24:44.861Z",
-    "commit": "814be90c",
+    "op": "2026-10-11T06:41:55.526Z",
+    "commit": "39f10eb9d",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/sabotage.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "uitleg": "Gemeten uitslag van npm run sabotage: per systeemwet of het uitzetten van zijn handhaver ECHT iets rood maakte. Niet met de hand bijwerken -- npm run wetten vergelijkt de vingerafdruk van het recept en meldt het als de meting verlopen is.",
   "grens": "Per wet is EEN sabotagezet geprobeerd. \"Raak\" betekent: deze handhaver staat aan en merkt DEZE zet. Het is geen bewijs dat de wet langs geen enkele andere weg te omzeilen is. Wetten met \"mensenwerk\" zijn helemaal niet machinaal beproefd.",
@@ -373,6 +373,20 @@
       "reden": "3. geen cijfer op een mens in de carrierekant, de Foundation, School, rtfos en command",
       "wachter": "test:test/cijferopmens.test.js",
       "duurMs": 195
+    },
+    "keuring-zwaarste-regel-wint": {
+      "stand": "raak",
+      "afdruk": "a82924f6cfc9131d",
+      "reden": "1. een wijziging in kern/pay laat de geldregels afgaan, en de klasse is de strengste",
+      "wachter": "test:test/keuringreden.test.js",
+      "duurMs": 2081
+    },
+    "keuring-ontbrekende-meting-is-streng": {
+      "stand": "raak",
+      "afdruk": "379e08c4d6dff017",
+      "reden": "4. mutatie: een weggehaalde meting maakt de keuring strenger, niet lichter",
+      "wachter": "test:test/keuringreden.test.js",
+      "duurMs": 2073
     }
   }
 }

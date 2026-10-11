@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-11T17:32:01.246Z",
-    "commit": "3477b00d",
+    "op": "2026-10-11T18:59:39.810Z",
+    "commit": "a089e46e",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
   },
@@ -10568,6 +10568,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 11,
       "scherp": "gezakt"
+    },
+    "onomkeerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commercie/besluit.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "ontmoeting-leeg.test.js": {
       "soort": "server",

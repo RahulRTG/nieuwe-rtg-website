@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T18:52:21.387Z",
-    "commit": "5068fe340",
+    "op": "2026-10-11T19:11:08.962Z",
+    "commit": "be72c241a",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1382,6 +1382,21 @@
       "operator": "+->-#2",
       "gezakt": 1,
       "geprobeerd": 17
+    },
+    "beraad-server.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "beraad.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/keten.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "bereikbaar.test.js": {
       "soort": "puur",
@@ -5004,6 +5019,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "gemeenschapsproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/gemeenschapsproef.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 6
+    },
     "gemeente.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5025,6 +5048,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "genootschap-drager-server.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "genootschap-drager.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/genootschap/drager-regels.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "genootschap-prikbord-lezen.test.js": {
       "soort": "puur",

@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-11T18:10:03.691Z",
-  "commit": "2ca8cc419",
+  "op": "2026-10-11T19:55:06.638Z",
+  "commit": "ddcf55d9e",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v26.10.0"
  },
  "gemeten": {
-  "artefacten": 380,
+  "artefacten": 388,
   "bron": 47,
-  "afgeleid": 200,
-  "fragmenten": 27,
+  "afgeleid": 205,
+  "fragmenten": 28,
   "momentopname": 1,
-  "onbeslist": 105,
+  "onbeslist": 107,
   "afgeleidZonderEigenaar": 1,
-  "metEigenaar": 227,
-  "afgeleidEigenaarHard": 199,
-  "afgeleidGrendelt": 28,
-  "metStempel": 124,
+  "metEigenaar": 233,
+  "afgeleidEigenaarHard": 204,
+  "afgeleidGrendelt": 29,
+  "metStempel": 129,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -126,6 +126,18 @@
     "scripts/adressen.js"
    ],
    "stempelInstrument": "scripts/adressen.js",
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "AFBOUWPROGRAMMA.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": false,
@@ -731,6 +743,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONCIERGEPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/conciergeproef.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/conciergeproef.js"
+   ],
+   "stempelInstrument": "scripts/conciergeproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run conciergeproef:vast",
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -1458,6 +1484,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GEMEENSCHAPSPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/gemeenschapsproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/gemeenschapsproef.js"
+   ],
+   "stempelInstrument": "scripts/gemeenschapsproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run gemeenschapsproef:vast",
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -3205,6 +3245,18 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "ONTWERPSTANDAARD-METING.md",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "ONVERVREEMDBAAR.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/onvervreemdbaar.js",
@@ -3676,6 +3728,20 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "ROMEPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/romeproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/romeproef.js"
+   ],
+   "stempelInstrument": "scripts/romeproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "ROUTEBRON.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/routebron.js",
@@ -3996,6 +4062,20 @@
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": "node -r ./scripts/lib/invoerspoor-preload.js scripts/schermroutes.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHILHERSTART.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/schilherstart.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/schilherstart.js"
+   ],
+   "stempelInstrument": "scripts/schilherstart.js",
+   "stempelAnders": false,
+   "versheidOpdracht": null,
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -4448,6 +4528,18 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "TOEZEGKLASSEN.json",
+   "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "TOEZICHT.md",
    "soort": "ONBESLIST",
    "eigenaar": null,
@@ -4681,6 +4773,20 @@
    "stempelAnders": false,
    "versheidOpdracht": "npm run vindbaar",
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "VOLTOOIPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/voltooiproef.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/voltooiproef.js"
+   ],
+   "stempelInstrument": "scripts/voltooiproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run voltooiproef:vast",
+   "grendelt": true,
    "botsingVerklaard": null
   },
   {

@@ -18,9 +18,12 @@
       .then(function (r) { return r.json().catch(function () { return {}; }); });
   }
   function sein(kind, payload) { if (call) post({ naar: call.met, kind: kind, payload: payload || null }).catch(function () {}); }
+  /* Elke oproep verse ICE-servers: een TURN-credential is kortlevend. Dezelfde
+     klas-geloofsbrief als het belsignaal, naar een deur binnen dezelfde router. */
   function haalIce() {
-    if (iceConfig) return Promise.resolve(iceConfig);
-    return fetch('/api/ice').then(function (r) { return r.json(); })
+    var b = Object.assign({ klasCode: S.klasCode }, S.gezin ? { code: S.gezin.code, token: S.gezin.token } : { leraarToken: S.leraar.token });
+    return fetch('/api/foundation/school/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
+      .then(function (r) { return r.json(); })
       .then(function (d) { iceConfig = d.iceServers || []; return iceConfig; })
       .catch(function () { iceConfig = []; return iceConfig; });
   }

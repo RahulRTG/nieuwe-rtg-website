@@ -28,7 +28,9 @@
   'use strict';
   if (w.RTGClipDeler) return;
 
-  var IJS = [{ urls: 'stun:stun.l.google.com:19302' }];
+  /* ICE-servers uit RTG's eigen uitgifte (geen externe STUN); start() haalt ze
+     met het token van de deler en ververst ze, want TURN-credentials verlopen. */
+  var IJS = [];
   var BROK = 64 * 1024;
   var HARTSLAG_MS = 45000;
 
@@ -38,6 +40,11 @@
     if (!token) return null;
     var zeg = typeof o.opStatus === 'function' ? o.opStatus : function () {};
     var pad = o.pad || '/api/clips/';
+    var haalIjs = function () {
+      return fetch('/api/ice', { headers: { Authorization: 'Bearer ' + token } })
+        .then(function (r) { return r.json(); }).then(function (d) { IJS = d.iceServers || []; }).catch(function () {});
+    };
+    haalIjs(); setInterval(haalIjs, 20 * 60 * 1000);
 
     function api(deel, lijf) {
       return fetch(pad + deel, {

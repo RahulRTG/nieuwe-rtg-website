@@ -493,7 +493,7 @@
   }
   let iceConfig = null;
   async function haalIce() { if (iceConfig) return iceConfig;
-    try { iceConfig = (await (await fetch('/api/ice')).json()).iceServers; } catch (e) {}
+    try { iceConfig = (await (await fetch('/api/ice', { headers: { Authorization: 'Bearer ' + token } })).json()).iceServers; } catch (e) {}
     return iceConfig || (iceConfig = [{ urls: 'stun:stun.l.google.com:19302' }]); }
 
   /* ---------- de studio (makerkant: de bron van de boom) ---------- */

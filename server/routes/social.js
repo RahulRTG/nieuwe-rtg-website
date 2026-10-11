@@ -82,17 +82,25 @@ app.get('/api/push/key', (req, res) => {
   res.json({ key: webpush && db.data.vapid ? db.data.vapid.publicKey : null });
 });
 
-/* ICE-servers voor WebRTC-bellen (leden onderling en de RTFoundation-gezinnen).
-   STUN werkt voor de meeste verbindingen; achter een streng mobiel netwerk
-   (symmetrische NAT) is een TURN-server nodig om het beeld er altijd doorheen te
-   krijgen. Zet die aan met de omgevingsvariabelen TURN_URL/TURN_USER/TURN_PASS.
-   Zie docs/turn-server.md voor de volledige productie-opzet. */
-/* TURN: het relais dat (video)bellen ook door strenge firewalls en 4G-NAT
-   heen laat werken. Voorkeursroute: TURN_SECRET (coturn "use-auth-secret"),
-   dan maakt de server per aanvraag KORTLEVENDE inloggegevens (1 uur geldig,
-   HMAC over het verloopmoment) in plaats van een vast wachtwoord dat op
-   straat kan komen. Vast TURN_USER/TURN_PASS blijft werken als terugval. */
-app.get('/api/ice', (req, res) => res.json({ iceServers: iceServers(req) }));
+/* ICE-servers voor WebRTC-bellen (leden, personeel, kantoor en de
+   RTFoundation-gezinnen). STUN gaat naar iedereen; een TURN-credential alleen
+   naar een GEAUTHENTICEERDE actor en, in publieke productie, alleen als de
+   relaystand bewezen gereed is (kern/rtc/ijs.js, kern/rtc/relaystand.js). De
+   actor komt uit de sessie, nooit uit het verzoeklichaam. Zie
+   docs/turn-server.md voor de productie-opzet. */
+const ijs = require('../kern/rtc/ijs');
+app.get('/api/ice', (req, res) => ijs.stuur(res, ijs.antwoord(ijs.bearerActor(req, kern.resolveSession), { hostname: req.hostname })));
+app.post('/api/ice', (req, res) => ijs.stuur(res, ijs.antwoord(ijs.bearerActor(req, kern.resolveSession), { hostname: req.hostname })));
+/* De relaystand voor de bewaking en de release-sonde: AFGELEID bij elke vraag,
+   zonder credentials of geheimen. Alleen lezen; er bestaat geen schrijfroute. */
+const relaystand = require('../kern/rtc/relaystand');
+app.get('/api/rtc/stand', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const st = relaystand.stand();
+  res.json({ beschikbaar: st.beschikbaar, relayVereist: st.relayVereist, geverifieerd: st.geverifieerd,
+    reden: st.reden, laatsteProef: relaystand.publiekeUitslag() });
+});
+relaystand.start(process.env);
 }
 
 socialeRoutes.iceServers = iceServers;

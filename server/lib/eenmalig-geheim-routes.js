@@ -158,6 +158,12 @@ const ROUTES = new Set([
   'POST /api/foundation/les/maak', 'POST /api/foundation/les/join', 'POST /api/foundation/les/code/roteer',
   // B25: het eenmalige stroomticket (foundation/onderwijs/stroomticket.js)
   'POST /api/foundation/les/stroomticket',
+  /* Kortlevende TURN-credentials (kern/rtc/ijs.js): elke oproep een nieuw
+     geheim en een tel in het plafond per actor. */
+  'POST /api/ice',
+  'POST /api/rtf/ice',
+  'POST /api/foundation/gezin/ice',
+  'POST /api/foundation/school/ice',
   /* Het gezinsprofieltoken (B17, foundation/gezinstoken.js): elk van deze
      antwoorden draagt een VERSE gezinssessie die daarna alleen als hash bestaat. */
   'POST /api/foundation/gezin/maak', 'POST /api/foundation/gezin/inloggen',

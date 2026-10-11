@@ -25,6 +25,8 @@
 const RECHT = require('./bediening-recht');
 
 module.exports = [
+  ['/api/rtc/stand', 'Relaystand', 'Of het TURN-relais nu aantoonbaar relayt (afgeleid uit de laatste echte proef, zonder geheimen).',
+    'een gezondheidsmeting van het relais; uitzetten zou bellen niet openen maar alleen het zicht op waarom het dicht staat wegnemen'],
   ['/api/webhooks/storingen', 'Storingenontvangst', 'Ondertekende meldingen duurzaam ontvangen op deze host.',
     'storingen moeten ontvangen kunnen worden terwijl bedrijfsfuncties uitstaan; geen onafhankelijke hostbewaking'],
   ['/api/boardroom', 'De boardroom', 'Het hoogste bedieningspaneel: schakelen, storingen, onboarding, betalingen.',

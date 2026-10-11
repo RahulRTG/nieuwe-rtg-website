@@ -319,7 +319,8 @@ const PUBLIEK = new Map([
     '(zie server/routes/fout.js voor wat er wel en niet meegaat)'],
   ['/api/zegel/sleutel', 'idem: de publieke helft van het zegel'],
   ['/api/zegel/controleer', 'controleert een handtekening; het bewijs zit in het verzoek'],
-  ['/api/ice', 'ijs-servers voor WebRTC; geen gegevens, wel een rem'],
+  ['/api/ice', 'ijs-servers voor WebRTC: zonder sessie alleen STUN (401, geen gegevens); een kortlevend TURN-credential pas na een geldige Bearer-sessie, met een plafond per actor (kern/rtc/ijs.js)'],
+  ['/api/rtc/stand', 'de afgeleide relaystand voor bewaking en releasesonde: beschikbaar/geverifieerd en de laatste proef per adres, zonder credentials of geheimen; alleen lezen'],
   ['/api/munt/opties', 'welke munten er aan staan is prijslijst-informatie, net als /api/pasprijzen'],
   /* Bedrijfsstatus van de doos zelf (modus, journaalstand, versie, wifi,
      stroom) -- geen zaakdata en geen ledengegevens. Wel eerlijk vermelden:

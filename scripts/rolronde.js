@@ -175,6 +175,11 @@ const ROLGEDEELD = new Map([
       + 'capabilities) maar geen ledensleutel, en komt binnen op zijn EIGEN naam: linkWieId(wie) rekent uit '
       + 'onder welke naam iemands bonnen staan, dus niemand ziet die van een ander.',
     toets: 'test/linkkoppelingen.test.js -- "je ziet alleen je eigen koppelingen, en een zaak de zijne"' }],
+  ...['GET', 'POST'].map(m => [m + ' /api/ice', {
+    reden: 'de ICE-uitgifte voor elk gesprek: leden, personeel (teamcall), zaken en het kantoor (servicebel, '
+      + 'ontmoeting) bellen allemaal. Elke rol krijgt een eigen kortlevend TURN-credential onder een '
+      + 'ondoorzichtig label van ZIJN sessie (kern/rtc/ijs.js); er komen geen gegevens van een ander mee.',
+    toets: 'test/rtc-relay.test.js -- "end-to-end: /api/ice alleen voor een sessie, kortlevend, HMAC klopt"' }]),
 ]);
 
 async function main() {

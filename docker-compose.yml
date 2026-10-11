@@ -311,7 +311,7 @@ services:
     networks:
       - keurdata
       # Alleen deze argumentloze keurtaak krijgt uitgaand internet om de
-      # ingestelde S3- en alarmontvanger werkelijk te beproeven. Er wordt geen
+      # ingestelde S3- en alarmontvanger en het TURN-relais werkelijk te beproeven. Er wordt geen
       # poort gepubliceerd en geen applicatieserver op dit netwerk gestart.
       - keuruitgangen
     depends_on:

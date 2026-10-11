@@ -100,6 +100,17 @@ function controleerGolive(golive, commit, image, bootstrapOnly) {
   if (!bootstrapOnly) {
     if (golive.geslaagd !== true || golive.blokkers !== 0)
       throw new Error('De container-golive is niet groen op exact dit kandidaatimage.');
+    /* Het relais zelf, onafhankelijk van de blokkerteller: een golive zonder
+       een ECHTE geslaagde TURN-relayproef over elk geconfigureerd adres
+       promoveert niet, ook als iemand de teller ooit anders zou gaan tellen. */
+    const t = golive.turnRelay;
+    if (!t || t.ok !== true || !/^[a-f0-9]{64}$/.test(String(t.configVingerafdruk || '')) ||
+        !Array.isArray(t.urls) || !t.urls.length ||
+        !t.urls.some(u => u && /^turns:/.test(String(u.url || ''))) ||
+        !t.urls.every(u => u && u.ok === true && /^(turns:|turn:.*\?transport=udp$)/.test(String(u.url || '')) &&
+          Number.isSafeInteger(u.bytesAB) && u.bytesAB >= 65536 &&
+          Number.isSafeInteger(u.bytesBA) && u.bytesBA >= 65536))
+      throw new Error('De container-golive mist een geslaagde echte TURN-relayproef over elk adres (minstens een turns:, UDP alleen als turn:?transport=udp).');
     const owner = golive.ownerReadback;
     if (!owner || owner.formaat !== 'rtg-owner-readback-bewijs-v2' ||
         !/^[a-f0-9]{40,64}$/.test(String(owner.commit || '')) || !geldigId(owner.imageId) ||

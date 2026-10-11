@@ -214,7 +214,13 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      bediening van het platform: een bewaartermijn die je niet kunt uitvoeren omdat
      een schakelaar uit staat, is een belofte die breekt. Hij valt onder de reden van
      /api/techniek in kern/bestuursroutes.js. `onverklaard <= 10` beweegt niet mee. */
-  assert.ok(zonder.length <= 151,
+  /* 151 -> 152: DE RELAYSTAND (docs/turn-server.md, oktober 2026). GET /api/rtc/stand
+     is de gezondheidsmeting van het TURN-relais: afgeleid uit de laatste echte proef,
+     zonder geheimen. Een schakelaar erop zet bellen niet aan maar neemt alleen het zicht
+     weg op waarom het dicht staat. Met dezelfde reden in kern/bestuursroutes.js EN in
+     kern/platformregister/bediening.js; test/platformregister.test.js was groen voordat
+     dit getal werd verzet. `onverklaard <= 10` beweegt niet mee. */
+  assert.ok(zonder.length <= 152,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');

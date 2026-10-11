@@ -125,7 +125,7 @@ async function bel(video) {
   luister();
   tekenGesprek('rinkelt');
   MOTOR = window.RTGServiceBel.maak({
-    rol: 'beller', video: !!video,
+    rol: 'beller', video: !!video, token: TOKEN,
     elLokaal: $('#vLokaal'), elExtern: $('#vExtern'),
     stuur: (kind, payload) => api('bel/signaal', { gesprek: GESPREK.id, kind, payload }),
     opStand: (stand) => zetStand(stand),

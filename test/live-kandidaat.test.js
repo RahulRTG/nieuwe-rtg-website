@@ -108,7 +108,10 @@ function opstelling() {
       toegestaan:1, geweigerd:1, teller:2, opgeruimd:true, doelSha256:'c'.repeat(64) },
     gedeeldeMedia:{ ok:true, tweeInstanties:true, verwijderd:true, bytes:96,
       sha256:'d'.repeat(64), doelSha256:'e'.repeat(64) },
-    alarmering:{ ok:true, status:204, doelSha256:'f'.repeat(64) } }) + '\n');
+    alarmering:{ ok:true, status:204, doelSha256:'f'.repeat(64) },
+    turnRelay:{ ok:true, reden:null, configVingerafdruk:'7'.repeat(64),
+      urls:[{ url:'turns:turn.rahultravelgroup.com:5349?transport=tcp', transport:'tls', ok:true,
+        reden:null, bytesAB:65536, bytesBA:65536 }] } }) + '\n');
   kandidaat.schrijfRuntime(root, { commit, verwachteImageId: APP_ID,
     imageId: APP_ID, imageVerwijzing:APP_REF, imageDigest:APP_DIGEST,
     inhoudSha256: manifest.inhoudSha256 });
@@ -160,6 +163,39 @@ test('een kandidaat zonder actieve Redis-, media- en alarmproef blijft geblokkee
       imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID,
       backupVerwijzing:BACKUP_REF, backupDigest:BACKUP_DIGEST, backupId:BACKUP_ID }),
     /Redis-, gedeelde-media- of alarmbezorgingproeven/);
+  } finally { fs.rmSync(root, { recursive:true, force:true }); }
+});
+
+test('een kandidaat zonder ECHTE geslaagde TURN-relayproef promoveert niet', () => {
+  const { root, commit, APP_REF, BACKUP_REF } = opstelling();
+  try {
+    const pad = path.join(root, kandidaat.REL.golive);
+    const goed = JSON.parse(fs.readFileSync(pad, 'utf8'));
+    const varianten = {
+      ontbreekt: g => { delete g.turnRelay; },
+      gezakt: g => { g.turnRelay.ok = false; },
+      teWeinigBytes: g => { g.turnRelay.urls[0].bytesBA = 1024; },
+      plaintext: g => { g.turnRelay.urls[0].url = 'turn:turn.rahultravelgroup.com:3478'; },
+      leeg: g => { g.turnRelay.urls = []; },
+      eenAdresGezakt: g => { g.turnRelay.urls.push({ ...g.turnRelay.urls[0], ok:false, reden:'TURN_NETWERK_FOUT' }); },
+      alleenUdp: g => { g.turnRelay.urls[0].url = 'turn:turn.rahultravelgroup.com:3478?transport=udp'; },
+      kaleTurnErnaast: g => { g.turnRelay.urls.push({ ...g.turnRelay.urls[0], url:'turn:turn.rahultravelgroup.com:3478' }); }
+    };
+    for (const [naam, maakStuk] of Object.entries(varianten)) {
+      const g = JSON.parse(JSON.stringify(goed)); maakStuk(g);
+      fs.writeFileSync(pad, JSON.stringify(g) + '\n');
+      assert.throws(() => kandidaat.maak(root, { commit,
+        imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID,
+        backupVerwijzing:BACKUP_REF, backupDigest:BACKUP_DIGEST, backupId:BACKUP_ID }),
+      /TURN-relayproef/, naam);
+    }
+    // besturingsproef: turns: plus een geslaagd turn:?transport=udp promoveert wel
+    const g = JSON.parse(JSON.stringify(goed));
+    g.turnRelay.urls.push({ ...g.turnRelay.urls[0], url:'turn:turn.rahultravelgroup.com:3478?transport=udp', transport:'udp' });
+    fs.writeFileSync(pad, JSON.stringify(g) + '\n');
+    assert.doesNotThrow(() => kandidaat.maak(root, { commit,
+      imageVerwijzing:APP_REF, imageDigest:APP_DIGEST, imageId:APP_ID,
+      backupVerwijzing:BACKUP_REF, backupDigest:BACKUP_DIGEST, backupId:BACKUP_ID }));
   } finally { fs.rmSync(root, { recursive:true, force:true }); }
 });
 

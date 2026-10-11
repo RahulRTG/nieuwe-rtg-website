@@ -335,6 +335,7 @@ const PUBLIEK = new Map([
   // techniek die van buiten moet kunnen
   ['GET /api/health', 'levendheid, voor de toezichthouder'],
   ['GET /api/ready', 'gereedheid, voor de load balancer'],
+  ['GET /api/rtc/stand', 'de afgeleide TURN-relaystand voor bewaking en de smoke na uitrol: geverifieerd ja/nee en de laatste proef per adres, zonder credentials of geheimen (kern/rtc/relaystand.js)'],
   ['GET /api/sat/ping', 'de satelliet-ping van de zaakdoos'],
   ['GET /api/ice', 'de STUN-servers voor bellen'],
   ['GET /api/push/key', 'de publieke web-push-sleutel; publiek is de bedoeling'],

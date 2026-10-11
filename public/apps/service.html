@@ -556,7 +556,7 @@ async function neemOp(id) {
   $('#bOpen').onclick = () => poging(() => openZaak(r.gesprek.zaak));
   $('#bStop').onclick = () => poging(belStop);
   BELMOTOR = window.RTGServiceBel.maak({
-    rol: 'opnemer', video: !!r.gesprek.video,
+    rol: 'opnemer', video: !!r.gesprek.video, token: TOKEN,
     elLokaal: $('#bLokaal'), elExtern: $('#bExtern'),
     stuur: (kind, payload) => api('gesprek/signaal', { gesprek: r.gesprek.id, kind, payload }),
     opStand: (stand) => { const el = $('#belStand'); if (el) el.textContent = stand; },

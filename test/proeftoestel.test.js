@@ -107,3 +107,16 @@ test('6. de passkeymedewerker komt klaar op de productiestand van het bezitsbewi
   assert.ok(m.klaar, 'de medewerker bindt zijn toestel en registreert zijn passkey: ' + m.reden);
   assert.deepEqual(m.klaar.routes, ['/api/office/bank/incasso']);
 });
+
+test('7. een toestel dat niet aan DEZE sessie vastzit, levert geen proeflid op', async () => {
+  const { bindToestel } = require('../scripts/lib/proeftoestel');
+  /* Een server die het toestel wel kent maar de sessie niet kon binden: dan is
+     er geen sleutelbinding, en zou de poort elk zwaar verzoek alsnog weigeren.
+     De bouwer hoort dat te zeggen in plaats van een half proeflid af te leveren. */
+  const nep = async (pad) => pad === '/api/mijn/toestel/uitdaging'
+    ? { status: 200, data: { nonce: 'n-123' } }
+    : { status: 200, data: { toestelId: 'T1', inSessie: false } };
+  const t = await bindToestel({ post: nep, token: 'tok' });
+  assert.equal(t.klaar, null);
+  assert.match(t.reden, /niet aan deze sessie gebonden/);
+});

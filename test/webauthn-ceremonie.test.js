@@ -62,14 +62,14 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
   const origin = url.origin;                 // http://127.0.0.1:<poort>
   const auth = maakAuthenticator(rpID);
 
-  const uvOpties = await api('/api/webauthn/registreer/opties', {}, lid);
+  const uvOpties = await api('/api/webauthn/registreer/opties', { huidig: 'geheim123' }, lid);
   const zonderUv = await api('/api/webauthn/registreer',
     { antwoord: auth.registratieAntwoord(uvOpties.body.opties.challenge, origin, { zonderUv: true }),
       naam: 'Onbeveiligde sleutel' }, lid);
   assert.equal(zonderUv.status, 400,
     'alleen aanwezigheid is niet genoeg: de server eist ook lokale biometrie/pincode');
 
-  const opties = await api('/api/webauthn/registreer/opties', {}, lid);
+  const opties = await api('/api/webauthn/registreer/opties', { huidig: 'geheim123' }, lid);
   assert.equal(opties.status, 200);
   assert.equal(opties.body.opties.authenticatorSelection.residentKey, 'required',
     'nieuwe passkeys zijn vindbaar, zodat de deur geen e-mailadres vooraf nodig heeft');
@@ -91,7 +91,7 @@ test('registreren, in de lijst, inloggen zonder wachtwoord, en weer weghalen', a
   // mag de naamloze accountzoeker niet dubbelzinnig kunnen maken.
   const tweede = await api('/api/auth/register', { name: 'Lid Twee', email: 'tweede-' + Date.now() + '@x.nl',
     password: 'geheim123', geboortedatum: '1990-05-05', tier: 'rtg', pasApp: 'rtg' });
-  const optiesTweede = await api('/api/webauthn/registreer/opties', {}, tweede.body.token);
+  const optiesTweede = await api('/api/webauthn/registreer/opties', { huidig: 'geheim123' }, tweede.body.token);
   const dubbel = await api('/api/webauthn/registreer',
     { antwoord: auth.registratieAntwoord(optiesTweede.body.opties.challenge, origin), naam: 'Dezelfde sleutel' }, tweede.body.token);
   assert.equal(dubbel.status, 409, 'dezelfde credential-id kan niet aan twee accounts hangen');

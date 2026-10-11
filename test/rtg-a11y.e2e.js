@@ -14,6 +14,7 @@
 
    Draai los: node --test test/rtg-a11y.e2e.js */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
@@ -67,7 +68,7 @@ const stilAsync = async (fn) => {
 };
 
 test('rtg a11y vindt in een echte cel wat er in zit', async (t) => {
-  if (!laadBrowser()) { t.skip('geen browser beschikbaar'); return; }
+  if (!laadBrowser()) { t.skip(vereist('browser', false, 'geen browser beschikbaar')); return; }
   const map = path.join(TMP, 'kapot');
   stil(() => rtg.opdrachtNew([map]));
   for (const [naam, inhoud] of Object.entries(KAPOT)) fs.writeFileSync(path.join(map, naam), inhoud);
@@ -101,7 +102,7 @@ test('rtg a11y vindt in een echte cel wat er in zit', async (t) => {
 });
 
 test('een schone app komt er schoon uit', async (t) => {
-  if (!laadBrowser()) { t.skip('geen browser beschikbaar'); return; }
+  if (!laadBrowser()) { t.skip(vereist('browser', false, 'geen browser beschikbaar')); return; }
   const map = path.join(TMP, 'schoon');
   stil(() => rtg.opdrachtNew([map]));
   const r = await stilAsync(() => a11y([map], { leesBundel: rtg.leesBundel, kleur: false }));

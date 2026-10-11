@@ -6,13 +6,14 @@
 'use strict';
 
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stroomAdres } = require('./helper');
 
-const OVERSLAAN = process.env.REDIS_URL ? false : 'vereist een echte REDIS_URL voor twee losse processen';
+const OVERSLAAN = vereist('redis', !!process.env.REDIS_URL, 'vereist een echte REDIS_URL voor twee losse processen');
 const OWNER = 'intrekking-eigenaar@x.nl';
 const MAP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-intrekking-cluster-'));
 const MAP_A = path.join(MAP, 'a');
@@ -51,7 +52,7 @@ async function openStream(base, token) {
     const timer = setTimeout(() => ac.abort(), 5000);
     let res;
     try {
-      res = await fetch(base + '/api/stream?token=' + encodeURIComponent(token), { signal: ac.signal });
+      res = await fetch(await stroomAdres(base, '/api/stream', token), { signal: ac.signal });
     } finally { clearTimeout(timer); }
     if (res.status === 503) {
       ac.abort();

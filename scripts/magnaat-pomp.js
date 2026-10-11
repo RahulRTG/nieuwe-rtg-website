@@ -452,7 +452,8 @@ function keur() {
    overdracht een overdracht en is elke cent verschil een bevinding. */
 async function rtgRonde() {
   const betaal = require('../server/betaal');
-  const keten = require('../server/kern/spellen/magnaat/rtg-keten')({ betaal, crypto: require('crypto') });
+  const keten = require('../server/kern/spellen/magnaat/rtg-keten')({ betaal, crypto: require('crypto'),
+    vrijgave: require('./lib/proefvrijgave').proefVrijgave() });
   console.log('Magnaat vraagt het aan RTG Pay: kan een speler waarde maken uit niets?\n');
   console.log('  rail: ' + betaal.AANBIEDER + (betaal.SIMULATIE_AAN ? '' : '   (' + betaal.simulatieBelet() + ')') + '\n');
   const { rijen, klachten } = await keten.keur();

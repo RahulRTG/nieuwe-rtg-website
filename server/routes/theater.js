@@ -11,7 +11,7 @@ module.exports = (kern) => {
     theaterAbonneer, theaterReactie, theaterReacties, theaterMeld,
     theaterThuisAanwezig, theaterSignaal, theaterOndertitels, theaterZaakMaak, theaterZaakZaal,
     theaterKijkplichtZet, theaterKijkplichtGedaan, theaterKijkplichtMijn, theaterKijkplichtStand,
-    theaterHuisstijl } = kern;
+    theaterHuisstijl, sessiestroom } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Het Theater is voor leden.' }); return true; }
@@ -85,14 +85,33 @@ module.exports = (kern) => {
     stuur(res, theaterSignaal(req.session.key, String(req.body.id || ''), String(req.body.kind || ''), req.body.doelKey, req.body.payload));
   });
 
-  /* Kijken: het video-element kan geen Authorization-header sturen, dus de
-     sessie komt als ?token= mee (zelfde patroon als /api/stream). Met een
-     Range-header komt precies het gevraagde stuk terug (206): soepel spoelen,
-     byte voor byte het origineel. */
-  app.get('/api/theater/kijk/:id', kijkRem, (req, res) => {
-    const sess = resolveSession(req.query.token);
-    if (!sess || sess.tier === 'guest') return res.status(401).end();
-    const v = theaterStreamVan(String(req.params.id || ''), sess.key);
+  /* Kijken: het video-element kan geen Authorization-header sturen. De sessie
+     stond daarom als ?token= in het adres; nu ruilt het scherm hem eerst voor
+     een KIJKTICKET (POST /api/stroom/ticket, stroom `theater-kijk`, id = de
+     video) en staat alleen dat ticket in het adres. Een <video> vraagt
+     hetzelfde adres meerdere keren op (laden, spoelen: Range-verzoeken), dus dit
+     ticket is niet eenmalig maar BEGRENSD: vijf minuten, een geteld aantal
+     openingen, en alleen voor DEZE video van DEZE sessie -- en bij elke opening
+     wordt de sessie opnieuw getoetst. Een volledig token in ?token= krijgt 401.
+     Met een Range-header komt precies het gevraagde stuk terug (206): soepel
+     spoelen, byte voor byte het origineel. */
+  /* Het ticket vraagt alleen een LEDENsessie; of deze video voor dit lid
+     bestaat beslist de deur zelf bij het openen (404, zoals altijd) -- zo
+     verraadt de ruil niet welke ids er zijn. */
+  const kijkSessie = (raw) => {
+    const sess = resolveSession(raw);
+    return sess && sess.tier !== 'guest' ? sess : null;
+  };
+  sessiestroom.soort('theater-kijk', { geldig: raw => !!kijkSessie(raw), metBij: true,
+    geldigMs: 5 * 60000, maxGebruik: 600 });
+  app.get('/api/theater/kijk/:id', kijkRem, async (req, res) => {
+    if (req.query.token !== undefined) return res.status(401).end();
+    const id = String(req.params.id || '');
+    const uit = await sessiestroom.open('theater-kijk', req.query.ticket, id);
+    if (!uit.ok) return res.status(uit.status || 401).end();
+    const sess = kijkSessie(uit.token);
+    if (!sess) return res.status(401).end();
+    const v = theaterStreamVan(id, sess.key);
     if (!v) return res.status(404).end();
     const range = /^bytes=(\d*)-(\d*)$/.exec(String(req.headers.range || ''));
     if (range && (range[1] || range[2])) {

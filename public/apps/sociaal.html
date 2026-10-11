@@ -2,6 +2,7 @@
 <html lang="nl" data-rtg-thema="champagne">
 <head>
 <script src="/shared/id.js"></script>
+<script src="/shared/stroom.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Sociaal</title>
@@ -756,7 +757,7 @@
 
   if (window.EventSource && token()) {
     try {
-      const sociaalLive = new EventSource('/api/stream?token=' + encodeURIComponent(token()));
+      const sociaalLive = RTGStroom.open('/api/stream', { token: token() });
       sociaalLive.addEventListener('comm', laadBerichtStand);
     } catch (e) {}
   }

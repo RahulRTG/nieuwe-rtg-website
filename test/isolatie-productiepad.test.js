@@ -4,7 +4,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stroomAdres } = require('./helper');
 
 let srv;
 const OWNER = 'isolatie-eigenaar@x.nl';
@@ -24,7 +24,7 @@ async function logInAlsEigenaar() {
 
 async function openStream(token) {
   const ac = new AbortController();
-  const res = await fetch(srv.base + '/api/stream?token=' + encodeURIComponent(token), { signal: ac.signal });
+  const res = await fetch(await stroomAdres(srv.base, '/api/stream', token), { signal: ac.signal });
   assert.equal(res.status, 200, 'de nog niet geisoleerde sessie hoort te openen');
   const reader = res.body.getReader();
   let tekst = '';
@@ -57,6 +57,9 @@ test('persoonlijke isolatie sluit HTTP, techniek en bestaande/nieuwe SSE terwijl
   const token = await logInAlsEigenaar();
   const stroom = await openStream(token);
   try {
+    /* Een stroomticket dat VOOR de zetting werd uitgegeven: de realtime-poort
+       hoort ook dat te weigeren, en niet alleen de ruil zelf. */
+    const vooraf = await stroomAdres(srv.base, '/api/stream', token);
     const zet = await post('/api/isolatie/mijn/zet', { drager: 'identiteit', naar: 'isolatie',
       reden: 'verdachte eigenaarssessie onmiddellijk containen' }, token);
     assert.equal(zet.status, 200, JSON.stringify(zet.body));
@@ -75,7 +78,9 @@ test('persoonlijke isolatie sluit HTTP, techniek en bestaande/nieuwe SSE terwijl
     const uitgang = await post('/api/isolatie/mijn', {}, token);
     assert.equal(uitgang.status, 200, 'Mijn bescherming blijft bereikbaar; isolatie is geen val');
 
-    const nieuw = await fetch(srv.base + '/api/stream?token=' + encodeURIComponent(token));
+    const ruil = await post('/api/stroom/ticket', { stroom: 'lid' }, token);
+    assert.notEqual(ruil.status, 200, 'een geisoleerde identiteit krijgt geen nieuw stroomticket: ' + JSON.stringify(ruil.body));
+    const nieuw = await fetch(vooraf);
     assert.equal(nieuw.status, 503, 'dezelfde geisoleerde identiteit opent geen nieuwe stream');
     const lijf = await nieuw.json();
     assert.equal(lijf.reden, 'ISOLATIE_REALTIME_DICHT');

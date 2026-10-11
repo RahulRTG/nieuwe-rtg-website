@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 76,
-    "bewijsAchterstand": 680,
+    "bewijsAchterstand": 823,
     "bewijsAlleenKeten": 23,
     "bewijsCellenBewezen": 28249,
     "bronBlindeBestanden": 0,
@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4515,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1685,
-    "kernGedeeld": 254,
+    "kernBreedte": 1686,
+    "kernGedeeld": 255,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 50,
     "keuringDubbeling": 177,
@@ -71,7 +71,7 @@
     "wekkersZonderTrede": 0,
     "wettenOnbewezen": 5,
     "zaakwigGezakt": 0,
-    "zelfpoortendeToetsen": 46,
+    "zelfpoortendeToetsen": 48,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 3,
@@ -176,6 +176,53 @@
     "loopFabricTijdelijk": 168
   },
   "notities": [
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 680,
+      "vervalt": "2027-01-09",
+      "meter": "bewijsAchterstand 680 -> 823",
+      "reden": "Zichtbaar geworden, niet nieuw ontstaan: WAAROM.json stond sinds 30 augustus 2026 op een vuile meting omdat scripts/waarom.js op main omviel (maakSleutels bestaat niet meer in scripts/lib/proefsleutels.js). Gerepareerd in deze PR; de verse meting ziet 4544 routes tegen 3805, en de 143 extra object-vooraf-posten zijn routes die sindsdien op main zijn bijgekomen.",
+      "waarheen": "De object-vooraf-posten aflossen via de objectpool (scripts/lib/objectpool.js) en de lijfsleutels; BEWIJSSCHULD.json draagt de groei met reden."
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "structureel",
+      "sleutel": "dbDeurenSchrijvend",
+      "van": 275,
+      "meter": "dbDeurenSchrijvend 275 -> 276",
+      "reden": "server/betaal/connect/opslag.js is de eigenaar van de collectie met Stripe Connect-afrekeningen en schrijft daarin via lib/duurzaam (keuringsregel 47: vastgelegd VOOR elke aanroep naar Stripe). Een omweg via een generieke db-helper zou de duurzaamheidsgarantie verliezen die de crashproef vasthoudt.",
+      "waarheen": "test/connect-afrekening.test.js (crash na versturen, twee processen tegelijk)"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 254,
+      "meter": "kernGedeeld 254 -> 255",
+      "reden": "Dezelfde naam als kernBreedte hierboven: sessiestroom is met opzet gedeeld door drie domeinen, want het ruilloket is een plek en de soorten zijn van de domeinen die de deur bezitten.",
+      "waarheen": "test/stroom-rolscheiding.test.js houdt vast dat elke rol alleen zijn eigen soort krijgt"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1685,
+      "meter": "kernBreedte 1685 -> 1686",
+      "reden": "De kernnaam sessiestroom (server/kern/sessiestroom.js, stroomtickets in plaats van sessies in een adres, P2 van de V1-hardening) wordt door de domeinen office, supplier en theater gelezen: elk registreert daar zijn EIGEN stroomsoort met zijn eigen toets op de sessie. Een route die de module zelf zou requiren, maakt een tweede ticketopslag met een eigen greep op de database.",
+      "waarheen": "GRENZEN.json draagt de naam; test/sessiestroom.test.js en test/stroom-rolscheiding.test.js tegen een echte server"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 343,
+      "vervalt": "2027-01-09",
+      "meter": "keuringOmvang 343 -> 353",
+      "reden": "De V1-hardening (PR #523) zette zestien serverbestanden in de band 9,4-10 kB en haalde er drie uit (kern/pay/partner.js, kern/webauthn.js, lib/keten.js): beleidsmotor/index, factuurcorrectie, identiteit/sessieregister, identiteit/toestellen, pay/opladen, pay/terug, pay/verzoeken, sessiestroom, vrijgave/oordeel, vrijgave/register, zwaarbewijs, lib/ankerdienst, lib/idem, opzet/luister, routes/member/toestellen, routes/theater. Geen ervan staat over de grens (de deltapoort houdt dat hard tegen); ze vlak voor een release opknippen raakt de geld- en identiteitspaden die net met mutaties zijn nagetrokken.",
+      "waarheen": "Per bestand op zijn natuurlijke naad knippen na de RC-bevriezing, te beginnen bij vrijgave/oordeel.js en pay/verzoeken.js (het dichtst bij de grens)."
+    },
     {
       "datum": "2026-10-06",
       "soort": "schuld",
@@ -4299,6 +4346,36 @@
       "meter": "bronscannerGemist 593 -> 595 (losser, met reden)",
       "reden": "#521 (self-hosted TURN) zet de ICE-uitgifte achter een sessie en voegt daarvoor POST /api/foundation/gezin/ice en POST /api/foundation/school/ice toe. Beide hangen op de /api/foundation-router, en dat is precies de familie die de bronscanner van de Capability Graph niet ziet (zie de geschiedenis in test/magnaat-capabilities.test.js: gezinsdeur, gezin/sessie, les/stroomticket). Op de tak van #521 stond de lat in de toets zelf op 595; sinds #518 woont hij in NORM.json, dus de verhoging staat hier. De router kent beide routes, routedekking telt ze, en de spooklat (4) beweegt niet.",
       "waarheen": "de bronscanner herbaseren op de router; dat hangt aan het Rust-pariteitsbesluit dat al bij de oorspronkelijke ratel staat (notitie van 2026-08-17)"
+    },
+    {
+      "datum": "2026-10-06",
+      "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 539,
+      "vervalt": "2027-01-04",
+      "meter": "dbDeuren 539 -> 540",
+      "reden": "server/lib/auditwacht.js (audit P1-4) leest de vijf auditjournalen rechtstreeks uit db.data om bij het opstarten en periodiek hun keten na te lopen; een gebroken spoor wordt zo een alarm in plaats van een stille 409. Het is een LEZER van de journalen die al aan db.data hangen; de ankerjournalen die uit ankerdienst.js werden geknipt raken db.data juist niet (de deur bleef bij ankerdienst.js).",
+      "waarheen": "De journalen krijgen een gedeelde leesaccessor (dezelfde die ankerdienst.js gebruikt), en de auditwacht leest via die accessor."
+    },
+    {
+      "datum": "2026-10-06",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 129,
+      "vervalt": "2027-01-04",
+      "meter": "toetsenNietGemeten 129 -> 137",
+      "reden": "Acht nieuwe toetsbestanden voor de auditspoorreparatie (P0-1, P1-2, P1-3, P1-4, P2-5, P2-7): auditspoor-atomair.pg, auditatomair-sqlite, auditwacht, auditherkomst, ankerketen, productie-anker, en de gegroeide ankerdienst- en ankertimertoetsen. Met de hand nagetrokken: zonder het meenemen van het spoor in pg/collectietransactie.js of pg/economische-boeking.js, met de oude conflictcode voor een gebroken keten, zonder de alarmcontrole, met de oude verifieer() of de oude verifieerTegenAnker() zakken ze; en tegen de servercode van de basis zakken ze allemaal behalve de SQLite-proef (die stand was al veilig; met de voorregel van het kritiekspoor genegeerd zakt hij wel).",
+      "waarheen": "Een volledige npm run mutatie op een schone boom neemt ze mee."
+    },
+    {
+      "datum": "2026-10-06",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 46,
+      "vervalt": "2027-01-04",
+      "meter": "zelfpoortendeToetsen 46 -> 48",
+      "reden": "test/auditspoor-atomair.pg.test.js (audit P0-1/P1-4) heeft twee toetsen die een echte PostgreSQL vereisen: een trigger die alleen de auditschrijf laat falen, tegen een echte server en tegen de PG-laag. Lokaal tegen PostgreSQL 16 gedraaid en groen (scripts/pgtoetsen.js: 43 van 43 bestanden). Hij staat in scripts/lib/pg-toetslijst.js en als uitzondering in deze norm.",
+      "waarheen": "De CI-dienstmatrix draait hem zonder skip; aflossen is de standaardomgeving met PostgreSQL."
     }
   ],
   "prestatie": {

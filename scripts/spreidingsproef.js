@@ -106,23 +106,8 @@ async function draaiClient() {
    staat er een ruimere marge op. Lukt geen van beide, dan zegt de uitslag dat
    de toewijzing ONBEKEND is; een verzonnen nul zou hier het hele oordeel
    omdraaien. */
-const HZ = 100;
-function rekentijd(pid) {
-  try {
-    const st = fs.readFileSync('/proc/' + pid + '/stat', 'utf8').split(' ');
-    return (Number(st[13]) + Number(st[14])) / HZ;
-  } catch (e) { /* geen /proc: hieronder verder */ }
-  try {
-    const t = execFileSync('ps', ['-p', String(pid), '-o', 'time='], { encoding: 'utf8' }).trim();
-    const d = t.split('-');
-    const stukken = d[d.length - 1].split(':').map(Number);
-    let sec = stukken.pop() || 0;
-    if (stukken.length) sec += (stukken.pop() || 0) * 60;
-    if (stukken.length) sec += (stukken.pop() || 0) * 3600;
-    if (d.length > 1) sec += Number(d[0]) * 86400;
-    return sec;
-  } catch (e) { return null; }
-}
+// de lezing staat sinds 6 oktober 2026 op een plek (./lib/procinfo.js), met dezelfde terugval
+function rekentijd(pid) { return require('./lib/procinfo').cpuSeconden(pid); }
 const som = (pids) => {
   let t = 0;
   for (const p of pids) { const s = rekentijd(p); if (s === null) return null; t += s; }

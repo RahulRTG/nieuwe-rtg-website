@@ -241,7 +241,7 @@ test('het inlogportaal en de aanmelding werken met de bestaande beveiligde route
       const member=await api('/api/auth/register',{name:'Passkey Testpersoon',email:'passkey@voorbeeld.test',password:secret,geboortedatum:'1992-03-14',tier:'guest'});
       const {maakAuthenticator}=require('./webauthn-authenticator');
       const auth=maakAuthenticator('localhost');
-      const options=await api('/api/webauthn/registreer/opties',{},member.token);
+      const options=await api('/api/webauthn/registreer/opties',{huidig:secret},member.token);
       await api('/api/webauthn/registreer',{naam:'Virtuele browsertest',antwoord:auth.registratieAntwoord(options.opties.challenge,base)},member.token);
       const c=await context(),p=await open(c);
       const cdp=await c.newCDPSession(p);await cdp.send('WebAuthn.enable');

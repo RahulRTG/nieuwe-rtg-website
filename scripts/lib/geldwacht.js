@@ -96,7 +96,7 @@ const UITZONDERINGEN = [{
   bestand: 'server/db/tx/topup.js',
   collecties: ['payBoekingen', 'betaalVerzoeken', 'bankBoekingen'],
   reden: 'vensterTopUp vult bij een herstart het WEERGAVEvenster aan uit het ' +
-    'transactiegrootboek. Er verandert geen saldo -- kern/pay/boeken.js schrijft dat ' +
+    'transactiegrootboek. Er verandert geen saldo -- kern/pay/boeking.js (pasToe) schrijft dat ' +
     'met zoveel woorden: de saldi zijn de waarheid, dit is de lijst die je terugleest.'
 }];
 function uitgezonderd(frames, collectie) {

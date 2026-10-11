@@ -3,6 +3,7 @@
    huidige wachtwoord als bevestiging. Krijgt de gedeelde context een keer
    bij het opstarten vanuit routes/auth.js. */
 const rtgKlok = require('../../lib/klok');
+const { ONTBREEKT } = require('../../lib/linkbasis');
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN , kern} = actx;
@@ -48,6 +49,8 @@ const HERSTEL_SMS_BEWUST_UIT = process.env.RTG_HERSTEL_SMS_UIT_BEWUST === '1';
    verandert, verandert ze voor allebei. */
 function herstelStart(u, req) {
   if (!u) return { ok: true, tweestaps: false };   // bestaan lekken we nooit
+  // ook voor de balie: geen basis, geen token (de aanroeper weigert netjes)
+  if (!appUrl(req)) throw new Error(ONTBREEKT);
   const tel = accounts.phoneOf(u);
   /* PRODUCTIE ZONDER ECHT TWEEDE KANAAL: GEEN TOKEN UITGEVEN.
 
@@ -102,6 +105,9 @@ kern.herstelStart = (u, req) => {
 };
 
 app.post('/api/auth/forgot', (req, res) => {
+  // geen vaste basis, geen herstelmail (lib/linkbasis.js); hangt niet aan het account
+
+  if (!appUrl(req)) return res.status(503).json({ error: ONTBREEKT, code: 'app-url-ontbreekt' });
   const begon = rtgKlok.nu();
   const antwoord = (lijf) => {
     const over = MIN_MS - (rtgKlok.nu() - begon);

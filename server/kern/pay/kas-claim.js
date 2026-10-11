@@ -26,7 +26,7 @@ const LEASE_MS = 60000;
 const NIET = { status: 404, error: 'Deze betaalcode is niet (meer) geldig.' };
 const GEBRUIKT = NIET;   // een gebruikte code is voor een ander gewoon niet (meer) geldig
 
-module.exports = ({ bak, crypto, nu, stelSamen, zorgSaldo, rekPartner, betaalDelen, weigering, waarde, schoon }) => {
+module.exports = ({ bak, crypto, nu, stelSamen, zorgSaldo, rekPartner, betaalDelen, weigering, waarde, schoon, vrijgavePoort }) => {
   const { transactie, zoek, reden, bearer, afdruk, kopie, iso } = bak;
 
   async function stap1({ code, soort, supplierCode, centen, idem, idemVerplicht, genre, oms }) {
@@ -50,6 +50,11 @@ module.exports = ({ bak, crypto, nu, stelSamen, zorgSaldo, rekPartner, betaalDel
       if (idemVerplicht && !idemHash) return { fout: { status: 400, code: 'IDEMPOTENTIESLEUTEL_VERPLICHT',
         error: 'Deze opdracht verplaatst geld en vraagt een idempotentiesleutel. Stuur een `idem` mee en gebruik bij een herhaling dezelfde waarde.',
         waarom: idemVerplicht } };
+      /* DE VRIJGAVEPOORT, op dezelfde plek als in ../../lib/idem.js: na de
+         herhaling en na een hervatting (hierboven, die gaan door), voor een
+         NIEUWE claim. Dicht = de code blijft open en er is niets geboekt. */
+      const dicht = vrijgavePoort ? vrijgavePoort.intern() : null;
+      if (dicht) return { fout: dicht };
       bearer.gebruik(r.toegang);
       r.stand = 'claimend';
       r.claim = { id: 'KC' + crypto.randomBytes(8).toString('hex'), soort, supplierCode, centen,

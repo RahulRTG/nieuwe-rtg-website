@@ -45,6 +45,14 @@ const REDENEN = [
      kern/platformregister/bediening-recht.js met dezelfde reden. */
   ['/api/mijn/pas/gast', 'een schakelaar op zelf gast worden houdt een lid vast aan een pas die hij niet meer wil'],
   ['/api/metrics', 'de meetlijn mag bij een incident niet blind worden gemaakt'],
+  /* HET RUILLOKET VAN DE STROOMTICKETS (opzet/stroomtoegang.js, kern/sessiestroom.js).
+     Het opent zelf niets: het ruilt een sessie in de kop voor een ticket, en de
+     deur die het ticket opent heeft haar eigen schakelaar (kern-live voor
+     /api/stream, en zo per stroom). Een knop hier zou ALLE live-stromen van alle
+     soorten tegelijk dichtzetten -- ook die van het kantoor en de eigenaar, die
+     hun stroom in onderhoud juist nodig hebben (middleware/remmen.js). */
+  ['/api/stroom/ticket', 'het ruilloket van sessie naar stroomticket opent zelf niets; elke stroomdeur erachter ' +
+    'heeft haar eigen schakelaar, en een knop hier zou alle stromen tegelijk dichtzetten, ook die van kantoor en eigenaar'],
   ['/api/cluster', 'de clusterlaag bestuurt instances en blijft buiten een instance-schakelaar'],
   ['/api/sat', 'de satellietping voorkomt dat een zaakdoos gezond verkeer als offline leest'],
   ['/api/test', 'de testhaak bestaat alleen in demostand en is geen productdienst'],

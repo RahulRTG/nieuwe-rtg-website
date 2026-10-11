@@ -56,18 +56,21 @@
       /* Voor een zware taak stroomt de server live de voortgang ("Stap 4/24:
          taxi zoeken...") over de eigen SSE-verbinding. We openen die alleen
          zolang de vraag loopt en sluiten hem als het antwoord er is. */
-      var vBron = null;
+      var vBron = null, vKlaar = false;
       if (memTok && window.EventSource) {
-        try {
-          vBron = new EventSource('/api/stream?token=' + encodeURIComponent(memTok));
-          vBron.addEventListener('rahul-voortgang', function (e) {
-            var v = {}; try { v = JSON.parse(e.data); } catch (x) {}
-            if (v.klaar) return;
-            if (v.totaal) { uit.textContent = 'Stap ' + v.stap + '/' + v.totaal + (v.bericht ? ': ' + v.bericht : '') + '...'; mond.praat(600); }
-          });
-        } catch (e) {}
+        metStroom(function (S) {
+          if (vKlaar) return;   // het antwoord was er al voordat de stroom kon openen
+          try {
+            vBron = S.open('/api/stream', { token: memTok });
+            vBron.addEventListener('rahul-voortgang', function (e) {
+              var v = {}; try { v = JSON.parse(e.data); } catch (x) {}
+              if (v.klaar) return;
+              if (v.totaal) { uit.textContent = 'Stap ' + v.stap + '/' + v.totaal + (v.bericht ? ': ' + v.bericht : '') + '...'; mond.praat(600); }
+            });
+          } catch (e) {}
+        });
       }
-      var sluitBron = function () { if (vBron) { try { vBron.close(); } catch (e) {} vBron = null; } };
+      var sluitBron = function () { vKlaar = true; if (vBron) { try { vBron.close(); } catch (e) {} vBron = null; } };
       fetch(pad, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ q: q }) })
         .then(function (r) { return r.json(); })
         .then(function (d) { sluitBron(); uit.textContent = (d && (d.antwoord || d.reply || d.error)) || 'Ik kwam er niet uit.'; mond.praat(1400); })

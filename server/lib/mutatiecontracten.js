@@ -32,26 +32,11 @@
 'use strict';
 
 const CONTRACTEN = Object.assign({},
-  require('./mutatiecontracten-library').CONTRACTEN,
-  require('./mutatiecontracten-loop-fabric').CONTRACTEN,
-  require('./mutatiecontracten-living-world').CONTRACTEN,
-  require('./mutatiecontracten-mall-aanvraag').CONTRACTEN,
-  require('./mutatiecontracten-beelden').CONTRACTEN,
-  require('./mutatiecontracten-document').CONTRACTEN,
-  require('./mutatiecontracten-storingen').CONTRACTEN,
-  /* Opgesplitst omdat scripts/check.js een bestandsgrens kent en die terecht
-     aansloeg: een lijst die naar duizenden regels groeit, hoort niet in een
-     bestand dat ook nog de vorm en de regels uitlegt. Zelfde vorm als
-     ./idemsleutels.js. */
-  require('./mutatiecontracten-beschermd').CONTRACTEN,
-  require('./mutatiecontracten-leest').CONTRACTEN,
-  require('./mutatiecontracten-connection').CONTRACTEN,
-  require('./mutatiecontracten-beleidsmotor').CONTRACTEN,
-  require('./mutatiecontracten-werkbetaling').CONTRACTEN,
-  require('./mutatiecontracten-vertegenwoordiging').CONTRACTEN,
-  require('./mutatiecontracten-staffgemoed').CONTRACTEN,
-  require('./mutatiecontracten-zaakkant').CONTRACTEN,
-  require('./mutatiecontracten-rugdekking').CONTRACTEN,
+  /* De eerste zestien domeinbestanden staan in ./mutatiecontracten-eerste.js:
+     deze lijst ging over de 10 kB van keuringsregel 13. De VOLGORDE blijft
+     dezelfde (Object.assign laat de laatste winnen), want dat bestand komt hier
+     als eerste. */
+  require('./mutatiecontracten-eerste').CONTRACTEN,
   /* RTG Vrijheid en RTG zelf als werkgever (VRIJHEID.md). */
   require('./mutatiecontracten-vrijheid').CONTRACTEN,
   require('./mutatiecontracten-magnaatleven').CONTRACTEN,
@@ -101,6 +86,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-lesfamilie').CONTRACTEN,
   require('./mutatiecontracten-lesstroom').CONTRACTEN,
   require('./mutatiecontracten-ijs').CONTRACTEN, // TURN-credentials, docs/turn-server.md
+  require('./mutatiecontracten-sessiestroom').CONTRACTEN,
   require('./mutatiecontracten-werksleutels').CONTRACTEN,
   require('./mutatiecontracten-machinesleutels').CONTRACTEN,
   require('./mutatiecontracten-ssogeheim').CONTRACTEN,
@@ -152,6 +138,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-herstel').CONTRACTEN,
   require('./mutatiecontracten-kantoorstuur').CONTRACTEN,
   require('./mutatiecontracten-rtgboek').CONTRACTEN,
+  require('./mutatiecontracten-vrijgave').CONTRACTEN,
   require('./mutatiecontracten-naargast').CONTRACTEN,
   /* De zevenenveertig die uit de afleidgang vielen toen die een grens erbij
      kreeg, met de hand gelezen op 13 september 2026 (zie de kop van de eerste). */

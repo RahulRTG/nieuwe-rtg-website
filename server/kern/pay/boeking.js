@@ -24,8 +24,21 @@
    Alles komt binnen; dit bestand leest geen omgeving en houdt geen stand vast. */
 'use strict';
 
+const { SLEUTEL, maakSleutel } = require('../../db/economische-identiteit');
+const { volgendeStap } = require('../../lib/idem-handeling');
+const { boekOpSleutel } = require('../betaalopdracht/terugboeking');
+
+/* Een programmeerfout op het geldpad is LUID: een sleutel die de motor straks
+   met 400 weigert, of een motorboeking zonder sleutel, gooit hier in plaats
+   van een nette weigering te worden die een aanroeper in een catch opeet. */
+function sleutelFout(code, bericht) {
+  const e = new Error(bericht);
+  e.code = code;
+  return e;
+}
+
 module.exports = ({ saldi, saldoVan, grootboek, payBoekingenVoegToe, save, id, schoon, nu, waardePoort,
-  betalingenUit, uitFout, geldModus, motorklant, schaduw, MIN_CENTEN, MAX_CENTEN }) => {
+  betalingenUit, uitFout, geldModus, motorklant, schaduw, boekEenmaal, MIN_CENTEN, MAX_CENTEN }) => {
 
   /* Gedeeld door de JS-guard (schaduw-modus) en door de motor-spiegel
      (motor-modus past de door de motor bevestigde regel toe). De cap van 50000
@@ -56,33 +69,83 @@ module.exports = ({ saldi, saldoVan, grootboek, payBoekingenVoegToe, save, id, s
     return { ok: true, boeking: rij };
   }
 
-  /* In schaduw-modus is dit exact de sync-guard, gewoon awaitbaar gemaakt --
-     geen gedragsverandering. In motor-modus gaat de boeking geguard naar de
-     motor (de autoriteit); pas als die hem bevestigt, spiegelt de JS-engine
-     dezelfde regel. Weigert de motor (onvoldoende saldo) of is hij onbereikbaar,
-     dan verandert er NIETS aan de JS-saldi. */
+  /* DE ECONOMISCHE SLEUTEL VAN EEN BOEKING.
+
+     Een sleutel van de aanroeper gaat voor: die hangt aan een BEDRIJFSobject
+     (een betaling, een betaalverzoek, een OV-rit) en ontdubbelt dus ook over
+     handelingen en instanties heen. Zijn vorm wordt HIER getoetst, voor de
+     motor wordt gebeld -- `pay-oplaad:BW-...` haalde de motor wel en kreeg
+     daar 400, terwijl het geld al van de kaart was.
+
+     Zonder sleutel van de aanroeper volgt hij in motorstand uit de handeling
+     waarin de boeking valt (../../lib/idem.js volgendeStap): idem-sleutel plus
+     volgnummer. Ook geen handeling, dan is er niets dat een herhaling kan
+     herkennen, en dan boekt de motor NIET -- een boeking die bij een retry
+     dubbel kan landen, is erger dan een die luid weigert. */
+  function sleutelVan(economischeSleutel) {
+    if (economischeSleutel != null) {
+      if (!SLEUTEL.test(String(economischeSleutel)))
+        throw sleutelFout('ECONOMISCHE_SLEUTEL_ONGELDIG', 'Deze economische sleutel heeft niet de vorm ' +
+          '<soort>:<sha256> uit db/economische-identiteit.js; er is niets geboekt: ' + String(economischeSleutel).slice(0, 40));
+      return { sleutel: String(economischeSleutel), vanAanroeper: true };
+    }
+    if (geldModus !== 'motor') return null;
+    const stap = volgendeStap();
+    if (!stap)
+      throw sleutelFout('ECONOMISCHE_SLEUTEL_ONTBREEKT', 'Een motorboeking zonder economische sleutel en buiten ' +
+        'een idem-handeling kan bij een herhaling dubbel landen; geef een sleutel uit het bedrijfsobject mee.');
+    return { sleutel: maakSleutel('pay-stap', [stap.naam, stap.sleutel, stap.stap]), vanAanroeper: false };
+  }
+
+  /* In schaduw-modus is dit de sync-guard, awaitbaar gemaakt. Draagt de
+     boeking een sleutel van de aanroeper, dan commit die sleutel in DEZELFDE
+     opslagtransactie als de saldi (../betaalopdracht/terugboeking.js
+     boekOpSleutel): boek() alleen gooide hem weg, en dan schreef een
+     herhaalde webhook na een crash dezelfde oplading twee keer bij.
+
+     In motor-modus gaat de boeking geguard naar de motor (de autoriteit), en
+     ALTIJD met een sleutel, zodat zijn duurzame ontdubbeling (met_economisch,
+     fsync voor de 200) de herhaling herkent die de JS-opslag na een crash niet
+     meer kent. Pas na zijn bevestiging neemt de spiegel de saldi over. Weigert
+     de motor of is hij onbereikbaar, dan verandert er NIETS aan de JS-saldi. */
   async function boekAsync({ van, naar, centen, soort, oms, ref, genre, dagBesteed, economischeSleutel }) {
     if (betalingenUit) return uitFout();
-    if (geldModus !== 'motor') return boek({ van, naar, centen, soort, oms, ref, genre, dagBesteed });
+    const k = sleutelVan(economischeSleutel);
+    if (geldModus !== 'motor') {
+      const args = { van, naar, centen, soort, oms, ref, genre, dagBesteed };
+      if (!k) return boek(args);
+      return boekOpSleutel({ domein: 'pay', grootboek, boek, boekEenmaal, sleutel: k.sleutel, args });
+    }
     const dicht = waardePoort({ van, naar, centen: Math.round(Number(centen)), soort, genre, dagBesteed });
-    if (dicht) return dicht;
-    const r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref, economischeSleutel });
+    /* Een weigering van de poort kan een HERHALING zijn: na een crash staat de
+       spiegel al op het afgeboekte saldo. Kent de motor deze sleutel met deze
+       beweging, dan is de boeking er al en komt het eerste antwoord terug --
+       anders zou ./dekking.js de kaart opnieuw belasten. De motor boekt hier
+       niets (alleen lezen); onbekend betekent: de weigering blijft staan. */
+    let r = null;
+    if (dicht) {
+      const al = await motorklant.boekBekend({ van, naar, centen, soort, ref, economischeSleutel: k.sleutel });
+      if (!al || !al.ok) return dicht;
+      r = al;
+    } else {
+      r = await motorklant.boekGuard({ van, naar, centen, soort, oms, ref, economischeSleutel: k.sleutel });
+    }
     if (!r || r.error) return { status: (r && r.status) || 502, error: (r && r.error) || 'Motor onbereikbaar.' };
     // Neem de door de motor bevestigde boeking exact over (id, at, bedragen).
     const b = r.boeking;
     const rij = { id: b.id, van: b.van, naar: b.naar, centen: Math.round(Number(b.centen)), soort: b.soort || 'boeking', oms: b.oms || '', ref: b.ref || null, at: b.at || nu() };
-    if (economischeSleutel) {
-      const sv = Math.round(Number(r.saldoVan)), sn = Math.round(Number(r.saldoNaar));
-      if (!Number.isFinite(sv) || !Number.isFinite(sn))
-        return { status: 502, error: 'Motor bevestigde geen actuele saldi; de spiegel blijft ongemoeid.' };
-      saldi()[rij.van] = sv; saldi()[rij.naar] = sn;
-      if (!grootboek().some(x => x && x.id === rij.id)) payBoekingenVoegToe(rij);
-      save();
-      return { ok: true, boeking: rij, herhaald: !!r.herhaald };
-    }
-    pasToe(rij);
-    return { ok: true, boeking: rij };
+    const sv = Math.round(Number(r.saldoVan)), sn = Math.round(Number(r.saldoNaar));
+    if (!Number.isFinite(sv) || !Number.isFinite(sn))
+      return { status: 502, error: 'Motor bevestigde geen actuele saldi; de spiegel blijft ongemoeid.' };
+    saldi()[rij.van] = sv; saldi()[rij.naar] = sn;
+    if (!grootboek().some(x => x && x.id === rij.id)) payBoekingenVoegToe(rij);
+    save();
+    return { ok: true, boeking: rij, herhaald: !!r.herhaald };
   }
 
-  return { pasToe, boek, boekAsync };
+  /* De sleutel van de VOLGENDE boeking vooraf vastleggen (./dekking.js boekt
+     twee keer met dezelfde). Buiten motorstand: null, en dan telt er niets. */
+  const reserveerSleutel = () => { const k = sleutelVan(undefined); return k ? k.sleutel : null; };
+
+  return { pasToe, boek, boekAsync, reserveerSleutel };
 };

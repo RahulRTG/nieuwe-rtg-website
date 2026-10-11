@@ -215,7 +215,8 @@ De volgorde is niet vrij: elke stap leunt op de vorige.
    Het lid ziet zijn posities naast elkaar op `/api/pay/portefeuille`.
 3. ~~**Slim betalen uit meerdere potjes.**~~ **Gedaan.** € 72 wordt € 25
    maaltijdbudget en € 47 eigen saldo, in één tik
-   (`kern/waarde/samenstellen.js`, uitgevoerd door `kern/pay/samen.js`).
+   (`kern/waarde/samenstellen.js`, samengesteld via `kern/pay/samen.js` en
+   uitgevoerd door `kern/pay/kas-boek.js`).
 
    De volgorde is de hele inhoud, en hij is omgekeerd aan wat een systeem uit
    zichzelf doet: **het meest beperkte potje eerst.** Wat het snelst vervalt vóór

@@ -26,6 +26,8 @@ test('mutatie: elke schakel die verdwijnt laat de wacht zakken, met zijn naam', 
     'artefact-vastgelegd': t => t.replace(/artefactketen\.js gebouwd/g, 'x'),
     'test-op-digest': t => t.replace(/artefactketen\.js testen/g, 'x'),
     'ketenbewijs-bewaard': t => t.replace(/artefactketen\.json/g, 'x'),
+    'tests-op-imagebytes': t => t.replace(/--fase=na/g, '--x'),
+    'kandidaat-is-gekwalificeerd': t => t.replace(/--image-id=/g, '--x='),
   };
   assert.deepStrictEqual(Object.keys(weg).sort(), SCHAKELS.map(s => s.id).sort());
   for (const [id, f] of Object.entries(weg)) {
@@ -38,6 +40,8 @@ test('mutatie: elke schakel die verdwijnt laat de wacht zakken, met zijn naam', 
 test('mutatie: een uitrol- of latest-stap laat de wacht zakken', () => {
   assert.ok(!beoordeel(echt + '\n      - run: docker push ghcr.io/x:latest\n').rond);
   assert.ok(!beoordeel(echt + '\n      - run: kubectl apply -f x\n').rond);
+  // de oude vorm: na de afbouw opnieuw bouwen
+  assert.ok(!beoordeel(echt + '\n      - run: docker build --tag x .\n').rond);
 });
 
 test('mutatie: een build NA de test op het digest laat de wacht zakken (gepromoveerd is niet wat getest is)', () => {

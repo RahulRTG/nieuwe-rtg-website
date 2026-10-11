@@ -607,7 +607,9 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        pasToe() aanwijst, met bestandsnaam erbij. Bij de knip zijn de
        bestandsnaam en de handhaverlijst meeverhuisd naar boeken.js en is de
        regel zelf letterlijk gelijk gebleven -- anders wijst de wet naar een
-       verplaatste regel en toetst ze niets meer. */
+       verplaatste regel en toetst ze niets meer. Die schrijfweg woont inmiddels
+       in ./boeking.js; boeken.js was een dode kopie met een sleutelloze
+       boekAsync en is op 6 oktober 2026 verwijderd. */
     /* DERTIEN REGELS STONDEN HIER EN ZIJN ER WEER AF, en ze stonden er te lang.
        De communicatiekern en wat eraan vastzit (comm/index, comm/wie, de twee
        comm-deuren, auth, vergeten), de zes van de werkplaats-ronde
@@ -875,6 +877,52 @@ console.log('\n15) id\'s in de client uit de CSPRNG, niet uit de klok of Math.ra
     }
   });
   if (!mist) ok(pag + ' pagina\'s die RTGId gebruiken laden shared/id.js (zonder defer)');
+}
+
+/* 15b) wie RTGStroom gebruikt, laadt shared/stroom.js -- zonder defer.
+
+   Dezelfde vorm als de tweede helft van regel 15, om dezelfde reden. Sinds een
+   live-stroom en een <video> geen sessie meer in het adres dragen (POST
+   /api/stroom/ticket, server/kern/sessiestroom.js), opent elk scherm zijn
+   stroom via RTGStroom. Ontbreekt de helper op een pagina, dan geeft
+   `RTGStroom.open` een ReferenceError die in een try wordt opgevangen -- en dan
+   is de stroom er gewoon niet, zonder melding. Dat is het stille gat dat deze
+   regel dichthoudt. De metgezel laadt hem zelf pas als hij een stroom opent
+   (hij staat op bijna elk scherm en opent er bijna nooit een); die roept
+   RTGStroom daarom nooit rechtstreeks aan en valt hier niet onder. */
+console.log('\n15b) wie RTGStroom gebruikt, laadt shared/stroom.js (zonder defer)');
+{
+  const gebruikers = new Set();
+  loop(path.join(ROOT, 'public'), /\.(js|html)$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/') || rel === 'public/shared/stroom.js') return;
+    if (/\bRTGStroom\.\w+\s*\(/.test(fs.readFileSync(f, 'utf8'))) gebruikers.add(rel.replace(/^public\//, ''));
+  });
+  let mist = 0, pag = 0;
+  loop(path.join(ROOT, 'public'), /\.html$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/')) return;
+    const bron = fs.readFileSync(f, 'utf8');
+    const eigen = rel.replace(/^public\//, '');
+    const map = path.posix.dirname(eigen);
+    let nodig = gebruikers.has(eigen);
+    for (const m of bron.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)) {
+      const src = m[1].split('?')[0];
+      const doel = src.startsWith('/') ? src.slice(1) : path.posix.normalize(path.posix.join(map, src));
+      if (gebruikers.has(doel)) nodig = true;
+    }
+    if (!nodig) return;
+    pag++;
+    if (!/<script[^>]*\ssrc="\/shared\/stroom\.js"/.test(bron)) {
+      mist++;
+      fout('RTGStroom zonder /shared/stroom.js: ' + rel + ' -- laad hem in (zonder defer, vooraan)');
+    } else if (/<script[^>]*\ssrc="\/shared\/stroom\.js"[^>]*\s(defer|async)/.test(bron)) {
+      mist++;
+      fout('stroom.js met defer/async: ' + rel + ' -- dan is RTGStroom er niet als het scherm zijn stroom opent');
+    }
+  });
+  if (!gebruikers.size) fout('geen enkel scherm gebruikt RTGStroom -- dan meet deze regel niets (keuringsregel 15b)');
+  else if (!mist) ok(pag + ' pagina\'s die RTGStroom gebruiken laden shared/stroom.js (zonder defer)');
 }
 
 /* 16) een pad met een DERDE PARTIJ gaat langs de gegevenspoort.
@@ -2201,7 +2249,11 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
     .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
     .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
   const KOP = /req\.get\(\s*['"]authorization['"]\s*\)|req\.headers\s*\[\s*['"]authorization['"]\s*\]|req\.headers\.authorization/i;
-  const VERIFIER = /\b(verifyToken|resolveSession|sessionFor|veiligGelijk|verifyActionToken|magAi|scimSleutelOk|apiSleutelOk|magMeten|vanSleutel|accounts\.\w+)\s*\(/;
+  /* `officeQueryMag`/`officeQueryOpNaam` (routes/office.js) zijn sessionFor en
+     verifyToken achter een naam; `sessiestroom.geef` (kern/sessiestroom.js) geeft
+     pas een stroomticket nadat de deur van de gevraagde soort het token heeft
+     goedgekeurd -- dezelfde vraag als die deur stelt. */
+  const VERIFIER = /\b(verifyToken|resolveSession|sessionFor|veiligGelijk|verifyActionToken|magAi|scimSleutelOk|apiSleutelOk|magMeten|vanSleutel|officeQueryMag|officeQueryOpNaam|sessiestroom\.geef|accounts\.\w+)\s*\(/;
   const VENSTER = 12;   // regels waarbinnen de verificatie moet volgen
   /* Plekken die de kop bewust lezen zonder te verifieren. Vandaag leeg, en dat
      hoort zo te blijven: wie hier iets toevoegt legt uit waarom betasten hier
@@ -2282,6 +2334,59 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
   });
   if (!los) ok(gekeurd + ' plekken lezen de Authorization-kop, en elk daarvan verifieert het token (' +
     MAG_BETASTEN.size + ' benoemd als uitzondering)');
+}
+
+/* 29b) een sessie of bearer staat nooit in een adres.
+
+   Een adres staat in proxy- en serverlogs, in de browsergeschiedenis en in een
+   Referer. Toch reisde de volledige sessie (dertig dagen geldig) als ?token=
+   naar vijf deuren -- /api/stream, de zaak- en kantoorstroom, de theaterdeur en
+   de paspoortscan -- en lazen drie middlewares hem als terugval uit de query.
+   Een live-stroom of <video> opent nu met een stroomticket (POST
+   /api/stroom/ticket, server/kern/sessiestroom.js), een <img> haalt zijn bestand
+   met fetch en de kop.
+
+   Twee helften, en ze vangen elk een andere kant:
+   - SERVER: geen enkele module leest een token uit req.query (`req.query.token`,
+     `req.query.leraarToken`, `req.query['token']`, of uitgepakt uit req.query).
+     Alleen de AANWEZIGHEIDSvraag mag (`req.query.token !== undefined`): die
+     bestaat juist om zo'n verzoek met 401 te weigeren.
+   - SCHERMEN: geen enkele bron in public/ bouwt een adres met `?token=` of
+     `&token=` (of een ander ...Token=). Een fragment (`#...`) gaat niet naar de
+     server en telt niet. Commentaar telt niet -- een toelichting is geen adres.
+   Een stroomticket (`?ticket=`) is precies de uitweg en valt er dus buiten. */
+console.log('\n29b) een sessie of bearer staat nooit in een adres');
+{
+  const zonder = (t) => String(t).replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1')
+    .replace(/<!--[\s\S]*?-->/g, ' ');
+  const NAAM = '(?:token|[A-Za-z]+Token|bearer|sessie)';
+  const LEES = new RegExp('req\\.query(?:\\.' + NAAM + '\\b|\\[\\s*[\'"]' + NAAM + '[\'"]\\s*\\])(?!\\s*[!=]==\\s*undefined)', 'g');
+  const UITGEPAKT = new RegExp('\\{[^{}]*\\b' + NAAM + '\\b[^{}]*\\}\\s*=\\s*req\\.query\\b', 'g');
+  const ADRES = new RegExp('[\'"`][^\'"`\\n#]*[?&]' + NAAM + '=', 'g');
+  let server = 0, scherm = 0, bekeken = 0;
+  loop(path.join(ROOT, 'server'), /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    const bron = zonder(fs.readFileSync(f, 'utf8'));
+    bekeken++;
+    for (const re of [LEES, UITGEPAKT]) for (const m of bron.matchAll(re)) {
+      server++;
+      fout(rel + ' leest een token uit het adres (' + m[0].slice(0, 60) + ') -- een sessie hoort in de kop ' +
+        'Authorization; een stroom opent met een stroomticket (server/kern/sessiestroom.js)');
+    }
+  });
+  const bundel = new Set(Object.keys(require('./bundel').bundels).map(k => 'public/' + k));
+  loop(path.join(ROOT, 'public'), /\.(js|html)$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/') || bundel.has(rel)) return;   // bundeluitvoer = de som van zijn delen
+    const bron = zonder(fs.readFileSync(f, 'utf8'));
+    bekeken++;
+    for (const m of bron.matchAll(ADRES)) {
+      scherm++;
+      fout(rel + ' zet een token in een adres (' + m[0].slice(0, 60) + ') -- gebruik RTGStroom.open, ' +
+        'RTGStroom.kijk of fetch met de kop Authorization (shared/stroom.js)');
+    }
+  });
+  if (!server && !scherm) ok(bekeken + ' bestanden bekeken: geen token uit req.query, geen token in een adres');
 }
 
 /* 30) een schermtoets luistert naar paginafouten via het gedeelde hulpje.
@@ -3433,7 +3538,8 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
     ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],
     ['server/opzet/lijfpoort.js', 'bouwt de duurzame vastlegger voor het kritiekspoor: een geldhandeling, privacyexport of machtiging gaat pas door als de regel `toegestaan` aantoonbaar staat (A-P1-05)'],
-    ['server/kern/pay/index.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed'],
+    ['server/kern/pay/idemlaag.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed (de idem-laag van RTG Pay; stond op kern/pay/index.js tot die op 7 oktober 2026 is geknipt -- VERPLAATST, niet gegroeid)'],
+    ['server/betaal/connect/index.js', 'geld naar een partner: een afrekening staat duurzaam op schijf VOOR Stripe wordt aangeroepen, en een Connect-melding krijgt pas 200 als haar stand en boeking vaststaan -- anders weet de veeg na een herstart niet wat er al vertrok (7 oktober 2026)'],
     ['server/kern/economie/runtime/index.js', 'economische waarheid: intent, ledger en evidence worden vóór bevestiging als één bundel vastgelegd'],
     ['server/kern/fonds.js', 'fondsallocatie: een bevestigde verdeling mag niet na een herstart verdwijnen'],
     ['server/kern/factuurcorrectie.js', 'geld terug naar een lid: de terugboeking en de correctieregel horen als een duurzame commit op schijf, net als de heenweg in kern/factuursaldo.js -- een lid dat "terugbetaald" leest terwijl de opslag het nog niet heeft, is precies de halve uitkomst waar de factuurproef voor is gebouwd'],

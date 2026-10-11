@@ -204,6 +204,10 @@ test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
    gezin/stroom/ticket, gezin/sessie/verleng en gezin/passkey/weg), alle zes als router.post of
    router.get op dezelfde /api/foundation-router. /api/rtf/gezin/passkey schrijft zijn volle
    adres op en wordt gewoon gezien. */
+/* EN VAN 593 NAAR 594 (stroomtickets, be127cdc1): POST /api/foundation/school/belkanaal/ticket
+   in server/school/bellen.js, als router.post('/school/belkanaal/ticket') op dezelfde
+   /api/foundation-router -- weer de bekende vorm. Vastgesteld door de lijst gemiste routes op
+   bd424df3d (593) naast die op deze tak (594) te leggen: dit is het enige verschil. */
 /* DE TWEE GETALLEN STAAN SINDS 6 OKTOBER 2026 IN NORM.json (meters
    `bronscannerGemist` en `bronscannerSpook`) en niet meer als constante hier.
    De geschiedenis hierboven blijft staan, want die is de reden van het getal.

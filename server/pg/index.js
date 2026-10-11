@@ -138,9 +138,12 @@ function maakPg({ merge3, kluis, log, url, onFout }) {
   const flushVoorrang = (dataNu) => flush(dataNu, false, VOORRANG);
 
   // een autoritatieve read-modify-write op een collectie; zie ./collectietransactie.js
-  const { bewerkCollectie } = require('./collectietransactie')(ctx);
-  const { boekEenmaal } = require('./economische-boeking')(ctx);
-  const { commitVerzoek, openstaandeWijzigingen } = require('./verzoektransactie')(ctx);
+  /* De requestcommit eerst: zijn schrijver gaat mee naar de twee vroege
+     commitpaden, zodat zij het auditspoor van het verzoek met DEZELFDE
+     samenvoeging in hun eigen transactie meenemen (./verzoekschrijf.js). */
+  const { commitVerzoek, openstaandeWijzigingen, schrijver } = require('./verzoektransactie')(ctx);
+  const { bewerkCollectie } = require('./collectietransactie')(ctx, schrijver);
+  const { boekEenmaal } = require('./economische-boeking')(ctx, schrijver);
 
   // Luister op NOTIFY zodat wijzigingen van andere instances vrijwel direct
   // binnenkomen (geen puur pollen). De aparte client blijft open staan.

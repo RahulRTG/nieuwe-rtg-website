@@ -48,7 +48,13 @@ const stappen = [
   ['Releasebewijs maken', process.execPath, ['scripts/release-bewijs.js']],
   ['Releasebewijs terugverifiëren', process.execPath, ['scripts/release-bewijs.js', '--controle']]
 ];
+/* DE V1-BASELINE VAN DE VRIJGAVEPOORT staat als eigen stap NAAST de go-live-
+   keuring (die hem ook draagt), zodat een gezakte baseline in de releasepoort
+   met haar eigen naam zakt en niet verdwijnt tussen twintig andere blokkades.
+   In de releaseconfiguratie (NODE_ENV=production): de lokale sandbox bestaat
+   daar niet, en een stand die niemand zette is dicht. */
 if (process.argv.includes('--productie')) stappen.splice(9, 0,
+  ['Vrijgavebaseline V1', process.execPath, ['scripts/vrijgave-stand.js', '--controle']],
   ['Productieconfiguratie en papierwerk', process.execPath, ['scripts/golive.js']]);
 
 const controles = [];

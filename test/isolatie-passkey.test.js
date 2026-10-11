@@ -85,7 +85,7 @@ async function nieuwLid() {
    Vorm letterlijk overgenomen uit test/rtgid.test.js. */
 async function passkeyVoor(token) {
   const a = maakAuthenticator(rpID);
-  const o = await api('/api/webauthn/registreer/opties', {}, token);
+  const o = await api('/api/webauthn/registreer/opties', { huidig: 'geheim123' }, token);
   assert.equal(o.status, 200);
   const r = await api('/api/webauthn/registreer',
     { antwoord: a.registratieAntwoord(o.body.opties.challenge, origin), naam: 'Toetssleutel' }, token);

@@ -76,6 +76,11 @@ module.exports = (ctx) => {
       const r = reserveringVanZaak(id, supplierCode);
       if (!r) return { fout: NIET_VAN_U };
       if (r.tot <= nu()) return { fout: { status: 409, error: 'Deze reservering is verlopen.' } };
+      /* Vastleggen boekt NIEUW geld naar de zaak; na de herhaling en een
+         hervatting (hierboven) vraagt het de vrijgavepoort. Dicht: de
+         reservering blijft staan en kan nog steeds worden vrijgegeven. */
+      const dicht = ctx.vrijgavePoort ? ctx.vrijgavePoort.intern() : null;
+      if (dicht) return { fout: dicht };
       const c = centen == null ? r.centen : Math.round(Number(centen));
       if (!Number.isFinite(c) || c <= 0) return { fout: { status: 400, error: 'Dat bedrag kan niet.' } };
       if (c > r.centen) return { fout: { status: 409, error: 'Boven het gereserveerde bedrag.', gereserveerd: r.centen } };

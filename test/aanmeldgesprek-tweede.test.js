@@ -180,7 +180,7 @@ test('4. foute codes op het bewijs uit het gesprek tellen in de gedeelde rem: na
 
 test('5. een account dat zijn organisatie op non-actief zette, krijgt uit het gesprek geen token', async () => {
   // de eigenaar koppelt een organisatie met een domein en haalt een SCIM-sleutel
-  const zw = await zwaarApi((p, b, t) => api(p, b, t), srv.base, eigenaarToken);
+  const zw = await zwaarApi((p, b, t) => api(p, b, t), srv.base, eigenaarToken, EIGENAAR_WW);
   const sso = await zw('/api/techniek/sso', { org: 'ag2org', naam: 'Gesprek BV', issuer: 'https://login.ag2-idp.test',
     clientId: 'rtg-ag2', clientSecret: 'ag2-geheim', domeinen: ['ag2-org.test'], actief: true }, eigenaarToken);
   assert.equal(sso.status, 200, 'SSO-koppeling: ' + JSON.stringify(sso.body).slice(0, 200));

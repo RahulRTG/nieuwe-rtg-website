@@ -97,6 +97,10 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
       return k && k.heel === false ? (k.waarom || 'de keten is gebroken') + ' (bij ' + k.bij + ')' : null;
     });
 
+    // audit P1-4
+    probeer('auditspoor-gebroken', 'Auditspoor gebroken of niet verankerd', 'hoog', () =>
+      require('../../lib/auditwacht').bevinding());
+
     voegAanvullendeAlarmcontrolesToe(probeer, { slo, kwaliteit, d });
 
     return uit;

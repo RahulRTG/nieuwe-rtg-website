@@ -14,6 +14,7 @@
    hebben. Draai ze daarom serieel via `npm run test:pg` (of geef elke toets een
    eigen database). */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
@@ -30,7 +31,7 @@ function api(base, pad, body, token) {
 const wacht = ms => new Promise(r => setTimeout(r, ms));
 
 test('Postgres-ledengids: een nieuw lid landt in de gids en telt mee in de kantoor-totalen',
-  { skip: HEEFT_PG ? false : 'geen DATABASE_URL: Postgres-ledengids overgeslagen' }, async () => {
+  { skip: vereist('pg', !!HEEFT_PG, 'geen DATABASE_URL: Postgres-ledengids overgeslagen') }, async () => {
   // verse lokale data-dir (de gedeelde waarheid staat in Postgres, maar de lokale
   // cache/snapshot moet schoon zijn zodat oude runs niet meetellen)
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gids-'));

@@ -149,7 +149,8 @@ test('5. A3 slaat uit: een kantoorroute zonder bekende poort wordt geteld, de re
 });
 
 test('6. de paspoortscan is op naam, zoals de lijst waar de link uit komt', async () => {
-  const doc = (token) => fetch(srv.base + '/api/office/doc?file=bestaat-niet.jpg&token=' + encodeURIComponent(token));
+  // de sessie in de KOP: een token in het adres wordt geweigerd (keuringsregel 29b)
+  const doc = (token) => fetch(srv.base + '/api/office/doc?file=bestaat-niet.jpg', { headers: { Authorization: 'Bearer ' + token } });
   assert.equal((await doc(gedeeld)).status, 403, 'de gedeelde code opent geen identiteitsbewijs');
   assert.equal((await doc(opNaam)).status, 404, 'een kantoormens op naam komt door de deur (en vindt dan het bestand niet)');
   assert.equal((await doc(eig)).status, 404);

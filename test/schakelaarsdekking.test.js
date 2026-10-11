@@ -220,7 +220,16 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      weg op waarom het dicht staat. Met dezelfde reden in kern/bestuursroutes.js EN in
      kern/platformregister/bediening.js; test/platformregister.test.js was groen voordat
      dit getal werd verzet. `onverklaard <= 10` beweegt niet mee. */
-  assert.ok(zonder.length <= 152,
+  /* 152 -> 153: HET RUILLOKET VAN DE STROOMTICKETS (POST /api/stroom/ticket, de
+     stap die de sessie uit het adres van een stroom haalde). Het opent zelf niets:
+     elke stroomdeur erachter heeft haar eigen schakelaar (kern-live voor
+     /api/stream), en een knop hier zou alle stromen van alle soorten tegelijk
+     dichtzetten -- ook die van kantoor en eigenaar, die hun stroom in onderhoud
+     nodig hebben. Met reden in kern/bestuursroutes.js EN in
+     kern/platformregister/bediening.js; test/platformregister.test.js was groen
+     voordat dit getal werd verzet. `onverklaard <= 10` beweegt niet mee: de route
+     telde daar mee (11) en is nu verklaard. */
+  assert.ok(zonder.length <= 153,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');

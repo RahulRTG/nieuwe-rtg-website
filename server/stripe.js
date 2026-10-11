@@ -24,6 +24,11 @@ function Stripe(apiKey, opts) {
   async function post(pad, params, extra) {
     const headers = { authorization: 'Bearer ' + apiKey, 'user-agent': 'rtg-stripe/1', 'stripe-version': '2024-06-20' };
     if (extra && extra.idempotencyKey) headers['idempotency-key'] = String(extra.idempotencyKey);
+    /* Connect: een handeling OP een verbonden account (een payout van zijn
+       saldo naar zijn bank) gaat met de Stripe-Account-kop, nooit door het
+       account-id in de parameters te stoppen -- dan doet Stripe het op het
+       platformaccount. */
+    if (extra && extra.stripeAccount) headers['stripe-account'] = String(extra.stripeAccount);
     const r = await http.vraag({ url: BASIS + pad, form: params || {}, headers, timeout, maxRetries: 1 });
     let data = {}; try { data = r.json(); } catch (e) {}
     if (r.status >= 200 && r.status < 300) return data;
@@ -33,8 +38,9 @@ function Stripe(apiKey, opts) {
     throw fout;
   }
 
-  async function get(pad) {
+  async function get(pad, extra) {
     const headers = { authorization: 'Bearer ' + apiKey, 'user-agent': 'rtg-stripe/1', 'stripe-version': '2024-06-20' };
+    if (extra && extra.stripeAccount) headers['stripe-account'] = String(extra.stripeAccount);
     const r = await http.vraag({ url: BASIS + pad, method: 'GET', headers, timeout, maxRetries: 1 });
     let data = {}; try { data = r.json(); } catch (e) {}
     if (r.status >= 200 && r.status < 300) return data;
@@ -55,7 +61,16 @@ function Stripe(apiKey, opts) {
       create(params, extra) { return post('/v1/refunds', params, extra); },
       retrieve(id) { return get('/v1/refunds/' + encodeURIComponent(String(id))); }
     },
-    payouts: { create(params, extra) { return post('/v1/payouts', params, extra); } },
+    payouts: {
+      create(params, extra) { return post('/v1/payouts', params, extra); },
+      retrieve(id, extra) { return get('/v1/payouts/' + encodeURIComponent(String(id)), extra); }
+    },
+    /* Een transfer verplaatst saldo van het platform naar een verbonden account
+       (server/betaal/connect/). */
+    transfers: {
+      create(params, extra) { return post('/v1/transfers', params, extra); },
+      retrieve(id) { return get('/v1/transfers/' + encodeURIComponent(String(id))); }
+    },
     webhooks: {
       /* Stripe-handtekening: de header is "t=<tijd>,v1=<hmac>,...". De getekende
          payload is `${t}.${ruweBody}`; de HMAC-SHA256 met het endpoint-secret

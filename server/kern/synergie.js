@@ -6,6 +6,8 @@
    beweging naar alle deelnemers, exact volgens de afgesproken aandelen: de
    som van de aandelen MOET de pakketprijs zijn (fail-fast, geen stille
    afrondingen). maakSynergie(state) volgt het vaste kern-patroon. */
+const { maakSleutel } = require('../db/economische-identiteit');
+
 function maakSynergie({ db, save, crypto, schoon, findSupplier, notifySupplier, pay }) {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/synergie', bezit: { synergie: 'lijst', synergieKopen: 'lijst' } });
   const id = () => 'syn' + crypto.randomBytes(4).toString('hex');
@@ -104,12 +106,19 @@ function maakSynergie({ db, save, crypto, schoon, findSupplier, notifySupplier, 
       return { ok: true, deal: { id: d.id, naam: d.naam }, alBetaald: true };
     const rek = 'lid:' + codenaam;
     if (pay.saldoVan(rek) < d.prijsCenten) return { status: 402, error: 'Onvoldoende saldo voor dit pakket.' };
-    for (const a of d.aandelen.filter(a => a.centen > 0)) {
+    /* Elk aandeel draagt een economische sleutel: met een idem van de client
+       herkent het grootboek een herhaling na een crash (de JS-lijst hierboven
+       is dan nog niet bewaard), zonder idem is dit een eigen aankoop. */
+    const koop = sleutel || id();
+    const aandelen = d.aandelen.filter(a => a.centen > 0);
+    for (let i = 0; i < aandelen.length; i++) {
+      const a = aandelen[i];
       const b = await pay.boekAsync({ van: rek, naar: 'partner:' + a.code, centen: a.centen,
-        soort: 'pakket', oms: 'Pakket ' + d.naam, ref: d.id });
+        soort: 'pakket', oms: 'Pakket ' + d.naam, ref: d.id,
+        economischeSleutel: maakSleutel('pay-handeling', ['synergie', codenaam, koop, d.id, i]) });
       if (b.error) return b;
     }
-    store().synergieKopen.unshift({ idem: sleutel || id(), codenaam, dealId: d.id, at: nu() });
+    store().synergieKopen.unshift({ idem: koop, codenaam, dealId: d.id, at: nu() });
     if (store().synergieKopen.length > 5000) store().synergieKopen.pop();
     zeg(d, null, 'Pakket "' + d.naam + '" is geboekt door ' + codenaam + '.');
     save();

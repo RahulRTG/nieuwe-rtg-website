@@ -15,6 +15,7 @@
    hebben. Draai ze daarom serieel via `npm run test:pg` (of geef elke toets een
    eigen database). */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 
 const URL = process.env.DATABASE_URL || process.env.PG_URL;
@@ -23,7 +24,7 @@ const URL = process.env.DATABASE_URL || process.env.PG_URL;
 // afwezig 'pg'-pakket meer (dat zou een vals-groene test zijn).
 
 if (!URL) {
-  test('chaos-schrijvers (overgeslagen: geen DATABASE_URL)', { skip: true }, () => {});
+  test('chaos-schrijvers (overgeslagen: geen DATABASE_URL)', { skip: vereist('pg', false, 'geen DATABASE_URL') }, () => {});
 } else {
   process.env.PG_POOL_MAX = process.env.PG_POOL_MAX || '4';
   const { merge3 } = require('../server/db');

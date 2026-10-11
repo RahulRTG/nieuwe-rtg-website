@@ -160,6 +160,7 @@ module.exports = (kern, hulp) => {
        omheen, en dat is precies verkeerd: scopeMag() draagt zijn eigen `ok`, en
        een tweede eromheen maakt van "mag niet" een geslaagd antwoord. */
     res.json(scopeMag(String(b.persoon || ''), String(b.recht || ''), doel,
+      /* `binnen`: anders las een eigenaar via `bijna` iemands rollen bij ANDERE werkgevers. */
       { kwalificatie: b.kwalificatie || null, binnen: e.id }));
   });
 

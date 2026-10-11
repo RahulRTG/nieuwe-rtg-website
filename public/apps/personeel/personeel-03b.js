@@ -63,3 +63,39 @@
     $('#toForgot').addEventListener('click', stepForgot);
     $('#toDevice').addEventListener('click', stepSector);
   }
+  /* DE TWEEDE STAP (N19). Staat de tweede factor van het account aan, dan geeft
+     het wachtwoord alleen een bewijs, en DEZELFDE route ruilt dat met een code
+     om (server/routes/supplier/pda/posities-inlog.js). Het gevraagde bedrijf
+     reist mee. Een verlopen bewijs brengt u terug naar het wachtwoord. Zelfde
+     veld als de leden-app en de techniekpagina: een code of een herstelcode. */
+  function stapCode(d, bedrijf){
+    teamAccessView('second', 'pd.access.second', 'Bevestig dat u het bent.',
+      'pd.access.secondhelp', 'Vul de code uit uw authenticator-app of een van uw herstelcodes in.');
+    $('#gateStep').innerHTML = teamBack('tcBack')+
+      '<form class="lform" id="codeForm" autocomplete="off">'+
+        teamField('tcCode', 'pd.tc.code', 'Code uit uw authenticator of herstelcode', 'text',
+          'autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" '+
+          'aria-label="'+esc(T('pd.tc.code', 'Code uit uw authenticator of herstelcode'))+'" data-i18n-aria="pd.tc.code" required')+
+        '<div class="access-error" id="tcErr" role="alert" data-i18n-ignore></div>'+
+        '<button class="access-primary" type="submit">'+teamText('pd.access.codego', 'Bevestig en ga naar mijn werkplek.')+'</button>'+
+      '</form>';
+    $('#tcBack').addEventListener('click', stepLogin);
+    $('#codeForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      $('#tcErr').textContent = '';
+      const btn = e.target.querySelector('button[type="submit"]'); btn.disabled = true;
+      try {
+        const r = await API.call('/supplier/mijn/login', { bewijs: d.bewijs, code: $('#tcCode').value.trim(), bedrijf: bedrijf || '' });
+        await landMijn(r);
+        if (r.let) toast(r.let);   // bijvoorbeeld: nog twee herstelcodes over
+      } catch(err){
+        btn.disabled = false; $('#tcCode').value = '';
+        // verlopen of niet meer geldig: terug naar het wachtwoord, met de reden
+        if (err.status === 401) { stepLogin(); $('#liErr').textContent = err.message; return; }
+        $('#tcErr').textContent = err.data && err.data.kantoor
+          ? T('pd.ka.tweede', 'Uw account heeft toegang tot RTG Kantoor en vraagt een tweede stap. Log in via de leden-app en open daar Mijn werkplekken, Backoffice.')
+          : (err.message || T('pd.mis', 'Er ging iets mis.'));
+      }
+    });
+    try { $('#tcCode').focus(); } catch(e){}
+  }

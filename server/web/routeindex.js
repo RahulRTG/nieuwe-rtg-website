@@ -51,6 +51,23 @@ function samenvoegen(a, b) {
   while (j < b.length) uit[n++] = b[j++];
   return uit;
 }
+/* WELKE VASTE ROUTEPADEN EEN VERZOEKPAD KAN BEREIKEN.
+
+   padMatch() in ./routing.js laat een vast pad ook matchen MET een afsluitende
+   slash, en verder niets: geen hoofdletters, geen procentcodering, geen dubbele
+   slash, geen punt-segment. kandidaten() hieronder zoekt alleen op de sleutels
+   die deze functie geeft, dus een vast pad dat hier niet uitkomt, bereikt de
+   router ook niet.
+
+   Een poort die op een lijst vaste paden beslist, leest via deze functie (de
+   inlogpauze in ../middleware/remmen.js). Anders heeft hij een tweede opvatting
+   van "dit pad" naast die van de router, en dat was precies het gat: de pauze
+   vergeleek letterlijk, de router liet /api/auth/login/ bij dezelfde handler
+   komen (N18 in de V1-audit). */
+function vastePaden(pn) {
+  return pn.length > 1 && pn.charCodeAt(pn.length - 1) === 47 ? [pn, pn.slice(0, -1)] : [pn];
+}
+
 // Eerste positie in de (oplopende) lijst met een waarde groter dan `na`.
 function eersteNa(lijst, na) {
   if (na < 0) return 0;
@@ -94,8 +111,9 @@ function maakDispatchIndex(lagen) {
     let raak = false;
     /* padMatch() laat een vast pad ook matchen MET afsluitende slash, en de
        router laat HEAD op een GET-route vallen. Allebei zijn het dus extra
-       sleutels om op te zoeken -- niet iets wat de index mag missen. */
-    const paden = pn.length > 1 && pn.charCodeAt(pn.length - 1) === 47 ? [pn, pn.slice(0, -1)] : [pn];
+       sleutels om op te zoeken -- niet iets wat de index mag missen. De
+       paden komen uit vastePaden(), dezelfde functie die de inlogpauze leest. */
+    const paden = vastePaden(pn);
     const methodes = methode === 'HEAD' ? ['HEAD', 'GET'] : [methode];
     for (const m of methodes) for (const p of paden) {
       const a = ix.exact.get(m + '\0' + p);
@@ -109,4 +127,4 @@ function maakDispatchIndex(lagen) {
   return { kandidaten, weg, eersteNa };
 }
 
-module.exports = { maakDispatchIndex, samenvoegen, eersteNa, CACHE_MAX };
+module.exports = { maakDispatchIndex, samenvoegen, eersteNa, vastePaden, CACHE_MAX };

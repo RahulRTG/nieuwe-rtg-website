@@ -12,6 +12,8 @@
    late binding. Verder alleen de schrijvers (opzet/envelop.js, de kostenhaak,
    kern/dienstidentiteit.js) en de montage; test/verzoekframe.test.js zakt
    zodra er een lezer bij komt voordat dat een besluit IS.
+   Het frame is ook de ENIGE bron van de keten (6 oktober 2026): het opent de
+   Trust & Evidence-wortel zelf, zie kern/bewijsvlak/context.js.
 
    DE VAKKEN
      correlatie    van de server (lib/correlatie.js), nooit een kop
@@ -31,28 +33,14 @@
    frame in de nulcontext, met de oorzaak erin.
    ========================================================================== */
 'use strict';
-const { AsyncLocalStorage } = require('async_hooks');
-const correlatie = require('../lib/correlatie');
 const envelop = require('../kern/envelop');
+const trust = require('../kern/bewijsvlak/context');
 const haak = require('../kern/kosten/haak');
 const { oorzaakVan } = require('../kern/agentteken');
 const { losVanVerzoek } = require('../lib/losvanverzoek');
 const { naAntwoord } = require('../lib/antwoord-einde');
-
-const winkel = new AsyncLocalStorage();
-const SOORTEN = Object.freeze(['verzoek', 'dienst', 'webhook', 'overdracht']);
-const GEEN_HOEDANIGHEID = Object.freeze({ naam: null, sinds: null,
-  reden: 'de sessie draagt geen hoedanigheid; alleen een aan de sessiesleutel getoetste machtiging kan er een geven' });
-const tellers = { geopend: 0, geidentificeerd: 0, herkend: 0, tweedeIdentiteit: 0, naSluiten: 0, overgedragen: 0,
-  codenaamGeweigerd: 0 };
+const { winkel, SOORTEN, tellers, nieuw } = require('./verzoekframe-winkel');
 const vanReq = new WeakMap();
-
-function nieuw({ soort, correlatie: c, extern, oorzaak } = {}) {
-  tellers.geopend++;
-  return { correlatie: c || correlatie.nieuw(), extern: extern || null, oorzaak: oorzaak || null,
-    soort: SOORTEN.includes(soort) ? soort : 'verzoek', actor: null, hoedanigheid: GEEN_HOEDANIGHEID,
-    drager: null, stand: 'open' };
-}
 
 const fout = (code, tekst) => Object.assign(new Error(tekst), { code });
 
@@ -65,19 +53,24 @@ function middleware() {
        intern aanroept), en dan zegt het antwoord hem terug aan die aanroeper. */
     const f = nieuw({ soort: 'verzoek', correlatie: req.id, extern: req.externeId, oorzaak: oorzaakVan(req) });
     if (f.oorzaak && typeof res.setHeader === 'function') res.setHeader('X-RTG-Oorzaak', f.oorzaak);
-    vanReq.set(req, f);
+    /* De trust-wortel is een lezer van dit frame: keten = chain_<correlatie>. */
+    const tc = trust.maak({ chainId: trust.ketenVan(f.correlatie), requestId: req.id || null, phase: 'request' });
+    req.trustContext = tc;
+    if (typeof res.setHeader === 'function') res.setHeader('X-RTG-Correlation', tc.chainId);
+    vanReq.set(req, { f, tc });
     const dicht = () => sluit(f);
     naAntwoord(res, dicht); res.on('close', dicht);
-    return winkel.run(f, next);
+    return winkel.run(f, () => trust.inContext(tc, next));
   };
 }
 
 /* De body-lezer kan de keten breken; zelfde vorm als handeling.hervat(). */
 function hervat() {
   return function verzoekframeHervat(req, res, next) {
-    const f = vanReq.get(req);
-    if (!f || winkel.getStore() === f) return next();
-    return winkel.run(f, next);
+    /* Ook de trust-wortel terug, als zichzelf. */
+    const h = vanReq.get(req);
+    if (!h || (winkel.getStore() === h.f && trust.huidige() === h.tc)) return next();
+    return winkel.run(h.f, () => trust.inContext(h.tc, next));
   };
 }
 
@@ -162,9 +155,13 @@ function overdraag(fn, opties) { tellers.overgedragen++; return achtergrond('ove
 /* Wat de bus-envelop uit het frame leest -- en niets meer. Een gesloten frame
    levert niets: werk na afloop erft geen verzoekidentiteit (I4). De oorzaak is
    het werk dat dit frame veroorzaakte, en anders het verzoek zelf. */
+/* Gesloten is leeg, niet null: null zegt "geen frame", en dan erft werk na
+   afloop via de trust-keten (kind van dit frame) de verzoekketen. */
+const GESLOTEN = Object.freeze({ correlatie: null, oorzaak: null, actor: null, hoedanigheid: null });
 function voorBus() {
   const f = winkel.getStore();
-  if (!f || f.stand === 'gesloten') return null;
+  if (!f) return null;
+  if (f.stand === 'gesloten') return GESLOTEN;
   const h = f.hoedanigheid;
   return { correlatie: f.correlatie, oorzaak: f.oorzaak || f.correlatie, actor: f.actor ? f.actor.codenaam : null,
     hoedanigheid: h && h.naam ? { naam: h.naam, grond: h.grond || null } : null };

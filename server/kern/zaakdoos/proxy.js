@@ -8,6 +8,31 @@ module.exports = (ctx) => {
   const { db, save, fs, path, nu, st, teller, journaal, naarLokaal,
     CLOUD, SLEUTEL, GEBRUIKER, WACHTWOORD, actief, HOP, KAS_DIR, KAS_MAX_BESTAND, KAS_MAX_STUKS,
     journaalPadOk, journaalZegel, journaalGeldig, JOURNAAL_MAX_BODY } = ctx;
+  const bodyHulp = require('../../web/body');
+  const PROXY_BODY_MAX = 8 * 1024 * 1024;
+  const LEESFOUT = Symbol('zaakdoos-leesfout');
+
+  /* Lees een schrijvend verzoek eenmaal en bewaar de exacte bytes op het
+     verzoek. Bij een gezonde lijn gaan die bytes naar de cloud. Valt de lijn
+     tijdens ditzelfde verzoek weg, dan kan de gewone lokale body-parser ze via
+     `_rtgProxyBody` opnieuw lezen. Zonder deze overdracht was de stream al op:
+     de eerste offline login hing dan tot de client-time-out en de handeling kon
+     dus ook niet in het journaal komen. De 8 MB-grens is dezelfde bovengrens
+     als de centrale lijfpoort; kleinere routegrenzen worden daar alsnog
+     toegepast wanneer lokaal wordt teruggevallen. */
+  async function leesProxyBody(req, res) {
+    if (!bodyHulp.heeftBody(req)) return undefined;
+    try {
+      const buf = await new Promise((resolve, reject) => {
+        bodyHulp.leesBody(req, PROXY_BODY_MAX, (err, bytes) => err ? reject(err) : resolve(bytes));
+      });
+      req._rtgProxyBody = buf;
+      return buf;
+    } catch (e) {
+      res.status(e && e.status || 400).json({ error: e && e.status === 413 ? 'Verzoek is te groot.' : 'Ongeldige invoer.' });
+      return LEESFOUT;
+    }
+  }
 
   /* ---------- de randcache: media blijft op het kastje ----------
      Elke Salon-foto die eenmaal via het doorgeefluik langskwam, bewaart de doos
@@ -58,10 +83,13 @@ module.exports = (ctx) => {
     const headers = {};
     for (const [k, v] of Object.entries(req.headers)) { if (!HOP.includes(k.toLowerCase())) headers[k] = v; }
     let r;
+    const zonderBody = req.method === 'GET' || req.method === 'HEAD';
+    const body = zonderBody ? undefined : await leesProxyBody(req, res);
+    if (body === LEESFOUT) return true;
     try {
       r = await fetch(CLOUD() + req.originalUrl, {
         method: req.method, headers,
-        body: (req.method === 'GET' || req.method === 'HEAD') ? undefined : req,
+        body,
         duplex: 'half', signal: AbortSignal.timeout(45000)
       });
     } catch (e) {

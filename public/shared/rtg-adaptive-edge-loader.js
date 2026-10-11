@@ -58,6 +58,8 @@
           add('script', '/shared/rtg-adaptive-edge-controls.js', 'RTGAdaptiveEdgeControls', function (bediening) {
           if (!bediening) return;
           add('script', '/shared/rtg-adaptive-edge-surface.js', 'RTGAdaptiveEdgeSurface', function () {
+          add('script', '/shared/rtg-adaptive-edge-services.js', 'RTGAdaptiveEdgeServices', function (diensten) {
+          if (!diensten) return;
           add('script', '/shared/rtg-adaptive-edge.js', 'RTGAdaptiveEdge', function (klaar) {
             if (!klaar) return;
             w.RTGAdaptiveEdge.start(d, w);
@@ -65,6 +67,7 @@
             add('script', '/shared/rtg-adaptive-edge-signals.js', 'RTGAdaptiveEdgeSignals', function (brug) {
               if (brug) w.RTGAdaptiveEdgeSignals.start(d, w);
             });
+          });
           });
           });
           });

@@ -47,6 +47,14 @@ const HERSTEL_SMS_BEWUST_UIT = process.env.RTG_HERSTEL_SMS_UIT_BEWUST === '1';
 
    Dus een functie, en de route roept hem aan. De balie straks ook. Wie de regels
    verandert, verandert ze voor allebei. */
+/* EEN plek voor de vraag "geeft het herstel met telefoon nu een link uit?".
+   herstelStart weigert erop, en het overzicht Opnieuw beginnen
+   (kern/opnieuwbeginnen.js) leest hem om niet een tweestapsweg te beloven die
+   in productie dicht staat. Twee kopieen van deze voorwaarde zouden uit elkaar
+   lopen zodra er een sms-kanaal komt. */
+function herstelSmsDicht() { return !!PRODUCTION && (HERSTEL_SMS_BEWUST_UIT || !mail.smsConfigured); }
+kern.herstelSmsDicht = herstelSmsDicht;
+
 function herstelStart(u, req) {
   if (!u) return { ok: true, tweestaps: false };   // bestaan lekken we nooit
   // ook voor de balie: geen basis, geen token (de aanroeper weigert netjes)
@@ -59,7 +67,7 @@ function herstelStart(u, req) {
      ontvangen maakt het account onherstelbaar; link-only doorgaan zou de
      beveiliging juist verlagen. We falen daarom gesloten en houden het
      publieke antwoord generiek. Lokaal blijft de outbox-proef beschikbaar. */
-  if (tel && PRODUCTION && (HERSTEL_SMS_BEWUST_UIT || !mail.smsConfigured)) {
+  if (tel && herstelSmsDicht()) {
     console.error('[auth] herstel veilig geblokkeerd: account heeft telefoon maar er is geen echte SMS-provider.');
     return { ok: true, tweestaps: true, geblokkeerd: true, url: null, code: null };
   }

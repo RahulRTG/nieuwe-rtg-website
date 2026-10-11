@@ -31,10 +31,15 @@
    ziet hem niet; hij krijgt daarom zijn eigen, eenvoudiger vraag: laadt de
    pagina zonder sessie.
 
-   EEN LEEG WERKWOORD IS EEN UITSLAG. `opnieuw beginnen` heeft hier geen enkele
-   functie, en dat is geen vergeten regel maar de bevinding van SAMENLEVING.md
-   par. 2: geen module heeft als opdracht dat iemand na een breuk opnieuw kan
-   instappen. De meter noemt dat `geen-eigenaar` en zwijgt er niet over.
+   EEN LEEG WERKWOORD IS EEN UITSLAG. `opnieuw beginnen` had hier geen enkele
+   functie -- de bevinding van SAMENLEVING.md par. 2: geen module had als
+   opdracht dat iemand na een breuk opnieuw kan instappen. De meter noemde dat
+   `geen-eigenaar`. Sinds 11 oktober 2026 draagt `kern/opnieuwbeginnen.js` het,
+   als PROJECTIE over export, wissen en herstel. Het pad hangt onder
+   /api/privacy en dus onder GEEN functie: de bodem hoort niet uit te zetten te
+   zijn. Zo'n regel draagt `buitenKast` met de reden in plaats van `functie`.
+   Een van de vier onderdelen (een schuld die van je scherm verdwijnt) bestaat
+   nog niet, en de projectie zegt dat zelf.
    ========================================================================== */
 'use strict';
 
@@ -85,7 +90,10 @@ const VERKLARING = {
     { functie: 'dom-gemeente', waarom: 'het gemeenteloket' },
     { functie: 'dom-care', waarom: 'zorg en welzijn' }
   ],
-  'opnieuw-beginnen': []
+  'opnieuw-beginnen': [
+    { buitenKast: 'onder /api/privacy, net als inzage, export en wissen: een recht dat RTG niet kan uitzetten (functies/register/cat-domeinen3.js)',
+      paden: ['/api/privacy/opnieuw'], waarom: 'opnieuw beginnen als projectie: account terug, verleden meenemen en achterlaten (SAMENLEVING.md par. 2)' }
+  ]
 };
 
 module.exports = { WERKWOORDEN, VERKLARING, AFGETEKEND };

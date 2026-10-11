@@ -42,6 +42,19 @@ test('2. elke verklaarde functie bestaat, en een versmalling blijft binnen de fu
         assert.ok(fs.existsSync(path.join(WORTEL, 'public', r.scherm)), ww + ': scherm ' + r.scherm + ' bestaat niet');
         continue;
       }
+      /* Een regel buiten de kast (de AVG-rechten onder /api/privacy staan met
+         opzet in geen enkele functie) draagt de REDEN in plaats van een
+         functie, en zijn paden mogen dan ook door geen functie geclaimd
+         worden -- anders is hij wel uit te zetten en klopt de reden niet. */
+      if (r.buitenKast) {
+        assert.ok(!r.functie && r.paden && r.paden.length, ww + ': een regel buiten de kast noemt paden en geen functie');
+        assert.ok(r.waarom, ww + ': regel buiten de kast zegt niet waarom hij dit werkwoord draagt');
+        for (const p of r.paden) {
+          const claim = FUNCTIES.find((f) => (f.paden || []).some((q) => p === q || p.startsWith(q + '/')));
+          assert.equal(claim, undefined, ww + ': ' + p + ' heet buiten de kast maar valt onder de functie ' + (claim && claim.id));
+        }
+        continue;
+      }
       const f = FUNCTIES.find((x) => x.id === r.functie);
       assert.ok(f, ww + ': functie ' + r.functie + ' staat niet in het functieregister');
       assert.ok(r.waarom, ww + ': ' + r.functie + ' zegt niet waarom hij dit werkwoord draagt');
@@ -112,7 +125,7 @@ test('7. de ratel: de bodem mag alleen breder worden', () => {
      er een verhoogt, zet een deel van de bodem achter betaling en hoort dat
      in SAMENLEVING.md uit te schrijven in plaats van hier een getal op te
      hogen. */
-  const GROND = { verdwenen: 0, geenEigenaar: 1, achterBetaling: 1, deelsAchterBetaling: 5 };
+  const GROND = { verdwenen: 0, geenEigenaar: 0, achterBetaling: 1, deelsAchterBetaling: 5 };   // geenEigenaar 1 -> 0 op 11 okt 2026: opnieuw beginnen kreeg een eigenaar
   assert.ok(meting.telling.verdwenen <= GROND.verdwenen, 'SAM-01: een werkwoord verdween achter betaling');
   assert.ok(meting.telling['geen-eigenaar'] <= GROND.geenEigenaar);
   assert.ok(meting.achterBetaling.length <= GROND.achterBetaling,

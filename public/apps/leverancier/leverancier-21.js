@@ -4,7 +4,7 @@
       html += '<div class="tkc"><h3>'+T('kt.newprice','Prijs doorgeven aan RTG')+'</h3>'+
         '<div class="st-form"><input class="st-in" id="kPrS" placeholder="'+T('kt.service','Dienst, bijv. Luchthaven, centrum')+'">'+
         '<input class="st-in" id="kPrP" type="number" inputmode="decimal" placeholder="€">'+
-        '<button class="bigbtn" id="kPrSend" class="h-mt20">'+T('kt.sendprice','Verstuur naar RTG')+'</button></div>'+
+        '<button class="bigbtn h-mt20" id="kPrSend">'+T('kt.sendprice','Verstuur naar RTG')+'</button></div>'+
         '<div class="tkc-who">'+T('kt.pricenote','RTG-leden betalen uw nettoprijs; u ontvangt altijd het volledige bedrag, RTG rekent 0% commissie.')+'</div></div>';
       html += '<div class="tkc"><h3>'+T('sup.pricehist','Eerder doorgegeven')+'</h3>'+
         (h.length ? h.slice(0,10).map(p=>'<div class="st-row"><span>'+p.service+'<span class="sub">'+timeAgo(p.at)+'</span></span><b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(p.price)+'</b></div>').join('')
@@ -48,7 +48,7 @@
           '<button class="bigbtn" id="mkDealGo">'+T('mk.dealgo','Zet op De Salon')+'</button></div>'+
           (mk.deals.length ? mk.deals.map(d2 =>
             '<div class="st-row"><span>'+d2.titel+'<span class="sub">'+(d2.geldigTot?'t/m '+d2.geldigTot+' · ':'')+d2.claims+' '+T('mk.claims','geclaimd')+' · '+d2.verzilverd+' '+T('mk.verzilverd','verzilverd')+'</span></span></div>').join('') : '')+
-          '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><input class="st-in" id="mkCode" placeholder="RTG-D-XXXXXX" class="h-flex1">'+
+          '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;"><input class="st-in h-flex1" id="mkCode" placeholder="RTG-D-XXXXXX">'+
           '<button class="obtn" id="mkRedeem">'+T('mk.innen','Verzilver')+'</button></div></div>';
         html += '<div class="tkc"><h3>'+T('mk.poll','Vraag het uw leden (poll)')+'</h3>'+
           '<div class="tkc-who">'+T('mk.poll.s','Marketinginzicht: laat leden kiezen en zie live de uitslag.')+'</div>'+

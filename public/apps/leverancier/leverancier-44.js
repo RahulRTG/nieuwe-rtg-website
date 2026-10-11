@@ -35,10 +35,10 @@
     // nieuwe zending: klant, lading, herkomst/bestemming en de etappe-bouwer
     h += '<div class="st-sec h-mt100">'+T('vr.nieuw','Nieuwe zending')+'</div>'+
       '<div style="border:1px solid var(--line);border-radius:0;padding:0.8rem;">'+
-      '<div class="row-gap"><input id="vrKlant" class="st-in" placeholder="'+T('vr.klant','Klant')+'" maxlength="60" class="h-flex2"><input id="vrInhoud" class="st-in" placeholder="'+T('vr.inhoud','Wat gaat er mee (lading)')+'" maxlength="120" style="flex:3;"></div>'+
-      '<div class="row-gap h-mt40"><input id="vrGewicht" class="st-in" type="number" min="1" placeholder="'+T('vr.gewicht','Gewicht (kg)')+'" class="h-flex1"><input id="vrColli" class="st-in" type="number" min="1" placeholder="'+T('vr.colli','Colli')+'" class="h-flex1">'+
+      '<div class="row-gap"><input id="vrKlant" class="st-in h-flex2" placeholder="'+T('vr.klant','Klant')+'" maxlength="60"><input id="vrInhoud" class="st-in" placeholder="'+T('vr.inhoud','Wat gaat er mee (lading)')+'" maxlength="120" style="flex:3;"></div>'+
+      '<div class="row-gap h-mt40"><input id="vrGewicht" class="st-in h-flex1" type="number" min="1" placeholder="'+T('vr.gewicht','Gewicht (kg)')+'"><input id="vrColli" class="st-in h-flex1" type="number" min="1" placeholder="'+T('vr.colli','Colli')+'">'+
       '<select id="vrIncoterm" class="st-in h-flex1">'+(d.incoterms||[]).map(t=>'<option'+(t==='DAP'?' selected':'')+'>'+t+'</option>').join('')+'</select></div>'+
-      '<div class="row-gap h-mt40"><input id="vrVanPlaats" class="st-in" placeholder="'+T('vr.vanplaats','Van: plaats')+'" maxlength="60" class="h-flex1"><input id="vrVanLand" class="st-in" placeholder="'+T('vr.vanland','Van: land')+'" maxlength="40" class="h-flex1"><input id="vrNaarPlaats" class="st-in" placeholder="'+T('vr.naarplaats','Naar: plaats')+'" maxlength="60" class="h-flex1"><input id="vrNaarLand" class="st-in" placeholder="'+T('vr.naarland','Naar: land')+'" maxlength="40" class="h-flex1"></div>'+
+      '<div class="row-gap h-mt40"><input id="vrVanPlaats" class="st-in h-flex1" placeholder="'+T('vr.vanplaats','Van: plaats')+'" maxlength="60"><input id="vrVanLand" class="st-in h-flex1" placeholder="'+T('vr.vanland','Van: land')+'" maxlength="40"><input id="vrNaarPlaats" class="st-in h-flex1" placeholder="'+T('vr.naarplaats','Naar: plaats')+'" maxlength="60"><input id="vrNaarLand" class="st-in h-flex1" placeholder="'+T('vr.naarland','Naar: land')+'" maxlength="40"></div>'+
       '<div class="sub h-mt55">'+T('vr.route','De route, etappe voor etappe; het juiste vervoersdocument (AWB, B/L, CMR, CIM, CMNI) regelt de app per etappe:')+'</div>'+
       '<div id="vrEtappes">'+vrEtappeRijen()+'</div>'+
       '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;">'+

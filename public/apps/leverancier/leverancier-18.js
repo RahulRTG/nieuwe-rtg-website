@@ -3,10 +3,10 @@
       const evs = state.events || [];
       html += '<div class="tkc"><h3>'+T('kt.newevent','Nieuw event')+'</h3><div class="st-form">'+
         '<input class="st-in" id="kEvName" placeholder="'+T('kt.ev.name','Naam, bijv. Jazz & sake night')+'">'+
-        '<div class="row-gap"><input class="st-in" id="kEvDate" type="date" class="h-flex2"><input class="st-in" id="kEvTime" type="time" class="h-flex1"></div>'+
+        '<div class="row-gap"><input class="st-in h-flex2" id="kEvDate" type="date"><input class="st-in h-flex1" id="kEvTime" type="time"></div>'+
         '<input class="st-in" id="kEvDesc" placeholder="'+T('kt.ev.desc','Korte omschrijving')+'">'+
-        '<div class="row-gap"><input class="st-in" id="kEvCap" type="number" placeholder="'+T('kt.ev.cap','Capaciteit')+'" class="h-flex1"><input class="st-in" id="kEvPrice" type="number" placeholder="'+T('kt.ev.price','Prijs p.p. (0 = gratis)')+'" class="h-flex1"></div>'+
-        '<button class="bigbtn" id="kEvAdd" class="h-mt20">'+T('kt.ev.add','Maak aan als concept')+'</button></div></div>';
+        '<div class="row-gap"><input class="st-in h-flex1" id="kEvCap" type="number" placeholder="'+T('kt.ev.cap','Capaciteit')+'"><input class="st-in h-flex1" id="kEvPrice" type="number" placeholder="'+T('kt.ev.price','Prijs p.p. (0 = gratis)')+'"></div>'+
+        '<button class="bigbtn h-mt20" id="kEvAdd">'+T('kt.ev.add','Maak aan als concept')+'</button></div></div>';
       html += evs.map(e=>{
         const taken=(e.guests||[]).reduce((n,g)=>n+g.qty,0);
         const rs = e.runsheet || [];
@@ -26,15 +26,15 @@
           (a.alternative?'<span class="sub">\u2192 '+a.alternative.name+'</span>':'')+'</span>'+
           '<span class="acts">'+(!a.alternative?'<button class="obtn primary" data-kalt="'+e.id+'" data-al="'+a.id+'">\u2728 '+T('ek.alt','Vervangend gerecht')+'</button>':'')+
           '<button class="obtn warn" data-kaldel="'+e.id+'" data-al="'+a.id+'">\u2715</button></span></div>').join(''))+
-        '<div class="row-gap"><input class="st-in" id="kaN'+e.id+'" placeholder="'+T('ek.allergen','Allergeen, bijv. noten')+'" class="h-flex2"><input class="st-in" id="kaC'+e.id+'" type="number" placeholder="1\u00d7" class="h-flex1"></div>'+
+        '<div class="row-gap"><input class="st-in h-flex2" id="kaN'+e.id+'" placeholder="'+T('ek.allergen','Allergeen, bijv. noten')+'"><input class="st-in h-flex1" id="kaC'+e.id+'" type="number" placeholder="1\u00d7"></div>'+
         '<button class="obtn" data-kaladd="'+e.id+'">'+T('ek.addal','Allergeen registreren')+'</button>'+
         '<button class="obtn primary" data-kmep="'+e.id+'">\u2728 '+T('ek.mep','Organiseer de mise en place')+'</button></div>'+
         '<h3 class="h-mt60">\uD83D\uDCCB '+T('rs.h','Draaiboek')+' ('+rs.length+')</h3>'+
         (rs.length ? rs.map(it=>'<div class="st-row"><span>'+(it.daysBefore?'<span style="font-size:0.6rem;letter-spacing:0.06em;color:var(--soft);margin-right:0.5rem;">D-'+it.daysBefore+'</span>':'')+'<b style="color:var(--gold);font-variant-numeric:tabular-nums;margin-right:0.5rem;">'+it.time+'</b>'+(RUN_ICON[it.station]||'')+' '+it.text+(it.done?' <span class="sub" style="display:inline;">\u2713 '+(it.doneBy||'')+'</span>':'')+'</span>'+
           '<button class="obtn warn" data-krdel="'+e.id+'" data-item="'+it.id+'">\u2715</button></div>').join('')
           : '<div class="tkc-who">'+T('rs.none','Nog geen draaiboek. Voer regels in, plak een bestaand draaiboek, of laat de AI er een opstellen.')+'</div>')+
-        '<div class="st-form"><div class="row-gap"><input class="st-in" type="time" id="krT'+e.id+'" class="h-flex1">'+
-        '<select class="st-in" id="krD'+e.id+'" class="h-flex1"><option value="0">'+T('rs.d0','Dag zelf')+'</option><option value="1">D-1</option><option value="2">D-2</option><option value="3">D-3</option></select>'+
+        '<div class="st-form"><div class="row-gap"><input class="st-in h-flex1" type="time" id="krT'+e.id+'">'+
+        '<select class="st-in h-flex1" id="krD'+e.id+'"><option value="0">'+T('rs.d0','Dag zelf')+'</option><option value="1">D-1</option><option value="2">D-2</option><option value="3">D-3</option></select>'+
         '<select class="st-in" id="krS'+e.id+'" style="flex:1.4;">'+stOpts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('')+'</select></div>'+
         '<input class="st-in" id="krX'+e.id+'" placeholder="'+T('rs.what','Wat moet er gebeuren?')+'">'+
         '<button class="obtn" data-kradd="'+e.id+'">'+T('rs.add','Regel toevoegen')+'</button></div>'+
@@ -61,7 +61,7 @@
             '<button class="obtn" data-kmhk="'+r.id+'" data-cur="'+hk+'">'+tHk(hk)+'</button>'+
             '<button class="obtn warn" data-kmrd="'+r.id+'">✕</button></span></div>';
         }).join('') : '<div class="tkc-who">'+T('sup.norooms','Nog geen kamers. Voeg uw eerste kamer toe.')+'</div>')+
-        '<div class="st-form"><div class="row-gap"><input class="st-in" id="kRmN" placeholder="'+T('sup.roomname','Kamernaam')+'" class="h-flex2"><input class="st-in" id="kRmP" type="number" inputmode="decimal" placeholder="€" class="h-flex1"></div>'+
-        '<button class="bigbtn" id="kRmAdd" class="h-mt20">'+(verblijfGenre?T('kt.unitadd','Verblijf toevoegen'):T('kt.kameradd','Kamer toevoegen'))+'</button></div>'+
+        '<div class="st-form"><div class="row-gap"><input class="st-in h-flex2" id="kRmN" placeholder="'+T('sup.roomname','Kamernaam')+'"><input class="st-in h-flex1" id="kRmP" type="number" inputmode="decimal" placeholder="€"></div>'+
+        '<button class="bigbtn h-mt20" id="kRmAdd">'+(verblijfGenre?T('kt.unitadd','Verblijf toevoegen'):T('kt.kameradd','Kamer toevoegen'))+'</button></div>'+
         '<div class="tkc-who">'+T('kt.hknote','Tik op de bezem om de housekeeping-status door te schakelen; Dicht = direct onzichtbaar voor gasten.')+'</div></div>';
     }

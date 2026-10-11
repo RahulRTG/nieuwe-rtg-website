@@ -27,7 +27,7 @@
           '<button class="obtn ghost" id="boPresent">'+T('z3.pres','Presentatie')+'</button></div>'+
           '<div id="boBriefTxt" style="display:none;border:1px solid var(--gold);border-radius:0;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.6;"></div></div>';
         // de kantoorvleugel: de week als 3D-skyline op de huiseigen Drie-motor
-        html += '<div class="tkc" id="zaak3dKaart" class="h-volbreed"><h3>'+T('z3.h','De zaak in 3D')+'</h3>'+
+        html += '<div class="tkc h-volbreed" id="zaak3dKaart"><h3>'+T('z3.h','De zaak in 3D')+'</h3>'+
           '<canvas id="zaak3d" style="display:block;width:100%;border-radius:0;touch-action:none;cursor:grab;" aria-label="'+T('z3.aria','Een draaibare 3D-skyline van uw omzet per dag: hoe hoger het blok, hoe meer omzet; vandaag in bordeaux en een gouden pin op de beste dag.')+'"></canvas>'+
           '<div class="tkc-who" id="zaak3dUitleg"></div></div>';
         html += '<div class="tkc h-volbreed"><h3>'+T('bz.actie','Actiecentrum van de zaak')+'</h3>'+

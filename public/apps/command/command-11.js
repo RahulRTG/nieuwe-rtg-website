@@ -83,7 +83,7 @@
   }
 
   function teken(w) {
-    var u = '<p class="meta" class="mt"><b>' + esc(w.object.titel) + '</b></p>';
+    var u = '<p class="meta mt"><b>' + esc(w.object.titel) + '</b></p>';
     u += rij('Wijst naar', w.wijstNaar.map(function (x) { return x.type + ' ' + x.id + ' (via ' + x.via + ')'; }));
     u += rij('Wordt genoemd door', w.wordtGenoemdDoor.map(function (x) { return x.type + ' ' + x.id; }));
     u += rij('In het journaal', w.journaal.map(function (r) { return r.at + ' ' + r.actie + ' (' + r.actor + ')'; }));

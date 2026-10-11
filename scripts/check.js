@@ -6028,6 +6028,58 @@ console.log('\n75) roteren met de hand neemt niet toe');
   }
 }
 
+/* ============================================================================
+   76) GEEN ELEMENT MET TWEE CLASS-ATTRIBUTEN
+
+   WAAR DIT UIT KOMT. Op 6 oktober 2026 stonden er 188 elementen met twee
+   class-attributen in 38 bronbestanden onder public/, het merendeel van de vorm
+
+     '<input class="st-in" id="kMbN" placeholder="..." class="h-flex2">'
+
+   Een browser leest van een dubbel attribuut alleen het EERSTE. Alles wat een
+   eerdere ronde uit `style="..."` naar een hulpklasse had verhuisd
+   (rtg-hulpklassen.css, zie regel 37) kwam daardoor niet aan: velden zonder
+   hun flex-verdeling, knoppen zonder hun marge, formuliervelden in de App
+   Store die niet de volle breedte namen. Geen consolefout, geen rode toets --
+   elke regel hierboven keek naar de klasse of naar het blad, en geen enkele
+   naar de vraag of de browser het attribuut ook LEEST.
+
+   Hoe ze erin kwamen is niet meer na te gaan (de historie van die regels
+   begint bij een samengevoegde commit), en dat maakt de poort belangrijker,
+   niet minder: de beide omzetters die nu bestaan (scripts/inlinestijl-omzet.js
+   en scripts/hulpklassen-omzet.js) voegen bij een bestaande class samen, maar
+   de volgende hand of het volgende script hoeft dat niet te doen.
+
+   De vraag zelf woont in scripts/lib/dubbeleklasse.js, die ook HTML leest die
+   in JavaScript wordt samengesteld (strings met `+`, templates met `${}`).
+   Hij meet de BRON: de delen van een bundel en niet de bundel, want regel 12
+   houdt vast dat de bundel byte voor byte hun som is. Het doel is nul, en nul
+   is hier geen ratel maar een harde grens: er is geen enkele reden om op een
+   element twee class-attributen te zetten. */
+console.log('\n76) geen element draagt twee class-attributen (de browser leest alleen het eerste)');
+{
+  const { meet, bronbestanden } = require('./lib/dubbeleklasse');
+  const gemeten = bronbestanden(ROOT).length;
+  const treffers = meet(ROOT);
+  const bestanden = Object.keys(treffers);
+  if (!gemeten) {
+    fout('geen enkel bronbestand gevonden om te meten; dan zegt deze regel niets');
+  } else if (bestanden.length) {
+    let n = 0;
+    for (const f of bestanden) {
+      for (const t of treffers[f]) {
+        n++;
+        fout(f + ':' + t.regel + ':' + t.kolom + ' <' + t.tag + '> draagt ' + t.aantal +
+          ' class-attributen: ' + t.fragment +
+          '\n    de browser leest alleen het eerste -- voeg ze samen tot een class="..."');
+      }
+    }
+    console.error('  ' + n + ' element(en) in ' + bestanden.length + ' bestand(en); doel is nul');
+  } else {
+    ok(gemeten + ' bronbestanden gemeten, geen enkel element met meer dan een class-attribuut');
+  }
+}
+
 /* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.
 
    Op 13 september 2026 heb ik twee keer op een dag "de gate is groen" gezegd op

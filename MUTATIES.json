@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-06T23:24:40.428Z",
-    "commit": "5e88062f7",
+    "op": "2026-10-11T07:59:47.693Z",
+    "commit": "715745a73",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
   },
@@ -402,14 +402,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
-    },
-    "agentinstructies.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/agentinstructies.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 2,
-      "geprobeerd": 1
     },
     "ai-budget.test.js": {
       "soort": "puur",
@@ -2289,6 +2281,13 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "clientafbreking.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "clipdeler.e2e.js": {
       "soort": "server",
@@ -6454,14 +6453,6 @@
         "scripts/lib/invoerproef.js"
       ],
       "posities": 1
-    },
-    "invoerspoor.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/invoerspoor.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 9,
-      "geprobeerd": 1
     },
     "inzagebewaring.test.js": {
       "soort": "puur",
@@ -15975,14 +15966,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
-    },
-    "toetsroutes.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/toetsroutes.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 1,
-      "geprobeerd": 1
     },
     "token-domeinscheiding.test.js": {
       "soort": "server",

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2442 bestanden en 16725 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2443 bestanden en 16731 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2442 |
-| losse beweringen (`test(...)`) | 16725 |
+| toetsbestanden | 2443 |
+| losse beweringen (`test(...)`) | 16731 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2268 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2269 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2134 bestanden, 16188 beweringen.
+2135 bestanden, 16194 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -834,6 +834,7 @@ toets omvalt.
 | `kantoorbank.test.js` | 10 | gezakt op `return-weg#0` | KAN DEZE HANDELING NA COMMIT EEN KANTOORBANK WIJZIGEN? (server/kern/isolatie/kantoorbank.js) DE VRAAG DIE DEZE SUITE AFDWINGT is met opzet NIET "zit deze route in het bankdomein". |
 | `kantoordeur-passkey.test.js` | 3 | gezakt op `liegpoort /api/` | EEN KANTOORMEDEWERKER MET EEN PASSKEY KAN DE INCASSORONDE STARTEN, en dan is de geldketen rond. Gevonden bij het meten van "passkeys aan de kantoordeur" (25 september 2026): kern/zwaarbewijs.js eist voor... |
 | `kantoordeur-productie.test.js` | 3 | gezakt op `liegpoort /api/` | DE KANTOORDEUR OP EEN ECHTE PRODUCTIESERVER (besluit B10, deur office.gedeelde_kantoorcode). In productie opent de gedeelde kantoorcode het kantoor niet meer; het kantoor gaat alleen open op naam, met een passkey... |
+| `kantoordeur-uitvoeren.test.js` | 6 | gezakt op `liegpoort /api/` | BESLUIT 3 VAN DE EIGENAAR (11 oktober 2026): ENFORCE_EXECUTE AAN DE KANTOORDEUR, in de volgorde (a) individuele passkey-identificatie aan de deur, (b) schaduwmeting, (c) pas daarna afdwingen. Deze toets houdt (a) en... |
 | `kantoordienst.test.js` | 3 | gezakt op `liegpoort /api/` | HET RTG-KANTOOR OP EEN WERKDAG: AANMELDEN, INWERKEN, EN DE NOODKNOP. DRIE DINGEN DIE HIER SAMENKOMEN 1. |
 | `kantoorgesprek.test.js` | 2 | gezakt op `liegpoort /api/` | De backoffice binnenkomen door met Rahul te praten in plaats van een codeveld in te vullen -- zonder dat de deur daar zachter van wordt. Dat laatste is de kern van deze test. |
 | `kantoorhuis.test.js` | 2 | gezakt op `liegpoort /api/` | WELKE ENTITEIT IS RTG, EN WERKT DEZE KANTOORMENS DAAR? (besluit B1, PERSONEEL.md par. |

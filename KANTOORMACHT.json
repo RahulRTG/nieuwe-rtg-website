@@ -21,20 +21,20 @@
     }
   ],
   "stempel": {
-    "op": "2026-10-04T11:58:24.417Z",
-    "commit": "71e2fdbc",
+    "op": "2026-10-11T21:17:35.434Z",
+    "commit": "bd0f72e6b",
     "node": "v22.22.0"
   },
   "gemeten": {
-    "routes": 688,
-    "deurEistMens": 245,
+    "routes": 690,
+    "deurEistMens": 247,
     "deurGedeeld": 443,
     "zonderBewakerslaag": 3,
-    "handlerKentMens": 206,
-    "anoniemUitvoerbaar": 348,
+    "handlerKentMens": 223,
+    "anoniemUitvoerbaar": 342,
     "metSpoor": 159,
     "metReden": 336,
-    "bestanden": 110,
+    "bestanden": 111,
     "zwaar": 15,
     "zwaarZonderMens": 0,
     "zwaarLezend": 4,
@@ -64,10 +64,10 @@
       "gemeten": 83,
       "geenWerk": 333,
       "geenOpslag": 222,
-      "nietInProef": 50,
-      "totaal": 688
+      "nietInProef": 52,
+      "totaal": 690
     },
-    "dekkingPct": 12.1,
+    "dekkingPct": 12,
     "raakt": [
       {
         "pad": "/api/office/bank/rekening/open",
@@ -146,6 +146,86 @@
       }
     ],
     "grens": "Deze as ziet alleen wat de idempotentieproef WERKELIJK heeft uitgevoerd. Zij wordt nooit opgeteld bij de padas: twee ondergrenzen die verschillende dingen missen, geven samen geen bovengrens. `blindVoor` noemt de zware routes waarover zij zwijgt."
+  },
+  "uitvoeren": {
+    "regel": "ENFORCE_EXECUTE",
+    "uitleg": "Een uitvoerende kantoorhandeling vraagt een bewezen individu (op naam, met een passkey aan de deur). Statisch: welke uitvoerende routes laat de router door voor een sessie zonder bewezen individu. De runtime-telling staat in POST /api/office/beleidsmotor (stand.uitvoeren).",
+    "grens": "Uitvoerend = geen GET en geen NOT_APPLICABLE in server/lib/mutatiecontracten.js; een route zonder contract telt als uitvoerend (ongeclassificeerd). BUITEN productie zou bij afdwingen ELKE uitvoerende route zakken voor een sessie zonder passkey; IN productie draagt elke kantoorsessie al een passkeybewijs (B10, kern/kantoor/productiedeur.js) en is de gedeelde code al dicht.",
+    "routes": 441,
+    "deurGedeeld": 270,
+    "deurEistMens": 171,
+    "perKlasse": {
+      "ongeclassificeerd": {
+        "routes": 298,
+        "deurGedeeld": 203,
+        "deurEistMens": 95
+      },
+      "INTENTIONALLY_NON_IDEMPOTENT": {
+        "routes": 42,
+        "deurGedeeld": 21,
+        "deurEistMens": 21
+      },
+      "PROTECTED": {
+        "routes": 97,
+        "deurGedeeld": 43,
+        "deurEistMens": 54
+      },
+      "BLOCKED_BY_TEST_FIXTURE": {
+        "routes": 4,
+        "deurGedeeld": 3,
+        "deurEistMens": 1
+      }
+    },
+    "actorUitVerzoek": 0,
+    "actorUitVerzoekBijGedeeldeDeur": 0,
+    "graden": {
+      "routes": "gemeten",
+      "deurGedeeld": "gemeten",
+      "deurEistMens": "gemeten",
+      "actorUitVerzoek": "vermoed"
+    },
+    "actorLijst": [],
+    "buitenKantoorpad": {
+      "uitleg": "Routes BUITEN /api/office en /api/boardroom achter een kantoordeur (officeAuth, kluisAuth, naamAuth, boardroomAuth). Niet in de assen of de ratel hierboven; wel onder ENFORCE_EXECUTE.",
+      "routesAchterKantoordeur": 421,
+      "uitvoerend": 350,
+      "deurGedeeld": 346,
+      "perVoorvoegsel": {
+        "/api/aanmelding": {
+          "uitvoerend": 7,
+          "deurGedeeld": 7
+        },
+        "/api/appstore": {
+          "uitvoerend": 6,
+          "deurGedeeld": 5
+        },
+        "/api/command": {
+          "uitvoerend": 71,
+          "deurGedeeld": 69
+        },
+        "/api/lab": {
+          "uitvoerend": 6,
+          "deurGedeeld": 6
+        },
+        "/api/lab2": {
+          "uitvoerend": 74,
+          "deurGedeeld": 74
+        },
+        "/api/rtfkantoor": {
+          "uitvoerend": 17,
+          "deurGedeeld": 17
+        },
+        "/api/rtfos": {
+          "uitvoerend": 154,
+          "deurGedeeld": 153
+        },
+        "/api/rtgone": {
+          "uitvoerend": 15,
+          "deurGedeeld": 15
+        }
+      },
+      "actorUitVerzoek": []
+    }
   },
   "graden": {
     "routes": "gemeten",
@@ -333,9 +413,9 @@
     }
   ],
   "deuren": {
-    "officeAuth": 465,
+    "officeAuth": 467,
     "boardroomAuth": 150,
-    "balieAuth": 31,
+    "balieAuth": 33,
     "kluisAuth": 30,
     "naamAuth": 24,
     "techAuth": 16,

@@ -51,10 +51,13 @@
    (noteFailedTry in ../../server.js), en die melding wordt bewaard; het
    vergeten van een account (../vergeten.js) raakt haar niet. Een e-mailadres
    hoort niet in een spoor, net zo min als een echte naam naast een codenaam.
-   test/werkplek-rem.test.js zoekt het in de datamap. De twee vormen van
-   vingerafdruk zien er hetzelfde uit, dus de naam zegt ook niet of het account
-   bestaat. Het antwoord evenmin: status en tekst zijn bij een onbekende naam
-   dezelfde (alleen de duur kan verschillen; dat staat apart).
+   test/werkplek-rem.test.js zoekt het in de datamap. Een vingerafdruk is
+   PSEUDONIEM en geen anonimisering: hij is ongezouten, en een id is een klein
+   getal, dus wie het journaal leest kan de id terugrekenen en ook zien of een
+   naam bij een bestaand account hoorde. Het journaal is daarom kantoordata,
+   geen publiek spoor. Het ANTWOORD aan de aanroeper verraadt het bestaan niet:
+   status en tekst zijn bij een onbekende naam dezelfde (alleen de duur kan
+   verschillen; dat staat apart).
 
    DE NOODREM. Elke emmer die dichtgaat meldt zich via noteFailedTry als brute
    force, met het adres als aanvaller (../../server.js). Hier geen eigen soort:

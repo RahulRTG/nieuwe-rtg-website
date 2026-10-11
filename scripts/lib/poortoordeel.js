@@ -5,8 +5,8 @@
    op een paar regels bron kan nagaan zonder de hele keuring te draaien. De
    poortnamen (POORT_MW, POORT_BINNEN) en de publieke lijst blijven waar ze
    wonen, in check.js en in ./publiek.js, en komen als argument binnen: zo
-   krijgt ./poortbereik.js ze ook, en twee lijsten van wat een poort is lopen
-   uiteen (LAT.md regel 4).
+   krijgt ./poortbereik.js dezelfde. Een eigen kopie hier zou een tweede lijst
+   van wat een poort is maken, en twee lijsten lopen uiteen (LAT.md regel 4).
 
    VIJF UITKOMSTEN PER ROUTE, in deze volgorde:
 

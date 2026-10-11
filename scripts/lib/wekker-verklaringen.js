@@ -55,6 +55,7 @@ module.exports = [
   /* DE MACHINE ONDER HET HUIS. Zelfde soort als de bediening in het
      platformregister: dit is niet een functie van RTG maar datgene waarop elke
      functie draait. */
+  { bestand: 'server/lib/auditwacht.js', reden: 'de periodieke integriteitscontrole van de auditketens (audit P1-4); een wacht op het spoor die je uit kunt zetten, meldt een vervalsing nooit meer -- en wie hem uitzet is precies wie het spoor wil laten breken' },
   { bestand: 'server/bus.js', reden: 'de berichtenbus zelf; een bus die je uit kunt zetten levert geen enkel bericht meer af' },
   { bestand: 'server/redis.js', reden: 'de gedeelde verbinding onder die bus' },
   { bestand: 'server/db/redis.js', reden: 'idem: de opslagkant van diezelfde verbinding' },

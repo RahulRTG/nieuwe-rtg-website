@@ -14,7 +14,7 @@
    `boekEffect` is de koppeling met het grootboek (kern/pay). Die staat hier op
    null tot de geldlaag hem levert; zonder koppeling weigert iedere aanvraag
    (./afrekening.js regel 3). De geldlaag levert hem bij het opstarten
-   (server/opzet/kernlaag4b.js, `koppelGrootboek(maakConnectBoeking(kern.pay))`).
+   (server/opzet/kern-geldnaden.js, `koppelGrootboek(maakConnectBoeking(kern.pay))`).
 
    DUURZAAM. Het standaardexemplaar legt zijn records vast via
    server/lib/duurzaam.js (keuringsregel 47): een afrekening die naar Stripe gaat,

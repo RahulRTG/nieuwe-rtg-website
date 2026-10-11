@@ -66,10 +66,8 @@ const WOORDEN = {
   opvang: ['opvang', 'kinderopvang', 'kind', 'kinderen', 'oppas', 'bso'],
   vervoer: ['vervoer', 'reizen', 'auto', 'ov', 'fiets', 'rijbewijs', 'afstand'],
   wonen: ['wonen', 'woning', 'huis', 'huur', 'woonruimte', 'adres', 'onderdak'],
-  /* `ondernem` en niet `ondernemen`: dat ene stuk vangt ondernemer, onderneming
-     en ondernemingsplan. `zaak` staat er met opzet NIET in -- het staat in
-     "oorzaak", "zaakwaarnemer" en "een zaak die mij aanneemt", en een
-     werkzoekende die "een zaak" schrijft bedoelt een werkgever. */
+  /* `zaak` staat er met opzet NIET in: "een zaak die mij aanneemt" is een
+     werkgever, en "oorzaak" zou ook raken. */
   ondernemen: ['ondernem', 'bedrijf', 'kvk', 'rechtsvorm', 'eenmanszaak', 'zzp', 'eigen zaak']
 };
 
@@ -115,28 +113,10 @@ const KAART = {
       'helpen", leest iets wat er niet staat.',
     bron: 'routes/member/handel/vastgoed.js'
   },
-  /* HET ZESDE TERREIN (11 oktober 2026), en het is er gekomen omdat de vraag
-     "ik wil een eigen bedrijf beginnen" bij een kaal doel werk-, opleiding- en
-     opvangwegen opleverde en geen enkele ondernemersweg -- terwijl
-     kern/onderneming/ (45 modules) precies dat pad draagt.
-
-     DE INGANG IS DE VOORLICHTING EN NIET HET PLAN, en dat is een keuze over WIE
-     erbij kan. `GET /api/onderneming/rechtsvormen` staat zonder inlog open
-     (routes/member/onderneming.js: *"wat een B.V. van een stichting
-     onderscheidt hoort iemand te kunnen lezen voordat hij een account heeft"*),
-     dus hij gaat ook open voor een gezin dat via /api/rtf/knelpunt vraagt. De
-     verkenning en het plan zitten achter `auth`; die staan als vondst in
-     ./aanvoer-ondernemen.js, MET de zin dat ze een RTG-account vragen.
-
-     WAT ER NIET IS, IS GEZOCHT EN NIET AANGENOMEN. Op 11 oktober 2026 zijn
-     financiering, regelgeving en samenwerking nagezocht. Regelgeving IS er:
-     de verplichtingen per rechtsvorm staan in kern/onderneming/rechtsvorm-nl.js.
-     Financiering niet: geen lening, krediet, subsidie of investeerder buiten
-     het spel Magnaat -- en een spelbank is geen financiering. Samenwerking ook
-     niet: kern/rtfos/ondernemers.js is wat een BEDRIJF de RTFoundation biedt,
-     met een kantoorcode, en geen plek waar een ondernemer een andere vindt.
-     Dat staat hieronder in `dektNiet`, want dat is de zin die een lezer anders
-     zelf invult. */
+  /* HET ZESDE TERREIN (11 oktober 2026). De ingang is de VOORLICHTING, omdat
+     die zonder inlog opengaat -- ook voor een gezin via /api/rtf/knelpunt. Wat
+     er niet is (financiering, andere ondernemers vinden), is nagezocht en staat
+     in `dektNiet`; zie ./aanvoer-ondernemen.js en MAATSTAF.md par. 7j. */
   ondernemen: {
     stand: 'bron', ingang: '/api/onderneming/rechtsvormen',
     wat: 'De rechtsvormen met wat er per vorm bij hoort: aansprakelijkheid, verplichtingen en de ' +

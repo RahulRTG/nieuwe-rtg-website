@@ -103,33 +103,11 @@ function posantwoord(pos, memberId, posities) {
   return { token: staffSessie(pos, memberId), supplier: { code: s.code, name: s.name, type: s.type },
     actor, posities, state: supplierState(s, actor) };
 }
-app.post('/api/supplier/mijn/login', async (req, res) => {
-  const bucket = 'mijn:' + req.ip;
-  if (tooManyTries(res, bucket)) return;
-  const lid = accounts.findByLogin(req.body.login);
-  if (!lid || (accounts.isActief && !accounts.isActief(lid)) ||
-      !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
-    noteFailedTry(bucket, req.ip);
-    return res.status(401).json({ error: 'Onjuiste RTG-inloggegevens. Log in met uw eigen RTG-account.' });
-  }
-  loginFails.delete(bucket);
-  const posities = mijnPosities(lid.id);
-  if (!posities.length) {
-    // geen zaak, wel kantoor: alleen de WEG terug, geen sessie (zie ../pda.js)
-    if (heeftKantoor(lid.id)) {
-      return res.status(404).json({ kantoor: true,
-        error: 'U staat bij geen zaak op het rooster, maar uw account heeft wel toegang tot RTG Kantoor.' });
-    }
-    return res.status(404).json({ error: 'U staat nog nergens op het rooster. Vraag uw werkgever om een kassacode en meld u eenmalig aan.' });
-  }
-  // land op het gevraagde bedrijf (deeplink/onthouden), anders het eerste
-  const voorkeur = String(req.body.bedrijf || '').toUpperCase();
-  const start = posities.find(p => p.code === voorkeur) || posities[0];
-  const antwoord = posantwoord(start, lid.id, posities);
-  if (!antwoord.token) return res.status(401).json({ error: 'Uw persoonlijke RTG-account is niet meer actief.' });
-  logActivity(start.code, { name: start.persoon }, start.persoon + ' logde in (RTG-account)');
-  res.json(antwoord);
-});
+/* De inlog zelf (POST /api/supplier/mijn/login), met de tweede factor van het
+   lid, staat in ./posities-inlog.js. Hier gemount zodat de registratievolgorde
+   blijft wat hij was. */
+require('./posities-inlog')({ app, accounts, tooManyTries, noteFailedTry, loginFails, logActivity,
+  heeftKantoor, tweefactor: kctx.tweefactor }, { posities: mijnPosities, antwoord: posantwoord });
 // De eigen werkplekken opnieuw ophalen (na herstel van de sessie), zodat de
 // wissel-kaart ook zonder verse login weet welke bedrijven er zijn.
 app.post('/api/supplier/mijn/opties', supplierAuth, (req, res) => {

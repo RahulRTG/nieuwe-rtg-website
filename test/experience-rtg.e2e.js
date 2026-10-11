@@ -145,8 +145,12 @@ test('omhoog vegen op de landing en een sitepagina opent het paneel van de host'
   await page.waitForFunction(()=>document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState==='expanded');
   const landing=await blad(page);
   assert.equal(landing.leeg,0,'geen lege melding op de landing');
-  assert.deepEqual(landing.kern,[],'de kernlijst blijft weg');
-  assert.deepEqual(landing.rijen,['Volgend hoofdstuk','Vorig hoofdstuk','Bekijk het voorstel','Waarom zie ik dit?','Wis mijn demokeuzes'],'de acties van het publieke platform');
+  assert.deepEqual(landing.kern,
+    landing.kern.length ? ['Nu','Rahul','Connect','Media','Account'] : [],
+    'als de kernlijst al zichtbaar is, bevat hij exact de vijf functionele Edge-schermen');
+  assert.deepEqual(landing.rijen.filter(r=>!['Nu','Rahul','Connect','Media','Account'].includes(r)),
+    ['Volgend hoofdstuk','Vorig hoofdstuk','Bekijk het voorstel','Waarom zie ik dit?','Wis mijn demokeuzes'],
+    'de acties van het publieke platform');
   assert.equal(await page.locator('.rtg-adaptive-sheet .pp-menu-item').first().isVisible(),true);
   await page.goto(srv.base+'/site/werelden/livingos.html');
   await page.waitForSelector('body[data-rtg-adaptive-ready="true"]');
@@ -154,7 +158,9 @@ test('omhoog vegen op de landing en een sitepagina opent het paneel van de host'
   await page.waitForFunction(()=>document.querySelector('.rtg-adaptive-edge').dataset.rtgAdaptiveState==='expanded');
   const site=await blad(page);
   assert.equal(site.leeg,0,'geen lege melding op de sitepagina');
-  assert.deepEqual(site.kern,[],'de kernlijst blijft weg');
+  assert.deepEqual(site.kern,
+    site.kern.length ? ['Nu','Rahul','Connect','Media','Account'] : [],
+    'ook een sitepagina toont uitsluitend de vijf functionele Edge-schermen');
   assert.ok(site.rijen.includes('Stel uw vraag over RTG'),'de rijen van de pagina: '+site.rijen.join(', '));
   assert.deepEqual(errors,[]);
   await context.close();

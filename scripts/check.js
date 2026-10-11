@@ -4595,7 +4595,8 @@ console.log('\n58) vaste hoekgrammatica: centrale inhouds-, systeem- en capsulev
     ['public/site/platform-detail.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/site/storyline-stage.css', new Set(['var(--rtg-radius-editorial)'])],
     ['public/site/website-truth.css', new Set(['var(--rtg-radius-editorial)'])],
-    ['public/apps/access/portal.css', new Set(['var(--rtg-radius-content)'])], ['public/shared/rtg-simple.css', new Set([
+    ['public/apps/access/portal.css', new Set(['var(--rtg-radius-content)', 'var(--rtg-radius-capsule)'])],
+    ['public/shared/toegang.css', new Set(['var(--rtg-radius-capsule)'])], ['public/shared/rtg-simple.css', new Set([
       'var(--rtg-radius-system)!important'
     ])],
     ['public/shared/interface/second-screen-personal.css', new Set([
@@ -4606,6 +4607,7 @@ console.log('\n58) vaste hoekgrammatica: centrale inhouds-, systeem- en capsulev
   // radii. Keep the scope explicit so unrelated routes cannot bypass the rule.
   const editorialSurfaces = [
     'public/shared/rtg-adaptive-edge.css', 'public/shared/rtg-editorial-system.css',
+    'public/shared/rtg-cinematic-system.css',
     'public/shared/rtg-communication-surface.css', 'public/shared/rtg-mail-2026.css',
     'public/shared/rtg-world-home.css', 'public/apps/wereld-feed.css',
     'public/apps/muziek-heritage.css'

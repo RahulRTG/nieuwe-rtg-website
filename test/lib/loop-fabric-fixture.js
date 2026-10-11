@@ -11,6 +11,7 @@ const clone=value=>JSON.parse(JSON.stringify(value));
 
 function fixture(previous,settings={}) {
   const db={data:clone(previous || {})};
+  const leesCollectie=name=>db.data[name];
   let now='2026-10-04T10:00:00.000Z', serial=0, chain=Promise.resolve(), fault=null;
   function bewerkCollectie(name,fn) {
     const run=async()=>{
@@ -24,9 +25,9 @@ function fixture(previous,settings={}) {
   }
   const sources={name:key=>'Member '+key,context:()=>({items:[],unavailable:[]}),media:()=>null};
   const world=makeWorld({db,bewerkCollectie,save:()=>{},sources,now:()=>now});
-  const workSource=makeWork({db,bewerkCollectie,serviceProof:settings.serviceProof,now:()=>now});
+  const workSource=makeWork({leesCollectie,bewerkCollectie,serviceProof:settings.serviceProof,now:()=>now});
   const academy=maakLeerhuis({db,save:()=>{},nu:()=>Date.parse(now)});
-  const academySource=makeAcademySource({db,bewerkCollectie,leerhuis:academy,serviceProof:settings.serviceProof,now:()=>now});
+  const academySource=makeAcademySource({leesCollectie,bewerkCollectie,leerhuis:academy,serviceProof:settings.serviceProof,now:()=>now});
   const fabric=makeFabric({db,bewerkCollectie,livingWorld:world,workSource,academySource,now:()=>now});
   const workspace={code:'WLOOP',naam:'Loop Werkruimte',leden:{
     lead:{id:'lead',naam:'Olivia Organisator',status:'actief',rtgKey:'user-1',rollen:[{id:'directie',van:null,tot:null,at:now}]}

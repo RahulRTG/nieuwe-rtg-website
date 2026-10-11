@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**61 bundels, 487 delen, 0 zonder onderwerp.**
+**61 bundels, 488 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9833 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9858 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -213,7 +213,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 115 delen, 9836 regels in de delen
+`public/apps/leverancier/` -- 116 delen, 9898 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -225,6 +225,7 @@ omlaag.
 | `leverancier-04.js` | het chatvenster met een partner |
 | `leverancier-05.js` | aanmelden als medewerker bij een zaak |
 | `leverancier-06.js` | de personeelskiezer: wie ben jij |
+| `leverancier-06a.js` | inloggen met het eigen RTG-account, met de tweede stap, en de app openen |
 | `leverancier-07.js` | een account voor alles: partner kiezen en de staat toepassen |
 | `leverancier-08.js` | de bonnenstatistiek van de kassa |
 | `leverancier-09.js` | de looplijst per station, op tijd gesorteerd |
@@ -389,7 +390,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 32 delen, 3252 regels in de delen
+`public/apps/personeel/` -- 32 delen, 3290 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -565,7 +566,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 10 delen, 915 regels in de delen
+`public/shared/basis/` -- 10 delen, 916 regels in de delen
 
 | deel | onderwerp |
 |---|---|

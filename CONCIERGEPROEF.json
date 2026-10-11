@@ -1,14 +1,14 @@
 {
   "stempel": {
-    "op": "2026-10-11T16:23:12.706Z",
-    "commit": "db47d8de",
+    "op": "2026-10-11T19:01:00.260Z",
+    "commit": "89b6f361",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/conciergeproef.js",
     "node": "v22.22.0"
   },
   "uitleg": "De concierge-lus van De Rechterhand (CONCIERGE.md), gemeten per SCHAKEL (handelt actor A, en merkt actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?): van een wens in een zin tot een gesloten case met een uitkomst, met een vertraging en een herstel onderweg.",
-  "grens": "Een Lifestyle-lid (demo-inlog), het kantoor met de gedeelde code, twee zaken (KIKUNOI, PONTO) en een Business-lid, allemaal over de API. Er komt geen browser aan te pas (dat doet test/conciergelusscherm.e2e.js). De zaak heeft nog GEEN scherm voor zijn opdrachten. Het verval van een aanbod vraagt een verzette klok en staat in test/conciergelus-kern.test.js. De hotelconcierge (B1), het collega-netwerk (B3) en de routekennis (B5) wachten op een besluit en worden niet gelopen.",
+  "grens": "Een Lifestyle-lid (demo-inlog), het kantoor met de gedeelde code, twee zaken (KIKUNOI met manager en medewerker, PONTO) en een Business-lid, allemaal over de API. Hij loopt de concierge-lus en de tafeluitzondering, en NIET de rest van het Privekantoor (woning, kring, bezit, mandaat): daarom is hij geen bewijs voor het Privekantoor als geheel. Er komt geen browser aan te pas (dat doen test/conciergelusscherm.e2e.js en test/conciergezaakscherm.e2e.js). Het verval van een aanbod vraagt een verzette klok en staat in test/conciergelus-kern.test.js. De hotelconcierge (B1), het collega-netwerk (B3) en de routekennis (B5) wachten op een besluit en worden niet gelopen.",
   "schakels": [
     {
       "nr": 1,
@@ -66,86 +66,122 @@
     },
     {
       "nr": 10,
+      "wat": "het lid zet de verrassing uit en weer aan; zijn zaak volgt, en de zaak ziet \"discreet\" alleen zolang hij aan staat",
+      "stand": "gesloten",
+      "detail": "uit: lid false, zaak false; weer aan: zaak true"
+    },
+    {
+      "nr": 11,
+      "wat": "de zaak ziet een nieuw onderdeel als gevraagd, bevestigt het zelf, en het kantoor ziet in de case dat de ZAAK het deed",
+      "stand": "gesloten",
+      "detail": "zaak zag gepland; daarna 200"
+    },
+    {
+      "nr": 12,
       "wat": "een vertraging rekent de gevolgen uit en zet per partner een bericht KLAAR",
       "stand": "gesloten",
       "detail": "Tafel bij het water: nieuwe tijd 21:45 (was 21:30)."
     },
     {
-      "nr": 11,
+      "nr": 13,
       "wat": "pas met alles aangevinkt gaat het weg, de zaak krijgt het, en de nieuwe tijd is de afspraak",
       "stand": "gesloten",
-      "detail": "zonder vinkjes 409; daarna [{\"id\":\"3dc3d3b3\",\"bezorgd\":true}]"
+      "detail": "zonder vinkjes 409; daarna [{\"id\":\"40bbbc2c\",\"bezorgd\":true}]"
     },
     {
-      "nr": 12,
+      "nr": 14,
       "wat": "een onderdeel dat omvalt maakt geen nieuwe case: dezelfde case gaat \"in herstel\"",
       "stand": "gesloten",
       "detail": "status in herstel"
     },
     {
-      "nr": 13,
+      "nr": 15,
       "wat": "het lid kan tijdens het herstel iets laten weten, in dezelfde case",
       "stand": "gesloten",
       "detail": "status 200"
     },
     {
-      "nr": 14,
+      "nr": 16,
       "wat": "een alternatief VERVANGT het kapotte onderdeel, en het lid hoort dat het programma is aangepast",
       "stand": "gesloten",
       "detail": "via het lid; het lid leest: Wij hebben het programma iets aangepast. Alles is geregeld."
     },
     {
-      "nr": 15,
+      "nr": 17,
       "wat": "\"geregeld\" kan alleen als het waar is, en draagt een uitkomst: beloften, herstel, en hoe vaak het lid het opnieuw moest vertellen",
       "stand": "gesloten",
-      "detail": "{\"beloften\":{\"totaal\":1,\"nagekomen\":1,\"open\":0},\"herstel\":1,\"opnieuwVerteld\":1}"
+      "detail": "{\"beloften\":{\"totaal\":2,\"nagekomen\":2,\"open\":0},\"herstel\":1,\"opnieuwVerteld\":1}"
+    },
+    {
+      "nr": 18,
+      "wat": "een medewerker zet een tafelaanvraag door met een reden; vanaf dan beslist alleen een manager, en de zaak ziet dat hij doorgezet is",
+      "stand": "gesloten",
+      "detail": "doorzetten 200, ja van de medewerker 403"
+    },
+    {
+      "nr": 19,
+      "wat": "de manager biedt 21:15 aan, twaalf minuten vastgehouden; het lid ziet de nieuwe tijd en de termijn, en de zaak houdt hem in beeld",
+      "stand": "gesloten",
+      "detail": "lid ziet tegenvoorstel om 21:15; zaak ziet tegenvoorstel"
+    },
+    {
+      "nr": 20,
+      "wat": "het lid zegt ja; de tafel staat bevestigd op 21:15, ook bij de zaak",
+      "stand": "gesloten",
+      "detail": "status 200, zaak ziet bevestigd 21:15"
     }
   ],
   "storingen": [
     {
       "nr": 1,
+      "wat": "een tweede zaak bevestigt geen onderdeel dat niet het hare is: 404, en het onderdeel blijft gevraagd",
+      "stand": "gehouden",
+      "detail": "status 404, stand gepland"
+    },
+    {
+      "nr": 2,
       "wat": "het bureau kan een lus-case niet om de lus heen een stand geven",
       "stand": "gehouden",
       "detail": "status 409: Deze zaak loopt via de concierge-lus; zet de stappen daar."
     },
     {
-      "nr": 2,
+      "nr": 3,
       "wat": "het lid kan niet beslissen over een voorstel dat er niet ligt",
       "stand": "gehouden",
       "detail": "status 400"
     },
     {
-      "nr": 3,
+      "nr": 4,
       "wat": "een ander lid opent deze case niet, ook niet met het juiste id",
       "stand": "gehouden",
       "detail": "status 404"
     },
     {
-      "nr": 4,
+      "nr": 5,
       "wat": "een tweede zaak ziet niets van een onderdeel dat niet het zijne is",
       "stand": "gehouden",
       "detail": "0 onderdeel/onderdelen gezien"
     },
     {
-      "nr": 5,
+      "nr": 6,
       "wat": "een lid kan de werkwijze niet zelf zetten: een gewone case blijft gewoon",
       "stand": "gehouden",
       "detail": "status 200, werkwijze undefined"
     },
     {
-      "nr": 6,
+      "nr": 7,
       "wat": "berichten die niet de klaargezette zijn, gaan niet weg",
       "stand": "gehouden",
       "detail": "status 409"
     }
   ],
   "telling": {
-    "schakels": 15,
-    "gesloten": 15,
+    "schakels": 20,
+    "gesloten": 20,
     "openBekend": 0,
     "stuk": 0,
-    "storingen": 6,
-    "gehouden": 6,
+    "storingen": 7,
+    "gehouden": 7,
     "gebroken": 0
   },
   "sluitMetBevinding": true,

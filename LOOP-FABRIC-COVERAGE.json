@@ -6764,6 +6764,7 @@
       "server/middleware/foundation-veilige-uitgangen.js",
       "server/middleware/functiebeleid.js",
       "server/middleware/functieschakelaars-tekst.js",
+      "server/middleware/idempotentie-eigen.js",
       "server/middleware/idempotentie.js",
       "server/middleware/isolatiepoort-stand.js",
       "server/middleware/isolatiepoort.js",

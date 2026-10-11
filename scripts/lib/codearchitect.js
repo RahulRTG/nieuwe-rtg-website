@@ -45,6 +45,7 @@ const GRAAD = {
   'WETTEN.json': ['vermoed', 'een wet is een besluit van een mens met een handhaver; dat hij geldt is geen meting'],
   'BEWIJSSCHULD.json': ['vermoed', 'verklaarde schuld: een mens schreef op wat er niet bewezen is'],
   'TOETSROUTES.json': ['gemeten', 'waargenomen in het routejournaal van echte rondes (scripts/toetsroutes.js)'],
+  'MUTATIES.json': ['gemeten', 'de mutatiemotor mat per toets tegen welke module hij zakt (scripts/mutatie.js); dat is gevoeligheid, geen dekking'],
   /* Geen register in de repository maar het bewijsplan van deze boom, door
      `npm run evidence:plan` gemaakt (scripts/plan.js). `why` leest hier de
      afgegane regels uit (fase 6). Ontbreekt hij, dan is er nog geen plan. */
@@ -317,7 +318,7 @@ function impact(lezer, bestanden) {
       regel(lezer, { veld: 'toetsen die een van die routes raakten', waarde: toetsen, register: 'TOETSROUTES.json', pad: 'per', navolgbaar: false }),
     ],
     kennisgaten: [
-      'de require-graaf ziet de kern-tas niet: een route krijgt zijn domein vaak via (kern) => ... (CLAUDE.md, KERNHERKOMST.json)',
+      'de require-graaf ziet de kern-tas niet: een route krijgt zijn domein vaak via (kern) => ... (CODE.md, KERNHERKOMST.json)',
       'toetsen die als apart proces over HTTP praten, zijn voor de require-graaf onzichtbaar (scripts/impactbereik.js)',
       tr.ontbreekt ? 'TOETSROUTES.json ontbreekt: welke toetsen deze routes werkelijk raken is niet waargenomen' : 'een relatie die een ronde niet gezien werd, bewijst niet dat hij er niet is',
     ],
@@ -405,6 +406,145 @@ function waarom(lezer, onderwerp) {
   return { ...uit, gevonden: true, regels };
 }
 
+/* ---------------------------------------------------------------- context */
+
+/* Een contextpakket voor een ontwikkelagent (ARCHITECTOPDRACHT.md fase 7), en
+   of dat pakket VOLDOENDE is voor de taak. Twee regels die niet mogen
+   sneuvelen:
+
+     - voldoendheid wordt hier UITGEREKEND en nooit door de agent afgevinkt;
+     - ze staat in de SCHADUW: hij meet en meldt en houdt niets tegen tot de
+       eigenaar besluit. Omdat toetsdekking voorlopig grotendeels ongemeten
+       is, zou een harde poort altijd dicht staan, en een poort die altijd
+       dicht staat leert mensen hem te negeren.
+
+   Per taakklasse wat er bekend moet zijn. Een toets toevoegen vraagt minder
+   dan een geldregel wijzigen. */
+const TAAKKLASSEN = {
+  'toets-toevoegen': { eist: ['onderwerp', 'toetsen'],
+    waarom: 'een toets toevoegen vraagt waar het ding staat en welke toetsen er al naar kijken' },
+  'code-wijzigen': { eist: ['onderwerp', 'wetten', 'grenzen', 'toetsen'],
+    waarom: 'code wijzigen vraagt ook welke wetten er gelden en wat het domein mag' },
+  'geldregel-wijzigen': { eist: ['onderwerp', 'wettenGenoemd', 'grenzen', 'toetsenWaargenomen', 'vers'],
+    waarom: 'een geldregel wijzigen vraagt een genoemde wet, waargenomen toetsen en een actuele symboolmeting' },
+};
+
+/* Wat de agent NIET mag aannemen. Geen meting maar de grens zelf, met bron. */
+const NIET_AANNEMEN = [
+  { zin: 'dat de toetsdekking compleet is: een toets die hier niet staat, kan de wijziging toch raken', bron: 'KEURING.md, ARCHITECTOPDRACHT.md R8' },
+  { zin: 'dat een register actueel is: elke regel draagt zijn eigen versheid, en "onbekend" is geen "actueel"', bron: 'ARCHITECTOPDRACHT.md par. 2' },
+  { zin: 'dat een bewering van een agent bewijs is; dat stelt een deterministische poort vast', bron: 'CODE.md par. 8, besluit 6 punt 3' },
+  { zin: 'dat een besluit van een agent gezag heeft: hij merget niet, releaset niet, zet geen poort uit en verlaagt geen ratel', bron: 'CODE.md par. 8, besluit 6 punt 4' },
+  { zin: 'dat productiegegevens, .env of sleutels uit server/data/ deel van de context mogen zijn', bron: 'CODE.md par. 8, besluit 6 punt 2' },
+  { zin: 'dat wat voor een ontwikkelagent mag, daardoor ook voor de runtime mag', bron: 'CODE.md par. 8, besluit 6 punt 5' },
+];
+
+function domeinVan(lezer, bestanden) {
+  const g = lezer.laad('GRENZEN.json');
+  if (!g.data) return null;
+  for (const b of bestanden) {
+    const m = /^server\/(?:kern|routes)\/([^/.]+)/.exec(b);
+    if (m && Object.prototype.hasOwnProperty.call(g.data.domeinen || {}, m[1])) return m[1];
+  }
+  return null;
+}
+
+function context(lezer, taakklasse, onderwerp) {
+  const taak = TAAKKLASSEN[taakklasse];
+  if (!taak) return { gevonden: false, reden: 'onbekende taakklasse; kies uit ' + Object.keys(TAAKKLASSEN).join(', ') };
+  const k = vind(lezer, onderwerp);
+  const pakket = { taakklasse, onderwerp, gevonden: k.length === 1 };
+  if (k.length !== 1) {
+    pakket.reden = k.length ? 'dubbelzinnig: kies een van de kandidaten' : 'geen route, bestand, wet, domein of symbool met deze naam';
+    pakket.kandidaten = k;
+    pakket.voldoendheid = voldoendheid(pakket, taakklasse);
+    return pakket;
+  }
+  const { soort, id } = k[0];
+  let bestanden = [];
+  if (soort === 'bestand') bestanden = [id];
+  else if (soort === 'symbool') bestanden = [id.split('#')[0]];
+  else if (soort === 'route') {
+    const rb = lezer.laad('ROUTEBRON.json');
+    const r = rb.data && (rb.data.perRoute || []).find((x) => x.route === id);
+    if (r && r.bestand) bestanden = [r.bestand];
+  } else if (soort === 'domein') {
+    const u = uitlegDomein(lezer, id).find((r) => r.veld === 'bestanden');
+    bestanden = (u && u.waarde) || [];
+  }
+  const set = new Set(bestanden);
+  const een = bestanden.length === 1 ? bestanden[0] : null;
+  pakket.soort = soort;
+  pakket.id = id;
+  pakket.bestanden = bestanden;
+  const dom = soort === 'domein' ? id : domeinVan(lezer, bestanden);
+  pakket.domein = dom;
+
+  const s = lezer.laad('SYMBOLEN.json');
+  const sym = s.data ? (s.data.perBestand || []).filter((b) => set.has(b.bestand)).flatMap((b) => b.symbolen.map((x) => (een ? x.naam : b.bestand + '#' + x.naam))) : null;
+  const rb = lezer.laad('ROUTEBRON.json');
+  const routes = rb.data ? (rb.data.perRoute || []).filter((r) => set.has(r.bestand)).map((r) => r.route) : null;
+  const w = lezer.laad('WETTEN.json');
+  const wetten = w.data ? (w.data.wetten || []).filter((x) => (x.sabotage && set.has(x.sabotage.bestand)) || (x.draagt || []).some((d) => set.has(d))) : null;
+  const tr = lezer.laad('TOETSROUTES.json');
+  let waargenomen = null;
+  if (tr.data && routes) {
+    const rs = new Set(routes);
+    waargenomen = Object.entries(tr.data.per || {}).filter(([, t]) => Object.keys(t.kanten || {}).some((x) => rs.has(x))).map(([n]) => n);
+  }
+  const mu = lezer.laad('MUTATIES.json');
+  const viaMutatie = mu.data ? Object.entries(mu.data.toetsen || {}).filter(([, t]) => t.module && set.has(t.module)).map(([n]) => 'test/' + n) : null;
+  const mogelijk = viaMutatie === null && wetten === null ? null
+    : [...new Set((viaMutatie || []).concat((wetten || []).flatMap((x) => x.bewaaktDoor || []).filter((t) => /^test\//.test(t))))].sort();
+  const bs = lezer.laad('BEWIJSSCHULD.json');
+  const woorden = [dom].concat(bestanden).filter(Boolean);
+  const bevindingen = bs.data ? (bs.data.posten || []).filter((p) => woorden.some((x) => String(p.id).includes(x) || String(p.wat).includes(x))).map((p) => p.id) : null;
+
+  pakket.regels = [
+    regel(lezer, { veld: 'symbolen', waarde: sym, register: 'SYMBOLEN.json', pad: een ? 'perBestand[bestand=' + een + '].symbolen' : 'perBestand', kies: een ? 'naam' : undefined, navolgbaar: een ? undefined : false }),
+    regel(lezer, { veld: 'routes', waarde: routes, register: 'ROUTEBRON.json', pad: een ? 'perRoute[bestand=' + een + ']*' : 'perRoute', kies: een ? 'route' : undefined, navolgbaar: een ? undefined : false }),
+    regel(lezer, { veld: 'wetten', waarde: wetten ? wetten.map((x) => x.id) : null, register: 'WETTEN.json', pad: 'wetten', navolgbaar: false,
+      toelichting: 'wetten waarvan de sabotage of het veld draagt een van deze bestanden noemt' }),
+    regel(lezer, { veld: 'grenzen (mag aan de kern)', waarde: dom ? lezer.laad('GRENZEN.json').data.domeinen[dom] : null, register: 'GRENZEN.json', pad: dom ? 'domeinen.' + dom : null,
+      toelichting: dom ? undefined : 'geen domein in GRENZEN.json voor deze bestanden' }),
+    regel(lezer, { veld: 'bekende bevindingen', waarde: bevindingen, register: 'BEWIJSSCHULD.json', pad: 'posten', navolgbaar: false }),
+    regel(lezer, { veld: 'toetsen waargenomen', waarde: waargenomen, register: 'TOETSROUTES.json', pad: 'per', navolgbaar: false }),
+    regel(lezer, { veld: 'toetsen mogelijk relevant', waarde: mogelijk, register: 'MUTATIES.json', pad: 'toetsen', navolgbaar: false,
+      toelichting: 'toetsen die de mutatiemotor tegen een van deze bestanden mat, plus de handhavers van de wetten hierboven; mogelijk, niet waargenomen' }),
+  ];
+  if (!een || !dom) {
+    const r = pakket.regels.find((x) => x.veld === 'grenzen (mag aan de kern)');
+    if (!dom) Object.assign(r, { graad: 'onbekend', reden: r.reden || 'geen domein in GRENZEN.json voor deze bestanden' });
+  }
+  pakket.kennisgaten = bestanden.length ? impact(lezer, bestanden).kennisgaten : ['geen bestand bekend: de impact is niet te bepalen'];
+  pakket.nietAannemen = NIET_AANNEMEN;
+  pakket.voldoendheid = voldoendheid(pakket, taakklasse);
+  return pakket;
+}
+
+/* De voldoendheid, uitgerekend uit het pakket. Een eis is gehaald als het
+   veld bekend is; een paar eisen vragen meer dan bekend (genoemd, waargenomen,
+   actueel). Elke gemiste eis draagt zijn reden. */
+function voldoendheid(pakket, taakklasse) {
+  const taak = TAAKKLASSEN[taakklasse];
+  const veld = (v) => (pakket.regels || []).find((r) => r.veld === v);
+  const bekend = (v) => { const r = veld(v); return !!r && r.waarde !== null && r.graad !== 'onbekend'; };
+  const toetsen = () => ['toetsen waargenomen', 'toetsen mogelijk relevant'].some((v) => bekend(v) && veld(v).waarde.length);
+  const eisen = {
+    onderwerp: [pakket.gevonden, pakket.reden || 'het onderwerp is niet gevonden'],
+    wetten: [bekend('wetten'), 'de wetten zijn niet te lezen'],
+    wettenGenoemd: [bekend('wetten') && veld('wetten').waarde.length > 0, 'geen wet noemt deze bestanden: wat mag hier niet stuk?'],
+    grenzen: [bekend('grenzen (mag aan de kern)'), 'het domein en zijn grens zijn niet bekend'],
+    toetsen: [toetsen(), 'er is geen toets bekend die hiernaar kijkt, waargenomen of mogelijk'],
+    toetsenWaargenomen: [bekend('toetsen waargenomen') && veld('toetsen waargenomen').waarde.length > 0,
+      (veld('toetsen waargenomen') && veld('toetsen waargenomen').reden) || 'geen toets is waargenomen die deze routes raakt'],
+    vers: [!!veld('symbolen') && veld('symbolen').versheid === 'actueel', 'de symboolmeting is niet aantoonbaar actueel (' + ((veld('symbolen') && veld('symbolen').versheid) || 'onbekend') + ')'],
+  };
+  const ontbreekt = taak.eist.filter((e) => !eisen[e][0]).map((e) => ({ eis: e, reden: eisen[e][1] }));
+  return { taakklasse, eist: taak.eist, waarom: taak.waarom, uitslag: ontbreekt.length ? 'onvoldoende' : 'voldoende', ontbreekt,
+    schaduw: true, houdtTegen: false, grens: 'schaduw: dit meet en meldt en houdt niets tegen tot de eigenaar besluit (ARCHITECTOPDRACHT.md fase 7)' };
+}
+
 /* ---------------------------------------------------------------- kaart */
 
 /* Geen tweede kaart: de structurele kaart is ARCHITECTUUR.md (scripts/kaart.js).
@@ -426,4 +566,4 @@ function kaart(lezer) {
   };
 }
 
-module.exports = { maakLezer, vind, uitleg, impact, onbekenden, kaart, waarom, poorten, volg, regel, GRAAD, WORTEL, PLAN };
+module.exports = { maakLezer, vind, uitleg, impact, onbekenden, kaart, waarom, poorten, context, voldoendheid, volg, regel, GRAAD, WORTEL, PLAN, TAAKKLASSEN, NIET_AANNEMEN };

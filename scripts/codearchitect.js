@@ -7,6 +7,7 @@
      npm run codearchitect -- impact <bestand> [<bestand> ...]
      npm run codearchitect -- unknowns [scope]
      npm run codearchitect -- why [poorten | keuring | besluitcode | wet-ID | pad]
+     npm run codearchitect -- context <taakklasse> <route | bestand | domein | symbool>
 
    Met --json krijgt een agent dezelfde regels als data. Elke regel draagt een
    waarde, graad, versheid, tegenspraak en herkomst (register + pad); een leeg
@@ -106,7 +107,27 @@ function main() {
     drukRegels(w.regels);
     return w.gevonden ? 0 : 1;
   }
-  console.error('gebruik: codearchitect map | explain <ding> | impact <bestand...> | unknowns [scope] | why [poort]  [--json]');
+  if (opdracht === 'context') {
+    const [klasse, ...rest2] = onderwerp;
+    const c = A.context(lezer, klasse, rest2.join(' '));
+    /* Schaduw: ook bij `onvoldoende` is de uitgang 0. Alleen een vraag die
+       niet te stellen is (onbekende taakklasse) geeft 2. */
+    if (json) return console.log(JSON.stringify(c, null, 1)), c.voldoendheid ? 0 : 2;
+    if (!c.voldoendheid) { console.error(c.reden); return 2; }
+    console.log('\nCONTEXT voor ' + c.taakklasse + ': ' + c.onderwerp + (c.domein ? '  (domein ' + c.domein + ')' : ''));
+    if (!c.gevonden) { console.log('  ' + c.reden); for (const k of c.kandidaten || []) console.log('    ' + k.soort.padEnd(8) + ' ' + k.id); }
+    else { console.log(''); drukRegels(c.regels); }
+    console.log('\nKENNISGATEN');
+    for (const g of c.kennisgaten || []) console.log('  - ' + g);
+    console.log('\nNIET AANNEMEN');
+    for (const n of c.nietAannemen || A.NIET_AANNEMEN) console.log('  - ' + n.zin + '  (' + n.bron + ')');
+    const v = c.voldoendheid;
+    console.log('\nVOLDOENDHEID: ' + v.uitslag + '  (eist: ' + v.eist.join(', ') + ')');
+    for (const o of v.ontbreekt) console.log('  ontbreekt ' + o.eis + ': ' + o.reden);
+    console.log('  ' + v.grens);
+    return 0;
+  }
+  console.error('gebruik: codearchitect map | explain <ding> | impact <bestand...> | unknowns [scope] | why [poort] | context <taakklasse> <ding>  [--json]');
   return 2;
 }
 

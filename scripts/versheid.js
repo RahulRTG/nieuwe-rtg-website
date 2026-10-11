@@ -451,6 +451,7 @@ const REGISTERS = [
   ['DOELGROEPBEREIK.json', 'npm run doelgroepbereik:vast', 'of de VERKLAARDE doelgroep van een functie zijn eigen paden werkelijk kan bereiken'],
   ['ONVERVREEMDBAAR.json', 'npm run onvervreemdbaar:vast', 'of een werkwoord van de universele bodem voor een gratis account achter betaling verdwijnt (SAMENLEVING.md SAM-01)'],
   ['AANVOERVORM.json', 'npm run aanvoervorm:vast', 'of de vijf terreinen van de aanvoer een VORM delen -- de vraag onder het aanvoercontract'],
+  ['GROEPVORM.json', 'npm run groepvorm:vast', 'of de groepsmodellen van GEMEENSCHAP.md een VORM delen -- de vraag onder de architectuur van FoundationOS'],
 
   /* De ketenbereikmeting hoort bij deze groep en niet bij de gouden ketens: die
      meten of een keten SLUIT, deze meet of de keten door een mensenzin wordt

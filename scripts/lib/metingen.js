@@ -514,6 +514,7 @@ const REGISTER = {
   'DOELGROEPBEREIK.json': { eigenRatel: 'test/doelgroepbereik.test.js' },
   'ONVERVREEMDBAAR.json': { eigenRatel: 'test/onvervreemdbaar.test.js' },
   'AANVOERVORM.json': { eigenRatel: 'test/aanvoer.test.js' },
+  'GROEPVORM.json': { eigenRatel: 'test/groepvorm.test.js' },
   'MOMENTPROEF.json': { eigenRatel: 'test/momentproef.test.js' },
   /* LUSPROEF.json (sinds 24 september 2026) levert voltooibaar voor Ontdekken
      via scripts/lib/appcontract.js. De toets houdt het woordgebruik vast dat

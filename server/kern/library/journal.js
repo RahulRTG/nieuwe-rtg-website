@@ -6,7 +6,7 @@ const NAMES = { 'work.create': 'library.work.created', 'contribution.accept': 'l
   'feedback.create': 'library.feedback.created', 'feedback.decide': 'library.feedback.decided',
   'feedback.resolve': 'library.feedback.resolved', 'education.release': 'library.education.released',
   'education.withdraw': 'library.education.withdrawn' };
-function append(ctx, result, operationId) {
+function appendLibraryEvent(ctx, result, operationId) {
   const { s, w, actor, action, at, receiptKey } = ctx;
   const eventId = 'libevt_' + receiptKey.slice(0, 32);
   const previous = s.journal.findLast(e => e.workId === w.id);
@@ -19,7 +19,7 @@ function append(ctx, result, operationId) {
       classificatie: 'persoonsgegeven' }) };
   event.hash = M.hash(event); s.journal.push(event); return event;
 }
-function verify(events) {
+function verifyLibraryJournal(events) {
   let previous = null;
   for (const event of events) {
     const { hash, ...body } = event;
@@ -49,4 +49,4 @@ function outbox({ read, transaction }) {
     return { deliveredThrough: cursor };
   };
 }
-module.exports = { append, verify, outbox };
+module.exports = { append: appendLibraryEvent, verify: verifyLibraryJournal, outbox };

@@ -776,17 +776,17 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
     const maat = await page.evaluate(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
       const doc = f.contentDocument;
-      const oppervlakken = [...document.querySelectorAll('.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface')];
+      const balk = document.querySelector('.rtg-adaptive-bar');
       const eigen = doc.querySelector('.hoofdtabs');
       const werelden = doc.querySelector('.os-switcher');
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' &&
         el.getBoundingClientRect().height > 0);
       return {
         frameTop: Math.round(f.getBoundingClientRect().top),
-        schilbalk: oppervlakken.filter(zichtbaar).length === 1,
+        schilbalk: zichtbaar(balk) && document.querySelectorAll('.rtg-adaptive-edge').length === 1,
         eigenBalk: zichtbaar(eigen),
         wereldbalk: zichtbaar(werelden),
-        onderbalken: [...oppervlakken, eigen].filter(zichtbaar).length,
+        onderbalken: [balk, eigen].filter(zichtbaar).length,
         navRuimte: getComputedStyle(doc.documentElement).getPropertyValue('--nav').trim(),
         acties: [...document.querySelectorAll('.rtg-adaptive-controls .cmd-actie')].map(b => b.dataset.cap),
         heeftMeer: zichtbaar(document.querySelector('#rtgCommand .cmd-meer'))
@@ -927,7 +927,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const doc = f.contentDocument;
       return {
         acties: window.RTGAdaptief.context().acties,
-        schil: [...document.querySelectorAll('.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface')].filter(zichtbaar).length === 1,
+        schil: zichtbaar(document.querySelector('.rtg-adaptive-bar')) && document.querySelectorAll('.rtg-adaptive-edge').length === 1,
         bank: zichtbaar(doc.querySelector('#rvApp > .rv-bank')),
         rahul: zichtbaar(doc.querySelector('#rvApp > .rv-rahul')),
         rasterrijen: getComputedStyle(doc.querySelector('#rvApp')).gridTemplateRows.trim().split(/\s+/).length
@@ -956,7 +956,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     assert.deepEqual(await page.evaluate(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe'), doc = f.contentDocument;
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
-      return { eigenaren: [...document.querySelectorAll('.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface'), doc.querySelector('.tos-nav')].filter(zichtbaar).length,
+      return { eigenaren: [...document.querySelectorAll('.rtg-adaptive-bar'), doc.querySelector('.tos-nav')].filter(zichtbaar).length,
         travel: zichtbaar(doc.querySelector('.tos-nav')),
         onderruimte: getComputedStyle(doc.documentElement).getPropertyValue('--tos-bottom').trim() };
     }), { eigenaren: 1, travel: false, onderruimte: '0px' },
@@ -985,7 +985,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     const vervoer = await page.evaluate(() => {
       const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' &&
         el.getBoundingClientRect().height > 0);
-      const buiten = [...document.querySelectorAll('.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface')];
+      const buiten = [...document.querySelectorAll('.rtg-adaptive-bar')];
       const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
       const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
       const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/ov.html');
@@ -1081,7 +1081,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
       const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
       const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/navigatie.html');
       return { bank: zichtbaar(rv.contentDocument.querySelector('#rvApp > .rv-bank')),
-        schil: [...document.querySelectorAll('.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface')].filter(zichtbaar).length === 1,
+        schil: zichtbaar(document.querySelector('.rtg-adaptive-bar')) && document.querySelectorAll('.rtg-adaptive-edge').length === 1,
         kindnav: zichtbaar(leaf && leaf.contentDocument.querySelector('.tos-nav')),
         directeBladen: frames.length };
     });

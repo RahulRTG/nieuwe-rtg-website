@@ -51,7 +51,19 @@
     gate.dataset.rtgAccess = 'true';
     gate.setAttribute('data-i18n-ignore','');
     gate.innerHTML =
-      '<div class="access-brand" aria-label="RTG">RTG<small>' + 'VEILIGE TOEGANG' + '</small></div>' +
+      '<section class="access-brand" aria-label="RTG">' +
+        '<div class="access-brand-head"><a href="https://www.rahultravelgroup.com/" aria-label="RTG website"><span translate="no">RTG</span></a>' +
+          '<button class="access-language" id="agLanguage" type="button" aria-label="Taal kiezen">NL</button></div>' +
+        '<div class="access-brand-copy"><small>' + 'VEILIGE TOEGANG' + '</small><p id="agBrandLine">Technologie voor het leven.</p></div>' +
+        '<div class="access-system" aria-hidden="true"><i class="access-system-ring access-system-ring-one"></i><i class="access-system-ring access-system-ring-two"></i>' +
+          '<span class="access-system-node access-system-personal"><b>Personal</b><em>Account</em></span>' +
+          '<span class="access-system-node access-system-travel"><b>Travel</b><em>Journey</em></span>' +
+          '<span class="access-system-node access-system-work"><b>Work</b><em>Role</em></span>' +
+          '<span class="access-system-node access-system-connect"><b>Connect</b><em>People</em></span>' +
+          '<span class="access-system-core"><b translate="no">RTG</b><em>Account</em><i></i></span>' +
+        '</div>' +
+        '<p class="access-brand-principles"><span>Account</span><span>Trust</span><span>Human control</span></p>' +
+      '</section>' +
       '<div class="access-content">' +
         '<button class="access-secondary access-back" id="agBack" type="button" hidden>' + 'Terug' + '</button>' +
         '<p class="access-progress" id="agStappen" role="status" aria-live="polite" hidden></p>' +
@@ -81,6 +93,8 @@
         '<p class="access-error" id="agError" role="alert"></p>' +
         '<a class="access-foundation" id="agFoundation" href="/apps/foundation/os-publiek.html" hidden>' +
           'Ontdek FoundationOS. Dit is en blijft altijd 100% gratis.' + '</a>' +
+        '<footer class="access-meta"><span class="access-protected" id="agProtected"><i></i>Beveiligde verbinding</span>' +
+          '<a id="agPrivacy" href="/apps/juridisch/privacy.html">Privacy</a><a id="agHelp" href="https://www.rahultravelgroup.com/support/">Hulp</a></footer>' +
       '</div>';
     const el = id => gate.querySelector('#' + id);
     const inp = el('agIn'), form = el('agForm'), title = el('agTitle');

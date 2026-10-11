@@ -44,7 +44,7 @@ function report() {
     authorityContracts: v3Authorities.BUILTIN.map(a => ({ id: a.id, version: a.version,
       signer: a.signer, factTypes: a.factTypes })),
     integration: {
-      allHttpRequests: 'server/opzet/verzoekketen.js', allBusEvents: 'server/kern/envelop.js',
+      allHttpRequests: 'server/opzet/verzoekframe.js', allBusEvents: 'server/kern/envelop.js',
       experienceBroker: 'server/kern/experience/broker.js', hospitalityBooking: 'server/kern/ervaring/tafels.js',
       hospitalityFulfillment: 'server/kern/ervaring/tafelplanning.js', connectionPayment: 'server/kern/vonk/payment.js',
       hospitalityOutcome: 'server/kern/ervaring/leden/waardering.js', commandSlo: 'server/kern/command/slo.js',

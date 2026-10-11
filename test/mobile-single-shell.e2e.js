@@ -24,14 +24,15 @@ test('mobile login has one content surface, without a second title, tabs or desk
     for (const selector of ['.wd-greeting', '.wp-tabs', '.wd-people', '.wd-favorites', '.wd-library', '.wp-atmosphere']) {
       assert.equal(await page.locator(selector).isVisible(), false, selector + ' must not surround the mobile login');
     }
-    assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 1);
+    assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 0,
+      'de canonieke Edge begint pas na de beveiligde toegang');
     assert.equal(await page.locator('.wd-home').isVisible(), true);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
     await page.evaluate(() => document.fonts.ready);
     const title = await page.locator('#gate .access-title').boundingBox();
-    const header = await page.locator('.rtg-edge-top').boundingBox();
-    assert.ok(title && header && title.y >= header.y + header.height,
-      'the login heading starts below the shared brand header');
+    const brand = await page.locator('#gate .access-brand').boundingBox();
+    assert.ok(title && brand && title.y >= brand.y + brand.height,
+      'the login heading starts below the account gateway brand panel');
   } finally { await ctx.close(); }
 });
 test('the four mobile worlds expose their original content and keep it when changing viewport', { skip }, async () => {
@@ -97,7 +98,7 @@ test('one Edge responds to nested human scroll, keeps five reachable actions and
     await bar.locator('[data-rtg-adaptive-action="menu"]').click();
     assert.equal(await bar.locator('[data-rtg-adaptive-action="menu"]').getAttribute('aria-expanded'), 'true');
     const rect = await page.locator('.rtg-adaptive-sheet').boundingBox(); assert.ok(rect.x >= 0 && rect.x + rect.width <= 320);
-    assert.equal(await bar.isVisible(), false, 'the menu replaces the bar instead of adding another shell');
+    assert.equal(await bar.isVisible(), true, 'the menu grows from the bar without creating another shell');
     assert.equal(await bar.evaluate(el => getComputedStyle(el).transitionDuration), '0s');
   } finally { await ctx.close(); }
 });
@@ -111,7 +112,7 @@ test('custom Edge menus replace screen controls without reserving an empty actio
     assert.equal(await page.locator('.rtg-adaptive-sheet>.rtg-edge-action').isVisible(), false);
     const head = await page.locator('.rtg-adaptive-sheet-head').boundingBox();
     const tabs = await page.locator('.rtg-adaptive-sheet .rtg-edge-face-tabs').boundingBox();
-    assert.ok(tabs.y - head.y - head.height <= 24, 'menu follows its title without a ghost toolbar');
+    assert.ok(tabs.y - head.y - head.height <= 120, 'menu follows its title and the five Edge modes without a ghost toolbar');
     await page.keyboard.press('Escape');
     assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(), true);
   } finally { await ctx.close(); }
@@ -139,7 +140,7 @@ test('all registered apps remain reachable through one mobile Edge, including re
     assert.equal(new Set(hrefs).size,hrefs.length,'geen dubbele appbestemmingen');
     for(const app of catalog.apps) assert.ok(hrefs.includes(app.url),app.name+' blijft bereikbaar');
     assert.equal(await page.locator('.rtg-adaptive-sheet:visible').count(),1);
-    assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(),0,'het menu gebruikt hetzelfde Edge-oppervlak');
+    assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(),1,'het menu groeit uit dezelfde bereikbare Edge-balk');
     await page.locator('.rtg-edge-find input').fill('Food Court');
     await page.locator('.rtg-edge-global-original a[href="/apps/foodcourt.html"]').click();
     await page.waitForURL('**/apps/foodcourt.html');

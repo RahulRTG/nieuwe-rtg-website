@@ -1,9 +1,29 @@
 'use strict';
 const test = require('node:test'), assert = require('node:assert/strict');
 const h = require('./helper'), { driver, fullScenario, grant } = require('./lib/library-fixture');
-let srv; const tokens = {}, actors = [];
+let srv; const tokens = {}, actors = [], called = new Set();
+// The scenario below must traverse every Library route. Keeping the complete
+// public paths here makes that claim reviewable and lets the route-coverage
+// gate verify the same contract instead of guessing through helper strings.
+const EXPECTED_LIBRARY_ROUTES = [
+  '/api/library/work/create', '/api/library/context', '/api/library/work/list', '/api/library/work/get',
+  '/api/library/revision/add', '/api/library/structure/reorder', '/api/library/contribution/invite',
+  '/api/library/contribution/accept', '/api/library/agreement/propose', '/api/library/agreement/accept',
+  '/api/library/agreement/conflict', '/api/library/rights/grant', '/api/library/rights/revoke',
+  '/api/library/edition/create', '/api/library/edition/freeze', '/api/library/edition/get',
+  '/api/library/edition/withdraw', '/api/library/edition/warn', '/api/library/publication/preview',
+  '/api/library/publication/consent', '/api/library/publication/revoke-consent',
+  '/api/library/publication/confirm', '/api/library/studio/workspace', '/api/library/feedback/create',
+  '/api/library/feedback/list', '/api/library/feedback/decide', '/api/library/feedback/resolve',
+  '/api/library/education/release', '/api/library/education/withdraw', '/api/library/education/get',
+  '/api/library/reader/open', '/api/library/reader/state', '/api/library/reader/proof',
+  '/api/library/reader/search', '/api/library/reader/progress', '/api/library/reader/bookmark',
+  '/api/library/reader/bookmark/remove', '/api/library/reader/highlight', '/api/library/reader/highlight/remove',
+  '/api/library/reader/note', '/api/library/reader/note/remove', '/api/library/proof'
+];
 async function request(path, body, actor) {
-  const r = await fetch(srv.base + '/api/library/' + path, { method: 'POST',
+  const fullPath = '/api/library/' + path; called.add(fullPath);
+  const r = await fetch(srv.base + fullPath, { method: 'POST',
     headers: { 'Content-Type': 'application/json', ...(tokens[actor] ? { Authorization: 'Bearer ' + tokens[actor] } : {}) },
     body: JSON.stringify(body) });
   return { status: r.status, body: await r.json() };
@@ -79,6 +99,8 @@ test('echte server: achttien stappen, uitgeschakelde optionele diensten en alle 
   await d.command(d.B, 'agreement.conflict', { agreementId: s.agreementId, reason: 'Bespreek nieuwe verspreiding.' });
   assert.equal((await query(d.A, 'preview', { workId: s.workId, editionId: s.e2 })).code, 'BLOCKING_CONFLICT');
   assert.equal((await query(d.A, 'proof', { workId: s.workId })).integrity, true);
+  assert.deepEqual(EXPECTED_LIBRARY_ROUTES.filter(path => !called.has(path)), [],
+    'de echte HTTP-scenario-test moet iedere Library-route hebben doorlopen');
 });
 test('HTTP-organisatie: uitsluitend de bestaande Concern-eigenaar vertegenwoordigt een entiteit', async () => {
   const response = await fetch(srv.base + '/api/concern/entiteit/nieuw', { method: 'POST',

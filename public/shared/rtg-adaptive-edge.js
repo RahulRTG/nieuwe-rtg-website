@@ -1,26 +1,18 @@
 (function (w, d) {
   'use strict';
   if(w.RTGAdaptiveEdge)return;
-  var K = w.RTGAdaptiveEdgeCore, Input = w.RTGAdaptiveEdgeInput, rt = null;
-  function esc(value) {
-    return String(value == null ? '' : value).replace(/[&<>"']/g, function (char) {
-      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
-    });
-  }
+  var K=w.RTGAdaptiveEdgeCore,Input=w.RTGAdaptiveEdgeInput,Services=w.RTGAdaptiveEdgeServices,rt=null;
   function icon(name) {
     var paths = w.RTGEdgeIcons || {};
     return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (paths[name] || paths.spark || '') + '</svg>';
-  }
-  function lips() {
-    return '<svg class="rtg-adaptive-lips" viewBox="0 0 100 58" aria-hidden="true"><path d="M2 30C18 28 30 18 43 10C48 7 52 13 56 15C60 13 65 7 70 10C82 18 91 27 98 30C80 34 68 34 55 31C42 34 23 35 2 30Z"/><path d="M3 31C22 34 39 33 55 31C71 34 84 34 97 31C85 42 73 51 55 52C36 50 17 42 3 31Z"/><path d="M8 31C25 35 40 33 55 31C70 34 83 34 92 31"/></svg>';
   }
   function button(spec, slot) {
     var b = d.createElement('button');
     b.type='button'; b.className='rtg-adaptive-item';
     b.dataset.rtgAdaptiveSlot=slot; b.dataset.rtgAdaptiveAction=spec[0];
     b.setAttribute('aria-label',spec[1]);
-    b.innerHTML=(spec[0]==='ai'?lips():icon(spec[3]))+'<span class="rtg-adaptive-item-copy"><small>'+
-      esc(spec[0]==='ai'?'Vraag of regel iets':spec[2]||spec[1])+'</small><b>'+esc(K.detail(spec[0]))+'</b></span>';
+    b.innerHTML=(spec[0]==='ai'?Services.lips():icon(spec[3]))+'<span class="rtg-adaptive-item-copy"><small>'+
+      Services.escape(spec[0]==='ai'?'Vraag of regel iets':spec[2]||spec[1])+'</small><b>'+Services.escape(K.detail(spec[0]))+'</b></span>';
     b.onclick=function(){execute(spec[0]);};
     return b;
   }
@@ -31,7 +23,7 @@
   }
   function execute(action) {
     if (rt.edge.onEdgeAction && rt.edge.onEdgeAction(action) === true) return true;
-    if (action === 'context' || action === 'primary' || (action === 'ai' && d.querySelector('#rtgCommand .cmd-vraagvorm,#rvRahul'))) {
+    if (action === 'context' || action === 'primary') {
       setDeck(action === 'ai' ? 'rahul' : 'actions');
       Input.prepare(rt, action); setState('expanded'); return true;
     }
@@ -42,15 +34,18 @@
     if (action === 'menu') return legacy('.rtg-edge-menu');
     if (action === 'status') return legacy('.rtg-edge-state');
     if (action === 'ai') {
-      if (w.RTGMetgezel && typeof w.RTGMetgezel.rahul === 'function' && d.querySelector('.rtg-rahul-page')) { w.RTGMetgezel.rahul(); return true; }
-      return legacy('.rtg-edge-ai');
+      if (d.querySelector('#rtgCommand .cmd-vraagvorm,#rvRahul')) {
+        setDeck('rahul'); Input.prepare(rt, 'ai'); setState('expanded'); return true;
+      }
+      return Services.open(rt, 'rahul', rt.serviceApi);
     }
     if (action === 'presence') return rt.model.presence && rt.model.presence.action ? execute(rt.model.presence.action) : false;
-    if (action === 'connect') return legacy('.rtg-edge-menu');
+    if (action === 'connect' || action === 'media' || action === 'account') return Services.open(rt, action, rt.serviceApi);
     return false;
   }
   function renderSheet() {
     if (rt.customPanel) return;
+    if (rt.serviceMode && Services.render(rt, rt.serviceApi)) return;
     var continuation = rt.model.continuation;
     rt.sheetTitle.textContent = continuation && continuation.title || rt.edge.ctx.title || d.title || 'Wat wilt u doen?';
     rt.sheetCopy.textContent = continuation && continuation.copy || 'Wat wilt u doen?';
@@ -60,6 +55,7 @@
       var empty = d.createElement('p'); empty.className = 'rtg-adaptive-empty';
       empty.textContent = 'Voor deze context zijn geen veilige acties beschikbaar.'; rt.sheetList.appendChild(empty);
     }
+    Services.modes(rt);
   }
   function renderDeck() {
     rt.bar.textContent = '';
@@ -86,7 +82,7 @@
   }
   function setDeck(deck) {
     if (!rt) return false;
-    closePanel();
+    closePanel(); Services.clear(rt);
     rt.model.deck = K.normDeck(deck); renderDeck(); setState('deck'); Input.haptic(w); return true;
   }
   function closePanel() { Input.closePanel(rt); }
@@ -112,7 +108,7 @@
   function build() {
     var host = d.createElement('section'); host.className = 'rtg-adaptive-edge'; host.setAttribute('aria-label', 'RTG Adaptive Edge');
     host.innerHTML = '<button class="rtg-adaptive-presence" type="button" hidden><i></i><span></span></button><div class="rtg-adaptive-identity" hidden></div>' +
-      '<section class="rtg-adaptive-sheet" hidden aria-hidden="true"><div class="rtg-adaptive-sheet-head"><div><button type="button" class="rtg-adaptive-sheet-mouth" data-rtg-sheet-action="ai" aria-label="Praat met Rahul">' + lips() + '</button><h2></h2><p></p></div><button type="button" data-rtg-adaptive-close aria-label="Sluiten">×</button></div><div class="rtg-adaptive-guard"><i></i><span>Uw volgende handeling</span><b>Controle bij uitvoering</b></div><div class="rtg-adaptive-sheet-list"></div></section>' +
+      '<section class="rtg-adaptive-sheet" hidden aria-hidden="true"><div class="rtg-adaptive-sheet-head"><div><button type="button" class="rtg-adaptive-sheet-mouth" data-rtg-sheet-action="ai" aria-label="Praat met Rahul">' + Services.lips() + '</button><h2></h2><p></p></div><button type="button" data-rtg-adaptive-close aria-label="Sluiten">×</button></div><div class="rtg-adaptive-guard"><i></i><span>Uw volgende handeling</span><b>Controle bij uitvoering</b></div><div class="rtg-adaptive-sheet-list"></div></section>' +
       '<nav class="rtg-adaptive-bar" aria-label="Home, Context, Acties, Connect en Rahul"></nav>';
     function find(selector) { return host.querySelector(selector); }
     rt.edge.root.appendChild(host); rt.host = host; rt.bar = find('.rtg-adaptive-bar');
@@ -124,6 +120,8 @@
     [['[data-rtg-sheet-action]', 'ai'], ['.rtg-adaptive-presence', 'presence']].forEach(function (item) {
       find(item[0]).onclick = function () { execute(item[1]); };
     });
+    rt.serviceApi = { setState: setState, setDeck: setDeck, execute: execute, closePanel: closePanel, legacy: legacy };
+    Services.mount(rt, rt.serviceApi);
     renderDeck(); rt.inputStop = Input.bind(rt, { state: setState, action: execute,
       deck: function (delta) { setDeck(K.nextDeck(rt.model.deck, delta)); },
       rahul: function () { rt.model.deck = 'rahul'; renderDeck(); setState('deck'); execute('ai'); },
@@ -131,7 +129,7 @@
   }
   function start(doc, win, host) {
     var edge = host || (w.RTGEdge && w.RTGEdge.active);
-    if (rt || doc !== d || win !== w || !K || !Input || !d.body || !edge || !edge.root || !edge.cfg || !edge.ctx) return rt;
+    if (rt || doc !== d || win !== w || !K || !Input || !Services || !d.body || !edge || !edge.root || !edge.cfg || !edge.ctx) return rt;
     rt = { doc: d, win: w, edge: edge, model: K.model(), manual: false };
     build(); d.body.dataset.rtgAdaptiveReady = 'true'; setState('dock', 'auto');
     if (w.RTGAdaptiveEdgeSurface) rt.surfaceStop = w.RTGAdaptiveEdgeSurface.start(rt);
@@ -156,6 +154,11 @@
     delete d.body.dataset.rtgAdaptiveReady; delete d.body.dataset.rtgAdaptiveState; rt = null;
   }
   w.RTGAdaptiveEdge = Object.freeze({ start: start, setState: setState, setDeck: setDeck,
+    openView: function (mode) {
+      if (mode === 'now') { setDeck('actions'); return setState('expanded'); }
+      if (mode === 'rahul') return execute('ai');
+      return Services.open(rt, mode, rt.serviceApi);
+    },
     openPanel: openPanel, mountSurface: function (node, options) { return w.RTGAdaptiveEdgeSurface && w.RTGAdaptiveEdgeSurface.mount(node, options); }, setPresence: setPresence,
     setIdentity: setIdentity, continueWith: continueWith, destroy: destroy });
 }(window, document));

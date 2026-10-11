@@ -6,7 +6,9 @@
    Een wereld houdt haar eigen materiaal en kleur; dit blad legt alleen de
    gedeelde toegangssignatuur erover. */
 [data-rtg-toegang]{
-  --rtg-toegang-goud:var(--rtg-leesgoud,var(--gold,var(--goud,#C9A24B)));
+  --rtg-toegang-goud:var(--rtg-leesgoud,var(--gold,var(--goud,#857007)));
+  --rtg-toegang-bordeaux:#711b36;
+  --rtg-toegang-papier:#F4F2EC;
   --rtg-toegang-lijn:var(--line,var(--lijn,rgba(255,255,255,.16)));
   --rtg-toegang-tekst:var(--txt,#F4F0E9);
   --rtg-toegang-zacht:var(--soft,var(--zacht,rgba(244,240,233,.64)));
@@ -36,7 +38,7 @@
   border-color:var(--rtg-toegang-goud)!important;box-shadow:inset 0 -1px 0 var(--rtg-toegang-goud);outline:none;
 }
 [data-rtg-toegang] [data-rtg-toegang-hoofd]{
-  min-height:44px;letter-spacing:.025em;transition:filter var(--rtg-tempo,240ms) var(--rtg-ease,ease),transform var(--rtg-tempo,240ms) var(--rtg-ease,ease);
+  min-height:44px;letter-spacing:.025em;transition:filter var(--rtg-tempo,240ms) var(--rtg-ease,ease),transform var(--rtg-tempo,240ms) var(--rtg-ease,ease),background var(--rtg-tempo,240ms) var(--rtg-ease,ease);
 }
 [data-rtg-toegang] [data-rtg-toegang-hoofd]:hover{filter:brightness(1.08);}
 [data-rtg-toegang] [data-rtg-toegang-hoofd]:active{transform:translateY(1px);}
@@ -44,6 +46,10 @@
   box-shadow:0 26px 80px rgba(0,0,0,.18);
 }
 [data-rtg-toegang-soort="registratie"] .rtg-toegang-id::after{content:"REGISTRATIE";color:var(--rtg-toegang-goud);font-size:.56rem;letter-spacing:.14em;}
+[data-rtg-toegang-soort="identiteit"] [data-rtg-toegang-hoofd],
+[data-rtg-toegang-soort="registratie"] [data-rtg-toegang-hoofd]{
+  border-radius:var(--rtg-radius-capsule);background:var(--rtg-toegang-bordeaux);color:#FFFDF8;
+}
 @media(max-width:520px){
   .rtg-toegang-signatuur{gap:.65rem;font-size:.56rem;letter-spacing:.12em;}
   .rtg-toegang-status{letter-spacing:.08em;}

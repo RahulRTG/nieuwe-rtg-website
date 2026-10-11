@@ -2,7 +2,7 @@
 const M = require('./model'), P = require('./policy');
 const KINDS = ['correction', 'clarity', 'translation', 'accessibility', 'source', 'other'];
 
-function command(ctx) {
+function feedbackCommand(ctx) {
   const { w, data: d, action, id, actor, at } = ctx;
   if (action === 'feedback.create') {
     M.fields(d, ['editionId', 'nodeId', 'kind', 'message', 'evidenceRefs', 'verificationOf', 'assessment']);
@@ -55,4 +55,4 @@ function list(w, editionId) {
   return M.clone(rows);
 }
 
-module.exports = { command, list, KINDS };
+module.exports = { command: feedbackCommand, list, KINDS };

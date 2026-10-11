@@ -254,3 +254,35 @@ test('bron: in een bestand dat het klokboek of een dienstkloktijd SCHRIJFT, draa
   }
   assert.deepEqual(fout, [], 'een logregel naast een kloktijd zonder klok-soort valt buiten de filter van logboekzicht.js');
 });
+
+test('f. de Vloer (/spatial) en het golfvoorstel verraden de inklokvolgorde niet', async () => {
+  /* live() in routes/supplier/horeca/spatial-command.js staat in boekvolgorde,
+     nieuwste inklok eerst. Zara klokt NA Bram in, en heet alfabetisch later:
+     in boekvolgorde staat zij voor hem, op naam erna. */
+  const nieuw = (await api(H, '/api/supplier/staff/add', { name: 'Zara' }, tokM)).body;
+  const tokZ = (await api(H, '/api/supplier/login', { code: 'KIKUNOI', staffId: nieuw.staff.id, pin: nieuw.pin })).body.token;
+  assert.equal((await api(H, '/api/staff/clock', {}, tokZ)).status, 200);
+  const team = async (tok) => {
+    const r = await api(H, '/api/supplier/horeca/spatial', {}, tok);
+    assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
+    return r.body.team;
+  };
+  const m = (await team(tokM)).map(x => x.name);
+  assert.ok(m.indexOf('Zara') >= 0 && m.indexOf('Zara') < m.indexOf(naamB), 'de manager houdt de boekvolgorde: ' + m);
+  const a = (await team(tokA)).map(x => x.name);
+  assert.deepEqual(a, a.slice().sort((x, y) => x.localeCompare(y, 'nl')), 'een collega krijgt de aanwezigen op naam: ' + a);
+  assert.deepEqual(a.slice().sort(), m.slice().sort(), 'wie er is, ziet iedereen');
+
+  // het golfvoorstel: bij gelijke last wint de eerste op NAAM, voor elke kijker dezelfde
+  const missies = (await api(H, '/api/supplier/horeca/missions', {}, tokM)).body.missies || [];
+  const last = (id) => missies.filter(x => String(x.voorId) === String(id) && !/klaar|geannuleerd/.test(x.status)).length;
+  const lijst = await team(tokM);
+  const min = Math.min(...lijst.map(x => last(x.id)));
+  const verwacht = lijst.filter(x => last(x.id) === min).map(x => x.name).sort((x, y) => x.localeCompare(y, 'nl'))[0];
+  assert.equal(verwacht, naamB, 'Bram en Zara hebben geen missies; Bram komt op naam voor Zara');
+  for (const tok of [tokM, tokA]) {
+    const v = await api(H, '/api/supplier/horeca/wave/voorstel', {}, tok);
+    assert.equal(v.status, 200, JSON.stringify(v.body).slice(0, 200));
+    assert.equal(v.body.voorstel.kandidaat && v.body.voorstel.kandidaat.name, verwacht, 'de kandidaat hangt af van de boekvolgorde');
+  }
+});

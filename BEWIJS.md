@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2445 bestanden en 16744 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2445 bestanden en 16745 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2445 |
-| losse beweringen (`test(...)`) | 16744 |
+| losse beweringen (`test(...)`) | 16745 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2271 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2137 bestanden, 16207 beweringen.
+2137 bestanden, 16208 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1859,7 +1859,7 @@ toets omvalt.
 | `supplier-comm-routes.test.js` | 5 | gezakt op `liegpoort /api/` | HET COLLEGA-GESPREK VAN EEN ZAAK, EN DE IDENTITEITSOPVRAAG. Zeven comm-deuren en twee identiteitsdeuren werden door geen enkele toets geopend. |
 | `supplier-contract-teken.test.js` | 6 | gezakt op `liegpoort /api/` | DE HANDTEKENING ONDER EEN ZAAKCONTRACT -- /api/supplier/contract/teken. Deze deur uit server/routes/supplier/contract.js werd door de hele suite nooit aangeroepen: scripts/dekking.js las hem uit het routejournaal als... |
 | `supplier-contract.test.js` | 5 | gezakt op `liegpoort /api/` | HET CONTRACT DAT EEN ZAAK OPSTELT -- /api/supplier/contract/maak. Deze ene deur uit server/routes/supplier/contract.js werd door de hele suite nooit geopend. |
-| `supplier-logboekzicht.test.js` | 7 | gezakt op `liegpoort /api/` | KLOKREGELS IN HET ZAAKLOGBOEK: WIE ZE ONTVANGT. Bestaande grens, eigenaarsbesluit 11 oktober 2026: wie er aanwezig is mag iedereen zien; wanneer een collega in- of uitklokte alleen een manager. |
+| `supplier-logboekzicht.test.js` | 8 | gezakt op `liegpoort /api/` | KLOKREGELS IN HET ZAAKLOGBOEK: WIE ZE ONTVANGT. Bestaande grens, eigenaarsbesluit 11 oktober 2026: wie er aanwezig is mag iedereen zien; wanneer een collega in- of uitklokte alleen een manager. |
 | `supplier-notificaties.test.js` | 4 | gezakt op `liegpoort /api/` | DE MELDINGENBEL VAN EEN ZAAK -- eerste vulling, authenticatie en tenantgrens. De leveranciersapp deed bij binnenkomst al een POST naar /api/supplier/notifications, maar die route bestond niet. |
 | `supplier-post-drive.test.js` | 12 | gezakt op `liegpoort /api/` | DE POST EN DE TEAM-DRIVE VAN EEN ZAAK -- de grens tussen twee bedrijven. Zestien endpoints die de waargenomen dekkingsmeting (scripts/dekking.js) als NOOIT AANGEROEPEN aanwees. |
 | `svgpaden.test.js` | 8 | gezakt op `===->!==#0` | De pad-keuring zelf toetsen. Een keuring die "niets gevonden" zegt is pas iets waard als vaststaat dat hij het echte defect ziet en geldige paden met rust laat. |

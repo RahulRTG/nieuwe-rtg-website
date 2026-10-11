@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-11T18:10:02.478Z",
-  "commit": "5c126a0ed",
+  "op": "2026-10-11T19:55:05.305Z",
+  "commit": "3e905915e",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
@@ -338,7 +338,7 @@
   },
   {
    "sleutel": "POST /api/auth/forgot",
-   "bestand": "server/routes/auth/herstel.js:107",
+   "bestand": "server/routes/auth/herstel.js:115",
    "staat": "openbaar",
    "reden": "wachtwoord vergeten: wie buitengesloten is heeft geen token"
   },
@@ -355,7 +355,7 @@
   },
   {
    "sleutel": "POST /api/auth/reset",
-   "bestand": "server/routes/auth/herstel.js:132",
+   "bestand": "server/routes/auth/herstel.js:140",
    "staat": "eigenControle"
   },
   {
@@ -1126,7 +1126,7 @@
   },
   {
    "sleutel": "POST /api/carriere/regel/toon",
-   "bestand": "server/routes/carriereledger.js:83",
+   "bestand": "server/routes/carriereledger.js:91",
    "staat": "openbaar",
    "reden": "een deelbewijs wordt getoond aan iemand zonder RTG-account; de deelcode is de sleutel, verloopt en is te stoppen"
   },

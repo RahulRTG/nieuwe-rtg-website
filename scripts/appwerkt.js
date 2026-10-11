@@ -886,9 +886,17 @@ function bouw(meting) {
 
 /* DE WACHT: dit script schrijft APPWERKT.json en start daarom niet bij het
    requiren (scripts/meetkeuring.js, regel `wacht`). Een laadcontrole -- node -e
-   "require('./scripts/appwerkt')" -- mag geen browserronde starten en geen
+   met een require van dit bestand -- mag geen browserronde starten en geen
    register overschrijven; dat is precies hoe ROLPROEF.json ooit van 3377 naar
-   292 beproefde routes terugviel. */
+   292 beproefde routes terugviel.
+
+   (Die laadcontrole stond hier eerst letterlijk, als require met een pad tussen
+   aanhalingstekens. sluiting() in ./lib/stempel.js leest requires LEXICAAL, vond
+   een pad dat vanaf scripts/ niet bestaat, en verklaarde daarom de sluiting van
+   dit bestand -- en van liegronde.js en bevoegdronde.js, die het inlezen --
+   onbekend. Gevolg: elke wijziging onder scripts/, ook een scenario van de
+   voltooiproef, liet LIEGRONDE.json en BEVOEGD.json vervallen. Gevonden op 11
+   oktober 2026.) */
 /* SCHERMEIGENAAR.json pas lezen als er gemeten wordt: een laadcontrole hoort
    niets van schijf te halen. */
 let schermregister = null;

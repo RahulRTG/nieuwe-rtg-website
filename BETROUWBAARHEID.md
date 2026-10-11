@@ -579,6 +579,38 @@ ontbreekt: een scenario (de testwereld staat), een eigen adres (een stand of tab
 in de app), of een adapter (`TESTWERELD_ONTBREEKT` in
 `scripts/lib/appcontract.js`: bellen en videobellen, WebRTC).
 
+**Ronde 2 (11 oktober 2026): zes onderdelen, en twee echte vondsten.** Er kwamen
+vier scenario's bij, elk uit een andere wereld en elk op routes die het scherm
+zelf aanroept: **Ik** (Instellingen: voornaamwoord, aanhef en het
+toegankelijkheidsprofiel, met de gedeelde leesroute `/api/ik/toegankelijk` als
+ontvanger), **Mijn loopbaan** (WorkOS: het carrièreledger, met een buitenstaander
+zonder account op de deelcode als ontvanger), **Wonen** (LivingOS: een
+onderhoudsmelding) en **Reizen & Veilig** (TravelOS: een Live Circle met een zaak
+als ontvanger). Hermeten op een schone boom: **16 van de 18 bewijzen sluiten**
+(`VOLTOOIPROEF.json`), en de twee die open staan zijn geen tekort van de proef:
+
+- **Mijn loopbaan, herstelbaar**: een feit dat met 200 is bevestigd, is na een
+  crash direct daarna weg. `kern/carriereledger` roept `vastleggen()` aan zonder
+  erop te wachten, en dat is een async functie -- het antwoord gaat dus de deur uit
+  vóór de duurzame commit, precies de stille faalvorm waar `lib/duurzaam.js` voor
+  bestaat. De nette herstart blijft groen (een deploy spoelt de opslag), de crash
+  niet; daarom zijn het twee bewijzen.
+- **Reizen & Veilig, herstelbaar**: een dubbeltik op "Deel live" maakt twee Live
+  Circles, en de zaak ziet er twee. `/api/veiligheid/moment/maak` heeft geen
+  verklaring in `server/lib/idemsleutels-*.js`; de melding van Wonen heeft die
+  wel en houdt hetzelfde gebaar.
+
+Beide liggen in `server/` en zijn in deze ronde niet gerepareerd: de proef heeft
+ze gevonden, en dat ze er staan is de uitslag. Twee kleinere dingen die het bouwen
+opleverde: Reizen & Veilig vraagt de Magnaat-testomgeving (`RTG_MAGNAAT_TEST=1`),
+omdat de enige zaak met een manager-PIN synthetische zaaidata is -- een scenario
+mag zo'n extra omgeving vragen, en die staat dan in het register (`omgeving`). En
+bij Ik is de kluis de opslag: de proef ontsleutelt `users.member_state` met opzet
+niet (dan las een meetscript de sleutel van de kluis), en bewijst op schijf alleen
+dat precies één rij veranderde en dat de klare tekst er niet in staat. Dat de
+inhoud klopt, bewijzen de route na de herstart en de nieuwe sessie. De ratel in
+`test/voltooiproef.test.js` ging van 6 naar 16.
+
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 
 `npm run appwerkt` schrijft `APPWERKT.json`: per onderdeel uit `MAPPEN`, met de

@@ -98,3 +98,15 @@ test('6. een nagekeken woord telt niet als defect, maar verdwijnt ook niet; een 
     for (const [woord, reden] of Object.entries(w)) assert.ok(String(reden).length > 40, f + '/' + woord + ' staat er zonder reden');
   }
 });
+
+test('7. de sluiting van de rondes is bekend, zodat een wijziging ernaast hun register niet laat vervallen', () => {
+  /* Een letterlijke require in COMMENTAAR van scripts/appwerkt.js maakte de
+     sluiting van appwerkt, liegronde en bevoegdronde onbekend; dan telt elke
+     wijziging onder scripts/ en vervalt het register bij de eerste commit. */
+  const { sluiting } = require('../scripts/lib/stempel');
+  for (const f of ['scripts/appwerkt.js', 'scripts/liegronde.js', 'scripts/bevoegdronde.js']) {
+    const sl = sluiting(f);
+    assert.ok(sl, f + ': de sluiting is onbekend');
+    assert.ok(sl.has('scripts/appwerkt.js'), f + ': appwerkt.js valt buiten de sluiting');
+  }
+});

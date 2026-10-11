@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T06:07:09.862Z",
-    "commit": "4b621148",
+    "op": "2026-10-11T06:40:52.212Z",
+    "commit": "b3cbab0f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1528,6 +1528,13 @@
       "operator": "true->false#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "betaalstop-spelling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "betaalstore.test.js": {
       "soort": "puur",
@@ -12403,6 +12410,13 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "rem-gelijktijdig.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "overleefd"
+    },
     "rem.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15053,6 +15067,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "staff-ontslag.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "staff-pin-productie.test.js": {

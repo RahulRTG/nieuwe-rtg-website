@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-11T11:53:30.482Z",
-  "commit": "5125ad7c6",
+  "op": "2026-10-11T15:06:05.707Z",
+  "commit": "a92e2b707",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,22 +10,22 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5326,
-  "geclassificeerd": 5301,
+  "totaal": 5335,
+  "geclassificeerd": 5310,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
-   "NOT_APPLICABLE": 1278,
+   "NOT_APPLICABLE": 1280,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 670,
+   "PROTECTED": 677,
    "INTENTIONALLY_NON_IDEMPOTENT": 189
   },
-  "vastgesteldDoorMens": 2189,
+  "vastgesteldDoorMens": 2198,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4381,
-   "PUBLIC": 139,
+   "AUTHENTICATED": 4387,
+   "PUBLIC": 140,
    "OBJECT_SCOPED": 775,
-   "(niet af te leiden -- vraagt een verklaring)": 15,
+   "(niet af te leiden -- vraagt een verklaring)": 17,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 179
+   "niet gemeten": 188
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -50,6 +50,12 @@
   {
    "route": "POST /api/arrival/pass/roteer",
    "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "PUBLIC",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/betaal/webhook/connect",
+   "bedoeld": "SERVICE_TO_SERVICE",
    "waargenomen": "PUBLIC",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
@@ -182,6 +188,12 @@
   {
    "route": "POST /api/mob/kaart/toon",
    "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/office/connect/afrekening",
+   "bedoeld": "CAPABILITY_GATED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
@@ -8749,6 +8761,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "betaal.webhook.connect",
+   "route": "POST /api/betaal/webhook/connect",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "SERVICE_TO_SERVICE",
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -20883,7 +20916,7 @@
    "mutatieId": "foundation.gezinscode.roteren",
    "route": "POST /api/foundation/gezin/code/roteer",
    "semantiek": {
-    "klasse": "nietHerhaalbaar"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -20893,7 +20926,7 @@
     "bewakers": []
    },
    "bewijs": null,
-   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -23628,6 +23661,25 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "school.belkanaal.ticket",
+   "route": "POST /api/foundation/school/belkanaal/ticket",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": null,
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -62991,6 +63043,69 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "office.connect.afrekening",
+   "route": "POST /api/office/connect/afrekening",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "CAPABILITY_GATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.connect.afrekeningen",
+   "route": "POST /api/office/connect/afrekeningen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.connect.veeg",
+   "route": "POST /api/office/connect/veeg",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "office.conversations",
    "route": "POST /api/office/conversations",
    "semantiek": {
@@ -65022,7 +65137,7 @@
    "mutatieId": "office.kantoor.uitnodiging",
    "route": "POST /api/office/kantoor/uitnodiging",
    "semantiek": {
-    "klasse": "nietHerhaalbaar"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
@@ -65040,7 +65155,7 @@
     "grond": null,
     "hindernis": "Een uitnodiging hangt aan een persoonlijke RTG-inlog."
    },
-   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -74033,6 +74148,69 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.vrijgave",
+   "route": "POST /api/office/vrijgave",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.vrijgave.besluit",
+   "route": "POST /api/office/vrijgave/besluit",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "office.vrijgave.stand",
+   "route": "POST /api/office/vrijgave/stand",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -104484,6 +104662,25 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "sessiestroom.ticket",
+   "route": "POST /api/stroom/ticket",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": null,
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

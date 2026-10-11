@@ -90,7 +90,7 @@ het voorstel voorlopig een oplossing voor een probleem dat niemand heeft.
 
 `scripts/symbolen.js` → `SYMBOLEN.json` (`npm run symbolen`):
 
-**<!--getal:symbolen.gelezen-->5304<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->26887<!--/getal--> benoemde symbolen met een regelnummer,
+**<!--getal:symbolen.gelezen-->5304<!--/getal--> bestanden gelezen, <!--getal:symbolen.totaal-->26889<!--/getal--> benoemde symbolen met een regelnummer,
 <!--getal:symbolen.kanten-->7498<!--/getal--> require-kanten** — heen (waar hang ik van af) én terug (wie hangt van
 mij af). Die tweede richting is de dure kant om met de hand te zoeken, en precies
 wat een impactvraag nodig heeft.

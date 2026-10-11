@@ -75,6 +75,7 @@ const LIJST = Object.freeze({
       'terugval en gaat vanaf duizend euro via de tweede handtekening naar ' +
       'kern/reisbureau-teruggave.js#uitvoeren. Deze regel schrijft die bestaande bevoegdheid op; ' +
       'hij breidt hem niet uit.',
+  }),
   /* De afstemming van een uitbetaling met onbekende uitkomst (MONEY-012). Ook die
      bevoegdheid bestond al: POST /api/office/bank/opdrachten/afstemming staat achter
      kluisAuth en voert na een tweede handtekening kern/betaalopdracht/afstemming.js#stemAf

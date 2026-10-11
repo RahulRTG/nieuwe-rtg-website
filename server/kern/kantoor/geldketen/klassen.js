@@ -124,6 +124,8 @@ const KETENS = Object.freeze([
       '/api/office/reisbureau/teruggave',          // klaarzetten: de hele baan tot het besluit
       '/api/office/bank/handtekening/bevestig',    // de tweede mens, en daarna de uitvoering
       '/api/office/bank/incasso/dossier',          // het dossier is per voornemen, niet per handeling
+    ]),
+  }),
   /* DE DERDE KETEN (11 oktober 2026, naast de reisteruggave): een ONBEKENDE uitbetaling afstemmen op een
      afschriftregel. Een geldbeweging (bij `niet-uitgevoerd` komt het geld terug), dus
      `geld-eenmalig` -- en daarmee verplicht `atomair`. Die as is met opzet OPEN: de

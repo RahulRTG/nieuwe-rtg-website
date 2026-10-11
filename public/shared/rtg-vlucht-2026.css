@@ -7,7 +7,7 @@ body.rtg-flight-experience{
 }
 body.rtg-flight-experience>header.vliegkop{display:grid;align-content:space-between;min-height:440px;padding:calc(env(safe-area-inset-top) + 1.1rem) max(1rem,calc((100% - 920px)/2)) 2rem;border:0;border-bottom:1px solid var(--flight-line);overflow:hidden;background:linear-gradient(180deg,rgba(2,9,15,.12),rgba(2,9,15,.9) 90%),url('/images/editorial/travel-flight.webp') center/cover!important}
 .vlucht-brand{align-self:start;display:grid;grid-template-columns:auto auto;align-items:baseline;gap:.12rem .8rem;width:max-content;color:inherit!important;text-decoration:none!important}
-.vlucht-brand>b{grid-row:1/3;color:var(--flight-gold);font:400 2.5rem/1 "Bodoni Moda",serif}.vlucht-brand>span{font-size:1rem}.vlucht-brand>small{color:#d5b67d;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase}
+.vlucht-brand>b{grid-row:1/3;color:var(--flight-gold);font:400 2.5rem/1 "Bodoni Moda",serif}.vlucht-brand>span{font-size:1rem}.vlucht-brand>small{color:var(--rtg-p-metaal,#d5b67d);font-size:.52rem;letter-spacing:.2em;text-transform:uppercase}
 .vlucht-koptekst{align-self:end;max-width:700px}.vlucht-koptekst .ey{color:var(--flight-gold);font-size:.62rem;letter-spacing:.24em}.vlucht-koptekst h1,#vluchtTitel{max-width:720px;margin:.55rem 0;color:var(--flight-ink);font:400 clamp(3rem,7vw,5.4rem)/.92 "Bodoni Moda",serif!important;letter-spacing:-.035em}.vlucht-koptekst p{max-width:530px;margin:0;color:var(--flight-soft);font-size:clamp(.9rem,2vw,1.1rem);line-height:1.6}
 .rtg-flight-experience[data-vlucht-tab=charter] .vliegkop{background:linear-gradient(180deg,rgba(2,9,15,.08),rgba(2,9,15,.92) 92%),none center/cover!important}
 .rtg-flight-experience main{max-width:920px;padding:0 1rem 11rem}

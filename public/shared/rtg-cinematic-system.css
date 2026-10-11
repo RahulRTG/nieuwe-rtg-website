@@ -290,6 +290,19 @@ body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]:not(#rtg-geen-l
 /* 2. EEN OUD DONKER VLAK WORDT EEN IVOREN KAMER. Deze vlakken zetten hun eigen
       donkere grond maar lazen hun tekst uit de wereldtokens: donkere inkt op
       een donker vlak, tot 1,01:1. De www-site kent geen donkere panelen. */
+/* 2b. DE COMMANDFAMILIE (horeca, geld, werk, Living OS, partnernetwerk,
+      privekantoor, reizen en de suites) schreef haar lichte tekst als letterlijke
+      kleur. Die staat nu als var(--rtg-p-*, oude kleur): buiten deze laag
+      bestaat --rtg-p-* niet en geldt exact de oude kleur, hier volgt hij de
+      wereld. In een echt donker vlak krijgt hij hieronder zijn lichte waarde
+      terug. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]){
+  --rtg-p-inkt:var(--rtg-world-ink);--rtg-p-zacht:var(--rtg-world-muted);--rtg-p-metaal:var(--rtg-world-metal);
+  --rtg-p-rood:#9e1c40;--rtg-p-groen:#2f7256;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.wh-photo,.wp-scene,[data-rtg-cinematic-lead="true"],#rtg-cookie){
+  --rtg-p-inkt:#f7f1e8;--rtg-p-zacht:#d8cfc2;--rtg-p-metaal:#e2c389;--rtg-p-rood:#e7a8b8;--rtg-p-groen:#9fd6b8;
+}
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]){--rtg-card:var(--rtg-world-card)!important;--rtg-oppervlak:var(--rtg-world-card)!important;--rv-bg:var(--rtg-world-bg)!important}
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tos-service-strip,.rtgplek,.rb-leeg,.rv-reiszoek button,.rail,.side,#balk,.topnav,.top,.school-boven,header.kop,#apparaten,#paginabar,nav.lagen,article.mise,.v-wijk.los,.leeg):not([data-rtg-cinematic-lead="true"]),
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(header.kop,.rtgplek) :is(a,button):not(.rtg-edge-mark),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) header.ios-nav .knop{

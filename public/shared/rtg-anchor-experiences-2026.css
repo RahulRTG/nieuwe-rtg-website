@@ -42,10 +42,10 @@ body.rtg-today-experience{
 .today-hero::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,rgba(81,18,29,.25),transparent 58%)}
 .today-ey{margin:0 0 .75rem;color:var(--anchor-gold);font-size:.58rem;font-weight:650;letter-spacing:.25em;text-transform:uppercase}
 .today-hero h1{max-width:12ch;margin:0;font:400 clamp(3.1rem,10vw,5.6rem)/.92 var(--anchor-serif);letter-spacing:-.035em;text-wrap:balance}
-.today-date{margin:.8rem 0 .2rem;font-size:.9rem;color:#f8f0e7}
-.today-weather{display:flex;gap:.65rem;align-items:center;margin:.45rem 0 0;color:#dfcbbb;font-size:.78rem}
+.today-date{margin:.8rem 0 .2rem;font-size:.9rem;color:var(--rtg-p-metaal,#f8f0e7)}
+.today-weather{display:flex;gap:.65rem;align-items:center;margin:.45rem 0 0;color:var(--rtg-p-metaal,#dfcbbb);font-size:.78rem}
 .today-weather b{color:var(--anchor-gold);font-size:1.05rem}
-.today-brief{max-width:38rem;margin:.8rem 0 0;color:#d8c8bd;font-size:.88rem;line-height:1.55}
+.today-brief{max-width:38rem;margin:.8rem 0 0;color:var(--rtg-p-zacht,#d8c8bd);font-size:.88rem;line-height:1.55}
 .today-primary,.today-action{
   min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:.75rem;
   border:1px solid #a42a48;border-radius:0;background:linear-gradient(100deg,#6f1028,#9d2341);color:#fff7ed;
@@ -55,16 +55,16 @@ body.rtg-today-experience{
 .today-section{margin-top:2rem}
 .today-section-head{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:.8rem}
 .today-section h2{margin:0;font:400 1.65rem/1.1 var(--anchor-serif)}
-.today-section-head span{color:#c9aebb;font-size:.7rem}
+.today-section-head span{color:var(--rtg-p-zacht,#c9aebb);font-size:.7rem}
 .today-moments,.today-attention{border:1px solid var(--anchor-line);background:rgba(28,17,14,.72)}
 .today-moment,.today-attention a{display:grid;grid-template-columns:3.6rem minmax(0,1fr) auto;gap:.8rem;align-items:center;min-height:4.8rem;padding:.9rem;border-top:1px solid var(--anchor-line);color:inherit;text-decoration:none}
 .today-moment:first-child,.today-attention a:first-child{border-top:0}
 .today-moment .tijd{color:var(--anchor-gold);font-size:.78rem;font-variant-numeric:tabular-nums}
 .today-moment b,.today-attention b{display:block;font-size:.88rem;font-weight:620}
-.today-moment span,.today-attention span{display:block;margin-top:.18rem;color:#bfaea5;font-size:.72rem;line-height:1.35}
+.today-moment span,.today-attention span{display:block;margin-top:.18rem;color:var(--rtg-p-zacht,#bfaea5);font-size:.72rem;line-height:1.35}
 .today-moment button{min-height:34px;border:1px solid rgba(213,181,116,.32);border-radius:0;background:transparent;color:var(--anchor-gold);padding:.45rem .65rem;font:600 .68rem var(--anchor-sans);cursor:pointer}
 .today-attention .icoon{width:2.7rem;height:2.7rem;display:grid;place-items:center;border:1px solid rgba(213,181,116,.38);border-radius:50%;color:var(--anchor-gold)}
-.today-attention em{color:#cfbbad;font-size:.75rem;font-style:normal}
+.today-attention em{color:var(--rtg-p-zacht,#cfbbad);font-size:.75rem;font-style:normal}
 .today-calm{margin:1rem 0 0;text-align:center;color:var(--anchor-gold);font:400 1rem var(--anchor-serif)}
 .today-evening{position:relative;isolation:isolate;min-height:25rem;display:flex;align-items:flex-end;margin-top:2rem;padding:1.25rem;overflow:hidden;border:1px solid var(--anchor-line)}
 .today-evening::before{content:"";position:absolute;z-index:-2;inset:0;background:url('/images/start/dagdelen/hero-avond.jpg') center/cover no-repeat;filter:saturate(.75)}
@@ -72,11 +72,11 @@ body.rtg-today-experience{
 .today-evening h2{max-width:11ch;margin:0 0 1rem;font:400 2.7rem/.94 var(--anchor-serif)}
 .today-evening-list{border:1px solid var(--anchor-line);background:rgba(12,8,7,.76)}
 .today-evening-list a{display:flex;align-items:center;gap:.7rem;padding:.72rem;border-top:1px solid var(--anchor-line);color:inherit;text-decoration:none;font-size:.78rem}
-.today-evening-list a:first-child{border-top:0}.today-evening-list i{color:var(--anchor-gold);font-style:normal}.today-evening-list span{margin-left:auto;color:#d5c0b4}
+.today-evening-list a:first-child{border-top:0}.today-evening-list i{color:var(--anchor-gold);font-style:normal}.today-evening-list span{margin-left:auto;color:var(--rtg-p-rood,#d5c0b4)}
 .today-evening .today-primary{width:100%}
 .today-secondary{display:inline-flex;align-items:center;justify-content:center;min-height:24px;margin:.7rem auto 0;border:0;background:none;color:var(--anchor-gold);font:600 .72rem var(--anchor-sans);text-decoration:none;text-align:center}
 .today-nav{position:fixed;z-index:20;left:.65rem;right:.65rem;bottom:calc(.65rem + env(safe-area-inset-bottom));height:4.4rem;display:grid;grid-template-columns:repeat(5,1fr);border:1px solid rgba(213,181,116,.25);background:rgba(17,10,8,.94);backdrop-filter:blur(22px)}
-.today-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.25rem;color:#bbaaa0;font-size:.58rem;text-decoration:none}.today-nav a[aria-current="page"]{color:var(--anchor-gold)}
+.today-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.25rem;color:var(--rtg-p-zacht,#bbaaa0);font-size:.58rem;text-decoration:none}.today-nav a[aria-current="page"]{color:var(--anchor-gold)}
 .today-nav b{font-size:1rem;font-weight:400}.today-nav .maak b{width:2.8rem;height:2.8rem;display:grid;place-items:center;border-radius:50%;background:#74142d;color:#fff0e5;font-size:1.35rem}
 .rtg-today-experience .vis-verborgen{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important;border:0!important}
 
@@ -112,7 +112,7 @@ body.rtg-travel-experience[data-rtg-world-dashboard-ready="true"]{background:rad
 .rtg-travel-experience .dagtitel{padding:clamp(1.2rem,4vw,3rem)!important}
 .rtg-travel-experience .travel-belofte{max-width:12ch;margin:.4rem 0 1rem;color:var(--anchor-ivory);font:400 clamp(3rem,6vw,5.8rem)/.92 var(--anchor-serif);letter-spacing:-.04em;text-wrap:balance}
 .rtg-travel-experience #titelVandaag{margin:0!important;color:var(--anchor-gold)!important;font:500 1rem/1.2 var(--anchor-serif)!important;letter-spacing:0!important}
-.rtg-travel-experience #dagzin{max-width:32rem!important;color:#d7d7d0!important}
+.rtg-travel-experience #dagzin{max-width:32rem!important;color:var(--rtg-p-inkt,#d7d7d0)!important}
 .rtg-travel-experience .travel-hero-actie{margin-top:1rem}
 .rtg-travel-experience :where(.strook,.rahulsnel,.kompaskaart,.reisregister,.reisdiensten>a,.volgendblok){border-color:rgba(213,181,116,.22)!important;background-color:#081d2e!important}
 .rtg-travel-experience .actieknop{border-color:#b18c4c!important;background:linear-gradient(100deg,#caa760,#e1c58d)!important;color:#071522!important}
@@ -141,7 +141,7 @@ body.rtg-work-experience[data-rtg-skin="heritage"]{
 }
 .rtg-work-experience .rtg-edge-top{background:rgba(7,21,34,.95)!important}
 .rtg-work-experience .rtg-edge-2-context-slot .wereldapps{display:flex!important;align-items:center!important;gap:0!important;padding:0!important;overflow-x:auto!important;background:#071522!important;scrollbar-width:none}
-.rtg-work-experience .rtg-edge-2-context-slot .wereldapps>*{position:static!important;flex:0 0 auto!important;width:auto!important;min-width:max-content!important;min-height:44px!important;display:flex!important;align-items:center!important;margin:0!important;padding:.55rem .8rem!important;border:0!important;border-right:1px solid rgba(213,181,116,.14)!important;white-space:nowrap!important;color:#b7c0c3!important;font-size:.58rem!important;line-height:1!important;text-decoration:none!important}
+.rtg-work-experience .rtg-edge-2-context-slot .wereldapps>*{position:static!important;flex:0 0 auto!important;width:auto!important;min-width:max-content!important;min-height:44px!important;display:flex!important;align-items:center!important;margin:0!important;padding:.55rem .8rem!important;border:0!important;border-right:1px solid rgba(213,181,116,.14)!important;white-space:nowrap!important;color:var(--rtg-p-zacht,#b7c0c3)!important;font-size:.58rem!important;line-height:1!important;text-decoration:none!important}
 .rtg-work-experience .rtg-edge-2-context-slot .wereldapps>b{color:var(--anchor-gold)!important;font-size:.52rem!important;letter-spacing:.14em!important;text-transform:uppercase!important}
 .rtg-work-experience .wereldtabs{border-color:rgba(213,181,116,.2)!important;background:rgba(5,16,26,.94)!important}
 .rtg-work-experience .wereldtab[aria-current="page"]{color:var(--anchor-gold)!important}
@@ -169,8 +169,8 @@ body.rtg-school-experience{
 .rtg-school-experience .school-kader{background:#071827!important}
 .rtg-school-experience .school-zij{border-color:rgba(213,181,116,.18)!important;background:#06131f!important}
 .rtg-school-experience .school-merk{color:var(--anchor-ivory)!important}.rtg-school-experience .school-merkbeeld{border-color:var(--school-gold)!important;color:var(--school-gold)!important}
-.rtg-school-experience .school-nav{color:#b8c2c7!important}.rtg-school-experience .school-nav.aan{border-color:var(--school-gold)!important;background:rgba(184,149,85,.12)!important;color:#fff6e8!important}
-.rtg-school-experience .school-veilig{border-color:rgba(213,181,116,.18)!important;color:#aebbc2!important}
+.rtg-school-experience .school-nav{color:var(--rtg-p-zacht,#b8c2c7)!important}.rtg-school-experience .school-nav.aan{border-color:var(--school-gold)!important;background:rgba(184,149,85,.12)!important;color:#fff6e8!important}
+.rtg-school-experience .school-veilig{border-color:rgba(213,181,116,.18)!important;color:var(--rtg-p-zacht,#aebbc2)!important}
 .rtg-school-experience .school-werk{background:var(--school-ivory)!important;color:var(--school-ink)!important}
 .rtg-school-experience .school-boven{border-color:#ded5c7!important;background:rgba(245,240,231,.94)!important;color:var(--school-ink)!important;backdrop-filter:blur(18px)}
 .rtg-school-experience .school-ey{color:var(--school-burgundy)!important}
@@ -180,12 +180,12 @@ body.rtg-school-experience{
 .rtg-school-experience .enterprise-hero::before{content:"";position:absolute;z-index:-2;inset:0;background:url('/images/editorial/foundation-school.webp') center/cover no-repeat;filter:saturate(.72) contrast(1.02)}
 .rtg-school-experience .enterprise-hero::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,rgba(5,18,29,.96),rgba(5,18,29,.48) 66%,rgba(5,18,29,.12)),linear-gradient(0deg,rgba(5,18,29,.93),transparent 70%)}
 .rtg-school-experience .enterprise-hero>div:first-child{max-width:39rem}
-.rtg-school-experience .enterprise-hero .ey{color:#e3c88c!important}
+.rtg-school-experience .enterprise-hero .ey{color:var(--rtg-p-metaal,#e3c88c)!important}
 .rtg-school-experience .enterprise-hero h2{max-width:12ch!important;margin:.55rem 0!important;color:var(--anchor-ivory)!important;font:400 clamp(3rem,6vw,5.6rem)/.92 var(--anchor-serif)!important;letter-spacing:-.035em!important;text-wrap:balance}
-.rtg-school-experience .enterprise-hero p{max-width:36rem!important;color:#d4dde0!important;font-size:.9rem!important;line-height:1.6!important}
+.rtg-school-experience .enterprise-hero p{max-width:36rem!important;color:var(--rtg-p-inkt,#d4dde0)!important;font-size:.9rem!important;line-height:1.6!important}
 .rtg-school-experience .enterprise-chip{border-color:rgba(227,200,140,.32)!important;background:rgba(6,19,31,.65)!important;color:#f8f0e7!important}
 .rtg-school-experience .enterprise-belofte{max-width:19rem;border:1px solid rgba(227,200,140,.28)!important;background:rgba(6,19,31,.78)!important;color:#d4dde0!important;backdrop-filter:blur(14px)}
-.rtg-school-experience .enterprise-belofte b{color:#e3c88c!important}
+.rtg-school-experience .enterprise-belofte b{color:var(--rtg-p-metaal,#e3c88c)!important}
 .rtg-school-experience :where(.kaart,.kpi,.school-dashboard-grid>*,#vandaagLeren>*){border-color:#d9d0c2!important;background:#fbf7f0!important;color:var(--school-ink)!important;box-shadow:0 12px 30px rgba(26,31,35,.06)}
 .rtg-school-experience :where(.mini,.sub,.rij small){color:var(--school-muted)!important}
 .rtg-school-experience .sec,.rtg-school-experience .soort{color:var(--school-burgundy)!important}

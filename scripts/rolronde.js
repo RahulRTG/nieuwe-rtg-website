@@ -261,7 +261,7 @@ async function main() {
 
   try {
     fs.writeFileSync(UITSLAGBESTAND, JSON.stringify({
-      stempel: stempel(),
+      stempel: stempel(null, { uitvoer: ['ROLRONDE.json'] }),
       uitleg: 'De rolronde: welke rol komt waar binnen, gevraagd aan een echte server in plaats van aan de brontekst. ' +
         'gaten MAG ALLEEN DALEN en gemeten mag ALLEEN STIJGEN -- zie scripts/rolronde.js. ' +
         'Dit is de VERTICALE scheiding; de horizontale (lid A tegen lid B) is de gluurder-trede van de ladder.',

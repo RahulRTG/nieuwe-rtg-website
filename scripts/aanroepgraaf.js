@@ -57,6 +57,9 @@ if (require.main !== module) return;
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+/* De gemeten invoer voor het stempel (ARCHITECTOPDRACHT.md fase 2); zonder
+   invoerspoor-preload is dit undefined en verandert het stempel niet. */
+const { blok: invoerBlok } = require('./lib/invoerspoor');
 const { parse } = require('./ast/parser');
 const { loop } = require('./ast/walk');
 
@@ -599,7 +602,7 @@ const uit = {
      dekkingsvraag triviaal waar, dus scripts/codewereld.js telt hem apart. */
   soort: 'index',
   uitleg: 'De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.',
-  stempel: { op: new Date().toISOString().slice(0, 10), commit },
+  stempel: { op: new Date().toISOString().slice(0, 10), commit, invoer: invoerBlok(['AANROEPGRAAF.json']) },
   grens: 'Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.',
   gemeten: {
     bestanden: bomen.size,

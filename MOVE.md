@@ -134,6 +134,31 @@ niet betrouwbaar* -- gerekend uit echte gegevens door de echte motor.
 
 ---
 
+## 5a. "Wat als het uitloopt?" staat op het scherm (11 oktober 2026)
+
+`/api/move/gevolg` bestond en was getoetst, maar geen enkel bestand in
+`public/` riep hem aan: voor een lid bestond de tweede vraag van Move niet.
+Elke overgang op `/apps/move.html` draagt nu de vraag *Loopt <onderdeel> uit?*
+met een keuzelijst (15 tot 90 minuten) en een knop *Reken door*. Drie dingen
+liggen daarbij vast, en `test/move-gevolg.e2e.js` zakt op elk ervan (met een
+mutatie nagetrokken):
+
+- **de minuten komen van de reiziger** -- het scherm stuurt de gekozen waarde,
+  Move raadt geen vertraging (zet het scherm een vaste 30 in, dan zakt de toets);
+- **het antwoord is een voorstel en het scherm zegt dat ook**: de link brengt
+  naar de app waar het echte werk hoort, met *er is niets verzet; dat bevestigt
+  een mens* eronder;
+- **valt de server weg**, dan staat er *Doorrekenen is niet gelukt* en komt de
+  knop terug.
+
+Wat er NIET is: *Past dit nog?* (`/api/move/vooraf`) staat niet op dit scherm.
+Die vraag hoort vóór een boeking en vraagt een plek die de plekkenlaag kan
+oplossen (een zaakcode); de Mall stelt hem al bij het kiezen van een tijd. Een
+vrij plekveld hier zou een stadsnaam naar coördinaten moeten benaderen, en dat
+doet deze laag met opzet niet. En een vers lid zonder twee opeenvolgende
+onderdelen ziet nog steeds alleen de lege stand: er is dan niets om door te
+rekenen, en een knop zonder werk zou schijn zijn.
+
 ## 6. Wat er niet is, met de reden
 
 - **Twee van de zes bronnen leveren geen plek**, en dat blijft zo tot het

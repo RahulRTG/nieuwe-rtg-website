@@ -1,56 +1,56 @@
 {
   "stempel": {
-    "op": "2026-09-14T15:23:42.516Z",
-    "commit": "67fd1712",
-    "boomVuil": false,
+    "op": "2026-10-11T09:46:59.597Z",
+    "commit": "3ee6e2c06",
+    "boomVuil": true,
     "instrument": "scripts/verband.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "uitleg": "De ijking van de verbandlaag: kan een onafhankelijke waarnemer de wet->wachter-randen terugvinden die WETTEN.json verklaart? Het veld `handhaver` is hier de REFERENTIE en wordt door geen enkele sensor gelezen -- anders ijkt de machine zichzelf en is de uitslag altijd honderd procent.",
   "graad": "vermoed",
   "grens": "De RECALL is gemeten, de PRECISIE niet: van de voorstellen per sensor is niet vastgesteld welk deel een echte handhaver aanwijst. De vijf sensoren worden NOOIT tot een cijfer gemiddeld -- `anker` haalt 8 van de 57 met 12 voorstellen en `wettekst` 52 met 411, dus een gemiddelde verbergt precies het verschil waar een lezer op moet wegen. Een rand draagt daarom WELKE sensoren hem zagen en geen betrouwbaarheidspercentage.",
   "telling": {
-    "wetten": 53,
-    "randenWachter": 59,
-    "randenImplementatie": 40,
-    "gevonden": 57,
+    "wetten": 55,
+    "randenWachter": 63,
+    "randenImplementatie": 44,
+    "gevonden": 61,
     "gemist": 2
   },
   "tweeRelaties": {
     "uitleg": "Het veld `handhaver` draagt twee verschillende beweringen: een WACHTER die rood wordt (relatie BEWAAKT_DOOR), en de IMPLEMENTATIE die de regel draagt (relatie DRAAGT). Deze meter ijkt alleen de eerste. Elke rand draagt daarom een `relatie` die zegt WAT hij is, naast een `bronrelatie` die zegt wat er in WETTEN.json stond.",
     "interpretatie": "ONBEPAALD IN DE BRON: WETTEN.json kent een veldnaam voor twee relaties. De splitsing hier is een LEZING van deze meter en geen besluit -- WETTEN.json is niet aangeraakt. Wie die twee daar uit elkaar trekt, doet dat als besluit en niet als berekening.",
-    "wachter": 59,
-    "implementatie": 40
+    "wachter": 63,
+    "implementatie": 44
   },
   "sensoren": {
     "causaal": {
-      "recall": 4,
-      "van": 59,
-      "voorstellen": 9,
+      "recall": 8,
+      "van": 63,
+      "voorstellen": 24,
       "bron": "gemeten"
     },
     "document": {
-      "recall": 38,
-      "van": 59,
-      "voorstellen": 416,
+      "recall": 35,
+      "van": 63,
+      "voorstellen": 376,
       "bron": "gemeten"
     },
     "anker": {
       "recall": 8,
-      "van": 59,
+      "van": 63,
       "voorstellen": 12,
       "bron": "gemeten"
     },
     "doelbestand": {
-      "recall": 34,
-      "van": 59,
-      "voorstellen": 110,
+      "recall": 36,
+      "van": 63,
+      "voorstellen": 123,
       "bron": "gemeten"
     },
     "wettekst": {
-      "recall": 52,
-      "van": 59,
-      "voorstellen": 395,
+      "recall": 54,
+      "van": 63,
+      "voorstellen": 426,
       "bron": "gemeten"
     }
   },
@@ -69,7 +69,6 @@
       "wet": "merk-kleurspelling",
       "wachter": "scripts/check.js",
       "gezienDoor": [
-        "document",
         "wettekst"
       ],
       "relatie": "BEWAAKT_DOOR",
@@ -164,7 +163,6 @@
       "wet": "toegang-ai-belooft-niets",
       "wachter": "scripts/check.js",
       "gezienDoor": [
-        "document",
         "doelbestand",
         "wettekst"
       ],
@@ -175,7 +173,6 @@
       "wet": "toegang-ai-belooft-niets",
       "wachter": "scripts/ai-oproepen.js",
       "gezienDoor": [
-        "document",
         "doelbestand",
         "wettekst"
       ],
@@ -225,7 +222,6 @@
       "wet": "toegang-progressie-stopt-bij-18",
       "wachter": "test/spelbeleid.test.js",
       "gezienDoor": [
-        "document",
         "doelbestand",
         "wettekst"
       ],
@@ -593,6 +589,7 @@
       "wet": "beveiliging-geen-verlaging-zonder-ceremonie",
       "wachter": "test/seclock.test.js",
       "gezienDoor": [
+        "causaal",
         "anker",
         "wettekst"
       ],
@@ -613,6 +610,7 @@
       "wet": "beveiliging-lagere-drager-neutraliseert-niet",
       "wachter": "test/seclock.test.js",
       "gezienDoor": [
+        "causaal",
         "anker",
         "wettekst"
       ],
@@ -667,6 +665,45 @@
       "wachter": "test/cijferopmens.test.js",
       "gezienDoor": [
         "document"
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "bewaaktDoor"
+    },
+    {
+      "wet": "keuring-zwaarste-regel-wint",
+      "wachter": "test/keuringreden.test.js",
+      "gezienDoor": [
+        "document",
+        "wettekst"
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "bewaaktDoor"
+    },
+    {
+      "wet": "keuring-zwaarste-regel-wint",
+      "wachter": "test/semdiff.test.js",
+      "gezienDoor": [
+        "causaal",
+        "doelbestand"
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "bewaaktDoor"
+    },
+    {
+      "wet": "keuring-ontbrekende-meting-is-streng",
+      "wachter": "test/keuringreden.test.js",
+      "gezienDoor": [
+        "wettekst"
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "bewaaktDoor"
+    },
+    {
+      "wet": "keuring-ontbrekende-meting-is-streng",
+      "wachter": "test/risico.test.js",
+      "gezienDoor": [
+        "causaal",
+        "doelbestand"
       ],
       "relatie": "BEWAAKT_DOOR",
       "bronrelatie": "bewaaktDoor"
@@ -910,6 +947,30 @@
     {
       "wet": "leven-geen-capaciteitscijfer-op-een-mens",
       "bestand": "scripts/lib/cijferopmens.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "draagt"
+    },
+    {
+      "wet": "keuring-zwaarste-regel-wint",
+      "bestand": "scripts/lib/semdiff.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "draagt"
+    },
+    {
+      "wet": "keuring-zwaarste-regel-wint",
+      "bestand": "scripts/lib/keuringreden.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "draagt"
+    },
+    {
+      "wet": "keuring-ontbrekende-meting-is-streng",
+      "bestand": "scripts/lib/risico.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "draagt"
+    },
+    {
+      "wet": "keuring-ontbrekende-meting-is-streng",
+      "bestand": "scripts/lib/keuringreden.js",
       "relatie": "DRAAGT",
       "bronrelatie": "draagt"
     }

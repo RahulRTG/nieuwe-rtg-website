@@ -277,7 +277,12 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-pla
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.wh-photo,.wp-scene,[data-rtg-cinematic-lead="true"],#rtg-cookie){
   --rtg-world-ink:#f7f1e8;--rtg-world-muted:#d8cfc2;--rtg-world-metal:#e2c389;--rtg-world-line:rgba(247,241,232,.2);
 }
-body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) [data-rtg-cinematic-lead="true"] .lv-hero{background:transparent!important}
+/* :not(#...) tilt de weging boven die van rtg-world-palette.css, dat met
+   evenveel klassen en later geladen de kaart onder de lead legde. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) [data-rtg-cinematic-lead="true"] .lv-hero:not(#rtg-geen-lead){background:transparent!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) header .rtg-rahul-tab:not(#rtg-geen-tab),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) header .rtg-rahul-tab:not(#rtg-geen-tab) *{color:var(--rtg-world-ink)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).rtg-suite-page .private-room h3{color:var(--rtg-world-ink)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).rtg-suite-page .private-room span{color:var(--rtg-world-metal)!important}
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) #rtg-cookie a{color:#f7f1e8!important}
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wh-photo :is(p,span,small,.wh-free),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wh-free *{color:var(--rtg-world-ink)!important}
 /* De lead verloor zijn foto en zijn donkere waas: `background:#faf8f3` voor het

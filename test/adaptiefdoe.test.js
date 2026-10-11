@@ -11,7 +11,11 @@
       hoort te krijgen) gaat via RTGGewicht.voerId -- dezelfde weg als een tik;
    3. zonder gewichtlaag gaat het dicht, en dat staat in de console;
    4. alleen de uitvoerder (gewicht.js) en de brug in een blad (de schil woog
-      al) mogen `{ gewogen: true }` meegeven, en dat staat hier op de bron vast;
+      al) mogen `{ gewogen: true }` meegeven, en dat staat hier op de bron vast
+      -- lexicaal (ook als sleutel tussen aanhalingstekens of als toekenning),
+      dus een bescherming tegen vergissingen en geen gezagsgrens: wie
+      capability(id).doe() rechtstreeks roept, omzeilt ook mag(). Wat iemand
+      mag, beslist de server;
    5. met de ECHTE gewicht.js opent een rechtstreekse doe() van een zware
       handeling de lade en voert niets uit; pas na bevestigen draait hij -- en
       dat zonder een tweede lade (geen lus).
@@ -69,6 +73,10 @@ test('2. wat niet licht is, gaat via RTGGewicht.voerId -- ook terug', () => {
   for (const id of ['p.zwaar', 'p.bewust', 'p.terug']) assert.equal(w.A.doe(id), true, id);
   assert.deepEqual(via, ['p.zwaar', 'p.bewust', 'p.terug']);
   assert.deepEqual(w.gedaan, [], 'een rechtstreekse doe() voert niets zwaars uit langs het gewicht heen');
+  // speelt hij nu niet (voerId geeft false), dan is dat niet stil
+  w.window.RTGGewicht = { voerId: () => false };
+  assert.equal(w.A.doe('p.zwaar'), false);
+  assert.ok(w.waarschuwing.some((m) => /p\.zwaar: speelt nu niet/.test(m)), 'buiten de context dichtgaan is niet stil');
 });
 
 test('3. zonder gewichtlaag gaat het dicht, met een melding; zonder grammatica ook', () => {
@@ -94,7 +102,7 @@ test('4. alleen gewicht.js en de brug geven `gewogen` mee', () => {
       if (f.isDirectory()) { if (f.name !== 'dist' && f.name !== 'node_modules') loop(p); continue; }
       if (!/\.(js|html)$/.test(f.name)) continue;
       const code = fs.readFileSync(p, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
-      if (/gewogen\s*:\s*true/.test(code)) vinden.push(path.relative(WORTEL, p));
+      if (/(?:[{,]\s*['"]?|\.|\[\s*['"])gewogen['"]?\s*\]?\s*[:=](?!=)/.test(code)) vinden.push(path.relative(WORTEL, p));
     }
   })(path.join(WORTEL, 'public'));
   assert.deepEqual(vinden.sort(), ['public/shared/adaptief/brug.js', 'public/shared/adaptief/gewicht.js'],

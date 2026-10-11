@@ -142,7 +142,11 @@
       var terug = !!(st && typeof st.ongedaan === 'function' && c.herstel !== 'compensatie');
       var g = gram && gram.effectief ? gram.effectief(c.gewicht, terug) : (c.gewicht || 'licht');
       if (g !== 'licht') {
-        if (w.RTGGewicht && w.RTGGewicht.voerId) return w.RTGGewicht.voerId(id);
+        if (w.RTGGewicht && w.RTGGewicht.voerId) {
+          var gedaan = w.RTGGewicht.voerId(id);    // true: draait of de lade staat open
+          if (!gedaan && w.console) w.console.warn('[adaptief] ' + id + ': speelt nu niet; "' + g + '" draait niet buiten de context');
+          return gedaan;
+        }
         if (w.console) w.console.warn('[adaptief] ' + id + ': "' + g + '" zonder gewichtlaag gaat dicht');
         return false;
       }

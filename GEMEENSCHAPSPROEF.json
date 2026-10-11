@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T15:30:17.356Z",
-    "commit": "d0b17fb63",
+    "op": "2026-10-11T15:54:37.776Z",
+    "commit": "63a4dd4be",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/gemeenschapsproef.js",
@@ -20,7 +20,7 @@
       "status": 200,
       "ziet": "gevonden: true, 1 lid",
       "fout": null,
-      "ms": 14
+      "ms": 9
     },
     {
       "nr": 2,
@@ -32,7 +32,7 @@
       "status": 200,
       "ziet": "alle vijf in de ledenlijst: true",
       "fout": null,
-      "ms": 21
+      "ms": 16
     },
     {
       "nr": 3,
@@ -44,7 +44,7 @@
       "status": 200,
       "ziet": "stand: gevraagd, codenaam in het partnerantwoord: false",
       "fout": null,
-      "ms": 8
+      "ms": 14
     },
     {
       "nr": 4,
@@ -56,7 +56,7 @@
       "status": 200,
       "ziet": "drager: {\"soort\":\"rtfpartner\",\"stand\":\"erkend\"}",
       "fout": null,
-      "ms": 9
+      "ms": 7
     },
     {
       "nr": 5,
@@ -68,7 +68,7 @@
       "status": 200,
       "ziet": "meldingen +1, stand: concept",
       "fout": null,
-      "ms": 13
+      "ms": 12
     },
     {
       "nr": 6,
@@ -80,7 +80,7 @@
       "status": 200,
       "ziet": "stand actief, verschilt: niets",
       "fout": null,
-      "ms": 31
+      "ms": 33
     },
     {
       "nr": 7,
@@ -92,7 +92,7 @@
       "status": 200,
       "ziet": "B ziet: actief, A ziet: actief, codenaam van de andere kant: false",
       "fout": null,
-      "ms": 7
+      "ms": 6
     },
     {
       "nr": 8,
@@ -116,7 +116,7 @@
       "status": 200,
       "ziet": "2 inbreng zichtbaar",
       "fout": null,
-      "ms": 11
+      "ms": 17
     },
     {
       "nr": 10,
@@ -128,7 +128,7 @@
       "status": 200,
       "ziet": "2 regels, elke inbreng gedekt: true",
       "fout": null,
-      "ms": 8
+      "ms": 6
     },
     {
       "nr": 11,
@@ -140,7 +140,7 @@
       "status": 200,
       "ziet": "stand stemmen, eigen stem voor, tussenstand null",
       "fout": null,
-      "ms": 50
+      "ms": 38
     },
     {
       "nr": 12,
@@ -152,7 +152,7 @@
       "status": 200,
       "ziet": "eindstand aangenomen, 4 voor / 1 tegen / 1 onthouding",
       "fout": null,
-      "ms": 20
+      "ms": 13
     },
     {
       "nr": 13,
@@ -165,7 +165,7 @@
       "status": 200,
       "ziet": "uitnodigingen per lid: 1,1,1,1,1, in de agenda: true",
       "fout": null,
-      "ms": 23
+      "ms": 29
     },
     {
       "nr": 14,
@@ -189,7 +189,7 @@
       "status": 200,
       "ziet": "eigen inbreng mee: false, besluit mee: false",
       "fout": null,
-      "ms": 5
+      "ms": 4
     }
   ],
   "storingen": [
@@ -279,11 +279,11 @@
     "tweede": "een besloten genootschap met een eigen beheerder en een lid (geen drager)"
   },
   "ids": {
-    "genootschap": 1791732625411,
-    "tweede": 1791732625462,
-    "verbond": "vb0650fb1fe6d44f20",
-    "beraad": 1791732625530,
-    "bijeenkomst": 1791732625644
+    "genootschap": 1791734085888,
+    "tweede": 1791734085932,
+    "verbond": "vbf00b5d07f5273647",
+    "beraad": 1791734085997,
+    "bijeenkomst": 1791734086097
   },
   "telling": {
     "schakels": 15,

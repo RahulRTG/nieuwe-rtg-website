@@ -76,7 +76,7 @@ function maakDeelnemers({ db, save, nu, boek, tripVan, gezelschap, geldbeleid })
       id: x.id, door: x.doorCodenaam, titel: x.titel, bestemming: x.bestemming, vertrek: x.vertrek,
       prijs: { pp: x.pp, valuta: 'EUR' }, stand: x.stand, ref: x.ref,
       budget: x.stand !== 'geweigerd' && geldbeleid() ? geldbeleid().budgettoets(codenaam, Math.round(x.pp * 100)) : null,
-      budgetGedeeld: x.budgetGedeeld ? x.budgetGedeeld.uitkomst : null
+      budgetGedeeld: gedeeldNu(x)
     }));
   }
 
@@ -107,12 +107,23 @@ function maakDeelnemers({ db, save, nu, boek, tripVan, gezelschap, geldbeleid })
     return { ok: true, gedeeld: t.uitkomst, met: x.doorCodenaam };
   }
 
+  /* Een gedeelde uitkomst geldt alleen zolang de toestemming van de deelnemer
+     LOOPT. Trekt hij die in (of verloopt ze), dan ziet de organisator niets meer,
+     ook niet de uitkomst van voor het intrekken: B2 zegt "alleen met
+     toestemming", en een ingetrokken toestemming die bij een ander blijft
+     doorwerken is geen intrekking. */
+  const gedeeldNu = (x) => {
+    if (!x.budgetGedeeld) return null;
+    const t = geldbeleid() ? geldbeleid().budgettoets(x.voorCodenaam, Math.round(x.pp * 100)) : null;
+    return t && t.uitkomst ? x.budgetGedeeld.uitkomst : null;
+  };
+
   /* Wat de ORGANISATOR ziet: de stand per deelnemer, zonder geld. */
   function standVan(key, ref) {
     const lijst = eigen.kijk('reisDelen').filter(x => x.doorKey === key && x.groepRef === String(ref || ''));
     if (!lijst.length) return { status: 404, error: 'Er staan geen delen klaar bij deze aanvraag.' };
     return { ok: true, ref: String(ref), delen: lijst.map(x => ({ codenaam: x.voorCodenaam, stand: x.stand,
-      budget: x.budgetGedeeld ? x.budgetGedeeld.uitkomst : null })) };
+      budget: gedeeldNu(x) })) };
   }
 
   /* Voor de samenstelling van Rahul (kern/socialecommand/samenstel.js): de

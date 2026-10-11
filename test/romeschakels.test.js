@@ -196,6 +196,9 @@ test('4. schakel 12: zonder toestemming geen uitkomst; met toestemming ziet alle
   assert.equal((await api('/api/toestemming/intrek', { laag: 'budgettoets', id: rij.id }, B.token)).status, 200);
   assert.equal((await api('/api/geld/budgettoets', {}, B.token)).body.toestemmingen[0].stand, 'ingetrokken');
   assert.equal((await api('/api/reisbureau/mijn', {}, B.token)).body.klaargezet.find(x => x.id === DEEL_B.id).budget.uitkomst, null);
+  // en de organisator ziet de eerder gedeelde uitkomst niet meer: intrekken werkt ook bij hem
+  assert.equal((await api('/api/reisbureau/deelnemers/stand', { ref: AANVRAAG.ref }, A.token)).body.delen
+    .find(d => d.codenaam === B.codenaam).budget, null, 'na intrekken ziet de organisator niets meer');
   // de vriend haalt zijn deling zelf weer weg
   assert.equal((await api('/api/reisbureau/deelnemers/budget', { id: DEEL_B.id, delen: false }, B.token)).status, 200);
   assert.equal((await api('/api/reisbureau/deelnemers/stand', { ref: AANVRAAG.ref }, A.token)).body.delen

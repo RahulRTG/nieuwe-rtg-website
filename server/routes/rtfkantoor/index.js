@@ -47,7 +47,10 @@ module.exports = (kern) => {
   app.post('/api/lab/project/team', officeAuth, (req, res) => veilig(res, () => lab.teamZet(String(req.body.id || ''), req.body.team)));
   app.post('/api/lab/project/fase', officeAuth, (req, res) => veilig(res, () => lab.faseZet(String(req.body.id || ''), String(req.body.fase || ''))));
   app.post('/api/lab/project/veiligheid', officeAuth, (req, res) => veilig(res, () => lab.veiligheidZet(String(req.body.id || ''), req.body || {})));
-  app.post('/api/lab/project/log', officeAuth, (req, res) => veilig(res, () => lab.logMaak(String(req.body.id || ''), req.body.tekst, req.body.wie)));
+  /* Wie de logregel schrijft komt uit de SESSIE en niet uit `req.body.wie`
+     (besluit 3, 11 oktober 2026; AUTHORITY.md P0b): met de gedeelde code is dat
+     niemand, en dan staat er 'lab' -- geen naam die de aanroeper zelf typte. */
+  app.post('/api/lab/project/log', officeAuth, (req, res) => veilig(res, () => lab.logMaak(String(req.body.id || ''), req.body.tekst, boardroomWie(req) || null)));
   app.post('/api/lab/project/bevinding', officeAuth, (req, res) => veilig(res, () => lab.bevindingMaak(String(req.body.id || ''), req.body.titel, req.body.tekst)));
   app.post('/api/lab/kennisbank', officeAuth, (req, res) => veilig(res, () => lab.kennisbank()));
 

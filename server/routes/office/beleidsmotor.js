@@ -77,7 +77,8 @@ module.exports = (octx) => {
     if (!beleidsmotor || typeof beleidsmotor.waarom !== 'function') {
       return res.status(503).json({ error: 'De beleidsmotor is niet bedraad in deze server.' });
     }
-    res.json({ ok: true, deuren: beleidsmotor.waarom(req),
-      grens: 'Alleen over uzelf. Dit zegt wat de deuren vandaag zouden besluiten; de poorten zelf beslissen nog.' });
+    res.json(Object.assign({ ok: true, deuren: beleidsmotor.waarom(req) },
+      typeof beleidsmotor.identiteit === 'function' ? beleidsmotor.identiteit(req) : {},
+      { grens: 'Alleen over uzelf. Dit zegt wat de deuren vandaag zouden besluiten; de poorten zelf beslissen nog.' }));
   });
 };

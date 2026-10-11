@@ -8,6 +8,7 @@
 const { DEUREN, FEITEN, STAPOP_DEUREN } = require('./regels');
 const { RIJP } = require('../commercie/schaduw');
 const { WERKWOORDEN, KAMERSOORT, EXPORTEN } = require('./werkwoorden');
+const uitvoeren = require('./uitvoeren');
 
 /* Drie bakken en geen percentage, en de rijpheid per deur apart: een deur die
    rijp is en nul keer oneens, kan verhuizen; de rest niet. */
@@ -16,7 +17,9 @@ module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) 
   const zonderPoort = [];
   const stapop = [];
   const gebruik = {};
+  const uitvoerRijen = [];
   for (const r of Object.values(beeld)) {
+    if (r.pad.startsWith(uitvoeren.VOORVOEGSEL)) { uitvoerRijen.push(r); continue; }
     if (r.pad.startsWith('werkwoord ') || r.pad.startsWith('kamer ') || r.pad.startsWith('export ')) { gebruik[r.pad] = r.gebruik || 0; continue; }
     if (r.pad.startsWith('stapop ')) {
       const [, deur, ...rest] = r.pad.split(' ');
@@ -71,6 +74,9 @@ module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) 
       /* stap twee: door wie er zit, niet door wie (werkwoorden.js, kamerTelling) */
       naarToewijzing: Object.fromEntries(['eigen', 'vreemd', 'zonderToewijzing', 'onbekend']
         .map(s => [s, gebruik['kamer ' + k + ' ' + s] || 0])) })),
+    /* BESLUIT 3b: ENFORCE_EXECUTE in de schaduw -- welke uitvoerende routes
+       bij afdwingen zouden zakken, per klasse. Telt alleen (./uitvoeren.js). */
+    uitvoeren: uitvoeren.lees(uitvoerRijen),
     /* FASE 6: lezen is niet exporteren. Hoe vaak een bestand het huis verliet. */
     exporten: Object.keys(EXPORTEN).map(r => Object.assign({ route: r }, EXPORTEN[r], { geleverd: gebruik['export ' + r] || 0 }))
   };

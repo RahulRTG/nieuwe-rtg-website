@@ -33,7 +33,8 @@ const FEITEN = Object.freeze({
   mensOpSessie: 'een kantoorsessie die aan een RTG-account hangt (er staat een mens achter)',
   boardroomZetel: 'de eigenaar, of wie van hem boardroomtoegang kreeg',
   balieZetel: 'een zetel aan de ledenbalie (de boardroom heeft er altijd een)',
-  eigenaarMens: 'de eigenaar zelf, via zijn account of een kantoorsessie op zijn sleutel'
+  eigenaarMens: 'de eigenaar zelf, via zijn account of een kantoorsessie op zijn sleutel',
+  passkeyOpSessie: 'een kantoorsessie op naam die aan de deur met een passkey is bewezen (een bewezen individu)'
 });
 
 /* BESLUIT A2 (23 september 2026): de eigenaar is geen dagelijkse superuser.
@@ -56,10 +57,28 @@ const DEUREN = Object.freeze({
     uitleg: 'de ledenbalie' }
 });
 
+/* SCHADUWREGELS: regels die (nog) aan geen poort hangen en dus niet als deur
+   in DEUREN staan -- een deur wordt met een poort VERGELEKEN, en een regel
+   zonder poort heeft niets om mee te vergelijken. Ze worden alleen GETELD.
+
+   ENFORCE_EXECUTE (besluit 3 van de eigenaar, 11 oktober 2026): een UITVOERENDE
+   kantoorhandeling vraagt een bewezen individu -- een kantoorsessie op naam met
+   een passkey aan de deur. Een gedeelde kantoorcode geldt nooit als bewijs van
+   een individuele uitvoerder, en een sessie op naam zonder passkey is een naam
+   en geen bewijs. Stap (b): de regel loopt mee in ./uitvoeren.js en houdt niets
+   tegen. Afdwingen (c) is een volgend besluit. De eigenaar met zijn kale
+   lid-token haalt de regel ook niet: zo opent hij het kantoor in productie al
+   niet meer (../kantoor/productiedeur.js eigenaarDirect). */
+const SCHADUWREGELS = Object.freeze({
+  ENFORCE_EXECUTE: { eisen: [['kantoorsessie'], ['passkeyOpSessie']],
+    uitleg: 'een uitvoerende kantoorhandeling, door een bewezen individu' }
+});
+
 /* HET BESLUIT, MET ZIJN OPBOUW. Een uitkomst zonder opbouw is een orakel
    (EXECUTIE.md); hier staat per eis welk feit hem haalde, of waarom niet. */
-function kan(feiten, deur) {
-  const d = DEUREN[deur];
+function kan(feiten, deur) { return kanMet(feiten, DEUREN[deur], deur); }
+
+function kanMet(feiten, d, deur) {
   if (!d) {
     return { uitkomst: UITKOMST.ONBEKEND, deur, opbouw: [],
       reden: 'Deze deur is niet verklaard; wat niet is verklaard, gaat niet open (AUTHORITY.md A3).' };
@@ -85,4 +104,4 @@ function kan(feiten, deur) {
   return { uitkomst: UITKOMST.TOESTAAN, deur, opbouw, reden: 'Elke eis van ' + d.uitleg + ' is gehaald.' };
 }
 
-module.exports = { kan, DEUREN, FEITEN, UITKOMST, STAPOP_DEUREN };
+module.exports = { kan, kanMet, DEUREN, SCHADUWREGELS, FEITEN, UITKOMST, STAPOP_DEUREN };

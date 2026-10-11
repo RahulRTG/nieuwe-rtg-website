@@ -29,8 +29,10 @@
 const { kan, DEUREN, FEITEN, UITKOMST, STAPOP_DEUREN } = require('./regels');
 const { maakFeiten } = require('./feiten');
 const { werkwoordVan, kamerTelling, EXPORTEN } = require('./werkwoorden');
+const uitvoeren = require('./uitvoeren');
 
-const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop', 'gebruik'];
+/* + de vier soorten van ENFORCE_EXECUTE (./uitvoeren.js) */
+const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop', 'gebruik'].concat(uitvoeren.SOORTEN);
 const MAX_SLEUTELS = 2400;   // ~600 kantoorroutes maal hoogstens vier deuren
 const VOORBEELDEN = 20;
 const DAG = 86400000;
@@ -74,6 +76,7 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
         (req.beleidsPoorten || (req.beleidsPoorten = [])).push(deur);
         feiten = feitenVan(req);
         besluit = kan(feiten, deur);
+        telUitvoer(req, res, feiten);
       } catch (e) { besluit = null; }
       let door = false;
       if (besluit) naAfloop(req, res, () => {
@@ -124,6 +127,11 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
     next();
   }
 
+  /* BESLUIT 3b: ENFORCE_EXECUTE in de schaduw; zie ./uitvoeren.js voor waarom
+     de teller IN de poortwikkel hangt en niet op een voorvoegsel. */
+  const uit = uitvoeren.maakUitvoeren({ tikVeld: (k, v) => spoeler.tikVeld(k, v), naAfloop: (q, r, w) => naAfloop(q, r, w) });
+  const telUitvoer = (req, res, feiten) => uit.telBijBinnenkomst(req, res, feiten);
+
   /* EEN LUISTERAAR PER VERZOEK, op 'close': een kantoorroute draagt al tien
      finish-luisteraars van andere lagen, en de elfde gaf een MaxListeners-
      waarschuwing. Alleen een afgerond antwoord telt (writableFinished). */
@@ -159,7 +167,10 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
     });
   }
 
-  return { kan: (req, deur) => kan(feitenVan(req), deur), waarom, bewaak, meelezer, stand, afdwingen,
+  /* BESLUIT 3a/b, over DEZE aanroeper (./uitvoeren.js). */
+  const identiteit = (req) => uitvoeren.overMij(feitenVan(req));
+
+  return { kan: (req, deur) => kan(feitenVan(req), deur), waarom, identiteit, bewaak, meelezer, stand, afdwingen,
     spoel: () => { slapend.spoel(); return spoeler.spoel(); }, laatstGebruikt: slapend.laatst };
 }
 

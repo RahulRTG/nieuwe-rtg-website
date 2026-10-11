@@ -178,6 +178,47 @@ const MACHINERIE = [
   ['rechten', 'commercie/rechten', 'machtskaart: nominaal naast effectief']
 ];
 
+/* ENFORCE_EXECUTE, STATISCH (besluit 3 van de eigenaar, 11 oktober 2026).
+
+   De runtime-schaduw staat in server/kern/beleidsmotor/uitvoeren.js en telt wat
+   er werkelijk gebeurt. Dit is de statische tegenhanger, en hij beantwoordt een
+   andere vraag: welke UITVOERENDE kantoorroutes laat de router vandaag door voor
+   een sessie zonder bewezen individu? Uitvoerend is dezelfde regel als in de
+   server, en het register is hetzelfde (server/lib/mutatiecontracten.js): geen
+   GET, en geen stand NOT_APPLICABLE. De twee delen die regel door hem allebei
+   uit dat register te lezen -- er komt geen tweede lijst lezende routes.
+
+   Twee assen per route, nooit opgeteld:
+     deur      laat de bewaker de gedeelde code door (geen EIST_MENS)?  GEMETEN
+     actor     leest de handler een naam van de uitvoerder uit het
+               VERZOEK (body.door, body.wie, ...)?                     VERMOED
+   De tweede is de AUTHORITY.md P0b-vorm (de actor van een auditregel komt uit
+   de sessie en nooit uit het verzoek), per ROUTE gesneden tot de volgende
+   `app.`-registratie, en daarom lexicaal: een ondergrens met valse treffers
+   (een `wie` die een ONTVANGER is, geen uitvoerder). */
+const LEZEND = new Set(['GET', 'HEAD', 'OPTIONS']);
+let contracten = null;
+function klasseVan(methode, pad) {
+  if (LEZEND.has(String(methode).toUpperCase())) return null;
+  if (contracten === null) {
+    try { contracten = require('../server/lib/mutatiecontracten').CONTRACTEN || {}; } catch (e) { contracten = {}; }
+  }
+  const c = contracten[String(methode).toUpperCase() + ' ' + pad];
+  if (c && c.stand === 'NOT_APPLICABLE') return null;
+  return c && c.stand ? c.stand : 'ongeclassificeerd';
+}
+const ACTOR_UIT_VERZOEK = /\b(?:req\.body|body|b)\.(door|wie|ondertekenaar|tekenaar|keurder|beoordelaar|actor|goedgekeurdDoor|medewerker)\b/;
+const { zonderCommentaar } = require('./lib/bron');
+function handlerBlok(bron, r) {
+  if (!bron || !r.regel) return '';
+  /* Commentaar eruit, met behoud van de regelnummers: een commentaar dat de
+     OUDE fout beschrijft (`b.door` stond voorop) is geen treffer. */
+  const regels = zonderCommentaar(bron, { regelsHeel: true }).split('\n').slice(r.regel - 1);
+  const uit = [regels[0]];
+  for (const l of regels.slice(1)) { if (/\bapp\.(get|post|put|patch|delete|use)\(/.test(l)) break; uit.push(l); }
+  return uit.join('\n');
+}
+
 const leescache = new Map();
 function lees(betrekkelijk) {
   if (!betrekkelijk) return '';
@@ -258,6 +299,45 @@ function meet() {
   const lezendRoutes = routes.filter(r => isZwaarLezend(r.pad));
   const lezendOpen = lezendRoutes.filter(r => !heeftMens(r));
 
+  /* ENFORCE_EXECUTE statisch (zie de kop bij klasseVan). */
+  const uitvoerend = [];
+  for (const r of routes) {
+    const klasse = klasseVan(r.methode, r.pad);
+    if (!klasse) continue;
+    const blok = handlerBlok(lees(r.bestand), r);
+    const a = ACTOR_UIT_VERZOEK.exec(blok);
+    uitvoerend.push({ methode: r.methode, pad: r.pad, klasse, deurGedeeld: !heeftMens(r),
+      actorUitVerzoek: a ? a[0] : null });
+  }
+  const perKlasse = {};
+  for (const u of uitvoerend) {
+    const k = perKlasse[u.klasse] || (perKlasse[u.klasse] = { routes: 0, deurGedeeld: 0, deurEistMens: 0 });
+    k.routes += 1; if (u.deurGedeeld) k.deurGedeeld += 1; else k.deurEistMens += 1;
+  }
+  const actorLijst = uitvoerend.filter(u => u.actorUitVerzoek);
+
+  /* DE KANTOORDEUR BUITEN HET KANTOORPAD. KANTOORPAD telt /api/office en
+     /api/boardroom, maar dezelfde vier kantoordeuren bewaken ook routes onder
+     /api/rtfos, /api/command, /api/lab2, /api/appstore/kantoor en meer. Die
+     tellen NIET mee in de assen en de ratel hierboven (dat zou de ratel stil
+     verschuiven); ze staan hier apart, omdat ENFORCE_EXECUTE ook daar zou
+     gelden -- de runtime-schaduw telt ze wel (hij hangt in de deur zelf). */
+  const KANTOORDEUREN = new Set(['officeAuth', 'kluisAuth', 'naamAuth', 'boardroomAuth']);
+  const buiten = alleRoutes().filter(r => !KANTOORPAD.test(r.pad) && (r.bewakers || []).some(b => KANTOORDEUREN.has(b)));
+  const buitenUit = [];
+  for (const r of buiten) {
+    const klasse = klasseVan(r.methode, r.pad);
+    if (!klasse) continue;
+    const a = ACTOR_UIT_VERZOEK.exec(handlerBlok(lees(r.bestand), r));
+    buitenUit.push({ methode: r.methode, pad: r.pad, klasse, deurGedeeld: !heeftMens(r), actorUitVerzoek: a ? a[0] : null });
+  }
+  const voorvoegsel = (pad) => pad.split('/').slice(0, 3).join('/');
+  const buitenPer = {};
+  for (const u of buitenUit) {
+    const v = buitenPer[voorvoegsel(u.pad)] || (buitenPer[voorvoegsel(u.pad)] = { uitvoerend: 0, deurGedeeld: 0 });
+    v.uitvoerend += 1; if (u.deurGedeeld) v.deurGedeeld += 1;
+  }
+
   /* DE TWEEDE AS, langs de andere kant: niet hoe een route HEET maar wat zij
      heeft AANGERAAKT. Zie scripts/lib/zwaareffect.js voor waarom die twee nooit
      worden opgeteld, en waarom zijn DEKKING het belangrijkste getal is. */
@@ -326,6 +406,37 @@ function meet() {
        de padas, want dan zou iemand ze optellen. Zie de kop van
        scripts/lib/zwaareffect.js. */
     zwaarEffect: effect,
+    /* BESLUIT 3 (11 oktober 2026): ENFORCE_EXECUTE. Staat NAAST `gemeten`, net
+       als de effectas, want hij deelt geen teller met de ratel hierboven. */
+    uitvoeren: {
+      regel: 'ENFORCE_EXECUTE',
+      uitleg: 'Een uitvoerende kantoorhandeling vraagt een bewezen individu (op naam, met een passkey aan de deur). ' +
+        'Statisch: welke uitvoerende routes laat de router door voor een sessie zonder bewezen individu. De ' +
+        'runtime-telling staat in POST /api/office/beleidsmotor (stand.uitvoeren).',
+      grens: 'Uitvoerend = geen GET en geen NOT_APPLICABLE in server/lib/mutatiecontracten.js; een route zonder ' +
+        'contract telt als uitvoerend (ongeclassificeerd). BUITEN productie zou bij afdwingen ELKE uitvoerende ' +
+        'route zakken voor een sessie zonder passkey; IN productie draagt elke kantoorsessie al een passkeybewijs ' +
+        '(B10, kern/kantoor/productiedeur.js) en is de gedeelde code al dicht.',
+      routes: uitvoerend.length,
+      deurGedeeld: uitvoerend.filter(u => u.deurGedeeld).length,
+      deurEistMens: uitvoerend.filter(u => !u.deurGedeeld).length,
+      perKlasse,
+      actorUitVerzoek: actorLijst.length,
+      actorUitVerzoekBijGedeeldeDeur: actorLijst.filter(u => u.deurGedeeld).length,
+      graden: { routes: 'gemeten', deurGedeeld: 'gemeten', deurEistMens: 'gemeten', actorUitVerzoek: 'vermoed' },
+      actorLijst: actorLijst.map(u => ({ route: u.methode + ' ' + u.pad, klasse: u.klasse,
+        deur: u.deurGedeeld ? 'gedeeld' : 'eist-mens', treffer: u.actorUitVerzoek })),
+      buitenKantoorpad: {
+        uitleg: 'Routes BUITEN /api/office en /api/boardroom achter een kantoordeur (officeAuth, kluisAuth, naamAuth, ' +
+          'boardroomAuth). Niet in de assen of de ratel hierboven; wel onder ENFORCE_EXECUTE.',
+        routesAchterKantoordeur: buiten.length,
+        uitvoerend: buitenUit.length,
+        deurGedeeld: buitenUit.filter(u => u.deurGedeeld).length,
+        perVoorvoegsel: buitenPer,
+        actorUitVerzoek: buitenUit.filter(u => u.actorUitVerzoek).map(u => ({ route: u.methode + ' ' + u.pad,
+          klasse: u.klasse, deur: u.deurGedeeld ? 'gedeeld' : 'eist-mens', treffer: u.actorUitVerzoek }))
+      }
+    },
     graden: {
       routes: 'gemeten',
       deurEistMens: 'gemeten',
@@ -390,6 +501,20 @@ function toon(u) {
     if (e.blindVoor.length)
       console.log('      BLIND voor ' + e.blindVoor.length + ' van de ' + g.zwaar +
         ' zware routes -- juist de bankknoppen; die vragen een wereld die de proef niet opzet');
+  }
+  const x = u.uitvoeren;
+  if (x) {
+    console.log('\n  ENFORCE_EXECUTE (besluit 3) -- uitvoerende kantoorroutes, statisch');
+    console.log('    uitvoerend               ' + x.routes + '   gemeten');
+    console.log('    deur laat gedeelde code  ' + x.deurGedeeld + '   gemeten (zou bij afdwingen zakken voor de code)');
+    console.log('    deur eist een mens       ' + x.deurEistMens + '   gemeten (zakt alleen zonder passkey)');
+    for (const [k, v] of Object.entries(x.perKlasse))
+      console.log('      ' + k.padEnd(30) + String(v.routes).padStart(4) + '   gedeeld ' + v.deurGedeeld);
+    console.log('    actor uit het verzoek    ' + x.actorUitVerzoek + '   vermoed (' +
+      x.actorUitVerzoekBijGedeeldeDeur + ' achter een gedeelde deur)');
+    const b = x.buitenKantoorpad;
+    console.log('    buiten het kantoorpad    ' + b.uitvoerend + ' uitvoerend achter een kantoordeur, ' +
+      b.deurGedeeld + ' gedeeld; actor uit het verzoek ' + b.actorUitVerzoek.length + '   vermoed');
   }
   console.log('\n  de machinerie -- bestaat, hangt hij aan de kantoordeur?');
   for (const [naam, m] of Object.entries(u.machinerie)) {

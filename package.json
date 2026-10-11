@@ -249,6 +249,7 @@
     "executionmap:controle": "node scripts/executionmap.js --controle",
     "resolverbereik": "node scripts/resolverbereik.js",
     "codewereld": "node scripts/codewereld.js",
+    "codearchitect": "node scripts/codearchitect.js",
     "symbolen": "node -r ./scripts/lib/invoerspoor-preload.js scripts/symbolen.js",
     "lussen": "node scripts/lussen.js",
     "lussen:controle": "node scripts/lussen.js --controle",

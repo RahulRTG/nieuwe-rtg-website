@@ -2336,6 +2336,14 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "codearchitect.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/codearchitect.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
     "codecredentials-kortecode.test.js": {
       "soort": "puur",
       "staat": "gezakt",

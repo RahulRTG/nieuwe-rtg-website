@@ -170,6 +170,10 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
         .map(x => ({ id: x.id, reis: x.reis, van: x.eigenaarCodenaam, rol: x.rol })) };
   }
 
+  // sleutel van een AANVAARDE reisgenoot: wie zijn eigen deel krijgt (./reisbureau-deelnemers.js)
+  const reisgenootSleutel = (key, reisId, c) => (leden().find(x => x.reis === reisId && x.eigenaar === key &&
+    x.stand === 'aanvaard' && x.rol === 'reisgenoot' && x.lidCodenaam === c) || {}).lid || null;
+
   /* WAT ER GEDEELD WORDT staat in ./reisgezelschap-delen.js: de tijdlijn, het
      aankomstmoment en het beeld. Die deelmodule krijgt dezelfde bakken en
      dezelfde hulpjes mee -- er ontstaat geen tweede opslag en geen tweede
@@ -181,7 +185,7 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
   return {
     reisgezelschap: Object.assign({
       ROLLEN, STANDEN, zicht, rolVan, nodigUit, antwoord, verwijder,
-      gezelschap, reisVoor, mijnKring
+      gezelschap, reisVoor, mijnKring, reisgenootSleutel
     }, delen)
   };
 };

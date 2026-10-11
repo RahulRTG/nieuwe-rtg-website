@@ -89,6 +89,20 @@ module.exports = (kern) => {
      WAT HIER NOOIT BIJ MAG KOMEN: een route die uitvoert zonder bevestiging,
      onder welke instelling dan ook. De grens van deze wereld is een ANDER MENS
      (LIFE.md par. 3), en die kent geen "automatisch". */
+  /* RAHUL STELT SAMEN (kern/socialecommand/samenstel.js): datum, reis, wie gaat
+     mee en wat ieder nog zelf moet doen, in EEN voorstel. Deze route leest
+     alleen; elke stap in het voorstel doet een mens zelf, langs zijn eigen deur. */
+  app.post('/api/sociaal/samenstel', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    const b = req.body || {};
+    try {
+      const r = await kern.socialecommand.samenstel(req.session.key, { groep: b.groep, reis: b.reis });
+      if (r.error) return res.status(r.status || 400).json({ error: r.error });
+      const uit = Object.assign({}, r); delete uit.status;
+      res.json(uit);
+    } catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+
   app.post('/api/sociaal/voorstel/bevestig', auth, (req, res) => {
     if (geenGast(req, res)) return;
     const b = req.body || {};

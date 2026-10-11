@@ -70,7 +70,10 @@ test('3. er is geen derde stand, en dus geen restpost', () => {
      gezet (`metier-naam` en `commercieel`) die nog geen termijn hadden. Allebei
      `zolang-het-staat`, allebei met een uitleg -- en dat is een besluit dat
      iemand heeft genomen omdat deze regel hem stelde. */
-  assert.equal(LAGEN.filter(l => l.termijn === 'venster').length, 4);
+  /* 5 sinds 11 oktober 2026: de budgettoets (besluit B2) draagt een einddatum
+     van dertig dagen -- "kijk voortaan altijd in mijn pot" vraagt niemand die
+     een weekend plant. */
+  assert.equal(LAGEN.filter(l => l.termijn === 'venster').length, 5);
   assert.equal(LAGEN.filter(l => l.termijn === 'zolang-het-staat').length, 7);
 });
 

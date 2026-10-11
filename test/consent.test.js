@@ -167,7 +167,10 @@ test('het register en het scherm lopen niet uiteen', () => {
     metierBewijs: { mijnToestemmingen: () => ({ toestemmingen: [
       { code: 'ZAAK-1', zaak: 'Atelier Nord', waarvoor: 'de opdrachtbon', actief: true }] }) },
     commercieelStand: () => ({ soorten: [
-      { id: 'reisaanbod', naam: 'Reisaanbod', kanalen: ['e-mail'], aan: true }] })
+      { id: 'reisaanbod', naam: 'Reisaanbod', kanalen: ['e-mail'], aan: true }] }),
+    /* De budgettoets (besluit B2): het geldbeleid draait op de codenaam. */
+    codenaamVan: () => 'KRAANVOGEL',
+    geldbeleid: { budgettoetsen: () => ([{ id: 'bt-1', pot: 'Rome', tot: '2099-01-01T00:00:00.000Z', stand: 'actief' }]) }
   } });
   const d = alles.consentVan('sleutel');
   assert.deepEqual(d.storingen, []);

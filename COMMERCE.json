@@ -1,9 +1,9 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-10-06",
+  "vastgelegd": "2026-10-11",
   "gemeten": {
-    "bestanden": 2788,
-    "domeinenTotaal": 699,
+    "bestanden": 2793,
+    "domeinenTotaal": 701,
     "koopbareVormen": 621,
     "koopbareDomeinen": 126,
     "envelopDrempel": 8,
@@ -78,7 +78,7 @@
     "reserveer": 32,
     "bevestig": 61,
     "lever": 25,
-    "annuleer": 37,
+    "annuleer": 38,
     "retour": 9
   },
   "overalAanwezig": [],
@@ -1510,6 +1510,24 @@
       "telt": 2
     },
     {
+      "domein": "kern/geldbeleid",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": true,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "reserveer": "potReserveer",
+        "annuleer": "intrek"
+      },
+      "telt": 2
+    },
+    {
       "domein": "kern/labfonds",
       "heeft": {
         "toon": true,
@@ -1809,23 +1827,6 @@
       },
       "bewijs": {
         "toon": "beeld"
-      },
-      "telt": 1
-    },
-    {
-      "domein": "kern/geldbeleid",
-      "heeft": {
-        "toon": false,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": true,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "reserveer": "potReserveer"
       },
       "telt": 1
     },

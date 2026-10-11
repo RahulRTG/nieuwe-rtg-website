@@ -112,6 +112,14 @@ const LAGEN = [
     doel: 'Zodat uw eigen metingen in uw dossier komen in plaats van alleen in de app van de fabrikant.',
     termijn: 'zolang-het-staat',
     termijnUitleg: 'Een toestel blijft schrijven tot u het loskoppelt. Dat is de bedoeling van een toestel.' },
+  /* De budgettoets (kern/geldbeleid/budgettoets.js, besluit B2 van 11 oktober
+     2026). Hij staat hier omdat hij precies de vorm heeft die dit scherm bedoelt:
+     iets mag in uw pot kijken, met een doel, een einddatum en een intrekknop.
+     De scan van test/consent-dekking.test.js vindt hem NIET (zijn rij draagt
+     een codenaam en geen `key`), dus hij staat er omdat een mens hem erin zette. */
+  { id: 'budgettoets', naam: 'Rahul die toetst of een voorstel binnen uw pot past', richting: 'ziet', gedekt: true,
+    doel: 'Zodat u bij een reis of uitje dat aan u is klaargezet meteen ziet of het past, zonder dat iemand uw bedrag ziet.',
+    termijn: 'venster' },
   { id: 'wachtlijst', naam: 'Zorgaanbieders die u mogen seinen als er iets vrijkomt', richting: 'seint', gedekt: true,
     doel: 'Zodat u bericht krijgt als er een plek vrijkomt, zonder dat u zelf hoeft te blijven bellen.',
     termijn: 'zolang-het-staat',

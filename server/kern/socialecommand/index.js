@@ -99,5 +99,9 @@ module.exports = ({ kern, db, save, klok }) => {
     });
   }
 
-  return { socialecommand: { command, bevestig, log: logMod.log, logBeleid } };
+  /* SAMENSTELLEN over werelden heen (./samenstel.js): een weekend met vrienden in
+     EEN voorstel, dat niets uitvoert. */
+  const { samenstel } = require('./samenstel')({ kern });
+
+  return { socialecommand: { command, bevestig, log: logMod.log, logBeleid, samenstel } };
 };

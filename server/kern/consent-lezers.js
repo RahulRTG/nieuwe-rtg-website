@@ -2,8 +2,7 @@
    HET CONSENT CENTER, deel "lezers": de negen lagen uitlezen en naast elkaar
    zetten.
 
-   Afgesplitst van ./consent.js op de 10 kB-grens, en op een echte naad -- dezelfde
-   die accounts/tokens.js van accounts/intreklijst.js scheidt. Dit bestand LEEST
+   Afgesplitst van ./consent.js op de 10 kB-grens, en op een echte naad. Dit bestand LEEST
    negen lagen en maakt er rijen van; ./consent.js beslist wat er met een rij mag
    gebeuren en stuurt het intrekken door. Twee soorten werk: een fout hier is een
    rij die ontbreekt of dubbel staat, een fout daar is een toestemming die niet
@@ -172,6 +171,8 @@ module.exports = ({ kern, LAGEN, NIET_GEDEKT }) => {
         wat: 'Mag u een seintje geven als er een plek vrijkomt; er wordt niets voor u ingeboekt',
         tot: null, richting: 'seint', intrekbaar: true });
     }
+
+    for (const r of require('./consent-budget')({ kern, key, pak })) uit.push(r);
 
     const toe = pak('Toestellen', kern.toestellenVan && (() => kern.toestellenVan(key)));
     for (const t of (toe && toe.toestellen) || []) {

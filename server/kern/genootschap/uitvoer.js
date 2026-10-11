@@ -87,13 +87,17 @@ module.exports = ({ genootschap, codenaamVan }) => {
     const antwoorden = bijeen(groepId)
       .filter(e => (e.antwoorden || {})[mij])
       .map(e => ({ wat: e.wat, datum: e.datum, mijnAntwoord: e.antwoorden[mij] }));
+    // het venster dat je zelf opgaf hoort er ook in: het is jouw inbreng
+    const vensters = bijeen(groepId)
+      .filter(e => ((e.vensters || {})[mij] || []).length)
+      .map(e => ({ wat: e.wat, datum: e.datum, mijnDagen: e.vensters[mij] }));
 
     const lid = genootschap.lidRegel(gr, mij);
     return { ok: true,
       uitgevoerdOp: new Date().toISOString(),
       genootschap: { naam: gr.naam, soort: gr.soort },
       ik: { codenaam: codenaamVan(mij), rol: lid ? lid.rol : null, sinds: lid ? lid.sinds : null },
-      berichten, reacties, stemmen, antwoorden,
+      berichten, reacties, stemmen, antwoorden, vensters,
       voorwaarde: 'Alleen wat jij zelf schreef, stemde of antwoordde. Van andere leden staat er niets in.' };
   }
 

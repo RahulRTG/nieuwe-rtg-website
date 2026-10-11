@@ -51,8 +51,12 @@ const bijeenkomst = (o) => Object.assign({ id: 'b1', groepId: 'g1', groep: 'De K
    keuze (bijvoorbeeld `voerUit(key, id)`). */
 test('er is geen weg die uitvoert zonder bevestiging', () => {
   const { c } = opzet();
-  assert.deepEqual(Object.keys(c).sort(), ['bevestig', 'command', 'log', 'logBeleid'],
-    'command en log lezen, logBeleid schrijft alleen het geheugen, ' +
+  /* samenstel (11 oktober 2026, romeproef schakel 19) LEEST alleen: hij stelt een
+     voorstel samen over werelden heen en voert niets uit. Dat hij geen
+     schrijvende aanroep kan doen, houdt test/romeschakels.test.js toets 6 vast
+     op de bron, en toets 5 meet de wereld voor en na tegen een echte server. */
+  assert.deepEqual(Object.keys(c).sort(), ['bevestig', 'command', 'log', 'logBeleid', 'samenstel'],
+    'command, log en samenstel lezen, logBeleid schrijft alleen het geheugen, ' +
     'en bevestig is de enige die iets in een domein verandert');
 });
 

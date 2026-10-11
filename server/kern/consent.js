@@ -42,6 +42,7 @@ module.exports = ({ kern }) => {
     if (laag === 'locatie') return kern.locStopKlant(key, id);
     if (laag === 'toestel') return kern.toestelIntrek(key, { id });
     if (laag === 'wachtlijst') return kern.wachtlijstAf(key, { id });
+    if (laag === 'budgettoets') return kern.geldbeleid.budgettoetsIntrek(kern.codenaamVan(key), id);
     if (laag === 'metier-naam') return kern.metierBewijs.trekIn(key, id);
     /* Intrekken is hier: geen kanaal meer. Dat is dezelfde weg als het scherm
        gebruikt, dus er ontstaat geen tweede manier om hetzelfde uit te zetten. */

@@ -38,7 +38,9 @@ app.post('/api/reisbureau/boek', auth, async (req, res) => {
   res.json(r);
 });
 // mijn reisaanvragen
-app.post('/api/reisbureau/mijn', auth, (req, res) => res.json({ aanvragen: reisbureau.mijn(req.session.key) }));
+// en de delen die een organisator voor mij klaarzette (kern/reisbureau-deelnemers.js)
+app.post('/api/reisbureau/mijn', auth, (req, res) => res.json({ aanvragen: reisbureau.mijn(req.session.key),
+  klaargezet: reisbureau.deelnemers.mijn(req.session.key, liveCodename(req.session)) }));
 /* HET LID BETAALT EEN BEVESTIGDE REIS (kern/reisbureau-betaling.js).
 
    Dit is de weg die TRAVELCOMMERCE.md par. 9 als eerste van vier bevindingen

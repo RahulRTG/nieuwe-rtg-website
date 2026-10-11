@@ -111,6 +111,8 @@ module.exports = (kern) => {
   require('./member/handel')(kern);
   // De winkel-laag (retail/mode-catalogus) en de paspoort/identiteits-routes.
   require('./member/winkel')(kern);
+  // Boeken en betalen per deelnemer bij een reis met vrienden (besluit B3).
+  require('./member/reisdeelnemers')(kern);
   // Het inwoner-loket van RTG Gemeente (meldingen, burgerzaken, vergunningen, afval).
   require('./member/gemeente')(kern);
   // Het MijnOverheid-loket van De Overheid (Berichtenbox, belasting, RDW, KVK, sociale zekerheid, stemmen).

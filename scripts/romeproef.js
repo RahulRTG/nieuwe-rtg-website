@@ -40,8 +40,11 @@
    belofte, `openBekend` met een uitgeschreven reden -- en wat de ketens
    werkelijk delen telt scripts/ketenvorm.js achteraf uit de registers.
 
-   DEZE PROEF WIJZIGT GEEN PRODUCTCODE. Een open schakel is hier de werklijst
-   van een volgende ronde: elke `openBekend` draagt een OORZAAK (wat de server
+   DE PROEF ZELF WIJZIGT GEEN PRODUCTCODE. Ronde 2 van het afbouwprogramma
+   (11 oktober 2026) sloot schakel 7, 12, 13, 18 en 19 in de PRODUCTcode; de
+   proef meet ze nu als gewone schakels, en de besluiten B2 (budget) en B3
+   (boeken en betalen per deelnemer) kregen eigen storingen (9 tot en met 12).
+   Een open schakel is hier de werklijst van een volgende ronde: elke `openBekend` draagt een OORZAAK (wat de server
    antwoordde), een EIGENAAR (het domein en het bestand) en een OPLOSSING (wat
    er moet komen, en of dat een bouwtaak of een besluit is). Er wordt geen
    route verzonnen: een schakel die een voorziening nodig heeft die er niet is,
@@ -151,7 +154,7 @@ async function werkgeverKlaar(basis) {
 /* Alles wat de ORGANISATOR van de groep, het reisgezelschap en Rahul te zien
    krijgt, in een keer. Storing 4 en 6 zoeken daarin naar wat er NIET in hoort.
    Het zijn leesroutes: een meting verandert de toestand niet. */
-async function watDeOrganisatorZiet(basis, A, groep, reis) {
+async function watDeOrganisatorZiet(basis, A, groep, reis, aanvraagRef) {
   const P = (pad, lijf) => post(basis, pad, lijf, A.token);
   const delen = {
     groep: await P('/api/genootschap/mijn', {}),
@@ -166,6 +169,11 @@ async function watDeOrganisatorZiet(basis, A, groep, reis) {
   if (reis) {
     delen.gezelschap = await P('/api/reis/gezelschap', { reis });
     delen.tijdlijn = await P('/api/reis/gezelschap/tijdlijn', { reis });
+    delen.samenstel = await P('/api/sociaal/samenstel', { groep, reis });
+  }
+  if (aanvraagRef) {
+    delen.reisbureau = await P('/api/reisbureau/mijn', {});
+    delen.deelstand = await P('/api/reisbureau/deelnemers/stand', { ref: aanvraagRef });
   }
   return delen;
 }
@@ -332,25 +340,27 @@ async function loop(basis, uit) {
           WEEKEND_2 + ': ' + (b2 ? b2.ja + ' ja / ' + b2.nee + ' nee' : '?') };
     });
 
-  /* 7 -- "IK KAN DRIE DAGEN IN DIE WEEK". Dit is wat de opdracht vraagt, en de
-     groep kent het niet: een antwoord is ja/misschien/nee op EEN datum. De
-     proef stuurt het venster mee met het enige antwoord dat er is, en kijkt of
-     het ergens aankomt. Er wordt geen route verzonnen. */
+  /* 7 -- "IK KAN DRIE DAGEN IN DIE WEEK". Een antwoord is ja/misschien/nee op
+     EEN datum; daarnaast geeft een lid nu ZELF een venster op rond een
+     kandidaat-weekend (kern/genootschap/bijeenkomst.js `zetVenster`). De
+     organisator ziet de OVERLAP per dag en niet wie, en het venster telt niet
+     als ja: Bram heeft op het tweede weekend nog niets geantwoord en dat blijft
+     zo. Niets komt uit een agenda of rooster -- alleen wat hij zelf noemt. */
+  const VENSTER = [WEEKEND_2, dag(38), dag(39)];
   await stap(
-    schakel(7, 'LivingOS', 'vriend', 'organisator', 'deelt zelf een beschikbaarheidsvenster ("drie dagen in die week") in plaats van ja/nee per datum', {
-      soort: 'bouwen',
-      oorzaak: 'Een bijeenkomst in kern/genootschap/bijeenkomst.js draagt een vaste `datum`, en antwoord() kent alleen ja, misschien en nee (ANTWOORDEN). Een venster dat met het antwoord wordt meegestuurd, wordt zonder melding genegeerd: de organisator ziet het nergens terug.',
-      eigenaar: 'LivingOS -- server/kern/genootschap/bijeenkomst.js (en datumRaad in kern/genootschap/ai.js, die alleen antwoorden telt)',
-      oplossing: 'Een peiling als vorm naast de bijeenkomst: de organisator zet een venster neer, elk lid geeft ZELF zijn beschikbare dagen op (nooit afgeleid uit agenda of rooster), en datumRaad telt overlap in plaats van ja-stemmen. De grens uit LIFE.md par. 4.3 geldt: alleen wat iemand zelf opgaf, wisbaar door hem.'
-    }),
-    () => P('/api/genootschap/antwoord', { groep: ctx.groep, id: ctx.b2, antwoord: 'misschien',
-      venster: { van: WEEKEND_2, dagen: 3 } }, B.token),
+    schakel(7, 'LivingOS', 'vriend', 'organisator', 'deelt zelf een beschikbaarheidsvenster ("drie dagen in die week") in plaats van ja/nee per datum'),
+    () => P('/api/genootschap/venster', { groep: ctx.groep, id: ctx.b2, dagen: VENSTER }, B.token),
     async () => {
       const ag = await P('/api/genootschap/agenda', { groep: ctx.groep }, A.token);
       const b2 = ((ag.data && ag.data.komt) || []).find(x => x.id === ctx.b2);
-      const draagt = !!b2 && /venster|beschikba|dagen/i.test(JSON.stringify(b2));
-      return { klopt: draagt, wat: 'de bijeenkomst bij de organisator draagt ' + (draagt ? 'een venster' :
-        'geen venster: velden ' + Object.keys(b2 || {}).join(', ')) };
+      const v = (b2 && b2.venster) || {};
+      const dagen = (v.perDag || []).map(x => x.dag);
+      const geenNamen = !JSON.stringify(v).includes(B.codenaam);
+      const geenJa = !!b2 && !(b2.komen || []).includes(B.codenaam);
+      return { klopt: v.opgegeven === 1 && VENSTER.every(d => dagen.includes(d)) && geenNamen && geenJa,
+        wat: 'bij de organisator: ' + (v.opgegeven || 0) + ' venster(s), overlap per dag ' +
+          (v.perDag || []).map(x => x.dag + '=' + x.aantal).join(', ') + '; naam van de vriend erin: ' + !geenNamen +
+          ', telt als ja: ' + !geenJa };
     });
 
   /* 8 -- RAHUL REKENT DE DATUM UIT DE ANTWOORDEN. kern/genootschap/ai.js
@@ -396,7 +406,7 @@ async function loop(basis, uit) {
     schakel(10, 'WorkOS', 'vriend', 'werkgever', 'vraagt met zijn eigen werkplek-login een vrije dag voor het weekend; de leidinggevende ziet het verzoek', {
       soort: 'bouwen',
       oorzaak: 'RTG Vrijheid beslist het verzoek meteen zelf en stuurt het niet naar een mens: de stap RIGHTS_POLICY zegt NIET_NODIG ("U staat op die dag niet ingeroosterd; er hoeft niets vrij te worden gemaakt"), omdat het rooster maar 7 dagen vooruit kijkt (kern/personeel.js, ook gemeld in `ontbreekt`). Voor een weekend over een maand bestaat dus nog geen dienst, het verzoek eindigt als DECLINED. Of die dag beschermd is wanneer het rooster later wordt gemaakt, is hier NIET gemeten -- het verzoek zelf staat in elk geval niet meer open. Het verlofsaldo is daarnaast niet aangesloten (Mijn tijd: "Het saldo komt uit uw contract en payroll en is hier niet aangeleverd").',
-      eigenaar: 'WorkOS -- server/kern/vrijheid/ (motor en teambeeld), saldo uit server/kern/payroll/; routes/vrijheid/tijd.js',
+      eigenaar: 'WorkOS -- server/kern/vrijheid/ (motor en teambeeld), saldo uit server/kern/payroll/; routes/vrijheid/tijd.js. In ronde 2 van het afbouwprogramma (11 oktober 2026) is dit het werk van de Vrijheid-werkstroom en niet van deze tak; besluit B1 (vakantiedagen) houdt de productiepoort van het saldo dicht tot de juridische toets van de rekenregel er is.',
       oplossing: 'Een verzoek voor een dag buiten de roosterhorizon wordt een VOORUITGEBOEKTE vrije dag die de planner leest wanneer het rooster wordt gemaakt (zoals kern/payroll/inplanbaar.js verzuim leest), of gaat als wachtend verzoek naar de leidinggevende -- niet DECLINED. En het vakantiesaldo uit het contract aansluiten (VRIJHEID.md, lus.js BLOCKED). Het saldo blijft van de medewerker en de werkgever; het verlaat WorkOS niet (storing 4).'
     }),
     async () => {
@@ -440,42 +450,22 @@ async function loop(basis, uit) {
         wat: p ? 'pot "' + p.naam + '", doel ' + p.doelCenten + ' centen, stand ' + p.standCenten : 'pot niet terug te vinden' };
     });
 
-  /* 12 -- PAST / PAST NIET. Wat de opdracht vraagt is dat Rahul per deelnemer
-     hoogstens weet of het weekend past -- en nooit het bedrag. Die projectie
-     bestaat niet. De proef meet de dichtstbijzijnde stem (Rahul in Sociaal) en
-     kijkt of hij iets per deelnemer zegt. */
-  await stap(
-    schakel(12, 'geld', 'vriend', 'Rahul', 'laat Rahul per deelnemer alleen weten of het weekend past, zonder bedrag en zonder vergelijking', {
-      soort: 'besluit',
-      oorzaak: 'Er is geen deling van "past / past niet": een pot (kern/geldbeleid/potten.js) is alleen van het lid zelf, en Rahul in Sociaal (routes/socialerahul.js) leest uitsluitend de sociale graaf -- zijn antwoord noemt geen deelnemer en geen budget. Rahul kan het budget dus niet meewegen, ook niet zonder bedrag.',
-      eigenaar: 'het geld (GELD.md) en LivingOS (LIFE.md par. 4.6) samen -- server/kern/geldbeleid/ en server/kern/levensband/ voor de deling',
-      oplossing: 'Een deling op kern/levensband/ (eigen cap, vervaldatum, intrekbaar door elke kant) die per deelnemer uitsluitend een BOOLEAN projecteert: past het opgegeven bedrag binnen zijn eigen pot. Nooit het bedrag, nooit een volgorde, en "past niet" zonder reden. Vraagt eerst een besluit van de eigenaar of deze deling mag bestaan (LIFE.md par. 4.6: toestemming reist niet mee).'
-    }),
-    () => P('/api/sociaal/rahul', { vraag: 'Past het weekend Rome binnen het budget van ' + B.codenaam + '?' }, A.token),
-    async r => {
-      const d = r.data || {};
-      const perDeelnemer = /past niet|past wel|binnen (zijn|het) budget/i.test(String(d.antwoord || '')) &&
-        String(d.antwoord || '').includes(B.codenaam);
-      return { klopt: perDeelnemer, wat: 'Rahul antwoordt: "' + String(d.antwoord || '').slice(0, 120) + '" op gronden: ' +
-        (d.gegevens || []).slice(0, 3).join(' | ') };
-    });
-
   /* ======================= TravelOS: de reis ======================= */
 
   /* 13 -- het reisbureau om een Rome-reis vragen. Het advies (kern/reisbureau-
-     advies.js) rangschikt de catalogus op woorden. Er ligt geen Rome in. */
+     advies.js) herkent nu een genoemde bestemming: er ligt geen Rome in de
+     catalogus, dus het wijst GEEN andere stad aan maar zegt dat, met de weg die
+     er wel is. Tot ronde 2 wees het op het woord "weekend" Gstaad aan. */
   await stap(
-    schakel(13, 'TravelOS', 'organisator', 'reisbureau', 'vraagt een weekend Rome; het advies wijst Rome aan of zegt eerlijk dat die er niet is', {
-      soort: 'bouwen',
-      oorzaak: 'De catalogus (db.data.partnerTrips, kern/reisaanbod.js) bevat Ibiza, Gstaad, Monaco en Lissabon -- geen Rome. Het advies matcht op losse woorden en wijst op "weekend" een reis naar GSTAAD aan, zonder te zeggen dat de gevraagde bestemming ontbreekt. Een advies naar een andere stad dan gevraagd is een verkeerd antwoord dat er goed uitziet.',
-      eigenaar: 'TravelOS -- server/kern/reisbureau-advies.js (rangschikking), aanbod in server/kern/reisaanbod.js',
-      oplossing: 'Het advies herkent een bestemming in de wens en geeft bij geen treffer GEEN andere stad maar de weg die er wel is: "geen Rome in de catalogus; het reisbureau kan hem samenstellen" (de klaarzetweg van schakel 14). Een Rome-reis in de catalogus is een inkoopbesluit (TRAVELCOMMERCE.md) en geen bouwtaak.'
-    }),
+    schakel(13, 'TravelOS', 'organisator', 'reisbureau', 'vraagt een weekend Rome; het advies wijst Rome aan of zegt eerlijk dat die er niet is'),
     () => P('/api/reisbureau/advies', { wens: 'een weekend Rome met vrienden' }, A.token),
     async r => {
-      const reis = (r.data && r.data.reis) || {};
-      const eerlijk = reis.bestemming === 'Rome' || (!reis.id && /rome|niet/i.test(JSON.stringify(r.data)));
-      return { klopt: eerlijk, wat: 'advies: ' + (reis.titel || '(geen reis)') + ' -- reden "' + ((r.data && r.data.reden) || '') + '"' };
+      const d = r.data || {};
+      const reis = d.reis || null;
+      const eerlijk = reis ? reis.bestemming === 'Rome'
+        : !!(d.ontbreekt && d.ontbreekt.bestemming === 'Rome') && /rome/i.test(String(d.reden || ''));
+      return { klopt: eerlijk, wat: 'advies: ' + (reis ? reis.titel + ' (' + reis.bestemming + ')' : '(geen reis; ontbreekt: ' +
+        JSON.stringify(d.ontbreekt || null) + ')') + ' -- reden "' + String(d.reden || '').slice(0, 120) + '"' };
     });
 
   /* 14 -- het reisbureau STELT DE REIS SAMEN en zet hem klaar; Anna eist hem
@@ -558,47 +548,102 @@ async function loop(basis, uit) {
         wat: 'gratis account: ' + n + ' kandidaat-weekenden in zijn agenda, de reis zichtbaar als reisgenoot: ' + reis.status };
     });
 
-  /* 18 -- BOEKEN EN BETALEN PER DEELNEMER. Een aanvraag bij het reisbureau
-     draagt `personen` als AANTAL. De catalogus heeft geen Rome (schakel 13),
-     dus de proef boekt het mechanisme op een catalogusreis -- het gaat hier om
-     de vorm van de aanvraag, niet om de stad. */
+  /* 18 -- BOEKEN EN BETALEN PER DEELNEMER (besluit B3). De catalogus heeft geen
+     Rome (schakel 13), dus de proef zet de delen klaar op een catalogusreis --
+     het gaat om de vorm, niet om de stad. Anna boekt haar EIGEN plaats en zet
+     voor Bram en de vriend zonder pas elk een deel klaar
+     (kern/reisbureau-deelnemers.js); Bram zegt zelf ja, en pas dan ontstaat
+     ZIJN aanvraag. Betalen loopt daarna langs zijn eigen /api/reisbureau/betaal,
+     en dus langs kern/pay -- die weg stond er al en int alleen de eigen
+     aanvraag van de betaler (storing 11 meet dat). */
   await stap(
-    schakel(18, 'TravelOS', 'organisator', 'vriend', 'vraagt de reis aan voor drie; elke medereiziger krijgt zijn eigen deel klaargezet om zelf te bevestigen en te betalen', {
-      soort: 'besluit',
-      oorzaak: 'Een aanvraag (kern/reisbureau.js boek) draagt `personen` als getal en `customerKey` van een lid: de medereizigers bestaan er niet in. De vriend ziet de aanvraag niet in /api/reisbureau/mijn, en betalen (kern/reisbureau-betaling.js) int de hele reissom op EEN boeking bij de aanvrager. Er is geen weg waarlangs ieder zijn eigen deel bevestigt.',
-      eigenaar: 'TravelOS -- server/kern/reisbureau.js en server/kern/reisbureau-betaling.js; de verdeling raakt TRAVELCOMMERCE.md (wie betaalt wat) en GELD.md par. 3',
-      oplossing: 'Deelnemers als verwijzing op de aanvraag (codenaam, en alleen na hun eigen ja in het reisgezelschap), met per deelnemer een KLAARGEZET deel dat hij zelf bevestigt en betaalt langs kern/pay. Nooit innen namens een ander. Wie het deel bepaalt en of RTG een gesplitste reissom mag innen is een besluit (TRAVELCOMMERCE.md), geen bouwtaak.'
-    }),
+    schakel(18, 'TravelOS', 'organisator', 'vriend', 'vraagt de reis aan voor drie; elke medereiziger krijgt zijn eigen deel klaargezet om zelf te bevestigen en te betalen'),
     async () => {
-      const r = await P('/api/reisbureau/boek', { tripId: 'lissabon-nieuw', personen: 3, vertrek: WEEKEND_2, notitie: 'met twee vrienden' }, A.token);
-      ctx.aanvraag = r.data && r.data.aanvraag;
-      return r;
-    },
-    async () => {
+      const r = await P('/api/reisbureau/deelnemers/klaarzetten', { tripId: 'lissabon-nieuw', vertrek: WEEKEND_2,
+        reis: ctx.reis, deelnemers: [B.codenaam, ctx.E.codenaam] }, A.token);
+      if (r.status !== 200) return r;
+      ctx.aanvraag = r.data.aanvraag;
       const mB = await P('/api/reisbureau/mijn', {}, B.token);
-      const ziet = ((mB.data && mB.data.aanvragen) || []).some(a => a.ref === (ctx.aanvraag && ctx.aanvraag.ref));
-      return { klopt: ziet, wat: 'aanvraag ' + (ctx.aanvraag && ctx.aanvraag.ref) + ' voor ' + (ctx.aanvraag && ctx.aanvraag.personen) +
-        ' personen; de medereiziger ziet hem: ' + ziet };
+      ctx.deelB = ((mB.data && mB.data.klaargezet) || [])[0];
+      if (!ctx.deelB) return { status: 409, data: { error: 'de vriend ziet geen klaargezet deel' } };
+      return P('/api/reisbureau/deelnemers/antwoord', { id: ctx.deelB.id, ja: true }, B.token);
+    },
+    async r => {
+      ctx.aanvraagB = r.data && r.data.aanvraag;
+      const st = await P('/api/reisbureau/deelnemers/stand', { ref: ctx.aanvraag.ref }, A.token);
+      const delen = (st.data && st.data.delen) || [];
+      const b = delen.find(x => x.codenaam === B.codenaam), e = delen.find(x => x.codenaam === ctx.E.codenaam);
+      const mB = await P('/api/reisbureau/mijn', {}, B.token);
+      const eigenB = ((mB.data && mB.data.aanvragen) || []).find(x => x.ref === (ctx.aanvraagB && ctx.aanvraagB.ref));
+      const eigenA = ((mB.data && mB.data.aanvragen) || []).some(x => x.ref === ctx.aanvraag.ref);
+      const mE = await P('/api/reisbureau/mijn', {}, ctx.E.token);
+      const deelE = ((mE.data && mE.data.klaargezet) || []).length;
+      return { klopt: ctx.aanvraag.personen === 1 && !!eigenB && eigenB.personen === 1 && !eigenA &&
+          !!b && b.stand === 'bevestigd' && !!e && e.stand === 'klaargezet' && deelE === 1,
+        wat: 'organisator boekt alleen zichzelf (' + ctx.aanvraag.personen + ' persoon); de vriend bevestigde zelf en heeft een eigen aanvraag ' +
+          (eigenB ? eigenB.ref + ' voor ' + eigenB.personen : '(geen)') + '; de aanvraag van de organisator in zijn lijst: ' + eigenA +
+          '; stand bij de organisator: ' + delen.map(x => x.codenaam + '=' + x.stand).join(', ') + '; vriend zonder pas ziet zijn deel: ' + deelE };
+    });
+
+  /* 12 -- PAST / PAST NIET (besluit B2). Uitgevoerd NA 18, want de toets gaat
+     over een CONCREET voorstel: het deel dat voor Bram klaarstaat. Drie stappen,
+     elk van Bram zelf: hij geeft toestemming voor zijn eigen pot, hij ziet de
+     uitkomst als enige, en hij deelt hem met de organisator. Gemeten wordt ook
+     wat de organisator ervoor zag: niets. (De schakels worden aan het eind op
+     nummer gezet, dus de volgorde van uitvoeren verschuift het register niet.) */
+  await stap(
+    schakel(12, 'geld', 'vriend', 'Rahul', 'laat Rahul per deelnemer alleen weten of het weekend past, zonder bedrag en zonder vergelijking'),
+    async () => {
+      const voor = await P('/api/reisbureau/deelnemers/stand', { ref: ctx.aanvraag.ref }, A.token);
+      ctx.budgetVoorDelen = ((voor.data && voor.data.delen) || []).find(x => x.codenaam === B.codenaam);
+      const zonder = ((await P('/api/reisbureau/mijn', {}, B.token)).data || {}).klaargezet || [];
+      ctx.budgetZonderToestemming = (zonder.find(x => x.id === ctx.deelB.id) || {}).budget;
+      const t = await P('/api/geld/budgettoets/sta', { potId: ctx.potB && ctx.potB.id }, B.token);
+      if (t.status !== 200) return t;
+      ctx.toestemmingB = t.data.toestemming;
+      const met = ((await P('/api/reisbureau/mijn', {}, B.token)).data || {}).klaargezet || [];
+      ctx.budgetB = (met.find(x => x.id === ctx.deelB.id) || {}).budget;
+      return P('/api/reisbureau/deelnemers/budget', { id: ctx.deelB.id, delen: true }, B.token);
+    },
+    async r => {
+      const st = await P('/api/reisbureau/deelnemers/stand', { ref: ctx.aanvraag.ref }, A.token);
+      const b = ((st.data && st.data.delen) || []).find(x => x.codenaam === B.codenaam) || {};
+      const uitkomst = ctx.budgetB && ctx.budgetB.uitkomst;
+      const kaal = JSON.stringify(st.data || {});
+      const geenBedrag = !kaal.includes(String(POT_CENTEN)) && !/centen|saldo|doel/i.test(kaal);
+      return { klopt: !!ctx.budgetVoorDelen && ctx.budgetVoorDelen.budget === null &&
+          !!ctx.budgetZonderToestemming && ctx.budgetZonderToestemming.uitkomst === null &&
+          ['past', 'past-niet'].includes(uitkomst) && r.data.gedeeld === uitkomst && b.budget === uitkomst && geenBedrag,
+        wat: 'zonder toestemming: ' + (ctx.budgetZonderToestemming && ctx.budgetZonderToestemming.reden) +
+          '; met toestemming ziet de vriend zelf: ' + uitkomst + '; bij de organisator voor het delen: ' +
+          (ctx.budgetVoorDelen && ctx.budgetVoorDelen.budget) + ', erna: ' + b.budget + '; bedrag of saldo zichtbaar: ' + !geenBedrag };
     });
 
   /* ======================= Rahul: samenstellen ======================= */
 
-  /* 19 -- "REGEL ZATERDAG" voor een weekend. LIFE.md par. 3: Rahul mag het hele
-     plan samenstellen en klaarzetten, een scherm, een bevestiging. De stukken
-     staan nu los (datum, reis, gezelschap); de proef vraagt of er EEN voorstel
-     is dat ze samenbrengt. */
+  /* 19 -- "REGEL ZATERDAG" voor een weekend. LIFE.md par. 3: Rahul stelt het
+     plan samen en zet het klaar; kern/socialecommand/samenstel.js projecteert de
+     datum uit de antwoorden en vensters, de reis door de poort, de delen en het
+     gedeelde budget in EEN voorstel, met per mens wat hij nog zelf doet (de
+     plan-vorm van kern/stuur/plan.js). Het voert niets uit (storing 12). */
   await stap(
-    schakel(19, 'LivingOS', 'Rahul', 'organisator', 'stelt het weekend in een voorstel samen (datum uit de antwoorden, de reis, wie meegaat) en zet het klaar voor een bevestiging', {
-      soort: 'bouwen',
-      oorzaak: 'Life Command (kern/socialecommand/voorstellen.js) leidt voorstellen alleen af uit een openstaande zaak ("laten weten of u komt"); er is geen samenstelling over werelden. Rahul in Sociaal leest alleen de sociale graaf en weet niets van de reis, en kern/stuur/plan.js compileert stappen tegen het beleid maar heeft geen HTTP-ingang voor een lid en geen deze-groep-context.',
-      eigenaar: 'LivingOS -- server/kern/socialecommand/ (voorstellen), met de datum uit kern/genootschap/ai.js en de reis als projectie uit kern/reisgezelschap.js',
-      oplossing: 'Een samenstel-voorstel dat PROJECTEERT en niets bezit: datumRaad + de reis (alleen de velden van de reisgezelschap-poort) + per deelnemer past/past niet (schakel 12, zodra die deling er is). Een bevestiging zet alleen klaar wat een ander bereikt; elke uitnodiging en elk deel blijft een eigen ja van de ander. Hangt af van schakel 7, 12 en 18.'
-    }),
-    () => P('/api/sociaal/command', {}, A.token),
+    schakel(19, 'LivingOS', 'Rahul', 'organisator', 'stelt het weekend in een voorstel samen (datum uit de antwoorden, de reis, wie meegaat) en zet het klaar voor een bevestiging'),
+    () => P('/api/sociaal/samenstel', { groep: ctx.groep, reis: ctx.reis }, A.token),
     async r => {
-      const v = (r.data && r.data.voorstellen) || [];
-      const samen = v.find(x => /weekend|rome/i.test(String(x.titel || '')) && /reis|samen/i.test(String(x.wat || '')));
-      return { klopt: !!samen, wat: v.length + ' voorstel(len) bij de organisator: ' + v.map(x => x.wat + ' - ' + x.titel).join('; ') };
+      const v = (r.data && r.data.voorstel) || {};
+      const d = (v.deelnemers || []);
+      const b = d.find(x => x.codenaam === B.codenaam) || {};
+      const e = d.find(x => x.codenaam === ctx.E.codenaam) || {};
+      const stappen = (v.plan && v.plan.stappen) || [];
+      const wieDoetWat = stappen.map(x => x.wie + ': ' + x.wat);
+      const klopt = !!v.datum && v.datum.beste === WEEKEND_2 && !!v.reis && v.reis.bestemming === 'Rome' &&
+        b.deel === 'bevestigd' && b.budget === (ctx.budgetB && ctx.budgetB.uitkomst) && e.deel === 'klaargezet' &&
+        stappen.some(x => x.wie === B.codenaam && /betaalt zelf/.test(x.wat)) &&
+        stappen.some(x => x.wie === ctx.E.codenaam && /bevestigt zelf/.test(x.wat)) &&
+        Array.isArray(v.uitgevoerd) && v.uitgevoerd.length === 0 && v.ai === false;
+      return { klopt, wat: 'datum ' + (v.datum && v.datum.beste) + ', reis ' + (v.reis && v.reis.bestemming) + ', ' + d.length +
+        ' deelnemers; ' + stappen.length + ' stap(pen) in ' + ((v.plan && v.plan.golven) || []).length + ' golf(ven): ' +
+        wieDoetWat.join(' | ') + '; uitgevoerd: ' + JSON.stringify(v.uitgevoerd) };
     });
 
   return ctx;
@@ -651,7 +696,7 @@ async function storingen(basis, uit, ctx) {
      Gezocht wordt naar de werkgever, zijn personeelsnummer, het verzoek en de
      woorden waarmee een saldo of dienstverband zich aandient. */
   const zijnTijd = ctx.werkTokenB ? await P('/api/staff/tijd', {}, ctx.werkTokenB) : { status: 0, data: null };
-  const ziet = await watDeOrganisatorZiet(basis, A, ctx.groep, ctx.reis);
+  const ziet = await watDeOrganisatorZiet(basis, A, ctx.groep, ctx.reis, ctx.aanvraag && ctx.aanvraag.ref);
   const tekst = JSON.stringify(ziet);
   const merktekens = [WERKGEVER, 'Meridiaan', ctx.verzoekB && ctx.verzoekB.id, 'STATUTORY_LEAVE', 'verlofsaldo', 'dienstverband',
     'Normaal verlofsaldo'].filter(Boolean);
@@ -708,6 +753,83 @@ async function storingen(basis, uit, ctx) {
     voorAnder.status === 200 && String(persoon) === String(ctx.staffB),
     'status ' + voorAnder.status + ', verzoek op personeelsnummer ' + persoon + ' (eigen: ' + ctx.staffB + ')');
 
+  /* 9. ZONDER TOESTEMMING GEEN UITKOMST (besluit B2). De vriend zonder pas
+     heeft nooit toestemming gegeven: hij ziet bij zijn eigen deel geen
+     uitkomst maar de reden, en hij kan niets delen. En Bram trekt zijn
+     toestemming in langs het TOESTEMMINGSSCHERM (de gewone weg, laag
+     `budgettoets`): daarna is ook zijn uitkomst weg en kan hij niet opnieuw
+     delen. Een "past niet" uit een pot waar niemand naar mocht kijken, is ook
+     een uitspraak over die pot. */
+  const E = ctx.E;
+  const deelE = (((await P('/api/reisbureau/mijn', {}, E.token)).data || {}).klaargezet || [])[0] || {};
+  const eDeelt = deelE.id ? await P('/api/reisbureau/deelnemers/budget', { id: deelE.id, delen: true }, E.token) : { status: 0 };
+  const lijstB = ((await P('/api/toestemming', {}, B.token)).data || {}).toestemmingen || [];
+  const rijB = lijstB.find(t => t.laag === 'budgettoets');
+  const intrek = rijB ? await P('/api/toestemming/intrek', { laag: 'budgettoets', id: rijB.id }, B.token) : { status: 0 };
+  const naIntrek = ((((await P('/api/reisbureau/mijn', {}, B.token)).data || {}).klaargezet || [])
+    .find(x => x.id === (ctx.deelB && ctx.deelB.id)) || {}).budget || {};
+  const opnieuw = ctx.deelB ? await P('/api/reisbureau/deelnemers/budget', { id: ctx.deelB.id, delen: true }, B.token) : { status: 0 };
+  noteer(9, 'een budgettoets zonder (of na ingetrokken) toestemming', 'budget',
+    'geen toestemming is geen uitkomst: niets te zien, niets te delen, en intrekken op het toestemmingsscherm sluit het meteen',
+    !!deelE.budget && deelE.budget.uitkomst === null && eDeelt.status === 409 && !!rijB && intrek.status === 200 &&
+      naIntrek.uitkomst === null && opnieuw.status === 409,
+    'zonder toestemming: uitkomst ' + (deelE.budget && deelE.budget.uitkomst) + ', delen ' + eDeelt.status +
+      '; op het toestemmingsscherm: ' + (rijB ? 'ja' : 'nee') + ', intrekken ' + intrek.status + '; daarna uitkomst ' +
+      naIntrek.uitkomst + ', opnieuw delen ' + opnieuw.status);
+
+  /* 10. DE UITKOMST GAAT NIET VANZELF NAAR DE ANDERE DEELNEMERS (besluit B2).
+     Bram deelde met de ORGANISATOR van zijn deel; de andere reisgenoot ziet
+     daar niets van -- niet in zijn eigen delen, niet in het reisgezelschap, en
+     de stand van de organisator is voor hem dicht. En voordat Bram deelde, zag
+     ook de organisator niets (gemeten in schakel 12). */
+  const eZiet = JSON.stringify([
+    (await P('/api/reisbureau/mijn', {}, E.token)).data,
+    (await P('/api/reis/gezelschap', { reis: ctx.reis }, E.token)).data,
+    (await P('/api/reis/gezelschap/reis', { reis: ctx.reis }, E.token)).data
+  ]);
+  const eStand = ctx.aanvraag ? await P('/api/reisbureau/deelnemers/stand', { ref: ctx.aanvraag.ref }, E.token) : { status: 0 };
+  const eigenRijen = ((JSON.parse(eZiet)[0] || {}).klaargezet || []);
+  const anderBudget = /"budgetGedeeld":"past/.test(eZiet) || eigenRijen.some(x => x.id === (ctx.deelB && ctx.deelB.id));
+  noteer(10, 'de budgetuitkomst van een vriend bij een andere deelnemer', 'budget',
+    'wat Bram deelde gaat alleen naar de organisator van zijn deel; een andere reisgenoot ziet het nergens',
+    !anderBudget && eStand.status === 404 && !!ctx.budgetVoorDelen && ctx.budgetVoorDelen.budget === null,
+    'andere reisgenoot: ' + eigenRijen.length + ' eigen deel, budget van een ander zichtbaar: ' + anderBudget +
+      ', stand van de organisator: ' + eStand.status + '; bij de organisator voor het delen: ' +
+      (ctx.budgetVoorDelen && ctx.budgetVoorDelen.budget));
+
+  /* 11. GEEN BOEKING OF BETALING NAMENS EEN ANDER (besluit B3). De organisator
+     probeert het deel van de vriend zonder pas te bevestigen, en de eigen
+     aanvraag van Bram te betalen; een reisgenoot probeert het deel van een
+     ander; en de organisator zet een deel klaar voor iemand die nooit zelf ja
+     zei als reisgenoot. */
+  const aBevestigt = deelE.id ? await P('/api/reisbureau/deelnemers/antwoord', { id: deelE.id, ja: true }, A.token) : { status: 0 };
+  const aBetaalt = ctx.aanvraagB ? await P('/api/reisbureau/betaal', { ref: ctx.aanvraagB.ref }, A.token) : { status: 0 };
+  const bVoorE = deelE.id ? await P('/api/reisbureau/deelnemers/antwoord', { id: deelE.id, ja: true }, B.token) : { status: 0 };
+  const voorC = await P('/api/reisbureau/deelnemers/klaarzetten', { tripId: 'gstaad-alpien', vertrek: WEEKEND_2,
+    reis: ctx.reis, deelnemers: [C.codenaam] }, A.token);
+  const eNog = ((((await P('/api/reisbureau/mijn', {}, E.token)).data || {}).klaargezet || [])[0] || {}).stand;
+  noteer(11, 'boeken of betalen namens een andere deelnemer', 'geld verlaat het huis niet vanzelf',
+    'een deel bevestigt alleen wie het geldt, een aanvraag betaalt alleen wie hem deed, en een deel staat alleen klaar voor wie zelf meereist',
+    aBevestigt.status === 404 && aBetaalt.status === 404 && bVoorE.status === 404 && voorC.status === 409 && eNog === 'klaargezet',
+    'organisator bevestigt voor een ander: ' + aBevestigt.status + ', betaalt de aanvraag van een ander: ' + aBetaalt.status +
+      '; reisgenoot voor een ander: ' + bVoorE.status + '; deel voor wie niet zelf ja zei: ' + voorC.status + ' "' +
+      String((voorC.data && voorC.data.error) || '').slice(0, 80) + '"; het deel van de ander staat nog op ' + eNog);
+
+  /* 12. RAHUL STELT SAMEN EN VOERT NIETS UIT. Voor en na het samenstellen:
+     dezelfde aanvragen bij elke deelnemer, dezelfde delen, dezelfde agenda. */
+  const beeld = async () => JSON.stringify([
+    ((await P('/api/reisbureau/mijn', {}, A.token)).data || {}).aanvragen,
+    ((await P('/api/reisbureau/mijn', {}, B.token)).data || {}).aanvragen,
+    ((await P('/api/reisbureau/mijn', {}, E.token)).data || {}).klaargezet,
+    ((await P('/api/genootschap/agenda', { groep: ctx.groep }, A.token)).data || {}).komt
+  ]);
+  const voorS = await beeld();
+  const sam = await P('/api/sociaal/samenstel', { groep: ctx.groep, reis: ctx.reis }, A.token);
+  const naS = await beeld();
+  noteer(12, 'Rahul stelt het weekend samen', 'menselijke regie',
+    'het voorstel verandert niets: geen aanvraag, geen deel, geen antwoord in de agenda',
+    sam.status === 200 && voorS === naS, 'samenstellen ' + sam.status + ', wereld voor en na gelijk: ' + (voorS === naS));
+
   return uit;
 }
 
@@ -722,7 +844,10 @@ async function meet() {
       'routes eronder doen. FoundationOS loopt hier alleen als de universele bodem (schakel 17: verbinden voor een gratis account, ' +
       'SAMENLEVING.md); het scenario vraagt geen stichting, en een schakel verzinnen om haar te raken zou een route meten die niemand ' +
       'nodig had. Het kantoor werkt op de gedeelde code, dus een besluit op naam is hier niet gemeten. ' +
-      'Boeken loopt op een catalogusreis omdat er geen Rome in de catalogus staat (schakel 13); betalen is alleen als WEIGERING gemeten.',
+      'Boeken loopt op een catalogusreis omdat er geen Rome in de catalogus staat (schakel 13); betalen is alleen als WEIGERING gemeten ' +
+      '(namens een ander, of voordat een reisadviseur bevestigde) -- een geslaagde betaling per deelnemer vraagt een bevestiging op naam ' +
+      'en een uitgesplitste reis, en die zijn hier niet opgezet. De budgettoets meet de VORM (toestemming, uitkomst alleen bij de ' +
+      'vriend, delen met de organisator); welke uitkomst eruit komt hangt af van zijn pot en is geen oordeel van de proef.',
     schakels: [], storingen: [], wereld: null
   };
   const srv = await start({ naam: 'romeproef', gereed: 'ready',
@@ -731,6 +856,9 @@ async function meet() {
     const ctx = await loop(srv.basis, uit);
     await storingen(srv.basis, uit, ctx);
   } finally { srv.klaar(); }
+  /* Op nummer: schakel 12 loopt na 18 (hij toetst een concreet voorstel), en de
+     volgorde van uitvoeren hoort het register niet te verschuiven. */
+  uit.schakels.sort((a, b) => a.nr - b.nr);
 
   const t = { schakels: uit.schakels.length, gesloten: 0, open: 0, openBekend: 0, stuk: 0,
     storingen: uit.storingen.length, gehouden: 0, gebroken: 0 };

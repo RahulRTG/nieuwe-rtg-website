@@ -17,6 +17,13 @@
        zakken, met de gevonden merktekens erbij.
    Een storing die je niet hebt zien zakken is geen storing (LAT.md).
 
+   RONDE 2 (11 oktober 2026) sloot schakel 7, 12, 13, 18 en 19 in de
+   PRODUCTcode en zette er vier storingen bij voor de besluiten B2 en B3. De
+   productkant wordt per route beproefd in test/romeschakels.test.js, met drie
+   mutaties gedraaid en gezien: de oude reisbureau-advies.js (wees Gstaad aan),
+   een deel dat iedereen mag beantwoorden, en een budgettoets zonder
+   toestemming. Hieronder staat de RATEL: wat ronde 2 sloot, blijft dicht.
+
    Draai los: node --test test/romeproef.test.js
    De keten zelf: npm run romeproef (of romeproef:vast om het register te schrijven) */
 'use strict';
@@ -127,6 +134,22 @@ test('6. het register telt op, raakt alle vier de werelden, en zegt wat het niet
   assert.doesNotMatch(JSON.stringify(j.perWereld), /pct|procent|score/i);
   assert.ok(j.grens && j.grens.length > 120, 'het register draagt geen uitgeschreven grens');
   assert.ok(j.stempel && j.stempel.commit, 'zonder stempel is het register niet na te lopen');
+});
+
+test('8. wat ronde 2 sloot blijft dicht, en B2 en B3 hebben elk een storing', () => {
+  const j = lees('ROMEPROEF.json');
+  for (const nr of [7, 12, 13, 18, 19]) {
+    const sch = j.schakels.find(x => x.nr === nr);
+    assert.ok(sch, 'schakel ' + nr + ' ontbreekt');
+    assert.equal(sch.stand, 'gesloten', 'schakel ' + nr + ' is weer open: ' + (sch.ziet || sch.antwoord));
+    assert.equal(sch.bekend, null, 'schakel ' + nr + ' draagt nog een werklijstreden terwijl hij dicht is');
+  }
+  assert.ok(j.telling.storingen >= 12, 'de storingen van B2 en B3 ontbreken');
+  const namen = j.storingen.map(x => x.naam).join(' | ');
+  for (const m of [/zonder \(of na ingetrokken\) toestemming/, /andere deelnemer/, /namens een andere deelnemer/, /stelt het weekend samen/])
+    assert.match(namen, m, 'geen storing ' + m);
+  assert.deepEqual(j.schakels.map(x => x.nr), j.schakels.map(x => x.nr).slice().sort((a, b) => a - b),
+    'de schakels staan niet op nummer; dan verschuift het register met de volgorde van uitvoeren');
 });
 
 test('7. de proef deelt geen ketenmodule -- de vorm wordt gevonden, niet verklaard', () => {

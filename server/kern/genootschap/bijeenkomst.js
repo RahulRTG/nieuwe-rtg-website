@@ -11,8 +11,12 @@
 
    Wel: een plaatsgrens die eerlijk werkt. Is het vol, dan is het vol -- er
    ontstaat geen wachtlijst die iedereen hoop geeft. Wie afzegt maakt een plaats
-   vrij en dat is meteen te zien. */
+   vrij en dat is meteen te zien.
+
+   En een VENSTER dat het lid zelf opgeeft ("ik kan drie dagen in die week")
+   staat in ./venster.js, met de grenzen erbij. */
 const { keur } = require('../veilig');
+const { maakVenster, vensterTelling } = require('./venster');
 
 module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
   const WAT_MAX = 90, WAAR_MAX = 120, TOELICHTING_MAX = 600;
@@ -129,6 +133,8 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
     vol: !!(b.plaatsen && tel(b, 'ja') >= b.plaatsen),
     mijnAntwoord: (sess && b.antwoorden && b.antwoorden[sess.key]) || null,
     komen: Object.keys(b.antwoorden || {}).filter(k => b.antwoorden[k] === 'ja').map(k => codenaamVan(k)),
+    venster: vensterTelling(b),
+    mijnVenster: (sess && b.vensters && b.vensters[sess.key]) || [],
     afgelast: b.afgelast || null
   });
 
@@ -161,5 +167,7 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
     return { ok: true, komt: uit.slice(0, 50) };
   }
 
-  return { roepBijeen, antwoord, afgelast, agenda, mijnAgenda, publiek, lijstVan, ANTWOORDEN };
+  const { zetVenster } = maakVenster({ save, poort, kijkVan, publiek: (b, sess) => publiek(b, sess) });
+
+  return { roepBijeen, antwoord, zetVenster, afgelast, agenda, mijnAgenda, publiek, lijstVan, ANTWOORDEN };
 };

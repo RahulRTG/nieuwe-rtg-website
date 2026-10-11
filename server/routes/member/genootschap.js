@@ -113,6 +113,12 @@ module.exports = (kern) => {
     try { uit(res, bijeenkomst.antwoord(req.session, id(req), req.body.id, req.body.antwoord)); } catch (e) { fout(res, e); }
   });
 
+  // het eigen beschikbaarheidsvenster rond een bijeenkomst: alleen wat het lid zelf noemt, een lege lijst wist het
+  app.post('/api/genootschap/venster', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { uit(res, bijeenkomst.zetVenster(req.session, id(req), req.body.id, req.body.dagen)); } catch (e) { fout(res, e); }
+  });
+
   app.post('/api/genootschap/afgelast', auth, (req, res) => {
     if (geenGast(req, res)) return;
     try { uit(res, bijeenkomst.afgelast(req.session, id(req), req.body.id, req.body.reden)); } catch (e) { fout(res, e); }

@@ -322,7 +322,7 @@ $('#adviesGo').addEventListener('click', async () => {
     const d = await api('/api/reisbureau/advies', { wens });
     if (d.reis){ $('#adviesUit').innerHTML = '<b style="color:var(--rtg-leesgoud,#E7A8B8);">'+esc(d.reis.titel)+'</b> · '+esc(d.reden)+' <button class="knop" id="adviesOpen" style="width:auto;margin-left:.4rem;padding:.3rem .7rem;font-size:.78rem;">Bekijk</button>';
       const ob = $('#adviesOpen'); if (ob) ob.addEventListener('click', () => openReis(d.reis.id)); }
-    else $('#adviesUit').textContent = 'Er is op dit moment geen passende reis beschikbaar. Uw reiswens is niet verstuurd en er is niets geboekt.';
+    else $('#adviesUit').textContent = d.reden || 'Er is op dit moment geen passende reis beschikbaar. Uw reiswens is niet verstuurd en er is niets geboekt.';
   } catch(e){ $('#adviesUit').textContent = e.status === 404 ? 'Er is op dit moment geen passende reis beschikbaar. Uw reiswens is niet verstuurd en er is niets geboekt.' : e.message; }
 });
 function openReis(id){

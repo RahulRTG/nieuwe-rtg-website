@@ -25,7 +25,7 @@ function reisAanbod(db) {
   }));
 }
 
-function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, reisbetalingVan }) {
+function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, reisbetalingVan, gezelschapVan, geldbeleidVan }) {
   const nu = () => new Date().toISOString();
   // de visumtaak-laag is optioneel en laat gebonden; zonder haar loopt alles door
   const visum = () => (visumtaakVan && visumtaakVan()) || null;
@@ -163,7 +163,11 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
     return { ok: true, betaald: a.betaald };
   }
 
-  return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen,
+  // per deelnemer boeken (./reisbureau-deelnemers.js, B3)
+  const deelnemers = require('./reisbureau-deelnemers').maakDeelnemers({ db, save, nu, boek, tripVan,
+    gezelschap: () => (gezelschapVan && gezelschapVan()) || null, geldbeleid: () => (geldbeleidVan && geldbeleidVan()) || null });
+
+  return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen, deelnemers,
     aanvraagVan, tripVan, markeerBetaald,
     bevestig, wijsAf, besluit,
     vraagWijziging: nazorg.vraagWijziging, besluitWijziging: nazorg.besluitWijziging,

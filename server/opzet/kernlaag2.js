@@ -139,7 +139,8 @@ Object.assign(kern, require('../kern/foodcourt').maakFoodcourt({ db, save, crypt
 /* Het RTG-reisbureau (kern/reisbureau.js): de aanvraag landt bij een
    RTG-reisadviseur, een mens bevestigt. De haken zijn laat gebonden. */
 Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic, accounts,
-  visumtaakVan: () => kern.visumtaak, meldLidVan: () => kern.meldLid, reisbetalingVan: () => kern.reisbetaling }));
+  visumtaakVan: () => kern.visumtaak, meldLidVan: () => kern.meldLid, reisbetalingVan: () => kern.reisbetaling,
+  gezelschapVan: () => kern.reisgezelschap, geldbeleidVan: () => kern.geldbeleid }));
 /* De geldgebeurtenis van een reis. Waarom, staat in de kop daar. */
 Object.assign(kern, require('../kern/reisbureau-betaling').maakReisbetaling({
   db, save, crypto, payVan: () => kern.pay, reisbureauVan: () => kern.reisbureau }));

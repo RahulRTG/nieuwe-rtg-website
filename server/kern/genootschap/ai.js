@@ -57,7 +57,13 @@ module.exports = ({ anthropic, genootschap, prikbord, bijeenkomst }) => {
     const gemeten = (a.komt || []).map(b => ({
       datum: b.datum, tijd: b.tijd, wat: b.wat,
       ja: b.ja, misschien: b.misschien, nee: b.nee,
-      stil: Math.max(0, leden - (b.ja + b.misschien + b.nee))
+      stil: Math.max(0, leden - (b.ja + b.misschien + b.nee)),
+      /* het venster dat leden ZELF opgaven: de dag(en) met de meeste overlap.
+         Telt niet mee in de volgorde -- een venster is geen ja. */
+      venster: ((v) => {
+        const top = Math.max(0, ...v.perDag.map(x => x.aantal));
+        return { opgegeven: v.opgegeven, overlap: top, dagen: top ? v.perDag.filter(x => x.aantal === top).map(x => x.dag) : [] };
+      })(b.venster || { opgegeven: 0, perDag: [] })
     })).sort((x, y) => (y.ja - x.ja) || (y.misschien - x.misschien) || x.datum.localeCompare(y.datum));
 
     if (!gemeten.length) return { ok: true, meting: [], tekst: 'Er staat nog niets in de agenda van dit genootschap.' };
@@ -66,7 +72,9 @@ module.exports = ({ anthropic, genootschap, prikbord, bijeenkomst }) => {
     const t = moment + ' past op dit moment de meeste leden: ' + beste.ja + ' ja, ' +
       beste.misschien + ' misschien en ' + beste.nee + ' nee. ' +
       (beste.stil ? beste.stil + ' ' + (beste.stil === 1 ? 'lid heeft' : 'leden hebben') + ' nog niet geantwoord.' :
-        'Iedereen heeft geantwoord.');
+        'Iedereen heeft geantwoord.') +
+      (beste.venster.opgegeven ? ' Rond die datum gaven ' + beste.venster.opgegeven + ' ' + (beste.venster.opgegeven === 1 ? 'lid' : 'leden') +
+        ' zelf een venster op; de meeste overlap (' + beste.venster.overlap + ') ligt op ' + beste.venster.dagen.join(', ') + '.' : '');
     return { ok: true, meting: gemeten, beste: beste.datum, tekst: t,
       bron: 'lokale-regels', ai: false };
   }

@@ -1,17 +1,17 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-10-06",
+  "vastgelegd": "2026-10-11",
   "gemeten": {
-    "bestanden": 2788,
-    "vormen": 1600,
-    "velden": 2289,
-    "modules": 887,
-    "domeinen": 310,
+    "bestanden": 2793,
+    "vormen": 1605,
+    "velden": 2296,
+    "modules": 891,
+    "domeinen": 312,
     "envelopDrempel": 19,
-    "envelop": 29,
-    "veldenDomeineigen": 1606,
-    "veldenGedeeldVanafVier": 234,
-    "gelijkendeVormparen": 64
+    "envelop": 30,
+    "veldenDomeineigen": 1608,
+    "veldenGedeeldVanafVier": 233,
+    "gelijkendeVormparen": 65
   },
   "envelop": [
     "aantal",
@@ -32,6 +32,7 @@
     "prijs",
     "reden",
     "ref",
+    "sinds",
     "soort",
     "stand",
     "status",
@@ -45,18 +46,6 @@
     "wat"
   ],
   "gedeeld": [
-    {
-      "veld": "sinds",
-      "domeinen": 18,
-      "waar": [
-        "bedrijf",
-        "kern/afdelingen",
-        "kern/clubs",
-        "kern/command",
-        "kern/commercie",
-        "kern/ledenbalie-inzage"
-      ]
-    },
     {
       "veld": "naar",
       "domeinen": 18,
@@ -94,6 +83,18 @@
       ]
     },
     {
+      "veld": "wie",
+      "domeinen": 18,
+      "waar": [
+        "bedrijf",
+        "kern/comm",
+        "kern/commerce",
+        "kern/consent-budget",
+        "kern/consent-lezers",
+        "kern/factuurcorrectie-gronden"
+      ]
+    },
+    {
       "veld": "supplierCode",
       "domeinen": 17,
       "waar": [
@@ -103,18 +104,6 @@
         "kern/comm",
         "kern/commercie",
         "kern/ervaring"
-      ]
-    },
-    {
-      "veld": "wie",
-      "domeinen": 17,
-      "waar": [
-        "bedrijf",
-        "kern/comm",
-        "kern/commerce",
-        "kern/consent-lezers",
-        "kern/factuurcorrectie-gronden",
-        "kern/horeca"
       ]
     },
     {
@@ -524,6 +513,18 @@
         "kern/livinglab",
         "kern/office"
       ]
+    },
+    {
+      "veld": "eigenaar",
+      "domeinen": 11,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/leerhuis",
+        "kern/levensgraaf",
+        "kern/onderneming",
+        "kern/reisgezelschap"
+      ]
     }
   ],
   "paren": [
@@ -570,6 +571,20 @@
         "max",
         "min",
         "vraag"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/consent-budget.js",
+      "b": "server/kern/consent-lezers.js",
+      "domeinA": "kern/consent-budget",
+      "domeinB": "kern/consent-lezers",
+      "gedeeld": [
+        "intrekbaar",
+        "laag",
+        "partij",
+        "richting",
+        "wie"
       ]
     },
     {
@@ -1084,19 +1099,6 @@
       "b": "server/kern/service/loop-source.js",
       "domeinA": "kern/library",
       "domeinB": "kern/service",
-      "gedeeld": [
-        "classificatie",
-        "correlatie",
-        "kanaal",
-        "oorzaak"
-      ]
-    },
-    {
-      "gelijkenis": 0.8,
-      "a": "server/kern/library/journal.js",
-      "b": "server/bedrijf/loop-source-change.js",
-      "domeinA": "kern/library",
-      "domeinB": "bedrijf",
       "gedeeld": [
         "classificatie",
         "correlatie",

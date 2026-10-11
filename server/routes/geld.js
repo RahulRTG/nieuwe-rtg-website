@@ -112,6 +112,14 @@ module.exports = (kern) => {
   app.post('/api/geld/grens/zet', auth, doe((c, b) => kern.geldbeleid.grensZet(c, b)));
   app.post('/api/geld/grens/weg', auth, doe((c, b) => kern.geldbeleid.grensWeg(c, String(b.id || ''))));
 
+  /* DE BUDGETTOETS (kern/geldbeleid/budgettoets.js, besluit B2). Het lid geeft
+     zelf toestemming om een voorstel dat aan HEM is klaargezet tegen een eigen
+     pot te toetsen; de uitkomst is past of past niet en ziet alleen hij.
+     Intrekken gaat langs het toestemmingsscherm (laag `budgettoets`), want daar
+     hoort elke lopende toestemming te staan -- geen tweede intrekknop hier. */
+  app.post('/api/geld/budgettoets', auth, doe((c) => ({ status: 200, ok: true, toestemmingen: kern.geldbeleid.budgettoetsen(c) })));
+  app.post('/api/geld/budgettoets/sta', auth, doe((c, b) => kern.geldbeleid.budgettoetsSta(c, String(b.potId || ''))));
+
   /* De gegronde Rahul staat in een eigen bestand: antwoorden (AI plus het
      rekenende terugvalpad) is meer dan vertalen, en dat hoort niet tussen de
      dunne routes hierboven te groeien. */

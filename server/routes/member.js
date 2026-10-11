@@ -85,6 +85,8 @@ module.exports = (kern) => {
   require('./member/metier')(kern);
   // Genootschap: besloten groepen met een prikbord en bijeenkomsten
   require('./member/genootschap')(kern);
+  // en zijn gezinsdeur: dezelfde kernfuncties voor een volwassen RTF-gezinslid
+  require('./member/genootschap-gezin')(kern);
   // Het verbond: een afspraak tussen twee genootschappen, getekend door beide kanten
   require('./member/verbond')(kern);
   // Het beraad (B3): overleggen en besluiten in een genootschap

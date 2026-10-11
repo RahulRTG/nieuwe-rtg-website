@@ -19,6 +19,14 @@ module.exports = [
      partner kent geen verbond. */
   { van: 'domein:verbond', naar: 'domein:rtfos', soort: 'DOMEINRELATIE',
     reden: 'het verbond gebruikt AFSPRAAKVELDEN en de pure toetsAfspraken() van rtfos/partners.js, zodat de vijf afspraakvragen op een plek staan; geen opslag en geen partner wordt aangeraakt' },
+  /* DE GEZINSDEUR VAN HET GENOOTSCHAP LEENT DE POORT, NIET DE ROUTES.
+     routes/member/genootschap-gezin.js (B1, GEMEENSCHAP-FASE0.md par. 4.1) hangt
+     achter gezinsPoort uit routes/connect-gezinsdeur.js: rtf.verifieerProfiel en
+     gasten eruit. Een eigen kopie zou een tweede definitie van wie een
+     gezinslid is worden, onder dezelfde naam die kern/handlerpoorten/buiten.js
+     en scripts/lib/bewakers.js verklaren (LAT.md regel 4). */
+  { van: 'ingang:member', naar: 'ingang:connect-gezinsdeur', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'de gezinsdeur van het genootschap gebruikt dezelfde gezinsPoort (verifieerProfiel, gasten eruit) als Foundation Connect; een kopie zou een tweede definitie van een gezinslid onder een verklaarde poortnaam zijn' },
   { van: 'domein:afdelingen', naar: 'domein:registerblik', soort: 'DOMEINRELATIE',
     reden: 'het boardroomadvies vraagt de registerblik wat de registers over productie, bewijs en routes zeggen; de registerblik leest alleen, en kent de afdelingen niet' },
   { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'ORKESTRATIE',

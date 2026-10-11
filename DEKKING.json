@@ -3,7 +3,7 @@
   "gemeten": {
     "op": "2026-10-06T13:07:35.169Z",
     "commit": "9919f748",
-    "routesToen": 5470,
+    "routesToen": 5480,
     "aangevuld": [
       {
         "op": "2026-10-11",
@@ -37,6 +37,24 @@
         ],
         "bron": "routejournaal (RTG_ROUTELOG) van node --test test/beraad-server.test.js",
         "waarom": "De volle suite is voor deze elf nieuwe routes NIET opnieuw gedraaid; de andere 5453 komen uit de meting van 6 oktober (commit 9919f748). routesToen staat daarom op de routekaart na deze commit. Een volgende npm run dekking:vast vervangt dit blok."
+      },
+      {
+        "op": "2026-10-11",
+        "commit": "5ff7ac57",
+        "routes": [
+          "POST /api/genootschap/drager/los",
+          "POST /api/genootschap/drager/vraag",
+          "POST /api/rtf/genootschap/agenda",
+          "POST /api/rtf/genootschap/binnen",
+          "POST /api/rtf/genootschap/mijn",
+          "POST /api/rtf/genootschap/prikbord",
+          "POST /api/rtf/genootschap/vertrek",
+          "POST /api/rtf/genootschap/zoek",
+          "POST /api/rtfos/portaal/partner/genootschap",
+          "POST /api/rtfos/portaal/partner/genootschap/erken"
+        ],
+        "bron": "routejournaal (RTG_ROUTELOG) van node --test test/genootschap-drager-server.test.js",
+        "waarom": "De volle suite is voor deze tien nieuwe routes NIET opnieuw gedraaid; de andere 5453 komen uit de meting van 6 oktober (commit 9919f748). routesToen staat daarom op de routekaart na deze commit. Een volgende npm run dekking:vast vervangt dit blok."
       }
     ]
   },
@@ -1337,6 +1355,8 @@
     "POST /api/genootschap/antwoord",
     "POST /api/genootschap/bijgepraat",
     "POST /api/genootschap/binnen",
+    "POST /api/genootschap/drager/los",
+    "POST /api/genootschap/drager/vraag",
     "POST /api/genootschap/eruit",
     "POST /api/genootschap/gezien",
     "POST /api/genootschap/gezondheid",
@@ -3441,6 +3461,12 @@
     "POST /api/rtf/geloof/lees",
     "POST /api/rtf/geloof/mijn",
     "POST /api/rtf/geloof/weg",
+    "POST /api/rtf/genootschap/agenda",
+    "POST /api/rtf/genootschap/binnen",
+    "POST /api/rtf/genootschap/mijn",
+    "POST /api/rtf/genootschap/prikbord",
+    "POST /api/rtf/genootschap/vertrek",
+    "POST /api/rtf/genootschap/zoek",
     "POST /api/rtf/gezin/passkey",
     "POST /api/rtf/kanaal",
     "POST /api/rtf/kantoorpakket/aanwezig",
@@ -3785,6 +3811,8 @@
     "POST /api/rtfos/portaal/gemeente",
     "POST /api/rtfos/portaal/ondernemer",
     "POST /api/rtfos/portaal/partner",
+    "POST /api/rtfos/portaal/partner/genootschap",
+    "POST /api/rtfos/portaal/partner/genootschap/erken",
     "POST /api/rtfos/portaal/vrijwilliger",
     "POST /api/rtfos/portaal/vrijwilliger/koppel",
     "POST /api/rtfos/portaal/vrijwilliger/ontkoppel",

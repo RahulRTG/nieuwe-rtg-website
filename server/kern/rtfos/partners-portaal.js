@@ -50,16 +50,38 @@ module.exports = (ctx, eigen) => {
      eromheen staan in server/routes/rtfos/portalen.js, dezelfde twee als bij de
      clubcodes (per bron tegen het afgrazen, per code tegen veel bronnen op een
      code). Zie de uitleg in routes/rtfkantoor/codedeuren.js. */
-  function portaal(c) {
-    const p = vindCode(c);
-    if (!p) return { status: 404, error: 'Deze partnercode kennen we niet. Vraag het RTF-kantoor om de code.' };
+  const dicht = (p) => {
     if (p.status === 'beeindigd') return { status: 403, error: 'Deze samenwerking is beeindigd.' };
     if (p.status === 'opgeschort') return { status: 403, error: 'Deze samenwerking staat tijdelijk stil. Neem contact op met het RTF-kantoor.' };
     if (verlopen(p)) return { status: 403, error: 'De looptijd van deze samenwerking is verlopen op ' + p.tot + '. RTF maakt een nieuwe overeenkomst.' };
+    return null;
+  };
+
+  function portaal(c) {
+    const p = vindCode(c);
+    if (!p) return { status: 404, error: 'Deze partnercode kennen we niet. Vraag het RTF-kantoor om de code.' };
+    const d = dicht(p);
+    if (d) return d;
     const projecten = S().projecten.filter(x => x.partnerId === p.id)
       .map(x => ({ id: x.id, naam: x.naam, status: x.status, doelgroep: x.doelgroep, van: x.van, tot: x.tot }));
     return { ok: true, partner: partnerBeeld(p), projecten };
   }
 
-  return { beoordeel, portaal };
+  /* ERKEND, voor een ander domein dat wil weten of een stichting iets mag DRAGEN
+     (kern/genootschap/drager.js). Dezelfde drie dichte deuren als het portaal,
+     plus de statusketen hierboven: alleen landelijk goedgekeurd of actief. Een
+     aangemelde of in toetsing zijnde stichting is nog niet erkend. Geeft alleen
+     id en naam terug -- nooit het dossier. */
+  const ERKEND = ['goedgekeurd', 'actief'];
+  function erkend(arg) {
+    const a = arg || {};
+    const p = a.code !== undefined ? vindCode(a.code) : vind(a.id);
+    if (!p) return { status: 404, error: 'Deze stichting staat niet in het partnerregister.' };
+    const d = dicht(p);
+    if (d) return d;
+    if (!ERKEND.includes(p.status)) return { status: 403, error: 'Deze stichting is (nog) niet door de RTFoundation erkend.' };
+    return { ok: true, id: p.id, naam: p.naam };
+  }
+
+  return { beoordeel, portaal, erkend };
 };

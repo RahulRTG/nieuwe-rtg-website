@@ -100,9 +100,7 @@ app.post('/api/supplier/bezorg/status', supplierAuth, (req, res) => {
   const status = String(req.body.status || '');
   if (!['onderweg', 'bezorgd', 'opgehaald'].includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
   const refs = (Array.isArray(req.body.refs) ? req.body.refs : [req.body.ref]).filter(Boolean).slice(0, 8);
-  /* EERST KEUREN, DAN DOEN. Een rit vertrekt met meerdere refs tegelijk; mag
-     er een niet, dan verandert er niets -- anders gaan de eerste twee onderweg,
-     krijgen die leden een bericht, en zegt het antwoord dat het misging. */
+  // eerst keuren, dan doen: mag een ref van de rit niet, dan verandert er niets
   const doen = [], al = [];
   for (const ref of refs) {
     const o = (x => x && x.supplierCode === s.code ? x : undefined)(orderMetRef(ref));
@@ -110,8 +108,7 @@ app.post('/api/supplier/bezorg/status', supplierAuth, (req, res) => {
     if (status === 'opgehaald' && o.levering !== 'ophalen') continue;
     if (status !== 'opgehaald' && o.levering !== 'bezorgen') continue;
     if (status !== 'opgehaald' && o.bezorger && req.actor.staffId && o.bezorger.staffId !== req.actor.staffId && !req.actor.manager) continue;
-    /* De bezorghelft van de keten loopt alleen vooruit, en dezelfde stand twee
-       keer is een herhaling zonder tweede bericht (kern/horeca/bezorgovergang.js). */
+    // alleen vooruit, en een herhaling meldt niets (kern/horeca/bezorgovergang.js)
     const mag = overgang(o, status);
     if (mag.herhaling) { al.push(o.ref); continue; }
     if (mag.error) return res.status(mag.status).json({ error: mag.error, code: mag.code, ref: o.ref });

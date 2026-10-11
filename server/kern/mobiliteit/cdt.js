@@ -38,22 +38,8 @@ module.exports = (ctx) => {
   const dienstenVan = code => { ensureCdt(); return opslag.bak('mobDiensten').filter(d => d.vervoerder === code); };
   const openDienst = (code, kaart) => dienstenVan(code).find(d => d.chauffeurskaart === kaart && !d.eind) || null;
 
-  // de grenzen van deze onderneming: de standaard, tenzij hij zijn eigen regime zette
-  const regimeVan = code => Object.assign({}, GRENZEN, (opslag.bak('mobCdtRegime') || {})[code] || {});
-
-  function regimeZet(code, body = {}) {
-    ensureCdt();
-    const eigen = {};
-    for (const [k, v] of Object.entries(body.grenzen || {})) {
-      if (!Object.prototype.hasOwnProperty.call(GRENZEN, k)) return { status: 400, error: 'Onbekende grens: ' + k };
-      if (!Number.isFinite(v) || v <= 0 || v > 7 * 24 * 60) return { status: 400, error: 'De grens ' + k + ' moet in minuten en zinnig zijn.' };
-      eigen[k] = Math.round(v);
-    }
-    if (!Object.keys(eigen).length) return { status: 400, error: 'Geef minstens een grens op.' };
-    opslag.bak('mobCdtRegime')[code] = Object.assign({}, opslag.bak('mobCdtRegime')[code] || {}, eigen);
-    save();
-    return { ok: true, grenzen: regimeVan(code), standaard: GRENZEN };
-  }
+  // het regime (de grenzen van deze onderneming): ./cdt-regime.js
+  const { regimeVan, regimeZet } = require('./cdt-regime')({ opslag, save, ensureCdt });
 
   /* Aanmelden. De chauffeurskaart is verplicht: zonder kaartnummer is er geen
      registratie die iets identificeert, en dan legt het systeem iets vast

@@ -22,7 +22,8 @@ module.exports = (ctx) => {
     logActivity, supplierState, officeState, magWerken, pinInfo, pinCheck,
     lijst, zelfde, eigenaarKantoor, kantoorVanZetel, afgeleid, nu, persoonsPoort, sessieregister, zwaarVan } = ctx;
   const productiedeur = require('../kantoor/productiedeur');
-  const startspoor = require('./startspoor')({ db, save, logInlog, logActivity });
+  const startspoor = require('./startspoor')({ save, logInlog, logActivity,
+    welzijn: () => (db.data.accountWelzijn = db.data.accountWelzijn || {}) });
 
   /* Het lidnummer uit de lidsleutel. De sleutel is 'user-<id>' -- dezelfde vorm
      die kernlaag1, kernlaag7 en kern/wauw.js al lezen. Geen tweede opzoeking in

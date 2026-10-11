@@ -8,7 +8,8 @@
 'use strict';
 const klok = require('../../lib/klok');
 
-module.exports = ({ db, save, logInlog, logActivity }) => {
+// `welzijn()` geeft de bak met werkstarts per lid; de datadeur blijft in ./starten.js
+module.exports = ({ welzijn, save, logInlog, logActivity }) => {
   // geeft de welzijnszin terug, of null
   function naStart(s, actor, key, req) {
     logInlog('zaak', true, s.code + ' · ' + actor.name + ' via RTG-account', req);
@@ -17,7 +18,7 @@ module.exports = ({ db, save, logInlog, logActivity }) => {
        nooit een blokkade, nooit een score, alleen zorg. Diep in de nacht
        of bij een zoveelste werkstart vandaag mag dat gezegd worden. */
     const uur = klok.datum().getHours();
-    const wm = db.data.accountWelzijn = db.data.accountWelzijn || {};
+    const wm = welzijn();
     const vandaag = klok.datum().toISOString().slice(0, 10);
     const wr = wm[key] = (wm[key] && wm[key].dag === vandaag) ? wm[key] : { dag: vandaag, starts: 0 };
     wr.starts++;

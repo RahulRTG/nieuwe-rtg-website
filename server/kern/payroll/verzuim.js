@@ -137,12 +137,8 @@ function maakVerzuim({ opslag, save, nu }) {
     save();
     return { ok: true, weg: voor - rij.length };
   }
-  /* Wat er LANGS EEN ANDERE WEG staat dan een besluit met een `bron` (de oude
-     verlofroute, een melding van de leidinggevende). Alleen lezen: RTG Vrijheid
-     telt daarmee vakantie mee die het zelf niet heeft geboekt, zonder een
-     tweede register (kern/vrijheid/saldobron.js). */
-  const zonderBron = (code, staffId, van, tot) => inPeriode(code, staffId, van, tot)
-    .filter(m => !m.bron).map(m => ({ van: m.van, tot: m.tot, soort: m.soort }));
+  // alleen lezen; zie vrijheid/saldobron.js
+  const zonderBron = (c, s, v, t) => inPeriode(c, s, v, t).filter(m => !m.bron).map(({ van, tot, soort }) => ({ van, tot, soort }));
   const heeftBron = (code, staffId, bron) => !!bron && rijVan(code, staffId).some(m => m.bron === String(bron));
 
   /* Wat een leidinggevende ziet: er is afwezigheid, en dit kan iemand nog.

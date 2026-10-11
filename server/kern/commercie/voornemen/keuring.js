@@ -42,17 +42,11 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
     if (!beslis) return { status: 503, error: 'Er is geen beslislaag om dit voornemen langs te leggen.' };
 
     const o = opties || {};
-    /* De risicogoedkeuring komt ALLEEN uit het voornemen: wie hem via de context
-       meegeeft, ontloopt de eisen van risicoGoedkeur (voor het besluit, op naam, met
-       reden). Wat de aanroeper stuurt, wordt dus vervangen. */
+    /* De risicogoedkeuring komt alleen uit DIT voornemen (niet uit de context, niet van
+       een andere ronde: besluit 2C), en omkeerbaar alleen uit de tabel. */
     const ctx = Object.assign({}, o.context || {});
     delete ctx.risicogoedkeuring;
-    /* En alleen de EIGEN: een risicogoedkeuring geldt voor precies dit voornemen (een
-       ronde), zodat een kopie op een volgende ronde niets opent (eigenaarsbesluit 2C). */
     if (v.risicogoedkeuring && v.risicogoedkeuring.voornemen === v.id) ctx.risicogoedkeuring = v.risicogoedkeuring;
-    /* En `omkeerbaar` komt uit de TABEL (../geldomkeer.js) en nooit van de aanroeper:
-       een context met `omkeerbaar: true` opende anders de grens voor elke handeling,
-       ook voor een teruggave. Onbekend is dicht. */
     ctx.omkeerbaar = require('../geldomkeer').voor(v.handeling).omkeerbaar === true;
     const b = beslis({ actor: v.actor, handeling: v.handeling, doel: v.doel,
       waardeCenten: v.totaalCenten, context: ctx });

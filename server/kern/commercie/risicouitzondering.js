@@ -43,7 +43,16 @@ function stand(handeling) {
   return t ? { open: true, bron: t.bron, reden: null } : { open: false, reden: DICHT };
 }
 
-function toets({ handeling, risico, actor, goedgekeurdDoor }) {
+/* Het antwoord voor ./besluit.js, met de zin erbij zodat het besluit hem niet hoeft op te
+   bouwen: een weigering opent altijd met de grens en zegt dat deze handeling niet terug kan. */
+function toets(v) {
+  const r = toetsKaal(v);
+  if (r.ok) return r;
+  return { ok: false, reden: 'Vanaf ' + (v.grens || 'de omkeerbaarheidsgrens') + ' alleen als de handeling terug te draaien ' +
+    'is, en deze is dat niet. ' + r.reden };
+}
+
+function toetsKaal({ handeling, risico, actor, goedgekeurdDoor }) {
   const g = stand(handeling);
   if (!g.open) return { ok: false, reden: g.reden };
   const r = risico || null;
@@ -58,7 +67,8 @@ function toets({ handeling, risico, actor, goedgekeurdDoor }) {
      risico, en twee vragen met een antwoord van dezelfde mens zijn er een. */
   if (goedgekeurdDoor != null && door === String(goedgekeurdDoor))
     return { ok: false, reden: 'Wie de tweede handtekening zette, geeft niet ook de risicogoedkeuring.' };
-  return { ok: true, uitzondering: { soort: SOORT, door, naam: r.naam || null, reden, bron: g.bron, omkeerbaar: false } };
+  return { ok: true, uitzondering: { soort: SOORT, door, naam: r.naam || null, reden, bron: g.bron, omkeerbaar: false,
+    zin: 'Onomkeerbaar, uitzondering met risicogoedkeuring van ' + (r.naam || door) + ' (' + g.bron + ').' } };
 }
 
 module.exports = { toets, stand, TOELATING, SOORT, DICHT };

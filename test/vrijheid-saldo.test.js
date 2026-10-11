@@ -30,12 +30,16 @@ const ORG = 'SALDOTEAM';
 const proef = maakBeleid({ LEGAL_BASELINE: { 'verlof.wettelijkWekenPerJaar': { waarde: 4, bron: 'proefbeleid' } } });
 const leeg = maakBeleid({});
 
-function wereld() {
+/* De productiepoort staat in deze helft OPEN als stub: hier wordt de aansluiting
+   op de bronnen beproefd. Dat de poort in het echt dicht staat en wat dat doet,
+   bewijst test/vrijheid-vakantieregel.test.js. */
+const poortOpen = () => ({ open: true });
+function wereld(poort) {
   const bak = {};
   const opslag = { bak: (n) => bak[n] || (bak[n] = {}) };
   const contracten = maakContracten({ opslag, save: () => {}, nu: () => '2026-01-01T08:00:00.000Z' });
   const verzuim = maakVerzuim({ opslag, save: () => {}, nu: () => '2026-01-01T08:00:00.000Z' });
-  const bron = maakSaldobron({ bronnen: () => ({ payrollOS: { contracten, verzuim } }) });
+  const bron = maakSaldobron({ bronnen: () => ({ payrollOS: { contracten, verzuim } }), poort });
   return { contracten, verzuim, bron, opslag };
 }
 const heelJaar = { id: '7', inDienst: { van: '2024-03-01', tot: null } };
@@ -56,8 +60,8 @@ test('de wettelijke rekenregel is open: geen getal, wel de bron en de reden', ()
   assert.ok(leeg.open().includes('verlof.wettelijkWekenPerJaar'));
 });
 
-test('het recht wordt alleen gerekend in het geval dat geen open regel raakt', () => {
-  const { contracten, verzuim, bron } = wereld();
+test('de bronnen dragen de rekenregel, en waar een bron tekortschiet staat de reden', () => {
+  const { contracten, verzuim, bron } = wereld(poortOpen);
   contracten.leg(ORG, '7', vast32, 'manager');
   const r = bron.verlofrechten(ORG, heelJaar, 2026, proef);
   assert.equal(r.waarom.wettelijk, null, r.waarom.wettelijk);
@@ -69,22 +73,24 @@ test('het recht wordt alleen gerekend in het geval dat geen open regel raakt', (
   contracten.leg(ORG, '7', { ...vast32, vanaf: '2025-09-01', uurloonCenten: 1700 }, 'manager');
   assert.equal(bron.verlofrechten(ORG, heelJaar, 2026, proef).wettelijk, 128, 'een oude versie telt niet als wijziging in 2026');
 
-  /* Elk ander geval zegt waarom niet, en noemt nooit een getal. */
+  /* Een deel van het jaar: naar rato (art. 7:634 lid 2 BW), 214 van 365 dagen. */
   const deel = bron.verlofrechten(ORG, { id: '7', inDienst: { van: '2026-06-01', tot: null } }, 2026, proef);
-  assert.equal(deel.wettelijk, null); assert.match(deel.waarom.wettelijk, /naar rato/);
+  assert.equal(deel.wettelijk, Math.round(4 * 32 * 214 / 365 * 100) / 100, deel.waarom.wettelijk);
+  /* Wat de bronnen niet dragen, zegt waarom niet en noemt nooit een getal. */
   assert.equal(bron.verlofrechten(ORG, { id: '7', inDienst: null }, 2026, proef).wettelijk, null);
   assert.match(bron.verlofrechten(ORG, { id: '8', inDienst: heelJaar.inDienst }, 2026, proef).waarom.wettelijk, /geen arbeidscontract/);
   contracten.leg(ORG, '9', { vanaf: '2025-01-01', soort: 'oproep', uurloonCenten: 1400 }, 'manager');
-  assert.match(bron.verlofrechten(ORG, { id: '9', inDienst: heelJaar.inDienst }, 2026, proef).waarom.wettelijk, /geen vaste arbeidsduur/);
+  assert.match(bron.verlofrechten(ORG, { id: '9', inDienst: heelJaar.inDienst }, 2026, proef).waarom.wettelijk, /zonder vaste arbeidsduur.*gewerkte uren/);
   contracten.leg(ORG, '7', { ...vast32, vanaf: '2026-07-01', urenPerWeek: 24 }, 'manager');
-  assert.match(bron.verlofrechten(ORG, heelJaar, 2026, proef).waarom.wettelijk, /verandert/);
+  assert.equal(bron.verlofrechten(ORG, heelJaar, 2026, proef).wettelijk, Math.round(4 * (32 * 181 + 24 * 184) / 365 * 100) / 100,
+    'wisselende arbeidsduur: naar rato per contractversie');
   contracten.leg(ORG, '7', { ...vast32, vanaf: '2025-01-01' }, 'manager', 2);
   assert.match(bron.verlofrechten(ORG, heelJaar, 2027, proef).waarom.wettelijk, /2 contracten/);
 
   /* Vakantie die langs de verlofroute in DAGEN is gemeld, wordt niet stil
      genegeerd: dan is het saldo niet te rekenen. Een dag uit RTG Vrijheid zelf
      (met bron) telt al als boeking en blokkeert niet. */
-  const w2 = wereld();
+  const w2 = wereld(poortOpen);
   w2.contracten.leg(ORG, '7', vast32, 'manager');
   w2.verzuim.meld(ORG, '7', { soort: 'rtgdag', van: '2026-03-03', tot: '2026-03-03', bron: 'vv_1' }, 'vrijheid');
   w2.verzuim.meld(ORG, '7', { soort: 'vakantie', van: '2026-04-06', tot: '2026-04-10', bron: 'vv_2' }, 'vrijheid');
@@ -96,7 +102,7 @@ test('het recht wordt alleen gerekend in het geval dat geen open regel raakt', (
 });
 
 test('een open saldo maakt een vakantieverzoek UNKNOWN met de reden, en een RTG Day raakt het saldo nooit', () => {
-  const { contracten, bron, opslag } = wereld();
+  const { contracten, bron, opslag } = wereld(poortOpen);
   contracten.leg(ORG, '7', vast32, 'manager');
   const team = { organisatie: ORG, rosterVersie: 'r', managers: ['m'], mensen: [heelJaar, { id: '8', inDienst: heelJaar.inDienst }],
     diensten: ['7', '8'].map(p => ({ persoon: p, datum: '2026-10-14', van: '09:00', tot: '17:00' })),
@@ -193,10 +199,10 @@ test('het teambeeld en het saldo uit de echte bronnen: dienstverband, contract, 
   assert.equal(b.contract.urenPerWeek, 32, 'het saldo leest het contract uit de payroll');
   assert.equal(b.contract.soort, 'vast');
   assert.ok(b.dienstverband && b.dienstverband.van, 'en het dienstverband');
-  assert.equal(na.body.tijd.vakantie.recht, null, 'de rekenregel is open, dus er staat geen getal');
-  assert.match(na.body.tijd.vakantie.reden, /niet juridisch getoetst/);
+  assert.equal(na.body.tijd.vakantie.recht, null, 'de productiepoort is dicht, dus er staat geen recht');
+  assert.match(na.body.tijd.vakantie.reden, /juridische toets.*niet afgerond/);
   assert.ok(!/uurloon|1600/.test(JSON.stringify(b)), 'het uurloon reist niet mee');
-  assert.ok(na.body.beleidOpen.includes('verlof.wettelijkWekenPerJaar'));
+  assert.ok(!na.body.beleidOpen.includes('verlof.wettelijkWekenPerJaar'), 'een Nederlandse zaak heeft de wet onder het beleid');
 
   /* Een vakantieverzoek komt nu langs ELIGIBILITY, en eindigt bij de open regel. */
   let datum = new Date(Date.now() + 86400000);
@@ -204,6 +210,6 @@ test('het teambeeld en het saldo uit de echte bronnen: dienstverband, contract, 
   assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 300));
   const st = r.body.verzoek.stappen;
   assert.equal(st[0].stap, 'ELIGIBILITY'); assert.equal(st[0].stand, 'OK', 'in dienst: de eerste stap houdt niet meer tegen');
-  if (r.body.verzoek.uitkomst === 'UNKNOWN') assert.match(st[1].uitleg, /niet juridisch getoetst/);
+  if (r.body.verzoek.uitkomst === 'UNKNOWN') assert.match(st[1].uitleg, /juridische toets.*niet afgerond/);
   else assert.equal(r.body.verzoek.code, 'geen-dienst', 'geen dienst op die dag: er hoeft niets vrij');
 });

@@ -17,6 +17,8 @@
 const OP = '2026-09-27';
 const AFGETEKEND = { door: 'Claude (Opus 5), op grond van de dubbeltik-ronde in test/vrijheid-routes.test.js; ' +
   'niet door een mens nagelezen', op: OP };
+const OP_B1 = '2026-10-11';
+const AFGETEKEND_B1 = { door: 'Claude, op grond van test/vrijheid-vakantieregel.test.js; niet door een mens nagelezen', op: OP_B1 };
 const ZAAK = { klasse: 'AUTHENTICATED', deur: 'supplierAuth',
   let: 'De persoon komt uit de sessie (req.actor.staffId) en de zaak ook (req.supplier.code); het lichaam kan ' +
     'geen ander aanwijzen. Een managerroute toetst managerOnly in de handler.' };
@@ -104,6 +106,26 @@ const CONTRACTEN = Object.fromEntries([
     nagekeken: 'Claude, ' + OP + ': afdelingZet ZET de kamers van een medewerker (toewijzing); test/rtghuis.test.js ' +
       'bewijst dat dubbele kamers samenvallen en een lege lijst de medewerker eruit haalt.',
     afgetekend: AFGETEKEND
+  }],
+
+  /* De productiepoort van de vakantieregel (besluit B1, 11 oktober 2026). Bewijs:
+     test/vrijheid-vakantieregel.test.js tegen een echte server. */
+  ['POST /api/office/vrijheid/vakantieregel', {
+    mutatieId: 'vrijheid.vakantieregel', herkomst: 'mens', semantiek: { klasse: 'idempotent' }, toegang: BOARDROOM,
+    stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'test/vrijheid-vakantieregel.test.js, ' + OP_B1 + ': twee keer lezen gaf twee keer dezelfde ' +
+      'stand (gesloten, met de reden en de regelversie).', op: OP_B1 },
+    nagekeken: 'Claude, ' + OP_B1 + ': de handler roept alleen vakantiepoort.stand() aan, en die leest via ' +
+      'eigencollectie.kijk(); er wordt niets aangemaakt of bewaard.',
+    afgetekend: AFGETEKEND_B1
+  }],
+  ['POST /api/office/vrijheid/vakantieregel/stand', {
+    mutatieId: 'vrijheid.vakantieregel.stand', herkomst: 'mens', semantiek: { klasse: 'idempotent' }, toegang: BOARDROOM,
+    stand: 'PROTECTED',
+    bewijs: { gemeten: 'test/vrijheid-vakantieregel.test.js, ' + OP_B1 + ': twee keer openen met dezelfde toets gaf ' +
+      'twee keer 200 en een open poort; twee keer sluiten gaf twee keer een gesloten poort. De route ZET een ' +
+      'stand (een toewijzing, geen toevoeging).', op: OP_B1 },
+    afgetekend: AFGETEKEND_B1
   }]
 ]);
 

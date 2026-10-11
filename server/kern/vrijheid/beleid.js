@@ -32,8 +32,9 @@ const LAGEN = Object.freeze(['LEGAL_BASELINE', 'COLLECTIVE_AGREEMENT', 'CONTRACT
 const VARIABELEN = Object.freeze({
   'rust.minUurTussenDiensten':    { richting: 'recht', soort: 'getal', over: 'Minimale rust tussen twee diensten, in uren.' },
   'rtgDag.perJaar':               { richting: 'recht', soort: 'getal', over: 'Aantal RTG Days per kalenderjaar.' },
-  /* Hoort in LEGAL_BASELINE en wordt door niemand gezet: hoe de wettelijke
-     regel voor deze laag uitpakt, is niet juridisch getoetst (./saldobron.js). */
+  /* Hoort in LEGAL_BASELINE. Voor een zaak met een Nederlandse vestiging zet
+     ./vakantieregel.js hem (art. 7:634 lid 1 BW); of de uitkomst een RECHT
+     wordt, beslist de productiepoort (./vakantiepoort.js), niet dit beleid. */
   'verlof.wettelijkWekenPerJaar': { richting: 'recht', soort: 'getal', over: 'Het wettelijke vakantierecht als veelvoud van de arbeidsduur per week (in Nederland art. 7:634 BW); hoe die regel voor deze laag uitpakt, is niet juridisch getoetst.' },
   'verjaardag.weekend':           { richting: 'keuze', soort: ['vervalt', 'vorige-werkdag', 'volgende-werkdag'], over: 'Verjaardag op een dag zonder dienst in het weekend.' },
   'verjaardag.feestdag':          { richting: 'keuze', soort: ['vervalt', 'vorige-werkdag', 'volgende-werkdag'], over: 'Verjaardag op een officiele feestdag.' },

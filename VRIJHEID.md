@@ -215,12 +215,10 @@ BLOCKED_BY_LAW_OR_POLICY met de reden, en verzint niets:
   aanvragen voor schaarse momenten;
 - de **herstelgrenzen** (uren in veertien dagen, dagen achter elkaar);
 - de **drempel voor een capaciteitsgat**;
-- de **wettelijke rekenregel voor het vakantierecht**
-  (`verlof.wettelijkWekenPerJaar`, laag LEGAL_BASELINE): in Nederland een
-  veelvoud van de arbeidsduur per week (art. 7:634 BW), maar hoe die regel hier
-  uitpakt -- naar rato, bij wisselende uren, tijdens ziekte, en hoe vakantie in
-  dagen uit de verlofroute in uren telt -- is niet juridisch getoetst. Niemand
-  zet hem, en het recht staat dus op "niet bekend" met de reden;
+- de **juridische toets van de rekenregel voor het vakantierecht**. De regel
+  zelf is sinds 11 oktober 2026 besloten en gebouwd (par. 6a), maar de toets
+  is niet afgerond, dus de productiepoort staat dicht en het recht blijft "niet
+  bekend" met die reden;
 - **minimale rust**: de 11 uur uit de Arbeidstijdenwet staat al in de
   beveiligingsroosters, maar moet per cao en contractvorm worden gevalideerd.
 
@@ -234,6 +232,93 @@ valideren:
   loonadministratief betaalde arbeidsvoorwaarden zijn, of iets anders;
 - hoe ze op de loonstrook staan;
 - of opbouw doorloopt tijdens deze categorieën.
+
+---
+
+## 6a. De rekenregel voor vakantiedagen, en de poort ervoor (besluit B1)
+
+**Besloten door de eigenaar op 11 oktober 2026 (B1):** een juridisch
+gevalideerde Nederlandse rekenregel, met onderscheid wettelijk en
+bovenwettelijk, contracturen, wisselende arbeidsduur en ziekte. WorkOS voert
+de berekening uit en controleert de brongegevens. **Tot de juridische toets is
+afgerond blijft de productiepoort gesloten.**
+
+**Dit is geen juridisch oordeel.** Wat hieronder staat is wat de CODE doet en
+welke artikelen hij daarbij volgt. Of dat de juiste lezing is, beslist een
+jurist; RTG doet niet alsof.
+
+**Wat de regel volgt** (`server/kern/vrijheid/vakantieregel.js`):
+
+| Onderdeel | Artikel | Wat de code doet |
+|---|---|---|
+| wettelijk minimum | art. 7:634 lid 1 BW | viermaal de overeengekomen arbeidsduur per week; de factor 4 staat als laag LEGAL_BASELINE onder het beleid van een zaak met een Nederlandse vestiging (`WETTELIJKE_LAAG`), zodat een latere laag hem nooit stil verlaagt |
+| deel van het jaar | art. 7:634 lid 2 BW | naar rato per kalenderdag over het deel van het jaar waarin het dienstverband loopt (365 of 366 dagen) |
+| wisselende arbeidsduur | art. 7:634 BW | per dag de contractversie die OP DIE DAG geldt (dezelfde vraag als `contracten.opDatum` in de loonrun), dus naar rato per periode |
+| ziekte | art. 7:635 BW | de opbouw loopt door; het verzuimregister (`kern/payroll/verzuim.js`) is de bron van de tijdvakken |
+| onbetaald verlof | art. 7:634 lid 1 en 7:635 BW | geen opbouw over het tijdvak zonder recht op loon |
+| zwangerschaps- en bevallingsverlof | art. 7:635 BW | de opbouw loopt door |
+| ouderschaps- en zorgverlof | art. 7:635 BW | OPEN: gedeeltelijk loon, en hoe het artikel deze soorten raakt is niet vastgesteld -- de regel rekent dan niet en zegt waarom |
+| bovenwettelijk | contract | OPEN: `kern/payroll/contracten.js` heeft geen veld voor bovenwettelijk verlof, dus `contractueel` is altijd onbekend met die reden |
+
+De volledige opbouwtabel per verzuimsoort is `OPBOUW` in dat bestand; een soort
+die er niet in staat laat `test/vrijheid-vakantieregel.test.js` zakken.
+
+**Broncontrole.** Ontbreekt het dienstverband, staat er een dag van het
+dienstverband zonder contractversie, heeft een vaste soort geen
+`urenPerWeek`, of is het contract er een zonder vaste omvang (oproep,
+nuluren, uitzend, freelance), dan is de uitkomst `null` met de reden en nooit
+nul. Ook open blijven: meer dan een contract bij dezelfde zaak, vakantie die
+langs de oude verlofroute in DAGEN staat, en elke zaak met een vestiging
+buiten Nederland.
+
+**De poort** (`server/kern/vrijheid/vakantiepoort.js`). Zolang hij dicht is,
+rekent de regel wel: de uitkomst staat in Mijn tijd als `berekening` met de
+graad **vermoed** en de reden "de juridische toets van de rekenregel is niet
+afgerond". Maar `wettelijk` blijft `null`, en een vakantieverzoek blijft
+**UNKNOWN** met die reden -- geen verlofbesluit kent vakantie toe op een
+berekening achter een dichte poort. Een mens kan in HUMAN_REVIEW nog steeds
+zelf besluiten; dat leunt dan op zijn eigen oordeel en niet op het getal.
+
+De poort heeft de vorm van de bestaande boardroomschakelaars (de
+terugstortstand, de cadeaubon, het afdwingen van de beleidsmotor): lezen
+achter de boardroom (`POST /api/office/vrijheid/vakantieregel`), zetten alleen
+door de **eigenaar**, op naam, met een verse passkey (actie
+`eigenaar-vakantieregel`) via `POST /api/office/vrijheid/vakantieregel/stand`.
+Openen vraagt een vastgelegde toets: wie toetste, de datum (niet in de
+toekomst) en het kenmerk van het toetsdossier. RTG beoordeelt dat dossier niet
+inhoudelijk; het legt vast waarop de eigenaar opende. De toets geldt voor EEN
+regelversie (`REGELVERSIE`, een hash over de artikelen, de factor en de
+opbouwtabel): verandert de regel, dan gaat de poort vanzelf dicht. Een open
+stand zonder toets of met een andere versie leest als dicht.
+
+**Wat de jurist moet toetsen, voordat de eigenaar de poort opent:**
+
+1. of de factor vier en de naar-rato-berekening per kalenderdag de juiste
+   lezing van art. 7:634 BW zijn (of per gewerkte week, of per maand);
+2. of de arbeidsduur per contractversie de "overeengekomen arbeidsduur" is,
+   ook bij `minmax` (de regel neemt dan het veld `urenPerWeek` van de versie) en bij
+   `stage`;
+3. de opbouwtabel per verzuimsoort, in het bijzonder art. 7:635 BW voor
+   ziekte, zwangerschap, onbetaald verlof en de twee open soorten
+   (ouderschaps- en zorgverlof);
+4. hoe een contract zonder vaste omvang (oproep, nuluren) moet worden gerekend
+   -- vandaag is dat open;
+5. of de cao of het contract bovenwettelijk verlof geeft, en waar dat in de
+   bron moet komen (er is vandaag geen veld);
+6. de verjaring en het vervallen van niet-opgenomen dagen (art. 7:640a en
+   7:642 BW): de regel rekent het RECHT van een jaar en raakt die vraag niet.
+
+Let op een vondst onderweg: het verzuimregister draagt per soort een vlag
+`opbouwend` die nergens wordt gelezen, en die voor `vakantie` op `false` staat.
+De regel leest hem met opzet niet (tijdens vakantie bestaat recht op loon, dus
+loopt de opbouw door) en gebruikt de eigen tabel met grond; de vlag hoort bij
+de toets te worden rechtgezet of weggehaald.
+
+**De Rome-keten, schakel 10** (`scripts/romeproef.js`, op een andere tak):
+het verlofsaldo van de vriend staat daar als "niet aangesloten". Met deze
+regel is het aangesloten en gerekend, maar blijft het recht `null` met de
+reden van de dichte poort; de schakel blijft daarnaast open op de
+roosterhorizon van zeven dagen. Dat is hier een verwijzing, geen meting.
 
 ---
 
@@ -382,6 +467,15 @@ valideren:
 
    `test/vrijheid-verzuim.test.js` draait de echte motor, het echte register
    en de echte samenstelling van een loonrun.
+9. **De rekenregel en de productiepoort** (11 oktober 2026, besluit B1; par.
+   6a). `vakantieregel.js` rekent art. 7:634 en 7:635 BW over de bronnen van
+   stap 8, `vakantiepoort.js` houdt de uitkomst tegen tot de eigenaar hem na
+   de juridische toets opent. `test/vrijheid-vakantieregel.test.js` bewijst
+   de regel, de poort (dicht zonder handeling, open alleen met toets en op de
+   eigen regelversie) en, tegen een echte server, dat een medewerker het
+   berekende getal pas als recht ziet wanneer de eigenaar de poort opent. Vier
+   mutaties (poort genegeerd, open zonder toets, ziekte zonder opbouw, een
+   dag zonder contract stil overgeslagen) laten hem alle vier zakken.
 
 **P1**
 

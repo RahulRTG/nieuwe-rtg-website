@@ -2912,6 +2912,8 @@
     "POST /api/office/voornemen/staak",
     "POST /api/office/voornemen/teken",
     "POST /api/office/voornemens",
+    "POST /api/office/vrijheid/vakantieregel",
+    "POST /api/office/vrijheid/vakantieregel/stand",
     "POST /api/office/web/overzicht",
     "POST /api/office/weefsel",
     "POST /api/office/weefsel/aandacht",

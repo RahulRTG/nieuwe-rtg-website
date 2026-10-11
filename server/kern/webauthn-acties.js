@@ -60,6 +60,7 @@ const ZWARE_ACTIES = Object.freeze([
   'eigenaar-doossleutel',       // POST /api/office/doos/sleutel
   'eigenaar-doossleutel-weg', 'eigenaar-doossleutel-gedeeld', 'eigenaar-beleidsmotor-afdwingen', 'eigenaar-entiteitrekening',   // POST /api/office/doos/sleutel/weg
   'eigenaar-werkbankpad',       // POST /api/office/werkos/bankpad/zet
+  'eigenaar-vakantieregel',     // POST /api/office/vrijheid/vakantieregel/stand  (de productiepoort van de vakantieregel, B1)
   'bank.incasso',               // POST /api/office/bank/incasso  (de geldketen, MACHINE.md par. 5a)
   'bank.bevestig',              // POST /api/office/bank/handtekening/bevestig  (tweede handtekening onder geld)
   'reisbureau.teruggave',       // POST /api/office/reisbureau/teruggave  (een betaalde reis terugbetalen)

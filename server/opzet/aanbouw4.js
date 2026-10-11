@@ -96,4 +96,5 @@ module.exports = function bouwKernAanVier(kern, grens) {
      domein, want de zaak van RTG bestaat alleen voor deze laag. */
   require('../routes/vrijheid/tijd')(grens('vrijheid'));
   require('../routes/vrijheid/rtghuis')(grens('vrijheid'));
+  require('../routes/vrijheid/vakantieregel')(grens('vrijheid'));
 };

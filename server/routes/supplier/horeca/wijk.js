@@ -56,9 +56,7 @@ module.exports = (kern) => {
     // de prikklok van de zaak, alleen gelezen via klokVan (kern/horeca/wijk-leen.js, drager)
     const klokVoor = typeof klokVan === 'function' ? (staffId) => klokVan(req.supplier.code, staffId) : null;
     const leningen = wijk.leen.lijst(h, klokVoor).map((l) => Object.assign({}, l, {
-      /* Eigenaarsbesluit 11 oktober 2026: elke medewerker ziet de STAND van de
-         drager, het uitkloktijdstip alleen een manager. Weggelaten aan de bron,
-         niet verborgen in het scherm. */
+      // de stand voor iedereen, het tijdstip alleen voor een manager (besluit 11 okt 2026)
       drager: l.drager && !ik.manager ? { stand: l.drager.stand, reden: l.drager.reden } : l.drager,
       vanMij: !!(l.vanId != null && String(l.vanId) === String(ik.staffId)),
       naarMij: String(l.staffId) === String(ik.staffId)

@@ -96,6 +96,26 @@ test('json: parse, limiet -> 413 (entity.too.large), kapotte json -> 400', async
   } finally { s.close(); }
 });
 
+test('json: een door de Zaakdoos gelezen body blijft lokaal parseerbaar en begrensd', async () => {
+  const app = web();
+  const { leesBody } = require('../server/web/body');
+  app.use((req, res, next) => leesBody(req, 1024 * 1024, (err, buf) => {
+    if (err) return next(err);
+    req._rtgProxyBody = buf;
+    next();
+  }));
+  app.use(web.json({ limit: '32b' }));
+  app.post('/echo', (req, res) => res.json({ ontvangen: req.body }));
+  app.use((err, req, res, next) => res.status(err.status || 500).json({ type: err.type }));
+  const { s, poort } = await start(app);
+  try {
+    const goed = await vraag(poort, '/echo', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{"offline":true}' });
+    assert.deepEqual(JSON.parse(goed.body).ontvangen, { offline: true });
+    const teGroot = await vraag(poort, '/echo', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ x: 'y'.repeat(40) }) });
+    assert.equal(teGroot.status, 413, 'de routespecifieke limiet geldt ook voor hergebruikte proxybytes');
+  } finally { s.close(); }
+});
+
 test('raw: body komt als Buffer, alleen bij passend type', async () => {
   const app = web();
   app.post('/hook', web.raw({ type: '*/*', limit: '1mb' }), (req, res) => res.json({ isBuffer: Buffer.isBuffer(req.body), len: req.body.length }));

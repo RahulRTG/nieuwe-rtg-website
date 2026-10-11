@@ -46,7 +46,7 @@ test('chat uses the actual composer in the one Edge; resize, reply and real deli
     assert.equal(await page.locator('#veld').inputValue(),'Dezelfde invoer blijft behouden.');
     await page.locator('.rtg-adaptive-surface [aria-label="Bediening openen"]').click();
     assert.equal(await page.locator('.rtg-adaptive-surface').isVisible(),false);
-    assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),false);
+    assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),true);
     await page.keyboard.press('Escape');
     assert.equal(await page.locator('#veld').inputValue(),'Dezelfde invoer blijft behouden.');
     await shot(page,'chat-mobile');
@@ -63,7 +63,7 @@ test('the menu becomes the same Edge surface; apps scroll with dots and no swipe
   try{
     await page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]').click();
     await page.waitForSelector('.rtg-adaptive-sheet .rtg-edge-index');
-    assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),false);
+    assert.equal(await page.locator('.rtg-adaptive-bar').isVisible(),true);
     await page.getByRole('tab',{name:'Heel RTG'}).click();
     await page.locator('[data-edge-smart-search]').click();
     const rail=page.locator('.rtg-edge-group:visible').first();

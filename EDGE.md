@@ -18,6 +18,23 @@ bouwen sturen:
 >
 > **De Edge presenteert bevoegdheid; hij verleent haar nooit.**
 
+### De canonieke app-uitvoering
+
+De actieve appschil laadt één visuele en functionele Edge via
+`shared/randen.js`, `rtg-edge-system.js`, `rtg-edge-2-loader.js` en
+`rtg-adaptive-edge-loader.js`. De compacte balk en het uitklappende scherm zijn
+daarom geen kopieën per pagina. `rtg-adaptive-edge.js` bezit de stand en de
+navigatie; `rtg-adaptive-edge-services.js` presenteert de schermen Nu, Rahul,
+Connect, Media en Account. Die servicelaag wijst uitsluitend naar bestaande
+RTG-routes of naar de bestaande mediaspeler. Zij krijgt geen eigen
+capabilityregister en geen eigen bevoegdheidsbeslissing.
+
+De schermdekkingsmeter blijft de grens bepalen: echte appschermen krijgen deze
+uitvoering via de centrale lader, redirects tekenen niets dubbel en een
+projectie- of gastoppervlak zonder persoonlijke sessie krijgt niet alsnog
+accountcontext. Zo betekent "één Edge" één gedeelde implementatie, niet één
+persoonlijke interface die ook op een publiek televisiescherm wordt opgedrongen.
+
 Er komt dus geen derde contextmodel, geen `edge.canPay()` en geen Edge-state die
 naar een domein terugschrijft. Wat er wél komt, en in ronde 0 is gebouwd, is een
 meetbare fundering: een kaart van wie wat doet (`EDGEKAART.json`), één leespad
@@ -41,8 +58,8 @@ staan; ontbreekt er een, dan zakt het script, want een verklaring die niet meer
 op de code past is een verouderde kaart en geen kaart. `--controle` hercompileert
 en vergelijkt met het ingecheckte register.
 
-Uitslag: <!--getal:edgekaart.bestanden-->77<!--/getal--> bestanden met
-<!--getal:edgekaart.rollen-->216<!--/getal--> verklaarde rollen, allemaal met een
+Uitslag: <!--getal:edgekaart.bestanden-->78<!--/getal--> bestanden met
+<!--getal:edgekaart.rollen-->218<!--/getal--> verklaarde rollen, allemaal met een
 citaat dat letterlijk staat;
 <!--getal:edgekaart.dubbeleEigenaars-->12<!--/getal--> verantwoordelijkheden met
 meer dan één schrijver of beslisser (par. 1), en

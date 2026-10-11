@@ -14,14 +14,14 @@ function state(raw) {
   return P.clone(raw);
 }
 
-function append(state,type,body,at,envelop) {
+function appendFabricEvent(state,type,body,at,envelop) {
   const previous=state.journal.at(-1);
   const row={sequence:state.journal.length+1,type,at,bodyHash:P.hash(body),envelop,
     previousHash:previous ? previous.hash : null};
   row.hash=P.hash(row); state.journal.push(row); return row;
 }
 
-function verify(rows) {
+function verifyFabricJournal(rows) {
   let previous=null;
   for (const row of rows) {
     const {hash,...body}=row;
@@ -31,4 +31,4 @@ function verify(rows) {
   return true;
 }
 
-module.exports={empty,state,append,verify};
+module.exports={empty,state,append:appendFabricEvent,verify:verifyFabricJournal};

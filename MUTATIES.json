@@ -204,6 +204,13 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "actietoken-uitgezet.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "activering.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4420,6 +4427,16 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "foundation-lesstroom.pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "module": "server/redis.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 11
+    },
     "foundation-lesstroom.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5249,6 +5266,16 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "gezinsdeur.pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "module": "server/redis.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 11
+    },
     "gezinsdeur.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5610,6 +5637,14 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 3
+    },
+    "herhaalbesluit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/herhaalbesluit.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "herhaalpakket.test.js": {
       "soort": "puur",
@@ -6325,6 +6360,13 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "inlogpauze-spelling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "inlogrem.test.js": {
       "soort": "server",
@@ -8245,6 +8287,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "loopfabric-ratel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/norm.js",
+      "operator": "voorwaarde-omkeren#2",
+      "gezakt": 2,
+      "geprobeerd": 22
     },
     "losvanverzoek.test.js": {
       "soort": "puur",
@@ -12074,6 +12124,14 @@
       "operator": "getal+1#1",
       "gezakt": 1,
       "geprobeerd": 8
+    },
+    "registerratel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/registerratel.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "registerratels.test.js": {
       "soort": "gericht",
@@ -17374,6 +17432,20 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "werkplek-tweede.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "werkplek-tweede.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 13,
       "scherp": "gezakt"
     },
     "werkplek-wijzigen.test.js": {

@@ -4,7 +4,7 @@ const {build,OUT}=require('../scripts/loop-fabric-execution');
 
 test('Execution Matrix dekt iedere capability exact eenmaal en is reproduceerbaar',()=>{
   const matrix=build(),disk=JSON.parse(fs.readFileSync(OUT,'utf8'));
-  assert.deepEqual(disk,matrix);
+  assert.deepEqual(disk,matrix,'LOOP-FABRIC-EXECUTION-MATRIX.json loopt achter op de code -- draai: npm run loopfabric:execution');
   const ids=matrix.batches.flatMap(batch=>batch.capabilities);
   assert.equal(ids.length,228);assert.equal(new Set(ids).size,228);
   for(const batch of matrix.batches){assert.ok(['GO','PHASE','STOP'].includes(batch.status));

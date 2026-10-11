@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-06T14:42:45.874Z",
-    "commit": "138e5be5c",
+    "op": "2026-10-06T19:38:21.948Z",
+    "commit": "f3816ac97",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/gastsplitsing.js",
-    "node": "v26.10.0"
+    "node": "v22.22.0"
   },
   "graad": "vermoed",
   "grens": "Lexicaal ingedeeld. Dit zegt NIET of een gratis account er werkelijk langs komt (dat meet npm run doelgroepbereik, met een echte gratis-accountsessie), en NIET of een deur voor een gratis account open hoort te staan -- dat is een productvraag (SAMENLEVING.md, de verklaring van de bodem). `leden` is geen fout: het woord is dubbelzinnig omdat een Community-lid ook lid heet. Een toets die het onderscheid via een andere poort maakt dan account of idGeverifieerd, telt hier als weigering.",

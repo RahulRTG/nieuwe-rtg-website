@@ -6,7 +6,7 @@ const makeServiceSource=require('../server/kern/service/loop-source');
 function serviceFixture(){
   const f=fixture(),save=()=>{},zaken=require('../server/kern/service/zaak')({db:f.db,save,crypto});
   const loop=require('../server/kern/service/loop')({zaken,save}),kwaliteit=require('../server/kern/service/kwaliteit')({zaken});
-  const source=makeServiceSource({db:f.db,bewerkCollectie:f.bewerkCollectie,zaken,kwaliteit,now:f.time,
+  const source=makeServiceSource({leesCollectie:name=>f.db.data[name],bewerkCollectie:f.bewerkCollectie,zaken,kwaliteit,now:f.time,
     authorize:actor=>actor==='user-1',authorizeRecipient:(actor,workspace)=>f.workSource.authorization(actor,workspace,['besluit'])});
   f.fabric.registerSource('service',source);return {...f,zaken,serviceLoop:loop,kwaliteit,serviceSource:source};
 }

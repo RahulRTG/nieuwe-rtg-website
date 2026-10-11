@@ -78,11 +78,10 @@ module.exports = function verzoekketen(deps) {
      staat vóór bodylezers en dus ook vóór de rauwe betaalwebhooks. */
   if (typeof postgresVerzoekMiddleware === 'function') app.use(postgresVerzoekMiddleware());
   app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
-  /* De Trust & Evidence-correlatie loopt door ELK verzoek, ook wanneer de route
-     zelf nog geen claims schrijft. Het publieke request-id blijft een logref;
-     de interne chain-id is apart, ondoorzichtig en verleent nooit toegang. */
-  app.use(require('../kern/bewijsvlak/context').middleware());
-  app.use(require('./verzoekframe').middleware()); // identiteit van dit werk (schaduw)
+  /* Het verzoekframe: identiteit van dit werk, en de ENIGE bron van de keten.
+     Het opent ook de Trust & Evidence-wortel van ELK verzoek, met als keten de
+     correlatie van het frame (zie kern/bewijsvlak/context.js). */
+  app.use(require('./verzoekframe').middleware());
   // wat verandert dit verzoek: rijen per collectie voor en na (blast radius).
   // NA het logboek want hij leunt op req.id; bewust niet in save(). Zie de kop
   // van ./handeling.js voor de afweging en de gemeten kosten.

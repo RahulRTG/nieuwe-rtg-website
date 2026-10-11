@@ -2,8 +2,8 @@
  "soort": "index",
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
-  "op": "2026-10-06",
-  "commit": "482ad905",
+  "op": "2026-10-11",
+  "commit": "38ff53a65",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -58,6 +58,7 @@
     "server/bedrijf/aansluiting.js",
     "server/bedrijf/beeld-consolidatie.js",
     "server/bedrijf/beeld.js",
+    "server/bedrijf/besluit-loop.js",
     "server/bedrijf/besluit.js",
     "server/bedrijf/besluitlijst.js",
     "server/bedrijf/bouw.js",
@@ -89,6 +90,7 @@
     "server/bedrijf/loop-context.js",
     "server/bedrijf/loop-source-change.js",
     "server/bedrijf/loop-source-lifecycle.js",
+    "server/bedrijf/loop-source-model.js",
     "server/bedrijf/loop-source-transport.js",
     "server/bedrijf/loop-source.js",
     "server/bedrijf/mijn.js",
@@ -1565,6 +1567,7 @@
     "server/kern/library/model.js",
     "server/kern/library/policy.js",
     "server/kern/library/publication.js",
+    "server/kern/library/reader-state.js",
     "server/kern/library/reader.js",
     "server/kern/library/rights.js",
     "server/kern/library/studio.js",
@@ -2460,6 +2463,7 @@
     "server/kern/service/klok.js",
     "server/kern/service/kwaliteit.js",
     "server/kern/service/loop-source-delivery.js",
+    "server/kern/service/loop-source-model.js",
     "server/kern/service/loop-source.js",
     "server/kern/service/loop.js",
     "server/kern/service/machtiging-grenzen.js",
@@ -3439,6 +3443,7 @@
     "server/opzet/theater.js",
     "server/opzet/trust-bewijs.js",
     "server/opzet/veiligadres.js",
+    "server/opzet/verzoekframe-winkel.js",
     "server/opzet/verzoekframe.js",
     "server/opzet/verzoekketen.js",
     "server/opzet/webhook-payout.js",
@@ -3999,6 +4004,7 @@
     "server/routes/supplier/paspoort.js",
     "server/routes/supplier/pda.js",
     "server/routes/supplier/pda/netwerk.js",
+    "server/routes/supplier/pda/posities-inlog.js",
     "server/routes/supplier/pda/posities.js",
     "server/routes/supplier/pda/vloer-missies.js",
     "server/routes/supplier/pda/vloer.js",
@@ -5219,36 +5225,36 @@
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
-  "bestanden": 4260,
+  "bestanden": 4266,
   "nietGelezen": 0,
-  "aanroepen": 174513,
-  "kanten": 30273,
-  "kantenLokaal": 19506,
-  "kantenIngevoerd": 2592,
-  "kantenLid": 2650,
+  "aanroepen": 174588,
+  "kanten": 30303,
+  "kantenLokaal": 19480,
+  "kantenIngevoerd": 2606,
+  "kantenLid": 2660,
   "kantenViaKern": 4848,
   "kantenModuleAlsFunctie": 105,
-  "kantenLidOpInvoer": 297,
-  "kantenUitFabriek": 275,
+  "kantenLidOpInvoer": 307,
+  "kantenUitFabriek": 297,
   "kantenViaKernZonderSymbool": 2923,
   "kernherkomstGelezen": 1337,
-  "onopgelosteAanroepen": 130328,
-  "onopgelosteNamen": 13371,
+  "onopgelosteAanroepen": 130366,
+  "onopgelosteNamen": 13379,
   "onopgelostNaarSoort": {
-   "ingebouwd": 34632,
+   "ingebouwd": 34653,
    "externeModule": 960,
-   "kader": 12232,
-   "contextobject": 20432,
+   "kader": 12234,
+   "contextobject": 20446,
    "uitgepaktObject": 1646,
-   "lokaleWaarde": 22945,
-   "methodeOpWaarde": 37020,
+   "lokaleWaarde": 22942,
+   "methodeOpWaarde": 37024,
    "overig": 461
   },
   "opgelostPct": 25.3,
   "doelOnbekend": 0,
   "bewaakteVooruitwijzing": 0,
   "doelNietVastTeStellen": 70,
-  "symbolenMetAanroeper": 11749,
+  "symbolenMetAanroeper": 11760,
   "routesMetSymbool": 3309,
   "routeSymboolKanten": 6921
  },
@@ -5817,6 +5823,17 @@
    ]
   },
   {
+   "route": "POST /api/bedrijf/besluit/maak",
+   "bestand": "server/bedrijf/besluit.js",
+   "symbolen": [
+    "server/server.js#null",
+    "server/bedrijf/besluit-loop.js#null",
+    "server/kern/mobiliteit/index.js#nu",
+    "server/bedrijf/besluit-loop.js#decisionContext",
+    "server/bedrijf/besluit.js#B"
+   ]
+  },
+  {
    "route": "POST /api/bedrijf/besluit/raakt",
    "bestand": "server/bedrijf/geheugen.js",
    "symbolen": [
@@ -6224,17 +6241,6 @@
    ]
   },
   {
-   "route": "POST /api/supplier/mijn/login",
-   "bestand": "server/routes/supplier/pda/posities.js",
-   "symbolen": [
-    "server/server.js#tooManyTries",
-    "server/server.js#noteFailedTry",
-    "server/routes/supplier/pda/posities.js#mijnPosities",
-    "server/routes/supplier/pda/posities.js#posantwoord",
-    "server/server.js#null"
-   ]
-  },
-  {
    "route": "POST /api/supplier/horeca/missions/voorstel",
    "bestand": "server/routes/supplier/pda/vloer-missies.js",
    "symbolen": [
@@ -6477,23 +6483,13 @@
    ]
   },
   {
-   "route": "POST /api/bedrijf/besluit/maak",
-   "bestand": "server/bedrijf/besluit.js",
-   "symbolen": [
-    "server/server.js#null",
-    "server/kern/mobiliteit/index.js#nu",
-    "server/bedrijf/loop-context.js#freeze",
-    "server/bedrijf/besluit.js#B"
-   ]
-  },
-  {
    "route": "POST /api/bedrijf/besluit/stem",
    "bestand": "server/bedrijf/besluit.js",
    "symbolen": [
     "server/bedrijf/besluit.js#B",
     "server/server.js#null",
     "server/kern/mobiliteit/index.js#nu",
-    "server/bedrijf/besluit.js#telling"
+    "server/bedrijf/besluit-loop.js#countVotes"
    ]
   },
   {
@@ -6501,7 +6497,7 @@
    "bestand": "server/bedrijf/besluit.js",
    "symbolen": [
     "server/bedrijf/besluit.js#B",
-    "server/bedrijf/besluit.js#telling",
+    "server/bedrijf/besluit-loop.js#countVotes",
     "server/server.js#null",
     "server/kern/mobiliteit/index.js#nu"
    ]
@@ -8624,6 +8620,16 @@
     "server/server.js#null",
     "server/routes/supplier/pda/netwerk.js#netState",
     "server/routes/supplier/pda/netwerk.js#netPaar"
+   ]
+  },
+  {
+   "route": "POST /api/supplier/mijn/login",
+   "bestand": "server/routes/supplier/pda/posities-inlog.js",
+   "symbolen": [
+    "server/routes/supplier/pda/posities-inlog.js#tweedeStap",
+    "server/server.js#tooManyTries",
+    "server/server.js#noteFailedTry",
+    "server/routes/supplier/pda/posities-inlog.js#land"
    ]
   },
   {
@@ -32032,15 +32038,15 @@
  "onopgelostTop": [
   {
    "naam": "MemberExpression",
-   "aantal": 34227
+   "aantal": 34228
   },
   {
    "naam": "String",
-   "aantal": 8968
+   "aantal": 8970
   },
   {
    "naam": "require",
-   "aantal": 7832
+   "aantal": 7846
   },
   {
    "naam": "app.post",
@@ -32048,7 +32054,7 @@
   },
   {
    "naam": "res.status",
-   "aantal": 3532
+   "aantal": 3534
   },
   {
    "naam": "save",
@@ -32056,11 +32062,11 @@
   },
   {
    "naam": "CallExpression",
-   "aantal": 2702
+   "aantal": 2705
   },
   {
    "naam": "res.json",
-   "aantal": 2553
+   "aantal": 2554
   },
   {
    "naam": "Number",
@@ -32068,7 +32074,7 @@
   },
   {
    "naam": "Object.assign",
-   "aantal": 2000
+   "aantal": 2002
   },
   {
    "naam": "Array.isArray",
@@ -32108,7 +32114,7 @@
   },
   {
    "naam": "Object.freeze",
-   "aantal": 598
+   "aantal": 599
   },
   {
    "naam": "crypto.randomBytes",
@@ -32197,11 +32203,11 @@
    "namen": [
     {
      "naam": "String",
-     "aantal": 8968
+     "aantal": 8970
     },
     {
      "naam": "require",
-     "aantal": 7832
+     "aantal": 7846
     },
     {
      "naam": "Number",
@@ -32209,7 +32215,7 @@
     },
     {
      "naam": "Object.assign",
-     "aantal": 2000
+     "aantal": 2002
     },
     {
      "naam": "Array.isArray",
@@ -32245,7 +32251,7 @@
     },
     {
      "naam": "Object.freeze",
-     "aantal": 598
+     "aantal": 599
     },
     {
      "naam": "Date.parse",
@@ -32262,11 +32268,11 @@
    "namen": [
     {
      "naam": "MemberExpression",
-     "aantal": 34214
+     "aantal": 34215
     },
     {
      "naam": "CallExpression",
-     "aantal": 2702
+     "aantal": 2705
     },
     {
      "naam": "ArrowFunctionExpression",
@@ -33277,7 +33283,7 @@
      "aantal": 2,
      "waar": [
       "server/server.js:972",
-      "server/server.js:2387"
+      "server/server.js:2386"
      ]
     },
     {
@@ -33285,7 +33291,7 @@
      "aantal": 2,
      "waar": [
       "server/server.js:1305",
-      "server/server.js:2316"
+      "server/server.js:2315"
      ]
     },
     {
@@ -33523,11 +33529,11 @@
     },
     {
      "naam": "res.status",
-     "aantal": 3532
+     "aantal": 3534
     },
     {
      "naam": "res.json",
-     "aantal": 2553
+     "aantal": 2554
     },
     {
      "naam": "router.post",
@@ -33535,7 +33541,7 @@
     },
     {
      "naam": "res.set",
-     "aantal": 130
+     "aantal": 129
     },
     {
      "naam": "req.get",
@@ -33543,7 +33549,7 @@
     },
     {
      "naam": "res.setHeader",
-     "aantal": 95
+     "aantal": 96
     },
     {
      "naam": "app.get",
@@ -33551,7 +33557,7 @@
     },
     {
      "naam": "app.use",
-     "aantal": 62
+     "aantal": 61
     },
     {
      "naam": "res.end",
@@ -33694,7 +33700,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "sleutelVoor",
    "hoe": "lid",
-   "lijn": 74
+   "lijn": 95
   },
   {
    "vanBestand": "server/accounts/actietokens.js",
@@ -33702,7 +33708,7 @@
    "naarBestand": "server/accounts/tokenvorm.js",
    "naar": "doelGeldig",
    "hoe": "ingevoerd",
-   "lijn": 79
+   "lijn": 100
   },
   {
    "vanBestand": "server/accounts/actietokens.js",
@@ -33710,7 +33716,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "signMet",
    "hoe": "lid",
-   "lijn": 85
+   "lijn": 106
   },
   {
    "vanBestand": "server/accounts/actietokens.js",
@@ -33718,7 +33724,7 @@
    "naarBestand": "server/accounts/actietokens.js",
    "naar": "actieSleutel",
    "hoe": "lokaal",
-   "lijn": 85
+   "lijn": 106
   },
   {
    "vanBestand": "server/accounts/actietokens.js",
@@ -33726,7 +33732,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "signMet",
    "hoe": "lid",
-   "lijn": 98
+   "lijn": 119
   },
   {
    "vanBestand": "server/accounts/actietokens.js",
@@ -33734,7 +33740,7 @@
    "naarBestand": "server/accounts/actietokens.js",
    "naar": "actieSleutel",
    "hoe": "lokaal",
-   "lijn": 98
+   "lijn": 119
   },
   {
    "vanBestand": "server/accounts/actietokens.js",
@@ -33742,7 +33748,7 @@
    "naarBestand": "server/kern/util.js",
    "naar": "veiligGelijk",
    "hoe": "ingevoerd",
-   "lijn": 99
+   "lijn": 120
   },
   {
    "vanBestand": "server/accounts/actietokens.js",
@@ -33750,7 +33756,15 @@
    "naarBestand": "server/accounts/sessiegrens.js",
    "naar": "voorGrens",
    "hoe": "ingevoerd",
-   "lijn": 107
+   "lijn": 128
+  },
+  {
+   "vanBestand": "server/accounts/actietokens.js",
+   "van": "verifyActionToken",
+   "naarBestand": "server/accounts/sessiegrens.js",
+   "naar": "uitgezet",
+   "hoe": "ingevoerd",
+   "lijn": 130
   },
   {
    "vanBestand": "server/accounts/demohash.js",
@@ -35377,6 +35391,14 @@
    "lijn": 138
   },
   {
+   "vanBestand": "server/accounts/tokens.js",
+   "van": "verifyToken",
+   "naarBestand": "server/accounts/sessiegrens.js",
+   "naar": "uitgezet",
+   "hoe": "ingevoerd",
+   "lijn": 141
+  },
+  {
    "vanBestand": "server/accounts/transactie-volgers.js",
    "van": "kolommen",
    "naarBestand": "server/accounts/transactie-volgers.js",
@@ -35566,7 +35588,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "schrijfUser",
    "hoe": "lokaal",
-   "lijn": 15
+   "lijn": 16
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35574,7 +35596,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "hashPassword",
    "hoe": "lid",
-   "lijn": 15
+   "lijn": 16
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35582,7 +35604,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "schrijfUser",
    "hoe": "lokaal",
-   "lijn": 18
+   "lijn": 19
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35590,7 +35612,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "hashPasswordSync",
    "hoe": "lid",
-   "lijn": 18
+   "lijn": 19
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35598,7 +35620,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "schrijfUser",
    "hoe": "lokaal",
-   "lijn": 23
+   "lijn": 24
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35606,7 +35628,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "zaaiHash",
    "hoe": "lid",
-   "lijn": 23
+   "lijn": 24
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35614,7 +35636,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "emailHash",
    "hoe": "lid",
-   "lijn": 46
+   "lijn": 47
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35622,7 +35644,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "enc",
    "hoe": "lid",
-   "lijn": 51
+   "lijn": 52
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35630,7 +35652,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "phoneHash",
    "hoe": "lid",
-   "lijn": 54
+   "lijn": 55
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35638,7 +35660,7 @@
    "naarBestand": "server/accounts/mirror.js",
    "naar": "nieuwId",
    "hoe": "lid",
-   "lijn": 60
+   "lijn": 61
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35646,7 +35668,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "makeCodename",
    "hoe": "lid",
-   "lijn": 66
+   "lijn": 67
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35654,7 +35676,7 @@
    "naarBestand": "server/accounts/state.js",
    "naar": "zin",
    "hoe": "lid",
-   "lijn": 68
+   "lijn": 69
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35662,7 +35684,7 @@
    "naarBestand": "server/accounts/state.js",
    "naar": "huidigeDb",
    "hoe": "lid",
-   "lijn": 75
+   "lijn": 76
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35670,7 +35692,7 @@
    "naarBestand": "server/accounts/mirror.js",
    "naar": "markUser",
    "hoe": "lid",
-   "lijn": 76
+   "lijn": 77
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35678,7 +35700,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "getUserById",
    "hoe": "lokaal",
-   "lijn": 77
+   "lijn": 78
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35686,7 +35708,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "meldPas",
    "hoe": "lokaal",
-   "lijn": 78
+   "lijn": 79
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35694,7 +35716,7 @@
    "naarBestand": "server/accounts/state.js",
    "naar": "zin",
    "hoe": "lid",
-   "lijn": 81
+   "lijn": 82
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35702,7 +35724,7 @@
    "naarBestand": "server/accounts/state.js",
    "naar": "zin",
    "hoe": "lid",
-   "lijn": 85
+   "lijn": 86
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35710,7 +35732,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "emailHash",
    "hoe": "lid",
-   "lijn": 85
+   "lijn": 86
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35718,7 +35740,7 @@
    "naarBestand": "server/accounts/state.js",
    "naar": "zin",
    "hoe": "lid",
-   "lijn": 89
+   "lijn": 90
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35726,7 +35748,7 @@
    "naarBestand": "server/accounts/gebonden.js",
    "naar": "phoneOf",
    "hoe": "lid",
-   "lijn": 127
+   "lijn": 128
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35734,7 +35756,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "getUserById",
    "hoe": "lokaal",
-   "lijn": 127
+   "lijn": 128
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35742,7 +35764,7 @@
    "naarBestand": "server/accounts/state.js",
    "naar": "zin",
    "hoe": "lid",
-   "lijn": 132
+   "lijn": 133
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35750,7 +35772,7 @@
    "naarBestand": "server/accounts/gebonden.js",
    "naar": "zegel",
    "hoe": "lid",
-   "lijn": 133
+   "lijn": 134
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35758,7 +35780,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "phoneHash",
    "hoe": "lid",
-   "lijn": 133
+   "lijn": 134
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35766,7 +35788,7 @@
    "naarBestand": "server/accounts/mirror.js",
    "naar": "markUser",
    "hoe": "lid",
-   "lijn": 134
+   "lijn": 135
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35774,7 +35796,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "getUserById",
    "hoe": "lokaal",
-   "lijn": 165
+   "lijn": 166
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35782,7 +35804,7 @@
    "naarBestand": "server/accounts/gebonden.js",
    "naar": "emailOf",
    "hoe": "lid",
-   "lijn": 167
+   "lijn": 168
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35790,7 +35812,7 @@
    "naarBestand": "server/accounts/state.js",
    "naar": "zin",
    "hoe": "lid",
-   "lijn": 173
+   "lijn": 174
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35798,7 +35820,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "emailHash",
    "hoe": "lid",
-   "lijn": 173
+   "lijn": 174
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35806,7 +35828,7 @@
    "naarBestand": "server/accounts/gebonden.js",
    "naar": "zegel",
    "hoe": "lid",
-   "lijn": 176
+   "lijn": 177
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35814,31 +35836,31 @@
    "naarBestand": "server/accounts/mirror.js",
    "naar": "markUser",
    "hoe": "lid",
-   "lijn": 177
+   "lijn": 178
   },
   {
    "vanBestand": "server/accounts/users.js",
    "van": "renameUser",
    "naarBestand": "server/accounts/state.js",
    "naar": "zin",
-   "hoe": "lid",
-   "lijn": 183
-  },
-  {
-   "vanBestand": "server/accounts/users.js",
-   "van": "renameUser",
-   "naarBestand": "server/accounts/gebonden.js",
-   "naar": "zegel",
    "hoe": "lid",
    "lijn": 184
   },
   {
    "vanBestand": "server/accounts/users.js",
    "van": "renameUser",
+   "naarBestand": "server/accounts/gebonden.js",
+   "naar": "zegel",
+   "hoe": "lid",
+   "lijn": 185
+  },
+  {
+   "vanBestand": "server/accounts/users.js",
+   "van": "renameUser",
    "naarBestand": "server/accounts/kluis.js",
    "naar": "emailHash",
    "hoe": "lid",
-   "lijn": 187
+   "lijn": 188
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35846,7 +35868,7 @@
    "naarBestand": "server/accounts/mirror.js",
    "naar": "markUser",
    "hoe": "lid",
-   "lijn": 189
+   "lijn": 190
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35854,7 +35876,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "getUserById",
    "hoe": "lokaal",
-   "lijn": 190
+   "lijn": 191
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35862,7 +35884,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "getUserById",
    "hoe": "lokaal",
-   "lijn": 200
+   "lijn": 201
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35870,7 +35892,7 @@
    "naarBestand": "server/accounts/state.js",
    "naar": "zin",
    "hoe": "lid",
-   "lijn": 202
+   "lijn": 203
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35878,7 +35900,7 @@
    "naarBestand": "server/accounts/mirror.js",
    "naar": "markUser",
    "hoe": "lid",
-   "lijn": 203
+   "lijn": 204
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35886,7 +35908,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "meldPas",
    "hoe": "lokaal",
-   "lijn": 205
+   "lijn": 206
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35894,55 +35916,63 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "getUserById",
    "hoe": "lokaal",
-   "lijn": 216
+   "lijn": 217
   },
   {
    "vanBestand": "server/accounts/users.js",
    "van": "zetActief",
    "naarBestand": "server/accounts/state.js",
    "naar": "zin",
-   "hoe": "lid",
-   "lijn": 218
-  },
-  {
-   "vanBestand": "server/accounts/users.js",
-   "van": "zetActief",
-   "naarBestand": "server/accounts/mirror.js",
-   "naar": "markUser",
    "hoe": "lid",
    "lijn": 219
   },
   {
    "vanBestand": "server/accounts/users.js",
+   "van": "zetActief",
+   "naarBestand": "server/accounts/mirror.js",
+   "naar": "markUser",
+   "hoe": "lid",
+   "lijn": 220
+  },
+  {
+   "vanBestand": "server/accounts/users.js",
+   "van": "isActief",
+   "naarBestand": "server/accounts/sessiegrens.js",
+   "naar": "uitgezet",
+   "hoe": "ingevoerd",
+   "lijn": 225
+  },
+  {
+   "vanBestand": "server/accounts/users.js",
    "van": "zetWachtwoordHash",
    "naarBestand": "server/accounts/state.js",
    "naar": "zin",
    "hoe": "lid",
-   "lijn": 230
-  },
-  {
-   "vanBestand": "server/accounts/users.js",
-   "van": "zetWachtwoordHash",
-   "naarBestand": "server/accounts/mirror.js",
-   "naar": "markUser",
-   "hoe": "lid",
-   "lijn": 232
-  },
-  {
-   "vanBestand": "server/accounts/users.js",
-   "van": "zetWachtwoordHash",
-   "naarBestand": "server/accounts/users.js",
-   "naar": "getUserById",
-   "hoe": "lokaal",
    "lijn": 233
   },
   {
    "vanBestand": "server/accounts/users.js",
+   "van": "zetWachtwoordHash",
+   "naarBestand": "server/accounts/mirror.js",
+   "naar": "markUser",
+   "hoe": "lid",
+   "lijn": 235
+  },
+  {
+   "vanBestand": "server/accounts/users.js",
+   "van": "zetWachtwoordHash",
+   "naarBestand": "server/accounts/users.js",
+   "naar": "getUserById",
+   "hoe": "lokaal",
+   "lijn": 236
+  },
+  {
+   "vanBestand": "server/accounts/users.js",
    "van": "zetSessiegrens",
    "naarBestand": "server/accounts/state.js",
    "naar": "zin",
    "hoe": "lid",
-   "lijn": 248
+   "lijn": 251
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35950,7 +35980,7 @@
    "naarBestand": "server/accounts/mirror.js",
    "naar": "markUser",
    "hoe": "lid",
-   "lijn": 249
+   "lijn": 252
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35958,7 +35988,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "getUserById",
    "hoe": "lokaal",
-   "lijn": 250
+   "lijn": 253
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35966,7 +35996,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "zetWachtwoordHash",
    "hoe": "lokaal",
-   "lijn": 255
+   "lijn": 258
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35974,7 +36004,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "hashPasswordSync",
    "hoe": "lid",
-   "lijn": 255
+   "lijn": 258
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35982,7 +36012,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "zetWachtwoordHash",
    "hoe": "lokaal",
-   "lijn": 260
+   "lijn": 263
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35990,7 +36020,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "zaaiHash",
    "hoe": "lid",
-   "lijn": 260
+   "lijn": 263
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -35998,7 +36028,7 @@
    "naarBestand": "server/accounts/users.js",
    "naar": "getUserById",
    "hoe": "lokaal",
-   "lijn": 275
+   "lijn": 278
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -36006,7 +36036,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "moetVernieuwen",
    "hoe": "lid",
-   "lijn": 276
+   "lijn": 279
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -36014,7 +36044,7 @@
    "naarBestand": "server/accounts/kluis.js",
    "naar": "hashPassword",
    "hoe": "lid",
-   "lijn": 277
+   "lijn": 280
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -36022,7 +36052,7 @@
    "naarBestand": "server/accounts/state.js",
    "naar": "zin",
    "hoe": "lid",
-   "lijn": 279
+   "lijn": 282
   },
   {
    "vanBestand": "server/accounts/users.js",
@@ -36030,7 +36060,7 @@
    "naarBestand": "server/accounts/mirror.js",
    "naar": "markUser",
    "hoe": "lid",
-   "lijn": 280
+   "lijn": 283
   },
   {
    "vanBestand": "server/accounts/wachtwoord.js",
@@ -36793,28 +36823,44 @@
    "lijn": 125
   },
   {
-   "vanBestand": "server/bedrijf/besluit.js",
-   "van": "route:POST /api/bedrijf/besluit/maak",
-   "naarBestand": "server/server.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 45
-  },
-  {
-   "vanBestand": "server/bedrijf/besluit.js",
-   "van": "route:POST /api/bedrijf/besluit/maak",
-   "naarBestand": "server/kern/mobiliteit/index.js",
-   "naar": "nu",
-   "hoe": "viaKern",
-   "lijn": 56
-  },
-  {
-   "vanBestand": "server/bedrijf/besluit.js",
-   "van": "route:POST /api/bedrijf/besluit/maak",
+   "vanBestand": "server/bedrijf/besluit-loop.js",
+   "van": "decisionContext",
    "naarBestand": "server/bedrijf/loop-context.js",
    "naar": "freeze",
    "hoe": "lid",
-   "lijn": 63
+   "lijn": 18
+  },
+  {
+   "vanBestand": "server/bedrijf/besluit.js",
+   "van": "route:POST /api/bedrijf/besluit/maak",
+   "naarBestand": "server/server.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 37
+  },
+  {
+   "vanBestand": "server/bedrijf/besluit.js",
+   "van": "route:POST /api/bedrijf/besluit/maak",
+   "naarBestand": "server/bedrijf/besluit-loop.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
+   "lijn": 42
+  },
+  {
+   "vanBestand": "server/bedrijf/besluit.js",
+   "van": "route:POST /api/bedrijf/besluit/maak",
+   "naarBestand": "server/kern/mobiliteit/index.js",
+   "naar": "nu",
+   "hoe": "viaKern",
+   "lijn": 48
+  },
+  {
+   "vanBestand": "server/bedrijf/besluit.js",
+   "van": "route:POST /api/bedrijf/besluit/maak",
+   "naarBestand": "server/bedrijf/besluit-loop.js",
+   "naar": "decisionContext",
+   "hoe": "ingevoerd",
+   "lijn": 49
   },
   {
    "vanBestand": "server/bedrijf/besluit.js",
@@ -36822,7 +36868,7 @@
    "naarBestand": "server/bedrijf/besluit.js",
    "naar": "B",
    "hoe": "lokaal",
-   "lijn": 68
+   "lijn": 52
   },
   {
    "vanBestand": "server/bedrijf/besluit.js",
@@ -36830,7 +36876,7 @@
    "naarBestand": "server/bedrijf/besluit.js",
    "naar": "B",
    "hoe": "lokaal",
-   "lijn": 77
+   "lijn": 61
   },
   {
    "vanBestand": "server/bedrijf/besluit.js",
@@ -36838,7 +36884,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 80
+   "lijn": 64
   },
   {
    "vanBestand": "server/bedrijf/besluit.js",
@@ -36846,7 +36892,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 83
+   "lijn": 67
   },
   {
    "vanBestand": "server/bedrijf/besluit.js",
@@ -36854,7 +36900,7 @@
    "naarBestand": "server/bedrijf/besluit.js",
    "naar": "B",
    "hoe": "lokaal",
-   "lijn": 91
+   "lijn": 75
   },
   {
    "vanBestand": "server/bedrijf/besluit.js",
@@ -36862,7 +36908,7 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 97
+   "lijn": 81
   },
   {
    "vanBestand": "server/bedrijf/besluit.js",
@@ -36870,7 +36916,7 @@
    "naarBestand": "server/bedrijf/besluit.js",
    "naar": "B",
    "hoe": "lokaal",
-   "lijn": 106
+   "lijn": 90
   },
   {
    "vanBestand": "server/bedrijf/besluit.js",
@@ -36878,7 +36924,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 117
+   "lijn": 101
   },
   {
    "vanBestand": "server/bedrijf/besluit.js",
@@ -36886,15 +36932,15 @@
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 117
+   "lijn": 101
   },
   {
    "vanBestand": "server/bedrijf/besluit.js",
    "van": "route:POST /api/bedrijf/besluit/stem",
-   "naarBestand": "server/bedrijf/besluit.js",
-   "naar": "telling",
-   "hoe": "lokaal",
-   "lijn": 119
+   "naarBestand": "server/bedrijf/besluit-loop.js",
+   "naar": "countVotes",
+   "hoe": "ingevoerd",
+   "lijn": 103
   },
   {
    "vanBestand": "server/bedrijf/besluit.js",
@@ -36902,31 +36948,31 @@
    "naarBestand": "server/bedrijf/besluit.js",
    "naar": "B",
    "hoe": "lokaal",
+   "lijn": 108
+  },
+  {
+   "vanBestand": "server/bedrijf/besluit.js",
+   "van": "route:POST /api/bedrijf/besluit/sluit",
+   "naarBestand": "server/bedrijf/besluit-loop.js",
+   "naar": "countVotes",
+   "hoe": "ingevoerd",
+   "lijn": 111
+  },
+  {
+   "vanBestand": "server/bedrijf/besluit.js",
+   "van": "route:POST /api/bedrijf/besluit/sluit",
+   "naarBestand": "server/server.js",
+   "naar": null,
+   "hoe": "viaKern",
    "lijn": 124
   },
   {
    "vanBestand": "server/bedrijf/besluit.js",
    "van": "route:POST /api/bedrijf/besluit/sluit",
-   "naarBestand": "server/bedrijf/besluit.js",
-   "naar": "telling",
-   "hoe": "lokaal",
-   "lijn": 127
-  },
-  {
-   "vanBestand": "server/bedrijf/besluit.js",
-   "van": "route:POST /api/bedrijf/besluit/sluit",
-   "naarBestand": "server/server.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 140
-  },
-  {
-   "vanBestand": "server/bedrijf/besluit.js",
-   "van": "route:POST /api/bedrijf/besluit/sluit",
    "naarBestand": "server/kern/mobiliteit/index.js",
    "naar": "nu",
    "hoe": "viaKern",
-   "lijn": 150
+   "lijn": 134
   },
   {
    "vanBestand": "server/bedrijf/besluitlijst.js",
@@ -38937,6 +38983,62 @@
    "lijn": 33
   },
   {
+   "vanBestand": "server/bedrijf/loop-source-model.js",
+   "van": "member",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "fail",
+   "hoe": "lid",
+   "lijn": 19
+  },
+  {
+   "vanBestand": "server/bedrijf/loop-source-model.js",
+   "van": "member",
+   "naarBestand": "server/bedrijf/rollen-beleid.js",
+   "naar": "rechtenVan",
+   "hoe": "lid",
+   "lijn": 20
+  },
+  {
+   "vanBestand": "server/bedrijf/loop-source-model.js",
+   "van": "workspaceFrom",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "fail",
+   "hoe": "lid",
+   "lijn": 26
+  },
+  {
+   "vanBestand": "server/bedrijf/loop-source-model.js",
+   "van": "refEqual",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "refKey",
+   "hoe": "lid",
+   "lijn": 29
+  },
+  {
+   "vanBestand": "server/bedrijf/loop-source-model.js",
+   "van": "refEqual",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "objectRef",
+   "hoe": "lid",
+   "lijn": 29
+  },
+  {
+   "vanBestand": "server/bedrijf/loop-source-model.js",
+   "van": "appendEvent",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "hash",
+   "hoe": "lid",
+   "lijn": 32
+  },
+  {
+   "vanBestand": "server/bedrijf/loop-source-model.js",
+   "van": "observationEligibility",
+   "naarBestand": "server/kern/loop-fabric/learning-eligibility.js",
+   "naar": "issue",
+   "hoe": "lid",
+   "lijn": 35
+  },
+  {
    "vanBestand": "server/bedrijf/loop-source-transport.js",
    "van": "protocolEvents",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
@@ -39058,6 +39160,14 @@
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
+   "van": "(module)",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "fail",
+   "hoe": "lid",
+   "lijn": 9
+  },
+  {
+   "vanBestand": "server/bedrijf/loop-source.js",
    "van": "tx",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fail",
@@ -39066,67 +39176,11 @@
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
-   "van": "member",
-   "naarBestand": "server/kern/loop-fabric/protocol.js",
-   "naar": "fail",
-   "hoe": "lid",
-   "lijn": 26
-  },
-  {
-   "vanBestand": "server/bedrijf/loop-source.js",
-   "van": "member",
-   "naarBestand": "server/bedrijf/rollen-beleid.js",
-   "naar": "rechtenVan",
-   "hoe": "lid",
-   "lijn": 27
-  },
-  {
-   "vanBestand": "server/bedrijf/loop-source.js",
-   "van": "workspaceFrom",
-   "naarBestand": "server/kern/loop-fabric/protocol.js",
-   "naar": "fail",
-   "hoe": "lid",
-   "lijn": 34
-  },
-  {
-   "vanBestand": "server/bedrijf/loop-source.js",
-   "van": "refEqual",
-   "naarBestand": "server/kern/loop-fabric/protocol.js",
-   "naar": "refKey",
-   "hoe": "lid",
-   "lijn": 37
-  },
-  {
-   "vanBestand": "server/bedrijf/loop-source.js",
-   "van": "refEqual",
-   "naarBestand": "server/kern/loop-fabric/protocol.js",
-   "naar": "objectRef",
-   "hoe": "lid",
-   "lijn": 37
-  },
-  {
-   "vanBestand": "server/bedrijf/loop-source.js",
-   "van": "appendEvent",
-   "naarBestand": "server/kern/loop-fabric/protocol.js",
-   "naar": "hash",
-   "hoe": "lid",
-   "lijn": 41
-  },
-  {
-   "vanBestand": "server/bedrijf/loop-source.js",
-   "van": "observationEligibility",
-   "naarBestand": "server/kern/loop-fabric/learning-eligibility.js",
-   "naar": "issue",
-   "hoe": "lid",
-   "lijn": 44
-  },
-  {
-   "vanBestand": "server/bedrijf/loop-source.js",
    "van": "observeIncident",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fields",
    "hoe": "lid",
-   "lijn": 53
+   "lijn": 19
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39134,7 +39188,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "operationId",
    "hoe": "lid",
-   "lijn": 54
+   "lijn": 20
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39142,7 +39196,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "text",
    "hoe": "lid",
-   "lijn": 54
+   "lijn": 20
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39150,7 +39204,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "hash",
    "hoe": "lid",
-   "lijn": 55
+   "lijn": 21
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39158,31 +39212,31 @@
    "naarBestand": "server/bedrijf/loop-source.js",
    "naar": "tx",
    "hoe": "lokaal",
-   "lijn": 56
+   "lijn": 22
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
    "van": "observeIncident",
-   "naarBestand": "server/bedrijf/loop-source.js",
+   "naarBestand": "server/bedrijf/loop-source-model.js",
    "naar": "workspaceFrom",
-   "hoe": "lokaal",
-   "lijn": 57
+   "hoe": "uitFabriek",
+   "lijn": 23
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
    "van": "observeIncident",
-   "naarBestand": "server/bedrijf/loop-source.js",
+   "naarBestand": "server/bedrijf/loop-source-model.js",
    "naar": "member",
-   "hoe": "lokaal",
-   "lijn": 57
+   "hoe": "uitFabriek",
+   "lijn": 23
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
    "van": "observeIncident",
-   "naarBestand": "server/bedrijf/loop-source.js",
+   "naarBestand": "server/bedrijf/loop-source-model.js",
    "naar": "protocolState",
-   "hoe": "lokaal",
-   "lijn": 58
+   "hoe": "uitFabriek",
+   "lijn": 24
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39190,7 +39244,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fail",
    "hoe": "lid",
-   "lijn": 60
+   "lijn": 26
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39198,7 +39252,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "clone",
    "hoe": "lid",
-   "lijn": 61
+   "lijn": 27
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39206,7 +39260,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "objectRef",
    "hoe": "lid",
-   "lijn": 67
+   "lijn": 33
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39214,23 +39268,23 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "instant",
    "hoe": "lid",
-   "lijn": 80
+   "lijn": 46
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
    "van": "observeIncident",
-   "naarBestand": "server/bedrijf/loop-source.js",
+   "naarBestand": "server/bedrijf/loop-source-model.js",
    "naar": "observationEligibility",
-   "hoe": "lokaal",
-   "lijn": 85
+   "hoe": "uitFabriek",
+   "lijn": 51
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
    "van": "observeIncident",
-   "naarBestand": "server/bedrijf/loop-source.js",
+   "naarBestand": "server/bedrijf/loop-source-model.js",
    "naar": "appendEvent",
-   "hoe": "lokaal",
-   "lijn": 88
+   "hoe": "uitFabriek",
+   "lijn": 54
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39238,7 +39292,7 @@
    "naarBestand": "server/kern/envelop.js",
    "naar": "maak",
    "hoe": "lid",
-   "lijn": 89
+   "lijn": 55
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39246,15 +39300,15 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "error",
    "hoe": "lid",
-   "lijn": 94
+   "lijn": 60
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
    "van": "authorization",
-   "naarBestand": "server/bedrijf/loop-source.js",
+   "naarBestand": "server/bedrijf/loop-source-model.js",
    "naar": "workspaceFrom",
-   "hoe": "lokaal",
-   "lijn": 100
+   "hoe": "uitFabriek",
+   "lijn": 66
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39262,15 +39316,15 @@
    "naarBestand": "server/bedrijf/loop-source.js",
    "naar": "read",
    "hoe": "lokaal",
-   "lijn": 100
+   "lijn": 66
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
    "van": "authorization",
-   "naarBestand": "server/bedrijf/loop-source.js",
+   "naarBestand": "server/bedrijf/loop-source-model.js",
    "naar": "member",
-   "hoe": "lokaal",
-   "lijn": 102
+   "hoe": "uitFabriek",
+   "lijn": 68
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39278,7 +39332,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "error",
    "hoe": "lid",
-   "lijn": 104
+   "lijn": 70
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39286,7 +39340,7 @@
    "naarBestand": "server/bedrijf/loop-source.js",
    "naar": "authorization",
    "hoe": "lokaal",
-   "lijn": 107
+   "lijn": 73
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39294,15 +39348,15 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "objectRef",
    "hoe": "lid",
-   "lijn": 109
+   "lijn": 75
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
    "van": "artifact",
-   "naarBestand": "server/bedrijf/loop-source.js",
+   "naarBestand": "server/bedrijf/loop-source-model.js",
    "naar": "workspaceFrom",
-   "hoe": "lokaal",
-   "lijn": 109
+   "hoe": "uitFabriek",
+   "lijn": 75
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39310,7 +39364,7 @@
    "naarBestand": "server/bedrijf/loop-source.js",
    "naar": "read",
    "hoe": "lokaal",
-   "lijn": 109
+   "lijn": 75
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39318,7 +39372,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fail",
    "hoe": "lid",
-   "lijn": 112
+   "lijn": 78
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39326,7 +39380,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "clone",
    "hoe": "lid",
-   "lijn": 113
+   "lijn": 79
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39334,7 +39388,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "error",
    "hoe": "lid",
-   "lijn": 115
+   "lijn": 81
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39342,7 +39396,7 @@
    "naarBestand": "server/bedrijf/loop-source.js",
    "naar": "artifact",
    "hoe": "lokaal",
-   "lijn": 117
+   "lijn": 83
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39350,15 +39404,15 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "objectRef",
    "hoe": "lid",
-   "lijn": 120
+   "lijn": 86
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
    "van": "resolveObservation",
-   "naarBestand": "server/bedrijf/loop-source.js",
+   "naarBestand": "server/bedrijf/loop-source-model.js",
    "naar": "workspaceFrom",
-   "hoe": "lokaal",
-   "lijn": 120
+   "hoe": "uitFabriek",
+   "lijn": 86
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39366,7 +39420,7 @@
    "naarBestand": "server/bedrijf/loop-source.js",
    "naar": "read",
    "hoe": "lokaal",
-   "lijn": 120
+   "lijn": 86
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39374,15 +39428,15 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fail",
    "hoe": "lid",
-   "lijn": 122
+   "lijn": 88
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
    "van": "resolveObservation",
-   "naarBestand": "server/bedrijf/loop-source.js",
+   "naarBestand": "server/bedrijf/loop-source-model.js",
    "naar": "refEqual",
-   "hoe": "lokaal",
-   "lijn": 125
+   "hoe": "uitFabriek",
+   "lijn": 91
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39390,7 +39444,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "clone",
    "hoe": "lid",
-   "lijn": 129
+   "lijn": 95
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39398,7 +39452,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "error",
    "hoe": "lid",
-   "lijn": 130
+   "lijn": 96
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39406,7 +39460,7 @@
    "naarBestand": "server/bedrijf/loop-source.js",
    "naar": "resolveObservation",
    "hoe": "lokaal",
-   "lijn": 133
+   "lijn": 99
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
@@ -39414,15 +39468,15 @@
    "naarBestand": "server/kern/loop-fabric/learning-eligibility.js",
    "naar": "evaluate",
    "hoe": "lid",
-   "lijn": 134
+   "lijn": 100
   },
   {
    "vanBestand": "server/bedrijf/loop-source.js",
    "van": "learningEligibility",
-   "naarBestand": "server/bedrijf/loop-source.js",
+   "naarBestand": "server/bedrijf/loop-source-model.js",
    "naar": "observationEligibility",
-   "hoe": "lokaal",
-   "lijn": 134
+   "hoe": "uitFabriek",
+   "lijn": 100
   },
   {
    "vanBestand": "server/bedrijf/mijn.js",
@@ -63758,7 +63812,7 @@
    "naarBestand": "server/kern/bewijsvlak/canon.js",
    "naar": "bevries",
    "hoe": "ingevoerd",
-   "lijn": 14
+   "lijn": 29
   },
   {
    "vanBestand": "server/kern/bewijsvlak/context.js",
@@ -63766,7 +63820,7 @@
    "naarBestand": "server/kern/bewijsvlak/context.js",
    "naar": "nieuw",
    "hoe": "lokaal",
-   "lijn": 16
+   "lijn": 31
   },
   {
    "vanBestand": "server/kern/bewijsvlak/context.js",
@@ -63774,7 +63828,7 @@
    "naarBestand": "server/kern/bewijsvlak/context.js",
    "naar": "maak",
    "hoe": "lokaal",
-   "lijn": 30
+   "lijn": 57
   },
   {
    "vanBestand": "server/kern/bewijsvlak/context.js",
@@ -63782,7 +63836,7 @@
    "naarBestand": "server/kern/bewijsvlak/context.js",
    "naar": "huidige",
    "hoe": "lokaal",
-   "lijn": 33
+   "lijn": 62
   },
   {
    "vanBestand": "server/kern/bewijsvlak/context.js",
@@ -63790,7 +63844,7 @@
    "naarBestand": "server/kern/bewijsvlak/context.js",
    "naar": "maak",
    "hoe": "lokaal",
-   "lijn": 34
+   "lijn": 63
   },
   {
    "vanBestand": "server/kern/bewijsvlak/context.js",
@@ -63798,7 +63852,7 @@
    "naarBestand": "server/kern/bewijsvlak/context.js",
    "naar": "nieuw",
    "hoe": "lokaal",
-   "lijn": 36
+   "lijn": 65
   },
   {
    "vanBestand": "server/kern/bewijsvlak/context.js",
@@ -63806,7 +63860,7 @@
    "naarBestand": "server/kern/bewijsvlak/context.js",
    "naar": "huidige",
    "hoe": "lokaal",
-   "lijn": 43
+   "lijn": 72
   },
   {
    "vanBestand": "server/kern/bewijsvlak/context.js",
@@ -63814,7 +63868,15 @@
    "naarBestand": "server/kern/bewijsvlak/context.js",
    "naar": "maak",
    "hoe": "lokaal",
-   "lijn": 44
+   "lijn": 73
+  },
+  {
+   "vanBestand": "server/kern/bewijsvlak/context.js",
+   "van": "uitEvent",
+   "naarBestand": "server/kern/bewijsvlak/context.js",
+   "naar": "ketenVan",
+   "hoe": "lokaal",
+   "lijn": 74
   },
   {
    "vanBestand": "server/kern/bewijsvlak/context.js",
@@ -63822,15 +63884,7 @@
    "naarBestand": "server/kern/bewijsvlak/context.js",
    "naar": "nieuw",
    "hoe": "lokaal",
-   "lijn": 46
-  },
-  {
-   "vanBestand": "server/kern/bewijsvlak/context.js",
-   "van": "middleware",
-   "naarBestand": "server/kern/bewijsvlak/context.js",
-   "naar": "maak",
-   "hoe": "lokaal",
-   "lijn": 58
+   "lijn": 75
   },
   {
    "vanBestand": "server/kern/bewijsvlak/context.js",
@@ -63838,7 +63892,7 @@
    "naarBestand": "server/kern/bewijsvlak/context.js",
    "naar": "huidige",
    "hoe": "lokaal",
-   "lijn": 69
+   "lijn": 87
   },
   {
    "vanBestand": "server/kern/bewijsvlak/context.js",
@@ -63846,7 +63900,7 @@
    "naarBestand": "server/kern/bewijsvlak/context.js",
    "naar": "maak",
    "hoe": "lokaal",
-   "lijn": 90
+   "lijn": 108
   },
   {
    "vanBestand": "server/kern/bewijsvlak/contract.js",
@@ -86870,7 +86924,7 @@
    "naarBestand": "server/kern/envelop.js",
    "naar": "keurHoedanigheid",
    "hoe": "lokaal",
-   "lijn": 151
+   "lijn": 155
   },
   {
    "vanBestand": "server/kern/envelop.js",
@@ -86878,7 +86932,7 @@
    "naarBestand": "server/kern/envelop.js",
    "naar": "hoedanigheidVan",
    "hoe": "lokaal",
-   "lijn": 152
+   "lijn": 156
   },
   {
    "vanBestand": "server/kern/envelop.js",
@@ -86886,7 +86940,7 @@
    "naarBestand": "server/kern/envelop.js",
    "naar": "versieBekend",
    "hoe": "lokaal",
-   "lijn": 161
+   "lijn": 165
   },
   {
    "vanBestand": "server/kern/envelop.js",
@@ -86894,7 +86948,7 @@
    "naarBestand": "server/kern/bewijsvlak/context.js",
    "naar": "inContext",
    "hoe": "lid",
-   "lijn": 162
+   "lijn": 166
   },
   {
    "vanBestand": "server/kern/envelop.js",
@@ -86902,7 +86956,7 @@
    "naarBestand": "server/kern/bewijsvlak/context.js",
    "naar": "uitEvent",
    "hoe": "lid",
-   "lijn": 162
+   "lijn": 166
   },
   {
    "vanBestand": "server/kern/ervaring/afgerond.js",
@@ -103734,7 +103788,7 @@
    "naarBestand": "server/kern/identiteit/tweedestap-rem.js",
    "naar": "emmers",
    "hoe": "lokaal",
-   "lijn": 41
+   "lijn": 42
   },
   {
    "vanBestand": "server/kern/identiteit/tweefactor.js",
@@ -103926,7 +103980,7 @@
    "naarBestand": "server/kern/identiteit/tweefactor.js",
    "naar": "standVan",
    "hoe": "lokaal",
-   "lijn": 162
+   "lijn": 164
   },
   {
    "vanBestand": "server/kern/identiteit/vertrouwen.js",
@@ -112130,9 +112184,9 @@
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-delivery.js",
-   "van": "deliveryStatuses",
+   "van": "academyDeliveryStatuses",
    "naarBestand": "server/kern/leerhuis/loop-delivery.js",
-   "naar": "deliveryStatus",
+   "naar": "academyDeliveryStatus",
    "hoe": "lokaal",
    "lijn": 48
   },
@@ -112242,7 +112296,7 @@
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-source.js",
-   "van": "protocolEvents",
+   "van": "academyProtocolEvents",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "hash",
    "hoe": "lid",
@@ -112250,7 +112304,7 @@
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-source.js",
-   "van": "protocolEvents",
+   "van": "academyProtocolEvents",
    "naarBestand": "server/kern/leerhuis/loop-source.js",
    "naar": "observation",
    "hoe": "lokaal",
@@ -112258,7 +112312,7 @@
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-source.js",
-   "van": "protocolEvents",
+   "van": "academyProtocolEvents",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "clone",
    "hoe": "lid",
@@ -112266,7 +112320,7 @@
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveAcademyObservation",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "objectRef",
    "hoe": "lid",
@@ -112274,7 +112328,7 @@
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveAcademyObservation",
    "naarBestand": "server/kern/leerhuis/loop-source.js",
    "naar": "academy",
    "hoe": "lokaal",
@@ -112282,7 +112336,7 @@
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveAcademyObservation",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fail",
    "hoe": "lid",
@@ -112290,7 +112344,7 @@
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveAcademyObservation",
    "naarBestand": "server/kern/leerhuis/loop-source.js",
    "naar": "observation",
    "hoe": "lokaal",
@@ -112298,7 +112352,7 @@
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveAcademyObservation",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "clone",
    "hoe": "lid",
@@ -112306,7 +112360,7 @@
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveAcademyObservation",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "error",
    "hoe": "lid",
@@ -112314,15 +112368,15 @@
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-source.js",
-   "van": "learningEligibility",
+   "van": "evaluateAcademyEligibility",
    "naarBestand": "server/kern/leerhuis/loop-source.js",
-   "naar": "resolveObservation",
+   "naar": "resolveAcademyObservation",
    "hoe": "lokaal",
    "lijn": 91
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-source.js",
-   "van": "learningEligibility",
+   "van": "evaluateAcademyEligibility",
    "naarBestand": "server/kern/loop-fabric/learning-eligibility.js",
    "naar": "evaluate",
    "hoe": "lid",
@@ -112378,11 +112432,19 @@
   },
   {
    "vanBestand": "server/kern/leerhuis/loop-source.js",
+   "van": "(module)",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "fail",
+   "hoe": "lid",
+   "lijn": 108
+  },
+  {
+   "vanBestand": "server/kern/leerhuis/loop-source.js",
    "van": "verifyReceipt",
    "naarBestand": "server/kern/loop-fabric/service-receipt.js",
    "naar": "verify",
    "hoe": "lid",
-   "lijn": 110
+   "lijn": 112
   },
   {
    "vanBestand": "server/kern/leerhuis/namen.js",
@@ -115194,7 +115256,7 @@
   },
   {
    "vanBestand": "server/kern/library/education.js",
-   "van": "command",
+   "van": "educationCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "fields",
    "hoe": "lid",
@@ -115202,7 +115264,7 @@
   },
   {
    "vanBestand": "server/kern/library/education.js",
-   "van": "command",
+   "van": "educationCommand",
    "naarBestand": "server/kern/library/policy.js",
    "naar": "publisher",
    "hoe": "lid",
@@ -115210,7 +115272,7 @@
   },
   {
    "vanBestand": "server/kern/library/education.js",
-   "van": "command",
+   "van": "educationCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "get",
    "hoe": "lid",
@@ -115218,7 +115280,7 @@
   },
   {
    "vanBestand": "server/kern/library/education.js",
-   "van": "command",
+   "van": "educationCommand",
    "naarBestand": "server/kern/library/editions.js",
    "naar": "intact",
    "hoe": "ingevoerd",
@@ -115226,7 +115288,7 @@
   },
   {
    "vanBestand": "server/kern/library/education.js",
-   "van": "command",
+   "van": "educationCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "fail",
    "hoe": "lid",
@@ -115234,7 +115296,7 @@
   },
   {
    "vanBestand": "server/kern/library/education.js",
-   "van": "command",
+   "van": "educationCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "strings",
    "hoe": "lid",
@@ -115242,7 +115304,7 @@
   },
   {
    "vanBestand": "server/kern/library/education.js",
-   "van": "command",
+   "van": "educationCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "text",
    "hoe": "lid",
@@ -115250,7 +115312,7 @@
   },
   {
    "vanBestand": "server/kern/library/education.js",
-   "van": "command",
+   "van": "educationCommand",
    "naarBestand": "server/kern/library/education.js",
    "naar": "requirements",
    "hoe": "lokaal",
@@ -115258,7 +115320,7 @@
   },
   {
    "vanBestand": "server/kern/library/education.js",
-   "van": "command",
+   "van": "educationCommand",
    "naarBestand": "server/kern/library/rights.js",
    "naar": "educationApplicable",
    "hoe": "lid",
@@ -115266,7 +115328,7 @@
   },
   {
    "vanBestand": "server/kern/library/education.js",
-   "van": "command",
+   "van": "educationCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "hash",
    "hoe": "lid",
@@ -115274,7 +115336,7 @@
   },
   {
    "vanBestand": "server/kern/library/education.js",
-   "van": "command",
+   "van": "educationCommand",
    "naarBestand": "server/kern/library/education.js",
    "naar": "ref",
    "hoe": "lokaal",
@@ -115282,7 +115344,7 @@
   },
   {
    "vanBestand": "server/kern/library/education.js",
-   "van": "command",
+   "van": "educationCommand",
    "naarBestand": "server/kern/library/education.js",
    "naar": "activeVersion",
    "hoe": "lokaal",
@@ -115354,7 +115416,7 @@
   },
   {
    "vanBestand": "server/kern/library/feedback.js",
-   "van": "command",
+   "van": "feedbackCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "fields",
    "hoe": "lid",
@@ -115362,7 +115424,7 @@
   },
   {
    "vanBestand": "server/kern/library/feedback.js",
-   "van": "command",
+   "van": "feedbackCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "get",
    "hoe": "lid",
@@ -115370,7 +115432,7 @@
   },
   {
    "vanBestand": "server/kern/library/feedback.js",
-   "van": "command",
+   "van": "feedbackCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "fail",
    "hoe": "lid",
@@ -115378,7 +115440,7 @@
   },
   {
    "vanBestand": "server/kern/library/feedback.js",
-   "van": "command",
+   "van": "feedbackCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "text",
    "hoe": "lid",
@@ -115386,7 +115448,7 @@
   },
   {
    "vanBestand": "server/kern/library/feedback.js",
-   "van": "command",
+   "van": "feedbackCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "strings",
    "hoe": "lid",
@@ -115394,7 +115456,7 @@
   },
   {
    "vanBestand": "server/kern/library/feedback.js",
-   "van": "command",
+   "van": "feedbackCommand",
    "naarBestand": "server/kern/library/policy.js",
    "naar": "editor",
    "hoe": "lid",
@@ -115690,7 +115752,7 @@
   },
   {
    "vanBestand": "server/kern/library/journal.js",
-   "van": "append",
+   "van": "appendLibraryEvent",
    "naarBestand": "server/kern/library/model.js",
    "naar": "clone",
    "hoe": "lid",
@@ -115698,7 +115760,7 @@
   },
   {
    "vanBestand": "server/kern/library/journal.js",
-   "van": "append",
+   "van": "appendLibraryEvent",
    "naarBestand": "server/kern/library/model.js",
    "naar": "hash",
    "hoe": "lid",
@@ -115706,7 +115768,7 @@
   },
   {
    "vanBestand": "server/kern/library/journal.js",
-   "van": "append",
+   "van": "appendLibraryEvent",
    "naarBestand": "server/kern/envelop.js",
    "naar": "maak",
    "hoe": "lid",
@@ -115714,7 +115776,7 @@
   },
   {
    "vanBestand": "server/kern/library/journal.js",
-   "van": "verify",
+   "van": "verifyLibraryJournal",
    "naarBestand": "server/kern/library/model.js",
    "naar": "hash",
    "hoe": "lid",
@@ -115764,7 +115826,7 @@
    "vanBestand": "server/kern/library/loop-source.js",
    "van": "authorization",
    "naarBestand": "server/kern/library/loop-source.js",
-   "naar": "context",
+   "naar": "libraryContext",
    "hoe": "lokaal",
    "lijn": 12
   },
@@ -115906,7 +115968,7 @@
   },
   {
    "vanBestand": "server/kern/library/loop-source.js",
-   "van": "protocolEvents",
+   "van": "libraryProtocolEvents",
    "naarBestand": "server/kern/library/loop-source.js",
    "naar": "mapped",
    "hoe": "lokaal",
@@ -115924,7 +115986,7 @@
    "vanBestand": "server/kern/library/loop-source.js",
    "van": "hasReceipt",
    "naarBestand": "server/kern/library/loop-source.js",
-   "naar": "protocolEvents",
+   "naar": "libraryProtocolEvents",
    "hoe": "lokaal",
    "lijn": 66
   },
@@ -115946,7 +116008,7 @@
   },
   {
    "vanBestand": "server/kern/library/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveLibraryObservation",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "objectRef",
    "hoe": "lid",
@@ -115954,7 +116016,7 @@
   },
   {
    "vanBestand": "server/kern/library/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveLibraryObservation",
    "naarBestand": "server/kern/library/loop-source.js",
    "naar": "work",
    "hoe": "lokaal",
@@ -115962,7 +116024,7 @@
   },
   {
    "vanBestand": "server/kern/library/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveLibraryObservation",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fail",
    "hoe": "lid",
@@ -115970,7 +116032,7 @@
   },
   {
    "vanBestand": "server/kern/library/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveLibraryObservation",
    "naarBestand": "server/kern/library/loop-source.js",
    "naar": "observation",
    "hoe": "lokaal",
@@ -115978,7 +116040,7 @@
   },
   {
    "vanBestand": "server/kern/library/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveLibraryObservation",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "error",
    "hoe": "lid",
@@ -115986,15 +116048,15 @@
   },
   {
    "vanBestand": "server/kern/library/loop-source.js",
-   "van": "learningEligibility",
+   "van": "evaluateLibraryEligibility",
    "naarBestand": "server/kern/library/loop-source.js",
-   "naar": "resolveObservation",
+   "naar": "resolveLibraryObservation",
    "hoe": "lokaal",
    "lijn": 78
   },
   {
    "vanBestand": "server/kern/library/loop-source.js",
-   "van": "learningEligibility",
+   "van": "evaluateLibraryEligibility",
    "naarBestand": "server/kern/loop-fabric/learning-eligibility.js",
    "naar": "evaluate",
    "hoe": "lid",
@@ -116385,28 +116447,60 @@
    "lijn": 51
   },
   {
-   "vanBestand": "server/kern/library/reader.js",
-   "van": "state",
-   "naarBestand": "server/kern/library/reader.js",
-   "naar": "empty",
+   "vanBestand": "server/kern/library/reader-state.js",
+   "van": "readerState",
+   "naarBestand": "server/kern/library/reader-state.js",
+   "naar": "emptyReaderState",
    "hoe": "lokaal",
    "lijn": 7
   },
   {
-   "vanBestand": "server/kern/library/reader.js",
-   "van": "state",
+   "vanBestand": "server/kern/library/reader-state.js",
+   "van": "readerState",
    "naarBestand": "server/kern/library/model.js",
    "naar": "fail",
    "hoe": "lid",
    "lijn": 9
   },
   {
-   "vanBestand": "server/kern/library/reader.js",
-   "van": "state",
+   "vanBestand": "server/kern/library/reader-state.js",
+   "van": "readerState",
    "naarBestand": "server/kern/library/model.js",
    "naar": "clone",
    "hoe": "lid",
    "lijn": 10
+  },
+  {
+   "vanBestand": "server/kern/library/reader-state.js",
+   "van": "appendReaderEvent",
+   "naarBestand": "server/kern/library/model.js",
+   "naar": "hash",
+   "hoe": "lid",
+   "lijn": 14
+  },
+  {
+   "vanBestand": "server/kern/library/reader-state.js",
+   "van": "appendReaderEvent",
+   "naarBestand": "server/kern/library/model.js",
+   "naar": "clone",
+   "hoe": "lid",
+   "lijn": 16
+  },
+  {
+   "vanBestand": "server/kern/library/reader-state.js",
+   "van": "appendReaderEvent",
+   "naarBestand": "server/kern/envelop.js",
+   "naar": "maak",
+   "hoe": "lid",
+   "lijn": 17
+  },
+  {
+   "vanBestand": "server/kern/library/reader-state.js",
+   "van": "verifyReaderJournal",
+   "naarBestand": "server/kern/library/model.js",
+   "naar": "hash",
+   "hoe": "lid",
+   "lijn": 26
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116414,15 +116508,15 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "datum",
    "hoe": "lid",
-   "lijn": 14
+   "lijn": 7
   },
   {
    "vanBestand": "server/kern/library/reader.js",
    "van": "read",
-   "naarBestand": "server/kern/library/reader.js",
-   "naar": "state",
-   "hoe": "lokaal",
-   "lijn": 15
+   "naarBestand": "server/kern/library/reader-state.js",
+   "naar": "readerState",
+   "hoe": "ingevoerd",
+   "lijn": 8
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116430,11 +116524,19 @@
    "naarBestand": "server/kern/kijken.js",
    "naar": "kijk",
    "hoe": "viaKern",
-   "lijn": 15
+   "lijn": 8
   },
   {
    "vanBestand": "server/kern/library/reader.js",
    "van": "transaction",
+   "naarBestand": "server/kern/library/model.js",
+   "naar": "fail",
+   "hoe": "lid",
+   "lijn": 11
+  },
+  {
+   "vanBestand": "server/kern/library/reader.js",
+   "van": "access",
    "naarBestand": "server/kern/library/model.js",
    "naar": "fail",
    "hoe": "lid",
@@ -116444,17 +116546,9 @@
    "vanBestand": "server/kern/library/reader.js",
    "van": "access",
    "naarBestand": "server/kern/library/model.js",
-   "naar": "fail",
-   "hoe": "lid",
-   "lijn": 25
-  },
-  {
-   "vanBestand": "server/kern/library/reader.js",
-   "van": "access",
-   "naarBestand": "server/kern/library/model.js",
    "naar": "get",
    "hoe": "lid",
-   "lijn": 26
+   "lijn": 19
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116462,39 +116556,7 @@
    "naarBestand": "server/kern/library/policy.js",
    "naar": "readable",
    "hoe": "lid",
-   "lijn": 27
-  },
-  {
-   "vanBestand": "server/kern/library/reader.js",
-   "van": "append",
-   "naarBestand": "server/kern/library/model.js",
-   "naar": "hash",
-   "hoe": "lid",
-   "lijn": 38
-  },
-  {
-   "vanBestand": "server/kern/library/reader.js",
-   "van": "append",
-   "naarBestand": "server/kern/library/model.js",
-   "naar": "clone",
-   "hoe": "lid",
-   "lijn": 40
-  },
-  {
-   "vanBestand": "server/kern/library/reader.js",
-   "van": "append",
-   "naarBestand": "server/kern/envelop.js",
-   "naar": "maak",
-   "hoe": "lid",
-   "lijn": 41
-  },
-  {
-   "vanBestand": "server/kern/library/reader.js",
-   "van": "verify",
-   "naarBestand": "server/kern/library/model.js",
-   "naar": "hash",
-   "hoe": "lid",
-   "lijn": 50
+   "lijn": 20
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116502,7 +116564,7 @@
    "naarBestand": "server/kern/library/model.js",
    "naar": "fields",
    "hoe": "lid",
-   "lijn": 57
+   "lijn": 31
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116510,7 +116572,7 @@
    "naarBestand": "server/kern/library/model.js",
    "naar": "fail",
    "hoe": "lid",
-   "lijn": 59
+   "lijn": 33
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116518,7 +116580,7 @@
    "naarBestand": "server/kern/library/model.js",
    "naar": "hash",
    "hoe": "lid",
-   "lijn": 62
+   "lijn": 36
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116526,7 +116588,7 @@
    "naarBestand": "server/kern/library/reader.js",
    "naar": "transaction",
    "hoe": "lokaal",
-   "lijn": 63
+   "lijn": 37
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116534,15 +116596,15 @@
    "naarBestand": "server/kern/library/reader.js",
    "naar": "access",
    "hoe": "lokaal",
-   "lijn": 64
+   "lijn": 38
   },
   {
    "vanBestand": "server/kern/library/reader.js",
    "van": "execute",
-   "naarBestand": "server/kern/library/reader.js",
-   "naar": "state",
-   "hoe": "lokaal",
-   "lijn": 64
+   "naarBestand": "server/kern/library/reader-state.js",
+   "naar": "readerState",
+   "hoe": "ingevoerd",
+   "lijn": 38
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116550,7 +116612,7 @@
    "naarBestand": "server/kern/library/model.js",
    "naar": "clone",
    "hoe": "lid",
-   "lijn": 68
+   "lijn": 42
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116558,7 +116620,7 @@
    "naarBestand": "server/kern/library/reader.js",
    "naar": "reader",
    "hoe": "lokaal",
-   "lijn": 70
+   "lijn": 44
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116566,7 +116628,7 @@
    "naarBestand": "server/kern/library/reader.js",
    "naar": "shelf",
    "hoe": "lokaal",
-   "lijn": 73
+   "lijn": 47
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116574,7 +116636,7 @@
    "naarBestand": "server/kern/library/model.js",
    "naar": "fail",
    "hoe": "lid",
-   "lijn": 76
+   "lijn": 50
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116582,7 +116644,7 @@
    "naarBestand": "server/kern/library/reader.js",
    "naar": "node",
    "hoe": "lokaal",
-   "lijn": 81
+   "lijn": 55
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116590,7 +116652,7 @@
    "naarBestand": "server/kern/library/model.js",
    "naar": "text",
    "hoe": "lid",
-   "lijn": 86
+   "lijn": 60
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116598,15 +116660,15 @@
    "naarBestand": "server/kern/library/model.js",
    "naar": "get",
    "hoe": "lid",
-   "lijn": 89
+   "lijn": 63
   },
   {
    "vanBestand": "server/kern/library/reader.js",
    "van": "execute",
-   "naarBestand": "server/kern/library/reader.js",
-   "naar": "append",
-   "hoe": "lokaal",
-   "lijn": 107
+   "naarBestand": "server/kern/library/reader-state.js",
+   "naar": "appendReaderEvent",
+   "hoe": "ingevoerd",
+   "lijn": 81
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116614,7 +116676,7 @@
    "naarBestand": "server/kern/library/model.js",
    "naar": "canonical",
    "hoe": "lid",
-   "lijn": 110
+   "lijn": 84
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116622,7 +116684,7 @@
    "naarBestand": "server/kern/library/reader.js",
    "naar": "failure",
    "hoe": "lokaal",
-   "lijn": 113
+   "lijn": 87
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116630,7 +116692,7 @@
    "naarBestand": "server/kern/library/model.js",
    "naar": "fields",
    "hoe": "lid",
-   "lijn": 117
+   "lijn": 91
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116638,7 +116700,7 @@
    "naarBestand": "server/kern/library/reader.js",
    "naar": "access",
    "hoe": "lokaal",
-   "lijn": 118
+   "lijn": 92
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116646,7 +116708,7 @@
    "naarBestand": "server/kern/library/model.js",
    "naar": "clone",
    "hoe": "lid",
-   "lijn": 121
+   "lijn": 95
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116654,7 +116716,7 @@
    "naarBestand": "server/kern/library/reader.js",
    "naar": "reader",
    "hoe": "lokaal",
-   "lijn": 124
+   "lijn": 98
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116662,7 +116724,7 @@
    "naarBestand": "server/kern/library/reader.js",
    "naar": "read",
    "hoe": "lokaal",
-   "lijn": 124
+   "lijn": 98
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116670,15 +116732,15 @@
    "naarBestand": "server/kern/library/reader.js",
    "naar": "shelf",
    "hoe": "lokaal",
-   "lijn": 125
+   "lijn": 99
   },
   {
    "vanBestand": "server/kern/library/reader.js",
    "van": "query",
-   "naarBestand": "server/kern/library/reader.js",
-   "naar": "verify",
-   "hoe": "lokaal",
-   "lijn": 129
+   "naarBestand": "server/kern/library/reader-state.js",
+   "naar": "verifyReaderJournal",
+   "hoe": "ingevoerd",
+   "lijn": 103
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116686,7 +116748,7 @@
    "naarBestand": "server/kern/library/model.js",
    "naar": "text",
    "hoe": "lid",
-   "lijn": 133
+   "lijn": 107
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116694,7 +116756,7 @@
    "naarBestand": "server/kern/library/model.js",
    "naar": "fail",
    "hoe": "lid",
-   "lijn": 148
+   "lijn": 122
   },
   {
    "vanBestand": "server/kern/library/reader.js",
@@ -116702,7 +116764,7 @@
    "naarBestand": "server/kern/library/reader.js",
    "naar": "failure",
    "hoe": "lokaal",
-   "lijn": 149
+   "lijn": 123
   },
   {
    "vanBestand": "server/kern/library/rights.js",
@@ -116810,7 +116872,7 @@
   },
   {
    "vanBestand": "server/kern/library/studio.js",
-   "van": "command",
+   "van": "studioCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "fail",
    "hoe": "lid",
@@ -116818,7 +116880,7 @@
   },
   {
    "vanBestand": "server/kern/library/studio.js",
-   "van": "command",
+   "van": "studioCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "fields",
    "hoe": "lid",
@@ -116826,7 +116888,7 @@
   },
   {
    "vanBestand": "server/kern/library/studio.js",
-   "van": "command",
+   "van": "studioCommand",
    "naarBestand": "server/kern/library/policy.js",
    "naar": "editor",
    "hoe": "lid",
@@ -116834,7 +116896,7 @@
   },
   {
    "vanBestand": "server/kern/library/studio.js",
-   "van": "command",
+   "van": "studioCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "strings",
    "hoe": "lid",
@@ -116842,7 +116904,7 @@
   },
   {
    "vanBestand": "server/kern/library/studio.js",
-   "van": "command",
+   "van": "studioCommand",
    "naarBestand": "server/kern/library/model.js",
    "naar": "clone",
    "hoe": "lid",
@@ -119258,15 +119320,15 @@
   },
   {
    "vanBestand": "server/kern/living-world/loop-delivery.js",
-   "van": "deliveryStatuses",
+   "van": "livingWorldDeliveryStatuses",
    "naarBestand": "server/kern/living-world/loop-delivery.js",
-   "naar": "deliveryStatus",
+   "naar": "livingWorldDeliveryStatus",
    "hoe": "lokaal",
    "lijn": 47
   },
   {
    "vanBestand": "server/kern/living-world/loop-source.js",
-   "van": "learningEligibility",
+   "van": "issueLivingWorldEligibility",
    "naarBestand": "server/kern/loop-fabric/learning-eligibility.js",
    "naar": "issue",
    "hoe": "lid",
@@ -119276,7 +119338,7 @@
    "vanBestand": "server/kern/living-world/loop-source.js",
    "van": "observationRecord",
    "naarBestand": "server/kern/living-world/loop-source.js",
-   "naar": "learningEligibility",
+   "naar": "issueLivingWorldEligibility",
    "hoe": "lokaal",
    "lijn": 24
   },
@@ -119290,7 +119352,7 @@
   },
   {
    "vanBestand": "server/kern/living-world/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveLivingWorldObservation",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "objectRef",
    "hoe": "lid",
@@ -119298,7 +119360,7 @@
   },
   {
    "vanBestand": "server/kern/living-world/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveLivingWorldObservation",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fail",
    "hoe": "lid",
@@ -119306,7 +119368,7 @@
   },
   {
    "vanBestand": "server/kern/living-world/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveLivingWorldObservation",
    "naarBestand": "server/kern/living-world/loop-source.js",
    "naar": "observationRecord",
    "hoe": "lokaal",
@@ -119314,7 +119376,7 @@
   },
   {
    "vanBestand": "server/kern/living-world/loop-source.js",
-   "van": "resolveObservation",
+   "van": "resolveLivingWorldObservation",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "error",
    "hoe": "lid",
@@ -119340,7 +119402,7 @@
    "vanBestand": "server/kern/living-world/loop-source.js",
    "van": "evaluateEligibility",
    "naarBestand": "server/kern/living-world/loop-source.js",
-   "naar": "learningEligibility",
+   "naar": "issueLivingWorldEligibility",
    "hoe": "lokaal",
    "lijn": 62
   },
@@ -119362,7 +119424,7 @@
   },
   {
    "vanBestand": "server/kern/living-world/loop-source.js",
-   "van": "protocolEvents",
+   "van": "livingWorldProtocolEvents",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "hash",
    "hoe": "lid",
@@ -119370,7 +119432,7 @@
   },
   {
    "vanBestand": "server/kern/living-world/loop-source.js",
-   "van": "protocolEvents",
+   "van": "livingWorldProtocolEvents",
    "naarBestand": "server/kern/living-world/model.js",
    "naar": "ref",
    "hoe": "lid",
@@ -119378,7 +119440,7 @@
   },
   {
    "vanBestand": "server/kern/living-world/loop-source.js",
-   "van": "protocolEvents",
+   "van": "livingWorldProtocolEvents",
    "naarBestand": "server/kern/living-world/loop-source.js",
    "naar": "observationRecord",
    "hoe": "lokaal",
@@ -123362,7 +123424,7 @@
   },
   {
    "vanBestand": "server/kern/loop-fabric/model.js",
-   "van": "append",
+   "van": "appendFabricEvent",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "hash",
    "hoe": "lid",
@@ -123370,7 +123432,7 @@
   },
   {
    "vanBestand": "server/kern/loop-fabric/model.js",
-   "van": "verify",
+   "van": "verifyFabricJournal",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "hash",
    "hoe": "lid",
@@ -123954,7 +124016,7 @@
   },
   {
    "vanBestand": "server/kern/loop-fabric/service-receipt.js",
-   "van": "verify",
+   "van": "verifyServiceReceipt",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "clone",
    "hoe": "lid",
@@ -174506,7 +174568,7 @@
   },
   {
    "vanBestand": "server/kern/service/loop-source-delivery.js",
-   "van": "deliveryStatus",
+   "van": "serviceDeliveryStatus",
    "naarBestand": "server/kern/loop-fabric/delivery.js",
    "naar": "summary",
    "hoe": "lid",
@@ -174514,7 +174576,7 @@
   },
   {
    "vanBestand": "server/kern/service/loop-source-delivery.js",
-   "van": "deliveryStatuses",
+   "van": "serviceDeliveryStatuses",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "hash",
    "hoe": "lid",
@@ -174522,31 +174584,47 @@
   },
   {
    "vanBestand": "server/kern/service/loop-source-delivery.js",
-   "van": "deliveryStatuses",
+   "van": "serviceDeliveryStatuses",
    "naarBestand": "server/kern/service/loop-source-delivery.js",
-   "naar": "deliveryStatus",
+   "naar": "serviceDeliveryStatus",
    "hoe": "lokaal",
    "lijn": 42
   },
   {
-   "vanBestand": "server/kern/service/loop-source.js",
+   "vanBestand": "server/kern/service/loop-source-model.js",
    "van": "state",
-   "naarBestand": "server/kern/service/loop-source.js",
+   "naarBestand": "server/kern/service/loop-source-model.js",
    "naar": "empty",
    "hoe": "lokaal",
-   "lijn": 14
+   "lijn": 8
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source-model.js",
+   "van": "appendServiceEvent",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "hash",
+   "hoe": "lid",
+   "lijn": 13
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source-model.js",
+   "van": "issueServiceEligibility",
+   "naarBestand": "server/kern/loop-fabric/learning-eligibility.js",
+   "naar": "issue",
+   "hoe": "lid",
+   "lijn": 16
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source-model.js",
+   "van": "publicObservation",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "clone",
+   "hoe": "lid",
+   "lijn": 22
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
-   "van": "read",
-   "naarBestand": "server/kern/service/loop-source.js",
-   "naar": "state",
-   "hoe": "lokaal",
-   "lijn": 14
-  },
-  {
-   "vanBestand": "server/kern/service/loop-source.js",
-   "van": "tx",
+   "van": "(module)",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fail",
    "hoe": "lid",
@@ -174554,11 +174632,27 @@
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
-   "van": "tx",
-   "naarBestand": "server/kern/service/loop-source.js",
+   "van": "read",
+   "naarBestand": "server/kern/service/loop-source-model.js",
    "naar": "state",
-   "hoe": "lokaal",
+   "hoe": "uitFabriek",
    "lijn": 17
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source.js",
+   "van": "tx",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "fail",
+   "hoe": "lid",
+   "lijn": 19
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source.js",
+   "van": "tx",
+   "naarBestand": "server/kern/service/loop-source-model.js",
+   "naar": "state",
+   "hoe": "uitFabriek",
+   "lijn": 20
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174566,31 +174660,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fail",
    "hoe": "lid",
-   "lijn": 22
-  },
-  {
-   "vanBestand": "server/kern/service/loop-source.js",
-   "van": "append",
-   "naarBestand": "server/kern/loop-fabric/protocol.js",
-   "naar": "hash",
-   "hoe": "lid",
-   "lijn": 28
-  },
-  {
-   "vanBestand": "server/kern/service/loop-source.js",
-   "van": "issued",
-   "naarBestand": "server/kern/loop-fabric/learning-eligibility.js",
-   "naar": "issue",
-   "hoe": "lid",
-   "lijn": 30
-  },
-  {
-   "vanBestand": "server/kern/service/loop-source.js",
-   "van": "publicObservation",
-   "naarBestand": "server/kern/loop-fabric/protocol.js",
-   "naar": "clone",
-   "hoe": "lid",
-   "lijn": 36
+   "lijn": 23
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174598,7 +174668,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fields",
    "hoe": "lid",
-   "lijn": 39
+   "lijn": 30
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174606,7 +174676,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "text",
    "hoe": "lid",
-   "lijn": 40
+   "lijn": 31
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174614,7 +174684,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "operationId",
    "hoe": "lid",
-   "lijn": 40
+   "lijn": 31
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174622,7 +174692,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fail",
    "hoe": "lid",
-   "lijn": 41
+   "lijn": 32
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174630,7 +174700,7 @@
    "naarBestand": "server/kern/service/loop-source.js",
    "naar": "authority",
    "hoe": "lokaal",
-   "lijn": 42
+   "lijn": 33
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174638,7 +174708,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "clone",
    "hoe": "lid",
-   "lijn": 44
+   "lijn": 35
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174646,7 +174716,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "objectRef",
    "hoe": "lid",
-   "lijn": 46
+   "lijn": 37
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174654,7 +174724,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "hash",
    "hoe": "lid",
-   "lijn": 49
+   "lijn": 40
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174662,15 +174732,15 @@
    "naarBestand": "server/kern/service/loop-source.js",
    "naar": "tx",
    "hoe": "lokaal",
-   "lijn": 50
+   "lijn": 41
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
    "van": "reviewCase",
-   "naarBestand": "server/kern/service/loop-source.js",
+   "naarBestand": "server/kern/service/loop-source-model.js",
    "naar": "processRef",
-   "hoe": "lokaal",
-   "lijn": 53
+   "hoe": "uitFabriek",
+   "lijn": 44
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174678,31 +174748,31 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "instant",
    "hoe": "lid",
-   "lijn": 57
+   "lijn": 48
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
    "van": "reviewCase",
-   "naarBestand": "server/kern/service/loop-source.js",
+   "naarBestand": "server/kern/service/loop-source-model.js",
    "naar": "addDays",
-   "hoe": "lokaal",
-   "lijn": 60
+   "hoe": "uitFabriek",
+   "lijn": 51
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
    "van": "reviewCase",
-   "naarBestand": "server/kern/service/loop-source.js",
-   "naar": "issued",
-   "hoe": "lokaal",
-   "lijn": 61
+   "naarBestand": "server/kern/service/loop-source-model.js",
+   "naar": "issueServiceEligibility",
+   "hoe": "uitFabriek",
+   "lijn": 52
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
    "van": "reviewCase",
-   "naarBestand": "server/kern/service/loop-source.js",
-   "naar": "append",
-   "hoe": "lokaal",
-   "lijn": 65
+   "naarBestand": "server/kern/service/loop-source-model.js",
+   "naar": "appendServiceEvent",
+   "hoe": "uitFabriek",
+   "lijn": 56
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174710,7 +174780,7 @@
    "naarBestand": "server/kern/envelop.js",
    "naar": "maak",
    "hoe": "lid",
-   "lijn": 66
+   "lijn": 57
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174718,7 +174788,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "error",
    "hoe": "lid",
-   "lijn": 70
+   "lijn": 61
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174726,7 +174796,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fields",
    "hoe": "lid",
-   "lijn": 74
+   "lijn": 65
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174734,7 +174804,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "text",
    "hoe": "lid",
-   "lijn": 75
+   "lijn": 66
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174742,7 +174812,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "operationId",
    "hoe": "lid",
-   "lijn": 75
+   "lijn": 66
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174750,7 +174820,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "objectRef",
    "hoe": "lid",
-   "lijn": 75
+   "lijn": 66
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174758,7 +174828,7 @@
    "naarBestand": "server/kern/service/loop-source.js",
    "naar": "authority",
    "hoe": "lokaal",
-   "lijn": 76
+   "lijn": 67
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174766,7 +174836,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "hash",
    "hoe": "lid",
-   "lijn": 76
+   "lijn": 67
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174774,7 +174844,7 @@
    "naarBestand": "server/kern/service/loop-source.js",
    "naar": "tx",
    "hoe": "lokaal",
-   "lijn": 77
+   "lijn": 68
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174782,7 +174852,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "fail",
    "hoe": "lid",
-   "lijn": 77
+   "lijn": 68
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174790,7 +174860,7 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "clone",
    "hoe": "lid",
-   "lijn": 78
+   "lijn": 69
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174798,23 +174868,23 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "refKey",
    "hoe": "lid",
-   "lijn": 79
+   "lijn": 70
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
    "van": "withdraw",
-   "naarBestand": "server/kern/service/loop-source.js",
+   "naarBestand": "server/kern/service/loop-source-model.js",
    "naar": "publicObservation",
-   "hoe": "lokaal",
-   "lijn": 80
+   "hoe": "uitFabriek",
+   "lijn": 71
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
    "van": "withdraw",
-   "naarBestand": "server/kern/service/loop-source.js",
-   "naar": "append",
-   "hoe": "lokaal",
-   "lijn": 82
+   "naarBestand": "server/kern/service/loop-source-model.js",
+   "naar": "appendServiceEvent",
+   "hoe": "uitFabriek",
+   "lijn": 73
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174822,7 +174892,7 @@
    "naarBestand": "server/kern/envelop.js",
    "naar": "maak",
    "hoe": "lid",
-   "lijn": 83
+   "lijn": 74
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174830,35 +174900,99 @@
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "error",
    "hoe": "lid",
+   "lijn": 77
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source.js",
+   "van": "resolveServiceObservation",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "objectRef",
+   "hoe": "lid",
+   "lijn": 80
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source.js",
+   "van": "resolveServiceObservation",
+   "naarBestand": "server/kern/service/loop-source.js",
+   "naar": "read",
+   "hoe": "lokaal",
+   "lijn": 80
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source.js",
+   "van": "resolveServiceObservation",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "fail",
+   "hoe": "lid",
+   "lijn": 80
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source.js",
+   "van": "resolveServiceObservation",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "refKey",
+   "hoe": "lid",
+   "lijn": 81
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source.js",
+   "van": "resolveServiceObservation",
+   "naarBestand": "server/kern/service/loop-source-model.js",
+   "naar": "publicObservation",
+   "hoe": "uitFabriek",
+   "lijn": 83
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source.js",
+   "van": "resolveServiceObservation",
+   "naarBestand": "server/kern/loop-fabric/protocol.js",
+   "naar": "error",
+   "hoe": "lid",
    "lijn": 86
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
-   "van": "resolveObservation",
-   "naarBestand": "server/kern/loop-fabric/protocol.js",
-   "naar": "objectRef",
+   "van": "evaluateServiceEligibility",
+   "naarBestand": "server/kern/service/loop-source.js",
+   "naar": "resolveServiceObservation",
+   "hoe": "lokaal",
+   "lijn": 88
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source.js",
+   "van": "evaluateServiceEligibility",
+   "naarBestand": "server/kern/loop-fabric/learning-eligibility.js",
+   "naar": "evaluate",
    "hoe": "lid",
    "lijn": 89
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
-   "van": "resolveObservation",
+   "van": "evaluateServiceEligibility",
+   "naarBestand": "server/kern/service/loop-source-model.js",
+   "naar": "issueServiceEligibility",
+   "hoe": "uitFabriek",
+   "lijn": 89
+  },
+  {
+   "vanBestand": "server/kern/service/loop-source.js",
+   "van": "serviceProtocolEvents",
    "naarBestand": "server/kern/service/loop-source.js",
    "naar": "read",
    "hoe": "lokaal",
-   "lijn": 89
+   "lijn": 90
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
-   "van": "resolveObservation",
+   "van": "serviceProtocolEvents",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
-   "naar": "fail",
+   "naar": "hash",
    "hoe": "lid",
-   "lijn": 89
+   "lijn": 90
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
-   "van": "resolveObservation",
+   "van": "serviceProtocolEvents",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "refKey",
    "hoe": "lid",
@@ -174866,83 +175000,19 @@
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
-   "van": "resolveObservation",
-   "naarBestand": "server/kern/service/loop-source.js",
+   "van": "serviceProtocolEvents",
+   "naarBestand": "server/kern/service/loop-source-model.js",
    "naar": "publicObservation",
-   "hoe": "lokaal",
-   "lijn": 92
+   "hoe": "uitFabriek",
+   "lijn": 91
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
-   "van": "resolveObservation",
-   "naarBestand": "server/kern/loop-fabric/protocol.js",
-   "naar": "error",
-   "hoe": "lid",
-   "lijn": 95
-  },
-  {
-   "vanBestand": "server/kern/service/loop-source.js",
-   "van": "learningEligibility",
-   "naarBestand": "server/kern/service/loop-source.js",
-   "naar": "resolveObservation",
-   "hoe": "lokaal",
-   "lijn": 97
-  },
-  {
-   "vanBestand": "server/kern/service/loop-source.js",
-   "van": "learningEligibility",
-   "naarBestand": "server/kern/loop-fabric/learning-eligibility.js",
-   "naar": "evaluate",
-   "hoe": "lid",
-   "lijn": 98
-  },
-  {
-   "vanBestand": "server/kern/service/loop-source.js",
-   "van": "learningEligibility",
-   "naarBestand": "server/kern/service/loop-source.js",
-   "naar": "issued",
-   "hoe": "lokaal",
-   "lijn": 98
-  },
-  {
-   "vanBestand": "server/kern/service/loop-source.js",
-   "van": "protocolEvents",
-   "naarBestand": "server/kern/service/loop-source.js",
-   "naar": "read",
-   "hoe": "lokaal",
-   "lijn": 99
-  },
-  {
-   "vanBestand": "server/kern/service/loop-source.js",
-   "van": "protocolEvents",
-   "naarBestand": "server/kern/loop-fabric/protocol.js",
-   "naar": "hash",
-   "hoe": "lid",
-   "lijn": 99
-  },
-  {
-   "vanBestand": "server/kern/service/loop-source.js",
-   "van": "protocolEvents",
-   "naarBestand": "server/kern/loop-fabric/protocol.js",
-   "naar": "refKey",
-   "hoe": "lid",
-   "lijn": 99
-  },
-  {
-   "vanBestand": "server/kern/service/loop-source.js",
-   "van": "protocolEvents",
-   "naarBestand": "server/kern/service/loop-source.js",
-   "naar": "publicObservation",
-   "hoe": "lokaal",
-   "lijn": 100
-  },
-  {
-   "vanBestand": "server/kern/service/loop-source.js",
-   "van": "protocolEvents",
+   "van": "serviceProtocolEvents",
    "naarBestand": "server/kern/loop-fabric/protocol.js",
    "naar": "clone",
    "hoe": "lid",
-   "lijn": 101
+   "lijn": 92
   },
   {
    "vanBestand": "server/kern/service/loop-source.js",
@@ -174950,7 +175020,7 @@
    "naarBestand": "server/kern/service/loop-source-delivery.js",
    "naar": null,
    "hoe": "moduleAlsFunctie",
-   "lijn": 102
+   "lijn": 93
   },
   {
    "vanBestand": "server/kern/service/loop.js",
@@ -202706,11 +202776,27 @@
   },
   {
    "vanBestand": "server/kern/zaakdoos/proxy.js",
+   "van": "leesProxyBody",
+   "naarBestand": "server/web/body.js",
+   "naar": "heeftBody",
+   "hoe": "lid",
+   "lijn": 24
+  },
+  {
+   "vanBestand": "server/kern/zaakdoos/proxy.js",
+   "van": "leesProxyBody",
+   "naarBestand": "server/web/body.js",
+   "naar": "leesBody",
+   "hoe": "lid",
+   "lijn": 27
+  },
+  {
+   "vanBestand": "server/kern/zaakdoos/proxy.js",
    "van": "kasBewaar",
    "naarBestand": "server/kern/zaakdoos/proxy.js",
    "naar": "kasNaam",
    "hoe": "lokaal",
-   "lijn": 21
+   "lijn": 46
   },
   {
    "vanBestand": "server/kern/zaakdoos/proxy.js",
@@ -202718,7 +202804,15 @@
    "naarBestand": "server/kern/zaakdoos/proxy.js",
    "naar": "kasNaam",
    "hoe": "lokaal",
-   "lijn": 34
+   "lijn": 59
+  },
+  {
+   "vanBestand": "server/kern/zaakdoos/proxy.js",
+   "van": "proxy",
+   "naarBestand": "server/kern/zaakdoos/proxy.js",
+   "naar": "leesProxyBody",
+   "hoe": "lokaal",
+   "lijn": 87
   },
   {
    "vanBestand": "server/kern/zaakdoos/proxy.js",
@@ -202726,7 +202820,7 @@
    "naarBestand": "server/kern/zaakdoos/proxy.js",
    "naar": "kasBewaar",
    "hoe": "lokaal",
-   "lijn": 87
+   "lijn": 115
   },
   {
    "vanBestand": "server/kern/zaakdoos/sleutels-schaduw.js",
@@ -205190,7 +205284,15 @@
    "naarBestand": "server/lib/mutatiecontracten-gezinsdeur.js",
    "naar": "STAND",
    "hoe": "lokaal",
-   "lijn": 26
+   "lijn": 34
+  },
+  {
+   "vanBestand": "server/lib/mutatiecontracten-gezinstoken.js",
+   "van": "(module)",
+   "naarBestand": "server/lib/mutatiecontracten-gezinstoken.js",
+   "naar": "EENMALIG",
+   "hoe": "lokaal",
+   "lijn": 21
   },
   {
    "vanBestand": "server/lib/mutatiecontracten-hardening-checkpoint.js",
@@ -205278,7 +205380,7 @@
    "naarBestand": "server/lib/mutatiecontracten-lesfamilie.js",
    "naar": "EENMALIG",
    "hoe": "lokaal",
-   "lijn": 31
+   "lijn": 30
   },
   {
    "vanBestand": "server/lib/mutatiecontracten-lesfamilie.js",
@@ -205286,7 +205388,7 @@
    "naarBestand": "server/lib/mutatiecontracten-lesfamilie.js",
    "naar": "STAND",
    "hoe": "lokaal",
-   "lijn": 39
+   "lijn": 43
   },
   {
    "vanBestand": "server/lib/mutatiecontracten-lezers.js",
@@ -208770,11 +208872,27 @@
   },
   {
    "vanBestand": "server/middleware/remmen.js",
+   "van": "isInlogPad",
+   "naarBestand": "server/web/routeindex.js",
+   "naar": "vastePaden",
+   "hoe": "ingevoerd",
+   "lijn": 130
+  },
+  {
+   "vanBestand": "server/middleware/remmen.js",
+   "van": "inlogpauzePoort",
+   "naarBestand": "server/middleware/remmen.js",
+   "naar": "isInlogPad",
+   "hoe": "lokaal",
+   "lijn": 134
+  },
+  {
+   "vanBestand": "server/middleware/remmen.js",
    "van": "inlogpauzePoort",
    "naarBestand": "server/techniek.js",
    "naar": "zekeringGesprongen",
    "hoe": "ingevoerd",
-   "lijn": 113
+   "lijn": 136
   },
   {
    "vanBestand": "server/middleware/schorspoort.js",
@@ -209182,7 +209300,7 @@
    "naarBestand": "server/migraties/lijst.js",
    "naar": "voegKolomToe",
    "hoe": "lokaal",
-   "lijn": 91
+   "lijn": 92
   },
   {
    "vanBestand": "server/mollie.js",
@@ -211345,28 +211463,36 @@
    "lijn": 47
   },
   {
-   "vanBestand": "server/opzet/verzoekframe.js",
+   "vanBestand": "server/opzet/verzoekframe-winkel.js",
    "van": "nieuw",
    "naarBestand": "server/lib/correlatie.js",
    "naar": "nieuw",
    "hoe": "lid",
-   "lijn": 52
+   "lijn": 17
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
    "van": "open",
-   "naarBestand": "server/opzet/verzoekframe.js",
+   "naarBestand": "server/opzet/verzoekframe-winkel.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
+   "lijn": 47
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "open",
+   "naarBestand": "server/opzet/verzoekframe-winkel.js",
    "naar": "nieuw",
-   "hoe": "lokaal",
-   "lijn": 59
+   "hoe": "ingevoerd",
+   "lijn": 47
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
    "van": "middleware",
-   "naarBestand": "server/opzet/verzoekframe.js",
+   "naarBestand": "server/opzet/verzoekframe-winkel.js",
    "naar": "nieuw",
-   "hoe": "lokaal",
-   "lijn": 66
+   "hoe": "ingevoerd",
+   "lijn": 54
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211374,7 +211500,23 @@
    "naarBestand": "server/kern/agentteken.js",
    "naar": "oorzaakVan",
    "hoe": "ingevoerd",
-   "lijn": 66
+   "lijn": 54
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "middleware",
+   "naarBestand": "server/kern/bewijsvlak/context.js",
+   "naar": "maak",
+   "hoe": "lid",
+   "lijn": 57
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "middleware",
+   "naarBestand": "server/kern/bewijsvlak/context.js",
+   "naar": "ketenVan",
+   "hoe": "lid",
+   "lijn": 57
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211382,7 +211524,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "sluit",
    "hoe": "lokaal",
-   "lijn": 69
+   "lijn": 61
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211390,7 +211532,47 @@
    "naarBestand": "server/lib/antwoord-einde.js",
    "naar": "naAntwoord",
    "hoe": "ingevoerd",
-   "lijn": 70
+   "lijn": 62
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "middleware",
+   "naarBestand": "server/opzet/verzoekframe-winkel.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
+   "lijn": 63
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "middleware",
+   "naarBestand": "server/kern/bewijsvlak/context.js",
+   "naar": "inContext",
+   "hoe": "lid",
+   "lijn": 63
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "hervat",
+   "naarBestand": "server/opzet/verzoekframe-winkel.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
+   "lijn": 72
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "hervat",
+   "naarBestand": "server/kern/bewijsvlak/context.js",
+   "naar": "huidige",
+   "hoe": "lid",
+   "lijn": 72
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "hervat",
+   "naarBestand": "server/kern/bewijsvlak/context.js",
+   "naar": "inContext",
+   "hoe": "lid",
+   "lijn": 73
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211398,7 +211580,15 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "fout",
    "hoe": "lokaal",
-   "lijn": 85
+   "lijn": 78
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "identificeer",
+   "naarBestand": "server/opzet/verzoekframe-winkel.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
+   "lijn": 83
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211406,7 +211596,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "schrijfbaar",
    "hoe": "lokaal",
-   "lijn": 92
+   "lijn": 85
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211414,7 +211604,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "fout",
    "hoe": "lokaal",
-   "lijn": 93
+   "lijn": 86
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211422,7 +211612,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "codenaamVan",
    "hoe": "lokaal",
-   "lijn": 95
+   "lijn": 88
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211430,7 +211620,15 @@
    "naarBestand": "server/kern/envelop.js",
    "naar": "keurActor",
    "hoe": "lid",
-   "lijn": 106
+   "lijn": 99
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "uitEnvelop",
+   "naarBestand": "server/opzet/verzoekframe-winkel.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
+   "lijn": 113
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211438,6 +211636,14 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "identificeer",
    "hoe": "lokaal",
+   "lijn": 121
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "zetDrager",
+   "naarBestand": "server/opzet/verzoekframe-winkel.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
    "lijn": 128
   },
   {
@@ -211446,7 +211652,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "schrijfbaar",
    "hoe": "lokaal",
-   "lijn": 137
+   "lijn": 130
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211454,7 +211660,7 @@
    "naarBestand": "server/kern/kosten/haak.js",
    "naar": "zetWaarnemer",
    "hoe": "lid",
-   "lijn": 142
+   "lijn": 135
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211462,7 +211668,15 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "zetDrager",
    "hoe": "lokaal",
-   "lijn": 142
+   "lijn": 135
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "achtergrond",
+   "naarBestand": "server/opzet/verzoekframe-winkel.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
+   "lijn": 145
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211470,15 +211684,15 @@
    "naarBestand": "server/lib/losvanverzoek.js",
    "naar": "losVanVerzoek",
    "hoe": "ingevoerd",
-   "lijn": 154
+   "lijn": 147
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
    "van": "achtergrond",
-   "naarBestand": "server/opzet/verzoekframe.js",
+   "naarBestand": "server/opzet/verzoekframe-winkel.js",
    "naar": "nieuw",
-   "hoe": "lokaal",
-   "lijn": 154
+   "hoe": "ingevoerd",
+   "lijn": 147
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211486,7 +211700,7 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "identificeer",
    "hoe": "lokaal",
-   "lijn": 155
+   "lijn": 148
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211494,7 +211708,7 @@
    "naarBestand": "server/kern/kosten/haak.js",
    "naar": "binnen",
    "hoe": "lid",
-   "lijn": 156
+   "lijn": 149
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211502,7 +211716,15 @@
    "naarBestand": "server/opzet/verzoekframe.js",
    "naar": "achtergrond",
    "hoe": "lokaal",
-   "lijn": 160
+   "lijn": 153
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "voorBus",
+   "naarBestand": "server/opzet/verzoekframe-winkel.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
+   "lijn": 162
   },
   {
    "vanBestand": "server/opzet/verzoekframe.js",
@@ -211510,7 +211732,15 @@
    "naarBestand": "server/kern/envelop.js",
    "naar": "zetFrameBron",
    "hoe": "lid",
-   "lijn": 172
+   "lijn": 169
+  },
+  {
+   "vanBestand": "server/opzet/verzoekframe.js",
+   "van": "huidig",
+   "naarBestand": "server/opzet/verzoekframe-winkel.js",
+   "naar": null,
+   "hoe": "lidOpInvoer",
+   "lijn": 173
   },
   {
    "vanBestand": "server/opzet/verzoekketen.js",
@@ -256561,6 +256791,54 @@
    "lijn": 82
   },
   {
+   "vanBestand": "server/routes/supplier/pda/posities-inlog.js",
+   "van": "land",
+   "naarBestand": "server/server.js",
+   "naar": null,
+   "hoe": "viaKern",
+   "lijn": 65
+  },
+  {
+   "vanBestand": "server/routes/supplier/pda/posities-inlog.js",
+   "van": "tweedeStap",
+   "naarBestand": "server/routes/supplier/pda/posities-inlog.js",
+   "naar": "land",
+   "hoe": "lokaal",
+   "lijn": 83
+  },
+  {
+   "vanBestand": "server/routes/supplier/pda/posities-inlog.js",
+   "van": "route:POST /api/supplier/mijn/login",
+   "naarBestand": "server/routes/supplier/pda/posities-inlog.js",
+   "naar": "tweedeStap",
+   "hoe": "lokaal",
+   "lijn": 87
+  },
+  {
+   "vanBestand": "server/routes/supplier/pda/posities-inlog.js",
+   "van": "route:POST /api/supplier/mijn/login",
+   "naarBestand": "server/server.js",
+   "naar": "tooManyTries",
+   "hoe": "viaKern",
+   "lijn": 89
+  },
+  {
+   "vanBestand": "server/routes/supplier/pda/posities-inlog.js",
+   "van": "route:POST /api/supplier/mijn/login",
+   "naarBestand": "server/server.js",
+   "naar": "noteFailedTry",
+   "hoe": "viaKern",
+   "lijn": 93
+  },
+  {
+   "vanBestand": "server/routes/supplier/pda/posities-inlog.js",
+   "van": "route:POST /api/supplier/mijn/login",
+   "naarBestand": "server/routes/supplier/pda/posities-inlog.js",
+   "naar": "land",
+   "hoe": "lokaal",
+   "lijn": 100
+  },
+  {
    "vanBestand": "server/routes/supplier/pda/posities.js",
    "van": "wisselDoelen",
    "naarBestand": "server/routes/supplier/pda/posities.js",
@@ -256642,51 +256920,11 @@
   },
   {
    "vanBestand": "server/routes/supplier/pda/posities.js",
-   "van": "route:POST /api/supplier/mijn/login",
-   "naarBestand": "server/server.js",
-   "naar": "tooManyTries",
-   "hoe": "viaKern",
-   "lijn": 108
-  },
-  {
-   "vanBestand": "server/routes/supplier/pda/posities.js",
-   "van": "route:POST /api/supplier/mijn/login",
-   "naarBestand": "server/server.js",
-   "naar": "noteFailedTry",
-   "hoe": "viaKern",
-   "lijn": 112
-  },
-  {
-   "vanBestand": "server/routes/supplier/pda/posities.js",
-   "van": "route:POST /api/supplier/mijn/login",
-   "naarBestand": "server/routes/supplier/pda/posities.js",
-   "naar": "mijnPosities",
-   "hoe": "lokaal",
-   "lijn": 116
-  },
-  {
-   "vanBestand": "server/routes/supplier/pda/posities.js",
-   "van": "route:POST /api/supplier/mijn/login",
-   "naarBestand": "server/routes/supplier/pda/posities.js",
-   "naar": "posantwoord",
-   "hoe": "lokaal",
-   "lijn": 128
-  },
-  {
-   "vanBestand": "server/routes/supplier/pda/posities.js",
-   "van": "route:POST /api/supplier/mijn/login",
-   "naarBestand": "server/server.js",
-   "naar": null,
-   "hoe": "viaKern",
-   "lijn": 130
-  },
-  {
-   "vanBestand": "server/routes/supplier/pda/posities.js",
    "van": "route:POST /api/supplier/mijn/opties",
    "naarBestand": "server/routes/supplier/pda/posities.js",
    "naar": "mijnPosities",
    "hoe": "lokaal",
-   "lijn": 137
+   "lijn": 115
   },
   {
    "vanBestand": "server/routes/supplier/pda/posities.js",
@@ -256694,7 +256932,7 @@
    "naarBestand": "server/routes/supplier/pda/posities.js",
    "naar": "mijnPosities",
    "hoe": "lokaal",
-   "lijn": 143
+   "lijn": 121
   },
   {
    "vanBestand": "server/routes/supplier/pda/posities.js",
@@ -256702,7 +256940,7 @@
    "naarBestand": "server/routes/supplier/pda/posities.js",
    "naar": "posantwoord",
    "hoe": "lokaal",
-   "lijn": 147
+   "lijn": 125
   },
   {
    "vanBestand": "server/routes/supplier/pda/posities.js",
@@ -256710,7 +256948,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 149
+   "lijn": 127
   },
   {
    "vanBestand": "server/routes/supplier/pda/vloer-missies.js",
@@ -272382,7 +272620,7 @@
    "naarBestand": "server/server.js",
    "naar": "migreerLokaleToegang",
    "hoe": "lokaal",
-   "lijn": 2344
+   "lijn": 2343
   },
   {
    "vanBestand": "server/sms-sandbox.js",
@@ -275182,7 +275420,7 @@
    "naarBestand": "server/web/body.js",
    "naar": "limietBytes",
    "hoe": "lokaal",
-   "lijn": 63
+   "lijn": 79
   },
   {
    "vanBestand": "server/web/body.js",
@@ -275190,7 +275428,7 @@
    "naarBestand": "server/web/body.js",
    "naar": "heeftBody",
    "hoe": "lokaal",
-   "lijn": 66
+   "lijn": 82
   },
   {
    "vanBestand": "server/web/body.js",
@@ -275198,7 +275436,7 @@
    "naarBestand": "server/web/body.js",
    "naar": "typeMatcht",
    "hoe": "lokaal",
-   "lijn": 66
+   "lijn": 82
   },
   {
    "vanBestand": "server/web/body.js",
@@ -275206,7 +275444,7 @@
    "naarBestand": "server/web/body.js",
    "naar": "leesBody",
    "hoe": "lokaal",
-   "lijn": 67
+   "lijn": 83
   },
   {
    "vanBestand": "server/web/body.js",
@@ -275214,7 +275452,7 @@
    "naarBestand": "server/lib/rtgjson.js",
    "naar": "parse",
    "hoe": "lid",
-   "lijn": 72
+   "lijn": 88
   },
   {
    "vanBestand": "server/web/body.js",
@@ -275222,7 +275460,7 @@
    "naarBestand": "server/web/body.js",
    "naar": "limietBytes",
    "hoe": "lokaal",
-   "lijn": 92
+   "lijn": 108
   },
   {
    "vanBestand": "server/web/body.js",
@@ -275230,7 +275468,7 @@
    "naarBestand": "server/web/body.js",
    "naar": "typeMatcht",
    "hoe": "lokaal",
-   "lijn": 95
+   "lijn": 111
   },
   {
    "vanBestand": "server/web/body.js",
@@ -275238,7 +275476,7 @@
    "naarBestand": "server/web/body.js",
    "naar": "leesBody",
    "hoe": "lokaal",
-   "lijn": 96
+   "lijn": 112
   },
   {
    "vanBestand": "server/web/index.js",
@@ -275278,7 +275516,15 @@
    "naarBestand": "server/web/routeindex.js",
    "naar": "bouw",
    "hoe": "lokaal",
-   "lijn": 89
+   "lijn": 106
+  },
+  {
+   "vanBestand": "server/web/routeindex.js",
+   "van": "kandidaten",
+   "naarBestand": "server/web/routeindex.js",
+   "naar": "vastePaden",
+   "hoe": "lokaal",
+   "lijn": 116
   },
   {
    "vanBestand": "server/web/routeindex.js",
@@ -275286,7 +275532,7 @@
    "naarBestand": "server/web/routeindex.js",
    "naar": "samenvoegen",
    "hoe": "lokaal",
-   "lijn": 102
+   "lijn": 120
   },
   {
    "vanBestand": "server/web/routing.js",

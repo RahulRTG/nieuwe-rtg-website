@@ -80,6 +80,7 @@
        niet, dan is er gewoon het oude blok. */
     if (lf && window.RTGPoort && window.RTGPoort.gesprek){
       const doos = document.createElement('div');
+      doos.id = 'gateGesprek';   // de tweede stap zet hem even weg (leverancier-06a.js)
       lf.parentNode.insertBefore(doos, lf);
       lf.style.display = 'none';   // .login-form staat op display:flex, dus [hidden] alleen is niet genoeg
       window.RTGPoort.gesprek(doos, {

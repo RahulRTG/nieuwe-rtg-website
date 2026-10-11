@@ -918,13 +918,16 @@ te laten springen: een leen eindigt nog steeds doordat iemand hem teruggeeft
 (`kern/horeca/wijk-leen.js`). De PDA van de drager toont wat hij van een collega
 draagt als vaste regel met een knop om het terug te geven, en wie zijn wijk
 loslaat terwijl hij nog geleende tafels draagt, krijgt dat te horen (bewezen in
-`test/horeca-leen-dienst.test.js`). De andere helft — dat de Vloer ziet dat de
-drager al **uitgeklokt** is — is gebouwd maar staat op een eigen tak
-(`claude/golf3-10a-horeca-leen-klok`): hij leest de prikklok via `klokVan` uit
-`kern/personeel.js`, en dat maakt de horecakant een tweede domein op die naam.
-Dat verhoogt de ratel `kernGedeeld` met een, en een ratel gaat alleen omhoog
-met een besluit in NORM.json. Ook uitklokken in de personeelsapp zegt het nog
-niet, om dezelfde reden in de andere richting.
+`test/horeca-leen-dienst.test.js`). De andere helft staat er sinds eigenaarsbesluit 1A (11 oktober 2026): de Vloer
+ziet per geleende tafel of de drager er nog is, in drie standen (`ingeklokt`,
+`uitgeklokt` na het uitlenen, `niet-gemeten` -- veel zaken klokken niet), en telt
+hoeveel TAFELS er nog bij iemand staan die al uitklokte. Dat leest de prikklok
+van het personeelsdomein via `klokVan` (`kern/personeel.js`) en verder niets: het
+besluit staat in NORM.json (`kernGedeeld` 254 -> 255) met wie levert, wie leest
+en de begrenzing, en `test/horeca-klokgrens.test.js` zakt zodra de horecakant
+meer uit dat domein haalt dan `open` en `laatsteUit`. Uitklokken in de
+personeelsapp zegt het nog niet; dat is de koppeling in de andere richting en
+valt buiten dit besluit.
 
 ## De echte wauw
 

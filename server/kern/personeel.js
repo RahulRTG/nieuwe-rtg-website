@@ -16,10 +16,16 @@ function maakPersoneel({ db, accounts, afwezigOp }) {
     const nu = Date.now();
     const week = new Date(nu - 6 * 86400000).toISOString().slice(0, 10);
     const vandaag = new Date().toISOString().slice(0, 10);
-    const mijn = (db.data.klok[code] || []).filter(e => e.staffId === staffId);
+    // String aan beide kanten: een staffId komt als getal uit de sessie en als tekst uit een leen
+    const mijn = (db.data.klok[code] || []).filter(e => e && e.in && String(e.staffId) === String(staffId));
     const duur = e => (e.out ? new Date(e.out) : new Date()) - new Date(e.in);
+    const uit = mijn.filter(e => e.out).map(e => e.out).sort();
     return {
       open: !!mijn.find(e => !e.out),
+      /* de laatste uitklok, zodat de horecavloer kan zien of de drager van een
+         geleende tafel al weg is (kern/horeca/wijk-leen.js) zonder zelf in het
+         klokboek te lezen */
+      laatsteUit: uit.length ? uit[uit.length - 1] : null,
       vandaagUren: urenVan(mijn.filter(e => e.in.slice(0, 10) === vandaag).reduce((s, e) => s + duur(e), 0)),
       weekUren: urenVan(mijn.filter(e => e.in.slice(0, 10) >= week).reduce((s, e) => s + duur(e), 0))
     };

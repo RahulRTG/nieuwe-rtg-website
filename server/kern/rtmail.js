@@ -46,18 +46,10 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
   function bezorg({ van, naar, onderwerp, tekst, soort, bron, antwoordOp } = {}, bewaar = save) {
     const opgegeven = normAdres(naar);
     if (!opgegeven) return { error: 'Geen geldig ontvang-adres.' };
-    /* EEN ALIAS IS EEN TWEEDE ADRES VOOR HETZELFDE POSTVAK. De oplosser (gezet
-       door opzet/postlaag.js) zegt naar welk postvak hij wijst; zonder oplosser,
-       of als hij niets weet, gaat het bericht naar het opgegeven adres zoals
-       altijd. Het opgegeven adres blijft bewaard in `viaAlias`, zodat de
-       ontvanger ziet langs welke deur het binnenkwam. */
-    let naarA = opgegeven, viaAlias = null;
-    if (adresOplosser) {
-      let doel = null;
-      try { doel = adresOplosser(opgegeven); } catch (e) { console.warn('[rtmail] aliasoplossing mislukt:', e && e.message); }
-      const echt = doel ? normAdres(doel) : '';
-      if (echt && !zelfdeBus(echt, opgegeven)) { naarA = echt; viaAlias = opgegeven; }
-    }
+    // alias -> postvak (rtmail-inst.js aliasDoel)
+    let naarA = opgegeven, viaAlias = null, doel = null;
+    try { doel = adresOplosser ? normAdres(adresOplosser(opgegeven) || '') : ''; } catch (e) { console.warn('[rtmail] alias', e.message); }
+    if (doel && !zelfdeBus(doel, opgegeven)) { naarA = doel; viaAlias = opgegeven; }
     const vanA = normAdres(van) || SYSTEEM;
     const b = schoonBron(bron, vanA);
     const tekstK = kap(tekst, 8000);

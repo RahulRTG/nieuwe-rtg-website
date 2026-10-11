@@ -21,7 +21,7 @@
   var vanLokaal=function(v){ if(!v) return null; var t=new Date(v); return isNaN(t)?v:t.toISOString(); };
   var lang=function(iso){ try{ return new Date(iso).toLocaleString(d.documentElement.lang||undefined,{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } };
 
-  function zeg(id,tekst,fout){ var el=d.getElementById(id); if(!el) return; el.textContent=tekst; el.className=fout?'fout':'noot'; el.style.textAlign='left'; el.hidden=!tekst; }
+  function zeg(id,tekst,fout){ var el=d.getElementById(id); if(!el) return; el.textContent=tekst; el.className=fout?'fout':'noot inst-noot'; el.hidden=!tekst; }
 
   async function open(melding){
     mail=w.RTGMail; if(!mail) return;
@@ -37,44 +37,44 @@
       '<button class="terug" id="terug">&larr; alle berichten</button>'+
       '<div class="kaart" id="rtmInstellingen"><h2>Instellingen van je postvak</h2>'+
       '<div class="meta">'+esc(eigen)+'</div>'+
-      (melding?'<div class="noot" style="text-align:left;margin:0 0 .6rem;" role="status">'+esc(melding)+'</div>':'')+
+      (melding?'<div class="noot inst-noot inst-ruim" role="status">'+esc(melding)+'</div>':'')+
 
       '<div class="kop">Handtekening</div>'+
       '<textarea class="vld" id="iHand" rows="3" maxlength="500" placeholder="Bijvoorbeeld je naam en hoe je bereikbaar bent">'+esc(inst.handtekening||'')+'</textarea>'+
-      '<div class="noot" style="text-align:left;margin:0;">Gaat onder elk bericht dat je vanuit RTMail verstuurt.</div>'+
+      '<div class="noot inst-noot">Gaat onder elk bericht dat je hier zelf opstelt en verstuurt, ook als het gepland was. Niet onder een bericht namens een team.</div>'+
       '<div class="knprij"><button class="knp prim" id="iHandBewaar">Handtekening bewaren</button></div><div id="iHandUit" hidden></div>'+
 
       '<div class="kop">Afwezigheid</div>'+
-      '<div class="noot" style="text-align:left;margin:0 0 .5rem;" id="iAfStand">'+esc(afStand)+'</div>'+
+      '<div class="noot inst-noot inst-ruim" id="iAfStand">'+esc(afStand)+'</div>'+
       '<textarea class="vld" id="iAfTekst" rows="3" maxlength="1000" placeholder="Wat krijgt iemand terug die je schrijft?">'+esc(af&&af.tekst||'')+'</textarea>'+
-      '<label class="noot" style="display:block;text-align:left;margin:0;">Vanaf (leeg is nu)<input class="vld" type="datetime-local" id="iAfVan" value="'+esc(naarLokaal(af&&af.van))+'"></label>'+
-      '<label class="noot" style="display:block;text-align:left;margin:0;">Tot (leeg is tot je hem uitzet)<input class="vld" type="datetime-local" id="iAfTot" value="'+esc(naarLokaal(af&&af.tot))+'"></label>'+
-      '<div class="noot" style="text-align:left;margin:0;">Iedere afzender krijgt dit antwoord een keer per periode. Berichten van RTG zelf en andere afwezigheidsberichten krijgen geen antwoord, zodat twee postvakken elkaar niet eindeloos terugschrijven.</div>'+
+      '<label class="noot inst-veld">Vanaf (leeg is nu)<input class="vld" type="datetime-local" id="iAfVan" value="'+esc(naarLokaal(af&&af.van))+'"></label>'+
+      '<label class="noot inst-veld">Tot (leeg is tot je hem uitzet)<input class="vld" type="datetime-local" id="iAfTot" value="'+esc(naarLokaal(af&&af.tot))+'"></label>'+
+      '<div class="noot inst-noot">Iedere afzender krijgt dit antwoord een keer per periode. Berichten van RTG zelf en andere afwezigheidsberichten krijgen geen antwoord, zodat twee postvakken elkaar niet eindeloos terugschrijven.</div>'+
       '<div class="knprij"><button class="knp prim" id="iAfAan">'+(af?'Afwezigheid bijwerken':'Afwezigheid aanzetten')+'</button>'+
         (af?'<button class="knp" id="iAfUit">Afwezigheid uitzetten</button>':'')+'</div><div id="iAfUitslag" hidden></div>'+
 
       '<div class="kop">Aliassen</div>'+
-      '<div class="noot" style="text-align:left;margin:0 0 .5rem;">Een alias is een tweede adres voor dit postvak. Post die er binnen RTG naartoe gaat, komt hier binnen met de alias erbij. Het adres van iemand anders, een zaak of een team kan geen alias worden.</div>'+
+      '<div class="noot inst-noot inst-ruim">Een alias is een tweede adres voor dit postvak. Post die er binnen RTG naartoe gaat, komt hier binnen met de alias erbij. Het adres van iemand anders, een zaak of een team kan geen alias worden.</div>'+
       ((inst.aliassen||[]).length ? (inst.aliassen||[]).map(function(a){
-        return '<div class="rij" style="cursor:default;"><span class="b"><span class="nm">'+esc(a+(domein?'@'+domein:''))+'</span></span>'+
+        return '<div class="rij vast"><span class="b"><span class="nm">'+esc(a+(domein?'@'+domein:''))+'</span></span>'+
           '<button class="knp" data-alias-uit="'+esc(a)+'">Alias uitzetten</button></div>'; }).join('')
-        : '<div class="noot" style="text-align:left;margin:0 0 .5rem;">Nog geen alias.</div>')+
+        : '<div class="noot inst-noot inst-ruim">Nog geen alias.</div>')+
       '<input class="vld" id="iAlias" maxlength="40" placeholder="Bijvoorbeeld inkoop">'+
       '<div class="knprij"><button class="knp prim" id="iAliasMaak">Alias toevoegen</button></div><div id="iAliasUit" hidden></div>'+
 
       '<div class="kop">Regels bij binnenkomst</div>'+
-      '<div class="noot" style="text-align:left;margin:0 0 .5rem;">Een regel draait op het moment dat post binnenkomt, ook als je de app niet open hebt. De teller zegt hoe vaak hij iets deed.</div>'+
+      '<div class="noot inst-noot inst-ruim">Een regel draait op het moment dat post binnenkomt, ook als je de app niet open hebt. De teller zegt hoe vaak hij iets deed.</div>'+
       ((regels.regels||[]).length ? regels.regels.map(function(r){
         var wat=(r.alleenOnvertrouwd?'niet-geverifieerde post':'')+(r.bevat?(r.alleenOnvertrouwd?' waarin ':'')+esc(VELDNAAM[r.veld]||r.veld)+' "'+esc(r.bevat)+'" bevat':'');
-        return '<div class="rij" style="cursor:default;"><span class="b"><span class="nm">'+esc(r.naam)+(r.aan?'':' (uit)')+'</span>'+
+        return '<div class="rij vast"><span class="b"><span class="nm">'+esc(r.naam)+(r.aan?'':' (uit)')+'</span>'+
           '<span class="lt">Als '+wat+': '+esc(ACTIENAAM[r.actie]||r.actie)+(r.actie==='etiket'?' "'+esc(r.waarde)+'"':'')+' · '+r.geraakt+' keer geraakt</span></span>'+
           '<button class="knp" data-regel-zet="'+esc(r.id)+'" data-aan="'+(r.aan?'1':'0')+'" aria-pressed="'+(r.aan?'true':'false')+'">'+(r.aan?'Regel uitzetten':'Regel aanzetten')+'</button>'+
           '<button class="knp" data-regel-weg="'+esc(r.id)+'">Regel verwijderen</button></div>'; }).join('')
-        : '<div class="noot" style="text-align:left;margin:0 0 .5rem;">Nog geen regel.</div>')+
+        : '<div class="noot inst-noot inst-ruim">Nog geen regel.</div>')+
       '<input class="vld" id="iRNaam" maxlength="60" placeholder="Naam van de regel (mag leeg)">'+
       '<select class="vld" id="iRVeld" aria-label="Waarop let de regel?">'+(regels.velden||[]).map(function(v){return '<option value="'+esc(v)+'">Let op '+esc(VELDNAAM[v]||v)+'</option>';}).join('')+'</select>'+
       '<input class="vld" id="iRBevat" maxlength="120" placeholder="...als dat dit bevat">'+
-      '<label class="noot" style="display:block;text-align:left;margin:0 0 .5rem;"><input type="checkbox" id="iROnv"> Alleen voor niet-geverifieerde post</label>'+
+      '<label class="noot inst-veld inst-ruim"><input type="checkbox" id="iROnv"> Alleen voor niet-geverifieerde post</label>'+
       '<select class="vld" id="iRActie" aria-label="Wat doet de regel?">'+(regels.acties||[]).map(function(a){return '<option value="'+esc(a)+'">Dan: '+esc(ACTIENAAM[a]||a)+'</option>';}).join('')+'</select>'+
       '<input class="vld" id="iRWaarde" maxlength="40" placeholder="Welk etiket? (alleen bij een etiket)">'+
       '<div class="knprij"><button class="knp prim" id="iRMaak">Regel maken</button></div><div id="iRUit" hidden></div>'+

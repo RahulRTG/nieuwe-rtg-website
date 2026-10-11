@@ -77,17 +77,17 @@ test('de bezorger zegt het als hij niet kan bezorgen, en verzint geen ontvanger'
     keyVanCodenaam: async (c) => (c === 'Zilverreiger' ? { key: 'user-7' } : null),
     log: (t) => gelogd.push(t) });
 
-  assert.deepEqual(mp.bezorg('user-3', { titel: 'T', tekst: 'x', zaak: 'Z1' }), { bezorgd: true, weg: 'lid' });
+  assert.deepEqual(mp.bezorgMelder('user-3', { titel: 'T', tekst: 'x', zaak: 'Z1' }), { bezorgd: true, weg: 'lid' });
   assert.equal(geschreven[0][2].title, 'T', 'titel wordt title');
-  assert.deepEqual(mp.bezorg('zaak-KIKUNOI', { titel: 'T', tekst: 'x' }), { bezorgd: true, weg: 'zaak' });
+  assert.deepEqual(mp.bezorgMelder('zaak-KIKUNOI', { titel: 'T', tekst: 'x' }), { bezorgd: true, weg: 'zaak' });
   assert.equal(geschreven[1][1], 'KIKUNOI');
   // tegengehouden door de rust van het lid is NIET bezorgd
-  assert.equal(mp.bezorg('user-9', { titel: 'T' }).bezorgd, false);
-  assert.equal(mp.bezorg('', {}).reden, 'geen-melder');
-  assert.equal(mp.bezorg('zaak-', {}).reden, 'zaak-zonder-code');
+  assert.equal(mp.bezorgMelder('user-9', { titel: 'T' }).bezorgd, false);
+  assert.equal(mp.bezorgMelder('', {}).reden, 'geen-melder');
+  assert.equal(mp.bezorgMelder('zaak-', {}).reden, 'zaak-zonder-code');
   // een oude codenaam-melder gaat via de gids, en alleen bij een eenduidige treffer
-  assert.deepEqual(await mp.bezorg('Zilverreiger', { titel: 'T' }), { bezorgd: true, weg: 'lid' });
+  assert.deepEqual(await mp.bezorgMelder('Zilverreiger', { titel: 'T' }), { bezorgd: true, weg: 'lid' });
   assert.equal(geschreven.at(-1)[1], 'user-7');
-  assert.equal((await mp.bezorg('Onbekend', { titel: 'T' })).reden, 'codenaam-niet-eenduidig');
+  assert.equal((await mp.bezorgMelder('Onbekend', { titel: 'T' })).reden, 'codenaam-niet-eenduidig');
   assert.ok(gelogd.length >= 4, 'elke mislukte bezorging is gezegd: ' + gelogd.join(' | '));
 });

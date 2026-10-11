@@ -46,7 +46,7 @@ function hangOp(kern, hulp) {
        naar een lidaccount, en kwam een antwoord aan een zaak nergens aan; zie
        kern/service/melderpost.js. Laat gebonden: meldLid ontstaat in een
        eerdere laag, maar wie hem hier vastpint maakt de volgorde tot gedrag. */
-    notify: (melder, bericht) => melderPost.bezorg(melder, bericht)
+    notify: (melder, bericht) => melderPost.bezorgMelder(melder, bericht)
   }));
   kern.serviceLoopSource = require('../kern/service/loop-source')({leesCollectie:hulp.leesCollectie,bewerkCollectie:hulp.bewerkCollectie,
     zaken:kern.serviceZaken,kwaliteit:kern.serviceKwaliteit,authorize:actorRef=>!!(kern.magBalie&&kern.magBalie(actorRef)),

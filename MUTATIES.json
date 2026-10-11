@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-06T16:44:21.467Z",
-    "commit": "c69fddd70",
-    "boomVuil": false,
+    "op": "2026-10-11T17:18:36.954Z",
+    "commit": "1b5b4f16",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v26.10.0"
+    "node": "v22.22.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -13297,6 +13297,13 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "rtmail-alias.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
     "rtmail-bestuur.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -13311,6 +13318,13 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "rtmail-instellingen.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "rtmail-lid.test.js": {
       "soort": "server",
@@ -14147,6 +14161,13 @@
       "geprobeerd": 1
     },
     "servicemachtiging.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "servicemelder.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",

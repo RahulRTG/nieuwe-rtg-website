@@ -49,7 +49,7 @@ module.exports = function maakMelderPost({ meldLid, notifySupplier, keyVanCodena
   /* `bericht` draagt { titel, tekst, zaak } zoals ./loop.js hem maakt; de lezers
      tonen `title` en `body` (public/shared/realtime.js), dus dat wordt hier
      vertaald en niet op twaalf plekken. */
-  function bezorg(melder, bericht) {
+  function bezorgMelder(melder, bericht) {
     const b = bericht || {};
     const note = { icon: 'service', title: String(b.titel || 'RTG Service').slice(0, 120),
       body: String(b.tekst || '').slice(0, 300), zaak: b.zaak || null };
@@ -75,5 +75,5 @@ module.exports = function maakMelderPost({ meldLid, notifySupplier, keyVanCodena
     }, (e) => waarschuw({ bezorgd: false, reden: 'gids-faalde: ' + (e && e.message || e) }, m));
   }
 
-  return { bezorg };
+  return { bezorgMelder };
 };

@@ -22,6 +22,7 @@ module.exports = ({ save, rtmail, vrij, nu, busVan, vakInst, kap, alleVakken, te
   /* Wie draagt dit linkerdeel als alias? Geeft de bussen terug, want het
      antwoord "twee postvakken" moet te zien zijn en niet stil een winnaar
      krijgen. */
+  const gereserveerd = (lokaal) => adresLaag.GERESERVEERD.map(sleutel).includes(sleutel(lokaal));
   function dragersVan(lokaal) {
     const k = sleutel(lokaal);
     if (!k || typeof alleVakken !== 'function') return [];
@@ -78,7 +79,11 @@ module.exports = ({ save, rtmail, vrij, nu, busVan, vakInst, kap, alleVakken, te
     if (!i) return { error: 'Dit postvak is niet te bepalen.' };
     const lokaal = adresLaag.lokaalVan(naam);
     if (!lokaal) return { error: 'Dit adres kan niet.' };
-    if (adresLaag.GERESERVEERD.includes(lokaal)) return { error: 'Deze naam houdt het huis zelf.' };
+    /* Op de SLEUTEL en niet op de exacte vorm: de bezorging legt twee bussen op
+       gelijk zonder punten en streepjes, dus `hu-lp` IS `hulp` (het
+       servicepostvak) en `r-t-g` IS het systeemadres. De tegenlezing van 11
+       oktober 2026 kaapte zo de servicepost. */
+    if (gereserveerd(lokaal)) return { error: 'Deze naam houdt het huis zelf.' };
     const zonder = (i.aliassen || []).filter(a => a !== lokaal);
     if (aan !== false && !(i.aliassen || []).includes(lokaal)) {
       if (zonder.length >= MAX_ALIASSEN) return { error: 'Meer dan ' + MAX_ALIASSEN + ' aliassen maakt een postvak onnavolgbaar.' };
@@ -117,7 +122,9 @@ module.exports = ({ save, rtmail, vrij, nu, busVan, vakInst, kap, alleVakken, te
     const sleutel = busVan(bericht.van) || bericht.van;
     if (echt.beantwoord[sleutel]) return null;
     echt.beantwoord[sleutel] = t;
-    const m = rtmail.stuur({ van: naarAdres, naar: bericht.van, onderwerp: 'Afwezig: ' + (bericht.onderwerp || ''),
+    /* Kwam de post via een alias, dan antwoordt de alias: anders verraadt het
+       afwezigheidsbericht achter welk postvak hij zit. */
+    const m = rtmail.stuur({ van: bericht.viaAlias || naarAdres, naar: bericht.van, onderwerp: 'Afwezig: ' + (bericht.onderwerp || ''),
       tekst: a.tekst, soort: 'afwezig', bron: 'lid' });
     save();
     return m && m.id ? m : null;
@@ -132,7 +139,13 @@ module.exports = ({ save, rtmail, vrij, nu, busVan, vakInst, kap, alleVakken, te
   function aliasDoel(adres) {
     const o = adresLaag.ontleed(adres);
     if (!o.binnenshuis || !o.lokaal) return null;
+    // het huis zelf (systeem, servicepostvak) wordt nooit omgeleid, ook niet door een oude alias
+    if (gereserveerd(o.lokaal)) return null;
     if (vrij && vrij.eigenaarsVorm && vrij.eigenaarsVorm(o.lokaal)) return null;
+    /* Waar al post ligt, woont iemand (dezelfde regel als slot 3 van
+       ./rtmail-vrij.js): een medewerker of overheid heeft een werknaam en geen
+       codenaamvorm, dus zonder deze regel slokte een oudere alias zijn post op. */
+    if (rtmail.postvak(o.adres, { limit: 1 }).length) return null;
     if (typeof teamOpAdres === 'function' && teamOpAdres(o.adres)) return null;
     const dragers = dragersVan(o.lokaal);
     if (dragers.length !== 1) return null;

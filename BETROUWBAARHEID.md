@@ -48,8 +48,8 @@ blijven.
 | 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een bron voor acht onderdelen** — twee ketenproeven (par. 4a) en zes scenario's van de voltooiproef (par. 4h); of een bron telt, beslist zijn versheid; de rest mist een scenario |
 | 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **staat, voor een leeg antwoord** (`LIEGRONDE.json`, per onderdeel; zie par. 4e) — 96 van 114 BEWEZEN op 11 oktober 2026; de andere 18 hebben geen eigen adres, staan achter een deur of vallen om |
 | 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **staat voor zes onderdelen** (`VOLTOOIPROEF.json`, par. 4h): nette herstart, nieuwe sessie, en de opslag zelf |
-| 6 | **bevoegd** | kan een andere rol, een ander gezin of een ander bedrijf hier niets? | **gezinnen gemeten, leden geblokkeerd** (`BEVOEGD.json`, par. 4f): de twaalf gezinsschermen krijgen een kruisproef op de gezinscode en zijn BEWEZEN; ledenschermen worden samengesteld uit `IDOR.json` (vers) en `ROLPROEF.json`, en dat tweede is op 11 oktober 2026 niet te hermeten (par. 4f, slot); zaak en kantoor hebben nog geen proef |
-| 7 | **herstelbaar** | overleeft de functie uitval, time-out, dubbelklik en een afgebroken verzoek? | **staat voor vier onderdelen, en zakt bij twee** (`VOLTOOIPROEF.json`, par. 4h): dubbelklik, herhaling, afgebroken verzoek en een crash na de bevestiging; bij Mijn loopbaan en Reizen & Veilig vond de proef een echt gebrek; uitval van Redis of PostgreSQL nog niet |
+| 6 | **bevoegd** | kan een andere rol, een ander gezin of een ander bedrijf hier niets? | **gezinnen en vier leden gemeten** (`BEVOEGD.json`): de twaalf gezinsschermen met een kruisproef op de gezinscode (par. 4f), en ledenschermen met de ledenkruis, die de SESSIE verwisselt (par. 4j) -- 4 BEWEZEN op 11 oktober 2026; `ROLPROEF.json` blijft vervallen en telt niet; zaak en kantoor hebben nog geen proef |
+| 7 | **herstelbaar** | overleeft de functie uitval, time-out, dubbelklik en een afgebroken verzoek? | **staat voor zes onderdelen** (`VOLTOOIPROEF.json`, par. 4h): dubbelklik, herhaling, afgebroken verzoek en een crash na de bevestiging; de twee gebreken die de proef bij Mijn loopbaan en Reizen & Veilig vond, zijn bij de oorzaak gerepareerd (par. 4j, slot); uitval van Redis of PostgreSQL nog niet |
 | 8 | **menselijk** | krijgt de gebruiker nooit een kale 500, TypeError, lege pagina of dode knop? | **staat, als ondergrens** (par. 4i): geen kale fout, elke weigering met haar zin in beeld, geen kale techniek in beeld, geen naamloze eigen knop; of een melding een WEG biedt, meet hij niet |
 
 Bewijs 1, 2 en 8 worden gemeten door `npm run appwerkt`; 4 en 6 komen uit de
@@ -703,6 +703,96 @@ waarvan `innerText` leeg is. Dat was de meter, en die telt ze nu niet meer.
 ijking weg, de NIET_GETEST-grendel weg, het strippen van scripts uit de ijklijn
 weg) laten hem zakken.
 
+
+## 4j. De ledenkruis — bewijs 6 aan de ledenkant, door de sessie te verwisselen
+
+**Staat** (11 oktober 2026, afbouw ronde 3). Par. 4f eindigde met alle ledenrijen
+op NIET_GETEST, omdat `ROLPROEF.json` sinds de toestelbinding niet te hermeten is.
+Dat is niet versoepeld: ROLPROEF blijft vervallen en telt niet. Wat erbij kwam is
+de kruisproef van de gezinsschermen, toegepast op een scherm dat op de SESSIE
+afbakent (`scripts/lib/ledenkruis.js`, gelopen door `scripts/bevoegdronde.js`).
+
+Er is bij een ledenscherm geen id om te verwisselen, dus wordt de sessie
+verwisseld. Lid A opent het scherm in een echte browser; elk verzoek dat het
+scherm doet, plus de lezers en handelingen van zijn scenario, wordt nagespeeld
+door IEMAND ANDERS: een anonieme bezoeker, een ander lid, een zaak, het kantoor en
+een gezin, allemaal uit de sleutelbos (`scripts/lib/proefsessies.js`). Drie
+waarnemingen maken een rij defect:
+
+| waarneming | wat het is |
+|---|---|
+| **lek** | een ander krijgt 2xx en het antwoord draagt een merkteken van A (behalve een woord dat hij zelf meestuurde) |
+| **open** | een handeling van A slaagt zonder sessie |
+| **aangetast** | na alle pogingen leest A zijn eigen stand niet meer byte voor byte terug (tijdstempels uitgezonderd) |
+
+En het eigen lid moet het WEL kunnen: een paar telt alleen als A zelf 2xx kreeg,
+en de handelingen doet A pas NA de anderen, op hetzelfde levende object.
+
+**Zonder onderwerp geen uitslag.** "Een ander zag niets" is alleen een uitslag als
+er iets van A op het scherm stond. Daarom zaait elk scenario van de voltooiproef
+(`zaai` in `scripts/lib/voltooi/*.js`) eerst iets dat alleen van A is -- een
+tekst die hij schreef, zijn sessie-ids, een map in zijn woningdossier, een adres
+in zijn veiligheidskring -- en noemt dat het merkteken. Zonder scenario zijn de
+merktekens alleen A's nummer, e-mail, telefoon en sessie-id, en dan telt een rij
+alleen als een route van het scherm zelf er een droeg (in de vastgelegde ronde: 78 van de 97 ledenrijen met een eigen adres niet).
+
+**De codenaam is geen merkteken.** De eerste volle ronde meldde een lek in
+`/api/residentie/betreed`: een ander lid zag A's codenaam. Met de hand nagekeken
+was dat A's aanwezigheid in een gedeelde zaal van de Residence -- zo bedoeld, want
+de codenaam is het pseudoniem dat een ander lid mag zien.
+
+**Waar IDOR geen id vond.** `IDOR.json` (vers, 698 gescheiden, 0 doorbraak, 0 lek)
+noemt een route zonder object-id `onbereikbaar`, en zo'n route hield de rij op
+NIET_GETEST. Voor een route die op de sessie afbakent is het verzoek van A zelf --
+met A's ids erin -- nagespeeld door een ander lid precies het IDOR-experiment; dat
+telt nu, en een breuk in IDOR gaat altijd voor. De ROLPROEF-kant geldt alleen
+voor de schrijfroutes die de kruis werkelijk raakte met A binnen: een
+schrijfroute van het scherm die hij niet raakte, houdt de rij op NIET_GETEST,
+met naam.
+
+**Nagetrokken met mutaties** (in Wonen, elk teruggedraaid): annuleren over alle
+leden heen gaf DEFECT (lek), de lijst over alle leden gaf DEFECT (lek), annuleren
+over alle leden zonder echo in het antwoord gaf DEFECT (aangetast), en melden
+zonder `auth` gaf DEFECT (open). Twee vondsten in de meter zelf: een merkteken dat
+de ander zelf meestuurde (`bron` in `/api/mijn/post/zet`) gaf eerst een vals lek,
+en een stroom (event-stream) hing de hele ronde een kwartier op `res.text()`.
+
+**Uitslag: 4 ledenschermen BEWEZEN** -- Wie ben ik, Mijn loopbaan, Reizen &
+Veilig en Wonen -- naast de 12 gezinsschermen. Post van RTG en Waar ben ik
+aanwezig blijven NIET_GETEST: hun gedeelde scripts (`shared/id.js`,
+`shared/toestelsleutel.js`) roepen ook `/api/privacy/delete`, `/api/privacy/export`,
+`/api/privacy/inzage`, `/api/rtgid/machtig`, `/api/webauthn/registreer` en
+`/api/webauthn/weg` aan, en die kruist deze ronde niet: een passkey registreren
+vraagt een WebAuthn-authenticator in de proef, en een account wissen vraagt een
+ander lid per rij dat het mag verliezen. Dat is werk met een adres, geen gat in
+de regel.
+
+**Wat dit niet bewijst**: wat het scherm bij het laden en het scenario aanroept,
+en niets daarbuiten; een merkteken dat een ander op een andere manier zou kunnen
+afleiden zonder het woordelijk te krijgen; de inhoud van een stroom (alleen zijn
+status telt); en een andere zaak of een ander kantoor dan het proefaccount uit
+de sleutelbos.
+
+**De twee vondsten van ronde 2 zijn bij de oorzaak gerepareerd.** Mijn loopbaan:
+`server/kern/carriereledger/` riep `vastleggen()` aan zonder `await`, terwijl
+`server/lib/duurzaam.js` async is -- het 200 ging de deur uit voor de duurzame
+commit. De schrijvers zijn nu async, muteren binnen de bundel en zetten bij een 503
+het geheugen terug (anders schrijft write-behind de regel alsnog weg);
+`test/carriereledger-duurzaam.test.js` zakt op de oude code (zet gaf 200 onder
+`schrijf-faalt`). Reizen & Veilig: `POST /api/veiligheid/moment/maak` had geen
+idempotentieverklaring; nu `zelfdeVerzoek` (`server/lib/idemsleutels-veiligmoment.js`)
+en een PROTECTED-contract, en het formulier schakelt zichzelf uit tijdens het
+verzoek. `test/veiligmoment-dubbeltik.test.js` heeft een tegenproef en zakt zonder
+de verklaring.
+
+**Eerste volledig bewezen onderdelen** (`APPWERKT.json`, 11 oktober 2026, op
+`ebb0a8555`): **Wie ben ik, Wonen, Reizen & Veilig en Mijn loopbaan** staan op
+alle acht bewijzen BEWEZEN. Post van RTG en Waar ben ik aanwezig staan op zeven:
+bevoegd ontbreekt, om de reden hierboven. Let op de meetomstandigheid: een ronde
+met zes werkers naast de toetsen van andere werkbomen op dezelfde vier kernen gaf
+laad-time-outs die als defect werden gemeld; vastgelegd is de ronde met
+`--par=2`, waarin ze niet terugkwamen.
+
 ## 5. Wat er vandaag gemeten wordt, en wat dat niet bewijst
 
 `npm run appwerkt` schrijft `APPWERKT.json`: per onderdeel uit `MAPPEN`, met de
@@ -919,11 +1009,12 @@ verkeerde persoon toont, wel.
    sms staan, en zes onderdelen uit vijf werelden dragen een scenario. Wat volgt is
    per onderdeel een scenario, de twee vondsten van ronde 2 repareren (in
    `server/`), en voor bellen een besluit over WebRTC-testidentiteiten.
-5. **Bewijs 6 naar de schermkant.** *Half* (par. 4f): voor gezinsschermen loopt de
-   kruisproef met de sessie van een ander gezin, en alle twaalf zijn BEWEZEN. Voor
-   ledenschermen is de schermkant gemeten en leeg (ze noemen geen object bij id),
-   dus de routekant beslist -- en die staat stil op de rolproef, die eerst een
-   ijklid met een gebonden toestel en een paspoort moet krijgen. *Een stap weg.*
+5. **Bewijs 6 naar de schermkant.** *Staat voor gezinnen en vier leden* (par. 4f,
+   4j): gezinsschermen krijgen de kruis op de gezinscode, ledenschermen de
+   ledenkruis die de sessie verwisselt. Wat een ledenrij nog tegenhoudt, staat er
+   met naam bij: een route die de kruis niet raakte (WebAuthn, account wissen) of
+   een scherm zonder scenario dat iets van A zaait. De rolproef zelf blijft
+   vervallen tot hij een ijklid met een gebonden toestel krijgt. *Een stap weg.*
 5a. **Bewijs 8 als ondergrens.** *Staat* (par. 4i). Wat een mens moet beoordelen
    -- biedt een melding een weg -- blijft buiten de machine.
 6. **De acht bewijzen aan `BELOFTE.json` koppelen**, zodat de uitspraak niet per

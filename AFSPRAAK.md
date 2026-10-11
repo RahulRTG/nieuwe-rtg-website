@@ -286,6 +286,17 @@ te maken — elke bindende capability verklaart `consent: vereist | niet-vereist
 en bij het tweede is een reden verplicht — is daarmee niet nieuw werk maar de
 reparatie van een bestaande meter.
 
+**Het gat zelf is dicht (11 oktober 2026), de releasepoort nog niet.** Het akkoord
+staat nu bij het niet-gedekte van het Consent Center
+(`kern/consent-register-grens.js`), met de reden: het is een overeenkomst en geen
+toestemming voor gegevensgebruik, dus je trekt haar niet in maar zegt haar op -- en
+dat kan het lid nu zelf, in RTG Geld onder *Lidmaatschap* (par. 14.1).
+`test/consent-dekking.test.js` kent een derde vorm, de ondertekening met versie en
+hash, en zakt zodra een module in `server/kern/` die vorm heeft zonder verklaring.
+Wat dat NIET is: stap 6. Een tekenweg zonder versie of hash valt nog steeds buiten
+het net, en een verklaring `consent: vereist | niet-vereist` per bindende
+capability bestaat niet.
+
 ---
 
 ## 8. De levenscyclus loopt zelf — **een stap weg**
@@ -444,14 +455,14 @@ Niet één herschrijving. Elke stap is los waardevol en los terug te draaien.
 | 3 | de contractstand in `auth()`, in de schaduw | **gedaan**, 11 sep 2026 |
 | 4 | de bewijsprimitive, met onboarding als eerste gebruiker | open |
 | 5 | alle 31 tekenwegen een zekerheids- en bewijsverklaring | open |
-| 6 | de consentscanner wordt een releasepoort | open |
+| 6 | de consentscanner wordt een releasepoort | open (het gat van par. 7.1 is dicht) |
 | 7 | `setTier` vervangen door een afgeleid recht | open |
 | 8 | een wekker voor de verlengronde, op een wachtrij | open |
 | 9 | het betaalmandaat als eigen object | vraagt eerst par. 6 |
 | 10 | wanbetaling als standenmachine | open |
 | 11 | proratie als zuivere rekendienst, vóór het akkoord getoond en erin bewaard | open |
 | 12 | WebAuthn aan de zware handelingen | open |
-| 13 | de plek waar het lid zijn afspraken ziet | vraagt eerst een naam (par. 11) |
+| 13 | de plek waar het lid zijn afspraken ziet | **gedaan** voor het lidmaatschap, 11 okt 2026 (stand *Lidmaatschap* in RTG Geld) |
 | 14 | clausules en een semantische diff | open |
 | 15 | de gebeurtenissen naar finance, CRM, kantoor en AI | open |
 | 16 | het anker naar buiten | vraagt een besluit (par. 9) |
@@ -475,8 +486,14 @@ Drie dingen die er met opzet NIET bij zitten, en alle drie zijn ze een grens:
   einddatum in plaats van ze op 'vervallen' te zetten. Terugdraaien is dus twee
   besluiten (een overgang toevoegen, en de termijnen opnieuw opwekken) en geen
   schakelaar. Dat hoort een eigen stap te zijn.
-- **Geen scherm.** De routes staan; de plek waar het lid ze ziet wacht op de
-  naamkwestie van par. 11.
+- **Geen scherm** -- dat was zo tot 11 oktober 2026. De stand heet
+  *Lidmaatschap* (RTG Geld, onder Meer) en niet *Afspraken*, want die naam is in
+  de leden-app van de boekingen (par. 11); de server noemde het al "Eigen
+  lidmaatschap". Het lid ziet zijn pas, het afgesproken bedrag en de termijnen,
+  leest eerst wat opzeggen doet en bevestigt dan een keer. Verlengen en
+  terugdraaien staan er niet, om de twee redenen hierboven, en het scherm zegt
+  dat. `test/geld-lidmaatschap.e2e.js` loopt het in een echte browser tot en met
+  herladen.
 
 **En het indelen van die routes vond een defect dat geen toets zag.** Het
 opzegVOORBEELD rekende zijn einddatum eerst uit met een `zegOp` op een

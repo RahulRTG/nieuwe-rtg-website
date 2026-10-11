@@ -33,7 +33,7 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
    `waarde` staat achter `wallet` omdat dat de volgorde met betekenis is: de
    wallet toont EEN saldo, de stand Waarde toont waarom dat getal alleen niet
    meer genoeg is zodra er een werkgeversbudget of gemeentetegoed naast staat. */
-const STANDEN = ['overzicht', 'wallet', 'waarde', 'bank', 'wbw', 'kosten', 'metier', 'balans',
+const STANDEN = ['overzicht', 'wallet', 'waarde', 'bank', 'wbw', 'kosten', 'lidmaatschap', 'metier', 'balans',
   'rtgcode', 'labfonds', 'mecenaat', 'logboek', 'nalatenschap'];
 const HOOFDSTANDEN = ['overzicht', 'betalen', 'vooruit', 'meer'];
 const OUDE_PADEN = {

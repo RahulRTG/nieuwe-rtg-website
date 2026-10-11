@@ -95,7 +95,7 @@
   function meerStart() {
     var groepen = [
       ['Dagelijks', ['wallet', 'waarde', 'bank', 'wbw', 'rtgcode']],
-      ['Inzicht en balans', ['kosten', 'metier', 'balans']],
+      ['Inzicht en balans', ['kosten', 'lidmaatschap', 'metier', 'balans']],
       ['Vermogen en nalaten', ['labfonds', 'mecenaat', 'logboek', 'nalatenschap']]
     ];
     $('#gxMeerData').innerHTML = groepen.map(function (groep) {

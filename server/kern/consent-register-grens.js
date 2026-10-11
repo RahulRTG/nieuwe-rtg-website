@@ -31,6 +31,16 @@ const NIET_GEDEKT = [
     reden: 'Dat is een overdracht die u zelf doet aan een werkgever: die ziet uw naam, contact en cv omdat u solliciteerde, en de stand staat bij uw sollicitaties. Het is geen doorlopende toestemming die u hier intrekt. Wilt u dat een werkgever uw gegevens wist, vraag het hem in het gesprek.' },
   { naam: 'Anonieme werkinteresse vanuit de RTFoundation',
     reden: 'Die hoort bij een gezinsprofiel en niet bij dit account. De werkgever ziet alleen een kop, vaardigheden en het aantal ervaringen, nooit een naam of contact. Intrekken gaat in de Foundation-app, zolang de werkgever nog niet heeft gereageerd.' },
+  /* HET AKKOORD MET DE VOORWAARDEN, GEVONDEN IN AFSPRAAK.md par. 7.1. Het stond
+     in geen van beide lijsten, en de dekkingstoets kon het niet vinden: hij zocht
+     `{ key, status: 'actief' }` en de onderteken-rij in kern/onboarding/lid.js is
+     `{ versie, naam, at, hash }`. Het is geen toestemming voor gegevensgebruik
+     maar een OVEREENKOMST -- vandaar hier en niet in LAGEN -- en een lezer hoort
+     te weten waar hij haar wel vindt. test/consent-dekking.test.js kent die vorm
+     nu ook, zodat een tweede tekenweg met dezelfde vorm er niet stil langs gaat. */
+  { naam: 'De lidmaatschapsovereenkomst die u bij uw aanmelding ondertekende',
+    reden: 'Dat is een overeenkomst en geen toestemming voor gegevensgebruik: u trekt haar niet in, u zegt haar op. ' +
+      'Wat u afsprak en de weg om op te zeggen staan in RTG Geld, onder Lidmaatschap.' },
   { naam: 'Wat een zaak van een boeking weet',
     reden: 'Dat hoort bij de boeking en verdwijnt met de boeking; het is geen losse toestemming.' }
 ];

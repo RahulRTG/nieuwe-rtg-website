@@ -199,7 +199,9 @@ const GEEN_FIXTURE = (wat) => ({ status: 'GEEN_FIXTURE', reden: wat, bewijs: nul
 const testwereldReden = (r, bewijs) => {
   const mist = TESTWERELD_ONTBREEKT[r.functie];
   if (mist) return 'de testwereld mist hiervoor een adapter: ' + mist;
-  if (r.soort !== 'link') return 'geen eigen adres: een scenario kan pas aan deze ingang hangen als hij een scherm heeft waarvan SCHERMROUTES.json de routes kent';
+  /* Op de ingang en niet op `soort`: meetRij() haalt dat veld weg voordat de
+     rij hier langskomt (gemeten: alle 108 rijen heetten eerst "geen adres"). */
+  if (!String(r.ingang || '').startsWith('/')) return 'geen eigen adres: een scenario kan pas aan deze ingang hangen als hij een scherm heeft waarvan SCHERMROUTES.json de routes kent';
   return 'de testwereld staat (scripts/voltooiproef.js), maar er is nog geen scenario voor deze ingang in scripts/lib/voltooi/; ' + bewijs;
 };
 const ONGEMETEN = {

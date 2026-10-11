@@ -877,6 +877,11 @@ const METERS = [
      Wat hier NIET staat is het aantal gesloten schakels. Dat zou stijgen door de
      proef langer te maken, en dan wordt een meter beter door hem te verlengen. */
   { sleutel: 'momentOpenBekend', richting: 'omlaag', wat: 'schakels in de publieke keten die openstaan met een uitgeschreven reden (MOMENTPROEF.json)' },
+  /* Dezelfde tand voor de samenwerkingsketen van FoundationOS
+     (GEMEENSCHAPSPROEF.json, GEMEENSCHAP-FASE0.md par. 7.5). Omlaag: elke open
+     schakel met een reden is een openstaand besluit, en die mogen alleen
+     minder worden. */
+  { sleutel: 'gemeenschapOpenBekend', richting: 'omlaag', wat: 'schakels in de samenwerkingsketen die openstaan met een uitgeschreven reden (GEMEENSCHAPSPROEF.json)' },
   { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' },
   /* WAT MAAKT TWEE AANROEPEN HETZELFDE VERZOEK (IDEMIDENTITEIT.json,
      npm run idemidentiteit). Drie tanden, en de eerste gaat met opzet de andere
@@ -1819,6 +1824,7 @@ function meet(bronnen) {
     aankomstUitPositie: leesRegister('POSITIEPROEF.json', (j) => j.tellers.aankomstUitPositie),
     wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
     momentOpenBekend: leesRegister('MOMENTPROEF.json', (j) => j.telling.openBekend),
+    gemeenschapOpenBekend: leesRegister('GEMEENSCHAPSPROEF.json', (j) => j.telling.openBekend),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),
     lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),

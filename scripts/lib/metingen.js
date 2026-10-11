@@ -515,6 +515,11 @@ const REGISTER = {
   'ONVERVREEMDBAAR.json': { eigenRatel: 'test/onvervreemdbaar.test.js' },
   'AANVOERVORM.json': { eigenRatel: 'test/aanvoer.test.js' },
   'MOMENTPROEF.json': { eigenRatel: 'test/momentproef.test.js' },
+  /* GEMEENSCHAPSPROEF.json (sinds 11 oktober 2026): de samenwerkingsketen van
+     FoundationOS (drager, verbond, beraad, bijeenkomst, terugkoppeling). Een
+     PROEF, dus de ratel staat op de uitslag; `openBekend` telt apart in
+     scripts/norm.js (gemeenschapOpenBekend, alleen omlaag). */
+  'GEMEENSCHAPSPROEF.json': { eigenRatel: 'test/gemeenschapsproef.test.js' },
   /* LUSPROEF.json (sinds 24 september 2026) levert voltooibaar voor Ontdekken
      via scripts/lib/appcontract.js. De toets houdt het woordgebruik vast dat
      scripts/lib/bewijsbron.js leest, en dat de telling de rijen niet overstemt. */

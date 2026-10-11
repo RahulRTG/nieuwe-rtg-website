@@ -387,6 +387,8 @@
     "tafelproef:vast": "node scripts/tafelproef.js --vastleggen",
     "momentproef": "node scripts/momentproef.js",
     "momentproef:vast": "node scripts/momentproef.js --vastleggen",
+    "gemeenschapsproef": "node scripts/gemeenschapsproef.js",
+    "gemeenschapsproef:vast": "node scripts/gemeenschapsproef.js --vastleggen",
     "ritproef": "node scripts/ritproef.js",
     "ritproef:vast": "node scripts/ritproef.js --vastleggen",
     "ketenvorm": "node scripts/ketenvorm.js",

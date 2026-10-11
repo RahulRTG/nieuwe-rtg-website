@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-11T06:02:53.510Z",
-  "commit": "01220378",
+  "op": "2026-10-11T21:23:12.481Z",
+  "commit": "883d84757",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
   "node": "v22.22.0"
  },
  "gemeten": {
-  "artefacten": 373,
+  "artefacten": 374,
   "bron": 41,
-  "afgeleid": 199,
+  "afgeleid": 200,
   "fragmenten": 27,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 1,
-  "metEigenaar": 226,
-  "afgeleidEigenaarHard": 198,
+  "metEigenaar": 227,
+  "afgeleidEigenaarHard": 199,
   "afgeleidGrendelt": 28,
-  "metStempel": 122,
+  "metStempel": 123,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -3586,6 +3586,20 @@
    "stempelInstrument": "scripts/rolronde.js",
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/rolronde.js",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ROMEPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/romeproef.js",
+   "graad": "stempel",
+   "schrijvers": [
+    "scripts/romeproef.js"
+   ],
+   "stempelInstrument": "scripts/romeproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": null,
    "grendelt": false,
    "botsingVerklaard": null
   },

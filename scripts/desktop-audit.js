@@ -99,7 +99,14 @@ async function main() {
           }, row.media.selector, { timeout:12000 });
           // Edge can append styles after DOMContentLoaded; wait for the shared
           // desktop stylesheet to finish applying before measuring its grid.
-          if (!row.access) await page.waitForFunction(() => document.body.dataset.rtgShell === 'mobile' || getComputedStyle(document.body).paddingTop === (/^(compact|focus)$/.test(document.body.getAttribute('data-rtg-edge-2-state') || '') ? '0px' : '64px'), null, { timeout: 6000 });
+          if (!row.access) await page.waitForFunction(() => {
+            const body = document.body;
+            if (body.dataset.rtgShell === 'mobile') return true;
+            const cinematic = body.dataset.rtgCinematic === 'true';
+            const edgeHidden = /^(compact|focus)$/.test(body.getAttribute('data-rtg-edge-2-state') || '');
+            const expected = cinematic ? (innerWidth < 1000 ? '82px' : '88px') : edgeHidden ? '0px' : '64px';
+            return getComputedStyle(body).paddingTop === expected;
+          }, null, { timeout: 6000 });
           await page.evaluate(() => document.fonts.ready);
           // Een doorverwijzing of later geladen stylesheet kan alle losse
           // gereed-signalen tussendoor vervangen. Meet één stabiel document;
@@ -129,6 +136,7 @@ async function main() {
             const heading = [...document.querySelectorAll('#platform-story-title,.wd-home h1,.wd-access h1,h1')]
               .find(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden');
             return { url: location.pathname, world:b.dataset.rtgWorld, desktop:b.dataset.rtgDesktop, shellMode:b.dataset.rtgShell, layout:b.dataset.rtgLayout, public:b.dataset.publicPlatform,
+              cinematic:b.dataset.rtgCinematic === 'true', viewport:innerWidth,
               access:[...document.querySelectorAll('[data-rtg-access]')].some(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden'),
               mobileDecoration:visible('.wd-shell>.wd-greeting,.wd-shell>.wp-tabs,.wd-shell>.wd-people,.wd-shell>.wd-favorites,.wd-shell>.wd-library,.wd-home>.wp-scene,.wp-domain'),
               nativeContent:visible('.wd-home:not([hidden]) main,.wd-home:not([hidden])>*,.wd-access,.wd-focus:not([hidden])'),
@@ -151,12 +159,17 @@ async function main() {
           row.failures = [];
           if (row.clippedContent.length) row.failures.push('clipped-app-content');
           if (row.http !== 200 && route !== '/site/404.html') row.failures.push('http-'+row.http);
-          const expectedTop = s.access ? 0 : s.public ? (mobile ? 76 : 88) : (mobile ? 136 : 88) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
+          const expectedTop = s.access ? 0 : s.public ? (mobile ? 76 : 88) : s.cinematic ? (mobile ? 82 : 88) :
+            (mobile ? 136 : 88) - (/^(compact|focus)$/.test(s.edgeState || '') ? 64 : 0);
           if (!s.access && (!mobile || s.public) && Math.abs(s.shell?.y+s.pageScroll-expectedTop) > 2) row.failures.push('nonstandard-top-inset');
           if (s.access && (!s.accessRect || s.accessRect.y > 64 || s.accessRect.w < 300 || s.accessRect.h < 600)) row.failures.push('access-portal-not-viewport');
           if (mobile && !s.public) {
             if (s.shellMode !== 'mobile' || s.desktop) row.failures.push('desktop-shell-on-mobile');
-            if (s.mobileDecoration) row.failures.push('stacked-mobile-shell');
+            /* Cinematic v2 intentionally promotes the native world scene to
+               the mobile lead. The old audit called that real product content
+               "desktop decoration" and would force the app back to a blank
+               list. Non-cinematic screens keep the original prohibition. */
+            if (s.mobileDecoration && !s.cinematic) row.failures.push('stacked-mobile-shell');
             if (!s.nativeContent) row.failures.push('missing-mobile-content');
           }
           if (mobile && s.public) {
@@ -165,11 +178,16 @@ async function main() {
             if (!s.publicHeader || Math.abs(s.publicHeader.h-64) > 2) row.failures.push('nonstandard-public-header');
             if (!s.headingFont || !s.headingFont.includes('Bodoni')) row.failures.push('public-editorial-heading-missing');
           }
-          if (s.shells !== 1 || s.edges !== (s.access ? 0 : 1)) row.failures.push('duplicate-or-missing-frame');
+          /* Edge is also the single, usable pre-auth entry now. There may be
+             one frame and one Edge, never a hidden second navigation. */
+          if (s.shells !== 1 || s.edges !== 1) row.failures.push('duplicate-or-missing-frame');
           if (s.overflow) row.failures.push('horizontal-overflow');
           if (!s.content || !s.shell || (!s.access && !mobile && (!s.left || !s.right || s.left.w < 100 || s.right.w < 100))) row.failures.push('missing-column');
           else if (!s.access && !mobile) {
-            if (Math.abs(s.shell.x-24) > 2 || Math.abs(s.left.w-216) > 2 || Math.abs(s.right.w-280) > 2) row.failures.push('nonstandard-geometry');
+            if (s.cinematic) {
+              const fullBleed = Math.abs(s.shell.x) <= 2 && Math.abs(s.shell.w-s.viewport) <= 2;
+              if (!fullBleed || s.left.w < 210 || s.right.w < 250) row.failures.push('nonstandard-geometry');
+            } else if (Math.abs(s.shell.x-24) > 2 || Math.abs(s.left.w-216) > 2 || Math.abs(s.right.w-280) > 2) row.failures.push('nonstandard-geometry');
             if (s.content.x < s.left.right || s.content.right > s.right.x + 1) row.failures.push('overlapping-columns');
             if (s.content.scroll === 'auto' || s.left.scroll === 'auto' || s.right.scroll === 'auto') row.failures.push('nested-page-scroll');
             if (s.library && Math.max(s.content.bottom,s.right.bottom) > s.library.y+1) row.failures.push('library-overlap');
@@ -177,10 +195,14 @@ async function main() {
           const palettes = {living:'rgb(16, 13, 10)',work:'rgb(16, 24, 23)',travel:'rgb(25, 13, 18)',foundation:'rgb(16, 35, 30)'};
           if(s.editorialVersion !== '20261001')row.failures.push('editorial-system-not-loaded');
           if(s.layout !== 'standard')row.failures.push('legacy-layout');
-          if (!s.access && s.background !== (s.public ? 'rgb(16, 14, 12)' : palettes[s.world])) row.failures.push('nonstandard-world-palette');
+          const cinematicCanvas = 'rgb(241, 238, 231)';
+          if (!s.access && s.background !== (s.public ? 'rgb(16, 14, 12)' : s.cinematic ? cinematicCanvas : palettes[s.world])) row.failures.push('nonstandard-world-palette');
           const cards = {living:'#201912',work:'#192422',travel:'#29171d',foundation:'#19372d'};
           if (!s.public && !s.access) for (const region of s.paletteRegions) {
-            const expected = region.selector === '.rtg-adaptive-bar' ? cards[s.world] : palettes[s.world];
+            /* Product-native workspaces may remain dark islands; the shared
+               app canvas, header and Edge are the cross-product contract. */
+            if (s.cinematic && region.selector !== '.rtg-adaptive-bar') continue;
+            const expected = s.cinematic ? '#11100e' : region.selector === '.rtg-adaptive-bar' ? cards[s.world] : palettes[s.world];
             if ((region.selector === '.rtg-adaptive-bar' ? region.material : region.background) !== expected) row.failures.push('nonstandard-inner-palette:'+region.selector);
           }
           }

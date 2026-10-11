@@ -147,11 +147,11 @@
       });
     };
   }
-  // Public stories can use the same sheet without constructing a second bar.
   function closePanel(rt) {
     if (!rt || !rt.customPanel) return;
     var panel = rt.customPanel;
-    panel.node.hidden = true; panel.parent.insertBefore(panel.node, panel.next && panel.next.parentNode === panel.parent ? panel.next : null);
+    panel.node.hidden = true; panel.node.style.removeProperty('display');
+    panel.parent.insertBefore(panel.node, panel.next && panel.next.parentNode === panel.parent ? panel.next : null);
     rt.customPanel = null; delete rt.sheet.dataset.rtgCustomPanel; if (panel.onClose) panel.onClose(); reflect(rt); rt.sheetList.hidden = false;
     if (rt.controls) rt.controls.hidden = false;
     if (panel.focus && panel.focus.isConnected) panel.focus.focus({ preventScroll: true });
@@ -162,12 +162,12 @@
     if (rt.host.contains(node)) return false;
     closePanel(rt); setState('expanded'); rt.sheet.dataset.rtgCustomPanel = 'true';
     rt.customPanel = { node: node, parent: node.parentNode, next: node.nextSibling, focus: rt.doc.activeElement, onClose: options && options.onClose };
-    /* Het paneel van de host vervangt de lijst: een lege melding van daarvoor hoort
-       er niet verborgen onder te blijven staan (stap 17, test/experience-rtg.e2e.js). */
+    /* Het hostpaneel vervangt de lijst. */
     rt.sheetList.textContent = ''; rt.sheetList.hidden = true; if (rt.controls) rt.controls.hidden = true;
     rt.sheetTitle.textContent = String(options && options.title || 'RTG');
     rt.sheetCopy.textContent = String(options && options.copy || '');
     node.hidden = false; rt.sheet.appendChild(node);
+    node.style.setProperty('display', 'block', 'important');
     reflect(rt);
     var focus = node.querySelector('input:not(:disabled),button:not(:disabled),a,select:not(:disabled),summary') || rt.sheet.querySelector('[data-rtg-adaptive-close]');
     if (focus) focus.focus({ preventScroll: true });

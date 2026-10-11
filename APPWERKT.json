@@ -1941,9 +1941,9 @@
    "vraagt-besluit": "vraagt-besluit"
   },
   "bron": {
-   "documenten": 166,
+   "documenten": 167,
    "besluitbestand": "TOEZEGKLASSEN.json",
-   "vingerafdruk": "2bda44499063575c"
+   "vingerafdruk": "76821114fe2093fa"
   },
   "telling": {
    "toegezegd": 879,
@@ -3179,7 +3179,7 @@
    },
    {
     "document": "CLAUDE.md",
-    "regel": 2868,
+    "regel": 2870,
     "onderdeel": "Competitieve progressie (ranglijsten, niveaus, toernooien) onder 18",
     "citaat": "- **De progressielaag stopt bij 18+.**",
     "reden": "progressieMag in server/kern/spellen/grens.js leest volwassen(); een leerdossier valt er niet onder (besluit 14 september 2026).",
@@ -5805,7 +5805,7 @@
    },
    {
     "document": "CLAUDE.md",
-    "regel": 2868,
+    "regel": 2870,
     "citaat": "- **De progressielaag stopt bij 18+.**",
     "onderdeel": "Competitieve progressie (ranglijsten, niveaus, toernooien) onder 18",
     "stand": null,

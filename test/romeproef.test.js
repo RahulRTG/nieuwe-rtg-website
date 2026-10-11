@@ -37,7 +37,10 @@ test('0. de proef zakt op een open schakel zonder reden, en niet op een werklijs
   assert.match(bron, /uit\.sluitMetBevinding =/, 'er is geen apart veld voor "loopt door, met een werklijst"');
   /* Een 5xx met een reden is nog steeds stuk: anders schrijft de proef een crash
      weg als een besluit. */
-  assert.match(bron, /r\.status >= 400 && r\.status < 500\) && s\.bekend/);
+  assert.match(bron, /const vier = r && r\.status >= 400 && r\.status < 500;/);
+  /* En een 4xx valt alleen onder een bevinding die OVER die weigering gaat:
+     anders draagt een mislukte login de oorzaak van een andere schakel. */
+  assert.match(bron, /const deur = vier && s\.bekend && s\.bekend\.weigering === true;/);
 });
 
 test('1. de proef draait op een wegwerpserver en raakt de ontwikkelserver niet', () => {

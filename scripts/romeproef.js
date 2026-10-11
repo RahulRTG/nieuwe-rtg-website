@@ -180,9 +180,17 @@ async function loop(basis, uit) {
       if (!r || r.status < 200 || r.status >= 300) {
         /* Een 4xx MET een uitgeschreven reden is de meetuitslag ("hier weigert
            het huis, en het zegt waarom"); een 5xx of een 0 is stuk, ook met
-           reden. Zelfde grens als scripts/adamproef.js. */
-        const deur = (r && r.status >= 400 && r.status < 500) && s.bekend;
-        uit.schakels.push(Object.assign({}, s, { stand: deur ? 'openBekend' : 'stuk',
+           reden. Zelfde grens als scripts/adamproef.js.
+           MAAR ALLEEN als de bevinding OVER die weigering gaat
+           (`bekend.weigering`). Alle bevindingen hieronder zijn gemeten op een
+           200 die niet doet wat de schakel vraagt; een 4xx is daar een ANDERE
+           breuk (een mislukte login, een verdwenen catalogusreis) en zou anders
+           onder een oorzaak landen die er niet over gaat -- met de tegenlezer
+           nagetrokken: een foute werkplek-login zette schakel 10 op openBekend
+           met de Vrijheid-oorzaak erbij. Dan heet hij `open`. */
+        const vier = r && r.status >= 400 && r.status < 500;
+        const deur = vier && s.bekend && s.bekend.weigering === true;
+        uit.schakels.push(Object.assign({}, s, { stand: deur ? 'openBekend' : (vier ? 'open' : 'stuk'),
           status: r ? r.status : 0, antwoord: r && r.data && (r.data.error || null), ms: Date.now() - t0 }));
         return null;
       }
@@ -753,7 +761,7 @@ function druk(u) {
   for (const s of u.schakels)
     console.log('  ' + String(s.nr).padStart(2) + ' ' + s.wereld.padEnd(13) + (s.van + '->' + s.naar).padEnd(30) +
       s.stand.padEnd(11) + s.wat + (s.ziet ? '\n      ziet: ' + s.ziet : '') +
-      (s.bekend ? '\n      OORZAAK: ' + s.bekend.oorzaak + '\n      EIGENAAR: ' + s.bekend.eigenaar +
+      (s.bekend && s.stand === 'openBekend' ? '\n      OORZAAK: ' + s.bekend.oorzaak + '\n      EIGENAAR: ' + s.bekend.eigenaar +
         '\n      OPLOSSING (' + s.bekend.soort + '): ' + s.bekend.oplossing : '') +
       (s.antwoord ? '\n      antwoord: ' + s.status + ' ' + s.antwoord : '') + (s.fout ? '\n      FOUT: ' + s.fout : ''));
   for (const s of u.storingen)

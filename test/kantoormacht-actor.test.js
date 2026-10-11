@@ -31,6 +31,8 @@ test('2. de uitzonderingslijst draagt per route een reden, en geldt alleen voor 
   const [route] = [...NAAM_GEEN_ACTOR.keys()];
   assert.equal(actorVan('f(req.body.naam)', route).treffer, null, 'de uitzondering werkt voor naam');
   assert.equal(actorVan('f(req.body.door)', route).treffer, 'req.body.door', 'maar niet voor een ander veld');
+  assert.equal(actorVan('f(req.body.naam); g({ door: b.door })', route).treffer, 'b.door',
+    'een uitzondering op naam maskeert geen actorveld verderop in hetzelfde blok');
 });
 
 test('3. het hele lijf aan de kern geven is onbepaald, en geen schone route', () => {

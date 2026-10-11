@@ -72,7 +72,12 @@ module.exports = (kern) => {
   app.post('/api/rtfkantoor/stadsraad/partner-stop', officeAuth, (req, res) => veilig(res, () => stadsraad.partnerStop(String(req.body.id || ''))));
   app.post('/api/rtfkantoor/stadsraad/besluit-start', officeAuth, (req, res) => veilig(res, () => stadsraad.besluitStart(req.body.projectId, req.body.voorstel, boardroomWie(req) || 'kantoor', 'rtg')));
   // de stemmer komt uit de sessie; `naam` in het lijf telt niet (anders telt elke getypte naam als een RTG-stem)
-  app.post('/api/rtfkantoor/stadsraad/stem', officeAuth, (req, res) => veilig(res, () => stadsraad.stem(String(req.body.besluitId || ''), 'rtg', boardroomWie(req), req.body.voor === true)));
+  app.post('/api/rtfkantoor/stadsraad/stem', officeAuth, (req, res) => {
+    const wie = boardroomWie(req);
+    // de gedeelde code stemt niet stil mee als "RTG": een stem is van een mens op naam
+    if (!wie) return res.status(403).json({ error: 'Een stem in de stadsraad brengt een mens op naam uit, niet de gedeelde kantoorcode. Log in met uw eigen RTG-account.', watNu: 'inloggen-op-naam' });
+    veilig(res, () => stadsraad.stem(String(req.body.besluitId || ''), 'rtg', wie, req.body.voor === true));
+  });
   app.post('/api/rtfkantoor/stadsraad/besluit-sluit', officeAuth, (req, res) => veilig(res, () => stadsraad.besluitSluit(String(req.body.besluitId || ''))));
 
   app.post('/api/lab/ai', officeAuth, async (req, res) => {

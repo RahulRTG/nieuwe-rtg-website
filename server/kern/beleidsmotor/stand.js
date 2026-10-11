@@ -21,14 +21,33 @@ const uitvoeren = require('./uitvoeren');
 const TE_KLEINE_GROEP = 'TE_KLEINE_GROEP';   // dezelfde betekenis als in ../bedrijfsmaat/poort.js (geen require: andere domeingrens)
 const KLEIN = 5;
 function kleineAantallen(u) {
-  const velden = uitvoeren.SOORTEN.concat(['zouZakken']);
+  const DELEN = ['opNaam', 'eigenaarToken', 'gedeeld'];   // zouZakken is hun som
+  const weg = (r, v) => { r[v] = null; r.klein = TE_KLEINE_GROEP; };
   u.werklijst = (u.werklijst || []).map(r => {
     const uit = Object.assign({}, r);
-    for (const v of velden) if (uit[v] > 0 && uit[v] < KLEIN) { uit[v] = null; uit.klein = TE_KLEINE_GROEP; }
+    for (const v of uitvoeren.SOORTEN.concat(['zouZakken'])) if (uit[v] > 0 && uit[v] < KLEIN) weg(uit, v);
+    /* TERUGREKENEN (B4): zouZakken = opNaam + eigenaarToken + gedeeld. Is een
+       deel weg, dan gaat de som ook weg -- anders is het deel som min de rest. */
+    if (DELEN.some(v => uit[v] === null)) weg(uit, 'zouZakken');
     return uit;
   });
+  /* COMPLEMENTAIRE ONDERDRUKKING: per klasse staan totalen. Is er in een klasse
+     iets weg, dan is het terug te rekenen uit totaal min de zichtbare cellen --
+     ook via een rij-som. Dus gaan in die klasse ALLE totalen weg, en daarmee de
+     totalen bovenaan. Wat dan nog zichtbaar is, zijn losse cellen die nergens
+     samen een vergelijking vormen met een verborgen cel. */
+  const pk = u.perKlasse || {};
+  let totaalWeg = false;
+  for (const k of Object.keys(pk)) {
+    if (!u.werklijst.some(r => r.klasse === k && r.klein)) continue;
+    const t = Object.assign({}, pk[k], { klein: TE_KLEINE_GROEP });
+    for (const v of uitvoeren.SOORTEN.concat(['zouZakken', 'waarnemingen'])) t[v] = null;
+    pk[k] = t; totaalWeg = true;
+  }
+  if (totaalWeg) { u.zouZakken = null; u.waarnemingen = null; }
   u.kleineAantallen = { grens: KLEIN, stand: TE_KLEINE_GROEP,
-    uitleg: 'In de werklijst staat een aantal onder de ' + KLEIN + ' niet als getal: per route kan dat over een mens gaan.' };
+    uitleg: 'In de werklijst staat een aantal onder de ' + KLEIN + ' niet als getal: per route kan dat over een mens gaan. ' +
+      'Ook wat er uit de rest terug te rekenen is (een som, een klassetotaal) blijft binnen.' };
   return u;
 }
 

@@ -62,11 +62,20 @@ test('samen beslissen: het besluit valt pas als beide kanten gestemd hebben', as
   const bid = b.besluit.id;
   // een kant alleen krijgt het besluit niet dicht
   assert.equal((await api('/api/rtfkantoor/stadsraad/besluit-sluit', { besluitId: bid }, office)).status, 409, 'beide kanten stemmen eerst');
-  await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam: 'Kantoor Zuid', voor: true }, office);
-  /* Een getypte naam is geen stemmer (11 oktober 2026): de gedeelde code met een
-     ANDERE naam is dezelfde stem en telt niet nog eens. */
-  const tweede = await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam: 'Kantoor Noord', voor: true }, office);
+  /* Een getypte naam is geen stemmer, en de gedeelde code stemt niet stil mee
+     als "RTG" (11 oktober 2026): een stem is van een mens op naam. */
+  const gedeeld = await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam: 'Kantoor Zuid', voor: true }, office);
+  assert.equal(gedeeld.status, 403, 'de gedeelde code bracht een RTG-stem uit');
+  assert.equal((await json(gedeeld)).watNu, 'inloggen-op-naam');
+  const { kantoorAlsPersoon } = require('./helper');
+  const opNaam = await kantoorAlsPersoon(BASE);
+  assert.equal((await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam: 'Kantoor Zuid', voor: true }, opNaam)).status, 200);
+  const tweede = await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam: 'Kantoor Noord', voor: true }, opNaam);
   assert.equal(tweede.status, 409, 'een tweede getypte naam bracht een tweede RTG-stem uit');
+  const zicht = await json(await api('/api/rtf/partner/raad', { code: raadcode }));
+  const tafel = zicht.besluiten.find(x => x.id === bid);
+  assert.ok(tafel.stemmen.some(x => x.kant === 'rtg' && x.wie === 'RTG-medewerker'), 'de partner ziet een RTG-medewerker');
+  assert.ok(!JSON.stringify(zicht).includes('user-'), 'en nooit de sessiesleutel');
   assert.equal((await api('/api/rtfkantoor/stadsraad/besluit-sluit', { besluitId: bid }, office)).status, 409, 'de partner heeft nog niet gestemd');
   await api('/api/rtf/partner/stem', { code: raadcode, besluitId: bid, voor: true });
   const dubbel = await api('/api/rtf/partner/stem', { code: raadcode, besluitId: bid, voor: true });

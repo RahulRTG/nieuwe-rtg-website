@@ -79,7 +79,10 @@ function maakSpoeler({ bak, save, bewerkCollectie, collectie, maxPaden, velden, 
         if (bezet >= (pl ? pl.max : maxPaden)) sleutel = pl ? pl.voorvoegsel + 'overig' : 'overig';
       }
       if (!kaart[sleutel]) kaart[sleutel] = Object.assign({ pad: sleutel }, leeg());
-      if (sleutel !== pad) kaart[sleutel].overgelopen = (kaart[sleutel].overgelopen || 0) + 1;
+      /* `overgelopen` telt TIKKEN en geen batchregels: een sleutel die in een
+         spoelronde vijf keer tikte, is vijf waarnemingen die geen eigen rij
+         kregen -- en zo staat hij ook in stand.overgelopen. */
+      if (sleutel !== pad) kaart[sleutel].overgelopen = (kaart[sleutel].overgelopen || 0) + V.reduce((n, v) => n + (tik[v] || 0), 0);
       for (const v of V) kaart[sleutel][v] = (kaart[sleutel][v] || 0) + (tik[v] || 0);
     }
   }

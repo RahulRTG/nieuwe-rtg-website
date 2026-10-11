@@ -244,9 +244,12 @@ const NAAM_GEEN_ACTOR = new Map([
    treffer en ook geen schone route. */
 const LIJF_DOOR = /[(,]\s*(?:req\.body|b)(?:\s*\|\|\s*\{\s*\})?\s*[,)]|\.\.\.\s*(?:req\.body|b)\b/;
 function actorVan(blok, route) {
-  const a = ACTOR_UIT_VERZOEK.exec(blok);
-  const naamVals = a && a[1] === 'naam' && NAAM_GEEN_ACTOR.has(route);
-  const treffer = a && !naamVals ? a[0] : null;
+  /* ALLE treffers en niet de eerste (B6): een uitzondering op `naam` mag een
+     `b.door` verderop in hetzelfde blok niet maskeren. Alleen de treffers op
+     `naam` vallen weg, en alleen voor een route op de lijst. */
+  const alle = [...blok.matchAll(new RegExp(ACTOR_UIT_VERZOEK.source, 'g'))];
+  const a = alle.find(m => !(m[1] === 'naam' && NAAM_GEEN_ACTOR.has(route)));
+  const treffer = a ? a[0] : null;
   const onbepaald = !treffer && LIJF_DOOR.test(blok) ? 'lijf-naar-kern' : null;
   return { treffer, onbepaald };
 }

@@ -32,8 +32,8 @@ test('1. een eigen plafond per voorvoegsel, en wat overloopt wordt geteld', () =
   assert.equal(Object.keys(kaart).filter(k => k.startsWith('uitvoer ') && k !== 'uitvoer overig').length, 2);
   assert.equal(kaart['uitvoer overig'].overgelopen, 3, 'wat over het plafond liep is geteld');
   assert.equal(kaart['uitvoer overig'].passkey, 3, 'en de tikken zelf gaan niet verloren');
-  sp.tikVeld('kantoor POST /d9', 'eens'); sp.spoel();
-  assert.equal(kaart.overig.overgelopen, 1, 'ook de deurbak telt wat overloopt');
+  sp.tikVeld('kantoor POST /d9', 'eens'); sp.tikVeld('kantoor POST /d9', 'eens'); sp.spoel();
+  assert.equal(kaart.overig.overgelopen, 2, 'ook de deurbak telt wat overloopt, in TIKKEN en niet in batchregels');
 });
 
 test('2. de beleidsmotor geeft de uitvoertellers een eigen plafond', () => {
@@ -101,4 +101,37 @@ test('5. de werklijst houdt kleine aantallen binnen, behalve voor wie exact moet
   assert.equal(r.passkey, 0, 'een nul is geen klein aantal');
   assert.equal(u.kleineAantallen.grens, stand.KLEIN);
   assert.ok(uitvoeren.SOORTEN.length);
+});
+
+test('6. wat binnen blijft, is niet terug te rekenen (B4)', () => {
+  const stand = require('../server/kern/beleidsmotor/stand');
+  const rij = (route, klasse, t) => Object.assign({ route, klasse, passkey: 0, opNaam: 0, eigenaarToken: 0, gedeeld: 0 }, t,
+    { zouZakken: (t.opNaam || 0) + (t.eigenaarToken || 0) + (t.gedeeld || 0) });
+  const werklijst = [rij('POST /a', 'k1', { opNaam: 2, gedeeld: 9 }), rij('POST /b', 'k1', { gedeeld: 12, passkey: 6 }),
+    rij('POST /c', 'k2', { gedeeld: 20, eigenaarToken: 8 })];
+  const perKlasse = {};
+  for (const r of werklijst) {
+    const k = perKlasse[r.klasse] || (perKlasse[r.klasse] = { passkey: 0, opNaam: 0, eigenaarToken: 0, gedeeld: 0, zouZakken: 0, waarnemingen: 0 });
+    for (const v of ['passkey', 'opNaam', 'eigenaarToken', 'gedeeld', 'zouZakken']) k[v] += r[v];
+    k.waarnemingen += r.passkey + r.zouZakken;
+  }
+  const u = stand.kleineAantallen({ werklijst, perKlasse, zouZakken: 51, waarnemingen: 57 });
+  const DELEN = ['opNaam', 'eigenaarToken', 'gedeeld'];
+  /* Elke vergelijking die er nog staat, mag hoogstens VOLLEDIG zichtbaar zijn of
+     minstens twee onbekenden hebben -- anders is de ene onbekende uit te rekenen. */
+  const onbekend = (x) => x === null;
+  for (const r of u.werklijst) {
+    const termen = DELEN.map(v => r[v]).concat([r.zouZakken]);
+    assert.notEqual(termen.filter(onbekend).length, 1, 'een rij-som verraadt een verborgen deel: ' + JSON.stringify(r));
+  }
+  for (const [k, t] of Object.entries(u.perKlasse)) {
+    for (const v of ['passkey', 'opNaam', 'eigenaarToken', 'gedeeld', 'zouZakken']) {
+      const cellen = u.werklijst.filter(r => r.klasse === k).map(r => r[v]);
+      if (t[v] !== null) assert.equal(cellen.filter(onbekend).length, 0, 'klassetotaal ' + k + '.' + v + ' verraadt een verborgen cel');
+    }
+  }
+  if (Object.values(u.perKlasse).some(t => t.zouZakken === null)) assert.equal(u.zouZakken, null, 'het totaal bovenaan verraadt een klasse');
+  assert.equal(u.werklijst[0].opNaam, null, 'de 2 is weg');
+  assert.equal(u.werklijst[0].zouZakken, null, 'en daarmee de som');
+  assert.equal(u.perKlasse.k2.gedeeld, 20, 'een klasse zonder verborgen cel houdt haar totalen');
 });

@@ -104,6 +104,13 @@ function hoofdzekering({ db, accounts, eigenaar }) {
    niet naar een deur ernaast te kunnen uitwijken. Zie de kop van
    ../routes/supplier/werving/personeel-aanmelden.js.
 
+   DEZE LIJST HEEFT TWEE LEZERS. Naast de pauze hieronder leest
+   ../kern/zaakdoos/journaal.js hem (journaalPadOk, via isInlogPad): een pad
+   op deze lijst komt nooit in het naspeeljournaal van de Zaakdoos. Wie een pad
+   weghaalt voor de pauze, haalt het dus ook uit de journaaluitsluiting, en dan
+   ligt zijn lijf weer onversleuteld op het kastje; slot 4B daar vangt alleen
+   een wachtwoordveld, geen code of bewijs.
+
    DEZE LIJST IS NIET ELKE DEUR NAAR EEN SESSIE. Het kantoorgesprek
    (/api/kantoor/gesprek/zeg), de techniekinlog, de passkey-inlog en de
    SSO-wissel staan er niet op. Een deur toevoegen zegt dus niets over of de

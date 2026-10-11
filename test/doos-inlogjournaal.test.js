@@ -13,7 +13,15 @@
         vastePaden() via isInlogPad (server/middleware/remmen.js);
      2. van het antwoord blijft alleen wat het naspelen leest (ref, id, pickup,
         orderRef), dus geen token na een wissel en geen kassacode;
-     3. een lijf met een wachtwoord gaat er niet in (/api/supplier/staff/join).
+     3. een lijf met een wachtwoord gaat er niet in (slot 4B).
+
+   DE AANMELDING IS SINDS N29 EEN INLOGPAD. /api/supplier/staff/join draagt een
+   RTG-wachtwoord en was daarom het voorbeeld van slot 4B. N29 zette hem op
+   INLOG_PADEN, dus houdt slot 1 hem nu al tegen en bewees de aanmelding in toets
+   1 niets meer over slot 4B. Daarvoor is er toets 2: een wachtwoord in het lijf
+   van een GEWONE zaakroute, door dezelfde echte doos. Dat de aanmelding lokaal
+   200 geeft en nooit wordt nagespeeld, staat als gevolg in slot 4B van
+   journaal.js.
 
    DE PROEF draait een ECHTE doos in lokale modus. Er is geen cloud nodig: het
    cloudadres is een poort die elke verbinding meteen dichtgooit, en dan valt de
@@ -43,6 +51,7 @@ const crypto = require('crypto');
 const { DatabaseSync } = require('node:sqlite');
 const { startServer, stop } = require('./helper');
 const { isInlogPad } = require('../server/middleware/remmen');
+const { journaalPadOk } = require('../server/kern/zaakdoos/journaal');
 const { totpCode } = require('../server/kern/totp');
 
 const WW = 'n27-' + crypto.randomBytes(9).toString('hex');
@@ -66,6 +75,19 @@ function journaalOpSchijf() {
     const r = db.prepare("SELECT val FROM kv WHERE key = 'doosJournaal'").get();
     return r ? String(r.val) : '';
   } finally { db.close(); }
+}
+/* Het journaal op schijf, zodra er een regel in staat die `klaar` herkent: een
+   handeling die NA de andere ging, zodat haar regel bewijst dat de rest er al staat. */
+async function journaalMet(klaar) {
+  let rauw = '', rij = [];
+  for (let i = 0; i < 150; i++) {
+    rauw = journaalOpSchijf();
+    try { rij = JSON.parse(rauw || '[]'); } catch (e) { rij = []; }
+    if (Array.isArray(rij) && rij.some(klaar)) break;
+    await new Promise(r => setTimeout(r, 200));
+  }
+  assert.ok(Array.isArray(rij) && rij.some(klaar), 'het journaal op schijf is leesbare JSON met de laatste regel: ' + rauw.slice(0, 120));
+  return { rauw, rij };
 }
 
 test.before(async () => {
@@ -108,7 +130,7 @@ test('geen inlog, geen wachtwoord, geen code en geen token in het doosjournaal; 
   const o1 = await api('/api/supplier/overschot', { op: 'erbij', itemId, qty: 2 }, t1.body.token);
   assert.equal(o1.status, 200, 'overschot lokaal: ' + kort(o1.body));
 
-  // 2. een eigen lid meldt zich aan bij de zaak (kassacode + eigen RTG-inlog)
+  // 2. een eigen lid meldt zich aan bij de zaak (kassacode + eigen RTG-inlog); sinds N29 een inlogpad
   const reg = await api('/api/auth/register', { name: 'Werk Nzevenentwintig', email: EMAIL, password: WW, geboortedatum: '1990-01-01' });
   assert.ok(reg.body.token, 'registratie op de doos: ' + kort(reg.body));
   const inv = await api('/api/supplier/staff/invite', { name: 'Werk Nzevenentwintig', func: 'Bediening' }, t1.body.token);
@@ -151,14 +173,7 @@ test('geen inlog, geen wachtwoord, geen code en geen token in het doosjournaal; 
   assert.equal(o2.status, 200, 'tweede overschot lokaal: ' + kort(o2.body));
 
   // het journaal op schijf, zodra de laatste keukenhandeling erin staat
-  let rauw = '', rij = [];
-  for (let i = 0; i < 150; i++) {
-    rauw = journaalOpSchijf();
-    try { rij = JSON.parse(rauw || '[]'); } catch (e) { rij = []; }
-    if (rij.some(e => e.pad === '/api/supplier/overschot' && e.body && e.body.qty === 3)) break;
-    await new Promise(r => setTimeout(r, 200));
-  }
-  assert.ok(Array.isArray(rij) && rij.length, 'het journaal op schijf is leesbare JSON: ' + rauw.slice(0, 120));
+  const { rauw, rij } = await journaalMet(e => e.pad === '/api/supplier/overschot' && e.body && e.body.qty === 3);
 
   // de tegenproef: beide keukenhandelingen staan er, met hun lijf intact
   for (const qty of [2, 3]) {
@@ -178,4 +193,47 @@ test('geen inlog, geen wachtwoord, geen code en geen token in het doosjournaal; 
   const invRegel = rij.find(e => e.pad === '/api/supplier/staff/invite');
   assert.ok(invRegel, 'de uitnodiging zelf wordt nagespeeld');
   assert.deepEqual(invRegel.res, { invite: { id: inv.body.invite.id } }, 'van het antwoord blijft alleen de ref');
+});
+
+/* SLOT 4B DOOR DE ECHTE DOOS (ronde 6b). Geen supplierroute buiten INLOG_PADEN
+   vraagt vandaag een wachtwoord, dus het lijf gaat mee met een gewone
+   keukenhandeling: precies de client die te veel meestuurt, of de deur die er
+   morgen bij komt. De handeling zelf slaagt lokaal; alleen de regel blijft uit
+   het journaal. Drie vormen, elk voor een tak van draagtWachtwoord (een naam,
+   een hoofdlettervorm, afdalen in een object en in een lijst), en de tegenproef
+   NA de drie: hetzelfde lijf met een sleutel die er alleen op lijkt, en het
+   woord als waarde, staat er wel in. De losse takken op elke diepte staan in
+   toets 7 van test/doos-journaal.test.js. */
+test('een wachtwoord in het lijf van een gewone zaakroute komt niet in het doosjournaal; hetzelfde lijf zonder wel', async () => {
+  const PAD = '/api/supplier/overschot';
+  assert.equal(isInlogPad(PAD), false, PAD + ' staat op INLOG_PADEN; dan beproeft deze toets slot 1 en niet slot 4B');
+  assert.equal(journaalPadOk(PAD), true, PAD + ' moet slot 1 passeren');
+  const t = await api('/api/supplier/login', { username: 'rahul', password: 'Imran' });
+  assert.equal(t.status, 200, 'bedrijfsinlog: ' + kort(t.body));
+  const state = (await api('/api/supplier/state', {}, t.body.token)).body.state || {};
+  const itemId = state.menu && state.menu[0] && state.menu[0].id;
+  assert.ok(itemId, 'een gerecht op de doos: ' + kort(state));
+  const merk = 'r6b-' + crypto.randomBytes(6).toString('hex');
+  const geweigerd = [
+    ['plat, in kleine letters', 11, { password: merk + '-plat' }],
+    ['genest, de Nederlandse naam met een hoofdletter', 12, { account: { profiel: { Wachtwoord: merk + '-genest' } } }],
+    ['in een lijst, in hoofdletters', 13, { leden: [{ naam: 'A' }, { PASSWORD: merk + '-lijst' }] }]
+  ];
+  for (const [vorm, qty, extra] of geweigerd) {
+    const r = await api(PAD, Object.assign({ op: 'erbij', itemId, qty }, extra), t.body.token);
+    assert.equal(r.status, 200, 'de handeling zelf slaagt lokaal (' + vorm + '): ' + kort(r.body));
+  }
+  const tegen = { op: 'erbij', itemId, qty: 14, passwordHint: merk + '-tegen', opmerking: 'password' };
+  const r = await api(PAD, tegen, t.body.token);
+  assert.equal(r.status, 200, 'de tegenproef slaagt lokaal: ' + kort(r.body));
+
+  const { rauw, rij } = await journaalMet(e => e.pad === PAD && e.body && e.body.passwordHint === merk + '-tegen');
+  const regel = rij.find(e => e.pad === PAD && e.body.passwordHint === merk + '-tegen');
+  assert.deepEqual(regel.body, tegen, 'de tegenproef staat erin, met zijn lijf intact');
+  for (const [vorm, qty] of geweigerd) {
+    assert.ok(!rij.some(e => e.pad === PAD && e.body && e.body.qty === qty), 'het lijf met een wachtwoord ' + vorm + ' staat in het journaal');
+  }
+  for (const stuk of ['-plat', '-genest', '-lijst']) {
+    assert.ok(!rauw.includes(merk + stuk), 'het wachtwoord "' + stuk + '" staat in het doosjournaal');
+  }
 });

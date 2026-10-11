@@ -43,7 +43,12 @@ function journaalPadOk(pad) {
    bewaren is bewaren wat niemand leest, en daar zat het geheim: een werktoken
    na een wissel, een nieuwe pincode, een kassacode, de code van een cadeaukaart.
    Nooit "alles behalve het gevoelige": een veld dat er morgen bij komt, blijft
-   buiten het journaal. De vorm blijft staan, zodat leerRefs hetzelfde pad loopt. */
+   buiten het journaal. De vorm blijft staan, zodat leerRefs hetzelfde pad loopt.
+   Alleen een TEKST gaat als ref mee; onder een object-`id` wordt verder gezocht,
+   zodat wat daar naast een ref staat thuisblijft. Toets 8 van
+   test/doos-journaal.test.js speelt een ingekorte en een volle regel na en eist
+   van allebei dezelfde, uitgeschreven refkaart: een vergelijking alleen zou een
+   sleutel missen die uit deze gedeelde lijst valt. */
 const REF_SLEUTELS = Object.freeze(['ref', 'id', 'pickup', 'orderRef']);
 function alleenRefs(x) {
   if (!x || typeof x !== 'object') return null;
@@ -61,13 +66,35 @@ function alleenRefs(x) {
 
 /* SLOT 4B: EEN LIJF MET EEN WACHTWOORD GAAT ER NIET IN. Het lijf wordt letterlijk
    nagespeeld, dus schoonmaken kan niet zonder de handeling te veranderen; weigeren
-   is de vorm die het journaal al kent (een te groot lijf). Dit vangt de deur die
-   geen inlog is en toch een RTG-wachtwoord draagt (/api/supplier/staff/join), en
-   elke volgende. Alleen deze twee namen: `code`, `bewijs` en `token` zijn in de
-   zaakkant gewone velden (de bedrijfscode bij een wissel, het bewijs bij een
-   belofte); die staan op een inlogroute, en daar houdt slot 1 ze tegen. Een
-   sleutel telt in elke hoofdlettervorm en op elke diepte, ook in een lijst;
-   toets 5 van test/doos-journaal.test.js houdt elk van die takken apart vast. */
+   is de vorm die het journaal al kent (een te groot lijf). Alleen deze twee namen:
+   `code`, `bewijs` en `token` zijn in de zaakkant gewone velden (de bedrijfscode
+   bij een wissel, het bewijs bij een belofte); die staan op een inlogroute, en
+   daar houdt slot 1 ze tegen. Een sleutel telt in elke hoofdlettervorm en op
+   elke diepte, ook in een lijst.
+
+   DIT SLOT IS DE ACHTERVANG, EN DAAROM BEPROEFT DE TOETS HET OP EEN EIGEN PAD.
+   De deur waarvoor het kwam, /api/supplier/staff/join, staat sinds N29 op
+   INLOG_PADEN en valt dus al bij slot 1 af. Vandaag vraagt geen supplierroute
+   buiten die lijst een wachtwoord: dit slot is er voor de deur die er morgen bij
+   komt, en voor de client die te veel meestuurt. Een toets die het
+   wachtwoordlijf op een inlogpad zet, beproeft slot 1: zo bleven toets 5 en 6
+   van test/doos-journaal.test.js na N29 groen zonder draagtWachtwoord. Nu eisen
+   ze een pad dat slot 1 passeert, toets 7 daar neemt elke spelling op elke
+   diepte die de dieptewacht doorlaat, en toets 2 van
+   test/doos-inlogjournaal.test.js gaat door een echte doos.
+
+   HET GEVOLG VOOR DE AANMELDING, UITGESCHREVEN (P4 uit ronde 6, met opzet geen
+   ander gedrag). Zonder lijn geeft /api/supplier/staff/join op de doos gewoon
+   200, en de koppeling komt in de accountopslag van de DOOS. In het journaal
+   komt hij niet (sinds N27 door dit slot, sinds N29 al door slot 1), dus hij
+   wordt nooit nagespeeld en de cloud hoort er niets van. Na herstel is de doos
+   weer doorgeefluik; wie zich zonder lijn aanmeldde, staat dan niet op het
+   rooster in de cloud en moet zich daar opnieuw aanmelden. Dat laatste volgt
+   uit de code en is niet op een doos met een terugkerende lijn beproefd. Het is
+   de prijs van geen RTG-wachtwoord op het kastje: nagespeeld zou de aanmelding
+   dat wachtwoord tot de lijn terugkomt onversleuteld op het kastje laten
+   liggen. Of de doos een aanmelding zonder lijn moet weigeren in plaats van
+   lokaal toe te laten, is een productbesluit en staat open. */
 const WACHTWOORD = Object.freeze(['password', 'wachtwoord']);
 function draagtWachtwoord(lijf) {
   const stapel = [lijf];

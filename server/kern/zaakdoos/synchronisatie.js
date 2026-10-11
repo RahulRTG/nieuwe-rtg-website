@@ -91,9 +91,11 @@ module.exports = (ctx) => {
     while (rij.length) {
       const e = rij[0];
       // beveiliging: nooit een gemanipuleerde of buiten-beleid regel naspelen.
-      // Een ongeldige regel wordt overgeslagen (niet naar de cloud gestuurd).
+      // Een ongeldige regel wordt overgeslagen (niet naar de cloud gestuurd),
+      // ook een oude met een wachtwoord in het lijf (slot 4B van ./journaal.js);
+      // de melding noemt daarom alle drie, en nooit het lijf zelf.
       if (!journaalGeldig(e)) {
-        console.warn('[doos] journaalregel geweigerd (zegel/pad ongeldig), overgeslagen: ' + (e && e.pad));
+        console.warn('[doos] journaalregel geweigerd (zegel, pad of lijf ongeldig), overgeslagen: ' + (e && e.pad));
         rij.shift(); teller.geweigerd = (teller.geweigerd || 0) + 1; save();
         continue;
       }
@@ -116,9 +118,13 @@ module.exports = (ctx) => {
     return true;
   }
 
-  // een 2xx-schrijfactie in lokale modus komt in het journaal (aangeroepen
-  // vanuit de journaal-middleware in server.js). Beveiligd: alleen zaak-paden,
-  // een plafond op de body, een oplopend volgnummer en een HMAC-zegel, zodat
-  // een gemanipuleerd journaal op schijf bij het naspelen wordt geweigerd.
+  /* HET SCHRIJVEN VAN EEN REGEL WOONT NIET HIER. Een 2xx-schrijfactie in lokale
+     modus komt in het journaal via schrijfJournaal in ./proxy.js, aangeroepen
+     door de journaalpoort in ../../opzet/lijfpoort.js (en niet door server.js,
+     zoals hier eerst stond). Wat er in een regel mag, beslist ./journaal.js met
+     vier sloten: het padbeleid (nooit een inlog), een HMAC-zegel met een
+     oplopend volgnummer, de verse controle in speelNa hierboven, en slot 4:
+     van het antwoord alleen de refs, en geen lijf met een wachtwoord. Een
+     plafond op de body bewaakt schrijfJournaal zelf. */
   return { haalKloon, speelNa };
 };

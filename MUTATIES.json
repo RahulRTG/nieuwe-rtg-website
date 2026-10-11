@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T06:08:26.331Z",
-    "commit": "49a0508d",
+    "op": "2026-10-11T18:22:00.899Z",
+    "commit": "39c17ccd",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3364,6 +3364,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "doossleutel-ontslag.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
       "scherp": "gezakt"
     },
     "doossleutels-register.test.js": {
@@ -15042,11 +15049,25 @@
       "gezakt": 1,
       "scherp": "overleefd"
     },
+    "staff-accountuit.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "staff-inzet-mob.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "staff-ontslag.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
       "scherp": "gezakt"
     },
     "staff-pin-productie.test.js": {

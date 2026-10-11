@@ -13,7 +13,7 @@
   "measured": {
     "capabilities": 228,
     "routes": 5449,
-    "mutationContracts": 5322,
+    "mutationContracts": 5328,
     "screens": 327
   },
   "classifications": [
@@ -20132,12 +20132,13 @@
         "source": "server/functies/register"
       },
       "entryPoints": [
-        "/api/genootschap"
+        "/api/genootschap",
+        "/api/verbond"
       ],
       "behaviourEvidence": {
         "routeCount": 28,
-        "mutationRoutes": 28,
-        "declaredMutationSemantics": 4,
+        "mutationRoutes": 34,
+        "declaredMutationSemantics": 10,
         "sourceFileCount": 1,
         "kernelDependencyCount": 1,
         "screenCount": 0,

@@ -33,6 +33,10 @@ const uitvoeren = require('./uitvoeren');
 
 const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop', 'gebruik'].concat(uitvoeren.SOORTEN);
 const MAX_SLEUTELS = 2400;   // ~600 kantoorroutes maal hoogstens vier deuren
+/* De uitvoertellers (./uitvoeren.js) hebben een EIGEN plafond: ~790 sleutels
+   (klasse x route, ook buiten /api/office). Gedeeld met de deurtellers liepen
+   die deurrijen stil over in `overig` (../kantoor/mensdeur-spoel.js). */
+const MAX_UITVOER = 2000;
 const VOORBEELDEN = 20;
 const DAG = 86400000;
 
@@ -52,7 +56,8 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
   const bak = () => eigen.bak('beleidsmotor');
   const kijk = () => eigen.kijk('beleidsmotor');
   const spoeler = require('../kantoor/mensdeur-spoel').maakSpoeler({
-    bak, save, bewerkCollectie, collectie: 'beleidsmotor', maxPaden: MAX_SLEUTELS, velden: VELDEN });
+    bak, save, bewerkCollectie, collectie: 'beleidsmotor', maxPaden: MAX_SLEUTELS, velden: VELDEN,
+    plafonden: [{ voorvoegsel: uitvoeren.VOORVOEGSEL, max: MAX_UITVOER }] });
   /* Fase 8: per zetel alleen de laatste gebruiksdatum (./slapend.js). */
   const slapend = require('./slapend').maakSlapend({ bak: () => eigen.bak('zetelGebruik'),
     kijk: () => eigen.kijk('zetelGebruik'), save, bewerkCollectie, nu: tijd });
@@ -75,8 +80,10 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
         (req.beleidsPoorten || (req.beleidsPoorten = [])).push(deur);
         feiten = feitenVan(req);
         besluit = kan(feiten, deur);
-        telUitvoer(req, res, feiten);
       } catch (e) { besluit = null; }
+      /* Een eigen try: gooit de uitvoerteller, dan vervallen vergelijk en
+         afdwingen voor deze deur NIET (dat zou fail-open zijn). */
+      try { if (feiten) telUitvoer(req, res, feiten); } catch (e) { /* een meting raakt geen besluit */ }
       let door = false;
       if (besluit) naAfloop(req, res, () => {
         vergelijk(deur, patroon(req), door, besluit);
@@ -146,9 +153,13 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
 
   /* DE STAND staat in ./stand.js: hoe de tellers gelezen worden is een eigen
      onderwerp naast hoe ze ontstaan. */
-  const stand = () => require('./stand')({
-    beeld: spoeler.projecteer(JSON.parse(JSON.stringify(kijk() || {}))),
-    dagen: Math.floor((tijd() - sinds) / DAG), sinds, oneens: oneensVoorbeelden, verklaardOpen: VERKLAARD_OPEN });
+  const stand = (o) => {
+    const S = require('./stand');
+    const st = S({ beeld: spoeler.projecteer(JSON.parse(JSON.stringify(kijk() || {}))),
+      dagen: Math.floor((tijd() - sinds) / DAG), sinds, oneens: oneensVoorbeelden, verklaardOpen: VERKLAARD_OPEN });
+    if (o && o.kleinBinnen) st.uitvoeren = S.kleineAantallen(st.uitvoeren);
+    return st;
+  };
 
   /* WAAROM (AUTHORITY.md fase 8) en, sinds besluit 3, WIE: alleen over DEZE
      aanroeper -- zie ./regels.js (perDeur) en ./uitvoeren.js (overMij). */
@@ -159,4 +170,4 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
     spoel: () => { slapend.spoel(); return spoeler.spoel(); }, laatstGebruikt: slapend.laatst };
 }
 
-module.exports = { maakBeleidsmotor, VERKLAARD_OPEN, VELDEN };
+module.exports = { maakBeleidsmotor, VERKLAARD_OPEN, VELDEN, MAX_SLEUTELS, MAX_UITVOER };

@@ -10,15 +10,42 @@ const { RIJP } = require('../commercie/schaduw');
 const { WERKWOORDEN, KAMERSOORT, EXPORTEN } = require('./werkwoorden');
 const uitvoeren = require('./uitvoeren');
 
+/* KLEINE AANTALLEN BLIJVEN BINNEN in de werklijst (11 oktober 2026). Per route
+   is "opNaam 1x" met drie mensen op kantoor een aanwijsbaar persoon. Onder de
+   GRENS geen getal en geen nul, maar de stand TE_KLEINE_GROEP -- de vorm van
+   ../bedrijfsmaat/poort.js. De totalen per klasse blijven staan: die gaan over
+   het hele kantoor en niet over een zeldzame route. De route
+   (routes/office/beleidsmotor.js) past dit toe voor iedereen behalve de
+   eigenaar, die over afdwingen beslist en de exacte werklijst daarvoor nodig
+   heeft. */
+const TE_KLEINE_GROEP = 'TE_KLEINE_GROEP';   // dezelfde betekenis als in ../bedrijfsmaat/poort.js (geen require: andere domeingrens)
+const KLEIN = 5;
+function kleineAantallen(u) {
+  const velden = uitvoeren.SOORTEN.concat(['zouZakken']);
+  u.werklijst = (u.werklijst || []).map(r => {
+    const uit = Object.assign({}, r);
+    for (const v of velden) if (uit[v] > 0 && uit[v] < KLEIN) { uit[v] = null; uit.klein = TE_KLEINE_GROEP; }
+    return uit;
+  });
+  u.kleineAantallen = { grens: KLEIN, stand: TE_KLEINE_GROEP,
+    uitleg: 'In de werklijst staat een aantal onder de ' + KLEIN + ' niet als getal: per route kan dat over een mens gaan.' };
+  return u;
+}
+
 /* Drie bakken en geen percentage, en de rijpheid per deur apart: een deur die
    rijp is en nul keer oneens, kan verhuizen; de rest niet. */
-module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) {
+const stand = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) {
   const perDeur = {};
   const zonderPoort = [];
   const stapop = [];
   const gebruik = {};
   const uitvoerRijen = [];
+  /* Wat over een plafond liep (../kantoor/mensdeur-spoel.js): geteld en
+     zichtbaar, en nooit als een deur of een route gelezen. */
+  const overgelopen = { deuren: 0, uitvoer: 0 };
   for (const r of Object.values(beeld)) {
+    if (r.pad === 'overig') { overgelopen.deuren += r.overgelopen || 0; continue; }
+    if (r.pad === uitvoeren.VOORVOEGSEL + 'overig') { overgelopen.uitvoer += r.overgelopen || 0; continue; }
     if (r.pad.startsWith(uitvoeren.VOORVOEGSEL)) { uitvoerRijen.push(r); continue; }
     if (r.pad.startsWith('werkwoord ') || r.pad.startsWith('kamer ') || r.pad.startsWith('export ')) { gebruik[r.pad] = r.gebruik || 0; continue; }
     if (r.pad.startsWith('stapop ')) {
@@ -53,6 +80,7 @@ module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) 
     rijp: RIJP, meetSinds: new Date(sinds).toISOString(),
     rijpheidNoot: 'De dagen tellen sinds dit proces startte; de getallen zelf blijven over herstarts staan.',
     deuren,
+    overgelopen,
     feiten: FEITEN,
     oneens: oneens.slice(),
     zonderPoort: zonderPoort.sort((a, b) => b.keer - a.keer).slice(0, 100),
@@ -81,3 +109,6 @@ module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) 
     exporten: Object.keys(EXPORTEN).map(r => Object.assign({ route: r }, EXPORTEN[r], { geleverd: gebruik['export ' + r] || 0 }))
   };
 };
+module.exports = stand;
+module.exports.kleineAantallen = kleineAantallen;
+module.exports.KLEIN = KLEIN;

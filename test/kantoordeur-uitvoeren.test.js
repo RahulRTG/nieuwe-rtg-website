@@ -136,6 +136,15 @@ test('2. (b) de gedeelde code is geen individu: geteld als "zou zakken", en toch
   assert.equal(r2.passkey, voor.passkey + 1);
   assert.equal(r2.zouZakken, voor.zouZakken + 2, 'gedeeld en op naam zakken, de passkey niet');
 
+  /* Het kale eigenaarstoken is GEEN passkey (M1 van de tegenlezing): het telt
+     als eigenaarToken en zou bij afdwingen zakken. */
+  assert.equal((await api('/api/office/kantine/menu-zet', { items: ['Thee'] }, eigenaar)).status, 200);
+  const u3 = await uitvoerStand(x => (rij(x, route) || {}).eigenaarToken > (r2.eigenaarToken || 0));
+  const r3 = rij(u3, route);
+  assert.equal(r3.eigenaarToken, (r2.eigenaarToken || 0) + 1, 'het eigenaarstoken telde niet als eigenaarToken');
+  assert.equal(r3.passkey, r2.passkey, 'het eigenaarstoken telde als een passkey');
+  assert.equal(r3.zouZakken, r2.zouZakken + 1);
+
   // een geweigerd verzoek is geen uitgevoerde handeling
   assert.equal((await api('/api/office/kantine/menu-zet', { items: [] }, gedeeld)).status, 400);
   await new Promise(z => setTimeout(z, 150));
@@ -169,6 +178,11 @@ test('5. P0b: wie spreekt en wie logt komt uit de sessie, niet uit het lichaam',
   assert.equal(b.body.voorstel.discussie.at(-1).wie, 'paniekkamer', 'de gedeelde code sprak als de boardroom');
   const e = await api('/api/office/paniek/bericht', { id: v.body.voorstel.id, wie: 'paniekkamer', tekst: 'En ik wel.' }, eigenaar);
   assert.equal(e.body.voorstel.discussie.at(-1).wie, 'boardroom', 'wie een boardroomzetel heeft, spreekt als boardroom');
+  /* MA van de tegenlezing: op naam is niet genoeg -- zonder boardroomzetel
+     spreekt een medewerker op naam als de paniekkamer, wat hij ook typt. */
+  const n = await api('/api/office/paniek/bericht', { id: v.body.voorstel.id, wie: 'boardroom', tekst: 'Ik ook?' }, mens.opNaam);
+  assert.equal(n.status, 200, JSON.stringify(n.body).slice(0, 160));
+  assert.equal(n.body.voorstel.discussie.at(-1).wie, 'paniekkamer', 'een sessie op naam zonder zetel sprak als de boardroom');
   await api('/api/office/paniek/besluit', { id: v.body.voorstel.id, besluit: 'wijs-af' }, eigenaar);
 
   const p = await api('/api/lab/project/maak', { titel: 'Proef voor de logregel', veld: 'dorp', voorWie: 'samen', doel: 'Wie schrijft' }, eigenaar);

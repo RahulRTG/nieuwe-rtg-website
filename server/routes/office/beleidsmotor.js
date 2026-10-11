@@ -16,7 +16,10 @@ module.exports = (octx) => {
     if (!beleidsmotor || typeof beleidsmotor.stand !== 'function') {
       return res.status(503).json({ error: 'De beleidsmotor is niet bedraad in deze server.' });
     }
-    res.json(Object.assign({}, beleidsmotor.stand(), { afdwingen: beleidsmotor.afdwingen ? beleidsmotor.afdwingen.overzicht() : null }));
+    /* Kleine aantallen per route blijven binnen, behalve voor de eigenaar
+       (kern/beleidsmotor/stand.js kleineAantallen). */
+    const st = beleidsmotor.stand({ kleinBinnen: !req.boardroomBaas });
+    res.json(Object.assign({}, st, { afdwingen: beleidsmotor.afdwingen ? beleidsmotor.afdwingen.overzicht() : null }));
   });
 
   /* DE TOEGANGSREVIEW (fase 8): wie houdt een kantoorzetel. Dat is een lijst

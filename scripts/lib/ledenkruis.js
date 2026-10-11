@@ -44,7 +44,8 @@
 
 const ANDEREN = ['anoniem', 'ander lid', 'zaak', 'kantoor', 'gezin'];
 const GRENS = 'het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, ' +
-  'een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord';
+  'een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; ' +
+  'van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen';
 
 const ok = (s) => s >= 200 && s < 300;
 
@@ -54,7 +55,7 @@ const ok = (s) => s >= 200 && s < 300;
    "via: scherm:x" terugkrijgt, ziet zijn eigen woord. Zonder die uitzondering
    meldde de eerste ronde een lek op /api/mijn/post/zet dat er niet was. */
 function andersOordeel({ status, tekst }, merktekens, { handeling = false, wie = '', verzoek = '' } = {}) {
-  if (status === 429) return 'onbeslist';
+  if (status === 429 || status === 0) return 'onbeslist';
   if (!ok(status)) return 'geweigerd';
   const raak = merktekens.find((m) => m && !String(verzoek).includes(m.replace(/^scherm:/, '')) && String(tekst || '').includes(m));
   if (raak) return 'lek';
@@ -119,9 +120,15 @@ async function roep(base, v, token) {
   }
   if (token) koppen.authorization = 'Bearer ' + token;
   try {
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), 15000);
     const r = await fetch(base + v.url, { method: v.methode, headers: koppen,
-      body: v.methode === 'GET' || v.methode === 'HEAD' ? undefined : (v.lijf || '{}'), signal: AbortSignal.timeout(15000) });
-    return { status: r.status, tekst: await r.text().catch(() => '') };
+      body: v.methode === 'GET' || v.methode === 'HEAD' ? undefined : (v.lijf || '{}'), signal: ac.signal });
+    clearTimeout(t);
+    /* Een stroom eindigt nooit: de status telt, de inhoud is leeg (zie hierboven). */
+    if (/event-stream/i.test(r.headers.get('content-type') || '')) { ac.abort(); return { status: r.status, tekst: '' }; }
+    const tekst = await Promise.race([r.text().catch(() => ''), new Promise((k) => setTimeout(() => { ac.abort(); k(''); }, 5000))]);
+    return { status: r.status, tekst };
   } catch (e) { return { status: 0, tekst: '' }; }
 }
 
@@ -179,7 +186,13 @@ async function meetRij({ rij, base, browser, maakContext, opslagVoor, anderen, e
     if (geladen.has(k)) return;
     const v = { methode: q.method(), url: u.pathname + u.search, pad: u.pathname, lijf: q.postData() || '', koppen: q.headers(), a: res.status() };
     geladen.set(k, v);
-    wacht.push(res.text().then((t) => { v.tekst = t; }, () => { v.tekst = ''; }));
+    /* Een stroom (EventSource, een lang lopend antwoord) eindigt nooit; wie daar
+       op res.text() wacht, hangt de hele ronde op -- dat gebeurde, een kwartier
+       lang zonder melding. Daarom een grens, en een stroom telt als leeg. */
+    const soort = String((res.headers() || {})['content-type'] || '');
+    if (/event-stream/i.test(soort)) { v.tekst = ''; return; }
+    wacht.push(Promise.race([res.text(), new Promise((r) => setTimeout(() => r(''), 5000))])
+      .then((t) => { v.tekst = t; }, () => { v.tekst = ''; }));
   });
   try { await page.goto(base + rij.pad, { waitUntil: 'domcontentloaded', timeout: 20000 }); await page.waitForTimeout(2600); } catch (e) { /* telt hieronder als niets geladen */ }
   await Promise.all(wacht);

@@ -3,14 +3,42 @@
   "gemeten": {
     "op": "2026-10-06T13:07:35.169Z",
     "commit": "9919f748",
-    "routesToen": 5459,
-    "aangevuld": {
-      "op": "2026-10-11",
-      "commit": "6ae9945a",
-      "routes": ["POST /api/verbond/lees", "POST /api/verbond/mijn", "POST /api/verbond/teken", "POST /api/verbond/voorstel", "POST /api/verbond/wijzig", "POST /api/verbond/zeg-op"],
-      "bron": "routejournaal (RTG_ROUTELOG) van node --test test/verbond-server.test.js",
-      "waarom": "De volle suite is voor deze zes nieuwe routes NIET opnieuw gedraaid; de andere 5453 komen uit de meting van 6 oktober (commit 9919f748). routesToen staat daarom op de routekaart na deze commit. Een volgende npm run dekking:vast vervangt dit blok."
-    }
+    "routesToen": 5470,
+    "aangevuld": [
+      {
+        "op": "2026-10-11",
+        "commit": "6ae9945a",
+        "routes": [
+          "POST /api/verbond/lees",
+          "POST /api/verbond/mijn",
+          "POST /api/verbond/teken",
+          "POST /api/verbond/voorstel",
+          "POST /api/verbond/wijzig",
+          "POST /api/verbond/zeg-op"
+        ],
+        "bron": "routejournaal (RTG_ROUTELOG) van node --test test/verbond-server.test.js",
+        "waarom": "De volle suite is voor deze zes nieuwe routes NIET opnieuw gedraaid; de andere 5453 komen uit de meting van 6 oktober (commit 9919f748). routesToen staat daarom op de routekaart na deze commit. Een volgende npm run dekking:vast vervangt dit blok."
+      },
+      {
+        "op": "2026-10-11",
+        "commit": "7674d27f",
+        "routes": [
+          "POST /api/beraad/heropen",
+          "POST /api/beraad/hulp",
+          "POST /api/beraad/inbreng",
+          "POST /api/beraad/lees",
+          "POST /api/beraad/mijn",
+          "POST /api/beraad/naar-stemmen",
+          "POST /api/beraad/open",
+          "POST /api/beraad/sluit",
+          "POST /api/beraad/stem",
+          "POST /api/beraad/terugkoppeling-gezien",
+          "POST /api/beraad/voorstel"
+        ],
+        "bron": "routejournaal (RTG_ROUTELOG) van node --test test/beraad-server.test.js",
+        "waarom": "De volle suite is voor deze elf nieuwe routes NIET opnieuw gedraaid; de andere 5453 komen uit de meting van 6 oktober (commit 9919f748). routesToen staat daarom op de routekaart na deze commit. Een volgende npm run dekking:vast vervangt dit blok."
+      }
+    ]
   },
   "aangeraakt": [
     "DELETE /api/scim/v2/Groups/:id",
@@ -405,6 +433,17 @@
     "POST /api/bedrijf/werkruimte/maak",
     "POST /api/bedrijf/werkruimte/tekenwijze",
     "POST /api/bedrijf/zoek",
+    "POST /api/beraad/heropen",
+    "POST /api/beraad/hulp",
+    "POST /api/beraad/inbreng",
+    "POST /api/beraad/lees",
+    "POST /api/beraad/mijn",
+    "POST /api/beraad/naar-stemmen",
+    "POST /api/beraad/open",
+    "POST /api/beraad/sluit",
+    "POST /api/beraad/stem",
+    "POST /api/beraad/terugkoppeling-gezien",
+    "POST /api/beraad/voorstel",
     "POST /api/bescherming/deur/intrekken",
     "POST /api/bescherming/deur/stand",
     "POST /api/bescherming/deur/start",

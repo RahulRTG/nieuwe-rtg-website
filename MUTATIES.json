@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T06:08:26.331Z",
-    "commit": "49a0508d",
+    "op": "2026-10-11T19:03:12.337Z",
+    "commit": "d4aed8e8",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -269,6 +269,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "leest scripttags in HTML en geen module; de operatoren raken geen scripttag. Met de hand nagetrokken: vorm.js weg op reizen-veilig (zakt, en appmenu.e2e.js op de context van reizen-veilig), vorm.js na register.js op app (zakt), de objectpoort na rtg-schil.js in werkruimte (zakt, en werkruimte-objecten.e2e.js)"
+    },
+    "adaptiefdoe.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/adaptief/grammatica.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 4
     },
     "administratie.test.js": {
       "soort": "server",

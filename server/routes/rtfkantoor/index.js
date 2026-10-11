@@ -60,7 +60,11 @@ module.exports = (kern) => {
   app.post('/api/rtfkantoor/stadsraad/partner-maak', officeAuth, (req, res) => veilig(res, () => stadsraad.partnerMaak(req.body || {})));
   app.post('/api/rtfkantoor/stadsraad/partner-stop', officeAuth, (req, res) => veilig(res, () => stadsraad.partnerStop(String(req.body.id || ''))));
   app.post('/api/rtfkantoor/stadsraad/besluit-start', officeAuth, (req, res) => veilig(res, () => stadsraad.besluitStart(req.body.projectId, req.body.voorstel, boardroomWie(req) || 'kantoor', 'rtg')));
-  app.post('/api/rtfkantoor/stadsraad/stem', officeAuth, (req, res) => veilig(res, () => stadsraad.stem(String(req.body.besluitId || ''), 'rtg', req.body.naam || boardroomWie(req), req.body.voor === true)));
+  /* de stemmer komt uit de sessie en nooit uit het verzoek (AUTHORITY.md P0b): een
+     stem is uniek per naam, dus een naam uit het verzoek gaf met dezelfde
+     kantoorcode zoveel stemmen als je namen verzon. Zonder naam op de sessie
+     (de gedeelde code) is het EEN stem van 'RTG' (kern/stadsraad.js). */
+  app.post('/api/rtfkantoor/stadsraad/stem', officeAuth, (req, res) => veilig(res, () => stadsraad.stem(String(req.body.besluitId || ''), 'rtg', boardroomWie(req), req.body.voor === true)));
   app.post('/api/rtfkantoor/stadsraad/besluit-sluit', officeAuth, (req, res) => veilig(res, () => stadsraad.besluitSluit(String(req.body.besluitId || ''))));
 
   app.post('/api/lab/ai', officeAuth, async (req, res) => {

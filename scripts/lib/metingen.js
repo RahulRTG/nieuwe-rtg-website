@@ -107,6 +107,11 @@ const REGISTER = {
   'AANROEPGRAAF.json': { eigenRatel: 'test/codewereld.test.js' },
   'CAPABILITEIT.json': { eigenRatel: 'test/capabilities.test.js' },
   'CODEWERELD.json': { eigenRatel: 'test/codewereld.test.js' },
+  /* TOEZEGKLASSEN.json is het besluitbestand van de inventaris (AFBOUWPROGRAMMA.md).
+     Zijn getal dat slechter kan worden is het aantal ROTTE citaten, en dat staat op
+     een harde nul: test/toezegklassen.test.js zakt bij een enkel rot citaat of een
+     klasse buiten de vier (met twee mutaties nagetrokken bij de tegenlezing). */
+  'TOEZEGKLASSEN.json': { eigenRatel: 'test/toezegklassen.test.js' },
   'COMMERCE.json': { eigenRatel: 'scripts/check.js' },
   'CONTEXTDOORGIFTE.json': { eigenRatel: 'test/contextdoorgifte.test.js' },
   'CONTROLS.json': { eigenRatel: 'test/controls.test.js' },

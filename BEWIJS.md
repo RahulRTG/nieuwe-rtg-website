@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2441 |
 | losse beweringen (`test(...)`) | 16714 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2267 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 1 |
+| niets van beide | 0 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -2259,7 +2259,7 @@ toets omvalt.
 | `gebaar.e2e.js` | 5 | gezakt op `liegpoort /api/` | RTG Gebaren in een echte browser: de laden onder een regel, de drempel, de uitvoering en de weg terug. WAAROM DIT EEN E2E IS EN GEEN UNIT. |
 | `gedachten-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets voor apps/gedachten.html. Het punt dat hier op het scherm zelf moet kloppen: bij een zin waar de crisisregel op aanslaat blijft de notitie STAAN en komt de hulp ernaast. |
 | `gegevenskaart-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets voor apps/mijn-gegevens.html. DE BEWERING DIE ERTOE DOET is dat "niet vast te stellen" op dit scherm een EIGEN gezicht heeft en niet dat van "nee". |
-| `geld-lidmaatschap.e2e.js` | 2 | -- | DE STAND LIDMAATSCHAP IN RTG GELD -- de hele stroom in een echte browser. WAAROM DIT NAAST test/lidabonnement-deur.test.js STAAT. |
+| `geld-lidmaatschap.e2e.js` | 2 | gezakt op `liegpoort /api/` | DE STAND LIDMAATSCHAP IN RTG GELD -- de hele stroom in een echte browser. WAAROM DIT NAAST test/lidabonnement-deur.test.js STAAT. |
 | `geld.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Geld als ECHTE app: vier rustige hoofdingangen met de twaalf vertrouwde geldstanden bereikbaar achter Meer (PLATFORM.md par. 0, de eerste wereld die werkelijk is samengevoegd). |
 | `genootschap.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor Genootschap. De unit-toetsen (test/genootschap.test.js) bewijzen de server-kant; deze bewijst dat het scherm het doet: oprichten, een bijeenkomst uitroepen en beantwoorden, en een peiling waarvan de... |
 | `gereedschap.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Gereedschap: rekenen met de toetsen (btw erbij), een wekker en een timer zetten (de server telt), en het alarmscherm dat op het SSE-seintje opent. Draait alleen waar een browser is. |

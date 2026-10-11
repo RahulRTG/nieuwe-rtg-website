@@ -18,7 +18,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stop, stopNet, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
 
 const pw = laadPlaywright();
 const SCHERM = '/apps/move.html';
@@ -125,8 +125,8 @@ test('Move rekent een gekozen uitloop door en zet een voorstel klaar zonder iets
 
     /* HERSTEL: valt de server weg, dan geen kale fout maar een zin, en de knop
        komt terug zodat de reiziger het opnieuw kan proberen. */
-    stop(srv); gestopt = true;
-    await new Promise(r => setTimeout(r, 400));
+    /* Wachten tot de server echt weg is, niet een vaste 400 ms. */
+    await stopNet(srv.child); gestopt = true;
     await page.locator('.naad .uitloop button').first().click();
     await page.waitForFunction(() => /niet gelukt/i.test((document.querySelector('.gevolg') || {}).textContent || ''),
       null, { timeout: 10000 });

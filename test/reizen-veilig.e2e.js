@@ -17,7 +17,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, letOpFouten, wachtOpNetstilte } = require('./helper');
 
 const pw = laadPlaywright();
 const SCHERM = '/apps/reizen-veilig.html';
@@ -124,8 +124,9 @@ test('Reizen & Veilig toont het echte volgende moment, het echte aanbod en geeft
       return !!veld && /wens=/.test(f.contentWindow.location.search) && veld.value === 'rust aan zee'
         && !doc.querySelector('#travelAdvice').hidden;
     }, null, { timeout: 20000 });
-    /* Ook niet een tel later: een uitgestelde vraag is net zo goed een vraag. */
-    await page.waitForTimeout(5000);
+    /* Ook niet een tel later: een uitgestelde vraag is net zo goed een vraag. Wachten tot
+       het netwerk twee seconden stil ligt, en niet op een vaste tijd. */
+    await wachtOpNetstilte(page, { stilMs: 2000, maxMs: 8000 });
     assert.deepEqual(adviesVragen, [], 'er is geen advies opgevraagd: drukken doet het lid daar zelf');
 
     assert.deepEqual(fouten, [], 'geen paginafout');

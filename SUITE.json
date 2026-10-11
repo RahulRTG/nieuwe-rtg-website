@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-30T20:57:40.326Z",
-  "commit": "c47e0090134a039811671a2bb4d9397004c69f92",
-  "boomVuil": false,
-  "boomAnders": 1,
+  "op": "2026-10-11T23:24:15.094Z",
+  "commit": "00a2b5886ac1ceb641e9e86694f59fcf2e9ea8f3",
+  "boomVuil": true,
+  "boomAnders": 0,
   "instrument": "scripts/test-runner.js",
   "node": "v26.10.0"
  },
@@ -12,16 +12,16 @@
  "hoe": "npm test",
  "gemeten": {
   "volledig": true,
-  "bestanden": 1993,
-  "bestandenSha256": "0bed38ca678ac39fa27a7cc07f92ad8f5fc80e57fcb82da1df0b1945797655d9",
+  "bestanden": 2243,
+  "bestandenSha256": "59adf0e63718f0f12dc08ec6079be268a191190361aaf4372eb1d579e88e1788",
   "afsluitcode": 1,
   "groen": false,
   "tapVolledig": true,
-  "tests": 15732,
-  "geslaagdeTests": 15680,
-  "mislukt": 9,
+  "tests": 17408,
+  "geslaagdeTests": 17337,
+  "mislukt": 23,
   "geannuleerd": 0,
-  "overgeslagen": 43,
+  "overgeslagen": 48,
   "todo": 0
  },
  "postgres": null

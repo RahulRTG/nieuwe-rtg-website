@@ -59,19 +59,21 @@ test('#tab=<stand> opent de stand ook als het account laat binnenkomt, en nooit 
         localStorage.setItem('rtg_cookieinfo_v1', '1');
       } catch (e) {}
     }, reg.token);
-    /* Het late account: het herstellen van de sessie wacht 1500 ms. */
-    await ctx.route('**/api/state', async (route) => {
-      await new Promise((r) => setTimeout(r, 1500));
-      await route.continue();
-    });
+    /* Het late account: het herstellen van de sessie komt pas binnen als de pagina al
+       helemaal geladen is. Geen vaste vertraging maar een toestand (zie open()). */
 
     const open = async (stand) => {
       const page = await ctx.newPage();
+      await page.route('**/api/state', async (route) => {
+        await page.waitForFunction(() => document.readyState === 'complete', null, { timeout: 20000 }).catch(() => {});
+        await route.continue();
+      });
       const fouten = [];
       letOpFouten(page, fouten);
       await page.goto(base + '/apps/app.html#' + (stand === 'ai' ? 'ai' : 'tab=' + stand), { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => !!document.querySelector('.view.active'), null, { timeout: 20000 });
-      await page.waitForTimeout(2500);
+      await page.waitForFunction(() => location.hash === '', null, { timeout: 20000 });
+      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
       const beeld = await page.evaluate((s) => {
         const knop = document.querySelector('.tabbar button[data-tab="' + s + '"]');
         return {

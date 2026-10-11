@@ -9,7 +9,7 @@
    - uitvoeren vraagt een passkey (de server antwoordt 401 met `bevestigingNodig`, en
      /shared/zwaarstap.js laat de browser tekenen op het loket van DIT recht);
    - vanaf duizend euro zet de server een aanvraag klaar voor een TWEEDE mens, en dan
-     zegt dit scherm dat er nog geen geld bewoog -- die collega tekent bij RTG Bank,
+     zegt dit scherm dat er nog geen geld bewoog -- die collega tekent bij RTG Rekening,
      onder "Wacht op een tweede handtekening";
    - afwijzen vraagt een reden van ten minste tien tekens, en die wordt bij het recht
      bewaard. Het scherm belooft NIET dat het lid hem leest: geen ledenroute toont de
@@ -78,7 +78,7 @@ window.RTGReisTeruggave = function (o) {
         const r = await uitvoeren(id);
         if (r.needsAuth) {
           const zin = await dossierZin(r.voornemen && r.voornemen.id);
-          meld('Klaargezet voor een tweede mens. Er is nog geen geld bewogen; een collega tekent bij RTG Bank.');
+          meld('Klaargezet voor een tweede mens. Er is nog geen geld bewogen; een collega tekent bij RTG Rekening.');
           if (stand) stand.textContent = 'Wacht op een tweede handtekening. ' + zin;
           return;
         }

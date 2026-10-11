@@ -72,7 +72,9 @@ async function proef(reducedMotion) {
     await page.evaluate(() => window.RTGCommand.open('/apps/reizen.html', 'TravelOS'));
     const blad = () => page.frames().find((f) => { try { return new URL(f.url()).pathname === '/apps/reizen.html'; } catch (e) { return false; } });
     await page.waitForFunction(() => !!document.querySelector('.cmd-pane.actief iframe'), null, { timeout: 20000 });
-    for (let i = 0; i < 100 && !blad(); i++) await page.waitForTimeout(100);
+    /* Wachten tot het blad echt op TravelOS staat, niet een vaste tik per ronde. */
+    await page.waitForFunction(() => [...document.querySelectorAll('iframe')].some((f) => {
+      try { return f.contentWindow.location.pathname === '/apps/reizen.html'; } catch (e) { return false; } }), null, { timeout: 20000 });
     const reizen = blad();
     assert.ok(reizen, 'TravelOS staat als blad in de werktafel');
     await reizen.waitForSelector('a.wh-service[href="/apps/reisboek.html"]', { state: 'attached', timeout: 20000 });
@@ -94,11 +96,9 @@ async function proef(reducedMotion) {
     await kaart.scrollIntoViewIfNeeded();
     await reizen.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
     await kaart.click();
-    let doel = null;
-    for (let i = 0; i < 200 && !doel; i++) {
-      doel = page.frames().find((f) => { try { return new URL(f.url()).pathname === '/apps/reisboek.html'; } catch (e) { return false; } });
-      if (!doel) await page.waitForTimeout(100);
-    }
+    await page.waitForFunction(() => [...document.querySelectorAll('iframe')].some((f) => {
+      try { return f.contentWindow.location.pathname === '/apps/reisboek.html'; } catch (e) { return false; } }), null, { timeout: 20000 });
+    const doel = page.frames().find((f) => { try { return new URL(f.url()).pathname === '/apps/reisboek.html'; } catch (e) { return false; } });
     assert.ok(doel, 'de kaart opent het reisboek in hetzelfde blad');
     await doel.waitForFunction(() => document.readyState !== 'loading', null, { timeout: 20000 });
     /* Wachten op het MOMENT en niet op een vaste tijd: onder belasting komt

@@ -403,6 +403,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "agentinstructies.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/agentinstructies.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "ai-budget.test.js": {
       "soort": "puur",
       "staat": "gezakt",

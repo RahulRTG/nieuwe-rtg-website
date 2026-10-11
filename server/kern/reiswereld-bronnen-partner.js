@@ -80,7 +80,12 @@ function activiteiten({ kern, regel, bron }, key, uit, stil) {
           van: datumVan(b), tijd: tijdVan(b), personen: b.personen,
           status: b.status, wacht: b.status === 'aangevraagd' ? 'de zaak' : null,
           kenmerk: b.ref, herkomst: 'partner',
-          app: b.kind === 'ticket' ? 'Tickets' : 'Diensten', link: '/apps/portaal.html'
+          /* `/apps/portaal.html` stond hier, en dat scherm heeft nooit bestaan
+             (404). De stand Ter plaatse van de ledenapp toont ze wel, maar is
+             via een adres niet betrouwbaar te openen (#tab= klikt een tabbalk
+             die daar verborgen is). Mijn reizen toont de afspraak met haar
+             status, en daar staat hij dus. */
+          app: 'Mijn reizen', link: '/apps/reizen.html#reizen'
         });
       });
   }, uit, stil);

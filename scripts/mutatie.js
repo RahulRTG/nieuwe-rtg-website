@@ -597,6 +597,8 @@ const EIGEN_MODULE = new Map([
   /* Reizen & Veilig: het moment uit Move en het aanbod uit de catalogus wonen
      in reizen-veilig-reis.js (11 oktober 2026). */
   ['reizen-veilig.e2e.js', ['public/apps/reizen-veilig-reis.js']],
+  /* Haal ik het?: de uitloopvraag op /api/move/gevolg (11 oktober 2026). */
+  ['move-gevolg.e2e.js', ['public/apps/move.html']],
   ['living-world.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sqlite.test.js', ['server/kern/living-world/index.js']],

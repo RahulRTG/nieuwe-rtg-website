@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-11",
-  "commit": "7bb32d96c",
-  "seconden": 9.4,
+  "commit": "be366f544",
+  "seconden": 14.1,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -4497,6 +4497,7 @@
     "server/lib/idemsleutels-rtflabfonds.js",
     "server/lib/idemsleutels-rtgid.js",
     "server/lib/idemsleutels-salon.js",
+    "server/lib/idemsleutels-samenvoeging.js",
     "server/lib/idemsleutels-stage.js",
     "server/lib/idemsleutels-toestemming.js",
     "server/lib/idemsleutels-verbond.js",
@@ -7166,18 +7167,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5690,
-  "gelezen": 5376,
+  "bestandenGezien": 5691,
+  "gelezen": 5377,
   "nietGelezen": 314,
   "waarvanBundeldeel": 314,
   "waarvanParsefout": 0,
   "symbolen": 27178,
-  "bestandenMetUitvoer": 4479,
-  "uitvoerMetNamen": 2025,
+  "bestandenMetUitvoer": 4480,
+  "uitvoerMetNamen": 2026,
   "uitvoerOnvolledig": 5,
   "uitvoerZonderNamen": 2449,
   "zonderUitvoer": 897,
-  "requireKanten": 7615
+  "requireKanten": 7616
  },
  "nietGelezen": [
   {
@@ -78102,13 +78103,13 @@
     {
      "naam": "geldpositieVan",
      "soort": "functie",
-     "lijn": 111,
+     "lijn": 115,
      "geexporteerd": true
     },
     {
      "naam": "klassenVan",
      "soort": "functie",
-     "lijn": 127,
+     "lijn": 131,
      "geexporteerd": true
     }
    ],
@@ -169982,6 +169983,7 @@
     "server/lib/idemsleutels-officeformaten.js",
     "server/lib/idemsleutels-reisteruggave.js",
     "server/lib/idemsleutels-rtc.js",
+    "server/lib/idemsleutels-samenvoeging.js",
     "server/lib/idemsleutels-toestemming.js",
     "server/lib/idemsleutels-vrijgave.js"
    ],
@@ -170091,6 +170093,21 @@
    "extern": [],
    "gebruiktDoor": [
     "server/lib/idemsleutels.js"
+   ]
+  },
+  {
+   "bestand": "server/lib/idemsleutels-samenvoeging.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "SLEUTELS"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/lib/idemsleutels-recent.js"
    ]
   },
   {

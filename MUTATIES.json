@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-11T20:04:19.271Z",
-    "commit": "43c53cfd",
+    "op": "2026-10-11T20:28:47.630Z",
+    "commit": "9a1c9606",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 6,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
   },
@@ -15421,6 +15421,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "supplier-logboekzicht.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
       "scherp": "gezakt"
     },
     "supplier-notificaties.test.js": {

@@ -1,8 +1,8 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-10-06",
+  "vastgelegd": "2026-10-11",
   "gemeten": {
-    "bestanden": 2788,
+    "bestanden": 2789,
     "domeinenTotaal": 699,
     "koopbareVormen": 621,
     "koopbareDomeinen": 126,
@@ -76,7 +76,7 @@
     "prijs": 41,
     "beschikbaarheid": 55,
     "reserveer": 32,
-    "bevestig": 61,
+    "bevestig": 62,
     "lever": 25,
     "annuleer": 37,
     "retour": 9
@@ -1272,6 +1272,25 @@
       "telt": 3
     },
     {
+      "domein": "kern/leverancier",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "beschikbaarheid": "ticketsVoorSlot",
+        "bevestig": "logboekVoor",
+        "lever": "bezorgtNu"
+      },
+      "telt": 3
+    },
+    {
       "domein": "kern/magnaat-grootboek",
       "heeft": {
         "toon": true,
@@ -1524,24 +1543,6 @@
       "bewijs": {
         "toon": "beeld",
         "beschikbaarheid": "openbaar"
-      },
-      "telt": 2
-    },
-    {
-      "domein": "kern/leverancier",
-      "heeft": {
-        "toon": false,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": true,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "beschikbaarheid": "ticketsVoorSlot",
-        "lever": "bezorgtNu"
       },
       "telt": 2
     },

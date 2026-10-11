@@ -1,16 +1,16 @@
 {
   "stempel": {
-    "op": "2026-10-11T05:58:02.762Z",
-    "commit": "f1faf3791",
+    "op": "2026-10-11T10:03:58.512Z",
+    "commit": "84a26c27e",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/rolronde.js",
     "node": "v26.10.0"
   },
   "uitleg": "De rolronde: welke rol komt waar binnen, gevraagd aan een echte server in plaats van aan de brontekst. gaten MAG ALLEEN DALEN en gemeten mag ALLEEN STIJGEN -- zie scripts/rolronde.js. Dit is de VERTICALE scheiding; de horizontale (lid A tegen lid B) is de gluurder-trede van de ladder.",
-  "gedraaid": "2026-10-11T05:58:02.763Z",
+  "gedraaid": "2026-10-11T10:03:58.513Z",
   "meters": {
-    "rolscheidingGaten": 2,
+    "rolscheidingGaten": 0,
     "rolscheidingGemeten": 2035
   },
   "routesOnderzocht": 5086,
@@ -25,18 +25,5 @@
       "toets": "test/linkkoppelingen.test.js -- \"je ziet alleen je eigen koppelingen, en een zaak de zijne\""
     }
   ],
-  "gaten": [
-    {
-      "route": "POST /api/stroom/ticket",
-      "rol": "leverancier",
-      "status": 200,
-      "bestand": "server/opzet/stroomtoegang.js:27"
-    },
-    {
-      "route": "POST /api/stroom/ticket",
-      "rol": "kantoor",
-      "status": 200,
-      "bestand": "server/opzet/stroomtoegang.js:27"
-    }
-  ]
+  "gaten": []
 }

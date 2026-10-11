@@ -8,6 +8,7 @@
 'use strict';
 
 const SLEUTELS = Object.assign({},
-  require('./idemsleutels-verbond').SLEUTELS);
+  require('./idemsleutels-verbond').SLEUTELS,
+  require('./idemsleutels-beraad').SLEUTELS);
 
 module.exports = { SLEUTELS };

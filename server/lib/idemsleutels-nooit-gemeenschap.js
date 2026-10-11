@@ -6,4 +6,5 @@
 'use strict';
 
 module.exports = Object.freeze(Object.assign({},
-  require('./idemsleutels-nooit-verbond')));
+  require('./idemsleutels-nooit-verbond'),
+  require('./idemsleutels-nooit-beraad')));

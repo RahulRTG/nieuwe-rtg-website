@@ -70,6 +70,26 @@ test('bezorgzones: kosten, minimum en gratis vanaf -- en buiten de zone een rede
   await H('/bezorg/zone', { open: true, reden: '' });
 });
 
+test('straalzones: binnen de straal bezorgbaar, erbuiten de afstand als reden', async () => {
+  /* Deze tak was dood. zoekZone riep haversine met vier GETALLEN aan terwijl
+     server/lib/geo.js twee PUNTEN verwacht, en las zaak.lat terwijl een zaak
+     zijn plek in zaak.loc draagt -- dus gaf hij null, en `null <= straal` is in
+     JavaScript waar. Alleen de postcodes waren getoetst. De zaak staat op
+     Ibiza (38.918, 1.451). */
+  const vorige = (await H('/bezorg/zone', {})).body.zones;
+  await H('/bezorg/zone', { zones: [{ id: 'kring', naam: 'Marina', straalKm: 5, kosten: 3, minuten: 20 }] });
+  const dichtbij = (await H('/bezorg/check', { lat: 38.93, lng: 1.45, bedrag: 30 })).body;
+  assert.equal(dichtbij.bezorgbaar, true, JSON.stringify(dichtbij));
+  assert.equal(dichtbij.hoe, 'straal');
+  assert.ok(dichtbij.km > 1 && dichtbij.km < 2, 'de afstand is in kilometers: ' + dichtbij.km);
+
+  const ver = (await H('/bezorg/check', { lat: 39.0, lng: 1.45, bedrag: 30 })).body;
+  assert.equal(ver.bezorgbaar, false, 'negen kilometer verderop valt buiten een straal van vijf');
+  assert.match(ver.reden, /km verderop; we bezorgen tot 5 km/, ver.reden);
+  assert.ok(ver.km > 8 && ver.km < 10, ver.km);
+  await H('/bezorg/zone', { zones: vorige });
+});
+
 test('tijdsloten: de rem telt keukenminuten en noemt het eerstvolgende slot', async () => {
   await H('/bezorg/sloten', { sloten: { '18:00': 60, '18:30': 60, '19:00': 120 } });
   const lijst = (await H('/bezorg/sloten', { datum: '2026-08-05' })).body;

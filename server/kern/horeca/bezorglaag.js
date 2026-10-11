@@ -33,8 +33,15 @@ module.exports = ({ save, horeca, haversine }) => {
   function zoekZone(b, { postcode, lat, lng }, zaak) {
     const code = pc(postcode);
     for (const z of b.zones) if (z.postcodes.length && z.postcodes.some(p => code.startsWith(p))) return { zone: z, hoe: 'postcode' };
-    if (lat != null && lng != null && zaak && zaak.lat != null && zaak.lng != null) {
-      const km = haversine(Number(lat), Number(lng), Number(zaak.lat), Number(zaak.lng));
+    /* Een zaak draagt zijn plek in `loc` (de oude vorm had lat/lng los), en
+       haversine() neemt twee PUNTEN en geeft METERS -- hier stonden vier losse
+       getallen, en dan kwam er null uit en is `null <= straalKm` waar. Geen
+       afstand is geen afstand: dan valt de straaltak weg, nooit raak. */
+    const plek = zaak && (zaak.loc || zaak);
+    const meter = (lat != null && lng != null && plek && plek.lat != null && plek.lng != null)
+      ? haversine({ lat: Number(lat), lng: Number(lng) }, { lat: Number(plek.lat), lng: Number(plek.lng) }) : null;
+    if (meter != null) {
+      const km = meter / 1000;
       for (const z of b.zones) if (z.straalKm && km <= z.straalKm) return { zone: z, hoe: 'straal', km: Math.round(km * 10) / 10 };
       const grootste = b.zones.filter(z => z.straalKm).sort((a, c) => c.straalKm - a.straalKm)[0];
       if (grootste) return { zone: null, reden: 'U zit ' + (Math.round(km * 10) / 10) + ' km verderop; we bezorgen tot ' + grootste.straalKm + ' km.', km: Math.round(km * 10) / 10 };

@@ -534,7 +534,8 @@
     "experience:gate": "node scripts/experience.js --gate",
     "releaseketenwacht": "node scripts/releaseketenwacht.js",
     "auditboek": "node scripts/auditboek.js",
-    "artefactketen": "node scripts/artefactketen.js"
+    "artefactketen": "node scripts/artefactketen.js",
+    "bezorgproef": "node scripts/bezorgproef.js"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

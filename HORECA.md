@@ -926,6 +926,31 @@ Dat verhoogt de ratel `kernGedeeld` met een, en een ratel gaat alleen omhoog
 met een besluit in NORM.json. Ook uitklokken in de personeelsapp zegt het nog
 niet, om dezelfde reden in de andere richting.
 
+**De tweede keten: bezorging** (11 oktober 2026). De tafelproef noemt
+bezorging, hotel en club als eigen naden; `scripts/bezorgproef.js`
+(`npm run bezorgproef`, en als gewone toets `test/bezorgproef.test.js`) loopt
+de eerste: zaak zet de dienst aan, lid bestelt en betaalt vooraf, keuken zet in
+bereiding, inpakker pakt in op het bonnummer, bezorger neemt de rit op eigen
+naam, vertrekt, deelt zijn positie en meldt bezorgd -- tien schakels, elk gemeten
+bij de ONTVANGER (het volgscherm en de meldingen van het lid, het overzicht van
+de bezorger). Hij vond twee gebreken die geen losse routetoets zag, en allebei
+zaten ze op twee wegen tegelijk (`bezorg/status` en `order/status`): een
+levering kon op **bezorgd** zonder ooit te zijn vertrokken -- het lid las "Eet
+smakelijk!" voor eten dat nog in de keuken stond, terwijl het vertrek wel een
+poort had -- en **dezelfde stand twee keer** gaf het lid een tweede bericht. Beide
+zijn dicht in `kern/horeca/bezorgovergang.js`, een regel die beide routes vragen: de
+bezorghelft loopt alleen vooruit, een afgeronde levering is geen vertrekpunt, en
+een herhaling verandert niets en meldt niets. Een rit met meerdere leveringen
+wordt eerst helemaal gekeurd en dan pas gezet, zodat er geen half vertrek meer is.
+In dezelfde ronde bleek de **straalzone** dood: `zoekZone` gaf `haversine` vier
+losse getallen in plaats van twee punten en las `zaak.lat` waar een zaak `loc`
+draagt, dus elk adres viel door naar "geef een postcode op" -- alleen de
+postcodezones waren getoetst (`test/horeca-bezorg-club.test.js` toetst nu ook de
+straal). Wat de proef niet bewijst: er wordt niet echt betaald, er komt geen
+browser aan te pas, en de bezorgzones en tijdsloten (`kern/horeca/bezorglaag.js`)
+worden door de ledenbestelling niet geraadpleegd -- dat is een naad die hier
+staat en niet is gelegd. De keten staat nog niet in `scripts/ketenvorm.js`.
+
 ## De echte wauw
 
 Voor de gast: *"Ze wisten wat wij nodig hadden, zonder dat het onpersoonlijk of

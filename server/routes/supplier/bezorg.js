@@ -1,5 +1,6 @@
 /* Domein "supplier" (deelmodule): bezorg. Draait op de gedeelde kern. */
 const { coord } = require('../../kern/util');
+const { overgang } = require('../../kern/horeca/bezorgovergang');
 module.exports = (kern) => {
   const { app, crypto, db, logActivity, magBezorgen, haversine, etaMinutes, managerOnly, notify, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, orderMetRef, ordersVanZaak } = kern;
 
@@ -99,16 +100,25 @@ app.post('/api/supplier/bezorg/status', supplierAuth, (req, res) => {
   const status = String(req.body.status || '');
   if (!['onderweg', 'bezorgd', 'opgehaald'].includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
   const refs = (Array.isArray(req.body.refs) ? req.body.refs : [req.body.ref]).filter(Boolean).slice(0, 8);
-  const bijgewerkt = [];
+  // eerst keuren, dan doen: mag een ref van de rit niet, dan verandert er niets
+  const doen = [], al = [];
   for (const ref of refs) {
     const o = (x => x && x.supplierCode === s.code ? x : undefined)(orderMetRef(ref));
     if (!o || !o.levering) continue;
     if (status === 'opgehaald' && o.levering !== 'ophalen') continue;
     if (status !== 'opgehaald' && o.levering !== 'bezorgen') continue;
     if (status !== 'opgehaald' && o.bezorger && req.actor.staffId && o.bezorger.staffId !== req.actor.staffId && !req.actor.manager) continue;
+    // alleen vooruit, en een herhaling meldt niets (kern/horeca/bezorgovergang.js)
+    const mag = overgang(o, status);
+    if (mag.herhaling) { al.push(o.ref); continue; }
+    if (mag.error) return res.status(mag.status).json({ error: mag.error, code: mag.code, ref: o.ref });
     // de keten sluit: vertrekken kan pas als de inpakker EN de bezorger hebben afgevinkt
     if (status === 'onderweg' && !(o.inpak && o.pakcheck))
-      return res.status(409).json({ error: 'Eerst afvinken: de inpakker (tas + bonnummer) en de bezorger (alles gepakt). Dan pas vertrekken.' });
+      return res.status(409).json({ error: 'Eerst afvinken: de inpakker (tas + bonnummer) en de bezorger (alles gepakt). Dan pas vertrekken.', ref: o.ref });
+    doen.push(o);
+  }
+  const bijgewerkt = [];
+  for (const o of doen) {
     o.status = status;
     /* Bezorgd of opgehaald: het bezorgpunt verdwijnt, het adres blijft bij de
        bestelling (NAVIGATIE.md N20). Na de rit heeft niemand de coordinaat nog nodig. */
@@ -118,12 +128,13 @@ app.post('/api/supplier/bezorg/status', supplierAuth, (req, res) => {
       body: status === 'onderweg' ? 'Uw bestelling is onderweg.' : status === 'bezorgd' ? 'Uw bestelling is bezorgd. Eet smakelijk!' : 'Uw bestelling is opgehaald. Dank u wel!', scope: 'orders' });
     sseToCustomer(o.customerKey || o.customerTier, 'bezorg', { ref: o.ref, kind: 'status', status });
   }
+  if (!bijgewerkt.length && al.length) return res.json({ ok: true, refs: [], al });
   if (!bijgewerkt.length) return res.status(404).json({ error: 'Geen levering gevonden om bij te werken.' });
   save();
   logActivity(s.code, req.actor, 'zette ' + bijgewerkt.join(', ') + ' op "' + status + '"');
   sseToSupplier(s.code, 'sync', { scope: 'bezorg' });
   sseToOffice('sync', { scope: 'orders' });
-  res.json({ ok: true, refs: bijgewerkt });
+  res.json({ ok: true, refs: bijgewerkt, al });
 });
 
 /* GPS van de bezorger: vluchtig (geen save), de klant krijgt positie en

@@ -260,7 +260,7 @@ test('elke verklaring noemt een route die werkelijk bestaat', () => {
 });
 
 test('een uitzondering zonder handtekening is schuld, en die schuld is begrensd', () => {
-  const { VERKLAARD, verklaringStand, VOORGEDRAGEN_MAX } = require('../scripts/lib/uitvoerproef');
+  const { VERKLAARD, verklaringStand, VOORGEDRAGEN_MAX, telVoorgedragen } = require('../scripts/lib/uitvoerproef');
   const standen = Object.keys(VERKLAARD).map(verklaringStand);
   for (const st of standen) assert.ok(st === 'afgetekend' || st === 'voorgedragen', 'onbekende stand: ' + st);
   /* GEEN VERKLARING IS EEN DERDE UITKOMST en geen synoniem van voorgedragen:
@@ -268,11 +268,15 @@ test('een uitzondering zonder handtekening is schuld, en die schuld is begrensd'
   assert.equal(verklaringStand('POST /api/nergens/heen'), null);
 
   const voorgedragen = standen.filter(s => s === 'voorgedragen').length;
+  /* De telling die scripts/norm.js gebruikt (meter `uitvoerVoorgedragen`) moet
+     dezelfde zijn als deze: twee tellingen van een ratel lopen uit elkaar. */
+  assert.equal(telVoorgedragen(), voorgedragen, 'telVoorgedragen() telt iets anders dan de standen');
   /* DE RATEL. Gaat alleen omlaag, en de weg omlaag is een mens die aftekent --
-     niet een regel die verdwijnt. Wie dit getal omhoog zet zonder het in
-     scripts/lib/uitvoerproef.js uit te schrijven, sloopt de ratel zelf. */
+     niet een regel die verdwijnt. Het getal staat in NORM.json
+     (uitvoerVoorgedragen); wie het daar omhoog zet zonder notitie, laat
+     scripts/normbasis.js zakken. */
   assert.ok(voorgedragen <= VOORGEDRAGEN_MAX,
-    voorgedragen + ' voorgedragen uitzonderingen, ratel staat op ' + VOORGEDRAGEN_MAX);
+    voorgedragen + ' voorgedragen uitzonderingen, ratel (NORM.json, uitvoerVoorgedragen) staat op ' + VOORGEDRAGEN_MAX);
 });
 
 test('de ronde meldt afgetekend en voorgedragen apart, nooit als een getal', async () => {

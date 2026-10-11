@@ -266,6 +266,53 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-pla
    daarmee viel de lichte kop en ondertitel onderin de hero op ivoor weg. Zoals
    de hero van de www-site blijft hij een donker blok op de ivoren pagina. */
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wh-photo{--wh-bg:#11100e}
+/* WWW-PARITEIT, HET SCHERM ZELF -----------------------------------------
+   De a11y-scan over alle schermen vond na de ivoren kamer ruim 4100
+   contrastfouten, en ze hadden vijf oorzaken. Die staan hieronder elk bij
+   naam, zodat een volgende app weet in welke bak hij hoort.
+
+   1. EEN ECHT DONKER VLAK KRIJGT DONKERE TOKENS. Een fotohero, een fotoscène
+      en de fotografische lead blijven donker, zoals de hero van de www-site.
+      Wie daarin de wereldtokens leest, krijgt hier de lichte waarden terug. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.wh-photo,.wp-scene,[data-rtg-cinematic-lead="true"]){
+  --rtg-world-ink:#f7f1e8;--rtg-world-muted:#d8cfc2;--rtg-world-metal:#e2c389;--rtg-world-line:rgba(247,241,232,.2);
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wh-photo :is(p,span,small,.wh-free),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wh-free *{color:var(--rtg-world-ink)!important}
+/* De lead verloor zijn foto en zijn donkere waas: `background:#faf8f3` voor het
+   OperationalPanel hieronder is een shorthand met hetzelfde gewicht en kwam
+   later, en wiste daarmee ook background-image. */
+body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"][data-rtg-cinematic-lead]{
+  background-color:#11100e!important;
+  background-image:linear-gradient(0deg,rgba(7,6,5,.94),rgba(7,6,5,.20) 72%),var(--rtg-cinema-photo)!important;
+}
+/* 2. EEN OUD DONKER VLAK WORDT EEN IVOREN KAMER. Deze vlakken zetten hun eigen
+      donkere grond maar lazen hun tekst uit de wereldtokens: donkere inkt op
+      een donker vlak, tot 1,01:1. De www-site kent geen donkere panelen. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]){--rtg-card:var(--rtg-world-card)!important;--rtg-oppervlak:var(--rtg-world-card)!important;--rv-bg:var(--rtg-world-bg)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tos-service-strip,.rtgplek,.rb-leeg,.rv-reiszoek button,.rail,.side,#balk,.topnav,.top,.school-boven,#rtg-cookie,header.kop){
+  background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;border-color:var(--rtg-world-line)!important;
+}
+/* 3. OUDE LICHTE APP-KLEUREN VOLGEN DE WERELD. Lichte inkt en licht goud voor
+      de donkere thema's, in eigen tokens of letterlijk in een appblad. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]){
+  --rtf-gold-soft:var(--rtg-world-metal)!important;--stay-ink:var(--rtg-world-ink)!important;
+  --anchor-gold:var(--rtg-world-metal)!important;--anchor-ivory:var(--rtg-world-ink)!important;
+  --campus-gold:var(--rtg-world-metal)!important;--ios-label:var(--rtg-world-ink)!important;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.verblijfkop,.vliegkop) :is(small,b),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.moveStop,#interpret,#enrollToggle,.private-kicker,.campus-kicker),
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wk-stage :is(.ey,.wk-ey),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-settings-intro .rtg-settings-kicker,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .pn-intent>div b{color:var(--rtg-world-metal)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.hq-rail,.fx-kaart,.pn-intent>div,.lo-panel>header) :is(i,span),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-settings-intro p,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wk-stage form .knop{color:var(--rtg-world-muted)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.rtg-settings-shell,.rtg-settings-intro h2,.living-example-head span,.living-example-copy span,.buurtknop.rand){color:var(--rtg-world-ink)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) [data-rtg-toegang-hoofd] :is(span,small){color:inherit!important}
+/* 4. SIGNAALKLEUREN IN HUN DONKERE VARIANT. Rood en groen stonden in hun
+      lichte variant voor een donkere grond; op ivoor is het merkbordeaux voor
+      rood en het rosthemagroen voor groen. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.knop.rood,#status,i.nee,#melding){color:#9e1c40!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tref .vrij,.school-zij b,.pn-intent>div em){color:#2f7256!important}
+/* 5. EEN GOUDEN KNOP WORDT BORDEAUX, DUS ZIJN LETTER WORDT LICHT. --gold volgt
+      het metaal, en dat is op ivoor bordeaux; de zwarte letter die bij goud
+      hoorde, haalt daarop 2,2:1. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.kg-rij button,#btn-zet,#rkToetsen .gelijk,.verstuur,#verstuur,.speler .afspeel,#idStart,button.chip.aan,#n-maak){color:#fffaf2!important}
 /* De signatuur volgt het palet, niet de route: een ingebed Work-blad kleurt
    de schil van Command of het bureau mee, ook al blijft die route Living. */
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="living"],[data-rtg-world="living"]:not([data-rtg-palette])):not([data-public-platform]){
@@ -293,6 +340,10 @@ body[data-rtg-cinematic="true"] .rtg-edge-top{
   position:fixed!important;inset:0 0 auto!important;z-index:120!important;
 }
 body[data-rtg-cinematic="true"] .rtg-edge-top::after{display:none!important}
+/* De kop is ivoor, dus zijn bediening is inkt: de taal- en profielknop
+   kregen nog de lichte Edge-tekst van de donkere balk (#f7f1e8 op ivoor). */
+body[data-rtg-cinematic="true"] .rtg-edge-top{--edge-copy:#171411;--edge-dim:#6b655c}
+body[data-rtg-cinematic="true"] .rtg-edge-top :is(.rtg-edge-language,.rtg-edge-profile){color:#171411!important}
 body[data-rtg-cinematic="true"] .rtg-edge-mark{
   display:flex!important;align-items:center!important;justify-content:flex-start!important;
   width:auto!important;height:auto!important;border:0!important;color:#fffaf2!important;

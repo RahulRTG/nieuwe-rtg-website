@@ -32,7 +32,7 @@
     "kernGedeeld": 255,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
-    "keuringDubbeling": 183,
+    "keuringDubbeling": 180,
     "keuringOmvang": 341,
     "keuringScheef": 14,
     "keuringStuk": 0,
@@ -4292,16 +4292,6 @@
       "meter": "kernBreedte 1685 -> 1687",
       "reden": "Het beraad (B3, GEMEENSCHAP-FASE0.md par. 4.3, bouw goedgekeurd door de eigenaar). Het domein member leest twee nieuwe namen: beraad (kern/beraad, bezit zijn eigen collectie) en beraadAI (Rahul op een bevroren leesweergave). Elk is een eigen kernmodule; een route die hem zelf zou requiren maakt een tweede instantie met een eigen greep op de database, en de AI-laag aan de beraadmodule hangen zou haar schrijffuncties binnen bereik van Rahul brengen.",
       "waarheen": "GRENZEN.json (member draagt beide namen) en test/beraad.test.js plus test/beraad-server.test.js tegen een echte server"
-    },
-    {
-      "datum": "2026-10-11",
-      "soort": "schuld",
-      "sleutel": "keuringDubbeling",
-      "van": 177,
-      "meter": "keuringDubbeling 177 -> 180",
-      "reden": "Samenvoeging van claude/foundationos-fase1a (met main) in claude/foundationos-beraad. Op main zijn bij Zero-Debt golf 0 de keuringsmeters strakker gezet (185 -> 177); de beraadtak zat met zijn eigen code onder de oude lat en komt nu boven de nieuwe uit. De nieuwe kernmodules onder server/kern/beraad/ (index.js, ronde.js, ai.js, terugkoppeling.js) voegen functienamen toe die al in andere kernmodules staan (onder meer concept, gezien en heropen). Een samenvoeging is niet de plek om productcode te hernoemen.",
-      "vervalt": "2026-11-15",
-      "waarheen": "De namen in kern/beraad/ bij de beraad-PR zelf ontdubbelen of als bewuste domeinnaam laten staan, met de keuring opnieuw gemeten."
     },
     {
       "datum": "2026-10-11",

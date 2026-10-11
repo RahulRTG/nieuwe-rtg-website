@@ -163,7 +163,7 @@ function maakSchrijver({ nu }) {
     return zetEind(b, r, { stand: 'ingetrokken', toelichting, door, at: iso() });
   }
 
-  function heropen(b, door, reden, quorum) {
+  function heropenRonde(b, door, reden, quorum) {
     const r = huidige(b);
     if (r.stand !== 'besloten') return { status: 409, error: 'Deze ronde loopt nog; er is niets te heropenen.' };
     if (String(reden || '').length < 15) return { status: 400, error: 'Zeg in minstens vijftien tekens wat er nieuw is.' };
@@ -188,7 +188,7 @@ function maakSchrijver({ nu }) {
     return bewogen;
   }
 
-  return { nieuw, brengIn, trekInbrengIn, zetVoorstel, naarStemmen, stem, sluit, trekIn, heropen,
+  return { nieuw, brengIn, trekInbrengIn, zetVoorstel, naarStemmen, stem, sluit, trekIn, heropen: heropenRonde,
     trede, huidige, items };
 }
 

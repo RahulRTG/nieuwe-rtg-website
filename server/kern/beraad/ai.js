@@ -68,7 +68,7 @@ module.exports = ({ lees }) => {
       uitleg: 'Een vaste lijst van zes aspecten. Wat hier staat, noemde nog niemand; dat zegt niet dat het ontbreekt.' };
   }
 
-  function concept(sess, id) {
+  function klaarzetConcept(sess, id) {
     const r = lees.ronde(sess, id);
     if (!r) return NIET;
     const s = samenvatting(sess, id).regels;
@@ -80,5 +80,5 @@ module.exports = ({ lees }) => {
       uitleg: 'Dit is een concept in je invoerveld. Er is niets geplaatst; dat doe je zelf, onder je eigen naam.' };
   }
 
-  return { samenvatting, perspectieven, concept, ASPECTEN };
+  return { samenvatting, perspectieven, concept: klaarzetConcept, ASPECTEN };
 };

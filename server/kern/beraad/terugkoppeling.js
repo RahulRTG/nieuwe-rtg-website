@@ -51,7 +51,7 @@ function maakTerugkoppeling({ notify, save, schr, zicht, lijstKijk, genootschap 
   /* Gezien: de terugkoppeling op de eigen sleutel naar de laatste trede. Werkt
      ook voor wie vertrok, want het spoor hangt aan de sleutel en niet aan het
      lidmaatschap; wie er niets heeft staan, krijgt 404. */
-  function gezien(sess, id) {
+  function markeerGezien(sess, id) {
     const b = lijstKijk().find(x => String(x.id) === String(id == null ? '' : id));
     const heeft = b && b.rondes.some(r => r.terugkoppeling && r.terugkoppeling[sess.key]);
     if (!heeft) return { status: 404, error: 'Hier staat geen terugkoppeling voor je klaar.' };
@@ -60,7 +60,7 @@ function maakTerugkoppeling({ notify, save, schr, zicht, lijstKijk, genootschap 
     return { ok: true, bewogen };
   }
 
-  return { wek, mijn, gezien };
+  return { wek, mijn, gezien: markeerGezien };
 }
 
 module.exports = { maakTerugkoppeling };

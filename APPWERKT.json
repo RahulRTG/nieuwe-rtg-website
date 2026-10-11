@@ -10,8 +10,8 @@
   "NIET_GETEST": "deze ronde niet aangeraakt, met de reden erbij"
  },
  "stempel": {
-  "op": "2026-10-11T14:11:09.204Z",
-  "commit": "da1e0bb8",
+  "op": "2026-10-11T15:37:00.274Z",
+  "commit": "e16198e9",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/appwerkt.js",
@@ -21,31 +21,31 @@
  "gemeten": {
   "onderdelen": 114,
   "defecten": 0,
-  "knoppenGevonden": 2589,
-  "knoppenAangetikt": 2246,
-  "knoppenNietKlikbaar": 398,
+  "knoppenGevonden": 2605,
+  "knoppenAangetikt": 2276,
+  "knoppenNietKlikbaar": 412,
   "remGeraakt": 0,
   "weigeringenGetoond": 6,
   "taalWissels": [],
   "onderscheppers": {
-   "img": 144,
-   "div.wd-shell": 66,
-   "div.wd-shell.wd-expanded": 30,
+   "img": 152,
+   "div.wd-shell": 68,
+   "div.wd-shell.wd-expanded": 29,
    "aside#mediaRechten.media-rechten": 7,
+   "aside#wp-panel-2.wd-favorites": 6,
    "div.rtgplek": 6,
-   "aside#wp-panel-2.wd-favorites": 5,
    "div#blokSheet.sheet.open": 5,
    "section.wd-library": 4,
    "nav.night-nav": 3,
    "section.rsm-rsheet": 3,
-   "body": 1,
+   "main#rtg-inhoud.rv-werk": 2,
+   "div.os-switcher": 1,
    "div.rtg-edge-chrome": 1,
    "div.schil": 1,
    "header.wd-greeting": 1,
-   "main#rtg-inhoud": 1,
-   "main#rtg-inhoud.rv-werk": 1
+   "main#rtg-inhoud": 1
   },
-  "schermenGrotendeelsOngemeten": 4,
+  "schermenGrotendeelsOngemeten": 3,
   "deurenZonderPersona": 2
  },
  "telling": {
@@ -58,8 +58,8 @@
    "NIET_GETEST": 15
   },
   "bedienbaar": {
-   "BEWEZEN": 95,
-   "NIET_GETEST": 19
+   "BEWEZEN": 96,
+   "NIET_GETEST": 18
   },
   "menselijk": {
    "NIET_GETEST": 114
@@ -2016,7 +2016,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "14 van 16 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (2x intercepts pointer events, 1x element is not stable), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "14 van 15 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -2066,18 +2066,18 @@
      "bewijs": null
     }
    },
-   "gevonden": 16,
+   "gevonden": 15,
    "geklikt": 14,
    "overgeslagen": [
     "Verwijder uit uw widgets"
    ],
    "nietKlikbaar": [
     "Beeld 2 wijzigen: intercepts pointer events",
-    "Beeld 3 wijzigen: element is not stable",
+    "Beeld 3 wijzigen: intercepts pointer events",
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1443 tekens zichtbaar"
+    "als gezin: 2566 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "gezin",
@@ -2095,6 +2095,10 @@
    "onderschept": [
     {
      "knop": "Beeld 2 wijzigen",
+     "door": "img"
+    },
+    {
+     "knop": "Beeld 3 wijzigen",
      "door": "img"
     },
     {
@@ -2137,7 +2141,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "14 van 16 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "13 van 16 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (1x reden niet gemeld, 3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -2188,17 +2192,18 @@
     }
    },
    "gevonden": 16,
-   "geklikt": 14,
+   "geklikt": 13,
    "overgeslagen": [
     "Verwijder uit uw widgets"
    ],
    "nietKlikbaar": [
+    "Leren & Groei\n↗: reden niet gemeld",
     "Beeld 2 wijzigen: intercepts pointer events",
     "Beeld 3 wijzigen: intercepts pointer events",
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1405 tekens zichtbaar"
+    "als gezin: 2529 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "gezin",
@@ -2447,7 +2452,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "16 van 16 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "16 van 15 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -2497,7 +2502,7 @@
      "bewijs": null
     }
    },
-   "gevonden": 16,
+   "gevonden": 15,
    "geklikt": 16,
    "overgeslagen": [
     "Verwijder uit uw widgets"
@@ -2633,7 +2638,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1660 tekens zichtbaar"
+    "als gezin: 2655 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "gezin",
@@ -2697,7 +2702,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "19 van 17 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "34 van 31 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (1x element is not visible, 3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -2758,18 +2763,19 @@
      "bewijs": null
     }
    },
-   "gevonden": 17,
-   "geklikt": 19,
+   "gevonden": 31,
+   "geklikt": 34,
    "overgeslagen": [
     "Verwijder uit uw widgets"
    ],
    "nietKlikbaar": [
+    "(naamloos): element is not visible",
     "Beeld 2 wijzigen: intercepts pointer events",
     "Beeld 3 wijzigen: intercepts pointer events",
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1377 tekens zichtbaar"
+    "als gezin: 2459 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -2893,7 +2899,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1406 tekens zichtbaar"
+    "als gezin: 2497 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -3021,7 +3027,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1831 tekens zichtbaar"
+    "als gezin: 2931 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "gezin",
@@ -3155,7 +3161,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 2913 tekens zichtbaar"
+    "als gezin: 2908 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -3226,7 +3232,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "14 van 16 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "14 van 15 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -3276,7 +3282,7 @@
      "bewijs": null
     }
    },
-   "gevonden": 16,
+   "gevonden": 15,
    "geklikt": 14,
    "overgeslagen": [
     "Verwijder uit uw widgets"
@@ -3287,7 +3293,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 2523 tekens zichtbaar"
+    "als gezin: 1396 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "gezin",
@@ -3438,7 +3444,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "25 van 21 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (1x element is not visible, 3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "25 van 21 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (1x element is not visible, 2x intercepts pointer events, 1x element is not stable), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -3496,11 +3502,11 @@
    "nietKlikbaar": [
     "(naamloos): element is not visible",
     "Beeld 2 wijzigen: intercepts pointer events",
-    "Beeld 3 wijzigen: intercepts pointer events",
+    "Beeld 3 wijzigen: element is not stable",
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1889 tekens zichtbaar"
+    "als gezin: 3014 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -3513,10 +3519,6 @@
    "onderschept": [
     {
      "knop": "Beeld 2 wijzigen",
-     "door": "img"
-    },
-    {
-     "knop": "Beeld 3 wijzigen",
      "door": "img"
     },
     {
@@ -3736,7 +3738,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 3080 tekens zichtbaar"
+    "als lid: 2893 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -3852,7 +3854,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2076 tekens zichtbaar"
+    "als lid: 2101 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -3967,7 +3969,7 @@
     "Beeld 5 wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2862 tekens zichtbaar"
+    "als lid: 2748 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4144,7 +4146,7 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op 0553e288; sindsdien is er geen code gewijzigd die dit instrument raakt (1 wijziging(en) in scripts die het niet inleest)): 4 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 0553e288; sindsdien is er geen code gewijzigd die dit instrument raakt (2 wijziging(en) in scripts die het niet inleest)): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
       "op": "2026-10-11T13:38:47.288Z",
@@ -4174,7 +4176,7 @@
     },
     "persistent": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op 0553e288; sindsdien is er geen code gewijzigd die dit instrument raakt (1 wijziging(en) in scripts die het niet inleest)): 3 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 0553e288; sindsdien is er geen code gewijzigd die dit instrument raakt (2 wijziging(en) in scripts die het niet inleest)): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
       "op": "2026-10-11T13:38:47.288Z",
@@ -4204,7 +4206,7 @@
     },
     "herstelbaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op 0553e288; sindsdien is er geen code gewijzigd die dit instrument raakt (1 wijziging(en) in scripts die het niet inleest)): 4 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 0553e288; sindsdien is er geen code gewijzigd die dit instrument raakt (2 wijziging(en) in scripts die het niet inleest)): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
       "op": "2026-10-11T13:38:47.288Z",
@@ -4299,7 +4301,7 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op 0553e288; sindsdien is er geen code gewijzigd die dit instrument raakt (1 wijziging(en) in scripts die het niet inleest)): 5 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 0553e288; sindsdien is er geen code gewijzigd die dit instrument raakt (2 wijziging(en) in scripts die het niet inleest)): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
       "op": "2026-10-11T13:38:47.288Z",
@@ -4329,7 +4331,7 @@
     },
     "persistent": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op 0553e288; sindsdien is er geen code gewijzigd die dit instrument raakt (1 wijziging(en) in scripts die het niet inleest)): 4 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 0553e288; sindsdien is er geen code gewijzigd die dit instrument raakt (2 wijziging(en) in scripts die het niet inleest)): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
       "op": "2026-10-11T13:38:47.288Z",
@@ -4359,7 +4361,7 @@
     },
     "herstelbaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op 0553e288; sindsdien is er geen code gewijzigd die dit instrument raakt (1 wijziging(en) in scripts die het niet inleest)): 4 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 0553e288; sindsdien is er geen code gewijzigd die dit instrument raakt (2 wijziging(en) in scripts die het niet inleest)): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
       "op": "2026-10-11T13:38:47.288Z",
@@ -4506,7 +4508,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 17595 tekens zichtbaar"
+    "als lid: 17781 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4753,7 +4755,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1689 tekens zichtbaar"
+    "als lid: 2201 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4874,7 +4876,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1674 tekens zichtbaar"
+    "als lid: 1785 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4998,7 +5000,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 4177 tekens zichtbaar"
+    "als lid: 4202 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5140,7 +5142,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "18 van 22 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (3x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "21 van 23 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (3x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -5190,8 +5192,8 @@
      "bewijs": null
     }
    },
-   "gevonden": 22,
-   "geklikt": 18,
+   "gevonden": 23,
+   "geklikt": 21,
    "overgeslagen": [
     "Verwijder uit uw widgets"
    ],
@@ -5202,7 +5204,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2681 tekens zichtbaar"
+    "als lid: 2839 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5438,7 +5440,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1539 tekens zichtbaar"
+    "als lid: 1938 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5579,8 +5581,8 @@
      "bewijs": "/apps/comm.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "8 van 22 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
+     "status": "BEWEZEN",
+     "reden": "27 van 29 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (3x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -5630,13 +5632,20 @@
      "bewijs": null
     }
    },
-   "gevonden": 22,
-   "geklikt": 8,
-   "overgeslagen": [],
-   "nietKlikbaar": [],
+   "gevonden": 29,
+   "geklikt": 27,
+   "overgeslagen": [
+    "Verwijder uit uw widgets"
+   ],
+   "nietKlikbaar": [
+    "OPEN COMMAND\n⌘ K: intercepts pointer events",
+    "(naamloos): element is not visible",
+    "Beeld 5 wijzigen: intercepts pointer events",
+    "Sfeerbeeld wijzigen: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 2418 tekens zichtbaar",
-    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw; opnieuw openen lukte niet: page.goto: Navigation to \"http://127.0.0.1:33673/apps/comm.html\" is interrupted "
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5646,7 +5655,20 @@
    },
    "schil": 21,
    "bedekt": [],
-   "onderschept": [],
+   "onderschept": [
+    {
+     "knop": "OPEN COMMAND\n⌘ K",
+     "door": "aside#wp-panel-2.wd-favorites"
+    },
+    {
+     "knop": "Beeld 5 wijzigen",
+     "door": "img"
+    },
+    {
+     "knop": "Sfeerbeeld wijzigen",
+     "door": "div.wd-shell"
+    }
+   ],
    "rem": 0,
    "gezegd": [],
    "taalWissel": [],
@@ -5972,7 +5994,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "28 van 31 eigen knoppen aangetikt zonder fout (plus 22 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (1x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "27 van 31 eigen knoppen aangetikt zonder fout (plus 22 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (3x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -6023,18 +6045,18 @@
     }
    },
    "gevonden": 31,
-   "geklikt": 28,
+   "geklikt": 27,
    "overgeslagen": [
     "Verwijder uit uw widgets"
    ],
    "nietKlikbaar": [
+    "Open een bestaande foto in de Studio: intercepts pointer events",
     "(naamloos): element is not visible",
     "Beeld 5 wijzigen: intercepts pointer events",
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2027 tekens zichtbaar",
-    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw"
+    "als lid: 1806 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6045,6 +6067,10 @@
    "schil": 22,
    "bedekt": [],
    "onderschept": [
+    {
+     "knop": "Open een bestaande foto in de Studio",
+     "door": "div.os-switcher"
+    },
     {
      "knop": "Beeld 5 wijzigen",
      "door": "img"
@@ -6150,7 +6176,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2315 tekens zichtbaar"
+    "als lid: 2105 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6267,7 +6293,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2495 tekens zichtbaar"
+    "als lid: 1827 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6326,7 +6352,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "28 van 26 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (1x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "27 van 26 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (1x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -6377,7 +6403,7 @@
     }
    },
    "gevonden": 26,
-   "geklikt": 28,
+   "geklikt": 27,
    "overgeslagen": [
     "Verwijder uit uw widgets"
    ],
@@ -6387,7 +6413,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 3562 tekens zichtbaar"
+    "als lid: 4140 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6620,7 +6646,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2503 tekens zichtbaar"
+    "als lid: 2671 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6740,7 +6766,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2187 tekens zichtbaar"
+    "als lid: 2342 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6858,7 +6884,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2201 tekens zichtbaar"
+    "als lid: 2267 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6976,7 +7002,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2832 tekens zichtbaar"
+    "als lid: 2607 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7201,7 +7227,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2292 tekens zichtbaar"
+    "als lid: 2129 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7256,7 +7282,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "24 van 23 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (1x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "24 van 21 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (1x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -7306,7 +7332,7 @@
      "bewijs": null
     }
    },
-   "gevonden": 23,
+   "gevonden": 21,
    "geklikt": 24,
    "overgeslagen": [
     "Verwijder uit uw widgets"
@@ -7317,7 +7343,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2068 tekens zichtbaar"
+    "als lid: 2002 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7459,7 +7485,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "24 van 25 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 6 niet aan te tikken (5x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "24 van 27 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 6 niet aan te tikken (5x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -7509,7 +7535,7 @@
      "bewijs": null
     }
    },
-   "gevonden": 25,
+   "gevonden": 27,
    "geklikt": 24,
    "overgeslagen": [
     "Verwijder uit uw widgets"
@@ -7523,7 +7549,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2521 tekens zichtbaar"
+    "als lid: 2904 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7767,7 +7793,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2540 tekens zichtbaar"
+    "als lid: 2430 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7885,7 +7911,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2267 tekens zichtbaar"
+    "als lid: 2312 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8001,7 +8027,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2234 tekens zichtbaar"
+    "als lid: 2039 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8119,7 +8145,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2270 tekens zichtbaar"
+    "als lid: 1619 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8174,7 +8200,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "36 van 75 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (1x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
+     "reden": "36 van 74 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (1x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -8224,7 +8250,7 @@
      "bewijs": null
     }
    },
-   "gevonden": 75,
+   "gevonden": 74,
    "geklikt": 36,
    "overgeslagen": [
     "Verwijder uit uw widgets"
@@ -8590,7 +8616,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 875 tekens zichtbaar"
+    "als lid: 865 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8607,11 +8633,11 @@
     },
     {
      "knop": "Nu open",
-     "door": "main#rtg-inhoud.rv-werk"
+     "door": "div.wd-shell"
     },
     {
      "knop": "Rustig",
-     "door": "body"
+     "door": "main#rtg-inhoud.rv-werk"
     },
     {
      "knop": "Bijzonder",
@@ -8627,7 +8653,7 @@
     },
     {
      "knop": "THUIS\nChef aan huis\n\nEen menu dat arrive",
-     "door": "div.wd-shell"
+     "door": "main#rtg-inhoud.rv-werk"
     },
     {
      "knop": "Beeld 5 wijzigen",
@@ -8734,7 +8760,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2716 tekens zichtbaar"
+    "als lid: 2496 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8850,7 +8876,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2279 tekens zichtbaar"
+    "als lid: 2201 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8966,7 +8992,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1819 tekens zichtbaar"
+    "als lid: 1816 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9208,7 +9234,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2020 tekens zichtbaar"
+    "als lid: 2021 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9324,7 +9350,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1675 tekens zichtbaar"
+    "als lid: 1741 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9441,7 +9467,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2375 tekens zichtbaar"
+    "als lid: 2273 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9655,7 +9681,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2414 tekens zichtbaar"
+    "als lid: 2338 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9800,7 +9826,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1733 tekens zichtbaar"
+    "als lid: 1833 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9915,7 +9941,7 @@
     "Beeld 5 wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1584 tekens zichtbaar"
+    "als lid: 1629 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10317,7 +10343,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1650 tekens zichtbaar"
+    "als lid: 1651 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10433,7 +10459,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2049 tekens zichtbaar"
+    "als lid: 1877 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10547,7 +10573,7 @@
     "(naamloos): element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 2325 tekens zichtbaar"
+    "als lid: 2150 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10593,7 +10619,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "22 van 22 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (1x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "21 van 23 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (1x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -10643,8 +10669,8 @@
      "bewijs": null
     }
    },
-   "gevonden": 22,
-   "geklikt": 22,
+   "gevonden": 23,
+   "geklikt": 21,
    "overgeslagen": [
     "Verwijder uit uw widgets"
    ],
@@ -10654,7 +10680,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2201 tekens zichtbaar"
+    "als lid: 2129 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11012,7 +11038,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1207 tekens zichtbaar"
+    "als lid: 1208 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11128,7 +11154,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1322 tekens zichtbaar"
+    "als lid: 1915 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11331,7 +11357,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2084 tekens zichtbaar"
+    "als lid: 1938 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11447,7 +11473,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 889 tekens zichtbaar"
+    "als lid: 2162 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11502,7 +11528,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "20 van 24 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 5 niet aan te tikken (1x element is not visible, 4x intercepts pointer events), 2 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "19 van 24 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 5 niet aan te tikken (1x element is not visible, 4x intercepts pointer events), 2 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -11553,7 +11579,7 @@
     }
    },
    "gevonden": 24,
-   "geklikt": 20,
+   "geklikt": 19,
    "overgeslagen": [
     "Controleer en verstuur aanvraag",
     "Verwijder uit uw widgets"
@@ -11566,7 +11592,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1530 tekens zichtbaar"
+    "als lid: 1742 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11818,7 +11844,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2404 tekens zichtbaar"
+    "als lid: 2359 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11881,7 +11907,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "36 van 42 eigen knoppen aangetikt zonder fout (plus 22 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (2x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "35 van 42 eigen knoppen aangetikt zonder fout (plus 22 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (3x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -11932,14 +11958,15 @@
     }
    },
    "gevonden": 42,
-   "geklikt": 36,
+   "geklikt": 35,
    "overgeslagen": [
     "Verwijder uit uw widgets"
    ],
    "nietKlikbaar": [
     "MEENEMEN: intercepts pointer events",
     "(naamloos): element is not visible",
-    "Beeld 5 wijzigen: intercepts pointer events"
+    "Beeld 5 wijzigen: intercepts pointer events",
+    "Beeld 6 wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
     "als lid: 1880 tekens zichtbaar"
@@ -11959,6 +11986,10 @@
     },
     {
      "knop": "Beeld 5 wijzigen",
+     "door": "img"
+    },
+    {
+     "knop": "Beeld 6 wijzigen",
      "door": "img"
     }
    ],
@@ -12062,7 +12093,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 5814 tekens zichtbaar"
+    "als lid: 5748 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12196,7 +12227,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1712 tekens zichtbaar"
+    "als lid: 1993 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -12327,7 +12358,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1995 tekens zichtbaar"
+    "als lid: 2226 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12477,7 +12508,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "21 van 23 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 7 niet aan te tikken (6x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "20 van 23 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 7 niet aan te tikken (6x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -12528,7 +12559,7 @@
     }
    },
    "gevonden": 23,
-   "geklikt": 21,
+   "geklikt": 20,
    "overgeslagen": [
     "Verwijder uit uw widgets"
    ],
@@ -12542,7 +12573,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2750 tekens zichtbaar"
+    "als lid: 2981 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12575,7 +12606,7 @@
     },
     {
      "knop": "Sfeerbeeld wijzigen",
-     "door": "div.wd-shell.wd-expanded"
+     "door": "div.wd-shell"
     }
    ],
    "rem": 0,
@@ -12670,7 +12701,7 @@
    ],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als kantoor: 4291 tekens zichtbaar"
+    "als kantoor: 3707 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12779,7 +12810,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1809 tekens zichtbaar"
+    "als lid: 1819 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12991,7 +13022,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 939 tekens zichtbaar"
+    "als lid: 1634 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -13115,7 +13146,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1588 tekens zichtbaar"
+    "als lid: 1813 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -13249,7 +13280,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1879 tekens zichtbaar"
+    "als lid: 2078 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -13439,7 +13470,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "21 van 24 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (1x element is not visible, 3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "21 van 24 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 7 niet aan te tikken (1x element is not visible, 6x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -13507,12 +13538,15 @@
    ],
    "nietKlikbaar": [
     "(naamloos): element is not visible",
+    "Beeld 2 wijzigen: intercepts pointer events",
+    "Beeld 3 wijzigen: intercepts pointer events",
+    "Beeld 4 wijzigen: intercepts pointer events",
     "Beeld 5 wijzigen: intercepts pointer events",
     "Beeld 6 wijzigen: intercepts pointer events",
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1871 tekens zichtbaar"
+    "als lid: 2188 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -13528,6 +13562,18 @@
    "schil": 21,
    "bedekt": [],
    "onderschept": [
+    {
+     "knop": "Beeld 2 wijzigen",
+     "door": "img"
+    },
+    {
+     "knop": "Beeld 3 wijzigen",
+     "door": "img"
+    },
+    {
+     "knop": "Beeld 4 wijzigen",
+     "door": "img"
+    },
     {
      "knop": "Beeld 5 wijzigen",
      "door": "img"
@@ -13639,7 +13685,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2013 tekens zichtbaar"
+    "als lid: 1765 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -13760,7 +13806,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 4153 tekens zichtbaar"
+    "als lid: 3282 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -13819,7 +13865,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "18 van 22 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (1x element is not visible, 3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "18 van 21 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (1x element is not visible, 3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -13869,7 +13915,7 @@
      "bewijs": null
     }
    },
-   "gevonden": 22,
+   "gevonden": 21,
    "geklikt": 18,
    "overgeslagen": [
     "Verwijder uit uw widgets"
@@ -13881,7 +13927,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 4306 tekens zichtbaar"
+    "als lid: 4202 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -14125,7 +14171,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1650 tekens zichtbaar"
+    "als lid: 1400 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -14184,7 +14230,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "30 van 34 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 5 niet aan te tikken (4x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "30 van 34 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 8 niet aan te tikken (7x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -14242,13 +14288,15 @@
    "nietKlikbaar": [
     "Alleen aandacht: intercepts pointer events",
     "(naamloos): element is not visible",
+    "Beeld 2 wijzigen: intercepts pointer events",
+    "Beeld 3 wijzigen: intercepts pointer events",
+    "Beeld 4 wijzigen: intercepts pointer events",
     "Beeld 5 wijzigen: intercepts pointer events",
     "Beeld 6 wijzigen: intercepts pointer events",
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 3176 tekens zichtbaar",
-    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw"
+    "als lid: 3436 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -14267,6 +14315,18 @@
     {
      "knop": "Alleen aandacht",
      "door": "aside#wp-panel-2.wd-favorites"
+    },
+    {
+     "knop": "Beeld 2 wijzigen",
+     "door": "img"
+    },
+    {
+     "knop": "Beeld 3 wijzigen",
+     "door": "img"
+    },
+    {
+     "knop": "Beeld 4 wijzigen",
+     "door": "img"
     },
     {
      "knop": "Beeld 5 wijzigen",
@@ -14378,7 +14438,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als kantoor: 1473 tekens zichtbaar"
+    "als kantoor: 1457 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -14522,7 +14582,7 @@
     "(naamloos): element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1918 tekens zichtbaar"
+    "als lid: 1602 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -14635,7 +14695,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als kantoor: 1783 tekens zichtbaar"
+    "als kantoor: 1741 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -14760,7 +14820,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1513 tekens zichtbaar"
+    "als lid: 1514 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -14881,7 +14941,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 3048 tekens zichtbaar"
+    "als lid: 3043 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -15004,7 +15064,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2385 tekens zichtbaar"
+    "als lid: 1281 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -15130,7 +15190,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1572 tekens zichtbaar"
+    "als lid: 1802 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -15189,7 +15249,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "33 van 50 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 6 niet aan te tikken (5x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "33 van 48 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 6 niet aan te tikken (5x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -15239,7 +15299,7 @@
      "bewijs": null
     }
    },
-   "gevonden": 50,
+   "gevonden": 48,
    "geklikt": 33,
    "overgeslagen": [
     "Verwijder uit uw widgets"

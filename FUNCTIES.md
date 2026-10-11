@@ -21,9 +21,9 @@ het?**
 | Bedrijfsgenres | **79** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2683** |
+| Kernmodules (`server/kern/**`) | **2692** |
 | App-pagina's (`public/apps/**.html`) | **316** |
-| Testbestanden | **2446** |
+| Testbestanden | **2451** |
 
 ## De vier werelden
 
@@ -398,8 +398,8 @@ ook blokkeert.
 
 - **Foundation LibraryOS kernel** (`dom-library`) — Besloten werken, afspraken, rechten en editiegebonden vrijgave; geen publieke catalogus of verkoop.  
   _voor: rtg, lifestyle, business_
-- **Het Genootschap** (`dom-genootschap`) — Het besloten genootschap: kringen, bijeenkomsten, beheer en verbonden tussen twee genootschappen.  
-  _voor: rtg, lifestyle, business_
+- **Het Genootschap** (`dom-genootschap`) — Het besloten genootschap: kringen, bijeenkomsten, beheer, een organisatie als drager, het beraad en verbonden tussen twee genootschappen.  
+  _voor: rtg, lifestyle, business, foundation_
 - **Sport** (`dom-sport`) — Sportprogramma's, teams en wedstrijden.  
   _voor: leverancier, personeel_
 - **Muziek** (`dom-muziek`) — Van lied tot zaal: maken, uitgeven en beluisteren.  

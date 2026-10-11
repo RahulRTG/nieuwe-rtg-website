@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2443 bestanden en 16722 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2446 bestanden en 16731 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2443 |
-| losse beweringen (`test(...)`) | 16722 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2268 |
+| toetsbestanden | 2446 |
+| losse beweringen (`test(...)`) | 16731 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 306 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2271 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2135 bestanden, 16185 beweringen.
+2138 bestanden, 16194 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -307,6 +307,7 @@ toets omvalt.
 | `capabilitycallers.test.js` | 11 | gezakt op `===->!==#0` | GEEN CAPABILITY ZONDER CALLER -- de tweede van de vier regels uit CONTROLPLANE.md, machinaal gemeten in plaats van met de hand geteld. WAT HIER WERKELIJK OP HET SPEL STAAT. |
 | `capgezondheid.test.js` | 8 | gezakt op `===->!==#0` | CAPABILITY HEALTH -- hoe gaat het met DIT onderdeel? DE FOUT DIE DIT VERVANGT. |
 | `care.test.js` | 8 | gezakt op `liegpoort /api/` | Toren 4: RTG Care (zorg & welzijn). Een behandeling boeken bij een behandelaar in een tijdslot, het zorgprofiel dat meereist, de aparte en veilige intake-deling per aanbieder, en Rahul die het in gewone taal regelt. |
+| `carriereledger-duurzaam.test.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `carriereledger.e2e.test.js` | 12 | gezakt op `liegpoort /api/` | HET CARRIERE LEDGER OVER HTTP -- drie partijen aan dezelfde regel. test/carriereledger.test.js beproeft het BESLUIT zonder server. |
 | `carriereledger.test.js` | 18 | gezakt op `===->!==#0` | HET CARRIERE LEDGER -- chronologisch, per regel bewijsbaar, met herkomst. CARRIERE.md par. |
 | `catalogus-wensen.test.js` | 4 | gezakt op `liegpoort /api/` | DE KANTOORKANT VAN DE CATALOGUS-WENSEN. De onboarding vraagt een nieuw lid of het een bedrijf heeft, en met een vinkje legt het de wens vast om in de RTG-catalogus te komen (kern/onboarding/meebouwen.js). |
@@ -916,6 +917,7 @@ toets omvalt.
 | `ledenbalie.test.js` | 7 | gezakt op `liegpoort /api/` | DE LEDENBALIE: helpen zonder de kluis open te breken. Het kantoor is een ongedeelde ruimte die je binnenkomt met een GEDEELDE code, en die code wijst niemand aan. |
 | `ledenbaliespoor.test.js` | 8 | gezakt op `liegpoort /api/` | GEEN AANTOONBAAR JOURNAAL, GEEN INZAGE. De ledenbalie opent het dossier van een lid: codenaam, pas, land, stad, lid sinds, abonnementsstand, klachten. |
 | `ledengids-race.test.js` | 4 | gezakt op `!==->===#0` | Structurele regressietest voor de member_dir-race (de GELD-fout uit de 100M- beproeving). De klasse: een lid staat BUITEN het RAM als geindexeerde rij in Postgres; de schrijf naar member_dir is fire-and-forget... |
+| `ledenkruis.test.js` | 7 | gezakt op `voorwaarde-omkeren#0` | DE LEDENKRUIS -- het oordeel van bewijs 6 (bevoegd) aan de schermkant van een ledenscherm (scripts/lib/ledenkruis.js), zonder browser. De meting zelf loopt in een echte browser tegen een echte server... |
 | `ledenladder.test.js` | 3 | gezakt op `liegpoort /api/` | DE LEDENLADDER -- van RTG Pass naar Lifestyle, en wat daar dan achter zit. WAAROM DIT DE BELANGRIJKSTE OPENSTAANDE WAS Dit huis is een membership-platform. |
 | `ledenregister.test.js` | 7 | gezakt op `===->!==#0` | Ledenregister (kern/ledenregister.js): leden op codenaam, gesplitst per stad/land/alfabet/geslacht en pas, met de omzet per pas en de 30%- foundationsplit (20% lokaal, 10% RTF). Draai: npm test |
 | `leerfabric.test.js` | 15 | gezakt op `&&->||#0` | De Learning Fabric: de structuur waar elk vak op draait. Een leerdoel is hier niet langer een naam met een zin uitleg, maar een knoop in een graaf: hij weet wat eronder ligt (vereist), hij kan zichzelf op meer dan... |
@@ -1986,6 +1988,7 @@ toets omvalt.
 | `veiligheid.test.js` | 1 | gezakt op `liegpoort /api/` | RTG Veilig: de vier apps op een ruggengraat. De belangrijkste toets staat in toets 4 en 5, en die is de reden dat dit zo gebouwd is: de dodemansknop moet aflopen ZONDER dat de telefoon nog iets doet. |
 | `veiligheidgrens.test.js` | 4 | geen bruikbare mutatie | DE GRENSREGEL VAN RTG VEILIG STAAT OP DRIE PLEKKEN EN BLIJFT DEZELFDE server/kern/veiligheid/grens.js is de bron. Twee andere plekken dragen een KOPIE, en dat is geen slordigheid maar de enige werkbare vorm: een... |
 | `veiligheidskern.test.js` | 8 | gezakt op `!==->===#0` | DE VEILIGHEIDSKERN -- vijf soorten onomkeerbare handelingen, een deur. WAAROM DIT HET LAATSTE STUK IS. |
+| `veiligmoment-dubbeltik.test.js` | 1 | gezakt op `liegpoort /api/` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `veranderbereik.test.js` | 20 | gezakt op `===->!==#0` | HET VERANDERBEREIK -- van welke toets staat vast WELKE BRONBESTANDEN hij dekt? Wat dit bestand bewijst, en waarom elk stuk ervan er staat: 1. |
 | `verband.test.js` | 5 | gezakt op `&&->||#0` | DE VERBANDIJKING -- en de ene fout die haar waardeloos zou maken. scripts/verband.js vraagt of een onafhankelijke waarnemer de wet->wachter- randen terugvindt die WETTEN.json verklaart. |
 | `verblijf.test.js` | 12 | gezakt op `liegpoort /api/` | De verblijf-laag (toren hotel): boeken met datums, het receptiebord en de check-in/check-out-keten. De logies gaan bij check-in automatisch als kamerlast op de rekening; de kassa-check-out int alles in een keer en... |

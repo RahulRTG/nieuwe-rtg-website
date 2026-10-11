@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-06T23:20:21.521Z",
-  "commit": "8f957541d",
+  "op": "2026-10-11T20:57:53.509Z",
+  "commit": "fa931a366",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v26.10.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
@@ -13,14 +13,14 @@
   "totaal": 5322,
   "geclassificeerd": 5297,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3164,
+   "BLOCKED_BY_TEST_FIXTURE": 3163,
    "NOT_APPLICABLE": 1278,
    "LEGACY_PENDING_CLASSIFICATION": 25,
-   "PROTECTED": 670,
+   "PROTECTED": 671,
    "INTENTIONALLY_NON_IDEMPOTENT": 185
   },
-  "vastgesteldDoorMens": 2185,
-  "afgeleidDoorScript": 3112,
+  "vastgesteldDoorMens": 2186,
+  "afgeleidDoorScript": 3111,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4381,
    "PUBLIC": 138,
@@ -136154,9 +136154,9 @@
    "mutatieId": "veiligheid.moment.maak",
    "route": "POST /api/veiligheid/moment/maak",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -136172,8 +136172,8 @@
     "grond": null,
     "hindernis": "Kies minstens één verbonden persoon of betrokken bedrijf."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

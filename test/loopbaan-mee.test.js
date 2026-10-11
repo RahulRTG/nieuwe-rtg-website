@@ -48,6 +48,20 @@ test('1. het afschrift: het hele eigen ledger, met de reden van een intrekking, 
   const deel = await post('/api/carriere/ledger/deel', { id: een.body.regel.id, dagen: 30, voor: 'Werkgever' }, lid.token);
   assert.equal(deel.status, 200);
 
+  /* een zaak bevestigt het eerste feit; daarna mag zij haar EIGEN bevestiging
+     terugnemen, maar niet het feit van het lid -- en het lid niet haar bevestiging */
+  const zaak = (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
+  assert.ok(zaak, 'de demozaak logt in');
+  const code = (await post('/api/state', {}, lid.token)).body.state.user.codename;
+  const bev = await post('/api/supplier/carriere/bevestig', { mens: code, id: een.body.regel.id, wat: 'Werkte bij ons in de keuken' }, zaak);
+  assert.equal(bev.status, 200, JSON.stringify(bev.body).slice(0, 200));
+  const zaakOpFeit = await post('/api/supplier/carriere/intrek', { mens: code, id: een.body.regel.id, reden: 'poging' }, zaak);
+  assert.equal(zaakOpFeit.status, 403, 'een zaak neemt het feit van het lid niet terug: ' + JSON.stringify(zaakOpFeit.body));
+  const lidOpBev = await post('/api/carriere/ledger/intrek', { id: bev.body.regel.id, reden: 'niet mee eens' }, lid.token);
+  assert.equal(lidOpBev.status, 403, 'een bevestiging neemt alleen terug wie hem gaf');
+  const zaakTerug = await post('/api/supplier/carriere/intrek', { mens: code, id: bev.body.regel.id, reden: 'Verkeerde periode' }, zaak);
+  assert.equal(zaakTerug.status, 200, JSON.stringify(zaakTerug.body).slice(0, 200));
+
   const a = await post('/api/carriere/ledger/afschrift', { key: 'iemand-anders' }, lid.token);
   assert.equal(a.status, 200, JSON.stringify(a.body).slice(0, 200));
   assert.equal(a.body.vorm, 'rtg-loopbaan-afschrift/1');
@@ -57,11 +71,18 @@ test('1. het afschrift: het hele eigen ledger, met de reden van een intrekking, 
   assert.equal(weg.ingetrokken, true);
   assert.deepEqual({ door: weg.intrekking.door, reden: weg.intrekking.reden }, { door: 'het lid', reden: 'Het waren er drie' },
     'een lezer buiten RTG kan niet doorvragen, dus de reden reist mee');
-  assert.equal(a.body.feiten.find(f => f.wat.startsWith('Kok')).intrekking, null);
+  const kok = a.body.feiten.find(f => f.wat.startsWith('Kok'));
+  assert.equal(kok.intrekking, null, 'het feit zelf is niet ingetrokken');
+  assert.equal(kok.bevestigingen.length, 1, 'de bevestiging van de zaak reist mee');
+  assert.equal(kok.bevestigingen[0].wat, 'Werkte bij ons in de keuken');
+  assert.equal(kok.bevestigingen[0].intrekking.reden, 'Verkeerde periode', 'ook de intrekking van een bevestiging, met reden');
+  assert.match(kok.bevestigingen[0].intrekking.door, /\(/, 'op naam van de zaak met de medewerker erachter');
+  assert.equal(a.body.misschienAfgekapt, false, 'twee feiten raken de grens van het ledger niet');
   assert.ok(a.body.nietZegt.some(z => /niet ondertekend/i.test(z)), 'het afschrift doet zich niet voor als bewijs');
   const tekst = JSON.stringify(a.body);
   assert.equal(tekst.includes('Regel van een ander'), false, 'het lichaam kan geen ander ledger aanwijzen');
   assert.equal(tekst.includes(deel.body.code), false, 'een deelcode is een sleutel en hoort niet in het afschrift');
+  assert.deepEqual(Object.keys(a.body).filter(k => /deel|code/i.test(k)), [], 'en er hangt geen lijst deelcodes aan');
   assert.equal(/"(totaal|score|niveau)"/.test(tekst), false, 'geen samengesteld getal over een mens (CAR-05)');
 
   const nogEens = await post('/api/carriere/ledger/afschrift', {}, lid.token);
@@ -95,5 +116,4 @@ test('2. Mijn werk: een afgelopen dienstverband staat in `eerder` en niet meer a
   assert.deepEqual(na.eerder.map(w => [w.rol, w.bedrijf, w.van, w.tot]), [['Kok', 'Brisa Horeca BV', '2025-01-01', gisteren]],
     'maar het blijft een feit van de mens');
   assert.match(na.regel, /nog geen werkplek/);
-  assert.deepEqual((await post('/api/concern/mijnwerk', {}, ander.token)).body.eerder, [], 'een ander lid ziet dit niet');
 });

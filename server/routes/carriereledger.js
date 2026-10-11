@@ -69,7 +69,7 @@ module.exports = (kern) => {
   app.post('/api/carriere/ledger/intrek', auth, (req, res) => {
     const k = lid(req, res); if (!k) return;
     const b = req.body || {};
-    stuur(res, carriereledger.intrek(k, String(b.id || ''), { door: 'het lid', reden: b.reden }));
+    stuur(res, carriereledger.intrek(k, String(b.id || ''), { door: 'het lid', reden: b.reden, van: { lid: true } }));
   });
 
   app.post('/api/carriere/ledger/deel', auth, (req, res) => {

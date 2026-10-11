@@ -239,7 +239,7 @@ $('#meeneem').addEventListener('click', async ()=>{
     const url=URL.createObjectURL(new Blob([JSON.stringify(a,null,2)],{type:'application/json'}));
     const l=document.createElement('a'); l.href=url; l.download='mijn-loopbaan-'+new Date().toISOString().slice(0,10)+'.json';
     document.body.appendChild(l); l.click(); l.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
-    meld('Uw loopbaan staat in het bestand: '+a.feiten.length+(a.feiten.length===1?' regel.':' regels.'));
+    meld('Uw loopbaan staat in het bestand: '+a.feiten.length+(a.feiten.length===1?' feit':' feiten')+', met wie ze bevestigde.'+(a.misschienAfgekapt?' Let op: oudere regels kunnen ontbreken; dat staat in het bestand.':''));
   }catch(e){ meld(e.message); }
 });
 

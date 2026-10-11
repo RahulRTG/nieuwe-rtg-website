@@ -2675,7 +2675,6 @@
       "server/routes/bijles.js",
       "server/routes/boeken.js",
       "server/routes/borden.js",
-      "server/routes/carriereledger.js",
       "server/routes/clips.js",
       "server/routes/clubs.js",
       "server/routes/code.js",
@@ -4446,6 +4445,7 @@
       "server/kern/bureau/lus.js",
       "server/kern/cadeaukaart.js",
       "server/kern/care/zaak.js",
+      "server/kern/carriereledger/deel.js",
       "server/kern/checklijst.js",
       "server/kern/codelevenscyclus.js",
       "server/kern/command/beleid.js",
@@ -5827,6 +5827,7 @@
       "server/kern/cadeaukaart.js",
       "server/kern/care.js",
       "server/kern/carriereledger/deel.js",
+      "server/kern/carriereledger/index.js",
       "server/kern/codelevenscyclus.js",
       "server/kern/comm/dm.js",
       "server/kern/comm/gast-lijsten.js",
@@ -14800,7 +14801,8 @@
         "screensOmitted": 0,
         "signals": [
           "decision",
-          "feedback"
+          "feedback",
+          "ai"
         ]
       },
       "classification": "NOT_YET_LOOP_CAPABLE",
@@ -23575,7 +23577,7 @@
       "behaviourEvidence": {
         "routeCount": 28,
         "mutationRoutes": 28,
-        "declaredMutationSemantics": 9,
+        "declaredMutationSemantics": 10,
         "sourceFileCount": 4,
         "kernelDependencyCount": 0,
         "screenCount": 3,

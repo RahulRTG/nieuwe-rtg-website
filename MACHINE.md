@@ -74,12 +74,12 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->4078<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->4115<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
 |---|---|---|---|
-| bewijsDraagt (proof-carrying) | 1 | <!--getal:machine.bewijsDraagt-->20<!--/getal--> | `kern/commercie/bewijstoken.js` |
+| bewijsDraagt (proof-carrying) | 1 | <!--getal:machine.bewijsDraagt-->21<!--/getal--> | `kern/commercie/bewijstoken.js` |
 | beleid (veiligheidskern) | 0 | 15 | `kern/commercie/veiligheidskern.js` |
 | gevolg (wat raakt dit aan) | 0 | 0 | `kern/stuur/gevolg.js` |
 | bewijsstand (bewezen) | 0 | 0 | `VERTROUWEN.json` |
@@ -93,10 +93,10 @@ aantal routes dat hem raakt (`handler` / `bestand`):
 | assurance (passkey, stap-op) | 2 | 49 | `kern/identiteit/vertrouwen.js` |
 | frictie | 2 | 98 | `kern/frictie/motor.js` |
 | simulatie | 10 | 103 | `kern/command/simulatie.js` |
-| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->213<!--/getal--> | `kern/envelop.js` |
+| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->222<!--/getal--> | `kern/envelop.js` |
 | idempotentie | 13 | 114 | `lib/idem-poort.js` |
 | aiVindbaar | 173 | 173 | `kern/stuur/beleid.js` |
-| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->313<!--/getal--> | `kern/kantoor/kluispoort.js` |
+| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->322<!--/getal--> | `kern/kantoor/kluispoort.js` |
 | herhaling (beschermd) | 1675 | 1675 | `IDEMPROEF.json` |
 
 Vier assen staan als **ongemeten met een reden** en nooit als 0: doelvindbaarheid
@@ -105,7 +105,7 @@ Vier assen staan als **ongemeten met een reden** en nooit als 0: doelvindbaarhei
 per handeling (hangt aan een async-context, niet aan een route).
 
 **De vierde teller, en hij gaat de andere kant op.** `volledigeKetens` staat op
-<!--getal:machine.volledigeKetens-->1<!--/getal-->. De twee tellers hieronder zijn
+<!--getal:machine.volledigeKetens-->3<!--/getal-->. De twee tellers hieronder zijn
 SCHULDEN en mogen alleen dalen; deze is een BEZIT en mag alleen stijgen -- en dat
 is een andere vraag dan "hoeveel routes raken een motor". Een keten heet volledig
 wanneer élke as die zijn handelingsklasse verplicht stelt, werkelijk op de routes
@@ -115,8 +115,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2694<!--/getal--> van de
-   <!--getal:machine.muterend-->4078<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2711<!--/getal--> van de
+   <!--getal:machine.muterend-->4115<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 
    **Let op de noemer: die is op 14 september 2026 verschoven, en een ronde van

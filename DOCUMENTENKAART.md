@@ -2536,7 +2536,7 @@ loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
 inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27178<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->7615<!--/getal--> require-kanten heen en terug, met de eigen parser
+met een regelnummer en <!--getal:symbolen.kanten-->7616<!--/getal--> require-kanten heen en terug, met de eigen parser
 en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->314<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
@@ -2671,8 +2671,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->4078<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2694<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->4115<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2711<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele
@@ -2688,7 +2688,7 @@ naam en toenaam onbruikbaar is verklaard. **De eerste keten is rond** (par. 5a):
 verplichte assen voor haar klasse en alle vijftien gelopen, met
 `kern/kantoor/geldketen.js` als BAAN en niet als zeventiende motor. Daarom een
 vierde teller die de andere kant op gaat: `volledigeKetens` staat op
-<!--getal:machine.volledigeKetens-->1<!--/getal--> (zestien verplichte assen,
+<!--getal:machine.volledigeKetens-->3<!--/getal--> (zestien verplichte assen,
 alle zestien gelopen) en mag alleen STIJGEN (de twee
 andere zijn schulden en mogen alleen dalen) -- haal er één as uit en hij zakt naar
 nul met de naam van die as erbij. Twee handelingsklassen, en het verschil is

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-11T07:56:47.727Z",
-  "commit": "2290de535",
+  "op": "2026-10-11T09:18:13.726Z",
+  "commit": "2d72220ec",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
@@ -4086,7 +4086,7 @@
   },
   {
    "sleutel": "POST /api/stroom/ticket",
-   "bestand": "server/opzet/stroomtoegang.js:27",
+   "bestand": "server/opzet/stroomtoegang.js:31",
    "staat": "eigenControle"
   },
   {

@@ -260,7 +260,7 @@ function druk(u) {
     for (const f of u.functies.filter((x) => x.werkwoord === ww)) {
       const naam = f.scherm || f.functie || ('buiten de kast: ' + f.paden.join(', '));
       const t = f.telling ? '  open ' + f.telling.open + ', achter betaling ' + f.telling['achter-betaling'] : '';
-      console.log('      ' + naam.padEnd(22) + f.stand.padEnd(24) + t);
+      console.log('      ' + naam.padEnd(22) + ' ' + f.stand.padEnd(24) + t);
     }
   }
   console.log('\n  achter betaling:        ' + (u.achterBetaling.join(', ') || '-'));

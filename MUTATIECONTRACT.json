@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-11T17:25:55.360Z",
-  "commit": "4e3f4596",
-  "boomVuil": true,
-  "boomAnders": 6,
+  "op": "2026-10-11T17:37:31.236Z",
+  "commit": "58a3337f",
+  "boomVuil": false,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.0"
  },
@@ -1032,27 +1032,6 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "identiteit.opnieuwbeginnen",
-   "route": "POST /api/account/opnieuw",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -83569,6 +83548,27 @@
     "grond": null,
     "hindernis": null
    },
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "identiteit.opnieuwbeginnen",
+   "route": "POST /api/privacy/opnieuw",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
    "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,

@@ -25727,8 +25727,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 6,
-        "mutationRoutes": 7,
-        "declaredMutationSemantics": 2,
+        "mutationRoutes": 6,
+        "declaredMutationSemantics": 1,
         "sourceFileCount": 2,
         "kernelDependencyCount": 1,
         "screenCount": 3,

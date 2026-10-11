@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T17:20:05.394Z",
-    "commit": "1354a64b",
+    "op": "2026-10-11T17:37:08.853Z",
+    "commit": "58a3337f",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/onvervreemdbaar.js",
@@ -2067,10 +2067,11 @@
     {
       "werkwoord": "opnieuw-beginnen",
       "waarom": "opnieuw beginnen als projectie: account terug, verleden meenemen en achterlaten (SAMENLEVING.md par. 2)",
-      "functie": "tg-account",
-      "naam": "Account en profiel",
+      "functie": null,
+      "buitenKast": "onder /api/privacy, net als inzage, export en wissen: een recht dat RTG niet kan uitzetten (functies/register/cat-domeinen3.js)",
+      "naam": null,
       "paden": [
-        "/api/account/opnieuw"
+        "/api/privacy/opnieuw"
       ],
       "stand": "open",
       "telling": {
@@ -2084,7 +2085,7 @@
       "achterPaspoortcontrole": false,
       "routes": [
         {
-          "route": "POST /api/account/opnieuw",
+          "route": "POST /api/privacy/opnieuw",
           "stand": "open",
           "gratis": 200,
           "rtg": 200,

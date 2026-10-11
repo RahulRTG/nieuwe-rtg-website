@@ -110,12 +110,12 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 254 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 255 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
-| `auth` | 21 | 6 | 8 | 54 |
-| `member` | 743 | 75 | 17 | 456 |
+| `auth` | 21 | 6 | 8 | 55 |
+| `member` | 743 | 75 | 17 | 457 |
 | `supplier` | 640 | 137 | 6 | 345 |
 | `office` | 98 | 22 | 3 | 98 |
 | `staff` | 27 | 9 | 1 | 43 |
@@ -140,8 +140,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1685 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 254 |
+| kern-namen die routes aanraken | 1686 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 255 |
 | daarvan door precies één domein | 1431 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
@@ -176,8 +176,8 @@ afdelingen(5) openVacatures(5) overheid(5) sseToCustomer(5)
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
 | 39 | `server/routes/staff.js` |
+| 35 | `server/routes/auth/herstel.js` |
 | 35 | `server/routes/auth.js` |
-| 35 | `server/routes/member/handel/uitjes.js` |
 
 ## 6. Waar de waarheid staat
 

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2442 bestanden en 16725 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2443 bestanden en 16728 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2442 |
-| losse beweringen (`test(...)`) | 16725 |
+| toetsbestanden | 2443 |
+| losse beweringen (`test(...)`) | 16728 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2268 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2269 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2134 bestanden, 16188 beweringen.
+2135 bestanden, 16191 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -84,6 +84,7 @@ toets omvalt.
 | `afhaalcode.test.js` | 13 | gezakt op `liegpoort /api/` | De afhaalcode van een bestelling (pay.order_pickup_code), control voor control. Het register CODECREDENTIALS.json noemt deze deur pas `migrated` als elke control in code staat EN door een toets wordt bewezen. |
 | `afleidbaar.test.js` | 9 | gezakt op `===->!==#0` | WAT IS ER AFLEIDBAAR UIT EEN CODENAAM -- en meet die meter dat werkelijk? MAGNAATLAB.md par. |
 | `afleidrest-dubbeltik.test.js` | 3 | geen bruikbare mutatie | DE VIJF DUBBELTIKKEN -- en de eis dat "geen tweede effect" niet genoeg is. server/lib/idemsleutels-afleidrest.js verklaart vijf routes als `zelfdeVerzoek` omdat de idemproef ze GEMETEN onbeschermd vond: "een... |
+| `afstemmingsketen.test.js` | 2 | gezakt op `liegpoort /api/` | DE AFSTEMMING DOOR DE GELDKETEN -- over een echte server, met echt geld. Een uitbetaling met onbekende uitkomst (MONEY-012) wordt afgestemd op een afschriftregel: een kantoormens neemt hem over, een tweede mens... |
 | `agenda-pro.test.js` | 5 | gezakt op `liegpoort /api/` | De pro-laag van de agenda: herhalingen die goed uitrollen, uitnodigen op codenaam (nooit een echte naam in beeld), ja/nee dat bij de organisator terugkomt, ICS-export met RRULE, en de eerlijke sluitregels. Draai los:... |
 | `agenda.test.js` | 5 | gezakt op `liegpoort /api/` | Tests voor de persoonlijke AI-agenda (kern/agenda.js): leden en leveranciers hebben een eigen agenda; de AI zet gewone taal om naar datum + tijd; de telling voedt de ballon-badge. Draai: npm test |
 | `agent.test.js` | 4 | gezakt op `liegpoort /api/` | De AI-bedrijfsagent: vaste leverancier koppelen, inkoopvoorstellen met goedkeuring door de gemachtigde (pas dan een echte bestelling bij de groothandel), automatisch een voorstel na de MEP-voorspelling, en het... |
@@ -1163,7 +1164,7 @@ toets omvalt.
 | `money-credential-productiepoort.test.js` | 12 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `money012-inkomend.test.js` | 9 | gezakt op `!==->===#0` | MONEY-012, de inkomende kant -- geld dat het huis BINNENKOMT eindigt na elke onderbreking in precies een verklaarbare waarheid. Dezelfde vier wetten als test/money012.test.js (de uitgaande kant), nu op... |
 | `money012-keten.test.js` | 3 | gezakt op `===->!==#0` | MONEY-012, DE EINDPROEF -- de keten als een systeem en niet als losse modules. test/money012.test.js en test/money012-inkomend.test.js beproeven elk een module met een nagemaakte buitenwereld. |
-| `money012.test.js` | 15 | gezakt op `===->!==#0` | MONEY-012 -- geld dat het huis verlaat, eindigt na elke onderbreking in precies EEN verklaarbare waarheid. Vier wetten, en deze toets beproeft ze op de uitgaande kant (de betaalopdracht, server/kern/betaalopdracht/),... |
+| `money012.test.js` | 16 | gezakt op `===->!==#0` | MONEY-012 -- geld dat het huis verlaat, eindigt na elke onderbreking in precies EEN verklaarbare waarheid. Vier wetten, en deze toets beproeft ze op de uitgaande kant (de betaalopdracht, server/kern/betaalopdracht/),... |
 | `motor-initialisatie.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `motor-vingerafdruk.test.js` | 4 | gezakt op `!==->===#0` | De saldi-vingerafdruk (drift-detector): borgt dat de JS-berekening BYTE-VOOR- BYTE gelijk is aan de Rust-motor (motor/src/pay.rs::vingerafdruk), zodat de schaduw-drift-detector per-rekening-drift vangt die de... |
 | `motorverbinding.test.js` | 7 | gezakt op `===->!==#0` | De gedeelde motorverbinding op het GELDPAD, in de AAN-stand. Waarom dit bestand er is. |

@@ -919,6 +919,25 @@ in *tafels die uitstaan* en een manager geeft hem in één druk terug, maar niem
 wordt eraan herinnerd. Dat vraagt een begrip dat hier nog nergens bestaat — het
 einde van een dienst — en dat is een eigen snede, geen restje van deze.
 
+**De tweede keten: bezorging** (11 oktober 2026). De tafelproef noemt
+bezorging, hotel en club als eigen naden; `scripts/bezorgproef.js`
+(`npm run bezorgproef`, en als gewone toets `test/bezorgproef.test.js`) loopt
+de eerste: zaak zet de dienst aan, lid bestelt en betaalt vooraf, keuken zet in
+bereiding, inpakker pakt in op het bonnummer, bezorger neemt de rit op eigen
+naam, vertrekt, deelt zijn positie en meldt bezorgd -- tien schakels, elk gemeten
+bij de ONTVANGER (het volgscherm en de meldingen van het lid, het overzicht van
+de bezorger). Hij vond twee gebreken die geen losse routetoets zag, en allebei
+zaten ze op twee wegen tegelijk (`bezorg/status` en `order/status`): een
+levering kon op **bezorgd** zonder ooit te zijn vertrokken -- het lid las "Eet
+smakelijk!" voor eten dat nog in de keuken stond, terwijl het vertrek wel een
+poort had -- en **dezelfde stand twee keer** gaf het lid een tweede bericht. Beide
+zijn dicht in `kern/horeca/bezorgovergang.js`, een regel die beide routes vragen: de
+bezorghelft loopt alleen vooruit, en een herhaling verandert niets en meldt
+niets. Wat de proef niet bewijst: er wordt niet echt betaald, er komt geen
+browser aan te pas, en de bezorgzones en tijdsloten (`kern/horeca/bezorglaag.js`)
+worden door de ledenbestelling niet geraadpleegd -- dat is een naad die hier
+staat en niet is gelegd. De keten staat nog niet in `scripts/ketenvorm.js`.
+
 ## De echte wauw
 
 Voor de gast: *"Ze wisten wat wij nodig hadden, zonder dat het onpersoonlijk of

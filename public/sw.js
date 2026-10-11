@@ -104,23 +104,14 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('rtg-app-') && k !== CACHE).map(k => caches.delete(k))))
-      /* Mediabeeld hoort niet in deze cache (zie fetch hieronder). Wat een oudere
-         schil er wel in zette -- ook privébeeld van voor AUTHORITY.md B4 -- gaat
-         er bij elke activering uit, ook als de cachenaam gelijk bleef. */
-      .then(() => caches.open(CACHE)).then(c => c.keys().then(reqs => Promise.all(
-        reqs.filter(r => new URL(r.url).pathname.startsWith('/media/')).map(r => c.delete(r)))))
+      .then(() => caches.open(CACHE)).then(c => c.keys().then(k => Promise.all(k.filter(r => r.url.includes('/media/')).map(r => c.delete(r))))) // B4
   );
   self.clients.claim();
 });
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  if (e.request.method !== 'GET' || url.origin !== location.origin || url.pathname.includes('/api/')) return;
-  /* /media gaat langs de schil heen: privébeeld komt via een kort geldige link
-     met `private, no-store`, en een network-first-cache die elk goed antwoord
-     bewaart zou het na het uitloggen op het toestel laten staan. De browser
-     volgt hier gewoon de cachekop van de server. */
-  if (url.pathname.startsWith('/media/')) return;
+  if (e.request.method !== 'GET' || url.origin !== location.origin || url.pathname.includes('/api/') || url.pathname.startsWith('/media/')) return;
   // Iconen en manifests veranderen zelden: die mogen uit de cache komen.
   const staticAsset = /^\/(icons|manifests)\//.test(url.pathname) || url.pathname === '/icon.svg';
   e.respondWith(

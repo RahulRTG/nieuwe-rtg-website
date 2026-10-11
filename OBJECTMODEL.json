@@ -2,11 +2,11 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-10-11",
   "gemeten": {
-    "bestanden": 2789,
-    "vormen": 1600,
-    "velden": 2289,
-    "modules": 887,
-    "domeinen": 310,
+    "bestanden": 2796,
+    "vormen": 1602,
+    "velden": 2291,
+    "modules": 888,
+    "domeinen": 311,
     "envelopDrempel": 19,
     "envelop": 29,
     "veldenDomeineigen": 1606,
@@ -154,6 +154,30 @@
       ]
     },
     {
+      "veld": "vraag",
+      "domeinen": 14,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/beraad",
+        "kern/command",
+        "kern/commerce",
+        "kern/livinglab",
+        "kern/magnaat-economenlab-rapport"
+      ]
+    },
+    {
+      "veld": "ingetrokken",
+      "domeinen": 14,
+      "waar": [
+        "bedrijf",
+        "kern/beraad",
+        "kern/beschermzaak",
+        "kern/carriereledger",
+        "kern/command",
+        "kern/festival"
+      ]
+    },
+    {
       "veld": "eenheid",
       "domeinen": 14,
       "waar": [
@@ -214,18 +238,6 @@
       ]
     },
     {
-      "veld": "vraag",
-      "domeinen": 13,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/command",
-        "kern/commerce",
-        "kern/livinglab",
-        "kern/magnaat-economenlab-rapport",
-        "kern/magnaat-economische-motor"
-      ]
-    },
-    {
       "veld": "aan",
       "domeinen": 13,
       "waar": [
@@ -262,15 +274,15 @@
       ]
     },
     {
-      "veld": "ingetrokken",
+      "veld": "vanMij",
       "domeinen": 13,
       "waar": [
-        "bedrijf",
-        "kern/beschermzaak",
-        "kern/carriereledger",
-        "kern/command",
-        "kern/festival",
-        "kern/leerhuis"
+        "kern/beraad",
+        "kern/berichten",
+        "kern/bestanden",
+        "kern/genootschap",
+        "kern/meet",
+        "kern/metier"
       ]
     },
     {
@@ -355,18 +367,6 @@
         "kern/frictie",
         "kern/geldbeleid",
         "kern/kantoor"
-      ]
-    },
-    {
-      "veld": "vanMij",
-      "domeinen": 12,
-      "waar": [
-        "kern/berichten",
-        "kern/bestanden",
-        "kern/genootschap",
-        "kern/meet",
-        "kern/metier",
-        "kern/muziek"
       ]
     },
     {

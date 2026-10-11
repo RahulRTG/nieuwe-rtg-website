@@ -228,6 +228,69 @@ is niet genoeg: ook indirecte herkenbaarheid, combinaties van gegevens en
 herkomstinformatie worden getoetst. Is de kennis nog herleidbaar en is er geen
 geldige grond voor behoud, dan gaat ook die weg.
 
+## 3d. Open besluiten, portie 2 (11 oktober 2026)
+
+**11 — Vijf Foundation-onderdelen (A19; FOUNDATION.md par. 2).** RTG Plan, Apply
+Once, Safe Autopilot, Warm Handoff en Process Engine worden gebouwd binnen de
+bestaande Foundation-architectuur. Safe Autopilot mag uitsluitend voorbereiden,
+bewaken en herinneren, nooit zelfstandig uitvoeren; er wordt een gebruikersnaam
+gezocht die geen automatische uitvoering suggereert. Menselijke bevestiging blijft
+verplicht waar de huisregels dat voorschrijven.
+
+**12 — Verantwoordelijkheidsgraaf (A25; HDI.md par. 5.1, een projectie en geen
+tabel).** Taakeigenaarschap wordt uitsluitend berekend uit bestaande gezaghebbende
+bronnen: dienstverband, rooster en de eigenaarsvelden van een domein. Geen nieuw
+toewijzingsregister. Spreken bronnen elkaar tegen, dan wordt geen eigenaar
+verzonnen: de onduidelijkheid wordt getoond en een handeling die een bewezen
+eigenaar vraagt, wordt tegengehouden.
+
+**13 — Betaalmandaat (A1; AFSPRAAK.md, en par. 3b 2B/2C).** Een afzonderlijk
+domeinobject naast het contract, met betaalrail, toestemming, reikwijdte,
+geldigheid, intrekking en bewijsverwijzingen. De naam botst niet met bestaande
+mandaten of machtigingen (`mandaat` en `machtiging` zijn bezet). Een geldig
+betaalmandaat is geen algemene toestemming om geld te verplaatsen; de bestaande
+betaalpoorten en transactieregels blijven gelden.
+
+**14 — Mensmodel en embeddings (A5; INT-03, HDI.md par. 5.1). Nee, voorlopig.** Geen
+afzonderlijk Mensmodel en geen nieuwe opslag van persoonsgegevens als
+AI-embeddings. Eerst de toegestane lezer op de bestaande levensgraaf, zonder
+centrale persoonsdatabase. Herbeoordeling alleen na aantoonbare werking,
+privacytoetsing en een afzonderlijk eigenaarsbesluit.
+
+**15 — Navigatieregister (A27; TIKKEN.md, geen tweede lijst apps).** `MAPPEN` is de
+enige bron; de ledenweergave, de Edge-navigatie en de zoekindex worden ervan
+afgeleid. Geen tweede applicatieregister.
+
+**16 — Zaakgegevens (A32; NAVIGATIE.md P-05).** Zaken beheren hun ingang,
+parkeerinformatie en openingstijden zelf, met passende validatie. Niets wordt
+afgeleid uit bewegingsgegevens van bezoekers.
+
+**17 — Rechtenregister voor makers (A30, keuze A; MENSNETWERK.md besluit 3).**
+Gebouwd, te beginnen bij AI-gebruik: rechten, toestemming, beperkingen,
+geldigheid, intrekking en herkomst, met een conflictcontrole die tegenstrijdige
+rechten signaleert en onbevoegd gebruik tegenhoudt. Op de bestaande identiteits-,
+bevoegdheids- en bewijsvoorzieningen; geen concurrerend rechtenstelsel. Het
+register signaleert technische conflicten maar stelt niet vast wie juridisch
+rechthebbende is: bij betwiste rechten geldt menselijke of juridische beoordeling.
+
+**18 — Reiswacht (A44; REIZEN.md, een wachter zonder bron zegt dat hij niet kijkt).**
+Opt-in per reis, via de bestaande meldingsvoorzieningen. Zichtbaar welke bronnen
+worden gecontroleerd, hoe actueel ze zijn en wat niet wordt bewaakt. De reiswacht
+bereidt voorstellen voor maar boekt nooit zelfstandig om, betaalt niet en handelt
+niet namens anderen.
+
+**19 — Zelfstandig handelen door de reisassistent (A47; FABRIC.md, B3). Nee.** Rahul
+en de reisassistent onderzoeken, plannen, vergelijken en bereiden voor; geen
+zelfstandige uitvoering die geld of een tweede persoon raakt. Herbeoordeling pas na
+bewezen uitvoeringsroutes en een afzonderlijk besluit.
+
+**20 — Containerbeveiliging (A39; `check.js` regel 14, nul runtime-afhankelijkheden).**
+Een vastgepinde, onderhouden image-scanner in CI (bijvoorbeeld Trivy of Grype),
+zonder nieuwe runtime-afhankelijkheid. De scan is een verplichte releasepoort voor
+relevante ernstige kwetsbaarheden, met een vastgelegde uitzonderingsprocedure,
+reproduceerbare uitslagen en een controle op verouderde kwetsbaarheidsinformatie.
+Faalt de scanner, dan faalt de poort: hij wordt nooit stil overgeslagen.
+
 ## 4. De vier werkstromen
 
 | werkstroom | wat | werkterrein |

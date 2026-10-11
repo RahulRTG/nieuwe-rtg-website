@@ -366,7 +366,7 @@ omlaag.
 
 ## `apps/office/app.js`
 
-`public/apps/office/app/` -- 9 delen, 959 regels in de delen
+`public/apps/office/app/` -- 9 delen, 1021 regels in de delen
 
 | deel | onderwerp |
 |---|---|

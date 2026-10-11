@@ -10,6 +10,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-mall-aanvraag').CONTRACTEN,
   require('./mutatiecontracten-beelden').CONTRACTEN,
   require('./mutatiecontracten-document').CONTRACTEN,
+  require('./mutatiecontracten-officeformaten').CONTRACTEN,
   require('./mutatiecontracten-storingen').CONTRACTEN,
   /* Opgesplitst omdat scripts/check.js een bestandsgrens kent en die terecht
      aansloeg: een lijst die naar duizenden regels groeit, hoort niet in een

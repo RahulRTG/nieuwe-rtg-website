@@ -4,6 +4,7 @@
    de mens voegt in of niet. */
 
 const { MAX_VERSIES } = require('./basis');
+const { poort } = require('./uitgangspoort');
 const { samenvat, actiepunten, zinnen } = require('../../lib/lokale-taal');
 
 module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, basis) => {
@@ -43,8 +44,8 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
     try { const t = keyVanCodenaam ? await keyVanCodenaam(String(codenaam || '').trim()) : null; doelKey = t && t.key; } catch (e) {}
     if (!doelKey) return { status: 404, error: 'Geen lid gevonden met die codenaam.' };
     if (doelKey === key) return { status: 400, error: 'Uzelf toevoegen hoeft niet.' };
-    if (aan !== false && d.beheer && d.beheer.classificatie === 'strikt')
-      return { status: 409, error: 'Een strikt document kan niet worden gedeeld. Pas eerst de classificatie aan.' };
+    const uit = poort(d, 'delen');
+    if (aan !== false && !uit.mag) return { status: 409, code: uit.code, error: uit.reden };
     d.gedeeldMet = (d.gedeeldMet || []).filter(k => k !== doelKey);
     d.bewerkers = (d.bewerkers || []).filter(k => k !== doelKey);
     if (aan !== false) {
@@ -117,11 +118,8 @@ module.exports = ({ save, schoon, keyVanCodenaam, sseToCustomer, anthropic }, ba
     /* Alleen hier gaat documenttekst naar een model, en een STRIKT document
        niet (OFFICE.md par. 3, punt 10). Lokaal-only is geen uitweg: server/ai.js
        valt bij een storing door naar extern. Zie office-ai-classificatie.test.js. */
-    if (d.beheer && d.beheer.classificatie === 'strikt') {
-      return { status: 403, code: 'CLASSIFICATIE_STRIKT', opdracht, handmatig: true,
-        error: 'Dit document is strikt geclassificeerd en gaat niet naar een taalmodel. ' +
-          'Samenvatten, inkorten, actiepunten, formule en kritisch lezen werken wel: die blijven in RTG.' };
-    }
+    const naarModel = poort(d, 'model');
+    if (!naarModel.mag) return { status: 403, code: naarModel.code, opdracht, handmatig: true, error: naarModel.reden };
     if (anthropic) {
       try {
         const prompt = opdracht === 'herschrijven' ? 'Herschrijf deze tekst zakelijk en helder, in het Nederlands, ongeveer even lang:\n' + kaal

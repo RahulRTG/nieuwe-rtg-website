@@ -176,6 +176,8 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-reisteruggave').SLEUTELS,
   require('./idemsleutels-vrijgave').SLEUTELS,
   require('./idemsleutels-horecateruggave').SLEUTELS,
+  // RTG Office in en uit: exporteer en importeer zijn met opzet een tweede handeling
+  require('./idemsleutels-officeformaten').SLEUTELS,
   /* De TURN-uitgifte: elk antwoord is een vers geheim. Zie de kop daar. */
   require('./idemsleutels-rtc').SLEUTELS);
 

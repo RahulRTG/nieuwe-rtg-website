@@ -52,6 +52,13 @@ function maakBasis({ db, crypto, codenaamVan }) {
   };
   const { inKring, magSchrijven, magLezen } = require('./rechten');
   const faseVan = d => FASES.includes(d && d.fase) ? d.fase : 'concept';
+  /* Exports staan in een EIGEN ring (`uitgaand`, kern/office/formaten.js):
+     iedereen die mag lezen mag exporteren, en zestig downloads mogen een
+     verlaging van strikt naar intern niet uit het beheerspoor duwen -- ook
+     niet uit wat de eigenaar ziet. Daarom: het beheerspoor (twintig) plus de
+     laatste vijf exports, samen op tijd. */
+  const spoorVan = d => (d.audit || []).slice(0, 20).concat((d.uitgaand || []).slice(0, 5))
+    .sort((a, b) => String(b.om).localeCompare(String(a.om)));
   const schrijfAudit = (d, door, actie, extra) => {
     if (!d.audit) d.audit = [];
     d.audit.unshift(Object.assign({ om: nu(), door: naamVan(door), actie: String(actie || '').slice(0, 40) }, extra || {}));
@@ -154,7 +161,7 @@ function maakBasis({ db, crypto, codenaamVan }) {
   }
 
   return { id, nu, lijsten, docMet, grootteVan, naamVan, inKring, magSchrijven, magLezen,
-    faseVan, schrijfAudit, schoonInhoud };
+    faseVan, schrijfAudit, spoorVan, schoonInhoud };
 }
 
 module.exports = { SOORTEN, MAX_DOCS, MAX_BYTES, MAX_TITEL, MAX_VERSIES, MAX_DIAS,

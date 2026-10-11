@@ -102,6 +102,8 @@ function maakVrijheid({ opslag, save, nu, meld, rooster }) {
     const r = o.rechten || {};
     const saldi = C.saldi({ wettelijk: r.wettelijk != null ? r.wettelijk : null, contractueel: r.contractueel != null ? r.contractueel : null, rtgDag: rtg.open ? null : rtg.waarde },
       staat.boekingen.filter(b => b.persoon === verzoek.persoon && !b.ingetrokken && String(b.datum).startsWith(jaar)));
+    /* Waarom een recht onbekend is, reist mee tot in de zin van het besluit. */
+    for (const t of ['wettelijk', 'contractueel']) if (saldi[t] && saldi[t].recht == null && r.waarom && r.waarom[t]) saldi[t].reden = r.waarom[t];
     const vid = id('vv', code, inhoud, tijd(), Object.keys(staat.verzoeken).length);
     const oordeel = B.beoordeel({ team, beleid: o.beleid, verzoek, afwezig: afwezig(code), grootboek: staat.grootboek, saldi, vandaag: o.vandaag });
     const v = { id: vid, inhoud, stand: 'DRAFT', soort: verzoek.soort, categorie: verzoek.categorie, persoon: verzoek.persoon,

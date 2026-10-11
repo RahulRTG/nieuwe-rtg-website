@@ -503,6 +503,17 @@
       esc(s.recht == null ? (s.reden || '') : (s.tekst || '')) + '</span></div></div>';
   }
 
+  /* Waar je vakantierecht uit gerekend wordt: je eigen dienstverband en contract
+     (kern/vrijheid/saldobron.js). Ook als het saldo nog niet te rekenen is. */
+  function tijdBron(b){
+    if (!b || (!b.contract && !b.dienstverband)) return '';
+    const c = b.contract;
+    const zin = T('pd.tijd.bron', 'Gerekend uit je eigen gegevens') + ': ' +
+      (c ? c.soort + (c.urenPerWeek != null ? ', ' + c.urenPerWeek + ' ' + T('pd.tijd.upw', 'uur per week') : '') : T('pd.tijd.geencontract', 'nog geen contract')) +
+      (b.dienstverband ? '; ' + T('pd.tijd.indienst', 'in dienst sinds') + ' ' + b.dienstverband.van : '') + '.';
+    return '<div class="task"><div class="t"><span>' + esc(zin) + '</span></div></div>';
+  }
+
   function renderTijd(){
     const w = $('#tijdWrap'); if (!w) return;
     if (tijdFout){ w.innerHTML = '<div class="card"><div class="t">' + esc(tijdFout) + '</div></div>'; return; }
@@ -513,7 +524,7 @@
     const bewaard = {}; TIJD_VELDEN.forEach(id => { const e = w.querySelector('#' + id); if (e) bewaard[id] = e.value; });
     w.innerHTML =
       '<div class="card"><div class="k">' + T('pd.tijd.saldo', 'Wat je hebt') + '</div>' +
-        tijdSaldo(T('pd.tijd.vak', 'Vakantie'), t.vakantie) + tijdSaldo('RTG Days', t.rtgDagen) +
+        tijdSaldo(T('pd.tijd.vak', 'Vakantie'), t.vakantie) + tijdBron(t.vakantieBron) + tijdSaldo('RTG Days', t.rtgDagen) +
         (t.verjaardag ? '<div class="task"><div class="t"><b>' + T('pd.tijd.jarig', 'Je verjaardag') + (t.verjaardag.datum ? ': ' + esc(t.verjaardag.datum) : '') +
           '</b><span>' + esc(t.verjaardag.tekst || '') + '</span></div></div>' : '') +
       '</div>' +

@@ -80,6 +80,17 @@ test('3. issued_at en expires_at: tot het eind van de geldigheidsdag, en daarna 
   assert.equal(w.rij(u.uitnodiging.id).stand, 'verlopen');
 });
 
+test('3b. de vervaltijd blijft op de dag, ook als de klok tussen twee lezingen verspringt', () => {
+  // CI zag 23:59:59.001: de vervaltijd werd uit twee kloklezingen gerekend.
+  // Een klok die per lezing een milliseconde verder staat, maakt dat zeker.
+  let t = Date.parse('2027-06-14T10:00:00.000Z');
+  const nu = () => new Date(t++).toISOString();
+  const T = require('../server/kern/concern/uitnodiging-toegang')({ crypto, opslag: {}, nu });
+  const u = { id: 'uit_klok', entiteit: 'ent_k', geldigTot: '2027-07-14' };
+  T.geefCode(u, 'werkgever');
+  assert.equal(u.toegang.expires_at, '2027-07-14T23:59:59.000Z');
+});
+
 test('4. max_gebruik 1: eenmalig, en de teller staat op de credential', async () => {
   const w = wereld();
   const u = w.nodig();

@@ -27,9 +27,12 @@ module.exports = ({ crypto, opslag, bewerkCollectie, nu }) => {
   // uitgeven en roteren: de vorige code wordt ingetrokken, de kale nieuwe gaat alleen terug naar de aanroeper
   function geefCode(u, door) {
     if (u.toegang) bearer.intrekken(u.toegang, door || 'werkgever', 'vervangen door een nieuwe code');
+    const einde = Date.parse(u.geldigTot + 'T23:59:59Z');
     const g = bearer.maak({ prefix: 'CU', issuer: 'rtg.concern.werkgever', doel: DOEL, scope: SCOPE,
       onderwerp: { soort: 'concern-uitnodiging', id: u.id, entiteit: u.entiteit },
-      geldigMs: Date.parse(u.geldigTot + 'T23:59:59Z') - Date.parse(nu()), maxGebruik: 1 });
+      geldigMs: einde - Date.parse(nu()), maxGebruik: 1 });
+    // maak() leest de klok een tweede keer; een milliseconde ertussen schoof het einde voorbij de dag
+    if (Date.parse(g.toegang.expires_at) > einde) g.toegang.expires_at = new Date(einde).toISOString();
     g.toegang.rotatie = ((u.toegang && Number(u.toegang.rotatie)) || 0) + 1;
     u.toegang = g.toegang;
     return g.code;

@@ -3,7 +3,7 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-11",
-  "commit": "31a7dd321",
+  "commit": "7bb32d96c",
   "seconden": 9.4,
   "invoer": {
    "meting": "invoerspoor",
@@ -7171,7 +7171,7 @@
   "nietGelezen": 314,
   "waarvanBundeldeel": 314,
   "waarvanParsefout": 0,
-  "symbolen": 27177,
+  "symbolen": 27178,
   "bestandenMetUitvoer": 4479,
   "uitvoerMetNamen": 2025,
   "uitvoerOnvolledig": 5,
@@ -198469,21 +198469,27 @@
      "geexporteerd": "onbekend"
     },
     {
+     "naam": "teamVoor",
+     "soort": "functie",
+     "lijn": 24,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "missiePubliek",
      "soort": "functie",
-     "lijn": 16,
+     "lijn": 25,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "voorstelVan",
      "soort": "functie",
-     "lijn": 17,
+     "lijn": 26,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "beste",
      "soort": "functie",
-     "lijn": 18,
+     "lijn": 27,
      "geexporteerd": "onbekend"
     }
    ],

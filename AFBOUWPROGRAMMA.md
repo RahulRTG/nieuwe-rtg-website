@@ -351,6 +351,81 @@ autorisatieproblemen oplossen; 2. rode CI diagnosticeren en herstellen; 3. lopen
 PR's groen en conflictvrij; 4. menselijke merges voorbereiden; 5. daarna de
 goedgekeurde functionele afbouw hervatten. Geen nieuwe grote cloudsessies tot dan.
 
+## 3f. Open besluiten, portie 4 (11 oktober 2026)
+
+De eigenaar nam alle tien de voorgestelde opties over, met aanvullende
+voorwaarden. Wat botst met een bestaande grens of juridische goedkeuring mist,
+wordt niet geactiveerd.
+
+**31 — Reismarge en aanbetaling (A45; TRAVELCOMMERCE.md, een reisbureau is een
+KLANT, geld wordt klaargezet en een mens voert uit). Optie A.** Het bestaande
+model blijft, zonder aparte reismarge of aanbetaling. Eerst juridisch onderzoek of
+RTG optreedt als bemiddelaar, doorverkoper of reisorganisator en welke
+verplichtingen daarbij horen. Een margemodel blijft mogelijk, maar vraagt een
+afzonderlijk besluit en een passende juridische inrichting.
+
+**32 — Uitbetalen aan een mens (A28; MENSNETWERK.md CAR-01, WAARDE.md:
+uitbetaalbaar hangt aan een bevoegdheid en nooit aan een boolean). Optie A.** Geen
+nieuwe uitbetalingsmogelijkheid aan privépersonen tot de besluiten uit GIFT.md en
+een juridische toets er zijn. Bestaande rechtmatige zakelijke betalingen via
+`PARTNER_SETTLEMENT` blijven binnen hun huidige bevoegdheden. Geen nieuwe
+waardeklasse zonder afzonderlijke goedkeuring.
+
+**33 — Navigatie en GPS (A34 + A35; NAVIGATIE.md N11, P-02, P-05). Optie A.**
+Navigatie loopt via de bestaande plaatsregels. Locatieverzameling en doorgifte
+stoppen zodra de navigatietaak aantoonbaar is afgerond, met een duidelijke
+mogelijkheid om opnieuw te starten. Een toets bewijst dat na beëindiging voor die
+taak geen nieuwe positiegegevens worden verzameld of opgeslagen; tijdelijke
+gegevens verlopen volgens de vastgestelde bewaartermijnen.
+
+**34 — Contextuele Saloon (A37; P-05, PLAATS.md par. 6). Optie A.** Uitsluitend
+plaatsfeiten uit bevoegde operationele bronnen, zoals openingstijden of wat de
+zaak zelf publiceert. Geen locatiegebonden berichtenstructuur die indirect een
+bewegingsgeschiedenis van bezoekers opbouwt.
+
+**35 — Afgeleide feiten tussen werelden (A3; `deel` is een poort, par. 1 correctie
+3, par. 3d: een betaalmandaat is geen algemene toestemming). Optie B.** Een wereld
+mag een afgeleid feit klaarzetten voor gebruik in een andere wereld. De gebruiker
+bevestigt per feit én per bestemming, en ziet vooraf welk gegeven wordt gedeeld,
+met welk doel en waar het terechtkomt. Geen automatische overdracht op grond van
+een algemene toestemming.
+
+**36 — Leren per codenaam (A4; EDGE.md besluit 3, INT-03, par. 3d over het
+Mensmodel). Opties A en B.** Lokaal leren op het toestel binnen de Edge-regels.
+Op de server uitsluitend voldoende geaggregeerde analyses met de bestaande
+groepsdrempels (`bedrijfsmaat/poort.js`-vorm). Geen individuele serverprofielen
+per codenaam. Kleine groepen, herhaalde analyses en combinaties van uitkomsten
+mogen een persoon niet alsnog herkenbaar maken (VERDER.md par. 7: celveilig is
+niet queryveilig).
+
+**37 — AI-cache (A8; AI-CONTEXT-02, MN-02). Optie B.** Alleen exacte treffers, met
+hoedanigheid, codenaam en elke andere noodzakelijke contextgrens in de sleutel.
+Eerst in de schaduw: er wordt nooit een gecacht antwoord teruggegeven. Gemeten
+worden correctheid, isolatie en de mogelijke besparing. Geen semantische cache
+totdat de besmettings- en autorisatietoetsen bewezen zijn.
+
+**38 — Wachtwoordloze eigenaar en sleutel-root (A17 + A18; EIGENAAR.md). Optie A.**
+Eerst een volledige herstelproef: herstel moet bewezen zijn bij verlies van een
+apparaat, een toegangsmiddel en het e-mailadres. Tot dan blijft de bestaande
+authenticatie met verplichte passkey bij zware handelingen. Volledig
+wachtwoordloos beheer en een sleutel-root los van het e-mailadres zijn daarna een
+afzonderlijk besluit.
+
+**39 — Jeugdcontracten (A29; RUGDEKKING.md: een sporter onder de 18 is geen merk,
+MENSNETWERK.md 11). Optie A.** Voorgestelde productgrens: maximaal één jaar, geen
+automatische verlenging en geen verborgen exclusiviteit. Bij het bereiken van 18
+jaar is een expliciete herbeoordeling en, waar van toepassing, nieuwe instemming
+vereist. Looptijd, beëindigingsregeling en herbeoordeling worden juridisch getoetst;
+tot die toets is afgerond blijft het afsluiten van nieuwe jeugdcontracten
+geblokkeerd.
+
+**40 — Abuse graph (A20; FOUNDATION.md par. 5.6, HDI.md: veiligheidsgegevens zijn
+een eigen dataklasse, geen score op een mens). Optie A.** Voorlopig geen abuse
+graph. Een toekomstige voorziening vraagt een eigen governanceronde over
+doelbinding, gegevenscategorieën, toegang, bewaartermijnen en menselijke controle.
+Geen scores op mensen en geen verborgen persoonsprofielen. Bestaande rechtmatige
+beveiligingsmaatregelen (zoals de rem in `pin-deur.js`) blijven werken.
+
 ## 4. De vier werkstromen
 
 | werkstroom | wat | werkterrein |

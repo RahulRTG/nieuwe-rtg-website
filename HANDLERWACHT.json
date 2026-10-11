@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-07T01:41:53.213Z",
-  "commit": "88661ef0e",
+  "op": "2026-10-11T06:28:21.743Z",
+  "commit": "35f77110",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -1264,13 +1264,13 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/code/intrek",
-   "bestand": "server/foundation/gezinsdeur.js:49",
+   "bestand": "server/foundation/gezinsdeur.js:56",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
   {
    "sleutel": "POST /api/foundation/gezin/code/roteer",
-   "bestand": "server/foundation/gezinsdeur.js:32",
+   "bestand": "server/foundation/gezinsdeur.js:33",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1485,7 +1485,7 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/passkey/weg",
-   "bestand": "server/foundation/gezinsdeur.js:67",
+   "bestand": "server/foundation/gezinsdeur.js:74",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1526,7 +1526,7 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/sessie/verleng",
-   "bestand": "server/foundation/gezinsdeur.js:75",
+   "bestand": "server/foundation/gezinsdeur.js:82",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },
@@ -1556,7 +1556,7 @@
   },
   {
    "sleutel": "POST /api/foundation/gezin/stroom/ticket",
-   "bestand": "server/foundation/gezinsdeur.js:57",
+   "bestand": "server/foundation/gezinsdeur.js:64",
    "staat": "bewaakt",
    "wacht": "gezinVan"
   },

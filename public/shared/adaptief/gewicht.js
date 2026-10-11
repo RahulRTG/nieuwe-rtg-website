@@ -62,7 +62,7 @@
   }
 
   function draai(it, extra, after) {
-    var f = it.doe || (w.RTGAdaptief && function (a) { return w.RTGAdaptief.doe(it.id, a); });
+    var f = it.doe || (w.RTGAdaptief && function (a) { return w.RTGAdaptief.doe(it.id, a, { gewogen: true }); });
     if (typeof f !== 'function') return false;
     try {
       var result = f(extra);

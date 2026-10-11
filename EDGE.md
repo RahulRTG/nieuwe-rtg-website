@@ -842,12 +842,22 @@ nagetrokken zijn; hieronder staat wat er is nagetrokken en wat er mee gebeurde.
   vijf schermen en zakte; de negen staan er nu bij, en
   `test/sociaal-edge.e2e.js` is weer groen.
 
+**Ronde 3, eerste stap (golf 3): `RTGAdaptief.doe()` weegt zelf.** Hij keek
+alleen of iets verhinderd was; wie hem rechtstreeks aanriep, sloeg de
+bevestiging over (de uitlegknop van `waarom.js` deed dat zonder gewichtlaag ook
+echt). Nu gaat alles wat volgens `grammatica.effectief()` niet licht is via
+`RTGGewicht.voerId` -- dezelfde weg als een tik, ook `terug` met zijn Ongedaan
+maken -- en zonder gewichtlaag gaat het dicht met een melding. Alleen de
+uitvoerder (`gewicht.js`) en de brug in een blad (de schil woog al) geven
+`{ gewogen: true }` mee; `test/adaptiefdoe.test.js` zakt bij een derde, en
+draait de echte uitvoerder om te bewijzen dat er na bevestigen precies een keer
+wordt uitgevoerd zonder tweede lade.
+
 **Nagetrokken en open, met de ronde waarin ze horen:**
 
 | Gebrek | Waar | Ronde |
 |---|---|---|
 | modulefouten van de werkruimte bereiken geen diagnose: `o.error` is de enige haak en geen aanroeper geeft hem mee (het dode kanaal `rtg-workspace-error` verborg dat) | `interface/workspace-runtime.js` | besluit (foutmelder heeft een budget van 3 en een deur zonder inlog) |
-| `RTGAdaptief.doe()` kijkt alleen of iets verhinderd is, niet wat het weegt; wie hem rechtstreeks aanroept, slaat de bevestiging over | `adaptief/register.js` | 3 |
 | `gebaar.js` houdt een eigen borgtijd van 800 ms naast `VASTHOUD`; lang drukken, stil en `scherp` lezen sinds ronde 2 de tabel (hierboven) | `shared/gebaar/` | 3 (besluit K-borg: de borg wordt `bewust`) |
 | DEELS: drie standmachines voor wat er van de Edge te zien is (Edge 2, zijn lader en de adaptieve balk). De vouwstand is weg, de indeling klopt (de Second Screen was er geen), en Work gaat via `setState`; ze delen nog geen stand | par. 1 | 3 |
 | de workspace-broker valt zonder eigen `confirm` terug op `window.confirm`: een bevestiging buiten de gewichtsgrammatica | `interface/workspace-broker.js` | 3 |

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T07:59:47.693Z",
-    "commit": "715745a73",
+    "op": "2026-10-11T08:14:18.414Z",
+    "commit": "02adbb7ee",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6461,6 +6461,14 @@
         "scripts/lib/invoerproef.js"
       ],
       "posities": 1
+    },
+    "invoerspoor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/invoerspoor.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 9,
+      "geprobeerd": 1
     },
     "inzagebewaring.test.js": {
       "soort": "puur",

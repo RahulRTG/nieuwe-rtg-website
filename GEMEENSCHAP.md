@@ -19,6 +19,11 @@ Er is in deze ronde **niets aan de code of de productie veranderd**. Alles
 hieronder is een voorstel met een volgorde; elke fase begint pas na een besluit
 van de eigenaar.
 
+**De eigenaar keurde de richting goed op 11 oktober 2026** en nam drie besluiten
+(par. 7.1): het sociale leven blijft in LivingOS, Rahul stelt buiten de datingcontext
+geen personen voor, en fase 0 begint -- meten en ontwerpen, zonder wijziging aan
+productie.
+
 ---
 
 ## 0. De kern, in een zin -- en de verbetering op het voorstel
@@ -29,13 +34,19 @@ vóór nieuwbouw). Het klopt niet in zijn **vorm**: het tekent FoundationOS als 
 plek waar het héle sociale leven woont. Dat botst met een besluit dat al genomen
 is, en het zou elf werkende sociale apps naar een tweede ingang dwingen.
 
-De verbeterde zin:
+De kernzin, zoals de eigenaar hem op 11 oktober 2026 vaststelde:
 
-> **De Human & Social Infrastructure is geen nieuwe app en geen nieuwe wereld,
-> maar de verbinding tussen wat er al staat. Het SOCIALE leven blijft waar de mens
-> denkt dat hij is (LivingOS, WorkOS, TravelOS); FoundationOS wordt de ingang
-> voor het GEMEENSCHAPPELIJKE en het MAATSCHAPPELIJKE -- de buurt, de vereniging,
-> de school als gemeenschap, het vrijwilligerswerk, het beraad, de hulp.**
+> **FoundationOS organiseert maatschappelijke samenwerking zelf, op bestaande
+> RTG-capabilities, zonder de sociale functies van LivingOS te dupliceren.**
+
+Twee helften, en ze wegen even zwaar. **Zelf organiseren**: FoundationOS is geen
+verzameling links naar andere apps en geen navigatielaag. Met de drager, het
+verbond en het beraad (par. 3.2) kan een gemeenschap hier van begin tot eind
+samenwerken. **Zonder dupliceren**: het sociale leven blijft waar de mens denkt
+dat hij is (vrienden, daten en gezin in LivingOS, groepsreizen in TravelOS, werk
+in WorkOS). FoundationOS gebruikt die functies voor maatschappelijke activiteiten
+en bouwt ze niet opnieuw. Het is de verbindende infrastructuur, niet de eigenaar
+van iedere sociale functie.
 
 Drie gevolgen die het hele plan sturen:
 
@@ -287,6 +298,40 @@ raakt de productie zonder akkoord van de eigenaar.**
 | 0.3 | DPIA voor geloofsgemeenschappen, mantelzorg en gemeenschappen met minderjarigen (naast `DPIA-GEZIN.md`) | G3 en G5 moeten vastliggen voordat er een veld bestaat |
 | 0.4 | `democratie/doe-bijeenkomst.js` en `genootschap/bijeenkomst.js` naast elkaar leggen | twee kopieën van dezelfde regels; samenvoegen voordat er een derde bijkomt |
 | 0.5 | de wereldtabel van par. 3.1 als besluit in `WERELDEN.md` | wie dat overslaat, krijgt een tweede vriendenscherm in FoundationOS |
+| 0.6 | ontwerp en toetsstrategie van de **samenwerkingsketen** (hieronder) | dit is de belangrijkste acceptatietoets van FoundationOS; zonder ontwerp vooraf wordt hij achteraf passend gemaakt |
+| 0.7 | open juridische vragen over minderjarigen, VOG, bijzondere persoonsgegevens en gegevensdeling tussen gemeenschappen, voor een privacyjurist of FG | de grenzen van par. 4 zijn een technisch minimum en geen juridisch oordeel; ze vervangen geen volledige veiligheids- en privacybeoordeling |
+
+**De uitkomst van 0.1 bepaalt de architectuurkeuze.** Fase 0 neemt niet vooraf aan
+dat de achttien groepsmodellen worden samengevoegd, en ook niet dat ze apart
+blijven. Valt de meting door zoals bij `Asset`, dan wordt de gemeenschap een
+projectie met etiketten. Haalt een deel van de modellen de drempel, dan worden
+alleen die samengevoegd, en alleen zonder functieverlies.
+
+**De samenwerkingsketen is de acceptatietoets:**
+
+```
+Drager → Verbond → Beraad → Besluit → Bijeenkomst → Terugkoppeling
+```
+
+Een buurtvereniging (drager) gaat een verbond aan met een tweede gemeenschap. Ze
+voeren samen een beraad, de leden nemen een besluit, er volgt een bijeenkomst, en
+de deelnemers krijgen terugkoppeling over wat er met het besluit is gebeurd. Elke
+schakel wordt gemeten met een echte sessie (handelt actor A, en ziet actor B dat?),
+en elke storing moet houden: een minderjarige deelnemer, een geweigerde
+toestemming, een vol genootschap, een opgezegd verbond, en een beraad waarin Rahul
+probeert te stemmen. Fase 0 levert het ontwerp en de toetsstrategie van deze keten
+op. De end-to-end-implementatie volgt pas na goedkeuring van de eigenaar.
+
+**Werkafspraak voor fase 0 (11 oktober 2026).** Fase 0 wordt op een eigen branch
+uitgevoerd en in een afzonderlijke PR opgeleverd. PR #544 blijft voor de
+documentwijzigingen aan dit bestand, zodat er niet door elkaar heen gewerkt wordt.
+Na beoordeling worden de resultaten gecontroleerd samengebracht. Toegestaan zijn
+alleen meetscripts, registers en documentatie. Geen wijzigingen in `server/` of
+`public/`, geen merges en geen deployments.
+
+Het resultaat van fase 0 bestaat uit vier delen: de definitieve
+FoundationOS-architectuur, een overzicht van herbruikbare bestaande
+functionaliteit, de noodzakelijke wijzigingen en een gefaseerd implementatieplan.
 
 ### Fase 1 -- FoundationOS toont wat er al is (klein, omkeerbaar)
 
@@ -399,13 +444,25 @@ haalt niets weg.
 
 ---
 
-## 7. Besluiten die openstaan
+## 7. Besluiten
+
+### 7.1 Genomen door de eigenaar (11 oktober 2026)
+
+| # | besluit |
+|---|---|
+| 1 | **Vrienden, daten en gezin blijven in LivingOS.** FoundationOS wordt de maatschappelijke en gemeenschappelijke verbindingslaag en gebruikt die bestaande functies voor maatschappelijke activiteiten, zonder ze te dupliceren. |
+| 2 | **Rahul stelt buiten de afgeschermde datingcontext geen individuele personen voor.** Hij helpt groepen, activiteiten, organisaties en mogelijkheden ontdekken. Bij vrijwillig mentorschap stellen mensen zichzelf beschikbaar, en contact ontstaat pas na wederzijdse toestemming (G1, B4). |
+| 3 | **Fase 0 begint.** Eerst meten en onderzoeken, met de samenwerkingsketen als acceptatietoets (par. 5). Er verandert niets aan productie. |
+
+Daarbij stelde de eigenaar één aanvullende eis: FoundationOS mag geen verzameling
+links naar bestaande apps worden, maar organiseert maatschappelijke samenwerking
+zelf (de kernzin in par. 0).
+
+### 7.2 Nog open
 
 | # | besluit | aanbeveling |
 |---|---|---|
-| 1 | Blijft het sociale leven (vrienden, daten, gezin) in LivingOS, met FoundationOS als ingang voor gemeenschappen met een maatschappelijk doel? | ja: dat is het besluit van 19 augustus, en het voorstel werkt binnen die kaart |
-| 2 | Mag Rahul **personen** voorstellen buiten dating? | nee: alleen groepen, activiteiten en zelf geplaatst aanbod (G1) |
-| 3 | Blijven Beraad en DemocratieOS gescheiden? | ja (G6) |
-| 4 | Mogen religieuze gemeenschappen erin vóór de DPIA? | nee: eerst fase 0.3 |
-| 5 | De RTF-functie Gemeenschap heet in code `gemeenschap` nu `samenkomst` bezet blijkt | ja |
-| 6 | Volgorde: fase 0 → 1 → 2, en 3 t/m 5 daarna parallel | ja |
+| 4 | Blijven Beraad en DemocratieOS gescheiden? | ja (G6) |
+| 5 | Mogen religieuze gemeenschappen erin vóór de DPIA? | nee: eerst fase 0.3 |
+| 6 | De RTF-functie Gemeenschap heet in code `gemeenschap` nu `samenkomst` bezet blijkt | ja |
+| 7 | Volgorde na fase 0: fase 1 → 2, en 3 t/m 5 daarna parallel | ja, maar pas vast te stellen na de uitkomst van fase 0 |

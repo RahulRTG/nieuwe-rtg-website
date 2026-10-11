@@ -45,7 +45,12 @@ module.exports = ({ db, save, crypto, findSupplier, antivirus, DATA_DIR }) => {
      juist de post waarvoor iemand een regel maakt. */
   const rtmailVrij = require('../kern/rtmail-vrij')({ rtmail, findSupplier,
     CODENAMES });
-  const rtmailSchrijf = require('../kern/rtmail-schrijf')({ db, save, crypto, rtmail, vrij: rtmailVrij });
+  const rtmailSchrijf = require('../kern/rtmail-schrijf')({ db, save, crypto, rtmail, vrij: rtmailVrij,
+    teamOpAdres: rtmailTeam.teamOpAdres });
+  /* Een alias is een tweede deur naar hetzelfde postvak; de bezorging vraagt
+     hier naar welk postvak hij wijst. Zonder deze regel bestond een alias wel
+     in de instellingen, maar kwam er nooit iets op aan. */
+  rtmail.zetAdresOplosser((naar) => rtmailSchrijf.aliasDoel(naar));
   const rtmailRegels = require('../kern/rtmail-regels')({ db, save, crypto, rtmail, vak: rtmailVak, schrijf: rtmailSchrijf });
 
   /* Rechten op een postvak (fijner dan "mag erin"), het journaal dat elke

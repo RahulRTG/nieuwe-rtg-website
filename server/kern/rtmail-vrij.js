@@ -38,5 +38,10 @@ module.exports = ({ rtmail, findSupplier, CODENAMES }) => {
     return null;
   }
 
-  return { bezet, codenaamVorm };
+  /* Hoort dit linkerdeel bij een postvak dat VAN IEMAND IS (een codenaam of een
+     zaakcode)? Bij het bezorgen wint zo'n postvak altijd van een alias: een
+     alias die eerder bestond dan de zaak, mag haar post niet gaan opvangen. */
+  const eigenaarsVorm = (lokaal) => codenaamVorm(lokaal) || !!(findSupplier && findSupplier(lokaal));
+
+  return { bezet, codenaamVorm, eigenaarsVorm };
 };

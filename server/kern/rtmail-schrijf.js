@@ -26,7 +26,7 @@ const adresLaag = require('./rtmail-adres');
 const MAX_CONCEPTEN = 200;
 const MAX_ALIASSEN = 5;
 
-module.exports = ({ db, save, crypto, rtmail, vrij }) => {
+module.exports = ({ db, save, crypto, rtmail, vrij, teamOpAdres }) => {
   const eigenC = require('./eigencollectie')({ db, domein: 'kern/rtmail-schrijf', bezit: { rtmailSchrijf: 'kaart' } });
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(6).toString('hex');
@@ -137,9 +137,10 @@ module.exports = ({ db, save, crypto, rtmail, vrij }) => {
      ./rtmail-inst.js. Dit bestand gaat over concepten; dat over hoe een postvak
      zich gedraagt. De gedeelde hulpjes gaan mee naar binnen, zodat er geen
      tweede versie van busVan of vakInst ontstaat (LAT.md regel 4). */
-  const inst = require('./rtmail-inst')({ save, rtmail, vrij, nu, busVan, vakInst, kap });
-  const { instellingen, zetHandtekening, zetAfwezig, zetAlias, afwezigAntwoord } = inst;
+  const inst = require('./rtmail-inst')({ save, rtmail, vrij, nu, busVan, vakInst, kap,
+    alleVakken: () => S().vakken, teamOpAdres });
+  const { instellingen, zetHandtekening, zetAfwezig, zetAlias, afwezigAntwoord, aliasDoel } = inst;
 
   return { bewaar, concepten, gooiWeg, verstuur, losMaken,
-    instellingen, zetHandtekening, zetAfwezig, zetAlias, afwezigAntwoord, aliassenVan: (a) => instellingen(a).aliassen };
+    instellingen, zetHandtekening, zetAfwezig, zetAlias, afwezigAntwoord, aliasDoel, aliassenVan: (a) => instellingen(a).aliassen };
 };

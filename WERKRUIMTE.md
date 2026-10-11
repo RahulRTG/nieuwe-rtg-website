@@ -474,7 +474,53 @@ reisboek" in TravelOS wordt de kop van het reisboek, op het bestaande
 structurele bewegingstoken (`test/gedeeld-element.e2e.js` kijkt in een blad
 van de werktafel naar wat de browser werkelijk animeert).
 
-### 12.6 Wat dit voorstel met opzet NIET doet
+### 12.6 De besluiten van de eigenaar (11 oktober 2026)
+
+Het voorstel is aangenomen, en de opdracht is breder dan alleen techniek:
+**RTG wordt één permanente, vloeiende applicatie, met de visuele identiteit van
+de website en de Edge als de laag die de complexiteit temt.** *Calm by default,
+power on demand.*
+
+1. **TravelOS wordt de eerste wereld zonder eigen paginaherlading** -- als Living
+   Module in de werktafel, met `reizen.html` als terugval, langs alle zeven
+   criteria van 12.4.
+2. **Trede 1 (een licht blad) gaat door**: aantoonbaar onnodige scriptuitvoering
+   en dubbele verzoeken eruit, gemeten, met behoud van beveiliging en herstel.
+3. **De bundelproef gaat door**, en wordt alleen behouden als de voor- en
+   nameting beter zijn zonder regressie.
+4. **De website is de visuele referentie** voor de hele app (filmische
+   fotografie, Bodoni en Inter, bordeaux, zwart, rust, witruimte, subtiel goud),
+   met de bestaande regels en componenten -- geen tweede ontwerpsysteem.
+5. **De Edge is de centrale contextuele interactielaag.** De werktafel en de
+   werelden blijven rustig; de Edge vangt aanvullende bediening, suggesties en
+   begeleiding op. Rahul begrijpt de bedoeling en zet klaar, de Edge presenteert
+   en vraagt toestemming, de uitvoering bewaakt de bevoegdheid. De Edge verbergt
+   geen essentiële informatie en verleent nooit zelf een bevoegdheid (EDGE.md).
+6. **Eén bewegingsgrammatica**: de vier tokens en de bestaande view transitions.
+7. **Geen nieuwe technische schuld**: bestaande infrastructuur, registers en
+   architectuur; privacy, toegankelijkheid, veiligheid, herstel en directe
+   adressen blijven.
+
+Werkwijze: controleerbare PR's, niets wordt zelfstandig gemerged, en er wordt
+gerapporteerd met meetbare uitkomsten en afwijkingen **voordat** een tweede
+wereld migreert.
+
+**Hoe de PR's beoordeeld worden** (de eigenaar, dezelfde dag), en dit is de lat
+en geen wens:
+
+- *Een licht blad*: een laag gaat niet weg alleen omdat het eerste beeld gelijk
+  blijft. Interacties, toegankelijkheid, rechten, de Edge-context naar de host
+  en herstel na een fout moeten blijven werken -- een laag over gebaren of
+  toetsenbord ziet een schermafdruk per definitie niet.
+- *TravelOS*: dezelfde projectie (`shared/rtg-world-home.js`) gebruiken bewijst
+  niet dat de functionaliteit gelijk is. Navigatie, diepe links,
+  terugnavigatie, het verlopen van de sessie en bediening op een telefoon worden
+  apart beproefd; de zeven criteria van 12.4 blijven leidend.
+- *De visuele standaard*: de website is de referentie voor de IDENTITEIT, niet
+  voor de hoeveelheid inhoud. Een wereld wordt niet voller om op de website te
+  lijken; de bediening mag verschillen, en de Edge vangt de complexiteit op.
+
+### 12.7 Wat dit voorstel met opzet NIET doet
 
 - Geen 313 schermen tegelijk verhuizen. Per wereld, per route, met een meter.
 - Geen tweede router of single-page-framework naast de werktafel.

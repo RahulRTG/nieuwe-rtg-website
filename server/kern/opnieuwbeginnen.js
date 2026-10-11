@@ -15,7 +15,8 @@
       bij elke POST -- dat is geen eigenschap van deze laag en wordt hier ook
       niet weggepoetst: het scherm zegt het erbij.
    2. ZE DOET NIETS. Exporteren, wissen en herstellen gebeuren waar ze al wonen
-      (/api/privacy/export, /api/privacy/delete, /api/auth/forgot). Een tweede
+      (/api/privacy/export, /api/privacy/delete, /api/auth/forgot). test/opnieuwbeginnen.test.js
+      toets 5 leest deze module en de route en zakt op elke schrijver. Een tweede
       wisknop hier zou een tweede plek zijn waar een gegeven weggaat, en die
       doet het binnen een jaar net iets anders (routes/member/gegevenskaart.js
       zegt hetzelfde). Elk onderdeel noemt daarom zijn INGANG.
@@ -30,7 +31,7 @@
    dan het onderdeel weglaten. */
 'use strict';
 
-function maakOpnieuwBeginnen({ accounts, naOpheffen }) {
+function maakOpnieuwBeginnen({ accounts, naOpheffen, herstelSmsDicht }) {
   function beeld(account, key) {
     const email = !!(account && accounts.emailOf(account));
     const telefoon = !!(account && accounts.phoneOf(account));
@@ -46,14 +47,20 @@ function maakOpnieuwBeginnen({ accounts, naOpheffen }) {
       onderdelen: [
         {
           id: 'terugkomen', wat: 'Uw account terugkrijgen',
-          ingang: { route: '/api/auth/forgot', scherm: '/apps/app.html', waar: 'Bij het inloggen: uw toegang herstellen' },
+          ingang: { route: '/api/auth/forgot', scherm: '/apps/app.html', waar: 'Op het inlogscherm, als u bent uitgelogd: uw toegang herstellen' },
           /* Een sessie zonder account (een demo-inlog) heeft geen herstelweg om
              te beschrijven; "er staat geen e-mailadres" zou dan iets beweren over
              een account dat er niet is. */
           jouwStand: !account ? { emailBekend: null, telefoonBekend: null,
             lezing: 'Deze sessie hangt niet aan een account, dus er is geen herstelweg om te beschrijven.' } : {
             emailBekend: email, telefoonBekend: telefoon,
-            lezing: !email ? 'Er staat geen e-mailadres bij uw account, dus een herstellink kan nergens heen. Een mens bij de ledenbalie kan u verder helpen.'
+            /* Dezelfde voorwaarden als routes/auth/herstel.js: met een
+               telefoonnummer en zonder echt sms-kanaal in productie geeft het
+               herstel GEEN link uit (het faalt gesloten). Dat hoort hier te
+               staan, en niet een tweestapsweg die er dan niet is. */
+            herstelOpen: !email ? false : !(telefoon && herstelSmsDicht && herstelSmsDicht()),
+            lezing: !email ? 'Er staat geen e-mailadres bij uw account, dus een herstellink kan nergens heen. Een e-mailadres toevoegen heeft vandaag nog geen scherm; dat is een gat en geen keuze.'
+              : telefoon && herstelSmsDicht && herstelSmsDicht() ? 'Herstellen is op dit moment dicht: bij uw account staat een telefoonnummer, en RTG heeft nog geen sms-kanaal om de tweede stap te sturen. Liever dicht dan een herstel met een stap minder.'
               : telefoon ? 'Herstellen gaat in twee stappen: een link per e-mail en een code op uw telefoon.'
               : 'Herstellen gaat met een link per e-mail. Er staat geen telefoonnummer bij, dus er is geen tweede stap.'
           },
@@ -62,7 +69,7 @@ function maakOpnieuwBeginnen({ accounts, naOpheffen }) {
         {
           id: 'meenemen', wat: 'Uw verleden meenemen',
           ingangen: [
-            { route: '/api/privacy/export', scherm: '/apps/app.html', waar: 'Bedieningspaneel: "Download mijn gegevens"', wat: 'uw hele dossier onder uw codenaam, als bestand' },
+            { route: '/api/privacy/export', scherm: '/apps/app.html', waar: 'Bedieningspaneel, Meldingen, onderaan: "Download mijn gegevens"', wat: 'uw hele dossier onder uw codenaam, als bestand' },
             { scherm: '/apps/bewijsmap.html', wat: 'aantonen dat u aan een eis voldoet, zonder uw nummer te laten zien' },
             { scherm: '/apps/mijn-gegevens.html', wat: 'wat RTG van u weet, per gegeven' }
           ],
@@ -71,7 +78,7 @@ function maakOpnieuwBeginnen({ accounts, naOpheffen }) {
         {
           id: 'achterlaten', wat: 'Uw verleden achterlaten',
           ingangen: [
-            { route: '/api/privacy/delete', scherm: '/apps/app.html', waar: 'Bedieningspaneel: "Verwijder mijn gegevens"', wat: 'uw gegevens definitief wissen; u wordt overal uitgelogd' },
+            { route: '/api/privacy/delete', scherm: '/apps/app.html', waar: 'Bedieningspaneel, Meldingen, onderaan: "Verwijder mijn gegevens"', wat: 'uw gegevens definitief wissen; u wordt overal uitgelogd' },
             { scherm: '/apps/mijn-sessies.html', wat: 'zien waar u nog bent ingelogd en daar weggaan' }
           ],
           blijftStaan: blijft,

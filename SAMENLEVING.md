@@ -85,7 +85,7 @@ doet. Hij mag er niets onder weghalen.
 | **verbinden** | Buurtruil (`kern/rtfos/ruil.js`, op een gewone ledensessie en zonder geld), De Salon, de kring | staat; De Salon is ongemeten voor de gratis trede |
 | **rust** | `kern/veiligheid/rust.js` (vijf standen, de kring komt er altijd door, elke stand eindigt vanzelf), met een eigen functie `rust` voor elke doelgroep met account | staat; RTG Veilig staat sinds 29 september in LivingOS (par. 6) |
 | **hulp kunnen vinden** | de HDI-voordeur zonder account, BSN of adres; `kern/service/mens.js` (een mens bij een probleem is een ondergrens voor elk account) | staat |
-| **opnieuw kunnen beginnen** | `kern/opnieuwbeginnen.js` (`/api/account/opnieuw`), getoond in *Wat weet RTG van mij*: een projectie over herstel, export, wissen en wat blijft | staat sinds 11 oktober 2026, op één onderdeel na (zie hieronder) |
+| **opnieuw kunnen beginnen** | `kern/opnieuwbeginnen.js` (`/api/privacy/opnieuw`), getoond in *Wat weet RTG van mij*: een projectie over herstel, export, wissen en wat blijft | staat sinds 11 oktober 2026, op één onderdeel na (zie hieronder) |
 
 **Opnieuw beginnen is het werkwoord zonder eigenaar.** Er zijn onderdelen die
 erbij horen: een account dat je terugkrijgt, een verleden dat je kunt
@@ -97,18 +97,25 @@ bouwt, bouwt het als PROJECTIE over wat er al staat (HDI.md par. 5.1), niet als
 nieuw dossier.
 
 **Gebouwd op 11 oktober 2026, en wel zo.** `server/kern/opnieuwbeginnen.js`
-is die projectie, op `POST /api/account/opnieuw` (onder de functie `tg-account`)
-en zichtbaar als sectie in *Wat weet RTG van mij*. Hij bewaart niets en voert
+is die projectie, op `POST /api/privacy/opnieuw` -- naast inzage, export en
+wissen, en dus in geen enkele schakelkast, want de bodem hoort niet uit te zetten
+te zijn -- en zichtbaar als sectie in *Wat weet RTG van mij*. Hij schrijft zelf niets weg en voert
 niets uit: elk onderdeel noemt de plek waar het woont (herstel bij het
-inloggen, export en wissen in het bedieningspaneel, de bewijsmap, de sessies).
+inloggen, export en wissen onder Meldingen in het bedieningspaneel, de bewijsmap, de sessies).
 Over de persoon zelf staat er alleen ja/nee (is er een e-mailadres om op te
-herstellen), nooit de waarde. Wat er na wissen blijft, leest hij van de
+herstellen), nooit de waarde. De herstel-lezing volgt de echte stand: in
+productie staat het herstel voor een account MET telefoonnummer dicht zolang er
+geen sms-kanaal is (`routes/auth/herstel.js` faalt daar gesloten), en dan zegt het
+overzicht dat in plaats van een tweestapsweg te beloven. Zonder e-mailadres kan een
+herstellink nergens heen, en een e-mailadres toevoegen heeft nog geen scherm
+(`/api/mijn/herstelkanaal/email` bestaat, weigert het gratis account, en geen
+scherm roept hem aan) -- dat staat er als gat. Wat er na wissen blijft, leest hij van de
 gegevenskaart en niet uit een eigen lijst. De **schuld** die niet voor altijd op
 je scherm staat, heeft geen module, en de projectie zegt dat met de reden
 (`nietGebouwd`). Twee dingen kwamen er onderweg uit. Ten eerste weigerde de
 gegevenskaart (`/api/mijn/gegevens`) het gratis account: weer `tier ===
 'guest'` als één mens gelezen, terwijl het er twee zijn (par. 11.2). Dat is
-gerepareerd. Ten tweede noteert het huisbrede handelingenspoor elke POST, ook
+gerepareerd, en `/api/privacy/inzage` had dezelfde fout. Ten tweede noteert het huisbrede handelingenspoor elke POST, ook
 deze leesvraag. Dat is geen eigenschap van deze laag, en het scherm zegt het
 erbij. De meter (`npm run onvervreemdbaar`) ziet het werkwoord nu als
 `aanwezig` en open voor een gecontroleerd gratis account. De ratel
@@ -325,7 +332,7 @@ op de deur) en voor de rest nog niet:
 |---|---|---|---|---|---|---|---|
 | zonder account | nee | deels | ja | nee | nee | ja (HDI-voordeur) | nee |
 | RTG Community | **ja** | **ja** | **ja** | **ja** | **ja** | **ja** | **ja** (11 okt 2026) |
-| RTG Pass en hoger | ? | ? | ? | ? | ? | ? | ja (gemeten: 200 op een RTG-sessie) |
+| RTG Pass en hoger | ? | ? | ? | ? | ? | ? | ? |
 | Business Lite | bestaat nog niet als pas (`bestaatNog: false`) | | | | | | |
 | FoundationOS (gezin) | ? | ? | ? | ? | ? | ? | ? (de projectie hangt aan een ledenaccount, niet aan een gezinssessie) |
 

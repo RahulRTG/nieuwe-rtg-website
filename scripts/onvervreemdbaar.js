@@ -200,7 +200,7 @@ async function meet() {
         } else {
           const f = FUNCTIES.find((x) => x.id === regel.functie);
           const paden = regel.paden || (f && f.paden) || [];
-          const sleutel = regel.functie + '|' + paden.join(',');
+          const sleutel = (regel.functie || 'buiten-kast') + '|' + paden.join(',');
           if (!gemeten.has(sleutel)) {
             const mijn = routes.filter((r) => paden.some((p) => onderVoorvoegsel(r.pad, p))).slice(0, MAX_PER_FUNCTIE);
             const perRoute = [];
@@ -221,7 +221,8 @@ async function meet() {
                 redenGratis: gratis.reden || undefined });
             }
             const k = klasseFunctie(perRoute.map((x) => x.stand));
-            gemeten.set(sleutel, { functie: regel.functie, naam: f ? f.naam : null, paden, stand: k.stand,
+            gemeten.set(sleutel, { functie: regel.functie || null, buitenKast: regel.buitenKast || undefined,
+              naam: f ? f.naam : null, paden, stand: k.stand,
               telling: k.telling, zonderAccount: mijn.length ? (anoniemOpen ? 'open' : 'dicht') : 'niet-beproefd',
               bezoeker: !mijn.length || !bezoekerKop ? 'niet-beproefd' : (bezoekerOpen ? 'open' : 'dicht'),
               achterPaspoortcontrole: achterControle,
@@ -257,7 +258,7 @@ function druk(u) {
     const kleur = w.stand === 'verdwenen' ? '\x1b[31m' : w.stand === 'aanwezig' ? '' : '\x1b[33m';
     console.log('  ' + kleur + ww.padEnd(18) + w.stand.padEnd(16) + '\x1b[0m' + w.functies + ' functie(s)');
     for (const f of u.functies.filter((x) => x.werkwoord === ww)) {
-      const naam = f.scherm || f.functie;
+      const naam = f.scherm || f.functie || ('buiten de kast: ' + f.paden.join(', '));
       const t = f.telling ? '  open ' + f.telling.open + ', achter betaling ' + f.telling['achter-betaling'] : '';
       console.log('      ' + naam.padEnd(22) + f.stand.padEnd(24) + t);
     }

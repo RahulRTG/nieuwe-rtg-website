@@ -13,7 +13,12 @@ module.exports = (kern) => {
   const { wisLid } = maakVergeten(kern);
   /* De gegevenskaart wordt later op de kern gezet (opzet/aanbouw4.js); daarom
      bij het verzoek gelezen en niet bij het monteren. */
-  const opnieuw = maakOpnieuwBeginnen({ accounts: kern.accounts,
+  /* De stand van het herstel komt van dezelfde voorwaarden als waar
+     routes/auth/herstel.js op weigert: in productie, met een telefoonnummer en
+     zonder echt sms-kanaal blijft het herstel dicht. Een overzicht dat dan "in
+     twee stappen" belooft, wijst naar een deur die niet opengaat. */
+  const herstelSmsDicht = () => kern.herstelSmsDicht();   // routes/auth/herstel.js, laat gelezen
+  const opnieuw = maakOpnieuwBeginnen({ accounts: kern.accounts, herstelSmsDicht,
     naOpheffen: (key, account) => kern.gegevenskaart.kaartVan(key, account).naOpheffen });
 
   /* Inzage en vergetelheid (AVG art. 15 en 17) gelden voor IEDER account, ook
@@ -95,7 +100,8 @@ module.exports = (kern) => {
      en het moment -- dat is waar de vraag over gaat. Wie de persoon achter een
      regel wil weten, vraagt dat via RTG, en dan kijkt een mens ernaar. */
   app.post('/api/privacy/inzage', auth, (req, res) => {
-    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    // ieder account, ook het gratis account (zie de kop: tier 'guest' is twee mensen)
+    if (zonderAccount(req)) return res.status(403).json({ error: 'Alleen voor wie een account heeft.' });
     if (!req.session.account) return res.json({ inzage: [], note: 'Dit is een demoprofiel zonder accountdossier.' });
     /* DE BELOFTE STAAT NAAST DE LIJST EN NIET IN PLAATS ERVAN. `inzage` blijft
        de regels, zodat een bestaand scherm er niets van merkt; `bewaring`
@@ -130,12 +136,15 @@ module.exports = (kern) => {
 
   /* OPNIEUW BEGINNEN (SAMENLEVING.md par. 2, kern/opnieuwbeginnen.js): een
      projectie over export, wissen en herstel, die zelf niets bewaart of doet.
-     Het pad hangt onder /api/account en niet onder /api/privacy: dit is een
-     onderdeel van het eigen account en hoort onder de functie `tg-account`,
-     terwijl /api/privacy met opzet in geen enkele kast staat. Open voor ieder
+     Het pad hangt onder /api/privacy en daarmee, net als inzage, export en
+     wissen, in GEEN schakelkast (functies/register/cat-domeinen3.js): een
+     werkwoord van de bodem hoort niet uit te zetten te zijn (SAMENLEVING.md
+     SAM-01). Een eerste versie hing onder /api/account, de functie
+     `tg-account`, en die kan per doelgroep uit -- dan viel het overzicht weg
+     terwijl de rechten waar het naar wijst bleven werken. Open voor ieder
      account, ook het gratis account; de bezoeker zonder account heeft niets
      om opnieuw mee te beginnen. */
-  app.post('/api/account/opnieuw', auth, (req, res) => {
+  app.post('/api/privacy/opnieuw', auth, (req, res) => {
     if (zonderAccount(req)) return res.status(403).json({ error: 'Alleen voor wie een account heeft. Een gratis account maken kan altijd.' });
     res.json(opnieuw.beeld(req.session.account, req.session.key));
   });

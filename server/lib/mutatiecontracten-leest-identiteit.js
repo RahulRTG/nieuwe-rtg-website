@@ -39,14 +39,15 @@ const CONTRACTEN = {
      export, wissen en wat blijft; "voert zelf niets uit" staat in het antwoord
      zelf, en de enige schrijver die hem raakt is het huisbrede
      handelingenspoor, zoals bij elke POST. */
-  'POST /api/account/opnieuw': {
+  'POST /api/privacy/opnieuw': {
     mutatieId: 'identiteit.opnieuwbeginnen',
     herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' },
     stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'test/opnieuwbeginnen.test.js toets 4: de export van het lid is voor en na ' +
-      'twee oproepen gelijk, op het handelingenspoor na', op: '2026-10-11' },
+    bewijs: { gemeten: 'test/opnieuwbeginnen.test.js toets 4 (de export is voor en na twee oproepen ' +
+      'gelijk, op het handelingenspoor na) en toets 5 (module en routelijf raken geen opslag aan; een ' +
+      'teller in db.data liet toets 4 groen en laat toets 5 zakken)', op: '2026-10-11' },
     nagekeken: 'met de hand, 2026-10-11: server/routes/member/privacy.js roept alleen ' +
       'opnieuw.beeld() aan; die leest het account (ja/nee) en de gegevenskaart -- geen save(), ' +
       'geen toewijzing',

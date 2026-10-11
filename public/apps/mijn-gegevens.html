@@ -300,8 +300,14 @@
   }
 
   async function laadOpnieuw() {
-    const r = await api('/api/account/opnieuw', {});
-    if (r.status !== 200 || !Array.isArray(r.body.onderdelen)) return;   // de kaart zelf meldt al waarom
+    const r = await api('/api/privacy/opnieuw', {});
+    if (r.status !== 200 || !Array.isArray(r.body.onderdelen)) {
+      /* Niet stil weglaten: de kaart erboven zegt niets over dit deel. */
+      const el = $('#opnieuw'); el.textContent = '';
+      el.appendChild(tekst(maak('h2'), 'Opnieuw beginnen'));
+      el.appendChild(tekst(maak('p', 'stil'), (r.body && r.body.error) || 'Dit overzicht kon niet worden geladen (status ' + r.status + ').'));
+      return;
+    }
     toonOpnieuw(r.body);
   }
 

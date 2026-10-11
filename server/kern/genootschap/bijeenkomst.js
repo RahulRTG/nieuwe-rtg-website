@@ -13,6 +13,7 @@
    ontstaat geen wachtlijst die iedereen hoop geeft. Wie afzegt maakt een plaats
    vrij en dat is meteen te zien. */
 const { keur } = require('../veilig');
+const { log } = require('../../log');
 
 module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
   const WAT_MAX = 90, WAAR_MAX = 120, TOELICHTING_MAX = 600;
@@ -38,6 +39,20 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
     const g = genootschap.S();
     return Array.isArray(g.bijeenkomst[id]) ? g.bijeenkomst[id] : [];
   };
+
+  /* EEN MELDING PER LID, EN EEN MISLUKTE MELDING VERDWIJNT NIET STIL.
+     De bijeenkomst staat er al (save() is gedaan), dus een melding die faalt mag
+     de handeling niet ongedaan maken -- de levering gaat voor, zoals in
+     kern/envelop.js. Maar hier stond EEN lege catch om de hele lus: een tekst
+     waar notify() een object eist gooide een TypeError, en geen enkel lid kreeg
+     ooit een uitnodiging zonder dat iemand het zag (GEMEENSCHAP-FASE0.md par. 6,
+     gebrek 1). Nu: per lid apart, zodat een fout bij de een de ander niet
+     overslaat, en de fout gaat naar het foutenlog. */
+  function meld(key, melding, waar) {
+    if (!notify) return;
+    try { notify(key, melding); }
+    catch (e) { log.uitzondering(e, { bron: 'genootschap-bijeenkomst', waar }); }
+  }
 
   const poort = (sess, groepId) => {
     const gr = genootschap.groepMet(groepId);
@@ -78,11 +93,9 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
     if (lijst.length > PER_GROEP) lijst.length = PER_GROEP;
     save();
     // een uitnodiging, EEN keer: geen herinneringsreeks
-    try {
-      if (notify) for (const l of (p.gr.leden || [])) {
-        if (l.key !== sess.key) notify(l.key, p.gr.naam + ': ' + wat + ' op ' + datum);
-      }
-    } catch (e) {}
+    for (const l of (p.gr.leden || [])) {
+      if (l.key !== sess.key) meld(l.key, { title: 'Genootschap', body: p.gr.naam + ': ' + wat + ' op ' + datum }, 'uitnodiging');
+    }
     return { ok: true, bijeenkomst: publiek(b, sess) };
   }
 
@@ -110,11 +123,9 @@ module.exports = ({ db, save, codenaamVan, notify, genootschap }) => {
     if (b.vanKey !== sess.key && !genootschap.isBeheer(p.gr, sess.key)) return { error: 'Alleen de gastheer of een beheerder last af.' };
     b.afgelast = { at: nu(), reden: String(reden || '').slice(0, 200).trim() };
     save();
-    try {
-      if (notify) for (const k of Object.keys(b.antwoorden)) {
-        if (b.antwoorden[k] === 'ja' && k !== sess.key) notify(k, { title: 'Genootschap', body: 'Afgelast: ' + b.wat });
-      }
-    } catch (e) {}
+    for (const k of Object.keys(b.antwoorden)) {
+      if (b.antwoorden[k] === 'ja' && k !== sess.key) meld(k, { title: 'Genootschap', body: 'Afgelast: ' + b.wat }, 'afgelast');
+    }
     return { ok: true, bijeenkomst: publiek(b, sess) };
   }
 

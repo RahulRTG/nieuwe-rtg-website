@@ -196,6 +196,38 @@ test('een bijeenkomst: ja, misschien en nee, en vol is vol', async () => {
   assert.ok(nu.ok, nu.error);
 });
 
+/* DE UITNODIGING KOMT AAN, en dat is gemeten bij de ONTVANGER en niet bij de
+   afzender. Hier stond `notify(l.key, naam + ': ' + wat)` -- een tekst --
+   en notify() weigert een tekst (opzet/meldingen.js, besluit 4 oktober 2026).
+   De TypeError viel in een lege catch, dus de bijeenkomst stond er en
+   niemand hoorde ervan (GEMEENSCHAP-FASE0.md par. 6, gebrek 1). De route gaf
+   200 en elke toets die alleen naar de afzender keek stond groen.
+
+   MUTATIE GEZIEN ZAKKEN: de melding in kern/genootschap/bijeenkomst.js terug
+   naar een tekst -- b krijgt dan geen melding. */
+test('een bijeenkomst: de uitnodiging komt aan bij de andere leden, een keer', async () => {
+  const a = await lid(), b = await lid();
+  const g = await json(await raw('/genootschap/richt-op', { naam: 'De Uitnodigclub', soort: 'openbaar' }, a.token));
+  await raw('/genootschap/binnen', { groep: g.groep.id }, b.token);
+  const telVoor = (await json(await raw('/notifications', {}, b.token))).notifications.length;
+  const eigenVoor = (await json(await raw('/notifications', {}, a.token))).notifications.length;
+
+  const bij = await json(await raw('/genootschap/roep-bijeen', { groep: g.groep.id, wat: 'Zomerborrel',
+    datum: morgen() }, a.token));
+  assert.ok(bij.ok, bij.error);
+
+  const na = (await json(await raw('/notifications', {}, b.token))).notifications;
+  assert.equal(na.length, telVoor + 1, 'het andere lid krijgt precies een uitnodiging');
+  const n = na.find(x => /Zomerborrel/.test(String(x.body || '')));
+  assert.ok(n, 'de uitnodiging noemt de gelegenheid');
+  assert.equal(typeof n.title, 'string');
+  assert.ok(n.title.length > 0, 'de melding heeft een titel');
+  assert.ok(!('0' in n), 'geen tekst die in losse letters is gespreid');
+
+  const eigen = (await json(await raw('/notifications', {}, a.token))).notifications.length;
+  assert.equal(eigen, eigenVoor, 'wie bijeenroept, nodigt zichzelf niet uit');
+});
+
 test('afgelasten kan alleen door de gastheer of een beheerder', async () => {
   const a = await lid(), b = await lid();
   const g = await json(await raw('/genootschap/richt-op', { naam: 'De Zondagclub', soort: 'openbaar' }, a.token));

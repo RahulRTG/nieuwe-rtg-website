@@ -385,15 +385,15 @@ test('afstemming weigert zonder bewijs, zonder bron, en op een opdracht die niet
 test('afstemming-vooruitblik: dezelfde uitkomst als stemAf, en er verandert niets', async () => {
   const run = await onbekendeOpdracht(['stil', 'stil', 'stil']);
   const voor = JSON.stringify(run.w.op.vind(run.id));
-  const niet = run.w.op.afstemVooruitblik({ id: run.id, uitspraak: 'niet-uitgevoerd' });
+  const niet = run.w.op.afstemBlik({ id: run.id, uitspraak: 'niet-uitgevoerd' });
   assert.equal(niet.uitkomst, 'NIET_UITGEVOERD');
   assert.equal(niet.bedragCenten, basis.centen, 'het bedrag dat terugkomt (zonder tarief)');
   assert.deepEqual(niet.effecten, ['GELD_BEWEGEN', 'SCHRIJVEN_ANDERMANS']);
-  const ja = run.w.op.afstemVooruitblik({ id: run.id, uitspraak: 'uitgevoerd', providerRef: 'po_x', centen: basis.centen, valuta: 'eur' });
+  const ja = run.w.op.afstemBlik({ id: run.id, uitspraak: 'uitgevoerd', providerRef: 'po_x', centen: basis.centen, valuta: 'eur' });
   assert.equal(ja.uitkomst, 'BEVESTIGD'); assert.equal(ja.bedragCenten, 0);
   assert.deepEqual(ja.effecten, ['SCHRIJVEN_ANDERMANS'], 'afwikkelen schrijft, ook al beweegt er geen geld');
-  const anders = run.w.op.afstemVooruitblik({ id: run.id, uitspraak: 'uitgevoerd', providerRef: 'po_x', centen: 1, valuta: 'eur' });
-  assert.equal(run.w.op.afstemVooruitblik({ id: run.id, uitspraak: 'uitgevoerd', centen: basis.centen, valuta: 'eur' }).status, 400,
+  const anders = run.w.op.afstemBlik({ id: run.id, uitspraak: 'uitgevoerd', providerRef: 'po_x', centen: 1, valuta: 'eur' });
+  assert.equal(run.w.op.afstemBlik({ id: run.id, uitspraak: 'uitgevoerd', centen: basis.centen, valuta: 'eur' }).status, 400,
     'zonder referentie van de rail weigert de vooruitblik, net als stemAf');
   assert.equal(anders.uitkomst, 'VERSCHIL');
   assert.equal(JSON.stringify(run.w.op.vind(run.id)), voor, 'de vooruitblik heeft de opdracht veranderd');
@@ -401,6 +401,6 @@ test('afstemming-vooruitblik: dezelfde uitkomst als stemAf, en er verandert niet
   // en het voorspelde klopt met wat stemAf daarna doet
   const echt = await run.w.op.stemAf(uitspraak(run, { uitspraak: 'niet-uitgevoerd', providerRef: null }));
   assert.equal(echt.uitkomst, niet.uitkomst);
-  assert.equal(run.w.op.afstemVooruitblik({ id: run.id, uitspraak: 'niet-uitgevoerd' }).status, 409,
+  assert.equal(run.w.op.afstemBlik({ id: run.id, uitspraak: 'niet-uitgevoerd' }).status, 409,
     'een gesloten opdracht heeft geen vooruitblik meer');
 });

@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2441 |
 | losse beweringen (`test(...)`) | 16714 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2266 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2267 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 1 |
+| niets van beide | 0 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -84,7 +84,7 @@ toets omvalt.
 | `afhaalcode.test.js` | 13 | gezakt op `liegpoort /api/` | De afhaalcode van een bestelling (pay.order_pickup_code), control voor control. Het register CODECREDENTIALS.json noemt deze deur pas `migrated` als elke control in code staat EN door een toets wordt bewezen. |
 | `afleidbaar.test.js` | 9 | gezakt op `===->!==#0` | WAT IS ER AFLEIDBAAR UIT EEN CODENAAM -- en meet die meter dat werkelijk? MAGNAATLAB.md par. |
 | `afleidrest-dubbeltik.test.js` | 3 | geen bruikbare mutatie | DE VIJF DUBBELTIKKEN -- en de eis dat "geen tweede effect" niet genoeg is. server/lib/idemsleutels-afleidrest.js verklaart vijf routes als `zelfdeVerzoek` omdat de idemproef ze GEMETEN onbeschermd vond: "een... |
-| `afstemmingsketen.test.js` | 2 | -- | DE AFSTEMMING DOOR DE GELDKETEN -- over een echte server, met echt geld. Een uitbetaling met onbekende uitkomst (MONEY-012) wordt afgestemd op een afschriftregel: een kantoormens neemt hem over, een tweede mens... |
+| `afstemmingsketen.test.js` | 2 | gezakt op `liegpoort /api/` | DE AFSTEMMING DOOR DE GELDKETEN -- over een echte server, met echt geld. Een uitbetaling met onbekende uitkomst (MONEY-012) wordt afgestemd op een afschriftregel: een kantoormens neemt hem over, een tweede mens... |
 | `agenda-pro.test.js` | 5 | gezakt op `liegpoort /api/` | De pro-laag van de agenda: herhalingen die goed uitrollen, uitnodigen op codenaam (nooit een echte naam in beeld), ja/nee dat bij de organisator terugkomt, ICS-export met RRULE, en de eerlijke sluitregels. Draai los:... |
 | `agenda.test.js` | 5 | gezakt op `liegpoort /api/` | Tests voor de persoonlijke AI-agenda (kern/agenda.js): leden en leveranciers hebben een eigen agenda; de AI zet gewone taal om naar datum + tijd; de telling voedt de ballon-badge. Draai: npm test |
 | `agent.test.js` | 4 | gezakt op `liegpoort /api/` | De AI-bedrijfsagent: vaste leverancier koppelen, inkoopvoorstellen met goedkeuring door de gemachtigde (pas dan een echte bestelling bij de groothandel), automatisch een voorstel na de MEP-voorspelling, en het... |

@@ -99,7 +99,7 @@ module.exports = (ctx) => {
      laatste weet alleen de teruggang (kern/bank/uitgang.js), dus het bedrag is een
      BOVENGRENS en draagt de graad `vermoed`. BEVESTIGD sluit de opdracht af zonder
      geldbeweging binnen het huis, VERSCHIL doet niets met het geld. */
-  function vooruitblik({ id, uitspraak, providerRef, centen, valuta } = {}) {
+  function afstemBlik({ id, uitspraak, providerRef, centen, valuta } = {}) {
     const o = ctx.vind(id);
     if (!o) return { status: 404, error: 'Die betaalopdracht bestaat niet.' };
     if (!SOORT.has(uitspraak)) return { status: 400, error: 'De uitspraak is "uitgevoerd" of "niet-uitgevoerd".' };
@@ -125,5 +125,5 @@ module.exports = (ctx) => {
         : 'een ander bedrag of een andere valuta: er gebeurt niets met het geld, er komt een verschilzaak' };
   }
 
-  return { stemAf, vooruitblik, ECHT };
+  return { stemAf, afstemBlik, ECHT };
 };

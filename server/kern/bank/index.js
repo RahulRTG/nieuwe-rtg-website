@@ -124,8 +124,7 @@ module.exports = (deps) => {
     bankOpdrachtenRonde: (a) => opdrachten.ronde(a || {}),
     bankOpdrachtOpnieuw: (id) => opdrachten.dienIn(id),
     bankOpdrachtBevestig: (a) => opdrachten.bevestig(a || {}),
-    bankOpdrachtVind: (id) => opdrachten.vind(id), bankOpdrachtStemAf: (a) => opdrachten.stemAf(a || {}),
-    bankOpdrachtAfstemVooruitblik: (a) => opdrachten.afstemVooruitblik(a || {}) };
+    bankOpdrachtVind: (id) => opdrachten.vind(id), bankOpdrachtStemAf: (a) => opdrachten.stemAf(a || {}), bankAfstemBlik: (a) => opdrachten.afstemBlik(a) };
   Object.assign(api, rek, over, brug, spaar, pas, krediet, incasso, zakelijk, advies, hart, entiteit);
 
   /* De bankrondes lopen vanzelf: elk uur een tik die de spaarrente (idempotent

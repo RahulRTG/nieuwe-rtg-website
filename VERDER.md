@@ -312,7 +312,7 @@ register.
 | 13 | Aandacht is geen impact. | gehandhaafd | `connect/portfolio.js`: `bereikt` komt er niet in |
 | 14 | Geen mens of buurt krijgt een waardescore. | deels | `scripts/lib/cijferopmens.js` (CAR-05) voor een mens; niets voor een buurt |
 | 15 | Het systeem leert van overgangen, niet van surveillance. | gehandhaafd | `connect/horizon.js` `GEEN_SIGNAAL` |
-| 16 | Wie een probleem kan oplossen, krijgt minimaal noodzakelijke informatie. | deels | `rtfos/gemeente.js` `K = 5`: celveilig, niet queryveilig (par. 6) |
+| 16 | Wie een probleem kan oplossen, krijgt minimaal noodzakelijke informatie. | deels | `rtfos/gemeente.js` `K = 5` met complementaire onderdrukking; tijdvensters ontbreken (par. 6) |
 | 17 | Iedere materiële aanbeveling heeft herkomst. | deels | `knelpunt/aanvoer.js` eist `herkomst`; daarbuiten niets |
 | 18 | Teruggeven blijft vrijwillig. | document | niemand |
 | 19 | Vergeten moet mogelijk blijven. | eigenaarbesluit | B7 |
@@ -330,7 +330,7 @@ harde eisen gemaakt.
 
 | # | Besluit | Stand |
 |---|---|---|
-| B1 | **Aggregatie is queryveilig, niet alleen celveilig.** Vaste views, minimumcel, complementaire onderdrukking en tijdvensters, en geen vrije gemeentelijke OLAP over gevoelige dimensies. | te-bouwen: minimumcel en vaste view staan, de rest niet (par. 6) |
+| B1 | **Aggregatie is queryveilig, niet alleen celveilig.** Vaste views, minimumcel, complementaire onderdrukking en tijdvensters, en geen vrije gemeentelijke OLAP over gevoelige dimensies. | deels: minimumcel, vaste view en complementaire onderdrukking staan (11 okt 2026); tijdvensters niet (par. 6) |
 | B2 | **Foundation zet financiële handelingen klaar, maar wordt geen betaalroute.** De organisatie betaalt via haar eigen geld- en arbeidsketen. | deels: een gift komt binnen over RTG Pay (`gift-betalen.js`, `partnerIn`); er is geen pad waarlangs de Foundation een mens betaalt, en dat moet zo blijven |
 | B3 | **Werk, leren, vrijwillig, oefenen en helpen zijn afdwingbare standen, geen labels.** Oefenen vraagt begrenzing, begeleiding en een einde, en misclassificatie eindigt fail-closed in WEIGER. | te-bouwen: er zijn twee van de vijf (vrijwilliger, dienstverband), zonder regel ertussen |
 | B4 | **Geen funnelmetriek op menselijke ontwikkeling.** Bezoeker → deelnemer → mentor mag als vorm worden gemeten (deze meter doet dat), maar nooit als conversie van mensen. | document |
@@ -384,10 +384,22 @@ exacte aantal onder "overige buurten (1)". De gemeente kent haar eigen buurten e
 weet dus welke ontbreekt (proef `buurtenQueryveilig`: met één kleine buurt lekt
 het, met twee niet). Het voorbeeld dat `gemeente.js` zelf in zijn kop gebruikt om
 de drempel uit te leggen (*"In de Zeewijk zijn twee mensen geholpen met
-schuldhulp"*), komt er zo alsnog uit. Dat is **B1** in één regel code, en het is
-**niet** gerepareerd in deze ronde, omdat er geen gedrag zou veranderen. De
-kleinste reparatie is complementaire onderdrukking: onderdruk bij één kleine buurt
-de op één na kleinste mee, of laat het aantal weg.
+schuldhulp"*), kwam er zo alsnog uit. Dat was **B1** in één regel code.
+
+**Gerepareerd op 11 oktober 2026** (golf 3), en niet op de manier die hier eerst
+stond. "Laat het aantal weg" is geen reparatie: het portaal toont ook het
+TOTAAL aan hulpvragen, en totaal min de genoemde buurten is weer die ene buurt.
+`buurten()` doet daarom complementaire onderdrukking: valt er precies één buurt
+onder de drempel, dan gaat de kleinste buurt BOVEN de drempel mee in de groep
+("overige buurten (2)"), zodat er nooit een groep van één buurt ontstaat. Is er
+geen tweede buurt, dan staat er geen aantal bij de groep (`aantal: null`, met
+`onderdrukt` als reden, en op het scherm "niet getoond"). De proef
+`buurtenQueryveilig` toetst sindsdien BEIDE aanvallen (de groep van één en het
+verschil met het totaal) en de toets bewijst dat hij de oude vorm nog als lek
+herkent. **Restrisico, benoemd en niet weggepoetst:** heeft een stad maar één
+buurt met hulpvragen, dan gaat het stadstotaal over die ene buurt. Dat is een
+stadsgetal; tijdvensters (B1, tweede helft) ontbreken nog -- wie het portaal
+vandaag en volgende week opent, ziet het verschil.
 
 ## 7. Wat de meting verder vond
 
@@ -396,7 +408,7 @@ graad erbij.
 
 | # | Bevinding | Waar | Graad |
 |---|---|---|---|
-| V1 | Een kleine buurt lekt haar exacte aantal naar de gemeente (par. 6). | `rtfos/gemeente.js` `buurten()` | **bewezen**: gedraaid |
+| V1 | Een kleine buurt lekte haar exacte aantal naar de gemeente (par. 6). **Dicht sinds 11 oktober 2026** met complementaire onderdrukking. | `rtfos/gemeente.js` `buurten()` | **bewezen**: gedraaid, en de reparatie ook |
 | V2 | `sluitbaar` in de klassen van RTG Service heeft **geen enkele lezer**. Het commentaar ernaast verwijst naar een `sluit()` in `zaak.js` die niet bestaat, dus een klacht die "niet sluitbaar" is, kan gewoon op klaar. | `service/klassen.js` | **gemeten**: nul lezers |
 | V3 | Het besluit "gestopt" in het Living Lab neemt de naam van de beslisser uit het **verzoek** (`b.door`) en niet uit de sessie, terwijl de sessie wel wordt meegegeven. AUTHORITY.md: de actor van een auditregel komt uit de sessie. | `livinglab/cyclus.js` `besluitZet` | **gemeten** |
 | V4 | Niets toetst dat wie een vakbewijs aftekent niet de betrokkene zelf is. | `vakbewijs-aftekenen.js` | **vermoed**: vraagt een kantoormens met een eigen vakbewijs |
@@ -447,15 +459,14 @@ en `overgangWoordenOnverklaard` omlaag, alle drie geijkt in
 - een `Overgang`-object;
 - een scherm;
 - de les na een gestopte poging;
-- een reparatie van V1 tot en met V8.
+- een reparatie van V2 tot en met V8 (V1 is op 11 oktober 2026 dicht).
 
 **Wat hierna komt, wordt bepaald door de meting en niet door de wens.** De
 gedeelde vorm hield niet, dus er wordt geen primitief gebouwd. De families hielden
 ook niet, dus er wordt ook geen familieprimitief gebouwd. De kandidaten voor de
 eerste implementatieronde zijn allemaal klein, en de keuze is aan de eigenaar:
 
-1. **V1 dichten** (B1, één functie). Dit is de enige bevinding die vandaag een
-   mens raakt die er niet om vroeg.
+1. ~~**V1 dichten**~~ (B1, één functie) -- **gedaan** op 11 oktober 2026, zie par. 6.
 2. **De les na een gestopte poging** (par. 3). Die sluit de mislukkingslus en
    verandert niets aan wat er al staat.
 3. **Wet 3 een handhaver geven**: een toets die elke weigering zonder reden laat

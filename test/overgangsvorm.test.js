@@ -72,10 +72,17 @@ test('6. de mutatieproef: zonder bewijs of bevoegdheid slaagt een universele mot
   assert.equal(M.universeleMotor(['actor', 'bewijs'], { actor: 1 }).ok, false);
 });
 
-test('7. queryveiligheid: EEN kleine buurt lekt haar exacte aantal, twee niet', () => {
+test('7. queryveiligheid: EEN kleine buurt lekt niet meer, ook niet via het totaal', () => {
   const q = u.proeven.buurtenQueryveilig;
-  assert.equal(q.lekt, true, 'de bevinding: "overige buurten (1)" draagt het aantal van precies een buurt');
+  assert.equal(q.lekt, false, 'V1 is dicht: geen groep van een buurt, en totaal min de genoemde buurten is nooit een buurt');
   assert.equal(q.besturing, true);
+  assert.equal(q.restrisico.aantalGetoond, false, 'zonder tweede buurt staat er geen aantal bij de groep');
+  // de proef zelf moet kunnen uitslaan: de oude buurten() lekte
+  const oud = (perWijk) => { const uit = []; let k = 0, n = 0;
+    for (const [w, a] of Object.entries(perWijk)) { if (a >= 5) uit.push({ wijk: w, aantal: a }); else { k += a; n++; } }
+    if (n) uit.push({ wijk: 'overige buurten (' + n + ')', buurten: n, aantal: k, samengevoegd: true }); return uit; };
+  const rijen = oud({ Zeewijk: 3, Centrum: 10, Noord: 12 });
+  assert.equal(rijen.some(r => r.samengevoegd && r.buurten === 1 && r.aantal !== null), true, 'besturing: de oude vorm moet als lek herkend worden');
 });
 
 test('8. elke overgang met een drager draagt alle veertien dimensies, en elke zonder drager een reden', () => {

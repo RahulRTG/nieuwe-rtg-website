@@ -83,16 +83,33 @@ module.exports = (ctx, eigen) => {
 
   /* Buurten samenvoegen onder de drempel. Het aantal samengevoegde buurten
      staat er WEL bij: "overige buurten: 7" is informatie, stilzwijgend weglaten
-     zou de gemeente een onvolledig beeld geven zonder dat ze het weet. */
+     zou de gemeente een onvolledig beeld geven zonder dat ze het weet.
+
+     CELVEILIG IS NIET QUERYVEILIG (VERDER.md par. 6, besluit B1). Valt er
+     precies EEN buurt onder de drempel, dan is "overige buurten (1)" die ene
+     buurt -- de gemeente kent haar eigen buurten en ziet welke ontbreekt -- en
+     dan stond haar exacte aantal hier, onder de drempel die het moest
+     verbergen. Het aantal alleen weglaten helpt niet: het portaal toont ook het
+     totaal, en totaal min de genoemde buurten is weer die ene buurt. Daarom
+     COMPLEMENTAIRE ONDERDRUKKING: de kleinste buurt boven de drempel gaat mee in
+     de groep, zodat er nooit een groep van een buurt ontstaat. Is er geen buurt
+     om mee samen te voegen, dan staat er geen aantal (null) met de reden erbij;
+     dat het stadstotaal dan over die ene buurt gaat, is een stadsgetal en staat
+     als restrisico in VERDER.md. */
   function buurten(perWijk) {
-    const uit = [];
-    let klein = 0, buurtenKlein = 0;
-    for (const [wijk, n] of Object.entries(perWijk || {})) {
-      if (n >= K) uit.push({ wijk, aantal: n });
-      else { klein += n; buurtenKlein++; }
+    const groot = [], klein = [];
+    for (const [wijk, n] of Object.entries(perWijk || {})) (n >= K ? groot : klein).push({ wijk, aantal: n });
+    groot.sort((a, b) => b.aantal - a.aantal || (a.wijk < b.wijk ? -1 : 1));
+    let complementair = false;
+    if (klein.length === 1 && groot.length) { klein.push(groot.pop()); complementair = true; }
+    const uit = groot.slice();
+    if (klein.length) {
+      const enkel = klein.length === 1;
+      uit.push({ wijk: 'overige buurten (' + klein.length + ')', buurten: klein.length,
+        aantal: enkel ? null : klein.reduce((a, r) => a + r.aantal, 0), samengevoegd: true,
+        ...(complementair ? { complementair: 'een buurt boven de drempel is meegenomen, anders was dit het aantal van precies een buurt' } : {}),
+        ...(enkel ? { onderdrukt: 'er is geen tweede buurt om mee samen te voegen; een aantal hier zou het aantal van precies een buurt zijn' } : {}) });
     }
-    uit.sort((a, b) => b.aantal - a.aantal);
-    if (buurtenKlein) uit.push({ wijk: 'overige buurten (' + buurtenKlein + ')', aantal: klein, samengevoegd: true });
     return uit;
   }
 

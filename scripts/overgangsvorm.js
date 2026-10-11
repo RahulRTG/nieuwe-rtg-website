@@ -512,7 +512,7 @@ const WETTEN = [
       'Kijktijd, scrollsnelheid en tijdstip zijn als signaal geweigerd.') },
   { nr: 16, wet: 'Wie een probleem kan oplossen, krijgt minimaal noodzakelijke informatie.',
     ...h('deels', K + 'rtfos/gemeente.js', 'const K = 5',
-      'Celveilig, niet queryveilig: als precies een buurt onder de drempel valt, staat haar exacte aantal onder "overige buurten (1)" (proef `buurtenQueryveilig`).') },
+      'Een minimumcel met complementaire onderdrukking: een groep van een buurt bestaat niet meer (proef `buurtenQueryveilig`). Tijdvensters ontbreken nog.') },
   { nr: 17, wet: 'Iedere materiele aanbeveling heeft herkomst.',
     ...h('deels', K + 'knelpunt/aanvoer.js', "'herkomst'",
       'Een vondst zonder herkomst wordt geweigerd. Een aanbeveling buiten de aanvoerlaag draagt er geen.') },
@@ -526,8 +526,8 @@ const WETTEN = [
 
 const BESLUITEN = [
   { nr: 'B1', besluit: 'Aggregatie is queryveilig, niet alleen celveilig: vaste views, minimumcel, complementaire onderdrukking, tijdvensters, geen vrije gemeentelijke OLAP over gevoelige dimensies.',
-    ...h('te-bouwen', K + 'rtfos/gemeente.js', 'const K = 5',
-      'Er is een minimumcel en een vaste view (het portaal roept alleen `cijfersVan` aan). Complementaire onderdrukking en tijdvensters ontbreken; zie proef `buurtenQueryveilig`.') },
+    ...h('deels', K + 'rtfos/gemeente.js', 'complementair',
+      'Er is een minimumcel, een vaste view (het portaal roept alleen `cijfersVan` aan) en complementaire onderdrukking (proef `buurtenQueryveilig`). Tijdvensters ontbreken: een gemeente die het portaal vandaag en volgende week opent, ziet het verschil.') },
   { nr: 'B2', besluit: 'Foundation zet financiele handelingen klaar maar wordt geen betaalroute; de organisatie betaalt via haar eigen geld- en arbeidsketen.',
     ...h('deels', K + 'rtfos/gift-betalen.js', 'partnerIn',
       'Een gift komt binnen over RTG Pay als bij elke zaak. Er is geen pad waarlangs de Foundation een mens betaalt, en dat moet zo blijven.') },
@@ -751,15 +751,29 @@ function proeven(kern) {
 
   // 4. Queryveiligheid: een drempel per cel is geen drempel per vraag.
   const gem = require('../server/kern/rtfos/gemeente.js')({}, { cijfersVan() {} });
-  const een = gem.buurten({ Zeewijk: 3, Centrum: 10, Noord: 12 });
-  const twee = gem.buurten({ Zeewijk: 3, Oost: 2, Centrum: 10 });
-  const lek = (rijen) => rijen.filter(r => r.samengevoegd && /\(1\)/.test(r.wijk) && r.aantal < gem.K);
+  /* Twee aanvallen, want het portaal toont ook het TOTAAL: een groep van een
+     buurt met een aantal, en het verschil totaal min de genoemde buurten als er
+     precies een buurt niet genoemd wordt. De eerste versie van deze proef zag
+     alleen de eerste, en die is met "laat het aantal weg" te repareren terwijl
+     de tweede dan blijft lekken. */
+  const lek = (invoer, rijen) => {
+    const genoemd = new Set(rijen.filter(r => !r.samengevoegd).map(r => r.wijk));
+    const verborgen = Object.keys(invoer).filter(w => !genoemd.has(w));
+    return rijen.some(r => r.samengevoegd && r.buurten === 1 && r.aantal !== null) || verborgen.length === 1;
+  };
+  const invEen = { Zeewijk: 3, Centrum: 10, Noord: 12 }, invTwee = { Zeewijk: 3, Oost: 2, Centrum: 10 };
+  const invAlleen = { Zeewijk: 3 };
+  const een = gem.buurten(invEen), twee = gem.buurten(invTwee), alleen = gem.buurten(invAlleen);
   uit.buurtenQueryveilig = {
-    wat: 'De gemeente ziet hulpvragen per buurt; buurten onder ' + gem.K + ' worden samengevoegd. Wat als er precies een onder de drempel valt?',
-    eenKleineBuurt: een, tweeKleineBuurten: twee,
-    lekt: lek(een).length > 0,
-    besturing: lek(twee).length === 0,
-    lezing: 'De gemeente kent haar eigen buurten. Staat er "overige buurten (1)", dan weet zij welke buurt ontbreekt -- en ziet zij haar exacte aantal, onder de drempel die het moest verbergen. Dat is celveilig en niet queryveilig.'
+    wat: 'De gemeente ziet hulpvragen per buurt en het totaal; buurten onder ' + gem.K + ' worden samengevoegd. Wat als er precies een onder de drempel valt?',
+    eenKleineBuurt: een, tweeKleineBuurten: twee, enigeBuurt: alleen,
+    lekt: lek(invEen, een),
+    besturing: !lek(invTwee, twee),
+    restrisico: {
+      aantalGetoond: alleen.some(r => r.aantal !== null && r.samengevoegd),
+      lezing: 'Heeft een stad maar EEN buurt met hulpvragen en ligt die onder de drempel, dan staat er geen aantal bij de groep -- maar het stadstotaal gaat dan over die ene buurt. Dat is een stadsgetal en geen buurtgetal; het is niet weggepoetst maar benoemd.'
+    },
+    lezing: 'De gemeente kent haar eigen buurten. Stond er "overige buurten (1)", dan wist zij welke buurt ontbrak en zag zij haar exacte aantal -- en het aantal weglaten hielp niet, want totaal min de genoemde buurten is hetzelfde getal. Complementaire onderdrukking neemt daarom de kleinste buurt boven de drempel mee in de groep.'
   };
   return uit;
 }

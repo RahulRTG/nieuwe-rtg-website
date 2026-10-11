@@ -82,7 +82,7 @@ test.before(async () => {
   await api('/api/techniek/tenant', { org: ORG, naam: 'Dossier Uitgeverij' }, tech);
   await api('/api/techniek/tenant/bind', { org: ORG, soort: 'zaak', code: 'KIKUNOI' }, tech);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Dossier Uitgeverij', contact: 'dev@dossier.nl' }, sup);
-  await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
   hash = (await publiceer()).hash;
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
@@ -207,7 +207,7 @@ test('6. een lid ziet alleen zijn eigen tijdlijn', async () => {
 });
 
 test('7. de controleronde haalt eruit wat niet meer klopt met wat is afgetekend', async () => {
-  const eerst = await api('/api/appstore/kantoor/hercontrole', { door: 'Sam van RTG' }, office);
+  const eerst = await api('/api/appstore/kantoor/hercontrole', { door: 'Sam van RTG' }, tekenaar);
   assert.equal(eerst.status, 200);
   assert.equal(eerst.body.gekeurd, 1);
   assert.equal(eerst.body.inOrde, 1);
@@ -218,7 +218,7 @@ test('7. de controleronde haalt eruit wat niet meer klopt met wat is afgetekend'
   const vol = path.join(TMP, 'appstore', 'dossier-app', hash, 'app.js');
   fs.writeFileSync(vol, 'window.location = "https://elders.example";');
 
-  const na = await api('/api/appstore/kantoor/hercontrole', { door: 'Sam van RTG' }, office);
+  const na = await api('/api/appstore/kantoor/hercontrole', { door: 'Sam van RTG' }, tekenaar);
   assert.equal(na.body.uitgezet.length, 1, 'een aangetaste bundel gaat eruit, en dat is geen afweging');
   assert.equal(na.body.uitgezet[0].sleutel, 'dossier-app');
   assert.equal((await api('/api/appstore/catalogus', {}, lid)).body.totaal, 0, 'weg uit de winkel');
@@ -291,7 +291,7 @@ test('9. een uitgever leest wat de klant leest -- en alleen over zijn eigen app'
   await api('/api/techniek/tenant', { org: ORG2, naam: 'Andere Uitgeverij' }, tech);
   await api('/api/techniek/tenant/bind', { org: ORG2, soort: 'zaak', code: 'SAKURA' }, tech);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Andere Uitgeverij', contact: 'dev@ander.nl' }, sup2);
-  await api('/api/appstore/kantoor/uitgever', { org: ORG2, besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/uitgever', { org: ORG2, besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
   const ander = await api('/api/appstore/uitgever/inzenden',
     { manifest: manifest({ sleutel: 'andermans-app', naam: 'Andermans app' }), bestanden: bundel() }, sup2);
   assert.equal(ander.status, 200, JSON.stringify(ander.body.fouten || ander.body.bevindingen || ander.body.error || ''));

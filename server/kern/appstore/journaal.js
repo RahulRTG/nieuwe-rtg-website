@@ -23,9 +23,14 @@ module.exports = function maakJournaal({ S, nu, norm, bus, log }) {
   /* Het journaal GROEIT AAN en wordt nooit herschreven -- dezelfde regel als het
      actielog van de werelden (PLATFORM.md, de vijfde laag). Elke beslissing over
      een derde is hier terug te vinden, ook een die iemand liever kwijt was. */
+  /* `extra.intern` (11 oktober 2026): wie er WERKELIJK handelde, als
+     sessiesleutel. Hij staat in de regel voor het kantoor, en gaat nooit naar
+     de bus of naar het journaal van een uitgever (journaalVan). */
   function boek(wat, over, wie, extra) {
     const j = S().journaal;
-    j.unshift(Object.assign({ at: nu(), wat, over: over || null, wie: wie || null }, extra || null));
+    const { intern, ...rest } = extra && typeof extra === 'object' ? extra : {};
+    j.unshift(Object.assign({ at: nu(), wat, over: over || null, wie: wie || null }, rest, intern ? { intern } : null));
+    extra = rest;
     if (j.length > 5000) j.length = 5000;
     /* En dezelfde regel gaat als GEBEURTENIS naar buiten. Het journaal blijft de
        waarheid -- het groeit aan en wordt nooit herschreven; de uitzending is
@@ -75,7 +80,8 @@ module.exports = function maakJournaal({ S, nu, norm, bus, log }) {
     const eigenApps = new Set(Object.values(S().apps).filter(a => a.org === o).map(a => a.sleutel));
     return S().journaal
       .filter(r => (r.over && eigenApps.has(r.over)) || r.wie === o)
-      .slice(0, Math.max(1, Math.min(200, Number(n) || 50)));
+      .slice(0, Math.max(1, Math.min(200, Number(n) || 50)))
+      .map(({ intern, ...r }) => r);
   }
 
   return { boek, journaal, uitgeverApps, journaalVan, KANAAL };

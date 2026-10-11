@@ -87,7 +87,7 @@ test.before(async () => {
   await api('/api/techniek/tenant', { org: ORG, naam: 'Doel Uitgeverij' }, tech);
   await api('/api/techniek/tenant/bind', { org: ORG, soort: 'zaak', code: 'KIKUNOI' }, tech);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Doel Uitgeverij', contact: 'dev@doel.nl' }, sup);
-  await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 

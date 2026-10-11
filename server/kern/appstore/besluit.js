@@ -81,7 +81,7 @@ module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever
     v.status = keuze;
     /* Met de GRAAD van de scheiding: "twee mensen" is een andere bewering op
        twee inlogs dan op twee ingetypte namen (BESTUUR.md). */
-    v.besluit = { door: wie, at: nu(), reden: String(reden || '').trim().slice(0, 600) || null,
+    v.besluit = { door: wie, doorKey: doorKey || null, at: nu(), reden: String(reden || '').trim().slice(0, 600) || null,
       scheiding: { graad: ogen.graad, uitleg: ogen.reden } };
     const a = app(v.sleutel);
     if (keuze === 'gepubliceerd' && a) {
@@ -102,7 +102,7 @@ module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever
        Een INGETROKKEN versie blijft wel liggen: die heeft gedraaid, en "wat
        draaide er vorige week" hoort beantwoordbaar te blijven. */
     if (keuze === 'geweigerd') opslag.weg(v.sleutel, v.hash);
-    boek('versie-' + keuze, v.sleutel, wie, { versie: v.manifest.versie, hash: v.hash, reden: v.besluit.reden });
+    boek('versie-' + keuze, v.sleutel, wie, { versie: v.manifest.versie, hash: v.hash, reden: v.besluit.reden, intern: { doorKey } });
     save();
     return { status: 200, ok: true, versie: publiekV(v) };
   }
@@ -118,7 +118,7 @@ module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever
      eruit, maar geen teruggaverecht en geen regel in de tijdlijn.
      De keuring telt namen die in meer dan twee kernmodules staan; deze stond er
      vier keer en dat was de aanleiding om hem te lezen. */
-  function intrekkenKaal({ sleutel, reden, door, doorOrg }) {
+  function intrekkenKaal({ sleutel, reden, door, doorOrg, doorKey }) {
     const a = app(sleutel);
     if (!a) return { status: 404, error: 'Deze app bestaat niet.' };
     if (doorOrg && norm(doorOrg) !== a.org) return { status: 403, error: 'Deze app is niet van jou.' };
@@ -128,7 +128,7 @@ module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever
     if (v) v.status = 'ingetrokken';
     a.live = null;
     a.ingetrokken = { at: nu(), door: wie, reden: String(reden || '').trim().slice(0, 400) || null };
-    boek('app-ingetrokken', a.sleutel, wie, { reden: a.ingetrokken.reden });
+    boek('app-ingetrokken', a.sleutel, wie, { reden: a.ingetrokken.reden, intern: doorKey ? { doorKey } : null });
     save();
     return { status: 200, ok: true, app: { sleutel: a.sleutel, live: null, ingetrokken: a.ingetrokken },
       let: 'De app is meteen weg -- ook bij de leden die hem al hadden. Wat zij in deze app hebben opgeslagen blijft staan; komt er een nieuwe versie, dan is het er weer.' };

@@ -70,6 +70,10 @@ test('0. de toets zelf: sleutel gaat voor naam, en de graad zegt hoe hard hij is
   assert.match(onbekend.reden, /persoonlijke inlog/, 'de weigering zegt hoe het wel kan');
   assert.equal(vierogen.toets({ inzender: { soort: 'medewerker', id: null, naam: null }, doorKey: 'user-7', doorNaam: 'Ada' }).mag, false,
     'een inzending zonder mens erachter tekent niemand af, ook niet met een bewezen sleutel aan de andere kant');
+  assert.match(vierogen.toets({ inzender: { soort: 'medewerker', id: null, naam: null }, doorKey: 'user-7', doorNaam: 'Ada' }).reden,
+    /INZENDING/, 'met een bekende tekenaar zegt de weigering dat de INZENDING opnieuw moet');
+  assert.equal(vierogen.toets({ inzender: { id: 'staff:K:1', ids: ['user-7'] }, doorKey: 'user-7' }).code, 'zelfde-mens',
+    'een tweede sleutel van dezelfde inzender telt ook');
 });
 
 test.before(async () => {
@@ -86,7 +90,7 @@ test.before(async () => {
   await api('/api/techniek/tenant', { org: 'O-VIER', naam: 'Vierogen Uitgeverij' }, tech);
   await api('/api/techniek/tenant/bind', { org: 'O-VIER', soort: 'zaak', code: 'KIKUNOI' }, tech);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Vierogen Uitgeverij', contact: 'dev@vier.nl' }, sup);
-  await api('/api/appstore/kantoor/uitgever', { org: 'O-VIER', besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/uitgever', { org: 'O-VIER', besluit: 'toegelaten', door: 'Sam van RTG' }, opNaam);
 });
 test.after(() => stop(srv));
 
@@ -164,7 +168,7 @@ test('5. dezelfde mens aan beide kanten publiceert NIET, ook op naam', async () 
   assert.equal(aan.status, 200, 'de aanvraag als persoon: ' + JSON.stringify(aan.body));
   const org = (await api('/api/appstore/persoon', {}, lid)).body.org;
   assert.ok(org, 'een persoonlijke uitgeversplek');
-  assert.equal((await api('/api/appstore/kantoor/uitgever', { org, besluit: 'toegelaten', door: 'Sam van RTG' }, office)).status, 200);
+  assert.equal((await api('/api/appstore/kantoor/uitgever', { org, besluit: 'toegelaten', door: 'Sam van RTG' }, opNaam)).status, 200);
   const inz = await api('/api/appstore/persoon/inzenden', { manifest: Object.assign(manifest('1.0.0'), { sleutel: 'vierogen-zelf' }),
     bestanden: bundel(3) }, lid);
   assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
@@ -180,4 +184,55 @@ test('5. dezelfde mens aan beide kanten publiceert NIET, ook op naam', async () 
   const ander = await api('/api/appstore/kantoor/besluit',
     { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Ada van RTG' }, opNaam);
   assert.equal(ander.status, 200, JSON.stringify(ander.body));
+});
+
+test('5b. een werkplekmedewerker met kantoorrol tekent zijn eigen inzending niet af', async () => {
+  /* Een mens, twee sleutelruimtes: als medewerker draagt hij `staff:...`, in
+     het kantoor op naam `user-N`. De inzending bewaart beide; een van de twee
+     gelijk is dezelfde mens. */
+  const u = (Date.now() + 7).toString(36);
+  const email = 'werkplek-' + u + '@voorbeeld.test';
+  const lid = (await api('/api/auth/register', { name: 'Werkplek Zelf', email,
+    phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)),
+    password: 'Geheim123!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  assert.ok(lid, 'geregistreerd');
+  const nieuw = await api('/api/supplier/staff/add', { name: 'Werkplek Zelf', role: 'staff', func: 'Ontwikkeling' }, sup);
+  assert.equal(nieuw.status, 200, JSON.stringify(nieuw.body).slice(0, 160));
+  const k = await api('/api/account/koppel', { soort: 'personeel', code: 'KIKUNOI', staffId: nieuw.body.staff.id, pin: nieuw.body.pin }, lid);
+  assert.equal(k.status, 200, 'personeel gekoppeld: ' + JSON.stringify(k.body).slice(0, 160));
+  const werk = (await api('/api/account/start', { rol: 'personeel', code: 'KIKUNOI', staffId: nieuw.body.staff.id }, lid)).body.token;
+  assert.ok(werk, 'een werksessie als medewerker');
+  const kk = await api('/api/account/koppel', await kantoorKoppelBody(base, lid), lid);
+  assert.equal(kk.status, 200, 'kantoorrol gekoppeld');
+  const zelfKantoor = (await api('/api/account/start', { rol: 'kantoor' }, lid)).body.token;
+  assert.ok(zelfKantoor, 'dezelfde mens op naam in het kantoor');
+
+  const inz = await api('/api/appstore/uitgever/inzenden', { manifest: Object.assign(manifest('2.0.0'), { sleutel: 'vierogen-werkplek' }),
+    bestanden: bundel(5) }, werk);
+  assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
+  const zelf = await api('/api/appstore/kantoor/besluit',
+    { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Iemand anders' }, zelfKantoor);
+  assert.equal(zelf.status, 403, 'een mens tekende als kantoormens zijn eigen inzending als medewerker af: ' + JSON.stringify(zelf.body));
+  assert.equal(zelf.body.code, 'zelfde-mens');
+  assert.ok(!JSON.stringify(inz.body).includes('user-'), 'de ledensleutel van de inzender lekt niet naar buiten');
+});
+
+test('6. de sleutel beslist en staat in het spoor, alleen voor het kantoor', async () => {
+  // de gedeelde code laat geen uitgever toe, trekt niets in en draait geen controleronde
+  for (const [pad, lijf] of [['/api/appstore/kantoor/uitgever', { org: 'O-VIER', besluit: 'toegelaten', door: 'Sam' }],
+    ['/api/appstore/kantoor/intrekken', { sleutel: 'vierogen-proef', reden: 'toets', door: 'Sam' }],
+    ['/api/appstore/kantoor/hercontrole', { door: 'Sam' }]]) {
+    const r = await api(pad, lijf, office);
+    assert.equal(r.status, 403, pad + ' liet de gedeelde code door: ' + JSON.stringify(r.body).slice(0, 120));
+    assert.equal(r.body.watNu, 'inloggen-op-naam');
+  }
+  const kj = (await api('/api/appstore/kantoor/journaal', { n: 200 }, office)).body.journaal;
+  const pub = kj.find(r => r.wat === 'versie-gepubliceerd' && r.over === 'vierogen-proef');
+  assert.ok(pub && pub.intern && /^user-\d+$/.test(pub.intern.doorKey), 'het kantoorjournaal draagt de sleutel van wie tekende: ' + JSON.stringify(pub));
+  const uj = (await api('/api/appstore/uitgever/journaal', { n: 200 }, sup)).body.lijst;
+  assert.ok(uj.some(r => r.wat === 'versie-gepubliceerd'), 'de uitgever ziet het besluit');
+  assert.ok(!JSON.stringify(uj).includes('user-') && !uj.some(r => 'intern' in r), 'maar nooit de sleutel van de tekenaar');
+  const eigen = (await api('/api/appstore/uitgever', {}, sup)).body.apps.find(a => a.sleutel === 'vierogen-proef');
+  assert.ok(eigen && eigen.live && eigen.live.besluit, 'het besluit staat op de versie');
+  assert.equal(eigen.live.besluit.doorKey, undefined, 'de sleutel staat niet in publiekV');
 });

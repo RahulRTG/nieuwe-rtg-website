@@ -18,6 +18,15 @@ module.exports = (kern) => {
      tweede handtekening (kern/appstore/vierogen.js, besluit van 11 oktober
      2026). De sleutel komt uit de sessie en nooit uit het lijf. */
   const wieKey = (req) => req.officeKey || null;
+  /* EEN HANDELING VAN EEN MENS OP NAAM (11 oktober 2026): uitgever toelaten of
+     schorsen, intrekken, de controleronde en de afdracht. De gedeelde code met
+     een getypte naam is geen actor; zonder sessiesleutel weigert de deur met de
+     reden. De naam blijft het label, de sleutel gaat intern het journaal in. */
+  const opNaam = (req, res, wat) => {
+    if (wieKey(req)) return true;
+    res.status(403).json({ error: wat + ' vraagt een kantoorsessie op naam: een getypte naam is geen handtekening. Log in met uw eigen RTG-account.', watNu: 'inloggen-op-naam' });
+    return false;
+  };
 
   // de wachtrij: alles wat de machinepoort heeft doorgelaten en op een mens wacht
   app.post('/api/appstore/kantoor/wachtrij', officeAuth, (req, res) => res.json({
@@ -25,8 +34,8 @@ module.exports = (kern) => {
     let: 'De machinepoort keurt nooit goed. Wat hier staat, is door de vormcontrole; of de app DOET wat hij belooft, ziet alleen een mens.' }));
 
   // een uitgever toelaten, weigeren of schorsen
-  app.post('/api/appstore/kantoor/uitgever', officeAuth, (req, res) => antwoord(res, appstore.uitgeverBesluit({
-    org: req.body.org, besluit: String(req.body.besluit || ''), reden: req.body.reden, door: naam(req) })));
+  app.post('/api/appstore/kantoor/uitgever', officeAuth, (req, res) => opNaam(req, res, 'Een besluit over een uitgever') && antwoord(res, appstore.uitgeverBesluit({
+    org: req.body.org, besluit: String(req.body.besluit || ''), reden: req.body.reden, door: naam(req), doorKey: wieKey(req) })));
 
   /* De toegankelijkheidsuitslag noteren. Achter officeAuth en NIET achter de
      uitgeverspoort, en dat is de kern: een ingediend stuk is geen bewijs
@@ -59,8 +68,8 @@ module.exports = (kern) => {
   /* De noodrem. Een app die live staat en niet had gemoeten, is met een verzoek
      weg -- ook bij de leden die hem al hadden. Dat is geen extra functie maar de
      reden dat publiceren een aanwijsbare versie is en geen toestand. */
-  app.post('/api/appstore/kantoor/intrekken', officeAuth, (req, res) => antwoord(res, appstore.intrekken({
-    sleutel: req.body.sleutel, reden: req.body.reden, door: naam(req) || 'RTG-kantoor' })));
+  app.post('/api/appstore/kantoor/intrekken', officeAuth, (req, res) => opNaam(req, res, 'Een app intrekken') && antwoord(res, appstore.intrekken({
+    sleutel: req.body.sleutel, reden: req.body.reden, door: naam(req) || 'RTG-kantoor', doorKey: wieKey(req) })));
 
   // het journaal: elke beslissing over een derde, aangroeiend en niet te herschrijven
   app.post('/api/appstore/kantoor/journaal', officeAuth, (req, res) => res.json({ journaal: appstore.journaal(req.body.n) }));
@@ -69,8 +78,8 @@ module.exports = (kern) => {
      in maart is afgetekend, zegt niets over vandaag. Deze ronde leest van elke
      live app de hele bundel terug en houdt hem tegen zijn eigen hash. Klopt hij
      niet, dan gaat de app er meteen uit -- daar valt niets af te wegen. */
-  app.post('/api/appstore/kantoor/hercontrole', officeAuth, (req, res) =>
-    antwoord(res, appstore.hercontrole({ door: naam(req) || 'RTG-kantoor' })));
+  app.post('/api/appstore/kantoor/hercontrole', officeAuth, (req, res) => opNaam(req, res, 'De controleronde') &&
+    antwoord(res, appstore.hercontrole({ door: naam(req) || 'RTG-kantoor', doorKey: wieKey(req) })));
 
   /* ---- de betaalde kant ----
      De AFDRACHT geldt voor elke uitgever tegelijk en werkt alleen vooruit: een
@@ -92,8 +101,8 @@ module.exports = (kern) => {
        geen actor: zonder sessiesleutel (`req.officeKey`) gaat er niets door. De
        naam blijft het LABEL dat uitgevers lezen -- de sleutel hoort in geen
        antwoord (zie publiekV in kern/appstore/versies.js). Lezen blijft open. */
-    if (!wieKey(req)) return res.status(403).json({ error: 'De afdracht zetten vraagt een kantoorsessie op naam: een getypte naam is geen handtekening onder wat elke uitgever betaalt. Log in met uw eigen RTG-account.', watNu: 'inloggen-op-naam' });
-    antwoord(res, geld().afdrachtZet({ procent: req.body.procent, reden: req.body.reden, door: naam(req) }));
+    if (!opNaam(req, res, 'De afdracht zetten')) return;
+    antwoord(res, geld().afdrachtZet({ procent: req.body.procent, reden: req.body.reden, door: naam(req), doorKey: wieKey(req) }));
   });
 
   app.post('/api/appstore/kantoor/teruggaven', officeAuth, (req, res) => {

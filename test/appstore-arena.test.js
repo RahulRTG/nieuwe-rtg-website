@@ -61,7 +61,7 @@ test.before(async () => {
   await api('/api/techniek/tenant', { org: 'O-ARENA', naam: 'Arena Uitgeverij' }, tech);
   await api('/api/techniek/tenant/bind', { org: 'O-ARENA', soort: 'zaak', code: 'KIKUNOI' }, tech);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Arena Uitgeverij', contact: 'dev@arena.nl' }, sup);
-  await api('/api/appstore/kantoor/uitgever', { org: 'O-ARENA', besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/uitgever', { org: 'O-ARENA', besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
 
   const inz = await api('/api/appstore/uitgever/inzenden', {
     manifest: { sleutel: 'arena-proef', naam: 'Arenaproef', versie: '1.0.0', categorie: 'spelen',

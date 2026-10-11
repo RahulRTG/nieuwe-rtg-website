@@ -67,7 +67,7 @@ test.before(async () => {
   await api('/api/techniek/tenant', { org: 'O-TIJD', naam: 'Tijd Uitgeverij' }, tech);
   await api('/api/techniek/tenant/bind', { org: 'O-TIJD', soort: 'zaak', code: 'KIKUNOI' }, tech);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Tijd Uitgeverij', contact: 'dev@tijd.nl' }, sup);
-  await api('/api/appstore/kantoor/uitgever', { org: 'O-TIJD', besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/uitgever', { org: 'O-TIJD', besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
   const inz = await api('/api/appstore/uitgever/inzenden', {
     manifest: { sleutel: 'reis-paklijst', naam: 'Paklijst', versie: '1.0.0', categorie: 'reizen',
       uitleg: 'Een paklijst die je voor een reis toevoegt en daarna weer weg kunt gooien.',

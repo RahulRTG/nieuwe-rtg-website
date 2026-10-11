@@ -116,7 +116,7 @@ test('3. de organisatie komt uit het register, niet uit de body', async () => {
 });
 
 test('4. de machinepoort keurt op vorm, met bestand, regel en de weg eruit', async () => {
-  const t = await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  const t = await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
   assert.equal(t.status, 200, 'een MENS laat de uitgever toe');
 
   // 4a. de verboden vormen worden gevonden, met regelnummer
@@ -313,7 +313,7 @@ test('10. GRENS 5: intrekken werkt onmiddellijk en overal', async () => {
   assert.equal(bericht.status, 200);
   assert.equal((await api('/api/appstore/berichten', { sleutel: 'derden-teller' }, lid)).body.berichten.length, 1);
 
-  const t = await api('/api/appstore/kantoor/intrekken', { sleutel: 'derden-teller', reden: 'toets', door: 'Sam van RTG' }, office);
+  const t = await api('/api/appstore/kantoor/intrekken', { sleutel: 'derden-teller', reden: 'toets', door: 'Sam van RTG' }, tekenaar);
   assert.equal(t.status, 200);
   assert.equal((await api('/api/appstore/catalogus', {}, lid)).body.totaal, 0, 'weg uit de winkel');
   assert.equal((await api('/api/appstore/mijn', {}, lid)).body.apps.length, 0, 'weg bij het lid dat hem al had');
@@ -332,7 +332,7 @@ test('11. een geschorste uitgever verliest zijn etalage op hetzelfde moment', as
   assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar)).status, 200);
   assert.equal((await api('/api/appstore/catalogus', {}, lid)).body.totaal, 1);
 
-  const s = await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'geschorst', reden: 'toets: de uitgever bleek onbereikbaar', door: 'Sam van RTG' }, office);
+  const s = await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'geschorst', reden: 'toets: de uitgever bleek onbereikbaar', door: 'Sam van RTG' }, tekenaar);
   assert.equal(s.status, 200);
   assert.equal(s.body.appsGevallen, 1, 'de lopende app valt mee');
   assert.equal((await api('/api/appstore/catalogus', {}, lid)).body.totaal, 0);
@@ -368,7 +368,7 @@ test('13. de uitgever heeft zijn eigen noodrem, en het lid zijn eigen gum', asyn
      te hoeven wachten. En een lid dat een app weghaalt, houdt wat hij erin had
      staan -- dat is zijn inhoud en niet die van de app -- tenzij hij het zelf
      weggooit. Beide wegen staan hier, want beide bestonden alleen in de code. */
-  const her = await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  const her = await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
   assert.equal(her.status, 200, 'de schorsing uit toets 11 wordt weer opgeheven');
   const r = await api('/api/appstore/uitgever/inzenden', { manifest: manifest({ versie: '1.1.0' }),
     bestanden: bundel([{ pad: 'extra.txt', inhoud: 'versie 1.1.0' }]) }, sup);

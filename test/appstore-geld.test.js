@@ -88,7 +88,7 @@ test.before(async () => {
   assert.equal((await api('/api/techniek/tenant', { org: ORG, naam: 'Geld Uitgeverij' }, tech)).status, 200);
   assert.equal((await api('/api/techniek/tenant/bind', { org: ORG, soort: 'zaak', code: 'KIKUNOI' }, tech)).status, 200);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Geld Uitgeverij', contact: 'dev@geld.nl' }, sup);
-  assert.equal((await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, office)).status, 200);
+  assert.equal((await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar)).status, 200);
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
@@ -221,7 +221,7 @@ test('7. de uitgever ziet aantallen en bedragen, nooit wie', async () => {
 
 test('8. intrekken laat een RECHT achter, geen automatische terugboeking', async () => {
   const partnerVoor = (await api('/api/supplier/pay/overzicht', {}, sup)).body.saldo;
-  const t = await api('/api/appstore/kantoor/intrekken', { sleutel: 'derden-betaald', reden: 'toets', door: 'Sam van RTG' }, office);
+  const t = await api('/api/appstore/kantoor/intrekken', { sleutel: 'derden-betaald', reden: 'toets', door: 'Sam van RTG' }, tekenaar);
   assert.equal(t.status, 200);
   assert.equal(t.body.teruggaverechten, 1, 'wie betaalde, krijgt een recht');
   assert.equal((await api('/api/supplier/pay/overzicht', {}, sup)).body.saldo, partnerVoor,

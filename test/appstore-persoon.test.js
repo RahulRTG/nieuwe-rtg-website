@@ -130,7 +130,8 @@ test('6 - de orgcode verraadt het account niet', async () => {
 
 test('7 - een mens van RTG laat toe, en daarna gaat het gratis wel', async () => {
   const org = (await api('/api/appstore/persoon', {}, lid)).body.org;
-  const t = await api('/api/appstore/kantoor/uitgever', { org, besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  const opNaam = await kantoorAlsPersoon(base);
+  const t = await api('/api/appstore/kantoor/uitgever', { org, besluit: 'toegelaten', door: 'Sam van RTG' }, opNaam);
   assert.equal(t.status, 200, JSON.stringify(t.body));
   const r = await api('/api/appstore/persoon/inzenden', { manifest: manifest(), bestanden: [{ pad: 'index.html', inhoud: HTML }] }, lid);
   assert.equal(r.status, 200, JSON.stringify(r.body.bevindingen || r.body.fouten || r.body.error));
@@ -145,7 +146,6 @@ test('7 - een mens van RTG laat toe, en daarna gaat het gratis wel', async () =>
     { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
   assert.equal(blind.status, 403, 'zonder identiteit aan een kant hoort het aftekenen dicht te zijn: ' + JSON.stringify(blind.body));
   assert.equal(blind.body.code, 'geen-identiteit');
-  const opNaam = await kantoorAlsPersoon(base);
   const live = await api('/api/appstore/kantoor/besluit',
     { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, opNaam);
   assert.equal(live.status, 200, JSON.stringify(live.body));

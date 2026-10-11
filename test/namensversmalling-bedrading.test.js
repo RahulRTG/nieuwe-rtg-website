@@ -82,7 +82,7 @@ test.before(async () => {
     { org: 'O-VIER', soort: 'zaak', code: 'KIKUNOI' }, tech)).status, 200);
   const aan = await api('/api/appstore/uitgever/aanvraag', { naam: 'Vier Uitgeverij', contact: 'dev@vier.nl' }, sup);
   assert.equal(aan.status, 200, JSON.stringify(aan.body));
-  await api('/api/appstore/kantoor/uitgever', { org: 'O-VIER', besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/uitgever', { org: 'O-VIER', besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
   const inz = await api('/api/appstore/uitgever/inzenden', {
     manifest: MANIFEST, bestanden: [{ pad: 'index.html', inhoud: HTML }, { pad: 'app.js', inhoud: JS }]
   }, sup);

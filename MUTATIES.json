@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-07T00:06:50.131Z",
-    "commit": "152f23099",
+    "op": "2026-10-11T07:59:47.693Z",
+    "commit": "715745a73",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
   },
@@ -2290,6 +2290,13 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "clientafbreking.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "clipdeler.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2328,14 +2335,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
-    },
-    "codearchitect.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/codearchitect.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 5,
-      "geprobeerd": 1
     },
     "codecredentials-kortecode.test.js": {
       "soort": "puur",

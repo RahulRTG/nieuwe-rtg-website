@@ -1,9 +1,8 @@
 /* De voordeur en de scriptbeveiliging van de pagina's.
 
-   De voordeur: het app-domein is een productoppervlak. / en de oude bureau-
-   URL's komen daarom zonder omleiding op /apps/app.html uit. De publieke
-   bedrijfspresentatie woont op www.rahultravelgroup.com; op app bestaat één
-   herkenbare RTG Account-ingang en niet daarnaast nog een marketingwebsite.
+   De voordeur: / is de openbare RTG-landing; alleen op het APP-domein
+   (landing.isAppHost) opent / meteen de app. De oude bureau-URL's komen op
+   elke host zonder omleiding op /apps/app.html uit.
 
    De scriptbeveiliging: op de app-pagina's staat geen 'unsafe-inline' voor
    scripts, maar krijgt elk antwoord een eigen nonce. We lezen het bestand,
@@ -43,23 +42,19 @@ function herschrijf(req, naar) {
   if (eigen && eigen.writable) req.path = naar;
 }
 
-/* Het app-domein heeft één HOMESCREEN, ook op de domeinroot.
-
-   Hier stonden twee bureaubladen naast elkaar. /apps/app.html draagt het
-   springboard -- iconen, mappen, de horlogering, zoeken -- en dat is de
-   homescreen. Daarnaast lag /apps/index.html: een scrollende pagina met alle
-   apps in secties, een eigen kopbalk met woordmerk, accountchips, en tegels
-   die een app in een IFRAME-venster erbovenop openden. Dat was een tweede
-   beginscherm met de metaforen van een computer, en twee beginschermen is er
-   een te veel: je wist nooit welke "thuis" was.
-
-   Alle app-paden komen op dezelfde plek uit. /apps/index.html blijft als pad
-   bestaan omdat er van buiten naar gelinkt kan zijn; hij brengt je gewoon
-   thuis. Ook / wordt intern herschreven: de browser houdt de korte domeinlink,
-   terwijl CSP, onboarding en toegang exact dezelfde appbron gebruiken. */
+/* Er is één HOMESCREEN, /apps/app.html. Hier lag ooit een tweede bureaublad
+   (/apps/index.html, met tegels in iframe-vensters), en twee beginschermen is
+   er een te veel. De oude paden blijven bestaan omdat er van buiten naar
+   gelinkt kan zijn; ze brengen je thuis. / blijft geregistreerd zodat de
+   routekaart de voordeur kent: op het app-domein wordt hij intern herschreven
+   (de browser houdt de korte link, CSP en toegang zijn die van de app), op
+   elke andere host levert de nonce-laag de canonieke landing. */
 function bureaublad(app) {
   const naarHome = (req, res, next) => { herschrijf(req, '/apps/app.html'); next(); };
-  app.get('/', naarHome);
+  app.get('/', (req, res, next) => {
+    if (landing.isAppHost(req)) herschrijf(req, '/apps/app.html');
+    next();
+  });
   app.get('/apps/bureau.html', naarHome);
   app.get('/apps/index.html', naarHome);
   /* ZONDER SCHUINE STREEP GEREGISTREERD, en dat is geen smaak.
@@ -92,9 +87,7 @@ function opPagina(fn) { paginaHaak = typeof fn === 'function' ? fn : null; }
 function cspNonce(publicDir, aan) {
   return (req, res, next) => {
     const isLanding = req.path === '/';
-    /* HEAD hoort exact dezelfde beveiligde bron en CSP te meten als GET. Na de
-       root-herschrijving is req.path al /apps/app.html, dus een uitzondering
-       alleen voor de oude landing zou juist de korte app-link verzwakken. */
+    /* HEAD meet dezelfde bron en CSP als GET, ook op de app-root. */
     if (req.method !== 'GET' && req.method !== 'HEAD') return next();
     if (!aan && !isLanding) return next();
     let rel = req.path;

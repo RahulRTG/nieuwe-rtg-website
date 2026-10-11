@@ -22,6 +22,16 @@ const path = require('path');
 const APP_ORIGIN = 'https://app.rahultravelgroup.com';
 const META_ZELFDE_ORIGIN = new Set(['rtg-api-base', 'rtg-app-base', 'rtg-asset-base']);
 
+/* Het APP-domein is de host van APP_ORIGIN, of elke host die met app. begint.
+   Alleen daar opent / meteen de app (voordeur.js); op elke andere host --
+   het hoofddomein, localhost, een testserver -- blijft / deze landing.
+   req.hostname komt uit server/web/verrijk.js en vertrouwt X-Forwarded-Host
+   alleen achter een vertrouwde proxy. */
+function isAppHost(req) {
+  const ruw = req && (req.hostname || (req.headers && req.headers.host));
+  return String(ruw || '').replace(/:\d+$/, '').toLowerCase().startsWith('app.');
+}
+
 function bronbestand(publicDir) {
   return path.resolve(publicDir, '..', 'index.html');
 }
@@ -54,4 +64,4 @@ function stuurZonderNonce(req, res, html) {
   return res.send(html);
 }
 
-module.exports = { APP_ORIGIN, bronbestand, voorNode, stuurZonderNonce };
+module.exports = { APP_ORIGIN, isAppHost, bronbestand, voorNode, stuurZonderNonce };

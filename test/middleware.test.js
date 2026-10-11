@@ -76,10 +76,34 @@ test('2. op een getter (Express) blijft req.path met rust', () => {
   assert.equal(req.path, '/apps/app.html', 'de getter leidt het zelf af');
 });
 
-test('3. de app-root en alle oude app-ingangen gaan naar dezelfde Account-voordeur', () => {
+test('3. / is landing, behalve op het app-domein; app-ingangen gaan naar het bureaublad', () => {
   const routes = {};
   bureaublad({ get: (pad, fn) => { routes[pad] = fn; } });
-  for (const ingang of ['/', '/apps', '/apps/bureau.html', '/apps/index.html']) {
+  const voordeur = nepReq('/');
+  let landingDoor = false;
+  routes['/'](voordeur, nepRes(), () => { landingDoor = true; });
+  assert.equal(voordeur.path, '/', 'de openbare voordeur wordt niet de leden-app in getrokken');
+  assert.ok(landingDoor, 'de canonieke landing gaat door naar de nonce-laag');
+
+  /* Het besluit heeft twee kanten, en beide horen te kunnen zakken: op het
+     hoofddomein en lokaal blijft / de landing, op het APP-domein opent / de app. */
+  for (const host of ['rahultravelgroup.com', 'www.rahultravelgroup.com', 'localhost:3000', '127.0.0.1:3000']) {
+    const req = nepReq('/', { host });
+    routes['/'](req, nepRes(), () => {});
+    assert.equal(req.path, '/', 'op ' + host + ' blijft / de openbare landing');
+  }
+  for (const host of ['app.rahultravelgroup.com', 'APP.rahultravelgroup.com:443', 'app.localhost:3000']) {
+    const req = nepReq('/', { host });
+    let door = false;
+    routes['/'](req, nepRes(), () => { door = true; });
+    assert.equal(req.path, '/apps/app.html', 'op het app-domein ' + host + ' opent / de app');
+    assert.ok(door, 'en gaat door naar de nonce-laag');
+  }
+  const viaProxy = Object.assign(nepReq('/', { host: '10.0.0.5' }), { hostname: 'app.rahultravelgroup.com' });
+  routes['/'](viaProxy, nepRes(), () => {});
+  assert.equal(viaProxy.path, '/apps/app.html', 'req.hostname (achter de proxy) beslist, niet de kale Host');
+
+  for (const ingang of ['/apps', '/apps/bureau.html', '/apps/index.html']) {
     const req = nepReq(ingang);
     let door = false;
     routes[ingang](req, nepRes(), () => { door = true; });

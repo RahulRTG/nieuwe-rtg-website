@@ -35,6 +35,7 @@ const KIND_NAAM = 'Wilhelmina Petronella Vandenbroeke';
 
 const LEEG = {
   paspoortGeboortejaarVan: () => null,
+  paspoortGeboortebronVan: () => null,
   onderwijs: { FASEN: LADDER, mijn: () => ({ ok: true, fase: null, jaar: 1, historie: [] }) },
   accRollen: () => ({ rollen: [] }),
   metier: { profielVan: () => ({ rollen: [] }) },
@@ -50,6 +51,7 @@ const faseUit = (l, id) => l.fasen.find(f => f.id === id);
    master bezig, een bewezen werkrol, een partner en twee kinderen. */
 const VOL = {
   paspoortGeboortejaarVan: () => 1994,
+  paspoortGeboortebronVan: () => 'opgegeven',
   onderwijs: { FASEN: LADDER, mijn: () => ({ ok: true,
     fase: { id: 'wo-m', trap: 'wo', naam: 'Universitaire master' }, jaar: 1,
     historie: [
@@ -254,9 +256,15 @@ test('valt de levensgraaf weg, dan blijft de lijn staan en meldt feiten dat', ()
 test('het geboortejaar noemt zijn herkomst: paspoort alleen als RTG het document zag', () => {
   const regel = (over) => faseUit(motor(Object.assign({}, VOL, over)).lijn('user-geb'), 'geboorte').gegevens.join(' | ');
   const opgegeven = regel({ paspoortGeboortebronVan: () => 'opgegeven' });
+  assert.match(opgegeven, /^opgegeven: /, 'de bron heet zoals leeftijdBron hem noemt');
   assert.doesNotMatch(opgegeven, /paspoort/i, 'een opgegeven datum is geen paspoortgegeven');
   assert.match(opgegeven, /zelf opgaf/);
   assert.match(regel({ paspoortGeboortebronVan: () => 'paspoort' }), /^paspoort: geboortejaar 1994 uit uw geverifieerde paspoort$/);
-  // geen bron bekend (oude kern, of de vraag faalt stil): nooit "geverifieerd"
-  assert.doesNotMatch(regel({}), /geverifieerd/);
+  /* Ontbreekt de herkomstvraag in de kern (een gebroken bedrading), dan valt
+     de bron NIET stil terug op "opgegeven": hij staat in stil[], zodat het
+     scherm zegt dat het beeld niet compleet is.
+     Mutatie gezien: de typeof-terugval teruggezet -- stil blijft leeg. */
+  const kapot = motor(Object.assign({}, VOL, { paspoortGeboortebronVan: undefined })).lijn('user-geb');
+  assert.ok(kapot.stil.includes('paspoort'), 'een ontbrekende herkomstvraag is een stille bron, geen opgave');
+  assert.equal(faseUit(kapot, 'geboorte').staat, 'nvt');
 });

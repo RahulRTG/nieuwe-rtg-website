@@ -43,11 +43,11 @@ module.exports = ({ kern }) => {
     const jaar = geldigJaar(kern.paspoortGeboortejaarVan(key));
     if (jaar === null) return [];
     /* De herkomst erbij (par. 2.10): een zelf getypte datum is geen
-       paspoortgegeven. Onbekend leest als opgegeven. */
-    const gezien = typeof kern.paspoortGeboortebronVan === 'function'
-      && kern.paspoortGeboortebronVan(key) === 'paspoort';
+       paspoortgegeven. Zonder herkomstvraag gooit dit, zodat de bron in stil[]
+       komt in plaats van stil op "opgegeven" terug te vallen. */
+    const gezien = kern.paspoortGeboortebronVan(key) === 'paspoort';
     return [aanwijzing({ fase: 'geboorte', staat: 'geweest', vanaf: jaar,
-      bron: gezien ? 'paspoort' : 'aanmelding',
+      bron: gezien ? 'paspoort' : 'opgegeven',
       wat: gezien
         ? 'geboortejaar ' + jaar + ' uit uw geverifieerde paspoort'
         : 'geboortejaar ' + jaar + ' zoals u het zelf opgaf; RTG heeft het nog niet naast een document gelegd' })];

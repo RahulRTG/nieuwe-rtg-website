@@ -94,6 +94,7 @@ test('RTG Leven opent op de levenslijn uit de cockpit, toont echte zaken en laat
     assert.deepEqual(lijnBeeld.fasen, cockpit.lijn.fasen.filter((f) => f.staat !== 'nvt').map((f) => f.id),
       'precies de fasen die spelen of speelden, in de volgorde van de server, zonder nvt');
     assert.ok(lijnBeeld.fasen.includes('geboorte'), 'het opgegeven geboortejaar staat op de lijn');
+    assert.doesNotMatch(lijnBeeld.geboorte, /sinds/i, 'een fase die geweest is, draagt een jaar en geen "sinds"');
     /* De herkomst bereikt het scherm: dit lid liet nooit een paspoort zien. */
     await page.click('.lv-lijn [data-fase-id="geboorte"] summary');
     const herkomst = await page.locator('.lv-lijn [data-fase-id="geboorte"] details').innerText();
@@ -127,7 +128,7 @@ test('RTG Leven opent op de levenslijn uit de cockpit, toont echte zaken en laat
     const fc = await lees('/api/foodcourt');
     assert.ok(fc.restaurants.some((r) => !r.reserverenOpen) && fc.restaurants.some((r) => r.reserverenOpen),
       'de proef heeft een open en een gesloten zaak nodig, anders kan de filter niet zakken');
-    const namen = () => page.$$eval('.lv-ontdek [data-resto] h3', (l) => l.map((e) => e.textContent));
+    const namen = () => page.$$eval('.lv-ontdek [data-zaak] h3', (l) => l.map((e) => e.textContent));
     assert.deepEqual(await namen(), fc.restaurants.slice(0, 4).map((r) => r.naam), 'de restaurants zijn die van het foodcourt');
     await page.click('.lv-ontdek [data-filter="reserveerbaar"]');
     assert.equal(await page.getAttribute('.lv-ontdek [data-filter]', 'aria-pressed'), 'true');
@@ -166,6 +167,16 @@ test('RTG Leven opent op de levenslijn uit de cockpit, toont echte zaken en laat
     const kader = page.frameLocator('.rv-pane iframe[src="/apps/avond.html"]');
     await kader.locator('#bPlan').waitFor({ timeout: 15000 });
     assert.equal(await kader.locator('#bPlan').count(), 1, 'de planner van avond.html staat in het paneel');
+
+    /* Een ingang kan een paneel bij naam openen: Vandaag (life.html) linkt met
+       "Uw avond" naar #moment, en dan opent de planner en niet de lijn.
+       Mutatie gezien: het lezen van de hash in leven.js weggehaald. */
+    await page.setViewportSize({ width: 430, height: 932 });
+    await page.goto(base + '/apps/life.html', { waitUntil: 'domcontentloaded' });
+    await page.locator('a.heen[href="/apps/leven.html#moment"]').click();
+    await page.waitForURL('**/apps/leven.html#moment');
+    await page.waitForSelector('.rv-pane iframe[src="/apps/avond.html"]', { timeout: 15000 });
+    assert.equal(await page.locator('.lv-lijn').count(), 0, 'op telefoonformaat staat alleen het gevraagde paneel');
 
     /* 4. Het foodcourt zelf zei "Nu gesloten voor reserveringen" op het veld
        van de BESTELLINGEN (`open`), terwijl de tijdsloten op dat van de

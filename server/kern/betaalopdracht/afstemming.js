@@ -90,5 +90,33 @@ module.exports = (ctx) => {
     return Object.assign(publiek(o), { uitkomst: 'BEVESTIGD' });
   }
 
-  return { stemAf, ECHT };
+  /* WAT AFSTEMMEN ZOU DOEN, ZONDER HET TE DOEN -- het tegenfeit voor de geldketen
+     (kern/kantoor/geldketen.js). Dezelfde drie takken als stemAf() hierboven, in
+     dezelfde volgorde, maar zonder zet(), save() of teruggang: een voorbeeld dat
+     schrijft is geen voorbeeld (zie de opzegvoorbeeld-fout in AFSPRAAK.md par.
+     14.1). Alleen NIET_UITGEVOERD beweegt geld: het bedrag van de opdracht komt
+     terug, plus het tarief als de teruggang van die soort het terugboekt -- dat
+     laatste weet alleen de teruggang (kern/bank/uitgang.js), dus het bedrag is een
+     BOVENGRENS en draagt de graad `vermoed`. BEVESTIGD sluit de opdracht af zonder
+     geldbeweging binnen het huis, VERSCHIL doet niets met het geld. */
+  function vooruitblik({ id, uitspraak, centen, valuta } = {}) {
+    const o = ctx.vind(id);
+    if (!o) return { status: 404, error: 'Die betaalopdracht bestaat niet.' };
+    if (!SOORT.has(uitspraak)) return { status: 400, error: 'De uitspraak is "uitgevoerd" of "niet-uitgevoerd".' };
+    if (o.status !== STATUS.ONBEKEND) return { status: 409, huidig: o.status,
+      error: 'Alleen een opdracht met onbekende uitkomst wordt hier afgestemd; deze staat op ' + o.status + '.' };
+    if (uitspraak === 'niet-uitgevoerd') {
+      const terug = o.centen + (o.tariefCenten || 0);
+      return { ok: true, uitkomst: 'NIET_UITGEVOERD', bedragCenten: terug, naar: o.bron || null,
+        effecten: terug > 0 ? ['GELD_BEWEGEN', 'SCHRIJVEN_ANDERMANS'] : [],
+        grens: 'bovengrens: het bedrag van de opdracht plus het tarief; of het tarief terugkomt, beslist de teruggang van deze soort' };
+    }
+    const c = centen == null ? null : Math.round(Number(centen));
+    const klopt = c === o.centen && String(valuta || '').toLowerCase() === String(o.valuta || '').toLowerCase();
+    return { ok: true, uitkomst: klopt ? 'BEVESTIGD' : 'VERSCHIL', bedragCenten: 0, naar: null, effecten: [],
+      grens: klopt ? 'de opdracht wordt afgewikkeld; er beweegt binnen het huis geen geld'
+        : 'een ander bedrag of een andere valuta: er gebeurt niets met het geld, er komt een verschilzaak' };
+  }
+
+  return { stemAf, vooruitblik, ECHT };
 };

@@ -6,10 +6,12 @@
    strenger dan de schaduw-eerst-volgorde van AUTHORITY.md, en met opzet: de
    eigenaar koos voor geld direct dicht.
 
-   Twee loketten die de ceremonie openen, elk met de binding van zijn handeling:
+   Drie loketten die de ceremonie openen, elk met de binding van zijn handeling:
    - de incassoronde, gebonden aan zijn grens ('incasso:' + tot). Zonder dit loket
      kon een medewerker MET passkey de ronde nooit starten, terwijl een medewerker
      zonder passkey er op de terugval door kwam (gevonden 25 september 2026);
+   - de afstemming van een onbekende uitbetaling, gebonden aan de opdracht
+     ('afstemming:' + id): bij `niet-uitgevoerd` komt er geld terug op een rekening;
    - de tweede handtekening, gebonden aan de aanvraag ('handtekening:' + id), en
      alleen voor een handeling die zich bij kern/kantoor/tweedehandtekening.js als
      `geld` heeft aangemeld. Een rood-limiet zetten beweegt geen geld en blijft zo.
@@ -24,7 +26,7 @@
 module.exports = (ctx) => {
   const { app, kluisAuth, zwaar, boardroomUser, tweedeHand } = ctx;
 
-  /* Twee routes met hun pad LETTERLIJK in de aanroep: de schakelkast leest paden
+  /* De routes met hun pad LETTERLIJK in de aanroep: de schakelkast leest paden
      uit de bron, en een pad dat een helper opbouwt ziet hij niet. */
   async function loket(req, res, actie, binding) {
     if (!binding) return res.status(400).json({ error: 'Voor welke handeling? Die ontbreekt of klopt niet.' });
@@ -36,6 +38,13 @@ module.exports = (ctx) => {
   app.post('/api/office/bank/incasso/opties', kluisAuth, (req, res) => {
     const tot = (req.body || {}).tot != null ? Number(req.body.tot) : NaN;
     return loket(req, res, 'bank.incasso', Number.isFinite(tot) ? 'incasso:' + tot : null);
+  });
+  /* De afstemming van een onbekende uitbetaling, gebonden aan die ene opdracht
+     ('afstemming:' + id). Zonder dit loket kan een medewerker de ceremonie die
+     ./bank-afstemming.js eist nooit openen. */
+  app.post('/api/office/bank/afstemming/opties', kluisAuth, (req, res) => {
+    const id = String((req.body || {}).id || '');
+    return loket(req, res, 'bank.afstemming', id ? 'afstemming:' + id : null);
   });
   app.post('/api/office/bank/handtekening/opties', kluisAuth, (req, res) => {
     const id = String((req.body || {}).id || '');

@@ -155,9 +155,9 @@ module.exports = function maakBetaalopdrachten(opties) {
   const inzending = require('./inzending')(ctx);
   ctx.dienIn = inzending.dienIn;
   ctx.draaiTerug = inzending.draaiTerug;   // bevestig() met een mislukking gebruikt dezelfde teruggang
-  const { stemAf } = require('./afstemming')(ctx);   // ONBEKEND sluiten op de uitspraak van de rail
+  const { stemAf, vooruitblik: afstemVooruitblik } = require('./afstemming')(ctx);   // ONBEKEND sluiten op de uitspraak van de rail
 
   return { STATUS, maak, publiek, registreerTeruggang, registreerAfwikkeling,
-    dienIn: inzending.dienIn, stemAf, ...derij };
+    dienIn: inzending.dienIn, stemAf, afstemVooruitblik, ...derij };
 };
 module.exports.STATUS = STATUS;

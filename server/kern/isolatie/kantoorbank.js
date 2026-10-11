@@ -70,6 +70,7 @@ const KANTOORBANK = Object.freeze({
     'GELD_BEWEGEN met zoveel woorden uit', ['VOORSTEL_MAKEN']],
   '/api/office/bank/incasso/dossier': [false, 'leest het dossier van de keten', ['LEZEN_ANDERMANS']],
   '/api/office/bank/incasso/opties': [false, 'zet een passkeyceremonie klaar', []],
+  '/api/office/bank/afstemming/opties': [false, 'zet een passkeyceremonie klaar', []],
   '/api/office/bank/handtekening/opties': [false, 'zet een passkeyceremonie klaar', []],
   '/api/office/bank/handtekening/open': [false, 'leest wat er openstaat', ['LEZEN_ANDERMANS']],
   '/api/office/bank/handtekening/intrek': [false, 'haalt een aanvraag weg voordat er iets is uitgevoerd', ['VOORSTEL_MAKEN']],

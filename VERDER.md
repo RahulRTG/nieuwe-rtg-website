@@ -170,7 +170,7 @@ hetzelfde ding, horen dus niet dezelfde poort te dragen.
 
 **De vorm-as zegt hetzelfde**: 0 velden staan in alle overgangen. Het aandeel in
 precies één overgang is lager dan bij de andere vormmetingen
-(<!--getal:overgangsvorm.inEenPct-->47.8<!--/getal-->%), maar dat komt doordat dragers gedeeld worden:
+(<!--getal:overgangsvorm.inEenPct-->44.4<!--/getal-->%), maar dat komt doordat dragers gedeeld worden:
 `netwerk.js` draagt zowel `blauwdruk` als `fork`, en het leerhuis draagt er
 vier. Een bestand deelt zijn velden met zichzelf. Het register zet die paren
 erbij in `vorm.gedeeldeDragers`.

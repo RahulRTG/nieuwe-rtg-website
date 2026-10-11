@@ -67,7 +67,7 @@ een marge of een leverancierscijfer bouwt. Het belangrijkste dat het document
 tegenhoudt is een `journeys`-tabel: een reis die mensen, geld, documenten én
 reserveringen BEZIT is de `Asset`-fout opnieuw, en de meting staat er
 (`KETENVORM.json`: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-<!--getal:ketenvorm.actorenTotaal-->33<!--/getal--> gedeelde actoren over vier
+<!--getal:ketenvorm.actorenTotaal-->39<!--/getal--> gedeelde actoren over vier
 ketens). De vorm die wél werkt is die van `kern/levensgraaf/graaf.js` — een
 PROJECTIE met vijf etiketten, hier plus de **herkomst** als zesde. Zeven grenzen
 bovenop die van REIZEN.md, waarvan de drie scherpste: geld wordt klaargezet en
@@ -2321,7 +2321,7 @@ gat, en hij zit nu in de meting (storing 1 en 7) in plaats van eromheen.
 `KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
 module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.
 Uitkomst over zeven ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
-van <!--getal:ketenvorm.actorenTotaal-->33<!--/getal--> actoren gedeeld
+van <!--getal:ketenvorm.actorenTotaal-->39<!--/getal--> actoren gedeeld
 (gast/zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur tegenover
 aanvrager/kantoor/keurder/dossier/tijd tegenover gezin/Adam/werkgever/mens tegenover fan/festival/publieke wereld) en
 <!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van
@@ -2535,8 +2535,8 @@ in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.r
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->26889<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->7498<!--/getal--> require-kanten heen en terug, met de eigen parser
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27177<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->7613<!--/getal--> require-kanten heen en terug, met de eigen parser
 en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->314<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
@@ -2556,11 +2556,11 @@ grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
-<!--getal:graaf.kanten-->30736<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
-(<!--getal:graaf.routesMetSymbool-->3323<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
+<!--getal:graaf.kanten-->31111<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
+(<!--getal:graaf.routesMetSymbool-->3347<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
-<!--getal:graaf.opgelostPct-->25.3<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
-`res.json()` of `String()`, en <!--getal:graaf.contextobject-->20555<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
+<!--getal:graaf.opgelostPct-->25.4<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
+`res.json()` of `String()`, en <!--getal:graaf.contextobject-->20707<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
 in server/opzet/ wordt samengesteld. Dat leek statisch onherleidbaar tot
 `CONTEXTPROEF.json` het NAMAT (`npm run contextproef`, een runtime-meting in de
 domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> routes die werk deden reiken er maar
@@ -2568,14 +2568,14 @@ domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> rout
 BEDRADEN worden opgehaald. Het gat is dus grotendeels statisch en niet runtime -- de meting
 keerde de voorspelling om, en dat is precies waarom hij er is. `KERNHERKOMST.json`
 (`npm run kernherkomst`) volgt die aanwijzing en beantwoordt wie welke naam in de
-zak legt: <!--getal:kern.namen-->1341<!--/getal--> namen over <!--getal:kern.vulplekken-->337<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->30<!--/getal--> plekken die
+zak legt: <!--getal:kern.namen-->1346<!--/getal--> namen over <!--getal:kern.vulplekken-->342<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->30<!--/getal--> plekken die
 niet te volgen zijn (elk met een reden, geen daarvan geraden). Dat leverde
-<!--getal:graaf.viaKern-->4842<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.3<!--/getal-->%; de restbak
-van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->466<!--/getal--> aanroepen (0,27%), en
+<!--getal:graaf.viaKern-->4868<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.4<!--/getal-->%; de restbak
+van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->468<!--/getal--> aanroepen (0,27%), en
 daar zat geen raadsel in maar vijf BEKENDE vormen die de meter niet herkende --
 een restbak vol bekende vormen laat je denken dat je code ondoorgrondelijk is
 terwijl je meter te weinig weet. Twee
-dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->2923<!--/getal--> van die kanten wijzen alleen het BESTAND
+dingen daar niet wegpoetsen: <!--getal:graaf.viaKernZonderSymbool-->2932<!--/getal--> van die kanten wijzen alleen het BESTAND
 aan en niet de functie (een fabriek mag `{ walletVoeg: voeg }` teruggeven, en dan
 is de zaknaam niet de symboolnaam), en een parameter die `save` heet wordt NIET
 op zijn naam als kernnaam herkend maar op zijn functie -- alleen de fabrieken die

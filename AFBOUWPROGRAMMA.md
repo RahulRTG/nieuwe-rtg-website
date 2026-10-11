@@ -133,7 +133,7 @@ geblokkeerd item zegt welke voorwaarde aantoonbaar vervuld moet zijn. Valt een
 item op dezelfde regel als een gelezen markering, dan wint het besluitbestand.
 
 **De stand bij lezing** (levende getallen uit `APPWERKT.json`, bijgehouden door
-`npm run getallen`): over <!--getal:toezeg.documenten-->166<!--/getal-->
+`npm run getallen`): over <!--getal:toezeg.documenten-->167<!--/getal-->
 documenten zijn er <!--getal:toezeg.toegezegd-->879<!--/getal--> onderdelen
 `toegezegd`, <!--getal:toezeg.afgewezen-->20<!--/getal-->
 `afgewezen-met-grens`, <!--getal:toezeg.besluit-->84<!--/getal-->
@@ -187,7 +187,7 @@ niet bij de geblokkeerde items.
 
 ## 8. De eindtoestand
 
-**<!--getal:toezeg.onderdelen-->112<!--/getal--> onderdelen in `APPWERKT.json`
+**<!--getal:toezeg.onderdelen-->114<!--/getal--> onderdelen in `APPWERKT.json`
 is de huidige registerbasis, niet het definitieve aantal.** Het register meet per
 onderdeel uit `MAPPEN`, en die lijst groeit wanneer er een toegezegd onderdeel
 bij komt. Het programma is af wanneer:

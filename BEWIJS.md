@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2449 bestanden en 16758 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2449 bestanden en 16760 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2449 |
-| losse beweringen (`test(...)`) | 16758 |
+| losse beweringen (`test(...)`) | 16760 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2275 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2141 bestanden, 16221 beweringen.
+2141 bestanden, 16223 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1508,7 +1508,7 @@ toets omvalt.
 | `release-trust.test.js` | 8 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `release-workflow-bewijs.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `releaseketenwacht.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `rem-gelijktijdig.test.js` | 3 | gezakt op `liegpoort /api/` | EEN GOLF GELIJKTIJDIGE GOKKEN GAAT NIET LANGS DE REM -- regressie voor N39 uit de V1-audit (ronde 7). DE FOUT: kern/identiteit/wachtwoordrem.js keek vóór de wachtwoordtoets of een emmer dicht was en telde pas erna. |
+| `rem-gelijktijdig.test.js` | 5 | gezakt op `liegpoort /api/` | EEN GOLF GELIJKTIJDIGE GOKKEN GAAT NIET LANGS DE REM -- regressie voor N39 uit de V1-audit (ronde 7). DE FOUT: kern/identiteit/wachtwoordrem.js keek vóór de wachtwoordtoets of een emmer dicht was en telde pas erna. |
 | `rem.test.js` | 6 | gezakt op `&&->||#0` | Test voor de eigen rate-limiter (server/rem.js): binnen het venster mag een sleutel tot `limit` verzoeken, daarboven springt de rem aan; sleutels tellen los; `skip` slaat over; een verlopen venster telt weer vanaf... |
 | `remduurzaam.test.js` | 5 | gezakt op `liegpoort /api/` | EEN REM DIE EEN MENS OVERHAALT, STAAT VAST VOORDAT HIJ BEVESTIGD WORDT. GELDLAT.md kreeg op 6 september 2026 een derde been in zijn reikwijdte. |
 | `rendezvous.test.js` | 32 | gezakt op `liegpoort /api/` | Integratietests voor Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass. Twee leden zetten een profiel op, liken elkaar (wederzijds = match), en Rahul stelt een jetset-date voor op een gedeelde locatie. |

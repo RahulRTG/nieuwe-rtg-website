@@ -323,8 +323,11 @@ async function controleerRoute(page, route, scherm) {
   assertEenRand(overzicht, label + ' · overzicht');
   assertStand(overzicht, { ...verwachtOverzicht, reveal: false }, label + ' · overzicht');
   assert.equal(overzicht.wereld, route.wereld, label + ': verkeerde wereldkleur/context');
-  assert.equal(overzicht.bottom.materiaal.toLowerCase(), {living:'#201912',work:'#192422',travel:'#29171d',foundation:'#19372d'}[route.wereld],
-    label + ': de adaptieve Edge volgt niet het wereldmateriaal');
+  // Sinds de www-pariteit (#534) heeft de Edge in elke wereld hetzelfde donkere
+  // materiaal, zoals het ene menu van de www-site; de wereld zelf leeft in de
+  // signatuurkleur, en die toetst test/world-palette.e2e.js per wereld.
+  assert.equal(overzicht.bottom.materiaal.toLowerCase(), '#11100e',
+    label + ': de adaptieve Edge draagt niet het ene www-materiaal');
   assert.equal(overzicht.randHerstel, 2, label + ': boven- en onderrand missen hun herstelzone');
   assert.equal(overzicht.randHerstelZichtbaar, 0, label + ': herstelzones zijn buiten compact zichtbaar');
   assertContext(overzicht, route, label);

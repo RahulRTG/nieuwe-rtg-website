@@ -515,6 +515,11 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
     --edge-top:88px!important;--rtg-header-desktop:88px!important;
     padding-top:88px!important;
   }
+  /* Compact en focus geven de ruimte van de bovenrand terug (rtg-warm-details.css);
+     de 88px hierboven woog zwaarder en hield hem vast. */
+  body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]){
+    padding-top:0!important;
+  }
   /* De kop staat vast; wat in beeld wordt geschoven landt eronder, niet erachter. */
   html:has(body[data-rtg-cinematic="true"][data-rtg-layout="standard"]){scroll-padding-top:104px}
   body[data-rtg-cinematic="true"] .rtg-edge-top{

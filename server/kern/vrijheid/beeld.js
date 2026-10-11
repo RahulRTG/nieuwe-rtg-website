@@ -32,7 +32,9 @@ module.exports = (ctx) => {
     return {
       vakantie: rechten && rechten.wettelijk != null
         ? { recht: rechten.wettelijk, gebruikt: gebruikt('STATUTORY_LEAVE'), over: rechten.wettelijk - gebruikt('STATUTORY_LEAVE'), eenheid: 'uur', tekst: 'Normaal verlofsaldo' }
-        : { recht: null, tekst: 'Normaal verlofsaldo', reden: 'Het saldo komt uit uw contract en payroll en is hier niet aangeleverd.' },
+        : { recht: null, tekst: 'Normaal verlofsaldo', reden: (rechten && rechten.waarom && rechten.waarom.wettelijk) || 'Het saldo komt uit uw contract en payroll en is hier niet aangeleverd.' },
+      /* Waar het recht uit gerekend wordt: uw eigen dienstverband en contract. */
+      vakantieBron: rechten && rechten.bron ? rechten.bron : null,
       rtgDagen: rtg.open ? { recht: null, tekst: 'Aanvullende betaalde dagen', reden: rtg.reden }
         : { recht: rtg.waarde, gebruikt: gebruikt('RTG_DAY'), over: rtg.waarde - gebruikt('RTG_DAY'), tekst: 'Een betaalde dag voor uzelf. Geen Academy. Geen werk. Geen uitleg nodig.' },
       verjaardag: vj ? { datum: vj.datum || vj.verjaardag || null, stand: vj.stand, tekst: vj.stand === 'SCHEDULED' ? 'Deze dag is voor u. Uw normale verlofsaldo verandert niet.' : vj.uitleg } : null,

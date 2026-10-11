@@ -54,7 +54,7 @@ function beoordeel({ team, beleid, verzoek: v, afwezig, grootboek, saldi, vandaa
   const teller = CATEGORIEEN[v.categorie].teller;
   if (teller) {
     const s = saldi && saldi[teller];
-    if (!s || s.recht == null) { stap('RIGHTS_POLICY', 'UNKNOWN', 'Het saldo voor ' + CATEGORIEEN[v.categorie].naam + ' is niet bekend.'); return klaar('UNKNOWN'); }
+    if (!s || s.recht == null) { stap('RIGHTS_POLICY', 'UNKNOWN', 'Het saldo voor ' + CATEGORIEEN[v.categorie].naam + ' is niet bekend.' + (s && s.reden ? ' ' + s.reden : '')); return klaar('UNKNOWN'); }
     const nodig = teller === 'rtgDag' ? 1 : uren;
     if (s.over < nodig) { stap('RIGHTS_POLICY', 'DECLINED', 'Er staat nog ' + s.over + ' over; nodig is ' + nodig + '.'); return klaar('DECLINED', { code: 'saldo' }); }
   }

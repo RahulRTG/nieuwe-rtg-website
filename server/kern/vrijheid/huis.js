@@ -36,6 +36,9 @@ module.exports = ({ db, save, bijeen, inBundel, kern }) => {
   /* stap twee: een zetel in de RTG-zaak is de kantoorsleutel (./rtgzetel.js) */
   const rtgZetel = require('./rtgzetel')({ accounts: kern().accounts, rtghuis });
   const { teambeeld } = require('./teambeeld')({ bronnen: () => ({ ...kern(), rtghuis }), instellingen });
+  /* Het vakantierecht uit dienstverband, contract en verzuimregister; de
+     rekenregel zelf blijft open (./saldobron.js). */
+  const saldo = require('./saldobron')({ bronnen: kern });
 
   /* Welk beleid geldt voor welke organisatie. Voor RTG zelf is er een besluit
      (rtgbeleid.js), en RTG zelf is de zaak met genre `rtg` (kern/vrijheid/rtghuis.js);
@@ -57,5 +60,5 @@ module.exports = ({ db, save, bijeen, inBundel, kern }) => {
     ? require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'vrijheid' })
     : async (werk) => { await werk(); return null; };
 
-  return Object.freeze({ motor, instellingen, teambeeld, beleidVoor, vastleggen, rtghuis, rtgZetel, rtgStand: STAND });
+  return Object.freeze({ motor, instellingen, teambeeld, saldo, beleidVoor, vastleggen, rtghuis, rtgZetel, rtgStand: STAND });
 };

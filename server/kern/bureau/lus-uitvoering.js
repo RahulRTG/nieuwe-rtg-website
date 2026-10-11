@@ -152,12 +152,8 @@ module.exports = (ctx) => {
     return { status: 200, opdrachten: uit };
   }
 
-  /* De zaak bevestigt ZIJN onderdeel. De zaakcode komt uit de sessie; de zaak
-     noemt alleen de case-verwijzing en het onderdeel uit zijn eigen opdrachten.
-     Een onderdeel dat niet van deze zaak is, een besloten of ingetrokken case
-     en een onbekend id geven hetzelfde antwoord: een zaak leert hier niets over
-     een case die hij niet hoort te zien (CON-02). Een omgevallen onderdeel
-     bevestigt hij niet terug -- dat vervangt het kantoor met een alternatief. */
+  /* De zaak bevestigt haar eigen onderdeel; de code komt uit de sessie. Alles
+     wat niet van haar is geeft hetzelfde 404 (CON-02); omgevallen is 409. */
   function lusZaakBevestig(code, caseRef, onderdeelId) {
     const nietHier = { status: 404, error: 'Deze opdracht staat niet bij uw zaak.' };
     if (!code || !caseRef || !onderdeelId) return nietHier;

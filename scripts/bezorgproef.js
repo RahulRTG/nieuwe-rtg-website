@@ -64,16 +64,24 @@ async function actoren(P) {
   const ander = (await P('/api/login', { tier: 'lifestyle' })).data;
   if (!inpakker || !inpakker.token || !bezorger || !bezorger.token) throw new Error('geen persoonlijke inlog voor inpakker en bezorger');
   if (!lid || !lid.token || !ander || !ander.token) throw new Error('geen lidsessies -- draait de server in de testomgeving?');
-  return { code, I: inpakker.token, B: bezorger.token, bezorgerNaam: vloer.name, M: lid.token, A: ander.token };
+  /* Een DERDE collega, geen manager en niet de bezorger: alleen met hem is
+     "alleen de eigen rit" te beproeven -- de manager mag het juist wel. */
+  const nieuw = (await P('/api/supplier/staff/add', { name: 'Collega Proef' }, inpakker.token)).data;
+  const collega = nieuw && nieuw.staff ? (await P('/api/supplier/login', { code, staffId: nieuw.staff.id, pin: nieuw.pin })).data : null;
+  return { code, I: inpakker.token, B: bezorger.token, C: collega && collega.token, bezorgerNaam: vloer.name, M: lid.token, A: ander.token };
 }
 
-async function bestelling(P, wie, opts) {
+async function bestelling(P, wie) {
   const parts = await P('/api/bezorg/partners', {}, wie.M);
   const zaak = ((parts.data && parts.data.partners) || []).find((p) => p.code === wie.code);
   if (!zaak) return { zaak: null };
-  const b = await P('/api/bezorg/bestel', Object.assign({ supplierCode: wie.code, levering: 'bezorgen',
-    adres: 'Keizersgracht 1', lat: 52.37, lng: 4.89, items: [{ id: zaak.producten[0].id, qty: 2 }] }, opts || {}), wie.M);
-  return { zaak, b, ref: b.data && b.data.order && b.data.order.ref, items: b.data && b.data.order && b.data.order.items };
+  const b = await P('/api/bezorg/bestel', { supplierCode: wie.code, levering: 'bezorgen',
+    adres: 'Keizersgracht 1', lat: 52.37, lng: 4.89, items: [{ id: zaak.producten[0].id, qty: 2 }] }, wie.M);
+  const ref = b.data && b.data.order && b.data.order.ref;
+  /* Zonder bestelling slaagt een storing LEEG: een neem op niets geeft ook 409
+     en een volg op niets ook 404. Dus geen bestelling = de proef stopt. */
+  if (!ref) throw new Error('de bestelling kwam er niet (' + b.status + '): ' + JSON.stringify(b.data));
+  return { zaak, b, ref, items: b.data.order.items };
 }
 
 const volg = (P, wie, ref, tok) => P('/api/bezorg/volg', { ref }, tok || wie.M);
@@ -237,7 +245,7 @@ async function storingen(basis, uit) {
   /* 1. EEN ONBETAALDE BESTELLING BESTAAT NIET VOOR DE ZAAK. Vooraf betalen is
      de afspraak; een zaak die een onbetaalde bezorging ziet, gaat koken voor
      iemand die nooit betaalt. */
-  const onbetaald = await bestelling(P, wie);
+  const onbetaald = await bestelling(P, wie);   // gooit als hij er niet komt
   const zietHem = !!(await lopendBij(P, wie.I, onbetaald.ref));
   const neem = await P('/api/supplier/bezorg/neem', { ref: onbetaald.ref }, wie.B);
   noteer('een onbetaalde bezorging', 'staat niet bij de zaak en kan niet worden aangenomen',
@@ -284,23 +292,65 @@ async function storingen(basis, uit) {
   noteer('een tweede medewerker neemt een rit die al op naam staat', 'weigert; een rit heeft een bezorger',
     twee.status === 409, 'status ' + twee.status);
 
-  /* 7. EEN COLLEGA ZET ANDERMANS RIT OP BEZORGD -- en de inpakker is hier de
-     MANAGER, dus die mag het wel. Dat is de tegenproef: zonder hem zou "weigert
-     iedereen" er ook groen uitzien. Eerst inpakken en vertrekken. */
+  /* 7. EEN COLLEGA ZET ANDERMANS RIT OP BEZORGD. Alleen de eigen rit, tenzij
+     manager (bezorg.js). Eerst inpakken en vertrekken. */
   await P('/api/supplier/bezorg/inpak', { ref, bon: ref, tas: 'tas 1', items: best.items.map((i) => i.id) }, wie.I);
   await P('/api/supplier/bezorg/pakcheck', { ref }, wie.B);
   await P('/api/supplier/bezorg/status', { ref, status: 'onderweg' }, wie.B);
-  const meldVoor = ((await P('/api/notifications', {}, wie.M)).data || {}).notifications || [];
-  const eerst = await P('/api/supplier/bezorg/status', { ref, status: 'bezorgd' }, wie.B);
+  const doorCollega = wie.C ? await P('/api/supplier/bezorg/status', { ref, status: 'bezorgd' }, wie.C) : { status: 0 };
+  const na7 = await volg(P, wie, ref);
+  noteer('een collega zonder managerrol meldt andermans rit als bezorgd', 'verandert niets; de rit blijft van de bezorger',
+    !!wie.C && doorCollega.status === 404 && na7.data.order.status === 'onderweg',
+    'collega kreeg ' + doorCollega.status + ', volgscherm ' + (na7.data && na7.data.order && na7.data.order.status));
 
   /* 8. DEZELFDE EINDSTAND TWEE KEER. Een tweede druk op "bezorgd" (een PDA die
      het antwoord niet kreeg en opnieuw stuurt) hoort geen tweede bericht aan het
      lid op te leveren. */
+  const meldVoor = ((await P('/api/notifications', {}, wie.M)).data || {}).notifications || [];
+  const eerst = await P('/api/supplier/bezorg/status', { ref, status: 'bezorgd' }, wie.B);
   const nogeens = await P('/api/supplier/bezorg/status', { ref, status: 'bezorgd' }, wie.B);
   const meldNa = ((await P('/api/notifications', {}, wie.M)).data || {}).notifications || [];
   noteer('bezorgd twee keer melden', 'het lid krijgt een bericht, niet twee',
-    eerst.status === 200 && meldNa.length - meldVoor.length === 1,
+    eerst.status === 200 && nogeens.status === 200 && meldNa.length - meldVoor.length === 1,
     'eerste ' + eerst.status + ', tweede ' + nogeens.status + '; meldingen ' + meldVoor.length + ' -> ' + meldNa.length);
+
+  /* 9. EEN BEZORGDE LEVERING TERUGZETTEN EN OPNIEUW LATEN VERTREKKEN. Langs
+     order/status kon een eindstand weer `klaar` worden; dan vertrok hij nog
+     eens en las het lid twee keer "bezorgd". */
+  const terug = await P('/api/supplier/order/status', { ref, status: 'klaar' }, wie.I);
+  const na9 = await volg(P, wie, ref);
+  noteer('een bezorgde levering terugzetten', 'weigert: een eindstand is geen vertrekpunt',
+    terug.status === 409 && na9.data.order.status === 'bezorgd', 'order/status gaf ' + terug.status +
+      ', volgscherm ' + (na9.data && na9.data.order && na9.data.order.status));
+
+  /* 10. DEZELFDE STAND TWEE KEER LANGS order/status -- de keukenweg, die het lid
+     "Uw bestelling is nu: klaar." stuurt. */
+  const k = await bestelling(P, wie);
+  await P('/api/order/pay', { ref: k.ref }, wie.M);
+  const kv = ((await P('/api/notifications', {}, wie.M)).data || {}).notifications || [];
+  const k1 = await P('/api/supplier/order/status', { ref: k.ref, status: 'klaar' }, wie.I);
+  const k2 = await P('/api/supplier/order/status', { ref: k.ref, status: 'klaar' }, wie.I);
+  const kn = ((await P('/api/notifications', {}, wie.M)).data || {}).notifications || [];
+  noteer('de keuken zet dezelfde stand twee keer', 'het lid krijgt een bericht, niet twee',
+    k1.status === 200 && k2.status === 200 && kn.length - kv.length === 1,
+    'eerste ' + k1.status + ', tweede ' + k2.status + '; meldingen ' + kv.length + ' -> ' + kn.length);
+
+  /* 11. EEN RIT MET TWEE LEVERINGEN WAARVAN ER EEN NIET MAG. Vertrekken gaat
+     per rit; mag een van de twee niet, dan vertrekt er geen van beide -- anders
+     krijgt het ene lid "onderweg" terwijl de PDA een fout ziet en de route niet
+     start. */
+  const r1 = await bestelling(P, wie), r2 = await bestelling(P, wie);
+  for (const x of [r1, r2]) {
+    await P('/api/order/pay', { ref: x.ref }, wie.M);
+    await P('/api/supplier/bezorg/neem', { ref: x.ref }, wie.B);
+  }
+  await P('/api/supplier/bezorg/inpak', { ref: r1.ref, bon: r1.ref, tas: 'tas 4', items: r1.items.map((i) => i.id) }, wie.I);
+  await P('/api/supplier/bezorg/pakcheck', { ref: r1.ref }, wie.B);
+  const half = await P('/api/supplier/bezorg/status', { refs: [r1.ref, r2.ref], status: 'onderweg' }, wie.B);
+  const v1 = await volg(P, wie, r1.ref);
+  noteer('een rit vertrekt met een levering die nog niet is ingepakt', 'weigert de hele rit: geen half vertrek',
+    half.status === 409 && v1.data.order.status !== 'onderweg',
+    'status ' + half.status + ', de ingepakte levering staat op ' + (v1.data && v1.data.order && v1.data.order.status));
 
   return uit;
 }
@@ -324,7 +374,7 @@ async function meet() {
   for (const s of uit.schakels) t[s.stand]++;
   for (const s of uit.storingen) t[s.stand]++;
   uit.telling = t;
-  uit.sluit = t.open === 0 && t.stuk === 0 && t.gebroken === 0 && t.schakels >= 10 && t.storingen >= 7;
+  uit.sluit = t.open === 0 && t.stuk === 0 && t.gebroken === 0 && t.schakels >= 10 && t.storingen >= 11;
   return uit;
 }
 

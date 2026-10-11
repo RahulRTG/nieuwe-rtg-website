@@ -932,8 +932,14 @@ levering kon op **bezorgd** zonder ooit te zijn vertrokken -- het lid las "Eet
 smakelijk!" voor eten dat nog in de keuken stond, terwijl het vertrek wel een
 poort had -- en **dezelfde stand twee keer** gaf het lid een tweede bericht. Beide
 zijn dicht in `kern/horeca/bezorgovergang.js`, een regel die beide routes vragen: de
-bezorghelft loopt alleen vooruit, en een herhaling verandert niets en meldt
-niets. Wat de proef niet bewijst: er wordt niet echt betaald, er komt geen
+bezorghelft loopt alleen vooruit, een afgeronde levering is geen vertrekpunt, en
+een herhaling verandert niets en meldt niets. Een rit met meerdere leveringen
+wordt eerst helemaal gekeurd en dan pas gezet, zodat er geen half vertrek meer is.
+In dezelfde ronde bleek de **straalzone** dood: `zoekZone` gaf `haversine` vier
+losse getallen in plaats van twee punten en las `zaak.lat` waar een zaak `loc`
+draagt, dus elk adres viel door naar "geef een postcode op" -- alleen de
+postcodezones waren getoetst (`test/horeca-bezorg-club.test.js` toetst nu ook de
+straal). Wat de proef niet bewijst: er wordt niet echt betaald, er komt geen
 browser aan te pas, en de bezorgzones en tijdsloten (`kern/horeca/bezorglaag.js`)
 worden door de ledenbestelling niet geraadpleegd -- dat is een naad die hier
 staat en niet is gelegd. De keten staat nog niet in `scripts/ketenvorm.js`.

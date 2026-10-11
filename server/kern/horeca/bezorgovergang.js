@@ -16,7 +16,8 @@
    die op twee plekken staat loopt uiteen (LAT-regel 4) -- de vertrekpoort stond
    al twee keer overgetypt. De regel staat hier een keer, de routes vragen hem.
 
-   Wat dit NIET doet: een stand terugzetten verbieden in het algemeen. De
+   Wat dit NIET doet: een stand terugzetten verbieden in het algemeen (behalve
+   uit een EINDSTAND van een levering, zie hieronder). De
    bestelketen van een zaak kent ook `nieuw` -> `in bereiding` -> `klaar`, en
    die is van de keuken. De VOLGORDE geldt alleen voor de bezorghelft: het
    vertrek en de aankomst van een levering die bezorgd wordt. De HERHALING geldt
@@ -36,7 +37,11 @@ function overgang(o, naar) {
   if (naar === 'bezorgd' && o.status !== 'onderweg')
     return { status: 409, code: 'nooit-vertrokken',
       error: 'Een levering is pas bezorgd als hij onderweg was. Pak hem in, vink af en vertrek eerst.' };
-  if (naar === 'onderweg' && EIND.includes(o.status))
+  /* Een afgeronde levering is een eindpunt en geen vertrekpunt: zonder deze
+     regel zet `order/status` een bezorgde levering terug op `klaar`, vertrekt
+     hij opnieuw en krijgt het lid een tweede "bezorgd". Terugstorten loopt
+     langs een eigen route (supplier/refund) en niet hierlangs. */
+  if (EIND.includes(o.status))
     return { status: 409, code: 'al-klaar', error: 'Deze levering is al afgerond (' + o.status + ').' };
   return {};
 }

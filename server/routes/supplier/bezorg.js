@@ -100,7 +100,10 @@ app.post('/api/supplier/bezorg/status', supplierAuth, (req, res) => {
   const status = String(req.body.status || '');
   if (!['onderweg', 'bezorgd', 'opgehaald'].includes(status)) return res.status(400).json({ error: 'Onbekende status.' });
   const refs = (Array.isArray(req.body.refs) ? req.body.refs : [req.body.ref]).filter(Boolean).slice(0, 8);
-  const bijgewerkt = [], al = [];
+  /* EERST KEUREN, DAN DOEN. Een rit vertrekt met meerdere refs tegelijk; mag
+     er een niet, dan verandert er niets -- anders gaan de eerste twee onderweg,
+     krijgen die leden een bericht, en zegt het antwoord dat het misging. */
+  const doen = [], al = [];
   for (const ref of refs) {
     const o = (x => x && x.supplierCode === s.code ? x : undefined)(orderMetRef(ref));
     if (!o || !o.levering) continue;
@@ -111,10 +114,14 @@ app.post('/api/supplier/bezorg/status', supplierAuth, (req, res) => {
        keer is een herhaling zonder tweede bericht (kern/horeca/bezorgovergang.js). */
     const mag = overgang(o, status);
     if (mag.herhaling) { al.push(o.ref); continue; }
-    if (mag.error) return res.status(mag.status).json({ error: mag.error, code: mag.code });
+    if (mag.error) return res.status(mag.status).json({ error: mag.error, code: mag.code, ref: o.ref });
     // de keten sluit: vertrekken kan pas als de inpakker EN de bezorger hebben afgevinkt
     if (status === 'onderweg' && !(o.inpak && o.pakcheck))
-      return res.status(409).json({ error: 'Eerst afvinken: de inpakker (tas + bonnummer) en de bezorger (alles gepakt). Dan pas vertrekken.' });
+      return res.status(409).json({ error: 'Eerst afvinken: de inpakker (tas + bonnummer) en de bezorger (alles gepakt). Dan pas vertrekken.', ref: o.ref });
+    doen.push(o);
+  }
+  const bijgewerkt = [];
+  for (const o of doen) {
     o.status = status;
     /* Bezorgd of opgehaald: het bezorgpunt verdwijnt, het adres blijft bij de
        bestelling (NAVIGATIE.md N20). Na de rit heeft niemand de coordinaat nog nodig. */

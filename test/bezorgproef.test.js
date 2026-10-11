@@ -18,7 +18,7 @@ test('1. de keten sluit: elke schakel gesloten, elke storing gehouden', { timeou
   const mis = u.schakels.filter((s) => s.stand !== 'gesloten').map((s) => s.nr + ' ' + s.stand + ': ' + s.wat + ' -- ' + (s.ziet || s.antwoord || s.fout))
     .concat(u.storingen.filter((s) => s.stand !== 'gehouden').map((s) => 'storing ' + s.naam + ': ' + s.wat));
   assert.deepEqual(mis, [], 'de bezorgketen sluit niet');
-  assert.ok(u.telling.schakels >= 10 && u.telling.storingen >= 7, 'een lege keten sluit niet');
+  assert.ok(u.telling.schakels >= 10 && u.telling.storingen >= 11, 'een lege keten sluit niet');
   assert.equal(u.sluit, true);
   assert.match(u.grens, /niet echt betaald/, 'de uitslag draagt zijn eigen grens');
 });
@@ -30,6 +30,7 @@ test('2. de overgang: alleen vooruit voor een levering, en een herhaling is geen
   assert.deepEqual(overgang(lev('onderweg'), 'bezorgd'), {});
   assert.equal(overgang(lev('bezorgd'), 'bezorgd').herhaling, true);
   assert.equal(overgang(lev('bezorgd'), 'onderweg').code, 'al-klaar');
+  assert.equal(overgang(lev('bezorgd'), 'klaar').code, 'al-klaar', 'een eindstand is geen vertrekpunt');
   // een afhaalbon en een tafelbestelling vallen niet onder de bezorgvolgorde
   assert.deepEqual(overgang({ levering: 'ophalen', status: 'klaar' }, 'opgehaald'), {});
   assert.deepEqual(overgang({ status: 'nieuw' }, 'klaar'), {});

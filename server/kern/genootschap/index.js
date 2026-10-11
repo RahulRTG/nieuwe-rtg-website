@@ -1,18 +1,14 @@
 /* Genootschap: besloten groepen van leden, met een prikbord en bijeenkomsten.
 
    WAAROM DIT EEN NIEUWE APP IS EN GEEN VERBOUWING.
-   Het inventarisatiedocument stelde voor om Cercle de groepen-app te maken en
-   de bijeenkomsten in Rendez-vous te zetten. Dat plan was op de NAMEN geschreven,
-   niet op de code. In werkelijkheid is:
-   - Cercle het register van je besloten societeiten: per club je lidnummer, de
-     dresscode, met welke clubs er reciprociteit is en hoeveel gastpassen je nog
-     hebt. Een eigen, doordacht jetset-idee.
-   - Rendez-vous de besloten datingdienst van de Lifestyle Pass, met wensen,
-     wederzijdse likes en een date-voorstel van Rahul.
-   Beide verbouwen zou twee werkende concepten slopen om een derde te maken. De
-   groepen-laag bestond echt nog niet (er is geen collectie groepen; het bestaande
-   /api/event/rsvp is de gastenlijst van een PARTNER, niet van een lid), dus die
-   komt hier, in een eigen huis.
+   Het plan om Cercle de groepen-app te maken en de bijeenkomsten in Rendez-vous
+   te zetten was op de NAMEN geschreven, niet op de code. In werkelijkheid is:
+   - Cercle het register van je besloten societeiten (lidnummer, dresscode,
+     reciprociteit, gastpassen);
+   - Rendez-vous de besloten datingdienst van de Lifestyle Pass.
+   Beide verbouwen zou twee werkende concepten slopen. De groepen-laag bestond
+   nog niet (/api/event/rsvp is de gastenlijst van een PARTNER), dus die komt
+   hier, in een eigen huis.
 
    Drie regels die dit anders maken dan een groep op Facebook:
    1. DRIE SOORTEN ZICHTBAARHEID, en geheim betekent echt geheim: een geheim
@@ -21,12 +17,13 @@
       wie er niet in zit.
    2. GEEN GROEITRUC. Geen "leden die je misschien kent", geen suggesties, geen
       teller die om leden vraagt. Je nodigt uit wie je kent, of niemand.
-   3. ALLES OP CODENAAM. Ook de beheerder ziet codenamen; er is geen route die
-      een echte naam teruggeeft (die weg loopt alleen via kern/metier/bewijs.js,
-      met toestemming per werkgever). */
+   3. ALLES OP CODENAAM. Ook de beheerder ziet codenamen; een echte naam loopt
+      alleen via kern/metier/bewijs.js, met toestemming per werkgever. */
 const { keur } = require('../veilig');
 
-module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify, zijnVrienden }) => {
+module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify, zijnVrienden, toelating }) => {
+  // de drager (./drager-regels.js) mag zeggen wie NIET in een gedragen groep komt
+  const weiger = (gr, key) => (typeof toelating === 'function' ? toelating(gr, key) : null);
   const NAAM_MAX = 70, OVER_MAX = 600, REGELS_MAX = 800;
   const MAX_PER_LID = 60;          // genootschappen waar je in kunt zitten
   const MAX_LEDEN = 500;
@@ -119,6 +116,7 @@ module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify,
     if (!doel) return { error: 'Dit lid ken ik niet.' };
     if (isLid(gr, doel)) return { error: 'Dit lid zit er al in.' };
     if ((gr.leden || []).length >= MAX_LEDEN) return { error: 'Dit genootschap is vol.' };
+    const w = weiger(gr, doel); if (w) return { error: w };
     if (!gr.uitnodigingen.includes(doel)) gr.uitnodigingen.push(doel);
     save();
     try { if (notify) notify(doel, { title: 'Genootschap', body: 'Je bent uitgenodigd voor een genootschap: ' + gr.naam }); } catch (e) {}
@@ -132,6 +130,7 @@ module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify,
     const uitgenodigd = (gr.uitnodigingen || []).includes(sess.key);
     if (gr.soort !== 'openbaar' && !uitgenodigd) return { error: 'Dit genootschap is op uitnodiging.' };
     if ((gr.leden || []).length >= MAX_LEDEN) return { error: 'Dit genootschap is vol.' };
+    const w = weiger(gr, sess.key); if (w) return { error: w };
     gr.leden.push({ key: sess.key, rol: 'lid', sinds: nu() });
     gr.uitnodigingen = (gr.uitnodigingen || []).filter(k => k !== sess.key);
     save();
@@ -165,7 +164,7 @@ module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify,
     const lid = lidRegel(gr, key);
     return {
       id: gr.id, naam: gr.naam, soort: gr.soort, over: gr.over || '', regels: gr.regels || '',
-      at: gr.at, leden: (gr.leden || []).length,
+      at: gr.at, leden: (gr.leden || []).length, drager: gr.draagOrg ? { soort: gr.draagOrg.soort, stand: gr.draagOrg.stand } : null,
       mijnRol: lid ? lid.rol : null, ikBenLid: !!lid,
       uitgenodigd: !lid && (gr.uitnodigingen || []).includes(key),
       ledenlijst: lid ? (gr.leden || []).map(l => ({ codenaam: codenaamVan(l.key), rol: l.rol, sinds: l.sinds, ikZelf: l.key === key })) : []

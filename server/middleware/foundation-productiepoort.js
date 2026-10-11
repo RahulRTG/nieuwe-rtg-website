@@ -60,6 +60,8 @@ const BESCHERMDE_ROUTEFAMILIES = Object.freeze([
   '/api/rtf/onboarding',
   '/api/rtf/link',
   '/api/rtf/club',
+  // het genootschap via de gezinsdeur (B1): een gemeenschap met volwassenen buiten het gezin
+  '/api/rtf/genootschap',
   '/api/rtfos/casus',
   '/api/rtfos/portaal/deelnemer',
   '/api/rtfos/veld',

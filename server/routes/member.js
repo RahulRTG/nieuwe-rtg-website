@@ -85,6 +85,8 @@ module.exports = (kern) => {
   require('./member/metier')(kern);
   // Genootschap: besloten groepen met een prikbord en bijeenkomsten
   require('./member/genootschap')(kern);
+  // en zijn gezinsdeur: dezelfde kernfuncties voor een volwassen RTF-gezinslid
+  require('./member/genootschap-gezin')(kern);
   // De wauw-laag: stemming, verjaardagsglans en De Terugblik
   require('./member/wauw')(kern);
   // De moedertaal van het account: iedereen praat en leest in de eigen taal

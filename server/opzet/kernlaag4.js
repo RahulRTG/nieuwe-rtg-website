@@ -95,7 +95,16 @@ kern.metierLoon = require('../kern/metier/loon')({ db });
    register van je societeiten) of Rendez-vous (de datingdienst van de Lifestyle
    Pass); zie de kop van kern/genootschap/index.js voor waarom. */
 kern.genootschap = require('../kern/genootschap')({ db, save, codenaamVan: kern.codenaamVan,
-  keyVanCodenaam, liveCodename, notify, zijnVrienden: kern.zijnVrienden });
+  keyVanCodenaam, liveCodename, notify, zijnVrienden: kern.zijnVrienden,
+  toelating: require('../kern/genootschap/drager-regels').maakToelating(kern.volwassen) });
+/* De drager (B1, GEMEENSCHAP-FASE0.md par. 4.1): een organisatie draagt een
+   genootschap, als verwijzing en nooit als ledenbezit. Of een stichting erkend
+   is, vraagt hij het partnerregister van de RTFoundation -- LAAT GEBONDEN, want
+   kern.rtfos wordt pas in kernlaag7 opgehangen en een kopie hier zou undefined
+   bevriezen. */
+kern.genootschapDrager = require('../kern/genootschap/drager')({ save, notify, genootschap: kern.genootschap,
+  volwassen: kern.volwassen,
+  erkendePartner: (a) => (kern.rtfos && kern.rtfos.partners ? kern.rtfos.partners.erkend(a) : null) });
 kern.genootschapBeheer = require('../kern/genootschap/beheer')({ save, codenaamVan: kern.codenaamVan,
   keyVanCodenaam, genootschap: kern.genootschap });
 kern.prikbord = require('../kern/genootschap/prikbord')({ db, save, codenaamVan: kern.codenaamVan,

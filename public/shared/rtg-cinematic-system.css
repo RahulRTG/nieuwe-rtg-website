@@ -383,6 +383,9 @@ body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-pla
       lichte variant voor een donkere grond; op ivoor is het merkbordeaux voor
       rood en het rosthemagroen voor groen. */
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.knop.rood,#status,i.nee,#melding){color:#9e1c40!important}
+/* De toast van de datingschermen schildert zijn eigen zwarte vlak (dating-premium.css):
+   bordeaux haalde daarop 2,33:1. Op zwart is kleine tekst wit (CLAUDE.md). */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-dating] #melding.melding{color:#f4f0e9!important}
 body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tref .vrij,.school-zij b,.pn-intent em,#loWorldLabel,.rail-foot span){color:#2f7256!important}
 /* 5. EEN GOUDEN KNOP WORDT BORDEAUX, DUS ZIJN LETTER WORDT LICHT. --gold volgt
       het metaal, en dat is op ivoor bordeaux; de zwarte letter die bij goud

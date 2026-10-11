@@ -308,6 +308,18 @@ stand zonder toets of met een andere versie leest als dicht.
 6. de verjaring en het vervallen van niet-opgenomen dagen (art. 7:640a en
    7:642 BW): de regel rekent het RECHT van een jaar en raakt die vraag niet.
 
+**Het toetsingsdossier is `VAKANTIETOETS.md`** (besluit 4A, 11 oktober 2026):
+per artikel RTG's lezing met de codeplek, de aannames, de grensgevallen, de
+voorbeeldberekeningen uit de echte functies, de stappen van de eigenaar na de
+toets, en een checklist met handtekeningblok voor de beoordelaar. Het is een
+eigen document en geen paragraaf hier, omdat het naar een beoordelaar buiten het
+huis gaat en per regelversie opnieuw wordt ingevuld. `test/vakantietoets.test.js`
+houdt het tegen de code: de REGELVERSIE, de bronhashes van de drie bestanden,
+elke codeverwijzing en elke voorbeelduitkomst. Let op wat het dossier daar
+blootlegt (par. 6.2): de REGELVERSIE is een hash over de TABELLEN en niet over de
+rekencode, dus een wijziging in `reken()` laat een open poort open -- de
+bronhashes vangen dat in de keuring op, niet in de poort.
+
 Let op een vondst onderweg: het verzuimregister draagt per soort een vlag
 `opbouwend` die nergens wordt gelezen, en die voor `vakantie` op `false` staat.
 De regel leest hem met opzet niet (tijdens vakantie bestaat recht op loon, dus

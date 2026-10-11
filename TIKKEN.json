@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-06T06:10:50.086Z",
-    "commit": "8374b835",
+    "op": "2026-10-06T22:51:17.655Z",
+    "commit": "8a19bb53",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/tikken.js",
@@ -27,18 +27,18 @@
     }
   ],
   "overgeslagen": [],
-  "schermen": 315,
-  "bereikt": 275,
+  "schermen": 316,
+  "bereikt": 276,
   "buitenBereik": 40,
   "bereiktPerRol": {
-    "lid": 262,
-    "zaak": 257,
-    "kantoor": 271
+    "lid": 263,
+    "zaak": 258,
+    "kantoor": 272
   },
   "verdeling": {
     "0": 3,
     "1": 9,
-    "2": 107,
+    "2": 108,
     "3": 127,
     "4": 27,
     "5": 2
@@ -1612,6 +1612,14 @@
       "rol": "zaak",
       "tikken": 0,
       "via": []
+    },
+    {
+      "pad": "/apps/library.html",
+      "rol": "lid",
+      "tikken": 2,
+      "via": [
+        "/apps/app.html -> LILibraryOSFoundationOS [verborgen]"
+      ]
     },
     {
       "pad": "/apps/life.html",

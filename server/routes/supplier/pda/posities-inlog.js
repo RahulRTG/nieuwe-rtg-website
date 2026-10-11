@@ -62,7 +62,7 @@ module.exports = (ictx, werk) => {
     const start = posities.find(p => p.code === voorkeur) || posities[0];
     const antwoord = werk.antwoord(start, lid.id, posities);
     if (!antwoord.token) return res.status(401).json({ error: 'Uw persoonlijke RTG-account is niet meer actief.' });
-    logActivity(start.code, { name: start.persoon }, start.persoon + ' logde in (RTG-account)');
+    logActivity(start.code, { name: start.persoon, staffId: start.staffId }, start.persoon + ' logde in (RTG-account)', 'klok-inlog');
     res.json(Object.assign(antwoord, extra || {}));
   }
 

@@ -4,10 +4,7 @@
 module.exports=kern=>{
   const {app,supplierAuth,managerOnly,accounts,db,crypto,save,schoon,sseToSupplier,horeca}=kern,{H,Hlees,nu}=horeca;
   const safety=require('../../../kern/horeca/safety');
-  /* Wie er binnen is, in een volgorde die niets over het klokken zegt (eigenaarsbesluit
-     11 oktober 2026): live() staat in boekvolgorde, nieuwste inklok eerst. /spatial geeft
-     een niet-manager de lijst op naam; het golfvoorstel breekt een gelijke last voor
-     IEDEREEN op naam, zodat de kandidaat niet van de kijker afhangt en niets verraadt. */
+  // live() staat nieuwste-inklok-eerst: aanwezigVoor ordent op naam (besluit 11-10-2026)
   const zicht=require('../../../kern/leverancier/logboekzicht');
   const live=code=>{const seen=new Set();return (((db.data.klok||{})[code])||[]).filter(k=>k.in&&!k.out&&!seen.has(String(k.staffId))&&seen.add(String(k.staffId))).map(k=>{const s=accounts.getStaffById(Number(k.staffId));return{id:k.staffId,name:k.name,func:s&&s.func||'Service',zone:(((H(code).venue||{}).zones)||{})[k.staffId]||null}})};
   const missies=code=>{db.data.horecaMissies=db.data.horecaMissies||{};return db.data.horecaMissies[code]=db.data.horecaMissies[code]||[]};

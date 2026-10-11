@@ -23,11 +23,11 @@ module.exports = (kern) => {
   app.post('/api/supplier/beveiliging/command', supplierAuth, (req, res) => {
     if (!eisBeveiliging(req, res)) return;
     const c = bevCommand(req.supplier);
-    /* Wie er op dienst is ziet iedereen; de in- en uitkloktijden van een collega
+    /* Wie er op dienst is ziet iedereen; de in- en uitkloktijden en plekIn (besluit 1A) van een collega
        alleen een manager -- dezelfde bron als het rooster hieronder
        (kern/leverancier/logboekzicht.js, besluit 11 oktober 2026). */
     if (c && Array.isArray(c.opDienst))
-      c.opDienst = c.opDienst.map((d) => logboekzicht.kloktijdenVoor(d, req.actor, d.guardId, ['inklokAt', 'uitklokAt']));
+      c.opDienst = c.opDienst.map((d) => logboekzicht.kloktijdenVoor(d, req.actor, d.guardId));
     res.json(Object.assign(c, { shifts: BEVEILIGING_SHIFTS, ernsten: BEVEILIGING_ERNST }));
   });
   app.post('/api/supplier/beveiliging/functie', supplierAuth, (req, res) => {
@@ -66,10 +66,10 @@ module.exports = (kern) => {
   app.post('/api/supplier/beveiliging/rooster', supplierAuth, (req, res) => {
     if (!eisBeveiliging(req, res)) return;
     const r = bevRooster(req.supplier, req.body && req.body.van, req.body && req.body.dagen);
-    /* Het rooster ziet iedereen; de in- en uitkloktijden van een collega alleen
+    /* Het rooster ziet iedereen; de in- en uitkloktijden en plekIn (besluit 1A) van een collega alleen
        een manager (kern/leverancier/logboekzicht.js, besluit 11 oktober 2026). */
     for (const dag of (r && r.dagen) || []) for (const p of dag.posten || []) for (const sh of p.shifts || [])
-      sh.bezet = (sh.bezet || []).map((d) => logboekzicht.kloktijdenVoor(d, req.actor, d.guardId, ['inklokAt', 'uitklokAt']));
+      sh.bezet = (sh.bezet || []).map((d) => logboekzicht.kloktijdenVoor(d, req.actor, d.guardId));
     res.json(r);
   });
   app.post('/api/supplier/beveiliging/dienst', supplierAuth, (req, res) => {

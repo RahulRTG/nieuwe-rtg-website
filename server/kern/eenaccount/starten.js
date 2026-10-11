@@ -150,10 +150,10 @@ module.exports = (ctx) => {
     rememberSession(token, zSess);
     legContext(zSess, key, 'zaak', s.code);
     logInlog('zaak', true, s.code + ' · ' + actor.name + ' via RTG-account', req);
-    logActivity(s.code, actor, actor.name + ' logde in met het RTG-account');
+    logActivity(s.code, actor, actor.name + ' logde in met het RTG-account', 'klok-inlog');
     /* Rahuls welzijnszin: een stille, eenmalige opmerking bij de start --
        nooit een blokkade, nooit een score, alleen zorg. Diep in de nacht
-       of bij een zoveelste werkstart vandaag mag dat gezegd worden. */
+       of bij een zoveelste werkstart vandaag mag dat. */
     let welzijn = null;
     const uur = klok.datum().getHours();
     const wm = db.data.accountWelzijn = db.data.accountWelzijn || {};

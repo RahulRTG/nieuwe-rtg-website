@@ -34,7 +34,7 @@ const api = (base, pad, body, token) => fetch(base + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
-let H, tokM, tokA, tokB, idA, idB, naamB;   // horecazaak KIKUNOI
+let H, tokM, tokA, tokB, idA, idB, naamB, pinB;   // horecazaak KIKUNOI
 let V, tokVM, tokG0, tokG1, g0;             // beveiligingszaak AEGIS
 
 test.before(async () => {
@@ -53,7 +53,7 @@ test.before(async () => {
   tokA = (await api(H, '/api/supplier/login', { code: 'KIKUNOI', staffId: vloer.id, pin: '5678' })).body.token;
   const nieuw = (await api(H, '/api/supplier/staff/add', { name: 'Bram' }, tokM)).body;
   tokB = (await api(H, '/api/supplier/login', { code: 'KIKUNOI', staffId: nieuw.staff.id, pin: nieuw.pin })).body.token;
-  idB = nieuw.staff.id; naamB = nieuw.staff.name;
+  idB = nieuw.staff.id; naamB = nieuw.staff.name; pinB = nieuw.pin;
   assert.ok(tokM && tokA && tokB, 'drie inlogs');
 
   // eerst 5 gewone regels, daarna 45 klokregels van Bram (in, uit, in, ... -> eindigt ingeklokt)
@@ -109,7 +109,8 @@ test('c+d. de 5 gewone regels komen door, en niets verraadt de 45 klokregels erb
   // precies wat er overblijft van het hele logboek zonder klokregels -- niet 40-minus-iets
   const alles = (await api(H, '/api/supplier/activity', { aantal: 80 }, tokM)).body.activity;
   assert.ok(alles.length > 40, 'het logboek is langer dan 40: ' + alles.length);
-  const verwacht = alles.filter(r => !isKlokTekst(r.text)).slice(0, 40);
+  // beschermd (klok en inlog) valt weg, behalve Ayla's EIGEN regel -- herkend aan staffId, nooit aan naam
+  const verwacht = alles.filter(r => !zicht.isKlokregel(r) || String(r.staffId) === String(idA)).slice(0, 40);
   assert.deepEqual(a.activity.map(r => r.text + '|' + r.at), verwacht.map(r => r.text + '|' + r.at));
   // geen teller, totaal of cursor naast de lijst, en geen veld dat de manager niet ook heeft
   const m = await state(H, tokM);
@@ -159,10 +160,23 @@ test('e. het beveiligingsrooster: inkloktijd voor de manager en de bewaker zelf,
   assert.equal(cc.x.status, 'ingeklokt', 'wie er op dienst is, mag een collega zien');
   assert.ok(!('inklokAt' in cc.x) && !cc.tekst.includes(m.x.inklokAt), 'het commandocentrum geeft een collega de inkloktijd niet');
 
+  /* besluit 1A: plekIn (binnen of buiten de post, met sinds) volgt het inkloktijdstip --
+     de manager en de bewaker zelf; een collega ziet alleen DAT iemand op de post staat */
+  assert.ok(m.x.plekIn && 'sinds' in m.x.plekIn, 'de manager krijgt plekIn in het rooster: ' + JSON.stringify(m.x.plekIn));
+  assert.deepEqual((await vind(tokG0)).x.plekIn, m.x.plekIn, 'de bewaker zelf ook');
+  assert.ok(!('plekIn' in c.x), 'het rooster geeft een collega plekIn niet');
+  assert.deepEqual((await cmd(tokVM)).x.plekIn, m.x.plekIn, 'het commandocentrum geeft de manager plekIn');
+  assert.deepEqual((await cmd(tokG0)).x.plekIn, m.x.plekIn, 'en de bewaker zelf');
+  assert.ok(!('plekIn' in cc.x), 'het commandocentrum geeft een collega plekIn niet');
+
   // en de logregel van die inklok ("klokte in op <post>") gaat ook alleen naar de manager
   const isPost = (r) => /^klokte in op /.test(r.text);
   assert.ok((await state(V, tokVM)).activity.some(r => isPost(r) && r.soort === 'klok-in'));
   assert.ok(!(await state(V, tokG1)).activity.some(isPost));
+  // en de bewaker zelf krijgt zijn eigen regel terug (op staffId), zonder soort of id in de vorm
+  const eigen = (await state(V, tokG0)).activity.filter(isPost);
+  assert.ok(eigen.length >= 1, 'de bewaker ziet zijn eigen inklok op post');
+  for (const r of eigen) assert.deepEqual(Object.keys(r).sort(), ['at', 'text', 'who']);
 });
 
 test('bron: de klokregel wordt herkend aan soort EN aan de vaste tekst van voor het soortveld', () => {
@@ -174,7 +188,10 @@ test('bron: de klokregel wordt herkend aan soort EN aan de vaste tekst van voor 
   ];
   for (const r of oud) assert.equal(zicht.isKlokregel(r), true, r.text);
   assert.equal(zicht.isKlokregel({ who: 'X', text: 'iets', soort: 'klok-uit' }), true);
-  for (const t of ['belde een ingeklokte collega (video)', 'zette de aanwezigheidsteller op nul', 'Bram logde in', 'klokteller bijgewerkt'])
+  // besluit 2A: een inlogregel van voor het soortveld is ook beschermd
+  for (const t of ['Bram logde in', 'Bram logde in met het RTG-account', 'Bram logde in (RTG-account)'])
+    assert.equal(zicht.isKlokregel({ who: 'Bram', text: t, at: 'x' }), true, t);
+  for (const t of ['belde een ingeklokte collega (video)', 'zette de aanwezigheidsteller op nul', 'klokteller bijgewerkt', 'logde in bij de kassa van de bar'])
     assert.equal(zicht.isKlokregel({ who: 'X', text: t, at: 'x' }), false, t);
   assert.equal(zicht.isKlokregel(null), true, 'een onbekende vorm gaat niet de deur uit');
 
@@ -204,18 +221,19 @@ test('bron: elke klokschrijver markeert zijn regel met een soort uit de gesloten
       const f = path.join(map, n);
       if (fs.statSync(f).isDirectory()) loop(f);
       else if (n.endsWith('.js')) fs.readFileSync(f, 'utf8').split('\n').forEach((regel, i) => {
-        if (/logActivity(\.alleenActiviteit)?\(/.test(regel) && /'klokte |klokcorrectie/.test(regel)) uit.push({ f, i, regel });
+        // besluit 2A: ook de inlogschrijvers (noteerInlog is de alias in routes/supplier/toegang.js)
+        if (/(logActivity(\.alleenActiviteit)?|noteerInlog)\(/.test(regel) && /'klokte |klokcorrectie| logde in/.test(regel)) uit.push({ f, i, regel });
       });
     }
   };
   loop(path.join(__dirname, '..', 'server'));
-  assert.ok(uit.length >= 3, 'de klokschrijvers zijn gevonden: ' + uit.length);
+  assert.ok(uit.length >= 6, 'de klok- en inlogschrijvers zijn gevonden: ' + uit.length);
   for (const { f, i, regel } of uit) {
     const s = regel.match(/'(klok-[a-z-]+)'/) || (/'klok-' \+ actie/.test(regel) ? [0, 'klok-in'] : null);
     assert.ok(s, 'klokregel zonder soort in ' + path.relative(process.cwd(), f) + ':' + (i + 1));
     assert.ok(zicht.isKlokSoort(s[1]), 'onbekende soort ' + s[1]);
   }
-  assert.deepEqual(Object.keys(zicht.KLOKSOORTEN).sort(), ['klok-correctie', 'klok-in', 'klok-uit']);
+  assert.deepEqual(Object.keys(zicht.KLOKSOORTEN).sort(), ['klok-correctie', 'klok-in', 'klok-inlog', 'klok-uit']);
 });
 
 test('bron: in een bestand dat het klokboek of een dienstkloktijd SCHRIJFT, draagt elke logregel een soort of een verklaring', () => {
@@ -285,4 +303,45 @@ test('f. de Vloer (/spatial) en het golfvoorstel verraden de inklokvolgorde niet
     assert.equal(v.status, 200, JSON.stringify(v.body).slice(0, 200));
     assert.equal(v.body.voorstel.kandidaat && v.body.voorstel.kandidaat.name, verwacht, 'de kandidaat hangt af van de boekvolgorde');
   }
+});
+
+test('g. besluit 2A: "X logde in" alleen voor de manager en de medewerker zelf, en geen team-signaal', async () => {
+  const isInlog = (r) => / logde in/.test(r.text);
+  // Bram logt nu in, zodat zijn regel bovenaan staat; Ayla daarna, zodat elk zijn eigen heeft
+  assert.equal((await api(H, '/api/supplier/login', { code: 'KIKUNOI', staffId: idB, pin: pinB })).status, 200);
+  // manager: alle inlogregels, met soort klok-inlog
+  const m = (await state(H, tokM)).activity.filter(isInlog);
+  assert.ok(m.some(r => r.who === naamB && r.soort === 'klok-inlog'), 'de manager ziet de inlog van Bram');
+  // Bram: alleen zijn eigen
+  const b = (await state(H, tokB)).activity.filter(isInlog);
+  assert.ok(b.length >= 1 && b.every(r => r.who === naamB), 'Bram ziet alleen zijn eigen inlog: ' + JSON.stringify(b));
+  // Ayla: geen inlog van Bram, en nergens het tijdstip van Brams inlog
+  const a = await state(H, tokA);
+  assert.ok(!a.activity.some(r => isInlog(r) && r.who === naamB), 'Ayla krijgt de inlog van Bram niet');
+  const brams = m.filter(r => r.who === naamB).map(r => r.at);
+  const tekst = JSON.stringify(a);
+  assert.deepEqual(brams.filter(t => tekst.includes(t)), [], 'het inlogtijdstip van Bram lekt via een ander veld');
+
+  // realtime: een inlog stuurt Ayla geen team-signaal; een gewone regel wel (besturingsproef)
+  const luister = async (doe, tok = tokA) => {
+    const ac = new AbortController();
+    const r = await fetch(H + '/api/supplier/stream?token=' + tok, { signal: ac.signal });
+    const lezer = r.body.getReader(); let tekst = '';
+    const lees = (async () => { try { for (;;) { const { value, done } = await lezer.read(); if (done) break; tekst += Buffer.from(value).toString(); } } catch (e) {} })();
+    await new Promise(z => setTimeout(z, 300));
+    await doe();
+    await new Promise(z => setTimeout(z, 1200));
+    ac.abort(); await lees;
+    return tekst;
+  };
+  const naInlog = await luister(async () => {
+    const r = await api(H, '/api/supplier/login', { code: 'KIKUNOI', staffId: idB, pin: pinB });
+    assert.equal(r.status, 200, 'Bram logt opnieuw in');
+  });
+  assert.doesNotMatch(naInlog, /"scope":"team"/, 'een inlog stuurt een collega geen team-signaal (dat zou het tijdstip verraden)');
+  // de manager krijgt het signaal wel: hij mag de regel zien, en zijn teamtab moet bijwerken
+  const mgrInlog = await luister(() => api(H, '/api/supplier/login', { code: 'KIKUNOI', staffId: idB, pin: pinB }), tokM);
+  assert.match(mgrInlog, /"scope":"team"/, 'de manager krijgt het team-signaal van een inlog');
+  const gewoon = await luister(() => api(H, '/api/supplier/aanwezig/leeg', { ronde: 'sse' }, tokM));
+  assert.match(gewoon, /"scope":"team"/, 'besturingsproef: een gewone regel stuurt wel een team-signaal');
 });

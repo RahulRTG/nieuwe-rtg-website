@@ -103,7 +103,7 @@ app.post('/api/supplier/login', async (req, res) => {
   // Alleen de gedeelde demo-inlog heeft uitsluitend spoor + sessie gewijzigd.
   // Personeel kan ook werkvenster-defaults initialiseren; behoud daar brede opslag.
   const noteerInlog = !staff && DEMO ? logActivity.alleenActiviteit || logActivity : logActivity;
-  noteerInlog(s.code, actor, actor.name + ' logde in');
+  noteerInlog(s.code, actor, actor.name + ' logde in', 'klok-inlog');
   res.json({ token, state: supplierState(s, actor) });
 });
 

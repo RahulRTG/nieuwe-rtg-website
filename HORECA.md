@@ -933,7 +933,21 @@ klokregels van vandaag), de logboekroute, het beveiligingsrooster, de Vloer en d
 vloeropdrachten gaan er alle vijf langs. Klokschrijvers markeren hun regel met een
 soort uit een gesloten lijst (oudere regels worden herkend aan hun vaste tekst),
 en er wordt gefilterd vóór het afkappen op 40, zodat aantal en volgorde niets
-verraden (`test/supplier-logboekzicht.test.js`). Hij telt
+verraden (`test/supplier-logboekzicht.test.js`). Ook de volgorde van wie er
+binnen is zegt niets: een collega krijgt de aanwezigen op naam en niet nieuwste
+inklok eerst, op `/state`, de vloeropdrachten en de ruimteweergave, en het
+golfvoorstel breekt een gelijke last voor iedere kijker op naam. Twee
+vervolgbesluiten van de eigenaar (11 oktober 2026) gaan langs dezelfde functie.
+**1A:** `plekIn` van een bewakersdienst (binnen of buiten de post, met `sinds`)
+volgt het inkloktijdstip -- de manager en de bewaker zelf zien het, een collega
+ziet alleen DAT iemand op een post staat (`DIENSTKLOKVELDEN`, in het rooster en
+het commandocentrum). **2A:** "X logde in" is een beschermde klokgebeurtenis
+(soort `klok-inlog`): de manager en de medewerker zelf, die zijn eigen regel
+terugkrijgt op `staffId` en nooit op naam. Er wordt niets minder geschreven --
+logboek en inlogspoor blijven volledig -- alleen minder geleverd, en een
+beschermde regel stuurt zijn `team`-signaal over SSE alleen naar de managers en
+de medewerker zelf (`alleenVoor` in `kern/sse.js`), omdat een signaal zonder
+zichtbare nieuwe regel een collega het tijdstip verraadt. Hij telt
 hoeveel TAFELS er nog bij iemand staan die al uitklokte. Dat leest de prikklok
 van het personeelsdomein via `klokVan` (`kern/personeel.js`) en verder niets: het
 besluit staat in NORM.json (`kernGedeeld` 254 -> 255) met wie levert, wie leest

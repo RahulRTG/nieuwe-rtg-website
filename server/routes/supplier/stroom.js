@@ -22,7 +22,7 @@ app.get('/api/supplier/stream', (req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
   res.write('retry: 3000\n\n');
   const tok = req.query.token;
-  const client = { sup: sess.code, staffId: sess.staffId != null ? sess.staffId : null, res,
+  const client = { sup: sess.code, staffId: sess.staffId != null ? sess.staffId : null, manager: sess.manager === true, res,
     geldig: () => {
       const s = sessionFor(tok);
       if (!accounts.controleerStaffSessie(s).ok) return false;

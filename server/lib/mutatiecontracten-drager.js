@@ -16,8 +16,11 @@
 const OP = '2026-10-11';
 const AF = { door: 'Claude (Opus 5.5), op grond van test/genootschap-drager-server.test.js en test/genootschap-drager.test.js; niet door een mens nagelezen', op: OP };
 const LID = { klasse: 'AUTHENTICATED', deur: 'auth' };
-const GROEP = { klasse: 'OBJECT_SCOPED', objectVeld: 'groep',
-  uitleg: 'alleen een beheerder van dit genootschap (403); voor een niet-lid bestaat het genootschap niet (404)' };
+/* AUTHENTICATED en niet OBJECT_SCOPED: zo zegt de router het (auth), en een
+   verklaring die strenger is dan de deur maakt dit register een verlanglijst.
+   De objectcontrole zit in de module: alleen een beheerder van dit genootschap
+   (403), en voor een niet-lid bestaat het genootschap niet (404). */
+const GROEP = LID;
 const GEZIN = { klasse: 'OBJECT_SCOPED', objectVeld: 'code',
   uitleg: 'het gezin uit `code`, en alleen met het `token` dat bij DAT gezin hoort (rtf.verifieerProfiel via ' +
     'gezinsPoort); daarbinnen alleen een gezinslid van 18 of ouder, anders 403 met de reden' };

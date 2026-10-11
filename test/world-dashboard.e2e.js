@@ -334,6 +334,7 @@ async function bewijsHandeling(page, route, maat) {
     for (const selector of ['.doelgroep', '.cv-rij', '#poorten'])
       await page.locator(selector).first().waitFor({ state: 'visible' });
     const actie = '[data-work-kies="ondernemers"]';
+    await page.locator(actie).scrollIntoViewIfNeeded();
     await raakdoel(page, actie, label);
     await page.click(actie);
     await page.waitForFunction(() => {

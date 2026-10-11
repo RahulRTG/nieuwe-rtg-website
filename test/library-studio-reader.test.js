@@ -113,7 +113,7 @@ test('inhoudelijke feedback sluit via een nieuwe revisie en Edition 2', async ()
     assert.ok(proof.events.some(e => e.type === name), name);
 });
 
-test('schema 1 migreert structuur en feedback zonder historische editiebytes te wijzigen', () => {
+test('schema 1 migreert structuur, feedback en onderwijsreleases zonder historische editiebytes te wijzigen', () => {
   const legacy = { schemaVersion: 1, works: { w: { nodes: { b: {}, a: {} } } }, receipts: {}, journal: [], delivery: {} };
   const migrated = M.state(legacy);
   // schema 1 loopt door tot de huidige versie: 1 -> 2 (structuur, feedback) -> 3 (onderwijsreleases)

@@ -1,14 +1,20 @@
 {
   "uitleg": "De ladder: elke trede van kleuter tot aanvaller tegen een echte server. raak MAG ALLEEN DALEN en nietGeprobeerd ook -- zie scripts/ladder.js. Een schone uitkomst betekent: niets van wat wij konden bedenken kwam erdoor. Niet: veilig.",
-  "gedraaid": "2026-10-06T14:53:31.796Z",
+  "gedraaid": "2026-10-11T05:57:28.042Z",
   "treden": 13,
   "meters": {
-    "ladderRaak": 0,
+    "ladderRaak": 1,
     "ladderNietGeprobeerd": 1
   },
-  "afgeslagen": 5287,
+  "afgeslagen": 5294,
   "gelukt": 8,
-  "bevindingen": [],
+  "bevindingen": [
+    {
+      "trede": "dwaler",
+      "wat": "een verzoek zonder token gaf een serverfout",
+      "hoe": "POST /api/betaal/webhook/connect -> 503  (server/opzet/connectwebhook.js:24)"
+    }
+  ],
   "nietGeprobeerd": [
     {
       "trede": "gast",

@@ -391,10 +391,10 @@ test('elke voorziening overleeft het contract waarmee de crashproef haar aanroep
      gezinssessie van gezin/inloggen, anders trekken ze die van de wereld in. */
   const post = async () => ({ status: 200, data: { pas: { id: 'p1' }, code: 'k1',
     verzoeken: [{ id: 'v1' }], regel: { id: 'r1' }, factuur: { id: 'F-1' },
-    voorstel: { id: 'vs1' }, token: 'vers-gezinstoken',
+    voorstel: { id: 'vs1' },
     /* `id` en `items` sinds het documentcontract een voorziening is (6 oktober 2026):
        zij uploadt een vers bestand en leest zijn versie uit /api/bestanden/mijn. */
-    id: 'b1', items: [{ id: 'b1', documentVersion: 'a'.repeat(64) }] } });
+    token: 'vers-gezinstoken', id: 'b1', items: [{ id: 'b1', documentVersion: 'a'.repeat(64) }] } });
   const tokenVoor = () => 'token';
   /* `anderToken` hoort hier sinds de tik een voorziening is (14 september 2026): die
      haalt een verse tikcode bij het TWEEDE lid, want kern/pay/tik.js weigert je eigen

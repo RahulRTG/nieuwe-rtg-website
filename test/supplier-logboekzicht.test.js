@@ -233,7 +233,7 @@ test('bron: elke klokschrijver markeert zijn regel met een soort uit de gesloten
     assert.ok(s, 'klokregel zonder soort in ' + path.relative(process.cwd(), f) + ':' + (i + 1));
     assert.ok(zicht.isKlokSoort(s[1]), 'onbekende soort ' + s[1]);
   }
-  assert.deepEqual(Object.keys(zicht.KLOKSOORTEN).sort(), ['klok-correctie', 'klok-in', 'klok-inlog', 'klok-uit']);
+  assert.deepEqual(Object.keys(zicht.KLOKSOORTEN).sort(), ['afwezig', 'klok-correctie', 'klok-in', 'klok-inlog', 'klok-uit', 'werving']);
 });
 
 test('bron: waar een kloktijd ontstaat of een werksessie wordt gemunt, draagt elke logregel een soort of een verklaring', () => {

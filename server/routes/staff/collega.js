@@ -108,7 +108,9 @@ app.post('/api/staff/dm/lijst', supplierAuth, (req, res) => {
       return {
         id: m.id, name: m.name, func: m.func || '', role: m.role,
         binnen: !!klok.find(e => e.staffId === m.id && !e.out),
-        online: online.has(m.id),
+        /* besluit C1: geen algemene stip. `online` alleen binnen een bestaand
+           gesprek met deze collega (er is een laatste bericht), en nooit een tijd */
+        online: !!laatste && online.has(m.id),
         ongelezen: commCollega.ongelezen(req.supplier.code, req.actor.staffId, m.id),
         laatste: laatste ? String(laatste.text || '').slice(0, 60) : ''
       };

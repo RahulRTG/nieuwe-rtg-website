@@ -18,6 +18,7 @@
    betekent dat de tweede handtekening bij de administratie ligt. */
 'use strict';
 
+const personeelzicht = require('../kern/leverancier/personeelzicht');
 module.exports = (kern) => {
   const { app, supplierAuth, payrollOS, accounts, schoon } = kern;
   if (!payrollOS) return;
@@ -115,7 +116,10 @@ module.exports = (kern) => {
     const uit = [];
     for (const m of accounts.listStaff(req.supplier.code)) {
       const regels = payrollOS.verzuim.voorPlanning(req.supplier.code, m.id, van, tot);
-      if (regels.length) uit.push({ staffId: m.id, naam: m.name, func: m.func || null, regels });
+      /* besluit B1: een manager en de medewerker zelf de regels (wat iemand nog kan);
+         een collega alleen DAT iemand in deze periode afwezig is */
+      if (regels.length) uit.push(personeelzicht.afwezigheidVoor({ staffId: m.id, naam: m.name, func: m.func || null, regels },
+        req.actor, m.id, ['staffId', 'naam']));
     }
     res.json({ ok: true, van, tot, afwezig: uit,
       let: 'Bij ziekte staat er "afwezig" en niet wat iemand heeft. Wat iemand nog wel kan, staat er wel: daar plant u mee.' });

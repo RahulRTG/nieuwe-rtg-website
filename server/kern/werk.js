@@ -101,7 +101,8 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
   }
   // een bericht van de sollicitant laat de werkgever meteen iets weten
   function meldWerkgever(chat, tekst) {
-    notifySupplier(chat.supplierCode, { icon: 'berichten', title: 'Bericht van ' + chat.applicant.naam, body: String(tekst).slice(0, 80) });
+    // een sollicitant is werving: alleen de managers (kern/leverancier/personeelzicht.js)
+    notifySupplier(chat.supplierCode, { icon: 'berichten', title: 'Bericht van ' + chat.applicant.naam, body: String(tekst).slice(0, 80), alleenVoor: { staffId: null } });
   }
 
   /* Openbare lijst met alle openstaande vacatures over alle partners heen. De

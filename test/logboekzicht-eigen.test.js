@@ -98,8 +98,8 @@ test('1b. een oude beschermde regel zonder staffId gaat alleen naar de manager, 
     { who: 'Kim', text: 'meldde zich aan op kaart NL-1', at: '2026-10-01T08:04:00.000Z' }];
   assert.deepEqual(zicht.logboekVoor(oud, { name: 'Kim', staffId: 7, manager: false }, 40).regels, []);
   assert.equal(zicht.logboekVoor(oud, { manager: true }, 40).regels.length, oud.length);
-  // de keukenlijn is een vraag voor de eigenaar en valt hier met opzet buiten
-  assert.equal(zicht.isKlokregel({ who: 'X', text: 'meldde zich aan op de kant warm', at: 'x' }), false);
+  // besluit A1: aan- en afmelden op een kant van de keukenlijn is ook een klokregel
+  assert.equal(zicht.isKlokregel({ who: 'X', text: 'meldde zich aan op de kant warm', at: 'x' }), true);
 });
 
 test('2. beschermde regels drukken geen zichtbare regel van het logboek', async () => {

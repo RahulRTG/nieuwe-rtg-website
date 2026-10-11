@@ -30,7 +30,7 @@ app.get('/api/supplier/stream', (req, res) => {
       return !!z && z.partnerStatus !== 'geschorst' && z.partnerStatus !== 'beeindigd';
     } };
   sseClients.push(client);
-  sseSend(res, 'hello', { unread: ongelezen(sess.code) });
+  sseSend(res, 'hello', { unread: ongelezen(sess.code, { staffId: client.staffId, manager: client.manager }) });
   const ping = setInterval(() => res.write(': ping\n\n'), 25000);
   req.on('close', () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); });
 });

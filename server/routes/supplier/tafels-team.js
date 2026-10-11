@@ -106,7 +106,8 @@ app.post('/api/supplier/leave/decide', supplierAuth, (req, res) => {
     if (m && m.error) console.error('[verzuim] goedgekeurd verlof niet vastgelegd:', m.error, m.bezwaren || '');
   }
   save();
-  logActivity(req.supplier.code, req.actor, (v.status === 'goedgekeurd' ? 'keurde verlof goed van ' : 'wees verlof af van ') + v.name);
+  // besluit B1: de manager en wie het betreft (op zijn staffId), geen collega
+  logActivity(req.supplier.code, { name: req.actor.name, staffId: v.staffId }, (v.status === 'goedgekeurd' ? 'keurde verlof goed van ' : 'wees verlof af van ') + v.name, 'afwezig');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'verlof' });
   res.json({ ok: true, entry: v });
 });

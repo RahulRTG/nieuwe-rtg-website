@@ -953,7 +953,18 @@ die een werksessie munt schrijft een `klok-inlog` (ook binnenkomen met het
 RTG-account en wisselen van werkplek), het CDT-bord van een taxibedrijf geeft
 een chauffeur alleen zijn eigen dienst, en het logboek bewaart de beschermde
 regels per medewerker naast de gewone, zodat ze geen zichtbare regel wegdrukken
-(`test/logboekzicht-eigen.test.js`). Hij telt
+(`test/logboekzicht-eigen.test.js`). Drie besluiten later op dezelfde dag gaan langs dezelfde
+predicaten, in `server/kern/leverancier/personeelzicht.js`. **A1:** aan- en
+afmelden op een kant van de keukenlijn is een klokgebeurtenis; wie er NU aan de
+lijn staat ziet iedereen, op naam en niet in aanmeldvolgorde. **B1:** een
+ziekmelding is gezondheidsinformatie -- een collega ziet alleen dat iemand
+vandaag "afwezig" is (geen soort, geen datum), de melding, de logregel en de
+verzuimplanning met wat iemand nog kan gaan alleen naar de manager en de
+medewerker zelf, en ook de manager krijgt geen omschrijving (een verlofaanvraag
+gaat dezelfde weg). **C1:** er is geen algemene online-stip meer; `online` in de
+collegalijst staat alleen aan binnen een bestaand gesprek, en nooit met een tijd.
+En sollicitaties horen bij de werving: alleen de manager krijgt ze, ook in de
+meldingen (`test/personeelzicht.test.js`). Hij telt
 hoeveel TAFELS er nog bij iemand staan die al uitklokte. Dat leest de prikklok
 van het personeelsdomein via `klokVan` (`kern/personeel.js`) en verder niets: het
 besluit staat in NORM.json (`kernGedeeld` 254 -> 255) met wie levert, wie leest

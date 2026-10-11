@@ -41,21 +41,11 @@
        collega precies wanneer er iets beschermds gebeurde. */
 'use strict';
 
-const KLOKSOORTEN = Object.freeze({
-  'klok-in': 'een medewerker klokte in (routes/staff/dienst-klok.js; kern/beveiliging/pda/patrouille.js, op een post; kern/mobiliteit/cdt.js, op een chauffeurskaart)',
-  'klok-uit': 'een medewerker klokte uit (routes/staff/dienst-klok.js; kern/mobiliteit/cdt.js, van een chauffeurskaart)',
-  'klok-correctie': 'een manager boekte uren bij voor een collega (routes/staff/collega.js)',
-  'klok-inlog': 'een medewerker kwam binnen in een werksessie (routes/supplier/toegang.js; kern/eenaccount/startspoor.js; ' +
-    'routes/supplier/pda/posities-inlog.js; kern/werkbijlogin.js; routes/supplier/pda/posities.js, wisselen)'
-});
+// de gesloten lijst beschermde soorten en de oude teksten: ./beschermdesoorten.js
+const { KLOKSOORTEN, OUDE_KLOKTEKST } = require('./beschermdesoorten');
 
 // de velden van een bewakersdienst die WANNEER zeggen (besluit 1A): alleen voor een manager en de bewaker zelf
 const DIENSTKLOKVELDEN = Object.freeze(['inklokAt', 'uitklokAt', 'plekIn']);
-
-// de vaste teksten van de klokschrijvers van voor het soortveld
-const OUDE_KLOKTEKST = Object.freeze([/^klokte (?:in|uit)(?: op |$)/, /^boekte een klokcorrectie voor /,
-  / logde in(?: met het RTG-account| \(RTG-account\))?$/, / kwam binnen met het RTG-account$/,
-  / wisselde (?:van afdeling \(vanuit |naar deze werkplek$)/, /^meldde zich (?:aan|af) op kaart /]);
 
 /* Hoeveel regels per KLASSE in het zaaklogboek blijven staan (opzet/leverancierpoort.js).
    Een gezamenlijke grens was een zijkanaal: elke beschermde regel drukte een

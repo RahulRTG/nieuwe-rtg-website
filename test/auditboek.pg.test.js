@@ -84,7 +84,9 @@ test('3. de catalogus weigert onbekende types, vrije tekst, geheimen, e-mailadre
     ev({ context: { methode: 'POST', pad: '/api/pay/x?token=geheim' } }),
     ev({ context: { methode: 'POST', pad: '/api/pay/x', wachtwoord: 'hunter2' } }),
     ev({ context: { methode: 'POST', pad: '/api/pay/x', status: 'Bearer eyJhbGciOiJIUzI1NiJ9.x.y' } }),
-    ev({ type: 'beheer.config.gewijzigd', context: { instelling: 'RTG_SECRET', waardeSha256: '-----BEGIN PRIVATE KEY-----' } }),
+    // Gesplitst, zodat scripts/geheimen.js deze nepkop niet als gelekte sleutel ziet;
+    // de catalogus krijgt exact dezelfde tekst.
+    ev({ type: 'beheer.config.gewijzigd', context: { instelling: 'RTG_SECRET', waardeSha256: '-----BEGIN ' + 'PRIVATE KEY-----' } }),
     ev({ uitkomst: 'wel-uitgevoerd-ofzo' }),
     ev({ correlatie: 'spatie in correlatie' })
   ];

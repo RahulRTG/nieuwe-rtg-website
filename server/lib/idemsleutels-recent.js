@@ -18,6 +18,8 @@ const SLEUTELS = Object.assign({},
   // RTG Office in en uit: exporteer en importeer zijn met opzet een tweede handeling
   require('./idemsleutels-officeformaten').SLEUTELS,
   /* De TURN-uitgifte: elk antwoord is een vers geheim. Zie de kop daar. */
-  require('./idemsleutels-rtc').SLEUTELS);
+  require('./idemsleutels-rtc').SLEUTELS,
+  /* Vier routes uit de samenvoeging van #542. Zie de kop daar. */
+  require('./idemsleutels-samenvoeging').SLEUTELS);
 
 module.exports = { SLEUTELS };

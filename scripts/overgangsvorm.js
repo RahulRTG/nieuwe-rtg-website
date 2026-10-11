@@ -138,6 +138,7 @@ const NAGEKEKEN = {
   'les.bewijs': RUIS + ' Het bewijs hoort bij de stappen van het onderzoek voor het besluit.',
   'les.privacyklasse': RUIS + ' De privacyregels in de route gaan over deelnemers aan een studie.',
   'les.menselijke_bevestiging': RUIS + ' Toestemming in de route is die van een deelnemer aan een studie.',
+  'werk.privacyklasse': '`codenaamVan` (#579, employment-wie.js) vertaalt een ledensleutel naar een codenaam: dat is de actor op codenaam, geen privacyregel van de aanname.',
   'werk.overdracht': 'De uitnodiging gaat naar de persoon; de woordenlijst kent `accepteer` alleen als bevestiging.',
   'leren.privacyklasse': 'De leeftijdspoort staat in de ROUTE (maakVolwassen), en het woord `volwassen` zit daar in een aanroep die de wringer als naam telt.',
   'bevoegd.menselijke_bevestiging': 'Aftekenen is een bevestiging door een mens; het woord in de code is `afgetekend`, niet `bevestig`.',

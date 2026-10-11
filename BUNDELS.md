@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**61 bundels, 488 delen, 0 zonder onderwerp.**
+**61 bundels, 489 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 

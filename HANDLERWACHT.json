@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-07T00:26:43.625Z",
-  "commit": "c691c006d",
+  "op": "2026-10-11T05:51:50.374Z",
+  "commit": "799756ef1",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/handlerwacht.js",
   "node": "v26.10.0"
  },
@@ -4102,7 +4102,7 @@
   },
   {
    "sleutel": "POST /api/supplier/mijn/login",
-   "bestand": "server/routes/supplier/pda/posities.js:106",
+   "bestand": "server/routes/supplier/pda/posities-inlog.js:86",
    "staat": "eigenControle"
   },
   {

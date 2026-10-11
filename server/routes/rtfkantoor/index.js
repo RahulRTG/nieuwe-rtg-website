@@ -46,7 +46,15 @@ module.exports = (kern) => {
   app.post('/api/lab/project/maak', officeAuth, (req, res) => veilig(res, () => lab.projectMaak(req.body || {}, boardroomWie(req))));
   app.post('/api/lab/project/team', officeAuth, (req, res) => veilig(res, () => lab.teamZet(String(req.body.id || ''), req.body.team)));
   app.post('/api/lab/project/fase', officeAuth, (req, res) => veilig(res, () => lab.faseZet(String(req.body.id || ''), String(req.body.fase || ''))));
-  app.post('/api/lab/project/veiligheid', officeAuth, (req, res) => veilig(res, () => lab.veiligheidZet(String(req.body.id || ''), req.body || {})));
+  /* WIE DE VEILIGHEIDS- EN ETHIEKTOETS ZET, komt uit de SESSIE (11 oktober
+     2026). Deze toets opent proef en uitrol; hier stond `b.door` uit het lijf,
+     zodat de gedeelde code met een getypte naam hem op akkoord kon zetten. Een
+     opgegeven naam is geen actor: zonder sessie op naam weigert de deur. */
+  app.post('/api/lab/project/veiligheid', officeAuth, (req, res) => {
+    const wie = boardroomWie(req);
+    if (!wie) return res.status(403).json({ error: 'De veiligheids- en ethiektoets zet een mens op naam: met de gedeelde kantoorcode is niet vast te stellen wie beslist. Log in met uw eigen RTG-account.', watNu: 'inloggen-op-naam' });
+    veilig(res, () => lab.veiligheidZet(String(req.body.id || ''), Object.assign({}, req.body || {}, { door: wie })));
+  });
   /* Wie de logregel schrijft komt uit de SESSIE en niet uit `req.body.wie`
      (besluit 3, 11 oktober 2026; AUTHORITY.md P0b): met de gedeelde code is dat
      niemand, en dan staat er 'lab' -- geen naam die de aanroeper zelf typte. */
@@ -63,7 +71,8 @@ module.exports = (kern) => {
   app.post('/api/rtfkantoor/stadsraad/partner-maak', officeAuth, (req, res) => veilig(res, () => stadsraad.partnerMaak(req.body || {})));
   app.post('/api/rtfkantoor/stadsraad/partner-stop', officeAuth, (req, res) => veilig(res, () => stadsraad.partnerStop(String(req.body.id || ''))));
   app.post('/api/rtfkantoor/stadsraad/besluit-start', officeAuth, (req, res) => veilig(res, () => stadsraad.besluitStart(req.body.projectId, req.body.voorstel, boardroomWie(req) || 'kantoor', 'rtg')));
-  app.post('/api/rtfkantoor/stadsraad/stem', officeAuth, (req, res) => veilig(res, () => stadsraad.stem(String(req.body.besluitId || ''), 'rtg', req.body.naam || boardroomWie(req), req.body.voor === true)));
+  // de stemmer komt uit de sessie; `naam` in het lijf telt niet (anders telt elke getypte naam als een RTG-stem)
+  app.post('/api/rtfkantoor/stadsraad/stem', officeAuth, (req, res) => veilig(res, () => stadsraad.stem(String(req.body.besluitId || ''), 'rtg', boardroomWie(req), req.body.voor === true)));
   app.post('/api/rtfkantoor/stadsraad/besluit-sluit', officeAuth, (req, res) => veilig(res, () => stadsraad.besluitSluit(String(req.body.besluitId || ''))));
 
   app.post('/api/lab/ai', officeAuth, async (req, res) => {

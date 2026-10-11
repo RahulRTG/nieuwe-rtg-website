@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-06T16:44:21.467Z",
-    "commit": "c69fddd70",
+    "op": "2026-10-11T06:07:09.862Z",
+    "commit": "4b621148",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v26.10.0"
+    "node": "v22.22.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -3351,6 +3351,13 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "doos-inlogjournaal.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "doos-journaal.test.js": {
       "soort": "puur",
@@ -11546,6 +11553,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "poortoordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/poortoordeel.js",
+      "operator": "+->-#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "poortrace.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -13925,6 +13940,13 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "schorspoort-spelling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "schorspoort.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15054,6 +15076,13 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "staffjoin-orakel.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
     "stagevorm.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15083,6 +15112,13 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "overleefd"
+    },
+    "stapeen-uitgezet.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "startpagina.test.js": {
       "soort": "puur",
@@ -17409,6 +17445,13 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "werkplek-rem.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "overleefd"
     },
     "werkplek-tweede.e2e.js": {
       "soort": "server",

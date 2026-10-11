@@ -41,7 +41,7 @@ const post = (base, pad, body, token) => fetch(base + '/api' + pad, { method: 'P
 const tekst = (page) => page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 
 async function wachtOpTekst(page, re, waar) {
-  const tot = Date.now() + 15000;
+  const tot = Date.now() + 30000; // ruim: onder de volle e2e-ronde is een schrijfronde trager
   while (Date.now() < tot) {
     if (re.test(await tekst(page))) return;
     await new Promise(r => setTimeout(r, 150));

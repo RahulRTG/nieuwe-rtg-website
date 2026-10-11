@@ -458,15 +458,33 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
     await wachtOpTekst(kp, /Zet je naam erbij/, { in: '#melding' });
     assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 0, 'zonder naam is er niets gepubliceerd');
 
-    // en met een naam ook niet, zolang de keuring niet is gedraaid
+    /* DE GEDEELDE CODE MET EEN GETYPTE NAAM TEKENT NIET AF (11 oktober 2026).
+       Een naam in het veld is geen tweede handtekening; de server weigert met de
+       reden, en dit scherm hoort die reden te TONEN -- anders drukt wie hier zit
+       op Publiceren en moet hij raden waarom er niets gebeurt. */
     await kp.fill('#wie', 'Sam van RTG');
     await kp.click('[data-v] .pub');
-    /* Op de TEKST van deze weigering wachten en niet op "er staat iets": de
-       melding van de vorige klik ("zet je naam erbij") staat er nog even, en
-       daar zit het woord keuring ook in. */
-    await kp.waitForFunction(() => /nog niet over deze bundel gedraaid/.test(document.getElementById('melding').textContent),
+    await kp.waitForFunction(() => /geen handtekening/.test(document.getElementById('melding').textContent),
       null, { timeout: 15000 });
-    assert.match(await kp.textContent('#melding'), /nog niet over deze bundel gedraaid/,
+    assert.match(await kp.textContent('#melding'), /op naam/, 'de weigering zegt de weg erheen');
+    assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 0,
+      'de gedeelde code met een getypte naam publiceert niets');
+
+    /* ---- de keuring door een kantoormens OP NAAM, in een eigen browserpagina ---- */
+    const mensTok = await kantoorAlsPersoon(base);
+    assert.ok(mensTok, 'een kantoormens op naam logt in');
+    const mp = await browser.newPage();
+    const mf = letOpFouten(mp, []);
+    await mp.addInitScript((t) => { try { localStorage.setItem('rtg_office_token', t); } catch (e) { /* de cel mag niet bij opslag */ } }, mensTok);
+    await mp.goto(base + '/apps/appstore-kantoor.html');
+    await mp.waitForSelector('[data-v] .pub', { timeout: 20000 });
+
+    // op naam en met een naam: nog steeds niet, zolang de keuring niet is gedraaid
+    await mp.fill('#wie', 'Sam van RTG');
+    await mp.click('[data-v] .pub');
+    await mp.waitForFunction(() => /nog niet over deze bundel gedraaid/.test(document.getElementById('melding').textContent),
+      null, { timeout: 15000 });
+    assert.match(await mp.textContent('#melding'), /nog niet over deze bundel gedraaid/,
       'de server weigert, en zegt waarom');
     assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 0,
       'een naam alleen publiceert niets: de keuring moet eerst gedraaid zijn');
@@ -477,15 +495,16 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
     const keur = await api(base, '/api/appstore/kantoor/toegankelijk',
       { versieId: inz.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
     assert.equal(keur.status, 200, JSON.stringify(keur.body));
-
-    await kp.reload();
-    await kp.waitForSelector('[data-v] .pub', { timeout: 20000 });
-    assert.match(await kp.textContent('#main'), /Toegankelijkheid: geen fouten gevonden/,
+    await mp.reload();
+    await mp.waitForSelector('[data-v] .pub', { timeout: 20000 });
+    assert.match(await mp.textContent('#main'), /Toegankelijkheid: geen fouten gevonden/,
       'en de uitslag komt op het scherm terecht');
-    assert.match(await kp.textContent('#main'), /geen goedkeuring|blokkade weg/,
+    assert.match(await mp.textContent('#main'), /geen goedkeuring|blokkade weg/,
       'met erbij dat een geslaagde keuring nog steeds niets goedkeurt');
-    await kp.click('[data-v] .pub');
-    await kp.waitForFunction(() => !document.querySelector('[data-v] .pub'), null, { timeout: 15000 });
+    await mp.fill('#wie', 'Sam van RTG');
+    await mp.click('[data-v] .pub');
+    await mp.waitForFunction(() => !document.querySelector('[data-v] .pub'), null, { timeout: 15000 });
+    assert.deepEqual(mf, [], 'de keuringspagina op naam zonder onopgevangen fouten');
     assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 1, 'daarna wel');
 
     /* ---- en dan de winkel: de bon voordat er wordt betaald ---- */

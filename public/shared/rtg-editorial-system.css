@@ -148,6 +148,15 @@ body[data-rtg-desktop] .wd-date-tile b{font-family:var(--rtg-display)}
   body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-top::after{display:none}
   body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-mark{font-size:34px!important;gap:10px}
   body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-mark .wd-world-label{font-size:15px!important}
+  /* Op de smalste telefoons (320 px) paste FOUNDATIONOS niet naast de statusknop:
+     het merk vroeg 183 px waar 168 px was. Iets minder kantlijn en een kleiner
+     monogram houden de wereldnaam heel. Een structurele vangrail in de grid
+     (minmax(0,auto)) is geprobeerd en verworpen: naast een fr-kolom kromp het merk
+     daarmee op elke wereld tot 48 px, en de overlaptoets zag dat niet. */
+  @media(max-width:359px){
+    body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-top{padding:0 14px!important}
+    body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-mark{font-size:28px!important;gap:8px}
+  }
   body[data-world-home][data-rtg-shell="mobile"] .rtg-edge-profile{flex-basis:44px;width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;border-color:color-mix(in srgb,var(--rtg-world-metal) 55%,transparent)!important}
   body[data-rtg-skin="heritage"] :is(.kantoor-intro,.rtg-intro) h1{max-width:17ch}
   body[data-rtg-shell="mobile"] .wd-access{margin:24px 18px!important;padding:24px!important;border-radius:var(--rtg-radius-editorial)}

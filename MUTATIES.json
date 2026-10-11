@@ -16632,6 +16632,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "versmaltrap.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/codearchitect.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 5
+    },
     "verstrengeling.test.js": {
       "soort": "puur",
       "staat": "gezakt",

@@ -1,4 +1,4 @@
-/* HET BERAAD bij ./idemsleutels-nooit-routes.js -- zes routes die het ZELF al
+/* HET BERAAD bij ./idemsleutels-nooit-gemeenschap.js -- zes routes die het ZELF al
    weten. Vijf herkennen een herhaling en geven `herhaling: true` zonder iets te
    veranderen; heropenen weigert hem met 409. Een duplicaatlaag hoort daar NIET
    tussen, en de reden is bij alle zes dezelfde vorm: het venster van de laag is

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T06:52:02.234Z",
-    "commit": "c4e35133f",
+    "op": "2026-10-11T08:14:18.414Z",
+    "commit": "02adbb7ee",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -875,14 +875,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
-    },
-    "architectcontext.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/codearchitect.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 2,
-      "geprobeerd": 1
     },
     "architectproef.test.js": {
       "soort": "puur",
@@ -2305,6 +2297,13 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "clientafbreking.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "clipdeler.e2e.js": {
       "soort": "server",

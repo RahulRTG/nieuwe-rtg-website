@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T18:34:11.837Z",
-    "commit": "c02492be",
+    "op": "2026-10-11T18:56:48.074Z",
+    "commit": "e60d691f4",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5869,6 +5869,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "horeca-klokgrens.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/personeel.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 11
     },
     "horeca-leen-dienst.test.js": {
       "soort": "server",

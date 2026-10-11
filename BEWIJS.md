@@ -15,8 +15,8 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2444 |
 | losse beweringen (`test(...)`) | 16734 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2269 |
-| **overleefd**: geen mutatie kreeg hem rood | 1 (waarvan 0 met minder dan 8 pogingen) |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2270 |
+| **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
 | niets van beide | 0 |
@@ -738,7 +738,7 @@ toets omvalt.
 | `horeca-journey.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Horeca: de gastreis-toren, en de regel die hem verbouwde. HORECA.md grens 7: WAT NIET GEMETEN IS, WORDT NIET ALS GETAL GETOOND. |
 | `horeca-kaart.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Horeca: DE KAART VAN EEN ZAAK -- één opbouw, twee deuren. De kaart stond in routes/gast/tafel.js en werd aan de kern gehangen. |
 | `horeca-keuken.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Horeca OS, deel 2: het keukenscherm. Getoetst zijn de beloftes, niet de knoppen: - de keuken ziet niets van een gang die de zaal nog niet heeft vrijgegeven; - de allergie staat op elke weergave, ook op het... |
-| `horeca-klokgrens.test.js` | 3 | overleefd | DE KLOKGRENS -- de horecavloer leest uit het personeelsdomein precies EEN ding. Eigenaarsbesluit 1A (11 oktober 2026): de dragerstand op de Vloer mag de prikklok lezen, die van het personeelsdomein is... |
+| `horeca-klokgrens.test.js` | 3 | gezakt op `===->!==#0` | DE KLOKGRENS -- de horecavloer leest uit het personeelsdomein precies EEN ding. Eigenaarsbesluit 1A (11 oktober 2026): de dragerstand op de Vloer mag de prikklok lezen, die van het personeelsdomein is... |
 | `horeca-leen-dienst.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Horeca: EEN LEEN EN HET EINDE VAN DE DIENST. HORECA.md, "Wat de vloer nog niet kan": een leen kende geen einde van de dienst. |
 | `horeca-pas.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Horeca: DE PAS -- wie pakt een gereed staande gang op, en wie draagt hem. Het patroon bestond al voor gastverzoeken ("ik ga" en "gedaan" zijn twee knoppen), maar niet voor het eten bij de pas. |
 | `horeca-rahul.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Horeca: WAT RAHUL MAG, en de actiebon die er altijd bij hoort. De opdracht was letterlijk: een AI-voorstel kan nooit ONGEMERKT een allergie aanpassen, een betaling uitvoeren, een medewerker beoordelen, een... |

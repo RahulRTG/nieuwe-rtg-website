@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T18:22:00.899Z",
-    "commit": "39c17ccd",
+    "op": "2026-10-11T18:39:21.205Z",
+    "commit": "2424390c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1528,6 +1528,13 @@
       "operator": "true->false#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "betaalstop-spelling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "betaalstore.test.js": {
       "soort": "puur",
@@ -3351,6 +3358,13 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "doos-inlogjournaal.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "doos-journaal.test.js": {
       "soort": "puur",
@@ -11553,6 +11567,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "poortoordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/poortoordeel.js",
+      "operator": "+->-#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "poortrace.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -12402,6 +12424,13 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "rem-gelijktijdig.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "overleefd"
     },
     "rem.test.js": {
       "soort": "puur",
@@ -13948,6 +13977,13 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "schorspoort-spelling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "schorspoort.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15091,6 +15127,13 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "staffjoin-orakel.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
     "stagevorm.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15120,6 +15163,13 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "overleefd"
+    },
+    "stapeen-uitgezet.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "startpagina.test.js": {
       "soort": "puur",
@@ -17446,6 +17496,13 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "werkplek-rem.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "overleefd"
     },
     "werkplek-tweede.e2e.js": {
       "soort": "server",

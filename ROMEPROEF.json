@@ -1,14 +1,14 @@
 {
   "stempel": {
-    "op": "2026-10-11T16:02:25.517Z",
-    "commit": "9871c292",
+    "op": "2026-10-11T17:39:55.607Z",
+    "commit": "0e807d74",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/romeproef.js",
     "node": "v22.22.0"
   },
   "uitleg": "De Rome-keten: \"ik wil met mijn vrienden een weekend naar Rome, rekening houdend met ieders budget, vakantiedagen en voorkeuren\". Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?), over LivingOS, WorkOS, TravelOS en het geld. De drie grenzen van het besluit van 11 oktober 2026 zitten in de storingen. Elke openBekend-schakel draagt oorzaak, eigenaar, oplossing en soort: dat is de werklijst.",
-  "grens": "Er komt geen browser en geen model aan te pas: wat Rahul in gewone taal van dit alles zou maken is niet gemeten, alleen wat de routes eronder doen. FoundationOS loopt hier alleen als de universele bodem (schakel 17: verbinden voor een gratis account, SAMENLEVING.md); het scenario vraagt geen stichting, en een schakel verzinnen om haar te raken zou een route meten die niemand nodig had. Het kantoor werkt op de gedeelde code, dus een besluit op naam is hier niet gemeten. Boeken loopt op een catalogusreis omdat er geen Rome in de catalogus staat (schakel 13); betalen is alleen als WEIGERING gemeten.",
+  "grens": "Er komt geen browser en geen model aan te pas: wat Rahul in gewone taal van dit alles zou maken is niet gemeten, alleen wat de routes eronder doen. FoundationOS loopt hier alleen als de universele bodem (schakel 17: verbinden voor een gratis account, SAMENLEVING.md); het scenario vraagt geen stichting, en een schakel verzinnen om haar te raken zou een route meten die niemand nodig had. Het kantoor werkt op de gedeelde code, dus een besluit op naam is hier niet gemeten. Boeken loopt op een catalogusreis omdat er geen Rome in de catalogus staat (schakel 13); betalen is alleen als WEIGERING gemeten (namens een ander, of voordat een reisadviseur bevestigde) -- een geslaagde betaling per deelnemer vraagt een bevestiging op naam en een uitgesplitste reis, en die zijn hier niet opgezet. De budgettoets meet de VORM (toestemming, uitkomst alleen bij de vriend, delen met de organisator); welke uitkomst eruit komt hangt af van zijn pot en is geen oordeel van de proef.",
   "schakels": [
     {
       "nr": 1,
@@ -34,7 +34,7 @@
       "status": 200,
       "ziet": "bij de vriend: uitnodiging true, al lid false",
       "fout": null,
-      "ms": 11
+      "ms": 13
     },
     {
       "nr": 3,
@@ -47,7 +47,7 @@
       "status": 200,
       "ziet": "3 leden, op codenaam",
       "fout": null,
-      "ms": 8
+      "ms": 10
     },
     {
       "nr": 4,
@@ -60,7 +60,7 @@
       "status": 200,
       "ziet": "in de agenda van de vriend: 2 bijeenkomst(en)",
       "fout": null,
-      "ms": 9
+      "ms": 16
     },
     {
       "nr": 5,
@@ -71,9 +71,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "bij de organisator: 1 ja op 2026-11-10, komen: Rode Kraanvogel 0315",
+      "ziet": "bij de organisator: 1 ja op 2026-11-10, komen: Marmeren Valk CF79",
       "fout": null,
-      "ms": 21
+      "ms": 32
     },
     {
       "nr": 6,
@@ -86,7 +86,7 @@
       "status": 200,
       "ziet": "2026-11-10: 1 ja / 1 nee; 2026-11-17: 2 ja / 0 nee",
       "fout": null,
-      "ms": 15
+      "ms": 27
     },
     {
       "nr": 7,
@@ -94,17 +94,12 @@
       "van": "vriend",
       "naar": "organisator",
       "wat": "deelt zelf een beschikbaarheidsvenster (\"drie dagen in die week\") in plaats van ja/nee per datum",
-      "bekend": {
-        "soort": "bouwen",
-        "oorzaak": "Een bijeenkomst in kern/genootschap/bijeenkomst.js draagt een vaste `datum`, en antwoord() kent alleen ja, misschien en nee (ANTWOORDEN). Een venster dat met het antwoord wordt meegestuurd, wordt zonder melding genegeerd: de organisator ziet het nergens terug.",
-        "eigenaar": "LivingOS -- server/kern/genootschap/bijeenkomst.js (en datumRaad in kern/genootschap/ai.js, die alleen antwoorden telt)",
-        "oplossing": "Een peiling als vorm naast de bijeenkomst: de organisator zet een venster neer, elk lid geeft ZELF zijn beschikbare dagen op (nooit afgeleid uit agenda of rooster), en datumRaad telt overlap in plaats van ja-stemmen. De grens uit LIFE.md par. 4.3 geldt: alleen wat iemand zelf opgaf, wisbaar door hem."
-      },
-      "stand": "openBekend",
+      "bekend": null,
+      "stand": "gesloten",
       "status": 200,
-      "ziet": "de bijeenkomst bij de organisator draagt geen venster: velden id, wat, waar, datum, tijd, toelichting, gastheer, vanMij, plaatsen, ja, misschien, nee, vol, mijnAntwoord, komen, afgelast",
+      "ziet": "bij de organisator: 1 venster(s), overlap per dag 2026-11-17=1, 2026-11-18=1, 2026-11-19=1; naam van de vriend erin: false, telt als ja: false",
       "fout": null,
-      "ms": 5
+      "ms": 12
     },
     {
       "nr": 8,
@@ -115,7 +110,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "beste: 2026-11-17 (bron lokale-regels, model: false) -- \"2026-11-17 past op dit moment de meeste leden: 2 ja, 1 misschien en 0 nee. Iedereen heeft geantwoord.\"",
+      "ziet": "beste: 2026-11-17 (bron lokale-regels, model: false) -- \"2026-11-17 past op dit moment de meeste leden: 2 ja, 0 misschien en 0 nee. 1 lid heeft nog niet geantwoord. Rond die dat\"",
       "fout": null,
       "ms": 3
     },
@@ -130,7 +125,7 @@
       "status": 200,
       "ziet": "personeelsnummer 185, dienstverband bij Meridiaan BV als Receptie",
       "fout": null,
-      "ms": 122
+      "ms": 141
     },
     {
       "nr": 10,
@@ -141,14 +136,14 @@
       "bekend": {
         "soort": "bouwen",
         "oorzaak": "RTG Vrijheid beslist het verzoek meteen zelf en stuurt het niet naar een mens: de stap RIGHTS_POLICY zegt NIET_NODIG (\"U staat op die dag niet ingeroosterd; er hoeft niets vrij te worden gemaakt\"), omdat het rooster maar 7 dagen vooruit kijkt (kern/personeel.js, ook gemeld in `ontbreekt`). Voor een weekend over een maand bestaat dus nog geen dienst, het verzoek eindigt als DECLINED. Of die dag beschermd is wanneer het rooster later wordt gemaakt, is hier NIET gemeten -- het verzoek zelf staat in elk geval niet meer open. Het verlofsaldo is daarnaast niet aangesloten (Mijn tijd: \"Het saldo komt uit uw contract en payroll en is hier niet aangeleverd\").",
-        "eigenaar": "WorkOS -- server/kern/vrijheid/ (motor en teambeeld), saldo uit server/kern/payroll/; routes/vrijheid/tijd.js",
+        "eigenaar": "WorkOS -- server/kern/vrijheid/ (motor en teambeeld), saldo uit server/kern/payroll/; routes/vrijheid/tijd.js. In ronde 2 van het afbouwprogramma (11 oktober 2026) is dit het werk van de Vrijheid-werkstroom en niet van deze tak; besluit B1 (vakantiedagen) houdt de productiepoort van het saldo dicht tot de juridische toets van de rekenregel er is.",
         "oplossing": "Een verzoek voor een dag buiten de roosterhorizon wordt een VOORUITGEBOEKTE vrije dag die de planner leest wanneer het rooster wordt gemaakt (zoals kern/payroll/inplanbaar.js verzuim leest), of gaat als wachtend verzoek naar de leidinggevende -- niet DECLINED. En het vakantiesaldo uit het contract aansluiten (VRIJHEID.md, lus.js BLOCKED). Het saldo blijft van de medewerker en de werkgever; het verlaat WorkOS niet (storing 4)."
       },
       "stand": "openBekend",
       "status": 200,
       "ziet": "verzoek DECLINED (DECLINED, stap RIGHTS_POLICY NIET_NODIG: \"U staat op 2026-11-17 niet (op dat tijdstip) ingeroosterd; er hoeft niets vrij te worden gemaakt en er wordt niets afgeschreven.\"), bij de leidinggevende wachtend: false; stappen: ELIGIBILITY=OK, RIGHTS_POLICY=NIET_NODIG; in dienst: true, verlofsaldo: niet aangesloten (\"Het saldo komt uit uw contract en payroll en is hier niet aangeleverd.\")",
       "fout": null,
-      "ms": 152
+      "ms": 280
     },
     {
       "nr": 11,
@@ -159,9 +154,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "pot \"Rome-0315\", doel 45317 centen, stand 0",
+      "ziet": "pot \"Rome-CF79\", doel 45317 centen, stand 0",
       "fout": null,
-      "ms": 6
+      "ms": 12
     },
     {
       "nr": 12,
@@ -169,17 +164,12 @@
       "van": "vriend",
       "naar": "Rahul",
       "wat": "laat Rahul per deelnemer alleen weten of het weekend past, zonder bedrag en zonder vergelijking",
-      "bekend": {
-        "soort": "besluit",
-        "oorzaak": "Er is geen deling van \"past / past niet\": een pot (kern/geldbeleid/potten.js) is alleen van het lid zelf, en Rahul in Sociaal (routes/socialerahul.js) leest uitsluitend de sociale graaf -- zijn antwoord noemt geen deelnemer en geen budget. Rahul kan het budget dus niet meewegen, ook niet zonder bedrag.",
-        "eigenaar": "het geld (GELD.md) en LivingOS (LIFE.md par. 4.6) samen -- server/kern/geldbeleid/ en server/kern/levensband/ voor de deling",
-        "oplossing": "Een deling op kern/levensband/ (eigen cap, vervaldatum, intrekbaar door elke kant) die per deelnemer uitsluitend een BOOLEAN projecteert: past het opgegeven bedrag binnen zijn eigen pot. Nooit het bedrag, nooit een volgorde, en \"past niet\" zonder reden. Vraagt eerst een besluit van de eigenaar of deze deling mag bestaan (LIFE.md par. 4.6: toestemming reist niet mee)."
-      },
-      "stand": "openBekend",
+      "bekend": null,
+      "stand": "gesloten",
       "status": 200,
-      "ziet": "Rahul antwoordt: \"1 ding wacht op u, 1 voorstel staat klaar.\" op gronden: wacht op u: 1 · ligt bij een ander: 0 | Genootschap · Weekend Rome · Weekend Rome · 2026-11-10 | Genootschap · Weekend Rome · Weekend Rome · 2026-11-17",
+      "ziet": "zonder toestemming: geen toestemming; met toestemming ziet de vriend zelf: past-niet; bij de organisator voor het delen: null, erna: past-niet; bedrag of saldo zichtbaar: false",
       "fout": null,
-      "ms": 8
+      "ms": 55
     },
     {
       "nr": 13,
@@ -187,17 +177,12 @@
       "van": "organisator",
       "naar": "reisbureau",
       "wat": "vraagt een weekend Rome; het advies wijst Rome aan of zegt eerlijk dat die er niet is",
-      "bekend": {
-        "soort": "bouwen",
-        "oorzaak": "De catalogus (db.data.partnerTrips, kern/reisaanbod.js) bevat Ibiza, Gstaad, Monaco en Lissabon -- geen Rome. Het advies matcht op losse woorden en wijst op \"weekend\" een reis naar GSTAAD aan, zonder te zeggen dat de gevraagde bestemming ontbreekt. Een advies naar een andere stad dan gevraagd is een verkeerd antwoord dat er goed uitziet.",
-        "eigenaar": "TravelOS -- server/kern/reisbureau-advies.js (rangschikking), aanbod in server/kern/reisaanbod.js",
-        "oplossing": "Het advies herkent een bestemming in de wens en geeft bij geen treffer GEEN andere stad maar de weg die er wel is: \"geen Rome in de catalogus; het reisbureau kan hem samenstellen\" (de klaarzetweg van schakel 14). Een Rome-reis in de catalogus is een inkoopbesluit (TRAVELCOMMERCE.md) en geen bouwtaak."
-      },
-      "stand": "openBekend",
+      "bekend": null,
+      "stand": "gesloten",
       "status": 200,
-      "ziet": "advies: Gstaad, alpien weekend -- reden \"Deze reis sluit aan op weekend.\"",
+      "ziet": "advies: (geen reis; ontbreekt: {\"bestemming\":\"Rome\"}) -- reden \"Er staat geen reis naar Rome in de catalogus. Ik wijs u daarom geen andere stad aan; een reis naar Rome bestaat hier all\"",
       "fout": null,
-      "ms": 3
+      "ms": 5
     },
     {
       "nr": 14,
@@ -210,7 +195,7 @@
       "status": 200,
       "ziet": "reis R-rome-2026-11-17, 2026-11-17 tot 2026-11-19",
       "fout": null,
-      "ms": 19
+      "ms": 34
     },
     {
       "nr": 15,
@@ -223,7 +208,7 @@
       "status": 200,
       "ziet": "uitnodiging klaar: true, reis zichtbaar voor ja: status 404",
       "fout": null,
-      "ms": 11
+      "ms": 15
     },
     {
       "nr": 16,
@@ -236,7 +221,7 @@
       "status": 200,
       "ziet": "reisgenoot ziet de reis: 200, kenmerk zichtbaar: false, bij de organisator aanvaard: true",
       "fout": null,
-      "ms": 10
+      "ms": 12
     },
     {
       "nr": 17,
@@ -249,7 +234,7 @@
       "status": 200,
       "ziet": "gratis account: 2 kandidaat-weekenden in zijn agenda, de reis zichtbaar als reisgenoot: 200",
       "fout": null,
-      "ms": 154
+      "ms": 496
     },
     {
       "nr": 18,
@@ -257,17 +242,12 @@
       "van": "organisator",
       "naar": "vriend",
       "wat": "vraagt de reis aan voor drie; elke medereiziger krijgt zijn eigen deel klaargezet om zelf te bevestigen en te betalen",
-      "bekend": {
-        "soort": "besluit",
-        "oorzaak": "Een aanvraag (kern/reisbureau.js boek) draagt `personen` als getal en `customerKey` van een lid: de medereizigers bestaan er niet in. De vriend ziet de aanvraag niet in /api/reisbureau/mijn, en betalen (kern/reisbureau-betaling.js) int de hele reissom op EEN boeking bij de aanvrager. Er is geen weg waarlangs ieder zijn eigen deel bevestigt.",
-        "eigenaar": "TravelOS -- server/kern/reisbureau.js en server/kern/reisbureau-betaling.js; de verdeling raakt TRAVELCOMMERCE.md (wie betaalt wat) en GELD.md par. 3",
-        "oplossing": "Deelnemers als verwijzing op de aanvraag (codenaam, en alleen na hun eigen ja in het reisgezelschap), met per deelnemer een KLAARGEZET deel dat hij zelf bevestigt en betaalt langs kern/pay. Nooit innen namens een ander. Wie het deel bepaalt en of RTG een gesplitste reissom mag innen is een besluit (TRAVELCOMMERCE.md), geen bouwtaak."
-      },
-      "stand": "openBekend",
+      "bekend": null,
+      "stand": "gesloten",
       "status": 200,
-      "ziet": "aanvraag RTG-R-5F8BCB voor 3 personen; de medereiziger ziet hem: false",
+      "ziet": "organisator boekt alleen zichzelf (1 persoon); de vriend bevestigde zelf en heeft een eigen aanvraag RTG-R-8177F6 voor 1; de aanvraag van de organisator in zijn lijst: false; stand bij de organisator: Poolvos 3DBE=klaargezet, Marmeren Valk CF79=bevestigd; vriend zonder pas ziet zijn deel: 1",
       "fout": null,
-      "ms": 12
+      "ms": 27
     },
     {
       "nr": 19,
@@ -275,17 +255,12 @@
       "van": "Rahul",
       "naar": "organisator",
       "wat": "stelt het weekend in een voorstel samen (datum uit de antwoorden, de reis, wie meegaat) en zet het klaar voor een bevestiging",
-      "bekend": {
-        "soort": "bouwen",
-        "oorzaak": "Life Command (kern/socialecommand/voorstellen.js) leidt voorstellen alleen af uit een openstaande zaak (\"laten weten of u komt\"); er is geen samenstelling over werelden. Rahul in Sociaal leest alleen de sociale graaf en weet niets van de reis, en kern/stuur/plan.js compileert stappen tegen het beleid maar heeft geen HTTP-ingang voor een lid en geen deze-groep-context.",
-        "eigenaar": "LivingOS -- server/kern/socialecommand/ (voorstellen), met de datum uit kern/genootschap/ai.js en de reis als projectie uit kern/reisgezelschap.js",
-        "oplossing": "Een samenstel-voorstel dat PROJECTEERT en niets bezit: datumRaad + de reis (alleen de velden van de reisgezelschap-poort) + per deelnemer past/past niet (schakel 12, zodra die deling er is). Een bevestiging zet alleen klaar wat een ander bereikt; elke uitnodiging en elk deel blijft een eigen ja van de ander. Hangt af van schakel 7, 12 en 18."
-      },
-      "stand": "openBekend",
+      "bekend": null,
+      "stand": "gesloten",
       "status": 200,
-      "ziet": "1 voorstel(len) bij de organisator: Laten weten of u komt - Weekend Rome",
+      "ziet": "datum 2026-11-17, reis Rome, 3 deelnemers; 2 stap(pen) in 1 golf(ven): Marmeren Valk CF79: betaalt zelf zijn eigen deel, nadat een reisadviseur zijn aanvraag bevestigde | Poolvos 3DBE: bevestigt zelf zijn eigen deel; uitgevoerd: []",
       "fout": null,
-      "ms": 7
+      "ms": 9
     }
   ],
   "storingen": [
@@ -311,7 +286,7 @@
       "grens": "menselijke regie",
       "belofte": "Rahul plaatst niets en verandert geen antwoord: de agenda is na de vraag dezelfde",
       "stand": "gehouden",
-      "wat": "voor [[1791734552086,1,0,1],[1791734552089,2,1,0]], na [[1791734552086,1,0,1],[1791734552089,2,1,0]]"
+      "wat": "voor [[1791740409232,1,0,1],[1791740409239,2,0,0]], na [[1791740409232,1,0,1],[1791740409239,2,0,0]]"
     },
     {
       "nr": 4,
@@ -319,7 +294,7 @@
       "grens": "MN-02 / vakantiedagen",
       "belofte": "niets van wat zijn werkgever over hem weet (saldo, dienstverband, verzoek) staat in wat de organisator, de groep of Rahul ziet",
       "stand": "gehouden",
-      "wat": "de vriend ziet in WorkOS zelf: 200; in 10 antwoorden aan de organisator gevonden: niets"
+      "wat": "de vriend ziet in WorkOS zelf: 200; in 13 antwoorden aan de organisator gevonden: niets"
     },
     {
       "nr": 5,
@@ -335,7 +310,7 @@
       "grens": "budget",
       "belofte": "zijn pot en zijn bedrag staan nergens bij de organisator, de groep of Rahul -- ook niet vergelijkend",
       "stand": "gehouden",
-      "wat": "gezocht naar \"Rome-0315\" en 45317 centen: niets gevonden"
+      "wat": "gezocht naar \"Rome-CF79\" en 45317 centen: niets gevonden"
     },
     {
       "nr": 7,
@@ -352,6 +327,38 @@
       "belofte": "de persoon komt uit de sessie: het lichaam kan geen ander noemen",
       "stand": "gehouden",
       "wat": "status 200, verzoek op personeelsnummer 185 (eigen: 185)"
+    },
+    {
+      "nr": 9,
+      "naam": "een budgettoets zonder (of na ingetrokken) toestemming",
+      "grens": "budget",
+      "belofte": "geen toestemming is geen uitkomst: niets te zien, niets te delen, en intrekken op het toestemmingsscherm sluit het meteen",
+      "stand": "gehouden",
+      "wat": "zonder toestemming: uitkomst null, delen 409; op het toestemmingsscherm: ja, intrekken 200; daarna uitkomst null, opnieuw delen 409"
+    },
+    {
+      "nr": 10,
+      "naam": "de budgetuitkomst van een vriend bij een andere deelnemer",
+      "grens": "budget",
+      "belofte": "wat Bram deelde gaat alleen naar de organisator van zijn deel; een andere reisgenoot ziet het nergens",
+      "stand": "gehouden",
+      "wat": "andere reisgenoot: 1 eigen deel, budget van een ander zichtbaar: false, stand van de organisator: 404; bij de organisator voor het delen: null"
+    },
+    {
+      "nr": 11,
+      "naam": "boeken of betalen namens een andere deelnemer",
+      "grens": "geld verlaat het huis niet vanzelf",
+      "belofte": "een deel bevestigt alleen wie het geldt, een aanvraag betaalt alleen wie hem deed, en een deel staat alleen klaar voor wie zelf meereist",
+      "stand": "gehouden",
+      "wat": "organisator bevestigt voor een ander: 404, betaalt de aanvraag van een ander: 404; reisgenoot voor een ander: 404; deel voor wie niet zelf ja zei: 409 \"Noordelijke Ster A566 reist (nog) niet mee als reisgenoot op deze reis. Een deel\"; het deel van de ander staat nog op klaargezet"
+    },
+    {
+      "nr": 12,
+      "naam": "Rahul stelt het weekend samen",
+      "grens": "menselijke regie",
+      "belofte": "het voorstel verandert niets: geen aanvraag, geen deel, geen antwoord in de agenda",
+      "stand": "gehouden",
+      "wat": "samenstellen 200, wereld voor en na gelijk: true"
     }
   ],
   "wereld": {
@@ -361,19 +368,19 @@
   },
   "telling": {
     "schakels": 19,
-    "gesloten": 13,
+    "gesloten": 18,
     "open": 0,
-    "openBekend": 6,
+    "openBekend": 1,
     "stuk": 0,
-    "storingen": 8,
-    "gehouden": 8,
+    "storingen": 12,
+    "gehouden": 12,
     "gebroken": 0
   },
   "perWereld": {
     "LivingOS": {
       "schakels": 9,
-      "gesloten": 7,
-      "openBekend": 2,
+      "gesloten": 9,
+      "openBekend": 0,
       "open": 0,
       "stuk": 0
     },
@@ -386,15 +393,15 @@
     },
     "geld": {
       "schakels": 2,
-      "gesloten": 1,
-      "openBekend": 1,
+      "gesloten": 2,
+      "openBekend": 0,
       "open": 0,
       "stuk": 0
     },
     "TravelOS": {
       "schakels": 5,
-      "gesloten": 3,
-      "openBekend": 2,
+      "gesloten": 5,
+      "openBekend": 0,
       "open": 0,
       "stuk": 0
     },
@@ -410,18 +417,6 @@
   "sluitMetBevinding": true,
   "werklijst": [
     {
-      "schakel": 7,
-      "wereld": "LivingOS",
-      "van": "vriend",
-      "naar": "organisator",
-      "wat": "deelt zelf een beschikbaarheidsvenster (\"drie dagen in die week\") in plaats van ja/nee per datum",
-      "gemeten": "de bijeenkomst bij de organisator draagt geen venster: velden id, wat, waar, datum, tijd, toelichting, gastheer, vanMij, plaatsen, ja, misschien, nee, vol, mijnAntwoord, komen, afgelast",
-      "soort": "bouwen",
-      "oorzaak": "Een bijeenkomst in kern/genootschap/bijeenkomst.js draagt een vaste `datum`, en antwoord() kent alleen ja, misschien en nee (ANTWOORDEN). Een venster dat met het antwoord wordt meegestuurd, wordt zonder melding genegeerd: de organisator ziet het nergens terug.",
-      "eigenaar": "LivingOS -- server/kern/genootschap/bijeenkomst.js (en datumRaad in kern/genootschap/ai.js, die alleen antwoorden telt)",
-      "oplossing": "Een peiling als vorm naast de bijeenkomst: de organisator zet een venster neer, elk lid geeft ZELF zijn beschikbare dagen op (nooit afgeleid uit agenda of rooster), en datumRaad telt overlap in plaats van ja-stemmen. De grens uit LIFE.md par. 4.3 geldt: alleen wat iemand zelf opgaf, wisbaar door hem."
-    },
-    {
       "schakel": 10,
       "wereld": "WorkOS",
       "van": "vriend",
@@ -430,56 +425,8 @@
       "gemeten": "verzoek DECLINED (DECLINED, stap RIGHTS_POLICY NIET_NODIG: \"U staat op 2026-11-17 niet (op dat tijdstip) ingeroosterd; er hoeft niets vrij te worden gemaakt en er wordt niets afgeschreven.\"), bij de leidinggevende wachtend: false; stappen: ELIGIBILITY=OK, RIGHTS_POLICY=NIET_NODIG; in dienst: true, verlofsaldo: niet aangesloten (\"Het saldo komt uit uw contract en payroll en is hier niet aangeleverd.\")",
       "soort": "bouwen",
       "oorzaak": "RTG Vrijheid beslist het verzoek meteen zelf en stuurt het niet naar een mens: de stap RIGHTS_POLICY zegt NIET_NODIG (\"U staat op die dag niet ingeroosterd; er hoeft niets vrij te worden gemaakt\"), omdat het rooster maar 7 dagen vooruit kijkt (kern/personeel.js, ook gemeld in `ontbreekt`). Voor een weekend over een maand bestaat dus nog geen dienst, het verzoek eindigt als DECLINED. Of die dag beschermd is wanneer het rooster later wordt gemaakt, is hier NIET gemeten -- het verzoek zelf staat in elk geval niet meer open. Het verlofsaldo is daarnaast niet aangesloten (Mijn tijd: \"Het saldo komt uit uw contract en payroll en is hier niet aangeleverd\").",
-      "eigenaar": "WorkOS -- server/kern/vrijheid/ (motor en teambeeld), saldo uit server/kern/payroll/; routes/vrijheid/tijd.js",
+      "eigenaar": "WorkOS -- server/kern/vrijheid/ (motor en teambeeld), saldo uit server/kern/payroll/; routes/vrijheid/tijd.js. In ronde 2 van het afbouwprogramma (11 oktober 2026) is dit het werk van de Vrijheid-werkstroom en niet van deze tak; besluit B1 (vakantiedagen) houdt de productiepoort van het saldo dicht tot de juridische toets van de rekenregel er is.",
       "oplossing": "Een verzoek voor een dag buiten de roosterhorizon wordt een VOORUITGEBOEKTE vrije dag die de planner leest wanneer het rooster wordt gemaakt (zoals kern/payroll/inplanbaar.js verzuim leest), of gaat als wachtend verzoek naar de leidinggevende -- niet DECLINED. En het vakantiesaldo uit het contract aansluiten (VRIJHEID.md, lus.js BLOCKED). Het saldo blijft van de medewerker en de werkgever; het verlaat WorkOS niet (storing 4)."
-    },
-    {
-      "schakel": 12,
-      "wereld": "geld",
-      "van": "vriend",
-      "naar": "Rahul",
-      "wat": "laat Rahul per deelnemer alleen weten of het weekend past, zonder bedrag en zonder vergelijking",
-      "gemeten": "Rahul antwoordt: \"1 ding wacht op u, 1 voorstel staat klaar.\" op gronden: wacht op u: 1 · ligt bij een ander: 0 | Genootschap · Weekend Rome · Weekend Rome · 2026-11-10 | Genootschap · Weekend Rome · Weekend Rome · 2026-11-17",
-      "soort": "besluit",
-      "oorzaak": "Er is geen deling van \"past / past niet\": een pot (kern/geldbeleid/potten.js) is alleen van het lid zelf, en Rahul in Sociaal (routes/socialerahul.js) leest uitsluitend de sociale graaf -- zijn antwoord noemt geen deelnemer en geen budget. Rahul kan het budget dus niet meewegen, ook niet zonder bedrag.",
-      "eigenaar": "het geld (GELD.md) en LivingOS (LIFE.md par. 4.6) samen -- server/kern/geldbeleid/ en server/kern/levensband/ voor de deling",
-      "oplossing": "Een deling op kern/levensband/ (eigen cap, vervaldatum, intrekbaar door elke kant) die per deelnemer uitsluitend een BOOLEAN projecteert: past het opgegeven bedrag binnen zijn eigen pot. Nooit het bedrag, nooit een volgorde, en \"past niet\" zonder reden. Vraagt eerst een besluit van de eigenaar of deze deling mag bestaan (LIFE.md par. 4.6: toestemming reist niet mee)."
-    },
-    {
-      "schakel": 13,
-      "wereld": "TravelOS",
-      "van": "organisator",
-      "naar": "reisbureau",
-      "wat": "vraagt een weekend Rome; het advies wijst Rome aan of zegt eerlijk dat die er niet is",
-      "gemeten": "advies: Gstaad, alpien weekend -- reden \"Deze reis sluit aan op weekend.\"",
-      "soort": "bouwen",
-      "oorzaak": "De catalogus (db.data.partnerTrips, kern/reisaanbod.js) bevat Ibiza, Gstaad, Monaco en Lissabon -- geen Rome. Het advies matcht op losse woorden en wijst op \"weekend\" een reis naar GSTAAD aan, zonder te zeggen dat de gevraagde bestemming ontbreekt. Een advies naar een andere stad dan gevraagd is een verkeerd antwoord dat er goed uitziet.",
-      "eigenaar": "TravelOS -- server/kern/reisbureau-advies.js (rangschikking), aanbod in server/kern/reisaanbod.js",
-      "oplossing": "Het advies herkent een bestemming in de wens en geeft bij geen treffer GEEN andere stad maar de weg die er wel is: \"geen Rome in de catalogus; het reisbureau kan hem samenstellen\" (de klaarzetweg van schakel 14). Een Rome-reis in de catalogus is een inkoopbesluit (TRAVELCOMMERCE.md) en geen bouwtaak."
-    },
-    {
-      "schakel": 18,
-      "wereld": "TravelOS",
-      "van": "organisator",
-      "naar": "vriend",
-      "wat": "vraagt de reis aan voor drie; elke medereiziger krijgt zijn eigen deel klaargezet om zelf te bevestigen en te betalen",
-      "gemeten": "aanvraag RTG-R-5F8BCB voor 3 personen; de medereiziger ziet hem: false",
-      "soort": "besluit",
-      "oorzaak": "Een aanvraag (kern/reisbureau.js boek) draagt `personen` als getal en `customerKey` van een lid: de medereizigers bestaan er niet in. De vriend ziet de aanvraag niet in /api/reisbureau/mijn, en betalen (kern/reisbureau-betaling.js) int de hele reissom op EEN boeking bij de aanvrager. Er is geen weg waarlangs ieder zijn eigen deel bevestigt.",
-      "eigenaar": "TravelOS -- server/kern/reisbureau.js en server/kern/reisbureau-betaling.js; de verdeling raakt TRAVELCOMMERCE.md (wie betaalt wat) en GELD.md par. 3",
-      "oplossing": "Deelnemers als verwijzing op de aanvraag (codenaam, en alleen na hun eigen ja in het reisgezelschap), met per deelnemer een KLAARGEZET deel dat hij zelf bevestigt en betaalt langs kern/pay. Nooit innen namens een ander. Wie het deel bepaalt en of RTG een gesplitste reissom mag innen is een besluit (TRAVELCOMMERCE.md), geen bouwtaak."
-    },
-    {
-      "schakel": 19,
-      "wereld": "LivingOS",
-      "van": "Rahul",
-      "naar": "organisator",
-      "wat": "stelt het weekend in een voorstel samen (datum uit de antwoorden, de reis, wie meegaat) en zet het klaar voor een bevestiging",
-      "gemeten": "1 voorstel(len) bij de organisator: Laten weten of u komt - Weekend Rome",
-      "soort": "bouwen",
-      "oorzaak": "Life Command (kern/socialecommand/voorstellen.js) leidt voorstellen alleen af uit een openstaande zaak (\"laten weten of u komt\"); er is geen samenstelling over werelden. Rahul in Sociaal leest alleen de sociale graaf en weet niets van de reis, en kern/stuur/plan.js compileert stappen tegen het beleid maar heeft geen HTTP-ingang voor een lid en geen deze-groep-context.",
-      "eigenaar": "LivingOS -- server/kern/socialecommand/ (voorstellen), met de datum uit kern/genootschap/ai.js en de reis als projectie uit kern/reisgezelschap.js",
-      "oplossing": "Een samenstel-voorstel dat PROJECTEERT en niets bezit: datumRaad + de reis (alleen de velden van de reisgezelschap-poort) + per deelnemer past/past niet (schakel 12, zodra die deling er is). Een bevestiging zet alleen klaar wat een ander bereikt; elke uitnodiging en elk deel blijft een eigen ja van de ander. Hangt af van schakel 7, 12 en 18."
     }
   ]
 }

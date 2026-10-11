@@ -525,17 +525,63 @@ Dit zijn **vragen en geen conclusies**. Elk noemt welk ontwerpdeel ervan afhangt
 
 ---
 
-## 9. Besluiten die de eigenaar nog moet nemen
+## 9. Besluiten van de eigenaar (11 oktober 2026)
 
-| # | besluit | aanbeveling |
+De eigenaar keurde de uitkomst van fase 0 goed als uitgangspunt voor de volgende
+fase, onder voorbehoud van de CI- en reviewresultaten van PR #544 en #546, en nam
+deze besluiten:
+
+| # | vraag | besluit |
 |---|---|---|
-| 1 | welk VOG-model de waarheid wordt | `vakbewijs` (nummer in de kluis, RTG tekent af), met rtfos als lezer -- na vraag 4 |
-| 2 | B4 op bestaande terreinen of een zesde terrein | bestaande terreinen: het contract blijft onaangeraakt |
-| 3 | een volwassene en een minderjarige buiten een gezin: één-op-één berichten huisbreed uit? | ja, met School als bewuste uitzondering |
-| 4 | stemmen in een beraad zichtbaar voor de leden, of alleen aantallen | zichtbaar zoals het prikbord, alleen aantallen bij een G3-gemeenschap |
-| 5 | idempotent afgelasten (gedragswijziging in het genootschap) | ja |
-| 6 | een gemeenschap kan "geloof" of "zorg" als soort dragen (G3) | ja, met `gevoelig: 3` en verplicht `besloten` -- na vraag 2 |
-| 7 | genootschap en leren-projecten samenvoegen | nee, na B1 opnieuw meten |
+| 1 | welk VOG-model de waarheid wordt | **ja, voorwaardelijk**: het `vakbewijs`-model, maar pas actief na juridische toetsing (vraag 4 en 5). Alleen gegevens die noodzakelijk en rechtmatig zijn; geen opslag van de VOG zelf als dat niet noodzakelijk is |
+| 2 | B4 op bestaande terreinen of een zesde terrein | **ja, bestaande terreinen**: geen zesde terrein en geen dubbele infrastructuur |
+| 3 | een volwassene en een minderjarige buiten een gezin: één-op-één berichten | **ja, huisbreed blokkeren** buiten toegestane gezinscontexten. School krijgt uitsluitend een expliciet afgebakende, gecontroleerde uitzondering met passende bevoegdheden, toezicht en logging |
+| 4 | stemmen in een beraad | **aangepast**: individuele stemmen alleen zichtbaar als dat noodzakelijk, vooraf duidelijk en passend is. Bij geloofs-, zorg- en andere gevoelige gemeenschappen standaard niet individueel herleidbaar; alleen geaggregeerde uitslagen die geen deelnemer identificeerbaar maken. Onderzoek de bescherming van kleine groepen (par. 9.1) |
+| 5 | idempotent afgelasten | **ja**: de eerste geldige afgelasting blijft leidend; een herhaald verzoek overschrijft de oorspronkelijke registratie niet |
+| 6 | geloofs- en zorggemeenschappen (G3) | **ja, voorwaardelijk**: standaard besloten, strikte gegevensisolatie, geen automatische ledenuitwisseling; definitieve implementatie pas na de juridische en privacyvragen. Onderzoek of ook het bestaan en de naam afgeschermd moeten kunnen worden (par. 9.2) |
+| 7 | genootschap en leren-projecten samenvoegen | **nee, nu niet**: domeingrenzen behouden, opnieuw meten na B1 |
+
+Fase 1a kreeg akkoord onder voorwaarden: een herstel- en stabilisatiefase, **geen**
+toestemming om de nieuwe bouwstenen te implementeren. Daarvoor komen afzonderlijke
+architectuur- en implementatiebesluiten.
+
+### 9.1 Onderzoeksvraag: kleine groepen en stemmen (bij besluit 4)
+
+Wat er al staat, en waarom het voor een beraad niet genoeg is:
+
+- `kern/bedrijfsmaat/poort.js` heeft per klasse een ondergrens (zaken 5, leden en
+  gezinnen 10) en geeft onder die grens geen waarde, geen nul en geen aantal maar
+  `TE_KLEINE_GROEP` met de reden. Dat is de juiste vorm: de grens valt aan de bron,
+  niet op het scherm.
+- Een stemuitslag is kwetsbaarder dan een telling over een stad. Drie gevallen
+  maken een geaggregeerde uitslag toch herleidbaar: **unanimiteit** (10 van 10 voor
+  zegt wat ieder stemde), **een groep onder de grens**, en **differentie** (wie de
+  uitslag vóór en na één nieuwe stem ziet, kent die stem). Het eerste en het laatste
+  vangt een drempel op het aantal deelnemers niet.
+- Voorstel voor de beraadfase (B3), ter beslissing: (a) onder een minimum aantal
+  stemmers geen uitslag maar alleen "besloten / niet besloten" met de reden;
+  (b) de uitslag pas tonen na het sluiten, nooit tussentijds, zodat differentie
+  niet kan; (c) bij een gevoelige gemeenschap alleen de eindstand (aangenomen,
+  verworpen) en geen verhouding; (d) de minimumgrens als klasse in
+  `bedrijfsmaat/poort.js` en niet als tweede grensmodule.
+- Let op dat celveilig niet queryveilig is (`VERDER.md` par. 7, en gebrek 6 in
+  par. 6 is precies die fout): "overige (1)" verraadt één groep.
+
+### 9.2 Onderzoeksvraag: bestaan en naam afschermen (bij besluit 6)
+
+- Het genootschap heeft dit al half: `geheim` betekent dat een groep in geen enkele
+  lijst staat voor wie er niet in zit (`genootschap/index.js:197`). Dat schermt het
+  bestaan af tegenover niet-leden.
+- Wat het NIET afschermt: de groepsnaam reist mee in een uitnodiging en in een
+  melding (`bijeenkomst.js` zet `p.gr.naam` in de meldtekst), en een melding staat op
+  het toestel van de ontvanger, ook in het voorbeeld op een vergrendeld scherm. Voor
+  een geloofs- of zorggemeenschap is de naam zelf het bijzondere gegeven.
+- Voorstel ter beslissing: voor een gevoelige gemeenschap (a) altijd `geheim`;
+  (b) een neutrale weergavenaam voor meldingen ("Je hebt een nieuwe uitnodiging")
+  naast de echte naam binnen de groep; (c) de naam niet in de uitvoer van een
+  ANDER lid, alleen in de eigen; (d) geen verbond met een gevoelige gemeenschap
+  waarin de naam aan de andere kant zichtbaar wordt zonder dat de leden dat weten.
+  Dit hoort bij juridische vraag 2 en wordt niet gebouwd voor die beantwoord is.
 
 ---
 

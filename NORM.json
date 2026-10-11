@@ -28,8 +28,8 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4515,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1686,
-    "kernGedeeld": 255,
+    "kernBreedte": 1691,
+    "kernGedeeld": 258,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 50,
     "keuringDubbeling": 181,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 2134,
-    "toetsenNietGemeten": 134,
+    "toetsenNietGemeten": 142,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -4438,6 +4438,36 @@
       "meter": "bronscannerGemist 595 -> 596",
       "reden": "POST /api/foundation/school/belkanaal/ticket (#523, commit be127cdc1: geen sessie meer in het adres van een stroom) hangt op de /api/foundation-router, de familie die de bronscanner van de Capability Graph niet ziet -- zelfde vorm als de notitie van 2026-10-11 bij #521. Gemeten door de gemist-lijst van scripts/lib/bronscannerachterstand.js op de kop van #542 naast die van deze samenvoeging te leggen: dit is de enige nieuwe. De router en routedekking kennen hem.",
       "waarheen": "de bronscanner herbaseren op de router (zie de notitie van 2026-10-11)"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "kernGedeeld",
+      "van": 255,
+      "vervalt": "2027-01-09",
+      "meter": "kernGedeeld 255 -> 258",
+      "reden": "Vier nieuwe kernnamen die meer dan een domein aanraakt, elk met zijn PR gemeten (scripts/grenzen.js, gedeeldeNamen naast die van main gelegd): sessiestroom (#523, stroomtickets zonder sessie in het adres), genootschapDrager (#557, de drager van een genootschap), herstelSmsDicht (#580, een plek voor de vraag of telefoonherstel dicht staat) en klokVan (#584, de dragerstand op de Vloer). Elk is een gedeelde vraag die anders twee keer zou staan.",
+      "waarheen": "de vier namen bij hun volgende wijziging achter een eigen kleine poortmodule zetten in plaats van op de kern-tas"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1686,
+      "vervalt": "2027-01-09",
+      "meter": "kernBreedte 1686 -> 1691",
+      "reden": "Dezelfde ronde: de vier gedeelde namen hierboven plus de nieuwe kernmodules van de samengevoegde PRs (verbond, beraad, drager, uitgangspoort, afstemming) die routes aanraken. Gemeten met scripts/grenzen.js naast main.",
+      "waarheen": "zie kernGedeeld"
+    },
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 134,
+      "vervalt": "2027-01-09",
+      "meter": "toetsenNietGemeten 134 -> 142",
+      "reden": "Acht nieuwe toetsbestanden uit de laatste samenvoeging waar de mutatiemotor nog niet langs is geweest, met naam: conciergelusscherm.e2e.js en conciergeproef.test.js (#562), contrastfoto.e2e.js (#549), office-formaten-eenheid.test.js, office-formaten.e2e.js, office-formaten.test.js en office-uitgangspoort.test.js (#582) en opnieuwbeginnen.test.js (#580). Geen van de PRs had ze in MUTATIES.json staan.",
+      "waarheen": "npm run mutatie over deze acht draaien en MUTATIES.json vastleggen"
     }
   ],
   "prestatie": {

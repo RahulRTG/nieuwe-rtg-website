@@ -83,6 +83,8 @@ const EIGENAAR = {
     waarom: 'npm run contextdoorgifte schrijft het (met de ratel onder `ratel`); test/contextdoorgifte-server.test.js houdt een deelronde ertegen.' },
   'TRUST_EVIDENCE_PLANE.json': { schrijver: 'scripts/trust-evidence-plane.js',
     waarom: 'npm run trust:manifest schrijft het; keuringsregel 74 (scripts/check.js) eist dat het bij de uitvoerbare kern hoort.' },
+  'TOEZEGKLASSEN.json': { soort: 'BRON', waarom: 'Handgeschreven besluitbestand onder de inventaris van AFBOUWPROGRAMMA.md (#559); elk citaat moet letterlijk in zijn document staan en test/toezegklassen.test.js bewaakt dat.' },
+  'ONTWERPSTANDAARD-METING.md': { soort: 'BRON', waarom: 'Handgeschreven meetverslag van website tegenover app (#585), op een genoemde commit; verandert geen code.' },
   'LIBRARYOS.md': { soort: 'BRON', waarom: 'Handgeschreven ontwerp van LibraryOS (#502); de kernel- en HTTP-toetsen leveren het bewijs.' },
   'LIBRARYOS-RESULTAAT.md': { soort: 'BRON', waarom: 'Handgeschreven opleververslag van LibraryOS (#502).' },
   'GEMEENSCHAP.md': { soort: 'BRON', waarom: 'Handgeschreven richtingsdocument van FoundationOS als Human & Social Infrastructure.' },

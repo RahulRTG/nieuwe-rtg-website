@@ -576,10 +576,8 @@ function tooManyTries(res, bucket) {
 /* DE BUCKET IS DE DEUR, DE BRON IS DE AANVALLER -- EN DAT ZIJN TWEE DINGEN.
 
    `bucket` is waar geteld wordt voor de snelheidsrem, en die is met opzet fijn:
-   'auth:<ip>:<account>', met als account een vingerafdruk van het gevonden
-   account (of van de getikte naam als er geen is; kern/identiteit/wachtwoordrem.js).
-   Het account hoort daarin, want anders kan iemand het account van een ander
-   op slot zetten door het tien keer fout te raden.
+   'auth:<ip>:<account>' (kern/identiteit/wachtwoordrem.js). Het account hoort
+   daarin, want anders zet iemand het account van een ander op slot.
 
    `bron` is WIE er klopt. Die gaat apart mee naar het beveiligingsjournaal,
    want de noodrem daar stelt een andere vraag: hoeveel AANVALLERS zijn er?

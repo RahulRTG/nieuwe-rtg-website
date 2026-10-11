@@ -188,6 +188,18 @@ async function laad(){
     '</button>').join('') : RTGFirstSteps.welcome('reisbureau');
   RTGFirstSteps.sync();
   $('#travelAdvice').hidden = !ALLE.length;
+  /* Een andere ingang (Reizen & Veilig) mag een wens of een reis MEEGEVEN, nooit
+     een advies opvragen of iets versturen: de wens wordt ingevuld en drukken doet
+     het lid hier zelf. Een reis-id die niet in de catalogus staat, opent niets. */
+  const mee = new URLSearchParams(location.search);
+  if (mee.get('wens') && ALLE.length && !$('#adviesIn').value) {
+    $('#adviesIn').value = mee.get('wens').slice(0, 200);
+    $('#travelAdvice').hidden = false;
+  } else if (mee.get('wens') && !ALLE.length) {
+    /* Een wens die nergens heen kan, verdwijnt niet stil. */
+    meld('Er is nu geen samengestelde reis om uw wens tegen te leggen. Uw wens is niet verstuurd.');
+  }
+  if (mee.get('reis') && typeof openReis === 'function') openReis(mee.get('reis'));
   $('#lijst').querySelectorAll('.reis').forEach(b => b.addEventListener('click', () => openReis(b.dataset.id)));
   laadMijn();
 }

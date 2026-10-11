@@ -196,7 +196,9 @@ async function proef(basis) {
 
   r = await post('/api/member/bureau/zaak/open', { titel: 'Probeer de lus te forceren', domein: 'gelegenheden', werkwijze: 'voorstel' }, ander);
   storing(5, 'een lid kan de werkwijze niet zelf zetten: een gewone case blijft gewoon',
-    r.status !== 200 || (r.body.zaak || {}).werkwijze !== 'voorstel', 'werkwijze ' + ((r.body || {}).zaak || {}).werkwijze);
+    // de case moet WEL ontstaan: een weigering bewijst niet dat de werkwijze niet te zetten is
+    r.status === 200 && !!(r.body.zaak || {}).id && (r.body.zaak || {}).werkwijze !== 'voorstel',
+    'status ' + r.status + ', werkwijze ' + ((r.body || {}).zaak || {}).werkwijze);
 
   r = await K('/vertraging', { onderdeel: alt.id, minuten: 10 });
   const kl2 = (r.body || {}).klaar || {};

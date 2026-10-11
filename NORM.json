@@ -10,7 +10,7 @@
     "bewijsAlleenKeten": 23,
     "bewijsCellenBewezen": 28249,
     "bronBlindeBestanden": 0,
-    "browserpoortToetsen": 430,
+    "browserpoortToetsen": 433,
     "carriereDomeinenGemeten": 15,
     "dbDeuren": 536,
     "dbDeurenSchrijvend": 275,
@@ -19,7 +19,7 @@
     "delenZonderOnderwerp": 0,
     "dependencies": 0,
     "devPakketten": 1,
-    "e2eBestanden": 308,
+    "e2eBestanden": 310,
     "endpointsNooitAangeraakt": 0,
     "endpointsZonderTest": 854,
     "faalproefGezakt": 0,
@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 9,
     "onbewaakt": 0,
-    "ratelTanden": 168,
+    "ratelTanden": 170,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 2,
     "rolscheidingGaten": 0,
@@ -162,7 +162,9 @@
     "positieNaTaak": 0,
     "positiePassages": 0,
     "aankomstUitPositie": 0,
-    "loopFabricTijdelijk": 168
+    "loopFabricTijdelijk": 168,
+    "schilHerstarts": 11,
+    "schilDubbeleVerzoeken": 19
   },
   "notities": [
     {
@@ -4423,7 +4425,9 @@
     "positiePassages": "2026-09-29",
     "aankomstUitPositie": "2026-09-29",
     "bronBlindeBestanden": "2026-10-04",
-    "zelfpoortendeToetsen": "2026-10-06"
+    "zelfpoortendeToetsen": "2026-10-06",
+    "schilHerstarts": "2026-10-11",
+    "schilDubbeleVerzoeken": "2026-10-11"
   },
   "uitzonderingen": []
 }

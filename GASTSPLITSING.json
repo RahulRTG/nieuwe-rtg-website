@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-06T19:38:21.948Z",
-    "commit": "f3816ac97",
+    "op": "2026-10-11T17:27:36.883Z",
+    "commit": "06941e02",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/gastsplitsing.js",
@@ -15,9 +15,9 @@
     "plekken": 140,
     "perSoort": {
       "vertakt": 23,
-      "onderscheidt": 25,
+      "onderscheidt": 26,
       "pas-eis": 11,
-      "leden": 80,
+      "leden": 79,
       "zonder-tekst": 1
     },
     "tegenspraak": 0
@@ -355,9 +355,9 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/gegevenskaart.js:16",
-      "soort": "leden",
-      "zegt": "Een gegevenskaart hoort bij een ledendossier; gasten hebben er geen."
+      "plek": "server/routes/member/gegevenskaart.js:20",
+      "soort": "onderscheidt",
+      "zegt": null
     },
     {
       "plek": "server/routes/member/gemeente.js:12",
@@ -460,12 +460,12 @@
       "zegt": "Alleen voor leden."
     },
     {
-      "plek": "server/routes/member/privacy.js:21",
+      "plek": "server/routes/member/privacy.js:26",
       "soort": "onderscheidt",
       "zegt": null
     },
     {
-      "plek": "server/routes/member/privacy.js:93",
+      "plek": "server/routes/member/privacy.js:98",
       "soort": "leden",
       "zegt": "Alleen voor leden."
     },

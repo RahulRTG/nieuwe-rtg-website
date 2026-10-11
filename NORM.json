@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 76,
-    "bewijsAchterstand": 680,
+    "bewijsAchterstand": 823,
     "bewijsAlleenKeten": 23,
     "bewijsCellenBewezen": 28249,
     "bronBlindeBestanden": 0,
@@ -165,6 +165,16 @@
     "loopFabricTijdelijk": 168
   },
   "notities": [
+    {
+      "datum": "2026-10-11",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 680,
+      "vervalt": "2027-01-09",
+      "meter": "bewijsAchterstand 680 -> 823",
+      "reden": "Zichtbaar geworden, niet nieuw ontstaan: WAAROM.json stond sinds 30 augustus 2026 op een vuile meting omdat scripts/waarom.js op main omviel (maakSleutels bestaat niet meer in scripts/lib/proefsleutels.js). Gerepareerd in deze PR; de verse meting ziet 4544 routes tegen 3805, en de 143 extra object-vooraf-posten zijn routes die sindsdien op main zijn bijgekomen.",
+      "waarheen": "De object-vooraf-posten aflossen via de objectpool (scripts/lib/objectpool.js) en de lijfsleutels; BEWIJSSCHULD.json draagt de groei met reden."
+    },
     {
       "datum": "2026-10-11",
       "soort": "structureel",

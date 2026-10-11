@@ -17,6 +17,21 @@ staat ook **het wereldpatroon**: samenvoegen is stap een, niet de bedoeling —
 een wereld is pas af als hij zijn onderwerp begrijpt (graaf, beleid, cockpit,
 gegronde Rahul, actielog).
 
+**`AFBOUWPROGRAMMA.md` is het eigenaarsbesluit van 11 oktober 2026, en het is
+leidend**: alles wat RTG daadwerkelijk heeft TOEGEZEGD wordt afgebouwd,
+geïntegreerd en bewezen, niet alles wat ooit in een document stond. Drie harde
+grenzen (scope: afgewezen blijft afgewezen en wat een besluit of externe
+voorwaarde vraagt blijft dicht tot die aantoonbaar vervuld is; integratie via
+projecties en platformvermogen, nooit één datamodel; menselijke regie, geld
+verlaat het huis nooit vanzelf), en een bewijsregel: niemand noemt iets voltooid
+op eigen toetsen of documentatie, alleen via `APPWERKT.json` en de ketenproeven.
+Het besluit uit `BETROUWBAARHEID.md` par. 4 is daarmee genomen: de testwereld
+wordt gebouwd. In welke van de vier klassen een onderdeel valt (toegezegd,
+afgewezen-met-grens, vraagt-besluit, extern) staat als blok `toezegklassen` in
+`APPWERKT.json` (`npm run appwerkt:inventaris`), gelezen uit de markeringen in
+de documenten plus het kleine besluitbestand `TOEZEGKLASSEN.json`, waarvan elk
+citaat letterlijk in de bron moet staan.
+
 **`SCHERMEIGENAAR.json` zegt per zichtbare functie wie de eigenaar is** — precies
 één scherm per capability; andere schermen mogen haar tonen of openen maar
 bouwen haar niet opnieuw. Het kwam uit de consolidatieronde van 23 september

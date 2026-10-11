@@ -58,8 +58,8 @@ module.exports = ({ save, notify, genootschap, volwassen, erkendePartner }) => {
     const gv = gevoeligeReden(gr, v.onderwerp);
     if (gv) return { status: 409, error: gv, wacht: 'besluit-6' };
     for (const l of gr.leden || []) {
-      const r = beschermdeReden(l.key, volwassen);
-      if (r) return { status: 409, error: r, wacht: 'G5' };
+      // neutraal: de beheerder hoort dat het met deze leden niet kan, niet over wie
+      if (beschermdeReden(l.key, volwassen)) return { status: 409, error: R.REDEN_LEDEN_NEUTRAAL, wacht: 'G5' };
     }
     const ref = String(v.ref || '').trim().slice(0, 40);
     if (!ref) return { status: 400, error: 'Welke stichting? Geef de verwijzing uit haar partnerportaal.' };

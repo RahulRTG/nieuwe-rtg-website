@@ -134,6 +134,7 @@ test('4. een genootschap over geloof of zorg krijgt geen drager, met de reden va
 
 // Zakt bij de mutatie: in drager-regels.js beschermdeReden `volwassen(k) === true ? null` -> `null` -> de minderjarige komt erin.
 // Zakt bij de mutatie: in index.js de regel `const w = weiger(gr, doel)` in nodigUit weghalen -> de uitnodiging gaat door.
+// Zakt bij de mutatie: in drager-regels.js maakToelating de neutrale tekst vervangen door de echte reden -> de beheerder leert de leeftijd.
 test('5. in een gedragen genootschap zet niemand een minderjarige of een gezinsprofiel', async () => {
   const w = wereld();
   const gr = w.genootschap.richtOp(w.sess('lid:beh'), { naam: 'De Schaakclub', soort: 'openbaar' }).groep;
@@ -142,11 +143,17 @@ test('5. in een gedragen genootschap zet niemand een minderjarige of een gezinsp
   const r = w.drager.vraag(w.sess('lid:beh'), gr.id, { ref: 'P1' });
   assert.equal(r.status, 409);
   assert.equal(r.wacht, 'G5');
+  // de beheerder hoort niets OVER een lid: geen leeftijd, geen verificatie
+  assert.equal(r.error, R.REDEN_LEDEN_NEUTRAAL);
+  assert.doesNotMatch(r.error, /18|minderjarig|gezien|geverifieerd/i);
   w.genootschap.vertrek(w.sess('lid:jong'), gr.id);
   assert.equal(w.drager.vraag(w.sess('lid:beh'), gr.id, { ref: 'P1' }).ok, true);
   // nu gedragen: uitnodigen en zelf binnenlopen weigeren met de reden
   const nu = await w.genootschap.nodigUit(w.sess('lid:beh'), gr.id, 'cn-lid:jong');
-  assert.match(String(nu.error), /18 jaar of ouder/);
+  // NEUTRAAL naar de beheerder: de weigering zegt niets over de persoon...
+  assert.equal(nu.error, R.REDEN_TOEVOEGEN_NEUTRAAL);
+  assert.doesNotMatch(String(nu.error), /18|minderjarig|gezien|geverifieerd/i);
+  // ...en de persoon zelf krijgt de echte reden
   assert.match(String(w.genootschap.tredBinnen(w.sess('lid:jong'), gr.id).error), /18 jaar of ouder/);
   assert.match(String(w.genootschap.tredBinnen(w.sess('rtf:ABC:p1'), gr.id).error), /gezinsprofielen/);
   assert.equal(w.genootschap.tredBinnen(w.sess('lid:a'), gr.id).ok, true, 'een volwassene kan gewoon binnen');

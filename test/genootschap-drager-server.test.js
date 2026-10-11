@@ -140,6 +140,7 @@ test('2. een stichting die de RTFoundation niet erkende, kan niet dragen en ziet
 
 // Zakt bij de mutatie: in opzet/kernlaag4.js `toelating: ...` weghalen -> de minderjarige wordt uitgenodigd, zakt.
 // Zakt bij de mutatie: in drager.js vraag() de lus over `gr.leden` met beschermdeReden weghalen -> de vraag gaat door, zakt.
+// Zakt bij de mutatie: in index.js nodigUit de echte reden teruggeven in plaats van de neutrale -> de beheerder leert iets over de persoon, zakt.
 test('3. een minderjarige gaat niet door een ander een gedragen genootschap in, en een groep met een minderjarige wacht', async () => {
   const jong = await lid('2009-09-09');            // zeventien, paspoort gekeurd
   const ongekeurd = await lid('1980-01-01', false); // volwassen op papier, niet gezien
@@ -148,13 +149,16 @@ test('3. een minderjarige gaat niet door een ander een gedragen genootschap in, 
   const wacht = await post('/api/genootschap/drager/vraag', { groep: gr.id, ref: P.een.id }, P.beh.token);
   assert.equal(wacht.status, 409);
   assert.equal(wacht.body.wacht, 'G5');
+  assert.doesNotMatch(wacht.body.error, /18|minderjarig|gezien|geverifieerd/i, 'de beheerder hoort iets over een lid');
   assert.equal((await post('/api/genootschap/vertrek', { groep: gr.id }, jong.token)).status, 200);
 
   assert.equal((await post('/api/genootschap/drager/vraag', { groep: gr.id, ref: P.een.id }, P.beh.token)).status, 200);
   for (const w of [jong, ongekeurd]) {
     const nu = await post('/api/genootschap/nodig-uit', { groep: gr.id, wie: w.codenaam }, P.beh.token);
     assert.equal(nu.status, 400);
-    assert.match(nu.body.error, /18 jaar of ouder/, w.codenaam + ' ' + (w === jong ? 'jong' : 'ongekeurd'));
+    // neutraal naar de beheerder: niets over leeftijd of verificatie van deze persoon
+    assert.match(nu.body.error, /kan niet worden toegevoegd/, w.codenaam);
+    assert.doesNotMatch(nu.body.error, /18|minderjarig|gezien|geverifieerd/i, 'de weigering verraadt iets over ' + w.codenaam);
     const zelf = await post('/api/genootschap/binnen', { groep: gr.id }, w.token);
     assert.match(String(zelf.body.error), /18 jaar of ouder/);
   }
@@ -198,40 +202,41 @@ test('6. de gezinsdeur: dezelfde kern, hetzelfde antwoord, en alleen voor een vo
   await post('/api/genootschap/roep-bijeen', { groep: gr.id, wat: 'Rondje Amelisweerd', datum: '2099-05-05', tijd: '10:00' }, P.beh.token);
   const vreemde = await lid(null, false);
   const fam = await gezin('1985-03-03');
-  const g = (pad, b) => post('/api/rtf/genootschap/' + pad, Object.assign({ code: fam.code, token: fam.token }, b || {}));
+  // het pad staat LETTERLIJK bij elke oproep: de dekkingsmeter van de keuring leest de toetstekst
+  const g = (pad, b) => post(pad, Object.assign({ code: fam.code, token: fam.token }, b || {}));
 
   // ZOEK: als niet-lid, byte voor byte gelijk aan de ledendeur
   const q = { zoek: 'Kromme Rijn ' + teller };
   const alsLid = await post('/api/genootschap/zoek', q, vreemde.token);
-  const alsGezin = await g('zoek', q);
+  const alsGezin = await g('/api/rtf/genootschap/zoek', q);
   assert.equal(alsGezin.status, 200, alsGezin.tekst);
   assert.equal(alsGezin.tekst, alsLid.tekst, 'de gezinsdeur gaf een ander antwoord dan de ledendeur');
 
   // BINNEN met een verzonnen sleutel in het lijf: het lidmaatschap komt op het gezinsprofiel
-  const binnen = await g('binnen', { groep: gr.id, key: P.a.codenaam });
+  const binnen = await g('/api/rtf/genootschap/binnen', { groep: gr.id, key: P.a.codenaam });
   assert.equal(binnen.status, 200, binnen.tekst);
-  assert.equal((await g('binnen', { groep: gr.id })).body.al, true, 'een tweede keer binnen is geen herhaling');
+  assert.equal((await g('/api/rtf/genootschap/binnen', { groep: gr.id })).body.al, true, 'een tweede keer binnen is geen herhaling');
   assert.ok((await post('/api/genootschap/binnen', { groep: gr.id }, vreemde.token)).body.ok);
   const lijst = JSON.parse(await ledenlijst(P.beh, gr.id));
   assert.equal(lijst.length, 3, 'beheerder, gezinslid en lid');
   assert.ok(!lijst.some(l => l.codenaam === P.a.codenaam), 'het lijf maakte P.a lid');
-  assert.equal((await g('mijn')).body.groepen.filter(x => x.id === gr.id).length, 1);
+  assert.equal((await g('/api/rtf/genootschap/mijn')).body.groepen.filter(x => x.id === gr.id).length, 1);
 
   // AGENDA: als lid van dezelfde groep, byte voor byte gelijk
   const agLid = await post('/api/genootschap/agenda', { groep: gr.id }, vreemde.token);
-  const agGezin = await g('agenda', { groep: gr.id });
+  const agGezin = await g('/api/rtf/genootschap/agenda', { groep: gr.id });
   assert.equal(agGezin.status, 200, agGezin.tekst);
   assert.equal(agGezin.body.komt.length, 1);
   assert.equal(agGezin.tekst, agLid.tekst, 'de agenda via de gezinsdeur wijkt af');
-  assert.equal((await g('prikbord', { groep: gr.id })).status, 200);
-  assert.equal((await g('vertrek', { groep: gr.id })).status, 200);
-  assert.equal((await g('vertrek', { groep: gr.id })).status, 400, 'een tweede vertrek is een toestandscontrole');
-  assert.equal((await g('mijn')).body.groepen.filter(x => x.id === gr.id).length, 0);
+  assert.equal((await g('/api/rtf/genootschap/prikbord', { groep: gr.id })).status, 200);
+  assert.equal((await g('/api/rtf/genootschap/vertrek', { groep: gr.id })).status, 200);
+  assert.equal((await g('/api/rtf/genootschap/vertrek', { groep: gr.id })).status, 400, 'een tweede vertrek is een toestandscontrole');
+  assert.equal((await g('/api/rtf/genootschap/mijn')).body.groepen.filter(x => x.id === gr.id).length, 0);
 
   // een gedragen groep: een gezinsprofiel komt er niet in, ook niet zelf
   const gedragen = await groep(P.beh, 'Hardloopclub ' + teller, 'openbaar');
   await post('/api/genootschap/drager/vraag', { groep: gedragen.id, ref: P.een.id }, P.beh.token);
-  const geweigerd = await g('binnen', { groep: gedragen.id });
+  const geweigerd = await g('/api/rtf/genootschap/binnen', { groep: gedragen.id });
   assert.equal(geweigerd.status, 400);
   assert.match(geweigerd.body.error, /gezinsprofielen/);
 

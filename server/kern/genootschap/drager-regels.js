@@ -54,9 +54,22 @@ function beschermdeReden(key, volwassen) {
   try { return volwassen(k) === true ? null : REDEN_BESCHERMD; } catch (e) { return REDEN_BESCHERMD; }
 }
 
+/* NEUTRAAL NAAR EEN ANDER. De echte reden zegt iets over de persoon (te jong,
+   of RTG heeft zijn identiteitsbewijs niet gezien), en dat gaat de beheerder
+   die hem uitnodigt niet aan: hij hoort alleen DAT het niet kan. De persoon zelf
+   krijgt de echte reden als hij binnen wil lopen. Hetzelfde geldt voor de vraag
+   om een drager: de beheerder hoort dat het met deze leden niet kan, niet wie. */
+const REDEN_TOEVOEGEN_NEUTRAAL = 'Deze persoon kan niet worden toegevoegd aan dit genootschap.';
+const REDEN_LEDEN_NEUTRAAL = 'Dit genootschap kan met de huidige leden (nog) geen organisatie als drager krijgen.';
+
 /* De toelatingshaak voor kern/genootschap/index.js (nodigUit en tredBinnen):
-   alleen in een gedragen genootschap telt hij. */
-const maakToelating = (volwassen) => (gr, key) => gedragen(gr) ? beschermdeReden(key, volwassen) : null;
+   alleen in een gedragen genootschap telt hij. `ander` = iemand anders zet deze
+   persoon erin, en dan is het antwoord neutraal. */
+const maakToelating = (volwassen) => (gr, key, ander) => {
+  if (!gedragen(gr)) return null;
+  const r = beschermdeReden(key, volwassen);
+  return r && ander ? REDEN_TOEVOEGEN_NEUTRAAL : r;
+};
 
 function beeld(gr) {
   const d = gr && gr.draagOrg;
@@ -65,4 +78,5 @@ function beeld(gr) {
 }
 
 module.exports = { SOORTEN, NOG_NIET, STANDEN, GEVOELIG, GEVOELIGE_WOORDEN, REDEN_GEVOELIG, REDEN_BESCHERMD,
+  REDEN_TOEVOEGEN_NEUTRAAL, REDEN_LEDEN_NEUTRAAL,
   gedragen, gevoeligeReden, beschermdeReden, maakToelating, beeld };

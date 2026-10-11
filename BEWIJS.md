@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2446 bestanden en 16747 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2449 bestanden en 16758 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2446 |
-| losse beweringen (`test(...)`) | 16747 |
+| toetsbestanden | 2449 |
+| losse beweringen (`test(...)`) | 16758 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2272 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2275 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2138 bestanden, 16210 beweringen.
+2141 bestanden, 16221 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -230,6 +230,7 @@ toets omvalt.
 | `betaalopdracht.test.js` | 26 | gezakt op `true->false#0` | De betaalopdracht (kern/betaalopdracht/): het verschil tussen "geboekt" en "echt weg". Getest met een NEPRAIL die we naar believen laten mislukken, want dat is precies het geval dat er in productie niet uit te lokken... |
 | `betaalproviders.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `betaalregie.test.js` | 6 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `betaalstop-spelling.test.js` | 3 | gezakt op `liegpoort /api/` | DE BETAALSTOP LEEST HET PAD ZOALS DE ROUTER -- regressie voor N37 uit de V1-audit (ronde 7). DE FOUT: server/opzet/betaalstop.js vergeleek req.path met patronen die op een $ eindigen. |
 | `betaalstore.test.js` | 2 | gezakt op `===->!==` | De betaal-naad met een geïnjecteerde, durable idempotentie-store (zoals server.js hem nu koppelt aan de database): dezelfde sleutel geeft hetzelfde resultaat terug, het resultaat staat echt in de store (en overleeft... |
 | `betaalwaarheid.test.js` | 14 | gezakt op `!==->===#0` | De provider-onafhankelijke betaalwaarheid. Deze toetsen bewaken vooral de twee gevaarlijke grenzen: een tussenstatus is nooit betaald, en een bedrag dat afwijkt wordt nooit stil vrijgegeven. |
 | `betaalwebhook-fouten.test.js` | 10 | gezakt op `true->false#0` | Failure-injection op de echte kaart-webhookbedrading. Geen provider wordt benaderd: de providers zijn deterministische doubles, maar de routes, de betaalwaarheid en de betaalopdrachtenrij zijn de productiemodules. |
@@ -1507,6 +1508,7 @@ toets omvalt.
 | `release-trust.test.js` | 8 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `release-workflow-bewijs.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `releaseketenwacht.test.js` | 3 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `rem-gelijktijdig.test.js` | 3 | gezakt op `liegpoort /api/` | EEN GOLF GELIJKTIJDIGE GOKKEN GAAT NIET LANGS DE REM -- regressie voor N39 uit de V1-audit (ronde 7). DE FOUT: kern/identiteit/wachtwoordrem.js keek vóór de wachtwoordtoets of een emmer dicht was en telde pas erna. |
 | `rem.test.js` | 6 | gezakt op `&&->||#0` | Test voor de eigen rate-limiter (server/rem.js): binnen het venster mag een sleutel tot `limit` verzoeken, daarboven springt de rem aan; sleutels tellen los; `skip` slaat over; een verlopen venster telt weer vanaf... |
 | `remduurzaam.test.js` | 5 | gezakt op `liegpoort /api/` | EEN REM DIE EEN MENS OVERHAALT, STAAT VAST VOORDAT HIJ BEVESTIGD WORDT. GELDLAT.md kreeg op 6 september 2026 een derde been in zijn reikwijdte. |
 | `rendezvous.test.js` | 32 | gezakt op `liegpoort /api/` | Integratietests voor Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass. Twee leden zetten een profiel op, liken elkaar (wederzijds = match), en Rahul stelt een jetset-date voor op een gedeelde locatie. |
@@ -1814,6 +1816,7 @@ toets omvalt.
 | `stadsweefsel-steden.test.js` | 8 | gezakt op `!==->===#0` | Het stadsweefsel draagt meer dan één stad (kern/stadsweefsel/steden.js). DE BOOM HAD ALTIJD AL EEN STAD-NIVEAU ALS WORTEL, dus meerdere wortels pasten er in. |
 | `stadsweefsel.test.js` | 12 | gezakt op `liegpoort /api/` | HET STADSWEEFSEL: de laag die van losse stadssystemen een stad maakt. Getest, en per toets is de bewering met een MUTATIE nagetrokken (de lat, regel 2). |
 | `staff-inzet-mob.test.js` | 6 | gezakt op `liegpoort /api/` | DRIE PERSONEELSINGANGEN VAN HET MOBILITY OS DIE DOOR NIETS WERDEN AANGEROEPEN. /api/staff/mob/kaart/storingen de storingslijst van de OV-vervoerder /api/staff/mob/mijn het dispatchbeeld op de PDA... |
+| `staff-ontslag.test.js` | 5 | gezakt op `liegpoort /api/` | EEN OUDE KASSACODE MAAKT GEEN ONTSLAG ONGEDAAN -- regressie voor N36 uit de V1-audit (ronde 7, besluit van de eigenaar: helemaal dicht). DE FOUT: een medewerker die een manager met /api/supplier/staff/remove uit het... |
 | `staff-pin-productie.test.js` | 2 | gezakt op `liegpoort /api/` | Productiegrens voor de oude viercijferige personeelspin. Deze toets draait de server in de gewone, niet-synthetische stand. |
 | `staffgemoed.test.js` | 7 | gezakt op `liegpoort /api/` | DE DAGCHECK-IN VOOR DE VLOER -- en vooral: wat de werkgever NIET ziet. ONDERNEMEN.md par. |
 | `staffinvite.test.js` | 13 | gezakt op `liegpoort /api/` | Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de bedrijfsnaam + kassacode + eigen RTG-inlog. |

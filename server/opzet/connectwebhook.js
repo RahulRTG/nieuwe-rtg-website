@@ -17,14 +17,17 @@
    gebeurd. Een noodstop op partnerafrekeningen houdt nieuwe afrekeningen
    tegen; het bijhouden van wat al onderweg was, hoort juist door te gaan.
    Zonder geheim weigert de route wel: een onondertekende melding is geen
-   melding. */
+   melding. Dat is een 404 en geen 503: in een installatie zonder Connect-geheim
+   bestaat deze terugmelding niet, en een anoniem verzoek naar een adres dat
+   niet is ingericht is geen storing van de server (de ladder vond hier een
+   serverfout op een verzoek zonder token). */
 'use strict';
 
 module.exports = function hangConnectWebhook({ app, express, db, save, log, webhookRem, webhookPoort, env = process.env }) {
   app.post('/api/betaal/webhook/connect', webhookRem, webhookPoort,
     express.raw({ type: '*/*', limit: '256kb' }), async (req, res) => {
       const geheim = env.STRIPE_CONNECT_WEBHOOK_SECRET || '';
-      if (!geheim) return res.status(503).json({ error: 'Deze terugmelding is niet ingericht.' });
+      if (!geheim) return res.status(404).json({ error: 'Deze terugmelding is in deze installatie niet ingericht.', code: 'niet-ingericht' });
       let evt;
       try {
         /* De verificatie heeft geen sleutel nodig; alleen het geheim. */

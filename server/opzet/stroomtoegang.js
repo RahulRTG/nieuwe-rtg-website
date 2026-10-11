@@ -20,9 +20,13 @@ module.exports = function stroomtoegang({ app, db, crypto, bewerkCollectie, acco
     zegelSleutel: () => (accounts && typeof accounts.sleutelVoor === 'function'
       ? accounts.sleutelVoor('sessiestroom-zegel-v1') : null) });
 
-  /* De ledenstroom stelt dezelfde vraag als altijd: kent resolveSession dit
-     token. */
-  sessiestroom.soort('lid', { geldig: raw => !!resolveSession(raw) });
+  /* De ledenstroom stelt de vraag van auth(): is dit een LEDENsessie. Alleen
+     "kent resolveSession dit token" was te ruim -- dat kent ook een leveranciers-
+     en een kantoorsessie, en de rolronde zag die met een ledenticket de
+     ledenstroom openen. Een sessie met een `role` (leverancier, kantoor,
+     foundation) heeft haar eigen stroomsoort en komt hier niet binnen. */
+  const lidSessie = s => !!(s && !s.role && (s.account || s.tier));
+  sessiestroom.soort('lid', { geldig: raw => lidSessie(resolveSession(raw)) });
 
   app.post('/api/stroom/ticket', async (req, res) => {
     const kop = req.get('authorization') || '';
@@ -47,7 +51,7 @@ module.exports = function stroomtoegang({ app, db, crypto, bewerkCollectie, acco
     if (!uit.ok) return res.status(uit.status || 401).end();
     const token = uit.token;
     const sess = resolveSession(token);
-    if (!sess) return res.status(401).end();
+    if (!lidSessie(sess)) return res.status(401).end();
     const isolatieRealtime = require('../middleware/isolatiepoort-realtime');
     const bewaakt = isolatieRealtime.registreer({ res, token, sessie: sess });
     if (!bewaakt.toegestaan) return res.status(bewaakt.status || 503).json(bewaakt.antwoord);

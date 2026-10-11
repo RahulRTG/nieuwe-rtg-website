@@ -20,6 +20,17 @@
        opent het scherm, en elk verzoek dat A's code draagt wordt nagespeeld met
        het token van gezin B (A's code blijft staan) en zonder token.
 
+   SINDS 11 OKTOBER 2026 OOK EEN LEDENKRUIS (./lib/ledenkruis.js). ROLPROEF.json
+   is niet meer te hermeten (zijn ijklid kan sinds de toestelbinding niet meer
+   opladen), en daarmee stond elke ledenrij op NIET_GETEST. De ledenkruis doet
+   voor een ledenscherm wat de gezinskruis voor een gezinsscherm doet, maar
+   verwisselt de SESSIE in plaats van de code: lid A opent het scherm (met iets
+   gezaaid dat alleen van hem is, als er een scenario voor is), en elk verzoek --
+   plus de handelingen van het scenario -- wordt nagespeeld door een anonieme
+   bezoeker, een ander lid, een zaak, het kantoor en een gezin. De kruis
+   vervangt het ROLPROEF-deel alleen voor de schrijfroutes die hij werkelijk
+   raakte met A binnen; IDOR.json blijft verplicht. Zie ledenOordeel().
+
    DE OORDELEN, per rij:
      BEWEZEN        ledenscherm: elke route gemeten en niets gebroken;
                     gezinsscherm: minstens een kruispaar, en B en anoniem werden
@@ -42,6 +53,7 @@
    route iets afschermt dat afgeschermd hoort te zijn.
 
    Draai: node scripts/bevoegdronde.js               (meet, schrijft niets)
+          node scripts/bevoegdronde.js --alleen=link:post,link:ik  (probeer rijen)
           node scripts/bevoegdronde.js --vastleggen  (schrijft BEVOEGD.json)
    ========================================================================== */
 'use strict';
@@ -70,10 +82,12 @@ function laadRegisters({ lees, vers } = {}) {
   const uit = { idor: new Map(), rol: new Map(), vervallen: [] };
   for (const [naam, zet] of [['IDOR.json', 'idor'], ['ROLPROEF.json', 'rol']]) {
     const t = l(naam);
+    uit[zet + 'Vers'] = false;
     if (t === null) { uit.vervallen.push(naam + ' bestaat niet'); continue; }
     let reg; try { reg = JSON.parse(t); } catch (e) { uit.vervallen.push(naam + ' is geen geldige JSON'); continue; }
     const s = reg.stempel && typeof reg.stempel === 'object' ? v(reg.stempel) : { vers: false, reden: 'geen stempel met commit' };
     if (!s.vers) uit.vervallen.push(naam + ': ' + s.reden);
+    uit[zet + 'Vers'] = !!s.vers;
     if (zet === 'idor') {
       for (const [k, w] of Object.entries(reg.perRoute || {})) {
         const [methode, pad] = k.split(' ');
@@ -94,9 +108,9 @@ const IDOR_GEBROKEN = new Set(['doorbraak', 'lek']);
 /* Het oordeel over een pad: gebroken, gemeten of open -- met de reden. Een
    schrijfroute (ROLPROEF kent hem) moet in BEIDE registers staan: IDOR zegt of
    een ander lid erbij kan, ROLPROEF of een andere rol het kan. */
-function padOordeel(pad, reg) {
+function padOordeel(pad, reg, { zonderRol = false } = {}) {
   const i = reg.idor.get(pad) || [];
-  const r = reg.rol.get(pad) || [];
+  const r = zonderRol ? [] : (reg.rol.get(pad) || []);
   const breuk = i.find((x) => IDOR_GEBROKEN.has(x.staat));
   if (breuk) return { stand: 'gebroken', reden: pad + ' staat in IDOR.json als ' + breuk.staat };
   const open = r.find((x) => x.acl !== 'dicht' || x.privacy !== 'schoon');
@@ -106,8 +120,19 @@ function padOordeel(pad, reg) {
   return { stand: 'gemeten' };
 }
 
-function ledenOordeel(rij, reg, { schermroutes, lees } = {}) {
-  if (reg.vervallen.length) return { status: 'NIET_GETEST', reden: 'bewijs vervallen: ' + reg.vervallen.join('; ') };
+/* `kruis` is de uitslag van de ledenkruis voor deze rij (./lib/ledenkruis.js),
+   of undefined als deze ronde hem niet heeft gelopen. ZONDER kruis geldt de
+   oude regel: IDOR en ROLPROEF, allebei vers. MET kruis vervangt de kruis het
+   ROLPROEF-deel -- maar alleen voor de schrijfroutes die hij werkelijk heeft
+   nagespeeld met A binnen; een schrijfroute van het scherm die hij niet raakte,
+   houdt de rij op NIET_GETEST, met naam. Een vervallen ROLPROEF is geen bewijs
+   van een breuk en geen bewijs van dichtheid: hij telt dan voor geen van beide.
+   IDOR blijft altijd verplicht: de kruis verwisselt de sessie, IDOR het object. */
+function ledenOordeel(rij, reg, { schermroutes, lees, kruis } = {}) {
+  const rolWeg = reg.vervallen.filter((v) => v.startsWith('ROLPROEF.json'));
+  const andereWeg = reg.vervallen.filter((v) => !v.startsWith('ROLPROEF.json'));
+  if (andereWeg.length || (rolWeg.length && !kruis)) return { status: 'NIET_GETEST', reden: 'bewijs vervallen: ' + reg.vervallen.join('; ') };
+  const zonderRol = rolWeg.length > 0;
   const ing = ingangRoutes(rij.ingang, { schermroutes, lees });
   if (!ing) return { status: 'NIET_GETEST', reden: 'geen eigen adres: een stand of kiezer binnen de ledenapp' };
   const paden = [...ing.exact];
@@ -120,16 +145,30 @@ function ledenOordeel(rij, reg, { schermroutes, lees } = {}) {
     else for (const p of onder) paden.push(p);
   }
   if (!paden.length) return { status: 'NIET_GETEST', reden: 'het scherm roept zelf geen route aan; er is niets te kruisen' };
-  const oordelen = [...new Set(paden)].sort().map((p) => (p.endsWith('*')
-    ? { stand: 'open', reden: p + ': de registers kennen geen route onder dit voorvoegsel' } : padOordeel(p, reg)));
+  const uniek = [...new Set(paden)].sort();
+  const oordelen = uniek.map((p) => (p.endsWith('*')
+    ? { stand: 'open', reden: p + ': de registers kennen geen route onder dit voorvoegsel' } : padOordeel(p, reg, { zonderRol })));
   const gebroken = oordelen.filter((o) => o.stand === 'gebroken');
   if (gebroken.length) return { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: gebroken[0].reden, routes: paden.length };
+  if (kruis && kruis.status === 'GEBLOKKEERD_DOOR_DEFECT') return { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: 'ledenkruis: ' + kruis.reden, routes: paden.length };
   const open = oordelen.filter((o) => o.stand === 'open');
   if (open.length) {
     return { status: 'NIET_GETEST', routes: paden.length, open: open.length,
       reden: open.length + ' van de ' + paden.length + ' routes niet gemeten, o.a. ' + open.slice(0, 3).map((o) => o.reden).join('; ') };
   }
-  return { status: 'BEWEZEN', routes: paden.length, reden: 'alle ' + paden.length + ' routes van het scherm gemeten: ' + GRENS_LID };
+  if (!kruis) return { status: 'BEWEZEN', routes: paden.length, reden: 'alle ' + paden.length + ' routes van het scherm gemeten: ' + GRENS_LID };
+  if (kruis.status !== 'BEWEZEN') return { status: 'NIET_GETEST', routes: paden.length, reden: 'ledenkruis: ' + kruis.reden };
+  if (zonderRol) {
+    const gekruist = new Set(kruis.gekruist || []);
+    const niet = uniek.filter((p) => reg.rol.has(p) && !gekruist.has(p));
+    if (niet.length) {
+      return { status: 'NIET_GETEST', routes: paden.length,
+        reden: 'ROLPROEF.json vervallen, en de ledenkruis raakte ' + niet.length + ' schrijfroute(s) van het scherm niet met lid A binnen: ' + niet.slice(0, 4).join(', ') };
+    }
+  }
+  return { status: 'BEWEZEN', routes: paden.length,
+    reden: 'alle ' + paden.length + ' routes in IDOR.json gemeten' + (zonderRol ? ' en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet)' : ' en in ROLPROEF.json dicht') +
+      '; ledenkruis: ' + kruis.reden };
 }
 
 /* ---- DE GEZINSKANT: KRUISEN --------------------------------------------------
@@ -196,23 +235,75 @@ async function meetGezinnen(rijen, base, browser, maakContext) {
   return uit;
 }
 
+/* De scenario's die een ledenrij iets laten zaaien dat alleen van A is. Letterlijk
+   gerequired, om dezelfde reden als in scripts/voltooiproef.js: de versheid ziet
+   alleen wat dit instrument via een letterlijke require bereikt. */
+const ZAAI = {
+  'link:ik': require('./lib/voltooi/ik').zaai,
+  'link:loopbaan': require('./lib/voltooi/loopbaan').zaai,
+  'link:post': require('./lib/voltooi/post').zaai,
+  'link:reizen': require('./lib/voltooi/reizen').zaai,
+  'link:sessies': require('./lib/voltooi/sessies').zaai,
+  'link:wonen': require('./lib/voltooi/wonen').zaai
+};
+
+async function meetLeden(rijen, base, browser, maakContext) {
+  const { ROLLEN, opslagVoor } = require('./lib/proefsessies');
+  const kruis = require('./lib/ledenkruis');
+  const gezin = await ROLLEN.gezin.haal(base);
+  const anderen = { anoniem: null, 'ander lid': await ROLLEN.lid.haal(base), zaak: await ROLLEN.zaak.haal(base),
+    kantoor: await ROLLEN.kantoor.haal(base), gezin: gezin && gezin.token };
+  const mist = Object.entries(anderen).filter(([wie, t]) => wie !== 'anoniem' && !t).map(([wie]) => wie);
+  const uit = new Map();
+  if (mist.length) {
+    for (const r of rijen) uit.set(r.functie, { status: 'NIET_GETEST', reden: 'geen sessie voor ' + mist.join(', ') + '; een kruis zonder die rol meldt "niets gevonden" over een rol die nooit heeft geprobeerd', gekruist: [] });
+    return uit;
+  }
+  /* Een lid voor de rijen zonder scenario: zijn merktekens zijn alleen zijn
+     identiteit. Een per rij registreren zou de rem van de registratie raken. */
+  const w = kruis.wereldOver(base);
+  const u = Date.now().toString().slice(-8);
+  const reg = await w.post('/api/auth/register', { name: 'Kruislid', email: 'krs' + u + '@voorbeeld.nl', phone: '06' + u,
+    password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
+  const standaardLid = reg.data && reg.data.token ? { token: reg.data.token, merktekens: await kruis.identiteit(w, reg.data.token) } : null;
+  for (const r of rijen) {
+    if (!r.pad) { uit.set(r.functie, { status: 'NIET_GETEST', reden: 'geen eigen adres', gekruist: [] }); continue; }
+    const zaai = ZAAI[r.functie] || null;
+    if (!zaai && !standaardLid) { uit.set(r.functie, { status: 'NIET_GETEST', reden: 'het kruislid kon niet registreren', gekruist: [] }); continue; }
+    try {
+      uit.set(r.functie, await kruis.meetRij({ rij: r, base, browser, maakContext, opslagVoor, anderen,
+        eigenRoutes: ingangRoutes(r.ingang) || { exact: new Set(), voor: new Set() }, zaai, standaardLid }));
+    } catch (e) {
+      uit.set(r.functie, kruis.kruisOordeel({ paren: [], onderwerp: false, fout: String((e && e.message) || e).slice(0, 200) }));
+    }
+  }
+  return uit;
+}
+
 async function meet() {
   const { rijen, maakContext } = require('./appwerkt');
   const lijst = rijen();
   const reg = laadRegisters();
   const regels = [];
-  const gezin = lijst.filter((r) => r.persona === 'gezin');
-  let gezinUit = new Map();
-  if (gezin.length) {
+  /* --alleen=link:a,link:b meet alleen die rijen (om te proberen); vastleggen
+     weigert dan, want een register met gaten leest als een register zonder. */
+  const alleen = ((process.argv.find((a) => a.startsWith('--alleen=')) || '').slice(9)).split(',').filter(Boolean);
+  const mag = (r) => !alleen.length || alleen.includes(r.functie);
+  const gezin = lijst.filter((r) => r.persona === 'gezin' && mag(r));
+  const leden = lijst.filter((r) => r.persona === 'lid' && mag(r));
+  let gezinUit = new Map(), ledenUit = new Map();
+  if (gezin.length || leden.length) {
     const { laadBrowser } = require(path.join(WORTEL, 'test', 'browser'));
     const pw = laadBrowser({ eigenDriver: false });
-    if (!pw) { console.error('Geen browser beschikbaar; de gezinskant meet in een echte browser.'); process.exit(2); }
+    if (!pw) { console.error('Geen browser beschikbaar; de kruisproeven meten in een echte browser.'); process.exit(2); }
     const { startServer } = require(path.join(WORTEL, 'test', 'helper.js'));
     const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bevoegdronde-'));
     const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
     const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    try { gezinUit = await meetGezinnen(gezin, base, browser, maakContext); }
-    finally {
+    try {
+      gezinUit = await meetGezinnen(gezin, base, browser, maakContext);
+      ledenUit = await meetLeden(leden, base, browser, maakContext);
+    } finally {
       await browser.close();
       try { child.kill(); } catch (e) {}
       try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
@@ -220,7 +311,10 @@ async function meet() {
   }
   for (const r of lijst) {
     const basis = { functie: r.functie, app: r.app, ingang: r.ingang, persona: r.persona };
-    if (r.persona === 'lid') regels.push(Object.assign(basis, ledenOordeel(r, reg)));
+    if (r.persona === 'lid') {
+      const k = ledenUit.get(r.functie);
+      regels.push(Object.assign(basis, ledenOordeel(r, reg, { kruis: k }), k ? { ledenkruis: { status: k.status, reden: k.reden, kruisparen: k.kruisparen || [] } } : {}));
+    }
     else if (r.persona === 'gezin') regels.push(Object.assign(basis, gezinUit.get(r.functie)));
     else regels.push(Object.assign(basis, { status: 'NIET_GETEST', reden: 'deze ronde heeft geen kruisproef voor de persona ' + r.persona }));
   }
@@ -229,8 +323,8 @@ async function meet() {
   for (const r of regels) telling[r.status] = (telling[r.status] || 0) + 1;
   return {
     stempel: stempel(),
-    uitleg: 'Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen samengesteld uit IDOR.json en ROLPROEF.json, gezinsschermen met een kruisproef op de gezinscode. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f.',
-    grens: 'leden: ' + GRENS_LID + '. gezinnen: ' + GRENS_GEZIN + '.',
+    uitleg: 'Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen met de ledenkruis (scripts/lib/ledenkruis.js: het scherm als lid A, nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin) plus IDOR.json, en ROLPROEF.json waar die vers is; gezinsschermen met een kruisproef op de gezinscode. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f en 4i.',
+    grens: 'leden: ' + GRENS_LID + '; ledenkruis: ' + require('./lib/ledenkruis').GRENS + '. gezinnen: ' + GRENS_GEZIN + '.',
     bronnen: { vervallen: reg.vervallen },
     telling,
     regels
@@ -244,6 +338,13 @@ if (require.main === module) {
     console.log('bevoegdronde: ' + u.regels.length + ' onderdelen -- ' + JSON.stringify(u.telling));
     if (u.bronnen.vervallen.length) console.log('  VERVALLEN: ' + u.bronnen.vervallen.join('; '));
     for (const r of u.regels) if (r.status === 'GEBLOKKEERD_DOOR_DEFECT') console.log('  DEFECT  ' + r.app + ': ' + r.reden);
+    if (process.argv.some((a) => a.startsWith('--alleen='))) {
+      for (const r of u.regels) if (r.ledenkruis) console.log(JSON.stringify({ functie: r.functie, status: r.status, reden: r.reden, ledenkruis: r.ledenkruis }));
+    }
+    if (process.argv.includes('--vastleggen') && process.argv.some((a) => a.startsWith('--alleen='))) {
+      console.error('--alleen en --vastleggen gaan niet samen: dan staan de andere rijen er ongemeten in');
+      process.exit(2);
+    }
     if (process.argv.includes('--vastleggen')) {
       fs.writeFileSync(DOEL, JSON.stringify(u, null, 2) + '\n');
       console.log('geschreven: BEVOEGD.json');

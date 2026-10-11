@@ -161,11 +161,34 @@ async function loop(w, stap) {
   });
 }
 
+/* ---------------- de kruisproef (bewijs 6, scripts/lib/ledenkruis.js) ----------------
+   Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
+   is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
+   staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
+   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf. */
+async function zaai(w) {
+  const lid = await nieuwLid(w, 'kses');
+  const A = lid.token;
+  await inloggen(w, lid); await inloggen(w, lid);
+  const sleutel = await toestel();
+  const u1 = await w.post(UITDAGING, {}, A);
+  await w.post(BIND, { jwk: sleutel.jwk, handtekening: await sleutel.teken(u1.data.nonce), naam: 'Kruistoestel' }, A);
+  const l = await w.post(LIJST, {}, A);
+  const sids = ((l.data && l.data.sessies) || []).map((s) => s.sid);
+  const ander = sids.find((s) => s !== (l.data && l.data.huidige));
+  const u2 = await w.post(UITDAGING, {}, A);
+  return { lid, merktekens: sids, lezers: [{ pad: LIJST }],
+    handelingen: [{ pad: BIND, lijf: { jwk: sleutel.jwk, handtekening: await sleutel.teken(u2.data.nonce), naam: 'Kruistoestel' } },
+      { pad: UITDAGING, lijf: {} },
+      { pad: SLUIT, lijf: { sid: ander }, kop: () => sleutel.bewijs('POST', SLUIT) }] };
+}
+
 module.exports = {
   functie: 'link:sessies',
   ingang: '/apps/mijn-sessies.html',
   persona: 'lid',
   belofte: 'een lid ziet waar het is ingelogd en sluit een ander toestel op afstand -- en dat toestel blijft buiten, ook na een herstart of een crash',
   grens: 'De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf: dat de knoppen dit ook doen, is bewijs 2 (bedienbaar). Er is geen Redis of PostgreSQL in de wereld; de intrekking is gemeten op de SQLite-opslag van een enkel proces. Een toestel intrekken (/api/mijn/toestel/introk) en "sluit alle andere" zijn andere handelingen en hier niet gelopen.',
-  loop
+  loop,
+  zaai
 };

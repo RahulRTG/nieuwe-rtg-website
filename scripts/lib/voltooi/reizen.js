@@ -169,6 +169,21 @@ async function loop(w, stap) {
   });
 }
 
+/* ---------------- de kruisproef (bewijs 6, scripts/lib/ledenkruis.js) ----------------
+   Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
+   is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
+   staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
+   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf. */
+async function zaai(w) {
+  const lid = await nieuwLid(w, 'krvl');
+  const TITEL = 'Diner kruisproef ' + merk();
+  const m = await w.post(MAAK, formulier(TITEL), lid.token);
+  const id = m.data && m.data.moment && m.data.moment.id;
+  return { lid, merktekens: [TITEL], lezers: [{ pad: MIJN }],
+    handelingen: [{ pad: STATUS, lijf: { id, status: 'onderweg', eta: '19:45' } }, { pad: PAUZE, lijf: { id, aan: true } },
+      { pad: STOP, lijf: { id } }, { pad: MAAK, lijf: formulier('Trein kruisproef ' + merk()) }] };
+}
+
 module.exports = {
   functie: 'link:reizen',
   /* De zaak KIKUNOI met een manager-PIN is synthetische zaaidata, en die bestaat
@@ -180,5 +195,6 @@ module.exports = {
   persona: 'lid',
   belofte: 'een lid deelt een reis tijdelijk met wie het zelf kiest, een zaak ziet hooguit voortgang en nooit een plek, en pauzeren en stoppen werken meteen -- ook na een herstart of een crash',
   grens: 'De proef loopt over de routes die het scherm aanroept en de leesroute van de zaak, niet door het scherm zelf. Een contact als ontvanger (met exacte plek) zit er niet in, net zo min als het vanzelf verlopen op de eindtijd. De zaak is KIKUNOI uit de zaaiset. Er is geen Redis of PostgreSQL in de wereld.',
-  loop
+  loop,
+  zaai
 };

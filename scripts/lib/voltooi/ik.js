@@ -118,11 +118,26 @@ async function loop(w, stap) {
   });
 }
 
+/* ---------------- de kruisproef (bewijs 6, scripts/lib/ledenkruis.js) ----------------
+   Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
+   is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
+   staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
+   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf. */
+async function zaai(w) {
+  const lid = await nieuwLid(w, 'kikk');
+  const VNW = 'zij/haar ' + merk() + 'kr', AANHEF = 'Geachte ' + merk() + 'kr';
+  await w.post(ZET, { voornaamwoord: VNW, aanhef: AANHEF }, lid.token);
+  await w.post(TOEG_ZET, { tekst: 'groot', contrast: 'hoog' }, lid.token);
+  return { lid, merktekens: [VNW, AANHEF], lezers: [{ pad: IK }, { pad: TOEG }],
+    handelingen: [{ pad: ZET, lijf: { voornaamwoord: 'hen/die ' + merk() + 'kr' } }, { pad: TOEG_ZET, lijf: { beweging: 'stil' } }] };
+}
+
 module.exports = {
   functie: 'link:ik',
   ingang: '/apps/ik.html',
   persona: 'lid',
   belofte: 'een lid zegt zelf hoe het aangesproken wil worden en hoe elk scherm zich hoort te gedragen, en dat geldt op elk scherm en op elk toestel -- ook na een herstart of een crash',
   grens: 'De proef loopt over de routes die het scherm aanroept en de gedeelde leesroute van het profiel, niet door het scherm zelf; of shared/basis.js het profiel ook UITVOERT, is niet gemeten. De kluiskolom wordt niet ontsleuteld: dat de waarde klopt, bewijst de route; dat hij op schijf veranderde en versleuteld is, bewijst de opslag. Fase, omgang en geloof zijn niet beproefd. Er is geen Redis of PostgreSQL in de wereld.',
-  loop
+  loop,
+  zaai
 };

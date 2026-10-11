@@ -191,7 +191,7 @@ const ALGEMEEN = {
     soort: 'bevoegdronde',
     register: 'BEVOEGD.json',
     instrument: 'scripts/bevoegdronde.js',
-    waarom: 'ledenschermen bakenen af op de sessie (BETROUWBAARHEID.md par. 4f), dus hun routes uit IDOR.json en ROLPROEF.json; gezinsschermen noemen hun code, dus een kruisproef met het token van een ander gezin'
+    waarom: 'ledenschermen bakenen af op de sessie (BETROUWBAARHEID.md par. 4f), dus een ledenkruis die de sessie verwisselt (anoniem, ander lid, zaak, kantoor, gezin) plus hun routes uit IDOR.json, en ROLPROEF.json waar die vers is; gezinsschermen noemen hun code, dus een kruisproef met het token van een ander gezin'
   }
 };
 

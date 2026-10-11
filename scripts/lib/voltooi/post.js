@@ -128,11 +128,25 @@ async function loop(w, stap) {
 
 }
 
+/* ---------------- de kruisproef (bewijs 6, scripts/lib/ledenkruis.js) ----------------
+   Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
+   is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
+   staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
+   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf. */
+async function zaai(w) {
+  const lid = await nieuwLid(w, 'kpst');
+  const bron = 'kruis' + Date.now().toString(36);
+  await w.post(ZET, { soort: 'aanbiedingen', kanalen: ['email', 'sms'], bron }, lid.token);
+  return { lid, merktekens: ['scherm:' + bron], lezers: [{ pad: STAND }, { pad: GESCHIEDENIS }],
+    handelingen: [{ pad: ZET, lijf: { soort: 'productnieuws', kanalen: ['push'], bron } }, { pad: ALLES_UIT, lijf: {} }] };
+}
+
 module.exports = {
   functie: 'link:post',
   ingang: '/apps/mijn-post.html',
   persona: 'lid',
   belofte: 'een lid geeft en trekt zelf toestemming in voor commerciele post, alles staat uit tot hij het aanzet, en de geschiedenis bewijst wanneer en waar -- ook na een herstart of een crash',
   grens: 'De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf. Er is geen tweede actor die de toestemming leest: commercieel.mag() heeft vandaag geen aanroeper, dus of een verzender zich aan de stand houdt is niet gemeten. Er is geen Redis of PostgreSQL in de wereld.',
-  loop
+  loop,
+  zaai
 };

@@ -145,11 +145,31 @@ async function loop(w, stap) {
   });
 }
 
+/* ---------------- de kruisproef (bewijs 6, scripts/lib/ledenkruis.js) ----------------
+   Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
+   is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
+   staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
+   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf. */
+async function zaai(w) {
+  const lid = await nieuwLid(w, 'klpb');
+  const WAT = 'Diploma kruisproef ' + merk();
+  const f = await w.post(ZET, { kapitaal: 'vermogen', wat: WAT, op: '2020-06-30' }, lid.token);
+  const feitId = f.data && f.data.regel && f.data.regel.id;
+  await w.post(DEEL, { id: feitId, dagen: 7, voor: 'een sponsor' }, lid.token);
+  const deel = (((await w.post(DELEN, {}, lid.token)).data || {}).delen || [])[0];
+  return { lid, merktekens: [WAT], lezers: [{ pad: MIJN }, { pad: DELEN }],
+    handelingen: [{ pad: DEEL, lijf: { id: feitId, dagen: 3, voor: 'een tweede' } },
+      { pad: STOP, lijf: { id: deel && deel.id } },
+      { pad: ZET, lijf: { kapitaal: 'netwerk', wat: 'Club kruisproef ' + merk(), op: '2022-11-12' } },
+      { pad: INTREK, lijf: { id: feitId, reden: 'kruisproef' } }] };
+}
+
 module.exports = {
   functie: 'link:loopbaan',
   ingang: '/apps/loopbaan.html',
   persona: 'lid',
   belofte: 'een lid schrijft zijn loopbaan zelf op als reeks die niets wist, deelt een regel met een buitenstaander zonder account en stopt dat delen weer -- ook na een herstart of een crash',
   grens: 'De proef loopt over de routes die het scherm aanroept plus de leesroute van de buitenstaander, niet door het scherm zelf. Bevestigen door een ander (kantoor, club) zit er niet in: alleen herkomst `zelf` is beproefd. Er is geen Redis of PostgreSQL in de wereld.',
-  loop
+  loop,
+  zaai
 };

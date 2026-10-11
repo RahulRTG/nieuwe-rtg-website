@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-10-11T15:18:55.955Z",
-    "commit": "9092c993",
-    "boomVuil": false,
+    "op": "2026-10-11T20:57:06.180Z",
+    "commit": "ecac61ae0",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.0"
@@ -2192,6 +2192,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "carriereledger-duurzaam.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "carriereledger.e2e.test.js": {
@@ -7352,6 +7359,14 @@
       "module": "server/db/ledengids.js",
       "operator": "!==->===#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "ledenkruis.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/ledenkruis.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "ledenladder.test.js": {
@@ -16423,6 +16438,13 @@
       "operator": "!==->===#0",
       "gezakt": 6,
       "geprobeerd": 1
+    },
+    "veiligmoment-dubbeltik.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "veranderbereik.test.js": {
       "soort": "puur",

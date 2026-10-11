@@ -120,11 +120,26 @@ async function loop(w, stap) {
   });
 }
 
+/* ---------------- de kruisproef (bewijs 6, scripts/lib/ledenkruis.js) ----------------
+   Zaait iets dat ALLEEN van dit lid is, zodat "een ander zag niets" een uitslag
+   is en geen leeg experiment. `merktekens` mogen in geen antwoord aan een ander
+   staan; `lezers` moeten na alle pogingen van de anderen byte voor byte gelijk
+   terugkomen; `handelingen` doen de anderen eerst, en daarna het lid zelf. */
+async function zaai(w) {
+  const lid = await nieuwLid(w, 'kwon');
+  const TITEL = 'Kraan kruisproef ' + merk();
+  await w.post(MELD, { titel: TITEL, plek: 'keuken', urgentie: 'hoog' }, lid.token);
+  const m = met(await w.post(LIJST, {}, lid.token), TITEL)[0];
+  return { lid, merktekens: [TITEL], lezers: [{ pad: LIJST }],
+    handelingen: [{ pad: ANNULEER, lijf: { id: m && m.id } }, { pad: MELD, lijf: { titel: 'CV kruisproef ' + merk(), plek: 'zolder', urgentie: 'normaal' } }] };
+}
+
 module.exports = {
   functie: 'link:wonen',
   ingang: '/apps/wonen.html',
   persona: 'lid',
   belofte: 'een lid meldt zelf wat er thuis stuk is, ziet het als gemeld (nooit als ingepland zonder vakman), annuleert het, en de historie blijft staan -- ook na een herstart of een crash',
   grens: 'De proef loopt over de routes die het scherm aanroept, niet door het scherm zelf. Er is geen tweede partij: toewijzing aan een vakman bestaat vandaag niet (kern/woningonderhoud.js), dus de ontvanger is het lid op een ander toestel. De bestanden en de woningkaart van hetzelfde scherm zijn niet beproefd. Er is geen Redis of PostgreSQL in de wereld.',
-  loop
+  loop,
+  zaai
 };

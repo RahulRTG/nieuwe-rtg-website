@@ -4,6 +4,7 @@ module.exports = (wctx) => {
   const { DEMO, accounts, app, logActivity, notifySupplier, schoon, supplierAuth,
     werkmail } = kern;
   const uitnodiging = kern.personeelsUitnodiging || require('./uitnodiging')({ kern });
+  const doosUitgever = require('../../../kern/zaakdoos/sleutels-uitgever');
   const { maakInvite, wervingsBasis, wervingsLink, lijstInvites, trekInviteIn,
     roteerInvite } = uitnodiging;
 app.post('/api/supplier/staff/add', supplierAuth, async (req, res) => {
@@ -19,19 +20,29 @@ app.post('/api/supplier/staff/add', supplierAuth, async (req, res) => {
   res.json({ ok: true, staff: accounts.publicStaff(staff), pin });
 });
 
+/* Uit het team: geen code (N36), open uitnodiging (N52) of doossleutel (N53)
+   mee. VOOR de plek uitgaat; het aantal gaat in antwoord en log (N55). */
+async function trekAllesIn(req, st) {
+  const u = await Promise.resolve(uitnodiging.trekInVoorStaff(req.supplier.code, st, req.actor.name));
+  const d = await doosUitgever.trekInVanPlek(kern.doosSleutels, req.supplier.code, st.id, req.actor.name);
+  return { uitnodigingen: u.ingetrokken, doossleutels: d };
+}
+const telling = n => n.uitnodigingen || n.doossleutels ? ' (ingetrokken: ' + n.uitnodigingen +
+  ' uitnodiging(en), ' + n.doossleutels + ' doossleutel(s))' : '';
+
 app.post('/api/supplier/staff/remove', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel verwijderen.' });
   const st = accounts.getStaffById(Number(req.body.staffId));
+  let ingetrokken = null;
   if (st && String(st.supplier_code).toUpperCase() === req.supplier.code) {
-    // N36: eerst de uitnodiging intrekken; lukt dat niet, dan verandert er niets.
-    try { await Promise.resolve(uitnodiging.trekInVoorStaff(req.supplier.code, st, req.actor.name)); }
+    try { ingetrokken = await trekAllesIn(req, st); }
     catch (e) { console.error('[staff-remove] veilige verwerking mislukt'); return res.status(503).json({ error: 'De medewerker kon niet veilig worden verwijderd.' }); }
     accounts.deactivateStaff(st.id);
     // Uit dienst trekt ook de persoonlijke werkmail meteen in.
     if (werkmail && werkmail.trekPersoneelIn) werkmail.trekPersoneelIn(req.supplier.code, st.id);
-    logActivity(req.supplier.code, req.actor, req.actor.name + ' verwijderde ' + st.name + ' uit het team');
+    logActivity(req.supplier.code, req.actor, req.actor.name + ' verwijderde ' + st.name + ' uit het team' + telling(ingetrokken));
   }
-  res.json({ ok: true, staff: accounts.listStaff(req.supplier.code).map(accounts.publicStaff) });
+  res.json({ ok: true, ingetrokken, staff: accounts.listStaff(req.supplier.code).map(accounts.publicStaff) });
 });
 
 // Idempotent uitnodigen: alleen een verse sleutel mag een tweede code maken.
@@ -63,14 +74,15 @@ app.post('/api/supplier/staff/invite/intrek', supplierAuth, async (req, res) => 
   const staff = r.claimStaffId != null && accounts.getStaffByIdAny
     ? accounts.getStaffByIdAny(r.claimStaffId)
     : (r.claimMemberId != null ? accounts.staffByMember(req.supplier.code, r.claimMemberId) : null);
+  let ingetrokken = null;
   if (staff && String(staff.supplier_code || '').toUpperCase() === req.supplier.code) {
-    // N36: ook hier uit het team, dus ook een half geclaimde tweede code van dit lid
-    try { await Promise.resolve(uitnodiging.trekInVoorStaff(req.supplier.code, staff, req.actor.name)); }
+    // ook hier uit het team, dus alles wat aan deze plek of dit lid hangt
+    try { ingetrokken = await trekAllesIn(req, staff); }
     catch (e) { console.error('[staff-invite] veilige verwerking mislukt'); return res.status(503).json({ error: 'De uitnodiging kon niet veilig worden ingetrokken.' }); }
     accounts.deactivateStaff(staff.id);
   }
-  logActivity(req.supplier.code, req.actor, req.actor.name + ' trok een uitnodiging in');
-  res.json({ ok: true });
+  logActivity(req.supplier.code, req.actor, req.actor.name + ' trok een uitnodiging in' + (ingetrokken ? telling(ingetrokken) : ''));
+  res.json({ ok: true, ingetrokken });
 });
 
 app.post('/api/supplier/staff/invite/roteer', supplierAuth, async (req, res) => {

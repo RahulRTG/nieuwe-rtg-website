@@ -53,6 +53,20 @@ function controleer(accounts, sess) {
   return { ok: true, staff };
 }
 
+/* Hetzelfde oordeel zonder sessie, voor wie iets UITGAF: een personeelsuitnodiging
+   (N52) of een doossleutel (N53) telt alleen zolang de plek bij deze zaak actief
+   is EN het account erachter (N54: SCIM en de AVG-wissing zetten het account
+   uit, niet de plek). Een plek zonder account (de pincode van Magnaat Test)
+   houdt het oude gedrag. Geen cascade: zet SCIM het account weer aan, dan geldt
+   het weer, want uitzetten is geen wissen. */
+function plekWerkt(accounts, staffId, zaak) {
+  const s = accounts.getStaffByIdAny(Number(staffId));
+  if (!s || Number(s.active) !== 1 || String(s.supplier_code || '').toUpperCase() !== String(zaak || '').toUpperCase()) return false;
+  if (s.member_id == null) return true;
+  const lid = accounts.getUserById(Number(s.member_id));
+  return !!lid && !(accounts.isActief && !accounts.isActief(lid));
+}
+
 function registreer(sessieregister, sess, lidKey, bron) {
   if (!sessieregister || !sess || !sess.sid || !lidKey) return false;
   sessieregister.open(sess.sid, lidKey, { context: {
@@ -63,4 +77,4 @@ function registreer(sessieregister, sess, lidKey, bron) {
   return true;
 }
 
-module.exports = { accountBinding, controleer, registreer };
+module.exports = { accountBinding, controleer, plekWerkt, registreer };

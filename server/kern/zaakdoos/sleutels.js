@@ -34,7 +34,7 @@ const DAG = 86400000;
 const naamVan = x => String(x || '').trim().toLowerCase();
 const zaakVan = x => String(x || '').trim().toUpperCase();
 
-function maakDoosSleutels({ db, save, crypto, bewerkCollectie, nu }) {
+function maakDoosSleutels({ db, save, crypto, bewerkCollectie, nu, uitgeverWeg }) {
   if (typeof bewerkCollectie !== 'function') throw new Error('De doossleutels vereisen een collectietransactie.');
   const tijd = nu || Date.now;
   const iso = () => new Date(tijd()).toISOString();
@@ -111,6 +111,7 @@ function maakDoosSleutels({ db, save, crypto, bewerkCollectie, nu }) {
     if (!t.onderwerp || t.onderwerp.doos !== n || t.onderwerp.zaak !== r.zaak) return null;
     const reden = bearer.reden(t, { doel: DOEL, scope: ['zaakdoos.' + familie], negeerGebruik: true });
     if (reden) return { fout: reden };
+    if (uitgeverWeg && uitgeverWeg(r)) return { fout: 'uitgever-niet-actief' };
     return { doos: n, zaak: r.zaak, expires_at: t.expires_at };
   }
 

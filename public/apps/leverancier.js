@@ -2650,6 +2650,7 @@
               '<div class="st-row"><span><span style="color:var(--rtg-leesgoud,var(--gold));">'+
               (i.status==='actief'?T('kt.codeonce','Code eenmalig uitgegeven'):
                 i.status==='verlopen'?T('kt.expired','Verlopen · code verborgen'):
+                i.status==='uitgever-niet-actief'?T('kt.uitgeverweg','Uitgever werkt hier niet meer · maak een nieuwe code'):
                   T('kt.revoked','Ingetrokken · code verborgen'))+'</span>'+
               '<span class="sub">'+(i.naam?escT(i.naam)+' \u00b7 ':'')+(i.func?escT(i.func)+' \u00b7 ':'')+(i.role==='manager'?'Manager \u00b7 ':'')+T('kt.geldigtot','geldig t/m')+' '+new Date(i.expires).toLocaleDateString()+'</span></span>'+
               '<span class="acts"><button class="obtn" data-krot="'+escT(i.id)+'">'+T('kt.roteer','Nieuwe code')+'</button>'+

@@ -152,6 +152,7 @@ const api = {
 api.staffAccountBinding = (lidOfId, uitgegevenOp) =>
   staffSessie.accountBinding(api, lidOfId, uitgegevenOp);
 api.controleerStaffSessie = sess => staffSessie.controleer(api, sess);
+api.plekWerkt = (staffId, zaak) => staffSessie.plekWerkt(api, staffId, zaak);
 api.registreerStaffSessie = (sessieregister, sess, lidKey, bron) =>
   staffSessie.registreer(sessieregister, sess, lidKey, bron);
 

@@ -175,8 +175,12 @@ for (const pad of ['/api/supplier/staff/remove', '/api/supplier/staff/invite/int
     const bron = fs.readFileSync(path.join(__dirname, '../server/routes/supplier/werving/personeel.js'), 'utf8');
     const begin = bron.indexOf("'" + pad + "'");
     const route = bron.slice(begin, bron.indexOf('app.post(', begin + 10));
-    const trek = route.indexOf('trekInVoorStaff('), uit = route.indexOf('deactivateStaff(');
-    assert.ok(trek > 0, pad + ' roept trekInVoorStaff aan');
+    const trek = route.indexOf('trekAllesIn('), uit = route.indexOf('deactivateStaff(');
+    assert.ok(trek > 0, pad + ' roept trekAllesIn aan');
+    // trekAllesIn zelf trekt de uitnodigingen (N36, N52) en de doossleutels (N53) in
+    const hulp = bron.slice(bron.indexOf('async function trekAllesIn('), bron.indexOf('const telling'));
+    assert.match(hulp, /trekInVoorStaff\(/, 'de uitnodigingen');
+    assert.match(hulp, /trekInVanPlek\(/, 'de doossleutels');
     assert.ok(uit > trek, 'eerst intrekken, dan pas de plek uitzetten: lukt het intrekken niet, dan verandert er niets');
   });
 }

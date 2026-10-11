@@ -21,7 +21,8 @@ module.exports = ({ crypto, beveilig, noteerAfketser, register }) => {
   const productie = () => process.env.NODE_ENV === 'production';
   const h = s => crypto.createHash('sha256').update('rtg-doos-gedeeld|' + String(s)).digest();
   const FOUT = { verlopen: 'Deze doossleutel is verlopen. Laat hem roteren door een manager van de zaak of het kantoor.',
-    ingetrokken: 'Deze doossleutel is ingetrokken.', 'scope-ontbreekt': 'Deze doossleutel mag dit eindpunt niet gebruiken.' };
+    ingetrokken: 'Deze doossleutel is ingetrokken.', 'scope-ontbreekt': 'Deze doossleutel mag dit eindpunt niet gebruiken.',
+    'uitgever-niet-actief': 'De manager die deze doossleutel uitgaf, werkt hier niet meer. Laat een manager van de zaak hem opnieuw uitgeven.' };
 
   function afketser(req, res, ip, rij) {
     rij.push(Date.now());

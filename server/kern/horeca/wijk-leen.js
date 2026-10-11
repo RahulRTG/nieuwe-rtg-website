@@ -110,12 +110,17 @@ module.exports = ({ horeca, schoon }) => {
        niet-gemeten  geen klokregel na de leen: veel zaken klokken niet, en
                      "niemand klokte" is geen "hij is weg"
      Die derde weglaten zou elke zaak zonder prikklok een vloer vol
-     verlaten tafels geven. */
+     verlaten tafels geven. En `ingeklokt` zegt wat het klokboek zegt: een
+     vergeten open klokregel van gisteren telt hier ook als ingeklokt, net als
+     op de andere plekken die het klokboek lezen. */
   function drager(l, klokBoek) {
     if (!Array.isArray(klokBoek)) return { stand: 'niet-gemeten', reden: 'Deze zaak heeft geen klokboek.' };
     const zijne = klokBoek.filter((e) => e && String(e.staffId) === String(l.staffId) && e.in);
     if (zijne.some((e) => !e.out)) return { stand: 'ingeklokt' };
-    const sinds = Date.parse(l.at) || 0;
+    /* Een leen zonder leesbaar tijdstip kan niet zeggen of een uitklok ERNA
+       kwam; dan zou een uitklok van gisteren "weg" melden. */
+    const sinds = Date.parse(l.at);
+    if (!Number.isFinite(sinds)) return { stand: 'niet-gemeten', reden: 'Deze leen heeft geen leesbaar tijdstip.' };
     const na = zijne.filter((e) => (Date.parse(e.out) || 0) >= sinds)
       .sort((a, b) => Date.parse(b.out) - Date.parse(a.out))[0];
     if (na) return { stand: 'uitgeklokt', om: na.out };

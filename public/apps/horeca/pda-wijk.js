@@ -61,16 +61,6 @@
       });
     });
 
-    /* HERVERDELEN GEBEURT NIET HIER. Een wijk overdragen is een aanbod aan een
-       collega met een antwoord terug (kern/horeca/wijk-overdracht.js), en dat
-       hoort op een scherm dat de hele verdeling toont -- niet als vierde knopje
-       onder een takenlijst. Wel de weg ernaartoe, want wie zijn wijk kwijt wil
-       staat op dit moment met een PDA in zijn hand en niet achter een bureau.
-
-       EN WAT AAN MIJ IS AANGEBODEN, STAAT ERBIJ. Een aanbod dat alleen op een
-       vast scherm te zien is, komt niet aan bij iemand die loopt -- en zolang
-       hij niet antwoordt, draagt een collega het nog. Alleen het AANTAL: de
-       handeling blijft op de vloer, want daar staat de hele verdeling erbij. */
     /* WAT IK VAN EEN COLLEGA DRAAG, met de knop om het terug te geven. Een
        vaste regel en geen melding die na drie seconden weg is: de tafel blijft
        op mijn naam tot ik hem teruggeef, dus de herinnering ook. */
@@ -88,6 +78,16 @@
       });
     }
 
+    /* HERVERDELEN GEBEURT NIET HIER. Een wijk overdragen is een aanbod aan een
+       collega met een antwoord terug (kern/horeca/wijk-overdracht.js), en dat
+       hoort op een scherm dat de hele verdeling toont -- niet als vierde knopje
+       onder een takenlijst. Wel de weg ernaartoe, want wie zijn wijk kwijt wil
+       staat op dit moment met een PDA in zijn hand en niet achter een bureau.
+
+       EN WAT AAN MIJ IS AANGEBODEN, STAAT ERBIJ. Een aanbod dat alleen op een
+       vast scherm te zien is, komt niet aan bij iemand die loopt -- en zolang
+       hij niet antwoordt, draagt een collega het nog. Alleen het AANTAL: de
+       handeling blijft op de vloer, want daar staat de hele verdeling erbij. */
     var n = Number(voorMij) || 0;
     $('pWijken').insertAdjacentHTML('beforeend',
       (n ? '<p class="pda-som"><b>Er ' + (n === 1 ? 'ligt een aanbod' : 'liggen ' + n + ' aanbiedingen') +

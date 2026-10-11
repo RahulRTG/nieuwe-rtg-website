@@ -130,9 +130,11 @@
       return ' · <b>uitgeklokt om ' + esc(isNaN(om) ? '?' : om.toTimeString().slice(0, 5)) +
         '</b>, de tafel staat nog op zijn naam';
     };
-    var wegZin = d.dragerWeg ? '<p class="v-som"><b>' + d.dragerWeg + (d.dragerWeg === 1 ? ' tafel staat' : ' tafels staan') +
-      ' nog op naam van iemand die al is uitgeklokt.</b> Geef ' + (d.dragerWeg === 1 ? 'hem' : 'ze') +
-      ' terug, of laat de uitlener dat doen.</p>' : '';
+    var nWeg = Number(d.dragerWeg) || 0;
+    var wegZin = nWeg ? '<p class="v-som"><b>' + nWeg + (nWeg === 1 ? ' tafel staat' : ' tafels staan') +
+      ' nog op naam van iemand die al is uitgeklokt.</b> ' +
+      (d.magIndelen ? 'U kunt ' + (nWeg === 1 ? 'hem' : 'ze') + ' hieronder teruggeven.'
+        : 'Teruggeven doet de uitlener of een manager.') + '</p>' : '';
     $('vGeleend').innerHTML = wegZin + (uit.length ? uit.map(function (l) {
       return '<div class="v-leen"><b>' + esc(l.tafel) + '</b><small>' +
         esc(l.naam) + ' draagt hem' + (l.vanNaam ? ', van ' + esc(l.vanNaam) : '') +

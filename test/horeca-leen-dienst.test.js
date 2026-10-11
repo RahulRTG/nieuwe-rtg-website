@@ -137,4 +137,9 @@ test('6. de drager wordt uit het klokboek gelezen: wie uitklokte VOOR de leen is
   assert.equal(leen.drager(l, [
     { staffId: 7, in: '2026-10-11T23:30:00.000Z', out: null },
     { staffId: 7, in: '2026-10-11T17:00:00.000Z', out: '2026-10-11T23:00:00.000Z' }]).stand, 'ingeklokt');
+  // het gewone geval: hij werkte al toen hij de tafel kreeg
+  assert.equal(leen.drager(l, [{ staffId: '7', in: '2026-10-11T18:00:00.000Z', out: null }]).stand, 'ingeklokt');
+  // een leen zonder leesbaar tijdstip zegt niet dat een oude uitklok "erna" kwam
+  assert.equal(leen.drager({ staffId: '7', naam: 'Bram' },
+    [{ staffId: 7, in: '2026-10-10T17:00:00.000Z', out: '2026-10-10T23:00:00.000Z' }]).stand, 'niet-gemeten');
 });

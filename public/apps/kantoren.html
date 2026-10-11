@@ -2602,7 +2602,7 @@ function voorstelKaart(v, alsBoardroom){
       (alsBoardroom ? '<button class="knop stil" data-acc="'+v.id+'" style="padding:.3rem .9rem;font-size:.78rem;">Accepteer en schakel</button>'+
       '<button class="knop stil" data-afw="'+v.id+'" style="padding:.3rem .9rem;font-size:.78rem;">Wijs af</button>' : '')+
       '<input class="veld" data-msg="'+v.id+'" placeholder="Discussieer mee..." style="flex:1;min-width:10rem;padding:.35rem .7rem;font-size:.8rem;">'+
-      '<button class="knop stil" data-stuur="'+v.id+'" data-wie="'+(alsBoardroom?'boardroom':'paniekkamer')+'" style="padding:.3rem .9rem;font-size:.78rem;">Stuur</button></div>' : '')+
+      '<button class="knop stil" data-stuur="'+v.id+'" style="padding:.3rem .9rem;font-size:.78rem;">Stuur</button></div>' : '')+
     '</div>';
 }
 function koppelVoorstellen(el, herlaad){
@@ -2614,7 +2614,7 @@ function koppelVoorstellen(el, herlaad){
   }));
   el.querySelectorAll('[data-stuur]').forEach(b => b.addEventListener('click', async () => {
     const inp = el.querySelector('[data-msg="'+b.dataset.stuur+'"]');
-    try { await api('paniek/bericht', { id: b.dataset.stuur, wie: b.dataset.wie, tekst: inp.value }); inp.value = ''; herlaad(); } catch (e) { meld(e.message); }
+    try { await api('paniek/bericht', { id: b.dataset.stuur, tekst: inp.value }); inp.value = ''; herlaad(); } catch (e) { meld(e.message); }
   }));
 }
 async function openPaniek(){

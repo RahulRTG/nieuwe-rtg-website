@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T22:32:37.468Z",
-    "commit": "048593f7",
+    "op": "2026-10-12T05:02:39.625Z",
+    "commit": "b5610174",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4032,6 +4032,14 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
+    },
+    "experience-volgorde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/experience/volgorde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "extern-afrekenen.test.js": {
       "soort": "server",
@@ -15307,6 +15315,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "stuur-knelpunt.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wegwerpserver.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "stuur-mandaat.test.js": {
       "soort": "puur",

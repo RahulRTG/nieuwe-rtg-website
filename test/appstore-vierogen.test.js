@@ -52,7 +52,12 @@ test('0. de toets zelf: sleutel gaat voor naam, en de graad zegt hoe hard hij is
   assert.equal(zelfdeNaam.mag, false);
   assert.equal(zelfdeNaam.code, 'zelfde-naam');
 
-  assert.equal(vierogen.toets({ inzender: { id: 'a', naam: 'Sam' }, doorKey: 'b', doorNaam: 'Ada' }).graad, 'bewezen');
+  assert.equal(vierogen.toets({ inzender: { id: 'user-1', naam: 'Sam' }, doorKey: 'user-2', doorNaam: 'Ada' }).graad, 'bewezen');
+  /* Twee ONBEKENDE sleutelvormen zijn geen vergelijkbare ruimte: ongelijk
+     bewijst daar niets. */
+  const vreemd = vierogen.toets({ inzender: { id: 'a', naam: 'Sam' }, doorKey: 'b', doorNaam: 'Ada' });
+  assert.equal(vreemd.mag, false, 'twee onbekende sleutelvormen werden als twee mensen gelezen');
+  assert.equal(vreemd.code, 'geen-identiteit');
   /* EEN GETYPTE NAAM TEKENT NIETS AF. De namen verschillen, maar wie tekent
      heeft geen sleutel: dat is de gedeelde kantoorcode met een woord erbij. */
   const getypt = vierogen.toets({ inzender: { id: null, naam: 'Sam' }, doorKey: null, doorNaam: 'Ada' });

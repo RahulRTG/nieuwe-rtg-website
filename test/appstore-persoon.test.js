@@ -123,7 +123,6 @@ test('6 - de orgcode verraadt het account niet', async () => {
      het codenaamontwerp omzeilen (CLAUDE.md). */
   const org = (await api('/api/appstore/persoon', {}, lid)).body.org;
   assert.ok(org, 'er hoort een orgcode te zijn');
-  assert.ok(!org.includes('rtg'), 'de sessiesleutel hoort er niet in te zitten, gevonden: ' + org);
   assert.match(org, /^P-[0-9A-F]{10}$/, 'een willekeurige code en niet iets wat uit de mens is gebouwd');
 
   /* En de sleutel zelf hoort NERGENS naar buiten te komen. publiekU is de enige

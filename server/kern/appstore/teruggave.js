@@ -66,6 +66,9 @@ module.exports = function maakTeruggave({ S, save, nu, boek, eigen, pay, aankope
     if (r.status !== 'open') return { status: 409, error: 'Hierover is al besloten (' + r.status + ').' };
     const wie = String(door || '').trim().slice(0, 80);
     if (!wie) return { status: 400, error: 'Zet je naam erbij: een besluit over andermans geld hoort een mens te hebben genomen.' };
+    /* De ACTOR wordt hier geeist en niet alleen in de route: een toekomstige
+       aanroeper zonder sessiesleutel legt geen besluit over andermans geld vast. */
+    if (!doorKey) return { status: 403, error: 'Een besluit over andermans geld vraagt een mens op naam: er kwam geen sessiesleutel mee.', watNu: 'inloggen-op-naam' };
     if (besluit === 'afgewezen') {
       if (String(reden || '').trim().length < 10) return { status: 400, error: 'Een afwijzing draagt een reden van ten minste tien tekens; die leest het lid.' };
       r.status = 'afgewezen'; r.besluit = { door: wie, doorKey: doorKey || null, at: nu(), reden: String(reden).trim().slice(0, 400) };

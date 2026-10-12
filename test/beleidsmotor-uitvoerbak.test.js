@@ -142,15 +142,30 @@ test('7. de volgorde verraadt geen verborgen waarde, en passkey-routes buiten de
   const r = (route, t) => Object.assign({ route, klasse: 'k', passkey: 0, opNaam: 0, eigenaarToken: 0, gedeeld: 0 }, t,
     { zouZakken: (t.opNaam || 0) + (t.eigenaarToken || 0) + (t.gedeeld || 0) });
   // gesorteerd op zouZakken, zoals uitvoeren.lees hem geeft: 21, 20 (met een 2 erin), 20
-  const werklijst = [r('POST /z', { gedeeld: 21 }), r('POST /m', { opNaam: 2, gedeeld: 18 }), r('POST /a', { gedeeld: 20 })];
-  const u = stand.kleineAantallen({ werklijst, perKlasse: { k: { passkey: 3, opNaam: 2, eigenaarToken: 0, gedeeld: 59, zouZakken: 61, waarnemingen: 64 } } });
-  const plek = u.werklijst.findIndex(x => x.klein);
-  assert.equal(plek, u.werklijst.length - 1, 'een rij met een verborgen cel staat tussen haar buren: ' + JSON.stringify(u.werklijst.map(x => x.route)));
-  assert.deepEqual(u.werklijst.slice(0, 2).map(x => x.route), ['POST /z', 'POST /a'], 'de open rijen houden hun volgorde');
+  // twee verborgen rijen, in een volgorde die NIET die van de route is (/q voor /b)
+  const werklijst = [r('POST /z', { gedeeld: 21 }), r('POST /q', { opNaam: 3, gedeeld: 18 }), r('POST /a', { gedeeld: 20 }),
+    r('POST /b', { opNaam: 2, gedeeld: 17 })];
+  const u = stand.kleineAantallen({ werklijst, perKlasse: { k: { passkey: 3, opNaam: 5, eigenaarToken: 0, gedeeld: 76, zouZakken: 81, waarnemingen: 84 } } });
+  assert.deepEqual(u.werklijst.map(x => x.route), ['POST /z', 'POST /a', 'POST /b', 'POST /q'],
+    'open rijen in hun volgorde, verborgen rijen achteraan OP ROUTE en niet op hun waarde');
 
   // drie passkeys op routes die niet in de lijst staan: het verschil met het totaal is klein
   const v = stand.kleineAantallen({ werklijst: [r('POST /b', { gedeeld: 30 })],
     perKlasse: { k: { passkey: 3, opNaam: 0, eigenaarToken: 0, gedeeld: 30, zouZakken: 30, waarnemingen: 33 } } });
   assert.equal(v.perKlasse.k.passkey, null, 'het klassetotaal verraadde een kleine som buiten de lijst');
   assert.equal(v.perKlasse.k.waarnemingen, null);
+});
+
+test('8. de afkapgrens van 100 rijen verraadt de afgevallen kleine route niet (N3)', () => {
+  const stand = require('../server/kern/beleidsmotor/stand');
+  const rijen = [];
+  for (let i = 0; i < 100; i++) rijen.push({ pad: uitvoeren.VOORVOEGSEL + 'k POST /groot' + String(i).padStart(3, '0'), gedeeld: 50 + i });
+  rijen.push({ pad: uitvoeren.VOORVOEGSEL + 'k POST /klein', opNaam: 2 });
+  const u = stand.kleineAantallen(uitvoeren.lees(rijen));
+  assert.equal(u.werklijst.length, 100, 'de werklijst is afgekapt');
+  assert.ok(!u.werklijst.some(x => x.route === 'POST /klein'), 'de kleine route viel eraf');
+  const k = u.perKlasse.k;
+  for (const v of ['opNaam', 'zouZakken', 'gedeeld', 'eigenaarToken'])
+    assert.equal(k[v], null, 'klassetotaal ' + v + ' min de zichtbare rijen geeft de afgevallen 2 terug');
+  assert.equal(u.zouZakken, null, 'en het totaal bovenaan ook');
 });

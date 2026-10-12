@@ -60,7 +60,8 @@ function toets({ inzender, doorKey, doorNaam }) {
      Zonder een sleutel van de inzender in de ruimte van de tekenaar is de
      scheiding niet vast te stellen, en dan is het nooit `bewezen`. */
   const ruimte = (k) => (/^user-\d+$/.test(String(k)) ? 'lid' : (/^staff:/.test(String(k)) ? 'staff' : 'anders'));
-  const sleutelBekend = !!(doorKey && ids.some(k => ruimte(k) === ruimte(doorKey)));
+  // `anders` is geen ruimte maar het ontbreken ervan: twee onbekende vormen bewijzen niets
+  const sleutelBekend = !!(doorKey && ruimte(doorKey) !== 'anders' && ids.some(k => ruimte(k) === ruimte(doorKey)));
   const naamBekend = !!(inz && inz.naam && doorNaam);
 
   if (doorKey && ids.includes(String(doorKey))) {

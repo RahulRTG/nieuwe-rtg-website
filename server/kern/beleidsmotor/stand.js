@@ -44,13 +44,22 @@ function kleineAantallen(u) {
     for (const v of uitvoeren.SOORTEN.concat(['zouZakken', 'waarnemingen'])) t[v] = null;
     pk[k] = t; totaalWeg = true;
   }
-  /* Routes met alleen een passkey staan niet in de werklijst maar wel in het
-     klassetotaal: het verschil is hun som. Is die klein, dan gaat het totaal weg. */
+  /* TOTAAL MIN ZICHTBAAR, per veld (N3). Niet alles staat in de werklijst: hij
+     is afgekapt op 100 rijen (de kleinste vallen eraf) en routes met alleen een
+     passkey staan er nooit in. Het klassetotaal min de zichtbare cellen is dan
+     de som van wat ontbreekt; is die klein, dan gaan de totalen van die klasse
+     weg -- anders rekent men een afgevallen 2 gewoon terug. */
   for (const k of Object.keys(pk)) {
-    if (pk[k].passkey === null) continue;
-    const gezien = u.werklijst.filter(r => r.klasse === k).reduce((n, r) => n + (r.passkey || 0), 0);
-    const rest = (pk[k].passkey || 0) - gezien;
-    if (rest > 0 && rest < KLEIN) { pk[k] = Object.assign({}, pk[k], { passkey: null, waarnemingen: null, klein: TE_KLEINE_GROEP }); totaalWeg = true; }
+    if (pk[k].klein) continue;
+    const rijen = u.werklijst.filter(r => r.klasse === k);
+    const klein = uitvoeren.SOORTEN.concat(['zouZakken']).some(v => {
+      const rest = (pk[k][v] || 0) - rijen.reduce((n, r) => n + (r[v] || 0), 0);
+      return rest > 0 && rest < KLEIN;
+    });
+    if (!klein) continue;
+    const t = Object.assign({}, pk[k], { klein: TE_KLEINE_GROEP });
+    for (const v of uitvoeren.SOORTEN.concat(['zouZakken', 'waarnemingen'])) t[v] = null;
+    pk[k] = t; totaalWeg = true;
   }
   if (totaalWeg) { u.zouZakken = null; u.waarnemingen = null; }
   /* DE VOLGORDE VERRAADT NIETS (N3). De werklijst staat op zouZakken; een rij

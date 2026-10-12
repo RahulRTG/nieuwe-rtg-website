@@ -61,13 +61,23 @@ function maakSse({ bus }) {
     for (const c of sseClients.slice()) {
       let raak = false;
       if (m.doel === 'key') raak = c.key === m.match;
-      else if (m.doel === 'sup') raak = c.sup === m.match;
+      else if (m.doel === 'sup') raak = c.sup === m.match && magBeperkt(c, m.alleenVoor);
       else if (m.doel === 'office') raak = !!c.office;
       else if (m.doel === 'tier') raak = m.match.includes(c.tier);
       if (!raak) continue;
       if (!nogGeldig(c)) { sluit(c); continue; }
       sseSend(c.res, m.event, m.data, m.doel === 'key' ? m.id : undefined);
     }
+  }
+
+  /* EEN BEPERKT ZAAKSIGNAAL (eigenaarsbesluit 2A, 11 oktober 2026): een signaal
+     over een beschermde logregel (inlog, klok) gaat alleen naar een manager van
+     de zaak en naar de medewerker zelf. Zonder `alleenVoor` verandert er niets. */
+  function magBeperkt(c, alleenVoor) {
+    if (!alleenVoor) return true;
+    // `zonderManager`: een eigen gesprek van een medewerker is ook voor zijn manager niet
+    if (c.manager === true && !alleenVoor.zonderManager) return true;
+    return alleenVoor.staffId != null && c.staffId != null && String(c.staffId) === String(alleenVoor.staffId);
   }
 
   /* ELK BERICHT OPNIEUW (AUTHORITY.md fase 3). Een kantoor- of leveranciersstroom

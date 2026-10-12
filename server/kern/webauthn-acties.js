@@ -53,6 +53,8 @@ const ZWARE_ACTIES = Object.freeze([
   'eigenaar-noodrem-uit',       // POST /api/techniek/beveiliging/auto  (alleen bij UIT)
   'eigenaar-terugstorting',     // POST /api/office/bank/terugstorting
   'eigenaar-cadeaubon',         // POST /api/office/cadeaubon/stand  (de e-geldpositie, C14)
+  'eigenaar-leidingtoets',      // POST /api/office/rtmail/leiding/toets  (juridische toets op sollicitatiepost, 584A)
+  'eigenaar-leidinghold',       // POST /api/office/rtmail/leiding/hold  (een juridische hold beoordelen, 584A)
   'eigenaar-herstel-in',        // POST /api/techniek/herstel/inrichten
   'eigenaar-herstel-af',        // POST /api/techniek/herstel/afbreken
   'eigenaar-ssogeheim',         // POST /api/techniek/sso/geheim en /api/techniek/sso met clientSecret (B22, zonder terugval)

@@ -1,6 +1,8 @@
 /* De volledige zaak-status voor de leverancier-app. */
 const GS = require('../geschikt');
 const ConnectionPartner = require('../connection-partner');
+const logboekzicht = require('./logboekzicht');
+const personeelzicht = require('./personeelzicht');
 module.exports = (ctx) => {
   const { db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer, logActivity,
     findSupplier, connectedSupplierCodes, guestsFor, gidsHaal, etaMinutes, haversine, accounts, werkgeverSollicitatie,
@@ -10,6 +12,7 @@ module.exports = (ctx) => {
   const { modulesVoor: pdaModules } = require('../pda/modules');
   const talentMatches = require('./talent')(db);
   function supplierState(s, actor) {
+    const kijker = actor || { name: 'Beheer', role: 'manager', manager: true };
     const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
     const vandaag = new Date().toISOString().slice(0, 10);
     const ORDER_KLAAR = { 'geserveerd': 1, 'geweigerd': 1, 'terugbetaald': 1, 'bezorgd': 1, 'opgehaald': 1 };
@@ -92,7 +95,6 @@ module.exports = (ctx) => {
         .slice(0, 12)
         .map(L => { const d = L.destCode ? findSupplier(L.destCode) : null; return { codename: L.codename, dest: d ? d.name : null }; }),
       menu: s.menu || [],
-      lijn: s.lijn || {},
       // wat over is op de pas (vers gefilterd: na twee uur telt het niet meer mee)
       overschot: (s.overschot || []).filter(x => Date.now() - new Date(x.at) < 2 * 3600000),
       orders: zichtOrders.map(o => {
@@ -114,26 +116,17 @@ module.exports = (ctx) => {
         ritOmzet: klaarAll.reduce((s2, r) => s2 + (r.quote || 0), 0),
         boekingen: alleBoekingen.length
       },
-      /* personeelszaken voor het kantoor: verlofaanvragen en wie er nu binnen is.
-
-         EEN ZIEKMELDING GAAT HIER ZONDER OMSCHRIJVING DE DEUR UIT. De route
-         weigert er tegenwoordig een (routes/staff/dienst.js), maar dit is de
-         plek waar het gegeven de werkgever BEREIKT, en dat is de plek waar je
-         het tegenhoudt: oudere meldingen kunnen er nog een dragen, en een
-         scherm dat hem morgen wel toont is een regel opmaak. Wat iemand heeft
-         hoort bij de arbodienst; hier gaat alleen mee DAT hij er niet is. */
-      verlof: (db.data.verlof[s.code] || []).slice(0, 30).map(v =>
-        v.soort === 'ziek' && v.reden ? Object.assign({}, v, { reden: '' }) : v),
-      klok: (() => {
-        const entries = (db.data.klok[s.code] || []).filter(e => e.in.slice(0, 10) === vandaag).slice(0, 60);
-        return { vandaag: entries, binnen: [...new Set(entries.filter(e => !e.out).map(e => e.name))] };
-      })(),
+      /* personeelszaken: lijn, verlof, meldingen en sollicitaties voor DEZE actor
+         (./personeelzicht.js, besluiten A1 en B1); een ziekmelding gaat er ook
+         voor de manager zonder omschrijving uit */
+      ...personeelzicht.staatDelen(db.data, s, actor, vandaag, werkgeverSollicitatie),
+      // klok + activity: wat deze actor mag ontvangen (./logboekzicht.js)
+      // de ECHTE actor en niet de terugval hieronder: zonder actor geen manager (fail-closed)
+      ...logboekzicht.staatDelen(db.data, s.code, actor, vandaag),
       guests: guestsFor(s.code).slice(0, 30),
       prices: db.data.supplierPrices.filter(p => p.supplierCode === s.code).slice(0, 20),
-      notifications: db.data.supplierNotifications[s.code] || [],
       staff: accounts.listStaff(s.code).map(accounts.publicStaff),
-      applications: (db.data.applications[s.code] || []).slice(0, 30).map(werkgeverSollicitatie),
-      talentMatches: talentMatches(s.code),
+      talentMatches: logboekzicht.magKlokZien(actor) ? talentMatches(s.code) : [],   // werving: de manager
       vacatures: (db.data.vacatures[s.code] || []).slice(0, 40),
       events: s.events || null,
       dailyMeps: (() => {
@@ -145,9 +138,8 @@ module.exports = (ctx) => {
         if (s.dailyMeps[morgen]) out[morgen] = s.dailyMeps[morgen];
         return out;
       })(),
-      activity: (db.data.supplierActivity[s.code] || []).slice(0, 40),
       team: (db.data.supplierTeam[s.code] || []).slice(-60),
-      actor: actor || { name: 'Beheer', role: 'manager', manager: true }
+      actor: kijker
     };
   }
 

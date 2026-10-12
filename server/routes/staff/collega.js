@@ -41,36 +41,14 @@ app.post('/api/staff/klok/correctie', supplierAuth, (req, res) => {
   lijst.unshift({ id: crypto.randomBytes(4).toString('hex'), staffId, name: wie.name, in: inAt.toISOString(), out: uitAt.toISOString(), correctie: req.actor.name });
   db.data.klok[req.supplier.code] = lijst.slice(0, 4000);
   save();
-  logActivity(req.supplier.code, req.actor, 'boekte een klokcorrectie voor ' + wie.name);
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' });
+  logActivity(req.supplier.code, req.actor, 'boekte een klokcorrectie voor ' + wie.name, 'klok-correctie');
+  // een correctie verandert niemands aanwezigheid: het signaal alleen voor de managers en wie het betreft
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' }, { staffId });
   res.json({ ok: true, ...klokVan(req.supplier.code, staffId) });
 });
 
-/* Videobellen op de werkvloer (WebRTC). De server geeft alleen signalen door
-   (bel, aannemen, offer/answer/ice); het beeld en geluid lopen rechtstreeks
-   tussen de toestellen (peer-to-peer). 1-op-1 belt op staffId en alleen wie
-   is ingeklokt is bereikbaar; de teamcall is een groepsgesprek per zaak
-   (kamer "team"), waarin ieder toestel rechtstreeks met de anderen verbindt
-   (mesh) tot de kamergrens van 100 deelnemers. */
-app.post('/api/staff/call', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const kind = String(req.body.kind || '');
-  if (!['ring', 'accept', 'decline', 'offer', 'answer', 'ice', 'hangup', 'join', 'leave'].includes(kind))
-    return res.status(400).json({ error: 'Onbekend signaal.' });
-  const naar = req.body.staffId != null && req.body.staffId !== '' ? parseInt(req.body.staffId, 10) : null;
-  if (kind === 'ring') {
-    if (!naar || naar === req.actor.staffId) return res.status(400).json({ error: 'Kies een collega.' });
-    const lijst = db.data.klok[req.supplier.code] || [];
-    if (!lijst.find(e => e.staffId === naar && !e.out)) return res.status(409).json({ error: 'Deze collega is niet ingeklokt en dus niet bereikbaar.' });
-    logActivity(req.supplier.code, req.actor, 'belde een ingeklokte collega (video)');
-  }
-  sseToSupplier(req.supplier.code, 'rtc', {
-    kind, van: req.actor.staffId, vanNaam: req.actor.name, naar,
-    video: req.body.video !== false, payload: req.body.payload || null,
-    kamer: String(req.body.kamer || '') || null
-  });
-  res.json({ ok: true });
-});
+// videobellen (1-op-1 en de teamkamer): ./bellen.js
+require('./bellen')(actx);
 
 /* Collega tegen collega: een direct chatbericht, van toestel naar toestel.
    De lijst toont wie er ingeklokt en online is; het gesprek zelf blijft
@@ -107,7 +85,9 @@ app.post('/api/staff/dm/lijst', supplierAuth, (req, res) => {
       return {
         id: m.id, name: m.name, func: m.func || '', role: m.role,
         binnen: !!klok.find(e => e.staffId === m.id && !e.out),
-        online: online.has(m.id),
+        /* besluit C1: geen algemene stip. `online` alleen binnen een gesprek
+           waarin BEIDE schreven (commCollega.wederkerig), en nooit een tijd */
+        online: !!laatste && online.has(m.id) && commCollega.wederkerig(req.supplier.code, req.actor.staffId, m.id),
         ongelezen: commCollega.ongelezen(req.supplier.code, req.actor.staffId, m.id),
         laatste: laatste ? String(laatste.text || '').slice(0, 60) : ''
       };
@@ -135,11 +115,12 @@ app.post('/api/staff/dm/send', supplierAuth, (req, res) => {
   const naam = (id) => (Number(id) === req.actor.staffId ? req.actor.name : st.name);
   commCollega.stuur(req.supplier.code, req.actor.staffId, st.id, text, { naamVan: naam });
   // alleen het toestel van de ontvanger krijgt het signaal (geen omroep)
-  let bezorgd = 0;
   for (const c of sseClients) {
-    if (c.sup === req.supplier.code && c.staffId === st.id) { sseSend(c.res, 'dm', { vanId: req.actor.staffId, van: req.actor.name, text }); bezorgd++; }
+    if (c.sup === req.supplier.code && c.staffId === st.id) sseSend(c.res, 'dm', { vanId: req.actor.staffId, van: req.actor.name, text });
   }
-  res.json({ ok: true, bezorgd,
+  /* Geen `bezorgd`: een aantal open toestellen is een online-stip die met elk
+     bericht af te lezen is (besluit C1). */
+  res.json({ ok: true,
     messages: commCollega.berichten(req.supplier.code, req.actor.staffId, st.id, 100, naam) });
 });
 

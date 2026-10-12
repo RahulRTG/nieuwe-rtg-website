@@ -36,7 +36,7 @@ app.get('/api/supplier/stream', async (req, res) => {
   if (!sess) return res.status(401).end();
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache, no-transform', 'Connection': 'keep-alive' });
   res.write('retry: 3000\n\n');
-  const client = { sup: sess.code, staffId: sess.staffId != null ? sess.staffId : null, res,
+  const client = { sup: sess.code, staffId: sess.staffId != null ? sess.staffId : null, manager: sess.manager === true, res,
     /* per bericht dezelfde lichte vraag als voorheen (sessie en zaak, geen
        personeelsopzoeking per bericht) */
     geldig: () => {
@@ -46,7 +46,7 @@ app.get('/api/supplier/stream', async (req, res) => {
       return !!z && z.partnerStatus !== 'geschorst' && z.partnerStatus !== 'beeindigd';
     } };
   sseClients.push(client);
-  sseSend(res, 'hello', { unread: ongelezen(sess.code) });
+  sseSend(res, 'hello', { unread: ongelezen(sess.code, { staffId: client.staffId, manager: client.manager }) });
   const ping = setInterval(() => res.write(': ping\n\n'), 25000);
   req.on('close', () => { clearInterval(ping); const i = sseClients.indexOf(client); if (i >= 0) sseClients.splice(i, 1); });
 });

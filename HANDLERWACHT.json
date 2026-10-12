@@ -3299,13 +3299,13 @@
   },
   {
    "sleutel": "POST /api/mail/binnen",
-   "bestand": "server/routes/mailpost.js:56",
+   "bestand": "server/routes/mailpost.js:57",
    "staat": "openbaar",
    "reden": "de buitenpoort voor echte RFC 5322-post; een vreemde mailserver heeft geen inlog bij ons. Eigen venster-rem per minuut, alles landt in de ONBETROUWDE baan, en de ontvanger komt uit de To-kop en niet uit een parameter (anders was het een open relay)"
   },
   {
    "sleutel": "POST /api/mail/ses",
-   "bestand": "server/routes/mailpost.js:80",
+   "bestand": "server/routes/mailpost.js:81",
    "staat": "openbaar",
    "reden": "AWS SES bewijst bezit met een verse HMAC over envelop, controles en exacte berichtbytes; zonder 32+ teken geheim blijft de route dicht"
   },
@@ -4108,7 +4108,7 @@
   },
   {
    "sleutel": "POST /api/supplier/apply",
-   "bestand": "server/routes/supplier/werving/sollicitaties.js:14",
+   "bestand": "server/routes/supplier/werving/sollicitaties.js:13",
    "staat": "openbaar",
    "reden": "solliciteren bij een zaak kan zonder account"
   },

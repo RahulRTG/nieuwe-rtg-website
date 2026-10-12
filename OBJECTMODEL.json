@@ -27,6 +27,7 @@
     "id",
     "label",
     "naam",
+    "naar",
     "notitie",
     "ok",
     "omschrijving",
@@ -107,6 +108,18 @@
       ]
     },
     {
+      "veld": "vervalt",
+      "domeinen": 16,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/ai",
+        "kern/command",
+        "kern/commerce",
+        "kern/koppel",
+        "kern/levensband"
+      ]
+    },
+    {
       "veld": "waarom",
       "domeinen": 16,
       "waar": [
@@ -116,18 +129,6 @@
         "kern/commercie",
         "kern/concern",
         "kern/gewoonten"
-      ]
-    },
-    {
-      "veld": "vervalt",
-      "domeinen": 15,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/ai",
-        "kern/command",
-        "kern/commerce",
-        "kern/koppel",
-        "kern/levensband"
       ]
     },
     {
@@ -188,18 +189,6 @@
         "kern/koppel",
         "kern/labfonds",
         "kern/livinglab"
-      ]
-    },
-    {
-      "veld": "onderwerp",
-      "domeinen": 14,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/commercie",
-        "kern/connect",
-        "kern/kantoor",
-        "kern/mailwachtrij"
       ]
     },
     {
@@ -538,7 +527,6 @@
         "actie",
         "certificaat",
         "klantImpact",
-        "naar",
         "oorzaak",
         "past",
         "terugDraaibaar",
@@ -994,7 +982,7 @@
       ]
     },
     {
-      "gelijkenis": 0.89,
+      "gelijkenis": 0.88,
       "a": "server/kern/command/runbookcatalogus.js",
       "b": "server/kern/zaakcommand/runbooks.js",
       "domeinA": "kern/command",
@@ -1003,7 +991,6 @@
         "actie",
         "certificaat",
         "klantImpact",
-        "naar",
         "oorzaak",
         "past",
         "terugDraaibaar",

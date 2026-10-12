@@ -97,7 +97,10 @@ module.exports = function start(deps) {
     sosVeeg: [(t, data) => require('../kern/voertuigsos').vergeetVoertuigSos(data.boekingen, t)].concat(
       ['ontmoetVergeetSosPosities', 'veiligVergeetSosPosities', 'veiligVergeetVerlopenPlekken',
         'bevVergeetSosPosities', 'bevVergeetRondePosities']
-        .map(n => (t) => (typeof kern[n] === 'function' ? kern[n](t) : 0))) });
+        .map(n => (t) => (typeof kern[n] === 'function' ? kern[n](t) : 0))),
+    // sollicitatiepost op de leidingsplek van RTMail (584A): de ronde blijft van het domein
+    leidingVeeg: (t) => (kern.rtmailBewaar ? kern.rtmailBewaar.leiding.ronde(t,
+      { meld: (...a) => kern.beveilig && kern.beveilig.meld(...a) }) : null) });
 
   require('./startcontrole')({ PRODUCTION, DEMO, accounts, eigenaar });
 

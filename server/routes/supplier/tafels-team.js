@@ -3,6 +3,7 @@
    Verbatim afgesplitst uit routes/supplier.js; alleen de routes, de helpers
    komen via het kern-object binnen. */
 const { coord } = require('../../kern/util');
+const logboekzicht = require('../../kern/leverancier/logboekzicht');
 module.exports = (kern) => {
   const { TABLE_STATUSES, accounts, app, broadcastSync, crypto, db, logActivity, managerOnly,
           notifySupplier, payrollOS, save, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth } = kern;
@@ -68,7 +69,10 @@ app.post('/api/supplier/team/buzz', supplierAuth, (req, res) => {
     }
   }
   logActivity(req.supplier.code, req.actor, all ? 'riep het hele team op (tril)' : 'riep ' + name + ' op (tril)');
-  res.json({ ok: true, reached, name: all ? 'het hele team' : name });
+  /* Geen aantal toestellen: dat is een online-stip (besluit C1). Een manager
+     hoort hooguit OF iemand het kreeg (ja/nee); een ander niets. */
+  res.json(Object.assign({ ok: true, name: all ? 'het hele team' : name },
+    logboekzicht.magKlokZien(req.actor) ? { reached: reached > 0 } : {}));
 });
 
 app.post('/api/supplier/security', supplierAuth, (req, res) => {
@@ -105,8 +109,9 @@ app.post('/api/supplier/leave/decide', supplierAuth, (req, res) => {
     if (m && m.error) console.error('[verzuim] goedgekeurd verlof niet vastgelegd:', m.error, m.bezwaren || '');
   }
   save();
-  logActivity(req.supplier.code, req.actor, (v.status === 'goedgekeurd' ? 'keurde verlof goed van ' : 'wees verlof af van ') + v.name);
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'verlof' });
+  // besluit B1: de manager en wie het betreft (op zijn staffId), geen collega
+  logActivity(req.supplier.code, { name: req.actor.name, staffId: v.staffId }, (v.status === 'goedgekeurd' ? 'keurde verlof goed van ' : 'wees verlof af van ') + v.name, 'afwezig');
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'verlof' }, { staffId: v.staffId }); // B1: manager en wie het betreft
   res.json({ ok: true, entry: v });
 });
 
@@ -138,7 +143,9 @@ app.post('/api/supplier/activity', supplierAuth, (req, res) => {
      duidelijk: de aanroeper wil zoveel mogelijk. */
   const gevraagd = Number(req.body && req.body.aantal);
   const n = Number.isFinite(gevraagd) && gevraagd >= 1 ? Math.min(gevraagd, 80) : 40;
-  res.json({ ok: true, activity: lijst.slice(0, n), totaal: lijst.length });
+  // managerOnly hierboven laat alles door; toch dezelfde bron als /state, zodat er een regel is
+  const zicht = logboekzicht.logboekVoor(lijst, req.actor, n);
+  res.json({ ok: true, activity: zicht.regels, totaal: zicht.totaal });
 });
 
 };

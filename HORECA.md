@@ -924,7 +924,68 @@ ziet per geleende tafel of de drager er nog is, in drie standen (`ingeklokt`,
 klok-tijdstip ziet alleen een manager, en de server stuurt het een ander niet
 mee -- één regel voor in- én uitklokken (eigenaarsbesluit 11 oktober 2026): een
 collega ziet de stand, aanwezig of niet, en het tijdstip wordt aan de bron
-weggelaten, ook bij het team in `/api/supplier/horeca/missions`. Hij telt
+weggelaten, ook bij het team in `/api/supplier/horeca/missions`. Dezelfde
+bestaande grens geldt voor het zaaklogboek en de klokregels zelf: wie aanwezig is
+mag iedereen zien, in- en uitkloktijden en klokregels van collega's alleen een
+manager. Waar dat wordt beslist staat op één plek,
+`server/kern/leverancier/logboekzicht.js` -- `/api/supplier/state` (logboek en
+klokregels van vandaag), de logboekroute, het beveiligingsrooster, de Vloer en de
+vloeropdrachten gaan er alle vijf langs. Klokschrijvers markeren hun regel met een
+soort uit een gesloten lijst (oudere regels worden herkend aan hun vaste tekst),
+en er wordt gefilterd vóór het afkappen op 40, zodat aantal en volgorde niets
+verraden (`test/supplier-logboekzicht.test.js`). Ook de volgorde van wie er
+binnen is zegt niets: een collega krijgt de aanwezigen op naam en niet nieuwste
+inklok eerst, op `/state`, de vloeropdrachten en de ruimteweergave, en het
+golfvoorstel breekt een gelijke last voor iedere kijker op naam. Twee
+vervolgbesluiten van de eigenaar (11 oktober 2026) gaan langs dezelfde functie.
+**1A:** `plekIn` van een bewakersdienst (binnen of buiten de post, met `sinds`)
+volgt het inkloktijdstip -- de manager en de bewaker zelf zien het, een collega
+ziet alleen DAT iemand op een post staat (`DIENSTKLOKVELDEN`, in het rooster en
+het commandocentrum). **2A:** "X logde in" is een beschermde klokgebeurtenis
+(soort `klok-inlog`): de manager en de medewerker zelf, die zijn eigen regel
+terugkrijgt op `staffId` en nooit op naam. Er wordt niets minder geschreven --
+logboek en inlogspoor blijven volledig -- alleen minder geleverd, en een
+beschermde regel stuurt zijn `team`-signaal over SSE alleen naar de managers en
+de medewerker zelf (`alleenVoor` in `kern/sse.js`), omdat een signaal zonder
+zichtbare nieuwe regel een collega het tijdstip verraadt. "Zelf" is altijd het
+`staffId` en nooit de naam (twee collega's kunnen dezelfde naam dragen), elke weg
+die een werksessie munt schrijft een `klok-inlog` (ook binnenkomen met het
+RTG-account en wisselen van werkplek), het CDT-bord van een taxibedrijf geeft
+een chauffeur alleen zijn eigen dienst, en het logboek bewaart de beschermde
+regels per medewerker naast de gewone, zodat ze geen zichtbare regel wegdrukken
+(`test/logboekzicht-eigen.test.js`). Drie besluiten later op dezelfde dag gaan langs dezelfde
+predicaten, in `server/kern/leverancier/personeelzicht.js`. **A1:** aan- en
+afmelden op een kant van de keukenlijn is een klokgebeurtenis; wie er NU aan de
+lijn staat ziet iedereen, op naam en niet in aanmeldvolgorde. **B1:** een
+ziekmelding is gezondheidsinformatie -- een collega ziet alleen dat iemand
+vandaag "afwezig" is (geen soort, geen datum), de melding, de logregel en de
+verzuimplanning met wat iemand nog kan gaan alleen naar de manager en de
+medewerker zelf, en ook de manager krijgt geen omschrijving (een verlofaanvraag
+gaat dezelfde weg). **C1:** er is geen algemene online-stip meer; `online` in de
+collegalijst staat alleen aan binnen een bestaand gesprek, en nooit met een tijd.
+En sollicitaties horen bij de werving: alleen de manager krijgt ze, ook in de
+meldingen (`test/personeelzicht.test.js`). Een derde tegenlezing vond de wegen
+eromheen, en die gaan nu langs dezelfde plek: de bel van de zaak dwingt aan de
+INGANG af dat een beperkte melding (`beperkt: 'werving'` of `'afwezig'`, of een
+oude met zo'n titel) alleen de managers bereikt, met een gelezen-vlag per lezer
+en een eigen grens per bak; een sollicitatiegesprek staat niet in de inbox van
+een medewerker en zijn realtime-signaal gaat alleen naar de managers (een eigen
+gesprek van een medewerker alleen naar hem); het beveiligingsrooster geeft een
+collega `afwezig: true` en niet de verlofsoort; loonruns, bevindingen,
+contracten en aangiftes zijn van de manager; de verzuimplanning toont van een
+collega alleen vandaag; de online-stip staat pas aan als BEIDE in het gesprek
+schreven, en een oproep of bericht zegt niet op hoeveel toestellen het aankwam
+(`test/personeelzicht-routes.test.js`). De vierde ronde sloot nog vier wegen: de
+online-stip in een gesprek tussen collega's volgt dezelfde wederkerigheid, de
+sollicitatiepost van RTMail staat verplicht op een LEIDINGSPLEK naast het
+zaakpostvak -- een plek en geen adres, dus niemand kan ernaar sturen, er een
+team van maken of er met een zaakcode mee botsen, en oude post wordt er bij het
+opstarten naartoe verhuisd, en elke lezer van het postvak roept zonder vlag
+hetzelfde vangnet aan, zodat ook een latere schrijver niets doorlaat -- die alleen
+de inbox en de export van een manager kent, en die onder dezelfde
+bewaartermijn en juridische bewaring valt als het postvak, een videobelsignaal
+(met zijn IP-adressen) gaat alleen naar wie gebeld wordt en de teamkamer alleen
+naar wie erin zit, en een pauze seint alleen de manager en de medewerker zelf. Hij telt
 hoeveel TAFELS er nog bij iemand staan die al uitklokte. Dat leest de prikklok
 van het personeelsdomein via `klokVan` (`kern/personeel.js`) en verder niets: het
 besluit staat in NORM.json (`kernGedeeld` 254 -> 255) met wie levert, wie leest

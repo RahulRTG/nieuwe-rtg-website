@@ -1788,8 +1788,11 @@
       "leren"
     ],
     "rtmail-bestuur": [
+      "boardroomAuth",
+      "boardroomWie",
       "rtmailBewaar",
-      "rtmailRecht"
+      "rtmailRecht",
+      "zwaarbewijs"
     ],
     "rtmail-lid": [
       "agenda",

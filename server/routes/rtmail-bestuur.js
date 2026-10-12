@@ -11,6 +11,8 @@
    poging. Dat is precies wat een beveiligingsonderzoek wil zien, en het is de
    reden dat de poort logt en niet de route: een route die zelf mag kiezen of
    hij logt, vergeet dat een keer. */
+const { magKlokZien } = require('../kern/leverancier/logboekzicht');
+const { zelfdeBus } = require('../kern/rtmail-adres');
 module.exports = (kern) => {
   const { app, auth, supplierAuth, db, rtmail, rtmailRecht, rtmailBewaar, codenaamVan } = kern;
   const wie = require('../kern/rtmail-wie')({ db, rtmail, codenaamVan });
@@ -26,6 +28,13 @@ module.exports = (kern) => {
     const doel = (req) => String(body(req).postvak || '') || p.adres(req);
     const geen = (res) => res.status(404).json({ error: 'Geen postvak voor deze inlog.' });
     const nee = (res, r) => res.status(403).json({ error: r.error || r.waarom });
+    /* De leidingsplek (kern/rtmail-leiding.js) alleen voor een manager van PRECIES
+       de zaak van dit postvak: magKlokZien kent de eigen zaak, dus via een
+       delegatie op een ander postvak telt hij niet. De sessie gaat mee in het
+       vernietigingsbewijs, uit de inlog en nooit uit de body; een gedelegeerde
+       leest dat bewijs mee, dus een accountsleutel wordt daar een label. */
+    const leidingVan = (req, ik, d) => p.pad === '/api/supplier/rtmail' && magKlokZien(req.actor) && zelfdeBus(ik, d);
+    const sessieVan = (req) => (req.actor && (req.actor.staffId || (req.actor.lidKey ? 'lid-account' : null))) || null;
 
     app.post(p.pad + '/rechten', p.poort, (req, res) => {
       const ik = p.adres(req);
@@ -69,7 +78,7 @@ module.exports = (kern) => {
     app.post(p.pad + '/bewaarbeleid', p.poort, (req, res) => {
       const ik = p.adres(req);
       if (!ik) return geen(res);
-      const r = rtmailBewaar.beleid(ik, doel(req));
+      const r = rtmailBewaar.beleid(ik, doel(req), { leiding: leidingVan(req, ik, doel(req)) });
       if (r.error) return nee(res, r);
       res.json(r);
     });
@@ -95,7 +104,7 @@ module.exports = (kern) => {
     app.post(p.pad + '/opruimen', p.poort, (req, res) => {
       const ik = p.adres(req);
       if (!ik) return geen(res);
-      const r = rtmailBewaar.ruimOp(ik, doel(req), body(req).reden);
+      const r = rtmailBewaar.ruimOp(ik, doel(req), body(req).reden, { sessie: sessieVan(req) });
       if (r.error) return res.status(400).json(r);
       res.json(r);
     });
@@ -106,7 +115,7 @@ module.exports = (kern) => {
       const d = doel(req);
       const g = rtmailRecht.mag(ik, d, 'metadata');
       if (!g.ok) return nee(res, g);
-      res.json({ ok: true, postvak: d, bewijs: rtmailBewaar.bewijs(d),
+      res.json({ ok: true, postvak: d, bewijs: rtmailBewaar.bewijs(d, { leiding: leidingVan(req, ik, d) }),
         let: 'Hier staat WAT er vernietigd is, niet wat erin stond. Dat laatste zou de vernietiging ongedaan maken.' });
     });
 
@@ -114,9 +123,41 @@ module.exports = (kern) => {
       const ik = p.adres(req);
       if (!ik) return geen(res);
       const b = body(req);
-      const r = rtmailBewaar.exporteer(ik, doel(req), { reden: b.reden, metInhoud: b.metInhoud });
+      const r = rtmailBewaar.exporteer(ik, doel(req), { reden: b.reden, metInhoud: b.metInhoud,
+        leiding: leidingVan(req, ik, doel(req)) });
       if (r.error) return nee(res, r);
       res.json(r);
     });
   }
+
+  /* DE LEIDINGSPLEK VAN DEZE ZAAK (besluit 584A): verlengen per bericht
+     (kern/rtmail-leidingtermijn.js) en een juridische hold aanvragen
+     (kern/rtmail-leidinghold.js). Alleen een manager van DEZE zaak; een collega
+     of een gedelegeerde van een andere zaak krijgt de reden. Wie het doet komt
+     uit de inlog. De kantoorkant (toets, beoordeling) staat in
+     ./rtmail-bestuur/kantoor.js, op dezelfde domeingrens. */
+  require('./rtmail-bestuur/kantoor')(kern);
+  const manager = (req, res, ik, b) => {
+    if (!ik) { res.status(404).json({ error: 'Geen postvak voor deze inlog.' }); return false; }
+    if (magKlokZien(req.actor) && !(b.postvak && !zelfdeBus(ik, String(b.postvak)))) return true;
+    res.status(403).json({ error: 'Alleen een manager van deze zaak kan de bewaartermijn van sollicitatiepost bepalen.' });
+    return false;
+  };
+  const ids = (b) => (Array.isArray(b.ids) ? b.ids : (b.id != null ? [b.id] : null));
+  const door = (req) => (req.actor && (req.actor.staffId || req.actor.lidKey)) || null;
+  const antwoord = (res, r) => (r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r));
+
+  app.post('/api/supplier/rtmail/leiding/verleng', supplierAuth, (req, res) => {
+    const ik = wie.zaakAdres(req), b = body(req);
+    if (!manager(req, res, ik, b)) return;
+    antwoord(res, rtmailBewaar.leiding.verleng({ adres: ik, ids: ids(b), dagen: b.dagen,
+      grondslag: b.grondslag, noodzaak: b.noodzaak, door: door(req) }));
+  });
+
+  app.post('/api/supplier/rtmail/leiding/hold', supplierAuth, (req, res) => {
+    const ik = wie.zaakAdres(req), b = body(req);
+    if (!manager(req, res, ik, b)) return;
+    antwoord(res, rtmailBewaar.leiding.hold.aanvraag({ adres: ik, ids: ids(b), grondslag: b.grondslag, doel: b.doel,
+      herbeoordeling: b.herbeoordeling, door: door(req), sleutel: (req.actor && req.actor.lidKey) || null }));
+  });
 };

@@ -117,8 +117,8 @@ module.exports = (wctx) => {
     save();
     // De melding aan het bedrijf is identiek aan die van een gewoon RTG-lid: de
     // foundation-herkomst blijft onzichtbaar voor de werkgever.
-    notifySupplier(s.code, { icon: 'werk', title: 'Sollicitatie via RTG', body: name + ' (RTG-lid) solliciteert als ' + vac.func + ', met cv.' });
-    sseToSupplier(s.code, 'sync', { scope: 'team' });
+    notifySupplier(s.code, { icon: 'werk', title: 'Sollicitatie via RTG', body: name + ' (RTG-lid) solliciteert als ' + vac.func + ', met cv.', beperkt: 'werving' });
+    sseToSupplier(s.code, 'sync', { scope: 'team' }, { staffId: null }); // werving: alleen de managers
     sseToOffice('sync', { scope: 'team' });
     res.json({ ok: true });
   });

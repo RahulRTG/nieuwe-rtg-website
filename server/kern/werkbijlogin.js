@@ -89,7 +89,7 @@ function maakWerkBijLogin({ accounts, crypto, findSupplier, magWerken, rememberS
       accounts.registreerStaffSessie(sessieregister, sess, binding.lidKey, 'auth/inlog');
       plek.token = token;
       try { logInlog('zaak', true, s.code + ' · ' + actor.name + ' (met het RTG-account)', req); } catch (e) {}
-      try { logActivity(s.code, actor, actor.name + ' kwam binnen met het RTG-account'); } catch (e) {}
+      try { logActivity(s.code, actor, actor.name + ' kwam binnen met het RTG-account', 'klok-inlog'); } catch (e) {}
       uit.push(plek);
     }
     return uit;

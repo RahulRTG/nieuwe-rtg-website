@@ -168,4 +168,9 @@ api.plekWerkt = (staffId, zaak) => staffSessie.plekWerkt(api, staffId, zaak);
 api.registreerStaffSessie = (sessieregister, sess, lidKey, bron) =>
   staffSessie.registreer(sessieregister, sess, lidKey, bron);
 
+/* Gekeurd (A3), en dezelfde gekeurde persoon? Alleen ja/nee en 'ander',
+   'zelfde' of 'onbekend' -- de kluis geeft hier geen rij, hash of document af. */
+Object.assign(api, require('./zelfdemens')({ getUserById: users.getUserById,
+  getMemberState: users.getMemberState }));
+
 module.exports = api;

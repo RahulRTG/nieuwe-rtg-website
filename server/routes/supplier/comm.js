@@ -39,7 +39,7 @@ module.exports = (kern) => {
   /* Wie deze sessie is, onder welke sleutel een gesprek van haar is, en hoe de
      draad opengaat: ./comm-sleutel.js. Daar staat ook waarom die sleutel wordt
      afgeleid en nooit aangeleverd. */
-  const { actor, alsWie, hoeTeOpenen } = require('./comm-sleutel')({ comm });
+  const { actor, alsWie, hoeTeOpenen, verborgen } = require('./comm-sleutel')({ comm });
 
   /* De inbox van de zaak EN de eigen gesprekken in een lijst. Twee aanroepen
      van dezelfde kern en geen samengevoegde query: de kern kent een deelnemer,
@@ -53,6 +53,7 @@ module.exports = (kern) => {
       for (const sleutel of a.alle) {
         comm.levensteken(sleutel);
         for (const g of comm.inbox(sleutel, { lade: req.body.lade, archief: !!req.body.archief }).gesprekken) {
+          if (verborgen(a, g)) continue;   // werving: alleen de manager (./comm-sleutel.js)
           /* De drie eigen velden staan ACHTERAAN: kwam er ooit een `alsWie`,
              `gedeeld` of `open` uit de kern, dan hoort de route te winnen --
              dit is wat zij weet en de kern niet. */
@@ -108,7 +109,8 @@ module.exports = (kern) => {
     const a = actor(req, res); if (!a) return;
     try {
       const uit = [];
-      for (const sleutel of a.alle) uit.push(...comm.zoek(sleutel, req.body.vraag).treffers);
+      for (const sleutel of a.alle)
+        uit.push(...comm.zoek(sleutel, req.body.vraag).treffers.filter((t) => !verborgen(a, comm.gesprekVan(t.gesprekId))));
       uit.sort((x, y) => String(y.at || '').localeCompare(String(x.at || '')));
       res.json({ ok: true, treffers: uit.slice(0, 60), vraag: String(req.body.vraag || '').slice(0, 80) });
     } catch (e) { fout(res, e); }

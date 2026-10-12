@@ -11,6 +11,7 @@
    AFGELEID uit de sessie, nooit aangeleverd. */
 'use strict';
 const wie = require('../../kern/comm/wie');
+const { magKlokZien } = require('../../kern/leverancier/logboekzicht');
 
 module.exports = ({ comm }) => {
   /* Wie deze sessie is. Geen zaak in de sessie is geen actor -- en dan is er
@@ -18,8 +19,14 @@ module.exports = ({ comm }) => {
   function actor(req, res) {
     const a = wie.vanZaak(req);
     if (!a) { res.status(401).json({ error: 'Geen zaak in deze sessie.' }); return null; }
-    return a;
+    return Object.assign(a, { manager: magKlokZien(req.actor) });
   }
+
+  /* EEN SOLLICITATIEGESPREK IS WERVING, en die is van de manager: het staat wel
+     in de gedeelde zaakinbox (de sollicitant spreekt de zaak aan), maar een
+     medewerker zonder managerrol ziet het niet en kan het niet openen
+     (kern/leverancier/beschermdesoorten.js, werving). */
+  const verborgen = (a, g) => !a.manager && !!g && ((g.meta && g.meta.bron === 'Werk') || g.bron === 'Werk');
 
   /* Onder WELKE sleutel dit gesprek van jou is. In de praktijk staat er een
      van de twee in een gesprek -- een gedeelde zaakinbox en een collega-DM
@@ -33,6 +40,7 @@ module.exports = ({ comm }) => {
      zodat er maar een plek is waar dat antwoord wordt geformuleerd. */
   function alsWie(a, gesprekId) {
     const g = comm.gesprekVan(String(gesprekId || ''));
+    if (verborgen(a, g)) throw new Error('Dit gesprek is niet van jou.');
     const sleutel = g && a.alle.find((s) => comm.magErin(g, s));
     if (!sleutel) throw new Error(g ? 'Dit gesprek is niet van jou.' : 'Dit gesprek bestaat niet.');
     return sleutel;
@@ -81,5 +89,5 @@ module.exports = ({ comm }) => {
     if (a && a.soort === 'mens') return { soort: 'collega', staffId: a.nummer };
     return null;
   }
-  return { actor, alsWie, hoeTeOpenen };
+  return { actor, alsWie, hoeTeOpenen, verborgen };
 };

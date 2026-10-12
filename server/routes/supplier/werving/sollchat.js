@@ -7,6 +7,7 @@ module.exports = (kern, { chatVan, sollicitatieVan, heeftMeldingen }) => {
   const { app, applyChatVertaald, chatStuur, managerOnly, notify, supplierAuth, talen } = kern;
 
   app.post('/api/supplier/apply/chat', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;   // werving is van de manager, net als het sturen hieronder
     const chat = chatVan(req.body.id);
     if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Chat niet gevonden.' });
     applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ chat: c }));

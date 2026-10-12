@@ -63,6 +63,18 @@ function maakTonen(binnen) {
     };
   }
 
+  /* DE ONLINE-STIP TUSSEN COLLEGA'S (besluit C1, 11 oktober 2026): in een
+     gesprek waarin alleen medewerkers zitten, staat hij pas aan als de kijker
+     EN de ander er allebei in schreven -- een gesprek openen of een bericht
+     sturen dwingt hem dus niet af. Dezelfde regel als commCollega.wederkerig()
+     voor de collegalijst. Bij een lid of een zaak blijft het zoals het was. */
+  function zichtbaarOnline(g, lijst, mij, anderen) {
+    const collegas = g.deelnemers.every((d) => (wie.ontleed(d) || {}).soort === 'mens');
+    if (!collegas) return anderen.length === 1 ? isAanwezig(anderen[0]) : anderen.some(isAanwezig);
+    const schreven = new Set(lijst.filter((m) => !m.weg).map((m) => m.van));
+    return schreven.has(mij) && anderen.some((d) => schreven.has(d) && isAanwezig(d));
+  }
+
   /* De titel van een een-op-een gesprek is de codenaam van de ANDER, en die
      hangt dus af van wie er kijkt. Vandaar hier en niet in het gesprek zelf:
      een opgeslagen titel zou voor een van beiden altijd de verkeerde zijn. */
@@ -82,7 +94,7 @@ function maakTonen(binnen) {
       at: g.laatst, ongelezen,
       vast: !!st.vast, stil: !!st.stil, weg: !!st.weg, concept: st.concept || null,
       typt: wieTypt(g.id, mij),
-      online: anderen.length === 1 ? isAanwezig(anderen[0]) : anderen.some(isAanwezig),
+      online: zichtbaarOnline(g, lijst, mij, anderen),
       bron: (g.meta && g.meta.bron) || null, link: (g.meta && g.meta.link) || null
     };
   }

@@ -58,7 +58,7 @@ app.post('/api/staff/clock', supplierAuth, (req, res) => {
   else { lijst.unshift({ id: crypto.randomBytes(4).toString('hex'), staffId: req.actor.staffId, name: req.actor.name, in: new Date().toISOString(), out: null, plekIn: plek }); actie = 'in'; }
   db.data.klok[req.supplier.code] = lijst.slice(0, 4000);
   save();
-  logActivity(req.supplier.code, req.actor, 'klokte ' + actie);
+  logActivity(req.supplier.code, req.actor, 'klokte ' + actie, 'klok-' + actie);
   sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' });
   /* De plaats-uitspraak gaat MEE IN HET ANTWOORD en niet alleen de klokregel in.
      Wie klokt hoort meteen te zien wat er over hem is vastgelegd -- dat is
@@ -97,7 +97,8 @@ app.post('/api/staff/pauze', supplierAuth, (req, res) => {
   if (open) { open.uit = new Date().toISOString(); actie = 'uit'; }
   else { dienst.pauzes.push({ in: new Date().toISOString(), uit: null }); actie = 'in'; }
   save();
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' });
+  // een pauze verandert niemands aanwezigheid: het signaal alleen voor de managers en de medewerker zelf
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'klok' }, { staffId: req.actor.staffId });
   const stand = werkbeleidPauzeStand(req.supplier.code, req.actor.staffId);
   res.json({ ok: true, actie, pauze: stand, budgetMinuten: WERKBELEID_PAUZE_MINUTEN });
 });

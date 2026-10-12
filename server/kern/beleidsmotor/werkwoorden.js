@@ -54,7 +54,9 @@ const WERKWOORDEN = Object.freeze({
       /* een besluit over RTG vastleggen of intrekken, met zijn gronden (C13) */
       '/api/office/beslisgeheugen',
       /* RTG zelf als werkgever inrichten: een werkgever en een eerste leidinggevende (VRIJHEID.md) */
-      '/api/office/rtghuis'] }
+      '/api/office/rtghuis',
+      /* de bewaarplicht van sollicitatiepost: de juridische toets en de holds (584A) */
+      '/api/office/rtmail/leiding/'] }
 });
 
 function werkwoordVan(pad) {

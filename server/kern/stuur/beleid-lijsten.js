@@ -30,7 +30,8 @@ const LEZEN = Object.freeze({
     /^\/api\/bank\/(overzicht|rekening|afschrift|rente-voorbeeld|passen|krediet|terugkerend|advies|hart|inzichten|vastelasten)$/,
     /^\/api\/bookings\/mine$/,
     // bewaart niets; besluit 11-10-2026 (MAATSTAF.md 7k)
-    /^\/api\/knelpunt$/
+    /^\/api\/knelpunt$/,
+    /^\/api\/reisbureau\/mijn$/ // zie test/stuur-niveaus.test.js
   ],
   supplier: [
     /^\/api\/supplier\/state$/,

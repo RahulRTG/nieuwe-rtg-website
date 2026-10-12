@@ -118,8 +118,12 @@ test('elke gespreks-assistent begint met het gedeelde karakter (RAHUL_LEAD)', ()
      "splits minder" maar: een wacht die op een BESTANDSNAAM staat, hoort bij
      elke splitsing nagelopen te worden -- en hij zakt luid, wat precies is wat
      je wilt. */
-  for (const p of ['server/routes/supplier/ai/index.js', 'server/routes/member/persoonlijk-rahul.js',
-    'server/routes/staff/dienst-fluister.js', 'server/routes/techniek/boardroom/ai.js', 'server/kern/fluister/gesprek.js'])
+  /* EN OP 12 OKTOBER 2026 NOG TWEE KEER, om dezelfde reden: de aanroep van de
+     stuurlus voor een lid ging naar persoonlijk-rahul-stuur.js en het
+     modelantwoord van het gesprek naar fluister/gesprek-model.js (de Context
+     Bridge, EDGE.md par. 14.4). Deze wacht zakte op allebei, luid. */
+  for (const p of ['server/routes/supplier/ai/index.js', 'server/routes/member/persoonlijk-rahul-stuur.js',
+    'server/routes/staff/dienst-fluister.js', 'server/routes/techniek/boardroom/ai.js', 'server/kern/fluister/gesprek-model.js'])
     assert.match(lees(p), /RAHUL_LEAD|rahulLeadVoor/, p + ' gebruikt het gedeelde karakter');
 });
 

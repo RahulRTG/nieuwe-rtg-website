@@ -22,6 +22,10 @@ module.exports = (ctx) => {
   const deelCtx = { ...ctx, zaken, open, caps, datumPlus };
   const { bouwReisplan, voerReisUit } = require('./reisplan')(deelCtx);
   const { bouwKleding, voerKledingUit, voorspel } = require('./kleding')(deelCtx);
+  const { leesReiswens, conceptVan, zinVan } = require('./reiswens');
+  const { reisAanbod } = require('../../reisbureau');
+  // een reiswens wordt een werkstuk met id en versie in het eigen geheugen (./reisconcept.js)
+  const concepten = require('./reisconcept')({ van: ctx.van, alle: ctx.alleFluister, save, nu, catalogus: () => reisAanbod(db) });
 
   /* ---- de servicedag: voor een zaak of een personeelslid bouwt Rahul uit
      de echte dagstand (reserveringen, lopende orders, activiteiten) een
@@ -76,6 +80,15 @@ module.exports = (ctx) => {
         plan.delen.map(d => d.oms).join(' | ') + '. Samen ' + eur(totaal) + ' (de transfer volgt het tarief van de vervoerder). ' +
         'Zeg "ja" en ik zet alles in een keer klaar, inclusief uw dagschema; afrekenen doet u daarna zelf in de app. "Nee" en het gaat niet door.', false, true);
     }
+    /* Een reiswens met een bestemming en reizigers, duur of budget: een
+       concept met wat bekend is en wat ontbreekt, zonder iets in te dienen
+       (./reiswens.js). Na het reisplan, zodat "plan mijn weekend" blijft wat
+       het was. */
+    const waarden = leesReiswens(q);
+    if (waarden) {
+      const concept = concepten.conceptNieuw(p, key, waarden);
+      return Object.assign(klaar(zinVan(conceptVan(waarden, reisAanbod(db)))), { concept });
+    }
     if (/\b(koop|bestel|zoek|regel)\b/i.test(q)) {
       // de catalogus zelf is het bewijs: vindt Rahul een echt kledingstuk in
       // de vraag, dan is dit een kledingwens (anders valt de vraag gewoon
@@ -96,5 +109,5 @@ module.exports = (ctx) => {
     return null;
   }
 
-  return { rahulExtra, voerReisUit, voerKledingUit };
+  return { rahulExtra, voerReisUit, voerKledingUit, concepten };
 };

@@ -875,6 +875,7 @@
     ],
     "member": [
       "reserveringUitzondering",
+      "contextDomeinen",
       "AUTHOR_TIER",
       "DOOR_RELOCK_MS",
       "LANDEN",

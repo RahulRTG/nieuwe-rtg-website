@@ -19,6 +19,7 @@
 'use strict';
 
 const MAX_WOORDEN = 12;    /* de vraag blijft het zwaartepunt, niet het scherm */
+const MAX_OPGEZOCHT = 3;
 
 /* DE WOORDEN, en meer komt er niet naar de interpretatielaag. Ze staan op
    volgorde van hoe dicht ze bij de bedoeling van de mens staan: wat hij heeft
@@ -48,8 +49,13 @@ function woordenVan(c) {
    Alleen bij een GESLAAGDE sanering. Bij NOT_RUN of OVERGESLAGEN is de regel
    leeg, en dan plakt ./lus.js er niets onder -- een lege "Actieve context:" zou
    het model laten denken dat het scherm leeg IS. */
-function handtekening(res) {
+function handtekening(res, opties) {
   if (!res || res.stand !== 'PASS' || !res.context) return '';
+  /* Gaat de vraag NIET over het aangewezen object (./menscontext-relatie.js),
+     dan staat het object er wel bij -- zodat "die andere" te lezen blijft --
+     maar zonder zijn velden en met de zin dat de vraag er niet over gaat. Het
+     scherm helpt lezen; het kiest de taak niet. */
+  const los = !!(opties && opties.relatie === 'los');
   const c = res.context, d = [];
   if (c.presentatie.app) d.push('scherm ' + c.presentatie.app);
   if (c.presentatie.scherm) d.push('deel ' + c.presentatie.scherm);
@@ -63,7 +69,22 @@ function handtekening(res) {
   if (c.verwijzingen.length) d.push(c.verwijzingen.length + ' verwijzing' +
     (c.verwijzingen.length > 1 ? 'en' : '') + ' naar ' +
     [...new Set(c.verwijzingen.map((v) => v.soort))].join(' en '));
+  /* WAT DE SERVER ZELF OPZOCHT (./menscontext-opzoek.js). Alleen CANONIEKE
+     verwijzingen, en alleen hun beeld: de velden die het domein op een
+     positieve lijst zette, opnieuw gelezen bij deze vraag. Hooguit drie
+     objecten -- de vraag blijft het zwaartepunt, niet het dossier. Zonder
+     opzoeker staat hier niets, en dan is de regel exact die van voorheen. */
+  const opgezocht = (res.verwijzingenUitslag || []).filter((u) => u && u.stand === 'CANONIEK' && u.object)
+    .slice(0, MAX_OPGEZOCHT).map((u) => {
+      const o = u.object, v = o.velden || {};
+      /* Tekst tussen aanhalingstekens: een titel met een komma mag niet als
+         twee velden te lezen zijn, en een waarde blijft zichtbaar een waarde. */
+      const delen = Object.keys(v).map((k) => k + ' ' + (typeof v[k] === 'string' ? JSON.stringify(v[k]) : v[k]));
+      return o.soort + ' ' + o.id + (delen.length ? ' (' + delen.join(', ') + ')' : '');
+    });
+  if (opgezocht.length && los) d.push('deze vraag gaat niet over het aangewezen object; behandel hem als een nieuwe vraag');
+  else if (opgezocht.length) d.push(('opgezocht door RTG: ' + opgezocht.join(' | ')).slice(0, 600));
   return d.join('; ');
 }
 
-module.exports = { woordenVan, handtekening, MAX_WOORDEN };
+module.exports = { woordenVan, handtekening, MAX_WOORDEN, MAX_OPGEZOCHT };

@@ -60,6 +60,7 @@ const CONTRACTEN = Object.assign({},
   /* De publieke laag: volgen op een aanwezigheid, en de redactiehandeling van
      De Salon (STAGE.md par. 5a). */
   require('./mutatiecontracten-stage').CONTRACTEN,
+  require('./mutatiecontracten-reisconcept').CONTRACTEN,
   /* De zestien waardebewegende routes die nog op `onbekend` stonden
      (GELDDEKKING.json). Eigen bestand om dezelfde reden als hierboven, en omdat
      ze een gedeelde herkomst hebben: ze zijn alle zestien gelezen in een ronde,

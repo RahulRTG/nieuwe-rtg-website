@@ -163,7 +163,10 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan, 
     return { ok: true, betaald: a.betaald };
   }
 
-  return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen,
+  /* De reisaanvraag als soort in een gesprek met Rahul: ./reisbureau-context.js. */
+  const contextDomein = require('./reisbureau-context')({ aanvraagVan });
+
+  return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen, contextDomein,
     aanvraagVan, tripVan, markeerBetaald,
     bevestig, wijsAf, besluit,
     vraagWijziging: nazorg.vraagWijziging, besluitWijziging: nazorg.besluitWijziging,

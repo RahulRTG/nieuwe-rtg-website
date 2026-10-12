@@ -6,7 +6,21 @@
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
     });
   }
+  /* DE CONTEXT VOOR RAHUL. Met een Edge Blikveld komt hij daaruit (EDGE.md
+     par. 14.4): schermtitel, wereld, leesmoment en een verwijzing naar het
+     aangewezen object, die de server zelf opzoekt. De tekst van een gekozen
+     optie wordt dan NIET meer uit de DOM geschraapt: dat kon alles zijn, ook
+     een naam. Zonder blikveld blijft alles zoals het was. `app` blijft de
+     documenttitel, want de tab toont die en de suggesties lezen hem. */
   function context() {
+    var B = window.RTGEdgeBlikveld;
+    if (B && typeof B.voorRahul === 'function') {
+      try {
+        var b = B.voorRahul();
+        return { app: document.title.replace(/^RTG\s*/i, '') || 'RTG', deel: b.deel || 'Actieve pagina',
+          selectie: '', wereld: b.wereld, verwijzingen: metWerkstuk(b.verwijzingen || [], B), op: b.op };
+      } catch (e) { /* val terug op de oude bron */ }
+    }
     var actief = document.querySelector('[data-wk].actief,.rv-bank .actief,.lo-rail .actief,.pn-rail .actief,.po-rail .actief,nav .actief');
     var keuze = document.querySelector('select:focus,select option:checked,[aria-selected="true"]');
     var titel = document.title.replace(/^RTG\s*/i, '');
@@ -28,6 +42,18 @@
     }
     return c;
   }
+  /* Het concept waar het lid in het gesprek aan werkt (shared/edge/conceptwerk.js)
+     staat naast het object van het scherm, de nieuwste eerst: wie na het concept
+     weer een aanvraag aanwijst, bedoelt die. Welke van de twee een vraag bedoelt,
+     beslist de server (kern/stuur/menscontext-relatie.js). */
+  function metWerkstuk(lijst, B) {
+    var W = window.RTGEdgeConceptwerk, w = W && W.verwijzing ? W.verwijzing() : null;
+    if (!w) return lijst;
+    var ref = { soort: w.soort, id: w.id }, sinds = 0;
+    try { sinds = Number(B.lees().velden.object.sinds) || 0; } catch (e) { sinds = 0; }
+    var rest = lijst.filter(function (v) { return !(v.soort === ref.soort && v.id === ref.id); });
+    return w.op >= sinds ? [ref].concat(rest) : rest.concat([ref]);
+  }
   function suggesties(c) {
     var bron = c.app + c.deel;
     if (/werk|employee|personeel/i.test(bron)) return ['Bundel mijn beslissingen', 'Bereid onboarding voor', 'Wat blokkeert het team?'];
@@ -40,9 +66,13 @@
      regel; wat wel klopt krijgt geen vinkje, want een gevonden getal bewijst
      niet dat het in de juiste betekenis is gebruikt. Geen staving: geen regel. */
   function noot(d) {
-    var n = d && d.staving && d.staving.nietGevonden;
-    if (!n || !n.length) return '';
-    return 'Niet teruggevonden in wat Rahul opzocht: ' + n.slice(0, 6).join(', ') + '. Lees dat als onbekend.';
+    var n = d && d.staving && d.staving.nietGevonden, uit = [];
+    if (n && n.length) uit.push('Niet teruggevonden in wat Rahul opzocht: ' + n.slice(0, 6).join(', ') + '. Lees dat als onbekend.');
+    /* Het taakbeeld van de server (shared/edge/taakbeeld.js, EDGE.md par. 14.4):
+       wat Rahul begreep, voorstelt en wat er werkelijk gebeurde. Als tekst. */
+    var T = window.RTGEdgeTaakbeeld;
+    if (d && d.taak && T && T.regels) T.regels(d.taak).forEach(function (r) { uit.push(r.tekst); });
+    return uit.join('\n');
   }
   /* Een bericht in het gesprek, met de noot eronder als die er is. Alles gaat
      door tekst(): wat uit een antwoord komt, is nooit opmaak. */
@@ -51,7 +81,24 @@
     return '<div class="rtg-command-msg ' + (mens ? 'user' : '') + '"><b>' + (mens ? 'U' : 'RAHUL') + '</b>' + tekst(m.tekst) +
       (m.noot ? '<small class="rtg-command-noot">' + tekst(m.noot) + '</small>' : '') + '</div>';
   }
-  window.RTGRahulTabHelpers = { tekst: tekst, context: context, suggesties: suggesties, noot: noot, bericht: bericht };
+  /* HET CONCEPT ALS WERKSTUK (shared/edge/conceptwerk.js, EDGE.md par. 14.6):
+     een concept met bewerkbare velden komt onder het gesprek te staan, en een
+     wijziging gaat met de eigen sessie naar de server. Een nieuw concept
+     vervangt het vorige; er staat er een tegelijk. */
+  function werk(d, page, auth) {
+    var c = d && d.taak && d.taak.concept, W = window.RTGEdgeConceptwerk;
+    if (!c || !c.id || !c.bewerkbaar || !W || !page || !auth) return null;
+    var oud = page.querySelector('.rtg-conceptwerk');
+    if (oud) oud.remove();
+    var k = W.maak(c, document, { verstuur: function (body) {
+      return fetch('/api/fluister/concept', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + auth },
+        body: JSON.stringify(body) }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { status: r.status, body: b }; }); });
+    } });
+    var form = page.querySelector('.rtg-command-form');
+    if (form && form.parentNode) form.parentNode.insertBefore(k.element, form);
+    return k;
+  }
+  window.RTGRahulTabHelpers = { tekst: tekst, context: context, suggesties: suggesties, noot: noot, bericht: bericht, werk: werk };
   /* Escape sluit het Rahul-paneel, zoals elke andere laag in deze schil
      (GRAMMATICA.md: ik kan bijna altijd terug). Het paneel ligt vast over het
      werkblad; zonder dit was de sluitknop de enige weg terug. Dezelfde knop,

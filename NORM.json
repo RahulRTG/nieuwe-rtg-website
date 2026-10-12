@@ -180,6 +180,15 @@
   "notities": [
     {
       "datum": "2026-10-12",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1687,
+      "meter": "kernBreedte 1687 -> 1688",
+      "reden": "De Context Bridge (EDGE.md par. 14.4): /api/fluister leest kern.contextDomeinen, het aanmeldpunt waar een domein zijn eigen soort laat opzoeken (kern/stuur/menscontext-opzoek.js). Dat IS een nieuwe koppeling en geen beperking van de meter: de route moet de opzoekers aan de sessie van de vraag binden, want alleen de route kent die sessie. Het alternatief, de opzoekers aan kern.stuurLus of kern.fluister hangen, verstopt dezelfde koppeling achter een naam die er niet over gaat. GRENZEN.json noemt de naam bij member. (Eerder vastgelegd als 1685 -> 1686; na het samenvoegen met main, dat zelf naar 1687 ging, is dit dezelfde stap.)",
+      "waarheen": "Geen: een tweede ingang die het scherm meestuurt (de Rahul-tab buiten de ledenroute) hoort dezelfde naam te gebruiken in plaats van een eigen."
+    },
+    {
+      "datum": "2026-10-12",
       "soort": "schuld",
       "sleutel": "bewijsAchterstand",
       "van": 680,

@@ -565,7 +565,7 @@
         "retour": false
       },
       "bewijs": {
-        "toon": "lijst",
+        "toon": "beeld",
         "beschikbaarheid": "open",
         "reserveer": "fluisterOnthoud",
         "bevestig": "bestel",
@@ -1032,7 +1032,7 @@
         "retour": false
       },
       "bewijs": {
-        "toon": "lijst",
+        "toon": "beeldVan",
         "reserveer": "inhoudVan",
         "bevestig": "stuurBevestig",
         "annuleer": "intrek"

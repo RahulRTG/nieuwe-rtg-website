@@ -79,7 +79,7 @@ async function zwaar({ anthropic, parseSubs, loop, opStap, systeem, vraag, metCo
     if (st) eind = st;
   } catch (e) {}
   try { opStap({ stap: totaal, totaal, bericht: 'Klaar', klaar: true }); } catch (e) {}
-  return { tekst: eind || 'Gedaan.', acties, zwaar: true, stappen: tel, deeltaken: subs };
+  return { tekst: require('./taakbeeld').eindtekst(eind, acties), acties, zwaar: true, stappen: tel, deeltaken: subs };
 }
 
 module.exports = { zwaar };

@@ -134,17 +134,13 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
   ctx.sparHouding = sparren.sparHouding;
   ctx.sparParkeer = sparren.parkeer;
 
-  /* Een bevestigd voorstel echt uitvoeren; het antwoord zegt eerlijk wat er
-     is gebeurd, ook als het alsnog misgaat. */
-
-  /* ---- het doe-deel: voerUit + fluisterZeg wonen in fluister/acties.js ----
-     Het geheugen, de seintjes en de stand blijven hier; de acties krijgen ze
-     via de context mee. */
-  /* De reislaag (hele reis op een vraag, kleding, voorspellen) draait als
-     eigen submodule en haakt via de context in fluisterZeg en voerUit. */
-  const { rahulExtra, voerReisUit, voerKledingUit } = require('./fluister/reis')({
-    db, save, acties, reserveerTafel, zorgVoor, eur, datumInZin, plusDagen, nu,
-    verblijfBoek, retailLegApart, retailKlantProfiel });
+  /* ---- het doe-deel: voerUit (een bevestigd voorstel echt uitvoeren, en
+     eerlijk zeggen wat er gebeurde) en fluisterZeg wonen in fluister/acties.js;
+     geheugen, seintjes en stand blijven hier. De reislaag (een hele reis,
+     kleding, voorspellen, het reisconcept) haakt via de context in. */
+  const { rahulExtra, voerReisUit, voerKledingUit, concepten } = require('./fluister/reis')({
+    db, save, acties, reserveerTafel, zorgVoor, eur, datumInZin, plusDagen, nu, van,
+    alleFluister: () => eigen.kijk('fluister'), verblijfBoek, retailLegApart, retailKlantProfiel });
 
   const { voerUit, fluisterZeg } = require('./fluister/acties')({
     db, save, schoon, anthropic, notify, reserveerTafel, annuleerReservering,
@@ -153,7 +149,7 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
     rahulExtra, voerReisUit, voerKledingUit, sparHouding: sparren.sparHouding, sparParkeer: sparren.parkeer,
     gegevensStart, gegevensZeg });
 
-  return { fluisterZeg, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush, fluisterPushAlle,
+  return { fluisterZeg, conceptWijzig: concepten.conceptAanpassen, conceptDomein: concepten.contextDomein, fluisterOnthoud, fluisterVergeet, fluisterFocus, fluisterProfiel, fluisterSeintjes, fluisterPush, fluisterPushAlle,
     sparParkeer: sparren.parkeer, sparLijst: sparren.lijst, sparStatus: sparren.status,
     sparHouding: sparren.sparHouding, sparRustMoment: sparren.rustMoment, sparSweepVoor: sparren.sweepVoor, sparSweepAlle: sparren.sweepAlle };
 };

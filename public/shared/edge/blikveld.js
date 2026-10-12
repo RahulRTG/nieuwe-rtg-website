@@ -170,5 +170,14 @@
     return { versie: 1, op: t, velden: velden, acties: gedaan, gebreken: gebreken };
   }
 
-  return Object.freeze({ lees: lees, acties: acties });
+  /* Voor Rahul (EDGE.md 14.4): van het object alleen soort en id. */
+  function voorRahul() {
+    var l = lees(), v = l.velden, c = v.context.waarde, o = v.object.waarde, u = { op: l.op };
+    if (c && c.titel) u.deel = String(c.titel);
+    if (v.wereld.waarde) u.wereld = String(v.wereld.waarde);
+    u.verwijzingen = o && o.soort && o.id ? [{ soort: String(o.soort), id: String(o.id) }] : [];
+    return u;
+  }
+
+  return Object.freeze({ lees: lees, acties: acties, voorRahul: voorRahul });
 }));

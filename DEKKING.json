@@ -770,6 +770,7 @@
     "POST /api/flits/stem",
     "POST /api/flits/vooruit",
     "POST /api/fluister",
+    "POST /api/fluister/concept",
     "POST /api/fluister/focus",
     "POST /api/fluister/onthoud",
     "POST /api/fluister/profiel",

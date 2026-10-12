@@ -48,6 +48,10 @@ const UIT_DIRECT_GEHAALD = [
    Weigeren kan hij niet blijven doen zodra de EIGENAAR zo'n pad opent, en dat is gebeurd.
    Dus staat het hier: benoemd, met datum en reden, en toets 1 erkent uitsluitend deze. */
 const ERBIJ_GEKOMEN = [
+  { pad: '/api/reisbureau/mijn', op: '2026-10-12', naar: 'lezen',
+    reden: 'besluit van de eigenaar: Rahul leest de eigen reisaanvragen, en alleen dat. Gemeten zonder effect in de ' +
+      'opslag (IDEMPROEF.json); de route geeft Rahul de positieve veldlijst van de reisaanvraag ' +
+      '(kern/reisbureau-context.js). Boeken, annuleren en wijzigen blijven dicht (test/reis-lezen.test.js).' },
   { pad: '/api/bestanden/mijn', op: '2026-09-22', naar: 'lezen',
     reden: 'Documents-pilot: Rahul leest dezelfde eigen metadata en verwachte documentversie als de UI; mutaties vereisen een afzonderlijk servervoorstel.' },
   { pad: '/api/bestanden/actie', op: '2026-09-22', naar: 'voorstel',

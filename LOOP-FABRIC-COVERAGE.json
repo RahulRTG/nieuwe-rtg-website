@@ -5363,6 +5363,7 @@
       "server/kern/reisbieb/gidsen/amerika-s.js",
       "server/kern/reisbureau-advies.js",
       "server/kern/reisbureau-betaling.js",
+      "server/kern/reisbureau.js",
       "server/kern/rendezvous-arrange.js",
       "server/kern/rendezvous-concierge.js",
       "server/kern/rendezvous-date.js",
@@ -20992,8 +20993,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 5,
-        "mutationRoutes": 5,
-        "declaredMutationSemantics": 2,
+        "mutationRoutes": 6,
+        "declaredMutationSemantics": 3,
         "sourceFileCount": 2,
         "kernelDependencyCount": 22,
         "screenCount": 9,

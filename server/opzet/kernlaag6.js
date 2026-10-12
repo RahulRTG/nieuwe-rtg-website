@@ -128,6 +128,11 @@ Object.assign(kern, require('../kern/office').maakOffice({
    het stuur nooit, zonder dat iets dat zegt. */
 Object.assign(kern, require('../kern/stuur').maakStuur({ log, anthropic, app, crypto,
   isolatie: () => kern.isolatie }));
+/* De opzoekers achter de verwijzingsketen (kern/stuur/menscontext-opzoek.js,
+   EDGE.md par. 14.4): elk domein meldt zijn EIGEN soort; de rest blijft ONOPGELOST. */
+kern.contextDomeinen = require('../kern/stuur/menscontext-opzoek').maakContextDomeinen();
+if (kern.reisbureau && kern.reisbureau.contextDomein) kern.contextDomeinen.meld(kern.reisbureau.contextDomein);
+if (kern.fluister && kern.fluister.conceptDomein) kern.contextDomeinen.meld(kern.fluister.conceptDomein);
 /* Passkeys (kern/webauthn.js): inloggen met vingerafdruk/gezicht/sleutel.
    De verificatie draait op de eigen WebAuthn-laag (server/webauthn.js) op Node's
    crypto; wij bewaren alleen publieke sleutels per account, challenges leven kort

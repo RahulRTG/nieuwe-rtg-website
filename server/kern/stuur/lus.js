@@ -18,6 +18,7 @@ const { maakIsolatiefilter } = require('./isolatiefilter');
 const { lusPakket } = require('./luspakket');
 const { vensterVan } = require('../ai/contextpakket');
 const { staaf, uitStuur } = require('./staving');
+const { eindtekst } = require('./taakbeeld');
 
 module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs, isolatie, railNaam }) => {
   /* Of het spoor naar buiten mag, beslist ./spoor.js -- die keuze hoort bij het
@@ -50,7 +51,9 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
        geen context is OVERGESLAGEN, context zonder bruikbare rest is NOT_RUN. En
        PASS zegt alleen dat er iets gesaneerd is; of de resolver hem GEBRUIKT
        heeft staat op INTENT_RESOLVED (./lusstap.js). */
-    const ctx = menscontext.saneer(opties && opties.context);
+    /* De opzoeking komt van de ROUTE, die de sessie kent (./menscontext-opzoek.js);
+       zonder haar blijft elke verwijzing ONOPGELOST, zoals voorheen. */
+    const ctx = menscontext.saneer(opties && opties.context, opties && opties.opzoeking);
     const verw = ctx.verwijzingenUitslag || [];
     spoor && spoor.mark('CONTEXT_SANITIZED', ctx.stand, { woorden: ctx.woorden.length,
       gewist: ctx.gewist.length, verwijzingen: verw.length,
@@ -131,7 +134,7 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
       if (!cls.zwaar) {
         const r = await loop([{ role: 'user', content: metContext(vraag) }], 4, 0, 4, 'Bezig...');
         spoor && spoor.mark('PROJECTED', r.tekst ? 'PASS' : 'NOT_RUN', { tekens: (r.tekst || '').length });
-        return { tekst: r.tekst || 'Gedaan.', acties, zwaar: false, stappen: r.tel, staving: staaf(r.tekst, gezien),
+        return { tekst: eindtekst(r.tekst, acties), acties, zwaar: false, stappen: r.tel, staving: staaf(r.tekst, gezien),
           spoor: (spoorMag && spoor) ? spoor.uitslag() : undefined };
       }
 

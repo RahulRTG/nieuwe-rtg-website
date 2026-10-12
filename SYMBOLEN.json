@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "8bf80a07e",
-  "seconden": 10.9,
+  "commit": "8a8448b27",
+  "seconden": 9.8,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -622,9 +622,9 @@
     "public/apps/personeel/personeel-03b.js",
     "public/apps/personeel/personeel-03c.js",
     "public/apps/personeel/personeel-04.js",
+    "public/apps/personeel/personeel-04a.js",
     "public/apps/personeel/personeel-05.js",
     "public/apps/personeel/personeel-05a.js",
-    "public/apps/personeel/personeel-05b.js",
     "public/apps/personeel/personeel-06.js",
     "public/apps/personeel/personeel-06a.js",
     "public/apps/personeel/personeel-07.js",
@@ -8170,17 +8170,17 @@
    "melding": "parsefout regel 129: verwacht '}' bij <eof>"
   },
   {
-   "bestand": "public/apps/personeel/personeel-05.js",
+   "bestand": "public/apps/personeel/personeel-04a.js",
    "reden": "bundeldeel: begint middenin een programma en is pas samengevoegd te lezen (scripts/bundel.js)",
    "melding": "parsefout regel 23: onverwacht token bij \"}\""
   },
   {
-   "bestand": "public/apps/personeel/personeel-05a.js",
+   "bestand": "public/apps/personeel/personeel-05.js",
    "reden": "bundeldeel: begint middenin een programma en is pas samengevoegd te lezen (scripts/bundel.js)",
    "melding": "parsefout regel 100: verwacht '}' bij <eof>"
   },
   {
-   "bestand": "public/apps/personeel/personeel-05b.js",
+   "bestand": "public/apps/personeel/personeel-05a.js",
    "reden": "bundeldeel: begint middenin een programma en is pas samengevoegd te lezen (scripts/bundel.js)",
    "melding": "parsefout regel 52: onverwacht token bij \"}\""
   },

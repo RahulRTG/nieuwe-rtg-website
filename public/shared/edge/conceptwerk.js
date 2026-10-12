@@ -44,8 +44,8 @@
     'section.rtg-conceptwerk header{background:none;padding:0;border:0;display:flex;justify-content:space-between;gap:12px;font:600 11px/1.4 Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase}' +
     '.rtg-conceptwerk header em{font-style:normal;opacity:.8}.rtg-conceptwerk h3{margin:8px 0 12px;font:500 19px/1.3 "Bodoni Moda",serif}' +
     '.rtg-conceptwerk-velden{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}' +
-    '.rtg-conceptwerk label{display:grid;gap:4px;font:500 12px/1.4 Inter,sans-serif}' +
-    /* het veld zelf volgt de huisstijl (shared/rtg-ui.css); hier alleen de maat */ +
+    '.rtg-conceptwerk label{display:grid;gap:4px;min-width:0;font:500 12px/1.4 Inter,sans-serif}' +
+    /* het veld zelf volgt de huisstijl (shared/rtg-ui.css); hier alleen de maat */
     'section.rtg-conceptwerk label input{box-sizing:border-box;width:100%;min-width:0;min-height:36px;margin:0}' +
     'section.rtg-conceptwerk label input[aria-invalid="true"]{border-color:#C23A5E}.rtg-conceptwerk small.fout{min-height:1em;font-size:12px}' +
     '.rtg-conceptwerk p{margin:8px 0 0;font:14px/1.5 Inter,sans-serif}.rtg-conceptwerk .rahul{font-weight:600}' +

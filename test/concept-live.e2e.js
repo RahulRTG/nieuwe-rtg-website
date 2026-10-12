@@ -92,6 +92,13 @@ test('het lid past het Rome-concept op het scherm aan; Rahul en de Edge werken m
     assert.match(await kaart.locator('header').textContent(), /TravelOS · Reisconcept.*Niet ingediend/);
     assert.equal(await kaart.locator('h3').textContent(), 'Nieuwe reis naar Rome');
     assert.equal(await kaart.locator('input[name="reizigers"]').inputValue(), '7');
+    /* Elk veld past in zijn eigen vak. Dit stond een keer stil verkeerd: een losse
+       `+` achter een commentaar in de stijlreeks maakte van de veldregel NaN, en
+       de bestemming liep over de reizigers heen zonder dat een toets het zag. */
+    const maten = await page.evaluate(() => [...document.querySelectorAll('.rtg-conceptwerk label')].map((l) =>
+      [l.querySelector('input').getBoundingClientRect().width, l.getBoundingClientRect().width]));
+    for (const [veld, vak] of maten) assert.ok(veld <= vak + 0.5, 'een veld van ' + veld + ' px in een vak van ' + vak + ' px');
+    assert.ok(!(await page.evaluate(() => document.getElementById('rtgConceptwerkStijl').textContent)).includes('NaN'));
     assert.match(await kaart.locator('.afgeleid').textContent(), /Groepsbudget: maximaal € 5\.600/);
     const voorModel = model.verzoeken.length;
 

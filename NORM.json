@@ -179,6 +179,15 @@
   },
   "notities": [
     {
+      "datum": "2026-10-12",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1687,
+      "meter": "kernBreedte 1687 -> 1693 (de SOM van twee lijnen, geen nieuwe naam)",
+      "reden": "Het samengaan van de integratie (#542) met main na #587. Main zette deze meter met eigen posten van 1685 op 1687 (de twee stappen van #587, AUTHORITY.md B4, elk met notitie hierboven). De integratie zette hem met eigen posten van 1685 op 1691 (de notities van 11 oktober, o.a. sessiestroom). Samen zijn het 1693; er komt hier geen naam bij die niet al in een van beide lijnen verklaard is.",
+      "waarheen": "GRENZEN.json en de notities van beide lijnen; test/media-toegang.test.js en test/sessiestroom.test.js"
+    },
+    {
       "datum": "2026-10-11",
       "soort": "schuld",
       "sleutel": "bewijsAchterstand",

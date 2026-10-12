@@ -139,7 +139,7 @@ module.exports = (kern) => {
       if (typeof logInlog === 'function') logInlog('sso', false, verzoek.org, req);
       const fout = binnenkomst.foutAntwoord(e);
       if (fout.retryAfter) res.set('retry-after', fout.retryAfter);
-      res.status(fout.status).json({ error: fout.bericht });
+      res.status(fout.status).json(fout.code ? { error: fout.bericht, code: fout.code, hoe: fout.hoe } : { error: fout.bericht });
     }
   });
 

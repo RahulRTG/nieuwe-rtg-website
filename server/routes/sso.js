@@ -133,6 +133,7 @@ module.exports = (kern) => {
       if (typeof logInlog === 'function') logInlog('sso', false, k.org, req);
       const antwoord = binnenkomst.foutAntwoord(e);
       if (antwoord.retryAfter) res.set('retry-after', antwoord.retryAfter);
+      if (antwoord.code) return res.status(antwoord.status).json({ error: antwoord.bericht, code: antwoord.code, hoe: antwoord.hoe });
       return fout(antwoord.bericht, antwoord.status);
     }
   });

@@ -47,7 +47,7 @@
       $('#zekeringBlok').hidden = !d.eigenaar;
       // de SSO-clientgeheimen (alleen de stand): eenmalig, niet elke 12 seconden
       if (d.eigenaar && !ssoGeladen){ ssoGeladen = true; ssoLaad(); }
-      if (d.eigenaar) vervang($('#zekeringen'), d.zekeringen.map(zekerRij));
+      if (d.eigenaar) vervang($('#zekeringen'), [registratieRij(d.registratie)].concat(d.zekeringen.map(zekerRij)).filter(Boolean));
       $('#archiefBlok').hidden = !(d.eigenaar && d.archief);
       if (d.eigenaar && d.archief){
         Util.tekst($('#archiefInfo'), 'Nu ' + d.archief.dagen + ' dagen \u00B7 ' + d.archief.levend.toLocaleString('nl-NL') + ' levend \u00B7 ' + d.archief.gearchiveerd.toLocaleString('nl-NL') + ' gearchiveerd');

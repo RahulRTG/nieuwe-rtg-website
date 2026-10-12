@@ -29,6 +29,7 @@ const migraties = require('../migraties');
 const kluis = require('./kluis');
 const mirror = require('./mirror');
 const users = require('./users');
+const registratie = require('./registratie');
 const staff = require('./staff');
 const staffSessie = require('./staff-sessie');
 const actiebewijs = require('./actiebewijs');
@@ -142,8 +143,19 @@ const api = {
      binnenwerk van de identiteitskluis rechtstreeks hoeft te importeren. */
   hashActiebewijs: actiebewijs.hash,
   kloptActiebewijs: actiebewijs.klopt,
+  /* Of RTG_REGISTRATIE_DICHT aan staat (./registratie.js); de registratieroute
+     weigert daarop al voor ze iets keurt. */
+  registratieDicht: () => registratie.dicht(),
+  registratieUitleg: registratie.UITLEG,
+  registratieWeigering: (zekeringEruit) => registratie.weigering(zekeringEruit),
+  registratieStand: () => registratie.stand(),
   ...users,
-  ...staff
+  ...staff,
+  /* De grendel op nieuwe accounts staat in de GEVEL en niet in ./users.js: alle
+     drie de wegen (registreren, de eerste SSO-aanmelding, SCIM) komen hier
+     langs, en hij gooit voor schrijfUser iets raakt. */
+  createUser: async (g) => { registratie.eisOpen(); return users.createUser(g); },
+  createUserSync: (g) => { registratie.eisOpen(); return users.createUserSync(g); }
 };
 
 /* De sessiecontrole hoort bij de identiteitskluis. Aanroepers gaan via deze

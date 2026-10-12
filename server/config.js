@@ -45,6 +45,9 @@ function valideer(env) {
      de installatie zichzelf als openbaar OPGEEFT, in plaats van te vertrouwen
      op de variabele die iemand kan vergeten. */
   require('./config/openbaar').keurOpenbareBouwstand(env, { fouten, waarschuwingen, hardeFouten, productie: prod });
+  /* Ook buiten productie: een RTG_REGISTRATIE_DICHT die geen 0 of 1 is, telt als
+     dicht (fail-closed) en hoort dan in het opstartlog te staan. */
+  require('./config/registratie').keur(env, waarschuwingen);
 
   return { fouten, waarschuwingen, hardeFouten, productie: prod };
 }

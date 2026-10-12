@@ -10,9 +10,15 @@ module.exports = (actx) => {
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering, kern, sessieregister } = actx;
   const keurAanmelding = require('./aanmeldcontrole')({ accounts, crypto, schoon, leeftijdVan, pasAppOk, PAS_FOUT });
 app.post('/api/auth/register', async (req, res) => {
-  // Registratie-zekering (een noodrem-trede dooft vanzelf; zie techniek.js).
+  /* Twee dingen sluiten registreren: de zekering op het techniekbord (een
+     noodrem-trede dooft vanzelf; zie techniek.js) en het blijvende besluit van
+     de eigenaar (RTG_REGISTRATIE_DICHT, accounts/registratie.js). Het antwoord
+     noemt ALLE redenen die gelden, zodat een reset van de zekering niet leest
+     als heropenen. createUser weigert zelf ook; dit staat vooraan zodat er
+     niets gekeurd of geteld wordt voor de weigering. */
   const zReg = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.registratie;
-  if (require('../../techniek').zekeringGesprongen(zReg)) return res.status(503).json({ error: 'Registreren is tijdelijk uitgeschakeld.' });
+  const dichtOm = accounts.registratieWeigering(require('../../techniek').zekeringGesprongen(zReg));
+  if (dichtOm) return res.status(503).json(dichtOm);
   /* De bevestigingsmail draagt een link, en die wordt nooit gebouwd uit een kop
      van de aanvrager (lib/linkbasis.js). Zonder vaste basis: eerst niets aanmaken. */
   if (!appUrl(req)) return res.status(503).json({ error: ONTBREEKT, code: 'app-url-ontbreekt' });
@@ -26,6 +32,7 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     user = await accounts.createUser({ email, username: req.body.username || null, password, tier, realName: name, phone: telefoon });
   } catch (e) {
+    if (e && e.code === 'REGISTRATIE_DICHT') return res.status(503).json({ error: e.message, code: e.code, reden: e.reden, hoe: e.hoe });
     return res.status(409).json({ error: 'Dit account bestaat al.' });
   }
   try {

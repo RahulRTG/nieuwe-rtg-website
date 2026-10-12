@@ -4340,9 +4340,11 @@
       "server/seed/media.js",
       "server/server.js",
       "server/smtp.js",
+      "server/sso/binnenkomst.js",
       "server/sso/clientgeheim.js",
       "server/sso/index.js",
       "server/sso/koppelingen.js",
+      "server/techniek.js",
       "server/translate/woordenboek/nl2en-delen/deel2.js",
       "server/webpush.js"
     ],

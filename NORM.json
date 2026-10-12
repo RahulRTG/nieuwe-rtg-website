@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4515,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1685,
+    "kernBreedte": 1686,
     "kernGedeeld": 254,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 50,
@@ -176,6 +176,15 @@
     "loopFabricTijdelijk": 168
   },
   "notities": [
+    {
+      "datum": "2026-10-12",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1685,
+      "meter": "kernBreedte 1685 -> 1686",
+      "reden": "AUTHORITY.md B4, tegenlezing PR #587. Een Salon-post in een DM reist als id en wordt bij het LEZEN opgelost met de sessie van de lezer (kern/sociaal/dmpost.js). Het domein social krijgt daarvoor alleen de leespoort van De Salon als kern.salonMagLezen (opzet/kernlaag4-comm.js) en niet heel kern.salon (upload, plaats, verwijder, S() met volgtLid/verborgen/bewaard, ai): een smalle naam in plaats van een brede verruiming van GRENZEN.json. Een eigen instantie van zichtbaarheid.js in het routebestand zou findSupplier en zijnVrienden naar social trekken.",
+      "waarheen": "GRENZEN.json (social draagt salonMagLezen) en test/media-toegang.test.js (de ontvanger ziet een gedeelde post alleen als HIJ hem mag lezen)"
+    },
     {
       "datum": "2026-10-06",
       "soort": "schuld",

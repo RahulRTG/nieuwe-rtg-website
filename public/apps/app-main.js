@@ -1921,8 +1921,7 @@ var RTG_BOUW = '70026b69';
     const emo = s => window.RTGEmoji ? RTGEmoji.render(escT(s)) : escT(s);
     const txt = mijn ? emo(m.text) : '<span class="xlate">' + escT(m.text) + '</span>';
     return '<div class="dm-m' + (mijn ? ' mine' : '') + '">' + txt +
-      (m.post ? (m.post.nietBeschikbaar ? '<div class="dm-post">' + escT(T('dm.postWeg', 'Gedeelde post niet beschikbaar')) + '</div>'
-        : '<div class="dm-post"><b>↗ ' + escT(m.post.author) + ' · ' + escT(m.post.place) + '</b>' + escT(m.post.text) + '…</div>') : '') +
+      (m.post ? '<div class="dm-post"><b>↗ ' + escT(m.post.author) + ' · ' + escT(m.post.place) + '</b>' + escT(m.post.text) + '…</div>' : '') +
       '<span class="tijd">' + tijd + '</span></div>';
   }
   function dmToevoegen(m){ const b = $('#dmBody'); b.insertAdjacentHTML('beforeend', dmBubbel(m)); vertaalBubbels(b); b.scrollTop = 999999; }

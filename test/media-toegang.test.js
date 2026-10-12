@@ -283,14 +283,16 @@ test('een DM: de ontvanger ziet een gedeelde post alleen als HIJ hem mag lezen',
   const bijC = await gedeeld(C, kB);
   assert.equal(bijC.length, 1, 'C ziet dat er iets gedeeld is');
   assert.equal(bijC[0].nietBeschikbaar, true, 'maar voor C is de post niet beschikbaar');
-  assert.ok(!JSON.stringify(bijC).includes(geheim) && !bijC[0].text && !bijC[0].author && !bijC[0].photo, 'zonder tekst, auteur of foto');
+  const { NIET_BESCHIKBAAR } = require('../server/kern/sociaal/dmpost')({ posts: () => [] });
+  assert.ok(!JSON.stringify(bijC).includes(geheim) && bijC[0].text === NIET_BESCHIKBAAR && !bijC[0].author && !bijC[0].photo,
+    'zonder tekst van de post, auteur of foto -- alleen de vaste mededeling');
   const bijD = await gedeeld(D, kB);
   assert.equal(bijD[0].text, geheim, 'controle: D, vriend van A, ziet de post wel');
   // A verwijdert de post: niemand ziet nog tekst, ook B en D niet
   assert.equal((await api('/api/salon/weg', { id: p.body.post.id }, A)).status, 200);
   for (const [lezer, ander, wie] of [[D, kB, 'D'], [B, kC, 'B']]) {
     const na = await gedeeld(lezer, ander);
-    assert.ok(na.length && na.every(x => x.nietBeschikbaar && !x.text), wie + ' ziet na verwijderen geen tekst meer');
+    assert.ok(na.length && na.every(x => x.nietBeschikbaar && !JSON.stringify(x).includes(geheim)), wie + ' ziet na verwijderen geen tekst meer');
   }
   assert.ok(!JSON.stringify(await gedeeld(B, kD)).includes(geheim), 'ook de afzender houdt geen kopie');
 });

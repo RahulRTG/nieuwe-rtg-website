@@ -19,6 +19,7 @@
 'use strict';
 
 const { toon } = require('../../media/toegang');
+const NIET_BESCHIKBAAR = 'Deze gedeelde post is niet (meer) beschikbaar';
 
 module.exports = function maakDmPost({ posts, magLezen }) {
   const vind = id => (posts() || []).find(p => p && String(p.id) === String(id)) || null;
@@ -35,10 +36,13 @@ module.exports = function maakDmPost({ posts, magLezen }) {
   function voorLezer(sess, bijlage) {
     if (!bijlage || bijlage.id == null) return null;
     const p = vind(bijlage.id);
-    if (!mag(sess, p)) return { id: bijlage.id, nietBeschikbaar: true };
+    /* De bestaande schermen tonen auteur, plaats en tekst van een gedeelde post;
+       hier staat in plaats daarvan een vaste mededeling, nooit iets van de post. */
+    if (!mag(sess, p)) return { id: bijlage.id, nietBeschikbaar: true, author: '', place: '',
+      text: NIET_BESCHIKBAAR, photo: null };
     return { id: p.id, author: p.author, place: p.place || '', text: String(p.text || '').slice(0, 120),
       photo: toon(p.photo) || null };
   }
 
-  return { deel, voorLezer };
+  return { deel, voorLezer, NIET_BESCHIKBAAR };
 };

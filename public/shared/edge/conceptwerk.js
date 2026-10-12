@@ -7,27 +7,19 @@
    (`bewerkbaar`); er staat hier geen reiswoord en geen tweede lijst velden.
 
    DE SERVER HEEFT HET LAATSTE WOORD. Een wijziging gaat als { id, versie,
-   velden } naar de host (opties.verstuur), en wat terugkomt wordt getekend --
-   ook bij een weigering (400: het veld krijgt de reden) en bij een botsing
-   (409: het scherm toont de stand van nu, en zegt dat). Er wordt niets lokaal
-   "alvast" goedgekeurd: een getal dat de server niet aanneemt, staat er niet
-   als geaccepteerd.
-
-   EEN WIJZIGING TEGELIJK. Tijdens een verzoek worden nieuwe wijzigingen
-   verzameld en daarna in een keer gestuurd, op de versie die de server net
-   teruggaf. Zo botst het scherm nooit met zichzelf.
+   velden } naar de host (opties.verstuur); wat terugkomt wordt getekend, ook een
+   weigering (400: de reden bij het veld) en een botsing (409: de stand van nu).
+   Niets wordt lokaal "alvast" goedgekeurd. Tijdens een verzoek worden nieuwe
+   wijzigingen verzameld en daarna in een keer gestuurd, op de nieuwe versie.
 
    RAHUL WEET WAAR HET LID AAN WERKT, ZONDER DAT DE KAART DE SCHERMCONTEXT ZET.
-   In de schil zet alleen de brug een context (test/edgedekking-zelf.test.js 5):
-   een kaart in het gesprek is geen blad. De kaart houdt daarom alleen bij welk
-   concept het laatst is gemaakt of aangepast (`verwijzing()`), en de
-   contextbouwer van Rahul (rahul-tab/helpers.js) zet die verwijzing naast het
-   object van het scherm, de nieuwste eerst. De server zoekt de waarden zelf op;
-   er gaan geen waarden mee in die verwijzing.
+   In de schil zet alleen de brug een context (test/edgedekking-zelf.test.js 5).
+   De kaart houdt bij welk concept het laatst is aangeraakt (`verwijzing()`), en
+   rahul-tab/helpers.js zet die naast het object van het scherm, nieuwste eerst.
+   De server zoekt de waarden zelf op.
 
-   EN DE KAART DOET NIETS. Er is hier geen knop om in te dienen, te boeken of te
-   betalen: dat is een eigen handeling met een eigen gewicht. Alles wordt als
-   tekst gezet (textContent), nooit als opmaak.
+   EN DE KAART DOET NIETS: geen knop om in te dienen, te boeken of te betalen.
+   Alles wordt als tekst gezet (textContent), nooit als opmaak.
 
    Levert window.RTGEdgeConceptwerk.maak(concept, document, opties) -> {
    element, concept(), teken(c) } en .verwijzing(), en in node module.exports. */
@@ -44,7 +36,7 @@
     'section.rtg-conceptwerk header{background:none;padding:0;border:0;display:flex;justify-content:space-between;gap:12px;font:600 11px/1.4 Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase}' +
     '.rtg-conceptwerk header em{font-style:normal;opacity:.8}.rtg-conceptwerk h3{margin:8px 0 12px;font:500 19px/1.3 "Bodoni Moda",serif}' +
     '.rtg-conceptwerk-velden{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}' +
-    '.rtg-conceptwerk label{display:grid;gap:4px;font:500 12px/1.4 Inter,sans-serif}' +
+    '.rtg-conceptwerk label{display:grid;gap:4px;min-width:0;font:500 12px/1.4 Inter,sans-serif}' +
     /* het veld zelf volgt de huisstijl (shared/rtg-ui.css); hier alleen de maat */ +
     'section.rtg-conceptwerk label input{box-sizing:border-box;width:100%;min-width:0;min-height:36px;margin:0}' +
     'section.rtg-conceptwerk label input[aria-invalid="true"]{border-color:#C23A5E}.rtg-conceptwerk small.fout{min-height:1em;font-size:12px}' +
@@ -174,7 +166,17 @@
     }
 
     teken(concept);
-    return { element: kaart, concept: function () { return huidig; }, teken: teken, stuur: stuur };
+    /* Een wijziging die NIET van deze kaart kwam (het lid typte haar tegen Rahul):
+       dezelfde tekening en dezelfde regel, zodat typen en klikken er op het
+       scherm hetzelfde uitzien. Een oudere versie overschrijft nooit een nieuwere. */
+    function vanBuiten(c, antwoord) {
+      if (!c || c.id !== huidig.id || Number(c.versie) < Number(huidig.versie)) return false;
+      teken(c);
+      if (antwoord) zeg('Rahul \u00b7 Concept bijgewerkt. ' + antwoord);
+      return true;
+    }
+
+    return { element: kaart, concept: function () { return huidig; }, teken: teken, stuur: stuur, vanBuiten: vanBuiten };
   }
 
   /* Alleen een kaart die nog in het document staat telt: een weggehaalde kaart

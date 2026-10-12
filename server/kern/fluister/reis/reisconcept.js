@@ -24,7 +24,7 @@
    gewicht, en die woont niet hier. */
 'use strict';
 const crypto = require('crypto');
-const { conceptVan, geld } = require('./reiswens');
+const { conceptVan, leesVelden, geld } = require('./reiswens');
 
 const MAX_CONCEPTEN = 5;
 const BEWAARTERMIJN_MS = 24 * 60 * 60 * 1000;
@@ -126,6 +126,19 @@ module.exports = function reisconcept({ van, alle, save, nu, catalogus }) {
     },
     eigenaar: (c) => c.eigenaar,
     mag: () => true,
+    /* Wijzigen in woorden: dezelfde lezer als bij een nieuwe wens (leesVelden),
+       alleen de velden die het scherm ook mag aanpassen, en dezelfde controle
+       (conceptAanpassen). Typen en klikken komen zo op exact dezelfde plek uit. */
+    tekstVelden(q) {
+      const v = leesVelden(q), uit = {};
+      for (const veld of BEWERKBAAR) if (v[veld.naam] != null) uit[veld.naam] = v[veld.naam];
+      return uit;
+    },
+    pasAan(sessie, rij, velden) {
+      const r = conceptAanpassen(sessie && sessie.key, { id: rij.id, versie: rij.versie, velden });
+      if (r.error) return { fout: r.error, concept: r.concept || null };
+      return { antwoord: r.zin, concept: r.concept, gewijzigd: r.gewijzigd };
+    },
     beeld: (c) => ({ titel: 'Nieuwe reis naar ' + c.waarden.bestemming, bestemming: c.waarden.bestemming, reizigers: c.waarden.reizigers, dagen: c.waarden.dagen,
       budgetPerPersoon: c.waarden.budgetPP, versie: c.versie, stand: 'concept' })
   };

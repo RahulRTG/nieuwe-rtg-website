@@ -29,35 +29,58 @@ const getal = (x) => (/^\d+$/.test(x) ? Number(x) : GETAL[String(x).toLowerCase(
    tweede lijst). */
 const { WIJS, WIJZIG } = require('../../stuur/menscontext-relatie');
 
+/* DE VELDEN UIT EEN ZIN, zonder te oordelen of het een reiswens is. Dezelfde
+   woorden voor een nieuwe wens (leesReiswens) en voor een wijziging in woorden
+   ("maak er vijf dagen van", ./reisconcept.js tekstVelden): EEN lezer, zodat
+   typen en klikken nooit iets anders verstaan. Wat de zin niet noemt, staat er
+   niet in -- ook niet als null. */
+function leesVelden(q) {
+  const tekst = String(q || '');
+  const uit = {};
+  /* Een bestemming is een eigennaam na "naar", of tussen "maak er" en "van"; een
+     kleine letter is geen plaats ("naar huis", "naar buiten"). */
+  const b = /\bnaar\s+([A-Z][\w\u00C0-\u017F'-]+(?:\s+[A-Z][\w\u00C0-\u017F'-]+)?)/.exec(tekst)
+    || /\b[Mm]aak\s+er\s+([A-Z][\w\u00C0-\u017F'-]+(?:\s+[A-Z][\w\u00C0-\u017F'-]+)?)\s+van\b/.exec(tekst);
+  if (b) uit.bestemming = b[1];
+  const vrienden = new RegExp('\\bmet\\s+' + N + '\\s+(vrienden|vriendinnen|collega\'?s|familieleden)\\b', 'i').exec(tekst);
+  const personen = new RegExp('\\b(?:met\\s+)?' + N + '\\s+(personen|reizigers|man|mensen)\\b', 'i').exec(tekst);
+  // "zet de reizigers op 8", "de duur naar vijf dagen": het veld eerst, dan het getal
+  const veldOp = (woorden) => new RegExp('\\b(?:' + woorden + ')\\s+(?:op|naar)\\s+' + N + '\\b', 'i').exec(tekst);
+  const reizigersOp = veldOp('reizigers|personen|mensen'), dagenOp = veldOp('dagen|duur');
+  if (vrienden) { uit.reizigers = getal(vrienden[1]) + 1; uit.aanname = 'u en ' + vrienden[1] + ' ' + vrienden[2]; }
+  else if (personen) uit.reizigers = getal(personen[1]);
+  else if (reizigersOp) uit.reizigers = getal(reizigersOp[1]);
+  const dagen = new RegExp('\\b' + N + '\\s+(dagen|dag|nachten|nacht)\\b', 'i').exec(tekst);
+  if (dagen) { uit.dagen = getal(dagen[1]); uit.nachten = /nacht/i.test(dagen[2]); }
+  else if (dagenOp) uit.dagen = getal(dagenOp[1]);
+  const budget = /\b(?:maximaal|max\.?|hooguit|tot)\s*(?:€|eur(?:o)?)?\s*(\d[\d.]*)\s*(?:euro|eur)?\s*(?:per persoon|p\.?p\.?|pp)\b/i.exec(tekst)
+    || /€\s*(\d[\d.]*)\s*(?:per persoon|p\.?p\.?|pp)\b/i.exec(tekst);
+  if (budget) uit.budgetPP = Number(String(budget[1]).replace(/\./g, ''));
+  return uit;
+}
+
 function leesReiswens(q) {
   const tekst = String(q || '');
   if (WIJS.test(tekst) || WIJZIG.test(tekst)) return null;
-  /* Een bestemming is een eigennaam na "naar"; een kleine letter is geen plaats
-     ("naar huis", "naar buiten"). */
-  const b = /\bnaar\s+([A-Z][\w\u00C0-\u017F'-]+(?:\s+[A-Z][\w\u00C0-\u017F'-]+)?)/.exec(tekst);
-  if (!b) return null;
-  const vrienden = new RegExp('\\bmet\\s+' + N + '\\s+(vrienden|vriendinnen|collega\'?s|familieleden)\\b', 'i').exec(tekst);
-  const personen = new RegExp('\\b(?:met\\s+)?' + N + '\\s+(personen|reizigers|man|mensen)\\b', 'i').exec(tekst);
-  const dagen = new RegExp('\\b' + N + '\\s+(dagen|dag|nachten|nacht)\\b', 'i').exec(tekst);
-  const budget = /\b(?:maximaal|max\.?|hooguit|tot)\s*(?:€|eur(?:o)?)?\s*(\d[\d.]*)\s*(?:euro|eur)?\s*(?:per persoon|p\.?p\.?|pp)\b/i.exec(tekst)
-    || /€\s*(\d[\d.]*)\s*(?:per persoon|p\.?p\.?|pp)\b/i.exec(tekst);
+  const v = leesVelden(tekst);
+  if (!v.bestemming || !/\bnaar\s/.test(tekst)) return null;
   /* EEN REISWENS IS EEN REIS. "Regel een taxi naar Sal de Mar met 2 personen"
      heeft een bestemming en personen en is een rit -- die is van de handelingen
      van kern/fluister (intent.js), en een concept zou hem wegvangen. Dus: een
      duur, een budget per persoon of een reiswoord, en nooit een vervoerswoord. */
   if (/\b(taxi|rit|ritje|transfer|chauffeur|vervoer|tafel|reserveer|reservering|bestel)\b/i.test(tekst)) return null;
-  if (!dagen && !budget && !/\b(reis|reizen|vakantie|trip|stedentrip|weekend|weekendje)\b/i.test(tekst)) return null;
+  if (v.dagen == null && v.budgetPP == null && !/\b(reis|reizen|vakantie|trip|stedentrip|weekend|weekendje)\b/i.test(tekst)) return null;
 
   /* De waarden staan GESTRUCTUREERD; de regels die het lid leest worden eruit
      afgeleid (conceptVan). Zo is een wijziging op het scherm een wijziging van
      een waarde, en geen tweede model naast het eerste (./reisconcept.js). */
   return {
-    bestemming: b[1],
-    reizigers: vrienden ? getal(vrienden[1]) + 1 : personen ? getal(personen[1]) : null,
-    aanname: vrienden ? 'u en ' + vrienden[1] + ' ' + vrienden[2] : null,
-    dagen: dagen ? getal(dagen[1]) : null,
-    nachten: !!(dagen && /nacht/i.test(dagen[2])),
-    budgetPP: budget ? Number(String(budget[1]).replace(/\./g, '')) : null,
+    bestemming: v.bestemming,
+    reizigers: v.reizigers == null ? null : v.reizigers,
+    aanname: v.aanname || null,
+    dagen: v.dagen == null ? null : v.dagen,
+    nachten: !!v.nachten,
+    budgetPP: v.budgetPP == null ? null : v.budgetPP,
     datumGenoemd: /\b(\d{1,2}[-/ ]\d{1,2}|januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december|morgen|volgende week|weekend)\b/i.test(tekst),
     vertrekGenoemd: /\bvanuit\s+[A-Z]|\bvertrek(ken)?\s+(vanuit|uit|vanaf)\s+[A-Z]/.test(tekst)
   };
@@ -102,4 +125,4 @@ function zinVan(c) {
     ' Er is niets ingediend of geboekt.';
 }
 
-module.exports = { leesReiswens, reiswens, conceptVan, zinVan, geld };
+module.exports = { leesReiswens, leesVelden, reiswens, conceptVan, zinVan, geld };

@@ -22,6 +22,7 @@ module.exports = (kern) => {
   const { app, auth, liveCodename, pestgrens, bus, noteerBeurt, stuurLus } = kern;
   const { fluisterZeg } = kern.fluister;
   const lusVoorLid = require('./persoonlijk-rahul-stuur')({ stuurLus, bus, liveCodename });
+  const wijzigUitTekst = require('./persoonlijk-rahul-wijzig')(kern);
   const aiStatus = () => require('../../ai-stand').beschikbaarheid(kern.anthropic);
   const meting = require('../../kern/ai/routermeting');
   /* HEEFT DE GOEDKOPE LAAG HET GEDEKT -- en `r.pakte` alleen is daarvoor niet
@@ -52,6 +53,9 @@ module.exports = (kern) => {
     if (grens) return res.json({ antwoord: grens.antwoord, pestgrens: true, weg: !!grens.weg });
     // het scherm, aan DEZE sessie gebonden (EDGE.md par. 14.4)
     const sch = kern.contextDomeinen.scherm(req.session, req.body.context, req.body.q);
+    // "maak er vijf dagen van": dezelfde wijzigingsroute als het scherm, zonder model
+    const tw = wijzigUitTekst(req, sch);
+    if (tw) { onthoudGesprek(req, tw.antwoord); return res.json(tw); }
     // sessie mee voor doen (reserveren, 24 uur plannen)
     const zeg = (eerst) => fluisterZeg(req.session.key, liveCodename(req.session), req.body.q, req.session,
       sch.scherm && Object.assign({ stuurEerst: eerst, verduidelijk: sch.verduidelijk }, sch.scherm));

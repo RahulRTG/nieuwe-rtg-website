@@ -75,6 +75,7 @@ function naamVan(beeld) {
 function maakContextDomeinen() {
   const domeinen = new Map();
   const achter = new WeakMap();
+  const wijzig = require('./menscontext-wijzig')(achter);
 
   /* Een domein meldt zich. Een onvolledige melding gooit -- bij het opstarten,
      niet bij de eerste vraag van een lid. */
@@ -86,8 +87,14 @@ function maakContextDomeinen() {
     if (!Array.isArray(d.velden) || !d.velden.length || d.velden.length > MAX_VELDEN)
       throw new Error('contextdomein ' + soort + ': velden is een positieve lijst van 1 tot ' + MAX_VELDEN + ' namen');
     if (domeinen.has(soort)) throw new Error('contextdomein ' + soort + ' is al gemeld; twee eigenaars van een soort is er een te veel');
+    /* WIJZIGEN IN WOORDEN (EDGE.md par. 14.7), en alleen samen: een domein dat
+       velden uit een zin kan lezen maar ze niet zelf kan toepassen, of andersom,
+       is half gemeld -- leeg is dicht. `pasAan` is de EIGEN wijzigingsroute van
+       het domein, dezelfde die het scherm gebruikt; hier komt er geen naast. */
+    if ((typeof d.tekstVelden === 'function') !== (typeof d.pasAan === 'function'))
+      throw new Error('contextdomein ' + soort + ': tekstVelden en pasAan horen bij elkaar');
     domeinen.set(soort, { soort, zoek: d.zoek, eigenaar: d.eigenaar, mag: d.mag, beeld: d.beeld,
-      velden: Object.freeze(d.velden.map(String)) });
+      velden: Object.freeze(d.velden.map(String)), tekstVelden: d.tekstVelden || null, pasAan: d.pasAan || null });
   }
 
   function beeldVan(dom, rij, id) {
@@ -156,13 +163,14 @@ function maakContextDomeinen() {
        taak met een oude aanvraag open is geen vraag over die aanvraag. */
     const aangewezen = beelden.length > 0 && (relatie === 'over' || relatie === 'wijzig');
     const onderwerp = object && relatie !== 'los' ? naamVan(object) : null;
-    return { opzoeking, aangewezen, relatie, reden, onderwerp,
+    const wijziging = wijzig.lees(relatie, object, vraag);
+    return { opzoeking, aangewezen, relatie, reden, onderwerp, wijziging,
       verduidelijk: relatie === 'onduidelijk' && beelden.length
         ? 'Bedoelt u ' + naamVan(object || beelden[0]) + ', of gaat het om iets nieuws? Zeg het gerust, dan ga ik verder.' : null,
       scherm: regel ? { regel, uitleg: CONTEXT_REGELS } : null };
   }
 
-  return { meld, voor, scherm, soorten: () => [...domeinen.keys()] };
+  return { meld, voor, scherm, pasAanUitTekst: wijzig.pasAanUitTekst, soorten: () => [...domeinen.keys()] };
 }
 
 module.exports = { maakContextDomeinen, MAX_VELDEN, MAX_WAARDE };

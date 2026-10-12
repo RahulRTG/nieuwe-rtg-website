@@ -76,6 +76,8 @@
   function werk(d, page, auth) {
     var c = d && d.taak && d.taak.concept, W = window.RTGEdgeConceptwerk;
     if (!c || !c.id || !c.bewerkbaar || !W || !page || !auth) return null;
+    // hetzelfde concept, in woorden gewijzigd: dezelfde kaart bijwerken
+    if (werk.kaart && werk.kaart.element.isConnected && werk.kaart.vanBuiten(c, d.viaTekst ? d.antwoord : '')) return werk.kaart;
     var oud = page.querySelector('.rtg-conceptwerk');
     if (oud) oud.remove();
     var k = W.maak(c, document, { verstuur: function (body) {
@@ -84,6 +86,7 @@
     } });
     var form = page.querySelector('.rtg-command-form');
     if (form && form.parentNode) form.parentNode.insertBefore(k.element, form);
+    werk.kaart = k;
     return k;
   }
   window.RTGRahulTabHelpers = { tekst: tekst, context: context, suggesties: suggesties, noot: noot, bericht: bericht, werk: werk };

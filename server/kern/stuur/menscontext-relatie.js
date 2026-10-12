@@ -37,8 +37,10 @@
 'use strict';
 const { inhoudswoorden } = require('./resolver-woorden');
 
-const WIJS = /\b(deze|dit|die|dat|hier|daar|hiervan|daarvan|ervan)\b/i;
-const WIJZIG = /\b(wijzig\w*|verander\w*|aanpass\w*|pas\b.*\baan|verzet\w*|verplaats\w*|annuleer\w*|zeg\b.*\baf|intrek\w*|trek\b.*\bin|zet\b.*\b(later|eerder|om|terug))\b/i;
+/* "Maak ER vijf dagen VAN": het gesplitste "ervan" wijst net zo goed naar het
+   object als "deze" -- het lid praat over het werkstuk dat voor hem ligt. */
+const WIJS = /\b(deze|dit|die|dat|hier|daar|hiervan|daarvan|ervan)\b|\ber\b[^.!?]*\bvan\b/i;
+const WIJZIG = /\b(wijzig\w*|verander\w*|aanpass\w*|pas\b.*\baan|verzet\w*|verplaats\w*|annuleer\w*|zeg\b.*\baf|intrek\w*|trek\b.*\bin|zet\b.*\b(later|eerder|om|terug|op)|maak\b.*\bvan)\b/i;
 /* Een nieuwe taak die zichzelf zo noemt. Zonder wijswoord gaat zo'n vraag nooit
    over het aangewezen object, ook als hij de soort noemt ("een nieuwe reis"). */
 const NIEUW = /\b(nieuwe?|andere|nog een|extra|tweede)\b/i;

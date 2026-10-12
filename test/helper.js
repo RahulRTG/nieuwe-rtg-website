@@ -1324,9 +1324,45 @@ function browserOpties(pw, extra) {
 /* Via test/infra.js: zonder RTG_EIS_INFRA een etiket ([infra:browser]) dat de
    draaier telt, MET de schakelaar een zakker -- een omgeving die schermtoetsen
    belooft, laat ze niet stil overslaan. */
+/* DE MOTOR VAN EEN BROWSERTOETS. Standaard Chromium; met RTG_TEST_MOTOR=webkit
+   draait een toets die zijn browser via startBrowser() start in WebKit, de motor
+   van Safari en van elke browser op iOS. Waarom: de kantoordeur liep op de
+   iPhone van de eigenaar vast, en geen enkele toets draaide in WebKit
+   (CONSOLIDATIE.md, fase 2). De CI-job "Kernroutes in WebKit"
+   (.github/workflows/desktop-standard.yml) zet hem aan voor de kernroutes.
+
+   Wat WebKit hier NIET kan: Chromium-vlaggen (--no-sandbox, nepmedia) en de
+   CDP-sessies van een virtuele passkey. Een toets die die nodig heeft, start
+   zijn browser dus niet via startBrowser(); de echte passkey op een iPhone staat
+   op de handmatige checklist. Een onbekende motor is een fout, geen terugval. */
+const MOTOREN = new Set(['chromium', 'webkit']);
+function testMotor() {
+  const m = String(process.env.RTG_TEST_MOTOR || 'chromium').trim().toLowerCase();
+  if (!MOTOREN.has(m)) throw new Error('RTG_TEST_MOTOR kent alleen chromium en webkit, niet: ' + m);
+  return m;
+}
+function webkitPad(pw) {
+  try {
+    const p = pw && pw.webkit && typeof pw.webkit.executablePath === 'function' ? pw.webkit.executablePath() : null;
+    return p && fs.existsSync(p) ? p : false;
+  } catch (e) { return false; }
+}
+function startBrowser(pw, extra) {
+  if (testMotor() === 'webkit') {
+    const e = Object.assign({}, extra || {});
+    delete e.args;   // Chromium-vlaggen; WebKit kent ze niet
+    return pw.webkit.launch(e);
+  }
+  return pw.chromium.launch(browserOpties(pw, extra));
+}
+
 function geenBrowser(pw) {
   const { vereist } = require('./infra');
   if (!pw) return vereist('browser', false, 'playwright niet beschikbaar in deze omgeving');
+  if (testMotor() === 'webkit') {
+    return webkitPad(pw) ? false
+      : vereist('browser', false, 'RTG_TEST_MOTOR=webkit, maar WebKit is niet geinstalleerd -- npx playwright install --with-deps webkit');
+  }
   if (browserPad(pw) === false) {
     return vereist('browser', false, 'playwright is er, maar geen enkele chromium start hier -- zet ' +
       'RTG_BROWSER_PATH of installeer de bouw die playwright vraagt');
@@ -1711,7 +1747,7 @@ async function bankDeur(page, naam, opties) {
   await deur.click();
 }
 
-module.exports = { edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+module.exports = { startBrowser, testMotor, edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, zaakMensOpNaam, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stroomAdres, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

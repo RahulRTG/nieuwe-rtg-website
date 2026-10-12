@@ -31,7 +31,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, laadPlaywright, browserOpties, geenBrowser, wachtOpRust,
+const { startServer, laadPlaywright, startBrowser, geenBrowser, wachtOpRust,
   volgVerzoeken } = require('./helper');
 
 const pw = laadPlaywright();
@@ -73,7 +73,7 @@ const SCHERMEN = [
 function vraagtCode(deur) { return !!deur && /kantoorcode/i.test(deur); }
 
 async function opstelling() {
-  const browser = await pw.chromium.launch(browserOpties(pw));
+  const browser = await startBrowser(pw);
   /* De service worker uit: anders haalt hij schermen vooruit op en meet deze
      toets een pagina uit de cache in plaats van een verse. */
   const ctx = await browser.newContext({ serviceWorkers: 'block' });

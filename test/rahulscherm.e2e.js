@@ -14,7 +14,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, startBrowser, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -34,7 +34,7 @@ test('het scherm van Rahul beweegt mee en zit nooit in de weg', { skip: geenBrow
     }).then(r => r.json());
     assert.ok(reg.token, 'het lid moet een token krijgen');
 
-    browser = await pw.chromium.launch(browserOpties(pw));
+    browser = await startBrowser(pw);
     const ctx = await browser.newContext({ viewport: { width: 430, height: 900 } });
     await ctx.addInitScript((tok) => { try { localStorage.setItem('rtg_member_token', tok); } catch (e) {} }, reg.token);
 

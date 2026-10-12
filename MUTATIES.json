@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T02:47:32.052Z",
-    "commit": "34a58cec9",
+    "op": "2026-10-12T03:31:13.812Z",
+    "commit": "e7176fe60",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -12139,6 +12139,13 @@
         "sourceSha256": "a3ef0b6130983a40089895c2e4eafb6f1dc7a4a05a6a85df745f1f7039eee1ee",
         "testSha256": "78ca1c807175600cd60b19dc35e5f02ded5b8ecc631869f32b79723025443014"
       }
+    },
+    "registratie-dicht-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "registratie-dicht.test.js": {
       "soort": "server",

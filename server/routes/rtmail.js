@@ -24,9 +24,17 @@ module.exports = (kern) => {
   const manager = (req) => magKlokZien(req.actor);
   app.post('/api/supplier/rtmail/inbox', supplierAuth, (req, res) => {
     const adres = adresVan(req), m = manager(req);
-    const berichten = rtmail.postvak(adres).concat(m ? rtmail.leidingPost(adres) : [])
+    const berichten = rtmail.postvak(adres).concat(m ? rtmail.leiding.post(adres) : [])
       .sort((x, y) => String(y.at).localeCompare(String(x.at))).slice(0, 60);
-    res.json({ adres, ongelezen: rtmail.ongelezen(adres) + (m ? rtmail.leidingOngelezen(adres) : 0), berichten });
+    res.json({ adres, ongelezen: rtmail.ongelezen(adres) + (m ? rtmail.leiding.ongelezen(adres) : 0), berichten });
+  });
+
+  // de manager archiveert een bericht van de leidingsplek (het valt dan uit de inbox)
+  app.post('/api/supplier/rtmail/leiding/archiveer', supplierAuth, (req, res) => {
+    if (!manager(req)) return res.status(403).json({ error: 'Alleen een manager beheert de wervingspost.' });
+    const r = rtmail.leiding.archiveer(adresVan(req), String((req.body && req.body.id) || ''));
+    if (r.error) return res.status(404).json({ error: r.error });
+    res.json(r);
   });
 
   app.post('/api/supplier/rtmail/verzonden', supplierAuth, (req, res) => {
@@ -34,13 +42,13 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/rtmail/ongelezen', supplierAuth, (req, res) => {
-    res.json({ ongelezen: rtmail.ongelezen(adresVan(req)) + (manager(req) ? rtmail.leidingOngelezen(adresVan(req)) : 0) });
+    res.json({ ongelezen: rtmail.ongelezen(adresVan(req)) + (manager(req) ? rtmail.leiding.ongelezen(adresVan(req)) : 0) });
   });
 
   app.post('/api/supplier/rtmail/lees', supplierAuth, (req, res) => {
     const id = String((req.body && req.body.id) || '');
     let r = rtmail.lees(adresVan(req), id);
-    if (r.error && manager(req)) r = rtmail.leidingLees(adresVan(req), id);
+    if (r.error && manager(req)) r = rtmail.leiding.lees(adresVan(req), id);
     if (r.error) return res.status(404).json({ error: r.error });
     res.json({ ok: true, bericht: r });
   });

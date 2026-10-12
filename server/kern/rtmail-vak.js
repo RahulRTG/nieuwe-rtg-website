@@ -23,6 +23,7 @@
    gaat via het bewaarbeleid en laat een spoor na (kern/rtmail-bestuur.js). Een
    mailsysteem waarin "weg" soms echt weg is en soms niet, is bij een juridisch
    onderzoek onbruikbaar. */
+const { schoon: schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
 const MAPPEN = ['in', 'archief', 'prullenbak'];
@@ -31,6 +32,7 @@ const MAX_LABELS = 12;
 module.exports = ({ db, save, rtmail }) => {
   const store = () => {
     if (!db.data.rtmail || !Array.isArray(db.data.rtmail.berichten)) db.data.rtmail = { berichten: [] };
+    schoonLeiding(db.data.rtmail, save); // beperkte post nooit in het gedeelde postvak (./rtmail-leiding.js)
     return db.data.rtmail;
   };
   const bus = (adres) => {

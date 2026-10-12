@@ -11,6 +11,7 @@
    poging. Dat is precies wat een beveiligingsonderzoek wil zien, en het is de
    reden dat de poort logt en niet de route: een route die zelf mag kiezen of
    hij logt, vergeet dat een keer. */
+const { magKlokZien } = require('../kern/leverancier/logboekzicht');
 module.exports = (kern) => {
   const { app, auth, supplierAuth, db, rtmail, rtmailRecht, rtmailBewaar, codenaamVan } = kern;
   const wie = require('../kern/rtmail-wie')({ db, rtmail, codenaamVan });
@@ -114,7 +115,9 @@ module.exports = (kern) => {
       const ik = p.adres(req);
       if (!ik) return geen(res);
       const b = body(req);
-      const r = rtmailBewaar.exporteer(ik, doel(req), { reden: b.reden, metInhoud: b.metInhoud });
+      // de wervingspost van de leidingsplek alleen voor een manager van de zaak (kern/rtmail-leiding.js)
+      const r = rtmailBewaar.exporteer(ik, doel(req), { reden: b.reden, metInhoud: b.metInhoud,
+        leiding: p.pad === '/api/supplier/rtmail' && magKlokZien(req.actor) });
       if (r.error) return nee(res, r);
       res.json(r);
     });

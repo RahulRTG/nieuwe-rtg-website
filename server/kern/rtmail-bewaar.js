@@ -23,6 +23,7 @@
    recht EN een reden (kern/rtmail-recht.js), en hij komt altijd in het
    journaal. Een export is een kopie die het systeem verlaat; wie dat stil kan
    doen, heeft geen postvak maar een lek. */
+const { schoon: schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
 module.exports = ({ db, save, rtmail, recht }) => {
@@ -44,6 +45,7 @@ module.exports = ({ db, save, rtmail, recht }) => {
   const beleidVan = (adres) => B().vakken[busVan(adres)] || { dagen: 0, bewaring: null };
   const store = () => {
     if (!db.data.rtmail || !Array.isArray(db.data.rtmail.berichten)) db.data.rtmail = { berichten: [] };
+    schoonLeiding(db.data.rtmail, save); // beperkte post nooit in het gedeelde postvak (./rtmail-leiding.js)
     return db.data.rtmail;
   };
   const inVak = (m, bus) => busVan(m.naar) === bus || busVan(m.van) === bus;
@@ -110,11 +112,14 @@ module.exports = ({ db, save, rtmail, recht }) => {
     const grens = new Date(Date.now() - b.dagen * 86400e3).toISOString();
     const bus = busVan(adres);
     const s = store();
-    const weg = s.berichten.filter(m => inVak(m, bus) && String(m.at) < grens);
+    const oud = (m) => inVak(m, bus) && String(m.at) < grens;
+    // de leidingsplek (kern/rtmail-leiding.js) valt onder dezelfde termijn en dezelfde bewaring
+    const weg = s.berichten.filter(oud).concat((s.leiding || []).filter(oud));
     if (!weg.length) return { ok: true, verwijderd: 0, let: 'Niets ouder dan ' + b.dagen + ' dagen.' };
     const oudste = weg.reduce((a, m) => (a && a < m.at ? a : m.at), null);
     const jongste = weg.reduce((a, m) => (a && a > m.at ? a : m.at), null);
     s.berichten = s.berichten.filter(m => !weg.includes(m));
+    if (Array.isArray(s.leiding)) s.leiding = s.leiding.filter(m => !weg.includes(m));
     B().vernietigingen.unshift({ postvak: bus, aantal: weg.length, van: oudste, tot: jongste,
       door: busVan(wie), reden: kap(reden, 300) || null, at: nu() });
     recht.log(wie, 'vernietigd: ' + weg.length + ' bericht(en)', adres, reden, { van: oudste, tot: jongste });
@@ -127,12 +132,15 @@ module.exports = ({ db, save, rtmail, recht }) => {
 
   /* Export. Metadata altijd; de inhoud alleen met het recht `lezen`, zodat een
      jurist met alleen inzage-metadata niet via de export toch meeleest. */
-  function exporteer(wie, adres, { reden, metInhoud } = {}) {
+  /* `leiding`: de post van de leidingsplek gaat alleen mee als de AANROEPER een
+     manager van deze zaak is -- dat weet de route, niet dit bestand. */
+  function exporteer(wie, adres, { reden, metInhoud, leiding } = {}) {
     const p = recht.poort(wie, adres, 'exporteren', reden);
     if (!p.ok) return { error: p.waarom };
     const magLezen = recht.mag(wie, adres, 'lezen').ok;
     const bus = busVan(adres);
-    const rijen = store().berichten.filter(m => inVak(m, bus)).map(m => {
+    const s = store();
+    const rijen = s.berichten.filter(m => inVak(m, bus)).concat(leiding ? (s.leiding || []).filter(m => inVak(m, bus)) : []).map(m => {
       const r = { id: m.id, van: m.van, naar: m.naar, onderwerp: m.onderwerp, at: m.at,
         soort: m.soort, vertrouwd: !!m.vertrouwd, draad: m.draad || m.id };
       if (metInhoud !== false && magLezen) r.tekst = m.tekst;

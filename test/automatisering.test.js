@@ -74,9 +74,9 @@ test('personeel-draaiboek: sollicitatie zet een seintje op de LEIDINGSPLEK van d
   assert.match(m.tekst, /gastvrouw/);
   assert.match(m.tekst, /orchidee/); // codenaam mag, echte naam niet
   assert.equal(rtmail.postvak('sakura').length, 0, 'niet in het gedeelde zaakpostvak');
-  assert.equal(rtmail.leidingPost('sakura').length, 1, 'wel op de leidingsplek');
+  assert.equal(rtmail.leiding.post('sakura').length, 1, 'wel op de leidingsplek');
   // een zaak of team waarvan de naam erop lijkt, deelt er niets mee
-  assert.equal(rtmail.leidingPost('sakuraleiding').length, 0);
+  assert.equal(rtmail.leiding.post('sakuraleiding').length, 0);
   assert.equal(rtmail.postvak('sakura-leiding').length, 0);
 });
 

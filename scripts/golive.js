@@ -34,19 +34,11 @@ const waarschuw = (t) => uit.push(['⚠', t, false]);
 const goed = (t) => uit.push(['✓', t, false]);
 let ownerReadback = null;
 
-/* .env.productie inlezen MET DE LEZER VAN DE SERVER (scripts/docker/start.js
-   leesEnv): aanhalingstekens eraf, `export ` ervoor eraf, een ongeldige naam of
-   nulbyte is een fout. De eigen lezer die hier stond deed geen van drieen, en dan
-   keurde dit rapport een andere stand dan de server draait -- `RTG_REGISTRATIE_DICHT="0"`
-   las hier als dicht en `export RTG_REGISTRATIE_DICHT=1` werd hier overgeslagen.
-   Geeft null als het bestand niet te lezen is; een bestand dat niet te ONTLEDEN
-   is gooit, en de aanroeper blokkeert daarop. */
-const { leesEnv } = require('./docker/start');
-function leesEnvBestand(pad) {
-  let tekst;
-  try { tekst = fs.readFileSync(pad, 'utf8'); } catch (e) { return null; }
-  return leesEnv(tekst);
-}
+/* Het envbestand lezen, de registratieregel en de databaseproef staan in
+   ./lib/golive-env.js, zodat ze in een toets kunnen draaien zonder de hele
+   keuring. */
+const goliveEnv = require('./lib/golive-env');
+const { leesEnvBestand } = goliveEnv;
 
 (async () => {
   // 0. het productie-envbestand, als dat er is (echte env wint altijd). In
@@ -97,8 +89,10 @@ function leesEnvBestand(pad) {
   /* De registratiegrendel hardop, want hij verandert wat "live" betekent: met
      RTG_REGISTRATIE_DICHT ontstaat er via geen enkele weg een nieuw account. Een
      onbekende waarde staat al als waarschuwing hierboven (config.valideer). */
-  if (require('../server/config/registratie').dicht(env)) waarschuw('Registratie staat DICHT bij besluit van de eigenaar (RTG_REGISTRATIE_DICHT): registreren, de eerste SSO-aanmelding en SCIM maken geen nieuw account. owner-init (scripts/eigenaar-aanmaken.js) werkt wel; heropenen is een besluit en een herstart.');
-  else goed('Registratie: open (RTG_REGISTRATIE_DICHT leeg of 0).');
+  {
+    const reg = goliveEnv.registratieRegel(env);
+    (reg.teken === '⚠' ? waarschuw : goed)(reg.tekst);
+  }
   /* Een losse Node-instantie mag voor een afgeschermde proef op SQLite en
      proceslokale tellers draaien. Dat is niet hetzelfde als een B2B2C-
      go-live: geld, intrekking, rate limits en realtime moeten instanceverlies
@@ -196,22 +190,9 @@ function leesEnvBestand(pad) {
 
   // 2. PostgreSQL echt aanraken (niet alleen "de variabele staat er")
   if (env.DATABASE_URL) {
-    try {
-      const { Client } = require('../server/pgwire');
-      const c = new Client({ connectionString: env.DATABASE_URL, connectionTimeoutMillis: 4000 });
-      const t0 = Date.now();
-      await c.connect();
-      await c.query('SELECT 1');
-      await c.end();
-      goed('PostgreSQL bereikbaar (' + (Date.now() - t0) + ' ms).');
-    } catch (e) {
-      /* DE FOUT VAN DE DRIVER GAAT ER GEMASKEERD IN. Hierboven wordt
-         DATABASE_URL zo nodig zelf samengesteld uit het wachtwoordbestand, dus
-         die reeks DRAAGT een wachtwoord -- en een driverfout neemt de
-         verbindingsreeks nogal eens mee. Dat is een wachtwoord in de log op
-         precies het moment dat iemand de log gaat delen om hulp te vragen. */
-      blokkeer('DATABASE_URL is gezet maar de database antwoordt niet: ' + zonderGeheim(e.message || e));
-    }
+    const pg = await goliveEnv.beproefPostgres(env);
+    if (pg.ok) goed('PostgreSQL bereikbaar (' + pg.ms + ' ms).');
+    else blokkeer('DATABASE_URL is gezet maar de database antwoordt niet: ' + pg.reden);
   }
 
   /* 2a. Redis, gedeelde bytes en externe alarmering actief beproeven. Een

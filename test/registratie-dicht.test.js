@@ -29,7 +29,13 @@
       het zekeringknopje (404, 400, reset, afkappen), het doven van een
       zekering, het statusbord dat de uitleg uit de STANDAARD neemt en niet uit
       een oude rij, de SSO-weigeringen, de uitleg van het eigenaarsscript,
-      golive bij een onleesbaar of ontbrekend envbestand, en config.pasToe.
+      golive bij een onleesbaar of ontbrekend envbestand, de databaseproef van
+      golive (die viel om bij een onbereikbare database), en config.pasToe.
+      Golive en het eigenaarsscript worden daarvoor NIET in een kind gedraaid:
+      de dekkingsmeting telt per proces de blokken die daar anders liepen, en
+      een kind dat het halve script doorloopt laat de rest als ongedekt staan.
+      De delen die ertoe doen staan in scripts/lib/golive-env.js en draaien
+      hier in hetzelfde proces.
       Mutaties: de spreidvolgorde in bord.js omdraaien -> 10c zakt (dat was de
       overlevende van de eerste ronde); de afkapgrens in knoppen.js -> 10a zakt.
 
@@ -348,32 +354,26 @@ test('8. SSO noemt een dichte registratie in plaats van een kale 401', () => {
 /* 9. npm run golive leest .env.productie zoals de server dat doet. Zijn eigen
    lezer stripte geen aanhalingstekens en geen `export `, en keurde daardoor een
    andere stand dan de server draait: `"0"` las als een vreemde waarde (dicht),
-   en `export ...=1` werd overgeslagen (open). Mutatie, met de hand: de oude lezer
-   terug in golive.js -> beide gevallen zakken. */
+   en `export ...=1` werd overgeslagen (open). De lezer en de registratieregel
+   staan in scripts/lib/golive-env.js en worden hier in hetzelfde proces
+   beproefd. Mutatie, met de hand: de oude lezer terug -> beide gevallen zakken. */
 test('9. golive leest het envbestand met de lezer van de server', () => {
-  const { spawnSync } = require('node:child_process');
+  const ge = require('../scripts/lib/golive-env');
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-regdicht-golive-'));
-  const draai = (regel) => {
-    const f = path.join(TMP, 'env-' + Math.random().toString(36).slice(2));
-    fs.writeFileSync(f, regel + '\n');
-    const env = { ...process.env, RTG_ENV_FILE: f };
-    delete env[VLAG];
-    /* --bewijs-stdout: het rapport gaat naar stdout en .release/ blijft onaangeraakt,
-       zodat deze toets niet botst met een parallelle golive-run. */
-    const r = spawnSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'golive.js'), '--bewijs-stdout'],
-      { encoding: 'utf8', env, timeout: 120000 });
-    return String(r.stdout || '') + String(r.stderr || '');
-  };
+  const lees = (regel) => { const f = path.join(TMP, 'env-' + Math.random().toString(36).slice(2)); fs.writeFileSync(f, regel + '\n'); return ge.leesEnvBestand(f); };
   try {
-    const open = draai(VLAG + '="0"');
-    assert.match(open, /Registratie: open/, '"0" is open, net als op de server');
-    assert.doesNotMatch(open, /is geen 0 of 1/);
-    const dicht = draai('export ' + VLAG + '=1');
-    assert.match(dicht, /Registratie staat DICHT/, '`export ...=1` is dicht, net als op de server');
-    const ds = require('../scripts/docker/start');
-    const r = require('../server/accounts/registratie');
-    assert.equal(r.dicht(ds.leesEnv(VLAG + '="0"')), false);
-    assert.equal(r.dicht(ds.leesEnv('export ' + VLAG + '=1')), true);
+    const open = lees(VLAG + '="0"');
+    assert.deepEqual(open, { [VLAG]: '0' }, 'de aanhalingstekens gaan eraf');
+    assert.deepEqual(ge.registratieRegel(open), { teken: '✓', tekst: 'Registratie: open (RTG_REGISTRATIE_DICHT leeg of 0).' });
+    const dicht = lees('export ' + VLAG + '=1');
+    assert.deepEqual(dicht, { [VLAG]: '1' }, '`export ` gaat eraf');
+    assert.equal(ge.registratieRegel(dicht).teken, '⚠');
+    assert.match(ge.registratieRegel(dicht).tekst, /Registratie staat DICHT/);
+    assert.equal(ge.registratieRegel({ [VLAG]: 'yes' }).teken, '⚠', 'ook golive leest fail-closed');
+    /* golive.js gebruikt deze lezer, en geen eigen */
+    const bron = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'golive.js'), 'utf8');
+    assert.match(bron, /require\('\.\/lib\/golive-env'\)/);
+    assert.doesNotMatch(bron, /function leesEnvBestand/);
   } finally { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen */ } }
 });
 
@@ -481,19 +481,17 @@ test('10e. de uitleg van het eigenaarsscript noemt alleen wat de fout aanwijst',
   assert.match(aanmaakUitleg(null).join(' '), /geen herkende reden/);
 });
 
-test('10f. golive weigert een envbestand dat de server niet kan lezen, en een ontbrekend', () => {
-  const { spawnSync } = require('node:child_process');
+test('10f. een envbestand dat de server niet kan lezen gooit, een ontbrekend is null', () => {
+  const ge = require('../scripts/lib/golive-env');
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-regdicht-golive2-'));
-  const draai = (pad) => {
-    const env = { ...process.env, RTG_ENV_FILE: pad }; delete env[VLAG];
-    const r = spawnSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'golive.js'), '--bewijs-stdout'], { encoding: 'utf8', env, timeout: 120000 });
-    return String(r.stdout || '') + String(r.stderr || '');
-  };
   try {
     const slecht = path.join(TMP, 'slecht.env');
     fs.writeFileSync(slecht, '1VERKEERD=ja\n');
-    assert.match(draai(slecht), /niet te lezen zoals de server hem leest: ongeldige variabelenaam/);
-    assert.match(draai(path.join(TMP, 'bestaat-niet.env')), /RTG_ENV_FILE wijst naar een ontbrekend geheimenbestand/);
+    assert.throws(() => ge.leesEnvBestand(slecht), /ongeldige variabelenaam/);
+    assert.equal(ge.leesEnvBestand(path.join(TMP, 'bestaat-niet.env')), null);
+    /* en golive blokkeert op de eerste, met de reden */
+    assert.match(fs.readFileSync(path.join(__dirname, '..', 'scripts', 'golive.js'), 'utf8'),
+      /catch \(e\) \{ blokkeer\(path\.basename\(envPad\) \+ ' is niet te lezen zoals de server hem leest: '/);
   } finally { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen */ } }
 });
 
@@ -507,4 +505,31 @@ test('10g. config.pasToe logt de waarschuwing bij een onbekende waarde', () => {
   const stil = [];
   config.pasToe({ [VLAG]: '1', NODE_ENV: 'development' }, { warn: (s) => stil.push(s), error: (s) => stil.push(s), info: () => {} });
   assert.ok(!stil.some(s => s.includes(VLAG)), '1 is bekend en geeft geen regel');
+});
+
+/* 10h. DE DATABASEPROEF VAN GOLIVE, die bij een onbereikbare database omviel.
+   De pgwire-client zendt een verbindingsfout ook als 'error' uit; zonder
+   luisteraar was dat een onafgevangen fout en kwam er geen rapport. Nu: een
+   uitslag met een gemaskeerde reden. Mutatie, met de hand: de luisteraar
+   weghalen -> deze toets valt om (het proces gooit). */
+test('10h. golive: een onbereikbare database blokkeert met een gemaskeerde reden en valt niet om', async () => {
+  const { beproefPostgres } = require('../scripts/lib/golive-env');
+  const geheim = 'geheim-wachtwoord-' + Date.now();
+  const uit = await beproefPostgres({ DATABASE_URL: 'postgresql://rtg:' + geheim + '@rtg-bestaat-niet.invalid:5432/rtg' });
+  assert.equal(uit.ok, false);
+  assert.match(uit.reden, /ENOTFOUND|getaddrinfo|EAI_AGAIN/);
+  assert.ok(!uit.reden.includes(geheim), 'geen wachtwoord in de reden');
+  /* en de goede kant, met een nagespeelde driver: verbinden, SELECT 1, sluiten */
+  const EventEmitter = require('events');
+  const gezien = [];
+  class Nep extends EventEmitter {
+    constructor(cfg) { super(); gezien.push(cfg.connectionString); }
+    async connect() { gezien.push('connect'); }
+    async query(q) { gezien.push(q); }
+    async end() { gezien.push('end'); }
+  }
+  const goed = await beproefPostgres({ DATABASE_URL: 'postgresql://x@y/z' }, { pgwire: { Client: Nep } });
+  assert.equal(goed.ok, true);
+  assert.equal(typeof goed.ms, 'number');
+  assert.deepEqual(gezien, ['postgresql://x@y/z', 'connect', 'SELECT 1', 'end']);
 });

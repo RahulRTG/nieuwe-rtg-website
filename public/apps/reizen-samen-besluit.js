@@ -12,14 +12,13 @@
    wanneer het beeld niet meer is bijgewerkt. Een oud resultaat wordt nooit als
    actueel getoond.
 
-   DE EDGE krijgt de voortgang als Trust Rail en twee handelingen (uw wensen,
-   en voor de reiziger: een optie klaarzetten). Wat erin staat komt uit dezelfde
-   projectie: geen tweede bron, en niets over een ander. */
+   DE EDGE krijgt de voortgang als Trust Rail en twee handelingen; dat staat in
+   ./reizen-samen-voorstel.js, uit dezelfde projectie. */
 (function (w, d) {
   'use strict';
   var R = w.RTGReizen; if (!R) return;
   var $ = R.$, maak = R.maak;
-  var reis = null, laatste = null, keuzes = [], klok = null, bezig = false;
+  var reis = null, laatste = null, keuzes = [], klok = null, bezig = null;
   var RONDE_MS = 6000;
   var taal = (d.documentElement && d.documentElement.lang) || undefined;   // de taal van de pagina, niet een vaste
 
@@ -66,6 +65,11 @@
         li.appendChild(j);
         if (!mijn.past) mijn.redenen.forEach(function (r) { li.appendChild(maak('p', 'rtg-sub besluitreden', r)); });
       }
+      if (b.werkruimte.handelingen.indexOf('voorstel.leg') >= 0 && o.voorIedereen === true) {
+        var leg = maak('button', 'rtg-knop', 'LEG VOOR AAN DE GROEP'); leg.type = 'button';
+        leg.addEventListener('click', function () { doe('/api/reis/gezelschap/voorstel/leg', { reis: reis, optie: o.id }); });
+        li.appendChild(leg);
+      }
       if (b.werkruimte.handelingen.indexOf('optie.wis') >= 0) {
         var weg = maak('button', 'rtg-knop', 'HAAL WEG'); weg.type = 'button';
         weg.addEventListener('click', function () { doe('/api/reis/gezelschap/opties/wis', { reis: reis, id: o.id }); });
@@ -84,37 +88,28 @@
     var vg = b.groep.voortgang;
     if (vg) $('#besluitVoortgang').textContent = vg.ingevuld + ' van ' + vg.deelnemers + ' deelnemers hebben hun wensen opgegeven.';
     tekenOpties(b);
+    if (w.RTGSamenVoorstel) w.RTGSamenVoorstel.teken(b, { reis: reis, doe: doe, euro: euro });
     $('#besluitToetsingen').textContent = b.groep.toetsingen.afgelopenEtmaal + ' van ' + b.groep.toetsingen.max +
       ' toetsingen gebruikt in het afgelopen etmaal. Iedereen in het gezelschap ziet dit getal.';
     $('#besluitGrens').textContent = b.groep.grens;
     stand('Voorlopig · berekend om ' + tijd(b.berekendOp), 'actueel');
-    meldEdge(b);
+    if (w.RTGSamenVoorstel) w.RTGSamenVoorstel.edge(b);
   }
 
-  function meldEdge(b) {
-    var A = w.RTGAdaptief; if (!A) return;
-    var acties = ['reizen.samen.wensen'];
-    if (b.werkruimte.handelingen.indexOf('optie.zet') >= 0) acties.push('reizen.samen.optie');
-    var passen = b.groep.opties.filter(function (o) { return o.voorIedereen === true; }).length;
-    var groep = !b.groep.vastTeStellen ? { tekst: 'Nog niet vast te stellen', staat: 'aandacht' }
-      : passen ? { tekst: passen + ' optie' + (passen === 1 ? '' : 's') + ' past voor iedereen', staat: 'goed' }
-        : { tekst: 'Nog geen optie past voor iedereen', staat: 'aandacht' };
-    var rail = [{ sleutel: 'groep', tekst: groep.tekst, staat: groep.staat },
-      { sleutel: 'jij', tekst: b.jij.opgave ? 'Uw wensen staan' : 'Geef uw wensen op', staat: b.jij.opgave ? 'goed' : 'aandacht' }];
-    if (b.groep.voortgang) rail.push({ sleutel: 'voortgang', tekst: b.groep.voortgang.ingevuld + ' van ' + b.groep.voortgang.deelnemers + ' ingevuld', staat: 'neutraal' });
-    A.context({ bron: 'reizen.samen.besluit', titel: 'Gezamenlijke reis', acties: acties, selectie: false, rail: rail });
-  }
-
+  /* Loopt er al een ronde, dan wacht een poll niet maar een EXPLICIETE vraag
+     wel: die sluit achter de lopende aan en haalt daarna opnieuw. Werd hij
+     overgeslagen, dan bleef na een eigen handeling het oude beeld staan. */
   function haal(stil) {
-    if (!reis || bezig) return Promise.resolve();
-    bezig = true;
-    return R.api('/api/reis/gezelschap/opties', { reis: reis }).then(function (b) {
+    if (!reis) return Promise.resolve();
+    if (bezig) return stil ? bezig : bezig.then(function () { return haal(false); });
+    bezig = R.api('/api/reis/gezelschap/opties', { reis: reis }).then(function (b) {
       if (!laatste || b.kenmerk !== laatste.kenmerk || !stil || b.rol !== laatste.rol) teken(b);
       else stand('Voorlopig · berekend om ' + tijd(b.berekendOp), 'actueel');
     }).catch(function (e) {
       if (e && e.status === 404) { var vak = $('#samenBesluit'); if (vak) vak.hidden = true; laatste = null; return; }
       if (laatste) stand('Niet bijgewerkt sinds ' + tijd(laatste.berekendOp) + '. Dit beeld is mogelijk verouderd.', 'verouderd');
-    }).then(function () { bezig = false; });
+    }).then(function () { bezig = null; });
+    return bezig;
   }
 
   function opgave() {

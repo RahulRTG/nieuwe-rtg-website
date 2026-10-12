@@ -22,6 +22,7 @@ const AFGETEKEND = {
 const toegang = { klasse: 'AUTHENTICATED', deur: 'auth' };
 const BESTAND = 'server/kern/reisgezelschap-opgave.js';
 const OPTIES = 'server/kern/reisgezelschap-opties.js';
+const INSTEM = 'server/kern/reisgezelschap-instemming.js';
 
 const leest = (route, mutatieId, wat, bestand) => [route, {
   mutatieId, herkomst: 'mens',
@@ -59,7 +60,19 @@ const CONTRACTEN = Object.fromEntries([
     'test/reisgezelschap-opties.test.js toets 4: dezelfde optie opnieuw (met id) en een tweede druk op nieuw ' +
     '(zonder id) gaven allebei de bestaande optie terug met getoetst:false', OPTIES),
   zet('POST /api/reis/gezelschap/opties/wis', 'reis.gezelschap.opties.wis',
-    'handler: filtert de optie weg als hij bestaat en geeft anders hetzelfde lege antwoord', OPTIES)
+    'handler: filtert de optie weg als hij bestaat en geeft anders hetzelfde lege antwoord', OPTIES),
+  /* INSTEMMEN OP EEN VASTE VERSIE (kern/reisgezelschap-instemming.js). Voorleggen
+     van dezelfde, onveranderde en geldige optie geeft dezelfde versie terug;
+     hetzelfde antwoord nog eens is gewijzigd:false; intrekken en terugnemen
+     vinden de tweede keer niets meer. */
+  zet('POST /api/reis/gezelschap/voorstel/leg', 'reis.gezelschap.voorstel.leg',
+    'test/reisgezelschap-instemming.test.js toets 1: een tweede voorlegging gaf versie 1 terug met nieuw:false', INSTEM),
+  zet('POST /api/reis/gezelschap/voorstel/trek', 'reis.gezelschap.voorstel.trek',
+    'handler: zet `ingetrokken` alleen als hij nog niet stond; een tweede keer laat dezelfde stand', INSTEM),
+  zet('POST /api/reis/gezelschap/instem', 'reis.gezelschap.instem',
+    'test/reisgezelschap-instemming.test.js toets 4: vijf keer nog eens instemmen gaf vijf keer gewijzigd:false', INSTEM),
+  zet('POST /api/reis/gezelschap/instem/terug', 'reis.gezelschap.instem.terug',
+    'handler: wist het eigen antwoord als het er is en geeft anders hetzelfde antwoord', INSTEM)
 ]);
 
 module.exports = CONTRACTEN;

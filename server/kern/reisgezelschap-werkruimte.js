@@ -29,12 +29,12 @@
 const crypto = require('crypto');
 
 const BLOKKEN = Object.freeze({
-  eigenaar: ['groepsvoortgang', 'groepsuitkomst', 'venster', 'opties', 'optieZetten', 'mijnOpgave', 'mijnKnelpunten'],
-  reisgenoot: ['groepsuitkomst', 'venster', 'opties', 'mijnOpgave', 'mijnKnelpunten']
+  eigenaar: ['groepsvoortgang', 'groepsuitkomst', 'voorlegging', 'venster', 'opties', 'optieZetten', 'mijnOpgave', 'mijnKnelpunten'],
+  reisgenoot: ['groepsuitkomst', 'voorlegging', 'venster', 'opties', 'mijnOpgave', 'mijnKnelpunten']
 });
 const HANDELINGEN = Object.freeze({
-  eigenaar: ['opgave.zet', 'opgave.wis', 'optie.zet', 'optie.wis'],
-  reisgenoot: ['opgave.zet', 'opgave.wis']
+  eigenaar: ['opgave.zet', 'opgave.wis', 'optie.zet', 'optie.wis', 'voorstel.leg', 'voorstel.trek', 'instem'],
+  reisgenoot: ['opgave.zet', 'opgave.wis', 'instem']
 });
 
 // zonder locale: de server kent de taal van de lezer hier niet, en een vaste is erger dan geen
@@ -66,6 +66,17 @@ function uitlegVoor(rol, groep, jij, voortgang) {
   } else if (groep.venster) {
     zinnen.push('Er is geen dag waarop iedereen die data opgaf, kan.');
   }
+  const v = groep.voorlegging;
+  if (v) {
+    if (v.stand === 'aangenomen') {
+      zinnen.push('Iedereen stemde in met versie ' + v.versie + ': ' + v.optie.titel + '. Dat is een besluit binnen het gezelschap; er is nog niets geboekt of betaald.');
+    } else if (v.stand === 'open') {
+      zinnen.push('Versie ' + v.versie + ' (' + v.optie.titel + ') ligt voor: ' + v.instemmingen.ja + ' van ' + v.instemmingen.totaal + ' stemden in. ' +
+        (jij.instemming === 'ja' ? 'U stemde in.' : jij.instemming === 'nee' ? 'U stemde niet in.' : 'U heeft nog niet geantwoord.'));
+    } else {
+      zinnen.push('Versie ' + v.versie + ' telt niet meer: ' + v.reden + ' Instemmingen erop zijn vervallen.');
+    }
+  }
   for (const o of groep.opties) {
     const mijn = jij.opties[o.id];
     if (mijn && !mijn.past) zinnen.push('Voor u past ' + o.titel + ' (' + euro(o.prijsPP) + ' p.p.) niet: ' + mijn.redenen.join(' '));
@@ -80,12 +91,14 @@ function projectie(rol, rauw) {
     vastTeStellen: rauw.vastTeStellen, waaromNiet: rauw.waaromNiet, venster: rauw.venster,
     opties: rauw.opties.map(o => ({ id: o.id, titel: o.titel, prijsPP: o.prijsPP, van: o.van, tot: o.tot,
       kenmerken: o.kenmerken, voorIedereen: o.voorIedereen })),
-    toetsingen: rauw.toetsingen, nietGezegd: rauw.nietGezegd, grens: rauw.grens
+    toetsingen: rauw.toetsingen, nietGezegd: rauw.nietGezegd, grens: rauw.grens,
+    voorlegging: (rauw.voorlegging && rauw.voorlegging.groep) || null
   };
   const kenmerk = crypto.createHash('sha256').update(JSON.stringify(groep)).digest('hex').slice(0, 16);
   const voortgang = rol === 'eigenaar' ? { deelnemers: rauw.deelnemers, ingevuld: rauw.ingevuld } : null;
   if (voortgang) groep.voortgang = voortgang;
-  const jij = { opgave: rauw.mijn, opties: Object.fromEntries(rauw.opties.filter(o => o.voorJou).map(o => [o.id, o.voorJou])) };
+  const jij = { opgave: rauw.mijn, opties: Object.fromEntries(rauw.opties.filter(o => o.voorJou).map(o => [o.id, o.voorJou])),
+    instemming: rauw.voorlegging && rauw.voorlegging.jij ? rauw.voorlegging.jij.instemming : null };
   return {
     status: 200, ok: true, stand: 'voorlopig', rol, kenmerk, berekendOp: rauw.berekendOp,
     groep, jij, uitleg: uitlegVoor(rol, groep, jij, voortgang),

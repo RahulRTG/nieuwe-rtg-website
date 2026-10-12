@@ -340,6 +340,11 @@
             <div id="besluitUitleg" aria-live="polite"></div>
           </div>
           <p class="rtg-sub" data-blok="groepsvoortgang" id="besluitVoortgang" hidden></p>
+          <div data-blok="voorlegging" id="besluitVoorlegging" hidden>
+            <p class="micro">HET VOORSTEL</p>
+            <div id="voorleggingInhoud"></div>
+            <div class="besluitknoppen" id="voorleggingKnoppen"></div>
+          </div>
           <div data-blok="opties" hidden><ul class="besluitopties" id="besluitOpties"></ul></div>
           <form data-blok="optieZetten" id="besluitOptieVorm" class="nodigvorm" hidden>
             <label class="rtg-label" for="optieTitel">Een optie klaarzetten</label>
@@ -1160,6 +1165,7 @@ function tekenCanvasVandaag(lijst) {
 <script src="/apps/reizen-samen-delen.js"></script>
 <script src="/apps/reizen-samen-mensen.js"></script>
 <script src="/apps/reizen-samen.js"></script>
+<script src="/apps/reizen-samen-voorstel.js"></script>
 <script src="/apps/reizen-samen-besluit.js"></script>
 <script src="/apps/reizen-context.js"></script>
 <!-- De vier bestaande TravelOS-tabs reizen als capabilities naar de ene

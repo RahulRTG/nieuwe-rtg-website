@@ -86,7 +86,8 @@ test('1. de server kiest de werkruimte bij de rol, en de rol komt niet uit het v
   assert.equal(anna.rol, 'eigenaar');
   assert.deepEqual(anna.werkruimte.blokken, W.BLOKKEN.eigenaar);
   assert.equal(bram.body.rol, 'reisgenoot', 'een rol in het verzoek telt niet');
-  assert.deepEqual(bram.body.werkruimte.handelingen, ['opgave.zet', 'opgave.wis']);
+  assert.deepEqual(bram.body.werkruimte.handelingen, W.HANDELINGEN.reisgenoot);
+  assert.ok(!bram.body.werkruimte.handelingen.some(h => /^optie\.|^voorstel\./.test(h)), 'een reisgenoot zet geen opties en legt niets voor');
   assert.equal(bram.body.groep.voortgang, undefined, 'de groepsvoortgang is van de reiziger');
   assert.deepEqual(anna.groep.voortgang, { deelnemers: 5, ingevuld: 5 });
   assert.equal(bram.body.jij.opgave.plafond, 120000, 'Bram ziet zijn eigen opgave terug');

@@ -162,7 +162,13 @@ test('vijf deelnemers, vijf werkruimten, een groepsuitkomst', { skip: geenBrowse
     assert.ok(reactie < 12000, 'de groep zag de wijziging pas na ' + reactie + ' ms');
 
     // een reisgenoot maakt de verborgen optievorm zichtbaar en verstuurt hem: de server weigert
-    const cees = pagina.Cees, kCees = await cees.evaluate(() => document.querySelector('#samenBesluit').dataset.kenmerk);
+    /* Eerst verversen en dan pas de vingerafdruk lezen: anders vergelijkt de
+       toets met een beeld van voor de laatste wijziging van Bram, en zakt hij op
+       de VERSING in plaats van op de manipulatie (of, met een verversing die
+       werd overgeslagen, staat hij om de verkeerde reden groen). */
+    const cees = pagina.Cees;
+    await cees.evaluate(() => window.RTGSamenBesluit.ververs());
+    const kCees = await cees.evaluate(() => document.querySelector('#samenBesluit').dataset.kenmerk);
     const geweigerd = cees.waitForResponse(r => /\/api\/reis\/gezelschap\/opties\/zet$/.test(r.url()));
     await cees.evaluate(() => {
       const f = document.querySelector('#besluitOptieVorm'); f.hidden = false;

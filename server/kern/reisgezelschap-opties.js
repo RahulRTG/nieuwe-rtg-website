@@ -51,7 +51,7 @@ const { BAND, MAX_OPTIES, MAX_TOETSEN, DAG_MS, MIN_DEELNEMERS, GRENS, NIET_GEZEG
   require('./reisgezelschap-opties-reken');
 const { projectie } = require('./reisgezelschap-werkruimte');
 
-module.exports.maakGezelschapOpties = ({ db, save, klok, crypto, reisVan, opgave }) => {
+module.exports.maakGezelschapOpties = ({ db, save, klok, crypto, reisVan, opgave, instemming }) => {
   const nuMs = () => klok.datum().getTime();
   const eigen = require('./eigencollectie')({ db, domein: 'kern/reisgezelschap-opties', bezit: { reisOpties: 'kaart' } });
   /* Op de sleutel van de EIGENAAR, zodat vergeten hem meeneemt. */
@@ -130,10 +130,18 @@ module.exports.maakGezelschapOpties = ({ db, save, klok, crypto, reisVan, opgave
       vastTeStellen: vast, waaromNiet, mijn,
       venster: vast ? gedeeldVenster(rijen.map(r => r.opgave)) : null,
       opties, berekendOp: new Date(nuMs()).toISOString(),
+      voorlegging: instemming ? instemming().beeld(d.eigenaar, reisId, key) : { groep: null, jij: null },
       toetsingen: { afgelopenEtmaal: recent(v).length, max: MAX_TOETSEN },
       nietGezegd: NIET_GEZEGD, grens: GRENS });
   }
 
-  return { zetOptie, wisOptie, groepsbeeld };
+  /* Voor de instemming (./reisgezelschap-instemming.js): de optie zoals hij NU
+     staat, om te zien of een voorgelegde versie nog dezelfde is. */
+  function optieVan(eigenaar, reisId, id) {
+    const v = vak(eigenaar, reisId, false);
+    return v ? v.opties.find(o => o.id === id) || null : null;
+  }
+
+  return { zetOptie, wisOptie, groepsbeeld, optieVan };
 };
 Object.assign(module.exports, { pastBij, gedeeldVenster, keurOptie, BAND, MAX_TOETSEN, MIN_DEELNEMERS });

@@ -19,9 +19,9 @@
    een meekijker. Er is daarom geen route die de invoer van een ANDER
    teruggeeft. Wat anderen mogen weten is alleen HOEVEEL deelnemers iets hebben
    ingevuld -- niet wie, want "iedereen behalve Remi" wijst al een mens aan. De
-   gezamenlijke berekening (./reisgezelschap-opties.js) krijgt een eigen, smalle
-   weg naar deze gegevens (`voorDeBerekening`) en geeft alleen een
-   groepsuitkomst vrij.
+   gezamenlijke berekening (./reisgezelschap-opties.js) en de instemming krijgen
+   een eigen, smalle weg naar deze gegevens (`voorDeBerekening`, aangesloten in
+   ./reisgezelschap-groep.js) en geven alleen een groepsuitkomst vrij.
 
    EERLIJK OVER WAT DIT NIET IS: de server van RTG ziet deze gegevens, op
    codenaam. Dit is een ontwerp dat bepaalt wat ANDERE DEELNEMERS te zien
@@ -97,7 +97,7 @@ const WIE_ZIET = 'Alleen u ziet wat u hier invult. Anderen in het gezelschap zie
   'deelnemers iets hebben ingevuld, niet wie en niet wat. De server van RTG verwerkt uw invoer ' +
   'om een groepsvoorstel te kunnen maken; dat is geen versleutelde berekening.';
 
-module.exports.maakGezelschapOpgave = ({ db, save, klok, crypto, leden, reisVan }) => {
+module.exports.maakGezelschapOpgave = ({ db, save, klok, leden, reisVan }) => {
   const nu = () => klok.datum().toISOString();
   const eigen = require('./eigencollectie')({ db, domein: 'kern/reisgezelschap-opgave', bezit: { reisOpgaven: 'kaart' } });
   const kaart = () => eigen.bak('reisOpgaven');
@@ -183,14 +183,8 @@ module.exports.maakGezelschapOpgave = ({ db, save, klok, crypto, leden, reisVan 
     return deelnemers(eigenaar, reisId).map(k => ({ key: k, opgave: (kaart()[k] || {})[sl] || null }));
   }
 
-  /* De groepsberekening hangt hier en niet in ./reisgezelschap.js: zij is de
-     enige afnemer van `voorDeBerekening`, en zo blijft die weg in dit paar
-     bestanden en komt hij nergens op de kern te liggen. */
-  const opties = require('./reisgezelschap-opties').maakGezelschapOpties({
-    db, save, klok, crypto, reisVan, opgave: { VOORKEUREN, deelnameVan, voorDeBerekening } });
-
-  return { VOORKEUREN, voortgang, wisVoorLid,
-    routes: Object.assign({ mijnOpgave, zetOpgave, wisOpgave }, opties) };
+  return { VOORKEUREN, voortgang, wisVoorLid, deelnameVan, voorDeBerekening,
+    routes: { mijnOpgave, zetOpgave, wisOpgave } };
 };
 module.exports.VOORKEUREN = VOORKEUREN;
 module.exports.keur = keur;

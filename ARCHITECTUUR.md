@@ -110,7 +110,7 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 256 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 255 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
@@ -141,8 +141,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 | Meting | Nu |
 |---|---|
 | kern-namen die routes aanraken | 1685 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 256 |
-| daarvan door precies één domein | 1429 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 255 |
+| daarvan door precies één domein | 1430 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -155,12 +155,12 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
 app(214) auth(130) supplierAuth(66) officeAuth(49) db(40) liveCodename(36) status(32)
-accounts(30) schoon(23) boardroomWie(20) managerOnly(20) codenaamVan(20) save(19)
-rtf(19) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth(13)
+accounts(30) schoon(23) boardroomWie(21) managerOnly(20) codenaamVan(20) save(19)
+rtf(19) tooManyTries(14) geenGast(14) express(14) boardroomAuth(14) findSupplier(13)
 crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)
 payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)
-logActivity(8) mail(7) naamAuth(7) sseToSupplier(7) onboarding(6) notifySupplier(6)
-talen(6) tweefactor(5) kluisAuth(5) tenant(5) logInlog(5) zwaarbewijs(5) veilig(5)
+logActivity(8) mail(7) naamAuth(7) sseToSupplier(7) onboarding(6) zwaarbewijs(6)
+notifySupplier(6) talen(6) tweefactor(5) kluisAuth(5) tenant(5) logInlog(5) veilig(5)
 afdelingen(5) openVacatures(5) overheid(5) sseToCustomer(5)
 ```
 

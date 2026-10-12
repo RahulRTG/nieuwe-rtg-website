@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-10-07T01:41:53.213Z",
-  "commit": "88661ef0e",
+  "op": "2026-10-11T22:28:46.540Z",
+  "commit": "4ac469c0",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 5,
   "instrument": "scripts/handlerwacht.js",
-  "node": "v24.18.0"
+  "node": "v22.22.0"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
@@ -3470,7 +3470,7 @@
   },
   {
    "sleutel": "POST /api/rtf/knelpunt",
-   "bestand": "server/routes/knelpunt.js:140",
+   "bestand": "server/routes/knelpunt.js:144",
    "staat": "bewaakt",
    "wacht": "rtf.verifieerProfiel"
   },

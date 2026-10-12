@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T06:08:26.331Z",
-    "commit": "49a0508d",
+    "op": "2026-10-11T22:32:37.468Z",
+    "commit": "048593f7",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -84,6 +84,13 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "geprobeerd": 3,
+      "scherp": "gezakt"
+    },
+    "aanvoer-ondernemen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "aanvoer.test.js": {
@@ -9920,6 +9927,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "neiging-gezag.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "neiging-scherm.e2e.js": {
       "soort": "server",

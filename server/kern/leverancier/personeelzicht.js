@@ -89,7 +89,7 @@ function meldingenVoor(lijst, actor) {
     return uit;
   });
 }
-function markeerGelezen(n, actor) {
+function meldingGelezen(n, actor) {
   if (!meldingVoor(n, actor)) return;
   if (!beperkt(n) || magKlokZien(actor)) { n.read = true; return; }
   const wie = String(actor.staffId);
@@ -129,4 +129,4 @@ function staatDelen(data, s, actor, vandaag, werkgeverSollicitatie) {
   };
 }
 
-module.exports = { staatDelen, periodeVoor, afwezigheidVoor, afwezigRedenVoor, verlofVoor, meldingVoor, meldingenVoor, markeerGelezen, bewaarMeldingen, lijnVoor, MELDINGEN_PER_BAK };
+module.exports = { staatDelen, periodeVoor, afwezigheidVoor, afwezigRedenVoor, verlofVoor, meldingVoor, meldingenVoor, meldingGelezen, bewaarMeldingen, lijnVoor, MELDINGEN_PER_BAK };

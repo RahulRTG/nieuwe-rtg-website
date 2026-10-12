@@ -353,6 +353,14 @@ Bij Cloudflare: zet in de Logpush-configuratie het veld `ClientRequestURI` uit
 (of gebruik `ClientRequestPath`). Draai je met `RTG_TLS=1` zonder proxy, dan
 speelt dit niet.
 
+Let op: niet elk token staat in de querystring. Een ondertekende medialink
+(`/media/t/<token>`, AUTHORITY.md B4) draagt zijn token in het **pad** en is
+vijftien minuten een bearer: wie hem heeft, krijgt het privébeeld. `$uri` en
+`ClientRequestPath` loggen dat pad dus wel. Maskeer `/media/t/…` in het
+proxylog (bijv. nginx `map $uri $rtg_uri { ~^/media/t/ /media/t/:ticket; default $uri; }`
+en log `$rtg_uri`), of log dat pad niet. De app zelf schrijft het als
+`/media/t/:ticket` (`kern/journaalvorm.js`, `kern/schild.js`).
+
 ### Eigen interne CA + mTLS (intern verkeer)
 
 Naast ACME (publieke domeinen) is er een **eigen interne certificaat-autoriteit**
@@ -515,8 +523,12 @@ achter de poortwachter, met Postgres en Redis overal aan.**
    `RTG_MEDIA_S3_*` (AWS S3, Cloudflare R2, MinIO, Backblaze). Salon-foto's en
    snaps staan dan als losse, versleutelde objecten in gedeelde objectopslag i.p.v.
    base64 in de database of op de lokale schijf van één instance; een lokale
-   warme cache houdt veelgevraagde foto's snel. De `/media`-route mag achter een
-   CDN (de responses zijn `immutable`). Zonder S3 op meerdere instances ziet
+   warme cache houdt veelgevraagde foto's snel. Alleen `/media/:naam` mag achter
+   een gedeelde cache, en die levert uitsluitend beeld van een verklaarde openbare
+   plek (`public, max-age=3600`, niet meer `immutable`). Privébeeld komt via
+   `/media/t/<token>` met `private, no-store`: laat een CDN dat pad NOOIT cachen
+   en nooit met het volledige pad loggen (zie hierboven, en
+   `server/media/toegang.js`). De S3-bucket zelf blijft privé. Zonder S3 op meerdere instances ziet
    alleen de instance die de foto ontving hem — de config-check waarschuwt hiervoor.
 4. **Zet er meer instances achter een load balancer, en laat een gebruiker aan
    één instance kleven.** De app is stateless tussen requests (de sessie staat in

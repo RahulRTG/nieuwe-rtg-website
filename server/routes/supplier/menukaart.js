@@ -33,6 +33,11 @@ app.post('/api/supplier/price', supplierAuth, (req, res) => {
 app.post('/api/supplier/menu', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return; // de kaart en de prijzen zijn voor het management
   if (!Array.isArray(req.body.menu)) return res.status(400).json({ error: 'Menu ontbreekt.' });
+  /* Een foto blijft alleen staan als hij AL op deze kaart stond (of via
+     /api/supplier/menu/foto kwam). De kaart is een openbare plek
+     (server/media/toegang.js): een willekeurige /media-naam die hier binnenkwam,
+     zou daarmee openbaar worden -- ook het privébeeld van een ander. */
+  const eigenFotos = new Set((req.supplier.menu || []).map(m => m && m.foto).filter(Boolean));
   req.supplier.menu = req.body.menu.slice(0, 100).map(m => {
     // ledenprijsgarantie: de publieke prijs is het plafond; als er geen aparte
     // publieke prijs is meegegeven, is de opgegeven prijs meteen de publieke.
@@ -44,7 +49,7 @@ app.post('/api/supplier/menu', supplierAuth, (req, res) => {
     desc: schoon(m.desc, 200),
     // Alleen een verwijzing uit onze eigen mediastore overleeft een
     // menuwijziging. Zo kan een gerecht nooit een externe volgpixel laden.
-    foto: typeof m.foto === 'string' && /^\/media\/[a-zA-Z0-9._-]+$/.test(m.foto) ? m.foto : undefined,
+    foto: typeof m.foto === 'string' && /^\/media\/[a-zA-Z0-9._-]+$/.test(m.foto) && eigenFotos.has(m.foto) ? m.foto : undefined,
     publiekePrijs: publiek,
     price: ledenPrijs(publiek, m.price),
     allergens: Array.isArray(m.allergens) ? m.allergens.slice(0, 12).map(a => String(a).slice(0, 20)) : [],

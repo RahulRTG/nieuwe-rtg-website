@@ -50,7 +50,9 @@ function maakTonen(binnen) {
          wat deed. */
       door: m.door ? (wie.zelfdeZaak(m.door, mij) ? naam(m.door) : wie.voornaam(naam(m.door))) : null,
       tekst: m.weg ? null : m.tekst, soort: m.soort,
-      bijlage: m.weg ? null : (m.bijlage || null),
+      /* een gedeelde Salon-post gaat als id naar buiten, nooit als bevroren kopie
+         (kern/sociaal/dmpost.js) -- ook niet een oude kopie uit de opslag */
+      bijlage: m.weg ? null : (m.bijlage && m.bijlage.soort === 'post' ? { soort: 'post', id: m.bijlage.id } : (m.bijlage || null)),
       antwoordOp: m.antwoordOp || null,
       reacties: Object.entries(m.reacties || {}).map(([teken, wie]) => ({
         teken, aantal: wie.length, vanMij: wie.includes(mij)

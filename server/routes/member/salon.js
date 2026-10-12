@@ -2,6 +2,8 @@
    (liken, reageren, privebericht) en de publieke partner-etalage (volgen,
    profiel, aanbieding claimen, poll stemmen). Alleen de routes; de helpers
    komen via het kern-object binnen. Gemount vanuit routes/member.js. */
+const { toon } = require('../../media/toegang');
+
 module.exports = (kern) => {
   const { app, auth, db, save, broadcastSync, canEngage, engageError, registerContact,
     notify, findSupplier, salonZichtbaar, talen, AUTHOR_TIER, PERSONAS,
@@ -123,10 +125,10 @@ module.exports = (kern) => {
     const eigen = db.data.posts.filter(p => p.partnerCode === s.code && kern.salon.magLezen(req.session, p));
     const claimVan = p => p.deal ? salonClaimcode.vindVanLid(p, key) : null;
     const items = eigen.map(p => ({
-      id: p.id, at: p.at || null, text: p.text, photo: p.photo || null,
+      id: p.id, at: p.at || null, text: p.text, photo: toon(p.photo) || null,
       soort: p.folder ? 'folder' : p.deal ? 'deal' : p.poll ? 'poll' : 'post',
       likes: p.baseLikes + Object.keys(p.likedBy || {}).length,
-      folder: p.folder ? { titel: p.folder.titel, fotos: p.folder.fotos || [], items: p.folder.items || [] } : null,
+      folder: p.folder ? { titel: p.folder.titel, fotos: (p.folder.fotos || []).map(toon), items: p.folder.items || [] } : null,
       deal: p.deal ? { titel: p.deal.titel, geldigTot: p.deal.geldigTot || null,
         mijnClaim: salonClaimcode.publiek(p, claimVan(p)) } : null,
       poll: p.poll ? { vraag: p.poll.vraag, totaal: p.poll.opties.reduce((n, o) => n + o.stemmen.length, 0),

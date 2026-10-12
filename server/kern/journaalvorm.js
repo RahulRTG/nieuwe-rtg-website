@@ -27,6 +27,8 @@ function padVorm(p) {
        ook bij een omleiding nooit alsnog in verzoek-, fout- of journaallogs
        belanden. Deze specifieke vorm moet vóór de generieke id-regels. */
     .replace(/^\/werken\/[^/]+(?=\/|$)/i, '/werken/:code')
+    // de ondertekende medialink (server/media/toegang.js) is ook een bearer
+    .replace(/^\/media\/t\/[^/]+(?=\/|$)/i, '/media/t/:ticket')
     .replace(/\/[0-9a-f]{16,}/gi, '/:sleutel')
     .replace(/\/\d+/g, '/:id')
     .slice(0, 120);

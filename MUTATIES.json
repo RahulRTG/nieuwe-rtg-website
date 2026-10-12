@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T05:02:39.625Z",
-    "commit": "b5610174",
+    "op": "2026-10-12T02:27:38.087Z",
+    "commit": "739a74980",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4032,14 +4032,6 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
-    },
-    "experience-volgorde.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/experience/volgorde.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 4,
-      "geprobeerd": 1
     },
     "extern-afrekenen.test.js": {
       "soort": "server",
@@ -8962,6 +8954,13 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "media-toegang.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "media-voorzijde.test.js": {
       "soort": "puur",
@@ -15315,14 +15314,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
-    },
-    "stuur-knelpunt.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/wegwerpserver.js",
-      "operator": "voorwaarde-omkeren#0",
-      "gezakt": 6,
-      "geprobeerd": 1
     },
     "stuur-mandaat.test.js": {
       "soort": "puur",

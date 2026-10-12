@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4515,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1685,
+    "kernBreedte": 1687,
     "kernGedeeld": 254,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 50,
@@ -185,6 +185,24 @@
       "meter": "bewijsAchterstand 680 -> 681 (gevolg-onbekend 96 -> 97)",
       "reden": "Besluit van de eigenaar (11 en 12 oktober 2026): Rahul is de ingang naar de knelpuntmotor, dus /api/knelpunt kwam op de LEZEN-lijst van het stuur. IDEMPROEF.json heeft die route nooit aan het werk gekregen (kale oproep: 400), dus kern/stuur/gevolg.js noemt zijn effect onbekend. Een lokale volle ronde mat hem 3x 200 zonder enige collectie te raken, maar reproduceerde de rest van het register niet (130 in plaats van 95 onbekend) en is daarom niet overgenomen; de eigenaar koos uitdrukkelijk voor deze vastgelegde schuld boven een register met metingen van twee rondes onder een stempel.",
       "waarheen": "Het lijf met een doel staat in scripts/lib/idemwereld.js; de eerstvolgende referentieronde van npm run idemproef meet hem en brengt gevolg-onbekend terug naar 96. Zie BEWIJSSCHULD.json (groei) en MAATSTAF.md par. 7k."
+    },
+    {
+      "datum": "2026-10-12",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1686,
+      "meter": "kernBreedte 1686 -> 1687",
+      "reden": "AUTHORITY.md B4, vierde tegenlezing PR #587. De oplosser voor een gedeelde Salon-post in een DM (kern/sociaal/dmpost.js) staat als EEN instantie op de gedeelde sociale context (sctx.dmPost, routes/social.js) en wordt door de ledenkant (routes/social/leden.js) en de gezinskant (routes/social/gezinnen/vrienden.js) gebruikt, in plaats van twee kopieen die elk hun eigen poort zouden kunnen krijgen. Een eerdere versie las hem zonder destructureren en hield de meter zo op 1686; dat verstopte de koppeling voor scripts/grenzen.js (die sctx. niet telt) en is teruggedraaid.",
+      "waarheen": "test/media-toegang.test.js (de ontvanger ziet een gedeelde post alleen als HIJ hem mag lezen; de gezinskant lost op met de sessie van het gezinslid)"
+    },
+    {
+      "datum": "2026-10-12",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1685,
+      "meter": "kernBreedte 1685 -> 1686",
+      "reden": "AUTHORITY.md B4, tegenlezing PR #587. Een Salon-post in een DM reist als id en wordt bij het LEZEN opgelost met de sessie van de lezer (kern/sociaal/dmpost.js). Het domein social krijgt daarvoor alleen de leespoort van De Salon als kern.salonMagLezen (opzet/kernlaag4-comm.js) en niet heel kern.salon (upload, plaats, verwijder, S() met volgtLid/verborgen/bewaard, ai): een smalle naam in plaats van een brede verruiming van GRENZEN.json. Een eigen instantie van zichtbaarheid.js in het routebestand zou findSupplier en zijnVrienden naar social trekken.",
+      "waarheen": "GRENZEN.json (social draagt salonMagLezen) en test/media-toegang.test.js (de ontvanger ziet een gedeelde post alleen als HIJ hem mag lezen)"
     },
     {
       "datum": "2026-10-06",

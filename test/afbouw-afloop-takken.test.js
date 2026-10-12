@@ -182,7 +182,7 @@ test('ruimOp doodt alleen wat er van de kring nog leeft, en schrijft dat op', as
   assert.equal(fs.existsSync(AFLOOP_PAD), false, 'zonder afloop wordt er niets geschreven');
   const kind = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
   try {
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise(r => kind.once('spawn', r));   // het kind bestaat: wachten op die toestand, niet op de klok
     zet({ taak: 't', stand: 'ABORTED', wortel: { pid: dodePid(), start: 1 }, kring: [merk(kind.pid), { pid: dodePid(), start: 3 }] });
     const geraakt = A.ruimOp();
     assert.deepEqual(geraakt, [kind.pid]);
@@ -195,7 +195,7 @@ test('ruimOp doodt alleen wat er van de kring nog leeft, en schrijft dat op', as
 test('kringVan vindt een eigen kind, en een proces zonder kinderen heeft een lege kring', async () => {
   const kind = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
   try {
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise(r => kind.once('spawn', r));   // het kind bestaat: wachten op die toestand, niet op de klok
     const kring = A.kringVan(process.pid);
     assert.ok(kring.some(k => k.pid === kind.pid), JSON.stringify(kring));
     assert.equal(A.kringVan(kind.pid).length, 0);

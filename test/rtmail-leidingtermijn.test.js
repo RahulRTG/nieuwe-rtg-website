@@ -162,7 +162,7 @@ test('3. de juridische toets: de eigenaar op naam, met een verse passkey, voor p
   const kaal = await api('/api/office/rtmail/leiding/toets', { getoetst: true, vingerafdruk: o1.vingerafdruk }, eig);
   assert.equal(kaal.status, 403, JSON.stringify(kaal.body)); assert.match(kaal.body.error, /passkey/);
   sleutel = maakAuthenticator(new URL(srv.base).hostname);
-  const opt = await api('/api/webauthn/registreer/opties', {}, eig);
+  const opt = await api('/api/webauthn/registreer/opties', { huidig: 'Imran' }, eig);
   assert.equal((await api('/api/webauthn/registreer', { antwoord: sleutel.registratieAntwoord(opt.body.opties.challenge, new URL(srv.base).origin),
     naam: 'Toestel eigenaar' }, eig)).status, 200, 'de passkey staat');
   // de set verandert (een verdwaald oud bericht komt binnen) en de oude vingerafdruk weigert

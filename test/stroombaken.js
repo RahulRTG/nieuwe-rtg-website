@@ -18,6 +18,9 @@
    onbestaand bezorgproduct door de manager: `sync` met scope `bezorg`, geen
    logregel en geen teamsignaal (dat laatste toetsen ze juist). */
 'use strict';
+/* De stroom gaat open met een eenmalig ticket en nooit met de sessie in het
+   adres (kern/sessiestroom.js): ?token= krijgt 401. */
+const { stroomAdres } = require('./helper');
 
 const BAKEN = /"scope":"bezorg"/g;
 
@@ -27,7 +30,7 @@ function maakLuister(H, bakenTok) {
     body: JSON.stringify({ weg: true, id: 'baken-bestaat-niet' }) });
   return async function luister(tok, doe, { ms = 15000 } = {}) {
     const ac = new AbortController();
-    const r = await fetch(H + '/api/supplier/stream?token=' + tok, { signal: ac.signal });
+    const r = await fetch(await stroomAdres(H, '/api/supplier/stream', tok, { stroom: 'zaak' }), { signal: ac.signal });
     const lezer = r.body.getReader();
     let tekst = '';
     const lees = (async () => {

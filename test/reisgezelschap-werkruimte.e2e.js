@@ -110,11 +110,17 @@ test('vijf deelnemers, vijf werkruimten, een groepsuitkomst', { skip: geenBrowse
     const bram = pagina.Bram;
     await bram.fill('#opgavePlafond', String(PLAFOND.Bram / 100));
     await bram.fill('#opgaveVan', dag(55)); await bram.fill('#opgaveTot', dag(70));
+    /* Niet op "berekend om" alleen: die tekst stond er al van de berekening met
+       vier opgaven, dus onder belasting las de toets voor Brams opgave binnen
+       was. Wachten op het antwoord van de server op zijn opgave zelf. */
+    const opgeslagen = bram.waitForResponse(r => /\/api\/reis\/gezelschap\/opgave\/zet$/.test(new URL(r.url()).pathname) && r.request().method() === 'POST', { timeout: 15000 });
     await bram.click('#besluitOpgaveVorm button[type="submit"]');
+    assert.equal((await opgeslagen).status(), 200, 'Brams opgave is door de server aangenomen');
     await bram.waitForFunction(() => /berekend om/.test(document.querySelector('#besluitStand').textContent), null, { timeout: 15000 });
 
     // iedereen ververst; daarna moet de vingerafdruk overal gelijk zijn
     for (const p of Object.values(pagina)) await p.evaluate(() => window.RTGSamenBesluit.ververs());
+    await pagina.Anna.waitForFunction(() => /5 van 5 deelnemers/.test(document.querySelector('#samenBesluit').innerText), null, { timeout: 15000 });
     const beeld = {};
     for (const [naam, p] of Object.entries(pagina)) {
       beeld[naam] = await p.evaluate(() => {

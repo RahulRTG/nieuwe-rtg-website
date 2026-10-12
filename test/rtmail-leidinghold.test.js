@@ -63,7 +63,7 @@ async function kantoorAccount(naam, email, phone) {
   assert.equal((await api('/api/office/boardroom/toegang/geef', { codenaam: me.codename }, await eigenaar())).status, 200);
   assert.equal((await api('/api/account/koppel', await kantoorKoppelBody(srv.base, r.body.token), r.body.token)).status, 200);
   const s = maakAuthenticator(new URL(srv.base).hostname);
-  const o = await api('/api/webauthn/registreer/opties', {}, r.body.token);
+  const o = await api('/api/webauthn/registreer/opties', { huidig: 'geheim123' }, r.body.token);
   assert.equal((await api('/api/webauthn/registreer', { antwoord: s.registratieAntwoord(o.body.opties.challenge, new URL(srv.base).origin),
     naam: 'Toestel ' + naam }, r.body.token)).status, 200);
   return { lid: r.body.token, id: me.id, sleutel: s, office: async () => (await api('/api/account/start', { rol: 'kantoor' }, r.body.token)).body.token };
@@ -146,7 +146,7 @@ test('2. beoordelen: een verse passkey, en dan houdt alleen de BEOORDEELDE hold 
   const kaal = await api('/api/office/rtmail/leiding/hold', { id: hold2, actie: 'goedkeuren' }, eig);
   assert.equal(kaal.status, 403, 'zonder passkey: ' + JSON.stringify(kaal.body)); assert.match(kaal.body.error, /passkey/);
   sleutel = maakAuthenticator(new URL(srv.base).hostname);
-  const opt = await api('/api/webauthn/registreer/opties', {}, eig);
+  const opt = await api('/api/webauthn/registreer/opties', { huidig: 'Imran' }, eig);
   assert.equal((await api('/api/webauthn/registreer', { antwoord: sleutel.registratieAntwoord(opt.body.opties.challenge, new URL(srv.base).origin),
     naam: 'Toestel eigenaar' }, eig)).status, 200);
   // een ongekeurde aanvrager: niet vast te stellen

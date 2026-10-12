@@ -68,11 +68,21 @@ test('de raadstafel: rtf/samen-uitslagen wel, besloten RTG-werk nooit', async ()
 test('de RTG-stem draagt de stemmer uit de sessie: verzonnen namen geven geen extra stemmen', async () => {
   const b = await json(await api('/api/rtf/partner/besluit-start', { code: raadcode, projectId, voorstel: 'De filterkennis ook naar Delft brengen.' }));
   const bid = b.besluit.id;
+  /* Sinds besluit 3 (11 oktober 2026, #590) stemt de gedeelde code helemaal
+     niet meer; de verzonnen namen gaan dus via een kantoorsessie OP NAAM, en
+     daar is het EEN stem, hoeveel namen er ook meekomen. */
   for (const naam of ['Verzonnen Een', 'Verzonnen Twee', 'Verzonnen Drie'])
-    await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam, voor: false }, office);
+    assert.equal((await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam, voor: false }, office)).status, 403,
+      'de gedeelde kantoorcode bracht een stem uit');
+  const { kantoorAlsPersoon } = require('./helper');
+  const opNaam = await kantoorAlsPersoon(BASE);
+  const standen = [];
+  for (const naam of ['Verzonnen Een', 'Verzonnen Twee', 'Verzonnen Drie'])
+    standen.push((await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam, voor: false }, opNaam)).status);
+  assert.deepEqual(standen, [200, 409, 409], 'een tweede verzonnen naam bracht een tweede RTG-stem uit');
   await api('/api/rtf/partner/stem', { code: raadcode, besluitId: bid, voor: true });
   const dicht = await json(await api('/api/rtf/partner/besluit-sluit', { code: raadcode, besluitId: bid }));
-  assert.equal(dicht.besluit.uitslag, 'RTG 0-1, partners 1-0', 'een gedeelde kantoorcode is een stem, hoeveel namen er ook meekomen');
+  assert.equal(dicht.besluit.uitslag, 'RTG 0-1, partners 1-0', 'een mens op naam is een stem, hoeveel namen er ook meekomen');
   assert.ok(!JSON.stringify(dicht.besluit.stemmen).includes('Verzonnen'), 'een naam uit het verzoek komt niet in het stemregister');
 });
 

@@ -104,7 +104,7 @@ test('1. (a) op naam zonder passkey is een naam; met een passkey aan de deur een
   assert.equal(zonderSleutel.body.token, undefined);
 
   // passkey op zijn EIGEN account, en dan de ceremonie aan de deur
-  const sleutel = await pk.zet(mens.lid);
+  const sleutel = await pk.zet(mens.lid, 'Geheim123!');   // een passkey toevoegen vraagt het wachtwoord (AUTHZ P1-2)
   const vraag = await api('/api/account/start', { rol: 'kantoor', passkey: true }, mens.lid);
   assert.equal(vraag.status, 401, JSON.stringify(vraag.body).slice(0, 160));
   assert.equal(vraag.body.bevestigingNodig, true);

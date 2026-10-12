@@ -68,6 +68,21 @@ module.exports = (kern) => {
     stuur(res, req.body && req.body.lijst ? favLijst(req.session) : favZet(req.session, req.body || {}));
   });
 
+  /* WAT DE REIZIGER ZELF ZEGT (kern/mobiliteit/ontvangst.js). De chauffeur
+     meldt aankomst; dit is de bevestiging van de reiziger ernaast, of zijn
+     melding dat er iets niet klopt. De rit beweegt er niet van. */
+  // dezelfde gegevenspoort als /api/mob/vraag: wat hier staat, ziet de vervoerder
+  app.post('/api/mob/ontvangst', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    if (gegevensStop(req, res, 'reservering')) return;
+    stuur(res, kern.ontvangstBevestig(req.session, req.body || {}));
+  });
+  app.post('/api/mob/ontvangst/probleem', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    if (gegevensStop(req, res, 'reservering')) return;
+    stuur(res, kern.ontvangstProbleem(req.session, req.body || {}));
+  });
+
   /* Het volgspoor van je eigen rit. Bewust een eigen route en niet een veld in
      /mijn: de app vraagt dit elke paar seconden op tijdens een rit, en dan wil
      je niet elke keer de hele geschiedenis en de favorieten meesturen. */

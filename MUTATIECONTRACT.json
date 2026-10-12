@@ -57671,6 +57671,48 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "mob.ontvangst.bevestig",
+   "route": "POST /api/mob/ontvangst",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "mob.ontvangst.probleem",
+   "route": "POST /api/mob/ontvangst/probleem",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "mob.pendel",
    "route": "POST /api/mob/pendel",
    "semantiek": {

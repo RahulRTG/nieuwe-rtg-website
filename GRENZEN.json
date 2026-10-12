@@ -1426,7 +1426,9 @@
       "stuur",
       "zakelijkBesluit",
       "zakelijkOverzicht",
-      "zakelijkWacht"
+      "zakelijkWacht",
+      "ontvangstBevestig",
+      "ontvangstProbleem"
     ],
     "move": [
       "move"

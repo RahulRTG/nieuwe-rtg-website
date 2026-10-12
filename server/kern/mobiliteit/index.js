@@ -73,6 +73,7 @@ function maakMobiliteit(state) {
   Object.assign(ctx, require('./assets')(ctx));
   Object.assign(ctx, require('./opdracht')(ctx));
   Object.assign(ctx, require('./voortgang')(ctx));
+  Object.assign(ctx, require('./ontvangst')(ctx));   // wat de reiziger zelf bevestigt of meldt
   Object.assign(ctx, require('./matching')(ctx));
   Object.assign(ctx, require('./dispatch')(ctx));
   Object.assign(ctx, require('./dispatch-acties')(ctx));   // leunt op poolVan uit ./dispatch

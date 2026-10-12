@@ -3,7 +3,7 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "c6fb7cd63",
+  "commit": "7995ce5a5",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -5460,7 +5460,7 @@
  "gemeten": {
   "bestanden": 4474,
   "nietGelezen": 0,
-  "aanroepen": 181084,
+  "aanroepen": 181089,
   "kanten": 31535,
   "kantenLokaal": 20238,
   "kantenIngevoerd": 2843,
@@ -5471,15 +5471,15 @@
   "kantenUitFabriek": 306,
   "kantenViaKernZonderSymbool": 2950,
   "kernherkomstGelezen": 1347,
-  "onopgelosteAanroepen": 135104,
-  "onopgelosteNamen": 13898,
+  "onopgelosteAanroepen": 135109,
+  "onopgelosteNamen": 13899,
   "onopgelostNaarSoort": {
-   "ingebouwd": 36274,
+   "ingebouwd": 36275,
    "externeModule": 1061,
    "kader": 12430,
-   "contextobject": 20794,
+   "contextobject": 20796,
    "uitgepaktObject": 1679,
-   "lokaleWaarde": 24187,
+   "lokaleWaarde": 24189,
    "methodeOpWaarde": 38212,
    "overig": 467
   },
@@ -32861,7 +32861,7 @@
   },
   {
    "naam": "Object.assign",
-   "aantal": 2122
+   "aantal": 2123
   },
   {
    "naam": "Array.isArray",
@@ -33002,7 +33002,7 @@
     },
     {
      "naam": "Object.assign",
-     "aantal": 2122
+     "aantal": 2123
     },
     {
      "naam": "Array.isArray",
@@ -182690,7 +182690,7 @@
    "naarBestand": "server/lib/klok.js",
    "naar": "datum",
    "hoe": "lid",
-   "lijn": 54
+   "lijn": 56
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182698,7 +182698,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "ruim",
    "hoe": "lokaal",
-   "lijn": 76
+   "lijn": 78
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182706,7 +182706,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "sleutel",
    "hoe": "lokaal",
-   "lijn": 84
+   "lijn": 86
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182714,7 +182714,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "sleutel",
    "hoe": "lokaal",
-   "lijn": 93
+   "lijn": 95
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182722,7 +182722,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "ontzegel",
    "hoe": "lokaal",
-   "lijn": 107
+   "lijn": 109
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182730,7 +182730,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "aadVan",
    "hoe": "lokaal",
-   "lijn": 107
+   "lijn": 109
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182738,7 +182738,7 @@
    "naarBestand": "server/kern/sessies.js",
    "naar": "tokenHash",
    "hoe": "ingevoerd",
-   "lijn": 108
+   "lijn": 110
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182746,7 +182746,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "eigen",
    "hoe": "lokaal",
-   "lijn": 120
+   "lijn": 122
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182754,7 +182754,7 @@
    "naarBestand": "server/kern/sessies.js",
    "naar": "tokenHash",
    "hoe": "ingevoerd",
-   "lijn": 140
+   "lijn": 142
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182762,7 +182762,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "zegel",
    "hoe": "lokaal",
-   "lijn": 141
+   "lijn": 144
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182770,7 +182770,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "aadVan",
    "hoe": "lokaal",
-   "lijn": 141
+   "lijn": 144
   },
   {
    "vanBestand": "server/kern/sessiestroom.js",
@@ -182778,7 +182778,7 @@
    "naarBestand": "server/kern/sessiestroom.js",
    "naar": "geopend",
    "hoe": "lokaal",
-   "lijn": 158
+   "lijn": 161
   },
   {
    "vanBestand": "server/kern/settlement.js",
@@ -193106,7 +193106,7 @@
    "naarBestand": "server/kern/stroomticket.js",
    "naar": "zelfdeGroep",
    "hoe": "lokaal",
-   "lijn": 70
+   "lijn": 73
   },
   {
    "vanBestand": "server/kern/stroomticket.js",
@@ -193114,7 +193114,7 @@
    "naarBestand": "server/kern/stroomticket.js",
    "naar": "levend",
    "hoe": "lokaal",
-   "lijn": 103
+   "lijn": 111
   },
   {
    "vanBestand": "server/kern/studio/aiwerk.js",

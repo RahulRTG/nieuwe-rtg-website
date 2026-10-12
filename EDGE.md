@@ -980,3 +980,139 @@ consent- of bewijskaarten zijn **richting**, niet door deze wijziging gebouwd
 of bewezen. Ze mogen alleen bestaande geautoriseerde capabilitycontracten en
 daadwerkelijke signalen presenteren. Onbekend of conflicterend bewijs mag nooit
 door presentatie veranderen in bevestigd, betaald, toegestaan of ingetrokken.
+
+## 14. Rahul, de Edge en de werkruimte — één doorlopende handeling (richting, 12 oktober 2026)
+
+Dit is een **richtingsparagraaf** in de vorm van de rest van dit document: per
+onderdeel staat er of het **staat**, **een stap weg** is, **een besluit vraagt**
+of **jaren weg** is. De richting is van de eigenaar en in een zin:
+
+> **Rahul begrijpt. De Edge verbindt. De werkruimte past zich aan. RTG voert
+> gecontroleerd uit. Het actiebewijs toont wat werkelijk is gebeurd.**
+
+Dat is geen nieuwe laag boven de bestaande. Rahul, de Edge en de werkruimte zijn
+drie verschijningsvormen van wat er al is, en de opdracht is ze op elkaar aan te
+sluiten. De twee zinnen bovenaan dit document blijven daarbij de grens: de Edge
+bezit de werkelijkheid niet, en hij verleent geen bevoegdheid.
+
+### 14.1 Wat er gemeten is voordat er iets gebouwd wordt
+
+De eerste lezing van het voorstel ging ervan uit dat Rahul alleen de getypte
+vraag krijgt. Dat klopt niet, en het verschil bepaalt de bouw:
+
+- **`/api/fluister` krijgt al schermcontext mee**, en
+  `server/kern/stuur/menscontext.js` saneert die tot een contract van drie delen
+  (presentatie, verwijzingen, interactie). Vier clientvormen komen daar samen.
+- **Wat de app meestuurt komt niet uit het blikveld.** De vraagbalk in de schil
+  (`app-main-29b.js`) en de Rahul-tab gebruiken allebei
+  `RTGRahulTabHelpers.context()`, en die schraapt de DOM: de documenttitel, de
+  tekst van het actieve menu-item en de tekst van een gekozen optie. Dat is een
+  derde contextbouwer naast het blikveld en `RTGAdaptief`, en precies de vorm
+  waar `shared/interface/workspace-context.js` al eens van is afgehaald.
+- **Een verwijzing wordt nooit een object.** `menscontext-ref.js` heeft de
+  ketting (opzoeken, bereik, bevoegdheid, canoniek), maar `kern/stuur/lus.js`
+  roept `saneer()` aan zonder opzoeker. Elke verwijzing staat daardoor op
+  `ONOPGELOST`, en het model leest hooguit "1 verwijzing naar reisaanvraag".
+- **Het blikveld wordt op de server nergens gelezen.** Geen bestand in `server/`
+  noemt het.
+- **Context bereikt alleen de stuurlus.** `/api/chat/send` (`kern/ai.js`) krijgt
+  er geen, en als `kern/fluister` een vraag zelf oppakt, komt de stuurlus niet
+  aan de beurt.
+
+### 14.2 De zes correcties op het voorstel, overgenomen
+
+1. **Geen "Screen" als naam.** "Second Screen" is bezet, en "scherm" is in
+   `SCHERMEIGENAAR.json` een bestand dat een capability bezit. De derde vorm
+   heet **de werkruimte** (`WERKRUIMTE.md`).
+2. **De beschrijving per functie wordt afgeleid en niet bijgehouden.** Wat een
+   functie kan, welke bevoegdheid en welk risico erbij horen en welk bewijs ze
+   oplevert, staat grotendeels al in `EXECUTION_MAP.json`, een projectie uit
+   `beleid.js`, de gezagsnoemer, `VERTROUWEN.json` en `IDEMPROEF.json`. Een
+   functie die zichzelf beschrijft is de 22e capabilitylijst.
+3. **Geen "Predictive".** Ronde 0 sloot voorspellend laden uit, en INT-04
+   verbiedt een zekerheidscijfer zonder meting. Het werkwoord is **vóór zijn**
+   (`REIZEN.md`): opmerken en klaarzetten, binnen de voorkeuren en toestemming
+   van het lid. Dat deel woont in `INTELLIGENTIE.md` par. 7.
+4. **De interfacebouwstenen bestaan al.** Rahul kiest uit de bloktaal van
+   `CREATE.md` par. 3: inhoud, view en handeling. Een blok dat iets **toont**
+   mag hij vrij voorstellen. Een blok dat iets **doet** loopt altijd langs de
+   actiestaat (par. 3) en `RTGGewicht.voer`.
+5. **Observe → Understand → Compose → Confirm → Execute → Prove → Continue is een
+   ontwerpprincipe en geen stand in code.** Als statusveld zou het de zesde
+   gezagsladder zijn. Elke stap heeft al een eigenaar: Observe is het blikveld,
+   Compose `kern/stuur/plan.js`, Confirm de gewichtsgrammatica, Prove het
+   actiebewijs (`kern/stuur/bon.js`), Continue de voortzetting uit besluit 8.
+6. **Alles wat een tweede persoon bereikt, wordt klaargezet en nooit verstuurd.**
+   Medereizigers uitnodigen, een aanvraag bij het kantoor indienen, een bedrag
+   reserveren: een mens bevestigt (`LIFE.md` par. 4, `GELD.md`), ook in de
+   verste fase. Een budget wordt nergens afgeschreven.
+
+De drie standen van wat er van de Edge te zien is (compact, interactief, de
+werkruimte) zijn **geen nieuwe standmachine**. Par. 1 telt er al drie die niets
+delen; de drie vormen uit het voorstel zijn namen voor standen die er al zijn.
+
+### 14.3 De onderdelen, per stand
+
+| onderdeel | stand | waarom |
+|---|---|---|
+| Context Bridge: blikveld als verwijzing naar Rahul, opnieuw getoetst op de server | **een stap weg** | het contract (`menscontext.js`), de objectvorm (`objectverwijzing.js`) en de ketting (`menscontext-ref.js`) staan; de clientbron en een opzoeker per domein ontbreken |
+| Point & Ask: wijs een object aan en vraag ernaar | **een stap weg** | volgt uit de Context Bridge zodra een scherm zijn object publiceert via `RTGAdaptief.context()` |
+| Plan op de Edge met echte actiestaten | **een stap weg** | `plan.js` en `actiestaat.js` staan; ze zijn nog niet op elkaar aangesloten |
+| Werkruimte die een view voorstelt uit de bloktaal | **een besluit** | welke blokken Rahul mag openen en waar de renderer woont, zonder tweede componentenlijst |
+| Deterministisch eerst | **een besluit, na een meting** | `kern/ai/router.js` meet in de schaduw; omdraaien pas als het getal er is |
+| Intentie herkennen op het toestel | **een stap weg** | `tekst.vector` loopt in de cel (`TOESTEL.md` par. 12); de koppeling aan de resolver niet |
+| Prompt caching met hoedanigheid in de sleutel | **een stap weg** | AI-CONTEXT-02 heeft vandaag geen handhaver, omdat er geen cache is |
+| Continuïteit over werelden via een correlatie | **jaren weg** voor hervatten, **staat** voor de keten | `kern/envelop.js` draagt correlatie en oorzaak; hervatten over werelden niet |
+| Vóór zijn | **een besluit** | `INTELLIGENTIE.md` par. 7 |
+| Externe diensten (agenda) via OAuth of MCP | **een besluit** | inkomende inhoud telt als besmet (`besmetting.js`); er is geen tokenkluis per lid |
+| Externe agents die RTG bedienen | **jaren weg** | `VERTROUWEN.json` heeft vrijwel geen bewezen routes |
+| Zelfstandige uitvoering van meerstapsdoelen | **jaren weg** | `INTELLIGENTIE.md` par. 6: 7 van de 118 schrijfparen dragen herstel, gevolg en herhaling |
+
+### 14.4 De eerste verticale doorsnede: een reisaanvraag in TravelOS
+
+Een doorsnede bewijst iets wat losse onderdelen niet bewijzen. De gekozen keten
+is de reisaanvraag, omdat die een lichte en een zware handeling heeft en de
+nazorg al rond is (`kern/reisbureau-nazorg.js`, `-wijziging.js`).
+
+> Het lid zegt: *"Ik wil met zes vrienden vier dagen naar Rome, maximaal € 800
+> per persoon."* Rahul begrijpt de vraag en de reiscontext op het scherm. De Edge
+> begeleidt en de werkruimte toont het voorstel. Het lid past rechtstreeks de
+> datum of het aantal reizigers aan, en Rahul verwerkt dat zonder de context
+> kwijt te raken. Daarna laat het lid de aanvraag voorbereiden; de Edge toont
+> wat er naar het kantoor gaat, het lid bevestigt via de gewichtsgrammatica, de
+> server toetst de bevoegdheid, en er komt een actiebewijs.
+
+Geen automatische uitnodigingen, geen automatische boeking en geen afschrijving.
+
+De doorsnede komt in drie stappen, elk afzonderlijk te beoordelen:
+
+1. **Context Bridge.** Rahul ontvangt precies de toegestane scherm- en
+   objectverwijzingen. Een vervalste, verouderde of onbevoegde verwijzing wordt
+   geweigerd of veilig genegeerd. Zonder blikveld werkt alles zoals vandaag. Een
+   nep-modelserver toont wat het model werkelijk ontvangt, en de extra latentie
+   is gemeten.
+2. **Plan op de Edge.** Rahul levert een gevalideerd plan; de Edge toont elke
+   stap met zijn echte actiestaat. Een plan is geen toestemming.
+3. **De werkruimte.** Het lid past het plan op het scherm aan, en Rahul en de
+   Edge verwerken die wijziging.
+
+**De Context Bridge is vanaf stap 1 generiek.** De reisaanvraag is de eerste
+gebruiker van het contract en niet de reden ervan: een domein meldt een opzoeker
+aan voor zijn eigen soort, met een eigenaarsvraag, een bevoegdheidsvraag en een
+**positieve lijst** velden die naar het model mogen (AI-CONTEXT-01). LivingOS,
+WorkOS en FoundationOS sluiten later via hetzelfde contract aan, zonder dat er
+een generieke objecttabel ontstaat: elk domein beantwoordt alleen vragen over
+zijn eigen soort.
+
+### 14.5 De grenzen voor deze doorsnede
+
+- **Clientcontext verleent nooit bevoegdheid.** Van een verwijzing blijven soort
+  en id over; de server zoekt het object zelf op, met de sessie van de vraag.
+- **Een ververste waarde komt van de server en nooit van het scherm.** Daarom is
+  een verouderde schermtekst een kwestie van relevantie en niet van veiligheid:
+  het object wordt bij elke vraag opnieuw gelezen.
+- **Vrije tekst die het lid zelf typte, gaat niet als feit naar het model.** De
+  positieve veldlijst van een domein noemt geen notitievelden.
+- **Een plan is geen toestemming, en een AI-antwoord is geen bewijs van
+  uitvoering.** Het actiebewijs is leidend.
+- **Er wordt geen snelheidsdoel genoemd zonder nulmeting.**

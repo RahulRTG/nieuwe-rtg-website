@@ -480,3 +480,44 @@ onderliggende uitslagen daartussen op vijf paren verschillen (par. 3.5a). Dat is
 geen toeval maar de drievoudige EN: een paar dat op één van de drie assen zakt,
 valt eruit, en de paren die alle drie halen zitten er ruim in. De eerste versie van deze paragraaf beweerde 4 zonder te
 rekenen; dat is precies de fout waar LAT.md regel 6 over gaat, en het getal is 7.*
+
+---
+
+## 7. Vóór zijn, niet voorspellen — Rahul en de Edge als één handeling (12 oktober 2026)
+
+`EDGE.md` par. 14 legt de richting vast waarin Rahul, de Edge en de werkruimte
+één doorlopende handeling worden. De interactieve helft woont daar. Deze
+paragraaf houdt de helft vast die bij dit document hoort: wat er gebeurt als RTG
+**uit zichzelf** iets opmerkt.
+
+**Het werkwoord is vóór zijn, en niet voorspellen.** Het voorstel noemde het
+*Predictive*. Dat woord belooft een zekerheid die INT-04 verbiedt zolang de
+trefzekerheid niet over drie afgesloten perioden is gemeten, en ronde 0 van de
+Edge sloot voorspellend laden met opzet uit. Vóór zijn (`REIZEN.md`) betekent:
+opmerken, klaarzetten, en de mens laten bevestigen. Een voorbeeld dat binnen die
+grens blijft: een reisaanvraag staat er, maar er is nog geen vervoer naar het
+vliegveld. Dan zegt de Edge dat, met de reden, en zet hij een vervolgstap klaar.
+
+Vier regels bovenop par. 3 en par. 5:
+
+1. **Het lid kiest welke signalen hij wil krijgen.** Dat is een keuze per soort
+   signaal in het consent-register, en geen schuifje voor alles tegelijk.
+   Standaard staat een nieuw soort signaal uit.
+2. **Een signaal draagt zijn reden in woorden en geen cijfer.** "Er is nog geen
+   vervoer naar het vliegveld" en nooit "82% kans dat u vervoer nodig heeft"
+   (INT-04).
+3. **Opmerken leest alleen wat het lid zelf al mocht zien.** De aanleiding komt
+   uit een gebeurtenis in de envelop (`kern/envelop.js`) of uit het eigen
+   dossier, en nooit uit wat een ander lid deed. Een signaal over een tweede
+   persoon (een medereiziger die nog niet heeft gereageerd) noemt een aantal en
+   geen naam, tenzij die persoon zijn naam zelf heeft gedeeld.
+4. **Klaarzetten is het plafond.** Wat een tweede persoon bereikt, geld beweegt
+   of een verplichting aangaat, wordt nooit vanuit een signaal uitgevoerd. Het
+   mandaat (`kern/stuur/mandaat.js`) kan dat plafond alleen verlagen.
+
+**De stand.** Vóór zijn is **een besluit van de eigenaar**: welke soorten
+signalen er als eerste komen en hoe het lid ze aanzet. Er wordt niets aan
+gebouwd voordat de eerste doorsnede uit `EDGE.md` par. 14.4 rond is. Die
+doorsnede maakt Rahul gevoelig voor de context die het lid op zijn scherm
+heeft, en die laag is de voorwaarde: wie niet weet waar het lid mee bezig is,
+merkt ook niets nuttigs op.

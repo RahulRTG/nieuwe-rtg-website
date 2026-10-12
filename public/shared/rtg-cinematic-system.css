@@ -639,9 +639,15 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
   body[data-rtg-cinematic="true"] .rtg-edge-mark .wd-world-label{display:none!important}
   body[data-rtg-cinematic="true"] .rtg-edge-crumbs,
   body[data-rtg-cinematic="true"] .rtg-edge-worldbar{display:none!important}
-  body[data-rtg-cinematic="true"] .rtg-edge-state,
+  /* De statusknop blijft: op mobiel is hij de enige weg naar beveiliging en
+     systeemstatus (de Adaptive Edge heeft er geen eigen actie voor). Hij krijgt de
+     maat van de taalknop ernaast, zonder zijn tekst. */
   body[data-rtg-cinematic="true"] .wp-edit-images,
   body[data-rtg-cinematic="true"] .rtg-edge-search{display:none!important}
+  body[data-rtg-cinematic="true"] .rtg-edge-state{
+    min-width:44px!important;min-height:44px!important;padding:0 10px!important;margin-inline-start:auto!important;
+  }
+  body[data-rtg-cinematic="true"] .rtg-edge-state~.rtg-edge-language{margin-inline-start:8px!important}
   body[data-rtg-cinematic="true"] .rtg-edge-language{
     display:grid!important;place-items:center!important;margin-inline-start:auto!important;
     width:44px!important;height:44px!important;border:1px solid rgba(33,29,22,.18)!important;

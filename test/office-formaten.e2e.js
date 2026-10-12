@@ -59,14 +59,17 @@ test('Office: exporteren als XLSX met de classificatie erin, en een XLSX inlezen
     await page.waitForSelector('#formaatScrim.open [data-formaat="xlsx"]', { timeout: 5000 });
     const [download] = await Promise.all([page.waitForEvent('download'), page.click('[data-formaat="xlsx"]')]);
     assert.equal(download.suggestedFilename(), 'Kwartaal (Vertrouwelijk).xlsx');
-    const delen = lees(fs.readFileSync(await download.path()));
+    /* saveAs en niet path(): in CI draait de browser op afstand, en dan bestaat path() niet. */
+    const kopie = path.join(os.tmpdir(), 'rtg-office-' + Date.now() + '.xlsx');
+    await download.saveAs(kopie);
+    const delen = lees(fs.readFileSync(kopie));
     assert.match(delen['docProps/custom.xml'].toString(), /RTG-Classificatie"><vt:lpwstr>Vertrouwelijk</);
     await page.waitForFunction(() => /JAAR/.test(document.querySelector('#formaatTrouw').textContent), null, { timeout: 5000 });
     assert.match(await page.textContent('#formaatTrouw'), /A3/, 'de trouwlijst staat in het venster, met de cel');
     await page.click('#formaatDicht');
 
     // en weer in: via de knop in de drive, als NIEUW blad
-    const xlsx = await download.path();
+    const xlsx = kopie;
     await page.goto(base + '/apps/office.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-rtd-diep="lijst"]', { timeout: 15000 });
     await page.click('[data-rtd-diep="lijst"]');
@@ -74,6 +77,7 @@ test('Office: exporteren als XLSX met de classificatie erin, en een XLSX inlezen
     const [kiezer] = await Promise.all([page.waitForEvent('filechooser'), page.click('#inleesXlsx')]);
     await kiezer.setFiles({ name: 'Terug.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       buffer: fs.readFileSync(xlsx) });
+    fs.rmSync(xlsx, { force: true });
     await page.waitForSelector('#formaatScrim.open', { timeout: 10000 });
     assert.match(await page.textContent('#formaatKop'), /Ingelezen: Terug/);
     await page.waitForFunction(() => {

@@ -142,12 +142,16 @@ test('het inlogportaal en de aanmelding werken met de bestaande beveiligde route
           return {bars:document.querySelectorAll('.rtg-adaptive-bar').length,
             visibleBars:[...document.querySelectorAll('.rtg-adaptive-bar')].filter(el=>
               el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').length,
+            chrome:[...document.querySelectorAll('.rtg-edge-chrome > :not(.rtg-adaptive-edge)')].filter(el=>
+              el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').length,
             overflow:document.documentElement.scrollWidth>innerWidth,
             passHeight:pass.height,clocks:g.querySelectorAll('[data-rtg-klok]').length,
             color:getComputedStyle(g).backgroundColor};
         });
         assert.equal(geometry.bars,1);assert.equal(geometry.overflow,false);
-        assert.equal(geometry.visibleBars,0);assert.ok(geometry.passHeight>=48);assert.equal(geometry.clocks,0);
+        /* Sinds de www-stijl (#534, #549) mag de compacte Edge voor taal en hulp op de toegang
+           staan; de productnavigatie van de Edge blijft verborgen tot na de toegang. */
+        assert.ok(geometry.visibleBars<=1);assert.equal(geometry.chrome,0);assert.ok(geometry.passHeight>=48);assert.equal(geometry.clocks,0);
         assert.equal(geometry.color,'rgb(244, 242, 236)');
         await p.locator('#agNieuw').click();
         assert.match(await p.locator('#agZin').innerText(),/Vul uw volledige naam in\./);

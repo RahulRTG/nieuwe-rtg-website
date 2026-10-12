@@ -127,6 +127,10 @@ test('productie, via het scherm: uitnodiging koppelen met de eigen passkey en da
   await p.locator('#bNaam').fill('Eigen toestel');
   const regA = antwoord('/api/webauthn/registreer');
   await p.locator('#bMaak').click();
+  /* Een passkey toevoegen vraagt eerst het huidige wachtwoord (P1-2,
+     shared/herbevestig.js); de medewerker heeft er nog geen. */
+  await p.locator('#rtgHbWw').fill('Geheim123!');
+  await p.locator('dialog[open] button[type=submit]').click();
   assert.equal((await regA).status(), 200, 'de passkey van de medewerker is geregistreerd');
   assert.equal((await cdp.send('WebAuthn.getCredentials', { authenticatorId })).credentials.length, 1);
 

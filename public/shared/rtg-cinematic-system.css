@@ -579,6 +579,9 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
     --edge-top:88px!important;--rtg-header-desktop:88px!important;
     padding-top:88px!important;
   }
+  /* Ingebed draagt de ouder de bovenrand; het kind houdt er geen ruimte voor vrij. */
+  body.rtg-edge-embed[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop],
+  body.rtg-edge-embed[data-rtg-cinematic="true"][data-rtg-layout="standard"]{padding-top:0!important}
   /* Compact en focus geven de ruimte van de bovenrand terug (rtg-warm-details.css);
      de 88px hierboven woog zwaarder en hield hem vast. */
   body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]){
@@ -629,6 +632,7 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
     --edge-top:82px!important;--rtg-header-mobile:82px!important;
     padding-top:82px!important;
   }
+  body.rtg-edge-embed[data-rtg-cinematic="true"][data-rtg-layout="standard"]{padding-top:0!important}
   html:has(body[data-rtg-cinematic="true"][data-rtg-layout="standard"]){scroll-padding-top:98px}
   body[data-rtg-cinematic="true"] .rtg-edge-top{
     min-height:82px!important;height:82px!important;padding:0 20px!important;gap:14px!important;

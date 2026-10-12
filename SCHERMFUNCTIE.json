@@ -2,8 +2,8 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-10-11",
-    "commit": "fa62153d"
+    "op": "2026-10-12",
+    "commit": "9073b0e0"
   },
   "bronnen": {
     "schermroutes": {
@@ -533,7 +533,7 @@
         "/api/push"
       ],
       "zonderServer": false,
-      "inkomend": 201,
+      "inkomend": 202,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/agenda.html",
@@ -5395,7 +5395,7 @@
         "/api/wbw"
       ],
       "zonderServer": false,
-      "inkomend": 39,
+      "inkomend": 40,
       "inIndex": 7,
       "inkomendVan": [
         "public/apps/app-main/app-main-12.js",

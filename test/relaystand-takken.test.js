@@ -196,6 +196,7 @@ test('antwoord: zonder actor 401 met STUN, en de kill switch geeft niemand iets'
   const anon = ijs.antwoord(null, { hostname: 'rtg.local', env: LOKAAL });
   assert.equal(anon.status, 401);
   assert.deepEqual(anon.body.iceServers, [{ urls: ['stun:rtg.local:3478'] }]);
+  assert.equal(anon.body.iceServers.length, 1, 'zonder kill switch staat er wel een STUN-adres');
   assert.equal(anon.body.relay.vereist, false);
   const uit = ijs.antwoord('sessie:a', { hostname: 'rtg.local', env: { ...LOKAAL, RTG_RTC_UIT: '1' } });
   assert.equal(uit.status, 503);

@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "01528f072",
-  "seconden": 10.5,
+  "commit": "b1fa27fff",
+  "seconden": 10.3,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -4468,6 +4468,7 @@
     "server/lib/idem-poort.js",
     "server/lib/idem-sleutelbepaling.js",
     "server/lib/idem.js",
+    "server/lib/idemring.js",
     "server/lib/idemsleutels-aankomst.js",
     "server/lib/idemsleutels-afleidrest.js",
     "server/lib/idemsleutels-basis.js",
@@ -7231,18 +7232,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5752,
-  "gelezen": 5437,
+  "bestandenGezien": 5753,
+  "gelezen": 5438,
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27489,
-  "bestandenMetUitvoer": 4536,
+  "symbolen": 27490,
+  "bestandenMetUitvoer": 4537,
   "uitvoerMetNamen": 2063,
   "uitvoerOnvolledig": 7,
-  "uitvoerZonderNamen": 2466,
+  "uitvoerZonderNamen": 2467,
   "zonderUitvoer": 901,
-  "requireKanten": 7753
+  "requireKanten": 7754
  },
  "nietGelezen": [
   {
@@ -140924,79 +140925,79 @@
     {
      "naam": "maak",
      "soort": "functie",
-     "lijn": 53,
+     "lijn": 55,
      "geexporteerd": true
     },
     {
      "naam": "levend",
      "soort": "pijl",
-     "lijn": 58,
+     "lijn": 60,
      "geexporteerd": false
     },
     {
      "naam": "eigen",
      "soort": "pijl",
-     "lijn": 59,
+     "lijn": 61,
      "geexporteerd": false
     },
     {
      "naam": "transactie",
      "soort": "functie",
-     "lijn": 65,
+     "lijn": 67,
      "geexporteerd": false
     },
     {
      "naam": "ruim",
      "soort": "pijl",
-     "lijn": 66,
+     "lijn": 68,
      "geexporteerd": false
     },
     {
      "naam": "sleutel",
      "soort": "functie",
-     "lijn": 79,
+     "lijn": 81,
      "geexporteerd": false
     },
     {
      "naam": "zegel",
      "soort": "functie",
-     "lijn": 83,
+     "lijn": 85,
      "geexporteerd": false
     },
     {
      "naam": "ontzegel",
      "soort": "functie",
-     "lijn": 92,
+     "lijn": 94,
      "geexporteerd": false
     },
     {
      "naam": "aadVan",
      "soort": "pijl",
-     "lijn": 104,
+     "lijn": 106,
      "geexporteerd": false
     },
     {
      "naam": "geopend",
      "soort": "pijl",
-     "lijn": 105,
+     "lijn": 107,
      "geexporteerd": false
     },
     {
      "naam": "soort",
      "soort": "functie",
-     "lijn": 114,
+     "lijn": 116,
      "geexporteerd": false
     },
     {
      "naam": "geef",
      "soort": "functie",
-     "lijn": 131,
+     "lijn": 133,
      "geexporteerd": false
     },
     {
      "naam": "open",
      "soort": "functie",
-     "lijn": 151,
+     "lijn": 153,
      "geexporteerd": false
     }
    ],
@@ -150469,13 +150470,13 @@
     {
      "naam": "geef",
      "soort": "functie",
-     "lijn": 64,
+     "lijn": 67,
      "geexporteerd": false
     },
     {
      "naam": "claim",
      "soort": "functie",
-     "lijn": 88,
+     "lijn": 96,
      "geexporteerd": false
     }
    ],
@@ -171203,7 +171204,7 @@
     {
      "naam": "doeWerkEnLegVast",
      "soort": "pijl",
-     "lijn": 151,
+     "lijn": 156,
      "geexporteerd": false
     }
    ],
@@ -171223,6 +171224,32 @@
     "server/kern/directpay/index.js",
     "server/kern/kassa/herhaling.js",
     "server/kern/pay/idemlaag.js"
+   ]
+  },
+  {
+   "bestand": "server/lib/idemring.js",
+   "symbolen": [
+    {
+     "naam": "weiger",
+     "soort": "functie",
+     "lijn": 20,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "bak",
+     "soort": "pijl",
+     "lijn": 25,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": {
+    "vorm": "functie",
+    "namen": null
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/server.js"
    ]
   },
   {
@@ -202381,69 +202408,63 @@
    "bestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "symbolen": [
     {
-     "naam": "hele",
-     "soort": "pijl",
-     "lijn": 10,
-     "geexporteerd": "onbekend"
-    },
-    {
      "naam": "maakPrefix",
      "soort": "pijl",
-     "lijn": 12,
+     "lijn": 8,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "findSupplierByName",
      "soort": "pijl",
-     "lijn": 17,
+     "lijn": 13,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "spec",
      "soort": "pijl",
-     "lijn": 23,
+     "lijn": 19,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "nieuweCode",
      "soort": "functie",
-     "lijn": 26,
+     "lijn": 22,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "maakInvite",
      "soort": "functie",
-     "lijn": 38,
+     "lijn": 34,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "lijstInvites",
      "soort": "pijl",
-     "lijn": 77,
+     "lijn": 73,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "trekInviteIn",
      "soort": "pijl",
-     "lijn": 80,
+     "lijn": 76,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "plekVan",
      "soort": "pijl",
-     "lijn": 90,
+     "lijn": 86,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "trekInVoorStaff",
      "soort": "pijl",
-     "lijn": 97,
+     "lijn": 93,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "roteerInvite",
      "soort": "pijl",
-     "lijn": 109,
+     "lijn": 105,
      "geexporteerd": "onbekend"
     }
    ],
@@ -207958,19 +207979,19 @@
     {
      "naam": "stationsForOrder",
      "soort": "functie",
-     "lijn": 2016,
+     "lijn": 1982,
      "geexporteerd": false
     },
     {
      "naam": "sectiesForOrder",
      "soort": "functie",
-     "lijn": 2026,
+     "lijn": 1992,
      "geexporteerd": false
     },
     {
      "naam": "migreerLokaleToegang",
      "soort": "functie",
-     "lijn": 2320,
+     "lijn": 2286,
      "geexporteerd": false
     }
    ],
@@ -208082,6 +208103,7 @@
     "server/lib/auditwacht.js",
     "server/lib/cache.js",
     "server/lib/handelingsspoor.js",
+    "server/lib/idemring.js",
     "server/lib/klok.js",
     "server/lib/leeftijd.js",
     "server/lib/lidsleutel.js",

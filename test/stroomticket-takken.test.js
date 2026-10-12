@@ -171,3 +171,13 @@ test('bijVol oudste zonder groep: de oudste van de hele sleutel wijkt', async ()
   assert.equal((await w.st.geef('g', () => ({ weiger: NEE }))).weiger, NEE);
   assert.equal(w.db.g.length, 2);
 });
+
+test('geef met verzegel: het onderwerp krijgt wat bij DIT ticket hoort, en null geeft geen ticket', async () => {
+  const { st, db, bearer } = wereld();
+  const m = await st.geef('k', () => ({ onderwerp: { a: 1 }, verzegel: h => ({ bij: h }) }));
+  assert.equal(m.ok, true);
+  assert.equal(db.k[0].onderwerp.bij, bearer.hash(m.code), 'de hash van het uitgegeven ticket zelf');
+  assert.equal(db.k[0].onderwerp.a, 1);
+  assert.deepEqual(await st.geef('k', () => ({ onderwerp: {}, verzegel: () => null })), { weiger: 'verzegel' });
+  assert.equal(db.k.length, 1, 'een geweigerde zegel laat geen ticket achter');
+});

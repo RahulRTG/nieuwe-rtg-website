@@ -59,7 +59,10 @@ module.exports = ({ bearer, nu, transactie, lees, schrijf, prefix, issuer, doel,
   };
 
   /* Uitgifte. `voor(staat)` draait BINNEN de transactie en geeft
-     { onderwerp } of { weiger } (het domein toetst daar zijn sleutel opnieuw).
+     { onderwerp } of { weiger } (het domein toetst daar zijn sleutel opnieuw),
+     en mag `verzegel(codeHash)` meegeven: wat die teruggeeft komt bij het
+     onderwerp, zodat iets in het onderwerp aan DIT ticket vast kan zitten (de
+     zegel van ./sessiestroom.js); null is een weigering en er komt geen ticket.
      Uitslag: { ok, code, toegang } | { weiger } | { vol: true }. */
   function geef(sleutel, voor) {
     return transactie(staat => {
@@ -73,6 +76,11 @@ module.exports = ({ bearer, nu, transactie, lees, schrijf, prefix, issuer, doel,
         return { vol: true };
       }
       const m = bearer.maak({ prefix, issuer, doel, scope: SCOPE, onderwerp: v.onderwerp, geldigMs, maxGebruik });
+      if (typeof v.verzegel === 'function') {
+        const extra = v.verzegel(m.toegang.code_hash);
+        if (!extra) { schrijf(staat, sleutel, rij); return { weiger: 'verzegel' }; }
+        Object.assign(m.toegang.onderwerp, extra);
+      }
       rij.push(m.toegang);
       if (bijVol === 'oudste') while (rij.filter(hoort).length > maxOpen) rij.splice(rij.findIndex(hoort), 1);
       schrijf(staat, sleutel, rij);

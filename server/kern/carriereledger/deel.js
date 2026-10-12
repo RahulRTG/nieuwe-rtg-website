@@ -100,9 +100,12 @@ module.exports = function maakDeel({ eigen, crypto, schoon, save, bijeen, inBund
       getoondOp: nu(), voorbehoud: VOORBEHOUD };
   }
 
+  /* `scope` staat erbij: wat de code de ontvanger laat doen. Het lid hoort te
+     zien wat hij heeft uitgegeven -- en een stille wijziging eraan is dan ook
+     zichtbaar (de ledenkruis las hem eerst niet, tegenlezing X7). */
   function mijnDelen(key) {
     return kijk().filter(r => r.issuer === key).map(r => ({ id: r.id, feit: r.onderwerp.feit,
-      voor: r.voor || null, tot: r.expires_at, gebruik: r.gebruik,
+      voor: r.voor || null, tot: r.expires_at, gebruik: r.gebruik, scope: r.scope || [],
       gestopt: !!r.ingetrokken_at }));
   }
 

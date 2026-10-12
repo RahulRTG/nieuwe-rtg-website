@@ -189,7 +189,7 @@ async function zaai(w) {
   const m = await w.post(MAAK, Object.assign(formulier(TITEL), { doel: DOEL, eta: ETA,
     ontvangers: [{ soort: 'bedrijf', id: CODE, naam: NAAM, niveau: 'voortgang' }] }), lid.token);
   const id = m.data && m.data.moment && m.data.moment.id;
-  return { lid, merktekens: [TITEL, DOEL, ETA, CODE, NAAM], objecten: [id], lezers: [{ pad: MIJN }],
+  return { lid, merktekens: [TITEL, DOEL, ETA, CODE, NAAM], objecten: [id], tijden: [m.data && m.data.moment && m.data.moment.van], lezers: [{ pad: MIJN }],
     handelingen: [{ pad: STATUS, object: true, lijf: { id, status: 'onderweg', eta: '19:45' } }, { pad: PAUZE, object: true, lijf: { id, aan: true } },
       { pad: STOP, object: true, lijf: { id } }, { pad: MAAK, lijf: formulier('Trein kruisproef ' + merk()) }] };
 }

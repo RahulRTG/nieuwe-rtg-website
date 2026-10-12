@@ -162,7 +162,7 @@ async function zaai(w) {
   const feitId = f.data && f.data.regel && f.data.regel.id;
   await w.post(DEEL, { id: feitId, dagen: 7, voor: VOOR }, lid.token);
   const deel = (((await w.post(DELEN, {}, lid.token)).data || {}).delen || [])[0];
-  return { lid, merktekens: [WAT, TOELICHTING, VOOR], objecten: [feitId, deel && deel.id], lezers: [{ pad: MIJN }, { pad: DELEN }],
+  return { lid, merktekens: [WAT, TOELICHTING, VOOR], objecten: [feitId, deel && deel.id], tijden: [f.data && f.data.regel && f.data.regel.at], lezers: [{ pad: MIJN }, { pad: DELEN }],
     handelingen: [{ pad: DEEL, object: true, lijf: { id: feitId, dagen: 3, voor: 'een tweede' } },
       { pad: STOP, object: true, lijf: { id: deel && deel.id } },
       { pad: ZET, lijf: { kapitaal: 'netwerk', wat: 'Club kruisproef ' + merk(), op: '2022-11-12' } },

@@ -145,7 +145,7 @@ async function zaai(w) {
   const mapId = map.data && map.data.id;
   const stuk = await w.post('/api/bestanden/upload', { naam: STUK, map: mapId, dataUrl: tekst('label A') }, lid.token);
   const stukId = stuk.data && stuk.data.id;
-  return { lid, merktekens: [TITEL, PLEK, NOTITIE, DOSSIER, STUK], objecten: [m && m.id, mapId, stukId], lezers: [{ pad: LIJST }, { pad: '/api/bestanden/mijn' }],
+  return { lid, merktekens: [TITEL, PLEK, NOTITIE, DOSSIER, STUK], objecten: [m && m.id, mapId, stukId], tijden: [m && m.gemaaktAt], lezers: [{ pad: LIJST }, { pad: '/api/bestanden/mijn' }],
     handelingen: [{ pad: ANNULEER, object: true, lijf: { id: m && m.id } }, { pad: MELD, lijf: { titel: 'CV kruisproef ' + merk(), plek: 'zolder', urgentie: 'normaal' } },
       { pad: '/api/bestanden/map', object: true, lijf: { id: mapId, naam: DOSSIER + ' (bijgewerkt)' } },
       { pad: '/api/bestanden/upload', object: true, lijf: { id: stukId, dataUrl: tekst('label A, tweede versie') } }] };

@@ -168,16 +168,46 @@ test('9. M3b: de codenaam lekt buiten de verklaarde gedeelde routes', () => {
   }
 });
 
-test('10. de live-replay ligt vast: elke mutatie van beide tegenlezingen staat in de ledenkruisproef', () => {
+test('10. de live-replay ligt vast: elke mutatie van de drie tegenlezingen staat in de ledenkruisproef', () => {
   /* De zware helft (server + browser per mutatie) staat niet in CI maar in
-     scripts/ledenkruisproef.js; deze toets houdt vast dat geen van de zes er
+     scripts/ledenkruisproef.js; deze toets houdt vast dat geen van de twaalf er
      stil uit verdwijnt en dat elk nog op de bron past. */
-  const { MUTATIES } = require('../scripts/ledenkruisproef');
+  const { MUTATIES, stukken } = require('../scripts/ledenkruisproef');
   const fs = require('fs');
   const path = require('path');
-  assert.deepEqual(Object.keys(MUTATIES).sort(), ['M1', 'M3b', 'N1', 'N2', 'N3', 'N4']);
+  assert.deepEqual(Object.keys(MUTATIES).sort(), ['M1', 'M3b', 'N1', 'N2', 'N3', 'N4', 'X2', 'X3', 'X4', 'X5', 'X7', 'X9']);
   for (const [naam, m] of Object.entries(MUTATIES)) {
-    const bron = fs.readFileSync(path.join(__dirname, '..', m.bestand), 'utf8');
-    for (const [oud] of m.vervang) assert.ok(bron.includes(oud), naam + ': het te muteren stuk staat niet meer in ' + m.bestand);
+    for (const [bestand, oud] of stukken(m)) {
+      const bron = fs.readFileSync(path.join(__dirname, '..', bestand), 'utf8');
+      assert.ok(bron.includes(oud), naam + ': het te muteren stuk staat niet meer in ' + bestand);
+    }
+  }
+});
+
+test('11. derde tegenlezing: koppen, omleidingen, hoofdletters, tijdstippen en de vorm van de vervangwaarde', () => {
+  /* X4: A's gegevens in een antwoordkop, ook als de body leeg is. */
+  assert.equal(K.andersOordeel({ status: 200, tekst: '{}', koppen: 'rtg-buren: kraan kruisproef abc' }, M, { wie: 'ander lid' }), 'lek');
+  assert.equal(K.andersOordeel({ status: 403, tekst: '', koppen: 'x-wie: Kraan kruisproef abc' }, M, { wie: 'zaak' }), 'lek',
+    'de koppen worden ook bij een weigering gelezen');
+  /* X5: een omleiding wordt niet gevolgd maar zelf beoordeeld. */
+  assert.equal(K.andersOordeel({ status: 302, tekst: '', koppen: 'location: /apps/wonen.html?t=Kraan%20kruisproef%20abc' },
+    ['Kraan%20kruisproef%20abc'], { wie: 'ander lid' }), 'lek');
+  assert.equal(K.andersOordeel({ status: 302, tekst: '', koppen: 'location: /elders' }, M, { wie: 'ander lid' }), 'geweigerd',
+    'een omleiding zonder iets van A is geen toegang');
+  /* X3: hoofdletterongevoelig. */
+  assert.equal(K.andersOordeel({ status: 200, tekst: '{"elders":["KRAAN KRUISPROEF ABC"]}' }, M, { wie: 'ander lid' }), 'lek');
+  /* X2: een tijdstip van A is een merkteken, en wordt niet vervangen. */
+  const tijd = [{ waarde: '2026-10-12T01:02:03.456Z', soort: 'tijd' }];
+  assert.equal(K.andersOordeel({ status: 200, tekst: '{"laatste":"2026-10-12T01:02:03.456Z"}' }, tijd, { wie: 'ander lid' }), 'lek');
+  assert.equal(K.vervangTekst('2026-10-12T01:02:03.456Z', tijd, 'ander lid'), '2026-10-12T01:02:03.456Z');
+  /* X9: de vervangwaarde houdt de VORM, anders weigert de invoercontrole al. */
+  const mail = K.vervangTekst('{"adres":"kring1@voorbeeld.nl"}', ['kring1@voorbeeld.nl'], 'ander lid');
+  assert.match(JSON.parse(mail).adres, /^[^@\s]+@[^@\s]+\.[a-z]+$/i);
+  assert.notEqual(JSON.parse(mail).adres, 'kring1@voorbeeld.nl');
+  const getal = K.vervangTekst('{"lat":52.13579}', ['52.13579'], 'ander lid');
+  assert.ok(Number.isFinite(JSON.parse(getal).lat) && JSON.parse(getal).lat !== 52.13579);
+  /* De grens staat uitgeschreven, met de klassen die niet bewezen zijn. */
+  for (const klasse of ['body van een weigering', 'afgeleide waarden', 'lezers van het scenario niet', 'derde aanroep']) {
+    assert.ok(K.GRENS.includes(klasse), 'de grens noemt "' + klasse + '" niet');
   }
 });

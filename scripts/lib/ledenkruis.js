@@ -44,9 +44,12 @@
 
 const ANDEREN = ['anoniem', 'ander lid', 'zaak', 'kantoor', 'gezin'];
 const GRENS = 'het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, ' +
-  'een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; ' +
-  'van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op ' +
-  'merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR';
+  'een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het ' +
+  'lekoordeel, met A\'s waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun ' +
+  'antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, ' +
+  'hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet ' +
+  'tonen ("onaangetast" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met ' +
+  'vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR';
 
 const ok = (s) => s >= 200 && s < 300;
 
@@ -64,17 +67,26 @@ const ok = (s) => s >= 200 && s < 300;
    IDOR-proef; komt het terug in het antwoord op een verzoek dat het zelf
    meestuurde, dan is dat geen lek (de handeling zelf wordt dan als `inbreuk`
    beoordeeld als hij slaagde). */
-function andersOordeel({ status, tekst }, merktekens, { handeling = false, object = false, wie = '', verzoek = '', pad = '' } = {}) {
+function andersOordeel({ status, tekst, koppen = '' }, merktekens, { handeling = false, object = false, wie = '', verzoek = '', pad = '' } = {}) {
   if (status === 429 || status === 0) return 'onbeslist';
-  if (!ok(status)) return 'geweigerd';
+  /* Wat er gelezen wordt: de KOPPEN altijd (een header of een Location die A's
+     gegevens draagt is een lek, ook bij een weigering of een omleiding), en de
+     body bij 2xx en 3xx. De body van een weigering (4xx) wordt NIET gelezen --
+     een uitgeschreven grens, zie GRENS. Hoofdletterongevoelig: een route die A's
+     tekst in hoofdletters teruggeeft, lekt evengoed (de tegenlezer, X3). */
+  const lezen = (String(koppen || '') + '\n' + (status < 400 ? String(tekst || '') : '')).toLowerCase();
   const raak = merktekens.find((m) => {
     const waarde = typeof m === 'string' ? m : m && m.waarde;
     if (!waarde) return false;
     if (m.zichtbaarOp && m.zichtbaarOp.includes(pad)) return false;
-    if (m.soort === 'object' && String(verzoek).includes(waarde)) return false;
-    return String(tekst || '').includes(waarde);
+    const w = String(waarde).toLowerCase();
+    if (m.soort === 'object' && String(verzoek).toLowerCase().includes(w)) return false;
+    return lezen.includes(w);
   });
   if (raak) return 'lek';
+  /* Een omleiding wordt niet gevolgd maar zelf beoordeeld: zonder merkteken is
+     hij voor een ander geen toegang (de tegenlezer, X5). */
+  if (!ok(status)) return 'geweigerd';
   if (handeling && wie === 'anoniem') return 'open';
   /* Een handeling op een OBJECT van A (een id van zijn feit, zijn melding, zijn
      sessie) hoort voor ieder ander te mislukken. Een 2xx daarop is geen "eigen"
@@ -97,6 +109,20 @@ const CODENAAM_ZICHTBAAR = {
   '/api/residentie/emote': 'een emote in een gedeelde zaal: zichtbaar voor wie er is, op codenaam'
 };
 
+/* Een vervangwaarde met dezelfde VORM als het origineel: een e-mailadres blijft
+   een e-mailadres en een getal een getal. Anders weigert de route het verzoek
+   van de ander al bij de invoercontrole, en toetst de kruis niets. */
+function vervanger(waarde, i, wie) {
+  const merk = 'ander' + i + String(wie).replace(/\W/g, '');
+  if (/^[^@\s]+@[^@\s]+\.[a-z]+$/i.test(waarde)) return merk + '@voorbeeld.nl';
+  if (/^-?\d+(\.\d+)?$/.test(waarde)) {
+    const n = Number(waarde) + 1 + i / 1000;
+    const dec = (waarde.split('.')[1] || '').length;
+    return n.toFixed(dec);
+  }
+  return merk + '-x';
+}
+
 /* Een tekst-merkteken van A vervangen door een eigen waarde van de ander, in het
    adres en het lijf van een verzoek dat een ander naspeelt. Objecten blijven. */
 function vervangTekst(s, merktekens, wie) {
@@ -105,7 +131,7 @@ function vervangTekst(s, merktekens, wie) {
     const waarde = typeof m === 'string' ? m : m && m.waarde;
     const soort = typeof m === 'string' ? 'tekst' : (m.soort || 'tekst');
     if (!waarde || soort !== 'tekst') return;
-    uit = uit.split(waarde).join('ander' + i + '-' + String(wie).replace(/\W/g, '') + '-x');
+    uit = uit.split(waarde).join(vervanger(waarde, i, wie));
   });
   return uit;
 }
@@ -179,13 +205,17 @@ async function roep(base, v, token) {
   try {
     const ac = new AbortController();
     const t = setTimeout(() => ac.abort(), 15000);
-    const r = await fetch(base + v.url, { method: v.methode, headers: koppen,
+    const r = await fetch(base + v.url, { method: v.methode, headers: koppen, redirect: 'manual',
       body: v.methode === 'GET' || v.methode === 'HEAD' ? undefined : (v.lijf || '{}'), signal: ac.signal });
     clearTimeout(t);
+    /* De antwoordkoppen (met een Location) apart van de body: een lek in een
+       header telt (de tegenlezer, X4), maar de koppen horen niet in de stand die
+       A terugleest -- een Date of een request-id verschilt elke keer. */
+    const kop = [...r.headers].map(([k, w]) => k + ': ' + w).join('\n');
     /* Een stroom eindigt nooit: de status telt, de inhoud is leeg (zie hierboven). */
-    if (/event-stream/i.test(r.headers.get('content-type') || '')) { ac.abort(); return { status: r.status, tekst: '' }; }
+    if (/event-stream/i.test(r.headers.get('content-type') || '')) { ac.abort(); return { status: r.status, tekst: '', koppen: kop }; }
     const tekst = await Promise.race([r.text().catch(() => ''), new Promise((k) => setTimeout(() => { ac.abort(); k(''); }, 5000))]);
-    return { status: r.status, tekst };
+    return { status: r.status, tekst, koppen: kop };
   } catch (e) { return { status: 0, tekst: '' }; }
 }
 
@@ -227,7 +257,10 @@ async function meetRij({ rij, base, browser, maakContext, opslagVoor, anderen, e
   if (zaai) {
     const z = await zaai(w);
     A = z.lid.token;
+    /* `tijden`: A's letterlijke tijdstippen (gemaaktAt en dergelijke) waar de zaai
+       ze kent. Geen tekst (niet vervangen) en geen object (geen uitzondering). */
     merktekens = (z.merktekens || []).concat((z.objecten || []).filter(Boolean).map((o) => ({ waarde: String(o), soort: 'object' })),
+      (z.tijden || []).filter(Boolean).map((t) => ({ waarde: String(t), soort: 'tijd' })),
       await identiteit(w, A));
     lezers = z.lezers || []; handelingen = z.handelingen || [];
   } else {
@@ -290,14 +323,23 @@ async function meetRij({ rij, base, browser, maakContext, opslagVoor, anderen, e
   let stand = voor;
   for (const wie of ANDEREN) {
     for (const p of paren) {
-      if (p.h) {
-        const koppen = p.h.kop ? await p.h.kop() : {};
-        const lijf = vervangTekst(JSON.stringify(p.h.lijf || {}), merktekens, wie);
-        p.anderen[wie] = andersOordeel(await roep(base, { methode: 'POST', url: p.h.pad, lijf, koppen }, anderen[wie]),
-          merktekens, { handeling: true, object: !!p.h.object, wie, pad: p.pad, verzoek: p.h.pad + ' ' + lijf });
-      } else {
-        const v = Object.assign({}, p.v, { url: vervangTekst(p.v.url, merktekens, wie), lijf: vervangTekst(p.v.lijf, merktekens, wie) });
-        p.anderen[wie] = andersOordeel(await roep(base, v, anderen[wie]), merktekens, { wie, pad: p.pad, verzoek: v.url + ' ' + v.lijf });
+      /* TWEE KEER NASPELEN. Eerst met een eigen waarde in plaats van A's tekst:
+         daarop wordt het LEK beoordeeld (de ander stuurt A's woord nooit mee).
+         Dan met A's ORIGINELE waarde, en daarop alleen het EFFECT (inbreuk,
+         open, en via de lezers: aangetast) -- want een route die op WAARDE
+         opzoekt (kring/mail {weg} die het adres uit elke kring haalt) doet met
+         een andere waarde niets, en dan is "onaangetast" een leeg experiment
+         (de tegenlezer, X9, een regressie van de vervanging). */
+      const orig = p.h ? { methode: 'POST', url: p.h.pad, lijf: JSON.stringify(p.h.lijf || {}) } : p.v;
+      const vervangen = Object.assign({}, orig, { url: vervangTekst(orig.url, merktekens, wie), lijf: vervangTekst(orig.lijf, merktekens, wie) });
+      const kop = async () => (p.h && p.h.kop ? await p.h.kop() : (p.v && p.v.koppen) || {});
+      const opties = { handeling: !!p.h, object: !!(p.h && p.h.object), wie, pad: p.pad };
+      p.anderen[wie] = andersOordeel(await roep(base, Object.assign({}, vervangen, { koppen: await kop() }), anderen[wie]),
+        merktekens, Object.assign({ verzoek: vervangen.url + ' ' + vervangen.lijf }, opties));
+      if (vervangen.url !== orig.url || vervangen.lijf !== orig.lijf) {
+        const r = await roep(base, Object.assign({}, orig, { koppen: await kop() }), anderen[wie]);
+        const effect = andersOordeel({ status: r.status, tekst: '', koppen: '' }, [], opties);
+        if ((effect === 'inbreuk' || effect === 'open') && p.anderen[wie] !== 'lek') p.anderen[wie] = effect;
       }
     }
     const na = await leesStand();

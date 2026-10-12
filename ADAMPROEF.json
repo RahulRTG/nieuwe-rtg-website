@@ -1,14 +1,14 @@
 {
   "stempel": {
-    "op": "2026-09-23T17:49:21.872Z",
-    "commit": "4e9a48e56",
+    "op": "2026-10-11T22:28:49.870Z",
+    "commit": "4ac469c0",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 6,
     "instrument": "scripts/adamproef.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "uitleg": "Een keten rond een jongere van 17 zonder RTG-account: van een doel naar een mogelijkheid die hij zelf ziet. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Vierde keten naast tafel-, rit- en toelatingsproef; met opzet geen gedeelde module -- zie MAATSTAF.md par. 7 en scripts/ketenvorm.js.",
-  "grens": "Dit is de WERK-weg naar een mogelijkheid (vacature -> sollicitatie -> aangenomen -> team -> contract -> dienstverband -> loonrun). Vanaf schakel 14 loopt een volwassen lid door waar Adam niet verder kan; goedkeuren en uitbetalen van de loonrun zijn met opzet niet gelopen. De andere terreinen van kern/knelpunt/openingen-kaart.js (opleiding, opvang, vervoer, wonen) hebben eigen naden en zijn hier niet gelopen. Er komt geen browser aan te pas en geen AI: wat Rahul van dit alles zou MAKEN is niet gemeten, alleen wat de routes eronder doen. Adam is een gezinsprofiel en geen echt kind; deze proef zegt niets over of de mens dit ook zo beleeft.",
+  "grens": "Dit is de WERK-weg naar een mogelijkheid (vacature -> sollicitatie -> aangenomen -> team -> contract -> dienstverband -> loonrun). Vanaf schakel 14 loopt een volwassen lid door waar Adam niet verder kan; goedkeuren en uitbetalen van de loonrun zijn met opzet niet gelopen. De andere terreinen van kern/knelpunt/openingen-kaart.js (opleiding, opvang, vervoer, wonen) hebben eigen naden en zijn hier niet gelopen; van `ondernemen` meet schakel 19 alleen de weg en zijn twee deuren, niet het oprichten zelf. Er komt geen browser aan te pas en geen AI: wat Rahul van dit alles zou MAKEN is niet gemeten, alleen wat de routes eronder doen. Adam is een gezinsprofiel en geen echt kind; deze proef zegt niets over of de mens dit ook zo beleeft.",
   "schakels": [
     {
       "nr": 1,
@@ -18,7 +18,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Zwarte Bever 298E",
+      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Oranje Havik A5FC",
       "fout": null,
       "ms": 0
     },
@@ -32,7 +32,7 @@
       "status": 200,
       "ziet": "de motor antwoordt het gezin: 1 wegen beoordeeld",
       "fout": null,
-      "ms": 13
+      "ms": 16
     },
     {
       "nr": 3,
@@ -44,7 +44,7 @@
       "status": 200,
       "ziet": "3 wegen, volgorde ongewijzigd: true, geblokkeerde weg blijft staan met \"heb ik een startkwalificatie\"",
       "fout": null,
-      "ms": 10
+      "ms": 19
     },
     {
       "nr": 4,
@@ -54,9 +54,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "de motor gaf 3 wegen bij een kaal doel (via-werk, via-opleiding, via-opvang), samengesteld door het huis: true, geen ervan heet \"open\": true",
+      "ziet": "de motor gaf 4 wegen bij een kaal doel (via-werk, via-opleiding, via-opvang, via-ondernemen), samengesteld door het huis: true, geen ervan heet \"open\": true",
       "fout": null,
-      "ms": 10
+      "ms": 6
     },
     {
       "nr": 5,
@@ -66,9 +66,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "vacature 065ca7e2, minimumleeftijd 16",
+      "ziet": "vacature 2935f98e, minimumleeftijd 16",
       "fout": null,
-      "ms": 9
+      "ms": 6
     },
     {
       "nr": 6,
@@ -80,7 +80,7 @@
       "status": 200,
       "ziet": "1 vacatures zichtbaar, magSolliciteren: true",
       "fout": null,
-      "ms": 5
+      "ms": 3
     },
     {
       "nr": 7,
@@ -92,7 +92,7 @@
       "status": 200,
       "ziet": "aangenomen door de route: true",
       "fout": null,
-      "ms": 10
+      "ms": 7
     },
     {
       "nr": 8,
@@ -102,9 +102,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "sollicitatie 5e57f6d7, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
+      "ziet": "sollicitatie aa71caa8, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
       "fout": null,
-      "ms": 18
+      "ms": 10
     },
     {
       "nr": 9,
@@ -116,7 +116,7 @@
       "status": 200,
       "ziet": "Adam ziet status \"uitgenodigd\" bij Cafe Brisa",
       "fout": null,
-      "ms": 26
+      "ms": 14
     },
     {
       "nr": 10,
@@ -128,7 +128,7 @@
       "status": 200,
       "ziet": "stand bij Adam: \"aangenomen\", bericht op zijn bord: \"Aangenomen bij Cafe Brisa -- Je plek staat klaar: open je so...\" van RTG, ongelezen: true",
       "fout": null,
-      "ms": 24
+      "ms": 11
     },
     {
       "nr": 11,
@@ -140,7 +140,7 @@
       "status": 200,
       "ziet": "blijft staan: Keukenhulp bij Cafe Brisa (aangenomen)",
       "fout": null,
-      "ms": 3
+      "ms": 2
     },
     {
       "nr": 12,
@@ -150,9 +150,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "opleiding + opvang + werk; 26 vondsten in 1 vorm; werk 1/1, opleiding 24/20000, opvang 1/1",
+      "ziet": "opleiding + opvang + werk; 26 vondsten in 1 vorm; werk 1/1, opleiding 24/20000, opvang 1/1, ondernemen 0/null",
       "fout": null,
-      "ms": 9
+      "ms": 11
     },
     {
       "nr": 13,
@@ -164,7 +164,7 @@
       "status": 200,
       "ziet": "in het team (id 185), dienstverband bij Brisa SL als Keukenhulp",
       "fout": null,
-      "ms": 239
+      "ms": 219
     },
     {
       "nr": 14,
@@ -176,7 +176,7 @@
       "status": 200,
       "ziet": "direct in dienst, personeelsnummer 187",
       "fout": null,
-      "ms": 123
+      "ms": 119
     },
     {
       "nr": 15,
@@ -186,9 +186,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "1 contractversie(s), vanaf 2026-09-01",
+      "ziet": "1 contractversie(s), vanaf 2026-10-01",
       "fout": null,
-      "ms": 14
+      "ms": 8
     },
     {
       "nr": 16,
@@ -200,7 +200,7 @@
       "status": 200,
       "ziet": "1 werkplek(ken): Meridiaan BV als Receptie",
       "fout": null,
-      "ms": 5
+      "ms": 3
     },
     {
       "nr": 17,
@@ -210,9 +210,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "loonstrook voor personeelsnummer 187 in run run_d84e02a676, basissalaris 1508.00 euro; dienstverband getoetst en gevonden; de ondernemer zonder dienstverband is gemeld",
+      "ziet": "loonstrook voor personeelsnummer 187 in run run_33e9c3bca8, basissalaris 1508.00 euro; dienstverband getoetst en gevonden; de ondernemer zonder dienstverband is gemeld",
       "fout": null,
-      "ms": 25
+      "ms": 33
     },
     {
       "nr": 18,
@@ -224,7 +224,19 @@
       "status": 200,
       "ziet": "voorstel met 1 mens(en), de ondernemer erin; een vreemde kreeg 404; 1 dienstverband(en) voor de keuze, 2 erna, ook na een herhaalde keuze (door de idem-poort als herhaling herkend)",
       "fout": null,
-      "ms": 26
+      "ms": 22
+    },
+    {
+      "nr": 19,
+      "van": "Adam",
+      "naar": "knelpuntmotor",
+      "wat": "noemt alleen een ondernemersdoel; de ondernemersweg staat ertussen en zegt eerlijk welke deur voor hem dicht is",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "4 wegen (via-werk, via-opleiding, via-opvang, via-ondernemen); voorlichting zonder account: 200; het plan met zijn gezinstoken: 401 (dicht, zoals de vondst zegt)",
+      "fout": null,
+      "ms": 8
     }
   ],
   "storingen": [
@@ -298,8 +310,8 @@
     "nederland": "een volwassen lid bij MERIDIAAN (NL), met een ondernemer die de zaak aan Meridiaan BV koppelt"
   },
   "telling": {
-    "schakels": 18,
-    "gesloten": 18,
+    "schakels": 19,
+    "gesloten": 19,
     "open": 0,
     "openBekend": 0,
     "stuk": 0,

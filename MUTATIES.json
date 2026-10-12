@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T16:05:09.371Z",
-    "commit": "c71bb687e",
+    "op": "2026-10-12T21:33:03.517Z",
+    "commit": "96ccf895d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -18158,6 +18158,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "verzoekbetaal-herhaling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/magnaat/rtg-keten.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "verzoekbetaal-race.test.js": {
       "soort": "puur",

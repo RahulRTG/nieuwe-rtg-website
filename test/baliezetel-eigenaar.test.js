@@ -91,7 +91,7 @@ test('1. een vertrouweling met een boardroomsleutel verleent geen zetels', async
 });
 
 test('2. met een passkey vraagt de eigenaar eerst de vinger', async () => {
-  const opties = await api('/api/webauthn/registreer/opties', {}, baas);
+  const opties = await api('/api/webauthn/registreer/opties', { huidig: 'Imran' }, baas);
   assert.equal(opties.status, 200, JSON.stringify(opties.body).slice(0, 160));
   const reg = await api('/api/webauthn/registreer',
     { antwoord: sleutel.registratieAntwoord(opties.body.opties.challenge, origin), naam: 'Toestel eigenaar' }, baas);

@@ -282,7 +282,7 @@ test('9. de werkplekken worden na de code opnieuw gelezen: van het rooster gehaa
 });
 
 test('10. of het lid nog actief is, wordt in stap twee opnieuw gelezen, VOOR de code', async () => {
-  const zw = await zwaarApi((p, b, t) => api(p, b, t), srv.base, eigenaarToken);
+  const zw = await zwaarApi((p, b, t) => api(p, b, t), srv.base, eigenaarToken, EIGENAAR_WW);
   const sso = await zw('/api/techniek/sso', { org: 'werk2org', naam: 'Werk BV', issuer: 'https://login.werk2-idp.test',
     clientId: 'rtg-werk2', clientSecret: 'werk2-geheim', domeinen: ['werk2-org.test'], actief: true }, eigenaarToken);
   assert.equal(sso.status, 200, 'SSO-koppeling: ' + kort(sso.body));

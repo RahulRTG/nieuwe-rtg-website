@@ -613,6 +613,50 @@ staat hier zodat niemand hem voor gebouwd aanziet.
 
 ---
 
+## 7b1. Samen beslissen: vijf privé-contexten, een gedeelde uitkomst (12 oktober 2026)
+
+Het gezelschap kreeg er een laag bij waarin de deelnemers samen tot een
+reisvoorstel komen zonder elkaars wensen te zien. Vier stappen, elk een eigen
+module, en de kop van elk bestand zegt waarom hij zo is:
+
+| Stap | Module | Wat hij doet |
+|---|---|---|
+| 1 | `kern/reisgezelschap-opgave.js` | ieder geeft privé een plafond, periodes en voorkeuren op; geen route geeft die van een ander terug |
+| 2 | `kern/reisgezelschap-opties.js` (+ `-reken.js`) | per optie "past voor iedereen" / "niet voor iedereen" / "nog niet vast te stellen", en per lezer alleen zijn eigen reden |
+| 3 | `kern/reisgezelschap-werkruimte.js` | een projectie per lezer: `groep` gelijk voor iedereen, `jij` alleen over de lezer, blokken en handelingen bij de rol; Rahul legt uit met regelwerk |
+| 4 | `kern/reisgezelschap-instemming.js` | ieder stemt apart in op een bevroren versie; een wijziging laat de versie en alle instemmingen vervallen; alles of niets |
+
+Op het scherm staat het in het bestaande blad Samen van het reisscherm, zonder
+nieuwe ingang (besluit van de eigenaar, 12 oktober 2026). Een meekijker reist
+niet mee en krijgt dit deel niet.
+
+**Aangenomen is niet geboekt.** Een versie waar iedereen mee instemde is een
+besluit binnen het gezelschap; klaarzetten (stap 5) en uitvoeren zijn aparte
+gebeurtenissen, en geld verlaat het huis daar niet vanzelf.
+
+### Resterend risico: het laagste plafond is te benaderen
+
+Dit staat hier als RISICO en niet als opgelost, en dat is een besluit van de
+eigenaar (12 oktober 2026): er wordt geen absolute privacygarantie
+gecommuniceerd.
+
+Een uitkomst "past voor iedereen" is een orakel over het laagste plafond van
+de groep. Drie remmen beperken dat (`kern/reisgezelschap-opties-reken.js`):
+vergelijken in stappen van EUR 50 (plafond omlaag, prijs omhoog), hoogstens zes
+nieuwe of gewijzigde opties per etmaal per reis, en die teller zichtbaar voor
+iedereen. **Wat ze niet dichten:** wie over meerdere dagen blijft toetsen,
+benadert het laagste plafond van de groep tot op EUR 50. Hij leert niet van wie
+het is. De server van RTG ziet de opgaven op codenaam; er is geen ruis en geen
+versleutelde berekening.
+
+Die grens staat niet alleen hier. Hij reist mee in elk antwoord (`groep.grens`)
+en staat onder de werkruimte op het scherm, en `test/reisgezelschap-opties.test.js`
+toets 4 houdt vast dat hij er staat. Wie hem dichter wil hebben, kiest een
+andere techniek (ruis met een privacybudget, of een berekening die de server
+zelf niet kan lezen) -- en verandert dan eerst deze paragraaf.
+
+---
+
 ## 7c. De weg terug uit een toezegging (10 september 2026)
 
 Fase 1 t/m 5 gaan over hoe een reis ONTSTAAT. Wat eronder ontbrak was de weg

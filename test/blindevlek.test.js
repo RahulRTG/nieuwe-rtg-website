@@ -100,11 +100,10 @@ function zonderInline(html) {
 let _kaart = null;
 function routekaart() {
   if (_kaart) return _kaart;
-  const uit = require('child_process').execFileSync(
-    process.execPath, [path.join(ROOT, 'scripts', 'routekaart.js'), '--json'],
-    { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'],
-      env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } });
-  _kaart = JSON.parse(uit);
+  /* Via de gedeelde routekaart() (scripts/lib/routes.js): een keer opnieuw bij
+     een bezette poort, en de stderr van het kind in de fout. Zelf het script
+     starten liep in de CI op dezelfde poortrace als routedekking (#584). */
+  _kaart = require('../scripts/lib/routes').routekaart();
   return _kaart;
 }
 

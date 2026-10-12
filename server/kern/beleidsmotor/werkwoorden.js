@@ -33,7 +33,10 @@ const WERKWOORDEN = Object.freeze({
       '/api/office/economie/', '/api/office/rtfwallet/', '/api/office/terugval/', '/api/rtfos/gift/', '/api/office/werkos/',
       '/api/office/bankpositie',
       /* de cadeaubon: een bon die ook bij zaken te besteden is, is e-geld (C14) */
-      '/api/office/cadeaubon'] },
+      '/api/office/cadeaubon',
+      /* de vrijgavepoort zet geldcapabilities aan en uit (server/kern/vrijgave/),
+         en Stripe Connect rekent partners af -- allebei geld, op de hoogste trede */
+      '/api/office/vrijgave', '/api/office/connect/'] },
   export: { trede: 'uitvoeren', uitleg: 'gegevens in bulk naar buiten', voorvoegsels: ['/api/office/aidata/'] },
   partners: { trede: 'uitvoeren', uitleg: 'partners, instellingen, foundationregistraties en hun papieren toelaten, en de personeelscodes van het partnerkanaal (B14)',
     voorvoegsels: ['/api/office/partner/', '/api/office/partnerkanaal/', '/api/office/papieren', '/api/office/instelling/', '/api/office/foundation/'] },
@@ -51,7 +54,9 @@ const WERKWOORDEN = Object.freeze({
       /* een besluit over RTG vastleggen of intrekken, met zijn gronden (C13) */
       '/api/office/beslisgeheugen',
       /* RTG zelf als werkgever inrichten: een werkgever en een eerste leidinggevende (VRIJHEID.md) */
-      '/api/office/rtghuis'] }
+      '/api/office/rtghuis',
+      /* de bewaarplicht van sollicitatiepost: de juridische toets en de holds (584A) */
+      '/api/office/rtmail/leiding/'] }
 });
 
 function werkwoordVan(pad) {

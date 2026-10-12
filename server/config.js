@@ -19,6 +19,13 @@ function valideer(env) {
   const hardeFouten = [];
   const prod = isProductie(env);
 
+  /* EERST: is NODE_ENV een stand die dit huis kent, en luistert de toetsstand
+     alleen op de loopback? Alles hieronder hangt aan de vraag of NODE_ENV
+     'production' is; een waarde als `prod` of `Production` beantwoordt die vraag
+     stil met nee en zette zo een echte server in de ontwikkelstand. Zie
+     ./config/omgeving.js. */
+  require('./config/omgeving').keurOmgeving(env, hardeFouten);
+
   // PORT moet een geldig poortnummer zijn als hij is gezet.
   if (env.PORT && !(Number(env.PORT) > 0 && Number(env.PORT) < 65536))
     fouten.push(`PORT is ongeldig: "${env.PORT}".`);
@@ -38,6 +45,9 @@ function valideer(env) {
      de installatie zichzelf als openbaar OPGEEFT, in plaats van te vertrouwen
      op de variabele die iemand kan vergeten. */
   require('./config/openbaar').keurOpenbareBouwstand(env, { fouten, waarschuwingen, hardeFouten, productie: prod });
+  /* Ook buiten productie: een RTG_REGISTRATIE_DICHT die geen 0 of 1 is, telt als
+     dicht (fail-closed) en hoort dan in het opstartlog te staan. */
+  require('./config/registratie').keur(env, waarschuwingen);
 
   return { fouten, waarschuwingen, hardeFouten, productie: prod };
 }

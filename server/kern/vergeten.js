@@ -136,20 +136,20 @@ module.exports = function maakVergeten(kern) {
     }
     /* Het inzagejournaal blijft staan, bewust. Het bevat geen naam en geen
        e-mailadres -- alleen een account-id dat na deze regel nergens meer op
-       slaat, plus wie er keek en waarom. Zou het wel worden gewist, dan kon
-       iemand zijn eigen sporen uitvegen door een account te verwijderen, en dat
-       is precies waarvoor een auditlog niet bedoeld is (AVG art. 17 lid 3
+       slaat, plus wie er keek en waarom. Anders veegt iemand zijn eigen
+       sporen uit door zijn account te verwijderen (AVG art. 17 lid 3
        laat bewaren toe waar dat voor een rechtsvordering of wettelijke plicht
        nodig is). Wat overblijft is de-geidentificeerd. */
-    /* EN HET API-SPOOR. Dat bewaart per geslaagde schrijfhandeling WIE er
-       handelde -- de sleutel, nooit een naam. Na een wissing hoort die sleutel
-       daar niet meer te staan: de bezem van test/vergeten.test.js gaat door de
-       hele database en rekent er terecht op af. De regels zelf blijven (wat er
-       gebeurde en wanneer), de actor wordt "gewist", de keten wordt opnieuw
-       gezegeld en er komt een regel bij die zegt dát er is herschreven, met de
-       oude kop erin. Zo verdwijnt de persoon zonder dat het spoor stilletjes
-       een ander verleden gaat vertellen. */
-    if (kern.apiSpoor && kern.apiSpoor.wisActor) kern.apiSpoor.wisActor(key, 'recht op vergetelheid (AVG art. 17)');
+    /* EN HET API-SPOOR. Dat bewaart per schrijfhandeling WIE er handelde (de
+       sleutel, nooit een naam); de bezem van test/vergeten.test.js rekent erop
+       af als die blijft staan. De regels blijven, de actor wordt "gewist", de
+       keten wordt opnieuw gezegeld en een regel zegt dat er is herschreven, met
+       de oude kop erin: de persoon verdwijnt zonder dat het spoor een ander
+       verleden vertelt. */
+    // het externe anker: eerst de herzegeling tekenen (./vergeten-anker.js)
+    const reden = 'recht op vergetelheid (AVG art. 17)';
+    const herzegeling = require('./vergeten-anker').voor(kern, key, sessie, reden);
+    if (kern.apiSpoor && kern.apiSpoor.wisActor) kern.apiSpoor.wisActor(key, reden);
     /* EN HET SESSIEREGISTER VAN MIJN RTG. Dat is iets anders dan de sessies die
        hieronder worden uitgelogd: forgetSession raakt de Map met tokens, dit
        register houdt de CONTEXT per sessie (waar, met welk toestel, hoe zeker)
@@ -181,6 +181,7 @@ module.exports = function maakVergeten(kern) {
        werk: bevestigd is vastgelegd. */
     await bijeen(() => { save(); }, { duurzaam: true });
     broadcastSync(['rtg', 'lifestyle', 'business'], 'salon');
+    await require('./vergeten-anker').naar(kern, herzegeling);
     /* En dan pas de bytes. Ná save(), zodat een fout in de opslag (S3 even
        onbereikbaar) de administratieve wissing niet terugdraait: het lid is dan
        hoe dan ook weg uit de database, en wat er op de opslag achterblijft is

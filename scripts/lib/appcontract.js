@@ -66,12 +66,35 @@ const BRONSOORTEN = {
   liegronde: ['waarheidsgetrouw'],
   /* De bevoegdronde levert bevoegd en verder niets: IDOR en ROLPROEF zeggen
      wie er NIET bij kan, niet of het scherm iets bewaart of herstelt. */
-  bevoegdronde: ['bevoegd']
+  bevoegdronde: ['bevoegd'],
+  /* De voltooiproef (scripts/voltooiproef.js, BETROUWBAARHEID.md par. 4h) levert
+     drie bewijzen, en precies de drie die een ketenproef NIET mag: hij loopt de
+     bedoeling af (voltooibaar), herstart netjes op dezelfde datamap en leest de
+     uitkomst daarna in een nieuwe sessie EN in de opslag buiten de server om
+     (persistent), en laat het proces sterven direct na een bevestiging, herhaalt
+     en breekt verzoeken af (herstelbaar). Hij leest geen scherm en kruist geen
+     vreemde rol, dus waarheidsgetrouw en bevoegd levert hij niet. */
+  voltooiproef: ['voltooibaar', 'persistent', 'herstelbaar']
 };
+
+/* Een onderdeel met een scenario in scripts/lib/voltooi/ krijgt zijn drie
+   bewijzen uit VOLTOOIPROEF.json. Het instrument is het SCENARIObestand en niet
+   scripts/voltooiproef.js: daarop meet de bewijsbron de koppeling, en het
+   gedeelde instrument noemt de routes van geen enkel scherm. */
+function voltooi(scenario, waarom) {
+  const bron = { soort: 'voltooiproef', register: 'VOLTOOIPROEF.json', instrument: 'scripts/lib/voltooi/' + scenario + '.js', waarom };
+  return { voltooibaar: bron, persistent: bron, herstelbaar: bron };
+}
 
 /* Sleutel: de functie-id uit MAPPEN (zoals APPWERKT.json hem als `functie`
    schrijft), zodat een hernoemde app het contract niet stil laat vallen. */
 const CONTRACT = {
+  'link:sessies': Object.assign({
+    belofte: 'een lid ziet waar het is ingelogd en sluit een ander toestel op afstand -- en dat toestel blijft buiten, ook na een herstart of een crash'
+  }, voltooi('sessies', 'het scenario loopt /api/mijn/sessies, /sluit en de toestelbinding, de routes die /apps/mijn-sessies.html zelf aanroept, met een echte sleutel voor het bezitsbewijs')),
+  'link:post': Object.assign({
+    belofte: 'een lid geeft en trekt zelf toestemming in voor commerciele post, alles staat uit tot hij het aanzet, en de geschiedenis bewijst wanneer en waar'
+  }, voltooi('post', 'het scenario loopt /api/mijn/post, /zet, /alles-uit en /geschiedenis, de routes die /apps/mijn-post.html zelf aanroept')),
   'link:horeca': {
     belofte: 'een zaak bedient een tafel van rekening openen tot afrekenen, en keuken en gast zien elke stap',
     voltooibaar: {
@@ -95,6 +118,21 @@ const CONTRACT = {
       register: 'LUSPROEF.json',
       instrument: 'scripts/lusproef.js',
       waarom: 'de lusproef loopt de ontdeklus van CONNECT.md over /api/connect/*, de routes die /apps/connect.html zelf aanroept, met twee leden; de gezinsdeur /api/rtf/connect (dezelfde motor) loopt hij niet'
+    }
+  },
+  /* Het Privékantoor (11 oktober 2026). De concierge-lus had tot die dag geen
+     scherm; nu staat de lid-kant in het tabblad Zaken van /apps/lifestyle.html
+     (apps/lifestyle-lus.js), en die roept /api/member/bureau/lus/* aan -- precies
+     de lid-routes die de conciergeproef loopt. De proef dekt de lus en niet het
+     hele Privékantoor (woning, kring, bezit, mandaat lopen hier niet mee); dat
+     staat in `waarom` in plaats van weggelaten. */
+  'link:rechterhand': {
+    belofte: 'een lid vertelt een wens in een zin, De Rechterhand regelt hem, en het lid beslist alleen over een concreet voorstel buiten zijn mandaat',
+    voltooibaar: {
+      soort: 'ketenproef',
+      register: 'CONCIERGEPROEF.json',
+      instrument: 'scripts/conciergeproef.js',
+      waarom: 'de conciergeproef loopt de lus van CONCIERGE.md over /api/member/bureau/lus/*, de routes die het tabblad Zaken van /apps/lifestyle.html aanroept, met het kantoor en twee zaken ernaast; de andere tabbladen van het Privékantoor loopt hij niet'
     }
   }
 };
@@ -157,4 +195,13 @@ const ALGEMEEN = {
   }
 };
 
-module.exports = { BEWIJZEN, BRONSOORTEN, CONTRACT, ZONDER_APP, WERELD, ALGEMEEN };
+/* WAAR DE TESTWERELD ZELF NOG TEKORTSCHIET (BETROUWBAARHEID.md par. 4, de
+   tabel). Voor de meeste onderdelen ontbreekt alleen een scenario; voor deze
+   ontbreekt een ADAPTER, en dan helpt een scenario niet. Alleen wat de tabel
+   als ontbrekend noemt staat hier -- geen gok per app. */
+const TESTWERELD_ONTBREEKT = {
+  'os:bellen': 'bellen vraagt test-identiteiten voor WebRTC in een headless browser, en dat vraagt een besluit (BETROUWBAARHEID.md par. 4)',
+  'os:videobellen': 'videobellen vraagt test-identiteiten voor WebRTC in een headless browser, en dat vraagt een besluit (BETROUWBAARHEID.md par. 4)'
+};
+
+module.exports = { BEWIJZEN, BRONSOORTEN, CONTRACT, ZONDER_APP, WERELD, ALGEMEEN, TESTWERELD_ONTBREEKT };

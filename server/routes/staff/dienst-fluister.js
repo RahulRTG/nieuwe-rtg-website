@@ -64,7 +64,7 @@ app.post('/api/staff/fluister', supplierAuth, async (req, res) => {
       systeem: require('../../kern/rahul').RAHUL_LEAD +
         'Je helpt ' + werkNaam(req) + ' (personeel, PDA) bij ' + req.supplier.name + ' (' + req.supplier.type + ').'
     });
-    if (lus && lus.tekst) return res.json(metKompas({ antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
+    if (lus && lus.tekst) return res.json(metKompas({ antwoord: lus.tekst, gedaan: require('../../kern/stuur/taakbeeld').taakBeeld({ acties: lus.acties }).uitgevoerd.length > 0, stuur: lus.acties,
       goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring), goedkeuringWereld: 'staff', staving: lus.staving }));
   }
   res.json(metKompas(r));

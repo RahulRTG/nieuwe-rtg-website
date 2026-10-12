@@ -26,7 +26,7 @@
     // de groepen: aanmelden en ophalen (alleen door de aangemelde ouder)
     h += '<div class="st-sec h-mt100">'+T('op.groepen','De groepen')+'</div>'+
       '<div class="row-gap"><select id="opGroep" class="st-in h-flex2">'+d.groepen.map(g=>'<option value="'+g.id+'">'+esc(g.naam)+' · '+g.aanwezig.length+' van '+g.capaciteit+'</option>').join('')+'</select>'+
-      '<input id="opKind" class="st-in" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30" class="h-flex1"><input id="opOuder" class="st-in" placeholder="'+T('op.ouder','Naam ouder')+'" maxlength="60" class="h-flex1">'+
+      '<input id="opKind" class="st-in h-flex1" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30"><input id="opOuder" class="st-in h-flex1" placeholder="'+T('op.ouder','Naam ouder')+'" maxlength="60">'+
       '<button id="opMeld" style="flex:1;'+vzGoud+'">'+T('op.meld','Meld aan')+'</button></div>';
     h += d.groepen.map(g=>'<div style="border:1px solid var(--line);border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<b style="font-size:0.85rem;">'+esc(g.naam)+'</b>'+
@@ -37,7 +37,7 @@
 
     // de nanny-service: aanvraag, en een mens bevestigt met een gescreende nanny
     h += '<div class="st-sec h-mt100">'+T('op.nanny','Nanny-service')+'</div>'+
-      '<div class="row-gap"><input id="opGezin" class="st-in" placeholder="'+T('op.gezin','Gezin')+'" maxlength="60" class="h-flex1"><input id="opNDatum" class="st-in" type="date" class="h-flex1"><input id="opNVan" class="st-in" type="time" class="h-flex1"><input id="opNTot" class="st-in" type="time" class="h-flex1">'+
+      '<div class="row-gap"><input id="opGezin" class="st-in h-flex1" placeholder="'+T('op.gezin','Gezin')+'" maxlength="60"><input id="opNDatum" class="st-in h-flex1" type="date"><input id="opNVan" class="st-in h-flex1" type="time"><input id="opNTot" class="st-in h-flex1" type="time">'+
       '<button id="opNVraag" style="flex:1;'+vzGoud+'">'+T('op.vraag','Vraag aan')+'</button></div>';
     h += (d.nannyBoekingen||[]).map(a=>'<div style="border:1px solid '+(a.status==='afgerond'?'var(--line)':'var(--gold)')+';border-radius:0;padding:0.6rem 0.8rem;margin-top:0.5rem;">'+
       '<div style="display:flex;gap:0.5rem;align-items:baseline;"><b style="flex:1;font-size:0.85rem;">'+esc(a.gezin)+' · '+esc(a.datum)+' '+esc(a.van)+' tot '+esc(a.tot)+'</b><span class="sub">'+esc(a.status)+(a.nanny?' · '+esc(a.nanny):'')+'</span></div>'+
@@ -46,7 +46,7 @@
 
     // dagverslagjes met alleen voornamen
     h += '<div class="st-sec h-mt100">'+T('op.verslag','Dagverslagjes')+'</div>'+
-      '<div class="row-gap"><input id="opVKind" class="st-in" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30" class="h-flex1"><input id="opVTekst" class="st-in" placeholder="'+T('op.vtekst','Wat is er vandaag beleefd?')+'" maxlength="240" style="flex:3;">'+
+      '<div class="row-gap"><input id="opVKind" class="st-in h-flex1" placeholder="'+T('op.kind','Voornaam kind')+'" maxlength="30"><input id="opVTekst" class="st-in" placeholder="'+T('op.vtekst','Wat is er vandaag beleefd?')+'" maxlength="240" style="flex:3;">'+
       '<button id="opVMaak" style="flex:1;'+vzGoud+'">'+T('op.schrijf','Schrijf')+'</button></div>';
     h += (d.verslagen||[]).slice(0,6).map(v=>'<div class="sub" style="padding:0.3rem 0;"><b>'+esc(v.voornaam)+'</b> · '+esc(v.tekst)+'</div>').join('');
     h += '<p class="sub h-mt50">'+esc(d.regel||'')+'</p>';

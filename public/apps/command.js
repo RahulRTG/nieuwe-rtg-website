@@ -1559,7 +1559,7 @@
   }
 
   function teken(w) {
-    var u = '<p class="meta" class="mt"><b>' + esc(w.object.titel) + '</b></p>';
+    var u = '<p class="meta mt"><b>' + esc(w.object.titel) + '</b></p>';
     u += rij('Wijst naar', w.wijstNaar.map(function (x) { return x.type + ' ' + x.id + ' (via ' + x.via + ')'; }));
     u += rij('Wordt genoemd door', w.wordtGenoemdDoor.map(function (x) { return x.type + ' ' + x.id; }));
     u += rij('In het journaal', w.journaal.map(function (r) { return r.at + ' ' + r.actie + ' (' + r.actor + ')'; }));
@@ -1797,7 +1797,7 @@
             var sl = b.getAttribute('data-goud');
             api('mdm/gouden', { sleutel: sl }).then(function (r) {
               document.querySelector('#mg-' + sl.replace(/[^a-z0-9]/g, '')).innerHTML =
-                '<p class="meta" class="mt">' + esc(r.uitleg) + '</p>' +
+                '<p class="meta mt">' + esc(r.uitleg) + '</p>' +
                 '<div class="schuif"><table class="ctab"><thead><tr><th>Veld</th><th>Wint</th><th>Van</th><th>Alternatieven</th></tr></thead><tbody>' +
                 Object.keys(r.velden).slice(0, 20).map(function (k) {
                   var v = r.velden[k];
@@ -2023,7 +2023,7 @@
             scopes: [{ pad: document.querySelector('#apS').value }],
             quotaPerUur: Number(document.querySelector('#apQ').value || 1000) })
             .then(function (r) {
-              document.querySelector('#apGeheim').innerHTML = '<p class="meta" class="mt">' +
+              document.querySelector('#apGeheim').innerHTML = '<p class="meta mt">' +
                 '<b>' + esc(r.geheim) + '</b><br>' + esc(r.let) + '</p>';
             }).catch(function (e) { if (!e.stil) C.meld(e.message); });
         };
@@ -2061,7 +2061,7 @@
                 (o.ligt ? 'ok' : 'mis') + '">' + (o.ligt ? 'ligt er' : 'ontbreekt') + '</span>' +
                 '<div class="meta">' + esc(o.uitleg) + ' <i>(' + esc(o.bron) + ')</i></div></div>';
             }).join('') +
-            '<div class="crij" class="mt">' +
+            '<div class="crij mt">' +
             '<button class="knop vol" data-laaan="' + esc(d.land) + '">Activeren</button>' +
             '<button class="knop" data-lauit="' + esc(d.land) + '">Terugdraaien</button>' +
             '<button class="knop" data-lakijk="">Terug naar de lijst</button></div></div>' +
@@ -2136,7 +2136,7 @@
                 (p.gedaan ? 'ok' : 'onbekend') + '">' + (p.gedaan ? 'gedaan' : 'staat open') + '</span>' +
                 '<div class="meta">' + esc(p.uitleg) + '</div></div>';
             }).join('') +
-            '<div class="crij" class="mt"><button class="knop" data-stweg="' + esc(s2.naam) +
+            '<div class="crij mt"><button class="knop" data-stweg="' + esc(s2.naam) +
             '">Stoppen</button></div></div>';
         }
         document.querySelector('#stUit').innerHTML = u;

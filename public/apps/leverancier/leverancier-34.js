@@ -22,7 +22,7 @@
             (r.bericht?'<div class="ds">'+esc(r.bericht)+'</div>':'')+
             (canEdit&&r.status!=='gekozen'&&op.open?'<div class="h-mt35"><button class="obtn primary" data-swkies="'+op.id+'" data-creator="'+r.creatorCode+'">'+T('sw.kiesdeze','Kies deze creator')+'</button></div>':'')+'</div>').join('')
             : '<div class="ds">'+T('sw.geenreacties','Nog geen reacties.')+'</div>')+
-          (canEdit&&op.open?'<button class="obtn" data-swsluit="'+op.id+'" class="h-mt50">'+T('sw.sluit','Oproep sluiten')+'</button>':'')+'</div>';
+          (canEdit&&op.open?'<button class="obtn h-mt50" data-swsluit="'+op.id+'">'+T('sw.sluit','Oproep sluiten')+'</button>':'')+'</div>';
       });
       // creators direct benaderen
       html += '<div class="card"><div class="tt-h">'+T('sw.vindcreator','Benader een creator direct')+'</div>'+

@@ -76,6 +76,23 @@ async function leesTot(lezer, patroon, ms) {
    `retry: 3000` en zet de client daarna in dezelfde tik in de set. Komt die
    eerste brok bij ons binnen, dan is die regel dus gepasseerd en staan we
    geregistreerd. Een brok LEZEN is daarmee precies de voorwaarde. */
+/* HET KANAAL OPENT MET EEN TICKET (server/school/bellen.js): het token gaat in
+   de kop naar de ruilplek, en alleen het eenmalige ticket staat in het adres --
+   zoals shared/schoolbel.js het doet. Geeft { status, adres }. */
+async function belTicket(klasCode, code, tok) {
+  const r = await fetch(BASE + '/api/foundation/school/belkanaal/ticket', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok },
+    body: JSON.stringify({ klasCode, code: code || '' }) });
+  const d = await r.json().catch(() => ({}));
+  return { status: r.status, adres: d.ticket ? BASE + '/api/foundation/school/belkanaal?klasCode=' + klasCode +
+    (code ? '&code=' + code : '') + '&ticket=' + encodeURIComponent(d.ticket) : null };
+}
+async function belKanaal(klasCode, code, tok) {
+  const t = await belTicket(klasCode, code, tok);
+  assert.equal(t.status, 200, 'het belticket werd geweigerd');
+  return fetch(t.adres);
+}
+
 async function kanaalOpen(lezer, ms) {
   const stuk = await Promise.race([
     lezer.read(),
@@ -87,7 +104,7 @@ async function kanaalOpen(lezer, ms) {
 
 test('1. de ouder belt de leraar binnen de app: het signaal komt aan op het klas-belkanaal', async () => {
   const { klas, g } = await opzet('Bel');
-  const kanaal = await fetch(BASE + '/api/foundation/school/belkanaal?klasCode=' + klas.code + '&leraarToken=' + encodeURIComponent(klas.leraarToken));
+  const kanaal = await belKanaal(klas.code, '', klas.leraarToken);
   assert.equal(kanaal.status, 200);
   const lezer = kanaal.body.getReader();
   await kanaalOpen(lezer);
@@ -104,8 +121,18 @@ test('2. de grenzen: kinderen bellen hier niet, vreemden komen er niet in', asyn
   const alsKind = await api('/school/bel', { code: g.code, token: kindToken, klasCode: klas.code, naar: 'leraar', kind: 'ring' });
   assert.equal(alsKind.status, 403);
   // het kind kan ook het kanaal niet openen
-  const kindKanaal = await fetch(BASE + '/api/foundation/school/belkanaal?klasCode=' + klas.code + '&code=' + g.code + '&token=' + encodeURIComponent(kindToken));
-  assert.equal(kindKanaal.status, 403);
+  assert.equal((await belTicket(klas.code, g.code, kindToken)).status, 403, 'het kind krijgt geen belticket');
+  // en een token in het adres opent niets meer -- ook niet dat van de ouder zelf
+  const metToken = await fetch(BASE + '/api/foundation/school/belkanaal?klasCode=' + klas.code + '&code=' + g.code + '&token=' + encodeURIComponent(g.token));
+  assert.equal(metToken.status, 401, 'een token hoort niet in een adres');
+  const leraarInAdres = await fetch(BASE + '/api/foundation/school/belkanaal?klasCode=' + klas.code + '&leraarToken=' + encodeURIComponent(klas.leraarToken));
+  assert.equal(leraarInAdres.status, 401);
+  // een ticket van de ouder opent het kanaal maar EEN keer, en alleen voor zijn eigen gezin
+  const t = await belTicket(klas.code, g.code, g.token);
+  assert.equal(t.status, 200);
+  const anderGezin = await fetch(t.adres.replace('&code=' + g.code, '&code=ANDERS'));
+  assert.equal(anderGezin.status, 403, 'een ticket is gebonden aan het gezin waarvoor het werd uitgegeven');
+  assert.equal((await fetch(t.adres)).status, 403, 'en na een poging is het op');
   // een gezin dat niet in de klas zit komt er niet in
   const vreemd = await json(await api('/gezin/maak', { gezinsnaam: 'Fam Vreemd', naam: 'Ouder Vreemd', pin: '1234' }));
   const vreemdBel = await api('/school/bel', { code: vreemd.code, token: vreemd.token, klasCode: klas.code, naar: 'leraar', kind: 'ring' });
@@ -119,7 +146,7 @@ test('3. de telefoonboom belt in de app: gezin naar gezin, en de takken kennen h
   const { klas, g } = await opzet('Boom');
   const g2 = await gezinErbij(klas.code, 'Twee');
   // gezin 2 (een boom-tak) heeft de app open; gezin 1 belt zonder nummer
-  const kanaal = await fetch(BASE + '/api/foundation/school/belkanaal?klasCode=' + klas.code + '&code=' + g2.g.code + '&token=' + encodeURIComponent(g2.g.token));
+  const kanaal = await belKanaal(klas.code, g2.g.code, g2.g.token);
   assert.equal(kanaal.status, 200);
   const lezer = kanaal.body.getReader();
   await kanaalOpen(lezer);
@@ -139,3 +166,19 @@ test('3. de telefoonboom belt in de app: gezin naar gezin, en de takken kennen h
   assert.ok(ov.volgorde.every(n => n.gezinCode), 'ook de leraar ziet per knoop de gezinscode');
 });
 const lr = (klas, pad, body) => api(pad, Object.assign({ klasCode: klas.code, leraarToken: klas.leraarToken }, body || {}));
+
+test('4. ICE-servers voor het schoolkanaal alleen voor de leraar en de ouders van DEZE klas', async () => {
+  const { klas, g: ouder } = await opzet('IJs');
+  const ijs = (lijf) => fetch(BASE + '/api/foundation/school/ice', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lijf) });
+  const leraar = await ijs({ klasCode: klas.code, leraarToken: klas.leraarToken });
+  assert.equal(leraar.status, 200);
+  assert.equal(leraar.headers.get('cache-control'), 'no-store');
+  assert.ok(Array.isArray((await leraar.json()).iceServers));
+  assert.equal((await ijs({ klasCode: klas.code, code: ouder.code, token: ouder.token })).status, 200, 'een ouder van deze klas');
+  assert.equal((await ijs({ klasCode: klas.code, leraarToken: 'nep' })).status, 403, 'een vreemd token');
+  const ander = await opzet('IJs2');
+  assert.equal((await ijs({ klasCode: klas.code, code: ander.g.code, token: ander.g.token })).status, 403,
+    'een ouder van een andere klas');
+  assert.equal((await ijs({ klasCode: 'BESTAATNIET', leraarToken: klas.leraarToken })).status, 404);
+});

@@ -60,9 +60,10 @@ module.exports = ({ lijst, zekeringen, autoStaat, save, meld, isoleer }) => {
 
      AANVALLERS, EN NIET DEUREN -- dat was de fout. Hier stond `.map(m => m.sleutel)`,
      en die sleutel is `brute-force|<bucket>`. Een bucket is fijnmazig met opzet:
-     'auth:<ip>:<inlognaam>' (server/server.js). De inlognaam hoort daarin voor de
+     'auth:<ip>:<account>', met het account gehasht
+     (kern/identiteit/wachtwoordrem.js). Het account hoort daarin voor de
      snelheidsrem, want anders zet iemand het account van een ander op slot door
-     het fout te raden -- maar hij hoort NIET in de telling van deze noodrem.
+     het fout te raden -- maar het hoort NIET in de telling van deze noodrem.
 
      Wat er daardoor gebeurde: een script vanaf EEN adres dat zes gebruikersnamen
      probeert leverde zes "bronnen" op, en het hele platform ging in onderhoud.
@@ -85,11 +86,12 @@ module.exports = ({ lijst, zekeringen, autoStaat, save, meld, isoleer }) => {
     if (!autoStaat().aan) return;
     const nu = klok.nu();
     /* Het ADRES DAT KLOPT (meta.aanvaller), niet de deur waarop geklopt werd
-       (meta.bron is de bucket, met de inlognaam erin) en niet de meldings-
-       sleutel: de quarantaine van trede 1 moet een adres isoleren en geen
-       etiket, en de telling eronder moet aanvallers tellen en geen deuren.
-       meta.bron blijft de terugval voor een melding die nog geen aanvaller
-       meegaf; server.js meldt zo'n aanroep hoorbaar. */
+       (meta.bron is de bucket, bij de wachtwoordrem met een vingerafdruk van
+       het account erin) en niet de meldingssleutel: de quarantaine van trede
+       1 moet een adres isoleren en geen etiket, en de telling eronder moet
+       aanvallers tellen en geen deuren. meta.bron blijft de terugval voor een
+       melding die nog geen aanvaller meegaf; server.js meldt zo'n aanroep
+       hoorbaar. */
     const bronnen = new Set(lijst()
       .filter(m => m.type === 'brute-force' && (nu - m.atMs) < NOODREM_VENSTER_MS)
       .map(m => (m.meta && (m.meta.aanvaller || m.meta.bron)) || '').filter(Boolean));

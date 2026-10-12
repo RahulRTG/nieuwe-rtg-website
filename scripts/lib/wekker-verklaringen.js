@@ -55,6 +55,7 @@ module.exports = [
   /* DE MACHINE ONDER HET HUIS. Zelfde soort als de bediening in het
      platformregister: dit is niet een functie van RTG maar datgene waarop elke
      functie draait. */
+  { bestand: 'server/lib/auditwacht.js', reden: 'de periodieke integriteitscontrole van de auditketens (audit P1-4); een wacht op het spoor die je uit kunt zetten, meldt een vervalsing nooit meer -- en wie hem uitzet is precies wie het spoor wil laten breken' },
   { bestand: 'server/bus.js', reden: 'de berichtenbus zelf; een bus die je uit kunt zetten levert geen enkel bericht meer af' },
   { bestand: 'server/redis.js', reden: 'de gedeelde verbinding onder die bus' },
   { bestand: 'server/db/redis.js', reden: 'idem: de opslagkant van diezelfde verbinding' },
@@ -92,6 +93,10 @@ module.exports = [
      (AUTHORITY.md fase 3). Hij begint ALLEEN binnen een open verzoek naar
      /api/supplier/stream en stopt bij `close` -- geen werk dat vanzelf terugkomt,
      maar een verbinding die open wordt gehouden voor wie hem zelf opende. */
+  /* De levensteken-ping van de ledenstroom /api/stream, met de deur uit
+     server/server.js naar server/opzet/stroomtoegang.js verhuisd (6 oktober
+     2026, stroomtickets). Zelfde vorm als die van de leveranciersstroom. */
+  { bestand: 'server/opzet/stroomtoegang.js', reden: 'de keep-alive-ping van een open ledenstroom: hij start binnen het verzoek van wie de stroom met een ticket opent, stopt bij het sluiten, en begint zelf geen werk' },
   { bestand: 'server/routes/supplier/stroom.js', reden: 'de keep-alive-ping van een open leveranciersstroom: hij start binnen het verzoek van wie de stroom opent, stopt bij het sluiten, en de stroom zelf wordt per bericht gekeurd (kern/sse.js geldig())' },
   { bestand: 'server/kern/sse.js', reden: 'de afleverlaag van realtime-berichten. Staat de functie kern-live uit, dan komt er geen verbinding tot stand en heeft deze abonnee niemand om aan te leveren -- hij begint zelf geen werk' },
 
@@ -136,5 +141,11 @@ module.exports = [
     reden: 'de IMAP-server geeft een postvak vrij aan een mailprogramma, buiten elke route om. Hier stond eerst `ov-werkmail`, en dat was FOUT: server/imap.js is een leeslaag boven kern/rtmail-vak.js -- hetzelfde postvak dat over HTTP achter /api/member/rtmail zit, en dat valt onder `member`. `ov-werkmail` gaat over de bezorging van interne werkmail (/api/werkmail) en komt hier niet langs. De vergissing kostte niets in gedrag maar wel in meting: hij liet een ingang als lek tellen die dat niet is, want `member` staat vanaf trede 0 aan' },
   { bestand: 'server/stun.js', vertegenwoordigt: 'kern-live',
     voorwaarde: 'altijd, tenzij STUN_UIT=1',
-    reden: 'de eigen STUN-server bedient de ICE-kant van bellen; /api/ice hangt aan kern-live, de UDP-poort aan niets. Hij staat WEL standaard aan -- maar kern-live gaat al op trede 0 open, dus hier loopt de schakelaar niet achter op de deur' }
+    reden: 'de eigen STUN-server bedient de ICE-kant van bellen; /api/ice hangt aan kern-live, de UDP-poort aan niets. Hij staat WEL standaard aan -- maar kern-live gaat al op trede 0 open, dus hier loopt de schakelaar niet achter op de deur' },
+  /* DE TURN-RELAYPROEF (docs/turn-server.md). Twee bestanden, en geen van
+     beide is een tweede weg naar binnen. */
+  { bestand: 'server/kern/rtc/relaystand.js',
+    reden: 'de klok die elke vier minuten de echte TURN-relayproef draait, zodat de relaystand een vers bewijs heeft. Het is een gezondheidsmeting en geen functie: uitzetten opent niets maar laat het bewijs na tien minuten verlopen, en dan staat bellen fail-closed DICHT (dezelfde redenering als de gezondheidscontrole in kern/platformregister/bediening.js). Hij start alleen met een TURN_URL, de timer is unref, en de echte uitknop voor bellen is RTG_RTC_UIT=1, die ELKE laag dichtzet' },
+  { bestand: 'server/kern/rtc/turnclient.js',
+    reden: 'geen luisteraar maar een CLIENT: dgram.createSocket en net/tls.connect openen alleen een UITGAANDE verbinding naar de eigen coturn tijdens een relayproef, en sluiten die in de finally van relayproef.js. Er wordt op geen enkele poort geluisterd en niemand van buiten kan hier iets in gang zetten' }
 ];

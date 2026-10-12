@@ -56,14 +56,16 @@ test('new homes fit mobile and desktop, use one Edge and retain visible free Fou
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, route + ' RTL');
           await page.evaluate(() => window.RTGi18n.set('nl'));
         }
-        const heading = page.locator(width < 1000 ? '.wh-photo h1:visible' : '.wp-heading h2:visible').first();
+        /* Sinds #534 is de cinematic scene ook de mobiele kop (besluit van de eigenaar,
+           11 oktober 2026); de oude fotokop wijkt daar, zodat er een kop overblijft. */
+        const heading = page.locator('.wp-heading h2:visible').first();
         assert.match(await heading.evaluate(e => getComputedStyle(e).fontFamily), /Bodoni/);
         if (width < 1000) {
-          assert.equal(await page.locator('.wp-scene:visible').count(), 0, 'mobile retains its original home, without another scene');
-          assert.equal(await page.locator('.wh-photo h1:visible').count(), 1, 'one original editorial hero');
+          assert.equal(await page.locator('.wp-scene:visible').count(), 1, 'mobile leads with the one shared cinematic scene: ' + route + ' @' + width);
+          assert.equal(await page.locator('.wh-photo:has(h1) :is(h1,img):visible').count(), 0, 'and not with a second hero underneath it: ' + route + ' @' + width);
         }
         if (route.includes('foundation')) {
-          assert.match(await page.locator(width < 1000 ? '.wh-free:visible' : '.wp-free:visible').first().innerText(), /100% gratis/);
+          assert.match(await page.locator('.wp-free:visible').first().innerText(), /100% gratis/);
           await page.locator('#vWelkom .wh-support').scrollIntoViewIfNeeded();
           const supportGeometry = await page.locator('#vWelkom .wh-support').evaluate(e => {
             const r = e.getBoundingClientRect();

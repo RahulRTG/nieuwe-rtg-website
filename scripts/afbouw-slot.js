@@ -39,15 +39,11 @@ function procesLeeft(pid) {
   catch (e) { return e.code === 'EPERM'; }
 }
 
-/* De starttijd van een proces, of null waar dat niet te lezen is. */
-function procesStart(pid) {
-  try {
-    const stat = fs.readFileSync('/proc/' + pid + '/stat', 'utf8');
-    // veld 22, geteld NA de ")": de procesnaam zelf kan spaties en haakjes bevatten
-    const na = stat.slice(stat.lastIndexOf(')') + 2).split(' ');
-    return Number(na[19]) || null;
-  } catch (e) { return null; }
-}
+/* De starttijd van een proces, of null waar dat niet te lezen is: /proc op
+   Linux, `ps lstart` elders (./lib/procinfo.js). Zonder die terugval gold op
+   macOS altijd het oude gedrag -- een levend PID was dan altijd dezelfde
+   eigenaar, ook als het nummer al door een ander proces was geerfd. */
+function procesStart(pid) { return require('./lib/procinfo').procesStart(pid); }
 
 /* Is dit nog steeds DEZELFDE eigenaar -- niet alleen een levend PID? */
 function eigenaarLeeft(huidig) {

@@ -2,14 +2,14 @@
  "soort": "index",
  "uitleg": "Welke module heeft welke naam op het contextobject gezet. Drie vormen: het basisobject, een directe toewijzing, en Object.assign met een fabriek -- die laatste gelezen uit het laatste letterlijke return-object van die fabriek.",
  "stempel": {
-  "op": "2026-10-06",
-  "commit": "34b19a5c7"
+  "op": "2026-10-12",
+  "commit": "486e9173f"
  },
  "grens": "Er wordt niet geraden. Een samenvoeging die niet te volgen is levert geen naam maar een regel in `onopgelost`, met de reden. Een herkomst die je naar de verkeerde module wijst is erger dan geen herkomst.",
  "gemeten": {
-  "namen": 1338,
-  "vulplekken": 335,
-  "basisNamen": 467,
+  "namen": 1348,
+  "vulplekken": 344,
+  "basisNamen": 468,
   "namenMetMeerdereHerkomsten": 1,
   "onopgelost": 30
  },
@@ -134,19 +134,19 @@
   },
   {
    "bestand": "server/opzet/kernlaag4.js",
-   "lijn": 131,
+   "lijn": 117,
    "vorm": "Object.assign",
    "reden": "de bron draagt een spread, dus deze lijst is onvolledig"
   },
   {
    "bestand": "server/opzet/kernlaag4.js",
-   "lijn": 150,
+   "lijn": 136,
    "vorm": "Object.assign",
    "reden": "in server/kern/economie/index.js is de uitvoer-functie niet gevonden"
   },
   {
    "bestand": "server/opzet/kernlaag4.js",
-   "lijn": 190,
+   "lijn": 176,
    "vorm": "Object.assign",
    "reden": "in server/kern/kosten/index.js is de uitvoer-functie niet gevonden"
   },
@@ -206,7 +206,7 @@
   },
   {
    "bestand": "server/server.js",
-   "lijn": 2184,
+   "lijn": 2160,
    "vorm": "basis",
    "reden": "een spread in het basisobject"
   }
@@ -1539,6 +1539,24 @@
    ]
   },
   {
+   "naam": "beraad",
+   "herkomsten": [
+    {
+     "bestand": "server/opzet/kernlaag4-gemeenschap.js",
+     "hoe": "toewijzing"
+    }
+   ]
+  },
+  {
+   "naam": "beraadAI",
+   "herkomsten": [
+    {
+     "bestand": "server/opzet/kernlaag4-gemeenschap.js",
+     "hoe": "toewijzing"
+    }
+   ]
+  },
+  {
    "naam": "berichten",
    "herkomsten": [
     {
@@ -2049,7 +2067,7 @@
    "naam": "bijeenkomst",
    "herkomsten": [
     {
-     "bestand": "server/opzet/kernlaag4.js",
+     "bestand": "server/opzet/kernlaag4-gemeenschap.js",
      "hoe": "toewijzing"
     }
    ]
@@ -2911,7 +2929,7 @@
     {
      "bestand": "server/kern/concern/index.js",
      "hoe": "fabriek",
-     "via": "server/opzet/kernlaag4b.js"
+     "via": "server/opzet/kernlaag4b-concern.js"
     }
    ]
   },
@@ -2921,7 +2939,7 @@
     {
      "bestand": "server/kern/concern/index.js",
      "hoe": "fabriek",
-     "via": "server/opzet/kernlaag4b.js"
+     "via": "server/opzet/kernlaag4b-concern.js"
     }
    ]
   },
@@ -3038,6 +3056,15 @@
      "bestand": "server/kern/consent.js",
      "hoe": "fabriek",
      "via": "server/opzet/aanbouw4.js"
+    }
+   ]
+  },
+  {
+   "naam": "contextDomeinen",
+   "herkomsten": [
+    {
+     "bestand": "server/opzet/kernlaag6.js",
+     "hoe": "toewijzing"
     }
    ]
   },
@@ -4190,7 +4217,7 @@
    "naam": "genootschap",
    "herkomsten": [
     {
-     "bestand": "server/opzet/kernlaag4.js",
+     "bestand": "server/opzet/kernlaag4-gemeenschap.js",
      "hoe": "toewijzing"
     }
    ]
@@ -4199,7 +4226,7 @@
    "naam": "genootschapAI",
    "herkomsten": [
     {
-     "bestand": "server/opzet/kernlaag4.js",
+     "bestand": "server/opzet/kernlaag4-gemeenschap.js",
      "hoe": "toewijzing"
     }
    ]
@@ -4208,7 +4235,16 @@
    "naam": "genootschapBeheer",
    "herkomsten": [
     {
-     "bestand": "server/opzet/kernlaag4.js",
+     "bestand": "server/opzet/kernlaag4-gemeenschap.js",
+     "hoe": "toewijzing"
+    }
+   ]
+  },
+  {
+   "naam": "genootschapDrager",
+   "herkomsten": [
+    {
+     "bestand": "server/opzet/kernlaag4-gemeenschap.js",
      "hoe": "toewijzing"
     }
    ]
@@ -4217,7 +4253,7 @@
    "naam": "genootschapInzicht",
    "herkomsten": [
     {
-     "bestand": "server/opzet/kernlaag4.js",
+     "bestand": "server/opzet/kernlaag4-gemeenschap.js",
      "hoe": "toewijzing"
     }
    ]
@@ -4226,7 +4262,7 @@
    "naam": "genootschapUitvoer",
    "herkomsten": [
     {
-     "bestand": "server/opzet/kernlaag4.js",
+     "bestand": "server/opzet/kernlaag4-gemeenschap.js",
      "hoe": "toewijzing"
     }
    ]
@@ -4436,6 +4472,15 @@
      "bestand": "server/kern/fiscaal/herkomst.js",
      "hoe": "fabriek maakHerkomst",
      "via": "server/opzet/kernlaag4c.js"
+    }
+   ]
+  },
+  {
+   "naam": "herstelSmsDicht",
+   "herkomsten": [
+    {
+     "bestand": "server/routes/auth/herstel.js",
+     "hoe": "toewijzing"
     }
    ]
   },
@@ -7567,7 +7612,7 @@
     {
      "bestand": "server/kern/concern/index.js",
      "hoe": "fabriek",
-     "via": "server/opzet/kernlaag4b.js"
+     "via": "server/opzet/kernlaag4b-concern.js"
     }
    ]
   },
@@ -8150,7 +8195,7 @@
    "naam": "prikbord",
    "herkomsten": [
     {
-     "bestand": "server/opzet/kernlaag4.js",
+     "bestand": "server/opzet/kernlaag4-gemeenschap.js",
      "hoe": "toewijzing"
     }
    ]
@@ -8571,6 +8616,15 @@
      "bestand": "server/kern/consent-relaties.js",
      "hoe": "fabriek maakRelaties",
      "via": "server/opzet/aanbouw4.js"
+    }
+   ]
+  },
+  {
+   "naam": "release",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/command/journaal.js",
+     "hoe": "toewijzing"
     }
    ]
   },
@@ -9536,6 +9590,15 @@
    ]
   },
   {
+   "naam": "salonMagLezen",
+   "herkomsten": [
+    {
+     "bestand": "server/opzet/kernlaag4-comm.js",
+     "hoe": "toewijzing"
+    }
+   ]
+  },
+  {
    "naam": "salonNaarVolgers",
    "herkomsten": [
     {
@@ -9886,6 +9949,15 @@
   },
   {
    "naam": "sessieregister",
+   "herkomsten": [
+    {
+     "bestand": "server/server.js",
+     "hoe": "basisobject"
+    }
+   ]
+  },
+  {
+   "naam": "sessiestroom",
    "herkomsten": [
     {
      "bestand": "server/server.js",
@@ -11586,7 +11658,7 @@
     {
      "bestand": "server/kern/concern/index.js",
      "hoe": "fabriek",
-     "via": "server/opzet/kernlaag4b.js"
+     "via": "server/opzet/kernlaag4b-concern.js"
     }
    ]
   },
@@ -11730,6 +11802,15 @@
    ]
   },
   {
+   "naam": "verbond",
+   "herkomsten": [
+    {
+     "bestand": "server/opzet/kernlaag4-gemeenschap.js",
+     "hoe": "toewijzing"
+    }
+   ]
+  },
+  {
    "naam": "verdienPunten",
    "herkomsten": [
     {
@@ -11762,6 +11843,15 @@
     {
      "bestand": "server/server.js",
      "hoe": "basisobject"
+    }
+   ]
+  },
+  {
+   "naam": "verzoek",
+   "herkomsten": [
+    {
+     "bestand": "server/kern/command/journaal.js",
+     "hoe": "toewijzing"
     }
    ]
   },
@@ -12615,7 +12705,7 @@
     {
      "bestand": "server/kern/concern/index.js",
      "hoe": "fabriek",
-     "via": "server/opzet/kernlaag4b.js"
+     "via": "server/opzet/kernlaag4b-concern.js"
     }
    ]
   },

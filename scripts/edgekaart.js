@@ -269,7 +269,7 @@ const KAART = [
     ['rendert', 'onderbalk:s', 'bladen in de Command-balk', "b.className='cmd-balkblad'+(i===actief?' actief':'');"],
     ['beslist', 'voortzetting:b', 'hooguit twee bladen', 'if(panes.length>=2)verwijder(actief>=0?actief:0);'],
     ['bewaart', 'voortzetting:l', 'bladen bij elke sync', 'w.RTGCommandGeheugen.schrijf(panes,actief);'],
-    ['leest', 'voortzetting:l', 'hervat de laatste bladen', 'var g=w.RTGCommandGeheugen.lees();if(!g)return;']]],
+    ['leest', 'voortzetting:l', 'hervat de laatste bladen', 'if(w.RTGCommandGeheugen)w.RTGCommandGeheugen.hervat(']]],
   ['command/bladstand.js', 'schil', 'wereld:sbl', [
     ['leest', 'wereld:l', 'de echte plek van het blad', 'wereld=id.classify(pad)'],
     ['beslist', 'wereld:b', 'vier werelden of geen', "if(WERELDEN.indexOf(wereld)<0)wereld='geen';"],

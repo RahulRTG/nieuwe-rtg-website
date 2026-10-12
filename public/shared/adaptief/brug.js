@@ -104,7 +104,7 @@
          terugkeert vraagt de schil hem daarom zijn LEVENDE context opnieuw te
          melden; context() zelf herhalen zou door de deduplicatie niets sturen. */
       if (m.soort === 'meld') { zendContext(A.context()); return; }
-      if (m.soort === 'doe') { A.doe(id, m.extra || undefined); return; }
+      if (m.soort === 'doe') { A.doe(id, m.extra || undefined, { gewogen: true }); return; }
       /* De weg terug draait hier, want hier woont de handeling. De functie wordt
          uit de LEVENDE context gehaald en niet uit een kopie: wie hem zou
          bewaren, houdt straks een ongedaan vast van een bestand dat allang dicht

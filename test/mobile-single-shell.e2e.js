@@ -24,8 +24,11 @@ test('mobile login has one content surface, without a second title, tabs or desk
     for (const selector of ['.wd-greeting', '.wp-tabs', '.wd-people', '.wd-favorites', '.wd-library', '.wp-atmosphere']) {
       assert.equal(await page.locator(selector).isVisible(), false, selector + ' must not surround the mobile login');
     }
-    assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(), 0,
-      'de canonieke Edge begint pas na de beveiligde toegang');
+    /* Sinds de www-stijl (#534, #549) staat de compacte Adaptive Edge voor taal en hulp
+       ook op de toegang; de productnavigatie van de Edge begint pas daarna. */
+    assert.ok(await page.locator('.rtg-adaptive-bar:visible').count() <= 1, 'hooguit de ene compacte Edge');
+    assert.equal(await page.locator('.rtg-edge-chrome > :not(.rtg-adaptive-edge):visible').count(), 0,
+      'de productnavigatie van de Edge begint pas na de beveiligde toegang');
     assert.equal(await page.locator('.wd-home').isVisible(), true);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
     await page.evaluate(() => document.fonts.ready);
@@ -39,7 +42,11 @@ test('the four mobile worlds expose their original content and keep it when chan
   for (const route of ['/apps/rtg.html', '/apps/reizen.html', '/apps/kantoor.html', '/apps/foundation/os-publiek.html']) {
     const { page, ctx } = await open(route);
     try {
-      assert.equal(await page.locator('.wp-scene').isVisible(), false, route + ': no second generated home');
+      /* De gedeelde cinematic scene is de mobiele kop (#534, besluit van de eigenaar van
+         11 oktober 2026); de eigen inhoud van de wereld staat eronder en blijft zichtbaar. */
+      await page.locator('.wd-home>.wp-scene').waitFor({ state: 'visible', timeout: 20000 }).catch(() => {});
+      assert.equal(await page.locator('.wd-home>.wp-scene').isVisible(), true, route + ': the shared scene leads on mobile');
+      assert.equal(await page.locator('.wd-home .wh-photo:has(h1) :is(h1,img):visible').count(), 0, route + ': no second hero under the scene');
       assert.equal(await page.locator('.wp-domain').isVisible(), false, route + ': no collapsed original home');
       const original = await page.locator('.wd-home').evaluate(el => {
         const node = [...el.children].find(n => !n.matches('.wp-scene'));

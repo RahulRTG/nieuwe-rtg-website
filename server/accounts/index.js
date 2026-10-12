@@ -29,6 +29,7 @@ const migraties = require('../migraties');
 const kluis = require('./kluis');
 const mirror = require('./mirror');
 const users = require('./users');
+const registratie = require('./registratie');
 const staff = require('./staff');
 const staffSessie = require('./staff-sessie');
 const actiebewijs = require('./actiebewijs');
@@ -142,8 +143,19 @@ const api = {
      binnenwerk van de identiteitskluis rechtstreeks hoeft te importeren. */
   hashActiebewijs: actiebewijs.hash,
   kloptActiebewijs: actiebewijs.klopt,
+  /* Of RTG_REGISTRATIE_DICHT aan staat (./registratie.js); de registratieroute
+     weigert daarop al voor ze iets keurt. */
+  registratieDicht: () => registratie.dicht(),
+  registratieUitleg: registratie.UITLEG,
+  registratieWeigering: (zekeringEruit) => registratie.weigering(zekeringEruit),
+  registratieStand: () => registratie.stand(),
   ...users,
-  ...staff
+  ...staff,
+  /* De grendel op nieuwe accounts staat in de GEVEL en niet in ./users.js: alle
+     drie de wegen (registreren, de eerste SSO-aanmelding, SCIM) komen hier
+     langs, en hij gooit voor schrijfUser iets raakt. */
+  createUser: async (g) => { registratie.eisOpen(); return users.createUser(g); },
+  createUserSync: (g) => { registratie.eisOpen(); return users.createUserSync(g); }
 };
 
 /* De sessiecontrole hoort bij de identiteitskluis. Aanroepers gaan via deze
@@ -152,7 +164,13 @@ const api = {
 api.staffAccountBinding = (lidOfId, uitgegevenOp) =>
   staffSessie.accountBinding(api, lidOfId, uitgegevenOp);
 api.controleerStaffSessie = sess => staffSessie.controleer(api, sess);
+api.plekWerkt = (staffId, zaak) => staffSessie.plekWerkt(api, staffId, zaak);
 api.registreerStaffSessie = (sessieregister, sess, lidKey, bron) =>
   staffSessie.registreer(sessieregister, sess, lidKey, bron);
+
+/* Gekeurd (A3), en dezelfde gekeurde persoon? Alleen ja/nee en 'ander',
+   'zelfde' of 'onbekend' -- de kluis geeft hier geen rij, hash of document af. */
+Object.assign(api, require('./zelfdemens')({ getUserById: users.getUserById,
+  getMemberState: users.getMemberState }));
 
 module.exports = api;

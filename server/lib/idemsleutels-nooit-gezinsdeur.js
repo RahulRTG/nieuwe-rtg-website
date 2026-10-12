@@ -7,8 +7,9 @@
 
 module.exports = Object.freeze({
   'POST /api/foundation/gezin/code/roteer':
-    'elke oproep maakt een NIEUWE 128-bit gezinscode (foundation/gezinscode.js) en vervangt de vorige; ' +
-    'een afgespeeld antwoord zou een vervangen code heronthullen alsof hij nog gold',
+    'elke rotatie maakt een NIEUWE 128-bit gezinscode (foundation/gezinscode.js) die alleen als hash blijft; ' +
+    'een afgespeeld antwoord zou dat geheim heronthullen. De herhaling met dezelfde sleutel vangt de domeinkern ' +
+    'zelf af (409 met herhaald, zonder code)',
   'POST /api/foundation/gezin/code/intrek':
     'intrekken leest de actuele stand in een collectietransactie; een tweede keer is een toestandscontrole ' +
     '(ingetrokken: 1 of 0 naar wat er DAN gebeurde), geen gecachet antwoord',

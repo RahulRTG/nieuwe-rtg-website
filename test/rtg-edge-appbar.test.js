@@ -70,9 +70,12 @@ test('zelfstandige apps houden de normale vijf Edge-ankers', () => {
   assert.match(SIMPLE, /grid-template-columns:minmax\(44px,.85fr\) minmax\(44px,.85fr\) 64px minmax\(72px,1.4fr\) minmax\(44px,.85fr\)/);
   assert.match(SIMPLE, /not\(\[data-rtg-edge-appbar="true"\]\)/,
     'de nieuwe actions-stand valt onder de normale Edge en niet onder de oude vervangingsstand');
-  assert.ok(ACCESS.includes('body:has(#gate[data-rtg-access]:not([style*="display: none"])) > :is(.rtg-edge-chrome'),
-    'de canonieke Edge begint pas na de beveiligde toegang');
-  assert.ok(ACCESS.includes('body:has(#onbGate:not([hidden])) > :is(.rtg-edge-chrome'),
+  /* Sinds de www-stijl (#534, #549) blijft de compacte Adaptive Edge voor taal en hulp
+     ook vóór de aanmelding staan; wat er pas na de beveiligde toegang bij komt, is
+     de grote app-chrome met de productnavigatie. Dat is wat hier bewaakt wordt. */
+  assert.ok(ACCESS.includes('body:has(#gate[data-rtg-access]:not([style*="display: none"])) > .rtg-edge-chrome > :not(.rtg-adaptive-edge),\nbody:has(#onbGate'),
+    'de productnavigatie van de Edge begint pas na de beveiligde toegang');
+  assert.ok(ACCESS.includes('body:has(#onbGate:not([hidden])) > .rtg-edge-chrome > :not(.rtg-adaptive-edge){display:none!important}'),
     'ook onboarding blijft één rustige toegangstaak zonder productnavigatie');
 });
 

@@ -13,10 +13,13 @@ const BANK_BEVESTIG = Object.freeze({
     classificatie: 'intern',
     streefstand: 'de aangevraagde geldhandeling is uitgevoerd door een ANDERE mens dan wie hem ' +
       'aanvroeg, en de openstaande aanvraag bestaat niet meer',
-    /* DE WERKWOORDEN GELDEN VOOR BEIDE gedelegeerde handelingen -- anders is de lijst
-       onwaar zodra de andere wordt bevestigd. Nagelezen: de incassoronde roept alleen
-       boekAsync aan en bank.rood zet een limiet; geen van beide bericht iemand of
-       laadt code van buiten. Bij een DERDE handeling zakt de uitkomsttoets. */
+    /* DE WERKWOORDEN GELDEN VOOR ALLE VIER gedelegeerde handelingen -- anders is de
+       lijst onwaar zodra een andere wordt bevestigd. Nagelezen (11 oktober 2026): de
+       incassoronde en de reisteruggave boeken via boekAsync, de afstemming zet een
+       betaalopdracht op uitgevoerd of boekt hem terug, en bank.rood zet een limiet. Geen
+       ervan bericht iemand of laadt code van buiten; het `seintje` van kern/pay na een
+       teruggave is een SSE-signaal aan de eigen app van het lid en geen bericht. Een
+       VIJFDE handeling laat de uitkomsttoets zakken. */
     veroorzaakt: ['GELD_BEWEGEN', 'SCHRIJVEN_ANDERMANS'],
     nooit: ['EXTERN_BEREIKEN', 'DERDENCODE_UITVOEREN', 'ONVERTROUWDE_BYTES'],
     voorwaarden: [
@@ -32,16 +35,16 @@ const BANK_BEVESTIG = Object.freeze({
           'want de tweede mens kan geen script zijn' },
       { soort: 'afgeleid', graad: 'vermoed',
         wat: 'de aangevraagde geldhandeling wordt uitgevoerd, met het lijf dat bij de AANVRAAG is bevroren',
-        uitkomsten: ['bank.rood', 'bank.incasso'],
-        reden: 'uitvoerders.get(a.actie) -- een gesloten set van twee geregistreerde handelingen ' +
-          '(routes/kantoren/bank-tweedehand.js). Wat elk van die twee veroorzaakt, staat in HUN ' +
-          'contract en niet in dit; deze route bezit dat gevolg niet' },
+        uitkomsten: ['bank.afstemming', 'bank.incasso', 'bank.rood', 'connect.afrekening', 'reisbureau.teruggave'],
+        reden: 'uitvoerders.get(a.actie) -- een gesloten set van vijf geregistreerde handelingen ' +
+          '(routes/kantoren/bank-tweedehand.js, bank-afstemming.js, connect.js en reisteruggave.js). Wat elk ' +
+          'daarvan veroorzaakt, staat in HUN contract en niet in dit; deze route bezit dat gevolg niet' },
       { soort: 'afgeleid', graad: 'vermoed',
         wat: 'er komt een auditregel bij op naam van de bevestiger, met de aanvrager erin',
         reden: 'afdelingen.audit() in de route; een spoor dat eindigt bij een gedeelde code is geen spoor' },
       { soort: 'buiten', graad: 'onbekend',
         wat: 'of de geldbeweging de rekening van het lid werkelijk bereikt',
-        reden: 'de incassoronde boekt binnen dit huis, maar of een boeking lukt beslist boekAsync ' +
+        reden: 'de incassoronde en de teruggave boeken binnen dit huis, maar of een boeking lukt beslist boekAsync ' +
           '(saldo, bevroren rekeningen, limieten) en daar is geen meting van deze weg' },
       /* DE BELANGRIJKSTE REGEL VAN DIT CONTRACT, en hij staat als beleid in de kop
          van de module: een nee wordt geen ja door het nog eens te vragen. */

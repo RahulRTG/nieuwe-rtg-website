@@ -15,6 +15,12 @@
         if (['rtg','lifestyle','business'].includes(doelPas)){ location.replace(pasAdres(doelPas)); return; }
         API.token = null; return; // onbekende pas: poort tonen
       }
+      /* De server heeft deze sessie op DEZE pas bevestigd. Onthoud dat, zodat
+         de volgende kale /apps/app.html het adres al in de kop van de pagina
+         goed zet (zie app.html, "de pas van deze werktafel") in plaats van
+         na een volledige opstart nog eens te herladen. Klopt het geheugen
+         ooit niet meer, dan stuurt de regel hierboven gewoon door. */
+      try { localStorage.setItem('rtg_werktafel_pas', vastePas); } catch(e){}
       $('#gate').style.display = 'none';
       $('#app').classList.add('active');
       renderAll();
@@ -36,6 +42,7 @@
     try { if (API.live) await API.call('/logout'); } catch(e){}
     try { localStorage.removeItem('rtg_member_token'); } catch(e){}
     try { localStorage.removeItem('rtg_actieve_tab'); } catch(e){} // de volgende gast begint op het beginscherm
+    try { localStorage.removeItem('rtg_werktafel_pas'); } catch(e){} // en zijn pas reist niet mee naar de volgende
     /* En zijn werktafel staat leeg. Sinds WERELD.md hervat de werktafel je
        laatste bladen (shared/command/geheugen.js); zonder deze regel zou de
        volgende mens op een gedeeld toestel de titels van de vorige zien. */
@@ -52,8 +59,9 @@
     gate.setAttribute('data-i18n-ignore','');
     gate.innerHTML =
       '<section class="access-brand" aria-label="RTG">' +
-        '<div class="access-brand-head"><a href="https://www.rahultravelgroup.com/" aria-label="RTG website"><span translate="no">RTG</span></a>' +
-          '<button class="access-language" id="agLanguage" type="button" aria-label="Taal kiezen">NL</button></div>' +
+        '<div class="access-brand-head"><a href="https://www.rahultravelgroup.com/" aria-label="Rahul Travel Group website"><span translate="no">Rahul Travel Group</span></a>' +
+          '<span class="access-brand-actions"><button class="access-language" id="agLanguage" type="button" aria-label="Taal kiezen">NL</button>' +
+          '<button class="access-menu" id="agMenu" type="button" aria-label="RTG-menu openen"><i></i><i></i></button></span></div>' +
         '<div class="access-brand-copy"><small>' + 'VEILIGE TOEGANG' + '</small><p id="agBrandLine">Technologie voor het leven.</p></div>' +
         '<div class="access-system" aria-hidden="true"><i class="access-system-ring access-system-ring-one"></i><i class="access-system-ring access-system-ring-two"></i>' +
           '<span class="access-system-node access-system-personal"><b>Personal</b><em>Account</em></span>' +

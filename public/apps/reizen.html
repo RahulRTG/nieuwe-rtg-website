@@ -85,7 +85,7 @@
           <a class="wh-story" href="/apps/reisboek.html"><img src="/images/travelos/travel-documents.jpg" alt="" width="960" height="720" loading="lazy"><span data-wh-copy="travelBook">Uw reisboek</span></a>
         </div>
           <section class="wh-travel-help" aria-labelledby="worldTravelHelp"><h2 id="worldTravelHelp" data-wh-copy="travelHelp">Alles voor onderweg.</h2>
-            <a class="wh-service" href="/apps/reisboek.html"><span class="wh-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 3h8l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M15 3v5h4M9 12h6M9 16h4"/></svg></span><div><h3 data-wh-copy="travelBook">Uw reisboek</h3><p data-wh-copy="documents">Bewaar uw plannen en documenten bij elkaar.</p></div><span aria-hidden="true">›</span></a>
+            <a class="wh-service" href="/apps/reisboek.html" data-rtg-gedeeld="reisboek"><span class="wh-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 3h8l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M15 3v5h4M9 12h6M9 16h4"/></svg></span><div><h3 data-wh-copy="travelBook">Uw reisboek</h3><p data-wh-copy="documents">Bewaar uw plannen en documenten bij elkaar.</p></div><span aria-hidden="true">›</span></a>
             <a class="wh-service" href="#reizen"><span class="wh-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="5" cy="18" r="2"/><path d="M7 18h4a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h5M20 6c0 2-3 5-3 5s-3-3-3-5a3 3 0 1 1 6 0Z"/><circle cx="17" cy="6" r=".5"/></svg></span><div><h3 data-wh-copy="nextStep">Uw volgende stap</h3><p data-wh-copy="prepare">Bekijk wat u voor vertrek wilt regelen.</p></div><span aria-hidden="true">›</span></a>
             <a class="wh-service" href="/apps/reisbureau.html"><img class="wh-service-thumb" src="/images/travelos/city-arrival.jpg" alt="" aria-hidden="true" width="1672" height="941" loading="lazy" draggable="false"><div><h3 data-wh-copy="whereNext">Waar wilt u hierna naartoe?</h3><p data-wh-copy="ideas">Ontdek nieuwe mogelijkheden die bij u passen.</p></div><span aria-hidden="true">↗</span></a>
           </section>
@@ -325,6 +325,55 @@
         </header>
 
         <div class="reiskeuzes" id="samenReizen"></div>
+
+        <!-- DE GEZAMENLIJKE REIS (stap 3, kern/reisgezelschap-werkruimte.js). Een
+             werkruimte en geen scherm: welke blokken hier verschijnen, beslist de
+             SERVER per deelnemer (`werkruimte.blokken`). Wat leeg blijft, is niet
+             vergeten maar niet voor u. Een meekijker krijgt dit vak niet. -->
+        <section class="kompaskaart samenbesluit" id="samenBesluit" aria-labelledby="samenBesluitTitel" hidden>
+          <div class="kompaskop">
+            <h2 id="samenBesluitTitel" class="micro">DE GEZAMENLIJKE REIS</h2>
+            <span class="rtg-sub" id="besluitStand" aria-live="polite"></span>
+          </div>
+          <div data-blok="groepsuitkomst" hidden>
+            <p class="micro">RAHUL</p>
+            <div id="besluitUitleg" aria-live="polite"></div>
+          </div>
+          <p class="rtg-sub" data-blok="groepsvoortgang" id="besluitVoortgang" hidden></p>
+          <div data-blok="voorlegging" id="besluitVoorlegging" hidden>
+            <p class="micro">HET VOORSTEL</p>
+            <div id="voorleggingInhoud"></div>
+            <div class="besluitknoppen" id="voorleggingKnoppen"></div>
+          </div>
+          <div data-blok="opties" hidden><ul class="besluitopties" id="besluitOpties"></ul></div>
+          <form data-blok="optieZetten" id="besluitOptieVorm" class="nodigvorm" hidden>
+            <label class="rtg-label" for="optieTitel">Een optie klaarzetten</label>
+            <input class="rtg-veld" id="optieTitel" maxlength="80" placeholder="Bijvoorbeeld Villa aan zee" required>
+            <label class="rtg-label" for="optiePrijs">Prijs per persoon (euro)</label>
+            <input class="rtg-veld" id="optiePrijs" type="number" min="1" step="1" required>
+            <label class="rtg-label" for="optieVan">Van</label>
+            <input class="rtg-veld" id="optieVan" type="date" required>
+            <label class="rtg-label" for="optieTot">Tot</label>
+            <input class="rtg-veld" id="optieTot" type="date" required>
+            <fieldset class="besluitkeuzes" id="optieKenmerken"><legend class="rtg-label">Kenmerken</legend></fieldset>
+            <button class="rtg-knop vol" type="submit">TOETS VOOR DE GROEP</button>
+            <p class="rtg-sub" id="besluitToetsingen"></p>
+          </form>
+          <form data-blok="mijnOpgave" id="besluitOpgaveVorm" class="nodigvorm" hidden>
+            <label class="rtg-label" for="opgavePlafond">Uw plafond per persoon (euro)</label>
+            <input class="rtg-veld" id="opgavePlafond" type="number" min="1" step="1" placeholder="Leeg: geen grens">
+            <label class="rtg-label" for="opgaveVan">U kunt van</label>
+            <input class="rtg-veld" id="opgaveVan" type="date">
+            <label class="rtg-label" for="opgaveTot">tot</label>
+            <input class="rtg-veld" id="opgaveTot" type="date">
+            <fieldset class="besluitkeuzes" id="opgaveGraag"><legend class="rtg-label">Graag</legend></fieldset>
+            <fieldset class="besluitkeuzes" id="opgaveNiet"><legend class="rtg-label">Liever niet</legend></fieldset>
+            <button class="rtg-knop vol" type="submit">BEWAAR MIJN WENSEN</button>
+            <button class="rtg-knop" type="button" id="opgaveWis">WIS MIJN WENSEN</button>
+            <p class="rtg-sub" id="besluitWieZiet"></p>
+          </form>
+          <p class="rtg-sub" id="besluitGrens"></p>
+        </section>
 
         <div class="dagdek">
           <div class="daghoofd">
@@ -1116,6 +1165,8 @@ function tekenCanvasVandaag(lijst) {
 <script src="/apps/reizen-samen-delen.js"></script>
 <script src="/apps/reizen-samen-mensen.js"></script>
 <script src="/apps/reizen-samen.js"></script>
+<script src="/apps/reizen-samen-voorstel.js"></script>
+<script src="/apps/reizen-samen-besluit.js"></script>
 <script src="/apps/reizen-context.js"></script>
 <!-- De vier bestaande TravelOS-tabs reizen als capabilities naar de ene
      mobiele Command-balk; de uitvoering blijft in reizen-performance.js. -->

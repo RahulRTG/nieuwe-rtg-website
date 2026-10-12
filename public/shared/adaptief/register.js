@@ -130,10 +130,27 @@
     var st = nu.staat && nu.staat[id];
     return !((st && st.verhinderd) || c.verhinderd);
   }
-  function doe(id, arg) {
+  /* WAT HIER NIET LICHT IS, GAAT LANGS HET GEWICHT (EDGE.md ronde 3). Alleen de
+     uitvoerder zelf (gewicht.js) en de brug in een blad (de schil woog al) geven
+     `{ gewogen: true }`; test/adaptiefdoe.test.js zakt bij een derde. */
+  function doe(id, arg, via) {
     var c = caps[id];
     if (!c || typeof c.doe !== 'function') return false;
     if (!mag(id)) return false;
+    if (!(via && via.gewogen === true)) {
+      var st = nu.staat && nu.staat[id];
+      var terug = !!(st && typeof st.ongedaan === 'function' && c.herstel !== 'compensatie');
+      var g = gram && gram.effectief ? gram.effectief(c.gewicht, terug) : (c.gewicht || 'licht');
+      if (g !== 'licht') {
+        if (w.RTGGewicht && w.RTGGewicht.voerId) {
+          var gedaan = w.RTGGewicht.voerId(id);    // true: draait of de lade staat open
+          if (!gedaan && w.console) w.console.warn('[adaptief] ' + id + ': speelt nu niet; "' + g + '" draait niet buiten de context');
+          return gedaan;
+        }
+        if (w.console) w.console.warn('[adaptief] ' + id + ': "' + g + '" zonder gewichtlaag gaat dicht');
+        return false;
+      }
+    }
     try { var result = c.doe(arg); if (result && typeof result.then === 'function') return result; } catch (e) { if (w.console) w.console.error('[adaptief] ' + id, e); return false; }
     return true;
   }

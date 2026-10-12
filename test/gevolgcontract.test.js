@@ -302,9 +302,16 @@ test('de route waar het geld BEWEEGT is verklaard, en zijn gevolg is GEDELEGEERD
      bij zonder dat dit contract meebeweegt, dan zakt deze toets. */
   const gedelegeerd = c.gevolgen.find(g => Array.isArray(g.uitkomsten));
   assert.ok(gedelegeerd, 'het gedelegeerde gevolg hoort zijn uitkomstruimte te noemen');
-  const route = require('node:fs').readFileSync(
-    require('node:path').join(__dirname, '..', 'server/routes/kantoren/bank-tweedehand.js'), 'utf8');
-  const geregistreerd = [...route.matchAll(/tweedeHand\.registreer\('([^']+)'/g)].map(m => m[1]).sort();
+  /* ALLE routebestanden en niet een: hier stond alleen bank-tweedehand.js, en daarmee
+     zag deze toets twee van de vier handelingen. De afstemming en de reisteruggave
+     registreren zich in hun EIGEN bestand -- dezelfde tweede handtekening, dezelfde
+     bevestigroute -- en het contract noemde ze niet terwijl deze toets groen stond. */
+  const fs = require('node:fs'), P = require('node:path');
+  const lees = (map) => fs.readdirSync(map, { withFileTypes: true }).flatMap(e =>
+    e.isDirectory() ? lees(P.join(map, e.name)) : (e.name.endsWith('.js') ? [P.join(map, e.name)] : []));
+  const geregistreerd = lees(P.join(__dirname, '..', 'server/routes'))
+    .flatMap(f => [...fs.readFileSync(f, 'utf8').matchAll(/tweedeHand\.registreer\('([^']+)'/g)].map(m => m[1])).sort();
+  assert.ok(geregistreerd.length >= 4, 'de lezer vond te weinig registraties: ' + geregistreerd.join(', '));
   assert.deepStrictEqual(gedelegeerd.uitkomsten.slice().sort(), geregistreerd,
     'de uitkomstruimte van het gedelegeerde gevolg loopt achter op de geregistreerde handelingen');
 

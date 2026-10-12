@@ -146,6 +146,10 @@ function blokken(bron) {
    als het ongemakkelijk wordt. Elke regel hieronder is een oordeel dat iemand
    kan nalezen en omdraaien. */
 const BEOORDEELD = new Map([
+  ['office-formaten.test.js::inn.body.trouw',
+    'een rondreis XLSX -> XLSX hoort niets te verliezen -- leeg is precies wat er getoetst wordt; dezelfde trouwlijst (kern/office/formaten.js) staat gevuld in toets 3 van hetzelfde bestand (een link als tekst bij DOCX, deepEqual op het item) en bij elke CSV-export'],
+  ['vrijgave-routes.test.js::l.body.afrekeningen',
+    'een aanvraag die de vrijgavepoort weigert hoort GEEN afrekening achter te laten -- nul is precies wat er getoetst wordt; dezelfde lijst (lijst() -> opslag.alle()) staat gevuld in test/connect-afrekening.test.js, de gelukkige weg: een toegelaten afrekening staat er precies een keer in'],
   ['mobiliteit.test.js::leeg.body.gemaakt',
     'zonder reserveringen hoort er geen rit te komen; de tegenproef staat in supplier-comm-mob-payroll.test.js toets 8: met een gereserveerde plaats maakt dezelfde planner precies een rit (met een mutatie nagetrokken)'],
   ['eenaccount.test.js::leeg.body.rollen',

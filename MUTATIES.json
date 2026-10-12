@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-10-12T02:27:38.087Z",
-    "commit": "739a74980",
+    "op": "2026-10-12T13:50:42.831Z",
+    "commit": "6d5abcb5c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.0"
+    "node": "v26.10.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -277,6 +277,14 @@
       "staat": "geen bronmutatie mogelijk",
       "reden": "leest scripttags in HTML en geen module; de operatoren raken geen scripttag. Met de hand nagetrokken: vorm.js weg op reizen-veilig (zakt, en appmenu.e2e.js op de context van reizen-veilig), vorm.js na register.js op app (zakt), de objectpoort na rtg-schil.js in werkruimte (zakt, en werkruimte-objecten.e2e.js)"
     },
+    "adaptiefdoe.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/adaptief/grammatica.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 4
+    },
     "administratie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -295,6 +303,14 @@
       "soort": "puur",
       "staat": "al rood",
       "gezakteZonderMutatie": 1
+    },
+    "adressoort-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/adressoort.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "advocaat-lezer.test.js": {
       "soort": "puur",
@@ -319,6 +335,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "afbouw-afloop-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/afbouw-afloop.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "afbouwafloop.test.js": {
       "soort": "puur",
@@ -382,6 +406,13 @@
       ],
       "posities": 1
     },
+    "afstemmingsketen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "agenda-pro.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -409,6 +440,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "agentinstructies.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/agentinstructies.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "ai-budget.test.js": {
       "soort": "puur",
@@ -594,6 +633,45 @@
       "gezakt": 1,
       "geprobeerd": 4
     },
+    "ankerherzegel-echt.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "ankerherzegel-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/ankerherzegel.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 12,
+      "geprobeerd": 1
+    },
+    "ankerherzegel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/ankerdienst.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 8,
+      "geprobeerd": 1
+    },
+    "ankerketen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/keten.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "ankerontvanger-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/ankerontvanger.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 8,
+      "geprobeerd": 1
+    },
     "ankerpost.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -773,6 +851,14 @@
       "gezakt": 15,
       "scherp": "gezakt"
     },
+    "appstore-manifestlezer.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/appstore/manifest.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
     "appstore-meting.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -787,6 +873,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 12,
       "scherp": "gezakt"
+    },
+    "appstore-teruggave-actor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/appstore/teruggave.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "appstore-tijdelijk.test.js": {
       "soort": "server",
@@ -823,6 +917,13 @@
       "operator": "liegpoort /api/",
       "gezakt": 16,
       "scherp": "gezakt"
+    },
+    "appurlvast.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "overleefd"
     },
     "appwereldcatalogus.test.js": {
       "soort": "puur",
@@ -875,6 +976,22 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "architectcontext.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/codearchitect.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "architectproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/codearchitect.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "arena.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -901,6 +1018,30 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "artefact-image.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/artefactketen.js",
+      "operator": "voorwaarde-omkeren#3",
+      "gezakt": 1,
+      "geprobeerd": 26
+    },
+    "artefactketen-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/release-trust.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "artefactketen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/release-trust.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 15,
+      "geprobeerd": 1
     },
     "assets.test.js": {
       "soort": "server",
@@ -938,6 +1079,37 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
+    "auditatomair-sqlite.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "auditboek-cli.pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/productie-auditboek.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "auditboek.pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/auditboek/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 15,
+      "geprobeerd": 5
+    },
+    "auditherkomst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/keten.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "auditopslag-pg.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -946,12 +1118,41 @@
       "gezakt": 2,
       "geprobeerd": 4
     },
+    "auditspoor-atomair.pg.test.js": {
+      "soort": "server",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 2
+    },
+    "auditspoor-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/auditspoor.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
     "auditspoor.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/opzet/auditspoor.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "auditwacht-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/keten.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "auditwacht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/keten.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
       "geprobeerd": 1
     },
     "auth-rol.test.js": {
@@ -1344,6 +1545,22 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "beleidsmotor-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/beleidsmotor/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 12,
+      "geprobeerd": 1
+    },
+    "beleidsmotor-uitvoerbak.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kantoor/mensdeur-spoel.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "beleidsmotor-werkwoorden.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1389,6 +1606,29 @@
       "operator": "+->-#2",
       "gezakt": 1,
       "geprobeerd": 17
+    },
+    "beraad-server.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "beraad-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/genootschap/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 10,
+      "geprobeerd": 1
+    },
+    "beraad.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/keten.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "bereikbaar.test.js": {
       "soort": "puur",
@@ -1443,6 +1683,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "besluit-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commercie/bevoegdheid.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 3
     },
     "besluit.test.js": {
       "soort": "puur",
@@ -1512,6 +1760,14 @@
       "gezakt": 14,
       "geprobeerd": 1
     },
+    "betaalopdracht-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalopdracht/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 12,
+      "geprobeerd": 1
+    },
     "betaalopdracht.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1535,6 +1791,13 @@
       "operator": "true->false#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "betaalstop-spelling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "betaalstore.test.js": {
       "soort": "puur",
@@ -1580,6 +1843,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 13,
       "scherp": "gezakt"
+    },
+    "bevoegdheid-keten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commercie/bevoegdheid.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "bevoegdronde.test.js": {
       "soort": "puur",
@@ -1647,6 +1918,14 @@
       "module": "scripts/lib/bewijsboek.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "bewijsbron-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bewijsbron.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
       "geprobeerd": 1
     },
     "bewijskosten.test.js": {
@@ -1724,6 +2003,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "bezitsbewijs-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/identiteit/bezitsbewijs.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 12,
+      "geprobeerd": 1
+    },
     "bezitsbewijs.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1760,6 +2047,22 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "bezorgproef-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bezorgproef.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "bezorgproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/horeca/bezorgovergang.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "bezorgpunt.test.js": {
       "soort": "server",
@@ -2289,6 +2592,13 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "clientafbreking.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "clipdeler.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2327,6 +2637,22 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "codearchitect-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/codearchitect.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 19,
+      "geprobeerd": 1
+    },
+    "codearchitect.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/codearchitect.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "codecredentials-kortecode.test.js": {
       "soort": "puur",
@@ -2510,6 +2836,14 @@
       "gezakt": 5,
       "geprobeerd": 3
     },
+    "commandjournaal-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/command/journaal.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 13,
+      "geprobeerd": 1
+    },
     "commandlagen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2610,6 +2944,20 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "concept-live.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "concept-live.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
+    },
     "concern-routes.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2691,12 +3039,28 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "connect-afrekening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/stripe.js",
+      "operator": "===->!==#0",
+      "gezakt": 11,
+      "geprobeerd": 2
+    },
     "connect-gezinsdeur.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "connect-grootboek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/proefvrijgave.js",
+      "operator": "optie-uit#0",
+      "gezakt": 4,
+      "geprobeerd": 2
     },
     "connect-routes.e2e.js": {
       "soort": "server",
@@ -2711,6 +3075,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "connect-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/betaal/connect/afrekening.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 17,
+      "geprobeerd": 4
     },
     "connect.test.js": {
       "soort": "puur",
@@ -2780,6 +3152,14 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
+    "connectwebhook-ingericht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/connectwebhook.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "consent-dekking.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -2840,6 +3220,28 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "contextbrug-model.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "contextbrug.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "contextbrug.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/menscontext.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 8,
+      "geprobeerd": 1
     },
     "contextdoorgifte-server.test.js": {
       "soort": "puur",
@@ -3187,6 +3589,13 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "dienstverband-sleutel.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
     "directpay.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3359,6 +3768,13 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "doos-inlogjournaal.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "doos-journaal.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3373,12 +3789,27 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "doossleutel-ontslag.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "doossleutels-register.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/zaakdoos/sleutels.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "doossleutels-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/zaakdoos/sleutels.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 7,
       "geprobeerd": 1
     },
     "doossleutels.test.js": {
@@ -3417,6 +3848,24 @@
       "operator": "!==->===#0",
       "gezakt": 4,
       "geprobeerd": 2
+    },
+    "dubbeleklasse-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "module": "scripts/lib/dubbeleklasse.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
+    },
+    "dubbeleklasse.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/dubbeleklasse.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 7,
+      "geprobeerd": 1
     },
     "dubbelemelding.test.js": {
       "soort": "puur",
@@ -3798,6 +4247,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "envelop-kantooridentiteit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/envelop.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "envelop.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4033,12 +4490,28 @@
       "gezakt": 2,
       "geprobeerd": 2
     },
+    "experience-volgorde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/experience/volgorde.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "extern-afrekenen.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "extern-bewijs-stripe-connect.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/extern-bewijs-stripe-connect.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "extern-bewijs.test.js": {
       "soort": "puur",
@@ -4163,6 +4636,14 @@
       "gezakt": 17,
       "geprobeerd": 2
     },
+    "festival-kalender.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/util.js",
+      "operator": "!==->===#0",
+      "gezakt": 5,
+      "geprobeerd": 3
+    },
     "festival-partner.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4185,6 +4666,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 30,
       "scherp": "gezakt"
+    },
+    "festival-terreinboom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/util.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
+      "geprobeerd": 3
     },
     "festival-tijdlijn.test.js": {
       "soort": "puur",
@@ -4800,6 +5289,13 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "gedeeld-element.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "geen-demo.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4837,6 +5333,11 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "geheimkanarie.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "lekscanner; een blinde scan() liet de toets zakken op de eigen ijking"
+    },
     "geheugen.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4851,6 +5352,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "geld-lidmaatschap.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "geld-motorsleutel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/economische-identiteit.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 11,
+      "geprobeerd": 1
     },
     "geld-rollen-buiten-bank.test.js": {
       "soort": "puur",
@@ -5011,6 +5527,22 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "gemeenschapsproef-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/gemeenschapsproef.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "gemeenschapsproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/gemeenschapsproef.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 6
+    },
     "gemeente.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5018,12 +5550,51 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "genootschap-ai-leesweergave.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/genootschap/ai.js",
+      "operator": "optie-uit#1",
+      "gezakt": 1,
+      "geprobeerd": 8
+    },
     "genootschap-beheer.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "genootschap-drager-server.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "genootschap-drager.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/genootschap/drager-regels.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "genootschap-prikbord-lezen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/genootschap/prikbord.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "genootschap-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/genootschap/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 12,
+      "geprobeerd": 1
     },
     "genootschap.e2e.js": {
       "soort": "server",
@@ -5257,6 +5828,21 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "gezinscode-roteer-idem.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "gezinscode-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/foundation/gezinscode.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
     "gezinscode.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5467,6 +6053,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "groepvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/groepvorm.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "grondwacht.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5537,6 +6131,14 @@
       "module": "server/lib/handelingsspoor.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "handelingwie-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/handelingwie.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
       "geprobeerd": 1
     },
     "handelscherm.e2e.js": {
@@ -5627,6 +6229,23 @@
       "module": "test/helper.js",
       "operator": "true->false#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "herbevestiging-p1.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "gezakt": 7,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "operator": "liegpoort /api/",
+      "scherp": "gezakt"
+    },
+    "herbevestiging-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/identiteit/herbevestiging.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "herbouwproef.test.js": {
@@ -5875,6 +6494,21 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "horeca-klokgrens.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/personeel.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 11
+    },
+    "horeca-leen-dienst.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
       "scherp": "gezakt"
     },
     "horeca-pas.test.js": {
@@ -6162,6 +6796,22 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
+    "idem-sleutelbepaling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem-sleutelbepaling.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "idem-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "idembundel.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6241,6 +6891,14 @@
       "gezakt": 1,
       "geprobeerd": 14
     },
+    "idemwereld-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/idemwereld.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "idemwereld-voorvoegsel.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6286,6 +6944,14 @@
       ],
       "posities": 1
     },
+    "imageherkomst-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/imageherkomst.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "imageherkomst.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6330,6 +6996,10 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
+    },
+    "infra.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "ingebedde-chrome.e2e.js": {
       "soort": "server",
@@ -6411,6 +7081,21 @@
       "gezakt": 7,
       "geprobeerd": 1
     },
+    "intentie-model.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
+    "intentie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/menscontext-relatie.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "intrekking-multi-instance.pg.test.js": {
       "soort": "server",
       "staat": "slaat zichzelf over",
@@ -6453,6 +7138,30 @@
         "scripts/lib/invoerproef.js"
       ],
       "posities": 1
+    },
+    "invoerspoor-preload-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/invoerspoor-preload.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 8,
+      "geprobeerd": 1
+    },
+    "invoerspoor-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/invoerspoor.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "invoerspoor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/invoerspoor.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 9,
+      "geprobeerd": 1
     },
     "inzagebewaring.test.js": {
       "soort": "puur",
@@ -6672,6 +7381,13 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "kantoordeur-uitvoeren.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "kantoordeur.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6736,6 +7452,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "kantoormacht-actor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/kantoormacht.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "kantoormacht.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6771,6 +7495,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "kantooruitnodiging-idem.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
       "scherp": "gezakt"
     },
     "kantooruitnodiging.test.js": {
@@ -6963,6 +7694,22 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "keuringreden-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/keuringreden.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "keuringreden.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/repository-snapshot.js",
+      "operator": "getal+1#0",
+      "gezakt": 7,
+      "geprobeerd": 3
     },
     "keuringsindex.test.js": {
       "soort": "puur",
@@ -7185,6 +7932,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "kritiekspoor-auditboek.pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/auditboek/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 4,
+      "geprobeerd": 4
+    },
     "kritiekspoor.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7199,6 +7954,22 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "kwalificatie-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/release-bewijs.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "kwalificatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/release-bewijs.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "kwaliteit.test.js": {
       "soort": "puur",
@@ -7893,6 +8664,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "live-kandidaat-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/release-bewijs.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 16,
+      "geprobeerd": 1
+    },
     "live-kandidaat.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -8057,6 +8836,13 @@
       "gezakt": 20,
       "scherp": "gezakt"
     },
+    "logboekzicht-eigen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "loghygiene.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -8064,6 +8850,14 @@
       "operator": "&&->||#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "logredactie-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/log-redactie.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "logstroom.test.js": {
       "soort": "puur",
@@ -8272,6 +9066,13 @@
       "gezakt": 11,
       "geprobeerd": 1
     },
+    "loopbaan-mee.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "loopbaan.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -8315,6 +9116,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "luisteraarlek.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "luisteradres-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/luisteradres.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "lusproef.test.js": {
       "soort": "puur",
@@ -9401,6 +10217,20 @@
       "gezakt": 1,
       "geprobeerd": 6
     },
+    "mob-ontvangst.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "mob-ontvangst.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "mobiel.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -9558,6 +10388,22 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 2
+    },
+    "move-gevolg-adressen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/move/gevolg.js",
+      "operator": "route-doel-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "move-gevolg.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/move.html",
+      "operator": "html-bron-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "move-keten.test.js": {
       "soort": "server",
@@ -10200,6 +11046,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "office-docs-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/office/basis.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "office-enterprise.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10243,6 +11097,14 @@
       "gezakt": 10,
       "scherp": "gezakt"
     },
+    "office-zip-xlsx-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/office/zip.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 17,
+      "geprobeerd": 1
+    },
     "office.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10264,6 +11126,13 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "omgevingsstand.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "overleefd"
     },
     "omzetproef.test.js": {
       "soort": "puur",
@@ -10306,6 +11175,13 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "onderhoudstroom.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "ondernemerbewijs.test.js": {
       "soort": "puur",
@@ -10591,6 +11467,14 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "onomkeerbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commercie/besluit.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
     "ontmoeting-leeg.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -10691,6 +11575,10 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "oplaadwebhook-crash.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "opslag-voorcheck.test.js": {
       "soort": "puur",
@@ -10993,7 +11881,8 @@
         "commit": "bb6d9cdd6d53f90ac9071451809b2d0b8af4a0d4",
         "sourceSha256": "4a0fd28071240fb56281805736980f6e94f8fad81a6c9666696f6b1388706790",
         "testSha256": "73494e3f99f5525a7335e2e8f4f2e7abaae1a510f1d5ae072853b76b90e5d460"
-      }
+      },
+      "scherp": "gezakt"
     },
     "partnerpersoneelscode-migratie.test.js": {
       "soort": "server",
@@ -11122,12 +12011,28 @@
       "gezakt": 10,
       "scherp": "gezakt"
     },
+    "payboeking-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/pay/boeking.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "paybudget.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "payopladen-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "payout-terugboeking.pg.test.js": {
       "soort": "puur",
@@ -11291,6 +12196,14 @@
       "gezakt": 12,
       "scherp": "gezakt"
     },
+    "payverzoeken-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "payvooraf.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -11344,6 +12257,14 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "personeel-aanmelden-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/supplier/werving/personeel-aanmelden.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 10,
+      "geprobeerd": 1
+    },
     "personeelsuitnodiging-montage.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -11352,10 +12273,32 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "personeelsuitnodiging-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/supplier/werving/uitnodiging.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 18,
+      "geprobeerd": 1
+    },
     "personeelsuitnodiging.pg.test.js": {
       "soort": "puur",
       "staat": "slaat zichzelf over",
       "overgeslagen": 1
+    },
+    "personeelzicht-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "personeelzicht.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "persoonseis.test.js": {
       "soort": "puur",
@@ -11568,6 +12511,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "poortoordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/poortoordeel.js",
+      "operator": "+->-#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "poortrace.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -11758,6 +12709,30 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "procinfo-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/procinfo.js",
+      "operator": "optie-uit#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "procinfo.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/procinfo.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "productie-anker.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/productie-anker.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "productie-communicatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -11822,6 +12797,22 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "productiekeur-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/productie.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "productiekeuring-regels.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/productie-geld.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "productieseed.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -11838,9 +12829,32 @@
       "gezakt": 2,
       "geprobeerd": 4
     },
+    "proeftoestel.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
     "project-room.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "promotieboek-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/release-trust.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "promotieboek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/release-trust.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
     },
     "provider-sandbox.test.js": {
       "soort": "puur",
@@ -11849,6 +12863,13 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "providerstatus-client.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "proxykop.test.js": {
       "soort": "puur",
@@ -11982,6 +13003,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "overleefd"
+    },
+    "rahulzicht.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "rahulzicht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/edge/blikveld.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "railvergelijk.test.js": {
       "soort": "puur",
@@ -12162,6 +13198,27 @@
         "testSha256": "78ca1c807175600cd60b19dc35e5f02ded5b8ecc631869f32b79723025443014"
       }
     },
+    "registratie-dicht-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "registratie-dicht.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reis-lezen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 10,
+      "scherp": "gezakt"
+    },
     "reisaanbod.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -12230,11 +13287,53 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "reisgezelschap-instemming.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reisgezelschap-instemming.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "reisgezelschap-opgave.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "reisgezelschap-opties.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "reisgezelschap-routes.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "scherp": "gezakt"
+    },
+    "reisgezelschap-werkruimte.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reisgezelschap-werkruimte.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "reisgezelschap.test.js": {
@@ -12291,6 +13390,13 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "reisteruggave.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "reisteruggave.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -12341,6 +13447,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "reizen-veilig.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/reizen-veilig-reis.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "reizen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -12377,6 +13491,14 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "relaystand-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/rtc/relayproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "release-bewijs.test.js": {
       "soort": "puur",
@@ -12418,6 +13540,13 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "rem-gelijktijdig.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "overleefd"
+    },
     "rem.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -12432,6 +13561,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "remmen-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/remmen.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "rendezvous.test.js": {
       "soort": "server",
@@ -12590,6 +13727,14 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "romeproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 4
+    },
     "ronde.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -12688,6 +13833,20 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "rtc-relay.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "rtc-relay.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "rtdocs-voorzijde.test.js": {
       "soort": "puur",
@@ -13335,6 +14494,13 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "rtmail-alias.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
     "rtmail-bestuur.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -13349,6 +14515,49 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "rtmail-instellingen.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "rtmail-leiding-bestuur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "rtmail-leiding-pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/rtmail-leiding.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "rtmail-leidinghold.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "rtmail-leidingplek.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "rtmail-leidingtermijn.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "rtmail-lid.test.js": {
       "soort": "server",
@@ -13787,6 +14996,13 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "schermcontext.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "schermeigenaar.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -13961,6 +15177,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "schorspoort-spelling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
       "scherp": "gezakt"
     },
     "schorspoort.test.js": {
@@ -14191,6 +15414,13 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "servicemelder.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "servicemens.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -14259,6 +15489,14 @@
       "gezakt": 1,
       "scherp": "overleefd"
     },
+    "sessieregister-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/identiteit/sessieregister.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 13,
+      "geprobeerd": 1
+    },
     "sessies.test.js": {
       "soort": "gericht",
       "staat": "gezakt",
@@ -14273,6 +15511,28 @@
         "sourceSha256": "88bbeef6abc0bf20470797034acd3ef36db13d09dbf9e1ecf0b5545b0c501159",
         "testSha256": "31be36277e1f3c275d78fb8e4bf0babc3c7b855c3a2892e2afee6b85124f37b5"
       }
+    },
+    "sessiestroom-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/sessiestroom.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 16,
+      "geprobeerd": 1
+    },
+    "sessiestroom.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "sessiestroom.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
     },
     "sessieverfijning.test.js": {
       "soort": "puur",
@@ -15064,11 +16324,25 @@
       "gezakt": 1,
       "scherp": "overleefd"
     },
+    "staff-accountuit.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "staff-inzet-mob.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "staff-ontslag.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "staff-pin-productie.test.js": {
@@ -15090,6 +16364,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 11,
+      "scherp": "gezakt"
+    },
+    "staffjoin-orakel.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
       "scherp": "gezakt"
     },
     "stagevorm.test.js": {
@@ -15122,6 +16403,13 @@
       "gezakt": 1,
       "scherp": "overleefd"
     },
+    "stapeen-uitgezet.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "startpagina.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15143,6 +16431,14 @@
       "module": "server/kern/stuur/staving.js",
       "operator": "===->!==#0",
       "gezakt": 8,
+      "geprobeerd": 1
+    },
+    "stempel-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/stempel.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "stempel.test.js": {
@@ -15269,6 +16565,25 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "stroom-client.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "stroom-rolscheiding.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "stroomticket-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stroomticket.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 14,
+      "geprobeerd": 1
+    },
     "stroomticket.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15314,6 +16629,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "stuur-knelpunt.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wegwerpserver.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "stuur-mandaat.test.js": {
       "soort": "puur",
@@ -15430,6 +16753,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "supplier-logboekzicht.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "supplier-notificaties.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -15466,6 +16796,28 @@
       "operator": "+->-#0",
       "gezakt": 4,
       "geprobeerd": 2
+    },
+    "taakbeeld-model.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "taakbeeld.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "taakbeeld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/taakbeeld.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "taalcheck.test.js": {
       "soort": "server",
@@ -15690,6 +17042,14 @@
       "gezakt": 3,
       "geprobeerd": 2
     },
+    "tenant-ondertekenaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/techniek/tenant.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "tenant.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15751,6 +17111,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "testwereld-adapters.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/post-vanger.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "theater-thuis.test.js": {
       "soort": "server",
@@ -15961,6 +17329,14 @@
       "operator": "===->!==#0",
       "geprobeerd": 1
     },
+    "toestelbinding-race.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/identiteit/toestellen.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "toestelbinding.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -15997,6 +17373,22 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "toetsroutes.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/toetsroutes.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "toezegklassen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/toezegklassen.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "token-domeinscheiding.test.js": {
       "soort": "server",
@@ -16133,6 +17525,38 @@
       "operator": "return-weg#0",
       "gezakt": 4,
       "geprobeerd": 2
+    },
+    "turn-inrichting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/turn/maak-config.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "turn-maak-config-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/turn/maak-config.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "turn-projectie-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/turn.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "turn-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/config/turn-adres.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "tweede-rem.test.js": {
       "soort": "server",
@@ -16481,6 +17905,21 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "verbond-server.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "verbond.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/keten.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "verdiepende-appflows.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
@@ -16527,6 +17966,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "verifier-failclosed.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
       "scherp": "gezakt"
     },
     "verjaardagen.test.js": {
@@ -16606,6 +18052,14 @@
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "versmaltrap.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/codearchitect.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "verstrengeling.test.js": {
       "soort": "puur",
@@ -16819,6 +18273,14 @@
       "staat": "geen bronmutatie mogelijk",
       "reden": "overleefde 17 mutaties in public/apps/voertuig.js en rit.js. Deze toets legt tekst en sleutelnamen vast, geen rekenend gedrag; geen enkele bronoperator raakt een letterlijke string. Met de hand nagetrokken op de foutklasse die hij wel bewaakt (een hernoemde opslagsleutel): tweemaal raak"
     },
+    "voltooiproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wereldregister.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "vonk-daglot.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -16918,6 +18380,140 @@
       "gezakt": 3,
       "geprobeerd": 1
     },
+    "vrijgave-afwikkeling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "vrijgave-baseline.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijgave/baseline.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "vrijgave-bewijs-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijgave/bewijs.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "vrijgave-hooks.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "vrijgave-index-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijgave/index.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 4
+    },
+    "vrijgave-lokaal-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijgave/lokaal.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "vrijgave-lokaal.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijgave/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 5
+    },
+    "vrijgave-oordeel-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijgave/oordeel.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 17,
+      "geprobeerd": 1
+    },
+    "vrijgave-rail.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijgave/register.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "vrijgave-rangorde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijgave/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "vrijgave-registerkeur-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijgave/registerkeur.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "vrijgave-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "vrijgave-schakelen-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijgave/schakelen.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "vrijgave-stand-script-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/vrijgave-stand.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "vrijgave-stand-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijgave/stand.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "vrijgave.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijgave/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 5
+    },
+    "vrijheid-besluit-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijheid/besluit.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 17,
+      "geprobeerd": 1
+    },
     "vrijheid-lus.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -16926,11 +18522,26 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "vrijheid-motor-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/vrijheid/index.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 13,
+      "geprobeerd": 1
+    },
     "vrijheid-routes.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "vrijheid-saldo.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "vrijheid-scherm.e2e.js": {
@@ -16979,12 +18590,28 @@
       "gezakt": 14,
       "scherp": "gezakt"
     },
+    "waardebeleid-lagen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/waarde/policy.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "waardegraaf.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "waardereserve-levensloop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/waarde/reserve.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "waarom.test.js": {
       "soort": "puur",
@@ -17142,6 +18769,16 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "wegwerpserver-takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "gezakt": 3,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "module": "scripts/lib/wegwerpserver.js",
+      "operator": "voorwaarde-omkeren#0",
+      "geprobeerd": 1
     },
     "wegwijzerscherm.e2e.js": {
       "soort": "server",
@@ -17448,6 +19085,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "werkplek-rem.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "overleefd"
+    },
     "werkplek-tweede.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -17560,6 +19204,13 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "werktafel-pas.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "werktafel.e2e.js": {
       "soort": "server",
@@ -17725,6 +19376,20 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "workspace-rechten.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "workspace-rechten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "workspace-server-platform.test.js": {
       "soort": "puur",

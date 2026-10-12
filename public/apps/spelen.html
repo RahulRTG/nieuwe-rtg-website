@@ -2,6 +2,7 @@
 <html lang="nl" data-rtg-thema="bordeaux">
 <head>
 <script src="/shared/id.js"></script>
+<script src="/shared/stroom.js"></script>
 <script src="/shared/schermrust.js" defer></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -830,7 +831,7 @@ function verbindStream(){
         op: { social: opSocial } });
       return;
     }
-    stream = new EventSource('/api/stream?token=' + encodeURIComponent(memberTok)); // herverbindt zelf na een dip
+    stream = RTGStroom.open('/api/stream', { token: memberTok }); // herverbindt zelf na een dip
     stream.addEventListener('social', opSocial);
   }catch(e){}
 }

@@ -82,6 +82,7 @@
   .tag{display:inline-block;font-size:.66rem;letter-spacing:.04em;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--line);border-radius:0;padding:.1rem .5rem;margin-right:.35rem;}
   .tag.af{color:#8FD6A6;}
   .fout{font-size:.78rem;color:#E78AA0;margin-top:.5rem;}
+  .inst-noot{text-align:left;margin:0;} .inst-veld{display:block;text-align:left;margin:0;} .inst-ruim{margin-bottom:.5rem;} .rij.vast{cursor:default;}
   /* De mappenbalk: vier bestemmingen, en de sluimerteller ernaast. Geen
      gekleurde vlakken -- het ritme van dit huis is zwart, wit en een accent. */
   .mapbalk{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center;margin:0 0 .6rem;}
@@ -169,6 +170,7 @@
   <span class="tel" id="tel" hidden></span></header>
 <main id="main" aria-hidden="true"><div class="leeg">Laden…</div></main>
 <script src="/shared/uitvoer.js"></script>
+<script src="/apps/rtmail-instellingen.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -264,7 +266,7 @@ async function laadInbox(){
     (tel.sluimert?'<span class="mslaap">'+tel.sluimert+' sluimert</span>':'')+
     '</div>'+
     '<div class="zoekrij"><input class="vld" id="zoekVeld" placeholder="Zoek in je eigen postvak" maxlength="120" value="'+esc(ZOEK)+'">'+
-    '<button class="knp" id="zoekKnp">Zoek</button>'+(ZOEK?'<button class="knp" id="zoekAf">Wissen</button>':'')+'</div>'+
+    '<button class="knp" id="zoekKnp">Zoek</button>'+(ZOEK?'<button class="knp" id="zoekAf">Wissen</button>':'')+(window.RTGMailInstellingen?'<button class="knp" id="instKnp">Instellingen</button>':'')+'</div>'+
     (ZOEK?'<div class="noot" style="margin:0 0 0.75rem;text-align:left;">'+(d.aantal||0)+' resultaat/resultaten voor "'+esc(ZOEK)+'". Zoeken blijft binnen je eigen postvak.</div>':'');
   $('#main').innerHTML = kaart + balk + (LIJST.length ? (
     '<button class="ai-knop" id="vatSamen">Rahul vat je postvak samen</button>'+
@@ -278,6 +280,7 @@ async function laadInbox(){
   if(zk) zk.addEventListener('click',doeZoek);
   if(zv) zv.addEventListener('keydown',e=>{ if(e.key==='Enter') doeZoek(); });
   if(za) za.addEventListener('click',()=>{ ZOEK=''; laadInbox(); });
+  const ik=$('#instKnp'); if(ik) ik.addEventListener('click',()=>RTGMailInstellingen.open());
   const vs=$('#vatSamen'); if(vs) vs.addEventListener('click',vatSamenNu);
   $('#main').querySelectorAll('[data-i]').forEach(b=>b.addEventListener('click',()=>openBericht(LIJST[+b.dataset.i])));
   teamsErbij(versie);

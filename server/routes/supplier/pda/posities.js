@@ -69,7 +69,7 @@ app.post('/api/supplier/wissel', supplierAuth, (req, res) => {
   const sess = { role: 'supplier', code: doel.code, actor: daar.name, staffId: daar.id,
     staffRole: daar.role, manager: daar.role === 'manager', ...binding };
   rememberSession(token, sess);
-  logActivity(doel.code, { name: daar.name }, daar.name + ' wisselde van afdeling (vanuit ' + req.supplier.name + ')');
+  logActivity(doel.code, { name: daar.name, staffId: daar.id }, daar.name + ' wisselde van afdeling (vanuit ' + req.supplier.name + ')', 'klok-inlog');
   res.json({ token, supplier: { code: doel.code, name: doel.name } });
 });
 
@@ -124,7 +124,7 @@ app.post('/api/supplier/mijn/wissel', supplierAuth, (req, res) => {
   if (doel.code === req.supplier.code) return res.status(400).json({ error: 'U bent hier al.' });
   const antwoord = posantwoord(doel, req.actor.lid, posities);
   if (!antwoord.token) return res.status(401).json({ error: 'Uw persoonlijke RTG-account is niet meer actief.' });
-  logActivity(doel.code, { name: doel.persoon }, doel.persoon + ' wisselde naar deze werkplek');
+  logActivity(doel.code, { name: doel.persoon, staffId: doel.staffId }, doel.persoon + ' wisselde naar deze werkplek', 'klok-inlog');
   res.json(antwoord);
 });
 };

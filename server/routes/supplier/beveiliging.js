@@ -3,6 +3,8 @@
    posten en handelt inzetaanvragen en incidenten af. De bewaker gebruikt de PDA
    (op staffId): eigen diensten, inklokken op post, patrouillerondes, incidenten
    melden en de SOS-noodknop. Draait op kern/beveiliging. */
+const logboekzicht = require('../../kern/leverancier/logboekzicht');
+const personeelzicht = require('../../kern/leverancier/personeelzicht');
 module.exports = (kern) => {
   const { app, express, supplierAuth, managerOnly, bevIsBeveiliging, bevCommand, bevZetFunctie,
           bevZetPost, bevVerwijderPost, bevBudget, bevZetBudget, bevRooster, bevZetDienst,
@@ -21,7 +23,13 @@ module.exports = (kern) => {
   /* ---- commandocentrum ---- */
   app.post('/api/supplier/beveiliging/command', supplierAuth, (req, res) => {
     if (!eisBeveiliging(req, res)) return;
-    res.json(Object.assign(bevCommand(req.supplier), { shifts: BEVEILIGING_SHIFTS, ernsten: BEVEILIGING_ERNST }));
+    const c = bevCommand(req.supplier);
+    /* Wie er op dienst is ziet iedereen; de in- en uitkloktijden en plekIn (besluit 1A) van een collega
+       alleen een manager -- dezelfde bron als het rooster hieronder
+       (kern/leverancier/logboekzicht.js, besluit 11 oktober 2026). */
+    if (c && Array.isArray(c.opDienst))
+      c.opDienst = c.opDienst.map((d) => logboekzicht.kloktijdenVoor(d, req.actor, d.guardId));
+    res.json(Object.assign(c, { shifts: BEVEILIGING_SHIFTS, ernsten: BEVEILIGING_ERNST }));
   });
   app.post('/api/supplier/beveiliging/functie', supplierAuth, (req, res) => {
     if (!eisBeveiliging(req, res) || !managerOnly(req, res)) return;
@@ -58,7 +66,13 @@ module.exports = (kern) => {
   /* ---- rooster ---- */
   app.post('/api/supplier/beveiliging/rooster', supplierAuth, (req, res) => {
     if (!eisBeveiliging(req, res)) return;
-    res.json(bevRooster(req.supplier, req.body && req.body.van, req.body && req.body.dagen));
+    const r = bevRooster(req.supplier, req.body && req.body.van, req.body && req.body.dagen);
+    /* Het rooster ziet iedereen; de in- en uitkloktijden en plekIn (besluit 1A) van een collega alleen
+       een manager (kern/leverancier/logboekzicht.js, besluit 11 oktober 2026). */
+    for (const dag of (r && r.dagen) || []) for (const p of dag.posten || []) for (const sh of p.shifts || [])
+      sh.bezet = (sh.bezet || []).map((d) => personeelzicht.afwezigRedenVoor(
+        logboekzicht.kloktijdenVoor(d, req.actor, d.guardId), req.actor, d.guardId));   // B1: geen verlofsoort voor een collega
+    res.json(r);
   });
   app.post('/api/supplier/beveiliging/dienst', supplierAuth, (req, res) => {
     if (!eisBeveiliging(req, res) || !managerOnly(req, res)) return;

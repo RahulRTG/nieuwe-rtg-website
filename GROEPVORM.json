@@ -1,0 +1,788 @@
+{
+  "stempel": {
+    "op": "2026-10-12T14:05:50.379Z",
+    "commit": "c2c0e05f4",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/groepvorm.js",
+    "node": "v26.10.0"
+  },
+  "uitleg": "Delen de groepsmodellen van GEMEENSCHAP.md par. 1.1 een VORM? Gemeten met de lezer van scripts/objectmodel.js -- dezelfde als bij Asset, Koopbaar, Career, Moment en Manier -- over TWEE modellenlijsten (ruim en smal). De as is het MODEL en niet de module. De uitslag bepaalt de architectuurkeuze voor FoundationOS (besluit van de eigenaar, 11 oktober 2026).",
+  "grens": "Dit meet de vorm van de DATA en niet of groepen als PROCES op elkaar lijken (lid worden, uitnodigen, opzeggen) -- dat is een vraag naar werkwoorden. Een gedeelde naam is geen gedeelde betekenis. Envelopvelden (uit OBJECTMODEL.json) vallen eruit. De lezer ziet alleen object-literalen met een `id` en minstens vier velden zonder geneste accolades: een model dat zijn rij anders opbouwt staat in `modellenLeeg`, en dat is een blinde vlek en geen nul.",
+  "extraBronnen": [
+    {
+      "map": "server/foundation",
+      "filter": "/^server\\/foundation\\/gezin[^/]*\\.js$/",
+      "reden": "het gezin woont buiten het bereik van objectmodel.js; zonder deze bron telt het als \"deelt niets\""
+    }
+  ],
+  "buitenBeschouwing": [
+    {
+      "model": "objectlaag",
+      "reden": "een projectie die niets bewaart (kern/objectlaag/groep.js); hij leest het genootschap en zou dat dus dubbel tellen"
+    }
+  ],
+  "conclusie": "GEEN GEDEELDE VORM: onder geen van beide lijsten staat een veld in alle groepsmodellen, en ook niet in de helft. Een `communities`-tabel of groepstype waar de modellen in opgaan is daarmee niet gerechtvaardigd. De vorm die overleeft is een PROJECTIE met etiketten (kern/levensgraaf/graaf.js) plus een verklaring van werkwoorden (COMMERCE.md, `Koopbaar`); samenvoegen kan alleen nog tussen een PAAR modellen dat in `paren` aantoonbaar overlapt, en dan per paar beslist.",
+  "stand": "geen-gedeelde-vorm",
+  "ruim": {
+    "modellen": [
+      "genootschap",
+      "gesprekken",
+      "samenkamer",
+      "rendezvousKring",
+      "cercleEntourage",
+      "sportclub",
+      "rtfclubs",
+      "festivalgroep",
+      "reisgezelschap",
+      "lerenProjecten",
+      "gezin",
+      "rtfosPartners",
+      "werkruimte",
+      "school",
+      "livinglab",
+      "democratie"
+    ],
+    "modellenLeeg": [
+      {
+        "model": "klankwerkSamen",
+        "reden": "geen enkele objectvorm gevonden onder /^server\\/kern\\/muziek-samen\\.js$/"
+      }
+    ],
+    "vormen": 145,
+    "velden": 268,
+    "perModel": {
+      "genootschap": {
+        "velden": 9,
+        "modules": [
+          "server/kern/genootschap/index.js",
+          "server/kern/genootschap/inzicht.js",
+          "server/kern/genootschap/prikbord.js"
+        ]
+      },
+      "gesprekken": {
+        "velden": 25,
+        "modules": [
+          "server/kern/comm/bronnen.js",
+          "server/kern/comm/collega.js",
+          "server/kern/comm/gast.js",
+          "server/kern/comm/tonen.js",
+          "server/kern/comm/werk.js"
+        ]
+      },
+      "samenkamer": {
+        "velden": 9,
+        "modules": [
+          "server/kern/samen.js",
+          "server/kern/samenrtf.js"
+        ]
+      },
+      "rendezvousKring": {
+        "velden": 12,
+        "modules": [
+          "server/kern/rendezvous-circles.js",
+          "server/kern/rendezvous-kring.js"
+        ]
+      },
+      "cercleEntourage": {
+        "velden": 4,
+        "modules": [
+          "server/kern/rechterhand/cercle.js",
+          "server/kern/rechterhand/entourage.js"
+        ]
+      },
+      "sportclub": {
+        "velden": 36,
+        "modules": [
+          "server/kern/clubs/fitclub.js",
+          "server/kern/clubs/golf.js",
+          "server/kern/sportclub/index.js",
+          "server/kern/sportclub/sportief.js",
+          "server/kern/sportclub/stadion.js",
+          "server/kern/sportclub/zakelijk.js"
+        ]
+      },
+      "rtfclubs": {
+        "velden": 9,
+        "modules": [
+          "server/kern/rtfclubs.js"
+        ]
+      },
+      "festivalgroep": {
+        "velden": 3,
+        "modules": [
+          "server/kern/festival/groep.js"
+        ]
+      },
+      "reisgezelschap": {
+        "velden": 13,
+        "modules": [
+          "server/kern/reisgezelschap-delen.js",
+          "server/kern/reisgezelschap-opties.js",
+          "server/kern/reisgezelschap-werkruimte.js",
+          "server/kern/reisgezelschap.js"
+        ]
+      },
+      "lerenProjecten": {
+        "velden": 8,
+        "modules": [
+          "server/kern/leren/projecten.js"
+        ]
+      },
+      "gezin": {
+        "velden": 31,
+        "modules": [
+          "server/foundation/gezin.js",
+          "server/foundation/gezinsclaim.js",
+          "server/foundation/gezinseigenaar.js",
+          "server/foundation/gezinshulp.js",
+          "server/foundation/gezinsuitnodiging.js"
+        ]
+      },
+      "rtfosPartners": {
+        "velden": 30,
+        "modules": [
+          "server/kern/rtfos/netwerk-meting.js",
+          "server/kern/rtfos/netwerk.js",
+          "server/kern/rtfos/partners-portaal.js",
+          "server/kern/rtfos/partners.js",
+          "server/kern/rtfos/steden.js"
+        ]
+      },
+      "werkruimte": {
+        "velden": 13,
+        "modules": [
+          "server/bedrijf/leden.js",
+          "server/bedrijf/rollen-register.js",
+          "server/bedrijf/rollen.js",
+          "server/bedrijf/werkruimte.js"
+        ]
+      },
+      "school": {
+        "velden": 25,
+        "modules": [
+          "server/school/gezin.js",
+          "server/school/klas.js",
+          "server/school/ouderportaal-mijn.js",
+          "server/school/ouderportaal.js",
+          "server/school/rollen.js"
+        ]
+      },
+      "livinglab": {
+        "velden": 79,
+        "modules": [
+          "server/kern/livinglab/apparatuur.js",
+          "server/kern/livinglab/bestuur.js",
+          "server/kern/livinglab/bewijs.js",
+          "server/kern/livinglab/capsule.js",
+          "server/kern/livinglab/cyclus.js",
+          "server/kern/livinglab/doorbraak.js",
+          "server/kern/livinglab/ethiek.js",
+          "server/kern/livinglab/impact.js",
+          "server/kern/livinglab/ledger.js",
+          "server/kern/livinglab/mensen.js",
+          "server/kern/livinglab/meting.js",
+          "server/kern/livinglab/observatorium.js",
+          "server/kern/livinglab/opslag.js",
+          "server/kern/livinglab/plan.js",
+          "server/kern/livinglab/publicatie.js",
+          "server/kern/livinglab/spel.js",
+          "server/kern/livinglab/studie.js",
+          "server/kern/livinglab/terugtrekken.js",
+          "server/kern/livinglab/themas.js",
+          "server/kern/livinglab/uitleen.js",
+          "server/kern/livinglab/waarborg.js",
+          "server/kern/livinglab/waarnemen.js",
+          "server/kern/livinglab/werkplaats.js",
+          "server/kern/stadsraad.js"
+        ]
+      },
+      "democratie": {
+        "velden": 2,
+        "modules": [
+          "server/kern/democratie/doe.js"
+        ]
+      }
+    },
+    "inAlleModellen": [],
+    "inMinstensHelft": [],
+    "inEenModelPct": 90.3,
+    "breedGedeeld": [
+      {
+        "veld": "wie",
+        "modellen": 5,
+        "waar": [
+          "cercleEntourage",
+          "gesprekken",
+          "livinglab",
+          "rtfclubs",
+          "werkruimte"
+        ]
+      },
+      {
+        "veld": "af",
+        "modellen": 4,
+        "waar": [
+          "lerenProjecten",
+          "livinglab",
+          "rtfclubs",
+          "school"
+        ]
+      },
+      {
+        "veld": "code",
+        "modellen": 4,
+        "waar": [
+          "livinglab",
+          "rtfclubs",
+          "rtfosPartners",
+          "sportclub"
+        ]
+      },
+      {
+        "veld": "rol",
+        "modellen": 4,
+        "waar": [
+          "gezin",
+          "livinglab",
+          "reisgezelschap",
+          "rtfosPartners"
+        ]
+      },
+      {
+        "veld": "stad",
+        "modellen": 4,
+        "waar": [
+          "cercleEntourage",
+          "livinglab",
+          "rendezvousKring",
+          "rtfosPartners"
+        ]
+      },
+      {
+        "veld": "deelnemers",
+        "modellen": 3,
+        "waar": [
+          "democratie",
+          "gesprekken",
+          "sportclub"
+        ]
+      },
+      {
+        "veld": "leden",
+        "modellen": 3,
+        "waar": [
+          "genootschap",
+          "lerenProjecten",
+          "samenkamer"
+        ]
+      },
+      {
+        "veld": "toegang",
+        "modellen": 3,
+        "waar": [
+          "festivalgroep",
+          "livinglab",
+          "samenkamer"
+        ]
+      }
+    ],
+    "paren": [
+      {
+        "paar": [
+          "genootschap",
+          "lerenProjecten"
+        ],
+        "gedeeld": 2,
+        "overlap": 0.133,
+        "velden": [
+          "leden",
+          "uitgenodigd"
+        ]
+      },
+      {
+        "paar": [
+          "samenkamer",
+          "festivalgroep"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.091,
+        "velden": [
+          "toegang"
+        ]
+      },
+      {
+        "paar": [
+          "cercleEntourage",
+          "rtfclubs"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.083,
+        "velden": [
+          "wie"
+        ]
+      },
+      {
+        "paar": [
+          "rendezvousKring",
+          "cercleEntourage"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.067,
+        "velden": [
+          "stad"
+        ]
+      },
+      {
+        "paar": [
+          "samenkamer",
+          "lerenProjecten"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.063,
+        "velden": [
+          "leden"
+        ]
+      },
+      {
+        "paar": [
+          "cercleEntourage",
+          "werkruimte"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.063,
+        "velden": [
+          "wie"
+        ]
+      },
+      {
+        "paar": [
+          "rtfclubs",
+          "lerenProjecten"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.063,
+        "velden": [
+          "af"
+        ]
+      },
+      {
+        "paar": [
+          "genootschap",
+          "samenkamer"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.059,
+        "velden": [
+          "leden"
+        ]
+      },
+      {
+        "paar": [
+          "gesprekken",
+          "werkruimte"
+        ],
+        "gedeeld": 2,
+        "overlap": 0.056,
+        "velden": [
+          "extern",
+          "wie"
+        ]
+      },
+      {
+        "paar": [
+          "rtfclubs",
+          "rtfosPartners"
+        ],
+        "gedeeld": 2,
+        "overlap": 0.054,
+        "velden": [
+          "code",
+          "contact"
+        ]
+      },
+      {
+        "paar": [
+          "rtfosPartners",
+          "livinglab"
+        ],
+        "gedeeld": 5,
+        "overlap": 0.048,
+        "velden": [
+          "actief",
+          "code",
+          "land",
+          "rol",
+          "stad"
+        ]
+      },
+      {
+        "paar": [
+          "sportclub",
+          "rtfosPartners"
+        ],
+        "gedeeld": 3,
+        "overlap": 0.048,
+        "velden": [
+          "code",
+          "key",
+          "sinds"
+        ]
+      },
+      {
+        "paar": [
+          "rtfclubs",
+          "werkruimte"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.048,
+        "velden": [
+          "wie"
+        ]
+      },
+      {
+        "paar": [
+          "sportclub",
+          "rtfclubs"
+        ],
+        "gedeeld": 2,
+        "overlap": 0.047,
+        "velden": [
+          "code",
+          "team"
+        ]
+      },
+      {
+        "paar": [
+          "school",
+          "livinglab"
+        ],
+        "gedeeld": 4,
+        "overlap": 0.04,
+        "velden": [
+          "af",
+          "antwoord",
+          "deadline",
+          "toestemming"
+        ]
+      }
+    ]
+  },
+  "smal": {
+    "modellen": [
+      "genootschap",
+      "samenkamer",
+      "rendezvousKring",
+      "cercleEntourage",
+      "sportclub",
+      "rtfclubs",
+      "festivalgroep",
+      "reisgezelschap",
+      "lerenProjecten",
+      "gezin",
+      "rtfosPartners",
+      "school",
+      "livinglab"
+    ],
+    "modellenLeeg": [
+      {
+        "model": "gesprekken",
+        "reden": "geen enkele objectvorm gevonden onder /^server\\/kern\\/comm\\/(gesprek|deelnemer)\\.js$/"
+      },
+      {
+        "model": "werkruimte",
+        "reden": "geen enkele objectvorm gevonden onder /^server\\/bedrijf\\/werkruimte\\.js$/"
+      },
+      {
+        "model": "klankwerkSamen",
+        "reden": "geen enkele objectvorm gevonden onder /^server\\/kern\\/muziek-samen\\.js$/"
+      },
+      {
+        "model": "democratie",
+        "reden": "geen enkele objectvorm gevonden onder /^server\\/kern\\/democratie\\/kwestie\\.js$/"
+      }
+    ],
+    "vormen": 42,
+    "velden": 89,
+    "perModel": {
+      "genootschap": {
+        "velden": 4,
+        "modules": [
+          "server/kern/genootschap/index.js"
+        ]
+      },
+      "samenkamer": {
+        "velden": 9,
+        "modules": [
+          "server/kern/samen.js",
+          "server/kern/samenrtf.js"
+        ]
+      },
+      "rendezvousKring": {
+        "velden": 4,
+        "modules": [
+          "server/kern/rendezvous-circles.js"
+        ]
+      },
+      "cercleEntourage": {
+        "velden": 4,
+        "modules": [
+          "server/kern/rechterhand/cercle.js",
+          "server/kern/rechterhand/entourage.js"
+        ]
+      },
+      "sportclub": {
+        "velden": 15,
+        "modules": [
+          "server/kern/sportclub/index.js"
+        ]
+      },
+      "rtfclubs": {
+        "velden": 9,
+        "modules": [
+          "server/kern/rtfclubs.js"
+        ]
+      },
+      "festivalgroep": {
+        "velden": 3,
+        "modules": [
+          "server/kern/festival/groep.js"
+        ]
+      },
+      "reisgezelschap": {
+        "velden": 7,
+        "modules": [
+          "server/kern/reisgezelschap.js"
+        ]
+      },
+      "lerenProjecten": {
+        "velden": 8,
+        "modules": [
+          "server/kern/leren/projecten.js"
+        ]
+      },
+      "gezin": {
+        "velden": 12,
+        "modules": [
+          "server/foundation/gezin.js"
+        ]
+      },
+      "rtfosPartners": {
+        "velden": 11,
+        "modules": [
+          "server/kern/rtfos/partners.js"
+        ]
+      },
+      "school": {
+        "velden": 6,
+        "modules": [
+          "server/school/klas.js"
+        ]
+      },
+      "livinglab": {
+        "velden": 10,
+        "modules": [
+          "server/kern/stadsraad.js"
+        ]
+      }
+    },
+    "inAlleModellen": [],
+    "inMinstensHelft": [],
+    "inEenModelPct": 88.8,
+    "breedGedeeld": [
+      {
+        "veld": "code",
+        "modellen": 3,
+        "waar": [
+          "livinglab",
+          "rtfclubs",
+          "rtfosPartners"
+        ]
+      },
+      {
+        "veld": "leden",
+        "modellen": 3,
+        "waar": [
+          "genootschap",
+          "lerenProjecten",
+          "samenkamer"
+        ]
+      },
+      {
+        "veld": "stad",
+        "modellen": 3,
+        "waar": [
+          "cercleEntourage",
+          "livinglab",
+          "rtfosPartners"
+        ]
+      }
+    ],
+    "paren": [
+      {
+        "paar": [
+          "genootschap",
+          "lerenProjecten"
+        ],
+        "gedeeld": 2,
+        "overlap": 0.2,
+        "velden": [
+          "leden",
+          "uitgenodigd"
+        ]
+      },
+      {
+        "paar": [
+          "rtfclubs",
+          "rtfosPartners"
+        ],
+        "gedeeld": 2,
+        "overlap": 0.111,
+        "velden": [
+          "code",
+          "contact"
+        ]
+      },
+      {
+        "paar": [
+          "rtfosPartners",
+          "livinglab"
+        ],
+        "gedeeld": 2,
+        "overlap": 0.105,
+        "velden": [
+          "code",
+          "stad"
+        ]
+      },
+      {
+        "paar": [
+          "samenkamer",
+          "festivalgroep"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.091,
+        "velden": [
+          "toegang"
+        ]
+      },
+      {
+        "paar": [
+          "genootschap",
+          "samenkamer"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.083,
+        "velden": [
+          "leden"
+        ]
+      },
+      {
+        "paar": [
+          "cercleEntourage",
+          "rtfclubs"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.083,
+        "velden": [
+          "wie"
+        ]
+      },
+      {
+        "paar": [
+          "cercleEntourage",
+          "livinglab"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.077,
+        "velden": [
+          "stad"
+        ]
+      },
+      {
+        "paar": [
+          "cercleEntourage",
+          "rtfosPartners"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.071,
+        "velden": [
+          "stad"
+        ]
+      },
+      {
+        "paar": [
+          "samenkamer",
+          "lerenProjecten"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.063,
+        "velden": [
+          "leden"
+        ]
+      },
+      {
+        "paar": [
+          "rtfclubs",
+          "lerenProjecten"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.063,
+        "velden": [
+          "af"
+        ]
+      },
+      {
+        "paar": [
+          "rtfclubs",
+          "livinglab"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.056,
+        "velden": [
+          "code"
+        ]
+      },
+      {
+        "paar": [
+          "reisgezelschap",
+          "gezin"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.056,
+        "velden": [
+          "rol"
+        ]
+      },
+      {
+        "paar": [
+          "sportclub",
+          "livinglab"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.042,
+        "velden": [
+          "veld"
+        ]
+      },
+      {
+        "paar": [
+          "genootschap",
+          "rendezvousKring"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      },
+      {
+        "paar": [
+          "genootschap",
+          "cercleEntourage"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      }
+    ]
+  }
+}

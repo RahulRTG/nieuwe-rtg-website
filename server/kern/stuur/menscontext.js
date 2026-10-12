@@ -8,11 +8,12 @@
    Een vijfde vorm erbij zetten is de fout die dit huis al eens heeft betaald;
    dit bestand NORMALISEERT wat er is in plaats van er iets naast te leggen.
 
-   EN CONTEXT BEREIKT DE RESOLVER VANDAAG AL, ONGETYPT. rahul-tab.js plakt hem
-   in de VRAAGTEKST ('...Actieve context: ' + app + ' . ' + deel). Die tekst gaat
-   rechtstreeks de resolver en het model in, zonder lengtegrens, zonder vorm en
-   zonder spoor. Fase 4 voegt dus geen weg toe die er niet was -- hij maakt de
-   bestaande weg zichtbaar, begrensd en bewijsbaar.
+   CONTEXT BEREIKTE DE RESOLVER EERST OOK ONGETYPT. rahul-tab.js plakte hem in
+   de VRAAGTEKST ('...Actieve context: ' + app + ' . ' + deel), zonder grens,
+   vorm of spoor. Fase 4 maakte die weg zichtbaar en begrensd; op 12 oktober 2026
+   is het plakken weggehaald, want het maakte de schermnaam tot een woord van de
+   VRAAG -- en dan leest ./menscontext-relatie.js "Reisbureau" als een onderwerp
+   dat de mens noemde. Intentie en context reizen sindsdien gescheiden.
 
    DRIE DELEN, EN ZE ZIJN NIET INWISSELBAAR:
 
@@ -69,7 +70,10 @@ const MAX_ITEMS = 8;       /* meer opties dan dit is geen keuze meer */
 const INTERACTIES = Object.freeze(['vergelijking', 'keuze', 'formulier', 'selectie', 'onbekend']);
 
 const CONTRACTSLEUTELS = Object.freeze(['presentatie', 'verwijzingen', 'interactie',
-  'app', 'deel', 'selectie', 'wereld', 'scherm']);
+  'app', 'deel', 'selectie', 'wereld', 'scherm', 'op']);
+
+/* `op` is het leesmoment van het blikveld; zie ./menscontext-vers.js. */
+const { verouderd, MAX_OUDERDOM_MS, MAX_VOORUIT_MS } = require('./menscontext-vers');
 
 /* Vrije tekst van een client: lengte af, besturingstekens weg, en verder niets
    veranderen -- een ingelezen waarde wordt nooit stilletjes verbeterd. */
@@ -107,6 +111,9 @@ function saneer(ruw, opties) {
       reden: 'Er is geen context meegestuurd; de fase kwam niet aan de beurt.' };
 
   const gewist = [];
+  const oud = ruw.op !== undefined ? verouderd(ruw.op, opties && opties.nu) : null;
+  if (oud) return { stand: 'NOT_RUN', context: null, woorden: [], gewist: [{ sleutel: 'op', reden: oud }],
+    reden: 'De context is niet gebruikt: ' + oud + '.' };
   const p = ruw.presentatie && typeof ruw.presentatie === 'object' ? ruw.presentatie : ruw;
   /* De bestaande vier vormen komen hier bij elkaar: app/deel/selectie van de
      Rahul-tab, wereld/scherm van de reis- en living-schermen. */
@@ -151,4 +158,4 @@ function saneer(ruw, opties) {
 }
 
 module.exports = { saneer, woordenVan, handtekening, INTERACTIES, CONTRACTSLEUTELS,
-  MAX_TEKST, MAX_ITEMS, MAX_WOORDEN };
+  MAX_TEKST, MAX_ITEMS, MAX_WOORDEN, MAX_OUDERDOM_MS, MAX_VOORUIT_MS };

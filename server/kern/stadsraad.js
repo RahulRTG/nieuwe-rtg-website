@@ -63,8 +63,12 @@ module.exports = ({ db, save, crypto }) => {
   }
 
   /* ---- besluiten over die uitslagen: beide kanten stemmen ---- */
+  /* Wie er aan RTG-kant stemde is een SESSIESLEUTEL (dedupe per mens); naar
+     buiten -- ook naar de stadspartner -- is dat "RTG-medewerker". */
+  const label = (t) => String(t || '').replace(/user-\d+/g, 'RTG-medewerker');
   const pubBesluit = b => ({ id: b.id, projectId: b.projectId, titel: b.titel, voorstel: b.voorstel,
-    door: b.door, status: b.status, uitslag: b.uitslag || null, stemmen: b.stemmen, at: b.at });
+    door: label(b.door), status: b.status, uitslag: b.uitslag || null, at: b.at,
+    stemmen: b.stemmen.map(s => Object.assign({}, s, { wie: s.kant === 'rtg' ? label(s.wie) : s.wie })) });
   function besluitStart(projectId, voorstel, door, kant) {
     const u = uitslagen().find(x => x.id === String(projectId || ''));
     if (!u) return { status: 404, error: 'Deze uitslag ligt niet op de raadstafel.' };

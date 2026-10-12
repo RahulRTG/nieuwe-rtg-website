@@ -13,11 +13,13 @@ De stand vandaag, machineleesbaar in `server/kern/vrijheid/lus.js`:
 **PEOPLE_TIME_STATUS = BLOCKED.** De motor is gebouwd en bewezen op een
 teambeeld, de routes staan en zijn tegen een echte server beproefd, en er
 zijn twee schermen: **Mijn tijd** in de personeelsapp en **Tijd van het team**
-in het Kantoor van de zaak. Wat nog niet aangesloten is: de bronnen die het
-teambeeld in productie vullen (verantwoordelijkheden, een lopend dienstverband
-in de zaaiset) en het vakantiesaldo, en de meeste beleidswaarden staan nog
-open. Een toegekende hele vrije dag bereikt de loonstrook wel (par. 7, punt 7).
-Dat is par. 7.
+in het Kantoor van de zaak. Het teambeeld leest het dienstverband langs de
+gewone routes (par. 7, punt 8), en het vakantierecht wordt gelezen uit
+dienstverband, contract en verzuimregister -- maar er staat geen getal, want de
+wettelijke rekenregel is niet juridisch getoetst en dus open. Wat nog niet
+aangesloten is: verantwoordelijkheden per dienst, een lopend dienstverband in
+de zaaiset, en de meeste beleidswaarden. Een toegekende hele vrije dag bereikt
+de loonstrook wel (par. 7, punt 7). Dat is par. 7.
 
 ---
 
@@ -78,7 +80,7 @@ stap verder brengen, en **nieuw** betekent dat er niets was.
 | Dienstverband als waarheid | BESTAAT | `server/kern/concern/employment.js` (besluit ARBEID.md par. 7a) | HERGEBRUIKEN: "in dienst op datum" |
 | Verjaardag | ONTBREEKT | staff draagt geen geboortedatum; `md.geboren` staat bij het lid en hoort niet naar de werkgever (MN-02) | NIEUW (`instellingen.js`): alleen `MM-DD`, door de mens zelf opgegeven |
 | Verlof en ziekte | DEELS, en dubbel | `server/kern/payroll/verzuim.js` én `db.data.verlof` via `server/routes/staff/dienst.js` | BOTST: twee opslagen, zie par. 4 |
-| Vakantiesaldo | ONTBREEKT | geen teller in dit huis | NIEUW als teller in `categorieen.js`; het RECHT komt van contract en payroll |
+| Vakantiesaldo | DEELS | de teller in `categorieen.js`; het recht uit `saldobron.js` (dienstverband, contractversie, verzuimregister) | AANGESLOTEN zonder tweede register; de rekenregel is OPEN (par. 7, punt 8) |
 | RTG Day, verjaardagvrijheid, eerder naar huis, hersteltijd | ONTBREEKT | | NIEUW |
 | Roosters | BESTAAT, zeven stuks | `server/kern/personeel.js`, `server/kern/agent.js`, `server/kern/beveiliging/rooster/` en vier andere (PLANNING.md par. 1) | HERGEBRUIKEN via een rooster-adapter; de adapter ontbreekt |
 | Dekking op bezetting | DEELS | `server/kern/beveiliging/rooster/` kent `minMan` | UITBREIDEN: nieuw in `dekking.js` met bevoegdheden erbij |
@@ -160,6 +162,7 @@ modelaanroep:
 | `capaciteit.js` | van blokkade naar opleidingsbehoefte, en terug |
 | `standen.js` | vijf standmachines met expliciete overgangen |
 | `index.js` + `mens.js` + `aanbod.js` + `herstel.js` + `jaarplan.js` + `beeld.js` | vastleggen, menselijke beoordeling, aanbod, jobs en de drie beelden |
+| `saldobron.js` | het vakantierecht uit dienstverband, contract en verzuimregister; de rekenregel blijft open |
 | `teambeeld.js` + `instellingen.js` + `huis.js` + `rtghuis.js` | het teambeeld uit de bestaande bronnen, wat de zaak en de mens zelf opgeven, RTG zelf als werkgever met de kamers als teams, en de montage als `kern.vrijheid` |
 | `lus.js` | PEOPLE_TIME_LOOP_COMPLETENESS_CHECK |
 
@@ -212,6 +215,12 @@ BLOCKED_BY_LAW_OR_POLICY met de reden, en verzint niets:
   aanvragen voor schaarse momenten;
 - de **herstelgrenzen** (uren in veertien dagen, dagen achter elkaar);
 - de **drempel voor een capaciteitsgat**;
+- de **wettelijke rekenregel voor het vakantierecht**
+  (`verlof.wettelijkWekenPerJaar`, laag LEGAL_BASELINE): in Nederland een
+  veelvoud van de arbeidsduur per week (art. 7:634 BW), maar hoe die regel hier
+  uitpakt -- naar rato, bij wisselende uren, tijdens ziekte, en hoe vakantie in
+  dagen uit de verlofroute in uren telt -- is niet juridisch getoetst. Niemand
+  zet hem, en het recht staat dus op "niet bekend" met de reden;
 - **minimale rust**: de 11 uur uit de Arbeidstijdenwet staat al in de
   beveiligingsroosters, maar moet per cao en contractvorm worden gevalideerd.
 
@@ -341,7 +350,35 @@ valideren:
      een toegekende vrije dag staat daar vrij. Sinds 29 september lezen ook de
      OV-dienst, het festivalrooster en de taxidispatch het (PLANNING.md par. 6);
      een school houdt een eigen verlofregister en hangt er met opzet niet aan.
-     Het vakantiesaldo komt nergens vandaan.
+8. **Het vakantierecht en het dienstverband, aangesloten** (11 oktober 2026).
+   `server/kern/vrijheid/saldobron.js` rekent het recht bij elke vraag opnieuw
+   uit drie bestaande waarheden, en er komt geen tweede saldoregister:
+   - het DIENSTVERBAND uit het teambeeld (employment aan de entiteit van de
+     zaak, ARBEID.md par. 7a);
+   - de ARBEIDSDUUR uit de contractversie in de payroll
+     (`kern/payroll/contracten.js`, dezelfde die de loonrun leest);
+   - wat er al OPGENOMEN is: de eigen boekingen van de motor, en vakantie die
+     langs de oude verlofroute in het verzuimregister staat (zonder `bron`;
+     `verzuim.zonderBron()` leest dat, alleen lezen).
+
+   De rekenregel staat als `verlof.wettelijkWekenPerJaar` in LEGAL_BASELINE en
+   wordt door niemand gezet, dus het recht is `null` met de reden -- tot in de
+   zin van het besluit (een vakantieverzoek wordt UNKNOWN en zegt waarom). Ook
+   mét een regel rekent de module alleen het eenvoudigste geval (heel jaar in
+   dienst, een contract met vaste omvang dat het hele jaar gelijk blijft, geen
+   vakantie uit de verlofroute) en zegt bij alle andere waarom niet.
+   Bovenwettelijk verlof staat in geen enkel contract, dus `contractueel` is
+   altijd onbekend met die reden. Mijn tijd toont waar het recht uit gerekend
+   wordt (soort, uren per week, in dienst sinds), en nooit het uurloon.
+
+   `test/vrijheid-saldo.test.js` bewijst het tegen een echte server langs de
+   gewone routes: een ondernemer koppelt zijn zaak aan zijn entiteit, haalt het
+   dienstverband van een medewerker in en legt diens contract vast; daarna ziet
+   de medewerker dat hij in dienst is, en komt zijn vakantieverzoek langs
+   ELIGIBILITY tot de open regel. Drie mutaties (open regel genegeerd, de
+   verlofroute genegeerd, de route weer zonder rechten) laten hem alle drie
+   zakken. Wat hij niet bewijst: een rond verzoek in de browser, want de
+   zaaiset heeft nog steeds geen zaak met een dienstverband.
 
    `test/vrijheid-verzuim.test.js` draait de echte motor, het echte register
    en de echte samenstelling van een loonrun.

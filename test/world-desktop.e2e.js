@@ -250,10 +250,14 @@ test('direct function screens keep their inputs when the common frame changes si
     await page.setViewportSize({ width: 1440, height: 1050 });
     assert.equal(await page.locator('#zoek').inputValue(), 'Desktop taken');
     assert.equal(await page.locator('.wd-shell').count(), 1);
-    const expected = 'rgb(16, 13, 10)';
+    /* De www-stijl (#534, #549) geeft het bureau de ivoren grond van zijn wereld; voor
+       de leefwereld is dat rgb(237, 232, 223) -- dezelfde waarde als cinematicCanvas in
+       scripts/desktop-audit.js. Het oude donkere canvas (16, 13, 10) bestaat niet meer. */
+    const expected = 'rgb(237, 232, 223)';
     assert.equal(await page.locator('body').evaluate(e => getComputedStyle(e).backgroundColor), expected);
     // Control experiment: the rendered check detects a wrong pure-black theme.
-    await page.addStyleTag({ content: 'body[data-rtg-layout][data-rtg-world][data-rtg-skin][data-rtg-desktop]{background:#000!important}' });
+    // inline en !important: dat wint van elke stylesheetregel, ook van de www-laag
+    await page.locator('body').evaluate(e => e.style.setProperty('background', '#000', 'important'));
     assert.notEqual(await page.locator('body').evaluate(e => getComputedStyle(e).backgroundColor), expected);
   } finally { await ctx.close(); }
 });
@@ -280,8 +284,10 @@ test('a missing catalogue reports failure inside the standard without restoring 
     assert.equal(await page.locator('.wd-shell').count(), 1);
     assert.equal(await page.locator('.wd-home').isVisible(), true);
     assert.match(await page.locator('.wd-announcement').innerText(), /kon niet worden geladen/);
+    /* De www-stijl laat de schil over de volle breedte lopen (rtg-cinematic-system.css,
+       .wd-shell width:100%); het oude kader sprong 24px in. */
     const x = await page.locator('.wd-shell').evaluate(e => e.getBoundingClientRect().x);
-    assert.equal(x, 24);
+    assert.equal(x, 0);
   } finally { await ctx.close(); }
 });
 

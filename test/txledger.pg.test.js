@@ -10,6 +10,7 @@
    hebben. Draai ze daarom serieel via `npm run test:pg` (of geef elke toets een
    eigen database). */
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const path = require('path');
 const { execFileSync } = require('child_process');
@@ -17,7 +18,7 @@ const { execFileSync } = require('child_process');
 const DB = process.env.DATABASE_URL || process.env.PG_URL;
 
 test('grootboek: RAM-venster + verlies-vrij vegen + historie + mutatie-doorstroom',
-  { skip: DB ? false : 'DATABASE_URL ontbreekt; deze integratietest vergt een echte Postgres' }, () => {
+  { skip: vereist('pg', !!DB, 'DATABASE_URL ontbreekt; deze integratietest vergt een echte Postgres') }, () => {
   const uit = execFileSync(process.execPath, [path.join(__dirname, 'txledger-rit.js')],
     { env: { ...process.env, DATABASE_URL: DB }, encoding: 'utf8', timeout: 120000 });
   const r = JSON.parse(uit.trim().split('\n').pop());

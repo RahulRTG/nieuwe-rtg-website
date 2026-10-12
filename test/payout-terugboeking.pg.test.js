@@ -5,10 +5,11 @@
 'use strict';
 
 const test = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const URL = process.env.DATABASE_URL || process.env.PG_URL;
-const OVERSLAAN = URL ? false : 'DATABASE_URL ontbreekt; deze proef vereist een echte PostgreSQL';
+const OVERSLAAN = vereist('pg', !!URL, 'DATABASE_URL ontbreekt; deze proef vereist een echte PostgreSQL');
 
 test('payout-teruggang is atomair over twee PostgreSQL-instances en crash/retry',
   { skip: OVERSLAAN, timeout: 120000 }, async () => {

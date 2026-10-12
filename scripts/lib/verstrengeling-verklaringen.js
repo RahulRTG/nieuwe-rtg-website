@@ -10,6 +10,23 @@ module.exports = [
      boardroom-Rahul RTG's eigen registers lezen via kern/registerblik/ in plaats
      van het uit zijn hoofd te moeten weten. De rand loopt een kant op: de
      registerblik kent de afdelingen niet, en leest alleen registers bij naam. */
+  /* HET VERBOND DEELT DE AFSPRAAKVELDEN VAN DE PARTNERSTICHTING. kern/verbond/
+     legt dezelfde vijf vragen vast (geld, vrijwilligers, persoonsgegevens,
+     aansprakelijk, rapportage) als kern/rtfos/partners.js, met een andere
+     woordenlijst. Een tweede lijst zou de eerste plek zijn waar ze uit elkaar
+     lopen (GEMEENSCHAP-FASE0.md par. 4.2: hergebruik, geen kopie). De rand
+     leest alleen twee pure exports; het verbond kent geen partner en de
+     partner kent geen verbond. */
+  { van: 'domein:verbond', naar: 'domein:rtfos', soort: 'DOMEINRELATIE',
+    reden: 'het verbond gebruikt AFSPRAAKVELDEN en de pure toetsAfspraken() van rtfos/partners.js, zodat de vijf afspraakvragen op een plek staan; geen opslag en geen partner wordt aangeraakt' },
+  /* DE GEZINSDEUR VAN HET GENOOTSCHAP LEENT DE POORT, NIET DE ROUTES.
+     routes/member/genootschap-gezin.js (B1, GEMEENSCHAP-FASE0.md par. 4.1) hangt
+     achter gezinsPoort uit routes/connect-gezinsdeur.js: rtf.verifieerProfiel en
+     gasten eruit. Een eigen kopie zou een tweede definitie van wie een
+     gezinslid is worden, onder dezelfde naam die kern/handlerpoorten/buiten.js
+     en scripts/lib/bewakers.js verklaren (LAT.md regel 4). */
+  { van: 'ingang:member', naar: 'ingang:connect-gezinsdeur', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'de gezinsdeur van het genootschap gebruikt dezelfde gezinsPoort (verifieerProfiel, gasten eruit) als Foundation Connect; een kopie zou een tweede definitie van een gezinslid onder een verklaarde poortnaam zijn' },
   { van: 'domein:afdelingen', naar: 'domein:registerblik', soort: 'DOMEINRELATIE',
     reden: 'het boardroomadvies vraagt de registerblik wat de registers over productie, bewijs en routes zeggen; de registerblik leest alleen, en kent de afdelingen niet' },
   { van: 'ingang:ik', naar: 'ingang:presentatie-beelden', soort: 'ORKESTRATIE',
@@ -43,6 +60,15 @@ module.exports = [
      domein. */
   { van: 'domein:foundation', naar: 'domein:stroomticket', soort: 'GEDEELDE_PRIMITIEF',
     reden: 'gezinsstroom en lesstroom openen hun live-stroom met hetzelfde eenmalige, kortlevende ticket uit kern/stroomticket.js; twee kopieen zouden twee definities van eenmalig worden' },
+  /* DE SESSIESTROOM (6 oktober 2026). Lid, zaak, kantoor, theater en het
+     schoolbelkanaal openden hun EventSource met de volledige sessie in het
+     adres. kern/sessiestroom.js ruilt die sessie (in de kop) voor een ticket uit
+     dezelfde mechaniek als de gezins- en lesstroom; het voegt alleen de
+     verzegelde sessie en de hercontrole per soort toe. */
+  { van: 'domein:sessiestroom', naar: 'domein:stroomticket', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'de sessiestroomtickets zijn exemplaren van kern/stroomticket.js (uitgifte, eenmalige claim, binding, plafond); een eigen kopie zou een tweede definitie van eenmalig worden' },
+  { van: 'domein:school', naar: 'domein:sessiestroom', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'het klas-belkanaal ruilt het gezins- of leraartoken voor hetzelfde sessiestroomticket als lid, zaak en kantoor, met klas en gezin als binding; de vragen wie er mag bellen blijven in server/school/bellen.js' },
   { van: 'domein:pasgeschiedenis', naar: 'domein:eigentransactie', soort: 'GEDEELDE_PRIMITIEF',
     reden: 'de pasovergang schrijft via kern/eigentransactie.js in een eigen collectietransactie, zodat gelijktijdige registraties niet in de requestcommit botsen' },
   { van: 'domein:aanwezigheid', naar: 'domein:eigentransactie', soort: 'GEDEELDE_PRIMITIEF',
@@ -53,6 +79,13 @@ module.exports = [
      geen passkey had, en was hij daarna dicht (23 september 2026: drie routes). */
   { van: 'domein:zwaarbewijs', naar: 'domein:webauthn-acties', soort: 'BELEID',
     reden: 'de zware poort weigert een actienaam die niet in de gesloten lijst ZWARE_ACTIES staat, zodat een route met een onbekende naam meteen zakt in plaats van pas als de eigenaar een passkey heeft' },
+  /* DE BESTANDENSPIEGEL IS EEN UITGANG (#582, OFFICE.md par. 4 grens 4). Een
+     Office-document dat in de bestandenkluis gespiegeld wordt, draagt zijn
+     classificatie mee, en die leest maar een plek: kern/office/uitgangspoort.js.
+     Een eigen `classificatie === 'strikt'` in bestanden.js zou de vijfde kopie zijn
+     waar die poort juist voor bestaat. */
+  { van: 'domein:bestanden', naar: 'domein:office', soort: 'BELEID',
+    reden: 'de spiegel van een Office-document naar de bestandenkluis vraagt zijn classificatie aan de uitgangspoort van kern/office, zodat die op een plek wordt gelezen; bestanden raakt geen Office-opslag aan' },
   { van: 'domein:bestanden', naar: 'domein:document-capability', soort: 'DOMEINRELATIE',
     reden: 'De persoonlijke bestandenkluis delegeert trash/restore aan haar eigen versiegebonden lifecyclecontract; UI, Edge Bar, API en bevestigde Rahul-aanvragen krijgen zo dezelfde eigenaarcontrole en transactie.' },
   /* DE KEURING ONDER DE VERTAALMOTOR. server/translate/ levert vertalingen en
@@ -384,6 +417,8 @@ module.exports = [
     reden: 'mail.js r.50: de transporter van de mail; een onderwerp over meerdere bestanden' },
   { van: 'motor:mail', naar: 'motor:smtp-direct', soort: 'DOMEINRELATIE',
     reden: 'zelfde bestand: de tweede bezorgweg, zonder relay' },
+  { van: 'motor:mail', naar: 'motor:post-vanger', soort: 'DOMEINRELATIE',
+    reden: 'mail.js leest of de postvanger van de testwereld aan staat (BETROUWBAARHEID.md par. 4): de vanger is de laatste meter van de bezorging, niet een eigen domein' },
   { van: 'motor:papieren', naar: 'motor:bewaarveger', soort: 'DOMEINRELATIE',
     reden: 'papieren/huidig.js r.15 leest STANDAARD: welke termijn standaard geldt staat bij de veger die hem uitvoert' },
   { van: 'motor:pg', naar: 'motor:pgwire', soort: 'EIGEN_DATA',

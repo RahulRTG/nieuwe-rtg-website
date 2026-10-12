@@ -215,7 +215,11 @@ function stempel(extra, opties) {
     boomVuil: vuil === null ? null : vuil.code.length > 0,
     boomAnders: vuil === null ? null : vuil.anders.length,
     instrument: instrumentPad(wortel),
-    node: process.version
+    node: process.version,
+    /* De gemeten invoer (ARCHITECTOPDRACHT.md fase 2), alleen als de generator
+       met scripts/lib/invoerspoor-preload.js draait; anders undefined, en dan
+       valt het veld uit de JSON en is dit stempel ongewijzigd. */
+    invoer: global.__rtgInvoerspoor ? require('./invoerspoor').blok((opties && opties.uitvoer) || []) : undefined
   }, extra || {});
 }
 

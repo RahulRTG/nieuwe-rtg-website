@@ -159,6 +159,8 @@ module.exports = (kern) => {
     res.json({ ok: true, audit: workspaceAudit.lees(accounts.getMemberState(id) || {}) });
   });
 
+  require('./ik-workspace-rechten')({ app, auth });
+
   app.post('/api/ik/workspace/audit/noteer', auth, (req, res) => {
     const id = uid(req);
     if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });

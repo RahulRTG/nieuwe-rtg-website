@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-30T06:58:34.697Z",
-    "commit": "e7da7900",
+    "op": "2026-10-11T18:03:29.047Z",
+    "commit": "170a819a",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/overgangsvorm.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
   "uitleg": "Is er EEN overgang onder werk, leren, bevoegdheid, buurtinitiatieven, kennis en blauwdrukken? Zestien overgangen tegen veertien dimensies, met een citaat per cel dat letterlijk in de code moet staan, plus proeven op de echte modules. De vraag staat in VERDER.md par. 2; de eigenaar vroeg deze meter het idee kapot te proberen te krijgen.",
   "grens": "DE INDELING IS EEN OORDEEL: het citaat bewijst dat de code er staat, niet dat hij deze dimensie IS. Daarom staat de lexicale as ernaast en wordt elke onenigheid gemeld in plaats van beslecht. De vormas leest alleen expliciete velden (de blinde vlek van scripts/objectmodel.js) en een drager die in twee overgangen staat, deelt zijn velden met zichzelf. De proeven draaien de echte modules met een verzonnen context: ze bewijzen dat een poort dichtgaat en een besturing opengaat, niet dat de route eromheen hetzelfde doet. Een overgang zonder drager telt niet mee in de noemer.",
@@ -1475,9 +1475,9 @@
     "zonderVorm": [
       "bevoegd"
     ],
-    "velden": 92,
+    "velden": 99,
     "inAlleOvergangen": [],
-    "inEenOvergangPct": 47.8,
+    "inEenOvergangPct": 44.4,
     "gedeeldeDragers": [
       {
         "paar": [
@@ -1597,36 +1597,155 @@
       "tenOnrechte": 1
     },
     "buurtenQueryveilig": {
-      "wat": "De gemeente ziet hulpvragen per buurt; buurten onder 5 worden samengevoegd. Wat als er precies een onder de drempel valt?",
-      "eenKleineBuurt": [
+      "wat": "De gemeente ziet hulpvragen per buurt en het totaal, weet welke buurten hulpvragen hebben en kent het algoritme. Kan zij het aantal van een verborgen buurt afleiden?",
+      "gevallen": [
         {
-          "wijk": "Noord",
-          "aantal": 12
+          "invoer": {
+            "Zeewijk": 3,
+            "Centrum": 10,
+            "Noord": 12
+          },
+          "beeld": [
+            [
+              "Noord",
+              12
+            ],
+            [
+              "overige buurten (2)",
+              13
+            ]
+          ],
+          "lekt": []
         },
         {
-          "wijk": "Centrum",
-          "aantal": 10
+          "invoer": {
+            "Zeewijk": 1,
+            "Centrum": 5,
+            "Noord": 12
+          },
+          "beeld": [
+            [
+              "overige buurten (3)",
+              18
+            ]
+          ],
+          "lekt": []
         },
         {
-          "wijk": "overige buurten (1)",
-          "aantal": 3,
-          "samengevoegd": true
+          "invoer": {
+            "Zeewijk": 4,
+            "Centrum": 5,
+            "Noord": 5
+          },
+          "beeld": [
+            [
+              "overige buurten (3)",
+              14
+            ]
+          ],
+          "lekt": []
+        },
+        {
+          "invoer": {
+            "A": 1,
+            "B": 1,
+            "Centrum": 10
+          },
+          "beeld": [
+            [
+              "overige buurten (3)",
+              12
+            ]
+          ],
+          "lekt": []
+        },
+        {
+          "invoer": {
+            "A": 4,
+            "B": 4,
+            "Centrum": 10
+          },
+          "beeld": [
+            [
+              "overige buurten (3)",
+              18
+            ]
+          ],
+          "lekt": []
+        },
+        {
+          "invoer": {
+            "Zeewijk": 3,
+            "zeewijk": 1,
+            "Centrum": 10,
+            "Noord": 12
+          },
+          "beeld": [
+            [
+              "Noord",
+              12
+            ],
+            [
+              "overige buurten (2)",
+              14
+            ]
+          ],
+          "lekt": []
+        },
+        {
+          "invoer": {
+            "A": 2,
+            "B": 3,
+            "Centrum": 10
+          },
+          "beeld": [
+            [
+              "Centrum",
+              10
+            ],
+            [
+              "overige buurten (2)",
+              5
+            ]
+          ],
+          "lekt": []
+        },
+        {
+          "invoer": {
+            "A": 1,
+            "B": 4,
+            "C": 6,
+            "D": 9
+          },
+          "beeld": [
+            [
+              "D",
+              9
+            ],
+            [
+              "C",
+              6
+            ],
+            [
+              "overige buurten (2)",
+              5
+            ]
+          ],
+          "lekt": []
         }
       ],
-      "tweeKleineBuurten": [
-        {
-          "wijk": "Centrum",
-          "aantal": 10
-        },
-        {
-          "wijk": "overige buurten (2)",
-          "aantal": 5,
-          "samengevoegd": true
-        }
-      ],
-      "lekt": true,
+      "veeg": {
+        "steden": 714,
+        "lekMetGetal": [],
+        "alleenStadstotaal": 9
+      },
+      "lekt": false,
       "besturing": true,
-      "lezing": "De gemeente kent haar eigen buurten. Staat er \"overige buurten (1)\", dan weet zij welke buurt ontbreekt -- en ziet zij haar exacte aantal, onder de drempel die het moest verbergen. Dat is celveilig en niet queryveilig."
+      "restrisico": {
+        "aantalGetoond": false,
+        "lezing": "Heeft een stad maar EEN buurt met hulpvragen en ligt die onder de drempel, dan staat er geen aantal bij de groep -- maar het stadstotaal gaat dan over die ene buurt. Een tikfout in een buurtnaam maakt van een buurt er twee; daartegen helpt alleen een vaste buurtenlijst per stad, en dat is een besluit. Tijdvensters ontbreken: twee keer kijken is een verschil."
+      },
+      "lezing": "Een buurt onder de drempel mag niet af te leiden zijn, ook niet uit grenzen of een uiterste som. buurten() voegt daarom buurten toe tot elke verborgen buurt minstens twee mogelijke waarden heeft, en toont anders geen aantal."
     }
   },
   "wetten": {
@@ -1637,8 +1756,8 @@
       "eigenaarbesluit": 1
     },
     "besluiten": {
-      "te-bouwen": 3,
-      "deels": 2,
+      "deels": 3,
+      "te-bouwen": 2,
       "document": 2,
       "eigenaarbesluit": 1
     },
@@ -1771,7 +1890,7 @@
         "stand": "deels",
         "bestand": "server/kern/rtfos/gemeente.js",
         "citaat": "const K = 5",
-        "reden": "Celveilig, niet queryveilig: als precies een buurt onder de drempel valt, staat haar exacte aantal onder \"overige buurten (1)\" (proef `buurtenQueryveilig`)."
+        "reden": "Een minimumcel met onderdrukking tot geen verborgen buurt meer af te leiden is (proef `buurtenQueryveilig`, een aanvallende veeg). Tijdvensters en een drempel op stadsniveau ontbreken."
       },
       {
         "nr": 17,
@@ -1808,10 +1927,10 @@
       {
         "nr": "B1",
         "besluit": "Aggregatie is queryveilig, niet alleen celveilig: vaste views, minimumcel, complementaire onderdrukking, tijdvensters, geen vrije gemeentelijke OLAP over gevoelige dimensies.",
-        "stand": "te-bouwen",
-        "bestand": "server/kern/rtfos/gemeente.js",
-        "citaat": "const K = 5",
-        "reden": "Er is een minimumcel en een vaste view (het portaal roept alleen `cijfersVan` aan). Complementaire onderdrukking en tijdvensters ontbreken; zie proef `buurtenQueryveilig`."
+        "stand": "deels",
+        "bestand": "server/kern/rtfos/buurtdrempel.js",
+        "citaat": "function afleidbaar",
+        "reden": "Er is een minimumcel, een vaste view (het portaal roept alleen `cijfersVan` aan) en onderdrukking tot geen buurt meer af te leiden is (proef `buurtenQueryveilig`). Tijdvensters ontbreken (vandaag en volgende week kijken is een verschil), en het stadstotaal heeft geen drempel."
       },
       {
         "nr": "B2",

@@ -37,7 +37,7 @@ module.exports = ({ db, save, crypto, findSupplier, antivirus, DATA_DIR }) => {
      verdwijnt post uit de verzonden-map van de afzender zodra de ontvanger hem
      opbergt. En de draad (het gesprek), die daarop leunt. */
   const rtmailVak = require('../kern/rtmail-vak')({ db, save, rtmail });
-  const rtmailDraad = require('../kern/rtmail-draad')({ db, rtmail, vak: rtmailVak });
+  const rtmailDraad = require('../kern/rtmail-draad')({ db, save, rtmail, vak: rtmailVak });
   /* De schrijfkant (concepten, uitgesteld verzenden, handtekening, afwezigheid,
      aliassen) en de regels die BIJ DE BEZORGING draaien. De regels hangen aan de
      haak in kern/rtmail.js, zodat ze langs elke bezorging komen -- ook langs post
@@ -45,14 +45,21 @@ module.exports = ({ db, save, crypto, findSupplier, antivirus, DATA_DIR }) => {
      juist de post waarvoor iemand een regel maakt. */
   const rtmailVrij = require('../kern/rtmail-vrij')({ rtmail, findSupplier,
     CODENAMES });
-  const rtmailSchrijf = require('../kern/rtmail-schrijf')({ db, save, crypto, rtmail, vrij: rtmailVrij });
+  const rtmailSchrijf = require('../kern/rtmail-schrijf')({ db, save, crypto, rtmail, vrij: rtmailVrij,
+    teamOpAdres: rtmailTeam.teamOpAdres });
+  /* Een alias is een tweede deur naar hetzelfde postvak; de bezorging vraagt
+     hier naar welk postvak hij wijst. Zonder deze regel bestond een alias wel
+     in de instellingen, maar kwam er nooit iets op aan. */
+  rtmail.zetAdresOplosser((naar) => rtmailSchrijf.aliasDoel(naar));
   const rtmailRegels = require('../kern/rtmail-regels')({ db, save, crypto, rtmail, vak: rtmailVak, schrijf: rtmailSchrijf });
 
   /* Rechten op een postvak (fijner dan "mag erin"), het journaal dat elke
      handeling op ANDERMANS post vastlegt, en het bewaarbeleid: termijn,
      juridische bewaring, aantoonbare vernietiging en export. */
   const rtmailRecht = require('../kern/rtmail-recht')({ db, save, crypto });
-  const rtmailBewaar = require('../kern/rtmail-bewaar')({ db, save, rtmail, recht: rtmailRecht });
+  const rtmailBewaar = require('../kern/rtmail-bewaar')({ db, save, rtmail, recht: rtmailRecht,
+    // alleen een antwoord uit de kluis, nooit een rij (accounts/zelfdemens.js)
+    zelfdeMens: (a, b) => require('../accounts').zelfdeMens(a, b) });
   /* Het dossier op een bericht in een gedeeld postvak (status, prioriteit,
      interne notities, koppeling aan klant of ticket) en de klok met de
      ontvangstbevestiging die hem betekenis geeft. */

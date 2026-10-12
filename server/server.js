@@ -47,6 +47,8 @@ const accounts = require('./accounts');
 const eigenaar = require('./eigenaar');
 const mail = require('./mail');
 const logboek = require('./log');
+// Elke console-regel van dit proces gaat door de centrale redactie (log-redactie.js).
+require('./log-redactie').bewaakConsole();
 const log = logboek.log;
 const testomgeving = require('./testomgeving');
 const betaal = require('./betaal');
@@ -142,8 +144,10 @@ process.on('uncaughtException', err => {
    In productie mag dat dus niet meer. De volgorde is nu:
    1. APP_URL, als die gezet is. Dat is het antwoord van de beheerder en die
       wint altijd.
-   2. Anders, in productie: het eerste domein uit RTG_DOMAINS (dat weet de
-      vloot toch al) -- ook uit de omgeving, dus ook niet te sturen.
+   2. Anders: een ECHTE openbare hostnaam uit RTG_DOMAINS -- ook uit de
+      omgeving, dus ook niet te sturen. Niet "het eerste element": die variabele
+      draagt meestal codedomeinen (member, social), en 'https://member' is geen
+      adres (lib/linkbasis.js vasteBasis).
    3. Anders, in productie: WEIGEREN we te gokken. Liever een link naar
       https://localhost die zichtbaar niet werkt dan een link naar een domein
       dat de aanvrager koos. Dat valt op en wordt gerepareerd; het andere niet.
@@ -153,17 +157,18 @@ process.on('uncaughtException', err => {
    De config-controle weigert inmiddels iedere productiestart zonder een vast
    geldig APP_URL; deze terugval blijft alleen extra verdediging voor het geval
    deze helper ooit vóór de configuratiekeuring wordt aangeroepen. */
-const APP_URL_VAST = (() => {
-  const gezet = String(process.env.APP_URL || '').trim();
-  if (gezet) return gezet.replace(/\/+$/, '');
-  const eerste = String(process.env.RTG_DOMAINS || '').split(',')[0].trim();
-  if (eerste) return 'https://' + eerste.replace(/^https?:\/\//, '').replace(/\/+$/, '');
-  return null;
-})();
+const linkbasis = require('./lib/linkbasis');
+const APP_URL_VAST = linkbasis.vasteBasis(process.env);
+/* 4 (vervolg). "Gewoon de header" was buiten productie OOK een server zonder
+   NODE_ENV op een publiek adres, en daar schreef een POST /api/auth/forgot met
+   `Origin: https://kwaad.example` precies die link in de mail. De kop levert de
+   basis nu alleen als de link naar deze machine of het eigen netwerk wijst, of
+   in de toetsstand (die alleen op de loopback luistert). Anders: '' -- en dan
+   weigert de route die een link wil versturen, met de reden (lib/linkbasis.js). */
 function appUrl(req) {
   if (APP_URL_VAST) return APP_URL_VAST;
   if (PRODUCTION) return 'https://localhost';
-  return (req && req.headers && req.headers.origin) || (req ? req.protocol + '://' + req.get('host') : '');
+  return linkbasis.basisUitVerzoek(req, process.env);
 }
 
 // Fail-fast: weiger te starten als productie onveilig is ingesteld (demo aan,
@@ -576,8 +581,8 @@ function tooManyTries(res, bucket) {
 /* DE BUCKET IS DE DEUR, DE BRON IS DE AANVALLER -- EN DAT ZIJN TWEE DINGEN.
 
    `bucket` is waar geteld wordt voor de snelheidsrem, en die is met opzet fijn:
-   'auth:<ip>:<inlognaam>'. De inlognaam hoort daarin, want anders kan iemand
-   het account van een ander op slot zetten door het tien keer fout te raden.
+   'auth:<ip>:<account>' (kern/identiteit/wachtwoordrem.js). Het account hoort
+   daarin, want anders zet iemand het account van een ander op slot.
 
    `bron` is WIE er klopt. Die gaat apart mee naar het beveiligingsjournaal,
    want de noodrem daar stelt een andere vraag: hoeveel AANVALLERS zijn er?
@@ -664,11 +669,18 @@ const handelingsspoor = require('./lib/handelingsspoor')({ db, save });
    Deze dienst verzamelt de koppen van alle journalen en rekent af met een blok
    dat wordt teruggevoerd. Hij schrijft zelf niets weg: een anker dat deze
    software op dezelfde schijf zet, is geen anker. Zie ./lib/ankerdienst.js. */
-const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db });
+/* Het blok wordt getekend met een sleutel BUITEN de database: afgeleid uit het
+   procesgeheim (of RTG_ANKER_SIGN_KEY), audit P1-3a. */
+const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db,
+  sleutel: (doel) => (accounts.sleutelVoor ? accounts.sleutelVoor(doel) : null) });
 /* WAAR het blok heen gaat is inmiddels wel besloten: een tweede machine binnen
    RTG (./lib/ankerpost.js). Zonder RTG_ANKERPOST_URL doet die post niets en
    zegt hij dat -- geen bestemming blijft "niet in bedrijf". */
 const ankerpost = require('./lib/ankerpost').maakAnkerpost({ ankerdienst });
+/* DE AUDITWACHT (./lib/auditwacht.js): alle journalen bij het opstarten en
+   daarna periodiek nalopen; een breuk wordt een alarm en geen stille 409
+   (audit P1-4). */
+require('./lib/auditwacht').start({ db });
 
 /* DE LEVERANCIERSPOORT staat in ./opzet/leverancierpoort.js: de twee
    SSE-wegen, de melding aan een zaak, de code-index, de opzoeking, de poort
@@ -1020,46 +1032,11 @@ function leesUploadDataUrl(fname) {
 
 
 
-/* Live-verbinding. EventSource kan geen Authorization-header sturen, dus het
-   token gaat als query-parameter. */
-app.get('/api/stream', (req, res) => {
-  const token = req.query.token;
-  const sess = resolveSession(token);
-  if (!sess) return res.status(401).end();
-  const isolatieRealtime = require('./middleware/isolatiepoort-realtime');
-  const bewaakt = isolatieRealtime.registreer({ res, token, sessie: sess });
-  if (!bewaakt.toegestaan) return res.status(bewaakt.status || 503).json(bewaakt.antwoord);
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache, no-transform',
-    'Connection': 'keep-alive'
-  });
-  /* Open de SSE-handshake nu. De PostgreSQL-antwoordgrens buffert gewone
-     antwoorden tot COMMIT; voor deze read-only stroom is flushHeaders het
-     expliciete teken dat de stream veilig mag beginnen. */
-  if (typeof res.flushHeaders === 'function') res.flushHeaders();
-  res.write('retry: 3000\n\n');
-  const client = { tier: sess.tier, key: sess.key, res };
-  sseClients.push(client);
-  // gemiste persoonlijke events opnieuw afspelen (na een korte verbroken verbinding)
-  const sinds = Number(req.headers['last-event-id'] || req.query.since || 0);
-  if (sinds) speelOpnieuw(res, sess.key, sinds);
-  // onopgehaalde notificaties meteen meesturen -- uit dezelfde twee bakken als
-  // /api/notifications hieronder, anders mist de handshake juist de
-  // persoonlijke berichten
-  const unread = meldingenVan(sess).filter(n => !n.read);
-  sseSend(res, 'hello', { unread });
-  const ping = setInterval(() => {
-    if (!isolatieRealtime.magSchrijven(res)) return clearInterval(ping);
-    res.write(': ping\n\n');
-  }, 25000);
-  req.on('close', () => {
-    clearInterval(ping);
-    isolatieRealtime.vergeet(res);
-    const i = sseClients.indexOf(client);
-    if (i >= 0) sseClients.splice(i, 1);
-  });
-});
+/* Live-verbinding en de ruil van sessie naar stroomticket: ./opzet/stroomtoegang.js.
+   Een sessie staat nooit meer in een adres; meldingenVan komt hieronder pas
+   tot stand en wordt dus pas bij een verzoek gelezen. */
+const { sessiestroom } = require('./opzet/stroomtoegang')({ app, db, crypto, bewerkCollectie, accounts,
+  resolveSession, sseClients, sseSend, speelOpnieuw, meldingenVan: sess => meldingenVan(sess) });
 
 /* Welke bakken een lid ziet en afvinkt: ./opzet/meldingenlezen.js. */
 const { meldingenVan, markeerGelezen } = require('./opzet/meldingenlezen').maakMeldingenLezer((naam) => db.data.notifications[naam]);
@@ -1246,8 +1223,7 @@ function idGeverifieerd(sess) {
        productie staat DEMO uit en bestaat deze sessie niet eens. */
     return DEMO && sess.tier !== 'guest' && !String(sess.key || '').startsWith('guest-');
   }
-  const u = accounts.getUserById(sess.account.id);
-  return !!u && u.verified === 'verified';
+  return accounts.isGekeurd(sess.account.id); // de ene regel: accounts/zelfdemens.js
 }
 
 /* ---------- gedeelde vriendenlaag over RTG en RTFoundation ----------
@@ -1345,6 +1321,7 @@ app.post('/api/talen', talenCache, (req, res) => res.json({ talen: talen.actieve
    onderwerp is een paarsgewijs pseudoniem: twee venues kunnen een lid niet
    matchen. Zie server/lib/zegel.js. */
 const zegel = require('./lib/zegel').maakZegel({ dataDir: DATA_DIR });
+const zegelfeiten = require('./kern/zegelfeiten').maakZegelfeiten({ accounts });
 // de publieke sleutel: hiermee verifieert een partner-app een zegel zonder server.
 app.get('/api/zegel/sleutel', (req, res) => {
   res.setHeader('Cache-Control', 'public, max-age=300');
@@ -1356,20 +1333,12 @@ app.post('/api/zegel/maak', auth, (req, res) => {
   const sess = req.session;
   const partner = typeof req.body.partner === 'string' ? req.body.partner.slice(0, 64) : null;
   const gevraagd = Array.isArray(req.body.claims) && req.body.claims.length ? req.body.claims : ['lid'];
-  const lft = leeftijdVan(geborenVan(sess));
-  const feiten = {
-    lid: true,
-    leeftijd18: lft != null && lft >= 18,
-    leeftijd21: lft != null && lft >= 21,
-    pas: sess.tier || (sess.account && sess.account.tier) || null,
-    zakelijk: sess.tier === 'business'
-  };
-  const claims = {};
-  for (const k of gevraagd) if (Object.prototype.hasOwnProperty.call(feiten, k) && feiten[k]) claims[k] = feiten[k];
+  // wat er getekend mag worden staat in kern/zegelfeiten.js (een leeftijd alleen als hij GEZIEN is)
+  const { claims, nietBewezen } = zegelfeiten(sess, gevraagd);
   const seed = sess.key || (sess.account && sess.account.id) || 'onbekend';
   const geldigMin = Math.max(1, Math.min(60, Number(req.body.geldigMin) || 5));
   const token = zegel.zegel({ codenaam: seed, partner, claims, geldigMin });
-  res.json({ token, claims, sub: zegel.pseudoniem(seed, partner), geldigMin });
+  res.json({ token, claims, sub: zegel.pseudoniem(seed, partner), geldigMin, nietBewezen });
 });
 // een partner/PDA controleert een zegel (kan ook offline met de publieke sleutel).
 app.post('/api/zegel/controleer', (req, res) => {
@@ -1777,9 +1746,16 @@ const betaalOpdrachten = require('./kern/betaalopdracht')({
   // herhaling bij de provider nooit een tweede betaling wordt
   railInzenden: async (o) => {
     try {
+      /* De capability van DEZE uitbetaling (server/kern/vrijgave/): een
+         uitbetaling naar een lid, een partner of de RTFoundation zijn financieel
+         drie verschillende handelingen, en server/betaal/uitbetaling.js weigert
+         er een zonder naam. De soort van de opdracht zegt welke het is; een soort
+         zonder capability in het register krijgt er geen, en is dus dicht zodra
+         hij een echte rail zou raken. */
       const uit = await betaal.maakUitbetaling({
         bedrag: o.centen, valuta: o.valuta, iban: o.bestemming, begunstigde: o.begunstigde,
-        referentie: o.ledgerRef, idempotentieSleutel: o.idemSleutel, omschrijving: o.oms
+        referentie: o.ledgerRef, idempotentieSleutel: o.idemSleutel, omschrijving: o.oms,
+        vrijgave: require('./kern/betaalopdracht/vrijgave').capabilityVan(o.soort)
       });
       capGezondheid.meld('money.payout', true);
       return uit;
@@ -2214,7 +2190,7 @@ const kern = {
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
   securityLogKeten, handelingsspoor, ankerdienst, ankerpost,
-  zorgContact, klantSalon, salonClaimcode, afhaalcode, tickettoegang,
+  zorgContact, klantSalon, salonClaimcode, afhaalcode, tickettoegang, sessiestroom,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,
   stemmingVoor: stemming.stemmingVoor,

@@ -204,7 +204,7 @@ test('Dag heeft een eigenaar en Vandaag is geen tweede dagproduct meer', () => {
   assert.equal(REG.capabilities['dag.overzicht'], 'apps/life.html');
   assert.deepEqual(REG.schermen['apps/vandaag.html'], { rol: 'alias', naar: '/apps/life.html' });
   const life = fs.readFileSync(path.join(WORTEL, 'public/apps/life.html'), 'utf8');
-  for (const weg of ['/apps/agenda.html', '/apps/mijnmall.html', '/apps/leven.html']) {
+  for (const weg of ['/apps/agenda.html', '/apps/mijnmall.html', '/apps/leven.html#moment']) {
     assert.ok(life.includes('href="' + weg + '"'), 'de ingang ' + weg + ' uit Vandaag staat in Life');
   }
 });

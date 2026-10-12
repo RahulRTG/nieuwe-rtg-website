@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-10-12",
   "gemeten": {
-    "bestanden": 2790,
-    "domeinenTotaal": 699,
-    "koopbareVormen": 621,
+    "bestanden": 2900,
+    "domeinenTotaal": 722,
+    "koopbareVormen": 616,
     "koopbareDomeinen": 126,
     "envelopDrempel": 8,
     "envelop": 45,
     "veldenDomeineigen": 792,
-    "veldenNietEnvelop": 1061,
+    "veldenNietEnvelop": 1062,
     "gelijkendeVormparen": 18,
     "werkwoordenVolledig": 2,
     "werkwoordenOveral": 0,
@@ -18,7 +18,7 @@
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
     "optellingen": 122,
-    "optelDomeinen": 61,
+    "optelDomeinen": 62,
     "optelCenten": 68,
     "optelEuro": 5,
     "optelGemengd": 0,
@@ -76,7 +76,7 @@
     "prijs": 41,
     "beschikbaarheid": 55,
     "reserveer": 32,
-    "bevestig": 61,
+    "bevestig": 62,
     "lever": 25,
     "annuleer": 37,
     "retour": 9
@@ -565,7 +565,7 @@
         "retour": false
       },
       "bewijs": {
-        "toon": "lijst",
+        "toon": "beeld",
         "beschikbaarheid": "open",
         "reserveer": "fluisterOnthoud",
         "bevestig": "bestel",
@@ -1032,7 +1032,7 @@
         "retour": false
       },
       "bewijs": {
-        "toon": "lijst",
+        "toon": "beeldVan",
         "reserveer": "inhoudVan",
         "bevestig": "stuurBevestig",
         "annuleer": "intrek"
@@ -1268,6 +1268,25 @@
         "toon": "lijst",
         "beschikbaarheid": "verlopen",
         "annuleer": "annuleer"
+      },
+      "telt": 3
+    },
+    {
+      "domein": "kern/leverancier",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "beschikbaarheid": "ticketsVoorSlot",
+        "bevestig": "bewaarLogboek",
+        "lever": "bezorgtNu"
       },
       "telt": 3
     },
@@ -1524,24 +1543,6 @@
       "bewijs": {
         "toon": "beeld",
         "beschikbaarheid": "openbaar"
-      },
-      "telt": 2
-    },
-    {
-      "domein": "kern/leverancier",
-      "heeft": {
-        "toon": false,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": true,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "beschikbaarheid": "ticketsVoorSlot",
-        "lever": "bezorgtNu"
       },
       "telt": 2
     },
@@ -2610,7 +2611,7 @@
     {
       "gelijkenis": 0.83,
       "a": "server/kern/bank/overboeken.js",
-      "b": "server/kern/pay/partner.js",
+      "b": "server/kern/pay/partner-uitbetaal.js",
       "domeinA": "kern/bank",
       "domeinB": "kern/pay",
       "gedeeld": [
@@ -2697,7 +2698,7 @@
     {
       "gelijkenis": 0.63,
       "a": "server/kern/fonds/uitbetalen.js",
-      "b": "server/kern/pay/partner.js",
+      "b": "server/kern/pay/partner-uitbetaal.js",
       "domeinA": "kern/fonds",
       "domeinB": "kern/pay",
       "gedeeld": [
@@ -2780,12 +2781,12 @@
     },
     {
       "domein": "kern/pay",
-      "plekken": 6,
+      "plekken": 5,
       "waar": [
         "server/kern/pay/partner.js",
-        "server/kern/pay/samen.js",
         "server/kern/pay/tegoed-zaak.js",
-        "server/kern/pay/tegoed.js"
+        "server/kern/pay/tegoed.js",
+        "server/kern/pay/verkoop.js"
       ]
     },
     {

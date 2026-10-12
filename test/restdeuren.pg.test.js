@@ -4,12 +4,13 @@
 'use strict';
 
 const test = require('node:test');
+const { vereistAlle } = require('./infra');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 
 const PG_URL = process.env.DATABASE_URL || process.env.PG_URL;
 const REDIS_URL = process.env.REDIS_URL;
-const OVERSLAAN = PG_URL && REDIS_URL ? false : 'vereist DATABASE_URL en REDIS_URL';
+const OVERSLAAN = vereistAlle([['pg', !!PG_URL], ['redis', !!REDIS_URL]], 'vereist DATABASE_URL en REDIS_URL');
 
 test('vier restdeuren claimen atomair en hash-only over twee PG/Redis-instances',
   { skip: OVERSLAAN, timeout: 120000 }, async () => {

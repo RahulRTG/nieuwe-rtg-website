@@ -1,6 +1,7 @@
 /* De Rahul-reislaag: Rahul regelt met een vraag een hele reis (verblijf,
    transfer, diner, activiteit) die op een enkel "ja" in zijn geheel wordt
-   geboekt; koopt kleding (apart leggen in de juiste maat bij de modezaak);
+   KLAARGEZET en niet afgerekend (besluit van 12 oktober 2026, zie de kop van
+   server/kern/fluister/reis/reisplan.js); koopt kleding (apart leggen in de juiste maat bij de modezaak);
    en voorspelt wat er nog nodig is. Draai los:
    node --test test/rahul-reis.test.js */
 const test = require('node:test');
@@ -36,17 +37,30 @@ test('voorspellen: Rahul zegt wat er nog nodig is, met bruikbare zinnen', async 
   assert.ok(/plan mijn weekend|reserveer|regel/i.test(r.body.antwoord), 'elke tip komt met een bruikbare zin');
 });
 
-test('een hele reis op een vraag: voorstel met totaalprijs, en het ene "ja" boekt alles', async () => {
+test('een hele reis op een vraag: voorstel met totaalprijs, en het ene "ja" zet alles klaar zonder af te rekenen', async () => {
   const v = await api('fluister', { q: 'plan mijn weekend naar Ibiza met 4 vrienden' });
   assert.equal(v.status, 200);
   assert.equal(v.body.voorstel, true, 'de reis is eerst een voorstel (drempel: er is geld mee gemoeid)');
   assert.ok(/Mijn voorstel voor uw reis/i.test(v.body.antwoord));
   assert.ok(/€/.test(v.body.antwoord), 'het voorstel noemt de totaalprijs');
+  assert.ok(/zelf in de app/i.test(v.body.antwoord), 'het voorstel zegt vooraf dat afrekenen bij het lid blijft');
+  assert.ok(!/ik boek alles/i.test(v.body.antwoord), 'het voorstel belooft geen boeking meer');
+  const ticketsVoor = (await api('tickets/mijn', {})).body;
 
   const ja = await api('fluister', { q: 'ja' });
   assert.equal(ja.status, 200);
   assert.ok(/Uw reis staat/i.test(ja.body.antwoord), 'na het ene ja staat de reis');
   assert.ok(/✓/.test(ja.body.antwoord), 'minstens een onderdeel is echt gelukt');
+  /* ER IS NIETS AFGESCHREVEN. /api/tickets/mijn toont alleen BETAALDE tickets:
+     vóór 12 oktober kwam er na dit ene ja een bij, nu niet. En de rit en het
+     ticket staan er als "nog te betalen" met de vervaltermijn erbij.
+     MUTATIE: zet betaalBoeking terug in reisplan.js -- deze toets zakt. */
+  const ticketsNa = (await api('tickets/mijn', {})).body;
+  assert.equal(JSON.stringify(ticketsNa), JSON.stringify(ticketsVoor), 'het ja heeft geen ticket afgerekend');
+  if (/nog te betalen/.test(ja.body.antwoord))
+    assert.ok(/niets afgeschreven/i.test(ja.body.antwoord) && /dertig minuten/.test(ja.body.antwoord),
+      'het antwoord zegt dat er niets is afgeschreven en wanneer het vervalt');
+  else assert.fail('dit voorstel had een rit of ticket moeten klaarzetten; anders bewijst deze toets niets over betalen');
 
   // het verblijf is echt geboekt en staat in de app
   const mijn = await api('verblijf/mijn', {});

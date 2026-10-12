@@ -724,9 +724,9 @@ async function laadAppstore(){
       '<input id="asZoek" class="veld as-breed" placeholder="Zoek op naam of uitgever" maxlength="60" aria-label="Zoeken in de App Store">'+
       '<button class="knop stil" id="asMijn" type="button">Mijn apps van derden</button>'+
       '<button class="knop stil" id="asGesch" type="button" aria-expanded="false">Mijn geschiedenis</button>'+
-      '<a class="knop stil" href="/apps/appstore-dossier.html" class="as-link">Wat geen app kan vragen</a>'+
+      '<a class="knop stil as-link" href="/apps/appstore-dossier.html">Wat geen app kan vragen</a>'+
     '</div><div id="asTijd" hidden class="as-mb"></div>'+
-    '<div id="asGrid"></div><div class="rij" id="asBlader" class="as-midden"></div></div>';
+    '<div id="asGrid"></div><div class="rij as-midden" id="asBlader"></div></div>';
   let zt; $('#asZoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { AS.zoek = $('#asZoek').value; AS.pagina = 1; AS.mijn = false; tekenStore(); }, 300); });
   $('#asMijn').addEventListener('click', () => { AS.mijn = !AS.mijn; AS.pagina = 1; tekenStore(); });
   /* De geschiedenis staat NAAST de winkel en niet erin: hij gaat over het lid en
@@ -809,7 +809,7 @@ function storeKaart(a){
         : '<b class="as-prijs">Inbegrepen</b>')+
       '<span class="h-flex1"></span>'+
       (a.geinstalleerd
-        ? '<a class="knop stil" href="/apps/appcel.html?app='+encodeURIComponent(a.sleutel)+'" class="as-link">Openen</a>'+
+        ? '<a class="knop stil as-link" href="/apps/appcel.html?app='+encodeURIComponent(a.sleutel)+'">Openen</a>'+
           '<button class="knop stil asZet" type="button">Bijwerken</button>'+
           '<button class="knop stil asWeg" type="button">Verwijderen</button>'+
           '<button class="knop stil asCelWeg" type="button">Cel vernietigen</button>'
@@ -828,12 +828,12 @@ function storeKaart(a){
        officer. Die laatste komt hier niet toevallig langs. */
     '<div class="rij as-mt-xs">'+
       '<button class="knop stil asPas as-p72" type="button" aria-expanded="false">Softwarepaspoort</button>'+
-      '<button class="knop stil asDos" type="button" aria-expanded="false" class="as-p72">Inkoopdossier</button>'+
-      '<a class="knop stil" href="/apps/appstore-dossier.html?app='+encodeURIComponent(a.sleutel)+'" class="as-kleinlink">Op eigen pagina &rarr;</a>'+
+      '<button class="knop stil asDos as-p72" type="button" aria-expanded="false">Inkoopdossier</button>'+
+      '<a class="knop stil as-kleinlink" href="/apps/appstore-dossier.html?app='+encodeURIComponent(a.sleutel)+'">Op eigen pagina &rarr;</a>'+
     '</div>'+
-    '<div class="asPasVak" hidden class="as-scheiding-s"></div>'+
-    '<div class="asDosVak" hidden class="as-scheiding-s"></div>'+
-    '<div class="asBon" hidden class="as-scheiding-m"></div></div>';
+    '<div class="asPasVak as-scheiding-s" hidden></div>'+
+    '<div class="asDosVak as-scheiding-s" hidden></div>'+
+    '<div class="asBon as-scheiding-m" hidden></div></div>';
 }
 /* HET PASPOORT ALS SCHERM. Een rij zonder waarde toont zijn REDEN en nooit een
    streepje of een nul: een onbekende waarde die eruitziet als een gemeten
@@ -1064,7 +1064,7 @@ async function toonBon(sleutel, vak, land){
       '<span class="tag as-p74">btw-land: <b>'+esc(d.landNaam)+'</b></span>'+
       '<button class="knop stil bonAnder" type="button">Ander land</button>'+
       '<span class="h-flex1"></span><button class="knop bonBetaal" type="button">Betalen</button>'+
-    '</div><div class="bonKies" hidden class="as-mt-xs"></div>';
+    '</div><div class="bonKies as-mt-xs" hidden></div>';
   /* "Ander land" haalt de lijst op en laat het lid kiezen. Hij stuurt met opzet
      geen onzinwaarde naar de bon om de keuzelijst uit te lokken: dan zou de
      server moeten raden wat een lid bedoelt, en dat is precies wat hij bij een

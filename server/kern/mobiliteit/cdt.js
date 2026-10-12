@@ -25,6 +25,7 @@
    is RTG niet. Zie ./cdt-export, dat daar niet omheen draait. */
 
 const { GRENZEN, SOORTEN, tel, signalen, rustSignaal } = require('./cdt-tijden');
+const { magKlokZien, isEigen } = require('../leverancier/logboekzicht');
 
 const DIENST_MAX = 4000;          // bewaargrens in de json-stand; de export gaat eerder
 
@@ -38,22 +39,16 @@ module.exports = (ctx) => {
   const dienstenVan = code => { ensureCdt(); return opslag.bak('mobDiensten').filter(d => d.vervoerder === code); };
   const openDienst = (code, kaart) => dienstenVan(code).find(d => d.chauffeurskaart === kaart && !d.eind) || null;
 
-  // de grenzen van deze onderneming: de standaard, tenzij hij zijn eigen regime zette
-  const regimeVan = code => Object.assign({}, GRENZEN, (opslag.bak('mobCdtRegime') || {})[code] || {});
+  // het regime (de grenzen van deze onderneming): ./cdt-regime.js
+  const { regimeVan, regimeZet } = require('./cdt-regime')({ opslag, save, ensureCdt });
 
-  function regimeZet(code, body = {}) {
-    ensureCdt();
-    const eigen = {};
-    for (const [k, v] of Object.entries(body.grenzen || {})) {
-      if (!Object.prototype.hasOwnProperty.call(GRENZEN, k)) return { status: 400, error: 'Onbekende grens: ' + k };
-      if (!Number.isFinite(v) || v <= 0 || v > 7 * 24 * 60) return { status: 400, error: 'De grens ' + k + ' moet in minuten en zinnig zijn.' };
-      eigen[k] = Math.round(v);
-    }
-    if (!Object.keys(eigen).length) return { status: 400, error: 'Geef minstens een grens op.' };
-    opslag.bak('mobCdtRegime')[code] = Object.assign({}, opslag.bak('mobCdtRegime')[code] || {}, eigen);
-    save();
-    return { ok: true, grenzen: regimeVan(code), standaard: GRENZEN };
-  }
+  /* Een lopende dienst die DEZE actor mag bijwerken: zijn eigen (op staffId), of
+     elke als hij manager is. De kaart van een collega is voor een ander een 404,
+     net als een kaart zonder dienst -- anders bevestigt het antwoord dat ze rijdt. */
+  const eigenDienst = (code, kaart, actor) => {
+    const d = openDienst(code, kaart);
+    return d && (magKlokZien(actor) || isEigen(actor, d.staffId)) ? d : null;
+  };
 
   /* Aanmelden. De chauffeurskaart is verplicht: zonder kaartnummer is er geen
      registratie die iets identificeert, en dan legt het systeem iets vast
@@ -75,11 +70,13 @@ module.exports = (ctx) => {
     const d = { id: id('dn'), vervoerder: supplier.code, chauffeurskaart: kaart,
       voertuig: schoon(body.voertuig, 40) || null,
       start, eind: null, blokken: [{ soort: 'ander', van: start, tot: null }],
-      startSignalen: rust ? [rust] : [], gemeldDoor: schoon(actor, 60) || 'chauffeur' };
+      startSignalen: rust ? [rust] : [], gemeldDoor: schoon(actor && actor.name, 60) || 'chauffeur',
+      // wie zich aanmeldde, op id: alleen hij en een manager zien begin en eind (kern/leverancier/logboekzicht.js)
+      staffId: actor && actor.staffId != null ? actor.staffId : null };
     opslag.bak('mobDiensten').push(d);
     if (opslag.bak('mobDiensten').length > DIENST_MAX) opslag.zetBak('mobDiensten', opslag.bak('mobDiensten').slice(-DIENST_MAX));
     save();
-    logActivity(supplier.code, actor, 'meldde zich aan op kaart ' + kaart);
+    logActivity(supplier.code, actor || { name: 'chauffeur' }, 'meldde zich aan op kaart ' + kaart, 'klok-in');
     return { ok: true, dienst: dienstBeeld(d), signalen: rust ? [rust] : [] };
   }
 
@@ -90,7 +87,7 @@ module.exports = (ctx) => {
   function dienstSoort(supplier, actor, body = {}) {
     ensureCdt();
     const kaart = schoon(body.chauffeurskaart, 30).toUpperCase();
-    const d = openDienst(supplier.code, kaart);
+    const d = eigenDienst(supplier.code, kaart, actor);
     if (!d) return { status: 404, error: 'Geen lopende dienst op deze chauffeurskaart.' };
     const soort = schoon(body.soort, 20);
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekende soort: ' + Object.keys(SOORTEN).join(', ') };
@@ -112,7 +109,7 @@ module.exports = (ctx) => {
   function dienstEind(supplier, actor, body = {}) {
     ensureCdt();
     const kaart = schoon(body.chauffeurskaart, 30).toUpperCase();
-    const d = openDienst(supplier.code, kaart);
+    const d = eigenDienst(supplier.code, kaart, actor);
     if (!d) return { status: 404, error: 'Geen lopende dienst op deze chauffeurskaart.' };
     const t = nu();
     const open = d.blokken.find(b => !b.tot);
@@ -122,8 +119,8 @@ module.exports = (ctx) => {
     d.som = { arbeidMin: som.arbeidMin, rijMin: som.rijMin, pauzeMin: som.pauzeMin };
     d.signalen = signalen(som, regimeVan(supplier.code));
     save();
-    logActivity(supplier.code, actor, 'meldde zich af op kaart ' + kaart +
-      ' (' + Math.round(som.arbeidMin / 6) / 10 + ' uur arbeid)');
+    logActivity(supplier.code, actor || { name: 'chauffeur' }, 'meldde zich af op kaart ' + kaart +
+      ' (' + Math.round(som.arbeidMin / 6) / 10 + ' uur arbeid)', 'klok-uit');
     return { ok: true, dienst: dienstBeeld(d) };
   }
 
@@ -144,7 +141,7 @@ module.exports = (ctx) => {
     const som = lopend ? tel(d.blokken) : tel(d.blokken, new Date(d.eind).getTime());
     const sig = lopend ? signalen(som, regimeVan(d.vervoerder)) : (d.signalen || []);
     const ritten = rittenVan(d);
-    return { id: d.id, vervoerder: d.vervoerder, chauffeurskaart: d.chauffeurskaart,
+    return { id: d.id, vervoerder: d.vervoerder, chauffeurskaart: d.chauffeurskaart, staffId: d.staffId != null ? d.staffId : null,
       voertuig: d.voertuig, start: d.start, eind: d.eind, lopend,
       huidigeSoort: (d.blokken.find(b => !b.tot) || {}).soort || null,
       arbeidMin: som.arbeidMin, rijMin: som.rijMin, pauzeMin: som.pauzeMin,

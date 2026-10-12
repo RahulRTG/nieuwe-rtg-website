@@ -14,6 +14,7 @@
 
    Draai los: node --test test/tegoedbon-credential.test.js */
 'use strict';
+const metDekking = require('./lib/dekking');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
@@ -53,7 +54,7 @@ function wereld({ tellendeCrypto } = {}) {
     zorgSaldo: async () => ({ ok: true, bijgeladen: 0 }), seintje() {}, bestaatLid: async () => true,
     MIN_CENTEN: 1, MAX_CENTEN: 500000
   };
-  const tegoed = require('../server/kern/pay/tegoed')(ctx);
+  const tegoed = require('../server/kern/pay/tegoed')(metDekking(ctx));
   return { tegoed, data, klok, stuk, saldi, grootboek, geboekt: () => geboekt };
 }
 

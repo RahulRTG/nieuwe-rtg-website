@@ -107,6 +107,11 @@ const REGISTER = {
   'AANROEPGRAAF.json': { eigenRatel: 'test/codewereld.test.js' },
   'CAPABILITEIT.json': { eigenRatel: 'test/capabilities.test.js' },
   'CODEWERELD.json': { eigenRatel: 'test/codewereld.test.js' },
+  /* TOEZEGKLASSEN.json is het besluitbestand van de inventaris (AFBOUWPROGRAMMA.md).
+     Zijn getal dat slechter kan worden is het aantal ROTTE citaten, en dat staat op
+     een harde nul: test/toezegklassen.test.js zakt bij een enkel rot citaat of een
+     klasse buiten de vier (met twee mutaties nagetrokken bij de tegenlezing). */
+  'TOEZEGKLASSEN.json': { eigenRatel: 'test/toezegklassen.test.js' },
   'COMMERCE.json': { eigenRatel: 'scripts/check.js' },
   'CONTEXTDOORGIFTE.json': { eigenRatel: 'test/contextdoorgifte.test.js' },
   'CONTROLS.json': { eigenRatel: 'test/controls.test.js' },
@@ -372,6 +377,7 @@ const REGISTER = {
      schuld die op nul hoort te staan en negen veldtanden die alleen omhoog
      mogen. De vergelijking per scherm zit daarnaast in edgedekking.js zelf. */
   'EDGEKAART.json': { meter: ['edgeDubbeleEigenaars', 'rtgDodeKanalen'] },
+  'SCHILHERSTART.json': { meter: ['schilHerstarts', 'schilDubbeleVerzoeken'] },
   'EDGEDEKKING.json': { meter: ['edgeGeblokkeerdZonderWaarom', 'edgeVeldIdentiteit', 'edgeVeldWereld', 'edgeVeldContext',
     'edgeVeldObject', 'edgeVeldActiviteit', 'edgeVeldPresence', 'edgeVeldVoortzetting', 'edgeVeldHoofdactie', 'edgeVeldTrust'] },
   'MEETLEER.json': { meter: ['meetleerBlind'] },
@@ -511,18 +517,33 @@ const REGISTER = {
   'RITPROEF.json': { eigenRatel: 'test/ritproef.test.js' },
   'TOELATINGSPROEF.json': { eigenRatel: 'test/toelatingsproef.test.js' },
   'ADAMPROEF.json': { eigenRatel: 'test/adamproef.test.js' },
+  'ROMEPROEF.json': { eigenRatel: 'test/romeproef.test.js' },
   'DOELGROEPBEREIK.json': { eigenRatel: 'test/doelgroepbereik.test.js' },
   'ONVERVREEMDBAAR.json': { eigenRatel: 'test/onvervreemdbaar.test.js' },
   'AANVOERVORM.json': { eigenRatel: 'test/aanvoer.test.js' },
+  'GROEPVORM.json': { eigenRatel: 'test/groepvorm.test.js' },
   'MOMENTPROEF.json': { eigenRatel: 'test/momentproef.test.js' },
+  /* GEMEENSCHAPSPROEF.json (sinds 11 oktober 2026): de samenwerkingsketen van
+     FoundationOS (drager, verbond, beraad, bijeenkomst, terugkoppeling). Een
+     PROEF, dus de ratel staat op de uitslag; `openBekend` telt apart in
+     scripts/norm.js (gemeenschapOpenBekend, alleen omlaag). */
+  'GEMEENSCHAPSPROEF.json': { eigenRatel: 'test/gemeenschapsproef.test.js' },
   /* LUSPROEF.json (sinds 24 september 2026) levert voltooibaar voor Ontdekken
      via scripts/lib/appcontract.js. De toets houdt het woordgebruik vast dat
      scripts/lib/bewijsbron.js leest, en dat de telling de rijen niet overstemt. */
   'LUSPROEF.json': { eigenRatel: 'test/lusproef.test.js' },
+  /* CONCIERGEPROEF.json (sinds 11 oktober 2026) levert voltooibaar voor het
+     Privékantoor, in dezelfde vorm en met dezelfde soort toets als de lusproef. */
+  'CONCIERGEPROEF.json': { eigenRatel: 'test/conciergeproef.test.js' },
   /* LIEGRONDE.json (sinds 24 september 2026) levert waarheidsgetrouw voor elke
      rij van APPWERKT.json. De toets houdt vast dat een BEWEZEN rij iets gelogen
      kreeg en dat een DEFECT een verzonnen zekerheid draagt. */
   'LIEGRONDE.json': { eigenRatel: 'test/liegronde.test.js' },
+  /* VOLTOOIPROEF.json (sinds 11 oktober 2026) levert voltooibaar, persistent en
+     herstelbaar per onderdeel met een scenario. De toets houdt vast dat het
+     register zichzelf niet tegenspreekt, dat de bewijsbron het leest zoals het
+     zichzelf noemt, en dat het aantal gesloten bewijzen niet daalt. */
+  'VOLTOOIPROEF.json': { eigenRatel: 'test/voltooiproef.test.js' },
   /* BEVOEGD.json (sinds 25 september 2026) levert bevoegd voor elke rij van
      APPWERKT.json. De toets houdt vast dat een ledenscherm alleen BEWEZEN is als
      ELKE route gemeten is, en dat een gezinspaar zonder A binnen niets bewijst. */

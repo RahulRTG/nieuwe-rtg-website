@@ -45,10 +45,13 @@
    register maakt het NIET_GETEST.
 
    De andere vijf (voltooibaar, waarheidsgetrouw, persistent, bevoegd,
-   herstelbaar) vragen verder een testwereld waarin betalen, versturen en verwijderen
-   ECHT mogen -- met sandboxprovider, sink-mailbox en wegwerpdata. Die bestaat
-   nog niet, en daarom staan ze hier als GEEN_FIXTURE met de reden. Ze staan er
-   WEL, want een bewijs dat je weglaat ziet eruit als een bewijs dat je haalt.
+   herstelbaar) komen uit een andere proef of staan op GEEN_FIXTURE met de
+   reden. Voor voltooibaar, persistent en herstelbaar is er sinds 11 oktober 2026
+   een testwereld (scripts/voltooiproef.js: wegwerpdata, postvanger, sms-sandbox,
+   een herstart en een crash); een onderdeel zonder scenario daarin houdt
+   GEEN_FIXTURE, en de reden zegt of het een scenario of een adapter mist. Ze
+   staan er WEL, want een bewijs dat je weglaat ziet eruit als een bewijs dat je
+   haalt.
 
    DE STANDEN ZIJN GESLOTEN, en "waarschijnlijk goed" zit er niet bij:
 
@@ -98,6 +101,23 @@
                                             het register kent (ratel: alleen omlaag)
      node scripts/appwerkt.js --filter=nav  alleen onderdelen waarvan het adres
                                             dit fragment bevat
+     node scripts/appwerkt.js --inventaris  werkt ALLEEN het blok `toezegklassen`
+                                            bij, zonder browser (zie hieronder)
+     node scripts/appwerkt.js --inventaris --controle
+                                            zakt als dat blok achterloopt, een
+                                            citaat rot is of een klasse buiten
+                                            de vier valt
+
+   HET BLOK `toezegklassen` (11 oktober 2026, AFBOUWPROGRAMMA.md). Het
+   eigenaarsbesluit zegt dat alles wat RTG heeft TOEGEZEGD wordt afgebouwd en
+   bewezen, en niet alles wat ooit in een document stond. Welk onderdeel in welke
+   van de vier klassen valt (toegezegd, afgewezen-met-grens, vraagt-besluit,
+   extern) staat daarom HIER, in hetzelfde register als de bewijzen -- er komt
+   geen tweede completion-register naast. De inventaris wordt gelezen door
+   scripts/lib/toezegklassen.js uit de documenten en TOEZEGKLASSEN.json, en hij
+   wordt bij een volle meting gewoon meegeschreven. `--inventaris` bestaat omdat
+   een browserronde over alle onderdelen te zwaar is om alleen een document-
+   wijziging bij te werken; hij laat elk ander veld byte voor byte staan.
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -109,13 +129,17 @@ const { stempel } = require('./lib/stempel');
 /* Bewijs SAMENSTELLEN uit proeven die al bestaan: het contract zegt welke bron
    een bewijs mag leveren, de bewijsbron of hij dat op deze code verdient. */
 const { stelSamen } = require('./lib/bewijsbron');
-const { CONTRACT, ZONDER_APP } = require('./lib/appcontract');
+const { CONTRACT, ZONDER_APP, TESTWERELD_ONTBREEKT } = require('./lib/appcontract');
 const { beoordeel: beoordeelBestemming, personaAfwijking } = require('./lib/bestemming');
+/* De inventaris van toezeggingen (AFBOUWPROGRAMMA.md): een blok in dit register,
+   geen eigen register. */
+const toezegklassen = require('./lib/toezegklassen');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'APPWERKT.json');
 const controle = process.argv.includes('--controle');
 const stil = process.argv.includes('--stil');
+const alleenInventaris = process.argv.includes('--inventaris');
 const filter = (process.argv.find((a) => a.startsWith('--filter=')) || '').slice(9);
 const PAR = Number((process.argv.find((a) => a.startsWith('--par=')) || '').slice(6) || 6);
 /* Hoogstens zoveel tikken per scherm. Het oordeel eist dat de proef minstens
@@ -186,12 +210,27 @@ function rijen() {
 
 /* ---- de vijf bewijzen die een testwereld nodig hebben ---- */
 const GEEN_FIXTURE = (wat) => ({ status: 'GEEN_FIXTURE', reden: wat, bewijs: null });
+/* Bewijs 3, 5 en 7 hebben sinds 11 oktober 2026 een testwereld
+   (scripts/voltooiproef.js: wegwerpdata, postvanger, sms-sandbox, simulatiebank,
+   een nette herstart en een crash op dezelfde datamap). Wat een onderdeel dan
+   nog mist, is zijn SCENARIO in scripts/lib/voltooi/ -- of, bij een handvol,
+   een adapter die er niet is. Dat tweede staat per onderdeel in
+   TESTWERELD_ONTBREEKT (scripts/lib/appcontract.js), zodat de reden zegt WELKE
+   adapter ontbreekt in plaats van "vraagt een testwereld". */
+const testwereldReden = (r, bewijs) => {
+  const mist = TESTWERELD_ONTBREEKT[r.functie];
+  if (mist) return 'de testwereld mist hiervoor een adapter: ' + mist;
+  /* Op de ingang en niet op `soort`: meetRij() haalt dat veld weg voordat de
+     rij hier langskomt (gemeten: alle 108 rijen heetten eerst "geen adres"). */
+  if (!String(r.ingang || '').startsWith('/')) return 'geen eigen adres: een scenario kan pas aan deze ingang hangen als hij een scherm heeft waarvan SCHERMROUTES.json de routes kent';
+  return 'de testwereld staat (scripts/voltooiproef.js), maar er is nog geen scenario voor deze ingang in scripts/lib/voltooi/; ' + bewijs;
+};
 const ONGEMETEN = {
-  voltooibaar: () => GEEN_FIXTURE('vraagt een testwereld waarin de hele stroom mag worden afgemaakt (sandboxprovider, sink-mailbox, wegwerpdata); zie BETROUWBAARHEID.md par. 4'),
+  voltooibaar: (r) => GEEN_FIXTURE(testwereldReden(r, 'dat loopt de hele bedoeling af tot en met wat de ontvanger ziet')),
   waarheidsgetrouw: () => GEEN_FIXTURE('vraagt de liegpoort over alle schermen (RTG_LIEG); vandaag meet SCHERMLEUGEN.json er zes'),
-  persistent: () => GEEN_FIXTURE('vraagt een tweede sessie en een herstart op dezelfde data'),
+  persistent: (r) => GEEN_FIXTURE(testwereldReden(r, 'dat herstart netjes op dezelfde datamap en leest de uitkomst in een nieuwe sessie en in de opslag')),
   bevoegd: () => GEEN_FIXTURE('vraagt de kruisproef met vreemde rollen, gezinnen en bedrijven; de routekant staat in IDOR.json en ROLPROEF.json, de schermkant niet'),
-  herstelbaar: () => GEEN_FIXTURE('vraagt uitval van Redis/PostgreSQL, providertimeouts en een afgebroken verzoek midden in een mutatie')
+  herstelbaar: (r) => GEEN_FIXTURE(testwereldReden(r, 'dat beproeft dubbelklik, een herhaald en een afgebroken verzoek en een crash direct na de bevestiging (uitval van Redis of PostgreSQL zit er nog niet in)'))
 };
 
 /* ---- de meting ---- */
@@ -428,7 +467,7 @@ async function meetRij(rij, base, persoonlijk, rollen) {
 }
 
 function vulOngemeten(r) {
-  for (const [naam, maak] of Object.entries(ONGEMETEN)) r.bewijzen[naam] = maak();
+  for (const [naam, maak] of Object.entries(ONGEMETEN)) r.bewijzen[naam] = maak(r);
   /* Pas NA de standaard: een contract kan een GEEN_FIXTURE alleen vervangen
      door wat een bron verdiend heeft. Niet genoemd = blijft staan. */
   r.samengesteld = stelSamen(r);
@@ -782,7 +821,7 @@ function bouw(meting) {
        gesloten ketens (nog) voor geen enkele app tellen. Die tweede lijst staat
        er even groot bij: weglaten leest als "nog niet aan toegekomen". */
     samenstelling: {
-      uitleg: 'Een bewijs mag uit een bestaande proef komen als scripts/lib/appcontract.js die bron noemt, de proef routes raakt die de ingang aanroept, en het register vers is (versheid() in scripts/lib/stempel.js). Een ketenproef levert alleen voltooibaar; een ronde uit ALGEMEEN levert per rij alleen het bewijs waarvoor hij staat.',
+      uitleg: 'Een bewijs mag uit een bestaande proef komen als scripts/lib/appcontract.js die bron noemt, de proef routes raakt die de ingang aanroept, en het register vers is (versheid() in scripts/lib/stempel.js). Een ketenproef levert alleen voltooibaar; de voltooiproef (VOLTOOIPROEF.json) levert voltooibaar, persistent en herstelbaar, per onderdeel met een eigen scenario; een ronde uit ALGEMEEN levert per rij alleen het bewijs waarvoor hij staat.',
       koppelingen: meting.regels.filter((r) => (r.samengesteld || []).length).map((r) => ({
         app: r.app, functie: r.functie,
         bewijzen: Object.fromEntries(r.samengesteld.map((n) => [n, { status: r.bewijzen[n].status,
@@ -798,8 +837,41 @@ function bouw(meting) {
       && r.bewijzen.bereikbaar.status === 'NIET_GETEST'
       && /er staat een deur/.test(r.bewijzen.bereikbaar.reden || ''))
       .map((r) => ({ app: r.app, wereld: r.wereld, ingang: r.ingang, reden: r.bewijzen.bereikbaar.reden })),
+    toezegklassen: toezegklassen.inventaris(),
     regels: meting.regels
   };
+}
+
+/* Alleen het inventarisblok vervangen: elk ander veld blijft zoals de laatste
+   browsermeting het schreef, inclusief zijn stempel. De sleutelvolgorde blijft
+   die van bouw(), zodat een volle meting daarna geen schijnverschil geeft. */
+function metInventaris(oud, blok) {
+  const uit = {};
+  for (const [k, v] of Object.entries(oud)) {
+    if (k === 'toezegklassen') continue;
+    if (k === 'regels') uit.toezegklassen = blok;
+    uit[k] = v;
+  }
+  if (!('toezegklassen' in uit)) uit.toezegklassen = blok;
+  return uit;
+}
+
+/* Het oordeel over het blok, zonder browser. Rot en fouten laten zakken; een
+   blok dat achterloopt op de documenten ook, met de weg om het bij te werken. */
+function inventarisOordeel(opgeslagen, vers) {
+  const bezwaren = [];
+  for (const r of vers.rot) bezwaren.push('ROT: ' + r.document + ' -- "' + r.citaat.slice(0, 70) + '" (' + r.reden + ')');
+  for (const f of vers.fouten) bezwaren.push('FOUT: ' + f);
+  for (const it of vers.items) {
+    if (!Object.prototype.hasOwnProperty.call(toezegklassen.KLASSEN, it.klasse)) bezwaren.push('KLASSE buiten de vier: ' + it.document + ':' + it.regel + ' ' + it.klasse);
+    if (!it.citaat) bezwaren.push('ZONDER CITAAT: ' + it.document + ':' + it.regel);
+  }
+  if (!opgeslagen) bezwaren.push('APPWERKT.json draagt geen blok toezegklassen -- draai node scripts/appwerkt.js --inventaris');
+  else if (JSON.stringify(opgeslagen) !== JSON.stringify(vers)) {
+    bezwaren.push('het blok toezegklassen loopt achter op de documenten (vingerafdruk ' +
+      (opgeslagen.bron && opgeslagen.bron.vingerafdruk) + ' tegen ' + vers.bron.vingerafdruk + ') -- draai node scripts/appwerkt.js --inventaris');
+  }
+  return bezwaren;
 }
 
 /* DE WACHT: dit script schrijft APPWERKT.json en start daarom niet bij het
@@ -818,9 +890,26 @@ function SCHERMREGISTER() {
 /* onderschepper en weigerZin voor de toetsen van de meter; rijen, maakContext,
    bezoek en POORTEN voor de rondes die per rij van APPWERKT meten
    (scripts/liegronde.js, scripts/bevoegdronde.js). */
-module.exports = { onderschepper, weigerZin, rijen, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN };
+module.exports = { onderschepper, weigerZin, rijen, maakContext, bezoek, bedien, bedektDoorSchil, POORTEN,
+  metInventaris, inventarisOordeel };
 
 if (require.main === module) (async () => {
+  if (alleenInventaris) {
+    const oud = JSON.parse(fs.readFileSync(DOEL, 'utf8'));
+    const vers = toezegklassen.inventaris();
+    if (controle) {
+      const bezwaren = inventarisOordeel(oud.toezegklassen, vers);
+      if (bezwaren.length) { for (const b of bezwaren) console.error('NIET OK: ' + b); process.exit(1); }
+      console.log('OK: toezegklassen ' + JSON.stringify(vers.telling) + ' over ' + vers.bron.documenten + ' documenten, 0 rot.');
+      process.exit(0);
+    }
+    const bezwaren = inventarisOordeel(null, vers).filter((b) => !b.startsWith('APPWERKT.json draagt'));
+    fs.writeFileSync(DOEL, JSON.stringify(metInventaris(oud, vers), null, 1) + '\n');
+    log('APPWERKT.json: blok toezegklassen bijgewerkt ' + JSON.stringify(vers.telling) +
+      ' (niet geteld: ' + vers.nietGeteld.prozaMarkeringen + ' in lopende tekst, ' + vers.nietGeteld.standOnbekend + ' andere standwaarden)');
+    if (bezwaren.length) { for (const b of bezwaren) console.error('NIET OK: ' + b); process.exit(1); }
+    process.exit(0);
+  }
   /* Een gefilterde ronde vergelijken met het VOLLEDIGE register telt appels bij
      peren: minder rijen geeft altijd minder defecten, dus de ratel zou altijd
      groen zeggen. Dat is precies het soort stille geruststelling waar dit

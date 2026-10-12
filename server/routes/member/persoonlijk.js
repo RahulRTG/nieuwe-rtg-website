@@ -60,6 +60,7 @@ app.post('/api/fluister/focus', auth, (req, res) => res.json(fluisterFocus(req.s
    bestand geworden, en het ging door de omvangband van keuringsregel `omvang`.
    Sparren staat apart om een ander soort reden: een ander onderwerp. */
 require('./persoonlijk-rahul')(kern);
+require('./persoonlijk-concept')(kern);
 require('./persoonlijk-spar')(kern);
 require('./persoonlijk-assets')(kern);
 

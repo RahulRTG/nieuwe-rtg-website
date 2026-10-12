@@ -2,6 +2,8 @@
    spoed vanaf de bediening, het overschot op de pas en het aanmelden op
    een kant van de lijn. Krijgt de gedeelde kern een keer bij het opstarten
    vanuit routes/supplier/orders.js. */
+// wie er aan de lijn staat, voor deze kijker: kern/leverancier/personeelzicht.js
+const personeelzicht = require('../../../kern/leverancier/personeelzicht');
 module.exports = (kern) => {
   const { app, crypto, logActivity, pickupCode, save, sseToSupplier, supplierAuth, orderMetRef,
           ordersVoegToe } = kern;
@@ -123,9 +125,10 @@ app.post('/api/supplier/lijn', supplierAuth, (req, res) => {
   for (const k of Object.keys(s.lijn)) s.lijn[k] = (s.lijn[k] || []).filter(x => x.id !== ik.id);
   if (!stond) (s.lijn[sectie] = s.lijn[sectie] || []).push(ik);
   save();
-  logActivity(s.code, req.actor, stond ? 'meldde zich af van de kant ' + sectie : 'meldde zich aan op de kant ' + sectie);
+  // besluit A1: aan- en afmelden op een kant is een klokgebeurtenis; wie er NU staat ziet iedereen, op naam
+  logActivity(s.code, req.actor, stond ? 'meldde zich af van de kant ' + sectie : 'meldde zich aan op de kant ' + sectie, stond ? 'klok-uit' : 'klok-in');
   sseToSupplier(s.code, 'sync', { scope: 'orders' });
-  res.json({ ok: true, lijn: s.lijn, aangemeld: !stond });
+  res.json({ ok: true, lijn: personeelzicht.lijnVoor(s.lijn, req.actor), aangemeld: !stond });
 });
 
 };

@@ -25,7 +25,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, stopNet } = require('./helper');
+const { startServer, stop, stopNet, stroomAdres } = require('./helper');
 const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==';
@@ -369,11 +369,14 @@ test('het banlog van het schild schrijft een medialink gemaskeerd', () => {
 
 /* ---- de vierde ronde (tegenlezing op 41fd8b7eb) ---- */
 
-/* Een lezer van de live-stroom van een lid, zoals het scherm hem opent. */
-function stroom(token) {
+/* Een lezer van de live-stroom van een lid, zoals het scherm hem opent: eerst de
+   sessie (in de kop) ruilen voor een stroomticket, dan de stroom op dat ticket
+   (server/kern/sessiestroom.js; de sessie staat niet meer in het adres). */
+async function stroom(token) {
   const ctl = new AbortController();
   const st = { tekst: '', ctl };
-  fetch(base + '/api/stream?token=' + encodeURIComponent(token), { signal: ctl.signal }).then(async r => {
+  const adres = await stroomAdres(base, '/api/stream', token);
+  fetch(adres, { signal: ctl.signal }).then(async r => {
     const rd = r.body.getReader(); const dec = new TextDecoder();
     for (;;) { const { value, done } = await rd.read(); if (done) break; st.tekst += dec.decode(value); }
   }).catch(() => {});
@@ -404,7 +407,7 @@ test('N1: het live-seintje van een DM draagt geen post, ook niet voor een gratis
   const p = await api('/api/salon/plaats', { tekst: geheim, media: [{ beeld: PNG, alt: 'x' }], publiek: 'vrienden', plaats: 'PlekLive' }, A);
   assert.equal(p.status, 200, p.body.error);
   const auteur = p.body.post.author;
-  const sC = stroom(C), sG = stroom(G);
+  const sC = await stroom(C), sG = await stroom(G);
   // de stroom staat open zodra de server zijn begroeting stuurde; daarop wachten en niet op de klok
   await wachtOpTekst(sC, 'hello'); await wachtOpTekst(sG, 'hello');
   for (const [k, wie] of [[kC, 'C'], [kG, 'G']]) {

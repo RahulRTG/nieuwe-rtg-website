@@ -165,10 +165,31 @@ test('5. het teamprikbord en de oproep blijven binnen de zaak', async () => {
   assert.equal(bz.status, 200, 'iedereen oproepen mag, ook als er niemand luistert');
 });
 
-test('6. meldingen op gelezen zetten raakt alleen de eigen zaak', async () => {
-  const r = await api('/api/supplier/notifications/read', {}, werker);
-  assert.equal(r.status, 200);
-  const st = await api('/api/supplier/state', {}, baas);
-  const mel = st.body.state.notifications || [];
-  assert.ok(mel.every(n => n.read), 'alles van deze zaak staat op gelezen');
+test('6. meldingen op gelezen zetten raakt alleen de eigen zaak, en een beperkte melding niet voor de manager', async () => {
+  /* Drie dingen, want met alleen "alles staat op gelezen" bleef de toets groen
+     terwijl hij niets meer zag (tegenlezing PR #584):
+     - een gewone melding die de werker leest, staat ook voor de manager op gelezen;
+     - een BEPERKTE melding (de eigen verlofaanvraag) zet de werker niet voor de
+       manager op gelezen: die vlag is per lezer (kern/leverancier/personeelzicht.js);
+     - een andere zaak blijft onaangeroerd. */
+  const nieuw = (await api('/api/supplier/staff/add', { name: 'Reset Proef' }, baas)).body;
+  assert.equal((await api('/api/supplier/staff/reset-pin', { staffId: nieuw.staff.id }, baas)).status, 200, 'een gewone melding');
+  const vr = await api('/api/staff/leave/request', { soort: 'verlof', van: '2027-06-01', tot: '2027-06-02' }, werker);
+  assert.equal(vr.status, 200, 'een verlofaanvraag: een beperkte melding');
+  const buurNieuw = (await api('/api/supplier/staff/add', { name: 'Buur Proef' }, buurbaas)).body;
+  assert.equal((await api('/api/supplier/staff/reset-pin', { staffId: buurNieuw.staff.id }, buurbaas)).status, 200);
+  const buurVoor = (await api('/api/supplier/notifications', {}, buurbaas)).body.notifications.map(n => n.id + ':' + n.read);
+  assert.ok(buurVoor.some(x => x.endsWith(':false')), 'de andere zaak heeft een ongelezen melding om te bewaken');
+
+  assert.equal((await api('/api/supplier/notifications/read', {}, werker)).status, 200);
+
+  const mel = (await api('/api/supplier/state', {}, baas)).body.state.notifications || [];
+  const gewoon = mel.find(n => /De code van Reset Proef/.test(n.text || ''));
+  assert.ok(gewoon, 'de manager ziet de gewone melding');
+  assert.equal(gewoon.read, true, 'die staat op gelezen');
+  const verlof = mel.find(n => n.title === 'Verlofaanvraag' && /2027-06-01/.test(n.body || ''));
+  assert.ok(verlof, 'de manager ziet de verlofaanvraag');
+  assert.equal(verlof.read, false, 'die blijft voor de manager nieuw');
+  const buurNa = (await api('/api/supplier/notifications', {}, buurbaas)).body.notifications.map(n => n.id + ':' + n.read);
+  assert.deepEqual(buurNa, buurVoor, 'een andere zaak is onaangeroerd');
 });

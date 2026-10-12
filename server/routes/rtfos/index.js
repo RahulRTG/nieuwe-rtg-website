@@ -137,6 +137,6 @@ module.exports = (kern) => {
   app.post('/api/rtfos/winkel/stand', officeAuth,
     (req, res) => veilig(res, () => rtfos.winkel.standZet(req.body, kern.boardroomWie && kern.boardroomWie(req))));
 
-  require('./portalen')({ app, rtfos, veilig });
+  require('./portalen')({ app, rtfos, veilig, genootschapDrager: kern.genootschapDrager });
   require('./voordeur')({ app, rtfos, veilig });
 };

@@ -17,16 +17,18 @@
    ========================================================================== */
 'use strict';
 
-const { idVanKey } = require('../lib/lidsleutel');
-
-/* De laag ophangen. `melden` gaat naar het LID: notify() uit ./meldingen.js
-   stuurt naar een hele pas, en een servicebericht is persoonlijk -- alleen
-   sendPushToUser wijst een account aan. Ontbreekt hij, dan meldt deze laag
-   niets en valt er niets om: de levering van een melding gaat nooit voor het
-   bestaan van de zaak (kern/envelop.js, dezelfde afweging). */
+/* De laag ophangen. `melden` gaat naar de MELDER, langs de bak die bij zijn
+   soort gelezen wordt (kern/service/melderpost.js): notify() uit ./meldingen.js
+   stuurt naar een hele pas, en een servicebericht is persoonlijk. Lukt de
+   bezorging niet, dan valt er niets om -- de levering van een melding gaat nooit
+   voor het bestaan van de zaak (kern/envelop.js) -- maar het wordt wel gezegd. */
 function hangOp(kern, hulp) {
   const accounts = hulp.accounts;
   const { db, save, crypto } = hulp;
+  const melderPost = require('../kern/service/melderpost')({
+    meldLid: (k, n) => (typeof kern.meldLid === 'function' ? kern.meldLid(k, n) : null),
+    notifySupplier: hulp.notifySupplier, keyVanCodenaam: hulp.keyVanCodenaam,
+    log: (t) => console.warn(t) });
   Object.assign(kern, require('../kern/service')({
     db, save, crypto, bewerkCollectie: hulp.bewerkCollectie,
     inzagelog: require('../inzagelog'),
@@ -39,11 +41,12 @@ function hangOp(kern, hulp) {
     /* De twee live-kanalen voor het bellen. Deze laag legt zelf geen verbinding
        aan: zij geeft WebRTC-signalen door en kijkt niet in het pakket. */
     sseToCustomer: hulp.sseToCustomer, sseToOffice: hulp.sseToOffice,
-    notify: (melderKey, bericht) => {
-      const id = idVanKey(melderKey);
-      if (id == null || typeof hulp.sendPushToUser !== 'function') return;
-      hulp.sendPushToUser(id, { title: bericht.titel, body: bericht.tekst, tag: 'service-' + bericht.zaak });
-    }
+    /* Naar de bak die bij de soort melder GELEZEN wordt -- een lid, een zaak of
+       (van voor 11 oktober 2026) een codenaam. Tot dan was dit alleen een push
+       naar een lidaccount, en kwam een antwoord aan een zaak nergens aan; zie
+       kern/service/melderpost.js. Laat gebonden: meldLid ontstaat in een
+       eerdere laag, maar wie hem hier vastpint maakt de volgorde tot gedrag. */
+    notify: (melder, bericht) => melderPost.bezorgMelder(melder, bericht)
   }));
   kern.serviceLoopSource = require('../kern/service/loop-source')({leesCollectie:hulp.leesCollectie,bewerkCollectie:hulp.bewerkCollectie,
     zaken:kern.serviceZaken,kwaliteit:kern.serviceKwaliteit,authorize:actorRef=>!!(kern.magBalie&&kern.magBalie(actorRef)),

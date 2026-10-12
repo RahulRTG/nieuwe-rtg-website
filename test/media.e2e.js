@@ -54,18 +54,13 @@ const pw = laadPlaywright();
 
 /* Een adres dat GEEN localhost is. Zonder zo'n adres is (a) niet te meten: op
    loopback vindt de browser http nog beveiligd, en dan blijft juist de fout die
-   we onderzoeken onzichtbaar. Ontbreekt er een niet-loopback adres op deze
-   machine, dan wordt dat deel overgeslagen met opgaaf van reden -- niet stil. */
-function lanAdres() {
-  const netten = os.networkInterfaces();
-  for (const naam of Object.keys(netten)) {
-    for (const n of netten[naam] || []) {
-      if (n.family !== 'IPv4' || n.internal) continue;
-      return n.address;
-    }
-  }
-  return null;
-}
+   we onderzoeken onzichtbaar. De server zelf blijft op de loopback -- de
+   toetsstand mag niet op een netwerk luisteren (server/lib/luisteradres.js) --
+   en de browser krijgt een hostnaam die hij naar 127.0.0.1 oplost. Voor de
+   browser is dat een gewone http-origin buiten localhost, en dus onveilig. */
+const LAN = 'rtg-lan.local';   // .local: de server ziet een lokaal netwerk, net als bij een LAN-adres
+// en nooit via een proxy: die kent de verzonnen naam niet
+const LAN_REGELS = ['--host-resolver-rules=MAP ' + LAN + ' 127.0.0.1', '--proxy-bypass-list=' + LAN];
 
 /* De pagina's met een camera of een microfoon. Met de hand, niet afgeleid: een
    afgeleide lijst schuift mee met de code en dan verandert wat deze toets dekt
@@ -79,21 +74,16 @@ const MEDIAPAGINAS = ['/apps/camera.html', '/apps/oog.html', '/apps/clips.html',
 test('camera en microfoon: op een LAN-adres zegt de app WAAROM het niet gaat, en op een veilig adres gaat het',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-media-e2e-'));
-  const lan = lanAdres();
-  // op alle interfaces luisteren, anders is het LAN-adres niet te bereiken
-  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_BIND: '0.0.0.0' } });
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch(browserOpties(pw, { args: nepMediaArgs() }));
+    browser = await pw.chromium.launch(browserOpties(pw, { args: nepMediaArgs().concat(LAN_REGELS) }));
     const ctx = await browser.newContext({ permissions: ['camera', 'microphone'] });
     await installeerNepMicrofoon(ctx);
 
     /* ---- (a) DE KLACHT ZELF: een http-adres dat geen localhost is ---- */
-    if (!lan) {
-      // geen niet-loopback adres: dan is dit deel niet te meten, en dat zeggen we
-      console.log('# LET OP: geen LAN-adres op deze machine, dus het onveilige-adres-deel is niet gemeten');
-    } else {
-      const lanBasis = srv.base.replace(/\/\/[^/]+/, '//' + lan + ':' + srv.port);
+    {
+      const lanBasis = srv.base.replace(/\/\/[^/]+/, '//' + LAN + ':' + srv.port);
       const p1 = await ctx.newPage();
       await p1.goto(lanBasis + '/apps/camera.html', { waitUntil: 'domcontentloaded', timeout: 30000 });
       const onveilig = await p1.evaluate(async () => {

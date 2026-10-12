@@ -33,7 +33,7 @@
     $('#tmMsg').addEventListener('keydown', e => { if (e.key==='Enter') send(); });
     const tc = document.getElementById('teamCall'); if (tc) tc.addEventListener('click', () => window.TeamCall && TeamCall.groep());
     const ba = document.getElementById('buzzAll'); if (ba) ba.addEventListener('click', async () => {
-      try { const d = await API.call('/supplier/team/buzz', { all: true }); toast(''+T('pd.allbuzzed','Hele team opgeroepen')+' ('+d.reached+').'); }
+      try { const d = await API.call('/supplier/team/buzz', { all: true }); toast(''+T('pd.allbuzzed','Hele team opgeroepen')+'.'); }
       catch(e){ toast(e.message); }
     });
     document.querySelectorAll('[data-belm]').forEach(b => b.addEventListener('click', () => window.TeamCall && TeamCall.bel(parseInt(b.dataset.belm, 10), b.dataset.naam)));
@@ -41,7 +41,7 @@
     if (window.CollegaChat) CollegaChat.badges();
     document.querySelectorAll('[data-buzz]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { staffId: Number(b.dataset.buzz) });
-        toast(d.reached ? ''+d.name+' '+T('pd.buzzed','wordt opgeroepen.') : d.name+' '+T('pd.buzzoff','heeft de app nu niet open.')); }
+        toast(d.reached === false ? d.name+' '+T('pd.buzzoff','heeft de app nu niet open.') : ''+d.name+' '+T('pd.buzzed','wordt opgeroepen.')); }
       catch(e){ toast(e.message); }
     }));
     // personeelsnetwerk: verbinden, goedkeuren en chatten in de aparte ruimte

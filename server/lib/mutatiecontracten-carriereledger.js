@@ -80,6 +80,12 @@ const CONTRACTEN = Object.fromEntries([
   leest('POST /api/carriere/ledger/mijn', 'carriereledger.mijn', LID,
     'De eigen reeks als projectie: feiten op tijd, met hun bevestigingen, de zeven voorraden en ' +
     'de NOOIT-lijst. Er staat met opzet geen totaal onder.'),
+  ['POST /api/carriere/ledger/afschrift', { mutatieId: 'carriereledger.afschrift', herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' }, toegang: LID, stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'test/loopbaan-mee.test.js: tweemaal 200, byte-gelijk (zonder tijdstempel).',
+      op: '2026-10-11' },
+    nagekeken: 'leest via reeksKijk(); maakt niets aan',
+    afgetekend: { door: 'Claude, op grond van die toets; niet door een mens nagelezen', op: '2026-10-11' } }],
   leest('POST /api/carriere/ledger/delen', 'carriereledger.mijnDelen', LID,
     'Welke deelcodes dit lid heeft uitgegeven, met hun verval en hun gebruik. Nooit de code zelf: ' +
     'die gaat precies eenmaal de deur uit.'),

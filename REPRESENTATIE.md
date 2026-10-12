@@ -90,8 +90,8 @@ handelen, spoor:
 | `fiscaal-mandaat` | 3/7 | 3/7 | aanvaarden, versmallen, handelen, spoor |
 | `sepa-machtiging` | 0/7 | 3/7 | verlenen, versmallen, handelen, spoor |
 
-Gemiddeld <!--getal:namens.gemiddeldOpNaam-->3<!--/getal--> op naam en
-<!--getal:namens.gemiddeldOpSynoniem-->4.6<!--/getal--> op synoniem, van de zeven.
+Gemiddeld <!--getal:namens.gemiddeldOpNaam-->3.1<!--/getal--> op naam en
+<!--getal:namens.gemiddeldOpSynoniem-->4.7<!--/getal--> op synoniem, van de zeven.
 **<!--getal:namens.werkwoordenInAlle-->0<!--/getal--> werkwoorden staan onder dezelfde
 naam in alle zeven mechanismen.** Precies één mechanisme voert de hele
 grammatica: `kern/vertegenwoordiging/`.

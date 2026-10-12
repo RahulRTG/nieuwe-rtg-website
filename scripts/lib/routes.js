@@ -672,5 +672,5 @@ const isSchakel = (pad) => SCHAKELPADEN.some(p => String(pad || '').startsWith(p
    de uitkomst niet ziet: allebei de bestanden bevatten het voorvoegsel, dus geen
    enkele controle op de TEKST kan zien dat de verkeerde is gekozen. Wie die regel
    wil bewaken, moet hem los kunnen aanroepen (test/routesbron.test.js). */
-module.exports = { alleRoutes, routesInBron, WORTEL, loopMap, SCHAKELPADEN, NIET_AANRAKEN, waaromNietAanraken, isSchakel,
+module.exports = { alleRoutes, routekaart, routesInBron, WORTEL, loopMap, SCHAKELPADEN, NIET_AANRAKEN, waaromNietAanraken, isSchakel,
   rolVan, redenZonderRol, verdeelOpRol, meldZonderRol, bewakerskaart, enigBestand };

@@ -63,7 +63,7 @@
     '.zc .zc-sig.rood{border-left-color:#C23A5E;} .zc .zc-sig.amber{border-left-color:#C99A2E;}' +
     '.zc .zc-nv{display:inline-block;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;' +
       'border:1px solid var(--line,rgba(255,255,255,.16));border-radius:0;padding:.05rem .45rem;}' +
-    '.zc .zc-auto{border-color:#4C9A75;color:#4C9A75;} .zc .zc-assist{border-color:#C99A2E;color:#C99A2E;}' +
+    '.zc .zc-auto{border-color:#4C9A75;color:var(--rtg-p-groen,#4C9A75);} .zc .zc-assist{border-color:#C99A2E;color:#C99A2E;}' +
     '.zc .zc-hand{border-color:#C23A5E;color:#C23A5E;}' +
     '.zc .zc-leeg{color:var(--soft,rgba(244,241,236,.55));padding:1.6rem 0;font-size:.88rem;}' +
     /* de duimstand: één kolom, grotere raakvlakken, geen tabelwerk */

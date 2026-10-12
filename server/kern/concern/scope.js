@@ -93,11 +93,11 @@ module.exports = (ctx) => {
      Geeft altijd een UITLEG mee, ook bij ja. Dat is CONCERN.md §7: een systeem
      dat rechten uitdeelt zonder te kunnen zeggen waarom iemand ergens NIET bij
      kan, is een systeem waarin mensen rechten stapelen tot het werkt. */
-  function mag(persoon, recht, doel, opties) {
+  function mag(persoon, recht, doel, opties = {}) {
     if (!rechtBestaat(recht)) {
       return { ok: false, reden: 'onbekend-recht', uitleg: 'Dit recht kennen we niet: ' + recht };
     }
-    const emps = employmentVanPersoon(persoon, false);
+    const emps = employmentVanPersoon(persoon, false).filter(x => !opties.binnen || x.entiteit === opties.binnen);
     if (!emps.length) {
       return { ok: false, reden: 'geen-werkrelatie',
         uitleg: 'Deze persoon heeft hier geen lopend dienstverband of mandaat.' };
@@ -117,7 +117,7 @@ module.exports = (ctx) => {
       if (heeft && past) {
         /* De kwalificatie-eis. Staat hij op het recht, dan moet de persoon hem
            geldig hebben; anders telt deze treffer niet mee. */
-        const eis = (opties || {}).kwalificatie;
+        const eis = opties.kwalificatie;
         if (eis && !kwal.some(k => k.wat === eis || (k.opent || []).includes(eis))) {
           bijna.push({ employment: emp.id, rol: emp.rol, reden: 'kwalificatie',
             uitleg: 'De rol geeft dit recht, maar de vereiste kwalificatie (' + eis + ') ontbreekt of is verlopen.' });

@@ -16,6 +16,7 @@
    WAAROM DE OVEREENKOMST ACHTER DE KANTOORDEUR ZIT en niet bij de vervoerder:
    een partij die zijn eigen overeenkomst kan schrijven, heeft geen overeenkomst
    maar een vinkje. */
+const logboekzicht = require('../../kern/leverancier/logboekzicht');
 module.exports = (kern, hulp) => {
   const { app, auth, supplierAuth, managerOnly, officeAuth, gegevensStop,
     kaartKoop, kaartMijn, kaartAanbod, kaartControle, kaartToonVoor,
@@ -131,18 +132,28 @@ module.exports = (kern, hulp) => {
 
   /* ---------------- de chauffeur: zijn dienst ---------------- */
   app.post('/api/staff/mob/cdt/aanmelden', supplierAuth, (req, res) => {
-    stuur(res, dienstStart(req.supplier, req.actor && req.actor.name, req.body || {}));
+    stuur(res, dienstStart(req.supplier, req.actor, req.body || {}));
   });
   app.post('/api/staff/mob/cdt/soort', supplierAuth, (req, res) => {
-    stuur(res, dienstSoort(req.supplier, req.actor && req.actor.name, req.body || {}));
+    stuur(res, dienstSoort(req.supplier, req.actor, req.body || {}));
   });
   app.post('/api/staff/mob/cdt/afmelden', supplierAuth, (req, res) => {
-    stuur(res, dienstEind(req.supplier, req.actor && req.actor.name, req.body || {}));
+    stuur(res, dienstEind(req.supplier, req.actor, req.body || {}));
   });
 
   /* ---------------- de onderneming: het bord en de uitvoer ---------------- */
   app.post('/api/supplier/mob/cdt', supplierAuth, (req, res) => {
-    stuur(res, cdtBeeld(req.supplier, req.body || {}));
+    /* Begin, eind, blokken en minuten van een dienst zijn kloktijden: een manager
+       ziet ze van iedereen, een chauffeur alleen van zichzelf, op staffId
+       (kern/leverancier/logboekzicht.js, eigenaarsbesluit 11 oktober 2026). */
+    const b = cdtBeeld(req.supplier, req.body || {});
+    if (b && b.ok && !logboekzicht.magKlokZien(req.actor)) {
+      const eigen = (l) => logboekzicht.eigenVoor(l, req.actor, (x) => x.staffId);
+      b.lopend = eigen(b.lopend); b.afgerond = eigen(b.afgerond);
+      // de signalen opnieuw uit de eigen diensten, zoals cdtBeeld ze maakt
+      b.signalen = b.lopend.concat(b.afgerond).flatMap((x) => (x.signalen || []).map((s) => Object.assign({ chauffeurskaart: x.chauffeurskaart }, s)));
+    }
+    stuur(res, b);
   });
   /* Het regime is de vertaling van de wet naar deze onderneming (loondienst,
      zelfstandig, cao). Dat is een besluit van de werkgever, niet van een

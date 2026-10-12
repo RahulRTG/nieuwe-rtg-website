@@ -117,7 +117,7 @@ const MUTATIES = [
     weg: 'de gesaneerde schermcontext bereikt de lus niet meer',
     hoortTeZakken: 'de gesprekssamenhang: dezelfde zin met een ander scherm geeft dan dezelfde uitkomst',
     tekst: [{ bestand: L,
-      van: 'menscontext.saneer(opties && opties.context)',
+      van: 'menscontext.saneer(opties && opties.context, opties && opties.opzoeking)',
       naar: 'menscontext.saneer(null)' }] },
 
   { nr: '2', naam: 'resolver bypass',

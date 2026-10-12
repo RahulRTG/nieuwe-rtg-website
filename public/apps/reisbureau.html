@@ -77,6 +77,7 @@
   .knop.stil.zacht{color:var(--soft);}
   .mijn-kop{font-size:1.1rem;margin:2rem 0 .8rem;border-top:1px solid var(--line);padding-top:1.4rem;}
   .reis.aanvraag{cursor:default;flex-direction:column;align-items:stretch;gap:.4rem;}
+  .reis.aanvraag[aria-current="true"]{box-shadow:inset 3px 0 0 var(--gold,#857007);}
   .aanvraag-rij{display:flex;justify-content:space-between;align-items:center;gap:1rem;}
   .aanvraag-rij h3{font-size:1rem;}
   .stand-bevestigd{color:var(--green);}
@@ -141,6 +142,14 @@
 </section>
 
 <div class="melding" id="melding" role="status"></div>
+<!-- Het register van de Edge, zodat dit scherm zelf zegt welke aanvraag het lid
+     aanwijst: het blikveld maakt er een verwijzing van, en Rahul krijgt die mee
+     (EDGE.md par. 14.4). Zonder defer: het eigen script hieronder spreekt al. -->
+<script src="/shared/adaptief.js"></script>
+<script src="/shared/adaptief/grammatica.js"></script>
+<script src="/shared/objectverwijzing.js"></script>
+<script src="/shared/adaptief/vorm.js"></script>
+<script src="/shared/adaptief/register.js"></script>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat meldt hieronder zijn eigen model aan -->
 <script src="/shared/uitvoer.js"></script>
 <script src="/shared/experience-intent.js"></script>
@@ -188,6 +197,18 @@ async function laad(){
     '</button>').join('') : RTGFirstSteps.welcome('reisbureau');
   RTGFirstSteps.sync();
   $('#travelAdvice').hidden = !ALLE.length;
+  /* Een andere ingang (Reizen & Veilig) mag een wens of een reis MEEGEVEN, nooit
+     een advies opvragen of iets versturen: de wens wordt ingevuld en drukken doet
+     het lid hier zelf. Een reis-id die niet in de catalogus staat, opent niets. */
+  const mee = new URLSearchParams(location.search);
+  if (mee.get('wens') && ALLE.length && !$('#adviesIn').value) {
+    $('#adviesIn').value = mee.get('wens').slice(0, 200);
+    $('#travelAdvice').hidden = false;
+  } else if (mee.get('wens') && !ALLE.length) {
+    /* Een wens die nergens heen kan, verdwijnt niet stil. */
+    meld('Er is nu geen samengestelde reis om uw wens tegen te leggen. Uw wens is niet verstuurd.');
+  }
+  if (mee.get('reis') && typeof openReis === 'function') openReis(mee.get('reis'));
   $('#lijst').querySelectorAll('.reis').forEach(b => b.addEventListener('click', () => openReis(b.dataset.id)));
   laadMijn();
 }
@@ -218,6 +239,18 @@ const STAND_KLAS = { bevestigd: 'stand-bevestigd', afgewezen: 'stand-afgewezen',
   afgezegd: 'stand-afgezegd', 'wijziging-gevraagd': 'stand-wijziging-gevraagd' };
 const STAND_WOORD = { 'wijziging-gevraagd': 'wijziging gevraagd' };
 let openPaneel = null;   // ref waarvan het paneel openstaat, zodat het na een herlading openblijft
+/* WELKE AANVRAAG HET LID AANWIJST (EDGE.md par. 14.4). Het scherm zegt het via
+   RTGAdaptief.context(); het blikveld maakt er een verwijzing van (soort en
+   ref), en Rahul krijgt alleen die mee. Wat er over de aanvraag in het gesprek
+   komt, zoekt de server zelf op -- dit scherm geeft geen velden door. */
+let gekozen = null;
+function spreek(a){
+  if (!window.RTGAdaptief) return;
+  RTGAdaptief.context(a
+    ? { bron: 'reisbureau', titel: 'Mijn aanvragen', object: { soort: 'reisaanvraag', id: a.ref, label: a.titel || a.ref } }
+    : { bron: 'reisbureau', titel: 'Reisbureau' });
+}
+spreek(null);
 
 function wijzigingRegel(a){
   const w = (a.wijziging||{}).gevraagd || {};
@@ -256,7 +289,7 @@ async function laadMijn(){
   const rijen = (d.aanvragen||[]).slice(0, 8);
   if (!rijen.length){ $('#mijnWrap').innerHTML = ''; return; }
   $('#mijnWrap').innerHTML = '<h2 class="mijn-kop">Mijn aanvragen</h2>'+
-    rijen.map(a => '<div class="reis aanvraag" data-ref="'+esc(a.ref)+'">'+
+    rijen.map(a => '<div class="reis aanvraag" tabindex="0" data-ref="'+esc(a.ref)+'"'+(gekozen===a.ref?' aria-current="true"':'')+'>'+
       '<div class="aanvraag-rij">'+
         '<div><h3>'+esc(a.titel)+'</h3><span class="meta">'+esc(a.bestemming)+' · '+esc(a.personen)+' pers'+
         (a.vertrek ? ' · '+esc(a.vertrek) : '')+' · <span class="'+(STAND_KLAS[a.status]||'')+'">'+esc(STAND_WOORD[a.status]||a.status)+'</span></span></div>'+
@@ -273,9 +306,17 @@ async function laadMijn(){
       paneelHtml(a)+
     '</div>').join('');
 
+  /* Aanwijzen: een tik op de aanvraag zelf (niet op een knop erin), of Enter. */
+  const kies = (ref) => { gekozen = ref; spreek(rijen.find(x => x.ref === ref) || null);
+    $('#mijnWrap').querySelectorAll('.aanvraag').forEach(r => r.setAttribute('aria-current', String(r.dataset.ref === ref))); };
+  $('#mijnWrap').querySelectorAll('.aanvraag').forEach(r => {
+    r.addEventListener('click', (e) => { if (!e.target.closest('button,input,label')) kies(r.dataset.ref); });
+    r.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target === r) kies(r.dataset.ref); });
+  });
+  if (gekozen && !rijen.some(x => x.ref === gekozen)) { gekozen = null; spreek(null); }
   $('#mijnWrap').querySelectorAll('button[data-doe]').forEach(b => b.addEventListener('click', async () => {
     const ref = b.dataset.ref, doe = b.dataset.doe;
-    if (doe === 'open'){ openPaneel = ref; laadMijn(); return; }
+    if (doe === 'open'){ openPaneel = ref; kies(ref); laadMijn(); return; }
     if (doe === 'dicht'){ openPaneel = null; laadMijn(); return; }
     try {
       if (doe === 'intrek'){ await api('/api/reisbureau/annuleer', { ref }); meld('Aanvraag ingetrokken.'); }

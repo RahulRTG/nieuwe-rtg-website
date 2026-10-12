@@ -20,8 +20,9 @@
                   Dit is de harde vergelijking; hij kan alleen ja of nee zeggen
                   als BEIDE kanten er een hebben.
      de naam      wat er op de handtekening staat. Zwakker -- namen zijn te
-                  typen -- maar het is het enige dat werkt wanneer het kantoor
-                  op een gedeelde code binnenkomt.
+                  typen -- en daarom alleen een EXTRA blokkade (dezelfde naam
+                  tekent niet af), nooit een doorlaat: een gedeelde code met een
+                  getypte naam tekent niets af (zie onder).
 
    ZONDER IDENTITEIT GAAT DE DEUR DICHT (AUTHORITY.md B2, besluit van de
    eigenaar, 23 september 2026). Eerst stond hier het omgekeerde: kende de toets
@@ -48,10 +49,22 @@ const normNaam = (n) => String(n == null ? '' : n).toLowerCase().replace(/\s+/g,
    vastgesteld, ook wanneer hij MAG. */
 function toets({ inzender, doorKey, doorNaam }) {
   const inz = inzender && typeof inzender === 'object' ? inzender : null;
-  const sleutelBekend = !!(inz && inz.id && doorKey);
+  /* ALLE SLEUTELS VAN DE INZENDER (11 oktober 2026). Een werkplek draagt er twee
+     -- het personeelsnummer EN de ledensleutel -- en het kantoor op naam kent
+     alleen de tweede. Vergeleek deze toets alleen `id` (het personeelsnummer),
+     dan zond een mens in als medewerker en tekende hij af als kantoormens. */
+  const ids = inz ? [inz.id].concat(Array.isArray(inz.ids) ? inz.ids : []).filter(Boolean).map(String) : [];
+  /* EN ALLEEN IN DEZELFDE SLEUTELRUIMTE (N2, 11 oktober 2026). `staff:K:9` en
+     `user-42` zijn niet gelijk, maar dat bewijst niets: het kunnen twee namen
+     van dezelfde mens zijn -- precies de inzendingen van voor `ids` bestond.
+     Zonder een sleutel van de inzender in de ruimte van de tekenaar is de
+     scheiding niet vast te stellen, en dan is het nooit `bewezen`. */
+  const ruimte = (k) => (/^user-\d+$/.test(String(k)) ? 'lid' : (/^staff:/.test(String(k)) ? 'staff' : 'anders'));
+  // `anders` is geen ruimte maar het ontbreken ervan: twee onbekende vormen bewijzen niets
+  const sleutelBekend = !!(doorKey && ruimte(doorKey) !== 'anders' && ids.some(k => ruimte(k) === ruimte(doorKey)));
   const naamBekend = !!(inz && inz.naam && doorNaam);
 
-  if (sleutelBekend && String(inz.id) === String(doorKey)) {
+  if (doorKey && ids.includes(String(doorKey))) {
     return { mag: false, graad: 'bewezen', code: 'zelfde-mens',
       reden: 'Deze inzending is door dezelfde persoon ingezonden. Wie een app inzendt, tekent hem niet af -- ook niet als hij namens RTG in het kantoor zit. Laat een andere collega de keuring doen.' };
   }
@@ -63,12 +76,27 @@ function toets({ inzender, doorKey, doorNaam }) {
     return { mag: true, graad: 'bewezen',
       reden: 'De inzender en de ondertekenaar zijn twee verschillende mensen, en dat is aan hun inlog vastgesteld.' };
   }
-  if (naamBekend) {
-    return { mag: true, graad: 'opgegeven',
-      reden: 'De namen verschillen. Dat is vastgesteld op wat er is ingetypt en niet op twee inlogs; de scheiding is dus opgegeven en niet bewezen.' };
+  /* EEN GETYPTE NAAM IS GEEN TWEEDE HANDTEKENING (besluit van de eigenaar,
+     11 oktober 2026). Hier stond een tak die doorliet op twee VERSCHILLENDE
+     namen, met graad `opgegeven`: de gedeelde kantoorcode plus een willekeurige
+     naam in `door` publiceerde dan een app. Een opgegeven naam, een bestaande
+     sessie en een bewezen identiteit zijn drie verschillende dingen, en alleen
+     de laatste mag een tweede paar ogen heten. Zonder sleutel aan de kant van
+     wie tekent, gaat de deur dus dicht -- met de weg erheen. De graad blijft
+     staan als BESCHRIJVING van wat er lag, niet als vergunning. Zonder naam EN
+     zonder sleutel valt het hieronder in `geen-identiteit`, ook dicht. */
+  if (naamBekend && !doorKey) {
+    return { mag: false, graad: 'opgegeven', code: 'geen-tweede-mens',
+      reden: 'Een ingetypte naam is geen handtekening: met de gedeelde kantoorcode is niet vast te stellen wie er tekent. Log in op naam met uw eigen RTG-account (kantoorrol) en teken dan af.' };
+  }
+  /* De tekenaar IS bekend, de inzending niet: dan moet de INZENDING opnieuw,
+     niet de handtekening. */
+  if (doorKey) {
+    return { mag: false, graad: 'onbekend', code: 'geen-identiteit',
+      reden: 'Uw handtekening op naam is in orde, maar deze INZENDING draagt geen persoon die met uw inlog te vergelijken is: niet vast te stellen of u iemand anders bent dan de inzender. Laat de uitgever de app opnieuw inzenden met een persoonlijke inlog.' };
   }
   return { mag: false, graad: 'onbekend', code: 'geen-identiteit',
-    reden: 'Van de inzender of de ondertekenaar is geen persoon bekend, dus niet vast te stellen of dit twee verschillende mensen zijn. Laat de uitgever opnieuw inzenden met een persoonlijke inlog, en teken af met uw eigen account of uw naam.' };
+    reden: 'Van de inzender of de ondertekenaar is geen persoon bekend, dus niet vast te stellen of dit twee verschillende mensen zijn. Laat de uitgever opnieuw inzenden met een persoonlijke inlog, en teken af met uw eigen account op naam -- een getypte naam is geen handtekening.' };
 }
 
 module.exports = { toets, normNaam };

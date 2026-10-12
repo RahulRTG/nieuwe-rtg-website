@@ -56,6 +56,8 @@
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
 <script src="/shared/uitvoer.js"></script>
+<script src="/apps/concierge-lus-vorm.js"></script>
+<script src="/apps/concierge-lus.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -86,20 +88,34 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>({
     v.status, v.laatste||'', v.details||''])
 }));
 async function laad(){
-  let d, rv, arrangements, circles; try{
-    [d,rv,arrangements,circles] = await Promise.all([api('concierge'),api('rendezvous/concierge'),api('rendezvous/arrangements'),api('rendezvous/circles')]);
-  }catch(e){ if(e.status===401){ TOKEN=null; return inlog(); } $('#main').innerHTML='<div class="leeg">Kon het bureau niet laden.</div>'; return; }
-  STATUS = d.statussen||[];
-  VERZOEKEN = d.verzoeken||[];
-  const oud=d.verzoeken.length?d.verzoeken.map(kaart).join(''):'<div class="leeg">Geen algemene verzoeken.</div>';
-  const rvCards=(rv.requests||[]).length?(rv.requests||[]).map(rvKaart).join(''):'<div class="leeg">Geen Rendez-vous Concierge-verzoeken.</div>';
-  const arrangeCards=(arrangements.requests||[]).length?(arrangements.requests||[]).map(arrangeKaart).join(''):'<div class="leeg">Geen Arrange It-verzoeken.</div>';
-  $('#main').innerHTML = '<div class="sectie"><span>Rendez-vous</span><h2>Concierge-verzoeken</h2></div>'+rvCards+
+  /* ELKE BRON APART. De Rendez-vous-routes eisen een kantoormens OP NAAM
+     (naamAuth); met de gedeelde kantoorcode weigeren ze met 403. Met een
+     Promise.all trok die ene weigering het hele bureau mee: wie met de gedeelde
+     code binnenkwam zag "Kon het bureau niet laden" en dus ook de verzoeken niet
+     die hij wel mocht behandelen. Nu staat een geweigerde sectie er met de reden
+     van de server, en de rest werkt. */
+  const uit = await Promise.allSettled([api('concierge'),api('rendezvous/concierge'),api('rendezvous/arrangements'),api('rendezvous/circles'),api('bureau')]);
+  if(uit.some(x=>x.status==='rejected' && x.reason && x.reason.status===401)){ TOKEN=null; return inlog(); }
+  const [d,rv,arrangements,circles,bureau] = uit.map(x=>x.status==='fulfilled'?x.value:null);
+  const reden = i => '<div class="leeg">Niet te laden: '+esc((uit[i].reason&&uit[i].reason.message)||'onbekende fout')+'</div>';
+  STATUS = (d&&d.statussen)||[];
+  VERZOEKEN = (d&&d.verzoeken)||[];
+  const oud=!d?reden(0):d.verzoeken.length?d.verzoeken.map(kaart).join(''):'<div class="leeg">Geen algemene verzoeken.</div>';
+  const rvCards=!rv?reden(1):(rv.requests||[]).length?(rv.requests||[]).map(rvKaart).join(''):'<div class="leeg">Geen Rendez-vous Concierge-verzoeken.</div>';
+  const arrangeCards=!arrangements?reden(2):(arrangements.requests||[]).length?(arrangements.requests||[]).map(arrangeKaart).join(''):'<div class="leeg">Geen Arrange It-verzoeken.</div>';
+  /* De zaken van het Privékantoor, met de werkvloer van de concierge-lus
+     (apps/concierge-lus.js). Bovenaan: daar wacht een lid op een mens. */
+  const LUS = window.RTGLusKantoor;
+  $('#main').innerHTML = (LUS ? (bureau ? LUS.sectie(bureau) : '<div class="sectie"><span>Privékantoor</span><h2>Zaken van De Rechterhand</h2></div>'+reden(4)) : '')+
+    '<div class="sectie"><span>Rendez-vous</span><h2>Concierge-verzoeken</h2></div>'+rvCards+
     '<div class="sectie"><span>Rendez-vous</span><h2>Arrange It</h2></div>'+arrangeCards+
-    '<div class="sectie"><span>Society</span><h2>Circles</h2></div>'+circleBureau(circles.circles||[])+
+    '<div class="sectie"><span>Society</span><h2>Circles</h2></div>'+(circles?circleBureau(circles.circles||[]):reden(3))+
     '<div class="sectie"><span>RTG</span><h2>Algemene Concierge</h2></div>'+oud;
-  d.verzoeken.forEach(bind);
-  (rv.requests||[]).forEach(bindRv);(arrangements.requests||[]).forEach(bindArrange);bindCircles(circles.circles||[]);
+  VERZOEKEN.forEach(bind);
+  if(LUS && bureau) LUS.bind(laad);
+  if(rv) (rv.requests||[]).forEach(bindRv);
+  if(arrangements) (arrangements.requests||[]).forEach(bindArrange);
+  if(circles) bindCircles(circles.circles||[]);
 }
 let STATUS=[];
 function kaart(v){
@@ -110,6 +126,7 @@ function kaart(v){
     + (v.details?'<div class="meta">'+esc(v.details)+'</div>':'')
     + (v.laatste?'<div class="meta">Laatste stap: '+esc(v.laatste)+'</div>':'')
     + (vk?'<div class="vk">Vaste voorkeuren - '+vk+'</div>':'')
+    + (v.zaak?'<div class="vk">Dit verzoek is een zaak in de concierge-lus; de volledige werkvloer staat bovenaan bij het Privékantoor.</div>':'')
     + '<input class="veld notitie" placeholder="Notitie voor het lid (optioneel)">'
     + '<div class="acties">'+STATUS.map(s=>'<button class="knop'+(s==='afgewezen'?' af':s==='bevestigd'||s==='afgerond'?' doe':'')+'" data-s="'+esc(s)+'">'+esc(s)+'</button>').join('')+'</div>'
     + '</div>';

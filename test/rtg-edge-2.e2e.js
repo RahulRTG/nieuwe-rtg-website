@@ -130,7 +130,9 @@ function schermToestand(route) {
   const panel = document.querySelector('.rtg-edge-2-context');
   const cs = getComputedStyle(document.body);
   const inhoud = document.querySelector('main.wd-home, .wd-page > main, main');
-  const heroTitel = [...document.querySelectorAll('.wh-photo-copy h1, .wh-foundation-public h1')].find(n => n.getBoundingClientRect().height > 0);
+  /* Sinds #534 leidt op mobiel de cinematic scene (besluit van de eigenaar, 11 oktober
+     2026); haar kop is dan de herotitel. De oude koppen blijven meetellen waar ze staan. */
+  const heroTitel = [...document.querySelectorAll('.wp-scene .wp-heading h2, .wh-photo-copy h1, .wh-foundation-public h1')].find(n => n.getBoundingClientRect().height > 0);
   return {
     beeldvullend: document.body.matches('.rtg-stijl[data-world-home][data-rtg-shell=mobile]') && cs.paddingTop === '0px',
     heroTitelTop: heroTitel ? heroTitel.getBoundingClientRect().top : null,
@@ -323,8 +325,11 @@ async function controleerRoute(page, route, scherm) {
   assertEenRand(overzicht, label + ' · overzicht');
   assertStand(overzicht, { ...verwachtOverzicht, reveal: false }, label + ' · overzicht');
   assert.equal(overzicht.wereld, route.wereld, label + ': verkeerde wereldkleur/context');
-  assert.equal(overzicht.bottom.materiaal.toLowerCase(), {living:'#201912',work:'#192422',travel:'#29171d',foundation:'#19372d'}[route.wereld],
-    label + ': de adaptieve Edge volgt niet het wereldmateriaal');
+  // Sinds de www-pariteit (#534) heeft de Edge in elke wereld hetzelfde donkere
+  // materiaal, zoals het ene menu van de www-site; de wereld zelf leeft in de
+  // signatuurkleur, en die toetst test/world-palette.e2e.js per wereld.
+  assert.equal(overzicht.bottom.materiaal.toLowerCase(), '#11100e',
+    label + ': de adaptieve Edge draagt niet het ene www-materiaal');
   assert.equal(overzicht.randHerstel, 2, label + ': boven- en onderrand missen hun herstelzone');
   assert.equal(overzicht.randHerstelZichtbaar, 0, label + ': herstelzones zijn buiten compact zichtbaar');
   assertContext(overzicht, route, label);

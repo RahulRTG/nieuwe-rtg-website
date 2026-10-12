@@ -26,7 +26,7 @@
 
   function lijn() {
     if (es || !window.EventSource || !M.token()) return;
-    es = new EventSource('/api/stream?token=' + encodeURIComponent(M.token()));
+    es = RTGStroom.open('/api/stream', { token: M.token() });
     es.addEventListener('mediasamen', function (e) {
       var d = JSON.parse(e.data);
       if (d.kind === 'uitnodiging') { M.zeg(d.van + ' nodigt u uit in een luisterkamer.'); return; }

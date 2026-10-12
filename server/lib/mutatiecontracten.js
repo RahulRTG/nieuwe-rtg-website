@@ -32,30 +32,17 @@
 'use strict';
 
 const CONTRACTEN = Object.assign({},
-  require('./mutatiecontracten-library').CONTRACTEN,
-  require('./mutatiecontracten-loop-fabric').CONTRACTEN,
-  require('./mutatiecontracten-living-world').CONTRACTEN,
-  require('./mutatiecontracten-mall-aanvraag').CONTRACTEN,
-  require('./mutatiecontracten-beelden').CONTRACTEN,
-  require('./mutatiecontracten-document').CONTRACTEN,
-  require('./mutatiecontracten-storingen').CONTRACTEN,
-  /* Opgesplitst omdat scripts/check.js een bestandsgrens kent en die terecht
-     aansloeg: een lijst die naar duizenden regels groeit, hoort niet in een
-     bestand dat ook nog de vorm en de regels uitlegt. Zelfde vorm als
-     ./idemsleutels.js. */
-  require('./mutatiecontracten-beschermd').CONTRACTEN,
-  require('./mutatiecontracten-leest').CONTRACTEN,
-  require('./mutatiecontracten-connection').CONTRACTEN,
-  require('./mutatiecontracten-beleidsmotor').CONTRACTEN,
-  require('./mutatiecontracten-werkbetaling').CONTRACTEN,
-  require('./mutatiecontracten-vertegenwoordiging').CONTRACTEN,
-  require('./mutatiecontracten-staffgemoed').CONTRACTEN,
-  require('./mutatiecontracten-zaakkant').CONTRACTEN,
-  require('./mutatiecontracten-rugdekking').CONTRACTEN,
+  /* De eerste zestien domeinbestanden staan in ./mutatiecontracten-eerste.js:
+     deze lijst ging over de 10 kB van keuringsregel 13. De VOLGORDE blijft
+     dezelfde (Object.assign laat de laatste winnen), want dat bestand komt hier
+     als eerste. */
+  require('./mutatiecontracten-eerste').CONTRACTEN,
   /* RTG Vrijheid en RTG zelf als werkgever (VRIJHEID.md). */
   require('./mutatiecontracten-vrijheid').CONTRACTEN,
   require('./mutatiecontracten-magnaatleven').CONTRACTEN,
   require('./mutatiecontracten-democratie').CONTRACTEN,
+  require('./mutatiecontracten-verbond').CONTRACTEN,
+  require('./mutatiecontracten-beraad').CONTRACTEN,
   require('./mutatiecontracten-eigengezin').CONTRACTEN,
   require('./mutatiecontracten-toestemming').CONTRACTEN,
   require('./mutatiecontracten-leerhuis').CONTRACTEN,
@@ -73,6 +60,7 @@ const CONTRACTEN = Object.assign({},
   /* De publieke laag: volgen op een aanwezigheid, en de redactiehandeling van
      De Salon (STAGE.md par. 5a). */
   require('./mutatiecontracten-stage').CONTRACTEN,
+  require('./mutatiecontracten-reisconcept').CONTRACTEN,
   /* De zestien waardebewegende routes die nog op `onbekend` stonden
      (GELDDEKKING.json). Eigen bestand om dezelfde reden als hierboven, en omdat
      ze een gedeelde herkomst hebben: ze zijn alle zestien gelezen in een ronde,
@@ -100,6 +88,8 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-codedeuren').CONTRACTEN,
   require('./mutatiecontracten-lesfamilie').CONTRACTEN,
   require('./mutatiecontracten-lesstroom').CONTRACTEN,
+  require('./mutatiecontracten-ijs').CONTRACTEN, // TURN-credentials, docs/turn-server.md
+  require('./mutatiecontracten-sessiestroom').CONTRACTEN,
   require('./mutatiecontracten-werksleutels').CONTRACTEN,
   require('./mutatiecontracten-machinesleutels').CONTRACTEN,
   require('./mutatiecontracten-ssogeheim').CONTRACTEN,
@@ -108,6 +98,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-beschermzaak').CONTRACTEN,
   require('./mutatiecontracten-neiging').CONTRACTEN,
   require('./mutatiecontracten-knelpunt').CONTRACTEN,
+  require('./mutatiecontracten-drager').CONTRACTEN,
   require('./mutatiecontracten-connectdelen').CONTRACTEN,
   /* De naleesronde van 13 september 2026 -- zie de kop van het eerste bestand. */
   require('./mutatiecontracten-naleesronde').CONTRACTEN,
@@ -151,7 +142,9 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-herstel').CONTRACTEN,
   require('./mutatiecontracten-kantoorstuur').CONTRACTEN,
   require('./mutatiecontracten-rtgboek').CONTRACTEN,
+  require('./mutatiecontracten-vrijgave').CONTRACTEN,
   require('./mutatiecontracten-naargast').CONTRACTEN,
+  require('./mutatiecontracten-leidingtermijn').CONTRACTEN,
   /* De zevenenveertig die uit de afleidgang vielen toen die een grens erbij
      kreeg, met de hand gelezen op 13 september 2026 (zie de kop van de eerste). */
   require('./mutatiecontracten-afleidrest').CONTRACTEN,
@@ -171,6 +164,9 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-uitvoer'),
   require('./mutatiecontracten-hindernis'),
   require('./mutatiecontracten-reis'),
+  require('./mutatiecontracten-werkruimterechten'),
+  require('./mutatiecontracten-reisopgave'),
+  require('./mutatiecontracten-ritontvangst'),
   require('./mutatiecontracten-proefronde-lijst'),
   require('./mutatiecontracten-ovronde'),
   require('./mutatiecontracten-objectronde'),

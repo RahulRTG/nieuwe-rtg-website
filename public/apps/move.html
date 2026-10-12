@@ -76,6 +76,21 @@
   details ul{margin:.5rem 0 0 1.1rem;font-size:.78rem;color:var(--soft);}
   .bron{font-size:.72rem;color:var(--soft);margin-top:.6rem;font-style:italic;}
 
+  /* WAT ALS HET UITLOOPT. De minuten kiest de reiziger zelf; Move raadt ze
+     nooit (kern/move/gevolg.js, zelfde grens als kern/mobiliteit/storing.js).
+     Het antwoord is een VOORSTEL met het adres van de app waar het echte werk
+     hoort -- verzetten doet het domein na een bevestiging door een mens. */
+  .uitloop{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-top:.9rem;
+    padding-top:.8rem;border-top:1px solid var(--line);font-size:.8rem;color:var(--soft);}
+  .uitloop select,.uitloop button{font:inherit;font-size:.8rem;min-height:36px;color:var(--txt);
+    background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.3rem .6rem;}
+  .uitloop button{border-color:var(--gold);cursor:pointer;}
+  .gevolg{margin-top:.7rem;font-size:.82rem;color:var(--soft);}
+  .gevolg .kop{color:var(--txt);font-weight:600;}
+  .gevolg ul{list-style:none;margin:.5rem 0 0;}
+  .gevolg li{padding:.45rem 0;border-top:1px solid var(--line);}
+  .gevolg li[data-geraakt="ja"] .t{color:var(--onhaalbaar);}
+  .gevolg a{color:var(--txt);}
   .leeg{border:1px solid var(--line);background:var(--card);padding:1.6rem 1.2rem;color:var(--soft);font-size:.9rem;}
   .leeg b{display:block;color:var(--txt);font-family:'Bodoni Moda',serif;font-size:1.1rem;
     font-weight:600;margin-bottom:.5rem;}
@@ -235,7 +250,98 @@
         ['Vanaf ' + n.drempel.ruimMin + ' minuten marge (' + n.drempel.grond + ', geen meting)']));
     }
     if (n.bron) kaart.appendChild(el('div', 'bron', n.bron));
+    if (n.van && n.van.kenmerk) kaart.appendChild(uitloopVak(n.van));
     return kaart;
+  }
+
+  /* Het woord komt uit de uitkomst zelf, zoals bij de badge van een naad. Geen
+     uitkomst is "niet te bepalen" en nooit een gunstig woord. */
+  const woord = u => u ? String(u).replace(/_/g, ' ').toLowerCase() : 'niet te bepalen';
+
+  /* Wat als dit onderdeel uitloopt? Een vraag per overgang, op het onderdeel
+     waar je VANDAAN komt -- dat is het onderdeel dat later klaar is. */
+  function uitloopVak(van) {
+    const vak = el('div');
+    const rij = el('div', 'uitloop');
+    const id = RTGId('uit');
+    const lab = el('label', '', 'Loopt ' + (van.titel || 'dit onderdeel') + ' uit?');
+    lab.htmlFor = id;
+    const kies = el('select');
+    kies.id = id;
+    for (const m of [15, 30, 45, 60, 90]) {
+      const o = el('option', '', m + ' min later');
+      o.value = String(m);
+      if (m === 30) o.selected = true;
+      kies.appendChild(o);
+    }
+    const knop = el('button', '', 'Reken door');
+    knop.type = 'button';
+    const uit = el('div', 'gevolg');
+    uit.setAttribute('aria-live', 'polite');
+    knop.addEventListener('click', async () => {
+      knop.disabled = true;
+      uit.textContent = 'Move rekent de rest van uw reis door\u2026';
+      try {
+        const r = await api('gevolg', { kenmerk: van.kenmerk, minuten: Number(kies.value) });
+        toonGevolg(uit, r, kies.value);
+      } catch (e) {
+        uit.textContent = 'Doorrekenen is niet gelukt. Probeer het opnieuw.';
+      }
+      knop.disabled = false;
+    });
+    rij.appendChild(lab); rij.appendChild(kies); rij.appendChild(knop);
+    vak.appendChild(rij); vak.appendChild(uit);
+    return vak;
+  }
+
+  function toonGevolg(bak, r, minuten) {
+    bak.textContent = '';
+    /* Een weigering van de server staat er met haar eigen zin: de reiziger
+       hoort te zien WAAROM er geen antwoord is. */
+    if (r.status !== 200) {
+      bak.textContent = (r.body && r.body.error) || 'Doorrekenen is niet gelukt.';
+      return;
+    }
+    const d = r.body || {};
+    const regels = Array.isArray(d.regels) ? d.regels : [];
+    /* ONBEKEND IS GEEN "GEEN GEVOLG". Een overgang die Move niet kan bepalen,
+       telt nooit als geraakt; zonder deze telling zei de kop "wordt geen
+       overgang krapper" over een reis waarvan Move de helft niet kon wegen. */
+    const onbekend = regels.filter(g => g.na === 'NIET_TE_BEPALEN').length;
+    const meervoud = n => n === 1 ? ' overgang' : ' overgangen';
+    bak.appendChild(el('div', 'kop', (d.geraakt
+      ? minuten + ' minuten uitloop raakt ' + d.geraakt + meervoud(d.geraakt) + '.'
+      : onbekend ? 'Move ziet geen overgang die krapper wordt, maar kan er niet alles van wegen.'
+        : 'Met ' + minuten + ' minuten uitloop wordt geen overgang krapper.') +
+      (onbekend ? ' ' + onbekend + meervoud(onbekend) + ' niet te bepalen.' : '')));
+    bak.appendChild(el('div', '', 'Uw reis: ' + woord(d.oordeelVoor) + ' \u2192 ' + woord(d.oordeelNa) +
+      (Number.isFinite(d.dekking) ? ' (Move kon ' + d.dekking + '% wegen)' : '')));
+    const ul = el('ul');
+    for (const g of regels) {
+      const li = el('li');
+      li.setAttribute('data-geraakt', g.geraakt ? 'ja' : 'nee');
+      li.appendChild(el('div', 't', (g.titel || 'Onderdeel') + ': ' + woord(g.voor) + ' \u2192 ' + woord(g.na)));
+      li.appendChild(el('div', '', g.uitleg || ''));
+      /* HET VOORSTEL, NOOIT DE UITVOERING. De link brengt u naar de app waar
+         het echte werk hoort; daar bevestigt u zelf. */
+      if (g.voorstel && g.voorstel.app) {
+        li.appendChild(el('div', '', 'Voorstel: ' + g.voorstel.wat + '.'));
+        const a = el('a', '', 'Open waar dit onderdeel staat');
+        a.href = g.voorstel.app;
+        li.appendChild(a);
+        /* De zin volgt het VELD dat het zegt, en niet de aanname dat Move nooit
+           iets uitvoert. */
+        if (g.voorstel.uitgevoerd === false) {
+          li.appendChild(el('div', '', 'Er is niets verzet; dat bevestigt ' + (g.voorstel.bevestigt || 'een mens') + '.'));
+        }
+      }
+      if (g.zonderWeg) li.appendChild(el('div', '', g.zonderWeg));
+      ul.appendChild(li);
+    }
+    bak.appendChild(ul);
+    if (Array.isArray(d.nietGewogen) && d.nietGewogen.length) {
+      bak.appendChild(lijstje('Niet meegewogen (' + d.nietGewogen.length + ')', d.nietGewogen));
+    }
   }
 
   function zegStand(uitkomst, extra) {

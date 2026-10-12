@@ -108,7 +108,7 @@ function zetNaam(n){ try { localStorage.setItem('rtg_office_naam', n); } catch (
 function tekenNaam(){
   return '<div class="kaart"><h2>Wie tekent er</h2>'+
     '<p class="sub">Elk besluit hieronder draagt jouw naam en gaat het journaal in. Een besluit zonder naam is een besluit dat niemand heeft genomen; de server neemt het dan ook niet aan.</p>'+
-    '<div class="rij"><input class="veld" id="wie" class="breed" maxlength="80" placeholder="Voor- en achternaam" value="'+esc(naam())+'"></div></div>';
+    '<div class="rij"><input class="veld breed" id="wie" maxlength="80" placeholder="Voor- en achternaam" value="'+esc(naam())+'"></div></div>';
 }
 
 /* DE TOEGANKELIJKHEIDSUITSLAG, op de plek waar de mens aftekent.
@@ -182,8 +182,8 @@ function tekenAfdracht(a){
   return '<div class="kaart"><h2>Afdracht</h2>'+
     '<p class="sub">Wat RTG inhoudt op het bedrag dat een uitgever overhoudt, na btw. Dit werkt alleen VOORUIT: een bon die al is geschreven wordt nooit herrekend. Elke uitgever leest de reden die je hier opschrijft.</p>'+
     '<p class="sub mt-xs">Nu: <b>'+esc(String(a.afdracht.procent))+'%</b> sinds '+esc(String(a.afdracht.sinds).slice(0,10))+', door '+esc(a.afdracht.door)+'. '+esc(a.afdracht.reden||'')+'</p>'+
-    '<div class="rij"><input class="veld" id="afProc" class="smal" inputmode="decimal" placeholder="0" value="'+esc(String(a.afdracht.procent))+'">'+
-      '<input class="veld" id="afReden" class="breed" maxlength="400" placeholder="Waarom dit percentage">'+
+    '<div class="rij"><input class="veld smal" id="afProc" inputmode="decimal" placeholder="0" value="'+esc(String(a.afdracht.procent))+'">'+
+      '<input class="veld breed" id="afReden" maxlength="400" placeholder="Waarom dit percentage">'+
       '<button class="knop" id="afZet" type="button">Vastleggen</button></div></div>';
 }
 
@@ -197,7 +197,7 @@ function tekenRonde(){
   return '<div class="kaart"><h2>Controleronde</h2>'+
     '<p class="sub">Houdt elk bestand van elke live app tegen de hash waarop een mens heeft afgetekend. Wat niet meer klopt gaat eruit &mdash; dat is geen afweging. De ronde komt met je naam in het journaal.</p>'+
     '<div class="rij"><button class="knop" id="hcDoe" type="button">Nu nalopen</button>'+
-      '<a class="knop stil" href="/apps/appstore-dossier.html" class="knoplink">Het kanaaldossier &rarr;</a></div>'+
+      '<a class="knop stil knoplink" href="/apps/appstore-dossier.html">Het kanaaldossier &rarr;</a></div>'+
     '<div id="hcUit" class="sub mt-s"></div></div>';
 }
 

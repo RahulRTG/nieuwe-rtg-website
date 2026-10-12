@@ -20,10 +20,12 @@ test('beide aanroepers vangen null op met een terugval (geen crash, geen stil ve
   assert.match(b, /opslag \? opslag\.view\(\) : eigen\.bak\('handelingLog'\)/);
 });
 
-test('het document noemt de beperking en het openstaande besluit', () => {
+test('het document noemt de beperking, het genomen besluit en waar het auditboek woont', () => {
   const d = fs.readFileSync(path.join(__dirname, '..', 'AUDITOPSLAG.md'), 'utf8');
-  assert.match(d, /Open besluit/);
+  assert.match(d, /Besluit \(6 oktober 2026\)/);
   assert.match(d, /geen tijdgebonden bewaring/);
+  assert.match(d, /server\/kern\/auditboek\//);
+  assert.ok(fs.existsSync(path.join(__dirname, '..', 'AUDITBOEK.md')));
 });
 
 test('mutatie: een poort die voor postgres wel iets teruggeeft laat de eerste toets zakken', () => {

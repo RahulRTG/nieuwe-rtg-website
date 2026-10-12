@@ -3,6 +3,7 @@
    huidige wachtwoord als bevestiging. Krijgt de gedeelde context een keer
    bij het opstarten vanuit routes/auth.js. */
 const rtgKlok = require('../../lib/klok');
+const { ONTBREEKT } = require('../../lib/linkbasis');
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN , kern} = actx;
@@ -38,16 +39,19 @@ const HERSTEL_SMS_BEWUST_UIT = process.env.RTG_HERSTEL_SMS_UIT_BEWUST === '1';
 
 /* HET HERSTEL IN GANG ZETTEN -- als eigen functie, niet alleen als route.
 
-   Deze stroom stond volledig binnen de route. Dat werkte, tot er een TWEEDE
-   plek kwam die hem nodig heeft: de ledenbalie, waar een medewerker een lid
-   helpt dat er niet meer in komt. Die had de stroom moeten nabouwen, en dan
-   heb je twee waarheden over hoe een herstel werkt -- precies de vorm waar
-   vandaag de helft van de fouten vandaan kwam.
+   Een TWEEDE plek heeft hem nodig: de ledenbalie, waar een medewerker een lid
+   helpt dat er niet meer in komt. Nabouwen geeft twee waarheden over hoe een
+   herstel werkt. Dus een functie, en route en balie roepen hem aan: wie de
+   regels verandert, verandert ze voor allebei. */
+/* EEN plek voor "geeft het herstel met telefoon nu een link uit?": herstelStart en
+   kern/opnieuwbeginnen.js lezen hem; twee kopieen lopen uiteen bij een sms-kanaal. */
+function herstelSmsDicht() { return !!PRODUCTION && (HERSTEL_SMS_BEWUST_UIT || !mail.smsConfigured); }
+kern.herstelSmsDicht = herstelSmsDicht;
 
-   Dus een functie, en de route roept hem aan. De balie straks ook. Wie de regels
-   verandert, verandert ze voor allebei. */
 function herstelStart(u, req) {
   if (!u) return { ok: true, tweestaps: false };   // bestaan lekken we nooit
+  // ook voor de balie: geen basis, geen token (de aanroeper weigert netjes)
+  if (!appUrl(req)) throw new Error(ONTBREEKT);
   const tel = accounts.phoneOf(u);
   /* PRODUCTIE ZONDER ECHT TWEEDE KANAAL: GEEN TOKEN UITGEVEN.
 
@@ -56,7 +60,7 @@ function herstelStart(u, req) {
      ontvangen maakt het account onherstelbaar; link-only doorgaan zou de
      beveiliging juist verlagen. We falen daarom gesloten en houden het
      publieke antwoord generiek. Lokaal blijft de outbox-proef beschikbaar. */
-  if (tel && PRODUCTION && (HERSTEL_SMS_BEWUST_UIT || !mail.smsConfigured)) {
+  if (tel && herstelSmsDicht()) {
     console.error('[auth] herstel veilig geblokkeerd: account heeft telefoon maar er is geen echte SMS-provider.');
     return { ok: true, tweestaps: true, geblokkeerd: true, url: null, code: null };
   }
@@ -102,6 +106,8 @@ kern.herstelStart = (u, req) => {
 };
 
 app.post('/api/auth/forgot', (req, res) => {
+  // geen vaste basis, geen herstelmail (lib/linkbasis.js); hangt niet aan het account
+  if (!appUrl(req)) return res.status(503).json({ error: ONTBREEKT, code: 'app-url-ontbreekt' });
   const begon = rtgKlok.nu();
   const antwoord = (lijf) => {
     const over = MIN_MS - (rtgKlok.nu() - begon);

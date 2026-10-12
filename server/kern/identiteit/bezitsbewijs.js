@@ -113,6 +113,14 @@ function maakBezitsbewijs({ db, save, toestellen }) {
   }
 
   async function beoordeel({ sess, methode, pad, kop, stand, zwaar }) {
+    if (require('../../lib/verraad').sla('bezitsbewijs-faalt')) throw new Error('verraad: bezitsbewijs-faalt');
+
+    /* A-P1-04: een onleesbaar register (vlag uit opzet/diensten2.js) is niet
+       "geen binding" -- die tak laat in `aanbevolen` door. */
+    if (sess && sess.sessieContextStoring) {
+      return { stand: 'geweigerd', code: 503, storing: true,
+        reden: 'De toestelbinding van deze sessie kon niet worden gelezen; er is niets uitgevoerd.' };
+    }
 
     const binding = sess && sess.sessieContext && sess.sessieContext.sleutelbinding;
     const toestelId = binding && binding.keyRef;

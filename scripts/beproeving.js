@@ -232,14 +232,9 @@ const GC_OUT = path.join(TMP, 'gc.json');
    meter waar dit huis niet op wil bouwen. /proc blijft voorop, want dat is
    goedkoper dan een proces starten; anders vraagt ps het, en dat kent elke Unix. */
 function rssMB(pid) {
-  try {
-    const m = fs.readFileSync('/proc/' + pid + '/status', 'utf8').match(/VmRSS:\s+(\d+) kB/);
-    if (m) return Math.round(m[1] / 1024);
-  } catch (e) { /* geen /proc: macOS en de BSD's */ }
-  try {
-    const kb = Number(execFileSync('ps', ['-o', 'rss=', '-p', String(pid)], { encoding: 'utf8' }).trim().split(/\s+/)[0]);
-    return Number.isFinite(kb) && kb > 0 ? Math.round(kb / 1024) : null;
-  } catch (e) { return null; }
+  // de lezing (eerst /proc, anders ps) staat sinds 6 oktober 2026 op een plek: ./lib/procinfo.js
+  const kb = require('./lib/procinfo').rssKB(pid);
+  return kb == null ? null : Math.round(kb / 1024);
 }
 async function heapNaGc(pid) {
   let laagst = Infinity;

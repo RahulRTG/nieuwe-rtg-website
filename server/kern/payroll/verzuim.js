@@ -137,6 +137,8 @@ function maakVerzuim({ opslag, save, nu }) {
     save();
     return { ok: true, weg: voor - rij.length };
   }
+  // alleen lezen; zie vrijheid/saldobron.js
+  const zonderBron = (c, s, v, t) => inPeriode(c, s, v, t).filter(m => !m.bron).map(({ van, tot, soort }) => ({ van, tot, soort }));
   const heeftBron = (code, staffId, bron) => !!bron && rijVan(code, staffId).some(m => m.bron === String(bron));
 
   /* Wat een leidinggevende ziet: er is afwezigheid, en dit kan iemand nog.
@@ -170,7 +172,7 @@ function maakVerzuim({ opslag, save, nu }) {
     });
   }
 
-  return { meld, bronWeg, heeftBron, zetInzetbaarheid, voorPlanning, afwezigOp, voorPayroll, keur, SOORTEN, INZETBAARHEID };
+  return { meld, bronWeg, heeftBron, zonderBron, zetInzetbaarheid, voorPlanning, afwezigOp, voorPayroll, keur, SOORTEN, INZETBAARHEID };
 }
 
 module.exports = { maakVerzuim, keur, SOORTEN, INZETBAARHEID };

@@ -56,7 +56,7 @@ body.rtg-social-experience.rtg-edge-embed > .social-nav{display:none!important}
 
 .living-sr{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
 .living-welcome{position:relative;overflow:hidden;border:1px solid var(--rtg-world-line);background:var(--rtg-world-card)}
-.living-example-photo{display:grid;isolation:isolate}
+.living-example-photo{display:grid;isolation:isolate;background:#100e0b}
 .living-example-photo>img{grid-area:1/1;display:block;width:100%;height:100%;aspect-ratio:1;object-fit:cover;object-position:center 58%;z-index:-1}
 .living-example-head{grid-area:1/1;align-self:start;display:flex;align-items:center;gap:10px;padding:12px 10px 36px;background:linear-gradient(rgba(10,8,5,.86),rgba(10,8,5,.4) 70%,transparent);color:#fff7e9}
 .living-example-head>img{width:38px;height:38px;border:1px solid #e2c389;border-radius:50%;object-fit:cover}
@@ -109,7 +109,8 @@ body.rtg-social-experience[data-world-home="living"] .living-example-head {paddi
 body.rtg-social-experience[data-world-home="living"] .living-example-mark {display:grid;width:34px;height:34px;font-size:11px}
 body.rtg-social-experience[data-world-home="living"] .living-example-head p {font:500 12px/1.4 Inter,sans-serif}
 body.rtg-social-experience[data-world-home="living"] .living-example-head>div>span {font-size:10px;letter-spacing:.02em}
-body.rtg-social-experience[data-world-home="living"] .living-example-copy {padding:65px 16px 16px;background:linear-gradient(transparent,rgba(16,13,10,.66) 47%,var(--rtg-world-bg));color:#f7f0e3}
+/* De voorbeeldfoto vervloeit in haar EIGEN donkere grond (.living-example-photo), niet in die van de pagina: in de ivoren www-kamer eindigde het verloop anders in ivoor, onder lichte tekst. */
+body.rtg-social-experience[data-world-home="living"] .living-example-copy {padding:65px 16px 16px;background:linear-gradient(transparent,rgba(16,13,10,.66) 47%,#100e0b);color:#f7f0e3}
 body.rtg-social-experience[data-world-home="living"] .living-example-copy h2 {font:400 33px/1.08 "Bodoni Moda",Georgia,serif!important;max-width:17ch;margin-bottom:9px;color:#f7f0e3!important}
 body.rtg-social-experience[data-world-home="living"] .living-example-copy p {font-size:13px;line-height:1.5;max-width:34ch;color:#e2d8c9}
 body.rtg-social-experience[data-world-home="living"] .living-example-actions {margin-inline:16px;padding:3px 0;border-color:rgba(223,189,136,.3)}

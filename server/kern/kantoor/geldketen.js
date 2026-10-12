@@ -59,8 +59,6 @@ const klok = require('../../lib/klok');
    in een machine te wonen. Zie ./geldketen/klassen.js. */
 const { KLASSEN, KETENS } = require('./geldketen/klassen');
 
-
-
 const MAX_JOURNAAL = 20000;
 const MAX_DOSSIERS = 5000;
 
@@ -78,51 +76,8 @@ function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron }) {
   /* De eerste helft van de baan staat apart: zie ./geldketen/klaarzet.js. */
   const klaarzet = require('./geldketen/klaarzet').maakKlaarzet({
     voornemens, frictie, mandaatBron, tijd, leg, noteer, bewaar, publiek });
-  /* ------------------------------------------------------------------------
-     DE TWEEDE MENS. Deze baan maakt GEEN eigen tweede-handtekeningmechanisme:
-     kern/kantoor/tweedehandtekening.js is de deur en blijft dat. Wat hier gebeurt
-     is dat diezelfde menselijke handeling ook het VOORNEMEN aftekent, zodat het
-     besluit opnieuw langs het beleid gaat met de goedkeuring erin. Twee registers,
-     een menselijke daad -- geen tweede poort.
-     ---------------------------------------------------------------------- */
-  function tekenAf({ id, door }) {
-    const d = vindDossier(id);
-    if (!d) return { status: 404, error: 'Er is geen geldketen met dit voornemen.' };
-    const wie = String(door || '').slice(0, 60);
-    if (!wie) return { status: 400, error: 'Wie tekent er af?' };
-
-    const r = voornemens.tekenAf(id, { door: wie, context: { pad: d.pad } });
-    const env = envelopLaag.maak({ kanaal: 'office', actor: null, classificatie: 'intern',
-      correlatie: d.correlatie, oorzaak: d.envelop });
-    if (!r.ok) {
-      /* EEN VOORNEMEN DAT GEEN TWEEDE HANDTEKENING VRAAGT, HEEFT ER WEL EEN.
-         Onder de goedkeuringsgrens van kern/commercie/besluit.js komt een
-         voornemen meteen op GEKEURD, en dan weigert `tekenAf` met 409 ("alleen een
-         wachtend voornemen wordt afgetekend"). Dat is geen ontbrekende tweede mens:
-         de DEUR (kern/kantoor/tweedehandtekening.js) heeft er een geeist en die
-         staat hier voor ons. Die as als `onbekend` wegschrijven zou de keten
-         onterecht open laten staan -- en de mens die tekende uit het dossier
-         wissen. Elke ANDERE weigering blijft wel een gat. */
-      const geenTekenNodig = r.status === 409;
-      leg(d, 'tweedeMens', geenTekenNodig
-        ? { graad: 'gemeten', uitslag: wie,
-            reden: 'een tweede mens op naam tekende aan de deur; het voornemen vroeg zelf geen ' +
-              'handtekening omdat het besluit binnen het beleid viel (' + (r.error || '') + ')' }
-        : { graad: 'onbekend', uitslag: 'geweigerd', reden: r.error || 'de tweede handtekening is niet gezet' });
-      bewaar(d);
-      noteer(env, geenTekenNodig ? 'geldketen.getekend.aan-de-deur' : 'geldketen.tekenen.geweigerd',
-        { voornemen: id, door: geenTekenNodig ? wie : null, reden: r.error || null });
-      return geenTekenNodig ? { status: 200, ok: true, aanDeDeur: true, reden: r.error } : r;
-    }
-    leg(d, 'tweedeMens', { graad: 'gemeten', uitslag: wie,
-      reden: 'een tweede mens op naam heeft getekend; de laag weigert dezelfde persoon als de aanvrager' });
-    const besluit = (r.voornemen && r.voornemen.besluit) || null;
-    leg(d, 'autoriteit', { graad: 'gemeten', uitslag: besluit ? besluit.uitkomst : null,
-      reden: (besluit && besluit.reden) || 'het besluit is na de handtekening opnieuw gewogen' });
-    bewaar(d);
-    noteer(env, 'geldketen.getekend', { voornemen: id, door: wie, stand: r.voornemen && r.voornemen.stand });
-    return r;
-  }
+  /* DE TWEEDE MENS staat apart: zie ./geldketen/tekenen.js. */
+  const tekenAf = require('./geldketen/tekenen').maakTekenen({ voornemens, vindDossier, leg, noteer, bewaar });
 
   /* ------------------------------------------------------------------------
      UITVOEREN. Hier verplaatst het domein het geld, binnen de envelop van deze
@@ -134,6 +89,11 @@ function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron }) {
     const d = vindDossier(id);
     if (!d) return { status: 404, error: 'Er is geen geldketen met dit voornemen.' };
     if (typeof doe !== 'function') return { status: 400, error: 'Er is geen uitvoerder meegegeven.' };
+    /* Een voornemen dat al UITGEVOERD of GESTAAKT staat, wordt niet uitgevoerd -- en dan
+       hoort het dossier van die eerdere uitvoering niet overschreven te worden. */
+    const v = voornemens.vind ? voornemens.vind(id) : null;
+    if (v && (v.stand === 'UITGEVOERD' || v.stand === 'GESTAAKT' || v.stand === 'AFGEWEZEN'))
+      return { status: 409, error: 'Dit voornemen staat al op ' + v.stand + ' en wordt niet uitgevoerd.' };
 
     /* WELK VERZOEK DEZE UITVOERING DEED, en dat is een id en geen identiteit. Het is de
        enige brug tussen deze keten en de effectbon van server/effectbon.js: die bon wordt
@@ -161,7 +121,29 @@ function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron }) {
     return r;
   }
 
-  return { klaarzet, tekenAf, uitvoer, dossier, lijst, voorspellingVan,
+  /* DE RISICOGOEDKEURING (eigenaarsbesluit 2C): een eigen menselijke stap, voor de tweede
+     handtekening, en alleen voor een handeling die kern/commercie/risicouitzondering.js
+     toelaat. Het voornemen weegt haar; hier komt zij in het dossier en de hashketen. Wie
+     de handeling aanvroeg, geeft haar niet: dat wordt op de SLEUTEL vergeleken, want de
+     naam alleen is een zwakkere vergelijking waar een harde bestaat. */
+  function risicoGoedkeur({ id, door, naam, reden }) {
+    const d = vindDossier(id);
+    if (!d) return { status: 404, error: 'Er is geen geldketen met dit voornemen.' };
+    if (door && d.doorSleutel && String(door) === String(d.doorSleutel))
+      return { status: 403, error: 'Wie de handeling aanvroeg, geeft er niet zelf de risicogoedkeuring voor.' };
+    const r = voornemens.risicoGoedkeur(id, { door, naam, reden });
+    if (!r.ok) return r;
+    const env = envelopLaag.maak({ kanaal: 'office', actor: null, classificatie: 'intern',
+      correlatie: d.correlatie, oorzaak: d.envelop });
+    leg(d, 'risicogoedkeuring', { graad: 'gemeten', uitslag: naam || door, omkeerbaar: false,
+      bron: r.voornemen.risicogoedkeuring && r.voornemen.risicogoedkeuring.bron,
+      reden: String(reden || '').slice(0, 400) });
+    bewaar(d);
+    noteer(env, 'geldketen.risicogoedkeuring', { voornemen: id, door: naam || door });
+    return { status: 200, ok: true, voornemen: r.voornemen, dossier: publiek(d), aanvrager: d.doorSleutel || null };
+  }
+
+  return { klaarzet, tekenAf, uitvoer, risicoGoedkeur, dossier, lijst, voorspellingVan,
     journaalTop: boeken.top, journaalVerifieer: boeken.verifieer, KLASSEN, KETENS };
 }
 

@@ -33,6 +33,9 @@
     if (!dag) return null;
     return ((stand.state && stand.state.verlof) || []).find(function (v) {
       var zelfde = Number(v.staffId) === Number(lid.id) || String(v.name || v.naam || '') === String(lid.name || '');
+      /* van een collega stuurt de server alleen { soort: 'afwezig' } zonder datum:
+         dat betekent VANDAAG afwezig (kern/leverancier/personeelzicht.js, besluit B1) */
+      if (zelfde && v.soort === 'afwezig' && !v.van) return dag.date === new Date().toISOString().slice(0, 10);
       var van = String(v.van || v.datum || '').slice(0, 10), tot = String(v.tot || v.van || v.datum || '').slice(0, 10);
       return zelfde && v.status !== 'afgewezen' && van && van <= dag.date && (!tot || tot >= dag.date);
     }) || null;

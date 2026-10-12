@@ -66,7 +66,7 @@ al een keer sneuvelde als `Asset`, en de meting is er nog:
   precies één domein wonen**; 20 gelijkende vormparen in het hele huis.
 - `KETENVORM.json`: over vier complete ketens (tafel, rit, toelating, adam)
   <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-  <!--getal:ketenvorm.actorenTotaal-->33<!--/getal--> gedeelde actoren, en
+  <!--getal:ketenvorm.actorenTotaal-->39<!--/getal--> gedeelde actoren, en
   <!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van
   <!--getal:ketenvorm.themasTotaal-->10<!--/getal--> gedeelde beloftethema's --
   en die twee gaan allebei over de MACHINE (mag dit twee keer, zegt een weigering
@@ -117,8 +117,8 @@ scherm van iemands schoonmoeder.
 
 ## 4. Vier namen die al bezet zijn
 
-`SEMANTIEK.json` telt <!--getal:semantiek.namen-->131<!--/getal--> namen in meer
-dan één domein, waarvan er <!--getal:semantiek.betekenissen-->113<!--/getal-->
+`SEMANTIEK.json` telt <!--getal:semantiek.namen-->132<!--/getal--> namen in meer
+dan één domein, waarvan er <!--getal:semantiek.betekenissen-->114<!--/getal-->
 meer dan één betekenis dragen. Deze vier raakt deze laag rechtstreeks:
 
 - **`SOORTEN`** -- 47 betekenissen over 49 domeinen, het ergste woord van het

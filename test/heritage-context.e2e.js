@@ -18,6 +18,10 @@ test('Heritage context returns through real navigation without writes', async t 
       await page.goto(server.base + path);
       await page.waitForFunction(() => window.RTGRouteMemory && document.body.getAttribute('data-rtg-world-start') !== 'loading' && document.body.getAttribute('data-rtg-edge-2-rendered') === 'true', null, {timeout:geduld(12000)});
     }
+    /* Op mobiel staat de statusknop niet in de bovenbalk (www-stijl, #534); de Edge
+       bereikt hem met zijn actie 'status', en die doet precies deze klik op de knop
+       (legacy() in shared/rtg-adaptive-edge.js). */
+    async function openStatus() { await page.locator('.rtg-edge-state').evaluate(e => e.click()); }
     async function returnTo(path) {
       await page.evaluate(() => window.RTGRouteMemory.save());
       await visit('/apps/bestanden.html');
@@ -92,7 +96,7 @@ test('Heritage context returns through real navigation without writes', async t 
          naar dezelfde dagsheet die deze toets nodig heeft. */
       await page.keyboard.press('Escape');
       await edgeBediening(page, 'Week');
-      await page.click('.rtg-edge-state'); await page.click('[data-edge-2-mode="focus"]');
+      await openStatus(); await page.click('[data-edge-2-mode="focus"]');
       await page.locator('#kal [data-dag]').first().click();
       await page.waitForSelector('#afScrim.open');
       await page.keyboard.press('Escape');
@@ -102,7 +106,7 @@ test('Heritage context returns through real navigation without writes', async t 
     });
     await t.test('Offline source status cannot retain a prior confirmation', async () => {
       await visit('/apps/agenda.html');
-      await page.click('.rtg-edge-state');
+      await openStatus();
       await context.setOffline(true);
       await page.waitForFunction(() => document.querySelector('[data-edge-ready]').textContent.includes('Wacht op bron'));
       assert.equal((await page.textContent('[data-edge-network]')).trim(),'Offline');

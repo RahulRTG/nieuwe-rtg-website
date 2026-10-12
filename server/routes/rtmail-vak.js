@@ -104,8 +104,9 @@ module.exports = (kern) => {
        bericht-id mee waar het antwoord vandaan komt -- zonder die verwijzing
        is een samenvatting een tweede versie van de waarheid.
 
-       Deze ingang LEEST alleen. Hij verstuurt niets, verplaatst niets en
-       besluit niets; dat blijft bij de gewone poorten hierboven. */
+       Deze ingang verstuurt en besluit niets. Het enige dat hij kan
+       verplaatsen is beperkte post naar de leidingsplek (het vangnet van
+       kern/rtmail-leiding.js, via de draad), en dat slaat hij op. */
     app.post(p.pad + '/hulp', p.poort, (req, res) => {
       const a = p.adres(req);
       if (!a) return geenPostvak(res);

@@ -41,7 +41,7 @@ async function draaiChecks(ctx) {
 function standaardZekeringen() {
   return {
     onderhoud:   { naam: 'Onderhoudsstand', code: 'FUSE-MAINT', aan: true, poort: true, uitleg: 'Springt hij (stroom eraf), dan is de hele app in onderhoud: alleen de eigenaar komt er nog in.' },
-    registratie: { naam: 'Nieuwe registraties', code: 'FUSE-REG', aan: true, poort: true, uitleg: 'Eraf = geen nieuwe accounts (bijv. bij misbruik).' },
+    registratie: { naam: 'Nieuwe registraties', code: 'FUSE-REG', aan: true, poort: true, dekt: ['/api/auth/register'], uitleg: 'Eraf = het aanmeldformulier (/api/auth/register) weigert, bijv. bij misbruik. De eerste SSO-aanmelding en SCIM vallen er NIET onder; die sluit alleen het besluit RTG_REGISTRATIE_DICHT.' },
     /* De kleine degraded mode van de noodrem-ladder: alleen de inlog- en
        registratiepaden dicht, ingelogde leden merken niets. Bestaat omdat de
        oude noodrem bij een brede brute force de ONDERHOUDS-zekering trok --

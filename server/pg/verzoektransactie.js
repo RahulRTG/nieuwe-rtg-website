@@ -7,16 +7,12 @@
    de bestaande flush/economische banen en voorkomt een kruisdeadlock. */
 'use strict';
 
-const { KANAAL } = require('./schrijflanen');
 const { voegVeilig } = require('./verzoekmerge');
 const { voegBijzonderSamen } = require('./verzoekbijzonder');
 const deelnemerProtocol = require('../db/deelnemers');
 
 module.exports = (ctx) => {
-  const { pool, uitStore, naarStore, toegepast, laatsteJson,
-    laatsteGrootte, laatsteLengte, laatsteCheck } = ctx;
-  const lengte = v => Array.isArray(v) ? v.length :
-    (v && typeof v === 'object' ? Object.keys(v).length : 0);
+  const { pool, uitStore, toegepast, laatsteJson } = ctx;
   const fout = (code, tekst) => Object.assign(new Error(tekst), { code });
 
   function voegSamen(w, rij) {
@@ -62,6 +58,10 @@ module.exports = (ctx) => {
     return { bestaat: true, waarde, dbJson: JSON.stringify(waarde) };
   }
 
+  /* Lock, samenvoeging, schrijven en publicatie: ./verzoekschrijf.js, gedeeld
+     met de twee vroege commitpaden die het auditspoor meenemen. */
+  const schrijver = require('./verzoekschrijf')(ctx, voegSamen);
+
   /* `deelnemers` (./db/deelnemers.js) landen in DEZELFDE transactie: na de
      collecties, zodat hun advisory locks altijd na de collectielocks komen en
      twee verzoeken nooit in omgekeerde volgorde op elkaar wachten. */
@@ -69,45 +69,13 @@ module.exports = (ctx) => {
     const mee = Array.isArray(deelnemers) ? deelnemers : [];
     wijzigingen = Array.isArray(wijzigingen) ? wijzigingen : [];
     if (!wijzigingen.length && !mee.length) return { geschreven: 0, sleutels: [] };
-    const lijst = wijzigingen.slice().sort((a, b) => a.sleutel.localeCompare(b.sleutel));
-    for (const w of lijst) {
-      if (!/^[A-Za-z_$][A-Za-z0-9_$-]{0,119}$/.test(String(w.sleutel || '')))
-        throw fout('PG_REQUEST_SLEUTEL', 'Ongeldige collectie in requestcommit.');
-    }
+    const lijst = schrijver.sorteer(wijzigingen);
     const client = await pool.connect();
-    const publicaties = [];
+    let publicaties = [];
     let gecommit = false, commitVerstuurd = false;
     try {
       await client.query('BEGIN');
-      for (const w of lijst)
-        await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [w.sleutel]);
-      for (const w of lijst) {
-        const q = await client.query('SELECT val, ver, weg FROM kv WHERE key=$1 FOR UPDATE', [w.sleutel]);
-        const rij = q.rows[0] || null;
-        if (rij && rij.weg && Number(rij.ver) > Number(toegepast.get(w.sleutel) || 0) && w.basisBestaat)
-          throw fout('PG_REQUEST_GRAFSTEEN', 'Een nieuwere verwijdering moet eerst worden ingelezen.');
-        const samen = voegSamen(w, rij);
-        const zelfde = samen.bestaat === (!!rij && !rij.weg) &&
-          (!samen.bestaat || samen.dbJson === uitStore(rij.val));
-        let versie = rij ? Number(rij.ver) : null;
-        if (!zelfde) {
-          const nv = await client.query("SELECT nextval('kv_ver_seq') AS v");
-          versie = Number(nv.rows[0].v);
-          if (samen.bestaat) {
-            await client.query(
-              `INSERT INTO kv(key,val,ver,bijgewerkt,weg) VALUES($1,$2,$3,now(),false)
-               ON CONFLICT(key) DO UPDATE SET val=EXCLUDED.val,ver=EXCLUDED.ver,bijgewerkt=now(),weg=false`,
-              [w.sleutel, naarStore(samen.dbJson), versie]);
-          } else {
-            await client.query(
-              `INSERT INTO kv(key,val,ver,bijgewerkt,weg) VALUES($1,'',$2,now(),true)
-               ON CONFLICT(key) DO UPDATE SET val='',ver=EXCLUDED.ver,bijgewerkt=now(),weg=true`,
-              [w.sleutel, versie]);
-          }
-          await client.query('SELECT pg_notify($1,$2)', [KANAAL, w.sleutel]);
-        }
-        publicaties.push({ sleutel: w.sleutel, ...samen, versie });
-      }
+      publicaties = await schrijver.schrijfIn(client, lijst);
       await deelnemerProtocol.pasToe(mee, client);
       commitVerstuurd = true;
       await client.query('COMMIT');
@@ -121,20 +89,7 @@ module.exports = (ctx) => {
     /* Publiceer pas na COMMIT. Alle lokale commitbanen delen één opslag-slot;
        daardoor is deze assignment de recentste autoritatieve DB-versie en
        kan geen oudere lokale publicatie er later overheen schrijven. */
-    for (const p of publicaties) {
-      if (p.bestaat) dataNu[p.sleutel] = p.waarde;
-      else delete dataNu[p.sleutel];
-      if (p.bestaat) laatsteJson.set(p.sleutel, p.dbJson);
-      else laatsteJson.delete(p.sleutel);
-      if (p.versie != null) toegepast.set(p.sleutel, p.versie);
-      if (p.bestaat) {
-        laatsteGrootte.set(p.sleutel, p.dbJson.length);
-        laatsteLengte.set(p.sleutel, lengte(p.waarde));
-        laatsteCheck.set(p.sleutel, Date.now());
-      } else {
-        laatsteGrootte.delete(p.sleutel); laatsteLengte.delete(p.sleutel); laatsteCheck.delete(p.sleutel);
-      }
-    }
+    schrijver.publiceer(dataNu, publicaties);
     deelnemerProtocol.publiceer(mee);
     return { geschreven: publicaties.length, sleutels: publicaties.map(p => p.sleutel),
       deelnemers: mee.map(d => d.naam) };
@@ -157,5 +112,5 @@ module.exports = (ctx) => {
     return uit.sort((a, b) => a.sleutel.localeCompare(b.sleutel));
   }
 
-  return { commitVerzoek, openstaandeWijzigingen };
+  return { commitVerzoek, openstaandeWijzigingen, schrijver };
 };

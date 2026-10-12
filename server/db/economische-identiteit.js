@@ -7,15 +7,47 @@ const normRef = v => v == null ? null : String(v);
 const heeft = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 
 /* DE VORM VAN EEN ECONOMISCHE SLEUTEL, op een plek voor alle drie de opslagen
-   (sqlite, PostgreSQL, de proceslokale ontwikkelweg). Drie soorten en geen
-   vrije tekst: `payout-terug` voor een teruggeboekte uitbetaling en
-   `pay-tegoed` voor geld dat een tegoedbon uit de escrow haalt
-   (kern/pay/tegoed-claim.js), plus `pay-kas` voor de delen onder een
-   kascode-claim (kern/pay/kas-boek.js). Achter de dubbele punt staat altijd een
-   SHA-256, want deze sleutel wordt een permanente primaire sleutel en een
-   providerref of codenaam hoort daar niet in. De Rust-motor kent dezelfde drie
-   (motor/src/pay.rs, economische_sleutel_geldig). */
-const SLEUTEL = /^(?:payout-terug|pay-tegoed|pay-kas):[a-f0-9]{64}$/;
+   (sqlite, PostgreSQL, de proceslokale ontwikkelweg) EN voor de Rust-motor.
+   Een gesloten lijst soorten en geen vrije tekst; achter de dubbele punt staat
+   altijd een SHA-256, want deze sleutel wordt een permanente primaire sleutel
+   en een providerref of codenaam hoort daar niet in.
+
+     payout-terug   een teruggeboekte uitbetaling
+     pay-tegoed     geld dat een tegoedbon uit de escrow haalt (kern/pay/tegoed-claim.js)
+     pay-kas        een deel onder een kascode-claim (kern/pay/kas-boek.js)
+     pay-oplaad     een bevestigde oplading, op het id van de betaling
+     pay-vonk       een deel van een Vonk-date (kern/vonk/payment.js)
+     pay-klompje    de betaling van EEN betaalverzoek, op het id van het verzoek
+     pay-handeling  een boeking op een bedrijfsobject buiten een idem-handeling
+                    (een OV-rit, een storingsteruggave, een verrekening)
+     pay-stap       stap n binnen een idem-handeling (lib/idem-handeling.js)
+     pay-uitbetaling  een uitbetaling naar een externe rekening via een
+                    uitbetaalrail (Stripe Connect), op het id van de opdracht
+
+   WAAROM DE LIJST HIER EN IN DE MOTOR LETTERLIJK GELIJK MOET ZIJN. De motor
+   (motor/src/pay.rs, ECONOMISCHE_SOORTEN) weigert elke andere vorm met 400, en
+   precies zo stond een bevestigde kaartbetaling voor altijd onbijgeschreven: de
+   JS-kant stuurde `pay-oplaad:BW-...` en de motor kende alleen drie soorten.
+   test/geld-motorsleutel.test.js legt beide lijsten tegen de ECHTE binary. */
+const SOORTEN = Object.freeze(['payout-terug', 'pay-tegoed', 'pay-kas', 'pay-oplaad',
+  'pay-vonk', 'pay-klompje', 'pay-handeling', 'pay-stap', 'pay-uitbetaling']);
+const SLEUTEL = new RegExp('^(?:' + SOORTEN.join('|') + '):[a-f0-9]{64}$');
+
+/* Maakt een sleutel uit een soort en de delen van een BEDRIJFSidentiteit (een
+   betaling-id, een verzoek-id, een idem-sleutel met stapnummer). De delen gaan
+   met een scheidingsteken dat in geen van hen voorkomt door SHA-256, zodat
+   ('a:b','c') en ('a','b:c') nooit dezelfde sleutel geven. Een onbekende soort
+   of een leeg deel is een programmeerfout en gooit: liever luid dan een sleutel
+   die de motor straks weigert terwijl het geld al van de kaart is. */
+function maakSleutel(soort, delen) {
+  if (!SOORTEN.includes(soort)) throw new Error('Onbekende soort economische sleutel: ' + soort);
+  const lijst = Array.isArray(delen) ? delen : [delen];
+  if (!lijst.length || lijst.some(x => x == null || String(x) === ''))
+    throw new Error('Een economische sleutel vraagt een volledige bedrijfsidentiteit.');
+  const h = require('crypto').createHash('sha256')
+    .update(['v1', soort, ...lijst.map(String)].join('\u001f')).digest('hex');
+  return soort + ':' + h;
+}
 
 function gelijk(a, b) {
   return !!a && !!b && typeof a.id === 'string' && a.id.length > 0 &&
@@ -78,4 +110,4 @@ const boekingenSamen = ({ live, commit }) => {
   return uit;
 };
 
-module.exports = { SLEUTEL, gelijk, bewegingGelijk, vind, vindBeweging, saldoSamen, boekingenSamen };
+module.exports = { SOORTEN, SLEUTEL, maakSleutel, gelijk, bewegingGelijk, vind, vindBeweging, saldoSamen, boekingenSamen };

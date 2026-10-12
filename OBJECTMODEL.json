@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-10-12",
   "gemeten": {
-    "bestanden": 2790,
-    "vormen": 1602,
-    "velden": 2292,
-    "modules": 888,
-    "domeinen": 310,
-    "envelopDrempel": 19,
+    "bestanden": 2900,
+    "vormen": 1613,
+    "velden": 2315,
+    "modules": 899,
+    "domeinen": 319,
+    "envelopDrempel": 20,
     "envelop": 29,
-    "veldenDomeineigen": 1608,
-    "veldenGedeeldVanafVier": 234,
-    "gelijkendeVormparen": 64
+    "veldenDomeineigen": 1622,
+    "veldenGedeeldVanafVier": 237,
+    "gelijkendeVormparen": 65
   },
   "envelop": [
     "aantal",
@@ -46,20 +46,8 @@
   ],
   "gedeeld": [
     {
-      "veld": "sinds",
-      "domeinen": 18,
-      "waar": [
-        "bedrijf",
-        "kern/afdelingen",
-        "kern/clubs",
-        "kern/command",
-        "kern/commercie",
-        "kern/ledenbalie-inzage"
-      ]
-    },
-    {
       "veld": "naar",
-      "domeinen": 18,
+      "domeinen": 19,
       "waar": [
         "bedrijf",
         "kern/ai",
@@ -71,7 +59,7 @@
     },
     {
       "veld": "code",
-      "domeinen": 18,
+      "domeinen": 19,
       "waar": [
         "kern/arrivalpas",
         "kern/fiscaal",
@@ -79,6 +67,18 @@
         "kern/invoer",
         "kern/livinglab",
         "kern/luchthaven"
+      ]
+    },
+    {
+      "veld": "sinds",
+      "domeinen": 18,
+      "waar": [
+        "bedrijf",
+        "kern/afdelingen",
+        "kern/clubs",
+        "kern/command",
+        "kern/commercie",
+        "kern/ledenbalie-inzage"
       ]
     },
     {
@@ -118,6 +118,18 @@
       ]
     },
     {
+      "veld": "vervalt",
+      "domeinen": 16,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/ai",
+        "kern/command",
+        "kern/commerce",
+        "kern/koppel",
+        "kern/levensband"
+      ]
+    },
+    {
       "veld": "waarom",
       "domeinen": 16,
       "waar": [
@@ -130,18 +142,6 @@
       ]
     },
     {
-      "veld": "vervalt",
-      "domeinen": 15,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/ai",
-        "kern/command",
-        "kern/commerce",
-        "kern/koppel",
-        "kern/levensband"
-      ]
-    },
-    {
       "veld": "icon",
       "domeinen": 15,
       "waar": [
@@ -151,6 +151,54 @@
         "kern/atelier",
         "kern/beroepenbieb",
         "kern/boerderij"
+      ]
+    },
+    {
+      "veld": "onderwerp",
+      "domeinen": 15,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/connect",
+        "kern/kantoor",
+        "kern/mailwachtrij"
+      ]
+    },
+    {
+      "veld": "vraag",
+      "domeinen": 14,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/beraad",
+        "kern/command",
+        "kern/commerce",
+        "kern/livinglab",
+        "kern/magnaat-economenlab-rapport"
+      ]
+    },
+    {
+      "veld": "versie",
+      "domeinen": 14,
+      "waar": [
+        "bedrijf",
+        "kern/appstore",
+        "kern/beroepenbieb",
+        "kern/command",
+        "kern/envelop",
+        "kern/fluister"
+      ]
+    },
+    {
+      "veld": "ingetrokken",
+      "domeinen": 14,
+      "waar": [
+        "bedrijf",
+        "kern/beraad",
+        "kern/beschermzaak",
+        "kern/carriereledger",
+        "kern/command",
+        "kern/festival"
       ]
     },
     {
@@ -178,18 +226,6 @@
       ]
     },
     {
-      "veld": "onderwerp",
-      "domeinen": 14,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/commercie",
-        "kern/connect",
-        "kern/kantoor",
-        "kern/mailwachtrij"
-      ]
-    },
-    {
       "veld": "actor",
       "domeinen": 14,
       "waar": [
@@ -211,18 +247,6 @@
         "kern/labfonds",
         "kern/lidmaatschap",
         "kern/livinglab"
-      ]
-    },
-    {
-      "veld": "vraag",
-      "domeinen": 13,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/command",
-        "kern/commerce",
-        "kern/livinglab",
-        "kern/magnaat-economenlab-rapport",
-        "kern/magnaat-economische-motor"
       ]
     },
     {
@@ -250,27 +274,15 @@
       ]
     },
     {
-      "veld": "versie",
+      "veld": "vanMij",
       "domeinen": 13,
       "waar": [
-        "bedrijf",
-        "kern/appstore",
-        "kern/beroepenbieb",
-        "kern/command",
-        "kern/envelop",
-        "kern/journalistiek-krant"
-      ]
-    },
-    {
-      "veld": "ingetrokken",
-      "domeinen": 13,
-      "waar": [
-        "bedrijf",
-        "kern/beschermzaak",
-        "kern/carriereledger",
-        "kern/command",
-        "kern/festival",
-        "kern/leerhuis"
+        "kern/beraad",
+        "kern/berichten",
+        "kern/bestanden",
+        "kern/genootschap",
+        "kern/meet",
+        "kern/metier"
       ]
     },
     {
@@ -355,18 +367,6 @@
         "kern/frictie",
         "kern/geldbeleid",
         "kern/kantoor"
-      ]
-    },
-    {
-      "veld": "vanMij",
-      "domeinen": 12,
-      "waar": [
-        "kern/berichten",
-        "kern/bestanden",
-        "kern/genootschap",
-        "kern/meet",
-        "kern/metier",
-        "kern/muziek"
       ]
     },
     {

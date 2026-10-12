@@ -1,0 +1,10 @@
+{
+  "uitleg": "ARCHITECTOPDRACHT.md fase 7: vijf ijktaken voor `codearchitect context`. Per taak de taakklasse, het onderwerp en de uitslag van de voldoendheid zoals die nu wordt uitgerekend, met de eisen die ontbreken. Een vastlegging van de stand, geen doel: verandert een uitslag, dan zakt test/architectcontext.test.js en wordt dit bestand met reden bijgewerkt. De voldoendheid staat in de schaduw en houdt niets tegen.",
+  "taken": [
+    { "id": "ijk-1", "taakklasse": "toets-toevoegen", "onderwerp": "server/kern/pay/boeking.js", "verwacht": "voldoende", "ontbreekt": [] },
+    { "id": "ijk-2", "taakklasse": "code-wijzigen", "onderwerp": "server/kern/pay/poort.js", "verwacht": "voldoende", "ontbreekt": [] },
+    { "id": "ijk-3", "taakklasse": "code-wijzigen", "onderwerp": "server/routes/supplier/horeca/rekening.js", "verwacht": "onvoldoende", "ontbreekt": ["toetsen"] },
+    { "id": "ijk-4", "taakklasse": "geldregel-wijzigen", "onderwerp": "server/kern/pay/boeking.js", "verwacht": "onvoldoende", "ontbreekt": ["toetsenWaargenomen"] },
+    { "id": "ijk-5", "taakklasse": "geldregel-wijzigen", "onderwerp": "POST /api/supplier/tafelticket/afrekenen", "verwacht": "onvoldoende", "ontbreekt": ["wettenGenoemd", "toetsenWaargenomen"] }
+  ]
+}

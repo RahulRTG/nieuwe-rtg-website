@@ -31,6 +31,26 @@
    De reparatie staat in test/helper.js, bij veegDoor -- op EEN plek, want deze
    functie stond hier vier keer.
 
+   EN DAARNA ZAKTE HIJ NOG STEEDS, EEN OP DE VIJF KEER, EN DAT WAS DEZE PROEF
+   ZELF (11 oktober 2026). Hij mat de regel met boundingBox() terwijl het scherm
+   nog aan het verhuizen was: het wereldkader (shared/rtg-world-desktop.js) zet
+   de pagina in zijn schil, en pas als de adaptieve Edge er staat
+   (`data-rtg-adaptive-ready`) verdwijnen de duimbalk en de oude kopbalk uit de
+   flow -- twee sprongen van 44 en 95 px, seconden na `domcontentloaded`. Daarbij
+   lag de regel ONDER de vouw (y 963 in een venster van 900), dus de muis van
+   Chromium raakte nooit iets en elke veeg liep via de terugval van veegDoor,
+   die zonder kiezer de regel kiest die het dichtst bij de OUDE coordinaten ligt.
+   Na de sprong van 95 px was dat Contract-2026.txt: de veeg slaagde, de server
+   zette een bestand in de prullenbak -- alleen het verkeerde, en de melding zei
+   dat ook ("Contract-2026.txt ligt in de prullenbak"). Gemeten met een
+   layoutlog per 30 ms en de doelregel van elke pointerdown.
+
+   Drie dingen houden dat nu dicht: wachten op de TOESTAND van het kader (klaar
+   en de Edge staat) voordat er iets gemeten wordt, de regel in beeld schuiven
+   en VLAK voor de veeg meten (zelfde vorm als maat() in gebaar.e2e.js), en een
+   kiezer op het bestands-id meegeven, zodat ook de terugval nooit een buurman
+   kan pakken.
+
    Draai: node --test test/gebaar-bestanden.e2e.js  (slaat over zonder Playwright) */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -41,6 +61,23 @@ const { startServer, stop, letOpFouten, veegDoor, laadPlaywright, browserOpties,
 
 const pw = laadPlaywright();
 const BROWSER = process.env.RTG_CHROMIUM || undefined;
+
+/* De regel in beeld en dan pas meten: een muis buiten het venster raakt niets,
+   en een maat van voor een verschuiving is een maat van een andere regel. Na het
+   schuiven een frame afwachten: de laag sluit een open lade op `scroll`, en die
+   gebeurtenis valt pas in de volgende renderstap -- niet midden in de veeg. */
+async function maat(loc) {
+  await loc.evaluate((el) => new Promise((klaar) => {
+    el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
+    requestAnimationFrame(() => requestAnimationFrame(klaar));
+  }));
+  return loc.boundingBox();
+}
+/* De kiezer die veegDoor in zijn terugval gebruikt om DEZE regel terug te
+   vinden, op het id dat het scherm zelf aan de regel hangt. */
+async function kiezerVan(loc) {
+  return '#lijst .item[data-open="' + await loc.getAttribute('data-open') + '"]';
+}
 
 /* Pollen tot het waar is, of tot de grens. Geeft de laatste waarde terug zodat
    de bewering zelf kan zeggen wat er dan wel stond. */
@@ -55,6 +92,18 @@ async function wachtTot(lees, klopt, wat, grens = 8000) {
   assert.fail(wat + ' -- na ' + grens + 'ms stond er: ' + JSON.stringify(laatst));
 }
 
+
+/* DE RIJ OP ZIJN NAAM EN NIET OP ZIJN PLEK. Wordt de eerste poging van veegDoor
+   een langdruk (de race van 520 ms hierboven), dan veegt hij een tweede keer, en
+   zonder kiezer kiest die tweede poging de rij die NU op de oude coordinaten
+   staat. Was de lijst intussen opnieuw getekend, dan ging die veeg over het
+   ANDERE bestand: de server zette Contract-2026.txt in de prullenbak terwijl deze
+   proef op Paspoort-scan.txt wachtte, en zakte na 8000 ms op
+   {"weg":false,"ster":false} -- ongeveer een op de zes rondes, ook op main.
+   Gevonden met een spoor IN de pagina (fetch en pointer-gebeurtenissen), want
+   een luisteraar aan de Node-kant verschoof de timing genoeg om hem te laten
+   verdwijnen. Een rij draagt zijn bestand in data-open; dat is de identiteit, en
+   precies dat geeft kiezerVan() hierboven aan veegDoor mee. */
 
 test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit',
   { skip: geenBrowser(pw) }, async () => {
@@ -92,6 +141,13 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     }, reg.token);
     await page.goto(base + '/apps/bestanden.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#lijst .item.gb-rij', { timeout: 20000 });
+    /* Het scherm staat pas stil als het wereldkader klaar is EN de adaptieve
+       Edge er staat: daarna gaan duimbalk en kopbalk uit de flow en schuift de
+       lijst omhoog. Zie de kop van dit bestand. */
+    await page.waitForFunction(() => {
+      const st = document.body.dataset.rtgDesktopState;
+      return (st === 'ready' || st === 'error') && document.body.dataset.rtgAdaptiveReady === 'true';
+    }, null, { timeout: 20000 });
     assert.equal(await page.locator('#lijst .item').count(), 2, 'beide bestanden horen op het bord te staan');
 
     /* 0. EERST: PAST DE KNOP IN ZIJN EIGEN LADE? Gemeten op de OPEN lade en niet
@@ -104,8 +160,8 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
        INHOUD af. Dan puilt de knoppenrij er precies zoveel uit en ziet de
        laatste letter er geschaafd uit. Daarom staat .gb-lade op content-box. */
     const eerste = page.locator('#lijst .item').first();
-    const d0 = await eerste.boundingBox();
-    await veegDoor(page, d0, { afstand: -112, stappen: 16 });
+    const d0 = await maat(eerste);
+    await veegDoor(page, d0, { afstand: -112, stappen: 16, kiezer: await kiezerVan(eerste) });
     /* Wachten tot de lade ER IS, niet tot het scherm stil is. wachtOpRust telt
        stilte, en vlak na een veeg is het nog stil omdat de lade nog moet
        opengaan -- dan meet de regel hieronder een lade die er niet staat. */
@@ -148,7 +204,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     // 1. doorvegen zet het bestand er ECHT in -- gemeten aan de server, niet aan het scherm
     const rij = page.locator('#lijst .item').first();
     const naam = (await rij.locator('b').textContent()).trim();
-    await veegDoor(page, await rij.boundingBox());
+    await veegDoor(page, await maat(rij), { kiezer: await kiezerVan(rij) });
     await wachtTot(() => staatVan(naam), (s) => s && s.weg,
       'doorvegen hoort ' + naam + ' bij de server in de prullenbak te zetten');
     assert.match(await page.locator('.gb-terug').textContent(), new RegExp(naam.slice(0, 8), 'i'),
@@ -163,9 +219,9 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     const weer = page.locator('#lijst .item.gb-rij').filter({ hasText: naam }).first();
     await weer.waitFor({ state: 'visible', timeout: 15000 });
     const naam2 = (await weer.locator('b').textContent()).trim();
-    const d2 = await weer.boundingBox();
+    const d2 = await maat(weer);
     assert.ok(d2, 'het teruggezette bestand hoort weer een meetbare regel te zijn');
-    await veegDoor(page, d2, { startFractie: 0.15, afstand: 176, stappen: 16 });
+    await veegDoor(page, d2, { startFractie: 0.15, afstand: 176, stappen: 16, kiezer: await kiezerVan(weer) });
     assert.deepEqual(await page.evaluate(() =>
       [...document.querySelectorAll('#lijst .gb-lade .gb-doe > span')].map((s) => s.textContent)),
       ['Ster', 'Overnemen'], 'naar rechts horen de ster en overnemen te liggen');
@@ -177,7 +233,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     }));
     const derde = page.locator('#lijst .item').first();
     const naam3 = (await derde.locator('b').textContent()).trim();
-    await veegDoor(page, await derde.boundingBox());
+    await veegDoor(page, await maat(derde), { kiezer: await kiezerVan(derde) });
     await page.waitForFunction(() => {
       const t = document.querySelector('.gb-terug');
       return t && /niet bereikbaar/i.test(t.textContent);

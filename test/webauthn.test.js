@@ -43,9 +43,9 @@ test.after(() => {
 
 test('1. registratie-opties: echte WebAuthn-opties, met de codenaam en nooit de echte naam', async () => {
   const demo = await api('/api/login', { tier: 'rtg' });
-  const dicht = await api('/api/webauthn/registreer/opties', {}, demo.body.token);
+  const dicht = await api('/api/webauthn/registreer/opties', { huidig: 'geheim123' }, demo.body.token);
   assert.equal(dicht.status, 403, 'passkeys horen bij een eigen account, niet bij een demo-persona');
-  const r = await api('/api/webauthn/registreer/opties', {}, lid);
+  const r = await api('/api/webauthn/registreer/opties', { huidig: 'geheim123' }, lid);
   assert.equal(r.status, 200);
   const o = r.body.opties;
   assert.ok(o.challenge && o.challenge.length >= 16, 'er is een verse challenge');
@@ -54,7 +54,7 @@ test('1. registratie-opties: echte WebAuthn-opties, met de codenaam en nooit de 
 });
 
 test('2. een vals registratie-antwoord wordt geweigerd', async () => {
-  await api('/api/webauthn/registreer/opties', {}, lid);
+  await api('/api/webauthn/registreer/opties', { huidig: 'geheim123' }, lid);
   const r = await api('/api/webauthn/registreer', { antwoord: { id: 'nep', rawId: 'bnVs', type: 'public-key',
     response: { attestationObject: 'bnVs', clientDataJSON: 'bnVs' } } }, lid);
   assert.equal(r.status, 400, 'de cryptografische controle houdt rommel tegen');

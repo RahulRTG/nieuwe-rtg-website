@@ -98,13 +98,36 @@ Elke schrijfroute is met een dubbeltik gemeten (`test/conciergelus-dubbel.test.j
 en heeft een contract in `server/lib/mutatiecontracten-conciergelus.js`. Een
 toelichting van het lid is met opzet een tweede handeling.
 
+**Sinds 11 oktober 2026 staan de schermen voor het lid en het kantoor**, op de
+twee schermen die al eigenaar waren (`SCHERMEIGENAAR.json`), dus zonder een
+tweede ingang:
+
+| wie | waar | wat hij kan |
+|---|---|---|
+| het lid (Lifestyle, u-vorm) | `apps/lifestyle.html`, tabblad Zaken (`apps/lifestyle-lus.js`) | een wens in een zin vertellen (met speelruimte, budget en de verrassing), zijn zaak terugzien, een voorstel met de REDEN zien en akkoord geven of afzien, de verrassing aan of uit zetten, iets laten weten |
+| de case-eigenaar | `apps/concierge.html`, sectie Privékantoor (`apps/concierge-lus.js` + `-vorm.js`) | oppakken, de weigering van de gewone route vastleggen, een aanbod met termijn, kiezen (de server beslist of het vastgezet wordt of naar het lid gaat), onderdelen toevoegen en bevestigen, een vertraging doorrekenen en de klaargezette berichten pas versturen als ze alle zijn aangevinkt, een onderdeel laten omvallen en vervangen, en afsluiten zodra `afsluitbaar()` het toelaat |
+
+Twee dingen die daarbij boven water kwamen. **Het bureau laadde niet met de
+gedeelde kantoorcode**: de Rendez-vous-routes eisen een kantoormens op naam en
+weigeren met 403, en een `Promise.all` trok die ene weigering het hele scherm
+mee. Elke sectie laadt nu apart en een geweigerde sectie staat er met de reden
+van de server. En de **conciergeproef staat** (`npm run conciergeproef`,
+`CONCIERGEPROEF.json`): vijftien schakels en zes storingen, met een mutatie
+nagetrokken (een verrassing die niet als `discreet` meereist, en een kiesknop
+die het mandaat negeert, laten allebei een schakel zakken). Hij levert via
+`scripts/lib/appcontract.js` het bewijs `voltooibaar` voor het Privékantoor in
+APPWERKT; dat het scherm hem bedient, toetst `test/conciergelusscherm.e2e.js`
+in een echte browser.
+
 **Wat er NIET staat**, en dat is evenveel:
 
-- **Geen schermen.** Alles hierboven is server en toetsen. Het kantoor ziet de
-  cases uit de lus op het bestaande bureau (`lus: true`), maar er is nog geen
-  knop voor een aanbod, een vertraging of een herstel. Het lid ziet zijn case in
-  het Privékantoor, maar nog geen voorstel om op te drukken. Volgens
-  `BETROUWBAARHEID.md` bestaat de functie daarom voor een mens nog niet.
+- **Geen scherm voor de ZAAK.** Een restaurant of bloemist die een onderdeel
+  levert, ziet zijn opdrachten alleen langs `/api/supplier/concierge/opdrachten`;
+  de leverancier-app heeft er nog geen tabblad voor. Een bericht bij een
+  vertraging komt wel aan (als melding), de lijst niet.
+- **Geen scherm voor de tafeluitzondering** (`kern/ervaring/tafeluitzondering.js`:
+  tegenvoorstel en doorzetten naar de manager). Die hangt aan de
+  reserveringsroutes van de zaak en niet aan deze lus.
 - **De routekaart (2.5)** is niet gebouwd; het kantoor noemt een route nog zelf.
 - **Het collega-netwerk (2.6)** en **de kennis over routes (2.16)** wachten op
   B3 en B5.
@@ -115,8 +138,10 @@ toelichting van het lid is met opzet een tweede handeling.
   niet uitgevoerd.
 - **Een grens per handeling** ("extra boven € 250") bestaat nog niet; er is één
   grens per domein plus de speelruimte in tijd.
-- **Geen conciergeproef** (een ketenproef naar het voorbeeld van `scripts/tafelproef.js`). De schakels en storingen van par. 6
-  zitten in de toetsen, niet in een ketenproef die `KETENVORM.json` meeneemt.
+- **De conciergeproef telt nog niet mee in `KETENVORM.json`.** Hij staat
+  (zie hierboven), maar `scripts/ketenvorm.js` meet over een vaste lijst ketens
+  en dat register is van een andere werkstroom; hem toevoegen verschuift de
+  gedeelde getallen in CLAUDE.md en hoort in een eigen ronde.
 - **Geen as van de machine.** Zestien nieuwe schrijfroutes raken geen enkele
   as van `npm run machinedekking` en tellen dus mee in `mutatiesZonderEnigeAs`
   (op deze tak ging die teller eerst van 2757 naar 2773 en is dat zo

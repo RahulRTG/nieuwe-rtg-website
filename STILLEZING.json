@@ -3,16 +3,16 @@
  "uitleg": "Lezers van bewijs- en gezagsstate die een ONLEESBAAR bestand als een AFWEZIG bestand behandelen. Bewijs kent drie toestanden (bestaat+geldig, bestaat+ongeldig, bestaat niet) en een catch die op null valt, maakt van de tweede de derde -- en leeg betekent in dit huis bijna overal \"geen beperking\". De spiegel van STILSPOOR.json: die meet schrijvers wier falen wordt opgegeten, deze meet lezers die het onderscheid verliezen. Nooit optellen.",
  "grens": "Lexicaal, dus een ONDERGRENS: de werkelijke schuld is minstens dit. server/ en scripts/ worden nooit opgeteld -- daar staat een handeling tegenover een meting. `smeltSamen` mag alleen dalen, `bewijslezingen` alleen stijgen: een schuld die daalt doordat de meter blind wordt, is de gevaarlijkste vorm van vooruitgang.",
  "stempel": {
-  "op": "2026-10-11T06:01:28.640Z",
-  "commit": "82dd590f",
+  "op": "2026-10-12T17:54:41.616Z",
+  "commit": "fbac2d095",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/stillezing.js",
-  "node": "v22.22.0"
+  "node": "v26.10.0"
  },
  "gemeten": {
   "server": {
-   "bewijslezingen": 91,
+   "bewijslezingen": 93,
    "metVanger": 9,
    "smeltSamen": 5,
    "zegtHet": 1,
@@ -21,13 +21,13 @@
    "anders": 1
   },
   "scripts": {
-   "bewijslezingen": 609,
-   "metVanger": 104,
+   "bewijslezingen": 632,
+   "metVanger": 106,
    "smeltSamen": 61,
    "zegtHet": 15,
    "onderscheidt": 6,
    "gooit": 3,
-   "anders": 19
+   "anders": 21
   }
  },
  "plekken": {
@@ -108,7 +108,7 @@
   "scripts": [
    {
     "bestand": "scripts/aanroepgraaf.js",
-    "regel": 163,
+    "regel": 166,
     "leest": [
      "KERNHERKOMST.json"
     ],
@@ -124,7 +124,7 @@
    },
    {
     "bestand": "scripts/afbouw-slot.js",
-    "regel": 62,
+    "regel": 58,
     "leest": [
      "eigenaar.json"
     ],
@@ -132,7 +132,7 @@
    },
    {
     "bestand": "scripts/afbouw-slot.js",
-    "regel": 96,
+    "regel": 92,
     "leest": [
      "eigenaar.json"
     ],
@@ -148,7 +148,7 @@
    },
    {
     "bestand": "scripts/bewijsladder.js",
-    "regel": 389,
+    "regel": 393,
     "leest": [
      "BEWIJSLADDER.json",
      "LADDER.json"
@@ -197,7 +197,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 3063,
+    "regel": 3145,
     "leest": [
      "BELOFTE.json"
     ],
@@ -205,7 +205,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 3382,
+    "regel": 3464,
     "leest": [
      "SLO.json"
     ],
@@ -213,7 +213,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 4738,
+    "regel": 4822,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -221,7 +221,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5227,
+    "regel": 5311,
     "leest": [
      "MUTATIECONTRACT.json"
     ],
@@ -229,7 +229,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5498,
+    "regel": 5582,
     "leest": [
      "TEKSTOPPERVLAK.json"
     ],
@@ -237,7 +237,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5674,
+    "regel": 5758,
     "leest": [
      "EERSTEMINUUT.json"
     ],
@@ -245,7 +245,7 @@
    },
    {
     "bestand": "scripts/check.js",
-    "regel": 5686,
+    "regel": 5770,
     "leest": [
      "NORM.json"
     ],
@@ -446,7 +446,7 @@
    },
    {
     "bestand": "scripts/gluurronde.js",
-    "regel": 798,
+    "regel": 809,
     "leest": [
      "NORM.json"
     ],
@@ -510,7 +510,7 @@
    },
    {
     "bestand": "scripts/idemproef-route.js",
-    "regel": 516,
+    "regel": 550,
     "leest": [
      "IDEMBESLUIT.json"
     ],
@@ -534,7 +534,7 @@
    },
    {
     "bestand": "scripts/kantoormacht.js",
-    "regel": 423,
+    "regel": 607,
     "leest": [
      "KANTOORMACHT.json"
     ],
@@ -571,6 +571,23 @@
      "NORM.json"
     ],
     "soort": "smeltSamen"
+   },
+   {
+    "bestand": "scripts/lib/codearchitect.js",
+    "regel": 100,
+    "leest": [
+     "AFGELEID.json",
+     "SYMBOLEN.json"
+    ],
+    "soort": "anders"
+   },
+   {
+    "bestand": "scripts/lib/codearchitect.js",
+    "regel": 372,
+    "leest": [
+     "GRENZEN.json"
+    ],
+    "soort": "anders"
    },
    {
     "bestand": "scripts/lib/delen.js",
@@ -639,7 +656,7 @@
    },
    {
     "bestand": "scripts/machinedekking.js",
-    "regel": 359,
+    "regel": 366,
     "leest": [
      "KERNHERKOMST.json"
     ],
@@ -647,7 +664,7 @@
    },
    {
     "bestand": "scripts/machinedekking.js",
-    "regel": 457,
+    "regel": 464,
     "leest": [
      "EXECUTION_MAP.json"
     ],
@@ -655,7 +672,7 @@
    },
    {
     "bestand": "scripts/machinedekking.js",
-    "regel": 712,
+    "regel": 719,
     "leest": [
      "DEKKING.json",
      "MACHINEDEKKING.json"
@@ -809,7 +826,7 @@
    },
    {
     "bestand": "scripts/rolronde.js",
-    "regel": 291,
+    "regel": 296,
     "leest": [
      "NORM.json"
     ],
@@ -849,7 +866,7 @@
    },
    {
     "bestand": "scripts/schermroutes.js",
-    "regel": 212,
+    "regel": 215,
     "leest": [
      "ROUTEBRON.json"
     ],
@@ -881,7 +898,7 @@
    },
    {
     "bestand": "scripts/test-runner.js",
-    "regel": 409,
+    "regel": 436,
     "leest": [
      "SUITE.json"
     ],

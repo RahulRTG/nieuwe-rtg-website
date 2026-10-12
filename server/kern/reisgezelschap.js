@@ -114,7 +114,10 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
   async function verwijder(key, id) {
     const rec = leden().find(x => x.id === id && (x.eigenaar === key || x.lid === key));
     if (!rec) return { status: 404, error: 'Niet gevonden.' };
-    db.data.reisGezelschap = leden().filter(x => x !== rec); save();
+    db.data.reisGezelschap = leden().filter(x => x !== rec);
+    // zijn opgave gaat mee: anders telt hij stil mee in een groepsvoorstel
+    opgaven.wisVoorLid(rec.lid, rec.eigenaar, rec.reis);
+    save();
     /* EN DE BEELDEN GAAN MEE. Wie de tijdlijn kwijtraakt maar de fotos houdt,
        is niet weggehaald; dat is een halve waarheid en die is erger dan geen.
        De deellaag van de kluis is hier de baas -- wij zetten alleen de
@@ -170,6 +173,8 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
         .map(x => ({ id: x.id, reis: x.reis, van: x.eigenaarCodenaam, rol: x.rol })) };
   }
 
+  const opgaven = require('./reisgezelschap-groep').maakGezelschapGroep({ db, save, klok, crypto, leden, reisVan });
+
   /* WAT ER GEDEELD WORDT staat in ./reisgezelschap-delen.js: de tijdlijn, het
      aankomstmoment en het beeld. Die deelmodule krijgt dezelfde bakken en
      dezelfde hulpjes mee -- er ontstaat geen tweede opslag en geen tweede
@@ -181,7 +186,8 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
   return {
     reisgezelschap: Object.assign({
       ROLLEN, STANDEN, zicht, rolVan, nodigUit, antwoord, verwijder,
-      gezelschap, reisVoor, mijnKring
-    }, delen)
+      gezelschap, reisVoor, mijnKring,
+      opgaveVoortgang: opgaven.voortgang
+    }, opgaven.routes, delen)
   };
 };

@@ -17,7 +17,18 @@ const adresLaag = require('./rtmail-adres');
    en dat is bij post geen smaakkwestie. */
 const MAX_ALIASSEN = 5;
 
-module.exports = ({ save, rtmail, vrij, nu, busVan, vakInst, kap }) => {
+module.exports = ({ save, rtmail, vrij, nu, busVan, vakInst, kap, alleVakken, teamOpAdres }) => {
+  const sleutel = (lokaal) => String(lokaal || '').replace(/[.-]/g, '');
+  /* Wie draagt dit linkerdeel als alias? Geeft de bussen terug, want het
+     antwoord "twee postvakken" moet te zien zijn en niet stil een winnaar
+     krijgen. */
+  const gereserveerd = (lokaal) => adresLaag.GERESERVEERD.map(sleutel).includes(sleutel(lokaal));
+  function dragersVan(lokaal) {
+    const k = sleutel(lokaal);
+    if (!k || typeof alleVakken !== 'function') return [];
+    const vakken = alleVakken() || {};
+    return Object.keys(vakken).filter(bus => (vakken[bus].aliassen || []).some(a => sleutel(a) === k));
+  }
   function instellingen(adres) {
     const i = vakInst(adres, false);
     return { handtekening: i.handtekening || '', afwezig: i.afwezig || null, aliassen: i.aliassen || [] };
@@ -68,15 +79,26 @@ module.exports = ({ save, rtmail, vrij, nu, busVan, vakInst, kap }) => {
     if (!i) return { error: 'Dit postvak is niet te bepalen.' };
     const lokaal = adresLaag.lokaalVan(naam);
     if (!lokaal) return { error: 'Dit adres kan niet.' };
-    if (adresLaag.GERESERVEERD.includes(lokaal)) return { error: 'Deze naam houdt het huis zelf.' };
-    i.aliassen = (i.aliassen || []).filter(a => a !== lokaal);
-    if (aan !== false) {
-      if (i.aliassen.length >= MAX_ALIASSEN) return { error: 'Meer dan ' + MAX_ALIASSEN + ' aliassen maakt een postvak onnavolgbaar.' };
+    /* Op de SLEUTEL en niet op de exacte vorm: de bezorging legt twee bussen op
+       gelijk zonder punten en streepjes, dus `hu-lp` IS `hulp` (het
+       servicepostvak) en `r-t-g` IS het systeemadres. De tegenlezing van 11
+       oktober 2026 kaapte zo de servicepost. */
+    if (gereserveerd(lokaal)) return { error: 'Deze naam houdt het huis zelf.' };
+    const zonder = (i.aliassen || []).filter(a => a !== lokaal);
+    if (aan !== false && !(i.aliassen || []).includes(lokaal)) {
+      if (zonder.length >= MAX_ALIASSEN) return { error: 'Meer dan ' + MAX_ALIASSEN + ' aliassen maakt een postvak onnavolgbaar.' };
       // een alias mag NOOIT het postvak van een ander opvangen
+      if (sleutel(lokaal) === busVan(adres)) return { error: 'Dit is uw eigen adres al.' };
       const bezet = vrij ? vrij.bezet(lokaal, adresLaag.adresVoor('rtg', lokaal)) : null;
       if (bezet) return { error: bezet };
-      i.aliassen.push(lokaal);
+      // ... en ook geen teamadres of de alias van een ander postvak
+      if (typeof teamOpAdres === 'function' && teamOpAdres(lokaal + '@' + adresLaag.OUD)) return { error: 'Dit is het adres van een team.' };
+      if (dragersVan(lokaal).some(bus => bus !== busVan(adres))) return { error: 'Deze alias is al van iemand anders.' };
     }
+    i.aliassen = aan !== false ? zonder.concat([lokaal]) : zonder;
+    /* Het adres van de eigenaar gaat mee, zodat de bezorging weet waar een
+       alias naartoe wijst -- de sleutel van het postvak is geen adres. */
+    i.adres = rtmail.normAdres(adres);
     save();
     return { ok: true, aliassen: i.aliassen };
   }
@@ -100,11 +122,36 @@ module.exports = ({ save, rtmail, vrij, nu, busVan, vakInst, kap }) => {
     const sleutel = busVan(bericht.van) || bericht.van;
     if (echt.beantwoord[sleutel]) return null;
     echt.beantwoord[sleutel] = t;
-    const m = rtmail.stuur({ van: naarAdres, naar: bericht.van, onderwerp: 'Afwezig: ' + (bericht.onderwerp || ''),
+    /* Kwam de post via een alias, dan antwoordt de alias: anders verraadt het
+       afwezigheidsbericht achter welk postvak hij zit. */
+    const m = rtmail.stuur({ van: bericht.viaAlias || naarAdres, naar: bericht.van, onderwerp: 'Afwezig: ' + (bericht.onderwerp || ''),
       tekst: a.tekst, soort: 'afwezig', bron: 'lid' });
     save();
     return m && m.id ? m : null;
   }
 
-  return { instellingen, zetHandtekening, zetAfwezig, zetAlias, afwezigAntwoord };
+  /* NAAR WELK POSTVAK WIJST DIT ADRES? De bezorging (kern/rtmail.js) vraagt het
+     bij elk bericht. Een alias werkt alleen binnen het huis, en nooit als het
+     adres ook van iemand is: een codenaam, een zaakcode of een team wint altijd.
+     Draagt meer dan een postvak dezelfde alias (van voor de controle bij het
+     aanzetten), dan wint er niemand -- liever geen bezorging via de alias dan
+     post bij de verkeerde. */
+  function aliasDoel(adres) {
+    const o = adresLaag.ontleed(adres);
+    if (!o.binnenshuis || !o.lokaal) return null;
+    // het huis zelf (systeem, servicepostvak) wordt nooit omgeleid, ook niet door een oude alias
+    if (gereserveerd(o.lokaal)) return null;
+    if (vrij && vrij.eigenaarsVorm && vrij.eigenaarsVorm(o.lokaal)) return null;
+    /* Waar al post ligt, woont iemand (dezelfde regel als slot 3 van
+       ./rtmail-vrij.js): een medewerker of overheid heeft een werknaam en geen
+       codenaamvorm, dus zonder deze regel slokte een oudere alias zijn post op. */
+    if (rtmail.postvak(o.adres, { limit: 1 }).length) return null;
+    if (typeof teamOpAdres === 'function' && teamOpAdres(o.adres)) return null;
+    const dragers = dragersVan(o.lokaal);
+    if (dragers.length !== 1) return null;
+    const vak = (alleVakken() || {})[dragers[0]];
+    return (vak && vak.adres) || (dragers[0] + '@' + adresLaag.OUD);
+  }
+
+  return { instellingen, zetHandtekening, zetAfwezig, zetAlias, afwezigAntwoord, aliasDoel };
 };

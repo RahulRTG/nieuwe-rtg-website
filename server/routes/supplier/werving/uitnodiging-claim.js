@@ -1,5 +1,4 @@
 'use strict';
-const { idVanKey } = require('../../../lib/lidsleutel');
 
 module.exports = ctx => {
   const { accounts, crypto, transactie, vindIn,
@@ -36,7 +35,7 @@ module.exports = ctx => {
           !['bezig', 'voltooid'].includes(inv.claim.status) || herstelGeldig(inv))
         return { status: 403, error: CODE_FOUT };
       return { ok: true, hervat: true, invite: publiek(inv),
-        claimStatus: inv.claim.status,
+        claimStatus: inv.claim.status, ooitActief: !!inv.claim.geactiveerd_at,
         claimStaffId: inv.claim.staffId != null ? Number(inv.claim.staffId) : null };
     }
     if (geldig(inv))
@@ -114,8 +113,11 @@ module.exports = ctx => {
 
     if (claim.claimStatus === 'voltooid') {
       const exact = accounts.getStaffByIdAny && accounts.getStaffByIdAny(claim.claimStaffId);
-      if (!pastBijInvite(exact, s, lid, inv))
-        return { status: 409, error: 'De eerdere aanmelding kan niet veilig worden hersteld.' };
+      /* N36: een plek die al eens actief was en nu uit staat, zette een
+         manager uit. Herstellen is alleen voor een aanmelding die halverwege
+         bleef steken; anders maakt een oude kassacode een ontslag ongedaan. */
+      if (!pastBijInvite(exact, s, lid, inv) || (claim.ooitActief && Number(exact.active) !== 1))
+        return { status: 403, error: CODE_FOUT };
       let bevestigd;
       try {
         const actief = Number(exact.active) === 1 ? exact : accounts.activateStaff(exact.id);
@@ -127,8 +129,7 @@ module.exports = ctx => {
       return { status: 409, hersteld: true,
         error: accounts.legacyStaffPinToegestaan && accounts.legacyStaffPinToegestaan()
           ? 'De personeelsplek is veilig hersteld. Een pincode wordt nooit opnieuw getoond; laat een manager haar zo nodig resetten.'
-          : 'De personeelsplek is veilig hersteld. Log in met uw persoonlijke RTG-account.',
-        staff: exact, naam: exact.name, s, invite: inv };
+          : 'De personeelsplek is veilig hersteld. Log in met uw persoonlijke RTG-account.' };
     }
 
     const legacyPin = !!(accounts.legacyStaffPinToegestaan && accounts.legacyStaffPinToegestaan());
@@ -166,25 +167,6 @@ module.exports = ctx => {
     return { ok: true, staff, naam, ...(legacyPin ? { pin } : {}), s, invite: inv, dienstverband };
   }
 
-  async function wisselCodeIn(lid, kassacode) {
-    if (!lid || !kassacode) return null;
-    try {
-      const v = await verbindCode(lid, kassacode, {}, null);
-      return v && v.ok
-        ? { code: v.s.code, bedrijf: v.s.name, staffId: v.staff.id,
-          role: v.invite.role, ...(v.pin ? { pin: v.pin } : {}) }
-        : null;
-    } catch (e) { return null; }
-  }
-
-  async function neemAan(supplier, uitgegeven, sollicitatieKey) {
-    const id = idVanKey(sollicitatieKey);
-    if (id == null) return null;
-    const lid = accounts.getUserById(id);
-    if (!lid) return null;
-    const v = await verbindCode(lid, uitgegeven.kassacode, {}, supplier.code);
-    return v && v.ok ? { staffId: v.staff.id, naam: v.naam, dienstverband: v.dienstverband || null } : null;
-  }
-
+  const { wisselCodeIn, neemAan } = require('./uitnodiging-afnemers')(ctx, verbindCode);
   return { zoekInvite, verbindCode, wisselCodeIn, neemAan };
 };

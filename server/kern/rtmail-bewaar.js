@@ -23,9 +23,10 @@
    recht EN een reden (kern/rtmail-recht.js), en hij komt altijd in het
    journaal. Een export is een kopie die het systeem verlaat; wie dat stil kan
    doen, heeft geen postvak maar een lek. */
+const { schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
-module.exports = ({ db, save, rtmail, recht }) => {
+module.exports = ({ db, save, rtmail, recht, zelfdeMens }) => {
   const nu = () => new Date().toISOString();
   const busVan = (adres) => {
     const o = adresLaag.ontleed(adres);
@@ -44,19 +45,22 @@ module.exports = ({ db, save, rtmail, recht }) => {
   const beleidVan = (adres) => B().vakken[busVan(adres)] || { dagen: 0, bewaring: null };
   const store = () => {
     if (!db.data.rtmail || !Array.isArray(db.data.rtmail.berichten)) db.data.rtmail = { berichten: [] };
+    schoonLeiding(db.data.rtmail, save); // beperkte post nooit in het gedeelde postvak (./rtmail-leiding.js)
     return db.data.rtmail;
   };
   const inVak = (m, bus) => busVan(m.naar) === bus || busVan(m.van) === bus;
+  const termijn = require('./rtmail-leidingtermijn')({ B, store, save, busVan, kap, nu, zelfdeMens });
 
-  function beleid(wie, adres) {
+  // `leiding` (de route: manager van DEZE zaak) voegt de leidingsplek toe (./rtmail-leidingtermijn.js)
+  function beleid(wie, adres, { leiding } = {}) {
     const p = recht.poort(wie, adres, 'metadata');
     if (!p.ok) return { error: p.waarom };
     const b = beleidVan(adres);
-    return { ok: true, postvak: busVan(adres), dagen: b.dagen || 0, bewaring: b.bewaring || null,
+    return Object.assign({ ok: true, postvak: busVan(adres), dagen: b.dagen || 0, bewaring: b.bewaring || null,
       let: b.bewaring
         ? 'Er ligt een juridische bewaring op dit postvak: er verdwijnt niets, ook niet wat over de termijn is.'
-        : (b.dagen ? 'Post ouder dan ' + b.dagen + ' dagen wordt opgeruimd zodra iemand het opruimen aanroept.'
-                   : 'Er wordt niets automatisch verwijderd.') };
+        : (b.dagen ? 'Post ouder dan ' + b.dagen + ' dagen wordt alleen opgeruimd als iemand met het recht vernietigen het opruimen start; er loopt geen automatische ronde over dit postvak.'
+                   : 'Er wordt niets automatisch verwijderd.') }, leiding ? { leiding: termijn.beeld(busVan(adres)) } : {});
   }
 
   function zetTermijn(wie, adres, dagen, reden) {
@@ -98,10 +102,12 @@ module.exports = ({ db, save, rtmail, recht }) => {
       let: 'Zolang deze bewaring ligt, verdwijnt er niets uit dit postvak -- ook niet wat over de bewaartermijn is.' };
   }
 
-  /* Opruimen. Doet niets zonder termijn, en niets onder een bewaring. Geeft
-     terug WAT er weg is, ook als dat nul is -- een opruimactie die stilzwijgend
-     niets doet, laat iemand denken dat het gelukt is. */
-  function ruimOp(wie, adres, reden) {
+  /* Opruimen. Niets zonder termijn of onder een bewaring, en zegt WAT er weg is,
+     ook als dat nul is. Alleen het gedeelde postvak: de leidingsplek volgt zijn
+     eigen termijn en ronde (./rtmail-leidingtermijn.js), en een kortere
+     postvaktermijn wordt daar met opzet niet overgenomen. `sessie` is de
+     medewerker uit de inlog, want het postvak is gedeeld. */
+  function ruimOp(wie, adres, reden, { sessie } = {}) {
     const p = recht.poort(wie, adres, 'vernietigen', reden);
     if (!p.ok) return { error: p.waarom };
     const b = beleidVan(adres);
@@ -116,23 +122,26 @@ module.exports = ({ db, save, rtmail, recht }) => {
     const jongste = weg.reduce((a, m) => (a && a > m.at ? a : m.at), null);
     s.berichten = s.berichten.filter(m => !weg.includes(m));
     B().vernietigingen.unshift({ postvak: bus, aantal: weg.length, van: oudste, tot: jongste,
-      door: busVan(wie), reden: kap(reden, 300) || null, at: nu() });
+      door: busVan(wie), sessie: sessie || null, reden: kap(reden, 300) || null, at: nu() });
     recht.log(wie, 'vernietigd: ' + weg.length + ' bericht(en)', adres, reden, { van: oudste, tot: jongste });
     save();
     return { ok: true, verwijderd: weg.length, van: oudste, tot: jongste,
       let: 'De inhoud is weg. Wat blijft staan is het FEIT: aantal, tijdvak, wie en waarom -- dat is wat aantoonbare vernietiging betekent.' };
   }
 
-  const bewijs = (adres) => B().vernietigingen.filter(v => !adres || v.postvak === busVan(adres)).slice(0, 200);
+  const bewijs = (adres, { leiding } = {}) => B().vernietigingen
+    .filter(v => (!adres || v.postvak === busVan(adres)) && (leiding || v.plek !== 'leiding')).slice(0, 200);
 
   /* Export. Metadata altijd; de inhoud alleen met het recht `lezen`, zodat een
-     jurist met alleen inzage-metadata niet via de export toch meeleest. */
-  function exporteer(wie, adres, { reden, metInhoud } = {}) {
+     jurist met alleen inzage-metadata niet via de export toch meeleest. De
+     leidingsplek alleen met `leiding` (de route beslist, zie beleid). */
+  function exporteer(wie, adres, { reden, metInhoud, leiding } = {}) {
     const p = recht.poort(wie, adres, 'exporteren', reden);
     if (!p.ok) return { error: p.waarom };
     const magLezen = recht.mag(wie, adres, 'lezen').ok;
     const bus = busVan(adres);
-    const rijen = store().berichten.filter(m => inVak(m, bus)).map(m => {
+    const s = store();
+    const rijen = s.berichten.filter(m => inVak(m, bus)).concat(leiding ? (s.leiding || []).filter(m => inVak(m, bus)) : []).map(m => {
       const r = { id: m.id, van: m.van, naar: m.naar, onderwerp: m.onderwerp, at: m.at,
         soort: m.soort, vertrouwd: !!m.vertrouwd, draad: m.draad || m.id };
       if (metInhoud !== false && magLezen) r.tekst = m.tekst;
@@ -146,5 +155,5 @@ module.exports = ({ db, save, rtmail, recht }) => {
                     : 'U heeft geen leesrecht op dit postvak, dus deze export bevat alleen metadata.' };
   }
 
-  return { beleid, zetTermijn, zetBewaring, ruimOp, bewijs, exporteer, beleidVan };
+  return { beleid, zetTermijn, zetBewaring, ruimOp, bewijs, exporteer, beleidVan, leiding: termijn };
 };

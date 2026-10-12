@@ -9,15 +9,16 @@
    DoS-versterker. Zie de kop van noodrem() in server/beveiliging.js.
 
    DE VRAAG IS WAT EEN "BRON" IS. De noodrem telde verschillende BUCKETS, en een
-   bucket is (server/routes/auth/inlog.js):
+   bucket is (server/kern/identiteit/wachtwoordrem.js):
 
-       const bucket = 'auth:' + req.ip + ':' + login.toLowerCase()
+       paar: 'auth:' + ip + ':' + account
 
-   De INLOGNAAM zit erin. Voor de snelheidsrem is dat juist goed -- anders kan
-   iemand het account van een ander op slot zetten door het fout te raden. Maar
-   voor de noodrem stelt het de verkeerde vraag: die wil weten HOEVEEL
-   AANVALLERS er zijn, en telde in plaats daarvan hoeveel DEUREN er zijn
-   aangeklopt.
+   met als account een vingerafdruk van het account dat findByLogin vond (van
+   de getikte naam als er geen is). Het ACCOUNT zit erin.
+   Voor de snelheidsrem is dat juist goed -- anders kan iemand het account van
+   een ander op slot zetten door het fout te raden. Maar voor de noodrem stelt
+   het de verkeerde vraag: die wil weten HOEVEEL AANVALLERS er zijn, en telde in
+   plaats daarvan hoeveel DEUREN er zijn aangeklopt.
 
    Gevolg: een script vanaf EEN adres dat zes gebruikersnamen probeert -- de
    meest gewone aanval die er is, credential stuffing -- zette het hele platform

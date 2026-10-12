@@ -65,5 +65,23 @@
 
   function wis() { try { w.localStorage.removeItem(SLEUTEL); } catch (e) {} }
 
-  w.RTGCommandGeheugen = { lees: lees, schrijf: schrijf, wis: wis, SLEUTEL: SLEUTEL };
+  /* TERUG WAAR JE GEBLEVEN WAS. Stond in werktafel.js; het hoort hier, bij de
+     regels over wanneer de werktafel iets terugzet. Staat er niets, dan blijft
+     de lege keuze staan die bouw() net heeft neergezet.
+
+     EN ALLEEN HET BLAD DAT IN BEELD KOMT, LAADT. Elk blad wordt teruggezet met
+     zijn titel in de tabbalk, maar zonder adres (`later`); de werktafel geeft
+     het adres pas als het blad gekozen wordt, en op een breed scherm -- waar ze
+     naast elkaar staan -- meteen allebei. Op een telefoon staat er een in beeld,
+     en SCHILHERSTART.json zag een terugkeer naar de werktafel daar TWEE bladen
+     volledig laden: 215 scripts en 3,2 MB JavaScript voor een scherm waarvan je
+     de helft niet zag. */
+  function hervat(t) {
+    var g = lees();
+    if (!g) return;
+    g.bladen.forEach(function (b) { t.toon(b.url, b.titel, true); });
+    if (t.aantal()) t.select(Math.min(g.actief, t.aantal() - 1));
+  }
+
+  w.RTGCommandGeheugen = { lees: lees, schrijf: schrijf, wis: wis, hervat: hervat, SLEUTEL: SLEUTEL };
 })(window);

@@ -144,7 +144,7 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
       systeem: require('../../../kern/rahul').RAHUL_LEAD +
         'Je bent de AI-assistent van een RTG-partner (ingelogd: ' + ((req.actor && req.actor.name) || 'Beheer') + '). Context: ' + ctx
     });
-    if (lus && lus.tekst) return A(lus.tekst, lus.acties.some(a => a.status < 400), {
+    if (lus && lus.tekst) return A(lus.tekst, require('../../../kern/stuur/taakbeeld').taakBeeld({ acties: lus.acties }).uitgevoerd.length > 0, {
       stuur: lus.acties,
       goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring),
       goedkeuringWereld: wereld, staving: lus.staving

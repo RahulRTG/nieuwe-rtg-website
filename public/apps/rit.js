@@ -34,7 +34,7 @@ function zetTab(tab,schrijf){
 function inlog(){return '<div class="rit-leeg"><span>ALLEEN VOOR LEDEN</span><h2>Uw aankomst blijft persoonlijk.</h2><p>Log in via de RTG-app om een rit aan te vragen en alleen uw eigen chauffeur te zien.</p><a href="/apps/app.html">Naar de app</a></div>'}
 function teken(){
   if(!TOKEN){$('#inhoud').innerHTML=inlog();return}
-  const ctx={$,esc,meld,plaats,ritten:()=>RITTEN,rit:actieveRit,verblijf:actiefVerblijf,aanbod:()=>AANBOD,gekozen:GEKOZEN,zoekPlek,vraagRit,ververs:laad,zetTab,openRit};
+  const ctx={$,esc,meld,plaats,api,ritten:()=>RITTEN,rit:actieveRit,verblijf:actiefVerblijf,aanbod:()=>AANBOD,gekozen:GEKOZEN,zoekPlek,vraagRit,ververs:laad,zetTab,openRit};
   if(TAB==='aanvragen')window.RTGRitMomenten.aanvragen(ctx);else if(TAB==='chauffeur')window.RTGRitMomenten.chauffeur(ctx);else window.RTGRitMomenten.aankomst(ctx);
 }
 function plekSpec(p){if(!p)return null;if(p.soort==='zaak')return{zaak:p.code};if(p.soort==='halte')return{halte:p.code};if(p.soort==='favoriet')return{favoriet:p.code};if(Number.isFinite(p.lat)&&Number.isFinite(p.lng))return{lat:p.lat,lng:p.lng,label:p.naam||p.label};return null}

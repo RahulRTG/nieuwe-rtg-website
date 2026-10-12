@@ -80,7 +80,7 @@
             scopes: [{ pad: document.querySelector('#apS').value }],
             quotaPerUur: Number(document.querySelector('#apQ').value || 1000) })
             .then(function (r) {
-              document.querySelector('#apGeheim').innerHTML = '<p class="meta" class="mt">' +
+              document.querySelector('#apGeheim').innerHTML = '<p class="meta mt">' +
                 '<b>' + esc(r.geheim) + '</b><br>' + esc(r.let) + '</p>';
             }).catch(function (e) { if (!e.stil) C.meld(e.message); });
         };
@@ -118,7 +118,7 @@
                 (o.ligt ? 'ok' : 'mis') + '">' + (o.ligt ? 'ligt er' : 'ontbreekt') + '</span>' +
                 '<div class="meta">' + esc(o.uitleg) + ' <i>(' + esc(o.bron) + ')</i></div></div>';
             }).join('') +
-            '<div class="crij" class="mt">' +
+            '<div class="crij mt">' +
             '<button class="knop vol" data-laaan="' + esc(d.land) + '">Activeren</button>' +
             '<button class="knop" data-lauit="' + esc(d.land) + '">Terugdraaien</button>' +
             '<button class="knop" data-lakijk="">Terug naar de lijst</button></div></div>' +

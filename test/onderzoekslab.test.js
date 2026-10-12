@@ -8,12 +8,12 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 let srv, base, token;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lab-'));
-const api = (pad, body) => fetch(base + '/api/lab/' + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+const api = (pad, body, tok) => fetch(base + '/api/lab/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (tok || token) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
@@ -54,9 +54,21 @@ test('de fase-keten slaat nooit een stap over, en de proef wacht op de menselijk
   const geblokt = await api('project/fase', { id: project.id, fase: 'proef' });
   assert.equal(geblokt.status, 409, 'zonder akkoord geen proef');
   assert.match(geblokt.body.error, /veiligheids/i);
+  /* DE TOETS DRAAGT ALTIJD EEN MENS, en die komt uit de SESSIE (11 oktober
+     2026): de gedeelde kantoorcode heeft er geen, met of zonder getypte naam,
+     en wordt geweigerd met de weg erheen. */
   const naamloos = await api('project/veiligheid', { id: project.id, status: 'akkoord' });
-  assert.equal(naamloos.status, 400, 'de toets draagt altijd een naam');
-  assert.equal((await api('project/veiligheid', { id: project.id, status: 'akkoord', door: 'Ir. Fatima', notitie: 'Waterkwaliteit dubbel getest' })).status, 200);
+  assert.equal(naamloos.status, 403, 'zonder mens op naam geen toets');
+  assert.equal(naamloos.body.watNu, 'inloggen-op-naam');
+  const getypt = await api('project/veiligheid', { id: project.id, status: 'akkoord', door: 'Ir. Fatima' });
+  assert.equal(getypt.status, 403, 'een getypte naam is geen mens op naam');
+  assert.equal((await api('project/fase', { id: project.id, fase: 'proef' })).status, 409, 'en de proef blijft dicht');
+  const opNaam = await kantoorAlsPersoon(base);
+  assert.ok(opNaam, 'een kantoormens op naam');
+  const akkoord = await api('project/veiligheid', { id: project.id, status: 'akkoord', door: 'Ir. Fatima', notitie: 'Waterkwaliteit dubbel getest' }, opNaam);
+  assert.equal(akkoord.status, 200, JSON.stringify(akkoord.body));
+  assert.ok(akkoord.body.project.veiligheid.door && akkoord.body.project.veiligheid.door !== 'Ir. Fatima',
+    'de beslisser komt uit de sessie, niet uit het lijf');
   assert.equal((await api('project/fase', { id: project.id, fase: 'proef' })).status, 200, 'na het akkoord opent de poort');
 });
 

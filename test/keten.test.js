@@ -264,15 +264,42 @@ test('MET ANKER: de hele keten opnieuw uitrekenen wordt betrapt', () => {
   assert.equal(verifieerTegenAnker(herbouwd, a).herschreven, true);
 });
 
-test('een anker dat uit het begrensde journaal is geschoven, oordeelt niet', () => {
+test('een anker dat uit het begrensde journaal is geschoven, is alleen in orde als de bewaring het verklaart', () => {
   /* Niet te beoordelen is iets anders dan in orde, en allebei iets anders dan
-     een aanval. Ze door elkaar halen levert of vals alarm of valse rust. */
+     een aanval. Ze door elkaar halen levert of vals alarm of valse rust.
+     Audit P2-5: hier stond `ok: true` zonder meer, en dan was "alles tot en met
+     de geankerde regel weggooien" een vervalsing die groen afrekende. */
   const l = journaal(8);
-  const oudAnker = { nr: 2, hash: 'wat dan ook' };
-  const uit = verifieerTegenAnker(l.slice(0, 3), oudAnker);   // alleen nr 8,7,6 over
-  assert.equal(uit.ok, true);
-  assert.equal(uit.weg, true);
-  assert.ok(!uit.ingekort);
+  const oudAnker = { nr: 2, hash: 'wat dan ook', at: '2026-01-01T00:00:00.000Z' };
+  const over = l.slice(0, 3);                                   // alleen nr 8,7,6 over
+  const zonder = verifieerTegenAnker(over, oudAnker);
+  assert.equal(zonder.ok, false, 'zonder bewaring is een verdwenen ankerregel niet verklaard');
+  assert.equal(zonder.weg, true);
+  assert.ok(!zonder.ingekort);
+  assert.equal(verifieerTegenAnker(over, oudAnker, { max: 3 }).ok, true, 'vol journaal: de noodrem verklaart het');
+  assert.equal(verifieerTegenAnker(over, oudAnker, { max: 10 }).ok, false, 'niet vol: dan is er iets weggehaald');
+  const nu = Date.parse('2026-01-10T00:00:00.000Z');
+  assert.equal(verifieerTegenAnker(over, oudAnker, { dagen: 5, nu }).ok, true, 'ouder dan de termijn: verjaard');
+  assert.equal(verifieerTegenAnker(over, oudAnker, { dagen: 30, nu }).ok, false, 'binnen de termijn: weggehaald');
+});
+
+test('een regel zonder hash BINNEN de keten breekt hem (audit P1-2)', () => {
+  /* Wijzig een regel en haal zijn hash weg: vroeger telde hij als "van voor de
+     keten" en meldde verifieer() ok. */
+  const l = journaal(6);
+  const r = { ...l[2], wat: 'een nettere werkelijkheid' }; delete r.hash; l[2] = r;
+  const uit = verifieer(l);
+  assert.equal(uit.ok, false);
+  assert.ok(uit.gebroken.some(g => g.index === 2), 'de hashloze regel zelf is aangewezen');
+  /* En de oudste geketende regel die zijn voorganger kwijt is. */
+  const m = journaal(4); const oud = { ...m[3] }; delete oud.hash; m[3] = oud;
+  assert.equal(verifieer(m).ok, false, 'de voorganger van de oudste geketende regel had een hash');
+  /* Echte erfenis -- regels van VOOR de keten, onder de oudste geketende -- blijft toegestaan. */
+  const erfenis = [{ at: 'x', wat: 'oud' }, { at: 'y', wat: 'ouder' }];
+  const nieuw = []; nieuw.unshift(hangAan(nieuw, { wat: 'een' })); nieuw.unshift(hangAan(nieuw, { wat: 'twee' }));
+  const gemengd = nieuw.concat(erfenis);
+  const v = verifieer(gemengd);
+  assert.equal(v.ok, true); assert.equal(v.zonderKeten, 2);
 });
 
 test('een ongemoeid journaal rekent netjes af met zijn anker', () => {

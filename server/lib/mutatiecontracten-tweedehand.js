@@ -127,6 +127,25 @@ const CONTRACTEN = {
       'dezelfde stand achter als een keer.',
     afgetekend: AFGETEKEND
   },
+  /* DE RISICOGOEDKEURING VAN EEN INCASSORONDE (eigenaarsbesluit 2C, 11 oktober 2026).
+     Een keer per voornemen: de tweede aanroep geeft 409 en zet niets. Ook dat is een
+     toestandscontrole en geen idempotentie -- het antwoord is anders, want de
+     goedkeuring staat er al en opent het deurticket maar een keer. */
+  'POST /api/office/bank/incasso/risico': {
+    mutatieId: 'bank.incasso.risicogoedkeuring',
+    herkomst: 'mens',
+    semantiek: { klasse: 'hooguitEens' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'INTENTIONALLY_NON_IDEMPOTENT',
+    waarom: 'Een risicogoedkeuring geldt voor precies een ronde en wordt precies een keer gegeven; de ' +
+      'tweede aanroep op hetzelfde voornemen weigert met 409 en opent geen tweede deurticket.',
+    bewijs: {
+      gemeten: 'test/tweedehandtekening.test.js toets 12: een tweede goedkeuring op dezelfde ronde geeft 409; ' +
+        'de aanvrager zelf 403; zonder reden 400. Mutatie "ticket op naam van de goedkeurder" laat de toets zakken.',
+      op: '2026-10-11'
+    },
+    afgetekend: { door: 'Claude, handler en toets gelezen op 11 oktober 2026; niet door een mens nagelezen', op: '2026-10-11' }
+  },
   'POST /api/office/bank/handtekening/bevestig': {
     mutatieId: 'bank.handtekening.bevestigen',
     herkomst: 'mens',

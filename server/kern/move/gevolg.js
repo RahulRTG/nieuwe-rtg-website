@@ -37,17 +37,27 @@ const ERGER_DAN = { [UITKOMST.RUIM]: 0, [UITKOMST.GEEN_BEWEGING]: 0, [UITKOMST.K
 /* Per soort onderdeel: wie het moet oplossen als de naad ervoor breekt. Staat
    een soort hier niet in, dan is er geen voorstel -- en dat is eerlijker dan
    een taak die bij niemand aankomt (de doodspoorregel uit DOODSPOOR.json). */
+/* DE ADRESSEN BESTAAN. Hier stonden `/apps/vervoer.html`, `/apps/reserveren.html`
+   en `/apps/portaal.html`, en geen van de drie heeft ooit bestaan -- een voorstel
+   dat naar een 404 wijst is een doodspoor dat er volkomen geloofwaardig uitziet.
+   Het viel pas op toen het voorstel voor het eerst een scherm kreeg (move.html,
+   11 oktober 2026). Nu de schermeigenaren uit SCHERMEIGENAAR.json:
+   `vervoer.rit` (ov.html) en `horeca.reserveren` (foodcourt.html). Een afspraak
+   bij een zaak kan een lid nergens zelf verzetten (er is geen ledenroute voor),
+   dus het voorstel zegt dat de tijd met de zaak wordt afgesproken en wijst naar
+   Mijn reizen, waar de afspraak staat.
+   test/move-gevolg-adressen.test.js legt elk adres tegen public/. */
 const WIE = {
-  transfer: { domein: 'mobiliteit', wat: 'de opdracht opnieuw inplannen', app: '/apps/vervoer.html' },
-  taxi: { domein: 'mobiliteit', wat: 'de opdracht opnieuw inplannen', app: '/apps/vervoer.html' },
-  horeca: { domein: 'horeca', wat: 'de reservering verzetten', app: '/apps/reserveren.html' },
-  verblijf: { domein: 'partner', wat: 'late aankomst doorgeven', app: '/apps/reizen.html' },
+  transfer: { domein: 'mobiliteit', wat: 'de opdracht opnieuw inplannen', app: '/apps/ov.html' },
+  taxi: { domein: 'mobiliteit', wat: 'de opdracht opnieuw inplannen', app: '/apps/ov.html' },
+  horeca: { domein: 'horeca', wat: 'de reservering verzetten', app: '/apps/foodcourt.html' },
+  verblijf: { domein: 'partner', wat: 'late aankomst doorgeven', app: '/apps/reizen.html#reizen' },
   /* `afspraak` en `activiteit` zijn de twee soorten die een ECHTE boeking bij
      een zaak oplevert (kern/reiswereld-bronnen.js), en `afspraak` ontbrak hier
      -- waarmee juist het meest voorkomende geval geen voorstel kreeg. Gevonden
      op een volle ronde met twee betaalde boekingen, niet op papier. */
-  afspraak: { domein: 'partner', wat: 'de afspraak verzetten', app: '/apps/portaal.html' },
-  activiteit: { domein: 'partner', wat: 'de tijd laten aanpassen', app: '/apps/reizen.html' }
+  afspraak: { domein: 'partner', wat: 'met de zaak een andere tijd afspreken', app: '/apps/reizen.html#reizen' },
+  activiteit: { domein: 'partner', wat: 'de tijd laten aanpassen', app: '/apps/reizen.html#reizen' }
 };
 
 /* Een verschuiving op EEN onderdeel, aangewezen op zijn kenmerk. De minuten

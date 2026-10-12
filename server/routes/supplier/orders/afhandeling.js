@@ -1,6 +1,7 @@
 /* Orders (deelmodule): de afhandeling: de sectie- en stationsfasen van
    een bon, de orderstatusketen en de terugbetaling. Krijgt de gedeelde
    kern een keer bij het opstarten vanuit routes/supplier/orders.js. */
+const { overgang } = require('../../../kern/horeca/bezorgovergang');
 module.exports = (kern) => {
   const { app, broadcastSync, logActivity, managerOnly, notify, save, sectiesForOrder, sseToOffice,
           sseToSupplier, stationsForOrder, supplierAuth, orderMetRef, afhaalcode } = kern;
@@ -83,6 +84,10 @@ app.post('/api/supplier/order/status', supplierAuth, async (req, res) => {
   // inpakker (tas + bonnummer) en de bezorger (alles gepakt) hebben afgevinkt
   if (status === 'onderweg' && o.levering && !(o.inpak && o.pakcheck))
     return res.status(409).json({ error: 'Eerst afvinken: de inpakker (tas + bonnummer) en de bezorger (alles gepakt). Dan pas vertrekken.' });
+  // dezelfde regel als bezorg/status: alleen vooruit, en een herhaling meldt niets
+  const mag = overgang(o, status);
+  if (mag.herhaling) return res.json({ ok: true, order: o, al: true });
+  if (mag.error) return res.status(mag.status).json({ error: mag.error, code: mag.code });
   if (CODE_DICHT.includes(status) && !(await sluitCode(o, req, 'bestelling ' + status)))
     return res.status(503).json({ error: 'De afhaalcode kon niet worden ingetrokken; de status is niet veranderd.' });
   o.status = status;

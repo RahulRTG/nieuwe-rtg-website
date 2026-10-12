@@ -122,7 +122,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     const door = schoon(b.door, 60);
     if (b.status !== 'open' && door.length < 2) return { status: 400, error: 'De toets draagt altijd de naam van de mens die beslist.' };
     p.veiligheid = { status: b.status, door: door || null, om: nu(), notitie: schoon(b.notitie, 300) };
-    p.logboek.unshift({ id: rid(), tekst: 'Veiligheids- en ethiektoets: ' + b.status + (door ? ' door ' + door : '') + '.', wie: 'mens', at: nu() });
+    p.logboek.unshift({ id: rid(), tekst: 'Veiligheids- en ethiektoets: ' + b.status + (door ? ' door ' + (/^user-\d+$/.test(door) ? 'een medewerker op naam' : door) : '') + '.', wie: 'mens', at: nu() });
     save();
     return { ok: true, project: beeld(p) };
   }

@@ -5,8 +5,8 @@
         (cat.length ? cat.map(m=>'<div class="st-row"><span>'+m.name+'<span class="sub">'+eur(m.price)+'</span></span>'+
           '<button class="obtn warn" data-kmbd="'+m.id+'">✕</button></div>').join('')
         : '<div class="tkc-who">'+T('kt.nomb','Nog geen artikelen in de minibar.')+'</div>')+
-        '<div class="st-form"><div class="row-gap"><input class="st-in" id="kMbN" placeholder="'+T('mb.newitem','Nieuw artikel')+'" class="h-flex2"><input class="st-in" id="kMbP" type="number" inputmode="decimal" placeholder="€" class="h-flex1"></div>'+
-        '<button class="bigbtn" id="kMbAdd" class="h-mt20">'+T('team.add','Toevoegen')+'</button></div>'+
+        '<div class="st-form"><div class="row-gap"><input class="st-in h-flex2" id="kMbN" placeholder="'+T('mb.newitem','Nieuw artikel')+'"><input class="st-in h-flex1" id="kMbP" type="number" inputmode="decimal" placeholder="€"></div>'+
+        '<button class="bigbtn h-mt20" id="kMbAdd">'+T('team.add','Toevoegen')+'</button></div>'+
         '<div class="tkc-who">'+T('kt.mbnote','De telling per kamer doet housekeeping in het tabblad Minibar; hier beheert u het assortiment en de prijzen.')+'</div></div>';
     }
     if (kantoorSec === 'deuren'){
@@ -62,7 +62,7 @@
         const h = histData;
         html += '<div class="tkc h-volbreed"><h3>'+T('kt.historie','Historie')+' ('+h.total+')</h3>'+
           '<div class="tkc-who">'+T('kt.omzet','Totale ritomzet')+': <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(h.omzet)+'</b> · '+T('kt.nulcom','RTG rekent 0% commissie.')+'</div>'+
-          '<div style="display:flex;gap:0.5rem;margin:0.5rem 0;"><input class="st-in" id="ktHz" placeholder="'+T('kt.zoekrit','Zoek op gast, referentie of chauffeur')+'" value="'+histQ.replace(/"/g,'&quot;')+'" class="h-flex1">'+
+          '<div style="display:flex;gap:0.5rem;margin:0.5rem 0;"><input class="st-in h-flex1" id="ktHz" placeholder="'+T('kt.zoekrit','Zoek op gast, referentie of chauffeur')+'" value="'+histQ.replace(/"/g,'&quot;')+'">'+
           '<button class="obtn" id="ktHzGo">'+T('kt.zoek','Zoek')+'</button></div>'+
           (h.items.length ? h.items.map(r =>
             '<div class="st-row"><span>'+r.customerCodename+'<span class="sub">'+(r.from||'')+' → '+(r.to||'?')+' · '+ritRegel(r)+' · '+String(r.finishedAt||r.at).slice(0,16).replace('T',' ')+(r.driver?' · '+r.driver.name:'')+'</span></span>'+
@@ -84,6 +84,6 @@
           '<button class="obtn warn" data-ktvd="'+v.id+'">✕</button></span></div>'
         ).join('') : '<div class="tkc-who">'+T('kt.geenvloot','Nog geen voertuigen.')+'</div>')+
         '<div class="st-form"><input class="st-in" id="ktVn" placeholder="'+T('kt.vnaam','Naam, bijv. Mercedes S-klasse')+'">'+
-        '<div class="row-gap"><input class="st-in" id="ktVp" placeholder="'+T('kt.kenteken','Kenteken / registratie')+'" class="h-flex2"><input class="st-in" id="ktVs" type="number" placeholder="4" class="h-flex1"></div>'+
-        '<button class="bigbtn" id="ktVAdd" class="h-mt20">'+T('kt.vadd','Voertuig toevoegen')+'</button></div></div>';
+        '<div class="row-gap"><input class="st-in h-flex2" id="ktVp" placeholder="'+T('kt.kenteken','Kenteken / registratie')+'"><input class="st-in h-flex1" id="ktVs" type="number" placeholder="4"></div>'+
+        '<button class="bigbtn h-mt20" id="ktVAdd">'+T('kt.vadd','Voertuig toevoegen')+'</button></div></div>';
     }

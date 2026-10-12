@@ -877,6 +877,11 @@ const METERS = [
      Wat hier NIET staat is het aantal gesloten schakels. Dat zou stijgen door de
      proef langer te maken, en dan wordt een meter beter door hem te verlengen. */
   { sleutel: 'momentOpenBekend', richting: 'omlaag', wat: 'schakels in de publieke keten die openstaan met een uitgeschreven reden (MOMENTPROEF.json)' },
+  /* Dezelfde tand voor de samenwerkingsketen van FoundationOS
+     (GEMEENSCHAPSPROEF.json, GEMEENSCHAP-FASE0.md par. 7.5). Omlaag: elke open
+     schakel met een reden is een openstaand besluit, en die mogen alleen
+     minder worden. */
+  { sleutel: 'gemeenschapOpenBekend', richting: 'omlaag', wat: 'schakels in de samenwerkingsketen die openstaan met een uitgeschreven reden (GEMEENSCHAPSPROEF.json)' },
   { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' },
   /* WAT MAAKT TWEE AANROEPEN HETZELFDE VERZOEK (IDEMIDENTITEIT.json,
      npm run idemidentiteit). Drie tanden, en de eerste gaat met opzet de andere
@@ -1001,6 +1006,21 @@ const METERS = [
      rtg-gebeurtenissen met een zender zonder luisteraar of andersom -- die
      laatste over heel public/, want een dood kanaal naast de Edge is net zo
      dood. */
+  /* DE SCHIL (SCHILHERSTART.json, npm run schilherstart; WERKRUIMTE.md par.
+     "De permanente schil"). Een vaste ledenroute langs de vier werelden, in een
+     echte browser. Twee tanden, allebei omlaag, en allebei TELLINGEN en geen
+     stopwatch -- een ratel op een tijd zakt op een drukke CI-machine en leert
+     mensen dat rood niets betekent; de tijden staan als `vermoed` in het
+     register en hangen hier met opzet niet aan.
+
+     `schilHerstarts` telt de documentnavigaties over de route, inclusief een
+     scherm dat zichzelf na het opstarten herlaadt. Hij daalt doordat een stap
+     binnen een doorlopende schil komt -- en ALLEEN zo: een stap uit de route
+     halen is een besluit, en dan hoort deze tand met de hand en met een notitie
+     omlaag. `schilDubbeleVerzoeken` telt API-verzoeken die in ELKE gemeten
+     ronde twee keer in hetzelfde document gingen. */
+  { sleutel: 'schilHerstarts', richting: 'omlaag', wat: 'documentnavigaties over de vaste ledenroute, een herlaad na opstarten meegeteld (SCHILHERSTART.json)' },
+  { sleutel: 'schilDubbeleVerzoeken', richting: 'omlaag', wat: 'API-verzoeken die in elke ronde dubbel gingen over de vaste ledenroute (SCHILHERSTART.json)' },
   { sleutel: 'edgeGeblokkeerdZonderWaarom', richting: 'omlaag', wat: 'geblokkeerde Edge-handelingen zonder reden, over alle gemeten schermen -- hoort nul te zijn (EDGEDEKKING.json)' },
   { sleutel: 'edgeDubbeleEigenaars', richting: 'omlaag', wat: 'Edge-verantwoordelijkheden met meer dan een schrijver of beslisser (EDGEKAART.json)' },
   { sleutel: 'rtgDodeKanalen', richting: 'omlaag', wat: 'rtg-gebeurtenissen in public/ met een luisteraar zonder zender of andersom (EDGEKAART.json)' },
@@ -1423,6 +1443,19 @@ function leesEdge(pad, wat, teller) {
   return v;
 }
 
+/* SCHILHERSTART.json lezen. Zelfde vorm als leesEdge: een ontbrekend bestand of
+   een ontbrekend getal is een FOUT en geen nul, want nul is hier de allerbeste
+   stand -- precies het getal dat een kapotte meting anders zou melden. */
+function leesSchil(pad, wat) {
+  const naam = path.basename(pad);
+  let j;
+  try { j = JSON.parse(fs.readFileSync(pad, 'utf8')); }
+  catch (e) { throw new Error(naam + ' ontbreekt of is stuk (' + e.message + '); draai npm run schilherstart'); }
+  const v = j && j.telling ? j.telling[wat] : undefined;
+  if (typeof v !== 'number' || Number.isNaN(v)) throw new Error(naam + ' draagt geen ' + wat + '; een meter zonder invoer is geen meter');
+  return v;
+}
+
 /* Een register uit de wortel, met de eerlijke uitkomst als hij er niet is:
    `undefined` en geen nul. Een meter die een ontbrekend bestand als nul leest,
    meldt zijn beste stand op het moment dat hij niets meet. */
@@ -1709,6 +1742,7 @@ function meet(bronnen) {
   const edgeKaart = (wat) => leesEdge(path.join(WORTEL, 'EDGEKAART.json'), wat);
   const edgeDekking = (wat, teller) => leesEdge(path.join(WORTEL, 'EDGEDEKKING.json'), wat, teller);
   const meetleerBlind = leesMeetleer(path.join(WORTEL, 'MEETLEER.json'));
+  const schil = (wat) => leesSchil(path.join(WORTEL, 'SCHILHERSTART.json'), wat);
 
   /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
      reden als hierboven: een tweede implementatie loopt binnen een week uiteen. */
@@ -1808,6 +1842,8 @@ function meet(bronnen) {
     zaakwigGezakt,
     edgeGeblokkeerdZonderWaarom: edgeDekking('geblokkeerdZonderWaarom'),
     edgeDubbeleEigenaars: edgeKaart('dubbeleEigenaars'),
+    schilHerstarts: schil('herstarts'),
+    schilDubbeleVerzoeken: schil('dubbeleVerzoeken'),
     rtgDodeKanalen: edgeKaart('dodeKanalen'),
     edgeVeldIdentiteit: edgeDekking('identiteit'),
     edgeVeldWereld: edgeDekking('wereld'),
@@ -1898,6 +1934,7 @@ function meet(bronnen) {
     aankomstUitPositie: leesRegister('POSITIEPROEF.json', (j) => j.tellers.aankomstUitPositie),
     wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
     momentOpenBekend: leesRegister('MOMENTPROEF.json', (j) => j.telling.openBekend),
+    gemeenschapOpenBekend: leesRegister('GEMEENSCHAPSPROEF.json', (j) => j.telling.openBekend),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),
     lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),
@@ -2362,6 +2399,6 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { meet, keuringRapport, losseRatels, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesLoopFabric, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesEdge, leesMeetleer,
+module.exports = { meet, keuringRapport, losseRatels, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesLoopFabric, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesEdge, leesSchil, leesMeetleer,
   PRESTATIEMETERS, leesPrestatie, leesMeting, prestatiePad, bron, PRESTATIEBESTAND, METINGBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

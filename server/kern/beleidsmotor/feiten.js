@@ -12,6 +12,7 @@
    lijsten sleutels. Er gaat geen naam in, en er gaat niets van hier naar een
    opslag (./index.js telt alleen). */
 'use strict';
+const productiedeur = require('../kantoor/productiedeur');
 
 function maakFeiten({ sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron }) {
   const probeer = (fn) => { try { return fn(); } catch (e) { return undefined; } };
@@ -20,7 +21,8 @@ function maakFeiten({ sessionFor, accounts, eigenaar, boardroomWie, magBoardroom
     const header = (req && typeof req.get === 'function' && req.get('authorization')) || '';
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
     if (!token) {
-      return { kantoorsessie: false, eigenaar: false, mensOpSessie: false, boardroomZetel: false, balieZetel: false, eigenaarMens: false };
+      return { kantoorsessie: false, eigenaar: false, mensOpSessie: false, boardroomZetel: false, balieZetel: false,
+        eigenaarMens: false, passkeyOpSessie: false, identiteit: null };
     }
     const sess = probeer(() => sessionFor(token) || null);
     const kantoor = sess === undefined ? undefined : !!(sess && sess.role === 'office');
@@ -45,7 +47,15 @@ function maakFeiten({ sessionFor, accounts, eigenaar, boardroomWie, magBoardroom
       /* DE EIGENAAR ALS MENS, langs welke weg ook (eigen account of een
          kantoorsessie op zijn sleutel). Geen deur-eis maar de vraag van besluit
          A2: hier zou een stap-op komen. */
-      eigenaarMens: eig === true ? true : zetel(boardroomBaas)
+      eigenaarMens: eig === true ? true : zetel(boardroomBaas),
+      /* BESLUIT 3a: een BEWEZEN individu -- op naam en met een passkey aan de
+         deur. Dezelfde vorm als de productiedeur (B10) hem eist, en uit
+         dezelfde functie, zodat er geen tweede definitie van "bewezen" ontstaat. */
+      passkeyOpSessie: kantoor === undefined ? undefined : !!(kantoor && sess.lidKey && productiedeur.bewijsGeldig(sess.kantoorBewijs)),
+      /* De SOORT identiteit (passkey / opNaam / eigenaarToken / gedeeld), zonder
+         naam of sleutel. Geen deur-eis maar wat ./uitvoeren.js telt. */
+      identiteit: kantoor === undefined || eig === undefined ? undefined
+        : (productiedeur.identiteitVan(kantoor ? sess : null, { eigenaarToken: eig === true }) || null)
     };
   };
 }

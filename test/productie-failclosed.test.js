@@ -24,13 +24,24 @@ const config = require('../server/config');
 const openbaar = require('../server/config/openbaar');
 const productiedeur = require('../server/kern/kantoor/productiedeur');
 
+/* Sinds het auditboek eist PostgreSQL-productie een extern anker (twee bestemmingen en
+   een publieke ankersleutel, server/config/productie-auditboek.js). Alleen de
+   aanwezigheid van een PEM wordt gekeurd; deze sleutel is een wegwerpexemplaar. */
+const AUDIT_ANKER = (() => {
+  const fs = require('node:fs'); const os = require('node:os'); const p = require('node:path');
+  const pub = p.join(fs.mkdtempSync(p.join(os.tmpdir(), 'rtg-anker-')), 'audit-anker.pub');
+  fs.writeFileSync(pub, require('node:crypto').generateKeyPairSync('ed25519').publicKey.export({ type: 'spki', format: 'pem' }));
+  return { RTG_AUDIT_ANKER_DIRS: '/srv/anker-a,/srv/anker-b', RTG_AUDIT_ANKER_PUBLIC_KEY_FILE: pub };
+})();
+
 /* Een volledige, veilige productieconfiguratie (zelfde opsomming als
    test/productie.test.js: "hoe veilig eruitziet"). */
 const VEILIG = {
+  ...AUDIT_ANKER,
   NODE_ENV: 'production', RTG_ENC_KEY: 'a'.repeat(64),
   APP_URL: 'https://x', DATABASE_URL: 'postgresql://postgres/rtg',
   RTG_VAULT_KEY: 'v'.repeat(64), RTG_SECRET_KEY: 's'.repeat(64),
-  REDIS_URL: 'r', ERR_WEBHOOK_URL: 'https://haak.voorbeeld.test/rtg', SMTP_URL: 'm',
+  REDIS_URL: 'r', RTG_ANKERPOST_URL: 'https://anker.voorbeeld.test/', ERR_WEBHOOK_URL: 'https://haak.voorbeeld.test/rtg', SMTP_URL: 'm',
   MAIL_PROVIDER_DKIM: '1', OPENAI_API_KEY: 'test-ai-key',
   STRIPE_SECRET_KEY: 'k', STRIPE_WEBHOOK_SECRET: 'whsec_k',
   RTG_MOTOR_GELD: 'motor', RTG_MOTOR_GELD_URL: 'http://motor:3100',
@@ -190,15 +201,21 @@ test('18. productie + RTG_LIEG of RTG_STAATLOG weigert de start (C4)', () => {
     'RTG_STAATLOG=0 is uit');
 });
 
-test('19. RTG_DEV_LINKS op een ONBEKEND adres zonder NODE_ENV: geen blokkade, wel een waarschuwing (C4)', () => {
+/* Deze toets stond eerst andersom ("onbekend: geen blokkade, wel een
+   waarschuwing") en legde daarmee het gat vast: een server zonder APP_URL op een
+   publiek IP startte met elk account over te nemen (CONFIG P1-2). RTG_DEV_LINKS
+   vraagt de STRENGE richting -- bewezen lokaal of geen start -- net als
+   RTG_PRIVATE_BETA. */
+test('19. RTG_DEV_LINKS op een ONBEKEND adres zonder NODE_ENV: geen start (C4, CONFIG P1-2)', () => {
   const { NODE_ENV, ...zonderProd } = VEILIG;
   for (const APP_URL of [undefined, 'https://rtg-intern', 'https://rtg.example.com']) {
     const env = { ...zonderProd, RTG_DEV_LINKS: '1' };
     if (APP_URL) env.APP_URL = APP_URL; else delete env.APP_URL;
     const r = config.valideer(env);
-    assert.equal(r.hardeFouten.some(f => /RTG_DEV_LINKS/.test(f)), false, 'onbekend is geen openbaar: geen harde fout');
-    assert.ok(r.waarschuwingen.some(f => /RTG_DEV_LINKS/.test(f)), 'maar het staat er wel (' + (APP_URL || 'geen APP_URL') + ')');
+    assert.ok(r.hardeFouten.some(f => /RTG_DEV_LINKS/.test(f)), 'onbekend is niet lokaal: harde fout (' + (APP_URL || 'geen APP_URL') + ')');
   }
+  const lokaal = config.valideer({ ...zonderProd, RTG_DEV_LINKS: '1', APP_URL: 'http://localhost:3000' });
+  assert.equal(lokaal.hardeFouten.some(f => /RTG_DEV_LINKS/.test(f)), false, 'een bewezen lokale installatie mag hem zetten');
 });
 
 test('20. een OPENBAAR adres zonder NODE_ENV weigert ook de proefstanden die zichzelf alleen in productie weigeren (C4)', () => {

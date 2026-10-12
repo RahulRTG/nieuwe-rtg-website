@@ -503,6 +503,17 @@
       esc(s.recht == null ? (s.reden || '') : (s.tekst || '')) + '</span></div></div>';
   }
 
+  /* Waar je vakantierecht uit gerekend wordt: je eigen dienstverband en contract
+     (kern/vrijheid/saldobron.js). Ook als het saldo nog niet te rekenen is. */
+  function tijdBron(b){
+    if (!b || (!b.contract && !b.dienstverband)) return '';
+    const c = b.contract;
+    const zin = T('pd.tijd.bron', 'Gerekend uit je eigen gegevens') + ': ' +
+      (c ? c.soort + (c.urenPerWeek != null ? ', ' + c.urenPerWeek + ' ' + T('pd.tijd.upw', 'uur per week') : '') : T('pd.tijd.geencontract', 'nog geen contract')) +
+      (b.dienstverband ? '; ' + T('pd.tijd.indienst', 'in dienst sinds') + ' ' + b.dienstverband.van : '') + '.';
+    return '<div class="task"><div class="t"><span>' + esc(zin) + '</span></div></div>';
+  }
+
   function renderTijd(){
     const w = $('#tijdWrap'); if (!w) return;
     if (tijdFout){ w.innerHTML = '<div class="card"><div class="t">' + esc(tijdFout) + '</div></div>'; return; }
@@ -513,7 +524,7 @@
     const bewaard = {}; TIJD_VELDEN.forEach(id => { const e = w.querySelector('#' + id); if (e) bewaard[id] = e.value; });
     w.innerHTML =
       '<div class="card"><div class="k">' + T('pd.tijd.saldo', 'Wat je hebt') + '</div>' +
-        tijdSaldo(T('pd.tijd.vak', 'Vakantie'), t.vakantie) + tijdSaldo('RTG Days', t.rtgDagen) +
+        tijdSaldo(T('pd.tijd.vak', 'Vakantie'), t.vakantie) + tijdBron(t.vakantieBron) + tijdSaldo('RTG Days', t.rtgDagen) +
         (t.verjaardag ? '<div class="task"><div class="t"><b>' + T('pd.tijd.jarig', 'Je verjaardag') + (t.verjaardag.datum ? ': ' + esc(t.verjaardag.datum) : '') +
           '</b><span>' + esc(t.verjaardag.tekst || '') + '</span></div></div>' : '') +
       '</div>' +
@@ -2955,7 +2966,7 @@
     $('#tmMsg').addEventListener('keydown', e => { if (e.key==='Enter') send(); });
     const tc = document.getElementById('teamCall'); if (tc) tc.addEventListener('click', () => window.TeamCall && TeamCall.groep());
     const ba = document.getElementById('buzzAll'); if (ba) ba.addEventListener('click', async () => {
-      try { const d = await API.call('/supplier/team/buzz', { all: true }); toast(''+T('pd.allbuzzed','Hele team opgeroepen')+' ('+d.reached+').'); }
+      try { const d = await API.call('/supplier/team/buzz', { all: true }); toast(''+T('pd.allbuzzed','Hele team opgeroepen')+'.'); }
       catch(e){ toast(e.message); }
     });
     document.querySelectorAll('[data-belm]').forEach(b => b.addEventListener('click', () => window.TeamCall && TeamCall.bel(parseInt(b.dataset.belm, 10), b.dataset.naam)));
@@ -2963,7 +2974,7 @@
     if (window.CollegaChat) CollegaChat.badges();
     document.querySelectorAll('[data-buzz]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { staffId: Number(b.dataset.buzz) });
-        toast(d.reached ? ''+d.name+' '+T('pd.buzzed','wordt opgeroepen.') : d.name+' '+T('pd.buzzoff','heeft de app nu niet open.')); }
+        toast(d.reached === false ? d.name+' '+T('pd.buzzoff','heeft de app nu niet open.') : ''+d.name+' '+T('pd.buzzed','wordt opgeroepen.')); }
       catch(e){ toast(e.message); }
     }));
     // personeelsnetwerk: verbinden, goedkeuren en chatten in de aparte ruimte
@@ -3222,7 +3233,7 @@
   function startStream(){
     if (!window.EventSource) return;
     try {
-      const src = new EventSource('/api/supplier/stream?token='+encodeURIComponent(API.token));
+      const src = RTGStroom.open('/api/supplier/stream', { stroom: 'zaak', token: API.token });
       src.addEventListener('sync', e => { refresh(); if (heeftRetail() && pdRetail) laadWinkel(); if (heeftCharter() && pdCharters) laadVaart(); if (heeftBeveiliging()) laadBevPda(); if (zbData) laadZorgbalie(); if (mkHulp || mkZorg) laadMeldkamerPda();
         // losstaande scripts (hr-mijn e.d.) luisteren mee via een window-event
         try { window.dispatchEvent(new CustomEvent('rtgsync', { detail: JSON.parse(e.data || '{}') })); } catch(err){} });

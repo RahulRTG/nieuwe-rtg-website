@@ -43,7 +43,7 @@ function maakNaam({ codenaamVan, zaakNaam, mensNaam, gezinNaam }) {
    alleen niet bijwerken, en dat is het soort defect dat maanden blijft staan
    omdat "even verversen" het verbergt. */
 function maakSein({ sseToCustomer, sseToSupplier, sseToOffice }) {
-  return function sein(sleutel, event, data) {
+  return function sein(sleutel, event, data, g) {
     const a = ontleed(sleutel);
     if (!a) return;
     if (a.soort === 'lid') return sseToCustomer && sseToCustomer(a.sleutel, event, data);
@@ -52,9 +52,15 @@ function maakSein({ sseToCustomer, sseToSupplier, sseToOffice }) {
        zelf op. Niets sturen is hier het eerlijke antwoord, en beter dan het
        naar de leverancierstroom sturen omdat de vorm toevallig lijkt. */
     if (a.soort === 'gezin') return;
-    /* Zaak en mens luisteren allebei op de stroom van hun zaak; de app aan die
-       kant kijkt zelf of het bericht voor het team of voor hem is. */
-    return sseToSupplier && sseToSupplier(a.code, event, data);
+    /* Zaak en mens luisteren allebei op de stroom van hun zaak, maar de SERVER
+       beslist wie het krijgt (tegenlezing PR #584) -- de app laten kijken of het
+       voor hem is, is verbergen op het scherm. Een eigen gesprek (mens) gaat
+       alleen naar die medewerker, ook niet naar zijn manager; een
+       sollicitatiegesprek (bron Werk) in de zaakinbox alleen naar de managers. */
+    if (!sseToSupplier) return;
+    if (a.soort === 'mens') return sseToSupplier(a.code, event, data, { staffId: a.nummer, zonderManager: true });
+    if (g && g.meta && g.meta.bron === 'Werk') return sseToSupplier(a.code, event, data, { staffId: null });
+    return sseToSupplier(a.code, event, data);
   };
 }
   return { maakNaam, maakSein };

@@ -67,7 +67,7 @@
   function luister() {
     if (!window.EventSource) return;
     try {
-      const bron = new EventSource('/api/stream?token=' + encodeURIComponent(TOKEN));
+      const bron = RTGStroom.open('/api/stream', { token: TOKEN });
       bron.addEventListener('residentie', ev => {
         let d; try { d = JSON.parse(ev.data); } catch (e) { return; }
         if (!S.kamer || d.kamer !== S.kamer.id) return;

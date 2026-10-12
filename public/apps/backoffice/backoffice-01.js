@@ -133,10 +133,7 @@
       '</div>').join('') : '<div class="empty">'+T('bo.noverify','Geen openstaande verificaties.')+'</div>';
     $('#verify').querySelectorAll('.vrow').forEach(row => {
       const id = Number(row.dataset.id);
-      row.querySelector('[data-doc]').addEventListener('click', e => {
-        $('#docImg').src = '/api/office/doc?token='+encodeURIComponent(API.token)+'&file='+encodeURIComponent(e.target.dataset.doc);
-        $('#docScrim').classList.add('open');
-      });
+      row.querySelector('[data-doc]').addEventListener('click', e => toonDocument(e.target.dataset.doc)); // deel 01a
       row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve',
         row.querySelector('[data-face]').checked, row.querySelector('[data-geb]').value));
       row.querySelector('[data-no]').addEventListener('click', () => decide(id, 'reject', false));

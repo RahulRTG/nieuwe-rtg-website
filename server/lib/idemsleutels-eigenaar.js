@@ -34,6 +34,8 @@ const SLEUTELS = {
       'challenge is een herbruikbare challenge' },
   'POST /api/office/bank/incasso/opties': { nietIdempotent: true,
     waarom: 'de ceremonie voor de incassoronde, gebonden aan zijn grens; een herhaalde challenge is een herbruikbare challenge' },
+  'POST /api/office/bank/afstemming/opties': { nietIdempotent: true,
+    waarom: 'de ceremonie voor de afstemming van een onbekende uitbetaling, gebonden aan die opdracht; een herhaalde challenge is een herbruikbare challenge' },
   'POST /api/office/bank/handtekening/opties': { nietIdempotent: true,
     waarom: 'de ceremonie voor de tweede handtekening, gebonden aan die aanvraag; een herhaalde challenge is een herbruikbare challenge' },
   'POST /api/webauthn/bevestig/opties': { nietIdempotent: true,
@@ -64,11 +66,14 @@ const SLEUTELS = {
   /* De toegangsreview (fase 8) leest drie zetelbronnen. Elke aanroep laat bewust
      EEN journaalregel na: het journaal hoort elke inzage te zien, ook de tweede. */
   'POST /api/office/beleidsmotor/review': { leest: true },
-  /* De kantooruitnodiging (fase 2): elke oproep maakt een NIEUWE code en maakt de
-     vorige van dezelfde mens ongeldig. Het overzicht leest alleen. */
+  /* De kantooruitnodiging (fase 2): elke oproep ZONDER sleutel maakt een NIEUWE code en
+     maakt de vorige van dezelfde mens ongeldig. Sinds 11 oktober 2026 vangt de
+     domeinkern een herhaling MET dezelfde sleutel zelf af (409 met `herhaald`, zonder
+     code); de generieke laag blijft er hoe dan ook af. Het overzicht leest alleen. */
   'POST /api/office/kantoor/uitnodiging': { nietIdempotent: true,
-    waarom: 'een tweede oproep is een tweede uitnodiging: een nieuwe code, en de vorige vervalt; een laag die ' +
-      'hem opslikt geeft de eigenaar een code terug waarvan hij denkt dat die de nieuwste is' },
+    waarom: 'een oproep zonder sleutel is een tweede uitnodiging: een nieuwe code, en de vorige vervalt; een laag die ' +
+      'hem opslikt geeft de eigenaar een code terug waarvan hij denkt dat die de nieuwste is. Een herhaling met ' +
+      'dezelfde sleutel vangt kern/kantoor/uitnodiging.js zelf af, zonder de code opnieuw te tonen' },
   'POST /api/office/kantoor/uitnodigingen': { leest: true },
   /* De simulator (fase 8) rekent en verandert niets; elke oproep laat bewust een
      journaalregel na. Uitgeven en intrekken van een doossleutel staan sinds

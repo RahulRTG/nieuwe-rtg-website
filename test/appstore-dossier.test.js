@@ -25,10 +25,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-dossier-'));
-let srv, base, lid, lid2, sup, office, tech, hash;
+let srv, base, lid, lid2, sup, office, tekenaar, tech, hash;
 const ORG = 'O-DOSSIER';
 
 function api(pad, body, token) {
@@ -58,7 +58,7 @@ async function publiceer(over) {
      want deze toetsen gaan over de winkel en niet over de keuring. */
   await api('/api/appstore/kantoor/toegankelijk',
     { versieId: r.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
-  const b = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  const b = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar);
   assert.equal(b.status, 200, JSON.stringify(b.body));
   return r.body.versie;
 }
@@ -71,15 +71,20 @@ test.before(async () => {
   lid2 = (await api('/api/auth/register', { name: 'Ander Lid', email: 'ander@x.nl', phone: '0612345672',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  /* DE TEKENAAR IS EEN MENS OP NAAM: de gedeelde code met een getypte naam
+     tekent geen app meer af (kern/appstore/vierogen.js, 11 oktober 2026). */
+  tekenaar = await kantoorAlsPersoon(base);
   tech = (await api('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
   const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const chef = (roster.staff || []).find(x => x.role === 'manager');
   sup = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+  // een zaakmens OP NAAM zendt in: zonder ledensleutel is vier-ogen niet vast te stellen (vierogen.js)
+  sup = await zaakMensOpNaam(base, sup, 'KIKUNOI');
   assert.ok(lid && lid2 && office && tech && sup);
   await api('/api/techniek/tenant', { org: ORG, naam: 'Dossier Uitgeverij' }, tech);
   await api('/api/techniek/tenant/bind', { org: ORG, soort: 'zaak', code: 'KIKUNOI' }, tech);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Dossier Uitgeverij', contact: 'dev@dossier.nl' }, sup);
-  await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
   hash = (await publiceer()).hash;
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
@@ -204,7 +209,7 @@ test('6. een lid ziet alleen zijn eigen tijdlijn', async () => {
 });
 
 test('7. de controleronde haalt eruit wat niet meer klopt met wat is afgetekend', async () => {
-  const eerst = await api('/api/appstore/kantoor/hercontrole', { door: 'Sam van RTG' }, office);
+  const eerst = await api('/api/appstore/kantoor/hercontrole', { door: 'Sam van RTG' }, tekenaar);
   assert.equal(eerst.status, 200);
   assert.equal(eerst.body.gekeurd, 1);
   assert.equal(eerst.body.inOrde, 1);
@@ -215,7 +220,7 @@ test('7. de controleronde haalt eruit wat niet meer klopt met wat is afgetekend'
   const vol = path.join(TMP, 'appstore', 'dossier-app', hash, 'app.js');
   fs.writeFileSync(vol, 'window.location = "https://elders.example";');
 
-  const na = await api('/api/appstore/kantoor/hercontrole', { door: 'Sam van RTG' }, office);
+  const na = await api('/api/appstore/kantoor/hercontrole', { door: 'Sam van RTG' }, tekenaar);
   assert.equal(na.body.uitgezet.length, 1, 'een aangetaste bundel gaat eruit, en dat is geen afweging');
   assert.equal(na.body.uitgezet[0].sleutel, 'dossier-app');
   assert.equal((await api('/api/appstore/catalogus', {}, lid)).body.totaal, 0, 'weg uit de winkel');
@@ -284,16 +289,16 @@ test('9. een uitgever leest wat de klant leest -- en alleen over zijn eigen app'
   const ORG2 = 'O-DOSSIER-2';
   const roster2 = (await api('/api/supplier/roster', { code: 'SAKURA' })).body;
   const chef2 = (roster2.staff || []).find(x => x.role === 'manager');
-  const sup2 = (await api('/api/supplier/login', { code: 'SAKURA', staffId: chef2.id, pin: '1234' })).body.token;
+  const sup2 = await zaakMensOpNaam(base, (await api('/api/supplier/login', { code: 'SAKURA', staffId: chef2.id, pin: '1234' })).body.token, 'SAKURA');
   await api('/api/techniek/tenant', { org: ORG2, naam: 'Andere Uitgeverij' }, tech);
   await api('/api/techniek/tenant/bind', { org: ORG2, soort: 'zaak', code: 'SAKURA' }, tech);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Andere Uitgeverij', contact: 'dev@ander.nl' }, sup2);
-  await api('/api/appstore/kantoor/uitgever', { org: ORG2, besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/uitgever', { org: ORG2, besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
   const ander = await api('/api/appstore/uitgever/inzenden',
     { manifest: manifest({ sleutel: 'andermans-app', naam: 'Andermans app' }), bestanden: bundel() }, sup2);
   assert.equal(ander.status, 200, JSON.stringify(ander.body.fouten || ander.body.bevindingen || ander.body.error || ''));
   await api('/api/appstore/kantoor/toegankelijk', { versieId: ander.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
-  await api('/api/appstore/kantoor/besluit', { versieId: ander.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/besluit', { versieId: ander.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar);
 
   assert.equal((await api('/api/appstore/uitgever/dossier', { sleutel: 'andermans-app' }, sup2)).status, 200,
     'de eigenaar leest hem wel');

@@ -8,7 +8,7 @@ module.exports = (kern) => {
           supplierState, tooManyTries, zaakBoard, zaakZet, logInlog, werkvensterVan, zetWerkvenster,
           magWerken, werkAdvies, persoonsPoort } = kern;
 app.post('/api/supplier/zaak/board', supplierAuth, (req, res) => {
-  res.json(zaakBoard(req.supplier));
+  res.json(zaakBoard(req.supplier, req.actor));
 });
 app.post('/api/supplier/zaak/functie', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
@@ -103,7 +103,7 @@ app.post('/api/supplier/login', async (req, res) => {
   // Alleen de gedeelde demo-inlog heeft uitsluitend spoor + sessie gewijzigd.
   // Personeel kan ook werkvenster-defaults initialiseren; behoud daar brede opslag.
   const noteerInlog = !staff && DEMO ? logActivity.alleenActiviteit || logActivity : logActivity;
-  noteerInlog(s.code, actor, actor.name + ' logde in');
+  noteerInlog(s.code, actor, actor.name + ' logde in', 'klok-inlog');
   res.json({ token, state: supplierState(s, actor) });
 });
 

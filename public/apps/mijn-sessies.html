@@ -339,10 +339,24 @@
     if (naam === null) return;
     knop.disabled = true;
     try {
-      const u = await api('/api/mijn/toestel/uitdaging');
-      if (u.body.error) { knop.disabled = false; return zeg(u.body.error); }
-      const bewijs = await RTGToestel.bewijs(u.body.nonce);
-      const r = await api('/api/mijn/toestel/bind', { jwk: bewijs.jwk, handtekening: bewijs.handtekening, naam });
+      /* Twee rondes hoogstens: een sessie die langer dan tien minuten open staat
+         vraagt eerst of u het bent (server/kern/identiteit/herbevestiging.js).
+         Elke ronde haalt een VERSE uitdaging: de herbevestiging kan langer
+         duren dan een uitdaging leeft. */
+      let extra = {}, r;
+      for (let ronde = 0; ronde < 2; ronde++) {
+        const u = await api('/api/mijn/toestel/uitdaging');
+        if (u.body.error) { knop.disabled = false; return zeg(u.body.error); }
+        const bewijs = await RTGToestel.bewijs(u.body.nonce);
+        r = await api('/api/mijn/toestel/bind', Object.assign({ jwk: bewijs.jwk, handtekening: bewijs.handtekening, naam }, extra));
+        if (!(r.body.herbevestigingNodig && ronde === 0 && window.RTGHerbevestig)) break;
+        const b = await RTGHerbevestig.vraag({ wegen: r.body.wegen, actie: r.body.actie, passkey: r.body.passkey,
+          token,
+          uitleg: 'Deze sessie staat al even open. Vul uw huidige wachtwoord in voordat dit toestel eraan wordt gebonden.' });
+        if (!b) { knop.disabled = false; return; }
+        if (b.fout) { knop.disabled = false; return zeg(b.fout); }
+        extra = b;
+      }
       if (r.body.error) { knop.disabled = false; return zeg(r.body.error); }
       zeg(r.body.inSessie ? 'Toestel bevestigd. Deze sessie draagt nu een cryptografisch bewijs.' : (r.body.nietGeraakt || 'Toestel bevestigd.'));
       laad();
@@ -397,6 +411,8 @@
 })();
 </script>
 <script src="/shared/toestelsleutel.js"></script>
+<script src="/shared/passkey.js"></script>
+<script src="/shared/herbevestig.js"></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 </body>

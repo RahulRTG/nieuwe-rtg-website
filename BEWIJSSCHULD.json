@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-10-06T14:44:09.908Z",
-  "commit": "992876536",
+  "op": "2026-10-12T14:01:16.290Z",
+  "commit": "6d5abcb5c",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 3,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v26.10.0"
  },
@@ -11,14 +11,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 357,
-  "instrument": 323,
+  "meetwerk": 358,
+  "instrument": 466,
   "grens": 687
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 680,
+  "staat": 824,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 680,
+  "achterstand": 824,
   "randVanDeMethode": 687,
   "auth-onbeslist": 1,
   "capability-in-handler": 560,
@@ -41,9 +41,9 @@
   "audit-wisselend": null,
   "audit-verklaard": null,
   "rollback-gezakt": 1,
-  "object-vooraf": 323,
+  "object-vooraf": 466,
   "proefruis": 1,
-  "gevolg-onbekend": 96,
+  "gevolg-onbekend": 97,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 49,
   "idem-ongeclassificeerd": 152,
@@ -142,7 +142,7 @@
    "id": "object-vooraf",
    "soort": "instrument",
    "wat": "routes die een bestaand object willen bedienen dat de proef niet heeft aangemaakt",
-   "aantal": 323,
+   "aantal": 466,
    "waarom": "de proef stuurt een plausibel lijf met een verzonnen identiteit. De route zoekt het object op, vindt het niet, en antwoordt 404 -- juist gedrag, en de handler heeft nooit gedraaid. Gemeten op 507 member-routes: 166 verschillende boodschappen die alle 166 hetzelfde zeggen.",
    "sluit": "de objectpool (scripts/lib/objectpool.js) oogst echte id's uit antwoorden die de ronde zelf zag en verrijkt er de lijven mee; de eerste ronde herwon zo 393 van de 1014. Wat rest zijn objecten die alleen via een eigen keten ontstaan (vier ogen, goedkeuring); daarvoor blijft de tweestapsketen per domein het antwoord."
   },
@@ -158,7 +158,7 @@
    "id": "gevolg-onbekend",
    "soort": "meetwerk",
    "wat": "bereikbare capabilities waarvan niemand heeft gemeten WAT ze veranderen",
-   "aantal": 96,
+   "aantal": 97,
    "waarom": "server/kern/stuur/gevolg.js projecteert een EERDERE proefronde op de stappen van een plan. Staat een pad niet in die ronde, dan is de eerlijke uitslag `onbekend` -- en een plan dat voor het merendeel uit onbekende gevolgen bestaat, is geen voorspelling.",
    "sluit": "de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
@@ -198,253 +198,253 @@
  "historie": {
   "auth-onbeslist": [
    {
-    "op": "2026-10-04",
-    "aantal": 1
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 1
    }
   ],
   "capability-in-handler": [
    {
-    "op": "2026-10-04",
-    "aantal": 560
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 560
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 560
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 560
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 560
    }
   ],
   "objectpoort": [
    {
-    "op": "2026-10-04",
-    "aantal": 52
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 52
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 52
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 52
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 52
    }
   ],
   "output-deuren": [
    {
-    "op": "2026-10-04",
-    "aantal": 21
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 21
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 21
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 21
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 21
    }
   ],
   "lichaamssleutel": [
    {
-    "op": "2026-10-04",
-    "aantal": 102
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 102
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 102
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 102
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 102
    }
   ],
   "output-niet-toerekenbaar": [
    {
-    "op": "2026-10-04",
-    "aantal": 0
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 0
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 0
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 0
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 0
    }
   ],
   "output-blind": [
    {
-    "op": "2026-10-04",
-    "aantal": 0
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 0
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 0
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 0
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
-    "op": "2026-10-04",
-    "aantal": 4
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 4
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 4
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 4
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 4
    }
   ],
   "audit-wisselend": [
    {
-    "op": "2026-10-04",
-    "aantal": null
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": null
-   },
-   {
     "op": "2026-10-06",
+    "aantal": null
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": null
+   },
+   {
+    "op": "2026-10-12",
     "aantal": null
    }
   ],
   "audit-verklaard": [
    {
-    "op": "2026-10-04",
-    "aantal": null
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": null
-   },
-   {
     "op": "2026-10-06",
+    "aantal": null
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": null
+   },
+   {
+    "op": "2026-10-12",
     "aantal": null
    }
   ],
   "rollback-gezakt": [
    {
-    "op": "2026-10-04",
-    "aantal": 1
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 1
    }
   ],
   "object-vooraf": [
    {
-    "op": "2026-10-04",
-    "aantal": 323
-   },
-   {
     "op": "2026-10-05",
     "aantal": 323
    },
    {
-    "op": "2026-10-06",
-    "aantal": 323
+    "op": "2026-10-11",
+    "aantal": 466
+   },
+   {
+    "op": "2026-10-12",
+    "aantal": 466
    }
   ],
   "proefruis": [
    {
-    "op": "2026-10-04",
-    "aantal": 1
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 1
    }
   ],
   "gevolg-onbekend": [
    {
-    "op": "2026-10-04",
-    "aantal": 96
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 96
-   },
-   {
     "op": "2026-10-06",
     "aantal": 96
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 96
+   },
+   {
+    "op": "2026-10-12",
+    "aantal": 97
    }
   ],
   "droogloop-onbeoordeeld": [
    {
-    "op": "2026-10-04",
-    "aantal": 2
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 2
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 2
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 2
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
-    "op": "2026-10-04",
-    "aantal": 49
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 49
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 49
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 49
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 49
    }
   ],
   "idem-ongeclassificeerd": [
    {
-    "op": "2026-10-04",
-    "aantal": 152
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 152
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 152
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 152
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 152
    }
   ],
   "wegwerpserver-kopieen": [
    {
-    "op": "2026-10-04",
-    "aantal": 3
-   },
-   {
-    "op": "2026-10-05",
-    "aantal": 3
-   },
-   {
     "op": "2026-10-06",
+    "aantal": 3
+   },
+   {
+    "op": "2026-10-11",
+    "aantal": 3
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 3
    }
   ]
@@ -469,22 +469,10 @@
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
   },
   {
-   "id": "object-vooraf",
-   "aantal": 323,
-   "meetdagen": 3,
-   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de objectpool (scripts/lib/objectpool.js) oogst echte id's uit antwoorden die de ronde zelf zag en verrijkt er de lijven mee; de eerste ronde herwon zo 393 van de 1014. Wat rest zijn objecten die alleen via een eigen keten ontstaan (vier ogen, goedkeuring); daarvoor blijft de tweestapsketen per domein het antwoord."
-  },
-  {
    "id": "proefruis",
    "aantal": 1,
    "meetdagen": 3,
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de ruis meten: tien rondes op dezelfde commit, en per as de spreiding vastleggen. Dan weet de ratel wat een echte verslechtering is en wat niet."
-  },
-  {
-   "id": "gevolg-onbekend",
-   "aantal": 96,
-   "meetdagen": 3,
-   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
   {
    "id": "droogloop-onbeoordeeld",
@@ -631,6 +619,18 @@
    "van": 2720,
    "naar": 3178,
    "reden": "OUTPUTPROEF.json is hermeten uit een volledige suite met routejournaal (29 september 2026). Die suite raakt 353 routes die de vorige ronde geen enkele toets raakte (ongemeten 421 -> 68) en 111 routes die sindsdien bijkwamen (5151 -> 5262). Ze landen in output-niet-toerekenbaar (579 -> 1037): een inhoudgevoelige toets raakt ze, maar raakt er ook andere, dus het is geen bewijs over deze route. Bewezen OUTPUT steeg van 4151 naar 4157. De groei is zichtbaar geworden meetwerk en geen achteruitgang."
+  },
+  {
+   "op": "2026-10-11",
+   "van": 680,
+   "naar": 823,
+   "reden": "WAAROM.json was sinds 30 augustus 2026 niet opnieuw gemeten (vuile boom, en scripts/waarom.js viel op main om met maakSleutels is not a function). Na de reparatie ziet de verse meting 4544 routes in plaats van 3805; de 143 extra object-vooraf-posten zijn routes die in die zes weken op main zijn bijgekomen en eerst een object nodig hebben. Zichtbaar geworden, niet nieuw ontstaan."
+  },
+  {
+   "op": "2026-10-12",
+   "van": 823,
+   "naar": 824,
+   "reden": "De post van #591 (680 -> 681) op de stand van de integratie (823): /api/knelpunt kwam op 11 oktober 2026 op de LEZEN-lijst van het stuur (Rahul als ingang naar de knelpuntmotor). IDEMPROEF.json kreeg hem nooit aan het werk (kale oproep: 400), dus gevolg.js noemt zijn effect onbekend (gevolg-onbekend 96 -> 97). Het lijf met een doel staat in scripts/lib/idemwereld.js; de eerstvolgende referentieronde van de idempotentieproef sluit deze post."
   }
  ]
 }

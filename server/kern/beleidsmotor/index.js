@@ -26,12 +26,14 @@
    pad komt van buiten en zou de opslag laten groeien. */
 'use strict';
 
-const { kan, DEUREN, FEITEN, UITKOMST, STAPOP_DEUREN } = require('./regels');
+const { kan, perDeur, DEUREN, UITKOMST, STAPOP_DEUREN } = require('./regels');
 const { maakFeiten } = require('./feiten');
 const { werkwoordVan, kamerTelling, EXPORTEN } = require('./werkwoorden');
+const uitvoeren = require('./uitvoeren');
 
-const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop', 'gebruik'];
+const VELDEN = ['eens', 'oneens', 'onbekend', 'zonderPoort', 'eigenaarZonderStapop', 'gebruik'].concat(uitvoeren.SOORTEN);
 const MAX_SLEUTELS = 2400;   // ~600 kantoorroutes maal hoogstens vier deuren
+const MAX_UITVOER = 2000;   // eigen plafond
 const VOORBEELDEN = 20;
 const DAG = 86400000;
 
@@ -41,8 +43,10 @@ const DAG = 86400000;
    zakt als een verklaring naar een route wijst die niet bestaat. */
 const VERKLAARD_OPEN = Object.freeze({
   'POST /api/office/login': 'de inlog zelf: wie hier komt, heeft nog geen sessie',
-  'GET /api/office/stream': 'de live-stroom; het token komt als query binnen en wordt daar gecontroleerd (officeQueryMag)',
-  'GET /api/office/doc': 'een paspoortscan in een <img>: het token komt als query binnen en moet op naam zijn (officeQueryOpNaam)'
+  'GET /api/office/stream': 'de live-stroom; hij opent met een eenmalig stroomticket (kern/sessiestroom.js) en de sessie ' +
+    'daarachter wordt in de handler gecontroleerd (officeQueryMag) -- een token in de query wordt geweigerd',
+  'GET /api/office/doc': 'een paspoortscan die het scherm met fetch ophaalt: de sessie komt uit de kop en moet op naam zijn ' +
+    '(officeQueryOpNaam) -- een token in de query wordt geweigerd'
 });
 
 function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eigenaar, boardroomWie, magBoardroom, boardroomBaas, balieBron, kamersVan, nu }) {
@@ -51,7 +55,8 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
   const bak = () => eigen.bak('beleidsmotor');
   const kijk = () => eigen.kijk('beleidsmotor');
   const spoeler = require('../kantoor/mensdeur-spoel').maakSpoeler({
-    bak, save, bewerkCollectie, collectie: 'beleidsmotor', maxPaden: MAX_SLEUTELS, velden: VELDEN });
+    bak, save, bewerkCollectie, collectie: 'beleidsmotor', maxPaden: MAX_SLEUTELS, velden: VELDEN,
+    plafonden: [{ voorvoegsel: uitvoeren.VOORVOEGSEL, max: MAX_UITVOER }] });
   /* Fase 8: per zetel alleen de laatste gebruiksdatum (./slapend.js). */
   const slapend = require('./slapend').maakSlapend({ bak: () => eigen.bak('zetelGebruik'),
     kijk: () => eigen.kijk('zetelGebruik'), save, bewerkCollectie, nu: tijd });
@@ -75,6 +80,7 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
         feiten = feitenVan(req);
         besluit = kan(feiten, deur);
       } catch (e) { besluit = null; }
+      try { if (feiten) telUitvoer(req, res, feiten); } catch (e) { /* geen fail-open */ }
       let door = false;
       if (besluit) naAfloop(req, res, () => {
         vergelijk(deur, patroon(req), door, besluit);
@@ -124,6 +130,9 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
     next();
   }
 
+  // besluit 3b: ENFORCE_EXECUTE in de schaduw (./uitvoeren.js)
+  const telUitvoer = uitvoeren.maakUitvoeren({ tikVeld: (k, v) => spoeler.tikVeld(k, v), naAfloop }).telBijBinnenkomst;
+
   /* EEN LUISTERAAR PER VERZOEK, op 'close': een kantoorroute draagt al tien
      finish-luisteraars van andere lagen, en de elfde gaf een MaxListeners-
      waarschuwing. Alleen een afgerond antwoord telt (writableFinished). */
@@ -139,28 +148,18 @@ function maakBeleidsmotor({ db, save, bewerkCollectie, sessionFor, accounts, eig
     req.beleidsWerk.push(werk);
   }
 
-  /* DE STAND staat in ./stand.js: hoe de tellers gelezen worden is een eigen
-     onderwerp naast hoe ze ontstaan. */
-  const stand = () => require('./stand')({
-    beeld: spoeler.projecteer(JSON.parse(JSON.stringify(kijk() || {}))),
-    dagen: Math.floor((tijd() - sinds) / DAG), sinds, oneens: oneensVoorbeelden, verklaardOpen: VERKLAARD_OPEN });
+  // de stand: ./stand.js (lezen staat los van tellen)
+  const stand = (o) => require('./stand')({ beeld: spoeler.projecteer(JSON.parse(JSON.stringify(kijk() || {}))),
+    dagen: Math.floor((tijd() - sinds) / DAG), sinds, oneens: oneensVoorbeelden, verklaardOpen: VERKLAARD_OPEN,
+    kleinBinnen: !!(o && o.kleinBinnen) });
 
-  /* WAAROM (AUTHORITY.md fase 8, het eerste stuk): per deur het besluit over
-     DEZE aanroeper, met de opbouw. Alleen over jezelf -- een vraag over een
-     ander is een rechtensimulator, en die hoort achter de boardroom met een
-     reden (een volgende stap). Er staan geen feiten in het antwoord die de
-     aanroeper niet al over zichzelf weet. */
-  function waarom(req) {
-    const f = feitenVan(req);
-    return Object.keys(DEUREN).map(deur => {
-      const b = kan(f, deur);
-      return { deur, uitleg: DEUREN[deur].uitleg, uitkomst: b.uitkomst, reden: b.reden,
-        opbouw: b.opbouw.map(o => ({ eis: o.eis.map(n => FEITEN[n] || n), gehaald: o.gehaald, onbekend: o.onbekend })) };
-    });
-  }
+  /* WAAROM (AUTHORITY.md fase 8) en, sinds besluit 3, WIE: alleen over DEZE
+     aanroeper -- zie ./regels.js (perDeur) en ./uitvoeren.js (overMij). */
+  const waarom = (req) => perDeur(feitenVan(req));
+  const identiteit = (req) => uitvoeren.overMij(feitenVan(req));
 
-  return { kan: (req, deur) => kan(feitenVan(req), deur), waarom, bewaak, meelezer, stand, afdwingen,
+  return { kan: (req, deur) => kan(feitenVan(req), deur), waarom, identiteit, bewaak, meelezer, stand, afdwingen,
     spoel: () => { slapend.spoel(); return spoeler.spoel(); }, laatstGebruikt: slapend.laatst };
 }
 
-module.exports = { maakBeleidsmotor, VERKLAARD_OPEN, VELDEN };
+module.exports = { maakBeleidsmotor, VERKLAARD_OPEN, VELDEN, MAX_SLEUTELS, MAX_UITVOER };

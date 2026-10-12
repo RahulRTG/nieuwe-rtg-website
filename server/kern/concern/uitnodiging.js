@@ -105,7 +105,8 @@ module.exports = (ctx) => {
 
   /* ---- accepteren ----
 
-     `persoon` is de codenaam van wie accepteert, en die komt van de AANROEPER
+     `persoon` is de LEDENSLEUTEL van wie accepteert (niet de codenaam: zie
+     `wie()` in ./employment.js), en die komt van de AANROEPER
      uit een geverifieerde sessie -- nooit uit het verzoeklichaam. Anders
      accepteert de een de uitnodiging op naam van de ander. Dezelfde regel als
      bij ondernemingAanvraag(). */

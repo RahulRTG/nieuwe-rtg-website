@@ -359,10 +359,10 @@ dialog::backdrop{background:rgba(2,4,8,.86)!important;backdrop-filter:blur(6px)}
 
 /* Losse portalen (Klas, Club, OS) volgen dezelfde rustige header. */
 .topnav{min-height:4.2rem;padding:.75rem clamp(.8rem,3vw,1.3rem)!important}
-.topnav .brand{color:var(--rtf-paper);font-size:1.05rem!important}.topnav .brand b{color:var(--rtf-gold-soft);font-weight:500}
+.topnav .brand{color:var(--rtg-p-inkt,var(--rtf-paper));font-size:1.05rem!important}.topnav .brand b{color:var(--rtf-gold-soft);font-weight:500}
 .merkvlak{padding:0!important;border-radius:0!important;background:none!important;color:var(--rtf-gold)!important}.merkvlak b{color:var(--rtf-paper)!important;font-weight:500}
 .topnav a{min-height:36px;display:inline-flex;align-items:center;padding:.35rem .65rem;border:1px solid var(--rtf-line);border-radius:0;background:#10141b;color:var(--rtf-paper)!important}
-.rtf-inline-safe{margin-left:auto;display:inline-flex;align-items:center;gap:.36rem;color:var(--rtf-muted);font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.rtf-inline-safe{margin-left:auto;display:inline-flex;align-items:center;gap:.36rem;color:var(--rtg-p-zacht,var(--rtf-muted));font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
 .rtf-inline-safe i{width:.42rem;height:.42rem;border-radius:50%;background:var(--rtf-safe);box-shadow:0 0 0 3px rgba(99,213,135,.12)}
 .topnav .rtf-inline-safe+ a{margin-left:0}
 .rtf-ios-brand{color:var(--rtf-gold-soft);font-family:var(--serif);font-size:.8rem;font-weight:700;letter-spacing:.08em}

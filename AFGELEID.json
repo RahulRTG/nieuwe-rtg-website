@@ -3,25 +3,25 @@
  "uitleg": "Per wortelartefact: is het BRON, AFGELEID, FRAGMENTEN, MOMENTOPNAME of ONBESLIST, en wie is de enige generator die het opnieuw mag afleiden. Afgeleid uit de drie verklaringen die al bestonden (EIGENAAR en detecteer() in scripts/lib/registereigenaar.js, en de opdrachtenlijst in scripts/versheid.js) plus het artefact zelf. Geen vierde lijst.",
  "grens": "De detectie is een ONDERGRENS: een generator die zijn pad over meerdere regels opbouwt of via een helper schrijft, valt erbuiten. Daarom is de VERKLARING leidend en de meting de controle erop. `afgeleidZonderEigenaar` hoort nul te zijn en `onbeslist` hoort te dalen doordat er verklaringen bijkomen -- nooit doordat het bereik krimpt.",
  "stempel": {
-  "op": "2026-10-11T06:02:53.510Z",
-  "commit": "01220378",
+  "op": "2026-10-12T17:54:32.901Z",
+  "commit": "a970a991c",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/afgeleid.js",
-  "node": "v22.22.0"
+  "node": "v26.10.0"
  },
  "gemeten": {
-  "artefacten": 373,
-  "bron": 41,
-  "afgeleid": 199,
-  "fragmenten": 27,
+  "artefacten": 388,
+  "bron": 49,
+  "afgeleid": 205,
+  "fragmenten": 28,
   "momentopname": 1,
   "onbeslist": 105,
   "afgeleidZonderEigenaar": 1,
-  "metEigenaar": 226,
-  "afgeleidEigenaarHard": 198,
-  "afgeleidGrendelt": 28,
-  "metStempel": 122,
+  "metEigenaar": 233,
+  "afgeleidEigenaarHard": 204,
+  "afgeleidGrendelt": 29,
+  "metStempel": 129,
   "stempelAnders": 0
  },
  "artefacten": [
@@ -47,7 +47,7 @@
    ],
    "stempelInstrument": null,
    "stempelAnders": false,
-   "versheidOpdracht": "node scripts/aanroepgraaf.js --vastleggen",
+   "versheidOpdracht": "node -r ./scripts/lib/invoerspoor-preload.js scripts/aanroepgraaf.js --vastleggen",
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -132,6 +132,18 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "AFBOUWPROGRAMMA.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "AFGELEID.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/afgeleid.js",
@@ -148,6 +160,18 @@
   {
    "naam": "AFSPRAAK.md",
    "soort": "ONBESLIST",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "AGENTS.md",
+   "soort": "BRON",
    "eigenaar": null,
    "graad": null,
    "schrijvers": [],
@@ -210,6 +234,18 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "ARCHITECTOPDRACHT.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "ARCHITECTUUR.md",
    "soort": "AFGELEID",
    "eigenaar": "scripts/kaart.js",
@@ -221,6 +257,18 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "AUDITBOEK.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -587,14 +635,14 @@
   },
   {
    "naam": "CLAUDE.md",
-   "soort": "FRAGMENTEN",
-   "eigenaar": "scripts/getallen.js",
-   "graad": "merkteken",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
    "schrijvers": [],
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
-   "grendelt": false,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -695,6 +743,20 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "CONCIERGEPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/conciergeproef.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/conciergeproef.js"
+   ],
+   "stempelInstrument": "scripts/conciergeproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run conciergeproef:vast",
+   "grendelt": false,
    "botsingVerklaard": null
   },
   {
@@ -940,6 +1002,18 @@
    "stempelInstrument": "scripts/doctrine.js",
    "stempelAnders": false,
    "versheidOpdracht": "npm run doctrine",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "DOCUMENTENKAART.md",
+   "soort": "FRAGMENTEN",
+   "eigenaar": "scripts/getallen.js",
+   "graad": "merkteken",
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -1389,6 +1463,44 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "GEMEENSCHAP-FASE0.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GEMEENSCHAP.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GEMEENSCHAPSPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/gemeenschapsproef.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/gemeenschapsproef.js"
+   ],
+   "stempelInstrument": "scripts/gemeenschapsproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run gemeenschapsproef:vast",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "GEVOLGDEKKING.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/gevolgdekking.js",
@@ -1522,6 +1634,20 @@
    "stempelInstrument": null,
    "stempelAnders": false,
    "versheidOpdracht": null,
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "GROEPVORM.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/groepvorm.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/groepvorm.js"
+   ],
+   "stempelInstrument": "scripts/groepvorm.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run groepvorm:vast",
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -3119,6 +3245,18 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "ONTWERPSTANDAARD-METING.md",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "ONVERVREEMDBAAR.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/onvervreemdbaar.js",
@@ -3585,7 +3723,21 @@
    ],
    "stempelInstrument": "scripts/rolronde.js",
    "stempelAnders": false,
-   "versheidOpdracht": "node scripts/rolronde.js",
+   "versheidOpdracht": "node -r ./scripts/lib/invoerspoor-preload.js scripts/rolronde.js",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "ROMEPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/romeproef.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/romeproef.js"
+   ],
+   "stempelInstrument": "scripts/romeproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run romeproef:vast",
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -3599,7 +3751,7 @@
    ],
    "stempelInstrument": null,
    "stempelAnders": false,
-   "versheidOpdracht": "node scripts/routebron.js --vastleggen",
+   "versheidOpdracht": "node -r ./scripts/lib/invoerspoor-preload.js scripts/routebron.js --vastleggen",
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -3909,7 +4061,21 @@
    ],
    "stempelInstrument": null,
    "stempelAnders": false,
-   "versheidOpdracht": "node scripts/schermroutes.js --vastleggen",
+   "versheidOpdracht": "node -r ./scripts/lib/invoerspoor-preload.js scripts/schermroutes.js --vastleggen",
+   "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "SCHILHERSTART.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/schilherstart.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/schilherstart.js"
+   ],
+   "stempelInstrument": "scripts/schilherstart.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run schilherstart",
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -4187,7 +4353,7 @@
    ],
    "stempelInstrument": null,
    "stempelAnders": false,
-   "versheidOpdracht": "node scripts/symbolen.js --vastleggen",
+   "versheidOpdracht": "node -r ./scripts/lib/invoerspoor-preload.js scripts/symbolen.js --vastleggen",
    "grendelt": false,
    "botsingVerklaard": null
   },
@@ -4359,6 +4525,18 @@
    "stempelAnders": false,
    "versheidOpdracht": null,
    "grendelt": false,
+   "botsingVerklaard": null
+  },
+  {
+   "naam": "TOEZEGKLASSEN.json",
+   "soort": "BRON",
+   "eigenaar": null,
+   "graad": null,
+   "schrijvers": [],
+   "stempelInstrument": null,
+   "stempelAnders": false,
+   "versheidOpdracht": null,
+   "grendelt": null,
    "botsingVerklaard": null
   },
   {
@@ -4598,6 +4776,20 @@
    "botsingVerklaard": null
   },
   {
+   "naam": "VOLTOOIPROEF.json",
+   "soort": "AFGELEID",
+   "eigenaar": "scripts/voltooiproef.js",
+   "graad": "verklaard",
+   "schrijvers": [
+    "scripts/voltooiproef.js"
+   ],
+   "stempelInstrument": "scripts/voltooiproef.js",
+   "stempelAnders": false,
+   "versheidOpdracht": "npm run voltooiproef:vast",
+   "grendelt": true,
+   "botsingVerklaard": null
+  },
+  {
    "naam": "VRIJHEID.md",
    "soort": "BRON",
    "eigenaar": null,
@@ -4625,11 +4817,11 @@
    "naam": "WAAROM.json",
    "soort": "AFGELEID",
    "eigenaar": "scripts/waarom.js",
-   "graad": "gemeten",
+   "graad": "stempel",
    "schrijvers": [
     "scripts/waarom.js"
    ],
-   "stempelInstrument": null,
+   "stempelInstrument": "scripts/waarom.js",
    "stempelAnders": false,
    "versheidOpdracht": "node scripts/waarom.js --vastleggen",
    "grendelt": false,

@@ -43,6 +43,8 @@ module.exports = Object.freeze([
   'POST /api/rtf/spel/opgeven',
   'POST /api/rtf/spel/team-verlaat',
   'POST /api/rtf/spel/projectie-sluit',
+  // een genootschap verlaten via de gezinsdeur: vertrekken mag nooit achter een releasepoort
+  'POST /api/rtf/genootschap/vertrek',
   'POST /api/rtf/social/block',
   'POST /api/rtf/social/report',
   'POST /api/rtf/social/connect/intrek',

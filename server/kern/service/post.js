@@ -57,7 +57,12 @@ const GELOOFD = (c) => {
 module.exports = function maakServicePost({ zaken, loop, accounts, inzagelog }) {
 
   /* DE KLUISVRAAG, en de enige plek waar deze laag hem stelt. Een treffer levert
-     een CODENAAM en niets anders -- de rij zelf blijft in de kluis. */
+     de LEDENSLEUTEL (`user-<id>`) en niets anders -- de rij zelf blijft in de
+     kluis. Tot 11 oktober 2026 was dat de codenaam, en dat leek zuiniger maar
+     maakte de zaak onvindbaar voor wie hem meldde: de app toont een lid zijn
+     zaken op zijn SESSIESLEUTEL (routes/service.js), en een antwoord van een
+     medewerker had geen weg naar zijn meldingen. Een codenaam is evengoed een
+     verwijzing naar een mens; de sleutel is de verwijzing die gelezen wordt. */
   function melderVoor(adres, { reden } = {}) {
     const a = String(adres || '').trim().toLowerCase();
     if (!a || a.indexOf('@') < 1) return { gevonden: false, waarom: 'Dit is geen adres.' };
@@ -76,7 +81,8 @@ module.exports = function maakServicePost({ zaken, loop, accounts, inzagelog }) 
           bron: 'service/post' });
       }
     } catch (e) {}
-    return { gevonden: true, melder: u.codename };
+    if (u.id == null) return { gevonden: false, waarom: 'Dit adres hoort bij geen RTG-account.' };
+    return { gevonden: true, melder: 'user-' + u.id };
   }
 
   /* Een bericht aannemen. `controles` komt van kern/mailaanname.js en is de

@@ -138,6 +138,7 @@ const NAGEKEKEN = {
   'les.bewijs': RUIS + ' Het bewijs hoort bij de stappen van het onderzoek voor het besluit.',
   'les.privacyklasse': RUIS + ' De privacyregels in de route gaan over deelnemers aan een studie.',
   'les.menselijke_bevestiging': RUIS + ' Toestemming in de route is die van een deelnemer aan een studie.',
+  'werk.privacyklasse': '`codenaamVan` (#579, employment-wie.js) vertaalt een ledensleutel naar een codenaam: dat is de actor op codenaam, geen privacyregel van de aanname.',
   'werk.overdracht': 'De uitnodiging gaat naar de persoon; de woordenlijst kent `accepteer` alleen als bevestiging.',
   'leren.privacyklasse': 'De leeftijdspoort staat in de ROUTE (maakVolwassen), en het woord `volwassen` zit daar in een aanroep die de wringer als naam telt.',
   'bevoegd.menselijke_bevestiging': 'Aftekenen is een bevestiging door een mens; het woord in de code is `afgetekend`, niet `bevestig`.',
@@ -512,7 +513,7 @@ const WETTEN = [
       'Kijktijd, scrollsnelheid en tijdstip zijn als signaal geweigerd.') },
   { nr: 16, wet: 'Wie een probleem kan oplossen, krijgt minimaal noodzakelijke informatie.',
     ...h('deels', K + 'rtfos/gemeente.js', 'const K = 5',
-      'Celveilig, niet queryveilig: als precies een buurt onder de drempel valt, staat haar exacte aantal onder "overige buurten (1)" (proef `buurtenQueryveilig`).') },
+      'Een minimumcel met onderdrukking tot geen verborgen buurt meer af te leiden is (proef `buurtenQueryveilig`, een aanvallende veeg). Tijdvensters en een drempel op stadsniveau ontbreken.') },
   { nr: 17, wet: 'Iedere materiele aanbeveling heeft herkomst.',
     ...h('deels', K + 'knelpunt/aanvoer.js', "'herkomst'",
       'Een vondst zonder herkomst wordt geweigerd. Een aanbeveling buiten de aanvoerlaag draagt er geen.') },
@@ -526,8 +527,8 @@ const WETTEN = [
 
 const BESLUITEN = [
   { nr: 'B1', besluit: 'Aggregatie is queryveilig, niet alleen celveilig: vaste views, minimumcel, complementaire onderdrukking, tijdvensters, geen vrije gemeentelijke OLAP over gevoelige dimensies.',
-    ...h('te-bouwen', K + 'rtfos/gemeente.js', 'const K = 5',
-      'Er is een minimumcel en een vaste view (het portaal roept alleen `cijfersVan` aan). Complementaire onderdrukking en tijdvensters ontbreken; zie proef `buurtenQueryveilig`.') },
+    ...h('deels', K + 'rtfos/buurtdrempel.js', 'function afleidbaar',
+      'Er is een minimumcel, een vaste view (het portaal roept alleen `cijfersVan` aan) en onderdrukking tot geen buurt meer af te leiden is (proef `buurtenQueryveilig`). Tijdvensters ontbreken (vandaag en volgende week kijken is een verschil), en het stadstotaal heeft geen drempel.') },
   { nr: 'B2', besluit: 'Foundation zet financiele handelingen klaar maar wordt geen betaalroute; de organisatie betaalt via haar eigen geld- en arbeidsketen.',
     ...h('deels', K + 'rtfos/gift-betalen.js', 'partnerIn',
       'Een gift komt binnen over RTG Pay als bij elke zaak. Er is geen pad waarlangs de Foundation een mens betaalt, en dat moet zo blijven.') },
@@ -751,15 +752,79 @@ function proeven(kern) {
 
   // 4. Queryveiligheid: een drempel per cel is geen drempel per vraag.
   const gem = require('../server/kern/rtfos/gemeente.js')({}, { cijfersVan() {} });
-  const een = gem.buurten({ Zeewijk: 3, Centrum: 10, Noord: 12 });
-  const twee = gem.buurten({ Zeewijk: 3, Oost: 2, Centrum: 10 });
-  const lek = (rijen) => rijen.filter(r => r.samengevoegd && /\(1\)/.test(r.wijk) && r.aantal < gem.K);
+  /* DE AANVALLER KENT HET ALGORITME. Een eerste versie van deze proef zocht
+     twee vormen (een groep van een buurt, en totaal min de genoemde buurten),
+     en de tegenlezing vond er drie die hij niet zag: grenzen ({1, 5, 12} gaf
+     een groep van 6, dus 1 en 5), uiterste sommen (twee buurten met samen 2)
+     en schrijfwijzen ("Zeewijk" en "zeewijk" als twee buurten). Een proef die
+     vormen opsomt, mist de volgende. Deze proeft daarom ALLE invullingen: de
+     gemeente weet welke buurten hulpvragen hebben, ziet wat het portaal toont
+     plus het totaal, en draait zelf `buurten()` op elke kandidaat. Heeft een
+     verborgen buurt over alle kandidaten die precies hetzelfde beeld geven maar
+     EEN mogelijke waarde, dan lekt het. Dit is onafhankelijk van de rekenwijze
+     in gemeente.js: het vergelijkt alleen uitkomsten. */
+  const zelfde = (x, y) => JSON.stringify(x.map(r => [r.wijk, r.aantal])) === JSON.stringify(y.map(r => [r.wijk, r.aantal]));
+  function aanval(fn, invoer) {
+    const beeld = fn(invoer);
+    const totaal = Object.values(invoer).reduce((a, n) => a + n, 0);
+    const genoemd = new Set(beeld.filter(r => !r.samengevoegd).map(r => r.wijk));
+    const verborgen = Object.keys(invoer).filter(w => !genoemd.has(w));
+    const rest = totaal - Object.keys(invoer).filter(w => genoemd.has(w)).reduce((a, w) => a + invoer[w], 0);
+    const mogelijk = verborgen.map(() => new Set());
+    const kand = Object.assign({}, invoer);
+    (function loop(i, over) {
+      if (i === verborgen.length) {
+        if (over === 0 && zelfde(fn(kand), beeld)) verborgen.forEach((w, j) => mogelijk[j].add(kand[w]));
+        return;
+      }
+      for (let v = 1; v <= over; v++) { kand[verborgen[i]] = v; loop(i + 1, over - v); }
+      kand[verborgen[i]] = invoer[verborgen[i]];
+    })(0, rest);
+    return verborgen.filter((w, j) => mogelijk[j].size === 1).map(w => w + ' = ' + invoer[w]);
+  }
+  const GEVALLEN = [
+    { Zeewijk: 3, Centrum: 10, Noord: 12 }, { Zeewijk: 1, Centrum: 5, Noord: 12 },
+    { Zeewijk: 4, Centrum: 5, Noord: 5 }, { A: 1, B: 1, Centrum: 10 }, { A: 4, B: 4, Centrum: 10 },
+    { Zeewijk: 3, zeewijk: 1, Centrum: 10, Noord: 12 }, { A: 2, B: 3, Centrum: 10 }, { A: 1, B: 4, C: 6, D: 9 }
+  ];
+  /* De oude buurten() als besturing: die moet de aanval laten slagen, anders
+     kan deze proef niet uitslaan. */
+  const oud = (perWijk) => { const r = []; let k = 0, n = 0;
+    for (const [w, a] of Object.entries(perWijk)) { if (a >= gem.K) r.push({ wijk: w, aantal: a }); else { k += a; n++; } }
+    r.sort((a, b) => b.aantal - a.aantal);
+    if (n) r.push({ wijk: 'overige buurten (' + n + ')', aantal: k, samengevoegd: true }); return r; };
+  const per = GEVALLEN.map(inv => ({ invoer: inv, beeld: gem.buurten(inv).map(r => [r.wijk, r.aantal]), lekt: aanval(gem.buurten, inv) }));
+  const alleen = gem.buurten({ Zeewijk: 3 });
+  /* DE VEEG: elke stad met een tot vier buurten en een tot negen hulpvragen per
+     buurt (714 steden). Twee uitkomsten die nooit worden opgeteld: een lek
+     waarbij het portaal een getal TOONDE (moet nul zijn), en een stad waarin
+     elke buurt onder de drempel zit -- dan staat er geen buurtgetal, maar het
+     stadstotaal zelf verraadt het (het restrisico). */
+  const veeg = { steden: 0, lekMetGetal: [], alleenStadstotaal: 0 };
+  (function rij(i, inv) {
+    if (i > 0) {
+      veeg.steden++;
+      const l = aanval(gem.buurten, inv);
+      if (l.length) {
+        const b = gem.buurten(inv);
+        if (b.every(r => r.samengevoegd && r.aantal === null)) veeg.alleenStadstotaal++;
+        else veeg.lekMetGetal.push(inv);
+      }
+    }
+    if (i === 4) return;
+    for (let v = 1; v <= 9; v++) { if (i > 0 && v < inv['ABCD'[i - 1]]) continue; rij(i + 1, Object.assign({}, inv, { ['ABCD'[i]]: v })); }
+  })(0, {});
   uit.buurtenQueryveilig = {
-    wat: 'De gemeente ziet hulpvragen per buurt; buurten onder ' + gem.K + ' worden samengevoegd. Wat als er precies een onder de drempel valt?',
-    eenKleineBuurt: een, tweeKleineBuurten: twee,
-    lekt: lek(een).length > 0,
-    besturing: lek(twee).length === 0,
-    lezing: 'De gemeente kent haar eigen buurten. Staat er "overige buurten (1)", dan weet zij welke buurt ontbreekt -- en ziet zij haar exacte aantal, onder de drempel die het moest verbergen. Dat is celveilig en niet queryveilig.'
+    wat: 'De gemeente ziet hulpvragen per buurt en het totaal, weet welke buurten hulpvragen hebben en kent het algoritme. Kan zij het aantal van een verborgen buurt afleiden?',
+    gevallen: per,
+    veeg,
+    lekt: per.some(g => g.lekt.length > 0) || veeg.lekMetGetal.length > 0,
+    besturing: GEVALLEN.some(inv => aanval(oud, inv).length > 0),
+    restrisico: {
+      aantalGetoond: alleen.some(r => r.aantal !== null && r.samengevoegd),
+      lezing: 'Heeft een stad maar EEN buurt met hulpvragen en ligt die onder de drempel, dan staat er geen aantal bij de groep -- maar het stadstotaal gaat dan over die ene buurt. Een tikfout in een buurtnaam maakt van een buurt er twee; daartegen helpt alleen een vaste buurtenlijst per stad, en dat is een besluit. Tijdvensters ontbreken: twee keer kijken is een verschil.'
+    },
+    lezing: 'Een buurt onder de drempel mag niet af te leiden zijn, ook niet uit grenzen of een uiterste som. buurten() voegt daarom buurten toe tot elke verborgen buurt minstens twee mogelijke waarden heeft, en toont anders geen aantal.'
   };
   return uit;
 }

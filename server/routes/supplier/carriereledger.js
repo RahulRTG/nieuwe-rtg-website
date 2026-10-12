@@ -55,7 +55,7 @@ module.exports = (kern) => {
     const b = req.body || {};
     const key = await zoek(b, res); if (!key) return;
     stuur(res, carriereledger.bevestig(key, String(b.id || ''),
-      { herkomst: 'bevestigd', door: namens(req, wie), wat: b.wat }));
+      { herkomst: 'bevestigd', door: namens(req, wie), wat: b.wat, zaak: req.supplier && req.supplier.code }));
   });
 
   app.post('/api/supplier/carriere/intrek', supplierAuth, async (req, res) => {
@@ -63,6 +63,7 @@ module.exports = (kern) => {
     const b = req.body || {};
     const key = await zoek(b, res); if (!key) return;
     stuur(res, carriereledger.intrek(key, String(b.id || ''),
-      { door: namens(req, wie), reden: b.reden }));
+      { door: namens(req, wie), reden: b.reden,
+        van: { zaak: req.supplier && req.supplier.code, zaakNaam: req.supplier && req.supplier.name } }));
   });
 };

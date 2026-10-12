@@ -76,7 +76,9 @@
      de console welke het was. */
   function vulTab(tab){
     const lijst = LADERS_PER_TAB[tab];
-    if (!lijst || gevuldeTabs[tab]) return;
+    /* Zonder account valt er niets te vullen: niet als gevuld markeren, anders
+       blijft de stand leeg als het account even later wel binnen is. */
+    if (!lijst || gevuldeTabs[tab] || !user) return;
     gevuldeTabs[tab] = true;
     // een gratis gebruiker heeft geen reizen, betalen, AI of assets: die
     // tabbladen staan voor hem verborgen, dus halen we er ook niets voor op.

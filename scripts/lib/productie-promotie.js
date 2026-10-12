@@ -51,6 +51,15 @@ function bewijskaart(root, soort = 'oci') {
   return uit;
 }
 
+/* GARANTIE 1+2: een promotiedocument wordt alleen gemaakt (en een uitrol alleen
+   toegelaten) voor het digest waarvoor de artefactketen een geslaagd testrecord
+   op exact die bytes EN een actief, ondertekend promotiebesluit heeft. */
+function eisKetenbesluit(root, commit, kandidaat, env = process.env) {
+  const k = require('./artefactketen');
+  return k.eisGepromoveerd(k.geverifieerd(root), { commit, digest:kandidaat.image.digest, backupDigest:kandidaat.backup.digest,
+    imageId:kandidaat.image.id, backupImageId:kandidaat.backup.id, omgeving:String(env.RTG_OMGEVING || 'productie') });
+}
+
 function maak(root, commit, env = process.env) {
   const status = leesProductiestatus(commit, root);
   const isNative = status.artifactSoort === 'native';
@@ -70,6 +79,7 @@ function maak(root, commit, env = process.env) {
       (zonderRail ? 'PROMOVEER-ZONDER-RAIL-' : 'PROMOVEER-') + '<commit12>).');
   const kandidaat = isNative ? require('./native-kandidaat').controleer(root, commit)
     : require('./live-kandidaat').controleer(root, commit);
+  if (!isNative) eisKetenbesluit(root, commit, kandidaat, env);
   return { formaat:isNative ? 'rtg-native-promotie-v1' : 'rtg-productie-promotie-v2', ondertekenDomein:trust.ROLES.PROMOTION.domain, gemaakt:new Date().toISOString(),
     commit, release:status.release, goedgekeurdDoor:approver, besluit:ticket,
     productieStand:status.PRODUCTION_STATUS,
@@ -147,5 +157,5 @@ function schrijf(root, commit, env = process.env) {
   return document;
 }
 
-module.exports = { REL, sha256, leesRegulier, bewijskaart, maak, teken,
+module.exports = { REL, eisKetenbesluit, sha256, leesRegulier, bewijskaart, maak, teken,
   controleerStructuur, controleer, schrijf };

@@ -594,6 +594,11 @@ const EIGEN_MODULE = new Map([
   ['juridischeschermen.e2e.js', ['public/apps/juridisch/privacy.html']],
   ['wereldbreedte.e2e.js', ['public/apps/living-os.html']],
   ['website-screen-edges.e2e.js', ['public/site/werelden/livingos.html']],
+  /* Reizen & Veilig: het moment uit Move en het aanbod uit de catalogus wonen
+     in reizen-veilig-reis.js (11 oktober 2026). */
+  ['reizen-veilig.e2e.js', ['public/apps/reizen-veilig-reis.js']],
+  /* Haal ik het?: de uitloopvraag op /api/move/gevolg (11 oktober 2026). */
+  ['move-gevolg.e2e.js', ['public/apps/move.html']],
   ['living-world.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sources.test.js', ['server/kern/living-world/actions.js']],
   ['living-world-sqlite.test.js', ['server/kern/living-world/index.js']],
@@ -730,6 +735,16 @@ const EIGEN_MODULE = new Map([
      hem niet. Statisch ziet de motor dan geen module, en toetsenNietGemeten zou
      het schrijven van deze toets bestraffen. */
   ['zwaarstap.test.js', ['public/shared/zwaarstap.js']],
+  /* DE ARTEFACTTOETS draait IN het gepubliceerde image en laadt zijn modules via
+     een PADVARIABELE (APP is /app in het image, de werkboom erbuiten), dus
+     statisch ziet de motor geen module. Bevestigd door de motor, en dat is hier
+     de voorwaarde: met deze regel muteert hij de ketenmodule en zakt de toets. */
+  ['artefact-image.test.js', ['scripts/lib/artefactketen.js']],
+  /* DE LEESWEERGAVE VAN RAHUL IN HET GENOOTSCHAP: de toets requiret ook
+     scripts/lib/bron.js (om commentaar te strippen), en zonder deze regel
+     muteerde de motor dat hulpje in plaats van de code onder toets. Het bewijs
+     hoort te gaan over de weergave en de AI-laag zelf. */
+  ['genootschap-ai-leesweergave.test.js', ['server/kern/genootschap/leesweergave.js', 'server/kern/genootschap/ai.js']],
   /* DE DEURVERKOOP laadt zijn route via een PADVARIABELE (require(ROUTE)) met
      een nagemaakte kern, zodat twee kopers door elkaar kunnen lopen. Statisch
      ziet de motor dan geen module. De bron is de route zelf: de vasthouding
@@ -1372,6 +1387,11 @@ const GEEN_BRONMUTATIE = new Map([
      foutklasse is wel echt nageproefd: een tijdelijke 200vw-dashboardbreedte
      liet de 320/390/desktopmatrix zakken (13 toetsen, geen skip of time-out). */
   ['world-dashboard.e2e.js', 'browsermatrix; handmutatie naar 200vw liet de echte wereldviewporttoets zakken'],
+  /* De geheimkanarie meet LEKKEN en geen antwoordinhoud (#523): een liegende /api/
+     lekt geen kanarie, dus de liegpoort overleeft hem terecht. Met de hand
+     nagetrokken op 11 oktober 2026: scan() in scripts/lib/geheimkanarie.js die altijd
+     [] teruggeeft, liet de toets zakken op zijn eigen uitslaande meter. Teruggezet. */
+  ['geheimkanarie.test.js', 'lekscanner; een blinde scan() liet de toets zakken op de eigen ijking'],
   /* Deze twee toetsen bewaken CSS-contracten. De mutatiemotor kan alleen JS
      syntactisch keuren en zou een CSS-bestand daarom ten onrechte als
      onmeetbaar afwijzen. Met de hand nageproefd: --edge-top van 44px naar 40px

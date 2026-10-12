@@ -16,6 +16,7 @@ const mandaatLaag = require('../../stuur/mandaat');
 const gevolgLaag = require('../../stuur/gevolg');
 const { KLASSEN } = require('./klassen');
 const { gevolgpoort } = require('./gevolgpoort');
+const { omkeerpoort } = require('./omkeerpoort');
 
 function maakKlaarzet({ voornemens, frictie, mandaatBron, tijd, leg, noteer, bewaar, publiek }) {
   const weeg = require('./weging').maakWeging({ voornemens, tijd, leg, noteer, bewaar, publiek });
@@ -40,6 +41,10 @@ function maakKlaarzet({ voornemens, frictie, mandaatBron, tijd, leg, noteer, bew
     if (!o.assurance || o.assurance.ok !== true)
       return { status: 401, error: 'De zekerheid over wie dit doet is niet vastgesteld; bevestig deze handeling eerst.' };
 
+    /* Boven de omkeerbaarheidsgrens en niet omkeerbaar: meteen nee (./omkeerpoort.js). */
+    const { omkeer, nee } = omkeerpoort(o);
+    if (nee) return nee;
+
     const env = envelopLaag.alsStart(envelopLaag.maak({
       kanaal: 'office', actor: mens.sleutel || null, classificatie: 'intern' }));
 
@@ -47,7 +52,11 @@ function maakKlaarzet({ voornemens, frictie, mandaatBron, tijd, leg, noteer, bew
       voornemen: null, keten: null, klasse, handeling: String(o.handeling || ''),
       doel: o.doel == null ? null : String(o.doel).slice(0, 120),
       pad: o.pad || null, envelop: env.id, correlatie: env.correlatie,
-      door: mens.naam, at: tijd(), assen: []
+      /* OMKEERBAAR KOMT UIT DE TABEL (eigenaarsbesluit 2B-aangepast): per handeling en
+         rail afgeleid in kern/commercie/geldomkeer.js, en de aanroeper kan het niet
+         overschrijven. Een handtekening verandert het nooit. */
+      omkeerbaar: omkeer.omkeerbaar === true, omkeerbaarheid: omkeer,
+      door: mens.naam, doorSleutel: mens.sleutel || null, at: tijd(), assen: []
     };
 
     leg(dossier, 'mensbewijs', { graad: 'gemeten', uitslag: 'mens op naam', wie: mens.naam,

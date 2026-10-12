@@ -12,8 +12,9 @@
                drukke avond toch nooit. */
 'use strict';
 
+const { magKlokZien } = require('../../../kern/leverancier/logboekzicht');
 module.exports = (kern) => {
-  const { app, save, schoon, supplierAuth, managerOnly, logActivity, sseToSupplier, horeca } = kern;
+  const { app, save, schoon, supplierAuth, managerOnly, logActivity, sseToSupplier, horeca, klokVan } = kern;
   const { H, Hlees } = horeca;
   const wijk = require('../../../kern/horeca/wijk')({ horeca, schoon });
   /* Het wijkbeeld (hoeveel open werk draagt elke wijk) komt uit de WERKLIJST en
@@ -53,7 +54,10 @@ module.exports = (kern) => {
       vanMij: String(o.vanId) === String(ik.staffId),
       voorMij: String(o.naarId) === String(ik.staffId)
     }));
-    const leningen = wijk.leen.lijst(h).map((l) => Object.assign({}, l, {
+    // de prikklok van de zaak, alleen gelezen via klokVan (kern/horeca/wijk-leen.js, drager)
+    const klokVoor = typeof klokVan === 'function' ? (staffId) => klokVan(req.supplier.code, staffId) : null;
+    const leningen = wijk.leen.lijst(h, klokVoor).map((l) => Object.assign({}, l, {
+      drager: l.drager && !magKlokZien(req.actor) ? { stand: l.drager.stand, reden: l.drager.reden } : l.drager,
       vanMij: !!(l.vanId != null && String(l.vanId) === String(ik.staffId)),
       naarMij: String(l.staffId) === String(ik.staffId)
     }));
@@ -66,6 +70,8 @@ module.exports = (kern) => {
          mist een bericht dat zichzelf opruimt (wijk-antwoord.js regel 2). */
       antwoorden: over.antwoorden(h, ik.staffId),
       leningen,
+      // een AANTAL tafels en geen lijst mensen: een teller per mens is een ranglijst (grens 5)
+      dragerWeg: leningen.filter((l) => l.drager && l.drager.stand === 'uitgeklokt').length,
       /* De ploeg, zodat een aanbod een naam kan krijgen. Geen rollen en geen
          telling per mens -- alleen wie er is (grens 5). */
       ploeg: (function () {
@@ -144,11 +150,13 @@ module.exports = (kern) => {
 
   app.post('/api/supplier/horeca/wijk/laat', supplierAuth, (req, res) => {
     const h = Hlees(req.supplier.code);
-    const uit = wijk.laat(h, req.body.wijkId, wieVan(req));
+    const ik = wieVan(req);
+    const uit = wijk.laat(h, req.body.wijkId, ik);
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     save();
     logActivity(req.supplier.code, req.actor, 'liet een wijk los');
     duw(req.supplier.code);
-    res.json(uit);
+    // wie loslaat en nog tafels van een collega draagt, hoort dat (wijk-leen.js)
+    res.json(Object.assign({}, uit, wijk.leen.herinnering(h, ik.staffId)));
   });
 };

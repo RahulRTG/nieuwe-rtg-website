@@ -143,6 +143,52 @@ test('elke overdracht van persoonsgegevens aan een derde in routes/ staat verkla
   assert.equal(heeftOverdrachtsvorm("const e = { id, status: 'nieuw' };"), false, 'zonder persoon geen overdracht');
 });
 
+/* DE DERDE VORM: EEN ONDERTEKENING (AFSPRAAK.md par. 7.1). Het akkoord met de
+   lidmaatschapsovereenkomst staat in kern/onboarding/lid.js als
+   `p.ondertekend[scope] = { versie, naam, at, hash }` -- geen `key` en geen
+   `status`, dus de twee scans hierboven zagen het niet, en het stond in geen van
+   beide lijsten van het register. Elke module in server/kern/ die een
+   ondertekening met een versie en een hash vastlegt, hoort hieronder met de regel
+   van NIET_GEDEKT die de lezer zegt waar hij haar vindt, of met een reden waarom
+   het geen akkoord van een lid is.
+
+   WAT DEZE SCAN NIET VINDT. AFSPRAAK.md par. 3 telt 31 tekenwegen (lexicaal, een
+   ondergrens) en deze vorm is er een van. Een tekenweg die geen versie of hash
+   vastlegt, valt erbuiten -- het net is kleiner geworden, niet dicht. */
+const ONDERTEKENING = {
+  'onboarding/lid.js': { nietGedekt: 'De lidmaatschaps- en reisovereenkomst die u bij uw aanmelding ondertekende' }
+};
+function heeftOndertekenvorm(bron) {
+  const zonderUitleg = bron.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/[^\n]*/g, '$1');
+  const regels = zonderUitleg.split('\n');
+  for (let i = 0; i < regels.length; i++) {
+    if (!/ondertekend\s*\[[^\]]+\]\s*=\s*\{/.test(regels[i])) continue;
+    const buurt = regels.slice(i, i + 3).join('\n');
+    if (/\bversie\b/.test(buurt) && /\bhash\b/.test(buurt)) return true;
+  }
+  return false;
+}
+
+test('elke ondertekening met versie en hash in kern/ staat verklaard (AFSPRAAK.md par. 7.1)', () => {
+  const gevonden = jsBestanden(KERN)
+    .filter(([, vol]) => heeftOndertekenvorm(fs.readFileSync(vol, 'utf8')))
+    .map(([rel]) => rel).sort();
+  assert.ok(gevonden.includes('onboarding/lid.js'), 'de scan vindt het bekende akkoord nog: ' + gevonden.join(', '));
+  const onbekend = gevonden.filter(f => !ONDERTEKENING[f]);
+  assert.deepEqual(onbekend, [], 'nieuwe ondertekening gevonden in: ' + onbekend.join(', ') +
+    ' -- zet hem in kern/consent-register-grens.js (NIET_GEDEKT) en hier met de verwijzing');
+  const dood = Object.keys(ONDERTEKENING).filter(f => !gevonden.includes(f));
+  assert.deepEqual(dood, [], 'deze staan in de lijst maar hebben de vorm niet meer: ' + dood.join(', '));
+  const namen = NIET_GEDEKT.map(n => n.naam);
+  for (const [f, def] of Object.entries(ONDERTEKENING)) {
+    if (def.nietGedekt) assert.ok(namen.includes(def.nietGedekt), f + ' wijst naar "' + def.nietGedekt + '", en die regel staat niet in NIET_GEDEKT');
+    else assert.ok(def.reden && def.reden.length > 20, f + ' heeft een reden nodig');
+  }
+  /* Regel 10: de meter op een bekend-foute en een bekend-goede invoer. */
+  assert.equal(heeftOndertekenvorm("p.ondertekend[scope] = { versie: 2, naam, at: nu(), hash };"), true, 'de vorm wordt herkend');
+  assert.equal(heeftOndertekenvorm("d.contract.ondertekend[key] = nu();"), false, 'een kale datum is geen akkoord met een versie');
+});
+
 test('de scan kan een nieuwe laag ook echt vinden', () => {
   /* Regel 10: een meter die je niet hebt zien uitslaan, meet niets. Hier is de
      bekend-foute invoer: een verzonnen module met precies de vorm. Vindt de

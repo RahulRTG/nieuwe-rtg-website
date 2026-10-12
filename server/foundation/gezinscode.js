@@ -83,12 +83,29 @@ function maak({ db, crypto, bewerkCollectie, G, productie = process.env.NODE_ENV
   }
 
   /* Een nieuwe gezinscode voor dit gezin; de vorige vervalt doordat hij wordt
-     vervangen (zijn hash staat nergens meer). De kale waarde komt EEN keer terug. */
-  function geef(g, door) {
+     vervangen (zijn hash staat nergens meer). De kale waarde komt EEN keer terug.
+
+     MET EEN IDEMPOTENTIESLEUTEL (gezin/code/roteer, 7 oktober 2026): dezelfde
+     beheerder met dezelfde sleutel is een HERHALING en geen tweede rotatie. Zonder
+     deze controle maakte een retry een tweede code en was de code die de beheerder
+     net had gedeeld meteen dood. De sleutel staat alleen als hash op de rij, in
+     dezelfde collectietransactie als de rotatie (een gelijktijdige dubbeltik ziet
+     hem dus ook), en de herhaling geeft `{ herhaald: true }` en NOOIT de kale code
+     -- die bestaat alleen als hash; zelfde vorm als kern/meet.js meetCode en
+     roteerInvite in routes/supplier/werving/uitnodiging-uitgifte.js. Alleen de
+     LAATSTE rotatie wordt onthouden: een sleutel van voor een verse rotatie is
+     daarna een nieuwe opdracht. */
+  const idemHashVan = (adres, door, idem) => crypto.createHash('sha256')
+    .update('gezinscode-roteer-idem|' + adres + '|' + String(door || '') + '|' + idem).digest('hex');
+  function geef(g, door, { idem } = {}) {
     const adres = String((g && g.code) || '');
     if (!adres) return Promise.reject(new Error('gezinscode vereist een gezin'));
+    const idemWaarde = String(idem == null ? '' : idem).trim().slice(0, 200);
+    const ih = idemWaarde ? idemHashVan(adres, door, idemWaarde) : null;
     return transactie(kaart => {
       const vorige = eigenRij(kaart, adres);
+      const al = vorige && vorige.laatste_rotatie;
+      if (ih && al && typeof al.idem_hash === 'string' && bearer.zelfdeHash(al.idem_hash, ih)) return { herhaald: true };
       const basis = { prefix: 'GC', issuer: 'rtg.foundation', doel: DOEL, scope: SCOPE,
         onderwerp: { gezin: adres, id: String(g.id || '') } };
       const MAX = require('../kern/bearercode').MAX_GELDIG_MS;
@@ -97,6 +114,7 @@ function maak({ db, crypto, bewerkCollectie, G, productie = process.env.NODE_ENV
         ? bearer.vernieuw(vorige, Object.assign({ geldigheid: { duurMs: MAX }, gebruik: { max: MAX_GEBRUIK }, afgeleid: 'geen' }, basis), String(door))
         : bearer.maak(Object.assign({ geldigMs: MAX, maxGebruik: MAX_GEBRUIK }, basis));
       m.toegang.uitgegeven_door = String(door || '').slice(0, 40);
+      if (ih) m.toegang.laatste_rotatie = { idem_hash: ih, at: nu() };
       kaart[adres] = m.toegang;
       return m.code;
     });

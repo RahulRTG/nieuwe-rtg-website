@@ -12,9 +12,9 @@
   }
 
   // live meeluisteren: een eigen, zuinige SSE-verbinding alleen voor 'samen'
-  if (kamerId && window.EventSource) {
+  if (kamerId && window.EventSource) metStroom(function (S) {
     try {
-      var bron = new EventSource('/api/stream?token=' + encodeURIComponent(memTok));
+      var bron = S.open('/api/stream', { token: memTok });
       bron.addEventListener('samen', function (e) {
         var d = {}; try { d = JSON.parse(e.data); } catch (x) {}
         if (d.id !== kamerId) return;
@@ -25,7 +25,7 @@
       });
       window.addEventListener('beforeunload', function () { try { bron.close(); } catch (e) {} });
     } catch (e) {}
-  }
+  });
   // bij het openen van een pagina: laat de kamer weten waar je bent
   if (kamerId) meldHier();
 

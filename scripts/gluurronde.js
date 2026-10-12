@@ -373,8 +373,17 @@ async function main() {
   console.log('  ' + K.grijs + 'A: ' + codeA + '   B: ' + codeB + K.reset);
 
   const routes = alleRoutes().filter(r => r.pad.startsWith('/api/') && !r.viaRouter && !NIET_KLOPPEN.test(r.pad));
+  /* /api/privacy MAAKT NIETS AAN, en dat moest er expliciet bij toen
+     /api/privacy/opnieuw kwam (#580): `nieuw\b` raakt ook "opnieuw". Dat pad is
+     een projectie over export, wissen en herstel, en de vaste woorden in zijn
+     antwoord ("terugkomen", "meenemen") zijn voor A en B dezelfde -- als
+     "stuk van B" zouden ze A overal als lek laten zien. Erger: de familie
+     /api/privacy kwam daardoor in de momentopname, en daar zat
+     /api/privacy/delete bij. B wiste dan in de opname vooraf zijn eigen account
+     en elke latere vraag werd 401 -- achttien "lekken" en een afgeslagen
+     zelfproef, zonder dat A iets had gedaan. */
   const aanmaak = routes.filter(r => r.methode === 'POST' && /(bewaar|maak|nieuw|voeg|aanmaak|create)\b/i.test(r.pad)
-    && !/supplier|office|staff|foundation|techniek|rtfos|lab2|bedrijf/.test(r.pad));
+    && !/supplier|office|staff|foundation|techniek|rtfos|lab2|bedrijf|\/api\/privacy\//.test(r.pad));
 
   /* ---------- 1. allebei een leven aanleggen ---------- */
   /* EEN MERK PER ROUTE. Met een merk per LID zou een enkele bewust-gedeelde
@@ -508,8 +517,10 @@ async function main() {
      De verbwoorden hieronder komen uit de padnamen van dit huis zelf. Het is een
      naamheuristiek en dus niet waterdicht -- een leesroute die toevallig "zet"
      heet valt eruit, en dat kost dekking maar geen waarheid. De andere kant op
-     fout gaan zou erger zijn: dan meet de controle zichzelf kapot. */
-  const MUTEERT = /\/(weg|wis|verwijder|reset|leeg|archiveer|archief|sluit|stop|uitlog|logout|afmeld|zet|bewaar|maak|nieuw|voeg|deel|vink|betaal|stuur|oplaad|koop|annuleer|start|kom|mee|join|verlaat|update|wijzig|schrijf|upload|wissel|intrekken|opzeg)(\/|$)/;
+     fout gaan zou erger zijn: dan meet de controle zichzelf kapot. `delete`
+     staat er sinds de samenvoeging van #542 naast `verwijder` en `wis`: het
+     Engelse woord van /api/privacy/delete hoort net zo goed nooit in een opname. */
+  const MUTEERT = /\/(weg|wis|verwijder|delete|reset|leeg|archiveer|archief|sluit|stop|uitlog|logout|afmeld|zet|bewaar|maak|nieuw|voeg|deel|vink|betaal|stuur|oplaad|koop|annuleer|start|kom|mee|join|verlaat|update|wijzig|schrijf|upload|wissel|intrekken|opzeg)(\/|$)/;
   /* EN DE OPNAME BLIJFT KLEIN, want een meting die de SNELHEIDSREM uitlokt meet
      de rem. Een eerdere versie riep alle 3071 niet-muterende routes aan: de
      eerste opname gaf nog 299 keer 2xx, de tweede nog maar 36 -- met 2700 keer

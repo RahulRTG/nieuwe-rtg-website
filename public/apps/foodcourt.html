@@ -176,7 +176,7 @@ let HUIDIG = null, AANTAL = 2, DATUM = '', TIJD = '', bezig = false, laadVersie 
 if (window.RTGUitvoer) RTGUitvoer.bron(() => ({
   naam: 'restaurants',
   kolommen: ['naam', 'keuken', 'prijs', 'stad', 'aanbod', 'reserveren mogelijk'],
-  rijen: ALLE.map(r => [r.naam, r.keuken, r.prijs, r.stad || '', r.deal || '', r.open ? 'ja' : 'nee'])
+  rijen: ALLE.map(r => [r.naam, r.keuken, r.prijs, r.stad || '', r.deal || '', r.reserverenOpen ? 'ja' : 'nee'])
 }));
 async function laad(){
   let d;
@@ -197,7 +197,7 @@ function tekenRestaurants(){
       '<h3>'+esc(r.naam)+'</h3>'+
       '<span class="tag">'+esc(r.tagline)+'</span>'+
       (r.deal?'<span class="deal">'+esc(r.deal)+'</span>':'')+
-      (r.open?'':'<span class="dicht">Nu gesloten voor reserveringen</span>')+
+      (r.reserverenOpen?'':'<span class="dicht">Nu gesloten voor reserveringen</span>')+
     '</button>').join('') : '<div class="leeg">Geen restaurants gevonden. Kies een andere keuken of zoekterm.</div>';
   $('#lijst').querySelectorAll('.resto').forEach(b => b.addEventListener('click', () => openResto(b.dataset)));
 }

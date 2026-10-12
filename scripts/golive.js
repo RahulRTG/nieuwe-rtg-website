@@ -33,20 +33,13 @@ const blokkeer = (t) => uit.push(['✗', t, true]);
 const waarschuw = (t) => uit.push(['⚠', t, false]);
 const goed = (t) => uit.push(['✓', t, false]);
 let ownerReadback = null;
+let turnRelay = null;
 
-/* .env.productie inlezen (alleen KEY=waarde-regels; # is commentaar). */
-function leesEnvBestand(pad) {
-  const uitv = {};
-  try {
-    for (const regel of fs.readFileSync(pad, 'utf8').split('\n')) {
-      const r = regel.trim();
-      if (!r || r.startsWith('#')) continue;
-      const i = r.indexOf('=');
-      if (i > 0) uitv[r.slice(0, i).trim()] = r.slice(i + 1).trim();
-    }
-  } catch (e) { return null; }
-  return uitv;
-}
+/* Het envbestand lezen, de registratieregel en de databaseproef staan in
+   ./lib/golive-env.js, zodat ze in een toets kunnen draaien zonder de hele
+   keuring. */
+const goliveEnv = require('./lib/golive-env');
+const { leesEnvBestand } = goliveEnv;
 
 (async () => {
   // 0. het productie-envbestand, als dat er is (echte env wint altijd). In
@@ -58,7 +51,8 @@ function leesEnvBestand(pad) {
     : standaardEnvPad;
   let bestand = null;
   if (fs.existsSync(envPad)) {
-    bestand = leesEnvBestand(envPad) || {};
+    try { bestand = leesEnvBestand(envPad) || {}; }
+    catch (e) { blokkeer(path.basename(envPad) + ' is niet te lezen zoals de server hem leest: ' + (e.message || e)); bestand = {}; }
     // HANDMATIG-plekken die nog niet zijn ingevuld tellen niet mee
     for (const [k, v] of Object.entries(bestand)) if (/VUL-IN/i.test(v)) delete bestand[k];
     goed(path.basename(envPad) + ' gevonden en meegelezen (' + Object.keys(bestand).length + ' ingevulde waarden).');
@@ -93,6 +87,29 @@ function leesEnvBestand(pad) {
   for (const f of r.fouten) blokkeer(f);
   for (const w of r.waarschuwingen) waarschuw(w);
   if (!r.fouten.length) goed('Configuratie: geen blokkerende fouten.');
+  /* HET RELAIS ECHT BEPROEVEN, niet alleen de variabelen. Publieke voice/video
+     vereist TURN (productie-communicatie.js); een geldige TURN_URL en een sterk
+     TURN_SECRET bewijzen alleen dat de configuratie er netjes uitziet. Deze
+     keurtaak draait in het KANDIDAATIMAGE met de echte productieconfig en doet
+     wat een browser doet: twee allocaties met een vers kortlevend credential,
+     permissies, en 64 KiB in beide richtingen door elk geconfigureerd adres.
+     Zakt dat, dan promoveert deze kandidaat niet -- geen waarschuwing. */
+  try {
+    const relaystand = require('../server/kern/rtc/relaystand');
+    const u = await relaystand.proef(env, { timeoutMs: 10000 });
+    turnRelay = { ...relaystand.publiekeUitslag(), configVingerafdruk: relaystand.binding(env).config };
+    if (u.ok) goed('TURN-relais: ' + u.urls.length + ' adres(sen) relayen aantoonbaar 64 KiB in beide richtingen met een kortlevend credential.');
+    else blokkeer('TURN-relais is niet aantoonbaar werkend (' + (u.reden || 'onbekend') + '): publieke voice/video zou niet via 4G, symmetrische NAT en bedrijfsfirewalls komen. Zie docs/turn-server.md.');
+  } catch (e) {
+    blokkeer('TURN-relais kon niet worden beproefd: ' + (e && e.code || 'onbekende fout') + '.');
+  }
+  /* De registratiegrendel hardop, want hij verandert wat "live" betekent: met
+     RTG_REGISTRATIE_DICHT ontstaat er via geen enkele weg een nieuw account. Een
+     onbekende waarde staat al als waarschuwing hierboven (config.valideer). */
+  {
+    const reg = goliveEnv.registratieRegel(env);
+    (reg.teken === '⚠' ? waarschuw : goed)(reg.tekst);
+  }
   /* Een losse Node-instantie mag voor een afgeschermde proef op SQLite en
      proceslokale tellers draaien. Dat is niet hetzelfde als een B2B2C-
      go-live: geld, intrekking, rate limits en realtime moeten instanceverlies
@@ -160,6 +177,20 @@ function leesEnvBestand(pad) {
     blokkeer('B2B2C-geld: de centrale Rust-noodstop staat aan terwijl echte geldrails actief zijn.');
   if (geldMotor.vereist && !(env.RTG_MOTOR_GELD_URL || env.RTG_MOTOR_SHADOW))
     blokkeer('B2B2C-geld: de duurzame geldmotor heeft geen bereikbare productie-URL.');
+  /* DE V1-BASELINE VAN DE VRIJGAVEPOORT (server/kern/vrijgave/baseline.js).
+     Wat de eigenaar in V1 aan wil hebben, moet in de RELEASEconfiguratie
+     beschikbaar zijn op ALLE assen, en wat hij erbuiten hield aantoonbaar dicht.
+     Een blokkade per capability, met de assen die ontbreken -- nooit een
+     waarschuwing. Met RTG_VRIJGAVE_URL vraagt hij het aan de draaiende
+     releasekandidaat (met de bevoegdheidslaag); zonder rekent hij hier, en dan
+     staat een capability die op een bevoegdheid rust eerlijk op dicht. */
+  const vrijgaveRelease = await require('./lib/vrijgave-baseline').beoordeelRelease({ env,
+    zonderRail: geldStand.releaseZonderRail === true });
+  if (vrijgaveRelease.ok)
+    goed('Vrijgavepoort (' + vrijgaveRelease.modus + '): ' + (vrijgaveRelease.modus === 'baseline'
+      ? 'elke capability uit de ' + vrijgaveRelease.baseline + '-baseline is beschikbaar en de rest is dicht.'
+      : 'geen enkele geldcapability is beschikbaar.'));
+  else for (const f of vrijgaveRelease.fouten) blokkeer('Vrijgavepoort ' + (vrijgaveRelease.baseline || 'V1') + ': ' + f);
   /* De env-vlag alleen is nooit een juridische of operationele vrijgave. Het
      vaste externe dossier moet dezelfde releasecommit, drie relevante PASS-
      controles en gehashte bewijsverwijzingen dragen. Zonder aanvraag blijven
@@ -190,22 +221,9 @@ function leesEnvBestand(pad) {
 
   // 2. PostgreSQL echt aanraken (niet alleen "de variabele staat er")
   if (env.DATABASE_URL) {
-    try {
-      const { Client } = require('../server/pgwire');
-      const c = new Client({ connectionString: env.DATABASE_URL, connectionTimeoutMillis: 4000 });
-      const t0 = Date.now();
-      await c.connect();
-      await c.query('SELECT 1');
-      await c.end();
-      goed('PostgreSQL bereikbaar (' + (Date.now() - t0) + ' ms).');
-    } catch (e) {
-      /* DE FOUT VAN DE DRIVER GAAT ER GEMASKEERD IN. Hierboven wordt
-         DATABASE_URL zo nodig zelf samengesteld uit het wachtwoordbestand, dus
-         die reeks DRAAGT een wachtwoord -- en een driverfout neemt de
-         verbindingsreeks nogal eens mee. Dat is een wachtwoord in de log op
-         precies het moment dat iemand de log gaat delen om hulp te vragen. */
-      blokkeer('DATABASE_URL is gezet maar de database antwoordt niet: ' + zonderGeheim(e.message || e));
-    }
+    const pg = await goliveEnv.beproefPostgres(env);
+    if (pg.ok) goed('PostgreSQL bereikbaar (' + pg.ms + ' ms).');
+    else blokkeer('DATABASE_URL is gezet maar de database antwoordt niet: ' + pg.reden);
   }
 
   /* 2a. Redis, gedeelde bytes en externe alarmering actief beproeven. Een
@@ -364,7 +382,13 @@ function leesEnvBestand(pad) {
     alarmering,
     accounts: accountStand,
     ownerReadback,
+    turnRelay,
     foundation: foundationStand,
+    vrijgave: { ok: vrijgaveRelease.ok === true, modus: vrijgaveRelease.modus || null,
+      baseline: vrijgaveRelease.baseline || null, bron: vrijgaveRelease.bron || null,
+      fouten: (vrijgaveRelease.fouten || []).map(zonderGeheim),
+      regels: (vrijgaveRelease.regels || []).map(r => ({ id: r.id, baseline: r.baseline, via: r.via,
+        beschikbaar: r.beschikbaar, ontbrekendeAssen: r.ontbrekendeAssen, code: r.code })) },
     controles: uit.map(([teken, tekst, hard]) => ({ teken, hard: !!hard, tekst: zonderGeheim(tekst) }))
   };
   if (RAPPORT_NAAR_STDOUT) {

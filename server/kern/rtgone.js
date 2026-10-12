@@ -1,8 +1,8 @@
-/* RTG One: het gezamenlijke werkgeheugen voor RTG en RTF. De module bewaart
-   niet alleen WAT er gebeurt, maar ook waarom, wie iets beloofde, waar werk
-   schuurt en hoe een automatisering veilig kan worden teruggedraaid. */
+/* RTG One: het gezamenlijke werkgeheugen voor RTG en RTF: wat er gebeurt,
+   waarom, wie iets beloofde, waar werk schuurt en hoe het terug kan. */
 const { nu: klokNu, datum: klokDatum } = require('../lib/klok');
 const projectenMaak = require('./rtgone-projecten');
+const { isBeperkt } = require('./rtmail-leiding');
 
 module.exports = ({ db, save, crypto }) => {
   const ROLLEN = {
@@ -35,7 +35,7 @@ module.exports = ({ db, save, crypto }) => {
     const rtfTaken = huis === 'rtf' ? Object.values(d.rtfKantoorTaken || {}).flatMap(x => lijst(x)).filter(t => !t.af).slice(0, 8).map(t => ({ soort: 'rtf', titel: t.tekst, at: t.at || null })) : [];
     const agenda = persoonlijk ? lijst((d.agendas || {})[context.key]).filter(x => !x.afgerond && !x.af).slice(0, 8).map(x => ({ soort: 'agenda', titel: x.titel || x.tekst || x.onderwerp || 'Agenda-item', at: x.start || x.at || x.datum || null })) : [];
     const adres = context && context.codename ? String(context.codename).trim().toLowerCase().replace(/[^a-z0-9._-]/g, '') + '@rtmail' : null;
-    const mail = adres ? lijst((d.rtmail || {}).berichten).filter(m => m.naar === adres && !m.gearchiveerd).slice(0, 12).map(m => ({ id: m.id, soort: 'rtmail', titel: m.onderwerp, at: m.at, van: m.van, gelezen: !!m.gelezen, preview: String(m.tekst || '').slice(0, 180) })) : [];
+    const mail = adres ? lijst((d.rtmail || {}).berichten).filter(m => m.naar === adres && !m.gearchiveerd && !isBeperkt(m)).slice(0, 12).map(m => ({ id: m.id, soort: 'rtmail', titel: m.onderwerp, at: m.at, van: m.van, gelezen: !!m.gelezen, preview: String(m.tekst || '').slice(0, 180) })) : [];
     const goedkeuringen = huis === 'rtg'
       ? lijst(d.partnerApplications).filter(x => x.status !== 'afgerond' && x.status !== 'afgewezen').slice(0, 6).map(x => ({ soort: 'goedkeuring', titel: 'Partneraanvraag · ' + (x.naam || x.name || x.bedrijf || 'Nieuwe partner'), at: x.at || null }))
       : lijst(d.labProjecten).filter(x => (x.veiligheid || {}).status === 'open').slice(0, 6).map(x => ({ soort: 'veiligheid', titel: 'Veiligheidstoets · ' + (x.titel || 'RTF-project'), at: x.at || null }));

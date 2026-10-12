@@ -38,7 +38,7 @@
 
   <section class="rv-rahul" id="rvRahul" aria-label="Rahul reisassistent">
     <button class="rv-mond" id="rvMond" aria-label="Rahul openen"><span>◌</span></button>
-    <div class="rv-vraag"><small id="rvContext">Ik bewaak uw reis en breng u waar u moet zijn.</small><input id="rvIn" aria-label="Vraag Rahul" placeholder="Vraag Rahul om een reis, route of veilige aankomst…"></div>
+    <div class="rv-vraag"><small id="rvContext">Vervoer, aankomst en veiligheid op één plek.</small><input id="rvIn" aria-label="Vraag Rahul" placeholder="Vraag Rahul om een reis, route of veilige aankomst…"></div>
     <button class="rv-stuur" id="rvStuur" aria-label="Versturen">→</button>
   </section>
 </div>
@@ -48,18 +48,24 @@
     <section class="rv-command-hero">
       <div class="rv-ey">03 / TRAVEL OS · VANDAAG</div>
       <div class="rv-rahulteken">◌</div>
-      <h1>Goedemiddag.</h1>
-      <p class="rv-intro">Uw reisdag staat rustig klaar. Ik verbind vervoer, aankomst en veiligheid zonder dat u tussen losse apps hoeft te zoeken.</p>
+      <h1 data-groet>Welkom.</h1>
+      <p class="rv-intro">Ik verbind vervoer, aankomst en veiligheid zonder dat u tussen losse apps hoeft te zoeken.</p>
       <div class="rv-suggesties"><button data-action="vervoer">Bereid mijn reis voor</button><button data-circle="maak">Deel mijn aankomst</button><button data-action="veilig">Loop met mij mee</button></div>
     </section>
     <details class="rv-specialisten"><summary>Alle reisspecialisten</summary><div><a href="/apps/reizen.html">Reizen</a><a href="/apps/vluchten.html">Vluchten</a><a href="/apps/ov.html">OV & privévervoer</a><a href="/apps/navigatie.html">Navigatie</a><a href="/apps/flits.html">Verkeer</a><a href="/apps/stad.html">Stad</a><a href="/apps/reisboek.html">Reisboek</a><a href="/apps/hangar.html">Hangar</a><a href="/apps/residentie.html">Residentie</a></div></details>
-    <div class="rv-status"><i></i><span><b>RTG Veilig staat klaar</b><small>Er wordt niets gedeeld zonder uw toestemming.</small></span><button data-action="veilig">Open</button></div>
+    <!-- Geen groene stip en geen "staat klaar": dit scherm meet niet of RTG Veilig
+         iets bewaakt, dus het zegt alleen wat er altijd geldt. -->
+    <div class="rv-status"><span><b>RTG Veilig</b><small>Er wordt niets gedeeld zonder uw toestemming.</small></span><button data-action="veilig">Open</button></div>
     <section class="rv-moment">
-      <div class="rv-momentkop"><span>Uw eerstvolgende moment</span><em>LIVE</em></div>
+      <!-- Het eerstvolgende moment komt uit RTG Move (/api/move/volgende) en
+           niet uit deze opmaak. Weet Move het niet, dan staat er waarom, en de
+           gewone handeling: vertrek plannen. Er stond hier een vaste regel
+           "Nu: Vertrek plannen" onder een LIVE-label, voor iedereen gelijk. -->
+      <div class="rv-momentkop"><span>Uw eerstvolgende moment</span></div>
+      <div data-volgende><div class="rv-lijn gedimd"><time>&hellip;</time><div><b>Move kijkt in uw reis</b></div></div></div>
       <div class="rv-lijn">
-        <time>Nu</time><div><b>Vertrek plannen</b><small>Vergelijk OV, taxi en lopen op tijd, prijs en uitstoot.</small><button data-action="vervoer">Plan met Rahul →</button></div>
+        <time>Gaan</time><div><b>Vertrek plannen</b><small>Vergelijk OV, taxi en lopen op tijd, prijs en uitstoot.</small><button data-action="vervoer">Plan met Rahul →</button></div>
       </div>
-      <div class="rv-lijn gedimd"><time>Daarna</time><div><b>Veilig aankomen</b><small>Kies pas bij het boeken wie uw voortgang of aankomst mag zien.</small></div></div>
     </section>
     <section class="rv-circle"><div><span class="rv-ey">LIVE CIRCLE</span><h2>Alleen delen wat nodig is</h2><p>Vrienden, partners en bedrijven krijgen per Moment precies genoeg informatie en nooit automatisch uw volledige locatie.</p><div class="rv-momenten" data-momenten></div></div><button data-circle="maak">Nieuw Moment</button></section>
   </article>
@@ -69,10 +75,15 @@
   <article class="rv-reisblad">
     <div class="rv-ey">SAMENGESTELDE REIZEN</div>
     <div class="rv-reisintro"><button data-action="reizen">Meenemen</button><p>Reizen die wij voor u samenstellen, met één planning voor verblijf, vervoer en veilige aankomst.</p></div>
-    <div class="rv-reiszoek"><input placeholder="Waar hebt u zin in? Bijv. zon, strand, rust" aria-label="Reiswens"><button data-action="reizen">Adviseer</button></div>
-    <section class="rv-reiskaart"><span>IBIZA · 7 DAGEN · ZOMER 2026</span><h2>Ibiza, jetset-week</h2><p>Vanaf Schiphol naar het eiland: hotel aan zee, een villa met eigen zwembad en diners bij geselecteerde adressen.</p><em>Vanaf € 2200 per persoon</em></section>
-    <section class="rv-reiskaart"><span>GSTAAD · 4 DAGEN · DOORLOPEND</span><h2>Gstaad, alpien weekend</h2><p>Een chalet met open haard, privéritten en diners in de bergen. Uw terugreis kan door RTG Veilig worden bewaakt.</p><em>Persoonlijk samengesteld</em></section>
-    <section class="rv-reiskaart"><span>UW REIS · LIVE</span><h2>Alles in één Moment</h2><p>Open uw echte boekingen, vervoerbewijzen en veiligheidskring zonder deze werkruimte te verlaten.</p><button data-action="reizen">Open mijn reizen →</button></section>
+    <!-- De wens gaat naar het Reisbureau, de eigenaar van reisadvies
+         (SCHERMEIGENAAR.json: reizen.reisbureau). Hier wordt niets geadviseerd
+         en niets verstuurd; de knop brengt de wens erheen en daar drukt u zelf. -->
+    <form class="rv-reiszoek" data-wens><input name="wens" maxlength="200" placeholder="Waar hebt u zin in? Bijv. zon, strand, rust" aria-label="Reiswens"><button type="submit">Adviseer</button></form>
+    <!-- Het aanbod komt uit /api/reisbureau, dezelfde catalogus als het
+         Reisbureau. Er stonden hier twee reizen met een vaste prijs in de
+         opmaak, die bij elke wijziging van de catalogus uit elkaar liepen. -->
+    <div data-reisaanbod><p class="rv-sub">Het aanbod wordt geladen&hellip;</p></div>
+    <section class="rv-reiskaart"><span>UW REIS</span><h2>Alles in één Moment</h2><p>Open uw echte boekingen, vervoerbewijzen en veiligheidskring zonder deze werkruimte te verlaten.</p><button data-action="reizen">Open mijn reizen →</button></section>
   </article>
 </template>
 
@@ -89,6 +100,7 @@
 
 <script src="/shared/mond.js"></script>
 <script src="/shared/media.js"></script>
+<script src="/apps/reizen-veilig-reis.js"></script>
 <script src="/apps/reizen-veilig.js"></script>
 <!-- De zes bestaande bankhandelingen reizen in een mobiel Command-werkblad
      naar de ene buitenste onderbalk; de uitvoering blijft in reizen-veilig.js. -->

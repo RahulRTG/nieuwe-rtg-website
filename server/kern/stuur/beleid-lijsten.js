@@ -7,8 +7,7 @@
    toevoegt raakt dit bestand aan; wie het besluit verandert raakt beleid.js
    aan, en die twee horen niet in dezelfde bewerking thuis.
 
-   De kop van ./beleid.js legt uit waarom het er drie zijn en niet twee; die
-   uitleg gaat over het besluit en blijft daar staan. */
+   Waarom het er drie zijn en niet twee: zie de kop van ./beleid.js. */
 'use strict';
 
 /* LEZEN: haalt op en verandert niets. Wie hier iets bij zet dat schrijft,
@@ -29,7 +28,10 @@ const LEZEN = Object.freeze({
     /^\/api\/meet\/mijn$/,
     /^\/api\/pay\/(overzicht|tiks)$/,
     /^\/api\/bank\/(overzicht|rekening|afschrift|rente-voorbeeld|passen|krediet|terugkerend|advies|hart|inzichten|vastelasten)$/,
-    /^\/api\/bookings\/mine$/
+    /^\/api\/bookings\/mine$/,
+    // bewaart niets; besluit 11-10-2026 (MAATSTAF.md 7k)
+    /^\/api\/knelpunt$/,
+    /^\/api\/reisbureau\/mijn$/ // zie test/stuur-niveaus.test.js
   ],
   supplier: [
     /^\/api\/supplier\/state$/,

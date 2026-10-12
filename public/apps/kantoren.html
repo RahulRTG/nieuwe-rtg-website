@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
 <script src="/shared/id.js"></script>
+<script src="/shared/stroom.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RTG Kantoren</title>
@@ -354,8 +355,12 @@
       <div id="kReisOpen"><div class="leeg">Laden...</div></div>
 
       <h4 class="rzKop">Reizen die rond zijn</h4>
-      <p class="stil rzUitleg">Een bevestigde reis kan alsnog niet doorgaan. Afzeggen kan alleen met een reden, en die reden leest het lid. Let op: een afzegging <b>verplaatst geen geld</b> -- er loopt geen betaling voor een reis van het reisbureau, dus een aanbetaling, een terugbetaling of annuleringskosten handelt u zelf af.</p>
+      <p class="stil rzUitleg">Een bevestigde reis kan alsnog niet doorgaan. Afzeggen kan alleen met een reden, en die reden leest het lid. Let op: een afzegging <b>verplaatst zelf geen geld</b>. Was de reis via RTG betaald, dan zet de afzegging een teruggave klaar die hieronder op een besluit wacht; was hij niet via RTG betaald, dan handelt u het geld zelf af.</p>
       <div id="kReisRond"><div class="leeg">Laden...</div></div>
+
+      <h4 class="rzKop">Teruggaven</h4>
+      <p class="stil rzUitleg">Een afgezegde betaalde reis laat een recht op teruggave achter. Uitvoeren doet u met uw passkey; vanaf € 1.000 tekent daarna een tweede mens bij RTG Rekening, en pas dan beweegt het geld. Afwijzen kan alleen met een reden, en die blijft bij het recht staan. Er gebeurt hier niets vanzelf.</p>
+      <div id="kReisTerug"><div class="leeg">Laden...</div></div>
 
       <section id="reisPlanner"></section>
       <h4 style="margin:1.2rem 0 .4rem;">Een reis klaarzetten voor een klant</h4>
@@ -951,6 +956,16 @@
     <h3 class="sec">Wacht op een tweede handtekening</h3>
     <div class="kaart lijst" id="bankTweedeHand"><div class="leeg">Niets in afwachting.</div></div>
 
+    <h3 class="sec">Risicogoedkeuring voor een incassoronde</h3>
+    <div class="kaart" id="bankRisico">
+      <p class="stil rzUitleg">Een incassoronde boven € 2.500 is niet terug te draaien en gaat alleen door met de risicogoedkeuring van een andere collega dan de aanvrager, voor precies die ronde (eigenaarsbesluit 2C). Daarna tekent een tweede mens hierboven.</p>
+      <div class="taakrij">
+        <input class="veld" id="bankRisicoId" maxlength="40" placeholder="Voornemen van de ronde (VN...)">
+        <input class="veld rzVeld" id="bankRisicoReden" maxlength="400" placeholder="Waarom dragen we dit risico? (verplicht)">
+        <button class="knop stil" id="bankRisicoBtn" type="button">Geef risicogoedkeuring</button>
+      </div>
+    </div>
+
     <h3 class="sec">Openstaande kredietaanvragen (een mens beslist)</h3>
     <div class="kaart lijst" id="bankKrediet"><div class="leeg">Geen aanvragen.</div></div>
 
@@ -1140,6 +1155,7 @@
 <script src="/shared/passkey.js"></script>
 <script src="/shared/zwaarstap.js"></script>
 <script src="/apps/kantoren-reisuitnodiging.js"></script>
+<script src="/apps/kantoren-reisteruggave.js"></script>
 <script src="/apps/reisprogramma-velden.js"></script>
 <script src="/apps/reisprogramma-weergave.js"></script>
 <script src="/apps/reisprogramma-editor.js"></script>
@@ -1414,9 +1430,14 @@ async function laadReisbalie(){
   });
   haak(rond, 'button[data-afzeg]', async (b) => {
     const veld = rond.querySelector('input[data-abericht="'+b.dataset.afzeg+'"]');
-    await api('reisbureau/afzeggen', { ref: b.dataset.afzeg, reden: veld ? veld.value : '' });
-    meld('Afgezegd. Het lid krijgt bericht -- het geld handelt u zelf af.');
+    const r = await api('reisbureau/afzeggen', { ref: b.dataset.afzeg, reden: veld ? veld.value : '' });
+    const geld = (r && r.aanvraag && r.aanvraag.geld) || {};
+    meld(geld.stand === 'teruggaveKlaargezet'
+      ? 'Afgezegd. Het lid krijgt bericht, en de teruggave staat hieronder klaar voor een besluit.'
+      : 'Afgezegd. Het lid krijgt bericht -- deze reis was niet via RTG betaald, het geld handelt u zelf af.');
   });
+  // de teruggaven: een eigen blok met eigen knoppen (kantoren-reisteruggave.js)
+  RTGReisTeruggave({ api, kaal, meld, esc, wortel: $('#kReisTerug') }).laad();
 }
 
 let KLAAR_BEDRAAD=false;
@@ -2602,7 +2623,7 @@ function voorstelKaart(v, alsBoardroom){
       (alsBoardroom ? '<button class="knop stil" data-acc="'+v.id+'" style="padding:.3rem .9rem;font-size:.78rem;">Accepteer en schakel</button>'+
       '<button class="knop stil" data-afw="'+v.id+'" style="padding:.3rem .9rem;font-size:.78rem;">Wijs af</button>' : '')+
       '<input class="veld" data-msg="'+v.id+'" placeholder="Discussieer mee..." style="flex:1;min-width:10rem;padding:.35rem .7rem;font-size:.8rem;">'+
-      '<button class="knop stil" data-stuur="'+v.id+'" data-wie="'+(alsBoardroom?'boardroom':'paniekkamer')+'" style="padding:.3rem .9rem;font-size:.78rem;">Stuur</button></div>' : '')+
+      '<button class="knop stil" data-stuur="'+v.id+'" style="padding:.3rem .9rem;font-size:.78rem;">Stuur</button></div>' : '')+
     '</div>';
 }
 function koppelVoorstellen(el, herlaad){
@@ -2614,7 +2635,7 @@ function koppelVoorstellen(el, herlaad){
   }));
   el.querySelectorAll('[data-stuur]').forEach(b => b.addEventListener('click', async () => {
     const inp = el.querySelector('[data-msg="'+b.dataset.stuur+'"]');
-    try { await api('paniek/bericht', { id: b.dataset.stuur, wie: b.dataset.wie, tekst: inp.value }); inp.value = ''; herlaad(); } catch (e) { meld(e.message); }
+    try { await api('paniek/bericht', { id: b.dataset.stuur, tekst: inp.value }); inp.value = ''; herlaad(); } catch (e) { meld(e.message); }
   }));
 }
 async function openPaniek(){
@@ -2649,6 +2670,7 @@ async function openBank(){
     $('#bankTerug').addEventListener('click', laadKamers);
     $('#bankRenteBtn').addEventListener('click', () => bankRonde('rente'));
     $('#bankIncassoBtn').addEventListener('click', () => bankRonde('incasso'));
+    $('#bankRisicoBtn').addEventListener('click', bankRisico);
   }
   await bankVervers();
 }
@@ -2668,11 +2690,38 @@ async function bankVervers(){
     bankRenderKrediet(k.aanvragen); bankRenderSalaris(o.rekeningen); bankRenderRekOpen(); bankRenderRek(o.rekeningen);
   } catch (e) { meld(e.message); }
 }
+/* DE RISICOGOEDKEURING VAN EEN RONDE (eigenaarsbesluit 2C): een andere collega dan de
+   aanvrager, met zijn passkey, voor precies dit voornemen. De server vergelijkt op de
+   sessie; dit scherm stuurt geen naam mee. */
+async function bankRisico(){
+  const voornemen = $('#bankRisicoId').value.trim(), reden = $('#bankRisicoReden').value;
+  try {
+    const r = await window.RTGZwaar.metVinger(extra => kaal('bank/incasso/risico', Object.assign({ voornemen, reden }, extra)),
+      () => kaal('bank/incasso/risico/opties', { voornemen }).then(x => x.body));
+    if (r.status >= 400) throw new Error((r.body && r.body.error) || 'De risicogoedkeuring ging niet door.');
+    meld('Risicogoedkeuring gegeven. Een tweede collega tekent de ronde hierboven; er is nog niets geind.');
+    $('#bankRisicoReden').value = '';
+    bankVervers();
+  } catch (e) { meld(e.message); }
+}
 async function bankRonde(soort){
   try {
     if (soort === 'rente'){ const d = await api('bank/rente', {}); meld(d.bijgeschrevenCenten > 0 ? 'Rente bijgeschreven: ' + bkEuro(d.bijgeschrevenCenten) : 'Geen nieuwe rente (0 dagen verstreken).'); }
     else {
-      const d = await api('bank/incasso', {});
+      /* NIET via api(): de ronde vraagt de passkey van deze medewerker, gebonden aan de
+         grens van de ronde (routes/kantoren/bank-passkey.js), en api() leest die 401 als
+         "uitgelogd". */
+      const tot = Date.now();
+      const r = await window.RTGZwaar.metVinger(extra => kaal('bank/incasso', Object.assign({ tot }, extra)),
+        () => kaal('bank/incasso/opties', { tot }).then(x => x.body));
+      if (r.status >= 400) throw new Error((r.body && r.body.error) || 'De incassoronde ging niet door.');
+      const d = r.body;
+      if (d.wachtOpRisico) {
+        $('#bankRisicoId').value = d.voornemen.id;
+        meld(d.uitleg);
+        bankVervers();
+        return;
+      }
       /* DE INCASSORONDE VRAAGT SINDS 9 SEPTEMBER EEN TWEEDE MENS. Zonder deze
          tak leest `d.uitgevoerd > 0` als false op een AANVRAAG, en dan meldde
          dit scherm "Niets aan de beurt" terwijl er een aanvraag klaarstond --
@@ -2988,7 +3037,14 @@ function bankRenderTweedeHand(rij){
     '<button class="knop stil" data-tekenen="' + esc(a.id) + '">Ik ben iemand anders: bevestig</button>' +
     '<button class="knop stil bk-th-weg" data-intrek="' + esc(a.id) + '">Intrekken</button></div>').join('');
   el.querySelectorAll('[data-tekenen]').forEach(b => b.addEventListener('click', async () => {
-    try { const d = await api('bank/handtekening/bevestig', { id: b.dataset.tekenen });
+    /* NIET via api(): onder een GELDhandeling vraagt de server ook de passkey van deze
+       tweede mens (routes/kantoren/bank-passkey.js), en dat is een 401 die api() als
+       "uitgelogd" leest. Gebonden aan het loket van DEZE aanvraag. */
+    try { const r = await window.RTGZwaar.metVinger(
+        extra => kaal('bank/handtekening/bevestig', Object.assign({ id: b.dataset.tekenen }, extra)),
+        () => kaal('bank/handtekening/opties', { id: b.dataset.tekenen }).then(x => x.body));
+      if (r.status >= 400) throw new Error((r.body && r.body.error) || 'De handtekening ging niet door.');
+      const d = r.body;
       meld('Getekend en uitgevoerd: ' + (d.wat || d.handeling || 'gedaan') + '.'); bankVervers(); }
     catch (e) { meld(e.message); }
   }));
@@ -4226,7 +4282,7 @@ setInterval(() => { if (!$('#vBoard').hidden && !document.hidden) openBoard(); }
 let osse = null, osseT = null;
 function officeLive(){
   if (!window.EventSource || osse || !TOKEN) return;
-  try { osse = new EventSource('/api/office/stream?token=' + encodeURIComponent(TOKEN)); } catch (e) { return; }
+  try { osse = RTGStroom.open('/api/office/stream', { stroom: 'kantoor', token: TOKEN }); } catch (e) { return; }
   osse.addEventListener('sync', e => {
     let scope = null; try { scope = JSON.parse(e.data).scope; } catch (x) {}
     if (document.hidden) return;

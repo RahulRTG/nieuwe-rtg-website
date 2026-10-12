@@ -87,7 +87,7 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt }) {
     const bedrag = Math.round(Number(waardeCenten) || 0);
     const raaktWaarde = bedrag > 0;
     const basis = { actor: actor || null, handeling, doel: doel == null ? null : String(doel),
-      waardeCenten: bedrag, beleid: B.versie, at: tijd() };
+      waardeCenten: bedrag, beleid: B.versie, omkeerbaarBovenCenten: B.omkeerbaarBovenCenten, at: tijd() };
 
     if (!handeling) return { ...basis, uitkomst: UITKOMST.ONBEKEND, reden: 'Er is geen handeling opgegeven.' };
 
@@ -140,9 +140,13 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt }) {
         reden: zelf ? 'De aanvrager keurt zijn eigen handeling niet goed; er tekent een ander mee.'
           : 'Vanaf ' + bev.euro(B.goedkeuringBovenCenten) + ' tekent er een tweede persoon mee.' };
 
-    if (bedrag >= B.omkeerbaarBovenCenten && ctx.omkeerbaar !== true)
-      return { ...basis, uitkomst: UITKOMST.OMKEERBAAR, bewijs,
-        reden: 'Vanaf ' + bev.euro(B.omkeerbaarBovenCenten) + ' alleen als de handeling terug te draaien is.' };
+    let via = null;
+    if (bedrag >= B.omkeerbaarBovenCenten && ctx.omkeerbaar !== true) {
+      const u = require('./risicouitzondering').toets({ handeling, risico: ctx.risicogoedkeuring,
+        actor, goedgekeurdDoor: ctx.goedgekeurdDoor, grens: bev.euro(B.omkeerbaarBovenCenten) });
+      if (!u.ok) return { ...basis, uitkomst: UITKOMST.OMKEERBAAR, bewijs, omkeerbaar: false, reden: u.reden };
+      via = u.uitzondering;
+    }
 
     if (bedrag >= B.extraBewijsBovenCenten && ctx.bevestigingVers !== true)
       return { ...basis, uitkomst: UITKOMST.EXTRA_BEWIJS, bewijs,
@@ -157,7 +161,8 @@ function maakBesluit({ zoekBevoegdheid, dagverbruik, beleid, nu, munt }) {
        `munt` komt van de aanroeper en is optioneel. Zonder is dit gewoon het
        besluit zoals het altijd al was -- niet een besluit dat stilzwijgend
        zwakker is. */
-    const uit = { ...basis, uitkomst: UITKOMST.TOESTAAN, bewijs, reden: 'Binnen de bevoegdheid en het beleid.' };
+    const uit = { ...basis, uitkomst: UITKOMST.TOESTAAN, bewijs, reden: via ? via.zin : 'Binnen de bevoegdheid en het beleid.' };
+    if (via) { uit.uitzondering = via; uit.omkeerbaar = false; }
     if (munt) {
       const t = munt(b, { actor: basis.actor, doel: basis.doel, waardeCenten: bedrag,
         beleid: B.versie, eenmalig: raaktWaarde });

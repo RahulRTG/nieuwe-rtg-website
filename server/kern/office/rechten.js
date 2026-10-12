@@ -3,7 +3,8 @@
 const inKring = (d, kring) => !!(kring && d.kring === kring && d.kringDeel);
 // Ook oude opslag kan nog een deling naast 'strikt' dragen. De lees- en
 // schrijfgrens moet die tegenstrijdige stand zelf veilig afhandelen.
-const deelbaar = d => !d.beheer || d.beheer.classificatie !== 'strikt';
+const { poort } = require('./uitgangspoort');
+const deelbaar = d => poort(d, 'meelezen').mag;
 const magSchrijven = (d, key, kring) => d.key === key || (deelbaar(d)
   && ((d.bewerkers || []).includes(key) || (inKring(d, kring) && d.kringDeel === 'bewerken')));
 const magLezen = (d, key, kring) => magSchrijven(d, key, kring) || (deelbaar(d)

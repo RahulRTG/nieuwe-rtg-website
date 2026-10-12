@@ -206,3 +206,569 @@ body[data-rtg-cinematic="true"] .rtg-edge-top::after{opacity:.52}
   body[data-rtg-cinematic="true"]{background:Canvas!important}
   body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]{background:Canvas!important;color:CanvasText!important}
 }
+
+/* WWW PARITY -------------------------------------------------------------
+   De publieke website is de visuele bron van waarheid. De app behoudt haar
+   echte routes, data, drie-kolomswerkruimte en Edge, maar gebruikt dezelfde
+   ivoorkleurige kamers, bordeauxrode signatuur, redactionele schaal en
+   fotografische rust. Donkere media-, kaart- en editorkanvassen vallen buiten
+   deze laag en blijven hun eigen materiaal bezitten. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:not([data-public-platform]){
+  --rtg-world-bg:#f1eee7!important;
+  --rtg-world-ground:#f1eee7!important;
+  --rtg-world-card:#faf8f3!important;
+  --rtg-world-card-strong:#e8e3d9!important;
+  --rtg-world-ink:#11110e!important;
+  --rtg-world-muted:#4d4a45!important;
+  --rtg-world-line:rgba(33,29,22,.17)!important;
+  --rtg-world-metal:#7f1634!important;
+  --rtg-world-action:#7f1634!important;
+  --rtg-world-action-ink:#fffaf2!important;
+  --rtg-world-schema:light!important;
+  --rtg-world-photo:var(--rtg-cinema-photo)!important;
+  --rtg-world-photo-mask:linear-gradient(180deg,rgba(241,238,231,.10),rgba(241,238,231,.92))!important;
+  --rtg-depth-content:none!important;
+  --rtg-depth-focus:0 26px 70px rgba(46,35,20,.08)!important;
+  --wh-paper:#faf8f3!important;
+  --wh-paper-ink:#171411!important;
+  --edge-bg:#0d0d0b!important;
+  --edge-panel:#11100e!important;
+  --edge-copy:#f7f1e8!important;
+  --edge-dim:#b8afa2!important;
+  --edge-line:rgba(226,195,137,.22)!important;
+  --edge-metal:#e2c389!important;
+  --edge-bar-bg:#11100e!important;
+  --edge-bar-copy:#f7f1e8!important;
+  --edge-bar-dim:#b8afa2!important;
+  --edge-bar-line:rgba(226,195,137,.24)!important;
+  --edge-bar-accent:#e2c389!important;
+  --edge-bar-metal:#e2c389!important;
+  /* De leeskleuren voor een signaal. Travel zet ze voor zijn donkere kamer licht
+     (#96d7b3, rtg-world-palette.css), en dat groen haalde op ivoor 1,4:1. In de
+     ivoren kamer gelden de groen en het bordeaux van het lichte thema. */
+  --rtg-leesgroen:#2e6b4e!important;--rtg-leesrood:#9e1c40!important;
+  color-scheme:light!important;
+  background:var(--rtg-p-ivoor,#f1eee7)!important;
+  color:#11110e!important;
+}
+/* Op ivoor halen grijs en goud geen 4,5:1 voor kleine tekst: #69645c en het
+   goud #8a7419 zakten op de lichtste lagen naar 4,34 en 3,38. De www-site zet
+   zijn overlines op ivoor daarom in bordeaux, en de onderschriften in het
+   merkgrijs; de app volgt dat hierboven. De oude decoratie van de donkere
+   werelden (lichte strepen en een gouden gloed op de body) hoort niet in een
+   ivoren kamer: die kleurde de grond beige. Een fotoscène houdt een donkere
+   eigen grond, zodat haar lichte tekst ook leesbaar is als de foto niet laadt. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:not([data-public-platform])::before,
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:not([data-public-platform])::after{
+  background:none!important;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wp-scene{
+  background-color:#11100e;color:#f7f1e8;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wp-scene .wp-free{color:#f7f1e8!important}
+/* Een fotohero vervloeit in zijn eigen grond (--wh-bg). Die werd ivoor, en
+   daarmee viel de lichte kop en ondertitel onderin de hero op ivoor weg. Zoals
+   de hero van de www-site blijft hij een donker blok op de ivoren pagina. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wh-photo{--wh-bg:#11100e}
+/* WWW-PARITEIT, HET SCHERM ZELF -----------------------------------------
+   De a11y-scan over alle schermen vond na de ivoren kamer ruim 4100
+   contrastfouten, en ze hadden vijf oorzaken. Die staan hieronder elk bij
+   naam, zodat een volgende app weet in welke bak hij hoort.
+
+   1. EEN ECHT DONKER VLAK KRIJGT DONKERE TOKENS. Een fotohero, een fotoscène
+      en de fotografische lead blijven donker, zoals de hero van de www-site.
+      Wie daarin de wereldtokens leest, krijgt hier de lichte waarden terug. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.wh-photo,.wp-scene,[data-rtg-cinematic-lead="true"],#rtg-cookie){
+  --rtg-world-ink:#f7f1e8;--rtg-world-muted:#d8cfc2;--rtg-world-metal:#e2c389;--rtg-world-line:rgba(247,241,232,.2);
+  /* Ook het VLAK hoort bij de donkere groep. Een lege-staatkaart of een
+     tegel in de lead (`.leeg`, `.lv-grid button`, `.fh-leeg`) las zijn grond
+     uit --rtg-world-card en werd ivoor, terwijl zijn tekst de lichte inkt van
+     de lead erfde: licht op licht, 1,03:1. In een donker vlak blijft een kaart
+     donker, zoals een kaart op de foto van de www-hero. */
+  --rtg-world-card:#1b1915;--rtg-world-card-strong:#24211c;
+  /* De stekkers uit rtg-heritage.css (--rtg-card, --zacht, --rtg-oppervlak ...)
+     worden op body uitgerekend en erven daarna als VASTE waarde: een `.sec` of
+     `.kaart` in een lead las dan het ivoren oppervlak van de kamer onder de
+     lichte inkt van de lead. Hier opnieuw verbonden, zodat ze in een donker
+     vlak de donkere tokens lezen. Effen, want de keuring leest geen color-mix. */
+  --rtg-card:var(--rtg-world-card);--rtg-card2:var(--rtg-world-card-strong);
+  --rtg-oppervlak:var(--rtg-world-card);--rtg-oppervlak-2:var(--rtg-world-card-strong);
+  --rtg-txt:var(--rtg-world-ink);--rtg-muted:var(--rtg-world-muted);--rtg-soft:var(--rtg-world-muted);
+  --rtg-line:var(--rtg-world-line);--rtg-leeszacht:var(--rtg-world-muted);
+  --card:var(--rtg-world-card);--card2:var(--rtg-world-card-strong);
+  --panel:var(--rtg-world-card);--panel2:var(--rtg-world-card-strong);
+  --paneel:var(--rtg-world-card);--paneel2:var(--rtg-world-card-strong);
+  --txt:var(--rtg-world-ink);--text:var(--rtg-world-ink);--ink:var(--rtg-world-ink);
+  --muted:var(--rtg-world-muted);--soft:var(--rtg-world-muted);--zacht:var(--rtg-world-muted);
+  --line:var(--rtg-world-line);--line2:var(--rtg-world-line);--lijn:var(--rtg-world-line);
+  --rtg-leesgroen:#9fd6b8;--rtg-leesrood:#e7a8b8;
+}
+/* :not(#...) tilt de weging boven die van rtg-world-palette.css, dat met
+   evenveel klassen en later geladen de kaart onder de lead legde. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) [data-rtg-cinematic-lead="true"] .lv-hero:not(#rtg-geen-lead){background:transparent!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) header .rtg-rahul-tab:not(#rtg-geen-tab),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) header .rtg-rahul-tab:not(#rtg-geen-tab) *{color:var(--rtg-world-ink)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).rtg-suite-page .private-room h3{color:var(--rtg-world-ink)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).rtg-suite-page .private-room span{color:var(--rtg-world-metal)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) #rtg-cookie a{color:#f7f1e8!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wh-photo :is(p,span,small,.wh-free),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wh-free *{color:var(--rtg-world-ink)!important}
+/* De lead verloor zijn foto en zijn donkere waas: `background:#faf8f3` voor het
+   OperationalPanel hieronder is een shorthand met hetzelfde gewicht en kwam
+   later, en wiste daarmee ook background-image. */
+body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]:not(#rtg-geen-lead){
+  background-color:#11100e!important;
+  background-image:linear-gradient(0deg,rgba(7,6,5,.94),rgba(7,6,5,.20) 72%),var(--rtg-cinema-photo)!important;
+}
+/* Een fotohero blijft een donker beeld: het wereldpalet geeft `.onthaal-beeld`
+   met een shorthand het ivoren vlak, en dan stond de lichte tekst op de foto op
+   ivoor zodra het beeld nog laadde of niet dekte. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.wh-photo,.wp-photo):not(#rtg-geen-foto){
+  background-color:#11100e!important;
+}
+/* 2. EEN OUD DONKER VLAK WORDT EEN IVOREN KAMER. Deze vlakken zetten hun eigen
+      donkere grond maar lazen hun tekst uit de wereldtokens: donkere inkt op
+      een donker vlak, tot 1,01:1. De www-site kent geen donkere panelen. */
+/* 2b. DE COMMANDFAMILIE (horeca, geld, werk, Living OS, partnernetwerk,
+      privekantoor, reizen en de suites) schreef haar lichte tekst als letterlijke
+      kleur. Die staat nu als var(--rtg-p-*, oude kleur): buiten deze laag
+      bestaat --rtg-p-* niet en geldt exact de oude kleur, hier volgt hij de
+      wereld. In een echt donker vlak krijgt hij hieronder zijn lichte waarde
+      terug. --rtg-p-op-metaal is de letter OP een metalen vlak: licht op het
+      bordeaux van de ivoren kamer, donker op het goud van een donker vlak. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]){
+  --rtg-p-inkt:var(--rtg-world-ink);--rtg-p-zacht:var(--rtg-world-muted);--rtg-p-metaal:var(--rtg-world-metal);
+  --rtg-p-rood:#9e1c40;--rtg-p-op-metaal:#fffaf2;--rtg-p-groen:#2f7256;--rtg-p-vlak:var(--rtg-world-card);
+  --rtg-p-ivoor:var(--rtg-world-bg);--rtg-p-papier:var(--rtg-world-card);
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.wh-photo,.wp-scene,[data-rtg-cinematic-lead="true"],#rtg-cookie){
+  --rtg-p-inkt:#f7f1e8;--rtg-p-zacht:#d8cfc2;--rtg-p-metaal:#e2c389;--rtg-p-rood:#e7a8b8;--rtg-p-op-metaal:#11100e;--rtg-p-groen:#9fd6b8;--rtg-p-vlak:#11100e;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]){--rtg-card:var(--rtg-world-card)!important;--rtg-oppervlak:var(--rtg-world-card)!important;--rv-bg:var(--rtg-world-bg)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tos-service-strip,.rtgplek,.rb-leeg,.rv-reiszoek button,.rail,.side,#balk,.topnav,.top,.school-boven,header.kop,#apparaten,#paginabar,nav.lagen,article.mise,.v-wijk.los,.leeg):not([data-rtg-cinematic-lead="true"]),
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(header.kop,.rtgplek) :is(a,button):not(.rtg-edge-mark),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) header.ios-nav .knop{
+  background:var(--rtg-world-card-strong)!important;color:var(--rtg-world-ink)!important;border-color:var(--rtg-world-line)!important;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tos-service-strip,.rtgplek,.rb-leeg,.rv-reiszoek button,.rail,.side,#balk,.topnav,.top,.school-boven,header.kop,#apparaten,#paginabar,nav.lagen,article.mise,.v-wijk.los,.leeg):not([data-rtg-cinematic-lead="true"]){
+  background:var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;border-color:var(--rtg-world-line)!important;
+}
+/* 3. OUDE LICHTE APP-KLEUREN VOLGEN DE WERELD. Lichte inkt en licht goud voor
+      de donkere thema's, in eigen tokens of letterlijk in een appblad. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]){
+  --rtf-gold-soft:var(--rtg-world-metal)!important;--stay-ink:var(--rtg-world-ink)!important;
+  --anchor-gold:var(--rtg-world-metal)!important;--anchor-ivory:var(--rtg-world-ink)!important;
+  --campus-gold:var(--rtg-world-metal)!important;--ios-label:var(--rtg-world-ink)!important;
+  --tos-wine-licht:#9e1c40!important;--nav-gold:var(--rtg-world-metal)!important;
+  /* Vluchten en verblijven dragen eigen inkt voor hun nachtblauwe kamer; hun
+     kaarten lezen via --tos-graphite al het ivoren vlak, hun eigen vlakken
+     (--flight-card, --stay-card) volgen hier mee: anders stond de inkt van de
+     kamer (#11110e) op nachtblauw #071b29. */
+  --flight-ink:var(--rtg-world-ink)!important;--flight-soft:var(--rtg-world-muted)!important;
+  --flight-bg:var(--rtg-world-bg)!important;--flight-card:var(--rtg-world-card)!important;--flight-card2:var(--rtg-world-card-strong)!important;
+  --flight-gold:var(--rtg-world-metal)!important;--stay-gold:var(--rtg-world-metal)!important;
+  --rit-bg:var(--rtg-world-bg)!important;--rit-card:var(--rtg-world-card)!important;--rit-card2:var(--rtg-world-card-strong)!important;
+  --rit-ivory:var(--rtg-world-ink)!important;--rit-soft:var(--rtg-world-muted)!important;--rit-gold:var(--rtg-world-metal)!important;
+  --stay-soft:var(--rtg-world-muted)!important;
+  --stay-bg:var(--rtg-world-bg)!important;--stay-card:var(--rtg-world-card)!important;--stay-card2:var(--rtg-world-card-strong)!important;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.verblijfkop,.vliegkop) :is(small,b),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.moveStop,#interpret,#enrollToggle,.private-kicker,.campus-kicker),
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wk-stage :is(.ey,.wk-ey),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.verblijfkop,.vliegkop) .tab.aan,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).travel-os .tab.aan,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) header.kop small,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .lo-worlds button,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .pn-intent :is(b,button),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(#transferForm,#zoekForm,.inlog) :is(span,b,a),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tos-service-step>span,.rahulsnel button,.kompaslabel,.lo-timeline time,.rv-reiskaart em,.rb-leeg :is(span,a)),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-settings-intro .rtg-settings-kicker,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .pn-intent>div b{color:var(--rtg-world-metal)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.hq-rail,.fx-kaart,.pn-intent>div,.lo-panel>header,.rv-reiskaart,.lo-worldhead) :is(i,span,a,summary,small,p,.k),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.merkkop .onder,.wereldvoet span,#vWelkom>.hero span,.rv-pane button,#transferForm label,#dagzin,.pionrond,header.ios-nav small),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).travel-os :is(.tab,#zoekForm label,.inlog p,.sec,#vluchtAantal),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).workos-has-bottom :is(span,.b-kop,.b-leeg,#pNuKop,.v-kop),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.hm-command label,.hm-label),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-settings-intro p,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .wk-stage form .knop{color:var(--rtg-world-muted)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.rtg-settings-shell,.rtg-settings-intro h2,.buurtknop.rand,#ritTitel,#vluchtTitel,#verblijfTitel,body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).travel-os h2,.rb-leeg p,#hmTitel,.kaart>.kop,.kaart>div>button:not([class]),#privateRoomsTitle,#gereedTeller,header.ios-nav .rtg-rahul-tab,#pModi button,#badge3d,#liveBadge),body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) .rtg-edge-top .rtg-edge-mark{color:var(--rtg-world-ink)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) [data-rtg-toegang-hoofd] :is(span,small,em){color:inherit!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).rtg-suite-page :is(p,.private-room-number){color:var(--rtg-world-muted)!important}
+/* Een link die zijn eigen vlak schildert (de springlink op het actievlak, een
+   knop als link) houdt zijn eigen letter: bordeaux op het bordeaux van de
+   springlink haalde 1:1, en op de gouden datingknop 2,6:1. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]).rtg-suite-page a:not(.skip):not([class*="button"]):not(.knop){color:var(--rtg-world-metal)!important}
+/* 4. SIGNAALKLEUREN IN HUN DONKERE VARIANT. Rood en groen stonden in hun
+      lichte variant voor een donkere grond; op ivoor is het merkbordeaux voor
+      rood en het rosthemagroen voor groen. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.knop.rood,#status,i.nee,#melding){color:#9e1c40!important}
+/* De toast van de datingschermen schildert zijn eigen zwarte vlak (dating-premium.css):
+   bordeaux haalde daarop 2,33:1. Op zwart is kleine tekst wit (CLAUDE.md). */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-dating] #melding.melding{color:#f4f0e9!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.tref .vrij,.school-zij b,.pn-intent em,#loWorldLabel,.rail-foot span){color:#2f7256!important}
+/* 5. EEN GOUDEN KNOP WORDT BORDEAUX, DUS ZIJN LETTER WORDT LICHT. --gold volgt
+      het metaal, en dat is op ivoor bordeaux; de zwarte letter die bij goud
+      hoorde, haalt daarop 2,2:1. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(.kg-rij button,#btn-zet,#rkToetsen .gelijk,.verstuur,#verstuur,.speler .afspeel,#idStart,button.chip.aan,#n-maak,#kaGo,#prBegin .knop.p,#zegGo,#startTrialTop){color:#fffaf2!important}
+/* De lichte letter hoort bij het bordeaux vlak, dus waar een scherm het actieve
+   chipje zonder vlak tekent (uitgaan, foodcourt: `background:none`), krijgt het
+   dat vlak hier mee. Anders stond #fffaf2 op ivoor. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) button.chip.aan:not(#rtg-geen-chip){background:var(--rtg-world-action)!important;border-color:var(--rtg-world-action)!important}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"]:not([data-public-platform]) :is(#kaGo,#prBegin .knop.p,#idStart) *{color:inherit!important}
+/* De signatuur volgt het palet, niet de route, en de grond draagt er heel
+   subtiel (5%, vlak 2,5%) de kleur van die wereld in mee: een ingebed Work-blad kleurt
+   de schil van Command of het bureau mee, ook al blijft die route Living. */
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="living"],[data-rtg-world="living"]:not([data-rtg-palette])):not([data-public-platform]){
+  --rtg-world-signature:#9b714e!important;
+  --rtg-world-bg:#ede8df!important;--rtg-world-ground:#ede8df!important;
+  --rtg-world-card:#f8f5ef!important;--rtg-world-card-strong:#e4ddd2!important;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="travel"],[data-rtg-world="travel"]:not([data-rtg-palette])):not([data-public-platform]){
+  --rtg-world-signature:#9b3152!important;
+  --rtg-world-bg:#ede5e0!important;--rtg-world-ground:#ede5e0!important;
+  --rtg-world-card:#f8f3ef!important;--rtg-world-card-strong:#e4dad2!important;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="work"],[data-rtg-world="work"]:not([data-rtg-palette])):not([data-public-platform]){
+  --rtg-world-signature:#587369!important;
+  --rtg-world-bg:#e9e8e1!important;--rtg-world-ground:#e9e8e1!important;
+  --rtg-world-card:#f6f5f0!important;--rtg-world-card-strong:#e1ddd3!important;
+}
+body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-world]:is([data-rtg-palette="foundation"],[data-rtg-world="foundation"]:not([data-rtg-palette])):not([data-public-platform]){
+  --rtg-world-signature:#557566!important;
+  --rtg-world-bg:#e9e8e1!important;--rtg-world-ground:#e9e8e1!important;
+  --rtg-world-card:#f6f5ef!important;--rtg-world-card-strong:#e1ddd3!important;
+}
+
+/* De officiële lock-up staat in het bestaande Edge-DOM. Alleen de vorm
+   verandert: geen tweede logo, geen duplicaat en geen route-eigen header. */
+body[data-rtg-cinematic="true"] .rtg-edge-top{
+  color:#171411!important;
+  background:#f4f0e9!important;
+  border-bottom:1px solid rgba(33,29,22,.14)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(24px) saturate(.9)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(.9)!important;
+  position:fixed!important;inset:0 0 auto!important;z-index:120!important;
+}
+body[data-rtg-cinematic="true"] .rtg-edge-top::after{display:none!important}
+/* De kop is ivoor, dus zijn bediening is inkt: de taal- en profielknop
+   kregen nog de lichte Edge-tekst van de donkere balk (#f7f1e8 op ivoor). */
+body[data-rtg-cinematic="true"] .rtg-edge-top{--edge-copy:#171411;--edge-dim:#6b655c}
+body[data-rtg-cinematic="true"] .rtg-edge-top :is(.rtg-edge-language,.rtg-edge-profile){color:#171411!important}
+body[data-rtg-cinematic="true"] .rtg-edge-mark{
+  display:flex!important;align-items:center!important;justify-content:flex-start!important;
+  width:auto!important;height:auto!important;border:0!important;color:#fffaf2!important;
+  font-family:"Bodoni Moda",Didot,Georgia,serif!important;text-decoration:none!important;
+}
+body[data-rtg-cinematic="true"] .rtg-edge-mark-short{display:none!important}
+body[data-rtg-cinematic="true"] .rtg-edge-mark-lockup{
+  display:flex!important;align-items:center!important;gap:0!important;min-width:0;
+}
+body[data-rtg-cinematic="true"] .rtg-edge-mark-lockup strong{
+  display:block;padding:9px 14px 10px;background:#7f1634;color:#fffaf2;
+  border:1px solid rgba(255,255,255,.15);font:600 20px/1 "Bodoni Moda",Didot,Georgia,serif;
+  letter-spacing:-.025em;white-space:nowrap;
+}
+body[data-rtg-cinematic="true"] .rtg-edge-mark-lockup small{display:none!important}
+body[data-rtg-cinematic="true"] .rtg-edge-crumbs,
+body[data-rtg-cinematic="true"] .rtg-edge-worldbar,
+body[data-rtg-cinematic="true"] .rtg-edge-state{color:#6b655c!important}
+body[data-rtg-cinematic="true"] .rtg-edge-worldbar a[aria-current="page"]{
+  color:#171411!important;background:rgba(127,22,52,.055)!important;
+}
+
+/* De app is een huis met open kamers, geen verzameling donkere kaarten. */
+body[data-rtg-cinematic="true"] :is(
+  [data-rtg-component="OperationalPanel"],.wd-widget,.wd-focus,.wd-access,
+  .kaart,.card,.paneel,.panel,.tegel,.box,.blok
+):not([data-rtg-own-surface]):not([data-rtg-native-canvas]){
+  box-shadow:none!important;
+}
+body[data-rtg-cinematic="true"] [data-rtg-component="OperationalPanel"]{
+  background:var(--rtg-p-papier,#faf8f3)!important;border-color:rgba(33,29,22,.15)!important;
+}
+body[data-rtg-cinematic="true"] [data-rtg-component="NarrativePanel"]{
+  background:linear-gradient(135deg,color-mix(in srgb,var(--rtg-world-signature) 8%,#faf8f3),#faf8f3 68%)!important;
+  border-color:rgba(33,29,22,.15)!important;
+}
+body[data-rtg-cinematic="true"] :is(input,select,textarea):not([data-rtg-own-surface]){
+  background:var(--rtg-p-papier,#faf8f3)!important;color:#171411!important;border-color:rgba(33,29,22,.24)!important;
+}
+body[data-rtg-cinematic="true"] :is(input,textarea)::placeholder{color:#7b746b!important}
+
+/* Besloten toegangen voelen als de entree van een product, niet als een
+   los administratief formulier. De bestaande velden en autorisatie blijven
+   onaangeraakt; het productiebeeld krijgt uitsluitend een eigen vlak. */
+body[data-rtg-cinematic="true"] #inlog[data-rtg-toegang]{
+  position:relative;isolation:isolate;overflow:hidden;min-height:clamp(560px,62vh,700px);
+  padding:clamp(44px,5vw,72px) clamp(38px,4vw,64px) clamp(44px,5vw,72px) calc(44% + clamp(38px,4vw,64px))!important;
+  border:1px solid rgba(33,29,22,.16)!important;border-radius:0!important;
+  background:var(--rtg-p-papier,#faf8f3)!important;color:#171411!important;
+}
+body[data-rtg-cinematic="true"] #inlog[data-rtg-toegang]::before{
+  content:"";position:absolute;z-index:-1;inset:0 auto 0 0;width:44%;
+  background-image:linear-gradient(180deg,rgba(7,6,5,.05),rgba(7,6,5,.62)),var(--rtg-cinema-photo);
+  background-position:center,var(--rtg-cinema-position);background-size:cover;
+}
+body[data-rtg-cinematic="true"] #inlog[data-rtg-toegang] h1{
+  font:400 clamp(48px,4.7vw,76px)/.96 "Bodoni Moda",Didot,Georgia,serif!important;
+  letter-spacing:-.05em!important;margin:28px 0 18px!important;color:#171411!important;
+}
+body[data-rtg-cinematic="true"] #inlog[data-rtg-toegang]>.stil{
+  max-width:54ch;font-size:15px!important;line-height:1.75!important;color:#625d55!important;
+}
+body[data-rtg-cinematic="true"] #inlog[data-rtg-toegang] .rtg-toegang-signatuur{
+  border-color:rgba(33,29,22,.16)!important;
+}
+
+/* LivingOS Outcome is een volwaardig productscherm. Zijn oude Command-huid
+   gebruikte 6-9px tekst en harde zwarte panelen; de structuur en handelingen
+   blijven, maar het materiaal wordt dezelfde rustige appkamer als de rest. */
+body[data-rtg-cinematic="true"] :is(.lo-shell,.lo-main,.lo-stage){background:var(--rtg-p-ivoor,#f1eee7)!important;color:#171411!important}
+body[data-rtg-cinematic="true"] .lo-top{
+  background:#f4f0e9!important;border-color:rgba(33,29,22,.15)!important;color:#171411!important;
+}
+body[data-rtg-cinematic="true"] .lo-tabs button{
+  color:#625d55!important;border-color:rgba(33,29,22,.14)!important;background:transparent!important;
+}
+body[data-rtg-cinematic="true"] .lo-tabs button:first-child{
+  color:#171411!important;border-bottom-color:#7f1634!important;background:rgba(127,22,52,.04)!important;
+}
+body[data-rtg-cinematic="true"] .lo-tabs small,
+body[data-rtg-cinematic="true"] .lo-health{color:#726c63!important}
+body[data-rtg-cinematic="true"] .lo-panel{
+  background:#f7f4ed!important;color:#171411!important;padding:clamp(30px,3vw,48px) clamp(24px,2.6vw,44px) 110px!important;
+}
+body[data-rtg-cinematic="true"] .lo-panel+.lo-panel{border-color:rgba(33,29,22,.14)!important}
+body[data-rtg-cinematic="true"] :is(.lo-intent,.lo-worlds,.lo-decisions){
+  background:#f7f4ed!important;color:#171411!important;
+}
+body[data-rtg-cinematic="true"] :is(.lo-understood,.lo-policies,.lo-sla,.lo-decision,.lo-permissions,.lo-status,.lo-delta){
+  border-color:rgba(33,29,22,.15)!important;
+}
+body[data-rtg-cinematic="true"] :is(.lo-understood>div,.lo-timeline article,.lo-node,.lo-permissions>p,.lo-status>div){
+  border-color:rgba(33,29,22,.12)!important;
+}
+body[data-rtg-cinematic="true"] :is(.lo-worldhead,.lo-compress,.lo-proof){
+  border-color:rgba(127,22,52,.20)!important;background:var(--rtg-p-papier,#faf8f3)!important;color:#171411!important;
+}
+body[data-rtg-cinematic="true"] .lo-capital{background:rgba(33,29,22,.12)!important}
+body[data-rtg-cinematic="true"] .lo-capital div,
+body[data-rtg-cinematic="true"] .lo-delta>div span{background:var(--rtg-p-papier,#faf8f3)!important}
+body[data-rtg-cinematic="true"] :is(
+  .lo-understood p,.lo-timeline small,.lo-timeline em,.lo-node small,.lo-decision>p,
+  .lo-decision aside p,.lo-permissions>p small,.lo-status small,.lo-status em,.lo-delta>p,.lo-proof small
+){color:#6f6961!important}
+body[data-rtg-cinematic="true"] :is(.lo-worldhead h2,.lo-worldhead strong,.lo-timeline b,.lo-node b,.lo-decision h2,.lo-proof b){color:#171411!important}
+body[data-rtg-cinematic="true"] .lo-worldtabs button{
+  min-height:44px;border-color:rgba(33,29,22,.16)!important;color:#625d55!important;background:transparent!important;
+}
+body[data-rtg-cinematic="true"] .lo-worldtabs button.actief{border-color:#8a7419!important;color:#171411!important;background:var(--rtg-p-papier,#faf8f3)!important}
+
+/* Het wereldportaal vult zijn echte werkvlak. Dit voorkomt het 52px-hoge
+   iframe waardoor LivingOS op mobiel als een lege ivoorkleurige pagina leek. */
+body[data-rtg-cinematic="true"] .rv-app{background:var(--rtg-p-ivoor,#f1eee7)!important}
+body[data-rtg-cinematic="true"] .rv-werk{min-height:calc(100dvh - var(--edge-top,82px) - var(--rtg-adaptive-inset,82px))!important}
+body[data-rtg-cinematic="true"] .rv-panes,
+body[data-rtg-cinematic="true"] .rv-pane,
+body[data-rtg-cinematic="true"] .rv-pane iframe{min-height:0!important;height:100%!important}
+
+/* De echte Adaptive Edge blijft donker en fotografisch boven de lichte app.
+   Eén zachte rand vervangt de dubbele halo die hem als los object liet ogen. */
+body[data-rtg-cinematic="true"][data-rtg-adaptive-ready="true"] .rtg-adaptive-edge{
+  --edge-bar-bg:#11100e!important;--edge-bar-copy:#f7f1e8!important;
+  --edge-bar-dim:#b8afa2!important;--edge-bar-line:rgba(226,195,137,.24)!important;
+  --edge-bar-accent:#e2c389!important;--edge-bar-accent-soft:rgba(226,195,137,.08)!important;
+}
+body[data-rtg-cinematic="true"] :is(.rtg-adaptive-bar,.rtg-adaptive-sheet,.rtg-adaptive-surface){
+  border:1px solid rgba(226,195,137,.24)!important;
+  background:linear-gradient(180deg,rgba(25,23,19,.96),rgba(13,13,11,.97))!important;
+  box-shadow:0 16px 38px rgba(31,24,16,.18)!important;
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-item .rtg-adaptive-lips{
+  align-self:center!important;transform:translateY(0)!important;
+  filter:drop-shadow(0 0 6px rgba(226,195,137,.18))!important;
+}
+body[data-rtg-cinematic="true"] .rtg-adaptive-item[data-rtg-adaptive-action="ai"],
+body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!important}
+
+@media(min-width:1000px){
+  body[data-rtg-cinematic="true"][data-rtg-layout="standard"],
+  body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]{
+    --edge-top:88px!important;--rtg-header-desktop:88px!important;
+    padding-top:88px!important;
+  }
+  /* Ingebed draagt de ouder de bovenrand; het kind houdt er geen ruimte voor vrij. */
+  body.rtg-edge-embed[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop],
+  body.rtg-edge-embed[data-rtg-cinematic="true"][data-rtg-layout="standard"]{padding-top:0!important}
+  /* Compact en focus geven de ruimte van de bovenrand terug (rtg-warm-details.css);
+     de 88px hierboven woog zwaarder en hield hem vast. */
+  body[data-rtg-cinematic="true"][data-rtg-layout="standard"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-desktop]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]){
+    padding-top:0!important;
+  }
+  /* De kop staat vast; wat in beeld wordt geschoven landt eronder, niet erachter. */
+  html:has(body[data-rtg-cinematic="true"][data-rtg-layout="standard"]){scroll-padding-top:104px}
+  body[data-rtg-cinematic="true"] .rtg-edge-top{
+    min-height:88px!important;height:88px!important;padding:0 clamp(32px,4vw,72px)!important;
+    gap:24px!important;
+  }
+  body[data-rtg-cinematic="true"] .rtg-edge-mark-lockup strong{
+    padding:10px 17px 11px;font-size:23px;
+  }
+  body[data-rtg-cinematic="true"][data-rtg-desktop]:not([data-rtg-shell="mobile"]) .wd-shell{
+    grid-template-columns:minmax(210px,15vw) minmax(0,1fr) minmax(250px,19vw)!important;
+    gap:clamp(24px,2.6vw,48px)!important;width:100%!important;max-width:1920px!important;
+    margin:0 auto 140px!important;padding:clamp(34px,4vw,70px) clamp(32px,4vw,72px) 0!important;
+  }
+  body[data-rtg-cinematic="true"] .wd-people{
+    border-inline-end:1px solid rgba(33,29,22,.14)!important;padding-inline-end:clamp(20px,2vw,36px)!important;
+  }
+  body[data-rtg-cinematic="true"] .wd-favorites{
+    border-inline-start:1px solid rgba(33,29,22,.14)!important;padding-inline-start:clamp(20px,2vw,36px)!important;
+  }
+  body[data-rtg-cinematic="true"] .wd-greeting h1{
+    font:400 clamp(38px,3.4vw,62px)/.98 "Bodoni Moda",Didot,Georgia,serif!important;
+    letter-spacing:-.045em!important;color:#171411!important;
+  }
+  body[data-rtg-cinematic="true"] .wp-scene{
+    min-height:clamp(480px,56vh,720px)!important;border:0!important;border-radius:0!important;
+  }
+  body[data-rtg-cinematic="true"] .wp-scene .wp-photo{
+    height:clamp(480px,56vh,720px)!important;border-radius:0!important;
+  }
+  body[data-rtg-cinematic="true"] .wp-scene .wp-heading{inset:auto clamp(34px,4vw,64px) 110px!important}
+  body[data-rtg-cinematic="true"] .wp-scene .wp-heading h2{
+    font-size:clamp(54px,5.2vw,88px)!important;line-height:.94!important;max-width:11ch!important;
+  }
+  body[data-rtg-cinematic="true"] .wp-scene>.wp-action{inset:auto auto 38px clamp(34px,4vw,64px)!important}
+  body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]{
+    min-height:clamp(500px,58vh,740px);border-radius:0!important;border:0!important;
+  }
+}
+
+@media(max-width:999px){
+  body[data-rtg-cinematic="true"][data-rtg-layout="standard"]{
+    --edge-top:82px!important;--rtg-header-mobile:82px!important;
+    padding-top:82px!important;
+  }
+  body.rtg-edge-embed[data-rtg-cinematic="true"][data-rtg-layout="standard"]{padding-top:0!important}
+  html:has(body[data-rtg-cinematic="true"][data-rtg-layout="standard"]){scroll-padding-top:98px}
+  body[data-rtg-cinematic="true"] .rtg-edge-top{
+    min-height:82px!important;height:82px!important;padding:0 20px!important;gap:14px!important;
+  }
+  body[data-rtg-cinematic="true"] .rtg-edge-mark-lockup strong{
+    padding:8px 11px 9px;font-size:18px;
+  }
+  body[data-rtg-cinematic="true"] .rtg-edge-mark .wd-world-label{display:none!important}
+  body[data-rtg-cinematic="true"] .rtg-edge-crumbs,
+  body[data-rtg-cinematic="true"] .rtg-edge-worldbar{display:none!important}
+  body[data-rtg-cinematic="true"] .rtg-edge-state,
+  body[data-rtg-cinematic="true"] .wp-edit-images,
+  body[data-rtg-cinematic="true"] .rtg-edge-search{display:none!important}
+  body[data-rtg-cinematic="true"] .rtg-edge-language{
+    display:grid!important;place-items:center!important;margin-inline-start:auto!important;
+    width:44px!important;height:44px!important;border:1px solid rgba(33,29,22,.18)!important;
+    border-radius:50%!important;color:#171411!important;font-size:12px!important;
+  }
+  body[data-rtg-cinematic="true"] .rtg-edge-profile{
+    display:none!important;
+  }
+  body[data-rtg-cinematic="true"][data-world-home][data-rtg-shell="mobile"] .rtg-edge-top{
+    min-height:82px!important;height:82px!important;padding:0 20px!important;
+    background:#f4f0e9!important;border-bottom:1px solid rgba(33,29,22,.14)!important;
+    box-shadow:none!important;backdrop-filter:blur(24px) saturate(.9)!important;
+    -webkit-backdrop-filter:blur(24px) saturate(.9)!important;
+  }
+  body[data-rtg-cinematic="true"][data-rtg-skin="heritage"][data-rtg-shell="mobile"]
+    .rtg-edge-mark .wd-world-label{display:none!important}
+  body[data-rtg-cinematic="true"][data-rtg-skin="heritage"][data-world-home][data-rtg-shell="mobile"]
+    .rtg-edge-profile{display:none!important}
+
+  body[data-rtg-cinematic="true"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen]
+    [data-rtg-cinematic-root="content"],
+  body[data-rtg-cinematic="true"].rtg-stijl[data-world-home][data-rtg-shell="mobile"]
+    :is(main#inhoud,main#hoofd,main#main,main.wd-home)[data-rtg-cinematic-root="content"]{
+    width:100%!important;max-width:none!important;margin:0!important;
+    padding:0 0 calc(var(--rtg-adaptive-inset,82px) + 24px)!important;
+  }
+  body[data-rtg-cinematic="true"][data-rtg-desktop] .wd-shell{
+    width:100%!important;max-width:none!important;margin:0 0 calc(110px + env(safe-area-inset-bottom,0px))!important;
+    gap:0!important;padding:0!important;
+  }
+  /* De scene is de mobiele kop (#534; besluit van de eigenaar, 11 oktober 2026): het
+     BEELD van de oude fotokop eronder zou een tweede kop zijn, dus dat wijkt -- foto,
+     label, titel en bijschrift. Wat er aan inhoud in staat (de bevestigde reis, de
+     intro, de passtatus, de knop) blijft staan -- ook binnen .wh-photo-copy. Alleen waar de scene er echt staat, en alleen de KOP
+     (een .wh-photo met een h1): een projectkaart met .wh-photo blijft heel. */
+  body[data-rtg-cinematic="true"][data-rtg-shell="mobile"] .wd-home:has(>.wp-scene) .wh-photo:has(>h1,>.wh-photo-copy>h1){
+    min-height:0!important;height:auto!important;background:none!important;
+  }
+  body[data-rtg-cinematic="true"][data-rtg-shell="mobile"] .wd-home:has(>.wp-scene) .wh-photo:has(>h1,>.wh-photo-copy>h1)>:is(img,h1,.wh-eyebrow,.wh-hero-label,.ey,.wh-caption,.wh-foundation-label,.wh-free,.buurtey){display:none!important}
+  body[data-rtg-cinematic="true"][data-rtg-shell="mobile"] .wd-home:has(>.wp-scene) .wh-photo:has(>h1,>.wh-photo-copy>h1)>.wh-photo-copy>h1{display:none!important}
+  body[data-rtg-cinematic="true"][data-rtg-shell="mobile"] .wd-home>.wp-scene{
+    display:block!important;width:100%!important;min-height:clamp(520px,72svh,720px)!important;
+    overflow:hidden!important;border:0!important;border-radius:0!important;background:#11100e!important;
+  }
+  body[data-rtg-cinematic="true"] .wp-scene .wp-photo{
+    width:100%!important;height:clamp(520px,72svh,720px)!important;min-height:0!important;
+    aspect-ratio:auto!important;border:0!important;border-radius:0!important;
+  }
+  body[data-rtg-cinematic="true"] .wp-scene .wp-photo::after{
+    background:linear-gradient(180deg,rgba(7,6,5,.08) 8%,rgba(7,6,5,.32) 30%,rgba(7,6,5,.78) 56%,rgba(7,6,5,.96) 100%)!important;
+  }
+  body[data-rtg-cinematic="true"] .wp-scene .wp-heading{
+    display:block!important;position:absolute!important;z-index:2!important;
+    inset:auto 26px 104px!important;margin:0!important;
+  }
+  body[data-rtg-cinematic="true"] .wp-scene .wp-heading h2{
+    margin:10px 0 0!important;color:#fff8ed!important;
+    font:400 clamp(46px,13vw,68px)/.94 "Bodoni Moda",Didot,Georgia,serif!important;
+    letter-spacing:-.05em!important;max-width:11ch!important;text-wrap:balance!important;
+    text-shadow:0 2px 22px rgba(0,0,0,.28)!important;
+  }
+  body[data-rtg-cinematic="true"] .wp-scene .wp-overline{color:#e2c389!important}
+  body[data-rtg-cinematic="true"] .wp-scene>.wp-action{
+    position:absolute!important;z-index:2!important;inset:auto auto 32px 26px!important;
+    color:#fff0d6!important;margin:0!important;
+  }
+  body[data-rtg-cinematic="true"] .wp-scene>.wp-free{inset:20px 20px auto auto!important}
+
+  body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"]{
+    min-height:clamp(520px,72svh,720px)!important;border:0!important;border-radius:0!important;
+    padding:32px 24px!important;
+    background-image:linear-gradient(0deg,rgba(7,6,5,.95),rgba(7,6,5,.08) 74%),var(--rtg-cinema-photo)!important;
+  }
+  body[data-rtg-cinematic="true"] [data-rtg-cinematic-lead="true"] :is(h1,h2){
+    font-size:clamp(48px,13vw,68px)!important;line-height:.94!important;max-width:11ch!important;
+  }
+
+  body[data-rtg-cinematic="true"] :is(.wd-greeting,.wp-story,.wp-domain,.wd-library,.wd-favorites,.wd-people){
+    box-sizing:border-box;padding-inline:24px!important;
+  }
+  body[data-rtg-cinematic="true"] .wd-greeting{padding-top:36px!important;padding-bottom:24px!important}
+  body[data-rtg-cinematic="true"] .wd-greeting h1{
+    font:400 clamp(38px,11vw,54px)/.98 "Bodoni Moda",Didot,Georgia,serif!important;
+    letter-spacing:-.045em!important;color:#171411!important;
+  }
+  body[data-rtg-cinematic="true"] .wp-tabs{
+    margin:0 24px!important;border-color:rgba(33,29,22,.16)!important;
+  }
+  body[data-rtg-cinematic="true"] .wp-tabs button{color:#4f4a43!important}
+  body[data-rtg-cinematic="true"] .wp-tabs button[aria-expanded="true"]{border-bottom-color:#7f1634!important}
+  body[data-rtg-cinematic="true"] .wd-access{
+    width:100%!important;margin:0!important;padding:44px 24px 52px!important;border:0!important;border-radius:0!important;
+    background:var(--rtg-p-ivoor,#f1eee7)!important;color:#171411!important;
+  }
+  body[data-rtg-cinematic="true"] .rtg-adaptive-edge{
+    width:calc(100vw - 24px)!important;max-width:620px!important;
+  }
+  body[data-rtg-cinematic="true"] #inlog[data-rtg-toegang]{
+    min-height:0;width:100vw!important;max-width:none!important;
+    margin-inline:calc(50% - 50vw)!important;padding:330px 24px 48px!important;border:0!important;
+  }
+  body[data-rtg-cinematic="true"] #inlog[data-rtg-toegang]::before{
+    inset:0 0 auto;width:100%;height:290px;
+    background-image:linear-gradient(180deg,rgba(7,6,5,.04),rgba(7,6,5,.67)),var(--rtg-cinema-photo);
+  }
+  body[data-rtg-cinematic="true"] #inlog[data-rtg-toegang] h1{font-size:clamp(48px,14vw,64px)!important}
+  body[data-rtg-cinematic="true"] .lo-panel{padding:30px 24px 116px!important}
+  body[data-rtg-cinematic="true"] :is(.lo-panel>header>span,.lo-worldhead span,.lo-decision>span,.lo-delta>em){font-size:11px!important}
+  body[data-rtg-cinematic="true"] :is(.lo-timeline b,.lo-node b,.lo-understood p,.lo-decision>p,.lo-permissions>p b,.lo-status b,.lo-delta>p,.lo-proof b){font-size:13px!important;line-height:1.55!important}
+  body[data-rtg-cinematic="true"] :is(.lo-timeline small,.lo-timeline em,.lo-node small,.lo-permissions>p small,.lo-status small,.lo-status em,.lo-proof small){font-size:11px!important;line-height:1.45!important}
+  body[data-rtg-cinematic="true"] .lo-worldhead h2{font-size:34px!important}
+  body[data-rtg-cinematic="true"] .lo-worldhead strong{font-size:46px!important}
+  body[data-rtg-cinematic="true"] .rv-werk{grid-template-rows:minmax(0,1fr)!important}
+  body[data-rtg-cinematic="true"] .rv-tabs{display:none!important}
+}
+
+/* Het label van de hoofdactie volgt de letter van de balk waar het in staat; een vaste
+   lichte letter verdween op de lichte balk van de Business-kant (WorkOS, 768px). */
+body[data-rtg-cinematic="true"] .rtg-edge-bottom .rtg-edge-action :is(button,span){color:var(--edge-copy)!important}
+/* Een ingebed werkblad (RTG Command) draagt geen eigen Edge: de buitenste schil doet
+   dat. Het blad houdt dan alleen de ene veilige inzet vrij, zonder de extra lucht
+   eronder die een los scherm wel krijgt. */
+html.rtg-command-blad body[data-rtg-cinematic="true"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen] [data-rtg-cinematic-root="content"],
+html.rtg-command-blad body[data-rtg-cinematic="true"].rtg-stijl[data-world-home][data-rtg-shell="mobile"] :is(main#inhoud,main#hoofd,main#main,main.wd-home)[data-rtg-cinematic-root="content"]{
+  padding-bottom:var(--rtg-adaptive-inset,82px)!important;
+}

@@ -297,14 +297,15 @@ later bij doet, geldt niet voor wat er al ligt.
 - **Zeven ledenroutes**, alle zeven met een mutatiecontract op een gemeten ronde.
 - **Het scherm** `/apps/mijn-neigingen.html` ("Mijn neigingen"), met per neiging *wijzigen*,
   *vergeet dit* en *niet hiervoor gebruiken*, en met de eigen rand erbij.
+- **Neigingen wegen in de projectie** (11 oktober 2026, `kern/experience/volgorde.js`):
+  alleen `gezegd` en `gekozen`, als stabiele tweedeling zonder score, met de reden
+  op elk naar voren gehaald object. De beslissing woont in de experience-laag en
+  niet hier (ADAPT-05). Vandaag raakt hij weinig: zie `MAATSTAF.md` par. 7k.
 - **De intake is nooit verplicht** — "ik doe dit later" bestaat, en wie hem nooit
   doet houdt exact het huis dat hij vandaag heeft.
 
 ### Een stap weg
 
-- **Neigingen in de projectie laten wegen.** `kern/experience/projections.js`
-  levert items met bron en versheid, maar zonder volgorde. De weging hoort dáár
-  en niet hier (zie grens ADAPT-05).
 - **`merkOp()` een aanroeper geven.** De progressive-profiling kant bestaat
   (`neigingMerkOp`) en wordt vandaag door niemand aangeroepen: er is nog geen
   plek waar gedrag wordt opgemerkt. Dat is bewust één besluit en niet twintig

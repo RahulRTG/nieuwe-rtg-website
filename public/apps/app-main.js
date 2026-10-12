@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '77a2d8f2';
+var RTG_BOUW = '0f6a9048';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -534,6 +534,12 @@ var RTG_BOUW = '77a2d8f2';
         if (['rtg','lifestyle','business'].includes(doelPas)){ location.replace(pasAdres(doelPas)); return; }
         API.token = null; return; // onbekende pas: poort tonen
       }
+      /* De server heeft deze sessie op DEZE pas bevestigd. Onthoud dat, zodat
+         de volgende kale /apps/app.html het adres al in de kop van de pagina
+         goed zet (zie app.html, "de pas van deze werktafel") in plaats van
+         na een volledige opstart nog eens te herladen. Klopt het geheugen
+         ooit niet meer, dan stuurt de regel hierboven gewoon door. */
+      try { localStorage.setItem('rtg_werktafel_pas', vastePas); } catch(e){}
       $('#gate').style.display = 'none';
       $('#app').classList.add('active');
       renderAll();
@@ -555,6 +561,7 @@ var RTG_BOUW = '77a2d8f2';
     try { if (API.live) await API.call('/logout'); } catch(e){}
     try { localStorage.removeItem('rtg_member_token'); } catch(e){}
     try { localStorage.removeItem('rtg_actieve_tab'); } catch(e){} // de volgende gast begint op het beginscherm
+    try { localStorage.removeItem('rtg_werktafel_pas'); } catch(e){} // en zijn pas reist niet mee naar de volgende
     /* En zijn werktafel staat leeg. Sinds WERELD.md hervat de werktafel je
        laatste bladen (shared/command/geheugen.js); zonder deze regel zou de
        volgende mens op een gedeeld toestel de titels van de vorige zien. */
@@ -571,8 +578,9 @@ var RTG_BOUW = '77a2d8f2';
     gate.setAttribute('data-i18n-ignore','');
     gate.innerHTML =
       '<section class="access-brand" aria-label="RTG">' +
-        '<div class="access-brand-head"><a href="https://www.rahultravelgroup.com/" aria-label="RTG website"><span translate="no">RTG</span></a>' +
-          '<button class="access-language" id="agLanguage" type="button" aria-label="Taal kiezen">NL</button></div>' +
+        '<div class="access-brand-head"><a href="https://www.rahultravelgroup.com/" aria-label="Rahul Travel Group website"><span translate="no">Rahul Travel Group</span></a>' +
+          '<span class="access-brand-actions"><button class="access-language" id="agLanguage" type="button" aria-label="Taal kiezen">NL</button>' +
+          '<button class="access-menu" id="agMenu" type="button" aria-label="RTG-menu openen"><i></i><i></i></button></span></div>' +
         '<div class="access-brand-copy"><small>' + 'VEILIGE TOEGANG' + '</small><p id="agBrandLine">Technologie voor het leven.</p></div>' +
         '<div class="access-system" aria-hidden="true"><i class="access-system-ring access-system-ring-one"></i><i class="access-system-ring access-system-ring-two"></i>' +
           '<span class="access-system-node access-system-personal"><b>Personal</b><em>Account</em></span>' +
@@ -857,6 +865,11 @@ var RTG_BOUW = '77a2d8f2';
     form.addEventListener('submit',event=>{event.preventDefault();submit();});
     el('agPasskey').addEventListener('click',passkeyLogin);
     el('agLanguage').addEventListener('click',()=>{ if (window.RTGi18n) RTGi18n.openModal(); });
+    el('agMenu').addEventListener('click',()=>{
+      const menu=document.querySelector('.rtg-adaptive-item[data-rtg-adaptive-action="menu"]');
+      if (menu) menu.click();
+      else if (window.RTGAdaptiveEdge) RTGAdaptiveEdge.setState('expanded');
+    });
     el('agAnders').addEventListener('click',()=>render('login',true));
     el('agNieuw').addEventListener('click',()=>{step=0;render('register',true);});
     el('agForgot').addEventListener('click',()=>render('forgot',true));
@@ -1999,7 +2012,7 @@ var RTG_BOUW = '77a2d8f2';
   }
   let iceConfig = null;
   // Elke oproep verse ICE-servers (TURN met kort geldige inloggegevens roteert).
-  async function haalIce(){ try { iceConfig = (await (await fetch('/api/ice')).json()).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
+  async function haalIce(){ try { iceConfig = (await API.call('/ice', {})).iceServers; } catch(e){ iceConfig = [{ urls:'stun:stun.l.google.com:19302' }]; } return iceConfig; }
   function maakPc(){
     const pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls:'stun:stun.l.google.com:19302' }] });
     call.stream.getTracks().forEach(t => pc.addTrack(t, call.stream));
@@ -2383,7 +2396,9 @@ var RTG_BOUW = '77a2d8f2';
      de console welke het was. */
   function vulTab(tab){
     const lijst = LADERS_PER_TAB[tab];
-    if (!lijst || gevuldeTabs[tab]) return;
+    /* Zonder account valt er niets te vullen: niet als gevuld markeren, anders
+       blijft de stand leeg als het account even later wel binnen is. */
+    if (!lijst || gevuldeTabs[tab] || !user) return;
     gevuldeTabs[tab] = true;
     // een gratis gebruiker heeft geen reizen, betalen, AI of assets: die
     // tabbladen staan voor hem verborgen, dus halen we er ook niets voor op.
@@ -2569,6 +2584,18 @@ var RTG_BOUW = '77a2d8f2';
         if (knop && knop.style.display !== 'none') beginTab = b.tab;
       }
     } catch(e){}
+    /* EEN ADRES MET EEN STAND (`#tab=salon`, of kort `#ai`): de sprong en
+       andere schermen sturen een lid zo naar een stand van deze app. Hier, en
+       niet met een timer ernaast: die drukte de knop soms vóór het account er
+       was, en dan bleef de stand leeg. Alleen een knop die de pas toont telt;
+       het adres wordt een keer gebruikt. */
+    const adres = /^#(?:tab=([a-z]+)|(ai))$/.exec(location.hash);
+    if (adres){
+      const stand = adres[1] || adres[2];
+      const knop = document.querySelector('.tabbar button[data-tab="' + stand + '"]');
+      if (knop && knop.style.display !== 'none') beginTab = stand;
+      try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+    }
     /* De tabbladen achter het beginscherm halen hun gegevens nu pas op als je
        ze opent -- zie LADERS_PER_TAB in ./app-main-12.js voor waarom, en wat
        er gemeten is. Hier blijven alleen de drie laders staan die aan geen
@@ -5459,27 +5486,10 @@ var RTG_BOUW = '77a2d8f2';
      milliseconden. De elementen dragen data-rtg-klok / data-rtg-datum. */
   if (window.RTGKlok) RTGKlok.alles();
 
-  /* Een app (zoals Balans) kan met #ai terugverwijzen naar de Rahul-chat:
-     na het opstarten openen we dan meteen de AI-tab. */
-  if (location.hash === '#ai') setTimeout(() => {
-    const t = tabKnop('ai');
-    if (t) t.click();
-  }, 600);
-
-  /* DEZELFDE AFSPRAAK, MAAR DAN VOOR ELKE STAND. De sprong (shared/sprong.js)
-     staat op elk scherm van het huis, ook op schermen die deze app niet laden.
-     Wil een lid daar naar een stand die IN deze app woont (Betalen, Salon,
-     Zorg), dan kan de sprong die knop niet indrukken -- hij staat er niet.
-     Hij stuurt dan hierheen met de stand in de hash, en wij drukken hem in.
-
-     Alleen een knop die er ECHT is: een stand die uw pas niet opent, staat
-     niet in de tabbalk, en dan gebeurt er niets. Zo kan een adres uit een
-     bericht nooit een tab openen die u niet hoort te hebben. */
-  const stand = /^#tab=(.+)$/.exec(location.hash);
-  if (stand) setTimeout(() => {
-    const t = tabKnop(decodeURIComponent(stand[1]));
-    if (t) t.click();
-  }, 600);
+  /* Een app (zoals Balans) die met #ai naar de Rahul-chat terugverwijst, en
+     elke stand met `#tab=...`: dat staat in
+     renderAll() (./app-main-12a.js): daar is het account er zeker, en daar
+     wordt al gekozen op welke stand de app opent. */
 
   /* ---------- batterij in de statusbalk, zoals op een telefoon ---------- */
   const bat = $('#osBat'), batVul = $('#osBatVul'), batPct = $('#osBatPct');
@@ -5769,6 +5779,18 @@ var RTG_BOUW = '77a2d8f2';
                                                  : { q, plafond: 'tonen' });
       if (r && r.pakte && r.antwoord) {
         zet(r.antwoord);
+        /* Het taakbeeld van de server onder het antwoord (EDGE.md par. 14.4):
+           wat Rahul begreep, voorstelt en wat er werkelijk gebeurde. */
+        const taak = r.taak && window.RTGEdgeTaakbeeld ? window.RTGEdgeTaakbeeld.teken(r.taak, document) : null;
+        if (taak && aiDraad) { taak.classList.add('os-bel', 'van-rahul'); aiDraad.appendChild(taak); aiDraad.scrollTop = aiDraad.scrollHeight; }
+        // een concept met bewerkbare velden wordt een werkstuk (shared/edge/conceptwerk.js, par. 14.6)
+        const c = r.taak && r.taak.concept, W = window.RTGEdgeConceptwerk;
+        if (W && c && c.bewerkbaar && aiDraad) {
+          const k = W.maak(c, document, { verstuur: (b) => API.call('/fluister/concept', b)
+            .then((x) => ({ status: 200, body: x }), (e) => ({ status: e.status || 0, body: e.data || {} })) });
+          k.element.classList.add('os-bel', 'van-rahul');
+          aiDraad.appendChild(k.element);
+        }
         if (r.gedaan) toast(T('fl.gedaan', 'Rahul heeft het geregeld.'));
         // een voorstel van Rahul krijgt hier dezelfde twee knoppen als in zijn app
         draadTips(r.voorstel
@@ -9050,7 +9072,7 @@ var RTG_BOUW = '77a2d8f2';
     const ov = document.createElement('div'); ov.className = 'zg-ov'; ov.id = 'zgOverlay';
     ov.innerHTML = '<div class="zg-card" role="dialog" aria-modal="true" aria-label="'+T('zg.titel','Toon je Zegel')+'">'+
       '<h3>'+T('zg.titel','Toon je Zegel')+'</h3>'+
-      '<div class="zg-sub">'+T('zg.sub','Bewijs een feit aan de zaak zonder je naam te tonen. RTG staat garant dat je paspoort is gezien.')+'</div>'+
+      '<div class="zg-sub">'+T('zg.sub','Bewijs een feit aan de zaak zonder je naam te tonen. Een leeftijd zit er alleen in als RTG je identiteitsbewijs heeft gezien.')+'</div>'+
       '<div id="zgKies">'+ ZG_CLAIMS.map((c,i) => '<label class="zg-opt"><input type="checkbox" data-claim="'+c.id+'"'+(i<1?' checked':'')+'><span>'+c.label+'</span></label>').join('') +
       '<button class="zg-btn" id="zgMaak">'+T('zg.toon','Toon mijn Zegel')+'</button>'+
       '<button class="zg-btn sec" id="zgAnnuleer">'+T('zg.annuleer','Annuleren')+'</button></div>'+
@@ -9068,7 +9090,12 @@ var RTG_BOUW = '77a2d8f2';
     catch(e){ toast(e.message); return; }
     const claims = d.claims || {};
     const bewezen = Object.keys(claims);
-    if (!bewezen.length){ toast(T('zg.geen','Geen van deze feiten kon worden bewezen voor jouw account.')); return; }
+    /* Een leeftijd die RTG niet heeft GEZIEN, gaat er niet in; de server zegt
+       waarom (nietBewezen). Die reden hoort het lid, anders lijkt een
+       ontbrekende 18+ op een storing. */
+    const nietReden = Object.values(d.nietBewezen || {})[0] || null;
+    if (!bewezen.length){ toast(nietReden || T('zg.geen','Geen van deze feiten kon worden bewezen voor jouw account.')); return; }
+    if (nietReden) toast(nietReden);
     // teken de QR met ruime foutcorrectie-marge (niveau L past de meeste combinaties
     // in een scanbare code); lukt het niet, vraag dan om minder feiten tegelijk
     let canvas;
@@ -9077,7 +9104,7 @@ var RTG_BOUW = '77a2d8f2';
     const labelVoor = k => k === 'pas' ? (T('zg.pas','Pas') + ': ' + claims[k]) : (ZG_CLAIMS.find(c => c.id === k) || {}).label || k;
     const kies = document.getElementById('zgKies'); if (kies) kies.style.display = 'none';
     const res = document.getElementById('zgResultaat');
-    res.innerHTML = '<div class="zg-qrwrap"><div class="zg-badge">\u{1F6E1} '+T('zg.geverifieerd','RTG-geverifieerd')+'</div>'+
+    res.innerHTML = '<div class="zg-qrwrap"><div class="zg-badge">\u{1F6E1} '+T('zg.geverifieerd','Ondertekend door RTG')+'</div>'+
       '<div class="zg-qr" id="zgQr"></div>'+
       '<div class="zg-claims">'+ bewezen.map(k => '<span class="zg-claim">✓ '+labelVoor(k)+'</span>').join('') +'</div>'+
       '<div class="zg-tel" id="zgTel"></div>'+

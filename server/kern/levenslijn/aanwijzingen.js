@@ -32,19 +32,8 @@ const TRAP_FASE = { po: 'basisschool', vo: 'middelbaar', mbo: 'studie', hbo: 'st
 
 module.exports = ({ kern }) => {
 
-  /* ---- GEBOORTE: het jaar uit het geverifieerde paspoort ----
-     Alleen het JAAR, en dat komt zo uit kern/paspoort.js: die module gaat over
-     paspoorten en geeft precies dit ene getal terug. Hier staat dus geen
-     kennis over waar het ledendossier ligt of hoe een sleutel eruitziet --
-     dezelfde afspraak als bij paspoortVervaldatumVan voor de levensgraaf.
-     Geen paspoort (een demo-persona, een gast): geen aanwijzing, en dan begint
-     de lijn gewoon later. Dat is eerlijker dan een geraden jaartal. */
-  function geboorte(key) {
-    const jaar = geldigJaar(kern.paspoortGeboortejaarVan(key));
-    if (jaar === null) return [];
-    return [aanwijzing({ fase: 'geboorte', staat: 'geweest', vanaf: jaar, bron: 'paspoort',
-      wat: 'geboortejaar ' + jaar + ' uit uw geverifieerde paspoort' })];
-  }
+  /* ---- GEBOORTE: het jaar en zijn herkomst, in ./geboorte.js ---- */
+  const geboorte = require('./geboorte')({ kern });
 
   /* ---- ONDERWIJS: het leerpaspoort (kern/onderwijs.js) ----
      Twee dingen komen hier vandaan: waar iemand NU staat, en elke overstap die

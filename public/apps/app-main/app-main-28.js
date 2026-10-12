@@ -117,27 +117,10 @@
      milliseconden. De elementen dragen data-rtg-klok / data-rtg-datum. */
   if (window.RTGKlok) RTGKlok.alles();
 
-  /* Een app (zoals Balans) kan met #ai terugverwijzen naar de Rahul-chat:
-     na het opstarten openen we dan meteen de AI-tab. */
-  if (location.hash === '#ai') setTimeout(() => {
-    const t = tabKnop('ai');
-    if (t) t.click();
-  }, 600);
-
-  /* DEZELFDE AFSPRAAK, MAAR DAN VOOR ELKE STAND. De sprong (shared/sprong.js)
-     staat op elk scherm van het huis, ook op schermen die deze app niet laden.
-     Wil een lid daar naar een stand die IN deze app woont (Betalen, Salon,
-     Zorg), dan kan de sprong die knop niet indrukken -- hij staat er niet.
-     Hij stuurt dan hierheen met de stand in de hash, en wij drukken hem in.
-
-     Alleen een knop die er ECHT is: een stand die uw pas niet opent, staat
-     niet in de tabbalk, en dan gebeurt er niets. Zo kan een adres uit een
-     bericht nooit een tab openen die u niet hoort te hebben. */
-  const stand = /^#tab=(.+)$/.exec(location.hash);
-  if (stand) setTimeout(() => {
-    const t = tabKnop(decodeURIComponent(stand[1]));
-    if (t) t.click();
-  }, 600);
+  /* Een app (zoals Balans) die met #ai naar de Rahul-chat terugverwijst, en
+     elke stand met `#tab=...`: dat staat in
+     renderAll() (./app-main-12a.js): daar is het account er zeker, en daar
+     wordt al gekozen op welke stand de app opent. */
 
   /* ---------- batterij in de statusbalk, zoals op een telefoon ---------- */
   const bat = $('#osBat'), batVul = $('#osBatVul'), batPct = $('#osBatPct');

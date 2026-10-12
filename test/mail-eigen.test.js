@@ -20,6 +20,7 @@
    echte DNS. Los: node --test test/mail-eigen.test.js */
 'use strict';
 const { test } = require('node:test');
+const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const net = require('node:net');
 const tls = require('node:tls');
@@ -287,7 +288,7 @@ test('mxVan: een domein zonder MX valt terug op het domein zelf (RFC 5321)', asy
   assert.equal(r[0].viaA, true, 'de terugval is als zodanig gemerkt, niet stilletjes');
 });
 
-test('bezorgen: STARTTLS met een onbekend certificaat faalt dicht', { skip: !TLS_OK }, async () => {
+test('bezorgen: STARTTLS met een onbekend certificaat faalt dicht', { skip: vereist('openssl', TLS_OK, 'openssl kon geen certificaat maken') }, async () => {
   const s = await nepMx({ starttls: true });
   try {
     const uit = await direct.bezorg({ van: 'post@rtg.test', naar: 'lid@voorbeeld.test',

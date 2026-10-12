@@ -1268,31 +1268,7 @@
       "url": "/apps/mijnmall.html"
     },
     {
-      "label": "Bijzonder",
-      "app": "Mijn leven",
-      "wereld": "LivingOS",
-      "url": "/apps/leven.html"
-    },
-    {
-      "label": "Buiten",
-      "app": "Mijn leven",
-      "wereld": "LivingOS",
-      "url": "/apps/leven.html"
-    },
-    {
       "label": "Laat Rahul kiezen",
-      "app": "Mijn leven",
-      "wereld": "LivingOS",
-      "url": "/apps/leven.html"
-    },
-    {
-      "label": "Nu open",
-      "app": "Mijn leven",
-      "wereld": "LivingOS",
-      "url": "/apps/leven.html"
-    },
-    {
-      "label": "Rustig",
       "app": "Mijn leven",
       "wereld": "LivingOS",
       "url": "/apps/leven.html"
@@ -1317,6 +1293,12 @@
     },
     {
       "label": "Mijn leerhuis",
+      "app": "Mijn loopbaan",
+      "wereld": "WorkOS",
+      "url": "/apps/loopbaan.html"
+    },
+    {
+      "label": "Mijn loopbaan downloaden",
       "app": "Mijn loopbaan",
       "wereld": "WorkOS",
       "url": "/apps/loopbaan.html"
@@ -2721,6 +2703,12 @@
     },
     {
       "label": "Iemand erbij",
+      "app": "RTMail",
+      "wereld": "WorkOS",
+      "url": "/apps/rtmail.html"
+    },
+    {
+      "label": "Instellingen",
       "app": "RTMail",
       "wereld": "WorkOS",
       "url": "/apps/rtmail.html"

@@ -3273,11 +3273,11 @@
       "type": "home",
       "icon": "house",
       "sections": [
-        "Maison Noire",
-        "Salon Privé",
-        "Chef aan huis"
+        "Mijn lijn",
+        "Ontdekken",
+        "Uw avond"
       ],
-      "description": "Uw huishouden, afspraken en kleine dagelijkse dingen.",
+      "description": "Uw levenslijn, en wat er vanavond kan.",
       "maturity": "L0"
     },
     {

@@ -131,7 +131,7 @@ function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer 
     if (!stuurSein) return;
     for (const d of g.deelnemers) {
       if (d === behalve) continue;
-      try { stuurSein(d, 'comm', Object.assign({ soort: event }, data)); } catch (e) {}
+      try { stuurSein(d, 'comm', Object.assign({ soort: event }, data), g); } catch (e) {}
     }
   }
 

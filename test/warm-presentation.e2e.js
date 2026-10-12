@@ -45,7 +45,7 @@ test('four worlds share the drawn desktop and mobile composition, and editor sav
       for(const width of [320,390,430]) {
         await page.setViewportSize({width,height:932});
         assert.equal(await page.locator('.wp-tabs').isVisible(),false,'mobile has one domain surface, without desktop accessory tabs');
-        assert.equal(await page.locator('.wd-home>.wp-scene').isVisible(),false,'the desktop scene must not duplicate the mobile home');
+        assert.equal(await page.locator('.wd-home>.wp-scene').isVisible(),true,'the shared cinematic world scene must remain the mobile lead');
         assert.equal(await page.locator('.rtg-adaptive-bar:visible').count(),1);
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,world+' '+width+' overflow');
         if(width===430)await page.screenshot({path:path.join(out,world+'-mobile.png')});

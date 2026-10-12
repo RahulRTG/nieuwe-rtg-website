@@ -110,4 +110,32 @@ function maakLidstand({ accounts, leeftijdVan = STD_LEEFTIJD, idVanKey = STD_SLE
   };
 }
 
-module.exports = { NIVEAUS, niveauVan, voldoet, bestaat, bronVan, maakLidstand };
+/* IS DE LEEFTIJD VAN DIT LID GEZIEN, en niet alleen opgegeven?
+
+   Drie dingen tegelijk: een eigen account, RTG heeft het document gezien (A3),
+   en de geboortedatum komt VAN dat document (`leeftijdBron === 'paspoort'`).
+   Het derde is niet overbodig naast het tweede: de keurder neemt de datum
+   optioneel over (routes/office/verificaties.js), en zonder die stap staat bij
+   een goedgekeurd paspoort nog steeds de datum die het lid zelf intypte.
+
+   Dit is de regel die het jeugdbestuur al hanteerde (vertegenwoordiging/
+   jeugd.js) en die het RTG Zegel NIET hanteerde: dat ondertekende 18+ op elke
+   geboortedatum, ook een opgegeven, en ook die van een demo-persona zonder
+   account -- terwijl de partner las dat RTG garant stond. Een poort die een
+   leeftijd naar BUITEN draagt, leest deze functie; een tweede kopie van de
+   vergelijking loopt uiteen zodra er een bron bij komt.
+
+   `waaromNiet` geeft de reden in gewone taal, of null als het gezien is. */
+function leeftijdGezien(st) {
+  return !!(st && st.account && voldoet(st.niveau, 'A3') &&
+    st.leeftijdBron === 'paspoort' && st.leeftijd != null);
+}
+function waaromLeeftijdNietGezien(st) {
+  if (leeftijdGezien(st)) return null;
+  if (!st || !st.account) return 'Een leeftijd bewijzen kan alleen met een eigen RTG-account.';
+  if (!voldoet(st.niveau, 'A3')) return 'RTG heeft je identiteitsbewijs nog niet gecontroleerd. Laat het controleren om je leeftijd te kunnen bewijzen.';
+  if (st.leeftijdBron !== 'paspoort') return 'Je geboortedatum staat nog zoals je hem zelf opgaf. RTG neemt de datum van je identiteitsbewijs over bij de controle.';
+  return 'Er is geen geboortedatum bekend.';
+}
+
+module.exports = { NIVEAUS, niveauVan, voldoet, bestaat, bronVan, maakLidstand, leeftijdGezien, waaromLeeftijdNietGezien };

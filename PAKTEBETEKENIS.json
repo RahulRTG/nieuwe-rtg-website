@@ -8,7 +8,7 @@
     "node": "v22.22.2"
   },
   "soort": "meting",
-  "uitleg": "Hoeveel ONDERSCHEIDEN betekenissen draagt de boolean `pakte` van kern/fluister/gesprek.js, gemeten aan een echte server. De poort die erop beslist staat in server/routes/member/persoonlijk-rahul.js:66.",
+  "uitleg": "Hoeveel ONDERSCHEIDEN betekenissen draagt de boolean `pakte` van kern/fluister/gesprek.js, gemeten aan een echte server. De poort die erop beslist staat in server/routes/member/persoonlijk-rahul.js:68.",
   "grens": "Vijf dingen die dit NIET zegt. (0) EFFECT_BEREIKT kent DRIE uitkomsten: bewezen wel, bewezen niet, en ONBEPAALD. Dat laatste is geen slordigheid maar de uitslag zelf -- `fluister` draagt het gespreksgeheugen EN de weetjes van het lid in EEN collectie, dus \"ik onthield deze beurt\", \"ik sloeg jouw weetje op\" en \"ik wiste al je gegevens\" zien er op dit meetniveau identiek uit. Lezen van de code zegt dat onthoud en vergeet wel degelijk muteren; dat is graad `vermoed` en staat hier bewust niet als `gemeten`. (1) TAAL_BEGREPEN is AFGELEID uit het antwoord en niet uit de handler zelf -- graad `vermoed`, de andere vijf zijn gemeten. (2) De opslagvloer komt van EEN ijkzin per stand; een antwoord dat toevallig meer gespreksgeheugen wegschrijft, zou als effect kunnen lezen. (3) server/effectmeter.js telt met opzet geen bestandsschrijfacties en geen externe aanroepen -- die staan in `effectNietGemeten` en niet als nul. (4) Dit is het corpus van EEN route (/api/fluister); over /api/ai en /api/chat/send zegt het niets.",
   "basislijn": {
     "zonder-model": [

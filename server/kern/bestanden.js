@@ -126,6 +126,7 @@ function maakBestanden({ db, save, bijeen, inBundel, bewerkCollectie, store, cry
     return mis || { id: it.id, documentVersion: require('./document-contracten').versie(it), bytes: it.bytes };
   }
 
+  const { poort: officeUitgang } = require('./office/uitgangspoort');
   const wijzig = require('./bestanden-metadata')({ bord, bewerkCollectie, schoonNaam, nu });
 
   /* ---- de lijst: het hele bord in een keer, plus de Office-spiegel ---- */
@@ -143,7 +144,9 @@ function maakBestanden({ db, save, bijeen, inBundel, bewerkCollectie, store, cry
     }
     // RTG Office-documenten als alleen-lezen spiegel: kijken kan hier, werken doet u daar
     const office = Object.values(db.data.officeDocs || {}).filter(d => d.key === key)
-      .map(d => ({ id: d.id, titel: d.titel, soort: d.soort, gewijzigd: d.gewijzigd || d.gemaakt }));
+      .map(d => ({ id: d.id, titel: d.titel, soort: d.soort, gewijzigd: d.gewijzigd || d.gemaakt,
+        // ook de spiegel is een uitgang: de classificatie reist mee (kern/office/uitgangspoort.js)
+        classificatie: officeUitgang(d, 'spiegel').classificatie }));
     return { mappen: b.mappen, items: eigen, gedeeld, office,
       gebruik: gebruik(key), quotum: QUOTUM };
   }

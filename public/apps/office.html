@@ -331,6 +331,10 @@
      die dubbele chrome weg; zelfstandig blijft RTG Office ongewijzigd. */
   html[data-rtg-oppervlak="1"] .kop{display:none !important;}
   html[data-rtg-oppervlak="1"] body{padding-bottom:0;}
+/* De formaatkeuze van exporteren (#582): klassen en geen inline stijl. */
+#formaatKeuze{display:flex;flex-wrap:wrap;gap:.5rem}
+#formaatTrouw{margin:.75rem 0 0;padding-left:1.1rem}
+.formaat-voet{display:flex;gap:.5rem;margin-top:.75rem}
 </style>
 <link href="/apps/office/enterprise.css?v=enterprise3" rel="stylesheet">
 <link href="/apps/office/presentation-enterprise.css?v=enterprise1" rel="stylesheet">
@@ -400,6 +404,8 @@
       <button class="nieuwe" id="nieuwFormulier" type="button"><span data-glyf="opties"></span><span>Formulier<small>Vragen en antwoorden</small></span></button>
       <button class="nieuwe" id="nieuwSchets" type="button"><span data-glyf="ontwerp"></span><span>Schets<small>Diagram met kaders en pijlen</small></span></button>
       <button class="nieuwe" id="nieuwBord" type="button"><span data-glyf="agenda"></span><span>Bord<small>Lijsten met kaarten, samen plannen</small></span></button>
+      <button class="nieuwe" id="inleesXlsx" type="button"><span data-glyf="grafiek"></span><span>XLSX inlezen<small>Een Excel-werkblad als nieuw rekenblad</small></span></button>
+      <input type="file" id="inleesBestand" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
       <div class="sec">Sjablonen</div>
       <div id="sjablonen"></div>
     </aside>
@@ -593,6 +599,18 @@
     <div style="display:flex;gap:.5rem;">
       <button class="knop vol" id="aiToepas" type="button" style="display:none;">Voeg toe aan het document</button>
       <button class="knop" id="aiDicht" type="button">Sluit</button>
+    </div>
+  </div>
+</div>
+<!-- in en uit: het formaat kiezen, en zien wat er niet meekwam -->
+<div class="scrim" id="formaatScrim" role="dialog" aria-label="Exporteren">
+  <div class="paneel">
+    <h3 id="formaatKop">Exporteren</h3>
+    <p class="stil" id="formaatUitleg">Het bestand draagt de classificatie van dit document, en het documentspoor noteert de export.</p>
+    <div id="formaatKeuze"></div>
+    <ul id="formaatTrouw" class="stil"></ul>
+    <div class="formaat-voet">
+      <button class="knop" id="formaatDicht" type="button">Sluit</button>
     </div>
   </div>
 </div>

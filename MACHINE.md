@@ -74,12 +74,12 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->4074<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->4130<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
 |---|---|---|---|
-| bewijsDraagt (proof-carrying) | 1 | <!--getal:machine.bewijsDraagt-->20<!--/getal--> | `kern/commercie/bewijstoken.js` |
+| bewijsDraagt (proof-carrying) | 1 | <!--getal:machine.bewijsDraagt-->21<!--/getal--> | `kern/commercie/bewijstoken.js` |
 | beleid (veiligheidskern) | 0 | 15 | `kern/commercie/veiligheidskern.js` |
 | gevolg (wat raakt dit aan) | 0 | 0 | `kern/stuur/gevolg.js` |
 | bewijsstand (bewezen) | 0 | 0 | `VERTROUWEN.json` |
@@ -93,10 +93,10 @@ aantal routes dat hem raakt (`handler` / `bestand`):
 | assurance (passkey, stap-op) | 2 | 49 | `kern/identiteit/vertrouwen.js` |
 | frictie | 2 | 98 | `kern/frictie/motor.js` |
 | simulatie | 10 | 103 | `kern/command/simulatie.js` |
-| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->213<!--/getal--> | `kern/envelop.js` |
+| envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->246<!--/getal--> | `kern/envelop.js` |
 | idempotentie | 13 | 114 | `lib/idem-poort.js` |
 | aiVindbaar | 173 | 173 | `kern/stuur/beleid.js` |
-| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->313<!--/getal--> | `kern/kantoor/kluispoort.js` |
+| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->324<!--/getal--> | `kern/kantoor/kluispoort.js` |
 | herhaling (beschermd) | 1675 | 1675 | `IDEMPROEF.json` |
 
 Vier assen staan als **ongemeten met een reden** en nooit als 0: doelvindbaarheid
@@ -105,7 +105,7 @@ Vier assen staan als **ongemeten met een reden** en nooit als 0: doelvindbaarhei
 per handeling (hangt aan een async-context, niet aan een route).
 
 **De vierde teller, en hij gaat de andere kant op.** `volledigeKetens` staat op
-<!--getal:machine.volledigeKetens-->1<!--/getal-->. De twee tellers hieronder zijn
+<!--getal:machine.volledigeKetens-->3<!--/getal-->. De twee tellers hieronder zijn
 SCHULDEN en mogen alleen dalen; deze is een BEZIT en mag alleen stijgen -- en dat
 is een andere vraag dan "hoeveel routes raken een motor". Een keten heet volledig
 wanneer élke as die zijn handelingsklasse verplicht stelt, werkelijk op de routes
@@ -115,8 +115,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2690<!--/getal--> van de
-   <!--getal:machine.muterend-->4074<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2714<!--/getal--> van de
+   <!--getal:machine.muterend-->4130<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 
    **Let op de noemer: die is op 14 september 2026 verschoven, en een ronde van
@@ -221,9 +221,9 @@ afgehandeld (**World Model** is bezet met zes betekenissen en heet hier
 levensgraaf, **Capability Mesh** half, **Trust Kernel** half, **Intent Engine**
 vrij, **Situation** let op); die worden hier niet herhaald. Dit zijn de zeven die
 uit de uitvoeringskant komen. `SEMANTIEK.json` meet dat dit huis
-<!--getal:semantiek.namen-->131<!--/getal--> namen in meer dan één domein heeft,
-waarvan <!--getal:semantiek.betekenissen-->113<!--/getal--> met meer dan één
-betekenis (samen <!--getal:semantiek.betekenissenTotaal-->424<!--/getal-->
+<!--getal:semantiek.namen-->132<!--/getal--> namen in meer dan één domein heeft,
+waarvan <!--getal:semantiek.betekenissen-->114<!--/getal--> met meer dan één
+betekenis (samen <!--getal:semantiek.betekenissenTotaal-->427<!--/getal-->
 betekenissen).
 
 1. **`envelop`** — bezet en gesloten (zie par. 2).
@@ -338,7 +338,7 @@ betekenissen).
 - **Routes als bijproduct.** Kan pas als de capability-laag is **afgeleid**;
   `OBJECTMODEL.json` (71% van de velden hoort bij één domein) en
   `KETENVORM.json` (<!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-  <!--getal:ketenvorm.actorenTotaal-->33<!--/getal--> gedeelde actoren over drie
+  <!--getal:ketenvorm.actorenTotaal-->39<!--/getal--> gedeelde actoren over drie
   ketens) zeggen dat een model eroverheen de `Asset`-fout is.
 
 ---

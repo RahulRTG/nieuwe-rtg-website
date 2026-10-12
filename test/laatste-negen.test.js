@@ -30,7 +30,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stroomAdres } = require('./helper');
 
 let srv, base, zaak, lid, G, kindHandle;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-laatste-'));
@@ -82,14 +82,19 @@ test('1. een open verbinding is nog steeds een deur', async () => {
   /* Wat hier te toetsen valt is de deur, niet de stroom. Een SSE-verbinding
      stuurt pas iets als er iets gebeurt; een toets die op inhoud wacht toetst
      de klok en niet de code. */
-  assert.equal((await stroom('/api/supplier/stream')).status, 401, 'zonder token');
-  assert.equal((await stroom('/api/supplier/stream?token=verzonnen')).status, 401, 'met een verzonnen token');
-  assert.equal((await stroom('/api/supplier/stream?token=' + lid)).status, 401,
-    'met het token van een LID: geldig, maar niet van een zaak');
+  assert.equal((await stroom('/api/supplier/stream')).status, 401, 'zonder ticket');
+  assert.equal((await stroom('/api/supplier/stream?ticket=ST.' + '0'.repeat(32))).status, 401, 'met een verzonnen ticket');
+  assert.equal((await stroom('/api/supplier/stream?token=' + zaak)).status, 401,
+    'het GELDIGE token van de zaak in de URL: een sessie hoort niet in een adres');
+  const ruil = (soort, tok) => fetch(base + '/api/stroom/ticket', { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ stroom: soort }) });
+  assert.equal((await ruil('zaak', lid)).status, 401, 'met het token van een LID: geldig, maar niet van een zaak');
 
-  const open = await stroom('/api/supplier/stream?token=' + zaak);
+  const adres = await stroomAdres(base, '/api/supplier/stream', zaak, { stroom: 'zaak' });
+  const open = await stroom(adres.slice(base.length));
   assert.equal(open.status, 200, 'de zaak zelf komt er wel in');
   assert.match(open.type, /text\/event-stream/, 'en krijgt een stroom, geen antwoord');
+  assert.equal((await stroom(adres.slice(base.length))).status, 401, 'en hetzelfde ticket is daarna op');
 });
 
 test('2. de leskamer en het gezinskanaal doen hetzelfde bij de deur', async () => {

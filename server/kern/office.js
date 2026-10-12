@@ -26,8 +26,13 @@ function maakOffice(state) {
 }
 
 function platteNamen(state, basis) {
+  const docs = require('./office/docs')(state, basis);
+  // in en uit (XLSX, DOCX, ...) langs de uitgangspoort; inlezen maakt een nieuw blad via `maak`
+  const formaten = require('./office/formaten')(state, basis);
   return {
-    ...require('./office/docs')(state, basis),
+    ...docs,
+    officeExporteer: (key, did, data, kring) => formaten.exporteer(key, did, data, kring),
+    officeImporteer: (key, data, kring) => formaten.importeer(key, data, kring, docs.officeMaak),
     ...require('./office/delen')(state, basis),
     ...require('./office/formulier')(state, basis),
     ...require('./office/workflow')(state, basis),
@@ -59,7 +64,7 @@ const PAKKETNAMEN = {
   deel: 'officeDeel', kring: 'officeKring', ai: 'officeAI', vul: 'officeVul',
   uitslag: 'officeUitslag', fase: 'officeFase', samen: 'officeSamen',
   aanwezig: 'officeAanwezig', opmerking: 'officeOpmerking', beheer: 'officeBeheer',
-  beheerVan: 'officeBeheerVan'
+  beheerVan: 'officeBeheerVan', exporteer: 'officeExporteer', importeer: 'officeImporteer'
 };
 
 function alsPakket(plat) {

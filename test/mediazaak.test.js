@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stroomAdres } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mediazaak-'));
 let srv, base, office;
@@ -143,12 +143,13 @@ test('4. DE BYTES zitten achter de deur, niet alleen de lijst', async () => {
   /* Dit is de toets die telt. Een interne bibliotheek die alleen uit de lijsten
      is weggelaten, is geen interne bibliotheek: wie het video-id heeft haalt de
      beelden dan gewoon op met een link. */
-  const mag = await fetch(base + '/api/theater/kijk/' + videoId + '?token=' + collega.token);
+  const kijk = tok => stroomAdres(base, '/api/theater/kijk/' + videoId, tok, { stroom: 'theater-kijk', id: videoId }).then(a => fetch(a));
+  const mag = await kijk(collega.token);
   assert.equal(mag.status, 200, 'de collega krijgt beeld');
 
-  const nietMag = await fetch(base + '/api/theater/kijk/' + videoId + '?token=' + vreemde.token);
+  const nietMag = await kijk(vreemde.token);
   assert.equal(nietMag.status, 404, 'de buitenstaander niet -- ook niet met het id');
-  const nooit = await fetch(base + '/api/theater/kijk/' + videoId + '?token=' + buiten.token);
+  const nooit = await kijk(buiten.token);
   assert.equal(nooit.status, 404);
 
   // en reageren of melden op iets wat voor jou niet bestaat, kan ook niet

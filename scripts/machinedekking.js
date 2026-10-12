@@ -282,7 +282,14 @@ const KETENAS_TOKENS = {
   gevolgcontract: ['geldketen', 'gevolgcontract', 'gevolgpoort'],
   frictie: ['geldketen', 'frictie'],
   idempotentie: ['geldketen', 'idem', 'sleutel'],
-  atomair: ['verzoektransactie', 'collectietransactie', 'metTransactie'],
+  /* `uitvoerbelofte` STAAT HIER OM DEZELFDE REDEN ALS BIJ `hervatbaar`: het is de
+     bedrading van de as. kern/kantoor/geldketen/weging.js legt die belofte op `atomair`
+     of op `hervatbaar`, afhankelijk van de klasse -- dus wie hem alleen bij de een
+     telde, liet een geld-eenmalig-keten (de reisteruggave, 11 oktober 2026) op een as
+     open staan die hij wel aansluit. Zoals overal hier is dit een woord en geen gedrag:
+     of de belofte klopt, toetst test/reisteruggave.test.js (een deel, graad in het
+     dossier), niet deze meter. */
+  atomair: ['verzoektransactie', 'collectietransactie', 'metTransactie', 'uitvoerbelofte'],
   mensbewijs: ['kluisAuth', 'naamAuth', 'boardroomAuth'],
   uitvoering: ['geldketen', 'ketenlaag.uitvoer', 'voerUit'],
 };

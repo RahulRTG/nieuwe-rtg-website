@@ -163,7 +163,16 @@ function maakCommCollega({ db, save, comm }) {
     return m ? oudeVorm(m) : null;
   }
 
-  return { gesprek, stuur, berichten, markeerGelezen, ongelezen, laatste, oudeVorm, sleutelVan };
+  /* Hebben BEIDE in dit gesprek geschreven? Dat is de kleinste toegestane
+     communicatiecontext voor de online-stip (besluit C1): een gesprek dat een
+     kant alleen opende, is geen context -- anders is de stip met een bericht af
+     te dwingen. */
+  function wederkerig(code, mij, ander) {
+    const wie2 = new Set(comm.berichtenVan(gesprek(code, mij, ander).id).filter((m) => !m.weg).map((m) => String(nummerVan(m.van))));
+    return wie2.has(String(mij)) && wie2.has(String(ander));
+  }
+
+  return { gesprek, stuur, berichten, markeerGelezen, ongelezen, laatste, wederkerig, oudeVorm, sleutelVan };
 }
 
 module.exports = { maakCommCollega };

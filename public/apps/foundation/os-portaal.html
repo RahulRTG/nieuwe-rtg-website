@@ -172,7 +172,8 @@ function toonGemeente(r) {
       stat(b.vrijwilligers, 'vrijwilligers') + stat(Math.round(b.vrijwilligersuren), 'vrijwilligersuren') +
       stat(b.hulpvragen, 'hulpvragen') + stat(b.hulpvragenOpen, 'nog open') + '</div></div>' +
     '<div class="kaart"><div class="sec">Buurten</div>' +
-      (b.buurten.length ? b.buurten.map(x => '<div class="lijnrij"><span class="naam">' + esc(x.wijk) + '</span><span class="pil">' + x.aantal + '</span></div>').join('')
+      (b.buurten.length ? b.buurten.map(x => '<div class="lijnrij"><span class="naam">' + esc(x.wijk) + '</span><span class="pil">' + (x.aantal === null ? 'niet getoond' : x.aantal) + '</span></div>' +
+        (x.onderdrukt || x.complementair ? '<div class="uitleg">' + esc(x.onderdrukt || x.complementair) + '</div>' : '')).join('')
         : '<div class="leeg">Nog geen buurten geregistreerd.</div>') + '</div>' +
     '<div class="kaart"><div class="sec">Soorten hulpvraag</div>' +
       (Object.keys(b.perSoort).length ? Object.entries(b.perSoort).map(([s, n]) =>

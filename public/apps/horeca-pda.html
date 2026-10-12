@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
 <script src="/shared/id.js"></script>
+<script src="/shared/stroom.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTG Horeca: PDA Service</title>
@@ -18,7 +19,7 @@
   /* PDA SERVICE. Een hand, staand, in beweging, in een donkere zaak. Dat is een
      andere vorm dan een tablet aan de pas -- geen kolommen, geen tabel, en geen
      enkel raakvlak onder 44 pixels (HORECA.md, de vorm per werkplek). */
-  :root{--pda-lijn:var(--rtg-line);--pda-kaart:var(--rtg-card);--pda-txt:var(--rtg-txt);
+  :root,body{--pda-lijn:var(--rtg-line);--pda-kaart:var(--rtg-card);--pda-txt:var(--rtg-txt);
         --pda-stil:var(--rtg-soft);--pda-accent:#C23A5E;}
   body.rtg-stijl main#main{padding:0 max(.7rem,env(safe-area-inset-left)) 5rem;}
   .pda-modi{display:flex;gap:.35rem;padding:.5rem 0;position:sticky;top:0;z-index:5;

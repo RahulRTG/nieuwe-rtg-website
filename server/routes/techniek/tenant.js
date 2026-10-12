@@ -21,6 +21,13 @@ const { log } = require('../../log');
 module.exports = (tctx) => {
   const { app, accounts, techAuth, eigenaarAlleen, kern } = tctx;
 
+  /* WIE TEKENT, en alleen uit de SESSIE (11 oktober 2026). Contract,
+     levensloop, bewaringsplicht en vernietigen lazen hier `b.door || wie(req)`:
+     een `door` in het lijf ging VOOR de ingelogde mens, zodat het logboek van
+     een tenant (en het vernietigingsbewijs) een getypte naam kon dragen. Een
+     opgegeven naam is geen actor (AUTHORITY.md P0b); `door` in het lijf wordt
+     genegeerd. Kan de kluis geen naam geven, dan is het null -- en weigert
+     vernietigen ("wie tekent"), in plaats van een verzonnen naam te nemen. */
   const wie = (req) => {
     try { return req.techUser ? accounts.realNameOf(req.techUser) : null; }
     catch (e) { return null; }
@@ -69,7 +76,7 @@ module.exports = (tctx) => {
       return c ? res.json({ ok: true, contract: c, pakketten: T().contract.PAKKETTEN })
         : res.status(404).json({ error: 'Die tenant kennen we niet.' });
     }
-    const uit = T().contract.zet(b.org, { ...b, door: b.door || wie(req) });
+    const uit = T().contract.zet(b.org, { ...b, door: wie(req) });
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     log.info('tenant contract', { org: String(b.org || '').toUpperCase(), pakket: uit.contract.pakket, door: wie(req) });
     res.json(uit);
@@ -87,7 +94,7 @@ module.exports = (tctx) => {
       const s = T().levensloop.stand(b.org);
       return s ? res.json({ ok: true, levensloop: s }) : res.status(404).json({ error: 'Die tenant kennen we niet.' });
     }
-    const uit = T().levensloop.zet(b.org, { ...b, door: b.door || wie(req) });
+    const uit = T().levensloop.zet(b.org, { ...b, door: wie(req) });
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     log.warn('tenant levensloop', { org: String(b.org || '').toUpperCase(), naar: b.naar, door: wie(req) });
     res.json(uit);
@@ -95,7 +102,7 @@ module.exports = (tctx) => {
 
   app.post('/api/techniek/tenant/bewaringsplicht', techAuth, eigenaarAlleen, (req, res) => {
     const b = req.body || {};
-    const uit = T().levensloop.houdVast(b.org, b.aan !== false, b.reden, b.door || wie(req));
+    const uit = T().levensloop.houdVast(b.org, b.aan !== false, b.reden, wie(req));
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     log.warn('tenant bewaringsplicht', { org: String(b.org || '').toUpperCase(), aan: b.aan !== false, door: wie(req) });
     res.json(uit);
@@ -106,7 +113,7 @@ module.exports = (tctx) => {
      aanroeper mist. */
   app.post('/api/techniek/tenant/vernietig', techAuth, eigenaarAlleen, (req, res) => {
     const b = req.body || {};
-    const uit = T().levensloop.vernietig(b.org, { door: b.door || wie(req) });
+    const uit = T().levensloop.vernietig(b.org, { door: wie(req) });
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     log.warn('tenant vernietigd', { org: String(b.org || '').toUpperCase(), door: wie(req),
       werkruimtes: uit.bewijs.werkruimtes.length });

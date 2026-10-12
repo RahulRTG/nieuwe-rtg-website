@@ -45,7 +45,9 @@ app.post('/api/supplier/team/message', supplierAuth, (req, res) => {
 
 /* De live-stroom van de zaak staat in ./supplier/stroom.js, met de keuring per
    bericht (AUTHORITY.md fase 3). */
-require('./supplier/stroom')(kern, (code) => (db.data.supplierNotifications[code] || []).filter(n => !n.read));
+// de ongelezen meldingen voor DEZE kijker (kern/leverancier/personeelzicht.js), niet voor de zaak
+const personeelzicht = require('../kern/leverancier/personeelzicht');
+require('./supplier/stroom')(kern, (code, kijker) => personeelzicht.meldingenVoor(db.data.supplierNotifications[code], kijker).filter(n => !n.read));
 
 app.post('/api/supplier/state', supplierAuth, (req, res) => res.json({ state: supplierState(req.supplier, req.actor) }));
 
@@ -121,11 +123,12 @@ app.post('/api/supplier/tijdzone', supplierAuth, (req, res) => {
    dezelfde grens als de live stroom hierboven, maar nu ook voor het scherm dat
    opent voordat de eerste SSE-melding binnenkomt. */
 app.post('/api/supplier/notifications', supplierAuth, (req, res) => {
-  res.json({ notifications: (db.data.supplierNotifications[req.supplier.code] || []).slice(0, 40) });
+  res.json({ notifications: personeelzicht.meldingenVoor(db.data.supplierNotifications[req.supplier.code], req.actor).slice(0, 40) });
 });
 
 app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
-  (db.data.supplierNotifications[req.supplier.code] || []).forEach(n => n.read = true);
+  // de gelezen-vlag van een beperkte melding is per lezer (kern/leverancier/personeelzicht.js)
+  (db.data.supplierNotifications[req.supplier.code] || []).forEach(n => personeelzicht.meldingGelezen(n, req.actor));
   save();
   res.json({ ok: true });
 });

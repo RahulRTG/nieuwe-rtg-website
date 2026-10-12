@@ -4,7 +4,8 @@
    routes waarmee een mens ze beheert.
 
    - /gezin/code/roteer: de BEHEERDER maakt een nieuwe gezinscode. Die staat een
-     keer in dit antwoord; de vorige opent daarna niets meer. Zo krijgt een gezin
+     keer in dit antwoord; de vorige opent daarna niets meer. Dezelfde
+     idempotentiesleutel nog eens roteert NIET opnieuw (409, `herhaald`). Zo krijgt een gezin
      van voor B18 (zes tekens) ook zijn eerste echte gezinscode -- er wordt niets
      stil omgezet.
    - /gezin/code/intrek: de beheerder trekt de gezinscode in zonder een nieuwe.
@@ -32,9 +33,15 @@ module.exports = (ctx) => {
   router.post('/gezin/code/roteer', async (req, res) => {
     const g = gezinVan(req, res); if (!g) return;
     const b = beheerderVan(g, req, res); if (!b) return;
+    /* De sleutel uit het lijf (`idem`) of de Idempotency-Key-kop, zoals kern/meet.js.
+       Een herhaling roteert niet opnieuw en toont de code niet nog eens: 409 met
+       `herhaald` en de stand, dus de code die de beheerder net deelde blijft gelden. */
+    const idem = String((req.body && req.body.idem) || (req.get && req.get('idempotency-key')) || '');
     let raw;
-    try { raw = await gezinscode.geef(g, b.id); } catch (e) { return res.status(503).json({ error: 'De gezinscode kon nu niet worden vastgelegd. Probeer het zo opnieuw.' }); }
+    try { raw = await gezinscode.geef(g, b.id, { idem }); } catch (e) { return res.status(503).json({ error: 'De gezinscode kon nu niet worden vastgelegd. Probeer het zo opnieuw.' }); }
     geenCache(res);
+    if (raw && raw.herhaald) return res.status(409).json({ herhaald: true, status: gezinscode.publiek(g.code),
+      error: 'Deze nieuwe gezinscode is al eenmalig getoond en wordt niet herhaald; hij blijft gelden. Maak een nieuwe als hij kwijt is.' });
     res.json({ ok: true, gezinscode: raw, status: gezinscode.publiek(g.code),
       let: 'Deze code staat alleen hier. Bewaar hem; de vorige gezinscode opent niets meer.' });
   });

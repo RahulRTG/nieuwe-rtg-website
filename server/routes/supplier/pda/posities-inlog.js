@@ -28,7 +28,16 @@
    stap mee en telt alleen als het lid daar werkt. Zonder tweede factor
    verandert er niets.
 
+   DE REM OP HET WACHTWOORD IS DIE VAN DE GEWONE INLOG (N28 van de V1-audit,
+   besluit van de eigenaar). Stap een remde alleen per ADRES ('mijn:'+adres),
+   dus dertig foute wachtwoorden op een account vanaf dertig adressen werden niet
+   geremd, en wat hier gegokt werd telde bij /api/auth/login niet mee. Nu
+   dezelfde drie emmers op dezelfde namen (../../../kern/identiteit/wachtwoordrem.js):
+   adres plus account (10), het adres (50) en het account (25, een vertraging en
+   geen slot). Een gok op deze deur telt dus ook op de andere, en andersom.
+
    Afgesplitst uit ./posities.js toen de tweede stap erbij kwam. */
+const { maakWachtwoordRem } = require('../../../kern/identiteit/wachtwoordrem');
 /* `werk` draagt de twee hulpjes van ./posities.js (posities en antwoord). Los
    van de context en niet uitgepakt: het zijn geen namen uit de kern, en naast
    de context uitgepakt zouden ze er wel zo uitzien, ook voor scripts/grenzen.js. */
@@ -42,6 +51,7 @@ module.exports = (ictx, werk) => {
   if (!tweefactor || typeof tweefactor.inlogPoort !== 'function' || !rem) {
     throw new Error('pda/posities-inlog: zonder tweefactor.inlogPoort en zijn rem kan deze deur de tweede factor niet vragen');
   }
+  const wachtwoordRem = maakWachtwoordRem({ tooManyTries, noteFailedTry, loginFails });
   const DOEL = 'werk2';
   const ONJUIST = 'Onjuiste RTG-inloggegevens. Log in met uw eigen RTG-account.';
 
@@ -62,7 +72,7 @@ module.exports = (ictx, werk) => {
     const start = posities.find(p => p.code === voorkeur) || posities[0];
     const antwoord = werk.antwoord(start, lid.id, posities);
     if (!antwoord.token) return res.status(401).json({ error: 'Uw persoonlijke RTG-account is niet meer actief.' });
-    logActivity(start.code, { name: start.persoon }, start.persoon + ' logde in (RTG-account)');
+    logActivity(start.code, { name: start.persoon, staffId: start.staffId }, start.persoon + ' logde in (RTG-account)', 'klok-inlog');
     res.json(Object.assign(antwoord, extra || {}));
   }
 
@@ -85,15 +95,16 @@ module.exports = (ictx, werk) => {
 
   app.post('/api/supplier/mijn/login', async (req, res) => {
     if (req.body && req.body.bewijs) return tweedeStap(req, res);
-    const bucket = 'mijn:' + req.ip;
-    if (tooManyTries(res, bucket)) return;
-    const lid = accounts.findByLogin(req.body.login);
+    const login = req.body.login;
+    // eerst opzoeken: de emmers hangen aan het account, niet aan de getikte naam
+    const lid = accounts.findByLogin(login);
+    if (wachtwoordRem.dicht(res, req.ip, login, lid)) return;
     if (!lid || (accounts.isActief && !accounts.isActief(lid)) ||
         !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
-      noteFailedTry(bucket, req.ip);
+      await wachtwoordRem.mis(req.ip, login, lid);   // afwachten: daar zit de vertraging
       return res.status(401).json({ error: ONJUIST });
     }
-    loginFails.delete(bucket);
+    wachtwoordRem.gelukt(req.ip, login, lid);
     // de poort staat VOOR de werkplekken en de sessie: eronder was hij een mededeling
     const tweede = tweefactor.inlogPoort(lid, DOEL);
     if (tweede) return res.json(tweede);

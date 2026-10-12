@@ -6,6 +6,7 @@
    Alles achter de leverancier-inlog; het adres komt uit de sessie, nooit uit
    de body -- zo kan niemand in het postvak van een ander kijken. */
 const { nu: klokNu } = require('../lib/klok');
+const { magKlokZien } = require('../kern/leverancier/logboekzicht');
 
 module.exports = (kern) => {
   const { app, supplierAuth, auth, rtmail, codenaamVan, automatisering, db } = kern;
@@ -17,9 +18,15 @@ module.exports = (kern) => {
   // het lid-adres: de codenaam van het account (privacy by design)
   const lidCodenaam = wie.lidCodenaam;
 
+  /* BEPERKTE POST (werving) staat op de leidingsplek naast het zaakpostvak
+     (kern/rtmail-leiding.js), niet in het postvak zelf; alleen een MANAGER leest
+     hem hier mee. Een medewerker ziet hem dus nergens, ook niet als aantal. */
+  const manager = (req) => magKlokZien(req.actor);
   app.post('/api/supplier/rtmail/inbox', supplierAuth, (req, res) => {
-    const adres = adresVan(req);
-    res.json({ adres, ongelezen: rtmail.ongelezen(adres), berichten: rtmail.postvak(adres) });
+    const adres = adresVan(req), m = manager(req);
+    const berichten = rtmail.postvak(adres).concat(m ? rtmail.leiding.post(adres) : [])
+      .sort((x, y) => String(y.at).localeCompare(String(x.at))).slice(0, 60);
+    res.json({ adres, ongelezen: rtmail.ongelezen(adres) + (m ? rtmail.leiding.ongelezen(adres) : 0), berichten });
   });
 
   app.post('/api/supplier/rtmail/verzonden', supplierAuth, (req, res) => {
@@ -27,11 +34,13 @@ module.exports = (kern) => {
   });
 
   app.post('/api/supplier/rtmail/ongelezen', supplierAuth, (req, res) => {
-    res.json({ ongelezen: rtmail.ongelezen(adresVan(req)) });
+    res.json({ ongelezen: rtmail.ongelezen(adresVan(req)) + (manager(req) ? rtmail.leiding.ongelezen(adresVan(req)) : 0) });
   });
 
   app.post('/api/supplier/rtmail/lees', supplierAuth, (req, res) => {
-    const r = rtmail.lees(adresVan(req), String((req.body && req.body.id) || ''));
+    const id = String((req.body && req.body.id) || '');
+    let r = rtmail.lees(adresVan(req), id);
+    if (r.error && manager(req)) r = rtmail.leiding.lees(adresVan(req), id);
     if (r.error) return res.status(404).json({ error: r.error });
     res.json({ ok: true, bericht: r });
   });

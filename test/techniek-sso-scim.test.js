@@ -58,7 +58,7 @@ test.before(async () => {
   const o = await post('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' });
   assert.ok(o.body.token, 'de eigenaar kan inloggen: ' + o.tekst.slice(0, 200));
   eigenaar = o.body.token;
-  zw = await zwaarApi(post, base, eigenaar); // B22
+  zw = await zwaarApi(post, base, eigenaar, 'Imran'); // B22
 
   // een gewoon lid, en een kantoorsessie: allebei mogen hier niet komen
   const u = Date.now().toString().slice(-9);

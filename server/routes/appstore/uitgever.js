@@ -55,6 +55,8 @@ module.exports = (kern) => {
     inzender: { soort: 'medewerker',
       id: req.actor && req.actor.staffId ? 'staff:' + req.supplier.code + ':' + req.actor.staffId
         : (req.actor && req.actor.lidKey ? req.actor.lidKey : null),
+      // en de ledensleutel ernaast: dezelfde mens kan op naam in het kantoor zitten
+      ids: req.actor && req.actor.lidKey ? [req.actor.lidKey] : [],
       naam: req.actor ? req.actor.name : null },
     org: o.org, manifest: req.body.manifest, bestanden: req.body.bestanden })));
 

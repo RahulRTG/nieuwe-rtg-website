@@ -1,12 +1,14 @@
 /* De projectlevensloop van RTG One. Deze kamer houdt bron, uitvoering, bewijs
    en menselijke oplevering bij elkaar, zonder de gezamenlijke kern te laten
    uitgroeien tot een tweede router. */
+// beperkte post (werving) hoort nooit in een project, ook niet als hij ooit op de verkeerde plek staat
+const { isBeperkt } = require('./rtmail-leiding');
 module.exports = function projectenMaak(h) {
   const { rtmailBerichten, save, S, id, geldigHuis, tekst, vind, log, nu, klokDatum, besluittypen, goedkeuringMaak } = h;
 
   function projectVanMail(body, context) {
     if (!context || !context.key || !context.codename) return { status: 403, error: 'Een RTMAIL-project vraagt een persoonlijk personeelsaccount.' };
-    const s = S(), huis = geldigHuis(body.huis), berichten = rtmailBerichten(),
+    const s = S(), huis = geldigHuis(body.huis), berichten = rtmailBerichten().filter(m => !isBeperkt(m)),
       adres = String(context.codename).trim().toLowerCase().replace(/[^a-z0-9._-]/g, '') + '@rtmail';
     const mail = berichten.find(m => m.id === String(body.mailId || '') && m.naar === adres);
     if (!mail) return { status: 404, error: 'Dit bericht staat niet in uw persoonlijke RTMAIL.' };

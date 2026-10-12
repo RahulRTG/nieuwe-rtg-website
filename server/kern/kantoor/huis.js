@@ -61,14 +61,21 @@ function maakHuis({ db, save, nu }) {
   function werkverband(key, { codenaamVan, employmentVanPersoon } = {}) {
     const h = aanwijzing();
     if (!h) return { stand: 'onbekend', reden: 'De eigenaar heeft nog niet aangewezen welke entiteit RTG is.' };
+    /* OP DE SLEUTEL VRAGEN, NIET OP DE CODENAAM. Een dienstverband draagt de
+       ledensleutel (uitnodiging, aanname) of de codenaam (een eigenaar die met
+       de hand aanneemt); kern/concern/employment.js leest een sleutel als
+       allebei. Hier stond de codenaam, en daarmee was een RTG-medewerker die
+       zijn uitnodiging zelf had aangenomen in deze review nooit in dienst. */
     let cn = null, lopend = null;
     try { cn = typeof codenaamVan === 'function' ? codenaamVan(key) : null; } catch (e) { cn = null; }
-    if (!cn || cn === key) return { stand: 'onbekend', reden: 'Bij deze sleutel is geen codenaam te vinden.' };
-    try { lopend = typeof employmentVanPersoon === 'function' ? employmentVanPersoon(cn, false) : null; } catch (e) { lopend = null; }
+    try { lopend = typeof employmentVanPersoon === 'function' ? employmentVanPersoon(key, false) : null; } catch (e) { lopend = null; }
     if (!Array.isArray(lopend)) return { stand: 'onbekend', reden: 'De concernlaag antwoordde niet.' };
     const hier = lopend.filter(e => e && e.entiteit === h.entiteit);
     const werk = hier.filter(e => e.telt);
     if (werk.length) return { stand: 'loopt', rollen: werk.map(e => e.rol).filter(Boolean) };
+    /* Geen treffer EN geen codenaam: dan is de helft die op codenaam staat niet
+       nagekeken, en dat is geen nee. */
+    if (!cn || cn === key) return { stand: 'onbekend', reden: 'Bij deze sleutel is geen codenaam te vinden; een dienstverband op codenaam is dus niet nagekeken.' };
     return { stand: 'geen', alleenMandaat: hier.length > 0 };
   }
 

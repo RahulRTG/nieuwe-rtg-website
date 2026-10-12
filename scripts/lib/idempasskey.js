@@ -30,6 +30,7 @@
 'use strict';
 
 const { maakAuthenticator } = require('../../test/webauthn-authenticator');
+const { bindToestel, metToestellen } = require('./proeftoestel');
 
 /* Per route: waar de opties vandaan komen, en uit welk deel van het lijf. */
 const PASSKEYROUTES = Object.freeze({
@@ -58,12 +59,24 @@ async function bouwPasskeyMedewerker({ post, basis, boardroom }) {
   const id = reg.data && reg.data.state && reg.data.state.user && reg.data.state.user.id;
   if (id) { try { await post('/api/office/balie/zetel', { key: 'user-' + id }, boardroom); } catch (e) { /* zetel is best-effort, zoals in ./proefsleutels.js */ } }
 
+  /* EERST HET TOESTEL, dan de passkey -- en dat is de volgorde van een echte
+     client. Een passkey toevoegen is een ZWAAR pad (kern/identiteit/bezitspaden.js:
+     "een nieuwe passkey is een nieuwe sleutel tot het account"), en sinds het
+     bezitsbewijs standaard `verplicht` staat, weigert de server dat aan een sessie
+     zonder gebonden toestel met 403. Hier stond de opties-aanroep op een kale
+     sessie, en de ronde van 7 oktober 2026 meldde precies dat: "geen
+     registratieopties (403)". Dezelfde oorzaak als de bankwereld, dezelfde
+     reparatie: de medewerker bindt zijn toestel en tekent (./proeftoestel.js). */
+  const toestel = await bindToestel({ post, token: lidTok, naam: 'Toestel kantoor passkey' });
+  if (!toestel.klaar) return { klaar: null, reden: 'toestel binden lukte niet: ' + toestel.reden };
+  const getekend = metToestellen(post, { toestellen: [toestel.klaar] });
+
   /* De passkey op zijn EIGEN account, zoals een medewerker dat doet. */
   const sleutel = maakAuthenticator(new URL(basis).hostname);
-  const o = await post('/api/webauthn/registreer/opties', {}, lidTok);
+  const o = await getekend('/api/webauthn/registreer/opties', { huidig: 'geheim123' }, lidTok);
   const uitdaging = o && o.data && o.data.opties && o.data.opties.challenge;
   if (!uitdaging) return { klaar: null, reden: 'geen registratieopties (' + (o && o.status) + ')' };
-  const r = await post('/api/webauthn/registreer',
+  const r = await getekend('/api/webauthn/registreer',
     { antwoord: sleutel.registratieAntwoord(uitdaging, origin), naam: 'Toestel idempotentieproef' }, lidTok);
   if (!r || r.status !== 200) return { klaar: null, reden: 'passkey registreren lukte niet (' + (r && r.status) + ')' };
 

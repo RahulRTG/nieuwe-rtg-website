@@ -16,7 +16,15 @@
     var identity = w.RTGIdentityRuntime({ actor: o.actor }), session = w.RTGSessionRuntime({ identity: identity, deviceId: o.deviceId });
     var contextEngine = w.RTGWorkspaceContext();
     var navigation = w.RTGWorkspaceNavigation({ open: o.open });
-    var policy = w.RTGWorkspacePolicy({ actor: identity.actor(), permission: o.permission, tenantPolicy: o.tenantPolicy });
+    /* Zonder eigen antwoordfunctie vraagt de runtime de SERVER welke permissies
+       gelden (kern/workspace-rechten.js). Tot dat antwoord er is, is alles dicht;
+       daarna tekent de aanroeper opnieuw via `onRechten`. */
+    var rechten = null, serverRecht = function (p) { return !!rechten && rechten[p] === true; };
+    var policy = w.RTGWorkspacePolicy({ actor: identity.actor(), permission: o.permission || serverRecht, tenantPolicy: o.tenantPolicy });
+    if (!o.permission && identity.authenticated()) Promise.resolve().then(function () {
+      return aanvraag('/api/ik/workspace/rechten', {});
+    }).then(function (j) { rechten = j && j.bron === 'server' && j.rechten ? j.rechten : {}; if (!dood && o.onRechten) o.onRechten(); })
+      .catch(function (e) { rechten = {}; fout('rechten', e); });
     var state = w.RTGWorkspaceState({ workspaceId: o.workspaceId, global: o.globalState, user: o.userState,
       session: Object.assign(session.snapshot(), o.sessionState || {}),
       workspace: o.workspaceState,

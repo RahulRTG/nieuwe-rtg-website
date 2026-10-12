@@ -134,6 +134,56 @@ niet betrouwbaar* -- gerekend uit echte gegevens door de echte motor.
 
 ---
 
+## 5a. "Wat als het uitloopt?" staat op het scherm (11 oktober 2026)
+
+`/api/move/gevolg` bestond en was getoetst, maar geen enkel bestand in
+`public/` riep hem aan: voor een lid bestond de tweede vraag van Move niet.
+Elke overgang op `/apps/move.html` draagt nu de vraag *Loopt <onderdeel> uit?*
+met een keuzelijst (15 tot 90 minuten) en een knop *Reken door*. Drie dingen
+liggen daarbij vast, en `test/move-gevolg.e2e.js` zakt op elk ervan (met een
+mutatie nagetrokken):
+
+- **de minuten komen van de reiziger** -- het scherm stuurt de gekozen waarde,
+  Move raadt geen vertraging (zet het scherm een vaste 30 in, dan zakt de toets);
+- **het antwoord is een voorstel en het scherm zegt dat ook**: de link brengt
+  naar de app waar het echte werk hoort, met *er is niets verzet; dat bevestigt
+  een mens* eronder;
+- **valt de server weg**, dan staat er *Doorrekenen is niet gelukt* en komt de
+  knop terug;
+- **onbekend blijft onbekend**: een overgang die Move niet kan wegen (na een
+  vlucht weet niemand wanneer je het vliegveld uit bent) staat er als *niet te
+  bepalen*, en de kop telt hem hardop mee in plaats van *er wordt geen overgang
+  krapper* te zeggen. Die zin stond er in de eerste versie; de tegenlezing vond
+  hem.
+
+**Wat het scherm aan het licht bracht: drie van de vijf voorsteladressen
+bestonden niet.** `kern/move/gevolg.js` wees naar `/apps/vervoer.html`,
+`/apps/reserveren.html` en `/apps/portaal.html`, en de reiswereld zette
+`/apps/portaal.html` op elke partnerboeking. Geen van die schermen heeft ooit
+bestaan (404). Zolang het voorstel geen scherm had, zag niemand het; de eerste
+versie van de toets keurde de dode link zelfs goed, omdat hij een adres
+VERGELEEK in plaats van het te VOLGEN. Nu wijzen ze naar de schermeigenaren
+(`vervoer.rit` = ov.html, `horeca.reserveren` = foodcourt.html) en naar
+`/apps/reizen.html#reizen`, waar de afspraak met haar status staat. De e2e-toets
+volgt de link tot de afspraak er staat, en `test/move-gevolg-adressen.test.js`
+legt elk adres van Move en de reiswereld tegen `public/`.
+
+Twee dingen die daarbij NIET zijn opgelost. Een lid kan een afspraak bij een zaak
+nergens zelf verzetten -- er is geen ledenroute voor -- dus het voorstel zegt
+*met de zaak een andere tijd afspreken* en doet niet alsof een knop dat regelt.
+En de stand Ter plaatse van de ledenapp, waar de afspraken ook staan, is via
+`/apps/app.html#tab=terplaatse` niet betrouwbaar te openen: die hash klikt een
+knop in een tabbalk die op het beginscherm verborgen is, en de app keert terug
+naar Home. Dat is schilwerk (`app-main.js`, de sprong) en hoort een eigen ronde.
+
+Wat er NIET is: *Past dit nog?* (`/api/move/vooraf`) staat niet op dit scherm.
+Die vraag hoort vóór een boeking en vraagt een plek die de plekkenlaag kan
+oplossen (een zaakcode); de Mall stelt hem al bij het kiezen van een tijd. Een
+vrij plekveld hier zou een stadsnaam naar coördinaten moeten benaderen, en dat
+doet deze laag met opzet niet. En een vers lid zonder twee opeenvolgende
+onderdelen ziet nog steeds alleen de lege stand: er is dan niets om door te
+rekenen, en een knop zonder werk zou schijn zijn.
+
 ## 6. Wat er niet is, met de reden
 
 - **Twee van de zes bronnen leveren geen plek**, en dat blijft zo tot het

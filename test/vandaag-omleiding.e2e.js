@@ -44,7 +44,7 @@ test('Vandaag: het oude adres komt op RTG Life uit, met de ingangen naar agenda,
     const heen = await page.$$eval('a.heen', as => as
       .filter(a => a.offsetParent !== null)
       .map(a => { const r = a.getBoundingClientRect(); return { href: a.getAttribute('href'), w: r.width, h: r.height }; }));
-    for (const doel of ['/apps/agenda.html', '/apps/mijnmall.html', '/apps/leven.html']) {
+    for (const doel of ['/apps/agenda.html', '/apps/mijnmall.html', '/apps/leven.html#moment']) {
       const a = heen.find(x => x.href === doel);
       assert.ok(a, 'Life draagt de ingang naar ' + doel + ' die eerst alleen op Vandaag stond');
       assert.ok(a.w >= 24 && a.h >= 24, doel + ' is een raakvlak van ' + Math.round(a.w) + 'x' + Math.round(a.h) + ', onder 24x24');

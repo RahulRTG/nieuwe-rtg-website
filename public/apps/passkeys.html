@@ -122,6 +122,8 @@
 <!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
      zijn eigen model aan met RTGUitvoer.bron() en moet de laag dus al vinden. -->
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/passkey.js"></script>
+<script src="/shared/herbevestig.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -140,7 +142,18 @@
   /* ---- registreren: het antwoord van de browser klaarmaken voor de server ---- */
   async function maakPasskey() {
     if (!('credentials' in navigator)) return zeg('Deze browser kent geen passkeys.');
-    const o = await api('registreer/opties');
+    /* Een passkey toevoegen vraagt eerst of u het bent: uw wachtwoord, of een
+       vinger op een passkey die er al staat. De server zegt welke weg
+       (herbevestigingNodig + wegen); dit scherm vraagt alleen. */
+    let o = await api('registreer/opties');
+    if (o.body.herbevestigingNodig && window.RTGHerbevestig) {
+      const b = await RTGHerbevestig.vraag({ wegen: o.body.wegen, actie: o.body.actie, token,
+        passkey: (o.body.wegen || []).indexOf('passkey') >= 0,
+        uitleg: 'Een passkey toevoegen geeft blijvend toegang tot uw account. Vul daarom eerst uw huidige wachtwoord in.' });
+      if (!b) return;
+      if (b.fout) return zeg(b.fout);
+      o = await api('registreer/opties', b);
+    }
     if (o.body.error) return zeg(o.body.error);
     const pub = o.body.opties;
     pub.challenge = naarBuf(pub.challenge);

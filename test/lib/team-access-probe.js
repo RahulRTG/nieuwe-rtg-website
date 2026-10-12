@@ -25,8 +25,10 @@ async function probe(browser,base,width,screenshot){
     assert.equal(await page.locator('label[for=liPass] span').innerText(),'Password');
     assert.equal(await page.locator('#liPass').inputValue(),'private-password-473');
     assert.equal(await page.locator('#liUser').inputValue(),'portal-private@example.test');
-    const geometry=await page.evaluate(()=>{const bars=document.querySelectorAll('.rtg-adaptive-bar'),button=document.getElementById('teamAccessLanguage'),r=button.getBoundingClientRect();return{bars:bars.length,visibleBars:[...bars].filter(b=>{const q=b.getBoundingClientRect();return b.getClientRects().length>0&&q.width>0&&q.height>0;}).length,languageVisible:r.width>0&&r.height>0,inside:r.left>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,overflow:document.documentElement.scrollWidth>innerWidth+1};});
-    assert.deepEqual(geometry,{bars:1,visibleBars:0,languageVisible:true,inside:true,overflow:false});
+    const geometry=await page.evaluate(()=>{const bars=document.querySelectorAll('.rtg-adaptive-bar'),button=document.getElementById('teamAccessLanguage'),r=button.getBoundingClientRect();return{bars:bars.length,visibleBars:[...bars].filter(b=>{const q=b.getBoundingClientRect();return b.getClientRects().length>0&&q.width>0&&q.height>0;}).length,languageVisible:r.width>0&&r.height>0,inside:r.left>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1,overflow:document.documentElement.scrollWidth>innerWidth+1,chrome:[...document.querySelectorAll('.rtg-edge-chrome > :not(.rtg-adaptive-edge)')].filter(el=>{const q=el.getBoundingClientRect();return el.getClientRects().length>0&&q.width>0&&q.height>0;}).length};});
+    /* De compacte Edge mag op de toegang staan (www-stijl, #534 en #549); de productnavigatie niet. */
+    assert.ok(geometry.visibleBars<=1);delete geometry.visibleBars;
+    assert.deepEqual(geometry,{bars:1,languageVisible:true,inside:true,overflow:false,chrome:0});
     await page.locator('#liUser').fill('');await page.locator('#liPass').fill('');
     if(screenshot)await page.screenshot({path:screenshot});
     await page.locator('#toJoin').click();

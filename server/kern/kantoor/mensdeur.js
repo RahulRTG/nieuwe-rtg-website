@@ -2,8 +2,8 @@
 
    WAT DIT OPLOST. KANTOOR.md par. 3 en KANTOORMACHT.md par. 0 zeggen hetzelfde:
    een spoor dat eindigt bij een gedeelde code is geen spoor, het is een alibi.
-   `officeAuth` WEET dat al -- hij zet `identiteit: 'bewezen'` of `'anoniem'` op
-   de envelop en legt `req.officeKey` klaar -- en niets doet er iets mee. Dit
+   `officeAuth` WEET dat al -- hij zet `identiteit: 'bewezen'` (passkey),
+   `'opNaam'` (eigen account, geen passkey) of `'anoniem'` op de envelop en legt `req.officeKey` klaar -- en niets doet er iets mee. Dit
    bestand doet er iets mee, en met opzet het minste dat werkt: het TELT.
 
    WAAROM TELLEN EN NIET WEIGEREN. Dat is de huisregel uit CONTROLPLANE.md en
@@ -78,9 +78,10 @@ function maakMensdeur({ db, save, bewerkCollectie }) {
     bak, save, bewerkCollectie, collectie: 'kantoorMensdeur', maxPaden: MAX_PADEN
   });
 
-  /* Het pad zonder querystring. De query kan een token dragen (zie
-     backoffice-01.js, dat /api/office/doc?token=... opvraagt) en die hoort in
-     geen enkele meting terecht te komen. */
+  /* Het pad zonder querystring. De query kan een ticket dragen (een
+     live-stroom opent met ?ticket=, kern/sessiestroom.js), en een oude client
+     kan er nog een token in zetten dat de deur weigert; geen van beide hoort in
+     een meting terecht te komen. */
   function padVan(req) {
     const rauw = String((req && (req.originalUrl || req.url)) || '');
     return rauw.split('?')[0].slice(0, 120);

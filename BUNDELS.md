@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**61 bundels, 488 delen, 0 zonder onderwerp.**
+**61 bundels, 489 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9866 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9893 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -120,11 +120,12 @@ omlaag.
 
 ## `apps/backoffice.js`
 
-`public/apps/backoffice/` -- 9 delen, 1145 regels in de delen
+`public/apps/backoffice/` -- 10 delen, 1163 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `backoffice-01.js` | de backoffice: de basis (helpers, taal, elementen) |
+| `backoffice-01a.js` | backoffice, deel 01a: DE SCAN VAN EEN IDENTITEITSBEWIJS |
 | `backoffice-01b.js` | backoffice, vervolg van deel 01 |
 | `backoffice-01c.js` | backoffice, vervolg van deel 01b: DE OFFICIELE BRONWACHT |
 | `backoffice-01d.js` | backoffice, DE VAKBEWIJZEN |
@@ -213,7 +214,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 116 delen, 9898 regels in de delen
+`public/apps/leverancier/` -- 116 delen, 9899 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -365,7 +366,7 @@ omlaag.
 
 ## `apps/office/app.js`
 
-`public/apps/office/app/` -- 9 delen, 959 regels in de delen
+`public/apps/office/app/` -- 9 delen, 1021 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -390,7 +391,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 32 delen, 3290 regels in de delen
+`public/apps/personeel/` -- 32 delen, 3301 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -527,7 +528,7 @@ omlaag.
 
 ## `apps/techniek.js`
 
-`public/apps/techniek/` -- 10 delen, 952 regels in de delen
+`public/apps/techniek/` -- 10 delen, 969 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -610,7 +611,7 @@ omlaag.
 
 ## `shared/clipdeler.js`
 
-`public/shared/clipdeler/` -- 2 delen, 218 regels in de delen
+`public/shared/clipdeler/` -- 2 delen, 225 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -776,7 +777,7 @@ omlaag.
 
 ## `shared/metgezel.js`
 
-`public/shared/metgezel/` -- 9 delen, 801 regels in de delen
+`public/shared/metgezel/` -- 9 delen, 814 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -855,7 +856,7 @@ omlaag.
 
 ## `shared/sprong.js`
 
-`public/shared/sprong/` -- 3 delen, 326 regels in de delen
+`public/shared/sprong/` -- 3 delen, 327 regels in de delen
 
 | deel | onderwerp |
 |---|---|

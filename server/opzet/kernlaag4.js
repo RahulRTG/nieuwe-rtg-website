@@ -9,16 +9,16 @@ module.exports = (kern, hulp) => {
 
 /* Het Huis: het reisdossier achter de hoofdingang. Leest alleen wat er al is --
    de eigen reis van het lid, en de papieren die Entourage al bewaakt. Die grens
-   wordt daar berekend en hier niet nog een keer: een limiet hoort op één plek. */
+   wordt daar berekend, niet hier: een limiet hoort op één plek. */
 kern.huis = require('../kern/huis')({
   reisVan: (sess) => (sess && sess.account
     ? (accounts.getMemberState(sess.account.id) || {}).trip
     : (sess && sess.tier !== 'guest' ? db.data.trip : null)) || null,
   entourageVan: (sess) => { try { return kern.entourage(sess.key); } catch (e) { return null; } }
 });
-/* Connection OS formaliseert wat de twee producten al delen. De policy is een
-   contract en geen vervangende backend; de blokkadelaag is wel een gedeelde
-   waarheid, zodat een veiligheidsactie niet bij de grens van een app stopt. */
+/* Connection OS formaliseert wat de twee producten al delen: de policy is een
+   contract, de blokkadelaag een gedeelde waarheid, zodat een veiligheidsactie
+   niet bij de grens van een app stopt. */
 kern.connectionPolicy = require('../kern/connection-policy');
 kern.connectionBlocking = require('../kern/connection-blocking')({ db, save });
 // Rendez-vous deelt zijn 18+/KYC-poort met Vonk; de route bewaakt de pas.
@@ -90,24 +90,10 @@ kern.metierNetwerk = require('../kern/metier/netwerk')({ db, save, codenaamVan: 
 kern.metierAI = require('../kern/metier/ai')({ anthropic, metier: kern.metier, netwerk: kern.metierNetwerk });
 kern.metierLoon = require('../kern/metier/loon')({ db });
 
-/* Genootschap (kern/genootschap/): besloten groepen van leden, met een prikbord
-   en bijeenkomsten. Bewust een EIGEN app en geen verbouwing van Cercle (het
-   register van je societeiten) of Rendez-vous (de datingdienst van de Lifestyle
-   Pass); zie de kop van kern/genootschap/index.js voor waarom. */
-kern.genootschap = require('../kern/genootschap')({ db, save, codenaamVan: kern.codenaamVan,
-  keyVanCodenaam, liveCodename, notify, zijnVrienden: kern.zijnVrienden });
-kern.genootschapBeheer = require('../kern/genootschap/beheer')({ save, codenaamVan: kern.codenaamVan,
-  keyVanCodenaam, genootschap: kern.genootschap });
-kern.prikbord = require('../kern/genootschap/prikbord')({ db, save, codenaamVan: kern.codenaamVan,
-  liveCodename, notify, genootschap: kern.genootschap });
-kern.bijeenkomst = require('../kern/genootschap/bijeenkomst')({ db, save, codenaamVan: kern.codenaamVan,
-  notify, genootschap: kern.genootschap });
-kern.genootschapAI = require('../kern/genootschap/ai')({ anthropic, genootschap: kern.genootschap,
-  prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst });
-kern.genootschapInzicht = require('../kern/genootschap/inzicht')({ db, save, genootschap: kern.genootschap,
-  prikbord: kern.prikbord, bijeenkomst: kern.bijeenkomst });
-kern.genootschapUitvoer = require('../kern/genootschap/uitvoer')({ genootschap: kern.genootschap,
-  codenaamVan: kern.codenaamVan });
+/* Genootschap en wat erop draait (de gemeenschapslaag) staat in
+   ./kernlaag4-gemeenschap.js, en wordt HIER aangeroepen: na Metier, voor de
+   Berichten-app -- dezelfde plek als waar het stond. */
+require('./kernlaag4-gemeenschap')(kern, hulp);
 /* De Berichten-app: zoeken over alle kanalen, gesprekken vastzetten/stilzetten/
    archiveren, en de drie AI-taken (samenvatten, een antwoord opstellen, de
    afspraken eruit halen). De AI stelt op, de mens verstuurt. */

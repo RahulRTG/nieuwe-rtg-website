@@ -53,6 +53,8 @@ const ZWARE_ACTIES = Object.freeze([
   'eigenaar-noodrem-uit',       // POST /api/techniek/beveiliging/auto  (alleen bij UIT)
   'eigenaar-terugstorting',     // POST /api/office/bank/terugstorting
   'eigenaar-cadeaubon',         // POST /api/office/cadeaubon/stand  (de e-geldpositie, C14)
+  'eigenaar-leidingtoets',      // POST /api/office/rtmail/leiding/toets  (juridische toets op sollicitatiepost, 584A)
+  'eigenaar-leidinghold',       // POST /api/office/rtmail/leiding/hold  (een juridische hold beoordelen, 584A)
   'eigenaar-herstel-in',        // POST /api/techniek/herstel/inrichten
   'eigenaar-herstel-af',        // POST /api/techniek/herstel/afbreken
   'eigenaar-ssogeheim',         // POST /api/techniek/sso/geheim en /api/techniek/sso met clientSecret (B22, zonder terugval)
@@ -62,6 +64,8 @@ const ZWARE_ACTIES = Object.freeze([
   'eigenaar-werkbankpad',       // POST /api/office/werkos/bankpad/zet
   'bank.incasso',               // POST /api/office/bank/incasso  (de geldketen, MACHINE.md par. 5a)
   'bank.bevestig',              // POST /api/office/bank/handtekening/bevestig  (tweede handtekening onder geld)
+  'bank.afstemming',            // POST /api/office/bank/opdrachten/afstemming  (een onbekende uitbetaling afstemmen; kan geld terugboeken)
+  'bank.incasso.risico',        // POST /api/office/bank/incasso/risico  (risicogoedkeuring boven de omkeerbaarheidsgrens, besluit 2C)
   'reisbureau.teruggave',       // POST /api/office/reisbureau/teruggave  (een betaalde reis terugbetalen)
   'connection.table.manage',    // POST /api/office/rendezvous/tafel/*
   'connection.safety.report.read', // GET /api/vonk/meldingen en /api/member/rendezvous/meldingen
@@ -69,7 +73,11 @@ const ZWARE_ACTIES = Object.freeze([
   'gezin-passkey-koppel',       // POST /api/rtf/gezin/passkey  (B19: eigen passkey aan het eigen gezinsprofiel)
   'gezin-sessie-verleng',       // POST /api/foundation/gezin/sessie/verleng  (B19: zeven dagen erbij, foundation/gezinsdeur.js)
   'kantoor-koppel',             // POST /api/account/koppel  (kantooruitnodiging, in productie; B24)
-  'passkey-weg'                 // POST /api/webauthn/weg
+  'connect.afrekening',         // POST /api/office/connect/afrekening  (geld naar een verbonden account, zonder terugval)
+  'eigenaar-vrijgave',        // POST /api/office/vrijgave/stand (aanzetten) en /api/office/vrijgave/besluit (vastleggen), zonder terugval
+  'passkey-weg',                // POST /api/webauthn/weg
+  'passkey-nieuw',              // POST /api/webauthn/registreer/opties  (P1-2: een TWEEDE passkey vraagt een vinger op de eerste)
+  'toestel-binden'              // POST /api/mijn/toestel/bind  (P1-1: herbevestiging buiten het verse venster, naast het wachtwoord)
 ]);
 
 module.exports = { PIN_ACTIES, ZWARE_ACTIES };

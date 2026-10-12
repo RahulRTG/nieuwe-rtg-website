@@ -45,6 +45,15 @@ function foutAntwoord(e) {
       bericht: 'Uw zakelijke toegang kon niet veilig worden bijgewerkt. Er is geen sessie geopend; probeer het over een moment opnieuw.'
     };
   }
+  /* De registratiegrendel (accounts/registratie.js) is geen mislukte inlog maar
+     een besluit: een NIEUW account via SSO ontstaat nu niet. Dat mag de mens
+     weten -- het verklapt niets over de inrichting van de koppeling, en een
+     kale 401 liet hem denken dat zijn organisatie iets fout deed. Bestaande
+     accounts komen hier niet: die worden gekoppeld zonder createUser. */
+  if (e && e.code === 'REGISTRATIE_DICHT') {
+    return { status: 503, retryAfter: null, code: e.code, hoe: e.hoe || null,
+      bericht: 'Er kan via uw organisatie op dit moment geen nieuw RTG-account worden aangemaakt: nieuwe registraties zijn gesloten. Bestaande accounts kunnen gewoon inloggen.' };
+  }
   return { status: 401, retryAfter: null, bericht: 'Inloggen via uw organisatie is niet gelukt.' };
 }
 
@@ -132,9 +141,12 @@ function brug(kern, k, user, claims) {
 }
 
 /* Van gecontroleerde claims naar de terugreis naar de app. Gooit door als de
-   aanmelding zelf niet mag (verkeerd domein, adres niet bevestigd); de
-   aanroeper vertaalt dat naar een antwoord dat een buitenstaander niets
-   verklapt over onze inrichting. */
+   aanmelding zelf niet mag (verkeerd domein, adres niet bevestigd, account uit
+   dienst gemeld); de aanroeper vertaalt dat naar een antwoord dat een
+   buitenstaander niets verklapt over onze inrichting. Daarom staat aanmelden
+   VOOR de brug en de logregel "gelukt": een account dat de organisatie via
+   SCIM uitzette, krijgt geen groepen en geen geslaagde inlog in het spoor
+   (N31; de weigering zelf staat in ./index.js). */
 async function binnen(kern, koppeling, claims, req, res, terug, soort) {
   const { accounts, logInlog } = kern;
   const { user, nieuw, gekoppeld } = await sso.aanmelden(accounts, koppeling, claims);

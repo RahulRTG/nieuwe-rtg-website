@@ -59,8 +59,14 @@ function opslagPoort(opslagKlaar) {
    verzoeken van de eigenaar met een geldig token: die moet de app bewust
    spanningsloos kunnen maken en er zelf bij blijven om de zekering er weer in
    te doen. */
-function hoofdzekering({ db, accounts, eigenaar }) {
+function hoofdzekering({ db, accounts, eigenaar, stroom = () => require('../kern/sessiestroom').actief() }) {
   const { zekeringGesprongen } = require('../techniek');
+  /* Is dit token van de eigenaar? Eerst accounts.verifyToken (handtekening,
+     verloop, intrekking), pas daarna telt wie het is. */
+  const geverifieerd = (tok) => { try { return tok ? accounts.verifyToken(tok) : null; } catch (e) { return null; } };
+  const isBaas = (u) => { try { return !!u && eigenaar.isEigenaar(accounts, u); } catch (e) { return false; } };
+  const dicht = (req, res, next) => req.path.startsWith('/api/')
+    ? res.status(503).json({ error: 'De app is in onderhoud. Probeer het later opnieuw.' }) : next();
   return (req, res, next) => {
     const z = db.data && db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen.onderhoud;
     /* zekeringGesprongen laat een tijdgebonden zekering hier vanzelf doven;
@@ -70,13 +76,28 @@ function hoofdzekering({ db, accounts, eigenaar }) {
     if (!zekeringGesprongen(z)) return next(); // normaal: stroom staat erop
     const p = req.path;
     if (p.startsWith('/api/techniek') || p === '/api/health' || p === '/api/ready') return next();
-    try {
-      const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || req.query.token;
-      const u = tok ? accounts.verifyToken(tok) : null;
-      if (eigenaar.isEigenaar(accounts, u)) return next(); // de eigenaar mag er wel bij
-    } catch (e) {}
-    if (p.startsWith('/api/')) return res.status(503).json({ error: 'De app is in onderhoud. Probeer het later opnieuw.' });
-    next();
+    /* Alleen uit de kop: een sessie in het adres wordt nergens meer aangenomen
+       (een live-stroom opent met een stroomticket, kern/sessiestroom.js). */
+    const kop = (req.get('authorization') || '').replace(/^Bearer\s+/i, '');
+    let u = null;
+    try { u = kop ? accounts.verifyToken(kop) : null; } catch (e) { u = null; }
+    if (isBaas(u)) return next(); // de eigenaar mag er wel bij
+    /* DE STROOM VAN DE EIGENAAR. Een EventSource stuurt geen kop: hij opent met
+       `?ticket=`, dat de eigenaar zelf (met zijn sessie in de kop, dus langs
+       deze zekering) heeft opgehaald. Hier stond alleen de kop, en de stroom
+       van de eigenaar kreeg in onderhoud 503 sinds de `?token=`-uitweg weg is.
+       De zekering KIJKT naar het ticket zonder het te claimen
+       (sessiestroom.kijk) en stelt dezelfde vraag aan de sessie die erin zit;
+       de deur erachter claimt en toetst het zelf. Een ticket van iemand anders,
+       een verlopen of een gebruikt ticket: dicht. Er komt GEEN sessie uit het
+       adres terug -- `?token=` blijft overal geweigerd. */
+    const ticket = req.query && typeof req.query.ticket === 'string' ? req.query.ticket : '';
+    const dienst = ticket && p.startsWith('/api/') ? stroom() : null;
+    if (!dienst || typeof dienst.kijk !== 'function') return dicht(req, res, next);
+    Promise.resolve(dienst.kijk(ticket)).then(uit => {
+      if (uit && isBaas(geverifieerd(uit.token))) return next();
+      dicht(req, res, next);
+    }, () => dicht(req, res, next));
   };
 }
 
@@ -98,6 +119,18 @@ function hoofdzekering({ db, accounts, eigenaar }) {
    /api/supplier/mijn/login staat erop om dezelfde reden (N19): de werkplekinlog
    van een lid geeft een werksessie of een bewijs voor de tweede stap, en de
    tweede stap loopt over hetzelfde pad. Tijdens de pauze wacht die dus ook.
+
+   /api/supplier/staff/join staat erop (N29) hoewel hij geen sessie geeft: hij
+   toetst wel een RTG-wachtwoord, en een aanval die de inlog dicht vindt, hoort
+   niet naar een deur ernaast te kunnen uitwijken. Zie de kop van
+   ../routes/supplier/werving/personeel-aanmelden.js.
+
+   DEZE LIJST HEEFT TWEE LEZERS. Naast de pauze hieronder leest
+   ../kern/zaakdoos/journaal.js hem (journaalPadOk, via isInlogPad): een pad
+   op deze lijst komt nooit in het naspeeljournaal van de Zaakdoos. Wie een pad
+   weghaalt voor de pauze, haalt het dus ook uit de journaaluitsluiting, en dan
+   ligt zijn lijf weer onversleuteld op het kastje; slot 4B daar vangt alleen
+   een wachtwoordveld, geen code of bewijs.
 
    DEZE LIJST IS NIET ELKE DEUR NAAR EEN SESSIE. Het kantoorgesprek
    (/api/kantoor/gesprek/zeg), de techniekinlog, de passkey-inlog en de
@@ -124,7 +157,7 @@ function hoofdzekering({ db, accounts, eigenaar }) {
    dat van de router, en draait de pauze op een echte server. */
 const INLOG_PADEN = ['/api/login', '/api/auth/login', '/api/auth/register', '/api/auth/forgot',
   '/api/auth/reset', '/api/office/login', '/api/supplier/login', '/api/staff/login', '/api/aanmeld/zeg',
-  '/api/supplier/mijn/login'];
+  '/api/supplier/mijn/login', '/api/supplier/staff/join'];
 const INLOG_SET = new Set(INLOG_PADEN);
 const { vastePaden } = require('../web/routeindex');
 function isInlogPad(pad) { return vastePaden(String(pad || '')).some(p => INLOG_SET.has(p)); }

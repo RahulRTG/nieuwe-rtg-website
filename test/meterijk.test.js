@@ -991,6 +991,10 @@ const IJKINGEN = {
   edgeGeblokkeerdZonderWaarom: { proef: () => edgeIjking('EDGEDEKKING.json', 'geblokkeerdZonderWaarom') },
   edgeDubbeleEigenaars: { proef: () => edgeIjking('EDGEKAART.json', 'dubbeleEigenaars') },
   rtgDodeKanalen: { proef: () => edgeIjking('EDGEKAART.json', 'dodeKanalen') },
+  /* De schil: de lezer moet met beide tellingen meebewegen, en een register
+     zonder telling is een fout -- nooit nul, want nul is de beste stand. */
+  schilHerstarts: { proef: () => schilIjking('herstarts') },
+  schilDubbeleVerzoeken: { proef: () => schilIjking('dubbeleVerzoeken') },
   edgeVeldIdentiteit: { proef: () => edgeIjking('EDGEDEKKING.json', 'identiteit') },
   edgeVeldWereld: { proef: () => edgeIjking('EDGEDEKKING.json', 'wereld') },
   edgeVeldContext: { proef: () => edgeIjking('EDGEDEKKING.json', 'context') },
@@ -1840,6 +1844,14 @@ const IJKINGEN = {
       (j) => { j.telling.openBekend = (j.telling.openBekend || 0) + 2; return j; },
       () => meet().momentOpenBekend - voor.momentOpenBekend)
   },
+  /* Dezelfde tand voor de samenwerkingsketen (GEMEENSCHAPSPROEF.json, 11
+     oktober 2026), met een ander getal (3) zodat een meter die de twee
+     registers verwisselt hier opvalt. */
+  gemeenschapOpenBekend: {
+    proef: (voor) => metVervangenJson('GEMEENSCHAPSPROEF.json',
+      (j) => { j.telling.openBekend = (j.telling.openBekend || 0) + 3; return j; },
+      () => meet().gemeenschapOpenBekend - voor.gemeenschapOpenBekend)
+  },
   /* DE DRIE TANDEN VAN IDEMIDENTITEIT.json (14 september 2026,
      MUTATIECONTRACT.md par. 6e). Elk veld een eigen verstoring, met een eigen
      getal: zou de meter twee sleutels verwisselen, dan valt dat hier op omdat
@@ -2599,6 +2611,25 @@ function edgeIjking(bestand, wat, teller) {
       assert.throws(() => norm.leesEdge(pad, wat, teller), new RegExp(teller), 'een register zonder ' + teller + ' levert geen nul maar een fout');
     }
     assert.throws(() => norm.leesEdge(path.join(dir, 'weg.json'), wat, teller), /ontbreekt/);
+    return na - voor;
+  } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
+}
+
+function schilIjking(wat) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-schil-ijk-'));
+  const pad = path.join(dir, 'SCHILHERSTART.json');
+  /* De andere telling staat er met opzet op een ander getal, zodat een lezer
+     die het verkeerde veld leest niet meebeweegt en de ijking zakt. */
+  const maak = (n) => ({ telling: Object.assign({ herstarts: 30, dubbeleVerzoeken: 30 }, { [wat]: n }) });
+  try {
+    fs.writeFileSync(pad, JSON.stringify(maak(4)));
+    const voor = norm.leesSchil(pad, wat);
+    fs.writeFileSync(pad, JSON.stringify(maak(9)));
+    const na = norm.leesSchil(pad, wat);
+    assert.equal(na - voor, 5, 'de lezer hoort exact mee te bewegen met ' + wat);
+    fs.writeFileSync(pad, JSON.stringify({ telling: {} }));
+    assert.throws(() => norm.leesSchil(pad, wat), new RegExp(wat), 'een ontbrekend getal levert geen nul maar een fout');
+    assert.throws(() => norm.leesSchil(path.join(dir, 'weg.json'), wat), /ontbreekt/);
     return na - voor;
   } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
 }

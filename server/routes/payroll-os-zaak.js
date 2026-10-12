@@ -18,8 +18,9 @@
    betekent dat de tweede handtekening bij de administratie ligt. */
 'use strict';
 
+const personeelzicht = require('../kern/leverancier/personeelzicht');
 module.exports = (kern) => {
-  const { app, supplierAuth, payrollOS, accounts, schoon } = kern;
+  const { app, supplierAuth, managerOnly, payrollOS, accounts, schoon } = kern;
   if (!payrollOS) return;
 
   const antwoord = (res, r) => (r && r.error) ? res.status(r.status || 400).json(r) : res.json(r);
@@ -27,10 +28,16 @@ module.exports = (kern) => {
   /* ---------- de werkgever ---------- */
   /* Alleen de eigen zaak, en dat komt uit het token. Een code in het lijf zou
      betekenen dat elke manager de loonrun van de buurman kan opvragen. */
-  app.post('/api/supplier/payroll/runs', supplierAuth, (req, res) =>
-    res.json({ ok: true, runs: payrollOS.run.lijst(req.supplier.code) }));
+  /* En alleen een MANAGER: loonruns, bevindingen, contracten en aangiftes dragen
+     uurlonen, overuren op naam en gewijzigde bankrekeningen. Een medewerker ziet
+     zijn eigen stroken (/payroll/stroken), niet die van het team. */
+  app.post('/api/supplier/payroll/runs', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    res.json({ ok: true, runs: payrollOS.run.lijst(req.supplier.code) });
+  });
 
   app.post('/api/supplier/payroll/bevindingen', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
     const r = payrollOS.run.haal(String((req.body || {}).runId || ''));
     if (!r || r.code !== req.supplier.code) return res.status(404).json({ error: 'Deze loonrun kennen we niet.' });
     res.json({ ok: true, run: payrollOS.run.lijst(req.supplier.code).find(x => x.id === r.id),
@@ -80,6 +87,7 @@ module.exports = (kern) => {
   /* De geschiedenis, en niet alleen de huidige versie. Wie wil weten waarom de
      strook van juni anders is dan die van juli, kijkt hier. */
   app.post('/api/supplier/payroll/contracten', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
     const staff = accounts.getStaffById(Number((req.body || {}).staffId));
     if (!staff || String(staff.supplier_code).toUpperCase() !== String(req.supplier.code).toUpperCase())
       return res.status(404).json({ error: 'Deze medewerker werkt niet bij uw zaak.' });
@@ -93,9 +101,11 @@ module.exports = (kern) => {
      recht op te zien wat er namens hem wordt aangegeven -- hij betaalt het --
      maar RTG voert de administratie en tekent ervoor. Twee partijen die allebei
      kunnen indienen, is twee aangiftes over dezelfde periode. */
-  app.post('/api/supplier/payroll/aangiftes', supplierAuth, (req, res) =>
+  app.post('/api/supplier/payroll/aangiftes', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
     res.json({ ok: true, aangiftes: payrollOS.aangifte.vanZaak(req.supplier.code,
-      (req.body || {}).periode || null) }));
+      (req.body || {}).periode || null) });
+  });
 
   /* ---------- verzuim voor de PLANNING ----------
      `voorPlanning()` stond in kern/payroll/verzuim.js en werd door niemand
@@ -112,10 +122,15 @@ module.exports = (kern) => {
     const van = String(b.van || '').slice(0, 10), tot = String(b.tot || '').slice(0, 10);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(van) || !/^\d{4}-\d{2}-\d{2}$/.test(tot))
       return res.status(400).json({ error: 'Geef een begin- en einddatum (JJJJ-MM-DD).' });
-    const uit = [];
+    const uit = [], vandaag = new Date().toISOString().slice(0, 10);
     for (const m of accounts.listStaff(req.supplier.code)) {
-      const regels = payrollOS.verzuim.voorPlanning(req.supplier.code, m.id, van, tot);
-      if (regels.length) uit.push({ staffId: m.id, naam: m.name, func: m.func || null, regels });
+      // van een collega alleen VANDAAG, niet de hele periode (personeelzicht.periodeVoor)
+      const p = personeelzicht.periodeVoor(req.actor, m.id, van, tot, vandaag);
+      const regels = p ? payrollOS.verzuim.voorPlanning(req.supplier.code, m.id, p.van, p.tot) : [];
+      /* besluit B1: een manager en de medewerker zelf de regels (wat iemand nog kan);
+         een collega alleen DAT iemand in deze periode afwezig is */
+      if (regels.length) uit.push(personeelzicht.afwezigheidVoor({ staffId: m.id, naam: m.name, func: m.func || null, regels },
+        req.actor, m.id, ['staffId', 'naam']));
     }
     res.json({ ok: true, van, tot, afwezig: uit,
       let: 'Bij ziekte staat er "afwezig" en niet wat iemand heeft. Wat iemand nog wel kan, staat er wel: daar plant u mee.' });

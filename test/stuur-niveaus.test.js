@@ -48,6 +48,10 @@ const UIT_DIRECT_GEHAALD = [
    Weigeren kan hij niet blijven doen zodra de EIGENAAR zo'n pad opent, en dat is gebeurd.
    Dus staat het hier: benoemd, met datum en reden, en toets 1 erkent uitsluitend deze. */
 const ERBIJ_GEKOMEN = [
+  { pad: '/api/reisbureau/mijn', op: '2026-10-12', naar: 'lezen',
+    reden: 'besluit van de eigenaar: Rahul leest de eigen reisaanvragen, en alleen dat. Gemeten zonder effect in de ' +
+      'opslag (IDEMPROEF.json); de route geeft Rahul de positieve veldlijst van de reisaanvraag ' +
+      '(kern/reisbureau-context.js). Boeken, annuleren en wijzigen blijven dicht (test/reis-lezen.test.js).' },
   { pad: '/api/bestanden/mijn', op: '2026-09-22', naar: 'lezen',
     reden: 'Documents-pilot: Rahul leest dezelfde eigen metadata en verwachte documentversie als de UI; mutaties vereisen een afzonderlijk servervoorstel.' },
   { pad: '/api/bestanden/actie', op: '2026-09-22', naar: 'voorstel',
@@ -58,7 +62,12 @@ const ERBIJ_GEKOMEN = [
       'lid laten iets gebeuren (een smaak wordt gezet, een model wordt betaald), deze laat iets ' +
       'vervallen. Hij hoort niet bij `lezen` (hij verandert toestand) en niet bij `voorstel` (een ' +
       'voorstel om een voorstel te laten vervallen is een cirkel); zie de kop bij KLEIN in ' +
-      'server/kern/stuur/beleid-lijsten.js' }
+      'server/kern/stuur/beleid-lijsten.js' },
+  { pad: '/api/knelpunt', op: '2026-10-11', naar: 'lezen',
+    reden: 'besluit van de eigenaar: Rahul is de ingang waarmee een lid een doel uitspreekt, en de ' +
+      'knelpuntmotor maakt daar de mogelijkheden bij zichtbaar. Lezen en niet klein: de route bewaart ' +
+      'niets en roept nergens save() aan (server/lib/mutatiecontracten-knelpunt.js); ' +
+      'test/stuur-knelpunt.test.js houdt vast dat hij via het stuur geen andere context ophaalt.' }
 ];
 
 /* De lijst zoals hij VOOR de splitsing was, met de hand overgeschreven uit de

@@ -43,7 +43,9 @@ module.exports = (ctx) => {
   Object.assign(k, require('./entiteit')(k));
   Object.assign(k, require('./vestiging')(k));
   Object.assign(k, require('./graaf')(k));
-  Object.assign(k, require('./employment')(k));
+  /* codenaamVan gaat ALLEEN naar het dienstverband: daar leest hij een
+     ledensleutel ook als codenaam (zie `wie()` in ./employment.js). */
+  Object.assign(k, require('./employment')(Object.assign({}, k, { codenaamVan: ctx.codenaamVan })));
   Object.assign(k, require('./scope')(k));
   /* De collectietransactie gaat ALLEEN naar de uitnodiging, en niet in `k`:
      `k` wordt aan het eind op de kern gezet, en dan reikte elk ander domein er
@@ -105,14 +107,22 @@ module.exports = (ctx) => {
      hele bedoeling. */
   function werkOverzicht(persoon) {
     const emps = k.employmentVanPersoon(persoon, false);
+    const plek = (e) => {
+      const ent = k.entiteitVind(e.entiteit);
+      return { employment: e.id,
+        bedrijf: ent ? k.entiteitBeeld(ent).naam : null,
+        rol: e.rol, plaats: e.vestigingNaam, soort: e.soortLabel,
+        van: e.van, tot: e.tot };
+    };
     return { ok: true,
-      werkplekken: emps.map(e => {
-        const ent = k.entiteitVind(e.entiteit);
-        return { employment: e.id,
-          bedrijf: ent ? k.entiteitBeeld(ent).naam : null,
-          rol: e.rol, plaats: e.vestigingNaam, soort: e.soortLabel,
-          van: e.van, tot: e.tot };
-      }),
+      werkplekken: emps.map(plek),
+      /* Wat AFGELOPEN is, apart en niet in `werkplekken` (die lijst zegt "uw
+         werkplek is klaar", en dat is hij dan niet meer). Mijn loopbaan toont
+         het: een dienstverband dat eindigde blijft een feit van de mens, en
+         uitdiensttreding is geen straf (PERSONEEL.md par. 9). Alleen wat er
+         stond -- werkgever, rol, van en tot -- en geen telling van dagen of
+         gedrag. */
+      eerder: k.employmentVanPersoon(persoon, true).filter(e => e.stand === 'beëindigd').map(plek),
       /* Ook hier de grens uit CONCERN.md, en met zoveel woorden: een werknemer
          die dit leest hoort te weten dat er geen abonnement achter zit. */
       regel: emps.length

@@ -8,15 +8,87 @@
 const { DEUREN, FEITEN, STAPOP_DEUREN } = require('./regels');
 const { RIJP } = require('../commercie/schaduw');
 const { WERKWOORDEN, KAMERSOORT, EXPORTEN } = require('./werkwoorden');
+const uitvoeren = require('./uitvoeren');
+
+/* KLEINE AANTALLEN BLIJVEN BINNEN in de werklijst (11 oktober 2026). Per route
+   is "opNaam 1x" met drie mensen op kantoor een aanwijsbaar persoon. Onder de
+   GRENS geen getal en geen nul, maar de stand TE_KLEINE_GROEP -- de vorm van
+   ../bedrijfsmaat/poort.js. De totalen per klasse blijven staan: die gaan over
+   het hele kantoor en niet over een zeldzame route. De route
+   (routes/office/beleidsmotor.js) past dit toe voor iedereen behalve de
+   eigenaar, die over afdwingen beslist en de exacte werklijst daarvoor nodig
+   heeft. */
+const TE_KLEINE_GROEP = 'TE_KLEINE_GROEP';   // dezelfde betekenis als in ../bedrijfsmaat/poort.js (geen require: andere domeingrens)
+const KLEIN = 5;
+function kleineAantallen(u) {
+  const DELEN = ['opNaam', 'eigenaarToken', 'gedeeld'];   // zouZakken is hun som
+  const weg = (r, v) => { r[v] = null; r.klein = TE_KLEINE_GROEP; };
+  u.werklijst = (u.werklijst || []).map(r => {
+    const uit = Object.assign({}, r);
+    for (const v of uitvoeren.SOORTEN.concat(['zouZakken'])) if (uit[v] > 0 && uit[v] < KLEIN) weg(uit, v);
+    /* TERUGREKENEN (B4): zouZakken = opNaam + eigenaarToken + gedeeld. Is een
+       deel weg, dan gaat de som ook weg -- anders is het deel som min de rest. */
+    if (DELEN.some(v => uit[v] === null)) weg(uit, 'zouZakken');
+    return uit;
+  });
+  /* COMPLEMENTAIRE ONDERDRUKKING: per klasse staan totalen. Is er in een klasse
+     iets weg, dan is het terug te rekenen uit totaal min de zichtbare cellen --
+     ook via een rij-som. Dus gaan in die klasse ALLE totalen weg, en daarmee de
+     totalen bovenaan. Wat dan nog zichtbaar is, zijn losse cellen die nergens
+     samen een vergelijking vormen met een verborgen cel. */
+  const pk = u.perKlasse || {};
+  let totaalWeg = false;
+  for (const k of Object.keys(pk)) {
+    if (!u.werklijst.some(r => r.klasse === k && r.klein)) continue;
+    const t = Object.assign({}, pk[k], { klein: TE_KLEINE_GROEP });
+    for (const v of uitvoeren.SOORTEN.concat(['zouZakken', 'waarnemingen'])) t[v] = null;
+    pk[k] = t; totaalWeg = true;
+  }
+  /* TOTAAL MIN ZICHTBAAR, per veld (N3). Niet alles staat in de werklijst: hij
+     is afgekapt op 100 rijen (de kleinste vallen eraf) en routes met alleen een
+     passkey staan er nooit in. Het klassetotaal min de zichtbare cellen is dan
+     de som van wat ontbreekt; is die klein, dan gaan de totalen van die klasse
+     weg -- anders rekent men een afgevallen 2 gewoon terug. */
+  for (const k of Object.keys(pk)) {
+    if (pk[k].klein) continue;
+    const rijen = u.werklijst.filter(r => r.klasse === k);
+    const klein = uitvoeren.SOORTEN.concat(['zouZakken']).some(v => {
+      const rest = (pk[k][v] || 0) - rijen.reduce((n, r) => n + (r[v] || 0), 0);
+      return rest > 0 && rest < KLEIN;
+    });
+    if (!klein) continue;
+    const t = Object.assign({}, pk[k], { klein: TE_KLEINE_GROEP });
+    for (const v of uitvoeren.SOORTEN.concat(['zouZakken', 'waarnemingen'])) t[v] = null;
+    pk[k] = t; totaalWeg = true;
+  }
+  if (totaalWeg) { u.zouZakken = null; u.waarnemingen = null; }
+  /* DE VOLGORDE VERRAADT NIETS (N3). De werklijst staat op zouZakken; een rij
+     met een verborgen cel op haar plaats laten, zet haar waarde tussen die van
+     haar buren. Die rijen gaan daarom achteraan, op route. */
+  const open = u.werklijst.filter(r => !r.klein);
+  const dicht = u.werklijst.filter(r => r.klein).sort((x, y) => (x.route < y.route ? -1 : x.route > y.route ? 1 : 0));
+  u.werklijst = open.concat(dicht);
+  u.kleineAantallen = { grens: KLEIN, stand: TE_KLEINE_GROEP,
+    uitleg: 'In de werklijst staat een aantal onder de ' + KLEIN + ' niet als getal: per route kan dat over een mens gaan. ' +
+      'Ook wat er uit de rest terug te rekenen is (een som, een klassetotaal) blijft binnen.' };
+  return u;
+}
 
 /* Drie bakken en geen percentage, en de rijpheid per deur apart: een deur die
    rijp is en nul keer oneens, kan verhuizen; de rest niet. */
-module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) {
+const stand = function stand({ beeld, dagen, sinds, oneens, verklaardOpen, kleinBinnen }) {
   const perDeur = {};
   const zonderPoort = [];
   const stapop = [];
   const gebruik = {};
+  const uitvoerRijen = [];
+  /* Wat over een plafond liep (../kantoor/mensdeur-spoel.js): geteld en
+     zichtbaar, en nooit als een deur of een route gelezen. */
+  const overgelopen = { deuren: 0, uitvoer: 0 };
   for (const r of Object.values(beeld)) {
+    if (r.pad === 'overig') { overgelopen.deuren += r.overgelopen || 0; continue; }
+    if (r.pad === uitvoeren.VOORVOEGSEL + 'overig') { overgelopen.uitvoer += r.overgelopen || 0; continue; }
+    if (r.pad.startsWith(uitvoeren.VOORVOEGSEL)) { uitvoerRijen.push(r); continue; }
     if (r.pad.startsWith('werkwoord ') || r.pad.startsWith('kamer ') || r.pad.startsWith('export ')) { gebruik[r.pad] = r.gebruik || 0; continue; }
     if (r.pad.startsWith('stapop ')) {
       const [, deur, ...rest] = r.pad.split(' ');
@@ -50,6 +122,7 @@ module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) 
     rijp: RIJP, meetSinds: new Date(sinds).toISOString(),
     rijpheidNoot: 'De dagen tellen sinds dit proces startte; de getallen zelf blijven over herstarts staan.',
     deuren,
+    overgelopen,
     feiten: FEITEN,
     oneens: oneens.slice(),
     zonderPoort: zonderPoort.sort((a, b) => b.keer - a.keer).slice(0, 100),
@@ -71,7 +144,13 @@ module.exports = function stand({ beeld, dagen, sinds, oneens, verklaardOpen }) 
       /* stap twee: door wie er zit, niet door wie (werkwoorden.js, kamerTelling) */
       naarToewijzing: Object.fromEntries(['eigen', 'vreemd', 'zonderToewijzing', 'onbekend']
         .map(s => [s, gebruik['kamer ' + k + ' ' + s] || 0])) })),
+    /* BESLUIT 3b: ENFORCE_EXECUTE in de schaduw -- welke uitvoerende routes
+       bij afdwingen zouden zakken, per klasse. Telt alleen (./uitvoeren.js). */
+    uitvoeren: kleinBinnen ? kleineAantallen(uitvoeren.lees(uitvoerRijen)) : uitvoeren.lees(uitvoerRijen),
     /* FASE 6: lezen is niet exporteren. Hoe vaak een bestand het huis verliet. */
     exporten: Object.keys(EXPORTEN).map(r => Object.assign({ route: r }, EXPORTEN[r], { geleverd: gebruik['export ' + r] || 0 }))
   };
 };
+module.exports = stand;
+module.exports.kleineAantallen = kleineAantallen;
+module.exports.KLEIN = KLEIN;

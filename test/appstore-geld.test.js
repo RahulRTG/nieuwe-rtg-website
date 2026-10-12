@@ -23,11 +23,11 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 const { splitsBruto } = require('../server/kern/fiscaal/digitaal');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-geld-'));
-let srv, base, lid, lidCode, sup, office, tech;
+let srv, base, lid, lidCode, sup, office, tekenaar, tech;
 const ORG = 'O-GELD';
 const PRIJS = 999;
 
@@ -59,7 +59,7 @@ async function publiceer(over) {
      want deze toetsen gaan over de winkel en niet over de keuring. */
   await api('/api/appstore/kantoor/toegankelijk',
     { versieId: r.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
-  const b = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  const b = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar);
   assert.equal(b.status, 200, JSON.stringify(b.body));
   return r.body.versie;
 }
@@ -77,15 +77,20 @@ test.before(async () => {
   lidCode = (await api('/api/pay/overzicht', {}, lid)).body.codenaam;
   assert.ok(lid && lidCode, 'een lid met een wallet');
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  /* DE TEKENAAR IS EEN MENS OP NAAM: de gedeelde code met een getypte naam
+     tekent geen app meer af (kern/appstore/vierogen.js, 11 oktober 2026). */
+  tekenaar = await kantoorAlsPersoon(base);
   tech = (await api('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
   const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const chef = (roster.staff || []).find(x => x.role === 'manager');
   sup = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+  // een zaakmens OP NAAM zendt in: zonder ledensleutel is vier-ogen niet vast te stellen (vierogen.js)
+  sup = await zaakMensOpNaam(base, sup, 'KIKUNOI');
   assert.ok(office && tech && sup, 'kantoor, eigenaar en uitgever ingelogd');
   assert.equal((await api('/api/techniek/tenant', { org: ORG, naam: 'Geld Uitgeverij' }, tech)).status, 200);
   assert.equal((await api('/api/techniek/tenant/bind', { org: ORG, soort: 'zaak', code: 'KIKUNOI' }, tech)).status, 200);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Geld Uitgeverij', contact: 'dev@geld.nl' }, sup);
-  assert.equal((await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, office)).status, 200);
+  assert.equal((await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar)).status, 200);
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
@@ -185,12 +190,17 @@ test('6. de afdracht werkt vooruit; een geschreven bon wordt nooit herrekend', a
   const eerste = (await api('/api/appstore/bonnen', {}, lid)).body.bonnen[0];
   assert.equal(eerste.afdrachtProcent, 0);
 
-  assert.equal((await api('/api/appstore/kantoor/afdracht', { procent: 15 }, office)).status, 400, 'zonder naam en reden gaat het niet');
-  const z = await api('/api/appstore/kantoor/afdracht', { procent: 15, reden: 'toets: RTG gaat een deel inhouden', door: 'Sam van RTG' }, office);
+  assert.equal((await api('/api/appstore/kantoor/afdracht', { procent: 15 }, tekenaar)).status, 400, 'zonder naam en reden gaat het niet');
+  /* De gedeelde code met een getypte naam zet geen geldinstelling: een opgegeven
+     naam is geen actor (11 oktober 2026). */
+  const getypt = await api('/api/appstore/kantoor/afdracht', { procent: 15, reden: 'toets: RTG gaat een deel inhouden', door: 'Sam van RTG' }, office);
+  assert.equal(getypt.status, 403, 'de gedeelde code zette de afdracht: ' + JSON.stringify(getypt.body));
+  assert.equal(getypt.body.watNu, 'inloggen-op-naam');
+  const z = await api('/api/appstore/kantoor/afdracht', { procent: 15, reden: 'toets: RTG gaat een deel inhouden', door: 'Sam van RTG' }, tekenaar);
   assert.equal(z.status, 200);
   assert.equal(z.body.afdracht.procent, 15);
   assert.match(z.body.let, /niet herrekend/);
-  assert.equal((await api('/api/appstore/kantoor/afdracht', { procent: 99, reden: 'te veel', door: 'Sam' }, office)).status, 400, 'er zit een bovengrens op');
+  assert.equal((await api('/api/appstore/kantoor/afdracht', { procent: 99, reden: 'te veel', door: 'Sam' }, tekenaar)).status, 400, 'er zit een bovengrens op');
 
   assert.equal((await api('/api/appstore/bonnen', {}, lid)).body.bonnen[0].afdrachtProcent, 0,
     'de bon van gisteren houdt het percentage van gisteren');
@@ -213,7 +223,7 @@ test('7. de uitgever ziet aantallen en bedragen, nooit wie', async () => {
 
 test('8. intrekken laat een RECHT achter, geen automatische terugboeking', async () => {
   const partnerVoor = (await api('/api/supplier/pay/overzicht', {}, sup)).body.saldo;
-  const t = await api('/api/appstore/kantoor/intrekken', { sleutel: 'derden-betaald', reden: 'toets', door: 'Sam van RTG' }, office);
+  const t = await api('/api/appstore/kantoor/intrekken', { sleutel: 'derden-betaald', reden: 'toets', door: 'Sam van RTG' }, tekenaar);
   assert.equal(t.status, 200);
   assert.equal(t.body.teruggaverechten, 1, 'wie betaalde, krijgt een recht');
   assert.equal((await api('/api/supplier/pay/overzicht', {}, sup)).body.saldo, partnerVoor,
@@ -236,6 +246,18 @@ test('8. intrekken laat een RECHT achter, geen automatische terugboeking', async
   assert.equal(g.status, 200, JSON.stringify(g.body));
   assert.notEqual(g.body.recht.besluit.door, 'Iemand Anders', 'een naam in het lijf telt niet');
   assert.ok(g.body.recht.besluit.door, 'de sessie levert de actor');
+  /* N1: de SESSIESLEUTEL is geen label. Hij staat intern bij het besluit en in
+     het kantoorjournaal, maar niet in het journaal van de uitgever en niet op
+     de tijdlijn van het lid. */
+  assert.match(String(g.body.recht.besluit.doorKey), /^user-\d+$/, 'de sleutel van wie besloot staat intern bij het besluit');
+  assert.ok(!/user-\d+/.test(g.body.recht.besluit.door), 'het label is geen sessiesleutel: ' + g.body.recht.besluit.door);
+  const kj = (await api('/api/appstore/kantoor/journaal', { n: 50 }, office)).body.journaal.find(r => r.wat === 'teruggave-betaald');
+  assert.ok(kj && kj.intern && /^user-\d+$/.test(kj.intern.doorKey) && !/user-\d+/.test(kj.wie), 'kantoorjournaal: label als wie, sleutel intern');
+  const uj = (await api('/api/appstore/uitgever/journaal', { n: 100 }, sup)).body.lijst;
+  assert.ok(uj.some(r => r.wat === 'teruggave-betaald'), 'de uitgever ziet de teruggave');
+  assert.ok(!/user-\d+/.test(JSON.stringify(uj)), 'maar nooit een sessiesleutel');
+  const tl = (await api('/api/appstore/tijdlijn', {}, lid)).body;
+  assert.ok(!/user-\d+/.test(JSON.stringify(tl)), 'en het lid ook niet op zijn tijdlijn');
   assert.equal((await api('/api/pay/overzicht', {}, lid)).body.saldo, saldoVoor + PRIJS, 'het lid heeft zijn geld terug');
   assert.equal((await api('/api/appstore/kantoor/teruggaven', {}, office)).body.open.length, 0);
   assert.equal((await api('/api/appstore/kantoor/teruggave', { id: recht.id, besluit: 'terugbetaald' }, opNaam)).status, 409,

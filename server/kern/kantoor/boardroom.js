@@ -49,8 +49,13 @@ function boardroomAuth(req, res, next) {
        hieronder, en daar leest envelop.wie(req) hem generiek uit. */
     req.boardroomBaas = boardroomBaas(key);
     // scherper dan officeAuth: een sleutel EN waar de bevoegdheid vandaan komt
+    /* De HARDHEID van de identiteit neemt deze poort over van officeAuth, die
+       hem net heeft vastgesteld (passkey = bewezen, anders opNaam); de boardroom
+       weet WIE en waar het gezag vandaan komt, niet met welke sleutel. Een
+       tweede oordeel hier zou `bewezen` zeggen over een wachtwoordsessie. */
+    const vorige = envelop.van(req);
     envelop.zet(req, { soort: req.boardroomBaas ? 'eigenaar' : 'kantoor', id: key,
-      identiteit: 'bewezen', gezagBron: req.boardroomBaas ? 'eigenaar' : 'toegekend',
+      identiteit: (vorige && vorige.actor && vorige.actor.identiteit) || 'onbekend', gezagBron: req.boardroomBaas ? 'eigenaar' : 'toegekend',
       gezagBaas: !!req.boardroomBaas });
     next();
   });

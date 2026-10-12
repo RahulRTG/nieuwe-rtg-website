@@ -36,13 +36,13 @@ test('alle toegangsschermen bewegen mee zonder invoer, voortgang of akkoord te v
       assert.deepEqual(codes,TALEN.map(t=>t.code));await offline.close();
     });
     await t.test('welkom, alle vier vragen en foutmeldingen volgen Nederlands en Engels',async()=>{
-      // Access has its own small language route. The authenticated Edge stays
-      // outside the identity flow and becomes available only after onboarding.
+      // Access has its own small language route. The Edge stays visible as the
+      // shared RTG shell, while identity fields remain owned by the gateway.
       await page.locator('#agLanguage').click();
       await page.locator('#rtg-lang-zoek').fill('English');
       await page.locator('#rtg-lang-hint[data-lang="en"]').click();
       assert.equal(await page.locator('#rtg-lang-modal').isVisible(),false);
-      assert.equal(await page.locator('.rtg-edge-chrome').evaluate(el=>getComputedStyle(el).display),'none');
+      assert.notEqual(await page.locator('.rtg-edge-chrome').evaluate(el=>getComputedStyle(el).display),'none');
       assert.equal(await page.locator('#agLanguage').innerText(),'EN');
       assert.match(await page.locator('#agTitle').innerText(),/Welcome/);
       assert.equal(await page.locator('#agNieuw').innerText(),'Create your RTG');

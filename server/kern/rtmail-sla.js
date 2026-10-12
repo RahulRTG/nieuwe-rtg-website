@@ -17,6 +17,7 @@
    twee postvakken eindeloos tegen elkaar te laten praten: nooit op een
    automatisch bericht, nooit op post van het team aan zichzelf, en maar EEN
    bevestiging per gesprek. */
+const { schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
 // wat NIET als antwoord telt voor de klok: door de machine geschreven post
@@ -28,6 +29,7 @@ module.exports = ({ db, save, rtmail, team }) => {
   const kap = (s, n) => String(s == null ? '' : s).replace(/[<>]/g, '').trim().slice(0, n);
   const store = () => {
     if (!db.data.rtmail || !Array.isArray(db.data.rtmail.berichten)) db.data.rtmail = { berichten: [] };
+    schoonLeiding(db.data.rtmail, save); // beperkte post nooit in het gedeelde postvak (./rtmail-leiding.js)
     return db.data.rtmail;
   };
 

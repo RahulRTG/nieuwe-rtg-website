@@ -214,14 +214,36 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      bediening van het platform: een bewaartermijn die je niet kunt uitvoeren omdat
      een schakelaar uit staat, is een belofte die breekt. Hij valt onder de reden van
      /api/techniek in kern/bestuursroutes.js. `onverklaard <= 10` beweegt niet mee. */
-  /* 151 -> 152: DE ONDERTEKENDE MEDIALINK (AUTHORITY.md B4, 12 oktober 2026).
+  /* 151 -> 152: DE RELAYSTAND (docs/turn-server.md, oktober 2026). GET /api/rtc/stand
+     is de gezondheidsmeting van het TURN-relais: afgeleid uit de laatste echte proef,
+     zonder geheimen. Een schakelaar erop zet bellen niet aan maar neemt alleen het zicht
+     weg op waarom het dicht staat. Met dezelfde reden in kern/bestuursroutes.js EN in
+     kern/platformregister/bediening.js; test/platformregister.test.js was groen voordat
+     dit getal werd verzet. `onverklaard <= 10` beweegt niet mee. */
+  /* 152 -> 153: HET RUILLOKET VAN DE STROOMTICKETS (POST /api/stroom/ticket, de
+     stap die de sessie uit het adres van een stroom haalde). Het opent zelf niets:
+     elke stroomdeur erachter heeft haar eigen schakelaar (kern-live voor
+     /api/stream), en een knop hier zou alle stromen van alle soorten tegelijk
+     dichtzetten -- ook die van kantoor en eigenaar, die hun stroom in onderhoud
+     nodig hebben. Met reden in kern/bestuursroutes.js EN in
+     kern/platformregister/bediening.js; test/platformregister.test.js was groen
+     voordat dit getal werd verzet. `onverklaard <= 10` beweegt niet mee: de route
+     telde daar mee (11) en is nu verklaard. */
+  /* 153 -> 154: OPNIEUW BEGINNEN (#580, SAMENLEVING.md). POST /api/privacy/opnieuw
+     staat naast /api/privacy/delete, /export en /inzage: een lid dat zijn sporen
+     wil wissen en opnieuw wil beginnen, oefent een recht uit, en een schakelaar
+     erop houdt hem vast aan een verleden dat hij kwijt wil. Hij valt onder de
+     bestaande reden van /api/privacy in kern/bestuursroutes.js ("AVG-rechten en
+     niet uitschakelbaar"). Kwam in de samenvoeging van #542 boven op #521 en #523,
+     die elk hun eigen stap al zetten. `onverklaard <= 10` beweegt niet mee. */
+  /* 154 -> 155: DE ONDERTEKENDE MEDIALINK (#587) (AUTHORITY.md B4, 12 oktober 2026).
      GET /media/t/:token levert privébeeld na de poort van een domeinroute. De
      levering is geen functie: wie iets mag zien beslist server/media/toegang.js,
      niet een knop. /media staat daarom met reden in kern/bestuursroutes.js (en
      al eerder in kern/platformregister/bediening.js), en test/platformregister.test.js
      en test/schakelkast-dekking.test.js waren groen voordat dit getal werd verzet.
      `onverklaard` ging in dezelfde stap OMLAAG, van 10 naar 9. */
-  assert.ok(zonder.length <= 152,
+  assert.ok(zonder.length <= 155,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');

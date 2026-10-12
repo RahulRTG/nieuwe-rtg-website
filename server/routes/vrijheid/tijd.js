@@ -45,11 +45,12 @@ module.exports = (kern) => {
     const jaar = Number(vandaag().slice(0, 4));
     const inst = V().instellingen.lees(code);
     const t = V().teambeeld(code);
+    const ik = t.mensen.find(m => m.id === p) || null;
     res.json({
       ok: true,
-      tijd: V().motor.mijnTijd(code, p, { beleid, rechten: null, jaar }),
+      tijd: V().motor.mijnTijd(code, p, { beleid, rechten: V().saldo.verlofrechten(code, ik || { id: p }, jaar, beleid), jaar }),
       verjaardag: (inst.verjaardagen[p] || {}).mmdd || null,
-      ikInDienst: !!(t.mensen.find(m => m.id === p) || {}).inDienst,
+      ikInDienst: !!(ik && ik.inDienst),
       /* Wat het systeem niet weet, staat erbij -- ook voor de medewerker. */
       ontbreekt: t.ontbreekt.map(o => o.reden),
       beleidOpen: beleid.open()
@@ -76,8 +77,10 @@ module.exports = (kern) => {
       ...(b.vanaf ? { vanaf: b.vanaf } : {}), ...(b.tot ? { tot: b.tot } : {}),
       ...(b.categorie === 'SPECIAL_LEAVE' && b.reden ? { reden: String(b.reden).slice(0, 500) } : {}) };
     const t = V().teambeeld(code);
+    const beleid = V().beleidVoor(code);
+    const rechten = V().saldo.verlofrechten(code, t.mensen.find(m => m.id === p) || { id: p }, b.datum.slice(0, 4), beleid);
     return duurzaam(res, () => V().motor.vraag(code, t, verzoek,
-      { door: p, beleid: V().beleidVoor(code), rechten: null, vandaag: vandaag(), sleutel: b.sleutel ? String(b.sleutel).slice(0, 80) : undefined }));
+      { door: p, beleid, rechten, vandaag: vandaag(), sleutel: b.sleutel ? String(b.sleutel).slice(0, 80) : undefined }));
   });
 
   app.post('/api/staff/tijd/intrekken', supplierAuth, (req, res) => {

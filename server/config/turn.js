@@ -6,78 +6,40 @@
 const net = require('node:net');
 const crypto = require('node:crypto');
 
-const PLAATSHOUDER = /(?:voorbeeld|example|placeholder|change-?me|your-?(?:domain|host)|vul-?in|dummy|test-?only)/i;
-const GERESERVEERD_DOMEIN = /(?:^|\.)(?:localhost|local|internal|invalid|test|example)$/i;
-const VOORBEELD_DOMEIN = /(?:^|\.)example\.(?:com|net|org)$/i;
-
-function priveIpv4(host) {
-  const p = host.split('.').map(Number);
-  if (p.length !== 4 || p.some(x => !Number.isInteger(x) || x < 0 || x > 255)) return true;
-  return p[0] === 0 || p[0] === 10 || p[0] === 127 || p[0] >= 224 ||
-    (p[0] === 100 && p[1] >= 64 && p[1] <= 127) ||
-    (p[0] === 169 && p[1] === 254) ||
-    (p[0] === 172 && p[1] >= 16 && p[1] <= 31) ||
-    (p[0] === 192 && (p[1] === 168 || p[1] === 0 || (p[1] === 0 && p[2] === 2))) ||
-    (p[0] === 198 && (p[1] === 18 || p[1] === 19 || p[1] === 51 && p[2] === 100)) ||
-    (p[0] === 203 && p[1] === 0 && p[2] === 113);
-}
-
-function priveIpv6(host) {
-  const h = host.toLowerCase();
-  if (h === '::' || h === '::1' || h.startsWith('2001:db8:') || h === '2001:db8::') return true;
-  if (/^f[cd]/.test(h) || /^fe[89ab]/.test(h) || /^ff/.test(h)) return true;
-  const mapped = ipv4Mapped(h);
-  return mapped ? priveIpv4(mapped) : false;
-}
-
-/* Node herkent zowel ::ffff:127.0.0.1 als ::ffff:7f00:1 als IPv6. Alleen de
-   eerste tekstvorm controleren laat dezelfde private IPv4-bestemming dus via
-   hex-notatie binnen. Normaliseer de acht groepen en haal de laatste 32 bits
-   terug voordat de gewone IPv4-classificatie beslist. */
-function ipv4Mapped(host) {
-  let h = String(host || '').toLowerCase();
-  if (net.isIP(h) !== 6) return null;
-  const gestippeld = h.match(/^(?:::ffff:)(\d+\.\d+\.\d+\.\d+)$/);
-  if (gestippeld) return gestippeld[1];
-  const kanten = h.split('::');
-  if (kanten.length > 2) return null;
-  const links = kanten[0] ? kanten[0].split(':') : [];
-  const rechts = kanten.length === 2 && kanten[1] ? kanten[1].split(':') : [];
-  const ontbrekend = 8 - links.length - rechts.length;
-  if (ontbrekend < 0 || (kanten.length === 1 && ontbrekend !== 0)) return null;
-  const groepen = [...links, ...Array(ontbrekend).fill('0'), ...rechts]
-    .map(x => Number.parseInt(x || '0', 16));
-  if (groepen.length !== 8 || groepen.some(x => !Number.isInteger(x) || x < 0 || x > 0xffff)) return null;
-  if (groepen.slice(0, 5).some(x => x !== 0) || groepen[5] !== 0xffff) return null;
-  return [groepen[6] >> 8, groepen[6] & 255, groepen[7] >> 8, groepen[7] & 255].join('.');
-}
-
-function openbareHost(host) {
-  const kaal = String(host || '').replace(/^\[|\]$/g, '').toLowerCase();
-  const ip = net.isIP(kaal);
-  if (ip === 4) return !priveIpv4(kaal);
-  if (ip === 6) return !priveIpv6(kaal);
-  if (!kaal.includes('.') || kaal.length > 253 || PLAATSHOUDER.test(kaal) ||
-      GERESERVEERD_DOMEIN.test(kaal) || VOORBEELD_DOMEIN.test(kaal)) return false;
-  return kaal.split('.').every(label => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(label));
-}
+const { ipv4Mapped, openbareHost } = require('./turn-adres');
 
 function ontleedUrl(waarde, { publiekeProductie = false } = {}) {
   const url = String(waarde || '').trim();
   const m = url.match(/^(turns?):(\[[0-9a-f:.]+\]|[^\s:/?#]+):(\d{1,5})(?:\?transport=(tcp|udp))?$/i);
   if (!m) return { ok:false, reden:'formaat-host-of-poort-ongeldig' };
   const schema = m[1].toLowerCase(), poort = Number(m[3]);
-  if (publiekeProductie && schema !== 'turns') return { ok:false, reden:'plaintext-turn-niet-toegestaan' };
-  if (publiekeProductie && m[4] && m[4].toLowerCase() !== 'tcp')
+  /* Publieke productie (besluit eigenaar, 6 oktober 2026): `turns:` over TCP,
+     en daarnaast `turn:` UITSLUITEND met expliciet ?transport=udp. Media blijft
+     DTLS-SRTP-versleuteld en de TURN-berichten dragen een HMAC; UDP geeft
+     betere gesprekskwaliteit. Een kale `turn:` (de browser probeert dan ook
+     TCP zonder TLS) en `turns:` over UDP blijven geweigerd. */
+  const transport = m[4] ? m[4].toLowerCase() : null;
+  if (publiekeProductie && schema === 'turn' && transport !== 'udp')
+    return { ok:false, reden:'plaintext-turn-niet-toegestaan' };
+  if (publiekeProductie && schema === 'turns' && transport && transport !== 'tcp')
     return { ok:false, reden:'onveilig-transport' };
   if (!Number.isInteger(poort) || poort < 1 || poort > 65535) return { ok:false, reden:'poort-ongeldig' };
   const host = m[2].replace(/^\[|\]$/g, '');
   if (net.isIP(host) === 0 && !/^[a-z0-9.-]+$/i.test(host)) return { ok:false, reden:'host-ongeldig' };
   if (publiekeProductie && !openbareHost(host)) return { ok:false, reden:'host-niet-openbaar' };
-  return { ok:true, url, schema, host, poort };
+  return { ok:true, url, schema, host, poort, transport:m[4] ? m[4].toLowerCase() : null };
 }
 
+/* Een lijst moet in publieke productie minstens EEN turns:-adres dragen: UDP
+   komt niet door elke bedrijfsfirewall, TLS over TCP vrijwel altijd. */
 function ontleedLijst(waarde, opties) {
+  const uit = ontleedLijstKaal(waarde, opties);
+  if (opties && opties.publiekeProductie && uit.urls.length && !uit.urls.some(u => /^turns:/i.test(u)))
+    uit.fouten.push({ index:-1, reden:'turns-adres-ontbreekt' });
+  return uit;
+}
+
+function ontleedLijstKaal(waarde, opties) {
   const bron = String(waarde || '');
   if (!bron.trim()) return { urls:[], fouten:[] };
   const urls = [], fouten = [];
@@ -143,39 +105,36 @@ function projecteerStun(env, { publiekeProductie = false, requestHost = null } =
   return { urls:lijst.urls, fouten:lijst.fouten };
 }
 
-function sterkGeheim(waarde) {
-  const s = String(waarde || '');
-  if (s.length < 32 || s.length > 512 || /[\s\0-\x1f\x7f]/.test(s) || PLAATSHOUDER.test(s)) return false;
-  if (new Set(s).size < 8) return false;
-  return (s + s).indexOf(s, 1) === s.length;
-}
+const { sterkGeheim, geldigeGebruiker, credentials, ttlVan, actorLabel, tijdelijk,
+  TTL_STANDAARD, TTL_MIN, TTL_MAX } = require('./turn-credential');
 
-function geldigeGebruiker(waarde) {
-  const s = String(waarde || '');
-  return s.length >= 3 && s.length <= 128 && !/[\s\0-\x1f\x7f:]/.test(s) && !PLAATSHOUDER.test(s);
-}
-
-function credentials(env) {
-  const secret = String(env.TURN_SECRET || '');
-  if (sterkGeheim(secret)) return { soort:'tijdelijk', secret };
-  const username = String(env.TURN_USER || ''), credential = String(env.TURN_PASS || '');
-  if (geldigeGebruiker(username) && sterkGeheim(credential))
-    return { soort:'vast', username, credential };
-  return null;
-}
-
-function projecteerTurn(env, { publiekeProductie = false, nu = Date.now } = {}) {
+/* Een vingerafdruk van de relevante TURN-configuratie. Bewijs (de relayproef)
+   geldt alleen zolang deze gelijk blijft: een andere URL-lijst of een ander
+   geheim maakt eerder bewijs ongeldig. Het geheim zit er als HMAC in, niet als
+   hash van zichzelf. */
+function vingerafdruk(env, { publiekeProductie = false } = {}) {
   const lijst = ontleedLijst(env.TURN_URL, { publiekeProductie });
-  const auth = credentials(env);
+  const auth = credentials(env, { publiekeProductie });
+  const sleutel = auth ? (auth.secret || auth.credential) : null;
+  const geheim = sleutel ? crypto.createHmac('sha256', sleutel)
+    .update('rtg-turn-config-vingerafdruk-v1').digest('hex') : 'geen';
+  return crypto.createHash('sha256').update(['rtg-turn-config-v1', [...lijst.urls].sort().join(','),
+    auth ? auth.soort : 'geen', geheim, String(ttlVan(env))].join('\0')).digest('hex');
+}
+
+function projecteerTurn(env, { publiekeProductie = false, nu = Date.now, actor = null } = {}) {
+  const lijst = ontleedLijst(env.TURN_URL, { publiekeProductie });
+  const auth = credentials(env, { publiekeProductie });
   if (!lijst.urls.length || !auth || (publiekeProductie && lijst.fouten.length))
     return { server:null, fouten:lijst.fouten };
   if (auth.soort === 'vast') return { server:{ urls:lijst.urls,
     username:auth.username, credential:auth.credential }, fouten:lijst.fouten };
-  const username = Math.floor(nu() / 1000 + 3600) + ':rtg';
-  const credential = crypto.createHmac('sha1', auth.secret).update(username).digest('base64');
-  return { server:{ urls:lijst.urls, username, credential }, fouten:lijst.fouten };
+  const c = tijdelijk(auth.secret, { actor, ttl:ttlVan(env), nu });
+  return { server:{ urls:lijst.urls, username:c.username, credential:c.credential },
+    verloopt:c.verloopt, fouten:lijst.fouten };
 }
 
 module.exports = { ontleedUrl, ontleedLijst, ontleedStunUrl, ontleedStunLijst,
   openbareHost, ipv4Mapped, sterkGeheim, geldigeGebruiker, credentials,
-  projecteerTurn, projecteerStun };
+  projecteerTurn, projecteerStun, tijdelijk, actorLabel, ttlVan, vingerafdruk,
+  TTL_STANDAARD, TTL_MIN, TTL_MAX };

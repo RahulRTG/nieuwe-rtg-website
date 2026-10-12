@@ -235,8 +235,10 @@ test('7. de context wordt NERGENS bewaard', () => {
   /* Vluchtig, en dat is geen belofte maar een eigenschap van de bron: een
      scherm waar iemand gisteren naar keek, hoort morgen nergens te staan.
      MUTATIE: schrijf de gesaneerde context in het fluisterprofiel. */
-  const BUREN = { 'menscontext.js': ['./menscontext-uit', './menscontext-ref'],
-    'menscontext-ref.js': [], 'menscontext-uit.js': [] };
+  /* menscontext-vers.js kwam erbij met de Context Bridge (EDGE.md par. 14.4):
+     het leesmoment van het blikveld, en ook die buur raakt niets aan. */
+  const BUREN = { 'menscontext.js': ['./menscontext-uit', './menscontext-ref', './menscontext-vers'],
+    'menscontext-ref.js': [], 'menscontext-uit.js': [], 'menscontext-vers.js': [] };
   for (const f of Object.keys(BUREN)) {
     const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/stuur', f), 'utf8');
     const code = bron.replace(/\/\*[\s\S]*?\*\//g, '');

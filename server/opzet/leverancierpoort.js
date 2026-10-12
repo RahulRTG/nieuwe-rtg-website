@@ -21,6 +21,7 @@
 
 const envelop = require('./envelop');
 const kostenhaak = require('../kern/kosten/haak');
+const logboekzicht = require('../kern/leverancier/logboekzicht');
 
 module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
   grootSupplierSync, busGeef, kernGeef, markeerHospitalityRequest }) => {
@@ -29,8 +30,10 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
   const kern = new Proxy({}, { get: (_, naam) => kernGeef()[naam] });
 
   // SSE-routering naar een specifieke leverancier of naar de backoffice
-  function sseToSupplier(code, event, data) {
-    bus.publish('sse', { doel: 'sup', match: code, event, data, envelop: { classificatie: 'intern' } });
+  // `alleenVoor` ({ staffId }) beperkt het signaal tot de managers en die ene medewerker (kern/sse.js)
+  function sseToSupplier(code, event, data, alleenVoor) {
+    bus.publish('sse', { doel: 'sup', match: code, event, data, envelop: { classificatie: 'intern' },
+      ...(alleenVoor ? { alleenVoor } : {}) });
   }
   function sseToOffice(event, data) {
     bus.publish('sse', { doel: 'office', event, data, envelop: { classificatie: 'intern' } });
@@ -99,18 +102,31 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO, accounts,
   const persoonsPoort = require('./persoonspoort')({ kern, DEMO });
 
   // Legt vast wie wat deed binnen het bedrijf; live zichtbaar in de team-tab.
-  function noteerActiviteit(code, actor, text, bewaar) {
+  // `soort` markeert een klokregel; wie hem mag ontvangen beslist ../kern/leverancier/logboekzicht.js
+  function noteerActiviteit(code, actor, text, bewaar, soort) {
+    if (soort != null && !logboekzicht.isKlokSoort(soort)) throw new Error('Onbekende logboeksoort: ' + soort);
     const list = db.data.supplierActivity[code] = (db.data.supplierActivity[code] || []);
-    list.unshift({ who: actor ? actor.name : 'Beheer', text, at: new Date().toISOString() });
-    db.data.supplierActivity[code] = list.slice(0, 80);
+    const regel = { who: actor ? actor.name : 'Beheer', text, at: new Date().toISOString() };
+    if (soort != null) {
+      regel.soort = soort;
+      // zodat de medewerker zelf zijn eigen beschermde regel terugkrijgt, op id en nooit op naam
+      if (actor && actor.staffId != null) regel.staffId = actor.staffId;
+    }
+    list.unshift(regel);
+    // een eigen grens per klasse: een beschermde regel drukt geen zichtbare regel weg (zijkanaal)
+    db.data.supplierActivity[code] = logboekzicht.bewaarLogboek(list);
     bewaar();
-    sseToSupplier(code, 'sync', { scope: 'team' });
+    /* een beschermde regel geeft geen signaal aan het hele team -- een signaal
+       zonder zichtbare nieuwe regel zou een collega het tijdstip verraden --
+       maar wel aan de managers en de medewerker zelf, die hem kunnen zien */
+    sseToSupplier(code, 'sync', { scope: 'team' },
+      soort != null ? { staffId: actor && actor.staffId != null ? actor.staffId : null } : undefined);
   }
-  const logActivity = (code, actor, text) => noteerActiviteit(code, actor, text, save);
+  const logActivity = (code, actor, text, soort) => noteerActiviteit(code, actor, text, save, soort);
   // Alleen voor een caller die zijn andere mutaties al zelf heeft bewaard.
   // Gewone activiteit bewaart ook de bestaande impliciete domeinmutaties mee.
-  logActivity.alleenActiviteit = (code, actor, text) => noteerActiviteit(code, actor, text,
-    () => typeof save.sleutels === 'function' ? save.sleutels(['supplierActivity']) : save());
+  logActivity.alleenActiviteit = (code, actor, text, soort) => noteerActiviteit(code, actor, text,
+    () => typeof save.sleutels === 'function' ? save.sleutels(['supplierActivity']) : save(), soort);
 
   return { sseToSupplier, sseToOffice, notifySupplier, supplierIndex,
     findSupplier, supplierAuth, persoonsPoort, logActivity };

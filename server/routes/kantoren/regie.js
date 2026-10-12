@@ -114,7 +114,19 @@ module.exports = (ctx) => {
     if (r.ok) sseToOffice('sync', { scope: 'paniek' });
     return r;
   }));
-  app.post('/api/office/paniek/bericht', officeAuth, (req, res) => veilig(res, () => afdelingen.paniekBericht(String(req.body.id || ''), String(req.body.wie || ''), req.body.tekst)));
+  /* WIE ER SPREEKT KOMT UIT DE SESSIE (besluit 3, 11 oktober 2026; AUTHORITY.md
+     P0b). Hier stond `req.body.wie`: de kantoorsessie zei ZELF of zij als
+     "boardroom" of als "paniekkamer" sprak, dus de gedeelde kantoorcode kon in de
+     discussie onder een voorstel spreken alsof de boardroom het zei -- de kamer
+     die er daarna over besluit. Boardroom is nu wie een boardroomzetel HEEFT;
+     iedereen anders spreekt als paniekkamer, wat hij ook meestuurt. */
+  const spreker = (req) => {
+    try {
+      const k = kern.boardroomWie(req);
+      return k && typeof kern.magBoardroom === 'function' && kern.magBoardroom(k) ? 'boardroom' : 'paniekkamer';
+    } catch (e) { return 'paniekkamer'; }
+  };
+  app.post('/api/office/paniek/bericht', officeAuth, (req, res) => veilig(res, () => afdelingen.paniekBericht(String(req.body.id || ''), spreker(req), req.body.tekst)));
 
   // de wereld: alles in het veld als bolletje (groen oke, oranje uit, rood
   // storing), met reset- en hulpknoppen; elke knop komt in het auditlog

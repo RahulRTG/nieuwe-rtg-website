@@ -1,4 +1,5 @@
 'use strict';
+const metDekking = require('./lib/dekking');
 const test = require('node:test'), assert = require('node:assert/strict');
 const fixture = require('./lib/audit-rijen-fixture');
 const schoon = (v, n) => String(v ?? '').slice(0, n);
@@ -19,10 +20,10 @@ function proef(t, reeks) {
     payBoekingenVoegToe: b => grootboek().push(b), save, id: () => 'PB' + (++teller), schoon,
     nu: () => Date.now(), waardePoort: () => null, betalingenUit: false,
     geldModus: 'schaduw', schaduw: { spiegel() {} }, MIN_CENTEN: 1, MAX_CENTEN: 500000 });
-  const pay = require('../server/kern/pay/zaakbetaling')({ schoon,
+  const pay = require('../server/kern/pay/zaakbetaling')(metDekking({ schoon,
     rekLid: c => 'lid:' + c, rekPartner: c => 'partner:' + c, saldoVan, boekAsync,
     metIdem: require('../server/lib/idem')({ d: () => db.data, save, bijeen, naam: 'payIdem', duurzaam: true }),
-    zorgSaldo: async () => ({ ok: true }), seintje() {}, MIN_CENTEN: 1, MAX_CENTEN: 500000 });
+    zorgSaldo: async () => ({ ok: true }), seintje() {}, MIN_CENTEN: 1, MAX_CENTEN: 500000 }));
   const zaak = { code: 'TAXI', name: 'Testvervoerder', type: 'taxi', settings: {} };
   const ctx = { db, save, pay, crypto: { randomBytes: n => Buffer.alloc(n, reeks[Math.min(willekeur++, reeks.length - 1)]) },
     schoon, findSupplier: code => code === zaak.code ? zaak : null, optieAan: () => true,

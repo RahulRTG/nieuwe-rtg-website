@@ -24,13 +24,39 @@
     if (/^[a-z0-9][a-z0-9-]{1,31}$/.test(c)) window.__RTG_CAMPAGNE = c;
   } catch (e) {}
 })();
+/* De pas van deze werktafel. Bijna elk scherm linkt terug naar de kale
+   /apps/app.html. Zonder ?pas= startte de werktafel dan VOLLEDIG op (170
+   scripts plus /api/state), ontdekte de pas van het lid en herlaadde zich met
+   location.replace(?pas=...): twee keer opstarten bij elke terugkeer
+   (SCHILHERSTART.json). Hier, voor het eerste script dat het adres leest, zet
+   een ingelogd lid wiens pas de server eerder bevestigde (app-main-03.js) het
+   adres meteen goed -- zonder navigatie. Het is een voorschot en geen besluit:
+   restoreSession() toetst de pas opnieuw tegen de sessie en stuurt door als
+   het geheugen niet meer klopt. Zonder token, met ?verify=, ?reset= of de
+   Magnaat-kopie blijft alles zoals het was. En ALLEEN in het bovenste venster:
+   staat deze pagina als blad in de werktafel (een oude Homealias), dan geeft
+   het blok hieronder haar terug aan de host, en die leest een ?pas= in het
+   adres als een diepe link en herlaadt dan de hele werktafel. Dat ving
+   test/appmenu.e2e.js ("Reizen & Veilig ..."), en niet de meter. */
+(function () {
+  try {
+    if (window.self !== window.top) return;
+    var q = new URLSearchParams(location.search);
+    if (q.has('pas') || q.has('verify') || q.has('reset') || q.has('magnaat')) return;
+    if (!localStorage.getItem('rtg_member_token')) return;
+    var pas = localStorage.getItem('rtg_werktafel_pas');
+    if (pas !== 'rtg' && pas !== 'lifestyle' && pas !== 'business') return;
+    q.set('pas', pas);
+    history.replaceState(history.state, '', location.pathname + '?' + q.toString() + location.hash);
+  } catch (e) {}
+})();
 </script>
 <!-- De bouwstempel. npm run build zet hier en in app-main.js hetzelfde getal;
      wijken ze af, dan draait er nieuwe html naast een oud script (of andersom)
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="77a2d8f2">
+<meta name="rtg-bouw" content="0f6a9048">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/meelezen.js"></script>
@@ -43,6 +69,7 @@
 <!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
 <script src="/shared/experience-handoff.js"></script>
 <script src="/shared/id.js"></script>
+<script src="/shared/stroom.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <script>
 /* De app-shell is uitsluitend host. Als een oud of programmatisch child-pad
@@ -81,6 +108,8 @@ try {
 <script src="/shared/adaptief.js" defer></script>
 <script src="/shared/adaptief/grammatica.js" defer></script>
 <script src="/shared/objectverwijzing.js" defer></script>
+<script src="/shared/edge/taakbeeld.js" defer></script>
+<script src="/shared/edge/conceptwerk.js" defer></script>
 <script src="/shared/adaptief/vorm.js" defer></script>
 <script src="/shared/adaptief/register.js" defer></script>
 <script src="/shared/adaptief/lagen.js" defer></script>
@@ -1391,6 +1420,10 @@ try {
     border-bottom-right-radius:calc(var(--e) * 0.3);
   }
   .os-bel.denkt{opacity:0.6;font-style:italic;}
+  /* het taakbeeld (shared/edge/taakbeeld.js): tekst, geen kleurcodes -- de
+     stand staat er in woorden, zodat hij ook zonder kleur te lezen is */
+  .os-taak-regel.doel{font-weight:600;}
+  .os-taak-regel.grens{font-style:italic;}
   /* de suggesties van Rahul: tikken in plaats van typen */
   .os-aitips{
     flex-shrink:0;display:flex;gap:calc(var(--e) * 0.35);flex-wrap:wrap;
@@ -1788,46 +1821,47 @@ try {
 #etalage-ov .salon-etalage-volg{margin-left:auto;background:none;color:var(--rtg-leesgoud,var(--goud));border:1px solid var(--rtg-leesgoud,var(--goud));border-radius:0;padding:0.3rem 0.9rem;font-size:0.72rem;font-weight:600;font-family:inherit;cursor:pointer;}
 #etalage-ov .salon-etalage-volg.volgt{background:var(--rtg-leesgoud,var(--goud));color:#000;}
 </style>
-<script src="/shared/command/catalog.js?v=77a2d8f2" defer></script>
-<script src="/shared/command/console.js?v=77a2d8f2" defer></script>
-<script src="/shared/command/verdeler.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/module-sdk.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-world-catalog.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-continuity.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-composer.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-registries.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-session.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-policy.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-context.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-navigation.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-state.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-orchestrator.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-blueprints.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-broker.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-module-host.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-runtime.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-legacy.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/workspace-empty.js?v=77a2d8f2" defer></script>
+<script src="/shared/command/catalog.js?v=0f6a9048" defer></script>
+<script src="/shared/command/console.js?v=0f6a9048" defer></script>
+<script src="/shared/command/verdeler.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/module-sdk.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-world-catalog.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-continuity.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-composer.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-registries.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-session.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-policy.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-context.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-navigation.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-state.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-orchestrator.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-blueprints.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-broker.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-module-host.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-runtime.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-legacy.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/workspace-empty.js?v=0f6a9048" defer></script>
 <!-- RTG_WORKSPACE_MODULES_START: nieuwe modules komen via scripts/workspace-module.js binnen -->
-<script src="/shared/interface/second-screen-modules.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/modules/context.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/modules/travel.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/modules/safety.js?v=77a2d8f2" defer></script>
+<script src="/shared/interface/second-screen-modules.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/modules/context.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/modules/travel.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/modules/safety.js?v=0f6a9048" defer></script>
 <!-- RTG_WORKSPACE_MODULES_END -->
-<script src="/shared/interface/workspace-experience.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/second-screen.js?v=77a2d8f2" defer></script>
-<script src="/shared/interface/second-screen-personal.js?v=77a2d8f2" defer></script>
-<script src="/shared/command/bank.js?v=77a2d8f2" defer></script>
-<script src="/shared/command/praat.js?v=77a2d8f2" defer></script>
-<script src="/shared/command/inlogpoort.js?v=77a2d8f2" defer></script>
-<script src="/shared/command/bladhaak.js?v=77a2d8f2" defer></script>
-<script src="/shared/command/romp.js?v=77a2d8f2" defer></script>
-<script src="/shared/command/geheugen.js?v=77a2d8f2" defer></script>
+<script src="/shared/interface/workspace-experience.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/second-screen.js?v=0f6a9048" defer></script>
+<script src="/shared/interface/second-screen-personal.js?v=0f6a9048" defer></script>
+<script src="/shared/command/bank.js?v=0f6a9048" defer></script>
+<script src="/shared/command/praat.js?v=0f6a9048" defer></script>
+<script src="/shared/command/inlogpoort.js?v=0f6a9048" defer></script>
+<script src="/shared/command/bladhaak.js?v=0f6a9048" defer></script>
+<script src="/shared/command/romp.js?v=0f6a9048" defer></script>
+<script src="/shared/command/geheugen.js?v=0f6a9048" defer></script>
+<script src="/shared/edge/rahulzicht.js" defer></script>
 <script src="/shared/rahul-tab/helpers.js" defer></script>
-<script src="/shared/command/beginscherm.js?v=77a2d8f2" defer></script>
-<script src="/shared/command/bladstand.js?v=77a2d8f2" defer></script>
-<script src="/shared/command/werktafel.js?v=77a2d8f2" defer></script>
-<script src="/shared/command.js?v=77a2d8f2" defer></script>
+<script src="/shared/command/beginscherm.js?v=0f6a9048" defer></script>
+<script src="/shared/command/bladstand.js?v=0f6a9048" defer></script>
+<script src="/shared/command/werktafel.js?v=0f6a9048" defer></script>
+<script src="/shared/command.js?v=0f6a9048" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -2514,8 +2548,8 @@ try {
 <script src="/shared/glyf.js"></script>
 <script src="/shared/emoji.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<script src="/apps/magnaat-sandbox.js?v=77a2d8f2"></script>
-<script src="/apps/magnaat-data.js?v=77a2d8f2"></script>
+<script src="/apps/magnaat-sandbox.js?v=0f6a9048"></script>
+<script src="/apps/magnaat-data.js?v=0f6a9048"></script>
 <script src="/apps/access/meaning.js"></script>
 <script src="/apps/app-main.js" defer></script>
 <script>

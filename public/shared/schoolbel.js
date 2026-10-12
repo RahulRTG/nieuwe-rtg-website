@@ -18,9 +18,12 @@
       .then(function (r) { return r.json().catch(function () { return {}; }); });
   }
   function sein(kind, payload) { if (call) post({ naar: call.met, kind: kind, payload: payload || null }).catch(function () {}); }
+  /* Elke oproep verse ICE-servers: een TURN-credential is kortlevend. Dezelfde
+     klas-geloofsbrief als het belsignaal, naar een deur binnen dezelfde router. */
   function haalIce() {
-    if (iceConfig) return Promise.resolve(iceConfig);
-    return fetch('/api/ice').then(function (r) { return r.json(); })
+    var b = Object.assign({ klasCode: S.klasCode }, S.gezin ? { code: S.gezin.code, token: S.gezin.token } : { leraarToken: S.leraar.token });
+    return fetch('/api/foundation/school/ice', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) })
+      .then(function (r) { return r.json(); })
       .then(function (d) { iceConfig = d.iceServers || []; return iceConfig; })
       .catch(function () { iceConfig = []; return iceConfig; });
   }
@@ -123,10 +126,13 @@
     start: function (opts) {
       S = opts;
       if (es) { try { es.close(); } catch (e) {} }
-      var q = 'klasCode=' + encodeURIComponent(S.klasCode) + (S.gezin
-        ? '&code=' + encodeURIComponent(S.gezin.code) + '&token=' + encodeURIComponent(S.gezin.token)
-        : '&leraarToken=' + encodeURIComponent(S.leraar.token));
-      es = new EventSource('/api/foundation/school/belkanaal?' + q);
+      /* Het token gaat in de KOP naar de ruilplek, en alleen een eenmalig
+         ticket staat in het adres van het kanaal (shared/stroom.js). */
+      var q = 'klasCode=' + encodeURIComponent(S.klasCode) + (S.gezin ? '&code=' + encodeURIComponent(S.gezin.code) : '');
+      es = RTGStroom.open('/api/foundation/school/belkanaal?' + q, { sinds: false,
+        token: S.gezin ? S.gezin.token : S.leraar.token,
+        ticketPad: '/api/foundation/school/belkanaal/ticket',
+        lijf: { klasCode: S.klasCode, code: S.gezin ? S.gezin.code : '' } });
       es.addEventListener('bel', function (e) { try { opSignaal(JSON.parse(e.data)); } catch (x) {} });
     },
     bel: function (naar, naam) {

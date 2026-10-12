@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T02:27:38.087Z",
-    "commit": "739a74980",
+    "op": "2026-10-12T11:09:03.009Z",
+    "commit": "ea12d803a",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -12212,6 +12212,13 @@
         "sourceSha256": "a3ef0b6130983a40089895c2e4eafb6f1dc7a4a05a6a85df745f1f7039eee1ee",
         "testSha256": "78ca1c807175600cd60b19dc35e5f02ded5b8ecc631869f32b79723025443014"
       }
+    },
+    "reis-lezen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 10,
+      "scherp": "gezakt"
     },
     "reisaanbod.test.js": {
       "soort": "server",

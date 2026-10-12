@@ -65,10 +65,10 @@
  },
  "laagste": 100,
  "stempel": {
-  "op": "2026-10-12T10:59:58.214Z",
-  "commit": "1f4d5f046",
-  "boomVuil": true,
-  "boomAnders": 1,
+  "op": "2026-10-12T11:09:13.708Z",
+  "commit": "ea12d803a",
+  "boomVuil": false,
+  "boomAnders": 0,
   "instrument": "scripts/resolverbereik.js",
   "node": "v22.22.0"
  },

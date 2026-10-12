@@ -34,7 +34,7 @@ module.exports = ({ soorten, transactie, bearer, eigen, geopend }) => {
         return null;
       });
     } catch (e) { return null; }
-    const raw = gevonden ? geopend(gevonden.onderwerp, gevonden.naam) : null;
+    const raw = gevonden ? geopend(gevonden.onderwerp, gevonden.naam, bearer.hash(kaal)) : null;
     return raw ? { soort: gevonden.naam, token: raw } : null;
   };
 };

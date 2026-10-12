@@ -3,7 +3,7 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "7f8d31011",
+  "commit": "773bcc27f",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -1955,8 +1955,8 @@
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-10-12T21:22:12.824Z",
-   "commit": "65600696c",
+   "op": "2026-10-12T20:58:33.319Z",
+   "commit": "8bd2ffc0a",
    "invoer": {
     "meting": "invoerspoor",
     "versie": 1,

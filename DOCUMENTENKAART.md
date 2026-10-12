@@ -2560,7 +2560,7 @@ De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
 (<!--getal:graaf.routesMetSymbool-->3373<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
 <!--getal:graaf.opgelostPct-->25.4<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
-`res.json()` of `String()`, en <!--getal:graaf.contextobject-->20794<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
+`res.json()` of `String()`, en <!--getal:graaf.contextobject-->20796<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
 in server/opzet/ wordt samengesteld. Dat leek statisch onherleidbaar tot
 `CONTEXTPROEF.json` het NAMAT (`npm run contextproef`, een runtime-meting in de
 domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> routes die werk deden reiken er maar

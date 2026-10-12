@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2675 bestanden en 18533 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2675 bestanden en 18535 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2675 |
-| losse beweringen (`test(...)`) | 18533 |
+| losse beweringen (`test(...)`) | 18535 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2487 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2343 bestanden, 17968 beweringen.
+2343 bestanden, 17970 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -853,7 +853,6 @@ toets omvalt.
 | `idem-poort-echt.test.js` | 4 | gezakt op `liegpoort /api/` | De idem-poort op een ECHTE server, langs een ECHTE route. test/idem-poort.test.js toetst de regel; dit toetst dat hij ook werkelijk in de keten hangt en dat er niets onder hem doorglipt. |
 | `idem-poort.test.js` | 23 | gezakt op `===->!==#0` | De idem-poort: hetzelfde verzoek twee keer sturen mag nooit twee keer werken. Deze toets draait op de middleware zelf, met een nagebootst verzoek/antwoord. |
 | `idem-sleutelbepaling.test.js` | 6 | gezakt op `voorwaarde-omkeren#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `idem-sleutelnaam.test.js` | 2 | gezakt op `voorwaarde-omkeren#0` | EEN SLEUTEL IS EEN SLEUTEL, GEEN EIGENSCHAPSNAAM (server/lib/idem.js). De idem-laag bewaart antwoorden in een gewoon object, met de ring van sleutels onder `_keys` ernaast. |
 | `idem-takken.test.js` | 15 | gezakt op `voorwaarde-omkeren#0` | DE IDEM-LAAG (server/lib/idem.js), TAK VOOR TAK. De bestaande toetsen meten de hoofdroute: dezelfde sleutel geeft hetzelfde antwoord, een andere afdruk een 409. |
 | `idembundel.test.js` | 8 | gezakt op `true->false#0` | MEEDOEN IN EEN BUNDEL DIE ER AL IS -- en de grendel eromheen. Hier komen twee reparaties samen die uit één meting volgen (`npm run factuurproef`, zie GELDLAT.md par. |
 | `idemcontract.test.js` | 14 | gezakt op `liegpoort /api/` | HET SEMANTISCHE IDENTITEITSCONTRACT, getoetst tegen de code die het beschrijft. server/lib/idem-contract.js verandert geen gedrag; het declareert wat twee handlers vandaag met de hand herontdekken. |
@@ -1877,6 +1876,7 @@ toets omvalt.
 | `sessiegrens.test.js` | 2 | gezakt op `liegpoort /api/` | EEN NIEUW WACHTWOORD HOORT ELKE LOPENDE SESSIE TE BEEINDIGEN. WAT ER MISGING. |
 | `sessieregister-takken.test.js` | 14 | gezakt op `voorwaarde-omkeren#0` | HET SESSIEREGISTER TAK VOOR TAK (server/kern/identiteit/sessieregister.js). Wat dit bestand vasthoudt: een ongeldige of onbekende sid opent, vult, leest, raakt en sluit niets; een register zonder lidsleutel bewaart... |
 | `sessies.test.js` | 9 | gezakt op `expliciete bronmutatie` | De sessie-opslag: gelijktijdige sessies mogen niet stilletjes op 400 vastlopen (dat gooide vroeger de 401e ingelogde gebruiker eruit). Verlopen sessies gaan wel weg. |
+| `sessiestroom-binding.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | DE ZEGEL HOORT BIJ ZIJN TICKET (server/kern/sessiestroom.js). Een stroomticket draagt de sessie verzegeld mee. |
 | `sessiestroom-takken.test.js` | 16 | gezakt op `voorwaarde-omkeren#0` | DE SESSIESTROOM TAK VOOR TAK (server/kern/sessiestroom.js, met sessiestroom-kijk.js). Naast test/sessiestroom.test.js houdt dit bestand de randen vast, alleen met de mechaniek (geen server): de dienst start niet... |
 | `sessiestroom.test.js` | 12 | gezakt op `liegpoort /api/` | DE SESSIESTROOM: geen sessie meer in het adres van een live-stroom of een video (server/kern/sessiestroom.js, server/opzet/stroomtoegang.js). Twee helften. |
 | `sessieverfijning.test.js` | 6 | geen bruikbare mutatie | De sessieverfijning: drie registers, een regel. Meet gedrag. |
@@ -2002,7 +2002,7 @@ toets omvalt.
 | `stripe-eigen.test.js` | 4 | gezakt op `===->!==#0` | De eigen Stripe-client (server/stripe.js) i.p.v. het pakket 'stripe'. |
 | `stroom-client.test.js` | 4 | geen module gevonden | RTGStroom (public/shared/stroom.js) zonder browser: de ruil, het herverbinden met een VERS ticket, en het stoppen als de sessie zelf weg is. Een EventSource verbindt na een storing vanzelf opnieuw met HETZELFDE adres. |
 | `stroom-rolscheiding.test.js` | 3 | gezakt op `liegpoort /api/` | DE ROLSCHEIDING VAN HET STROOMLOKET (server/opzet/stroomtoegang.js). POST /api/stroom/ticket is EEN loket voor drie soorten stromen (lid, zaak, kantoor), en elke soort toetst zelf of de sessie de hare is. |
-| `stroomticket-takken.test.js` | 14 | gezakt op `voorwaarde-omkeren#0` | HET STROOMTICKET TAK VOOR TAK (server/kern/stroomticket.js). Aanvulling op test/stroomticket.test.js. |
+| `stroomticket-takken.test.js` | 15 | gezakt op `voorwaarde-omkeren#0` | HET STROOMTICKET TAK VOOR TAK (server/kern/stroomticket.js). Aanvulling op test/stroomticket.test.js. |
 | `stroomticket.test.js` | 8 | gezakt op `===->!==#0` | Het gedeelde stroomticket (server/kern/stroomticket.js), regel voor regel: 128 bits en alleen de hash, kort en eenmalig, binding aan het onderwerp, het plafond (weigeren of de oudste verdringen), de hercontrole bij... |
 | `studio.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Ontwerpstudio: het voertuig- en vaartuig-ontwerpbureau van de kantoren (automotive, jachten, luchtvaart, helikopters). Een AI tekent het concept uit (silhouet, aandrijving, materialen, gedempt palet, uitrusting,... |
 | `stun.test.js` | 4 | gezakt op `===->!==#0` | Test voor de eigen STUN-server (server/stun.js): een Binding Request krijgt een Binding Success Response met een correct ge-XOR'd MAPPED-ADDRESS terug, en rommel wordt genegeerd (geen crash). Zo bellen leden zonder... |

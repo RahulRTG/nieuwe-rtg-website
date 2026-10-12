@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "c8f75704b",
-  "seconden": 11.2,
+  "commit": "4a2d2d2f7",
+  "seconden": 10.8,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -140924,79 +140924,79 @@
     {
      "naam": "maak",
      "soort": "functie",
-     "lijn": 53,
+     "lijn": 55,
      "geexporteerd": true
     },
     {
      "naam": "levend",
      "soort": "pijl",
-     "lijn": 58,
+     "lijn": 60,
      "geexporteerd": false
     },
     {
      "naam": "eigen",
      "soort": "pijl",
-     "lijn": 59,
+     "lijn": 61,
      "geexporteerd": false
     },
     {
      "naam": "transactie",
      "soort": "functie",
-     "lijn": 65,
+     "lijn": 67,
      "geexporteerd": false
     },
     {
      "naam": "ruim",
      "soort": "pijl",
-     "lijn": 66,
+     "lijn": 68,
      "geexporteerd": false
     },
     {
      "naam": "sleutel",
      "soort": "functie",
-     "lijn": 79,
+     "lijn": 81,
      "geexporteerd": false
     },
     {
      "naam": "zegel",
      "soort": "functie",
-     "lijn": 83,
+     "lijn": 85,
      "geexporteerd": false
     },
     {
      "naam": "ontzegel",
      "soort": "functie",
-     "lijn": 92,
+     "lijn": 94,
      "geexporteerd": false
     },
     {
      "naam": "aadVan",
      "soort": "pijl",
-     "lijn": 104,
+     "lijn": 106,
      "geexporteerd": false
     },
     {
      "naam": "geopend",
      "soort": "pijl",
-     "lijn": 105,
+     "lijn": 107,
      "geexporteerd": false
     },
     {
      "naam": "soort",
      "soort": "functie",
-     "lijn": 114,
+     "lijn": 116,
      "geexporteerd": false
     },
     {
      "naam": "geef",
      "soort": "functie",
-     "lijn": 131,
+     "lijn": 133,
      "geexporteerd": false
     },
     {
      "naam": "open",
      "soort": "functie",
-     "lijn": 151,
+     "lijn": 153,
      "geexporteerd": false
     }
    ],
@@ -150469,13 +150469,13 @@
     {
      "naam": "geef",
      "soort": "functie",
-     "lijn": 64,
+     "lijn": 67,
      "geexporteerd": false
     },
     {
      "naam": "claim",
      "soort": "functie",
-     "lijn": 88,
+     "lijn": 96,
      "geexporteerd": false
     }
    ],
@@ -171203,7 +171203,7 @@
     {
      "naam": "doeWerkEnLegVast",
      "soort": "pijl",
-     "lijn": 156,
+     "lijn": 151,
      "geexporteerd": false
     }
    ],

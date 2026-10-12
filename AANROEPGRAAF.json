@@ -3,7 +3,7 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "aa9d7d6e6",
+  "commit": "f673c1c74",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -2561,6 +2561,7 @@
     "server/kern/sleutelwoorden-uitdaging.js",
     "server/kern/sleutelwoorden.js",
     "server/kern/sociaal.js",
+    "server/kern/sociaal/dmpost.js",
     "server/kern/sociaal/pin-beveiliging.js",
     "server/kern/sociaal/pin-clusterrem.js",
     "server/kern/sociaal/pin-deur-rem.js",
@@ -3431,8 +3432,11 @@
     "server/media.js",
     "server/media/bestand.js",
     "server/media/disk.js",
+    "server/media/montage.js",
+    "server/media/openbare-plekken.js",
     "server/media/proef.js",
     "server/media/s3.js",
+    "server/media/toegang.js",
     "server/meetpoort.js",
     "server/meting-capaciteit.js",
     "server/meting-lus.js",
@@ -5402,38 +5406,38 @@
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
-  "bestanden": 4421,
+  "bestanden": 4425,
   "nietGelezen": 0,
-  "aanroepen": 179248,
-  "kanten": 31114,
-  "kantenLokaal": 19969,
-  "kantenIngevoerd": 2764,
+  "aanroepen": 179456,
+  "kanten": 31146,
+  "kantenLokaal": 19993,
+  "kantenIngevoerd": 2772,
   "kantenLid": 2785,
   "kantenViaKern": 4868,
   "kantenModuleAlsFunctie": 105,
   "kantenLidOpInvoer": 323,
   "kantenUitFabriek": 300,
   "kantenViaKernZonderSymbool": 2932,
-  "kernherkomstGelezen": 1345,
-  "onopgelosteAanroepen": 133794,
-  "onopgelosteNamen": 13770,
+  "kernherkomstGelezen": 1346,
+  "onopgelosteAanroepen": 133960,
+  "onopgelosteNamen": 13776,
   "onopgelostNaarSoort": {
-   "ingebouwd": 35824,
-   "externeModule": 1052,
-   "kader": 12385,
-   "contextobject": 20707,
+   "ingebouwd": 35881,
+   "externeModule": 1058,
+   "kader": 12389,
+   "contextobject": 20723,
    "uitgepaktObject": 1681,
-   "lokaleWaarde": 23858,
-   "methodeOpWaarde": 37819,
+   "lokaleWaarde": 23896,
+   "methodeOpWaarde": 37864,
    "overig": 468
   },
   "opgelostPct": 25.4,
   "doelOnbekend": 0,
   "bewaakteVooruitwijzing": 0,
   "doelNietVastTeStellen": 71,
-  "symbolenMetAanroeper": 12191,
-  "routesMetSymbool": 3347,
-  "routeSymboolKanten": 7019
+  "symbolenMetAanroeper": 12208,
+  "routesMetSymbool": 3349,
+  "routeSymboolKanten": 7022
  },
  "routeNaarSymbool": [
   {
@@ -7846,6 +7850,16 @@
     "server/routes/member/salon-claims.js#sleutel",
     "server/server.js#null",
     "server/routes/member/salon-claims.js#stuur"
+   ]
+  },
+  {
+   "route": "POST /api/salon/profiel",
+   "bestand": "server/routes/member/salon.js",
+   "symbolen": [
+    "server/server.js#null",
+    "server/routes/member/salon.js#openLijn",
+    "server/media/toegang.js#toon",
+    "server/routes/member/salon.js#claimVan"
    ]
   },
   {
@@ -11918,15 +11932,6 @@
     "server/routes/member/salon-claims.js#lid",
     "server/routes/member/salon-claims.js#stuur",
     "server/routes/member/salon-claims.js#sleutel"
-   ]
-  },
-  {
-   "route": "POST /api/salon/profiel",
-   "bestand": "server/routes/member/salon.js",
-   "symbolen": [
-    "server/server.js#null",
-    "server/routes/member/salon.js#openLijn",
-    "server/routes/member/salon.js#claimVan"
    ]
   },
   {
@@ -29815,6 +29820,20 @@
    ]
   },
   {
+   "route": "POST /api/rtf/social/dm",
+   "bestand": "server/routes/social/gezinnen/vrienden.js",
+   "symbolen": [
+    "server/routes/social/gezinnen/vrienden.js#metPosts"
+   ]
+  },
+  {
+   "route": "POST /api/rtf/social/dm/send",
+   "bestand": "server/routes/social/gezinnen/vrienden.js",
+   "symbolen": [
+    "server/routes/social/gezinnen/vrienden.js#metPosts"
+   ]
+  },
+  {
    "route": "POST /api/klets",
    "bestand": "server/routes/social/klets.js",
    "symbolen": [
@@ -32541,15 +32560,15 @@
  "onopgelostTop": [
   {
    "naam": "MemberExpression",
-   "aantal": 34962
+   "aantal": 35004
   },
   {
    "naam": "String",
-   "aantal": 9211
+   "aantal": 9220
   },
   {
    "naam": "require",
-   "aantal": 8243
+   "aantal": 8263
   },
   {
    "naam": "app.post",
@@ -32557,7 +32576,7 @@
   },
   {
    "naam": "res.status",
-   "aantal": 3599
+   "aantal": 3601
   },
   {
    "naam": "save",
@@ -32565,7 +32584,7 @@
   },
   {
    "naam": "CallExpression",
-   "aantal": 2760
+   "aantal": 2763
   },
   {
    "naam": "res.json",
@@ -32573,15 +32592,15 @@
   },
   {
    "naam": "Number",
-   "aantal": 2426
+   "aantal": 2425
   },
   {
    "naam": "Object.assign",
-   "aantal": 2069
+   "aantal": 2072
   },
   {
    "naam": "Array.isArray",
-   "aantal": 2019
+   "aantal": 2024
   },
   {
    "naam": "Math.round",
@@ -32597,7 +32616,7 @@
   },
   {
    "naam": "Object.values",
-   "aantal": 886
+   "aantal": 887
   },
   {
    "naam": "uit.push",
@@ -32605,7 +32624,7 @@
   },
   {
    "naam": "Number.isFinite",
-   "aantal": 808
+   "aantal": 809
   },
   {
    "naam": "Math.min",
@@ -32613,15 +32632,15 @@
   },
   {
    "naam": "Object.freeze",
-   "aantal": 707
+   "aantal": 708
   },
   {
    "naam": "Date.now",
-   "aantal": 649
+   "aantal": 654
   },
   {
    "naam": "crypto.randomBytes",
-   "aantal": 594
+   "aantal": 596
   },
   {
    "naam": "Date.parse",
@@ -32633,7 +32652,7 @@
   },
   {
    "naam": "Object.entries",
-   "aantal": 473
+   "aantal": 474
   },
   {
    "naam": "d",
@@ -32641,11 +32660,11 @@
   },
   {
    "naam": "JSON.stringify",
-   "aantal": 392
+   "aantal": 393
   },
   {
    "naam": "Buffer.from",
-   "aantal": 374
+   "aantal": 378
   },
   {
    "naam": "S",
@@ -32681,15 +32700,15 @@
   },
   {
    "naam": "path.join",
-   "aantal": 256
+   "aantal": 259
   },
   {
    "naam": "Math.floor",
-   "aantal": 251
+   "aantal": 252
   },
   {
    "naam": "JSON.parse",
-   "aantal": 239
+   "aantal": 240
   },
   {
    "naam": "next",
@@ -32706,23 +32725,23 @@
    "namen": [
     {
      "naam": "String",
-     "aantal": 9211
+     "aantal": 9220
     },
     {
      "naam": "require",
-     "aantal": 8243
+     "aantal": 8263
     },
     {
      "naam": "Number",
-     "aantal": 2426
+     "aantal": 2425
     },
     {
      "naam": "Object.assign",
-     "aantal": 2069
+     "aantal": 2072
     },
     {
      "naam": "Array.isArray",
-     "aantal": 2019
+     "aantal": 2024
     },
     {
      "naam": "Math.round",
@@ -32738,11 +32757,11 @@
     },
     {
      "naam": "Object.values",
-     "aantal": 886
+     "aantal": 887
     },
     {
      "naam": "Number.isFinite",
-     "aantal": 808
+     "aantal": 809
     },
     {
      "naam": "Math.min",
@@ -32750,11 +32769,11 @@
     },
     {
      "naam": "Object.freeze",
-     "aantal": 707
+     "aantal": 708
     },
     {
      "naam": "Date.now",
-     "aantal": 649
+     "aantal": 654
     },
     {
      "naam": "Date.parse",
@@ -32762,7 +32781,7 @@
     },
     {
      "naam": "Object.entries",
-     "aantal": 473
+     "aantal": 474
     }
    ]
   },
@@ -32771,11 +32790,11 @@
    "namen": [
     {
      "naam": "MemberExpression",
-     "aantal": 34949
+     "aantal": 34991
     },
     {
      "naam": "CallExpression",
-     "aantal": 2760
+     "aantal": 2763
     },
     {
      "naam": "ArrowFunctionExpression",
@@ -32869,7 +32888,7 @@
     },
     {
      "naam": "crypto.createHash",
-     "aantal": 95
+     "aantal": 96
     },
     {
      "naam": "fs.readFileSync",
@@ -32877,7 +32896,7 @@
     },
     {
      "naam": "crypto.randomBytes",
-     "aantal": 83
+     "aantal": 85
     },
     {
      "naam": "fs.existsSync",
@@ -32908,11 +32927,11 @@
      "aantal": 19
     },
     {
-     "naam": "fs.openSync",
-     "aantal": 18
+     "naam": "path.basename",
+     "aantal": 19
     },
     {
-     "naam": "path.basename",
+     "naam": "fs.openSync",
      "aantal": 18
     },
     {
@@ -34036,7 +34055,7 @@
     },
     {
      "naam": "res.status",
-     "aantal": 3599
+     "aantal": 3601
     },
     {
      "naam": "res.json",
@@ -34048,7 +34067,7 @@
     },
     {
      "naam": "res.set",
-     "aantal": 137
+     "aantal": 138
     },
     {
      "naam": "req.get",
@@ -34060,7 +34079,7 @@
     },
     {
      "naam": "app.get",
-     "aantal": 74
+     "aantal": 75
     },
     {
      "naam": "app.use",
@@ -59151,7 +59170,7 @@
    "naarBestand": "server/kern/autoverkoop/showroom.js",
    "naar": "bedrijven",
    "hoe": "lokaal",
-   "lijn": 75
+   "lijn": 79
   },
   {
    "vanBestand": "server/kern/autoverkoop/showroom.js",
@@ -59159,7 +59178,7 @@
    "naarBestand": "server/kern/autoverkoop/showroom.js",
    "naar": "publiekeAuto",
    "hoe": "lokaal",
-   "lijn": 81
+   "lijn": 85
   },
   {
    "vanBestand": "server/kern/autoverkoop/showroom.js",
@@ -59167,7 +59186,7 @@
    "naarBestand": "server/kern/autoverkoop/showroom.js",
    "naar": "showroom",
    "hoe": "lokaal",
-   "lijn": 90
+   "lijn": 94
   },
   {
    "vanBestand": "server/kern/autoverkoop/showroom.js",
@@ -59175,7 +59194,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 93
+   "lijn": 97
   },
   {
    "vanBestand": "server/kern/autoverkoop.js",
@@ -59523,17 +59542,17 @@
   },
   {
    "vanBestand": "server/kern/baby.js",
-   "van": "boekVan",
-   "naarBestand": "server/kern/baby.js",
-   "naar": "boek",
-   "hoe": "lokaal",
-   "lijn": 44
+   "van": "uiterlijk",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "toon",
+   "hoe": "ingevoerd",
+   "lijn": 39
   },
   {
    "vanBestand": "server/kern/baby.js",
    "van": "boekVan",
    "naarBestand": "server/kern/baby.js",
-   "naar": "leeftijdTekst",
+   "naar": "boek",
    "hoe": "lokaal",
    "lijn": 46
   },
@@ -59541,31 +59560,23 @@
    "vanBestand": "server/kern/baby.js",
    "van": "boekVan",
    "naarBestand": "server/kern/baby.js",
+   "naar": "leeftijdTekst",
+   "hoe": "lokaal",
+   "lijn": 48
+  },
+  {
+   "vanBestand": "server/kern/baby.js",
+   "van": "boekVan",
+   "naarBestand": "server/kern/baby.js",
    "naar": "uiterlijk",
    "hoe": "lokaal",
-   "lijn": 47
+   "lijn": 49
   },
   {
    "vanBestand": "server/kern/baby.js",
    "van": "instellen",
    "naarBestand": "server/kern/baby.js",
    "naar": "boek",
-   "hoe": "lokaal",
-   "lijn": 52
-  },
-  {
-   "vanBestand": "server/kern/baby.js",
-   "van": "instellen",
-   "naarBestand": "server/kern/baby.js",
-   "naar": "schoonTekst",
-   "hoe": "lokaal",
-   "lijn": 53
-  },
-  {
-   "vanBestand": "server/kern/baby.js",
-   "van": "instellen",
-   "naarBestand": "server/kern/baby.js",
-   "naar": "fout",
    "hoe": "lokaal",
    "lijn": 54
   },
@@ -59573,31 +59584,31 @@
    "vanBestand": "server/kern/baby.js",
    "van": "instellen",
    "naarBestand": "server/kern/baby.js",
+   "naar": "schoonTekst",
+   "hoe": "lokaal",
+   "lijn": 55
+  },
+  {
+   "vanBestand": "server/kern/baby.js",
+   "van": "instellen",
+   "naarBestand": "server/kern/baby.js",
+   "naar": "fout",
+   "hoe": "lokaal",
+   "lijn": 56
+  },
+  {
+   "vanBestand": "server/kern/baby.js",
+   "van": "instellen",
+   "naarBestand": "server/kern/baby.js",
    "naar": "leeftijdTekst",
    "hoe": "lokaal",
-   "lijn": 58
+   "lijn": 60
   },
   {
    "vanBestand": "server/kern/baby.js",
    "van": "entryMaak",
    "naarBestand": "server/kern/baby.js",
    "naar": "boek",
-   "hoe": "lokaal",
-   "lijn": 62
-  },
-  {
-   "vanBestand": "server/kern/baby.js",
-   "van": "entryMaak",
-   "naarBestand": "server/kern/baby.js",
-   "naar": "schoonTekst",
-   "hoe": "lokaal",
-   "lijn": 63
-  },
-  {
-   "vanBestand": "server/kern/baby.js",
-   "van": "entryMaak",
-   "naarBestand": "server/kern/baby.js",
-   "naar": "fout",
    "hoe": "lokaal",
    "lijn": 64
   },
@@ -59605,9 +59616,25 @@
    "vanBestand": "server/kern/baby.js",
    "van": "entryMaak",
    "naarBestand": "server/kern/baby.js",
+   "naar": "schoonTekst",
+   "hoe": "lokaal",
+   "lijn": 65
+  },
+  {
+   "vanBestand": "server/kern/baby.js",
+   "van": "entryMaak",
+   "naarBestand": "server/kern/baby.js",
+   "naar": "fout",
+   "hoe": "lokaal",
+   "lijn": 66
+  },
+  {
+   "vanBestand": "server/kern/baby.js",
+   "van": "entryMaak",
+   "naarBestand": "server/kern/baby.js",
    "naar": "vandaag",
    "hoe": "lokaal",
-   "lijn": 72
+   "lijn": 74
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59615,31 +59642,31 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "uiterlijk",
    "hoe": "lokaal",
-   "lijn": 79
+   "lijn": 81
   },
   {
    "vanBestand": "server/kern/baby.js",
    "van": "entryWeg",
    "naarBestand": "server/kern/baby.js",
    "naar": "boek",
-   "hoe": "lokaal",
-   "lijn": 83
-  },
-  {
-   "vanBestand": "server/kern/baby.js",
-   "van": "entryWeg",
-   "naarBestand": "server/kern/baby.js",
-   "naar": "fout",
    "hoe": "lokaal",
    "lijn": 85
   },
   {
    "vanBestand": "server/kern/baby.js",
+   "van": "entryWeg",
+   "naarBestand": "server/kern/baby.js",
+   "naar": "fout",
+   "hoe": "lokaal",
+   "lijn": 87
+  },
+  {
+   "vanBestand": "server/kern/baby.js",
    "van": "favoriet",
    "naarBestand": "server/kern/baby.js",
    "naar": "boek",
    "hoe": "lokaal",
-   "lijn": 97
+   "lijn": 99
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59647,7 +59674,7 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "fout",
    "hoe": "lokaal",
-   "lijn": 99
+   "lijn": 101
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59655,7 +59682,7 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "boek",
    "hoe": "lokaal",
-   "lijn": 109
+   "lijn": 111
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59663,7 +59690,7 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "uiterlijk",
    "hoe": "lokaal",
-   "lijn": 115
+   "lijn": 117
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59671,7 +59698,7 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "vandaag",
    "hoe": "lokaal",
-   "lijn": 117
+   "lijn": 119
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59679,7 +59706,7 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "leeftijdTekst",
    "hoe": "lokaal",
-   "lijn": 120
+   "lijn": 122
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59687,7 +59714,7 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "boek",
    "hoe": "lokaal",
-   "lijn": 126
+   "lijn": 128
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59695,7 +59722,7 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "schoonTekst",
    "hoe": "lokaal",
-   "lijn": 127
+   "lijn": 129
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59703,7 +59730,7 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "n",
    "hoe": "lokaal",
-   "lijn": 137
+   "lijn": 139
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59711,7 +59738,7 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "boek",
    "hoe": "lokaal",
-   "lijn": 147
+   "lijn": 149
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59719,7 +59746,7 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "leeftijdTekst",
    "hoe": "lokaal",
-   "lijn": 150
+   "lijn": 152
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59727,7 +59754,7 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "schoonTekst",
    "hoe": "lokaal",
-   "lijn": 167
+   "lijn": 169
   },
   {
    "vanBestand": "server/kern/baby.js",
@@ -59735,7 +59762,7 @@
    "naarBestand": "server/kern/baby.js",
    "naar": "DEMO_MOMENTEN",
    "hoe": "lokaal",
-   "lijn": 174
+   "lijn": 176
   },
   {
    "vanBestand": "server/kern/balans.js",
@@ -75135,7 +75162,7 @@
    "naarBestand": "server/kern/comm/tonen.js",
    "naar": "ladeVan",
    "hoe": "lokaal",
-   "lijn": 75
+   "lijn": 77
   },
   {
    "vanBestand": "server/kern/comm/tonen.js",
@@ -75143,7 +75170,7 @@
    "naarBestand": "server/kern/comm/tonen.js",
    "naar": "naam",
    "hoe": "lokaal",
-   "lijn": 76
+   "lijn": 78
   },
   {
    "vanBestand": "server/kern/comm/tonen.js",
@@ -75151,7 +75178,7 @@
    "naarBestand": "server/kern/comm/tonen.js",
    "naar": "toonGesprek",
    "hoe": "lokaal",
-   "lijn": 95
+   "lijn": 97
   },
   {
    "vanBestand": "server/kern/comm/tonen.js",
@@ -75159,7 +75186,7 @@
    "naarBestand": "server/kern/comm/tonen.js",
    "naar": "toonGesprek",
    "hoe": "lokaal",
-   "lijn": 107
+   "lijn": 109
   },
   {
    "vanBestand": "server/kern/comm/tonen.js",
@@ -75167,7 +75194,7 @@
    "naarBestand": "server/kern/comm/tonen.js",
    "naar": "toonBericht",
    "hoe": "lokaal",
-   "lijn": 108
+   "lijn": 110
   },
   {
    "vanBestand": "server/kern/comm/tonen.js",
@@ -75175,7 +75202,7 @@
    "naarBestand": "server/kern/comm/tonen.js",
    "naar": "ladeVan",
    "hoe": "lokaal",
-   "lijn": 126
+   "lijn": 128
   },
   {
    "vanBestand": "server/kern/comm/tonen.js",
@@ -75183,7 +75210,7 @@
    "naarBestand": "server/kern/comm/tonen.js",
    "naar": "toonGesprek",
    "hoe": "lokaal",
-   "lijn": 127
+   "lijn": 129
   },
   {
    "vanBestand": "server/kern/comm/tonen.js",
@@ -75191,7 +75218,7 @@
    "naarBestand": "server/kern/comm/tonen.js",
    "naar": "toonGesprek",
    "hoe": "lokaal",
-   "lijn": 142
+   "lijn": 144
   },
   {
    "vanBestand": "server/kern/comm/tonen.js",
@@ -75199,7 +75226,7 @@
    "naarBestand": "server/kern/comm/tonen.js",
    "naar": "naam",
    "hoe": "lokaal",
-   "lijn": 143
+   "lijn": 145
   },
   {
    "vanBestand": "server/kern/comm/werk-lijsten.js",
@@ -96467,11 +96494,19 @@
   },
   {
    "vanBestand": "server/kern/galerij.js",
+   "van": "beelden",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "toon",
+   "hoe": "ingevoerd",
+   "lijn": 40
+  },
+  {
+   "vanBestand": "server/kern/galerij.js",
    "van": "galerijMijn",
    "naarBestand": "server/kern/galerij.js",
    "naar": "bord",
    "hoe": "lokaal",
-   "lijn": 52
+   "lijn": 54
   },
   {
    "vanBestand": "server/kern/galerij.js",
@@ -96479,7 +96514,7 @@
    "naarBestand": "server/kern/galerij.js",
    "naar": "beelden",
    "hoe": "lokaal",
-   "lijn": 53
+   "lijn": 55
   },
   {
    "vanBestand": "server/kern/galerij.js",
@@ -96487,7 +96522,7 @@
    "naarBestand": "server/kern/galerij.js",
    "naar": "zelfde",
    "hoe": "lokaal",
-   "lijn": 55
+   "lijn": 57
   },
   {
    "vanBestand": "server/kern/galerij.js",
@@ -96495,7 +96530,7 @@
    "naarBestand": "server/kern/galerij.js",
    "naar": "bord",
    "hoe": "lokaal",
-   "lijn": 67
+   "lijn": 69
   },
   {
    "vanBestand": "server/kern/galerij.js",
@@ -96503,7 +96538,7 @@
    "naarBestand": "server/kern/galerij.js",
    "naar": "nu",
    "hoe": "lokaal",
-   "lijn": 81
+   "lijn": 83
   },
   {
    "vanBestand": "server/kern/galerij.js",
@@ -96511,7 +96546,7 @@
    "naarBestand": "server/kern/galerij.js",
    "naar": "bord",
    "hoe": "lokaal",
-   "lijn": 86
+   "lijn": 88
   },
   {
    "vanBestand": "server/kern/galerij.js",
@@ -96519,7 +96554,7 @@
    "naarBestand": "server/kern/galerij.js",
    "naar": "geldig",
    "hoe": "lokaal",
-   "lijn": 89
+   "lijn": 91
   },
   {
    "vanBestand": "server/kern/galerij.js",
@@ -96527,31 +96562,31 @@
    "naarBestand": "server/kern/galerij.js",
    "naar": "zelfde",
    "hoe": "lokaal",
-   "lijn": 90
+   "lijn": 92
   },
   {
    "vanBestand": "server/kern/galerij.js",
    "van": "galerijFavoriet",
    "naarBestand": "server/kern/galerij.js",
    "naar": "bord",
-   "hoe": "lokaal",
-   "lijn": 99
-  },
-  {
-   "vanBestand": "server/kern/galerij.js",
-   "van": "galerijFavoriet",
-   "naarBestand": "server/kern/galerij.js",
-   "naar": "geldig",
-   "hoe": "lokaal",
-   "lijn": 100
-  },
-  {
-   "vanBestand": "server/kern/galerij.js",
-   "van": "galerijFavoriet",
-   "naarBestand": "server/kern/galerij.js",
-   "naar": "zelfde",
    "hoe": "lokaal",
    "lijn": 101
+  },
+  {
+   "vanBestand": "server/kern/galerij.js",
+   "van": "galerijFavoriet",
+   "naarBestand": "server/kern/galerij.js",
+   "naar": "geldig",
+   "hoe": "lokaal",
+   "lijn": 102
+  },
+  {
+   "vanBestand": "server/kern/galerij.js",
+   "van": "galerijFavoriet",
+   "naarBestand": "server/kern/galerij.js",
+   "naar": "zelfde",
+   "hoe": "lokaal",
+   "lijn": 103
   },
   {
    "vanBestand": "server/kern/gast/beleid.js",
@@ -117671,7 +117706,7 @@
    "naarBestand": "server/kern/leverancier/gastcontact.js",
    "naar": "deptsFor",
    "hoe": "lokaal",
-   "lijn": 21
+   "lijn": 24
   },
   {
    "vanBestand": "server/kern/leverancier/gastcontact.js",
@@ -117679,7 +117714,23 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 51
+   "lijn": 54
+  },
+  {
+   "vanBestand": "server/kern/leverancier/gastcontact.js",
+   "van": "klantSalon",
+   "naarBestand": "server/kern/salon/vorm.js",
+   "naar": "publiek",
+   "hoe": "lid",
+   "lijn": 89
+  },
+  {
+   "vanBestand": "server/kern/leverancier/gastcontact.js",
+   "van": "klantSalon",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "toon",
+   "hoe": "ingevoerd",
+   "lijn": 90
   },
   {
    "vanBestand": "server/kern/leverancier/state.js",
@@ -119831,7 +119882,7 @@
    "naarBestand": "server/kern/lid.js",
    "naar": "memberTemplate",
    "hoe": "lokaal",
-   "lijn": 52
+   "lijn": 55
   },
   {
    "vanBestand": "server/kern/lid.js",
@@ -119839,15 +119890,23 @@
    "naarBestand": "server/kern/lid.js",
    "naar": "zijnVriendenVan",
    "hoe": "lokaal",
-   "lijn": 78
+   "lijn": 81
   },
   {
    "vanBestand": "server/kern/lid.js",
    "van": "stateFor",
-   "naarBestand": "server/kern/salonviraal.js",
-   "naar": "toonInSalon",
-   "hoe": "lid",
-   "lijn": 81
+   "naarBestand": "server/kern/lid.js",
+   "naar": "salonLeespoort",
+   "hoe": "lokaal",
+   "lijn": 89
+  },
+  {
+   "vanBestand": "server/kern/lid.js",
+   "van": "stateFor",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "toon",
+   "hoe": "ingevoerd",
+   "lijn": 94
   },
   {
    "vanBestand": "server/kern/lid.js",
@@ -119855,7 +119914,7 @@
    "naarBestand": "server/kern/salonviraal.js",
    "naar": "reden",
    "hoe": "lid",
-   "lijn": 87
+   "lijn": 95
   },
   {
    "vanBestand": "server/kern/lid.js",
@@ -119863,7 +119922,7 @@
    "naarBestand": "server/kern/lid/contact.js",
    "naar": "canEngage",
    "hoe": "uitFabriek",
-   "lijn": 92
+   "lijn": 100
   },
   {
    "vanBestand": "server/kern/lid.js",
@@ -119871,7 +119930,7 @@
    "naarBestand": "server/kern/lidmaatschap.js",
    "naar": "voorSessie",
    "hoe": "lid",
-   "lijn": 110
+   "lijn": 118
   },
   {
    "vanBestand": "server/kern/lid.js",
@@ -119879,7 +119938,7 @@
    "naarBestand": "server/kern/lid.js",
    "naar": "myApplications",
    "hoe": "lokaal",
-   "lijn": 114
+   "lijn": 122
   },
   {
    "vanBestand": "server/kern/lid.js",
@@ -119887,7 +119946,7 @@
    "naarBestand": "server/kern/lid.js",
    "naar": "memberTemplate",
    "hoe": "lokaal",
-   "lijn": 118
+   "lijn": 126
   },
   {
    "vanBestand": "server/kern/lid.js",
@@ -119895,7 +119954,7 @@
    "naarBestand": "server/kern/lid/facturen.js",
    "naar": "facturenVoor",
    "hoe": "uitFabriek",
-   "lijn": 121
+   "lijn": 129
   },
   {
    "vanBestand": "server/kern/lid.js",
@@ -119903,7 +119962,7 @@
    "naarBestand": "server/kern/lid/facturen.js",
    "naar": "reisVoor",
    "hoe": "uitFabriek",
-   "lijn": 122
+   "lijn": 130
   },
   {
    "vanBestand": "server/kern/lidacties/afrekenen.js",
@@ -176090,6 +176149,14 @@
    "lijn": 82
   },
   {
+   "vanBestand": "server/kern/salon/publiek.js",
+   "van": "(module)",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "toon",
+   "hoe": "ingevoerd",
+   "lijn": 28
+  },
+  {
    "vanBestand": "server/kern/salon/reacties.js",
    "van": "genoemd",
    "naarBestand": "server/server.js",
@@ -177734,6 +177801,14 @@
    "van": "middleware",
    "naarBestand": "server/kern/schild.js",
    "naar": "ban",
+   "hoe": "lokaal",
+   "lijn": 72
+  },
+  {
+   "vanBestand": "server/kern/schild.js",
+   "van": "middleware",
+   "naarBestand": "server/kern/schild.js",
+   "naar": "logDoel",
    "hoe": "lokaal",
    "lijn": 72
   },
@@ -180432,6 +180507,46 @@
    "naar": "maakUitdaging",
    "hoe": "ingevoerd",
    "lijn": 134
+  },
+  {
+   "vanBestand": "server/kern/sociaal/dmpost.js",
+   "van": "deel",
+   "naarBestand": "server/kern/sociaal/dmpost.js",
+   "naar": "vind",
+   "hoe": "lokaal",
+   "lijn": 31
+  },
+  {
+   "vanBestand": "server/kern/sociaal/dmpost.js",
+   "van": "deel",
+   "naarBestand": "server/kern/sociaal/dmpost.js",
+   "naar": "mag",
+   "hoe": "lokaal",
+   "lijn": 32
+  },
+  {
+   "vanBestand": "server/kern/sociaal/dmpost.js",
+   "van": "voorLezer",
+   "naarBestand": "server/kern/sociaal/dmpost.js",
+   "naar": "vind",
+   "hoe": "lokaal",
+   "lijn": 38
+  },
+  {
+   "vanBestand": "server/kern/sociaal/dmpost.js",
+   "van": "voorLezer",
+   "naarBestand": "server/kern/sociaal/dmpost.js",
+   "naar": "mag",
+   "hoe": "lokaal",
+   "lijn": 41
+  },
+  {
+   "vanBestand": "server/kern/sociaal/dmpost.js",
+   "van": "voorLezer",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "toon",
+   "hoe": "ingevoerd",
+   "lijn": 44
   },
   {
    "vanBestand": "server/kern/sociaal/pin-beveiliging.js",
@@ -205119,7 +205234,7 @@
    "naarBestand": "server/kern/wereld/feed.js",
    "naar": "kort",
    "hoe": "lokaal",
-   "lijn": 33
+   "lijn": 34
   },
   {
    "vanBestand": "server/kern/wereld/feed.js",
@@ -205127,7 +205242,15 @@
    "naarBestand": "server/kern/wereld/feed.js",
    "naar": "item",
    "hoe": "lokaal",
-   "lijn": 53
+   "lijn": 54
+  },
+  {
+   "vanBestand": "server/kern/wereld/feed.js",
+   "van": "(module)",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "toon",
+   "hoe": "ingevoerd",
+   "lijn": 57
   },
   {
    "vanBestand": "server/kern/wereld/feed.js",
@@ -205135,7 +205258,7 @@
    "naarBestand": "server/kern/wereld/feed.js",
    "naar": "isLid",
    "hoe": "lokaal",
-   "lijn": 93
+   "lijn": 95
   },
   {
    "vanBestand": "server/kern/wereld/feed.js",
@@ -205143,7 +205266,7 @@
    "naarBestand": "server/kern/wereld/feed.js",
    "naar": "tijd",
    "hoe": "lokaal",
-   "lijn": 125
+   "lijn": 127
   },
   {
    "vanBestand": "server/kern/wereld/feed.js",
@@ -205151,7 +205274,7 @@
    "naarBestand": "server/kern/wereld/rechten.js",
    "naar": "modusOpen",
    "hoe": "lid",
-   "lijn": 147
+   "lijn": 151
   },
   {
    "vanBestand": "server/kern/wereld/feed.js",
@@ -205159,7 +205282,7 @@
    "naarBestand": "server/kern/wereld/rechten.js",
    "naar": "magVan",
    "hoe": "lid",
-   "lijn": 150
+   "lijn": 154
   },
   {
    "vanBestand": "server/kern/wereld/feed.js",
@@ -205167,7 +205290,7 @@
    "naarBestand": "server/kern/wereld/feed.js",
    "naar": "tijd",
    "hoe": "lokaal",
-   "lijn": 154
+   "lijn": 158
   },
   {
    "vanBestand": "server/kern/wereld/feed.js",
@@ -205175,7 +205298,7 @@
    "naarBestand": "server/kern/wereld/context.js",
    "naar": "doorLens",
    "hoe": "lid",
-   "lijn": 155
+   "lijn": 159
   },
   {
    "vanBestand": "server/kern/wereld/feed.js",
@@ -205183,7 +205306,7 @@
    "naarBestand": "server/kern/wereld/context.js",
    "naar": "sectieVan",
    "hoe": "lid",
-   "lijn": 155
+   "lijn": 159
   },
   {
    "vanBestand": "server/kern/wereld/inzicht.js",
@@ -207759,7 +207882,7 @@
    "naarBestand": "server/web/body.js",
    "naar": "heeftBody",
    "hoe": "lid",
-   "lijn": 25
+   "lijn": 26
   },
   {
    "vanBestand": "server/kern/zaakdoos/proxy.js",
@@ -207767,7 +207890,7 @@
    "naarBestand": "server/web/body.js",
    "naar": "leesBody",
    "hoe": "lid",
-   "lijn": 28
+   "lijn": 29
   },
   {
    "vanBestand": "server/kern/zaakdoos/proxy.js",
@@ -207775,7 +207898,7 @@
    "naarBestand": "server/kern/zaakdoos/proxy.js",
    "naar": "kasNaam",
    "hoe": "lokaal",
-   "lijn": 47
+   "lijn": 48
   },
   {
    "vanBestand": "server/kern/zaakdoos/proxy.js",
@@ -207783,7 +207906,7 @@
    "naarBestand": "server/kern/zaakdoos/proxy.js",
    "naar": "kasNaam",
    "hoe": "lokaal",
-   "lijn": 60
+   "lijn": 67
   },
   {
    "vanBestand": "server/kern/zaakdoos/proxy.js",
@@ -207791,7 +207914,7 @@
    "naarBestand": "server/kern/zaakdoos/proxy.js",
    "naar": "leesProxyBody",
    "hoe": "lokaal",
-   "lijn": 88
+   "lijn": 100
   },
   {
    "vanBestand": "server/kern/zaakdoos/proxy.js",
@@ -207799,7 +207922,7 @@
    "naarBestand": "server/kern/zaakdoos/proxy.js",
    "naar": "kasBewaar",
    "hoe": "lokaal",
-   "lijn": 116
+   "lijn": 132
   },
   {
    "vanBestand": "server/kern/zaakdoos/proxy.js",
@@ -207807,7 +207930,7 @@
    "naarBestand": "server/kern/zaakdoos/journaal.js",
    "naar": "draagtWachtwoord",
    "hoe": "ingevoerd",
-   "lijn": 133
+   "lijn": 149
   },
   {
    "vanBestand": "server/kern/zaakdoos/proxy.js",
@@ -207815,7 +207938,7 @@
    "naarBestand": "server/kern/zaakdoos/journaal.js",
    "naar": "alleenRefs",
    "hoe": "ingevoerd",
-   "lijn": 136
+   "lijn": 152
   },
   {
    "vanBestand": "server/kern/zaakdoos/sleutels-schaduw.js",
@@ -213203,11 +213326,27 @@
   },
   {
    "vanBestand": "server/media/bestand.js",
-   "van": "maakServeer",
+   "van": "lever",
    "naarBestand": "server/media/bestand.js",
    "naar": "stuurBuffer",
    "hoe": "lokaal",
-   "lijn": 78
+   "lijn": 82
+  },
+  {
+   "vanBestand": "server/media/bestand.js",
+   "van": "serveer",
+   "naarBestand": "server/media/bestand.js",
+   "naar": "lever",
+   "hoe": "lokaal",
+   "lijn": 87
+  },
+  {
+   "vanBestand": "server/media/bestand.js",
+   "van": "serveerLink",
+   "naarBestand": "server/media/bestand.js",
+   "naar": "lever",
+   "hoe": "lokaal",
+   "lijn": 92
   },
   {
    "vanBestand": "server/media/disk.js",
@@ -213216,6 +213355,22 @@
    "naar": "ensure",
    "hoe": "lokaal",
    "lijn": 21
+  },
+  {
+   "vanBestand": "server/media/openbare-plekken.js",
+   "van": "(module)",
+   "naarBestand": "server/media/openbare-plekken.js",
+   "naar": "levend",
+   "hoe": "lokaal",
+   "lijn": 40
+  },
+  {
+   "vanBestand": "server/media/openbare-plekken.js",
+   "van": "(module)",
+   "naarBestand": "server/media/openbare-plekken.js",
+   "naar": "refsVanPost",
+   "hoe": "lokaal",
+   "lijn": 42
   },
   {
    "vanBestand": "server/media/s3.js",
@@ -213298,12 +213453,108 @@
    "lijn": 151
   },
   {
+   "vanBestand": "server/media/toegang.js",
+   "van": "voeg",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "naamVan",
+   "hoe": "lokaal",
+   "lijn": 73
+  },
+  {
+   "vanBestand": "server/media/toegang.js",
+   "van": "openbaarKlasse",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "naamVan",
+   "hoe": "lokaal",
+   "lijn": 95
+  },
+  {
+   "vanBestand": "server/media/toegang.js",
+   "van": "openbaarKlasse",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "bouw",
+   "hoe": "lokaal",
+   "lijn": 98
+  },
+  {
+   "vanBestand": "server/media/toegang.js",
+   "van": "openbaarKlasse",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "misserMag",
+   "hoe": "lokaal",
+   "lijn": 100
+  },
+  {
+   "vanBestand": "server/media/toegang.js",
+   "van": "teken",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "sleutelNu",
+   "hoe": "lokaal",
+   "lijn": 125
+  },
+  {
+   "vanBestand": "server/media/toegang.js",
+   "van": "leesLink",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "sleutelNu",
+   "hoe": "lokaal",
+   "lijn": 140
+  },
+  {
+   "vanBestand": "server/media/toegang.js",
+   "van": "toon",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "isMediaRef",
+   "hoe": "lokaal",
+   "lijn": 156
+  },
+  {
+   "vanBestand": "server/media/toegang.js",
+   "van": "toon",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "naamVan",
+   "hoe": "lokaal",
+   "lijn": 157
+  },
+  {
+   "vanBestand": "server/media/toegang.js",
+   "van": "toon",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "openbaarKlasse",
+   "hoe": "lokaal",
+   "lijn": 159
+  },
+  {
+   "vanBestand": "server/media/toegang.js",
+   "van": "toon",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "teken",
+   "hoe": "lokaal",
+   "lijn": 160
+  },
+  {
+   "vanBestand": "server/media/toegang.js",
+   "van": "fase",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "toon",
+   "hoe": "lokaal",
+   "lijn": 166
+  },
+  {
+   "vanBestand": "server/media/toegang.js",
+   "van": "inspectie",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "fase",
+   "hoe": "lokaal",
+   "lijn": 167
+  },
+  {
    "vanBestand": "server/media.js",
    "van": "maakMedia",
    "naarBestand": "server/media/s3.js",
    "naar": "s3ConfigVanEnv",
    "hoe": "ingevoerd",
-   "lijn": 44
+   "lijn": 47
   },
   {
    "vanBestand": "server/media.js",
@@ -213311,7 +213562,7 @@
    "naarBestand": "server/media/s3.js",
    "naar": "maakS3Backend",
    "hoe": "ingevoerd",
-   "lijn": 45
+   "lijn": 48
   },
   {
    "vanBestand": "server/media.js",
@@ -213319,7 +213570,7 @@
    "naarBestand": "server/media/disk.js",
    "naar": "maakDiskBackend",
    "hoe": "ingevoerd",
-   "lijn": 45
+   "lijn": 48
   },
   {
    "vanBestand": "server/media.js",
@@ -213327,7 +213578,7 @@
    "naarBestand": "server/media.js",
    "naar": "naamVan",
    "hoe": "lokaal",
-   "lijn": 52
+   "lijn": 55
   },
   {
    "vanBestand": "server/media.js",
@@ -213335,7 +213586,7 @@
    "naarBestand": "server/media.js",
    "naar": "put",
    "hoe": "lokaal",
-   "lijn": 70
+   "lijn": 73
   },
   {
    "vanBestand": "server/media.js",
@@ -213343,7 +213594,7 @@
    "naarBestand": "server/kluis.js",
    "naar": "versleutelBestand",
    "hoe": "lid",
-   "lijn": 70
+   "lijn": 73
   },
   {
    "vanBestand": "server/media.js",
@@ -213351,7 +213602,7 @@
    "naarBestand": "server/media.js",
    "naar": "put",
    "hoe": "lokaal",
-   "lijn": 86
+   "lijn": 89
   },
   {
    "vanBestand": "server/media.js",
@@ -213359,7 +213610,7 @@
    "naarBestand": "server/kluis.js",
    "naar": "versleutelBestand",
    "hoe": "lid",
-   "lijn": 86
+   "lijn": 89
   },
   {
    "vanBestand": "server/media.js",
@@ -213367,7 +213618,7 @@
    "naarBestand": "server/media.js",
    "naar": "bewaar",
    "hoe": "lokaal",
-   "lijn": 89
+   "lijn": 92
   },
   {
    "vanBestand": "server/media.js",
@@ -213375,7 +213626,7 @@
    "naarBestand": "server/media.js",
    "naar": "url",
    "hoe": "lokaal",
-   "lijn": 89
+   "lijn": 92
   },
   {
    "vanBestand": "server/media.js",
@@ -213383,7 +213634,7 @@
    "naarBestand": "server/media.js",
    "naar": "bewaarBuffer",
    "hoe": "lokaal",
-   "lijn": 94
+   "lijn": 97
   },
   {
    "vanBestand": "server/media.js",
@@ -213391,7 +213642,7 @@
    "naarBestand": "server/media.js",
    "naar": "url",
    "hoe": "lokaal",
-   "lijn": 95
+   "lijn": 98
   },
   {
    "vanBestand": "server/media.js",
@@ -213399,7 +213650,7 @@
    "naarBestand": "server/media.js",
    "naar": "bewaarBuffer",
    "hoe": "lokaal",
-   "lijn": 102
+   "lijn": 105
   },
   {
    "vanBestand": "server/media.js",
@@ -213407,7 +213658,7 @@
    "naarBestand": "server/media.js",
    "naar": "naamVan",
    "hoe": "lokaal",
-   "lijn": 108
+   "lijn": 111
   },
   {
    "vanBestand": "server/media.js",
@@ -213415,7 +213666,7 @@
    "naarBestand": "server/kluis.js",
    "naar": "ontsleutelBestand",
    "hoe": "lid",
-   "lijn": 108
+   "lijn": 111
   },
   {
    "vanBestand": "server/media.js",
@@ -213423,7 +213674,7 @@
    "naarBestand": "server/media.js",
    "naar": "haal",
    "hoe": "lokaal",
-   "lijn": 108
+   "lijn": 111
   },
   {
    "vanBestand": "server/media.js",
@@ -213431,7 +213682,7 @@
    "naarBestand": "server/media.js",
    "naar": "leesBuf",
    "hoe": "lokaal",
-   "lijn": 116
+   "lijn": 119
   },
   {
    "vanBestand": "server/media.js",
@@ -213439,7 +213690,7 @@
    "naarBestand": "server/media.js",
    "naar": "naamVan",
    "hoe": "lokaal",
-   "lijn": 118
+   "lijn": 121
   },
   {
    "vanBestand": "server/media.js",
@@ -213447,7 +213698,7 @@
    "naarBestand": "server/media.js",
    "naar": "naamVan",
    "hoe": "lokaal",
-   "lijn": 124
+   "lijn": 127
   },
   {
    "vanBestand": "server/media.js",
@@ -213455,7 +213706,7 @@
    "naarBestand": "server/media.js",
    "naar": "naamVan",
    "hoe": "lokaal",
-   "lijn": 128
+   "lijn": 131
   },
   {
    "vanBestand": "server/media.js",
@@ -213463,7 +213714,7 @@
    "naarBestand": "server/media/bestand.js",
    "naar": "maakServeer",
    "hoe": "lid",
-   "lijn": 130
+   "lijn": 134
   },
   {
    "vanBestand": "server/media.js",
@@ -213471,7 +213722,7 @@
    "naarBestand": "server/media.js",
    "naar": "bewaarPubliek",
    "hoe": "lokaal",
-   "lijn": 137
+   "lijn": 141
   },
   {
    "vanBestand": "server/media.js",
@@ -213479,7 +213730,7 @@
    "naarBestand": "server/media.js",
    "naar": "bewaar",
    "hoe": "lokaal",
-   "lijn": 138
+   "lijn": 142
   },
   {
    "vanBestand": "server/media.js",
@@ -213487,7 +213738,7 @@
    "naarBestand": "server/media.js",
    "naar": "naarPubliek",
    "hoe": "lokaal",
-   "lijn": 140
+   "lijn": 144
   },
   {
    "vanBestand": "server/media.js",
@@ -213495,7 +213746,7 @@
    "naarBestand": "server/media.js",
    "naar": "naarPrive",
    "hoe": "lokaal",
-   "lijn": 151
+   "lijn": 155
   },
   {
    "vanBestand": "server/meetpoort.js",
@@ -216119,7 +216370,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 46
+   "lijn": 50
   },
   {
    "vanBestand": "server/opzet/kernlaag4-gemeenschap.js",
@@ -241751,7 +242002,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 13
+   "lijn": 15
   },
   {
    "vanBestand": "server/routes/member/salon.js",
@@ -241759,7 +242010,7 @@
    "naarBestand": "server/routes/member/salon.js",
    "naar": "openLijnVoor",
    "hoe": "lokaal",
-   "lijn": 15
+   "lijn": 17
   },
   {
    "vanBestand": "server/routes/member/salon.js",
@@ -241767,7 +242018,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 29
+   "lijn": 31
   },
   {
    "vanBestand": "server/routes/member/salon.js",
@@ -241775,7 +242026,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 41
+   "lijn": 43
   },
   {
    "vanBestand": "server/routes/member/salon.js",
@@ -241783,7 +242034,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 69
+   "lijn": 71
   },
   {
    "vanBestand": "server/routes/member/salon.js",
@@ -241791,7 +242042,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 104
+   "lijn": 106
   },
   {
    "vanBestand": "server/routes/member/salon.js",
@@ -241799,7 +242050,7 @@
    "naarBestand": "server/routes/member/salon.js",
    "naar": "openLijn",
    "hoe": "lokaal",
-   "lijn": 109
+   "lijn": 111
   },
   {
    "vanBestand": "server/routes/member/salon.js",
@@ -241807,7 +242058,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 118
+   "lijn": 120
   },
   {
    "vanBestand": "server/routes/member/salon.js",
@@ -241815,7 +242066,15 @@
    "naarBestand": "server/routes/member/salon.js",
    "naar": "openLijn",
    "hoe": "lokaal",
-   "lijn": 121
+   "lijn": 123
+  },
+  {
+   "vanBestand": "server/routes/member/salon.js",
+   "van": "route:POST /api/salon/profiel",
+   "naarBestand": "server/media/toegang.js",
+   "naar": "toon",
+   "hoe": "ingevoerd",
+   "lijn": 128
   },
   {
    "vanBestand": "server/routes/member/salon.js",
@@ -241823,7 +242082,7 @@
    "naarBestand": "server/routes/member/salon.js",
    "naar": "claimVan",
    "hoe": "lokaal",
-   "lijn": 131
+   "lijn": 133
   },
   {
    "vanBestand": "server/routes/member/salon.js",
@@ -241831,7 +242090,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 163
+   "lijn": 165
   },
   {
    "vanBestand": "server/routes/member/salonapp.js",
@@ -253850,6 +254109,22 @@
    "lijn": 109
   },
   {
+   "vanBestand": "server/routes/social/gezinnen/vrienden.js",
+   "van": "route:POST /api/rtf/social/dm",
+   "naarBestand": "server/routes/social/gezinnen/vrienden.js",
+   "naar": "metPosts",
+   "hoe": "lokaal",
+   "lijn": 97
+  },
+  {
+   "vanBestand": "server/routes/social/gezinnen/vrienden.js",
+   "van": "route:POST /api/rtf/social/dm/send",
+   "naarBestand": "server/routes/social/gezinnen/vrienden.js",
+   "naar": "metPosts",
+   "hoe": "lokaal",
+   "lijn": 103
+  },
+  {
    "vanBestand": "server/routes/social/gezinnen.js",
    "van": "(module)",
    "naarBestand": "server/kern/rtc/ijs.js",
@@ -253935,7 +254210,7 @@
    "naarBestand": "server/translate.js",
    "naar": "translate",
    "hoe": "lid",
-   "lijn": 81
+   "lijn": 82
   },
   {
    "vanBestand": "server/routes/social/leden.js",
@@ -253943,7 +254218,7 @@
    "naarBestand": "server/kern/mediaos/index.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 130
+   "lijn": 128
   },
   {
    "vanBestand": "server/routes/social/pin.js",
@@ -254031,7 +254306,7 @@
    "naarBestand": "server/kern/rtc/ijs.js",
    "naar": "stuur",
    "hoe": "lid",
-   "lijn": 92
+   "lijn": 98
   },
   {
    "vanBestand": "server/routes/social.js",
@@ -254039,7 +254314,7 @@
    "naarBestand": "server/kern/rtc/ijs.js",
    "naar": "antwoord",
    "hoe": "lid",
-   "lijn": 92
+   "lijn": 98
   },
   {
    "vanBestand": "server/routes/social.js",
@@ -254047,7 +254322,7 @@
    "naarBestand": "server/kern/rtc/ijs.js",
    "naar": "bearerActor",
    "hoe": "lid",
-   "lijn": 92
+   "lijn": 98
   },
   {
    "vanBestand": "server/routes/social.js",
@@ -254055,7 +254330,7 @@
    "naarBestand": "server/kern/rtc/ijs.js",
    "naar": "stuur",
    "hoe": "lid",
-   "lijn": 93
+   "lijn": 99
   },
   {
    "vanBestand": "server/routes/social.js",
@@ -254063,7 +254338,7 @@
    "naarBestand": "server/kern/rtc/ijs.js",
    "naar": "antwoord",
    "hoe": "lid",
-   "lijn": 93
+   "lijn": 99
   },
   {
    "vanBestand": "server/routes/social.js",
@@ -254071,7 +254346,7 @@
    "naarBestand": "server/kern/rtc/ijs.js",
    "naar": "bearerActor",
    "hoe": "lid",
-   "lijn": 93
+   "lijn": 99
   },
   {
    "vanBestand": "server/routes/social.js",
@@ -254079,7 +254354,7 @@
    "naarBestand": "server/kern/rtc/relaystand.js",
    "naar": "stand",
    "hoe": "lid",
-   "lijn": 99
+   "lijn": 105
   },
   {
    "vanBestand": "server/routes/social.js",
@@ -254087,7 +254362,7 @@
    "naarBestand": "server/kern/rtc/relaystand.js",
    "naar": "publiekeUitslag",
    "hoe": "lid",
-   "lijn": 101
+   "lijn": 107
   },
   {
    "vanBestand": "server/routes/social.js",
@@ -254095,7 +254370,7 @@
    "naarBestand": "server/kern/rtc/relaystand.js",
    "naar": "start",
    "hoe": "lid",
-   "lijn": 103
+   "lijn": 109
   },
   {
    "vanBestand": "server/routes/socialerahul.js",
@@ -257223,7 +257498,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 34
+   "lijn": 35
   },
   {
    "vanBestand": "server/routes/supplier/charter/reis.js",
@@ -257231,7 +257506,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 82
+   "lijn": 83
   },
   {
    "vanBestand": "server/routes/supplier/charter/reis.js",
@@ -257239,7 +257514,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 101
+   "lijn": 102
   },
   {
    "vanBestand": "server/routes/supplier/charter/vloot.js",
@@ -263087,7 +263362,7 @@
    "naarBestand": "server/routes/supplier/menukaart.js",
    "naar": "bewaar",
    "hoe": "lokaal",
-   "lijn": 77
+   "lijn": 82
   },
   {
    "vanBestand": "server/routes/supplier/menukaart.js",
@@ -263095,7 +263370,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 83
+   "lijn": 88
   },
   {
    "vanBestand": "server/routes/supplier/menukaart.js",
@@ -263103,7 +263378,7 @@
    "naarBestand": "server/routes/supplier/menukaart.js",
    "naar": "bewaar",
    "hoe": "lokaal",
-   "lijn": 87
+   "lijn": 92
   },
   {
    "vanBestand": "server/routes/supplier/menukaart.js",
@@ -263111,7 +263386,7 @@
    "naarBestand": "server/server.js",
    "naar": null,
    "hoe": "viaKern",
-   "lijn": 102
+   "lijn": 107
   },
   {
    "vanBestand": "server/routes/supplier/menukaart.js",
@@ -263119,7 +263394,7 @@
    "naarBestand": "server/server.js",
    "naar": "alcoholGrensVan",
    "hoe": "viaKern",
-   "lijn": 107
+   "lijn": 112
   },
   {
    "vanBestand": "server/routes/supplier/menukaart.js",
@@ -263127,7 +263402,7 @@
    "naarBestand": "server/server.js",
    "naar": "geborenVan",
    "hoe": "viaKern",
-   "lijn": 108
+   "lijn": 113
   },
   {
    "vanBestand": "server/routes/supplier/modebezorg.js",

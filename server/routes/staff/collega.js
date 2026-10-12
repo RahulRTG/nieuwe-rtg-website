@@ -108,9 +108,9 @@ app.post('/api/staff/dm/lijst', supplierAuth, (req, res) => {
       return {
         id: m.id, name: m.name, func: m.func || '', role: m.role,
         binnen: !!klok.find(e => e.staffId === m.id && !e.out),
-        /* besluit C1: geen algemene stip. `online` alleen binnen een bestaand
-           gesprek met deze collega (er is een laatste bericht), en nooit een tijd */
-        online: !!laatste && online.has(m.id),
+        /* besluit C1: geen algemene stip. `online` alleen binnen een gesprek
+           waarin BEIDE schreven (commCollega.wederkerig), en nooit een tijd */
+        online: !!laatste && online.has(m.id) && commCollega.wederkerig(req.supplier.code, req.actor.staffId, m.id),
         ongelezen: commCollega.ongelezen(req.supplier.code, req.actor.staffId, m.id),
         laatste: laatste ? String(laatste.text || '').slice(0, 60) : ''
       };
@@ -138,11 +138,12 @@ app.post('/api/staff/dm/send', supplierAuth, (req, res) => {
   const naam = (id) => (Number(id) === req.actor.staffId ? req.actor.name : st.name);
   commCollega.stuur(req.supplier.code, req.actor.staffId, st.id, text, { naamVan: naam });
   // alleen het toestel van de ontvanger krijgt het signaal (geen omroep)
-  let bezorgd = 0;
   for (const c of sseClients) {
-    if (c.sup === req.supplier.code && c.staffId === st.id) { sseSend(c.res, 'dm', { vanId: req.actor.staffId, van: req.actor.name, text }); bezorgd++; }
+    if (c.sup === req.supplier.code && c.staffId === st.id) sseSend(c.res, 'dm', { vanId: req.actor.staffId, van: req.actor.name, text });
   }
-  res.json({ ok: true, bezorgd,
+  /* Geen `bezorgd`: een aantal open toestellen is een online-stip die met elk
+     bericht af te lezen is (besluit C1). */
+  res.json({ ok: true,
     messages: commCollega.berichten(req.supplier.code, req.actor.staffId, st.id, 100, naam) });
 });
 

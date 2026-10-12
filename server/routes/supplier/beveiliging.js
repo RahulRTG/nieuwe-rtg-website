@@ -4,6 +4,7 @@
    (op staffId): eigen diensten, inklokken op post, patrouillerondes, incidenten
    melden en de SOS-noodknop. Draait op kern/beveiliging. */
 const logboekzicht = require('../../kern/leverancier/logboekzicht');
+const personeelzicht = require('../../kern/leverancier/personeelzicht');
 module.exports = (kern) => {
   const { app, express, supplierAuth, managerOnly, bevIsBeveiliging, bevCommand, bevZetFunctie,
           bevZetPost, bevVerwijderPost, bevBudget, bevZetBudget, bevRooster, bevZetDienst,
@@ -69,7 +70,8 @@ module.exports = (kern) => {
     /* Het rooster ziet iedereen; de in- en uitkloktijden en plekIn (besluit 1A) van een collega alleen
        een manager (kern/leverancier/logboekzicht.js, besluit 11 oktober 2026). */
     for (const dag of (r && r.dagen) || []) for (const p of dag.posten || []) for (const sh of p.shifts || [])
-      sh.bezet = (sh.bezet || []).map((d) => logboekzicht.kloktijdenVoor(d, req.actor, d.guardId));
+      sh.bezet = (sh.bezet || []).map((d) => personeelzicht.afwezigRedenVoor(
+        logboekzicht.kloktijdenVoor(d, req.actor, d.guardId), req.actor, d.guardId));   // B1: geen verlofsoort voor een collega
     res.json(r);
   });
   app.post('/api/supplier/beveiliging/dienst', supplierAuth, (req, res) => {

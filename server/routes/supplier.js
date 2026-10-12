@@ -127,7 +127,8 @@ app.post('/api/supplier/notifications', supplierAuth, (req, res) => {
 });
 
 app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
-  (db.data.supplierNotifications[req.supplier.code] || []).forEach(n => { if (personeelzicht.meldingVoor(n, req.actor)) n.read = true; });
+  // de gelezen-vlag van een beperkte melding is per lezer (kern/leverancier/personeelzicht.js)
+  (db.data.supplierNotifications[req.supplier.code] || []).forEach(n => personeelzicht.markeerGelezen(n, req.actor));
   save();
   res.json({ ok: true });
 });

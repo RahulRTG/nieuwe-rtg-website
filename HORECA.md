@@ -964,7 +964,18 @@ medewerker zelf, en ook de manager krijgt geen omschrijving (een verlofaanvraag
 gaat dezelfde weg). **C1:** er is geen algemene online-stip meer; `online` in de
 collegalijst staat alleen aan binnen een bestaand gesprek, en nooit met een tijd.
 En sollicitaties horen bij de werving: alleen de manager krijgt ze, ook in de
-meldingen (`test/personeelzicht.test.js`). Hij telt
+meldingen (`test/personeelzicht.test.js`). Een derde tegenlezing vond de wegen
+eromheen, en die gaan nu langs dezelfde plek: de bel van de zaak dwingt aan de
+INGANG af dat een beperkte melding (`beperkt: 'werving'` of `'afwezig'`, of een
+oude met zo'n titel) alleen de managers bereikt, met een gelezen-vlag per lezer
+en een eigen grens per bak; een sollicitatiegesprek staat niet in de inbox van
+een medewerker en zijn realtime-signaal gaat alleen naar de managers (een eigen
+gesprek van een medewerker alleen naar hem); het beveiligingsrooster geeft een
+collega `afwezig: true` en niet de verlofsoort; loonruns, bevindingen,
+contracten en aangiftes zijn van de manager; de verzuimplanning toont van een
+collega alleen vandaag; de online-stip staat pas aan als BEIDE in het gesprek
+schreven, en een oproep of bericht zegt niet op hoeveel toestellen het aankwam
+(`test/personeelzicht-routes.test.js`). Hij telt
 hoeveel TAFELS er nog bij iemand staan die al uitklokte. Dat leest de prikklok
 van het personeelsdomein via `klokVan` (`kern/personeel.js`) en verder niets: het
 besluit staat in NORM.json (`kernGedeeld` 254 -> 255) met wie levert, wie leest

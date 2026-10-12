@@ -105,13 +105,13 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
     // besluit B1: logregel en melding alleen voor de managers en de medewerker zelf
     logActivity(req.supplier.code, req.actor, 'meldde zich ziek', 'afwezig');
     notifySupplier(req.supplier.code, { icon: 'zorg', title: 'Ziekmelding', body: req.actor.name + ' heeft zich ziek gemeld. Denk aan de bezetting van vandaag.',
-      alleenVoor: { staffId: req.actor.staffId } });
+      beperkt: 'afwezig', alleenVoor: { staffId: req.actor.staffId } });
   } else {
     logActivity(req.supplier.code, req.actor, 'vroeg verlof aan (' + entry.van + ' t/m ' + entry.tot + ')', 'afwezig');
     notifySupplier(req.supplier.code, { icon: 'parasol', title: 'Verlofaanvraag', body: req.actor.name + ': ' + entry.van + ' t/m ' + entry.tot,
-      alleenVoor: { staffId: req.actor.staffId } });
+      beperkt: 'afwezig', alleenVoor: { staffId: req.actor.staffId } });
   }
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'verlof' });
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'verlof' }, { staffId: req.actor.staffId }); // B1: manager en zelf
   res.json({ ok: true, entry });
 });
 

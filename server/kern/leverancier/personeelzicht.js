@@ -18,6 +18,7 @@
    geen zichtbare van de lijst drukt -- dezelfde reden als bij het logboek. */
 'use strict';
 const { magKlokZien, isEigen, aanwezigVoor } = require('./logboekzicht');
+const { meldingBeperking } = require('./beschermdesoorten');
 
 const zelfOfManager = (actor, staffId) => magKlokZien(actor) || isEigen(actor, staffId);
 
@@ -28,6 +29,23 @@ function afwezigheidVoor(rij, actor, eigenaarId, houd) {
   const uit = { afwezig: true };
   for (const v of houd || []) if (rij[v] !== undefined) uit[v] = rij[v];
   return uit;
+}
+
+/* De reden van een afwezigheid op een rij (het beveiligingsrooster zet daar de
+   verlofsoort in, "Vakantie." of erger): de manager en de mens zelf de tekst,
+   een collega alleen `afwezig: true`. */
+function afwezigRedenVoor(rij, actor, eigenaarId) {
+  if (!rij || typeof rij !== 'object' || !rij.afwezig || zelfOfManager(actor, eigenaarId)) return rij;
+  return Object.assign({}, rij, { afwezig: true });
+}
+
+/* Over welke periode een actor iemands afwezigheid mag opvragen: de manager en
+   de mens zelf de gevraagde, een collega alleen vandaag -- anders leest hij een
+   ziekteperiode af aan van tot tot over jaren. Valt vandaag buiten de vraag,
+   dan niets (null). */
+function periodeVoor(actor, eigenaarId, van, tot, vandaag) {
+  if (zelfOfManager(actor, eigenaarId)) return { van, tot };
+  return van <= vandaag && tot >= vandaag ? { van: vandaag, tot: vandaag } : null;
 }
 
 /* De verlofstroom van de zaak (db.data.verlof). Een manager: alles, zonder
@@ -50,22 +68,38 @@ function verlofVoor(lijst, actor, vandaag) {
 }
 
 /* De meldingen van de zaak. Een melding met `alleenVoor` gaat naar de managers
-   en naar die ene medewerker; de rest naar iedereen. Het veld zelf gaat niet mee. */
+   en naar die ene medewerker; een BEPERKTE melding zonder `alleenVoor` (van voor
+   dat veld, herkend aan haar titel) alleen naar de managers; de rest naar
+   iedereen. Het veld zelf gaat niet mee. */
+const beperkt = (n) => !!n && (!!n.alleenVoor || !!meldingBeperking(n));
 function meldingVoor(n, actor) {
-  if (!n || !n.alleenVoor) return true;
-  return magKlokZien(actor) || isEigen(actor, n.alleenVoor.staffId);
+  if (!beperkt(n)) return true;
+  if (magKlokZien(actor)) return true;
+  return !!n.alleenVoor && isEigen(actor, n.alleenVoor.staffId);
 }
+/* De gelezen-vlag van een beperkte melding is per LEZER voor wie geen manager
+   is: zou de zieke zijn eigen ziekmelding op gelezen zetten, dan ziet zijn
+   manager hem niet meer als nieuw. */
 function meldingenVoor(lijst, actor) {
+  const manager = magKlokZien(actor);
   return (Array.isArray(lijst) ? lijst : []).filter((n) => meldingVoor(n, actor)).map((n) => {
-    if (!n || !n.alleenVoor) return n;
-    const uit = Object.assign({}, n); delete uit.alleenVoor; return uit;
+    if (!beperkt(n)) return n;
+    const uit = Object.assign({}, n); delete uit.alleenVoor; delete uit.gelezenDoor;
+    if (!manager) uit.read = (n.gelezenDoor || []).includes(String(actor && actor.staffId));
+    return uit;
   });
+}
+function markeerGelezen(n, actor) {
+  if (!meldingVoor(n, actor)) return;
+  if (!beperkt(n) || magKlokZien(actor)) { n.read = true; return; }
+  const wie = String(actor.staffId);
+  n.gelezenDoor = (n.gelezenDoor || []).includes(wie) ? n.gelezenDoor : (n.gelezenDoor || []).concat(wie);
 }
 const MELDINGEN_PER_BAK = 40;
 function bewaarMeldingen(lijst) {
   const tel = new Map();
   return (Array.isArray(lijst) ? lijst : []).filter((n) => {
-    const bak = n && n.alleenVoor ? 'b:' + (n.alleenVoor.staffId != null ? n.alleenVoor.staffId : '-') : 'g';
+    const bak = beperkt(n) ? 'b:' + (n.alleenVoor && n.alleenVoor.staffId != null ? n.alleenVoor.staffId : '-') : 'g';
     const k = (tel.get(bak) || 0) + 1;
     tel.set(bak, k);
     return k <= MELDINGEN_PER_BAK;
@@ -95,4 +129,4 @@ function staatDelen(data, s, actor, vandaag, werkgeverSollicitatie) {
   };
 }
 
-module.exports = { staatDelen, afwezigheidVoor, verlofVoor, meldingVoor, meldingenVoor, bewaarMeldingen, lijnVoor, MELDINGEN_PER_BAK };
+module.exports = { staatDelen, periodeVoor, afwezigheidVoor, afwezigRedenVoor, verlofVoor, meldingVoor, meldingenVoor, markeerGelezen, bewaarMeldingen, lijnVoor, MELDINGEN_PER_BAK };

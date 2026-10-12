@@ -47,7 +47,9 @@ module.exports = ({ db, save, accounts, codenaamVan, keyVanCodenaam, findSupplie
     if (lijst.length > 50) lijst.length = 50;
     save();
     try {
-      if (notifySupplier) notifySupplier(c, 'Een lid gaf u inzage in zijn naam voor een sollicitatie.');
+      // een object en geen tekst (een tekst werd letter voor letter een melding), en werving: de manager
+      if (notifySupplier) notifySupplier(c, { icon: 'werk', title: 'Inzage voor een sollicitatie',
+        body: 'Een lid gaf u inzage in zijn naam voor een sollicitatie.', beperkt: 'werving' });
     } catch (e) {}
     return { ok: true, toestemming: publiekeToestemming(g) };
   }

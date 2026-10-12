@@ -3,7 +3,6 @@
    laag); de sollicitatiechat staat in ./sollchat.js. Gemount vanuit
    routes/supplier/werving.js. */
 const { eigenVeld } = require('../../../kern/util');
-const { datum: klokDatum } = require('../../../lib/klok');
 const { vulVacature } = require('./vacature');
 module.exports = (wctx) => {
   const { kern, maakInvite, neemAan, wervingsBasis, wervingsLink } = wctx;
@@ -30,8 +29,8 @@ app.post('/api/supplier/apply', (req, res) => {
   db.data.applications[s.code] = list.slice(0, 100);
   save();
   // sollicitatiegegevens horen bij de werving: alleen de managers (kern/leverancier/personeelzicht.js)
-  notifySupplier(s.code, { icon: 'werk', title: 'Nieuwe sollicitatie', body: name + ' solliciteert als ' + func + '.', alleenVoor: { staffId: null } });
-  sseToSupplier(s.code, 'sync', { scope: 'team' });
+  notifySupplier(s.code, { icon: 'werk', title: 'Nieuwe sollicitatie', body: name + ' solliciteert als ' + func + '.', beperkt: 'werving' });
+  sseToSupplier(s.code, 'sync', { scope: 'team' }, { staffId: null });
   sseToOffice('sync', { scope: 'team' });
   res.json({ ok: true });
 });
@@ -48,7 +47,7 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
     if (!chat.berichten.length) chatStuur(chat, 'werkgever', req.supplier.name, 'Hallo ' + a.name + ', leuk dat je wilt komen werken als ' + a.func + '. Wanneer kun je langskomen voor een kennismaking?');
     save();
     logActivity(req.supplier.code, req.actor, 'nodigde ' + a.name + ' uit voor een gesprek', 'werving');
-    sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+    sseToSupplier(req.supplier.code, 'sync', { scope: 'team' }, { staffId: null });
     notifyApplicant(a, req.supplier);
     return applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ ok: true, chat: c }));
   }
@@ -79,7 +78,7 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
     ensureApplyChat(req.supplier.code, a); // ook na aanname: chatten om af te spreken
     save();
     logActivity(req.supplier.code, req.actor, 'nam ' + a.name + ' aan als ' + a.func, 'werving');
-    sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+    sseToSupplier(req.supplier.code, 'sync', { scope: 'team' }, { staffId: null });
     sseToOffice('sync', { scope: 'team' });
     // Mee met het besluit; een eigen `if (a.key)`-blok liet een sollicitant
     // zonder lidsessie dit missen. Zie kern/werk-bezorging.js.
@@ -105,7 +104,7 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
   a.status = 'afgewezen';
   save();
   logActivity(req.supplier.code, req.actor, 'wees de sollicitatie van ' + a.name + ' af', 'werving');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' }, { staffId: null });
   notifyApplicant(a, req.supplier);
   res.json({ ok: true });
 });
@@ -152,16 +151,6 @@ app.post('/api/supplier/vacature/verwijder', supplierAuth, (req, res) => {
   res.json({ ok: true, vacatures: list.slice(0, 40) });
 });
 
-app.post('/api/supplier/talent/match', supplierAuth, (req, res) => {
-  if (!managerOnly(req, res)) return;
-  const lijst = Array.isArray(db.data.talentInteresses) ? db.data.talentInteresses : [];
-  const match = lijst.find(x => x.id === req.body.id && x.supplierCode === req.supplier.code);
-  if (!match || match.status !== 'interesse') return res.status(404).json({ error: 'Deze talentmatch is niet meer beschikbaar.' });
-  match.status = req.body.action === 'interesse' ? 'wederzijds' : 'afgewezen';
-  match.beslistAt = klokDatum().toISOString();
-  save();
-  logActivity(req.supplier.code, req.actor, (match.status === 'wederzijds' ? 'toonde wederzijdse interesse in ' : 'sloot een talentmatch voor ') + match.func, 'werving');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
-  res.json({ ok: true, status: match.status });
-});
+// de anonieme talentmatch: ./talentmatch.js (de opslag gaat als functie mee)
+require('./talentmatch')(kern, { interesses: () => (Array.isArray(db.data.talentInteresses) ? db.data.talentInteresses : []) });
 };

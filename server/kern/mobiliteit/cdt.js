@@ -25,6 +25,7 @@
    is RTG niet. Zie ./cdt-export, dat daar niet omheen draait. */
 
 const { GRENZEN, SOORTEN, tel, signalen, rustSignaal } = require('./cdt-tijden');
+const { magKlokZien, isEigen } = require('../leverancier/logboekzicht');
 
 const DIENST_MAX = 4000;          // bewaargrens in de json-stand; de export gaat eerder
 
@@ -40,6 +41,14 @@ module.exports = (ctx) => {
 
   // het regime (de grenzen van deze onderneming): ./cdt-regime.js
   const { regimeVan, regimeZet } = require('./cdt-regime')({ opslag, save, ensureCdt });
+
+  /* Een lopende dienst die DEZE actor mag bijwerken: zijn eigen (op staffId), of
+     elke als hij manager is. De kaart van een collega is voor een ander een 404,
+     net als een kaart zonder dienst -- anders bevestigt het antwoord dat ze rijdt. */
+  const eigenDienst = (code, kaart, actor) => {
+    const d = openDienst(code, kaart);
+    return d && (magKlokZien(actor) || isEigen(actor, d.staffId)) ? d : null;
+  };
 
   /* Aanmelden. De chauffeurskaart is verplicht: zonder kaartnummer is er geen
      registratie die iets identificeert, en dan legt het systeem iets vast
@@ -78,7 +87,7 @@ module.exports = (ctx) => {
   function dienstSoort(supplier, actor, body = {}) {
     ensureCdt();
     const kaart = schoon(body.chauffeurskaart, 30).toUpperCase();
-    const d = openDienst(supplier.code, kaart);
+    const d = eigenDienst(supplier.code, kaart, actor);
     if (!d) return { status: 404, error: 'Geen lopende dienst op deze chauffeurskaart.' };
     const soort = schoon(body.soort, 20);
     if (!SOORTEN[soort]) return { status: 400, error: 'Onbekende soort: ' + Object.keys(SOORTEN).join(', ') };
@@ -100,7 +109,7 @@ module.exports = (ctx) => {
   function dienstEind(supplier, actor, body = {}) {
     ensureCdt();
     const kaart = schoon(body.chauffeurskaart, 30).toUpperCase();
-    const d = openDienst(supplier.code, kaart);
+    const d = eigenDienst(supplier.code, kaart, actor);
     if (!d) return { status: 404, error: 'Geen lopende dienst op deze chauffeurskaart.' };
     const t = nu();
     const open = d.blokken.find(b => !b.tot);

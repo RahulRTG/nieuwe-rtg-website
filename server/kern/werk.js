@@ -95,14 +95,14 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
     const bericht = w.stuur(chat.id, van, wie, tekst, lang || 'nl');
     if (!bericht) return null;
     // live seintje naar de andere kant
-    sseToSupplier(chat.supplierCode, 'sync', { scope: 'team' });
+    sseToSupplier(chat.supplierCode, 'sync', { scope: 'team' }, { staffId: null }); // werving: alleen de managers
     if (chat.applicant.kind === 'rtg' && chat.applicant.key) sseToCustomer(chat.applicant.key, 'sync', { scope: 'apply' });
     return bericht;
   }
   // een bericht van de sollicitant laat de werkgever meteen iets weten
   function meldWerkgever(chat, tekst) {
     // een sollicitant is werving: alleen de managers (kern/leverancier/personeelzicht.js)
-    notifySupplier(chat.supplierCode, { icon: 'berichten', title: 'Bericht van ' + chat.applicant.naam, body: String(tekst).slice(0, 80), alleenVoor: { staffId: null } });
+    notifySupplier(chat.supplierCode, { icon: 'berichten', title: 'Bericht van ' + chat.applicant.naam, body: String(tekst).slice(0, 80), beperkt: 'werving' });
   }
 
   /* Openbare lijst met alle openstaande vacatures over alle partners heen. De

@@ -33,4 +33,28 @@ const OUDE_KLOKTEKST = Object.freeze([/^klokte (?:in|uit)(?: op |$)/, /^boekte e
   /^(?:keurde verlof goed|wees verlof af) van /, /^nodigde .+ uit voor een gesprek$/, /^nam .+ aan als /,
   /^wees de sollicitatie van .+ af$/, /^(?:toonde wederzijdse interesse in|sloot een talentmatch voor) /]);
 
-module.exports = { KLOKSOORTEN, OUDE_KLOKTEKST };
+/* BEPERKTE MELDINGEN (de bel van de zaak, opzet/leveranciersmeldingen.js). Een
+   melding met `beperkt` uit deze lijst gaat alleen naar de managers en, met
+   `alleenVoor.staffId`, naar die ene medewerker. De INGANG dwingt dat af: een
+   beperkte melding zonder `alleenVoor` krijgt { staffId: null } (alleen de
+   managers), zodat een volgende schrijver de beperking niet kan vergeten. Een
+   melding van voor dit veld wordt herkend aan haar vaste titel. */
+const MELDINGBEPERKING = Object.freeze({
+  werving: 'sollicitaties en wat erbij hoort (routes/supplier/werving/; routes/member/werk.js; routes/member/werk/rtf.js; kern/werk.js)',
+  afwezig: 'ziekmelding en verlofaanvraag (routes/staff/dienst.js)'
+});
+const BEPERKTE_TITELS = Object.freeze({
+  'Ziekmelding': 'afwezig', 'Verlofaanvraag': 'afwezig',
+  'Nieuwe sollicitatie': 'werving', 'Sollicitatie via RTG': 'werving'
+});
+// de beperking van een melding, of null; een onbekende `beperkt` is een fout van de schrijver
+function meldingBeperking(n) {
+  if (!n || typeof n !== 'object') return null;
+  if (n.beperkt != null) {
+    if (!Object.prototype.hasOwnProperty.call(MELDINGBEPERKING, n.beperkt)) throw new Error('Onbekende meldingbeperking: ' + n.beperkt);
+    return n.beperkt;
+  }
+  return Object.prototype.hasOwnProperty.call(BEPERKTE_TITELS, n.title) ? BEPERKTE_TITELS[n.title] : null;
+}
+
+module.exports = { KLOKSOORTEN, OUDE_KLOKTEKST, MELDINGBEPERKING, BEPERKTE_TITELS, meldingBeperking };

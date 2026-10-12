@@ -149,6 +149,11 @@ test('4. het CDT-bord: begin en eind van een dienst alleen voor de manager en de
     assert.ok(!tekst.includes(vreemd.start) && !tekst.includes(vreemd.chauffeurskaart), 'begin of kaart van een collega lekt');
     assert.ok(!(b.signalen || []).some(s => s.chauffeurskaart === vreemd.chauffeurskaart));
   }
+  // M4: een chauffeur werkt niet op de kaart van een ander -- een manager wel
+  assert.equal((await api('/api/staff/mob/cdt/soort', { chauffeurskaart: 'NL-11111111', soort: 'pauze' }, ch2.tok)).status, 404, 'soort op andermans kaart');
+  assert.equal((await api('/api/staff/mob/cdt/afmelden', { chauffeurskaart: 'NL-11111111' }, ch2.tok)).status, 404, 'afmelden op andermans kaart');
+  assert.equal((await api('/api/staff/mob/cdt/soort', { chauffeurskaart: 'NL-11111111', soort: 'pauze' }, ch1.tok)).status, 200, 'op de eigen kaart wel');
+  assert.equal((await api('/api/staff/mob/cdt/soort', { chauffeurskaart: 'NL-11111111', soort: 'rijden' }, baas)).status, 200, 'de manager ook');
   // de aanmeldregel is een klokregel met een echte naam
   const r = (await api('/api/supplier/activity', { aantal: 80 }, baas)).body.activity.find(x => /^meldde zich aan op kaart NL-11111111/.test(x.text));
   assert.ok(r, 'de manager ziet de aanmelding');

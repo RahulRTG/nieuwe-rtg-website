@@ -53,12 +53,13 @@
     const tcs = $('#teamCallSup'); if (tcs) tcs.addEventListener('click', () => window.TeamCall && TeamCall.groep());
     const ba = $('#buzzAll'); if (ba) ba.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { all: true });
-        toast(''+T('team.allbuzzed','Hele team opgeroepen')+' ('+d.reached+' '+T('team.online','online')+').'); }
+        // geen aantal: de server noemt alleen OF iemand het kreeg (besluit C1)
+        toast(''+T('team.allbuzzed','Hele team opgeroepen')+(d.reached === false ? ' ('+T('team.buzzoff','heeft de app nu niet open.')+')' : '.')); }
       catch(e){ toast(e.message); }
     });
     document.querySelectorAll('[data-buzz]').forEach(b => b.addEventListener('click', async () => {
       try { const d = await API.call('/supplier/team/buzz', { staffId: Number(b.dataset.buzz) });
-        toast(d.reached ? ''+d.name+' '+T('team.buzzed','wordt opgeroepen.') : d.name+' '+T('team.buzzoff','heeft de app nu niet open.')); }
+        toast(d.reached === false ? d.name+' '+T('team.buzzoff','heeft de app nu niet open.') : ''+d.name+' '+T('team.buzzed','wordt opgeroepen.')); }
       catch(e){ toast(e.message); }
     }));
     document.querySelectorAll('[data-aphire]').forEach(b => b.addEventListener('click', async () => {

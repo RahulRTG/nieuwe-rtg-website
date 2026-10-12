@@ -169,6 +169,10 @@ test('6. meldingen op gelezen zetten raakt alleen de eigen zaak', async () => {
   const r = await api('/api/supplier/notifications/read', {}, werker);
   assert.equal(r.status, 200);
   const st = await api('/api/supplier/state', {}, baas);
-  const mel = st.body.state.notifications || [];
-  assert.ok(mel.every(n => n.read), 'alles van deze zaak staat op gelezen');
+  /* Een BEPERKTE melding (werving, afwezigheid) zet een medewerker niet voor
+     de manager op gelezen: die vlag is per lezer (kern/leverancier/
+     personeelzicht.js, tegenlezing PR #584). De rest is gedeeld. */
+  const { meldingBeperking } = require('../server/kern/leverancier/beschermdesoorten');
+  const mel = (st.body.state.notifications || []).filter(n => !meldingBeperking(n));
+  assert.ok(mel.every(n => n.read), 'alles van deze zaak dat iedereen ziet, staat op gelezen');
 });

@@ -126,7 +126,7 @@ module.exports = (ctx) => {
       guests: guestsFor(s.code).slice(0, 30),
       prices: db.data.supplierPrices.filter(p => p.supplierCode === s.code).slice(0, 20),
       staff: accounts.listStaff(s.code).map(accounts.publicStaff),
-      talentMatches: talentMatches(s.code),
+      talentMatches: logboekzicht.magKlokZien(actor) ? talentMatches(s.code) : [],   // werving: de manager
       vacatures: (db.data.vacatures[s.code] || []).slice(0, 40),
       events: s.events || null,
       dailyMeps: (() => {

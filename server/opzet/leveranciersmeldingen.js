@@ -6,9 +6,12 @@
 // een deur naar db.data en niet twee.
 // `alleenVoor` op een melding: alleen de managers en die medewerker (kern/leverancier/personeelzicht.js)
 const { bewaarMeldingen } = require('../kern/leverancier/personeelzicht');
+const { meldingBeperking } = require('../kern/leverancier/beschermdesoorten');
 module.exports = ({ meldingen, save, crypto, rtgKlok, sseToSupplier }) => {
   function meld(code, note, bewaar) {
     const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: rtgKlok.datum().toISOString(), ...note };
+    // een beperkte melding zonder ontvanger gaat alleen naar de managers: hier, en niet bij elke schrijver
+    if (meldingBeperking(n) && !n.alleenVoor) n.alleenVoor = { staffId: null };
     const alle = meldingen();
     alle[code] = bewaarMeldingen([n, ...(alle[code] || [])]);
     bewaar();

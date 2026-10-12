@@ -8,7 +8,7 @@ module.exports = (kern) => {
           supplierState, tooManyTries, zaakBoard, zaakZet, logInlog, werkvensterVan, zetWerkvenster,
           magWerken, werkAdvies, persoonsPoort } = kern;
 app.post('/api/supplier/zaak/board', supplierAuth, (req, res) => {
-  res.json(zaakBoard(req.supplier));
+  res.json(zaakBoard(req.supplier, req.actor));
 });
 app.post('/api/supplier/zaak/functie', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;

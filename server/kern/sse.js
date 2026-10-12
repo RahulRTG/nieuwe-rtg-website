@@ -75,7 +75,8 @@ function maakSse({ bus }) {
      de zaak en naar de medewerker zelf. Zonder `alleenVoor` verandert er niets. */
   function magBeperkt(c, alleenVoor) {
     if (!alleenVoor) return true;
-    if (c.manager === true) return true;
+    // `zonderManager`: een eigen gesprek van een medewerker is ook voor zijn manager niet
+    if (c.manager === true && !alleenVoor.zonderManager) return true;
     return alleenVoor.staffId != null && c.staffId != null && String(c.staffId) === String(alleenVoor.staffId);
   }
 

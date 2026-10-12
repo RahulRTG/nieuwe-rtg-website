@@ -102,10 +102,10 @@ module.exports = (kern) => {
     list.unshift(entry);
     db.data.applications[s.code] = list.slice(0, 100);
     save();
-    notifySupplier(s.code, { icon: 'werk', title: 'Sollicitatie via RTG', body: cv.name + ' (RTG-lid) solliciteert als ' + func + ', met cv.' });
+    notifySupplier(s.code, { icon: 'werk', title: 'Sollicitatie via RTG', body: cv.name + ' (RTG-lid) solliciteert als ' + func + ', met cv.', beperkt: 'werving' });
     // personeel-draaiboek: een seintje in het RTMAIL-postvak van de zaak (op codenaam)
     try { if (automatisering) automatisering.sollicitatieBinnen({ zaakCode: s.code, functie: func, codename }); } catch (e) {}
-    sseToSupplier(s.code, 'sync', { scope: 'team' });
+    sseToSupplier(s.code, 'sync', { scope: 'team' }, { staffId: null }); // werving: alleen de managers
     sseToOffice('sync', { scope: 'team' });
     res.json({ ok: true });
   });

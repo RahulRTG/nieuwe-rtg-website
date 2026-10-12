@@ -39,8 +39,8 @@ module.exports = (wctx) => {
       }
     };
     alle.unshift(entry); db.data.talentInteresses = alle.slice(0, 5000); save();
-    notifySupplier(zaak.code, { icon: 'werk', title: 'Nieuwe anonieme werkmatch', body: 'Een talent toont interesse in ' + vac.func + '.' });
-    sseToSupplier(zaak.code, 'sync', { scope: 'team' });
+    notifySupplier(zaak.code, { icon: 'werk', title: 'Nieuwe anonieme werkmatch', body: 'Een talent toont interesse in ' + vac.func + '.', beperkt: 'werving' });
+    sseToSupplier(zaak.code, 'sync', { scope: 'team' }, { staffId: null }); // werving: alleen de managers
     res.json({ ok: true, interesse: { id: entry.id, status: entry.status } });
   });
 

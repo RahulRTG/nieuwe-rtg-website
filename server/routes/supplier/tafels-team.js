@@ -69,7 +69,10 @@ app.post('/api/supplier/team/buzz', supplierAuth, (req, res) => {
     }
   }
   logActivity(req.supplier.code, req.actor, all ? 'riep het hele team op (tril)' : 'riep ' + name + ' op (tril)');
-  res.json({ ok: true, reached, name: all ? 'het hele team' : name });
+  /* Geen aantal toestellen: dat is een online-stip (besluit C1). Een manager
+     hoort hooguit OF iemand het kreeg (ja/nee); een ander niets. */
+  res.json(Object.assign({ ok: true, name: all ? 'het hele team' : name },
+    logboekzicht.magKlokZien(req.actor) ? { reached: reached > 0 } : {}));
 });
 
 app.post('/api/supplier/security', supplierAuth, (req, res) => {
@@ -108,7 +111,7 @@ app.post('/api/supplier/leave/decide', supplierAuth, (req, res) => {
   save();
   // besluit B1: de manager en wie het betreft (op zijn staffId), geen collega
   logActivity(req.supplier.code, { name: req.actor.name, staffId: v.staffId }, (v.status === 'goedgekeurd' ? 'keurde verlof goed van ' : 'wees verlof af van ') + v.name, 'afwezig');
-  sseToSupplier(req.supplier.code, 'sync', { scope: 'verlof' });
+  sseToSupplier(req.supplier.code, 'sync', { scope: 'verlof' }, { staffId: v.staffId }); // B1: manager en wie het betreft
   res.json({ ok: true, entry: v });
 });
 

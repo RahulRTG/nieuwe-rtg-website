@@ -127,15 +127,26 @@ test('sollicitaties: alleen de manager', async () => {
   }
 });
 
-test('C1. online alleen binnen een bestaand gesprek, en zonder tijd', async () => {
+test('C1. online alleen binnen een gesprek waarin BEIDE schreven, zonder tijd en zonder bezorgteller', async () => {
   const lijst = async () => (await api('/api/staff/dm/lijst', {}, abel.tok)).body.collegas.find(c => String(c.id) === String(zora.id));
-  let voor, na;
+  let voor, eenzijdig, wederzijds, verstuurd;
   await luister(zora.tok, async () => {
     voor = await lijst();
-    assert.equal((await api('/api/staff/dm/send', { staffId: zora.id, text: 'hoi' }, abel.tok)).status, 200);
-    na = await lijst();
+    verstuurd = await api('/api/staff/dm/send', { staffId: zora.id, text: 'hoi' }, abel.tok);
+    eenzijdig = await lijst();
+    assert.equal((await api('/api/staff/dm/send', { staffId: abel.id, text: 'hoi terug' }, zora.tok)).status, 200);
+    wederzijds = await lijst();
   });
+  assert.equal(verstuurd.status, 200);
+  assert.ok(!('bezorgd' in verstuurd.body), 'dm/send zegt niet op hoeveel toestellen het aankwam');
   assert.equal(voor.online, false, 'zonder gesprek geen online-stip, ook al is Zora verbonden');
-  assert.equal(na.online, true, 'binnen het gesprek wel');
-  assert.deepEqual(Object.keys(na).filter(k => /at$|sinds|laatstActief|tijd/i.test(k)), [], 'geen tijdstip naast de stip');
+  assert.equal(eenzijdig.online, false, 'een bericht van een kant dwingt de stip niet af');
+  assert.equal(wederzijds.online, true, 'binnen een gesprek waarin beiden schreven wel');
+  assert.deepEqual(Object.keys(wederzijds).filter(k => /at$|sinds|laatstActief|tijd/i.test(k)), [], 'geen tijdstip naast de stip');
+  // de tril-oproep: geen aantal toestellen; een manager hooguit ja/nee
+  const ab = await api('/api/supplier/team/buzz', { staffId: zora.id }, abel.tok);
+  assert.equal(ab.status, 200);
+  assert.ok(!('reached' in ab.body), 'een collega hoort niet of Zora de app open heeft');
+  const mb = await api('/api/supplier/team/buzz', { all: true }, tokM);
+  assert.equal(typeof mb.body.reached, 'boolean', 'de manager krijgt ja/nee en geen aantal');
 });

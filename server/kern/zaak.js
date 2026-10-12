@@ -10,6 +10,8 @@
 
    maakZaak(state) volgt het vaste kern-patroon. */
 
+const { magKlokZien } = require('./leverancier/logboekzicht');
+
 function maakZaak({ db, save, accounts }) {
   // s.functies: eigen aan/uit-vlaggen die geen bestaande instelling hebben.
   function zf(s, id) { return !(s.functies && s.functies[id] === false); }
@@ -47,18 +49,26 @@ function maakZaak({ db, save, accounts }) {
   }
 
   /* ---- HR-momentopname ---- */
-  function hr(s) {
+  /* Een medewerker ziet het team en wie er binnen is; openstaande verlof-
+     aanvragen en sollicitaties zijn werk van de manager en tellen alleen voor
+     hem (tegenlezing PR #584). De statussen zijn die de routes werkelijk zetten:
+     een aanvraag is 'nieuw' (routes/staff/dienst.js), een sollicitatie 'nieuw' of
+     'uitgenodigd' (routes/supplier/werving/sollicitaties.js); 'aangevraagd' en
+     'open' bestonden nergens. Het klokboek is een LIJST met `out`, geen object
+     met `uit`: zo telde hier elke klokregel ooit als binnen. */
+  function hr(s, actor) {
     const code = s.code;
     let team = [];
     try { team = accounts.listStaff(code).map(accounts.publicStaff); } catch (e) {}
-    const klok = (db.data.klok && db.data.klok[code]) || {};
-    const ingeklokt = Object.values(klok).filter(k => k && k.in && !k.uit).length;
-    const verlof = ((db.data.verlof && db.data.verlof[code]) || []).filter(v => v.status === 'aangevraagd' || v.status === 'open');
-    const sollicitaties = ((db.data.applications && db.data.applications[code]) || []).filter(a => ['nieuw', 'aangevraagd', 'open'].includes(a.status));
+    const klok = (db.data.klok && db.data.klok[code]);
+    const ingeklokt = new Set((Array.isArray(klok) ? klok : []).filter(k => k && k.in && !k.out).map(k => String(k.staffId))).size;
+    const manager = magKlokZien(actor);
+    const verlof = ((db.data.verlof && db.data.verlof[code]) || []).filter(v => v.status === 'nieuw');
+    const sollicitaties = ((db.data.applications && db.data.applications[code]) || []).filter(a => ['nieuw', 'uitgenodigd'].includes(a.status));
     const vacatures = ((db.data.vacatures && db.data.vacatures[code]) || []).filter(v => v.open !== false);
     return {
       teamAantal: team.length, managers: team.filter(t => t.role === 'manager').length,
-      ingeklokt, openVerlof: verlof.length, openSollicitaties: sollicitaties.length, openVacatures: vacatures.length,
+      ingeklokt, openVerlof: manager ? verlof.length : null, openSollicitaties: manager ? sollicitaties.length : null, openVacatures: vacatures.length,
       team: team.slice(0, 40)
     };
   }
@@ -81,8 +91,8 @@ function maakZaak({ db, save, accounts }) {
     };
   }
 
-  function board(s) {
-    return { functies: functieLijst(s), hr: hr(s), marketing: marketing(s) };
+  function board(s, actor) {
+    return { functies: functieLijst(s), hr: hr(s, actor), marketing: marketing(s) };
   }
 
   return { ZAAK_CAPS: CAPS, zaakFunctieAan: functieAan, zaakFunctieLijst: functieLijst, zaakZet: zet, zaakHr: hr, zaakMarketing: marketing, zaakBoard: board };

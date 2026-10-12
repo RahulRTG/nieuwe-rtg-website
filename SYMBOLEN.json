@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "4a2d2d2f7",
-  "seconden": 10.8,
+  "commit": "d3fddb068",
+  "seconden": 10.7,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -4468,6 +4468,7 @@
     "server/lib/idem-poort.js",
     "server/lib/idem-sleutelbepaling.js",
     "server/lib/idem.js",
+    "server/lib/idemring.js",
     "server/lib/idemsleutels-aankomst.js",
     "server/lib/idemsleutels-afleidrest.js",
     "server/lib/idemsleutels-basis.js",
@@ -7231,18 +7232,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5752,
-  "gelezen": 5437,
+  "bestandenGezien": 5753,
+  "gelezen": 5438,
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27488,
-  "bestandenMetUitvoer": 4536,
+  "symbolen": 27490,
+  "bestandenMetUitvoer": 4537,
   "uitvoerMetNamen": 2063,
   "uitvoerOnvolledig": 7,
-  "uitvoerZonderNamen": 2466,
+  "uitvoerZonderNamen": 2467,
   "zonderUitvoer": 901,
-  "requireKanten": 7753
+  "requireKanten": 7754
  },
  "nietGelezen": [
   {
@@ -171203,7 +171204,7 @@
     {
      "naam": "doeWerkEnLegVast",
      "soort": "pijl",
-     "lijn": 151,
+     "lijn": 156,
      "geexporteerd": false
     }
    ],
@@ -171223,6 +171224,32 @@
     "server/kern/directpay/index.js",
     "server/kern/kassa/herhaling.js",
     "server/kern/pay/idemlaag.js"
+   ]
+  },
+  {
+   "bestand": "server/lib/idemring.js",
+   "symbolen": [
+    {
+     "naam": "weiger",
+     "soort": "functie",
+     "lijn": 20,
+     "geexporteerd": "onbekend"
+    },
+    {
+     "naam": "bak",
+     "soort": "pijl",
+     "lijn": 25,
+     "geexporteerd": "onbekend"
+    }
+   ],
+   "uitvoer": {
+    "vorm": "functie",
+    "namen": null
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/server.js"
    ]
   },
   {
@@ -207952,19 +207979,19 @@
     {
      "naam": "stationsForOrder",
      "soort": "functie",
-     "lijn": 2016,
+     "lijn": 1982,
      "geexporteerd": false
     },
     {
      "naam": "sectiesForOrder",
      "soort": "functie",
-     "lijn": 2026,
+     "lijn": 1992,
      "geexporteerd": false
     },
     {
      "naam": "migreerLokaleToegang",
      "soort": "functie",
-     "lijn": 2320,
+     "lijn": 2286,
      "geexporteerd": false
     }
    ],
@@ -208076,6 +208103,7 @@
     "server/lib/auditwacht.js",
     "server/lib/cache.js",
     "server/lib/handelingsspoor.js",
+    "server/lib/idemring.js",
     "server/lib/klok.js",
     "server/lib/leeftijd.js",
     "server/lib/lidsleutel.js",

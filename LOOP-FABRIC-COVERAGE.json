@@ -13,7 +13,7 @@
   "measured": {
     "capabilities": 228,
     "routes": 5449,
-    "mutationContracts": 5324,
+    "mutationContracts": 5326,
     "screens": 327
   },
   "classifications": [
@@ -15227,8 +15227,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 1023,
-        "mutationRoutes": 1023,
-        "declaredMutationSemantics": 316,
+        "mutationRoutes": 1024,
+        "declaredMutationSemantics": 317,
         "sourceFileCount": 199,
         "kernelDependencyCount": 2566,
         "screenCount": 39,
@@ -16220,8 +16220,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 674,
-        "mutationRoutes": 655,
-        "declaredMutationSemantics": 380,
+        "mutationRoutes": 656,
+        "declaredMutationSemantics": 381,
         "sourceFileCount": 108,
         "kernelDependencyCount": 121,
         "screenCount": 21,

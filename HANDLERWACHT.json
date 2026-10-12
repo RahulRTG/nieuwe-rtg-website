@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-11T22:28:46.540Z",
-  "commit": "4ac469c0",
+  "op": "2026-10-12T04:49:15.409Z",
+  "commit": "ed6470cac",
   "boomVuil": false,
   "boomAnders": 5,
   "instrument": "scripts/handlerwacht.js",
@@ -3476,19 +3476,19 @@
   },
   {
    "sleutel": "POST /api/rtf/onboarding/opslaan",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:16",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:20",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/onboarding/status",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:12",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:16",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/onboarding/teken",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:20",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:24",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
@@ -3590,37 +3590,37 @@
   },
   {
    "sleutel": "POST /api/rtf/social/connect",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:33",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:37",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/connections",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:66",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:70",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/dm",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:89",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:93",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/dm/send",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:95",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:99",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/find",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:28",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:32",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/goedkeuren",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:101",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:105",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
@@ -3662,13 +3662,13 @@
   },
   {
    "sleutel": "POST /api/rtf/social/opdracht",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:127",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:131",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/oudervoeg",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:42",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:46",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
@@ -3680,43 +3680,43 @@
   },
   {
    "sleutel": "POST /api/rtf/social/respond",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:60",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:64",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/snap/send",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:108",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:112",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/snap/view",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:115",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:119",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/snaps",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:114",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:118",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/stories",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:128",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:132",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/story/post",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:121",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:125",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },
   {
    "sleutel": "POST /api/rtf/social/story/view",
-   "bestand": "server/routes/social/gezinnen/vrienden.js:129",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:133",
    "staat": "bewaakt",
    "wacht": "rtfSociaal"
   },

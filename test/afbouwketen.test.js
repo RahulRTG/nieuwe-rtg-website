@@ -186,10 +186,18 @@ test('DE KETEN: van claim tot herstel, met echte processen', (t) => {
   process.kill(ronde.pid, 'SIGKILL');
   assert.ok(wachtOp(() => !A.procesLeeft(ronde.pid)), 'de wortel hoort weg te zijn');
 
-  // --- de opgeslagen stand is NIET herschreven ---
-  assert.equal(leesRauw(w.afloop), rauwVoor,
-    'een SIGKILL hoort geen letter aan het afloopbestand te veranderen -- dit is de invariant: ' +
+  /* --- de opgeslagen stand is NIET herschreven ---
+     Tussen het lezen van rauwVoor en het aankomen van de SIGKILL leeft de ronde
+     nog, en dan mag de hartslag één keer tikken (CI zag dat: alleen `kring` en
+     `kringGepeild` anders). Dus twee beweringen: de afloop zelf is gelijk, en
+     NA de dood verandert er over drie hartslagen geen letter meer. */
+  const rauwDood = leesRauw(w.afloop);
+  assert.deepEqual(afloopZonderHartslag(rauwDood), afloopZonderHartslag(rauwVoor),
+    'een SIGKILL hoort de afloop niet te veranderen -- dit is de invariant: ' +
     'een terminale toestand komt van de eigenaar of van een expliciete herstel(), nooit van een waarnemer');
+  wachtOp(() => false, 350);
+  assert.equal(leesRauw(w.afloop), rauwDood,
+    'na de SIGKILL hoort er geen letter meer aan het afloopbestand te veranderen');
 
   // --- het OORDEEL is ONVOLTOOID, en de poort weigert ---
   const g1 = A.magStarten('proefronde');

@@ -1,14 +1,14 @@
 {
   "stempel": {
-    "op": "2026-10-12T01:34:14.531Z",
-    "commit": "f6639d667",
+    "op": "2026-10-12T03:48:00.292Z",
+    "commit": "22894e5ab",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bevoegdronde.js",
     "node": "v22.22.0"
   },
   "uitleg": "Bewijs 6 (bevoegd) per onderdeel uit MAPPEN: ledenschermen met de ledenkruis (scripts/lib/ledenkruis.js: het scherm als lid A, nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin) plus IDOR.json, en ROLPROEF.json waar die vers is; gezinsschermen met een kruisproef op de gezinscode. Zie de kop van scripts/bevoegdronde.js en BETROUWBAARHEID.md par. 4f en 4j.",
-  "grens": "leden: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af; ledenkruis: het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR. gezinnen: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token.",
+  "grens": "leden: samengesteld uit IDOR.json en ROLPROEF.json per route die het scherm aanroept; een voorvoegsel telt als gemeten als elke bekende route eronder gemeten is, en een route die IDOR `publiek` noemt schermt niets af; ledenkruis: het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR. gezinnen: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token.",
   "bronnen": {
     "vervallen": [
       "ROLPROEF.json: gemeten op 76dbed774, sindsdien zijn 1314 codebestand(en) gewijzigd (185 andere buiten dit instrument gelaten)"
@@ -228,18 +228,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -276,6 +264,18 @@
             }
           },
           {
+            "pad": "/api/notities/mijn",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/ik/workspace",
             "soort": "laden",
             "a": 200,
@@ -288,7 +288,7 @@
             }
           },
           {
-            "pad": "/api/notities/mijn",
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -400,18 +400,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -461,6 +449,18 @@
           },
           {
             "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -560,31 +560,19 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ik/workspace",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/notities/mijn",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -620,7 +608,19 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
+            "pad": "/api/notities/mijn",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/workspace",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -720,6 +720,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -769,18 +781,6 @@
           },
           {
             "pad": "/api/ik/workspace",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -916,6 +916,30 @@
             }
           },
           {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
             "pad": "/api/auth/me",
             "soort": "laden",
             "a": 200,
@@ -964,30 +988,6 @@
             }
           },
           {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
             "pad": "/api/chat/history",
             "soort": "laden",
             "a": 200,
@@ -1016,18 +1016,6 @@
         "reden": "geen eigen route van het scherm droeg iets van lid A; \"een ander zag niets\" is dan geen uitslag",
         "kruisparen": [
           {
-            "pad": "/api/isolatie/mijn",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/talen",
             "soort": "laden",
             "a": 200,
@@ -1037,6 +1025,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/isolatie/mijn",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           },
           {
@@ -1053,6 +1053,18 @@
           },
           {
             "pad": "/api/ik/beelden",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -1085,18 +1097,6 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/comm/inbox",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
             }
           },
           {
@@ -1210,18 +1210,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -1271,6 +1259,18 @@
           },
           {
             "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -1388,15 +1388,15 @@
             }
           },
           {
-            "pad": "/api/comm/inbox",
+            "pad": "/api/health",
             "soort": "laden",
             "a": 200,
             "anderen": {
-              "anoniem": "geweigerd",
+              "anoniem": "eigen",
               "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -1412,15 +1412,15 @@
             }
           },
           {
-            "pad": "/api/health",
+            "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
             "anderen": {
-              "anoniem": "eigen",
+              "anoniem": "geweigerd",
               "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           },
           {
@@ -1572,30 +1572,6 @@
             }
           },
           {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
             "pad": "/api/auth/me",
             "soort": "laden",
             "a": 200,
@@ -1641,6 +1617,30 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -1962,18 +1962,6 @@
             }
           },
           {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -1995,6 +1983,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           }
         ]
@@ -2062,7 +2062,7 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
+            "pad": "/api/commerce/retour/mijn",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -2074,7 +2074,7 @@
             }
           },
           {
-            "pad": "/api/commerce/retour/mijn",
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -2312,6 +2312,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -2372,7 +2384,7 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
+            "pad": "/api/chat/history",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -2405,18 +2417,6 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
             }
           }
         ]
@@ -2459,18 +2459,6 @@
           },
           {
             "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ik/workspace",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -2531,6 +2519,18 @@
           },
           {
             "pad": "/api/notities/mijn",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/workspace",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -2630,6 +2630,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -2690,18 +2702,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -2750,7 +2750,7 @@
       "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
       "kruisparen": [
         {
-          "verzoek": "GET /api/foundation/gezin/NX2B8G/gezondheid",
+          "verzoek": "GET /api/foundation/gezin/EU52U2/gezondheid",
           "a": 200,
           "b": 403,
           "anoniem": 403,
@@ -2848,18 +2848,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -2920,6 +2908,30 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -2941,18 +2953,6 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
             }
           }
         ]
@@ -3008,6 +3008,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -3057,18 +3069,6 @@
           },
           {
             "pad": "/api/ik/workspace",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -3168,6 +3168,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -3228,30 +3240,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -3273,6 +3261,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           }
         ]
@@ -3358,6 +3358,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -3430,30 +3442,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -3475,6 +3463,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           }
         ]
@@ -3530,18 +3530,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -3591,6 +3579,18 @@
           },
           {
             "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -3712,30 +3712,6 @@
             }
           },
           {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -3806,6 +3782,30 @@
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
             }
+          },
+          {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
           }
         ]
       }
@@ -3817,10 +3817,10 @@
       "persona": "lid",
       "status": "BEWEZEN",
       "routes": 12,
-      "reden": "alle 12 routes gemeten (3 waar IDOR geen id vond, door de ledenkruis met A's eigen verzoek) en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet); ledenkruis: 27 verzoeken van lid A (8 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
+      "reden": "alle 12 routes gemeten (3 waar IDOR geen id vond, door de ledenkruis met A's eigen verzoek) en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet); ledenkruis: 27 verzoeken van lid A (8 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR",
       "ledenkruis": {
         "status": "BEWEZEN",
-        "reden": "27 verzoeken van lid A (8 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
+        "reden": "27 verzoeken van lid A (8 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR",
         "kruisparen": [
           {
             "pad": "/api/ik/beelden",
@@ -3931,18 +3931,6 @@
             }
           },
           {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
             "pad": "/api/chat/history",
             "soort": "laden",
             "a": 200,
@@ -3952,6 +3940,18 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -4185,18 +4185,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -4246,6 +4234,18 @@
           },
           {
             "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -4551,6 +4551,30 @@
             }
           },
           {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -4608,30 +4632,6 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
             }
           },
           {
@@ -4757,6 +4757,42 @@
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
             }
+          },
+          {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
           }
         ]
       }
@@ -4829,6 +4865,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -4877,42 +4925,6 @@
             }
           },
           {
-            "pad": "/api/ik/workspace",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -4934,6 +4946,30 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           }
         ]
@@ -4987,18 +5023,6 @@
             }
           },
           {
-            "pad": "/api/talen",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -5056,6 +5080,18 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/talen",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -5116,10 +5152,10 @@
       "persona": "lid",
       "status": "BEWEZEN",
       "routes": 6,
-      "reden": "alle 6 routes gemeten (6 waar IDOR geen id vond, door de ledenkruis met A's eigen verzoek) en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet); ledenkruis: 19 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
+      "reden": "alle 6 routes gemeten (6 waar IDOR geen id vond, door de ledenkruis met A's eigen verzoek) en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet); ledenkruis: 19 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR",
       "ledenkruis": {
         "status": "BEWEZEN",
-        "reden": "19 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
+        "reden": "19 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR",
         "kruisparen": [
           {
             "pad": "/api/carriere/ledger/mijn",
@@ -5167,6 +5203,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           },
           {
@@ -5219,18 +5267,6 @@
           },
           {
             "pad": "/api/ik/workspace",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -5402,18 +5438,6 @@
             }
           },
           {
-            "pad": "/api/member/magnaat/overzicht",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/stream",
             "soort": "laden",
             "a": 200,
@@ -5423,6 +5447,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/member/magnaat/overzicht",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           },
           {
@@ -5438,7 +5474,19 @@
             }
           },
           {
-            "pad": "/api/auth/me",
+            "pad": "/api/talen",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -5450,7 +5498,7 @@
             }
           },
           {
-            "pad": "/api/comm/inbox",
+            "pad": "/api/auth/me",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -5498,15 +5546,15 @@
             }
           },
           {
-            "pad": "/api/talen",
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
-              "anoniem": "eigen",
+              "anoniem": "geweigerd",
               "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           }
         ]
@@ -5710,7 +5758,7 @@
             }
           },
           {
-            "pad": "/api/mall/zoek",
+            "pad": "/api/mall",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -5722,7 +5770,7 @@
             }
           },
           {
-            "pad": "/api/mall",
+            "pad": "/api/mall/zoek",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -5794,6 +5842,18 @@
             }
           },
           {
+            "pad": "/api/mall/home",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/mall/apps/mijn",
             "soort": "laden",
             "a": 200,
@@ -5830,31 +5890,7 @@
             }
           },
           {
-            "pad": "/api/mall/home",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/mall/apps/catalogus",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ik/beelden",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -5890,6 +5926,18 @@
             }
           },
           {
+            "pad": "/api/ik/beelden",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/talen",
             "soort": "laden",
             "a": 200,
@@ -5902,7 +5950,103 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/auth/me",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/agenda/bereik",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/notities/mijn",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -6038,18 +6182,6 @@
             }
           },
           {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -6071,6 +6203,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           }
         ]
@@ -6114,18 +6258,6 @@
             }
           },
           {
-            "pad": "/api/talen",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
             "pad": "/api/ik/beelden",
             "soort": "laden",
             "a": 200,
@@ -6138,15 +6270,15 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
+            "pad": "/api/talen",
             "soort": "laden",
             "a": 200,
             "anderen": {
-              "anoniem": "geweigerd",
+              "anoniem": "eigen",
               "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -6159,30 +6291,6 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
             }
           },
           {
@@ -6231,6 +6339,42 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -6358,18 +6502,6 @@
             }
           },
           {
-            "pad": "/api/talen",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
             "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
@@ -6382,7 +6514,31 @@
             }
           },
           {
+            "pad": "/api/talen",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/auth/me",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -6407,18 +6563,6 @@
           },
           {
             "pad": "/api/notities/mijn",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/auth/me",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -6492,7 +6636,7 @@
         "reden": "geen eigen route van het scherm droeg iets van lid A; \"een ander zag niets\" is dan geen uitslag",
         "kruisparen": [
           {
-            "pad": "/api/move/volgende",
+            "pad": "/api/move/reis",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -6504,7 +6648,7 @@
             }
           },
           {
-            "pad": "/api/move/reis",
+            "pad": "/api/move/volgende",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -6872,6 +7016,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -6921,18 +7077,6 @@
           },
           {
             "pad": "/api/ik/workspace",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -7020,18 +7164,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -7093,6 +7225,18 @@
           },
           {
             "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -7204,18 +7348,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -7265,6 +7397,18 @@
           },
           {
             "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -7351,18 +7495,6 @@
             }
           },
           {
-            "pad": "/api/talen",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
             "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
@@ -7372,6 +7504,18 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/talen",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -7435,7 +7579,7 @@
             }
           },
           {
-            "pad": "/api/ready",
+            "pad": "/api/health",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -7447,7 +7591,7 @@
             }
           },
           {
-            "pad": "/api/health",
+            "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -7523,18 +7667,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -7584,6 +7716,18 @@
           },
           {
             "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -7683,6 +7827,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -7743,18 +7899,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -7803,7 +7947,7 @@
       "reden": "ROLPROEF.json vervallen, en de ledenkruis raakte 2 schrijfroute(s) van het scherm niet met lid A binnen: /api/member/huis/map, /api/member/huis/rahul",
       "ledenkruis": {
         "status": "BEWEZEN",
-        "reden": "17 verzoeken van lid A (0 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
+        "reden": "17 verzoeken van lid A (0 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR",
         "kruisparen": [
           {
             "pad": "/api/member/huis/dossier",
@@ -7878,7 +8022,7 @@
             }
           },
           {
-            "pad": "/api/ik/beelden",
+            "pad": "/api/experience/evidence",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -7890,7 +8034,7 @@
             }
           },
           {
-            "pad": "/api/experience/evidence",
+            "pad": "/api/ik/beelden",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -8062,30 +8206,6 @@
             }
           },
           {
-            "pad": "/api/mob/mijn",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/mob/reis/mijn",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ik/beelden",
             "soort": "laden",
             "a": 200,
@@ -8119,6 +8239,54 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/mob/mijn",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/mob/reis/mijn",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -8191,30 +8359,6 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
             }
           },
           {
@@ -8294,6 +8438,18 @@
             }
           },
           {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
             "pad": "/api/auth/me",
             "soort": "laden",
             "a": 200,
@@ -8351,18 +8507,6 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
             }
           },
           {
@@ -8634,7 +8778,7 @@
             }
           },
           {
-            "pad": "/api/ik/workspace",
+            "pad": "/api/notities/mijn",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -8646,7 +8790,7 @@
             }
           },
           {
-            "pad": "/api/notities/mijn",
+            "pad": "/api/ik/workspace",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -8722,31 +8866,19 @@
             }
           },
           {
-            "pad": "/api/member/connections",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/pay/tiks",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ik/beelden",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/member/connections",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -8770,7 +8902,7 @@
             }
           },
           {
-            "pad": "/api/pay/tegoed",
+            "pad": "/api/auth/me",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -8783,18 +8915,6 @@
           },
           {
             "pad": "/api/comm/inbox",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/auth/me",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -8831,6 +8951,18 @@
           },
           {
             "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/pay/tiks",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -8879,6 +9011,18 @@
           },
           {
             "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/pay/tegoed",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -8966,18 +9110,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/auth/me",
             "soort": "laden",
             "a": 200,
@@ -9015,6 +9147,18 @@
           },
           {
             "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -9075,7 +9219,7 @@
       "reden": "6 van de 14 routes niet gemeten, o.a. /api/privacy/delete is in IDOR.json onbereikbaar; /api/privacy/export is in IDOR.json onbereikbaar; /api/privacy/inzage is in IDOR.json onbereikbaar",
       "ledenkruis": {
         "status": "BEWEZEN",
-        "reden": "17 verzoeken van lid A (2 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
+        "reden": "17 verzoeken van lid A (2 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR",
         "kruisparen": [
           {
             "pad": "/api/mijn/post",
@@ -9126,7 +9270,7 @@
             }
           },
           {
-            "pad": "/api/agenda/bereik",
+            "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -9150,7 +9294,7 @@
             }
           },
           {
-            "pad": "/api/comm/inbox",
+            "pad": "/api/agenda/bereik",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -9342,6 +9486,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -9402,30 +9558,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -9447,6 +9579,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           }
         ]
@@ -9686,18 +9830,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -9770,6 +9902,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -9815,10 +9959,10 @@
       "persona": "lid",
       "status": "BEWEZEN",
       "routes": 5,
-      "reden": "alle 5 routes gemeten (1 waar IDOR geen id vond, door de ledenkruis met A's eigen verzoek) en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet); ledenkruis: 18 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
+      "reden": "alle 5 routes gemeten (1 waar IDOR geen id vond, door de ledenkruis met A's eigen verzoek) en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet); ledenkruis: 18 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR",
       "ledenkruis": {
         "status": "BEWEZEN",
-        "reden": "18 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
+        "reden": "18 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR",
         "kruisparen": [
           {
             "pad": "/api/veiligheid/moment",
@@ -10053,18 +10197,6 @@
         "reden": "geen eigen route van het scherm droeg iets van lid A; \"een ander zag niets\" is dan geen uitslag",
         "kruisparen": [
           {
-            "pad": "/api/inzagekaart",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/toestemming/relaties",
             "soort": "laden",
             "a": 200,
@@ -10078,6 +10210,18 @@
           },
           {
             "pad": "/api/toestemming",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/inzagekaart",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -10110,6 +10254,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           },
           {
@@ -10162,18 +10318,6 @@
           },
           {
             "pad": "/api/ik/workspace",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -10261,18 +10405,6 @@
             }
           },
           {
-            "pad": "/api/member/rendezvous/circles",
-            "soort": "laden",
-            "a": 403,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "geweigerd",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/member/rendezvous/tafels",
             "soort": "laden",
             "a": 403,
@@ -10286,6 +10418,18 @@
           },
           {
             "pad": "/api/member/rendezvous/introducties",
+            "soort": "laden",
+            "a": 403,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "geweigerd",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/member/rendezvous/circles",
             "soort": "laden",
             "a": 403,
             "anderen": {
@@ -10503,30 +10647,6 @@
             }
           },
           {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -10596,6 +10716,30 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -10823,30 +10967,6 @@
             }
           },
           {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
             "pad": "/api/auth/me",
             "soort": "laden",
             "a": 200,
@@ -10892,6 +11012,30 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -11027,30 +11171,6 @@
             }
           },
           {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
             "pad": "/api/auth/me",
             "soort": "laden",
             "a": 200,
@@ -11096,6 +11216,30 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -11148,6 +11292,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           },
           {
@@ -11211,18 +11367,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -11257,6 +11401,66 @@
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
             }
+          },
+          {
+            "pad": "/api/onderwijs/ladder",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/onderwijs/mijn",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/leerstof/herhalen",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/leerstof/dag",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/bijles/gesprek",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
           }
         ]
       }
@@ -11272,7 +11476,7 @@
       "reden": "6 van de 14 routes niet gemeten, o.a. /api/privacy/delete is in IDOR.json onbereikbaar; /api/privacy/export is in IDOR.json onbereikbaar; /api/privacy/inzage is in IDOR.json onbereikbaar",
       "ledenkruis": {
         "status": "BEWEZEN",
-        "reden": "16 verzoeken van lid A (3 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
+        "reden": "16 verzoeken van lid A (3 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR",
         "kruisparen": [
           {
             "pad": "/api/mijn/sessies",
@@ -11530,18 +11734,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -11591,6 +11783,18 @@
           },
           {
             "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -11678,6 +11882,42 @@
             }
           },
           {
+            "pad": "/api/sociaal/command",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/sociaal/lijn",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/comm/inbox",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/ik/beelden",
             "soort": "laden",
             "a": 200,
@@ -11714,39 +11954,27 @@
             }
           },
           {
-            "pad": "/api/sociaal/command",
+            "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
             "anderen": {
-              "anoniem": "geweigerd",
+              "anoniem": "eigen",
               "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
-            "pad": "/api/sociaal/lijn",
+            "pad": "/api/health",
             "soort": "laden",
             "a": 200,
             "anderen": {
-              "anoniem": "geweigerd",
+              "anoniem": "eigen",
               "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/comm/inbox",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -11795,30 +12023,6 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
             }
           },
           {
@@ -11887,7 +12091,7 @@
       "reden": "14 van de 48 routes niet gemeten, o.a. /api/foundation staat niet in IDOR.json; /api/member/spel/arcade-bord is in IDOR.json onbereikbaar; /api/member/spel/arcade-score is in IDOR.json onbereikbaar",
       "ledenkruis": {
         "status": "BEWEZEN",
-        "reden": "21 verzoeken van lid A (0 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
+        "reden": "21 verzoeken van lid A (0 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR",
         "kruisparen": [
           {
             "pad": "/api/member/spel/mijn",
@@ -12106,6 +12310,18 @@
             }
           },
           {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -12127,18 +12343,6 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
             }
           }
         ]
@@ -12206,18 +12410,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -12267,6 +12459,18 @@
           },
           {
             "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -12328,18 +12532,6 @@
         "reden": "geen eigen route van het scherm droeg iets van lid A; \"een ander zag niets\" is dan geen uitslag",
         "kruisparen": [
           {
-            "pad": "/api/stad/bewoner",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/stream",
             "soort": "laden",
             "a": 200,
@@ -12349,6 +12541,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/stad/bewoner",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           },
           {
@@ -12376,7 +12580,7 @@
             }
           },
           {
-            "pad": "/api/comm/inbox",
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -12388,7 +12592,7 @@
             }
           },
           {
-            "pad": "/api/notities/mijn",
+            "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -12436,7 +12640,7 @@
             }
           },
           {
-            "pad": "/api/ik/workspace",
+            "pad": "/api/notities/mijn",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -12448,7 +12652,7 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
+            "pad": "/api/ik/workspace",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -12472,18 +12676,6 @@
             }
           },
           {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/health",
             "soort": "laden",
             "a": 200,
@@ -12493,6 +12685,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           }
         ]
@@ -12560,6 +12764,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -12620,30 +12836,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -12665,6 +12857,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           }
         ]
@@ -12744,6 +12948,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -12756,7 +12972,7 @@
             }
           },
           {
-            "pad": "/api/agenda/bereik",
+            "pad": "/api/auth/me",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -12768,7 +12984,7 @@
             }
           },
           {
-            "pad": "/api/auth/me",
+            "pad": "/api/agenda/bereik",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -12804,7 +13020,7 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
+            "pad": "/api/chat/history",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -12837,18 +13053,6 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
             }
           }
         ]
@@ -13076,6 +13280,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -13136,30 +13352,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -13181,6 +13373,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           }
         ]
@@ -13224,6 +13428,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -13237,18 +13453,6 @@
           },
           {
             "pad": "/api/auth/me",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ik/workspace",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -13284,7 +13488,7 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
+            "pad": "/api/ik/workspace",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -13321,6 +13525,102 @@
           },
           {
             "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/metingen",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/toestellen",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/gemoed",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/gewoonten",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/noodkaart",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/medicatie",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/life",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/dag",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -13478,6 +13778,30 @@
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
             }
+          },
+          {
+            "pad": "/api/veiligheid/kring",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/veiligheid",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
           }
         ]
       }
@@ -13530,18 +13854,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -13591,6 +13903,18 @@
           },
           {
             "pad": "/api/ik/workspace",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -13700,18 +14024,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -13772,7 +14084,19 @@
             }
           },
           {
-            "pad": "/api/ready",
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/health",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -13784,7 +14108,7 @@
             }
           },
           {
-            "pad": "/api/health",
+            "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -13860,18 +14184,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -13944,6 +14256,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -13996,7 +14320,7 @@
         "reden": "geen eigen route van het scherm droeg iets van lid A; \"een ander zag niets\" is dan geen uitslag",
         "kruisparen": [
           {
-            "pad": "/api/vonk/selectie",
+            "pad": "/api/vonk/edge",
             "soort": "laden",
             "a": 403,
             "anderen": {
@@ -14008,7 +14332,7 @@
             }
           },
           {
-            "pad": "/api/vonk/edge",
+            "pad": "/api/vonk/selectie",
             "soort": "laden",
             "a": 403,
             "anderen": {
@@ -14116,7 +14440,7 @@
             }
           },
           {
-            "pad": "/api/ready",
+            "pad": "/api/health",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -14128,7 +14452,7 @@
             }
           },
           {
-            "pad": "/api/health",
+            "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -14300,18 +14624,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -14372,7 +14684,7 @@
             }
           },
           {
-            "pad": "/api/chat/history",
+            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -14406,6 +14718,18 @@
               "kantoor": "eigen",
               "gezin": "eigen"
             }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
           }
         ]
       }
@@ -14427,6 +14751,13 @@
           "uitslag": "gescheiden"
         },
         {
+          "verzoek": "GET /api/foundation/gezin/EU52U2/mij",
+          "a": 200,
+          "b": 403,
+          "anoniem": 403,
+          "uitslag": "gescheiden"
+        },
+        {
           "verzoek": "POST /api/rtf/social/connections",
           "a": 200,
           "b": 403,
@@ -14435,13 +14766,6 @@
         },
         {
           "verzoek": "POST /api/foundation/gezin/stroom/ticket",
-          "a": 200,
-          "b": 403,
-          "anoniem": 403,
-          "uitslag": "gescheiden"
-        },
-        {
-          "verzoek": "GET /api/foundation/gezin/NX2B8G/mij",
           "a": 200,
           "b": 403,
           "anoniem": 403,
@@ -14476,18 +14800,18 @@
           "uitslag": "gescheiden"
         },
         {
-          "verzoek": "POST /api/foundation/gezin/beelden",
-          "a": 200,
-          "b": 401,
-          "anoniem": 401,
-          "uitslag": "gescheiden"
-        },
-        {
           "verzoek": "GET /api/rtf/social/stream",
           "a": 401,
           "b": 401,
           "anoniem": 401,
           "uitslag": "eigenaarWeg"
+        },
+        {
+          "verzoek": "POST /api/foundation/gezin/beelden",
+          "a": 200,
+          "b": 401,
+          "anoniem": 401,
+          "uitslag": "gescheiden"
         },
         {
           "verzoek": "POST /api/foundation/gezin/agenda/bereik",
@@ -14567,6 +14891,30 @@
             }
           },
           {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -14624,30 +14972,6 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
             }
           },
           {
@@ -14703,18 +15027,6 @@
             }
           },
           {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/talen",
             "soort": "laden",
             "a": 200,
@@ -14724,6 +15036,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           },
           {
@@ -14787,18 +15111,6 @@
             }
           },
           {
-            "pad": "/api/chat/history",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/ready",
             "soort": "laden",
             "a": 200,
@@ -14820,6 +15132,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/chat/history",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           }
         ]
@@ -14887,6 +15211,18 @@
             }
           },
           {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/comm/inbox",
             "soort": "laden",
             "a": 200,
@@ -14924,18 +15260,6 @@
           },
           {
             "pad": "/api/notities/mijn",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ik/toegankelijk",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -15023,18 +15347,6 @@
             }
           },
           {
-            "pad": "/api/ik/beelden",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
             "pad": "/api/talen",
             "soort": "laden",
             "a": 200,
@@ -15044,6 +15356,18 @@
               "zaak": "eigen",
               "kantoor": "eigen",
               "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/ik/beelden",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
             }
           },
           {
@@ -15164,25 +15488,13 @@
       "persona": "lid",
       "status": "BEWEZEN",
       "routes": 7,
-      "reden": "alle 7 routes gemeten (1 waar IDOR geen id vond, door de ledenkruis met A's eigen verzoek) en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet); ledenkruis: 20 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
+      "reden": "alle 7 routes gemeten (1 waar IDOR geen id vond, door de ledenkruis met A's eigen verzoek) en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet); ledenkruis: 20 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR",
       "ledenkruis": {
         "status": "BEWEZEN",
-        "reden": "20 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
+        "reden": "20 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos, elk verzoek twee keer (met een eigen waarde voor het lekoordeel, met A's waarde voor het effect); een lek is een merkteken van A (hoofdletterongevoelig) in hun body of hun antwoordkoppen, ook in een Location. NIET bewezen: de body van een weigering (4xx); afgeleide waarden (tellers, ja/nee, hashes, lengtes) die geen letterlijke waarde van A dragen; schrijven naar een veld dat de lezers van het scenario niet tonen (\"onaangetast\" betekent alleen dat die lezers dezelfde bytes geven); een effect pas na de derde aanroep of met vertraging; de inhoud van een stroom (event-stream); de codenaam op de routes in CODENAAM_ZICHTBAAR",
         "kruisparen": [
           {
             "pad": "/api/home/onderhoud",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/bestanden/mijn",
             "soort": "laden",
             "a": 200,
             "anderen": {
@@ -15206,6 +15518,18 @@
             }
           },
           {
+            "pad": "/api/bestanden/mijn",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
             "pad": "/api/ik/beelden",
             "soort": "laden",
             "a": 200,
@@ -15215,6 +15539,54 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/talen",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/ik/toegankelijk",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "geweigerd",
+              "ander lid": "eigen",
+              "zaak": "geweigerd",
+              "kantoor": "geweigerd",
+              "gezin": "geweigerd"
+            }
+          },
+          {
+            "pad": "/api/ready",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
+            }
+          },
+          {
+            "pad": "/api/health",
+            "soort": "laden",
+            "a": 200,
+            "anderen": {
+              "anoniem": "eigen",
+              "ander lid": "eigen",
+              "zaak": "eigen",
+              "kantoor": "eigen",
+              "gezin": "eigen"
             }
           },
           {
@@ -15275,54 +15647,6 @@
               "zaak": "geweigerd",
               "kantoor": "geweigerd",
               "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/talen",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/ik/toegankelijk",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "geweigerd",
-              "ander lid": "eigen",
-              "zaak": "geweigerd",
-              "kantoor": "geweigerd",
-              "gezin": "geweigerd"
-            }
-          },
-          {
-            "pad": "/api/ready",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
-            }
-          },
-          {
-            "pad": "/api/health",
-            "soort": "laden",
-            "a": 200,
-            "anderen": {
-              "anoniem": "eigen",
-              "ander lid": "eigen",
-              "zaak": "eigen",
-              "kantoor": "eigen",
-              "gezin": "eigen"
             }
           },
           {

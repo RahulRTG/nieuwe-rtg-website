@@ -581,6 +581,73 @@ runner, conflicten in gegenereerde bestanden (83% van de merges op claude-takken
 PR. Wekelijks gemeten: PR's gemerged, tijd tot merge, CI-wachttijd tegen
 uitvoertijd, bewezen producten, gesloten ketens en ontsnapte defecten.
 
+## 3i. Besluiten tijdens de integratie, deel 3 (12 oktober 2026)
+
+**Registratie en vrijgave.** De openbare registratie blijft dicht
+(`RTG_REGISTRATIE_DICHT`, #589) tot de /media-reparatie (#587) is uitgerold en
+productiecontroles aantonen dat privébestanden niet meer onbevoegd bereikbaar
+zijn. Heropenen gebeurt alleen met uitdrukkelijke toestemming van de eigenaar.
+Er komt geen publieke lancering voordat de privacy- en autorisatietoetsen van deze
+ronde slagen. Het incident heet pas "technisch ingeperkt" als de productiecontrole
+dat aantoont, niet als de PR gemerged is.
+
+**Mergevolgorde.** #587, dan #589, dan #590, dan #559 en de rest van ronde 1. Per PR
+gelden drie voorwaarden: de actuele commit is groen, de menselijke beoordeling is
+afgerond en er is geen conflict. Er wordt één PR tegelijk gemerged, en daarna wordt
+main gecontroleerd. Dit akkoord gaat over de volgorde, niet over het overslaan van
+review of over automatisch mergen.
+
+**584A: bewaring van sollicitatiepost.**
+- De standaardtermijn is vier weken na binnenkomst.
+- Een bevoegde manager van de eigen zaak mag verlengen tot hoogstens één jaar. Dat
+  kan alleen met een vastgelegde grondslag en een aantoonbare noodzaak, en nooit
+  automatisch.
+- Een dagelijkse ronde ruimt verlopen post op en schrijft een vernietigingsbewijs.
+- Bestaande post wordt pas onomkeerbaar verwijderd nadat de juridische
+  bewaartermijnen en eventuele bewaarplichten zijn getoetst.
+
+**B3-A: tweede handtekening.** Dit komt in een afzonderlijke vervolg-PR, direct na
+#590, voor `voornemen/teken|staak` en `terugval/bevestig`.
+- De tweede ondertekenaar is een afzonderlijke, bevoegde persoon met een eigen
+  geauthenticeerde sessie.
+- Een getypte naam of een gedeelde code telt nooit.
+- Twee accounts tellen niet vanzelf als twee mensen. Kan niet betrouwbaar worden
+  vastgesteld dat het om verschillende personen gaat, dan heet de tweede goedkeuring
+  niet "bewezen onafhankelijk".
+- De bestaande vier-ogenregels blijven staan, met regressie- en mutatietoetsen.
+
+**1A-A: CI voor drafts.** Dit komt in een afzonderlijke PR na #559.
+- Drafts krijgen snelle statische en relevante beveiligingscontroles.
+- Ready for review start de volledige vereiste CI aantoonbaar.
+- Alle verplichte checks en de branchbescherming blijven zoals ze zijn.
+- Er wordt bewezen dat een overgeslagen job nooit als volledige controle telt.
+
+**opNaam-A: identiteitsclassificatie, platformbreed, eerst in de schaduw.**
+
+| Klasse | Betekenis |
+|---|---|
+| `passkey` | Cryptografisch geauthenticeerd binnen de relevante sessie, met een geldig en toepasselijk bewijs. |
+| `opNaam` | Persoonlijk geauthenticeerd, zonder vers passkeybewijs. |
+| `eigenaarToken` | Herleidbaar naar de eigenaar, maar niet vanzelf passkey-bewezen. |
+| `gedeeld` | Geen individuele actor. |
+
+- De actor komt altijd uit een vertrouwde sessie, nooit uit een vrij invulbaar
+  veld.
+- Eerst wordt alleen gelabeld en gemeten. Er komt geen algemene handhaving voordat
+  de schaduwmetingen en routeclassificaties zijn beoordeeld.
+- Een passkey bewijst het gebruik van een geregistreerde authenticator in een
+  context. Hij bewijst niet vanzelf bevoegdheid, niet dat de bedoelde persoon zelf
+  handelde, en niet dat er een tweede, onafhankelijke persoon is. Er komen dus geen
+  nieuwe bewijsclaims die meer zeggen dan dat.
+
+**Uitvoering.**
+- De WIP-limiet geldt: zes actieve implementatie-PR's, vier in review.
+- B3 begint na de merge van #590, 1A na de merge van #559, en opNaam zodra er
+  ruimte is binnen de WIP-limiet.
+- Er komt geen nieuwe grote ontwikkelgolf.
+- Elke beveiligingswijziging wordt onafhankelijk tegengelezen en volledig getest
+  voordat zij mergegereed heet.
+
 ## 4. De vier werkstromen
 
 | werkstroom | wat | werkterrein |

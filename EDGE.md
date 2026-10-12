@@ -1116,3 +1116,56 @@ zijn eigen soort.
 - **Een plan is geen toestemming, en een AI-antwoord is geen bewijs van
   uitvoering.** Het actiebewijs is leidend.
 - **Er wordt geen snelheidsdoel genoemd zonder nulmeting.**
+
+### 14.6 Live samenwerking: het concept als werkstuk (12 oktober 2026)
+
+Stap 3 van de doorsnede. Het lid past een voorbereiding van Rahul **op het
+scherm** aan, en Rahul en de Edge werken daarna met dezelfde waarden, zonder dat
+het lid de vraag opnieuw typt of een nieuw gesprek begint.
+
+**Geen tweede conceptmodel.** Het concept is de reiswens van
+`kern/fluister/reis/reiswens.js`, nu met gestructureerde waarden. Daar komen
+precies drie dingen bij: een id, een versie en een eigenaar
+(`kern/fluister/reis/reisconcept.js`). Het concept staat in Rahuls eigen geheugen
+van het lid (`van(key)`), dus "vergeet alles" neemt het mee en er komt geen
+collectie bij.
+
+**Een wijziging is deterministisch.** `POST /api/fluister/concept` roept geen
+model en geen stuurlus aan. Elk veld heeft een vaste controle, en een onbekend
+veld wordt geweigerd met zijn naam. Dezelfde waarden opnieuw geven geen nieuwe
+versie. Andere waarden op een oude versie geven 409, met de stand van nu.
+
+**Rahul krijgt de waarden via het bestaande contract.** Het concept meldt zich
+als contextdomein `reiswens`. De kaart op het scherm (`shared/edge/conceptwerk.js`)
+publiceert alleen haar verwijzing in `RTGAdaptief.context`. Bij de volgende vraag
+zoekt de server de waarden van NU op, en alleen voor de eigenaar.
+
+**De kaart kent geen domein.** Welke velden er te bewerken zijn en waar hun
+grenzen liggen, komt uit het concept van de server (`bewerkbaar`). De server
+heeft het laatste woord: een waarde die hij niet aanneemt, staat er niet als
+aangenomen.
+
+**Een concept doet niets.** De kaart heeft geen knop om in te dienen, te boeken,
+te betalen of iemand te bereiken. Indienen is een eigen handeling met een eigen
+gewicht, en hoort bij de volgende twee besluiten.
+
+**Twee besluiten van de eigenaar (12 oktober 2026)**, elk als een eigen wijziging
+die afzonderlijk te toetsen is:
+
+1. **Rahul mag het reisbureau lezen (`/api/reisbureau/mijn`), alleen-lezen.**
+   - Het leesrecht valt binnen de bestaande bevoegdheden: de server stelt
+     identiteit, hoedanigheid en bevoegdheid opnieuw vast.
+   - Het lid ziet alleen zijn eigen aanvragen. Het scherm verleent geen extra
+     leesrecht.
+   - De route heeft geen neveneffect.
+   - Er lekt niets via context of cache.
+   - De bestaande bewijspoort en routecontroles blijven gelden.
+   - Lezen is geen wijzigen of indienen.
+2. **Een vrije reiswens wordt een variant van de bestaande reisaanvraag.** Het
+   wordt geen parallel boekingssysteem.
+   - Een catalogusreis houdt haar bestaande route, productgegevens,
+     beschikbaarheidsregels en uitvoeringsgrenzen.
+   - Bij een vrije reiswens wordt geen beschikbaarheid verondersteld.
+   - Na menselijke bevestiging, via de gewichtsgrammatica, mag de wens naar het
+     kantoor. Dat is geen boeking, geen bevestiging van beschikbaarheid en geen
+     betalingsverplichting.

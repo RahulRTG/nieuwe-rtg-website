@@ -3,7 +3,7 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "74ba9d3c8",
+  "commit": "6788b6b94",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -846,7 +846,6 @@
     "public/apps/personeel/personeel-03b.js",
     "public/apps/personeel/personeel-03c.js",
     "public/apps/personeel/personeel-04.js",
-    "public/apps/personeel/personeel-04a.js",
     "public/apps/personeel/personeel-05.js",
     "public/apps/personeel/personeel-05a.js",
     "public/apps/personeel/personeel-06.js",
@@ -1297,7 +1296,6 @@
     "public/shared/kaart.js",
     "public/shared/kaartopslag.js",
     "public/shared/kaartpakket.js",
-    "public/shared/kantoordeur.js",
     "public/shared/kantoorgesprek.js",
     "public/shared/keukenlicht.js",
     "public/shared/klok/klok-01.js",
@@ -1955,8 +1953,8 @@
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-10-12T16:32:16.276Z",
-   "commit": "a0836eee8",
+   "op": "2026-10-12T17:52:33.420Z",
+   "commit": "f0aa5bda3",
    "invoer": {
     "meting": "invoerspoor",
     "versie": 1,
@@ -7676,10 +7674,10 @@
   "bekendePaden": 5507
  },
  "gemeten": {
-  "schermenMetPad": 440,
+  "schermenMetPad": 439,
   "nietGelezen": 0,
   "exactePaden": 1004,
-  "verwijzingen": 1215,
+  "verwijzingen": 1214,
   "voorvoegsels": 145,
   "basisPaden": 2,
   "doodPad": 0,
@@ -7817,10 +7815,10 @@
    "pad": "/api/account/start",
    "schermen": [
     "public/apps/decision-room.js",
+    "public/apps/personeel/personeel-05.js",
     "public/apps/project-room.js",
     "public/apps/rtgone.html",
-    "public/apps/rtmail-voorzijde-werk.js",
-    "public/shared/kantoordeur.js"
+    "public/apps/rtmail-voorzijde-werk.js"
    ],
    "aantal": 5
   },
@@ -7861,16 +7859,6 @@
     "public/apps/foundation/voorzijde.js",
     "public/shared/interface/world-desktop-home.js",
     "public/shared/interface/world-widget-data.js"
-   ],
-   "aantal": 4
-  },
-  {
-   "pad": "/api/health",
-   "schermen": [
-    "public/apps/leverancier/leverancier-04.js",
-    "public/apps/personeel/personeel-03a.js",
-    "public/shared/kantoordeur.js",
-    "public/shared/rtg-edge-library.js"
    ],
    "aantal": 4
   },
@@ -7995,6 +7983,15 @@
    "aantal": 3
   },
   {
+   "pad": "/api/health",
+   "schermen": [
+    "public/apps/leverancier/leverancier-04.js",
+    "public/apps/personeel/personeel-03a.js",
+    "public/shared/rtg-edge-library.js"
+   ],
+   "aantal": 3
+  },
+  {
    "pad": "/api/auth/me",
    "schermen": [
     "public/apps/life-lagen.js",
@@ -8034,7 +8031,7 @@
    "pad": "/api/account/rollen",
    "schermen": [
     "public/apps/app-main/app-main-24a3.js",
-    "public/apps/personeel/personeel-04a.js"
+    "public/apps/personeel/personeel-05.js"
    ],
    "aantal": 2
   },
@@ -12932,14 +12929,14 @@
   {
    "pad": "/api/account/koppel",
    "schermen": [
-    "public/apps/personeel/personeel-04a.js"
+    "public/apps/personeel/personeel-05.js"
    ],
    "aantal": 1
   },
   {
    "pad": "/api/office/login",
    "schermen": [
-    "public/apps/personeel/personeel-04a.js"
+    "public/apps/personeel/personeel-05.js"
    ],
    "aantal": 1
   },
@@ -17466,10 +17463,11 @@
    ]
   },
   {
-   "bestand": "public/apps/personeel/personeel-04a.js",
+   "bestand": "public/apps/personeel/personeel-05.js",
    "exact": [
     "/api/account/koppel",
     "/api/account/rollen",
+    "/api/account/start",
     "/api/office/login"
    ],
    "voorvoegsels": []
@@ -18821,14 +18819,6 @@
    "voorvoegsels": [
     "/api/nav/gebied/pakket/"
    ]
-  },
-  {
-   "bestand": "public/shared/kantoordeur.js",
-   "exact": [
-    "/api/account/start",
-    "/api/health"
-   ],
-   "voorvoegsels": []
   },
   {
    "bestand": "public/shared/kantoorgesprek.js",

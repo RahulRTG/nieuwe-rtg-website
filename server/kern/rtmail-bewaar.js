@@ -26,7 +26,7 @@
 const { schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
-module.exports = ({ db, save, rtmail, recht }) => {
+module.exports = ({ db, save, rtmail, recht, zelfdeMens }) => {
   const nu = () => new Date().toISOString();
   const busVan = (adres) => {
     const o = adresLaag.ontleed(adres);
@@ -49,7 +49,7 @@ module.exports = ({ db, save, rtmail, recht }) => {
     return db.data.rtmail;
   };
   const inVak = (m, bus) => busVan(m.naar) === bus || busVan(m.van) === bus;
-  const termijn = require('./rtmail-leidingtermijn')({ B, store, save, busVan, kap, nu });
+  const termijn = require('./rtmail-leidingtermijn')({ B, store, save, busVan, kap, nu, zelfdeMens });
 
   // `leiding` (de route: manager van DEZE zaak) voegt de leidingsplek toe (./rtmail-leidingtermijn.js)
   function beleid(wie, adres, { leiding } = {}) {

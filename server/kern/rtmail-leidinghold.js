@@ -1,17 +1,18 @@
 /* RTMAIL (deelmodule): de JURIDISCHE HOLD op sollicitatiepost van de
    leidingsplek (besluit 584A met de voorwaarden van de eigenaar, 12 oktober 2026).
-   Een verlenging (./rtmail-leidingtermijn.js) is per bericht en hoogstens een
-   jaar; een hold heeft geen plafond, want een bewaarplicht kan langer duren --
-   en is daarom zwaarder afgeschermd.
+   Anders dan een verlenging geen plafond (een bewaarplicht kan langer duren),
+   en daarom zwaarder afgeschermd.
 
    1. AANVRAGEN: een manager van DIE zaak (de route), voor bestaande berichten,
       met grondslag (gesloten lijst), doel en herbeoordelingsdatum, uit de inlog.
    2. HOUDT NIETS VAST tot een beoordeling door de eigenaar of een
-      boardroombevoegde met een verse passkey (de route), vanaf een ANDER
-      account. Twee accounts zijn niet bewezen twee mensen: vastgelegd wordt
-      `onafhankelijkheid: 'ander-account'`. Zonder accountsleutel (PIN), met
-      accounts die de kluis aan dezelfde mens koppelt, of met een account dat
-      niet te vinden is, valt het dicht; alleen afwijzen kan dan nog.
+      boardroombevoegde met een verse passkey (de route), en alleen als aanvrager
+      en beoordelaar ALLEBEI door RTG gekeurd zijn (A3) en aantoonbaar
+      verschillende personen (accounts/zelfdemens.js, besluit van de eigenaar).
+      Vastgelegd: `onafhankelijkheid: 'gekeurde-identiteit'`, nooit "bewezen":
+      een keuring bewijst een identiteit, niet wie er achter het toetsenbord zat.
+      Niet gekeurd, niet te vergelijken of zonder accountsleutel (PIN): 409.
+      Dezelfde persoon: 403. Afwijzen kan altijd.
    3. HERBEOORDELEN is een volledige nieuwe beoordeling: dezelfde toets, grondslag
       en doel opnieuw, en een datum hoogstens twaalf maanden na DEZE beoordeling.
    4. Een verlopen herbeoordeling HOUDT VAST (besluit van de eigenaar), maar
@@ -36,7 +37,7 @@ function binnenTermijn(s, t) {
 }
 const DATUMFOUT = 'Geef een herbeoordelingsdatum (JJJJ-MM-DD) die bestaat, in de toekomst ligt en hoogstens ' + MAAND_MAX + ' maanden vooruit.';
 
-module.exports = ({ L, lees, plek, save, busVan, kap, nu, crypto }) => {
+module.exports = ({ L, lees, plek, save, busVan, kap, nu, crypto, zelfdeMens }) => {
   const holds = () => (lees().holds || []);
   const schrijf = () => { const l = L(); if (!Array.isArray(l.holds)) l.holds = []; return l.holds; };
   const spoor = (r) => L().spoor.unshift(Object.assign({ at: nu() }, r));
@@ -56,30 +57,30 @@ module.exports = ({ L, lees, plek, save, busVan, kap, nu, crypto }) => {
     if (vreemd.length) return { status: 404, error: 'Niet op de leidingsplek van deze zaak: ' + vreemd.join(', ') + '.' };
     const h = { id: crypto.randomBytes(5).toString('hex'), postvak: bus, ids: [...new Set(ids)], grondslag, doel: d,
       herbeoordeling, stand: 'aangevraagd', aangevraagdDoor: door, aanvragerSleutel: sleutel || null, aangevraagdOp: nu() };
-    const zonderAccount = !h.aanvragerSleutel;
+    const zonder = !h.aanvragerSleutel;
     schrijf().unshift(h);
     spoor({ postvak: bus, hold: h.id, actie: 'hold aangevraagd', grondslag, door });
     save();
-    return { ok: true, hold: h, let: zonderAccount
-      ? 'Deze inlog heeft geen account: niet vast te stellen wie aanvroeg, dus deze hold kan niet worden goedgekeurd. Vraag hem aan vanaf een account.'
-      : 'De hold houdt niets vast tot de eigenaar of een boardroombevoegde hem vanaf een ander account heeft beoordeeld.' };
+    return { ok: true, hold: h, let: zonder ? 'Een inlog zonder account: deze hold kan niet worden goedgekeurd.'
+      : 'De hold houdt niets vast tot een andere, door RTG gekeurde persoon met boardroomrecht hem heeft beoordeeld.' };
   }
 
   /* De beoordeling. `wie` is de boardroomsleutel uit de inlog (de route eist
      boardroom en een verse passkey); de aanvrager beoordeelt nooit zijn eigen hold. */
-  function beoordeel({ id, actie, herbeoordeling, grondslag, doel, wie, zelfdeMens }) {
+  function beoordeel({ id, actie, herbeoordeling, grondslag, doel, wie }) {
     const h = schrijf().find(x => x.id === String(id || ''));
     if (!h) return { status: 404, error: 'Die hold bestaat niet.' };
     if (!wie) return { status: 403, error: 'Beoordelen hoort bij een persoon met een boardroomsleutel.' };
     if (!h.aanvragerSleutel && actie !== 'afwijzen')
-      return { status: 409, error: 'Niet vast te stellen wie deze hold aanvroeg (een inlog zonder account), dus ook niet dat u een ander account bent. Alleen afwijzen kan; laat hem opnieuw aanvragen vanaf een account.' };
+      return { status: 409, error: 'Niet vast te stellen wie aanvroeg (een inlog zonder account). Alleen afwijzen kan; vraag opnieuw aan vanaf een account.' };
     if (h.aanvragerSleutel === wie)
-      return { status: 403, error: 'Wie de hold aanvroeg, beoordeelt hem niet zelf: daar is een ander account voor.' };
-    // `zelfdeMens` (de route, uit de kluis): 'ander', 'zelfde' of 'onbekend' -- alleen 'ander' telt
+      return { status: 403, error: 'Wie de hold aanvroeg, beoordeelt hem niet zelf: daar is een andere gekeurde persoon voor.' };
+    // `zelfdeMens` (accounts/zelfdemens.js): 'ander', 'zelfde' of 'onbekend' -- alleen 'ander' telt
     const mens = actie === 'afwijzen' ? 'ander' : (typeof zelfdeMens === 'function' ? zelfdeMens(h.aanvragerSleutel, wie) : 'onbekend');
-    if (mens === 'zelfde') return { status: 403, error: 'Volgens de kluis horen aanvrager en beoordelaar bij dezelfde mens: daar is een ander voor nodig.' };
-    if (mens !== 'ander') return { status: 409, error: 'Niet vast te stellen dat u een ander mens bent dan de aanvrager; beoordelen kan daarom niet.' };
-    const ander = { onafhankelijkheid: 'ander-account', vastgesteld: 'andere accountsleutel, en de kluis koppelt de accounts niet aan dezelfde mens' };
+    if (mens === 'zelfde') return { status: 403, error: 'Volgens de kluis zijn aanvrager en beoordelaar dezelfde (gekeurde) persoon: daar is een ander voor nodig.' };
+    if (mens !== 'ander') return { status: 409, error: 'Niet vast te stellen dat u een andere gekeurde persoon bent dan de aanvrager: ' +
+      'laat beide accounts door RTG keuren (identiteitsbewijs met de geboortedatum van het document) en probeer het opnieuw.' };
+    const ander = { onafhankelijkheid: 'gekeurde-identiteit', vastgesteld: 'beide accounts door RTG gekeurd (A3); naam of documentgeboortedatum verschilt' };
     const open = h.stand === 'aangevraagd', loopt = h.stand === 'beoordeeld';
     if (actie === 'goedkeuren' && open) Object.assign(h, ander, { stand: 'beoordeeld', beoordeeldDoor: wie, beoordeeldOp: nu() });
     else if (actie === 'afwijzen' && open) Object.assign(h, { stand: 'afgewezen', beoordeeldDoor: wie, beoordeeldOp: nu() });

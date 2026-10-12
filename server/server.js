@@ -1246,8 +1246,7 @@ function idGeverifieerd(sess) {
        productie staat DEMO uit en bestaat deze sessie niet eens. */
     return DEMO && sess.tier !== 'guest' && !String(sess.key || '').startsWith('guest-');
   }
-  const u = accounts.getUserById(sess.account.id);
-  return !!u && u.verified === 'verified';
+  return accounts.isGekeurd(sess.account.id); // de ene regel: accounts/zelfdemens.js
 }
 
 /* ---------- gedeelde vriendenlaag over RTG en RTFoundation ----------

@@ -24,7 +24,7 @@ const GRONDSLAGEN = Object.freeze(['toestemming-sollicitant', 'lopende-procedure
 const SYSTEEM = 'systeem: dagelijkse ronde';
 const dag = (iso) => (iso ? String(iso).slice(0, 10) : null);
 
-module.exports = ({ B, store, save, busVan, kap, nu }) => {
+module.exports = ({ B, store, save, busVan, kap, nu, zelfdeMens }) => {
   function L() {
     const b = B();
     if (!b.leiding || typeof b.leiding !== 'object') b.leiding = {};
@@ -34,7 +34,7 @@ module.exports = ({ B, store, save, busVan, kap, nu }) => {
   // lezen maakt niets aan (een leespad dat schrijft is PG_SAVE_ONTBREEKT)
   const lees = () => (B().leiding || {});
   const plek = () => (store().leiding || []);
-  const hold = require('./rtmail-leidinghold')({ L, lees, plek, save, busVan, kap, nu, crypto });
+  const hold = require('./rtmail-leidinghold')({ L, lees, plek, save, busVan, kap, nu, crypto, zelfdeMens });
   const dagenVoor = (m) => Math.max(TERMIJN_DAGEN, (m.verlenging && m.verlenging.dagen) || 0);
   const vervalt = (m) => new Date((Date.parse(m.at) || 0) + dagenVoor(m) * DAG).toISOString();
   const bestaand = (m) => m.regel !== REGEL;

@@ -17,7 +17,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const crypto = require('crypto');
-const { startServer, stopNet, kantoorKoppelBody } = require('./helper');
+const { startServer, stopNet, kantoorKoppelBody, kantoorAlsPersoon } = require('./helper');
 const { maakAuthenticator } = require('./webauthn-authenticator');
 
 let srv, TMP, sleutel, teller = 10, hold1, hold2;
@@ -54,7 +54,23 @@ async function vinger(eig, actie, s = sleutel) {
   return { ceremonie: o.body.ceremonie, antwoord: s.loginAntwoord(o.body.opties.challenge, new URL(srv.base).origin, ++teller) };
 }
 const beoordeel = async (eig, body, s = sleutel) => api('/api/office/rtmail/leiding/hold', Object.assign(body, await vinger(eig, 'eigenaar-leidinghold', s)), eig);
-let tweede, tweedeLid, tweedeSleutel, luzPost, twee, tweeSleutel;   // de manager van KIKUNOI met een eigen account, die ook een boardroomsleutel heeft
+let tweede, tweedeLid, tweedeSleutel, luzPost, twee, tweeSleutel, vreemd, dubbel, tweedeId;
+/* Een account met een boardroomsleutel, een kantoorrol en een eigen passkey. */
+async function kantoorAccount(naam, email, phone) {
+  const r = await api('/api/auth/register', { name: naam, email, phone, password: 'geheim123', geboortedatum: '1988-03-03', tier: 'business', pasApp: 'business' });
+  assert.equal(r.status, 200, naam + ': ' + JSON.stringify(r.body).slice(0, 200));
+  const me = (await api('/api/auth/me', {}, r.body.token)).body.user;
+  assert.equal((await api('/api/office/boardroom/toegang/geef', { codenaam: me.codename }, await eigenaar())).status, 200);
+  assert.equal((await api('/api/account/koppel', await kantoorKoppelBody(srv.base, r.body.token), r.body.token)).status, 200);
+  const s = maakAuthenticator(new URL(srv.base).hostname);
+  const o = await api('/api/webauthn/registreer/opties', {}, r.body.token);
+  assert.equal((await api('/api/webauthn/registreer', { antwoord: s.registratieAntwoord(o.body.opties.challenge, new URL(srv.base).origin),
+    naam: 'Toestel ' + naam }, r.body.token)).status, 200);
+  return { lid: r.body.token, id: me.id, sleutel: s, office: async () => (await api('/api/account/start', { rol: 'kantoor' }, r.body.token)).body.token };
+}
+// door RTG laten keuren (A3), met de geboortedatum van het document
+const keur = async (userId, geboortedatum) => assert.equal((await api('/api/office/verify', { userId, decision: 'approve', faceMatch: true, geboortedatum },
+  await kantoorAlsPersoon(srv.base, 'RTG-OFFICE'))).status, 200);
 
 test.before(async () => {
   TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-leidinghold-'));
@@ -74,37 +90,24 @@ test.before(async () => {
   await api('/api/cv/save', { name: 'Hold Proef', contact: 'h@x.nl', skills: 'koken', experience: 'horeca' }, l4);
   assert.equal((await api('/api/member/apply', { supplierCode: 'LUZ', func: 'Kok' }, l4)).status, 200);
   luzPost = (await api('/api/supplier/rtmail/inbox', {}, (await zaak('LUZ')).m.tok)).body.berichten.find(m => m.onderwerp === 'Nieuwe sollicitatie').id;
-  /* De manager van KIKUNOI krijgt een eigen account, en dat account krijgt ook een
-     boardroomsleutel: een persoon die aanvraagt en zou kunnen beoordelen. */
-  const t = (await api('/api/auth/register', { name: 'Manager Tweede', email: 'mtweede@x.nl', phone: '0612348899',
-    password: 'geheim123', geboortedatum: '1988-03-03', tier: 'business', pasApp: 'business' })).body.token;
-  const me = (await api('/api/auth/me', {}, t)).body.user;
-  const eig = await eigenaar();
-  assert.equal((await api('/api/office/boardroom/toegang/geef', { codenaam: me.codename }, eig)).status, 200);
-  assert.equal((await api('/api/account/koppel', await kantoorKoppelBody(srv.base, t), t)).status, 200);
+  /* Vier kantooraccounts:
+     - de manager van KIKUNOI met een eigen account (de aanvrager), ook met een boardroomsleutel;
+     - een tweede account met HETZELFDE telefoonnummer (de kluis koppelt ze);
+     - een ongekeurd account (een andere persoon, maar niet vast te stellen);
+     - een tweede account met DEZELFDE gekeurde identiteit (naam en documentdatum), andere telefoon en e-mail. */
+  const t = await kantoorAccount('Manager Tweede', 'mtweede@x.nl', '0612348899');
+  const tw = await kantoorAccount('Manager Tweeling', 'mtweeling@x.nl', '0612348899');
+  const vr = await kantoorAccount('Vreemde Beoordelaar', 'vreemd@x.nl', '0612348877');
+  const db2 = await kantoorAccount('Manager Tweede', 'mtweede.dubbel@x.nl', '0612348866');
   const mgr = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body.staff.find(x => x.role === 'manager');
-  await herstart(null, (d) => d.prepare('UPDATE supplier_staff SET member_id = ? WHERE id = ?').run(Number(me.id), Number(mgr.id)));
-  tweedeLid = t;
-  const st = await api('/api/account/start', { rol: 'kantoor' }, t);
-  tweede = st.body.token;
-  assert.ok(tweede, 'de manager komt ook het kantoor in: ' + JSON.stringify(st.body).slice(0, 300));
-  tweedeSleutel = maakAuthenticator(new URL(srv.base).hostname);
-  const o = await api('/api/webauthn/registreer/opties', {}, t);
-  assert.equal((await api('/api/webauthn/registreer', { antwoord: tweedeSleutel.registratieAntwoord(o.body.opties.challenge, new URL(srv.base).origin),
-    naam: 'Toestel tweede' }, t)).status, 200, 'de passkey van de tweede staat');
-  /* Een TWEEDE account van dezelfde mens: hetzelfde telefoonnummer, dus de kluis
-     koppelt ze. Ook dat account krijgt een boardroomsleutel. */
-  const tw = await api('/api/auth/register', { name: 'Manager Tweeling', email: 'mtweeling@x.nl', phone: '0612348899',
-    password: 'geheim123', geboortedatum: '1988-03-03', tier: 'business', pasApp: 'business' });
-  assert.equal(tw.status, 200, 'een tweede account met hetzelfde nummer: ' + JSON.stringify(tw.body).slice(0, 200));
-  const cn2 = (await api('/api/auth/me', {}, tw.body.token)).body.user.codename;
-  assert.equal((await api('/api/office/boardroom/toegang/geef', { codenaam: cn2 }, await eigenaar())).status, 200);
-  assert.equal((await api('/api/account/koppel', await kantoorKoppelBody(srv.base, tw.body.token), tw.body.token)).status, 200);
-  twee = (await api('/api/account/start', { rol: 'kantoor' }, tw.body.token)).body.token;
-  tweeSleutel = maakAuthenticator(new URL(srv.base).hostname);
-  const o2 = await api('/api/webauthn/registreer/opties', {}, tw.body.token);
-  assert.equal((await api('/api/webauthn/registreer', { antwoord: tweeSleutel.registratieAntwoord(o2.body.opties.challenge, new URL(srv.base).origin),
-    naam: 'Toestel tweeling' }, tw.body.token)).status, 200);
+  await herstart(null, (d) => d.prepare('UPDATE supplier_staff SET member_id = ? WHERE id = ?').run(Number(t.id), Number(mgr.id)));
+  tweedeLid = t.lid; tweedeId = t.id; tweedeSleutel = t.sleutel; tweede = await t.office();
+  twee = await tw.office(); tweeSleutel = tw.sleutel;
+  vreemd = { office: await vr.office(), sleutel: vr.sleutel };
+  dubbel = { office: await db2.office(), sleutel: db2.sleutel };
+  assert.ok(tweede && twee && vreemd.office && dubbel.office, 'alle vier komen het kantoor in');
+  await keur(db2.id, '1988-03-03');
+  await keur((await api('/api/auth/me', {}, await eigenaar())).body.user.id, '1975-05-05');
 });
 test.after(async () => {
   try { await stopNet(srv.child); } catch (e) {}
@@ -139,15 +142,25 @@ test('2. beoordelen: een verse passkey, en dan houdt alleen de BEOORDEELDE hold 
   const opt = await api('/api/webauthn/registreer/opties', {}, eig);
   assert.equal((await api('/api/webauthn/registreer', { antwoord: sleutel.registratieAntwoord(opt.body.opties.challenge, new URL(srv.base).origin),
     naam: 'Toestel eigenaar' }, eig)).status, 200);
+  // een ongekeurde aanvrager: niet vast te stellen
+  const onAanvr = await beoordeel(eig, { id: hold2, actie: 'goedkeuren' });
+  assert.equal(onAanvr.status, 409, 'ongekeurde aanvrager: ' + JSON.stringify(onAanvr.body)); assert.match(onAanvr.body.error, /gekeurde persoon/);
+  await keur(tweedeId, '1988-03-03');
+  // een ongekeurde beoordelaar: ook niet
+  const onBeo = await beoordeel(vreemd.office, { id: hold2, actie: 'goedkeuren' }, vreemd.sleutel);
+  assert.equal(onBeo.status, 409, 'ongekeurde beoordelaar: ' + JSON.stringify(onBeo.body)); assert.match(onBeo.body.error, /gekeurde persoon/);
   // de manager die aanvroeg, met een boardroomsleutel en een verse passkey: zijn eigen hold niet
   const zelf = await beoordeel(tweede, { id: hold1, actie: 'goedkeuren' }, tweedeSleutel);
-  assert.equal(zelf.status, 403, 'zelfbeoordeling: ' + JSON.stringify(zelf.body)); assert.match(zelf.body.error, /ander account/);
-  // en ook niet vanaf een ander account dat volgens de kluis dezelfde mens is
+  assert.equal(zelf.status, 403, 'zelfbeoordeling: ' + JSON.stringify(zelf.body)); assert.match(zelf.body.error, /beoordeelt hem niet zelf/);
+  // ook niet vanaf een account met hetzelfde telefoonnummer, of met dezelfde gekeurde identiteit
   const tweeling = await beoordeel(twee, { id: hold1, actie: 'goedkeuren' }, tweeSleutel);
-  assert.equal(tweeling.status, 403, 'zelfde mens: ' + JSON.stringify(tweeling.body)); assert.match(tweeling.body.error, /dezelfde mens/);
+  assert.equal(tweeling.status, 403, 'zelfde telefoon: ' + JSON.stringify(tweeling.body)); assert.match(tweeling.body.error, /dezelfde/);
+  const dub = await beoordeel(dubbel.office, { id: hold1, actie: 'goedkeuren' }, dubbel.sleutel);
+  assert.equal(dub.status, 403, 'dezelfde gekeurde identiteit: ' + JSON.stringify(dub.body)); assert.match(dub.body.error, /dezelfde/);
+  // twee gekeurde, verschillende personen: geslaagd
   const ok = await beoordeel(eig, { id: hold2, actie: 'goedkeuren' });
   assert.equal(ok.status, 200, JSON.stringify(ok.body)); assert.equal(ok.body.hold.stand, 'beoordeeld');
-  assert.equal(ok.body.hold.onafhankelijkheid, 'ander-account', 'twee accounts, niet bewezen twee mensen');
+  assert.equal(ok.body.hold.onafhankelijkheid, 'gekeurde-identiteit', 'gekeurd, niet bewezen');
   // een hold van een manager die met een PIN inlogt: niet vast te stellen wie aanvroeg
   const luz = await zaak('LUZ');
   const pin = await api('/api/supplier/rtmail/leiding/hold', { ids: [luzPost], grondslag: 'geschil', doel: 'x', herbeoordeling: datum(30) }, luz.m.tok);
@@ -217,15 +230,17 @@ test('4. de aanvrager beoordeelt zijn eigen hold niet', () => {
   const B = { leiding: { spoor: [] }, vernietigingen: [] };
   const h = require('../server/kern/rtmail-leidinghold')({ L: () => B.leiding, lees: () => B.leiding,
     plek: () => [{ id: 'm1', naar: 'kik@partner.rtg' }], save: () => {}, busVan: (a) => String(a).split('@')[0],
-    kap: (s, n) => String(s || '').slice(0, n), nu: () => new Date().toISOString(), crypto });
+    kap: (s, n) => String(s || '').slice(0, n), nu: () => new Date().toISOString(), crypto, zelfdeMens: () => kluis });
+  let kluis = 'onbekend';   // het antwoord van accounts.zelfdeMens in deze proef
   const a = h.aanvraag({ adres: 'kik@partner.rtg', ids: ['m1'], grondslag: 'geschil', doel: 'd', herbeoordeling: datum(10), door: 7, sleutel: 'user-5' });
   assert.ok(a.ok);
   const zelf = h.beoordeel({ id: a.hold.id, actie: 'goedkeuren', wie: 'user-5' });
-  assert.equal(zelf.status, 403); assert.match(zelf.error, /ander account/);
-  assert.equal(h.beoordeel({ id: a.hold.id, actie: 'goedkeuren', wie: 'user-1', zelfdeMens: () => 'onbekend' }).status, 409, 'niet vast te stellen: dicht');
-  assert.equal(h.beoordeel({ id: a.hold.id, actie: 'goedkeuren', wie: 'user-1' }).status, 409, 'zonder kluisvraag: dicht');
-  assert.equal(h.beoordeel({ id: a.hold.id, actie: 'goedkeuren', wie: 'user-1', zelfdeMens: () => 'zelfde' }).status, 403, 'dezelfde mens');
-  assert.equal(h.beoordeel({ id: a.hold.id, actie: 'goedkeuren', wie: 'user-1', zelfdeMens: () => 'ander' }).hold.onafhankelijkheid, 'ander-account', 'een ander account wel');
+  assert.equal(zelf.status, 403); assert.match(zelf.error, /beoordeelt hem niet zelf/);
+  assert.equal(h.beoordeel({ id: a.hold.id, actie: 'goedkeuren', wie: 'user-1' }).status, 409, 'niet vast te stellen: dicht');
+  kluis = 'zelfde';
+  assert.equal(h.beoordeel({ id: a.hold.id, actie: 'goedkeuren', wie: 'user-1' }).status, 403, 'dezelfde mens');
+  kluis = 'ander';
+  assert.equal(h.beoordeel({ id: a.hold.id, actie: 'goedkeuren', wie: 'user-1' }).hold.onafhankelijkheid, 'gekeurde-identiteit', 'een andere gekeurde persoon wel');
   // datums: een dag die niet bestaat, en verder dan twaalf maanden
   for (const d of ['2027-02-31', '2026-13-01', datum(400)])
     assert.equal(h.aanvraag({ adres: 'kik@partner.rtg', ids: ['m1'], grondslag: 'geschil', doel: 'd', herbeoordeling: d, door: 7, sleutel: 'user-5' }).status, 400, d);
@@ -241,4 +256,42 @@ test('5. de bewaarveger logt verlopen holds, ook als er niets verdwijnt', () => 
   assert.equal(v.veeg().leidingpost.holdsVerlopen, 1);
   const r = regels.find(x => x.wat === 'bewaarveger-leidingpost');
   assert.ok(r && r.velden.holdsVerlopen === 1, 'een verlopen hold staat in de log: ' + JSON.stringify(regels));
+});
+
+test('6. de postroute ziet geen gebruikersrij: alleen een antwoord uit de kluis', () => {
+  /* De vergelijking woont in server/accounts/zelfdemens.js en geeft alleen
+     'ander', 'zelfde' of 'onbekend'. Geen route of kernmodule van RTMail haalt
+     zelf een gebruikersrij op, en de domeingrens van rtmail-bestuur kent
+     `accounts` niet. */
+  const W = path.join(__dirname, '..', 'server');
+  const bestanden = [path.join(W, 'routes', 'rtmail-bestuur.js')]
+    .concat(fs.readdirSync(path.join(W, 'routes', 'rtmail-bestuur')).map(n => path.join(W, 'routes', 'rtmail-bestuur', n)))
+    .concat(fs.readdirSync(path.join(W, 'kern')).filter(n => /^rtmail-/.test(n)).map(n => path.join(W, 'kern', n)));
+  for (const f of bestanden) {
+    const t = fs.readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    assert.doesNotMatch(t, /getUserById|phone_hash|email_hash|\baccounts\s*[.,}]/, path.relative(W, f) + ' leest de identiteitskluis zelf');
+  }
+  const grens = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'GRENZEN.json'), 'utf8')).domeinen['rtmail-bestuur'];
+  assert.ok(!grens.includes('accounts'), 'rtmail-bestuur heeft de hele accountslaag in zijn domeingrens');
+  // en de kluis geeft echt alleen een woord terug
+  const rij = {
+    1: { id: 1, verified: 'verified', phone_hash: 'p1', email_hash: 'e1', naam: 'Anna de Vries', md: { geboren: '1980-01-01', geborenBron: 'paspoort' } },
+    2: { id: 2, verified: 'verified', phone_hash: 'p2', email_hash: 'e2', naam: 'Ánna  de vries', md: { geboren: '1980-01-01', geborenBron: 'paspoort' } },
+    3: { id: 3, verified: 'verified', phone_hash: 'p3', email_hash: 'e3', naam: 'Bram Bakker', md: { geboren: '1980-01-01', geborenBron: 'paspoort' } },
+    4: { id: 4, verified: 'pending', phone_hash: 'p4', email_hash: 'e4', naam: 'Cor Claes', md: { geboren: '1981-01-01', geborenBron: 'paspoort' } },
+    5: { id: 5, verified: 'verified', phone_hash: 'p1', email_hash: 'e5', naam: 'Dirk Dam', md: {} },
+    6: { id: 6, verified: 'verified', phone_hash: 'p6', email_hash: 'e6', naam: 'Eva Eik', md: { geboren: '1990-01-01', geborenBron: 'opgegeven' } }
+  };
+  const k = require('../server/accounts/zelfdemens')({ getUserById: (id) => rij[id] || null,
+    getMemberState: (id) => (rij[id] || {}).md, realNameOf: (u) => u.naam });
+  const z = (a, b) => k.zelfdeMens('user-' + a, 'user-' + b);
+  assert.deepEqual([z(1, 3), z(1, 2), z(1, 1), z(1, 5), z(1, 4), z(1, 6), z(1, 9), k.zelfdeMens(null, 'user-1')],
+    ['ander', 'zelfde', 'zelfde', 'zelfde', 'onbekend', 'onbekend', 'onbekend', 'onbekend'],
+    'gekeurd en verschillend; dezelfde gekeurde persoon; zelfde account; zelfde telefoon; ongekeurd; geen documentdatum; geen account; geen sleutel');
+  assert.equal(k.isGekeurd(1), true); assert.equal(k.isGekeurd(4), false);
+  for (const a of ['ander', 'zelfde', 'onbekend']) assert.equal(typeof a, 'string');
+  // server.js leest de ene regel en heeft geen eigen kopie meer
+  const srvBron = fs.readFileSync(path.join(__dirname, '..', 'server', 'server.js'), 'utf8');
+  const idg = srvBron.slice(srvBron.indexOf('function idGeverifieerd'), srvBron.indexOf('function idGeverifieerd') + 1200);
+  assert.match(idg, /accounts\.isGekeurd\(/); assert.doesNotMatch(idg, /verified === 'verified'/);
 });

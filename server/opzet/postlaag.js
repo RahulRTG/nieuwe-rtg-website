@@ -52,7 +52,9 @@ module.exports = ({ db, save, crypto, findSupplier, antivirus, DATA_DIR }) => {
      handeling op ANDERMANS post vastlegt, en het bewaarbeleid: termijn,
      juridische bewaring, aantoonbare vernietiging en export. */
   const rtmailRecht = require('../kern/rtmail-recht')({ db, save, crypto });
-  const rtmailBewaar = require('../kern/rtmail-bewaar')({ db, save, rtmail, recht: rtmailRecht });
+  const rtmailBewaar = require('../kern/rtmail-bewaar')({ db, save, rtmail, recht: rtmailRecht,
+    // alleen een antwoord uit de kluis, nooit een rij (accounts/zelfdemens.js)
+    zelfdeMens: (a, b) => require('../accounts').zelfdeMens(a, b) });
   /* Het dossier op een bericht in een gedeeld postvak (status, prioriteit,
      interne notities, koppeling aan klant of ticket) en de klok met de
      ontvangstbevestiging die hem betekenis geeft. */

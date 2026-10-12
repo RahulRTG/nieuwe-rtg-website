@@ -2535,8 +2535,8 @@ in plaats van aangenomen -- zelfde reden als bij `Asset`: <!--getal:codewereld.r
 loopt over de as ROUTE. De as SYMBOOL is **nul** -- geen register kent een
 functienaam met een plaats, dus het objectvoorbeeld `pay.boeken` met een
 `symbol`-veld belooft iets wat geen enkele meter vult. Die as is
-inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27181<!--/getal--> benoemde symbolen
-met een regelnummer en <!--getal:symbolen.kanten-->7620<!--/getal--> require-kanten heen en terug, met de eigen parser
+inmiddels GEBOUWD (`npm run symbolen`, `SYMBOLEN.json`): <!--getal:symbolen.totaal-->27207<!--/getal--> benoemde symbolen
+met een regelnummer en <!--getal:symbolen.kanten-->7638<!--/getal--> require-kanten heen en terug, met de eigen parser
 en <!--getal:symbolen.parsefout-->0<!--/getal--> parsefouten. De <!--getal:symbolen.nietGelezen-->314<!--/getal--> niet-gelezen bestanden staan er MET reden in
 (bundeldelen die pas samengevoegd een programma vormen) -- weglaten zou ze
 onzichtbaar maken. Wat hij met opzet niet doet: aanroepers raden (een naam in
@@ -2556,11 +2556,11 @@ grens vandaag niet -- en dat ene getal verbergt nog iets, want `server/` haalt
 vrijwel niets (6,6%) tot `SCHERMROUTES.json` erbij kwam, dat per bestand in
 public/ leest welke API-paden het noemt en daarmee de keten scherm -> route legt.
 De aanroepgraaf ligt er sinds dezelfde dag naast (`AANROEPGRAAF.json`,
-<!--getal:graaf.kanten-->31114<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
-(<!--getal:graaf.routesMetSymbool-->3347<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
+<!--getal:graaf.kanten-->31146<!--/getal--> kanten): wie roept wie aan, en welk symbool handelt welke route af
+(<!--getal:graaf.routesMetSymbool-->3349<!--/getal--> routes). Daarmee loopt de impactketen scherm -> route -> bestand ->
 functie uit registers alleen. Let daar op twee dingen. Ten eerste is
 <!--getal:graaf.opgelostPct-->25.4<!--/getal-->% opgelost geen tekort maar een indeling: het meeste dat overblijft is
-`res.json()` of `String()`, en <!--getal:graaf.contextobject-->20707<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
+`res.json()` of `String()`, en <!--getal:graaf.contextobject-->20723<!--/getal--> aanroepen lopen via het CONTEXTOBJECT dat
 in server/opzet/ wordt samengesteld. Dat leek statisch onherleidbaar tot
 `CONTEXTPROEF.json` het NAMAT (`npm run contextproef`, een runtime-meting in de
 domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> routes die werk deden reiken er maar
@@ -2568,7 +2568,7 @@ domeingrens-Proxy): van de <!--getal:context.aanHetWerk-->3214<!--/getal--> rout
 BEDRADEN worden opgehaald. Het gat is dus grotendeels statisch en niet runtime -- de meting
 keerde de voorspelling om, en dat is precies waarom hij er is. `KERNHERKOMST.json`
 (`npm run kernherkomst`) volgt die aanwijzing en beantwoordt wie welke naam in de
-zak legt: <!--getal:kern.namen-->1346<!--/getal--> namen over <!--getal:kern.vulplekken-->342<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->30<!--/getal--> plekken die
+zak legt: <!--getal:kern.namen-->1347<!--/getal--> namen over <!--getal:kern.vulplekken-->343<!--/getal--> vulplekken, met <!--getal:kern.onopgelost-->30<!--/getal--> plekken die
 niet te volgen zijn (elk met een reden, geen daarvan geraden). Dat leverde
 <!--getal:graaf.viaKern-->4868<!--/getal--> nieuwe kanten en bracht de graaf van 18,1% naar <!--getal:graaf.opgelostPct-->25.4<!--/getal-->%; de restbak
 van de graaf ging in dezelfde ronde van 3071 naar <!--getal:graaf.overig-->468<!--/getal--> aanroepen (0,27%), en

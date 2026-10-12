@@ -110,6 +110,8 @@ module.exports = (ctx) => {
        12 oktober 2026; EDGE.md par. 14.4). Alleen als de server het object ZELF
        vond en geen eigen regel of handeling de vraag pakte. Niets in het
        geheugen: de route vraagt het gesprek opnieuw als de stuurlus niets zegt. */
+    // wijst de vraag naar het object en noemt hij iets anders: vragen, niet raden
+    if (sch && sch.verduidelijk && !sparModus) return Object.assign(klaar(sch.verduidelijk), { verduidelijking: true });
     if (sch && sch.stuurEerst && !sparModus) return { ok: true, pakte: false, stuurEerst: true };
     const tekst = await modelAntwoord({ key, codenaam, q, p, stand, seintjes, sch });
     /* VIA HET MODEL, EN DAT MOET HIER GEZEGD WORDEN. Van buitenaf is

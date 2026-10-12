@@ -133,7 +133,11 @@ test.after(async () => { await stop(server); model.srv.close(); });
 
 test('1. de eigen aanvraag gaat mee, met precies de velden van de positieve lijst', async () => {
   const A = leden.a;
-  const v = await vraag(A, 'Ik wil met zes vrienden vier dagen naar Rome, maximaal €800 per persoon.', ctxVoor(A.ref));
+  /* Een vraag OVER de aangewezen aanvraag. Sinds de relatieregel
+     (kern/stuur/menscontext-relatie.js) komen de velden alleen mee als de vraag
+     over het object gaat; een nieuwe reis met deze aanvraag open krijgt ze niet
+     (toets 7). */
+  const v = await vraag(A, 'Hoe staat deze aanvraag ervoor?', ctxVoor(A.ref));
   const m = /Actieve context: (.*)$/.exec(v.vraagAanModel);
   assert.ok(m, 'de schermcontext staat onder de vraag:\n' + v.vraagAanModel);
   const opgezocht = /opgezocht door RTG: reisaanvraag (\S+) \(((?:[^)"]|"(?:[^"\\]|\\.)*")*)\)/.exec(m[1]);
@@ -234,4 +238,22 @@ test('7. de opzoeking kost gemeten weinig tijd', async () => {
   console.log('# contextbrug latentie: mediaan met ' + mediaan(met).toFixed(1) + ' ms, zonder ' +
     mediaan(zonder).toFixed(1) + ' ms, verschil ' + extra.toFixed(1) + ' ms (over HTTP, met nep-model)');
   assert.ok(extra < 50, 'de context kost ' + extra.toFixed(1) + ' ms extra per vraag; dat is geen opzoeking meer maar een zoektocht');
+});
+
+test('7. een nieuwe reis met een andere aanvraag open krijgt de velden van die aanvraag niet', async () => {
+  /* De expliciete vraag bepaalt de taak; het scherm helpt alleen lezen.
+     MUTATIE: laat handtekening() de relatie negeren -- deze toets zakt. */
+  const A = leden.a;
+  const voor = model.verzoeken.length;
+  const r = await api('/api/fluister', { q: 'Welke musea in Rome zijn de moeite waard?', plafond: 'tonen',
+    context: ctxVoor(A.ref) }, A.token);
+  assert.equal(r.status, 200);
+  assert.ok(model.verzoeken.length > voor, 'de vraag ging echt naar het model; anders meet deze toets niets');
+  const alles = JSON.stringify(model.verzoeken.slice(voor));
+  /* Specifiek op een opgezocht OBJECT: de uitleg in CONTEXT_REGELS noemt de
+     woorden "opgezocht door RTG" ook, en een marker die in vaste tekst staat is
+     geen marker. */
+  assert.ok(!/opgezocht door RTG: /.test(alles), 'de open aanvraag wordt niet het onderwerp van een nieuwe vraag');
+  assert.match(alles, /deze vraag gaat niet over het aangewezen object/, 'het model hoort dat de open aanvraag niet het onderwerp is');
+  assert.ok(!alles.includes(A.reis.titel), 'de titel van de open aanvraag gaat niet mee');
 });

@@ -29,6 +29,18 @@
 
 const MAX_TEKST = 200;
 
+/* WAT EEN MENS LEEST, NAAST WAT HET SYSTEEM BESLOOT. `waarom` blijft de reden
+   van het beleid of het plafond, woordelijk -- dat is diagnose, en hij reist in
+   het antwoord mee voor wie het nakijkt. `voorMens` is dezelfde grens in de
+   woorden van een lid: "staat niet op de expliciete AI-allowlist" zegt een lid
+   niets, maar betekent dat Rahul dit niet voor hem doet. Er wordt geen grens
+   verzacht: elke vertaling zegt wat er NIET gebeurt. */
+const VOOR_MENS = Object.freeze({
+  plafond: 'Dit kan ik voor u voorbereiden, maar niet zelf indienen of uitvoeren.',
+  beleid: 'Dit kan Rahul niet voor u doen; u kunt het zelf in de app.',
+  anders: 'Dit kan nu niet.'
+});
+
 function tekst(x) {
   return String(x == null ? '' : x).replace(/[\x00-\x1f\x7f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, MAX_TEKST);
 }
@@ -58,12 +70,14 @@ function planBeeld(plan, per, plafond) {
     const boven = !s.bezwaar && s.niveau !== 'verboden' && plafond && typeof plafond.mag === 'function' && !plafond.mag(s.capability);
     if (boven) s = Object.assign({}, s, { bezwaar: 'deze vraag mag alleen ' + (plafond.trede || 'tonen') + '; dit klaarzetten vraagt een ruimer plafond' });
     const geblokkeerd = s.niveau === 'verboden' || !!s.bezwaar;
+    const soort = boven ? 'plafond' : s.niveau === 'verboden' ? 'beleid' : 'anders';
     const na = per.get(s.capability) || null;
     return {
       id: tekst(s.id), capability: tekst(s.capability),
       uitkomst: { tekst: tekst(s.uitkomst), herkomst: 'model' },
       staat: na ? na.uitkomst : geblokkeerd ? 'GEBLOKKEERD' : 'BESCHIKBAAR',
       waarom: geblokkeerd ? tekst(s.bezwaar || s.waarom || 'deze capability bestaat niet voor deze rol') : null,
+      voorMens: geblokkeerd ? VOOR_MENS[soort] : null,
       bevestiging: !geblokkeerd && s.bevestigingNodig ? 'mens' : null
     };
   });
@@ -72,27 +86,35 @@ function planBeeld(plan, per, plafond) {
     uitvoerbaar: !!plan.uitvoerbaar,
     samenvatting: tekst(plan.samenvatting),
     bezwaren: (plan.bezwaren || []).map((b) => tekst(b.reden)).filter(Boolean),
+    nietUitvoerbaarVoorMens: plan.uitvoerbaar ? null : 'Zo kan dit plan niet in zijn geheel; de geblokkeerde stappen hieronder zeggen waarom.',
     stappen
   };
 }
 
 /* `acties` is wat de stuurlus teruggaf; het laatste gewogen plan erin wordt
-   getoond. `vraag` en `scherm` zijn wat Rahul begreep: de vraag van de mens en
-   de schermregel die de server afleidde (of null). */
-function taakBeeld({ vraag, scherm, acties, plafond }) {
+   getoond. `vraag` en `sch` zijn wat Rahul begreep: de vraag van de mens en wat
+   kern/stuur/menscontext-opzoek.js van het scherm maakte. Voor de mens telt het
+   ONDERWERP (welk object, als de vraag er over gaat); de technische schermregel
+   gaat alleen mee als diagnose. `concept` is een voorbereiding die een domein
+   herkende (bijvoorbeeld een reiswens) en die nergens is ingediend. */
+function taakBeeld({ vraag, sch, acties, plafond, concept }) {
   const per = uitkomsten(acties);
   const plannen = (acties || []).filter((a) => a && a.pad === 'plan' && a.plan);
   const plan = planBeeld(plannen.length ? plannen[plannen.length - 1].plan : null, per, plafond);
   const lijst = [...per.values()];
   const uitgevoerd = lijst.filter((u) => u.uitkomst === 'UITGEVOERD');
   return {
-    begrepen: { vraag: tekst(vraag), scherm: scherm ? tekst(scherm) : null },
+    begrepen: { vraag: tekst(vraag), onderwerp: sch && sch.onderwerp ? tekst(sch.onderwerp) : null,
+      relatie: (sch && sch.relatie) || null },
+    diagnose: { scherm: sch && sch.scherm ? tekst(sch.scherm.regel) : null, relatieReden: (sch && sch.reden) || null },
+    concept: concept || null,
     plan,
     uitgevoerd,
     wachtOpBevestiging: lijst.filter((u) => u.uitkomst === 'WACHT').map((u) => u.pad),
     geweigerd: lijst.filter((u) => u.uitkomst === 'GEWEIGERD').map((u) => u.pad),
     grens: uitgevoerd.length
-      ? 'Alleen wat onder "uitgevoerd" staat is gebeurd; de rest is een voorstel.'
+      ? 'Alleen wat als uitgevoerd is gemarkeerd, is gebeurd; de rest is een voorstel.'
+      : concept ? 'Er is niets ingediend, geboekt of betaald. Dit is een voorbereiding.'
       : 'Er is niets uitgevoerd. Wat hier staat is een voorstel van Rahul, gewogen door RTG.'
   };
 }
@@ -106,4 +128,4 @@ function eindtekst(tekst, acties) {
   return [...uitkomsten(acties).values()].some((u) => u.uitkomst === 'UITGEVOERD') ? 'Gedaan.' : '';
 }
 
-module.exports = { taakBeeld, uitkomsten, eindtekst };
+module.exports = { taakBeeld, uitkomsten, eindtekst, VOOR_MENS };

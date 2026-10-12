@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T07:53:22.396Z",
-    "commit": "a8d9a66f",
+    "op": "2026-10-12T08:35:50.097Z",
+    "commit": "1bbe22f8",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6431,6 +6431,21 @@
       "module": "scripts/lib/wegwerpserver.js",
       "operator": "true->false#0",
       "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "intentie-model.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
+    "intentie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/menscontext-relatie.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "intrekking-multi-instance.pg.test.js": {

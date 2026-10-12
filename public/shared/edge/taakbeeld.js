@@ -46,11 +46,29 @@
      onbekende stand, dan zegt de regel dat en raadt hij niets. */
   function stapTekst(s) {
     var w = WOORD[s.staat] || 'stand onbekend';
-    var wat = (s.uitkomst && s.uitkomst.tekst) || s.capability || 'stap';
+    /* Nooit een pad: wat een mens leest is de bedoeling van de stap, en als die
+       er niet is "een stap". Het pad staat in het antwoord voor wie nakijkt. */
+    var wat = (s.uitkomst && s.uitkomst.tekst) || 'een stap';
     var t = wat + ' -- ' + w;
     if (s.staat === 'BESCHIKBAAR' && s.bevestiging === 'mens') t += ' (vraagt uw bevestiging)';
-    if (s.staat === 'GEBLOKKEERD' && s.waarom) t += ': ' + s.waarom;
+    if (s.staat === 'GEBLOKKEERD') t += ': ' + (s.voorMens || 'dit kan nu niet');
     return t;
+  }
+
+  /* Een concept: wat een domein uit de vraag herkende, met wat bekend is, wat
+     aangenomen is en wat nog ontbreekt. Het tekent velden en geen domein: er
+     staat hier geen reiswoord. */
+  function conceptRegels(c) {
+    var r = [];
+    if (!c || !c.titel) return r;
+    r.push({ cls: 'doel', tekst: c.titel });
+    (c.velden || []).forEach(function (v) {
+      r.push({ cls: 'veld' + (v.aanname ? ' aanname' : ''),
+        tekst: v.naam + ': ' + v.waarde + (v.aanname ? ' (aangenomen: ' + v.aanname + '; pas aan als dat niet klopt)' : '') });
+    });
+    if (c.ontbreekt && c.ontbreekt.length) r.push({ cls: 'ontbreekt', tekst: 'Nog nodig: ' + c.ontbreekt.join(', ') });
+    if (c.volgende) r.push({ cls: 'volgende', tekst: c.volgende });
+    return r;
   }
 
   /* De regels zelf, zonder DOM: dezelfde volgorde en dezelfde woorden voor de
@@ -59,21 +77,25 @@
      waarheid zijn. */
   function regels(taak) {
     if (!taak) return [];
-    var plan = taak.plan, uit = taak.uitgevoerd || [], r = [];
-    if (!plan && !uit.length) return [];
-    if (taak.begrepen && taak.begrepen.scherm) r.push({ cls: 'begrepen', tekst: 'Op uw scherm: ' + taak.begrepen.scherm });
+    var plan = taak.plan, uit = taak.uitgevoerd || [], r = [], b = taak.begrepen || {};
+    if (!plan && !uit.length && !taak.concept) return [];
+    /* Het onderwerp alleen als de vraag erover GAAT; een open aanvraag die bij
+       een nieuwe vraag op het scherm staat, wordt niet het onderwerp. */
+    if (b.onderwerp && (b.relatie === 'over' || b.relatie === 'wijzig'))
+      r.push({ cls: 'begrepen', tekst: (b.relatie === 'wijzig' ? 'Wijziging van ' : 'Over ') + b.onderwerp });
+    r = r.concat(conceptRegels(taak.concept));
     if (plan) {
       if (plan.doel && plan.doel.tekst) r.push({ cls: 'doel', tekst: 'Rahul stelt voor: ' + plan.doel.tekst });
       (plan.stappen || []).forEach(function (s) {
         r.push({ cls: 'stap staat-' + String(s.staat || 'onbekend').toLowerCase(), tekst: stapTekst(s) });
       });
-      if (!plan.uitvoerbaar && plan.bezwaren && plan.bezwaren.length)
-        r.push({ cls: 'bezwaar', tekst: 'Zo kan het niet: ' + plan.bezwaren[0] });
+      if (!plan.uitvoerbaar && plan.nietUitvoerbaarVoorMens)
+        r.push({ cls: 'bezwaar', tekst: plan.nietUitvoerbaarVoorMens });
     }
     /* Wat werkelijk gebeurde en niet in het plan stond, staat er ook: een
        uitvoering die je niet ziet, bestaat voor de mens niet. */
     var inPlan = plan ? (plan.stappen || []).map(function (s) { return s.capability; }) : [];
-    uit.forEach(function (u) { if (inPlan.indexOf(u.pad) < 0) r.push({ cls: 'stap staat-uitgevoerd', tekst: u.pad + ' -- uitgevoerd' }); });
+    uit.forEach(function (u) { if (inPlan.indexOf(u.pad) < 0) r.push({ cls: 'stap staat-uitgevoerd', tekst: 'een stap -- uitgevoerd' }); });
     if (taak.grens) r.push({ cls: 'grens', tekst: taak.grens });
     return r;
   }
@@ -92,5 +114,5 @@
     return e;
   }
 
-  return { teken: teken, regels: regels, stapTekst: stapTekst, WOORD: WOORD };
+  return { teken: teken, regels: regels, conceptRegels: conceptRegels, stapTekst: stapTekst, WOORD: WOORD };
 }));

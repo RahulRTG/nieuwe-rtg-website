@@ -21,6 +21,8 @@ module.exports = (ctx) => {
   const deelCtx = { ...ctx, zaken, open, caps, datumPlus };
   const { bouwReisplan, voerReisUit } = require('./reisplan')(deelCtx);
   const { bouwKleding, voerKledingUit, voorspel } = require('./kleding')(deelCtx);
+  const { reiswens, zinVan } = require('./reiswens');
+  const { reisAanbod } = require('../../reisbureau');
 
   /* ---- de servicedag: voor een zaak of een personeelslid bouwt Rahul uit
      de echte dagstand (reserveringen, lopende orders, activiteiten) een
@@ -75,6 +77,12 @@ module.exports = (ctx) => {
         plan.delen.map(d => d.oms).join(' | ') + '. Samen ' + eur(totaal) + ' (de transfer volgt het tarief van de vervoerder). ' +
         'Zeg "ja" en ik boek alles in een keer, inclusief uw dagschema; "nee" en het gaat niet door.', false, true);
     }
+    /* Een reiswens met een bestemming en reizigers, duur of budget: een
+       concept met wat bekend is en wat ontbreekt, zonder iets in te dienen
+       (./reiswens.js). Na het reisplan, zodat "plan mijn weekend" blijft wat
+       het was. */
+    const wens = reiswens(q, reisAanbod(db));
+    if (wens) return Object.assign(klaar(zinVan(wens)), { concept: wens });
     if (/\b(koop|bestel|zoek|regel)\b/i.test(q)) {
       // de catalogus zelf is het bewijs: vindt Rahul een echt kledingstuk in
       // de vraag, dan is dit een kledingwens (anders valt de vraag gewoon

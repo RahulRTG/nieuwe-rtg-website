@@ -46,6 +46,7 @@
 
 const menscontext = require('./menscontext');
 const { CONTEXT_REGELS } = require('./lusregels');
+const { relatieVan } = require('./menscontext-relatie');
 
 const MAX_VELDEN = 8;      /* dezelfde grens als shared/objectverwijzing.js */
 const MAX_WAARDE = 80;     /* dezelfde grens als een tekst in ./menscontext.js */
@@ -60,6 +61,15 @@ function waarde(x) {
   if (typeof x !== 'string') return undefined;
   const t = x.replace(/[^\S ]|[\x00-\x1f\x7f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, MAX_WAARDE);
   return t || undefined;
+}
+
+/* Hoe een mens het object noemt: "uw reisaanvraag 'Ibiza, jetset-week'". De
+   titel komt uit het beeld (de positieve lijst van het domein); zonder titel
+   blijft het bij de soort. Nooit een id: dat is een sleutel, geen naam. */
+function naamVan(beeld) {
+  const soort = String(beeld.soort || 'object').replace(/-/g, ' ');
+  const titel = beeld.velden && typeof beeld.velden.titel === 'string' ? beeld.velden.titel : '';
+  return 'uw ' + soort + (titel ? ' ‘' + titel + '’' : '');
 }
 
 function maakContextDomeinen() {
@@ -130,13 +140,26 @@ function maakContextDomeinen() {
   /* Wat een route nodig heeft, in een keer: de opzoeking voor de stuurlus (die
      zelf saneert) en de schermregel voor het gesprek. Een sanering per route,
      zodat het gesprek en de stuurlus dezelfde regel zien. */
-  function scherm(sessie, ruw) {
+  /* Wat een route nodig heeft, in een keer, voor DEZE vraag: de opzoeking voor
+     de stuurlus, de relatie tussen de vraag en het aangewezen object
+     (./menscontext-relatie.js), de schermregel voor het gesprek, en -- als de
+     vraag het object noemt en er iets bij zegt dat er niet bij hoort -- de
+     vraag die Rahul terugstelt in plaats van te raden. */
+  function scherm(sessie, ruw, vraag) {
     const opzoeking = voor(sessie);
-    const r = menscontext.saneer(ruw, opzoeking), regel = menscontext.handtekening(r);
-    /* `aangewezen`: de SERVER vond een object van deze mens -- niet wat de client
-       beweert. Alleen dan mag een vrije vraag eerst naar de stuurlus. */
-    const aangewezen = (r.verwijzingenUitslag || []).some((u) => u.stand === 'CANONIEK');
-    return { opzoeking, aangewezen, scherm: regel ? { regel, uitleg: CONTEXT_REGELS } : null };
+    const r = menscontext.saneer(ruw, opzoeking);
+    const beelden = (r.verwijzingenUitslag || []).filter((u) => u.stand === 'CANONIEK').map((u) => u.object);
+    const { relatie, reden } = relatieVan(vraag, beelden);
+    const regel = menscontext.handtekening(r, { relatie });
+    /* `aangewezen`: de SERVER vond een object van deze mens EN de vraag gaat
+       erover. Alleen dan mag een vrije vraag eerst naar de stuurlus; een nieuwe
+       taak met een oude aanvraag open is geen vraag over die aanvraag. */
+    const aangewezen = beelden.length > 0 && (relatie === 'over' || relatie === 'wijzig');
+    const onderwerp = beelden.length && relatie !== 'los' ? naamVan(beelden[0]) : null;
+    return { opzoeking, aangewezen, relatie, reden, onderwerp,
+      verduidelijk: relatie === 'onduidelijk' && beelden.length
+        ? 'Bedoelt u ' + naamVan(beelden[0]) + ', of gaat het om iets nieuws? Zeg het gerust, dan ga ik verder.' : null,
+      scherm: regel ? { regel, uitleg: CONTEXT_REGELS } : null };
   }
 
   return { meld, voor, scherm, soorten: () => [...domeinen.keys()] };

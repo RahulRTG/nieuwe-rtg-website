@@ -49,8 +49,13 @@ function woordenVan(c) {
    Alleen bij een GESLAAGDE sanering. Bij NOT_RUN of OVERGESLAGEN is de regel
    leeg, en dan plakt ./lus.js er niets onder -- een lege "Actieve context:" zou
    het model laten denken dat het scherm leeg IS. */
-function handtekening(res) {
+function handtekening(res, opties) {
   if (!res || res.stand !== 'PASS' || !res.context) return '';
+  /* Gaat de vraag NIET over het aangewezen object (./menscontext-relatie.js),
+     dan staat het object er wel bij -- zodat "die andere" te lezen blijft --
+     maar zonder zijn velden en met de zin dat de vraag er niet over gaat. Het
+     scherm helpt lezen; het kiest de taak niet. */
+  const los = !!(opties && opties.relatie === 'los');
   const c = res.context, d = [];
   if (c.presentatie.app) d.push('scherm ' + c.presentatie.app);
   if (c.presentatie.scherm) d.push('deel ' + c.presentatie.scherm);
@@ -77,7 +82,8 @@ function handtekening(res) {
       const delen = Object.keys(v).map((k) => k + ' ' + (typeof v[k] === 'string' ? JSON.stringify(v[k]) : v[k]));
       return o.soort + ' ' + o.id + (delen.length ? ' (' + delen.join(', ') + ')' : '');
     });
-  if (opgezocht.length) d.push(('opgezocht door RTG: ' + opgezocht.join(' | ')).slice(0, 600));
+  if (opgezocht.length && los) d.push('deze vraag gaat niet over het aangewezen object; behandel hem als een nieuwe vraag');
+  else if (opgezocht.length) d.push(('opgezocht door RTG: ' + opgezocht.join(' | ')).slice(0, 600));
   return d.join('; ');
 }
 

@@ -51,10 +51,10 @@ module.exports = (kern) => {
     const grens = pestgrens.poort(req.session.key, req.body.q);
     if (grens) return res.json({ antwoord: grens.antwoord, pestgrens: true, weg: !!grens.weg });
     // het scherm, aan DEZE sessie gebonden (EDGE.md par. 14.4)
-    const sch = kern.contextDomeinen.scherm(req.session, req.body.context);
+    const sch = kern.contextDomeinen.scherm(req.session, req.body.context, req.body.q);
     // sessie mee voor doen (reserveren, 24 uur plannen)
     const zeg = (eerst) => fluisterZeg(req.session.key, liveCodename(req.session), req.body.q, req.session,
-      sch.scherm && Object.assign({ stuurEerst: eerst }, sch.scherm));
+      sch.scherm && Object.assign({ stuurEerst: eerst, verduidelijk: sch.verduidelijk }, sch.scherm));
     // een aangewezen object gaat eerst naar de stuurlus, als die er is
     let r = await zeg(!!(stuurLus && sch.aangewezen));
     if (r.error) return res.status(r.status).json({ error: r.error });
@@ -78,7 +78,7 @@ module.exports = (kern) => {
         onthoudGesprek(req, lus.tekst);
         /* Wat de Edge toont, uit serverbronnen (kern/stuur/taakbeeld.js); `gedaan`
            komt alleen uit echte uitvoeringen, nooit uit een gewogen plan. */
-        const taak = taakBeeld({ vraag: req.body.q, scherm: sch.scherm && sch.scherm.regel, acties: lus.acties,
+        const taak = taakBeeld({ vraag: req.body.q, sch, acties: lus.acties,
           plafond: grendel && { trede: plafondTrede, mag: grendel } });
         const stand = aiStatus();
         /* HET STUURSPOOR REIST MEE ALS DE LUS HEM MEEGEEFT, en die geeft hem
@@ -110,6 +110,8 @@ module.exports = (kern) => {
     const stand = aiStatus();
     const antwoord = Object.assign(r, { aiBeschikbaar: stand.beschikbaar, modus: stand.modus,
       verwerking: stand.verwerking, kompas: stand.kompas, uitgevoerd: require('../../ai-stand').uitgevoerd() });
+    // een concept van een domein (een reiswens) krijgt hetzelfde taakbeeld
+    if (r.concept) antwoord.taak = taakBeeld({ vraag: req.body.q, sch, acties: [], concept: r.concept });
     antwoord.liveTwin = maakLiveTwin({ vraag: req.body.q, context: req.body.context, wereld: 'member',
       actor: req.session.tier || 'member', stand, gedaan: !!antwoord.gedaan, goedkeuringen: antwoord.goedkeuringen });
     // Geen stuurlus of geen tekst: kern/fluister gaf het antwoord, of anders de

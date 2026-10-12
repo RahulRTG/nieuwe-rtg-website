@@ -113,16 +113,22 @@ test.before(async () => {
 test.after(async () => { await stop(server); model.srv.close(); });
 
 test('1. een aangewezen eigen aanvraag gaat eerst naar de stuurlus, en de Edge krijgt een taakbeeld uit serverbronnen', async () => {
-  const v = await vraag(A, 'Ik wil met zes vrienden vier dagen naar Rome, maximaal 800 euro per persoon.', ctx(A.ref));
+  /* Een vraag OVER de aangewezen aanvraag: alleen die gaat eerst naar de
+     stuurlus (kern/stuur/menscontext-relatie.js). */
+  const v = await vraag(A, 'Kun je deze aanvraag voor me in orde maken?', ctx(A.ref));
   assert.equal(v.status, 200);
   assert.ok(v.stuur, 'de stuurlus kwam aan de beurt');
   assert.equal(v.body.antwoord, 'Ik heb het gewogen; er is nog niets gedaan.');
   const t = v.body.taak;
   assert.ok(t && t.plan, 'er is een taakbeeld met een plan');
-  assert.match(t.begrepen.scherm, /opgezocht door RTG: reisaanvraag/, 'Rahul begreep het aangewezen object');
+  assert.equal(t.begrepen.relatie, 'over');
+  assert.match(t.begrepen.onderwerp, /^uw reisaanvraag \u2018/, 'Rahul begreep over welk object het gaat, in mensentaal');
+  assert.match(t.diagnose.scherm, /opgezocht door RTG: reisaanvraag/, 'de technische regel blijft beschikbaar als diagnose');
   assert.deepEqual(t.plan.stappen.map((s) => s.staat), ['BESCHIKBAAR', 'GEBLOKKEERD', 'GEBLOKKEERD']);
   assert.match(t.plan.stappen[1].waarom, /alleen tonen/, 'het plafond van de vraagbalk blokkeert het klaarzetten');
+  assert.match(t.plan.stappen[1].voorMens, /voorbereiden, maar niet zelf indienen/);
   assert.match(t.plan.stappen[2].waarom, /allowlist/, 'een verzonnen capability is geblokkeerd met de reden');
+  assert.ok(!/allowlist/i.test(t.plan.stappen[2].voorMens), 'maar het lid leest geen intern woord');
   assert.equal(t.plan.stappen[0].uitkomst.herkomst, 'model');
   assert.deepEqual(t.uitgevoerd, [], 'het model zei "al geboekt en betaald"; er is niets uitgevoerd');
   assert.equal(v.body.gedaan, false, 'een gewogen plan zet gedaan niet aan');
@@ -143,7 +149,7 @@ test('3. een verwijzing naar andermans aanvraag maakt de vraag niet tot een stuu
 });
 
 test('4. zegt de stuurlus niets, dan antwoordt het gesprek alsnog', async () => {
-  const v = await vraag(A, 'Kun je ' + STIL + ' doen?', ctx(A.ref));
+  const v = await vraag(A, 'Kun je ' + STIL + ' doen met deze aanvraag?', ctx(A.ref));
   assert.equal(v.status, 200);
   assert.ok(v.stuur, 'eerst de stuurlus');
   assert.ok(v.gesprek, 'daarna het gesprek');
@@ -160,7 +166,7 @@ test('5. een eigen regel van Rahul gaat voor, ook met een aangewezen object', as
 test('6. een volledig uitvoerbaar plan is nog steeds niets gedaan', async () => {
   /* Het oude `gedaan: acties.some(a => a.status < 400)` gaf hier true: een
      uitvoerbaar plan staat met 200 in de acties. */
-  const v = await vraag(A, 'Laat ' + LEES + ' zien', ctx(A.ref));
+  const v = await vraag(A, 'Laat ' + LEES + ' van deze aanvraag zien', ctx(A.ref));
   assert.ok(v.stuur);
   assert.equal(v.body.taak.plan.uitvoerbaar, true);
   assert.equal(v.body.gedaan, false, 'een gewogen plan zet gedaan niet aan, ook niet als het uitvoerbaar is');

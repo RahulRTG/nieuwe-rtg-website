@@ -81,16 +81,29 @@ test('onder het antwoord van Rahul staat het taakbeeld van de server, niet de be
     await tab.click();
     const veld = page.locator('.rtg-rahul-page input[aria-label="Vraag Rahul"]');
     await veld.waitFor({ state: 'visible', timeout: 10000 });
+    /* Eerst de Rome-vraag met de Ibiza-aanvraag aangewezen: een nieuw
+       reisconcept, en de open aanvraag wordt niet het onderwerp. */
     await veld.fill('Ik wil met zes vrienden vier dagen naar Rome, maximaal 800 euro per persoon.');
     await veld.press('Enter');
+    const noten = page.locator('.rtg-command-log .rtg-command-noot');
+    await noten.first().waitFor({ timeout: 20000 });
+    const concept = await noten.last().textContent();
+    assert.match(concept, /^Nieuwe reis naar Rome\n/);
+    assert.match(concept, /Reizigers: 7 \(aangenomen: u en zes vrienden; pas aan als dat niet klopt\)/);
+    assert.match(concept, /Nog nodig: de reisdata, uw vertrekplaats/);
+    assert.match(concept, /Er is niets ingediend, geboekt of betaald/);
+    assert.ok(!/ibiza/i.test(concept), 'de open aanvraag wordt niet het onderwerp');
 
-    const noot = page.locator('.rtg-command-log .rtg-command-noot').last();
-    await noot.waitFor({ timeout: 20000 });
-    const tekst = await noot.textContent();
-    assert.match(tekst, /Op uw scherm: .*opgezocht door RTG: reisaanvraag/, 'Rahul begreep de aangewezen aanvraag');
+    /* Dan een vraag OVER de aanvraag: het plan, in de woorden van een lid. */
+    await veld.fill('Kun je deze aanvraag voor me in orde maken?');
+    await veld.press('Enter');
+    await page.waitForFunction(() => document.querySelectorAll('.rtg-command-log .rtg-command-noot').length >= 2, null, { timeout: 20000 });
+    const tekst = await noten.last().textContent();
+    assert.match(tekst, /^Over uw reisaanvraag \u2018/, 'Rahul zegt over welke aanvraag het gaat');
     assert.match(tekst, /Rahul stelt voor: Uw reis naar Rome klaarzetten/);
     assert.match(tekst, /Ik heb alles al geboekt en betaald -- voorgesteld/, 'de bewering van het model staat er als voorstel');
-    assert.match(tekst, /Zes vrienden uitgenodigd -- geblokkeerd: /, 'uitnodigen bestaat niet en staat geblokkeerd met de reden');
+    assert.match(tekst, /Zes vrienden uitgenodigd -- geblokkeerd: Dit kan Rahul niet voor u doen/, 'in mensentaal');
+    assert.ok(!/allowlist|\/api\//.test(tekst), 'geen intern woord en geen pad');
     assert.match(tekst, /Er is niets uitgevoerd/);
     assert.equal(await page.locator('[data-done]').textContent(), 'Geen uitvoering in deze sessie',
       'de tab meldt geen uitvoering, want er is niets gedaan');

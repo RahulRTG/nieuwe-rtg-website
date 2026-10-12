@@ -3511,6 +3511,7 @@
       "server/kern/fiscaal/meegeleverd/index.js",
       "server/kern/fiscaal/tarief.js",
       "server/kern/fiscaal/zekerheid.js",
+      "server/kern/fluister/gesprek.js",
       "server/kern/fonds/economie.js",
       "server/kern/foundationregistratie-register.js",
       "server/kern/foundationregistratie-uitgifte.js",

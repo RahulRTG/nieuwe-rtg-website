@@ -23,7 +23,7 @@
    gaat via het bewaarbeleid en laat een spoor na (kern/rtmail-bestuur.js). Een
    mailsysteem waarin "weg" soms echt weg is en soms niet, is bij een juridisch
    onderzoek onbruikbaar. */
-const { schoon: schoonLeiding } = require('./rtmail-leiding');
+const { schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
 const MAPPEN = ['in', 'archief', 'prullenbak'];

@@ -12,12 +12,12 @@
 
    MIGRATIE EN VANGNET: beperkte post die in het gedeelde postvak staat -- van
    voor deze plek, van een oude instantie tijdens een rolling deploy, of van
-   welke schrijver ook -- verhuist hierheen (schoon). Dat gebeurt ZONDER vlag,
+   welke schrijver ook -- verhuist hierheen (schoonLeiding). Dat gebeurt ZONDER vlag,
    telkens als een lezer van RTMail zijn opslag pakt: de check is een goedkope
    doorloop, en een vlag die eenmaal staat zou elke latere schrijver doorlaten.
    Post uit de tussenversie met een adres "<code>-leiding" krijgt zijn
    zaakadres terug. Elke lezer (rtmail, vak, draad, bewaar, dossier, sla,
-   rtgone, postbrug, mailpost) roept dezelfde schoon() aan. De
+   rtgone, postbrug, mailpost) roept dezelfde schoonLeiding() aan. De
    regels na bezorging (doorsturen, afwezigheid) draaien voor deze post met
    opzet niet: doorsturen zou de beperking opheffen. */
 'use strict';
@@ -28,9 +28,9 @@ const SYSTEEM = 'rtg@rtmail';
 const isBeperkt = (m) => !!postBeperking(m, SYSTEEM);
 const zonderLeiding = (a) => String(a || '').replace(/-leiding@/, '@');
 
-/* Het vangnet, op een plek: haal beperkte post uit `data.berichten` (in place,
+/* Het vangnet (schoonLeiding), op een plek: haal beperkte post uit `data.berichten` (in place,
    want andere lezers houden de lijst vast) en zet hem op `data.leiding`. */
-function schoon(data, bewaar) {
+function schoonLeiding(data, bewaar) {
   if (!data || !Array.isArray(data.berichten) || !data.berichten.some(isBeperkt)) return 0;
   if (!Array.isArray(data.leiding)) data.leiding = [];
   const weg = [];
@@ -55,7 +55,7 @@ module.exports = ({ ruw, heeft, save, crypto, klokDatum, normAdres, zelfdeBus, z
     return r.leiding;
   }
 
-  const migreer = () => (heeft() ? schoon(ruw(), bewaar) : 0);
+  const migreer = () => (heeft() ? schoonLeiding(ruw(), bewaar) : 0);
 
   function leg({ naar, onderwerp, tekst, soort, beperkt }) {
     const naarA = normAdres(naar);
@@ -85,5 +85,5 @@ module.exports = ({ ruw, heeft, save, crypto, klokDatum, normAdres, zelfdeBus, z
   }
   return { beperking, migreer, leg, post, ongelezen, lees };
 };
-module.exports.schoon = schoon;
+module.exports.schoonLeiding = schoonLeiding;
 module.exports.isBeperkt = isBeperkt;

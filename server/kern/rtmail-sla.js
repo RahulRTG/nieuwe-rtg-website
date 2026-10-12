@@ -17,7 +17,7 @@
    twee postvakken eindeloos tegen elkaar te laten praten: nooit op een
    automatisch bericht, nooit op post van het team aan zichzelf, en maar EEN
    bevestiging per gesprek. */
-const { schoon: schoonLeiding } = require('./rtmail-leiding');
+const { schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
 // wat NIET als antwoord telt voor de klok: door de machine geschreven post

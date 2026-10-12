@@ -24,7 +24,7 @@
    4. ALLEEN TEAMLEDEN. Elke functie hier vraagt het team op via
       kern/rtmail-team.js en weigert wie er niet in zit. Het dossier is niet
       openbaarder dan het postvak waar het bij hoort. */
-const { schoon: schoonLeiding } = require('./rtmail-leiding');
+const { schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
 const STATUSSEN = ['nieuw', 'in behandeling', 'wacht op klant', 'afgehandeld'];

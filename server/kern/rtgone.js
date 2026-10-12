@@ -1,7 +1,7 @@
 /* RTG One: het gezamenlijke werkgeheugen voor RTG en RTF. De module bewaart
    niet alleen WAT er gebeurt, maar ook waarom, wie iets beloofde, waar werk
    schuurt en hoe een automatisering veilig kan worden teruggedraaid. */
-const { schoon: schoonLeiding } = require('./rtmail-leiding');
+const { schoonLeiding } = require('./rtmail-leiding');
 const { nu: klokNu, datum: klokDatum } = require('../lib/klok');
 const projectenMaak = require('./rtgone-projecten');
 

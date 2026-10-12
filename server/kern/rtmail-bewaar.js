@@ -23,7 +23,7 @@
    recht EN een reden (kern/rtmail-recht.js), en hij komt altijd in het
    journaal. Een export is een kopie die het systeem verlaat; wie dat stil kan
    doen, heeft geen postvak maar een lek. */
-const { schoon: schoonLeiding } = require('./rtmail-leiding');
+const { schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
 module.exports = ({ db, save, rtmail, recht }) => {

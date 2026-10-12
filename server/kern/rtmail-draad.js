@@ -17,7 +17,7 @@
    zelf afzender of ontvanger van is, plus een EERLIJKE telling van wat er
    verder in het gesprek zit. Verzwijgen dat er meer is, zou net zo misleidend
    zijn als het tonen ervan. */
-const { schoon: schoonLeiding } = require('./rtmail-leiding');
+const { schoonLeiding } = require('./rtmail-leiding');
 const adresLaag = require('./rtmail-adres');
 
 module.exports = ({ db, rtmail, vak }) => {

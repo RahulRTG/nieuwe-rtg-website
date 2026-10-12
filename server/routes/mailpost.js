@@ -13,7 +13,7 @@
    De buitenpoort neemt bewust NIET zelf een postvak aan uit de body: hij leest
    de To-kop van het bericht zelf. Een poort die de ontvanger uit een parameter
    haalt, is een open relay met extra stappen. */
-const { schoon: schoonLeiding } = require('../kern/rtmail-leiding');
+const { schoonLeiding } = require('../kern/rtmail-leiding');
 module.exports = (kern) => {
   const { app, express, officeAuth, auth, supplierAuth, db, save, mailQ, mailIn,
     mailBijlage, mailAanname, rtmail, rtmailRecht, codenaamVan } = kern;

@@ -25,7 +25,7 @@
    verwijzing, nooit een tweede administratie. */
 'use strict';
 
-const { schoon: schoonLeiding } = require('../kern/rtmail-leiding');
+const { schoonLeiding } = require('../kern/rtmail-leiding');
 module.exports = (sctx) => {
   const { app, save, nu, werkPoort, eigenVeld, schoon, rid, kern } = sctx;
   const { auth, rtmail, rtmailTeam, rtmailVak } = kern;

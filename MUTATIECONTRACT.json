@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-11T20:57:53.509Z",
-  "commit": "fa931a366",
+  "op": "2026-10-12T00:01:19.905Z",
+  "commit": "013d93650",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -136154,7 +136154,7 @@
    "mutatieId": "veiligheid.moment.maak",
    "route": "POST /api/veiligheid/moment/maak",
    "semantiek": {
-    "klasse": "idempotent"
+    "klasse": "compenseerbaar"
    },
    "duplicaatregel": "zelfdeVerzoek",
    "toegang": {

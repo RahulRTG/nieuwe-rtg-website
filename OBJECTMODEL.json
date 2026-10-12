@@ -2,23 +2,22 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-10-12",
   "gemeten": {
-    "bestanden": 2869,
-    "vormen": 1607,
-    "velden": 2305,
-    "modules": 893,
-    "domeinen": 314,
-    "envelopDrempel": 19,
-    "envelop": 30,
-    "veldenDomeineigen": 1618,
-    "veldenGedeeldVanafVier": 236,
-    "gelijkendeVormparen": 64
+    "bestanden": 2900,
+    "vormen": 1613,
+    "velden": 2315,
+    "modules": 899,
+    "domeinen": 319,
+    "envelopDrempel": 20,
+    "envelop": 29,
+    "veldenDomeineigen": 1622,
+    "veldenGedeeldVanafVier": 237,
+    "gelijkendeVormparen": 65
   },
   "envelop": [
     "aantal",
     "at",
     "bron",
     "centen",
-    "code",
     "codenaam",
     "datum",
     "doel",
@@ -27,7 +26,6 @@
     "id",
     "label",
     "naam",
-    "naar",
     "notitie",
     "ok",
     "omschrijving",
@@ -48,6 +46,30 @@
   ],
   "gedeeld": [
     {
+      "veld": "naar",
+      "domeinen": 19,
+      "waar": [
+        "bedrijf",
+        "kern/ai",
+        "kern/bank",
+        "kern/command",
+        "kern/leerhuis",
+        "kern/lidboard"
+      ]
+    },
+    {
+      "veld": "code",
+      "domeinen": 19,
+      "waar": [
+        "kern/arrivalpas",
+        "kern/fiscaal",
+        "kern/handelsketen",
+        "kern/invoer",
+        "kern/livinglab",
+        "kern/luchthaven"
+      ]
+    },
+    {
       "veld": "sinds",
       "domeinen": 18,
       "waar": [
@@ -57,18 +79,6 @@
         "kern/command",
         "kern/commercie",
         "kern/ledenbalie-inzage"
-      ]
-    },
-    {
-      "veld": "naar",
-      "domeinen": 18,
-      "waar": [
-        "bedrijf",
-        "kern/ai",
-        "kern/bank",
-        "kern/command",
-        "kern/leerhuis",
-        "kern/lidboard"
       ]
     },
     {
@@ -144,6 +154,18 @@
       ]
     },
     {
+      "veld": "onderwerp",
+      "domeinen": 15,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/connect",
+        "kern/kantoor",
+        "kern/mailwachtrij"
+      ]
+    },
+    {
       "veld": "vraag",
       "domeinen": 14,
       "waar": [
@@ -153,6 +175,18 @@
         "kern/commerce",
         "kern/livinglab",
         "kern/magnaat-economenlab-rapport"
+      ]
+    },
+    {
+      "veld": "versie",
+      "domeinen": 14,
+      "waar": [
+        "bedrijf",
+        "kern/appstore",
+        "kern/beroepenbieb",
+        "kern/command",
+        "kern/envelop",
+        "kern/fluister"
       ]
     },
     {
@@ -237,18 +271,6 @@
         "kern/groothandel",
         "kern/magnaat-partnerstudio-bedrijf",
         "kern/mall"
-      ]
-    },
-    {
-      "veld": "versie",
-      "domeinen": 13,
-      "waar": [
-        "bedrijf",
-        "kern/appstore",
-        "kern/beroepenbieb",
-        "kern/command",
-        "kern/envelop",
-        "kern/journalistiek-krant"
       ]
     },
     {
@@ -502,18 +524,6 @@
         "kern/livinglab",
         "kern/office"
       ]
-    },
-    {
-      "veld": "eigenaar",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/leerhuis",
-        "kern/levensgraaf",
-        "kern/onderneming",
-        "kern/reisgezelschap"
-      ]
     }
   ],
   "paren": [
@@ -527,6 +537,7 @@
         "actie",
         "certificaat",
         "klantImpact",
+        "naar",
         "oorzaak",
         "past",
         "terugDraaibaar",
@@ -982,7 +993,7 @@
       ]
     },
     {
-      "gelijkenis": 0.88,
+      "gelijkenis": 0.89,
       "a": "server/kern/command/runbookcatalogus.js",
       "b": "server/kern/zaakcommand/runbooks.js",
       "domeinA": "kern/command",
@@ -991,6 +1002,7 @@
         "actie",
         "certificaat",
         "klantImpact",
+        "naar",
         "oorzaak",
         "past",
         "terugDraaibaar",

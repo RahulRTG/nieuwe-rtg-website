@@ -227,7 +227,7 @@ uit een `require` komt, **én** het doelbestand dat symbool ook echt kent.
 
 #### Een kwart opgelost is hier geen tekort
 
-Van de <!--getal:graaf.aanroepen-->181084<!--/getal--> aanroepen is <!--getal:graaf.opgelostPct-->25.4<!--/getal-->% naar een symbool te herleiden (18,1%
+Van de <!--getal:graaf.aanroepen-->181089<!--/getal--> aanroepen is <!--getal:graaf.opgelostPct-->25.4<!--/getal-->% naar een symbool te herleiden (18,1%
 toen deze meter werd gebouwd; §0.7 bracht de rest). Dat getal zonder indeling
 nodigt uit tot de verkeerde reparatie — iemand gaat de resolver "verbeteren" tot
 hij `res.json` aan een bestand knoopt. Daarom staat de rest ingedeeld:
@@ -236,7 +236,7 @@ hij `res.json` aan een bestand knoopt. Daarom staat de rest ingedeeld:
 |---|---|---|
 | ingebouwd | 25.345 | `String()`, `Object.freeze()`, `JSON.parse()` |
 | kader | 10.735 | `res.json()`, `app.post()`, `req.body` |
-| contextobject | <!--getal:graaf.contextobject-->20794<!--/getal--> | `k.instantMutate()` — zie hieronder (was 20.961 vóór §0.7) |
+| contextobject | <!--getal:graaf.contextobject-->20796<!--/getal--> | `k.instantMutate()` — zie hieronder (was 20.961 vóór §0.7) |
 | lokale waarde | 20.218 | `uit.push()` op iets dat hier is verklaard |
 | methode op waarde | 30.250 | `iets().nogwat()` — geen naam om op te lossen |
 | **overig** | **<!--getal:graaf.overig-->467<!--/getal-->** | de echte restbak: 2,3% van alle aanroepen |
@@ -471,7 +471,7 @@ geen uitvoer van de fabriek.
 | aanroepkanten | 17.596 | <!--getal:graaf.kanten-->31535<!--/getal--> |
 | aanroepen herleid | 18,1% | <!--getal:graaf.opgelostPct-->25.4<!--/getal-->% |
 | routes met een symbool | 2346 | <!--getal:graaf.routesMetSymbool-->3373<!--/getal--> |
-| post `contextobject` | 20.961 | <!--getal:graaf.contextobject-->20794<!--/getal--> |
+| post `contextobject` | 20.961 | <!--getal:graaf.contextobject-->20796<!--/getal--> |
 
 <!--getal:graaf.viaKern-->4899<!--/getal--> kanten bestaan puur dankzij deze herkomst. Van die kanten wijzen er
 <!--getal:graaf.viaKernZonderSymbool-->2950<!--/getal--> alleen het **bestand** aan en niet de functie, en dat is geen slordigheid
@@ -832,7 +832,7 @@ Drie stappen, in deze volgorde:
 1. ~~**Gedragsdekking van `public/`**~~ — gedaan in §0.5: 6,6% → <!--getal:codewereld.bronPublicPct-->41.3<!--/getal-->%.
    Wat er nu nog onder zit zijn de <!--getal:schermgedrag.zonderGrond-->153<!--/getal--> schermen die hun paden opbouwen; die
    zijn statisch niet te volgen en vallen onder punt 2.
-2. ~~**De <!--getal:graaf.contextobject-->20794<!--/getal--> contextobject-aanroepen via een runtime-meting**~~ — gemeten in
+2. ~~**De <!--getal:graaf.contextobject-->20796<!--/getal--> contextobject-aanroepen via een runtime-meting**~~ — gemeten in
    §0.6, en de uitkomst keert de stap om: maar <!--getal:context.metSpoor-->213<!--/getal--> routes reiken tijdens een
    verzoek naar de kern. De rest haalt zijn namen bij het BEDRADEN op, en dat is
    statisch zichtbaar. Wat overblijft voor runtime is de late binding, en dat is

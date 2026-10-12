@@ -104,7 +104,7 @@ function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, 
     if (typeof leidingVeeg === 'function') {
       try { leidingpost = leidingVeeg(t); }
       catch (e) { leidingpost = { fout: String((e && e.message) || e) }; }
-      if (leidingpost && (leidingpost.verwijderd || leidingpost.wachtOpToets || leidingpost.fout) && log && log.schrijf) {
+      if (leidingpost && (leidingpost.verwijderd || leidingpost.wachtOpToets || leidingpost.holdsVerlopen || leidingpost.fout) && log && log.schrijf) {
         try { log.schrijf(leidingpost.fout ? 'warn' : 'info', 'bewaarveger-leidingpost', leidingpost); } catch (x) { /* de logger zelf faalt */ }
       }
     }

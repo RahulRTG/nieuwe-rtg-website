@@ -1,31 +1,40 @@
 /* RTMAIL (deelmodule): de JURIDISCHE HOLD op sollicitatiepost van de
-   leidingsplek (besluit 584A, aanscherping van de eigenaar, 12 oktober 2026).
+   leidingsplek (besluit 584A met de voorwaarden van de eigenaar, 12 oktober 2026).
+   Een verlenging (./rtmail-leidingtermijn.js) is per bericht en hoogstens een
+   jaar; een hold heeft geen plafond, want een bewaarplicht kan langer duren --
+   en is daarom zwaarder afgeschermd.
 
-   Een VERLENGING (./rtmail-leidingtermijn.js) is een gewone zaak: per bericht,
-   hoogstens een jaar, in te trekken. Een HOLD is iets anders: een wettelijke of
-   juridische bewaarplicht kan langer duren dan een jaar, dus er staat geen
-   plafond op -- en juist daarom is hij zwaarder afgeschermd.
-
-   1. AANVRAGEN doet een manager van DIE zaak (de route beslist), voor een
-      expliciete lijst bestaande berichten -- nooit voor post die nog moet komen
-      -- met een grondslag uit een gesloten lijst, een doel en een
-      herbeoordelingsdatum. Wie aanvraagt komt uit de inlog.
-   2. EEN AANVRAAG HOUDT NIETS VAST tot een tweede, bevoegde mens hem heeft
-      beoordeeld: de eigenaar of iemand met een boardroomsleutel, met een verse
-      passkey (de route), en nooit de aanvrager zelf (hier).
-   3. DE HERBEOORDELINGSDATUM laat de hold niet vervallen. Besluit van de
-      eigenaar: VASTHOUDEN -- zolang de verplichting geldig kan zijn, wordt er
-      niets automatisch vernietigd -- maar nooit ongemerkt: de ronde escaleert
-      elke keer opnieuw naar het kantoor (de bestaande beveiligingsmeldingen,
-      die een kritieke melding naar de eigenaar doorzetten), tot iemand
-      herbeoordeelt met een nieuwe datum of de hold opheft.
-   Een hold van wie dan ook anders -- een collega, een gedelegeerde, de
-   juridische bewaring van het gedeelde postvak -- raakt de leidingsplek niet. */
+   1. AANVRAGEN: een manager van DIE zaak (de route), voor bestaande berichten,
+      met grondslag (gesloten lijst), doel en herbeoordelingsdatum, uit de inlog.
+   2. HOUDT NIETS VAST tot een beoordeling door de eigenaar of een
+      boardroombevoegde met een verse passkey (de route), vanaf een ANDER
+      account. Twee accounts zijn niet bewezen twee mensen: vastgelegd wordt
+      `onafhankelijkheid: 'ander-account'`. Zonder accountsleutel (PIN), met
+      accounts die de kluis aan dezelfde mens koppelt, of met een account dat
+      niet te vinden is, valt het dicht; alleen afwijzen kan dan nog.
+   3. HERBEOORDELEN is een volledige nieuwe beoordeling: dezelfde toets, grondslag
+      en doel opnieuw, en een datum hoogstens twaalf maanden na DEZE beoordeling.
+   4. Een verlopen herbeoordeling HOUDT VAST (besluit van de eigenaar), maar
+      escaleert elke ronde naar het kantoor (beveilig.meld, kritiek) tot iemand
+      herbeoordeelt of de hold opheft. Niets wordt vanzelf verlengd of vernietigd.
+   Een hold van een collega, een gedelegeerde of de bewaring van het gedeelde
+   postvak raakt de leidingsplek niet. */
 'use strict';
 
 const HOLD_GRONDSLAGEN = Object.freeze(['wettelijke-plicht', 'geschil', 'onderzoek-autoriteit']);
 const dag = (iso) => String(iso || '').slice(0, 10);
-const isDatum = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(Date.parse(s));
+// een echte kalenderdag: 2027-02-31 rolt bij het parsen door naar maart en telt dus niet
+const isDatum = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) &&
+  !isNaN(Date.parse(s + 'T00:00:00Z')) && new Date(s + 'T00:00:00Z').toISOString().slice(0, 10) === s;
+/* Hoogstens twaalf maanden vooruit: een hold kan langer gelden, maar alleen door
+   hem opnieuw te beoordelen -- zo wordt hij nooit stil permanent. */
+const MAAND_MAX = 12;
+function binnenTermijn(s, t) {
+  if (!isDatum(s) || s <= dag(t)) return false;
+  const grens = new Date(dag(t) + 'T00:00:00Z'); grens.setUTCMonth(grens.getUTCMonth() + MAAND_MAX);
+  return s <= grens.toISOString().slice(0, 10);
+}
+const DATUMFOUT = 'Geef een herbeoordelingsdatum (JJJJ-MM-DD) die bestaat, in de toekomst ligt en hoogstens ' + MAAND_MAX + ' maanden vooruit.';
 
 module.exports = ({ L, lees, plek, save, busVan, kap, nu, crypto }) => {
   const holds = () => (lees().holds || []);
@@ -39,8 +48,7 @@ module.exports = ({ L, lees, plek, save, busVan, kap, nu, crypto }) => {
       return { status: 400, error: 'Kies een grondslag voor de hold: ' + HOLD_GRONDSLAGEN.join(', ') + '.' };
     const d = kap(doel, 600);
     if (!d) return { status: 400, error: 'Zeg waarvoor deze post bewaard moet blijven (doel).' };
-    if (!isDatum(herbeoordeling) || herbeoordeling <= dag(nu()))
-      return { status: 400, error: 'Geef een herbeoordelingsdatum in de toekomst (JJJJ-MM-DD).' };
+    if (!binnenTermijn(herbeoordeling, nu())) return { status: 400, error: DATUMFOUT };
     if (!Array.isArray(ids) || !ids.length || ids.some(x => typeof x !== 'string'))
       return { status: 400, error: 'Noem de berichten waar de hold over gaat; een hold geldt nooit voor post die nog moet komen.' };
     const eigen = new Set(plek().filter(m => busVan(m.naar) === bus).map(m => m.id));
@@ -48,29 +56,44 @@ module.exports = ({ L, lees, plek, save, busVan, kap, nu, crypto }) => {
     if (vreemd.length) return { status: 404, error: 'Niet op de leidingsplek van deze zaak: ' + vreemd.join(', ') + '.' };
     const h = { id: crypto.randomBytes(5).toString('hex'), postvak: bus, ids: [...new Set(ids)], grondslag, doel: d,
       herbeoordeling, stand: 'aangevraagd', aangevraagdDoor: door, aanvragerSleutel: sleutel || null, aangevraagdOp: nu() };
+    const zonderAccount = !h.aanvragerSleutel;
     schrijf().unshift(h);
     spoor({ postvak: bus, hold: h.id, actie: 'hold aangevraagd', grondslag, door });
     save();
-    return { ok: true, hold: h, let: 'De hold houdt niets vast tot de eigenaar of een boardroombevoegde hem heeft beoordeeld.' };
+    return { ok: true, hold: h, let: zonderAccount
+      ? 'Deze inlog heeft geen account: niet vast te stellen wie aanvroeg, dus deze hold kan niet worden goedgekeurd. Vraag hem aan vanaf een account.'
+      : 'De hold houdt niets vast tot de eigenaar of een boardroombevoegde hem vanaf een ander account heeft beoordeeld.' };
   }
 
   /* De beoordeling. `wie` is de boardroomsleutel uit de inlog (de route eist
      boardroom en een verse passkey); de aanvrager beoordeelt nooit zijn eigen hold. */
-  function beoordeel({ id, actie, herbeoordeling, wie }) {
+  function beoordeel({ id, actie, herbeoordeling, grondslag, doel, wie, zelfdeMens }) {
     const h = schrijf().find(x => x.id === String(id || ''));
     if (!h) return { status: 404, error: 'Die hold bestaat niet.' };
     if (!wie) return { status: 403, error: 'Beoordelen hoort bij een persoon met een boardroomsleutel.' };
-    if (h.aanvragerSleutel && h.aanvragerSleutel === wie)
-      return { status: 403, error: 'Wie de hold aanvroeg, beoordeelt hem niet zelf: daar is een tweede mens voor.' };
+    if (!h.aanvragerSleutel && actie !== 'afwijzen')
+      return { status: 409, error: 'Niet vast te stellen wie deze hold aanvroeg (een inlog zonder account), dus ook niet dat u een ander account bent. Alleen afwijzen kan; laat hem opnieuw aanvragen vanaf een account.' };
+    if (h.aanvragerSleutel === wie)
+      return { status: 403, error: 'Wie de hold aanvroeg, beoordeelt hem niet zelf: daar is een ander account voor.' };
+    // `zelfdeMens` (de route, uit de kluis): 'ander', 'zelfde' of 'onbekend' -- alleen 'ander' telt
+    const mens = actie === 'afwijzen' ? 'ander' : (typeof zelfdeMens === 'function' ? zelfdeMens(h.aanvragerSleutel, wie) : 'onbekend');
+    if (mens === 'zelfde') return { status: 403, error: 'Volgens de kluis horen aanvrager en beoordelaar bij dezelfde mens: daar is een ander voor nodig.' };
+    if (mens !== 'ander') return { status: 409, error: 'Niet vast te stellen dat u een ander mens bent dan de aanvrager; beoordelen kan daarom niet.' };
+    const ander = { onafhankelijkheid: 'ander-account', vastgesteld: 'andere accountsleutel, en de kluis koppelt de accounts niet aan dezelfde mens' };
     const open = h.stand === 'aangevraagd', loopt = h.stand === 'beoordeeld';
-    if (actie === 'goedkeuren' && open) Object.assign(h, { stand: 'beoordeeld', beoordeeldDoor: wie, beoordeeldOp: nu() });
+    if (actie === 'goedkeuren' && open) Object.assign(h, ander, { stand: 'beoordeeld', beoordeeldDoor: wie, beoordeeldOp: nu() });
     else if (actie === 'afwijzen' && open) Object.assign(h, { stand: 'afgewezen', beoordeeldDoor: wie, beoordeeldOp: nu() });
     else if (actie === 'herbeoordeel' && loopt) {
-      if (!isDatum(herbeoordeling) || herbeoordeling <= dag(nu())) return { status: 400, error: 'Geef een nieuwe herbeoordelingsdatum in de toekomst.' };
-      Object.assign(h, { herbeoordeling, herbeoordeeldDoor: wie, herbeoordeeldOp: nu(), escalatie: null });
-    } else if (actie === 'opheffen' && loopt) Object.assign(h, { stand: 'opgeheven', opgehevenDoor: wie, opgehevenOp: nu(), escalatie: null });
+      if (typeof grondslag !== 'string' || !HOLD_GRONDSLAGEN.includes(grondslag))
+        return { status: 400, error: 'Een herbeoordeling stelt de grondslag opnieuw vast: ' + HOLD_GRONDSLAGEN.join(', ') + '.' };
+      const d = kap(doel, 600);
+      if (!d) return { status: 400, error: 'Een herbeoordeling stelt het doel opnieuw vast; een nieuwe datum alleen zet een hold niet voort.' };
+      if (!binnenTermijn(herbeoordeling, nu())) return { status: 400, error: DATUMFOUT };
+      Object.assign(h, ander, { grondslag, doel: d, herbeoordeling, herbeoordeeldDoor: wie, herbeoordeeldOp: nu(), escalatie: null });
+    } else if (actie === 'opheffen' && loopt) Object.assign(h, ander, { stand: 'opgeheven', opgehevenDoor: wie, opgehevenOp: nu(), escalatie: null });
     else return { status: 409, error: 'Dat kan niet in de stand "' + h.stand + '".' };
-    spoor({ postvak: h.postvak, hold: h.id, actie: 'hold ' + actie, door: wie });
+    spoor({ postvak: h.postvak, hold: h.id, actie: 'hold ' + actie, door: wie, grondslag: h.grondslag, doel: h.doel,
+      herbeoordeling: h.herbeoordeling, onafhankelijkheid: h.onafhankelijkheid || null });
     save();
     return { ok: true, hold: h };
   }

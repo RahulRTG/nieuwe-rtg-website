@@ -21,6 +21,17 @@ module.exports = (kern) => {
   const boardroomUser = (req) => zwaar.boardroomUser(req);
   const body = (req) => (req && req.body) || {};
   const antwoord = (res, r) => (r.error ? res.status(r.status || 400).json(Object.assign({ error: r.error }, r.omvang ? { omvang: r.omvang } : {})) : res.json(r));
+  /* Zijn twee accounts dezelfde mens? Zo ver als de kluis het laat zien: dezelfde
+     sleutel, dezelfde telefoon-hash of dezelfde e-mail-hash. Een account dat niet
+     te vinden is, is 'onbekend' -- en dat telt nooit als een ander mens. */
+  const idVan = (k) => (/^user-\d+$/.test(String(k || '')) ? Number(String(k).slice(5)) : null);
+  function zelfdeMens(a, b) {
+    let x = null, y = null;
+    try { x = idVan(a) && kern.accounts.getUserById(idVan(a)); y = idVan(b) && kern.accounts.getUserById(idVan(b)); } catch (e) { return 'onbekend'; }
+    if (!x || !y) return 'onbekend';
+    if (x.id === y.id || (x.phone_hash && x.phone_hash === y.phone_hash) || (x.email_hash && x.email_hash === y.email_hash)) return 'zelfde';
+    return 'ander';
+  }
   const vinger = (req, actie, wat) => zwaar.eis(boardroomUser(req), actie, zwaar.sessieSleutel(req), req, wat, { zonderTerugval: true });
 
   app.post('/api/office/rtmail/leiding/toets', boardroomAuth, async (req, res) => {
@@ -39,6 +50,7 @@ module.exports = (kern) => {
     if (!b.actie) return res.json({ ok: true, holds: hold.lijst(new Date().toISOString()) });
     const bewijs = await vinger(req, 'eigenaar-leidinghold', 'Het beoordelen van een juridische hold op sollicitatiepost');
     if (bewijs.error) return zwaar.stuur(res, bewijs);
-    antwoord(res, hold.beoordeel({ id: b.id, actie: String(b.actie), herbeoordeling: b.herbeoordeling, wie: kern.boardroomWie(req) }));
+    antwoord(res, hold.beoordeel({ id: b.id, actie: String(b.actie), herbeoordeling: b.herbeoordeling,
+      grondslag: b.grondslag, doel: b.doel, wie: kern.boardroomWie(req), zelfdeMens }));
   });
 };

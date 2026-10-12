@@ -10,8 +10,8 @@
   "NIET_GETEST": "deze ronde niet aangeraakt, met de reden erbij"
  },
  "stempel": {
-  "op": "2026-10-12T00:51:57.798Z",
-  "commit": "50a1c4b5e",
+  "op": "2026-10-12T02:14:59.283Z",
+  "commit": "b0d551111",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/appwerkt.js",
@@ -22,14 +22,14 @@
   "onderdelen": 114,
   "defecten": 0,
   "knoppenGevonden": 2679,
-  "knoppenAangetikt": 2303,
+  "knoppenAangetikt": 2304,
   "knoppenNietKlikbaar": 403,
   "remGeraakt": 0,
   "weigeringenGetoond": 6,
   "taalWissels": [],
   "onderscheppers": {
    "img": 146,
-   "div.wd-shell": 78,
+   "div.wd-shell": 75,
    "div.wd-shell.wd-expanded": 20,
    "aside#mediaRechten.media-rechten": 7,
    "aside#wp-panel-2.wd-favorites": 6,
@@ -38,11 +38,11 @@
    "section.wd-library": 4,
    "nav.night-nav": 3,
    "section.rsm-rsheet": 3,
+   "main#rtg-inhoud.rv-werk": 2,
    "div.rtg-edge-chrome": 1,
    "div.schil": 1,
    "header.wd-greeting": 1,
-   "main#rtg-inhoud": 1,
-   "main#rtg-inhoud.rv-werk": 1
+   "main#rtg-inhoud": 1
   },
   "schermenGrotendeelsOngemeten": 3,
   "deurenZonderPersona": 2
@@ -102,7 +102,7 @@
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -118,7 +118,7 @@
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -134,7 +134,7 @@
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -150,7 +150,7 @@
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -166,7 +166,7 @@
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -182,7 +182,7 @@
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -203,7 +203,7 @@
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -219,7 +219,7 @@
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -235,7 +235,7 @@
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -251,7 +251,7 @@
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -267,7 +267,7 @@
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -283,7 +283,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -299,7 +299,7 @@
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -315,7 +315,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -331,7 +331,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -347,7 +347,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -363,7 +363,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -379,7 +379,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -390,7 +390,7 @@
      "voltooibaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/post.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      },
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
@@ -400,17 +400,17 @@
      "persistent": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/post.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      },
      "herstelbaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/post.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      }
     }
    },
@@ -421,7 +421,7 @@
      "voltooibaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/sessies.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      },
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
@@ -431,17 +431,17 @@
      "persistent": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/sessies.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      },
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      },
      "herstelbaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/sessies.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      }
     }
    },
@@ -457,7 +457,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -468,7 +468,7 @@
      "voltooibaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/ik.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      },
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
@@ -478,17 +478,17 @@
      "persistent": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/ik.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      },
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      },
      "herstelbaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/ik.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      }
     }
    },
@@ -504,7 +504,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -520,7 +520,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -536,7 +536,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -552,7 +552,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -568,7 +568,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -584,7 +584,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -600,7 +600,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -616,7 +616,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -632,7 +632,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -648,7 +648,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -664,7 +664,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -680,7 +680,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -696,7 +696,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -712,7 +712,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -728,7 +728,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -744,7 +744,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -760,7 +760,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -776,7 +776,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -792,7 +792,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -808,7 +808,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -824,7 +824,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -840,7 +840,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -856,7 +856,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -872,7 +872,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -888,7 +888,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -904,7 +904,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -920,7 +920,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -936,7 +936,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -952,7 +952,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -968,7 +968,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -984,7 +984,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1000,7 +1000,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1016,7 +1016,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1032,7 +1032,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1048,7 +1048,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1064,7 +1064,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1080,7 +1080,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1096,7 +1096,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1112,7 +1112,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1128,7 +1128,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1144,7 +1144,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1160,7 +1160,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1176,7 +1176,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1192,7 +1192,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1208,7 +1208,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1224,7 +1224,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1240,7 +1240,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1256,7 +1256,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1272,7 +1272,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1288,7 +1288,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1304,7 +1304,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1320,7 +1320,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1336,7 +1336,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1352,7 +1352,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1368,7 +1368,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1384,7 +1384,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1400,7 +1400,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1416,7 +1416,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1432,7 +1432,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1443,7 +1443,7 @@
      "voltooibaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/wonen.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      },
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
@@ -1453,17 +1453,17 @@
      "persistent": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/wonen.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      },
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      },
      "herstelbaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/wonen.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      }
     }
    },
@@ -1479,7 +1479,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1495,7 +1495,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1511,7 +1511,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1527,7 +1527,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1543,7 +1543,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1559,7 +1559,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1575,7 +1575,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1591,7 +1591,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1602,7 +1602,7 @@
      "voltooibaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/reizen.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      },
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
@@ -1612,17 +1612,17 @@
      "persistent": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/reizen.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      },
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      },
      "herstelbaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/reizen.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      }
     }
    },
@@ -1638,7 +1638,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1654,7 +1654,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1670,7 +1670,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1686,7 +1686,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1702,7 +1702,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1718,7 +1718,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1734,7 +1734,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1755,7 +1755,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1771,7 +1771,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1787,7 +1787,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1798,7 +1798,7 @@
      "voltooibaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/loopbaan.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      },
      "waarheidsgetrouw": {
       "status": "BEWEZEN",
@@ -1808,17 +1808,17 @@
      "persistent": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/loopbaan.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      },
      "bevoegd": {
       "status": "BEWEZEN",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      },
      "herstelbaar": {
       "status": "BEWEZEN",
       "bron": "scripts/lib/voltooi/loopbaan.js",
-      "commit": "f259e9136"
+      "commit": "4ecd9603e"
      }
     }
    },
@@ -1834,7 +1834,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1850,7 +1850,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1866,7 +1866,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1882,7 +1882,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1898,7 +1898,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1914,7 +1914,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1930,7 +1930,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1946,7 +1946,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1962,7 +1962,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1978,7 +1978,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -1994,7 +1994,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    },
@@ -2010,7 +2010,7 @@
      "bevoegd": {
       "status": "NIET_GETEST",
       "bron": "scripts/bevoegdronde.js",
-      "commit": "70ef6967b"
+      "commit": "f6639d667"
      }
     }
    }
@@ -2115,8 +2115,8 @@
      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -2242,8 +2242,8 @@
      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -2369,8 +2369,8 @@
      "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -2464,8 +2464,8 @@
      "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -2554,8 +2554,8 @@
      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -2677,8 +2677,8 @@
      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -2702,7 +2702,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1689 tekens zichtbaar"
+    "als gezin: 1660 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "gezin",
@@ -2768,7 +2768,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "18 van 17 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (1x element is not stable, 3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "19 van 17 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (1x element is not visible, 3x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -2778,7 +2778,7 @@
     },
     "voltooibaar": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op 910cd346, sindsdien zijn 1942 codebestand(en) gewijzigd (240 andere buiten dit instrument gelaten)",
+     "reden": "bewijs vervallen: gemeten op 910cd346, sindsdien zijn 1942 codebestand(en) gewijzigd (241 andere buiten dit instrument gelaten)",
      "bewijs": {
       "register": "LUSPROEF.json",
       "op": "2026-09-25T08:52:10.526Z",
@@ -2815,8 +2815,8 @@
      "reden": "5 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -2830,18 +2830,18 @@
     }
    },
    "gevonden": 17,
-   "geklikt": 18,
+   "geklikt": 19,
    "overgeslagen": [
     "Verwijder uit uw widgets"
    ],
    "nietKlikbaar": [
-    "Rahul\nKOMPAS: element is not stable",
+    "Menu: element is not visible",
     "Beeld 2 wijzigen: intercepts pointer events",
     "Beeld 3 wijzigen: intercepts pointer events",
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 2678 tekens zichtbaar"
+    "als gezin: 1377 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -2939,8 +2939,8 @@
      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -2967,7 +2967,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1406 tekens zichtbaar"
+    "als gezin: 76 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -3072,8 +3072,8 @@
      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -3097,7 +3097,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1831 tekens zichtbaar"
+    "als gezin: 1810 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "gezin",
@@ -3199,8 +3199,8 @@
      "reden": "10 van de 12 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -3233,7 +3233,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als gezin: 1797 tekens zichtbaar"
+    "als gezin: 1812 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -3342,8 +3342,8 @@
      "reden": "1 van de 1 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -3469,8 +3469,8 @@
      "reden": "geen eigen adres",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -3556,8 +3556,8 @@
      "reden": "4 van de 5 kruisparen gescheiden (A binnen, B met A's code en anoniem geweigerd), 0 lek: alleen de verzoeken die het scherm bij het laden doet en die de gezinscode dragen; B krijgt A's code met B's eigen token",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -3679,8 +3679,8 @@
      "reden": "2 van de 7 routes niet gemeten, o.a. /api/isolatie/mijn/ontsluiting is in IDOR.json onbereikbaar; /api/isolatie/mijn/zet is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -3797,8 +3797,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -3915,8 +3915,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -3940,7 +3940,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2101 tekens zichtbaar"
+    "als lid: 2076 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4033,8 +4033,8 @@
      "reden": "7 van de 17 routes niet gemeten, o.a. /api/neiging/antwoord is in IDOR.json onbereikbaar; /api/privacy/delete is in IDOR.json onbereikbaar; /api/privacy/export is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -4146,8 +4146,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -4171,7 +4171,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2182 tekens zichtbaar"
+    "als lid: 2376 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4238,11 +4238,11 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:post/voltooibaar"
      },
@@ -4268,11 +4268,11 @@
     },
     "persistent": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:post/persistent"
      },
@@ -4288,8 +4288,8 @@
      "reden": "6 van de 14 routes niet gemeten, o.a. /api/privacy/delete is in IDOR.json onbereikbaar; /api/privacy/export is in IDOR.json onbereikbaar; /api/privacy/inzage is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -4298,11 +4298,11 @@
     },
     "herstelbaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:post/herstelbaar"
      },
@@ -4395,11 +4395,11 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:sessies/voltooibaar"
      },
@@ -4425,11 +4425,11 @@
     },
     "persistent": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:sessies/persistent"
      },
@@ -4445,8 +4445,8 @@
      "reden": "6 van de 14 routes niet gemeten, o.a. /api/privacy/delete is in IDOR.json onbereikbaar; /api/privacy/export is in IDOR.json onbereikbaar; /api/privacy/inzage is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -4455,11 +4455,11 @@
     },
     "herstelbaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:sessies/herstelbaar"
      },
@@ -4579,8 +4579,8 @@
      "reden": "6 van de 11 routes niet gemeten, o.a. /api/privacy/delete is in IDOR.json onbereikbaar; /api/privacy/export is in IDOR.json onbereikbaar; /api/privacy/inzage is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -4604,7 +4604,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 17620 tekens zichtbaar"
+    "als lid: 17826 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -4671,11 +4671,11 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:ik/voltooibaar"
      },
@@ -4701,11 +4701,11 @@
     },
     "persistent": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:ik/persistent"
      },
@@ -4721,8 +4721,8 @@
      "reden": "alle 12 routes gemeten (3 waar IDOR geen id vond, door de ledenkruis met A's eigen verzoek) en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet); ledenkruis: 27 verzoeken van lid A (8 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -4731,11 +4731,11 @@
     },
     "herstelbaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:ik/herstelbaar"
      },
@@ -4869,8 +4869,8 @@
      "reden": "7 van de 16 routes niet gemeten, o.a. /api/inzagekaart is in IDOR.json onbereikbaar; /api/privacy/delete is in IDOR.json onbereikbaar; /api/privacy/export is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -4987,8 +4987,8 @@
      "reden": "2 van de 5 routes niet gemeten, o.a. /api/krant/artikel staat niet in IDOR.json; /api/mediaos/volg is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -5118,8 +5118,8 @@
      "reden": "ledenkruis: geen eigen route van het scherm droeg iets van lid A; \"een ander zag niets\" is dan geen uitslag",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -5236,8 +5236,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -5323,8 +5323,8 @@
      "reden": "2 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -5349,7 +5349,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2688 tekens zichtbaar"
+    "als lid: 2925 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5446,8 +5446,8 @@
      "reden": "66 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -5564,8 +5564,8 @@
      "reden": "66 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -5589,7 +5589,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2516 tekens zichtbaar"
+    "als lid: 2549 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5682,8 +5682,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -5769,8 +5769,8 @@
      "reden": "1 van de 6 routes niet gemeten, o.a. /api/sociaal/beleid/zet is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -5795,7 +5795,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2644 tekens zichtbaar"
+    "als lid: 2662 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -5892,8 +5892,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -5979,8 +5979,8 @@
      "reden": "66 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -6004,7 +6004,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2378 tekens zichtbaar"
+    "als lid: 2403 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6097,8 +6097,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -6184,8 +6184,8 @@
      "reden": "1 van de 1 routes niet gemeten, o.a. /api/fluister is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -6209,7 +6209,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2005 tekens zichtbaar"
+    "als lid: 2226 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6302,8 +6302,8 @@
      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -6327,7 +6327,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2315 tekens zichtbaar"
+    "als lid: 2105 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6420,8 +6420,8 @@
      "reden": "2 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -6446,7 +6446,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2479 tekens zichtbaar"
+    "als lid: 2607 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6507,7 +6507,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "24 van 26 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (1x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "24 van 26 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (2x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -6543,8 +6543,8 @@
      "reden": "9 van de 9 routes niet gemeten, o.a. /api/commerce/aanbod is in IDOR.json onbereikbaar; /api/commerce/etalage is in IDOR.json onbereikbaar; /api/commerce/mand is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -6563,12 +6563,13 @@
     "Verwijder uit uw widgets"
    ],
    "nietKlikbaar": [
+    "Menu: element is not visible",
     "(naamloos): element is not visible",
     "Beeld 5 wijzigen: intercepts pointer events",
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 4271 tekens zichtbaar"
+    "als lid: 4208 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6661,8 +6662,8 @@
      "reden": "5 van de 9 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json; /api/ondertiteling/fragment is in IDOR.json onbereikbaar; /api/ondertiteling/stand is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -6686,7 +6687,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2101 tekens zichtbaar"
+    "als lid: 2286 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6779,8 +6780,8 @@
      "reden": "2 van de 75 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/sociaal/beleid/zet is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -6805,7 +6806,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2550 tekens zichtbaar"
+    "als lid: 2915 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -6902,8 +6903,8 @@
      "reden": "2 van de 2 routes niet gemeten, o.a. /api/theater/kijk/*: de registers kennen geen route onder dit voorvoegsel; /api/theater/upload/:id staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -6927,7 +6928,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2190 tekens zichtbaar"
+    "als lid: 2387 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7022,8 +7023,8 @@
      "reden": "66 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -7140,8 +7141,8 @@
      "reden": "5 van de 7 routes niet gemeten, o.a. /api/adres/zoek is in IDOR.json onbereikbaar; /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -7167,7 +7168,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2607 tekens zichtbaar"
+    "als lid: 2832 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7268,8 +7269,8 @@
      "reden": "2 van de 2 routes niet gemeten, o.a. /api/projectie/kijk staat niet in IDOR.json; /api/projectie/koppel staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -7371,8 +7372,8 @@
      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -7396,7 +7397,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2129 tekens zichtbaar"
+    "als lid: 2104 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7489,8 +7490,8 @@
      "reden": "66 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -7514,7 +7515,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2055 tekens zichtbaar"
+    "als lid: 2080 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7607,8 +7608,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -7694,8 +7695,8 @@
      "reden": "4 van de 12 routes niet gemeten, o.a. /api/agenda/bereik is in IDOR.json onbereikbaar; /api/fluister is in IDOR.json onbereikbaar; /api/geld/cockpit is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -7722,7 +7723,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 3365 tekens zichtbaar"
+    "als lid: 3320 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7827,8 +7828,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -7852,7 +7853,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1965 tekens zichtbaar"
+    "als lid: 1745 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -7945,8 +7946,8 @@
      "reden": "1 van de 1 routes niet gemeten, o.a. /api/ice staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -7970,7 +7971,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2430 tekens zichtbaar"
+    "als lid: 2606 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8065,8 +8066,8 @@
      "reden": "66 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -8183,8 +8184,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -8208,7 +8209,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2234 tekens zichtbaar"
+    "als lid: 2014 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8303,8 +8304,8 @@
      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -8328,7 +8329,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2197 tekens zichtbaar"
+    "als lid: 2172 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8385,7 +8386,7 @@
     },
     "bedienbaar": {
      "status": "NIET_GETEST",
-     "reden": "36 van 75 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 3 niet aan te tikken (1x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
+     "reden": "35 van 75 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 4 niet aan te tikken (1x reden niet gemeld, 1x element is not visible, 2x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -8421,8 +8422,8 @@
      "reden": "20 van de 58 routes niet gemeten, o.a. /api/adres/zoek is in IDOR.json onbereikbaar; /api/bieb/ai is in IDOR.json onbereikbaar; /api/booking/request is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -8436,17 +8437,18 @@
     }
    },
    "gevonden": 75,
-   "geklikt": 36,
+   "geklikt": 35,
    "overgeslagen": [
     "Verwijder uit uw widgets"
    ],
    "nietKlikbaar": [
+    "Rahul\nKOMPAS: reden niet gemeld",
     "(naamloos): element is not visible",
     "Beeld 5 wijzigen: intercepts pointer events",
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 24966 tekens zichtbaar"
+    "als lid: 25008 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8539,8 +8541,8 @@
      "reden": "66 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -8564,7 +8566,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2403 tekens zichtbaar"
+    "als lid: 2378 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8657,8 +8659,8 @@
      "reden": "2 van de 18 routes niet gemeten, o.a. /api/mall/aanvraag is in IDOR.json onbereikbaar; /api/supplier/mall/aanvraag/behandel staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -8682,7 +8684,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2224 tekens zichtbaar"
+    "als lid: 2140 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8739,7 +8741,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "19 van 22 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 10 niet aan te tikken (9x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "19 van 22 eigen knoppen aangetikt zonder fout (plus 20 van de gedeelde schil, die hier niet telt), 8 niet aan te tikken (7x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -8775,8 +8777,8 @@
      "reden": "2 van de 2 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -8800,14 +8802,12 @@
     "Rustig: intercepts pointer events",
     "Bijzonder: intercepts pointer events",
     "Buiten: intercepts pointer events",
-    "NA HET DINER\nSalon Privé\n\nLive jazz, lag: intercepts pointer events",
-    "THUIS\nChef aan huis\n\nEen menu dat arrive: intercepts pointer events",
     "(naamloos): element is not visible",
     "Beeld 5 wijzigen: intercepts pointer events",
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1998 tekens zichtbaar"
+    "als lid: 2043 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -8824,11 +8824,11 @@
     },
     {
      "knop": "Nu open",
-     "door": "div.wd-shell"
+     "door": "main#rtg-inhoud.rv-werk"
     },
     {
      "knop": "Rustig",
-     "door": "div.wd-shell"
+     "door": "main#rtg-inhoud.rv-werk"
     },
     {
      "knop": "Bijzonder",
@@ -8836,14 +8836,6 @@
     },
     {
      "knop": "Buiten",
-     "door": "main#rtg-inhoud.rv-werk"
-    },
-    {
-     "knop": "NA HET DINER\nSalon Privé\n\nLive jazz, lag",
-     "door": "div.wd-shell"
-    },
-    {
-     "knop": "THUIS\nChef aan huis\n\nEen menu dat arrive",
      "door": "div.wd-shell"
     },
     {
@@ -8928,8 +8920,8 @@
      "reden": "2 van de 2 routes niet gemeten, o.a. /api/fluister is in IDOR.json onbereikbaar; /api/muziek/bestand is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -8953,7 +8945,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2608 tekens zichtbaar"
+    "als lid: 2698 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9046,8 +9038,8 @@
      "reden": "66 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -9164,8 +9156,8 @@
      "reden": "ledenkruis: geen eigen route van het scherm droeg iets van lid A; \"een ander zag niets\" is dan geen uitslag",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -9189,7 +9181,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1816 tekens zichtbaar"
+    "als lid: 2012 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9282,8 +9274,8 @@
      "reden": "ROLPROEF.json vervallen, en de ledenkruis raakte 2 schrijfroute(s) van het scherm niet met lid A binnen: /api/member/huis/map, /api/member/huis/rahul",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -9309,7 +9301,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1955 tekens zichtbaar"
+    "als lid: 1960 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9410,8 +9402,8 @@
      "reden": "1 van de 73 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -9435,7 +9427,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2967 tekens zichtbaar"
+    "als lid: 2748 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9528,8 +9520,8 @@
      "reden": "1 van de 15 routes niet gemeten, o.a. /api/member/pulse/volg is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -9646,8 +9638,8 @@
      "reden": "5 van de 38 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/ice staat niet in IDOR.json; /api/ondertiteling/fragment is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -9672,7 +9664,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2685 tekens zichtbaar"
+    "als lid: 2485 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -9769,8 +9761,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -9856,8 +9848,8 @@
      "reden": "1 van de 4 routes niet gemeten, o.a. /api/ondertiteling/fragment is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -9888,7 +9880,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 3406 tekens zichtbaar"
+    "als lid: 3211 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10009,8 +10001,8 @@
      "reden": "1 van de 1 routes niet gemeten, o.a. /api/login staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -10035,7 +10027,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1732 tekens zichtbaar"
+    "als lid: 1838 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10128,8 +10120,8 @@
      "reden": "6 van de 21 routes niet gemeten, o.a. /api/veiligheid/alarm is in IDOR.json onbereikbaar; /api/veiligheid/codewoord/zet is in IDOR.json onbereikbaar; /api/veiligheid/kring/mail is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -10152,7 +10144,7 @@
     "Beeld 5 wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1637 tekens zichtbaar"
+    "als lid: 2671 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10241,8 +10233,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -10328,8 +10320,8 @@
      "reden": "66 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -10446,8 +10438,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -10533,8 +10525,8 @@
      "reden": "1 van de 11 routes niet gemeten, o.a. /api/sociaal/beleid/zet is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -10558,7 +10550,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2509 tekens zichtbaar"
+    "als lid: 2464 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10651,8 +10643,8 @@
      "reden": "14 van de 48 routes niet gemeten, o.a. /api/foundation staat niet in IDOR.json; /api/member/spel/arcade-bord is in IDOR.json onbereikbaar; /api/member/spel/arcade-score is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -10769,8 +10761,8 @@
      "reden": "3 van de 11 routes niet gemeten, o.a. /api/adres/zoek is in IDOR.json onbereikbaar; /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -10792,7 +10784,7 @@
     "(naamloos): element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 2150 tekens zichtbaar"
+    "als lid: 2307 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10876,8 +10868,8 @@
      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -10901,7 +10893,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2314 tekens zichtbaar"
+    "als lid: 2129 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -10994,8 +10986,8 @@
      "reden": "2 van de 2 routes niet gemeten, o.a. /api/supplier/ai staat niet in IDOR.json; /api/supplier/state staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -11117,8 +11109,8 @@
      "reden": "3 van de 6 routes niet gemeten, o.a. /api/event/rsvp is in IDOR.json onbereikbaar; /api/event/rsvp/annuleer is in IDOR.json onbereikbaar; /api/fluister is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -11143,7 +11135,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2381 tekens zichtbaar"
+    "als lid: 2463 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11240,8 +11232,8 @@
      "reden": "11 van de 26 routes niet gemeten, o.a. /api/dag is in IDOR.json onbereikbaar; /api/medicatie is in IDOR.json onbereikbaar; /api/metingen is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -11265,7 +11257,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2000 tekens zichtbaar"
+    "als lid: 1955 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11358,8 +11350,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -11383,7 +11375,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1915 tekens zichtbaar"
+    "als lid: 1904 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11476,8 +11468,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -11563,8 +11555,8 @@
      "reden": "66 van de 95 routes niet gemeten, o.a. /api/balans is in IDOR.json onbereikbaar; /api/bank/advies is in IDOR.json onbereikbaar; /api/bank/afschrift is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -11588,7 +11580,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2204 tekens zichtbaar"
+    "als lid: 2179 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11655,11 +11647,11 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:wonen/voltooibaar"
      },
@@ -11685,11 +11677,11 @@
     },
     "persistent": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:wonen/persistent"
      },
@@ -11705,8 +11697,8 @@
      "reden": "alle 7 routes gemeten (1 waar IDOR geen id vond, door de ledenkruis met A's eigen verzoek) en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet); ledenkruis: 20 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -11715,11 +11707,11 @@
     },
     "herstelbaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:wonen/herstelbaar"
      },
@@ -11742,7 +11734,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2086 tekens zichtbaar"
+    "als lid: 2230 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -11838,8 +11830,8 @@
      "reden": "3 van de 3 routes niet gemeten, o.a. /api/arrival/pass staat niet in IDOR.json; /api/arrival/pulse staat niet in IDOR.json; /api/plaats/venster is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -11967,8 +11959,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -11994,7 +11986,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1610 tekens zichtbaar"
+    "als lid: 1864 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12095,8 +12087,8 @@
      "reden": "1 van de 70 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -12122,7 +12114,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2707 tekens zichtbaar"
+    "als lid: 2662 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12223,8 +12215,8 @@
      "reden": "1 van de 1 routes niet gemeten, o.a. /api/nav/gebied/pakket/*: de registers kennen geen route onder dit voorvoegsel",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -12248,7 +12240,7 @@
     "Beeld 5 wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2155 tekens zichtbaar"
+    "als lid: 2120 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -12341,8 +12333,8 @@
      "reden": "2 van de 2 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -12484,8 +12476,8 @@
      "reden": "7 van de 7 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/staff/ov/checkin staat niet in IDOR.json; /api/staff/ov/dienst staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -12511,7 +12503,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2131 tekens zichtbaar"
+    "als lid: 2134 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -12581,7 +12573,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "20 van 24 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 5 niet aan te tikken (1x element is not visible, 4x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
+     "reden": "21 van 24 eigen knoppen aangetikt zonder fout (plus 21 van de gedeelde schil, die hier niet telt), 5 niet aan te tikken (1x element is not visible, 4x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn",
      "bewijs": null
     },
     "menselijk": {
@@ -12617,8 +12609,8 @@
      "reden": "3 van de 12 routes niet gemeten, o.a. /api/gegevens/start is in IDOR.json onbereikbaar; /api/gegevens/zeg is in IDOR.json onbereikbaar; /api/gids/app staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -12632,7 +12624,7 @@
     }
    },
    "gevonden": 24,
-   "geklikt": 20,
+   "geklikt": 21,
    "overgeslagen": [
     "Verwijder uit uw widgets"
    ],
@@ -12745,8 +12737,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -12806,11 +12798,11 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:reizen/voltooibaar"
      },
@@ -12836,11 +12828,11 @@
     },
     "persistent": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:reizen/persistent"
      },
@@ -12856,8 +12848,8 @@
      "reden": "alle 5 routes gemeten (1 waar IDOR geen id vond, door de ledenkruis met A's eigen verzoek) en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet); ledenkruis: 18 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -12866,11 +12858,11 @@
     },
     "herstelbaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 5 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:reizen/herstelbaar"
      },
@@ -13009,8 +13001,8 @@
      "reden": "deze ronde heeft geen kruisproef voor de persona kantoor",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -13030,7 +13022,7 @@
    ],
    "nietKlikbaar": [],
    "waarnemingen": [
-    "als kantoor: 4518 tekens zichtbaar"
+    "als kantoor: 4564 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -13114,8 +13106,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -13141,7 +13133,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2008 tekens zichtbaar"
+    "als lid: 2291 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -13242,8 +13234,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -13329,8 +13321,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -13355,7 +13347,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1766 tekens zichtbaar"
+    "als lid: 1767 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -13452,8 +13444,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -13480,7 +13472,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1936 tekens zichtbaar"
+    "als lid: 1819 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -13585,8 +13577,8 @@
      "reden": "2 van de 7 routes niet gemeten, o.a. /api/member/vluchten/boek is in IDOR.json onbereikbaar; /api/member/vluchten/charter is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -13715,8 +13707,8 @@
      "reden": "deze ronde heeft geen kruisproef voor de persona kantoor",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -13816,7 +13808,7 @@
     },
     "voltooibaar": {
      "status": "NIET_GETEST",
-     "reden": "bewijs vervallen: gemeten op b1c53b23c, sindsdien zijn 1312 codebestand(en) gewijzigd (186 andere buiten dit instrument gelaten)",
+     "reden": "bewijs vervallen: gemeten op b1c53b23c, sindsdien zijn 1312 codebestand(en) gewijzigd (187 andere buiten dit instrument gelaten)",
      "bewijs": {
       "register": "TAFELPROEF.json",
       "op": "2026-09-29T20:19:55.319Z",
@@ -13853,8 +13845,8 @@
      "reden": "132 van de 134 routes niet gemeten, o.a. /api/gids/app staat niet in IDOR.json; /api/supplier/horeca/arrival/promise staat niet in IDOR.json; /api/supplier/horeca/arrivals staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -13982,8 +13974,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -14105,8 +14097,8 @@
      "reden": "20 van de 88 routes niet gemeten, o.a. /api/member/magnaat/economie/analyse is in IDOR.json onbereikbaar; /api/member/magnaat/economie/schok is in IDOR.json onbereikbaar; /api/member/magnaat/economie/volgende-dag is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -14131,7 +14123,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 4146 tekens zichtbaar"
+    "als lid: 3416 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -14202,11 +14194,11 @@
     },
     "voltooibaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 6 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:loopbaan/voltooibaar"
      },
@@ -14232,11 +14224,11 @@
     },
     "persistent": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 3 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:loopbaan/persistent"
      },
@@ -14252,8 +14244,8 @@
      "reden": "alle 6 routes gemeten (6 waar IDOR geen id vond, door de ledenkruis met A's eigen verzoek) en elke schrijfroute door de ledenkruis nagespeeld (ROLPROEF.json is vervallen en telt niet); ledenkruis: 19 verzoeken van lid A (4 handelingen) nagespeeld door anoniem, ander lid, zaak, kantoor, gezin: geen lek, geen handeling zonder sessie, geen handeling op een object van A, de stand van A onaangetast; het scherm bij het laden plus de zaai en handelingen van zijn scenario; nagespeeld door een anonieme bezoeker, een ander lid, een zaak, het kantoor en een gezin uit de sleutelbos; een lek is een merkteken van A in hun antwoord; van een stroom (event-stream) telt alleen de status, zijn inhoud wordt niet gelezen; een weigering (4xx) wordt niet op merktekens gelezen; de codenaam mag zichtbaar zijn op de routes in CODENAAM_ZICHTBAAR",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -14262,11 +14254,11 @@
     },
     "herstelbaar": {
      "status": "BEWEZEN",
-     "reden": "vers gemeten (gemeten op f259e9136; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
+     "reden": "vers gemeten (gemeten op 4ecd9603e; sindsdien is er geen code gewijzigd): 4 schakels gesloten, 0 storingen gehouden",
      "bewijs": {
       "register": "VOLTOOIPROEF.json",
-      "op": "2026-10-12T00:02:49.678Z",
-      "commit": "f259e9136",
+      "op": "2026-10-12T01:25:43.247Z",
+      "commit": "4ecd9603e",
       "instrument": "scripts/voltooiproef.js",
       "deel": "apps/link:loopbaan/herstelbaar"
      },
@@ -14392,8 +14384,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -14515,8 +14507,8 @@
      "reden": "1 van de 1 routes niet gemeten, o.a. /api/onderneming/rechtsvormen staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -14638,8 +14630,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -14771,8 +14763,8 @@
      "reden": "deze ronde heeft geen kruisproef voor de persona kantoor",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -14898,8 +14890,8 @@
      "reden": "1 van de 1 routes niet gemeten, o.a. /api/supplier/ai staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -14943,7 +14935,7 @@
     "(naamloos): element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1705 tekens zichtbaar"
+    "als lid: 1986 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -15032,8 +15024,8 @@
      "reden": "deze ronde heeft geen kruisproef voor de persona kantoor",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -15058,7 +15050,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als kantoor: 1783 tekens zichtbaar"
+    "als kantoor: 1741 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -15159,8 +15151,8 @@
      "reden": "5 van de 5 routes niet gemeten, o.a. /api/bedrijf/mijn is in IDOR.json onbereikbaar; /api/tenant/bijstand*: de registers kennen geen route onder dit voorvoegsel; /api/tenant/bootstrap staat niet in IDOR.json",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -15282,8 +15274,8 @@
      "reden": "34 van de 63 routes niet gemeten, o.a. /api/account/start is in IDOR.json onbereikbaar; /api/member/rtmail/afwezig is in IDOR.json onbereikbaar; /api/member/rtmail/antwoord is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -15308,7 +15300,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2699 tekens zichtbaar"
+    "als lid: 2746 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -15407,8 +15399,8 @@
      "reden": "4 van de 5 routes niet gemeten, o.a. /api/bijles/gesprek is in IDOR.json onbereikbaar; /api/bijles/vraag is in IDOR.json onbereikbaar; /api/leerstof/examen is in IDOR.json onbereikbaar",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -15433,7 +15425,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 2569 tekens zichtbaar"
+    "als lid: 1465 tekens zichtbaar"
    ],
    "personaAfwijking": {
     "gebruikt": "lid",
@@ -15535,8 +15527,8 @@
      "reden": "het scherm roept zelf geen route aan; er is niets te kruisen",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -15561,7 +15553,7 @@
     "Sfeerbeeld wijzigen: intercepts pointer events"
    ],
    "waarnemingen": [
-    "als lid: 1703 tekens zichtbaar"
+    "als lid: 1966 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -15658,8 +15650,8 @@
      "reden": "ledenkruis: geen eigen route van het scherm droeg iets van lid A; \"een ander zag niets\" is dan geen uitslag",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",
@@ -15686,7 +15678,7 @@
     "(naamloos): element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 2057 tekens zichtbaar"
+    "als lid: 2359 tekens zichtbaar"
    ],
    "personaAfwijking": null,
    "bestemming": {
@@ -15791,8 +15783,8 @@
      "reden": "geen eigen adres: een stand of kiezer binnen de ledenapp",
      "bewijs": {
       "register": "BEVOEGD.json",
-      "op": "2026-10-12T00:13:23.609Z",
-      "commit": "70ef6967b"
+      "op": "2026-10-12T01:34:14.531Z",
+      "commit": "f6639d667"
      },
      "bron": {
       "soort": "bevoegdronde",

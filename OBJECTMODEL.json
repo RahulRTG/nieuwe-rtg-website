@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-10-12",
   "gemeten": {
-    "bestanden": 2793,
-    "vormen": 1599,
-    "velden": 2289,
-    "modules": 887,
-    "domeinen": 310,
+    "bestanden": 2794,
+    "vormen": 1601,
+    "velden": 2290,
+    "modules": 888,
+    "domeinen": 311,
     "envelopDrempel": 19,
-    "envelop": 29,
+    "envelop": 30,
     "veldenDomeineigen": 1607,
-    "veldenGedeeldVanafVier": 234,
-    "gelijkendeVormparen": 64
+    "veldenGedeeldVanafVier": 233,
+    "gelijkendeVormparen": 65
   },
   "envelop": [
     "aantal",
@@ -26,6 +26,7 @@
     "id",
     "label",
     "naam",
+    "naar",
     "notitie",
     "ok",
     "omschrijving",
@@ -79,18 +80,6 @@
         "kern/gemeente",
         "kern/instant-reality",
         "kern/ledenbalie-inzage"
-      ]
-    },
-    {
-      "veld": "naar",
-      "domeinen": 17,
-      "waar": [
-        "bedrijf",
-        "kern/ai",
-        "kern/bank",
-        "kern/command",
-        "kern/leerhuis",
-        "kern/lidboard"
       ]
     },
     {
@@ -151,6 +140,18 @@
         "kern/atelier",
         "kern/beroepenbieb",
         "kern/boerderij"
+      ]
+    },
+    {
+      "veld": "onderwerp",
+      "domeinen": 15,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/connect",
+        "kern/kantoor",
+        "kern/mailwachtrij"
       ]
     },
     {
@@ -259,18 +260,6 @@
         "kern/command",
         "kern/festival",
         "kern/leerhuis"
-      ]
-    },
-    {
-      "veld": "onderwerp",
-      "domeinen": 13,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/commercie",
-        "kern/connect",
-        "kern/kantoor",
-        "kern/mailwachtrij"
       ]
     },
     {
@@ -524,6 +513,18 @@
         "kern/livinglab",
         "kern/office"
       ]
+    },
+    {
+      "veld": "eigenaar",
+      "domeinen": 11,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/leerhuis",
+        "kern/levensgraaf",
+        "kern/onderneming",
+        "kern/reisgezelschap"
+      ]
     }
   ],
   "paren": [
@@ -537,7 +538,6 @@
         "actie",
         "certificaat",
         "klantImpact",
-        "naar",
         "oorzaak",
         "past",
         "terugDraaibaar",
@@ -993,7 +993,7 @@
       ]
     },
     {
-      "gelijkenis": 0.89,
+      "gelijkenis": 0.88,
       "a": "server/kern/command/runbookcatalogus.js",
       "b": "server/kern/zaakcommand/runbooks.js",
       "domeinA": "kern/command",
@@ -1002,7 +1002,6 @@
         "actie",
         "certificaat",
         "klantImpact",
-        "naar",
         "oorzaak",
         "past",
         "terugDraaibaar",

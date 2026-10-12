@@ -86,6 +86,13 @@
       "geprobeerd": 3,
       "scherp": "gezakt"
     },
+    "aanvoer-ondernemen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "aanvoer.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -8948,6 +8955,13 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "media-toegang.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "media-voorzijde.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
@@ -9920,6 +9934,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "neiging-gezag.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "neiging-scherm.e2e.js": {
       "soort": "server",

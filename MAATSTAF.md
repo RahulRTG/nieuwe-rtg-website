@@ -1528,6 +1528,75 @@ bevinding wegpoetsen omdat er iets naast is komen staan, zou kwijtmaken wat er
 nog echt ontbreekt — en de stap die rest is klein en eerlijk te benoemen: van een
 doel naar een handvol manieren, zonder ze te rangschikken.
 
+> **Stand van 13 september, en hij loopt achter.** Schakel 4 sluit sinds 14
+> september: `kern/knelpunt/wegen.js` stelt bij een kaal doel de manieren samen
+> uit de bronnen die aangesloten zijn, met `voorwaardenOnbekend` op elke weg en
+> zonder rangorde. Deze alinea bleef staan zoals hij was, en dat kostte op 11
+> oktober een verkeerd advies: wie hem las, dacht dat het gat er nog was. Wat er
+> werkelijk ontbrak, was de **dekking** van de kaart — zie par. 7j.
+
+## 7j. Het zesde terrein: ondernemen (11 oktober 2026)
+
+Wie *"ik wil een eigen bedrijf beginnen"* intikte, kreeg werk-, opleiding- en
+opvangwegen en **geen enkele ondernemersweg**, terwijl `kern/onderneming/` (45
+modules) precies dat pad draagt. De motor was in orde; de kaart kende het terrein
+niet.
+
+### Eerst gezocht, dan aangesloten
+
+De vier routes uit de vraag zijn nagezocht voordat er iets bijkwam:
+
+| route | bron | stand |
+|---|---|---|
+| een ondernemingsplan voorbereiden | `kern/onderneming/` (verkenning, stress test, plan in acht hoofdstukken) | **er is**, achter een RTG-account |
+| rechtsvormen en verplichtingen | `kern/onderneming/rechtsvorm.js` (28 vormen in 7 landen) | **er is**, en open zonder inlog |
+| financiering | geen lening, krediet, subsidie of investeerder buiten het spel Magnaat | **er is niets** |
+| andere ondernemers, een eerste klant, een partner | `kern/rtfos/ondernemers.js` is wat een bedrijf de RTFoundation biedt; de pijplijn volgt offertes die al binnenkomen | **er is niets** |
+
+Daaruit volgt de regel die dit terrein draagt, en hij is breder dan dit terrein:
+**RTG biedt een mogelijkheid pas aan als er een echte bron voor bestaat; ontbreekt
+die, dan zegt RTG dat hardop in plaats van een oplossing te suggereren die het
+niet kan leveren.** Daarom levert de bron (`kern/knelpunt/aanvoer-ondernemen.js`)
+twee vondsten en niet vier, en staan financiering en samenwerking in de `dektNiet`
+van het terrein. Een vondst *"zoek financiering"* zonder bron erachter is precies
+de opening die dit huis niet kan waarmaken. `test/aanvoer-ondernemen.test.js`
+toets 3 zakt zodra een vondst er toch een belooft.
+
+### De ingang is de voorlichting, en dat is een keuze over wie erbij kan
+
+De kaart wijst `GET /api/onderneming/rechtsvormen` aan, omdat die zonder inlog
+opengaat en dus ook voor een gezin dat via `/api/rtf/knelpunt` vraagt. De
+plan-vondst wijst naar `/api/onderneming/nieuw` en zegt erbij dat die deur
+vanuit de gezinsingang dicht is. Die zin is niet beloofd maar **gemeten**:
+schakel 19 van de Adamproef stuurt Adams gezinstoken naar die route en krijgt
+401.
+
+### Schakel 19, en een meetfout in schakel 12
+
+De Adamproef staat op **19 schakels, alle 19 gesloten**, en 10 van 10 storingen
+gehouden. Schakel 19: Adam (17) noemt alleen een ondernemersdoel via de
+gezinsdeur; de ondernemersweg staat ertussen, er is niets weggelaten omdat het
+doel er niet naar klonk, geen weg heet `open`, de voorlichting gaat zonder account
+open en het plan niet. Wat hij **niet** meet: of een zeventienjarige een
+onderneming mag beginnen. Dat is een juridische vraag, en een vondst is geen
+recht.
+
+Het aansluiten liet schakel 12 zakken, en dat lag aan de proef: hij telde elke
+bron met `gevonden: null` als *gladgestreken*, ook een bron die bij een
+knelpunt buiten zijn terrein een lege lijst gaf. Een bron die niets toont kapt
+niets af; het criterium is nu `gevonden === null && getoond > 0`, zoals de
+definitie in de proef zelf al zei.
+
+### Wat er is meegemeten
+
+`AANVOERVORM.json` loopt over zes terreinen: nog steeds **0 velden in alle
+terreinen**, onder beide domeinlijsten. En de grens die de opzet vroeg — *een
+neiging bepaalt wat iemand ziet en nooit wat hij mag* — staat als toets:
+`test/neiging-gezag.test.js` leest 178 gezagsbestanden (poorten, stuur,
+bevoegdheid, identiteit, kantoor, machtigingen, leeftijds- en paspoortgrenzen) en
+zakt zodra er één de neiginglaag noemt, of zodra een tweede routedomein de
+kernnaam `neiging` mag lezen. Beide helften zijn met een mutatie nagetrokken.
+
 ## 8. De volgorde
 
 1. **Dit document** — welke uitspraak huisgrond heeft, welke wordt

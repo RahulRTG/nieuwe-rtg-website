@@ -9,6 +9,7 @@ module.exports = (ctx) => {
     CLOUD, SLEUTEL, GEBRUIKER, WACHTWOORD, actief, HOP, KAS_DIR, KAS_MAX_BESTAND, KAS_MAX_STUKS,
     journaalPadOk, journaalZegel, journaalGeldig, JOURNAAL_MAX_BODY } = ctx;
   const bodyHulp = require('../../web/body');
+  const { OPENBAAR_MS, CACHE_OPENBAAR } = require('../../media/toegang');
   const PROXY_BODY_MAX = 8 * 1024 * 1024;
   const LEESFOUT = Symbol('zaakdoos-leesfout');
 
@@ -45,21 +46,32 @@ module.exports = (ctx) => {
       fs.mkdirSync(KAS_DIR, { recursive: true });
       fs.writeFileSync(path.join(KAS_DIR, kasNaam(url) + '.bin'), buf);
       fs.writeFileSync(path.join(KAS_DIR, kasNaam(url) + '.typ'), String(type || 'application/octet-stream'));
+      fs.writeFileSync(path.join(KAS_DIR, kasNaam(url) + '.pub'), '1');
       const alle = fs.readdirSync(KAS_DIR).filter(n => n.endsWith('.bin'));
       if (alle.length > KAS_MAX_STUKS) {
         const opLeeftijd = alle.map(n => ({ n, t: fs.statSync(path.join(KAS_DIR, n)).mtimeMs })).sort((a, b) => a.t - b.t);
         for (const oud of opLeeftijd.slice(0, alle.length - KAS_MAX_STUKS)) {
           try { fs.unlinkSync(path.join(KAS_DIR, oud.n)); fs.unlinkSync(path.join(KAS_DIR, oud.n.replace(/\.bin$/, '.typ'))); } catch (e) {}
+          try { fs.unlinkSync(path.join(KAS_DIR, oud.n.replace(/\.bin$/, '.pub'))); } catch (e) {}
         }
       }
     } catch (e) { /* de kas is best-effort; de foto komt anders gewoon niet */ }
   }
+  /* ALLEEN WAT DE CLOUD OPENBAAR NOEMDE. De randcache serveert zonder sessie,
+     dus hij mag alleen bevatten wat de cloud met een publieke cachekop gaf
+     (server/media/toegang.js). Een entry zonder `.pub`-merkteken stamt van vóór
+     die regel en kan een privébestand zijn: die wordt niet meer uitgeleverd. */
   function kasLees(url) {
     try {
-      const buf = fs.readFileSync(path.join(KAS_DIR, kasNaam(url) + '.bin'));
+      if (!fs.existsSync(path.join(KAS_DIR, kasNaam(url) + '.pub'))) return null;
+      /* Niet langer dan de cloud het openbaar liet cachen: een foto die van de
+         etalage is gehaald, hoort ook van het kastje te verdwijnen. */
+      const bin = path.join(KAS_DIR, kasNaam(url) + '.bin');
+      if (Date.now() - fs.statSync(bin).mtimeMs > OPENBAAR_MS) return null;
+      const buf = fs.readFileSync(bin);
       let type = 'application/octet-stream';
       try { type = fs.readFileSync(path.join(KAS_DIR, kasNaam(url) + '.typ'), 'utf8'); } catch (e) {}
-      return { buf, type };
+      return { buf, type, cc: CACHE_OPENBAAR };   // alleen openbaar beeld staat hier
     } catch (e) { return null; }
   }
   // hoeveel foto's staan er in de randcache en hoe groot is die (voor het
@@ -99,7 +111,11 @@ module.exports = (ctx) => {
     res.status(r.status);
     r.headers.forEach((v, k) => { if (!HOP.includes(k.toLowerCase()) && k.toLowerCase() !== 'content-encoding') res.setHeader(k, v); });
     // media die over de lijn komt, gaat en passant de randcache in
-    const wilKas = req.method === 'GET' && r.status === 200 && req.originalUrl.startsWith('/media/');
+    // ... maar alleen wat de cloud zelf openbaar noemde: een ondertekende privélink
+    // (Cache-Control private/no-store) komt nooit op een kastje dat zonder sessie serveert
+    const cc = String(r.headers.get('cache-control') || '').toLowerCase();
+    const wilKas = req.method === 'GET' && r.status === 200 && req.originalUrl.startsWith('/media/') &&
+      /(^|,)\s*public\b/.test(cc) && !/no-store|private/.test(cc);
     const stukken = wilKas ? [] : null;
     let totaal = 0, heel = true;
     if (r.body) {

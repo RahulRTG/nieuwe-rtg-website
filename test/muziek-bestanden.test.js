@@ -87,7 +87,7 @@ test('een maker publiceert eigen muziek in de feed zonder een kale publieke medi
 
   opslagNaam = fs.readdirSync(path.join(TMP, 'media')).find(x => x.endsWith('.mp3'));
   assert.match(opslagNaam, /^prive-[0-9a-f]{32}\.mp3$/);
-  assert.equal((await fetch(base + '/media/' + opslagNaam)).status, 400,
+  assert.equal((await fetch(base + '/media/' + opslagNaam)).status, 404,
     'de gewone publieke mediaroute weigert een privébestand');
 });
 

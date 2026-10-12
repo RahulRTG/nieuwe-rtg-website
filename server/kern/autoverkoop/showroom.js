@@ -35,7 +35,11 @@ module.exports = (ctx) => {
       const uit = [];
       for (const f of data.fotos.slice(0, 8)) {
         if (typeof f !== 'string') continue;
-        if (media && media.isRef(f)) { uit.push(f); continue; }
+        /* Een bestaande verwijzing blijft alleen staan als hij AL bij deze auto
+           hoorde. De showroom is een openbare plek (media/toegang.js): een
+           willekeurige /media-naam die hier binnenkwam, zou daarmee openbaar
+           worden -- ook het privébeeld van een ander. */
+        if (media && media.isRef(f)) { if ((a.fotos || []).includes(f)) uit.push(f); continue; }
         const ref = media ? await media.bewaarPubliek(f, 900 * 1024) : null;
         if (ref) uit.push(ref);
       }

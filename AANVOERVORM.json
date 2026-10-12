@@ -1,40 +1,42 @@
 {
   "stempel": {
-    "op": "2026-09-19T19:06:50.003Z",
-    "commit": "6083f652",
+    "op": "2026-10-11T22:28:56.975Z",
+    "commit": "4ac469c0",
     "boomVuil": false,
-    "boomAnders": 34,
+    "boomAnders": 7,
     "instrument": "scripts/aanvoervorm.js",
-    "node": "v22.22.2"
+    "node": "v22.22.0"
   },
-  "uitleg": "Delen de vijf terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de lezer van scripts/objectmodel.js -- dezelfde als bij de Asset- en Koopbaar-metingen, want een tweede parser maakt de vergelijking waardeloos. De as is het TERREIN en niet de module, en er wordt over TWEE domeinlijsten gemeten (ruim en smal) zodat de uitslag niet op de lijst drijft.",
+  "uitleg": "Delen de zes terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de lezer van scripts/objectmodel.js -- dezelfde als bij de Asset- en Koopbaar-metingen, want een tweede parser maakt de vergelijking waardeloos. De as is het TERREIN en niet de module, en er wordt over TWEE domeinlijsten gemeten (ruim en smal) zodat de uitslag niet op de lijst drijft.",
   "grens": "Dit meet de vorm van de DATA en niet of aanvoer als PROCES bestaat -- dat is de vraag van een ketenproef (scripts/adamproef.js). Een lage uitslag zegt dat aanvoer geen OBJECT is, niet dat er geen aanvoer is. Envelopvelden (id, naam, status, at, ...) vallen eruit: die staan overal en meten de verpakking. En de lezer van objectmodel.js kijkt alleen in server/kern, server/bedrijf, server/school en server/papieren -- een bron die in een ROUTE woont is voor deze meter onzichtbaar, en dat is geen nul maar een blinde vlek. Zie `terreinenLeeg`.",
   "conclusie": "GEEN GEDEELDE VORM: geen enkel veld staat in alle gemeten terreinen, onder geen van beide domeinlijsten. Een `Vondst` als objecttype met verplichte velden is daarmee niet gerechtvaardigd; de vorm die overleeft is een PROJECTIE met een klein aantal etiketten, per aanroep samengesteld door het brondomein zelf -- de vorm van kern/levensgraaf/graaf.js, en de uitweg die COMMERCE.md voor `Koopbaar` al koos.",
   "geenGedeeldeVorm": true,
   "ruim": {
-    "uitleg": "Delen de vijf terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de lezer van scripts/objectmodel.js -- dezelfde als bij de Asset- en Koopbaar-metingen, want een tweede parser maakt de vergelijking waardeloos. De as is het TERREIN en niet de module.",
+    "uitleg": "Delen de zes terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de lezer van scripts/objectmodel.js -- dezelfde als bij de Asset- en Koopbaar-metingen, want een tweede parser maakt de vergelijking waardeloos. De as is het TERREIN en niet de module.",
     "grens": "Dit meet de vorm van de DATA en niet of aanvoer als proces bestaat -- dat is de vraag van een ketenproef. Een lage uitslag zegt dat aanvoer geen OBJECT is, niet dat er geen aanvoer is. De modulelijst per terrein is met opzet ruim: een module die er ten onrechte bij staat verlaagt hooguit de gedeeldheid, een module die ontbreekt VERBERGT juist een gedeelde vorm. De uitslag is dus een ONDERgrens voor \"ze delen niets\". Envelopvelden (id, naam, status, at, ...) vallen eruit: die staan overal en meten de verpakking.",
     "terreinen": [
       "werk",
       "opleiding",
       "opvang",
       "vervoer",
-      "wonen"
+      "wonen",
+      "ondernemen"
     ],
     "terreinenLeeg": [],
-    "vormen": 100,
-    "velden": 209,
+    "vormen": 157,
+    "velden": 291,
     "perTerrein": {
       "werk": {
-        "velden": 18,
+        "velden": 21,
         "modules": [
           "server/kern/werk.js",
+          "server/kern/werkbetaling.js",
           "server/kern/werkplaats.js",
           "server/kern/werkplek.js"
         ]
       },
       "opleiding": {
-        "velden": 135,
+        "velden": 136,
         "modules": [
           "server/kern/beroepenbieb/index.js",
           "server/kern/onderwijs-ladder.js",
@@ -75,19 +77,20 @@
         ]
       },
       "opvang": {
-        "velden": 5,
+        "velden": 6,
         "modules": [
           "server/kern/verzorging/opvang.js",
           "server/kern/verzorging/opvangleden.js"
         ]
       },
       "vervoer": {
-        "velden": 60,
+        "velden": 67,
         "modules": [
           "server/kern/mobiliteit/abonnement.js",
           "server/kern/mobiliteit/assets.js",
           "server/kern/mobiliteit/cdt-export.js",
           "server/kern/mobiliteit/dispatch.js",
+          "server/kern/mobiliteit/kaarttoegang.js",
           "server/kern/mobiliteit/modulecatalogus.js",
           "server/kern/mobiliteit/overeenkomst.js",
           "server/kern/mobiliteit/pendel-rooster.js",
@@ -103,23 +106,65 @@
         "modules": [
           "server/kern/woningonderhoud.js"
         ]
+      },
+      "ondernemen": {
+        "velden": 89,
+        "modules": [
+          "server/kern/concern/duiding.js",
+          "server/kern/concern/employment-organigram.js",
+          "server/kern/concern/employment.js",
+          "server/kern/concern/entiteit.js",
+          "server/kern/concern/scope.js",
+          "server/kern/concern/tijd.js",
+          "server/kern/concern/uitnodiging.js",
+          "server/kern/concern/verandering.js",
+          "server/kern/concern/vestiging.js",
+          "server/kern/onderneming/beeld.js",
+          "server/kern/onderneming/belasting.js",
+          "server/kern/onderneming/bestuur-handelingen.js",
+          "server/kern/onderneming/bestuur.js",
+          "server/kern/onderneming/capaciteit.js",
+          "server/kern/onderneming/catalogus.js",
+          "server/kern/onderneming/contracten.js",
+          "server/kern/onderneming/crediteuren.js",
+          "server/kern/onderneming/dagbeeld.js",
+          "server/kern/onderneming/debiteuren.js",
+          "server/kern/onderneming/fase.js",
+          "server/kern/onderneming/kans.js",
+          "server/kern/onderneming/kas.js",
+          "server/kern/onderneming/klussen.js",
+          "server/kern/onderneming/levensloop.js",
+          "server/kern/onderneming/mallprofiel.js",
+          "server/kern/onderneming/oprichting.js",
+          "server/kern/onderneming/pijplijn-opvolging.js",
+          "server/kern/onderneming/pijplijn.js",
+          "server/kern/onderneming/relaties.js",
+          "server/kern/onderneming/simulatie.js",
+          "server/kern/onderneming/toegang.js",
+          "server/kern/onderneming/voorraad.js",
+          "server/kern/onderneming/werving.js"
+        ]
       }
     },
     "inAlleTerreinen": [],
-    "inMinstensHelft": [],
-    "inEenTerreinPct": 94.3,
+    "inMinstensHelft": [
+      "geldigTot"
+    ],
+    "inEenTerreinPct": 89.7,
     "paren": [
       {
         "paar": [
           "werk",
           "opleiding"
         ],
-        "gedeeld": 6,
-        "overlap": 0.041,
+        "gedeeld": 8,
+        "overlap": 0.054,
         "velden": [
           "af",
+          "bestemming",
           "grootteMB",
           "icon",
+          "mislukt",
           "sterren",
           "versie",
           "winkelwaardeCenten"
@@ -128,10 +173,46 @@
       {
         "paar": [
           "opleiding",
+          "ondernemen"
+        ],
+        "gedeeld": 11,
+        "overlap": 0.051,
+        "velden": [
+          "actief",
+          "contact",
+          "geldigTot",
+          "nummer",
+          "open",
+          "rechten",
+          "rol",
+          "sinds",
+          "sleutel",
+          "vestiging",
+          "wens"
+        ]
+      },
+      {
+        "paar": [
+          "vervoer",
+          "ondernemen"
+        ],
+        "gedeeld": 5,
+        "overlap": 0.033,
+        "velden": [
+          "dagen",
+          "geldigTot",
+          "key",
+          "toegang",
+          "totaal"
+        ]
+      },
+      {
+        "paar": [
+          "opleiding",
           "vervoer"
         ],
         "gedeeld": 4,
-        "overlap": 0.021,
+        "overlap": 0.02,
         "velden": [
           "geldigTot",
           "ingetrokken",
@@ -141,11 +222,23 @@
       },
       {
         "paar": [
+          "werk",
+          "ondernemen"
+        ],
+        "gedeeld": 2,
+        "overlap": 0.019,
+        "velden": [
+          "plan",
+          "soortLabel"
+        ]
+      },
+      {
+        "paar": [
           "opvang",
           "vervoer"
         ],
         "gedeeld": 1,
-        "overlap": 0.016,
+        "overlap": 0.014,
         "velden": [
           "capaciteit"
         ]
@@ -208,8 +301,26 @@
       },
       {
         "paar": [
+          "opvang",
+          "ondernemen"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      },
+      {
+        "paar": [
           "vervoer",
           "wonen"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      },
+      {
+        "paar": [
+          "wonen",
+          "ondernemen"
         ],
         "gedeeld": 0,
         "overlap": 0,
@@ -218,7 +329,7 @@
     ]
   },
   "smal": {
-    "uitleg": "Delen de vijf terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de lezer van scripts/objectmodel.js -- dezelfde als bij de Asset- en Koopbaar-metingen, want een tweede parser maakt de vergelijking waardeloos. De as is het TERREIN en niet de module.",
+    "uitleg": "Delen de zes terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de lezer van scripts/objectmodel.js -- dezelfde als bij de Asset- en Koopbaar-metingen, want een tweede parser maakt de vergelijking waardeloos. De as is het TERREIN en niet de module.",
     "grens": "Dit meet de vorm van de DATA en niet of aanvoer als proces bestaat -- dat is de vraag van een ketenproef. Een lage uitslag zegt dat aanvoer geen OBJECT is, niet dat er geen aanvoer is. De modulelijst per terrein is met opzet ruim: een module die er ten onrechte bij staat verlaagt hooguit de gedeeldheid, een module die ontbreekt VERBERGT juist een gedeelde vorm. De uitslag is dus een ONDERgrens voor \"ze delen niets\". Envelopvelden (id, naam, status, at, ...) vallen eruit: die staan overal en meten de verpakking.",
     "terreinen": [
       "werk",
@@ -233,10 +344,14 @@
       {
         "terrein": "wonen",
         "reden": "geen enkele objectvorm gevonden onder /^server\\/routes\\/member\\/handel\\/vastgoed\\.js$/"
+      },
+      {
+        "terrein": "ondernemen",
+        "reden": "geen enkele objectvorm gevonden onder /^server\\/kern\\/onderneming\\/(rechtsvorm|plan)/"
       }
     ],
     "vormen": 7,
-    "velden": 17,
+    "velden": 18,
     "perTerrein": {
       "werk": {
         "velden": 3,
@@ -251,7 +366,7 @@
         ]
       },
       "opvang": {
-        "velden": 5,
+        "velden": 6,
         "modules": [
           "server/kern/verzorging/opvang.js",
           "server/kern/verzorging/opvangleden.js"

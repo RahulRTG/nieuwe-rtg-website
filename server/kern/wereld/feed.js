@@ -5,6 +5,7 @@
 
 const rechten = require('./rechten');
 const context = require('./context');
+const { toon } = require('../../media/toegang');
 
 /* Welke bronnen horen bij welke modus. Eén tabel; de poort en het scherm lezen
    allebei deze. Een bron met `eist` doet alleen mee als de pas dat vermogen
@@ -52,7 +53,8 @@ module.exports = ({ db, codenaamVan, zijnVrienden, salonToegang, pulseLezen }) =
       .filter(p => salonToegang ? salonToegang({ key: mij, tier }, p) : p.authorKey === mij)
       .map(p => item('salon', {
         id: p.id, kring: p.authorKey === mij || !!(zijnVrienden && zijnVrienden(mij, p.authorKey)), wereld: 'lifestyle', auteur: p.author, tekst: p.text, at: p.at,
-        beeld: Array.isArray(p.media) && p.media.length ? p.media : (p.photo ? [{ src: p.photo, alt: '' }] : []),
+        /* na de Salon-leespoort hierboven: privébeeld wordt een ondertekende link */
+        beeld: Array.isArray(p.media) && p.media.length ? p.media.map(m => Object.assign({}, m, { src: toon(m && m.src) })) : (p.photo ? [{ src: toon(p.photo), alt: '' }] : []),
         likes: (p.baseLikes || 0) + Object.keys(p.likedBy || {}).length,
         reacties: (p.comments || []).length,
         type: p.momentType || (p.offer || p.deal ? 'offer' : 'moment'),
@@ -133,7 +135,9 @@ module.exports = ({ db, codenaamVan, zijnVrienden, salonToegang, pulseLezen }) =
            of er iets staat. */
         auteur: (codenaamVan ? codenaamVan(s.van) : '') || 'Een lid',
         tekst: s.tekst || '', at: s.at, type: 'story',
-        beeld: s.foto ? [{ src: '/media/' + s.foto, alt: '' }] : []
+        /* Een verhaal is voor vrienden (filter hierboven) en nooit openbaar: de
+           kale naam werd hier een /media-URL die iedereen een jaar kon opvragen. */
+        beeld: s.foto ? [{ src: toon(s.foto), alt: '' }] : []
       }))
   };
 

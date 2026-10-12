@@ -433,8 +433,13 @@ body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kompas{
 }
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kompaskaart{
   margin:0!important;padding:1rem!important;border-color:var(--rtg-v-line)!important;
-  background:var(--rtg-v-card)!important
+  background:var(--rtg-v-card)!important;color:var(--rtg-v-ink)!important
 }
+/* Zelfde reparatie als de kaart van het volgende reismoment: de lichte letters van de
+   oude donkere kaart haalden op de dashboardkaart 2,2:1. */
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kompaskaart :is(b,strong,em){color:var(--rtg-v-ink)!important}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kompaskaart small{color:var(--rtg-v-muted)!important}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kompaskaart .statusicoon.goed{color:#2f7256!important}
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] :where(.reisregister,.canvasband,.reisdiensten>a,.sectiekop,.taxilinks,.taxirechts){
   border-color:var(--rtg-v-line)!important;background-color:var(--rtg-v-card)!important
 }
@@ -762,3 +767,7 @@ body[data-rtg-vandaag-luxe][data-rtg-world="foundation"] .buurtknop.vol{
   }
   body[data-rtg-world-dashboard-ready="true"] :where(.dagkop,.kaartraster)::before{transform:none!important}
 }
+
+/* De bestemmingskaart is een foto onder een donker masker; kleine tekst daarop is wit
+   (CLAUDE.md: op zwart haalt bordeaux noch grijs genoeg contrast). */
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster .dagkop :is(.micro,.sub){color:#f4f0e9!important}

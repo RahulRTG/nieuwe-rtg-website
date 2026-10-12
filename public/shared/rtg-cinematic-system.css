@@ -639,15 +639,9 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
   body[data-rtg-cinematic="true"] .rtg-edge-mark .wd-world-label{display:none!important}
   body[data-rtg-cinematic="true"] .rtg-edge-crumbs,
   body[data-rtg-cinematic="true"] .rtg-edge-worldbar{display:none!important}
-  /* De statusknop blijft: op mobiel is hij de enige weg naar beveiliging en
-     systeemstatus (de Adaptive Edge heeft er geen eigen actie voor). Hij krijgt de
-     maat van de taalknop ernaast, zonder zijn tekst. */
+  body[data-rtg-cinematic="true"] .rtg-edge-state,
   body[data-rtg-cinematic="true"] .wp-edit-images,
   body[data-rtg-cinematic="true"] .rtg-edge-search{display:none!important}
-  body[data-rtg-cinematic="true"] .rtg-edge-state{
-    min-width:44px!important;min-height:44px!important;padding:0 10px!important;margin-inline-start:auto!important;
-  }
-  body[data-rtg-cinematic="true"] .rtg-edge-state~.rtg-edge-language{margin-inline-start:8px!important}
   body[data-rtg-cinematic="true"] .rtg-edge-language{
     display:grid!important;place-items:center!important;margin-inline-start:auto!important;
     width:44px!important;height:44px!important;border:1px solid rgba(33,29,22,.18)!important;
@@ -681,12 +675,13 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
   /* De scene is de mobiele kop (#534; besluit van de eigenaar, 11 oktober 2026): het
      BEELD van de oude fotokop eronder zou een tweede kop zijn, dus dat wijkt -- foto,
      label, titel en bijschrift. Wat er aan inhoud in staat (de bevestigde reis, de
-     status, de knop) blijft staan. Alleen waar de scene er echt staat, en alleen de KOP
+     intro, de passtatus, de knop) blijft staan -- ook binnen .wh-photo-copy. Alleen waar de scene er echt staat, en alleen de KOP
      (een .wh-photo met een h1): een projectkaart met .wh-photo blijft heel. */
   body[data-rtg-cinematic="true"][data-rtg-shell="mobile"] .wd-home:has(>.wp-scene) .wh-photo:has(>h1,>.wh-photo-copy>h1){
     min-height:0!important;height:auto!important;background:none!important;
   }
-  body[data-rtg-cinematic="true"][data-rtg-shell="mobile"] .wd-home:has(>.wp-scene) .wh-photo:has(>h1,>.wh-photo-copy>h1)>:is(img,h1,.wh-eyebrow,.wh-photo-copy,.wh-caption,.wh-foundation-label,.wh-free,.buurtey){display:none!important}
+  body[data-rtg-cinematic="true"][data-rtg-shell="mobile"] .wd-home:has(>.wp-scene) .wh-photo:has(>h1,>.wh-photo-copy>h1)>:is(img,h1,.wh-eyebrow,.wh-hero-label,.ey,.wh-caption,.wh-foundation-label,.wh-free,.buurtey){display:none!important}
+  body[data-rtg-cinematic="true"][data-rtg-shell="mobile"] .wd-home:has(>.wp-scene) .wh-photo:has(>h1,>.wh-photo-copy>h1)>.wh-photo-copy>h1{display:none!important}
   body[data-rtg-cinematic="true"][data-rtg-shell="mobile"] .wd-home>.wp-scene{
     display:block!important;width:100%!important;min-height:clamp(520px,72svh,720px)!important;
     overflow:hidden!important;border:0!important;border-radius:0!important;background:#11100e!important;
@@ -762,3 +757,7 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
   body[data-rtg-cinematic="true"] .rv-werk{grid-template-rows:minmax(0,1fr)!important}
   body[data-rtg-cinematic="true"] .rv-tabs{display:none!important}
 }
+
+/* Het label van de hoofdactie volgt de letter van de balk waar het in staat; een vaste
+   lichte letter verdween op de lichte balk van de Business-kant (WorkOS, 768px). */
+body[data-rtg-cinematic="true"] .rtg-edge-bottom .rtg-edge-action :is(button,span){color:var(--edge-copy)!important}

@@ -106,7 +106,10 @@ test('Mijn loopbaan en het deelbewijs: van een leeg ledger naar een regel die ee
         'zonder dienstverband zegt het scherm dat, en blijft het niet leeg');
       const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#meeneem')]);
       assert.match(dl.suggestedFilename(), /^mijn-loopbaan-\d{4}-\d{2}-\d{2}\.json$/);
-      const bestand = JSON.parse(fs.readFileSync(await dl.path(), 'utf8'));
+      /* saveAs en niet path(): in CI draait de browser op afstand, en dan bestaat path() niet. */
+      const kopie = path.join(os.tmpdir(), 'rtg-loopbaan-' + Date.now() + '.json');
+      await dl.saveAs(kopie);
+      const bestand = JSON.parse(fs.readFileSync(kopie, 'utf8'));
       assert.equal(bestand.vorm, 'rtg-loopbaan-afschrift/1');
       assert.deepEqual(bestand.feiten.map(f => f.wat).sort(),
         ['Iets dat een vreemde niet hoeft te zien', 'Nederlands kampioen junior'],

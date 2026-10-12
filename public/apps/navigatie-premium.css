@@ -140,3 +140,11 @@ body.nav-route .intelligence-dock{opacity:0;transform:translateX(18px);pointer-e
    de www-kamer ivoor, dus volgen zijn eigen inkten (room, groen, goud) daar de
    --rtg-p-tokens. Buiten de pariteitslaag bestaan die niet en geldt de oude kleur. */
 .paneel{--nav-cream:var(--rtg-p-inkt,#f3eee4);--nav-green:var(--rtg-p-groen,#63d692);--nav-gold:var(--rtg-p-metaal,#d7b56d)}
+/* Tussen 1000 en 1200px geeft de bureauschil de kaart een smalle middenkolom; de kop
+   brak dan over drie regels en Kaarten viel onder de zwevende zoekbalk. De titel
+   blijft voor schermlezers staan, zodat de knoppen op één regel passen, en de
+   zoekbalk begint onder die regel (travel-os.css zet hem met !important). */
+@media(min-width:1000px) and (max-width:1199px){
+  body[data-rtg-desktop] .wd-page[data-rtg-canvas-surface] .kop h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  body.travel-os-map[data-rtg-desktop] .wd-page[data-rtg-canvas-surface] .zoekwrap{top:calc(var(--tos-top,0px) + 4.6rem)!important}
+}

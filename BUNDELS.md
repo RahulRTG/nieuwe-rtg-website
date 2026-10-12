@@ -402,9 +402,9 @@ omlaag.
 | `personeel-03b.js` | Team access uses the same canvas and Edge as the member portal |
 | `personeel-03c.js` | MIJN TIJD (VRIJHEID.md): de tab waarin een medewerker zijn eigen tijd ziet en vraagt |
 | `personeel-04.js` | De apparaatpoort: bedrijf, medewerker en pincode; daarna de kantoorpoort |
-| `personeel-05.js` | aanmelden met de kassacode |
-| `personeel-05a.js` | de kantoordeur op naam: pin, passkey en wat de deur antwoordt |
-| `personeel-05b.js` | de dienstkeuze en de sectorstap |
+| `personeel-04a.js` | de kantoorinlog: de code (buiten productie), de ene accountdeur en de uitnodiging |
+| `personeel-05.js` | de kantoordeur op naam (pin, passkey, het antwoord) en het begin van het kantoorscherm |
+| `personeel-05a.js` | de dienstkeuze en de sectorstap |
 | `personeel-06.js` | de borden van dit personeelslid |
 | `personeel-06a.js` | de voorspeller op de PDA: het team ziet de piek van morgen aankomen |
 | `personeel-07.js` | in- en uitklokken |

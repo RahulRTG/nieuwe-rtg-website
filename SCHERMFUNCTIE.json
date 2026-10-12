@@ -3,12 +3,12 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-10-12",
-    "commit": "c0f9031da"
+    "commit": "da0af78d1"
   },
   "bronnen": {
     "schermroutes": {
       "op": "2026-10-12",
-      "commit": "c55316a42",
+      "commit": "74ba9d3c8",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,
@@ -851,9 +851,9 @@
           "public/apps/personeel/personeel-03b.js",
           "public/apps/personeel/personeel-03c.js",
           "public/apps/personeel/personeel-04.js",
+          "public/apps/personeel/personeel-04a.js",
           "public/apps/personeel/personeel-05.js",
           "public/apps/personeel/personeel-05a.js",
-          "public/apps/personeel/personeel-05b.js",
           "public/apps/personeel/personeel-06.js",
           "public/apps/personeel/personeel-06a.js",
           "public/apps/personeel/personeel-07.js",
@@ -8430,7 +8430,7 @@
         "public/apps/office/app.js",
         "public/apps/office/app/app-01.js",
         "public/apps/personeel.js",
-        "public/apps/personeel/personeel-05a.js",
+        "public/apps/personeel/personeel-05.js",
         "public/apps/websitestudio.html",
         "public/shared/randen.js",
         "server/kern/appgids-data/deel7.js"
@@ -9431,7 +9431,7 @@
         "public/apps/kantoren.html",
         "public/apps/magnaat.html",
         "public/apps/personeel.js",
-        "public/apps/personeel/personeel-05a.js",
+        "public/apps/personeel/personeel-05.js",
         "server/kern/appgids-data/deel1b.js",
         "server/kern/appgids-data/deel1c.js"
       ]

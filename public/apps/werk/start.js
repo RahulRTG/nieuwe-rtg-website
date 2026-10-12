@@ -20,10 +20,14 @@
        werkruimte die zonder tenant draait, hoort gewoon te werken. */
     if (window.RTGWerkMerk) window.RTGWerkMerk.laad();
     K.api('/start', {}).then(function (r) {
-      var d = r.body;
+      var d = r.body || {};
       if (d.error) return K.meld(d.error);
+      /* Een lijf zonder `wie` of `werkruimte` is geen startscherm: geen JSON,
+         een verbroken verbinding, of een verzoek dat WebKit afbrak bij het
+         weg-navigeren (test/werkstart-onvolledig.test.js). */
+      if (!d.wie || !d.werkruimte) return K.meld('Het startscherm kon niet worden geladen. Probeer het opnieuw.');
       $('wWie').textContent = d.wie.naam + (d.wie.functie ? ' · ' + d.wie.functie : '') +
-        ' · ' + (d.wie.rollen.join(', ') || 'zonder rol') + (d.wie.alleenLezen ? ' · alleen lezen' : '');
+        ' · ' + ((d.wie.rollen || []).join(', ') || 'zonder rol') + (d.wie.alleenLezen ? ' · alleen lezen' : '');
       $('wRuimte').textContent = d.werkruimte.naam + ' (' + d.werkruimte.code + ')';
 
       var b = d.blokken || {};

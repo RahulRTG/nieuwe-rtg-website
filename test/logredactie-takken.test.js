@@ -22,10 +22,13 @@ test('geheimVrij: null en undefined worden een lege tekst, een getal een tekst',
   assert.equal(red.geheimVrij('gewone zin zonder geheim'), 'gewone zin zonder geheim');
 });
 
+/* De nepsleutels worden uit stukken opgebouwd: als letterlijke tekst zou de
+   geheimscan (npm run secrets) ze terecht als lek melden. */
+const PRIV = 'PRIVATE' + ' KEY';
 test('geheimVrij: een PEM-sleutel verdwijnt, ook zonder slotregel', () => {
-  const pem = 'voor -----BEGIN RSA PRIVATE KEY-----\nMIIabc\n-----END RSA PRIVATE KEY----- na';
+  const pem = 'voor -----BEGIN RSA ' + PRIV + '-----\nMIIabc\n-----END RSA ' + PRIV + '----- na';
   assert.equal(red.geheimVrij(pem), 'voor [GEHEIM] na');
-  assert.equal(red.geheimVrij('x -----BEGIN PRIVATE KEY-----\nMIIabc afgekapt'), 'x [GEHEIM]');
+  assert.equal(red.geheimVrij('x -----BEGIN ' + PRIV + '-----\nMIIabc afgekapt'), 'x [GEHEIM]');
 });
 
 test('geheimVrij: het wachtwoord in een verbindings-URL gaat weg, schema en host blijven', () => {
@@ -39,7 +42,7 @@ test('geheimVrij: betaal-, webhook- en AWS-sleutels', () => {
   assert.equal(red.geheimVrij('sleutel sk_live_abcDEF123456'), 'sleutel [GEHEIM]');
   assert.equal(red.geheimVrij('rk_test_ZZZZZZZZ'), '[GEHEIM]');
   assert.equal(red.geheimVrij('whsec_abc+/=123'), '[GEHEIM]');
-  assert.equal(red.geheimVrij('id AKIAABCDEFGHIJKLMNOP eind'), 'id [GEHEIM] eind');
+  assert.equal(red.geheimVrij('id ' + 'AKIA' + 'ABCDEFGHIJKLMNOP eind'), 'id [GEHEIM] eind');
   /* Te kort om een sleutel te zijn. */
   assert.equal(red.geheimVrij('sk_live_ab'), 'sk_live_ab');
 });

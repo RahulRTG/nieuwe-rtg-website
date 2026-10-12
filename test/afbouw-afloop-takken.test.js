@@ -29,9 +29,9 @@ const OUD = {};
 for (const k of ['RTG_AFLOOP_PAD', 'RTG_AFBOUW_SLOT', 'RTG_AFBOUW_SLOT_ACTIEF', 'RTG_AFBOUW_RUN_ID', 'RTG_AFLOOP_HARTSLAG']) OUD[k] = process.env[k];
 process.env.RTG_AFLOOP_PAD = AFLOOP_PAD;
 process.env.RTG_AFBOUW_SLOT = SLOT_PAD;
-delete require.cache[require.resolve(MODULE)];
+delete require.cache[require.resolve('../scripts/lib/afbouw-afloop')];
 delete require.cache[require.resolve('../scripts/afbouw-slot')];
-const A = require(MODULE);
+const A = require('../scripts/lib/afbouw-afloop');
 test.after(() => {
   for (const [k, v] of Object.entries(OUD)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
   fs.rmSync(PROEFMAP, { recursive: true, force: true });
@@ -243,8 +243,9 @@ test('begin: hartslag met kring, klaar met extra velden, en geen tweede afloop',
 /* De afloop bij het einde van het proces: in een kind, met zijn eigen bestand. */
 function kindRonde(regel, opties = {}) {
   const pad = path.join(PROEFMAP, 'kind-' + Math.random().toString(36).slice(2) + '.json');
-  const code = 'const A = require(' + JSON.stringify(MODULE) + '); ' + regel;
-  return { pad, kind: spawn(process.execPath, ['-e', code], { stdio: ['ignore', 'pipe', 'inherit'],
+  /* Het pad van de module gaat als argument mee en niet als tekst in de code. */
+  const code = 'const A = require(process.argv[1]); ' + regel;
+  return { pad, kind: spawn(process.execPath, ['-e', code, MODULE], { stdio: ['ignore', 'pipe', 'inherit'],
     env: { ...process.env, RTG_AFLOOP_PAD: pad, RTG_AFLOOP_HARTSLAG: '', ...(opties.env || {}) } }) };
 }
 const afgelopen = (kind) => new Promise(r => kind.once('exit', (code, sig) => r({ code, sig })));

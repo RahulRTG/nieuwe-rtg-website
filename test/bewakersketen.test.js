@@ -41,11 +41,8 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const path = require('path');
-const { execFileSync } = require('child_process');
 const routedekking = require('../server/kern/routedekking');
 
-const WORTEL = path.join(__dirname, '..');
 
 /* De zes invarianten. Per domein het slot dat erop hoort te zitten; meerdere
    namen betekent "een van deze volstaat" (de boardroom is een zwaardere office,
@@ -127,10 +124,10 @@ function routes() {
   if (_routes) return _routes;
   /* Aan de LEVENDE router vragen, want dat is de hele reden dat deze toets kan
      bestaan. Een broncode-scan ziet de helft van de bewakers niet. */
-  const kaart = JSON.parse(execFileSync(process.execPath,
-    [path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
-    { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024,
-      stdio: ['ignore', 'pipe', 'ignore'], env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } }));
+  /* Via de gedeelde routekaart() (scripts/lib/routes.js): een keer opnieuw bij
+     een bezette poort, en de stderr van het kind in de fout. Zelf het script
+     starten liep in de CI op dezelfde poortrace als routedekking (#584). */
+  const kaart = require('../scripts/lib/routes').routekaart();
   _routes = routedekking.inventaris(kaart.routes).routes;
   assert.ok(_routes.length > 1000, 'de routekaart geeft routes (' + _routes.length + ')');
   return _routes;

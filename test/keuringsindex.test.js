@@ -27,7 +27,6 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const { execFileSync } = require('child_process');
 const { maakDekkingsIndex, DEKKING_KAP } = require('../scripts/lib/dekkingsindex');
 
 const WORTEL = path.join(__dirname, '..');
@@ -93,10 +92,10 @@ test('3. EN OP DE ECHTE ROUTEKAART TEGEN DE ECHTE TOETSEN, route voor route', ()
   /* Dit is de bewering die telt. Verzonnen gevallen dekken af wat ik heb
      bedacht; de echte 4000+ routes tegen de echte toetstekst dekken af wat ik
      niet heb bedacht. */
-  const uit = execFileSync(process.execPath,
-    [path.join(WORTEL, 'scripts/routekaart.js'), '--json'],
-    { cwd: WORTEL, encoding: 'utf8', timeout: 180000, maxBuffer: 32 * 1024 * 1024 });
-  const routes = (JSON.parse(uit).routes || [])
+  /* Via de gedeelde routekaart() (scripts/lib/routes.js): een keer opnieuw bij
+     een bezette poort, en de stderr van het kind in de fout. Zelf het script
+     starten liep in de CI op dezelfde poortrace als routedekking (#584). */
+  const routes = (require('../scripts/lib/routes').routekaart().routes || [])
     .map(r => (typeof r === 'string' ? r : r.pad || r.path)).filter(Boolean)
     .filter(r => r.startsWith('/api/'));
   assert.ok(routes.length > 1000, 'de routekaart hoort duizenden routes te geven, kreeg ' + routes.length);

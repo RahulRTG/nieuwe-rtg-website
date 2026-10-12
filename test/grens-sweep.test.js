@@ -36,7 +36,6 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { execFileSync } = require('child_process');
 const { startServer, stop } = require('./helper');
 
 const WORTEL = path.join(__dirname, '..');
@@ -48,9 +47,10 @@ let srv, base, A, B;
 const A_NAAM = 'Alfa Kluisnaam Zeldzaam';
 const A_MAIL_LOKAAL = 'alfa-kluis-zeldzaam';
 
-const routekaart = () => JSON.parse(execFileSync(process.execPath,
-  [path.join(WORTEL, 'scripts/routekaart.js'), '--json'],
-  { cwd: WORTEL, encoding: 'utf8', timeout: 180000, maxBuffer: 64 * 1024 * 1024 })).routes || [];
+/* Via de gedeelde routekaart() (scripts/lib/routes.js): een keer opnieuw bij
+   een bezette poort, en de stderr van het kind in de fout. Zelf het script
+   starten liep in de CI op dezelfde poortrace als routedekking (#584). */
+const routekaart = () => require('../scripts/lib/routes').routekaart().routes || [];
 
 async function nieuwLid(naam, mailLokaal, n) {
   const u = (Date.now() + n * 7919).toString().slice(-9);

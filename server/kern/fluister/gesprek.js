@@ -12,7 +12,7 @@ module.exports = (ctx) => {
   const intent = require('./intent')(ctx);
   /* Het gesprek. Eerst de eigen commando's (onthouden, opvragen, vergeten);
      daarna Claude met het volledige persoonlijke beeld, of de eigen regels. */
-  async function fluisterZeg(key, codenaam, qIn, sess) {
+  async function fluisterZeg(key, codenaam, qIn, sess, scherm) {
     const q = String(qIn || '').trim().slice(0, 600);
     if (!q) return { status: 400, error: 'Zeg iets.' };
     if (teSnel(key)) return { status: 429, error: 'Even op adem komen: te veel berichten achter elkaar. Probeer het over een minuutje weer.' };
@@ -103,6 +103,8 @@ module.exports = (ctx) => {
 
     const stand = standVan(key);
     const seintjes = fluisterSeintjes(key);
+    // EDGE.md 14.4, niet bewaard
+    const sch = scherm && scherm.regel ? scherm : null;
     if (anthropic) {
       try {
         const ctx = 'Lid: ' + codenaam + '. ' +
@@ -112,8 +114,8 @@ module.exports = (ctx) => {
           (seintjes.length ? 'Actuele seintjes: ' + seintjes.map(x => x.tekst).join('; ') + '.' : '');
         const response = await anthropic.messages.create({
           model: 'claude-sonnet-5', max_tokens: 300,
-          system: require('../rahul').rahulLeadVoor(key) + 'je bent de persoonlijke rechterhand in de RTG-app. Antwoord kort, warm en concreet, in de taal van de vraag. Gebruik het persoonlijke beeld alleen als het helpt. ' + (sparHouding ? sparHouding() + ' ' : '') + 'Context: ' + ctx,
-          messages: [...p.gesprek.flatMap(g => [{ role: 'user', content: g.u }, { role: 'assistant', content: g.a }]), { role: 'user', content: q }]
+          system: require('../rahul').rahulLeadVoor(key) + 'je bent de persoonlijke rechterhand in de RTG-app. Antwoord kort, warm en concreet, in de taal van de vraag. Gebruik het persoonlijke beeld alleen als het helpt. ' + (sparHouding ? sparHouding() + ' ' : '') + 'Context: ' + ctx + (sch ? ' ' + sch.uitleg : ''),
+          messages: [...p.gesprek.flatMap(g => [{ role: 'user', content: g.u }, { role: 'assistant', content: g.a }]), { role: 'user', content: sch ? q + '\n\nActieve context: ' + sch.regel : q }]
         });
         /* VIA HET MODEL, EN DAT MOET HIER GEZEGD WORDEN. Van buitenaf is
            `pakte: true` niet te lezen als goedkoop of duur: deze functie

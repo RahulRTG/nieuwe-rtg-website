@@ -6,7 +6,21 @@
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
     });
   }
+  /* DE CONTEXT VOOR RAHUL. Met een Edge Blikveld komt hij daaruit (EDGE.md
+     par. 14.4): schermtitel, wereld, leesmoment en een verwijzing naar het
+     aangewezen object, die de server zelf opzoekt. De tekst van een gekozen
+     optie wordt dan NIET meer uit de DOM geschraapt: dat kon alles zijn, ook
+     een naam. Zonder blikveld blijft alles zoals het was. `app` blijft de
+     documenttitel, want de tab toont die en de suggesties lezen hem. */
   function context() {
+    var B = window.RTGEdgeBlikveld;
+    if (B && typeof B.voorRahul === 'function') {
+      try {
+        var b = B.voorRahul();
+        return { app: document.title.replace(/^RTG\s*/i, '') || 'RTG', deel: b.deel || 'Actieve pagina',
+          selectie: '', wereld: b.wereld, verwijzingen: b.verwijzingen, op: b.op };
+      } catch (e) { /* val terug op de oude bron */ }
+    }
     var actief = document.querySelector('[data-wk].actief,.rv-bank .actief,.lo-rail .actief,.pn-rail .actief,.po-rail .actief,nav .actief');
     var keuze = document.querySelector('select:focus,select option:checked,[aria-selected="true"]');
     var titel = document.title.replace(/^RTG\s*/i, '');

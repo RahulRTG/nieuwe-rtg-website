@@ -19,13 +19,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5453 |
-| servermodules (`server/**/*.js`) | 4267 |
+| servermodules (`server/**/*.js`) | 4270 |
 | routebestanden (`server/routes/**`) | 646 |
-| kernmodules (`server/kern/**`) | 2677 |
+| kernmodules (`server/kern/**`) | 2680 |
 | schermen (`public/**/*.html`) | 327 |
 | gedeelde browsermodules (`public/shared/*.js`) | 427 |
-| toetsbestanden (`test/*.test.js`) | 2136 |
-| schermtoetsen (`test/*.e2e.js`) | 308 |
+| toetsbestanden (`test/*.test.js`) | 2138 |
+| schermtoetsen (`test/*.e2e.js`) | 309 |
 
 ## 2. De weg van een verzoek
 
@@ -115,7 +115,7 @@ zie §5 -- er zijn nog 254 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 21 | 6 | 8 | 54 |
-| `member` | 742 | 75 | 17 | 456 |
+| `member` | 742 | 75 | 17 | 457 |
 | `supplier` | 640 | 137 | 6 | 345 |
 | `office` | 98 | 22 | 3 | 98 |
 | `staff` | 27 | 9 | 1 | 43 |
@@ -140,9 +140,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1685 |
+| kern-namen die routes aanraken | 1686 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 254 |
-| daarvan door precies één domein | 1431 |
+| daarvan door precies één domein | 1432 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

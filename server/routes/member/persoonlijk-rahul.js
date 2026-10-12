@@ -46,8 +46,10 @@ module.exports = (kern) => {
     const grendel = plafond.grendelVoor(plafondTrede, 'member');
     const grens = pestgrens.poort(req.session.key, req.body.q);
     if (grens) return res.json({ antwoord: grens.antwoord, pestgrens: true, weg: !!grens.weg });
+    // het scherm, aan DEZE sessie gebonden (EDGE.md par. 14.4)
+    const sch = kern.contextDomeinen.scherm(req.session, req.body.context);
     // sessie mee voor doen (reserveren, 24 uur plannen)
-    const r = await fluisterZeg(req.session.key, liveCodename(req.session), req.body.q, req.session);
+    const r = await fluisterZeg(req.session.key, liveCodename(req.session), req.body.q, req.session, sch.scherm);
     if (r.error) return res.status(r.status).json({ error: r.error });
     /* Rahul aan het stuur: pakten de eigen regels het gesprek NIET op
        (pakte=false), dan mag hij het met het AI-stuur alsnog echt DOEN;
@@ -67,10 +69,8 @@ module.exports = (kern) => {
       const lus = await stuurLus(req, {
         vraag: req.body.q,
         wereld: 'member',
-        /* De schermcontext van de client, ONGESANEERD meegegeven: saneren doet
-           kern/stuur/menscontext.js, op een plek waar de grens ook getoetst is.
-           Hier hem alvast opknippen zou een tweede contract zijn. */
-        context: req.body.context,
+        /* Ruw: kern/stuur/menscontext.js saneert, met de opzoeking hierboven. */
+        context: req.body.context, opzoeking: sch.opzoeking,
         // streamende voortgang voor een zware taak: elke stap wordt live
         // "Stap X/24: taxi zoeken..." op de eigen SSE-verbinding (de UI toont het)
         opStap: (v) => {

@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4515,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1685,
+    "kernBreedte": 1686,
     "kernGedeeld": 254,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 50,
@@ -4292,6 +4292,15 @@
       "meter": "nieuw in NORM.json: adressenKapot 23; mediaOndertitelOpen 4; serviceBevoegdheidStil 0; rotatieMetDeHand 15; uitvoerVoorgedragen 8; edgeContextSchuld 49; bronscannerGemist 593; bronscannerSpook 4 (was 6); meetkeuringGezakt 0; refundOnverklaard 15; schermeigenaarOpen 8; ratelTanden 167 -> 178 (strakker: elf meters erbij)",
       "reden": "Besluit van de eigenaar: elke schuldratel die als losse constante buiten NORM.json leefde, wordt een geijkte meter in NORM.json, zodat er een inventaris van latten is en scripts/normbasis.js een verhoging zonder notitie tegenhoudt. Het waren er elf: KAPOT_MAX (scripts/adressen.js), OPEN_MAX/STIL_MAX/ROTATIE_MAX (scripts/check.js regels 49, 65 en 75), VOORGEDRAGEN_MAX (scripts/lib/uitvoerproef.js), SCHULD_MAX (test/edgenieuwscherm.test.js), GEMIST_MAX en SPOOK_MAX (test/magnaat-capabilities.test.js), OPEN_MAX (test/meetkeuring.test.js), ONVERKLAARD_MAX (test/refundmigratie.test.js) en OPEN_MAX (test/schermeigenaar.test.js). De waarden zijn exact de constanten van dat moment, op een na: bronscannerSpook stond als constante op 6 terwijl de meting 4 geeft (POST /api/geld/, /api/member/spel/, /api/rtf/spel/ en /api/rtfos/), dus staat hij hier op 4 -- een ratel die twee boven de stand staat, laat twee nieuwe spookroutes ongemerkt door. Geen lat is verlaagd. De aanroepers houden hun eigen bewering en melding en lezen het getal via scripts/lib/normwaarde.js; rotatieMetDeHand en schermeigenaarOpen blijven daar gelijkheidsratels (minder dan de norm zakt ook, tot npm run norm:vast hem strak trekt).",
       "waarheen": "De waarden staan nu onder meters in NORM.json; elke meter staat in METERS van scripts/norm.js (met dezelfde telling als zijn aanroeper) en heeft een proef in test/meterijk.test.js. De losse constanten bestaan niet meer."
+    },
+    {
+      "datum": "2026-10-12",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1685,
+      "meter": "kernBreedte 1685 -> 1686",
+      "reden": "De Context Bridge (EDGE.md par. 14.4): /api/fluister leest kern.contextDomeinen, het aanmeldpunt waar een domein zijn eigen soort laat opzoeken (kern/stuur/menscontext-opzoek.js). Dat IS een nieuwe koppeling en geen beperking van de meter: de route moet de opzoekers aan de sessie van de vraag binden, want alleen de route kent die sessie. Het alternatief, de opzoekers aan kern.stuurLus of kern.fluister hangen, verstopt dezelfde koppeling achter een naam die er niet over gaat. GRENZEN.json noemt de naam bij member.",
+      "waarheen": "Geen: een tweede ingang die het scherm meestuurt (de Rahul-tab buiten de ledenroute) hoort dezelfde naam te gebruiken in plaats van een eigen."
     }
   ],
   "prestatie": {

@@ -69,7 +69,10 @@ const MAX_ITEMS = 8;       /* meer opties dan dit is geen keuze meer */
 const INTERACTIES = Object.freeze(['vergelijking', 'keuze', 'formulier', 'selectie', 'onbekend']);
 
 const CONTRACTSLEUTELS = Object.freeze(['presentatie', 'verwijzingen', 'interactie',
-  'app', 'deel', 'selectie', 'wereld', 'scherm']);
+  'app', 'deel', 'selectie', 'wereld', 'scherm', 'op']);
+
+/* `op` is het leesmoment van het blikveld; zie ./menscontext-vers.js. */
+const { verouderd, MAX_OUDERDOM_MS, MAX_VOORUIT_MS } = require('./menscontext-vers');
 
 /* Vrije tekst van een client: lengte af, besturingstekens weg, en verder niets
    veranderen -- een ingelezen waarde wordt nooit stilletjes verbeterd. */
@@ -107,6 +110,9 @@ function saneer(ruw, opties) {
       reden: 'Er is geen context meegestuurd; de fase kwam niet aan de beurt.' };
 
   const gewist = [];
+  const oud = ruw.op !== undefined ? verouderd(ruw.op, opties && opties.nu) : null;
+  if (oud) return { stand: 'NOT_RUN', context: null, woorden: [], gewist: [{ sleutel: 'op', reden: oud }],
+    reden: 'De context is niet gebruikt: ' + oud + '.' };
   const p = ruw.presentatie && typeof ruw.presentatie === 'object' ? ruw.presentatie : ruw;
   /* De bestaande vier vormen komen hier bij elkaar: app/deel/selectie van de
      Rahul-tab, wereld/scherm van de reis- en living-schermen. */
@@ -151,4 +157,4 @@ function saneer(ruw, opties) {
 }
 
 module.exports = { saneer, woordenVan, handtekening, INTERACTIES, CONTRACTSLEUTELS,
-  MAX_TEKST, MAX_ITEMS, MAX_WOORDEN };
+  MAX_TEKST, MAX_ITEMS, MAX_WOORDEN, MAX_OUDERDOM_MS, MAX_VOORUIT_MS };

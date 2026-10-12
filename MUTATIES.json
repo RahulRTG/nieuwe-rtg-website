@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T22:32:37.468Z",
-    "commit": "048593f7",
+    "op": "2026-10-12T07:38:56.264Z",
+    "commit": "b44de6aa",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2840,6 +2840,28 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "contextbrug-model.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "contextbrug.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "contextbrug.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/menscontext.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 8,
+      "geprobeerd": 1
     },
     "contextdoorgifte-server.test.js": {
       "soort": "puur",

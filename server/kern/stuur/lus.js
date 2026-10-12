@@ -50,7 +50,9 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
        geen context is OVERGESLAGEN, context zonder bruikbare rest is NOT_RUN. En
        PASS zegt alleen dat er iets gesaneerd is; of de resolver hem GEBRUIKT
        heeft staat op INTENT_RESOLVED (./lusstap.js). */
-    const ctx = menscontext.saneer(opties && opties.context);
+    /* De opzoeking komt van de ROUTE, die de sessie kent (./menscontext-opzoek.js);
+       zonder haar blijft elke verwijzing ONOPGELOST, zoals voorheen. */
+    const ctx = menscontext.saneer(opties && opties.context, opties && opties.opzoeking);
     const verw = ctx.verwijzingenUitslag || [];
     spoor && spoor.mark('CONTEXT_SANITIZED', ctx.stand, { woorden: ctx.woorden.length,
       gewist: ctx.gewist.length, verwijzingen: verw.length,

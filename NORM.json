@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4515,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1686,
+    "kernBreedte": 1687,
     "kernGedeeld": 254,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 50,
@@ -176,6 +176,15 @@
     "loopFabricTijdelijk": 168
   },
   "notities": [
+    {
+      "datum": "2026-10-12",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1686,
+      "meter": "kernBreedte 1686 -> 1687",
+      "reden": "AUTHORITY.md B4, vierde tegenlezing PR #587. De oplosser voor een gedeelde Salon-post in een DM (kern/sociaal/dmpost.js) staat als EEN instantie op de gedeelde sociale context (sctx.dmPost, routes/social.js) en wordt door de ledenkant (routes/social/leden.js) en de gezinskant (routes/social/gezinnen/vrienden.js) gebruikt, in plaats van twee kopieen die elk hun eigen poort zouden kunnen krijgen. Een eerdere versie las hem zonder destructureren en hield de meter zo op 1686; dat verstopte de koppeling voor scripts/grenzen.js (die sctx. niet telt) en is teruggedraaid.",
+      "waarheen": "test/media-toegang.test.js (de ontvanger ziet een gedeelde post alleen als HIJ hem mag lezen; de gezinskant lost op met de sessie van het gezinslid)"
+    },
     {
       "datum": "2026-10-12",
       "soort": "structureel",

@@ -4,6 +4,10 @@
 module.exports = ctx => {
   const { db, crypto, bearer, transactie, lijstVan, publiek, geldig, idemHash,
     doel, scope, dagen, dubbeltikMs } = ctx;
+  /* Alleen hele rijen tellen mee. Een beschadigde rij (null, of zonder toegang)
+     laat de legacy-migratie bewust staan; hij is geen uitnodiging, maar mag het
+     overzicht van de zaak ook niet breken. Hij blijft bewaard. */
+  const hele = (bron, code) => lijstVan(bron, code).filter(x => x && typeof x === 'object' && x.toegang);
   const ALFABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const maakPrefix = () => {
     let c = '';
@@ -37,9 +41,9 @@ module.exports = ctx => {
       role: role === 'manager' ? 'manager' : 'staff', func: func || null });
     const nu = Date.now();
     return transactie(bron => {
-      const lijst = lijstVan(bron, supplier.code);
+      const lijst = lijstVan(bron, supplier.code), heel = hele(bron, supplier.code);
       const ih = idem ? idemHash(supplier.code + '|' + idem) : null;
-      const bestaand = ih ? lijst.find(x => x.idem_hash === ih) : null;
+      const bestaand = ih ? heel.find(x => x.idem_hash === ih) : null;
       if (bestaand) {
         if (bestaand.idem_fingerprint !== fingerprint)
           return { status: 409, error: 'Deze herhaalsleutel hoort al bij een andere uitnodiging.' };
@@ -48,13 +52,13 @@ module.exports = ctx => {
           herhaald: true, invite: publiek(bestaand) };
       }
       const dubbelHash = idemHash('dubbel|' + supplier.code + '|' + fingerprint);
-      const dubbel = !ih && lijst.find(x => x.dubbel_hash === dubbelHash &&
+      const dubbel = !ih && heel.find(x => x.dubbel_hash === dubbelHash &&
         nu - Date.parse(x.toegang && x.toegang.issued_at) >= 0 &&
         nu - Date.parse(x.toegang && x.toegang.issued_at) < dubbeltikMs);
       if (dubbel) return { status: 409,
         error: 'Deze uitnodiging is zojuist al eenmalig uitgegeven en wordt niet opnieuw getoond. Roteer haar als de ontvanger de code niet kreeg.',
         herhaald: true, invite: publiek(dubbel) };
-      if (lijst.filter(x => !x.toegang.ingetrokken_at && !x.claim && !geldig(x)).length >= 500)
+      if (heel.filter(x => !x.toegang.ingetrokken_at && !x.claim && !geldig(x)).length >= 500)
         return { status: 409, error: 'Trek eerst oude personeelsuitnodigingen in.' };
       const id = 'sinv-' + crypto.randomBytes(8).toString('hex');
       const gemaakt = nieuweCode(bron, () => bearer.maak(spec(supplier.code, actorNaam)));
@@ -71,10 +75,10 @@ module.exports = ctx => {
   /* Ook een verlopen of door legacy-migratie gesloten rij blijft zichtbaar:
      alleen dan kan de manager hem bewust roteren. De kale code blijft weg. */
   const lijstInvites = supplierCode => transactie(bron => ({ ok: true,
-    invites: lijstVan(bron, supplierCode).filter(inv => !inv.claim).slice(-200).map(inv =>
+    invites: hele(bron, supplierCode).filter(inv => !inv.claim).slice(-200).map(inv =>
       Object.assign(publiek(inv), { status: geldig(inv) || 'actief' })) }));
   const trekInviteIn = (supplierCode, id, actor, reden) => transactie(bron => {
-    const inv = lijstVan(bron, supplierCode).find(x => x.id === String(id || ''));
+    const inv = hele(bron, supplierCode).find(x => x.id === String(id || ''));
     if (!inv) return { status: 404, error: 'Deze uitnodiging bestaat niet (meer).' };
     bearer.intrekken(inv.toegang, actor, reden || 'ingetrokken door manager');
     return { ok: true, invite: publiek(inv),
@@ -92,7 +96,7 @@ module.exports = ctx => {
      geclaimde uitnodigingen niet in zijn lijst (herkeuring ronde 7). */
   const trekInVoorStaff = (supplierCode, staff, actor) => transactie(bron => {
     let n = 0;
-    for (const inv of lijstVan(bron, supplierCode)) {
+    for (const inv of hele(bron, supplierCode)) {
       const c = inv.claim;
       // N52: ook een OPEN uitnodiging die deze plek uitgaf, anders komt hij ermee terug
       const zijnCode = !c && inv.uitgever_staff != null && Number(inv.uitgever_staff) === Number(staff.id);
@@ -103,7 +107,7 @@ module.exports = ctx => {
     return { ok: true, ingetrokken: n };
   });
   const roteerInvite = (supplierCode, id, actor, idem, staffId) => transactie(bron => {
-    const inv = lijstVan(bron, supplierCode).find(x => x.id === String(id || ''));
+    const inv = hele(bron, supplierCode).find(x => x.id === String(id || ''));
     if (!inv) return { status: 404, error: 'Deze uitnodiging bestaat niet (meer).' };
     if (inv.claim) return { status: 409, error: 'Een geclaimde uitnodiging kan niet worden geroteerd.' };
     const idemWaarde = String(idem || '').trim().slice(0, 200);

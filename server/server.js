@@ -1322,6 +1322,7 @@ app.post('/api/talen', talenCache, (req, res) => res.json({ talen: talen.actieve
    onderwerp is een paarsgewijs pseudoniem: twee venues kunnen een lid niet
    matchen. Zie server/lib/zegel.js. */
 const zegel = require('./lib/zegel').maakZegel({ dataDir: DATA_DIR });
+const zegelfeiten = require('./kern/zegelfeiten').maakZegelfeiten({ accounts });
 // de publieke sleutel: hiermee verifieert een partner-app een zegel zonder server.
 app.get('/api/zegel/sleutel', (req, res) => {
   res.setHeader('Cache-Control', 'public, max-age=300');
@@ -1333,20 +1334,12 @@ app.post('/api/zegel/maak', auth, (req, res) => {
   const sess = req.session;
   const partner = typeof req.body.partner === 'string' ? req.body.partner.slice(0, 64) : null;
   const gevraagd = Array.isArray(req.body.claims) && req.body.claims.length ? req.body.claims : ['lid'];
-  const lft = leeftijdVan(geborenVan(sess));
-  const feiten = {
-    lid: true,
-    leeftijd18: lft != null && lft >= 18,
-    leeftijd21: lft != null && lft >= 21,
-    pas: sess.tier || (sess.account && sess.account.tier) || null,
-    zakelijk: sess.tier === 'business'
-  };
-  const claims = {};
-  for (const k of gevraagd) if (Object.prototype.hasOwnProperty.call(feiten, k) && feiten[k]) claims[k] = feiten[k];
+  // wat er getekend mag worden staat in kern/zegelfeiten.js (een leeftijd alleen als hij GEZIEN is)
+  const { claims, nietBewezen } = zegelfeiten(sess, gevraagd);
   const seed = sess.key || (sess.account && sess.account.id) || 'onbekend';
   const geldigMin = Math.max(1, Math.min(60, Number(req.body.geldigMin) || 5));
   const token = zegel.zegel({ codenaam: seed, partner, claims, geldigMin });
-  res.json({ token, claims, sub: zegel.pseudoniem(seed, partner), geldigMin });
+  res.json({ token, claims, sub: zegel.pseudoniem(seed, partner), geldigMin, nietBewezen });
 });
 // een partner/PDA controleert een zegel (kan ook offline met de publieke sleutel).
 app.post('/api/zegel/controleer', (req, res) => {

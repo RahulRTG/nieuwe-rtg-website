@@ -9060,7 +9060,7 @@ var RTG_BOUW = '8015af3e';
     const ov = document.createElement('div'); ov.className = 'zg-ov'; ov.id = 'zgOverlay';
     ov.innerHTML = '<div class="zg-card" role="dialog" aria-modal="true" aria-label="'+T('zg.titel','Toon je Zegel')+'">'+
       '<h3>'+T('zg.titel','Toon je Zegel')+'</h3>'+
-      '<div class="zg-sub">'+T('zg.sub','Bewijs een feit aan de zaak zonder je naam te tonen. RTG staat garant dat je paspoort is gezien.')+'</div>'+
+      '<div class="zg-sub">'+T('zg.sub','Bewijs een feit aan de zaak zonder je naam te tonen. Een leeftijd zit er alleen in als RTG je identiteitsbewijs heeft gezien.')+'</div>'+
       '<div id="zgKies">'+ ZG_CLAIMS.map((c,i) => '<label class="zg-opt"><input type="checkbox" data-claim="'+c.id+'"'+(i<1?' checked':'')+'><span>'+c.label+'</span></label>').join('') +
       '<button class="zg-btn" id="zgMaak">'+T('zg.toon','Toon mijn Zegel')+'</button>'+
       '<button class="zg-btn sec" id="zgAnnuleer">'+T('zg.annuleer','Annuleren')+'</button></div>'+
@@ -9078,7 +9078,12 @@ var RTG_BOUW = '8015af3e';
     catch(e){ toast(e.message); return; }
     const claims = d.claims || {};
     const bewezen = Object.keys(claims);
-    if (!bewezen.length){ toast(T('zg.geen','Geen van deze feiten kon worden bewezen voor jouw account.')); return; }
+    /* Een leeftijd die RTG niet heeft GEZIEN, gaat er niet in; de server zegt
+       waarom (nietBewezen). Die reden hoort het lid, anders lijkt een
+       ontbrekende 18+ op een storing. */
+    const nietReden = Object.values(d.nietBewezen || {})[0] || null;
+    if (!bewezen.length){ toast(nietReden || T('zg.geen','Geen van deze feiten kon worden bewezen voor jouw account.')); return; }
+    if (nietReden) toast(nietReden);
     // teken de QR met ruime foutcorrectie-marge (niveau L past de meeste combinaties
     // in een scanbare code); lukt het niet, vraag dan om minder feiten tegelijk
     let canvas;
@@ -9087,7 +9092,7 @@ var RTG_BOUW = '8015af3e';
     const labelVoor = k => k === 'pas' ? (T('zg.pas','Pas') + ': ' + claims[k]) : (ZG_CLAIMS.find(c => c.id === k) || {}).label || k;
     const kies = document.getElementById('zgKies'); if (kies) kies.style.display = 'none';
     const res = document.getElementById('zgResultaat');
-    res.innerHTML = '<div class="zg-qrwrap"><div class="zg-badge">\u{1F6E1} '+T('zg.geverifieerd','RTG-geverifieerd')+'</div>'+
+    res.innerHTML = '<div class="zg-qrwrap"><div class="zg-badge">\u{1F6E1} '+T('zg.geverifieerd','Ondertekend door RTG')+'</div>'+
       '<div class="zg-qr" id="zgQr"></div>'+
       '<div class="zg-claims">'+ bewezen.map(k => '<span class="zg-claim">✓ '+labelVoor(k)+'</span>').join('') +'</div>'+
       '<div class="zg-tel" id="zgTel"></div>'+

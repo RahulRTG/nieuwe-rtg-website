@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T11:09:03.009Z",
-    "commit": "ea12d803a",
+    "op": "2026-10-12T12:37:08.271Z",
+    "commit": "542438019",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -15760,6 +15760,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "tekst-wijzig.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
       "scherp": "gezakt"
     },
     "tekstbinding.test.js": {

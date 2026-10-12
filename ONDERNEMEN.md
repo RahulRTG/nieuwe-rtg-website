@@ -35,7 +35,7 @@ De inventaris is daarom het eerste hoofdstuk en niet het laatste:
 
 | Station van de lus | Wat er staat | Waar |
 |---|---|---|
-| Ontdekken, leren | beroepenbieb, leerstof, knelpuntmotor met aanvoer | `kern/knelpunt/`, `kern/beroepenbieb/` |
+| Ontdekken, leren | beroepenbieb, leerstof, knelpuntmotor met aanvoer — sinds 11 oktober 2026 met `ondernemen` als zesde terrein, zodat een kaal ondernemersdoel ook een ondernemersweg oplevert (`MAATSTAF.md` par. 7j) | `kern/knelpunt/`, `kern/beroepenbieb/` |
 | Starten | intake, kans, simulatie, stress, plan, rechtsvorm, oprichting, fase | `kern/onderneming/` (45 modules) |
 | Toelating | vergunningbewijs voor 8 gereguleerde genres, besluit door een mens | `kern/aanmeldingen/bewijs.js` |
 | Eerste klant | eersteklant, pijplijn, offertebouw, klussen, relaties | `kern/onderneming/` |

@@ -53,7 +53,7 @@
    `SOORTEN`: dat woord draagt in deze code al 45 betekenissen over 47 domeinen
    (SEMANTIEK.json, de ergste botsing van het huis), en er komt er geen 46e bij
    voor iets wat prima een eigen naam kan hebben. */
-const TERREINEN = ['werk', 'opleiding', 'opvang', 'vervoer', 'wonen'];
+const TERREINEN = ['werk', 'opleiding', 'opvang', 'vervoer', 'wonen', 'ondernemen'];
 
 /* De woorden waarmee een randvoorwaarde op een terrein wordt gelegd. BEWUST
    DOM, en dat is dezelfde keuze als in kern/stadsweefsel/kansen.js: *"BEWUST
@@ -65,7 +65,10 @@ const WOORDEN = {
   opleiding: ['opleiding', 'diploma', 'cursus', 'leren', 'studie', 'school', 'bevoegdheid', 'certificaat'],
   opvang: ['opvang', 'kinderopvang', 'kind', 'kinderen', 'oppas', 'bso'],
   vervoer: ['vervoer', 'reizen', 'auto', 'ov', 'fiets', 'rijbewijs', 'afstand'],
-  wonen: ['wonen', 'woning', 'huis', 'huur', 'woonruimte', 'adres', 'onderdak']
+  wonen: ['wonen', 'woning', 'huis', 'huur', 'woonruimte', 'adres', 'onderdak'],
+  /* `zaak` staat er met opzet NIET in: "een zaak die mij aanneemt" is een
+     werkgever, en "oorzaak" zou ook raken. */
+  ondernemen: ['ondernem', 'bedrijf', 'kvk', 'rechtsvorm', 'eenmanszaak', 'zzp', 'eigen zaak']
 };
 
 const KAART = {
@@ -109,6 +112,25 @@ const KAART = {
       'code niet -- geen enkele treffer. Wie hier "wonen" leest als "wij kunnen u aan een woning ' +
       'helpen", leest iets wat er niet staat.',
     bron: 'routes/member/handel/vastgoed.js'
+  },
+  /* HET ZESDE TERREIN (11 oktober 2026). De ingang is de VOORLICHTING, omdat
+     die zonder inlog opengaat -- ook voor een gezin via /api/rtf/knelpunt. Wat
+     er niet is (financiering, andere ondernemers vinden), is nagezocht en staat
+     in `dektNiet`; zie ./aanvoer-ondernemen.js en MAATSTAF.md par. 7j. */
+  ondernemen: {
+    stand: 'bron', ingang: '/api/onderneming/rechtsvormen',
+    wat: 'De rechtsvormen met wat er per vorm bij hoort: aansprakelijkheid, verplichtingen en de ' +
+      'oprichtingsstappen. Met een RTG-account daarbij een verkenning met stress test en een ' +
+      'ondernemingsplan dat u zelf vastlegt.',
+    dektNiet: 'Dit is voorlichting en uw eigen rekenwerk, geen advies welke vorm bij u past: een ' +
+      'rechtsvorm wordt hier opgegeven en nooit afgeleid. Inschrijven bij de KvK, de notaris en de ' +
+      'belastingdienst doet u zelf; RTG dient niets namens u in. Financiering (een lening, krediet, ' +
+      'subsidie of investeerder) bestaat in deze code niet, en ook geen plek waar u andere ' +
+      'ondernemers, een eerste klant of een samenwerkingspartner vindt: de eerste-klantstap meet hoe ' +
+      'klaar uw zaak staat en de pijplijn volgt offertes die al binnenkomen, maar geen van beide ' +
+      'zoekt klanten voor u.',
+    bron: 'kern/onderneming/rechtsvorm.js (voorlichting, zonder inlog); de verkenning en het plan in ' +
+      'kern/onderneming/ achter een RTG-account.'
   }
 };
 

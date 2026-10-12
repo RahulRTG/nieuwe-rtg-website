@@ -33,6 +33,7 @@ module.exports = (kern) => {
   const { maakWerkbron } = require('../kern/knelpunt/aanvoer-werk');
   const { maakOpleidingbron } = require('../kern/knelpunt/aanvoer-opleiding');
   const { maakOpvangbron } = require('../kern/knelpunt/aanvoer-opvang');
+  const { maakOndernemenbron } = require('../kern/knelpunt/aanvoer-ondernemen');
   const { maakWegen } = require('../kern/knelpunt/wegen');
   const { bundelVondsten } = require('../kern/knelpunt/vondstenbundel');
   /* De aanvoer wordt EEN keer samengesteld, bij het bedraden. Per verzoek
@@ -46,7 +47,10 @@ module.exports = (kern) => {
   const AANVOERBRONNEN = {
     werk: maakWerkbron(() => kern.openVacatures),
     opleiding: maakOpleidingbron(() => kern.beroepenbieb),
-    opvang: maakOpvangbron(() => kern.opvangwijzer)
+    opvang: maakOpvangbron(() => kern.opvangwijzer),
+    /* Geen ophaler op de kern-tas: het rechtsvormregister is data zonder
+       database. Zie de kop van ../kern/knelpunt/aanvoer-ondernemen.js. */
+    ondernemen: maakOndernemenbron()
   };
   const aanvoer = maakAanvoer(AANVOERBRONNEN);
   /* De wegen komen uit DEZELFDE lijst bronnen: een bron die hier wordt

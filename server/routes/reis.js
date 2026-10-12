@@ -71,6 +71,7 @@ module.exports = (kern) => {
   });
   app.post('/api/reis/gezelschap/aangekomen', auth, (req, res) =>
     gez(res, kern.reisgezelschap.meldAankomst(req.session.key, String((req.body || {}).reis || ''))));
+  require('./reis-opgave')(kern, gez);
 
   /* DE REISWACHT (REIZEN.md fase 3): de signalen rond de komende reizen, met
      per bron of hij gemeten is, stilviel of simpelweg niet bestaat. Alleen

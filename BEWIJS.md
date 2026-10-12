@@ -1617,7 +1617,11 @@ toets omvalt.
 | `reisbureau-nazorg.test.js` | 8 | gezakt op `liegpoort /api/` | DE NAZORG VAN EEN REISAANVRAAG: wijzigen en afzeggen nadat een mens de reis heeft bevestigd -- kern/reisbureau-nazorg.js. WAAROM DIT BESTAND ER IS. |
 | `reisbureau-thuis.test.js` | 4 | gezakt op `liegpoort /api/` | THUIS: de reis is voorbij en de reiziger is terug -- kern/reisbureau-thuis.js (besluit C3, AUTONOMIE.md par. 2.5). |
 | `reisbureau.test.js` | 9 | gezakt op `liegpoort /api/` | De losse leverancierspagina's in de app: het RTG-reisbureau (samengestelde reizen aanvragen), RTG Verblijven (hotels/appartementen/villa's boeken via /api/verblijf) en RTG Uitgaan (bars/clubs/beachclubs, aanmelden... |
+| `reisgezelschap-instemming.test.js` | 8 | -- | INSTEMMEN OP EEN VASTE VERSIE, over de draad (kern/reisgezelschap-instemming.js). Stap 4 van "Five People. |
+| `reisgezelschap-opgave.test.js` | 8 | -- | DE PRIVE-INVOER VAN EEN REISGENOOT, over de draad (kern/reisgezelschap-opgave.js). Stap 1 van "Five People. |
+| `reisgezelschap-opties.test.js` | 6 | -- | DE GROEPSBEREKENING, over de draad (kern/reisgezelschap-opties.js). Stap 2 van "Five People. |
 | `reisgezelschap-routes.test.js` | 12 | gezakt op `liegpoort /api/` | HET REISGEZELSCHAP OVER DE DRAAD -- de twaalf routes uit server/routes/reis.js. WAAROM DIT BESTAND NAAST test/reisgezelschap.test.js STAAT. |
+| `reisgezelschap-werkruimte.test.js` | 5 | -- | DE WERKRUIMTE PER DEELNEMER, over de draad (kern/reisgezelschap-werkruimte.js). Stap 3 van "Five People. |
 | `reisgezelschap.test.js` | 16 | gezakt op `!==->===#0` | HET REISGEZELSCHAP -- de tabel uit kern/reisgezelschap.js, als toets. WAAROM DIT BESTAAD ER. |
 | `reisherkomst.test.js` | 19 | gezakt op `liegpoort /api/` | DE EERSTE VERTICALE SLICE VAN ECONOMIC PROVENANCE -- besluit van de eigenaar, 15 september 2026. De keten die hier wordt beproefd: reiscomponent -> herkomst -> commerciele geldgebeurtenis -> pay-geldrij -> economic... |
 | `reisoplosser.test.js` | 8 | gezakt op `liegpoort /api/` | DE OPLOSSER (kern/reisoplosser.js) -- REIZEN.md fase 5: "Los het op". De gevaarlijkste belofte van deze knop is dat hij dingen REGELT. |
@@ -2581,6 +2585,8 @@ toets omvalt.
 | `rahulzicht.e2e.js` | 1 | gezakt op `liegpoort /api/` | RAHUL ZIET HET OPEN BLAD -- in een echte schil, tot op de server. test/rahulzicht.test.js houdt de projectie vast zonder browser. |
 | `regelwacht-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets op "Wat veranderde?" in de Regelwacht (kantoren.html, kamer bank). De endpoints zijn gedekt (test/fiscaal-jaargangen.test.js voor de geschiedenis, test/fiscaal-herkomst.test.js voor de impact), maar een... |
 | `reisbalie.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op DE REISBALIE: de kamer Reisbureau in kantoren.html. WAAROM DIT BESTAND ER IS. |
+| `reisgezelschap-instemming.e2e.js` | 1 | -- | INSTEMMEN IN EEN ECHTE BROWSER -- vijf mensen, ieder apart, op een versie. Stap 4 van "Five People. |
+| `reisgezelschap-werkruimte.e2e.js` | 1 | -- | DE GEZAMENLIJKE REIS IN EEN ECHTE BROWSER -- vijf accounts, vijf werkruimten. Stap 3 van "Five People. |
 | `reisprogramma.e2e.js` | 1 | gezakt op `===->!==#0` | Echte kantoorinvulling en gast zonder account; geen verzonnen API-antwoorden. |
 | `reisschermen.e2e.js` | 3 | gezakt op `liegpoort /api/` | REIZEN, UITGAAN EN DE DIENST: ZESTIEN SCHERMEN, VIER SOORTEN. Allemaal uit de lijst van TAKEN 4.9. |
 | `reisteruggave.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op DE TERUGGAVEN van de reisbalie (kantoren.html, kamer Reisbureau). WAAROM DIT BESTAND ER IS. |

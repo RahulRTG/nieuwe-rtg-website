@@ -86,6 +86,8 @@
       var vanMij = lijst.some(function (r) { return r.id === huidig && !r.van; });
       kiesReis(lijst);
       if (!huidig) return;
+      // de gezamenlijke reis (./reizen-samen-besluit.js) volgt dezelfde keuze
+      if (w.RTGSamenBesluit) w.RTGSamenBesluit.toon(huidig);
       R.api('/api/reis/gezelschap', { reis: huidig }).then(deel('tekenLeden')).catch(function () {});
       R.api('/api/reis/gezelschap/tijdlijn', { reis: huidig }).then(deel('tekenTijdlijn')).catch(function () {});
       R.api('/api/reis/gezelschap/reis', { reis: huidig }).then(deel('tekenZicht')).catch(function () {});

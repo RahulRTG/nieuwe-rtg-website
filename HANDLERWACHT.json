@@ -3366,7 +3366,7 @@
   },
   {
    "sleutel": "POST /api/reis/uitnodiging/open",
-   "bestand": "server/routes/reis.js:131",
+   "bestand": "server/routes/reis.js:132",
    "staat": "openbaar",
    "reden": "een klaargezette reis openen kan per definitie nog zonder account (met rem per ip)"
   },

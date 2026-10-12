@@ -42,7 +42,11 @@ const EIGEN_TAKKEN = [
   'accountRollen',      // uw koppelingen aan werkplekken
   'ledenBoard',         // uw eigen boardroom: wat u wel en niet deelt
   'contactPins',        // uw contactpin: het adres waarmee anderen u toevoegden
-  'contactPinSecurity'  // uw noodslot en eigen PIN-veiligheidsjournaal
+  'contactPinSecurity', // uw noodslot en eigen PIN-veiligheidsjournaal
+  'reisOpgaven',         // wat u voor een gezamenlijke reis opgaf: plafond, data, voorkeuren
+  'reisOpties',          // de opties die u voor uw reis klaarzette
+  'reisVoorleggingen',   // de voorstellen die u voorlegde
+  'reisInstemmingen'     // uw instemming op een voorstel
 ];
 
 module.exports = ({ db, lidBoardLogWis }) => {

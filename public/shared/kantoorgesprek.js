@@ -68,10 +68,12 @@
   }
 
   /* De kantoordeur op naam (/shared/kantoordeur.js) pas laden als het gesprek
-     haar nodig heeft; die laadt zelf de passkeyvertaling (B10). */
+     haar nodig heeft; die laadt de passkeyvertaling zelf, en alleen als de deur
+     om een ceremonie vraagt (B10). */
   function kantoordeur() {
-    var klaar = function () { return w.RTGKantoorDeur ? w.RTGKantoorDeur.laadPasskey().then(function () { return w.RTGKantoorDeur; }) : null; };
-    if (w.RTGKantoorDeur) return klaar();
+    // de passkeyvertaling laadt RTGKantoorDeur pas als er een ceremonie komt
+    var klaar = function () { return w.RTGKantoorDeur || null; };
+    if (w.RTGKantoorDeur) return Promise.resolve(klaar());
     return new Promise(function (ok) {
       var t = document.createElement('script'); t.src = '/shared/kantoordeur.js';
       t.onload = t.onerror = function () { ok(klaar()); }; document.head.appendChild(t);
@@ -165,6 +167,8 @@
         return;
       }
       zegt.textContent = 'Een moment, ik kijk of uw eigen RTG-account hier al toegang heeft...';
+      // de deur tegelijk met de rollenvraag laden: geen extra stap in de keten
+      var deurLaadt = kantoordeur();
       accountPost('rollen', {}, lt).then(function (d) {
         var heeft = (d.rollen || []).some(function (r) { return r && r.rol === 'kantoor'; });
         if (!heeft) return codeGesprek();
@@ -175,7 +179,7 @@
          de ceremonie buiten een tik (Safari, iOS), dan een knop die hem in de
          tik zelf start. */
       function start(pin) {
-        kantoordeur().then(function (D) {
+        deurLaadt.then(function (D) {
           if (!D) { codeGesprek(); fout.textContent = 'De kantoordeur kon hier niet laden.'; return; }
           return D.binnen(lt, { pin: pin, vraagTik: D.tikDialoog('Bevestig met uw passkey, dan zet ik het kantoor open.') }).then(function (s) {
             if (s.token) {

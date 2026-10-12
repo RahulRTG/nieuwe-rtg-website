@@ -110,11 +110,11 @@
      o: { pin, passkey, vraagTik(fn) } -- vraagTik krijgt een functie die het
      scherm SYNCHROON in een klik aanroept; de belofte die hij teruggeeft, is
      het resultaat van die klik. Zonder vraagTik blijft het bij een poging. */
+  /* Geen stand-vraag vooraf: waar de passkey verplicht is (productie, B10)
+     geeft de deur de ceremonie zelf mee. Een verzoek minder in de keten. */
   function binnen(lt, o) {
     o = o || {};
-    return stand().then(function (st) {
-      return vraag(lt, { pin: o.pin, passkey: o.passkey === undefined ? st.codeDicht : o.passkey });
-    }).then(function (u) {
+    return vraag(lt, { pin: o.pin, passkey: !!o.passkey }).then(function (u) {
       if (!u.bevestiging) return u;
       return laadPasskey().then(function () {
         return tekenNu(u.bevestiging).then(function (b) {

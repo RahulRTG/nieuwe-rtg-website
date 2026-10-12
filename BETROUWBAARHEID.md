@@ -810,9 +810,9 @@ en een PROTECTED-contract, en het formulier schakelt zichzelf uit tijdens het
 verzoek. `test/veiligmoment-dubbeltik.test.js` heeft een tegenproef en zakt zonder
 de verklaring.
 
-**Eerste volledig bewezen onderdelen** (`APPWERKT.json`, 11 oktober 2026, op
-`ebb0a8555`): **Wie ben ik, Wonen, Reizen & Veilig en Mijn loopbaan** staan op
-alle acht bewijzen BEWEZEN. Post van RTG en Waar ben ik aanwezig staan op zeven:
+**Eerste volledig bewezen onderdelen** (`APPWERKT.json`, 12 oktober 2026, op
+`50a1c4b5e`, na de scherpere ledenkruis met inbreuk en codenaam): **Wie ben ik,
+Wonen, Reizen & Veilig en Mijn loopbaan** staan op alle acht bewijzen BEWEZEN. Post van RTG en Waar ben ik aanwezig staan op zeven:
 bevoegd ontbreekt, om de reden hierboven. Let op de meetomstandigheid: een ronde
 met zes werkers naast de toetsen van andere werkbomen op dezelfde vier kernen gaf
 laad-time-outs die als defect werden gemeld; vastgelegd is de ronde met

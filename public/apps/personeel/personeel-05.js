@@ -28,7 +28,7 @@
       // geen passkey op dit account: de weg erheen, en geen terugval op de code
       const b = $('#kaAccountVerder'); if (b) b.remove();
       if ($('#kaDeurVak') && !$('#kaPasskeyZet')) $('#kaDeurVak').insertAdjacentHTML('beforeend',
-        '<a id="kaPasskeyZet" class="abtn" style="display:block;margin-top:0.7rem;text-align:center;padding:0.8rem;" href="'+RTGKantoorDeur.PASSKEYS+'">'+T('pd.ka.passkeyZet','Een passkey toevoegen')+'</a>');
+        '<a id="kaPasskeyZet" class="abtn pd-block" href="'+RTGKantoorDeur.PASSKEYS+'">'+T('pd.ka.passkeyZet','Een passkey toevoegen')+'</a>');
       fout(u.error);
       return;
     }

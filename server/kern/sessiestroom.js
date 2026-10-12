@@ -33,7 +33,9 @@
    hash-gebaseerde versie van elk van die deuren zou LAT.md regel 4 breken. Dus
    draagt het ticket de sessie VERZEGELD (AES-256-GCM met een sleutel die uit de
    accountkluis wordt afgeleid, ../accounts/kluis.js sleutelVoor, en dus NIET in
-   de database staat), met soort en sessiehash als geassocieerde gegevens. Wat
+   de database staat), met soort, sessiehash en de hash van het ticket zelf als
+   geassocieerde gegevens: een onderwerp dat onder een ander ticket wordt
+   geschoven, gaat niet open (test/sessiestroom-binding.test.js). Wat
    er in de opslag staat is hoogstens een minuut oud, verdwijnt bij de claim, en
    is zonder de servergeheimen niet te openen. Ontbreekt de zegelsleutel, dan
    geeft de uitgifte 503: liever geen stroom dan een sessie in leesbare vorm.
@@ -101,10 +103,10 @@ function maak({ db, crypto, bewerkCollectie, zegelSleutel, productie = process.e
       return Buffer.concat([d.update(b.subarray(28)), d.final()]).toString('utf8');
     } catch (e) { return null; }
   }
-  const aadVan = (naam, sessie) => 'rtg.sessiestroom|' + naam + '|' + sessie;
-  const geopend = (o, naam) => {
+  const aadVan = (naam, sessie, ticketHash) => 'rtg.sessiestroom|' + naam + '|' + sessie + '|' + ticketHash;
+  const geopend = (o, naam, ticketHash) => {
     if (!o || o.soort !== naam || !/^[a-f0-9]{64}$/.test(String(o.sessie || ''))) return null;
-    const raw = ontzegel(o.zegel, aadVan(naam, o.sessie));
+    const raw = ontzegel(o.zegel, aadVan(naam, o.sessie, ticketHash));
     return raw && tokenHash(raw) === o.sessie ? raw : null;
   };
 
@@ -138,9 +140,9 @@ function maak({ db, crypto, bewerkCollectie, zegelSleutel, productie = process.e
     try { mag = !!(kaal && await s.geldig(kaal, onderwerpId)); } catch (e) { mag = false; }
     if (!mag) return { status: 401, error: 'Deze sessie mag deze stroom niet openen.' };
     const sessie = tokenHash(kaal);
-    const z = zegel(kaal, aadVan(naam, sessie));
-    if (!z) return { status: 503, error: 'De stroom kan nu niet veilig worden geopend.' };
-    const m = await s.st.geef(naam, () => ({ onderwerp: { soort: naam, sessie, bij: onderwerpId, zegel: z } }));
+    const m = await s.st.geef(naam, () => ({ onderwerp: { soort: naam, sessie, bij: onderwerpId },
+      verzegel: h => { const z = zegel(kaal, aadVan(naam, sessie, h)); return z ? { zegel: z } : null; } }));
+    if (!m.ok) return { status: 503, error: 'De stroom kan nu niet veilig worden geopend.' };
     return { ok: true, ticket: m.code, geldigTot: m.toegang.expires_at };
   }
 
@@ -152,13 +154,14 @@ function maak({ db, crypto, bewerkCollectie, zegelSleutel, productie = process.e
     const s = soorten.get(String(naam || ''));
     if (!s || !s.st.vorm(ticket)) return { status: 401 };
     const onderwerpId = s.metBij ? String(bij == null ? '' : bij).trim().slice(0, 200) : '';
+    const h = bearer.hash(ticket);
     let uit;
     try {
       uit = await s.st.claim(naam, ticket, { voor: () => ({ binding: { soort: naam, bij: onderwerpId } }),
-        hercontrole: o => !!geopend(o, naam) });
+        hercontrole: o => !!geopend(o, naam, h) });
     } catch (e) { return { status: 503 }; }
     if (!uit || !uit.ok) return { status: 401 };
-    const raw = geopend(uit.onderwerp, naam);
+    const raw = geopend(uit.onderwerp, naam, h);
     let mag = false;
     try { mag = !!(raw && await s.geldig(raw, onderwerpId)); } catch (e) { mag = false; }
     return mag ? { ok: true, token: raw } : { status: 401 };

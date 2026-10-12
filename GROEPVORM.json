@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-10-11T22:23:19.530Z",
-    "commit": "9f737e2f5",
+    "op": "2026-10-12T14:05:50.379Z",
+    "commit": "c2c0e05f4",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/groepvorm.js",
     "node": "v26.10.0"
   },
@@ -49,8 +49,8 @@
         "reden": "geen enkele objectvorm gevonden onder /^server\\/kern\\/muziek-samen\\.js$/"
       }
     ],
-    "vormen": 144,
-    "velden": 263,
+    "vormen": 145,
+    "velden": 268,
     "perModel": {
       "genootschap": {
         "velden": 9,
@@ -92,7 +92,7 @@
         ]
       },
       "sportclub": {
-        "velden": 35,
+        "velden": 36,
         "modules": [
           "server/kern/clubs/fitclub.js",
           "server/kern/clubs/golf.js",
@@ -103,7 +103,7 @@
         ]
       },
       "rtfclubs": {
-        "velden": 8,
+        "velden": 9,
         "modules": [
           "server/kern/rtfclubs.js"
         ]
@@ -115,9 +115,11 @@
         ]
       },
       "reisgezelschap": {
-        "velden": 9,
+        "velden": 13,
         "modules": [
           "server/kern/reisgezelschap-delen.js",
+          "server/kern/reisgezelschap-opties.js",
+          "server/kern/reisgezelschap-werkruimte.js",
           "server/kern/reisgezelschap.js"
         ]
       },
@@ -138,7 +140,7 @@
         ]
       },
       "rtfosPartners": {
-        "velden": 29,
+        "velden": 30,
         "modules": [
           "server/kern/rtfos/netwerk-meting.js",
           "server/kern/rtfos/netwerk.js",
@@ -204,7 +206,7 @@
     },
     "inAlleModellen": [],
     "inMinstensHelft": [],
-    "inEenModelPct": 90.1,
+    "inEenModelPct": 90.3,
     "breedGedeeld": [
       {
         "veld": "wie",
@@ -225,6 +227,16 @@
           "livinglab",
           "rtfclubs",
           "school"
+        ]
+      },
+      {
+        "veld": "code",
+        "modellen": 4,
+        "waar": [
+          "livinglab",
+          "rtfclubs",
+          "rtfosPartners",
+          "sportclub"
         ]
       },
       {
@@ -305,7 +317,7 @@
           "rtfclubs"
         ],
         "gedeeld": 1,
-        "overlap": 0.091,
+        "overlap": 0.083,
         "velden": [
           "wie"
         ]
@@ -319,17 +331,6 @@
         "overlap": 0.067,
         "velden": [
           "stad"
-        ]
-      },
-      {
-        "paar": [
-          "rtfclubs",
-          "lerenProjecten"
-        ],
-        "gedeeld": 1,
-        "overlap": 0.067,
-        "velden": [
-          "af"
         ]
       },
       {
@@ -352,6 +353,17 @@
         "overlap": 0.063,
         "velden": [
           "wie"
+        ]
+      },
+      {
+        "paar": [
+          "rtfclubs",
+          "lerenProjecten"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.063,
+        "velden": [
+          "af"
         ]
       },
       {
@@ -380,12 +392,64 @@
       {
         "paar": [
           "rtfclubs",
+          "rtfosPartners"
+        ],
+        "gedeeld": 2,
+        "overlap": 0.054,
+        "velden": [
+          "code",
+          "contact"
+        ]
+      },
+      {
+        "paar": [
+          "rtfosPartners",
+          "livinglab"
+        ],
+        "gedeeld": 5,
+        "overlap": 0.048,
+        "velden": [
+          "actief",
+          "code",
+          "land",
+          "rol",
+          "stad"
+        ]
+      },
+      {
+        "paar": [
+          "sportclub",
+          "rtfosPartners"
+        ],
+        "gedeeld": 3,
+        "overlap": 0.048,
+        "velden": [
+          "code",
+          "key",
+          "sinds"
+        ]
+      },
+      {
+        "paar": [
+          "rtfclubs",
           "werkruimte"
         ],
         "gedeeld": 1,
-        "overlap": 0.05,
+        "overlap": 0.048,
         "velden": [
           "wie"
+        ]
+      },
+      {
+        "paar": [
+          "sportclub",
+          "rtfclubs"
+        ],
+        "gedeeld": 2,
+        "overlap": 0.047,
+        "velden": [
+          "code",
+          "team"
         ]
       },
       {
@@ -400,54 +464,6 @@
           "antwoord",
           "deadline",
           "toestemming"
-        ]
-      },
-      {
-        "paar": [
-          "rtfosPartners",
-          "livinglab"
-        ],
-        "gedeeld": 4,
-        "overlap": 0.038,
-        "velden": [
-          "actief",
-          "land",
-          "rol",
-          "stad"
-        ]
-      },
-      {
-        "paar": [
-          "gesprekken",
-          "democratie"
-        ],
-        "gedeeld": 1,
-        "overlap": 0.038,
-        "velden": [
-          "deelnemers"
-        ]
-      },
-      {
-        "paar": [
-          "gesprekken",
-          "cercleEntourage"
-        ],
-        "gedeeld": 1,
-        "overlap": 0.036,
-        "velden": [
-          "wie"
-        ]
-      },
-      {
-        "paar": [
-          "sportclub",
-          "rtfosPartners"
-        ],
-        "gedeeld": 2,
-        "overlap": 0.032,
-        "velden": [
-          "key",
-          "sinds"
         ]
       }
     ]
@@ -486,8 +502,8 @@
         "reden": "geen enkele objectvorm gevonden onder /^server\\/kern\\/democratie\\/kwestie\\.js$/"
       }
     ],
-    "vormen": 43,
-    "velden": 88,
+    "vormen": 42,
+    "velden": 89,
     "perModel": {
       "genootschap": {
         "velden": 4,
@@ -522,7 +538,7 @@
         ]
       },
       "rtfclubs": {
-        "velden": 8,
+        "velden": 9,
         "modules": [
           "server/kern/rtfclubs.js"
         ]
@@ -552,7 +568,7 @@
         ]
       },
       "rtfosPartners": {
-        "velden": 10,
+        "velden": 11,
         "modules": [
           "server/kern/rtfos/partners.js"
         ]
@@ -572,8 +588,17 @@
     },
     "inAlleModellen": [],
     "inMinstensHelft": [],
-    "inEenModelPct": 88.6,
+    "inEenModelPct": 88.8,
     "breedGedeeld": [
+      {
+        "veld": "code",
+        "modellen": 3,
+        "waar": [
+          "livinglab",
+          "rtfclubs",
+          "rtfosPartners"
+        ]
+      },
       {
         "veld": "leden",
         "modellen": 3,
@@ -608,6 +633,30 @@
       },
       {
         "paar": [
+          "rtfclubs",
+          "rtfosPartners"
+        ],
+        "gedeeld": 2,
+        "overlap": 0.111,
+        "velden": [
+          "code",
+          "contact"
+        ]
+      },
+      {
+        "paar": [
+          "rtfosPartners",
+          "livinglab"
+        ],
+        "gedeeld": 2,
+        "overlap": 0.105,
+        "velden": [
+          "code",
+          "stad"
+        ]
+      },
+      {
+        "paar": [
           "samenkamer",
           "festivalgroep"
         ],
@@ -615,29 +664,6 @@
         "overlap": 0.091,
         "velden": [
           "toegang"
-        ]
-      },
-      {
-        "paar": [
-          "cercleEntourage",
-          "rtfclubs"
-        ],
-        "gedeeld": 1,
-        "overlap": 0.091,
-        "velden": [
-          "wie"
-        ]
-      },
-      {
-        "paar": [
-          "sportclub",
-          "livinglab"
-        ],
-        "gedeeld": 2,
-        "overlap": 0.087,
-        "velden": [
-          "uitslag",
-          "veld"
         ]
       },
       {
@@ -654,12 +680,12 @@
       {
         "paar": [
           "cercleEntourage",
-          "rtfosPartners"
+          "rtfclubs"
         ],
         "gedeeld": 1,
-        "overlap": 0.077,
+        "overlap": 0.083,
         "velden": [
-          "stad"
+          "wie"
         ]
       },
       {
@@ -675,13 +701,13 @@
       },
       {
         "paar": [
-          "rtfclubs",
-          "lerenProjecten"
+          "cercleEntourage",
+          "rtfosPartners"
         ],
         "gedeeld": 1,
-        "overlap": 0.067,
+        "overlap": 0.071,
         "velden": [
-          "af"
+          "stad"
         ]
       },
       {
@@ -698,12 +724,23 @@
       {
         "paar": [
           "rtfclubs",
-          "rtfosPartners"
+          "lerenProjecten"
         ],
         "gedeeld": 1,
-        "overlap": 0.059,
+        "overlap": 0.063,
         "velden": [
-          "contact"
+          "af"
+        ]
+      },
+      {
+        "paar": [
+          "rtfclubs",
+          "livinglab"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.056,
+        "velden": [
+          "code"
         ]
       },
       {
@@ -719,13 +756,13 @@
       },
       {
         "paar": [
-          "rtfosPartners",
+          "sportclub",
           "livinglab"
         ],
         "gedeeld": 1,
-        "overlap": 0.053,
+        "overlap": 0.042,
         "velden": [
-          "stad"
+          "veld"
         ]
       },
       {
@@ -741,15 +778,6 @@
         "paar": [
           "genootschap",
           "cercleEntourage"
-        ],
-        "gedeeld": 0,
-        "overlap": 0,
-        "velden": []
-      },
-      {
-        "paar": [
-          "genootschap",
-          "sportclub"
         ],
         "gedeeld": 0,
         "overlap": 0,

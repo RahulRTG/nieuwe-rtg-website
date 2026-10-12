@@ -9032,7 +9032,7 @@
       '<div class="zc-kop">'+(geldig?T('zc.ok','RTG-geverifieerd'):T('zc.nee','Niet geldig'))+'</div>'+
       (geldig ? '<div class="zc-claims">'+rijen+'</div>'+(geldTot?'<div class="zc-tot">'+T('zc.geldigtot','Geldig tot ')+geldTot+'</div>':'')
               : '<div class="zc-tot">'+reden+'</div>')+
-      '<div class="zc-priv">'+T('zc.priv','Zonder naam of geboortedatum: RTG staat met de handtekening garant dat het paspoort is gezien.')+'</div>'+
+      '<div class="zc-priv">'+T('zc.priv','Zonder naam of geboortedatum. Een leeftijd staat er alleen op als RTG het identiteitsbewijs heeft gezien; ontbreekt hij, dan is hij niet bewezen.')+'</div>'+
       '<button class="zc-btn" id="zcDicht">'+T('zc.klaar','Klaar')+'</button></div>';
     document.body.appendChild(ov);
     const dicht = () => ov.remove();

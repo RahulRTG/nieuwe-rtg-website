@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2445 bestanden en 16754 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2445 bestanden en 16755 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 2445 |
-| losse beweringen (`test(...)`) | 16754 |
+| losse beweringen (`test(...)`) | 16755 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 2271 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2137 bestanden, 16217 beweringen.
+2137 bestanden, 16218 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2163,7 +2163,7 @@ toets omvalt.
 | `zegel-wedloop.test.js` | 2 | gezakt op `!==->===#0` | DE ZEGELSLEUTEL ONDER GELIJKTIJDIG OPSTARTEN. DE AANLEIDING IS EEN ECHTE CI-UITVAL. |
 | `zegel.test.js` | 6 | gezakt op `&&->||#0` | RTG Zegel (server/lib/zegel.js): bewijs zonder tonen, offline verifieerbaar. Getoetst: selectieve onthulling (ruwe persoonsgegevens komen er nooit in), offline verificatie met alleen de publieke sleutel, afwijzing... |
 | `zegelcheck.test.js` | 4 | gezakt op `!==->===#0` | RTG Zegel offline controleren (public/shared/zegelcheck.js): dezelfde WebCrypto- verificatie die de leverancier-app op het toestel draait. We maken een echt Zegel met de uitgevende kant (server/lib/zegel.js), en... |
-| `zegelroute.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Zegel-routes (server.js): een lid maakt een zegel voor een partner, de partner haalt de publieke sleutel op en verifieert OFFLINE (met server/lib/ zegel.controleer). Getoetst: selectieve onthulling (alleen ware,... |
+| `zegelroute.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Zegel-routes (server.js): een lid maakt een zegel voor een partner, de partner haalt de publieke sleutel op en verifieert OFFLINE (met server/lib/ zegel.controleer). Getoetst: selectieve onthulling (alleen ware,... |
 | `zelfzorg-repareren.test.js` | 3 | gezakt op `===->!==#0` | De reparatieknop van de zelfzorg mag klantdata en sporen niet legen (ARBEID.md par. 4 punt 9; BESTUUR.md 6.5). |
 | `zelfzorg.test.js` | 7 | gezakt op `liegpoort /api/` | De zelfzorg van het platform: opruimen, beschermen, repareren en upgraden, met de knoppen achter de kantoor-inlog. De automaat doet alleen het veilige werk; alles wat geld raakt wordt een advies, nooit een ingreep. |
 | `ziekmelding-privacy.test.js` | 3 | gezakt op `liegpoort /api/` | Een ziekmelding draagt geen omschrijving -- en de loonrun weet er wel van. WAT HIER FOUT WAS. |

@@ -1,12 +1,15 @@
 /* Scherm-test: "Toon je Zegel" in de leden-app. Het lid opent de Zegel-knop,
    kiest een feit (18+ staat standaard aan) en toont het. De app hoort dan via
    /api/zegel/maak een token te halen en er met onze eigen codec een QR van te
-   tekenen, met de badge "RTG-geverifieerd" en de bewezen claim. Zo is de hele
+   tekenen, met de badge "Ondertekend door RTG" en de bewezen claim. Sinds 12
+   oktober 2026 laat het lid eerst zijn paspoort controleren: een leeftijd in
+   het zegel is een GEZIENE leeftijd (kern/betrouwbaarheid.js `leeftijdGezien`),
+   en deze toets stond groen op een zelf ingetypte datum. Zo is de hele
    ID-check-kant (lid toont) in een echte browser getoetst. Overgeslagen zonder
    browser. Draai: node --test test/zegel-ui.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, bankDeur, pasAppAdres } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, letOpFouten, laadPlaywright, browserOpties, geenBrowser, bankDeur, pasAppAdres } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-zguI-')); }
@@ -16,7 +19,7 @@ async function api(base, pad, body, token) {
   return (await fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })).json();
 }
 
-test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
+test('leden-app: Toon je Zegel -> QR, ondertekend door RTG, met de bewezen claim',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -25,6 +28,14 @@ test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
     const reg = await api(base, '/api/auth/register', { name: 'Zegel Toon', email: 'zt@x.nl', phone: '0612345677',
       password: 'geheim123', geboortedatum: '1990-03-03', tier: 'business', pasApp: 'business' });
     assert.ok(reg.token, 'lid geregistreerd');
+    // het paspoort laten zien: een kantoormens op naam neemt de datum van het document over
+    const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+    await api(base, '/api/verify/upload', { image: PNG }, reg.token);
+    const kantoor = await kantoorAlsPersoon(base, 'RTG-OFFICE');
+    assert.ok(kantoor, 'een kantoormens op naam');
+    const rij = (await api(base, '/api/office/verifications', {}, kantoor)).pending.find(x => x.email === 'zt@x.nl');
+    assert.ok(rij, 'de verificatie staat in de wachtrij');
+    await api(base, '/api/office/verify', { userId: rij.id, decision: 'approve', geboortedatum: '1990-03-03' }, kantoor);
 
     browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
@@ -72,7 +83,8 @@ test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
     await page.click('#zgMaak');
     await page.waitForSelector('#zgQr canvas', { timeout: 10000 });
     const badge = await page.textContent('.zg-badge');
-    assert.match(badge, /geverifieerd/i, 'de badge toont RTG-geverifieerd');
+    assert.match(badge, /Ondertekend door RTG/, 'de badge zegt wat de handtekening bewijst');
+    assert.match(await page.textContent('.zg-claims'), /18 jaar of ouder/, 'de geziene leeftijd staat erin');
     const claimCount = await page.evaluate(() => document.querySelectorAll('.zg-claim').length);
     assert.ok(claimCount >= 1, 'minstens een bewezen claim getoond');
     // de getekende QR is een echte canvas met inhoud

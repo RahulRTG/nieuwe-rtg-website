@@ -1,8 +1,11 @@
 /* RTG Zegel controleren (offline): een leverancier scant het Zegel van een lid
    en verifieert het HIER, op het toestel, met alleen de publieke sleutel van RTG
-   -- geen serveroproep. Zo wordt het een echte, cryptografisch bewezen ID-/
-   leeftijdscontrole: RTG staat garant dat het paspoort is gezien, de partner
-   leert enkel het bewezen feit (18+, lid, welke pas), nooit de naam.
+   -- geen serveroproep. De handtekening bewijst dat RTG deze feiten verklaart,
+   niet meer. Wat RTG verklaart verschilt per feit: een leeftijd (18+, 21+) zit
+   er alleen in als RTG het identiteitsbewijs heeft gezien en de geboortedatum
+   van dat document komt (server/kern/betrouwbaarheid.js `leeftijdGezien`);
+   `lid` en `pas` zeggen niets over identiteit. Ontbreekt een leeftijdsclaim,
+   dan is hij niet bewezen -- niet onwaar. De partner leert nooit de naam.
 
    Puur WebCrypto (Ed25519), dezelfde code in de browser en in node. Geen extern
    pakket. Levert {geldig, claims, sub, exp, reden}. */

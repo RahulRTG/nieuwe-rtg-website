@@ -1345,6 +1345,8 @@ app.post('/api/talen', talenCache, (req, res) => res.json({ talen: talen.actieve
    onderwerp is een paarsgewijs pseudoniem: twee venues kunnen een lid niet
    matchen. Zie server/lib/zegel.js. */
 const zegel = require('./lib/zegel').maakZegel({ dataDir: DATA_DIR });
+const { leeftijdGezien, waaromLeeftijdNietGezien } = require('./kern/betrouwbaarheid');
+const lidstandZegel = require('./kern/betrouwbaarheid').maakLidstand({ accounts });
 // de publieke sleutel: hiermee verifieert een partner-app een zegel zonder server.
 app.get('/api/zegel/sleutel', (req, res) => {
   res.setHeader('Cache-Control', 'public, max-age=300');
@@ -1356,7 +1358,21 @@ app.post('/api/zegel/maak', auth, (req, res) => {
   const sess = req.session;
   const partner = typeof req.body.partner === 'string' ? req.body.partner.slice(0, 64) : null;
   const gevraagd = Array.isArray(req.body.claims) && req.body.claims.length ? req.body.claims : ['lid'];
-  const lft = leeftijdVan(geborenVan(sess));
+  /* EEN LEEFTIJD IN HET ZEGEL IS EEN GEZIENE LEEFTIJD. Hier stond
+     `leeftijdVan(geborenVan(sess))`: elke geboortedatum, ook een zelf
+     ingetypte en ook die van een demo-persona zonder account. De handtekening
+     klopte dan, de bewering eronder niet -- en de partner leest dat RTG garant
+     staat. Nu alleen met account, A3 en een datum van het document
+     (kern/betrouwbaarheid.js `leeftijdGezien`, dezelfde regel als het
+     jeugdbestuur). Is hij niet gezien, dan gaat de claim er niet in en hoort
+     het lid waarom (`nietBewezen`); de partner ziet een ontbrekende claim, nooit
+     een verzonnen. */
+  const zegelstand = lidstandZegel(sess.key);
+  const lft = leeftijdGezien(zegelstand) ? zegelstand.leeftijd : null;
+  const nietBewezen = {};
+  for (const k of ['leeftijd18', 'leeftijd21']) {
+    if (gevraagd.includes(k) && lft == null) nietBewezen[k] = waaromLeeftijdNietGezien(zegelstand);
+  }
   const feiten = {
     lid: true,
     leeftijd18: lft != null && lft >= 18,
@@ -1369,7 +1385,7 @@ app.post('/api/zegel/maak', auth, (req, res) => {
   const seed = sess.key || (sess.account && sess.account.id) || 'onbekend';
   const geldigMin = Math.max(1, Math.min(60, Number(req.body.geldigMin) || 5));
   const token = zegel.zegel({ codenaam: seed, partner, claims, geldigMin });
-  res.json({ token, claims, sub: zegel.pseudoniem(seed, partner), geldigMin });
+  res.json({ token, claims, sub: zegel.pseudoniem(seed, partner), geldigMin, nietBewezen });
 });
 // een partner/PDA controleert een zegel (kan ook offline met de publieke sleutel).
 app.post('/api/zegel/controleer', (req, res) => {

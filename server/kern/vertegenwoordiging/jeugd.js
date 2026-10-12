@@ -45,10 +45,9 @@
    ========================================================================== */
 'use strict';
 
-const { voldoet } = require('../betrouwbaarheid');
+const { leeftijdGezien } = require('../betrouwbaarheid');
 
 const STANDEN = Object.freeze(['gevraagd', 'aanvaard', 'bevestigd', 'afgewezen']);
-const MIN_NIVEAU = 'A3';
 const MEERDERJARIG = 18;
 
 module.exports = (h) => {
@@ -60,7 +59,7 @@ module.exports = (h) => {
      andere staat. */
   function jeugdstand(key) {
     const st = (typeof lidstand === 'function' ? lidstand(String(key || '')) : null) || {};
-    const gezien = !!st.account && voldoet(st.niveau, MIN_NIVEAU) && st.leeftijdBron === 'paspoort';
+    const gezien = leeftijdGezien(st);
     return {
       account: !!st.account,
       gezien,

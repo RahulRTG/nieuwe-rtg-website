@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "451a64826",
-  "seconden": 9.7,
+  "commit": "190042724",
+  "seconden": 9.9,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,

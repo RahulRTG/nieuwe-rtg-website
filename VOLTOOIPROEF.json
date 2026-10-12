@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T00:02:49.678Z",
-    "commit": "f259e9136",
+    "op": "2026-10-12T01:25:43.247Z",
+    "commit": "4ecd9603e",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/voltooiproef.js",
@@ -43,28 +43,28 @@
             "wat": "een nieuw lid heeft geen voornaamwoord en het standaardprofiel",
             "stand": "gesloten",
             "ziet": "voornaamwoord \"\", tekst normaal, contrast normaal",
-            "ms": 34
+            "ms": 33
           },
           {
             "nr": 2,
             "wat": "het lid zet zijn voornaamwoord en aanhef in eigen woorden",
             "stand": "gesloten",
-            "ziet": "\"hen/die hnhpf\", \"Beste hnhpf\"",
-            "ms": 27
+            "ziet": "\"hen/die km2tt\", \"Beste km2tt\"",
+            "ms": 118
           },
           {
             "nr": 3,
             "wat": "het lid zet groot en hoog contrast; elk ander scherm leest dat via de gedeelde leesroute",
             "stand": "gesloten",
             "ziet": "zet 200; leesroute: tekst groot, contrast hoog, beweging normaal",
-            "ms": 19
+            "ms": 26
           },
           {
             "nr": 4,
             "wat": "een onbekende keuze wordt nooit opgeslagen, en de andere instellingen blijven staan",
             "stand": "gesloten",
             "ziet": "status 200, tekst normaal, contrast hoog",
-            "ms": 11
+            "ms": 26
           }
         ],
         "storingen": [],
@@ -83,21 +83,21 @@
             "wat": "na een nette herstart staan voornaamwoord, aanhef en profiel er nog",
             "stand": "gesloten",
             "ziet": "beeld byte voor byte gelijk",
-            "ms": 85
+            "ms": 52
           },
           {
             "nr": 2,
             "wat": "een nieuwe sessie (een andere browser) krijgt hetzelfde profiel",
             "stand": "gesloten",
-            "ziet": "\"hen/die hnhpf\", tekst groter, beweging stil",
-            "ms": 271
+            "ziet": "\"hen/die km2tt\", tekst groter, beweging stil",
+            "ms": 226
           },
           {
             "nr": 3,
             "wat": "in de kluis (rtg.db, buiten de server om) veranderde precies een rij, versleuteld en zonder de klare tekst",
             "stand": "gesloten",
             "ziet": "1 rij(en) veranderd sinds voor de handeling, klare tekst niet te vinden",
-            "ms": 2
+            "ms": 1
           }
         ],
         "storingen": [],
@@ -116,21 +116,21 @@
             "wat": "dubbelklik: dezelfde keuze twee keer geeft dezelfde stand",
             "stand": "gesloten",
             "ziet": "200/200, tekst groter, links streep",
-            "ms": 16
+            "ms": 26
           },
           {
             "nr": 2,
             "wat": "een afgebroken verzoek en daarna opnieuw: de nieuwe stand, de rest onaangetast",
             "stand": "gesloten",
-            "ziet": "afgebroken (client gaf op), opnieuw 200, \"zij/haar hnnq9\", aanhef bleef \"Beste hnhpf\"",
-            "ms": 327
+            "ziet": "afgebroken (client gaf op), opnieuw 200, \"zij/haar km7ud\", aanhef bleef \"Beste km2tt\"",
+            "ms": 329
           },
           {
             "nr": 3,
             "wat": "een crash direct na het zetten: de keuze staat er nog",
             "stand": "gesloten",
             "ziet": "zet 200, na SIGKILL contrast normaal, tekst groter",
-            "ms": 5143
+            "ms": 5679
           }
         ],
         "storingen": [],
@@ -169,42 +169,42 @@
             "wat": "een nieuw lid begint met een leeg ledger, en de zeven kapitalen staan er zonder totaal",
             "stand": "gesloten",
             "ziet": "0 feiten, 7 kapitalen",
-            "ms": 22
+            "ms": 70
           },
           {
             "nr": 2,
             "wat": "een feit met een bedrag wordt geweigerd, met de reden erbij",
             "stand": "gesloten",
             "ziet": "400: NOOIT.bedrag: een som geld; die woont in WAARDE.md en kern/rugdekking, nooit hie",
-            "ms": 44
+            "ms": 37
           },
           {
             "nr": 3,
             "wat": "het lid schrijft een feit op; het staat in de reeks met de dag waarop het gebeurde",
             "stand": "gesloten",
             "ziet": "vermogen, 2020-06-30, ingetrokken=false",
-            "ms": 22
+            "ms": 26
           },
           {
             "nr": 4,
             "wat": "het lid deelt die ene regel; een buitenstaander zonder account leest precies die regel en het voorbehoud",
             "stand": "gesloten",
-            "ziet": "deel 200, ontvanger 200 ziet \"Diploma hotelschool mv4hnxt6g1va\", gebruikt 1x",
-            "ms": 27
+            "ziet": "deel 200, ontvanger 200 ziet \"Diploma hotelschool mv4kmh8nfj33\", gebruikt 1x",
+            "ms": 40
           },
           {
             "nr": 5,
             "wat": "het lid stopt het delen; de buitenstaander krijgt niets meer",
             "stand": "gesloten",
             "ziet": "stop 200, ontvanger daarna 404",
-            "ms": 18
+            "ms": 15
           },
           {
             "nr": 6,
             "wat": "intrekken vraagt een reden, en de regel blijft leesbaar als ingetrokken",
             "stand": "gesloten",
             "ziet": "zonder reden 400, met reden 200; regel staat er, ingetrokken=true",
-            "ms": 35
+            "ms": 22
           }
         ],
         "storingen": [],
@@ -223,21 +223,21 @@
             "wat": "na een nette herstart is de reeks byte voor byte dezelfde, intrekking inbegrepen",
             "stand": "gesloten",
             "ziet": "reeks gelijk (2 feiten)",
-            "ms": 193
+            "ms": 33
           },
           {
             "nr": 2,
             "wat": "een nieuwe sessie (een andere browser) leest dezelfde reeks",
             "stand": "gesloten",
             "ziet": "reeks gelijk",
-            "ms": 146
+            "ms": 141
           },
           {
             "nr": 3,
             "wat": "de regels staan in de opslag zelf (store.db, gelezen buiten de server om)",
             "stand": "gesloten",
             "ziet": "1 reeks met deze regel, 1 intrekking erin",
-            "ms": 0
+            "ms": 1
           }
         ],
         "storingen": [],
@@ -256,28 +256,28 @@
             "wat": "dubbelklik: hetzelfde feit twee keer wordt een regel, en de tweede keer zegt waarom",
             "stand": "gesloten",
             "ziet": "eerste 200, tweede 409, 1 regel(s)",
-            "ms": 26
+            "ms": 24
           },
           {
             "nr": 2,
             "wat": "een afgebroken verzoek en daarna opnieuw: precies een regel",
             "stand": "gesloten",
             "ziet": "afgebroken (client gaf op), opnieuw 409, 1 regel(s)",
-            "ms": 314
+            "ms": 317
           },
           {
             "nr": 3,
             "wat": "een crash direct na het opschrijven: wat er stond, staat er nog",
             "stand": "gesloten",
             "ziet": "zet 200, na SIGKILL staat hij er",
-            "ms": 6255
+            "ms": 5712
           },
           {
             "nr": 4,
             "wat": "een crash direct na het intrekken: ingetrokken blijft ingetrokken",
             "stand": "gesloten",
             "ziet": "intrek 200, na SIGKILL ingetrokken=true",
-            "ms": 6638
+            "ms": 5791
           }
         ],
         "storingen": [],
@@ -316,28 +316,28 @@
             "wat": "een nieuw lid begint met alles uit: afwezigheid is geen toestemming",
             "stand": "gesloten",
             "ziet": "4 soorten, 0 aan, 4 die nooit uit kunnen",
-            "ms": 19
+            "ms": 21
           },
           {
             "nr": 2,
             "wat": "het lid geeft toestemming voor aanbiedingen per e-mail en sms, met herkomst",
             "stand": "gesloten",
             "ziet": "aan=true, kanalen email+sms, via scherm:voltooiproef",
-            "ms": 16
+            "ms": 23
           },
           {
             "nr": 3,
             "wat": "het lid beperkt het tot e-mail; de geschiedenis zegt gegeven en daarna gewijzigd",
             "stand": "gesloten",
             "ziet": "geschiedenis: gewijzigd, gegeven",
-            "ms": 11
+            "ms": 13
           },
           {
             "nr": 4,
             "wat": "afmelden in een handeling: alles uit, en de intrekking staat erbij",
             "stand": "gesloten",
             "ziet": "2 uitgezet, 0 nog aan, 2 intrekkingen in de geschiedenis",
-            "ms": 29
+            "ms": 26
           }
         ],
         "storingen": [],
@@ -355,22 +355,22 @@
             "nr": 1,
             "wat": "na een nette herstart staat de gegeven toestemming er nog, met hetzelfde tijdstip en dezelfde herkomst",
             "stand": "gesloten",
-            "ziet": "voor: 2026-10-12T00:03:42.142Z via scherm:voltooiproef; na: 2026-10-12T00:03:42.142Z via scherm:voltooiproef",
-            "ms": 54
+            "ziet": "voor: 2026-10-12T01:26:33.477Z via scherm:voltooiproef; na: 2026-10-12T01:26:33.477Z via scherm:voltooiproef",
+            "ms": 72
           },
           {
             "nr": 2,
             "wat": "een nieuwe sessie (een andere browser) leest exact dezelfde geschiedenis",
             "stand": "gesloten",
             "ziet": "geschiedenis byte voor byte gelijk (6 regels)",
-            "ms": 227
+            "ms": 241
           },
           {
             "nr": 3,
             "wat": "de toestemming staat in de opslag zelf (store.db, gelezen buiten de server om)",
             "stand": "gesloten",
-            "ziet": "1 lid met deze toestemming in de kv-opslag, gegeven 2026-10-12T00:03:42.142Z",
-            "ms": 0
+            "ziet": "1 lid met deze toestemming in de kv-opslag, gegeven 2026-10-12T01:26:33.477Z",
+            "ms": 1
           }
         ],
         "storingen": [],
@@ -389,28 +389,28 @@
             "wat": "dubbelklik: dezelfde keuze twee keer is een gebeurtenis, niet twee",
             "stand": "gesloten",
             "ziet": "geschiedenis 6 -> 7",
-            "ms": 35
+            "ms": 68
           },
           {
             "nr": 2,
             "wat": "een afgebroken verzoek en daarna opnieuw: de juiste stand, een regel in de geschiedenis",
             "stand": "gesloten",
             "ziet": "afgebroken (client gaf op), opnieuw 200, geschiedenis 7 -> 8",
-            "ms": 329
+            "ms": 342
           },
           {
             "nr": 3,
             "wat": "een crash direct na het afmelden: wat ingetrokken heette, blijft ingetrokken",
             "stand": "gesloten",
             "ziet": "afmelden 200 (3 uit), na SIGKILL en herstart 0 aan, laatste regel ingetrokken",
-            "ms": 5144
+            "ms": 5913
           },
           {
             "nr": 4,
             "wat": "een crash direct na het geven: wat gegeven heette, staat er nog",
             "stand": "gesloten",
             "ziet": "geven 200, na SIGKILL: aan=true via push",
-            "ms": 4875
+            "ms": 9721
           }
         ],
         "storingen": [],
@@ -451,42 +451,42 @@
             "wat": "een Live Circle zonder ontvanger wordt geweigerd, met de reden erbij",
             "stand": "gesloten",
             "ziet": "400: Kies minstens één verbonden persoon of betrokken bedrijf.",
-            "ms": 14
+            "ms": 21
           },
           {
             "nr": 2,
             "wat": "het lid deelt zijn reis met de zaak, en vraagt exacte plek: de zaak krijgt hooguit voortgang",
             "stand": "gesloten",
             "ziet": "maak 200, niveau voor de zaak: voortgang",
-            "ms": 9
+            "ms": 6
           },
           {
             "nr": 3,
             "wat": "de zaak ziet de aankomst, op codenaam en zonder plek",
             "stand": "gesloten",
-            "ziet": "1 aankomst, status gepland, eigenaar Saffieren Ooievaar A573, plek niet meegestuurd",
-            "ms": 9
+            "ziet": "1 aankomst, status gepland, eigenaar Noordelijke Ster 4677, plek niet meegestuurd",
+            "ms": 5
           },
           {
             "nr": 4,
             "wat": "het lid zet \"onderweg\" met een aankomsttijd; de zaak ziet het",
             "stand": "gesloten",
             "ziet": "zaak ziet onderweg 19:45",
-            "ms": 13
+            "ms": 17
           },
           {
             "nr": 5,
             "wat": "pauze: de zaak ziet niets meer; hervatten: weer wel",
             "stand": "gesloten",
             "ziet": "tijdens pauze 0, na hervatten 1",
-            "ms": 34
+            "ms": 14
           },
           {
             "nr": 6,
             "wat": "stop: de zaak ziet niets meer, en het lid ook niet",
             "stand": "gesloten",
             "ziet": "stop 200, zaak 0, lid 0",
-            "ms": 13
+            "ms": 9
           }
         ],
         "storingen": [],
@@ -505,21 +505,21 @@
             "wat": "na een nette herstart staat het lopende moment er nog, met dezelfde stand",
             "stand": "gesloten",
             "ziet": "momenten byte voor byte gelijk",
-            "ms": 16
+            "ms": 81
           },
           {
             "nr": 2,
             "wat": "een nieuwe sessie van het lid en een nieuwe sessie van de zaak zien hetzelfde",
             "stand": "gesloten",
             "ziet": "lid: vertraagd, zaak: vertraagd 21:10",
-            "ms": 297
+            "ms": 426
           },
           {
             "nr": 3,
             "wat": "het moment staat in de opslag zelf (store.db, gelezen buiten de server om), het gestopte ook",
             "stand": "gesloten",
             "ziet": "1 lopend, 1 gestopt in de kv-opslag",
-            "ms": 1
+            "ms": 6
           }
         ],
         "storingen": [],
@@ -538,14 +538,14 @@
             "wat": "dubbelklik op Pauze: een stand, en de zaak ziet niets",
             "stand": "gesloten",
             "ziet": "200/200, gepauzeerd=true, zaak ziet 0",
-            "ms": 31
+            "ms": 59
           },
           {
             "nr": 2,
             "wat": "dubbelklik op Deel live: hetzelfde formulier twee keer is een Live Circle, niet twee",
             "stand": "gesloten",
             "ziet": "200/200, lid heeft er 1, zaak ziet er 1",
-            "ms": 20
+            "ms": 17
           },
           {
             "nr": 3,
@@ -559,14 +559,14 @@
             "wat": "een crash direct na het delen: de zaak ziet de aankomst nog",
             "stand": "gesloten",
             "ziet": "maak 200, na SIGKILL ziet de zaak 1",
-            "ms": 5288
+            "ms": 6419
           },
           {
             "nr": 5,
             "wat": "een crash direct na stop: gestopt blijft gestopt, de zaak ziet niets",
             "stand": "gesloten",
             "ziet": "stop 200, na SIGKILL ziet de zaak 0",
-            "ms": 5317
+            "ms": 6397
           }
         ],
         "storingen": [],
@@ -604,36 +604,36 @@
             "nr": 1,
             "wat": "een tweede toestel logt in, en het lid ziet het in zijn lijst",
             "stand": "gesloten",
-            "ziet": "2 sessies, huidige YIzfyvxnBHk8",
-            "ms": 184
+            "ziet": "2 sessies, huidige bQEPjC4hhDsa",
+            "ms": 158
           },
           {
             "nr": 2,
             "wat": "het lid bevestigt zijn toestel met een sleutel (uitdaging, handtekening)",
             "stand": "gesloten",
             "ziet": "binden 200, sleutelbinding bewezen",
-            "ms": 44
+            "ms": 41
           },
           {
             "nr": 3,
             "wat": "het lid sluit het andere toestel op afstand, met een bezitsbewijs",
             "stand": "gesloten",
             "ziet": "status 200, ingetrokken_tokens 0 -> 1",
-            "ms": 26
+            "ms": 132
           },
           {
             "nr": 4,
             "wat": "het gesloten toestel merkt het: zijn token wordt geweigerd",
             "stand": "gesloten",
             "ziet": "het andere toestel krijgt 401",
-            "ms": 5
+            "ms": 9
           },
           {
             "nr": 5,
             "wat": "het lid ziet het andere toestel niet meer, en werkt zelf gewoon door",
             "stand": "gesloten",
-            "ziet": "lijst: YIzfyvxnBHk8",
-            "ms": 13
+            "ziet": "lijst: bQEPjC4hhDsa",
+            "ms": 7
           }
         ],
         "storingen": [],
@@ -652,21 +652,21 @@
             "wat": "na een nette herstart blijft het gesloten toestel buiten",
             "stand": "gesloten",
             "ziet": "het andere toestel krijgt 401 na de herstart",
-            "ms": 13
+            "ms": 14
           },
           {
             "nr": 2,
             "wat": "na de herstart werkt de sessie van het lid nog, en de lijst is dezelfde",
             "stand": "gesloten",
-            "ziet": "lijst: YIzfyvxnBHk8",
-            "ms": 39
+            "ziet": "lijst: bQEPjC4hhDsa",
+            "ms": 35
           },
           {
             "nr": 3,
             "wat": "een nieuwe sessie (een andere browser) ziet hetzelfde",
             "stand": "gesloten",
             "ziet": "lijst in de nieuwe sessie: 2 sessies, de gesloten er niet bij",
-            "ms": 186
+            "ms": 214
           },
           {
             "nr": 4,
@@ -692,28 +692,28 @@
             "wat": "dubbelklik: dezelfde sessie nog eens sluiten geeft een nette weigering en verandert niets",
             "stand": "gesloten",
             "ziet": "tweede keer 404 (Die sessie kennen wij niet.), andere toestel 401, lid 200",
-            "ms": 45
+            "ms": 57
           },
           {
             "nr": 2,
             "wat": "een netwerkherhaling met hetzelfde bewijs doet niets twee keer",
             "stand": "gesloten",
             "ziet": "eerste 200, herhaling 401 (Dit bezitsbewijs is al gebruikt.), toestel 401",
-            "ms": 253
+            "ms": 245
           },
           {
             "nr": 3,
             "wat": "een afgebroken sluitverzoek laat geen halve stand na, en opnieuw proberen maakt het af",
             "stand": "gesloten",
             "ziet": "afgebroken (client gaf op), opnieuw 404, toestel 401",
-            "ms": 541
+            "ms": 512
           },
           {
             "nr": 4,
             "wat": "een crash direct na de bevestiging: wat gesloten heette, blijft gesloten",
             "stand": "gesloten",
             "ziet": "sluiten 200, na SIGKILL en herstart: toestel 401, lid 200",
-            "ms": 6074
+            "ms": 6272
           }
         ],
         "storingen": [],
@@ -752,35 +752,35 @@
             "wat": "een nieuw lid heeft geen meldingen",
             "stand": "gesloten",
             "ziet": "0 meldingen",
-            "ms": 13
+            "ms": 20
           },
           {
             "nr": 2,
             "wat": "een melding zonder plek wordt geweigerd, met de reden erbij",
             "stand": "gesloten",
             "ziet": "400: Kies of beschrijf de plek in huis.",
-            "ms": 14
+            "ms": 11
           },
           {
             "nr": 3,
             "wat": "het lid meldt wat er stuk is; de melding staat er als gemeld en niet als ingepland",
             "stand": "gesloten",
             "ziet": "gemeld, hoog, keuken",
-            "ms": 17
+            "ms": 10
           },
           {
             "nr": 4,
             "wat": "het lid ziet dezelfde melding op een ander toestel",
             "stand": "gesloten",
             "ziet": "zelfde id, gemeld",
-            "ms": 178
+            "ms": 233
           },
           {
             "nr": 5,
             "wat": "het lid annuleert; de melding blijft als historie staan",
             "stand": "gesloten",
             "ziet": "annuleer 200, staat er als geannuleerd",
-            "ms": 10
+            "ms": 16
           }
         ],
         "storingen": [],
@@ -799,21 +799,21 @@
             "wat": "na een nette herstart staan dezelfde meldingen er, met dezelfde stand en hetzelfde tijdstip",
             "stand": "gesloten",
             "ziet": "lijst gelijk (2 meldingen)",
-            "ms": 27
+            "ms": 89
           },
           {
             "nr": 2,
             "wat": "een nieuwe sessie leest dezelfde meldingen",
             "stand": "gesloten",
             "ziet": "lijst gelijk",
-            "ms": 238
+            "ms": 236
           },
           {
             "nr": 3,
             "wat": "de meldingen staan in de opslag zelf (store.db, gelezen buiten de server om)",
             "stand": "gesloten",
             "ziet": "1 lid met deze melding, geannuleerde melding ook bewaard",
-            "ms": 0
+            "ms": 1
           }
         ],
         "storingen": [],
@@ -832,28 +832,28 @@
             "wat": "dubbelklik: dezelfde melding twee keer is een melding, niet twee",
             "stand": "gesloten",
             "ziet": "statussen 200/200, 1 melding(en)",
-            "ms": 19
+            "ms": 23
           },
           {
             "nr": 2,
             "wat": "een afgebroken verzoek en daarna opnieuw: precies een melding",
             "stand": "gesloten",
             "ziet": "afgebroken (client gaf op), opnieuw 200, 1 melding(en)",
-            "ms": 316
+            "ms": 324
           },
           {
             "nr": 3,
             "wat": "een crash direct na het melden: de melding staat er nog",
             "stand": "gesloten",
             "ziet": "meld 200, na SIGKILL gemeld",
-            "ms": 8836
+            "ms": 5743
           },
           {
             "nr": 4,
             "wat": "een crash direct na het annuleren: geannuleerd blijft geannuleerd",
             "stand": "gesloten",
             "ziet": "annuleer 200, na SIGKILL geannuleerd",
-            "ms": 6856
+            "ms": 5737
           }
         ],
         "storingen": [],

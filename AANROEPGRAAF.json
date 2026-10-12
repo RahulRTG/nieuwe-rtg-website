@@ -3,7 +3,7 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "c6fb7cd63",
+  "commit": "8ed35e6a3",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -5460,9 +5460,9 @@
  "gemeten": {
   "bestanden": 4474,
   "nietGelezen": 0,
-  "aanroepen": 181084,
-  "kanten": 31535,
-  "kantenLokaal": 20238,
+  "aanroepen": 181087,
+  "kanten": 31540,
+  "kantenLokaal": 20243,
   "kantenIngevoerd": 2843,
   "kantenLid": 2819,
   "kantenViaKern": 4899,
@@ -5471,23 +5471,23 @@
   "kantenUitFabriek": 306,
   "kantenViaKernZonderSymbool": 2950,
   "kernherkomstGelezen": 1347,
-  "onopgelosteAanroepen": 135104,
-  "onopgelosteNamen": 13898,
+  "onopgelosteAanroepen": 135102,
+  "onopgelosteNamen": 13900,
   "onopgelostNaarSoort": {
    "ingebouwd": 36274,
    "externeModule": 1061,
    "kader": 12430,
-   "contextobject": 20794,
+   "contextobject": 20791,
    "uitgepaktObject": 1679,
    "lokaleWaarde": 24187,
-   "methodeOpWaarde": 38212,
+   "methodeOpWaarde": 38213,
    "overig": 467
   },
   "opgelostPct": 25.4,
   "doelOnbekend": 0,
   "bewaakteVooruitwijzing": 0,
   "doelNietVastTeStellen": 72,
-  "symbolenMetAanroeper": 12382,
+  "symbolenMetAanroeper": 12383,
   "routesMetSymbool": 3373,
   "routeSymboolKanten": 7091
  },
@@ -32825,7 +32825,7 @@
  "onopgelostTop": [
   {
    "naam": "MemberExpression",
-   "aantal": 35333
+   "aantal": 35334
   },
   {
    "naam": "String",
@@ -33055,7 +33055,7 @@
    "namen": [
     {
      "naam": "MemberExpression",
-     "aantal": 35320
+     "aantal": 35321
     },
     {
      "naam": "CallExpression",
@@ -269922,39 +269922,79 @@
    "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "naar": "maakPrefix",
    "hoe": "lokaal",
-   "lijn": 19
+   "lijn": 23
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "maakInvite",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "hele",
+   "hoe": "lokaal",
+   "lijn": 44
   },
   {
    "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "van": "maakInvite",
    "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "naar": "nieuweCode",
-   "hoe": "lokaal",
-   "lijn": 60
-  },
-  {
-   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
-   "van": "maakInvite",
-   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
-   "naar": "spec",
-   "hoe": "lokaal",
-   "lijn": 60
-  },
-  {
-   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
-   "van": "maakInvite",
-   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
-   "naar": "plekVan",
    "hoe": "lokaal",
    "lijn": 64
   },
   {
    "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "maakInvite",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "spec",
+   "hoe": "lokaal",
+   "lijn": 64
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "maakInvite",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "plekVan",
+   "hoe": "lokaal",
+   "lijn": 68
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "lijstInvites",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "hele",
+   "hoe": "lokaal",
+   "lijn": 78
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "trekInviteIn",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "hele",
+   "hoe": "lokaal",
+   "lijn": 81
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "trekInVoorStaff",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "hele",
+   "hoe": "lokaal",
+   "lijn": 99
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "van": "roteerInvite",
+   "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
+   "naar": "hele",
+   "hoe": "lokaal",
+   "lijn": 110
+  },
+  {
+   "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "van": "roteerInvite",
    "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "naar": "nieuweCode",
    "hoe": "lokaal",
-   "lijn": 125
+   "lijn": 129
   },
   {
    "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
@@ -269962,7 +270002,7 @@
    "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "naar": "spec",
    "hoe": "lokaal",
-   "lijn": 125
+   "lijn": 129
   },
   {
    "vanBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
@@ -269970,7 +270010,7 @@
    "naarBestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "naar": "plekVan",
    "hoe": "lokaal",
-   "lijn": 130
+   "lijn": 134
   },
   {
    "vanBestand": "server/routes/supplier/werving/uitnodiging.js",

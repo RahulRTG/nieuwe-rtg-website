@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 76,
-    "bewijsAchterstand": 680,
+    "bewijsAchterstand": 681,
     "bewijsAlleenKeten": 23,
     "bewijsCellenBewezen": 28249,
     "bronBlindeBestanden": 0,
@@ -176,6 +176,16 @@
     "loopFabricTijdelijk": 168
   },
   "notities": [
+    {
+      "datum": "2026-10-12",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 680,
+      "vervalt": "2027-01-12",
+      "meter": "bewijsAchterstand 680 -> 681 (gevolg-onbekend 96 -> 97)",
+      "reden": "Besluit van de eigenaar (11 en 12 oktober 2026): Rahul is de ingang naar de knelpuntmotor, dus /api/knelpunt kwam op de LEZEN-lijst van het stuur. IDEMPROEF.json heeft die route nooit aan het werk gekregen (kale oproep: 400), dus kern/stuur/gevolg.js noemt zijn effect onbekend. Een lokale volle ronde mat hem 3x 200 zonder enige collectie te raken, maar reproduceerde de rest van het register niet (130 in plaats van 95 onbekend) en is daarom niet overgenomen; de eigenaar koos uitdrukkelijk voor deze vastgelegde schuld boven een register met metingen van twee rondes onder een stempel.",
+      "waarheen": "Het lijf met een doel staat in scripts/lib/idemwereld.js; de eerstvolgende referentieronde van npm run idemproef meet hem en brengt gevolg-onbekend terug naar 96. Zie BEWIJSSCHULD.json (groei) en MAATSTAF.md par. 7k."
+    },
     {
       "datum": "2026-10-06",
       "soort": "schuld",

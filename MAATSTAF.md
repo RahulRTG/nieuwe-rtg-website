@@ -1635,6 +1635,15 @@ van die toets las de velden op de buitenkant van `/api/member/doe`, waar ze niet
 staan, en slaagde dus op `undefined === undefined`. Een vergelijking van twee
 keer niets is geen vergelijking.
 
+**Een openstaande post, met opzet.** `IDEMPROEF.json` heeft `/api/knelpunt` nooit aan
+het werk gekregen (kale oproep: 400), dus `gevolg-onbekend` ging van 96 naar 97. Een
+lokale volle ronde mat de route drie keer 200 zonder een collectie te raken, maar
+reproduceerde de rest van het register niet (130 in plaats van 95 onbekend). De
+eigenaar koos voor een vastgelegde schuld (`BEWIJSSCHULD.json`, NORM-notitie met
+vervaldatum) boven een register met metingen van twee rondes onder één stempel. Het
+lijf staat in `scripts/lib/idemwereld.js`, dus de eerstvolgende referentieronde sluit
+hem.
+
 De resolver versmalt bij deze doelzinnen niet: het werkveld blijft de volle
 lijst, en de dekking staat op 100%. Of een echt model met dat werkveld de juiste
 keuze maakt, is **niet gemeten**. Dat ligt buiten wat een proef zonder model kan

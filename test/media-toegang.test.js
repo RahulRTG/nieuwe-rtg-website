@@ -25,7 +25,8 @@ const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stopNet } = require('./helper');
+const { registreerGratis } = require('../scripts/lib/gratisaccount');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==';
 const ENC = 'b'.repeat(64);
@@ -58,11 +59,13 @@ async function haal(url, token) {
   return { status: r.status, cc: r.headers.get('cache-control'), bytes };
 }
 let seq = 0;
+const email = {};
 async function lid() {
   const u = (Date.now() + (++seq)).toString().slice(-8);
   const r = await api('/api/auth/register', { name: 'Toegang ' + seq, email: 'mt' + u + '@x.nl', phone: '06' + u,
     password: 'geheim123', geboortedatum: '1989-06-06', geslacht: 'm', tier: 'rtg', pasApp: 'rtg' });
   assert.ok(r.body.token, 'registreren lukt');
+  email[r.body.token] = 'mt' + u + '@x.nl';
   return r.body.token;
 }
 
@@ -363,3 +366,105 @@ test('het banlog van het schild schrijft een medialink gemaskeerd', () => {
   assert.equal(logDoel('/api/x'), '/api/x');
 });
 
+
+/* ---- de vierde ronde (tegenlezing op 41fd8b7eb) ---- */
+
+/* Een lezer van de live-stroom van een lid, zoals het scherm hem opent. */
+function stroom(token) {
+  const ctl = new AbortController();
+  const st = { tekst: '', ctl };
+  fetch(base + '/api/stream?token=' + encodeURIComponent(token), { signal: ctl.signal }).then(async r => {
+    const rd = r.body.getReader(); const dec = new TextDecoder();
+    for (;;) { const { value, done } = await rd.read(); if (done) break; st.tekst += dec.decode(value); }
+  }).catch(() => {});
+  return st;
+}
+async function wachtOpTekst(st, stuk, ms) {
+  const eind = Date.now() + (ms || 10000);
+  while (!st.tekst.includes(stuk)) {
+    if (Date.now() > eind) throw new Error('de stroom kreeg "' + stuk + '" niet binnen ' + (ms || 10000) + ' ms');
+    await new Promise(r => setTimeout(r, 50));
+  }
+}
+
+test('N1: het live-seintje van een DM draagt geen post, ook niet voor een gratis vriend van de auteur', async () => {
+  /* A post voor vrienden. B deelt hem met C (vreemde) en met G (een GRATIS
+     account dat wel vriend is van A). In het gesprek ziet G nietBeschikbaar:
+     de leespoort telt een gratis account niet als vriend. Het live-seintje
+     loste eerst op met een NAGEMAAKTE sessie zonder pas, en gaf G zo de hele
+     post. Nu draagt het alleen het id. */
+  const A = await lid(), B = await lid(), C = await lid();
+  const g = await registreerGratis(base);
+  assert.ok(g && g.token, 'een gratis account (pas guest) kan worden aangemaakt');
+  const G = g.token;
+  await vrienden(A, B); await vrienden(B, C); await vrienden(A, G); await vrienden(B, G);
+  const sleutel = async t => (await api('/api/member/connections', {}, t)).body.me;
+  const [kB, kC, kG] = [await sleutel(B), await sleutel(C), await sleutel(G)];
+  const geheim = 'live geheim ' + Date.now();
+  const p = await api('/api/salon/plaats', { tekst: geheim, media: [{ beeld: PNG, alt: 'x' }], publiek: 'vrienden', plaats: 'PlekLive' }, A);
+  assert.equal(p.status, 200, p.body.error);
+  const auteur = p.body.post.author;
+  const sC = stroom(C), sG = stroom(G);
+  await new Promise(r => setTimeout(r, 500));
+  for (const [k, wie] of [[kC, 'C'], [kG, 'G']]) {
+    const r = await api('/api/member/dm/send', { toKey: k, text: 'kijk ' + wie, postId: p.body.post.id }, B);
+    assert.equal(r.status, 200, wie + ': ' + r.body.error);
+  }
+  await wachtOpTekst(sC, 'kijk C'); await wachtOpTekst(sG, 'kijk G');
+  sC.ctl.abort(); sG.ctl.abort();
+  for (const [st, wie] of [[sC, 'C'], [sG, 'G']]) {
+    for (const naald of [geheim, 'PlekLive', auteur, '/media/t/'])
+      assert.ok(!st.tekst.includes(naald), wie + ' kreeg via de live-stroom: ' + naald);
+    assert.ok(st.tekst.includes('"postId":' + JSON.stringify(p.body.post.id)), wie + ': het seintje noemt wel welk bericht een post draagt');
+  }
+  // en in het gesprek zelf: G mag de post niet lezen, dus nietBeschikbaar
+  const bijG = ((await api('/api/member/dm', { withKey: kB }, G)).body.messages || []).filter(m => m.post).map(m => m.post);
+  assert.ok(bijG.length && bijG.every(x => x.nietBeschikbaar && !JSON.stringify(x).includes(geheim)), 'G ziet in het gesprek geen post');
+});
+
+/* LAATSTE TOETS IN DIT BESTAND: hij stopt de server en start hem opnieuw. */
+test('N2: een oude bevroren kopie in commBerichten komt via /api/comm/gesprek niet meer naar buiten', async () => {
+  const B = await lid(), C = await lid();
+  await vrienden(B, C);
+  const [kB, kC] = [(await api('/api/member/connections', {}, B)).body.me, (await api('/api/member/connections', {}, C)).body.me];
+  assert.equal((await api('/api/member/dm/send', { toKey: kC, text: 'hallo' }, B)).status, 200);
+  const A = await lid();
+  const p = await api('/api/salon/plaats', { tekst: 'echte post ' + Date.now(), publiek: 'alleenik' }, A);
+  await stopNet(srv.child);
+  /* Wat er in productie van voor deze wijziging staat: een bericht met een
+     bijlage die de hele post bevriest. Rechtstreeks in de opslag gezet. */
+  process.env.RTG_ENC_KEY = ENC;
+  const kluis = require('../server/kluis');
+  const { DatabaseSync } = require('node:sqlite');
+  let kv = null;
+  for (const f of ['store.db', 'rtg.db']) {
+    if (!fs.existsSync(path.join(TMP, f))) continue;
+    const d = new DatabaseSync(path.join(TMP, f));
+    try { if (d.prepare("SELECT key FROM kv WHERE key = 'commBerichten'").get()) { kv = d; break; } } catch (e) { /* geen kv-tabel hier */ }
+    d.close();
+  }
+  assert.ok(kv, 'de opslag van de communicatiekern is gevonden');
+  const lees = k => JSON.parse(kluis.ontsleutel(kv.prepare('SELECT val FROM kv WHERE key = ?').get(k).val));
+  const gesprek = lees('commGesprekken').find(g => (g.deelnemers || []).includes(kB) && (g.deelnemers || []).includes(kC));
+  assert.ok(gesprek, 'het gesprek tussen B en C staat in de opslag');
+  const berichten = lees('commBerichten');
+  (berichten[gesprek.id] = berichten[gesprek.id] || []).push({ id: 'brc_bevroren', van: kB, at: new Date().toISOString(),
+    tekst: 'oud', soort: 'post', antwoordOp: null, lang: null, reacties: {},
+    bijlage: { soort: 'post', id: p.body.post.id, author: 'AuteurBevroren', place: 'PlekBevroren', text: 'TEKST BEVROREN', photo: '/media/bevroren.png' } });
+  kv.prepare('UPDATE kv SET val = ?, ver = ver + 1 WHERE key = ?').run(kluis.versleutel(JSON.stringify(berichten)), 'commBerichten');
+  kv.close();
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_ENC_KEY: ENC, DEMO_SUPPLIER: 'KIKUNOI' } });
+  base = srv.base;
+  const C2 = (await api('/api/auth/login', { email: email[C], password: 'geheim123' })).body.token;
+  assert.ok(C2, 'C logt opnieuw in');
+  const r = await api('/api/comm/gesprek', { id: gesprek.id }, C2);
+  assert.equal(r.status, 200, r.body.error);
+  const bericht = (r.body.berichten || r.body.gesprek && r.body.gesprek.berichten || []).find(m => m.id === 'brc_bevroren');
+  assert.ok(bericht, 'controle: het bevroren bericht komt mee (anders bewijst dit niets)');
+  assert.deepEqual(bericht.bijlage, { soort: 'post', id: p.body.post.id }, 'alleen het id van de post gaat naar buiten');
+  for (const naald of ['BEVROREN', 'PlekBevroren', 'AuteurBevroren', 'bevroren.png'])
+    assert.ok(!JSON.stringify(r.body).includes(naald), 'het gesprek geeft ' + naald);
+  // en de ledenroute lost hem op met de sessie van C: niet beschikbaar
+  const dm = ((await api('/api/member/dm', { withKey: kB }, C2)).body.messages || []).filter(m => m.post);
+  assert.ok(dm.length && dm.every(x => x.post.nietBeschikbaar && !JSON.stringify(x).includes('BEVROREN')), 'ook de ledenroute geeft geen kopie');
+});

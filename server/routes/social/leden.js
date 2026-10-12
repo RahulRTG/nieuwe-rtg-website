@@ -143,8 +143,11 @@ app.post('/api/member/dm/send', auth, async (req, res) => {
   const msg = brug.stuur(req.session.key, ander, { tekst: text, post: postDeel, stuk: stukDeel,
     lang: (db.data.memberTaal || {})[req.session.key] || null });
   const mijnNaam = liveCodename(req.session);
+  /* Het live-seintje draagt de post NIET, alleen zijn id: hier is geen sessie
+     van de ontvanger, en een nagemaakte (zonder pas) telde een gratis vriend als
+     vriend. De ontvanger haalt het gesprek op met zijn eigen sessie. */
   sseToCustomer(ander, 'social', { kind: 'dm', from: req.session.key, codename: mijnNaam, text: msg.text,
-    post: dmPost().voorLezer({ key: ander }, msg.post), stuk: msg.stuk, at: msg.at });
+    post: null, postId: msg.post ? msg.post.id : null, stuk: msg.stuk, at: msg.at });
   res.json({ ok: true, message: Object.assign({}, msg, { post: dmPost().voorLezer(req.session, msg.post) }) });
 });
 

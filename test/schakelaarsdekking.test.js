@@ -119,7 +119,7 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      Wat allebei bewaken is hetzelfde: dat het er niet STILLETJES meer worden. */
   const onverklaard = zonder.filter(r => !redenVoor(r.pad)).map(r => r.pad);
 
-  assert.ok(onverklaard.length <= 10,
+  assert.ok(onverklaard.length <= 9,   // 10 -> 9: /media staat sinds AUTHORITY.md B4 in bestuursroutes.js
     onverklaard.length + ' routes hangen aan geen enkele functie EN staan in geen enkel register. ' +
     'Ze zijn dan niet schakelbaar en niemand heeft opgeschreven waarom: ' +
     onverklaard.sort().join(', ') + ' -- zet ze in server/kern/bestuursroutes.js met een reden, ' +

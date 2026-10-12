@@ -75,23 +75,15 @@ module.exports = ({ ruw, heeft, save, crypto, klokDatum, normAdres, zelfdeBus, z
   }
 
   const van = (adres) => { migreer(); const a = normAdres(adres); return plek().filter(m => zelfdeBus(m.naar, a)); };
-  // het archief van de leidingsplek: niet meer in de inbox, wel onder de bewaartermijn en in de export
-  const open = (adres) => van(adres).filter(m => !m.gearchiveerd);
-  const post = (adres, { limit = 60 } = {}) => open(adres).slice(0, Math.max(1, Math.min(200, limit))).map(pub);
-  const ongelezen = (adres) => open(adres).filter(m => !m.gelezen).length;
-  function archiveer(adres, id) {
-    const m = open(adres).find(x => x.id === id);
-    if (!m) return { error: 'Dit bericht staat niet in dit postvak.' };
-    m.gearchiveerd = true; m.gelezen = true; bewaar();
-    return { ok: true, id: m.id };
-  }
+  const post = (adres, { limit = 60 } = {}) => van(adres).slice(0, Math.max(1, Math.min(200, limit))).map(pub);
+  const ongelezen = (adres) => van(adres).filter(m => !m.gelezen).length;
   function lees(adres, id) {
     const m = van(adres).find(x => x.id === id);
     if (!m) return { error: 'Dit bericht staat niet in dit postvak.' };
     if (!m.gelezen) { m.gelezen = true; bewaar(); }
     return pub(m);
   }
-  return { beperking, migreer, leg, post, ongelezen, lees, archiveer };
+  return { beperking, migreer, leg, post, ongelezen, lees };
 };
 module.exports.schoon = schoon;
 module.exports.isBeperkt = isBeperkt;

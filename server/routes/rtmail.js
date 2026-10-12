@@ -29,14 +29,6 @@ module.exports = (kern) => {
     res.json({ adres, ongelezen: rtmail.ongelezen(adres) + (m ? rtmail.leiding.ongelezen(adres) : 0), berichten });
   });
 
-  // de manager archiveert een bericht van de leidingsplek (het valt dan uit de inbox)
-  app.post('/api/supplier/rtmail/leiding/archiveer', supplierAuth, (req, res) => {
-    if (!manager(req)) return res.status(403).json({ error: 'Alleen een manager beheert de wervingspost.' });
-    const r = rtmail.leiding.archiveer(adresVan(req), String((req.body && req.body.id) || ''));
-    if (r.error) return res.status(404).json({ error: r.error });
-    res.json(r);
-  });
-
   app.post('/api/supplier/rtmail/verzonden', supplierAuth, (req, res) => {
     res.json({ berichten: rtmail.verzonden(adresVan(req)) });
   });

@@ -124,20 +124,7 @@ test('3. bewaartermijn, juridische bewaring en export gelden ook voor de leiding
   assert.ok(!(await inbox()).includes(postId), 'de termijn ruimt ook de leidingsplek op');
 });
 
-test('4. de manager archiveert een wervingsbericht; een medewerker kan dat niet', async () => {
-  const { tokM, tokW } = await inlog();
-  const reg = await api('/api/auth/register', { name: 'Tweede Sollicitant', email: 'tweede.leiding@x.nl', phone: '0612340010',
-    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' });
-  assert.equal((await api('/api/cv/save', { name: 'Tweede Sollicitant', contact: 't@x.nl', skills: 'x', experience: 'x' }, reg.body.token)).status, 200);
-  assert.equal((await api('/api/member/apply', { supplierCode: 'KIKUNOI', func: 'Bediening' }, reg.body.token)).status, 200);
-  const nieuw = (await api('/api/supplier/rtmail/inbox', {}, tokM)).body.berichten.find(m => m.onderwerp === 'Nieuwe sollicitatie');
-  assert.ok(nieuw);
-  assert.equal((await api('/api/supplier/rtmail/leiding/archiveer', { id: nieuw.id }, tokW)).status, 403);
-  assert.equal((await api('/api/supplier/rtmail/leiding/archiveer', { id: nieuw.id }, tokM)).status, 200);
-  assert.ok(!(await api('/api/supplier/rtmail/inbox', {}, tokM)).body.berichten.some(m => m.id === nieuw.id), 'uit de inbox');
-});
-
-test('5. vangnet: beperkte post die NA de verhuizing in het gedeelde postvak komt, ziet een collega niet', () => {
+test('4. vangnet: beperkte post die NA de verhuizing in het gedeelde postvak komt, ziet een collega niet', () => {
   /* Een oude instantie bij een rolling deploy, of een andere schrijver, kan nog
      beperkte post in `berichten` zetten. Elke lezer roept dezelfde schoon() aan
      (kern/rtmail-leiding.js), zonder vlag. Hier rechtstreeks op de kern, want

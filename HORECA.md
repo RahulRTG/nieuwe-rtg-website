@@ -982,7 +982,7 @@ zaakpostvak -- een plek en geen adres, dus niemand kan ernaar sturen, er een
 team van maken of er met een zaakcode mee botsen, en oude post wordt er bij het
 opstarten naartoe verhuisd, en elke lezer van het postvak roept zonder vlag
 hetzelfde vangnet aan, zodat ook een latere schrijver niets doorlaat -- die alleen
-de inbox, de export en het archiveren van een manager kent, en die onder dezelfde
+de inbox en de export van een manager kent, en die onder dezelfde
 bewaartermijn en juridische bewaring valt als het postvak, een videobelsignaal
 (met zijn IP-adressen) gaat alleen naar wie gebeld wordt en de teamkamer alleen
 naar wie erin zit, en een pauze seint alleen de manager en de medewerker zelf. Hij telt

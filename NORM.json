@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 76,
-    "bewijsAchterstand": 823,
+    "bewijsAchterstand": 824,
     "bewijsAlleenKeten": 23,
     "bewijsCellenBewezen": 28249,
     "bronBlindeBestanden": 0,
@@ -28,12 +28,12 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4515,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1693,
-    "kernGedeeld": 258,
+    "kernBreedte": 1696,
+    "kernGedeeld": 260,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 50,
-    "keuringDubbeling": 181,
-    "keuringOmvang": 351,
+    "keuringDubbeling": 185,
+    "keuringOmvang": 356,
     "keuringScheef": 14,
     "keuringStuk": 0,
     "keuringTeGroot": 12,
@@ -175,9 +175,58 @@
     "schermeigenaarOpen": 8,
     "loopFabricTijdelijk": 168,
     "schilHerstarts": 11,
-    "schilDubbeleVerzoeken": 19
+    "schilDubbeleVerzoeken": 19,
+    "gemeenschapOpenBekend": 1
   },
   "notities": [
+    {
+      "datum": "2026-10-12",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 823,
+      "vervalt": "2027-01-10",
+      "meter": "bewijsAchterstand 823 -> 824 (gevolg-onbekend 96 -> 97)",
+      "reden": "De post van #591 (notitie hieronder, 680 -> 681) op de stand van de integratie (823): /api/knelpunt staat op de LEZEN-lijst van het stuur en IDEMPROEF.json kreeg hem nooit aan het werk. BEWIJSSCHULD.json draagt dezelfde reden onder groei.",
+      "waarheen": "de eerstvolgende referentieronde van de idempotentieproef, met het lijf uit scripts/lib/idemwereld.js"
+    },
+    {
+      "datum": "2026-10-12",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 351,
+      "vervalt": "2027-01-10",
+      "meter": "keuringOmvang 351 -> 356",
+      "reden": "De tweede integratieronde (#584, #589, #599, #602-#607) zet vijf bestanden tussen 9 en 10 kB: server/kern/stuur/beleid-lijsten.js (de LEZEN-lijst kreeg /api/knelpunt en /api/reisbureau/mijn), server/kern/mobiliteit/opdracht.js (de ontvangstbevestiging van de reiziger, #607), server/routes/auth/account.js (de registratiegrendel van #589 naast de app-url-poort), server/kern/rtmail.js (de leiding van #584) en server/kern/reisgezelschap-opgave.js (#602). Geen ervan haalt de grens; elk groeide om een besluit dat er nu staat.",
+      "waarheen": "de vijf bestanden bij hun volgende wijziging op een naad knippen"
+    },
+    {
+      "datum": "2026-10-12",
+      "soort": "schuld",
+      "sleutel": "keuringDubbeling",
+      "van": 181,
+      "vervalt": "2027-01-10",
+      "meter": "keuringDubbeling 181 -> 185",
+      "reden": "De reisgezelschapreeks (#602-#606) en Second Screen (#604) brengen de functienamen pastBij, rechtenVoor en vanMij in een derde kernmodule, en aanvraag, antwoord, beoordeel, oordeel en versies komen elk in een module meer voor. Het zijn eigen functies per domein met dezelfde naam, geen gekopieerde logica.",
+      "waarheen": "bij de volgende wijziging van het reisgezelschap de naamgeving per domein onderscheidend maken (scripts/keuring.js, groep dubbeling)"
+    },
+    {
+      "datum": "2026-10-12",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1693,
+      "meter": "kernBreedte 1693 -> 1696",
+      "reden": "Drie kernnamen uit de tweede integratieronde: contextDomeinen van de Context Bridge (#594-#599, notitie hierboven: 1687 -> 1688), magBoardroom van de kantoordeur (#590, AUTHORITY.md P0b) en reisgezelschap (#602-#606). Op de stand van #542 (1693) komen er dus drie bij, en elk staat al met een eigen reden in een van de lijnen.",
+      "waarheen": "GRENZEN.json en de notities van #590 en #599"
+    },
+    {
+      "datum": "2026-10-12",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 258,
+      "meter": "kernGedeeld 258 -> 260",
+      "reden": "magBoardroom (#590: de kantoren dragen hem, de boardroom en de paniekkamer lezen hem) en reisgezelschap (gelezen door het lidgedeelte en door de werkruimte van Second Screen) worden door meer dan een domein aangeraakt. Dat is met opzet: een naam per besluit, niet een kopie per domein.",
+      "waarheen": "scripts/grenzen.js, gedeeldeNamen"
+    },
     {
       "datum": "2026-10-12",
       "soort": "structureel",
@@ -4550,19 +4599,19 @@
     "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). scripts/normverval.js keurt alleen wat vanaf hier bij komt. DE GRENS IS NU TWEE KEER OPGESCHOVEN, en dat is geen verzachting maar twee keer dezelfde oorzaak. De eerste keer (18 -> 19 augustus) schreef main twee notities op een eigen tak waar deze regel niet bestond. De tweede keer (19 -> 21 augustus) kwamen bij de samenvoeging van 23 PR-takken elf notities van 20 augustus mee, geschreven op takken die van dezelfde dag zijn als de regel en hem dus niet kenden. WAAROM ZE NIET ALSNOG WORDEN INGEDEELD: een soort toekennen aan andermans notitie betekent hem woorden in de mond leggen -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Dat is precies de reden die de eerste verschuiving al gaf. WAT DAT KOST, EERLIJK: elf verlagingen uit die ronde staan nu zonder soort in het register. Ze dragen wel allemaal een uitgeschreven reden -- wat ze missen is het VELD. En om te laten zien dat dit geen uitweg voor mezelf is: alle acht notities die deze samenvoeging zelf schrijft (2026-08-21) dragen een soort, zeven daarvan als schuld met een sleutel, een van-waarde en een einddatum. Vanaf 21 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
   },
   "sinds": {
-    "keuringOmvang": "2026-10-11",
+    "keuringOmvang": "2026-10-12",
     "testbestanden": "2026-10-12",
     "toetsenNietGemeten": "2026-10-12",
     "inlineStijlAttributen": "2026-10-06",
     "ratelTanden": "2026-10-11",
     "metingenZonderRatel": "2026-10-11",
-    "bewijsAchterstand": "2026-10-06",
+    "bewijsAchterstand": "2026-10-12",
     "toetsenOngevoeligPct": "2026-09-05",
     "endpointsZonderTest": "2026-10-06",
     "dekkingPct": "2026-10-06",
     "keuringScheef": "2026-10-04",
     "keuringTeGroot": "2026-10-04",
-    "keuringDubbeling": "2026-10-11",
+    "keuringDubbeling": "2026-10-12",
     "keuringDekkingAdvies": "2026-10-06",
     "dbDeuren": "2026-10-11",
     "dbDeurenSchrijvend": "2026-08-28",
@@ -4583,8 +4632,8 @@
     "wekkersZonderTrede": "2026-09-02",
     "wekkersOnverklaard": "2026-09-02",
     "meetleerBlind": "2026-09-02",
-    "kernBreedte": "2026-10-05",
-    "kernGedeeld": "2026-09-28",
+    "kernBreedte": "2026-10-12",
+    "kernGedeeld": "2026-10-12",
     "registersUitVuileBoom": "2026-09-10",
     "laatSpoorVerdacht": "2026-09-03",
     "rollbackUitzonderingen": "2026-09-03",
@@ -4694,7 +4743,8 @@
     "refundOnverklaard": "2026-10-06",
     "schermeigenaarOpen": "2026-10-06",
     "schilHerstarts": "2026-10-11",
-    "schilDubbeleVerzoeken": "2026-10-11"
+    "schilDubbeleVerzoeken": "2026-10-11",
+    "gemeenschapOpenBekend": "2026-10-12"
   },
   "uitzonderingen": []
 }

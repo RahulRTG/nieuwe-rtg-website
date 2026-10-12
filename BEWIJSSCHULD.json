@@ -1,24 +1,24 @@
 {
  "stempel": {
-  "op": "2026-10-11T09:59:24.386Z",
-  "commit": "64b08a641",
+  "op": "2026-10-12T14:01:16.290Z",
+  "commit": "6d5abcb5c",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 3,
   "instrument": "scripts/bewijsschuld.js",
-  "node": "v22.22.0"
+  "node": "v26.10.0"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 357,
+  "meetwerk": 358,
   "instrument": 466,
   "grens": 687
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 823,
+  "staat": 824,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 823,
+  "achterstand": 824,
   "randVanDeMethode": 687,
   "auth-onbeslist": 1,
   "capability-in-handler": 560,
@@ -198,155 +198,155 @@
  "historie": {
   "auth-onbeslist": [
    {
-    "op": "2026-10-05",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-06",
     "aantal": 1
    },
    {
     "op": "2026-10-11",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 1
    }
   ],
   "capability-in-handler": [
    {
-    "op": "2026-10-05",
-    "aantal": 560
-   },
-   {
     "op": "2026-10-06",
     "aantal": 560
    },
    {
     "op": "2026-10-11",
+    "aantal": 560
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 560
    }
   ],
   "objectpoort": [
    {
-    "op": "2026-10-05",
-    "aantal": 52
-   },
-   {
     "op": "2026-10-06",
     "aantal": 52
    },
    {
     "op": "2026-10-11",
+    "aantal": 52
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 52
    }
   ],
   "output-deuren": [
    {
-    "op": "2026-10-05",
-    "aantal": 21
-   },
-   {
     "op": "2026-10-06",
     "aantal": 21
    },
    {
     "op": "2026-10-11",
+    "aantal": 21
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 21
    }
   ],
   "lichaamssleutel": [
    {
-    "op": "2026-10-05",
-    "aantal": 102
-   },
-   {
     "op": "2026-10-06",
     "aantal": 102
    },
    {
     "op": "2026-10-11",
+    "aantal": 102
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 102
    }
   ],
   "output-niet-toerekenbaar": [
    {
-    "op": "2026-10-05",
-    "aantal": 0
-   },
-   {
     "op": "2026-10-06",
     "aantal": 0
    },
    {
     "op": "2026-10-11",
+    "aantal": 0
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 0
    }
   ],
   "output-blind": [
    {
-    "op": "2026-10-05",
-    "aantal": 0
-   },
-   {
     "op": "2026-10-06",
     "aantal": 0
    },
    {
     "op": "2026-10-11",
+    "aantal": 0
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 0
    }
   ],
   "output-onwaarneembaar": [
    {
-    "op": "2026-10-05",
-    "aantal": 4
-   },
-   {
     "op": "2026-10-06",
     "aantal": 4
    },
    {
     "op": "2026-10-11",
+    "aantal": 4
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 4
    }
   ],
   "audit-wisselend": [
    {
-    "op": "2026-10-05",
-    "aantal": null
-   },
-   {
     "op": "2026-10-06",
     "aantal": null
    },
    {
     "op": "2026-10-11",
+    "aantal": null
+   },
+   {
+    "op": "2026-10-12",
     "aantal": null
    }
   ],
   "audit-verklaard": [
    {
-    "op": "2026-10-05",
-    "aantal": null
-   },
-   {
     "op": "2026-10-06",
     "aantal": null
    },
    {
     "op": "2026-10-11",
+    "aantal": null
+   },
+   {
+    "op": "2026-10-12",
     "aantal": null
    }
   ],
   "rollback-gezakt": [
    {
-    "op": "2026-10-05",
-    "aantal": 1
-   },
-   {
     "op": "2026-10-06",
     "aantal": 1
    },
    {
     "op": "2026-10-11",
+    "aantal": 1
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 1
    }
   ],
@@ -356,19 +356,15 @@
     "aantal": 323
    },
    {
-    "op": "2026-10-12",
-    "aantal": 323
+    "op": "2026-10-11",
+    "aantal": 466
    },
    {
-    "op": "2026-10-11",
+    "op": "2026-10-12",
     "aantal": 466
    }
   ],
   "proefruis": [
-   {
-    "op": "2026-10-05",
-    "aantal": 1
-   },
    {
     "op": "2026-10-06",
     "aantal": 1
@@ -376,13 +372,13 @@
    {
     "op": "2026-10-11",
     "aantal": 1
+   },
+   {
+    "op": "2026-10-12",
+    "aantal": 1
    }
   ],
   "gevolg-onbekend": [
-   {
-    "op": "2026-10-05",
-    "aantal": 96
-   },
    {
     "op": "2026-10-06",
     "aantal": 96
@@ -398,57 +394,57 @@
   ],
   "droogloop-onbeoordeeld": [
    {
-    "op": "2026-10-05",
-    "aantal": 2
-   },
-   {
     "op": "2026-10-06",
     "aantal": 2
    },
    {
     "op": "2026-10-11",
+    "aantal": 2
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 2
    }
   ],
   "herstel-onbevestigd": [
    {
-    "op": "2026-10-05",
-    "aantal": 49
-   },
-   {
     "op": "2026-10-06",
     "aantal": 49
    },
    {
     "op": "2026-10-11",
+    "aantal": 49
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 49
    }
   ],
   "idem-ongeclassificeerd": [
    {
-    "op": "2026-10-05",
-    "aantal": 152
-   },
-   {
     "op": "2026-10-06",
     "aantal": 152
    },
    {
     "op": "2026-10-11",
+    "aantal": 152
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 152
    }
   ],
   "wegwerpserver-kopieen": [
    {
-    "op": "2026-10-05",
-    "aantal": 3
-   },
-   {
     "op": "2026-10-06",
     "aantal": 3
    },
    {
     "op": "2026-10-11",
+    "aantal": 3
+   },
+   {
+    "op": "2026-10-12",
     "aantal": 3
    }
   ]
@@ -629,6 +625,12 @@
    "van": 680,
    "naar": 823,
    "reden": "WAAROM.json was sinds 30 augustus 2026 niet opnieuw gemeten (vuile boom, en scripts/waarom.js viel op main om met maakSleutels is not a function). Na de reparatie ziet de verse meting 4544 routes in plaats van 3805; de 143 extra object-vooraf-posten zijn routes die in die zes weken op main zijn bijgekomen en eerst een object nodig hebben. Zichtbaar geworden, niet nieuw ontstaan."
+  },
+  {
+   "op": "2026-10-12",
+   "van": 823,
+   "naar": 824,
+   "reden": "De post van #591 (680 -> 681) op de stand van de integratie (823): /api/knelpunt kwam op 11 oktober 2026 op de LEZEN-lijst van het stuur (Rahul als ingang naar de knelpuntmotor). IDEMPROEF.json kreeg hem nooit aan het werk (kale oproep: 400), dus gevolg.js noemt zijn effect onbekend (gevolg-onbekend 96 -> 97). Het lijf met een doel staat in scripts/lib/idemwereld.js; de eerstvolgende referentieronde van de idempotentieproef sluit deze post."
   }
  ]
 }

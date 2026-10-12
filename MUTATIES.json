@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T13:20:39.674Z",
-    "commit": "4b4b5f718",
+    "op": "2026-10-12T13:50:42.831Z",
+    "commit": "6d5abcb5c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -10217,6 +10217,20 @@
       "gezakt": 1,
       "geprobeerd": 6
     },
+    "mob-ontvangst.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "mob-ontvangst.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "mobiel.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -13273,11 +13287,53 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "reisgezelschap-instemming.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reisgezelschap-instemming.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "reisgezelschap-opgave.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "reisgezelschap-opties.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "reisgezelschap-routes.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 12,
+      "scherp": "gezakt"
+    },
+    "reisgezelschap-werkruimte.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "reisgezelschap-werkruimte.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
       "scherp": "gezakt"
     },
     "reisgezelschap.test.js": {
@@ -19320,6 +19376,20 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "workspace-rechten.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "workspace-rechten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "workspace-server-platform.test.js": {
       "soort": "puur",

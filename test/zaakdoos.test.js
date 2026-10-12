@@ -298,8 +298,19 @@ test('de randcache: een foto die over de lijn kwam, blijft op de doos', async ()
   fs.mkdirSync(kas, { recursive: true });
   fs.writeFileSync(path.join(kas, '_media_' + oudKasNaam + '.bin'), FOTO);
   fs.writeFileSync(path.join(kas, '_media_' + oudKasNaam + '.typ'), 'image/png');
+
+  /* En een gemerkt item dat ouder is dan de publieke cachetijd (een uur) wordt
+     ook niet meer uitgeleverd: een foto die van de etalage ging, hoort ook van
+     het kastje te verdwijnen. */
+  verlopenKasNaam = require('node:crypto').randomBytes(16).toString('hex') + '.png';
+  const basis = path.join(kas, '_media_' + verlopenKasNaam);
+  fs.writeFileSync(basis + '.bin', FOTO);
+  fs.writeFileSync(basis + '.typ', 'image/png');
+  fs.writeFileSync(basis + '.pub', '1');
+  const tweeUurGeleden = new Date(Date.now() - 2 * 3600 * 1000);
+  fs.utimesSync(basis + '.bin', tweeUurGeleden, tweeUurGeleden);
 });
-let privelink, oudKasNaam;
+let privelink, oudKasNaam, verlopenKasNaam;
 
 test('de lijn valt weg: de zaak werkt lokaal door en het journaal telt mee', async () => {
   // Borg dat er minstens een gezonde ping geteld is voordat de lijn wegvalt: de
@@ -340,6 +351,8 @@ test('zonder lijn: de randcache serveert de foto en het dagrapport telt mee', as
   // maar geen privélink en geen oud, ongemerkt randcache-item
   assert.equal((await fetch(doos.base + privelink)).status, 404, 'de privélink komt zonder cloud niet van het kastje');
   assert.equal((await fetch(doos.base + '/media/' + oudKasNaam)).status, 404, 'een ongemerkt oud item wordt niet uitgeleverd');
+  assert.equal((await fetch(doos.base + '/media/' + verlopenKasNaam)).status, 404, 'een item ouder dan een uur wordt niet uitgeleverd');
+  assert.equal(r.headers.get('cache-control'), 'public, max-age=3600', 'een treffer uit de randcache draagt de publieke cachetijd');
   // het nachtwerk-dagrapport van de doos zelf: pings en uitval zijn geteld
   const rap = await (await fetch(doos.base + '/api/doos/rapport')).json();
   assert.ok(rap.pings >= 1, 'de pings zijn geteld');

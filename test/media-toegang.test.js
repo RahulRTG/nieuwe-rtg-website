@@ -263,6 +263,38 @@ test('B1: een vriend ziet een post "alleen ik" niet in /api/state, en krijgt er 
     assert.notEqual(naamUitLink(x.photo), naam, 'en er is geen link naar zijn foto');
 });
 
+test('een DM: de ontvanger ziet een gedeelde post alleen als HIJ hem mag lezen', async () => {
+  /* A post voor vrienden. B (vriend van A) deelt hem met C (geen vriend van A)
+     en met D (wel vriend van A). Daarna verwijdert A de post. */
+  const A = await lid(), B = await lid(), C = await lid(), D = await lid();
+  await vrienden(A, B); await vrienden(B, C); await vrienden(B, D); await vrienden(A, D);
+  const geheim = 'alleen voor vrienden ' + Date.now();
+  const p = await api('/api/salon/plaats', { tekst: geheim, publiek: 'vrienden' }, A);
+  assert.equal(p.status, 200, p.body.error);
+  const sleutel = async t => (await api('/api/member/connections', {}, t)).body.me;
+  const [kB, kC, kD] = [await sleutel(B), await sleutel(C), await sleutel(D)];
+  assert.equal((await api('/api/member/dm/send', { toKey: kC, text: 'kijk', postId: p.body.post.id }, B)).status, 200);
+  assert.equal((await api('/api/member/dm/send', { toKey: kD, text: 'kijk', postId: p.body.post.id }, B)).status, 200);
+  const gedeeld = async (lezer, ander) => {
+    const r = await api('/api/member/dm', { withKey: ander }, lezer);
+    assert.equal(r.status, 200, r.body.error);
+    return (r.body.messages || []).filter(m => m.post).map(m => m.post);
+  };
+  const bijC = await gedeeld(C, kB);
+  assert.equal(bijC.length, 1, 'C ziet dat er iets gedeeld is');
+  assert.equal(bijC[0].nietBeschikbaar, true, 'maar voor C is de post niet beschikbaar');
+  assert.ok(!JSON.stringify(bijC).includes(geheim) && !bijC[0].text && !bijC[0].author && !bijC[0].photo, 'zonder tekst, auteur of foto');
+  const bijD = await gedeeld(D, kB);
+  assert.equal(bijD[0].text, geheim, 'controle: D, vriend van A, ziet de post wel');
+  // A verwijdert de post: niemand ziet nog tekst, ook B en D niet
+  assert.equal((await api('/api/salon/weg', { id: p.body.post.id }, A)).status, 200);
+  for (const [lezer, ander, wie] of [[D, kB, 'D'], [B, kC, 'B']]) {
+    const na = await gedeeld(lezer, ander);
+    assert.ok(na.length && na.every(x => x.nietBeschikbaar && !x.text), wie + ' ziet na verwijderen geen tekst meer');
+  }
+  assert.ok(!JSON.stringify(await gedeeld(B, kD)).includes(geheim), 'ook de afzender houdt geen kopie');
+});
+
 test('een DM kan geen post delen die de afzender niet mag lezen', async () => {
   const A = await lid(), B = await lid(), C = await lid();
   await vrienden(A, B);

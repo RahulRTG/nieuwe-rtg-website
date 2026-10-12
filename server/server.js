@@ -424,14 +424,14 @@ if (zaakdoos.actief) {
     if (zaakdoos.modusVan() !== 'cloud' || !zaakdoos.magProxy(req.path)) return next();
     zaakdoos.proxy(req, res).then(gelukt => { if (!gelukt) next(); }).catch(() => next());
   });
-  // de randcache: media die eerder over de lijn kwam, serveert de doos zelf
-  // zodra het doorgeefluik hem niet kan leveren (de lijn is weg)
+  // de randcache: media die eerder over de lijn kwam, serveert de doos zelf als de lijn weg is
   app.use((req, res, next) => {
     if (req.method !== 'GET' || !req.path.startsWith('/media/') || zaakdoos.modusVan() === 'cloud') return next();
     const hit = zaakdoos.kasLees(req.originalUrl);
     if (!hit) return next();
     res.set('Content-Type', hit.type);
     res.set('X-Content-Type-Options', 'nosniff');
+    res.set('Cache-Control', hit.cc);
     res.end(hit.buf);
   });
   console.log('[doos] zaakdoos-modus: doorgeefluik naar', process.env.RTG_DOOS_CLOUD);

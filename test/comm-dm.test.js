@@ -66,7 +66,10 @@ test('een gedeelde Salon-post overleeft de verhuizing als bijlage', () => {
   const post = dm.berichten('a', 'b')[2].post;
   assert.ok(post, 'de gedeelde post is weg');
   assert.equal(post.id, 7, 'de post wijst naar een ander bericht');
-  assert.equal(post.author, 'Katja', 'de auteur is niet meegekomen');
+  /* Alleen het id verhuist: de bevroren kopie (auteur, tekst) blijft achter.
+     De lezer lost de post op met zijn eigen sessie (kern/sociaal/dmpost.js),
+     anders leest een ontvanger wat de auteur hem nooit liet zien. */
+  assert.equal(post.author, undefined, 'een bevroren kopie van de post is meeverhuisd');
 });
 
 test('de leesstand verhuist mee, dus niemand krijgt een stapel valse bolletjes', () => {

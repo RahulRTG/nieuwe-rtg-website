@@ -45,6 +45,8 @@ Object.assign(kern, require('../kern/pulse')({ db, save, crypto, liveCodename, n
    geen toegang tot de losse Pulse- en Salon-domeinen. Hun privacyregels blijven
    bij de bron; er wordt geen tweede opslag of selectiebeleid gemaakt. */
 const salonZicht = require('../kern/salon/zichtbaarheid')({ db, findSupplier, zijnVrienden: kern.zijnVrienden });
+// alleen de LEESPOORT van De Salon, onder een eigen naam: een DM lost een gedeelde post ermee op
+kern.salonMagLezen = salonZicht.magLezen;
 kern.wereldFeed = require('../kern/wereld/feed')({ db, codenaamVan: kern.codenaamVan,
   zijnVrienden: kern.zijnVrienden, salonToegang: salonZicht.magLezen,
   pulseLezen: key => ((kern.pulseFeed(key, 'volgend') || {}).feed || []) }).feed;

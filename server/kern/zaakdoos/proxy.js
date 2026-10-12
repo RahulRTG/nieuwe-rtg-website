@@ -9,7 +9,7 @@ module.exports = (ctx) => {
     CLOUD, SLEUTEL, GEBRUIKER, WACHTWOORD, actief, HOP, KAS_DIR, KAS_MAX_BESTAND, KAS_MAX_STUKS,
     journaalPadOk, journaalZegel, journaalGeldig, JOURNAAL_MAX_BODY } = ctx;
   const bodyHulp = require('../../web/body');
-  const { OPENBAAR_MS } = require('../../media/toegang');
+  const { OPENBAAR_MS, CACHE_OPENBAAR } = require('../../media/toegang');
   const PROXY_BODY_MAX = 8 * 1024 * 1024;
   const LEESFOUT = Symbol('zaakdoos-leesfout');
 
@@ -71,7 +71,7 @@ module.exports = (ctx) => {
       const buf = fs.readFileSync(bin);
       let type = 'application/octet-stream';
       try { type = fs.readFileSync(path.join(KAS_DIR, kasNaam(url) + '.typ'), 'utf8'); } catch (e) {}
-      return { buf, type };
+      return { buf, type, cc: CACHE_OPENBAAR };   // alleen openbaar beeld staat hier
     } catch (e) { return null; }
   }
   // hoeveel foto's staan er in de randcache en hoe groot is die (voor het

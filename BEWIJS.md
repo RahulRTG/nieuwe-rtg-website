@@ -15,9 +15,9 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2633 |
 | losse beweringen (`test(...)`) | 18301 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2444 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2445 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
-| niet te meten (al rood, geen module gevonden, ...) | 180 |
+| niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
 | niets van beide | 8 |
 
@@ -78,7 +78,7 @@ toets omvalt.
 | `advocaat-lezer.test.js` | 4 | gezakt op `!==->===#0` | DE ADVOCATE ALS LEZER: EEN AFLOPENDE TOESTEMMING IS EEN TERMIJN HDI.md par. 7 regel 7. |
 | `adyen-config.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `adyen-eigen.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `afbouw-afloop-takken.test.js` | 11 | geen module gevonden | DE AFLOOP VAN EEN AFBOUW, TAK VOOR TAK (scripts/lib/afbouw-afloop.js). test/afbouwafloop.test.js bewijst de twee sabotages met echte wezen. |
+| `afbouw-afloop-takken.test.js` | 11 | gezakt op `voorwaarde-omkeren#0` | DE AFLOOP VAN EEN AFBOUW, TAK VOOR TAK (scripts/lib/afbouw-afloop.js). test/afbouwafloop.test.js bewijst de twee sabotages met echte wezen. |
 | `afbouwafloop.test.js` | 8 | geen bronmutatie mogelijk | GEEN WERK ZONDER EIGENAAR, GEEN OPVOLGER ZOLANG WERK VAN DE VOORGANGER LEEFT. scripts/lib/afbouw-afloop.js legt vast wat er van een meetronde overblijft. |
 | `afbouwketen.test.js` | 2 | geen bronmutatie mogelijk | DE VOLLEDIGE LEVENSLOOP VAN EEN BRONMUTERENDE RONDE -- met echte processen. test/afbouwafloop.test.js beproeft de module op zichzelf. |
 | `afbouwoordeel.test.js` | 6 | gezakt op `===->!==#0` | DE GEZAGSPOORT -- alleen BEWEZEN mag door. `afbouw:software` is de softwarepoort voor een uitrol, en hij reeg vier stappen aan elkaar met `&&`. |

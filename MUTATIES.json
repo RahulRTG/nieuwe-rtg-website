@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T10:55:43.601Z",
-    "commit": "03646ee4d",
+    "op": "2026-10-12T11:03:11.903Z",
+    "commit": "e6ebd499b",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -338,7 +338,11 @@
     },
     "afbouw-afloop-takken.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "scripts/lib/afbouw-afloop.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "afbouwafloop.test.js": {
       "soort": "puur",

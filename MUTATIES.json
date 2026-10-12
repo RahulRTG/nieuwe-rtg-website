@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-11T23:11:35.514Z",
-    "commit": "f2220ad80",
+    "op": "2026-10-12T00:11:18.201Z",
+    "commit": "ec4468669",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -11356,6 +11356,13 @@
       "soort": "puur",
       "staat": "slaat zichzelf over",
       "overgeslagen": 1
+    },
+    "personeelzicht-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
     },
     "personeelzicht.test.js": {
       "soort": "server",

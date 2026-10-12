@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2446 |
 | losse beweringen (`test(...)`) | 16734 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 306 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2271 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2272 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
-| niets van beide | 1 |
+| niets van beide | 0 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -828,7 +828,7 @@ toets omvalt.
 | `journalistiek-versies.test.js` | 3 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `kaart.test.js` | 8 | gezakt op `===->!==` | De kaart-uitwijk (public/shared/kaart.js): de pure parseGeo() ontleedt de geo:-URI's die het huis gebruikt tot iets toonbaars. Getoetst op beide vormen (echte coördinaten en het adres-alleen 0,0?q=...), op de... |
 | `kaarttoegang.test.js` | 7 | gezakt op `liegpoort /api/` | De code van een OV-vervoerbewijs (travelos.mobility_transport_ticket), control voor control: 128 bits en kaal eenmaal, hash-only, issuer/doel/scope, verval met het kaartje, max_gebruik = ritten (en een rotatie speelt... |
-| `kalefout.test.js` | 4 | -- | BEWIJS 8 (MENSELIJK) ALS ONDERGRENS -- scripts/lib/kalefout.js. De meter van bewijs 8 draait in een browser (scripts/appwerkt.js), en een browser is er niet altijd. |
+| `kalefout.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | BEWIJS 8 (MENSELIJK) ALS ONDERGRENS -- scripts/lib/kalefout.js. De meter van bewijs 8 draait in een browser (scripts/appwerkt.js), en een browser is er niet altijd. |
 | `kantoor-eerste-account.test.js` | 1 | gezakt op `liegpoort /api/` | HET EERSTE KANTOORACCOUNT OP NAAM, OP EEN VERSE PRODUCTIESERVER (besluit B23, deur office.gedeelde_kantoorcode). In productie opent de gedeelde code niets (B10); de EIGENAAR machtigt het eerste kantooraccount met... |
 | `kantoor-koppel-passkey.test.js` | 2 | gezakt op `liegpoort /api/` | B24: EEN KANTOORUITNODIGING VERZILVEREN MET EEN EIGEN VERSE PASSKEY, OP EEN ECHTE PRODUCTIESERVER (deur office.gedeelde_kantoorcode). In productie vraagt /api/account/koppel geen gedeelde OFFICE_TOTP meer maar de... |
 | `kantoor-productiedeur.test.js` | 4 | gezakt op `===->!==#0` | De regels van server/kern/kantoor/productiedeur.js (besluit B10), los van een server. De e2e-proef staat in test/kantoordeur-productie.test.js; hier de randen die daar niet te bereiken zijn: de eigenaar met een kaal... |

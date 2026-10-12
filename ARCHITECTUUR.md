@@ -19,12 +19,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5453 |
-| servermodules (`server/**/*.js`) | 4271 |
-| routebestanden (`server/routes/**`) | 646 |
+| servermodules (`server/**/*.js`) | 4272 |
+| routebestanden (`server/routes/**`) | 647 |
 | kernmodules (`server/kern/**`) | 2681 |
 | schermen (`public/**/*.html`) | 327 |
 | gedeelde browsermodules (`public/shared/*.js`) | 427 |
-| toetsbestanden (`test/*.test.js`) | 2139 |
+| toetsbestanden (`test/*.test.js`) | 2140 |
 | schermtoetsen (`test/*.e2e.js`) | 308 |
 
 ## 2. De weg van een verzoek
@@ -116,7 +116,7 @@ zie §5 -- er zijn nog 255 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 21 | 6 | 8 | 54 |
 | `member` | 742 | 75 | 17 | 456 |
-| `supplier` | 640 | 137 | 6 | 346 |
+| `supplier` | 640 | 138 | 6 | 346 |
 | `office` | 98 | 22 | 3 | 98 |
 | `staff` | 27 | 9 | 1 | 43 |
 | `social` | 76 | 10 | 31 | 71 |
@@ -155,7 +155,7 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
 app(214) auth(130) supplierAuth(66) officeAuth(49) db(40) liveCodename(36) status(32)
-accounts(30) schoon(23) boardroomWie(20) codenaamVan(20) managerOnly(19) save(19)
+accounts(30) schoon(23) boardroomWie(20) managerOnly(20) codenaamVan(20) save(19)
 rtf(19) tooManyTries(14) geenGast(14) express(14) findSupplier(13) boardroomAuth(13)
 crypto(12) keyVanCodenaam(12) appUrl(11) pay(11) anthropic(11) noteFailedTry(10)
 payrollOS(10) rtmail(10) kern(9) gegevensStop(9) sseToOffice(9) loginFails(8) stuur(8)

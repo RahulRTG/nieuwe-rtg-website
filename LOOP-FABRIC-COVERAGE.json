@@ -3409,6 +3409,7 @@
       "server/kern/cadeaukaart-migratie.js",
       "server/kern/carriereledger/regels.js",
       "server/kern/clamd.js",
+      "server/kern/comm/collega.js",
       "server/kern/comm/tonen.js",
       "server/kern/comm/wie.js",
       "server/kern/command/apipoort-levensduur.js",

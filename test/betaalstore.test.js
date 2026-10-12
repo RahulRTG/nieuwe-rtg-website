@@ -28,23 +28,15 @@ test('betaalstore: injectie wordt gebruikt en dezelfde sleutel schrijft nooit du
   assert.equal(c.id, a.id, 'ook na een herstart schrijft dezelfde sleutel niet dubbel af');
 });
 
-test('betaalstore: de FIFO-cap-vorm van de server-wiring houdt de administratie begrensd', () => {
-  // dezelfde vorm als in server.js, met een kleine cap zodat de test snel is
+test('betaalstore: de ring die server.js koppelt (server/lib/idemring.js) houdt de administratie begrensd', () => {
   const CAP = 5;
-  const idem = { _keys: [] };
-  const set = (k, v) => {
-    if (k === '_keys') return;
-    if (!(k in idem)) {
-      idem._keys.push(k);
-      if (idem._keys.length > CAP)
-        for (const weg of idem._keys.splice(0, idem._keys.length - CAP)) delete idem[weg];
-    }
-    idem[k] = v;
-  };
+  const data = {};
+  const { set, get } = require('../server/lib/idemring')({ data: () => data, naam: 'betaalIdem', max: CAP, save: () => {} });
+  const idem = data.betaalIdem;
   for (let i = 0; i < 12; i++) set('k' + i, { id: i });
   assert.equal(idem._keys.length, CAP, 'nooit meer sleutels dan de cap');
-  assert.ok(!('k0' in idem), 'de oudste sleutels zijn opgeruimd');
-  assert.ok('k11' in idem, 'de nieuwste sleutels blijven');
+  assert.equal(get('k0'), undefined, 'de oudste sleutels zijn opgeruimd');
+  assert.deepEqual(get('k11'), { id: 11 }, 'de nieuwste sleutels blijven');
   set('k11', { id: 'update' }); // bestaande sleutel: geen extra _keys-regel
   assert.equal(idem._keys.length, CAP);
 });

@@ -68,7 +68,13 @@ function rtfSociaal(req, res) {
   }
 
   const pinClusterRem = require('../kern/sociaal/pin-clusterrem')({ crypto: kern.crypto });
-  const sctx = { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, linkBon, pinClusterRem, pinBeveiliging };
+  /* Een gedeelde Salon-post in een DM wordt bij het LEZEN opgelost met de sessie
+     van de lezer (kern/sociaal/dmpost.js) -- aan de ledenkant en aan de
+     gezinskant op dezelfde manier. Laat gebonden: salonMagLezen staat later op de kern. */
+  let _dmPost = null;
+  const dmPost = () => _dmPost || (_dmPost = require('../kern/sociaal/dmpost')({
+    posts: () => db.data.posts, magLezen: kern.salonMagLezen }));
+  const sctx = { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, linkBon, pinClusterRem, pinBeveiliging, dmPost };
   require('./social/leden')(sctx);
   require('./social/pin')(sctx);
   require('./social/snaps')(sctx);

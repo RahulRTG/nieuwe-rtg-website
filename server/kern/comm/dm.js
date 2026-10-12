@@ -60,7 +60,7 @@ function maakCommDm({ db, save, comm, dmSleutel }) {
           soort: m.post ? 'post' : m.stuk ? 'stuk' : 'tekst',
           antwoordOp: null,
           /* ook een gedeeld mediastuk uit de oude vorm verhuist mee */
-          bijlage: m.post ? Object.assign({ soort: 'post' }, m.post)
+          bijlage: m.post ? { soort: 'post', id: m.post.id }   // alleen het id: zie kern/sociaal/dmpost.js
             : m.stuk ? Object.assign({ soort: 'stuk' }, m.stuk) : null,
           lang: m.lang || null,
           reacties: {}
@@ -92,7 +92,7 @@ function maakCommDm({ db, save, comm, dmSleutel }) {
     const g = gesprek(van, naar);
     /* Een bijlage is een post OF een mediastuk (Media OS); de soort in de
        bijlage zelf vertelt de leeskant welke van de twee het is. */
-    const bijlage = o.post ? Object.assign({ soort: 'post' }, o.post)
+    const bijlage = o.post ? { soort: 'post', id: o.post.id }
       : o.stuk ? Object.assign({ soort: 'stuk' }, o.stuk) : null;
     const m = comm.bericht({ gesprekId: g.id, van, tekst: o.tekst || '',
       bijlage, soort: bijlage ? bijlage.soort : 'tekst', lang: o.lang || null });
@@ -105,7 +105,7 @@ function maakCommDm({ db, save, comm, dmSleutel }) {
   function oudeVorm(m) {
     const b = m.bijlage || null;
     return { id: m.id, from: m.van, text: m.tekst || '',
-      post: (b && b.soort === 'post') ? b : null,
+      post: (b && b.soort === 'post') ? { id: b.id } : null,
       stuk: (b && b.soort === 'stuk') ? { id: b.id, vorm: b.vorm || null } : null,
       at: m.at, lang: m.lang || null };
   }

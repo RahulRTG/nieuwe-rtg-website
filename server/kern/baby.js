@@ -5,6 +5,8 @@
    voor het hele gezin kan bedenken; zonder AI-sleutel komt er een warm demosetje.
    Alles hangt aan het gezin zelf (g.babyboek) en is onzichtbaar voor gasten. */
 
+const { toon } = require('../media/toegang');
+
 module.exports = ({ save, crypto, media, anthropic }) => {
 
   const fout = (status, error) => ({ status, error });
@@ -34,7 +36,7 @@ module.exports = ({ save, crypto, media, anthropic }) => {
 
   function uiterlijk(e, s) {
     return {
-      id: e.id, dag: e.dag, tekst: e.tekst, foto: e.foto ? media.url(e.foto) : null,
+      id: e.id, dag: e.dag, tekst: e.tekst, foto: e.foto ? toon(e.foto) : null,   // gezinsbeeld: nooit openbaar, een kort geldige link
       van: e.van, avatar: e.avatar, at: e.at, magWeg: e.vanId === s.p.id || s.beheerder,
       fav: (e.favVan || []).length, mijnFav: (e.favVan || []).includes(s.p.id)
     };

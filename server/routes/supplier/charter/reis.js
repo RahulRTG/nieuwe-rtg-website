@@ -10,7 +10,8 @@ module.exports = (cctx) => {
     if (!isCharter(s, res)) return;
     const c = charterVan(s, req.body.ref);
     if (!c) return res.status(404).json({ error: 'Charter niet gevonden.' });
-    res.json({ fotos: db.data.charterFotos[c.ref] || { voor: [], na: [] } });
+    // inspectiefoto's zijn van gast en verhuurder, niet van de wereld: ondertekende links
+    res.json({ fotos: require('../../../media/toegang').inspectie(db.data.charterFotos[c.ref]) });
   });
 
   app.post('/api/supplier/charter/foto', express.json({ limit: '1.5mb' }), supplierAuth, async (req, res) => {

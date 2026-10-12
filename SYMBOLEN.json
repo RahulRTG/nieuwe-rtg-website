@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "74b4f504c",
-  "seconden": 9.4,
+  "commit": "2ab92bf40",
+  "seconden": 9.3,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -256167,7 +256167,7 @@
     {
      "naam": "binnen",
      "soort": "functie",
-     "lijn": 113,
+     "lijn": 115,
      "geexporteerd": "onbekend"
     },
     {
@@ -256206,79 +256206,79 @@
     {
      "naam": "kantoordeur",
      "soort": "functie",
-     "lijn": 72,
+     "lijn": 73,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "klaar",
      "soort": "functie",
-     "lijn": 73,
+     "lijn": 75,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "lidToken",
      "soort": "functie",
-     "lijn": 82,
+     "lijn": 84,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "accountPost",
      "soort": "functie",
-     "lijn": 87,
+     "lijn": 89,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "toon",
      "soort": "functie",
-     "lijn": 94,
+     "lijn": 96,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vraag",
      "soort": "functie",
-     "lijn": 108,
+     "lijn": 110,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "melden",
      "soort": "functie",
-     "lijn": 117,
+     "lijn": 119,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "stuur",
      "soort": "functie",
-     "lijn": 128,
+     "lijn": 130,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "zegCode",
      "soort": "functie",
-     "lijn": 137,
+     "lijn": 139,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "codeGesprek",
      "soort": "functie",
-     "lijn": 148,
+     "lijn": 150,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "viaAccount",
      "soort": "functie",
-     "lijn": 159,
+     "lijn": 161,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "start",
      "soort": "functie",
-     "lijn": 177,
+     "lijn": 181,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "vraagPin",
      "soort": "functie",
-     "lijn": 201,
+     "lijn": 205,
      "geexporteerd": "onbekend"
     }
    ],

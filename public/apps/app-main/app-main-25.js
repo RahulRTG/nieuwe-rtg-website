@@ -71,7 +71,16 @@
           try {
             const body = { rol: r.rol, code: r.code, staffId: r.staffId, pin };
             let s;
-            try { s = await API.call('/account/start', body); }
+            /* Het kantoor gaat door de ene kantoordeur (shared/kantoordeur.js):
+               in productie met een passkey, en die start in een tik. */
+            if (r.rol === 'kantoor') {
+              const deur = await laadKantoorDeur();
+              if (!deur) throw new Error(T('werk.mis', 'Openen lukte niet.'));
+              const u = await deur.binnen(API.token, { pin, vraagTik: deur.tikDialoog() });
+              if (u.geenPasskey) { location.href = deur.PASSKEYS; return; }
+              if (!u.token) throw new Error(u.error || T('werk.mis', 'Openen lukte niet.'));
+              s = u;
+            } else try { s = await API.call('/account/start', body); }
             catch (e1) {
               if (!(e1.data && e1.data.locatieNodig)) throw e1;
               const pos = await vraagPositie();

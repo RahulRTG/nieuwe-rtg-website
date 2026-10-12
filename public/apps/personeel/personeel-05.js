@@ -12,28 +12,39 @@
     };
     $('#kaGo').addEventListener('click', go);
     $('#kaCode').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
-    $('#kaCode').focus();
-    // Een gekoppelde kantoorrol start met een tik via hetzelfde RTG-account.
-    (async () => {
-      let lt = null; try { lt = localStorage.getItem('rtg_member_token'); } catch(e){}
-      if (!lt) return;
-      try {
-        const r = await fetch('/api/account/rollen', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: '{}' });
-        const d = await r.json().catch(() => ({}));
-        if (!r.ok) return;
-        if (!(d.rollen || []).some(x => x.rol === 'kantoor')) { kantoorUitnodigingVeld(lt); return; }
-        // toonKantoorLogin kan opnieuw tekenen terwijl de rollencontrole nog
-        // onderweg is. Beide antwoorden mogen samen maar één ingang maken.
-        if ($('#kaAccountVerder')) return;
-        const b = document.createElement('button');
-        b.id = 'kaAccountVerder';
-        b.className = 'abtn'; b.style.cssText = 'margin-top:0.7rem;width:100%;padding:0.8rem;';
-        b.textContent = '' + T('pd.ka.een', 'Verder met uw RTG-account');
-        b.addEventListener('click', () => kantoorMetAccount(lt));
-        const kaart = $('#gateStep').querySelector('.card');
-        if (kaart) kaart.appendChild(b);
-      } catch(e){}
-    })();
+    const deur = window.RTGKantoorDeur;
+    let lt = null; try { lt = localStorage.getItem('rtg_member_token'); } catch(e){}
+    (deur ? deur.stand() : Promise.resolve({ codeDicht: false })).then(st => {
+      kaStand = st;
+      if (!st.codeDicht && $('#kaCodeVak')) { $('#kaCodeVak').hidden = false; $('#kaCode').focus(); }
+      else if (!lt && $('#kaDeurVak')) $('#kaDeurVak').innerHTML = '<p class="k">'+T('pd.ka.alleenAccount','Het kantoor opent met uw eigen RTG-account en een passkey. Log eerst in met uw account.')+'</p>';
+      if (lt) accountDeur(lt, st);
+    });
+  }
+  let kaStand = null;
+  /* EEN INGANG VOOR WIE DE KANTOORROL HEEFT. Waar de code dicht is (productie)
+     is dit de passkeyknop, en ligt de ceremonie al klaar voor er getikt wordt:
+     de tik start navigator.credentials.get zelf (shared/kantoordeur.js, Safari). */
+  async function accountDeur(lt, st){
+    try {
+      const r = await fetch('/api/account/rollen', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: '{}' });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) return;
+      if (!(d.rollen || []).some(x => x.rol === 'kantoor')) { kantoorUitnodigingVeld(lt); return; }
+      // toonKantoorLogin kan opnieuw tekenen terwijl de rollencontrole nog
+      // onderweg is. Beide antwoorden mogen samen maar één ingang maken.
+      if ($('#kaAccountVerder')) return;
+      const b = document.createElement('button');
+      b.id = 'kaAccountVerder';
+      b.className = st.codeDicht ? 'hoofd' : 'abtn'; b.style.cssText = 'margin-top:0.7rem;width:100%;padding:0.8rem;';
+      if (st.codeDicht) b.setAttribute('data-hoofdactie', '');
+      b.textContent = st.codeDicht ? T('pd.ka.passkey', 'Kantoor openen met passkey') : T('pd.ka.een', 'Verder met uw RTG-account');
+      b.onclick = () => kantoorMetAccount(lt);
+      const vak = $('#kaDeurVak') || $('#gateStep').querySelector('.card');
+      if (!vak) return;
+      vak.appendChild(b);
+      if (st.codeDicht && window.RTGKantoorDeur) kaUitkomst(lt, null, await RTGKantoorDeur.bereid(lt), true);
+    } catch(e){}
   }
   /* DE KANTOORUITNODIGING VERZILVEREN (op naam, eenmalig). Het scherm volgt de
      server: vraagt die een passkey (productie, B24), dan de ceremonie via
@@ -56,61 +67,3 @@
     $('#kaUitnGo').addEventListener('click', ga);
     $('#kaUitn').addEventListener('keydown', e => { if (e.key === 'Enter') ga(); });
   }
-  /* Het kantoor openen met het ene RTG-account (/api/account/start). Vraagt de
-     server een pin, dan een pinveld; vraagt hij in productie een passkey (B10),
-     dan de ceremonie die hij meegeeft, net als shared/kantoorgesprek.js. */
-  async function kantoorMetAccount(lt, pin, bewijs){
-    const lijf = Object.assign({ rol: 'kantoor' }, pin ? { pin } : {}, bewijs ? { ceremonie: bewijs.ceremonie, antwoord: bewijs.antwoord } : {});
-    const s = await fetch('/api/account/start', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt },
-      body: JSON.stringify(lijf) });
-    const sd = await s.json().catch(() => ({}));
-    if (!s.ok && sd.bevestigingNodig && sd.bevestiging && !bewijs) {
-      await laad('RTGPasskey', 'passkey');
-      const b = window.RTGPasskey ? await RTGPasskey.bevestig(() => sd.bevestiging) : { fout: T('pd.passkeyStart', 'De passkey kon hier niet starten.') };
-      if (b && !b.fout) return kantoorMetAccount(lt, pin, b);
-      if ($('#kaFout')) $('#kaFout').textContent = (b && b.fout) || T('pd.mis', 'Er ging iets mis.');
-      return;
-    }
-    if (!s.ok) {
-      if (sd.pinNodig && !$('#kaPin') && $('#kaFout')) {
-        $('#kaFout').insertAdjacentHTML('afterend', '<div class="pinrow h-mt60"><input id="kaPin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="'+T('pin.veld','Algemene pin')+'" placeholder="'+T('pin.veld','Algemene pin')+'">'+
-          '<button id="kaPinGo" class="hoofd">'+T('pd.ka.binnen','Binnen')+'</button></div>');
-        const ga = () => kantoorMetAccount(lt, $('#kaPin').value.trim());
-        $('#kaPinGo').addEventListener('click', ga);
-        $('#kaPin').addEventListener('keydown', e => { if (e.key === 'Enter') ga(); });
-        $('#kaPin').focus();
-      }
-      $('#kaFout').textContent = sd.error || T('pd.mis', 'Er ging iets mis.');
-      return;
-    }
-    kaToken = sd.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
-    enterKantoor();
-  }
-  async function enterKantoor(){
-    const k = await kaApi('kamers');
-    // een kantoren-deeplink bracht ons hier alleen voor het inloggen: meteen door
-    const terug = kaTerugPad();
-    if (terug){ location.replace(terug); return; }
-    let naam = ''; try { naam = localStorage.getItem('rtg_kantoor_naam') || ''; } catch(e){}
-    $('#gateStep').innerHTML = '<button class="gback" id="kaTerug">← '+T('pd.ka.staf','Personeel van een zaak')+'</button>'+
-      '<div class="card" id="kaMeld">'+
-        '<div class="k">'+T('pd.ka.naam','Jouw naam')+'</div>'+
-        '<input class="hin h-mt40" id="kaNaam" maxlength="30" value="'+esc(naam)+'">'+
-        '<div class="row"><select class="hin" id="kaKamer">'+k.kamers.map(x => '<option value="'+x.id+'">'+esc(x.naam)+'</option>').join('')+'</select>'+
-        '<select class="hin" id="kaWaar" style="max-width:9.5rem;"><option value="thuis">'+T('pd.ka.thuis','Thuis')+'</option><option value="kantoor">'+T('pd.ka.hier','Kantoor')+'</option></select></div>'+
-        '<button class="abtn" id="kaMeldGo" style="margin-top:0.75rem;width:100%;padding:0.8rem;">'+T('pd.ka.meld','Meld je aan voor je dienst')+'</button>'+
-        '<div id="kaMFout" style="margin-top:0.5rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>'+
-      '<div class="card" id="kaDienstBlok" hidden><div id="kaDienstTekst" style="font-size:0.9rem;"></div>'+
-        '<button class="abtn ghost h-mt60" id="kaAfmeld">'+T('pd.ka.afmeld','Meld je af')+'</button></div>'+
-      '<div class="card"><div class="k">'+T('pd.ka.wie','Nu aan het werk')+'</div><div class="h-mt40" id="kaWie"></div></div>'+
-      '<div class="card"><div class="k">'+T('pd.ka.chat','De chat van jouw kamer')+'</div>'+
-        '<div id="kaChat" style="max-height:15rem;overflow-y:auto;font-size:0.85rem;margin-top:0.5rem;"></div>'+
-        '<div class="row"><input class="hin" id="kaTekst" maxlength="500" placeholder="'+T('pd.ka.bericht','Bericht...')+'">'+
-        '<button class="abtn" id="kaStuur">'+T('pd.ka.stuur','Stuur')+'</button></div></div>'+
-      '<div class="card"><div class="k">Integratiekamer</div>'+
-        '<div class="pd-card-copy">SMTP, SMS, Stripe Connect en SEPA lokaal testen, gecontroleerd schakelen en samen als keten beproeven. Bediening vraagt boardroomtoegang.</div>'+
-        '<a class="abtn pd-block" href="/apps/kantoren.html?kamer=integraties">Open het beveiligde schakelbord</a></div>'+
-      '<div class="card"><div class="k">RTG Controleregister</div>'+
-        '<div class="pd-card-copy">Bekijk welke code al een kantoor, rol, proef, audit, gameplay en economisch gevolg heeft. Ontbrekende koppelingen worden werk voor het juiste team.</div>'+
-        '<a class="abtn pd-block" href="/apps/magnaat-kantoor.html">Open de dekkingsmatrix</a></div>'+
-      '<div style="margin-top:0.5rem;font-size:0.7rem;line-height:1.5;color:var(--soft);">'+T('pd.ka.uitleg','Het volledige kantoor (statistieken, taken, boardroom) staat in de kantoren-app; dit is je zak-versie voor aanmelden en contact.')+'</div>';

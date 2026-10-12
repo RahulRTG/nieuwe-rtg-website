@@ -46,6 +46,12 @@
       bewaar: (t, r) => { localStorage.setItem('rtg_werk_sessie', JSON.stringify({ werkruimte: r.code, lidToken: t })); } }
   };
 
+  // de kantoordeur en de passkeyvertaling, pas geladen als iemand het kantoor opent
+  const laadKantoorDeur = () => window.RTGKantoorDeur ? Promise.resolve(window.RTGKantoorDeur) : new Promise(ok => {
+    const t = document.createElement('script'); t.src = '/shared/kantoordeur.js';
+    t.onload = t.onerror = () => ok(window.RTGKantoorDeur ? RTGKantoorDeur.laadPasskey().then(() => window.RTGKantoorDeur) : null);
+    document.head.appendChild(t);
+  });
   /* vraag de algemene pin (of zet hem eerst) en geef hem door aan af(pin) */
   function metAlgPin(af) {
     if (Date.now() < pinOkTot) return af(null);

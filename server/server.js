@@ -843,6 +843,8 @@ app.get('/api/health', (req, res) => {
        Zonder die modus zijn ze altijd gelijk. */
     server: Number(process.env.RTG_SERVER || 1), active: db.writable, leider: !!db.leider,
     domeinen: process.env.RTG_DOMAINS || 'alle',
+    // de kantoordeur (B10): code of passkey -- het scherm raadt het niet zelf
+    kantoordeur: require('./kern/kantoor/productiedeur').deurStand(),
     pid: process.pid, up: Math.round(process.uptime())
   });
 });

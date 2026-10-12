@@ -58,7 +58,12 @@ const ERBIJ_GEKOMEN = [
       'lid laten iets gebeuren (een smaak wordt gezet, een model wordt betaald), deze laat iets ' +
       'vervallen. Hij hoort niet bij `lezen` (hij verandert toestand) en niet bij `voorstel` (een ' +
       'voorstel om een voorstel te laten vervallen is een cirkel); zie de kop bij KLEIN in ' +
-      'server/kern/stuur/beleid-lijsten.js' }
+      'server/kern/stuur/beleid-lijsten.js' },
+  { pad: '/api/knelpunt', op: '2026-10-11', naar: 'lezen',
+    reden: 'besluit van de eigenaar: Rahul is de ingang waarmee een lid een doel uitspreekt, en de ' +
+      'knelpuntmotor maakt daar de mogelijkheden bij zichtbaar. Lezen en niet klein: de route bewaart ' +
+      'niets en roept nergens save() aan (server/lib/mutatiecontracten-knelpunt.js); ' +
+      'test/stuur-knelpunt.test.js houdt vast dat hij via het stuur geen andere context ophaalt.' }
 ];
 
 /* De lijst zoals hij VOOR de splitsing was, met de hand overgeschreven uit de

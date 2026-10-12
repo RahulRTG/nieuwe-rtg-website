@@ -18,21 +18,23 @@
 
 const { postBeperking } = require('./leverancier/beschermdesoorten');
 
-module.exports = ({ db, save, crypto, klokDatum, SYSTEEM, normAdres, zelfdeBus, zegel, scanLinks, pub, kap, MAX }) => {
+// `ruw` geeft db.data.rtmail (of maakt hem); de datadeur blijft in ./rtmail.js
+module.exports = ({ ruw, heeft, save, crypto, klokDatum, SYSTEEM, normAdres, zelfdeBus, zegel, scanLinks, pub, kap, MAX }) => {
   const isBeperkt = (m) => !!postBeperking(m, SYSTEEM);
   const beperking = (soort) => postBeperking({ van: SYSTEEM, soort: soort || 'systeem' }, SYSTEEM);
   const bewaar = () => typeof save.sleutels === 'function' ? save.sleutels(['rtmail']) : save();
   function plek() {
-    if (!db.data.rtmail || !Array.isArray(db.data.rtmail.berichten)) db.data.rtmail = { berichten: [] };
-    if (!Array.isArray(db.data.rtmail.leiding)) db.data.rtmail.leiding = [];
-    return db.data.rtmail.leiding;
+    const r = ruw();
+    if (!Array.isArray(r.leiding)) r.leiding = [];
+    return r.leiding;
   }
 
   // oude beperkte post uit het gedeelde postvak halen; in place, want andere lezers houden de lijst vast
   // eenmalig per opslag (leidingVersie): nieuwe beperkte post komt nooit meer in het gedeelde postvak
   function migreer() {
-    const r = db.data.rtmail;
-    if (!r || !Array.isArray(r.berichten) || r.leidingVersie === 1) return 0;
+    if (!heeft()) return 0;
+    const r = ruw();
+    if (r.leidingVersie === 1) return 0;
     r.leidingVersie = 1;
     if (!r.berichten.some(isBeperkt)) return 0;
     const l = plek(), weg = [];

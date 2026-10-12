@@ -37,11 +37,11 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
     return VERTROUWDE_BRONNEN.includes(b) ? b : 'extern';
   }
 
-  function store() {
+  function ruw() {
     if (!db.data.rtmail || !Array.isArray(db.data.rtmail.berichten)) db.data.rtmail = { berichten: [] };
-    leiding.migreer();
     return db.data.rtmail;
   }
+  function store() { leiding.migreer(); return ruw(); }
 
   // De geverifieerde serverroute zet `bron`; de client bepaalt dit vertrouwen niet.
   function bezorg({ van, naar, onderwerp, tekst, soort, bron, antwoordOp } = {}, bewaar = save) {
@@ -104,7 +104,7 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
     // Een systeemseintje bezit alleen rtmail. Gewone bezorging behoudt save():
     // een afwezigheidsantwoord legt ook de lus-rem in rtmailSchrijf vast.
     const bewaar = () => typeof save.sleutels === 'function' ? save.sleutels(['rtmail']) : save();
-    // beperkte post verplicht naar de leidingsplek (./rtmail-leiding.js)
+    // beperkt: naar de leidingsplek
     const beperkt = leiding.beperking(soort);
     if (beperkt) return leiding.leg({ naar, onderwerp, tekst, soort, beperkt });
     return bezorg({ van: SYSTEEM, naar, onderwerp, tekst, soort: soort || 'systeem', bron: 'systeem' }, bewaar);
@@ -129,9 +129,9 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
   /* Alleen voor een legitieme naverwerking binnen dezelfde bezorgketen, zoals
      het toevoegen van de uitkomst van de bijlagescanner. `bewaar` staat daar
      aan, zodat inhoud en nieuw zegel atomisch in dezelfde opslagronde landen. */
-  const leiding = require('./rtmail-leiding')({ db, save, crypto, klokDatum, SYSTEEM, normAdres, zelfdeBus,
+  const leiding = require('./rtmail-leiding')({ ruw, heeft: () => !!db.data.rtmail, save, crypto, klokDatum, SYSTEEM, normAdres, zelfdeBus,
     zegel: veiligheid.zegel, scanLinks, pub: (m) => pub(m), kap, MAX });
-  try { leiding.migreer(); } catch (e) { /* bij het eerste gebruik */ }
+  try { leiding.migreer(); } catch (e) { /* later */ }
 
   function herzegel(m, bewaar) { veiligheid.zegel(m); if (bewaar) save(); return m; }
 

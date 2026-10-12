@@ -3,12 +3,12 @@
  "uitleg": "Welke module heeft welke naam op het contextobject gezet. Drie vormen: het basisobject, een directe toewijzing, en Object.assign met een fabriek -- die laatste gelezen uit het laatste letterlijke return-object van die fabriek.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "489709486"
+  "commit": "c852bb6d0"
  },
  "grens": "Er wordt niet geraden. Een samenvoeging die niet te volgen is levert geen naam maar een regel in `onopgelost`, met de reden. Een herkomst die je naar de verkeerde module wijst is erger dan geen herkomst.",
  "gemeten": {
-  "namen": 1347,
-  "vulplekken": 343,
+  "namen": 1348,
+  "vulplekken": 344,
   "basisNamen": 468,
   "namenMetMeerdereHerkomsten": 1,
   "onopgelost": 30
@@ -206,7 +206,7 @@
   },
   {
    "bestand": "server/server.js",
-   "lijn": 2168,
+   "lijn": 2160,
    "vorm": "basis",
    "reden": "een spread in het basisobject"
   }
@@ -3056,6 +3056,15 @@
      "bestand": "server/kern/consent.js",
      "hoe": "fabriek",
      "via": "server/opzet/aanbouw4.js"
+    }
+   ]
+  },
+  {
+   "naam": "contextDomeinen",
+   "herkomsten": [
+    {
+     "bestand": "server/opzet/kernlaag6.js",
+     "hoe": "toewijzing"
     }
    ]
   },

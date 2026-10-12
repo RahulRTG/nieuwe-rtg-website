@@ -70,6 +70,7 @@
 module.exports = function maakNeigingLaag({ db, save, crypto, nu }) {
   const neiging = require('./bewaren')({ db, save, crypto, nu });
   const vraag = require('./vraag');
+  const lijst = require('./vraag-lijst');
   const ladder = require('./ladder');
 
   /* De onderwerpen die dit lid draagt en die nog meetellen. De vraagmotor krijgt
@@ -158,6 +159,8 @@ module.exports = function maakNeigingLaag({ db, save, crypto, nu }) {
       lees: (key, doel, opties) => neiging.neigingen(key, doel, opties),
       merkOp,
       controle: () => vraag.controle(),
+      // voor kern/experience/volgorde.js; uit de vragenlijst en nergens anders
+      wijstVan: lijst.wijstVan, labelVan: lijst.labelVan,
       ladder
     }
   };

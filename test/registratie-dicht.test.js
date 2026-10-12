@@ -24,7 +24,14 @@
       7c scant de bron op ook dynamische vormen;
    8. SSO geeft bij een dichte registratie de reden door in plaats van een
       kale 401, en de publieke `hoe` noemt geen interne variabele;
-   9. npm run golive leest het envbestand met de lezer van de server.
+   9. npm run golive leest het envbestand met de lezer van de server;
+   10. de takken die de eerste rondes niet liepen (de dekkingsvloer zakte):
+      het zekeringknopje (404, 400, reset, afkappen), het doven van een
+      zekering, het statusbord dat de uitleg uit de STANDAARD neemt en niet uit
+      een oude rij, de SSO-weigeringen, de uitleg van het eigenaarsscript,
+      golive bij een onleesbaar of ontbrekend envbestand, en config.pasToe.
+      Mutaties: de spreidvolgorde in bord.js omdraaien -> 10c zakt (dat was de
+      overlevende van de eerste ronde); de afkapgrens in knoppen.js -> 10a zakt.
 
    Mutaties van de tweede ronde, met de hand: in server/techniek.js een
    require(path.join(__dirname,'accounts','users')) of './accounts/'+'users'
@@ -39,10 +46,10 @@
    deze ronde: de vlag weer alleen op een letterlijke `1` lezen -> 5 en 6b
    zakken; de reden `zekering` laten vallen -> 2 en 6b zakken; het
    eigenaarsscript weer via de gevel laten schrijven -> 7 en 7b zakken; de
-   SSO-tak voor REGISTRATIE_DICHT weghalen -> 8 zakt. Wat NIET zakt: de uitleg
-   van FUSE-REG weer uit de opgeslagen rij nemen in plaats van de standaard --
-   een verse datamap heeft geen oude tekst om te tonen. De liegpoort-meting
-   staat in MUTATIES.json.
+   SSO-tak voor REGISTRATIE_DICHT weghalen -> 8 zakt. De uitleg van FUSE-REG
+   weer uit de opgeslagen rij nemen overleefde toets 2 (een verse datamap heeft
+   geen oude tekst) en wordt nu door 10c gevangen. De liegpoort-meting staat in
+   MUTATIES.json.
 
    Draai: node --test test/registratie-dicht.test.js */
 'use strict';
@@ -368,4 +375,136 @@ test('9. golive leest het envbestand met de lezer van de server', () => {
     assert.equal(r.dicht(ds.leesEnv(VLAG + '="0"')), false);
     assert.equal(r.dicht(ds.leesEnv('export ' + VLAG + '=1')), true);
   } finally { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen */ } }
+});
+
+/* 10. DE TAKKEN DIE DE EERSTE RONDE NIET LIEP, elk met een uitkomst.
+   Deze staan er omdat de dekkingsvloer van de volledige CI zakte: de grendel
+   voegde takken toe die alleen in een echte server liepen (en die telt de
+   dekking niet mee, want hij wordt met SIGKILL gestopt), of die geen enkele
+   toets ooit nam. Geen aanroep zonder bewering. */
+test('10a. het zekeringknopje: onbekend, verkeerde actie, reset en het prototype', () => {
+  const routes = {};
+  const app = { post: (pad, ...fns) => { routes[pad] = fns[fns.length - 1]; } };
+  const zekeringen = { registratie: { naam: 'Nieuwe registraties', aan: false, reden: 'oud', sindsGesprongen: 1, tot: Date.now() + 60000 } };
+  let opgeslagen = 0;
+  require('../server/routes/techniek/knoppen')({ app, kern: {}, accounts: {}, staat: () => ({ zekeringen }),
+    save: () => { opgeslagen++; }, log: {}, beveilig: null, techAuth: null, eigenaarAlleen: null });
+  const roep = (body) => {
+    const uit = { status: 200, body: null };
+    routes['/api/techniek/zekering']({ body }, { status(s) { uit.status = s; return this; }, json(b) { uit.body = b; } });
+    return uit;
+  };
+  assert.equal(roep({ id: 'bestaat-niet', actie: 'spring' }).status, 404);
+  assert.equal(roep({ id: '__proto__', actie: 'spring' }).status, 404, 'het prototype is geen zekering');
+  assert.equal(Object.prototype.aan, undefined);
+  assert.equal(roep({}).status, 404, 'zonder id');
+  const fout = roep({ id: 'registratie', actie: 'omdraaien' });
+  assert.equal(fout.status, 400);
+  assert.equal(opgeslagen, 0, 'een geweigerde handeling slaat niets op');
+  const reset = roep({ id: 'registratie', actie: 'reset' });
+  assert.deepEqual(reset.body, { ok: true, id: 'registratie', aan: true });
+  const z = zekeringen.registratie;
+  assert.equal(z.reden, null); assert.equal(z.tot, null); assert.equal(z.sindsGesprongen, null);
+  const spring = roep({ id: 'registratie', actie: 'spring' });
+  assert.equal(spring.body.aan, false);
+  assert.equal(z.reden, 'handmatig uitgeschakeld', 'zonder reden een standaardreden');
+  roep({ id: 'registratie', actie: 'spring', reden: 'x'.repeat(300) });
+  assert.equal(z.reden.length, 120, 'de reden wordt afgekapt');
+  assert.equal(opgeslagen, 3);
+});
+
+test('10b. de zekering dooft alleen met een verstreken einde', () => {
+  const { zekeringGesprongen } = require('../server/techniek');
+  assert.equal(zekeringGesprongen(null), false);
+  assert.equal(zekeringGesprongen({ aan: true }), false);
+  assert.equal(zekeringGesprongen({ aan: false }), true, 'handmatig: blijft eruit');
+  assert.equal(zekeringGesprongen({ aan: false, tot: Date.now() + 60000 }), true, 'noodrem nog niet voorbij');
+  const oud = { aan: false, reden: 'noodrem', sindsGesprongen: 1, tot: Date.now() - 1 };
+  assert.equal(zekeringGesprongen(oud), false, 'noodrem voorbij: de stroom gaat erop');
+  assert.deepEqual([oud.aan, oud.reden, oud.tot], [true, null, null]);
+});
+
+test('10c. het statusbord neemt naam en uitleg uit de standaard, niet uit een oude rij', async () => {
+  const routes = {};
+  const zet = (pad, ...fns) => { routes[pad] = fns[fns.length - 1]; };
+  const app = { get: zet, post: zet, put: zet, delete: zet };
+  const techniek = require('../server/techniek');
+  /* een rij van vóór de correctie: de oude uitleg zei "geen nieuwe accounts" */
+  const zekeringen = { registratie: { naam: 'Oude naam', code: 'FUSE-REG', aan: false, reden: 'proef', uitleg: 'Eraf = geen nieuwe accounts (bijv. bij misbruik).' },
+    eigen: { naam: 'Zelfgemaakt', aan: true, uitleg: 'blijft zoals hij is' } };
+  const bouw = (accounts) => require('../server/routes/techniek/bord')({
+    techniek: { draaiChecks: async () => [{ status: 'ok' }, { status: 'fout' }], standaardZekeringen: techniek.standaardZekeringen },
+    functies: { catalogus: () => [], DOELGROEPEN: [] }, eigenaar: {}, inzagelog: {}, log: { foutenSamenvatting: () => ({ totaal: 0 }) },
+    accounts, archief: null, beveilig: null, db: { data: {} }, app, ctx: () => ({}),
+    staat: () => ({ zekeringen, functieVerzoeken: [], toegang: [] }), isEigenaar: () => false, techAuth: null,
+    bewaren: () => null, foutmelder: null, spelTelemetrie: null });
+  const vraag = async () => { let b; await routes['/api/techniek/status']({ techUser: {} }, { json: (x) => { b = x; } }); return b; };
+
+  bouw({ realNameOf: () => 'Proef', registratieStand: () => require('../server/accounts/registratie').stand({ [VLAG]: 'ja' }) });
+  const st = await vraag();
+  const reg = st.zekeringen.find(z => z.id === 'registratie');
+  assert.match(reg.uitleg, /alleen.*\/api\/auth\/register|\/api\/auth\/register/, 'de gecorrigeerde uitleg');
+  assert.doesNotMatch(reg.uitleg, /geen nieuwe accounts/);
+  assert.equal(reg.naam, 'Nieuwe registraties');
+  assert.deepEqual(reg.dekt, ['/api/auth/register']);
+  assert.equal(reg.aan, false, 'de STAND komt wel uit de rij');
+  assert.equal(reg.reden, 'proef');
+  const eigen = st.zekeringen.find(z => z.id === 'eigen');
+  assert.equal(eigen.uitleg, 'blijft zoals hij is', 'een zekering zonder standaard houdt zijn eigen tekst');
+  assert.equal(st.registratie.dicht, true);
+  assert.equal(st.registratie.onbekendeWaarde, true);
+  assert.deepEqual(st.samenvatting, { ok: 1, waarschuwing: 0, fout: 1 });
+  assert.equal(st.toegang, undefined, 'geen eigenaar: geen toegangslijst');
+
+  bouw({ realNameOf: () => 'Proef' });
+  assert.equal((await vraag()).registratie, null, 'een gevel zonder registratieStand zegt null en niet open');
+});
+
+test('10d. SSO-weigeringen: werksync, dicht zonder hoe, en de rest', () => {
+  const { foutAntwoord } = require('../server/sso/binnenkomst');
+  const w = foutAntwoord(Object.assign(new Error('x'), { code: 'SSO_WERKSYNC' }));
+  assert.equal(w.status, 503); assert.equal(w.retryAfter, '30');
+  const d = foutAntwoord(Object.assign(new Error('x'), { code: 'REGISTRATIE_DICHT' }));
+  assert.equal(d.status, 503); assert.equal(d.hoe, null, 'zonder hoe wordt het null, nooit undefined');
+  assert.equal(foutAntwoord(null).status, 401);
+});
+
+test('10e. de uitleg van het eigenaarsscript noemt alleen wat de fout aanwijst', () => {
+  const { aanmaakUitleg } = require('../scripts/eigenaar-aanmaken');
+  const dicht = aanmaakUitleg(Object.assign(new Error('x'), { code: 'REGISTRATIE_DICHT' })).join(' ');
+  assert.match(dicht, /RTG_REGISTRATIE_DICHT/);
+  assert.doesNotMatch(dicht, /tweede schrijver/);
+  const grendel = aanmaakUitleg(Object.assign(new Error('x'), { code: require('../server/accounts/duurzaamheid').BLOKKADECODE })).join(' ');
+  assert.match(grendel, /NODE_ENV=production en DATABASE_URL/);
+  const anders = aanmaakUitleg(new Error('iets')).join(' ');
+  assert.match(anders, /geen herkende reden/);
+  assert.match(aanmaakUitleg(null).join(' '), /geen herkende reden/);
+});
+
+test('10f. golive weigert een envbestand dat de server niet kan lezen, en een ontbrekend', () => {
+  const { spawnSync } = require('node:child_process');
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-regdicht-golive2-'));
+  const draai = (pad) => {
+    const env = { ...process.env, RTG_ENV_FILE: pad }; delete env[VLAG];
+    const r = spawnSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'golive.js'), '--bewijs-stdout'], { encoding: 'utf8', env, timeout: 120000 });
+    return String(r.stdout || '') + String(r.stderr || '');
+  };
+  try {
+    const slecht = path.join(TMP, 'slecht.env');
+    fs.writeFileSync(slecht, '1VERKEERD=ja\n');
+    assert.match(draai(slecht), /niet te lezen zoals de server hem leest: ongeldige variabelenaam/);
+    assert.match(draai(path.join(TMP, 'bestaat-niet.env')), /RTG_ENV_FILE wijst naar een ontbrekend geheimenbestand/);
+  } finally { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen */ } }
+});
+
+test('10g. config.pasToe logt de waarschuwing bij een onbekende waarde', () => {
+  const config = require('../server/config');
+  const regels = [];
+  const log = { warn: (s) => regels.push(['warn', s]), error: (s) => regels.push(['error', s]), info: (s) => regels.push(['info', s]) };
+  const r = config.pasToe({ [VLAG]: 'yes', NODE_ENV: 'development' }, log);
+  assert.equal(r.productie, false);
+  assert.ok(regels.some(([n, s]) => n === 'warn' && s.startsWith('[config] ' + VLAG + '="yes"')), JSON.stringify(regels).slice(0, 300));
+  const stil = [];
+  config.pasToe({ [VLAG]: '1', NODE_ENV: 'development' }, { warn: (s) => stil.push(s), error: (s) => stil.push(s), info: () => {} });
+  assert.ok(!stil.some(s => s.includes(VLAG)), '1 is bekend en geeft geen regel');
 });

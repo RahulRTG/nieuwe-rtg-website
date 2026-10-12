@@ -570,5 +570,5 @@ async function voer(argv) {
   }
 }
 
-module.exports = { argumenten, vulOntbrekendIn, hoofd, voer };
+module.exports = { argumenten, vulOntbrekendIn, hoofd, voer, aanmaakUitleg };
 if (require.main === module) voer(process.argv.slice(2));

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2451 bestanden en 16779 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2452 bestanden en 16783 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2451 |
-| losse beweringen (`test(...)`) | 16779 |
+| toetsbestanden | 2452 |
+| losse beweringen (`test(...)`) | 16783 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 304 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2277 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2278 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 174 |
 | alleen in de kop *genoemd*, nog niet gemeten | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-2143 bestanden, 16242 beweringen.
+2144 bestanden, 16246 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1619,6 +1619,7 @@ toets omvalt.
 | `rtmail-leiding-bestuur.test.js` | 2 | gezakt op `liegpoort /api/` | HET BESTUUR VAN DE LEIDINGSPLEK (kern/rtmail-leiding.js) -- zevende tegenlezing van PR #584, op een echte server. 1. |
 | `rtmail-leiding-pg.test.js` | 4 | gezakt op `voorwaarde-omkeren#0` | HET VANGNET VAN DE LEIDINGSPLEK IN POSTGRESQL-MODUS (kern/rtmail-leiding.js) -- zevende tegenlezing van PR #584. schoonLeiding() VERHUIST beperkte post uit het gedeelde postvak, en dat is een mutatie -- ook op een... |
 | `rtmail-leidingplek.test.js` | 4 | gezakt op `liegpoort /api/` | DE LEIDINGSPLEK VAN EEN ZAAKPOSTVAK (kern/rtmail-leiding.js) -- vijfde tegenlezing van PR #584. Sollicitatiepost hoort bij de werving, en die is van de manager. |
+| `rtmail-leidingtermijn.test.js` | 4 | gezakt op `liegpoort /api/` | DE BEWAARTERMIJN VAN DE LEIDINGSPLEK (besluit 584A, kern/rtmail-leidingtermijn.js), op een echte server. Vier weken na binnenkomst, verlengen alleen door een manager van deze zaak met grondslag en noodzaak tot... |
 | `rtmail-lid.test.js` | 7 | gezakt op `liegpoort /api/` | RTMAIL aan de lid-kant: elk nieuw lid krijgt een welkom in zijn eigen postvak, dat als kanaal in de verenigde Berichten-app verschijnt en te lezen is. End-to-end tegen een echte server. |
 | `rtmail-schrijf.test.js` | 10 | gezakt op `liegpoort /api/` | RTMAIL, de schrijfkant: concepten, uitgesteld verzenden, handtekening, afwezigheid, aliassen en de regels die bij de BEZORGING draaien. De vier beweringen die er het meest toe doen: 1. |
 | `rtmail-team.test.js` | 9 | gezakt op `liegpoort /api/` | RTMAIL-teams: een adres dat meerdere mensen samen lezen (receptie@partner.rtg). Toetst de vier beloftes van kern/rtmail-team.js: het adres volgt de oprichter, een team kaapt nooit een bestaand postvak, toewijzen... |

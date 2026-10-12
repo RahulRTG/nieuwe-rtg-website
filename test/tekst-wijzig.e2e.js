@@ -91,13 +91,6 @@ test('typen en klikken wijzigen hetzelfde concept op dezelfde kaart; gemeten van
     const kaart = page.locator('.rtg-rahul-page .rtg-conceptwerk');
     await kaart.waitFor({ timeout: 20000 });
     const voorModel = model.verzoeken.length;
-    if (process.env.RTG_DEBUG) console.log('MAAT', JSON.stringify(await page.evaluate(() => {
-      const i = document.querySelector('.rtg-conceptwerk input[name="bestemming"]'), l = i.parentElement, g = l.parentElement;
-      const cs = getComputedStyle(i), regels = [];
-      for (const sh of document.styleSheets) { let r; try { r = sh.cssRules; } catch (e) { continue; }
-        (function loop(rs) { for (const x of rs) { if (x.cssRules && !x.selectorText) loop(x.cssRules); else if (x.selectorText) { try { if (i.matches(x.selectorText) && /width|radius/.test(x.style.cssText)) regels.push(x.selectorText.slice(0, 90) + ' :: ' + x.style.cssText.slice(0, 120)); } catch (e) {} } } })(r); }
-      return { input: i.getBoundingClientRect().width, label: l.getBoundingClientRect().width, grid: g.getBoundingClientRect().width, w: cs.width, minw: cs.minWidth, regels };
-    })));
 
     const klik = [], typ = [];
     let versie = 1;

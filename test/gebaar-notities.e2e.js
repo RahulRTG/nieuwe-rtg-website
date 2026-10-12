@@ -80,11 +80,19 @@ test('een veeg archiveert een notitie en draait terug; weggooien gaat alleen op 
     assert.equal(await page.locator('#bord .nkaart').count(), 2, 'beide notities horen op het bord te staan');
 
     // 1. doorvegen legt de notitie ECHT in de la
-    const rij = page.locator('#bord .nkaart').first();
+    /* DE KAART OP HAAR ID EN NIET OP HAAR PLEK. Het bord tekent na het laden
+       nog een keer (een tweede /api/notities/mijn), en `.first()` meet dan de
+       kaart die op dat moment vooraan staat: de titel en de maat kwamen van twee
+       verschillende kaarten, en de veeg archiveerde de buurman terwijl de proef
+       op deze wachtte (`{"archief":false}` na 8000 ms). Dezelfde race als in
+       test/gebaar-bestanden.e2e.js. Eerst de rust, dan de identiteit, dan de
+       maat van DIE kaart. */
+    await wachtOpRust(page, '#bord');
+    const rijSelector = '#bord .nkaart[data-open="' + await page.locator('#bord .nkaart').first().getAttribute('data-open') + '"]';
+    const rij = page.locator(rijSelector);
     await rij.scrollIntoViewIfNeeded();
     await wachtOpRust(page, '#bord');
     const titel = (await rij.locator('h3').textContent()).trim();
-    const rijSelector = '#bord .nkaart[data-open="' + await rij.getAttribute('data-open') + '"]';
     await veegDoor(page, await rij.boundingBox(), { kiezer: rijSelector });
     await wachtTot(() => staatVan(titel), (s) => s && s.archief,
       'doorvegen hoort ' + titel + ' bij de server te archiveren');

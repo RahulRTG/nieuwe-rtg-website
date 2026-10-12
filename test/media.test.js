@@ -62,11 +62,23 @@ test('module: serveer streamt met het juiste type; migreer verplaatst bestaande 
   const naam = await media.bewaar(PNG);
   let type = null, code = 200, body = null;
   const res = { headersSent: false, set: (k, v) => { if (k === 'Content-Type') type = v; }, status: c => { code = c; return res; }, end: b => { body = b; } };
+  /* /media/:naam is fail-closed (server/media/toegang.js): een bestand dat op
+     geen verklaarde openbare plek staat, komt er niet uit. De kijker die het mag
+     zien krijgt een ondertekende link (media.toon), en die levert de bytes. */
   await media.serveer({ params: { naam } }, res);
-  assert.equal(type, 'image/png', 'serveer zet het juiste content-type');
-  assert.ok(Buffer.isBuffer(body) && body.length > 0, 'serveer geeft de bytes terug');
+  assert.equal(code, 404, 'een privébestand komt niet via de kale naam');
+  assert.equal(type, null);
+  const link = media.toon(naam);
+  assert.match(link, /^\/media\/t\/[A-Za-z0-9_-]+$/, 'privé wordt een ondertekende link');
+  code = 200;
+  let cc = null;
+  const res2 = Object.assign({}, res, { set: (k, v) => { if (k === 'Content-Type') type = v; if (k === 'Cache-Control') cc = v; }, status: c => { code = c; return res2; } });
+  await media.serveerLink({ params: { token: link.slice('/media/t/'.length) } }, res2);
+  assert.equal(type, 'image/png', 'de link zet het juiste content-type');
+  assert.equal(cc, 'private, no-store');
+  assert.ok(Buffer.isBuffer(body) && body.length > 0, 'de link geeft de bytes terug');
   await media.serveer({ params: { naam: '../secret' } }, res);
-  assert.equal(code, 400, 'geen directory-traversal');
+  assert.equal(code, 404, 'geen directory-traversal');
 
   const db = { data: {
     suppliers: [{ code: 'A', photos: [PNG, PNG], salon: { foto: PNG },

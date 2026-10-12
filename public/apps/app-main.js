@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '96163bb4';
+var RTG_BOUW = 'e8259765';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -2146,8 +2146,16 @@ var RTG_BOUW = '96163bb4';
     else if (d.kind === 'accepted'){ toast('' + d.by + ' ' + T('sal.accepteerde','accepteerde uw verzoek')); loadSocial(); }
     else if (d.kind === 'dm'){
       if (dmWith === d.from && $('#dm-sheet').classList.contains('open')){
-        dmToevoegen({ from: d.from, text: d.text, post: d.post, at: d.at });
-        API.call('/member/dm', { withKey: d.from }).catch(()=>{}); // gelezen
+        /* Een gedeelde post zit niet in het seintje (alleen postId): de server
+           lost hem op met DEZE sessie bij het ophalen van het gesprek, dat we
+           toch al doen om hem als gelezen te markeren. */
+        const gesprek = API.call('/member/dm', { withKey: d.from }).catch(()=>null); // gelezen
+        if (d.postId == null) dmToevoegen({ from: d.from, text: d.text, post: d.post, at: d.at });
+        else gesprek.then(r => {
+          const lijst = (r && r.messages) || [];
+          const m = lijst.slice().reverse().find(x => x.from === d.from && x.post && x.post.id === d.postId);
+          dmToevoegen(m || { from: d.from, text: d.text, post: null, at: d.at });
+        });
       } else {
         toast('' + d.codename + ': ' + (d.text || '↗').slice(0, 60));
         loadSocial();

@@ -87,7 +87,8 @@ app.post('/api/supplier/huur/fotos', supplierAuth, (req, res) => {
   if (!isVerhuur(s, res)) return;
   const h = huurVan(s, req.body.ref);
   if (!h) return res.status(404).json({ error: 'Huur niet gevonden.' });
-  res.json({ fotos: db.data.huurFotos[h.ref] || { voor: [], na: [] } });
+  // inspectiefoto's zijn van huurder en verhuurder, niet van de wereld: ondertekende links
+  res.json({ fotos: require('../../../media/toegang').inspectie(db.data.huurFotos[h.ref]) });
 });
 
 };

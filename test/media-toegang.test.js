@@ -422,6 +422,51 @@ test('N1: het live-seintje van een DM draagt geen post, ook niet voor een gratis
   assert.ok(bijG.length && bijG.every(x => x.nietBeschikbaar && !JSON.stringify(x).includes(geheim)), 'G ziet in het gesprek geen post');
 });
 
+test('de gezinskant (/api/rtf/social/dm) lost een gedeelde post op met de sessie van het gezinslid', async () => {
+  /* A post voor vrienden en B deelt hem met twee gezinsleden: O1 is ook vriend
+     van A en ziet de post, O2 alleen van B en krijgt nietBeschikbaar. Deze route
+     gaf eerst de ruwe berichtvorm door, zonder oplossen. */
+  const A = await lid(), B = await lid();
+  await vrienden(A, B);
+  const kB = (await api('/api/member/connections', {}, B)).body.me;
+  const g = (await api('/api/foundation/gezin/maak', { gezinsnaam: 'Deel', naam: 'Ouder', pin: '2468', groep: 'volw' })).body;
+  assert.ok(g && g.token, 'een gezin is gemaakt');
+  const p2 = (await api('/api/foundation/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Tweede', rol: 'gezinslid', groep: 'volw' })).body;
+  const t2 = (await api('/api/foundation/gezin/profiel/kies', { code: g.code, token: g.token, profielId: p2.profiel.id })).body.token;
+  assert.ok(t2, 'een tweede gezinslid is gekozen');
+  const O1 = { code: g.code, token: g.token }, O2 = { code: g.code, token: t2 };
+  async function sleutelVan(O) {
+    const mij = await (await fetch(base + '/api/foundation/gezin/' + O.code + '/mij', { headers: { Authorization: 'Bearer ' + O.token } })).json();
+    const cn = mij.profiel.codenaam;
+    const res = (await api('/api/member/find', { q: cn.split(' ')[0] }, B)).body.results || [];
+    return (res.find(r => r.codename === cn) || {}).key;
+  }
+  async function koppel(lidT, O, okey) {
+    await api('/api/member/connect', { key: okey }, lidT);
+    const oc = (await api('/api/rtf/social/connections', O)).body;
+    const lidKey = (await api('/api/member/connections', {}, lidT)).body.me;
+    const r = await api('/api/rtf/social/respond', Object.assign({ key: lidKey, action: 'accept' }, O));
+    assert.equal(r.status, 200, 'het gezinslid aanvaardt: ' + JSON.stringify(r.body) + ' ' + JSON.stringify(oc.requests));
+  }
+  const k1 = await sleutelVan(O1), k2 = await sleutelVan(O2);
+  assert.ok(k1 && k2 && k1 !== k2, 'beide gezinsleden zijn als codenaam te vinden');
+  await koppel(B, O1, k1); await koppel(B, O2, k2); await koppel(A, O1, k1);
+  const geheim = 'gezinsgeheim ' + Date.now();
+  const p = await api('/api/salon/plaats', { tekst: geheim, publiek: 'vrienden', plaats: 'GezinPlek' }, A);
+  assert.equal(p.status, 200, p.body.error);
+  for (const k of [k1, k2]) assert.equal((await api('/api/member/dm/send', { toKey: k, text: 'kijk', postId: p.body.post.id }, B)).status, 200);
+  const posts = async O => {
+    const r = await api('/api/rtf/social/dm', Object.assign({ withKey: kB }, O));
+    assert.equal(r.status, 200, JSON.stringify(r.body));
+    return (r.body.messages || []).filter(m => m.post).map(m => m.post);
+  };
+  const bij1 = await posts(O1), bij2 = await posts(O2);
+  assert.equal(bij1.length && bij1[0].text, geheim, 'O1, vriend van A, ziet de post echt (niet alleen een id)');
+  assert.ok(bij2.length && bij2.every(x => x.nietBeschikbaar && !JSON.stringify(x).includes(geheim) && !x.author),
+    'O2, geen vriend van A, krijgt nietBeschikbaar');
+  assert.ok(!JSON.stringify(bij2).includes('GezinPlek'), 'ook de plek blijft weg');
+});
+
 /* LAATSTE TOETS IN DIT BESTAND: hij stopt de server en start hem opnieuw. */
 test('N2: een oude bevroren kopie in commBerichten komt via /api/comm/gesprek niet meer naar buiten', async () => {
   const B = await lid(), C = await lid();

@@ -2,10 +2,7 @@
    codenaam, DM en (video)bellen. Snaps en 24-uurs verhalen staan in
    ./snaps.js. Gemount vanuit routes/social.js op de gedeelde kern. */
 module.exports = (sctx) => {
-  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
-  let _dmPost = null;   // laat gebonden: de leespoort van De Salon staat op de kern als salonMagLezen
-  const dmPost = () => _dmPost || (_dmPost = require('../../kern/sociaal/dmpost')({
-    posts: () => kern.db.data.posts, magLezen: kern.salonMagLezen }));
+  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, dmPost } = sctx;
   const { app, auth, geenGast, db, socialZoek, socialVerbind, socialAntwoord, socialIntrek,
           socialConnecties, liveCodename, connectieTussen, verbActief, codenaamVan,
           sseToCustomer, isGeblokkeerd } = kern;

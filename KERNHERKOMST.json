@@ -3,12 +3,12 @@
  "uitleg": "Welke module heeft welke naam op het contextobject gezet. Drie vormen: het basisobject, een directe toewijzing, en Object.assign met een fabriek -- die laatste gelezen uit het laatste letterlijke return-object van die fabriek.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "2915e93c7"
+  "commit": "489709486"
  },
  "grens": "Er wordt niet geraden. Een samenvoeging die niet te volgen is levert geen naam maar een regel in `onopgelost`, met de reden. Een herkomst die je naar de verkeerde module wijst is erger dan geen herkomst.",
  "gemeten": {
-  "namen": 1346,
-  "vulplekken": 342,
+  "namen": 1347,
+  "vulplekken": 343,
   "basisNamen": 468,
   "namenMetMeerdereHerkomsten": 1,
   "onopgelost": 30
@@ -9577,6 +9577,15 @@
     {
      "bestand": "server/server.js",
      "hoe": "basisobject"
+    }
+   ]
+  },
+  {
+   "naam": "salonMagLezen",
+   "herkomsten": [
+    {
+     "bestand": "server/opzet/kernlaag4-comm.js",
+     "hoe": "toewijzing"
     }
    ]
   },

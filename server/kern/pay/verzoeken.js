@@ -87,7 +87,7 @@ module.exports = (ctx) => {
   async function verzoekBetaal({ codenaam, verzoekId, idem }) {
     const v = klompjesKijk().find(x => x.id === verzoekId && x.aan === codenaam);
     if (!v) return { status: 404, error: 'Dit verzoek staat niet voor jou open.' };
-    if (v.status !== 'open') return { status: 409, error: 'Dit verzoek is al afgehandeld.' };
+    // `open` toetst het werk: een herhaling krijgt eerst haar eerdere antwoord
     return metIdem(idem ? 'klompje:' + codenaam + ':' + idem : null,
       'klompje|' + codenaam + '|' + v.id + '|' + v.centen, async () => {
       // opnieuw, en zonder await ertussen: dit is het moment dat telt

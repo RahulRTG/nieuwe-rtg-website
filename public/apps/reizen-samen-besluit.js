@@ -19,7 +19,7 @@
   'use strict';
   var R = w.RTGReizen; if (!R) return;
   var $ = R.$, maak = R.maak;
-  var reis = null, laatste = null, keuzes = [], klok = null, bezig = false;
+  var reis = null, laatste = null, keuzes = [], klok = null, bezig = null;
   var RONDE_MS = 6000;
   var taal = (d.documentElement && d.documentElement.lang) || undefined;   // de taal van de pagina, niet een vaste
 
@@ -105,16 +105,18 @@
     A.context({ bron: 'reizen.samen.besluit', titel: 'Gezamenlijke reis', acties: acties, selectie: false, rail: rail });
   }
 
+  // een poll wacht niet op een lopende ronde, een expliciete vraag sluit erachter aan
   function haal(stil) {
-    if (!reis || bezig) return Promise.resolve();
-    bezig = true;
-    return R.api('/api/reis/gezelschap/opties', { reis: reis }).then(function (b) {
+    if (!reis) return Promise.resolve();
+    if (bezig) return stil ? bezig : bezig.then(function () { return haal(false); });
+    bezig = R.api('/api/reis/gezelschap/opties', { reis: reis }).then(function (b) {
       if (!laatste || b.kenmerk !== laatste.kenmerk || !stil || b.rol !== laatste.rol) teken(b);
       else stand('Voorlopig · berekend om ' + tijd(b.berekendOp), 'actueel');
     }).catch(function (e) {
       if (e && e.status === 404) { var vak = $('#samenBesluit'); if (vak) vak.hidden = true; laatste = null; return; }
       if (laatste) stand('Niet bijgewerkt sinds ' + tijd(laatste.berekendOp) + '. Dit beeld is mogelijk verouderd.', 'verouderd');
-    }).then(function () { bezig = false; });
+    }).then(function () { bezig = null; });
+    return bezig;
   }
 
   function opgave() {

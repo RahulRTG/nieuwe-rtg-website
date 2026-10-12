@@ -3,7 +3,7 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "cc38c176a",
+  "commit": "aa9d7d6e6",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -1447,6 +1447,7 @@
     "server/kern/kletspraat/namen.js",
     "server/kern/klok.js",
     "server/kern/knelpunt/aanvoer-bronnen.js",
+    "server/kern/knelpunt/aanvoer-ondernemen.js",
     "server/kern/knelpunt/aanvoer-opleiding.js",
     "server/kern/knelpunt/aanvoer-opvang.js",
     "server/kern/knelpunt/aanvoer-werk.js",
@@ -5401,12 +5402,12 @@
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
-  "bestanden": 4420,
+  "bestanden": 4421,
   "nietGelezen": 0,
-  "aanroepen": 179231,
-  "kanten": 31112,
+  "aanroepen": 179248,
+  "kanten": 31114,
   "kantenLokaal": 19969,
-  "kantenIngevoerd": 2762,
+  "kantenIngevoerd": 2764,
   "kantenLid": 2785,
   "kantenViaKern": 4868,
   "kantenModuleAlsFunctie": 105,
@@ -5414,23 +5415,23 @@
   "kantenUitFabriek": 300,
   "kantenViaKernZonderSymbool": 2932,
   "kernherkomstGelezen": 1345,
-  "onopgelosteAanroepen": 133779,
-  "onopgelosteNamen": 13764,
+  "onopgelosteAanroepen": 133794,
+  "onopgelosteNamen": 13770,
   "onopgelostNaarSoort": {
-   "ingebouwd": 35817,
+   "ingebouwd": 35824,
    "externeModule": 1052,
    "kader": 12385,
    "contextobject": 20707,
    "uitgepaktObject": 1681,
-   "lokaleWaarde": 23852,
-   "methodeOpWaarde": 37817,
+   "lokaleWaarde": 23858,
+   "methodeOpWaarde": 37819,
    "overig": 468
   },
   "opgelostPct": 25.4,
   "doelOnbekend": 0,
   "bewaakteVooruitwijzing": 0,
   "doelNietVastTeStellen": 71,
-  "symbolenMetAanroeper": 12190,
+  "symbolenMetAanroeper": 12191,
   "routesMetSymbool": 3347,
   "routeSymboolKanten": 7019
  },
@@ -32540,7 +32541,7 @@
  "onopgelostTop": [
   {
    "naam": "MemberExpression",
-   "aantal": 34960
+   "aantal": 34962
   },
   {
    "naam": "String",
@@ -32548,7 +32549,7 @@
   },
   {
    "naam": "require",
-   "aantal": 8239
+   "aantal": 8243
   },
   {
    "naam": "app.post",
@@ -32580,7 +32581,7 @@
   },
   {
    "naam": "Array.isArray",
-   "aantal": 2018
+   "aantal": 2019
   },
   {
    "naam": "Math.round",
@@ -32592,11 +32593,11 @@
   },
   {
    "naam": "Object.keys",
-   "aantal": 938
+   "aantal": 939
   },
   {
    "naam": "Object.values",
-   "aantal": 885
+   "aantal": 886
   },
   {
    "naam": "uit.push",
@@ -32709,7 +32710,7 @@
     },
     {
      "naam": "require",
-     "aantal": 8239
+     "aantal": 8243
     },
     {
      "naam": "Number",
@@ -32721,7 +32722,7 @@
     },
     {
      "naam": "Array.isArray",
-     "aantal": 2018
+     "aantal": 2019
     },
     {
      "naam": "Math.round",
@@ -32733,11 +32734,11 @@
     },
     {
      "naam": "Object.keys",
-     "aantal": 938
+     "aantal": 939
     },
     {
      "naam": "Object.values",
-     "aantal": 885
+     "aantal": 886
     },
     {
      "naam": "Number.isFinite",
@@ -32770,7 +32771,7 @@
    "namen": [
     {
      "naam": "MemberExpression",
-     "aantal": 34947
+     "aantal": 34949
     },
     {
      "naam": "CallExpression",
@@ -111167,6 +111168,14 @@
    "naar": "keur",
    "hoe": "ingevoerd",
    "lijn": 83
+  },
+  {
+   "vanBestand": "server/kern/knelpunt/aanvoer-ondernemen.js",
+   "van": "maakOndernemenbron",
+   "naarBestand": "server/kern/knelpunt/openingen.js",
+   "naar": "terreinenVan",
+   "hoe": "ingevoerd",
+   "lijn": 62
   },
   {
    "vanBestand": "server/kern/knelpunt/aanvoer-opleiding.js",
@@ -231174,7 +231183,7 @@
    "naarBestand": "server/kern/knelpunt/aanvoer-werk.js",
    "naar": "maakWerkbron",
    "hoe": "ingevoerd",
-   "lijn": 47
+   "lijn": 48
   },
   {
    "vanBestand": "server/routes/knelpunt.js",
@@ -231182,7 +231191,7 @@
    "naarBestand": "server/kern/knelpunt/aanvoer-opleiding.js",
    "naar": "maakOpleidingbron",
    "hoe": "ingevoerd",
-   "lijn": 48
+   "lijn": 49
   },
   {
    "vanBestand": "server/routes/knelpunt.js",
@@ -231190,7 +231199,15 @@
    "naarBestand": "server/kern/knelpunt/aanvoer-opvang.js",
    "naar": "maakOpvangbron",
    "hoe": "ingevoerd",
-   "lijn": 49
+   "lijn": 50
+  },
+  {
+   "vanBestand": "server/routes/knelpunt.js",
+   "van": "(module)",
+   "naarBestand": "server/kern/knelpunt/aanvoer-ondernemen.js",
+   "naar": "maakOndernemenbron",
+   "hoe": "ingevoerd",
+   "lijn": 53
   },
   {
    "vanBestand": "server/routes/knelpunt.js",
@@ -231198,7 +231215,7 @@
    "naarBestand": "server/kern/knelpunt/aanvoer-bronnen.js",
    "naar": "maakAanvoer",
    "hoe": "ingevoerd",
-   "lijn": 51
+   "lijn": 55
   },
   {
    "vanBestand": "server/routes/knelpunt.js",
@@ -231206,7 +231223,7 @@
    "naarBestand": "server/kern/knelpunt/wegen.js",
    "naar": "maakWegen",
    "hoe": "ingevoerd",
-   "lijn": 55
+   "lijn": 59
   },
   {
    "vanBestand": "server/routes/knelpunt.js",
@@ -231214,7 +231231,7 @@
    "naarBestand": "server/kern/knelpunt/index.js",
    "naar": "reken",
    "hoe": "lid",
-   "lijn": 75
+   "lijn": 79
   },
   {
    "vanBestand": "server/routes/knelpunt.js",
@@ -231222,7 +231239,7 @@
    "naarBestand": "server/kern/knelpunt/openingen.js",
    "naar": "voorKnelpunten",
    "hoe": "lid",
-   "lijn": 88
+   "lijn": 92
   },
   {
    "vanBestand": "server/routes/knelpunt.js",
@@ -231230,7 +231247,7 @@
    "naarBestand": "server/kern/knelpunt/vondstenbundel.js",
    "naar": "bundelVondsten",
    "hoe": "ingevoerd",
-   "lijn": 93
+   "lijn": 97
   },
   {
    "vanBestand": "server/routes/knelpunt.js",
@@ -231238,7 +231255,7 @@
    "naarBestand": "server/routes/knelpunt.js",
    "naar": "beantwoord",
    "hoe": "lokaal",
-   "lijn": 143
+   "lijn": 147
   },
   {
    "vanBestand": "server/routes/kosten-kantoor.js",

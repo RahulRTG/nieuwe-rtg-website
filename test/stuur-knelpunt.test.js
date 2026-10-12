@@ -19,7 +19,11 @@
    4. DE GEZINSDEUR STAAT NIET OP DE LIJST. /api/rtf/knelpunt is voor een gezin
       zonder stuursessie; het stuur bereikt hem niet.
    5. DE ANDERE ROLLEN NIET. Een zaak of medewerker krijgt dit pad niet van het
-      stuur: het besluit ging over een lid. */
+      stuur: het besluit ging over een lid.
+   6. OOK VANUIT DE EDGE. De schilbalk (public/apps/app-main/app-main-29b.js,
+      osRahulVraag) vraagt met plafond `tonen`; de motor hoort daaronder te
+      vallen, anders bereikt de balk hem niet terwijl het Rahul-tabblad het wel
+      doet. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -117,4 +121,13 @@ test('5. alleen een lid: zaak, medewerker en kantoor krijgen dit pad niet', () =
   assert.equal(beleidVoor('/api/knelpunt', 'member').niveau, 'lezen');
   for (const rol of ['supplier', 'staff', 'office'])
     assert.equal(beleidVoor('/api/knelpunt', rol).niveau, 'verboden', rol + ' kreeg de knelpuntmotor');
+});
+
+test('6. vanuit de Edge-balk, met plafond tonen, komt de motor ook', async () => {
+  const lid = await versLid();
+  const r = await post('/api/fluister', { q: 'Ik wil mijn eigen bedrijf beginnen', plafond: 'tonen' }, lid.token);
+  assert.equal(r.status, 200);
+  const knel = ((r.data && r.data.stuur) || []).find(a => a.pad === '/api/knelpunt');
+  assert.ok(knel && knel.status === 200, 'onder plafond tonen bereikte Rahul de knelpuntmotor niet: ' +
+    JSON.stringify((r.data && r.data.stuur) || []));
 });

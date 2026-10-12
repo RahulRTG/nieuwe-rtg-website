@@ -25,7 +25,9 @@ module.exports = {
         begrepen: 'nazoeken welke wegen RTG heeft voor het doel dat dit lid uitspreekt',
         body: { doel } } }] }
     ],
-    projectie: 'Ik heb nagezocht welke wegen RTG voor dit doel heeft. Ze staan er zonder volgorde, ' +
-      'met wat ze niet regelen; kies zelf welke je wilt verkennen.'
+    /* Deze rail leest het tool-antwoord niet, dus deze zin zegt alleen wat er
+       GEBEURDE. "Ze staan hieronder" zou hier onwaar zijn: de wegen in woorden
+       weergeven doet een taalmodel dat het antwoord van de motor leest. */
+    projectie: 'Ik heb nagezocht welke wegen RTG voor dit doel heeft; zelf zet ik niets in gang.'
   }
 };

@@ -3,7 +3,7 @@
  "uitleg": "Welk bestand in public/ noemt welk API-pad. Gelezen met de lexer (dus zonder commentaar) zodat ook de bundeldelen meetellen, die niet parsen. De bewering per vondst is \"dit bestand noemt dit pad\" -- niet \"roept het aan\".",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "f559b732d",
+  "commit": "bb6f9667b",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -1948,8 +1948,8 @@
  "gemetenTegen": {
   "register": "ROUTEBRON.json",
   "stempel": {
-   "op": "2026-10-12T05:57:55.318Z",
-   "commit": "7f32bdae8",
+   "op": "2026-10-12T06:56:58.237Z",
+   "commit": "75be0cf6a",
    "invoer": {
     "meting": "invoerspoor",
     "versie": 1,
@@ -4509,6 +4509,7 @@
      "server/kern/sleutelwoorden-uitdaging.js",
      "server/kern/sleutelwoorden.js",
      "server/kern/sociaal.js",
+     "server/kern/sociaal/dmpost.js",
      "server/kern/sociaal/pin-beveiliging.js",
      "server/kern/sociaal/pin-clusterrem.js",
      "server/kern/sociaal/pin-deur-rem.js",
@@ -5379,8 +5380,11 @@
      "server/media.js",
      "server/media/bestand.js",
      "server/media/disk.js",
+     "server/media/montage.js",
+     "server/media/openbare-plekken.js",
      "server/media/proef.js",
      "server/media/s3.js",
+     "server/media/toegang.js",
      "server/meetpoort.js",
      "server/meting-capaciteit.js",
      "server/meting-lus.js",
@@ -7609,7 +7613,7 @@
     "nodeHoofdversie": 26
    }
   },
-  "bekendePaden": 5487
+  "bekendePaden": 5488
  },
  "gemeten": {
   "schermenMetPad": 435,

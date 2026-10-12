@@ -3,7 +3,7 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "c6fb7cd63",
+  "commit": "c17be5a0d",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -5460,7 +5460,7 @@
  "gemeten": {
   "bestanden": 4474,
   "nietGelezen": 0,
-  "aanroepen": 181084,
+  "aanroepen": 181085,
   "kanten": 31535,
   "kantenLokaal": 20238,
   "kantenIngevoerd": 2843,
@@ -5471,10 +5471,10 @@
   "kantenUitFabriek": 306,
   "kantenViaKernZonderSymbool": 2950,
   "kernherkomstGelezen": 1347,
-  "onopgelosteAanroepen": 135104,
+  "onopgelosteAanroepen": 135105,
   "onopgelosteNamen": 13898,
   "onopgelostNaarSoort": {
-   "ingebouwd": 36274,
+   "ingebouwd": 36275,
    "externeModule": 1061,
    "kader": 12430,
    "contextobject": 20794,
@@ -212858,7 +212858,7 @@
    "naarBestand": "server/lib/idem.js",
    "naar": "store",
    "hoe": "lokaal",
-   "lijn": 125
+   "lijn": 130
   },
   {
    "vanBestand": "server/lib/idem.js",
@@ -212866,7 +212866,7 @@
    "naarBestand": "server/lib/idem.js",
    "naar": "afdrukStore",
    "hoe": "lokaal",
-   "lijn": 126
+   "lijn": 131
   },
   {
    "vanBestand": "server/lib/idem.js",
@@ -212874,7 +212874,7 @@
    "naarBestand": "server/lib/idem-handeling.js",
    "naar": null,
    "hoe": "lidOpInvoer",
-   "lijn": 152
+   "lijn": 157
   },
   {
    "vanBestand": "server/lib/idem.js",
@@ -212882,7 +212882,7 @@
    "naarBestand": "server/lib/idem.js",
    "naar": "doeWerkEnLegVast",
    "hoe": "lokaal",
-   "lijn": 173
+   "lijn": 178
   },
   {
    "vanBestand": "server/lib/jws.js",

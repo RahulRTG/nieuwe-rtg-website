@@ -977,8 +977,10 @@ collega alleen vandaag; de online-stip staat pas aan als BEIDE in het gesprek
 schreven, en een oproep of bericht zegt niet op hoeveel toestellen het aankwam
 (`test/personeelzicht-routes.test.js`). De vierde ronde sloot nog vier wegen: de
 online-stip in een gesprek tussen collega's volgt dezelfde wederkerigheid, de
-sollicitatiepost van RTMail staat verplicht in een LEIDINGSBUS naast het
-zaakpostvak die alleen de inbox van een manager meeleest, een videobelsignaal
+sollicitatiepost van RTMail staat verplicht op een LEIDINGSPLEK naast het
+zaakpostvak -- een plek en geen adres, dus niemand kan ernaar sturen, er een
+team van maken of er met een zaakcode mee botsen, en oude post wordt er bij het
+opstarten naartoe verhuisd -- die alleen de inbox van een manager meeleest, een videobelsignaal
 (met zijn IP-adressen) gaat alleen naar wie gebeld wordt en de teamkamer alleen
 naar wie erin zit, en een pauze seint alleen de manager en de medewerker zelf. Hij telt
 hoeveel TAFELS er nog bij iemand staan die al uitklokte. Dat leest de prikklok

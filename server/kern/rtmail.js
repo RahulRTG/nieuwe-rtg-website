@@ -3,7 +3,6 @@
    hier niet. Een geld- of toegangsactie blijft altijd bij de bestaande poort. */
 const adresLaag = require('./rtmail-adres');
 const { datum: klokDatum } = require('../lib/klok');
-const { postBeperking } = require('./leverancier/beschermdesoorten');
 
 module.exports = ({ db, save, crypto, integriteitSleutel }) => {
   const SYSTEEM = 'rtg@rtmail';
@@ -40,11 +39,12 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
 
   function store() {
     if (!db.data.rtmail || !Array.isArray(db.data.rtmail.berichten)) db.data.rtmail = { berichten: [] };
+    leiding.migreer();
     return db.data.rtmail;
   }
 
   // De geverifieerde serverroute zet `bron`; de client bepaalt dit vertrouwen niet.
-  function bezorg({ van, naar, onderwerp, tekst, soort, bron, antwoordOp, beperkt } = {}, bewaar = save) {
+  function bezorg({ van, naar, onderwerp, tekst, soort, bron, antwoordOp } = {}, bewaar = save) {
     const naarA = normAdres(naar);
     if (!naarA) return { error: 'Geen geldig ontvang-adres.' };
     const vanA = normAdres(van) || SYSTEEM;
@@ -63,8 +63,7 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
       links, // { externeLinks:[], aantal, gevaarlijk }
       bijlagen: [], // RTMAIL draagt nooit een te openen bijlage -- bewust altijd leeg
       at: klokDatum().toISOString(),
-      gelezen: false,
-      ...(beperkt ? { beperkt } : {})
+      gelezen: false
     };
     const s = store();
     /* De DRAAD (het gesprek). Een antwoord erft de draad van het bericht waarop
@@ -105,13 +104,11 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
     // Een systeemseintje bezit alleen rtmail. Gewone bezorging behoudt save():
     // een afwezigheidsantwoord legt ook de lus-rem in rtmailSchrijf vast.
     const bewaar = () => typeof save.sleutels === 'function' ? save.sleutels(['rtmail']) : save();
-    // beperkte post gaat verplicht naar de leidingsbus
-    const beperkt = postBeperking({ van: SYSTEEM, soort: soort || 'systeem' }, SYSTEEM);
-    return bezorg({ van: SYSTEEM, naar: beperkt ? adresLaag.leidingBus(normAdres(naar)) : naar,
-      onderwerp, tekst, soort: soort || 'systeem', bron: 'systeem', beperkt }, bewaar);
+    // beperkte post verplicht naar de leidingsplek (./rtmail-leiding.js)
+    const beperkt = leiding.beperking(soort);
+    if (beperkt) return leiding.leg({ naar, onderwerp, tekst, soort, beperkt });
+    return bezorg({ van: SYSTEEM, naar, onderwerp, tekst, soort: soort || 'systeem', bron: 'systeem' }, bewaar);
   }
-  // zonder { beperkt: true } geen beperkte post (fail-closed)
-  const zicht = (m, o) => !postBeperking(m, SYSTEEM) || !!(o && o.beperkt);
 
   const pub = m => {
     const veilig = veiligheid.publiek(m), stuk = veilig.inhoudGeblokkeerd;
@@ -132,26 +129,30 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
   /* Alleen voor een legitieme naverwerking binnen dezelfde bezorgketen, zoals
      het toevoegen van de uitkomst van de bijlagescanner. `bewaar` staat daar
      aan, zodat inhoud en nieuw zegel atomisch in dezelfde opslagronde landen. */
+  const leiding = require('./rtmail-leiding')({ db, save, crypto, klokDatum, SYSTEEM, normAdres, zelfdeBus,
+    zegel: veiligheid.zegel, scanLinks, pub: (m) => pub(m), kap, MAX });
+  try { leiding.migreer(); } catch (e) { /* bij het eerste gebruik */ }
+
   function herzegel(m, bewaar) { veiligheid.zegel(m); if (bewaar) save(); return m; }
 
   // Het postvak IN van een adres (nieuwste eerst).
-  function postvak(adres, { limit = 60, beperkt = false } = {}) {
+  function postvak(adres, { limit = 60 } = {}) {
     const a = normAdres(adres);
-    return store().berichten.filter(m => zelfdeBus(m.naar, a) && zicht(m, { beperkt })).slice(0, Math.max(1, Math.min(200, limit))).map(pub);
+    return store().berichten.filter(m => zelfdeBus(m.naar, a)).slice(0, Math.max(1, Math.min(200, limit))).map(pub);
   }
   // Wat een adres zelf verstuurd heeft.
   function verzonden(adres, { limit = 60 } = {}) {
     const a = normAdres(adres);
     return store().berichten.filter(m => zelfdeBus(m.van, a)).slice(0, Math.max(1, Math.min(200, limit))).map(pub);
   }
-  function ongelezen(adres, o) {
+  function ongelezen(adres) {
     const a = normAdres(adres);
-    return store().berichten.reduce((n, m) => n + (zelfdeBus(m.naar, a) && !m.gelezen && zicht(m, o) ? 1 : 0), 0);
+    return store().berichten.reduce((n, m) => n + (zelfdeBus(m.naar, a) && !m.gelezen ? 1 : 0), 0);
   }
   // Een bericht als gelezen markeren -- alleen als het echt aan dit adres is.
-  function lees(adres, id, o) {
+  function lees(adres, id) {
     const a = normAdres(adres);
-    const m = store().berichten.find(x => x.id === id && zelfdeBus(x.naar, a) && zicht(x, o));
+    const m = store().berichten.find(x => x.id === id && zelfdeBus(x.naar, a));
     if (!m) return { error: 'Dit bericht staat niet in dit postvak.' };
     if (!m.gelezen) { m.gelezen = true; save(); }
     return pub(m);
@@ -160,9 +161,9 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
   /* Een actie uit RTMAIL blijft aan het bronbericht vastzitten. Zo kan de
      werkstroom later aantonen waar een agenda-item of project vandaan kwam,
      zonder dat RTMAIL zelf geld of toegang aanraakt. */
-  function workflow(adres, id, stap, o) {
+  function workflow(adres, id, stap) {
     const a = normAdres(adres);
-    const m = store().berichten.find(x => x.id === id && zelfdeBus(x.naar, a) && zicht(x, o));
+    const m = store().berichten.find(x => x.id === id && zelfdeBus(x.naar, a));
     if (!m) return { error: 'Dit bericht staat niet in dit postvak.' };
     const s = stap || {};
     if (!Array.isArray(m.workflow)) m.workflow = [];
@@ -177,7 +178,7 @@ module.exports = ({ db, save, crypto, integriteitSleutel }) => {
 
   return { SYSTEEM, VERTROUWDE_BRONNEN, normAdres, scanLinks, stuur, systeemStuur, postvak, verzonden, ongelezen, lees, workflow,
     publiek:pub, herzegel, controleerIntegriteit:veiligheid.controleer,
-    zetNaBezorging,
+    zetNaBezorging, leidingPost: leiding.post, leidingOngelezen: leiding.ongelezen, leidingLees: leiding.lees,
     // de adreslaag doorgeven, zodat routes en tests er maar een bron voor hebben
     DOMEINEN: adresLaag.DOMEINEN, adresVoor: adresLaag.adresVoor, ontleed: adresLaag.ontleed,
     soortVoor: adresLaag.soortVoor, zelfdeBus };

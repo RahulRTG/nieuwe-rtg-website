@@ -58,23 +58,26 @@ test('zonder bruikbaar adres gebeurt er niets (geen crash)', () => {
   assert.equal(automatisering.welkomLid({}), null);
 });
 
-test('personeel-draaiboek: sollicitatie zet een seintje in de LEIDINGSBUS van de zaak', () => {
+test('personeel-draaiboek: sollicitatie zet een seintje op de LEIDINGSPLEK van de zaak, niet in het postvak', () => {
   /* Werving is van de manager (tegenlezing PR #584): het seintje staat niet in
-     het gedeelde zaakpostvak maar in de leidingsbus ernaast
-     (kern/rtmail-adres.js leidingBus), en draagt de beperking. Alleen de inbox
-     van een manager leest die bus mee (routes/rtmail.js). */
+     het gedeelde zaakpostvak maar op de leidingsplek ernaast
+     (kern/rtmail-leiding.js) -- een plek en geen adres, dus niemand kan ernaar
+     sturen of er een team van maken. Alleen de inbox van een manager leest hem
+     mee (routes/rtmail.js). */
   const { rtmail, automatisering } = maak();
   const m = automatisering.sollicitatieBinnen({ zaakCode: 'SAKURA', functie: 'gastvrouw', codename: 'orchidee' });
   assert.ok(m);
-  assert.equal(m.naar, 'sakura-leiding@rtmail');
+  assert.equal(m.naar, 'sakura@rtmail');
   assert.equal(m.beperkt, 'werving');
   assert.equal(m.van, 'rtg@rtmail');
   assert.match(m.onderwerp, /sollicitatie/i);
   assert.match(m.tekst, /gastvrouw/);
   assert.match(m.tekst, /orchidee/); // codenaam mag, echte naam niet
-  assert.equal(rtmail.postvak('sakura', { beperkt: true }).length, 0, 'niet in het gedeelde zaakpostvak');
-  assert.equal(rtmail.postvak('sakura-leiding').length, 0, 'zonder { beperkt: true } levert ook de leidingsbus niets');
-  assert.equal(rtmail.postvak('sakura-leiding', { beperkt: true }).length, 1);
+  assert.equal(rtmail.postvak('sakura').length, 0, 'niet in het gedeelde zaakpostvak');
+  assert.equal(rtmail.leidingPost('sakura').length, 1, 'wel op de leidingsplek');
+  // een zaak of team waarvan de naam erop lijkt, deelt er niets mee
+  assert.equal(rtmail.leidingPost('sakuraleiding').length, 0);
+  assert.equal(rtmail.postvak('sakura-leiding').length, 0);
 });
 
 test('personeel-draaiboek: zonder zaakcode gebeurt er niets', () => {

@@ -132,14 +132,4 @@ function soortVoor({ tier, rollen, handle } = {}) {
   return DOMEINEN[t] ? t : 'rtg';
 }
 
-/* DE LEIDINGSBUS van een postvak: een apart postvak naast dat van de zaak, voor
-   beperkte systeempost (werving, kern/leverancier/beschermdesoorten.js). Geen
-   enkele route van het gedeelde zaakpostvak komt er vanzelf bij -- alleen de
-   inbox van een MANAGER leest hem mee (routes/rtmail.js). Zo is de beperking een
-   eigenschap van waar het bericht staat, en niet van elke lezer afzonderlijk. */
-function leidingBus(adres) {
-  const x = ontleed(adres);
-  return x.lokaal ? x.lokaal + '-leiding@' + x.domein : '';
-}
-
-module.exports = { DOMEINEN, OUD, ALLE, GERESERVEERD, lokaalVan, domeinVoor, adresVoor, ontleed, zelfdeBus, soortVoor, leidingBus };
+module.exports = { DOMEINEN, OUD, ALLE, GERESERVEERD, lokaalVan, domeinVoor, adresVoor, ontleed, zelfdeBus, soortVoor };

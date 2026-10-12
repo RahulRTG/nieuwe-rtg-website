@@ -836,14 +836,12 @@ app.get('/api/health', (req, res) => {
   res.json({
     ok: true, ...omgeving, ai: model.modus, verwerking: model.verwerking,
     betalen: betaal.AANBIEDER,
-    /* `active` is "schrijft dit proces?", `leider` is "doet dit proces het werk
-       dat per installatie een keer hoort te gebeuren?". In spreidingsmodus
-       (RTG_SPREIDING=1) staat `active` op alle drie de servers op true en is
-       `leider` de enige manier om van buitenaf te zien wie de backup maakt.
-       Zonder die modus zijn ze altijd gelijk. */
+    /* `active`: schrijft dit proces? `leider`: doet het het werk dat per
+       installatie een keer gebeurt (de backup)? Alleen in spreidingsmodus
+       (RTG_SPREIDING=1) verschillen ze. */
     server: Number(process.env.RTG_SERVER || 1), active: db.writable, leider: !!db.leider,
     domeinen: process.env.RTG_DOMAINS || 'alle',
-    // de kantoordeur (B10): code of passkey -- het scherm raadt het niet zelf
+    // B10: code of passkey (kern/kantoor/productiedeur.js deurStand)
     kantoordeur: require('./kern/kantoor/productiedeur').deurStand(),
     pid: process.pid, up: Math.round(process.uptime())
   });

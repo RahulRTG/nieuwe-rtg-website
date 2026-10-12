@@ -255,14 +255,65 @@ let fotoNaam; // een Salon-foto op de cloud, voor de randcache
 const FOTO = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
 
 test('de randcache: een foto die over de lijn kwam, blijft op de doos', async () => {
-  // een foto rechtstreeks in de cloudmediastore leggen (zonder RTG_ENC_KEY onversleuteld)
-  fotoNaam = require('node:crypto').randomBytes(16).toString('hex') + '.png';
-  fs.mkdirSync(path.join(TMP_CLOUD, 'media'), { recursive: true });
-  fs.writeFileSync(path.join(TMP_CLOUD, 'media', fotoNaam), FOTO);
+  /* Een OPENBARE foto: de zaak zet hem op haar eigen pagina. Een los bestand in
+     de mediastore is sinds AUTHORITY.md B4 privé en komt niet via /media/:naam
+     (server/media/toegang.js) -- en dus ook niet op het kastje. */
+  const zaak = await api(cloudBase(), '/api/supplier/login', { username: 'rahul', password: 'Imran' });
+  assert.equal(zaak.status, 200, 'de zaak logt in op de cloud');
+  const add = await api(cloudBase(), '/api/supplier/photo/add', { image: 'data:image/png;base64,' + FOTO.toString('base64') }, zaak.body.token);
+  assert.equal(add.status, 200, 'de foto staat op de pagina van de zaak');
+  const naam = fs.readdirSync(path.join(TMP_CLOUD, 'media')).filter(n => /^[0-9a-f]{32}\.png$/.test(n))
+    .map(n => ({ n, t: fs.statSync(path.join(TMP_CLOUD, 'media', n)).mtimeMs })).sort((a, b) => b.t - a.t)[0];
+  fotoNaam = naam && naam.n;
+  assert.ok(fotoNaam, 'de foto staat in de cloudmediastore');
   const r = await fetch(doos.base + '/media/' + fotoNaam);
   assert.equal(r.status, 200, 'online komt de foto via het doorgeefluik');
   assert.equal(Buffer.compare(Buffer.from(await r.arrayBuffer()), FOTO), 0, 'byte voor byte dezelfde foto');
+
+  /* EN EEN PRIVÉLINK GAAT ER NIET IN (AUTHORITY.md B4). Een lid plaatst op de
+     cloud een post "alleen ik"; zijn ondertekende link komt online gewoon via
+     de doos, maar met `private, no-store` -- en het kastje serveert zonder
+     sessie, dus dat antwoord mag er nooit in. */
+  const u = Date.now().toString().slice(-8);
+  const lid = (await api(cloudBase(), '/api/auth/register', { name: 'Doos Lid', email: 'dl' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const p = await api(cloudBase(), '/api/salon/plaats', { tekst: 'alleen ik', publiek: 'alleenik',
+    media: [{ beeld: 'data:image/png;base64,' + FOTO.toString('base64'), alt: 'x' }] }, lid);
+  assert.equal(p.status, 200, p.body.error);
+  privelink = p.body.post.media[0].src;
+  assert.ok(privelink.startsWith('/media/t/'), 'een privéfoto is een ondertekende link');
+  const kas = path.join(TMP_DOOS, 'dooskas');
+  const lijst = () => (fs.existsSync(kas) ? fs.readdirSync(kas).sort() : []);
+  const voor = lijst();
+  const via = await fetch(doos.base + privelink);
+  assert.equal(via.status, 200, 'online komt de privélink gewoon door het doorgeefluik');
+  assert.equal(via.headers.get('cache-control'), 'private, no-store');
+  await via.arrayBuffer();
+  /* De kas schrijft synchroon direct na res.end() van het doorgeefluik. Een
+     volgend verzoek aan dezelfde doos is dus een baken: als dat beantwoord is,
+     is het werk van het vorige verzoek gedaan -- geen wachten op de klok. */
+  await (await fetch(doos.base + '/api/doos/status')).arrayBuffer();
+  assert.deepEqual(lijst(), voor, 'de privélink staat niet in de randcache');
+
+  /* Een randcache-item van VOOR deze regel (zonder merkteken) kan privébeeld
+     zijn: dat levert de doos niet meer uit. */
+  oudKasNaam = require('node:crypto').randomBytes(16).toString('hex') + '.png';
+  fs.mkdirSync(kas, { recursive: true });
+  fs.writeFileSync(path.join(kas, '_media_' + oudKasNaam + '.bin'), FOTO);
+  fs.writeFileSync(path.join(kas, '_media_' + oudKasNaam + '.typ'), 'image/png');
+
+  /* En een gemerkt item dat ouder is dan de publieke cachetijd (een uur) wordt
+     ook niet meer uitgeleverd: een foto die van de etalage ging, hoort ook van
+     het kastje te verdwijnen. */
+  verlopenKasNaam = require('node:crypto').randomBytes(16).toString('hex') + '.png';
+  const basis = path.join(kas, '_media_' + verlopenKasNaam);
+  fs.writeFileSync(basis + '.bin', FOTO);
+  fs.writeFileSync(basis + '.typ', 'image/png');
+  fs.writeFileSync(basis + '.pub', '1');
+  const tweeUurGeleden = new Date(Date.now() - 2 * 3600 * 1000);
+  fs.utimesSync(basis + '.bin', tweeUurGeleden, tweeUurGeleden);
 });
+let privelink, oudKasNaam, verlopenKasNaam;
 
 test('de lijn valt weg: de zaak werkt lokaal door en het journaal telt mee', async () => {
   // Borg dat er minstens een gezonde ping geteld is voordat de lijn wegvalt: de
@@ -300,6 +351,11 @@ test('zonder lijn: de randcache serveert de foto en het dagrapport telt mee', as
   assert.equal(r.status, 200, 'de foto komt uit de randcache van de doos zelf');
   assert.equal(Buffer.compare(Buffer.from(await r.arrayBuffer()), FOTO), 0, 'dezelfde bytes, nu zonder cloud');
   assert.ok((r.headers.get('content-type') || '').startsWith('image/'), 'met het juiste type');
+  // maar geen privélink en geen oud, ongemerkt randcache-item
+  assert.equal((await fetch(doos.base + privelink)).status, 404, 'de privélink komt zonder cloud niet van het kastje');
+  assert.equal((await fetch(doos.base + '/media/' + oudKasNaam)).status, 404, 'een ongemerkt oud item wordt niet uitgeleverd');
+  assert.equal((await fetch(doos.base + '/media/' + verlopenKasNaam)).status, 404, 'een item ouder dan een uur wordt niet uitgeleverd');
+  assert.equal(r.headers.get('cache-control'), 'public, max-age=3600', 'een treffer uit de randcache draagt de publieke cachetijd');
   // het nachtwerk-dagrapport van de doos zelf: pings en uitval zijn geteld
   const rap = await (await fetch(doos.base + '/api/doos/rapport')).json();
   assert.ok(rap.pings >= 1, 'de pings zijn geteld');

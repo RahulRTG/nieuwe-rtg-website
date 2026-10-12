@@ -63,6 +63,12 @@ const REDENEN = [
      public/shared/toestel/sleutels.js en zonder uitgerold manifest laadt geen
      toestel iets. Een boardroomschakelaar is een stap weg en vraagt dat de
      functiepoort ook /toestel afdwingt. */
+  /* DE MEDIALEVERING (AUTHORITY.md B4). Net als /toestel geen API-route, dus
+     een functieschakelaar zou niets tegenhouden. Wie wat mag zien beslist niet
+     een knop maar server/media/toegang.js: alleen verklaard openbaar beeld via
+     /media/:naam, al het andere via een kort geldige link die een domeinroute
+     na haar eigen poort zet. Zelfde reden in kern/platformregister/bediening.js. */
+  ['/media', 'de levering zelf is geen functie: de toegang staat in server/media/toegang.js (fail-closed), en wat je met media mag staat in de functies die ze maken en tonen'],
   ['/toestel', 'de afgesloten rekencel en haar ondertekende artefacten; uit zolang er geen modelsleutel en geen manifest is, en een schakelaar hier zou door de functiepoort (alleen /api) niet worden afgedwongen']
 ];
 

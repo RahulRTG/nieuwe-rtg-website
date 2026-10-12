@@ -18,8 +18,11 @@
    weten waar de foto's staan.
 
    Twee soorten verwijzingen:
-   - Salon-foto's (publiek): "/media/<naam>". De browser laadt die rechtstreeks in
-     een <img src>; de /media-route serveert het bestand (en kan achter een CDN).
+   - "/media/<naam>" (bewaarPubliek): de VORM van de verwijzing, niet een besluit
+     dat hij openbaar is. Of /media/<naam> hem uitlevert beslist
+     server/media/toegang.js, uit een gesloten lijst openbare plekken; al het
+     andere krijgt de kijker alleen via een kort geldige ondertekende link die
+     een domeinroute na haar eigen poort zet (media.toon). Standaard privé.
    - Snaps/verhalen (privé, kijk-een-keer): de kale bestandsnaam. Die komt nooit als
      publieke URL naar buiten; bij het openen leest de server het bestand en geeft
      het eenmalig als data-URL terug, waarna het weg mag. */
@@ -127,7 +130,8 @@ function maakMedia({ dir, env }) {
   }
   async function bestaat(ref) { return backend.has(naamVan(ref)); }
 
-  const serveer = mediaBestand.maakServeer(leesBuf);
+  const toegang = require('./media/toegang');
+  const { serveer, serveerLink } = mediaBestand.maakServeer(leesBuf, toegang);
 
   /* Eenmalige migratie: foto's die nu nog als base64 IN db.data staan, verplaatsen
      naar de mediastore en vervangen door een verwijzing. Idempotent. */
@@ -161,7 +165,7 @@ function maakMedia({ dir, env }) {
 
   return { MEDIA_DIR, backendNaam: backend.naam, isRef, url, naamVan, pad, bewaar, bewaarPubliek,
     bewaarBestandPubliek, bewaarBestandPrive, soortVanBuffer, leesBuf, leesDataUrl,
-    verwijder, bestaat, serveer, migreerDb };
+    verwijder, bestaat, serveer, serveerLink, toon: toegang.toon, migreerDb };
 }
 
 module.exports = { maakMedia, sigV4, afgeleideSleutel };

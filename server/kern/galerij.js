@@ -11,6 +11,7 @@
 const MAX_ALBUMS = 50;
 const MAX_PER_ALBUM = 500;
 const BRONNEN = ['salon', 'bestand'];
+const { toon } = require('../media/toegang');
 
 function maakGalerij({ db, save, crypto, schoon }) {
   const nu = () => new Date().toISOString();
@@ -29,13 +30,14 @@ function maakGalerij({ db, save, crypto, schoon }) {
   /* ---- de tijdlijn: lezen wat er al is ---- */
   function beelden(key) {
     const uit = [];
-    // eigen Salon-posts met beeld: publieke /media/-verwijzingen
+    // eigen Salon-posts met beeld (/media/-verwijzingen; openbaar of niet beslist media/toegang)
     for (const p of db.data.posts || []) {
       if (p.authorKey !== key) continue;
       const srcs = Array.isArray(p.media) && p.media.length ? p.media.map(b => b.src) : (p.photo ? [p.photo] : []);
       srcs.forEach((src, i) => {
         if (typeof src === 'string' && src.startsWith('/media/')) {
-          uit.push({ bron: 'salon', id: p.id + (i ? ':' + i : ''), src, op: p.at || p.op || '', uit: 'De Salon' });
+          // eigen beeld: de eigenaar krijgt het, via een ondertekende link als het niet openbaar is
+          uit.push({ bron: 'salon', id: p.id + (i ? ':' + i : ''), src: toon(src), op: p.at || p.op || '', uit: 'De Salon' });
         }
       });
     }

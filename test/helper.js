@@ -1238,6 +1238,10 @@ function laadPlaywright(opties) {
          met "Executable doesn't exist", en dat is rood dat niets over de code
          zegt. Deze controle komt uit scripts/lib/scherm.js en staat sinds de
          samenvoeging van 20 augustus 2026 hier, op de ene plek. */
+      /* In WebKit-stand (testMotor, hieronder) telt de WebKit van playwright,
+         niet een Chromium: de WebKit-job installeert alleen WebKit, en de
+         eigen driver hieronder kent geen WebKit. */
+      if (testMotor() === 'webkit') { if (mod && webkitPad(mod)) return mod; continue; }
       if (mod && mod.chromium && fs.existsSync(process.env.RTG_BROWSER_PATH || mod.chromium.executablePath())) {
         const endpoint = process.env.RTG_SHARED_BROWSER_ENDPOINT;
         if (!endpoint) return mod;
@@ -1249,6 +1253,7 @@ function laadPlaywright(opties) {
     } catch (e) { /* volgende */ }
   }
   if (opties && opties.eigenDriver === false) return null;
+  if (testMotor() === 'webkit') return null;   // geen WebKit gevonden: geenBrowser() zegt waarom
   try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
   return null;
 }
@@ -1358,11 +1363,11 @@ function startBrowser(pw, extra) {
 
 function geenBrowser(pw) {
   const { vereist } = require('./infra');
-  if (!pw) return vereist('browser', false, 'playwright niet beschikbaar in deze omgeving');
   if (testMotor() === 'webkit') {
     return webkitPad(pw) ? false
       : vereist('browser', false, 'RTG_TEST_MOTOR=webkit, maar WebKit is niet geinstalleerd -- npx playwright install --with-deps webkit');
   }
+  if (!pw) return vereist('browser', false, 'playwright niet beschikbaar in deze omgeving');
   if (browserPad(pw) === false) {
     return vereist('browser', false, 'playwright is er, maar geen enkele chromium start hier -- zet ' +
       'RTG_BROWSER_PATH of installeer de bouw die playwright vraagt');

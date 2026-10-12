@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T21:01:35.808Z",
-    "commit": "b3e5a0a4c",
+    "op": "2026-10-12T23:33:46.163Z",
+    "commit": "8f43e369a",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -18733,6 +18733,11 @@
       "gezakt": 5,
       "scherp": "overleefd"
     },
+    "webkitstand.test.js": {
+      "soort": "server",
+      "staat": "overleefd",
+      "operator": "liegpoort /api/"
+    },
     "webplatform.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -19203,6 +19208,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "werkstart-onvolledig.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/werk/start.js",
+      "operator": "browser-export-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "werkstatus.e2e.js": {
       "soort": "puur",

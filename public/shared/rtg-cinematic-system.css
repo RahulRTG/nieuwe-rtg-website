@@ -761,3 +761,10 @@ body[data-rtg-cinematic="true"] .rtg-adaptive-sheet-mouth{color:#e2c389!importan
 /* Het label van de hoofdactie volgt de letter van de balk waar het in staat; een vaste
    lichte letter verdween op de lichte balk van de Business-kant (WorkOS, 768px). */
 body[data-rtg-cinematic="true"] .rtg-edge-bottom .rtg-edge-action :is(button,span){color:var(--edge-copy)!important}
+/* Een ingebed werkblad (RTG Command) draagt geen eigen Edge: de buitenste schil doet
+   dat. Het blad houdt dan alleen de ene veilige inzet vrij, zonder de extra lucht
+   eronder die een los scherm wel krijgt. */
+html.rtg-command-blad body[data-rtg-cinematic="true"][data-rtg-skin="heritage"][data-rtg-world][data-rtg-screen] [data-rtg-cinematic-root="content"],
+html.rtg-command-blad body[data-rtg-cinematic="true"].rtg-stijl[data-world-home][data-rtg-shell="mobile"] :is(main#inhoud,main#hoofd,main#main,main.wd-home)[data-rtg-cinematic-root="content"]{
+  padding-bottom:var(--rtg-adaptive-inset,82px)!important;
+}

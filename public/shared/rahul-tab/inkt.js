@@ -96,6 +96,7 @@
      (#F2EEE8 op #E1DDD3, 1,2:1 in meldkamer en merken), want een inline
      !important wint van elke regel in een stijlblad. Dus kiest hij opnieuw
      zodra body een attribuut krijgt dat de grond verandert. */
+  var gekozen = null;
   function kies() {
   var ouder = tab.parentElement || tab;
   var grond = grondVan(ouder);
@@ -132,6 +133,10 @@
      zacht, en altijd te lezen. Wie hem terug wil, moet EERST grondVan() en
      gronden() dezelfde vraag laten beantwoorden -- niet de uitkomst ervan gokken. */
   var zacht = woord;
+  /* Alleen schrijven als de inkt verandert: ook een gelijke waarde is een
+     stijlmutatie, en Office wist zijn context op elke mutatie in main. */
+  if (woord === gekozen) return;
+  gekozen = woord;
   tab.style.setProperty('color', woord, 'important');
   var sub = tab.querySelector('small');
   if (sub) sub.style.setProperty('color', zacht, 'important');

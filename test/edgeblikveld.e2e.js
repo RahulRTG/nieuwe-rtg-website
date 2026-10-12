@@ -213,6 +213,12 @@ test('het blikveld in de schil en op een los scherm: wereld, brug, leespad, hoof
       await page.goto(srv.base + '/apps/office.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
       await page.waitForFunction(() => window.RTGAdaptief && window.RTGAdaptiveEdge && window.RTGGewicht && window.RTGWaarom,
         null, { timeout: 20000 });
+      /* Office meldt zijn eigen context op elke mutatie in main, en de inkt van
+         de Rahul-tab kiest pas na load (shared/rahul-tab/inkt.js). Wie de
+         proefcontext daarvoor zet, ziet hem door die eerste keuze gewist. */
+      await page.waitForLoadState('load');
+      await page.waitForFunction(() => { const t = document.querySelector('.rtg-rahul-tab'); return !t || t.style.color; },
+        null, { timeout: 10000 });
     };
     await office();
     const zet = (acties, staat) => page.evaluate(([a, st]) => {

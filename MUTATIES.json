@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T00:18:58.533Z",
-    "commit": "ae5d679d4",
+    "op": "2026-10-12T00:47:58.026Z",
+    "commit": "23ef7bec8",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -780,6 +780,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 12,
       "scherp": "gezakt"
+    },
+    "appstore-teruggave-actor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/appstore/teruggave.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "appstore-tijdelijk.test.js": {
       "soort": "server",

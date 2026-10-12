@@ -16,11 +16,12 @@
 
    DE REGEL WAAR DIT BESTAND OM DRAAIT: DE INVOER VAN IEMAND GAAT NIET NAAR
    IEMAND ANDERS. Niet naar de organisator, niet naar een reisgenoot, niet naar
-   een meekijker. Er is daarom geen functie die de invoer van een ANDER
+   een meekijker. Er is daarom geen route die de invoer van een ANDER
    teruggeeft. Wat anderen mogen weten is alleen HOEVEEL deelnemers iets hebben
    ingevuld -- niet wie, want "iedereen behalve Remi" wijst al een mens aan. De
-   gezamenlijke berekening (stap 2) krijgt een eigen, smalle weg naar deze
-   gegevens en geeft alleen een groepsuitkomst vrij.
+   gezamenlijke berekening (./reisgezelschap-opties.js) krijgt een eigen, smalle
+   weg naar deze gegevens (`voorDeBerekening`) en geeft alleen een
+   groepsuitkomst vrij.
 
    EERLIJK OVER WAT DIT NIET IS: de server van RTG ziet deze gegevens, op
    codenaam. Dit is een ontwerp dat bepaalt wat ANDERE DEELNEMERS te zien
@@ -96,7 +97,7 @@ const WIE_ZIET = 'Alleen jij ziet wat je hier invult. Anderen in het gezelschap 
   'deelnemers iets hebben ingevuld, niet wie en niet wat. De server van RTG verwerkt je invoer ' +
   'om een groepsvoorstel te kunnen maken; dat is geen versleutelde berekening.';
 
-module.exports.maakGezelschapOpgave = ({ db, save, klok, leden, reisVan }) => {
+module.exports.maakGezelschapOpgave = ({ db, save, klok, crypto, leden, reisVan }) => {
   const nu = () => klok.datum().toISOString();
   const eigen = require('./eigencollectie')({ db, domein: 'kern/reisgezelschap-opgave', bezit: { reisOpgaven: 'kaart' } });
   const kaart = () => eigen.bak('reisOpgaven');
@@ -172,7 +173,24 @@ module.exports.maakGezelschapOpgave = ({ db, save, klok, leden, reisVan }) => {
     return false;
   }
 
-  return { VOORKEUREN, voortgang, wisVoorLid, routes: { mijnOpgave, zetOpgave, wisOpgave } };
+  /* DE ENIGE WEG NAAR DE OPGAVEN VAN ANDEREN, en hij gaat naar de berekening
+     (./reisgezelschap-opties.js) en nergens anders heen. Geen route roept hem
+     aan; wat de berekening teruggeeft is een groepsuitkomst en per lid alleen
+     zijn eigen reden. Een `null` op een plek betekent: deze deelnemer gaf nog
+     niets op. */
+  function voorDeBerekening(eigenaar, reisId) {
+    const sl = reisSleutel(eigenaar, reisId);
+    return deelnemers(eigenaar, reisId).map(k => ({ key: k, opgave: (kaart()[k] || {})[sl] || null }));
+  }
+
+  /* De groepsberekening hangt hier en niet in ./reisgezelschap.js: zij is de
+     enige afnemer van `voorDeBerekening`, en zo blijft die weg in dit paar
+     bestanden en komt hij nergens op de kern te liggen. */
+  const opties = require('./reisgezelschap-opties').maakGezelschapOpties({
+    db, save, klok, crypto, reisVan, opgave: { VOORKEUREN, deelnameVan, voorDeBerekening } });
+
+  return { VOORKEUREN, voortgang, wisVoorLid,
+    routes: Object.assign({ mijnOpgave, zetOpgave, wisOpgave }, opties) };
 };
 module.exports.VOORKEUREN = VOORKEUREN;
 module.exports.keur = keur;

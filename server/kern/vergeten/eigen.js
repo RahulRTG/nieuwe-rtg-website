@@ -43,7 +43,8 @@ const EIGEN_TAKKEN = [
   'ledenBoard',         // uw eigen boardroom: wat u wel en niet deelt
   'contactPins',        // uw contactpin: het adres waarmee anderen u toevoegden
   'contactPinSecurity', // uw noodslot en eigen PIN-veiligheidsjournaal
-  'reisOpgaven'          // wat u voor een gezamenlijke reis opgaf: plafond, data, voorkeuren
+  'reisOpgaven',         // wat u voor een gezamenlijke reis opgaf: plafond, data, voorkeuren
+  'reisOpties'           // de opties die u voor uw reis klaarzette
 ];
 
 module.exports = ({ db, lidBoardLogWis }) => {

@@ -21,23 +21,24 @@ const AFGETEKEND = {
 };
 const toegang = { klasse: 'AUTHENTICATED', deur: 'auth' };
 const BESTAND = 'server/kern/reisgezelschap-opgave.js';
+const OPTIES = 'server/kern/reisgezelschap-opties.js';
 
-const leest = (route, mutatieId, wat) => [route, {
+const leest = (route, mutatieId, wat, bestand) => [route, {
   mutatieId, herkomst: 'mens',
   semantiek: { klasse: 'idempotent' },
   toegang,
   stand: 'NOT_APPLICABLE',
   bewijs: { gemeten: 'test/reisgezelschap-opgave.test.js leest dezelfde route herhaald en vergelijkt de stand', op: OP },
-  nagekeken: 'handler gelezen in ' + BESTAND + ': ' + wat + ' -- schrijft niets',
+  nagekeken: 'handler gelezen in ' + (bestand || BESTAND) + ': ' + wat + ' -- schrijft niets',
   afgetekend: AFGETEKEND
 }];
-const zet = (route, mutatieId, gemeten) => [route, {
+const zet = (route, mutatieId, gemeten, bestand) => [route, {
   mutatieId, herkomst: 'mens',
   semantiek: { klasse: 'idempotent' },
   toegang,
   stand: 'PROTECTED',
   bewijs: { gemeten, op: OP },
-  nagekeken: 'handler gelezen in ' + BESTAND + ': de stand hangt alleen af van de inhoud van de opgave, ' +
+  nagekeken: 'handler gelezen in ' + (bestand || BESTAND) + ': de stand hangt alleen af van de inhoud, ' +
     'niet van het aantal oproepen',
   afgetekend: AFGETEKEND
 }];
@@ -48,7 +49,17 @@ const CONTRACTEN = Object.fromEntries([
   zet('POST /api/reis/gezelschap/opgave/zet', 'reis.gezelschap.opgave.zet',
     'toets 6: dezelfde opgave twee keer gaf gewijzigd:false en versie 1 bleef 1; een andere opgave gaf versie 2'),
   zet('POST /api/reis/gezelschap/opgave/wis', 'reis.gezelschap.opgave.wis',
-    'toets 6: twee keer wissen gaf twee keer 200 en een lege opgave; de tweede vond niets meer om te wissen')
+    'toets 6: twee keer wissen gaf twee keer 200 en een lege opgave; de tweede vond niets meer om te wissen'),
+  /* DE GROEPSBEREKENING (kern/reisgezelschap-opties.js). Een optie zetten die er
+     al precies zo staat -- met of zonder id -- maakt geen tweede optie en kost
+     geen toetsing; wissen vindt de tweede keer niets meer. */
+  leest('POST /api/reis/gezelschap/opties', 'reis.gezelschap.opties',
+    'groepsbeeld rekent de opties tegen de opgaven; de toetsteller loopt alleen bij zetten', OPTIES),
+  zet('POST /api/reis/gezelschap/opties/zet', 'reis.gezelschap.opties.zet',
+    'test/reisgezelschap-opties.test.js toets 4: dezelfde optie opnieuw (met id) en een tweede druk op nieuw ' +
+    '(zonder id) gaven allebei de bestaande optie terug met getoetst:false', OPTIES),
+  zet('POST /api/reis/gezelschap/opties/wis', 'reis.gezelschap.opties.wis',
+    'handler: filtert de optie weg als hij bestaat en geeft anders hetzelfde lege antwoord', OPTIES)
 ]);
 
 module.exports = CONTRACTEN;

@@ -173,7 +173,7 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
         .map(x => ({ id: x.id, reis: x.reis, van: x.eigenaarCodenaam, rol: x.rol })) };
   }
 
-  const opgaven = require('./reisgezelschap-opgave').maakGezelschapOpgave({ db, save, klok, leden, reisVan });
+  const opgaven = require('./reisgezelschap-opgave').maakGezelschapOpgave({ db, save, klok, crypto, leden, reisVan });
 
   /* WAT ER GEDEELD WORDT staat in ./reisgezelschap-delen.js: de tijdlijn, het
      aankomstmoment en het beeld. Die deelmodule krijgt dezelfde bakken en

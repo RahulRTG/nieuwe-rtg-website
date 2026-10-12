@@ -18,4 +18,18 @@ module.exports = (kern, gez) => {
     gez(res, kern.reisgezelschap.wisOpgave(req.session.key, String((req.body || {}).reis || ''))));
   app.post('/api/reis/gezelschap/opgave/voortgang', auth, (req, res) =>
     gez(res, kern.reisgezelschap.opgaveVoortgang(req.session.key, String((req.body || {}).reis || ''))));
+  /* DE GROEPSBEREKENING (kern/reisgezelschap-opties.js): de reiziger zet opties
+     klaar, elke deelnemer ziet per optie of hij voor iedereen past en alleen
+     zijn EIGEN reden als hij voor hem niet past. */
+  app.post('/api/reis/gezelschap/opties', auth, (req, res) =>
+    gez(res, kern.reisgezelschap.groepsbeeld(req.session.key, String((req.body || {}).reis || ''))));
+  app.post('/api/reis/gezelschap/opties/zet', auth, (req, res) => {
+    const b = req.body || {};
+    const r = kern.reisgezelschap.zetOptie(req.session.key, String(b.reis || ''), b.optie, b.id ? String(b.id) : null);
+    r && r.error ? res.status(r.status || 400).json({ error: r.error, weerVanaf: r.weerVanaf }) : res.json(r);
+  });
+  app.post('/api/reis/gezelschap/opties/wis', auth, (req, res) => {
+    const b = req.body || {};
+    gez(res, kern.reisgezelschap.wisOptie(req.session.key, String(b.reis || ''), String(b.id || '')));
+  });
 };

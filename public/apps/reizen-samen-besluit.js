@@ -96,9 +96,7 @@
     if (w.RTGSamenVoorstel) w.RTGSamenVoorstel.edge(b);
   }
 
-  /* Loopt er al een ronde, dan wacht een poll niet maar een EXPLICIETE vraag
-     wel: die sluit achter de lopende aan en haalt daarna opnieuw. Werd hij
-     overgeslagen, dan bleef na een eigen handeling het oude beeld staan. */
+  // een poll wacht niet op een lopende ronde, een expliciete vraag sluit erachter aan
   function haal(stil) {
     if (!reis) return Promise.resolve();
     if (bezig) return stil ? bezig : bezig.then(function () { return haal(false); });

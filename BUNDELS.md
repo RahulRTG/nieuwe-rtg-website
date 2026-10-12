@@ -527,7 +527,7 @@ omlaag.
 
 ## `apps/techniek.js`
 
-`public/apps/techniek/` -- 10 delen, 952 regels in de delen
+`public/apps/techniek/` -- 10 delen, 969 regels in de delen
 
 | deel | onderwerp |
 |---|---|

@@ -13,6 +13,7 @@
    bewaard. Hier wordt hij alleen op de opdracht gezet. */
 
 const { CATEGORIEEN } = require('./voertuigcatalogus');
+const { ontvangstBeeld } = require('./ontvangst');
 
 /* Ritsoort -> de module die aan moet staan. Een ritsoort waarvan de module
    uit staat, bestaat in dat gebied niet; de aanvraag wordt geweigerd met de
@@ -162,7 +163,9 @@ module.exports = (ctx) => {
       vervoerder: o.vervoerder, voertuig: o.voertuig, chauffeur: o.chauffeur,
       km: o.km, minuten: o.minuten, prijs: o.prijs, tarief: o.tarief,
       status: o.status, gemaakt: o.gemaakt, stad: o.stad, notitie: o.notitie,
-      annulering: o.annulering, afgerekend: o.afgerekend || null };
+      annulering: o.annulering, afgerekend: o.afgerekend || null,
+      // wat de chauffeur meldde en wat de reiziger bevestigde, naast elkaar (./ontvangst.js)
+      ontvangst: ontvangstBeeld(o) };
     if (vol) { b.veiligheid = o.veiligheid; b.gebeurtenissen = o.gebeurtenissen || []; }
     return b;
   }

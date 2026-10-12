@@ -20,3 +20,10 @@
 .overdracht{margin:.75rem 0;border:1px solid var(--rit-line)}.overdracht div{display:grid;grid-template-columns:24px 1fr auto;gap:.55rem;align-items:center;padding:.8rem;border-bottom:1px solid var(--rit-line)}.overdracht div:last-child{border-bottom:0}.overdracht i{color:var(--rit-gold);font-style:normal}.overdracht span{font-size:.78rem}.overdracht b{color:var(--rit-soft);font-size:.72rem;font-weight:500;text-align:right}.overdracht b.klaar{color:var(--rit-green)}
 .aankomst-acties{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin:.75rem 0}.aankomst-acties a{min-height:48px;display:grid;place-items:center;padding:.6rem;border:1px solid var(--rit-line);color:var(--rit-ivory);font-size:.72rem;text-align:center;text-decoration:none}
 @media(max-width:440px){.chauffeur-foto,.aankomst-foto{min-height:225px}.rit-acties{grid-template-columns:1fr 1fr}.rit-acties>*:last-child{grid-column:1/-1}.aankomst-route{align-items:flex-start;flex-direction:column}.overdracht div{grid-template-columns:20px 1fr}.overdracht b{grid-column:2;text-align:left}.transfer-moment{grid-template-columns:1fr}.voertuig-keuzes{gap:.35rem}.voertuig-keuzes button{min-height:70px;padding:.3rem}.voertuig-keuzes button span{font-size:.66rem}}
+/* Wat de reiziger zelf bevestigt (apps/rit-ontvangst.js): naast de melding van de chauffeur, nooit erin. */
+.rit-ontvangst{display:grid;gap:.45rem;margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--rit-line)}
+.rit-ontvangst>span{font-size:.7rem;letter-spacing:.12em}
+.rit-ontvangst p{margin:0}
+.rit-ontvangst-knoppen{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.rit-ontvangst small{opacity:.8}
+.rit-probleem{display:flex;gap:.4rem;align-items:center;min-height:24px}

@@ -1169,3 +1169,34 @@ die afzonderlijk te toetsen is:
    - Na menselijke bevestiging, via de gewichtsgrammatica, mag de wens naar het
      kantoor. Dat is geen boeking, geen bevestiging van beschikbaarheid en geen
      betalingsverplichting.
+
+### 14.7 Typen en klikken zijn één wijziging (12 oktober 2026)
+
+Besluit 2 van de eigenaar: een lid moet een veld kunnen aanpassen én tegen Rahul
+kunnen zeggen *"Maak er vijf dagen van"*, en beide moeten langs dezelfde
+gevalideerde wijzigingsroute gaan.
+
+**Er komt geen tweede wijzigingsweg.**
+- Een contextdomein mag zich naast zijn vier vragen ook melden met `tekstVelden`
+  (welke velden noemt deze zin) en `pasAan` (de eigen wijzigingsroute van het
+  domein). Die twee horen bij elkaar: een domein dat alleen één ervan meldt, wordt
+  bij het opstarten geweigerd.
+- De context bridge leest de velden alleen als aan drie voorwaarden is voldaan:
+  1. de vraag wil het object veranderen (relatie `wijzig`);
+  2. de server vond het object voor deze mens;
+  3. vlak voor het schrijven blijkt het object nog steeds van deze sessie.
+- Het reisconcept gebruikt voor een zin dezelfde lezer als voor een nieuwe
+  reiswens, en dezelfde controle als het scherm.
+
+**Typen kan niet meer dan klikken.** Alleen de velden die het scherm mag
+aanpassen tellen mee, en een waarde buiten de grenzen wordt met dezelfde reden
+geweigerd. "En boek meteen" in dezelfde zin boekt niets: de wijziging roept geen
+model en geen stuurlus aan.
+
+**Op het scherm is er één kaart.** Een wijziging in woorden werkt de bestaande
+kaart bij, met dezelfde regel van Rahul als na een klik.
+
+**De meting gaat van handeling tot zichtbaar.** Gemeten wordt van de toets van
+het lid tot het moment dat de nieuwe waarde op de kaart van de Edge staat, niet
+tot het antwoord van de server. Een eigen plek in de werkruimte bestaat nog niet,
+dus die meting hoort bij de volgende stap.

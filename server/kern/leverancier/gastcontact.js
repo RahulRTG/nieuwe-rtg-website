@@ -1,6 +1,9 @@
 /* Leverancier (deelmodule): de chatlijnen per afdeling, de zorg-contactlijn en de Salon-kant van de klant.
    Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/leverancier.js. */
+const { toon } = require('../../media/toegang');
+const salonVorm = require('../salon/vorm');
+
 module.exports = (ctx) => {
   const { db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer, logActivity,
     findSupplier, connectedSupplierCodes, guestsFor, gidsHaal, etaMinutes, haversine, accounts, werkgeverSollicitatie,
@@ -80,7 +83,11 @@ module.exports = (ctx) => {
     const posts = [];
     for (const p of (db.data.posts || [])) {
       if (p.partner || p.author !== codename) continue;
-      posts.push({ text: String(p.text || '').slice(0, 200), place: p.place || '', photo: p.photo || null, at: p.at || null });
+      /* De zaak is geen lid en geen vriend: ze ziet alleen wat het lid aan
+         iedereen in De Salon liet zien. Een post "alleen ik", "vrienden" of
+         "volgers" ging hier tot 11 oktober 2026 mee, tekst en foto. */
+      if (p.weg || p.verborgen || p.archief || !['salon', 'iedereen'].includes(salonVorm.publiek(p.publiek))) continue;
+      posts.push({ text: String(p.text || '').slice(0, 200), place: p.place || '', photo: toon(p.photo) || null, at: p.at || null });
       if (posts.length >= 12) break;
     }
     return { codename, tier, posts };

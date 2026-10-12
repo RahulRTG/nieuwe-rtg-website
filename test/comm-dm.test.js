@@ -66,7 +66,10 @@ test('een gedeelde Salon-post overleeft de verhuizing als bijlage', () => {
   const post = dm.berichten('a', 'b')[2].post;
   assert.ok(post, 'de gedeelde post is weg');
   assert.equal(post.id, 7, 'de post wijst naar een ander bericht');
-  assert.equal(post.author, 'Katja', 'de auteur is niet meegekomen');
+  /* Alleen het id verhuist: de bevroren kopie (auteur, tekst) blijft achter.
+     De lezer lost de post op met zijn eigen sessie (kern/sociaal/dmpost.js),
+     anders leest een ontvanger wat de auteur hem nooit liet zien. */
+  assert.equal(post.author, undefined, 'een bevroren kopie van de post is meeverhuisd');
 });
 
 test('de leesstand verhuist mee, dus niemand krijgt een stapel valse bolletjes', () => {
@@ -109,4 +112,21 @@ test('een paar zonder geschiedenis begint gewoon leeg', () => {
   dm.stuur('a', 'b', { tekst: 'eerste' });
   assert.deepEqual(dm.berichten('a', 'b').map((m) => m.text), ['eerste']);
   assert.equal(dm.laatste('b', 'a').text, 'eerste', 'de andere kant ziet het bericht niet');
+});
+
+test('een bevroren kopie die AL in de kern staat, komt in de oude berichtvorm alleen als id terug', () => {
+  /* Productiedata van voor de reparatie (AUTHORITY.md B4, kern/sociaal/dmpost.js):
+     een bijlage met auteur, plaats, tekst en foto, rechtstreeks in de kern. Elke
+     lezer van berichten() -- ook de gezinsroute /api/rtf/social/dm -- krijgt
+     alleen het id; wat de lezer van de post mag zien, lost de route op met zijn
+     eigen sessie. */
+  const { dm, comm } = opzet(null);
+  dm.stuur('a', 'b', { tekst: 'hallo' });
+  const g = dm.gesprek('a', 'b');
+  comm.berichtenVan(g.id).push({ id: 'brc_bevroren', van: 'a', at: new Date().toISOString(), tekst: '',
+    soort: 'post', antwoordOp: null, lang: null, reacties: {},
+    bijlage: { soort: 'post', id: 7, author: 'Katja', place: 'Ibiza', text: 'strand', photo: '/media/x.png' } });
+  const m = dm.berichten('a', 'b').find(x => x.id === 'brc_bevroren');
+  assert.ok(m, 'controle: het bevroren bericht wordt gelezen');
+  assert.deepEqual(m.post, { id: 7 }, 'de oude berichtvorm gaf een bevroren kopie van de post door');
 });

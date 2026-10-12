@@ -2,7 +2,11 @@
    (met ouderakkoord), dm, snaps en verhalen. Gemount vanuit
    routes/social/gezinnen.js op de gedeelde context. */
 module.exports = (sctx) => {
-  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, gezinsPoort, nietBeschermd, pinClusterRem } = sctx;
+  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, gezinsPoort, nietBeschermd, pinClusterRem, dmPost } = sctx;
+  /* Een gedeelde post lost op met de sessie van DEZE lezer (kern/sociaal/dmpost.js):
+     een gezinsvriend die hem mag zien, ziet hem; anders nietBeschikbaar. */
+  const metPosts = (s, berichten) => (berichten || []).map(m => m.post
+    ? Object.assign({}, m, { post: dmPost().voorLezer(rtfOnbSess(s), m.post) }) : m);
   const { app, express, rtf, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties,
           socialDm, socialDmSend, socialGoedkeur, socialIntrek, socialTeKeuren, snapSturen, snapsVoor, snapOpenen,
           verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding, pinKaart } = kern;
@@ -90,13 +94,13 @@ app.post('/api/rtf/social/dm', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   const r = socialDm(s.handle, String(req.body.withKey || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ messages: r.messages, codename: r.codename });
+  res.json({ messages: metPosts(s, r.messages), codename: r.codename });
 });
 app.post('/api/rtf/social/dm/send', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   const r = socialDmSend(s.handle, String(req.body.toKey || ''), req.body.text);
   if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ ok: true, messages: r.messages });
+  res.json({ ok: true, messages: metPosts(s, r.messages) });
 });
 app.post('/api/rtf/social/goedkeuren', (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;

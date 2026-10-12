@@ -11,6 +11,10 @@
 
 module.exports = (kern, hulp) => {
   const { accounts, anthropic, crypto, db, findSupplier, rtmail, save } = hulp;
+  /* Alleen de LEESPOORT van De Salon, onder een eigen naam: een DM lost een
+     gedeelde post op met de sessie van de lezer (kern/sociaal/dmpost.js). Het
+     domein social krijgt zo die ene vraag, en niet heel kern.salon. */
+  kern.salonMagLezen = (sess, post) => kern.salon.magLezen(sess, post);
   /* De communicatiekern bezit drie actuele collecties en kan bij de eerste
      lezing nog uit vier oude voorraden overnemen. Door dit vlak expliciet te
      bewaren hoeft ieder bericht niet de hele wereld opnieuw te vergelijken. */

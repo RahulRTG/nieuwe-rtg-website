@@ -3856,6 +3856,7 @@
       "server/kern/stuur/gevolgcontract/voorspelling.js",
       "server/kern/stuur/goedkeuring.js",
       "server/kern/stuur/isolatiefilter.js",
+      "server/kern/stuur/lusregels.js",
       "server/kern/stuur/lusstap.js",
       "server/kern/stuur/mandaat.js",
       "server/kern/stuur/rail-corpus-intrek.js",

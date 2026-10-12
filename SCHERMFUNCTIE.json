@@ -3,12 +3,12 @@
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
     "op": "2026-10-12",
-    "commit": "c71d31b36"
+    "commit": "c0f9031da"
   },
   "bronnen": {
     "schermroutes": {
       "op": "2026-10-12",
-      "commit": "3b60fef05",
+      "commit": "c55316a42",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,
@@ -853,6 +853,7 @@
           "public/apps/personeel/personeel-04.js",
           "public/apps/personeel/personeel-05.js",
           "public/apps/personeel/personeel-05a.js",
+          "public/apps/personeel/personeel-05b.js",
           "public/apps/personeel/personeel-06.js",
           "public/apps/personeel/personeel-06a.js",
           "public/apps/personeel/personeel-07.js",
@@ -1301,6 +1302,7 @@
           "public/shared/kaart.js",
           "public/shared/kaartopslag.js",
           "public/shared/kaartpakket.js",
+          "public/shared/kantoordeur.js",
           "public/shared/kantoorgesprek.js",
           "public/shared/keukenlicht.js",
           "public/shared/klok/klok-01.js",
@@ -8428,7 +8430,7 @@
         "public/apps/office/app.js",
         "public/apps/office/app/app-01.js",
         "public/apps/personeel.js",
-        "public/apps/personeel/personeel-05.js",
+        "public/apps/personeel/personeel-05a.js",
         "public/apps/websitestudio.html",
         "public/shared/randen.js",
         "server/kern/appgids-data/deel7.js"
@@ -9429,7 +9431,7 @@
         "public/apps/kantoren.html",
         "public/apps/magnaat.html",
         "public/apps/personeel.js",
-        "public/apps/personeel/personeel-05.js",
+        "public/apps/personeel/personeel-05a.js",
         "server/kern/appgids-data/deel1b.js",
         "server/kern/appgids-data/deel1c.js"
       ]
@@ -10945,12 +10947,13 @@
         "/api/webauthn"
       ],
       "zonderServer": false,
-      "inkomend": 7,
+      "inkomend": 8,
       "inIndex": 5,
       "inkomendVan": [
         "public/apps/app-main/app-main-23a.js",
         "public/apps/ik.html",
         "public/apps/kantoren.html",
+        "public/shared/kantoordeur.js",
         "public/shared/rosapps.js",
         "server/kern/appcatalogus-rijen/deel2.js",
         "server/kern/appgids-data/deel7.js",

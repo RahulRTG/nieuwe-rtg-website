@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**61 bundels, 489 delen, 0 zonder onderwerp.**
+**61 bundels, 490 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 100 delen, 9893 regels in de delen
+`public/apps/app-main/` -- 100 delen, 9908 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -391,7 +391,7 @@ omlaag.
 
 ## `apps/personeel.js`
 
-`public/apps/personeel/` -- 32 delen, 3301 regels in de delen
+`public/apps/personeel/` -- 33 delen, 3355 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -403,7 +403,8 @@ omlaag.
 | `personeel-03c.js` | MIJN TIJD (VRIJHEID.md): de tab waarin een medewerker zijn eigen tijd ziet en vraagt |
 | `personeel-04.js` | De apparaatpoort: bedrijf, medewerker en pincode; daarna de kantoorpoort |
 | `personeel-05.js` | aanmelden met de kassacode |
-| `personeel-05a.js` | de dienstkeuze en de sectorstap |
+| `personeel-05a.js` | de kantoordeur op naam: pin, passkey en wat de deur antwoordt |
+| `personeel-05b.js` | de dienstkeuze en de sectorstap |
 | `personeel-06.js` | de borden van dit personeelslid |
 | `personeel-06a.js` | de voorspeller op de PDA: het team ziet de piek van morgen aankomen |
 | `personeel-07.js` | in- en uitklokken |

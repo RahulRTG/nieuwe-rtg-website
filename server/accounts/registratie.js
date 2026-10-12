@@ -43,8 +43,12 @@
 const { VLAG, waarde, dicht, onbekend, keur } = require('../config/registratie');
 const UITLEG = 'Nieuwe registraties zijn op dit moment gesloten. Bestaande accounts kunnen gewoon inloggen.';
 /* De `hoe` van BETROUWBAARHEID.md par. 3: een weigering die zegt dat het een
-   INSTELLING is en geen defect, en wie hem kan veranderen. */
-const HOE = 'Registratie gesloten bij besluit van de eigenaar (' + VLAG + ' in de serveromgeving). ' +
+   INSTELLING is en geen defect. Die gaat naar ANONIEME aanroepers, dus hij
+   noemt geen interne variabele en geen herstart -- dat staat in HOE_TECHNIEK,
+   en die toont alleen het techniekbord (stand()). De vorm blijft gelijk: een
+   503 met een `hoe` leest de meting (scripts/appwerkt.js) als CONFIG. */
+const HOE = 'Registratie is tijdelijk gesloten door een besluit van RTG.';
+const HOE_TECHNIEK = 'Registratie gesloten bij besluit van de eigenaar (' + VLAG + ' in de serveromgeving). ' +
   'Heropenen kan alleen de eigenaar: de variabele weghalen of op 0 zetten, en de server herstarten.';
 /* Welke wegen deze grendel dekt -- alle drie lopen door createUser van de gevel. */
 const PADEN = Object.freeze([
@@ -62,7 +66,7 @@ function stand(env = process.env) {
     herkomst: 'besluit van de eigenaar, in de serveromgeving',
     paden: PADEN.map(p => ({ ...p })),
     wijzigbaarHier: false,
-    hoe: HOE
+    hoe: HOE_TECHNIEK
   };
 }
 
@@ -70,8 +74,7 @@ function stand(env = process.env) {
    besluit en zekering allebei dicht, dan staan ze er allebei: anders zegt het
    antwoord na een reset van de zekering iets anders terwijl de deur gewoon
    dicht blijft, en leest een reset als heropenen. Geeft null als niets sluit. */
-const HOE_ZEKERING = 'De zekering Nieuwe registraties (FUSE-REG) is eruit; de eigenaar zet hem terug op /apps/techniek.html. ' +
-  'Die zekering dekt alleen /api/auth/register.';
+const HOE_ZEKERING = 'Registratie is tijdelijk uitgeschakeld door RTG.';
 function weigering(zekeringEruit, env = process.env) {
   const reden = [];
   if (dicht(env)) reden.push('besluit');
@@ -81,7 +84,7 @@ function weigering(zekeringEruit, env = process.env) {
     error: reden.includes('besluit') ? UITLEG : 'Registreren is tijdelijk uitgeschakeld.',
     code: 'REGISTRATIE_DICHT',
     reden,
-    hoe: reden.map(r => r === 'besluit' ? HOE : HOE_ZEKERING).join(' ')
+    hoe: reden.includes('besluit') ? HOE : HOE_ZEKERING
   };
 }
 
@@ -90,4 +93,4 @@ function eisOpen() {
   if (dicht()) throw Object.assign(new Error(UITLEG), { code: 'REGISTRATIE_DICHT', status: 503, reden: ['besluit'], hoe: HOE });
 }
 
-module.exports = { VLAG, UITLEG, HOE, PADEN, waarde, dicht, onbekend, keur, stand, weigering, eisOpen };
+module.exports = { VLAG, UITLEG, HOE, HOE_TECHNIEK, PADEN, waarde, dicht, onbekend, keur, stand, weigering, eisOpen };

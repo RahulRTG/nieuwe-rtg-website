@@ -19,10 +19,18 @@
       zodat een reset van de zekering niet leest als heropenen; en
       /api/techniek/status toont het besluit alleen-lezen naast de zekering;
    7. het eigenaarsscript maakt het eigenaarsaccount OOK met de vlag aan, langs
-      de gevel -- en die weg is van geen enkele route te bereiken (niets in
-      server/ buiten server/accounts/ laadt accounts/users zelf);
+      de gevel -- en die weg is van geen enkele route te bereiken: 7b meet bij
+      het opstarten wie accounts/users.js laadt (precies index.js en staff.js),
+      7c scant de bron op ook dynamische vormen;
    8. SSO geeft bij een dichte registratie de reden door in plaats van een
-      kale 401.
+      kale 401, en de publieke `hoe` noemt geen interne variabele;
+   9. npm run golive leest het envbestand met de lezer van de server.
+
+   Mutaties van de tweede ronde, met de hand: in server/techniek.js een
+   require(path.join(__dirname,'accounts','users')) of './accounts/'+'users'
+   -> 7b en 7c zakken; './acc'+'ounts/us'+'ers' -> 7b zakt; een doorgeefmodule
+   binnen server/accounts/ of een alias op de gevel -> 7b zakt; de oude lezer
+   terug in golive.js -> 9 zakt.
 
    Mutaties, met de hand nagetrokken: de regel `registratie.eisOpen()` uit
    createUser gehaald -> toets 1 zakt; de vroege controle in de route weggehaald
@@ -97,7 +105,8 @@ test('2 en 3. op een echte server: dicht met de vlag, open zonder, en de zekerin
       assert.equal(r.status, 503, JSON.stringify(r.body));
       assert.equal(r.body.code, 'REGISTRATIE_DICHT');
       assert.deepEqual(r.body.reden, ['besluit']);
-      assert.match(String(r.body.hoe), /RTG_REGISTRATIE_DICHT/, 'de weigering zegt dat het een instelling is');
+      assert.match(String(r.body.hoe), /besluit van RTG/, 'de weigering zegt dat het een instelling is');
+      assert.doesNotMatch(String(r.body.hoe), /RTG_REGISTRATIE_DICHT|herstart/, 'een anonieme aanroeper krijgt geen interne uitleg');
       assert.ok(!r.body.token, 'geen sessie');
       const l = await post(srv.base, '/api/auth/login', { login: n.email, password: n.password, pasApp: 'rtg' });
       assert.ok(!l.body.token && l.status >= 400, 'het adres bestaat niet: ' + l.status);
@@ -111,6 +120,7 @@ test('2 en 3. op een echte server: dicht met de vlag, open zonder, en de zekerin
       const st = await bord.json();
       assert.equal(st.registratie.dicht, true, 'het bord ziet het besluit');
       assert.equal(st.registratie.wijzigbaarHier, false);
+      assert.match(st.registratie.hoe, /RTG_REGISTRATIE_DICHT/, 'de technische uitleg staat op het techniekbord');
       assert.deepEqual(st.registratie.paden.map(p => p.pad), ['/api/auth/register', '/api/sso/terug en /api/sso/saml/acs', '/api/scim/v2/Users']);
       const fuse = st.zekeringen.find(z => z.id === 'registratie');
       assert.deepEqual(fuse.dekt, ['/api/auth/register'], 'de zekering zegt dat hij alleen de route dekt');
@@ -141,7 +151,7 @@ test('2 en 3. op een echte server: dicht met de vlag, open zonder, en de zekerin
       const d = await post(srv.base, '/api/auth/register', nieuw());
       assert.equal(d.status, 503);
       assert.deepEqual(d.body.reden, ['zekering']);
-      assert.match(String(d.body.hoe), /FUSE-REG/);
+      assert.match(String(d.body.hoe), /tijdelijk uitgeschakeld/);
       await post(srv.base, '/api/techniek/zekering', { id: 'registratie', actie: 'reset' }, eig);
       assert.ok((await post(srv.base, '/api/auth/register', nieuw())).body.token, 'na de reset weer open');
     } finally { stop(srv); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen */ } }
@@ -190,7 +200,7 @@ test('5. de vlag faalt dicht: alleen leeg en 0 zijn open', () => {
   const oud = process.env[VLAG];
   try {
     process.env[VLAG] = 'true';
-    assert.throws(() => r.eisOpen(), e => e.code === 'REGISTRATIE_DICHT' && /RTG_REGISTRATIE_DICHT/.test(e.hoe));
+    assert.throws(() => r.eisOpen(), e => e.code === 'REGISTRATIE_DICHT' && e.hoe === r.HOE);
   } finally { if (oud === undefined) delete process.env[VLAG]; else process.env[VLAG] = oud; }
 });
 
@@ -201,8 +211,8 @@ test('6b. de weigering noemt alle redenen die gelden', () => {
   assert.deepEqual(r.weigering(false, { [VLAG]: '1' }).reden, ['besluit']);
   const beide = r.weigering(true, { [VLAG]: 'ja' });
   assert.deepEqual(beide.reden, ['besluit', 'zekering']);
-  assert.match(beide.hoe, /RTG_REGISTRATIE_DICHT/);
-  assert.match(beide.hoe, /FUSE-REG/);
+  assert.equal(beide.hoe, r.HOE, 'publiek een korte hoe');
+  assert.doesNotMatch(beide.hoe, /RTG_REGISTRATIE_DICHT|FUSE-REG|herstart/);
 });
 
 test('7. het eigenaarsscript maakt het eigenaarsaccount ook met de vlag aan', () => {
@@ -224,27 +234,94 @@ test('7. het eigenaarsscript maakt het eigenaarsaccount ook met de vlag aan', ()
   } finally { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen */ } }
 });
 
-test('7b. de ongegrendelde schrijver is van geen route te bereiken', () => {
+/* 7b. DE ENIGE BEWAKER VAN DE UITZONDERING, en daarom in twee helften.
+
+   De eerste versie was een regex op `require('...accounts/users')`, en een
+   tegenlezing liet vier vormen groen staan: path.join(__dirname,'accounts',
+   'users'), een template string, './accounts/'+'users' en './accounts/users/'.
+   Bovendien was heel server/accounts/ vrijgesteld, dus een module daarbinnen die
+   createUser doorgaf kwam er stil doorheen.
+
+   HELFT 1 IS EEN RUNTIMEMETING en geen tekstzoektocht: een kindproces laadt de
+   echte server met een haak op Module._resolveFilename en noteert ELKE module
+   die accounts/users.js oplost, in welke vorm ook. Die lijst moet precies
+   {accounts/index.js, accounts/staff.js} zijn -- dus ook binnen accounts/ mag er
+   geen derde lader bij komen zonder dat iemand deze toets aanpast. Wat de meting
+   niet ziet: een require die pas TIJDENS een verzoek gebeurt. Daarvoor is
+   helft 2.
+
+   HELFT 2 SCANT server/ en scripts/ zonder commentaar op ELKE plek waar
+   `accounts` en `users` vlak naast elkaar staan (ook met ',' of '+' of '/'
+   ertussen) -- de vier vormen hierboven alle vier. Daarvan mag alleen
+   scripts/eigenaar-aanmaken.js de module laden; twee bestanden noemen het pad
+   als TEKST, en op hun treffende regels mag geen require, import, join of
+   resolve staan. Een naam die volledig wordt uitgerekend ('us'+'ers') ziet
+   een tekstscan niet; die vangt helft 1 zodra hij bij het opstarten laadt. */
+const LADERS_SCRIPT = `
+  const Module = require('module'); const path = require('path');
+  const root = process.argv[1]; const doel = path.join(root, 'server', 'accounts', 'users.js');
+  const ouders = new Set(); const orig = Module._resolveFilename;
+  Module._resolveFilename = function (req, parent, ...r) {
+    const uit = orig.call(this, req, parent, ...r);
+    if (uit === doel && parent && parent.filename) ouders.add(path.relative(root, parent.filename).split(path.sep).join('/'));
+    return uit;
+  };
+  require(path.join(root, 'server', 'server.js'));
+  setTimeout(() => {
+    for (const m of Object.values(require.cache))
+      if (m.children.some(c => c.id === doel)) ouders.add(path.relative(root, m.id).split(path.sep).join('/'));
+    process.stdout.write('OUDERS=' + JSON.stringify([...ouders].sort()) + '\\n'); process.exit(0);
+  }, 4000);`;
+
+test('7b. de ongegrendelde schrijver is van geen route te bereiken (runtime: wie laadt accounts/users.js)', () => {
+  const { execFileSync } = require('node:child_process');
   const ROOT = path.join(__dirname, '..');
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-regdicht-laders-'));
+  try {
+    const uit = execFileSync(process.execPath, ['-e', LADERS_SCRIPT, ROOT], {
+      encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 90000,
+      env: { ...process.env, RTG_DATA_DIR: TMP, PORT: '0', HOST: '127.0.0.1', SMTP_URL: '', NODE_ENV: 'test', DATABASE_URL: '', REDIS_URL: '' }
+    });
+    const m = /OUDERS=(.*)/.exec(uit);
+    assert.ok(m, 'de meting gaf geen uitslag: ' + uit.slice(-300));
+    assert.deepEqual(JSON.parse(m[1]), ['server/accounts/index.js', 'server/accounts/staff.js'],
+      'alleen de gevel en staff.js mogen accounts/users.js laden');
+  } finally { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen */ } }
+
   const accounts = require('../server/accounts');
   const users = require('../server/accounts/users');
-  assert.notEqual(accounts.createUser, users.createUser, 'de gevel draagt de gegrendelde createUser');
-  assert.notEqual(accounts.createUserSync, users.createUserSync);
-  const laadtUsers = /require\(\s*['"][^'"]*accounts\/users(\.js)?['"]\s*\)/;
-  const buiten = [];
+  /* en de gevel draagt geen ongegrendelde createUser onder een andere naam */
+  for (const [k, v] of Object.entries(accounts))
+    assert.ok(v !== users.createUser && v !== users.createUserSync, 'de gevel geeft de ongegrendelde schrijver door als ' + k);
+});
+
+test('7c. de ongegrendelde schrijver is van geen route te bereiken (bron: ook dynamische vormen)', () => {
+  const { zonderCommentaar } = require('../scripts/lib/bron');
+  const ROOT = path.join(__dirname, '..');
+  const NAAST = /accounts\W{0,8}users\b/;
+  const LADER = 'scripts/eigenaar-aanmaken.js';
+  const ALS_TEKST = new Set(['server/kern/identiteit/gegevenssoorten.js', 'scripts/check.js']);
+  const treffers = [];
   const loop = (dir) => {
     for (const n of fs.readdirSync(dir, { withFileTypes: true })) {
       const f = path.join(dir, n.name);
       if (n.isDirectory()) { if (n.name !== 'node_modules' && n.name !== 'data') loop(f); continue; }
-      if (!/\.js$/.test(n.name)) continue;
+      if (!/\.(js|cjs|mjs)$/.test(n.name)) continue;
       const rel = path.relative(ROOT, f).split(path.sep).join('/');
-      if (rel.startsWith('server/accounts/')) continue;
-      if (laadtUsers.test(fs.readFileSync(f, 'utf8'))) buiten.push(rel);
+      if (rel.startsWith('server/accounts/')) continue;   // die dekt de runtimemeting (7b)
+      const code = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+      if (!NAAST.test(code)) continue;
+      treffers.push(rel);
+      if (ALS_TEKST.has(rel)) {
+        for (const r of code.split('\n').filter(r => NAAST.test(r)))
+          assert.doesNotMatch(r, /require|import|join|resolve|Module/, rel + ' noemt het pad niet alleen als tekst: ' + r.trim());
+      }
     }
   };
   loop(path.join(ROOT, 'server')); loop(path.join(ROOT, 'scripts'));
-  assert.deepEqual(buiten, ['scripts/eigenaar-aanmaken.js'],
-    'alleen het offline eigenaarsscript mag de grendel omzeilen; gevonden: ' + buiten.join(', '));
+  assert.deepEqual(treffers.filter(r => !ALS_TEKST.has(r)), [LADER],
+    'alleen het offline eigenaarsscript mag de grendel omzeilen; gevonden: ' + treffers.join(', '));
+  assert.match(fs.readFileSync(path.join(ROOT, LADER), 'utf8'), /require\('\.\.\/server\/accounts\/users'\)\.createUser\(/);
 });
 
 test('8. SSO noemt een dichte registratie in plaats van een kale 401', () => {
@@ -259,4 +336,36 @@ test('8. SSO noemt een dichte registratie in plaats van een kale 401', () => {
   assert.equal(a.code, 'REGISTRATIE_DICHT');
   assert.match(a.bericht, /registraties zijn gesloten/);
   assert.equal(foutAntwoord(new Error('verkeerd domein')).status, 401, 'een gewone weigering blijft een 401');
+});
+
+/* 9. npm run golive leest .env.productie zoals de server dat doet. Zijn eigen
+   lezer stripte geen aanhalingstekens en geen `export `, en keurde daardoor een
+   andere stand dan de server draait: `"0"` las als een vreemde waarde (dicht),
+   en `export ...=1` werd overgeslagen (open). Mutatie, met de hand: de oude lezer
+   terug in golive.js -> beide gevallen zakken. */
+test('9. golive leest het envbestand met de lezer van de server', () => {
+  const { spawnSync } = require('node:child_process');
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-regdicht-golive-'));
+  const draai = (regel) => {
+    const f = path.join(TMP, 'env-' + Math.random().toString(36).slice(2));
+    fs.writeFileSync(f, regel + '\n');
+    const env = { ...process.env, RTG_ENV_FILE: f };
+    delete env[VLAG];
+    /* --bewijs-stdout: het rapport gaat naar stdout en .release/ blijft onaangeraakt,
+       zodat deze toets niet botst met een parallelle golive-run. */
+    const r = spawnSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'golive.js'), '--bewijs-stdout'],
+      { encoding: 'utf8', env, timeout: 120000 });
+    return String(r.stdout || '') + String(r.stderr || '');
+  };
+  try {
+    const open = draai(VLAG + '="0"');
+    assert.match(open, /Registratie: open/, '"0" is open, net als op de server');
+    assert.doesNotMatch(open, /is geen 0 of 1/);
+    const dicht = draai('export ' + VLAG + '=1');
+    assert.match(dicht, /Registratie staat DICHT/, '`export ...=1` is dicht, net als op de server');
+    const ds = require('../scripts/docker/start');
+    const r = require('../server/accounts/registratie');
+    assert.equal(r.dicht(ds.leesEnv(VLAG + '="0"')), false);
+    assert.equal(r.dicht(ds.leesEnv('export ' + VLAG + '=1')), true);
+  } finally { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen */ } }
 });

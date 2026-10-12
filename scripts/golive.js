@@ -34,18 +34,18 @@ const waarschuw = (t) => uit.push(['⚠', t, false]);
 const goed = (t) => uit.push(['✓', t, false]);
 let ownerReadback = null;
 
-/* .env.productie inlezen (alleen KEY=waarde-regels; # is commentaar). */
+/* .env.productie inlezen MET DE LEZER VAN DE SERVER (scripts/docker/start.js
+   leesEnv): aanhalingstekens eraf, `export ` ervoor eraf, een ongeldige naam of
+   nulbyte is een fout. De eigen lezer die hier stond deed geen van drieen, en dan
+   keurde dit rapport een andere stand dan de server draait -- `RTG_REGISTRATIE_DICHT="0"`
+   las hier als dicht en `export RTG_REGISTRATIE_DICHT=1` werd hier overgeslagen.
+   Geeft null als het bestand niet te lezen is; een bestand dat niet te ONTLEDEN
+   is gooit, en de aanroeper blokkeert daarop. */
+const { leesEnv } = require('./docker/start');
 function leesEnvBestand(pad) {
-  const uitv = {};
-  try {
-    for (const regel of fs.readFileSync(pad, 'utf8').split('\n')) {
-      const r = regel.trim();
-      if (!r || r.startsWith('#')) continue;
-      const i = r.indexOf('=');
-      if (i > 0) uitv[r.slice(0, i).trim()] = r.slice(i + 1).trim();
-    }
-  } catch (e) { return null; }
-  return uitv;
+  let tekst;
+  try { tekst = fs.readFileSync(pad, 'utf8'); } catch (e) { return null; }
+  return leesEnv(tekst);
 }
 
 (async () => {
@@ -58,7 +58,8 @@ function leesEnvBestand(pad) {
     : standaardEnvPad;
   let bestand = null;
   if (fs.existsSync(envPad)) {
-    bestand = leesEnvBestand(envPad) || {};
+    try { bestand = leesEnvBestand(envPad) || {}; }
+    catch (e) { blokkeer(path.basename(envPad) + ' is niet te lezen zoals de server hem leest: ' + (e.message || e)); bestand = {}; }
     // HANDMATIG-plekken die nog niet zijn ingevuld tellen niet mee
     for (const [k, v] of Object.entries(bestand)) if (/VUL-IN/i.test(v)) delete bestand[k];
     goed(path.basename(envPad) + ' gevonden en meegelezen (' + Object.keys(bestand).length + ' ingevulde waarden).');

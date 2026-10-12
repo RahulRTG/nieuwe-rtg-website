@@ -3,7 +3,7 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "f036c834f",
+  "commit": "c6fb7cd63",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -5460,9 +5460,9 @@
  "gemeten": {
   "bestanden": 4474,
   "nietGelezen": 0,
-  "aanroepen": 181081,
-  "kanten": 31534,
-  "kantenLokaal": 20237,
+  "aanroepen": 181084,
+  "kanten": 31535,
+  "kantenLokaal": 20238,
   "kantenIngevoerd": 2843,
   "kantenLid": 2819,
   "kantenViaKern": 4899,
@@ -5471,16 +5471,16 @@
   "kantenUitFabriek": 306,
   "kantenViaKernZonderSymbool": 2950,
   "kernherkomstGelezen": 1347,
-  "onopgelosteAanroepen": 135102,
+  "onopgelosteAanroepen": 135104,
   "onopgelosteNamen": 13898,
   "onopgelostNaarSoort": {
-   "ingebouwd": 36273,
+   "ingebouwd": 36274,
    "externeModule": 1061,
    "kader": 12430,
    "contextobject": 20794,
    "uitgepaktObject": 1679,
    "lokaleWaarde": 24187,
-   "methodeOpWaarde": 38211,
+   "methodeOpWaarde": 38212,
    "overig": 467
   },
   "opgelostPct": 25.4,
@@ -32825,7 +32825,7 @@
  "onopgelostTop": [
   {
    "naam": "MemberExpression",
-   "aantal": 35332
+   "aantal": 35333
   },
   {
    "naam": "String",
@@ -32833,7 +32833,7 @@
   },
   {
    "naam": "require",
-   "aantal": 8381
+   "aantal": 8382
   },
   {
    "naam": "app.post",
@@ -32994,7 +32994,7 @@
     },
     {
      "naam": "require",
-     "aantal": 8381
+     "aantal": 8382
     },
     {
      "naam": "Number",
@@ -33055,7 +33055,7 @@
    "namen": [
     {
      "naam": "MemberExpression",
-     "aantal": 35319
+     "aantal": 35320
     },
     {
      "naam": "CallExpression",
@@ -110771,6 +110771,14 @@
    "naar": "isProductie",
    "hoe": "lokaal",
    "lijn": 98
+  },
+  {
+   "vanBestand": "server/kern/kantoor/productiedeur.js",
+   "van": "deurStand",
+   "naarBestand": "server/kern/kantoor/productiedeur.js",
+   "naar": "codeDicht",
+   "hoe": "lokaal",
+   "lijn": 137
   },
   {
    "vanBestand": "server/kern/kantoor/tweedehandtekening.js",

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 2673 bestanden en 18530 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 2674 bestanden en 18531 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 2673 |
-| losse beweringen (`test(...)`) | 18530 |
+| toetsbestanden | 2674 |
+| losse beweringen (`test(...)`) | 18531 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2485 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2486 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
@@ -2382,7 +2382,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-331 bestanden, 564 beweringen.
+332 bestanden, 565 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -2502,6 +2502,7 @@ toets omvalt.
 | `isolatie-cockpit.e2e.js` | 1 | gezakt op `liegpoort /api/` | SCHERM-TEST: de isolatiecockpit van het kantoor (/apps/isolatie.html). WAAROM DEZE TOETS BESTAAT, en waarom hij meer doet dan de pagina openen. |
 | `juridischeschermen.e2e.js` | 1 | geen bronmutatie mogelijk | DE VIER JURIDISCHE PAGINA'S: STAAT ERIN WAT ERIN MOET? WAAROM DIT EEN TOETS VERDIENT Dit zijn de saaiste schermen van het huis en tegelijk de enige waar een ontbrekende alinea een boete oplevert. |
 | `kantoor.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Kantoor, de samenhanglaag over de kantoorwereld. Wat hier bewezen wordt is de belofte van laag 2 uit PLATFORM.md, en niet of de agenda werkt -- dat toetst test/agenda.e2e.js. |
+| `kantoordeur-passkey.e2e.js` | 1 | gezakt op `liegpoort /api/` | EEN KANTOORDEUR IN PRODUCTIE: DE PASSKEY, OP DRIE SCHERMEN EEN WEG. De eigenaar logde in productie in met zijn eigen account en kwam niet in het kantoor. |
 | `kantoordeur.e2e.js` | 2 | gezakt op `liegpoort /api/` | DE KANTOORDEUR EN HET ENE ACCOUNT. De server laat de eigenaar met zijn EIGEN lid-token door officeAuth (server/kern/kantoor/index.js: "de eigenaar komt ook met zijn eigen accountlogin binnen"), en kern/eenaccount.js... |
 | `kantoordeuren.e2e.js` | 1 | gezakt op `liegpoort /api/` | DE KANTOOR-APPS: EEN DEUR OP DE APP ZELF, GEEN OMLEIDING. WAT ER MIS WAS (TAKEN 5.5) Acht kantoor-apps stuurden een uitgelogde bezoeker weg met een location.replace() naar personeel.html. |
 | `kantoorgesprek.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor de kantoor-inlog als gesprek. De server-kant staat in test/kantoorgesprek.test.js; dit gaat over wat een mens ziet. |

@@ -129,9 +129,18 @@ async function startBewijs({ zwaarVan, accounts, key, req, env, actie, omschrijv
   return r;
 }
 
+/* De stand van de deur voor het scherm (/api/health): `code` zegt of de
+   gedeelde kantoorcode hier nog opent, `passkey` of het kantoor alleen met een
+   passkey opent. Afgeleid van codeDicht en niets anders, zodat het scherm en de
+   deur niet uiteen kunnen lopen. */
+function deurStand(env) {
+  const dicht = !!codeDicht(env);
+  return { code: !dicht, passkey: dicht };
+}
+
 /* Wie er individueel achter een kantoorsessie staat, en hoe hard: ./identiteit.js
    (besluit 3a). Hier opnieuw uitgegeven, zodat er een ingang blijft. */
 module.exports = { ACTIE, KOPPEL_ACTIE, CODE_DICHT, WEG, isProductie, codeDicht, bewijsGeldig, sessieMag,
-  eigenaarDirect, startBewijs };
+  eigenaarDirect, startBewijs, deurStand };
 const { IDENTITEIT, identiteitVan } = require('./identiteit');
 Object.assign(module.exports, { IDENTITEIT, identiteitVan });

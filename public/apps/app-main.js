@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '0f6a9048';
+var RTG_BOUW = '7008ca01';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4538,6 +4538,12 @@ var RTG_BOUW = '0f6a9048';
       bewaar: (t, r) => { localStorage.setItem('rtg_werk_sessie', JSON.stringify({ werkruimte: r.code, lidToken: t })); } }
   };
 
+  // de kantoordeur en de passkeyvertaling, pas geladen als iemand het kantoor opent
+  const laadKantoorDeur = () => window.RTGKantoorDeur ? Promise.resolve(window.RTGKantoorDeur) : new Promise(ok => {
+    const t = document.createElement('script'); t.src = '/shared/kantoordeur.js';
+    t.onload = t.onerror = () => ok(window.RTGKantoorDeur ? RTGKantoorDeur.laadPasskey().then(() => window.RTGKantoorDeur) : null);
+    document.head.appendChild(t);
+  });
   /* vraag de algemene pin (of zet hem eerst) en geef hem door aan af(pin) */
   function metAlgPin(af) {
     if (Date.now() < pinOkTot) return af(null);
@@ -4614,7 +4620,16 @@ var RTG_BOUW = '0f6a9048';
           try {
             const body = { rol: r.rol, code: r.code, staffId: r.staffId, pin };
             let s;
-            try { s = await API.call('/account/start', body); }
+            /* Het kantoor gaat door de ene kantoordeur (shared/kantoordeur.js):
+               in productie met een passkey, en die start in een tik. */
+            if (r.rol === 'kantoor') {
+              const deur = await laadKantoorDeur();
+              if (!deur) throw new Error(T('werk.mis', 'Openen lukte niet.'));
+              const u = await deur.binnen(API.token, { pin, vraagTik: deur.tikDialoog() });
+              if (u.geenPasskey) { location.href = deur.PASSKEYS; return; }
+              if (!u.token) throw new Error(u.error || T('werk.mis', 'Openen lukte niet.'));
+              s = u;
+            } else try { s = await API.call('/account/start', body); }
             catch (e1) {
               if (!(e1.data && e1.data.locatieNodig)) throw e1;
               const pos = await vraagPositie();

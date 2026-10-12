@@ -67,11 +67,13 @@
     }).then(function (r) { return r.json().catch(function () { return {}; }); });
   }
 
-  // /shared/passkey.js pas laden als de kantoordeur erom vraagt (productie, B10)
-  function passkey() {
-    return w.RTGPasskey ? Promise.resolve(w.RTGPasskey) : new Promise(function (ok) {
-      var t = document.createElement('script'); t.src = '/shared/passkey.js';
-      t.onload = t.onerror = function () { ok(w.RTGPasskey); }; document.head.appendChild(t);
+  // de kantoordeur op naam (/shared/kantoordeur.js); passkey pas bij een ceremonie
+  function kantoordeur() {
+    var klaar = function () { return w.RTGKantoorDeur || null; };
+    if (w.RTGKantoorDeur) return Promise.resolve(klaar());
+    return new Promise(function (ok) {
+      var t = document.createElement('script'); t.src = '/shared/kantoordeur.js';
+      t.onload = t.onerror = function () { ok(klaar()); }; document.head.appendChild(t);
     });
   }
 
@@ -162,35 +164,36 @@
         return;
       }
       zegt.textContent = 'Een moment, ik kijk of uw eigen RTG-account hier al toegang heeft...';
+      // tegelijk met de rollenvraag: geen extra stap
+      var deurLaadt = kantoordeur();
       accountPost('rollen', {}, lt).then(function (d) {
         var heeft = (d.rollen || []).some(function (r) { return r && r.rol === 'kantoor'; });
         if (!heeft) return codeGesprek();
         start(null);
       }).catch(function () { codeGesprek(); });
 
-      function start(pin, bewijs) {
-        var lijf = { rol: 'kantoor' };
-        if (pin) lijf.pin = pin;
-        if (bewijs) { lijf.ceremonie = bewijs.ceremonie; lijf.antwoord = bewijs.antwoord; }
-        accountPost('start', lijf, lt).then(function (s) {
-          if (s.token) {
-            sleutelGebruikt = true;
-            zegt.textContent = 'Welkom terug. U bent binnen met uw eigen RTG-account.';
-            return klaar(s.token, s.state);
-          }
-          /* `pinNodig` is de vraag EN de afwijzing (eenaccount/starten.js);
-             alleen de afwijzing draagt een reden. Zie test/kantoordeur.e2e.js. */
-          if (s.pinNodig) return vraagPin(pin ? (s.error || 'Die pincode klopt niet.') : '');
-          /* B10: in productie opent het kantoor met een passkey (kern/kantoor/productiedeur.js) */
-          if (s.bevestigingNodig && s.bevestiging && !bewijs) {
-            zegt.textContent = 'Bevestig met uw passkey, dan zet ik het kantoor open.';
-            return passkey().then(function (P) {
-              return P ? P.bevestig(function () { return s.bevestiging; }) : { fout: 'De passkey kon hier niet starten.' };
-            }).then(function (b) { if (b.fout) fout.textContent = b.fout; else start(pin, b); });
-          }
-          // geen sleutel (meer), of iets anders mis: de code, met de reden erbij
-          codeGesprek();
-          fout.textContent = s.error || '';
+      // de ene kantoordeur: pin voor passkey; weigert Safari buiten een tik, dan een knop
+      function start(pin) {
+        deurLaadt.then(function (D) {
+          if (!D) { codeGesprek(); fout.textContent = 'De kantoordeur kon hier niet laden.'; return; }
+          return D.binnen(lt, { pin: pin, vraagTik: D.tikDialoog('Bevestig met uw passkey, dan zet ik het kantoor open.') }).then(function (s) {
+            if (s.token) {
+              sleutelGebruikt = true;
+              zegt.textContent = 'Welkom terug. U bent binnen met uw eigen RTG-account.';
+              return klaar(s.token, s.state);
+            }
+            /* `pinNodig` is de vraag EN de afwijzing (eenaccount/starten.js);
+               alleen de afwijzing draagt een reden. Zie test/kantoordeur.e2e.js. */
+            if (s.pinNodig) return vraagPin(pin ? (s.error || 'Die pincode klopt niet.') : '');
+            if (s.geenPasskey) {
+              zegt.innerHTML = esc(s.error) + ' <a href="' + esc(s.link) + '">Een passkey toevoegen</a>';
+              veld.disabled = true; knop.disabled = true;
+              return;
+            }
+            // geen sleutel (meer), of iets anders mis: de code, met de reden erbij
+            codeGesprek();
+            fout.textContent = s.error || '';
+          });
         }).catch(function () { codeGesprek(); });
       }
 

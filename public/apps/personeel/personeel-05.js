@@ -1,78 +1,19 @@
-/* aanmelden met de kassacode */
-    const go = async () => {
-      $('#kaFout').textContent = '';
-      try {
-        const r = await fetch('/api/office/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: $('#kaCode').value.trim(), totp: $('#kaTotp').value.trim() }) });
-        const d = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(d.error || T('pd.ka.fout','Die code klopt niet.'));
-        kaToken = d.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
-        // een kantoorrol koppelen gaat alleen met een uitnodiging op naam (23-09-2026)
-        enterKantoor();
-      } catch(e){ $('#kaFout').textContent = e.message; }
-    };
-    $('#kaGo').addEventListener('click', go);
-    $('#kaCode').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
-    $('#kaCode').focus();
-    // Een gekoppelde kantoorrol start met een tik via hetzelfde RTG-account.
-    (async () => {
-      let lt = null; try { lt = localStorage.getItem('rtg_member_token'); } catch(e){}
-      if (!lt) return;
-      try {
-        const r = await fetch('/api/account/rollen', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt }, body: '{}' });
-        const d = await r.json().catch(() => ({}));
-        if (!r.ok) return;
-        if (!(d.rollen || []).some(x => x.rol === 'kantoor')) { kantoorUitnodigingVeld(lt); return; }
-        // toonKantoorLogin kan opnieuw tekenen terwijl de rollencontrole nog
-        // onderweg is. Beide antwoorden mogen samen maar één ingang maken.
-        if ($('#kaAccountVerder')) return;
-        const b = document.createElement('button');
-        b.id = 'kaAccountVerder';
-        b.className = 'abtn'; b.style.cssText = 'margin-top:0.7rem;width:100%;padding:0.8rem;';
-        b.textContent = '' + T('pd.ka.een', 'Verder met uw RTG-account');
-        b.addEventListener('click', () => kantoorMetAccount(lt));
-        const kaart = $('#gateStep').querySelector('.card');
-        if (kaart) kaart.appendChild(b);
-      } catch(e){}
-    })();
+/* de kantoordeur op naam (pin, passkey, het antwoord) en het begin van het kantoorscherm */
+  /* Het kantoor openen met het ene RTG-account (/api/account/start), via de
+     ene clientweg (shared/kantoordeur.js). De pin komt voor de passkey; de
+     passkey start altijd in een tik op de knop. */
+  async function kantoorMetAccount(lt, pin){
+    if ($('#kaFout')) $('#kaFout').textContent = '';
+    const deur = window.RTGKantoorDeur;
+    if (!deur) { if ($('#kaFout')) $('#kaFout').textContent = T('pd.passkeyStart', 'De passkey kon hier niet starten.'); return; }
+    const st = kaStand || await deur.stand();
+    kaUitkomst(lt, pin, await deur.vraag(lt, { pin, passkey: st.codeDicht }));
   }
-  /* DE KANTOORUITNODIGING VERZILVEREN (op naam, eenmalig). Het scherm volgt de
-     server: vraagt die een passkey (productie, B24), dan de ceremonie via
-     RTGZwaar; anders telt de TOTP uit het veld erboven. */
-  const laad = (g, f) => window[g] || new Promise(ok => { const t = document.createElement('script'); t.src = '/shared/'+f+'.js'; t.onload = t.onerror = ok; document.head.appendChild(t); });
-  function kantoorUitnodigingVeld(lt){
-    const kaart = $('#gateStep').querySelector('.card');
-    if (!kaart || $('#kaUitn')) return;
-    kaart.insertAdjacentHTML('beforeend', '<div class="k h-mt70">'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'</div>'+
-      '<div class="pinrow h-mt40"><input id="kaUitn" aria-label="'+T('pd.ka.uitn','Uitnodiging van de eigenaar')+'" autocomplete="off" autocapitalize="characters" maxlength="40" placeholder="KU.">'+
-      '<button id="kaUitnGo" class="abtn">'+T('pd.ka.uitnGo','Koppel aan mijn account')+'</button></div>');
-    const ga = async () => {
-      $('#kaFout').textContent = '';
-      try {
-        await laad('RTGPasskey', 'passkey'); await laad('RTGZwaar', 'zwaarbevestig');
-        await RTGZwaar.doe('/api/account/koppel', { soort: 'kantoor', uitnodiging: $('#kaUitn').value.trim(), totp: $('#kaTotp').value.trim() }, { token: lt });
-        kantoorMetAccount(lt);
-      } catch(e){ $('#kaFout').textContent = e.message || T('pd.mis', 'Er ging iets mis.'); }
-    };
-    $('#kaUitnGo').addEventListener('click', ga);
-    $('#kaUitn').addEventListener('keydown', e => { if (e.key === 'Enter') ga(); });
-  }
-  /* Het kantoor openen met het ene RTG-account (/api/account/start). Vraagt de
-     server een pin, dan een pinveld; vraagt hij in productie een passkey (B10),
-     dan de ceremonie die hij meegeeft, net als shared/kantoorgesprek.js. */
-  async function kantoorMetAccount(lt, pin, bewijs){
-    const lijf = Object.assign({ rol: 'kantoor' }, pin ? { pin } : {}, bewijs ? { ceremonie: bewijs.ceremonie, antwoord: bewijs.antwoord } : {});
-    const s = await fetch('/api/account/start', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + lt },
-      body: JSON.stringify(lijf) });
-    const sd = await s.json().catch(() => ({}));
-    if (!s.ok && sd.bevestigingNodig && sd.bevestiging && !bewijs) {
-      await laad('RTGPasskey', 'passkey');
-      const b = window.RTGPasskey ? await RTGPasskey.bevestig(() => sd.bevestiging) : { fout: T('pd.passkeyStart', 'De passkey kon hier niet starten.') };
-      if (b && !b.fout) return kantoorMetAccount(lt, pin, b);
-      if ($('#kaFout')) $('#kaFout').textContent = (b && b.fout) || T('pd.mis', 'Er ging iets mis.');
-      return;
-    }
-    if (!s.ok) {
-      if (sd.pinNodig && !$('#kaPin') && $('#kaFout')) {
+  function kaUitkomst(lt, pin, u, stil){
+    const fout = t => { if ($('#kaFout')) $('#kaFout').textContent = t || ''; };
+    if (u.token) { kaToken = u.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){} enterKantoor(); return; }
+    if (u.pinNodig) {
+      if (!$('#kaPin') && $('#kaFout')) {
         $('#kaFout').insertAdjacentHTML('afterend', '<div class="pinrow h-mt60"><input id="kaPin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="'+T('pin.veld','Algemene pin')+'" placeholder="'+T('pin.veld','Algemene pin')+'">'+
           '<button id="kaPinGo" class="hoofd">'+T('pd.ka.binnen','Binnen')+'</button></div>');
         const ga = () => kantoorMetAccount(lt, $('#kaPin').value.trim());
@@ -80,11 +21,53 @@
         $('#kaPin').addEventListener('keydown', e => { if (e.key === 'Enter') ga(); });
         $('#kaPin').focus();
       }
-      $('#kaFout').textContent = sd.error || T('pd.mis', 'Er ging iets mis.');
+      fout(u.error);
       return;
     }
-    kaToken = sd.token; try { localStorage.setItem('rtg_office_token', kaToken); } catch(e){}
-    enterKantoor();
+    if (u.geenPasskey) {
+      // geen passkey op dit account: de weg erheen, en geen terugval op de code
+      const b = $('#kaAccountVerder'); if (b) b.remove();
+      if ($('#kaDeurVak') && !$('#kaPasskeyZet')) $('#kaDeurVak').insertAdjacentHTML('beforeend',
+        '<a id="kaPasskeyZet" class="abtn pd-block" href="'+RTGKantoorDeur.PASSKEYS+'">'+T('pd.ka.passkeyZet','Een passkey toevoegen')+'</a>');
+      fout(u.error);
+      return;
+    }
+    if (u.bevestiging) {
+      kaWapen(lt, pin, u.bevestiging);
+      if (stil) return;   // vooraf opgehaald: niets starten zonder tik
+      /* Na een tik (de knop, de pin, het koppelen) meteen proberen; weigert de
+         browser de ceremonie buiten de tik, dan wacht de gewapende knop. */
+      RTGKantoorDeur.tekenNu(u.bevestiging).then(async bw => {
+        if (!bw.fout) return kaUitkomst(lt, pin, await RTGKantoorDeur.lever(lt, bw, { pin }));
+        fout(T('pd.ka.tik','Tik op de knop om met uw passkey te bevestigen.'));
+        kaUitkomst(lt, pin, await RTGKantoorDeur.bereid(lt, { pin }), true);
+      });
+      return;
+    }
+    fout(u.error || T('pd.mis', 'Er ging iets mis.'));
+  }
+  /* De knop draagt de klaarliggende ceremonie: get() start in de klik zelf. */
+  function kaWapen(lt, pin, bevestiging){
+    let b = $('#kaAccountVerder');
+    if (!b && $('#kaDeurVak')) {
+      // kwam de rol er pas net bij (koppelen), dan bestaat de knop nog niet
+      b = document.createElement('button'); b.id = 'kaAccountVerder'; b.className = 'hoofd';
+      b.style.cssText = 'margin-top:0.7rem;width:100%;padding:0.8rem;';
+      $('#kaDeurVak').appendChild(b);
+    }
+    if (!b) return;
+    b.textContent = T('pd.ka.passkey', 'Kantoor openen met passkey');
+    b.onclick = () => {
+      const p = RTGKantoorDeur.tekenNu(bevestiging);
+      b.disabled = true;
+      p.then(async bw => {
+        if (bw.fout) {
+          if ($('#kaFout')) $('#kaFout').textContent = bw.fout;
+          // een nieuwe ceremonie voor de volgende tik: de vorige kan verlopen zijn
+          kaUitkomst(lt, pin, await RTGKantoorDeur.bereid(lt, { pin }), true);
+        } else kaUitkomst(lt, pin, await RTGKantoorDeur.lever(lt, bw, { pin }));
+      }).finally(() => { b.disabled = false; });
+    };
   }
   async function enterKantoor(){
     const k = await kaApi('kamers');

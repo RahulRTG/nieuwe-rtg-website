@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-12T00:22:00.767Z",
-  "commit": "498aae305",
+  "op": "2026-10-12T05:57:55.318Z",
+  "commit": "7f32bdae8",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -1449,6 +1449,7 @@
     "server/kern/kletspraat/namen.js",
     "server/kern/klok.js",
     "server/kern/knelpunt/aanvoer-bronnen.js",
+    "server/kern/knelpunt/aanvoer-ondernemen.js",
     "server/kern/knelpunt/aanvoer-opleiding.js",
     "server/kern/knelpunt/aanvoer-opvang.js",
     "server/kern/knelpunt/aanvoer-werk.js",
@@ -19880,7 +19881,7 @@
   {
    "route": "POST /api/knelpunt",
    "bestand": "server/routes/knelpunt.js",
-   "regel": 105,
+   "regel": 109,
    "samengesteld": false
   },
   {
@@ -32168,7 +32169,7 @@
   {
    "route": "POST /api/rtf/knelpunt",
    "bestand": "server/routes/knelpunt.js",
-   "regel": 140,
+   "regel": 144,
    "samengesteld": false
   },
   {

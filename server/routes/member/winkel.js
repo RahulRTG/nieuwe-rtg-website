@@ -1,6 +1,8 @@
 /* Domein "member", deelmodule winkel & identiteit: de retail/mode-catalogus
    (verlanglijst, apart leggen, styling) en het paspoort: het lid houdt de regie.
    Alleen routes; de logica woont in de kern-modules. */
+const { agentVan } = require('../../kern/agentteken');
+
 module.exports = (kern) => {
   const { app, auth, findSupplier, liveCodename,
     voorkeurVan, zetVoorkeur, retailCatalogus, wishlistToggle,
@@ -37,8 +39,13 @@ app.post('/api/reisbureau/boek', auth, async (req, res) => {
   if (!wijzer.error) r.reiswijzer = wijzer;
   res.json(r);
 });
-// mijn reisaanvragen
-app.post('/api/reisbureau/mijn', auth, (req, res) => res.json({ aanvragen: reisbureau.mijn(req.session.key) }));
+// mijn reisaanvragen. Leest Rahul ze (het stuur, herkend aan het agentteken),
+// dan alleen de positieve veldlijst van de reisaanvraag: geen notitie, geen
+// bericht van de adviseur, geen codenaam en geen customerKey (EDGE.md par. 14.6)
+app.post('/api/reisbureau/mijn', auth, (req, res) => {
+  const aanvragen = reisbureau.mijn(req.session.key);
+  res.json({ aanvragen: agentVan(req) ? reisbureau.contextDomein.lijstVoorRahul(aanvragen) : aanvragen });
+});
 /* HET LID BETAALT EEN BEVESTIGDE REIS (kern/reisbureau-betaling.js).
 
    Dit is de weg die TRAVELCOMMERCE.md par. 9 als eerste van vier bevindingen

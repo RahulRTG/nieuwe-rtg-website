@@ -17,13 +17,21 @@
 'use strict';
 
 module.exports = function reisaanvraagContext({ aanvraagVan }) {
+  const beeld = (a) => ({ titel: a.titel, bestemming: a.bestemming, personen: a.personen,
+    vertrek: a.vertrek, stand: a.status, prijsPerPersoon: a.prijs && a.prijs.pp });
   return {
     soort: 'reisaanvraag',
     velden: ['titel', 'bestemming', 'personen', 'vertrek', 'stand', 'prijsPerPersoon'],
     zoek: (ref) => aanvraagVan(ref),
     eigenaar: (a) => a.customerKey,
     mag: () => true,
-    beeld: (a) => ({ titel: a.titel, bestemming: a.bestemming, personen: a.personen,
-      vertrek: a.vertrek, stand: a.status, prijsPerPersoon: a.prijs && a.prijs.pp })
+    beeld,
+    /* WAT RAHUL LEEST ALS HIJ "MIJN AANVRAGEN" OPVRAAGT (besluit van de eigenaar,
+       12 oktober 2026). Dezelfde velden als hierboven en geen tweede lijst: een
+       aanvraag die Rahul zelf ophaalt, mag niet meer dragen dan een aanvraag die
+       het lid hem aanwijst. Plus de ref, want zonder kan hij er niet naar
+       verwijzen. Welke aanvragen het zijn beslist de route met de sessie, niet
+       dit bestand. */
+    lijstVoorRahul: (lijst) => (lijst || []).map((a) => Object.assign({ ref: a.ref }, beeld(a)))
   };
 };

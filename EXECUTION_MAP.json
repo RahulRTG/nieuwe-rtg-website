@@ -73,7 +73,7 @@
  },
  "telling": {
   "capabilities": 5148,
-  "bereikbaarPerRol": 179,
+  "bereikbaarPerRol": 180,
   "conflicten": 0,
   "metBesluit": 167,
   "metVermoedeTerugweg": 49,
@@ -25107,7 +25107,11 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
-   "bereik": "verboden"
+   "bereik": {
+    "member": "lezen",
+    "supplier": "verboden",
+    "staff": "verboden"
+   }
   },
   {
    "pad": "/api/reisbureau/thuis",

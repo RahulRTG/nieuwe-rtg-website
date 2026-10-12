@@ -1,76 +1,76 @@
 {
- "paden": 177,
+ "paden": 180,
  "perRol": {
-  "member": 121,
+  "member": 124,
   "supplier": 40,
   "staff": 16
  },
  "vormen": {
   "eigen woorden": {
-   "gevonden": 177,
-   "totaal": 177,
+   "gevonden": 180,
+   "totaal": 180,
    "dekking": 100,
    "versmaldPct": 100,
-   "gemiddeldWerkveld": 10.7,
+   "gemiddeldWerkveld": 10.6,
    "gemist": []
   },
   "mensenwoorden": {
-   "gevonden": 177,
-   "totaal": 177,
+   "gevonden": 180,
+   "totaal": 180,
    "dekking": 100,
    "versmaldPct": 100,
-   "gemiddeldWerkveld": 10.7,
+   "gemiddeldWerkveld": 10.6,
    "gemist": []
   },
   "alleen domein": {
-   "gevonden": 177,
-   "totaal": 177,
+   "gevonden": 180,
+   "totaal": 180,
    "dekking": 100,
    "versmaldPct": 28,
-   "gemiddeldWerkveld": 66.3,
+   "gemiddeldWerkveld": 68.4,
    "gemist": []
   },
   "alleen werkwoord": {
-   "gevonden": 177,
-   "totaal": 177,
+   "gevonden": 180,
+   "totaal": 180,
    "dekking": 100,
-   "versmaldPct": 94,
-   "gemiddeldWerkveld": 7.4,
+   "versmaldPct": 93,
+   "gemiddeldWerkveld": 8.7,
    "gemist": []
   },
   "typefout": {
-   "gevonden": 177,
-   "totaal": 177,
+   "gevonden": 180,
+   "totaal": 180,
    "dekking": 100,
-   "versmaldPct": 14,
-   "gemiddeldWerkveld": 81,
+   "versmaldPct": 13,
+   "gemiddeldWerkveld": 83.5,
    "gemist": []
   },
   "omgekeerd": {
-   "gevonden": 177,
-   "totaal": 177,
+   "gevonden": 180,
+   "totaal": 180,
    "dekking": 100,
    "versmaldPct": 100,
-   "gemiddeldWerkveld": 10.7,
+   "gemiddeldWerkveld": 10.6,
    "gemist": []
   },
   "veel ruis": {
-   "gevonden": 177,
-   "totaal": 177,
+   "gevonden": 180,
+   "totaal": 180,
    "dekking": 100,
    "versmaldPct": 94,
-   "gemiddeldWerkveld": 12.7,
+   "gemiddeldWerkveld": 12.5,
    "gemist": []
   }
  },
  "laagste": 100,
  "stempel": {
-  "op": "2026-09-19T19:05:53.642Z",
-  "commit": "6083f652",
-  "boomVuil": false,
-  "boomAnders": 22,
+  "op": "2026-10-12T10:59:58.214Z",
+  "commit": "1f4d5f046",
+  "boomVuil": true,
+  "boomAnders": 1,
   "instrument": "scripts/resolverbereik.js",
-  "node": "v22.22.2"
+  "node": "v22.22.0"
  },
  "uitleg": "Per toegestaan pad een gegenereerde vraag in zeven vervormingen; gemeten of de resolver dat pad dan in zijn werkveld houdt.",
  "grens": "Zegt alleen of het pad in het werkveld BLIJFT (dekking), niet of het bovenaan staat; en de zinnen zijn gegenereerd, geen echte vragen van leden."

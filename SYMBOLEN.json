@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "9f693aeb7",
-  "seconden": 9.7,
+  "commit": "03b139b27",
+  "seconden": 10.5,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -4533,6 +4533,7 @@
     "server/lib/idemsleutels-proefronde.js",
     "server/lib/idemsleutels-recent.js",
     "server/lib/idemsleutels-reisconcept.js",
+    "server/lib/idemsleutels-reisgezelschap.js",
     "server/lib/idemsleutels-reisherkomst.js",
     "server/lib/idemsleutels-reisteruggave.js",
     "server/lib/idemsleutels-restbak.js",
@@ -7228,18 +7229,18 @@
  },
  "grens": "Dit register kent GEEN symbool-naar-symboolaanroepen: een naam in aanroeppositie is geen verwijzing. De kanten hier zijn require-kanten, en die wijzen naar een bestand dat bestaat.",
  "gemeten": {
-  "bestandenGezien": 5749,
-  "gelezen": 5435,
+  "bestandenGezien": 5750,
+  "gelezen": 5436,
   "nietGelezen": 314,
   "waarvanBundeldeel": 314,
   "waarvanParsefout": 0,
   "symbolen": 27471,
-  "bestandenMetUitvoer": 4535,
-  "uitvoerMetNamen": 2062,
+  "bestandenMetUitvoer": 4536,
+  "uitvoerMetNamen": 2063,
   "uitvoerOnvolledig": 7,
   "uitvoerZonderNamen": 2466,
   "zonderUitvoer": 900,
-  "requireKanten": 7751
+  "requireKanten": 7752
  },
  "nietGelezen": [
   {
@@ -172189,6 +172190,7 @@
     "server/lib/idemsleutels-loop-fabric.js",
     "server/lib/idemsleutels-officeformaten.js",
     "server/lib/idemsleutels-reisconcept.js",
+    "server/lib/idemsleutels-reisgezelschap.js",
     "server/lib/idemsleutels-reisteruggave.js",
     "server/lib/idemsleutels-rtc.js",
     "server/lib/idemsleutels-samenvoeging.js",
@@ -172202,6 +172204,21 @@
   },
   {
    "bestand": "server/lib/idemsleutels-reisconcept.js",
+   "symbolen": [],
+   "uitvoer": {
+    "vorm": "object",
+    "namen": [
+     "SLEUTELS"
+    ]
+   },
+   "requires": [],
+   "extern": [],
+   "gebruiktDoor": [
+    "server/lib/idemsleutels-recent.js"
+   ]
+  },
+  {
+   "bestand": "server/lib/idemsleutels-reisgezelschap.js",
    "symbolen": [],
    "uitvoer": {
     "vorm": "object",

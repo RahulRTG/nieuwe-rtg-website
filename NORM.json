@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-10-11",
+  "vastgelegd": "2026-10-12",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 50,
@@ -4523,8 +4523,8 @@
   },
   "sinds": {
     "keuringOmvang": "2026-10-11",
-    "testbestanden": "2026-10-11",
-    "toetsenNietGemeten": "2026-10-06",
+    "testbestanden": "2026-10-12",
+    "toetsenNietGemeten": "2026-10-12",
     "inlineStijlAttributen": "2026-10-06",
     "ratelTanden": "2026-10-11",
     "metingenZonderRatel": "2026-10-11",
@@ -4538,8 +4538,8 @@
     "keuringDekkingAdvies": "2026-10-06",
     "dbDeuren": "2026-10-11",
     "dbDeurenSchrijvend": "2026-08-28",
-    "browserpoortToetsen": "2026-10-11",
-    "e2eBestanden": "2026-10-11",
+    "browserpoortToetsen": "2026-10-12",
+    "e2eBestanden": "2026-10-12",
     "schermenZonderVormtaal": "2026-08-28",
     "bewijsCellenBewezen": "2026-10-04",
     "beweringenZonderVulcontrole": "2026-10-06",

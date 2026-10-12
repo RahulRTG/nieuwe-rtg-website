@@ -50,6 +50,20 @@ async function uitvoerStand(voorwaarde) {
 }
 const rij = (u, route) => (u.werklijst || []).find(r => r.route === route);
 
+/* EEN BAKEN IN PLAATS VAN EEN SLAAP. Om te bewijzen dat iets NIET is geteld,
+   moet de teller klaar zijn met wat ervoor kwam. Een vaste wachttijd gokt
+   daarop (test/klokwacht.test.js); dit doet een handeling die WEL telt -- een
+   passkey-schrijfactie -- en wacht tot die in de stand staat. Wat ervoor werd
+   afgehandeld, staat er dan ook. */
+async function baken() {
+  const route = 'POST /api/office/kantine/menu-zet';
+  const voor = (rij(await uitvoerStand(), route) || { passkey: 0 }).passkey;
+  assert.equal((await api('/api/office/kantine/menu-zet', { items: ['Baken'] }, mens.passkey)).status, 200);
+  const u = await uitvoerStand(x => ((rij(x, route) || {}).passkey || 0) > voor);
+  assert.equal(rij(u, route).passkey, voor + 1, 'het baken is geteld');
+  return u;
+}
+
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
   base = srv.base;
@@ -147,14 +161,12 @@ test('2. (b) de gedeelde code is geen individu: geteld als "zou zakken", en toch
 
   // een geweigerd verzoek is geen uitgevoerde handeling
   assert.equal((await api('/api/office/kantine/menu-zet', { items: [] }, gedeeld)).status, 400);
-  await new Promise(z => setTimeout(z, 150));
-  assert.equal(rij(await uitvoerStand(), route).gedeeld, voor.gedeeld + 1, 'een 400 telt niet');
+  assert.equal(rij(await baken(), route).gedeeld, voor.gedeeld + 1, 'een 400 telt niet');
 });
 
 test('3. een leesroute telt niet mee', async () => {
   for (let i = 0; i < 3; i++) assert.equal((await api('/api/office/kantine/menu', {}, gedeeld)).status, 200);
-  await new Promise(z => setTimeout(z, 150));
-  const u = await uitvoerStand();
+  const u = await baken();
   assert.equal((u.werklijst || []).some(r => /kantine\/menu$/.test(r.route)), false,
     'POST /api/office/kantine/menu is NOT_APPLICABLE (leest) en hoort niet in de uitvoertelling');
 });

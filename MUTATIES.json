@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T08:35:50.097Z",
-    "commit": "1bbe22f8",
+    "op": "2026-10-12T09:56:11.464Z",
+    "commit": "c2341f81",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2609,6 +2609,20 @@
       "operator": "!==->===#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "concept-live.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "concept-live.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
     },
     "concern-routes.e2e.js": {
       "soort": "server",

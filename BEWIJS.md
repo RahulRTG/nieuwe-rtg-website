@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 2675 |
 | losse beweringen (`test(...)`) | 18535 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 348 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 2486 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 2487 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 179 |
 | alleen in de kop *genoemd*, nog niet gemeten | 1 |
-| niets van beide | 9 |
+| niets van beide | 8 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1876,7 +1876,7 @@ toets omvalt.
 | `sessiegrens.test.js` | 2 | gezakt op `liegpoort /api/` | EEN NIEUW WACHTWOORD HOORT ELKE LOPENDE SESSIE TE BEEINDIGEN. WAT ER MISGING. |
 | `sessieregister-takken.test.js` | 14 | gezakt op `voorwaarde-omkeren#0` | HET SESSIEREGISTER TAK VOOR TAK (server/kern/identiteit/sessieregister.js). Wat dit bestand vasthoudt: een ongeldige of onbekende sid opent, vult, leest, raakt en sluit niets; een register zonder lidsleutel bewaart... |
 | `sessies.test.js` | 9 | gezakt op `expliciete bronmutatie` | De sessie-opslag: gelijktijdige sessies mogen niet stilletjes op 400 vastlopen (dat gooide vroeger de 401e ingelogde gebruiker eruit). Verlopen sessies gaan wel weg. |
-| `sessiestroom-binding.test.js` | 3 | -- | DE ZEGEL HOORT BIJ ZIJN TICKET (server/kern/sessiestroom.js). Een stroomticket draagt de sessie verzegeld mee. |
+| `sessiestroom-binding.test.js` | 3 | gezakt op `voorwaarde-omkeren#0` | DE ZEGEL HOORT BIJ ZIJN TICKET (server/kern/sessiestroom.js). Een stroomticket draagt de sessie verzegeld mee. |
 | `sessiestroom-takken.test.js` | 16 | gezakt op `voorwaarde-omkeren#0` | DE SESSIESTROOM TAK VOOR TAK (server/kern/sessiestroom.js, met sessiestroom-kijk.js). Naast test/sessiestroom.test.js houdt dit bestand de randen vast, alleen met de mechaniek (geen server): de dienst start niet... |
 | `sessiestroom.test.js` | 12 | gezakt op `liegpoort /api/` | DE SESSIESTROOM: geen sessie meer in het adres van een live-stroom of een video (server/kern/sessiestroom.js, server/opzet/stroomtoegang.js). Twee helften. |
 | `sessieverfijning.test.js` | 6 | geen bruikbare mutatie | De sessieverfijning: drie registers, een regel. Meet gedrag. |

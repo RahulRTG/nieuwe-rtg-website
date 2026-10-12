@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-dossier-'));
 let srv, base, lid, lid2, sup, office, tekenaar, tech, hash;
@@ -78,6 +78,8 @@ test.before(async () => {
   const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const chef = (roster.staff || []).find(x => x.role === 'manager');
   sup = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+  // een zaakmens OP NAAM zendt in: zonder ledensleutel is vier-ogen niet vast te stellen (vierogen.js)
+  sup = await zaakMensOpNaam(base, sup, 'KIKUNOI');
   assert.ok(lid && lid2 && office && tech && sup);
   await api('/api/techniek/tenant', { org: ORG, naam: 'Dossier Uitgeverij' }, tech);
   await api('/api/techniek/tenant/bind', { org: ORG, soort: 'zaak', code: 'KIKUNOI' }, tech);
@@ -287,7 +289,7 @@ test('9. een uitgever leest wat de klant leest -- en alleen over zijn eigen app'
   const ORG2 = 'O-DOSSIER-2';
   const roster2 = (await api('/api/supplier/roster', { code: 'SAKURA' })).body;
   const chef2 = (roster2.staff || []).find(x => x.role === 'manager');
-  const sup2 = (await api('/api/supplier/login', { code: 'SAKURA', staffId: chef2.id, pin: '1234' })).body.token;
+  const sup2 = await zaakMensOpNaam(base, (await api('/api/supplier/login', { code: 'SAKURA', staffId: chef2.id, pin: '1234' })).body.token, 'SAKURA');
   await api('/api/techniek/tenant', { org: ORG2, naam: 'Andere Uitgeverij' }, tech);
   await api('/api/techniek/tenant/bind', { org: ORG2, soort: 'zaak', code: 'SAKURA' }, tech);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Andere Uitgeverij', contact: 'dev@ander.nl' }, sup2);

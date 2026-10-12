@@ -99,4 +99,5 @@ test('de veiligheids- en ethiektoets zet een mens op naam, nooit een getypte naa
   const r = await json(await api('/api/lab/project/veiligheid', { id, status: 'akkoord', door: 'Dr. Iemand' }, opNaam));
   assert.equal(r.ok, true, JSON.stringify(r));
   assert.ok(r.project.veiligheid.door && r.project.veiligheid.door !== 'Dr. Iemand', 'de getypte naam stond als beslisser op de toets');
+  assert.ok(!/user-\d+/.test(r.project.logboek[0].tekst), 'de logboektekst toont geen sessiesleutel: ' + r.project.logboek[0].tekst);
 });

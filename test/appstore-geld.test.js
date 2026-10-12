@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 const { splitsBruto } = require('../server/kern/fiscaal/digitaal');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-geld-'));
@@ -84,6 +84,8 @@ test.before(async () => {
   const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const chef = (roster.staff || []).find(x => x.role === 'manager');
   sup = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+  // een zaakmens OP NAAM zendt in: zonder ledensleutel is vier-ogen niet vast te stellen (vierogen.js)
+  sup = await zaakMensOpNaam(base, sup, 'KIKUNOI');
   assert.ok(office && tech && sup, 'kantoor, eigenaar en uitgever ingelogd');
   assert.equal((await api('/api/techniek/tenant', { org: ORG, naam: 'Geld Uitgeverij' }, tech)).status, 200);
   assert.equal((await api('/api/techniek/tenant/bind', { org: ORG, soort: 'zaak', code: 'KIKUNOI' }, tech)).status, 200);
@@ -244,6 +246,18 @@ test('8. intrekken laat een RECHT achter, geen automatische terugboeking', async
   assert.equal(g.status, 200, JSON.stringify(g.body));
   assert.notEqual(g.body.recht.besluit.door, 'Iemand Anders', 'een naam in het lijf telt niet');
   assert.ok(g.body.recht.besluit.door, 'de sessie levert de actor');
+  /* N1: de SESSIESLEUTEL is geen label. Hij staat intern bij het besluit en in
+     het kantoorjournaal, maar niet in het journaal van de uitgever en niet op
+     de tijdlijn van het lid. */
+  assert.match(String(g.body.recht.besluit.doorKey), /^user-\d+$/, 'de sleutel van wie besloot staat intern bij het besluit');
+  assert.ok(!/user-\d+/.test(g.body.recht.besluit.door), 'het label is geen sessiesleutel: ' + g.body.recht.besluit.door);
+  const kj = (await api('/api/appstore/kantoor/journaal', { n: 50 }, office)).body.journaal.find(r => r.wat === 'teruggave-betaald');
+  assert.ok(kj && kj.intern && /^user-\d+$/.test(kj.intern.doorKey) && !/user-\d+/.test(kj.wie), 'kantoorjournaal: label als wie, sleutel intern');
+  const uj = (await api('/api/appstore/uitgever/journaal', { n: 100 }, sup)).body.lijst;
+  assert.ok(uj.some(r => r.wat === 'teruggave-betaald'), 'de uitgever ziet de teruggave');
+  assert.ok(!/user-\d+/.test(JSON.stringify(uj)), 'maar nooit een sessiesleutel');
+  const tl = (await api('/api/appstore/tijdlijn', {}, lid)).body;
+  assert.ok(!/user-\d+/.test(JSON.stringify(tl)), 'en het lid ook niet op zijn tijdlijn');
   assert.equal((await api('/api/pay/overzicht', {}, lid)).body.saldo, saldoVoor + PRIJS, 'het lid heeft zijn geld terug');
   assert.equal((await api('/api/appstore/kantoor/teruggaven', {}, office)).body.open.length, 0);
   assert.equal((await api('/api/appstore/kantoor/teruggave', { id: recht.id, besluit: 'terugbetaald' }, opNaam)).status, 409,

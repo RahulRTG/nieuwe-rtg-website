@@ -57,7 +57,10 @@ module.exports = function maakTeruggave({ S, save, nu, boek, eigen, pay, aankope
 
   /* Afhandelen. Twee wegen, en allebei met een naam eronder: terugbetalen (het
      geld gaat van de zaak terug naar het lid) of afwijzen met een reden. */
-  async function rechtDoe({ id, besluit, reden, door, idem }) {
+  /* `door` is het LABEL dat het journaal, de bus en de tijdlijn van het lid
+     lezen; `doorKey` is de sessiesleutel van wie besloot en gaat alleen intern
+     mee (N1, 11 oktober 2026: hier stond de sleutel zelf als `wie`). */
+  async function rechtDoe({ id, besluit, reden, door, doorKey, idem }) {
     const r = rechten().find(x => x.id === String(id || ''));
     if (!r) return { status: 404, error: 'Dit teruggaverecht bestaat niet.' };
     if (r.status !== 'open') return { status: 409, error: 'Hierover is al besloten (' + r.status + ').' };
@@ -65,8 +68,8 @@ module.exports = function maakTeruggave({ S, save, nu, boek, eigen, pay, aankope
     if (!wie) return { status: 400, error: 'Zet je naam erbij: een besluit over andermans geld hoort een mens te hebben genomen.' };
     if (besluit === 'afgewezen') {
       if (String(reden || '').trim().length < 10) return { status: 400, error: 'Een afwijzing draagt een reden van ten minste tien tekens; die leest het lid.' };
-      r.status = 'afgewezen'; r.besluit = { door: wie, at: nu(), reden: String(reden).trim().slice(0, 400) };
-      boek('teruggave-afgewezen', r.sleutel, wie, { id: r.id, reden: r.besluit.reden });
+      r.status = 'afgewezen'; r.besluit = { door: wie, doorKey: doorKey || null, at: nu(), reden: String(reden).trim().slice(0, 400) };
+      boek('teruggave-afgewezen', r.sleutel, wie, { id: r.id, reden: r.besluit.reden, intern: doorKey ? { doorKey } : null });
       save();
       return { status: 200, ok: true, recht: r };
     }
@@ -80,8 +83,8 @@ module.exports = function maakTeruggave({ S, save, nu, boek, eigen, pay, aankope
       uitRtg: [{ rekening: 'rtg:btw', centen: r.btwCenten }, { rekening: 'rtg:appstore', centen: r.afdrachtCenten }],
       oms: 'Teruggave App Store: ' + r.naam, ref: r.sleutel, idem: idem || r.id });
     if (b.error) return { status: b.status || 400, error: b.error };
-    r.status = 'terugbetaald'; r.besluit = { door: wie, at: nu(), reden: String(reden || '').trim().slice(0, 400) || null, delen: b.delen };
-    boek('teruggave-betaald', r.sleutel, wie, { id: r.id, centen: b.centen });
+    r.status = 'terugbetaald'; r.besluit = { door: wie, doorKey: doorKey || null, at: nu(), reden: String(reden || '').trim().slice(0, 400) || null, delen: b.delen };
+    boek('teruggave-betaald', r.sleutel, wie, { id: r.id, centen: b.centen, intern: doorKey ? { doorKey } : null });
     if (noteer) noteer(r.key, 'teruggekregen', r.sleutel, { centen: b.centen, door: wie });
     save();
     return { status: 200, ok: true, recht: r };

@@ -24,7 +24,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 const { lees } = require('../server/kern/appstore/manifest');
 const { maakArena } = require('../server/kern/appstore/arena');
 
@@ -58,6 +58,8 @@ test.before(async () => {
   const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const chef = (roster.staff || []).find(x => x.role === 'manager');
   sup = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+  // een zaakmens OP NAAM zendt in: zonder ledensleutel is vier-ogen niet vast te stellen (vierogen.js)
+  sup = await zaakMensOpNaam(base, sup, 'KIKUNOI');
   await api('/api/techniek/tenant', { org: 'O-ARENA', naam: 'Arena Uitgeverij' }, tech);
   await api('/api/techniek/tenant/bind', { org: 'O-ARENA', soort: 'zaak', code: 'KIKUNOI' }, tech);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Arena Uitgeverij', contact: 'dev@arena.nl' }, sup);

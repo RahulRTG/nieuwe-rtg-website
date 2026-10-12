@@ -54,10 +54,16 @@ function toets({ inzender, doorKey, doorNaam }) {
      alleen de tweede. Vergeleek deze toets alleen `id` (het personeelsnummer),
      dan zond een mens in als medewerker en tekende hij af als kantoormens. */
   const ids = inz ? [inz.id].concat(Array.isArray(inz.ids) ? inz.ids : []).filter(Boolean).map(String) : [];
-  const sleutelBekend = !!(ids.length && doorKey);
+  /* EN ALLEEN IN DEZELFDE SLEUTELRUIMTE (N2, 11 oktober 2026). `staff:K:9` en
+     `user-42` zijn niet gelijk, maar dat bewijst niets: het kunnen twee namen
+     van dezelfde mens zijn -- precies de inzendingen van voor `ids` bestond.
+     Zonder een sleutel van de inzender in de ruimte van de tekenaar is de
+     scheiding niet vast te stellen, en dan is het nooit `bewezen`. */
+  const ruimte = (k) => (/^user-\d+$/.test(String(k)) ? 'lid' : (/^staff:/.test(String(k)) ? 'staff' : 'anders'));
+  const sleutelBekend = !!(doorKey && ids.some(k => ruimte(k) === ruimte(doorKey)));
   const naamBekend = !!(inz && inz.naam && doorNaam);
 
-  if (sleutelBekend && ids.includes(String(doorKey))) {
+  if (doorKey && ids.includes(String(doorKey))) {
     return { mag: false, graad: 'bewezen', code: 'zelfde-mens',
       reden: 'Deze inzending is door dezelfde persoon ingezonden. Wie een app inzendt, tekent hem niet af -- ook niet als hij namens RTG in het kantoor zit. Laat een andere collega de keuring doen.' };
   }
@@ -86,7 +92,7 @@ function toets({ inzender, doorKey, doorNaam }) {
      niet de handtekening. */
   if (doorKey) {
     return { mag: false, graad: 'onbekend', code: 'geen-identiteit',
-      reden: 'Uw handtekening op naam is in orde, maar deze INZENDING draagt geen persoon: niet vast te stellen of u iemand anders bent dan de inzender. Laat de uitgever de app opnieuw inzenden met een persoonlijke inlog.' };
+      reden: 'Uw handtekening op naam is in orde, maar deze INZENDING draagt geen persoon die met uw inlog te vergelijken is: niet vast te stellen of u iemand anders bent dan de inzender. Laat de uitgever de app opnieuw inzenden met een persoonlijke inlog.' };
   }
   return { mag: false, graad: 'onbekend', code: 'geen-identiteit',
     reden: 'Van de inzender of de ondertekenaar is geen persoon bekend, dus niet vast te stellen of dit twee verschillende mensen zijn. Laat de uitgever opnieuw inzenden met een persoonlijke inlog, en teken af met uw eigen account op naam -- een getypte naam is geen handtekening.' };

@@ -16,7 +16,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 const { MACHTIGINGEN } = require('../server/kern/appstore/machtigingen');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-'));
@@ -40,7 +40,8 @@ async function supplierToken(code) {
   // de manager van een demozaak heeft PIN 1234 (server/kern/staffseed.js)
   const r = await api('/api/supplier/login', { code, staffId: staff.id, pin: staff.role === 'manager' ? '1234' : '5678' });
   assert.ok(r.body.token, 'ingelogd bij ' + code + ': ' + (r.body.error || ''));
-  return r.body.token;
+  // een zaakmens OP NAAM: zonder ledensleutel is vier-ogen niet vast te stellen (vierogen.js)
+  return zaakMensOpNaam(base, r.body.token, code);
 }
 
 /* Een kleine, eerlijke app: een teller die zijn stand onthoudt. Precies wat een

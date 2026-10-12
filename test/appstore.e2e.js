@@ -17,7 +17,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
-  wachtOpTekst, kantoorAlsPersoon } = require('./helper');
+  wachtOpTekst, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -157,7 +157,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
     const tekenaar = await kantoorAlsPersoon(base); // een mens op naam tekent af (vierogen.js)
     const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
     const chef = (roster.staff || []).find(x => x.role === 'manager');
-    const sup = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+    const sup = await zaakMensOpNaam(base, (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token, 'KIKUNOI');
     const lid = (await api(base, '/api/auth/register', { name: 'Cel Lid', email: 'cel@x.nl', phone: '0612345677',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
     assert.ok(tech && office && sup && lid, 'alle vier de sessies staan');
@@ -245,7 +245,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
     const tekenaar = await kantoorAlsPersoon(base); // een mens op naam tekent af (vierogen.js)
     const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
     const chef = (roster.staff || []).find(x => x.role === 'manager');
-    const sup = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+    const sup = await zaakMensOpNaam(base, (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token, 'KIKUNOI');
     const lid = (await api(base, '/api/auth/register', { name: 'Winkel Lid', email: 'winkel@x.nl', phone: '0612345676',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
     await api(base, '/api/techniek/tenant', { org: 'O-WINKEL', naam: 'Winkel Uitgeverij' }, tech);
@@ -395,7 +395,7 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
     const tekenaar = await kantoorAlsPersoon(base); // een mens op naam laat toe en tekent af (vierogen.js)
     const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
     const chef = (roster.staff || []).find(x => x.role === 'manager');
-    const sup = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+    const sup = await zaakMensOpNaam(base, (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token, 'KIKUNOI');
     /* Een demosessie als koper: een echt account moet voor RTG Pay eenmalig zijn
        paspoort laten zien, en die poort geldt hier ook (test/appstore-geld.test.js
        toets 9). Een demosessie heeft geen account en dus geen paspoortplicht. */

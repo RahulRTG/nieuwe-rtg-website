@@ -23,7 +23,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, keurLidGoed } = require('./helper');
 const U = require('../server/kern/appstore/uitgevers');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-persoon-'));
@@ -46,7 +46,19 @@ const manifest = (over) => Object.assign({
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
-  lid = (await api('/api/login', { tier: 'rtg' })).body.token;
+  /* EEN ECHT, GEKEURD ACCOUNT en geen demosessie (11 oktober 2026). De
+     demosessie draagt de sleutel `rtg` -- geen mens, en niet te vergelijken met
+     een kantoormens op naam (`user-N`). Vier-ogen kan dan niet vaststellen dat
+     inzender en tekenaar twee mensen zijn, en weigert terecht
+     (kern/appstore/vierogen.js, N2). */
+  const u = Date.now().toString(36);
+  const email = 'persoon-' + u + '@voorbeeld.test';
+  const reg = await api('/api/auth/register', { name: 'Persoon Uitgever', email,
+    phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)),
+    password: 'Geheim123!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  const codenaam = (await api('/api/auth/me', {}, reg.body.token)).body.user.codename;
+  await keurLidGoed(base, reg.body.token, codenaam, '1990-01-01');
+  lid = (await api('/api/auth/login', { login: email, password: 'Geheim123!', pasApp: 'rtg' })).body.token;
   gast = (await api('/api/login', { tier: 'guest' })).body.token;
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
   assert.ok(lid && gast && office, 'de drie inlogs horen te lukken');

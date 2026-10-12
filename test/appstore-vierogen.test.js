@@ -24,7 +24,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody, keurLidGoed } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, kantoorKoppelBody, keurLidGoed, zaakMensOpNaam } = require('./helper');
 const vierogen = require('../server/kern/appstore/vierogen');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vierogen-'));
@@ -74,6 +74,16 @@ test('0. de toets zelf: sleutel gaat voor naam, en de graad zegt hoe hard hij is
     /INZENDING/, 'met een bekende tekenaar zegt de weigering dat de INZENDING opnieuw moet');
   assert.equal(vierogen.toets({ inzender: { id: 'staff:K:1', ids: ['user-7'] }, doorKey: 'user-7' }).code, 'zelfde-mens',
     'een tweede sleutel van dezelfde inzender telt ook');
+  /* N2: twee sleutels in verschillende ruimtes die niet gelijk zijn, bewijzen
+     niets -- een inzending van voor `ids` (alleen een personeelsnummer) tekent
+     een kantoormens op naam niet af. */
+  const oud = vierogen.toets({ inzender: { id: 'staff:K:1', naam: 'Sam' }, doorKey: 'user-42', doorNaam: 'Ada' });
+  assert.equal(oud.mag, false, 'staff tegenover user werd als bewezen scheiding gelezen');
+  assert.equal(oud.code, 'geen-identiteit');
+  assert.notEqual(oud.graad, 'bewezen');
+  assert.match(oud.reden, /INZENDING/);
+  assert.equal(vierogen.toets({ inzender: { id: 'staff:K:1', ids: ['user-7'] }, doorKey: 'user-42' }).graad, 'bewezen',
+    'met een sleutel in dezelfde ruimte is de scheiding wel bewezen');
 });
 
 test.before(async () => {
@@ -129,8 +139,22 @@ test('3. de gedeelde code met een getypte naam publiceert NIET; een tweede mens 
   const nog = (await api('/api/appstore/kantoor/wachtrij', {}, office)).body.inzendingen.find(x => x.id === v.id);
   assert.ok(nog, 'de inzending staat nog in de wachtrij: er is niets gepubliceerd');
 
-  const r = await api('/api/appstore/kantoor/besluit',
+  /* N2: deze inzending kwam van een PIN-sessie zonder ledensleutel (alleen
+     `staff:...`). Een kantoormens op naam (`user-N`) is daarmee niet te
+     vergelijken -- twee ongelijke sleutels in twee ruimtes bewijzen niets. */
+  const ongelijk = await api('/api/appstore/kantoor/besluit',
     { versieId: v.id, besluit: 'gepubliceerd', door: 'Ada van RTG' }, opNaam);
+  assert.equal(ongelijk.status, 403, 'staff tegenover user werd als twee mensen gelezen: ' + JSON.stringify(ongelijk.body));
+  assert.equal(ongelijk.body.code, 'geen-identiteit');
+  assert.match(ongelijk.body.error, /INZENDING/);
+
+  // een zaakmens OP NAAM zendt opnieuw in; die is wel te vergelijken
+  const mens = await zaakMensOpNaam(base, sup, 'KIKUNOI');
+  const opnieuw = await api('/api/appstore/uitgever/inzenden', { manifest: manifest('1.0.1'), bestanden: bundel(11) }, mens);
+  assert.equal(opnieuw.status, 200, JSON.stringify(opnieuw.body.bevindingen || opnieuw.body.error));
+  await api('/api/appstore/kantoor/toegankelijk', { versieId: opnieuw.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
+  const r = await api('/api/appstore/kantoor/besluit',
+    { versieId: opnieuw.body.versie.id, besluit: 'gepubliceerd', door: 'Ada van RTG' }, opNaam);
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.equal(r.body.versie.status, 'gepubliceerd');
   assert.equal(r.body.versie.besluit.scheiding.graad, 'bewezen',
@@ -235,4 +259,20 @@ test('6. de sleutel beslist en staat in het spoor, alleen voor het kantoor', asy
   const eigen = (await api('/api/appstore/uitgever', {}, sup)).body.apps.find(a => a.sleutel === 'vierogen-proef');
   assert.ok(eigen && eigen.live && eigen.live.besluit, 'het besluit staat op de versie');
   assert.equal(eigen.live.besluit.doorKey, undefined, 'de sleutel staat niet in publiekV');
+});
+
+test('6b. de bus krijgt de sleutel van de tekenaar nooit (N4)', () => {
+  /* Het journaal geeft elke regel ook als gebeurtenis naar buiten. De sleutel
+     staat intern in de regel voor het kantoor; op de bus hoort hij niet -- niet
+     in de inhoud en niet als actor. Hier luistert de toets de bus zelf af. */
+  const maakJournaal = require('../server/kern/appstore/journaal');
+  const staat = { journaal: [], apps: { x: { sleutel: 'x', org: 'O-X' } } };
+  const gehoord = [];
+  const j = maakJournaal({ S: () => staat, nu: () => '2026-10-12T00:00:00Z', norm: (o) => String(o).toUpperCase(),
+    bus: { publish: (kanaal, bericht) => gehoord.push(bericht) } });
+  j.boek('versie-gepubliceerd', 'x', 'Ada van RTG', { versie: '1.0.0', intern: { doorKey: 'user-42' } });
+  assert.equal(gehoord.length, 1, 'de regel ging de bus op');
+  assert.ok(!JSON.stringify(gehoord).includes('user-42'), 'de sessiesleutel stond op de bus: ' + JSON.stringify(gehoord));
+  assert.equal(staat.journaal[0].intern.doorKey, 'user-42', 'en in de kantoorregel staat hij wel');
+  assert.ok(!JSON.stringify(j.journaalVan('O-X')).includes('user-42'), 'het uitgeversjournaal krijgt hem niet');
 });

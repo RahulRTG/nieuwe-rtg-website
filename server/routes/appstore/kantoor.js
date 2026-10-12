@@ -120,6 +120,6 @@ module.exports = (kern) => {
   app.post('/api/appstore/kantoor/teruggave', kluisAuth, async (req, res) => {
     if (!geld()) return geenGeld(res);
     antwoord(res, await geld().rechtDoe({ id: req.body.id, besluit: String(req.body.besluit || ''),
-      reden: req.body.reden, door: req.officeKey, idem: req.body.idem }));
+      reden: req.body.reden, door: 'een medewerker van RTG', doorKey: req.kantoorKey || req.officeKey, idem: req.body.idem }));
   });
 };

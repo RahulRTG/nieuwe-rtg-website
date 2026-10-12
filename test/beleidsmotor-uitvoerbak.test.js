@@ -131,7 +131,26 @@ test('6. wat binnen blijft, is niet terug te rekenen (B4)', () => {
     }
   }
   if (Object.values(u.perKlasse).some(t => t.zouZakken === null)) assert.equal(u.zouZakken, null, 'het totaal bovenaan verraadt een klasse');
-  assert.equal(u.werklijst[0].opNaam, null, 'de 2 is weg');
-  assert.equal(u.werklijst[0].zouZakken, null, 'en daarmee de som');
+  const a = u.werklijst.find(r => r.route === 'POST /a');
+  assert.equal(a.opNaam, null, 'de 2 is weg');
+  assert.equal(a.zouZakken, null, 'en daarmee de som');
   assert.equal(u.perKlasse.k2.gedeeld, 20, 'een klasse zonder verborgen cel houdt haar totalen');
+});
+
+test('7. de volgorde verraadt geen verborgen waarde, en passkey-routes buiten de lijst ook niet (N3)', () => {
+  const stand = require('../server/kern/beleidsmotor/stand');
+  const r = (route, t) => Object.assign({ route, klasse: 'k', passkey: 0, opNaam: 0, eigenaarToken: 0, gedeeld: 0 }, t,
+    { zouZakken: (t.opNaam || 0) + (t.eigenaarToken || 0) + (t.gedeeld || 0) });
+  // gesorteerd op zouZakken, zoals uitvoeren.lees hem geeft: 21, 20 (met een 2 erin), 20
+  const werklijst = [r('POST /z', { gedeeld: 21 }), r('POST /m', { opNaam: 2, gedeeld: 18 }), r('POST /a', { gedeeld: 20 })];
+  const u = stand.kleineAantallen({ werklijst, perKlasse: { k: { passkey: 3, opNaam: 2, eigenaarToken: 0, gedeeld: 59, zouZakken: 61, waarnemingen: 64 } } });
+  const plek = u.werklijst.findIndex(x => x.klein);
+  assert.equal(plek, u.werklijst.length - 1, 'een rij met een verborgen cel staat tussen haar buren: ' + JSON.stringify(u.werklijst.map(x => x.route)));
+  assert.deepEqual(u.werklijst.slice(0, 2).map(x => x.route), ['POST /z', 'POST /a'], 'de open rijen houden hun volgorde');
+
+  // drie passkeys op routes die niet in de lijst staan: het verschil met het totaal is klein
+  const v = stand.kleineAantallen({ werklijst: [r('POST /b', { gedeeld: 30 })],
+    perKlasse: { k: { passkey: 3, opNaam: 0, eigenaarToken: 0, gedeeld: 30, zouZakken: 30, waarnemingen: 33 } } });
+  assert.equal(v.perKlasse.k.passkey, null, 'het klassetotaal verraadde een kleine som buiten de lijst');
+  assert.equal(v.perKlasse.k.waarnemingen, null);
 });

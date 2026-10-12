@@ -582,6 +582,28 @@ async function kantoorAlsPersoon(base, code, opties) {
   return null;
 }
 
+/* EEN ZAAKMEDEWERKER OP NAAM (11 oktober 2026). De demomanager van een zaak
+   logt in met een PIN en draagt GEEN ledensleutel; een App Store-inzending van
+   hem heeft dan alleen een personeelsnummer, en dat is niet te vergelijken met
+   een kantoormens op naam (`user-N`) -- kern/appstore/vierogen.js weigert dan
+   terecht met `geen-identiteit`. Dit hulpje maakt een vers account, laat de
+   manager hem als MANAGER toevoegen, koppelt de personeelsplek aan het account
+   en geeft de werksessie terug: dezelfde zaak, met een mens erachter. */
+async function zaakMensOpNaam(base, managerToken, code) {
+  const post = postJson(base);
+  const u = (Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
+  const reg = await post('/api/auth/register', { name: 'Zaakmens ' + u, email: 'zaakmens-' + u + '@voorbeeld.test',
+    phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)),
+    password: 'Geheim123!', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  if (!reg || !reg.token) throw new Error('zaakmens: registreren mislukt');
+  const nieuw = await post('/api/supplier/staff/add', { name: 'Zaakmens ' + u, role: 'manager', func: 'Uitgeverij' }, managerToken);
+  if (!nieuw || !nieuw.staff) throw new Error('zaakmens: toevoegen mislukt: ' + JSON.stringify(nieuw).slice(0, 160));
+  await post('/api/account/koppel', { soort: 'personeel', code, staffId: nieuw.staff.id, pin: nieuw.pin }, reg.token);
+  const start = await post('/api/account/start', { rol: 'personeel', code, staffId: nieuw.staff.id }, reg.token);
+  if (!start || !start.token) throw new Error('zaakmens: werksessie mislukt: ' + JSON.stringify(start).slice(0, 160));
+  return start.token;
+}
+
 /* DE KANTOORROL KOPPELEN, ZOALS HET IN PRODUCTIE GAAT: de eigenaar maakt een
    uitnodiging voor de codenaam van dit lid, en het lid verzilvert hem. Geeft het
    LICHAAM voor /api/account/koppel terug, zodat een toets alleen dat hoeft te
@@ -1660,7 +1682,7 @@ async function bankDeur(page, naam, opties) {
 }
 
 module.exports = { edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
-  installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
+  installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, zaakMensOpNaam, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,
   wachtOpNetstilte, wachtOpVloeiend, wachtOpBestand, klikEnWacht, tekstVan, postJson,

@@ -44,7 +44,21 @@ function kleineAantallen(u) {
     for (const v of uitvoeren.SOORTEN.concat(['zouZakken', 'waarnemingen'])) t[v] = null;
     pk[k] = t; totaalWeg = true;
   }
+  /* Routes met alleen een passkey staan niet in de werklijst maar wel in het
+     klassetotaal: het verschil is hun som. Is die klein, dan gaat het totaal weg. */
+  for (const k of Object.keys(pk)) {
+    if (pk[k].passkey === null) continue;
+    const gezien = u.werklijst.filter(r => r.klasse === k).reduce((n, r) => n + (r.passkey || 0), 0);
+    const rest = (pk[k].passkey || 0) - gezien;
+    if (rest > 0 && rest < KLEIN) { pk[k] = Object.assign({}, pk[k], { passkey: null, waarnemingen: null, klein: TE_KLEINE_GROEP }); totaalWeg = true; }
+  }
   if (totaalWeg) { u.zouZakken = null; u.waarnemingen = null; }
+  /* DE VOLGORDE VERRAADT NIETS (N3). De werklijst staat op zouZakken; een rij
+     met een verborgen cel op haar plaats laten, zet haar waarde tussen die van
+     haar buren. Die rijen gaan daarom achteraan, op route. */
+  const open = u.werklijst.filter(r => !r.klein);
+  const dicht = u.werklijst.filter(r => r.klein).sort((x, y) => (x.route < y.route ? -1 : x.route > y.route ? 1 : 0));
+  u.werklijst = open.concat(dicht);
   u.kleineAantallen = { grens: KLEIN, stand: TE_KLEINE_GROEP,
     uitleg: 'In de werklijst staat een aantal onder de ' + KLEIN + ' niet als getal: per route kan dat over een mens gaan. ' +
       'Ook wat er uit de rest terug te rekenen is (een som, een klassetotaal) blijft binnen.' };

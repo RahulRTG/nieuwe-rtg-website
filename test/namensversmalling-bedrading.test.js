@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 const V = require('../server/kern/namens/versmalling');
 const { maakMandaat } = require('../server/kern/fiscaal/gateway/mandaat');
 
@@ -73,6 +73,8 @@ test.before(async () => {
   const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const chef = (roster.staff || []).find(x => x.role === 'manager');
   sup = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+  // een zaakmens OP NAAM zendt in: zonder ledensleutel is vier-ogen niet vast te stellen (vierogen.js)
+  sup = await zaakMensOpNaam(base, sup, 'KIKUNOI');
 
   await api('/api/techniek/tenant', { org: 'O-VIER', naam: 'Vier Uitgeverij' }, tech);
   /* De zaak moet ONDER de organisatie hangen, anders weigert de aanvraag met

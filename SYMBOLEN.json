@@ -3,8 +3,8 @@
  "uitleg": "De symboolas van de Codewereld: welke benoemde functie, klasse of methode op welke regel woont, wat een bestand uitvoert, en de require-graaf heen en terug. Deterministisch gelezen met scripts/ast/ -- geen model.",
  "stempel": {
   "op": "2026-10-12",
-  "commit": "42259c4af",
-  "seconden": 10.9,
+  "commit": "365b7800c",
+  "seconden": 10.3,
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -7236,7 +7236,7 @@
   "nietGelezen": 315,
   "waarvanBundeldeel": 315,
   "waarvanParsefout": 0,
-  "symbolen": 27488,
+  "symbolen": 27489,
   "bestandenMetUitvoer": 4536,
   "uitvoerMetNamen": 2063,
   "uitvoerOnvolledig": 7,
@@ -202381,63 +202381,69 @@
    "bestand": "server/routes/supplier/werving/uitnodiging-uitgifte.js",
    "symbolen": [
     {
+     "naam": "hele",
+     "soort": "pijl",
+     "lijn": 10,
+     "geexporteerd": "onbekend"
+    },
+    {
      "naam": "maakPrefix",
      "soort": "pijl",
-     "lijn": 8,
+     "lijn": 12,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "findSupplierByName",
      "soort": "pijl",
-     "lijn": 13,
+     "lijn": 17,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "spec",
      "soort": "pijl",
-     "lijn": 19,
+     "lijn": 23,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "nieuweCode",
      "soort": "functie",
-     "lijn": 22,
+     "lijn": 26,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "maakInvite",
      "soort": "functie",
-     "lijn": 34,
+     "lijn": 38,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "lijstInvites",
      "soort": "pijl",
-     "lijn": 73,
+     "lijn": 77,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "trekInviteIn",
      "soort": "pijl",
-     "lijn": 76,
+     "lijn": 80,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "plekVan",
      "soort": "pijl",
-     "lijn": 86,
+     "lijn": 90,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "trekInVoorStaff",
      "soort": "pijl",
-     "lijn": 93,
+     "lijn": 97,
      "geexporteerd": "onbekend"
     },
     {
      "naam": "roteerInvite",
      "soort": "pijl",
-     "lijn": 105,
+     "lijn": 109,
      "geexporteerd": "onbekend"
     }
    ],

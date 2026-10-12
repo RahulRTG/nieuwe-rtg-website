@@ -3,23 +3,23 @@
  "uitleg": "Per handeling: hoeveel van de eigen machinerie raakt hij? Zestien motoren die ieder apart gemeten zijn, hier voor het eerst naast elkaar op DEZELFDE route.",
  "grens": "Twee assen die verschillende dingen missen, nooit opgeteld: `handler` is lexicaal binnen de tekst van de handler (mist een hulpfunctie en de kern-tas) en `bestand` rekent het routebestand plus zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op \"idempotent\". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. Sinds 6 oktober 2026 een derde meetweg, `tas` (scripts/lib/kerntas.js): de module die een fabriek of toewijzing in de kern-tas legt, telt een as alleen als zij of een directe require de BRON van die as inlaadt (structureel, geen woord), plus de ingespoten collectietransactie als aanroep. Ook `tas` wordt nooit bij de andere twee opgeteld. De assen uit EXECUTION_MAP.json zijn gelezen en niet hier geteld.",
  "stempel": {
-  "op": "2026-10-11T22:07:54.186Z",
-  "commit": "10532935e",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-10-12T16:19:19.331Z",
+  "commit": "34557e24f",
+  "boomVuil": true,
+  "boomAnders": 2,
   "instrument": "scripts/machinedekking.js",
   "node": "v26.10.0"
  },
  "bronnen": {
-  "EXECUTION_MAP.json": "a160e289f51556a7",
-  "KERNHERKOMST.json": "3eaf800e3efab5a1",
-  "MUTATIECONTRACT.json": "c67291b28ecaed07",
+  "EXECUTION_MAP.json": "30248812c97e57a5",
+  "KERNHERKOMST.json": "bd7a5aef48ef262f",
+  "MUTATIECONTRACT.json": "4d454a2da786a430",
   "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
   "kernherkomstStempel": {
-   "op": "2026-10-11",
-   "commit": "2182e9d57"
+   "op": "2026-10-12",
+   "commit": "c852bb6d0"
   },
-  "kernherkomstNamen": 1345,
+  "kernherkomstNamen": 1347,
   "executionmapStempel": null
  },
  "assen": {
@@ -214,19 +214,19 @@
   }
  },
  "gemeten": {
-  "routes": 5509,
-  "muterend": 4115,
-  "leesroutesUitRegister": 1292,
+  "routes": 5529,
+  "muterend": 4130,
+  "leesroutesUitRegister": 1296,
   "assen": 19,
   "perAs": {
    "mensAanDeDeur": {
-    "handler": 322,
-    "bestand": 322,
+    "handler": 324,
+    "bestand": 324,
     "tas": 0
    },
    "assurance": {
     "handler": 4,
-    "bestand": 105,
+    "bestand": 129,
     "tas": 0
    },
    "mandaat": {
@@ -270,8 +270,8 @@
     "tas": 0
    },
    "envelop": {
-    "handler": 13,
-    "bestand": 222,
+    "handler": 14,
+    "bestand": 246,
     "tas": 16
    },
    "idempotentie": {
@@ -300,8 +300,8 @@
     "tas": 0
    },
    "aiVindbaar": {
-    "handler": 176,
-    "bestand": 176,
+    "handler": 178,
+    "bestand": 178,
     "uitKaart": true
    },
    "bewijsstand": {
@@ -325,8 +325,8 @@
     "lezers": [
      "server/kern/kantoor/index.js"
     ],
-    "routesHandler": 322,
-    "routesBestand": 322,
+    "routesHandler": 324,
+    "routesBestand": 324,
     "tokens": null,
     "graad": "gemeten"
    },
@@ -340,7 +340,7 @@
      "server/kern/identiteit/sessielijst.js"
     ],
     "routesHandler": 4,
-    "routesBestand": 105,
+    "routesBestand": 129,
     "tokens": 4,
     "graad": "vermoed"
    },
@@ -467,8 +467,8 @@
      "server/kern/kantoor/geldketen/tekenen.js",
      "server/kern/kantoor/geldketen/weging.js"
     ],
-    "routesHandler": 13,
-    "routesBestand": 222,
+    "routesHandler": 14,
+    "routesBestand": 246,
     "tokens": 4,
     "graad": "vermoed"
    },
@@ -671,10 +671,10 @@
     }
    }
   ],
-  "mutatiesZonderEnigeAs": 2711,
+  "mutatiesZonderEnigeAs": 2714,
   "mutatiesAlleenViaTas": 107,
   "kerntas": {
-   "namenGevolgd": 851,
+   "namenGevolgd": 852,
    "toewijzingOnopgelost": [
     "bevoegd",
     "democratieVergeet",
@@ -686,6 +686,7 @@
     "n",
     "rahulActies",
     "reserveringUitzondering",
+    "salonMagLezen",
     "volwassen"
    ]
   },
@@ -708,15 +709,15 @@
   "assenPerMutatie": [
    {
     "assen": 0,
-    "routes": 3195
+    "routes": 3208
    },
    {
     "assen": 1,
-    "routes": 839
+    "routes": 840
    },
    {
     "assen": 2,
-    "routes": 78
+    "routes": 79
    },
    {
     "assen": 3,
@@ -5967,6 +5968,14 @@
     "mandaat",
     "frictie"
    ],
+   "tas": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/fluister/concept",
+   "bestand": "server/routes/member/persoonlijk-concept.js",
+   "onder": [],
+   "boven": [],
    "tas": []
   },
   {
@@ -14756,6 +14765,8 @@
     "herhaling"
    ],
    "boven": [
+    "assurance",
+    "envelop",
     "herhaling"
    ],
    "tas": []
@@ -14765,7 +14776,10 @@
    "pad": "/api/member/rtmail/bewaring",
    "bestand": "server/routes/rtmail-bestuur.js",
    "onder": [],
-   "boven": [],
+   "boven": [
+    "assurance",
+    "envelop"
+   ],
    "tas": []
   },
   {
@@ -14821,7 +14835,10 @@
    "pad": "/api/member/rtmail/delegatie/weg",
    "bestand": "server/routes/rtmail-bestuur.js",
    "onder": [],
-   "boven": [],
+   "boven": [
+    "assurance",
+    "envelop"
+   ],
    "tas": []
   },
   {
@@ -14829,7 +14846,10 @@
    "pad": "/api/member/rtmail/delegeer",
    "bestand": "server/routes/rtmail-bestuur.js",
    "onder": [],
-   "boven": [],
+   "boven": [
+    "assurance",
+    "envelop"
+   ],
    "tas": []
   },
   {
@@ -14856,6 +14876,8 @@
     "herhaling"
    ],
    "boven": [
+    "assurance",
+    "envelop",
     "herhaling"
    ],
    "tas": []
@@ -14917,7 +14939,10 @@
    "pad": "/api/member/rtmail/opruimen",
    "bestand": "server/routes/rtmail-bestuur.js",
    "onder": [],
-   "boven": [],
+   "boven": [
+    "assurance",
+    "envelop"
+   ],
    "tas": []
   },
   {
@@ -15908,6 +15933,22 @@
    "methode": "POST",
    "pad": "/api/mob/kaart/toon",
    "bestand": "server/routes/mobiliteit/vervoerbewijs.js",
+   "onder": [],
+   "boven": [],
+   "tas": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mob/ontvangst",
+   "bestand": "server/routes/mobiliteit.js",
+   "onder": [],
+   "boven": [],
+   "tas": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mob/ontvangst/probleem",
+   "bestand": "server/routes/mobiliteit.js",
    "onder": [],
    "boven": [],
    "tas": []
@@ -19937,6 +19978,35 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/rtmail/leiding/hold",
+   "bestand": "server/routes/rtmail-bestuur/kantoor.js",
+   "onder": [
+    "mensAanDeDeur"
+   ],
+   "boven": [
+    "mensAanDeDeur",
+    "assurance",
+    "envelop"
+   ],
+   "tas": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rtmail/leiding/toets",
+   "bestand": "server/routes/rtmail-bestuur/kantoor.js",
+   "onder": [
+    "mensAanDeDeur",
+    "envelop"
+   ],
+   "boven": [
+    "mensAanDeDeur",
+    "assurance",
+    "envelop"
+   ],
+   "tas": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/rugdekking/beurs",
    "bestand": "server/routes/office/rugdekking.js",
    "onder": [
@@ -23284,6 +23354,22 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/reis/gezelschap/instem",
+   "bestand": "server/routes/reis-opgave.js",
+   "onder": [],
+   "boven": [],
+   "tas": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/gezelschap/instem/terug",
+   "bestand": "server/routes/reis-opgave.js",
+   "onder": [],
+   "boven": [],
+   "tas": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/reis/gezelschap/nodig-uit",
    "bestand": "server/routes/reis.js",
    "onder": [],
@@ -23291,6 +23377,38 @@
    "tas": [
     "atomair"
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/gezelschap/opgave/wis",
+   "bestand": "server/routes/reis-opgave.js",
+   "onder": [],
+   "boven": [],
+   "tas": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/gezelschap/opgave/zet",
+   "bestand": "server/routes/reis-opgave.js",
+   "onder": [],
+   "boven": [],
+   "tas": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/gezelschap/opties/wis",
+   "bestand": "server/routes/reis-opgave.js",
+   "onder": [],
+   "boven": [],
+   "tas": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/gezelschap/opties/zet",
+   "bestand": "server/routes/reis-opgave.js",
+   "onder": [],
+   "boven": [],
+   "tas": []
   },
   {
    "methode": "POST",
@@ -23321,6 +23439,22 @@
    "tas": [
     "atomair"
    ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/gezelschap/voorstel/leg",
+   "bestand": "server/routes/reis-opgave.js",
+   "onder": [],
+   "boven": [],
+   "tas": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reis/gezelschap/voorstel/trek",
+   "bestand": "server/routes/reis-opgave.js",
+   "onder": [],
+   "boven": [],
+   "tas": []
   },
   {
    "methode": "POST",
@@ -28970,7 +29104,7 @@
   {
    "methode": "POST",
    "pad": "/api/staff/call",
-   "bestand": "server/routes/staff/collega.js",
+   "bestand": "server/routes/staff/bellen.js",
    "onder": [],
    "boven": [],
    "tas": []
@@ -34628,6 +34762,8 @@
     "herhaling"
    ],
    "boven": [
+    "assurance",
+    "envelop",
     "herhaling"
    ],
    "tas": []
@@ -34637,7 +34773,10 @@
    "pad": "/api/supplier/rtmail/bewaring",
    "bestand": "server/routes/rtmail-bestuur.js",
    "onder": [],
-   "boven": [],
+   "boven": [
+    "assurance",
+    "envelop"
+   ],
    "tas": []
   },
   {
@@ -34685,7 +34824,10 @@
    "pad": "/api/supplier/rtmail/delegatie/weg",
    "bestand": "server/routes/rtmail-bestuur.js",
    "onder": [],
-   "boven": [],
+   "boven": [
+    "assurance",
+    "envelop"
+   ],
    "tas": []
   },
   {
@@ -34693,7 +34835,10 @@
    "pad": "/api/supplier/rtmail/delegeer",
    "bestand": "server/routes/rtmail-bestuur.js",
    "onder": [],
-   "boven": [],
+   "boven": [
+    "assurance",
+    "envelop"
+   ],
    "tas": []
   },
   {
@@ -34720,6 +34865,8 @@
     "herhaling"
    ],
    "boven": [
+    "assurance",
+    "envelop",
     "herhaling"
    ],
    "tas": []
@@ -34794,10 +34941,35 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/rtmail/leiding/hold",
+   "bestand": "server/routes/rtmail-bestuur.js",
+   "onder": [],
+   "boven": [
+    "assurance",
+    "envelop"
+   ],
+   "tas": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/rtmail/leiding/verleng",
+   "bestand": "server/routes/rtmail-bestuur.js",
+   "onder": [],
+   "boven": [
+    "assurance",
+    "envelop"
+   ],
+   "tas": []
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/rtmail/opruimen",
    "bestand": "server/routes/rtmail-bestuur.js",
    "onder": [],
-   "boven": [],
+   "boven": [
+    "assurance",
+    "envelop"
+   ],
    "tas": []
   },
   {
@@ -35368,7 +35540,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/talent/match",
-   "bestand": "server/routes/supplier/werving/sollicitaties.js",
+   "bestand": "server/routes/supplier/werving/talentmatch.js",
    "onder": [],
    "boven": [],
    "tas": []

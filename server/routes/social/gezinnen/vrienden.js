@@ -2,7 +2,8 @@
    (met ouderakkoord), dm, snaps en verhalen. Gemount vanuit
    routes/social/gezinnen.js op de gedeelde context. */
 module.exports = (sctx) => {
-  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, gezinsPoort, nietBeschermd, pinClusterRem, dmPost } = sctx;
+  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, gezinsPoort, nietBeschermd, pinClusterRem } = sctx;
+  const dmPost = sctx.dmPost;
   /* Een gedeelde post lost op met de sessie van DEZE lezer (kern/sociaal/dmpost.js):
      een gezinsvriend die hem mag zien, ziet hem; anders nietBeschikbaar. */
   const metPosts = (s, berichten) => (berichten || []).map(m => m.post

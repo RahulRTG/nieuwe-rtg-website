@@ -203,7 +203,7 @@
       "blastRadius": {
         "sourceOwners": 13,
         "kernelModules": 129,
-        "mutationContracts": 1060,
+        "mutationContracts": 1061,
         "routes": 1081,
         "screens": 29,
         "dataSchema": "versioned source targets en duurzame events waar zij ontbreken",
@@ -795,7 +795,7 @@
       "blastRadius": {
         "sourceOwners": 86,
         "kernelModules": 2576,
-        "mutationContracts": 2072,
+        "mutationContracts": 2073,
         "routes": 2094,
         "screens": 98,
         "dataSchema": "geen learning-opslag vóór menselijke/juridische beslissing",

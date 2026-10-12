@@ -13,7 +13,7 @@
   "measured": {
     "capabilities": 228,
     "routes": 5449,
-    "mutationContracts": 5322,
+    "mutationContracts": 5324,
     "screens": 327
   },
   "classifications": [
@@ -4138,6 +4138,7 @@
       "server/routes/rtfos/uitvoering.js",
       "server/routes/rtfos/voordeur.js",
       "server/routes/rtgone.js",
+      "server/routes/rtmail-bestuur.js",
       "server/routes/rtmail-vak.js",
       "server/routes/rtmail.js",
       "server/routes/service-kantoor.js",
@@ -15226,8 +15227,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 1023,
-        "mutationRoutes": 1022,
-        "declaredMutationSemantics": 315,
+        "mutationRoutes": 1023,
+        "declaredMutationSemantics": 316,
         "sourceFileCount": 199,
         "kernelDependencyCount": 2566,
         "screenCount": 39,
@@ -16219,8 +16220,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 674,
-        "mutationRoutes": 654,
-        "declaredMutationSemantics": 379,
+        "mutationRoutes": 655,
+        "declaredMutationSemantics": 380,
         "sourceFileCount": 108,
         "kernelDependencyCount": 121,
         "screenCount": 21,

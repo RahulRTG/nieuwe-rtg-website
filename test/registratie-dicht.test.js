@@ -27,8 +27,14 @@
    Mutaties, met de hand nagetrokken: de regel `registratie.eisOpen()` uit
    createUser gehaald -> toets 1 zakt; de vroege controle in de route weggehaald
    -> toets 2 houdt (de accountlaag vangt hem) maar de reden blijft `besluit`;
-   `z.tot = null` uit de spring-tak van knoppen.js -> toets 4 zakt. De
-   meetbare staan in MUTATIES.json (fail-open lezen, een reden laten vallen).
+   `z.tot = null` uit de spring-tak van knoppen.js -> toets 4 zakt. En voor
+   deze ronde: de vlag weer alleen op een letterlijke `1` lezen -> 5 en 6b
+   zakken; de reden `zekering` laten vallen -> 2 en 6b zakken; het
+   eigenaarsscript weer via de gevel laten schrijven -> 7 en 7b zakken; de
+   SSO-tak voor REGISTRATIE_DICHT weghalen -> 8 zakt. Wat NIET zakt: de uitleg
+   van FUSE-REG weer uit de opgeslagen rij nemen in plaats van de standaard --
+   een verse datamap heeft geen oude tekst om te tonen. De liegpoort-meting
+   staat in MUTATIES.json.
 
    Draai: node --test test/registratie-dicht.test.js */
 'use strict';

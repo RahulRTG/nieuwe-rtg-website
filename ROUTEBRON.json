@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-12T05:57:55.318Z",
-  "commit": "7f32bdae8",
+  "op": "2026-10-12T06:56:58.237Z",
+  "commit": "75be0cf6a",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -2563,6 +2563,7 @@
     "server/kern/sleutelwoorden-uitdaging.js",
     "server/kern/sleutelwoorden.js",
     "server/kern/sociaal.js",
+    "server/kern/sociaal/dmpost.js",
     "server/kern/sociaal/pin-beveiliging.js",
     "server/kern/sociaal/pin-clusterrem.js",
     "server/kern/sociaal/pin-deur-rem.js",
@@ -3433,8 +3434,11 @@
     "server/media.js",
     "server/media/bestand.js",
     "server/media/disk.js",
+    "server/media/montage.js",
+    "server/media/openbare-plekken.js",
     "server/media/proef.js",
     "server/media/s3.js",
+    "server/media/toegang.js",
     "server/meetpoort.js",
     "server/meting-capaciteit.js",
     "server/meting-lus.js",
@@ -5674,9 +5678,9 @@
  },
  "grens": "Een verschil is pas een TEGENSPRAAK als beide betrokken bestanden stilstaan sinds het stempel van het andere register. Verschilt de leeftijd, dan vergelijk je twee momenten -- dat wordt hier apart geteld en nooit als tegenspraak gepresenteerd.",
  "gemeten": {
-  "routerRoutes": 5509,
+  "routerRoutes": 5510,
   "routerRoutesZonderBestand": 4,
-  "routerRoutesMetBestand": 5505,
+  "routerRoutesMetBestand": 5506,
   "bronRoutesMetBestand": 4441,
   "beideKennen": 4121,
   "gelijk": 4081,
@@ -5684,9 +5688,9 @@
   "waarvanVerouderd": 40,
   "waarvanTegenspraak": 0,
   "waarvanNietVastTeStellen": 0,
-  "alleenRouter": 1384,
+  "alleenRouter": 1385,
   "alleenBron": 320,
-  "toetsbaarPct": 74.9
+  "toetsbaarPct": 74.8
  },
  "verschillen": [
   {
@@ -6352,6 +6356,7 @@
   "GET /apps/bureau.html",
   "GET /apps/index.html",
   "GET /media/:naam",
+  "GET /media/t/:token",
   "GET /scriptblok.js",
   "GET /scriptbundel.js",
   "GET /stijlblok.css",
@@ -14997,7 +15002,7 @@
   {
    "route": "POST /api/comment",
    "bestand": "server/routes/member/salon.js",
-   "regel": 38,
+   "regel": 40,
    "samengesteld": false
   },
   {
@@ -15735,7 +15740,7 @@
   {
    "route": "POST /api/dm",
    "bestand": "server/routes/member/salon.js",
-   "regel": 66,
+   "regel": 68,
    "samengesteld": false
   },
   {
@@ -19509,13 +19514,13 @@
   {
    "route": "GET /api/ice",
    "bestand": "server/routes/social.js",
-   "regel": 92,
+   "regel": 98,
    "samengesteld": false
   },
   {
    "route": "POST /api/ice",
    "bestand": "server/routes/social.js",
-   "regel": 93,
+   "regel": 99,
    "samengesteld": false
   },
   {
@@ -21099,7 +21104,7 @@
   {
    "route": "POST /api/like",
    "bestand": "server/routes/member/salon.js",
-   "regel": 17,
+   "regel": 19,
    "samengesteld": false
   },
   {
@@ -22455,7 +22460,7 @@
   {
    "route": "POST /api/member/call",
    "bestand": "server/routes/social/leden.js",
-   "regel": 150,
+   "regel": 152,
    "samengesteld": false
   },
   {
@@ -22575,7 +22580,7 @@
   {
    "route": "POST /api/member/dm/send",
    "bestand": "server/routes/social/leden.js",
-   "regel": 106,
+   "regel": 107,
    "samengesteld": false
   },
   {
@@ -31233,7 +31238,7 @@
   {
    "route": "GET /api/push/key",
    "bestand": "server/routes/social.js",
-   "regel": 81,
+   "regel": 87,
    "samengesteld": false
   },
   {
@@ -31707,7 +31712,7 @@
   {
    "route": "GET /api/rtc/stand",
    "bestand": "server/routes/social.js",
-   "regel": 97,
+   "regel": 103,
    "samengesteld": false
   },
   {
@@ -32577,19 +32582,19 @@
   {
    "route": "POST /api/rtf/onboarding/opslaan",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 16,
+   "regel": 20,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/onboarding/status",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 12,
+   "regel": 16,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/onboarding/teken",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 20,
+   "regel": 24,
    "samengesteld": false
   },
   {
@@ -32733,43 +32738,43 @@
   {
    "route": "POST /api/rtf/social/connect",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 33,
+   "regel": 37,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/connect/intrek",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 83,
+   "regel": 87,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/connections",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 66,
+   "regel": 70,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/dm",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 89,
+   "regel": 93,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/dm/send",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 95,
+   "regel": 99,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/find",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 28,
+   "regel": 32,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/goedkeuren",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 101,
+   "regel": 105,
    "samengesteld": false
   },
   {
@@ -32811,13 +32816,13 @@
   {
    "route": "POST /api/rtf/social/opdracht",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 127,
+   "regel": 131,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/oudervoeg",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 42,
+   "regel": 46,
    "samengesteld": false
   },
   {
@@ -32877,43 +32882,43 @@
   {
    "route": "POST /api/rtf/social/respond",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 60,
+   "regel": 64,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/snap/send",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 108,
+   "regel": 112,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/snap/view",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 115,
+   "regel": 119,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/snaps",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 114,
+   "regel": 118,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/stories",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 128,
+   "regel": 132,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/story/post",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 121,
+   "regel": 125,
    "samengesteld": false
   },
   {
    "route": "POST /api/rtf/social/story/view",
    "bestand": "server/routes/social/gezinnen/vrienden.js",
-   "regel": 129,
+   "regel": 133,
    "samengesteld": false
   },
   {
@@ -34935,19 +34940,19 @@
   {
    "route": "POST /api/salon/poll/stem",
    "bestand": "server/routes/member/salon.js",
-   "regel": 154,
+   "regel": 156,
    "samengesteld": false
   },
   {
    "route": "POST /api/salon/profiel",
    "bestand": "server/routes/member/salon.js",
-   "regel": 117,
+   "regel": 119,
    "samengesteld": false
   },
   {
    "route": "POST /api/salon/promo",
    "bestand": "server/routes/member/salon.js",
-   "regel": 98,
+   "regel": 100,
    "samengesteld": false
   },
   {
@@ -34983,7 +34988,7 @@
   {
    "route": "POST /api/salon/volg",
    "bestand": "server/routes/member/salon.js",
-   "regel": 102,
+   "regel": 104,
    "samengesteld": false
   },
   {
@@ -36837,7 +36842,7 @@
   {
    "route": "POST /api/supplier/charter/foto",
    "bestand": "server/routes/supplier/charter/reis.js",
-   "regel": 16,
+   "regel": 17,
    "samengesteld": false
   },
   {
@@ -36855,13 +36860,13 @@
   {
    "route": "POST /api/supplier/charter/sos-ok",
    "bestand": "server/routes/supplier/charter/reis.js",
-   "regel": 92,
+   "regel": 93,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/charter/status",
    "bestand": "server/routes/supplier/charter/reis.js",
-   "regel": 41,
+   "regel": 42,
    "samengesteld": false
   },
   {
@@ -39507,13 +39512,13 @@
   {
    "route": "POST /api/supplier/menu/foto",
    "bestand": "server/routes/supplier/menukaart.js",
-   "regel": 82,
+   "regel": 87,
    "samengesteld": false
   },
   {
    "route": "POST /api/supplier/menu/get",
    "bestand": "server/routes/supplier/menukaart.js",
-   "regel": 101,
+   "regel": 106,
    "samengesteld": false
   },
   {
@@ -44762,8 +44767,14 @@
   },
   {
    "route": "GET /media/:naam",
-   "bestand": "server/server.js",
-   "regel": 1007,
+   "bestand": "server/media/montage.js",
+   "regel": 15,
+   "samengesteld": false
+  },
+  {
+   "route": "GET /media/t/:token",
+   "bestand": "server/media/montage.js",
+   "regel": 16,
    "samengesteld": false
   },
   {

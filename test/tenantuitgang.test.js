@@ -207,10 +207,15 @@ test('4. de bewaring sluit de toegang -- en de uitgang blijft open', async () =>
     { org: ORG, naar: 'bewaring', reden: 'Klant stopt.' }, tech);
   assert.equal(sprong.status, 409, 'van actief kun je niet rechtstreeks de bewaring in');
 
+  /* `door` in het lijf is GEEN actor (11 oktober 2026): wie tekent komt uit de
+     sessie. Een getypte naam hoort niet in het logboek van de tenant. */
   const op = await api('/api/techniek/tenant/levensloop',
-    { org: ORG, naar: 'opzegging', reden: 'Contract per 1 december opgezegd.' }, tech);
+    { org: ORG, naar: 'opzegging', reden: 'Contract per 1 december opgezegd.', door: 'Iemand Anders' }, tech);
   assert.equal(op.status, 200);
   assert.equal(op.body.levensloop.stand, 'opzegging');
+  const regel = op.body.levensloop.log[0];
+  assert.ok(regel && regel.door, 'de levensloopregel draagt wie tekende');
+  assert.notEqual(regel.door, 'Iemand Anders', 'een getypte naam uit het lijf stond als ondertekenaar in het logboek');
 
   // tijdens de opzegging werkt alles nog gewoon
   const tijdens = await api('/api/bedrijf/start', { werkruimte: ruimte, lidToken });

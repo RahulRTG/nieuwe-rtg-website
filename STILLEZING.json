@@ -6,7 +6,7 @@
   "op": "2026-10-12T11:10:29.359Z",
   "commit": "a90a13b14",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/stillezing.js",
   "node": "v26.10.0"
  },
@@ -534,7 +534,7 @@
    },
    {
     "bestand": "scripts/kantoormacht.js",
-    "regel": 423,
+    "regel": 607,
     "leest": [
      "KANTOORMACHT.json"
     ],

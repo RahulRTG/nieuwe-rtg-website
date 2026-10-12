@@ -27,11 +27,11 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 const { MACHTIGINGEN, DOELEN } = require('../server/kern/appstore/machtigingen');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-appstore-doel-'));
-let srv, base, lid, sup, office, tech;
+let srv, base, lid, sup, office, tekenaar, tech;
 const ORG = 'O-DOEL';
 
 function api(pad, body, token) {
@@ -65,7 +65,7 @@ async function publiceer(over) {
      want deze toetsen gaan over de winkel en niet over de keuring. */
   await api('/api/appstore/kantoor/toegankelijk',
     { versieId: r.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
-  const b = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  const b = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar);
   assert.equal(b.status, 200, JSON.stringify(b.body));
   return r.body.versie;
 }
@@ -76,15 +76,20 @@ test.before(async () => {
   lid = (await api('/api/auth/register', { name: 'Doel Lid', email: 'doel@x.nl', phone: '0612345674',
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
   office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  /* DE TEKENAAR IS EEN MENS OP NAAM: de gedeelde code met een getypte naam
+     tekent geen app meer af (kern/appstore/vierogen.js, 11 oktober 2026). */
+  tekenaar = await kantoorAlsPersoon(base);
   tech = (await api('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
   const roster = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body;
   const chef = (roster.staff || []).find(x => x.role === 'manager');
   sup = (await api('/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+  // een zaakmens OP NAAM zendt in: zonder ledensleutel is vier-ogen niet vast te stellen (vierogen.js)
+  sup = await zaakMensOpNaam(base, sup, 'KIKUNOI');
   assert.ok(lid && office && tech && sup);
   await api('/api/techniek/tenant', { org: ORG, naam: 'Doel Uitgeverij' }, tech);
   await api('/api/techniek/tenant/bind', { org: ORG, soort: 'zaak', code: 'KIKUNOI' }, tech);
   await api('/api/appstore/uitgever/aanvraag', { naam: 'Doel Uitgeverij', contact: 'dev@doel.nl' }, sup);
-  await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+  await api('/api/appstore/kantoor/uitgever', { org: ORG, besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 

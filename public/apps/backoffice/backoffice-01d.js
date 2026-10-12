@@ -102,12 +102,13 @@
     const knop = row.querySelector('[data-nummer]'); if (knop) knop.remove();
   }
 
+  /* GEEN NAAMVELD (11 oktober 2026). De server neemt wie aftekent uit de
+     SESSIE en negeert een getypte naam; een prompt om "uw naam" suggereerde dat
+     die naam telde. Nu een bevestiging, en de aftekening staat op uw inlog. */
   async function teken(sleutel, wat){
-    const door = prompt(T('bo.vak.wie','Wie tekent af dat dit stuk is gezien? (uw naam)'));
-    if (door === null) return;
-    if (!door.trim()) { alert(T('bo.vak.naamnodig','Een aftekening zonder naam is geen aftekening.')); return; }
+    if (!confirm(T('bo.vak.bevestig','U tekent af dat dit stuk is gezien. Dat gebeurt onder uw eigen inlog, niet onder een getypte naam. Doorgaan?'))) return;
     try {
-      const r = await call('/office/vakbewijs/teken', { sleutel, wat, door: door.trim() });
+      const r = await call('/office/vakbewijs/teken', { sleutel, wat });
       /* De grens die de server meestuurt tonen we letterlijk. Wie aftekent moet
          weten wat hij WEL en NIET vastlegt: dat het stuk er is, niet dat het
          klopt. RTG is geen inspectie. */
@@ -119,9 +120,8 @@
   async function intrek(sleutel, wat){
     const reden = prompt(T('bo.vak.waarom','Waarom trekt u dit stuk in? (bijvoorbeeld: doorgehaald in het register)'));
     if (reden === null) return;
-    const door = prompt(T('bo.vak.wie','Wie tekent af dat dit stuk is gezien? (uw naam)'));
-    if (door === null || !door.trim()) return;
-    try { await call('/office/vakbewijs/intrek', { sleutel, wat, door: door.trim(), reden: reden.trim() }); }
+    // wie intrekt komt uit de sessie (zie teken hierboven); geen naamveld
+    try { await call('/office/vakbewijs/intrek', { sleutel, wat, reden: reden.trim() }); }
     catch(e){ alert(e.message); return; }
     loadVakbewijzen();
   }

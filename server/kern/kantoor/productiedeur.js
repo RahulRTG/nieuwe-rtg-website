@@ -84,13 +84,26 @@ function eigenaarDirect(env) {
    Geeft { ok:true, bewijs } (buiten productie: bewijs null), of een weigering
    in de vorm die /api/account/start doorgeeft. `zwaarVan` is een getter: de
    zware poort wordt later in de montage gemaakt dan de sleutelbos. */
-async function startBewijs({ zwaarVan, accounts, key, req, env, actie, omschrijving }) {
+/* `vrijwillig` (besluit 3 van de eigenaar, 11 oktober 2026, stap a): BUITEN
+   productie mag een medewerker op naam zich met zijn passkey aan de deur
+   bewijzen -- dezelfde ceremonie, dezelfde handeling, zonder terugval. Wie dat
+   niet vraagt, merkt niets (de deur blijft zoals hij was). Wie het wel vraagt
+   en het niet haalt, komt NIET alsnog zonder bewijs binnen: hij vroeg om een
+   bewijs, en een stille terugval zou een sessie maken die er alleen op lijkt.
+   Zo kan de schaduwmeting van ENFORCE_EXECUTE (../beleidsmotor/uitvoeren.js)
+   ook buiten productie een bewezen individu onderscheiden van een naam. */
+async function startBewijs({ zwaarVan, accounts, key, req, env, actie, omschrijving, vrijwillig }) {
   const naam = actie || ACTIE;
   const omgeving = env || process.env;
-  if (!isProductie(omgeving)) return { ok: true, bewijs: null };
+  const productie = isProductie(omgeving);
+  /* Vrijwillig is een vraag van de aanroeper zelf: `passkey: true`, of een
+     ceremonie met antwoord in hetzelfde lichaam dat de ceremonie leest. */
+  const b = (req && req.body) || {};
+  const gevraagd = vrijwillig === undefined ? (b.passkey === true || !!(b.ceremonie && b.antwoord)) : !!vrijwillig;
+  if (!productie && !gevraagd) return { ok: true, bewijs: null };
   let zwaar = null;
   try { zwaar = typeof zwaarVan === 'function' ? zwaarVan() : null; } catch (e) { zwaar = null; }
-  if (!zwaar || typeof zwaar.eis !== 'function' || typeof zwaar.opties !== 'function' || !omgeving.APP_URL)
+  if (!zwaar || typeof zwaar.eis !== 'function' || typeof zwaar.opties !== 'function' || (productie && !omgeving.APP_URL))
     return { status: 503, code: 'KANTOOR_PASSKEY_NIET_INGERICHT', watNu: 'melden-bij-rtg',
       error: 'De passkeycontrole voor het kantoor is op deze server niet ingericht. Het kantoor blijft dicht; er is geen terugval op de kantoorcode.' };
   const m = /^user-(\d+)$/.exec(String(key || ''));
@@ -116,4 +129,9 @@ async function startBewijs({ zwaarVan, accounts, key, req, env, actie, omschrijv
   return r;
 }
 
-module.exports = { ACTIE, KOPPEL_ACTIE, CODE_DICHT, WEG, isProductie, codeDicht, bewijsGeldig, sessieMag, eigenaarDirect, startBewijs };
+/* Wie er individueel achter een kantoorsessie staat, en hoe hard: ./identiteit.js
+   (besluit 3a). Hier opnieuw uitgegeven, zodat er een ingang blijft. */
+module.exports = { ACTIE, KOPPEL_ACTIE, CODE_DICHT, WEG, isProductie, codeDicht, bewijsGeldig, sessieMag,
+  eigenaarDirect, startBewijs };
+const { IDENTITEIT, identiteitVan } = require('./identiteit');
+Object.assign(module.exports, { IDENTITEIT, identiteitVan });

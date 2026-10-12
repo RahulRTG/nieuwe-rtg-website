@@ -57,7 +57,7 @@ module.exports = function maakGeld({ S, save, nu, boek, eigen, norm, uitgever, a
     }
     return s.afdracht;
   }
-  function afdrachtZet({ procent, reden, door }) {
+  function afdrachtZet({ procent, reden, door, doorKey }) {
     const p = Number(procent);
     if (!Number.isFinite(p) || p < 0 || p > AFDRACHT_MAX || Math.round(p * 10) !== p * 10) {
       return { status: 400, error: 'De afdracht is 0 tot ' + AFDRACHT_MAX + ' procent, in stappen van een tiende.' };
@@ -67,7 +67,7 @@ module.exports = function maakGeld({ S, save, nu, boek, eigen, norm, uitgever, a
     if (String(reden || '').trim().length < 10) return { status: 400, error: 'Een afdracht draagt een reden van ten minste tien tekens; die leest elke uitgever.' };
     const oud = afdracht().procent;
     S().afdracht = { procent: p, sinds: nu(), door: wie, reden: String(reden).trim().slice(0, 400) };
-    boek('afdracht-gezet', null, wie, { van: oud, naar: p, reden: S().afdracht.reden });
+    boek('afdracht-gezet', null, wie, { van: oud, naar: p, reden: S().afdracht.reden, intern: doorKey ? { doorKey } : null });
     save();
     return { status: 200, ok: true, afdracht: afdracht(), let: 'Dit geldt vanaf nu. Wat al is verkocht, houdt het percentage van die dag: een bon wordt niet herrekend.' };
   }

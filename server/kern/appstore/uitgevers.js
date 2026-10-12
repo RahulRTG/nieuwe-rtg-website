@@ -68,7 +68,7 @@ module.exports = function maakUitgevers({ S, save, nu, boek, eigen, norm }) {
 
   /* De mens van RTG beslist. `door` is wie er tekent en gaat mee het journaal in;
      een besluit zonder naam is een besluit dat niemand heeft genomen. */
-  function uitgeverBesluit({ org, besluit, reden, door }) {
+  function uitgeverBesluit({ org, besluit, reden, door, doorKey }) {
     const u = uitgever(org);
     if (!u) return { status: 404, error: 'Deze uitgever bestaat niet.' };
     if (!STATUS_UITGEVER.includes(besluit) || besluit === 'aangevraagd') return { status: 400, error: 'Een besluit is toegelaten, geweigerd of geschorst.' };
@@ -91,7 +91,7 @@ module.exports = function maakUitgevers({ S, save, nu, boek, eigen, norm }) {
         gevallen++;
       }
     }
-    boek('uitgever-' + besluit, u.org, wie, { reden: u.reden, appsGevallen: gevallen });
+    boek('uitgever-' + besluit, u.org, wie, { reden: u.reden, appsGevallen: gevallen, intern: doorKey ? { doorKey } : null });
     save();
     return { status: 200, ok: true, uitgever: publiekU(u), appsGevallen: gevallen };
   }

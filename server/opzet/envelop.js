@@ -65,7 +65,7 @@ const SOORTEN = Object.freeze([
   'werkplek'    // iemand met een sleutel van een werkplek-bedrijf
 ]);
 
-const IDENTITEITEN = Object.freeze(['bewezen', 'anoniem', 'onbekend']);
+const IDENTITEITEN = Object.freeze(['bewezen', 'opNaam', 'anoniem', 'onbekend']);
 
 const tekst = (v, max) => {
   if (v == null) return null;

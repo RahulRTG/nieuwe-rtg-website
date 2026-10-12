@@ -90,7 +90,7 @@ module.exports = function maakNaad({ S, save, nu, boek, eigen, norm, uitgever, a
      De celroute controleert de integriteit al bij ELKE lezing. Deze ronde is er
      voor de app die niemand opent: zonder hem blijft een aangetaste bundel stil
      staan tot het eerste lid hem toevallig aanraakt. */
-  function hercontrole({ door } = {}) {
+  function hercontrole({ door, doorKey } = {}) {
     const wie = String(door || 'de controleronde').trim().slice(0, 80);
     const uit = { gekeurd: 0, inOrde: 0, uitgezet: [], gemeld: [] };
     for (const a of Object.values(S().apps || {})) {
@@ -102,7 +102,7 @@ module.exports = function maakNaad({ S, save, nu, boek, eigen, norm, uitgever, a
       const kapot = !index ? ['de bundelindex zelf is weg']
         : Object.keys(index).filter(pad => !opslag.lees(a.sleutel, v.hash, pad, false));
       if (kapot.length) {
-        intrekkenMetGevolgen({ sleutel: a.sleutel, door: wie,
+        intrekkenMetGevolgen({ sleutel: a.sleutel, door: wie, doorKey,
           reden: 'de bundel komt niet meer overeen met wat is goedgekeurd (' + kapot.slice(0, 3).join(', ') + ')' });
         uit.uitgezet.push({ sleutel: a.sleutel, bestanden: kapot.slice(0, 5) });
         continue;
@@ -111,7 +111,7 @@ module.exports = function maakNaad({ S, save, nu, boek, eigen, norm, uitgever, a
       if (!u || u.status !== 'toegelaten') { uit.gemeld.push({ sleutel: a.sleutel, org: a.org, uitgever: u ? u.status : 'verdwenen' }); continue; }
       uit.inOrde++;
     }
-    boek('hercontrole', null, wie, { gekeurd: uit.gekeurd, uitgezet: uit.uitgezet.length, gemeld: uit.gemeld.length });
+    boek('hercontrole', null, wie, { gekeurd: uit.gekeurd, uitgezet: uit.uitgezet.length, gemeld: uit.gemeld.length, intern: doorKey ? { doorKey } : null });
     save();
     return Object.assign({ status: 200, ok: true }, uit, {
       let: uit.uitgezet.length

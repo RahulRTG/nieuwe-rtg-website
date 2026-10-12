@@ -50,7 +50,16 @@ const BUFFER_MAX = 500;
    de beleidsmotor (kern/beleidsmotor/) telt met dezelfde schrijfweg andere
    tellers, want een tweede spoeler zou de PostgreSQL-les hierboven een tweede
    keer moeten leren. */
-function maakSpoeler({ bak, save, bewerkCollectie, collectie, maxPaden, velden }) {
+/* `plafonden` (11 oktober 2026): sleutels met een eigen VOORVOEGSEL tellen
+   tegen een eigen plafond en lopen over in `<voorvoegsel>overig`; de rest telt
+   alleen tegen `maxPaden` en loopt over in `overig`. Zonder dit deelden de
+   uitvoertellers van de beleidsmotor (~790 sleutels) het plafond met de
+   deurtellers, en slokte `overig` stil deurrijen op -- dan kan de rijpheid van
+   een deur dalen door iets wat niets met die deur te maken heeft. Wat overloopt
+   wordt GETELD (`overgelopen` op de overig-rij): stil opslokken is geen meting. */
+function maakSpoeler({ bak, save, bewerkCollectie, collectie, maxPaden, velden, plafonden }) {
+  const P = Array.isArray(plafonden) ? plafonden.filter(x => x && x.voorvoegsel && x.max > 0) : [];
+  const plafondVan = (pad) => P.find(x => String(pad).startsWith(x.voorvoegsel)) || null;
   const V = Array.isArray(velden) && velden.length ? velden.slice() : ['metMens', 'zonderMens'];
   const leeg = () => { const t = {}; for (const v of V) t[v] = 0; return t; };
   /* De RAM-buffer: sleutel -> { <veld>: aantal }, nog niet weggeschreven. */
@@ -64,8 +73,16 @@ function maakSpoeler({ bak, save, bewerkCollectie, collectie, maxPaden, velden }
   function pasToe(kaart, batch) {
     for (const [pad, tik] of batch) {
       let sleutel = pad;
-      if (!kaart[sleutel] && Object.keys(kaart).length >= maxPaden) sleutel = 'overig';
+      if (!kaart[sleutel]) {
+        const pl = plafondVan(pad);
+        const bezet = Object.keys(kaart).filter(k => (pl ? k.startsWith(pl.voorvoegsel) : !plafondVan(k))).length;
+        if (bezet >= (pl ? pl.max : maxPaden)) sleutel = pl ? pl.voorvoegsel + 'overig' : 'overig';
+      }
       if (!kaart[sleutel]) kaart[sleutel] = Object.assign({ pad: sleutel }, leeg());
+      /* `overgelopen` telt TIKKEN en geen batchregels: een sleutel die in een
+         spoelronde vijf keer tikte, is vijf waarnemingen die geen eigen rij
+         kregen -- en zo staat hij ook in stand.overgelopen. */
+      if (sleutel !== pad) kaart[sleutel].overgelopen = (kaart[sleutel].overgelopen || 0) + V.reduce((n, v) => n + (tik[v] || 0), 0);
       for (const v of V) kaart[sleutel][v] = (kaart[sleutel][v] || 0) + (tik[v] || 0);
     }
   }

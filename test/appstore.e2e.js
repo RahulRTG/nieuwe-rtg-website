@@ -18,7 +18,7 @@ const test = require('node:test');
 const { vereist } = require('./infra');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
-  wachtOpTekst } = require('./helper');
+  wachtOpTekst, kantoorAlsPersoon, zaakMensOpNaam } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -155,9 +155,10 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
     // ---- opzetten: uitgever, app, publicatie, lid ----
     const tech = (await api(base, '/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
     const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+    const tekenaar = await kantoorAlsPersoon(base); // een mens op naam tekent af (vierogen.js)
     const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
     const chef = (roster.staff || []).find(x => x.role === 'manager');
-    const sup = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+    const sup = await zaakMensOpNaam(base, (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token, 'KIKUNOI');
     const lid = (await api(base, '/api/auth/register', { name: 'Cel Lid', email: 'cel@x.nl', phone: '0612345677',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
     assert.ok(tech && office && sup && lid, 'alle vier de sessies staan');
@@ -165,7 +166,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
     await api(base, '/api/techniek/tenant', { org: 'O-CEL', naam: 'Cel Uitgeverij' }, tech);
     await api(base, '/api/techniek/tenant/bind', { org: 'O-CEL', soort: 'zaak', code: 'KIKUNOI' }, tech);
     await api(base, '/api/appstore/uitgever/aanvraag', { naam: 'Cel Uitgeverij', contact: 'dev@cel.nl' }, sup);
-    await api(base, '/api/appstore/kantoor/uitgever', { org: 'O-CEL', besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+    await api(base, '/api/appstore/kantoor/uitgever', { org: 'O-CEL', besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
 
     const inz = await api(base, '/api/appstore/uitgever/inzenden', {
       manifest: { sleutel: 'cel-proef', naam: 'Celproef', versie: '1.0.0', categorie: 'leven',
@@ -176,7 +177,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
     assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
     await api(base, '/api/appstore/kantoor/toegankelijk', { versieId: inz.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
     assert.equal((await api(base, '/api/appstore/kantoor/besluit',
-      { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office)).status, 200);
+      { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar)).status, 200);
 
     /* Het lid verleent er EEN van de twee. Dat is de kern van de toets: de app
        probeert straks allebei, in een echte browser, en krijgt er een. */
@@ -242,15 +243,16 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: vereist('b
   try {
     const tech = (await api(base, '/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
     const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+    const tekenaar = await kantoorAlsPersoon(base); // een mens op naam tekent af (vierogen.js)
     const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
     const chef = (roster.staff || []).find(x => x.role === 'manager');
-    const sup = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+    const sup = await zaakMensOpNaam(base, (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token, 'KIKUNOI');
     const lid = (await api(base, '/api/auth/register', { name: 'Winkel Lid', email: 'winkel@x.nl', phone: '0612345676',
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
     await api(base, '/api/techniek/tenant', { org: 'O-WINKEL', naam: 'Winkel Uitgeverij' }, tech);
     await api(base, '/api/techniek/tenant/bind', { org: 'O-WINKEL', soort: 'zaak', code: 'KIKUNOI' }, tech);
     await api(base, '/api/appstore/uitgever/aanvraag', { naam: 'Winkel Uitgeverij', contact: 'dev@winkel.nl' }, sup);
-    await api(base, '/api/appstore/kantoor/uitgever', { org: 'O-WINKEL', besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+    await api(base, '/api/appstore/kantoor/uitgever', { org: 'O-WINKEL', besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
     const inz = await api(base, '/api/appstore/uitgever/inzenden', {
       manifest: { sleutel: 'winkel-proef', naam: 'Winkelproef', versie: '1.0.0', categorie: 'leven',
         uitleg: 'Een proefapp om de winkelkant van de App Store te tonen.',
@@ -258,7 +260,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: vereist('b
       bestanden: [{ pad: 'index.html', inhoud: PROEF_HTML }, { pad: 'app.js', inhoud: PROEF_JS }] }, sup);
     assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
     await api(base, '/api/appstore/kantoor/toegankelijk', { versieId: inz.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
-    await api(base, '/api/appstore/kantoor/besluit', { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+    await api(base, '/api/appstore/kantoor/besluit', { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, tekenaar);
 
     browser = await pw.chromium.launch(browserOpties(pw));
 
@@ -391,9 +393,10 @@ test('de bon, de koop en de keuringskant in een browser', { skip: vereist('brows
   try {
     const tech = (await api(base, '/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
     const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+    const tekenaar = await kantoorAlsPersoon(base); // een mens op naam laat toe en tekent af (vierogen.js)
     const roster = (await api(base, '/api/supplier/roster', { code: 'KIKUNOI' })).body;
     const chef = (roster.staff || []).find(x => x.role === 'manager');
-    const sup = (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token;
+    const sup = await zaakMensOpNaam(base, (await api(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: chef.id, pin: '1234' })).body.token, 'KIKUNOI');
     /* Een demosessie als koper: een echt account moet voor RTG Pay eenmalig zijn
        paspoort laten zien, en die poort geldt hier ook (test/appstore-geld.test.js
        toets 9). Een demosessie heeft geen account en dus geen paspoortplicht. */
@@ -403,7 +406,7 @@ test('de bon, de koop en de keuringskant in een browser', { skip: vereist('brows
     await api(base, '/api/techniek/tenant', { org: 'O-BON', naam: 'Bon Uitgeverij' }, tech);
     await api(base, '/api/techniek/tenant/bind', { org: 'O-BON', soort: 'zaak', code: 'KIKUNOI' }, tech);
     await api(base, '/api/appstore/uitgever/aanvraag', { naam: 'Bon Uitgeverij', contact: 'dev@bon.nl' }, sup);
-    await api(base, '/api/appstore/kantoor/uitgever', { org: 'O-BON', besluit: 'toegelaten', door: 'Sam van RTG' }, office);
+    await api(base, '/api/appstore/kantoor/uitgever', { org: 'O-BON', besluit: 'toegelaten', door: 'Sam van RTG' }, tekenaar);
     const inz = await api(base, '/api/appstore/uitgever/inzenden', {
       manifest: { sleutel: 'bon-proef', naam: 'Bonproef', versie: '1.0.0', categorie: 'leven',
         uitleg: 'Een betaalde proefapp om de bon en de keuringskant te tonen.', machtigingen: [], prijsCenten: 999 },
@@ -425,11 +428,13 @@ test('de bon, de koop en de keuringskant in een browser', { skip: vereist('brows
        nooit gedraaid. Op dit moment staat er nog niets live -- de app hieronder
        moet nog worden afgetekend -- dus het juiste antwoord is nul, en dat is
        ook een antwoord dat op het scherm hoort te komen. */
+    /* Met de GEDEELDE code draait hij niet: de ronde kan apps uitzetten, en dat
+       is een handeling van een mens op naam (11 oktober 2026). Het scherm zegt
+       waarom; de ronde zelf draait hieronder op de pagina van een kantoormens. */
     await kp.click('#hcDoe');
     await kp.waitForFunction(() => !/Bezig met nalopen/.test(document.getElementById('hcUit').textContent),
       null, { timeout: 15000 });
-    assert.match(await kp.textContent('#hcUit'), /0 nagelopen/, 'er staat nog niets live, en dat zegt hij ook');
-    assert.match(await kp.textContent('#hcUit'), /byte voor byte/, 'met wat de ronde eigenlijk heeft gedaan erbij');
+    assert.match(await kp.textContent('#hcUit'), /op naam/, 'de gedeelde code krijgt de reden te zien');
     assert.match(await kp.textContent('#main'), /Bonproef/, 'de inzending staat in de wachtrij');
     assert.match(await kp.textContent('#main'), /keurt nooit goed/, 'en de pagina zegt zelf dat de machine niets goedkeurt');
     /* DE TOEGANKELIJKHEIDSPOORT, van scherm tot server (besluit 27 augustus
@@ -457,15 +462,38 @@ test('de bon, de koop en de keuringskant in een browser', { skip: vereist('brows
     await wachtOpTekst(kp, /Zet je naam erbij/, { in: '#melding' });
     assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 0, 'zonder naam is er niets gepubliceerd');
 
-    // en met een naam ook niet, zolang de keuring niet is gedraaid
+    /* DE GEDEELDE CODE MET EEN GETYPTE NAAM TEKENT NIET AF (11 oktober 2026).
+       Een naam in het veld is geen tweede handtekening; de server weigert met de
+       reden, en dit scherm hoort die reden te TONEN -- anders drukt wie hier zit
+       op Publiceren en moet hij raden waarom er niets gebeurt. */
     await kp.fill('#wie', 'Sam van RTG');
     await kp.click('[data-v] .pub');
-    /* Op de TEKST van deze weigering wachten en niet op "er staat iets": de
-       melding van de vorige klik ("zet je naam erbij") staat er nog even, en
-       daar zit het woord keuring ook in. */
-    await kp.waitForFunction(() => /nog niet over deze bundel gedraaid/.test(document.getElementById('melding').textContent),
+    await kp.waitForFunction(() => /geen handtekening/.test(document.getElementById('melding').textContent),
       null, { timeout: 15000 });
-    assert.match(await kp.textContent('#melding'), /nog niet over deze bundel gedraaid/,
+    assert.match(await kp.textContent('#melding'), /op naam/, 'de weigering zegt de weg erheen');
+    assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 0,
+      'de gedeelde code met een getypte naam publiceert niets');
+
+    /* ---- de keuring door een kantoormens OP NAAM, in een eigen browserpagina ---- */
+    const mensTok = tekenaar;
+    assert.ok(mensTok, 'een kantoormens op naam logt in');
+    const mp = await browser.newPage();
+    const mf = letOpFouten(mp, []);
+    await mp.addInitScript((t) => { try { localStorage.setItem('rtg_office_token', t); } catch (e) { /* de cel mag niet bij opslag */ } }, mensTok);
+    await mp.goto(base + '/apps/appstore-kantoor.html');
+    await mp.waitForSelector('[data-v] .pub', { timeout: 20000 });
+    await mp.click('#hcDoe');
+    await mp.waitForFunction(() => !/Bezig met nalopen/.test(document.getElementById('hcUit').textContent),
+      null, { timeout: 15000 });
+    assert.match(await mp.textContent('#hcUit'), /0 nagelopen/, 'er staat nog niets live, en dat zegt hij ook');
+    assert.match(await mp.textContent('#hcUit'), /byte voor byte/, 'met wat de ronde eigenlijk heeft gedaan erbij');
+
+    // op naam en met een naam: nog steeds niet, zolang de keuring niet is gedraaid
+    await mp.fill('#wie', 'Sam van RTG');
+    await mp.click('[data-v] .pub');
+    await mp.waitForFunction(() => /nog niet over deze bundel gedraaid/.test(document.getElementById('melding').textContent),
+      null, { timeout: 15000 });
+    assert.match(await mp.textContent('#melding'), /nog niet over deze bundel gedraaid/,
       'de server weigert, en zegt waarom');
     assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 0,
       'een naam alleen publiceert niets: de keuring moet eerst gedraaid zijn');
@@ -476,15 +504,16 @@ test('de bon, de koop en de keuringskant in een browser', { skip: vereist('brows
     const keur = await api(base, '/api/appstore/kantoor/toegankelijk',
       { versieId: inz.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
     assert.equal(keur.status, 200, JSON.stringify(keur.body));
-
-    await kp.reload();
-    await kp.waitForSelector('[data-v] .pub', { timeout: 20000 });
-    assert.match(await kp.textContent('#main'), /Toegankelijkheid: geen fouten gevonden/,
+    await mp.reload();
+    await mp.waitForSelector('[data-v] .pub', { timeout: 20000 });
+    assert.match(await mp.textContent('#main'), /Toegankelijkheid: geen fouten gevonden/,
       'en de uitslag komt op het scherm terecht');
-    assert.match(await kp.textContent('#main'), /geen goedkeuring|blokkade weg/,
+    assert.match(await mp.textContent('#main'), /geen goedkeuring|blokkade weg/,
       'met erbij dat een geslaagde keuring nog steeds niets goedkeurt');
-    await kp.click('[data-v] .pub');
-    await kp.waitForFunction(() => !document.querySelector('[data-v] .pub'), null, { timeout: 15000 });
+    await mp.fill('#wie', 'Sam van RTG');
+    await mp.click('[data-v] .pub');
+    await mp.waitForFunction(() => !document.querySelector('[data-v] .pub'), null, { timeout: 15000 });
+    assert.deepEqual(mf, [], 'de keuringspagina op naam zonder onopgevangen fouten');
     assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 1, 'daarna wel');
 
     /* ---- en dan de winkel: de bon voordat er wordt betaald ---- */

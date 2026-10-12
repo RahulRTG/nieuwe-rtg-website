@@ -82,7 +82,20 @@ test('samen beslissen: het besluit valt pas als beide kanten gestemd hebben', as
   const bid = b.besluit.id;
   // een kant alleen krijgt het besluit niet dicht
   assert.equal((await api('/api/rtfkantoor/stadsraad/besluit-sluit', { besluitId: bid }, office)).status, 409, 'beide kanten stemmen eerst');
-  await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam: 'Kantoor Zuid', voor: true }, office);
+  /* Een getypte naam is geen stemmer, en de gedeelde code stemt niet stil mee
+     als "RTG" (11 oktober 2026): een stem is van een mens op naam. */
+  const gedeeld = await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam: 'Kantoor Zuid', voor: true }, office);
+  assert.equal(gedeeld.status, 403, 'de gedeelde code bracht een RTG-stem uit');
+  assert.equal((await json(gedeeld)).watNu, 'inloggen-op-naam');
+  const { kantoorAlsPersoon } = require('./helper');
+  const opNaam = await kantoorAlsPersoon(BASE);
+  assert.equal((await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam: 'Kantoor Zuid', voor: true }, opNaam)).status, 200);
+  const tweede = await api('/api/rtfkantoor/stadsraad/stem', { besluitId: bid, naam: 'Kantoor Noord', voor: true }, opNaam);
+  assert.equal(tweede.status, 409, 'een tweede getypte naam bracht een tweede RTG-stem uit');
+  const zicht = await json(await api('/api/rtf/partner/raad', { code: raadcode }));
+  const tafel = zicht.besluiten.find(x => x.id === bid);
+  assert.ok(tafel.stemmen.some(x => x.kant === 'rtg' && x.wie === 'RTG-medewerker'), 'de partner ziet een RTG-medewerker');
+  assert.ok(!JSON.stringify(zicht).includes('user-'), 'en nooit de sessiesleutel');
   assert.equal((await api('/api/rtfkantoor/stadsraad/besluit-sluit', { besluitId: bid }, office)).status, 409, 'de partner heeft nog niet gestemd');
   await api('/api/rtf/partner/stem', { code: raadcode, besluitId: bid, voor: true });
   const dubbel = await api('/api/rtf/partner/stem', { code: raadcode, besluitId: bid, voor: true });
@@ -92,4 +105,19 @@ test('samen beslissen: het besluit valt pas als beide kanten gestemd hebben', as
   assert.equal(dicht.besluit.uitslag, 'RTG 1-0, partners 1-0');
   // over een uitslag die niet op tafel ligt, valt niets te besluiten
   assert.equal((await api('/api/rtf/partner/besluit-start', { code: raadcode, projectId: 'nep', voorstel: 'Toch iets beslissen hier.' })).status, 404);
+});
+
+test('de veiligheids- en ethiektoets zet een mens op naam, nooit een getypte naam', async () => {
+  const { kantoorAlsPersoon } = require('./helper');
+  const p = await json(await api('/api/lab/project/maak', { titel: 'Veilig filter', veld: 'water', voorWie: 'samen', doel: 'Een toets op de toets.' }, office));
+  const id = p.project.id;
+  const getypt = await api('/api/lab/project/veiligheid', { id, status: 'akkoord', door: 'Dr. Iemand' }, office);
+  assert.equal(getypt.status, 403, 'de gedeelde code met een getypte naam zette de toets');
+  assert.equal((await json(getypt)).watNu, 'inloggen-op-naam');
+  const opNaam = await kantoorAlsPersoon(BASE);
+  assert.ok(opNaam, 'een kantoormens op naam');
+  const r = await json(await api('/api/lab/project/veiligheid', { id, status: 'akkoord', door: 'Dr. Iemand' }, opNaam));
+  assert.equal(r.ok, true, JSON.stringify(r));
+  assert.ok(r.project.veiligheid.door && r.project.veiligheid.door !== 'Dr. Iemand', 'de getypte naam stond als beslisser op de toets');
+  assert.ok(!/user-\d+/.test(r.project.logboek[0].tekst), 'de logboektekst toont geen sessiesleutel: ' + r.project.logboek[0].tekst);
 });

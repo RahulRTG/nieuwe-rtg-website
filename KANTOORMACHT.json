@@ -21,20 +21,20 @@
     }
   ],
   "stempel": {
-    "op": "2026-10-04T11:58:24.417Z",
-    "commit": "71e2fdbc",
+    "op": "2026-10-12T02:43:11.040Z",
+    "commit": "52507b441",
     "node": "v22.22.0"
   },
   "gemeten": {
-    "routes": 688,
-    "deurEistMens": 245,
+    "routes": 690,
+    "deurEistMens": 247,
     "deurGedeeld": 443,
     "zonderBewakerslaag": 3,
-    "handlerKentMens": 206,
-    "anoniemUitvoerbaar": 348,
+    "handlerKentMens": 223,
+    "anoniemUitvoerbaar": 342,
     "metSpoor": 159,
     "metReden": 336,
-    "bestanden": 110,
+    "bestanden": 111,
     "zwaar": 15,
     "zwaarZonderMens": 0,
     "zwaarLezend": 4,
@@ -64,10 +64,10 @@
       "gemeten": 83,
       "geenWerk": 333,
       "geenOpslag": 222,
-      "nietInProef": 50,
-      "totaal": 688
+      "nietInProef": 52,
+      "totaal": 690
     },
-    "dekkingPct": 12.1,
+    "dekkingPct": 12,
     "raakt": [
       {
         "pad": "/api/office/bank/rekening/open",
@@ -147,6 +147,2423 @@
     ],
     "grens": "Deze as ziet alleen wat de idempotentieproef WERKELIJK heeft uitgevoerd. Zij wordt nooit opgeteld bij de padas: twee ondergrenzen die verschillende dingen missen, geven samen geen bovengrens. `blindVoor` noemt de zware routes waarover zij zwijgt."
   },
+  "uitvoeren": {
+    "regel": "ENFORCE_EXECUTE",
+    "uitleg": "Een uitvoerende kantoorhandeling vraagt een bewezen individu (op naam, met een passkey aan de deur). Statisch: welke uitvoerende routes laat de router door voor een sessie zonder bewezen individu. De runtime-telling staat in POST /api/office/beleidsmotor (stand.uitvoeren).",
+    "grens": "Uitvoerend = geen GET en geen NOT_APPLICABLE in server/lib/mutatiecontracten.js; een route zonder contract telt als uitvoerend (ongeclassificeerd). BUITEN productie zou bij afdwingen ELKE uitvoerende route zakken voor een sessie zonder passkey; IN productie draagt elke kantoorsessie al een passkeybewijs (B10, kern/kantoor/productiedeur.js) en is de gedeelde code al dicht.",
+    "routes": 441,
+    "deurGedeeld": 270,
+    "deurEistMens": 171,
+    "perKlasse": {
+      "ongeclassificeerd": {
+        "routes": 298,
+        "deurGedeeld": 203,
+        "deurEistMens": 95
+      },
+      "INTENTIONALLY_NON_IDEMPOTENT": {
+        "routes": 42,
+        "deurGedeeld": 21,
+        "deurEistMens": 21
+      },
+      "PROTECTED": {
+        "routes": 97,
+        "deurGedeeld": 43,
+        "deurEistMens": 54
+      },
+      "BLOCKED_BY_TEST_FIXTURE": {
+        "routes": 4,
+        "deurGedeeld": 3,
+        "deurEistMens": 1
+      }
+    },
+    "actorUitVerzoek": 21,
+    "actorUitVerzoekBijGedeeldeDeur": 8,
+    "actorOnbepaald": 132,
+    "actorLezing": "ondergrens: een treffer is vermoed, nul treffers is NIET schoon zolang er onbepaalde routes zijn (handler geeft het hele lijf door aan de kern)",
+    "graden": {
+      "routes": "gemeten",
+      "deurGedeeld": "gemeten",
+      "deurEistMens": "gemeten",
+      "actorUitVerzoek": "vermoed",
+      "actorOnbepaald": "onbepaald"
+    },
+    "actorOnbepaaldLijst": [
+      {
+        "route": "POST /api/office/afdelingshotel/boek",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/afdelingshotel/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/architect/maak",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/architect/project",
+        "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/architect/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/atelier/collectie",
+        "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/atelier/maak",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/atelier/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/atelierweb/foto",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/atelierweb/foto-weg",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/atelierweb/haal",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/atelierweb/verwijder",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bank/handtekening/bevestig",
+        "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bank/handtekening/intrek",
+        "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bank/handtekening/opties",
+        "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bank/incasso/opties",
+        "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bank/instellingen",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bank/salaris/run",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/beleidsmotor/huis/zet",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bewaarverzoek",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bureau/lus/aanbod",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bureau/lus/bevestig",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bureau/lus/kapot",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bureau/lus/kies",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bureau/lus/neem",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bureau/lus/onderdeel",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bureau/lus/verstuur",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bureau/lus/vertraging",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bureau/lus/weigering",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/bureau/voortgang",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/cadeaubon/stand",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/democratie/kwestie/behandel",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/democratie/kwestie/eindstand",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/democratie/kwestie/heropen",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/democratie/partij/registreer",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/democratie/partij/sleutel",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/democratie/partij/uitschrijf",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/foundation/registratie/controle",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/gateway/controleer",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/geld/ai-inkoop",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/geld/betaaldienst",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/geld/commissie",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/geld/korting",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/geld/pasprijs",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/hardware/maak",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/hardware/serie",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/hardware/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/ideeen/maak",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/ideeen/reactie",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/ideeen/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/instelling/aansluiten",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoor/uitnodiging/intrek",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/aanwezig",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/ai",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/beheer",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/bewaar",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/deel",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/fase",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/maak",
+        "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/open",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/opmerking",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/samen",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/ster",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/terug",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/uitslag",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/versies",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/vul",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kantoorpakket/weg",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kosten/gebruiker",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kosten/herkomst",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kosten/leveranciersfactuur/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kosten/nota/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kosten/periode/heropen",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kosten/periode/sluit",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kosten/periode/verklaar",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/kosten/vrijgeven",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/mall/collectie/weg",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/mall/collectie/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/mob/module/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/mob/overeenkomst",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/ondernemersregie/bijdrage",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/ondernemersregie/provisioning",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/partner/controle",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/partner/status",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/pas/gast/regels/zet",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/pay/factuurcorrectie",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/payroll/aangifte",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/payroll/aangifte/aansluiting",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/payroll/herbouw",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/payroll/journaal",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/payroll/personeel",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/payroll/run/definitief",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/payroll/run/een",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/payroll/run/open",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/payroll/verklaar",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/prijsgarantie/afwijzen",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/prijsgarantie/rechtzetten",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/redactie/artikel/maak",
+        "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/redactie/artikel/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/redactie/editie/maak",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/regering/besluit",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/reisaanbod/weg",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/reisaanbod/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/reisbureau/afwijzen",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/reisbureau/afzeggen",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/reisbureau/bevestig",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/reisbureau/klaarzetten",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/reisbureau/lees",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/reisbureau/teruggave/opties",
+        "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/reisbureau/thuis",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/reisbureau/uitnodiging-roteer",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/reisbureau/uitnodiging-weg",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/reisbureau/wijziging",
+        "klasse": "PROTECTED",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/rendezvous/circle/create",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/rendezvous/circle/gathering",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/rendezvous/concierge/step",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/rendezvous/tafel/maak",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/rendezvous/tafel/nodig",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/rtfwallet/maak",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/rtghuis/maak",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/rugdekking/beurs",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/rugdekking/stel",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/salon/uitlicht",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/salon/uitlicht/intrek",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/sociaal",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/streefbeeld/teken",
+        "klasse": "PROTECTED",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/studio/collectie",
+        "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/studio/maak",
+        "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/studio/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/uitgifte/start",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/werkplaats/maak",
+        "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      },
+      {
+        "route": "POST /api/office/werkplaats/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "waarom": "lijf-naar-kern"
+      }
+    ],
+    "actorLijst": [
+      {
+        "route": "POST /api/office/boardroom/alles",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/boardroom/fase",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/boardroom/genre",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/boardroom/schakel",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/boardroom/schakel-fijn",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/dienst/in",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/doos/netwerk-zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/doos/update-zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/gezondheid/quarantaine",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "b.naam"
+      },
+      {
+        "route": "POST /api/office/gezondheid/vrij",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "b.naam"
+      },
+      {
+        "route": "POST /api/office/handhaving/zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "b.naam"
+      },
+      {
+        "route": "POST /api/office/kachat/stuur",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/kantine/menu-zet",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/papieren/antwoord",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/rampbeeld/schaal",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/sport/kamp/beslis",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/stad/werk/klaar",
+        "klasse": "ongeclassificeerd",
+        "deur": "gedeeld",
+        "treffer": "req.body.naam"
+      },
+      {
+        "route": "POST /api/office/terugval/bevestig",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "b.naam"
+      },
+      {
+        "route": "POST /api/office/voornemen/staak",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "b.naam"
+      },
+      {
+        "route": "POST /api/office/voornemen/teken",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "b.naam"
+      },
+      {
+        "route": "POST /api/office/wereld/actie",
+        "klasse": "ongeclassificeerd",
+        "deur": "eist-mens",
+        "treffer": "req.body.naam"
+      }
+    ],
+    "buitenKantoorpad": {
+      "uitleg": "Routes BUITEN /api/office en /api/boardroom achter een kantoordeur (officeAuth, kluisAuth, naamAuth, boardroomAuth). Niet in de assen of de ratel hierboven; wel onder ENFORCE_EXECUTE.",
+      "routesAchterKantoordeur": 421,
+      "uitvoerend": 350,
+      "deurGedeeld": 346,
+      "perVoorvoegsel": {
+        "/api/aanmelding": {
+          "uitvoerend": 7,
+          "deurGedeeld": 7
+        },
+        "/api/appstore": {
+          "uitvoerend": 6,
+          "deurGedeeld": 5
+        },
+        "/api/command": {
+          "uitvoerend": 71,
+          "deurGedeeld": 69
+        },
+        "/api/lab": {
+          "uitvoerend": 6,
+          "deurGedeeld": 6
+        },
+        "/api/lab2": {
+          "uitvoerend": 74,
+          "deurGedeeld": 74
+        },
+        "/api/rtfkantoor": {
+          "uitvoerend": 17,
+          "deurGedeeld": 17
+        },
+        "/api/rtfos": {
+          "uitvoerend": 154,
+          "deurGedeeld": 153
+        },
+        "/api/rtgone": {
+          "uitvoerend": 15,
+          "deurGedeeld": 15
+        }
+      },
+      "actorUitVerzoek": [
+        {
+          "route": "POST /api/rtfkantoor/club/bericht",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "treffer": "req.body.naam"
+        }
+      ],
+      "actorOnbepaald": [
+        {
+          "route": "POST /api/aanmelding/beslis",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/aanmelding/bewijs/stand",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/aanmelding/bewijs/teken",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/aanmelding/een",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/aanmelding/opzeggen",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/aanmelding/termijn-voldaan",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/aanmelding/verleng",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab/project/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab/project/veiligheid",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/app/bevoegd",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/app/kalibratie",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/app/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/app/onderhoud",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/app/reserveer",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/app/reservering-weg",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/app/storing-op",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/app/uitgifte",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/bewijs/conclusie",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/bewijs/dataset",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/bewijs/graad",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/bewijs/koppel",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/bewijs/observatie",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/bewijs/reflectie",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/coach",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/coach/conclusie",
+          "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/coach/methoden",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/ethiek/klacht-af",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/ethiek/klasse",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/ethiek/privacy",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/ethiek/review",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/ethiek/stilleggen",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/ethiek/stopcriterium",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/ethiek/toestemming",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/lab/audit",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/lab/budget",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/lab/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/lab/partner",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/lab/tekenaar",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/lab/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/ledger/lab",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/mens/bij",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/mens/rol",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/mens/weg",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/observatorium",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/opbrengst",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/plan/advies",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/plan/bron",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/plan/bron-natrek",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/plan/hypothese",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/plan/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/protocol/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/publicatie/intrekken",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/publicatie/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/studie/besluit",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/studie/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/studie/stap",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/studie/vraagstuk",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/thema/koppel",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/uit/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/uit/naar-lab",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/uit/status",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/uit/vervolg",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/uitleen/besluit",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/uitleen/herijkt",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/uitleen/lijst",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/uitleen/meegeven",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/uitleen/terug",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/vraag/heroverweeg",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/vraag/niet-starten",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/vraag/verken",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/werk/besluit",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/werk/document",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/werk/log",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/werk/taak",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/lab2/werk/taak-zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfkantoor/club/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfkantoor/club/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfkantoor/stadsraad/partner-maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/activiteit/afmelden",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/activiteit/begeleiders",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/activiteit/incheck",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/activiteit/incheckcode",
+          "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/activiteit/inschrijven",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/activiteit/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/activiteit/open",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/activiteit/status",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/activiteit/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/activiteiten",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/audit",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/beleid/bevestig",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/beleid/herzien",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/beleid/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bericht/besluit",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bericht/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bericht/verzend",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bericht/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/berichten",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bescherming/lees",
+          "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bescherming/meldcode",
+          "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bescherming/open",
+          "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bescherming/overdracht",
+          "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bescherming/sluit",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bescherming/stand",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bescherming/toestemming",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bescherming/toestemming-weg",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bescherming/veiligheid",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/blauwdruk/deel",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/blauwdruk/overnemen",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bron/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/bron/verplaats",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/campagne/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/campagne/ronde",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/campagne/sleutel",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/campagne/status",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/casus/code",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/casus/code/intrekken",
+          "klasse": "BLOCKED_BY_TEST_FIXTURE",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/casus/code/roteren",
+          "klasse": "BLOCKED_BY_TEST_FIXTURE",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/casus/contact",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/casus/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/casus/stap",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/casus/status",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/casus/toestemming-weg",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/casus/toewijzen",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/casussen",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/donateur/code",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/donateur/code/intrekken",
+          "klasse": "BLOCKED_BY_TEST_FIXTURE",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/donateur/code/roteren",
+          "klasse": "BLOCKED_BY_TEST_FIXTURE",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/donateur/periodiek",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/geld",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/gemeente/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/gemeente/opdracht",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/gemeenten",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/gift/plan/vastleggen",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/gift/stand/zet",
+          "klasse": "INTENTIONALLY_NON_IDEMPOTENT",
+          "deur": "eist-mens",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/herkomst/beoordeel",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/inkoop/inschrijven",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/inkoop/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/inkoop/sluit",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/inkoop/status",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/jaarverslag/aanvullen",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/jaarverslag/opstellen",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/jaarverslag/publiceren",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/jaarverslag/vaststellen",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/koppel/agenda",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/koppel/nog-niet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/meldcode/open",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/meldcode/sluit",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/meldcode/stap",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/meldcodes",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/melding/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/melding/sluit",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/melding/stap",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/meldingen",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/ondernemer/aanbod",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/ondernemer/aanbod-status",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/ondernemer/koppel",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/ondernemer/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/ondernemers",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/partner/beoordeel",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/partner/document",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/partner/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/partner/status",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/partner/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/partners",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/project/activiteit",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/project/bewijs",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/project/deelnemers",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/project/indicator",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/project/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/project/rapportage",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/project/status",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/project/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/projecten",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/rapport",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/risico/herbeoordeel",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/risico/meld",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/risico/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/stad",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/stad/kernteam",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/stad/limiet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/stad/maak",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/stad/module",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/stad/status",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/subsidie/bewijs",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/subsidie/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/subsidie/moment",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/subsidie/status",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/subsidie/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/subsidies",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/uitgave/aanvraag",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/uitgave/besluit",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/uitleen",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/uitleen/beeindig",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/uitleen/toestemming",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/uitleen/vraag",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/veld/adres",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/veld/hulpvraag",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/veld/rapport",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vergadering",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vergadering/agenda",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vergadering/besluit",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vergadering/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vergadering/presentie",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vergadering/vaststellen",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/voorraad",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/voorraad/afschrijven",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/voorraad/binnen",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/voorraad/uit",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vrijwilliger/account-los",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vrijwilliger/code",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vrijwilliger/code/intrekken",
+          "klasse": "BLOCKED_BY_TEST_FIXTURE",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vrijwilliger/code/roteren",
+          "klasse": "BLOCKED_BY_TEST_FIXTURE",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vrijwilliger/evaluatie",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vrijwilliger/koppel",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vrijwilliger/maak",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vrijwilliger/uren",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vrijwilliger/uren-bevestig",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vrijwilliger/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/vrijwilligers",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/winkel/artikel/zet",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/winkel/stand",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/zetel",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtfos/zetel/weg",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtgone/automatisering/voorbereid",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtgone/belofte",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtgone/frictie",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtgone/goedkeuring",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtgone/goedkeuring/beslis",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtgone/intentie",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtgone/overdracht",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtgone/project/bewijs",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtgone/project/oplever",
+          "klasse": "PROTECTED",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtgone/project/van-mail",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        },
+        {
+          "route": "POST /api/rtgone/rol/geef",
+          "klasse": "ongeclassificeerd",
+          "deur": "gedeeld",
+          "waarom": "lijf-naar-kern"
+        }
+      ]
+    }
+  },
   "graden": {
     "routes": "gemeten",
     "deurEistMens": "gemeten",
@@ -177,7 +2594,7 @@
     "vierogen": {
       "wat": "tweede handtekening, met de graad van de scheiding",
       "aanKantoorroute": 0,
-      "aanroepersInServer": 5
+      "aanroepersInServer": 6
     },
     "bevoegdheid": {
       "wat": "vier dimensies; delegatie versmalt structureel",
@@ -333,9 +2750,9 @@
     }
   ],
   "deuren": {
-    "officeAuth": 465,
+    "officeAuth": 467,
     "boardroomAuth": 150,
-    "balieAuth": 31,
+    "balieAuth": 33,
     "kluisAuth": 30,
     "naamAuth": 24,
     "techAuth": 16,

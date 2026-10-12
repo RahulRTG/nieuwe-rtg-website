@@ -178,6 +178,92 @@ const MACHINERIE = [
   ['rechten', 'commercie/rechten', 'machtskaart: nominaal naast effectief']
 ];
 
+/* ENFORCE_EXECUTE, STATISCH (besluit 3 van de eigenaar, 11 oktober 2026).
+
+   De runtime-schaduw staat in server/kern/beleidsmotor/uitvoeren.js en telt wat
+   er werkelijk gebeurt. Dit is de statische tegenhanger, en hij beantwoordt een
+   andere vraag: welke UITVOERENDE kantoorroutes laat de router vandaag door voor
+   een sessie zonder bewezen individu? Uitvoerend is dezelfde regel als in de
+   server, en het register is hetzelfde (server/lib/mutatiecontracten.js): geen
+   GET, en geen stand NOT_APPLICABLE. De twee delen die regel door hem allebei
+   uit dat register te lezen -- er komt geen tweede lijst lezende routes.
+
+   Twee assen per route, nooit opgeteld:
+     deur      laat de bewaker de gedeelde code door (geen EIST_MENS)?  GEMETEN
+     actor     leest de handler een naam van de uitvoerder uit het
+               VERZOEK (body.door, body.wie, ...)?                     VERMOED
+   De tweede is de AUTHORITY.md P0b-vorm (de actor van een auditregel komt uit
+   de sessie en nooit uit het verzoek), per ROUTE gesneden tot de volgende
+   `app.`-registratie, en daarom lexicaal: een ondergrens met valse treffers
+   (een `wie` die een ONTVANGER is, geen uitvoerder). */
+const LEZEND = new Set(['GET', 'HEAD', 'OPTIONS']);
+let contracten = null;
+function klasseVan(methode, pad) {
+  if (LEZEND.has(String(methode).toUpperCase())) return null;
+  if (contracten === null) {
+    try { contracten = require('../server/lib/mutatiecontracten').CONTRACTEN || {}; } catch (e) { contracten = {}; }
+  }
+  const c = contracten[String(methode).toUpperCase() + ' ' + pad];
+  if (c && c.stand === 'NOT_APPLICABLE') return null;
+  return c && c.stand ? c.stand : 'ongeclassificeerd';
+}
+const ACTOR_UIT_VERZOEK = /\b(?:req\.body|body|b)\.(door|wie|naam|ondertekenaar|tekenaar|keurder|beoordelaar|actor|goedgekeurdDoor|medewerker)\b/;
+/* `naam` STAAT ERIN SINDS 11 OKTOBER 2026, en dat kwam uit een tegenlezing: de
+   stadsraadstem las `req.body.naam || boardroomWie(req)` en de meter zag het
+   niet, omdat `naam` niet in de lijst stond. Maar `naam` is ook de naam van
+   een DING (een club, een kamer, een product). Die valse treffers staan hier
+   per route met de reden -- weglaten zou de treffer onzichtbaar maken, en een
+   lijst zonder reden is een vrijbrief. */
+const NAAM_GEEN_ACTOR = new Map([
+  ['POST /api/command/agent/hervat', 'naam = de AGENT die hervat; de actor is wie(req)'],
+  ['POST /api/command/agent/rechten', 'naam = de AGENT wiens grenzen worden gezet; de actor is wie(req)'],
+  ['POST /api/command/agent/stop', 'naam = de AGENT die stopt; de actor is wie(req)'],
+  ['POST /api/command/apipoort/sleutel', 'naam = de naam van de SLEUTEL; door komt uit wie(req)'],
+  ['POST /api/command/overname/lees', 'naam = de naam van de ingelezen set; de actor is wie(req)'],
+  ['POST /api/command/stad', 'naam = de STAD waarvan de stand wordt gelezen'],
+  ['POST /api/command/stad/start', 'naam = de STAD die start'],
+  ['POST /api/command/stad/stop', 'naam = de STAD die stopt; de actor is wie(req)'],
+  ['POST /api/command/zandbak/kwaliteit', 'naam = de ZANDBAK'],
+  ['POST /api/command/zandbak/maak', 'naam = de ZANDBAK; door komt uit wie(req)'],
+  ['POST /api/command/zandbak/runbook', 'naam = de ZANDBAK'],
+  ['POST /api/command/zandbak/weg', 'naam = de ZANDBAK; de actor is wie(req)'],
+  ['POST /api/command/zandbak/zoek', 'naam = de ZANDBAK'],
+  ['POST /api/office/architect/portfolio', 'naam = het PORTFOLIO-item'],
+  ['POST /api/office/hardware/productblad', 'naam = het PRODUCT'],
+  ['POST /api/office/leerhuis/open', 'naam = de naam van het geopende ITEM; de eigenaar komt uit de sessie'],
+  ['POST /api/office/payroll/bron', 'naam = de naam van de BRON; de actor is wie(req)'],
+  ['POST /api/office/payroll/component', 'naam = de naam van het looncomponent'],
+  ['POST /api/office/rtgcampagne/maak', 'naam = de CAMPAGNE; wie komt uit boardroomWie(req)'],
+  ['POST /api/office/techniek/integraties/verantwoordelijke', 'naam = de AANGEWEZEN verantwoordelijke (het onderwerp), niet wie aanwijst'],
+  ['POST /api/rtfkantoor/club/programma', 'naam = het PROGRAMMA'],
+]);
+/* DE BLINDE VLEK, nu benoemd: een handler die het HELE lijf aan de kern geeft
+   (`f(id, req.body)`, `{ ...b }`) laat de kern beslissen welk veld de actor is.
+   Dan ziet deze snede niets -- zo stond de lab-veiligheidstoets (`b.door` in
+   kern/onderzoekslab.js) buiten beeld. Zulke routes zijn ONBEPAALD: geen
+   treffer en ook geen schone route. */
+const LIJF_DOOR = /[(,]\s*(?:req\.body|b)(?:\s*\|\|\s*\{\s*\})?\s*[,)]|\.\.\.\s*(?:req\.body|b)\b/;
+function actorVan(blok, route) {
+  /* ALLE treffers en niet de eerste (B6): een uitzondering op `naam` mag een
+     `b.door` verderop in hetzelfde blok niet maskeren. Alleen de treffers op
+     `naam` vallen weg, en alleen voor een route op de lijst. */
+  const alle = [...blok.matchAll(new RegExp(ACTOR_UIT_VERZOEK.source, 'g'))];
+  const a = alle.find(m => !(m[1] === 'naam' && NAAM_GEEN_ACTOR.has(route)));
+  const treffer = a ? a[0] : null;
+  const onbepaald = !treffer && LIJF_DOOR.test(blok) ? 'lijf-naar-kern' : null;
+  return { treffer, onbepaald };
+}
+const { zonderCommentaar } = require('./lib/bron');
+function handlerBlok(bron, r) {
+  if (!bron || !r.regel) return '';
+  /* Commentaar eruit, met behoud van de regelnummers: een commentaar dat de
+     OUDE fout beschrijft (`b.door` stond voorop) is geen treffer. */
+  const regels = zonderCommentaar(bron, { regelsHeel: true }).split('\n').slice(r.regel - 1);
+  const uit = [regels[0]];
+  for (const l of regels.slice(1)) { if (/\bapp\.(get|post|put|patch|delete|use)\(/.test(l)) break; uit.push(l); }
+  return uit.join('\n');
+}
+
 const leescache = new Map();
 function lees(betrekkelijk) {
   if (!betrekkelijk) return '';
@@ -258,6 +344,46 @@ function meet() {
   const lezendRoutes = routes.filter(r => isZwaarLezend(r.pad));
   const lezendOpen = lezendRoutes.filter(r => !heeftMens(r));
 
+  /* ENFORCE_EXECUTE statisch (zie de kop bij klasseVan). */
+  const uitvoerend = [];
+  for (const r of routes) {
+    const klasse = klasseVan(r.methode, r.pad);
+    if (!klasse) continue;
+    const blok = handlerBlok(lees(r.bestand), r);
+    const a = actorVan(blok, r.methode + ' ' + r.pad);
+    uitvoerend.push({ methode: r.methode, pad: r.pad, klasse, deurGedeeld: !heeftMens(r),
+      actorUitVerzoek: a.treffer, actorOnbepaald: a.onbepaald });
+  }
+  const perKlasse = {};
+  for (const u of uitvoerend) {
+    const k = perKlasse[u.klasse] || (perKlasse[u.klasse] = { routes: 0, deurGedeeld: 0, deurEistMens: 0 });
+    k.routes += 1; if (u.deurGedeeld) k.deurGedeeld += 1; else k.deurEistMens += 1;
+  }
+  const actorLijst = uitvoerend.filter(u => u.actorUitVerzoek);
+
+  /* DE KANTOORDEUR BUITEN HET KANTOORPAD. KANTOORPAD telt /api/office en
+     /api/boardroom, maar dezelfde vier kantoordeuren bewaken ook routes onder
+     /api/rtfos, /api/command, /api/lab2, /api/appstore/kantoor en meer. Die
+     tellen NIET mee in de assen en de ratel hierboven (dat zou de ratel stil
+     verschuiven); ze staan hier apart, omdat ENFORCE_EXECUTE ook daar zou
+     gelden -- de runtime-schaduw telt ze wel (hij hangt in de deur zelf). */
+  const KANTOORDEUREN = new Set(['officeAuth', 'kluisAuth', 'naamAuth', 'boardroomAuth']);
+  const buiten = alleRoutes().filter(r => !KANTOORPAD.test(r.pad) && (r.bewakers || []).some(b => KANTOORDEUREN.has(b)));
+  const buitenUit = [];
+  for (const r of buiten) {
+    const klasse = klasseVan(r.methode, r.pad);
+    if (!klasse) continue;
+    const a = actorVan(handlerBlok(lees(r.bestand), r), r.methode + ' ' + r.pad);
+    buitenUit.push({ methode: r.methode, pad: r.pad, klasse, deurGedeeld: !heeftMens(r),
+      actorUitVerzoek: a.treffer, actorOnbepaald: a.onbepaald });
+  }
+  const voorvoegsel = (pad) => pad.split('/').slice(0, 3).join('/');
+  const buitenPer = {};
+  for (const u of buitenUit) {
+    const v = buitenPer[voorvoegsel(u.pad)] || (buitenPer[voorvoegsel(u.pad)] = { uitvoerend: 0, deurGedeeld: 0 });
+    v.uitvoerend += 1; if (u.deurGedeeld) v.deurGedeeld += 1;
+  }
+
   /* DE TWEEDE AS, langs de andere kant: niet hoe een route HEET maar wat zij
      heeft AANGERAAKT. Zie scripts/lib/zwaareffect.js voor waarom die twee nooit
      worden opgeteld, en waarom zijn DEKKING het belangrijkste getal is. */
@@ -326,6 +452,48 @@ function meet() {
        de padas, want dan zou iemand ze optellen. Zie de kop van
        scripts/lib/zwaareffect.js. */
     zwaarEffect: effect,
+    /* BESLUIT 3 (11 oktober 2026): ENFORCE_EXECUTE. Staat NAAST `gemeten`, net
+       als de effectas, want hij deelt geen teller met de ratel hierboven. */
+    uitvoeren: {
+      regel: 'ENFORCE_EXECUTE',
+      uitleg: 'Een uitvoerende kantoorhandeling vraagt een bewezen individu (op naam, met een passkey aan de deur). ' +
+        'Statisch: welke uitvoerende routes laat de router door voor een sessie zonder bewezen individu. De ' +
+        'runtime-telling staat in POST /api/office/beleidsmotor (stand.uitvoeren).',
+      grens: 'Uitvoerend = geen GET en geen NOT_APPLICABLE in server/lib/mutatiecontracten.js; een route zonder ' +
+        'contract telt als uitvoerend (ongeclassificeerd). BUITEN productie zou bij afdwingen ELKE uitvoerende ' +
+        'route zakken voor een sessie zonder passkey; IN productie draagt elke kantoorsessie al een passkeybewijs ' +
+        '(B10, kern/kantoor/productiedeur.js) en is de gedeelde code al dicht.',
+      routes: uitvoerend.length,
+      deurGedeeld: uitvoerend.filter(u => u.deurGedeeld).length,
+      deurEistMens: uitvoerend.filter(u => !u.deurGedeeld).length,
+      perKlasse,
+      actorUitVerzoek: actorLijst.length,
+      actorUitVerzoekBijGedeeldeDeur: actorLijst.filter(u => u.deurGedeeld).length,
+      /* Een nul hier is GEEN schone uitslag: de snede is lexicaal (een
+         ondergrens) en ziet niet wat een kernfunctie uit een doorgegeven lijf
+         haalt. Daarom staan de onbepaalde routes ernaast, en zegt `lezing` dat. */
+      actorOnbepaald: uitvoerend.filter(u => u.actorOnbepaald).length,
+      actorLezing: 'ondergrens: een treffer is vermoed, nul treffers is NIET schoon zolang er onbepaalde routes zijn ' +
+        '(handler geeft het hele lijf door aan de kern)',
+      graden: { routes: 'gemeten', deurGedeeld: 'gemeten', deurEistMens: 'gemeten', actorUitVerzoek: 'vermoed',
+        actorOnbepaald: 'onbepaald' },
+      actorOnbepaaldLijst: uitvoerend.filter(u => u.actorOnbepaald).map(u => ({ route: u.methode + ' ' + u.pad,
+        klasse: u.klasse, deur: u.deurGedeeld ? 'gedeeld' : 'eist-mens', waarom: u.actorOnbepaald })),
+      actorLijst: actorLijst.map(u => ({ route: u.methode + ' ' + u.pad, klasse: u.klasse,
+        deur: u.deurGedeeld ? 'gedeeld' : 'eist-mens', treffer: u.actorUitVerzoek })),
+      buitenKantoorpad: {
+        uitleg: 'Routes BUITEN /api/office en /api/boardroom achter een kantoordeur (officeAuth, kluisAuth, naamAuth, ' +
+          'boardroomAuth). Niet in de assen of de ratel hierboven; wel onder ENFORCE_EXECUTE.',
+        routesAchterKantoordeur: buiten.length,
+        uitvoerend: buitenUit.length,
+        deurGedeeld: buitenUit.filter(u => u.deurGedeeld).length,
+        perVoorvoegsel: buitenPer,
+        actorUitVerzoek: buitenUit.filter(u => u.actorUitVerzoek).map(u => ({ route: u.methode + ' ' + u.pad,
+          klasse: u.klasse, deur: u.deurGedeeld ? 'gedeeld' : 'eist-mens', treffer: u.actorUitVerzoek })),
+        actorOnbepaald: buitenUit.filter(u => u.actorOnbepaald).map(u => ({ route: u.methode + ' ' + u.pad,
+          klasse: u.klasse, deur: u.deurGedeeld ? 'gedeeld' : 'eist-mens', waarom: u.actorOnbepaald }))
+      }
+    },
     graden: {
       routes: 'gemeten',
       deurEistMens: 'gemeten',
@@ -391,6 +559,22 @@ function toon(u) {
       console.log('      BLIND voor ' + e.blindVoor.length + ' van de ' + g.zwaar +
         ' zware routes -- juist de bankknoppen; die vragen een wereld die de proef niet opzet');
   }
+  const x = u.uitvoeren;
+  if (x) {
+    console.log('\n  ENFORCE_EXECUTE (besluit 3) -- uitvoerende kantoorroutes, statisch');
+    console.log('    uitvoerend               ' + x.routes + '   gemeten');
+    console.log('    deur laat gedeelde code  ' + x.deurGedeeld + '   gemeten (zou bij afdwingen zakken voor de code)');
+    console.log('    deur eist een mens       ' + x.deurEistMens + '   gemeten (zakt alleen zonder passkey)');
+    for (const [k, v] of Object.entries(x.perKlasse))
+      console.log('      ' + k.padEnd(30) + String(v.routes).padStart(4) + '   gedeeld ' + v.deurGedeeld);
+    console.log('    actor uit het verzoek    ' + x.actorUitVerzoek + '   vermoed (' +
+      x.actorUitVerzoekBijGedeeldeDeur + ' achter een gedeelde deur); ONBEPAALD ' + x.actorOnbepaald +
+      ' (lijf naar de kern) -- een nul is een ondergrens, geen schone uitslag');
+    const b = x.buitenKantoorpad;
+    console.log('    buiten het kantoorpad    ' + b.uitvoerend + ' uitvoerend achter een kantoordeur, ' +
+      b.deurGedeeld + ' gedeeld; actor uit het verzoek ' + b.actorUitVerzoek.length + '   vermoed, onbepaald ' +
+      b.actorOnbepaald.length);
+  }
   console.log('\n  de machinerie -- bestaat, hangt hij aan de kantoordeur?');
   for (const [naam, m] of Object.entries(u.machinerie)) {
     console.log('    ' + naam.padEnd(13) + 'kantoor: ' + String(m.aanKantoorroute).padStart(3) +
@@ -441,4 +625,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { meet, EIST_MENS, KANTOORPAD };
+module.exports = { meet, EIST_MENS, KANTOORPAD, actorVan, NAAM_GEEN_ACTOR };

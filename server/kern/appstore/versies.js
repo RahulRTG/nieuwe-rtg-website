@@ -100,6 +100,7 @@ module.exports = function maakVersies({ S, save, nu, boek, opslag, eigen, norm, 
     const inz = inzender && typeof inzender === 'object'
       ? { soort: String(inzender.soort || 'onbekend').slice(0, 20),
           id: inzender.id ? String(inzender.id).slice(0, 120) : null,
+          ids: (Array.isArray(inzender.ids) ? inzender.ids : []).filter(Boolean).slice(0, 4).map(x => String(x).slice(0, 120)),
           naam: inzender.naam ? String(inzender.naam).slice(0, 80) : null }
       : null;
     const v = { id: id(), sleutel: m.manifest.sleutel, org: o, manifest: m.manifest, hash,
@@ -136,7 +137,7 @@ module.exports = function maakVersies({ S, save, nu, boek, opslag, eigen, norm, 
       uitleg: v.manifest.uitleg, categorie: v.manifest.categorie, taal: v.manifest.taal,
       prijsCenten: Number(v.manifest.prijsCenten || 0),
       vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen), hash: v.hash, maten: v.maten,
-      bevindingen: v.bevindingen, status: v.status, at: v.at, besluit: v.besluit || null,
+      bevindingen: v.bevindingen, status: v.status, at: v.at, besluit: v.besluit ? Object.assign({}, v.besluit, { doorKey: undefined }) : null,
       /* WIE HET INZOND, voor de mens die aftekent -- met de NAAM en zonder het
          handvat. De sleutel is er om twee handelingen te kunnen vergelijken
          (kern/appstore/vierogen.js) en niet om te tonen; hij hoort in geen enkel

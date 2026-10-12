@@ -128,11 +128,20 @@ module.exports = (kern, gedeeld) => {
      zelf) telt dat dubbel: dan is de handtekening het enige wat er is.
 
      Sinds de kluispoort is er ook iets beters: een kantoorsessie op naam draagt
-     een sleutel. Die wint van de body; het veld blijft bestaan voor de
-     eigenaarssessie, die er zelf geen draagt. */
+     een sleutel. Die wint van de body.
+
+     EN HET VELD IS NU HELEMAAL WEG (besluit 3, 11 oktober 2026, AUTHORITY.md
+     P0b). Het bleef staan "voor de eigenaarssessie, die er zelf geen draagt" --
+     maar die draagt er wel een: officeAuth zet `req.officeKey` op 'user-<id>'
+     als de eigenaar met zijn eigen token binnenkomt. Met het veld erbij schreef
+     de eigenaar onder een aftekening wat hij in het formulier typte, dus een
+     naam uit het VERZOEK in plaats van uit de sessie. Dezelfde regel als
+     ./uitgifte.js (wieOffice): de kluissleutel, of bij de eigenaar zijn eigen
+     sleutel, en verder niets. */
+  const tekenaar = (req) => String(req.kantoorKey || (req.eigenaar ? req.officeKey : '') || '').trim();
   app.post('/api/office/vakbewijs/teken', kluisAuth, (req, res) => {
     const b = req.body || {};
-    const door = String(req.kantoorKey || b.door || (req.session && req.session.naam) || '').trim();
+    const door = tekenaar(req);
     stuur(res, vakbewijsTeken(String(b.sleutel || ''), String(b.wat || ''), door));
   });
 
@@ -141,7 +150,7 @@ module.exports = (kern, gedeeld) => {
      einddatum. */
   app.post('/api/office/vakbewijs/intrek', kluisAuth, (req, res) => {
     const b = req.body || {};
-    const door = String(req.kantoorKey || b.door || (req.session && req.session.naam) || '').trim();
+    const door = tekenaar(req);
     const r = vakbewijsIntrek(String(b.sleutel || ''), String(b.wat || ''), door, b.reden);
     if (!r.error) {
       const m = /^lid:(\d+)$/.exec(String(b.sleutel || ''));

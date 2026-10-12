@@ -32,7 +32,6 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { execFileSync } = require('child_process');
 const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 const WORTEL = path.join(__dirname, '..');
@@ -115,10 +114,13 @@ test('POORT: elke route die de server registreert staat in DEKKING.json als aang
     'het bewijsstuk hoort de volle lijst aangeraakte routes te dragen (' +
     (bewijs.aangeraakt || []).length + ')');
 
-  const kaart = JSON.parse(execFileSync(process.execPath,
-    [path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
-    { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024,
-      stdio: ['ignore', 'pipe', 'ignore'], env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } }));
+  /* De kaart via het gedeelde hulpje (scripts/lib/routes.js) en niet met een
+     eigen execFileSync: dat ene hulpje probeert een bezette poort (EADDRINUSE,
+     vier scherven op een runner) precies een keer opnieuw en geeft bij een
+     andere fout de stderr van het kind mee. Hier stond stderr op 'ignore', en
+     in run 38236464497 zakte deze poort op "Command failed" zonder reden --
+     terwijl dezelfde commit in de handmatige run groen was. */
+  const kaart = require('../scripts/lib/routes').routekaart();
   assert.ok((kaart.routes || []).length > 1000, 'de routekaart geeft routes (' + (kaart.routes || []).length + ')');
 
   const m = rd.meet(kaart.routes, bewijs.aangeraakt);

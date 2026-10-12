@@ -724,7 +724,7 @@
       '<div id="kaDeurVak"></div>'+
       '<div id="kaFout" style="margin-top:0.5rem;font-size:0.76rem;color:var(--burgundy);min-height:1rem;"></div></div>';
     $('#kaTerug').addEventListener('click', stepSector);
-/* aanmelden met de kassacode */
+/* de kantoorinlog: de code (buiten productie), de ene accountdeur en de uitnodiging */
     const go = async () => {
       $('#kaFout').textContent = '';
       try {
@@ -793,7 +793,7 @@
     $('#kaUitnGo').addEventListener('click', ga);
     $('#kaUitn').addEventListener('keydown', e => { if (e.key === 'Enter') ga(); });
   }
-/* de kantoordeur op naam: pin, passkey en wat de deur antwoordt */
+/* de kantoordeur op naam (pin, passkey, het antwoord) en het begin van het kantoorscherm */
   /* Het kantoor openen met het ene RTG-account (/api/account/start), via de
      ene clientweg (shared/kantoordeur.js). De pin komt voor de passkey; de
      passkey start altijd in een tik op de knop. */

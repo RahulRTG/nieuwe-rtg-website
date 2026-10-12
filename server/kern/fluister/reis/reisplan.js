@@ -1,9 +1,19 @@
 /* Rahul-reislaag, deel "reisplan" (kern/fluister/reis): de hele reis in een
    vraag. bouwReisplan zet verblijf + transfer + diner + activiteit klaar als een
-   voorstel met totaalprijs; voerReisUit boekt daarna alles in volgorde op het
+   voorstel met totaalprijs; voerReisUit zet daarna alles in volgorde KLAAR op het
    ene "ja", via exact dezelfde actie-functies als de app-knoppen. Verbatim
    afgesplitst uit reis.js; de gedeelde zaken-/open-/caps-/datumPlus-helpers
-   komen via de context binnen. */
+   komen via de context binnen.
+
+   KLAARZETTEN EN NIET AFREKENEN (besluit van de eigenaar, 12 oktober 2026).
+   Hier stond op hetzelfde "ja" ook betaalRit en betaalBoeking: een ja op een
+   VOORSTEL schreef geld af voor een rit en tickets. Dat zijn drie gebeurtenissen
+   die er als een knop uitzien (EXECUTIE.md: voorbereiden, verplichten en
+   betalen), en GELD.md zegt dat geld het huis nooit vanzelf verlaat. Nu
+   ontstaan de rit en de tickets als `wacht-op-betaling`; het lid rekent ze
+   zelf af in de app. Die staan dertig minuten vast en vervallen daarna -- het
+   antwoord zegt dat, want een vervallen rit waar je op rekende is erger dan een
+   betaalknop. */
 module.exports = (ctx) => {
   const { acties, reserveerTafel, zorgVoor, eur, datumInZin, plusDagen,
     verblijfBoek, zaken, open, caps, datumPlus } = ctx;
@@ -41,7 +51,7 @@ module.exports = (ctx) => {
 
   async function voerReisUit(key, codenaam, w, sess) {
     const regels = [];
-    let gelukt = 0;
+    let gelukt = 0, tebetalen = 0;
     for (const d of w.delen) {
       try {
         if (d.soort === 'verblijf' && verblijfBoek) {
@@ -51,9 +61,8 @@ module.exports = (ctx) => {
         } else if (d.soort === 'rit' && acties && acties.vraagRit) {
           const r = acties.vraagRit(sess, { supplierCode: d.supplierCode, to: d.to, toCode: d.toCode, personen: d.personen, datum: d.datum, tijd: d.tijd });
           if (r.error) { regels.push('✕ ' + d.oms + ': ' + r.error); continue; }
-          const b = await acties.betaalRit(sess, { ref: r.rit.ref });
-          regels.push(b.error ? '✕ ' + d.oms + ': ' + b.error : '✓ ' + d.oms + ' om ' + d.tijd + ' (' + r.rit.ref + ')');
-          if (!b.error) gelukt++;
+          regels.push('✓ ' + d.oms + ' om ' + d.tijd + ' klaargezet (' + r.rit.ref + ', nog te betalen)');
+          gelukt++; tebetalen++;
         } else if (d.soort === 'tafel' && reserveerTafel) {
           const r = reserveerTafel({ key, tier: sess.tier }, codenaam, { supplierCode: d.supplierCode, datum: d.datum, tijd: d.tijd, personen: d.personen });
           regels.push(r.error ? '✕ ' + d.oms + ': ' + r.error : '✓ ' + d.oms + ' op ' + d.datum);
@@ -61,14 +70,14 @@ module.exports = (ctx) => {
         } else if (d.soort === 'ticket' && acties && acties.koopTicket) {
           const r = acties.koopTicket(sess, { supplierCode: d.supplierCode, activiteitId: d.activiteitId, datum: d.datum, tijd: d.tijd, personen: d.personen });
           if (r.error) { regels.push('✕ ' + d.oms + ': ' + r.error); continue; }
-          const b = acties.betaalBoeking(sess, { ref: r.ticket.ref });
-          regels.push(b.error ? '✕ ' + d.oms + ': ' + b.error : '✓ ' + d.oms + ' op ' + d.datum + ' om ' + d.tijd + ' (entreecode ' + r.ticket.code + ')');
-          if (!b.error) gelukt++;
+          regels.push('✓ ' + d.oms + ' op ' + d.datum + ' om ' + d.tijd + ' klaargezet (' + r.ticket.ref + ', nog te betalen)');
+          gelukt++; tebetalen++;
         }
       } catch (e) { regels.push('✕ ' + d.oms + ': dat lukte net niet; probeer dat onderdeel los.'); }
     }
     const zorgNu = zorgVoor && zorgVoor(key);
-    return { tekst: 'Uw reis staat: ' + regels.join(' | ') + '.' +
+    return { tekst: 'Uw reis staat klaar: ' + regels.join(' | ') + '.' +
+      (tebetalen ? ' Er is niets afgeschreven. Reken de onderdelen met "nog te betalen" binnen dertig minuten zelf af in de app; daarna vervallen ze.' : '') +
       (gelukt < w.delen.length ? ' De onderdelen met een ✕ regel ik graag alsnog; zeg het maar.' : '') +
       (zorgNu && (zorgNu.allergenen || []).length ? ' Uw allergenen reizen overal automatisch mee.' : '') +
       ' Alles staat in uw app: het verblijf onder Reizen, de rit onder Onderweg, de tickets met oplichtende code.', gedaan: true };

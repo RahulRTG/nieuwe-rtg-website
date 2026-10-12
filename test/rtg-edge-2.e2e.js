@@ -130,7 +130,9 @@ function schermToestand(route) {
   const panel = document.querySelector('.rtg-edge-2-context');
   const cs = getComputedStyle(document.body);
   const inhoud = document.querySelector('main.wd-home, .wd-page > main, main');
-  const heroTitel = [...document.querySelectorAll('.wh-photo-copy h1, .wh-foundation-public h1')].find(n => n.getBoundingClientRect().height > 0);
+  /* Sinds #534 leidt op mobiel de cinematic scene (besluit van de eigenaar, 11 oktober
+     2026); haar kop is dan de herotitel. De oude koppen blijven meetellen waar ze staan. */
+  const heroTitel = [...document.querySelectorAll('.wp-scene .wp-heading h2, .wh-photo-copy h1, .wh-foundation-public h1')].find(n => n.getBoundingClientRect().height > 0);
   return {
     beeldvullend: document.body.matches('.rtg-stijl[data-world-home][data-rtg-shell=mobile]') && cs.paddingTop === '0px',
     heroTitelTop: heroTitel ? heroTitel.getBoundingClientRect().top : null,

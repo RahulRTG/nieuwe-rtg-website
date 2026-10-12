@@ -668,11 +668,15 @@ test('Inlogportaal: toegang bezit het venster en houdt de standaard Edge verborg
         visibleBars:[...document.querySelectorAll('.rtg-adaptive-bar')].filter(el=>
           el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').length,
         legacy:document.querySelectorAll('#gate .rtg-ring,#gate .ag-mond').length,
+        chrome:[...document.querySelectorAll('.rtg-edge-chrome > :not(.rtg-adaptive-edge)')].filter(el=>
+          el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').length,
         end:document.querySelector('#agNieuw').getBoundingClientRect().bottom,
         gate:document.querySelector('#gate[data-rtg-access]').getBoundingClientRect().bottom,
         viewport:innerHeight
       }));
-      assert.equal(shape.bars,1); assert.equal(shape.visibleBars,0); assert.equal(shape.legacy,0);
+      /* Sinds de www-stijl (#534, #549) mag de compacte Edge voor taal en hulp op de toegang
+         staan; de productnavigatie van de Edge blijft verborgen tot na de toegang. */
+      assert.equal(shape.bars,1); assert.ok(shape.visibleBars<=1); assert.equal(shape.chrome,0); assert.equal(shape.legacy,0);
       assert.ok(shape.end<=shape.gate&&shape.end<=shape.viewport);
       await ctx.close();
     }

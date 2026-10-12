@@ -1,6 +1,6 @@
 {
-  "catalogi": 1223,
-  "verschillendeNamen": 748,
+  "catalogi": 1224,
+  "verschillendeNamen": 749,
   "namenInMeerDomeinen": 132,
   "woordenMetMeerBetekenissen": 114,
   "betekenissenTotaal": 427,
@@ -543,7 +543,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 278,
+  "dubbelingenZonderNaam": 280,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -3733,5 +3733,5 @@
       ]
     }
   ],
-  "bestanden": 4398
+  "bestanden": 4450
 }

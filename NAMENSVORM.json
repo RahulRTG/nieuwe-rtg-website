@@ -1,15 +1,15 @@
 {
   "stempel": {
-    "op": "2026-10-11T22:23:21.246Z",
-    "commit": "9f737e2f5",
+    "op": "2026-10-12T13:45:15.071Z",
+    "commit": "c71d31b36",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 3,
     "instrument": "scripts/namensvorm.js",
     "node": "v26.10.0"
   },
   "uitleg": "Gemeten met scripts/namensvorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in REPRESENTATIE.md par. 0: delen de bestaande manieren waarop iemand namens een ander handelt werkelijk een machine? Twee lijsten (smal = handelen, ruim = handelen plus kennen), zodat de uitslag niet op de lijst drijft.",
   "grens": "De eenheid is het MECHANISME en niet het domein, omdat kern/service/machtiging*.js en kern/command/bijstand*.js elk een mechanisme BINNEN een groter domein zijn. Daardoor zijn de percentages hier NIET uitwisselbaar met CARRIEREVORM.json of STAGEVORM.json, die per domein tellen; alleen de VORM van het antwoord is vergelijkbaar. Verder meet dit bewaarde VORMEN (velden van objectliteralen) en geen werkwoorden, volgorde of uitkomst: een nul zegt dat er geen gedeeld OBJECT is, niet dat er geen gedeeld PROCES is -- die tweede vraag beantwoordt een ketenproef. Een mechanisme zonder opgeslagen vormen (een regelbestand zonder db) valt uit de noemer en staat in `zonderVormen`. De woordenschat telt IDENTIFIERS na aftrek van commentaar en tekenreeksen: `bezet` is een waarschuwing met een adres en geen verbod, en samenstellingen tellen niet mee omdat een samenstelling een andere naam is.",
-  "vastgelegd": "2026-10-11",
+  "vastgelegd": "2026-10-12",
   "gemeten": {
     "smal": {
       "vormen": 10,
@@ -17,12 +17,12 @@
       "zonderVormen": [
         "ai-mandaat"
       ],
-      "velden": 49,
+      "velden": 50,
       "inAlleMechanismen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 3,
-      "veldenMechanismeEigen": 45,
-      "eigenPct": 91.8,
+      "veldenMechanismeEigen": 46,
+      "eigenPct": 92,
       "perMechanisme": [
         {
           "mechanisme": "app-machtiging",
@@ -34,7 +34,7 @@
         },
         {
           "mechanisme": "fiscaal-mandaat",
-          "velden": 7
+          "velden": 8
         },
         {
           "mechanisme": "sepa-machtiging",
@@ -91,12 +91,12 @@
         "ai-mandaat",
         "rtgid-claims"
       ],
-      "velden": 74,
+      "velden": 75,
       "inAlleMechanismen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 5,
-      "veldenMechanismeEigen": 70,
-      "eigenPct": 94.6,
+      "veldenMechanismeEigen": 71,
+      "eigenPct": 94.7,
       "perMechanisme": [
         {
           "mechanisme": "app-machtiging",
@@ -112,7 +112,7 @@
         },
         {
           "mechanisme": "fiscaal-mandaat",
-          "velden": 7
+          "velden": 8
         },
         {
           "mechanisme": "ledenbalie-inzage",
@@ -597,15 +597,15 @@
         }
       ]
     },
-    "envelopVelden": 30
+    "envelopVelden": 29
   },
   "woordenschat": [
     {
       "woord": "doel",
-      "bestanden": 314,
-      "domeinen": 160,
-      "samengesteld": 203,
-      "samengesteldDomeinen": 95,
+      "bestanden": 317,
+      "domeinen": 161,
+      "samengesteld": 205,
+      "samengesteldDomeinen": 96,
       "stand": "bezet",
       "waar": [
         "bedrijf",
@@ -627,8 +627,8 @@
       "woord": "contract",
       "bestanden": 75,
       "domeinen": 23,
-      "samengesteld": 123,
-      "samengesteldDomeinen": 40,
+      "samengesteld": 124,
+      "samengesteldDomeinen": 41,
       "stand": "bezet",
       "waar": [
         "bedrijf",
@@ -650,8 +650,8 @@
       "woord": "claim",
       "bestanden": 65,
       "domeinen": 38,
-      "samengesteld": 67,
-      "samengesteldDomeinen": 33,
+      "samengesteld": 68,
+      "samengesteldDomeinen": 34,
       "stand": "bezet",
       "waar": [
         "bedrijf",
@@ -671,7 +671,7 @@
     },
     {
       "woord": "capability",
-      "bestanden": 75,
+      "bestanden": 76,
       "domeinen": 30,
       "samengesteld": 30,
       "samengesteldDomeinen": 19,
@@ -808,6 +808,29 @@
       ]
     },
     {
+      "woord": "envelop",
+      "bestanden": 31,
+      "domeinen": 15,
+      "samengesteld": 22,
+      "samengesteldDomeinen": 13,
+      "stand": "bezet",
+      "waar": [
+        "bedrijf",
+        "kern/agentteken",
+        "kern/appstore",
+        "kern/bewijsvlak",
+        "kern/dienstidentiteit"
+      ],
+      "vormen": [
+        "ENVELOPKLASSEN",
+        "envelopIdentiteit",
+        "envelopLaag",
+        "envelopWie",
+        "envelope",
+        "envelopeNaar"
+      ]
+    },
+    {
       "woord": "purpose",
       "bestanden": 50,
       "domeinen": 18,
@@ -828,32 +851,9 @@
       ]
     },
     {
-      "woord": "envelop",
-      "bestanden": 31,
-      "domeinen": 15,
-      "samengesteld": 21,
-      "samengesteldDomeinen": 13,
-      "stand": "bezet",
-      "waar": [
-        "bedrijf",
-        "kern/agentteken",
-        "kern/appstore",
-        "kern/bewijsvlak",
-        "kern/dienstidentiteit"
-      ],
-      "vormen": [
-        "ENVELOPKLASSEN",
-        "envelopLaag",
-        "envelopWie",
-        "envelope",
-        "envelopeNaar",
-        "envelopeVan"
-      ]
-    },
-    {
       "woord": "projectie",
-      "bestanden": 28,
-      "domeinen": 8,
+      "bestanden": 31,
+      "domeinen": 10,
       "samengesteld": 18,
       "samengesteldDomeinen": 12,
       "stand": "bezet",

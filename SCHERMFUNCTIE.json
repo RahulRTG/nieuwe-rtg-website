@@ -2,13 +2,13 @@
   "soort": "schermfunctie",
   "uitleg": "Feiten per scherm (paden, domeinen, rol, wereld, inkomende links, alias) en de paren schermen die dezelfde API-paden raken. Het oordeel over die paren staat in SCHERMEIGENAAR.json; dit register stelt niets vast behalve wat er gemeten is.",
   "stempel": {
-    "op": "2026-10-11",
-    "commit": "9f737e2f5"
+    "op": "2026-10-12",
+    "commit": "c71d31b36"
   },
   "bronnen": {
     "schermroutes": {
-      "op": "2026-10-11",
-      "commit": "84b6f3285",
+      "op": "2026-10-12",
+      "commit": "3b60fef05",
       "invoer": {
         "meting": "invoerspoor",
         "versie": 1,
@@ -907,8 +907,10 @@
           "public/apps/reizen-performance-reis.js",
           "public/apps/reizen-performance-taxi.js",
           "public/apps/reizen-performance.js",
+          "public/apps/reizen-samen-besluit.js",
           "public/apps/reizen-samen-delen.js",
           "public/apps/reizen-samen-mensen.js",
+          "public/apps/reizen-samen-voorstel.js",
           "public/apps/reizen-samen.js",
           "public/apps/reizen-veilig-reis.js",
           "public/apps/reizen-veilig.html",
@@ -934,6 +936,7 @@
           "public/apps/residentie/residentie-04.js",
           "public/apps/rijksloket.html",
           "public/apps/rit-momenten.js",
+          "public/apps/rit-ontvangst.js",
           "public/apps/rit.html",
           "public/apps/rit.js",
           "public/apps/routedekking.html",
@@ -1198,7 +1201,9 @@
           "public/shared/edge/actiestaat.js",
           "public/shared/edge/blikveld-hoofdactie.js",
           "public/shared/edge/blikveld.js",
+          "public/shared/edge/conceptwerk.js",
           "public/shared/edge/rahulzicht.js",
+          "public/shared/edge/taakbeeld.js",
           "public/shared/emoji.js",
           "public/shared/experience-actions.js",
           "public/shared/experience-handoff.js",
@@ -2297,19 +2302,6 @@
       ]
     },
     {
-      "a": "public/apps/reizen.html",
-      "b": "public/apps/rit.html",
-      "gedeeld": 4,
-      "jaccard": 0.15,
-      "omvatting": 0.67,
-      "voorbeeld": [
-        "/api/mob/aanbod",
-        "/api/mob/mijn",
-        "/api/mob/plekken",
-        "/api/mob/vraag"
-      ]
-    },
-    {
       "a": "public/apps/kantoren.html",
       "b": "public/apps/stadsdoos.html",
       "gedeeld": 2,
@@ -2318,6 +2310,19 @@
       "voorbeeld": [
         "/api/office/",
         "/api/office/stream"
+      ]
+    },
+    {
+      "a": "public/apps/reizen.html",
+      "b": "public/apps/rit.html",
+      "gedeeld": 4,
+      "jaccard": 0.1,
+      "omvatting": 0.5,
+      "voorbeeld": [
+        "/api/mob/aanbod",
+        "/api/mob/mijn",
+        "/api/mob/plekken",
+        "/api/mob/vraag"
       ]
     },
     {
@@ -2483,7 +2488,7 @@
         "/api/push"
       ],
       "zonderServer": false,
-      "inkomend": 202,
+      "inkomend": 203,
       "inIndex": 3,
       "inkomendVan": [
         "public/apps/agenda.html",
@@ -11542,11 +11547,21 @@
         "/api/reis/gezelschap/beeld",
         "/api/reis/gezelschap/beleid",
         "/api/reis/gezelschap/beleid/zet",
+        "/api/reis/gezelschap/instem",
+        "/api/reis/gezelschap/instem/terug",
         "/api/reis/gezelschap/kring",
         "/api/reis/gezelschap/nodig-uit",
+        "/api/reis/gezelschap/opgave",
+        "/api/reis/gezelschap/opgave/wis",
+        "/api/reis/gezelschap/opgave/zet",
+        "/api/reis/gezelschap/opties",
+        "/api/reis/gezelschap/opties/wis",
+        "/api/reis/gezelschap/opties/zet",
         "/api/reis/gezelschap/reis",
         "/api/reis/gezelschap/schrijf",
         "/api/reis/gezelschap/tijdlijn",
+        "/api/reis/gezelschap/voorstel/leg",
+        "/api/reis/gezelschap/voorstel/trek",
         "/api/reis/gezelschap/weg",
         "/api/reis/los",
         "/api/reis/los/doe",
@@ -11759,6 +11774,8 @@
       "paden": [
         "/api/mob/aanbod",
         "/api/mob/mijn",
+        "/api/mob/ontvangst",
+        "/api/mob/ontvangst/probleem",
         "/api/mob/plekken",
         "/api/mob/volg",
         "/api/mob/vraag",

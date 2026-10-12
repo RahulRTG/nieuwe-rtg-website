@@ -48,7 +48,7 @@ blijven.
 | 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een bron voor acht onderdelen** — twee ketenproeven (par. 4a) en zes scenario's van de voltooiproef (par. 4h); of een bron telt, beslist zijn versheid; de rest mist een scenario |
 | 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **staat, voor een leeg antwoord** (`LIEGRONDE.json`, per onderdeel; zie par. 4e) — 96 van 114 BEWEZEN op 11 oktober 2026; de andere 18 hebben geen eigen adres, staan achter een deur of vallen om |
 | 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **staat voor zes onderdelen** (`VOLTOOIPROEF.json`, par. 4h): nette herstart, nieuwe sessie, en de opslag zelf |
-| 6 | **bevoegd** | kan een andere rol, een ander gezin of een ander bedrijf hier niets? | **gezinnen en vier leden gemeten** (`BEVOEGD.json`): de twaalf gezinsschermen met een kruisproef op de gezinscode (par. 4f), en ledenschermen met de ledenkruis, die de SESSIE verwisselt (par. 4j) -- 4 BEWEZEN op 11 oktober 2026; `ROLPROEF.json` blijft vervallen en telt niet; zaak en kantoor hebben nog geen proef |
+| 6 | **bevoegd** | kan een andere rol, een ander gezin of een ander bedrijf hier niets? | **gezinnen en vier leden gemeten** (`BEVOEGD.json`): de twaalf gezinsschermen met een kruisproef op de gezinscode (par. 4f), en ledenschermen met de ledenkruis, die de SESSIE verwisselt (par. 4j) -- 4 BEWEZEN binnen de uitgeschreven grens van par. 4j (12 oktober 2026); `ROLPROEF.json` blijft vervallen en telt niet; zaak en kantoor hebben nog geen proef |
 | 7 | **herstelbaar** | overleeft de functie uitval, time-out, dubbelklik en een afgebroken verzoek? | **staat voor zes onderdelen** (`VOLTOOIPROEF.json`, par. 4h): dubbelklik, herhaling, afgebroken verzoek en een crash na de bevestiging; de twee gebreken die de proef bij Mijn loopbaan en Reizen & Veilig vond, zijn bij de oorzaak gerepareerd (par. 4j, slot); uitval van Redis of PostgreSQL nog niet |
 | 8 | **menselijk** | krijgt de gebruiker nooit een kale 500, TypeError, lege pagina of dode knop? | **staat, als ondergrens** (par. 4i): geen kale fout, elke weigering met haar zin in beeld, geen kale techniek in beeld, geen naamloze eigen knop; of een melding een WEG biedt, meet hij niet |
 
@@ -796,14 +796,38 @@ die vielen in twee klassen:
   naam van de ontvanger), en de ids van A's dingen (feit, deelcode, melding,
   map, document, moment, sessies) tellen als OBJECT-merkteken.
 
-**De zes mutaties liggen vast** in `scripts/ledenkruisproef.js`
+**Een derde tegenlezing (op `ab6528086`) vond een regressie en vier klassen.**
+
+- **X9, regressie -- opzoeken op WAARDE.** Het vervangen van A's tekst door een
+  eigen waarde maakte een route blind die op waarde opzoekt: `kring/mail {weg}`
+  die het adres uit ELKE kring haalt, deed met een andere waarde niets en bleef
+  BEWEZEN. Reparatie: een ander speelt elk verzoek nu TWEE keer na -- met een
+  eigen waarde voor het lekoordeel, en met A's originele waarde alleen voor het
+  effect (inbreuk, open, en via de lezers aangetast). De eigen waarde houdt de
+  VORM van het origineel (een e-mailadres blijft een e-mailadres, een getal een
+  getal), anders weigert de route al bij de invoercontrole.
+- **X4 en X5 -- koppen en omleidingen.** De kruis las alleen de body. Nu leest hij
+  de antwoordkoppen (ook bij een weigering) en volgt hij een omleiding niet: een
+  3xx wordt zelf beoordeeld, en een Location met A's gegevens is een lek.
+- **X3 en X2 -- getransformeerde waarden.** De merkteken-check is
+  hoofdletterongevoelig, en A's letterlijke tijdstippen (`gemaaktAt` van een
+  melding, `at` van een feit, `van` van een moment) zijn merkteken waar de zaai ze
+  kent.
+- **X7 -- schrijven naar een veld dat de lezers niet tonen.** Een ander die de
+  `scope` van A's deelcode leegmaakte, liet A's lezers dezelfde bytes geven.
+  `/api/carriere/ledger/delen` toont nu ook de `scope` van elke deelcode (het lid
+  hoort te zien wat het heeft uitgegeven), en daarmee is dit geval zichtbaar. De
+  KLASSE blijft een grens: "onaangetast" betekent alleen dat de lezers van het
+  scenario dezelfde bytes geven.
+
+**De mutaties liggen vast** in `scripts/ledenkruisproef.js`
 (`npm run ledenkruisproef`): hij brengt elk lek weer aan in de bron, draait
 `bevoegdronde --alleen=<rij>` en eist DEFECT. Gedraaid op 12 oktober 2026: M1,
-M3b, N1, N2, N3 en N4 alle zes DEFECT. Die live-replay start per mutatie een
+M3b, N1, N2, N3 en N4, en daarna X2, X3, X4, X5, X7 en X9 -- alle twaalf DEFECT. Die live-replay start per mutatie een
 server en een browser en zit daarom **niet in de gewone CI**; wat wel in CI zit
 zijn de oordelen per klasse (`test/ledenkruis.test.js`, toetsen 1, 1b, 8 en 9) en
-een toets (10) die vasthoudt dat alle zes mutaties nog in de proef staan en nog
-op de bron passen. Twee vondsten in de meter zelf, eerder: een merkteken dat de ander zelf meestuurde (`bron` in
+een toets (10) die vasthoudt dat alle twaalf mutaties nog in de proef staan en
+nog op de bron passen. Twee vondsten in de meter zelf, eerder: een merkteken dat de ander zelf meestuurde (`bron` in
 `/api/mijn/post/zet`) gaf een vals lek, en een stroom (event-stream) hing de hele
 ronde een kwartier op `res.text()`.
 
@@ -817,7 +841,21 @@ vraagt een WebAuthn-authenticator in de proef, en een account wissen vraagt een
 ander lid per rij dat het mag verliezen. Dat is werk met een adres, geen gat in
 de regel.
 
-**Wat dit niet bewijst, en de bekende blinde vlekken**: wat het scherm bij het
+**De grens, uitgeschreven** (dezelfde tekst staat als `GRENS` in
+`scripts/lib/ledenkruis.js`, en daarom heet de stand van deze vier rijen
+voorlopig **8/8 binnen de uitgeschreven grens** en niet "volledig bewezen"):
+
+- de BODY van een weigering (4xx) wordt niet op merktekens gelezen; de koppen wel;
+- AFGELEIDE waarden (een teller over anderen, een ja/nee "iemand in de buurt is
+  urgent", een hash, een lengte) bewijs je niet met merktekens: die dragen geen
+  letterlijke waarde van A;
+- schrijven naar een veld dat de lezers van het scenario NIET tonen: "onaangetast"
+  betekent alleen dat die lezers dezelfde bytes teruggeven (X7 is gedicht door de
+  scope te tonen, de klasse niet);
+- een effect dat pas na de derde aanroep of met vertraging optreedt: elke ander
+  speelt elk verzoek twee keer na, en A leest direct daarna terug.
+
+**Verder niet bewezen, en de bekende blinde vlekken**: wat het scherm bij het
 laden en het scenario aanroept, en niets daarbuiten; een merkteken dat een ander
 op een andere manier zou kunnen afleiden zonder het woordelijk te krijgen; de
 inhoud van een stroom (alleen zijn status telt); de inhoud van een WEIGERING (een
@@ -846,8 +884,9 @@ verzoek. `test/veiligmoment-dubbeltik.test.js` heeft een tegenproef en zakt zond
 de verklaring.
 
 **Eerste volledig bewezen onderdelen** (`APPWERKT.json`, 12 oktober 2026, op
-`50a1c4b5e`, na de scherpere ledenkruis met inbreuk en codenaam): **Wie ben ik,
-Wonen, Reizen & Veilig en Mijn loopbaan** staan op alle acht bewijzen BEWEZEN. Post van RTG en Waar ben ik aanwezig staan op zeven:
+`8b7b7e6de`, na de derde aanscherping van de ledenkruis): **Wie ben ik,
+Wonen, Reizen & Veilig en Mijn loopbaan** staan op alle acht bewijzen BEWEZEN --
+binnen de uitgeschreven grens hierboven. Post van RTG en Waar ben ik aanwezig staan op zeven:
 bevoegd ontbreekt, om de reden hierboven. Let op de meetomstandigheid: een ronde
 met zes werkers naast de toetsen van andere werkbomen op dezelfde vier kernen gaf
 laad-time-outs die als defect werden gemeld; vastgelegd is de ronde met

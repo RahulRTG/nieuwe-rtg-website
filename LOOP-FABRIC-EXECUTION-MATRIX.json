@@ -640,7 +640,7 @@
       "blastRadius": {
         "sourceOwners": 38,
         "kernelModules": 124,
-        "mutationContracts": 1123,
+        "mutationContracts": 1127,
         "routes": 1146,
         "screens": 87,
         "dataSchema": "pas na product/juridisch besluit",

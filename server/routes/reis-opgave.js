@@ -35,12 +35,15 @@ module.exports = (kern, gez) => {
   /* INSTEMMEN OP EEN VASTE VERSIE (kern/reisgezelschap-instemming.js). De
      reiziger legt voor of trekt in; ieder stemt zelf in op de versie en de
      vingerafdruk die hij zag, en kan zijn eigen antwoord terugnemen. */
-  const post = (pad, fn) => app.post(pad, auth, (req, res) => {
-    const b = req.body || {}, r = fn(req.session.key, String(b.reis || ''), b);
-    r && r.error ? res.status(r.status || 400).json({ error: r.error, versie: r.versie }) : res.json(r);
+  const geef = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error, versie: r.versie }) : res.json(r);
+  app.post('/api/reis/gezelschap/voorstel/leg', auth, (req, res) =>
+    geef(res, kern.reisgezelschap.legVoor(req.session.key, String((req.body || {}).reis || ''), String((req.body || {}).optie || ''))));
+  app.post('/api/reis/gezelschap/voorstel/trek', auth, (req, res) =>
+    geef(res, kern.reisgezelschap.trekVoorstelIn(req.session.key, String((req.body || {}).reis || ''))));
+  app.post('/api/reis/gezelschap/instem', auth, (req, res) => {
+    const b = req.body || {};
+    geef(res, kern.reisgezelschap.instem(req.session.key, String(b.reis || ''), b.versie, b.vingerafdruk, b.ja === true));
   });
-  post('/api/reis/gezelschap/voorstel/leg', (k, reis, b) => kern.reisgezelschap.legVoor(k, reis, String(b.optie || '')));
-  post('/api/reis/gezelschap/voorstel/trek', (k, reis) => kern.reisgezelschap.trekVoorstelIn(k, reis));
-  post('/api/reis/gezelschap/instem', (k, reis, b) => kern.reisgezelschap.instem(k, reis, b.versie, b.vingerafdruk, b.ja === true));
-  post('/api/reis/gezelschap/instem/terug', (k, reis) => kern.reisgezelschap.neemInstemmingTerug(k, reis));
+  app.post('/api/reis/gezelschap/instem/terug', auth, (req, res) =>
+    geef(res, kern.reisgezelschap.neemInstemmingTerug(req.session.key, String((req.body || {}).reis || ''))));
 };

@@ -24,18 +24,7 @@
 
 const HOLD_GRONDSLAGEN = Object.freeze(['wettelijke-plicht', 'geschil', 'onderzoek-autoriteit']);
 const dag = (iso) => String(iso || '').slice(0, 10);
-// een echte kalenderdag: 2027-02-31 rolt bij het parsen door naar maart en telt dus niet
-const isDatum = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) &&
-  !isNaN(Date.parse(s + 'T00:00:00Z')) && new Date(s + 'T00:00:00Z').toISOString().slice(0, 10) === s;
-/* Hoogstens twaalf maanden vooruit: een hold kan langer gelden, maar alleen door
-   hem opnieuw te beoordelen -- zo wordt hij nooit stil permanent. */
-const MAAND_MAX = 12;
-function binnenTermijn(s, t) {
-  if (!isDatum(s) || s <= dag(t)) return false;
-  const grens = new Date(dag(t) + 'T00:00:00Z'); grens.setUTCMonth(grens.getUTCMonth() + MAAND_MAX);
-  return s <= grens.toISOString().slice(0, 10);
-}
-const DATUMFOUT = 'Geef een herbeoordelingsdatum (JJJJ-MM-DD) die bestaat, in de toekomst ligt en hoogstens ' + MAAND_MAX + ' maanden vooruit.';
+const { binnenTermijn, DATUMFOUT } = require('./rtmail-leidingdatum');
 
 module.exports = ({ L, lees, plek, save, busVan, kap, nu, crypto, zelfdeMens }) => {
   const holds = () => (lees().holds || []);
@@ -78,9 +67,9 @@ module.exports = ({ L, lees, plek, save, busVan, kap, nu, crypto, zelfdeMens }) 
     // `zelfdeMens` (accounts/zelfdemens.js): 'ander', 'zelfde' of 'onbekend' -- alleen 'ander' telt
     const mens = actie === 'afwijzen' ? 'ander' : (typeof zelfdeMens === 'function' ? zelfdeMens(h.aanvragerSleutel, wie) : 'onbekend');
     if (mens === 'zelfde') return { status: 403, error: 'Volgens de kluis zijn aanvrager en beoordelaar dezelfde (gekeurde) persoon: daar is een ander voor nodig.' };
-    if (mens !== 'ander') return { status: 409, error: 'Niet vast te stellen dat u een andere gekeurde persoon bent dan de aanvrager: ' +
-      'laat beide accounts door RTG keuren (identiteitsbewijs met de geboortedatum van het document) en probeer het opnieuw.' };
-    const ander = { onafhankelijkheid: 'gekeurde-identiteit', vastgesteld: 'beide accounts door RTG gekeurd (A3); naam of documentgeboortedatum verschilt' };
+    if (mens !== 'ander') return { status: 409, error: 'Niet vast te stellen dat u een ander mens bent dan de aanvrager: ' +
+      'een ander door RTG gekeurd lid moet beoordelen (beide gekeurd, met een andere geboortedatum op het document).' };
+    const ander = { onafhankelijkheid: 'gekeurde-identiteit', vastgesteld: 'beide accounts door RTG gekeurd (A3); de geboortedatum op het document verschilt' };
     const open = h.stand === 'aangevraagd', loopt = h.stand === 'beoordeeld';
     if (actie === 'goedkeuren' && open) Object.assign(h, ander, { stand: 'beoordeeld', beoordeeldDoor: wie, beoordeeldOp: nu() });
     else if (actie === 'afwijzen' && open) Object.assign(h, { stand: 'afgewezen', beoordeeldDoor: wie, beoordeeldOp: nu() });

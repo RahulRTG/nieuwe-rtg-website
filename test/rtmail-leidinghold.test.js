@@ -54,7 +54,7 @@ async function vinger(eig, actie, s = sleutel) {
   return { ceremonie: o.body.ceremonie, antwoord: s.loginAntwoord(o.body.opties.challenge, new URL(srv.base).origin, ++teller) };
 }
 const beoordeel = async (eig, body, s = sleutel) => api('/api/office/rtmail/leiding/hold', Object.assign(body, await vinger(eig, 'eigenaar-leidinghold', s)), eig);
-let tweede, tweedeLid, tweedeSleutel, luzPost, twee, tweeSleutel, vreemd, dubbel, tweedeId;
+let tweede, tweedeLid, tweedeSleutel, luzPost, twee, tweeSleutel, vreemd, dubbel, tweedeId, varianten;
 /* Een account met een boardroomsleutel, een kantoorrol en een eigen passkey. */
 async function kantoorAccount(naam, email, phone) {
   const r = await api('/api/auth/register', { name: naam, email, phone, password: 'geheim123', geboortedatum: '1988-03-03', tier: 'business', pasApp: 'business' });
@@ -99,12 +99,19 @@ test.before(async () => {
   const tw = await kantoorAccount('Manager Tweeling', 'mtweeling@x.nl', '0612348899');
   const vr = await kantoorAccount('Vreemde Beoordelaar', 'vreemd@x.nl', '0612348877');
   const db2 = await kantoorAccount('Manager Tweede', 'mtweede.dubbel@x.nl', '0612348866');
+  /* Drie varianten van de ZELFGETYPTE naam met dezelfde documentdatum: de naam doet
+     niet mee (de keurder legt geen documentnaam vast), dus alle drie zijn 'onbekend'. */
+  const vars = [];
+  for (const [i, naam] of ['M. Tweede', 'Manager-Tweede', 'Manager Tweede.'].entries())
+    vars.push(await kantoorAccount(naam, 'mvariant' + i + '@x.nl', '061234885' + i));
   const mgr = (await api('/api/supplier/roster', { code: 'KIKUNOI' })).body.staff.find(x => x.role === 'manager');
   await herstart(null, (d) => d.prepare('UPDATE supplier_staff SET member_id = ? WHERE id = ?').run(Number(t.id), Number(mgr.id)));
   tweedeLid = t.lid; tweedeId = t.id; tweedeSleutel = t.sleutel; tweede = await t.office();
   twee = await tw.office(); tweeSleutel = tw.sleutel;
   vreemd = { office: await vr.office(), sleutel: vr.sleutel };
   dubbel = { office: await db2.office(), sleutel: db2.sleutel };
+  varianten = [];
+  for (const v of vars) { await keur(v.id, '1988-03-03'); varianten.push({ office: await v.office(), sleutel: v.sleutel }); }
   assert.ok(tweede && twee && vreemd.office && dubbel.office, 'alle vier komen het kantoor in');
   await keur(db2.id, '1988-03-03');
   await keur((await api('/api/auth/me', {}, await eigenaar())).body.user.id, '1975-05-05');
@@ -144,19 +151,25 @@ test('2. beoordelen: een verse passkey, en dan houdt alleen de BEOORDEELDE hold 
     naam: 'Toestel eigenaar' }, eig)).status, 200);
   // een ongekeurde aanvrager: niet vast te stellen
   const onAanvr = await beoordeel(eig, { id: hold2, actie: 'goedkeuren' });
-  assert.equal(onAanvr.status, 409, 'ongekeurde aanvrager: ' + JSON.stringify(onAanvr.body)); assert.match(onAanvr.body.error, /gekeurde persoon/);
+  assert.equal(onAanvr.status, 409, 'ongekeurde aanvrager: ' + JSON.stringify(onAanvr.body)); assert.match(onAanvr.body.error, /ander mens/);
   await keur(tweedeId, '1988-03-03');
   // een ongekeurde beoordelaar: ook niet
   const onBeo = await beoordeel(vreemd.office, { id: hold2, actie: 'goedkeuren' }, vreemd.sleutel);
-  assert.equal(onBeo.status, 409, 'ongekeurde beoordelaar: ' + JSON.stringify(onBeo.body)); assert.match(onBeo.body.error, /gekeurde persoon/);
+  assert.equal(onBeo.status, 409, 'ongekeurde beoordelaar: ' + JSON.stringify(onBeo.body)); assert.match(onBeo.body.error, /ander mens/);
   // de manager die aanvroeg, met een boardroomsleutel en een verse passkey: zijn eigen hold niet
   const zelf = await beoordeel(tweede, { id: hold1, actie: 'goedkeuren' }, tweedeSleutel);
   assert.equal(zelf.status, 403, 'zelfbeoordeling: ' + JSON.stringify(zelf.body)); assert.match(zelf.body.error, /beoordeelt hem niet zelf/);
   // ook niet vanaf een account met hetzelfde telefoonnummer, of met dezelfde gekeurde identiteit
   const tweeling = await beoordeel(twee, { id: hold1, actie: 'goedkeuren' }, tweeSleutel);
   assert.equal(tweeling.status, 403, 'zelfde telefoon: ' + JSON.stringify(tweeling.body)); assert.match(tweeling.body.error, /dezelfde/);
+  // dezelfde naam en dezelfde documentdatum: nooit 200 (hier 409: niet vast te stellen)
   const dub = await beoordeel(dubbel.office, { id: hold1, actie: 'goedkeuren' }, dubbel.sleutel);
-  assert.equal(dub.status, 403, 'dezelfde gekeurde identiteit: ' + JSON.stringify(dub.body)); assert.match(dub.body.error, /dezelfde/);
+  assert.equal(dub.status, 409, 'dezelfde naam en documentdatum: ' + JSON.stringify(dub.body)); assert.match(dub.body.error, /ander mens/);
+  // en een andere zelfgetypte naam met dezelfde documentdatum maakt er geen ander mens van
+  for (const v of varianten) {
+    const r = await beoordeel(v.office, { id: hold1, actie: 'goedkeuren' }, v.sleutel);
+    assert.equal(r.status, 409, 'een naamvariant met dezelfde documentdatum: ' + JSON.stringify(r.body));
+  }
   // twee gekeurde, verschillende personen: geslaagd
   const ok = await beoordeel(eig, { id: hold2, actie: 'goedkeuren' });
   assert.equal(ok.status, 200, JSON.stringify(ok.body)); assert.equal(ok.body.hold.stand, 'beoordeeld');
@@ -277,17 +290,27 @@ test('6. de postroute ziet geen gebruikersrij: alleen een antwoord uit de kluis'
   const rij = {
     1: { id: 1, verified: 'verified', phone_hash: 'p1', email_hash: 'e1', naam: 'Anna de Vries', md: { geboren: '1980-01-01', geborenBron: 'paspoort' } },
     2: { id: 2, verified: 'verified', phone_hash: 'p2', email_hash: 'e2', naam: 'Ánna  de vries', md: { geboren: '1980-01-01', geborenBron: 'paspoort' } },
-    3: { id: 3, verified: 'verified', phone_hash: 'p3', email_hash: 'e3', naam: 'Bram Bakker', md: { geboren: '1980-01-01', geborenBron: 'paspoort' } },
+    3: { id: 3, verified: 'verified', phone_hash: 'p3', email_hash: 'e3', naam: 'Bram Bakker', md: { geboren: '1982-06-06', geborenBron: 'paspoort' } },
+    7: { id: 7, verified: 'verified', phone_hash: 'p7', email_hash: 'e7', naam: 'Bram Bakker', md: { geboren: '1980-01-01', geborenBron: 'paspoort' } },
     4: { id: 4, verified: 'pending', phone_hash: 'p4', email_hash: 'e4', naam: 'Cor Claes', md: { geboren: '1981-01-01', geborenBron: 'paspoort' } },
     5: { id: 5, verified: 'verified', phone_hash: 'p1', email_hash: 'e5', naam: 'Dirk Dam', md: {} },
     6: { id: 6, verified: 'verified', phone_hash: 'p6', email_hash: 'e6', naam: 'Eva Eik', md: { geboren: '1990-01-01', geborenBron: 'opgegeven' } }
   };
   const k = require('../server/accounts/zelfdemens')({ getUserById: (id) => rij[id] || null,
-    getMemberState: (id) => (rij[id] || {}).md, realNameOf: (u) => u.naam });
+    getMemberState: (id) => (rij[id] || {}).md });
   const z = (a, b) => k.zelfdeMens('user-' + a, 'user-' + b);
-  assert.deepEqual([z(1, 3), z(1, 2), z(1, 1), z(1, 5), z(1, 4), z(1, 6), z(1, 9), k.zelfdeMens(null, 'user-1')],
-    ['ander', 'zelfde', 'zelfde', 'zelfde', 'onbekend', 'onbekend', 'onbekend', 'onbekend'],
-    'gekeurd en verschillend; dezelfde gekeurde persoon; zelfde account; zelfde telefoon; ongekeurd; geen documentdatum; geen account; geen sleutel');
+  assert.deepEqual([z(1, 3), z(1, 2), z(1, 7), z(1, 1), z(1, 5), z(1, 4), z(1, 6), z(1, 9), k.zelfdeMens(null, 'user-1')],
+    ['ander', 'onbekend', 'onbekend', 'zelfde', 'zelfde', 'onbekend', 'onbekend', 'onbekend', 'onbekend'],
+    'andere documentdatum; zelfde datum (andere naamvorm); zelfde datum (andere naam); zelfde account; zelfde telefoon; ' +
+    'ongekeurd; geen documentdatum; geen account; geen sleutel');
+  // de datums: 29 februari plus twaalf maanden is 28 februari, geen 1 maart
+  const { binnenTermijn } = require('../server/kern/rtmail-leidingdatum');
+  assert.equal(binnenTermijn('2029-02-28', '2028-02-29T10:00:00Z'), true);
+  assert.equal(binnenTermijn('2029-03-01', '2028-02-29T10:00:00Z'), false, 'een dag boven de twaalf maanden');
+  assert.equal(binnenTermijn('2027-10-12', '2026-10-12T08:00:00Z'), true);
+  assert.equal(binnenTermijn('2027-10-13', '2026-10-12T08:00:00Z'), false);
+  assert.equal(binnenTermijn('2027-03-31', '2026-03-31T08:00:00Z'), true);
+  assert.equal(binnenTermijn('2027-04-01', '2026-03-31T08:00:00Z'), false);
   assert.equal(k.isGekeurd(1), true); assert.equal(k.isGekeurd(4), false);
   for (const a of ['ander', 'zelfde', 'onbekend']) assert.equal(typeof a, 'string');
   // server.js leest de ene regel en heeft geen eigen kopie meer

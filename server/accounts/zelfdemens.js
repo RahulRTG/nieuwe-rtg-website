@@ -4,36 +4,39 @@
    besluit van de eigenaar 12 oktober 2026: "gekeurde identiteit"). Een beoordeling
    telt alleen als aanvrager en beoordelaar ALLEBEI een identiteit hebben die RTG
    heeft gezien, en die twee aantoonbaar verschillende personen zijn. De
-   vergelijking woont hier, in de identiteitskluis, omdat zij naam, geboortedatum
-   en hashes leest; wie haar aanroept krijgt alleen 'ander', 'zelfde' of
+   vergelijking woont hier, in de identiteitskluis, omdat zij de keuring, de
+   documentgeboortedatum en hashes leest; wie haar aanroept krijgt alleen 'ander', 'zelfde' of
    'onbekend' terug -- geen veld, geen hash, geen document en geen rij.
 
    GEKEURD (A3) is EEN regel en staat hier: `isGekeurd(id)`. server.js
    idGeverifieerd() leest hem voor een sessie met een account; er is geen tweede
    kopie.
 
-   WAT "DEZELFDE GEKEURDE PERSOON" HIER BETEKENT, en wat niet:
-   - 'zelfde' als het hetzelfde account is, als beide accounts dezelfde telefoon-
-     of e-mailhash dragen, of als beide GEKEURD zijn met dezelfde naam (zoals de
-     keurder die tegen het document hield, genormaliseerd: hoofdletters, accenten
-     en spaties tellen niet) EN dezelfde geboortedatum VAN HET DOCUMENT
-     (`geborenBron: 'paspoort'`, routes/office/verificaties.js).
-   - 'ander' alleen als beide gekeurd zijn, beide een documentdatum hebben, en
-     naam of geboortedatum verschilt. Twee mensen met dezelfde naam en
-     geboortedatum heten hier 'zelfde': dat is de weigerkant, en die is veilig.
+   WAT HIER WORDT VASTGESTELD, en wat niet:
+   - 'zelfde' als het hetzelfde account is, of als beide accounts dezelfde
+     telefoon- of e-mailhash dragen.
+   - 'ander' ALLEEN als beide accounts gekeurd zijn, beide een geboortedatum VAN
+     HET DOCUMENT hebben (`geborenBron: 'paspoort'`, routes/office/verificaties.js)
+     en die twee datums verschillen. Verschillende documentdatums zijn
+     verschillende documenten, dus verschillende mensen.
    - 'onbekend' in elk ander geval: een sleutel zonder account, een account dat
-     niet gekeurd is, een keuring zonder documentdatum, of een kluis die niet
-     antwoordt. De aanroeper telt dat NOOIT als een ander mens.
-   De keuring bewaart geen documentnummer; deze vergelijking is daarom zo sterk
-   als naam plus documentdatum, en niet sterker. En ook 'ander' is niet bewezen:
-   een keuring bewijst een geregistreerde identiteit, niet wie er achter het
-   toetsenbord zat. */
+     niet gekeurd is, een keuring zonder documentdatum, DEZELFDE documentdatum,
+     of een kluis die niet antwoordt. De aanroeper telt dat NOOIT als een ander
+     mens.
+   De naam doet met opzet NIET mee: dat is wat het lid zelf intypte (met de
+   gebruikersnaam of 'Lid' als terugval), en de keurder legt geen documentnaam
+   vast -- 'M. Tweede' en 'Manager Tweede' zouden anders twee mensen zijn. De
+   keuring bewaart ook geen documentnummer. De vergelijking is daarom precies zo
+   sterk als de geboortedatum van het document, en dat heeft een prijs: twee echt
+   verschillende mensen met dezelfde geboortedatum kunnen elkaar niet
+   beoordelen; een ander gekeurd lid moet het doen. En ook 'ander' is niet
+   bewezen: een keuring bewijst een geregistreerde identiteit, niet wie er achter
+   het toetsenbord zat. */
 'use strict';
 
 const idVan = (k) => (/^user-\d+$/.test(String(k || '')) ? Number(String(k).slice(5)) : null);
-const norm = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 
-module.exports = function maakZelfdeMens({ getUserById, getMemberState, realNameOf }) {
+module.exports = function maakZelfdeMens({ getUserById, getMemberState }) {
   function isGekeurd(id) {
     const u = getUserById(Number(id));
     return !!u && u.verified === 'verified';
@@ -50,9 +53,8 @@ module.exports = function maakZelfdeMens({ getUserById, getMemberState, realName
       if (!isGekeurd(x.id) || !isGekeurd(y.id)) return 'onbekend';
       const mx = getMemberState(x.id) || {}, my = getMemberState(y.id) || {};
       if (mx.geborenBron !== 'paspoort' || my.geborenBron !== 'paspoort' || !mx.geboren || !my.geboren) return 'onbekend';
-      const nx = norm(realNameOf(x)), ny = norm(realNameOf(y));
-      if (!nx || !ny) return 'onbekend';
-      return nx === ny && mx.geboren === my.geboren ? 'zelfde' : 'ander';
+      // dezelfde documentdatum: niet vast te stellen dat het twee mensen zijn
+      return mx.geboren !== my.geboren ? 'ander' : 'onbekend';
     } catch (e) { return 'onbekend'; }
   }
   return { isGekeurd, zelfdeMens };

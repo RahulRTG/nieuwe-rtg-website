@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T05:13:38.524Z",
-    "commit": "7a33d15fb",
+    "op": "2026-10-12T06:21:04.219Z",
+    "commit": "1c4b0a946",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -13379,6 +13379,13 @@
       "operator": "voorwaarde-omkeren#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "rtmail-leidinghold.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "rtmail-leidingplek.test.js": {
       "soort": "server",

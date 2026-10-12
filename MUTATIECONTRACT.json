@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-12T16:20:58.249Z",
-  "commit": "b5423bc68",
+  "op": "2026-10-12T17:52:05.985Z",
+  "commit": "a388ec9ad",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
@@ -57676,7 +57676,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -57697,7 +57697,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -84798,7 +84798,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -84819,7 +84819,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "velden",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -84936,7 +84936,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "velden",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -84957,7 +84957,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -84999,7 +84999,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "velden",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -85020,7 +85020,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -85122,7 +85122,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "velden",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -85143,7 +85143,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": "velden",
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,

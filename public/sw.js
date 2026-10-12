@@ -11,7 +11,7 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-21d3fe01';
+const CACHE = 'rtg-app-8054f4ec';
 const SHELL = [
   /* The mandatory desktop standard is available offline too. */
   '/shared/interface/module-sdk.js',

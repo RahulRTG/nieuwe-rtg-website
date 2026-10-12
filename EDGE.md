@@ -1123,10 +1123,10 @@ Stap 3 van de doorsnede. Het lid past een voorbereiding van Rahul **op het
 scherm** aan, en Rahul en de Edge werken daarna met dezelfde waarden, zonder dat
 het lid de vraag opnieuw typt of een nieuw gesprek begint.
 
-**Geen tweede conceptmodel.** Het concept is de reiswens van
-`kern/fluister/reis/reiswens.js`, nu met gestructureerde waarden. Daar komen
-precies drie dingen bij: een id, een versie en een eigenaar
-(`kern/fluister/reis/reisconcept.js`). Het concept staat in Rahuls eigen geheugen
+**Geen tweede conceptmodel.** Het concept is de reiswens uit de reislaag van
+Rahul, nu met gestructureerde waarden. Daar komen
+precies drie dingen bij: een id, een versie en een eigenaar (het reisconcept,
+PR #597). Het concept staat in Rahuls eigen geheugen
 van het lid (`van(key)`), dus "vergeet alles" neemt het mee en er komt geen
 collectie bij.
 
@@ -1136,7 +1136,7 @@ veld wordt geweigerd met zijn naam. Dezelfde waarden opnieuw geven geen nieuwe
 versie. Andere waarden op een oude versie geven 409, met de stand van nu.
 
 **Rahul krijgt de waarden via het bestaande contract.** Het concept meldt zich
-als contextdomein `reiswens`. De kaart op het scherm (`shared/edge/conceptwerk.js`)
+als contextdomein `reiswens`. De kaart op het scherm (het conceptwerk van de Edge)
 publiceert alleen haar verwijzing in `RTGAdaptief.context`. Bij de volgende vraag
 zoekt de server de waarden van NU op, en alleen voor de eigenaar.
 

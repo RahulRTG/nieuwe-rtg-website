@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-10-12T05:20:35.672Z",
-  "commit": "65e9ada5a",
+  "op": "2026-10-12T06:00:57.413Z",
+  "commit": "746ea41e8",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -10,19 +10,19 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 5324,
-  "geclassificeerd": 5299,
+  "totaal": 5326,
+  "geclassificeerd": 5301,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3164,
    "NOT_APPLICABLE": 1278,
    "LEGACY_PENDING_CLASSIFICATION": 25,
    "PROTECTED": 670,
-   "INTENTIONALLY_NON_IDEMPOTENT": 187
+   "INTENTIONALLY_NON_IDEMPOTENT": 189
   },
-  "vastgesteldDoorMens": 2187,
+  "vastgesteldDoorMens": 2189,
   "afgeleidDoorScript": 3112,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4383,
+   "AUTHENTICATED": 4385,
    "PUBLIC": 138,
    "OBJECT_SCOPED": 773,
    "(niet af te leiden -- vraagt een verklaring)": 14,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 138,
    "kale ronde: onbeschermd": 128,
    "kale ronde: geen uitspraak": 4881,
-   "niet gemeten": 177
+   "niet gemeten": 179
   },
   "voorstellen": {
    "NOT_APPLICABLE": 1
@@ -71214,6 +71214,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "office.rtmail.leiding.hold",
+   "route": "POST /api/office/rtmail/leiding/hold",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "office.rtmail.leiding.toets",
    "route": "POST /api/office/rtmail/leiding/toets",
    "semantiek": {
@@ -125991,6 +126012,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.rtmail.leiding.hold",
+   "route": "POST /api/supplier/rtmail/leiding/hold",
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

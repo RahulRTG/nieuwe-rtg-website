@@ -733,6 +733,21 @@ async function elevateTier(base, memberToken, pas, approverToken) {
    doet. Alles wat de APP zegt hoort door te komen. */
 const BROWSERRUIS = ['Transition was skipped',
   'Transition was aborted because of invalid state. ViewTransition opt-in disabled'];
+/* WEBKIT MELDT EEN VERZOEK DAT AFBREEKT OMDAT ZIJN DOCUMENT WORDT VERLATEN --
+   een pagina die dichtgaat of weg-navigeert -- als onafgevangen fout, met de
+   misleidende tekst "<adres> due to access control checks.". Voor een adres op
+   de EIGEN pagina-origin bestaat geen toegangscontrole die kan falen, dus dit
+   is altijd die afbreking; Chromium meldt hem niet. Alleen in WebKit-stand,
+   alleen voor de eigen origin en alleen in precies die vorm telt hij niet als
+   fout; hij wordt wel geteld (bak.afgebroken). Elke andere melding, ook
+   "Load failed" (een echte netwerkfout), blijft een fout.
+   test/mobile-content.e2e.js houdt een strengere zeef voor zijn eigen venster. */
+function afbrekingsTekst(bericht, host) {
+  return !!host && String(bericht).includes(host + '/') && / due to access control checks\.$/.test(String(bericht));
+}
+function webkitAfbreking(bericht, origin) {
+  return testMotor() === 'webkit' && !!origin && afbrekingsTekst(bericht, origin.replace(/^https?:\/\//, ''));
+}
 function letOpFouten(page, bak) {
   /* De eigen browserdriver (server/lib/browser.js) heeft geen .on. Vroeger stond
      bij elke aanroeper `if (page.on)` ervoor; nu staat die vraag hier, op een
@@ -741,6 +756,9 @@ function letOpFouten(page, bak) {
   if (!page || typeof page.on !== 'function') return bak;
   page.on('pageerror', (e) => {
     const bericht = String((e && e.message) || e);
+    let origin = '';
+    try { origin = new URL(page.url()).origin; } catch (_) { /* nog geen adres */ }
+    if (webkitAfbreking(bericht, origin)) { bak.afgebroken = (bak.afgebroken || 0) + 1; return; }
     if (!BROWSERRUIS.includes(bericht)) bak.push(bericht);
   });
   return bak;
@@ -901,6 +919,14 @@ async function wachtOpVerandering(page, selector, oud, opties) {
    want hij hangt een teller om window.fetch. */
 async function volgVerzoeken(page) {
   await page.addInitScript(() => {
+    /* EEN KEER PER DOCUMENT, en geteld per aanroep. In WebKit liep de kale
+       teller onder nul (-7 tot -11 in de WebKit-job): draait dit script twee
+       keer in een document, dan zette de tweede keer hem op 0 terwijl de
+       finally's van de eerste nog aftrokken -- en een negatieve teller is
+       "bezig" voor altijd. Nu wikkelt hij fetch maar een keer, en elke aanroep
+       haalt alleen zijn eigen merk weg. */
+    if (window.__rtgVolgt) return;
+    window.__rtgVolgt = true;
     window.__rtgBezig = 0;
     /* De ADRESSEN erbij, en niet alleen de teller. Blijft een wacht hangen op
        "er loopt nog een verzoek", dan is de teller alleen een getal en moet je
@@ -910,12 +936,13 @@ async function volgVerzoeken(page) {
     const echt = window.fetch;
     window.fetch = function (...args) {
       const waar = String((args[0] && args[0].url) || args[0] || '');
-      window.__rtgBezig++;
-      window.__rtgInVlucht.push(waar);
+      const merk = { waar };
+      window.__rtgInVlucht.push(merk);
+      window.__rtgBezig = window.__rtgInVlucht.length;
       return echt.apply(this, args).finally(() => {
-        window.__rtgBezig--;
-        const i = window.__rtgInVlucht.indexOf(waar);
+        const i = window.__rtgInVlucht.indexOf(merk);
         if (i >= 0) window.__rtgInVlucht.splice(i, 1);
+        window.__rtgBezig = window.__rtgInVlucht.length;
       });
     };
   });
@@ -927,7 +954,7 @@ async function watHieldHemBezig(page) {
   try {
     return await page.evaluate(() => 'op ' + location.pathname + ' liepen er ' + (window.__rtgBezig || 0) +
       ' verzoeken' + (window.__rtgInVlucht && window.__rtgInVlucht.length
-        ? ' (' + window.__rtgInVlucht.slice(0, 4).join(', ') + ')' : '') + '.');
+        ? ' (' + window.__rtgInVlucht.slice(0, 4).map(m => m.waar || m).join(', ') + ')' : '') + '.');
   } catch (e) { return 'de stand was niet meer te lezen (' + (e && e.message) + ').'; }
 }
 
@@ -1752,7 +1779,7 @@ async function bankDeur(page, naam, opties) {
   await deur.click();
 }
 
-module.exports = { startBrowser, testMotor, edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+module.exports = { startBrowser, testMotor, webkitAfbreking, afbrekingsTekst, edgeActies, edgeBediening, edgeCatalogus, edgeWerkbladen, bankDeur, pasAppAdres, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, kantoorKoppelBody, zaakMensOpNaam, keurLidGoed, laadPlaywright, laadScherm, metGedeeldeBrowser, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stroomAdres, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort, vrijePoortReeks, efemeerBereik,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

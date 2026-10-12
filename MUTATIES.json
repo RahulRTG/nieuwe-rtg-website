@@ -1553,6 +1553,14 @@
       "gezakt": 12,
       "geprobeerd": 1
     },
+    "beleidsmotor-uitvoerbak.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kantoor/mensdeur-spoel.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "beleidsmotor-werkwoorden.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -13176,6 +13184,20 @@
         "testSha256": "78ca1c807175600cd60b19dc35e5f02ded5b8ecc631869f32b79723025443014"
       }
     },
+    "registratie-dicht-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "registratie-dicht.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "reis-lezen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -14443,6 +14465,42 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "rtmail-leiding-bestuur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "rtmail-leiding-pg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/rtmail-leiding.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "rtmail-leidinghold.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "rtmail-leidingplek.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "rtmail-leidingtermijn.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
       "scherp": "gezakt"
     },
     "rtmail-lid.test.js": {

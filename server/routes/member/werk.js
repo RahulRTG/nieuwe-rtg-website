@@ -104,7 +104,15 @@ module.exports = (kern) => {
     save();
     notifySupplier(s.code, { icon: 'werk', title: 'Sollicitatie via RTG', body: cv.name + ' (RTG-lid) solliciteert als ' + func + ', met cv.', beperkt: 'werving' });
     // personeel-draaiboek: een seintje in het RTMAIL-postvak van de zaak (op codenaam)
-    try { if (automatisering) automatisering.sollicitatieBinnen({ zaakCode: s.code, functie: func, codename }); } catch (e) {}
+    /* Weigert de leidingsplek de kopie (vol, kern/rtmail-leiding.js), dan niet stil:
+       een logregel en een melding voor de leiding. De sollicitatie zelf staat er al. */
+    let kopie = null;
+    try { if (automatisering) kopie = automatisering.sollicitatieBinnen({ zaakCode: s.code, functie: func, codename }); }
+    catch (e) { kopie = { error: String((e && e.message) || e) }; }
+    if (kopie && kopie.error) {
+      require('../../log').log.warn('rtmail-kopie van een sollicitatie geweigerd', { zaak: s.code, reden: kopie.error });
+      notifySupplier(s.code, { icon: 'werk', title: 'RTMail-kopie niet bezorgd', body: kopie.error + ' De sollicitatie staat wel in de lijst.', beperkt: 'werving' });
+    }
     sseToSupplier(s.code, 'sync', { scope: 'team' }, { staffId: null }); // werving: alleen de managers
     sseToOffice('sync', { scope: 'team' });
     res.json({ ok: true });

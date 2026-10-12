@@ -24,6 +24,10 @@ open('POST /api/supplier/rtmail/leiding/verleng', 'supplier.rtmail.leiding.verle
   'test/rtmail-leidingtermijn.test.js toets 1: dezelfde verlenging twee keer laat twee spoorregels na; ' +
   'een collega en een manager van een andere zaak krijgen 403 met de reden');
 open('POST /api/office/rtmail/leiding/toets', 'office.rtmail.leiding.toets', { klasse: 'AUTHENTICATED' },
-  'test/rtmail-leidingtermijn.test.js toets 3: de gedeelde kantoorcode zet hem niet, de eigenaar wel en op naam');
+  'test/rtmail-leidingtermijn.test.js toets 3: de gedeelde kantoorcode zet hem niet, zonder passkey 403, een veranderde set 409, de eigenaar wel en op naam');
+open('POST /api/supplier/rtmail/leiding/hold', 'supplier.rtmail.leiding.hold', { klasse: 'AUTHENTICATED' },
+  'test/rtmail-leidinghold.test.js: een collega 403, twee aanvragen zijn twee holds');
+open('POST /api/office/rtmail/leiding/hold', 'office.rtmail.leiding.hold', { klasse: 'AUTHENTICATED' },
+  'test/rtmail-leidinghold.test.js: zonder passkey 403, met een verse passkey een besluit op naam; de aanvrager zelf wordt geweigerd');
 
 module.exports = { CONTRACTEN };

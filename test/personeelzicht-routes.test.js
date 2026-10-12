@@ -25,6 +25,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path'); const vm = require('vm');
 const { startServer } = require('./helper');
+const { maakLuister } = require('./stroombaken');
 const pz = require('../server/kern/leverancier/personeelzicht');
 
 let H, V, kinderen = [], tmps = [];
@@ -42,17 +43,8 @@ async function nieuw(name) {
   return { id: n.staff.id, name: n.staff.name, tok };
 }
 const state = async (tok) => (await h('/api/supplier/state', {}, tok)).body.state;
-async function luister(tok, doe) {
-  const ac = new AbortController();
-  const r = await fetch(H + '/api/supplier/stream?token=' + tok, { signal: ac.signal });
-  const lezer = r.body.getReader(); let tekst = '';
-  const lees = (async () => { try { for (;;) { const { value, done } = await lezer.read(); if (done) break; tekst += Buffer.from(value).toString(); } } catch (e) {} })();
-  await new Promise(z => setTimeout(z, 300));
-  await doe();
-  await new Promise(z => setTimeout(z, 1200));
-  ac.abort(); await lees;
-  return tekst;
-}
+// wacht op bakens en niet op de klok (test/stroombaken.js)
+const luister = (tok, doe) => maakLuister(H, () => tokM)(tok, doe);
 const vandaag = () => new Date().toISOString().slice(0, 10);
 
 test.before(async () => {

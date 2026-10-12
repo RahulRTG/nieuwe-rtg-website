@@ -25,6 +25,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { startServer } = require('./helper');
+const { maakLuister } = require('./stroombaken');
 const zicht = require('../server/kern/leverancier/logboekzicht');
 
 const kinderen = [];
@@ -347,17 +348,8 @@ test('g. besluit 2A: "X logde in" alleen voor de manager en de medewerker zelf, 
   assert.deepEqual(brams.filter(t => tekst.includes(t)), [], 'het inlogtijdstip van Bram lekt via een ander veld');
 
   // realtime: een inlog stuurt Ayla geen team-signaal; een gewone regel wel (besturingsproef)
-  const luister = async (doe, tok = tokA) => {
-    const ac = new AbortController();
-    const r = await fetch(H + '/api/supplier/stream?token=' + tok, { signal: ac.signal });
-    const lezer = r.body.getReader(); let tekst = '';
-    const lees = (async () => { try { for (;;) { const { value, done } = await lezer.read(); if (done) break; tekst += Buffer.from(value).toString(); } } catch (e) {} })();
-    await new Promise(z => setTimeout(z, 300));
-    await doe();
-    await new Promise(z => setTimeout(z, 1200));
-    ac.abort(); await lees;
-    return tekst;
-  };
+  // bakens in plaats van de klok (test/stroombaken.js)
+  const luister = (doe, tok = tokA) => maakLuister(H, () => tokM)(tok, doe);
   const naInlog = await luister(async () => {
     const r = await api(H, '/api/supplier/login', { code: 'KIKUNOI', staffId: idB, pin: pinB });
     assert.equal(r.status, 200, 'Bram logt opnieuw in');

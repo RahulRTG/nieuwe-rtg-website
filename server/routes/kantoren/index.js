@@ -115,6 +115,7 @@ module.exports = (kern) => {
   require('./regie')(ctx);
   require('./salon')(ctx);
   require('./bank')(ctx);
+  require('./rtmail-leiding')(ctx);   // de toets en de holds van sollicitatiepost (584A)
   require('./stad')(ctx);
   require('./weefsel')(ctx);
   require('./weefsel2')(ctx);

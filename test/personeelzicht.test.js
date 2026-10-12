@@ -14,6 +14,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { startServer } = require('./helper');
+const { maakLuister } = require('./stroombaken');
 
 let H, child, TMP, tokM, zora, abel;
 const api = (pad, body, token) => fetch(H + pad, {
@@ -32,17 +33,8 @@ const state = async (tok) => {
   return r.body.state;
 };
 // een open stroom zolang `doe` loopt; geeft alles terug wat er binnenkwam
-async function luister(tok, doe) {
-  const ac = new AbortController();
-  const r = await fetch(H + '/api/supplier/stream?token=' + tok, { signal: ac.signal });
-  const lezer = r.body.getReader(); let tekst = '';
-  const lees = (async () => { try { for (;;) { const { value, done } = await lezer.read(); if (done) break; tekst += Buffer.from(value).toString(); } } catch (e) {} })();
-  await new Promise(z => setTimeout(z, 300));
-  await doe();
-  await new Promise(z => setTimeout(z, 1200));
-  ac.abort(); await lees;
-  return tekst;
-}
+// wacht op bakens en niet op de klok (test/stroombaken.js)
+const luister = (tok, doe) => maakLuister(H, () => tokM)(tok, doe);
 
 test.before(async () => {
   TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-perszicht-'));

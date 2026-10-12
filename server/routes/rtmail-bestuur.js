@@ -13,9 +13,8 @@
    hij logt, vergeet dat een keer. */
 const { magKlokZien } = require('../kern/leverancier/logboekzicht');
 const { zelfdeBus } = require('../kern/rtmail-adres');
-const { wie: envelopWie } = require('../opzet/envelop');
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, db, rtmail, rtmailRecht, rtmailBewaar, codenaamVan, boardroomAuth, zwaarbewijs } = kern;
+  const { app, auth, supplierAuth, db, rtmail, rtmailRecht, rtmailBewaar, codenaamVan } = kern;
   const wie = require('../kern/rtmail-wie')({ db, rtmail, codenaamVan });
   const body = (req) => (req && req.body) || {};
 
@@ -131,32 +130,33 @@ module.exports = (kern) => {
     });
   }
 
-  /* DE TERMIJN VAN DE LEIDINGSPLEK VERLENGEN (besluit 584A,
-     kern/rtmail-leidingtermijn.js). Alleen een manager van DEZE zaak; een
-     collega of een gedelegeerde van een andere zaak krijgt de reden. */
+  /* DE LEIDINGSPLEK VAN DEZE ZAAK (besluit 584A): verlengen per bericht
+     (kern/rtmail-leidingtermijn.js) en een juridische hold aanvragen
+     (kern/rtmail-leidinghold.js). Alleen een manager van DEZE zaak; een collega
+     of een gedelegeerde van een andere zaak krijgt de reden. Wie het doet komt
+     uit de inlog. De kantoorkant (toets, beoordeling) staat in
+     ./rtmail-leidingkantoor.js. */
+  const manager = (req, res, ik, b) => {
+    if (!ik) { res.status(404).json({ error: 'Geen postvak voor deze inlog.' }); return false; }
+    if (magKlokZien(req.actor) && !(b.postvak && !zelfdeBus(ik, String(b.postvak)))) return true;
+    res.status(403).json({ error: 'Alleen een manager van deze zaak kan de bewaartermijn van sollicitatiepost bepalen.' });
+    return false;
+  };
+  const ids = (b) => (Array.isArray(b.ids) ? b.ids : (b.id != null ? [b.id] : null));
+  const door = (req) => (req.actor && (req.actor.staffId || req.actor.lidKey)) || null;
+  const antwoord = (res, r) => (r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r));
+
   app.post('/api/supplier/rtmail/leiding/verleng', supplierAuth, (req, res) => {
-    const ik = wie.zaakAdres(req);
-    if (!ik) return res.status(404).json({ error: 'Geen postvak voor deze inlog.' });
-    const b = body(req);
-    if (!magKlokZien(req.actor) || (b.postvak && !zelfdeBus(ik, String(b.postvak))))
-      return res.status(403).json({ error: 'Alleen een manager van deze zaak kan de bewaartermijn van sollicitatiepost verlengen.' });
-    const door = (req.actor && (req.actor.staffId || req.actor.lidKey)) || null;
-    const r = rtmailBewaar.leiding.verleng({ adres: ik, id: b.id || null, dagen: b.dagen,
-      grondslag: String(b.grondslag || ''), noodzaak: b.noodzaak, door });
-    if (r.error) return res.status(r.status || 400).json({ error: r.error });
-    res.json(r);
+    const ik = wie.zaakAdres(req), b = body(req);
+    if (!manager(req, res, ik, b)) return;
+    antwoord(res, rtmailBewaar.leiding.verleng({ adres: ik, ids: ids(b), dagen: b.dagen,
+      grondslag: b.grondslag, noodzaak: b.noodzaak, door: door(req) }));
   });
 
-  /* DE JURIDISCHE TOETS (de migratie van 584A): staat dicht tot de EIGENAAR hem
-     op naam zet, met een verse passkey, zoals de terugstortstand. Zolang hij
-     dicht staat, verwijdert de ronde geen post van voor de termijnregel. */
-  app.post('/api/office/rtmail/leiding/toets', boardroomAuth, async (req, res) => {
-    if (!req.boardroomBaas) return res.status(403).json({ error: 'De juridische toets zet alleen de eigenaar, op naam.' });
-    const bewijs = await zwaarbewijs.eis(zwaarbewijs.boardroomUser(req), 'eigenaar-leidingtoets',
-      zwaarbewijs.sessieSleutel(req), req, 'Het zetten van de juridische toets op sollicitatiepost');
-    if (bewijs.error) return zwaarbewijs.stuur(res, bewijs);
-    const r = rtmailBewaar.leiding.toets({ getoetst: body(req).getoetst === true, door: envelopWie(req), notitie: body(req).notitie });
-    if (r.error) return res.status(r.status || 400).json({ error: r.error });
-    res.json(r);
+  app.post('/api/supplier/rtmail/leiding/hold', supplierAuth, (req, res) => {
+    const ik = wie.zaakAdres(req), b = body(req);
+    if (!manager(req, res, ik, b)) return;
+    antwoord(res, rtmailBewaar.leiding.hold.aanvraag({ adres: ik, ids: ids(b), grondslag: b.grondslag, doel: b.doel,
+      herbeoordeling: b.herbeoordeling, door: door(req), sleutel: (req.actor && req.actor.lidKey) || null }));
   });
 };

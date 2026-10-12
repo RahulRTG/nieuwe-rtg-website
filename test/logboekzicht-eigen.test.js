@@ -26,6 +26,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 const { startServer } = require('./helper');
+const { maakLuister } = require('./stroombaken');
 const zicht = require('../server/kern/leverancier/logboekzicht');
 
 let H, child, TMP;
@@ -164,17 +165,7 @@ test('4. het CDT-bord: begin en eind van een dienst alleen voor de manager en de
 });
 
 test('5. het klok-signaal van een klokcorrectie gaat alleen naar de managers en wie het betreft', async () => {
-  const luister = async (tok, doe) => {
-    const ac = new AbortController();
-    const r = await fetch(H + '/api/supplier/stream?token=' + tok, { signal: ac.signal });
-    const lezer = r.body.getReader(); let tekst = '';
-    const lees = (async () => { try { for (;;) { const { value, done } = await lezer.read(); if (done) break; tekst += Buffer.from(value).toString(); } } catch (e) {} })();
-    await new Promise(z => setTimeout(z, 300));
-    await doe();
-    await new Promise(z => setTimeout(z, 1200));
-    ac.abort(); await lees;
-    return tekst;
-  };
+  const luister = maakLuister(H, () => tokM);   // bakens in plaats van de klok (test/stroombaken.js)
   const corrigeer = () => {
     const uit = new Date(Date.now() - 3600000), inn = new Date(uit.getTime() - 3600000);
     return api('/api/staff/klok/correctie', { staffId: kim2.id, in: inn.toISOString(), uit: uit.toISOString() }, tokM)

@@ -681,6 +681,7 @@
       "reisbetaling",
       "reisbureau",
       "reisuitnodiging",
+      "rtmailBewaar",
       "salonUitlichten",
       "stad",
       "studio",
@@ -1775,10 +1776,8 @@
       "leren"
     ],
     "rtmail-bestuur": [
-      "boardroomAuth",
       "rtmailBewaar",
-      "rtmailRecht",
-      "zwaarbewijs"
+      "rtmailRecht"
     ],
     "rtmail-lid": [
       "agenda",

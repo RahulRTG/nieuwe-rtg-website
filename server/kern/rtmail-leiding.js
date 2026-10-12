@@ -23,6 +23,7 @@
 'use strict';
 
 const { postBeperking } = require('./leverancier/beschermdesoorten');
+const { REGEL } = require('./rtmail-leidingtermijn');
 
 const SYSTEEM = 'rtg@rtmail';
 const isBeperkt = (m) => !!postBeperking(m, SYSTEEM);
@@ -63,16 +64,18 @@ module.exports = ({ ruw, heeft, save, crypto, klokDatum, normAdres, zelfdeBus, z
   function leg({ naar, onderwerp, tekst, soort, beperkt }) {
     const naarA = normAdres(naar);
     if (!naarA) return { error: 'Geen geldig ontvang-adres.' };
+    /* Vol is een weigering en geen stille kap: wat hier verdwijnt hoort een
+       vernietigingsbewijs te hebben (./rtmail-leidingtermijn.js), en dat schrijft de ronde. */
+    if (plek().length >= MAX) return { error: 'De leidingsplek is vol; er wordt niets stil weggegooid.' };
     const t = kap(tekst, 8000);
     const msg = { id: crypto.randomBytes(6).toString('hex'), van: SYSTEEM, naar: naarA,
       onderwerp: kap(onderwerp, 160) || '(geen onderwerp)', tekst: t, soort: kap(soort, 24) || 'bericht',
       bron: 'systeem', vertrouwd: true, links: scanLinks(t), bijlagen: [], at: klokDatum().toISOString(),
-      gelezen: false, beperkt };
+      gelezen: false, beperkt, regel: REGEL }; // regel: valt onder de termijn van 584A
     msg.draad = msg.id;
     zegel(msg);
     const l = plek();
     l.unshift(msg);
-    if (l.length > MAX) l.length = MAX;
     bewaar();
     return msg;
   }

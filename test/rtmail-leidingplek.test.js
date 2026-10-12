@@ -58,6 +58,7 @@ test.before(async () => {
   assert.ok(i >= 0, 'de post stond op de leidingsplek');
   const [m] = db.rtmail.leiding.splice(i, 1);
   delete m.beperkt;
+  delete m.regel;   // van voor de termijnregel (584A)
   m.at = new Date(Date.now() - 3 * 86400e3).toISOString();   // oud genoeg voor een termijn van een dag
   db.rtmail.berichten.unshift(m);
   delete db.rtmail.leidingVersie;
@@ -117,11 +118,13 @@ test('3. bewaartermijn, juridische bewaring en export gelden ook voor de leiding
   assert.equal((await api('/api/supplier/rtmail/bewaring', { aan: true, zaak: 'Z-1', reden: 'onderzoek' }, tokM)).status, 200);
   assert.notEqual((await api('/api/supplier/rtmail/opruimen', { reden: 'proef' }, tokM)).status, 200, 'onder een bewaring verdwijnt niets');
   assert.ok((await inbox()).includes(postId), 'de wervingspost staat er nog');
-  // zonder bewaring ruimt een termijn van een dag hem op
+  /* zonder bewaring ruimt de POSTVAKtermijn van een dag hem NIET op: de leidingsplek
+     volgt zijn eigen termijn (584A, test/rtmail-leidingtermijn.test.js), en een
+     kortere postvaktermijn wordt niet stil overgenomen */
   assert.equal((await api('/api/supplier/rtmail/bewaring', { aan: false, reden: 'onderzoek klaar' }, tokM)).status, 200);
   const op = await api('/api/supplier/rtmail/opruimen', { reden: 'proef' }, tokM);
   assert.equal(op.status, 200, JSON.stringify(op.body));
-  assert.ok(!(await inbox()).includes(postId), 'de termijn ruimt ook de leidingsplek op');
+  assert.ok((await inbox()).includes(postId), 'een postvaktermijn ruimde de leidingsplek op');
 });
 
 test('4. vangnet: beperkte post die NA de verhuizing in het gedeelde postvak komt, ziet een collega niet', () => {

@@ -152,6 +152,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-kantoorstuur').CONTRACTEN,
   require('./mutatiecontracten-rtgboek').CONTRACTEN,
   require('./mutatiecontracten-naargast').CONTRACTEN,
+  require('./mutatiecontracten-leidingtermijn').CONTRACTEN,
   /* De zevenenveertig die uit de afleidgang vielen toen die een grens erbij
      kreeg, met de hand gelezen op 13 september 2026 (zie de kop van de eerste). */
   require('./mutatiecontracten-afleidrest').CONTRACTEN,

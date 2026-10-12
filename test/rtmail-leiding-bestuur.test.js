@@ -5,11 +5,10 @@
       het postvak (exporteren) aan een andere zaak. Een MANAGER van die andere
       zaak is daarmee geen manager van KIKUNOI: zijn export bevat de
       wervingspost van KIKUNOI niet.
-   2. EEN COLLEGA VERNIETIGT DE LEIDINGSPLEK NIET. Een termijn die een collega
-      zet en een opruimronde die hij start, laten de wervingspost staan; alleen
-      een manager van de zaak ruimt hem op, op een termijn die een manager
-      zette. Het bewijs noemt de medewerker uit de INLOG, en een collega ziet
-      geen aantal wervingspost in het bewijs.
+   2. EEN POSTVAKTERMIJN RAAKT DE LEIDINGSPLEK NIET, van een collega niet en
+      van een manager niet: die volgt zijn eigen termijn (584A,
+      test/rtmail-leidingtermijn.test.js). Het bewijs van een opruimronde noemt
+      de medewerker uit de INLOG.
 
    Draai: node --test test/rtmail-leiding-bestuur.test.js */
 'use strict';
@@ -50,6 +49,9 @@ test.before(async () => {
   const pad = path.join(TMP, 'db.json');
   const db = JSON.parse(fs.readFileSync(pad, 'utf8'));
   db.rtmail.leiding.find(m => m.id === postId).at = new Date(Date.now() - 3 * 86400e3).toISOString();
+  // en een gewoon oud bericht in het gedeelde postvak, voor het bewijs van een opruimronde
+  db.rtmail.berichten.unshift({ id: 'oudgewoon', van: 'klant@rtmail', naar: 'kikunoi@partner.rtg', soort: 'bericht',
+    onderwerp: 'oud', tekst: 'x', at: new Date(Date.now() - 3 * 86400e3).toISOString(), draad: 'oudgewoon' });
   fs.writeFileSync(pad, JSON.stringify(db));
   srv = await startServer({ env: env() });
 });
@@ -67,34 +69,26 @@ test('1. een manager van een ANDERE zaak krijgt via een delegatie de wervingspos
   const ex = await api('/api/supplier/rtmail/export', { postvak: 'kikunoi@partner.rtg', reden: 'proef', metInhoud: true }, luz.m.tok);
   assert.equal(ex.status, 200, JSON.stringify(ex.body));
   assert.ok(!heeft(ex), 'de export van een manager van LUZ bevat de wervingspost van KIKUNOI');
-  // en zijn termijn plus opruimen raakt hem ook niet
-  assert.equal((await api('/api/supplier/rtmail/bewaartermijn', { postvak: 'kikunoi@partner.rtg', dagen: 1, reden: 'proef' }, luz.m.tok)).status, 200);
-  assert.equal((await api('/api/supplier/rtmail/opruimen', { postvak: 'kikunoi@partner.rtg', reden: 'proef' }, luz.m.tok)).status, 200);
-  assert.ok(heeft(await api('/api/supplier/rtmail/inbox', {}, k.m.tok)), 'een manager van LUZ ruimde de leidingsplek van KIKUNOI op');
+  // en het bewaarbeleid toont hem de leidingsplek niet
+  assert.equal((await api('/api/supplier/rtmail/bewaarbeleid', { postvak: 'kikunoi@partner.rtg' }, luz.m.tok)).body.leiding, undefined);
   // tegenproef: de manager van KIKUNOI zelf krijgt hem wel mee
   assert.ok(heeft(await api('/api/supplier/rtmail/export', { reden: 'proef', metInhoud: true }, k.m.tok)), 'de eigen manager mist hem');
 });
 
-test('2. een collega vernietigt de leidingsplek niet; het bewijs noemt de inlog', async () => {
+test('2. een postvaktermijn raakt de leidingsplek nooit; het bewijs noemt de inlog', async () => {
   const k = await zaak('KIKUNOI');
   const inbox = async () => heeft(await api('/api/supplier/rtmail/inbox', {}, k.m.tok));
+  // een collega zet een termijn van een dag en ruimt op: de wervingspost blijft
   assert.equal((await api('/api/supplier/rtmail/bewaartermijn', { dagen: 1, reden: 'proef' }, k.w.tok)).status, 200);
-  assert.equal((await api('/api/supplier/rtmail/opruimen', { reden: 'proef' }, k.w.tok)).status, 200);
+  const op = await api('/api/supplier/rtmail/opruimen', { reden: 'proef' }, k.w.tok);
+  assert.equal(op.status, 200, JSON.stringify(op.body));
   assert.ok(await inbox(), 'een collega ruimde de wervingspost op');
-  // de manager ruimt op, maar op de termijn van de COLLEGA: ook dan blijft hij staan
-  assert.equal((await api('/api/supplier/rtmail/opruimen', { reden: 'proef' }, k.m.tok)).status, 200);
-  assert.ok(await inbox(), 'een termijn die een collega zette ruimde de leidingsplek op');
-  // een termijn van een manager, maar een opruimronde van een collega: hij blijft staan
+  // het bewijs van zijn opruimronde noemt hem uit de inlog
+  const r = (await api('/api/supplier/rtmail/vernietigingen', {}, k.w.tok)).body.bewijs.find(v => v.aantal > 0);
+  assert.ok(r, 'het oude gewone bericht is opgeruimd en staat in het bewijs');
+  assert.equal(r.sessie, k.w.id, 'het bewijs noemt de medewerker uit de inlog');
+  // ook een manager neemt met een postvaktermijn geen kortere termijn voor de leidingsplek over (584A)
   assert.equal((await api('/api/supplier/rtmail/bewaartermijn', { dagen: 1, reden: 'proef' }, k.m.tok)).status, 200);
-  assert.equal((await api('/api/supplier/rtmail/opruimen', { reden: 'proef' }, k.w.tok)).status, 200);
-  assert.ok(await inbox(), 'een opruimronde van een collega ruimde de leidingsplek op');
-  // pas een termijn van een manager EN een opruimronde van een manager
   assert.equal((await api('/api/supplier/rtmail/opruimen', { reden: 'proef' }, k.m.tok)).status, 200);
-  assert.ok(!(await inbox()), 'de manager kan de leidingsplek wel opruimen');
-  const bewijsM = (await api('/api/supplier/rtmail/vernietigingen', {}, k.m.tok)).body.bewijs;
-  const lijn = bewijsM.find(v => v.plek === 'leiding');
-  assert.ok(lijn, 'de vernietiging van de leidingsplek staat in het bewijs');
-  assert.equal(lijn.sessie, k.m.id, 'het bewijs noemt de medewerker uit de inlog');
-  const bewijsW = (await api('/api/supplier/rtmail/vernietigingen', {}, k.w.tok)).body.bewijs;
-  assert.ok(Array.isArray(bewijsW) && !bewijsW.some(v => v.plek === 'leiding'), 'een collega ziet het aantal wervingspost');
+  assert.ok(await inbox(), 'een postvaktermijn ruimde de leidingsplek op');
 });

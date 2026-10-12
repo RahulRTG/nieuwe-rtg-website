@@ -30,7 +30,7 @@ const DAG = 86400000;
    register liegen zodra hier iets verandert (LAT-regel 4). */
 const STANDAARD = { locatieDagen: 7, idDagen: 365 };
 
-function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, log, nu, instel, accountWerk, radarVeeg, sosVeeg }) {
+function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, log, nu, instel, accountWerk, radarVeeg, sosVeeg, leidingVeeg }) {
   const I = Object.assign({}, STANDAARD, instel || {});
   /* ACCOUNTMUTATIES LOPEN HIER BUITEN EEN HTTP-VERZOEK, en in productie mocht
      dat niet: de identiteitscache commit alleen als deelnemer aan een
@@ -96,6 +96,19 @@ function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, 
       }
     }
 
+    /* 1d. SOLLICITATIEPOST OP DE LEIDINGSPLEK VAN RTMAIL (besluit 584A). De regel,
+       het bewijs en de juridische toets blijven van het domein
+       (kern/rtmail-leidingtermijn.js); de veger roept alleen aan, en een fout
+       wordt gemeld en niet opgegeten. */
+    let leidingpost = null;
+    if (typeof leidingVeeg === 'function') {
+      try { leidingpost = leidingVeeg(t); }
+      catch (e) { leidingpost = { fout: String((e && e.message) || e) }; }
+      if (leidingpost && (leidingpost.verwijderd || leidingpost.wachtOpToets || leidingpost.fout) && log && log.schrijf) {
+        try { log.schrijf(leidingpost.fout ? 'warn' : 'info', 'bewaarveger-leidingpost', leidingpost); } catch (x) { /* de logger zelf faalt */ }
+      }
+    }
+
     // 2. identiteitsbewijzen: een jaar na goedkeuring weg, afgewezen als vangnet
     for (const u of accounts.listByVerification('verified')) {
       const md = accounts.getMemberState(u.id) || {};
@@ -144,7 +157,7 @@ function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, 
         try { log.schrijf('info', 'bewaarveger', { posities, dossiers, sosPosities }); } catch (e) {}
       }
     }
-    return { posities, dossiers, klokGestart, sosPosities };
+    return Object.assign({ posities, dossiers, klokGestart, sosPosities }, leidingpost ? { leidingpost } : {});
   }
 
   function start() {

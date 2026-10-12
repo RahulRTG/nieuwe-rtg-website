@@ -1775,8 +1775,10 @@
       "leren"
     ],
     "rtmail-bestuur": [
+      "boardroomAuth",
       "rtmailBewaar",
-      "rtmailRecht"
+      "rtmailRecht",
+      "zwaarbewijs"
     ],
     "rtmail-lid": [
       "agenda",

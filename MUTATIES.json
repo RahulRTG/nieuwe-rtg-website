@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-10-12T21:01:35.808Z",
-    "commit": "b3e5a0a4c",
+    "op": "2026-10-12T22:48:23.572Z",
+    "commit": "a715f01d8",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6804,6 +6804,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "idem-sleutelnaam.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "idem-takken.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6865,6 +6873,14 @@
       "module": "scripts/lib/idemproef.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "idemring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idemring.js",
+      "operator": "voorwaarde-omkeren#0",
+      "gezakt": 4,
       "geprobeerd": 1
     },
     "idemschuld.test.js": {

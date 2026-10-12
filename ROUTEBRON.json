@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De tweede, onafhankelijke bron onder de brug route -> bestand: gevraagd aan de ROUTER (wat de server werkelijk aanbiedt) in plaats van gelezen uit de bronboom. Bestaat om SCHRIJFANALYSE.json toetsbaar te maken; zonder tweede bron betekent \"geen tegenspraak\" niets.",
  "stempel": {
-  "op": "2026-10-12T20:58:33.319Z",
-  "commit": "8bd2ffc0a",
+  "op": "2026-10-12T22:45:51.762Z",
+  "commit": "b5a55ec8e",
   "invoer": {
    "meting": "invoerspoor",
    "versie": 1,
@@ -3191,6 +3191,7 @@
     "server/lib/idem-poort.js",
     "server/lib/idem-sleutelbepaling.js",
     "server/lib/idem.js",
+    "server/lib/idemring.js",
     "server/lib/idemsleutels-aankomst.js",
     "server/lib/idemsleutels-afleidrest.js",
     "server/lib/idemsleutels-basis.js",
@@ -4500,6 +4501,7 @@
     "server/betaal/connect",
     "server/betaal/uitbetaalgate.json",
     "server/config",
+    "server/data",
     "server/db",
     "server/db/tx",
     "server/foundation",

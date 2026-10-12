@@ -3,7 +3,7 @@
   "op": "2026-10-12T06:58:59.136Z",
   "commit": "c43386241",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 4,
   "instrument": "scripts/handlerwacht.js",
   "node": "v26.10.0"
  },

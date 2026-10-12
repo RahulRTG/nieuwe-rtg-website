@@ -1,12 +1,18 @@
 /* Centraal policy- en permissionbesluit. Modules vragen gezag; zij maken het
-   niet zelf. Tenantbeleid kan hier later dezelfde beslisvorm invoegen. */
+   niet zelf. Tenantbeleid kan hier later dezelfde beslisvorm invoegen.
+
+   ZONDER ANTWOORDFUNCTIE IS HET NEE. Hier stond `typeof o.permission !==
+   'function'` als JA, en het Second Screen gaf er geen mee: elke module met een
+   permissie werd dus getoond zonder dat iemand die vraag had beantwoord. Wie
+   een permissie eist en geen antwoord kan krijgen, krijgt hem niet; het antwoord
+   komt van de server (/api/ik/workspace/rechten, via workspace-runtime.js). */
 (function (w) {
   'use strict';
   w.RTGWorkspacePolicy = function (opties) {
     var o = opties || {}, actor = o.actor || { id: 'current-user', type: 'member' };
     function toestemming(permission, moduleId) {
       if (!permission) return true;
-      try { return typeof o.permission !== 'function' || o.permission(permission, moduleId, actor) === true; }
+      try { return typeof o.permission === 'function' && o.permission(permission, moduleId, actor) === true; }
       catch (e) { return false; }
     }
     function besluit(vraag) {

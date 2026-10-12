@@ -18,6 +18,7 @@
         return o.open(url, title);
       },
       confirm: function (vraag) { return w.confirm(String(typeof vraag === 'function' ? vraag() : vraag)); },
+      onRechten: function () { if (composer) composer.draw(state, editing); },
       onOrchestrate: function (layout, changes, event) {
         var kritiek = event && event.event === 'safety.incident.started' && event.payload && event.payload.severity === 'critical';
         if (!kritiek) return;

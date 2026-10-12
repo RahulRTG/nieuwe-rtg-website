@@ -33430,6 +33430,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "ik.workspace.rechten",
+   "route": "POST /api/ik/workspace/rechten",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "ik.workspace.zet",
    "route": "POST /api/ik/workspace/zet",
    "semantiek": {

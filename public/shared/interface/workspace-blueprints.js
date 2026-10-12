@@ -19,7 +19,8 @@
         if (state !== 'hidden' && (!manifest.surfaces[state] || manifest.states.indexOf(state) < 0)) {
           fouten.push('regel ' + i + ': surface niet ondersteund'); return;
         }
-        if (manifest.permissions.some(function (p) { return typeof o.permission === 'function' && o.permission(p, mid) !== true; })) {
+        // zonder antwoordfunctie is een vereiste permissie niet verleend (zelfde regel als workspace-policy.js)
+        if (manifest.permissions.some(function (p) { return typeof o.permission !== 'function' || o.permission(p, mid) !== true; })) {
           fouten.push('regel ' + i + ': niet bevoegd voor ' + mid); return;
         }
         if (typeof o.moduleAllowed === 'function' && o.moduleAllowed(mid) !== true) {

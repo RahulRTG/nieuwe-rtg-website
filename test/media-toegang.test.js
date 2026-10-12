@@ -405,7 +405,8 @@ test('N1: het live-seintje van een DM draagt geen post, ook niet voor een gratis
   assert.equal(p.status, 200, p.body.error);
   const auteur = p.body.post.author;
   const sC = stroom(C), sG = stroom(G);
-  await new Promise(r => setTimeout(r, 500));
+  // de stroom staat open zodra de server zijn begroeting stuurde; daarop wachten en niet op de klok
+  await wachtOpTekst(sC, 'hello'); await wachtOpTekst(sG, 'hello');
   for (const [k, wie] of [[kC, 'C'], [kG, 'G']]) {
     const r = await api('/api/member/dm/send', { toKey: k, text: 'kijk ' + wie, postId: p.body.post.id }, B);
     assert.equal(r.status, 200, wie + ': ' + r.body.error);

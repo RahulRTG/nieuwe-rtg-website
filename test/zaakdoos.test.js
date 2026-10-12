@@ -289,7 +289,10 @@ test('de randcache: een foto die over de lijn kwam, blijft op de doos', async ()
   assert.equal(via.status, 200, 'online komt de privélink gewoon door het doorgeefluik');
   assert.equal(via.headers.get('cache-control'), 'private, no-store');
   await via.arrayBuffer();
-  await new Promise(r => setTimeout(r, 200));   // de kas schrijft na het antwoord
+  /* De kas schrijft synchroon direct na res.end() van het doorgeefluik. Een
+     volgend verzoek aan dezelfde doos is dus een baken: als dat beantwoord is,
+     is het werk van het vorige verzoek gedaan -- geen wachten op de klok. */
+  await (await fetch(doos.base + '/api/doos/status')).arrayBuffer();
   assert.deepEqual(lijst(), voor, 'de privélink staat niet in de randcache');
 
   /* Een randcache-item van VOOR deze regel (zonder merkteken) kan privébeeld

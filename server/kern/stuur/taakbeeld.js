@@ -26,6 +26,8 @@
    Er komt geen standmachine bij: een stap verandert hier niet van stand, het
    beeld wordt per beurt opnieuw uit de bronnen afgeleid. */
 'use strict';
+/* De trede komt uit de schaal van het beleid en wordt niet overgetypt. */
+const { NIVEAUS } = require('./beleid');
 
 const MAX_TEKST = 200;
 
@@ -67,10 +69,10 @@ function uitkomsten(acties) {
 function planBeeld(plan, per, plafond) {
   if (!plan) return null;
   const stappen = (plan.stappen || []).map((s) => {
-    const boven = !s.bezwaar && s.niveau !== 'verboden' && plafond && typeof plafond.mag === 'function' && !plafond.mag(s.capability);
+    const boven = !s.bezwaar && s.niveau !== NIVEAUS.verboden && plafond && typeof plafond.mag === 'function' && !plafond.mag(s.capability);
     if (boven) s = Object.assign({}, s, { bezwaar: 'deze vraag mag alleen ' + (plafond.trede || 'tonen') + '; dit klaarzetten vraagt een ruimer plafond' });
-    const geblokkeerd = s.niveau === 'verboden' || !!s.bezwaar;
-    const soort = boven ? 'plafond' : s.niveau === 'verboden' ? 'beleid' : 'anders';
+    const geblokkeerd = s.niveau === NIVEAUS.verboden || !!s.bezwaar;
+    const soort = boven ? 'plafond' : s.niveau === NIVEAUS.verboden ? 'beleid' : 'anders';
     const na = per.get(s.capability) || null;
     return {
       id: tekst(s.id), capability: tekst(s.capability),

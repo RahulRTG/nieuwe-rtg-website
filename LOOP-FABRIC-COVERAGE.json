@@ -13,7 +13,7 @@
   "measured": {
     "capabilities": 228,
     "routes": 5449,
-    "mutationContracts": 5326,
+    "mutationContracts": 5329,
     "screens": 327
   },
   "classifications": [
@@ -27986,8 +27986,8 @@
       ],
       "behaviourEvidence": {
         "routeCount": 29,
-        "mutationRoutes": 33,
-        "declaredMutationSemantics": 16,
+        "mutationRoutes": 36,
+        "declaredMutationSemantics": 19,
         "sourceFileCount": 1,
         "kernelDependencyCount": 0,
         "screenCount": 4,
